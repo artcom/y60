@@ -25,6 +25,7 @@
 #include <string>
 #include <iostream>
 
+#include "begin_end.h"
 #include "Block.h"
 #include "string_functions.h"
 
@@ -86,7 +87,7 @@ public:
 		ENSURE(theBlock.wend() != theBlock.wbegin());
 		ENSURE(theBlock.wsize() == theBlock.size()/2);
 
-		Block anotherBlock(&(*theTestData.begin()),&(*theTestData.end()));
+		Block anotherBlock(asl::begin_ptr(theTestData),asl::end_ptr(theTestData));
 		ENSURE(anotherBlock != theBlock);
 		copy(anotherBlock,theBlock);
 		ENSURE(anotherBlock == theBlock);

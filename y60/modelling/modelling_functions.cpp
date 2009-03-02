@@ -104,7 +104,7 @@ namespace y60 {
     setAlpha(dom::Node * theNode, float theAlpha) {
         if (theNode->nodeName() == "body") {
             AC_DEBUG << "Fetching shape from body: " << *theNode;
-            theNode = &*theNode->getElementById(theNode->getAttributeString("shape"));
+            theNode = theNode->getElementById(theNode->getAttributeString("shape")).get();
         }
 
         dom::Node * myShapeNode;

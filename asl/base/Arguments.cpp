@@ -38,6 +38,7 @@
 //own header
 #include "Arguments.h"
 
+#include <asl/base/begin_end.h>
 #include "Path.h"
 #include "Logger.h"
 #include "Revision.h"
@@ -137,7 +138,7 @@ Arguments::parse(std::vector<string> myArgs, StringEncoding theEncoding, int err
     for (std::vector<string>::size_type i = 0; i < myArgs.size(); ++i) {
         myArgv.push_back(myArgs[i].c_str());
     }
-    return parse(myArgv.size(), &(*myArgv.begin()), theEncoding, errorHandlingPolicy);
+    return parse(myArgv.size(), begin_ptr(myArgv), theEncoding, errorHandlingPolicy);
 }
 
 bool

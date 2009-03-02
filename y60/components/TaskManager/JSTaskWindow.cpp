@@ -267,7 +267,7 @@ namespace jslib {
                 return JS_FALSE;
             }
 
-            JSTaskWindow * myNewObject = new JSTaskWindow(myNewNative, &*myNewNative);
+            JSTaskWindow * myNewObject = new JSTaskWindow(myNewNative, myNewNative.get());
 
             if (!myNewObject) {
                 JS_ReportError(cx, "JSTaskWindow::Constructor: bad parameters");
@@ -291,7 +291,7 @@ namespace jslib {
     }
 
     jsval as_jsval(JSContext *cx, JSTaskWindow::OWNERPTR theOwner) {
-        JSObject * myReturnObject = JSTaskWindow::Construct(cx, theOwner, &(*theOwner));
+        JSObject * myReturnObject = JSTaskWindow::Construct(cx, theOwner, theOwner.get());
         return OBJECT_TO_JSVAL(myReturnObject);
     }
 

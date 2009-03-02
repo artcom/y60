@@ -124,7 +124,7 @@ namespace {
     template<class T>
     struct JSValueConverter {
         static jsval jsvalByValue_global(JSContext *cx, dom::ValuePtr theValue) {
-            const T * myTPtr = dom::dynamic_cast_Value<T>(&(*theValue));
+            const T * myTPtr = dom::dynamic_cast_Value<T>(theValue.get());
             if (myTPtr) {
                 return as_jsval(cx, *myTPtr);
             }
@@ -136,7 +136,7 @@ namespace {
     template<class Enum>
     struct JSValueConverter< asl::Bitset<Enum> > {
         static jsval jsvalByValue_global(JSContext *cx, dom::ValuePtr theValue) {
-            const asl::Bitset<Enum> * myTPtr = dom::dynamic_cast_Value< asl::Bitset<Enum> >(&(*theValue));
+            const asl::Bitset<Enum> * myTPtr = dom::dynamic_cast_Value< asl::Bitset<Enum> >(theValue.get());
             if (myTPtr) {
                 return as_jsval<Enum>(cx, *myTPtr);
             }
@@ -198,7 +198,7 @@ namespace {
         }
 
         static jsval jsvalFromIDValue(JSContext *cx, dom::ValuePtr theValue) {
-            dom::IDValue * myIdValue = dynamic_cast<dom::IDValue *>(&*theValue);
+            dom::IDValue * myIdValue = dynamic_cast<dom::IDValue *>(theValue.get());
             if (myIdValue) {
                 //AC_TRACE << "conversion succeeded in TypeConverter::jsvalFromIDValue";
                 return as_jsval(cx, theValue->getString());
@@ -207,7 +207,7 @@ namespace {
             return JSVAL_VOID;
         }
         static jsval jsvalFromIDRefValue(JSContext *cx, dom::ValuePtr theValue) {
-            dom::IDRefValue * myIdValue = dynamic_cast<dom::IDRefValue *>(&*theValue);
+            dom::IDRefValue * myIdValue = dynamic_cast<dom::IDRefValue *>(theValue.get());
             if (myIdValue) {
                 //AC_TRACE << "conversion succeeded in TypeConverter::jsvalFromIDRefValue";
                 return as_jsval(cx, theValue->getString());
@@ -325,7 +325,7 @@ std::vector<TypeConverterMap::ValuePtrFromJSVal> TypeConverterMap::_myValuePtrFr
 
 #define JSVAL_FROM_VECTORVALUE(TYPE) \
     { \
-        TYPE * myTPtr = dynamic_cast< TYPE *>(&(*theValue)); \
+        TYPE * myTPtr = dynamic_cast< TYPE *>(theValue.get()); \
         if (myTPtr) { \
             return as_jsval(cx, theValue, myTPtr); \
         } \

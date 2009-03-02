@@ -361,7 +361,7 @@ JSTreeView::getPropertySwitch(NATIVE & theNative, unsigned long theID,
                 Gtk::TreeModel::iterator iter = refTreeSelection->get_selected();
                 if (iter) {
                     asl::Ptr<Gtk::TreeIter> myRow = asl::Ptr<Gtk::TreeIter>(new Gtk::TreeIter(iter));
-                    *vp = as_jsval(cx, myRow, &(*myRow));
+                    *vp = as_jsval(cx, myRow, myRow.get());
 
                 } else {
                     *vp = JSVAL_NULL;

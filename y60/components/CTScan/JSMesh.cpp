@@ -433,7 +433,7 @@ JSMesh::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval
             return JS_FALSE;
     }
 
-    JSMesh * myNewObject = new JSMesh(myNewNative, &(*myNewNative));
+    JSMesh * myNewObject = new JSMesh(myNewNative, myNewNative.get());
     JS_SetPrivate(cx, obj, myNewObject);
     return JS_TRUE;
 }
@@ -457,7 +457,7 @@ bool convertFrom(JSContext *cx, jsval theValue, JSMesh::OWNERPTR & theMesh) {
 }
 
 jsval as_jsval(JSContext *cx, JSMesh::OWNERPTR theOwner) {
-    JSObject * myReturnObject = JSMesh::Construct(cx, theOwner, &(*theOwner));
+    JSObject * myReturnObject = JSMesh::Construct(cx, theOwner, theOwner.get());
     return OBJECT_TO_JSVAL(myReturnObject);
 }
 

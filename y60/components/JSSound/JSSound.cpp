@@ -249,7 +249,7 @@ namespace jslib {
                 myNewNative = y60::SoundManager::get().createSound(myURI, myLoopFlag, myCacheFlag);
             }
 
-            JSSound * myNewObject = new JSSound(myNewNative, &(*myNewNative));
+            JSSound * myNewObject = new JSSound(myNewNative, myNewNative.get());
             if (myNewObject) {
                 JS_SetPrivate(cx, obj, myNewObject);
                 return JS_TRUE;
@@ -269,7 +269,7 @@ namespace jslib {
 
     jsval as_jsval(JSContext *cx, JSSound::OWNERPTR theOwner) {
         //AC_PRINT << "JSSound::as_jsval";
-        JSObject * myReturnObject = JSSound::Construct(cx, theOwner, &(*theOwner));
+        JSObject * myReturnObject = JSSound::Construct(cx, theOwner, theOwner.get());
         return OBJECT_TO_JSVAL(myReturnObject);
     }
 

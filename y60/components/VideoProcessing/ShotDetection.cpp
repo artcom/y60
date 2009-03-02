@@ -74,7 +74,7 @@ namespace y60 {
 
 void 
 ShotDetectionAlgorithm::onFrame(double theTime) {
-    const BGRRaster * myFrame = dom::dynamic_cast_Value<BGRRaster>(&*_mySourceRaster);
+    const BGRRaster * myFrame = dom::dynamic_cast_Value<BGRRaster>(_mySourceRaster.get());
     static int n = 0;
 
     //clear current histogram

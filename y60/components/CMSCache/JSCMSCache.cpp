@@ -269,7 +269,7 @@ JSCMSCache::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, j
             break;
     }
 
-    JSCMSCache * myNewObject = new JSCMSCache(myNewNative, &(*myNewNative));
+    JSCMSCache * myNewObject = new JSCMSCache(myNewNative, myNewNative.get());
     JS_SetPrivate(cx, obj, myNewObject);
     return JS_TRUE;
 }
@@ -293,7 +293,7 @@ bool convertFrom(JSContext *cx, jsval theValue, JSCMSCache::OWNERPTR & theCMSCac
 }
 
 jsval as_jsval(JSContext *cx, JSCMSCache::OWNERPTR theOwner) {
-    JSObject * myReturnObject = JSCMSCache::Construct(cx, theOwner, &(*theOwner));
+    JSObject * myReturnObject = JSCMSCache::Construct(cx, theOwner, theOwner.get());
     return OBJECT_TO_JSVAL(myReturnObject);
 }
 

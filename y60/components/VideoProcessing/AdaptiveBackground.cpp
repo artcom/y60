@@ -105,10 +105,10 @@ namespace y60 {
         
         _myCounter = 0;
 
-        const BGRRaster * mySourceFrame = dom::dynamic_cast_Value<BGRRaster>(&*_mySourceImage->getRasterValue());
-        const BGRRaster * myBlobFrame = dom::dynamic_cast_Value<BGRRaster>(&*_myBlobImage->getRasterValue());
-        const BGRRaster * myTargetFrame = dom::dynamic_cast_Value<BGRRaster>(&*_myTargetImage->getRasterValue());
-        
+        const BGRRaster * mySourceFrame = dom::dynamic_cast_Value<BGRRaster>(_mySourceImage->getRasterValue().get());
+        const BGRRaster * myBlobFrame   = dom::dynamic_cast_Value<BGRRaster>(_myBlobImage->getRasterValue().get());
+        const BGRRaster * myTargetFrame = dom::dynamic_cast_Value<BGRRaster>(_myTargetImage->getRasterValue().get());
+
         BGRRaster::iterator itSrc   = const_cast<BGRRaster::iterator>(mySourceFrame->begin());
         BGRRaster::iterator itBlob  = const_cast<BGRRaster::iterator>(myBlobFrame->begin());
         BGRRaster::iterator itTarg  = const_cast<BGRRaster::iterator>(myTargetFrame->begin());

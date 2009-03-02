@@ -252,7 +252,7 @@ JSOscSender::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, 
 
     JSOscSender * myNewObject = 0;
         OWNERPTR myOscSender = OWNERPTR(new OscSender());
-        myNewObject = new JSOscSender(myOscSender, &(*myOscSender));
+        myNewObject = new JSOscSender(myOscSender, myOscSender.get());
 
     JS_SetPrivate(cx, obj, myNewObject);
     return JS_TRUE;
@@ -295,7 +295,7 @@ bool convertFrom(JSContext *cx, jsval theValue, JSOscSender::NATIVE & theNative)
 }
 
 jsval as_jsval(JSContext *cx, JSOscSender::OWNERPTR theOwner) {
-    JSObject * myReturnObject = JSOscSender::Construct(cx, theOwner, &(*theOwner));
+    JSObject * myReturnObject = JSOscSender::Construct(cx, theOwner, theOwner.get());
     return OBJECT_TO_JSVAL(myReturnObject);
 }
 

@@ -624,14 +624,14 @@ JSSerial::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsv
         if (convertFrom(cx, argv[0], myPortNumber)) {
             if (myPortNumber == 999) {
                 OWNERPTR myNewSerial = OWNERPTR(new DebugPort("MyDebug Port #999"));
-                myNewObject = new JSSerial(myNewSerial, &(*myNewSerial));
+                myNewObject = new JSSerial(myNewSerial, myNewSerial.get());
             } else {
                 OWNERPTR myNewSerial = OWNERPTR(getSerialDevice(myPortNumber));
-                myNewObject = new JSSerial(myNewSerial, &(*myNewSerial));
+                myNewObject = new JSSerial(myNewSerial, myNewSerial.get());
             }
         } else if (convertFrom(cx, argv[0], myDeviceName)) {
             OWNERPTR myNewSerial = OWNERPTR(getSerialDeviceByName( myDeviceName ));
-            myNewObject = new JSSerial(myNewSerial, &(*myNewSerial));
+            myNewObject = new JSSerial(myNewSerial, myNewSerial.get());
         } else {
             JS_ReportError(cx, "JSSerial::Constructor: argument #1 must be an integer (port number)"
                                 " or a string (device name).");
@@ -705,7 +705,7 @@ bool convertFrom(JSContext *cx, jsval theValue, JSSerial::NATIVE & theSerial) {
 }
 
 jsval as_jsval(JSContext *cx, JSSerial::OWNERPTR theOwner) {
-    JSObject * myReturnObject = JSSerial::Construct(cx, theOwner, &(*theOwner));
+    JSObject * myReturnObject = JSSerial::Construct(cx, theOwner, theOwner.get());
     return OBJECT_TO_JSVAL(myReturnObject);
 }
 

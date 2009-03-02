@@ -279,7 +279,7 @@ namespace y60 {
 
     void
     TransformHierarchyFacade::recalculateLocalMatrix() {
-        PRINTMESSAGE(getNode(), "Recalculating local matrix (copy local to global) @ " << (Field*)(&*LocalMatrixTag::Plug::getValuePtr()), TTYRED);
+        PRINTMESSAGE(getNode(), "Recalculating local matrix (copy local to global) @ " << (Field*)(LocalMatrixTag::Plug::getValuePtr().get()), TTYRED);
         asl::Matrix4f myMatrix = Matrix4f::Identity();
         myMatrix.scale(get<ScaleTag>());
         myMatrix.translate(-get<PivotTag>());
@@ -291,13 +291,13 @@ namespace y60 {
 
     void
     TransformHierarchyFacade::copyLocalToGlobalMatrix() {
-        PRINTMESSAGE(getNode(), "Recalculating global matrix (copy local to global) @ " << (Field*)(&*GlobalMatrixTag::Plug::getValuePtr()), TTYRED);
+        PRINTMESSAGE(getNode(), "Recalculating global matrix (copy local to global) @ " << (Field*)(GlobalMatrixTag::Plug::getValuePtr().get()), TTYRED);
         set<GlobalMatrixTag>(get<LocalMatrixTag>());
     }
 
     void
     TransformHierarchyFacade::recalculateGlobalMatrix() {
-        PRINTMESSAGE(getNode(), "Recalculating global matrix @ " << (Field*)(&*GlobalMatrixTag::Plug::getValuePtr()), TTYRED);
+        PRINTMESSAGE(getNode(), "Recalculating global matrix @ " << (Field*)(GlobalMatrixTag::Plug::getValuePtr().get()), TTYRED);
         asl::Matrix4f myMatrix = get<LocalMatrixTag>();
 
         TransformHierarchyFacadePtr myParent = getNode().parentNode()->getFacade<TransformHierarchyFacade>();
@@ -309,7 +309,7 @@ namespace y60 {
 
     void
     TransformHierarchyFacade::recalculateBoundingBox() {
-        PRINTMESSAGE(getNode(), "Recalculating bounding matrix @ " << (Field*)(&*BoundingBoxTag::Plug::getValuePtr()), TTYGREEN);
+        PRINTMESSAGE(getNode(), "Recalculating bounding matrix @ " << (Field*)(BoundingBoxTag::Plug::getValuePtr().get()), TTYGREEN);
         asl::Box3f myBoundingBox;
         myBoundingBox.makeEmpty();
 
@@ -327,7 +327,7 @@ namespace y60 {
 
     void
     TransformHierarchyFacade::recalculateInverseGlobalMatrix() {
-        PRINTMESSAGE(getNode(), "Recalculating inverse global matrix @ " << (Field*)(&*InverseGlobalMatrixTag::Plug::getValuePtr()), TTYYELLOW);
+        PRINTMESSAGE(getNode(), "Recalculating inverse global matrix @ " << (Field*)(InverseGlobalMatrixTag::Plug::getValuePtr().get()), TTYYELLOW);
         set<InverseGlobalMatrixTag>(asl::inverse(get<GlobalMatrixTag>()));
     }
 }

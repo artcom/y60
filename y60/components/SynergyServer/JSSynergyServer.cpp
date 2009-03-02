@@ -226,7 +226,7 @@ JSSynergyServer::Constructor( JSContext *cx, JSObject *obj, uintN argc, jsval *a
 
         OWNERPTR mySynergyServer = OWNERPTR(new SynergyServer( myHostAddress, 
                                                                static_cast<asl::Unsigned16>(myPort) ));
-        myNewObject = new JSSynergyServer(mySynergyServer, &(*mySynergyServer));
+        myNewObject = new JSSynergyServer(mySynergyServer, mySynergyServer.get());
 
         if (myNewObject) {
             JS_SetPrivate(cx, obj, myNewObject);
@@ -258,7 +258,7 @@ JSSynergyServer::initClass(JSContext *cx, JSObject *theGlobalObject) {
 }
 
 jsval as_jsval(JSContext *cx, JSSynergyServer::OWNERPTR theOwner) {
-    JSObject * myReturnObject = JSSynergyServer::Construct(cx, theOwner, &(*theOwner));
+    JSObject * myReturnObject = JSSynergyServer::Construct(cx, theOwner, theOwner.get());
     return OBJECT_TO_JSVAL(myReturnObject);
 }
 

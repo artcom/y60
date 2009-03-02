@@ -190,7 +190,7 @@ JSTestServer::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
 
         OWNERPTR myNewTestServer = OWNERPTR(new NATIVE(TCPPolicy::Endpoint(myAddress.c_str(), myPort), inet::TestServer::create));
 
-        myNewObject = new JSTestServer(myNewTestServer, &(*myNewTestServer));
+        myNewObject = new JSTestServer(myNewTestServer, myNewTestServer.get());
     } else {
         JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected 2 (URL, port) %d",ClassName(), argc);
         return JS_FALSE;
@@ -224,7 +224,7 @@ bool convertFrom(JSContext *cx, jsval theValue, JSTestServer::OWNERPTR & theTest
 }
 
 jsval as_jsval(JSContext *cx, JSTestServer::OWNERPTR theOwner) {
-    JSObject * myReturnObject = JSTestServer::Construct(cx, theOwner, &(*theOwner));
+    JSObject * myReturnObject = JSTestServer::Construct(cx, theOwner, theOwner.get());
     return OBJECT_TO_JSVAL(myReturnObject);
 }
 

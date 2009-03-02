@@ -246,7 +246,7 @@ bool convertFrom(JSContext *cx, jsval theValue, GLResourceManager *& theGLResour
         JSObject * myArgument;
         if (JS_ValueToObject(cx, theValue, &myArgument)) {
             if (JSA_GetClass(cx,myArgument) == JSClassTraits<JSGLResourceManager::NATIVE >::Class()) {
-                theGLResourceManager = &(*JSClassTraits<JSGLResourceManager::NATIVE>::getNativeOwner(cx,myArgument));
+                theGLResourceManager = JSClassTraits<JSGLResourceManager::NATIVE>::getNativeOwner(cx,myArgument).get();
                 return true;
             }
         }
@@ -269,7 +269,7 @@ bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<GLResourceManager> & th
 }
 
 jsval as_jsval(JSContext *cx, JSGLResourceManager::OWNERPTR & theOwner) {
-    JSObject * myReturnObject = JSGLResourceManager::Construct(cx, theOwner, &(*theOwner));
+    JSObject * myReturnObject = JSGLResourceManager::Construct(cx, theOwner, theOwner.get());
     return OBJECT_TO_JSVAL(myReturnObject);
 }
 */

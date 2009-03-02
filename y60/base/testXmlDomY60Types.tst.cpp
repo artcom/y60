@@ -64,6 +64,7 @@
 #include <asl/dom/Nodes.h>
 #include <asl/dom/Schema.h>
 
+#include <asl/base/begin_end.h>
 #include <asl/base/UnitTest.h>
 #include <asl/math/linearAlgebra.h>
 
@@ -100,13 +101,13 @@ public:
 		
 		dom::ValuePtr myValue(myValueFactory.createValue(_myTypeName,asl::as_string(_someVariable), 0));
 		ENSURE(myValue);
-		ENSURE(dom::dynamic_cast_Value<T>(&(*myValue)));
-		ENSURE(*dom::dynamic_cast_Value<T>(&(*myValue)) == _someVariable);
+		ENSURE(dom::dynamic_cast_Value<T>(myValue.get()));
+		ENSURE(*dom::dynamic_cast_Value<T>(myValue.get()) == _someVariable);
 
 		dom::ValuePtr myBinValue(myValueFactory.createValue(_myTypeName,asl::FixedBlock<T>(_someVariable),0));
 		ENSURE(myBinValue);
-		ENSURE(dom::dynamic_cast_Value<T>(&(*myBinValue)));
-		ENSURE(*dom::dynamic_cast_Value<T>(&(*myBinValue)) == _someVariable);
+		ENSURE(dom::dynamic_cast_Value<T>(myBinValue.get()));
+		ENSURE(*dom::dynamic_cast_Value<T>(myBinValue.get()) == _someVariable);
 
     }
 
@@ -138,14 +139,14 @@ public:
 		
 		dom::ValuePtr myValue(myValueFactory.createValue(_myTypeName,asl::as_string(_someVariable), 0));
 		ENSURE(myValue);
-		ENSURE(dom::dynamic_cast_Value<T>(&(*myValue)));
-		ENSURE(*dom::dynamic_cast_Value<T>(&(*myValue)) == _someVariable);
+		ENSURE(dom::dynamic_cast_Value<T>(myValue.get()));
+		ENSURE(*dom::dynamic_cast_Value<T>(myValue.get()) == _someVariable);
 
 		dom::ValuePtr myBinValue(myValueFactory.createValue(_myTypeName,
-            asl::ReadableBlockAdapter(&(*_someVariable.begin()),&*_someVariable.begin() + _someVariable.size()),0));
+            asl::ReadableBlockAdapter(begin_ptr(_someVariable),begin_ptr(_someVariable) + _someVariable.size()),0));
 		ENSURE(myBinValue);
-		ENSURE(dom::dynamic_cast_Value<T>(&(*myBinValue)));
-		ENSURE(*dom::dynamic_cast_Value<T>(&(*myBinValue)) == _someVariable);
+		ENSURE(dom::dynamic_cast_Value<T>(myBinValue.get()));
+		ENSURE(*dom::dynamic_cast_Value<T>(myBinValue.get()) == _someVariable);
     }
 private:
     T _someVariable;

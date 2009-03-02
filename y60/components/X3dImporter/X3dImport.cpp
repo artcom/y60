@@ -351,7 +351,7 @@ namespace y60 {
         // Insert a 'Main' Transform above all X3D stuff
         y60::TransformBuilderPtr myTransformBuilder(new y60::TransformBuilder("Main"));
         _myWorldBuilder->appendObject(*myTransformBuilder);
-        _myCurrentTransform = &*myTransformBuilder;
+        _myCurrentTransform = myTransformBuilder.get();
 
         dom::Document myDom(myXML);
         const dom::Node & myX3dScene = myDom("X3D")("Scene");

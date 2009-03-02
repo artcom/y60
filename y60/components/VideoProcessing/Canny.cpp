@@ -72,7 +72,7 @@ Canny::Canny( const string & theName ) : Algorithm( theName ) {
 void Canny::onFrame( double t ) {
 
     const GRAYRaster * mySourceFrame = 
-        dom::dynamic_cast_Value<GRAYRaster>(&*_mySourceImage->getRasterValue());
+        dom::dynamic_cast_Value<GRAYRaster>(_mySourceImage->getRasterValue().get());
     dom::Node::WritableValue<GRAYRaster> myTargetFrameLock(_myTargetImage->getRasterValueNode());
     GRAYRaster & myTargetFrame = myTargetFrameLock.get();
 

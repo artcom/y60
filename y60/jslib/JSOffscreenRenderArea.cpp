@@ -330,7 +330,7 @@ JSOffscreenRenderArea::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsv
 
     OWNERPTR myNewObject = NATIVE::create();
 
-    JSOffscreenRenderArea * myNewJSObject = new JSOffscreenRenderArea(myNewObject, &(*myNewObject));
+    JSOffscreenRenderArea * myNewJSObject = new JSOffscreenRenderArea(myNewObject, myNewObject.get());
 
     if (myNewJSObject) {
         JS_SetPrivate(cx,obj,myNewJSObject);
@@ -375,7 +375,7 @@ bool convertFrom(JSContext *cx, jsval theValue, OffscreenRenderArea *& theRender
         JSObject * myArgument;
         if (JS_ValueToObject(cx, theValue, &myArgument)) {
             if (JSA_GetClass(cx,myArgument) == JSClassTraits<JSOffscreenRenderArea::NATIVE>::Class()) {
-                theRenderArea = &(*JSClassTraits<JSOffscreenRenderArea::NATIVE>::getNativeOwner(cx,myArgument));
+                theRenderArea = JSClassTraits<JSOffscreenRenderArea::NATIVE>::getNativeOwner(cx,myArgument).get();
                 return true;
             }
         }

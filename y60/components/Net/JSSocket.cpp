@@ -377,7 +377,7 @@ JSSocket::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsv
     JSSocket * myNewObject = 0;
     if (argc == 0 ) {
         OWNERPTR mySocket = OWNERPTR(new inet::Socket(0,0));
-        myNewObject = new JSSocket(mySocket, &(*mySocket));
+        myNewObject = new JSSocket(mySocket, mySocket.get());
     }
     if (argc == 1 || argc > 3) {
         JS_ReportError(cx, "Constructor for %s: bad number of arguments: expected 2 or 3 "
@@ -429,11 +429,11 @@ JSSocket::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsv
         try {
             if (mySocketType == SOCKET_TYPE_UDP) {
                 OWNERPTR myNewSocket = OWNERPTR(new inet::UDPConnection(myLocalHostAddress, myLocalPort));
-                myNewObject = new JSSocket(myNewSocket, &(*myNewSocket));
+                myNewObject = new JSSocket(myNewSocket, myNewSocket.get());
             } else if (mySocketType == SOCKET_TYPE_TCPCLIENT) {
                 OWNERPTR myNewSocket = OWNERPTR(new inet::TCPClientSocket());
 
-                myNewObject = new JSSocket(myNewSocket, &(*myNewSocket));
+                myNewObject = new JSSocket(myNewSocket, myNewSocket.get());
             }
         } HANDLE_CPP_EXCEPTION;
     }
@@ -492,7 +492,7 @@ bool convertFrom(JSContext *cx, jsval theValue, JSSocket::NATIVE & theNative) {
 }
 
 jsval as_jsval(JSContext *cx, JSSocket::OWNERPTR theOwner) {
-    JSObject * myReturnObject = JSSocket::Construct(cx, theOwner, &(*theOwner));
+    JSObject * myReturnObject = JSSocket::Construct(cx, theOwner, theOwner.get());
     return OBJECT_TO_JSVAL(myReturnObject);
 }
 

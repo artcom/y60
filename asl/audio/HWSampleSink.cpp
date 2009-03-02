@@ -401,7 +401,7 @@ AudioBufferBase* HWSampleSink::getNextBuffer() {
     AutoLocker<ThreadLock> myLocker(_myQueueLock);
     if (_isDelayingPlay) {
         _isUsingBackupBuffer = true;
-        return &(*_myBackupBuffer);
+        return _myBackupBuffer.get();
     }
     if (_myBufferQueue.empty()) {
         if (_myState != PLAYBACK_DONE) {
@@ -424,9 +424,10 @@ AudioBufferBase* HWSampleSink::getNextBuffer() {
         _isUsingBackupBuffer = true;
         ASSURE_MSG(_myPosInInputBuffer == 0,
                 "Position in input buffer should be zero on underrun.");
-        return &(*_myBackupBuffer);
+        return _myBackupBuffer.get();
     }
     _isUsingBackupBuffer = false;
+    ASSURE_WITH(AssurePolicy::Abort,!_myBufferQueue.empty());
     AudioBufferBase* myBuffer = &(*_myBufferQueue.front());
     return myBuffer;
 }

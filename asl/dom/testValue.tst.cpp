@@ -200,13 +200,13 @@ public:
 		
 		dom::ValuePtr myValue(myValueFactory.createValue(_myTypeName,asl::as_string(_someVariable),0));
 		ENSURE(myValue);
-		ENSURE(dom::dynamic_cast_Value<T>(&(*myValue)));
-		ENSURE(*dom::dynamic_cast_Value<T>(&(*myValue)) == _someVariable);
+		ENSURE(dom::dynamic_cast_Value<T>(myValue.get()));
+		ENSURE(*dom::dynamic_cast_Value<T>(myValue.get()) == _someVariable);
 
 		dom::ValuePtr myBinValue(myValueFactory.createValue(_myTypeName,asl::FixedBlock<T>(_someVariable),0));
 		ENSURE(myBinValue);
-		ENSURE(dom::dynamic_cast_Value<T>(&(*myBinValue)));
-		ENSURE(*dom::dynamic_cast_Value<T>(&(*myBinValue)) == _someVariable);
+		ENSURE(dom::dynamic_cast_Value<T>(myBinValue.get()));
+		ENSURE(*dom::dynamic_cast_Value<T>(myBinValue.get()) == _someVariable);
 		
 		{
         	dom::SimpleValue<T> myConfusedValue(_someVariable, 0);
@@ -295,13 +295,13 @@ public:
 		
 		dom::ValuePtr myValue(myValueFactory.createValue(_myTypeName,asl::as_string(_someVariable), 0));
 		ENSURE(myValue);
-		ENSURE(dom::dynamic_cast_Value<T>(&(*myValue)));
-		ENSURE(*dom::dynamic_cast_Value<T>(&(*myValue)) == _someVariable);
+		ENSURE(dom::dynamic_cast_Value<T>(myValue.get()));
+		ENSURE(*dom::dynamic_cast_Value<T>(myValue.get()) == _someVariable);
 
 		dom::ValuePtr myBinValue(myValueFactory.createValue(_myTypeName,ValueType(_someVariable, 0).accessReadableBlock(),0));
 		ENSURE(myBinValue);
-		ENSURE(dom::dynamic_cast_Value<T>(&(*myBinValue)));
-		ENSURE(*dom::dynamic_cast_Value<T>(&(*myBinValue)) == _someVariable);
+		ENSURE(dom::dynamic_cast_Value<T>(myBinValue.get()));
+		ENSURE(*dom::dynamic_cast_Value<T>(myBinValue.get()) == _someVariable);
     }
 private:
     T _someVariable;
@@ -367,13 +367,13 @@ public:
 		
 		dom::ValuePtr myValue(myValueFactory.createValue(_myTypeName,asl::as_string(_someVariable), 0));
 		ENSURE(myValue);
-		ENSURE(dom::dynamic_cast_Value<T>(&(*myValue)));
-		ENSURE(*dom::dynamic_cast_Value<T>(&(*myValue)) == _someVariable);
+		ENSURE(dom::dynamic_cast_Value<T>(myValue.get()));
+		ENSURE(*dom::dynamic_cast_Value<T>(myValue.get()) == _someVariable);
 
 		dom::ValuePtr myBinValue(myValueFactory.createValue(_myTypeName,VALUE_T(_someVariable, 0).accessReadableBlock(),0));
 		ENSURE(myBinValue);
-		ENSURE(dom::dynamic_cast_Value<T>(&(*myBinValue)));
-		ENSURE(*dom::dynamic_cast_Value<T>(&(*myBinValue)) == _someVariable);
+		ENSURE(dom::dynamic_cast_Value<T>(myBinValue.get()));
+		ENSURE(*dom::dynamic_cast_Value<T>(myBinValue.get()) == _someVariable);
 	    
         ResizeableRaster & myRaster = dynamic_cast<ResizeableRaster&>(*myValue);	
         myRaster.resize(20, 10);

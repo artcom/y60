@@ -64,6 +64,7 @@
 #include <y60/jsbase/JSWrapper.impl>
 
 #include <asl/base/file_functions.h>
+#include <asl/base/begin_end.h>
 
 using namespace std;
 using namespace asl;
@@ -114,8 +115,8 @@ Append(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, jsval * rval) {
         if ( myBlock ) {
             myNative->append(*myBlock, myFilename);
         } else {
-            asl::Block myStringBlock(reinterpret_cast<const unsigned char*>(&(*myString.begin())),
-                                     reinterpret_cast<const unsigned char*>(&(*myString.end())));
+            asl::Block myStringBlock(reinterpret_cast<const unsigned char*>(asl::begin_ptr(myString)),
+                                     reinterpret_cast<const unsigned char*>(asl::end_ptr  (myString)));
             myNative->append(myStringBlock, myFilename);
         }
         return JS_TRUE;
@@ -193,7 +194,7 @@ JSZipWriter::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, 
 
         try {
             OWNERPTR myNewZipWriter = OWNERPTR(new asl::ZipWriter(myFilename));
-            myNewObject = new JSZipWriter(myNewZipWriter, &(*myNewZipWriter));
+            myNewObject = new JSZipWriter(myNewZipWriter, myNewZipWriter.get());
         } HANDLE_CPP_EXCEPTION;
     } else {
         JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected 1 (filename) %d",ClassName(), argc);
@@ -249,7 +250,7 @@ bool convertFrom(JSContext *cx, jsval theValue, JSZipWriter::NATIVE *& theZipWri
 }
 
 jsval as_jsval(JSContext *cx, JSZipWriter::OWNERPTR theOwner) {
-    JSObject * myReturnObject = JSZipWriter::Construct(cx, theOwner, &(*theOwner));
+    JSObject * myReturnObject = JSZipWriter::Construct(cx, theOwner, theOwner.get());
     return OBJECT_TO_JSVAL(myReturnObject);
 }
 

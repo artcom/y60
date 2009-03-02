@@ -218,7 +218,7 @@ class ChildFacade :
             AC_TRACE << "recalculateDoubleParentFloat: this="<<(void*)this <<",node=" << getNode() << endl;
             asl::Ptr<ChildFacade, dom::ThreadingModel> myParent = getNode().parentNode()->getFacade<ChildFacade>();
             if (myParent) {
-                AC_TRACE << "recalculateDoubleParentFloat: parent="<<(void*)&(*myParent) <<",node=" << getNode() << endl;
+                AC_TRACE << "recalculateDoubleParentFloat: parent="<<(void*)myParent.get() <<",node=" << getNode() << endl;
                 float myValue = myParent->get<DoubleParentFloatTag>();
                 AC_TRACE << "recalculateDoubleParentFloat: parent value="<<myValue<<endl;
                 set<DoubleParentFloatTag>(myParent->get<DoubleParentFloatTag>() * 2);
@@ -554,7 +554,7 @@ class FacadeUnitTest : public UnitTest {
                     myNewValue->setString("3.0");
                     ENSURE(myNewValue->getString() == "3");
 
-                    const float * myNewFloatPtr = dynamic_cast_Value<float>(&(*myNewValue));
+                    const float * myNewFloatPtr = dynamic_cast_Value<float>(myNewValue.get());
                     ENSURE(myNewFloatPtr);
                     ENSURE(*myNewFloatPtr == 3.0f);
                     myFloatAttr2->nodeValueWrapperPtr(myNewValue);

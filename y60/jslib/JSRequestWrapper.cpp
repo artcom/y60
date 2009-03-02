@@ -353,7 +353,7 @@ JSRequestWrapper::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *a
 
         }
 
-        myNewObject = new JSRequestWrapper(myNewRequest, &(*myNewRequest));
+        myNewObject = new JSRequestWrapper(myNewRequest, myNewRequest.get());
         myNewRequest->setJSListener(cx, obj);
     } else {
         JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected 1 (URL) %d",ClassName(), argc);
@@ -415,7 +415,7 @@ bool convertFrom(JSContext *cx, jsval theValue, inet::RequestPtr & theRequest) {
 }
 
 jsval as_jsval(JSContext *cx, JSRequestWrapper::OWNERPTR theOwner) {
-    JSObject * myReturnObject = JSRequestWrapper::Construct(cx, theOwner, &(*theOwner));
+    JSObject * myReturnObject = JSRequestWrapper::Construct(cx, theOwner, theOwner.get());
     return OBJECT_TO_JSVAL(myReturnObject);
 }
 

@@ -66,6 +66,7 @@
 #include <limits>
 #include <vector>
 
+#include <asl/base/begin_end.h>
 #include <asl/base/Exception.h>
 #include <asl/base/Logger.h>
 #include <asl/base/Auto.h>
@@ -183,7 +184,7 @@ namespace y60 {
                 bindMe();
                 if (_mySize) {
                     myBuffer.resize(_mySize);
-                    download(&(*myBuffer.begin()), _mySize, 0);
+                    download(asl::begin_ptr(myBuffer), _mySize, 0);
                 }
                 theStream << myBuffer;
                 unbind();
@@ -386,13 +387,13 @@ namespace y60 {
                 myBuffer.resize(n);
                 bindMe();
                 if (_mySize) {
-                    download(&(*myBuffer.begin()), _mySize, 0);
+                    download(asl::begin_ptr(myBuffer), _mySize, 0);
                 }
                 _myCapacity = n;
                 destructiveResize(n, _myUsageType);
                 if (_mySize) {
                     //uploadPart( theData, theSize, theOffset)
-                    uploadPart(&(*myBuffer.begin()), _mySize, 0);
+                    uploadPart(asl::begin_ptr(myBuffer), _mySize, 0);
                 }
             }
         }

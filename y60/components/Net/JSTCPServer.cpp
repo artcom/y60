@@ -168,7 +168,7 @@ JSTCPServer::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, 
     }
     unsigned long myHostAddress = asl::hostaddress(myHostAddressString);
     OWNERPTR myNewTCPServer = OWNERPTR(new inet::TCPServer(myHostAddress, myPort, myReusePortFlag));
-    JSTCPServer * myNewObject = new JSTCPServer(myNewTCPServer, &(*myNewTCPServer));
+    JSTCPServer * myNewObject = new JSTCPServer(myNewTCPServer, myNewTCPServer.get());
 
     if (myNewObject) {
         JS_SetPrivate(cx, obj, myNewObject);
@@ -208,7 +208,7 @@ bool convertFrom(JSContext *cx, jsval theValue, JSTCPServer::NATIVE & theTCPServ
 }
 
 jsval as_jsval(JSContext *cx, JSTCPServer::OWNERPTR theOwner) {
-    JSObject * myReturnObject = JSTCPServer::Construct(cx, theOwner, &(*theOwner));
+    JSObject * myReturnObject = JSTCPServer::Construct(cx, theOwner, theOwner.get());
     return OBJECT_TO_JSVAL(myReturnObject);
 }
 

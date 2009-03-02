@@ -235,7 +235,7 @@ JSLocale::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsv
 
     if (argc == 0) {
         OWNERPTR myNewOwner = OWNERPTR(new NATIVE());
-        myNewObject = new JSLocale(myNewOwner, &(*myNewOwner));
+        myNewObject = new JSLocale(myNewOwner, myNewOwner.get());
     } else if (argc == 1) {
         if (JSVAL_IS_VOID(argv[0])) {
             JS_ReportError(cx,"JSLocale::Constructor: bad argument #1 (undefined)");
@@ -250,11 +250,11 @@ JSLocale::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsv
 
         try {
             OWNERPTR myNewOwner = OWNERPTR(new NATIVE(myLocaleString.c_str()));        
-            myNewObject = new JSLocale(myNewOwner, &(*myNewOwner));
+            myNewObject = new JSLocale(myNewOwner, myNewOwner.get());
         } catch (const exception & ex) {
             AC_ERROR << "Error while creating locale for `" << myLocaleString << "`. Using `C` as default. Exception thrown: " << ex.what();  
             OWNERPTR myNewOwner = OWNERPTR(new NATIVE());
-            myNewObject = new JSLocale(myNewOwner, &(*myNewOwner));
+            myNewObject = new JSLocale(myNewOwner, myNewOwner.get());
         }
         
     } else {

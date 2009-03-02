@@ -113,7 +113,7 @@ namespace y60 {
             return;
         }
         
-        const GRAYRaster * mySourceFrame = dom::dynamic_cast_Value<GRAYRaster>(&*_mySourceImage->getRasterValue());
+        const GRAYRaster * mySourceFrame = dom::dynamic_cast_Value<GRAYRaster>(_mySourceImage->getRasterValue().get());
         
         // float!
         GRAYRaster::const_iterator itSrc = mySourceFrame->begin();

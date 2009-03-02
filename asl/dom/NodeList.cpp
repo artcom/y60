@@ -98,7 +98,7 @@ dom::NodeList::NodeList(const NodeList & theOtherList, Node * theShell) : _myShe
 
 dom::NodeList::size_type dom::NodeList::findIndex(const Node * theNode) const {
     for (size_type i=0; i < length();++i) {
-        if (&(*item(i)) == theNode) {
+        if (item(i).get() == theNode) {
             return i;
         }
     }

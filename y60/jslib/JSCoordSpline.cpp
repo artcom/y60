@@ -170,7 +170,7 @@ JSCoordSpline::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv
 
     if (argc == 0) {
         OWNERPTR myNewCoordSpline = OWNERPTR(new CoordSpline());
-        myNewObject = new JSCoordSpline(myNewCoordSpline, &(*myNewCoordSpline));
+        myNewObject = new JSCoordSpline(myNewCoordSpline, myNewCoordSpline.get());
     } else if (argc == 1) {
         std::vector<asl::QuaternionKeyframe> myKeyframes;
         if (JSVAL_IS_VOID(argv[0]) || !convertFrom(cx, argv[0], myKeyframes)) {
@@ -181,7 +181,7 @@ JSCoordSpline::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv
 
         OWNERPTR myNewCoordSpline = OWNERPTR(new CoordSpline());
         myNewCoordSpline->init(myKeyframes, myLength, false);
-        myNewObject = new JSCoordSpline(myNewCoordSpline, &(*myNewCoordSpline));
+        myNewObject = new JSCoordSpline(myNewCoordSpline, myNewCoordSpline.get());
     } else {
         JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected 4 (position, orienation, timestamp, speed) %d",ClassName(), argc);
         return JS_FALSE;

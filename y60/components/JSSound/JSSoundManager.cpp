@@ -165,7 +165,7 @@ namespace jslib {
 
             OWNERPTR myNewNative = &(Singleton<SoundManager>::get());
 
-            JSSoundManager * myNewObject = new JSSoundManager(myNewNative, &*myNewNative);
+            JSSoundManager * myNewObject = new JSSoundManager(myNewNative, myNewNative);
             if (myNewObject) {
                 JS_SetPrivate(cx, obj, myNewObject);
             } else  {
@@ -205,7 +205,7 @@ namespace jslib {
     }
 
     jsval as_jsval(JSContext *cx, JSSoundManager::OWNERPTR theOwner) {
-        JSObject * myReturnObject = JSSoundManager::Construct(cx, theOwner, &(*theOwner));
+        JSObject * myReturnObject = JSSoundManager::Construct(cx, theOwner, theOwner);
         return OBJECT_TO_JSVAL(myReturnObject);
     }
 

@@ -82,7 +82,7 @@ ColorDetection::configure(const dom::Node & theNode) {
 
 void 
 ColorDetection::onFrame(double t) {
-    const BGRRaster * myFrame = dom::dynamic_cast_Value<BGRRaster>(&*_mySourceRaster);
+    const BGRRaster * myFrame = dom::dynamic_cast_Value<BGRRaster>(_mySourceRaster.get());
     std::vector<unsigned> myHistogram(360);
     Vector3f myHSV;
     for (BGRRaster::const_iterator it = myFrame->begin(); it != myFrame->end(); ++it) {

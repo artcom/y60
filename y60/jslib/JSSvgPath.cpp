@@ -881,7 +881,7 @@ namespace jslib {
             mySvgPath = OWNERPTR(new asl::SvgPath(myPathDefinition));
         }
 
-        JSSvgPath * myNewObject = new JSSvgPath(mySvgPath, &*mySvgPath);
+        JSSvgPath * myNewObject = new JSSvgPath(mySvgPath, mySvgPath.get());
         JS_SetPrivate(cx, obj, myNewObject);
         return JS_TRUE;
     }
@@ -922,7 +922,7 @@ namespace jslib {
     }
 
     jsval as_jsval(JSContext *cx, JSSvgPath::OWNERPTR theOwner) {
-        JSObject * myReturnObject = JSSvgPath::Construct(cx, theOwner, &*theOwner);
+        JSObject * myReturnObject = JSSvgPath::Construct(cx, theOwner, theOwner.get());
         return OBJECT_TO_JSVAL(myReturnObject);
     }
 

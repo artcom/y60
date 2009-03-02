@@ -190,7 +190,7 @@ JSRequestManager::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *a
 
     if (argc == 0) {
         OWNERPTR myNewManager = OWNERPTR(new inet::RequestManager());
-        myNewObject = new JSRequestManager(myNewManager, &(*myNewManager));
+        myNewObject = new JSRequestManager(myNewManager, myNewManager.get());
     } else {
         JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected 0, got %d",ClassName(), argc);
         return JS_FALSE;
@@ -229,7 +229,7 @@ bool convertFrom(JSContext *cx, jsval theValue, JSRequestManager::NATIVE *& theR
         JSObject * myArgument;
         if (JS_ValueToObject(cx, theValue, &myArgument)) {
             if (JSA_GetClass(cx,myArgument) == JSClassTraits<JSRequestManager::NATIVE >::Class()) {
-                theRequest = &(*JSClassTraits<JSRequestManager::NATIVE>::getNativeOwner(cx,myArgument));
+                theRequest = JSClassTraits<JSRequestManager::NATIVE>::getNativeOwner(cx,myArgument).get();
                 return true;
             }
         }
@@ -251,7 +251,7 @@ bool convertFrom(JSContext *cx, jsval theValue, JSRequestManager::OWNERPTR & the
 }
 
 jsval as_jsval(JSContext *cx, JSRequestManager::OWNERPTR theOwner) {
-    JSObject * myReturnObject = JSRequestManager::Construct(cx, theOwner, &(*theOwner));
+    JSObject * myReturnObject = JSRequestManager::Construct(cx, theOwner, theOwner.get());
     return OBJECT_TO_JSVAL(myReturnObject);
 }
 

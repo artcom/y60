@@ -99,7 +99,7 @@ void DebugEventSink::handle(EventPtr theEvent) {
             break;
         case Event::AXIS:
             {
-                AxisEvent * theAxEvent = dynamic_cast<AxisEvent *>(&*theEvent);
+                AxisEvent * theAxEvent = dynamic_cast<AxisEvent *>(theEvent.get());
                 cerr << "AXIS: device=" << theAxEvent->device << ", axis=" << theAxEvent->axis <<
                     ", value=" << theAxEvent->value;
                 cerr << endl;
@@ -108,7 +108,7 @@ void DebugEventSink::handle(EventPtr theEvent) {
         case Event::BUTTON_DOWN:
         case Event::BUTTON_UP:
             {
-                ButtonEvent * theButtonEvent = dynamic_cast<ButtonEvent *>(&*theEvent);
+                ButtonEvent * theButtonEvent = dynamic_cast<ButtonEvent *>(theEvent.get());
                 if (theEvent->type == Event::BUTTON_DOWN) {
                     cerr << "BUTTON_DOWN";
                 } else {

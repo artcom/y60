@@ -69,7 +69,7 @@ MaskPerson::MaskPerson( const std::string & theName ) : Algorithm(theName) {}
 
 void MaskPerson::onFrame( double t ) {
 
-    const raster<asl::BGR> * mySourceRaster = dynamic_cast_Value<raster<asl::BGR> >(&*_mySourceImage->getRasterValue());
+    const raster<asl::BGR> * mySourceRaster = dynamic_cast_Value<raster<asl::BGR> >(_mySourceImage->getRasterValue().get());
     dom::Node::WritableValue<raster<asl::BGR> > myTargetLock(_myTargetImage->getRasterValueNode());
     raster<asl::BGR> & myTargetRaster = myTargetLock.get();
     dom::Node::WritableValue<raster<asl::GRAY> > myMaskLock(_myTargetMask->getRasterValueNode());

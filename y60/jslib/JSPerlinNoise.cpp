@@ -205,7 +205,7 @@ JSPerlinNoise::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv
     }
 
     OWNERPTR myNewPerlinNoise = OWNERPTR(new PerlinNoise3D(theOctaveCount, theAmplitudeFalloff));
-    myNewObject = new JSPerlinNoise(myNewPerlinNoise, &(*myNewPerlinNoise));
+    myNewObject = new JSPerlinNoise(myNewPerlinNoise, myNewPerlinNoise.get());
 
     if (myNewObject) {
         JS_SetPrivate(cx,obj,myNewObject);
@@ -254,7 +254,7 @@ bool convertFrom(JSContext *cx, jsval theValue, JSPerlinNoise::NATIVE & thePerli
 }
 
 jsval as_jsval(JSContext *cx, JSPerlinNoise::OWNERPTR theOwner) {
-    JSObject * myReturnObject = JSPerlinNoise::Construct(cx, theOwner, &(*theOwner));
+    JSObject * myReturnObject = JSPerlinNoise::Construct(cx, theOwner, theOwner.get());
     return OBJECT_TO_JSVAL(myReturnObject);
 }
 

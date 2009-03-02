@@ -424,12 +424,12 @@ namespace dom {
         template <class T>
         T * nodeValuePtrOpen() {
             ensureValue();
-            return dynamic_cast_and_openWriteableValue<T>(&(*_myValue));
+            return dynamic_cast_and_openWriteableValue<T>(_myValue.get());
         }
         template <class T>
         void nodeValuePtrClose() {
             ensureValue();
-            dynamic_cast_and_closeWriteableValue<T>(&(*_myValue));
+            dynamic_cast_and_closeWriteableValue<T>(_myValue.get());
         }
 
         template <class T>
@@ -459,7 +459,7 @@ namespace dom {
         template <class T>
         const T * nodeValuePtr() const {
             ensureValue();
-            return dynamic_cast_Value<T>(&(*_myValue));
+            return dynamic_cast_Value<T>(_myValue.get());
         }
 
         template <class T>

@@ -30,6 +30,8 @@
 #include <stddef.h>
 #include <algorithm>
 #include <vector>
+
+#include <asl/base/begin_end.h>
 #include "piterator.h"
 
 namespace asl {
@@ -195,10 +197,10 @@ class raster {
         // same as std::vector:
 
         iterator begin() {
-			return _data.empty() ? NULL : &(*_data.begin());
+			return begin_ptr(_data);
         }
         const_iterator begin() const {
-            return _data.empty() ? NULL : &(*_data.begin());
+            return begin_ptr(_data);
         }
         iterator end() {
             return begin() + size();

@@ -189,7 +189,7 @@ JSACIconFactory::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *ar
 
     OWNERPTR myNewACIconFactory = OWNERPTR(new NATIVE());
 
-    myNewObject = new JSACIconFactory(myNewACIconFactory, &(*myNewACIconFactory));
+    myNewObject = new JSACIconFactory(myNewACIconFactory, myNewACIconFactory.get());
     if (myNewObject) {
         JS_SetPrivate(cx,obj,myNewObject);
         return JS_TRUE;
@@ -218,7 +218,7 @@ bool convertFrom(JSContext *cx, jsval theValue, JSACIconFactory::OWNERPTR & theA
 }
 
 jsval as_jsval(JSContext *cx, JSACIconFactory::OWNERPTR theOwner) {
-    JSObject * myReturnObject = JSACIconFactory::Construct(cx, theOwner, &(*theOwner));
+    JSObject * myReturnObject = JSACIconFactory::Construct(cx, theOwner, theOwner.get());
     return OBJECT_TO_JSVAL(myReturnObject);
 }
 

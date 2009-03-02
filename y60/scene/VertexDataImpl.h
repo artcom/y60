@@ -72,6 +72,8 @@
 
 #include "VertexData.h"
 
+#include <asl/base/begin_end.h>
+
 namespace y60 {
 
     template <class T, class VertexDataVector>
@@ -138,10 +140,10 @@ namespace y60 {
 
     protected:
         const void * getDataPtr() const {
-            return &(*_myData.begin());
+            return asl::begin_ptr(_myData);
         }
         void * getDataPtr() {
-            return &(*_myData.begin());
+            return asl::begin_ptr(_myData);
         }
         VertexDataVector & getDataVector() {
             return _myData;

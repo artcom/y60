@@ -258,7 +258,7 @@ JSParticleSystem::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *a
         }
     
         OWNERPTR myParticleSystem = OWNERPTR(new ParticleSystem(myScene));
-        JSParticleSystem * myNewObject = new JSParticleSystem(myParticleSystem, &(*myParticleSystem));
+        JSParticleSystem * myNewObject = new JSParticleSystem(myParticleSystem, myParticleSystem.get());
     
         if (myNewObject) {
             JS_SetPrivate(cx, obj, myNewObject);
@@ -288,7 +288,7 @@ JSParticleSystem::initClass(JSContext *cx, JSObject *theGlobalObject) {
 }
 
 jsval as_jsval(JSContext *cx, JSParticleSystem::OWNERPTR theOwner) {
-    JSObject * myReturnObject = JSParticleSystem::Construct(cx, theOwner, &(*theOwner));
+    JSObject * myReturnObject = JSParticleSystem::Construct(cx, theOwner, theOwner.get());
     return OBJECT_TO_JSVAL(myReturnObject);
 }
 

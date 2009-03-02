@@ -163,7 +163,7 @@ namespace jslib {
                 myNewNative = OWNERPTR();
             }
 
-            JSOscReceiver * myNewObject = new JSOscReceiver(myNewNative, &(*myNewNative));
+            JSOscReceiver * myNewObject = new JSOscReceiver(myNewNative, myNewNative.get());
             if (myNewObject) {
                 JS_SetPrivate(cx, obj, myNewObject);
                 return JS_TRUE;
@@ -184,7 +184,7 @@ namespace jslib {
 
     jsval as_jsval(JSContext *cx, JSOscReceiver::OWNERPTR theOwner) {
         //AC_PRINT << "JSOscReceiver::as_jsval";
-        JSObject * myReturnObject = JSOscReceiver::Construct(cx, theOwner, &(*theOwner));
+        JSObject * myReturnObject = JSOscReceiver::Construct(cx, theOwner, theOwner.get());
         return OBJECT_TO_JSVAL(myReturnObject);
     }
 

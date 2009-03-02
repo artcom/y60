@@ -195,7 +195,7 @@ JSBlock::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
 
     if (argc == 0) {
         OWNERPTR myNewBlock = OWNERPTR(new asl::Block());
-        myNewObject = new JSBlock(myNewBlock, &(*myNewBlock));
+        myNewObject = new JSBlock(myNewBlock, myNewBlock.get());
     } else if (argc == 1) {
         if (JSVAL_IS_VOID(argv[0])) {
             JS_ReportError(cx,"JSBlock::Constructor: bad argument #1 (undefined)");
@@ -219,7 +219,7 @@ JSBlock::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
             JS_ReportError(cx, "JSBlock::Constructor: argument #1 must be a string (filename)");
             return JS_FALSE;
         }
-        myNewObject = new JSBlock(myNewBlock, &(*myNewBlock));
+        myNewObject = new JSBlock(myNewBlock, myNewBlock.get());
     } else {
         JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected 1 (filename) %d",ClassName(), argc);
         return JS_FALSE;
@@ -286,7 +286,7 @@ bool convertFrom(JSContext *cx, jsval theValue, JSBlock::OWNERPTR & theBlock) {
 }
 
 jsval as_jsval(JSContext *cx, JSBlock::OWNERPTR theOwner) {
-    JSObject * myReturnObject = JSBlock::Construct(cx, theOwner, &(*theOwner));
+    JSObject * myReturnObject = JSBlock::Construct(cx, theOwner, theOwner.get());
     return OBJECT_TO_JSVAL(myReturnObject);
 }
 

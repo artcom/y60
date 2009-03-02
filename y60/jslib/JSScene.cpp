@@ -682,7 +682,7 @@ JSScene::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
         JS_ReportError(cx,"Constructor for %s  bad object; did you forget a 'new'?",ClassName());
         return JS_FALSE;
     }
-    asl::Ptr<y60::Scene, dom::ThreadingModel> myNewPtr = OWNERPTR();;
+    asl::Ptr<y60::Scene, dom::ThreadingModel> myNewPtr = OWNERPTR();
 
     JSScene * myNewObject = 0;
 
@@ -718,7 +718,7 @@ JSScene::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
             }
 
         }
-        myNewObject = new JSScene(myNewPtr, &(*myNewPtr));
+        myNewObject = new JSScene(myNewPtr, myNewPtr.get());
         if (myNewObject) {
             JS_SetPrivate(cx,obj,myNewObject);
             return JS_TRUE;
@@ -754,7 +754,7 @@ bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<y60::Scene, dom::Thread
 
 jsval as_jsval(JSContext *cx, asl::Ptr<y60::Scene, dom::ThreadingModel> theScene) {
     if (theScene) {
-        JSObject * myReturnObject = JSScene::asJSVal(cx, theScene, &(*theScene) );
+        JSObject * myReturnObject = JSScene::asJSVal(cx, theScene, theScene.get() );
         return OBJECT_TO_JSVAL(myReturnObject);
     }
     return JSVAL_NULL;

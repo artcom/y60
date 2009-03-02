@@ -119,7 +119,7 @@ namespace y60 {
         glPushAttrib(GL_PIXEL_MODE_BIT | GL_TEXTURE_BIT); //GL_ALL_ATTRIB_BITS);
 
         if (theTexture->getTextureId() > 0) {
-            unbindTexture(&*theTexture);
+            unbindTexture(theTexture.get());
         }
 
         // generate texture object

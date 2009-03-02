@@ -109,7 +109,7 @@ namespace y60 {
         }
 #define ORIG
 #ifdef ORIG       
-        const BGRRaster * mySourceFrame  = dom::dynamic_cast_Value<BGRRaster>(&*_mySourceRaster);
+        const BGRRaster * mySourceFrame  = dom::dynamic_cast_Value<BGRRaster>(_mySourceRaster.get());
         dom::Node::WritableValue<GRAYRaster> myTargetLock(_myTargetImage->getRasterValueNode());
         GRAYRaster & myTargetFrame = myTargetLock.get();
 

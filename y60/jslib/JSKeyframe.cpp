@@ -177,7 +177,7 @@ JSKeyframe::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, j
 
     if (argc == 0) {
         OWNERPTR myNewKeyframe = OWNERPTR(new QuaternionKeyframe());
-        myNewObject = new JSKeyframe(myNewKeyframe, &(*myNewKeyframe));
+        myNewObject = new JSKeyframe(myNewKeyframe, myNewKeyframe.get());
     } else if (argc == 4) {
         asl::Vector3f myPosition;
         if (JSVAL_IS_VOID(argv[0]) || !convertFrom(cx, argv[0], myPosition)) {
@@ -205,7 +205,7 @@ JSKeyframe::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, j
 
 
         OWNERPTR myNewKeyframe = OWNERPTR(new QuaternionKeyframe(myPosition, myOrienation, myTimeStamp, mySpeed));
-        myNewObject = new JSKeyframe(myNewKeyframe, &(*myNewKeyframe));
+        myNewObject = new JSKeyframe(myNewKeyframe, myNewKeyframe.get());
     } else {
         JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected 4 (position, orienation, timestamp, speed) %d",ClassName(), argc);
         return JS_FALSE;

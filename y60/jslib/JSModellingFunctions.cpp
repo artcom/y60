@@ -1190,7 +1190,7 @@ SetAlpha(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) {
         convertFrom(cx, argv[0], myNode);
         convertFrom(cx, argv[1], myAlpha);
 
-        y60::setAlpha(&*myNode, myAlpha);
+        y60::setAlpha(myNode.get(), myAlpha);
 
         return JS_TRUE;
 
@@ -1298,7 +1298,7 @@ JSModellingFunctions::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsva
 
     JSModellingFunctions *myNewObject = 0;
     OWNERPTR myNewNative = OWNERPTR(new bool);
-    myNewObject = new JSModellingFunctions(myNewNative, &(*myNewNative));
+    myNewObject = new JSModellingFunctions(myNewNative, myNewNative.get());
 
      if (myNewObject) {
         JS_SetPrivate(cx,obj,myNewObject);
@@ -1326,7 +1326,7 @@ bool convertFrom(JSContext *cx, jsval theValue, DummyT *& theDummy) {
         JSObject * myArgument;
         if (JS_ValueToObject(cx, theValue, &myArgument)) {
             if (JSA_GetClass(cx,myArgument) == JSClassTraits<JSModellingFunctions::NATIVE >::Class()) {
-                theDummy = &(*JSClassTraits<JSModellingFunctions::NATIVE>::getNativeOwner(cx,myArgument));
+                theDummy = JSClassTraits<JSModellingFunctions::NATIVE>::getNativeOwner(cx,myArgument).get();
                 return true;
             }
         }
@@ -1349,7 +1349,7 @@ bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<DummyT> & theDummy) {
 }
 
 jsval as_jsval(JSContext *cx, JSModellingFunctions::OWNERPTR & theOwner) {
-    JSObject * myReturnObject = JSModellingFunctions::Construct(cx, theOwner, &(*theOwner));
+    JSObject * myReturnObject = JSModellingFunctions::Construct(cx, theOwner, theOwner.get());
     return OBJECT_TO_JSVAL(myReturnObject);
 }
 

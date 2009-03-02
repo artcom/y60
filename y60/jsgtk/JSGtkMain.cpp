@@ -438,7 +438,7 @@ JSGtkMain::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, js
     }
 
     if (myNewObject) {
-        JS_SetPrivate(cx,obj,new JSGtkMain(myNewObject, &(*myNewObject)));
+        JS_SetPrivate(cx,obj,new JSGtkMain(myNewObject, myNewObject.get()));
         return JS_TRUE;
     }
     JS_ReportError(cx,"JSGtkMain::Constructor: bad parameters");

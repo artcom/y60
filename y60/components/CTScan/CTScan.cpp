@@ -88,6 +88,7 @@
 #include <asl/zip/PackageManager.h>
 #include <asl/math/Box.h>
 #include <asl/math/Line.h>
+#include <asl/base/begin_end.h>
 
 #include <y60/base/property_functions.h>
 #include <y60/base/PropertyNames.h>
@@ -1147,7 +1148,7 @@ CTScan::appendEmptySlices(asl::Block & the3DTexture, unsigned theSliceCount, int
 
     for (unsigned i = 0; i < theSliceCount; ++i) {
         AC_TRACE << "appending empty slice with " << theBytesPerSlice << " bytes";
-        the3DTexture.append(static_cast<void*>(&(*myEmptySlice.begin())), theBytesPerSlice);
+        the3DTexture.append(static_cast<void*>(asl::begin_ptr(myEmptySlice)), theBytesPerSlice);
     }
 }
 

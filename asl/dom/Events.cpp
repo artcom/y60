@@ -48,7 +48,7 @@ EventFactory::createEvent(const DOMString & theType) const {
 
 void
 EventFactory::registerPrototype(const DOMString & theType, EventPtr thePrototype) {
-    DB(AC_TRACE << "EventFactory::registerPrototype('"<<theType<<"',"<<(void*)&(*thePrototype)<<")"<<std::endl;)
+    DB(AC_TRACE << "EventFactory::registerPrototype('"<<theType<<"',"<<(void*)thePrototype.get()<<")"<<std::endl;)
     _myPrototypes[theType] = EventPtr(thePrototype->clone());
 }
 

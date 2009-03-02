@@ -583,7 +583,7 @@ bool Station::receive(asl::ResizeableBlock & theData, unsigned long & theSenderA
 #ifdef _WIN32
         int mySenderAddrSize = sizeof(sockaddr_in);
         // for windows, non-blocking mode has been already enabled in Station::open
-        int myResult = recvfrom(_myFileDescriptor, (char*)&(*myNewPacket), sizeof(Packet), 0,
+        int myResult = recvfrom(_myFileDescriptor, (char*)myNewPacket.get(), sizeof(Packet), 0,
                 (struct sockaddr*)&mySender, &mySenderAddrSize);
 
         DB2(AC_TRACE << "myResult = " << myResult << ", lastError = " << lastError() << endl);
@@ -596,7 +596,7 @@ bool Station::receive(asl::ResizeableBlock & theData, unsigned long & theSenderA
         }        
 #else
         socklen_t mySenderAddrSize = sizeof(sockaddr_in);
-        int myResult = recvfrom(_myFileDescriptor, &(*myNewPacket), sizeof(Packet), MSG_DONTWAIT,
+        int myResult = recvfrom(_myFileDescriptor, myNewPacket.get(), sizeof(Packet), MSG_DONTWAIT,
                 (struct sockaddr*)&mySender, &mySenderAddrSize);
         DB2(AC_TRACE << "myResult = " << myResult << ", lastError = " << lastError() << endl);
         if (myResult < 0) {

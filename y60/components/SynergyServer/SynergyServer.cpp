@@ -60,6 +60,7 @@
 #include <asl/base/Time.h>
 #include <y60/base/iostream_functions.h>
 #include <asl/net/net_functions.h>
+#include <asl/base/begin_end.h>
 #include <sstream>
 
 const unsigned int READ_BUFFER_SIZE = 2000;
@@ -243,7 +244,7 @@ void SynergyServer::run() {
                         std::vector<unsigned char>(_mySendMsgQueue.front());
                     _mySendMsgQueue.pop();
                     _myLock.unlock();
-                    _mySocket->send( reinterpret_cast<char*>(&(*myMsg.begin())), 
+                    _mySocket->send( reinterpret_cast<char*>(asl::begin_ptr(myMsg)), 
                                      myMsg.size() );
                 }
             }

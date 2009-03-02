@@ -621,7 +621,7 @@ Plug(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
         if (IEventSourcePtr myEventSource = dynamic_cast_Ptr<IEventSource>(myPlugIn)) {
             AC_INFO << myPluginName << ": as EventSource" << endl;
-            y60::EventDispatcher::get().addSource(&*myEventSource);
+            y60::EventDispatcher::get().addSource(myEventSource.get());
             IScriptablePluginPtr myScriptablePlugin = dynamic_cast_Ptr<IScriptablePlugin>( myPlugIn );
             if (myScriptablePlugin) {
                 * rval = as_jsval(cx, myScriptablePlugin);

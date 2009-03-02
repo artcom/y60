@@ -64,10 +64,11 @@
 #include "JScppUtils.h"
 #include "JSWrapper.h"
 
+#include <asl/base/begin_end.h>
 #include <asl/base/settings.h>
 #include <asl/base/Singleton.h>
-#include <y60/base/DataTypes.h>
 #include <asl/math/Vector234.h>
+#include <y60/base/DataTypes.h>
 
 namespace jslib {
 
@@ -104,8 +105,8 @@ namespace detail {
     template <template<class> class NATIVE_VECTOR>
     struct as_jsval_helper<NATIVE_VECTOR,asl::AC_SIZE_TYPE> {
         static jsval as_jsval(JSContext *cx, const NATIVE_VECTOR<asl::AC_SIZE_TYPE> & theValue) {
-            NATIVE_VECTOR<int> tmp( reinterpret_cast<const int*>(&*theValue.begin())
-                                  , reinterpret_cast<const int*>(&*theValue.end  ()) );
+            NATIVE_VECTOR<int> tmp( reinterpret_cast<const int*>(asl::begin_ptr(theValue))
+                                  , reinterpret_cast<const int*>(asl::end_ptr  (theValue)) );
             JSObject * myReturnObject = JSVector<NATIVE_VECTOR<int> >::Construct(cx, tmp);
             return OBJECT_TO_JSVAL(myReturnObject);
         }

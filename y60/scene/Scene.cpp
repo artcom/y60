@@ -510,7 +510,7 @@ namespace y60 {
     void
     Scene::reloadMaterial(NodePtr theMaterialNode, MaterialBasePtr theMaterial) {
         // Find all primitives that reference the material
-        MaterialBase * myMaterial = &*theMaterial;
+        MaterialBase * myMaterial = theMaterial.get();
         PrimitiveVector myAffectedPrimitives;
         NodePtr myShapeListNode = getShapesRoot();
         unsigned myShapeCount = myShapeListNode->childNodesLength();
@@ -537,7 +537,7 @@ namespace y60 {
     Scene::reloadMaterial(NodePtr theMaterialNode, MaterialBasePtr theMaterial) {
         AC_TRACE << " Scene::reloadMaterial id="<< theMaterialNode->getAttributeString("id");
         // Find all primitives that reference the material
-        MaterialBase * myMaterial = &*theMaterial;
+        MaterialBase * myMaterial = theMaterial.get();
         PrimitiveVector myAffectedPrimitives;
         std::vector<NodePtr> myShapes = xpath::findAll(getNode(), "//shape");
         unsigned myShapeCount = myShapes.size();

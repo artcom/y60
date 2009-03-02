@@ -188,7 +188,7 @@ JSStlCodec::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, j
         return JS_FALSE;
     }
 
-    JSStlCodec * myNewObject = new JSStlCodec(myNewNative, &(*myNewNative));
+    JSStlCodec * myNewObject = new JSStlCodec(myNewNative, myNewNative.get());
     JS_SetPrivate(cx, obj, myNewObject);
     return JS_TRUE;
 }
@@ -227,7 +227,7 @@ bool convertFrom(JSContext *cx, jsval theValue, JSStlCodec::OWNERPTR & theStlCod
 }
 
 jsval as_jsval(JSContext *cx, JSStlCodec::OWNERPTR theOwner) {
-    JSObject * myReturnObject = JSStlCodec::Construct(cx, theOwner, &(*theOwner));
+    JSObject * myReturnObject = JSStlCodec::Construct(cx, theOwner, theOwner.get());
     return OBJECT_TO_JSVAL(myReturnObject);
 }
 

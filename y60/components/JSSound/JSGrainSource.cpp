@@ -86,7 +86,7 @@ namespace jslib {
         JSGrainSource::OWNERPTR myNative;
         convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
-        myDecoder->setSampleSink(&(*myNative));
+        myDecoder->setSampleSink(myNative.get());
         myNative->clearAudioData();
         myDecoder->decodeEverything();
         delete myDecoder;
@@ -281,7 +281,7 @@ namespace jslib {
 
             Pump::get().addSampleSource(myNewNative);
 
-            JSGrainSource * myNewObject = new JSGrainSource(myNewNative, &(*myNewNative));
+            JSGrainSource * myNewObject = new JSGrainSource(myNewNative, myNewNative.get());
             if (myNewObject) {
                 JS_SetPrivate(cx, obj, myNewObject);
                 return JS_TRUE;
@@ -313,7 +313,7 @@ namespace jslib {
     }
 
     jsval as_jsval(JSContext *cx, JSGrainSource::OWNERPTR theOwner) {
-        JSObject * myReturnObject = JSGrainSource::Construct(cx, theOwner, &(*theOwner));
+        JSObject * myReturnObject = JSGrainSource::Construct(cx, theOwner, theOwner.get());
         return OBJECT_TO_JSVAL(myReturnObject);
     }
 

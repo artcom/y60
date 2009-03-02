@@ -85,6 +85,7 @@
 #include "GLResourceManager.h"
 
 #include <asl/base/Assure.h>
+#include <asl/base/begin_end.h>
 #include <asl/base/file_functions.h>
 #include <asl/base/string_functions.h>
 #include <asl/math/numeric_functions.h>
@@ -1498,7 +1499,7 @@ namespace y60 {
         glLightf(gl_lightid, GL_LINEAR_ATTENUATION, myLinearAttenuation); // 0
         glLightfv(gl_lightid, GL_SPOT_DIRECTION, &(myDirection[0])); // 0.0, 0.0, -1.0
 
-        glLightfv(gl_lightid, GL_POSITION, &(*myGLLightPos.begin()));
+        glLightfv(gl_lightid, GL_POSITION, asl::begin_ptr(myGLLightPos));
         glLightfv(gl_lightid, GL_AMBIENT,  myLightPropFacade->get<LightAmbientTag>().begin());
         glLightfv(gl_lightid, GL_DIFFUSE,  myLightPropFacade->get<LightDiffuseTag>().begin());
         glLightfv(gl_lightid, GL_SPECULAR, myLightPropFacade->get<LightSpecularTag>().begin());
@@ -1826,7 +1827,7 @@ namespace y60 {
                 // force depth buffer deactivation
                 RenderStyles myOverlayRenderStyle(BIT(IGNORE_DEPTH) | BIT(NO_DEPTH_WRITES));
 
-                enableRenderStyles(myOverlayRenderStyle, &(*myMaterial));
+                enableRenderStyles(myOverlayRenderStyle, myMaterial.get());
                 MaterialPropertiesFacadePtr myPropFacade = myMaterial->getChild<MaterialPropertiesTag>();
 
                 const asl::Vector4f & myColor = myPropFacade->get<SurfaceColorTag>();

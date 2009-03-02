@@ -108,7 +108,7 @@ public:
 
               IAudioDecoder* myDecoder = 
                   new FFMpegAudioDecoder(mySoundFile);
-              myDecoder->setSampleSink(&(*myGrainSource));
+              myDecoder->setSampleSink(myGrainSource.get());
               myGrainSource->clearAudioData();
               myDecoder->decodeEverything();
               delete myDecoder;

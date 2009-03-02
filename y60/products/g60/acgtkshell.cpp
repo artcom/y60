@@ -6,7 +6,7 @@
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
 // of GNU General Public License referenced below. 
-//    
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -76,6 +76,7 @@
     #pragma warning(pop)
 #endif //defined(_MSC_VER)
 
+#include <asl/base/begin_end.h>
 #include <asl/base/Arguments.h>
 #include <asl/base/string_functions.h>
 #include <asl/base/StdOutputRedirector.h>
@@ -136,7 +137,7 @@ acMain(int argc, char **argv) {
         }
 
         ourArguments.addAllowedOptions(ourAllowedOptions);
-        if (!ourArguments.parse(myAppArgv.size(), &(*myAppArgv.begin()) )) {
+        if (!ourArguments.parse(myAppArgv.size(), asl::begin_ptr(myAppArgv) )) {
             return 0;
         }
 

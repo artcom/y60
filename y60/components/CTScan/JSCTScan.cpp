@@ -810,7 +810,7 @@ JSCTScan::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsv
             return JS_FALSE;
     }
 
-    JSCTScan * myNewObject = new JSCTScan(myNewNative, &(*myNewNative));
+    JSCTScan * myNewObject = new JSCTScan(myNewNative, myNewNative.get());
     JS_SetPrivate(cx, obj, myNewObject);
     return JS_TRUE;
 }
@@ -834,7 +834,7 @@ bool convertFrom(JSContext *cx, jsval theValue, JSCTScan::OWNERPTR & theCTScan) 
 }
 
 jsval as_jsval(JSContext *cx, JSCTScan::OWNERPTR theOwner) {
-    JSObject * myReturnObject = JSCTScan::Construct(cx, theOwner, &(*theOwner));
+    JSObject * myReturnObject = JSCTScan::Construct(cx, theOwner, theOwner.get());
     return OBJECT_TO_JSVAL(myReturnObject);
 }
 

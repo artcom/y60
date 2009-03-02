@@ -64,6 +64,7 @@
 #include "RankedFeature.h" // Needed to make sure [de]binarize(RankedFeature) gets called :-(.
 #include "typedefs.h"
 
+#include <asl/base/begin_end.h>
 #include <asl/base/Block.h>
 #include <asl/dom/Value.h>
 
@@ -143,7 +144,7 @@ namespace asl {
         asl::Vector2i mySize(m.hsize(), m.vsize());
         if (o << mySize) {
 #ifdef UNCOMPRESSED_RASTER_STREAM
-            o << asl::ReadableBlockAdapter((const unsigned char*)&(*m.begin()), (const unsigned char*)&(*m.end()));
+            o << asl::ReadableBlockAdapter((const unsigned char*)begin_ptr(m), (const unsigned char*)end_ptr(m));
 #else
             asl::Block myRasterBlock;
             dom::binarize(m, myRasterBlock);
@@ -160,10 +161,10 @@ namespace asl {
 #ifdef UNCOMPRESSED_RASTER_STREAM
             asl::Block myBlock;
             if (is >> myBlock) {
-                asl::WriteableBlockAdapter myCurrentImage((unsigned char*)&(*m.begin()), (unsigned char*)&(*m.end()));
+                asl::WriteableBlockAdapter myCurrentImage((const unsigned char*)begin_ptr(m), (const unsigned char*)end_ptr(m));
                 if (myCurrentImage.size() != myBlock.size()) {
                     m.resize(mySize[0], mySize[1]);
-                    asl::WriteableBlockAdapter myImage((unsigned char*)&(*m.begin()), (unsigned char*)&(*m.end()));
+                    asl::WriteableBlockAdapter myImage((const unsigned char*)begin_ptr(m), (const unsigned char*)end_ptr(m));
                     myImage.assign(myBlock);
                     return is;
                 }

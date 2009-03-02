@@ -100,7 +100,7 @@ class XmlDomUnitTest : public UnitTest {
                     ENSURE(myParsedDocument->childNodes().length() == 1);
                     ENSURE(myParsedDocument->childNodesLength() == 1);
                     ENSURE(myParsedDocument->childNode(0));
-                    ENSURE(myParsedDocument->childNode(0)->parentNode() == &(*myParsedDocument));
+                    ENSURE(myParsedDocument->childNode(0)->parentNode() == myParsedDocument.get());
                     ENSURE(myParsedDocument->childNode(0)->nodeType() == dom::Node::ELEMENT_NODE);
                     ENSURE(myParsedDocument->childNode(0)->nodeName() == "somexml");
                     dom::NodePtr myElement = myParsedDocument->childNode(0);
@@ -110,7 +110,7 @@ class XmlDomUnitTest : public UnitTest {
                     myElement->appendChild(dom::Element("blub"));
                     SUCCESS("myElement->appendChild(dom::Element(blub))");
                     dom::NodePtr myChild = myElement->childNode(1);
-                    ENSURE(myChild->parentNode() == &(*myElement));
+                    ENSURE(myChild->parentNode() == myElement.get());
                     ENSURE(myElement->childNode(0)->nextSibling() == myChild);
                     ENSURE(myElement->childNode(1)->nextSibling() == dom::NodePtr());
                     ENSURE(myElement->removeChild(myChild) == myChild);
@@ -126,7 +126,7 @@ class XmlDomUnitTest : public UnitTest {
                 myNodeMap.setNamedItem(myAttribNodePtr);
                 ENSURE(myNodeMap.length() == 1);
                 ENSURE(myNodeMap.item(0) == myAttribNodePtr);
-                ENSURE(&(myNodeMap[0]) == &(*myAttribNodePtr));
+                ENSURE(&(myNodeMap[0]) == myAttribNodePtr.get());
                 ENSURE(myNodeMap["attribute"].nodeValue() == "value");
 
                 dom::Node myElemWithAttrib("elem_with_attrib",myNodeMap, 0);

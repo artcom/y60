@@ -451,7 +451,7 @@ bool convertFrom(JSContext *cx, jsval theValue, Renderer *& theRenderer) {
         JSObject * myArgument;
         if (JS_ValueToObject(cx, theValue, &myArgument)) {
             if (JSA_GetClass(cx,myArgument) == JSClassTraits<JSRenderer::NATIVE >::Class()) {
-                theRenderer = &(*JSClassTraits<JSRenderer::NATIVE>::getNativeOwner(cx,myArgument));
+                theRenderer = JSClassTraits<JSRenderer::NATIVE>::getNativeOwner(cx,myArgument).get();
                 return true;
             }
         }
@@ -473,7 +473,7 @@ bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<Renderer> & theRenderer
 }
 
 jsval as_jsval(JSContext *cx, JSRenderer::OWNERPTR & theOwner) {
-    JSObject * myReturnObject = JSRenderer::Construct(cx, theOwner, &(*theOwner));
+    JSObject * myReturnObject = JSRenderer::Construct(cx, theOwner, theOwner.get());
     return OBJECT_TO_JSVAL(myReturnObject);
 }
 

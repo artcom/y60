@@ -61,6 +61,7 @@
 
 #include <asl/base/Time.h>
 #include <asl/base/Logger.h>
+#include <asl/base/begin_end.h>
 
 const unsigned RESPONSE_TIMEOUT = 1500;
 const unsigned READ_BUFFER_SIZE = 20000;
@@ -305,6 +306,6 @@ bool TestSynergyServer::waitUntilTimeout() {
 
 unsigned TestSynergyServer::receive( std::vector<unsigned char> & theData ) {
     theData.resize( READ_BUFFER_SIZE, 0x00 );
-    return _myTestSocket.receive( reinterpret_cast<char*>(&(*theData.begin())),
+    return _myTestSocket.receive( reinterpret_cast<char*>(asl::begin_ptr(theData)),
                                  theData.size() );
 }

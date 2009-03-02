@@ -65,11 +65,13 @@
 #    include <direct.h>
 #endif
 
-#include <y60/base/NodeValueNames.h>
+#include <asl/base/begin_end.h>
 #include <y60/base/iostream_functions.h>
 #include <asl/base/string_functions.h>
 #include <asl/base/file_functions.h>
 #include <asl/dom/Nodes.h>
+
+#include <y60/base/NodeValueNames.h>
 
 #include "Renderer.h"
 
@@ -172,7 +174,7 @@ namespace y60 {
             assertCg("CgProgramInfo::~CgProgramInfo()", _myContext);
         }
     }
-    
+
     // This should go away when the cg bug will be fixed that prevents vertex shaders to accept
     // unsized arrays of size 0; theArgs pointer will also become invalid after destruction of theArgsStrings, so take care
     void CgProgramInfo::appendUnsizedArrayBugWorkaroundCompilerArgs(std::vector<std::string> & theArgStrings, std::vector<const char*> theArgs) const {
@@ -216,7 +218,7 @@ namespace y60 {
                                                      _myPathName.c_str(),
                                                      asCgProfile(_myShader),
                                                      _myShader._myEntryFunction.c_str(),
-                                                     &(*myArgs.begin()));
+                                                     asl::begin_ptr(myArgs));
             DBP2(STOP_TIMER(CgProgramInfo_cgCreateProgramFromFile));
             AC_TRACE << "cgCreateProgramFromFile created program id = "<<_myCgProgramID;
 
@@ -244,7 +246,7 @@ namespace y60 {
             AC_DEBUG << "cgCreateProgram  profile = " << ShaderProfileStrings[_myShader._myProfile] << ", entry= "<<_myShader._myEntryFunction;
             _myCgProgramID = cgCreateProgram(_myContext, CG_SOURCE, _myCgProgramString.c_str(),
                                              asCgProfile(_myShader), _myShader._myEntryFunction.c_str(),
-                                             &(*_myCachedCompilerArgs.begin()));
+                                             asl::begin_ptr(_myCachedCompilerArgs));
             AC_TRACE << "cgCreateProgram created program id = "<<_myCgProgramID;
 #ifdef _WIN32
             _chdir( myCWD.c_str());                                     
@@ -510,26 +512,26 @@ namespace y60 {
             AC_DEBUG << "#of texture matrices:" << theMaterial.getTextureUnitCount();
             _myUnsizedArrayAutoParamSizes[TEXTURE_MATRICES] = theMaterial.getTextureUnitCount();
 
-                                            DBP2(START_TIMER(CgProgramInfo_reloadIfRequired_reload_compile));
+            DBP2(START_TIMER(CgProgramInfo_reloadIfRequired_reload_compile));
             createAndCompileProgram();
-                                            DBP2(STOP_TIMER(CgProgramInfo_reloadIfRequired_reload_compile));
+            DBP2(STOP_TIMER(CgProgramInfo_reloadIfRequired_reload_compile));
 
-                                            START_TIMER(CgProgramInfo_reloadIfRequired_reload_load);
+            START_TIMER(CgProgramInfo_reloadIfRequired_reload_load);
             cgGLLoadProgram(_myCgProgramID);
-                                            STOP_TIMER(CgProgramInfo_reloadIfRequired_reload_load);
+            STOP_TIMER(CgProgramInfo_reloadIfRequired_reload_load);
             assertCg(PLUS_FILE_LINE, _myContext);
 
-                                            DBP2(START_TIMER(CgProgramInfo_reloadIfRequired_enableProfile));
+            DBP2(START_TIMER(CgProgramInfo_reloadIfRequired_enableProfile));
             enableProfile();
-                                            DBP2(STOP_TIMER(CgProgramInfo_reloadIfRequired_enableProfile));
+            DBP2(STOP_TIMER(CgProgramInfo_reloadIfRequired_enableProfile));
             
-                                            DBP2(START_TIMER(CgProgramInfo_reloadIfRequired_bindMaterialParams));
+            DBP2(START_TIMER(CgProgramInfo_reloadIfRequired_bindMaterialParams));
             bindMaterialParams(theMaterial);
-                                            DBP2(STOP_TIMER(CgProgramInfo_reloadIfRequired_bindMaterialParams));
+            DBP2(STOP_TIMER(CgProgramInfo_reloadIfRequired_bindMaterialParams));
             
-                                            DBP2(START_TIMER(CgProgramInfo_reloadIfRequired_enableTextures));
+            DBP2(START_TIMER(CgProgramInfo_reloadIfRequired_enableTextures));
             enableTextures();
-                                            DBP2(STOP_TIMER(CgProgramInfo_reloadIfRequired_enableTextures));
+            DBP2(STOP_TIMER(CgProgramInfo_reloadIfRequired_enableTextures));
 
             assertCg(PLUS_FILE_LINE, _myContext);
         }
@@ -544,7 +546,7 @@ namespace y60 {
         const Viewport & theViewport,
         const Body & theBody,
         const Camera & theCamera)
-    {        
+    {
         AC_TRACE << "CgProgramInfo::bindBodyParams for shader filename=" << _myShader._myFilename << " entry=" << _myShader._myEntryFunction
                  << " body=" << theBody.get<NameTag>()<< " material=" << theMaterial.get<NameTag>() 
                  << " camera=" << theCamera.get<NameTag>() << " viewport=" << theViewport.get<NameTag>();
@@ -626,128 +628,128 @@ namespace y60 {
             AC_TRACE << "setting parameter " << curParam._myName;
 
             switch (curParam._myID) {
-                case CAMERA_POSITION :
+            case CAMERA_POSITION :
 				{AC_TRACE << "setting CAMERA_POSITION to " << theCamera.get<GlobalMatrixTag>().getTranslation();}
-                    setCgVectorParameter(curParam, theCamera.get<GlobalMatrixTag>().getTranslation());
-                    break;
-                case POSITIONAL_LIGHTS :
+                setCgVectorParameter(curParam, theCamera.get<GlobalMatrixTag>().getTranslation());
+                break;
+            case POSITIONAL_LIGHTS :
 				{AC_TRACE << "setting POSITIONAL_LIGHTS to " << myPositionalLights;}
-                    setCgUnsizedArrayParameter(curParam, myPositionalLights);
-                    break;
-                case POSITIONAL_LIGHTS_DIFFUSE_COLOR :
+                setCgUnsizedArrayParameter(curParam, myPositionalLights);
+                break;
+            case POSITIONAL_LIGHTS_DIFFUSE_COLOR :
 				{AC_TRACE << "setting POSITIONAL_LIGHTS_DIFFUSE_COLOR to " << myPositionalLightDiffuseColors;}
-                    setCgUnsizedArrayParameter(curParam, myPositionalLightDiffuseColors);
-                    break;
-                case POSITIONAL_LIGHTS_SPECULAR_COLOR :
+                setCgUnsizedArrayParameter(curParam, myPositionalLightDiffuseColors);
+                break;
+            case POSITIONAL_LIGHTS_SPECULAR_COLOR :
 				{AC_TRACE << "setting POSITIONAL_LIGHTS_SPECULAR_COLOR to " << myPositionalLightSpecularColors;}
-                    setCgUnsizedArrayParameter(curParam, myPositionalLightSpecularColors);
-                    break;
-                case DIRECTIONAL_LIGHTS :
+                setCgUnsizedArrayParameter(curParam, myPositionalLightSpecularColors);
+                break;
+            case DIRECTIONAL_LIGHTS :
 				{AC_TRACE << "setting DIRECTIONAL_LIGHTS to " << myDirectionalLights;}
-                    setCgUnsizedArrayParameter(curParam, myDirectionalLights);
-                    break;
-                case DIRECTIONAL_LIGHTS_DIFFUSE_COLOR :
+                setCgUnsizedArrayParameter(curParam, myDirectionalLights);
+                break;
+            case DIRECTIONAL_LIGHTS_DIFFUSE_COLOR :
 				{AC_TRACE << "setting DIRECTIONAL_LIGHTS_DIFFUSE_COLOR to " << myDirectionalLightDiffuseColors;}
-                    setCgUnsizedArrayParameter(curParam, myDirectionalLightDiffuseColors);
-                    break;
-                case DIRECTIONAL_LIGHTS_SPECULAR_COLOR :
+                setCgUnsizedArrayParameter(curParam, myDirectionalLightDiffuseColors);
+                break;
+            case DIRECTIONAL_LIGHTS_SPECULAR_COLOR :
 				{AC_TRACE << "setting DIRECTIONAL_LIGHTS_SPECULAR_COLOR to " << myDirectionalLightSpecularColors;}
-                    setCgUnsizedArrayParameter(curParam, myDirectionalLightSpecularColors);
-                    break;
-                case SPOT_LIGHTS :
+                setCgUnsizedArrayParameter(curParam, myDirectionalLightSpecularColors);
+                break;
+            case SPOT_LIGHTS :
 				{AC_TRACE << "setting SPOT_LIGHTS to " << mySpotLights;}
-                    setCgUnsizedArrayParameter(curParam, mySpotLights);
-                    break;
-                case SPOT_LIGHTS_DIFFUSE_COLOR :
+                setCgUnsizedArrayParameter(curParam, mySpotLights);
+                break;
+            case SPOT_LIGHTS_DIFFUSE_COLOR :
 				{AC_TRACE << "setting SPOT_LIGHTS_DIFFUSE_COLOR to " << mySpotLightDiffuseColors;}
-                    setCgUnsizedArrayParameter(curParam, mySpotLightDiffuseColors);
-                    break;
-                case SPOT_LIGHTS_SPECULAR_COLOR :
+                setCgUnsizedArrayParameter(curParam, mySpotLightDiffuseColors);
+                break;
+            case SPOT_LIGHTS_SPECULAR_COLOR :
 				{AC_TRACE << "setting SPOT_LIGHTS_SPECULAR_COLOR to " << mySpotLightSpecularColors;}
-                    setCgUnsizedArrayParameter(curParam, mySpotLightSpecularColors);
-                    break;
-                case SPOT_LIGHTS_EXPONENT :
+                setCgUnsizedArrayParameter(curParam, mySpotLightSpecularColors);
+                break;
+            case SPOT_LIGHTS_EXPONENT :
 				{AC_TRACE << "setting SPOT_LIGHTS_EXPONENT to " << mySpotLightExponent;}
-                    setCgUnsizedArrayParameter(curParam, mySpotLightExponent);
-                    break;
-                case SPOT_LIGHTS_CUTOFF :
+                setCgUnsizedArrayParameter(curParam, mySpotLightExponent);
+                break;
+            case SPOT_LIGHTS_CUTOFF :
 				{AC_TRACE << "setting SPOT_LIGHTS_CUTOFF to " << mySpotLightCutoff;}
-                    setCgUnsizedArrayParameter(curParam, mySpotLightCutoff);
-                    break;
-                case SPOT_LIGHTS_DIRECTION :
+                setCgUnsizedArrayParameter(curParam, mySpotLightCutoff);
+                break;
+            case SPOT_LIGHTS_DIRECTION :
 				{AC_TRACE << "setting SPOT_LIGHTS_DIRECTION to " << mySpotLightDirection;}
-                    setCgUnsizedArrayParameter(curParam, mySpotLightDirection);
-                    break;
-                case SPOT_LIGHTS_ATTENUATION :
+                setCgUnsizedArrayParameter(curParam, mySpotLightDirection);
+                break;
+            case SPOT_LIGHTS_ATTENUATION :
 				{AC_TRACE << "setting SPOT_LIGHTS_ATTENUATION to " << mySpotLightAttenuation;}
-                    setCgUnsizedArrayParameter(curParam, mySpotLightAttenuation);
-                    break;
-                case AMBIENT_LIGHT_COLOR :
+                setCgUnsizedArrayParameter(curParam, mySpotLightAttenuation);
+                break;
+            case AMBIENT_LIGHT_COLOR :
 				{AC_TRACE << "setting AMBIENT_LIGHT_COLOR to " << myAmbientLightColor;}
-                    setCgVectorParameter(curParam, myAmbientLightColor);
-                    break;
-                case CAMERA_I:
+                setCgVectorParameter(curParam, myAmbientLightColor);
+                break;
+            case CAMERA_I:
 				{AC_TRACE << "setting CAMERA_I to " << theCamera.get<InverseGlobalMatrixTag>();}
-                    setCgMatrixParameter(curParam, theCamera.get<InverseGlobalMatrixTag>());
-                    break;
-                case CAMERA_T:
-                {
-                    Matrix4f myTransposedMatrix = theCamera.get<GlobalMatrixTag>();
-                    myTransposedMatrix.transpose();
+                setCgMatrixParameter(curParam, theCamera.get<InverseGlobalMatrixTag>());
+                break;
+            case CAMERA_T:
+            {
+                Matrix4f myTransposedMatrix = theCamera.get<GlobalMatrixTag>();
+                myTransposedMatrix.transpose();
                     {AC_TRACE << "setting CAMERA_T to " << myTransposedMatrix;}
-                    setCgMatrixParameter(curParam, myTransposedMatrix);
-                    break;
-                }
-                case VIEWPROJECTION:
-                {
-                    Matrix4f myMatrix = theCamera.get<InverseGlobalMatrixTag>();
-                    //myMatrix.postMultiply(theViewport.get<ProjectionMatrixTag>()); XXX
-                    Matrix4f myProjectionMatrix;
-                    theCamera.get<FrustumTag>().getProjectionMatrix( myProjectionMatrix );
-                    myMatrix.postMultiply(myProjectionMatrix);
+                setCgMatrixParameter(curParam, myTransposedMatrix);
+                break;
+            }
+            case VIEWPROJECTION:
+            {
+                Matrix4f myMatrix = theCamera.get<InverseGlobalMatrixTag>();
+                //myMatrix.postMultiply(theViewport.get<ProjectionMatrixTag>()); XXX
+                Matrix4f myProjectionMatrix;
+                theCamera.get<FrustumTag>().getProjectionMatrix( myProjectionMatrix );
+                myMatrix.postMultiply(myProjectionMatrix);
                     {AC_TRACE << "setting VIEWPROJECTION to " << myMatrix;}
-                    setCgMatrixParameter(curParam, myMatrix);
-                    break;
-                }
-                case OBJECTWORLD:
+                setCgMatrixParameter(curParam, myMatrix);
+                break;
+            }
+            case OBJECTWORLD:
 				{AC_TRACE << "setting OBJECTWORLD to " << theBody.get<GlobalMatrixTag>();}
-                    setCgMatrixParameter(curParam, theBody.get<GlobalMatrixTag>());
-                    break;
-                case OBJECTWORLD_I:
+                setCgMatrixParameter(curParam, theBody.get<GlobalMatrixTag>());
+                break;
+            case OBJECTWORLD_I:
 				{AC_TRACE << "setting OBJECTWORLD_I to " << theBody.get<InverseGlobalMatrixTag>();}
-                    setCgMatrixParameter(curParam, theBody.get<InverseGlobalMatrixTag>());
-                    break;
-                case OBJECTWORLD_T:
-                {
-                    Matrix4f myTransposedMatrix = theBody.get<GlobalMatrixTag>();
-                    myTransposedMatrix.transpose();
+                setCgMatrixParameter(curParam, theBody.get<InverseGlobalMatrixTag>());
+                break;
+            case OBJECTWORLD_T:
+            {
+                Matrix4f myTransposedMatrix = theBody.get<GlobalMatrixTag>();
+                myTransposedMatrix.transpose();
                     {AC_TRACE << "setting OBJECTWORLD_T to " << myTransposedMatrix;}
-                    setCgMatrixParameter(curParam, myTransposedMatrix);
-                    break;
-                }
-                case OBJECTWORLD_IT:
-                {
-                    Matrix4f myTransposedMatrix = theBody.get<InverseGlobalMatrixTag>();
-                    myTransposedMatrix.transpose();
+                setCgMatrixParameter(curParam, myTransposedMatrix);
+                break;
+            }
+            case OBJECTWORLD_IT:
+            {
+                Matrix4f myTransposedMatrix = theBody.get<InverseGlobalMatrixTag>();
+                myTransposedMatrix.transpose();
                     {AC_TRACE << "setting OBJECTWORLD_T to " << myTransposedMatrix;}
-                    setCgMatrixParameter(curParam, myTransposedMatrix);
-                    break;
-                }
-                case TEXTURE_MATRICES:
-                {
+                setCgMatrixParameter(curParam, myTransposedMatrix);
+                break;
+            }
+            case TEXTURE_MATRICES:
+            {
                     {AC_TRACE << "setting TEXTURE_MATRICES";}
-                    unsigned mySize = cgGetArraySize(curParam._myParameter, 0);
-                    for (unsigned i = 0; i < mySize; ++i) {
-                        CGparameter myParam = cgGetArrayParameter(curParam._myParameter, i);
-                        Matrix4f myTextureMatrix = theMaterial.getTextureUnit(i).get<TextureUnitMatrixTag>();
+                unsigned mySize = cgGetArraySize(curParam._myParameter, 0);
+                for (unsigned i = 0; i < mySize; ++i) {
+                    CGparameter myParam = cgGetArrayParameter(curParam._myParameter, i);
+                    Matrix4f myTextureMatrix = theMaterial.getTextureUnit(i).get<TextureUnitMatrixTag>();
                         {AC_TRACE << "setting texture matrix << " << i << " param=" << myParam << " to " << myTextureMatrix;}
-                        cgGLSetMatrixParameterfc(myParam, myTextureMatrix.getData());
-                    }
-                    break;
+                    cgGLSetMatrixParameterfc(myParam, myTextureMatrix.getData());
                 }
-                default:
-                    myParamValueFoundFlag = false;
-                    break;
+                break;
+            }
+            default:
+                myParamValueFoundFlag = false;
+                break;
             }
             if (!myParamValueFoundFlag) {
                 AC_WARNING << "no value for cg auto parameter " << curParam._myName << endl;
@@ -808,81 +810,81 @@ namespace y60 {
         TypeId myType;
         myType.fromString(theNode.parentNode()->nodeName());
         switch(myType) {
-            case FLOAT:
-            {
-                float myValue = theNode.nodeValueAs<float>();
-                cgGLSetParameter1f(theCgParameter, myValue);
-                break;
-            }
-            case VECTOR2F:
-            {
-                Vector2f myValueV = theNode.nodeValueAs<Vector2f>();
-                float * myValue = myValueV.begin();
-                cgGLSetParameter2fv(theCgParameter, myValue);
-                break;
-            }
-            case VECTOR3F:
-            {
-                Vector3f myValueV = theNode.nodeValueAs<Vector3f>();
-                float * myValue = myValueV.begin();
-                cgGLSetParameter3fv(theCgParameter, myValue);
-                break;
-            }
-            case VECTOR4F:
-            {
-                Vector4f myValueV = theNode.nodeValueAs<Vector4f>();
-                float * myValue = myValueV.begin();
-                cgGLSetParameter4fv(theCgParameter, myValue);
-                break;
-            }
-            case VECTOR_OF_FLOAT:
-            {
-                VectorOfFloat myValueV = theNode.nodeValueAs<VectorOfFloat>();
-                float * myValue = &myValueV[0];
-                cgGLSetParameterArray1f(theCgParameter, 0, myValueV.size(), myValue);
-                break;
-            }
-            case VECTOR_OF_VECTOR2F:
-            {
-                VectorOfVector2f myValueV = theNode.nodeValueAs<VectorOfVector2f>();
-                float * myValue = myValueV.begin()->begin();
-                cgGLSetParameterArray2f(theCgParameter, 0, myValueV.size(), myValue);
-                break;
-            }
-            case VECTOR_OF_VECTOR4F:
-            {
-                VectorOfVector4f myValueV = theNode.nodeValueAs<VectorOfVector4f>();
-                float * myValue = myValueV.begin()->begin();
-                cgGLSetParameterArray4f(theCgParameter, 0, myValueV.size(), myValue);
-                break;
-            }
-            case SAMPLER2D:
-            case SAMPLER3D:
-            case SAMPLERCUBE:
-            {
-                unsigned myTextureIndex = theNode.nodeValueAs<unsigned>();
-                if (myTextureIndex < theMaterial.getTextureUnitCount()) {
-                    const TextureUnit & myTextureUnit = theMaterial.getTextureUnit(myTextureIndex);
-                    const TexturePtr & myTexture = myTextureUnit.getTexture();
-                    
-                    unsigned myTextureId = myTexture->getTextureId();
-                    AC_TRACE << "cgGLSetTextureParameter param=" << theCgParameter << " texid=" << myTextureId;
-                    cgGLSetTextureParameter( theCgParameter, myTextureId);
-                    AC_TRACE << "cgGLSetTextureParameter: Texture index " << as_string(myTextureIndex)
-                       << ", texid=" << myTextureId << ", property=" << thePropertyName
-                       << " to parameter : "<< cgGetParameterName(theCgParameter) << endl;
-                } else {
-                    throw ShaderException(string("Texture index ") + as_string(myTextureIndex) +
-                                          " not found. Material id=" + theMaterial.get<IdTag>() + " name=" + theMaterial.get<NameTag>() + " has " + as_string(theMaterial.getTextureUnitCount()) + " texture(s)",
-                                          "CgProgramInfo::setCgMaterialParameter()");
-                }
-                break;
-            }
-            default:
-                throw ShaderException(string("Unknown CgParameter type in property '")+thePropertyName+"'",
-                                      "CgProgramInfo::setCgMaterialParameter()");
+        case FLOAT:
+        {
+            float myValue = theNode.nodeValueAs<float>();
+            cgGLSetParameter1f(theCgParameter, myValue);
+            break;
         }
-        
+        case VECTOR2F:
+        {
+            Vector2f myValueV = theNode.nodeValueAs<Vector2f>();
+            float * myValue = myValueV.begin();
+            cgGLSetParameter2fv(theCgParameter, myValue);
+            break;
+        }
+        case VECTOR3F:
+        {
+            Vector3f myValueV = theNode.nodeValueAs<Vector3f>();
+            float * myValue = myValueV.begin();
+            cgGLSetParameter3fv(theCgParameter, myValue);
+            break;
+        }
+        case VECTOR4F:
+        {
+            Vector4f myValueV = theNode.nodeValueAs<Vector4f>();
+            float * myValue = myValueV.begin();
+            cgGLSetParameter4fv(theCgParameter, myValue);
+            break;
+        }
+        case VECTOR_OF_FLOAT:
+        {
+            VectorOfFloat myValueV = theNode.nodeValueAs<VectorOfFloat>();
+            float * myValue = &myValueV[0];
+            cgGLSetParameterArray1f(theCgParameter, 0, myValueV.size(), myValue);
+            break;
+        }
+        case VECTOR_OF_VECTOR2F:
+        {
+            VectorOfVector2f myValueV = theNode.nodeValueAs<VectorOfVector2f>();
+            float * myValue = myValueV.begin()->begin();
+            cgGLSetParameterArray2f(theCgParameter, 0, myValueV.size(), myValue);
+            break;
+        }
+        case VECTOR_OF_VECTOR4F:
+        {
+            VectorOfVector4f myValueV = theNode.nodeValueAs<VectorOfVector4f>();
+            float * myValue = myValueV.begin()->begin();
+            cgGLSetParameterArray4f(theCgParameter, 0, myValueV.size(), myValue);
+            break;
+        }
+        case SAMPLER2D:
+        case SAMPLER3D:
+        case SAMPLERCUBE:
+        {
+            unsigned myTextureIndex = theNode.nodeValueAs<unsigned>();
+            if (myTextureIndex < theMaterial.getTextureUnitCount()) {
+                const TextureUnit & myTextureUnit = theMaterial.getTextureUnit(myTextureIndex);
+                const TexturePtr & myTexture = myTextureUnit.getTexture();
+
+                unsigned myTextureId = myTexture->getTextureId();
+                AC_TRACE << "cgGLSetTextureParameter param=" << theCgParameter << " texid=" << myTextureId;
+                cgGLSetTextureParameter( theCgParameter, myTextureId);
+                    AC_TRACE << "cgGLSetTextureParameter: Texture index " << as_string(myTextureIndex)
+                   << ", texid=" << myTextureId << ", property=" << thePropertyName
+                       << " to parameter : "<< cgGetParameterName(theCgParameter) << endl;
+            } else {
+                throw ShaderException(string("Texture index ") + as_string(myTextureIndex) +
+                                      " not found. Material id=" + theMaterial.get<IdTag>() + " name=" + theMaterial.get<NameTag>() + " has " + as_string(theMaterial.getTextureUnitCount()) + " texture(s)",
+                                      "CgProgramInfo::setCgMaterialParameter()");
+            }
+            break;
+        }
+        default:
+            throw ShaderException(string("Unknown CgParameter type in property '")+thePropertyName+"'",
+                                  "CgProgramInfo::setCgMaterialParameter()");
+        }
+
         assertCg(PLUS_FILE_LINE, 0);
     }
 

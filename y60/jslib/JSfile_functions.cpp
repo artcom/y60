@@ -608,7 +608,7 @@ ReadFileAsBlock(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
             // we have to make a copy
             asl::Ptr<asl::Block> myBlock(new asl::Block);
             *myBlock = myReadableBlock->getBlock();
-            *rval = as_jsval(cx, myBlock, &(*myBlock) );
+            *rval = as_jsval(cx, myBlock, myBlock.get() );
         } else {
             *rval = JSVAL_NULL;
         }

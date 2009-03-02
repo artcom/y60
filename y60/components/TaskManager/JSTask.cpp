@@ -225,10 +225,10 @@ namespace jslib {
 
         if (myCommand.size() > 0) {
             OWNERPTR myNewNative = OWNERPTR(new Task(myCommand, myPath, myShowFlag));
-            myNewObject = new JSTask(myNewNative, &*myNewNative);
+            myNewObject = new JSTask(myNewNative, myNewNative.get());
         } else {
             OWNERPTR myNewNative = OWNERPTR(new Task());
-            myNewObject = new JSTask(myNewNative, &*myNewNative);
+            myNewObject = new JSTask(myNewNative, myNewNative.get());
         }
 
         if (myNewObject) {
@@ -264,7 +264,7 @@ namespace jslib {
 
     using namespace y60;
     jsval as_jsval(JSContext *cx, JSTask::OWNERPTR theOwner) {
-        JSObject * myReturnObject = JSTask::Construct(cx, theOwner, &(*theOwner));
+        JSObject * myReturnObject = JSTask::Construct(cx, theOwner, theOwner.get());
         return OBJECT_TO_JSVAL(myReturnObject);
     }
 

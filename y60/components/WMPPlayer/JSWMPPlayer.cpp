@@ -315,7 +315,7 @@ JSWMPPlayer::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, 
             return JS_FALSE;
     }
 
-    JSWMPPlayer * myNewObject = new JSWMPPlayer(myNewNative, &(*myNewNative));
+    JSWMPPlayer * myNewObject = new JSWMPPlayer(myNewNative, myNewNative.get());
     JS_SetPrivate(cx, obj, myNewObject);
     return JS_TRUE;
 }
@@ -344,7 +344,7 @@ bool convertFrom(JSContext *cx, jsval theValue, JSWMPPlayer::OWNERPTR & theWMPPl
 }
 
 jsval as_jsval(JSContext *cx, JSWMPPlayer::OWNERPTR theOwner) {
-    JSObject * myReturnObject = JSWMPPlayer::Construct(cx, theOwner, &(*theOwner));
+    JSObject * myReturnObject = JSWMPPlayer::Construct(cx, theOwner, theOwner.get());
     return OBJECT_TO_JSVAL(myReturnObject);
 }
 

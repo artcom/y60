@@ -558,7 +558,7 @@ DEFINE_EXCEPTION(InternalCorruption,asl::Exception);
            --notLessThanThePtrLocation;
            DBP2(std::cerr << "findLocationInObject: thePtrLocation="<< thePtrLocation <<  std::endl);
            DBP2(std::cerr << "findLocationInObject: notLessThanThePtrLocation="<< (void*)&*notLessThanThePtrLocation <<  std::endl);
-           DBP2(std::cerr << "findLocationInObject: ourCollectableMap.end()="<< (void*)(&*ourCollectableMap.end()) <<  std::endl);
+           DBP2(std::cerr << "findLocationInObject: ourCollectableMap.end()="<< (void*)end_ptr(ourCollectableMap) <<  std::endl);
            if (notLessThanThePtrLocation != ourCollectableMap.end()) {
                Collectable<ThreadingModel, Allocator> * myObjectLocation = (Collectable<ThreadingModel, Allocator>*)(notLessThanThePtrLocation->first);
                if ((char*)thePtrLocation >= (char*)myObjectLocation &&
@@ -581,7 +581,7 @@ DEFINE_EXCEPTION(InternalCorruption,asl::Exception);
            --notLessThanThePtrLocation;
            DBP2(std::cerr << "findLocationInDependendMemory: theLocation="<< theLocation <<  std::endl);
            DBP2(std::cerr << "findLocationInDependendMemory: notLessThanThePtrLocation="<< (void*)&*notLessThanThePtrLocation <<  std::endl);
-           DBP2(std::cerr << "findLocationInDependendMemory: ourMemoryMap.end()="<< (void*)(&*ourMemoryMap.end()) <<  std::endl);
+           DBP2(std::cerr << "findLocationInDependendMemory: ourMemoryMap.end()="<< (void*)end_ptr(ourCollectableMap) <<  std::endl);
            if (notLessThanThePtrLocation != ourMemoryMap.end()) {
                char * myMemoryLocation = (char*)notLessThanThePtrLocation->first.myMemory;
                if ((char*)theLocation >= myMemoryLocation &&
@@ -679,8 +679,8 @@ DEFINE_EXCEPTION(InternalCorruption,asl::Exception);
                 DBP2(std::cerr << "sweepUnused: it->second="<< (void*)(it->second) << std::endl);
                
                 // make sure to keep the weakCount to avoid premature disposal of current ObjectDescriptor 
-				CollectableWeakPtr<Collectable<ThreadingModel, Allocator>,ThreadingModel, Allocator> myDescriptorSaver(it->second);
-				//CollectableWeakPtr<Collectable<ThreadingModel, Allocator>,ThreadingModel, Allocator> myDescriptorSaver2(it->second);
+                CollectableWeakPtr<Collectable<ThreadingModel, Allocator>,ThreadingModel, Allocator> myDescriptorSaver(it->second);
+                //CollectableWeakPtr<Collectable<ThreadingModel, Allocator>,ThreadingModel, Allocator> myDescriptorSaver2(it->second);
                 DBP2(std::cerr << "sweepUnused: saved it in weakptr "<< *myDescriptorSaver.getDescriptorPtr() << std::endl);
 #ifdef USE_STD_SET
                 typename ObjectDescriptor<ThreadingModel, Allocator>::PtrSet * myPtrs = &getInfo(it).myPtrs;
@@ -702,7 +702,7 @@ DEFINE_EXCEPTION(InternalCorruption,asl::Exception);
                         ++numSweptObjects; 
                     } else {
                         DBP2(std::cerr << "-- sweepUnused: &*pit="<< (void*)(&*pit) << " , not disposing" << std::endl);
-					}
+                    }
                     DBP2(std::cerr << "-- sweepUnused: inner loop end *pit="<< (void*)(*pit) << std::endl);
                     DBP2(std::cerr << "sweepUnused: loop end it in weakptr "<< (void*)(myDescriptorSaver.getDescriptorPtr()) << std::endl);
                     pit = myNext;

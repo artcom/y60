@@ -210,7 +210,7 @@ class JSSignal2 : public JSWrapper<sigc::signal2<R, P0, P1>, asl::Ptr<sigc::sign
 
         static
         JSObject * Construct(JSContext *cx, OWNERPTR theOwner) {
-            return Base::Construct(cx, theOwner, &(*theOwner));
+            return Base::Construct(cx, theOwner, theOwner.get());
         }
 
         JSSignal2(OWNERPTR theOwner, NATIVE * theNative)

@@ -20,6 +20,7 @@
 #include "Dictionary.h"
 #include "Field.h"
 
+#include <asl/base/begin_end.h>
 #include <asl/base/Block.h>
 #include <asl/base/MemoryPool.h>
 #include <asl/raster/raster.h>
@@ -408,19 +409,19 @@ namespace dom {
             if (!this->isBlockWriteable()) {
                 throw ValueNotBlockWriteable(JUST_FILE_LINE);
             }
-            return reinterpret_cast<unsigned char*>(&(*_myStringValue.begin()));
+            return reinterpret_cast<unsigned char*>(asl::begin_ptr(_myStringValue));
         }
         virtual unsigned char * end() {
             if (!this->isBlockWriteable()) {
                 throw ValueNotBlockWriteable(JUST_FILE_LINE);
             }
-            return reinterpret_cast<unsigned char*>(&(*_myStringValue.end()));
+            return reinterpret_cast<unsigned char*>(asl::end_ptr(_myStringValue));
         }
         virtual const unsigned char * begin() const {
-            return reinterpret_cast<const unsigned char*>(&(*_myStringValue.begin()));
+            return reinterpret_cast<const unsigned char*>(asl::begin_ptr(_myStringValue));
         }
         virtual const unsigned char * end() const {
-            return reinterpret_cast<const unsigned char*>(&(*_myStringValue.end()));
+            return reinterpret_cast<const unsigned char*>(asl::end_ptr(_myStringValue));
         }
         operator const void*() const {
             return this;
@@ -1166,15 +1167,15 @@ namespace dom {
             return _myRasterValue.getValue().vsize();
         }
         const asl::ReadableBlock & pixels() const {
-            _myPixels.reference(asl::ReadableBlockAdapter((const unsigned char*)&(*_myRasterValue.getValue().begin()),
-                                              (const unsigned char*)&(*_myRasterValue.getValue().end())));
+            _myPixels.reference(asl::ReadableBlockAdapter((const unsigned char*)asl::begin_ptr(_myRasterValue.getValue()),
+                                                          (const unsigned char*)asl::end_ptr  (_myRasterValue.getValue())));
             return _myPixels;
         }
         // [ch] This interface does not respect the open/close protocol, it therefore does not
         // trigger a bumpversion or an raster dependency update.
         asl::WriteableBlock & pixels() {
-            asl::WriteableBlockAdapter myAdapter((unsigned char*)&(*_myRasterValue.getValue().begin()),
-                                                 (unsigned char*)&(*_myRasterValue.getValue().end()));
+            asl::WriteableBlockAdapter myAdapter((unsigned char*)asl::begin_ptr(_myRasterValue.getValue()),
+                                                 (unsigned char*)asl::end_ptr  (_myRasterValue.getValue()));
             _myWriteablePixels.reference(myAdapter);
             return _myWriteablePixels;
         }
@@ -1182,8 +1183,8 @@ namespace dom {
         virtual void assign(asl::AC_SIZE_TYPE newWidth, asl::AC_SIZE_TYPE newHeight, const asl::ReadableBlock & thePixels) {
             resize(newWidth, newHeight);
             T & myNativeRaster = _myRasterValue.openWriteableValue();
-            asl::WriteableBlockAdapter myPixels((unsigned char*)&(*myNativeRaster.begin()),
-                                                (unsigned char*)&(*myNativeRaster.end()));
+            asl::WriteableBlockAdapter myPixels((unsigned char*)asl::begin_ptr(myNativeRaster),
+                                                (unsigned char*)asl::end_ptr  (myNativeRaster));
             myPixels.assign(thePixels);
             _myRasterValue.closeWriteableValue();
         }
@@ -1690,10 +1691,10 @@ namespace dom {
     private:
         T * _myLockedValue;
         virtual ELEM * doBegin() {
-            return _myLockedValue->empty() ? NULL : &*_myLockedValue->begin();
+            return asl::begin_ptr(*_myLockedValue);
         }
         virtual const ELEM * doBegin() const {
-            return this->getValue().empty() ? NULL : &*(this->getValue().begin());
+            return asl::begin_ptr(this->getValue());
         }
     };
 

@@ -291,7 +291,7 @@ JSDomEvent::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, j
     JSDomEvent * myNewObject = 0;
     if (argc == 0 ) {
         OWNERPTR myNewEvent = OWNERPTR(new GenericJSDomEvent("default"));
-        myNewObject = new JSDomEvent(myNewEvent, &(*myNewEvent));
+        myNewObject = new JSDomEvent(myNewEvent, myNewEvent.get());
     } else if (argc >0 && argc < 7) {
         if (JSVAL_IS_VOID(argv[0])) {
             JS_ReportError(cx,"JSDomEvent::Constructor: bad argument #1 (undefined)");
@@ -348,7 +348,7 @@ JSDomEvent::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, j
                      myTimeStamp,
                      myObject)
                      );
-        myNewObject = new JSDomEvent(myNewEvent, &(*myNewEvent));
+        myNewObject = new JSDomEvent(myNewEvent, myNewEvent.get());
     } else {
         JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected 1-6 args (theType [, thePayload, canBubbleArg, cancelableArg, targetOnly, theTimeStamp]) %d",ClassName(), argc);
         return JS_FALSE;
@@ -390,7 +390,7 @@ bool convertFrom(JSContext *cx, jsval theValue, dom::EventPtr & theEvent) {
 jsval as_jsval(JSContext *cx, dom::EventPtr theOwner) {
     // TODO, generalize to dom::Events. Right now it only works for JSGenericEvents
     JSDomEvent::OWNERPTR myGenericEvent = dynamic_cast_Ptr<JSDomEvent::NATIVE>(theOwner);
-    JSObject * myReturnObject = JSDomEvent::Construct(cx, myGenericEvent, &(*myGenericEvent));
+    JSObject * myReturnObject = JSDomEvent::Construct(cx, myGenericEvent, myGenericEvent.get());
     return OBJECT_TO_JSVAL(myReturnObject);
 }
 

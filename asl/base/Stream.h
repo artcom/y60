@@ -28,6 +28,7 @@
 #include "asl_base_settings.h"
 
 #include "Exception.h"
+#include <asl/base/begin_end.h>
 #include "string_functions.h"
 
 #include "Ptr.h"
@@ -383,7 +384,7 @@ namespace asl {
             return readString(theDest, myStringLength, theReadOffset);	
         }
         virtual operator const void*() const = 0;
-		virtual ~ReadableArrangedStream() {};
+        virtual ~ReadableArrangedStream() {};
     };
     typedef ReadableArrangedStream<AC_DEFAULT_BYTE_ORDER> ReadableStream;
 
@@ -631,11 +632,7 @@ namespace asl {
             return append(&theByte, sizeof(theByte));
         }
         WriteableStream & appendString(const std::string & theString) {
-            if( theString.empty() ) {
-                return append(NULL,0);
-            } else {
-                return append(&(*theString.begin()), theString.size());
-            }
+            return append( begin_ptr(theString), theString.size() );
         }
         WriteableStream & appendCountedString(const std::string & theString) {
             appendUnsigned(SIZE_TYPE(theString.size()));

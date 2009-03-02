@@ -253,7 +253,7 @@ void SoundManager::preloadSound(const std::string& theURI) {
     SoundCacheItemPtr myCacheItem = SoundCacheItemPtr(new SoundCacheItem(theURI));
     addCacheItem(myCacheItem);
     IAudioDecoder * myDecoder = createDecoder(theURI);
-    myDecoder->setSampleSink(&(*myCacheItem));
+    myDecoder->setSampleSink(myCacheItem.get());
     myDecoder->decodeEverything();
     myCacheItem->doneCaching(myDecoder->getCurFrame());
     delete myDecoder;

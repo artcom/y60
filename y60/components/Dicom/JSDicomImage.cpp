@@ -206,7 +206,7 @@ JSDicomImage::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
     }
 
     OWNERPTR myNewNative = OWNERPTR(new DicomImage(myFilename.c_str()));
-    JSDicomImage * myNewObject = new JSDicomImage(myNewNative, &(*myNewNative));
+    JSDicomImage * myNewObject = new JSDicomImage(myNewNative, myNewNative.get());
     JS_SetPrivate(cx, obj, myNewObject);
     return JS_TRUE;
 }
@@ -231,7 +231,7 @@ bool convertFrom(JSContext *cx, jsval theValue, JSDicomImage::NATIVE & theNative
 }
 */
 jsval as_jsval(JSContext *cx, JSDicomImage::OWNERPTR theOwner) {
-    JSObject * myReturnObject = JSDicomImage::Construct(cx, theOwner, &(*theOwner));
+    JSObject * myReturnObject = JSDicomImage::Construct(cx, theOwner, theOwner.get());
     return OBJECT_TO_JSVAL(myReturnObject);
 }
 

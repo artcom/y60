@@ -22,6 +22,7 @@
 // own header
 #include "file_functions.h"
 
+#include <asl/base/begin_end.h>
 #include "os_functions.h"
 #include "string_functions.h"
 #include "error_functions.h"
@@ -321,8 +322,8 @@ namespace asl {
             std::vector<char> myBuffer(65536);
             theContent.resize(0);
             while (inFile) {
-                inFile.read(&(*myBuffer.begin()),myBuffer.size());
-                theContent.append(&(*myBuffer.begin()),inFile.gcount());
+                inFile.read(begin_ptr(myBuffer),myBuffer.size());
+                theContent.append(begin_ptr(myBuffer),inFile.gcount());
             }
         } else {
             return false;

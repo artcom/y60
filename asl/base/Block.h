@@ -13,7 +13,7 @@
 // Description:  Memory Block handling functions; should be used whenever
 //               using memcpy is considered; features
 //               - typesafe conversion,
-//		         - compile-time memory read-write control, 
+//               - compile-time memory read-write control, 
 //               - convenient windows api interfaces and
 //               - also a copy-on-write (COW) implementation
 //
@@ -158,6 +158,9 @@ namespace asl {
         }
         virtual ~ReadableBlock() {}
     };
+
+    inline const unsigned char * begin_ptr(const ReadableBlock & block) { return block.begin(); }
+    inline const unsigned char * end_ptr  (const ReadableBlock & block) { return block.end  (); }
 
     struct ReadableBlockHandle : public ReadableStreamHandle {
         virtual ReadableStream & getStream() {
@@ -479,6 +482,12 @@ ReadableArrangedStream<EXTERNAL_BYTE_ORDER, SIZE_TYPE, OFFSET_TYPE>::readBlock(W
         AC_SIZE_TYPE _myCapacity;
     };
 
+    inline unsigned char * begin_ptr(Chunk & chunk) { return chunk.begin(); }
+    inline unsigned char * end_ptr  (Chunk & chunk) { return chunk.end  (); }
+
+    inline const unsigned char * begin_ptr(const Chunk & chunk) { return chunk.begin(); }
+    inline const unsigned char * end_ptr  (const Chunk & chunk) { return chunk.end  (); }
+
     //-------------------------------------------------------------------------------
     /**
         Block is a general purpose class for raw byte data storage;
@@ -491,16 +500,16 @@ ReadableArrangedStream<EXTERNAL_BYTE_ORDER, SIZE_TYPE, OFFSET_TYPE>::readBlock(W
             return this;
         }
         virtual const unsigned char * begin() const {
-            return &(*_myData.begin());
+            return begin_ptr(_myData);
         }
         virtual const unsigned char * end() const {
-            return &(*_myData.end());
+            return end_ptr(_myData);
         }
         virtual unsigned char * begin() {
-            return &(*_myData.begin());
+            return begin_ptr(_myData);
         }
         virtual unsigned char * end() {
-            return &(*_myData.end());
+            return end_ptr(_myData);
         }
         virtual void resize(AC_SIZE_TYPE theSize) {
             _myData.resize(theSize);
@@ -563,6 +572,12 @@ ReadableArrangedStream<EXTERNAL_BYTE_ORDER, SIZE_TYPE, OFFSET_TYPE>::readBlock(W
     private:
         Chunk _myData;
     };
+
+    inline unsigned char * begin_ptr(Block & block) { return block.begin(); }
+    inline unsigned char * end_ptr  (Block & block) { return block.end  (); }
+
+    inline const unsigned char * begin_ptr(const Block & block) { return block.begin(); }
+    inline const unsigned char * end_ptr  (const Block & block) { return block.end  (); }
 
    struct AnyReadableBlockHandle : public ReadableBlockHandle {
         AnyReadableBlockHandle(asl::Ptr<ReadableBlock> theBlock, const std::string & theName="") 

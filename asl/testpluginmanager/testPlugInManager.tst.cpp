@@ -71,8 +71,8 @@ public:
         UnitTestSuite::setup(); // called to print a launch message 
         PlugInManager::get().setSearchPath("${PRO}/lib");
         cout << "Loading PlugIn " << myPlugInName << endl;
-	    _myPlugIn = PlugInManager::get().getPlugIn(myPlugInName);
-        dynamic_cast<ITest*>(&*_myPlugIn)->addTests(*this);
+        _myPlugIn = PlugInManager::get().getPlugIn(myPlugInName);
+        dynamic_cast<ITest*>(_myPlugIn.get())->addTests(*this);
     }
 protected:
     asl::Ptr<PlugInBase> _myPlugIn;

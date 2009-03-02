@@ -88,7 +88,7 @@ namespace y60 {
             if( myImage ) {
                 if( myName == "sourceimage") {
                     _mySourceRaster =  myImage->getFacade<y60::Image>()->getRasterValue();
-                    //const BGRRaster * myFrame = dom::dynamic_cast_Value<BGRRaster>(&*_mySourceRaster);
+                    //const BGRRaster * myFrame = dom::dynamic_cast_Value<BGRRaster>(_mySourceRaster.get());
                     //AC_INFO << "histogram configure " << *myFrame;
                 }
             }   
@@ -101,7 +101,7 @@ namespace y60 {
         std::vector<asl::Unsigned32> redHistogram(256);
         std::vector<asl::Unsigned32> blueHistogram(256);
         std::vector<asl::Unsigned32> greenHistogram(256);
-        if (const RGBRaster * myFrame = dom::dynamic_cast_Value<RGBRaster>(&*_mySourceRaster)) {
+        if (const RGBRaster * myFrame = dom::dynamic_cast_Value<RGBRaster>(_mySourceRaster.get())) {
             for (RGBRaster::const_iterator it = myFrame->begin(); it != myFrame->end(); ++it) {
                 // AC_WARNING << static_cast<unsigned int>((*it)[0]);
                 redHistogram[static_cast<unsigned int>((*it)[0])]++;
@@ -109,7 +109,7 @@ namespace y60 {
                 blueHistogram[(*it)[2]]++;
             }
 
-        } else if (const BGRRaster * myFrame = dom::dynamic_cast_Value<BGRRaster>(&*_mySourceRaster)) {
+        } else if (const BGRRaster * myFrame = dom::dynamic_cast_Value<BGRRaster>(_mySourceRaster.get())) {
             for (BGRRaster::const_iterator it = myFrame->begin(); it != myFrame->end(); ++it) {
                 redHistogram[(*it)[2]]++;
                 greenHistogram[(*it)[1]]++;

@@ -206,7 +206,7 @@ JSASSOscClient::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *arg
             return JS_FALSE;
     }
 
-    JSASSOscClient * myNewObject = new JSASSOscClient(myNewNative, &(*myNewNative));
+    JSASSOscClient * myNewObject = new JSASSOscClient(myNewNative, myNewNative.get());
     JS_SetPrivate(cx, obj, myNewObject);
     return JS_TRUE;
 }
@@ -231,7 +231,7 @@ bool convertFrom(JSContext *cx, jsval theValue, JSASSOscClient::OWNERPTR & theAS
 }
 
 jsval as_jsval(JSContext *cx, JSASSOscClient::OWNERPTR theOwner) {
-    JSObject * myReturnObject = JSASSOscClient::Construct(cx, theOwner, &(*theOwner));
+    JSObject * myReturnObject = JSASSOscClient::Construct(cx, theOwner, theOwner.get());
     return OBJECT_TO_JSVAL(myReturnObject);
 }
 

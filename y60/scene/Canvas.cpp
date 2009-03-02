@@ -69,24 +69,24 @@ namespace y60 {
 unsigned 
 Canvas::getWidth() const { 
     asl::Ptr<IFrameBuffer> myFrameBuffer = _myFrameBuffer.lock();
-    AC_TRACE << "Canvas::getWidth '" << get<NameTag>() << "' framebuffer=" << &*myFrameBuffer;
+    AC_TRACE << "Canvas::getWidth '" << get<NameTag>() << "' framebuffer=" << myFrameBuffer.get();
     return myFrameBuffer ? myFrameBuffer->getWidth() : 0;
 }
 
 unsigned 
 Canvas::getHeight() const {
     asl::Ptr<IFrameBuffer> myFrameBuffer = _myFrameBuffer.lock();
-    AC_TRACE << "Canvas::getHeight '" << get<NameTag>() << "' framebuffer=" << &*myFrameBuffer;
+    AC_TRACE << "Canvas::getHeight '" << get<NameTag>() << "' framebuffer=" << myFrameBuffer.get();
     return myFrameBuffer ? myFrameBuffer->getHeight() : 0;
 }
 
 bool
 Canvas::setFrameBuffer(asl::Ptr<IFrameBuffer> theFrameBuffer) {
-    AC_DEBUG << "Canvas::setFrameBuffer '" << get<NameTag>() << " to " << &*theFrameBuffer;
+    AC_DEBUG << "Canvas::setFrameBuffer '" << get<NameTag>() << " to " << theFrameBuffer.get();
     if (theFrameBuffer) {
         asl::Ptr<IFrameBuffer> myFrameBuffer = _myFrameBuffer.lock();
         if (! myFrameBuffer) {
-            //AC_TRACE << "Canvas @"<< this << ", setting framebuffer @ " << &(*theFrameBuffer) << endl;
+            //AC_TRACE << "Canvas @"<< this << ", setting framebuffer @ " << theFrameBuffer.get() << endl;
             _myFrameBuffer = theFrameBuffer;
             return true;
         } else {

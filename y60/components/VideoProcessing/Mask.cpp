@@ -91,15 +91,15 @@ namespace y60 {
         }   
     }
 
-	void 
+    void 
     Mask::onFrame(double t) {
         const BGRRaster * mySourceFrame = 
-            dom::dynamic_cast_Value<BGRRaster>(&*_mySourceImage->getRasterValue());
+            dom::dynamic_cast_Value<BGRRaster>(_mySourceImage->getRasterValue().get());
         const BGRRaster * myMaskFrame   = 
-            dom::dynamic_cast_Value<BGRRaster>(&*_myMaskImage->getRasterValue());
+            dom::dynamic_cast_Value<BGRRaster>(_myMaskImage->getRasterValue().get());
         const BGRRaster * myTargetFrame = 
-            dom::dynamic_cast_Value<BGRRaster>(&*_myTargetImage->getRasterValue());
-        
+            dom::dynamic_cast_Value<BGRRaster>(_myTargetImage->getRasterValue().get());
+
         BGRRaster::iterator itSrc   = const_cast<BGRRaster::iterator>(mySourceFrame->begin());
         BGRRaster::iterator itBlob  = const_cast<BGRRaster::iterator>(myMaskFrame->begin());
         BGRRaster::iterator itTarg  = const_cast<BGRRaster::iterator>(myTargetFrame->begin());

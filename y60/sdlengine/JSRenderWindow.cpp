@@ -481,7 +481,7 @@ JSRenderWindow::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *arg
     }
 
     OWNERPTR myNewWindow = NATIVE::create();
-    JSRenderWindow * myNewObject = new JSRenderWindow(myNewWindow, &(*myNewWindow));
+    JSRenderWindow * myNewObject = new JSRenderWindow(myNewWindow, myNewWindow.get());
     if (myNewObject) {
         JS_SetPrivate(cx, obj, myNewObject);
 
@@ -541,7 +541,7 @@ bool convertFrom(JSContext *cx, jsval theValue, SDLWindow *& theRenderWindow) {
         JSObject * myArgument;
         if (JS_ValueToObject(cx, theValue, &myArgument)) {
             if (JSA_GetClass(cx,myArgument) == JSClassTraits<JSRenderWindow::NATIVE>::Class()) {
-                theRenderWindow = &(*JSClassTraits<JSRenderWindow::NATIVE>::getNativeOwner(cx,myArgument));
+                theRenderWindow = JSClassTraits<JSRenderWindow::NATIVE>::getNativeOwner(cx,myArgument).get();
                 return true;
             }
         }
@@ -550,7 +550,7 @@ bool convertFrom(JSContext *cx, jsval theValue, SDLWindow *& theRenderWindow) {
 }
 
 jsval as_jsval(JSContext *cx, asl::Ptr<SDLWindow> theOwner) {
-    JSObject * myReturnObject = JSRenderWindow::Construct(cx, theOwner, &(*theOwner));
+    JSObject * myReturnObject = JSRenderWindow::Construct(cx, theOwner, theOwner.get());
     return OBJECT_TO_JSVAL(myReturnObject);
 }
 

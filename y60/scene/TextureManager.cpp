@@ -120,7 +120,7 @@ namespace y60 {
             dom::NodePtr myTextureNode = _myTextureList->childNode(i);
             if (myTextureNode->nodeType() == dom::Node::ELEMENT_NODE) {
                 TexturePtr myTexture = myTextureNode->getFacade<Texture>();
-                unbindTexture(&(*myTexture));
+                unbindTexture(myTexture.get());
             }
         }
     }

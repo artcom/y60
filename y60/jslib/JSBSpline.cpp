@@ -433,7 +433,7 @@ namespace jslib {
         JSBSpline * myNewObject = 0;
         if (argc == 0) {
             OWNERPTR myBSpline = OWNERPTR(new asl::BSpline<BSplineNumber>());
-            myNewObject = new JSBSpline(myBSpline, &*myBSpline);
+            myNewObject = new JSBSpline(myBSpline, myBSpline.get());
         } else if (argc == 1) {
             std::vector<asl::Vector3f> myPoints;
             if (JSVAL_IS_VOID(argv[0]) || !convertFrom(cx, argv[0], myPoints)) {
@@ -442,7 +442,7 @@ namespace jslib {
             }
 
             OWNERPTR myBSpline = OWNERPTR(new asl::BSpline<BSplineNumber>(myPoints));
-            myNewObject = new JSBSpline(myBSpline, &(*myBSpline));
+            myNewObject = new JSBSpline(myBSpline, myBSpline.get());
         } else if (argc == 4) {
             asl::Vector3f myStart, myStartAnchor;
             asl::Vector3f myEnd, myEndAnchor;
@@ -466,7 +466,7 @@ namespace jslib {
 
             OWNERPTR myBSpline = OWNERPTR(new asl::BSpline<BSplineNumber>(myStart, myStartAnchor,
                                                                           myEnd, myEndAnchor));
-            myNewObject = new JSBSpline(myBSpline, &(*myBSpline));
+            myNewObject = new JSBSpline(myBSpline, myBSpline.get());
         } else {
             JS_ReportError(cx, "Constructor for %s: bad number of arguments: expected 0,1,4, got %d", ClassName(), argc);
             return JS_FALSE;
@@ -519,7 +519,7 @@ namespace jslib {
     }
 
     jsval as_jsval(JSContext *cx, JSBSpline::OWNERPTR theOwner) {
-        JSObject * myReturnObject = JSBSpline::Construct(cx, theOwner, &(*theOwner));
+        JSObject * myReturnObject = JSBSpline::Construct(cx, theOwner, theOwner.get());
         return OBJECT_TO_JSVAL(myReturnObject);
     }
 

@@ -89,7 +89,7 @@ namespace y60 {
         for (unsigned i = 0; i < _myEventSources.size(); ++i) {
             EventPtrList curEvents = _myEventSources[i]->poll();
             for (unsigned j = 0; j < curEvents.size(); ++j) {
-                curEvents[j]->source = &(*_myEventSources[i]);
+                curEvents[j]->source = _myEventSources[i];
                 sortedEvents.push(curEvents[j]);
             }
         }

@@ -188,7 +188,7 @@ class JSSignalProxy2 : public JSWrapper<Glib::SignalProxy2<R, P0, P1>, asl::Ptr<
 
         static
         JSObject * Construct(JSContext *cx, OWNERPTR theOwner) {
-            return Base::Construct(cx, theOwner, &(*theOwner));
+            return Base::Construct(cx, theOwner, theOwner.get());
         }
 
         JSSignalProxy2(OWNERPTR theOwner, NATIVE * theNative)

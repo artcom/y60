@@ -131,10 +131,10 @@ private:
     virtual void run(SampleFormat theSampleFormat) {
         asl::Ptr<AudioBufferBase> myAudioBuffer = asl::Ptr<AudioBufferBase>(
                 createAudioBuffer(theSampleFormat, 2048, 2, 44100));
-        fillSineBuffer(&(*myAudioBuffer), theSampleFormat, 440, 1.0);
+        fillSineBuffer(myAudioBuffer.get(), theSampleFormat, 440, 1.0);
         asl::Ptr<AudioBufferBase> myBaselineBuffer = asl::Ptr<AudioBufferBase>(
                 createAudioBuffer(theSampleFormat, 2048, 2, 44100));
-        fillSineBuffer(&(*myBaselineBuffer), theSampleFormat, 440, 0.5);
+        fillSineBuffer(myBaselineBuffer.get(), theSampleFormat, 440, 0.5);
         HalfEffect myEffect(theSampleFormat);
         myEffect.apply(*myAudioBuffer, 0);
         ENSURE(myBaselineBuffer->almostEqual(*myAudioBuffer, 0.000001));
@@ -149,7 +149,7 @@ private:
     virtual void run(SampleFormat theSampleFormat) {
         asl::Ptr<AudioBufferBase> myAudioBuffer = asl::Ptr<AudioBufferBase>(
                 createAudioBuffer(theSampleFormat, 2048, 2, 44100));
-        fillSineBuffer(&(*myAudioBuffer), theSampleFormat, 440, 1.0);
+        fillSineBuffer(myAudioBuffer.get(), theSampleFormat, 440, 1.0);
         asl::Ptr<AudioBufferBase> myBaselineBuffer = asl::Ptr<AudioBufferBase>(myAudioBuffer->clone());
         NullEffect myEffect(theSampleFormat);
         myEffect.apply(*myAudioBuffer, 0);
@@ -164,7 +164,7 @@ private:
     virtual void run(SampleFormat theSampleFormat) {
         asl::Ptr<AudioBufferBase> myAudioBuffer = asl::Ptr<AudioBufferBase>(
                 createAudioBuffer(theSampleFormat, 2048, 2, 44100));
-        fillSineBuffer(&(*myAudioBuffer), theSampleFormat, 440, 1.0);
+        fillSineBuffer(myAudioBuffer.get(), theSampleFormat, 440, 1.0);
         asl::Ptr<AudioBufferBase> myBaselineBuffer = asl::Ptr<AudioBufferBase>(myAudioBuffer->clone());
         VolumeFader myFader(theSampleFormat);
         myFader.setVolume(1.0);

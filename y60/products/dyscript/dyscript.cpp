@@ -1082,7 +1082,7 @@ namespace dys {
                     }
 #else
                     } else {
-                        NativeFunction * myNativeFunction = dom::dynamic_cast_Value<NativeFunction>(&(*myValue));
+                        NativeFunction * myNativeFunction = dom::dynamic_cast_Value<NativeFunction>(myValue.get());
                         _myCachedFunction = myNativeFunction;
                     }
 #endif
@@ -1379,11 +1379,11 @@ namespace dys {
     bool isTrue(ValuePtr theValue) {
         MAKE_SCOPE_TIMER(isTrue);
         if (theValue) {
-            bool * myBool = dom::dynamic_cast_Value<bool>(&(*theValue));
+            bool * myBool = dom::dynamic_cast_Value<bool>(theValue.get());
             if (myBool) {
                 return *myBool;
             }
-            int * myInt = dom::dynamic_cast_Value<int>(&(*theValue));
+            int * myInt = dom::dynamic_cast_Value<int>(theValue.get());
             if (myInt) {
                 return *myInt != 0;
             }
@@ -1436,7 +1436,7 @@ namespace dys {
 
     /*
     int toInt(ValuePtr theValue) {
-        int * myInt = dom::dynamic_cast_Value<int>(&(*theValue));
+        int * myInt = dom::dynamic_cast_Value<int>(theValue.get());
         if (myInt) {
             return *myInt;
         }
@@ -2709,7 +2709,7 @@ _ready:     mov         a, edi
         }
         {
             IntPtr IPtr = IntPtr(new int);
-            int * ip = &(*IPtr);
+            int * ip = IPtr.get();
             Base * myBase = new Derived;
             asl::NanoTime start;
             for (*ip = 0; *ip < 100 * 1000000; myBase->incPtr(IPtr));

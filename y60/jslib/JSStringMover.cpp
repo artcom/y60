@@ -207,7 +207,7 @@ JSStringMover::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv
         }
 
         OWNERPTR myNewCharacterMover = OWNERPTR(new StringMover(myStartPos, asl::Vector3f(0.0f, 0.0f, 0.0f), myShapeNode, myBodyNode));
-        myNewObject = new JSStringMover(myNewCharacterMover, &(*myNewCharacterMover));
+        myNewObject = new JSStringMover(myNewCharacterMover, myNewCharacterMover.get());
     } else {
         JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected 3 (startpos, shapenode) %d",ClassName(), argc);
         return JS_FALSE;

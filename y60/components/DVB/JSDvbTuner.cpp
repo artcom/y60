@@ -267,7 +267,7 @@ JSDvbTuner::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, j
         }
     
         OWNERPTR myDvbTuner = OWNERPTR(new DvbTuner(myConfigurationNode, myDeviceName));
-        myNewObject = new JSDvbTuner(myDvbTuner, &(*myDvbTuner));
+        myNewObject = new JSDvbTuner(myDvbTuner, myDvbTuner.get());
     
         if (myNewObject) {
             JS_SetPrivate(cx, obj, myNewObject);
@@ -296,7 +296,7 @@ JSDvbTuner::initClass(JSContext *cx, JSObject *theGlobalObject) {
 }
 
 jsval as_jsval(JSContext *cx, JSDvbTuner::OWNERPTR theOwner) {
-    JSObject * myReturnObject = JSDvbTuner::Construct(cx, theOwner, &(*theOwner));
+    JSObject * myReturnObject = JSDvbTuner::Construct(cx, theOwner, theOwner.get());
     return OBJECT_TO_JSVAL(myReturnObject);
 }
 

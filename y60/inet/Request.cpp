@@ -59,10 +59,10 @@
 // own header
 #include "Request.h"
 
-
-#include <asl/base/MappedBlock.h>
-
 #include <iostream>
+
+#include <asl/base/begin_end.h>
+#include <asl/base/MappedBlock.h>
 #include <asl/base/string_functions.h>
 #include <asl/base/os_functions.h>
 
@@ -100,7 +100,7 @@ namespace inet {
         myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_URL, _myURL.c_str());
         checkCurlStatus(myStatus, PLUS_FILE_LINE);
         
-        curl_easy_setopt(_myCurlHandle, CURLOPT_ERRORBUFFER, &(*_myErrorBuffer.begin()));
+        curl_easy_setopt(_myCurlHandle, CURLOPT_ERRORBUFFER, asl::begin_ptr(_myErrorBuffer));
         checkCurlStatus(myStatus, PLUS_FILE_LINE);
         
         setVerbose(CURL_VERBOSE);
@@ -146,7 +146,7 @@ namespace inet {
     void
     Request::checkCurlStatus(CURLcode theStatusCode, const string & theWhere) const {
         if (theStatusCode != CURLE_OK) {
-            throw INetException(string(&(*_myErrorBuffer.begin())), theWhere);
+            throw INetException(string(asl::begin_ptr(_myErrorBuffer)), theWhere);
         }
     }
 
@@ -271,7 +271,7 @@ namespace inet {
 
     string
     Request::getErrorString() const {
-        return string(&(*_myErrorBuffer.begin()));
+        return string(asl::begin_ptr(_myErrorBuffer));
     }
 
     void

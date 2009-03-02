@@ -69,14 +69,14 @@ public:
 
             Ptr<PlugInBase> myPlugIn = myManager.getPlugIn(ourPlugInName);
             // ensure we actually got something
-            ENSURE(&(*myPlugIn));
+            ENSURE(myPlugIn.get());
             // ensure the manager considers the plugin loaded
             ENSURE(myManager.isLoaded(ourPlugInName));
 
             // cast the plugin to the expected class
             Ptr<ITestPlugIn> myTestPlugIn = dynamic_cast_Ptr<ITestPlugIn>(myPlugIn);
             // ensure that it was of the expected class
-            ENSURE(&(*myPlugIn));
+            ENSURE(myPlugIn.get());
             // make the plugin change the indicator
             myTestPlugIn->touchThatString(_myTouchIndicator);
             // check the indicator
@@ -92,14 +92,14 @@ public:
 
 	        asl::Ptr<PlugInBase> myPlugIn = myManager.getPlugIn(ourPlugInName);
             // ensure we actually got something
-            ENSURE(&(*myPlugIn));
+            ENSURE(myPlugIn.get());
             // ensure the manager considers the plugin loaded
             ENSURE(myManager.isLoaded(ourPlugInName));
 
             // cast the plugin to the expected class
             Ptr<ITestPlugIn> myTestPlugIn = dynamic_cast_Ptr<ITestPlugIn>(myPlugIn);
             // ensure that it was of the expected class
-            ENSURE(&(*myPlugIn));
+            ENSURE(myPlugIn.get());
             // make the plugin change the indicator
             myTestPlugIn->touchThatString(_myTouchIndicator);
             // check the indicator

@@ -51,56 +51,82 @@ namespace asl {
     /*! \addtogroup aslbase */
     /* @{ */
     
-    template <class T>
-    inline T * begin(T & x) {
-        return &x;
-    }
+    template <class T> inline T * begin(T & x) { return &x; }
+    template <class T> inline T * end  (T & x) { return &x+1; }
 
-    template <class T>
-    inline T * end(T & x) {
-        return &x+1;
-    }
+    template <class T> inline const T * begin(const T & x) { return &x; }
+    template <class T> inline const T * end  (const T & x) { return &x+1; }
 
-    template <class T>
-    inline const T * begin(const T & x) {
-        return &x;
-    }
-
-    template <class T>
-    inline const T * end(const T & x) {
-        return &x+1;
-    }
+    // iterators into containers with one template argument
+    template <class ELEM, template <class> class CONTAINER>
+    inline typename CONTAINER<ELEM>::iterator begin(CONTAINER<ELEM> & c) { return c.begin(); }
+    template <class ELEM, template <class> class CONTAINER>
+    inline typename CONTAINER<ELEM>::iterator end  (CONTAINER<ELEM> & c) { return c.end(); }
 
     template <class ELEM, template <class> class CONTAINER>
-    inline typename CONTAINER<ELEM>::iterator begin(CONTAINER<ELEM> & c) {
-        return c.begin();
-    }
+    inline typename CONTAINER<ELEM>::const_iterator begin(const CONTAINER<ELEM> & c) { return c.begin(); }
+    template <class ELEM, template <class> class CONTAINER>
+    inline typename CONTAINER<ELEM>::const_iterator end  (const CONTAINER<ELEM> & c) { return c.end(); }
 
     template <class ELEM, template <class> class CONTAINER>
-    inline typename CONTAINER<ELEM>::iterator end(CONTAINER<ELEM> & c) {
-        return c.end();
-    }
+    inline ELEM* begin_ptr(CONTAINER<ELEM> & c) { return c.empty() ? NULL : &*c.begin(); }
+    template <class ELEM, template <class> class CONTAINER>
+    inline ELEM* end_ptr  (CONTAINER<ELEM> & c) { return c.empty() ? NULL : &*c.end(); }
 
     template <class ELEM, template <class> class CONTAINER>
-    inline typename CONTAINER<ELEM>::const_iterator begin(const CONTAINER<ELEM> & c) {
-        return c.begin();
-    }
-
+    inline const ELEM* begin_ptr(const CONTAINER<ELEM> & c) { return c.empty() ? NULL : &*c.begin(); }
     template <class ELEM, template <class> class CONTAINER>
-    inline typename CONTAINER<ELEM>::const_iterator end(const CONTAINER<ELEM> & c) {
-        return c.end();
-    }
-    //! begin iterator into C array
-    template <typename T, const std::size_t N>
-    inline T* begin(T (&array)[N]) {
-        return array;
-    }
+    inline const ELEM* end_ptr  (const CONTAINER<ELEM> & c) { return c.empty() ? NULL : &*c.end(); }
 
-    //! end iterator into C array
-    template <typename T, const std::size_t N>
-    inline T* end(T (&array)[N]) {
-        return array+N;
-    }
+    // iterators into containers with two template arguments
+    template <class ELEM, class A, template <class,class> class CONTAINER>
+    inline typename CONTAINER<ELEM,A>::iterator begin(CONTAINER<ELEM,A> & c) { return c.begin(); }
+    template <class ELEM, class A, template <class,class> class CONTAINER>
+    inline typename CONTAINER<ELEM,A>::iterator end  (CONTAINER<ELEM,A> & c) { return c.end(); }
+
+    template <class ELEM, class A, template <class,class> class CONTAINER>
+    inline typename CONTAINER<ELEM,A>::const_iterator begin(const CONTAINER<ELEM,A> & c) { return c.begin(); }
+    template <class ELEM, class A, template <class,class> class CONTAINER>
+    inline typename CONTAINER<ELEM,A>::const_iterator end  (const CONTAINER<ELEM,A> & c) { return c.end(); }
+
+    template <class ELEM, class A, template <class,class> class CONTAINER>
+    inline ELEM* begin_ptr(CONTAINER<ELEM,A> & c) { return c.empty() ? NULL : &*c.begin(); }
+    template <class ELEM, class A, template <class,class> class CONTAINER>
+    inline ELEM* end_ptr  (CONTAINER<ELEM,A> & c) { return c.empty() ? NULL : &*c.end(); }
+
+    template <class ELEM, class A, template <class,class> class CONTAINER>
+    inline const ELEM* begin_ptr(const CONTAINER<ELEM,A> & c) { return c.empty() ? NULL : &*c.begin(); }
+    template <class ELEM, class A, template <class,class> class CONTAINER>
+    inline const ELEM* end_ptr  (const CONTAINER<ELEM,A> & c) { return c.empty() ? NULL : &*c.end(); }
+
+    // iterators into containers with three template arguments
+    template <class ELEM, class T, class A, template <class,class,class> class CONTAINER>
+    inline typename CONTAINER<ELEM,T,A>::iterator begin(CONTAINER<ELEM,T,A> & c) { return c.begin(); }
+    template <class ELEM, class T, class A, template <class,class,class> class CONTAINER>
+    inline typename CONTAINER<ELEM,T,A>::iterator end  (CONTAINER<ELEM,T,A> & c) { return c.end(); }
+
+    template <class ELEM, class T, class A, template <class,class,class> class CONTAINER>
+    inline typename CONTAINER<ELEM,T,A>::const_iterator begin(const CONTAINER<ELEM,T,A> & c) { return c.begin(); }
+    template <class ELEM, class T, class A, template <class,class,class> class CONTAINER>
+    inline typename CONTAINER<ELEM,T,A>::const_iterator end  (const CONTAINER<ELEM,T,A> & c) { return c.end(); }
+
+    template <class ELEM, class T, class A, template <class,class,class> class CONTAINER>
+    inline ELEM* begin_ptr(CONTAINER<ELEM,T,A> & c) { return c.empty() ? NULL : &*c.begin(); }
+    template <class ELEM, class T, class A, template <class,class,class> class CONTAINER>
+    inline ELEM* end_ptr  (CONTAINER<ELEM,T,A> & c) { return c.empty() ? NULL : &*c.end(); }
+
+    template <class ELEM, class T, class A, template <class,class,class> class CONTAINER>
+    inline const ELEM* begin_ptr(const CONTAINER<ELEM,T,A> & c) { return c.empty() ? NULL : &*c.begin(); }
+    template <class ELEM, class T, class A, template <class,class,class> class CONTAINER>
+    inline const ELEM* end_ptr  (const CONTAINER<ELEM,T,A> & c) { return c.empty() ? NULL : &*c.end(); }
+
+    // iterators into C arrays
+    template <typename T, const std::size_t N> inline T* begin(T (&array)[N]) { return array; }
+    template <typename T, const std::size_t N> inline T* end  (T (&array)[N]) { return array+N; }
+
+    // iterators into const C arrays
+    template <typename T, const std::size_t N> inline const T* begin(const T (&array)[N]) { return array; }
+    template <typename T, const std::size_t N> inline const T* end  (const T (&array)[N]) { return array+N; }
 
     //! size of C array
     template <typename T, const std::size_t N>

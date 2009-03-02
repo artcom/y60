@@ -105,7 +105,7 @@ insert(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         asl::Ptr<Gtk::TreeIter> myInsertPosition;
         convertFrom(cx, argv[0], myInsertPosition);
         asl::Ptr<Gtk::TreeIter> myNewRow = asl::Ptr<Gtk::TreeIter>(new Gtk::TreeIter(myOwner->insert(*myInsertPosition)));
-        *rval = as_jsval(cx, myNewRow, &(*myNewRow));
+        *rval = as_jsval(cx, myNewRow, myNewRow.get());
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }
@@ -120,7 +120,7 @@ insert_after(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
         asl::Ptr<Gtk::TreeIter> myInsertPosition;
         convertFrom(cx, argv[0], myInsertPosition);
         asl::Ptr<Gtk::TreeIter> myNewRow = asl::Ptr<Gtk::TreeIter>(new Gtk::TreeIter(myOwner->insert_after(*myInsertPosition)));
-        *rval = as_jsval(cx, myNewRow, &(*myNewRow));
+        *rval = as_jsval(cx, myNewRow, myNewRow.get());
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }
@@ -135,7 +135,7 @@ erase(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         asl::Ptr<Gtk::TreeIter> myInsertPosition;
         convertFrom(cx, argv[0], myInsertPosition);
         asl::Ptr<Gtk::TreeIter> myNewRow = asl::Ptr<Gtk::TreeIter>(new Gtk::TreeIter(myOwner->erase(*myInsertPosition)));
-        *rval = as_jsval(cx, myNewRow, &(*myNewRow));
+        *rval = as_jsval(cx, myNewRow, myNewRow.get());
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }
@@ -147,7 +147,7 @@ append(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     try {
         OWNERPTR myOwner = JSListStore::getJSWrapper(cx, obj).getOwner();
         asl::Ptr<Gtk::TreeIter> myNewRow = asl::Ptr<Gtk::TreeIter>(new Gtk::TreeIter(myOwner->append()));
-        *rval = as_jsval(cx, myNewRow, &(*myNewRow));
+        *rval = as_jsval(cx, myNewRow, myNewRow.get());
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }

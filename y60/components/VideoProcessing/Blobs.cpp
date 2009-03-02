@@ -111,13 +111,13 @@ namespace y60 {
         }   
     }
 
-	void 
+    void 
     Blobs::onFrame(double t) {
         y60::ImagePtr myGrayImage = _mySourceImage;
 
-        const GRAYRaster * mySourceFrame = dom::dynamic_cast_Value<GRAYRaster>(&*_mySourceImage->getRasterValue());
-        const GRAYRaster * myTargetFrame = dom::dynamic_cast_Value<GRAYRaster>(&*_myTargetImage->getRasterValue());
-        
+        const GRAYRaster * mySourceFrame = dom::dynamic_cast_Value<GRAYRaster>(_mySourceImage->getRasterValue().get());
+        const GRAYRaster * myTargetFrame = dom::dynamic_cast_Value<GRAYRaster>(_myTargetImage->getRasterValue().get());
+
         dom::ResizeableRasterPtr myResizeableRasterPtr = _mySourceImage->getRasterPtr();
 
         // // left-to-right horizontal pass

@@ -615,7 +615,7 @@ ValueFactory::createValue(const DOMString & theType, const asl::ReadableBlock & 
 
 void
 ValueFactory::registerPrototype(const DOMString & theType, ValuePtr thePrototype) {
-    DB(AC_TRACE << "ValueFactory::registerPrototype('"<<theType<<"',"<<(void*)&(*thePrototype)<<")"<<std::endl;)
+    DB(AC_TRACE << "ValueFactory::registerPrototype('"<<theType<<"',"<<(void*)thePrototype.get()<<")"<<std::endl;)
         _myPrototypes[theType] = thePrototype->clone(0);
 }
 

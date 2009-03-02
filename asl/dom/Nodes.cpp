@@ -1200,11 +1200,11 @@ dom::Node::cloneNode(CloneDepth depth, Node * theParent) const {
     result->_mySchemaInfo = _mySchemaInfo;
     //result->_myParent = theParent;
     if (myCloneValue) {
-        myCloneValue->setNodePtr(&(*result));
+        myCloneValue->setNodePtr(result.get());
     }
 
     for (TypedNamedNodeMap::size_type attr = 0; attr < _myAttributes.size(); ++attr) {
-        result->appendAttribute(_myAttributes.item(attr)->cloneNode(DEEP,&(*result)));
+        result->appendAttribute(_myAttributes.item(attr)->cloneNode(DEEP,result.get()));
     }
     return result;
 }
@@ -1367,7 +1367,7 @@ dom::Node::parseAll(const String& is) {
                     getChildren().append(new_child);
                 }
                 if (new_child->nodeType() == DOCUMENT_TYPE_NODE) {
-                    doctype = &(*new_child);
+                    doctype = new_child.get();
                 }
             }
         } while (completed_pos > pos);
@@ -1415,8 +1415,8 @@ void Node::makeSchemaInfo(bool forceNew) {
         if (_myParent) {
             DB(AC_TRACE << "parent exists" << endl);
             if (_myParent->_mySchemaInfo) {
-                DB(AC_TRACE << "parent has SchemaInfo, initializing SchemaInfo to Schema "<< (void*)&(*_myParent->_mySchemaInfo->_mySchema)
-                    << ", level=" << _mySchemaInfo->_myDepthLevel+1<<" , factory = " << (void*)&(*_myParent->_mySchemaInfo->_myValueFactory)<< endl);
+                DB(AC_TRACE << "parent has SchemaInfo, initializing SchemaInfo to Schema "<< (void*)_myParent->_mySchemaInfo->_mySchema.get()
+                    << ", level=" << _mySchemaInfo->_myDepthLevel+1<<" , factory = " << (void*)_myParent->_mySchemaInfo->_myValueFactory.get()<< endl);
                 if (!_myParent->_mySchemaInfo->_mySchema) {
                     string myError = string(" parent node name='")+
                         _myParent->nodeName()+"', my node name = '"+nodeName()+"'";
@@ -1930,7 +1930,7 @@ dom::Node::appendAttribute(NodePtr theNewAttribute) {
 
 NodePtr
 dom::Node::replaceChild(NodePtr theNewChild, NodePtr theOldChild) {
-    int myOldIndex = getChildren().findIndex(&(*theOldChild));
+    int myOldIndex = getChildren().findIndex(theOldChild.get());
     if (myOldIndex < 0) {
         return NodePtr();
     }
@@ -2064,7 +2064,7 @@ dom::Node::compareByDocumentOrder(const NodePtr theNode) const
 
 NodePtr 
 dom::Node::insertBefore(NodePtr theNewChild, NodePtr theRefChild) {
-    int myRefIndex = getChildren().findIndex(&(*theRefChild));
+    int myRefIndex = getChildren().findIndex(theRefChild.get());
     if (myRefIndex < 0) {
         return NodePtr();
     }
@@ -2903,7 +2903,7 @@ dom::Node::previousSibling() const {
 }
 dom::NodePtr
 dom::Node::removeChild(dom::NodePtr theChild) {
-    return getChildren().removeItem(getChildren().findIndex(&(*theChild)));
+    return getChildren().removeItem(getChildren().findIndex(theChild.get()));
 }
 
 // Does not return the document node, but the root element node
@@ -3209,9 +3209,9 @@ dom::Node::addEventListener(const DOMString & type,
                         bool useCapture)
 {
     if (useCapture) {
-        _myCapturingEventListeners[type][&(*listener)]=listener;
+        _myCapturingEventListeners[type][listener.get()]=listener;
     } else {
-        _myEventListeners[type][&(*listener)]=listener;
+        _myEventListeners[type][listener.get()]=listener;
     }
 }
 
@@ -3221,9 +3221,9 @@ dom::Node::removeEventListener(const DOMString & type,
                             bool useCapture)
 {
     if (useCapture) {
-        _myCapturingEventListeners[type].erase(&(*listener));
+        _myCapturingEventListeners[type].erase(listener.get());
     } else {
-        _myEventListeners[type].erase(&(*listener));
+        _myEventListeners[type].erase(listener.get());
     }
 }
 bool
@@ -3349,7 +3349,7 @@ dom::operator>>(std::istream & is, dom::Node & n) {
     String xml_data;
     std::vector<char> xml_data_vec(4096);
     while (is) {
-        is.read(&(*xml_data_vec.begin()),xml_data_vec.size());
+        is.read(asl::begin_ptr(xml_data_vec),xml_data_vec.size());
 
 #if defined(_WIN32)
         // Sane reallocation strategy. Actually, append should do this. With
@@ -3358,7 +3358,7 @@ dom::operator>>(std::istream & is, dom::Node & n) {
             xml_data.reserve(xml_data.capacity()*2);
         }
 #endif
-        xml_data.append(&(*xml_data_vec.begin()),is.gcount());
+        xml_data.append(asl::begin_ptr(xml_data_vec),is.gcount());
     }
     //n = Node();
     n.parseAll(xml_data);
