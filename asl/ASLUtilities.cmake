@@ -15,7 +15,7 @@ macro(asl_add_schema XSD)
         )
         add_custom_command(
             OUTPUT  ${THIS_XSD_CXX_FILE}
-            DEPENDS ${THIS_XSD_FILE}
+            DEPENDS ${THIS_XSD_FILE} asl-text2src
             WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
             COMMAND 
                 ${TEXT2SRC}
