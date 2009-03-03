@@ -68,6 +68,7 @@ namespace asl {
     template <class ELEM, template <class> class CONTAINER>
     inline typename CONTAINER<ELEM>::const_iterator end  (const CONTAINER<ELEM> & c) { return c.end(); }
 
+#if !defined(_SETTING_GCC_TEMPLATE_MATCHING_BUG_WORKAROUND_)
     template <class ELEM, template <class> class CONTAINER>
     inline ELEM* begin_ptr(CONTAINER<ELEM> & c) { return c.empty() ? NULL : &*c.begin(); }
     template <class ELEM, template <class> class CONTAINER>
@@ -77,6 +78,7 @@ namespace asl {
     inline const ELEM* begin_ptr(const CONTAINER<ELEM> & c) { return c.empty() ? NULL : &*c.begin(); }
     template <class ELEM, template <class> class CONTAINER>
     inline const ELEM* end_ptr  (const CONTAINER<ELEM> & c) { return c.empty() ? NULL : &*c.end(); }
+#endif //!defined(_SETTING_GCC_TEMPLATE_MATCHING_BUG_WORKAROUND_)
 
     // iterators into containers with two template arguments
     template <class ELEM, class A, template <class,class> class CONTAINER>
@@ -89,6 +91,7 @@ namespace asl {
     template <class ELEM, class A, template <class,class> class CONTAINER>
     inline typename CONTAINER<ELEM,A>::const_iterator end  (const CONTAINER<ELEM,A> & c) { return c.end(); }
 
+#if !defined(_SETTING_GCC_TEMPLATE_MATCHING_BUG_WORKAROUND_)
     template <class ELEM, class A, template <class,class> class CONTAINER>
     inline ELEM* begin_ptr(CONTAINER<ELEM,A> & c) { return c.empty() ? NULL : &*c.begin(); }
     template <class ELEM, class A, template <class,class> class CONTAINER>
@@ -98,6 +101,7 @@ namespace asl {
     inline const ELEM* begin_ptr(const CONTAINER<ELEM,A> & c) { return c.empty() ? NULL : &*c.begin(); }
     template <class ELEM, class A, template <class,class> class CONTAINER>
     inline const ELEM* end_ptr  (const CONTAINER<ELEM,A> & c) { return c.empty() ? NULL : &*c.end(); }
+#endif //!defined(_SETTING_GCC_TEMPLATE_MATCHING_BUG_WORKAROUND_)
 
     // iterators into containers with three template arguments
     template <class ELEM, class T, class A, template <class,class,class> class CONTAINER>
@@ -110,6 +114,7 @@ namespace asl {
     template <class ELEM, class T, class A, template <class,class,class> class CONTAINER>
     inline typename CONTAINER<ELEM,T,A>::const_iterator end  (const CONTAINER<ELEM,T,A> & c) { return c.end(); }
 
+#if !defined(_SETTING_GCC_TEMPLATE_MATCHING_BUG_WORKAROUND_)
     template <class ELEM, class T, class A, template <class,class,class> class CONTAINER>
     inline ELEM* begin_ptr(CONTAINER<ELEM,T,A> & c) { return c.empty() ? NULL : &*c.begin(); }
     template <class ELEM, class T, class A, template <class,class,class> class CONTAINER>
@@ -119,6 +124,19 @@ namespace asl {
     inline const ELEM* begin_ptr(const CONTAINER<ELEM,T,A> & c) { return c.empty() ? NULL : &*c.begin(); }
     template <class ELEM, class T, class A, template <class,class,class> class CONTAINER>
     inline const ELEM* end_ptr  (const CONTAINER<ELEM,T,A> & c) { return c.empty() ? NULL : &*c.end(); }
+#endif //!defined(_SETTING_GCC_TEMPLATE_MATCHING_BUG_WORKAROUND_)
+
+#if defined(_SETTING_GCC_TEMPLATE_MATCHING_BUG_WORKAROUND_)
+    template <class CONTAINER>
+    inline ELEM* begin_ptr(CONTAINER & c) { return c.empty() ? NULL : &*c.begin(); }
+    template <class CONTAINER>
+    inline ELEM* end_ptr  (CONTAINER & c) { return c.empty() ? NULL : &*c.end(); }
+
+    template <class CONTAINER>
+    inline const ELEM* begin_ptr(const CONTAINER & c) { return c.empty() ? NULL : &*c.begin(); }
+    template <class CONTAINER>
+    inline const ELEM* end_ptr  (const CONTAINER & c) { return c.empty() ? NULL : &*c.end(); }
+#endif //defined(_SETTING_GCC_TEMPLATE_MATCHING_BUG_WORKAROUND_)
 
     // iterators into C arrays
     template <typename T, const std::size_t N> inline T* begin(T (&array)[N]) { return array; }

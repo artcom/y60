@@ -60,12 +60,10 @@
     #define _SETTING_USE_SYSVIPC_
     #define _SETTING_USE_MPFIFO_
     #define _SETTING_USE_PTHREAD_
-
-    #define _SETTING_GCC_TEMPLATE_BUG_WORKAROUND_
 #endif
 
 #ifdef OSX
-    #define _SETTING_GCC_TEMPLATE_BUG_WORKAROUND_
+    #define _SETTING_GCC_TEMPLATE_MATCHING_BUG_WORKAROUND_
 #endif
 
 #ifdef _MSC_VER
