@@ -74,6 +74,8 @@ FFMpegAudioDecoder::FFMpegAudioDecoder (const string& myURI)
     : _myURI (myURI),
       _myFormatContext(0),
       _myStreamIndex(-1),
+      _mySampleRate(0),
+      _myNumChannels(0),
       _myResampleContext(0),
       _mySampleSink(0),
       _myCurFrame(0)
@@ -211,7 +213,6 @@ void FFMpegAudioDecoder::open() {
 
 void FFMpegAudioDecoder::close() {
     AC_DEBUG << "FFMpegAudioDecoder::close() (" << _myURI << ")";
-    
 
     if (_myFormatContext) {
         if (_myResampleContext) {
@@ -226,7 +227,7 @@ void FFMpegAudioDecoder::close() {
                 myCodecContext = &_myFormatContext->streams[_myStreamIndex]->codec;
 #           endif
         }
-        if (myCodecContext) {
+        if (_mySampleRate && _myNumChannels) {
             AutoLocker<ThreadLock> myLocker(_myAVCodecLock);
             avcodec_close(myCodecContext);
         }
