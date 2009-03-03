@@ -33,19 +33,26 @@ struct vert2frag {
 };
 
 vert2frag mainVertex(app2vert IN,    
-                     uniform float4x4 GL_MODELVIEW_PROJECTION,
-                     uniform float4x4 AC_TEXTURE_MATRICES[])
+                     uniform float4x4 GL_MODELVIEW_PROJECTION
+#if (AC_TEXTURE_MATRICES_LENGTH > 0)
+                    , uniform float4x4 AC_TEXTURE_MATRICES[]
+#endif
+)
 {
     vert2frag OUT;
 
     OUT.Vertex = mul(GL_MODELVIEW_PROJECTION, IN.Position);
+#if (AC_TEXTURE_MATRICES_LENGTH > 0)
     OUT.TexCoord0 = mul(AC_TEXTURE_MATRICES[0], float4(IN.TexCoord,0,1)).xy;
+#endif
     OUT.TexCoord1 = float2(0,0);
     OUT.TwoTexFlag = false;
+#if (AC_TEXTURE_MATRICES_LENGTH > 0)
     if(AC_TEXTURE_MATRICES.length == 2) {
         OUT.TexCoord1 = mul(AC_TEXTURE_MATRICES[1], float4(IN.TexCoord,0,1)).xy;
         OUT.TwoTexFlag = true;
     }
+#endif
     OUT.TexCoordC = IN.TexCoord;
     return OUT;
 }

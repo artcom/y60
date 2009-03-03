@@ -164,7 +164,7 @@ namespace y60 {
                     const dom::Node & theNode, const std::string & thePropertyName,
                     const MaterialBase & theMaterial);
 
-            void appendUnsizedArrayBugWorkaroundCompilerArgs(std::vector<std::string> & theArgStrings, std::vector<const char*> theArgs) const;
+            void appendUnsizedArrayBugWorkaroundCompilerArgs(std::vector<std::string> & theArgStrings, std::vector<const char*> & theArgs) const;
             void createAndCompileProgram();
 
             void setCGGLParameters();

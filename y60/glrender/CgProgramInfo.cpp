@@ -115,6 +115,17 @@ namespace y60 {
     }
     std::ostream & operator<<(std::ostream & os, const std::vector<string> & t) {
         return asl::operator<<(os,t);
+    }   
+    std::ostream & operator<<(std::ostream & os, const std::vector<const char*> & t) {
+        os << "[array size ="<<t.size()<<"]"<<endl;
+        for (unsigned i = 0; i < t.size(); ++i) {
+            if (t[i]) {
+                os << "'" << t[i] << "'" << endl;
+            } else {
+                os << "(NULL)" << endl;
+            }
+        }
+        return os;
     }
     
     void
@@ -156,7 +167,7 @@ namespace y60 {
         _myUnsizedArrayAutoParamSizes[SPOT_LIGHTS_DIRECTION] = 0;
         _myUnsizedArrayAutoParamSizes[SPOT_LIGHTS_ATTENUATION] = 0;
         
-        _myUnsizedArrayAutoParamSizes[TEXTURE_MATRICES] = 1; // bug in Cg prevents unsized arrays of type float4x4 of size 0 to compile
+        _myUnsizedArrayAutoParamSizes[TEXTURE_MATRICES] = 0; // bug in Cg prevents unsized arrays of type float4x4 of size 0 to compile
 
         //VS: 100 punkte
         cgSetAutoCompile(_myContext, CG_COMPILE_MANUAL);
@@ -177,13 +188,14 @@ namespace y60 {
 
     // This should go away when the cg bug will be fixed that prevents vertex shaders to accept
     // unsized arrays of size 0; theArgs pointer will also become invalid after destruction of theArgsStrings, so take care
-    void CgProgramInfo::appendUnsizedArrayBugWorkaroundCompilerArgs(std::vector<std::string> & theArgStrings, std::vector<const char*> theArgs) const {
+    void CgProgramInfo::appendUnsizedArrayBugWorkaroundCompilerArgs(std::vector<std::string> & theArgStrings, std::vector<const char*> & theArgs) const {
         for (std::map<int,int>::const_iterator it = _myUnsizedArrayAutoParamSizes.begin(); 
              it !=_myUnsizedArrayAutoParamSizes.end(); ++it)
         {
             const std::string myParamName = asl::getStringFromEnum(it->first, CgAutoParameterString);
             int myArrayLength = it->second;
             string myDefine = string("-D")+myParamName+"_LENGTH="+asl::as_string(myArrayLength);
+            //string myDefine = string("-D")+myParamName+"_LENGTH=1";
             theArgStrings.push_back(myDefine);
         }
         for (unsigned i = 0; i < theArgStrings.size(); ++i) {
@@ -200,20 +212,22 @@ namespace y60 {
             DBP2(MAKE_GL_SCOPE_TIMER(CgProgramInfo_loadFromFile));
 
             // create null terminated array of null terminated strings
+            _myCachedCompilerArgs.resize(0);
             for (std::vector<std::string>::size_type i=0; i < _myShader._myCompilerArgs.size(); ++i) {
                 AC_DEBUG << "Using arg '" << _myShader._myCompilerArgs[i].c_str() << "'" << endl;
                 _myCachedCompilerArgs.push_back(_myShader._myCompilerArgs[i].c_str());
             }
             
-            
-            _myCachedCompilerArgs.push_back(0);
+            //_myCachedCompilerArgs.push_back(0);
 
             AC_DEBUG << "cgCreateProgramFromFile profile = " << ShaderProfileStrings[_myShader._myProfile] << ", entry= "<<_myShader._myEntryFunction;
             DBP2(START_TIMER(CgProgramInfo_cgCreateProgramFromFile));
             std::vector<string> myArgStrings;
             std::vector<const char *> myArgs = _myCachedCompilerArgs;
             appendUnsizedArrayBugWorkaroundCompilerArgs(myArgStrings, myArgs);
-            AC_TRACE << "cgCreateProgram  unsized array fix args = " << myArgStrings;
+            myArgs.push_back(0);
+            AC_TRACE << "cgCreateProgramFromFile  args = " << myArgs;
+            //AC_TRACE << "cgCreateProgram  unsized array fix args = " << myArgStrings;
             _myCgProgramID = cgCreateProgramFromFile(_myContext, CG_SOURCE,
                                                      _myPathName.c_str(),
                                                      asCgProfile(_myShader),
@@ -242,11 +256,13 @@ namespace y60 {
             std::vector<string> myArgStrings;
             std::vector<const char *> myArgs = _myCachedCompilerArgs;
             appendUnsizedArrayBugWorkaroundCompilerArgs(myArgStrings, myArgs);
-            AC_TRACE << "cgCreateProgram  unsized array fix args = " << myArgStrings;
+            myArgs.push_back(0);
+            //AC_TRACE << "cgCreateProgram  unsized array fix args = " << myArgStrings;
+            AC_TRACE << "cgCreateProgram  args = " << myArgs;
             AC_DEBUG << "cgCreateProgram  profile = " << ShaderProfileStrings[_myShader._myProfile] << ", entry= "<<_myShader._myEntryFunction;
             _myCgProgramID = cgCreateProgram(_myContext, CG_SOURCE, _myCgProgramString.c_str(),
                                              asCgProfile(_myShader), _myShader._myEntryFunction.c_str(),
-                                             asl::begin_ptr(_myCachedCompilerArgs));
+                                             asl::begin_ptr(myArgs));
             AC_TRACE << "cgCreateProgram created program id = "<<_myCgProgramID;
 #ifdef _WIN32
             _chdir( myCWD.c_str());                                     
@@ -343,9 +359,7 @@ namespace y60 {
                 if (myParameterType == CG_ARRAY) /* && cgGetArraySize(myParam, 0) == 0)*/ {
                     int myArraySize = _myUnsizedArrayAutoParamSizes[myParamID];
                     AC_TRACE << "setting array " << myParamName << " to size " << myArraySize;
-                    cgSetArraySize(myParam, myArraySize);
-                    assertCg(PLUS_FILE_LINE, _myContext);
-#if 0
+#ifdef ALLOW_SIZED_ARRAYS_AND_UNSIZED_ARRAYS_AS_AUTOPARAMS
                     CGtype myArrayType = cgGetArrayType(myParam);
                     CGparameter myArray = cgCreateParameterArray(_myContext, myArrayType, myArraySize);
                     assertCg(PLUS_FILE_LINE, _myContext);
@@ -356,8 +370,10 @@ namespace y60 {
                     }
 
                     cgConnectParameter(myArray, myParam);
-                    assertCg(PLUS_FILE_LINE, _myContext);
+#else
+                    cgSetArraySize(myParam, myArraySize);
 #endif
+                    assertCg(PLUS_FILE_LINE, _myContext);
                     AC_TRACE << "done. created unsized array of size " << myArraySize;
                 }
                 AC_TRACE << "adding auto param " << myParamName << ":" << myParamID << endl;
@@ -443,7 +459,7 @@ namespace y60 {
         bool myReload = false;
 
         DBP2(START_TIMER(CgProgramInfo_reloadIfRequired_pos_lights));
-        if (myReload == false && _myAutoParams.find(POSITIONAL_LIGHTS) != _myAutoParams.end()) {
+        if (myReload == false /* && _myAutoParams.find(POSITIONAL_LIGHTS) != _myAutoParams.end()*/) {
             unsigned myLastCount = _myUnsizedArrayAutoParamSizes[POSITIONAL_LIGHTS];
             if (myLastCount != myPositionalLightCount) {
                 DBP2(COUNT(CgProgramInfo_posLightCount_differ));
@@ -455,7 +471,7 @@ namespace y60 {
         DBP2(STOP_TIMER(CgProgramInfo_reloadIfRequired_pos_lights));
 
         DBP2(START_TIMER(CgProgramInfo_reloadIfRequired_dir_lights));
-        if (myReload == false && _myAutoParams.find(DIRECTIONAL_LIGHTS) != _myAutoParams.end()) {
+        if (myReload == false  /* && _myAutoParams.find(DIRECTIONAL_LIGHTS) != _myAutoParams.end()*/) {
             unsigned myLastCount = _myUnsizedArrayAutoParamSizes[DIRECTIONAL_LIGHTS];
             if (myLastCount != myDirectionalLightCount)  {
                 DBP2(COUNT(CgProgramInfo_dirLightCount_differ));
@@ -467,7 +483,7 @@ namespace y60 {
         DBP2(STOP_TIMER(CgProgramInfo_reloadIfRequired_dir_lights));
         
         DBP2(START_TIMER(CgProgramInfo_reloadIfRequired_spot_lights));
-        if (myReload == false && _myAutoParams.find(SPOT_LIGHTS) != _myAutoParams.end()) {
+        if (myReload == false /* && _myAutoParams.find(SPOT_LIGHTS) != _myAutoParams.end()*/) {
             unsigned myLastCount = _myUnsizedArrayAutoParamSizes[SPOT_LIGHTS];
             if (myLastCount != mySpotLightCount)  {
                 DBP2(COUNT(CgProgramInfo_spotLightCount_differ));
@@ -478,28 +494,29 @@ namespace y60 {
         }
         DBP2(STOP_TIMER(CgProgramInfo_reloadIfRequired_spot_lights));
 
-        if (myReload == false && _myAutoParams.find(TEXTURE_MATRICES) != _myAutoParams.end()) {
+        if (myReload == false /* && _myAutoParams.find(TEXTURE_MATRICES) != _myAutoParams.end() */) {
             unsigned myLastCount = _myUnsizedArrayAutoParamSizes[TEXTURE_MATRICES];
             if (myLastCount != theMaterial.getTextureUnitCount()) {
+                AC_TRACE << "myLastCount="<< myLastCount;
                 myReload = true;
             }
         }
-
+                
         if (myReload) {
             //change unsized array sizes here
             AC_DEBUG << "Cg program reload required";
-
+            
             DBP2(MAKE_GL_SCOPE_TIMER(CgProgramInfo_reloadIfRequired_reload));
             AC_DEBUG << "#of positional lights:" << myPositionalLightCount;
             _myUnsizedArrayAutoParamSizes[POSITIONAL_LIGHTS] = myPositionalLightCount;
             _myUnsizedArrayAutoParamSizes[POSITIONAL_LIGHTS_DIFFUSE_COLOR] = myPositionalLightCount;
             _myUnsizedArrayAutoParamSizes[POSITIONAL_LIGHTS_SPECULAR_COLOR] = myPositionalLightCount;
-
+            
             AC_DEBUG << "#of directional lights:" << myDirectionalLightCount;
             _myUnsizedArrayAutoParamSizes[DIRECTIONAL_LIGHTS] = myDirectionalLightCount;
             _myUnsizedArrayAutoParamSizes[DIRECTIONAL_LIGHTS_DIFFUSE_COLOR] = myDirectionalLightCount;
             _myUnsizedArrayAutoParamSizes[DIRECTIONAL_LIGHTS_SPECULAR_COLOR] = myDirectionalLightCount;
-
+            
             AC_DEBUG << "#of spot lights:" << mySpotLightCount;
             _myUnsizedArrayAutoParamSizes[SPOT_LIGHTS] = mySpotLightCount;
             _myUnsizedArrayAutoParamSizes[SPOT_LIGHTS_DIFFUSE_COLOR] = mySpotLightCount;
@@ -508,7 +525,7 @@ namespace y60 {
             _myUnsizedArrayAutoParamSizes[SPOT_LIGHTS_EXPONENT] = mySpotLightCount;
             _myUnsizedArrayAutoParamSizes[SPOT_LIGHTS_DIRECTION] = mySpotLightCount;
             _myUnsizedArrayAutoParamSizes[SPOT_LIGHTS_ATTENUATION] = mySpotLightCount;
-
+            
             AC_DEBUG << "#of texture matrices:" << theMaterial.getTextureUnitCount();
             _myUnsizedArrayAutoParamSizes[TEXTURE_MATRICES] = theMaterial.getTextureUnitCount();
 
@@ -520,7 +537,7 @@ namespace y60 {
             cgGLLoadProgram(_myCgProgramID);
             STOP_TIMER(CgProgramInfo_reloadIfRequired_reload_load);
             assertCg(PLUS_FILE_LINE, _myContext);
-
+            
             DBP2(START_TIMER(CgProgramInfo_reloadIfRequired_enableProfile));
             enableProfile();
             DBP2(STOP_TIMER(CgProgramInfo_reloadIfRequired_enableProfile));
@@ -535,10 +552,10 @@ namespace y60 {
 
             assertCg(PLUS_FILE_LINE, _myContext);
         }
-
+        
         return myReload;
     }
-
+    
     void
     CgProgramInfo::bindBodyParams(
         const MaterialBase & theMaterial,
