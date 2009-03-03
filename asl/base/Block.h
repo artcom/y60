@@ -159,8 +159,10 @@ namespace asl {
         virtual ~ReadableBlock() {}
     };
 
+#if !defined(_SETTING_GCC_TEMPLATE_MATCHING_BUG_WORKAROUND_)
     inline const unsigned char * begin_ptr(const ReadableBlock & block) { return block.begin(); }
     inline const unsigned char * end_ptr  (const ReadableBlock & block) { return block.end  (); }
+#endif //!defined(_SETTING_GCC_TEMPLATE_MATCHING_BUG_WORKAROUND_)
 
     struct ReadableBlockHandle : public ReadableStreamHandle {
         virtual ReadableStream & getStream() {
@@ -482,11 +484,13 @@ ReadableArrangedStream<EXTERNAL_BYTE_ORDER, SIZE_TYPE, OFFSET_TYPE>::readBlock(W
         AC_SIZE_TYPE _myCapacity;
     };
 
+#if !defined(_SETTING_GCC_TEMPLATE_MATCHING_BUG_WORKAROUND_)
     inline unsigned char * begin_ptr(Chunk & chunk) { return chunk.begin(); }
     inline unsigned char * end_ptr  (Chunk & chunk) { return chunk.end  (); }
 
     inline const unsigned char * begin_ptr(const Chunk & chunk) { return chunk.begin(); }
     inline const unsigned char * end_ptr  (const Chunk & chunk) { return chunk.end  (); }
+#endif //!defined(_SETTING_GCC_TEMPLATE_MATCHING_BUG_WORKAROUND_)
 
     //-------------------------------------------------------------------------------
     /**
