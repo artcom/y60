@@ -2,7 +2,7 @@
 #   ifndef Y60_APE_INVOKE_INCLUDED
 #       define Y60_APE_INVOKE_INCLUDED
 
-#       include <y60/components/yape/y60_ape_settings.h>
+#       include "y60_ape_settings.h"
 
 #       include <boost/mpl/front.hpp>
 #       include <boost/type_traits.hpp>
@@ -18,9 +18,9 @@
 #       include <asl/base/logger.h>
 #       include <y60/jsbase/JScppUtils.h>
 
-#       include <y60/components/yape/exception.h>
-#       include <y60/components/yape/signature_utils.h>
-#       include <y60/components/yape/preprocessor.h>
+#       include "exception.h"
+#       include "signature_utils.h"
+#       include "preprocessor.h"
 
 namespace y60 { namespace ape { namespace detail {
 

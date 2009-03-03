@@ -6,10 +6,10 @@
 #include <vector>
 
 #include <js/spidermonkey/jscntxt.h>
-
 #include <asl/base/Logger.h>
-#include <y60/components/yape/signature.h>
-#include <y60/components/yape/invoke.h>
+
+#include "signature.h"
+#include "invoke.h"
 
 namespace y60 { namespace ape {
 

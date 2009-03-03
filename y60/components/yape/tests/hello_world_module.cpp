@@ -4,7 +4,7 @@
 
 #include <asl/base/TraceUtils.h>
 
-Y60_APE_MODULE( y60HelloWorld ) {
+Y60_APE_MODULE( y60_hello_world ) {
     using namespace y60::ape;
 
     function< const char* (), greet> ("greet");

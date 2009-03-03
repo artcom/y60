@@ -3,7 +3,7 @@
 #ifndef Y60_APE_SIGNATURE_INCLUDED
 #   define Y60_APE_SIGNATURE_INCLUDED
 
-#   include <y60/components/yape/y60_ape_settings.h>
+#   include "y60_ape_settings.h"
 
 #   include <boost/preprocessor/repeat.hpp>
 #   include <boost/preprocessor/enum.hpp>
