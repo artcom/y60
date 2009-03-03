@@ -294,21 +294,21 @@ namespace y60 {
                 }
             }
 
-            for (VectorOfVectorOfString::size_type i = 0; i < myCompilerArgs.size(); i++) {
-                PackageList myPackages = AppPackageManager::get().getPtr()->getPackageList();
-                PackageList::const_iterator it = myPackages.begin();
-                while( it != myPackages.end() ) {
-                    std::string myArg = " -I" + (*it++)->getPath();
-                    myCompilerArgs[i].push_back( myArg );
-                }
-            }
-
             if (myCompilerArgs.size() > myCompilerArgsIndex) {
                 theShader._myCompilerArgs = myCompilerArgs[myCompilerArgsIndex];
             } else {
                 throw ShaderException("bad number of compiler arg sets", PLUS_FILE_LINE);
             }    
         }    
+
+        // now add the include path to the shader args
+        PackageList myPackages = AppPackageManager::get().getPtr()->getPackageList();
+        PackageList::const_iterator it = myPackages.begin();
+        while( it != myPackages.end() ) {
+            std::string myArg = " -I" + (*it++)->getPath();
+            theShader._myCompilerArgs.push_back( myArg );
+        }
+
 #if 0
         //old:
         string myFilename = theShaderNode->getAttributeString(CG_FILE_PROPERTY);
