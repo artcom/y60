@@ -128,14 +128,14 @@ namespace asl {
 
 #if defined(_SETTING_GCC_TEMPLATE_MATCHING_BUG_WORKAROUND_)
     template <class CONTAINER>
-    inline ELEM* begin_ptr(CONTAINER & c) { return c.empty() ? NULL : &*c.begin(); }
+    inline typename CONTAINER::value_type* begin_ptr(CONTAINER & c) { return c.empty() ? NULL : &*c.begin(); }
     template <class CONTAINER>
-    inline ELEM* end_ptr  (CONTAINER & c) { return c.empty() ? NULL : &*c.end(); }
+    inline typename CONTAINER::value_type* end_ptr  (CONTAINER & c) { return c.empty() ? NULL : &*c.end(); }
 
     template <class CONTAINER>
-    inline const ELEM* begin_ptr(const CONTAINER & c) { return c.empty() ? NULL : &*c.begin(); }
+    inline const typename CONTAINER::value_type* begin_ptr(const CONTAINER & c) { return c.empty() ? NULL : &*c.begin(); }
     template <class CONTAINER>
-    inline const ELEM* end_ptr  (const CONTAINER & c) { return c.empty() ? NULL : &*c.end(); }
+    inline const typename CONTAINER::value_type* end_ptr  (const CONTAINER & c) { return c.empty() ? NULL : &*c.end(); }
 #endif //defined(_SETTING_GCC_TEMPLATE_MATCHING_BUG_WORKAROUND_)
 
     // iterators into C arrays
