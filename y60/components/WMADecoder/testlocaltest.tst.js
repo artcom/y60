@@ -66,7 +66,7 @@ function WMADecoder2UnitTest() {
     this.Constructor(this, "WMADecoder2UnitTest");
 }
 
-const SOUNDFILE = searchFile("../../../testmodels/tex/ramp.rgb");
+const SOUNDFILE = searchFile("../../../src/y60/components/WMADecoder/testfiles/music_cut_wm9.wma");
 
 WMADecoder2UnitTest.prototype.Constructor = function(obj, theName) {
     UnitTest.prototype.Constructor(obj, theName);
