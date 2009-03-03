@@ -22,4 +22,4 @@ y60_add_component(
     EXTERNS ${EXTERNALS}
 )
 
-y60_add_jstest(localtest mod_WMADecoder)
+#y60_add_jstest(localtest mod_WMADecoder)
