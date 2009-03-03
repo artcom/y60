@@ -1,6 +1,8 @@
 #ifndef Y60_APE_SIGNATURE_UTILS_INCLUDED
 #define Y60_APE_SIGNATURE_UTILS_INCLUDED
 
+#include <y60/components/yape/y60_ape_settings.h>
+
 #include <boost/mpl/size.hpp>
 #include <boost/mpl/front.hpp>
 #include <boost/mpl/int.hpp>

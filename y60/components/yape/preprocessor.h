@@ -1,6 +1,8 @@
 #ifndef Y60_APE_PREPROCESSOR
 #define Y60_APE_PREPROCESSOR
 
+#include <y60/components/yape/y60_ape_settings.h>
+
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/tuple/elem.hpp>
 
@@ -8,10 +10,6 @@
 
 #define Y60_APE_APPLY_Y60_APE_ITEM(v) v
 #define Y60_APE_APPLY_Y60_APE_NIL
-
-#ifndef Y60_APE_MAX_ARITY
-#   define Y60_APE_MAX_ARITY 15
-#endif
 
 #define Y60_APE_CV_QUALIFIER(i)                               \
         Y60_APE_APPLY(                                        \

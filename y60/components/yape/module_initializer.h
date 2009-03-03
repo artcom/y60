@@ -1,14 +1,15 @@
 #ifndef Y60_APE_MODULE_INITIALIZER_INCLUDED
 #define Y60_APE_MODULE_INITIALIZER_INCLUDED
 
+#include "y60_ape_settings.h"
+
 #include <vector>
 
 #include <js/spidermonkey/jscntxt.h>
 
 #include <asl/base/Logger.h>
-#include <y60/components/yape/detail/signature.h>
-#include <y60/components/yape/detail/module_loader.h>
-#include <y60/components/yape/detail/invoke.h>
+#include <y60/components/yape/signature.h>
+#include <y60/components/yape/invoke.h>
 
 namespace y60 { namespace ape {
 
@@ -29,11 +30,11 @@ class module_initializer {
             }
         }
 
-        template <typename FuncPtrT, FuncPtrT Func>
+        template <typename FuncT, FuncT * Func>
         void function(const char * name) {
             JSFunctionSpec js_func;
             js_func.name  = name;
-            js_func.call  = detail::get_invoker<FuncPtrT,Func>( detail::get_signature( Func ) );
+            js_func.call  = detail::get_invoker<FuncT,Func>( detail::get_signature( Func ) );
             js_func.nargs = detail::argument_count( detail::get_signature( Func ));
             js_func.flags = 0;
             js_func.extra = 0; // number of arg slots for local GC roots
@@ -42,7 +43,7 @@ class module_initializer {
         }
 
         template <typename Class>
-        class_wrapper<Class> class_(const char * name) { return class_wrapper<Class>(*this); }
+        class_wrapper<Class> class_(const char * name) { return class_wrapper<Class>(name, *this); }
 
     protected:
         template <typename Class> friend class class_wrapper;

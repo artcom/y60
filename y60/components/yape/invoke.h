@@ -2,6 +2,8 @@
 #   ifndef Y60_APE_INVOKE_INCLUDED
 #       define Y60_APE_INVOKE_INCLUDED
 
+#       include <y60/components/yape/y60_ape_settings.h>
+
 #       include <boost/mpl/front.hpp>
 #       include <boost/type_traits.hpp>
 #       include <boost/preprocessor/cat.hpp>
@@ -16,9 +18,9 @@
 #       include <asl/base/logger.h>
 #       include <y60/jsbase/JScppUtils.h>
 
-#       include <y60/components/yape/detail/exception.h>
-#       include <y60/components/yape/detail/signature_utils.h>
-#       include <y60/components/yape/detail/preprocessor.h>
+#       include <y60/components/yape/exception.h>
+#       include <y60/components/yape/signature_utils.h>
+#       include <y60/components/yape/preprocessor.h>
 
 namespace y60 { namespace ape { namespace detail {
 
@@ -28,6 +30,16 @@ template <typename Sig>
 struct dispatch {
     typedef invoke_tag< returns_void<Sig>::value, arity<Sig>::value > type;
 };
+
+inline
+void
+check_argument_count( int argc, int N ) {
+    if ( argc != N ) {
+        std::ostringstream os;
+        os << "expected " << N << " arguments but got " << argc;
+        throw bad_arguments( os.str(), PLUS_FILE_LINE );
+    }
+}
 
 template <typename T>
 inline
@@ -48,23 +60,23 @@ arg_from_jsval(JSContext * cx, jsval * const& argv, uintN i, T & out) {
     }
 }
 
-template <typename FuncPtrT,
-          FuncPtrT Func,
+template <typename FuncT,
+          FuncT * Func,
           typename Sig,
           typename Tag = typename dispatch<Sig>::type>
 struct invoker {
     static
     JSBool
     invoke(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, jsval * rval) {
-        BOOST_STATIC_ASSERT(sizeof(FuncPtrT) == 0);
+        BOOST_STATIC_ASSERT(sizeof(FuncT) == 0);
         return JS_FALSE;
     }
 };
 
-template < typename FuncPtrT, FuncPtrT Func, typename Sig >
+template < typename FuncT, FuncT * Func, typename Sig >
 JSNative
 get_invoker(Sig const& sig) {
-    return & detail::invoker<FuncPtrT,Func,Sig>::invoke; 
+    return & detail::invoker<FuncT,Func,Sig>::invoke; 
 }
 
 
@@ -76,7 +88,7 @@ get_invoker(Sig const& sig) {
                 arg_from_jsval(cx, argv, n, arg ## n );
 
 #       define BOOST_PP_ITERATION_PARAMS_1 \
-            (3, (0, Y60_APE_MAX_ARITY, <y60/components/yape/detail/invoke.h>))
+            (3, (0, Y60_APE_MAX_ARITY, <y60/components/yape/invoke.h>))
 #       include BOOST_PP_ITERATE()
 
 #       undef Y60_APE_DECL_ARG
@@ -89,17 +101,18 @@ get_invoker(Sig const& sig) {
 
 #   define N BOOST_PP_ITERATION()
 
-template <typename FuncPtrT,
-          FuncPtrT Func,
+template <typename FuncT,
+          FuncT * Func,
           typename Sig>
-struct invoker<FuncPtrT, Func, Sig, invoke_tag<false, N> > {
+struct invoker<FuncT, Func, Sig, invoke_tag<false, N> > {
     static
     JSBool
     invoke(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, jsval * rval) {
         try {
             AC_TRACE << "invoke: non_void " << N << " args";
+            check_argument_count( argc, N );
             typedef boost::function_traits<
-                typename boost::remove_pointer<FuncPtrT>::type > func_trait;
+                typename boost::remove_pointer<FuncT>::type > func_trait;
             BOOST_PP_REPEAT( N, Y60_APE_DECL_ARG, Sig )
             BOOST_PP_REPEAT( N, Y60_APE_INIT_ARG, Sig );
             *rval = jslib::as_jsval(cx, Func( BOOST_PP_ENUM_PARAMS(N, arg) ));
@@ -108,17 +121,18 @@ struct invoker<FuncPtrT, Func, Sig, invoke_tag<false, N> > {
     }
 };
 
-template <typename FuncPtrT,
-          FuncPtrT Func,
+template <typename FuncT,
+          FuncT * Func,
           typename Sig>
-struct invoker<FuncPtrT, Func, Sig, invoke_tag<true, N> > {
+struct invoker<FuncT, Func, Sig, invoke_tag<true, N> > {
     static
     JSBool
     invoke(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, jsval * rval) {
         try {
             AC_TRACE << "invoke: void " << N << " args";
+            check_argument_count( argc, N );
             typedef boost::function_traits<
-                typename boost::remove_pointer<FuncPtrT>::type > func_trait;
+                typename boost::remove_pointer<FuncT>::type > func_trait;
             BOOST_PP_REPEAT( N, Y60_APE_DECL_ARG, Sig );
             BOOST_PP_REPEAT( N, Y60_APE_INIT_ARG, Sig );
             Func( BOOST_PP_ENUM_PARAMS(N, arg) );

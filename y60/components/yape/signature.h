@@ -3,6 +3,8 @@
 #ifndef Y60_APE_SIGNATURE_INCLUDED
 #   define Y60_APE_SIGNATURE_INCLUDED
 
+#   include <y60/components/yape/y60_ape_settings.h>
+
 #   include <boost/preprocessor/repeat.hpp>
 #   include <boost/preprocessor/enum.hpp>
 #   include <boost/preprocessor/enum_params.hpp>
@@ -34,7 +36,7 @@ struct most_derived : public boost::mpl::if_< boost::is_convertible<C1*,C2*>, C1
                             
 
 #   define BOOST_PP_ITERATION_PARAMS_1                                   \
-            (3, (0, Y60_APE_MAX_ARITY, <y60/components/yape/detail/signature.h>))
+            (3, (0, Y60_APE_MAX_ARITY, <y60/components/yape/signature.h>))
 #   include BOOST_PP_ITERATE()
 #   undef Y60_APE_LIST_INC
 
@@ -59,7 +61,7 @@ get_signature(RT(*)(BOOST_PP_ENUM_PARAMS_Z(1, N, T)), void* = 0)
 
 #   undef N
 #   define BOOST_PP_ITERATION_PARAMS_2 \
-            (3, (0, 3, <y60/components/yape/detail/signature.h>))
+            (3, (0, 3, <y60/components/yape/signature.h>))
 #   include BOOST_PP_ITERATE()
 
 #else 

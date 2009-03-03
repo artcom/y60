@@ -1,20 +1,26 @@
 set( LIB_HEADERS
     class_wrapper.h
-    detail/invoke.h
-    detail/preprocessor.h
-    detail/signature.h
-    detail/signature_utils.h
+    exception.h
+    invoke.h
+    preprocessor.h
+    signature.h
+    signature_utils.h
     module.h
     module_initializer.h
+    module_loader.h
+    y60_ape_settings.h
     yape.h
 )
 # XXX need spidermonkey defs
 add_definitions( -DXP_UNIX )
 
-y60_add_component(
-    HelloWorld
-    SOURCES hello_world_wrapper.cpp
-    HEADERS ${LIB_HEADERS}
-    DEPENDS ${JSDEPENDS} y60jsbase
+ac_add_library(
+    yape
+    SOURCES dummy.cpp
+    HEADERS ${LIB_HEADERS} dummy.h
+    DEPENDS y60jsbase
+    EXTERNS Boost
+#    HEADER_ONLY
 )
 
+add_subdirectory( tests )
