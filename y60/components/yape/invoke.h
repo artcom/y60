@@ -15,7 +15,7 @@
 #       include <js/spidermonkey/jsapi.h>
 
 #       include <asl/base/TraceUtils.h>
-#       include <asl/base/logger.h>
+#       include <asl/base/Logger.h>
 #       include <y60/jsbase/JScppUtils.h>
 
 #       include "exception.h"
