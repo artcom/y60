@@ -15,26 +15,37 @@
 # __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 #
 
-option(ACMAKE_DEBUG_LINKAGE "Debug acmake linkage mechanism" NO)
+option(ACMAKE_DEBUG_LINKAGE "Debug acmake target-specific linkage" NO)
 macro(debug_linkage)
     if(ACMAKE_DEBUG_LINKAGE)
         message("LINKAGE: ${ARGN}")
     endif(ACMAKE_DEBUG_LINKAGE)
 endmacro(debug_linkage)
 
-option(ACMAKE_DEBUG_SEARCHPATH "Debug acmake include and library search path mechanism" NO)
+option(ACMAKE_DEBUG_SEARCHPATH "Debug acmake target-specific searchpaths" NO)
 macro(debug_searchpath)
     if(ACMAKE_DEBUG_SEARCHPATH)
         message("SEARCHPATH: ${ARGN}")
     endif(ACMAKE_DEBUG_SEARCHPATH)
 endmacro(debug_searchpath)
 
-option(ACMAKE_DEBUG_DEFINITIONS "Debug acmake preprocessor definition handling" NO)
+option(ACMAKE_DEBUG_DEFINITIONS "Debug acmake target-specific definitions" NO)
 macro(debug_definitions)
     if(ACMAKE_DEBUG_DEFINITIONS)
         message("DEFINITIONS: ${ARGN}")
     endif(ACMAKE_DEBUG_DEFINITIONS)
 endmacro(debug_definitions)
+
+if(ACMAKE_DEBUG_LINKAGE OR ACMAKE_DEBUG_SEARCHPATH OR ACMAKE_DEBUG_DEFINITIONS)
+    set(ACMAKE_DEBUG_TARGET YES)
+else(ACMAKE_DEBUG_LINKAGE OR ACMAKE_DEBUG_SEARCHPATH OR ACMAKE_DEBUG_DEFINITIONS)
+    set(ACMAKE_DEBUG_TARGET NO)
+endif(ACMAKE_DEBUG_LINKAGE OR ACMAKE_DEBUG_SEARCHPATH OR ACMAKE_DEBUG_DEFINITIONS)
+macro(debug_target)
+    if(ACMAKE_DEBUG_TARGET)
+        message("TARGET: ${ARGN}")
+    endif(ACMAKE_DEBUG_TARGET)
+endmacro(debug_target)
 
 # given set of depends, gives set of libraries to be linked for them
 function(_ac_collect_depend_libraries OUT)
@@ -59,7 +70,6 @@ function(_ac_collect_depend_externs OUT)
         if(${_PROJECT}_IS_IMPORTED)
             get_global(${_PROJECT}_${DEPEND}_EXTERNS _EXTERNS)
             list(APPEND EXTERNS ${_EXTERNS})
-            message("${DEPEND} gave us implicit externs ${_EXTERNS}")
         endif(${_PROJECT}_IS_IMPORTED)
     endforeach(DEPEND)
     set(${OUT} "${EXTERNS}" PARENT_SCOPE)
@@ -70,7 +80,7 @@ function(_ac_collect_extern_definitions OUT)
     set(DEFINITIONS)
     foreach(EXTERN ${ARGN})
         if (${EXTERN}_DEFINITIONS)
-            list(APPEND EXTERN_DEFINITIONS ${${EXTERN}_DEFINITIONS})
+            list(APPEND DEFINITIONS ${${EXTERN}_DEFINITIONS})
         endif (${EXTERN}_DEFINITIONS)        
     endforeach(EXTERN)
     set(${OUT} "${DEFINITIONS}" PARENT_SCOPE)
@@ -126,8 +136,7 @@ endfunction(_ac_collect_extern_libraries)
 # attach libraries from DEPENDS and EXTERNS to TARGET
 macro(_ac_attach_depends TARGET DEPENDS EXTERNS)
 
-    debug_linkage("Collecting depends for ${TARGET}")
-
+    debug_target("Attaching dependencies for ${TARGET}")
 
     ### COLLECT EXTERNS
 
