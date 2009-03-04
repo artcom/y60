@@ -36,87 +36,124 @@ macro(debug_definitions)
     endif(ACMAKE_DEBUG_DEFINITIONS)
 endmacro(debug_definitions)
 
-# attach libraries from DEPENDS and EXTERNS to TARGET
-macro(_ac_attach_depends TARGET DEPENDS EXPLICIT_EXTERNS)
-
-    debug_linkage("Collecting depends for ${TARGET}")
-
-    # collect libraries from depends
-    set(DEPEND_LIBRARIES)
-    foreach(DEPEND ${DEPENDS})
+# given set of depends, gives set of libraries to be linked for them
+function(_ac_collect_depend_libraries OUT)
+    set(LIBRARIES)
+    foreach(DEPEND ${ARGN})
         get_target_property(DEPEND_TYPE ${DEPEND} TYPE)
-
-        if("XXX${DEPEND_TYPE}XXX" STREQUAL "XXXSHARED_LIBRARYXXX"
-                OR "XXX${DEPEND_TYPE}XXX" STREQUAL "XXXSTATIC_LIBRARYXXX")
-            list(APPEND DEPEND_LIBRARIES ${DEPEND})
-        endif("XXX${DEPEND_TYPE}XXX" STREQUAL "XXXSHARED_LIBRARYXXX"
-            OR "XXX${DEPEND_TYPE}XXX" STREQUAL "XXXSTATIC_LIBRARYXXX")
+        
+        if(DEPEND_TYPE STREQUAL "SHARED_LIBRARY"
+                OR DEPEND_TYPE STREQUAL "STATIC_LIBRARY")
+            list(APPEND LIBRARIES ${DEPEND})
+        endif(DEPEND_TYPE STREQUAL "SHARED_LIBRARY"
+                OR DEPEND_TYPE STREQUAL "STATIC_LIBRARY")
     endforeach(DEPEND)
+    set(${OUT} "${LIBRARIES}" PARENT_SCOPE)
+endfunction(_ac_collect_depend_libraries)
 
-    # collect implicit externs
-    set(IMPLICIT_EXTERNS)
-    foreach(DEPEND ${DEPENDS})
+# given set of depends, gives set of externs to be included for them
+function(_ac_collect_depend_externs OUT)
+    set(EXTERNS)
+    foreach(DEPEND ${ARGN})
         get_global(${DEPEND}_PROJECT _PROJECT)
         if(${_PROJECT}_IS_IMPORTED)
             get_global(${_PROJECT}_${DEPEND}_EXTERNS _EXTERNS)
-            list(APPEND IMPLICIT_EXTERNS ${_EXTERNS})
+            list(APPEND EXTERNS ${_EXTERNS})
             message("${DEPEND} gave us implicit externs ${_EXTERNS}")
         endif(${_PROJECT}_IS_IMPORTED)
     endforeach(DEPEND)
+    set(${OUT} "${EXTERNS}" PARENT_SCOPE)
+endfunction(_ac_collect_depend_externs)
+
+# given set of externs, gives set of definitions to be added for them
+function(_ac_collect_extern_definitions OUT)
+    set(DEFINITIONS)
+    foreach(EXTERN ${ARGN})
+        if (${EXTERN}_DEFINITIONS)
+            list(APPEND EXTERN_DEFINITIONS ${${EXTERN}_DEFINITIONS})
+        endif (${EXTERN}_DEFINITIONS)        
+    endforeach(EXTERN)
+    set(${OUT} "${DEFINITIONS}" PARENT_SCOPE)
+endfunction(_ac_collect_extern_definitions)
+
+# given set of externs, gives three sets
+# (common, optimized, debug) sets of libraries
+# to be linked for them
+function(_ac_collect_extern_libraries OUT)
+    set(COMMON)
+    set(DEBUG)
+    set(OPTIMIZED)
+    foreach(EXTERN ${ARGN})
+        if(EXTERN MATCHES ".*\\.framework/?$")
+            # frameworks are trivial
+            list(APPEND COMMON ${EXTERN})
+        else(EXTERN MATCHES ".*\\.framework/?$")
+            # libraries have two cases
+
+            if(${EXTERN}_LIBRARIES_D OR ${EXTERN}_LIBRARY_D)
+                # case 1: split debug and optimized
+
+                if(${EXTERN}_LIBRARIES_D)
+                    list(APPEND DEBUG ${${EXTERN}_LIBRARIES_D})
+                else(${EXTERN}_LIBRARIES_D)
+                    list(APPEND DEBUG ${${EXTERN}_LIBRARY_D})
+                endif(${EXTERN}_LIBRARIES_D)
+
+                if(${EXTERN}_LIBRARIES)
+                    list(APPEND OPTIMIZED ${${EXTERN}_LIBRARIES})
+                else(${EXTERN}_LIBRARIES)
+                    list(APPEND OPTIMIZED ${${EXTERN}_LIBRARY})
+                endif(${EXTERN}_LIBRARIES)
+
+            else(${EXTERN}_LIBRARIES_D OR ${EXTERN}_LIBRARY_D)
+                # case 2: only one variant
+
+                if(${EXTERN}_LIBRARIES)
+                    list(APPEND COMMON ${${EXTERN}_LIBRARIES})
+                else(${EXTERN}_LIBRARIES)
+                    list(APPEND COMMON ${${EXTERN}_LIBRARY})
+                endif(${EXTERN}_LIBRARIES)
+
+            endif(${EXTERN}_LIBRARIES_D OR ${EXTERN}_LIBRARY_D)
+        endif(EXTERN MATCHES ".*\\.framework/?$")
+    endforeach(EXTERN)
+
+    set(${OUT}_COMMON    "${COMMON}"    PARENT_SCOPE)
+    set(${OUT}_DEBUG     "${DEBUG}"     PARENT_SCOPE)
+    set(${OUT}_OPTIMIZED "${OPTIMIZED}" PARENT_SCOPE)
+endfunction(_ac_collect_extern_libraries)
+    
+# attach libraries from DEPENDS and EXTERNS to TARGET
+macro(_ac_attach_depends TARGET DEPENDS EXTERNS)
+
+    debug_linkage("Collecting depends for ${TARGET}")
+
+
+    ### COLLECT EXTERNS
+
+    # depends can pull in externs
+    _ac_collect_depend_externs(DEPEND_EXTERNS ${DEPENDS})
 
     # merge externs
-    set(EXTERNS ${EXPLICIT_EXTERNS} ${IMPLICIT_EXTERNS})
+    list(APPEND EXTERNS ${DEPEND_EXTERNS})
+
+    # make externs unique
     if(EXTERNS)
         list(REMOVE_DUPLICATES EXTERNS)
     endif(EXTERNS)
-    
-    # collect libraries and definitions from externs
-    set(EXTERN_DEFINITIONS)
-    set(EXTERN_LIBRARIES_GENERAL)
-    set(EXTERN_LIBRARIES_DEBUG)
-    set(EXTERN_LIBRARIES_OPTIMIZED)
-    foreach(EXTERN ${EXTERNS})
-        if(EXTERN MATCHES ".*\\.framework/?$")
-            list(APPEND EXTERN_LIBRARIES_GENERAL ${EXTERN})
-        else(EXTERN MATCHES ".*\\.framework/?$")
-            if(${EXTERN}_LIBRARIES_D OR ${EXTERN}_LIBRARY_D)
-                if(${EXTERN}_LIBRARIES_D)
-                    list(APPEND EXTERN_LIBRARIES_DEBUG     ${${EXTERN}_LIBRARIES_D})
-                else(${EXTERN}_LIBRARIES_D)
-                    list(APPEND EXTERN_LIBRARIES_DEBUG     ${${EXTERN}_LIBRARY_D})
-                endif(${EXTERN}_LIBRARIES_D)
-                if(${EXTERN}_LIBRARIES)
-                    list(APPEND EXTERN_LIBRARIES_OPTIMIZED ${${EXTERN}_LIBRARIES})
-                else(${EXTERN}_LIBRARIES)
-                    list(APPEND EXTERN_LIBRARIES_OPTIMIZED ${${EXTERN}_LIBRARY})
-                endif(${EXTERN}_LIBRARIES)
-            else(${EXTERN}_LIBRARIES_D OR ${EXTERN}_LIBRARY_D)
-                if(${EXTERN}_LIBRARIES)
-                    list(APPEND EXTERN_LIBRARIES_GENERAL ${${EXTERN}_LIBRARIES})
-                else(${EXTERN}_LIBRARIES)
-                    list(APPEND EXTERN_LIBRARIES_GENERAL ${${EXTERN}_LIBRARY})
-                endif(${EXTERN}_LIBRARIES)
-            endif(${EXTERN}_LIBRARIES_D OR ${EXTERN}_LIBRARY_D)
-            
-        endif(EXTERN MATCHES ".*\\.framework/?$")
-        if (${EXTERN}_DEFINITIONS)
-            list(APPEND EXTERN_DEFINITIONS ${${EXTERN}_DEFINITIONS})
-        endif (${EXTERN}_DEFINITIONS)
-    endforeach(EXTERN)
-    
-    # collect and clean definitions
+
+
+    ### COLLECT DEFINITIONS
+
+    # externs provide definitions
+    _ac_collect_extern_definitions(EXTERN_DEFINITIONS ${EXTERNS})
+
+    # alias definitions for consistent naming and make them unique
     set(ALL_DEFINITIONS
         ${EXTERN_DEFINITIONS}
     )
-    if(ALL_DEFINITIONS)
-        list(REMOVE_DUPLICATES ALL_DEFINITIONS)
-    endif(ALL_DEFINITIONS)
-    set(ALL_LIBRARIES
-        ${DEPEND_LIBRARIES}
-        ${EXTERN_LIBRARIES_GENERAL}
-        ${EXTERN_LIBRARIES_DEBUG}
-        ${EXTERN_LIBRARIES_OPTIMIZED}
-    )
+
+    # transform definitions to normal form
     foreach(DEF ${ALL_DEFINITIONS})
         if(DEF MATCHES "-D.*")
             list(REMOVE_ITEM ALL_DEFINITIONS "${DEF}")
@@ -125,23 +162,54 @@ macro(_ac_attach_depends TARGET DEPENDS EXPLICIT_EXTERNS)
         endif(DEF MATCHES "-D.*")
     endforeach(DEF)
 
-    # collect libraries into various subsets
+    # make definitions unique
+    if(ALL_DEFINITIONS)
+        list(REMOVE_DUPLICATES ALL_DEFINITIONS)
+    endif(ALL_DEFINITIONS)
+
+    # report definitions
+    if(ALL_DEFINITIONS)
+        debug_definitions("${TARGET} will be compiled with definitions ${ALL_DEFINITIONS}")
+    endif(ALL_DEFINITIONS)
+
+
+    ### COLLECT LIBRARIES
+
+    # depends are to be linked against
+    _ac_collect_depend_libraries(DEPEND_LIBRARIES ${DEPENDS})
+
+    # externs too
+    _ac_collect_extern_libraries(EXTERN_LIBRARIES ${EXTERNS})
+
+    # set of all libraries
+    set(ALL_LIBRARIES
+        ${DEPEND_LIBRARIES}
+        ${EXTERN_LIBRARIES_COMMON}
+        ${EXTERN_LIBRARIES_DEBUG}
+        ${EXTERN_LIBRARIES_OPTIMIZED}
+    )
     if(ALL_LIBRARIES)
         list(REMOVE_DUPLICATES ALL_LIBRARIES)
     endif(ALL_LIBRARIES)
-    set(GENERAL_LIBRARIES
+
+    # set of libraries common between build types
+    set(COMMON_LIBRARIES
         ${DEPEND_LIBRARIES}
-        ${EXTERN_LIBRARIES_GENERAL}
+        ${EXTERN_LIBRARIES_COMMON}
     )
-    if(GENERAL_LIBRARIES)
-        list(REMOVE_DUPLICATES GENERAL_LIBRARIES)
-    endif(GENERAL_LIBRARIES)
+    if(COMMON_LIBRARIES)
+        list(REMOVE_DUPLICATES COMMON_LIBRARIES)
+    endif(COMMON_LIBRARIES)
+
+    # set of libraries only for debug build types
     set(DEBUG_LIBRARIES
         ${EXTERN_LIBRARIES_DEBUG}
     )
     if(DEBUG_LIBRARIES)
         list(REMOVE_DUPLICATES DEBUG_LIBRARIES)
     endif(DEBUG_LIBRARIES)
+
+    # set of libraries only for optimized build types
     set(OPTIMIZED_LIBRARIES
         ${EXTERN_LIBRARIES_OPTIMIZED}
     )
@@ -149,9 +217,14 @@ macro(_ac_attach_depends TARGET DEPENDS EXPLICIT_EXTERNS)
         list(REMOVE_DUPLICATES OPTIMIZED_LIBRARIES)
     endif(OPTIMIZED_LIBRARIES)
 
-    # define linkage
-    target_link_libraries(${TARGET} ${GENERAL_LIBRARIES})
-    debug_linkage("${TARGET} always links against ${GENERAL_LIBRARIES}")
+
+    ### DEFINE LINKAGE
+
+    # link common libraries
+    target_link_libraries(${TARGET} ${COMMON_LIBRARIES})
+    debug_linkage("${TARGET} always links against ${COMMON_LIBRARIES}")
+
+    # link variant-specific libraries one by one
     foreach(LIBRARY ${DEBUG_LIBRARIES})
         target_link_libraries(${TARGET} debug ${LIBRARY})
         debug_linkage("${TARGET}, when compiled debug, links against ${LIBRARY}")
@@ -161,22 +234,20 @@ macro(_ac_attach_depends TARGET DEPENDS EXPLICIT_EXTERNS)
         debug_linkage("${TARGET}, when compiled optimized, links against ${LIBRARY}")
     endforeach(LIBRARY ${OPTIMIZED_LIBRARIES})
 
-    # declare all libraries as transient link deps
-    # and make extern definitions available to source files
-    if(ALL_DEFINITIONS)
-        debug_definitions("${TARGET} will be compiled with definitions ${ALL_DEFINITIONS}")
-    endif(ALL_DEFINITIONS)
+
+    ### SET RELEVANT TARGET PROPERTIES
+
+    # add libs and defns as target props
     set_target_properties(
         ${TARGET}
         PROPERTIES
             COMPILE_DEFINITIONS "${ALL_DEFINITIONS}"
-            LINK_INTERFACE_LIBRARIES_RELEASE        "${GENERAL_LIBRARIES};${OPTIMIZED_LIBRARIES}"
-            LINK_INTERFACE_LIBRARIES_MINSIZEREL     "${GENERAL_LIBRARIES};${OPTIMIZED_LIBRARIES}"
-            LINK_INTERFACE_LIBRARIES_RELWITHDEBINFO "${GENERAL_LIBRARIES};${OPTIMIZED_LIBRARIES}"
-            LINK_INTERFACE_LIBRARIES_DEBUG          "${GENERAL_LIBRARIES};${DEBUG_LIBRARIES}"
+            LINK_INTERFACE_LIBRARIES_RELEASE        "${COMMON_LIBRARIES};${OPTIMIZED_LIBRARIES}"
+            LINK_INTERFACE_LIBRARIES_MINSIZEREL     "${COMMON_LIBRARIES};${OPTIMIZED_LIBRARIES}"
+            LINK_INTERFACE_LIBRARIES_RELWITHDEBINFO "${COMMON_LIBRARIES};${OPTIMIZED_LIBRARIES}"
+            LINK_INTERFACE_LIBRARIES_DEBUG          "${COMMON_LIBRARIES};${DEBUG_LIBRARIES}"
             # XXX: profile and coverage
     )
-
 endmacro(_ac_attach_depends)
 
 # declare include and library search paths for the given EXTERNS
