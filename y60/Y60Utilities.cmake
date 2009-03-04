@@ -117,8 +117,8 @@ macro(write_scenetest NAME CMAKEFILE DIRNAME IS_CGTEST TOLERANCE THRESHOLD)
   endif(IS_CGTEST)
     
   if(EXISTS ${TESTMODELDIR}/${NAME}.pre.cmake)
-    file(APPEND ${CMAKEFILE} "include(${TESTMODELDIR}/${NAME}.pre.cmake)\n")
-    file(APPEND ${CMAKEFILE} "${NAME}_pre(${CMAKE_BINARY_DIR} ${TESTMODELDIR} ${GENMOVIE_EXECUTABLE} ${GENCOMPRESSEDTEX_EXECUTABLE}) \n\n")
+    file(APPEND ${CMAKEFILE} "include(\"${TESTMODELDIR}/${NAME}.pre.cmake\")\n")
+    file(APPEND ${CMAKEFILE} "${NAME}_pre(\"${CMAKE_BINARY_DIR}\" \"${TESTMODELDIR}\" \"${GENMOVIE_EXECUTABLE}\" \"${GENCOMPRESSEDTEX_EXECUTABLE}\") \n\n")
   endif(EXISTS ${TESTMODELDIR}/${NAME}.pre.cmake)
 
   file(APPEND ${CMAKEFILE} "message(\"Executing: ${Y60_EXECUTABLE} -I \"${PLUGIN_DIRS}\" ${SCRIPT} ${SCENE} ${SHADERLIB} rehearsal offscreen outputimage=${CMAKE_BINARY_DIR}/${DIRNAME}/TestImages/${NAME} outputsuffix=${IMGSUFFIX}\")\n")
