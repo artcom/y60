@@ -24,7 +24,7 @@ ShapeExporter.h
 )
 
 # XXX: add definitions for compiling maya plugin
-add_definitions(${MAYA_PLUGIN_DEFINTIONS})
+add_definitions(${MAYA_PLUGIN_DEFINITIONS})
 
 ac_add_plugin(
     maya-xport y60/maya-xport
