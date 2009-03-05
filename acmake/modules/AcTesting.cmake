@@ -15,6 +15,7 @@
 # __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 #
 
+# Since the whole ctest-shebang is normally not needed, we make it optional.
 option(ACMAKE_USE_CTEST "Use full ctest with cdash support?" NO)
 
 if(ACMAKE_USE_CTEST)
