@@ -56,7 +56,7 @@ void PLBmpBase::AssertValid () const
     PLASSERT (m_Size.x >= 0);
 
     // Greyscale only if 8 bpp
-    PLASSERT ((GetBitsPerPixel() <= 8) || !IsGreyscale());
+    //PLASSERT ((GetBitsPerPixel() <= 8) || !IsGreyscale()); // needlessly blows on valid 16 bit greyscale images
   }
 }
 #endif
