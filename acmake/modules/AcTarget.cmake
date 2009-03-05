@@ -347,10 +347,8 @@ macro(_ac_attach_rpath TARGET)
     endif(NOT WIN32)
 endmacro(_ac_attach_rpath)
 
-
-
 if(NOT WIN32)
-    option(ACMAKE_SYMLINK_SOURCES_TO_BUILDTREE "Create symlinks <bindir>/src -> <srcdir>" NO)
+    option(ACMAKE_SYMLINK_SOURCES_TO_BUILDTREE "Create symlinks <bindir>/src -> <srcdir>" YES)
 endif(NOT WIN32)
 
 macro(_ac_create_source_symlinks)
@@ -362,5 +360,3 @@ macro(_ac_create_source_symlinks)
         endif( NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/src)
     endif( NOT WIN32 AND ACMAKE_SYMLINK_SOURCES_TO_BUILDTREE)
 endmacro(_ac_create_source_symlinks)
-
-

@@ -326,10 +326,10 @@ macro(ac_end_project PROJECT_NAME)
     )
 
     # Generate Find-file
-    configure_file(
+    ac_configure_file(
         ${ACMAKE_TEMPLATES_DIR}/AcFind.cmake.in
         ${THIS_PROJECT_BINARY_DIR}/Find${PROJECT_NAME}.cmake
-        @ONLY
+        "ac_end_project()"
     )
 
     # Generate dependency finding script

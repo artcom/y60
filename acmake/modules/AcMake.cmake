@@ -35,18 +35,11 @@ endif(ACMAKE_LOCKED_AND_LOADED)
 # load pkg-config
 include(FindPkgConfig)
 
-# Force default buildtype to Release.
-# Change helpstring to show Profiling and Coverage
-if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Release CACHE STRING
-        "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel Profiling [gcc] Coverage [gcc]." FORCE)
-endif(NOT CMAKE_BUILD_TYPE)
-
 # Make sure we have our templates and tools available.
 # For an integrated build, this just means setting some vars.
 # For a separate build, we load the installed config file.
 if(NOT ACMAKE_INTEGRATED_BUILD)
-    include(AcMakeConfig)
+    include(AcMakeConfig) # XXX this should probably use the same config file mechanism like pro60_deps
 else(NOT ACMAKE_INTEGRATED_BUILD)
     set(ACMAKE_TOOLS_DIR ${AcMake_SOURCE_DIR}/tools)
     set(ACMAKE_MODULES_DIR ${AcMake_SOURCE_DIR}/modules)
@@ -58,16 +51,19 @@ endif(NOT ACMAKE_INTEGRATED_BUILD)
 set(ACMAKE_BINARY_SUBDIR "ACMakeFiles")
 
 # All sources may include acmake headers
-include_directories(${ACMAKE_INCLUDE_DIR})
+include_directories(${ACMAKE_INCLUDE_DIR} ${CMAKE_BINARY_DIR}/include/)
+
+include(AcBoostUtils)
+include(AcFileUtils)
+include(AcVariableUtils)
 
 include(AcPlatform)
 include(AcCompiler)
-include(AcBoostUtils)
-include(AcVariableUtils)
 
 include(AcTesting)
 include(AcTarget)
 include(AcProject)
+include(AcBuildinfo)
 
 include(AcAddExecutable)
 include(AcAddLibrary)
@@ -78,8 +74,8 @@ include(AcProfiling)
 
 include(AcDocumentation)
 
-include(AcBuildinfo)
-include(AcBundleResources)
+include(AcBundleResources) # XXX deprecate this. It's shit. I'know it because I wrote it [DS]
 
 include(AcAddPro60Dependencies)
 
+ac_create_build_config_header()

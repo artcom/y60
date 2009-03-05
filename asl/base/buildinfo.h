@@ -25,6 +25,7 @@
 #include <sstream>
 #include <algorithm>
 
+#include <acmake/build_configuration.h>
 #include "Singleton.h"
 
 namespace asl {
@@ -140,16 +141,16 @@ class build_target_info {
             size_t result;
         };
     public:
-        enum type {
+        enum target_t {
             LIBRARY,
             EXECUTABLE,
             PLUGIN
         };
         template <typename SCMInfo>
-        build_target_info(const char * name, const type type,
-                const char * build_date, const char * build_time,
-                SCMInfo const& scm_info) :
-            name_( name ), target_type_( type ),
+        build_target_info(const char * name, const target_t target,
+                const char * build_config, const char * build_date,
+                const char * build_time, SCMInfo const& scm_info) :
+            name_( name ), target_type_( target ), build_config_( build_config ),
             build_date_( build_date ), build_time_( build_time ),
             scm_name_( scm_info.name() ), scm_history_id_( scm_info.history_id() ),
             scm_repository_id_( scm_info.repository_id())
@@ -157,7 +158,8 @@ class build_target_info {
             
         }
         std::string const& name() const { return name_; }
-        type const& target_type() const { return target_type_; }
+        target_t const& target_type() const { return target_type_; }
+        std::string const& build_config() const { return build_config_; }
 
         std::string const& scm_name() const { return scm_name_; }
         std::string const& history_id() const { return scm_history_id_; }
@@ -184,12 +186,14 @@ class build_target_info {
                << "Build on: " << build_date_ << " at "
                                << build_time_ << std::endl
                << "Compiler: " << detected_compiler::name() << ' '
-                               << detected_compiler::version_str() << std::endl;
+                               << detected_compiler::version_str() << std::endl
+               << "Config  : " << build_config_ << std::endl;
             return os;
         }
     private:
         std::string name_;
-        type        target_type_;
+        target_t        target_type_;
+        std::string build_config_;
         std::string build_date_;
         std::string build_time_;
         std::string scm_name_;
@@ -215,12 +219,12 @@ class build_information : public Singleton<build_information>,
                 name     = std::max( name, c.second.name().size() );
                 url      = std::max( url , c.second.repository_id().size() );
                 revision = std::max( revision, c.second.history_id().size() );
-                type     = std::max( type, c.second.type_str().size() );
+                target_type     = std::max( target_type, c.second.type_str().size() );
             }
             size_t name;
             size_t url;
             size_t revision;
-            size_t type;
+            size_t target_type;
         };
     public:
 #if 0
@@ -261,7 +265,7 @@ class build_information : public Singleton<build_information>,
                 }
             }
             // Hmmm
-            return build_target_info("unknown", build_target_info::EXECUTABLE,
+            return build_target_info("unknown", build_target_info::EXECUTABLE, "",
                     __DATE__, __TIME__, no_scm_data());
         }
         
@@ -277,12 +281,13 @@ class target_info_initializer {
     public:
         template <typename SCMInfo>
         target_info_initializer(const char * name,
-                build_target_info::type type,
+                build_target_info::target_t target,
+                const char * build_config,
                 const char * date, const char * time,
                 SCMInfo const& scm_info)
         {
             build_information::get().insert( std::make_pair( name,
-                        build_target_info( name, type, date, time,
+                        build_target_info( name, target, build_config, date, time,
                         scm_info)));
         }
 };
@@ -301,13 +306,15 @@ class target_info_initializer {
 #   define BUILDINFO_DLL_EXPORT
 #endif
 
-#define ACMAKE_BUILDINFO(name, target_type, scm_info, c_ident)               \
-        namespace {                                                          \
-BUILDINFO_DLL_EXPORT asl::target_info_initializer revision_info ## c_ident = \
-                    asl::target_info_initializer( name,                      \
-                            asl::build_target_info:: target_type,            \
-                            __DATE__, __TIME__,                              \
-                            scm_info);                                       \
+#define ACMAKE_BUILDINFO(name, target_type, scm_info, c_ident)          \
+        namespace {                                                     \
+            BUILDINFO_DLL_EXPORT                                        \
+            asl::target_info_initializer revision_info ## c_ident =     \
+                    asl::target_info_initializer( name,                 \
+                            asl::build_target_info:: target_type,       \
+                            acmake::build_configuration,                \
+                            __DATE__, __TIME__,                         \
+                            scm_info);                                  \
         }
 
 #endif // ASL_BASE_BUILD_INFORMATION_INCLUDED

@@ -24,6 +24,12 @@
 # __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 #
 
+if(ACMAKE_MODULES_DIR)
+    list(APPEND CMAKE_MODULE_PATH ${ACMAKE_MODULES_DIR})
+endif(ACMAKE_MODULES_DIR)
+
+include(AcFileUtils)
+
 if(NOT TARGET_NAME)
     message(FATAL_ERROR "Variable TARGET_NAME not set")
 endif(NOT TARGET_NAME)
@@ -92,17 +98,18 @@ if (SCM)
     set(ACMAKE_HAVE_${SCM}_SCM ON)
 endif (SCM)
 
-
+# attempt do derive a valid C identifier from the targetname
+# if you need more replacements, feel free to add them
 string(REGEX REPLACE "[-. ]" "_" TARGET_NAME_C ${TARGET_NAME})
 string(REGEX REPLACE "[@]" "" TARGET_NAME_C ${TARGET_NAME_C})
 
-set(ACMAKE_GENERATOR "${CMAKE_CURRENT_LIST_FILE}" )
-set(ACMAKE_TEMPLATE_FILE "${BUILDINFO_TEMPLATE}" )
 # XXX CMake configure_file is smart. it just updates the file
 # if the content actually will change. In this case we don't want that.
-# Best wy I found so far is to remove the file before updating it :-(
+# Best way I found so far is to remove the file before updating it :-(
 # [DS]
 file(REMOVE ${BUILDINFO_FILE})
-configure_file( ${BUILDINFO_TEMPLATE}
-                ${BUILDINFO_FILE}
-                @ONLY)
+ac_configure_file(
+    "${BUILDINFO_TEMPLATE}"
+    "${BUILDINFO_FILE}"
+    "${CMAKE_CURRENT_LIST_FILE}"
+)

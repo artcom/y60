@@ -64,10 +64,10 @@ macro(ac_add_library LIBRARY_NAME LIBRARY_PATH)
 
     # generate a header describing our binary, source and install locations
     set(THIS_LIBRARY_PATHS_TEMPLATE ${ACMAKE_TEMPLATES_DIR}/AcPaths.h.in)
-    configure_file(
+    ac_configure_file(
          ${THIS_LIBRARY_PATHS_TEMPLATE}
          ${CMAKE_CURRENT_BINARY_DIR}/${ACMAKE_BINARY_SUBDIR}/acmake/${THIS_LIBRARY_NAME}_paths.h
-         @ONLY
+         "ac_add_library()"
     )
     
     # make paths header available by extending include path
