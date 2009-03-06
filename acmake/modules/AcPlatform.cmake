@@ -66,6 +66,12 @@ else(UNIX)
         add_definitions( -D_CRT_SECURE_NO_WARNINGS )
         add_definitions( -D_CRT_NONSTDC_NO_WARNINGS )
         add_definitions( -D_SCL_SECURE_NO_WARNINGS )
+
+        # Set default output directories for executables and libraries
+        set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+        set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
+        set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
+
     endif(WIN32)
 
     if (CMAKE_GENERATOR MATCHES "Visual Studio.*")
