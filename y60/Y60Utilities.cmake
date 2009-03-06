@@ -75,6 +75,10 @@ macro(collect_plugin_path INTO)
         list(APPEND PLUGIN_DIRS ${PLUGIN_PATH})
     endforeach(PLUGIN)
 
+    if(PLUGIN_DIRS)
+        list(REMOVE_DUPLICATES PLUGIN_DIRS)
+    endif(PLUGIN_DIRS)
+
     # set output variable
     set(${INTO} ${PLUGIN_DIRS})
 endmacro(collect_plugin_path)
