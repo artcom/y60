@@ -94,10 +94,14 @@ function(_ac_collect_extern_libraries OUT)
     set(DEBUG)
     set(OPTIMIZED)
     foreach(EXTERN ${ARGN})
-        if(EXTERN MATCHES ".*\\.framework/?$")
+        if(${EXTERN}_IS_PROJECT)
+            # if the extern is a project, its libs
+            # do not need to be collected as they
+            # are registered as external targets
+        elseif(EXTERN MATCHES ".*\\.framework/?$")
             # frameworks are trivial
             list(APPEND COMMON ${EXTERN})
-        else(EXTERN MATCHES ".*\\.framework/?$")
+        else(${EXTERN}_IS_PROJECT)
             # libraries have two cases
 
             if(${EXTERN}_LIBRARIES_D OR ${EXTERN}_LIBRARY_D)
@@ -125,7 +129,7 @@ function(_ac_collect_extern_libraries OUT)
                 endif(${EXTERN}_LIBRARIES)
 
             endif(${EXTERN}_LIBRARIES_D OR ${EXTERN}_LIBRARY_D)
-        endif(EXTERN MATCHES ".*\\.framework/?$")
+        endif(${EXTERN}_IS_PROJECT)
     endforeach(EXTERN)
 
     set(${OUT}_COMMON    "${COMMON}"    PARENT_SCOPE)

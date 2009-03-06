@@ -367,12 +367,38 @@ macro(ac_end_project PROJECT_NAME)
     # XXX: not implemented for plugins
     set(EXT "${THIS_PROJECT_BINARY_DIR}/Find${PROJECT_NAME}Targets.cmake")
     file(WRITE ${EXT} "# This generated script defines target dependencies for ${PROJECT_NAME}\n")
+    foreach(EXECUTABLE ${THIS_PROJECT_EXECUTABLES})
+        get_globals(${PROJECT_NAME}_${EXECUTABLE} THIS_EXECUTABLE "LIBRARIES;INCLUDE_DIRS;LIBRARY_DIRS;DEPENDS;EXTERNS") # XXX: classify
+
+        if(WIN32)
+            set(LOCATION  "${CMAKE_INSTALL_PREFIX}/bin/${EXECUTABLE}.exe")
+        else(WIN32)
+            set(LOCATION "${CMAKE_INSTALL_PREFIX}/bin/${EXECUTABLE}")
+        endif(WIN32)
+
+        file(APPEND ${EXT} "# executable target ${EXECUTABLE}\n")
+        file(APPEND ${EXT} "set(${EXECUTABLE}_PROJECT ${PROJECT_NAME})\n")
+        file(APPEND ${EXT} "set(${EXECUTABLE}_LOCATION \"${LOCATION}\")\n")
+    endforeach(EXECUTABLE ${THIS_PROJECT_EXECUTABLES})
     foreach(LIBRARY ${THIS_PROJECT_LIBRARIES})
         get_globals(${PROJECT_NAME}_${LIBRARY} THIS_LIBRARY "LIBRARIES;INCLUDE_DIRS;LIBRARY_DIRS;DEPENDS;EXTERNS") # XXX: classify
+
+        if(WIN32)
+            set(OBJECT_LOCATION  "${CMAKE_INSTALL_PREFIX}/bin/${LIBRARY}.dll")
+            set(IMPLIB_LOCATION "${CMAKE_INSTALL_PREFIX}/lib/${LIBRARY}.lib")
+        else(WIN32)
+            set(OBJECT_LOCATION "${CMAKE_INSTALL_PREFIX}/lib/${FILENAME}.${CMAKE_SHARED_MODULE_SUFFIX}")
+            set(IMPLIB_LOCATION)
+        endif(WIN32)
+
         file(APPEND ${EXT} "# library target ${LIBRARY}\n")
         file(APPEND ${EXT} "set(${LIBRARY}_PROJECT ${PROJECT_NAME})\n")
         file(APPEND ${EXT} "set(${LIBRARY}_DEPENDS ${THIS_LIBRARY_DEPENDS})\n")
         file(APPEND ${EXT} "set(${LIBRARY}_EXTERNS ${THIS_LIBRARY_EXTERNS})\n")
+        file(APPEND ${EXT} "set(${LIBRARY}_OBJECT_LOCATION \"${OBJECT_LOCATION}\")\n")
+        if(IMPLIB_LOCATION)
+            file(APPEND ${EXT} "set(${LIBRARY}_IMPLIB_LOCATION \"${IMPLIB_LOCATION}\")\n")
+        endif(IMPLIB_LOCATION)
     endforeach(LIBRARY ${THIS_PROJECT_LIBRARIES})
 
     # Preprocess list of custom scripts
