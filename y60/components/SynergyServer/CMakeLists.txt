@@ -13,7 +13,7 @@ y60_synergyserver_settings.h
 )
 
 y60_add_component(
-    SynergyServer
+    y60SynergyServer
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     DEPENDS y60jslib

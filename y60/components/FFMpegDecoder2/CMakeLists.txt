@@ -21,7 +21,7 @@ list(APPEND EXTERNALS PAINTLIB FFMPEG)
 add_definitions(-D__STDC_CONSTANT_MACROS) # XXX: why? what? aeh!?
 
 y60_add_component(
-    FFMpegDecoder2
+    y60FFMpegDecoder2
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     DEPENDS asldom aslaudio

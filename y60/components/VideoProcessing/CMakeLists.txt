@@ -38,7 +38,7 @@ y60_videoprocessing_settings.h
 )
 
 y60_add_component(
-    VideoProcessing
+    y60VideoProcessing
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     DEPENDS y60jslib

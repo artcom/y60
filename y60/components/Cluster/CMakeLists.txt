@@ -8,7 +8,7 @@ y60_clusterextension_settings.h
 )
 
 y60_add_component(
-    Cluster
+    y60Cluster
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     DEPENDS y60jslib

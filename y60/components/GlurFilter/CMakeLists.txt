@@ -10,7 +10,7 @@ y60_glurfilter_settings.h
 )
 
 y60_add_component(
-    GlurFilter
+    y60GlurFilter
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     DEPENDS y60image

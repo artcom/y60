@@ -11,7 +11,7 @@ y60_openexrdecoder_settings.h
 )
 
 y60_add_component(
-    OpenEXR
+    y60OpenEXR
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     DEPENDS y60jslib

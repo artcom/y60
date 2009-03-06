@@ -10,7 +10,7 @@ y60_nagios_settings.h
 )
 
 y60_add_component(
-    Nagios
+    y60Nagios
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     DEPENDS y60jslib

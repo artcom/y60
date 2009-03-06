@@ -18,7 +18,7 @@ if(WIN32)
 endif(WIN32)
 
 y60_add_component(
-    ASSOscPlugin 
+    y60ASSOscPlugin 
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     EXTERNS ${EXTERNALS}

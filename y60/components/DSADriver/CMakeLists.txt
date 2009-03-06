@@ -13,7 +13,7 @@ y60_dsadriver_settings.h
 )
 
 y60_add_component(
-    DSADriver
+    y60DSADriver
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     DEPENDS y60jslib

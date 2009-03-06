@@ -17,7 +17,7 @@ if(WIN32)
 endif(WIN32)
 
 y60_add_component(
-    OscSender
+    y60OscSender
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     DEPENDS asldom aslnet y60jsbase oscpackip oscpackosc

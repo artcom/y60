@@ -10,7 +10,7 @@ y60_procfunctions_settings.h
 )
 
 y60_add_component(
-    ProcFunctions
+    y60ProcFunctions
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     DEPENDS y60jslib

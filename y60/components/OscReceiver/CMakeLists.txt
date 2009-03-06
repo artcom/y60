@@ -19,7 +19,7 @@ if(WIN32)
 endif(WIN32)
 
 y60_add_component(
-    OscReceiver
+    y60OscReceiver
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     DEPENDS asldom y60jsbase y60input oscpackip oscpackosc

@@ -78,7 +78,7 @@ macro(ac_add_plugin PLUGIN_NAME PLUGIN_PATH)
             LIBRARY
                 DESTINATION lib/${THIS_PLUGIN_PATH}
             PUBLIC_HEADER
-                DESTINATION include/${THIS_PLUGIN_PATH}
+                DESTINATION include/${THIS_PLUGIN_PATH}/${THIS_PLUGIN_NAME}
         )
     endif(NOT THIS_PLUGIN_DONT_INSTALL)
 

@@ -8,7 +8,7 @@ y60_assschema_settings.h
 )
 
 y60_add_component(
-    ASSSchema
+    y60ASSSchema
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     DEPENDS asldom y60input y60jsbase

@@ -18,7 +18,7 @@ WiiScanner.h
 )
 
 y60_add_component(
-    Wiimote
+    y60Wiimote
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     DEPENDS y60jslib y60input ${JSDEPENDS}

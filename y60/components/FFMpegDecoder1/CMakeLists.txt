@@ -13,7 +13,7 @@ list(APPEND EXTERNALS FFMPEG)
 add_definitions(-D__STDC_CONSTANT_MACROS) # XXX: why? what? aeh!?
 
 y60_add_component(
-    FFMpegDecoder1
+    y60FFMpegDecoder1
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     DEPENDS y60video

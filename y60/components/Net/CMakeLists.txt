@@ -12,7 +12,7 @@ y60_net_settings.h
 )
 
 y60_add_component(
-    Net
+    y60Net
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     DEPENDS aslinet y60jslib

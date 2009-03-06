@@ -13,7 +13,7 @@ y60_jssound_settings.h
 )
 
 y60_add_component(
-    JSSound
+    y60JSSound
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     DEPENDS y60jslib y60sound

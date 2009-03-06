@@ -13,7 +13,7 @@ y60_stlimporter_settings.h
 )
 
 y60_add_component(
-    StlImporter
+    y60StlImporter
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     DEPENDS y60jslib ${JSDEPENDS}
