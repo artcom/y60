@@ -17,7 +17,9 @@
 # __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 #
 
-# include guard
+
+### INCLUDE GUARD
+
 get_property(ACMAKE_PRESENT GLOBAL PROPERTY ACMAKE_PRESENT)
 set_property(GLOBAL PROPERTY ACMAKE_PRESENT TRUE)
 
@@ -32,26 +34,15 @@ else(ACMAKE_LOCKED_AND_LOADED)
     endif(ACMAKE_PRESENT)
 endif(ACMAKE_LOCKED_AND_LOADED)
 
-# load pkg-config
+
+### LOAD STANDARD MODULES
+
 include(FindPkgConfig)
 
-# Make sure we have our templates and tools available.
-# For an integrated build, this just means setting some vars.
-# For a separate build, we load the installed config file.
-if(NOT ACMAKE_INTEGRATED_BUILD)
-    include(AcMakeConfig) # XXX this should probably use the same config file mechanism like pro60_deps
-else(NOT ACMAKE_INTEGRATED_BUILD)
-    set(ACMAKE_TOOLS_DIR ${AcMake_SOURCE_DIR}/tools)
-    set(ACMAKE_MODULES_DIR ${AcMake_SOURCE_DIR}/modules)
-    set(ACMAKE_TEMPLATES_DIR ${AcMake_SOURCE_DIR}/templates)
-    set(ACMAKE_INCLUDE_DIR ${AcMake_SOURCE_DIR}/include)
-endif(NOT ACMAKE_INTEGRATED_BUILD)
 
-# Store generated files in this subdirectory of ${CMAKE_CURRENT_BINARY_DIR}
-set(ACMAKE_BINARY_SUBDIR "ACMakeFiles")
+### LOAD ACMAKE
 
-# All sources may include acmake headers
-include_directories(${ACMAKE_INCLUDE_DIR} ${CMAKE_BINARY_DIR}/include/)
+include(AcGlobal)
 
 include(AcBoostUtils)
 include(AcFileUtils)
@@ -78,4 +69,8 @@ include(AcBundleResources) # XXX deprecate this. It's shit. I'know it because I 
 
 include(AcAddPro60Dependencies)
 
+
+### GLOBAL BUILD SETUP
+
 ac_create_build_config_header()
+
