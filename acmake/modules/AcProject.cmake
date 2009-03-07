@@ -63,7 +63,8 @@ set(_AC_PROJECT_VARIABLES
     OPTIONAL_PACKAGES # list of all optional find packages
     REQUIRED_PKGCONFIG # bilist of all required pkg-config packages
     OPTIONAL_PKGCONFIG # bilist of all optional pkg-config packages
-    CUSTOM_SCRIPTS # custom scripts to be included in the find-package
+    CUSTOM_SCRIPTS   # custom scripts to be included in the find-package
+    CUSTOM_TEMPLATES # custom templates for use by the find-package
 )
 
 # Static method: check if a project is integrated or not
@@ -80,7 +81,7 @@ endmacro(ac_is_integrated)
 #
 macro(ac_add_project PROJECT_NAME)
     parse_arguments(THIS_PROJECT
-        "REQUIRED_PACKAGES;OPTIONAL_PACKAGES;REQUIRED_PKGCONFIG;OPTIONAL_PKGCONFIG;CUSTOM_SCRIPTS;DEFINITIONS"
+        "REQUIRED_PACKAGES;OPTIONAL_PACKAGES;REQUIRED_PKGCONFIG;OPTIONAL_PKGCONFIG;CUSTOM_SCRIPTS;CUSTOM_TEMPLATES;DEFINITIONS"
         ";"
         ${ARGN})
 
@@ -140,8 +141,9 @@ macro(ac_add_project PROJECT_NAME)
     set_global(${PROJECT_NAME}_REQUIRED_PKGCONFIG "")
     set_global(${PROJECT_NAME}_OPTIONAL_PKGCONFIG "")
 
-    # Remember custom scripts
-    set_global(${PROJECT_NAME}_CUSTOM_SCRIPTS ${THIS_PROJECT_CUSTOM_SCRIPTS})
+    # Remember custom files
+    set_global(${PROJECT_NAME}_CUSTOM_SCRIPTS   ${THIS_PROJECT_CUSTOM_SCRIPTS})
+    set_global(${PROJECT_NAME}_CUSTOM_TEMPLATES ${THIS_PROJECT_CUSTOM_TEMPLATES})
 
     # Add required cmake-packaged externals
     foreach(PACKAGE ${THIS_PROJECT_REQUIRED_PACKAGES})
@@ -401,21 +403,19 @@ macro(ac_end_project PROJECT_NAME)
         endif(IMPLIB_LOCATION)
     endforeach(LIBRARY ${THIS_PROJECT_LIBRARIES})
 
-    # Preprocess list of custom scripts
-    # XXX: dirty hack
-    set(THIS_PROJECT_CUSTOM_SCRIPT_FILES)
-    foreach(SCRIPT ${THIS_PROJECT_CUSTOM_SCRIPTS})
-        list(APPEND THIS_PROJECT_CUSTOM_SCRIPT_FILES ${SCRIPT}.cmake)
-    endforeach(SCRIPT ${THIS_PROJECT_CUSTOM_SCRIPTS})
-
     # Install find fileset
     install(
         FILES
             ${THIS_PROJECT_BINARY_DIR}/Find${PROJECT_NAME}.cmake
             ${THIS_PROJECT_BINARY_DIR}/Find${PROJECT_NAME}Dependencies.cmake
             ${THIS_PROJECT_BINARY_DIR}/Find${PROJECT_NAME}Targets.cmake
-            ${THIS_PROJECT_CUSTOM_SCRIPT_FILES}
+            ${THIS_PROJECT_CUSTOM_SCRIPTS}
 	    DESTINATION share/cmake-2.6/Modules
+    )
+    install(
+        FILES
+            ${THIS_PROJECT_CUSTOM_TEMPLATES}
+	    DESTINATION share/cmake-2.6/Templates
     )
 
     # Remove our local copy of the project

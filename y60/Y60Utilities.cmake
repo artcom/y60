@@ -38,13 +38,38 @@ include(AcMake)
 #
 # endmacro(y60_add_application)
 
-function(y60_add_assets APPLICATION DIRECTORY)
+function(y60_begin_application NAME)
+    # Check for nesting
+    if(Y60_CURRENT_APPLICATION)
+        message(FATAL_ERROR "Y60 application ${NAME} nested in ${Y60_CURRENT_APPLICATION}")
+    endif(Y60_CURRENT_APPLICATION)
 
-    if(ARGN)
-        set(PATTERNS ${ARGN})
-    else(ARGN)
-        set(PATTERNS PATTERN "*")
-    endif(ARGN)
+    set(Y60_CURRENT_APPLICATION ${NAME} PARENT_SCOPE)
+
+    set_global(${NAME}_NAME ${NAME})
+
+    set_global(${NAME}_IS_APPLICATION YES)
+
+    set_global(${NAME}_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
+    set_global(${NAME}_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+
+    set_global(${NAME}_BUILD_PATH   "${CMAKE_CURRENT_BINARY_DIR};${CMAKE_CURRENT_SOURCE_DIR}")
+    set_global(${NAME}_INSTALL_PATH ".")
+endfunction(y60_begin_application)
+
+function(y60_add_assets DIRECTORY)
+    parse_arguments(
+        THIS_ASSETS
+        "PATTERNS"
+        "ADD_TO_PATH"
+        ${ARGN}
+    )
+
+    set(APPLICATION ${Y60_CURRENT_APPLICATION})
+
+    if(NOT THIS_ASSETS_PATTERNS)
+        set(THIS_ASSETS_PATTERNS PATTERN "*")
+    endif(NOT THIS_ASSETS_PATTERNS)
 
     get_filename_component(DIRECTORY_NAME "${DIRECTORY}" NAME)
 
@@ -55,7 +80,12 @@ function(y60_add_assets APPLICATION DIRECTORY)
            ${PATTERNS}
            PATTERN ".svn" EXCLUDE
     )
-endfunction(y60_add_assets APPLICATION DIRECTORY)
+
+    if(THIS_ASSETS_ADD_TO_PATH)
+        append_global(${APPLICATION}_BUILD_PATH   "${CMAKE_CURRENT_SOURCE_DIR}/${DIRECTORY}")
+        append_global(${APPLICATION}_INSTALL_PATH "${DIRECTORY_NAME}")
+    endif(THIS_ASSETS_ADD_TO_PATH)
+endfunction(y60_add_assets)
 
 macro(y60_add_component COMPONENT_NAME)
     ac_add_plugin(
@@ -63,6 +93,55 @@ macro(y60_add_component COMPONENT_NAME)
         ${ARGN}
     )
 endmacro(y60_add_component)
+
+macro(y60_add_launcher NAME)
+    parse_arguments(
+        THIS_LAUNCHER
+        "MAIN_SCRIPT;BUILD_WORKING_DIR"
+        ""
+        ${ARGN}
+    )
+    set(APPLICATION ${Y60_CURRENT_APPLICATION})
+    get_global(${APPLICATION}_BUILD_PATH THIS_APPLICATION_BUILD_PATH)
+    get_global(${APPLICATION}_INSTALL_PATH THIS_APPLICATION_INSTALL_PATH)
+    get_global(${APPLICATION}_BINARY_DIR THIS_APPLICATION_BINARY_DIR)
+    get_global(${APPLICATION}_SOURCE_DIR THIS_APPLICATION_SOURCE_DIR)
+
+    # choose working dir for running from build tree
+    if(THIS_LAUNCHER_BUILD_WORKING_DIR STREQUAL SOURCE)
+        message("${NAME} will be run from source dir")
+        set(THIS_LAUNCHER_BUILD_WORKING_DIR ${THIS_APPLICATION_SOURCE_DIR})
+    elseif(THIS_LAUNCHER_BUILD_WORKING_DIR STREQUAL BINARY)
+        message("${NAME} will be run from binary dir")
+        set(THIS_LAUNCHER_BUILD_WORKING_DIR ${THIS_APPLICATION_BINARY_DIR})
+    elseif(NOT THIS_LAUNCHER_BUILD_WORKING_DIR)
+        message("${NAME} will be run from binary dir (default)")
+        set(THIS_LAUNCHER_BUILD_WORKING_DIR ${THIS_APPLICATION_BINARY_DIR})
+    endif(THIS_LAUNCHER_BUILD_WORKING_DIR STREQUAL SOURCE)
+
+    # XXX: choose working dir for running from installed system
+
+    if(UNIX)
+        # generate launcher shell script for build tree runs
+        configure_file(
+            ${Y60_INSTALL_PREFIX}/share/cmake-2.6/Templates/Y60BuildLauncher.sh.in
+            ${CMAKE_CURRENT_BINARY_DIR}/${NAME}
+            @ONLY
+        )
+    endif(UNIX)
+endmacro(y60_add_launcher)
+
+function(y60_end_application NAME)
+    if(NOT Y60_CURRENT_APPLICATION)
+        message(FATAL_ERROR "Trying to end Y60 application ${NAME} before it started")
+    endif(NOT Y60_CURRENT_APPLICATION)
+
+    get_global(${NAME}_BUILD_PATH BUILD_PATH)
+    get_global(${NAME}_INSTALL_PATH INSTALL_PATH)
+    message("Y60 path B=\"${BUILD_PATH}\" I=\"${INSTALL_PATH}\"")
+
+    set(Y60_CURRENT_APPLICATION)
+endfunction(y60_end_application)
 
 
 macro(collect_path INTO)

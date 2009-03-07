@@ -41,7 +41,7 @@ ac_add_project(
     DEFINITIONS
         -DAC_BUILT_WITH_CMAKE
     CUSTOM_SCRIPTS
-        ASLUtilities
+        ASLUtilities.cmake
 )
 
 # Make sure we can access our includes without staging

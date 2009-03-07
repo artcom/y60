@@ -40,7 +40,10 @@ ac_add_project(Y60
     OPTIONAL_PKGCONFIG
         ${OPT_PKGCONFIG}
     CUSTOM_SCRIPTS
-        Y60Utilities
+        Y60Utilities.cmake
+    CUSTOM_TEMPLATES
+        Y60BuildLauncher.sh.in
+        Y60InstallLauncher.sh.in
     DEFINITIONS
         -DAC_BUILT_WITH_CMAKE
         ${Y60_EXTRA_DEFINITIONS}
