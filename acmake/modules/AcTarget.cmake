@@ -36,16 +36,55 @@ macro(debug_definitions)
     endif(ACMAKE_DEBUG_DEFINITIONS)
 endmacro(debug_definitions)
 
-if(ACMAKE_DEBUG_LINKAGE OR ACMAKE_DEBUG_SEARCHPATH OR ACMAKE_DEBUG_DEFINITIONS)
-    set(ACMAKE_DEBUG_TARGET YES)
-else(ACMAKE_DEBUG_LINKAGE OR ACMAKE_DEBUG_SEARCHPATH OR ACMAKE_DEBUG_DEFINITIONS)
-    set(ACMAKE_DEBUG_TARGET NO)
-endif(ACMAKE_DEBUG_LINKAGE OR ACMAKE_DEBUG_SEARCHPATH OR ACMAKE_DEBUG_DEFINITIONS)
 macro(debug_target)
-    if(ACMAKE_DEBUG_TARGET)
+    if(ACMAKE_DEBUG_LINKAGE OR ACMAKE_DEBUG_SEARCHPATH OR ACMAKE_DEBUG_DEFINITIONS)
         message("TARGET: ${ARGN}")
-    endif(ACMAKE_DEBUG_TARGET)
+    endif(ACMAKE_DEBUG_LINKAGE OR ACMAKE_DEBUG_SEARCHPATH OR ACMAKE_DEBUG_DEFINITIONS)
 endmacro(debug_target)
+
+# utility function for extending FLAGS-like target properties
+function(_ac_prepend_target_flag TARGET PROPERTY VALUE)
+    get_property(FLAGS TARGET ${TARGET} PROPERTY ${PROPERTY})
+    set_property(TARGET ${TARGET} PROPERTY ${PROPERTY} "${VALUE} ${FLAGS}")
+endfunction(_ac_prepend_target_flag TARGET PROPERTY VALUE)
+
+# add include path to a target for its own use
+# PROPAGATE indicates if this path should be used in dependents
+function(_ac_add_include_path TARGET PATH PROPAGATE)
+    debug_searchpath("${TARGET} gets include path ${PATH}")
+    if(MSVC)
+        _ac_prepend_target_flag(${TARGET} COMPILE_FLAGS "/I\"${PATH}\"")
+    else(MSVC)
+        _ac_prepend_target_flag(${TARGET} COMPILE_FLAGS "-I\"${PATH}\"")
+    endif(MSVC)
+    if(PROPAGATE)
+        prepend_global(${TARGET}_INCLUDE_DIRS "${PATH}")
+    endif(PROPAGATE)
+endfunction(_ac_add_include_path TARGET PATH)
+
+# add library path to a target for its own use
+# PROPAGATE indicates if this path should be used in dependents
+function(_ac_add_library_path TARGET PATH PROPAGATE)
+    debug_searchpath("${TARGET} gets library path ${PATH}")
+    if(MSVC)
+        _ac_prepend_target_flag(${TARGET} LINK_FLAGS "/L\"${PATH}\"")
+    else(MSVC)
+        _ac_prepend_target_flag(${TARGET} LINK_FLAGS "-L\"${PATH}\"")
+    endif(MSVC)
+    if(PROPAGATE)
+        prepend_global(${TARGET}_LIBRARY_DIRS "${PATH}")
+    endif(PROPAGATE)
+endfunction(_ac_add_library_path TARGET PATH)
+
+# add build-directory-global include and library paths to target
+function(_ac_add_global_paths TARGET)
+    foreach(INCLUDE_DIR ${ACMAKE_GLOBAL_INCLUDE_DIRS})
+        _ac_add_include_path(${TARGET} "${INCLUDE_DIR}" NO)
+    endforeach(INCLUDE_DIR ${ACMAKE_GLOBAL_INCLUDE_DIRS})
+    foreach(LIBRARY_DIR ${ACMAKE_GLOBAL_LIBRARY_DIRS})
+        _ac_add_library_path(${TARGET} "${LIBRARY_DIR}" NO)
+    endforeach(LIBRARY_DIR ${ACMAKE_GLOBAL_LIBRARY_DIRS})
+endfunction(_ac_add_global_paths TARGET)
 
 # given set of depends, gives set of libraries to be linked for them
 function(_ac_collect_depend_libraries OUT)
@@ -266,19 +305,24 @@ endmacro(_ac_attach_depends)
 # declare include and library search paths for the given EXTERNS
 # on a global scope from this directory downward
 # (used by target declarators to globally pull in paths)
-macro(_ac_declare_searchpath TARGET DEPENDS EXTERNS)
-    _ac_collect_searchpath(${TARGET} LIBRARY INCLUDE "${DEPENDS}" "${EXTERNS}")
-    link_directories(${LIBRARY})
-    include_directories(${INCLUDE})
-    set_global(${TARGET}_INCLUDE_DIRS ${INCLUDE})
-    set_global(${TARGET}_LIBRARY_DIRS ${LIBRARY})
-endmacro(_ac_declare_searchpath)
+macro(_ac_add_dependency_paths TARGET DEPENDS EXTERNS)
+    _ac_collect_dependency_paths(${TARGET} LIBRARY_DIRS INCLUDE_DIRS "${DEPENDS}" "${EXTERNS}")
+    
+    foreach(DIR ${LIBRARY_DIRS})
+        _ac_add_library_path(${TARGET} "${DIR}" YES)
+    endforeach(DIR)
+
+    foreach(DIR ${INCLUDE_DIRS})
+        _ac_add_include_path(${TARGET} "${DIR}" YES)
+    endforeach(DIR)
+endmacro(_ac_add_dependency_paths)
 
 # collect include and library search paths for a set
 # of external and internal dependencies, returning
 # lists of paths in the variables indicated
 # by LIBS and INCS
-macro(_ac_collect_searchpath TARGET LIBS INCS DEPENDS EXTERNS)
+macro(_ac_collect_dependency_paths TARGET LIBS INCS DEPENDS EXTERNS)
+    set(_EXTERNS ${EXTERNS})
     set(_LIBRARY)
     set(_INCLUDE)
 
@@ -295,6 +339,10 @@ macro(_ac_collect_searchpath TARGET LIBS INCS DEPENDS EXTERNS)
             list(APPEND _INCLUDE ${${DEPEND}_INCLUDE_DIRS})
         endif(${DEPEND}_INCLUDE_DIRS)
     endforeach(DEPEND)
+
+    if(_EXTERNS)
+        list(REMOVE_DUPLICATES _EXTERNS)
+    endif(_EXTERNS)
 
     foreach(EXTERN ${EXTERNS})
         if(NOT EXTERN MATCHES ".*\\.framework/?$")
@@ -324,12 +372,9 @@ macro(_ac_collect_searchpath TARGET LIBS INCS DEPENDS EXTERNS)
         list(REMOVE_DUPLICATES _INCLUDE)
     endif(_INCLUDE)
 
-    debug_searchpath("Library: ${_LIBRARY}")
-    debug_searchpath("Include: ${_INCLUDE}")
-
     set(${LIBS} ${_LIBRARY})
     set(${INCS} ${_INCLUDE})
-endmacro(_ac_collect_searchpath)
+endmacro(_ac_collect_dependency_paths)
 
 # optionally add an rpath to installed binaries
 if(NOT WIN32)

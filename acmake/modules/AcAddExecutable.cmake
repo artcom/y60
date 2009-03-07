@@ -25,12 +25,6 @@ macro(ac_add_executable EXECUTABLE_NAME)
     # bring name into our namespace
     set(THIS_EXECUTABLE_NAME "${EXECUTABLE_NAME}")
     
-    # declare searchpath for external headers and libs
-    _ac_declare_searchpath(
-        ${THIS_EXECUTABLE_NAME}
-        "${THIS_EXECUTABLE_DEPENDS}" "${THIS_EXECUTABLE_EXTERNS}"
-    )
-
     # find out how the build info file will be called
     if(NOT THIS_EXECUTABLE_NO_REVISION_INFO)
         _ac_buildinfo_filename(${THIS_EXECUTABLE_NAME} THIS_EXECUTABLE_BUILDINFO_FILE)
@@ -42,6 +36,7 @@ macro(ac_add_executable EXECUTABLE_NAME)
                 ${THIS_EXECUTABLE_OSX_BUNDLE_RESOURCES})
     endif(THIS_EXECUTABLE_OSX_BUNDLE)
 
+    # create src symlink in binary dir
     _ac_create_source_symlinks()
 
     # define the target
@@ -51,6 +46,15 @@ macro(ac_add_executable EXECUTABLE_NAME)
             ${THIS_EXECUTABLE_HEADERS}
             ${THIS_EXECUTABLE_RESOURCES}
             ${THIS_EXECUTABLE_BUILDINFO_FILE}
+    )
+
+    # add global include and library paths
+    _ac_add_global_paths(${THIS_EXECUTABLE_NAME})
+
+    # add paths for external headers and libs
+    _ac_add_dependency_paths(
+        ${THIS_EXECUTABLE_NAME}
+        "${THIS_EXECUTABLE_DEPENDS}" "${THIS_EXECUTABLE_EXTERNS}"
     )
 
     # set up bundle resources

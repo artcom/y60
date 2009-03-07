@@ -26,15 +26,10 @@ macro(ac_add_plugin PLUGIN_NAME PLUGIN_PATH)
     set(THIS_PLUGIN_NAME "${PLUGIN_NAME}")
     set(THIS_PLUGIN_PATH "${PLUGIN_PATH}")
 
-    # declare searchpath for external headers and libs
-    _ac_declare_searchpath(
-        ${THIS_PLUGIN_NAME}
-        "${THIS_PLUGIN_DEPENDS}" "${THIS_PLUGIN_EXTERNS}"
-    )
-    
     # figure out file name for build info
     _ac_buildinfo_filename(${THIS_PLUGIN_NAME} THIS_PLUGIN_BUILDINFO_FILE)
 
+    # create src symlink in binary dir
     _ac_create_source_symlinks()
 
     # define the target
@@ -43,6 +38,15 @@ macro(ac_add_plugin PLUGIN_NAME PLUGIN_PATH)
             ${THIS_PLUGIN_SOURCES}
             ${THIS_PLUGIN_HEADERS}
             ${THIS_PLUGIN_BUILDINFO_FILE}
+    )
+
+    # add global include and library paths
+    _ac_add_global_paths(${THIS_PLUGIN_NAME})
+
+    # declare searchpath for external headers and libs
+    _ac_add_dependency_paths(
+        ${THIS_PLUGIN_NAME}
+        "${THIS_PLUGIN_DEPENDS}" "${THIS_PLUGIN_EXTERNS}"
     )
 
     # update repository and revision information

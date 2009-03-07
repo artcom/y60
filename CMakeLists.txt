@@ -27,14 +27,6 @@ set(ACMAKE_INTEGRATED_BUILD YES)
 set(ACMAKE_BUILDINFO_TEMPLATE
     ${CMAKE_CURRENT_SOURCE_DIR}/asl/base/buildinfo.cpp.in)
 
-# add paths to our internal staged includes
-include_directories(
-    ${CMAKE_CURRENT_BINARY_DIR}/netsrc/paintlib/include
-    ${CMAKE_CURRENT_BINARY_DIR}/netsrc/SDL_ttf2/include
-    ${CMAKE_CURRENT_BINARY_DIR}/netsrc/spidermonkey/include # XXX: tracemonkey?
-    ${CMAKE_CURRENT_BINARY_DIR}/netsrc/oscpack/include
-)
-
 # add and load acmake
 add_subdirectory(acmake)
 include(AcMake)

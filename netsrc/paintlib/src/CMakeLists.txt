@@ -190,6 +190,8 @@ ac_add_library(
     EXTERNS GIF PNG TIFF JPEG OPENEXR CURL
 )
 
+_ac_add_include_path(paintlib ${CMAKE_CURRENT_BINARY_DIR}/../include YES)
+
 # add debug definition
 set_property(
     TARGET paintlib

@@ -70,10 +70,7 @@ macro(ac_add_library LIBRARY_NAME LIBRARY_PATH)
          "ac_add_library()"
     )
     
-    # make paths header available by extending include path
-    include_directories(${CMAKE_CURRENT_BINARY_DIR}/${ACMAKE_BINARY_SUBDIR})
-
-
+    # create src symlink in binary dir
     _ac_create_source_symlinks()
 
     if(THIS_LIBRARY_HEADER_ONLY)
@@ -92,12 +89,6 @@ macro(ac_add_library LIBRARY_NAME LIBRARY_PATH)
     else(THIS_LIBRARY_HEADER_ONLY)
         # for a full library
         
-        # declare include and library searchpath
-        _ac_declare_searchpath(
-            ${THIS_LIBRARY_NAME}
-            "${THIS_LIBRARY_DEPENDS}" "${THIS_LIBRARY_EXTERNS}"
-        )
-
         # figure out file name for build info
         _ac_buildinfo_filename("${THIS_LIBRARY_NAME}" THIS_LIBRARY_BUILDINFO_FILE)
 
@@ -109,6 +100,18 @@ macro(ac_add_library LIBRARY_NAME LIBRARY_PATH)
                 ${THIS_LIBRARY_BUILDINFO_FILE}
                 ${CMAKE_CURRENT_SOURCE_DIR}/.svn/entries # XXX: really needed? consistent for all target types?
         )
+
+        # add global include and library paths
+        _ac_add_global_paths(${THIS_LIBRARY_NAME})
+
+        # declare include and library searchpath
+        _ac_add_dependency_paths(
+            ${THIS_LIBRARY_NAME}
+            "${THIS_LIBRARY_DEPENDS}" "${THIS_LIBRARY_EXTERNS}"
+        )
+
+        # add path to generated headers (XXX: only done for libs right now)
+        _ac_add_include_path(${THIS_LIBRARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${ACMAKE_BINARY_SUBDIR} NO)
 
         # update repository and revision information
         _ac_add_repository_info(
@@ -163,7 +166,11 @@ macro(ac_add_library LIBRARY_NAME LIBRARY_PATH)
                 DONT_INSTALL
                 NO_REVISION_INFO
             )
-            
+        
+            # add path to generated headers from our parent library
+            # XXX: maybe remove when executable has own conf header?
+            _ac_add_include_path(${TEST_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${ACMAKE_BINARY_SUBDIR} NO)
+        
             # XXX: multiple build types in VS
             get_target_property(
                 TEST_LOCATION ${TEST_NAME} LOCATION_${CMAKE_BUILD_TYPE}

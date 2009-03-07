@@ -99,6 +99,8 @@ ac_add_library(
     HEADERS ${HEADERS}
 )
 
+_ac_add_include_path(spidermonkey ${CMAKE_CURRENT_BINARY_DIR}/include YES)
+
 set_target_properties(
     spidermonkey
     PROPERTIES
