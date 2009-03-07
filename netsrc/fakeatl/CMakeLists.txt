@@ -6,7 +6,11 @@ include(AcMake)
 
 list(INSERT CMAKE_MODULE_PATH 0 ${FakeATL_SOURCE_DIR})
 
-ac_add_project(FakeATL CUSTOM_SCRIPTS FindFakeATLIncludes)
+ac_add_project(
+    FakeATL
+    CUSTOM_SCRIPTS
+        FindFakeATLIncludes.cmake
+)
 
 ac_add_library(
     fakeatl fakeatl
