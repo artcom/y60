@@ -68,7 +68,7 @@
 
 #if defined(WIN32)
 #   pragma warning( disable : 4275 )
-#endif defined(WIN32)
+#endif /* defined(WIN32) */
 
 namespace y60 {
 
