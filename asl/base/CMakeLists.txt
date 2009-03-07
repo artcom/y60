@@ -165,5 +165,6 @@ ac_add_plugin(
     asltestplugin asl/testplugin
     SOURCES testPlugIn.cpp
     HEADERS testPlugIn.h
+    DEPENDS aslbase
     DONT_INSTALL
 )
