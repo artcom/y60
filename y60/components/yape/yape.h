@@ -4,6 +4,5 @@
 #include "y60_ape_settings.h"
 
 #include "module.h"
-#include "class_wrapper.h"
 
 #endif // Y60_APE_INCLUDED

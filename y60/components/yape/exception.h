@@ -5,6 +5,14 @@
 
 #include <asl/base/Exception.h>
 
-DEFINE_EXCEPTION( bad_arguments, asl::Exception );
+namespace y60 { namespace ape {
+
+DEFINE_EXCEPTION( script_error, asl::Exception );
+DEFINE_EXCEPTION( bad_arguments, script_error);
+
+DEFINE_EXCEPTION( internal_error, asl::Exception);
+DEFINE_EXCEPTION( internal_monkey_error, internal_error );
+
+}} // end of namespace ape, y60
 
 #endif // Y60_APE_EXCEPTION_INCLUDED

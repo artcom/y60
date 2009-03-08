@@ -4,13 +4,8 @@
 
 #       include "y60_ape_settings.h"
 
-#       include <boost/mpl/front.hpp>
-#       include <boost/type_traits.hpp>
-#       include <boost/preprocessor/cat.hpp>
 #       include <boost/preprocessor/iterate.hpp>
-#       include <boost/preprocessor/arithmetic/add.hpp>
-#       include <boost/preprocessor/iterate.hpp>
-#       include <boost/preprocessor/enum_params.hpp>
+#       include <boost/preprocessor/repetition/enum.hpp>
 
 #       include <js/spidermonkey/jsapi.h>
 
@@ -19,79 +14,40 @@
 #       include <y60/jsbase/JScppUtils.h>
 
 #       include "exception.h"
-#       include "signature_utils.h"
-#       include "preprocessor.h"
+#       include "arguments.h"
 
 namespace y60 { namespace ape { namespace detail {
 
-template <bool returns_void, int arity> struct invoke_tag {};
+template <bool returns_void, int arity> struct deduce_tag {};
 
-template <typename Sig>
-struct dispatch {
-    typedef invoke_tag< returns_void<Sig>::value, arity<Sig>::value > type;
+template <typename Signature>
+struct invoke_discriminator {
+    typedef deduce_tag<
+        returns_void<Signature>::value,
+                arity<Signature>::value > type;
 };
 
-inline
-void
-check_argument_count( int argc, int N ) {
-    if ( argc != N ) {
-        std::ostringstream os;
-        os << "expected " << N << " arguments but got " << argc;
-        throw bad_arguments( os.str(), PLUS_FILE_LINE );
-    }
-}
-
-template <typename T>
-inline
-void
-arg_from_jsval(JSContext * cx, jsval * const& argv, uintN i, T & out) {
-    if ( ! jslib::convertFrom(cx, argv[i], out )) {
-        JSString * js_string = JS_ValueToString(cx, argv[0]);
-        std::string js_string_rep;
-        if(js_string) {
-            js_string_rep = JS_GetStringBytes(js_string);
+/* Generic invoker template. Just throws a compiletime exception if
+ * the maximum arity is exceeded
+ */
+template <typename F,
+          typename Signature,
+          typename UniqueId,
+          typename DeduceTag = typename invoke_discriminator<Signature>::type>
+class invoker {
+    public:
+        static
+        JSBool
+        invoke(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, jsval * rval) {
+            // Y60_APE_MAX_ARITY exceeded
+            BOOST_STATIC_ASSERT(sizeof(F) == 0);
+            return JS_FALSE;
         }
-        JS_RemoveRoot(cx, & js_string );
-        std::ostringstream os;
-        os << "could not convert argument " << i << " with value '"
-           << js_string_rep << "' to native type '" 
-           << asl::demangled_name<T>() << "'";
-        throw bad_arguments(os.str(), PLUS_FILE_LINE);
-    }
-}
-
-template <typename FuncT,
-          FuncT * Func,
-          typename Sig,
-          typename Tag = typename dispatch<Sig>::type>
-struct invoker {
-    static
-    JSBool
-    invoke(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, jsval * rval) {
-        BOOST_STATIC_ASSERT(sizeof(FuncT) == 0);
-        return JS_FALSE;
-    }
 };
-
-template < typename FuncT, FuncT * Func, typename Sig >
-JSNative
-get_invoker(Sig const& sig) {
-    return & detail::invoker<FuncT,Func,Sig>::invoke; 
-}
-
-
-#       define Y60_APE_DECL_ARG(z, n, Sig )                       \
-                typename argument_storage<Sig,n>::type arg ## n = \
-                        typename argument_storage<Sig,n>::type() ;
-
-#       define Y60_APE_INIT_ARG(z, n, Sig) \
-                arg_from_jsval(cx, argv, n, arg ## n );
 
 #       define BOOST_PP_ITERATION_PARAMS_1 \
             (3, (0, Y60_APE_MAX_ARITY, <y60/components/yape/invoke.h>))
 #       include BOOST_PP_ITERATE()
-
-#       undef Y60_APE_DECL_ARG
 
 }}} // end of namespace detail, ape, y60
 
@@ -100,46 +56,54 @@ get_invoker(Sig const& sig) {
 #else // BOOST_PP_IS_ITERATING
 
 #   define N BOOST_PP_ITERATION()
+#   define Y60_APE_ARG_REF(z, n, var) boost::get< n >( var )
 
-template <typename FuncT,
-          FuncT * Func,
-          typename Sig>
-struct invoker<FuncT, Func, Sig, invoke_tag<false, N> > {
-    static
-    JSBool
-    invoke(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, jsval * rval) {
-        try {
-            AC_TRACE << "invoke: non_void " << N << " args";
-            check_argument_count( argc, N );
-            typedef boost::function_traits<
-                typename boost::remove_pointer<FuncT>::type > func_trait;
-            BOOST_PP_REPEAT( N, Y60_APE_DECL_ARG, Sig )
-            BOOST_PP_REPEAT( N, Y60_APE_INIT_ARG, Sig );
-            *rval = jslib::as_jsval(cx, Func( BOOST_PP_ENUM_PARAMS(N, arg) ));
-        } HANDLE_CPP_EXCEPTION;
-        return JS_TRUE;
-    }
+template <typename F,
+          typename Signature,
+          typename UniqueId>
+class invoker<F, Signature, UniqueId, deduce_tag<false, N> > {
+    public:
+        static
+        JSBool
+        invoke(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, jsval * rval) {
+            try {
+                arguments<Signature> args(cx, argc, argv);
+                *rval = jslib::as_jsval(cx,
+                        f( BOOST_PP_ENUM( N, Y60_APE_ARG_REF, args ) ) );
+            } HANDLE_CPP_EXCEPTION;
+            return JS_TRUE;
+        }
+        static void init(F * func) { f = func; }
+    private:
+        static F * f;
 };
 
-template <typename FuncT,
-          FuncT * Func,
-          typename Sig>
-struct invoker<FuncT, Func, Sig, invoke_tag<true, N> > {
-    static
-    JSBool
-    invoke(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, jsval * rval) {
-        try {
-            AC_TRACE << "invoke: void " << N << " args";
-            check_argument_count( argc, N );
-            typedef boost::function_traits<
-                typename boost::remove_pointer<FuncT>::type > func_trait;
-            BOOST_PP_REPEAT( N, Y60_APE_DECL_ARG, Sig );
-            BOOST_PP_REPEAT( N, Y60_APE_INIT_ARG, Sig );
-            Func( BOOST_PP_ENUM_PARAMS(N, arg) );
-            *rval = JSVAL_VOID;
-        } HANDLE_CPP_EXCEPTION;
-        return JS_TRUE;
-    }
+template <typename F, typename Signature, typename UniqueId>
+F * invoker<F, Signature, UniqueId, deduce_tag<false, N> >::f = 0;
+
+template <typename F,
+          typename Signature,
+          typename UniqueId>
+class invoker<F, Signature, UniqueId, deduce_tag<true, N> > {
+    public:
+        static
+        JSBool
+        invoke(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, jsval * rval) {
+            try {
+                arguments<Signature> args(cx, argc, argv);
+                f( BOOST_PP_ENUM( N, Y60_APE_ARG_REF, args  ) );
+                *rval = JSVAL_VOID; // XXX needed?
+            } HANDLE_CPP_EXCEPTION;
+            return JS_TRUE;
+        }
+        static void init(F * func) { f = func; }
+    private:
+        static F * f;
 };
+
+template <typename F, typename Signature, typename UniqueId>
+F * invoker<F, Signature, UniqueId, deduce_tag<true, N> >::f = 0;
+
+#   undef Y60_APE_ARG_REF
 
 #endif // BOOST_PP_IS_ITERATING
