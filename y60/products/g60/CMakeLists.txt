@@ -12,7 +12,9 @@ ac_add_executable(
 
 # fix OpenGL/X11 link cycle problem
 if(OSX)
-    set_property(TARGET g60 APPEND PROPERTY LINK_FLAGS " -Wl,-dylib_file,/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib:/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib")
+    get_property(FLAGS TARGET g60 PROPERTY LINK_FLAGS)
+    set_property(TARGET g60 PROPERTY LINK_FLAGS "${FLAGS} -Wl,-dylib_file,/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib:/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib")
+    set(FLAGS)
 endif(OSX)
 
 
