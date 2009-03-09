@@ -10,6 +10,10 @@ add_subdirectory(GenCompressedTex)
 add_subdirectory(GenCubemap)
 add_subdirectory(GenMovie)
 
+if(Y60_WITH_GTK)
+    add_subdirectory(rendergirl)
+endif(Y60_WITH_GTK)
+
 if(MAYA_FOUND)
     add_subdirectory(maya-xport)
 endif(MAYA_FOUND)
