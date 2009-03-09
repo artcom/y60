@@ -143,7 +143,7 @@ function(_ac_collect_extern_libraries OUT)
         else(${EXTERN}_IS_PROJECT)
             # libraries have two cases
 
-            if(${EXTERN}_LIBRARIES_D OR ${EXTERN}_LIBRARY_D)
+            if(${EXTERN}_LIBRARIES_D OR ${EXTERN}_LIBRARY_D OR ${EXTERN}_LIBRARIES_C OR ${EXTERN}_LIBRARY_C)
                 # case 1: split debug and optimized
 
                 if(${EXTERN}_LIBRARIES_D)
@@ -158,7 +158,13 @@ function(_ac_collect_extern_libraries OUT)
                     list(APPEND OPTIMIZED ${${EXTERN}_LIBRARY})
                 endif(${EXTERN}_LIBRARIES)
 
-            else(${EXTERN}_LIBRARIES_D OR ${EXTERN}_LIBRARY_D)
+                if(${EXTERN}_LIBRARIES_C)
+                    list(APPEND COMMON ${${EXTERN}_LIBRARIES_C})
+                else(${EXTERN}_LIBRARIES_C)
+                    list(APPEND COMMON ${${EXTERN}_LIBRARY_C})
+                endif(${EXTERN}_LIBRARIES_C)
+
+            else(${EXTERN}_LIBRARIES_D OR ${EXTERN}_LIBRARY_D OR ${EXTERN}_LIBRARIES_C OR ${EXTERN}_LIBRARY_C)
                 # case 2: only one variant
 
                 if(${EXTERN}_LIBRARIES)
@@ -167,7 +173,7 @@ function(_ac_collect_extern_libraries OUT)
                     list(APPEND COMMON ${${EXTERN}_LIBRARY})
                 endif(${EXTERN}_LIBRARIES)
 
-            endif(${EXTERN}_LIBRARIES_D OR ${EXTERN}_LIBRARY_D)
+            endif(${EXTERN}_LIBRARIES_D OR ${EXTERN}_LIBRARY_D OR ${EXTERN}_LIBRARIES_C OR ${EXTERN}_LIBRARY_C)
         endif(${EXTERN}_IS_PROJECT)
     endforeach(EXTERN)
 
