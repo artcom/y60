@@ -26,6 +26,10 @@ macro(ac_add_plugin PLUGIN_NAME PLUGIN_PATH)
     set(THIS_PLUGIN_NAME "${PLUGIN_NAME}")
     set(THIS_PLUGIN_PATH "${PLUGIN_PATH}")
 
+    # add aslbase to dependencies
+    #   XXX: acmake should not be asl-specific
+    list(APPEND THIS_PLUGIN_DEPENDS aslbase)
+
     # figure out file name for build info
     _ac_buildinfo_filename(${THIS_PLUGIN_NAME} THIS_PLUGIN_BUILDINFO_FILE)
 
@@ -55,11 +59,6 @@ macro(ac_add_plugin PLUGIN_NAME PLUGIN_PATH)
         PLUGIN ${THIS_PLUGIN_SOURCES} ${THIS_PLUGIN_HEADERS}
     )
 
-    # link to aslbase because it contains asl::PluginBase
-    #   XXX: acmake should not be asl-specific
-    #        also, this does not seem project-safe
-    target_link_libraries(${THIS_PLUGIN_NAME} aslbase )
-    
     # attach headers to target
     set_target_properties(
         ${THIS_PLUGIN_NAME} PROPERTIES
