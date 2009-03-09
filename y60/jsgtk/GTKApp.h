@@ -76,7 +76,7 @@
 
 namespace jslib {
 
-class GTKApp : public jslib::JSApp {
+class Y60_JSGTK_EXPORT GTKApp : public jslib::JSApp {
     public:
         GTKApp();
         static void addSignalHandler(const gchar *handler_name,

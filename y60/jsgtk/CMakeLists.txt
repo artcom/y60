@@ -220,7 +220,7 @@ ac_add_library(
             y60base y60image y60video y60inet y60scene y60input
             y60glrender y60glutil y60gltext y60modelling y60jsbase y60jslib
             y60acgtk ${JSDEPENDS}
-    EXTERNS GTKMM GTKGLEXT GLADEMM ${JSEXTERN}
+    EXTERNS GTKMM GTKGLEXT ${JSEXTERN}
 )
 
 # fix OpenGL/X11 link cycle problem
