@@ -63,6 +63,11 @@
 //
 //=============================================================================
 
+#ifndef ACGTK_CELL_RENDERER_PIXBUF_TOGGLE_INCLUDED
+#define ACGTK_CELL_RENDERER_PIXBUF_TOGGLE_INCLUDED
+
+#include "y60_acgtk_settings.h"
+
 #if defined(_MSC_VER)
     #pragma warning(push)
     #pragma warning(disable:4413 4244 4127 4512)
@@ -74,7 +79,7 @@
 
 namespace acgtk {
 
-class CellRendererPixbufToggle : public Gtk::CellRenderer {
+class Y60_ACGTK_EXPORT CellRendererPixbufToggle : public Gtk::CellRenderer {
     public:
         CellRendererPixbufToggle();
         virtual ~CellRendererPixbufToggle();
@@ -117,3 +122,5 @@ class CellRendererPixbufToggle : public Gtk::CellRenderer {
 };
 
 } // end of namespace
+
+#endif // ACGTK_CELL_RENDERER_PIXBUF_TOGGLE_INCLUDED

@@ -66,6 +66,8 @@
 #ifndef ACGTK_GRAY_SCALE_INCLUDED
 #define ACGTK_GRAY_SCALE_INCLUDED
 
+#include "y60_acgtk_settings.h"
+
 #include <asl/math/Vector234.h>
 
 #if defined(_MSC_VER)
@@ -86,7 +88,7 @@ namespace acgtk {
 
 #undef GrayScale
 
-class GrayScale : public Gtk::DrawingArea {
+class Y60_ACGTK_EXPORT GrayScale : public Gtk::DrawingArea {
     public:
         GrayScale();
         virtual ~GrayScale();

@@ -36,6 +36,7 @@ Histogram.h
 RenderArea.h
 TNTMeasurementList.h
 TNTThresholdList.h
+y60_acgtk_settings.h
 )
 
 # if(OSX)

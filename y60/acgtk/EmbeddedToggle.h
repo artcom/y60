@@ -66,11 +66,13 @@
 #ifndef ACGTK_EMBEDDED_TOGGLE_INCLUDED
 #define ACGTK_EMBEDDED_TOGGLE_INCLUDED
 
+#include "y60_acgtk_settings.h"
+
 #include "EmbeddedButton.h"
 
 namespace acgtk {
 
-class EmbeddedToggle : public EmbeddedButton {
+class Y60_ACGTK_EXPORT EmbeddedToggle : public EmbeddedButton {
     public:
         EmbeddedToggle();
         EmbeddedToggle(const std::string & theDefaultIcon,

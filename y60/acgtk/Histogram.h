@@ -66,6 +66,8 @@
 #ifndef ACGTK_HISTOGRAM_INCLUDED
 #define ACGTK_HISTOGRAM_INCLUDED
 
+#include "y60_acgtk_settings.h"
+
 #include <asl/math/Vector234.h>
 
 #if defined(_MSC_VER)
@@ -81,7 +83,7 @@
 
 namespace acgtk {
 
-class Histogram : public Gtk::DrawingArea {
+class Y60_ACGTK_EXPORT Histogram : public Gtk::DrawingArea {
     public:
         Histogram();
         virtual ~Histogram();

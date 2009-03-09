@@ -59,6 +59,8 @@
 #ifndef ACGTK_AC_ICON_FACTORY_INCLUDED
 #define ACGTK_AC_ICON_FACTORY_INCLUDED
 
+#include "y60_acgtk_settings.h"
+
 #if defined(_MSC_VER)
     #pragma warning(push)
     #pragma warning(disable:4413 4244 4512)
@@ -73,7 +75,7 @@ namespace acgtk {
 /** This class hides some of the complexities of Gtk's icon handling
  * and works around some shortcomings of our approch to wrap Gtk.
  */
-class ACIconFactory {
+class Y60_ACGTK_EXPORT ACIconFactory {
     public:
         ACIconFactory();
 

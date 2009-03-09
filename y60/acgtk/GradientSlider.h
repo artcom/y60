@@ -59,6 +59,8 @@
 #ifndef ACGTK_GRADIENT_SLIDER_INCLUDED
 #define ACGTK_GRADIENT_SLIDER_INCLUDED
 
+#include "y60_acgtk_settings.h"
+
 #include <asl/math/Vector234.h>
 #include <asl/dom/Nodes.h>
 
@@ -80,7 +82,7 @@
 
 namespace acgtk {
 
-class GradientSlider : public Gtk::DrawingArea {
+class Y60_ACGTK_EXPORT GradientSlider : public Gtk::DrawingArea {
     public:
         GradientSlider();
         virtual ~GradientSlider();

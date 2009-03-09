@@ -59,6 +59,8 @@
 #ifndef _ac_y60_jslib_gcobserver_included_
 #define _ac_y60_jslib_gcobserver_included_
 
+#include "y60_acgtk_settings.h"
+
 #include <y60/jsbase/jssettings.h>
 #include <asl/base/Singleton.h>
 
@@ -75,7 +77,7 @@
 namespace jslib {
     
 
-class GCObserver : public asl::Singleton<GCObserver> {
+class Y60_ACGTK_EXPORT GCObserver : public asl::Singleton<GCObserver> {
     public:
         typedef sigc::signal<void, JSObject*> FinalizeSignal;
 

@@ -66,11 +66,13 @@
 #ifndef ACGTK_DRAG_BUTTON_INCLUDED
 #define ACGTK_DRAG_BUTTON_INCLUDED
 
+#include "y60_acgtk_settings.h"
+
 #include "EmbeddedButton.h"
 
 namespace acgtk {
 
-class DragButton : public EmbeddedButton {
+class Y60_ACGTK_EXPORT DragButton : public EmbeddedButton {
     public:
         DragButton();
         DragButton(const std::string & theIconFile);

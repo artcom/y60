@@ -59,6 +59,8 @@
 #ifndef ACGTK_TNT_MEASUREMENT_LIST_INCLUDED
 #define ACGTK_TNT_MEASUREMENT_LIST_INCLUDED
 
+#include "y60_acgtk_settings.h"
+
 #include <asl/dom/Nodes.h>
 
 #ifdef OSX
@@ -81,7 +83,7 @@
 
 namespace acgtk {
 
-class TNTMeasurementList : public Gtk::TreeView {
+class Y60_ACGTK_EXPORT TNTMeasurementList : public Gtk::TreeView {
     public:
         /** The default constructor creates a default list view without icons
          *  and special layout. It must be present because all wrapped objects

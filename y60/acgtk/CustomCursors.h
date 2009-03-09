@@ -63,6 +63,11 @@
 //
 //=============================================================================
 
+#ifndef ACGTK_CUSTOM_CURSORS_INCLUDED
+#define ACGTK_CUSTOM_CURSORS_INCLUDED
+
+#include "y60_acgtk_settings.h"
+
 #if defined(_MSC_VER)
     #pragma warning(push)
     #pragma warning(disable:4413 4244 4512)
@@ -78,7 +83,7 @@ using namespace std;
 
 namespace acgtk {
 
-class CustomCursors {
+class Y60_ACGTK_EXPORT CustomCursors {
     public:
         static void init();
 
@@ -94,3 +99,5 @@ class CustomCursors {
 Gdk::Cursor createCustomCursor(unsigned char * theBitmap, unsigned char * theMask,
         int theWidth, int theHeight, int theHotX, int theHotY);
 } // end of namespace
+
+#endif // ACGTK_CUSTOM_CURSORS_INCLUDED

@@ -59,6 +59,8 @@
 #ifndef ACGTK_TNT_THRESHOLD_LIST_INCLUDED
 #define ACGTK_TNT_THRESHOLD_LIST_INCLUDED
 
+#include "y60_acgtk_settings.h"
+
 #include <asl/dom/Nodes.h>
 
 #ifdef OSX
@@ -83,7 +85,7 @@
 
 namespace acgtk {
 
-class TNTThresholdList : public Gtk::TreeView {
+class Y60_ACGTK_EXPORT TNTThresholdList : public Gtk::TreeView {
     public:
         TNTThresholdList();
         virtual ~TNTThresholdList();

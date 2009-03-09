@@ -59,6 +59,8 @@
 #ifndef ACGTK_CONSOLE_VIEW_INCLUDED
 #define ACGTK_CONSOLE_VIEW_INCLUDED
 
+#include "y60_acgtk_settings.h"
+
 #if defined(_MSC_VER)
     #pragma warning(push)
     #pragma warning(disable:4413 4244 4512)
@@ -72,7 +74,7 @@
 
 namespace acgtk {
 
-class ConsoleView : public Gtk::TextView {
+class Y60_ACGTK_EXPORT ConsoleView : public Gtk::TextView {
     public:
         ConsoleView();
         virtual ~ConsoleView();

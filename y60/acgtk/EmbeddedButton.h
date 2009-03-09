@@ -59,6 +59,8 @@
 #ifndef ACGTK_EMBEDDED_BUTTON_INCLUDED
 #define ACGTK_EMBEDDED_BUTTON_INCLUDED
 
+#include "y60_acgtk_settings.h"
+
 #if defined(_MSC_VER)
 #pragma warning(push)
 #pragma warning(disable:4413 4244 4512)
@@ -71,7 +73,7 @@
 
 namespace acgtk {
 
-class EmbeddedButton : public Gtk::EventBox {
+class Y60_ACGTK_EXPORT EmbeddedButton : public Gtk::EventBox {
     public:
         EmbeddedButton();
         EmbeddedButton(const std::string & theIconFile);

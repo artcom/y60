@@ -66,6 +66,8 @@
 #ifndef _Y60_INPUT_GTKEVENTADAPTER_INCLUDED_
 #define _Y60_INPUT_GTKEVENTADAPTER_INCLUDED_
 
+#include "y60_acgtk_settings.h"
+
 #include <y60/input/Event.h>
 #include <y60/input/IEventSource.h>
 #include <y60/input/KeyCodes.h>
@@ -73,7 +75,7 @@
 #include <gdk/gdkevents.h>
 #include <vector>
 
-class GtkEventAdapter : public y60::IEventSource {
+class Y60_ACGTK_EXPORT GtkEventAdapter : public y60::IEventSource {
     public:
         // GtkEventAdapter();
         // virtual void init();

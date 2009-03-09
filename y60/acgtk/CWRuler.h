@@ -66,6 +66,8 @@
 #ifndef ACGTK_CW_RULER_INCLUDED
 #define ACGTK_CW_RULER_INCLUDED
 
+#include "y60_acgtk_settings.h"
+
 #include <asl/math/Vector234.h>
 
 #if defined(_MSC_VER)
@@ -80,7 +82,7 @@
 
 namespace acgtk {
 
-class CWRuler : public Gtk::DrawingArea {
+class Y60_ACGTK_EXPORT CWRuler : public Gtk::DrawingArea {
     public:
         enum Mode {
             MODE_THRESHOLD, // [DS] ... think this is deprecated

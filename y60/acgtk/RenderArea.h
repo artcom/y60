@@ -60,6 +60,8 @@
 #ifndef _tnt_renderarea_included_
 #define _tnt_renderarea_included_
 
+#include "y60_acgtk_settings.h"
+
 #if defined(_MSC_VER)
     #pragma warning(push)
     #pragma warning(disable:4413 4244 4127 4512 4520 4251)
@@ -82,7 +84,7 @@ namespace acgtk {
 class RenderArea;
 typedef asl::Ptr<RenderArea> RenderAreaPtr;
 
-class RenderArea : public Gtk::DrawingArea, public jslib::AbstractRenderWindow {
+class Y60_ACGTK_EXPORT RenderArea : public Gtk::DrawingArea, public jslib::AbstractRenderWindow {
     public:
         RenderArea(RenderAreaPtr theContext = RenderAreaPtr());
         virtual ~RenderArea();
