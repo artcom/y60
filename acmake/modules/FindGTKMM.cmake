@@ -3,6 +3,8 @@ if(GTKMM_FIND_REQUIRED)
     set(GTKMM_REQUIRED_FLAG REQUIRED)
 endif(GTKMM_FIND_REQUIRED)
 
+include(FindPkgConfig)
+
 pkg_search_module(GTKMM gtkmm-2.4 ${GTKMM_REQUIRED_FLAG})
 pkg_search_module(GLADEMM libglademm-2.4 ${GTKMM_REQUIRED_FLAG})
 

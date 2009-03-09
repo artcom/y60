@@ -23,6 +23,7 @@ if(WIN32)
         GTKGLEXT_LIBRARIES GTKGLEXT_LIBRARIES_D
     )
 else(WIN32)
+    include(FindPkgConfig)
     find_pkgconfig(gtkglext-1.0)
 endif(WIN32)
 
