@@ -24,7 +24,7 @@ if(WIN32)
     )
 else(WIN32)
     include(FindPkgConfig)
-    find_pkgconfig(gtkglext-1.0)
+    pkg_search_module(GTKGLEXT gtkglext-1.0)
 endif(WIN32)
 
 include(FindPackageHandleStandardArgs)
