@@ -97,34 +97,47 @@ endmacro(y60_add_component)
 macro(y60_add_launcher NAME)
     parse_arguments(
         THIS_LAUNCHER
-        "MAIN_SCRIPT;BUILD_WORKING_DIR"
+        "ENGINE;MAIN_SCRIPT;BUILD_WORKING_DIR"
         ""
         ${ARGN}
     )
+
     set(APPLICATION ${Y60_CURRENT_APPLICATION})
+
     get_global(${APPLICATION}_BUILD_PATH THIS_APPLICATION_BUILD_PATH)
     get_global(${APPLICATION}_INSTALL_PATH THIS_APPLICATION_INSTALL_PATH)
     get_global(${APPLICATION}_BINARY_DIR THIS_APPLICATION_BINARY_DIR)
     get_global(${APPLICATION}_SOURCE_DIR THIS_APPLICATION_SOURCE_DIR)
 
+    if(NOT THIS_LAUNCHER_ENGINE)
+        set(THIS_LAUNCHER_ENGINE y60)
+    endif(NOT THIS_LAUNCHER_ENGINE)
+
+    get_global(Y60_IS_INTEGRATED Y60_IS_INTEGRATED)
+    if(Y60_IS_INTEGRATED)
+            get_global(Y60_SOURCE_DIR Y60_SOURCE_DIR)
+            set(Y60_TEMPLATE_DIR ${Y60_SOURCE_DIR})
+    else(Y60_IS_INTEGRATED)
+            set(Y60_TEMPLATE_DIR ${Y60_INSTALL_PREFIX}/share/cmake-2.6/Templates)
+    endif(Y60_IS_INTEGRATED)
+
     # choose working dir for running from build tree
     if(THIS_LAUNCHER_BUILD_WORKING_DIR STREQUAL SOURCE)
-        message("${NAME} will be run from source dir")
         set(THIS_LAUNCHER_BUILD_WORKING_DIR ${THIS_APPLICATION_SOURCE_DIR})
     elseif(THIS_LAUNCHER_BUILD_WORKING_DIR STREQUAL BINARY)
-        message("${NAME} will be run from binary dir")
         set(THIS_LAUNCHER_BUILD_WORKING_DIR ${THIS_APPLICATION_BINARY_DIR})
     elseif(NOT THIS_LAUNCHER_BUILD_WORKING_DIR)
-        message("${NAME} will be run from binary dir (default)")
         set(THIS_LAUNCHER_BUILD_WORKING_DIR ${THIS_APPLICATION_BINARY_DIR})
     endif(THIS_LAUNCHER_BUILD_WORKING_DIR STREQUAL SOURCE)
 
     # XXX: choose working dir for running from installed system
 
+    get_property(THIS_LAUNCHER_BUILD_ENGINE TARGET ${THIS_LAUNCHER_ENGINE} PROPERTY LOCATION_RELEASE)
+
     if(UNIX)
         # generate launcher shell script for build tree runs
         configure_file(
-            ${Y60_INSTALL_PREFIX}/share/cmake-2.6/Templates/Y60BuildLauncher.sh.in
+            ${Y60_TEMPLATE_DIR}/Y60BuildLauncher.sh.in
             ${CMAKE_CURRENT_BINARY_DIR}/${NAME}
             @ONLY
         )
@@ -138,7 +151,6 @@ function(y60_end_application NAME)
 
     get_global(${NAME}_BUILD_PATH BUILD_PATH)
     get_global(${NAME}_INSTALL_PATH INSTALL_PATH)
-    message("Y60 path B=\"${BUILD_PATH}\" I=\"${INSTALL_PATH}\"")
 
     set(Y60_CURRENT_APPLICATION)
 endfunction(y60_end_application)
