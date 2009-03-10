@@ -1,7 +1,10 @@
 
 y60_begin_application(rendergirl)
 
-y60_add_assets(SCRIPTS ADD_TO_PATH)
+y60_add_assets(
+    SCRIPTS ADD_TO_PATH
+)
+
 y60_add_assets(GLADE)
 
 y60_add_launcher(

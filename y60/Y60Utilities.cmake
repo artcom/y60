@@ -2,42 +2,6 @@
 
 include(AcMake)
 
-# macro(y60_maybe_install_directory LOCAL_NAME INSTALL_NAME)
-#     if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${LOCAL_NAME})
-#         install(
-#             DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${LOCAL_NAME}/
-#             DESTINATION ${INSTALL_NAME}
-#             FILES_MATCHING
-#                 PATTERN "*"
-#                 PATTERN ".svn" EXCLUDE
-#         )
-#     endif(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${LOCAL_NAME})
-# endmacro(y60_maybe_install_directory LOCAL_NAME INSTALL_NAME)
-#
-# macro(y60_add_application APPLICATION_NAME)
-#     parse_arguments(
-#         THIS_APPLICATION
-#         ""
-#         ""
-#         ${ARGN}
-#     )
-#
-#     y60_maybe_install_directory(CONFIG etc/${APPLICATION_NAME})
-#
-#     y60_maybe_install_directory(SCRIPTS lib/${APPLICATION_NAME}/js)
-#
-#     y60_maybe_install_directory(TEX     lib/${APPLICATION_NAME}/textures)
-#
-#     y60_maybe_install_directory(FONTS   lib/${APPLICATION_NAME}/fonts)
-#
-#     y60_maybe_install_directory(MODELS  lib/${APPLICATION_NAME}/models)
-#
-#     y60_maybe_install_directory(SOUNDS  lib/${APPLICATION_NAME}/sounds)
-#
-#     y60_maybe_install_directory(MOVIES  lib/${APPLICATION_NAME}/movies)
-#
-# endmacro(y60_add_application)
-
 function(y60_begin_application NAME)
     # Check for nesting
     if(Y60_CURRENT_APPLICATION)
@@ -77,7 +41,7 @@ function(y60_add_assets DIRECTORY)
         DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/${DIRECTORY}/"
         DESTINATION "lib/${APPLICATION}/${DIRECTORY_NAME}"
         FILES_MATCHING
-           ${PATTERNS}
+           ${THIS_ASSETS_PATTERNS}
            PATTERN ".svn" EXCLUDE
     )
 
@@ -97,7 +61,7 @@ endmacro(y60_add_component)
 macro(y60_add_launcher NAME)
     parse_arguments(
         THIS_LAUNCHER
-        "ENGINE;MAIN_SCRIPT;BUILD_WORKING_DIR"
+        "ENGINE;MAIN_SCRIPT;BUILD_WORKING_DIR;INSTALL_WORKING_DIR"
         ""
         ${ARGN}
     )
@@ -123,16 +87,27 @@ macro(y60_add_launcher NAME)
 
     # choose working dir for running from build tree
     if(THIS_LAUNCHER_BUILD_WORKING_DIR STREQUAL SOURCE)
+        # BINARY lets us run in the source directory of the build
         set(THIS_LAUNCHER_BUILD_WORKING_DIR ${THIS_APPLICATION_SOURCE_DIR})
     elseif(THIS_LAUNCHER_BUILD_WORKING_DIR STREQUAL BINARY)
+        # BINARY lets us run in the binary directory of the build
         set(THIS_LAUNCHER_BUILD_WORKING_DIR ${THIS_APPLICATION_BINARY_DIR})
     elseif(NOT THIS_LAUNCHER_BUILD_WORKING_DIR)
-        set(THIS_LAUNCHER_BUILD_WORKING_DIR ${THIS_APPLICATION_BINARY_DIR})
+        # the prefered default is to run from ${PWD}
+        set(THIS_LAUNCHER_BUILD_WORKING_DIR "")
     endif(THIS_LAUNCHER_BUILD_WORKING_DIR STREQUAL SOURCE)
 
-    # XXX: choose working dir for running from installed system
+    # choose working dir for running from install
+    if(THIS_LAUNCHER_INSTALL_WORKING_DIR STREQUAL ASSETS)
+        # the shell script will do the right thing
+        set(THIS_LAUNCHER_INSTALL_WORKING_DIR ASSETS)
+    elseif(NOT THIS_LAUNCHER_INSTALL_WORKING_DIR)
+        # the prefered default is to run from ${PWD}
+        set(THIS_LAUNCHER_INSTALL_WORKING_DIR "")
+    endif(THIS_LAUNCHER_INSTALL_WORKING_DIR STREQUAL ASSETS)
 
     get_property(THIS_LAUNCHER_BUILD_ENGINE TARGET ${THIS_LAUNCHER_ENGINE} PROPERTY LOCATION_RELEASE)
+    set(THIS_LAUNCHER_INSTALL_ENGINE ${THIS_LAUNCHER_ENGINE})
 
     if(UNIX)
         # generate launcher shell script for build tree runs
@@ -140,6 +115,19 @@ macro(y60_add_launcher NAME)
             ${Y60_TEMPLATE_DIR}/Y60BuildLauncher.sh.in
             ${CMAKE_CURRENT_BINARY_DIR}/${NAME}
             @ONLY
+        )
+        # generate launcher shell script for build tree runs
+        configure_file(
+            ${Y60_TEMPLATE_DIR}/Y60InstallLauncher.sh.in
+            ${CMAKE_CURRENT_BINARY_DIR}/${ACMAKE_BINARY_SUBDIR}/${NAME}
+            @ONLY
+        )
+        install(
+            FILES ${CMAKE_CURRENT_BINARY_DIR}/${ACMAKE_BINARY_SUBDIR}/${NAME}
+            DESTINATION bin/
+            PERMISSIONS OWNER_EXECUTE GROUP_EXECUTE WORLD_EXECUTE
+                        OWNER_READ    GROUP_READ    WORLD_READ
+                        OWNER_WRITE
         )
     endif(UNIX)
 endmacro(y60_add_launcher)
