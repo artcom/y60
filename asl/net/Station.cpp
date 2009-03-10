@@ -740,7 +740,7 @@ bool Station::receive(asl::ResizeableBlock & theData, unsigned long & theSenderA
                         DB(AC_TRACE << "Uncompressed Message size " <<compressedData.size() <<"->"<< theData .size()<< endl);
                     }
                     DB2(AC_TRACE << "Received '" << theData << "'" << endl);
-                    DB(if (theData.size()> 20000) AC_TRACE << "Received large Message:'" << theData << "'" << endl);
+                    DB( if (theData.size()> 20000) { AC_TRACE << "Received large Message:'" << theData << "'" << endl;} );
                     ++_myReceiveStatistic._myMessageCount;
                     return true;
                 } else {
