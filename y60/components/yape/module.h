@@ -8,11 +8,6 @@
 #include <iostream>
 #include <sstream>
 
-#include <boost/shared_ptr.hpp>
-#include <boost/type_traits.hpp>
-
-#include <js/spidermonkey/jsapi.h>
-
 #include <asl/base/PlugInBase.h>
 #include <asl/base/begin_end.h>
 #include <y60/jsbase/IJSModuleLoader.h>
@@ -22,103 +17,58 @@
 #include "invoke.h"
 #include "signature.h"
 #include "arguments.h"
+#include "function.h"
+#include "monkey_utilities.h"
 
 namespace y60 { namespace ape {
 
-namespace detail {
-
-inline
-JSFunctionSpec
-init_js_function_spec_terminator() {
-    JSFunctionSpec terminator;
-    terminator.name  = 0;
-    terminator.call  = 0;
-    terminator.nargs = 0;
-    terminator.flags = 0;
-    terminator.extra = 0;
-    return terminator;
-}
-
-inline
-JSFunctionSpec const&
-js_function_spec_terminator() {
-    static JSFunctionSpec terminator = init_js_function_spec_terminator();
-    return terminator;
-}
-
-}
-
-template <typename Derived> // XXX think about a better name
+template <typename UserModule>
 class module {
+    private:
+        template <typename LocalUniqueId>
+        struct unique_id : boost::mpl::vector2<LocalUniqueId, UserModule> {};
+
     protected:
         module(const char * name) : name_(name) {}
 
-        void
-        import(JSContext * cx, JSObject * global, JSObject * ns) {
-            if ( ! functions_.empty() ) {
-                std::cout << "importing " << num_functions() << " function(s)" << std::endl;
-                if ( ! JS_DefineFunctions(cx, ns, asl::begin_ptr(functions_))) {
-                    std::ostringstream os;
-                    os << "Failed to init functions for module " << name_;
-                    throw internal_monkey_error( os.str(), PLUS_FILE_LINE);
-                }
-            }
-        }
-
-        size_t
-        num_functions() const {
-            return functions_.empty() ? 0 : functions_.size() - 1;
-        }
-
-        void
-        init_module() {
-            static_cast<Derived&>( *this ).init();
-            if ( ! functions_.empty() ) {
-                functions_.push_back( detail::js_function_spec_terminator() );
-            }
-        }
-
-        template <typename F, typename UniqueId>
-        void
-        function( F * f, const char * name, UniqueId const& id) {
-            JSFunctionSpec js_func;
-            js_func.name  = name;
-            js_func.call  = get_invoker(f, detail::get_signature( f ), id);
-            js_func.nargs = get_arity( detail::get_signature( f )) ;
-            js_func.flags = 0;
-            js_func.extra = 0; // number of arg slots for local GC roots
-
-            functions_.push_back( js_func );
+        template <typename LocalUniqueId>
+        detail::function_helper< typename unique_id<LocalUniqueId>::type >
+        functions() {
+            typedef typename unique_id<LocalUniqueId>::type id;
+            return detail::function_helper<id>( module_description_ );
         }
 
         template <typename Class>
-        class_wrapper<Class>
-        class_(const char * name) { return class_wrapper<Class>(name); }
+        detail::class_helper< typename unique_id<Class>::type >
+        class_(const char * name) {
+            typedef typename unique_id<Class>::type id;
+            typedef boost::shared_ptr<detail::class_desc<Class> > cp;
+            cp c( new detail::class_desc<Class>(name) );
+            module_description_.push_back( c );
+            return detail::class_helper<id>( * c );
+        }
 
-        std::string const & get_name() { return name_; }
+        void
+        import(JSContext * cx, JSObject * ns) {
+            static_cast<UserModule&>( *this ).init();
+            for(size_t i = 0; i < module_description_.size(); ++i) {
+                module_description_[i]->import( cx, ns, free_functions_ );
+            }
+            register_free_functions(cx, ns);
+        }
+
+        void
+        register_free_functions(JSContext * cx, JSObject * ns)  {
+            JS_DefineFunctions(cx, ns, free_functions_.ptr());
+        }
+
+        const char * get_name() { return name_; }
 
         template <typename Class> friend class class_wrapper;
     private:
-
-        template <typename F, typename Signature, typename UniqueId>
-        inline
-        JSNative
-        get_invoker(F * f, Signature const& sig, UniqueId const& id) {
-            typedef detail::invoker<F,Signature,UniqueId> invoker_type;
-            invoker_type::init( f );
-            return & invoker_type::invoke;
-        }
-
-        template <typename Signature>
-        inline
-        uintN
-        get_arity(Signature const& sig) {
-            return detail::arity<Signature>::value;
-        }
-
-        const std::string name_;
-
-        std::vector<JSFunctionSpec> functions_;
+        const char *         name_;
+        detail::js_functions free_functions_;
+        detail::ape_list   module_description_;
 };
 
 
@@ -135,15 +85,14 @@ class module_loader : public asl::PlugInBase,
 
         // implement IJSModuleLoader initClasses()
         void initClasses(JSContext * cx, JSObject * global, JSObject * ns) {
-            static module_ptr_type module = init_module();
-            module->import(cx, global, ns);
-            // TODO: policy-fy
-            announce_module_in_namespace(cx, ns, module->get_name());
+            static module_ptr_type module = init_module(cx, global, ns);
         }
     private:
-        module_ptr_type init_module() {
+        module_ptr_type init_module(JSContext * cx, JSObject * global, JSObject * ns) {
             module_ptr_type module( new Module() );
-            module->init_module();
+            module->import(cx, ns);
+            // TODO: policy-fy
+            announce_module_in_namespace(cx, ns, module->get_name());
             return module;
         }
 
@@ -182,8 +131,12 @@ class module_loader : public asl::PlugInBase,
 }} // end of namespace ape, y60
 
 // some workaround macros for current deficiencies of the implementation
+
+#define FUNCTIONS() \
+        functions<y60::ape::detail::line_number_tag<__LINE__> >()
+
 #define FUNCTION_ALIAS( f, name )                            \
-        function( f, #name, ape_tag<__LINE__>() )
+        function( f, #name, ape_tag< __LINE__ >() )
 
 #define FUNCTION( f ) FUNCTION_ALIAS( f, f )
 
@@ -195,7 +148,7 @@ class module_loader : public asl::PlugInBase,
 #endif
 
 #define Y60_APE_MODULE( name )                                                  \
-template <int LineNo> struct ape_tag {};                                        \
+template <int Counter> struct ape_tag {};                                       \
                                                                                 \
 class name ## _module : public y60::ape::module<name ## _module> {              \
     public:                                                                     \

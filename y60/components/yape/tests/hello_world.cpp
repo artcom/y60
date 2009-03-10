@@ -23,7 +23,17 @@ std::string greet_more_args(const std::string & msg, const int n) {
     return os.str();
 }
 
+foo::foo() {
+    std::cout << "foo::foo()" << std::endl;
+}
+
+foo::~foo() {
+    std::cout << "foo::~foo()" << std::endl;
+}
+
 const char * 
-foo::bar() { return "foobar\n"; }
+foo::bar() { return "bar"; }
+const char * 
+foo::foobar() { return "foobar"; }
 
 

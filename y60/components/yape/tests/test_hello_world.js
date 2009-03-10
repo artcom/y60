@@ -15,12 +15,15 @@ hello.greet2();
 hello.greet_n(5);
 print( hello.greet_more_args("foo", 3) );
 
-/*
 try { hello.greet_n("fifteen"); } catch (ex) { print( ex ); }
 
 try { hello.greet_n({foo: 5 }); } catch (ex) { print( ex ); }
 
 try { hello.greet_more_args("foo", 5, 7, 7); } catch (ex) { print( ex ); }
 
+var my_foo = new hello.foo();
+print( my_foo.bar() );
+
+/*
 loaded_modules( hello );
 */

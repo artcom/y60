@@ -6,11 +6,11 @@
 
 #       include <boost/preprocessor/iterate.hpp>
 #       include <boost/preprocessor/repetition/enum.hpp>
+#       include <boost/type_traits/is_member_function_pointer.hpp>
 
 #       include <js/spidermonkey/jsapi.h>
 
 #       include <asl/base/TraceUtils.h>
-#       include <asl/base/Logger.h>
 #       include <y60/jsbase/JScppUtils.h>
 
 #       include "exception.h"
@@ -20,26 +20,48 @@ namespace y60 { namespace ape { namespace detail {
 
 template <bool returns_void, int arity> struct deduce_tag {};
 
-template <typename Signature>
+/** A discriminator for the diffrent call semantics. Used to distinguish
+ *  between void and non-void calls and the diffrent arities.
+ */ 
+template <typename F, typename Sig>
 struct invoke_discriminator {
     typedef deduce_tag<
-        returns_void<Signature>::value,
-                arity<Signature>::value > type;
+        returns_void<Sig>::value,
+        arity<F,Sig>::value > type;
 };
 
-/* Generic invoker template. Just throws a compiletime exception if
- * the maximum arity is exceeded
+/** Generic invoker template. Just throws a compiletime exception if
+ *  the maximum arity is exceeded
  */
-template <typename F,
-          typename Signature,
-          typename UniqueId,
-          typename DeduceTag = typename invoke_discriminator<Signature>::type>
+template <typename F, typename Sig, typename UId,
+          typename DeduceTag = typename invoke_discriminator<F,Sig>::type>
 class invoker {
     public:
         static
         JSBool
         invoke(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, jsval * rval) {
-            // Y60_APE_MAX_ARITY exceeded
+            // COMPILE TIME ASSERTION: Y60_APE_MAX_ARITY exceeded.
+            // You probably got here because you try to wrap a function with
+            // more arguments than the current value of Y60_APE_MAX_ARITY.
+            // Either define Y60_APE_MAX_ARITY to a higher value before
+            // including any ape headers or rethink your design.
+            BOOST_STATIC_ASSERT(sizeof(F) == 0);
+            return JS_FALSE;
+        }
+};
+
+template <typename Class, typename F, typename Sig, typename UId,
+          typename DeduceTag = typename invoke_discriminator<F,Sig>::type>
+class member_invoker {
+    public:
+        static
+        JSBool
+        invoke(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, jsval * rval) {
+            // COMPILE TIME ASSERTION: Y60_APE_MAX_ARITY exceeded.
+            // You probably got here because you try to wrap a function with
+            // more arguments than the current value of Y60_APE_MAX_ARITY.
+            // Either define Y60_APE_MAX_ARITY to a higher value before
+            // including any ape headers or rethink your design.
             BOOST_STATIC_ASSERT(sizeof(F) == 0);
             return JS_FALSE;
         }
@@ -58,51 +80,140 @@ class invoker {
 #   define N BOOST_PP_ITERATION()
 #   define Y60_APE_ARG_REF(z, n, var) boost::get< n >( var )
 
-template <typename F,
-          typename Signature,
-          typename UniqueId>
-class invoker<F, Signature, UniqueId, deduce_tag<false, N> > {
+// XXX: Hendrik is right. This is too much duplicated code.
+/** invoker specialization for calls to free functions of arity N with return
+ *  value
+ */
+template <typename F, typename Sig, typename UId>
+class invoker<F, Sig, UId, deduce_tag<false, N> > {
     public:
+        typedef F function_type;
+        typedef Sig signature_type;
+
         static
         JSBool
         invoke(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, jsval * rval) {
             try {
-                arguments<Signature> args(cx, argc, argv);
+                arguments<F,Sig> args(cx, argc, argv);
                 *rval = jslib::as_jsval(cx,
                         f( BOOST_PP_ENUM( N, Y60_APE_ARG_REF, args ) ) );
-            } HANDLE_CPP_EXCEPTION;
-            return JS_TRUE;
+                return JS_TRUE;
+            } Y60_APE_CATCH_BLOCKS;
         }
-        static void init(F * func) { f = func; }
+        static void init(F func) {
+            if (f != 0) { 
+                throw ape_error("duplicate initialization of function ptr",
+                        PLUS_FILE_LINE);
+            }
+            f = func; 
+        }
     private:
-        static F * f;
+        static F f;
 };
 
-template <typename F, typename Signature, typename UniqueId>
-F * invoker<F, Signature, UniqueId, deduce_tag<false, N> >::f = 0;
+template <typename F, typename Sig, typename UId>
+F invoker<F, Sig, UId, deduce_tag<false, N> >::f = 0;
 
-template <typename F,
-          typename Signature,
-          typename UniqueId>
-class invoker<F, Signature, UniqueId, deduce_tag<true, N> > {
+/** invoker specialization for calls to free functions of arity N without 
+ * return value
+ */
+template <typename F, typename Sig, typename UId>
+class invoker<F, Sig, UId, deduce_tag<true, N> > {
+    public:
+        typedef F   function_type;
+        typedef Sig signature_type;
+
+        static
+        JSBool
+        invoke(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, jsval * rval) {
+            try {
+                arguments<F, Sig> args(cx, argc, argv);
+                f( BOOST_PP_ENUM( N, Y60_APE_ARG_REF, args  ) );
+                return JS_TRUE;
+            } Y60_APE_CATCH_BLOCKS;
+        }
+        static void init(F func) {
+            if (f != 0) { 
+                throw ape_error("duplicate initialization of function ptr",
+                        PLUS_FILE_LINE);
+            }
+            f = func;
+        }
+    private:
+        static F f;
+};
+
+template <typename F, typename Sig, typename UId>
+F invoker<F, Sig, UId, deduce_tag<true, N> >::f = 0;
+
+
+/** invoker specialization for calls to member functions of arity N with return
+ *  value
+ */
+template <typename Class, typename F, typename Sig, typename UId>
+class member_invoker<Class, F, Sig, UId, deduce_tag<false, N> > {
     public:
         static
         JSBool
         invoke(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, jsval * rval) {
             try {
-                arguments<Signature> args(cx, argc, argv);
-                f( BOOST_PP_ENUM( N, Y60_APE_ARG_REF, args  ) );
-                *rval = JSVAL_VOID; // XXX needed?
-            } HANDLE_CPP_EXCEPTION;
-            return JS_TRUE;
+                if ( ! JS_InstanceOf(cx, obj, & Class::js_class, argv)) {
+                    throw ape_error("object is not of this class", PLUS_FILE_LINE);
+                }
+                typedef typename Class::native_type native_t;
+                native_t * n = static_cast<native_t*>( JS_GetPrivate( cx, obj));
+                if ( ! n ) {
+                    throw ape_error("failed to get native instance", PLUS_FILE_LINE);
+                }
+                arguments<F,Sig> args(cx, argc, argv);
+                *rval = jslib::as_jsval(cx,
+                        (*n.*f)( BOOST_PP_ENUM( N, Y60_APE_ARG_REF, args ) ) );
+                return JS_TRUE;
+            } Y60_APE_CATCH_BLOCKS;
         }
-        static void init(F * func) { f = func; }
+        static void init(F func) {
+            if (f != 0) { 
+                throw ape_error("duplicate initialization of function ptr",
+                        PLUS_FILE_LINE);
+            }
+            f = func; 
+        }
     private:
-        static F * f;
+        static F f;
 };
 
-template <typename F, typename Signature, typename UniqueId>
-F * invoker<F, Signature, UniqueId, deduce_tag<true, N> >::f = 0;
+template <typename Class, typename F, typename Sig, typename UId>
+F member_invoker<Class, F, Sig, UId, deduce_tag<false, N> >::f = 0;
+
+/** invoker specialization for calls to member functions of arity N without 
+ * return value
+ */
+template <typename Class, typename F, typename Sig, typename UId>
+class member_invoker<Class, F, Sig, UId, deduce_tag<true, N> > {
+    public:
+        static
+        JSBool
+        invoke(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, jsval * rval) {
+            try {
+
+                arguments<F,Sig> args(cx, argc, argv);
+                f( BOOST_PP_ENUM( N, Y60_APE_ARG_REF, args  ) );
+                return JS_TRUE;
+            } Y60_APE_CATCH_BLOCKS;
+        }
+        static void init(F * func) {
+            if (f != 0) { 
+                throw ape_error("duplicate initialization of function ptr",
+                        PLUS_FILE_LINE);
+            }
+            f = func;
+        }
+    private:
+        static F f;
+};
+
+template <typename Class, typename F, typename Sig, typename UId>
+F member_invoker<Class, F, Sig, UId, deduce_tag<true, N> >::f = 0;
 
 #   undef Y60_APE_ARG_REF
 

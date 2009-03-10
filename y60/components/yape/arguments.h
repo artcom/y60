@@ -3,47 +3,64 @@
 
 #include "y60_ape_settings.h"
 
-//#include "signature_utilities.h"
-
 #include <boost/tuple/tuple.hpp> 
-#include <boost/mpl/transform_view.hpp>
-#include <boost/mpl/reverse_fold.hpp>
-#include <boost/mpl/iterator_range.hpp>
-#include <boost/mpl/empty_sequence.hpp>
-#include <boost/mpl/begin.hpp>
-#include <boost/mpl/end.hpp>
-#include <boost/mpl/next.hpp>
-#include <boost/mpl/front.hpp>
-#include <boost/mpl/if.hpp>
-#include <boost/mpl/greater.hpp>
-#include <boost/mpl/size.hpp>
-#include <boost/mpl/range_c.hpp>
-#include <boost/mpl/int.hpp>
+#include <boost/type_traits.hpp> 
+
+#include <boost/mpl/advance.hpp>
 #include <boost/mpl/at.hpp>
+#include <boost/mpl/begin.hpp>
+#include <boost/mpl/empty_sequence.hpp>
+#include <boost/mpl/end.hpp>
 #include <boost/mpl/for_each.hpp>
+#include <boost/mpl/front.hpp>
+#include <boost/mpl/greater.hpp>
+#include <boost/mpl/if.hpp>
+#include <boost/mpl/int.hpp>
+#include <boost/mpl/iterator_range.hpp>
+#include <boost/mpl/minus.hpp>
+#include <boost/mpl/range_c.hpp>
+#include <boost/mpl/reverse_fold.hpp>
+#include <boost/mpl/size.hpp>
+#include <boost/mpl/transform_view.hpp>
 
 #include "typelist.h"
 
 namespace y60 { namespace ape { namespace detail {
 
-template <typename Signature>
-struct get_arguments :
-        boost::mpl::if_<
-                boost::mpl::greater< boost::mpl::size<Signature>, boost::mpl::int_<1> >,
+template <typename F>
+struct first_arg_index {
+    typedef typename boost::mpl::if_<
+        boost::is_member_function_pointer<F>,
+        boost::mpl::int_<2>,
+        boost::mpl::int_<1> >::type type;
+};
+
+template <typename F, typename Signature>
+class get_arguments {
+    private:
+        typedef typename first_arg_index<F>::type first_arg_idx;
+    public:
+        typedef typename boost::mpl::if_<
+            boost::mpl::greater< boost::mpl::size<Signature>, first_arg_idx >,
                 boost::mpl::iterator_range< 
-                    typename boost::mpl::next< typename boost::mpl::begin<Signature>::type>::type,
+                    typename boost::mpl::advance<typename boost::mpl::begin<Signature>::type, first_arg_idx>::type,
                     typename boost::mpl::end<Signature>::type>,
-                boost::mpl::vector0<> > {};
+                boost::mpl::vector0<> >::type type;
+};
 
 template <typename Signature>
-    struct returns_void :
+struct returns_void :
         boost::is_void< typename boost::mpl::front<Signature>::type > {};
 
-template <typename Signature>
-    struct arity {
-        enum { value = boost::mpl::size< typename get_arguments<Signature>::type >::value };
-    };
+template <typename F, typename Signature>
+struct arity {
+        enum {
+            value  = boost::mpl::minus<
+                            typename boost::mpl::size<Signature>::type, 
+                            typename first_arg_index<F>::type>::type::value 
+        };
 
+};
 
 struct storage_type {
     template <typename T>
@@ -64,13 +81,13 @@ struct tuple_for_args :
                     boost::tuples::null_type, 
                     boost::tuples::cons<boost::mpl::_2, boost::mpl::_1> > {};
 
-template <typename Signature>
+template <typename F, typename Signature>
 inline
 void
 check_arity(uintN argc) {
-    if ( argc != arity<Signature>::value ) {
+    if ( argc != arity<F,Signature>::value ) {
         std::ostringstream os;
-        os << "expected " << arity<Signature>::value << " arguments but got " << argc;
+        os << "expected " << arity<F,Signature>::value << " arguments but got " << argc;
         throw bad_arguments( os.str(), PLUS_FILE_LINE );
     }
 }
@@ -95,7 +112,7 @@ class convert_arguments {
                 std::ostringstream os;
                 os << "could not convert argument " << I::value << " with value '"
                     << js_string_rep << "' to native type '" 
-                    << asl::demangled_name< boost::mpl::at_c<Types, I::value> >() << "'";
+                    << asl::demangled_name< typename boost::mpl::at_c<Types, I::value>::type >() << "'";
                 throw bad_arguments(os.str(), PLUS_FILE_LINE);
             }
         }
@@ -105,23 +122,22 @@ class convert_arguments {
         Tuple     & args_;
 };
 
-template <typename Signature>
+template <typename F, typename Signature>
 class  arguments : public
-    tuple_for_args< typename get_arguments<Signature>::type>::type 
+    tuple_for_args< typename get_arguments<F,Signature>::type>::type 
 {
-        typedef typename get_arguments<Signature>::type argument_types;
-        typedef typename get_storage_types<Signature>::type storage_types;
+        typedef typename get_arguments<F,Signature>::type argument_types;
+        typedef typename get_storage_types<argument_types>::type storage_types;
     public:
         
         arguments( JSContext * cx, uintN argc, jsval * argv ) {
-            check_arity<Signature>(argc);    
-            typedef boost::mpl::range_c<uintN, 0, arity<Signature>::value> R;
+            check_arity<F,Signature>(argc);    
+            typedef boost::mpl::range_c<uintN, 0, arity<F,Signature>::value> R;
             boost::mpl::for_each< R >(
                     convert_arguments<arguments, storage_types>( cx, argv, *this ) );
         }
 
 };
-
 
 }}} // end of namespace detail, ape, y60
 
