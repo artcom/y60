@@ -56,6 +56,10 @@ macro(y60_add_component COMPONENT_NAME)
         ${COMPONENT_NAME} y60/components
         ${ARGN}
     )
+    # XXX: semi-dirty path hack
+    if(UNIX AND Y60_CURRENT_APPLICATION)
+        append_global(${Y60_CURRENT_APPLICATION}_BUILD_PATH ${CMAKE_CURRENT_BINARY_DIR})
+    endif(UNIX AND Y60_CURRENT_APPLICATION)
 endmacro(y60_add_component)
 
 macro(y60_add_launcher NAME)
