@@ -25,7 +25,7 @@ include_directories(
     ${CMAKE_BINARY_DIR}/netsrc/paintlib/include
     ${CMAKE_BINARY_DIR}/netsrc/spidermonkey/include # XXX: tracemonkey
     ${CMAKE_BINARY_DIR}/netsrc/SDL_ttf2/include
-    ${CMAKE_BINARY_DIR}/netsrc/oscpack
+    ${CMAKE_BINARY_DIR}/netsrc/oscpack/include
     ${CMAKE_SOURCE_DIR}/netsrc/fakeatl
 )
 
