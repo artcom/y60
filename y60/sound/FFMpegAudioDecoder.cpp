@@ -121,7 +121,7 @@ Time FFMpegAudioDecoder::getDuration() const {
         return (double(myStream->duration)*av_q2d(myStream->time_base));
 #else
         return (double(myStream->duration)/double(AV_TIME_BASE));
-#endif	
+#endif
     } else {
         return 0;
     }
