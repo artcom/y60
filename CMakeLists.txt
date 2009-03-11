@@ -20,6 +20,15 @@ list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_BINARY_DIR}/netsrc/fakeatl)
 list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_SOURCE_DIR}/netsrc/fakeatl) # XXX: [IA] this should not be needed
 list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_BINARY_DIR}/netsrc/spidermonkey) # XXX: tracemonkey?
 
+# this replaces the (currently) broken transient depend include path propagation
+include_directories(
+    ${CMAKE_BINARY_DIR}/netsrc/paintlib/include
+    ${CMAKE_BINARY_DIR}/netsrc/spidermonkey/include # XXX: tracemonkey
+    ${CMAKE_BINARY_DIR}/netsrc/SDL_ttf2/include
+    ${CMAKE_BINARY_DIR}/netsrc/oscpack
+    ${CMAKE_SOURCE_DIR}/netsrc/fakeatl
+)
+
 # tell acmake that it is being used in integrated mode
 set(ACMAKE_INTEGRATED_BUILD YES)
 
