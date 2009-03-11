@@ -119,9 +119,12 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
         var mySetting = mySection.childNode(theSetting);
         if (!mySetting) {
             mySetting = mySection.appendChild(Node.createElement(theSetting));
+            mySetting.appendChild(Node.createTextNode(theValue));
+        } else {
+            mySetting.firstChild.nodeValue = theValue;
         }
 
-        mySetting.firstChild.nodeValue = theValue;
+        notifyListeners();
     }
 
     obj.restoreSettings = function() {
