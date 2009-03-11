@@ -33,6 +33,9 @@ macro(ac_add_plugin PLUGIN_NAME PLUGIN_PATH)
     # figure out file name for build info
     _ac_buildinfo_filename(${THIS_PLUGIN_NAME} THIS_PLUGIN_BUILDINFO_FILE)
 
+    # compute full set of dependencies
+    _ac_compute_dependencies(${THIS_PLUGIN_NAME} THIS_PLUGIN_DEPENDS THIS_PLUGIN_EXTERNS)
+
     # create src symlink in binary dir
     _ac_create_source_symlinks()
 

@@ -36,6 +36,9 @@ macro(ac_add_executable EXECUTABLE_NAME)
                 ${THIS_EXECUTABLE_OSX_BUNDLE_RESOURCES})
     endif(THIS_EXECUTABLE_OSX_BUNDLE)
 
+    # compute full set of dependencies
+    _ac_compute_dependencies(${THIS_EXECUTABLE_NAME} THIS_EXECUTABLE_DEPENDS THIS_EXECUTABLE_EXTERNS)
+
     # create src symlink in binary dir
     _ac_create_source_symlinks()
 

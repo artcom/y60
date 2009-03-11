@@ -106,10 +106,14 @@ function(_ac_collect_depend_externs OUT)
     set(EXTERNS)
     foreach(DEPEND ${ARGN})
         get_global(${DEPEND}_PROJECT _PROJECT)
-        if(${_PROJECT}_IS_IMPORTED)
-            get_global(${_PROJECT}_${DEPEND}_EXTERNS _EXTERNS)
+        if(_PROJECT)
+            # XXX: we should not fiddle with this internal property
+            if(NOT ACMAKE_CURRENT_PROJECT STREQUAL ${_PROJECT})
+                list(APPEND EXTERNS ${_PROJECT})
+            endif(NOT ACMAKE_CURRENT_PROJECT STREQUAL ${_PROJECT})
+            get_global(${DEPEND}_EXTERNS _EXTERNS)
             list(APPEND EXTERNS ${_EXTERNS})
-        endif(${_PROJECT}_IS_IMPORTED)
+        endif(_PROJECT)
     endforeach(DEPEND)
     set(${OUT} "${EXTERNS}" PARENT_SCOPE)
 endfunction(_ac_collect_depend_externs)
@@ -182,10 +186,10 @@ function(_ac_collect_extern_libraries OUT)
     set(${OUT}_OPTIMIZED "${OPTIMIZED}" PARENT_SCOPE)
 endfunction(_ac_collect_extern_libraries)
     
-# attach libraries from DEPENDS and EXTERNS to TARGET
-macro(_ac_attach_depends TARGET DEPENDS EXTERNS)
+function(_ac_compute_dependencies TARGET DEPENDS_VAR EXTERNS_VAR)
+    set(DEPENDS ${${DEPENDS_VAR}})
+    set(EXTERNS ${${EXTERNS_VAR}})
 
-    debug_target("Attaching dependencies for ${TARGET}")
 
     ### COLLECT EXTERNS
 
@@ -200,6 +204,15 @@ macro(_ac_attach_depends TARGET DEPENDS EXTERNS)
         list(REMOVE_DUPLICATES EXTERNS)
     endif(EXTERNS)
 
+
+    set(${DEPENDS_VAR} ${DEPENDS} PARENT_SCOPE)
+    set(${EXTERNS_VAR} ${EXTERNS} PARENT_SCOPE)
+endfunction(_ac_compute_dependencies)
+
+# attach libraries from DEPENDS and EXTERNS to TARGET
+macro(_ac_attach_depends TARGET DEPENDS EXTERNS)
+
+    debug_target("Attaching dependencies for ${TARGET}")
 
     ### COLLECT DEFINITIONS
 

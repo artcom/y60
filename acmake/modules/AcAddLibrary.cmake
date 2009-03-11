@@ -67,7 +67,10 @@ macro(ac_add_library LIBRARY_NAME LIBRARY_PATH)
          ${CMAKE_CURRENT_BINARY_DIR}/${ACMAKE_BINARY_SUBDIR}/acmake/${THIS_LIBRARY_NAME}_paths.h
          "ac_add_library()"
     )
-    
+
+    # compute full set of dependencies
+    _ac_compute_dependencies(${THIS_LIBRARY_NAME} THIS_LIBRARY_DEPENDS THIS_LIBRARY_EXTERNS)
+
     # create src symlink in binary dir
     _ac_create_source_symlinks()
 
@@ -104,6 +107,7 @@ macro(ac_add_library LIBRARY_NAME LIBRARY_PATH)
             ${THIS_LIBRARY_HEADERS}
             ${THIS_LIBRARY_BUILDINFO_FILE}
     )
+
     # add global include and library paths
     _ac_add_global_paths(${THIS_LIBRARY_NAME})
 

@@ -207,11 +207,11 @@ macro(ac_project_add_target TARGET_TYPE_PLURAL TARGET_NAME)
         append_global(${ACMAKE_CURRENT_PROJECT}_${TARGET_TYPE_PLURAL} ${TARGET_NAME})
 
         # fill the target object
-        set_global(${ACMAKE_CURRENT_PROJECT}_${TARGET_NAME}_LIBRARIES    ${TARGET_NAME})
-        set_global(${ACMAKE_CURRENT_PROJECT}_${TARGET_NAME}_DEPENDS      "")
-        set_global(${ACMAKE_CURRENT_PROJECT}_${TARGET_NAME}_EXTERNS      "")
-        set_global(${ACMAKE_CURRENT_PROJECT}_${TARGET_NAME}_INCLUDE_DIRS ${CMAKE_INSTALL_PREFIX}/include)
-        set_global(${ACMAKE_CURRENT_PROJECT}_${TARGET_NAME}_LIBRARY_DIRS ${CMAKE_INSTALL_PREFIX}/lib)
+        set_global(${TARGET_NAME}_LIBRARIES    ${TARGET_NAME})
+        set_global(${TARGET_NAME}_DEPENDS      "")
+        set_global(${TARGET_NAME}_EXTERNS      "")
+        set_global(${TARGET_NAME}_INCLUDE_DIRS ${CMAKE_INSTALL_PREFIX}/include)
+        set_global(${TARGET_NAME}_LIBRARY_DIRS ${CMAKE_INSTALL_PREFIX}/lib)
 
         # add externs to project object
         foreach(EXTERN ${THIS_TARGET_EXTERNS})
@@ -221,13 +221,13 @@ macro(ac_project_add_target TARGET_TYPE_PLURAL TARGET_NAME)
         # add externs to target object
         foreach(EXTERN ${THIS_TARGET_EXTERNS})
             debug_exports("Target depends on extern ${EXTERN}")
-            append_global_unique(${ACMAKE_CURRENT_PROJECT}_${TARGET_NAME}_EXTERNS ${EXTERN})
+            append_global_unique(${TARGET_NAME}_EXTERNS ${EXTERN})
         endforeach(EXTERN ${THIS_TARGET_EXTERNS})
 
         # add externs to target object
         foreach(DEPEND ${THIS_TARGET_DEPENDS})
             debug_exports("Target depends on depend ${DEPEND}")
-            append_global_unique(${ACMAKE_CURRENT_PROJECT}_${TARGET_NAME}_DEPENDS ${DEPEND})
+            append_global_unique(${TARGET_NAME}_DEPENDS ${DEPEND})
         endforeach(DEPEND ${THIS_TARGET_DEPENDS})
 
         # for each depend, add the externs it pulls in
@@ -239,7 +239,7 @@ macro(ac_project_add_target TARGET_TYPE_PLURAL TARGET_NAME)
             # and add it if there is anything to add
             if(_IMPLICIT_EXTERNS)
                 debug_exports("Found ${DEPEND} to require ${_IMPLICIT_EXTERNS}")
-                append_global_unique(${ACMAKE_CURRENT_PROJECT}_${TARGET_NAME}_EXTERNS ${_IMPLICIT_EXTERNS})
+                append_global_unique(${TARGET_NAME}_EXTERNS ${_IMPLICIT_EXTERNS})
             endif(_IMPLICIT_EXTERNS)
         endforeach(DEPEND ${THIS_TARGET_DEPENDS})
     endif(ACMAKE_CURRENT_PROJECT)
@@ -370,7 +370,7 @@ macro(ac_end_project PROJECT_NAME)
     set(EXT "${THIS_PROJECT_BINARY_DIR}/Find${PROJECT_NAME}Targets.cmake")
     file(WRITE ${EXT} "# This generated script defines target dependencies for ${PROJECT_NAME}\n")
     foreach(EXECUTABLE ${THIS_PROJECT_EXECUTABLES})
-        get_globals(${PROJECT_NAME}_${EXECUTABLE} THIS_EXECUTABLE "LIBRARIES;INCLUDE_DIRS;LIBRARY_DIRS;DEPENDS;EXTERNS") # XXX: classify
+        get_globals(${EXECUTABLE} THIS_EXECUTABLE "LIBRARIES;INCLUDE_DIRS;LIBRARY_DIRS;DEPENDS;EXTERNS") # XXX: classify
 
         if(WIN32)
             set(LOCATION  "${CMAKE_INSTALL_PREFIX}/bin/${EXECUTABLE}.exe")
@@ -383,7 +383,7 @@ macro(ac_end_project PROJECT_NAME)
         file(APPEND ${EXT} "set(${EXECUTABLE}_LOCATION \"${LOCATION}\")\n")
     endforeach(EXECUTABLE ${THIS_PROJECT_EXECUTABLES})
     foreach(LIBRARY ${THIS_PROJECT_LIBRARIES})
-        get_globals(${PROJECT_NAME}_${LIBRARY} THIS_LIBRARY "LIBRARIES;INCLUDE_DIRS;LIBRARY_DIRS;DEPENDS;EXTERNS") # XXX: classify
+        get_globals(${LIBRARY} THIS_LIBRARY "LIBRARIES;INCLUDE_DIRS;LIBRARY_DIRS;DEPENDS;EXTERNS") # XXX: classify
 
         if(WIN32)
             set(OBJECT_LOCATION  "${CMAKE_INSTALL_PREFIX}/bin/${LIBRARY}.dll")
