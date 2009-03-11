@@ -24,7 +24,6 @@
 #    [ DEPENDS integrated_library ... ]
 #    [ EXTERNS imported_package ... ]
 #    [ TESTS   testname ... ]
-#    [ HEADER_ONLY ]
 #    [ DONT_INSTALL ]
 # )
 #
@@ -36,7 +35,8 @@
 #
 # HEADERS is a list of all public header files for the library.
 #
-# Unless the library is header-only, SOURCES must be a list of source files.
+# SOURCES is a list of source files for this library. If empty or not present
+# all the library is treated as a header-only library
 #
 # DEPENDS can be used to reference libraries that are defined
 # within this project or another cmake project.
@@ -46,8 +46,6 @@
 #
 # TESTS is a list of tests using a certain old A+C naming scheme.
 #
-# The flag HEADER_ONLY must be given for guess what.
-#
 # DONT_INSTALL can be used to prevent installation of this library.
 # Libraries used only for testing should get this flag.
 #
@@ -55,7 +53,7 @@ macro(ac_add_library LIBRARY_NAME LIBRARY_PATH)
     # put arguments into the THIS_LIBRARY namespace
     parse_arguments(THIS_LIBRARY
         "SOURCES;HEADERS;DEPENDS;EXTERNS;TESTS"
-        "HEADER_ONLY;DONT_INSTALL"
+        "DONT_INSTALL"
         ${ARGN})
     
     # do the same manually for name and path
@@ -73,80 +71,86 @@ macro(ac_add_library LIBRARY_NAME LIBRARY_PATH)
     # create src symlink in binary dir
     _ac_create_source_symlinks()
 
-    if(THIS_LIBRARY_HEADER_ONLY)
-        # for a header-only library
-        
-        if(NOT THIS_LIBRARY_DONT_INSTALL)
-            # if we should be installed
-
-            # define installation
-            install(
-                FILES ${THIS_LIBRARY_HEADERS}
-                    DESTINATION include/${THIS_LIBRARY_PATH}
-            )
-        endif(NOT THIS_LIBRARY_DONT_INSTALL)
-        
-    else(THIS_LIBRARY_HEADER_ONLY)
-        # for a full library
-        
+    if(NOT THIS_LIBRARY_SOURCES)
+        set(THIS_LIBRARY_HEADER_ONLY ON)
+        # CMake currently does not support header only libraries. To work around
+        # this limitation we create a dummy source file while configuring and
+        # treat the library as a full library afterwards.
+        set(_OUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/${ACMAKE_BINARY_SUBDIR})
+        set(_OUT_NAME cmake_header_only_workaround.cpp)
+        set(_OUT_FILE "${_OUT_DIR}/${_OUT_NAME}")
+        # TODO: check if we need a symbol at all. If not just use touch.
+        add_custom_command(
+                OUTPUT ${_OUT_FILE} 
+                COMMAND
+                    ${CMAKE_COMMAND}
+                        -E copy_if_different ${ACMAKE_TEMPLATES_DIR}/AcCMakeHeaderOnlyWorkaround.cpp
+                                             ${_OUT_FILE}
+                DEPENDS ${THIS_LIBRARY_HEADERS}
+                COMMENT "Creating CMake header only workaround"
+        )
+        set( THIS_LIBRARY_SOURCES ${_OUT_FILE} )
+        set(THIS_LIBRARY_BUILDINFO_FILE)
+    else(NOT THIS_LIBRARY_SOURCES)
+        set(THIS_LIBRARY_HEADER_ONLY OFF)
         # figure out file name for build info
         _ac_buildinfo_filename("${THIS_LIBRARY_NAME}" THIS_LIBRARY_BUILDINFO_FILE)
+    endif(NOT THIS_LIBRARY_SOURCES)
+        
+    # define the library target
+    add_library(
+        ${THIS_LIBRARY_NAME} SHARED
+            ${THIS_LIBRARY_SOURCES}
+            ${THIS_LIBRARY_HEADERS}
+            ${THIS_LIBRARY_BUILDINFO_FILE}
+    )
+    # add global include and library paths
+    _ac_add_global_paths(${THIS_LIBRARY_NAME})
 
-        # define the library target
-        add_library(
-            ${THIS_LIBRARY_NAME} SHARED
-                ${THIS_LIBRARY_SOURCES}
-                ${THIS_LIBRARY_HEADERS}
-                ${THIS_LIBRARY_BUILDINFO_FILE}
-                ${CMAKE_CURRENT_SOURCE_DIR}/.svn/entries # XXX: really needed? consistent for all target types?
-        )
+    # declare include and library searchpath
+    _ac_add_dependency_paths(
+        ${THIS_LIBRARY_NAME}
+        "${THIS_LIBRARY_DEPENDS}" "${THIS_LIBRARY_EXTERNS}"
+    )
 
-        # add global include and library paths
-        _ac_add_global_paths(${THIS_LIBRARY_NAME})
+    # add path to generated headers (XXX: only done for libs right now)
+    _ac_add_include_path(${THIS_LIBRARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${ACMAKE_BINARY_SUBDIR} NO)
 
-        # declare include and library searchpath
-        _ac_add_dependency_paths(
-            ${THIS_LIBRARY_NAME}
-            "${THIS_LIBRARY_DEPENDS}" "${THIS_LIBRARY_EXTERNS}"
-        )
-
-        # add path to generated headers (XXX: only done for libs right now)
-        _ac_add_include_path(${THIS_LIBRARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${ACMAKE_BINARY_SUBDIR} NO)
-
+    if(NOT THIS_LIBRARY_HEADER_ONLY)
         # update repository and revision information
         _ac_add_repository_info(
                 ${THIS_LIBRARY_NAME} "${THIS_LIBRARY_BUILDINFO_FILE}"
                 LIBRARY ${THIS_LIBRARY_SOURCES} ${THIS_LIBRARY_HEADERS}
         )
+    endif(NOT THIS_LIBRARY_HEADER_ONLY)
 
-        # attach headers to target
-        set_target_properties(
-            ${THIS_LIBRARY_NAME} PROPERTIES
-                PUBLIC_HEADER "${THIS_LIBRARY_HEADERS}"
+    # attach headers to target
+    set_target_properties(
+        ${THIS_LIBRARY_NAME} PROPERTIES
+            PUBLIC_HEADER "${THIS_LIBRARY_HEADERS}"
+    )
+
+    # attach rpath configuration
+    _ac_attach_rpath(${THIS_LIBRARY_NAME})
+    
+    # attach depends and externs
+    _ac_attach_depends(${THIS_LIBRARY_NAME} "${THIS_LIBRARY_DEPENDS}" "${THIS_LIBRARY_EXTERNS}")
+    
+    # define installation
+    if(NOT THIS_LIBRARY_DONT_INSTALL)
+        # XXX: handle header only lib
+        install(
+            TARGETS ${THIS_LIBRARY_NAME}
+                DESTINATION lib # XXX I think this is a hack to shut up cmake.
+            EXPORT  ${CMAKE_PROJECT_NAME}
+            RUNTIME
+                DESTINATION bin
+            LIBRARY
+                DESTINATION lib
+            PUBLIC_HEADER
+                DESTINATION include/${THIS_LIBRARY_PATH}
         )
-
-        # attach rpath configuration
-        _ac_attach_rpath(${THIS_LIBRARY_NAME})
-        
-        # attach depends and externs
-        _ac_attach_depends(${THIS_LIBRARY_NAME} "${THIS_LIBRARY_DEPENDS}" "${THIS_LIBRARY_EXTERNS}")
-        
-        # define installation
-        if(NOT THIS_LIBRARY_DONT_INSTALL)
-            install(
-                TARGETS ${THIS_LIBRARY_NAME}
-                    DESTINATION lib
-                EXPORT  ${CMAKE_PROJECT_NAME}
-                RUNTIME
-                    DESTINATION bin
-                LIBRARY
-                    DESTINATION lib
-                PUBLIC_HEADER
-                    DESTINATION include/${THIS_LIBRARY_PATH}
-            )
-        endif(NOT THIS_LIBRARY_DONT_INSTALL)
-        
-    endif(THIS_LIBRARY_HEADER_ONLY)
+    endif(NOT THIS_LIBRARY_DONT_INSTALL)
 
     # create tests
     # TODO: clean up test naming
@@ -157,11 +161,18 @@ macro(ac_add_library LIBRARY_NAME LIBRARY_PATH)
         foreach(TEST ${THIS_LIBRARY_TESTS})
             set(TEST_NAME "${TEST_NAMESPACE}_test${TEST}")
             
+            # header only libraries do not require the lib which only
+            # exists as a workaround
+            if(THIS_LIBRARY_HEADER_ONLY)
+                set(THIS_LIBRARY_MAYBE_LINK_SELF)
+            else(THIS_LIBRARY_HEADER_ONLY)
+                set(THIS_LIBRARY_MAYBE_LINK_SELF ${THIS_LIBRARY_NAME})
+            endif(THIS_LIBRARY_HEADER_ONLY)
             # define the executable
             ac_add_executable(
                 ${TEST_NAME}
                 SOURCES test${TEST}.tst.cpp
-                DEPENDS ${THIS_LIBRARY_DEPENDS} ${THIS_LIBRARY_NAME} # XXX: asl-specifics
+                DEPENDS ${THIS_LIBRARY_DEPENDS} ${THIS_LIBRARY_MAYBE_LINK_SELF} # XXX: asl-specifics
                 EXTERNS ${THIS_LIBRARY_EXTERNS}
                 DONT_INSTALL
                 NO_REVISION_INFO
@@ -171,7 +182,16 @@ macro(ac_add_library LIBRARY_NAME LIBRARY_PATH)
             # XXX: maybe remove when executable has own conf header?
             _ac_add_include_path(${TEST_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${ACMAKE_BINARY_SUBDIR} NO)
         
-            # XXX: multiple build types in VS
+            # XXX: We know how to do better here! We should use
+            #      CMAKE_CFG_INTDIR and run ctest through vcbuild:
+            #      
+            #      $ vcbuild RUN_TESTS.vcproj "Win32|<build_config>"
+            #
+            #      If this is neccessary at all. I still think the above
+            #      command line does exactly the right thing without our
+            #      interference.
+            #      I'm on Mac OS right now so I can't test it and I don't want
+            #      to break the build. Buddah is smiling so nicely. [DS]
             get_target_property(
                 TEST_LOCATION ${TEST_NAME} LOCATION_${CMAKE_BUILD_TYPE}
             )
@@ -191,3 +211,4 @@ macro(ac_add_library LIBRARY_NAME LIBRARY_PATH)
     endif(NOT THIS_LIBRARY_DONT_INSTALL)
 
 endmacro(ac_add_library)
+

@@ -32,8 +32,10 @@ add_subdirectory(X3dImporter)
 add_subdirectory(FFMpegDecoder1)
 add_subdirectory(FFMpegDecoder2)
 
-#add_subdirectory(yape)
-
+option(Y60_APE_EXPERIMENT "Enable experimental *monkey wrappers" NO)
+if(Y60_APE_EXPERIMENT)
+    add_subdirectory(yape)
+endif(Y60_APE_EXPERIMENT)
 
 if(GSTREAMER_FOUND)
     add_subdirectory(GStreamerCapture)

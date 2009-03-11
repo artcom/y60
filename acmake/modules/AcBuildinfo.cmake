@@ -79,9 +79,10 @@ if(ACMAKE_BUILDINFO)
 endif( ACMAKE_BUILDINFO )
 
 macro(_ac_add_repository_info TARGET_NAME BUILDINFO_FILENAME TARGET_TYPE)
-    if( ACMAKE_BUILDINFO)
+    if(ACMAKE_BUILDINFO)
         set(ALL_DEPEND_FILES ${BUILDINFO_SCM_DEPEND_FILES} ${ARGN})
-        add_custom_command( OUTPUT ${BUILDINFO_FILENAME}
+        add_custom_command(
+                OUTPUT ${BUILDINFO_FILENAME}
                 COMMAND
                     ${CMAKE_COMMAND}
                           -D "SOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR}"
@@ -95,37 +96,19 @@ macro(_ac_add_repository_info TARGET_NAME BUILDINFO_FILENAME TARGET_TYPE)
                           -D "ACMAKE_MODULES_DIR=${ACMAKE_MODULES_DIR}"
                           -P ${ACMAKE_TOOLS_DIR}/update_buildinfo_file.cmake
                  DEPENDS ${ALL_DEPEND_FILES}
-                 COMMENT "Updating build information for ${TARGET_NAME}")
-        #set_source_files_properties( ${BUILDINFO_FILENAME} PROPERTIES GENERATED ON)
-    endif( ACMAKE_BUILDINFO)
+                 COMMENT "Updating build information for ${TARGET_NAME}"
+        )
+        set_source_files_properties(${BUILDINFO_FILENAME} PROPERTIES GENERATED ON)
+    endif(ACMAKE_BUILDINFO)
 endmacro(_ac_add_repository_info )
 
 macro(_ac_buildinfo_filename TARGET_NAME OUTPUT_VARIABLE)
-    if( ACMAKE_BUILDINFO)
+    if(ACMAKE_BUILDINFO)
         set( ${OUTPUT_VARIABLE}
                 "${CMAKE_CURRENT_BINARY_DIR}/${ACMAKE_BINARY_SUBDIR}/${TARGET_NAME}${ACMAKE_BUILDINFO_FILE_SUFFIX}")
-    else( ACMAKE_BUILDINFO)
+    else(ACMAKE_BUILDINFO)
         set(${OUTPUT_VARIABLE})
-    endif( ACMAKE_BUILDINFO)
+    endif(ACMAKE_BUILDINFO)
 endmacro(_ac_buildinfo_filename)
-
-macro( ac_register_build_configuration NAME )
-    list(FIND CMAKE_CONFIGURATION_TYPES ${NAME} INDEX)
-    if(NOT INDEX EQUAL -1)
-        message(SEND_ERROR "build configuration '${NAME}' already exists.")
-    else(NOT INDEX EQUAL -1)
-        list(APPEND CMAKE_CONFIGURATION_TYPES ${NAME})
-    endif(NOT INDEX EQUAL -1)
-endmacro( ac_register_build_configuration)
-
-macro(ac_create_build_config_header)
-    set(ACMAKE_GENERATOR )
-    set(ACMAKE_TEMPLATE_FILE "build_configuration.h.in")
-    ac_configure_file(
-            "${ACMAKE_TEMPLATES_DIR}/AcBuildConfiguration.h.in"
-            "${CMAKE_BINARY_DIR}/include/acmake/build_configuration.h"
-            "ac_create_build_config_header()"
-    )
-endmacro(ac_create_build_config_header)
 
 mark_as_advanced( ACMAKE_BUILDINFO_TEMPLATE SVN SVNVERSION )

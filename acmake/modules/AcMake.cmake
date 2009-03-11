@@ -55,6 +55,7 @@ include(AcTesting)
 include(AcTarget)
 include(AcProject)
 include(AcBuildinfo)
+include(AcBuildConfiguration)
 
 include(AcAddExecutable)
 include(AcAddLibrary)
@@ -62,6 +63,8 @@ include(AcAddPlugin)
 
 include(AcCoverage)
 include(AcProfiling)
+
+ac_done_registering_build_types()
 
 include(AcDocumentation)
 
@@ -71,6 +74,4 @@ include(AcAddPro60Dependencies)
 
 
 ### GLOBAL BUILD SETUP
-
-ac_create_build_config_header()
 
