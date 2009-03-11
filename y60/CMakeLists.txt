@@ -50,7 +50,7 @@ ac_add_project(Y60
 )
 
 # Make sure we can access our includes without staging
-include_directories(../)
+include_directories(../ ${CMAKE_CURRENT_BINARY_DIR}/../)
 
 # Traverse our subdirectories
 add_subdirectory(base)
