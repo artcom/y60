@@ -1,6 +1,6 @@
 # __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 #
-# Copyright (C) 1993-2008, ART+COM AG Berlin, Germany <www.artcom.de>
+# Copyright (C) 1993-2009, ART+COM AG Berlin, Germany <www.artcom.de>
 #
 # This file is part of the ART+COM CMake Library (acmake).
 #
@@ -10,11 +10,43 @@
 # __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 #
 #
-# Macro to declare a plugin within the current acmake project.
+# Macro to declare a plugin within the current acmake project
 #
 # __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 #
 
+# Define a plugin in the current ACMake project.
+#
+# ac_add_plugin(
+#    name path
+#    SOURCES sourcefile ...
+#    [ HEADERS headerfile ... ]
+#    [ DEPENDS integrated_library ... ]
+#    [ EXTERNS imported_package ... ]
+#    [ DONT_INSTALL ]
+# )
+#
+# The NAME is used in project exports and for the target name.
+#
+# The PATH defines where includes are installed within the installed include
+# tree. It is also used for the install location of the plugin. Example:
+#  If PATH is "y60/components", then headers will be installed to
+#  "include/y60/components/${NAME}". The Plugin itself will be installed
+#  to "lib/y60/components".
+#
+# HEADERS is a list of all public header files for the plugin.
+#
+# SOURCES is a list of source files for the plugin.
+#
+# DEPENDS can be used to reference libraries that are defined
+# within this project or another cmake project.
+#
+# EXTERNS can be used to reference libraries that are defined
+# outside the project (i.e. by a find package or pkg-config).
+#
+# DONT_INSTALL can be used to prevent installation of the plugin.
+# Plugins used only for testing should get this flag.
+#
 macro(ac_add_plugin PLUGIN_NAME PLUGIN_PATH)
     # put arguments into the THIS_PLUGIN namespace
     parse_arguments(THIS_PLUGIN

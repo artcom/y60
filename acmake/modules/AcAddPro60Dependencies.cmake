@@ -1,6 +1,6 @@
 # __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 #
-# Copyright (C) 1993-2008, ART+COM AG Berlin, Germany <www.artcom.de>
+# Copyright (C) 1993-2009, ART+COM AG Berlin, Germany <www.artcom.de>
 #
 # This file is part of the ART+COM CMake Library (acmake).
 #
@@ -10,9 +10,9 @@
 # __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 #
 #
-# Handle PRO60 dependencies.
+# Import PRO60 dependency package.
 #
-# XXX:This is pro60-specific and should not be in ACMake.
+# XXX: This is pro60-specific and should not be in ACMake.
 #
 # __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 #

@@ -1,6 +1,6 @@
 # __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 #
-# Copyright (C) 2009, ART+COM AG Berlin, Germany <www.artcom.de>
+# Copyright (C) 1993-2009, ART+COM AG Berlin, Germany <www.artcom.de>
 #
 # This file is part of the ART+COM CMake Library (acmake).
 #
@@ -11,6 +11,8 @@
 #
 #
 # Utilities to help with adding resources to Mac OS X bundles.
+#
+# XXX: revise/remove/finish this
 #
 # __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 #

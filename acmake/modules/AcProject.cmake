@@ -1,6 +1,6 @@
 # __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 #
-# Copyright (C) 1993-2008, ART+COM AG Berlin, Germany <www.artcom.de>
+# Copyright (C) 1993-2009, ART+COM AG Berlin, Germany <www.artcom.de>
 #
 # This file is part of the ART+COM CMake Library (acmake).
 #
@@ -17,10 +17,9 @@
 # generates a set of find-files for other projects to include.
 #
 # TODO:
-#  - rework dependency handling to be compatible
+#  - rework package dependency handling to be compatible
 #    with pkg-config version expressions and more
 #    advanced packages with arguments like FindBoost
-#  - implement cpack support
 #
 # __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 #

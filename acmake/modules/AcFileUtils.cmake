@@ -1,6 +1,6 @@
 # __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 #
-# Copyright (C) 1993-2008, ART+COM AG Berlin, Germany <www.artcom.de>
+# Copyright (C) 1993-2009, ART+COM AG Berlin, Germany <www.artcom.de>
 #
 # This file is part of the ART+COM CMake Library (acmake).
 #
@@ -10,7 +10,7 @@
 # __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 #
 #
-# Utility macros for copying files
+# Utility macros for copying files.
 #
 # __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 #
@@ -55,5 +55,4 @@ macro(ac_configure_file FROM_FILE TO_FILE WHERE)
     set(ACMAKE_TEMPLATE_FILE "${FROM_FILE}")
     configure_file(${FROM_FILE} ${TO_FILE} @ONLY)
 endmacro(ac_configure_file)
-
 

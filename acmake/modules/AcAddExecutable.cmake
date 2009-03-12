@@ -1,6 +1,6 @@
 # __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 #
-# Copyright (C) 1993-2008, ART+COM AG Berlin, Germany <www.artcom.de>
+# Copyright (C) 1993-2009, ART+COM AG Berlin, Germany <www.artcom.de>
 #
 # This file is part of the ART+COM CMake Library (acmake).
 #
@@ -10,11 +10,37 @@
 # __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 #
 #
-# Macro to declare an executable within the current acmake project.
+# Macro to declare an executable within the current acmake project
 #
 # __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 #
 
+# XXX: HEADERS is allowed as an argument. This should be removed.
+# XXX: document/remove/revise OSX bundle resource support
+
+# Define an executable in the current ACMake project.
+#
+# ac_add_executable(
+#    name
+#    SOURCES sourcefile ...
+#    [ DEPENDS integrated_library ... ]
+#    [ EXTERNS imported_package ... ]
+#    [ DONT_INSTALL ]
+# )
+#
+# The NAME is used in project exports and for the target name.
+#
+# SOURCES is a list of source files for the executable.
+#
+# DEPENDS can be used to reference libraries that are defined
+# within this project or another cmake project.
+#
+# EXTERNS can be used to reference libraries that are defined
+# outside the project (i.e. by a find package or pkg-config).
+#
+# DONT_INSTALL can be used to prevent installation of the executable.
+# Executables used only for testing should get this flag.
+#
 macro(ac_add_executable EXECUTABLE_NAME)
     # put arguments into the THIS_EXECUTABLE namespace
     parse_arguments(THIS_EXECUTABLE
