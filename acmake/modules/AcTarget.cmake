@@ -191,6 +191,18 @@ function(_ac_compute_dependencies TARGET DEPENDS_VAR EXTERNS_VAR)
     set(EXTERNS ${${EXTERNS_VAR}})
 
 
+    ### COLLECT DEPENDS
+
+    foreach(DEPEND ${DEPENDS})
+        get_global(${DEPEND}_DEPENDS DEPEND_DEPENDS)
+        list(APPEND DEPENDS ${DEPEND_DEPENDS})
+    endforeach(DEPEND ${DEPENDS})
+
+    if(DEPENDS)
+        list(REMOVE_DUPLICATES DEPENDS)
+    endif(DEPENDS)
+
+
     ### COLLECT EXTERNS
 
     # depends can pull in externs
