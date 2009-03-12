@@ -139,6 +139,8 @@ int main( int argc, char *argv[])  {
         AC_INFO << "loading '" << myArguments.getArgument(1) << endl;
         PLAnyBmp mySecondBitmap;
         myDecoder.MakeBmpFromFile(myArguments.getArgument(1).c_str(), &mySecondBitmap, PLPixelFormat::A8R8G8B8);
+        myFirstBitmap.SetHasAlpha(false);
+        mySecondBitmap.SetHasAlpha(false);
 
         string myBaseName = asl::removeExtension(myArguments.getArgument(0));  
         float myTolerance = 0.0f;
