@@ -35,28 +35,32 @@ struct first_arg_index {
         boost::mpl::int_<1> >::type type;
 };
 
-template <typename F, typename Signature>
+template <typename F, typename Sig>
 class get_arguments {
     private:
         typedef typename first_arg_index<F>::type first_arg_idx;
     public:
         typedef typename boost::mpl::if_<
-            boost::mpl::greater< boost::mpl::size<Signature>, first_arg_idx >,
+            boost::mpl::greater< boost::mpl::size<Sig>, first_arg_idx >,
                 boost::mpl::iterator_range< 
-                    typename boost::mpl::advance<typename boost::mpl::begin<Signature>::type, first_arg_idx>::type,
-                    typename boost::mpl::end<Signature>::type>,
+                    typename boost::mpl::advance<typename boost::mpl::begin<Sig>::type, first_arg_idx>::type,
+                    typename boost::mpl::end<Sig>::type>,
                 boost::mpl::vector0<> >::type type;
 };
 
-template <typename Signature>
+template <typename Sig>
 struct returns_void :
-        boost::is_void< typename boost::mpl::front<Signature>::type > {};
+        boost::is_void< boost::mpl::front<Sig> > {};
 
-template <typename F, typename Signature>
+template <typename Sig>
+struct get_member_function_class : boost::mpl::at_c<Sig, 1 > {};
+
+// XXX ugly shit ... rewrite!
+template <typename F, typename Sig>
 struct arity {
         enum {
             value  = boost::mpl::minus<
-                            typename boost::mpl::size<Signature>::type, 
+                            typename boost::mpl::size<Sig>::type, 
                             typename first_arg_index<F>::type>::type::value 
         };
 
@@ -81,13 +85,13 @@ struct tuple_for_args :
                     boost::tuples::null_type, 
                     boost::tuples::cons<boost::mpl::_2, boost::mpl::_1> > {};
 
-template <typename F, typename Signature>
+template <typename F, typename Sig>
 inline
 void
 check_arity(uintN argc) {
-    if ( argc != arity<F,Signature>::value ) {
+    if ( argc != arity<F,Sig>::value ) {
         std::ostringstream os;
-        os << "expected " << arity<F,Signature>::value << " arguments but got " << argc;
+        os << "expected " << arity<F,Sig>::value << " arguments but got " << argc;
         throw bad_arguments( os.str(), PLUS_FILE_LINE );
     }
 }
@@ -122,17 +126,17 @@ class convert_arguments {
         Tuple     & args_;
 };
 
-template <typename F, typename Signature>
+template <typename F, typename Sig>
 class  arguments : public
-    tuple_for_args< typename get_arguments<F,Signature>::type>::type 
+    tuple_for_args< typename get_arguments<F,Sig>::type>::type 
 {
-        typedef typename get_arguments<F,Signature>::type argument_types;
+        typedef typename get_arguments<F,Sig>::type argument_types;
         typedef typename get_storage_types<argument_types>::type storage_types;
     public:
         
         arguments( JSContext * cx, uintN argc, jsval * argv ) {
-            check_arity<F,Signature>(argc);    
-            typedef boost::mpl::range_c<uintN, 0, arity<F,Signature>::value> R;
+            check_arity<F,Sig>(argc);    
+            typedef boost::mpl::range_c<uintN, 0, arity<F,Sig>::value> R;
             boost::mpl::for_each< R >(
                     convert_arguments<arguments, storage_types>( cx, argv, *this ) );
         }

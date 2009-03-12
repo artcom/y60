@@ -3,63 +3,80 @@
 
 #include "y60_ape_settings.h"
 
+#include <boost/mpl/if.hpp>
+#include <boost/type_traits/is_member_function_pointer.hpp>
+
 #include "ape_thing.h"
 #include "monkey_utilities.h"
+#include "invoke.h"
 
 namespace y60 { namespace ape { namespace detail {
 
-template <typename Invoker>
+template <typename F, typename Id, typename Sig>
+struct create_invoker {
+    typedef typename boost::mpl::if_<
+        boost::is_member_function_pointer<F>,
+        member_invoker< typename boost::remove_reference< typename get_member_function_class<Sig>::type >::type, F, Sig, Id>,
+        invoker<F,Sig,Id>
+    >::type type;
+};
+
+template <typename F, typename Id, typename Sig>
+JSNative
+get_invoker( F f, Sig const& sig) {
+    typedef typename create_invoker<F,Id,Sig>::type invoker_type;
+    invoker_type::init( f );
+    return & invoker_type::invoke;
+}
+
+template <typename F, typename Id >
 class function_desc : public ape_thing {
     public:
-        function_desc(const char * name) : ape_thing(ape_function,name) {}
+        function_desc(F f, const char * name) : ape_thing(ape_function,name) {
+            setup_js_function_spec( f, name, get_signature( f ) );
+        }
 
         virtual
         void
-        import(JSContext * cx, JSObject * ns, js_functions & free_functions) {
+        import(JSContext * cx, JSObject * ns, monkey_data & ape_ctx) {
             APE_LOG(log::import,log::inf,log::usr) 
-                << "importing function " << get_name() << "(...)";
-            JSFunctionSpec func;
-            func.name  = get_name();
-            func.call  = & Invoker::invoke;
-            typedef Invoker inv;
-            // XXX arity is a major suckage, cuz it requires two (2) arguments!
-            //      ... needs fixing :-(
-            func.nargs = detail::arity<typename inv::function_type,
-                                       typename inv::signature_type>::value;
-            func.flags = 0;
-            func.extra = 0;
-            free_functions.add( func );
+                << "importing function '" << get_name() << "'";
+            ape_ctx.functions.add( fs_ );
         }
+
+        template <typename Sig>
+        inline
+        void 
+        setup_js_function_spec( F f, const char * name, Sig const& sig) {
+            fs_.name = name;
+            fs_.call = get_invoker<F,Id,Sig>(f, sig);
+            fs_.nargs = detail::arity<F,Sig>::value;
+            fs_.flags = 0;
+            fs_.extra = 0;
+        }
+    private:
+        JSFunctionSpec fs_;
 };
 
-template <typename Id, typename Prev = void, int Idx = 0>
-class function_helper {
+template <typename Id, int Idx = 0>
+class namespace_helper {
     public:
-        function_helper(ape_list & desc) : desc_(desc) {}
-        ~function_helper() {}
+        namespace_helper(ape_thing & parent) : parent_(parent) {}
+        ~namespace_helper() {}
 
         template <typename F>
-        function_helper<Id, function_helper<Id,Prev,Idx>, Idx + 1>
+        namespace_helper<Id, Idx + 1>
         function(F f, const char * name) {
             typedef typename append_to_id<Id, boost::mpl::long_<Idx> >::type unique_id;
 
-            setup_invoker( f, name, get_signature( f ), unique_id() );
+            parent_.add( ape_thing_ptr( new function_desc<F,unique_id>(f,name) ));
 
-            typedef function_helper< Id, Prev, Idx> this_type;
-            typedef function_helper<Id, this_type, Idx + 1> result_type;
-            return result_type(desc_);
+            typedef namespace_helper<Id, Idx + 1> next_type;
+            return next_type(parent_);
         }
     private:
-        template <typename F, typename Sig, typename CallId>
-        inline
-        void
-        setup_invoker(F f, const char * name, Sig const& /*s*/, CallId const& /*id*/) const {
-            typedef detail::invoker<F,Sig,CallId> invoker_t;
-            invoker_t::init( f );
-            desc_.push_back( ape_thing_ptr( new function_desc<invoker_t>(name) ));
-        }
 
-        ape_list & desc_;
+        ape_thing & parent_;
 };
 
 }}} // end of namespace detail, ape, y60

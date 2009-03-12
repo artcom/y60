@@ -69,6 +69,13 @@ class monkey_specs {
 typedef monkey_specs<JSFunctionSpec> js_functions;
 typedef monkey_specs<JSPropertySpec> js_properties;
 
+struct monkey_data {
+    js_functions  functions;
+    js_properties properties;
+    js_functions  static_functions;
+    js_properties static_properties;
+};
+
 }}} // end of namespace detail, ape, y60
 
 #endif // Y60_APE_MONKEY_UTILITIES_INCLUDED

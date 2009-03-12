@@ -7,7 +7,7 @@
 
 #include "ape_thing.h"
 #include "exception.h"
-#include "invoke.h"
+#include "function.h"
 
 namespace y60 { namespace ape {
 
@@ -17,8 +17,6 @@ namespace detail {
 template <typename Class>
 class class_binding {
     public:
-        typedef Class native_type;
-
         static
         JSBool
         construct(JSContext * cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -42,101 +40,77 @@ class class_binding {
                 delete native;
             }
         }
-        static JSClass    js_class;
-        static JSObject * prototype;
+        static void init_class(JSContext * cx, JSObject * ns, const char * name) {
+            typedef class_binding<Class> cb;
+            js_class.name        = name;
+            js_class.flags       = JSCLASS_HAS_PRIVATE;
+            js_class.addProperty = JS_PropertyStub;
+            js_class.delProperty = JS_PropertyStub;
+            js_class.getProperty = JS_PropertyStub;
+            js_class.setProperty = JS_PropertyStub;
+            js_class.enumerate   = JS_EnumerateStub;
+            js_class.resolve     = JS_ResolveStub;
+            js_class.convert     = JS_ConvertStub;
+            js_class.finalize    = & cb::finalize;
+
+            if ( ! JS_InitClass( cx, ns,
+                        NULL, & cb::js_class, & cb::construct, 0,
+                        cb::specs.properties.ptr(),
+                        cb::specs.functions.ptr(),
+                        cb::specs.static_properties.ptr(),
+                        cb::specs.static_functions.ptr()))
+            {
+                throw monkey_error("Failed to init class", PLUS_FILE_LINE);
+            }
+        }
+// XXX    private:
+        static JSClass     js_class;
+        static monkey_data specs;
 };
 
 template <typename Class>
 JSClass class_binding<Class>::js_class = JSClass();
 
 template <typename Class>
-JSObject * class_binding<Class>::prototype = 0;
+monkey_data class_binding<Class>::specs = monkey_data();
 
 template <typename Class>
-class class_desc : public ape_thing, public ape_list {
+class class_desc : public ape_thing {
     public:
         typedef boost::shared_ptr<class_desc> ptr_type;
 
         class_desc(const char* name) : ape_thing( ape_class, name ) {}
 
-        virtual void import(JSContext * cx, JSObject * ns, js_functions & free_functions) {
+        virtual void import(JSContext * cx, JSObject * ns, monkey_data & /*parent_ctx*/ ) {
             typedef log::import log_t;
             APE_LOG(log_t,log::inf,log::usr) << "importing class '"
                 << get_name() << "'";
 
             typedef class_binding<Class> cb;
-            JSClass & c = cb::js_class;
-
-            c.name        = get_name();
-            c.flags       = JSCLASS_HAS_PRIVATE;
-            c.addProperty = JS_PropertyStub;
-            c.delProperty = JS_PropertyStub;
-            c.getProperty = JS_PropertyStub;
-            c.setProperty = JS_PropertyStub;
-            c.enumerate   = JS_EnumerateStub;
-            c.resolve     = JS_ResolveStub;
-            c.convert     = JS_ConvertStub;
-            c.finalize    = & cb::finalize;
-
-            cb::prototype = JS_InitClass( cx, ns,
-                    NULL, & cb::js_class, & cb::construct, 0,
-                    NULL, NULL, NULL, NULL );
-                    /*
-                    properties_.ptr(),
-                    functions_.ptr(),
-                    static_properties_.ptr(),
-                    static_functions_.ptr());*/
-            if ( ! cb::prototype ) {
-                throw monkey_error("Failed to init class", PLUS_FILE_LINE);
-            }
+            import_children(cx, ns, cb::specs);
+            cb::init_class(cx, ns, get_name());
         }
-
-        /*
-        template <typename F>
-        void
-        add_function(F f, const char * name) {
-            JSFunctionSpec js_func;
-            js_func.name = name;
-            setup_invoker( js_func, f, get_signature( f ) );
-            functions_.add( js_func );
-        }
-        */
-    private:
-        /*
-        template <typename F, typename Sig>
-        void
-        setup_invoker( JSFunctionSpec & js_func, F f, Sig const& sig ) {
-            // XXX this should clash!
-            typedef detail::member_invoker<class_binding<Class>,F,Sig,Class> invoker_type;
-            invoker_type::init( f );
-            js_func.call  = & invoker_type::invoke;
-            js_func.nargs = arity<F,Sig>::value;
-            js_func.flags = 0;
-            js_func.extra = 0;
-        }
-        js_properties properties_;
-        js_functions  functions_;
-        js_properties static_properties_;
-        js_functions  static_functions_;
-        */
 }; 
 
-template <typename Class, typename Prev = void, int FIdx = 0, int PIdx = 0>
+template <typename Class, int FIdx = 0, int PIdx = 0>
 class class_helper {
     public:
-        class_helper(ape_list & desc) : desc_( desc ) {}
+        class_helper(ape_thing & parent) : parent_( parent ) {}
         ~class_helper() {}
 
         template <typename F>
-        class_helper<Class, class_helper<Class, Prev, FIdx, PIdx>, FIdx + 1, PIdx>
+        class_helper<Class, FIdx + 1, PIdx>
         function(F f, const char * name) {
-            typedef class_helper<Class, Prev, FIdx, PIdx> this_type;
-            typedef class_helper<Class, this_type, FIdx + 1, PIdx> result_type;
+            typedef typename append_to_id< 
+                    boost::mpl::vector1<Class>, boost::mpl::long_<FIdx> >::type unique_id;
+            parent_.add( ape_thing_ptr( new function_desc<F,unique_id>(f,name) ));
 
-            return result_type( desc_ );
+            typedef class_helper<Class, FIdx + 1, PIdx> next_type;
+            return next_type( parent_ );
         }
     private:
-        ape_list & desc_;
+
+        ape_thing & parent_;
 };
 
 } // end of namespace detail

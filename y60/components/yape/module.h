@@ -19,77 +19,97 @@
 #include "arguments.h"
 #include "function.h"
 #include "monkey_utilities.h"
+#include "ape_thing.h"
 
 namespace y60 { namespace ape {
 
 template <typename UserModule>
-class module {
+class binding {
     private:
         template <typename LocalUniqueId>
         struct unique_id : boost::mpl::vector2<LocalUniqueId, UserModule> {};
 
     protected:
-        module(const char * name) : name_(name) {}
+        binding(detail::ape_thing & module) : module_(module) {
+            // XXX: this only works as long as no virtual functions
+            //      are involved! binding is not fully constructed yet!
+            static_cast<UserModule&>( *this ).bind();
+        }
 
         template <typename LocalUniqueId>
-        detail::function_helper< typename unique_id<LocalUniqueId>::type >
-        functions() {
+        detail::namespace_helper< typename unique_id<LocalUniqueId>::type >
+        namespace_scope() {
             typedef typename unique_id<LocalUniqueId>::type id;
-            return detail::function_helper<id>( module_description_ );
+            return detail::namespace_helper<id>( module_ );
         }
 
         template <typename Class>
-        detail::class_helper< typename unique_id<Class>::type >
+        detail::class_helper<Class>
         class_(const char * name) {
             typedef typename unique_id<Class>::type id;
             typedef boost::shared_ptr<detail::class_desc<Class> > cp;
             cp c( new detail::class_desc<Class>(name) );
-            module_description_.push_back( c );
-            return detail::class_helper<id>( * c );
+            module_.add( c );
+            return detail::class_helper<Class>( * c );
         }
 
-        void
-        import(JSContext * cx, JSObject * ns) {
-            static_cast<UserModule&>( *this ).init();
-            for(size_t i = 0; i < module_description_.size(); ++i) {
-                module_description_[i]->import( cx, ns, free_functions_ );
-            }
-            register_free_functions(cx, ns);
-        }
-
-        void
-        register_free_functions(JSContext * cx, JSObject * ns)  {
-            JS_DefineFunctions(cx, ns, free_functions_.ptr());
-        }
-
-        const char * get_name() { return name_; }
 
         template <typename Class> friend class class_wrapper;
     private:
-        const char *         name_;
-        detail::js_functions free_functions_;
-        detail::ape_list   module_description_;
+        detail::ape_thing &          module_;
 };
 
+template <typename Binding>
+class module : public detail::ape_thing {
+    public:
+        module(const char * name) : detail::ape_thing(detail::ape_module, name) {}
+        void import(JSContext * cx, JSObject * ns) {
+            import(cx, ns, ns_scope);
+        }
+        void import(JSContext * cx, JSObject * ns, detail::monkey_data & /*ape_ctx*/) {
+            static bool imported = false;
+            if ( imported ) {
+                std::ostringstream os;
+                os << "module '" << get_name() << "' is already imported.";
+                throw ape_error(os.str(), PLUS_FILE_LINE);
+            }
+            {
+                Binding b(*this);
+            }
+            import_children(cx, ns, ns_scope);
+            if ( ! JS_DefineFunctions(cx, ns, ns_scope.functions.ptr())) {
+                throw monkey_error("failed to define functions", PLUS_FILE_LINE);
+            }
+            imported = true;
+        }
+    private:
+        static detail::monkey_data ns_scope;
+};
 
+template <typename Binding>
+detail::monkey_data module<Binding>::ns_scope;
 // XXX namespace pollution
 const char * const prop_modules = "modules";
 
-template <typename Module>
+template <typename ModuleBinding>
 class module_loader : public asl::PlugInBase,
                       public jslib::IJSModuleLoader
 {
-        typedef boost::shared_ptr<Module> module_ptr_type;
     public:
-        module_loader(asl::DLHandle theDLHandle) : asl::PlugInBase( theDLHandle ) {}
+        typedef module<ModuleBinding> module_type;
+        typedef boost::shared_ptr<module_type> module_ptr_type;
 
-        // implement IJSModuleLoader initClasses()
+        module_loader(const char * name, asl::DLHandle theDLHandle) :
+            asl::PlugInBase( theDLHandle ), module_name_( name ) {}
+
+        // implement IJSModuleLoader
         void initClasses(JSContext * cx, JSObject * global, JSObject * ns) {
             static module_ptr_type module = init_module(cx, global, ns);
         }
     private:
-        module_ptr_type init_module(JSContext * cx, JSObject * global, JSObject * ns) {
-            module_ptr_type module( new Module() );
+        module_ptr_type
+        init_module(JSContext * cx, JSObject * global, JSObject * ns) {
+            module_ptr_type module( new module_type(module_name_) );
             module->import(cx, ns);
             // TODO: policy-fy
             announce_module_in_namespace(cx, ns, module->get_name());
@@ -126,20 +146,13 @@ class module_loader : public asl::PlugInBase,
                 }
             }
         }
+        const char * module_name_;
 };
 
 }} // end of namespace ape, y60
 
-// some workaround macros for current deficiencies of the implementation
-
-#define FUNCTIONS() \
-        functions<y60::ape::detail::line_number_tag<__LINE__> >()
-
-#define FUNCTION_ALIAS( f, name )                            \
-        function( f, #name, ape_tag< __LINE__ >() )
-
-#define FUNCTION( f ) FUNCTION_ALIAS( f, f )
-
+#define Y60_APE_NS_SCOPE() \
+        namespace_scope<y60::ape::detail::line_number_tag<__LINE__> >()
 
 #if defined(WIN32)
 #   define Y60_APE_MODULE_DECL __declspec( dllexport )
@@ -147,23 +160,25 @@ class module_loader : public asl::PlugInBase,
 #   define Y60_APE_MODULE_DECL 
 #endif
 
+#define Y60_APE_BNAME( name ) \
+    name ## _binding
+
 #define Y60_APE_MODULE( name )                                                  \
-template <int Counter> struct ape_tag {};                                       \
-                                                                                \
-class name ## _module : public y60::ape::module<name ## _module> {              \
+class Y60_APE_BNAME(name) : public y60::ape::binding< Y60_APE_BNAME(name) > {   \
     public:                                                                     \
-        friend class y60::ape::module_loader< name ## _module >;                \
-        void init();                                                            \
+        friend class y60::ape::module< Y60_APE_BNAME(name) >;            \
+        void bind();                                                            \
     protected:                                                                  \
-        name ## _module() : y60::ape::module<name ## _module>(#name) {}         \
+        Y60_APE_BNAME(name)(y60::ape::detail::ape_thing & mod) :                                                 \
+                y60::ape::binding< Y60_APE_BNAME(name) >(mod) {} \
 };                                                                              \
                                                                                 \
 extern "C" Y60_APE_MODULE_DECL                                                  \
 asl::PlugInBase * name ## _instantiatePlugIn(asl::DLHandle theDLHandle) {       \
     using y60::ape::module_loader;                                              \
-    return new module_loader<name ## _module>(theDLHandle);                     \
+    return new module_loader< Y60_APE_BNAME(name) >(#name, theDLHandle);        \
 }                                                                               \
                                                                                 \
-void name ## _module::init()
+void Y60_APE_BNAME( name ) ::bind()
 
 #endif // Y60_APE_MODULE_INCLUDED

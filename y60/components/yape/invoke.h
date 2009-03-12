@@ -15,6 +15,7 @@
 
 #       include "exception.h"
 #       include "arguments.h"
+#       include "class.h"
 
 namespace y60 { namespace ape { namespace detail {
 
@@ -146,22 +147,26 @@ class invoker<F, Sig, UId, deduce_tag<true, N> > {
 template <typename F, typename Sig, typename UId>
 F invoker<F, Sig, UId, deduce_tag<true, N> >::f = 0;
 
-
+template <typename> class class_binding;
 /** invoker specialization for calls to member functions of arity N with return
  *  value
  */
 template <typename Class, typename F, typename Sig, typename UId>
 class member_invoker<Class, F, Sig, UId, deduce_tag<false, N> > {
     public:
+        //typedef F function_type;
+        //typedef Sig signature_type;
+
         static
         JSBool
         invoke(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, jsval * rval) {
+            typedef class_binding<Class> cb;
             try {
-                if ( ! JS_InstanceOf(cx, obj, & Class::js_class, argv)) {
+
+                if ( ! JS_InstanceOf(cx, obj, & cb::js_class, argv)) {
                     throw ape_error("object is not of this class", PLUS_FILE_LINE);
                 }
-                typedef typename Class::native_type native_t;
-                native_t * n = static_cast<native_t*>( JS_GetPrivate( cx, obj));
+                Class * n = static_cast<Class*>( JS_GetPrivate( cx, obj));
                 if ( ! n ) {
                     throw ape_error("failed to get native instance", PLUS_FILE_LINE);
                 }
@@ -191,6 +196,9 @@ F member_invoker<Class, F, Sig, UId, deduce_tag<false, N> >::f = 0;
 template <typename Class, typename F, typename Sig, typename UId>
 class member_invoker<Class, F, Sig, UId, deduce_tag<true, N> > {
     public:
+        typedef F function_type;
+        typedef Sig signature_type;
+
         static
         JSBool
         invoke(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, jsval * rval) {

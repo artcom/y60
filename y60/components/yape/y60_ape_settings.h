@@ -1,7 +1,7 @@
 #ifndef Y60_APE_SETTING_INCLUDED
 #define Y60_APE_SETTING_INCLUDED
 
-#include <y60_ape_config.h>
+#include <y60/components/yape/y60_ape_config.h>
 
 #include <asl/base/settings.h>
 
