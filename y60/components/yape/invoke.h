@@ -28,7 +28,7 @@ template <typename F, typename Sig>
 struct invoke_discriminator {
     typedef deduce_tag<
         returns_void<Sig>::value,
-        arity<F,Sig>::value > type;
+        arity<F>::value > type;
 };
 
 /** Generic invoker template. Just throws a compiletime exception if

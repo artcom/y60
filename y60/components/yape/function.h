@@ -16,7 +16,7 @@ template <typename F, typename Id, typename Sig>
 struct create_invoker {
     typedef typename boost::mpl::if_<
         boost::is_member_function_pointer<F>,
-        member_invoker< typename boost::remove_reference< typename get_member_function_class<Sig>::type >::type, F, Id, Sig>,
+        member_invoker< typename get_member_function_class<Sig>::type, F, Id, Sig>,
         invoker<F,Id,Sig>
     >::type type;
 };
@@ -50,7 +50,7 @@ class function_desc : public ape_thing {
         setup_js_function_spec( F f, const char * name, Sig const& sig) {
             fs_.name = name;
             fs_.call = get_invoker<F,Id,Sig>(f, sig);
-            fs_.nargs = detail::arity<F,Sig>::value;
+            fs_.nargs = detail::arity<F>::value;
             fs_.flags = 0;
             fs_.extra = 0;
         }
@@ -67,7 +67,7 @@ class namespace_helper {
         template <typename F>
         namespace_helper<Id, Idx + 1>
         function(F f, const char * name) {
-            typedef typename append_to_id<Id, boost::mpl::long_<Idx> >::type unique_id;
+            typedef eid<Id, boost::mpl::long_<Idx> > unique_id;
 
             parent_.add( ape_thing_ptr( new function_desc<F,unique_id>(f,name) ));
 

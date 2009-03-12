@@ -53,25 +53,34 @@ struct returns_void :
         boost::is_void< typename boost::mpl::front<Sig>::type > {};
 
 template <typename Sig>
-struct get_member_function_class : boost::mpl::at_c<Sig, 1 > {};
+struct get_member_function_class : 
+    boost::remove_reference<
+            typename boost::mpl::at_c<Sig, 1 >::type > {};
 
-// XXX ugly shit ... rewrite!
-template <typename F, typename Sig>
+template <typename F> struct member_function_traits;
+
+template <typename F, typename Class>
+struct member_function_traits<F Class::*> : boost::function_traits<F> {};
+
+template <typename F>
+struct function_traits {
+    typedef typename boost::mpl::if_<
+        typename boost::is_member_function_pointer<F>::type,
+        member_function_traits<typename boost::remove_pointer<F>::type >,
+        boost::function_traits<typename boost::remove_pointer<F>::type > >::type type;
+};
+
+template <typename F>
 struct arity {
-        enum {
-            value  = boost::mpl::minus<
-                            typename boost::mpl::size<Sig>::type, 
-                            typename first_arg_index<F>::type>::type::value 
-        };
-
+    enum { value = function_traits<F>::type::arity };
 };
 
 struct storage_type {
     template <typename T>
-        struct apply {
-            typedef typename boost::remove_const<
-                typename boost::remove_reference<T>::type >::type type;
-        };
+    struct apply {
+        typedef typename boost::remove_const<
+        typename boost::remove_reference<T>::type >::type type;
+    };
 };
 
 template <typename Seq>
@@ -89,9 +98,9 @@ template <typename F, typename Sig>
 inline
 void
 check_arity(uintN argc) {
-    if ( argc != arity<F,Sig>::value ) {
+    if ( argc != arity<F>::value ) {
         std::ostringstream os;
-        os << "expected " << arity<F,Sig>::value << " arguments but got " << argc;
+        os << "expected " << arity<F>::value << " arguments but got " << argc;
         throw bad_arguments( os.str(), PLUS_FILE_LINE );
     }
 }
@@ -136,7 +145,7 @@ class  arguments : public
         
         arguments( JSContext * cx, uintN argc, jsval * argv ) {
             check_arity<F,Sig>(argc);    
-            typedef boost::mpl::range_c<uintN, 0, arity<F,Sig>::value> R;
+            typedef boost::mpl::range_c<uintN, 0, arity<F>::value> R;
             boost::mpl::for_each< R >(
                     convert_arguments<arguments, storage_types>( cx, argv, *this ) );
         }

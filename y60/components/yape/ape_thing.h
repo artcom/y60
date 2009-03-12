@@ -49,13 +49,10 @@ class ape_thing {
 };
 
 // does not really belong here ...
-template <long LineNumber>
-struct line_number_tag : boost::mpl::long_<LineNumber>{};
+template <long LineNumber> struct line_number_tag {};
 
-template <typename Id, typename Appendix>
-struct append_to_id {
-    typedef typename boost::mpl::push_back< Id, Appendix>::type type;
-};
+// extended id: used to concatenate two ids
+template <typename Id, typename Appendix> struct eid {}; 
 
 }}} // end of namespace detail, ape, y60
 

@@ -101,8 +101,7 @@ class class_helper {
         template <typename F>
         class_helper<Class, FIdx + 1, PIdx>
         function(F f, const char * name) {
-            typedef typename append_to_id< 
-                    boost::mpl::vector1<Class>, boost::mpl::long_<FIdx> >::type unique_id;
+            typedef eid<Class, boost::mpl::long_<FIdx> > unique_id;
             parent_.add( ape_thing_ptr( new function_desc<F,unique_id>(f,name) ));
 
             typedef class_helper<Class, FIdx + 1, PIdx> next_type;

@@ -10,6 +10,8 @@ const_char_ptr const_char_ptr_func()        { return "const_char_ptr_func()"; }
 int            int_func_int(int i)          { return i; }
 int            int_func_intcr(int const& i) { return i; }
 
+//==== Module Code =============================================================
+
 Y60_APE_MODULE( ape_test_functions ) {
     Y60_APE_NS_SCOPE()
         . function( void_func,           "void_func")
