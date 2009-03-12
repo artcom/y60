@@ -103,7 +103,7 @@ static JSBool
 read(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     string docStr = "Read utf-8 text from connected socket. (max. bytes " + asl::as_string(READ_BUFFER_SIZE) + ")";
     DOC_BEGIN(docStr);
-    DOC_RVAL("number of bytes read.", DOC_TYPE_INTEGER);
+    DOC_RVAL("read utf-8 string", DOC_TYPE_STRING);
     DOC_END;
     try {
         if (argc != 0) {
@@ -111,7 +111,7 @@ read(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             return JS_FALSE;
         }
 
-        char myBuffer[READ_BUFFER_SIZE];
+        char myBuffer[READ_BUFFER_SIZE+1];
         unsigned myBytesRead = JSSocket::getJSWrapper(cx,obj).openNative().receive(myBuffer, READ_BUFFER_SIZE);
         JSSocket::getJSWrapper(cx,obj).closeNative();
 
