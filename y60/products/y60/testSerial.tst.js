@@ -57,8 +57,6 @@
 
 */
 
-exit(0);
-
 use("UnitTest.js");
 
 function SerialUnitTest() {
