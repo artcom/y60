@@ -7,3 +7,9 @@ y60_add_component(
     ${Y60_APE_LINK_ARGS}
 )
 
+y60_add_component(
+    ape_test_functions
+    SOURCES functions.cpp
+    ${Y60_APE_LINK_ARGS}
+)
+

@@ -50,7 +50,7 @@ class get_arguments {
 
 template <typename Sig>
 struct returns_void :
-        boost::is_void< boost::mpl::front<Sig> > {};
+        boost::is_void< typename boost::mpl::front<Sig>::type > {};
 
 template <typename Sig>
 struct get_member_function_class : boost::mpl::at_c<Sig, 1 > {};

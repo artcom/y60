@@ -16,8 +16,8 @@ template <typename F, typename Id, typename Sig>
 struct create_invoker {
     typedef typename boost::mpl::if_<
         boost::is_member_function_pointer<F>,
-        member_invoker< typename boost::remove_reference< typename get_member_function_class<Sig>::type >::type, F, Sig, Id>,
-        invoker<F,Sig,Id>
+        member_invoker< typename boost::remove_reference< typename get_member_function_class<Sig>::type >::type, F, Id, Sig>,
+        invoker<F,Id,Sig>
     >::type type;
 };
 

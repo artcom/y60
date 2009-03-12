@@ -34,7 +34,7 @@ struct invoke_discriminator {
 /** Generic invoker template. Just throws a compiletime exception if
  *  the maximum arity is exceeded
  */
-template <typename F, typename Sig, typename UId,
+template <typename F, typename Id, typename Sig,
           typename DeduceTag = typename invoke_discriminator<F,Sig>::type>
 class invoker {
     public:
@@ -51,7 +51,7 @@ class invoker {
         }
 };
 
-template <typename Class, typename F, typename Sig, typename UId,
+template <typename Class, typename F, typename Id, typename Sig,
           typename DeduceTag = typename invoke_discriminator<F,Sig>::type>
 class member_invoker {
     public:
@@ -85,12 +85,9 @@ class member_invoker {
 /** invoker specialization for calls to free functions of arity N with return
  *  value
  */
-template <typename F, typename Sig, typename UId>
-class invoker<F, Sig, UId, deduce_tag<false, N> > {
+template <typename F, typename Id, typename Sig>
+class invoker<F, Id, Sig, deduce_tag<false, N> > {
     public:
-        typedef F function_type;
-        typedef Sig signature_type;
-
         static
         JSBool
         invoke(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, jsval * rval) {
@@ -112,18 +109,15 @@ class invoker<F, Sig, UId, deduce_tag<false, N> > {
         static F f;
 };
 
-template <typename F, typename Sig, typename UId>
-F invoker<F, Sig, UId, deduce_tag<false, N> >::f = 0;
+template <typename F, typename Id, typename Sig>
+F invoker<F, Id, Sig, deduce_tag<false, N> >::f = 0;
 
 /** invoker specialization for calls to free functions of arity N without 
  * return value
  */
-template <typename F, typename Sig, typename UId>
-class invoker<F, Sig, UId, deduce_tag<true, N> > {
+template <typename F, typename Id, typename Sig>
+class invoker<F, Id, Sig, deduce_tag<true, N> > {
     public:
-        typedef F   function_type;
-        typedef Sig signature_type;
-
         static
         JSBool
         invoke(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, jsval * rval) {
@@ -144,19 +138,16 @@ class invoker<F, Sig, UId, deduce_tag<true, N> > {
         static F f;
 };
 
-template <typename F, typename Sig, typename UId>
-F invoker<F, Sig, UId, deduce_tag<true, N> >::f = 0;
+template <typename F, typename Id, typename Sig>
+F invoker<F, Id, Sig, deduce_tag<true, N> >::f = 0;
 
 template <typename> class class_binding;
 /** invoker specialization for calls to member functions of arity N with return
  *  value
  */
-template <typename Class, typename F, typename Sig, typename UId>
-class member_invoker<Class, F, Sig, UId, deduce_tag<false, N> > {
+template <typename Class, typename F, typename Id, typename Sig>
+class member_invoker<Class, F, Id, Sig, deduce_tag<false, N> > {
     public:
-        //typedef F function_type;
-        //typedef Sig signature_type;
-
         static
         JSBool
         invoke(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, jsval * rval) {
@@ -187,14 +178,14 @@ class member_invoker<Class, F, Sig, UId, deduce_tag<false, N> > {
         static F f;
 };
 
-template <typename Class, typename F, typename Sig, typename UId>
-F member_invoker<Class, F, Sig, UId, deduce_tag<false, N> >::f = 0;
+template <typename Class, typename F, typename Id, typename Sig>
+F member_invoker<Class, F, Id, Sig, deduce_tag<false, N> >::f = 0;
 
 /** invoker specialization for calls to member functions of arity N without 
  * return value
  */
-template <typename Class, typename F, typename Sig, typename UId>
-class member_invoker<Class, F, Sig, UId, deduce_tag<true, N> > {
+template <typename Class, typename F, typename Id, typename Sig>
+class member_invoker<Class, F, Id, Sig, deduce_tag<true, N> > {
     public:
         typedef F function_type;
         typedef Sig signature_type;
@@ -220,8 +211,8 @@ class member_invoker<Class, F, Sig, UId, deduce_tag<true, N> > {
         static F f;
 };
 
-template <typename Class, typename F, typename Sig, typename UId>
-F member_invoker<Class, F, Sig, UId, deduce_tag<true, N> >::f = 0;
+template <typename Class, typename F, typename Id, typename Sig>
+F member_invoker<Class, F, Id, Sig, deduce_tag<true, N> >::f = 0;
 
 #   undef Y60_APE_ARG_REF
 
