@@ -276,6 +276,11 @@ SceneTester.prototype.Constructor = function(obj, theArguments) {
         }
         Base.setup(theWidth, theHeight, false, "Scene Tester");
         window.position = [0,0];
+        if (_myOffscreenFlag) {
+            Logger.info("tester running in offscreen mode");
+        } else {
+            Logger.info("tester not running in offscreen mode");
+        } 
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -287,7 +292,7 @@ SceneTester.prototype.Constructor = function(obj, theArguments) {
     var _myTestDurationInFrames = 3;
     var _myOutputImageName      = null;
     var _myOutputSuffix         = null;
-    var _myOffscreenFlag        = false;
+    var _myOffscreenFlag        = (expandEnvironment("${AC_NO_OFFSCREEN_TEST}") != 1);
     var _mySaveLoadFlag         = true;
     var _myOffscreenRenderer    = null;
 
@@ -300,11 +305,6 @@ SceneTester.prototype.Constructor = function(obj, theArguments) {
         if (myArgument.search(/outputsuffix/) != -1) {
             var lastEqualPosition = myArgument.lastIndexOf('=');
             _myOutputSuffix = myArgument.substr(lastEqualPosition + 1);
-        }
-        if (myArgument == "offscreen" && 
-        operatingSystem() != "OSX" &&
-        expandEnvironment("${AC_NO_OFFSCREEN_TEST}") != 1) {
-            _myOffscreenFlag = true;
         }
     }
 }

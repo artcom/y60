@@ -143,6 +143,10 @@ int main( int argc, char *argv[])  {
         mySecondBitmap.SetHasAlpha(false);
 
         string myBaseName = asl::removeExtension(myArguments.getArgument(0));  
+        Encoder.MakeFileFromBmp(string(myBaseName+".1st.png").c_str(), &myFirstBitmap);
+        Encoder.MakeFileFromBmp(string(myBaseName+".2nd.png").c_str(), &mySecondBitmap);
+
+        
         float myTolerance = 0.0f;
         int myThreshold = 128;
 

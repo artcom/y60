@@ -317,6 +317,7 @@ AbstractRenderWindow::saveBuffer(const std::string & theFilename) {
         myFormat = PL_FT_PNG;
     }
 
+    y60::ScopedGLContext myContextLock(this);
     BufferToFile myBufferWriter(theFilename, myFormat,
         _myCanvas->getFacade<Canvas>()->getWidth(),
         _myCanvas->getFacade<Canvas>()->getHeight(), 4);
