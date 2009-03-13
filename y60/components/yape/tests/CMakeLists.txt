@@ -13,3 +13,9 @@ y60_add_component(
     ${Y60_APE_LINK_ARGS}
 )
 
+y60_add_component(
+    ape_test_hundred_functions
+    SOURCES hundred_functions.cpp
+    ${Y60_APE_LINK_ARGS}
+)
+

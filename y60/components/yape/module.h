@@ -14,7 +14,6 @@
 
 #include "exception.h"
 #include "class.h"
-#include "invoke.h"
 #include "signature.h"
 #include "arguments.h"
 #include "function.h"
@@ -152,7 +151,7 @@ class module_loader : public asl::PlugInBase,
 }} // end of namespace ape, y60
 
 #define Y60_APE_NS_SCOPE() \
-        namespace_scope<y60::ape::detail::line_number_tag<__LINE__> >()
+        namespace_scope<y60::ape::detail::line_number<__LINE__> >()
 
 #if defined(WIN32)
 #   define Y60_APE_MODULE_DECL __declspec( dllexport )
@@ -166,11 +165,11 @@ class module_loader : public asl::PlugInBase,
 #define Y60_APE_MODULE( name )                                                  \
 class Y60_APE_BNAME(name) : public y60::ape::binding< Y60_APE_BNAME(name) > {   \
     public:                                                                     \
-        friend class y60::ape::module< Y60_APE_BNAME(name) >;            \
+        friend class y60::ape::module< Y60_APE_BNAME(name) >;                   \
         void bind();                                                            \
     protected:                                                                  \
-        Y60_APE_BNAME(name)(y60::ape::detail::ape_thing & mod) :                                                 \
-                y60::ape::binding< Y60_APE_BNAME(name) >(mod) {} \
+        Y60_APE_BNAME(name)(y60::ape::detail::ape_thing & mod) :                \
+                y60::ape::binding< Y60_APE_BNAME(name) >(mod) {}                \
 };                                                                              \
                                                                                 \
 extern "C" Y60_APE_MODULE_DECL                                                  \

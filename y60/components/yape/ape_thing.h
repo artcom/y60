@@ -48,12 +48,6 @@ class ape_thing {
         ape_children children_;
 };
 
-// does not really belong here ...
-template <long LineNumber> struct line_number_tag {};
-
-// extended id: used to concatenate two ids
-template <typename Id, typename Appendix> struct eid {}; 
-
 }}} // end of namespace detail, ape, y60
 
 #endif // Y60_APE_APE_THING_INCLUDED

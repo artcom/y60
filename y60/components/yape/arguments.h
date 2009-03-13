@@ -4,7 +4,6 @@
 #include "y60_ape_settings.h"
 
 #include <boost/tuple/tuple.hpp> 
-#include <boost/type_traits.hpp> 
 
 #include <boost/mpl/advance.hpp>
 #include <boost/mpl/at.hpp>
@@ -24,6 +23,7 @@
 #include <boost/mpl/transform_view.hpp>
 
 #include "typelist.h"
+#include "meta.h"
 
 namespace y60 { namespace ape { namespace detail {
 
@@ -47,34 +47,6 @@ class get_arguments {
                     typename boost::mpl::end<Sig>::type>,
                 boost::mpl::vector0<> >::type type;
 };
-
-template <typename Sig>
-struct returns_void :
-        boost::is_void< typename boost::mpl::front<Sig>::type > {};
-
-template <typename Sig>
-struct get_member_function_class : 
-    boost::remove_reference<
-            typename boost::mpl::at_c<Sig, 1 >::type > {};
-
-template <typename F> struct member_function_traits;
-
-template <typename F, typename Class>
-struct member_function_traits<F Class::*> : boost::function_traits<F> {};
-
-template <typename F>
-struct function_traits {
-    typedef typename boost::mpl::if_<
-        typename boost::is_member_function_pointer<F>::type,
-        member_function_traits<typename boost::remove_pointer<F>::type >,
-        boost::function_traits<typename boost::remove_pointer<F>::type > >::type type;
-};
-
-template <typename F>
-struct arity {
-    enum { value = function_traits<F>::type::arity };
-};
-
 struct storage_type {
     template <typename T>
     struct apply {

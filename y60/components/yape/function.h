@@ -8,32 +8,16 @@
 
 #include "ape_thing.h"
 #include "monkey_utilities.h"
-#include "invoke.h"
+#include "caller.h"
+
 
 namespace y60 { namespace ape { namespace detail {
-
-template <typename F, typename Id, typename Sig>
-struct create_invoker {
-    typedef typename boost::mpl::if_<
-        boost::is_member_function_pointer<F>,
-        member_invoker< typename get_member_function_class<Sig>::type, F, Id, Sig>,
-        invoker<F,Id,Sig>
-    >::type type;
-};
-
-template <typename F, typename Id, typename Sig>
-JSNative
-get_invoker( F f, Sig const& sig) {
-    typedef typename create_invoker<F,Id,Sig>::type invoker_type;
-    invoker_type::init( f );
-    return & invoker_type::invoke;
-}
 
 template <typename F, typename Id >
 class function_desc : public ape_thing {
     public:
         function_desc(F f, const char * name) : ape_thing(ape_function,name) {
-            setup_js_function_spec( f, name, get_signature( f ) );
+            setup_js_function_spec( f, name );
         }
 
         virtual
@@ -44,12 +28,11 @@ class function_desc : public ape_thing {
             ape_ctx.functions.add( fs_ );
         }
 
-        template <typename Sig>
         inline
         void 
-        setup_js_function_spec( F f, const char * name, Sig const& sig) {
+        setup_js_function_spec( F f, const char * name) {
             fs_.name = name;
-            fs_.call = get_invoker<F,Id,Sig>(f, sig);
+            fs_.call = get_caller<F,Id>(f, get_signature( f ));
             fs_.nargs = detail::arity<F>::value;
             fs_.flags = 0;
             fs_.extra = 0;
