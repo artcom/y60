@@ -29,17 +29,12 @@ class class_wrapper {
         static 
         void 
         finalize(JSContext * cx, JSObject * obj) {
-            C * native = unwrap_native(cx, obj);
-            delete native;
+            delete unwrap_native(cx, obj);
         }
         static inline
         C *
         unwrap_native(JSContext * cx, JSObject * obj) {
-            C * n = static_cast<C*>( JS_GetInstancePrivate( cx, obj, & js_class_, NULL));
-            if ( ! n ) {
-                throw ape_error("failed to get native instance", PLUS_FILE_LINE);
-            }
-            return n;
+            return static_cast<C*>( JS_GetInstancePrivate( cx, obj, & js_class_, NULL));
         }
         static 
         void 
@@ -105,7 +100,7 @@ class class_helper {
         class_helper<C, FIdx + 1, PIdx>
         function(F f, const char * name) {
             typedef eid<C, boost::mpl::long_<FIdx> > unique_id;
-            parent_.add( ape_thing_ptr( new function_desc<F,unique_id>(f,name) ));
+            parent_.add( ape_thing_ptr( new function_desc<F,unique_id>(f,name,parent_.function_flags()) ));
 
             typedef class_helper<C, FIdx + 1, PIdx> next_type;
             return next_type( parent_ );

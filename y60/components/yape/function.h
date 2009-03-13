@@ -10,14 +10,17 @@
 #include "monkey_utilities.h"
 #include "caller.h"
 
-
 namespace y60 { namespace ape { namespace detail {
 
 template <typename F, typename Id >
 class function_desc : public ape_thing {
     public:
-        function_desc(F f, const char * name) : ape_thing(ape_function,name) {
-            setup_js_function_spec( f, name );
+        function_desc(F f, const char * name, uint8 flags) : ape_thing(ape_function,name) {
+            fs_.name  = name;
+            fs_.call  = get_caller<F,Id>(f, get_signature( f ));
+            fs_.nargs = arity<F>::value;
+            fs_.flags = flags;
+            fs_.extra = 0;
         }
 
         virtual
@@ -28,15 +31,6 @@ class function_desc : public ape_thing {
             ape_ctx.functions.add( fs_ );
         }
 
-        inline
-        void 
-        setup_js_function_spec( F f, const char * name) {
-            fs_.name = name;
-            fs_.call = get_caller<F,Id>(f, get_signature( f ));
-            fs_.nargs = detail::arity<F>::value;
-            fs_.flags = 0;
-            fs_.extra = 0;
-        }
     private:
         JSFunctionSpec fs_;
 };
@@ -50,15 +44,16 @@ class namespace_helper {
         template <typename F>
         namespace_helper<Id, Idx + 1>
         function(F f, const char * name) {
-            typedef eid<Id, boost::mpl::long_<Idx> > unique_id;
+            typedef eid<Id, boost::mpl::long_<Idx> > uid;
 
-            parent_.add( ape_thing_ptr( new function_desc<F,unique_id>(f,name) ));
+            parent_.add( ape_thing_ptr(
+                        new function_desc<F,uid>(f,name,parent_.function_flags())));
 
             typedef namespace_helper<Id, Idx + 1> next_type;
             return next_type(parent_);
         }
-    private:
 
+    private:
         ape_thing & parent_;
 };
 

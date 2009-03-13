@@ -52,6 +52,11 @@ class binding {
             return detail::class_helper<Class>( * c );
         }
 
+        void enumerate(bool functions, bool properties, bool classes) {
+            module_.set_function_flag(JSPROP_ENUMERATE, functions);
+            module_.set_property_flag(JSPROP_ENUMERATE, properties);
+            module_.set_class_flag(JSPROP_ENUMERATE, classes);
+        }
 
         template <typename Class> friend class class_wrapper;
     private:

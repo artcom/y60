@@ -18,6 +18,10 @@ ape_function_test.prototype.Constructor = function(obj, name) {
         ENSURE("const_char_ptr_func()" === t.const_char_ptr_func());
         ENSURE(23 === t.int_func_int(23));
         ENSURE(42 === t.int_func_intcr(42));
+
+        for ( var f in t ) {
+            print( f );
+        }
     }
 }
 
