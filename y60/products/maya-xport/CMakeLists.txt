@@ -32,5 +32,20 @@ ac_add_plugin(
     HEADERS ${HEADERS}
     DEPENDS y60scene y60modelling
     EXTERNS MAYA
+    DONT_INSTALL
 )
 
+# XXX: hack up something portable
+if(UNIX)
+
+get_property(MAYA_XPORT_PLUGIN_LOCATION TARGET maya-xport PROPERTY LOCATION)
+
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/install.sh.in
+    ${CMAKE_CURRENT_BINARY_DIR}/install.sh
+    @ONLY
+)
+
+set(MAYA_XPORT_PLUGIN_LOCATION)
+
+endif(UNIX)
