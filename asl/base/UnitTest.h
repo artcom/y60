@@ -193,7 +193,7 @@ public:
 
 #define DTITLE(TITLE)                               std::cerr << getTracePrefix() << TITLE << ":" << std::endl;;
 #define DPRINT2(TITEL,VARIABLE)                     std::cerr << getTracePrefix() << TITEL << ": " << #VARIABLE << " = " << VARIABLE << std::endl;;
-#define DPRINT(VARIABLE)                            DPRINT2(#VARIABLE,VARIABLE)
+#define DPRINT(VARIABLE)                            std::cerr << getTracePrefix() << #VARIABLE << " = " << VARIABLE << std::endl;;
 #define DDUMP(MULTI_LINE_VARIABLE)                  std::cerr << getTracePrefix() << #MULTI_LINE_VARIABLE<< ":" << std::endl << MULTI_LINE_VARIABLE<< std::endl;
 
 
