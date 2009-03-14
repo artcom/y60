@@ -17,7 +17,7 @@
 # __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 #
 
-find_package(PRO60_DEPS NO_MODULE)
+find_package(PRO60_DEPS NO_MODULE QUIET)
 
 if(PRO60_DEPS_FOUND)
     pro60_deps_register_searchpath()
@@ -27,7 +27,7 @@ else(PRO60_DEPS_FOUND)
     if(WIN32)
         message(FATAL_ERROR "PRO60_DEPS could not be found")
     else(WIN32)
-        message("PRO60_DEPS package could not be found.")
+        message("-- ACMake: PRO60_DEPS package could not be found.")
         if(ENV{PRO60_DEPS})
             list(INSERT CMAKE_PREFIX_PATH 0 $ENV{PRO60_DEPS})
         endif(ENV{PRO60_DEPS})
