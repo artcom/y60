@@ -16,7 +16,6 @@
 #
 
 # XXX: HEADERS is allowed as an argument. This should be removed.
-# XXX: document/remove/revise OSX bundle resource support
 
 # Define an executable in the current ACMake project.
 #
@@ -44,8 +43,8 @@
 macro(ac_add_executable EXECUTABLE_NAME)
     # put arguments into the THIS_EXECUTABLE namespace
     parse_arguments(THIS_EXECUTABLE
-        "SOURCES;HEADERS;DEPENDS;EXTERNS;OSX_BUNDLE_RESOURCES"
-        "DONT_INSTALL;NO_REVISION_INFO;OSX_BUNDLE"
+        "SOURCES;HEADERS;DEPENDS;EXTERNS"
+        "DONT_INSTALL;NO_REVISION_INFO"
         ${ARGN})
 
     # bring name into our namespace
@@ -55,12 +54,6 @@ macro(ac_add_executable EXECUTABLE_NAME)
     if(NOT THIS_EXECUTABLE_NO_REVISION_INFO)
         _ac_buildinfo_filename(${THIS_EXECUTABLE_NAME} THIS_EXECUTABLE_BUILDINFO_FILE)
     endif(NOT THIS_EXECUTABLE_NO_REVISION_INFO)
-
-    # gather bundle resources
-    if(THIS_EXECUTABLE_OSX_BUNDLE)
-        ac_get_all_resources(THIS_EXECUTABLE_RESOURCES
-                ${THIS_EXECUTABLE_OSX_BUNDLE_RESOURCES})
-    endif(THIS_EXECUTABLE_OSX_BUNDLE)
 
     # compute full set of dependencies
     _ac_compute_dependencies(${THIS_EXECUTABLE_NAME} THIS_EXECUTABLE_DEPENDS THIS_EXECUTABLE_EXTERNS)
@@ -86,11 +79,6 @@ macro(ac_add_executable EXECUTABLE_NAME)
         "${THIS_EXECUTABLE_DEPENDS}" "${THIS_EXECUTABLE_EXTERNS}"
     )
 
-    # set up bundle resources
-    if(THIS_EXECUTABLE_OSX_BUNDLE)
-        _ac_attach_resources(${THIS_EXECUTABLE_OSX_BUNDLE_RESOURCES})
-    endif(THIS_EXECUTABLE_OSX_BUNDLE)
-
     # update build information
     if(NOT THIS_EXECUTABLE_NO_REVISION_INFO)
         _ac_add_repository_info(
@@ -105,22 +93,12 @@ macro(ac_add_executable EXECUTABLE_NAME)
     # attach depends and externs
     _ac_attach_depends(${THIS_EXECUTABLE_NAME} "${THIS_EXECUTABLE_DEPENDS}" "${THIS_EXECUTABLE_EXTERNS}")
 
-    # configure target as bundle
-    if(THIS_EXECUTABLE_OSX_BUNDLE)
-        set_target_properties(
-            ${THIS_EXECUTABLE_NAME}
-                PROPERTIES
-                    MACOSX_BUNDLE ON
-        )
-    endif(THIS_EXECUTABLE_OSX_BUNDLE)
-
     # define installation
     if(NOT THIS_EXECUTABLE_DONT_INSTALL)
         install(
             TARGETS ${THIS_EXECUTABLE_NAME}
             EXPORT ${CMAKE_PROJECT_NAME}
             RUNTIME DESTINATION bin
-            BUNDLE  DESTINATION Applications
         )
     endif(NOT THIS_EXECUTABLE_DONT_INSTALL)
     

@@ -4,10 +4,6 @@ if(WIN32)
     list( APPEND EXTERNALS PTHREADVC )
 endif(WIN32)
 
-if(Y60_MAC_OS_X_BUNDLE)
-    set(Y60_APP_STYLE OSX_BUNDLE)
-endif(Y60_MAC_OS_X_BUNDLE)
-
 ac_add_executable(
   y60
   SOURCES y60.cpp
@@ -18,7 +14,6 @@ ac_add_executable(
           aslzip acsdlttf
   EXTERNS ${EXTERNALS}
   ${Y60_APP_STYLE}
-  OSX_BUNDLE_RESOURCES Y60_RESOURCES
 )
 
 

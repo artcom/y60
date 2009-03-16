@@ -68,7 +68,5 @@ ac_done_registering_build_types()
 
 include(AcDocumentation)
 
-include(AcBundleResources) # XXX deprecate this. It's shit. I'know it because I wrote it [DS]
-
 include(AcAddPro60Dependencies)
 
