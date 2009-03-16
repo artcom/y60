@@ -3,13 +3,15 @@
 
 // only needed while the real module loader resides in components/jswrapper_test/*
 
+#include <js/spidermonkey/jsapi.h>
+
 namespace jslib {
 
 class IJSModuleLoader {
     public:
         virtual void initClasses( JSContext * cx, JSObject * global,
-                JSObject * ns, const std::string & module_name) = 0;
-        virtual ~IJSModuleLoader(){}
+                JSObject * ns) = 0;
+        virtual ~IJSModuleLoader() {}
 };
 
 typedef asl::Ptr<IJSModuleLoader> IJSModuleLoaderPtr;

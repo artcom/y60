@@ -1240,7 +1240,7 @@ Load(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         if ( IJSModuleLoaderPtr myModuleLoader =
                 dynamic_cast_Ptr<IJSModuleLoader>( myPlugin ))
         {
-            myModuleLoader->initClasses( cx, obj, myNamespace, myModuleName );
+            myModuleLoader->initClasses( cx, obj, myNamespace);
         }
     } HANDLE_CPP_EXCEPTION;
 
