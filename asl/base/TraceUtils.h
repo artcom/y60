@@ -60,6 +60,7 @@ std::string beautify(const std::string & theSymbol);
 // TODO: put the rest of this in namespace asl
 namespace asl {
 
+/** returns the demangled name of a type as a string */
 template <typename T>
 std::string
 demangled_name() {
@@ -74,9 +75,15 @@ demangled_name() {
         }
         return std::string( typeid(T).name() );
 #   else
-        //TODO: MSVC demangleing ... code should be in the win32 stack tracer
         return std::string(typeid(T).name());
 #   endif
+}
+
+/** returns the demangled name of the return type of an expression as a string */
+template <typename T>
+std::string
+demangled_name(T) {
+    return demangled_name<T>();
 }
 
 } // end of namespace asl
