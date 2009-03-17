@@ -1,6 +1,8 @@
 #ifndef Y60_APE_META_INCLUDED
 #define Y60_APE_META_INCLUDED
 
+#include "y60_ape_settings.h"
+
 #include <boost/type_traits/function_traits.hpp> 
 #include <boost/type_traits/is_void.hpp> 
 #include <boost/type_traits/remove_pointer.hpp> 
@@ -55,7 +57,9 @@ template <int LineNumber> struct line_number {};
 // the name was chosen because it may appear in a compiler error message
 // many times but does not contribute any valuable information. With namespaces
 // it still is too long.
-template <typename Id, typename Appendix> struct eid {}; 
+template <typename Id, typename Appendix> struct eid {
+    typedef Appendix index_type;    
+}; 
 
 }}}
 

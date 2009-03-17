@@ -1,5 +1,5 @@
 # XXX need spidermonkey defs
-add_definitions( -DXP_UNIX )
+#add_definitions( -DXP_UNIX )
 
 y60_add_component(
     ape_test_simple
@@ -14,9 +14,3 @@ y60_add_component(
     ${Y60_APE_LINK_ARGS}
 )
 y60_add_jstest(_functions mod_ape)
-
-y60_add_component(
-    ape_test_hundred_functions
-    SOURCES hundred_functions.cpp
-    ${Y60_APE_LINK_ARGS}
-)

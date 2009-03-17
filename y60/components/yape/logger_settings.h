@@ -1,6 +1,8 @@
 #ifndef Y60_APE_LOGGER_SETTINGS_INCLUDED
 #define Y60_APE_LOGGER_SETTINGS_INCLUDED
 
+#include "y60_ape_settings.h"
+
 #ifdef Y60_APE_HAVE_TEMPLOG
 
 #include <templog/logging.h>
@@ -29,7 +31,10 @@ namespace log {
         usr = aud_user         // for users of the library
     };
     //=== Logger Hierarchy ====================================================
-    typedef global_logger                               root;
+    typedef non_filtering_logger<
+            sev_aud_formatting_policy,
+            stderr_write_policy>
+                                                        root;
 
     typedef logger<root,
             dbg,
@@ -51,7 +56,8 @@ namespace log {
 
 #else // Y60_APE_HAVE_TEMPLOG
 
-#   define APE_LOG( logger, sev, aud ) //
+#   include <asl/base/Logger.h>
+#   define APE_LOG( logger, sev, aud ) AC_PRINT
 
 #endif // Y60_APE_HAVE_TEMPLOG
 

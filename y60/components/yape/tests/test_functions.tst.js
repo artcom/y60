@@ -1,6 +1,4 @@
-
 use("UnitTest.js");
-
 
 function ape_function_test() {
     this.Constructor( this, "ape_function_test");
@@ -18,6 +16,7 @@ ape_function_test.prototype.Constructor = function(obj, name) {
         ENSURE("const_char_ptr_func()" === t.const_char_ptr_func());
         ENSURE(23 === t.int_func_int(23));
         ENSURE(42 === t.int_func_intcr(42));
+        ENSURE(undefined === t.void_func_intcr_stringcr(42,"answer: "));
 
         for ( var f in t ) {
             print( f );

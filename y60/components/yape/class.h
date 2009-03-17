@@ -8,6 +8,7 @@
 #include "ape_thing.h"
 #include "exception.h"
 #include "function.h"
+#include "property.h"
 
 namespace y60 { namespace ape {
 
@@ -23,7 +24,7 @@ class class_wrapper {
                 if (!JS_IsConstructing(cx)) {
                     throw bad_call("constructor called as function", PLUS_FILE_LINE);
                 }
-                return JS_SetPrivate(cx, obj, (void *) new C() );
+                return JS_SetPrivate(cx, obj, static_cast<void *>( new C() ));
             } Y60_APE_CATCH_BLOCKS;
         }
         static 
@@ -33,8 +34,8 @@ class class_wrapper {
         }
         static inline
         C *
-        unwrap_native(JSContext * cx, JSObject * obj) {
-            return static_cast<C*>( JS_GetInstancePrivate( cx, obj, & js_class_, NULL));
+        unwrap_native(JSContext * cx, JSObject * obj, jsval * argv = NULL) {
+            return static_cast<C*>( JS_GetInstancePrivate( cx, obj, & js_class_, argv));
         }
         static 
         void 
@@ -43,8 +44,12 @@ class class_wrapper {
             js_class_.flags       = JSCLASS_HAS_PRIVATE;
             js_class_.addProperty = JS_PropertyStub;
             js_class_.delProperty = JS_PropertyStub;
-            js_class_.getProperty = JS_PropertyStub;
-            js_class_.setProperty = JS_PropertyStub;
+            if ( ! js_class_.getProperty ) {
+                js_class_.getProperty = JS_PropertyStub;
+            }
+            if ( ! js_class_.setProperty ) {
+                js_class_.setProperty = JS_PropertyStub;
+            }
             js_class_.enumerate   = JS_EnumerateStub;
             js_class_.resolve     = JS_ResolveStub;
             js_class_.convert     = JS_ConvertStub;
@@ -61,6 +66,12 @@ class class_wrapper {
             }
         }
 
+        template <typename AllItems>
+        inline
+        void
+        init_property_accessors( AllItems const& all_items ) {
+        }
+
         static inline JSClass * js_class_ptr() { return & js_class_; }
         static inline monkey_data & specs() { return specs_; }
     private:
@@ -75,39 +86,61 @@ template <typename C> monkey_data class_wrapper<C>::specs_ = monkey_data();
 template <typename C>
 class class_desc : public ape_thing {
     public:
-        typedef boost::shared_ptr<class_desc> ptr_type;
+        typedef class_wrapper<C> wrapper_type;
 
-        class_desc(const char* name) : ape_thing( ape_class, name ) {}
+        class_desc(const char* name, uint8 flags) :
+            ape_thing( ape_class, name, flags),
+            property_accessors_created_( false ) {}
 
-        virtual void import(JSContext * cx, JSObject * ns, monkey_data & /*parent_ctx*/ ) {
+        void 
+        import(JSContext * cx, JSObject * ns, monkey_data &) {
             typedef log::import log_t;
             APE_LOG(log_t,log::inf,log::usr) << "importing class '"
                 << get_name() << "'";
 
-            typedef class_wrapper<C> cw;
-            import_children(cx, ns, cw::specs());
-            cw::init_class(cx, ns, get_name());
+            import_children(cx, ns, wrapper_type::specs());
+            wrapper_type::init_class(cx, ns, get_name());
         }
+        template <typename AllItems>
+        inline
+        void
+        init_property_accessors( AllItems const& all_items ) {
+            if ( ! property_accessors_created_ ) {
+                wrapper_type::init_property_accessors( all_items );
+                property_accessors_created_ = true;
+            }
+        }
+    private:
+        bool property_accessors_created_;
 }; 
 
 template <typename C, int FIdx = 0, int PIdx = 0>
 class class_helper {
     public:
-        class_helper(ape_thing & parent) : parent_( parent ) {}
+        class_helper(scope_lock sl) : scope_lock_( sl ) {}
         ~class_helper() {}
 
         template <typename F>
         class_helper<C, FIdx + 1, PIdx>
-        function(F f, const char * name) {
-            typedef eid<C, boost::mpl::long_<FIdx> > unique_id;
-            parent_.add( ape_thing_ptr( new function_desc<F,unique_id>(f,name,parent_.function_flags()) ));
+        function(const char * name, F f) {
+            typedef eid<C, boost::mpl::long_<FIdx> > uid;
+            current_scope->add( ape_thing_ptr(
+                        new function_desc<F,uid>(name,f,current_scope->property_flags())));
 
             typedef class_helper<C, FIdx + 1, PIdx> next_type;
-            return next_type( parent_ );
+            return next_type(scope_lock_);
+        }
+        template <typename T>
+        class_helper<C, FIdx, PIdx + 1>
+        property(const char * name, T v) {
+            typedef eid<C, boost::mpl::long_<PIdx> > uid;
+            current_scope->add( ape_thing_ptr(
+                        new property_desc<T,uid>(name,v,current_scope->property_flags())));
+            typedef class_helper<C, FIdx, PIdx + 1> next_type;
+            return next_type(scope_lock_);
         }
     private:
-
-        ape_thing & parent_;
+        scope_lock scope_lock_;
 };
 
 } // end of namespace detail

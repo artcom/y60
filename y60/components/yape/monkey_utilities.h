@@ -1,8 +1,12 @@
 #ifndef Y60_APE_MONKEY_UTILITIES_INCLUDED
 #define Y60_APE_MONKEY_UTILITIES_INCLUDED
 
+#include "y60_ape_settings.h"
+
 #include <js/spidermonkey/jsapi.h>
 #include <asl/base/begin_end.h>
+
+#include "exception.h"
 
 namespace y60 { namespace ape { namespace detail {
 

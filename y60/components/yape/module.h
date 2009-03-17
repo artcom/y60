@@ -19,6 +19,7 @@
 #include "function.h"
 #include "monkey_utilities.h"
 #include "ape_thing.h"
+#include "scope.h"
 
 namespace y60 { namespace ape {
 
@@ -29,17 +30,14 @@ class binding {
         struct unique_id : boost::mpl::vector2<LocalUniqueId, UserModule> {};
 
     protected:
-        binding(detail::ape_thing & module) : module_(module) {
-            // XXX: this only works as long as no virtual functions
-            //      are involved! binding is not fully constructed yet!
-            static_cast<UserModule&>( *this ).bind();
+        binding() {
         }
 
         template <typename LocalUniqueId>
         detail::namespace_helper< typename unique_id<LocalUniqueId>::type >
         namespace_scope() {
             typedef typename unique_id<LocalUniqueId>::type id;
-            return detail::namespace_helper<id>( module_ );
+            return detail::namespace_helper<id>();
         }
 
         template <typename Class>
@@ -47,20 +45,20 @@ class binding {
         class_(const char * name) {
             typedef typename unique_id<Class>::type id;
             typedef boost::shared_ptr<detail::class_desc<Class> > cp;
-            cp c( new detail::class_desc<Class>(name) );
-            module_.add( c );
-            return detail::class_helper<Class>( * c );
+            // XXX ugly
+            cp cd( new detail::class_desc<Class>(name,
+                            detail::current_scope->property_flags()));
+            detail::current_scope->add( cd );
+            detail::scope_lock class_scope_lock( new detail::scope(cd));
+            return detail::class_helper<Class>( class_scope_lock );
         }
 
-        void enumerate(bool functions, bool properties, bool classes) {
-            module_.set_function_flag(JSPROP_ENUMERATE, functions);
-            module_.set_property_flag(JSPROP_ENUMERATE, properties);
-            module_.set_class_flag(JSPROP_ENUMERATE, classes);
+        void enumerate(bool flag) {
+            detail::current_scope->enumerate(flag);
         }
 
         template <typename Class> friend class class_wrapper;
     private:
-        detail::ape_thing &          module_;
 };
 
 template <typename Binding>
@@ -78,11 +76,14 @@ class module : public detail::ape_thing {
                 throw ape_error(os.str(), PLUS_FILE_LINE);
             }
             {
-                Binding b(*this);
+                Binding b;
+                b.bind();
             }
             import_children(cx, ns, ns_scope);
-            if ( ! JS_DefineFunctions(cx, ns, ns_scope.functions.ptr())) {
-                throw monkey_error("failed to define functions", PLUS_FILE_LINE);
+            if ( ! ns_scope.static_functions.empty()) {
+                if ( ! JS_DefineFunctions(cx, ns, ns_scope.static_functions.ptr())) {
+                    throw monkey_error("failed to define functions", PLUS_FILE_LINE);
+                }
             }
             imported = true;
         }
@@ -108,16 +109,17 @@ class module_loader : public asl::PlugInBase,
 
         // implement IJSModuleLoader
         void initClasses(JSContext * cx, JSObject * global, JSObject * ns) {
-            static module_ptr_type module = init_module(cx, global, ns);
+            init_module(cx, global, ns);
         }
     private:
-        module_ptr_type
+        void
         init_module(JSContext * cx, JSObject * global, JSObject * ns) {
-            module_ptr_type module( new module_type(module_name_) );
-            module->import(cx, ns);
+            module_ptr_type mod(new module<ModuleBinding>(module_name_));
+            detail::scope module_scope(mod);
+
+            mod->import(cx, ns);
             // TODO: policy-fy
-            announce_module_in_namespace(cx, ns, module->get_name());
-            return module;
+            announce_module_in_namespace(cx, ns, detail::current_scope->get_name());
         }
 
         void announce_module_in_namespace(JSContext * cx, JSObject * obj,
@@ -173,8 +175,8 @@ class Y60_APE_BNAME(name) : public y60::ape::binding< Y60_APE_BNAME(name) > {   
         friend class y60::ape::module< Y60_APE_BNAME(name) >;                   \
         void bind();                                                            \
     protected:                                                                  \
-        Y60_APE_BNAME(name)(y60::ape::detail::ape_thing & mod) :                \
-                y60::ape::binding< Y60_APE_BNAME(name) >(mod) {}                \
+        Y60_APE_BNAME(name)() :                \
+                y60::ape::binding< Y60_APE_BNAME(name) >() {}                \
 };                                                                              \
                                                                                 \
 extern "C" Y60_APE_MODULE_DECL                                                  \

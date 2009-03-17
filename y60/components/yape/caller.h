@@ -1,6 +1,8 @@
 #ifndef Y60_APE_CALLER_INCLUDED
 #define Y60_APE_CALLER_INCLUDED
 
+#include "y60_ape_settings.h"
+
 #include "invoke.h"
 #include "arguments.h"
 
@@ -14,13 +16,13 @@ class caller {
         call(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, jsval * rval) {
             try {
                 arguments<F, Sig> args(cx, argc, argv);
-                invoke(invoke_tag<F>(), f_, args, cx, obj, rval );
+                invoke( invoke_tag<F>(), f_, args, cx, obj, rval );
                 return JS_TRUE;
             } Y60_APE_CATCH_BLOCKS;
         }
         static void init(F func) {
             if (f_ != 0) { 
-                throw ape_error("duplicate initialization of function ptr",
+                throw ape_error("duplicate initialization of function pointer",
                         PLUS_FILE_LINE);
             }
             f_ = func;

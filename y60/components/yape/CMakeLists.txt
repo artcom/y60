@@ -1,18 +1,22 @@
 set( LIB_HEADERS
-ape_thing.h
-arguments.h
-caller.h
-class.h
-exception.h
-function.h
-invoke.h
-invoke2.h
-module.h
-signature.h
-typelist.h
-y60_ape_config.h
-y60_ape_settings.h
-yape.h
+    ape_thing.h
+    arguments.h
+    caller.h
+    class.h
+    cv_qualifier_macros.h
+    exception.h
+    function.h
+    invoke.h
+    logger_settings.h
+    meta.h
+    module.h
+    monkey_utilities.h
+    property.h
+    signature.h
+    typelist.h
+    y60_ape_settings.h
+    y60_ape_config.h
+    yape.h
 )
 
 # look for templog
@@ -22,7 +26,7 @@ find_path(
 )
 
 if(TEMPLOG_INCLUDE_DIR)
-    message("Found templog")
+    message("-- Y60 Ape: Found templog")
     set(Y60_APE_HAVE_TEMPLOG ON)
     include_directories( ${TEMPLOG_INCLUDE_DIR} )
 endif(TEMPLOG_INCLUDE_DIR)
@@ -37,14 +41,15 @@ ac_configure_file(
 ac_add_library(
     yape
     HEADERS ${LIB_HEADERS} ${TEMPLOG_HEADERS}
-    DEPENDS y60jsbase 
-    EXTERNS Boost 
+    DEPENDS y60jsbase y60jslib ${JSDEPENDS}
+    EXTERNS Boost ${JSEXTERN}
 )
 
 set(Y60_APE_LINK_ARGS
-    DEPENDS ${JSDEPENDS} y60jslib 
+    DEPENDS yape ${JSDEPENDS} y60jslib 
     EXTERNS ${JSEXTERN}
 )
 
-add_subdirectory( examples )
 add_subdirectory( tests )
+add_subdirectory( benchmarks )
+add_subdirectory( examples )

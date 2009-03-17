@@ -9,13 +9,14 @@
 #include "ape_thing.h"
 #include "monkey_utilities.h"
 #include "caller.h"
+#include "scope.h"
 
 namespace y60 { namespace ape { namespace detail {
 
 template <typename F, typename Id >
 class function_desc : public ape_thing {
     public:
-        function_desc(F f, const char * name, uint8 flags) : ape_thing(ape_function,name) {
+        function_desc(const char * name, F f, uint8 flags) : ape_thing(ape_function,name) {
             fs_.name  = name;
             fs_.call  = get_caller<F,Id>(f, get_signature( f ));
             fs_.nargs = arity<F>::value;
@@ -23,12 +24,17 @@ class function_desc : public ape_thing {
             fs_.extra = 0;
         }
 
-        virtual
         void
         import(JSContext * cx, JSObject * ns, monkey_data & ape_ctx) {
-            APE_LOG(log::import,log::inf,log::usr) 
-                << "importing function '" << get_name() << "'";
-            ape_ctx.functions.add( fs_ );
+            if ( boost::is_member_function_pointer<F>::value ) {
+                APE_LOG(log::import,log::inf,log::usr) 
+                    << "importing member function '" << get_name() << "'";
+                ape_ctx.functions.add( fs_ );
+            } else {
+                APE_LOG(log::import,log::inf,log::usr) 
+                    << "importing static function '" << get_name() << "'";
+                ape_ctx.static_functions.add( fs_ );
+            }
         }
 
     private:
@@ -38,23 +44,26 @@ class function_desc : public ape_thing {
 template <typename Id, int Idx = 0>
 class namespace_helper {
     public:
-        namespace_helper(ape_thing & parent) : parent_(parent) {}
+        namespace_helper() {}
         ~namespace_helper() {}
 
         template <typename F>
         namespace_helper<Id, Idx + 1>
-        function(F f, const char * name) {
+        function(const char * name, F f) {
             typedef eid<Id, boost::mpl::long_<Idx> > uid;
 
-            parent_.add( ape_thing_ptr(
-                        new function_desc<F,uid>(f,name,parent_.function_flags())));
+            current_scope->add( ape_thing_ptr(
+                        new function_desc<F,uid>(name,f,current_scope->property_flags())));
 
             typedef namespace_helper<Id, Idx + 1> next_type;
-            return next_type(parent_);
+            return next_type();
         }
 
-    private:
-        ape_thing & parent_;
+        namespace_helper<Id,Idx> &
+        enumerate(bool flag) {
+            current_scope->enumerate(flag);
+            return *this;
+        }
 };
 
 }}} // end of namespace detail, ape, y60
