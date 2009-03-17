@@ -18,6 +18,13 @@
 if(MSVC)
     # Full warnings
     add_definitions( /W4 )
+
+    set(ACMAKE_PARALLEL_CL "" CACHE STRING "Number of processes to use when compiling with cl")
+
+    if(ACMAKE_PARALLEL_CL)
+        add_definitions( /MP${ACMAKE_PARALLEL_CL} )
+    endif(ACMAKE_PARALLEL_CL)
+
 endif(MSVC)
 
 if(CMAKE_COMPILER_IS_GNUC OR CMAKE_COMPILER_IS_GNUCXX)
