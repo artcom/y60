@@ -78,7 +78,7 @@
 
 namespace y60 {
     class ClipBuilder;
-    class Y60_SCENE_EXPORT CharacterBuilder : public BuilderBase {
+    class Y60_SCENE_DECL CharacterBuilder : public BuilderBase {
         public:
             CharacterBuilder(const std::string & theName);
             virtual ~CharacterBuilder();

@@ -301,14 +301,14 @@ class target_info_initializer {
     asl::no_scm_data()
 
 #ifdef WIN32
-#   define BUILDINFO_DLL_EXPORT __declspec(dllexport)
+#   define BUILDINFO_DLL_DECL __declspec(dllexport)
 #else
-#   define BUILDINFO_DLL_EXPORT
+#   define BUILDINFO_DLL_DECL
 #endif
 
 #define ACMAKE_BUILDINFO(name, target_type, scm_info, c_ident)          \
         namespace {                                                     \
-            BUILDINFO_DLL_EXPORT                                        \
+            BUILDINFO_DLL_DECL                                        \
             asl::target_info_initializer revision_info ## c_ident =     \
                     asl::target_info_initializer( name,                 \
                             asl::build_target_info:: target_type,       \

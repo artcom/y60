@@ -210,7 +210,7 @@ namespace asl {
     }
 
 
-    ASL_MATH_EXPORT double calculatePolyhedraVolume(const std::vector<Point3f> & theTriangleVertices);
+    ASL_MATH_DECL double calculatePolyhedraVolume(const std::vector<Point3f> & theTriangleVertices);
     /* @} */
 };
 

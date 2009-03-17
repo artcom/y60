@@ -84,7 +84,7 @@
 
 class PLBmp;
 
-class Y60_IMAGE_EXPORT PLFilterResizePadded : public PLFilter {
+class Y60_IMAGE_DECL PLFilterResizePadded : public PLFilter {
     public:
         PLFilterResizePadded(unsigned theNewWidth, unsigned theNewHeight) :
             _myNewWidth(theNewWidth), _myNewHeight(theNewHeight) {}

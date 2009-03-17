@@ -124,10 +124,10 @@ struct JSClassTraits<JSCMSCache::NATIVE>
     : public JSClassTraitsWrapper<JSCMSCache::NATIVE, JSCMSCache> {};
 
 
-Y60_CMSCACHE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, JSCMSCache::OWNERPTR & theCMSCache);
+Y60_CMSCACHE_DECL bool convertFrom(JSContext *cx, jsval theValue, JSCMSCache::OWNERPTR & theCMSCache);
 
-Y60_CMSCACHE_EXPORT jsval as_jsval(JSContext *cx, JSCMSCache::OWNERPTR theOwner);
-Y60_CMSCACHE_EXPORT jsval as_jsval(JSContext *cx, JSCMSCache::OWNERPTR theOwner, JSCMSCache::NATIVE * theCMSCache);
+Y60_CMSCACHE_DECL jsval as_jsval(JSContext *cx, JSCMSCache::OWNERPTR theOwner);
+Y60_CMSCACHE_DECL jsval as_jsval(JSContext *cx, JSCMSCache::OWNERPTR theOwner, JSCMSCache::NATIVE * theCMSCache);
 
 } // namespace jslib
 #endif

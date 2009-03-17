@@ -81,7 +81,7 @@
 #include <asl/dom/Nodes.h>
 
 namespace y60 {
-    class Y60_SCENE_EXPORT AnimationBuilder : public BuilderBase {
+    class Y60_SCENE_DECL AnimationBuilder : public BuilderBase {
         public:
             AnimationBuilder();
             virtual ~AnimationBuilder();

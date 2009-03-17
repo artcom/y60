@@ -44,7 +44,7 @@ namespace dom {
     typedef asl::Ptr<Facade,ThreadingModel> FacadePtr;
     typedef asl::WeakPtr<Facade,ThreadingModel> FacadeWeakPtr;
 
-    class ASL_DOM_EXPORT Facade : public TypedNamedNodeMap {
+    class ASL_DOM_DECL Facade : public TypedNamedNodeMap {
         public:
             DEFINE_NESTED_EXCEPTION(Facade, Exception, asl::Exception);
             DEFINE_NESTED_EXCEPTION(Facade, InvalidNullPointerPassed, Exception);
@@ -164,7 +164,7 @@ namespace dom {
                      this->_myParentName < second._myParentName) );
         }
     };
-    class ASL_DOM_EXPORT FacadeFactory {
+    class ASL_DOM_DECL FacadeFactory {
         public:
             FacadeFactory() {};
             Facade * createFacade(const DOMString & theType, Node & theNode,

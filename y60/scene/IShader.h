@@ -83,7 +83,7 @@ namespace y60 {
     class Light;
     typedef std::vector<asl::Ptr<Light, dom::ThreadingModel> > LightVector;
 
-    class Y60_SCENE_EXPORT IShader {
+    class Y60_SCENE_DECL IShader {
         public:
             virtual const std::string & getName() const = 0;
             virtual unsigned getPropertyNodeCount() const =0;
@@ -137,7 +137,7 @@ namespace y60 {
     typedef asl::Ptr<ICombiner, dom::ThreadingModel> ICombinerPtr;
     typedef asl::WeakPtr<ICombiner, dom::ThreadingModel> ICombinerWeakPtr;
 
-    class Y60_SCENE_EXPORT IShaderLibrary {
+    class Y60_SCENE_DECL IShaderLibrary {
     public:
         virtual IShaderPtr findShader(MaterialBasePtr theMaterial) = 0;
         virtual ICombinerPtr findCombiner(const std::string & theCombinerName) = 0;

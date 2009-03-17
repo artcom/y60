@@ -37,9 +37,9 @@ namespace dom {
 
     // Introduced in DOM Level 2:
 
-    ASL_DOM_EXPORT extern const char * PhaseTypeName[];
+    ASL_DOM_DECL extern const char * PhaseTypeName[];
 
-    class ASL_DOM_EXPORT Event {
+    class ASL_DOM_DECL Event {
     public:
         // PhaseType
         enum PhaseType { CAPTURING_PHASE                = 1,
@@ -93,7 +93,7 @@ namespace dom {
     };
 
     // Introduced in DOM Level 2:
-    class ASL_DOM_EXPORT EventTarget {
+    class ASL_DOM_DECL EventTarget {
     public:
         virtual ~EventTarget() {}
         virtual void addEventListener(const DOMString & type, 
@@ -273,7 +273,7 @@ namespace dom {
         asl::Ptr<AC_PAYLOAD_TPL> _myPayload;
     };
 
-    class ASL_DOM_EXPORT EventFactory {
+    class ASL_DOM_DECL EventFactory {
     public:
 		EventFactory();
 		EventPtr createEvent(const DOMString & theType) const;
@@ -284,7 +284,7 @@ namespace dom {
 		ProtoMap _myPrototypes;
 	};
 
-	ASL_DOM_EXPORT extern void registerStandardTypes(EventFactory & theFactory);
+	ASL_DOM_DECL extern void registerStandardTypes(EventFactory & theFactory);
 
     inline
     EventFactory &

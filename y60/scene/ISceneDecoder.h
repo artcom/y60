@@ -77,7 +77,7 @@
 
 namespace y60 {
 
-class Y60_SCENE_EXPORT ISceneDecoder : public IDecoder {
+class Y60_SCENE_DECL ISceneDecoder : public IDecoder {
     public:
         virtual bool decodeScene(asl::Ptr<asl::ReadableStreamHandle>, dom::DocumentPtr theScene) = 0;
         virtual bool setProgressNotifier(IProgressNotifierPtr theNotifier) = 0;

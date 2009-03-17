@@ -149,8 +149,8 @@ template <>
 struct JSClassTraits<JSGradientSlider::NATIVE> 
     : public JSClassTraitsWrapper<JSGradientSlider::NATIVE, JSGradientSlider> {};
 
-Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSGradientSlider::NATIVE * theWindow);
-Y60_JSGTK_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<acgtk::GradientSlider> & theGradientSlider);
+Y60_JSGTK_DECL jsval as_jsval(JSContext *cx, JSGradientSlider::NATIVE * theWindow);
+Y60_JSGTK_DECL bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<acgtk::GradientSlider> & theGradientSlider);
 
 } // namespace
 

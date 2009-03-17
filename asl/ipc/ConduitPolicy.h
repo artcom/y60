@@ -69,7 +69,7 @@ typedef std::deque<CharBufferPtr> BufferQueue;
   message-based communication with asl::Block based payloads) to provide Messages-over-tcp (MessageAcceptor<TCPPolicy>)
   or Messages-over-Named Pipes (MessageAcceptor<NamedPipePolicy>).
 **/
-class ASL_IPC_EXPORT ConduitPolicy {
+class ASL_IPC_DECL ConduitPolicy {
     public:
 //        enum State { COMPLETED, PENDING, NO_CONNECTION };
         

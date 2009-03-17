@@ -4,9 +4,9 @@
 #include <asl/base/settings.h>
 
 #ifdef y60glrender_EXPORTS
-#   define Y60_GLRENDER_EXPORT AC_DLL_EXPORT
+#   define Y60_GLRENDER_DECL AC_DLL_EXPORT
 #else
-#   define Y60_GLRENDER_EXPORT AC_DLL_IMPORT
+#   define Y60_GLRENDER_DECL AC_DLL_IMPORT
 #endif
 
 #endif // Y60_GLRENDER_SETTING_INCLUDED

@@ -125,8 +125,8 @@ namespace jslib {
     
 } // namespace jslib
 
-Y60_PARTICLES_EXPORT jsval as_jsval(JSContext *cx, JSParticleSystem::OWNERPTR theOwner);
-Y60_PARTICLES_EXPORT jsval as_jsval(JSContext *cx, JSParticleSystem::OWNERPTR theOwner, JSParticleSystem::NATIVE * theSerial);
+Y60_PARTICLES_DECL jsval as_jsval(JSContext *cx, JSParticleSystem::OWNERPTR theOwner);
+Y60_PARTICLES_DECL jsval as_jsval(JSContext *cx, JSParticleSystem::OWNERPTR theOwner, JSParticleSystem::NATIVE * theSerial);
 
 #endif
 

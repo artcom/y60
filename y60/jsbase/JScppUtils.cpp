@@ -259,14 +259,14 @@ jsval as_jsval(JSContext *cx, const std::basic_string<asl::Unsigned16> & theUTF1
     return STRING_TO_JSVAL(myString);    
 }
 
-template Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, const std::vector<bool> & theVector);
-template Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, const std::vector<y60::AcBool> & theVector);
-template Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, const std::vector<unsigned char> & theVector);
-template Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, const std::vector<int> & theVector);
-template Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, const std::vector<unsigned int> & theVector);
-template Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, const std::vector<float> & theVector);
-template Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, const std::vector<double> & theVector);
-template Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, const std::vector<std::string> & theVector);
+template Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, const std::vector<bool> & theVector);
+template Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, const std::vector<y60::AcBool> & theVector);
+template Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, const std::vector<unsigned char> & theVector);
+template Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, const std::vector<int> & theVector);
+template Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, const std::vector<unsigned int> & theVector);
+template Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, const std::vector<float> & theVector);
+template Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, const std::vector<double> & theVector);
+template Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, const std::vector<std::string> & theVector);
          
 void ensureParamCount(uintN argc, int theMinCount, int theMaxCount) {
     if ( static_cast<int>(argc) < theMinCount) {
@@ -1058,18 +1058,18 @@ bool convertFrom(JSContext *cx, jsval theValue, asl::Time & theDest) {
     return false;
 }
 
-template Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, std::vector<double> & theVector);
-template Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, std::vector<float> & theVector);
-template Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, std::vector<unsigned short> & theVector);
-template Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, std::vector<int> & theVector);
-template Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, std::vector<unsigned int> & theVector);
-template Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, std::vector<unsigned long> & theVector);
-template Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, std::vector<long> & theVector);
-template Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, std::vector<bool> & theVector);
-template Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, std::vector<std::string> & theVector);
-template Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, std::vector<JSObject *> & theVector);
-template Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, std::vector<unsigned char> & theVector);
-template Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, std::vector<asl::Time> & theVector);
-template Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, std::vector<dom::NodePtr> & theVector);
+template Y60_JSBASE_DECL bool convertFrom(JSContext *cx, jsval theValue, std::vector<double> & theVector);
+template Y60_JSBASE_DECL bool convertFrom(JSContext *cx, jsval theValue, std::vector<float> & theVector);
+template Y60_JSBASE_DECL bool convertFrom(JSContext *cx, jsval theValue, std::vector<unsigned short> & theVector);
+template Y60_JSBASE_DECL bool convertFrom(JSContext *cx, jsval theValue, std::vector<int> & theVector);
+template Y60_JSBASE_DECL bool convertFrom(JSContext *cx, jsval theValue, std::vector<unsigned int> & theVector);
+template Y60_JSBASE_DECL bool convertFrom(JSContext *cx, jsval theValue, std::vector<unsigned long> & theVector);
+template Y60_JSBASE_DECL bool convertFrom(JSContext *cx, jsval theValue, std::vector<long> & theVector);
+template Y60_JSBASE_DECL bool convertFrom(JSContext *cx, jsval theValue, std::vector<bool> & theVector);
+template Y60_JSBASE_DECL bool convertFrom(JSContext *cx, jsval theValue, std::vector<std::string> & theVector);
+template Y60_JSBASE_DECL bool convertFrom(JSContext *cx, jsval theValue, std::vector<JSObject *> & theVector);
+template Y60_JSBASE_DECL bool convertFrom(JSContext *cx, jsval theValue, std::vector<unsigned char> & theVector);
+template Y60_JSBASE_DECL bool convertFrom(JSContext *cx, jsval theValue, std::vector<asl::Time> & theVector);
+template Y60_JSBASE_DECL bool convertFrom(JSContext *cx, jsval theValue, std::vector<dom::NodePtr> & theVector);
 
 }

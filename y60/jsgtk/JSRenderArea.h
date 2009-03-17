@@ -137,8 +137,8 @@ template <>
 struct JSClassTraits<JSRenderArea::NATIVE>
     : public JSClassTraitsWrapper<JSRenderArea::NATIVE, JSRenderArea> {};
 
-Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSRenderArea::OWNERPTR theOwner, JSRenderArea::NATIVE * theWindow);
-Y60_JSGTK_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<acgtk::RenderArea> & theRenderArea);
+Y60_JSGTK_DECL jsval as_jsval(JSContext *cx, JSRenderArea::OWNERPTR theOwner, JSRenderArea::NATIVE * theWindow);
+Y60_JSGTK_DECL bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<acgtk::RenderArea> & theRenderArea);
 
 } // namespace
 

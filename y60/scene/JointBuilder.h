@@ -78,7 +78,7 @@
 
 namespace y60 {
 
-    class Y60_SCENE_EXPORT JointBuilder : public TransformBuilderBase {
+    class Y60_SCENE_DECL JointBuilder : public TransformBuilderBase {
         public:
             JointBuilder(const std::string & theName);
             virtual ~JointBuilder() {};

@@ -140,7 +140,7 @@ template <>
 struct JSClassTraits<JSComboBox::NATIVE>
     : public JSClassTraitsWrapper<JSComboBox::NATIVE, JSComboBox> {};
 
-Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSComboBox::OWNERPTR theOwner, JSComboBox::NATIVE * theNative);
+Y60_JSGTK_DECL jsval as_jsval(JSContext *cx, JSComboBox::OWNERPTR theOwner, JSComboBox::NATIVE * theNative);
 
 } // namespace
 

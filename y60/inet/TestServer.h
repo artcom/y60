@@ -66,7 +66,7 @@
 
 namespace inet {
     
-class Y60_INET_EXPORT TestServer : public asl::ConduitServer<asl::TCPPolicy> {
+class Y60_INET_DECL TestServer : public asl::ConduitServer<asl::TCPPolicy> {
     public:
         static asl::ConduitServer<asl::TCPPolicy>::Ptr create(asl::TCPPolicy::Handle theHandle);
     private:

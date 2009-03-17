@@ -80,16 +80,16 @@
 
 namespace y60 {
     //                  theTagName                 theType           theAttributeName              theDefault
-    DEFINE_ATTRIBUT_TAG(TextureUnitTextureIdTag,   std::string,      TEXTUREUNIT_TEXTURE_ATTRIB,   "", Y60_SCENE_EXPORT);
-    DEFINE_ATTRIBUT_TAG(TextureUnitApplyModeTag,   TextureApplyMode, TEXTUREUNIT_APPLYMODE_ATTRIB, MODULATE, Y60_SCENE_EXPORT);
-    DEFINE_ATTRIBUT_TAG(TextureUnitCombinerTag,    std::string,      TEXTUREUNIT_COMBINER_ATTRIB,  "", Y60_SCENE_EXPORT);
-    DEFINE_ATTRIBUT_TAG(TextureUnitEnvColorTag,    asl::Vector4f,    TEXTUREUNIT_ENVCOLOR_ATTRIB,  asl::Vector4f(1,1,1,1), Y60_SCENE_EXPORT);
-    DEFINE_ATTRIBUT_TAG(TextureUnitSpriteTag,      bool,             TEXTUREUNIT_SPRITE_ATTRIB,    false, Y60_SCENE_EXPORT);
-    DEFINE_ATTRIBUT_TAG(TextureUnitProjectorIdTag, std::string,      TEXTUREUNIT_PROJECTOR_ATTRIB, "", Y60_SCENE_EXPORT);
-    DEFINE_ATTRIBUT_TAG(TextureUnitMatrixTag,      asl::Matrix4f,    MATRIX_ATTRIB,                asl::Matrix4f::Identity(), Y60_SCENE_EXPORT);
+    DEFINE_ATTRIBUT_TAG(TextureUnitTextureIdTag,   std::string,      TEXTUREUNIT_TEXTURE_ATTRIB,   "", Y60_SCENE_DECL);
+    DEFINE_ATTRIBUT_TAG(TextureUnitApplyModeTag,   TextureApplyMode, TEXTUREUNIT_APPLYMODE_ATTRIB, MODULATE, Y60_SCENE_DECL);
+    DEFINE_ATTRIBUT_TAG(TextureUnitCombinerTag,    std::string,      TEXTUREUNIT_COMBINER_ATTRIB,  "", Y60_SCENE_DECL);
+    DEFINE_ATTRIBUT_TAG(TextureUnitEnvColorTag,    asl::Vector4f,    TEXTUREUNIT_ENVCOLOR_ATTRIB,  asl::Vector4f(1,1,1,1), Y60_SCENE_DECL);
+    DEFINE_ATTRIBUT_TAG(TextureUnitSpriteTag,      bool,             TEXTUREUNIT_SPRITE_ATTRIB,    false, Y60_SCENE_DECL);
+    DEFINE_ATTRIBUT_TAG(TextureUnitProjectorIdTag, std::string,      TEXTUREUNIT_PROJECTOR_ATTRIB, "", Y60_SCENE_DECL);
+    DEFINE_ATTRIBUT_TAG(TextureUnitMatrixTag,      asl::Matrix4f,    MATRIX_ATTRIB,                asl::Matrix4f::Identity(), Y60_SCENE_DECL);
     DEFINE_EXCEPTION(TextureUnitException, asl::Exception);
 
-    class Y60_SCENE_EXPORT TextureUnit :
+    class Y60_SCENE_DECL TextureUnit :
         public dom::Facade,
         public TextureUnitTextureIdTag::Plug,
         public TextureUnitProjectorIdTag::Plug,

@@ -144,8 +144,8 @@ template <>
 struct JSClassTraits<JSGrayScale::NATIVE> 
     : public JSClassTraitsWrapper<JSGrayScale::NATIVE, JSGrayScale> {};
 
-Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSGrayScale::NATIVE * theWindow);
-Y60_JSGTK_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<acgtk::GrayScale> & theGrayScale);
+Y60_JSGTK_DECL jsval as_jsval(JSContext *cx, JSGrayScale::NATIVE * theWindow);
+Y60_JSGTK_DECL bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<acgtk::GrayScale> & theGrayScale);
 
 } // namespace
 

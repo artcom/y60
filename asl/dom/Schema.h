@@ -55,7 +55,7 @@ namespace dom {
 /*! \addtogroup aslxml */
 /* @{ */
 
-class ASL_DOM_EXPORT Schema : public DocumentFragment {
+class ASL_DOM_DECL Schema : public DocumentFragment {
 	public:
 		DEFINE_NESTED_EXCEPTION(dom::Schema,Exception,asl::Exception);
 		DEFINE_NESTED_EXCEPTION(dom::Schema,DuplicateDeclaration,Exception);

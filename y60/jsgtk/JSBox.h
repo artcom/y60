@@ -138,7 +138,7 @@ template <>
 struct JSClassTraits<JSBox::NATIVE>
     : public JSClassTraitsWrapper<JSBox::NATIVE, JSBox> {};
 
-Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSBox::OWNERPTR theOwner, JSBox::NATIVE * theBox);
+Y60_JSGTK_DECL jsval as_jsval(JSContext *cx, JSBox::OWNERPTR theOwner, JSBox::NATIVE * theBox);
 
 } // namespace
 

@@ -71,28 +71,28 @@ namespace asl {
     // returns the hostname
     // @warning Returns only the NetBIOS name under Win9x,
     //          all other Windows versions return the fully qualified DNS name.
-    ASL_BASE_EXPORT const std::string & hostname();
+    ASL_BASE_DECL const std::string & hostname();
 
     // returns the name of the application without path and possibly truncated
     // to a handsome length
-    ASL_BASE_EXPORT const std::string & appname();
+    ASL_BASE_DECL const std::string & appname();
 
     // return a concatenation of hostname and appname separated by a colon (':')
-    ASL_BASE_EXPORT const std::string & hostappid();
+    ASL_BASE_DECL const std::string & hostappid();
 
     // returns a string identifying login session
     std::string getSessionId();
 
-    ASL_BASE_EXPORT unsigned long getThreadId();
+    ASL_BASE_DECL unsigned long getThreadId();
 
     void precision_sleep(double theSeconds);
 
     // environment variable handling
 
     // expands embedded ${ENVVAR} with their values
-    ASL_BASE_EXPORT std::string expandEnvironment(const std::string & theString);
-    ASL_BASE_EXPORT bool get_environment_var(const std::string & theVariable, std::string & theValue);
-    ASL_BASE_EXPORT void set_environment_var(const std::string & theVariable, const std::string & theValue);
+    ASL_BASE_DECL std::string expandEnvironment(const std::string & theString);
+    ASL_BASE_DECL bool get_environment_var(const std::string & theVariable, std::string & theValue);
+    ASL_BASE_DECL void set_environment_var(const std::string & theVariable, const std::string & theValue);
 
     template <class T>
     bool get_environment_var_as(const std::string & theVariable, T& theValue);
@@ -111,7 +111,7 @@ namespace asl {
     }
 
 #ifdef _WIN32
-		ASL_BASE_EXPORT bool hResultIsOk(HRESULT hr, std::string & theMessage);
+		ASL_BASE_DECL bool hResultIsOk(HRESULT hr, std::string & theMessage);
 #endif		
     /* @} */
 

@@ -86,7 +86,7 @@ namespace y60 {
      * @ingroup y60scene
      * Performs texture loading and management
      */
-    class Y60_SCENE_EXPORT TextureManager : public ITextureManager {
+    class Y60_SCENE_DECL TextureManager : public ITextureManager {
         public:
             static asl::Ptr<TextureManager> create();
 

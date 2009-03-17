@@ -90,7 +90,7 @@ namespace y60 {
 //#define ASS_LATENCY_TEST
 
 
-class Y60_ASSCORE_EXPORT ASSDriver :
+class Y60_ASSCORE_DECL ASSDriver :
     public jslib::IScriptablePlugin,
     public y60::IRendererExtension
 {

@@ -70,7 +70,7 @@ namespace y60 {
 
     class TextRenderer;
 
-    class Y60_GLTEXT_EXPORT Text {
+    class Y60_GLTEXT_DECL Text {
         public:
             Text(TextRenderer * theRenderer,
                  const asl::Vector2f & thePos,

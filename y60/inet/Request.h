@@ -98,7 +98,7 @@ namespace inet {
         ""
     };
 
-    DEFINE_ENUM(AuthentType, AuthentTypeEnum, Y60_INET_EXPORT);
+    DEFINE_ENUM(AuthentType, AuthentTypeEnum, Y60_INET_DECL);
 
     class RequestManager;
 
@@ -107,7 +107,7 @@ namespace inet {
      * HTTP Request.
      *
      */    
-    class Y60_INET_EXPORT Request {
+    class Y60_INET_DECL Request {
         friend class RequestManager;
 
         public:

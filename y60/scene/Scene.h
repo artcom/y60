@@ -140,7 +140,7 @@ namespace y60 {
      * 3D Scene object.
      *
      */
-    class Y60_SCENE_EXPORT Scene : public dom::Facade, public IScene {
+    class Y60_SCENE_DECL Scene : public dom::Facade, public IScene {
         public:
             struct Statistics {
                 Statistics();

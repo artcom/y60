@@ -73,7 +73,7 @@ namespace y60 {
 
     DEFINE_EXCEPTION(GLTextRendererException, asl::Exception);
 
-    class Y60_GLTEXT_EXPORT TextRenderer {
+    class Y60_GLTEXT_DECL TextRenderer {
         public:
             enum TextAligment {
                 CENTER_ALIGNMENT,

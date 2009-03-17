@@ -76,7 +76,7 @@ namespace jslib {
 
 typedef float TriangleNumber;
 
-class Y60_JSBASE_EXPORT JSTriangle : public JSWrapper<asl::Triangle<TriangleNumber> > {
+class Y60_JSBASE_DECL JSTriangle : public JSWrapper<asl::Triangle<TriangleNumber> > {
     JSTriangle() {}
 public:
     typedef JSWrapper<asl::Triangle<TriangleNumber> > Base;
@@ -130,11 +130,11 @@ template <>
 struct JSClassTraits<asl::Triangle<TriangleNumber> >
     : public JSClassTraitsWrapper<asl::Triangle<TriangleNumber> , JSTriangle> {};
 
-Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Triangle<TriangleNumber>  & theTriangle);
+Y60_JSBASE_DECL bool convertFrom(JSContext *cx, jsval theValue, asl::Triangle<TriangleNumber>  & theTriangle);
 
-Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, const asl::Triangle<TriangleNumber>  & theValue);
+Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, const asl::Triangle<TriangleNumber>  & theValue);
 
-Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, JSTriangle::NativeValuePtr theValue);
+Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, JSTriangle::NativeValuePtr theValue);
 
 }
 

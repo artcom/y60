@@ -136,7 +136,7 @@ template <>
 struct JSClassTraits<JSSeparatorMenuItem::NATIVE>
     : public JSClassTraitsWrapper<JSSeparatorMenuItem::NATIVE, JSSeparatorMenuItem> {};
 
-Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSSeparatorMenuItem::OWNERPTR theOwner, JSSeparatorMenuItem::NATIVE * theNative);
+Y60_JSGTK_DECL jsval as_jsval(JSContext *cx, JSSeparatorMenuItem::OWNERPTR theOwner, JSSeparatorMenuItem::NATIVE * theNative);
 
 } // namespace
 

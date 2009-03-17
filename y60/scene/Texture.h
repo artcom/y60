@@ -82,7 +82,7 @@ namespace y60 {
      * @ingroup y60texture
      * Facade for a texture node in the dom.
      */
-    class Y60_SCENE_EXPORT Texture :
+    class Y60_SCENE_DECL Texture :
         public dom::Facade,
         public IdTag::Plug,
         public NameTag::Plug,

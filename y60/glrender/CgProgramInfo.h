@@ -134,7 +134,7 @@ namespace y60 {
 
     void assertCg(const std::string & theWhere, const CGcontext theCgContext);
 
-    class Y60_GLRENDER_EXPORT CgProgramInfo {
+    class Y60_GLRENDER_DECL CgProgramInfo {
         public:
             CgProgramInfo(const ShaderDescription & theShader,
                     const CGcontext theCgContext);

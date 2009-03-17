@@ -71,7 +71,7 @@ namespace dom {
     class Connector;
     class Facade;
 
-    class ASL_DOM_EXPORT Field {
+    class ASL_DOM_DECL Field {
         friend class ValueFactory;
         friend class Connector;
         friend class Facade;

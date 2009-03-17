@@ -76,7 +76,7 @@
 
 namespace jslib {
 
-class Y60_JSBASE_EXPORT JSNamedNodeMap : public JSWrapper<dom::NamedNodeMap,dom::NodePtr,StaticAccessProtocol> {
+class Y60_JSBASE_DECL JSNamedNodeMap : public JSWrapper<dom::NamedNodeMap,dom::NodePtr,StaticAccessProtocol> {
 public:
     typedef JSWrapper<dom::NamedNodeMap,dom::NodePtr,StaticAccessProtocol> Base;
 
@@ -123,7 +123,7 @@ template <>
 struct JSClassTraits<dom::NamedNodeMap>
     : public JSClassTraitsWrapper<dom::NamedNodeMap, JSNamedNodeMap> {};
 
-Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, dom::NodePtr theNode, dom::NamedNodeMap * theNodeMap);
+Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, dom::NodePtr theNode, dom::NamedNodeMap * theNodeMap);
 
 }
 

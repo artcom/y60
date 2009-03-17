@@ -29,13 +29,13 @@ namespace asl {
     /* @{ */
  
     /// Get amount of system memory in KB.
-    ASL_BASE_EXPORT unsigned getTotalMemory();
+    ASL_BASE_DECL unsigned getTotalMemory();
 
     /// Get amount of used system memory in KB.
-    ASL_BASE_EXPORT unsigned getUsedMemory();
+    ASL_BASE_DECL unsigned getUsedMemory();
 
     /// Get amount of free system memory in KB.
-    ASL_BASE_EXPORT unsigned getFreeMemory();
+    ASL_BASE_DECL unsigned getFreeMemory();
 
     /**
      * Get process memory usage in KB.
@@ -46,7 +46,7 @@ namespace asl {
 #else
     typedef pid_t ProcessID;
 #endif
-    ASL_BASE_EXPORT unsigned getProcessMemoryUsage(ProcessID thePid = 0);
+    ASL_BASE_DECL unsigned getProcessMemoryUsage(ProcessID thePid = 0);
 
     /* @} */
 }

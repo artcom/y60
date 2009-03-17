@@ -92,7 +92,7 @@ namespace jslib {
 
     extern JSContext * ourJSContext;
 
-    class Y60_JSLIB_EXPORT JSApp {
+    class Y60_JSLIB_DECL JSApp {
         public:
             JSApp();
             virtual ~JSApp() {}

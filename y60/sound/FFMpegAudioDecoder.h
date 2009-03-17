@@ -93,7 +93,7 @@ extern "C" {
 
 namespace y60 {
 
-class Y60_SOUND_EXPORT FFMpegAudioDecoder: public IAudioDecoder
+class Y60_SOUND_DECL FFMpegAudioDecoder: public IAudioDecoder
 {
     public:
         FFMpegAudioDecoder (const std::string& myURI);

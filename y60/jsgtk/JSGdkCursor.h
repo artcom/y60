@@ -126,9 +126,9 @@ template <>
 struct JSClassTraits<JSGdkCursor::NATIVE>
     : public JSClassTraitsWrapper<JSGdkCursor::NATIVE, JSGdkCursor> {};
 
-Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSGdkCursor::OWNERPTR theOwner, JSGdkCursor::NATIVE * theNative);
+Y60_JSGTK_DECL jsval as_jsval(JSContext *cx, JSGdkCursor::OWNERPTR theOwner, JSGdkCursor::NATIVE * theNative);
 
-Y60_JSGTK_EXPORT bool convertFrom(JSContext *cx, jsval theValue, JSGdkCursor::NATIVE * & theCursor);
+Y60_JSGTK_DECL bool convertFrom(JSContext *cx, jsval theValue, JSGdkCursor::NATIVE * & theCursor);
 
 } // namespace
 

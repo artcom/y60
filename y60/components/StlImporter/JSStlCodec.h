@@ -118,10 +118,10 @@ struct JSClassTraits<JSStlCodec::NATIVE>
     : public JSClassTraitsWrapper<JSStlCodec::NATIVE, JSStlCodec> {};
 
 
-Y60_STLIMPORTER_EXPORT bool convertFrom(JSContext *cx, jsval theValue, JSStlCodec::OWNERPTR & theStlCodec);
+Y60_STLIMPORTER_DECL bool convertFrom(JSContext *cx, jsval theValue, JSStlCodec::OWNERPTR & theStlCodec);
 
-Y60_STLIMPORTER_EXPORT jsval as_jsval(JSContext *cx, JSStlCodec::OWNERPTR theOwner);
-Y60_STLIMPORTER_EXPORT jsval as_jsval(JSContext *cx, JSStlCodec::OWNERPTR theOwner, JSStlCodec::NATIVE * theStlCodec);
+Y60_STLIMPORTER_DECL jsval as_jsval(JSContext *cx, JSStlCodec::OWNERPTR theOwner);
+Y60_STLIMPORTER_DECL jsval as_jsval(JSContext *cx, JSStlCodec::OWNERPTR theOwner, JSStlCodec::NATIVE * theStlCodec);
 
 } // jslib
 

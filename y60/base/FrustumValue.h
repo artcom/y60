@@ -77,8 +77,8 @@ class FrustumValue : public SimpleValue<asl::Frustum> {
         FrustumValue(const asl::Frustum  & theValue, Node * theNode) : Base(theValue, theNode) {}
         FrustumValue(const DOMString & theStringValue, Node * theNode) : Base(theStringValue, theNode) {}
         FrustumValue(const asl::ReadableBlock & theValue, Node * theNode) : Base(theValue, theNode) {}
-        Y60_BASE_EXPORT virtual void binarize(asl::WriteableStream & theDest) const;
-        Y60_BASE_EXPORT virtual asl::AC_SIZE_TYPE debinarize(const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos);
+        Y60_BASE_DECL virtual void binarize(asl::WriteableStream & theDest) const;
+        Y60_BASE_DECL virtual asl::AC_SIZE_TYPE debinarize(const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos);
 
     virtual ValuePtr clone(Node * theNode) const {
         this->onGetValue();

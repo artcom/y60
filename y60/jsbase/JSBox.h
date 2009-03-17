@@ -75,7 +75,7 @@ namespace jslib {
 
 typedef float BoxNumber;
 
-class Y60_JSBASE_EXPORT JSBox3f : public JSWrapper<asl::Box3<BoxNumber> > {
+class Y60_JSBASE_DECL JSBox3f : public JSWrapper<asl::Box3<BoxNumber> > {
     JSBox3f() {}
 public:
     typedef JSWrapper<asl::Box3<BoxNumber> > Base;
@@ -140,11 +140,11 @@ template <>
 struct JSClassTraits<asl::Box3<BoxNumber> >
     : public JSClassTraitsWrapper<asl::Box3<BoxNumber> , JSBox3f> {};
 
-Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Box3<BoxNumber>  & theBox3f);
+Y60_JSBASE_DECL bool convertFrom(JSContext *cx, jsval theValue, asl::Box3<BoxNumber>  & theBox3f);
 
-Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, const asl::Box3<BoxNumber>  & theValue);
+Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, const asl::Box3<BoxNumber>  & theValue);
 
-Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, JSBox3f::NativeValuePtr theValue);
+Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, JSBox3f::NativeValuePtr theValue);
 
 }
 

@@ -80,7 +80,7 @@ namespace y60 {
     typedef asl::Ptr<GrainSource, asl::MultiProcessor, asl::PtrHeapAllocator<asl::MultiProcessor> > GrainSourcePtr;
     typedef asl::WeakPtr<GrainSource, asl::MultiProcessor, asl::PtrHeapAllocator<asl::MultiProcessor> > GrainSourceWeakPtr;
     
-    class Y60_SOUND_EXPORT GrainSource :
+    class Y60_SOUND_DECL GrainSource :
         public asl::SampleSource, public asl::ISampleSink
     {
 

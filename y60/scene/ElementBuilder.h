@@ -104,7 +104,7 @@ namespace y60 {
 
     typedef std::vector<VertexIndexBin> VertexIndexBinMap;
 
-    class Y60_SCENE_EXPORT ElementBuilder : public BuilderBase {
+    class Y60_SCENE_DECL ElementBuilder : public BuilderBase {
         public:
             ElementBuilder(const std::string & thePrimitiveType,
                            const std::string & theMaterial);

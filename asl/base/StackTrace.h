@@ -61,7 +61,7 @@ namespace asl {
  * StackTrace instead.
  */
 template <class TRACE_POLICY>
-class ASL_BASE_EXPORT StackTracer {
+class ASL_BASE_DECL StackTracer {
     public:
         StackTracer();
 

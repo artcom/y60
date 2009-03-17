@@ -57,7 +57,7 @@
 
 namespace asl {
 
-class ASL_MATH_EXPORT FixedVectorStreamFormatter {
+class ASL_MATH_DECL FixedVectorStreamFormatter {
     public:
         FixedVectorStreamFormatter(const char theStartToken, 
                                    const char theEndToken, 
@@ -86,16 +86,16 @@ class ASL_MATH_EXPORT FixedVectorStreamFormatter {
         bool       _myOneElementPerLineFlag; 
 };
 
-ASL_MATH_EXPORT FixedVectorStreamFormatter
+ASL_MATH_DECL FixedVectorStreamFormatter
 formatFixedVector(const char theStartToken, 
                   const char theEndToken, 
                   const char theDelimiter, 
                   bool theOneElementPerLineFlag);
 
-ASL_MATH_EXPORT std::ostream &
+ASL_MATH_DECL std::ostream &
 operator << (std::ostream & theStream, const FixedVectorStreamFormatter & theFormatter);
 
-ASL_MATH_EXPORT std::istream &
+ASL_MATH_DECL std::istream &
 operator >> (std::istream & theStream, const FixedVectorStreamFormatter & theFormatter);
 
 }

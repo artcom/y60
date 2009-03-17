@@ -100,7 +100,7 @@ namespace y60 {
     };
 #endif
     
-    class Y60_GLRENDER_EXPORT ShaderLibrary : public IShaderLibrary {
+    class Y60_GLRENDER_DECL ShaderLibrary : public IShaderLibrary {
         public:
             DEFINE_EXCEPTION(ShaderLibraryException, asl::Exception);
             ShaderLibrary();

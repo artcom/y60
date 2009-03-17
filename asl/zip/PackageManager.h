@@ -44,7 +44,7 @@ typedef std::list<IPackagePtr> PackageList;
 /** allows the efficient search for and opening of files contained in packages (see asl::IPackage).
  *  Example packages are asl::DirectoryPackage and asl::ZipPackage
 */
-class ASL_ZIP_EXPORT PackageManager {
+class ASL_ZIP_DECL PackageManager {
     public:
         
         

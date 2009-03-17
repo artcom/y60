@@ -68,7 +68,7 @@ namespace y60 {
 
     DEFINE_EXCEPTION(SomException, asl::Exception);
 
-    class Y60_SCENE_EXPORT BuilderBase {
+    class Y60_SCENE_DECL BuilderBase {
         public:
             BuilderBase();
             BuilderBase(const std::string & theNodeName);

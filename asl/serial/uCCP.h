@@ -64,7 +64,7 @@ namespace asl {
 
     DEFINE_EXCEPTION(uCCPException, asl::Exception);
 
-    class ASL_SERIAL_EXPORT uCCP {
+    class ASL_SERIAL_DECL uCCP {
         public:
             enum ErrorChecking {
                 NO_CHECKING,

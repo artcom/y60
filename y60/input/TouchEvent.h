@@ -75,7 +75,7 @@
 
 namespace y60 {
 
-    struct Y60_INPUT_EXPORT TouchEvent : public Event {
+    struct Y60_INPUT_DECL TouchEvent : public Event {
         TouchEvent(const std::string & theDevice,
                    const asl::Vector2f & thePosition,
                    const asl::Vector2i & theSize,

@@ -67,7 +67,7 @@
 
 namespace jslib {
 
-class Y60_JSBASE_EXPORT JSResizeableVector
+class Y60_JSBASE_DECL JSResizeableVector
     : public JSWrapper<dom::ResizeableVector, dom::ValuePtr, VectorValueAccessProtocol>
 {
 public:
@@ -120,7 +120,7 @@ template <>
 struct JSClassTraits<dom::ResizeableVector>
     : public JSClassTraitsWrapper<dom::ResizeableVector, JSResizeableVector> {};
 
-Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, dom::ValuePtr theValuePtr, dom::ResizeableVector * theVectorPtr);
+Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, dom::ValuePtr theValuePtr, dom::ResizeableVector * theVectorPtr);
 
 }
 

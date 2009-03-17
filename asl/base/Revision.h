@@ -46,7 +46,7 @@
 #include <string>
 
 namespace asl {
-    extern ASL_BASE_EXPORT std::string ourRevision;
+    extern ASL_BASE_DECL std::string ourRevision;
 }
 
 #endif

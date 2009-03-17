@@ -213,9 +213,9 @@ template <>
 struct JSClassTraits<JSStockID::NATIVE>
     : public JSClassTraitsWrapper<JSStockID::NATIVE, JSStockID> {};
 
-Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSStockID::OWNERPTR theOwner, JSStockID::NATIVE * theNative);
+Y60_JSGTK_DECL jsval as_jsval(JSContext *cx, JSStockID::OWNERPTR theOwner, JSStockID::NATIVE * theNative);
 
-Y60_JSGTK_EXPORT bool convertFrom(JSContext *cx, jsval theValue, JSStockID::NATIVE * & theStockId);
+Y60_JSGTK_DECL bool convertFrom(JSContext *cx, jsval theValue, JSStockID::NATIVE * & theStockId);
  
 
 } // namespace

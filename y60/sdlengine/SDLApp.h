@@ -71,7 +71,7 @@
 
 #include <y60/jslib/JSApp.h>
 
-class Y60_SDLENGINE_EXPORT SDLApp : public jslib::JSApp {
+class Y60_SDLENGINE_DECL SDLApp : public jslib::JSApp {
     public:
         SDLApp();
     protected:

@@ -81,10 +81,10 @@ namespace y60 {
     /* @{ */
 
     //                  theTagName    theType      theAttributeName            theDefault
-    DEFINE_ATTRIBUT_TAG(NormTag,      std::string, CAPTURE_NORM_ATTRIB,   "PAL", Y60_VIDEO_EXPORT);
-    DEFINE_ATTRIBUT_TAG(DeviceTag,    unsigned,    CAPTURE_DEVICE_ATTRIB, 0, Y60_VIDEO_EXPORT);
+    DEFINE_ATTRIBUT_TAG(NormTag,      std::string, CAPTURE_NORM_ATTRIB,   "PAL", Y60_VIDEO_DECL);
+    DEFINE_ATTRIBUT_TAG(DeviceTag,    unsigned,    CAPTURE_DEVICE_ATTRIB, 0, Y60_VIDEO_DECL);
 
-    class Y60_VIDEO_EXPORT CaptureDevice;
+    class Y60_VIDEO_DECL CaptureDevice;
 
     /**
      * @ingroup y60-video
@@ -97,7 +97,7 @@ namespace y60 {
      *
      * @see MovieDecoder
      */
-    class Y60_VIDEO_EXPORT Capture : public Image,
+    class Y60_VIDEO_DECL Capture : public Image,
         public DeviceTag::Plug,
         public NormTag::Plug,
         public FrameRateTag::Plug,

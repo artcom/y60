@@ -146,7 +146,7 @@ namespace y60 {
                                                                     forWriting, forReading) {}
     };
 
-    class Y60_SCENE_EXPORT VertexDataBase  {
+    class Y60_SCENE_DECL VertexDataBase  {
         public:
             typedef std::size_t size_type;
             VertexDataBase(const TypeId & theType) : _myType(theType)  {};

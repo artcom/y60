@@ -72,8 +72,8 @@ using namespace asl;
 namespace jslib {
 
 template class JSWrapper<JSRequest, JSRequestPtr, StaticAccessProtocol>;
-template struct Y60_JSLIB_EXPORT ArgumentHolder<JSRequestPtr const &>;
-template struct Y60_JSLIB_EXPORT ArgumentHolder<inet::RequestPtr>;
+template struct Y60_JSLIB_DECL ArgumentHolder<JSRequestPtr const &>;
+template struct Y60_JSLIB_DECL ArgumentHolder<inet::RequestPtr>;
 
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {

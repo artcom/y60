@@ -80,13 +80,13 @@ namespace y60 {
 }
 namespace asl {
     bool initializeGLMemoryExtensions();
-    struct Y60_GLUTIL_EXPORT AGPMemoryFlushSingleton : public asl::Singleton<AGPMemoryFlushSingleton>
+    struct Y60_GLUTIL_DECL AGPMemoryFlushSingleton : public asl::Singleton<AGPMemoryFlushSingleton>
     {
         void resetGLAGPMemoryFlush();
         void flushGLAGPMemory();
         bool  _myAGPMemoryIsFlushed;
     };
-    class Y60_GLUTIL_EXPORT GLMemory : public FixedCapacityBlock {
+    class Y60_GLUTIL_DECL GLMemory : public FixedCapacityBlock {
     public:
         enum MemoryType {MainMemoryType=0, AGPMemoryType=1, GPUMemoryType=2};
         GLMemory(MemoryType theMemoryType)
@@ -195,7 +195,7 @@ namespace asl {
         }
     };
 
-    extern Y60_GLUTIL_EXPORT GLMemoryPtr VertexMemory(GLMemory::MemoryType theMemoryType = GLMemory::AGPMemoryType,
+    extern Y60_GLUTIL_DECL GLMemoryPtr VertexMemory(GLMemory::MemoryType theMemoryType = GLMemory::AGPMemoryType,
                                     asl::AC_SIZE_TYPE theCapacity=0);
 
     template <typename T>

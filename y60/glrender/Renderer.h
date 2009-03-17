@@ -106,7 +106,7 @@ namespace y60 {
 
     DEFINE_EXCEPTION(RendererException, asl::Exception);
 
-    class Y60_GLRENDER_EXPORT Renderer {
+    class Y60_GLRENDER_DECL Renderer {
         public:
             Renderer(GLContextPtr theGLContext, unsigned int theRenderingCaps = -1 /*get em all*/);
             virtual ~Renderer();

@@ -141,7 +141,7 @@ template <>
 struct JSClassTraits<JSSeparator::NATIVE>
     : public JSClassTraitsWrapper<JSSeparator::NATIVE, JSSeparator> {};
 
-Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSSeparator::OWNERPTR theOwner, JSSeparator::NATIVE * theSeparator);
+Y60_JSGTK_DECL jsval as_jsval(JSContext *cx, JSSeparator::OWNERPTR theOwner, JSSeparator::NATIVE * theSeparator);
 
 
 }

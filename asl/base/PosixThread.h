@@ -62,7 +62,7 @@ namespace asl {
 /*! \addtogroup aslbase */
 /* @{ */
 
-class ASL_BASE_EXPORT PosixThread {
+class ASL_BASE_DECL PosixThread {
     public:
         typedef void (WorkFunc)(PosixThread &);
 

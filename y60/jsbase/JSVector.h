@@ -74,25 +74,25 @@ namespace jslib {
 
 template<class NATIVE_VECTOR> struct JSVector;
 
-Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Vector2i & theVector);
-Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Vector3i & theVector);
-Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Vector4i & theVector);
-Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Vector2f & theVector);
-Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Vector3f & theVector);
-Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Vector4f & theVector);
-Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Vector2d & theVector);
-Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Vector3d & theVector);
-Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Vector4d & theVector);
+Y60_JSBASE_DECL bool convertFrom(JSContext *cx, jsval theValue, asl::Vector2i & theVector);
+Y60_JSBASE_DECL bool convertFrom(JSContext *cx, jsval theValue, asl::Vector3i & theVector);
+Y60_JSBASE_DECL bool convertFrom(JSContext *cx, jsval theValue, asl::Vector4i & theVector);
+Y60_JSBASE_DECL bool convertFrom(JSContext *cx, jsval theValue, asl::Vector2f & theVector);
+Y60_JSBASE_DECL bool convertFrom(JSContext *cx, jsval theValue, asl::Vector3f & theVector);
+Y60_JSBASE_DECL bool convertFrom(JSContext *cx, jsval theValue, asl::Vector4f & theVector);
+Y60_JSBASE_DECL bool convertFrom(JSContext *cx, jsval theValue, asl::Vector2d & theVector);
+Y60_JSBASE_DECL bool convertFrom(JSContext *cx, jsval theValue, asl::Vector3d & theVector);
+Y60_JSBASE_DECL bool convertFrom(JSContext *cx, jsval theValue, asl::Vector4d & theVector);
 
-Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Point2i & theVector);
-Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Point3i & theVector);
-Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Point4i & theVector);
-Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Point2f & theVector);
-Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Point3f & theVector);
-Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Point4f & theVector);
-Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Point2d & theVector);
-Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Point3d & theVector);
-Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Point4d & theVector);
+Y60_JSBASE_DECL bool convertFrom(JSContext *cx, jsval theValue, asl::Point2i & theVector);
+Y60_JSBASE_DECL bool convertFrom(JSContext *cx, jsval theValue, asl::Point3i & theVector);
+Y60_JSBASE_DECL bool convertFrom(JSContext *cx, jsval theValue, asl::Point4i & theVector);
+Y60_JSBASE_DECL bool convertFrom(JSContext *cx, jsval theValue, asl::Point2f & theVector);
+Y60_JSBASE_DECL bool convertFrom(JSContext *cx, jsval theValue, asl::Point3f & theVector);
+Y60_JSBASE_DECL bool convertFrom(JSContext *cx, jsval theValue, asl::Point4f & theVector);
+Y60_JSBASE_DECL bool convertFrom(JSContext *cx, jsval theValue, asl::Point2d & theVector);
+Y60_JSBASE_DECL bool convertFrom(JSContext *cx, jsval theValue, asl::Point3d & theVector);
+Y60_JSBASE_DECL bool convertFrom(JSContext *cx, jsval theValue, asl::Point4d & theVector);
 
 namespace detail {
     template <template<class> class NATIVE_VECTOR, class NUMBER>
@@ -410,7 +410,7 @@ struct JSVector  {
     static
     JSVector & getJSWrapper(JSContext *cx, JSObject *obj);
 
-    Y60_JSBASE_EXPORT static
+    Y60_JSBASE_DECL static
     bool matchesClassOf(JSContext *cx, jsval theVal); 
 
     // This functions must be called only on JSObjects containing the correct
@@ -563,16 +563,16 @@ struct JSVector  {
 
     virtual ~JSVector(); 
 
-    Y60_JSBASE_EXPORT static
+    Y60_JSBASE_DECL static
     JSObject * Construct(JSContext *cx, jsval theVectorArgument); 
     
-    Y60_JSBASE_EXPORT static
+    Y60_JSBASE_DECL static
     JSObject * Construct(JSContext *cx, uintN argc, jsval *argv);
 
-    Y60_JSBASE_EXPORT static
+    Y60_JSBASE_DECL static
     JSObject * Construct(JSContext *cx, const NATIVE_VECTOR & theVector);
 
-    Y60_JSBASE_EXPORT static
+    Y60_JSBASE_DECL static
     JSObject * Construct(JSContext *cx, NativeValuePtr theVector); 
 
     //TODO: implement the following three functions according to those in JSWrapper
@@ -592,13 +592,13 @@ private:
     static JSBool
     Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 public:
-    Y60_JSBASE_EXPORT static JSObject * initClass(JSContext *cx, JSObject *theGlobalObject); 
+    Y60_JSBASE_DECL static JSObject * initClass(JSContext *cx, JSObject *theGlobalObject); 
 private:
     NativeValuePtr _myOwner;
 };
 #define DEFINE_VECTOR_CLASS_TRAITS(TYPE) \
 template <> \
-struct Y60_JSBASE_EXPORT JSClassTraits<TYPE> : public JSClassTraitsWrapper<TYPE, JSVector<TYPE> > {};
+struct Y60_JSBASE_DECL JSClassTraits<TYPE> : public JSClassTraitsWrapper<TYPE, JSVector<TYPE> > {};
 
 
 DEFINE_VECTOR_CLASS_TRAITS(asl::Vector2f)

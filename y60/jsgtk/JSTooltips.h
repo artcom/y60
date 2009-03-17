@@ -133,9 +133,9 @@ template <>
 struct JSClassTraits<JSTooltips::NATIVE>
     : public JSClassTraitsWrapper<JSTooltips::NATIVE, JSTooltips> {};
 
-Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSTooltips::OWNERPTR theOwner, JSTooltips::NATIVE * theTooltips);
+Y60_JSGTK_DECL jsval as_jsval(JSContext *cx, JSTooltips::OWNERPTR theOwner, JSTooltips::NATIVE * theTooltips);
 
-Y60_JSGTK_EXPORT bool convertFrom(JSContext *cx, jsval theValue, JSTooltips::NATIVE *& theTarget);
+Y60_JSGTK_DECL bool convertFrom(JSContext *cx, jsval theValue, JSTooltips::NATIVE *& theTarget);
 
 }
 

@@ -43,7 +43,7 @@ namespace dom {
        with the original dom IDRRegistry.
     */
 
-    class ASL_DOM_EXPORT NodeList {
+    class ASL_DOM_DECL NodeList {
     private:
         typedef std::vector<NodePtr> _myNodeListType;
     public:
@@ -91,7 +91,7 @@ namespace dom {
         _myNodeListType _myNodes;
     };
 
-    class ASL_DOM_EXPORT NamedNodeMap : public NodeList {
+    class ASL_DOM_DECL NamedNodeMap : public NodeList {
     public:
         friend class Node;
 
@@ -115,7 +115,7 @@ namespace dom {
         NodePtr appendWithoutReparenting(NodePtr theNewNode);
     };
 
-    class ASL_DOM_EXPORT TypedNamedNodeMap : public NamedNodeMap {
+    class ASL_DOM_DECL TypedNamedNodeMap : public NamedNodeMap {
     public:
         friend class Node;
 

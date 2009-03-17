@@ -68,7 +68,7 @@ namespace asl {
     
     class ReadWriteLock;
 
-    class ASL_BASE_EXPORT ScopeLocker {
+    class ASL_BASE_DECL ScopeLocker {
         public:
             ScopeLocker(ReadWriteLock & theLock, bool theLockWriteFlag=true);
             ~ScopeLocker();
@@ -77,7 +77,7 @@ namespace asl {
             bool _myWriteLockFlag;
     };
 
-    class ASL_BASE_EXPORT ReadWriteLock {
+    class ASL_BASE_DECL ReadWriteLock {
         public:
             DEFINE_NAMED_EXCEPTION(Exception,ReadWriteLock::Exception,asl::Exception);
 

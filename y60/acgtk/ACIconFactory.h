@@ -75,7 +75,7 @@ namespace acgtk {
 /** This class hides some of the complexities of Gtk's icon handling
  * and works around some shortcomings of our approch to wrap Gtk.
  */
-class Y60_ACGTK_EXPORT ACIconFactory {
+class Y60_ACGTK_DECL ACIconFactory {
     public:
         ACIconFactory();
 

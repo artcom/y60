@@ -131,8 +131,8 @@ namespace jslib {
             }
     };
 
-    Y60_TASKMANAGER_EXPORT jsval as_jsval(JSContext *cx, JSTask::OWNERPTR theOwner);
-    Y60_TASKMANAGER_EXPORT jsval as_jsval(JSContext *cx, JSTask::OWNERPTR theOwner, JSTask::NATIVE * theNative);
+    Y60_TASKMANAGER_DECL jsval as_jsval(JSContext *cx, JSTask::OWNERPTR theOwner);
+    Y60_TASKMANAGER_DECL jsval as_jsval(JSContext *cx, JSTask::OWNERPTR theOwner, JSTask::NATIVE * theNative);
 
     template <>
     struct JSClassTraits<JSTask::NATIVE> 

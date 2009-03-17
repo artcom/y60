@@ -140,7 +140,7 @@ template <>
 struct JSClassTraits<JSColorButton::NATIVE>
     : public JSClassTraitsWrapper<JSColorButton::NATIVE, JSColorButton> {};
 
-Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSColorButton::OWNERPTR theOwner, JSColorButton::NATIVE * theColorButton);
+Y60_JSGTK_DECL jsval as_jsval(JSContext *cx, JSColorButton::OWNERPTR theOwner, JSColorButton::NATIVE * theColorButton);
 
 } // namespace
 

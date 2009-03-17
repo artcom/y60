@@ -68,7 +68,7 @@
 #include <string>
 
 namespace y60 {
-    class Y60_GLRENDER_EXPORT CgShader : public GLShader {
+    class Y60_GLRENDER_DECL CgShader : public GLShader {
         public:
             CgShader(const dom::NodePtr theNode,
                      const std::string & theVertexProfileName,

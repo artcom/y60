@@ -73,7 +73,7 @@
 
 namespace y60 {
 
-    struct Y60_INPUT_EXPORT AxisEvent : public Event {
+    struct Y60_INPUT_DECL AxisEvent : public Event {
         AxisEvent(int myDevice,
                   int myAxis,
                   int myValue);

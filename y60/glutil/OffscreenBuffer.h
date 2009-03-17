@@ -72,7 +72,7 @@ namespace y60 {
     class Texture;
     typedef asl::Ptr<Texture, dom::ThreadingModel> TexturePtr;
 
-    class Y60_GLUTIL_EXPORT OffscreenBuffer {
+    class Y60_GLUTIL_DECL OffscreenBuffer {
         public:        
             /**
             * Allows Offscreen rendering into a texture.

@@ -83,7 +83,7 @@
 
 namespace acgtk {
 
-class Y60_ACGTK_EXPORT Histogram : public Gtk::DrawingArea {
+class Y60_ACGTK_DECL Histogram : public Gtk::DrawingArea {
     public:
         Histogram();
         virtual ~Histogram();

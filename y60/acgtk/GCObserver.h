@@ -77,7 +77,7 @@
 namespace jslib {
     
 
-class Y60_ACGTK_EXPORT GCObserver : public asl::Singleton<GCObserver> {
+class Y60_ACGTK_DECL GCObserver : public asl::Singleton<GCObserver> {
     public:
         typedef sigc::signal<void, JSObject*> FinalizeSignal;
 

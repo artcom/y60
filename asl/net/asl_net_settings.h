@@ -4,9 +4,9 @@
 #include <asl/base/settings.h>
 
 #ifdef aslnet_EXPORTS
-#   define ASL_NET_EXPORT AC_DLL_EXPORT
+#   define ASL_NET_DECL AC_DLL_EXPORT
 #else
-#   define ASL_NET_EXPORT AC_DLL_IMPORT
+#   define ASL_NET_DECL AC_DLL_IMPORT
 #endif
 
 #endif // ASL_NET_SETTING_INCLUDED

@@ -135,7 +135,7 @@ template <>
 struct JSClassTraits<JSScrolledWindow::NATIVE>
     : public JSClassTraitsWrapper<JSScrolledWindow::NATIVE, JSScrolledWindow> {};
 
-Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSScrolledWindow::OWNERPTR theOwner, JSScrolledWindow::NATIVE * theNative);
+Y60_JSGTK_DECL jsval as_jsval(JSContext *cx, JSScrolledWindow::OWNERPTR theOwner, JSScrolledWindow::NATIVE * theNative);
 
 } // namespace
 

@@ -79,7 +79,7 @@
 
 namespace acgtk {
 
-class Y60_ACGTK_EXPORT CellRendererPixbufToggle : public Gtk::CellRenderer {
+class Y60_ACGTK_DECL CellRendererPixbufToggle : public Gtk::CellRenderer {
     public:
         CellRendererPixbufToggle();
         virtual ~CellRendererPixbufToggle();

@@ -66,7 +66,7 @@
 
 namespace jslib {
 
-class Y60_JSBASE_EXPORT JSResizeableRaster
+class Y60_JSBASE_DECL JSResizeableRaster
     : public JSWrapper<dom::ResizeableRaster,
                        dom::ValuePtr,
                        VectorValueAccessProtocol> // TODO: verify if correct, probably is not
@@ -118,7 +118,7 @@ template <>
 struct JSClassTraits<dom::ResizeableRaster>
     : public JSClassTraitsWrapper<dom::ResizeableRaster, JSResizeableRaster> {};
 
-Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, dom::ValuePtr theValuePtr, dom::ResizeableRaster * theVectorPtr);
+Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, dom::ValuePtr theValuePtr, dom::ResizeableRaster * theVectorPtr);
 
 }
 

@@ -61,7 +61,7 @@
 namespace asl {
 
     // This is a POD type. Don't add virtual functions.
-    class ASL_NET_EXPORT INetEndpoint: public sockaddr_in {
+    class ASL_NET_DECL INetEndpoint: public sockaddr_in {
         public:
             INetEndpoint(const char * myHost, asl::Unsigned16 myPort);
             INetEndpoint(asl::Unsigned32 myHost, asl::Unsigned16 myPort);

@@ -79,7 +79,7 @@ namespace y60 {
 
     DEFINE_EXCEPTION(GLContextException, asl::Exception);
 
-    class Y60_GLUTIL_EXPORT GLContext {
+    class Y60_GLUTIL_DECL GLContext {
         public:
             GLContext();
 

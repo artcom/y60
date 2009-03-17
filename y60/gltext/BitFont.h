@@ -31,12 +31,12 @@ struct BitFont {
   char *short_name;
 };
 
-Y60_GLTEXT_EXPORT void
+Y60_GLTEXT_DECL void
 getStringSize(const BitFont & font, const char * text,
               int & x_ret, int & y_ret,
               int & w_ret, int & h_ret);
 
-Y60_GLTEXT_EXPORT void
+Y60_GLTEXT_DECL void
 getFontSize(int & ascent, int & descent, const BitFont & font);
 
 #endif // _BitFont_h_

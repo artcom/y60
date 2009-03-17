@@ -84,7 +84,7 @@ namespace y60 {
 
     class Scene;
 
-    class Y60_SCENE_EXPORT Shape :
+    class Y60_SCENE_DECL Shape :
         public dom::Facade,
         public IdTag::Plug,
         public NameTag::Plug,

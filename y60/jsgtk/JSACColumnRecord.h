@@ -126,7 +126,7 @@ template <>
 struct JSClassTraits<JSACColumnRecord::NATIVE>
     : public JSClassTraitsWrapper<JSACColumnRecord::NATIVE, JSACColumnRecord> {};
 
-Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSACColumnRecord::OWNERPTR theOwner, JSACColumnRecord::NATIVE * theACColumnRecord);
+Y60_JSGTK_DECL jsval as_jsval(JSContext *cx, JSACColumnRecord::OWNERPTR theOwner, JSACColumnRecord::NATIVE * theACColumnRecord);
 
 } // namespace
 

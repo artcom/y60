@@ -129,8 +129,8 @@ namespace jslib {
         : public JSClassTraitsWrapper<JSSynergyServer::NATIVE , JSSynergyServer> {};
 
 
-    Y60_SYNERGYSERVER_EXPORT jsval as_jsval( JSContext *cx, JSSynergyServer::OWNERPTR theOwner );
-    Y60_SYNERGYSERVER_EXPORT jsval as_jsval( JSContext *cx, JSSynergyServer::OWNERPTR theOwner, 
+    Y60_SYNERGYSERVER_DECL jsval as_jsval( JSContext *cx, JSSynergyServer::OWNERPTR theOwner );
+    Y60_SYNERGYSERVER_DECL jsval as_jsval( JSContext *cx, JSSynergyServer::OWNERPTR theOwner, 
                     JSSynergyServer::NATIVE * theSerial );
 
 

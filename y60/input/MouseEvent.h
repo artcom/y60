@@ -67,7 +67,7 @@
 
 namespace y60 {
 
-    struct Y60_INPUT_EXPORT MouseEvent : public Event {
+    struct Y60_INPUT_DECL MouseEvent : public Event {
         enum Button {
             NONE = 0,  // for mouse move events.
             // UH: 'None' is #defined by X11.

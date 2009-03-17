@@ -151,8 +151,8 @@ template <>
 struct JSClassTraits<JSHistogram::NATIVE> 
     : public JSClassTraitsWrapper<JSHistogram::NATIVE, JSHistogram> {};
 
-Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSHistogram::NATIVE * theWindow);
-Y60_JSGTK_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<acgtk::Histogram> & theHistogram);
+Y60_JSGTK_DECL jsval as_jsval(JSContext *cx, JSHistogram::NATIVE * theWindow);
+Y60_JSGTK_DECL bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<acgtk::Histogram> & theHistogram);
 
 } // namespace
 

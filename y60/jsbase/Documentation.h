@@ -198,7 +198,7 @@ namespace jslib {
     typedef std::pair<std::string, std::string> DokumentationKey;
     typedef std::map<DokumentationKey, ObjectDocumentation> DocumentationMap;
 
-    class Y60_JSBASE_EXPORT DocumentationSingleton : public asl::Singleton<DocumentationSingleton> {
+    class Y60_JSBASE_DECL DocumentationSingleton : public asl::Singleton<DocumentationSingleton> {
         friend class asl::SingletonManager;
         public:
             ObjectDocumentation & operator[](const DokumentationKey & theKey) {
@@ -215,14 +215,14 @@ namespace jslib {
              DocumentationMap _myDocumentation;
     };
 
-    Y60_JSBASE_EXPORT void documentConstructor(const char *theModule, const char *theClassName,
+    Y60_JSBASE_DECL void documentConstructor(const char *theModule, const char *theClassName,
         JSBool (*theConstructor)(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval));
 
-    Y60_JSBASE_EXPORT void describeFunctionParameter(FunctionDescription *myFunctionDescription,
+    Y60_JSBASE_DECL void describeFunctionParameter(FunctionDescription *myFunctionDescription,
         const std::string & theName, const std::string & theDescription, const DocType & theType, const std::string & theDefaultValue);
 
 
-    Y60_JSBASE_EXPORT void
+    Y60_JSBASE_DECL void
     createClassModuleDocumentation(const char *theModule, const char * theClassName,
             JSPropertySpec * theProperties,
             JSFunctionSpec * theFunctions,
@@ -231,7 +231,7 @@ namespace jslib {
             JSFunctionSpec * theStaticFunctions = 0,
             const char * theBaseClassName = 0);
 
-    Y60_JSBASE_EXPORT void
+    Y60_JSBASE_DECL void
     createClassDocumentation(const char * theClassName,
             JSPropertySpec * theProperties,
             JSFunctionSpec * theFunctions,
@@ -240,7 +240,7 @@ namespace jslib {
             JSFunctionSpec * theStaticFunctions = 0,
             const char * theBaseClassName = 0);
 
-    Y60_JSBASE_EXPORT void
+    Y60_JSBASE_DECL void
     createFunctionDocumentation(const char * theSection, JSFunctionSpec * theFunctions);
 }
 

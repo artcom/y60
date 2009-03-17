@@ -133,7 +133,7 @@ needs to be added; exposing the file descriptor should be enough to do that.
 #include <vector>
 #include <algorithm>
 
-class ASL_NET_EXPORT Station {
+class ASL_NET_DECL Station {
 public:
     DEFINE_NAMED_EXCEPTION(Exception,Station::Exception,asl::Exception);
     DEFINE_NAMED_EXCEPTION(SocketFailed,Station::SocketFailed,Exception);

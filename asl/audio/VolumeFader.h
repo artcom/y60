@@ -50,7 +50,7 @@
 
 namespace asl {
 
-class ASL_AUDIO_EXPORT VolumeFader: public Effect {
+class ASL_AUDIO_DECL VolumeFader: public Effect {
 public:
     static const unsigned DEFAULT_FADE_FRAMES = 200;
     VolumeFader(SampleFormat theSampleFormat); 

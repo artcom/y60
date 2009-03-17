@@ -82,7 +82,7 @@
 namespace y60 {
 
     DEFINE_EXCEPTION(TextRendererManagerException, asl::Exception);
-    class Y60_GLTEXT_EXPORT TextRendererManager {
+    class Y60_GLTEXT_DECL TextRendererManager {
         public:
             TextRendererManager();
             virtual ~TextRendererManager();

@@ -60,7 +60,7 @@ class EffectFunctorBase {
 /**
  * Mostly-abstract base class for Effects.
  */
-class ASL_AUDIO_EXPORT Effect {
+class ASL_AUDIO_DECL Effect {
 public:
     Effect(asl::Ptr<EffectFunctorBase> myFunctor);
     virtual ~Effect() {}
@@ -113,7 +113,7 @@ asl::Ptr<EffectFunctorBase> createEffectFunctor(SampleFormat theSampleFormat) {
 /**
  * NullEffect that effectively does not affect anybody.
  */
-class ASL_AUDIO_EXPORT NullEffect: public Effect {
+class ASL_AUDIO_DECL NullEffect: public Effect {
 public:
     NullEffect(SampleFormat theSampleFormat);
         

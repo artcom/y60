@@ -54,7 +54,7 @@
 
 namespace asl {
 
-    class ASL_AUDIO_EXPORT SampleSource;
+    class ASL_AUDIO_DECL SampleSource;
 
     // Use this pointer as smart pointer to SampleSource. If you use the default Ptr,
     // you'll get thread-specific free lists. Since lots of pointers are allocated 

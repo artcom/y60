@@ -149,9 +149,9 @@ namespace y60 {
     typedef asl::Ptr<BoundingBoxTree> BoundingBoxTreePtr;
 
     //                  theTagName      theType       theAttributeName        theDefault
-    DEFINE_ATTRIBUT_TAG(RenderStylesTag, RenderStyles, RENDER_STYLE_ATTRIB,    TYPE(), Y60_SCENE_EXPORT); 
-    DEFINE_ATTRIBUT_TAG(MaterialIdTag,  std::string,   MATERIAL_REF_ATTRIB,    std::string(), Y60_SCENE_EXPORT); 
-    DEFINE_ATTRIBUT_TAG(PrimitiveTypeTag, PrimitiveType,  PRIMITIVE_TYPE_ATTRIB,    TRIANGLES, Y60_SCENE_EXPORT); 
+    DEFINE_ATTRIBUT_TAG(RenderStylesTag, RenderStyles, RENDER_STYLE_ATTRIB,    TYPE(), Y60_SCENE_DECL); 
+    DEFINE_ATTRIBUT_TAG(MaterialIdTag,  std::string,   MATERIAL_REF_ATTRIB,    std::string(), Y60_SCENE_DECL); 
+    DEFINE_ATTRIBUT_TAG(PrimitiveTypeTag, PrimitiveType,  PRIMITIVE_TYPE_ATTRIB,    TRIANGLES, Y60_SCENE_DECL); 
 
     class Shape;
      /**
@@ -159,7 +159,7 @@ namespace y60 {
      * A list of elements described by their vertexdata. An element is
      * for example a triangle, quad or tringle strip, line, ...
      */
-    class Y60_SCENE_EXPORT Primitive : 
+    class Y60_SCENE_DECL Primitive : 
         public dom::Facade,
         public MaterialIdTag::Plug,
         public PrimitiveTypeTag::Plug,

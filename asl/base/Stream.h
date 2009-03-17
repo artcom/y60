@@ -41,7 +41,7 @@
 
 namespace asl {
 
-    ASL_BASE_EXPORT off_t getFileSize(const std::string& theFileName);
+    ASL_BASE_DECL off_t getFileSize(const std::string& theFileName);
 
     /*! \addtogroup aslbase */
     /* @{ */

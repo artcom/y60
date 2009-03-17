@@ -37,7 +37,7 @@ DEFINE_EXCEPTION(PackageException, asl::Exception);
 /* @{ */
 
 /// interface for file packages
-class ASL_ZIP_EXPORT IPackage {
+class ASL_ZIP_DECL IPackage {
     public:
         typedef std::vector<std::string> FileList;
 

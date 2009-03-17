@@ -135,7 +135,7 @@ namespace y60 {
         TEXTURE_APPLY_COMBINE,
         ""
     };
-    DEFINE_ENUM(TextureApplyMode, TextureApplyModeEnum, Y60_BASE_EXPORT);
+    DEFINE_ENUM(TextureApplyMode, TextureApplyModeEnum, Y60_BASE_DECL);
 
     //=== Texture magnification filters =====================================================
     const char * const TEXTURE_SAMPLE_FILTER_NEAREST       = "nearest";
@@ -152,7 +152,7 @@ namespace y60 {
         TEXTURE_SAMPLE_FILTER_LINEAR,
         ""
     };
-    DEFINE_ENUM(TextureSampleFilter, TextureSampleFilterEnum, Y60_BASE_EXPORT);
+    DEFINE_ENUM(TextureSampleFilter, TextureSampleFilterEnum, Y60_BASE_DECL);
 
     //=== Texture repeat modes =====================================================
     const char * const TEXTURE_WRAP_CLAMP           = "clamp";
@@ -175,7 +175,7 @@ namespace y60 {
         TEXTURE_WRAP_MIRROR,
         ""
     };
-    DEFINE_ENUM(TextureWrapMode, TextureWrapModeEnum, Y60_BASE_EXPORT);
+    DEFINE_ENUM(TextureWrapMode, TextureWrapModeEnum, Y60_BASE_DECL);
 
     //=== Texture Internal Formats ============================================
     const char * const TEXTURE_INTERNAL_FORMAT_DEPTH               = "DEPTH";
@@ -427,7 +427,7 @@ namespace y60 {
         IMAGE_TYPE_CUBEMAP,
         ""
     };
-    DEFINE_ENUM(ImageType, ImageTypeEnum, Y60_BASE_EXPORT);
+    DEFINE_ENUM(ImageType, ImageTypeEnum, Y60_BASE_DECL);
 
     //=== Texture usage =====================================================
     const char * const TEXTURE_USAGE_PAINT        = "paint";
@@ -477,7 +477,7 @@ namespace y60 {
         TEXTURE_USAGE_FADE,
         ""
     };
-    DEFINE_ENUM(TextureUsage, TextureUsageEnum, Y60_BASE_EXPORT);
+    DEFINE_ENUM(TextureUsage, TextureUsageEnum, Y60_BASE_DECL);
     typedef std::vector<TextureUsageEnum> VectorOfTextureUsage;
 
     //=== Image filter =====================================================
@@ -516,7 +516,7 @@ namespace y60 {
         TEXTURE_TYPE_CUBEMAP,
         ""
     };
-    DEFINE_ENUM(TextureType, TextureTypeEnum, Y60_BASE_EXPORT);
+    DEFINE_ENUM(TextureType, TextureTypeEnum, Y60_BASE_DECL);
 
     enum CubemapFacesEnum {
         CUBEMAP_BEHIND,
@@ -569,7 +569,7 @@ namespace y60 {
        "polygon_offset", 
        "" 
     };
-    DEFINE_BITSET(RenderStyles, RenderStyle, RenderStyleEnum, Y60_BASE_EXPORT);
+    DEFINE_BITSET(RenderStyles, RenderStyle, RenderStyleEnum, Y60_BASE_DECL);
 
     enum BlendFunctionEnum {
         ONE,
@@ -608,7 +608,7 @@ namespace y60 {
         "one_minus_constant_alpha",
         ""
     };
-    DEFINE_ENUM(BlendFunction, BlendFunctionEnum, Y60_BASE_EXPORT);
+    DEFINE_ENUM(BlendFunction, BlendFunctionEnum, Y60_BASE_DECL);
 
     // same as GL_POINTS, GL_LINES etc.
     enum PrimitiveTypeEnum {
@@ -649,7 +649,7 @@ namespace y60 {
         PRIMITIVE_TYPE_POLYGON,
         ""
     };
-    DEFINE_ENUM(PrimitiveType, PrimitiveTypeEnum, Y60_BASE_EXPORT);
+    DEFINE_ENUM(PrimitiveType, PrimitiveTypeEnum, Y60_BASE_DECL);
     
     enum TargetBuffersEnum {
         RED_MASK,
@@ -687,8 +687,8 @@ namespace y60 {
         ""
     };
 
-    DEFINE_BITSET(TargetBuffers, TargetBuffer, TargetBuffersEnum, Y60_BASE_EXPORT);
-    DEFINE_ENUM(BlendEquation, BlendEquationEnum, Y60_BASE_EXPORT);
+    DEFINE_BITSET(TargetBuffers, TargetBuffer, TargetBuffersEnum, Y60_BASE_DECL);
+    DEFINE_ENUM(BlendEquation, BlendEquationEnum, Y60_BASE_DECL);
 
     //=== Animation types ===============================================
     enum AnimationDirection {
@@ -765,9 +765,9 @@ namespace y60 {
             "dynamic_copy", 
             ""
     };
-    DEFINE_ENUM(VertexBufferUsage, VertexBufferUsageEnum, Y60_BASE_EXPORT);
+    DEFINE_ENUM(VertexBufferUsage, VertexBufferUsageEnum, Y60_BASE_DECL);
    
-    Y60_BASE_EXPORT VertexBufferUsage getDefaultVertexBufferUsage();
+    Y60_BASE_DECL VertexBufferUsage getDefaultVertexBufferUsage();
 
 }
 

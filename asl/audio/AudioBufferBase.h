@@ -55,7 +55,7 @@
 
 namespace asl {
 
-class ASL_AUDIO_EXPORT AudioBufferBase {
+class ASL_AUDIO_DECL AudioBufferBase {
     public:
         AudioBufferBase();
         virtual ~AudioBufferBase();

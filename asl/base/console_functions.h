@@ -58,13 +58,13 @@ namespace asl {;
 /* @{ */
     bool isTTY(std::ostream & os);
 
-    ASL_BASE_EXPORT std::ostream & TTYGREEN (std::ostream & os );
+    ASL_BASE_DECL std::ostream & TTYGREEN (std::ostream & os );
 
-    ASL_BASE_EXPORT std::ostream & TTYRED (std::ostream & os );
-    ASL_BASE_EXPORT std::ostream & TTYYELLOW (std::ostream & os );
-    ASL_BASE_EXPORT std::ostream & TTYBLUE (std::ostream & os );
+    ASL_BASE_DECL std::ostream & TTYRED (std::ostream & os );
+    ASL_BASE_DECL std::ostream & TTYYELLOW (std::ostream & os );
+    ASL_BASE_DECL std::ostream & TTYBLUE (std::ostream & os );
 
-    ASL_BASE_EXPORT std::ostream & ENDCOLOR (std::ostream & os );
+    ASL_BASE_DECL std::ostream & ENDCOLOR (std::ostream & os );
 /* @} */
 }
 

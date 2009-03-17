@@ -133,7 +133,7 @@ namespace asl {
          * Wrapper around a milliseconds precise time.
          *
          */
-        class ASL_BASE_EXPORT Time {
+        class ASL_BASE_DECL Time {
         private:
 #ifdef _WIN32
         static const long long SECS_BETWEEN_EPOCHS = 11644473600;

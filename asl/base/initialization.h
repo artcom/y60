@@ -24,7 +24,7 @@
 #include "asl_base_settings.h"
 
 namespace asl {
-    ASL_BASE_EXPORT void initialize();
+    ASL_BASE_DECL void initialize();
 } // namespace asl
 
 

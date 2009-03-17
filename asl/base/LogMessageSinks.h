@@ -87,7 +87,7 @@ namespace asl {
         std::ostream & _myStream;
     };
 
-    class ASL_BASE_EXPORT FilePrinter : public MessageSink {
+    class ASL_BASE_DECL FilePrinter : public MessageSink {
     public:
         FilePrinter(const std::string & theFilename) : _myStream(theFilename.c_str()) {}
         void push(Severity theSeverity, const std::string & theMessage) {

@@ -112,10 +112,10 @@ namespace jslib {
 
 template <>
 struct JSClassTraits<std::locale> : public JSClassTraitsWrapper<std::locale, JSLocale> {};
-Y60_JSLIB_EXPORT bool convertFrom(JSContext *cx, jsval theValue, JSLocale::NATIVE *& theLocale);
-Y60_JSLIB_EXPORT bool convertFrom(JSContext *cx, jsval theValue, JSLocale::OWNERPTR & theLocale);
+Y60_JSLIB_DECL bool convertFrom(JSContext *cx, jsval theValue, JSLocale::NATIVE *& theLocale);
+Y60_JSLIB_DECL bool convertFrom(JSContext *cx, jsval theValue, JSLocale::OWNERPTR & theLocale);
 
-Y60_JSLIB_EXPORT jsval as_jsval(JSContext *cx, JSLocale::OWNERPTR theOwner);
+Y60_JSLIB_DECL jsval as_jsval(JSContext *cx, JSLocale::OWNERPTR theOwner);
 }
 
 #endif // _ac_jslib_JSLocale_h_

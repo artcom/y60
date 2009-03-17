@@ -59,7 +59,7 @@ namespace asl {
 /*! \addtogroup aslbase */
 /* @{ */
 
-class ASL_BASE_EXPORT SingletonBase {
+class ASL_BASE_DECL SingletonBase {
 public:
     // The Singleton Manager will call this method on all singletons before it starts deleting them.
     // This way singletons can correctly shut down, independent of the order of destruction.

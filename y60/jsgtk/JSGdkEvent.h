@@ -115,13 +115,13 @@ template <>
 struct JSClassTraits<JSGdkEvent::NATIVE>
     : public JSClassTraitsWrapper<JSGdkEvent::NATIVE, JSGdkEvent> {};
 
-Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSGdkEvent::OWNERPTR theOwner, JSGdkEvent::NATIVE * theNative);
+Y60_JSGTK_DECL jsval as_jsval(JSContext *cx, JSGdkEvent::OWNERPTR theOwner, JSGdkEvent::NATIVE * theNative);
 
-Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, GdkEvent * theNative);
-Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, GdkEventButton * theNative);
-Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, GdkEventMotion * theNative);
-Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, GdkEventKey * theNative);
-Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, GdkEventFocus * theNative);
+Y60_JSGTK_DECL jsval as_jsval(JSContext *cx, GdkEvent * theNative);
+Y60_JSGTK_DECL jsval as_jsval(JSContext *cx, GdkEventButton * theNative);
+Y60_JSGTK_DECL jsval as_jsval(JSContext *cx, GdkEventMotion * theNative);
+Y60_JSGTK_DECL jsval as_jsval(JSContext *cx, GdkEventKey * theNative);
+Y60_JSGTK_DECL jsval as_jsval(JSContext *cx, GdkEventFocus * theNative);
 
 } // namespace
 

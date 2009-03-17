@@ -88,7 +88,7 @@ namespace acgtk {
 
 #undef GrayScale
 
-class Y60_ACGTK_EXPORT GrayScale : public Gtk::DrawingArea {
+class Y60_ACGTK_DECL GrayScale : public Gtk::DrawingArea {
     public:
         GrayScale();
         virtual ~GrayScale();

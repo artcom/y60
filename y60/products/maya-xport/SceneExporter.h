@@ -92,13 +92,13 @@ namespace y60 {
 }
 
 #if WIN32
-#   define DLL_EXPORT __declspec(dllexport)
+#   define DLL_DECL __declspec(dllexport)
 #else
-#   define DLL_EXPORT
+#   define DLL_DECL
 #endif
 
-DLL_EXPORT MStatus initializePlugin(MObject theObject);
-DLL_EXPORT MStatus uninitializePlugin(MObject theObject);
+DLL_DECL MStatus initializePlugin(MObject theObject);
+DLL_DECL MStatus uninitializePlugin(MObject theObject);
 
 typedef std::map<y60::BodyPtr, MObject> SkinAndBonesMap;
 typedef std::map<std::string, std::string> PathToIdMap;

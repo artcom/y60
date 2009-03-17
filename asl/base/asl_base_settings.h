@@ -4,9 +4,9 @@
 #include "settings.h"
 
 #ifdef aslbase_EXPORTS
-#   define ASL_BASE_EXPORT AC_DLL_EXPORT
+#   define ASL_BASE_DECL AC_DLL_EXPORT
 #else
-#   define ASL_BASE_EXPORT AC_DLL_IMPORT
+#   define ASL_BASE_DECL AC_DLL_IMPORT
 #endif
 
 #endif // ASL_BASE_SETTING_INCLUDED

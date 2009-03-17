@@ -115,10 +115,10 @@ private:
 template <>
 struct JSClassTraits<DummyT> : public JSClassTraitsWrapper<DummyT, JSModellingFunctions> {};
 
-Y60_JSLIB_EXPORT bool convertFrom(JSContext *cx, jsval theValue, DummyT *& theDummy);
-Y60_JSLIB_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<DummyT> & theDummy);
+Y60_JSLIB_DECL bool convertFrom(JSContext *cx, jsval theValue, DummyT *& theDummy);
+Y60_JSLIB_DECL bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<DummyT> & theDummy);
 
-Y60_JSLIB_EXPORT jsval as_jsval(JSContext *cx, JSModellingFunctions::OWNERPTR & theOwner);
+Y60_JSLIB_DECL jsval as_jsval(JSContext *cx, JSModellingFunctions::OWNERPTR & theOwner);
 
 }
 

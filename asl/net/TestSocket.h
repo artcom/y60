@@ -47,7 +47,7 @@
 
 #include "TCPServer.h"
 
-class ASL_NET_EXPORT TestSocket: public UnitTest{
+class ASL_NET_DECL TestSocket: public UnitTest{
     public:
         TestSocket ()
             : UnitTest("TestSocket") {}

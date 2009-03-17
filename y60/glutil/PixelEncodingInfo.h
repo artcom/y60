@@ -96,8 +96,8 @@ namespace y60 {
         GLenum   pixeltype;
     };
     
-    Y60_GLUTIL_EXPORT PixelEncodingInfo getDefaultGLTextureParams(PixelEncoding theEncoding);
-    Y60_GLUTIL_EXPORT std::string getGLEnumString(GLenum theFormat);
+    Y60_GLUTIL_DECL PixelEncodingInfo getDefaultGLTextureParams(PixelEncoding theEncoding);
+    Y60_GLUTIL_DECL std::string getGLEnumString(GLenum theFormat);
     
     inline
     std::ostream & operator<<(std::ostream & os, const PixelEncodingInfo & theInfo) {

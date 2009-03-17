@@ -4,9 +4,9 @@
 #include <asl/base/settings.h>
 
 #ifdef y60video_EXPORTS
-#   define Y60_VIDEO_EXPORT AC_DLL_EXPORT
+#   define Y60_VIDEO_DECL AC_DLL_EXPORT
 #else
-#   define Y60_VIDEO_EXPORT AC_DLL_IMPORT
+#   define Y60_VIDEO_DECL AC_DLL_IMPORT
 #endif
 
 #endif // Y60_VIDEO_SETTING_INCLUDED

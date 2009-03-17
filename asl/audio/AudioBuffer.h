@@ -160,7 +160,7 @@ class AudioBuffer: public AudioBufferBase {
             return _mySampleRate;
         }
 
-        ASL_AUDIO_EXPORT SampleFormat getSampleFormat() const;
+        ASL_AUDIO_DECL SampleFormat getSampleFormat() const;
 
         unsigned getBytesPerFrame() const {
             ASSURE_MSG(_numChannels != 0,
@@ -399,7 +399,7 @@ class AudioBuffer: public AudioBufferBase {
         unsigned _mySampleRate;
 };
 
-ASL_AUDIO_EXPORT AudioBufferBase * createAudioBuffer(SampleFormat mySampleFormat, unsigned numFrames,
+ASL_AUDIO_DECL AudioBufferBase * createAudioBuffer(SampleFormat mySampleFormat, unsigned numFrames,
         unsigned numChannels, unsigned mySampleRate);
 
 template<>

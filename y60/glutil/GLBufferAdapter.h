@@ -83,7 +83,7 @@ namespace y60 {
     };   
 
     DEFINE_EXCEPTION(GLBufferAdapterException, asl::Exception);
-    class Y60_GLUTIL_EXPORT BufferAdapter {
+    class Y60_GLUTIL_DECL BufferAdapter {
         public:
             BufferAdapter(unsigned theWidth, unsigned theHeight, unsigned theComponents);
             virtual ~BufferAdapter();
@@ -121,7 +121,7 @@ namespace y60 {
 #define PL_FT_SGI    15
 */
     
-    class Y60_GLUTIL_EXPORT BufferToFile : public BufferAdapter {
+    class Y60_GLUTIL_DECL BufferToFile : public BufferAdapter {
         public:
             BufferToFile(const std::string & theFilename, unsigned theFormat,
                          unsigned theWidth, unsigned theHeight, unsigned theComponents);
@@ -132,7 +132,7 @@ namespace y60 {
             unsigned _myFormat;
     };
  
-    class Y60_GLUTIL_EXPORT BufferToTexture : public BufferAdapter {
+    class Y60_GLUTIL_DECL BufferToTexture : public BufferAdapter {
         public:
             BufferToTexture(TexturePtr theTexture, const asl::Vector2i & theOffset, bool theCopyToImageFlag = false);
             virtual ~BufferToTexture();

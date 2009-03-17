@@ -139,7 +139,7 @@ template <>
 struct JSClassTraits<JSVScale::NATIVE>
     : public JSClassTraitsWrapper<JSVScale::NATIVE, JSVScale> {};
 
-Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSVScale::OWNERPTR theOwner, JSVScale::NATIVE * theVScale);
+Y60_JSGTK_DECL jsval as_jsval(JSContext *cx, JSVScale::OWNERPTR theOwner, JSVScale::NATIVE * theVScale);
 
 } // namespace
 

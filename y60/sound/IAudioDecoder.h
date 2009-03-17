@@ -66,7 +66,7 @@
 
 namespace y60 {
 
-class Y60_SOUND_EXPORT IAudioDecoder
+class Y60_SOUND_DECL IAudioDecoder
 {
     public:
         virtual ~IAudioDecoder() {};

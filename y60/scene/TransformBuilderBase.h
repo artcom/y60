@@ -68,7 +68,7 @@
 #include <string>
 
 namespace y60 {
-    class Y60_SCENE_EXPORT TransformBuilderBase : public WorldBuilderBase {
+    class Y60_SCENE_DECL TransformBuilderBase : public WorldBuilderBase {
         public:
             enum BillboardType { BB_NONE, BB_AXIS, BB_POINT };
 

@@ -75,7 +75,7 @@
 
 namespace y60 {
 
-    class Y60_SOUND_EXPORT SoundManager :
+    class Y60_SOUND_DECL SoundManager :
         public asl::Singleton<SoundManager>, private asl::PosixThread
     {
         friend class asl::SingletonManager;

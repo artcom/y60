@@ -136,7 +136,7 @@ template <>
 struct JSClassTraits<JSTable::NATIVE>
     : public JSClassTraitsWrapper<JSTable::NATIVE, JSTable> {};
 
-Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSTable::OWNERPTR theOwner, JSTable::NATIVE * theBin);
+Y60_JSGTK_DECL jsval as_jsval(JSContext *cx, JSTable::OWNERPTR theOwner, JSTable::NATIVE * theBin);
 
 } // namespace
 

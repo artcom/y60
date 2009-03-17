@@ -145,8 +145,8 @@ template <>
 struct JSClassTraits<JSEmbeddedButton::NATIVE> 
     : public JSClassTraitsWrapper<JSEmbeddedButton::NATIVE, JSEmbeddedButton> {};
 
-Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSEmbeddedButton::NATIVE * theWindow);
-Y60_JSGTK_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<acgtk::EmbeddedButton> & theEmbeddedButton);
+Y60_JSGTK_DECL jsval as_jsval(JSContext *cx, JSEmbeddedButton::NATIVE * theWindow);
+Y60_JSGTK_DECL bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<acgtk::EmbeddedButton> & theEmbeddedButton);
 
 } // namespace
 

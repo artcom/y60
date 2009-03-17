@@ -35,7 +35,7 @@
 /*! \addtogroup aslbase */
 /* @{ */
 
-class ASL_BASE_EXPORT UnitTest {
+class ASL_BASE_DECL UnitTest {
 public:
     virtual void run() = 0;
     unsigned int getPassedCount() const;
@@ -91,7 +91,7 @@ private:
     void reportResult(bool myExpressionResult,bool myExpectedResult);
 };
 
-class ASL_BASE_EXPORT UnitTestSuite : public UnitTest {
+class ASL_BASE_DECL UnitTestSuite : public UnitTest {
 public:
     explicit UnitTestSuite(const char * myName, int argc, char *argv[]) 
         : UnitTest(myName), _argc(argc), _argv(argv) {

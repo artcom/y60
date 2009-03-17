@@ -97,7 +97,7 @@ typedef std::list<asl::Vector2f> PointList;
 class Blob;
 typedef asl::Ptr<Blob> BlobPtr;
 
-class Y60_IMAGE_EXPORT Blob {
+class Y60_IMAGE_DECL Blob {
     public:
         Blob() {}
         Blob(RunPtr theRun);
@@ -119,7 +119,7 @@ typedef std::vector<BlobPtr> BlobList;
 typedef asl::Ptr<BlobList> BlobListPtr;
 typedef std::map<int, BlobPtr> ComponentMap;
 
-Y60_IMAGE_EXPORT BlobListPtr connectedComponents(dom::ResizeableRasterPtr image, int object_threshold);
+Y60_IMAGE_DECL BlobListPtr connectedComponents(dom::ResizeableRasterPtr image, int object_threshold);
 
 } // end namespace
 

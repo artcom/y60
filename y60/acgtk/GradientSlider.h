@@ -82,7 +82,7 @@
 
 namespace acgtk {
 
-class Y60_ACGTK_EXPORT GradientSlider : public Gtk::DrawingArea {
+class Y60_ACGTK_DECL GradientSlider : public Gtk::DrawingArea {
     public:
         GradientSlider();
         virtual ~GradientSlider();

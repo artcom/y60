@@ -80,7 +80,7 @@
 
 namespace y60 {
 
-    class Y60_SCENE_EXPORT LightSourceBuilder : public BuilderBase {
+    class Y60_SCENE_DECL LightSourceBuilder : public BuilderBase {
         public:
             LightSourceBuilder(const std::string & theName);
             virtual ~LightSourceBuilder();

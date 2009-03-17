@@ -54,7 +54,7 @@ namespace asl {
 
 //! Abstract base class for all socket-based conduit policies.  
     
-class ASL_IPC_EXPORT SocketPolicy : public ConduitPolicy {
+class ASL_IPC_DECL SocketPolicy : public ConduitPolicy {
     public:
         typedef int Handle; 
 

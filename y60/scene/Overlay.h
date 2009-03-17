@@ -70,21 +70,21 @@
 namespace y60 {
     
   //DEFINE_ATTRIBUT_TAG(theTagName       theType        theAttributeName             theDefault,                theExportToken);
-    DEFINE_ATTRIBUT_TAG(WidthTag,        float,         WIDTH_ATTRIB,                0.0f,                      Y60_SCENE_EXPORT);
-    DEFINE_ATTRIBUT_TAG(HeightTag,       float,         HEIGHT_ATTRIB,               0.0f,                      Y60_SCENE_EXPORT);
-    DEFINE_ATTRIBUT_TAG(MaterialTag,     std::string,   MATERIAL_REF_ATTRIB,         "",                        Y60_SCENE_EXPORT);
-    DEFINE_ATTRIBUT_TAG(AlphaTag,        float,         OVERLAY_ALPHA_ATTRIB,        1.0f,                      Y60_SCENE_EXPORT);
-    DEFINE_ATTRIBUT_TAG(SrcOriginTag,    asl::Vector2f, OVERLAY_SRCORIGIN_ATTRIB,    asl::Vector2f(0.f,0.f),    Y60_SCENE_EXPORT);
-    DEFINE_ATTRIBUT_TAG(SrcSizeTag,      asl::Vector2f, OVERLAY_SRCSIZE_ATTRIB,      asl::Vector2f(1,1),        Y60_SCENE_EXPORT);
-    DEFINE_ATTRIBUT_TAG(BorderColorTag,  asl::Vector4f, OVERLAY_BORDERCOLOR_ATTRIB,  asl::Vector4f(0,0,0,1),    Y60_SCENE_EXPORT);
-    DEFINE_ATTRIBUT_TAG(BorderWidthTag,  float,         OVERLAY_BORDERWIDTH_ATTRIB,  1,                         Y60_SCENE_EXPORT);
-    DEFINE_ATTRIBUT_TAG(TopBorderTag,    bool,          OVERLAY_TOPBORDER_ATTRIB,    false,                     Y60_SCENE_EXPORT);
-    DEFINE_ATTRIBUT_TAG(BottomBorderTag, bool,          OVERLAY_BOTTOMBORDER_ATTRIB, false,                     Y60_SCENE_EXPORT);
-    DEFINE_ATTRIBUT_TAG(LeftBorderTag,   bool,          OVERLAY_LEFTBORDER_ATTRIB,   false,                     Y60_SCENE_EXPORT);
-    DEFINE_ATTRIBUT_TAG(RightBorderTag,  bool,          OVERLAY_RIGHTBORDER_ATTRIB,  false,                     Y60_SCENE_EXPORT);
-    DEFINE_ATTRIBUT_TAG(Rotation2DTag,   float,         OVERLAY_ROTATION2D_ATTRIB,   0.0f,                      Y60_SCENE_EXPORT);
-    DEFINE_ATTRIBUT_TAG(Scale2DTag,      asl::Vector2f, OVERLAY_SCALE2D_ATTRIB,      asl::Vector2f(1.0f,1.0f),  Y60_SCENE_EXPORT);
-    DEFINE_ATTRIBUT_TAG(Pivot2DTag,      asl::Vector2f, OVERLAY_PIVOT2D_ATTRIB,      asl::Vector2f(0.0f,0.0f),  Y60_SCENE_EXPORT);
+    DEFINE_ATTRIBUT_TAG(WidthTag,        float,         WIDTH_ATTRIB,                0.0f,                      Y60_SCENE_DECL);
+    DEFINE_ATTRIBUT_TAG(HeightTag,       float,         HEIGHT_ATTRIB,               0.0f,                      Y60_SCENE_DECL);
+    DEFINE_ATTRIBUT_TAG(MaterialTag,     std::string,   MATERIAL_REF_ATTRIB,         "",                        Y60_SCENE_DECL);
+    DEFINE_ATTRIBUT_TAG(AlphaTag,        float,         OVERLAY_ALPHA_ATTRIB,        1.0f,                      Y60_SCENE_DECL);
+    DEFINE_ATTRIBUT_TAG(SrcOriginTag,    asl::Vector2f, OVERLAY_SRCORIGIN_ATTRIB,    asl::Vector2f(0.f,0.f),    Y60_SCENE_DECL);
+    DEFINE_ATTRIBUT_TAG(SrcSizeTag,      asl::Vector2f, OVERLAY_SRCSIZE_ATTRIB,      asl::Vector2f(1,1),        Y60_SCENE_DECL);
+    DEFINE_ATTRIBUT_TAG(BorderColorTag,  asl::Vector4f, OVERLAY_BORDERCOLOR_ATTRIB,  asl::Vector4f(0,0,0,1),    Y60_SCENE_DECL);
+    DEFINE_ATTRIBUT_TAG(BorderWidthTag,  float,         OVERLAY_BORDERWIDTH_ATTRIB,  1,                         Y60_SCENE_DECL);
+    DEFINE_ATTRIBUT_TAG(TopBorderTag,    bool,          OVERLAY_TOPBORDER_ATTRIB,    false,                     Y60_SCENE_DECL);
+    DEFINE_ATTRIBUT_TAG(BottomBorderTag, bool,          OVERLAY_BOTTOMBORDER_ATTRIB, false,                     Y60_SCENE_DECL);
+    DEFINE_ATTRIBUT_TAG(LeftBorderTag,   bool,          OVERLAY_LEFTBORDER_ATTRIB,   false,                     Y60_SCENE_DECL);
+    DEFINE_ATTRIBUT_TAG(RightBorderTag,  bool,          OVERLAY_RIGHTBORDER_ATTRIB,  false,                     Y60_SCENE_DECL);
+    DEFINE_ATTRIBUT_TAG(Rotation2DTag,   float,         OVERLAY_ROTATION2D_ATTRIB,   0.0f,                      Y60_SCENE_DECL);
+    DEFINE_ATTRIBUT_TAG(Scale2DTag,      asl::Vector2f, OVERLAY_SCALE2D_ATTRIB,      asl::Vector2f(1.0f,1.0f),  Y60_SCENE_DECL);
+    DEFINE_ATTRIBUT_TAG(Pivot2DTag,      asl::Vector2f, OVERLAY_PIVOT2D_ATTRIB,      asl::Vector2f(0.0f,0.0f),  Y60_SCENE_DECL);
 
     class Overlay :
         public dom::Facade,

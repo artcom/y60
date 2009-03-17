@@ -138,7 +138,7 @@ template <>
 struct JSClassTraits<JSMenuShell::NATIVE>
     : public JSClassTraitsWrapper<JSMenuShell::NATIVE, JSMenuShell> {};
 
-Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSMenuShell::OWNERPTR theOwner, JSMenuShell::NATIVE * theMenuShell);
+Y60_JSGTK_DECL jsval as_jsval(JSContext *cx, JSMenuShell::OWNERPTR theOwner, JSMenuShell::NATIVE * theMenuShell);
 
 } // namespace
 

@@ -68,7 +68,7 @@
 
 namespace y60 {
 
-extern Y60_INPUT_EXPORT const std::string ourasseventxsd;
+extern Y60_INPUT_DECL const std::string ourasseventxsd;
 
 }
 

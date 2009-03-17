@@ -74,7 +74,7 @@
 
 namespace acgtk {
 
-class Y60_ACGTK_EXPORT ConsoleView : public Gtk::TextView {
+class Y60_ACGTK_DECL ConsoleView : public Gtk::TextView {
     public:
         ConsoleView();
         virtual ~ConsoleView();

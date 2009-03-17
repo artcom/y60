@@ -99,7 +99,7 @@ namespace y60 {
 
     DEFINE_EXCEPTION(ImageLoaderException, asl::Exception);
 
-    class Y60_IMAGE_EXPORT ImageLoader : public PLBmp {
+    class Y60_IMAGE_DECL ImageLoader : public PLBmp {
     public:
         //! Creates an empty bitmap.
         ImageLoader(const ITextureManagerPtr & theTextureManager = ITextureManagerPtr());

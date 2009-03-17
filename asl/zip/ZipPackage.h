@@ -30,7 +30,7 @@
 
 namespace asl {
 
-class ASL_ZIP_EXPORT ZipPackage : public IPackage {
+class ASL_ZIP_DECL ZipPackage : public IPackage {
     public:
         ZipPackage(const std::string & theZipReader);
         ~ZipPackage();

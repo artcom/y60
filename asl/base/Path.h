@@ -34,7 +34,7 @@
 
 namespace asl {
 
-class ASL_BASE_EXPORT Path {
+class ASL_BASE_DECL Path {
 public:
     Path();
     Path(const char * theString, StringEncoding theEncoding);
@@ -57,7 +57,7 @@ private:
     void free();
 };
 
-ASL_BASE_EXPORT std::ostream & operator << (std::ostream & os, const asl::Path & thePath);
+ASL_BASE_DECL std::ostream & operator << (std::ostream & os, const asl::Path & thePath);
 
 }
 

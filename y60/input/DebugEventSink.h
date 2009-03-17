@@ -75,7 +75,7 @@
 
 namespace y60 {
 
-    class Y60_INPUT_EXPORT DebugEventSink: public y60::IEventSink {
+    class Y60_INPUT_DECL DebugEventSink: public y60::IEventSink {
         public:
             DebugEventSink();
             virtual void handle(EventPtr theEvent);

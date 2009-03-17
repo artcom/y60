@@ -78,7 +78,7 @@
 
 namespace y60 {
 
-    class Y60_SDLENGINE_EXPORT SDLWindow : public jslib::AbstractRenderWindow {
+    class Y60_SDLENGINE_DECL SDLWindow : public jslib::AbstractRenderWindow {
 
         public:
             static asl::Ptr<SDLWindow> create();

@@ -60,7 +60,7 @@ namespace asl {
 
 DEFINE_EXCEPTION(PlugInException, Exception)
 
-class ASL_BASE_EXPORT PlugInManager :
+class ASL_BASE_DECL PlugInManager :
     public Singleton<PlugInManager>
 {
 public:

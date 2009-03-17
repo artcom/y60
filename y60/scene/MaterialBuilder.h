@@ -75,7 +75,7 @@
 namespace y60 {
     class SceneBuilder;
 
-    class Y60_SCENE_EXPORT MaterialBuilder : public BuilderBase {
+    class Y60_SCENE_DECL MaterialBuilder : public BuilderBase {
     public:
         DEFINE_EXCEPTION(MaterialBuilderException, asl::Exception);
 
@@ -174,7 +174,7 @@ namespace y60 {
 
     typedef asl::Ptr<MaterialBuilder>  MaterialBuilderPtr;
 
-    Y60_SCENE_EXPORT void createLightingFeature(VectorOfRankedFeature & theRequirement,
+    Y60_SCENE_DECL void createLightingFeature(VectorOfRankedFeature & theRequirement,
                                LightingModel  theLightingModelType);
 }
 

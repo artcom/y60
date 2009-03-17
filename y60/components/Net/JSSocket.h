@@ -125,11 +125,11 @@ struct JSClassTraits<JSSocket::NATIVE>
 
 } // namespace jslib
 
-Y60_NET_EXPORT bool convertFrom(JSContext *cx, jsval theValue, JSSocket::NATIVE & theNative);
-Y60_NET_EXPORT bool convertFrom(JSContext *cx, jsval theValue, JSSocket::OWNERPTR & theNativePtr);
+Y60_NET_DECL bool convertFrom(JSContext *cx, jsval theValue, JSSocket::NATIVE & theNative);
+Y60_NET_DECL bool convertFrom(JSContext *cx, jsval theValue, JSSocket::OWNERPTR & theNativePtr);
 
-Y60_NET_EXPORT jsval as_jsval(JSContext *cx, JSSocket::OWNERPTR theOwner);
-Y60_NET_EXPORT jsval as_jsval(JSContext *cx, JSSocket::OWNERPTR theOwner, JSSocket::NATIVE * theSerial);
+Y60_NET_DECL jsval as_jsval(JSContext *cx, JSSocket::OWNERPTR theOwner);
+Y60_NET_DECL jsval as_jsval(JSContext *cx, JSSocket::OWNERPTR theOwner, JSSocket::NATIVE * theSerial);
 
 #endif
 

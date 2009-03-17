@@ -134,7 +134,7 @@ template <>
 struct JSClassTraits<JSGtkMain::NATIVE> 
     : public JSClassTraitsWrapper<JSGtkMain::NATIVE, JSGtkMain> {};
 
-Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSGtkMain::OWNERPTR theOwner);
+Y60_JSGTK_DECL jsval as_jsval(JSContext *cx, JSGtkMain::OWNERPTR theOwner);
 //jsval as_jsval(JSContext *cx, JSGtkMain::OWNERPTR theOwner, JSGtkMain::NATIVE * theSerial);
 
 }

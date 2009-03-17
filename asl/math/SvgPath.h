@@ -62,7 +62,7 @@ namespace asl {
      *   - linear path segments are now stored as bezier snippets, too.
      *  
      */
-    class ASL_MATH_EXPORT SvgPath {
+    class ASL_MATH_DECL SvgPath {
     public:
         /**
          * Point-on-path.
@@ -309,7 +309,7 @@ namespace asl {
         
     };
 
-    ASL_MATH_EXPORT std::ostream & operator<<(std::ostream & os, const asl::SvgPath & thePath);
+    ASL_MATH_DECL std::ostream & operator<<(std::ostream & os, const asl::SvgPath & thePath);
 
 } // namespace
 

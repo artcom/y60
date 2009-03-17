@@ -90,7 +90,7 @@ namespace y60 {
 
     typedef std::vector<dom::ResizeableRasterPtr> RasterVector;
 
-    Y60_VIDEO_EXPORT void copyPlaneToRaster(unsigned char * theDestination, unsigned char * theSource, int theStride, unsigned theWidth, unsigned theHeight);
+    Y60_VIDEO_DECL void copyPlaneToRaster(unsigned char * theDestination, unsigned char * theSource, int theStride, unsigned theWidth, unsigned theHeight);
     
     class Movie;
     /**
@@ -98,7 +98,7 @@ namespace y60 {
      * Abstract base class for Movie Decoders.
      *
      */
-    class Y60_VIDEO_EXPORT MovieDecoderBase : public IDecoder {
+    class Y60_VIDEO_DECL MovieDecoderBase : public IDecoder {
         public:
             MovieDecoderBase();
 

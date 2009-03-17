@@ -83,7 +83,7 @@
 
 namespace acgtk {
 
-class Y60_ACGTK_EXPORT TNTMeasurementList : public Gtk::TreeView {
+class Y60_ACGTK_DECL TNTMeasurementList : public Gtk::TreeView {
     public:
         /** The default constructor creates a default list view without icons
          *  and special layout. It must be present because all wrapped objects

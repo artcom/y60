@@ -65,7 +65,7 @@
 
 namespace asl {
 
-class ASL_BASE_EXPORT PlugInBase {
+class ASL_BASE_DECL PlugInBase {
 public:
 	PlugInBase(DLHandle theDLHandle);
 	virtual ~PlugInBase() {}

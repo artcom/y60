@@ -67,7 +67,7 @@ namespace asl {
     enum Severity {SEV_PRINT, SEV_FATAL, SEV_ERROR, SEV_WARNING, SEV_INFO, SEV_DEBUG, SEV_TRACE, SEV_DISABLED};
     extern const char * SeverityName[];
 
-    class ASL_BASE_EXPORT MessageSink {
+    class ASL_BASE_DECL MessageSink {
     public:
         virtual void push(Severity theSeverity, const std::string & theMessage) = 0;
         virtual ~MessageSink() {}
@@ -105,7 +105,7 @@ namespace asl {
      * AC_MODULE_VERBOSITY := MODULE_VERBOSITY | AC_MODULE_VERBOSITY:MODULE_VERBOSITY
      * MODULE_VERBOSITY := <LEVEL>/<MODULE>[/<FROMLINE>[/<TOLINE>]]
      */
-    class ASL_BASE_EXPORT Logger : public Singleton<Logger> {
+    class ASL_BASE_DECL Logger : public Singleton<Logger> {
         struct ModuleVerbosity {
             ModuleVerbosity() {}
             ModuleVerbosity(Severity theVerbosity,int theMinId, int myMaxId)

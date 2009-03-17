@@ -108,12 +108,12 @@ namespace y60 {
     DEFINE_MATERIAL_PROPERTY_TAG(LineWidthTag, float, LINEWIDTH_PROPERTY, float(1.0));
     DEFINE_MATERIAL_PROPERTY_TAG(PointSizeTag, asl::Vector3f, POINTSIZE_PROPERTY, asl::Vector3f(1,1,1));
     DEFINE_MATERIAL_PROPERTY_TAG(LineSmoothTag, bool, LINESMOOTH_PROPERTY, bool(false));
-    DEFINE_FACADE_ATTRIBUTE_TAG(MaterialPropGroup1HashTag, int, "material_prop_group1_hash_tag", 0, Y60_SCENE_EXPORT);
+    DEFINE_FACADE_ATTRIBUTE_TAG(MaterialPropGroup1HashTag, int, "material_prop_group1_hash_tag", 0, Y60_SCENE_DECL);
 
     DEFINE_PROPERTY_TAG(ReqLightingTag, MaterialRequirementFacade, y60::VectorOfRankedFeature, FEATURE_NODE_NAME,
             LIGHTING_FEATURE, REQUIRES_LIST_NAME, y60::VectorOfRankedFeature(1, RankedFeature(100,"unlit")));
 
-    class Y60_SCENE_EXPORT MaterialPropertiesFacade :
+    class Y60_SCENE_DECL MaterialPropertiesFacade :
         public PropertyListFacade,
         public MaterialAmbientTag::Plug,
         public MaterialDiffuseTag::Plug,
@@ -174,12 +174,12 @@ namespace y60 {
     DEFINE_CHILDNODE_TAG(MaterialPropertiesTag, MaterialBase, MaterialPropertiesFacade, PROPERTY_LIST_NAME);
     DEFINE_CHILDNODE_TAG(MaterialRequirementTag, MaterialBase, MaterialRequirementFacade, REQUIRES_LIST_NAME);
 
-    DEFINE_ATTRIBUT_TAG(TransparencyTag,   bool, TRANSPARENCY_ATTRIB, false, Y60_SCENE_EXPORT);
-    DEFINE_ATTRIBUT_TAG(EnabledTag,   bool, "enabled", true, Y60_SCENE_EXPORT);
+    DEFINE_ATTRIBUT_TAG(TransparencyTag,   bool, TRANSPARENCY_ATTRIB, false, Y60_SCENE_DECL);
+    DEFINE_ATTRIBUT_TAG(EnabledTag,   bool, "enabled", true, Y60_SCENE_DECL);
 
     class Scene;
 
-    class Y60_SCENE_EXPORT MaterialBase :
+    class Y60_SCENE_DECL MaterialBase :
         public dom::Facade,
         public IdTag::Plug,
         public MaterialPropertiesTag::Plug,

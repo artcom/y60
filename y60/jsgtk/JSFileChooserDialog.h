@@ -139,7 +139,7 @@ template <>
 struct JSClassTraits<JSFileChooserDialog::NATIVE>
     : public JSClassTraitsWrapper<JSFileChooserDialog::NATIVE, JSFileChooserDialog> {};
 
-Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSFileChooserDialog::OWNERPTR theOwner, JSFileChooserDialog::NATIVE * theNative);
+Y60_JSGTK_DECL jsval as_jsval(JSContext *cx, JSFileChooserDialog::OWNERPTR theOwner, JSFileChooserDialog::NATIVE * theNative);
 
 } // namespace
 

@@ -79,7 +79,7 @@ namespace y60 {
  * Builder for Canvasses
  * @ingroup Y60builder
  */ 
-class Y60_SCENE_EXPORT CanvasBuilder : public BuilderBase {
+class Y60_SCENE_DECL CanvasBuilder : public BuilderBase {
     public:
         CanvasBuilder(const std::string & theName);
         virtual ~CanvasBuilder();

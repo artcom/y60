@@ -90,7 +90,7 @@ namespace asl {
  * was destroyed!
  */
 
-class ASL_BASE_EXPORT SingletonManager {
+class ASL_BASE_DECL SingletonManager {
 public:
     ~SingletonManager();
 
@@ -171,7 +171,7 @@ private:
  * once for every DLL, will destroy all singletons from its destructor as soon 
  * as the first DLL is unloaded. 
  */
-class ASL_BASE_EXPORT SingletonDeleter {
+class ASL_BASE_DECL SingletonDeleter {
 public:
     SingletonDeleter() {}
     ~SingletonDeleter()

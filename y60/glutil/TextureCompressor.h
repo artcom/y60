@@ -80,7 +80,7 @@
 namespace y60 {
 
     DEFINE_EXCEPTION(GLTextureCompressionException, asl::Exception);
-    class Y60_GLUTIL_EXPORT TextureCompressor {
+    class Y60_GLUTIL_DECL TextureCompressor {
         public:
             TextureCompressor(PixelEncoding myFormat);
             virtual ~TextureCompressor();

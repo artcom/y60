@@ -73,7 +73,7 @@ namespace y60 {
     struct Event;
     typedef asl::Ptr<Event> EventPtr;
 
-    struct Y60_INPUT_EXPORT Event {
+    struct Y60_INPUT_DECL Event {
         enum Type {
             KEY_UP,
             KEY_DOWN,

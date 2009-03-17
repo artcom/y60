@@ -78,7 +78,7 @@ DEFINE_EXCEPTION(DoesNotExist, asl::Exception);
 template <class T> struct JSClassTraits;
 
 struct Global {
-    Y60_JSBASE_EXPORT static JSFunctionSpec * Functions();
+    Y60_JSBASE_DECL static JSFunctionSpec * Functions();
 };
 
 }

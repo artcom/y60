@@ -73,7 +73,7 @@ namespace inet {
      * delete mySocket; // disconnect from the client
      * @endcode
      */
-    class ASL_NET_EXPORT TCPServer {
+    class ASL_NET_DECL TCPServer {
         public:
             /// creates a new TCPServer listening on port theport on address fromhost.
             TCPServer(asl::Unsigned32 myHost, asl::Unsigned16 myPort, bool theReusePortFlag=false);

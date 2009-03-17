@@ -146,7 +146,7 @@ template <>
 struct JSClassTraits<JSRange::NATIVE>
     : public JSClassTraitsWrapper<JSRange::NATIVE, JSRange> {};
 
-Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSRange::OWNERPTR theOwner, JSRange::NATIVE * theRange);
+Y60_JSGTK_DECL jsval as_jsval(JSContext *cx, JSRange::OWNERPTR theOwner, JSRange::NATIVE * theRange);
 
 } // namespace
 

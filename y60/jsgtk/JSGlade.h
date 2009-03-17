@@ -123,7 +123,7 @@ template <>
 struct JSClassTraits<JSGlade::NATIVE> 
     : public JSClassTraitsWrapper<JSGlade::NATIVE, JSGlade> {};
 
-Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSGlade::OWNERPTR theOwner);
+Y60_JSGTK_DECL jsval as_jsval(JSContext *cx, JSGlade::OWNERPTR theOwner);
 //jsval as_jsval(JSContext *cx, JSGlade::OWNERPTR theOwner, JSGlade::NATIVE * theSerial);
 
 }

@@ -116,7 +116,7 @@ struct GLExceptionHelper {
 }
 
 namespace y60 {
-    class Y60_GLUTIL_EXPORT GLScopeTimer {
+    class Y60_GLUTIL_DECL GLScopeTimer {
 	public:
 		GLScopeTimer(asl::TimerPtr theTimer) : _myTimer(theTimer) {
            if (_flushGL_before_stop) {
@@ -138,8 +138,8 @@ namespace y60 {
     static asl::TimerPtr myScopeTimer ## NAME = asl::getDashboard().getTimer(#NAME);\
         y60::GLScopeTimer myScopeTimerWrapper ## NAME ( myScopeTimer ## NAME);
 
-    Y60_GLUTIL_EXPORT void checkOGLError(const std::string& theLocation);
-    Y60_GLUTIL_EXPORT void queryGLVersion(unsigned & theMajor, unsigned & theMinor, unsigned & theRelease);
+    Y60_GLUTIL_DECL void checkOGLError(const std::string& theLocation);
+    Y60_GLUTIL_DECL void queryGLVersion(unsigned & theMajor, unsigned & theMinor, unsigned & theRelease);
 
     // [CH+VS]: Do not turn this on in release mode, because each check takes
     // up to 50 ms on a 1 GHz Machine in the renderBodyPart method.
@@ -149,19 +149,19 @@ namespace y60 {
     #define CHECK_OGL_ERROR
     #endif
 
-    Y60_GLUTIL_EXPORT GLenum asGLBlendFunction(BlendFunction theFunction);
-    Y60_GLUTIL_EXPORT GLenum asGLTextureRegister(unsigned theIndex);
-    Y60_GLUTIL_EXPORT GLenum asGLTextureRegister(y60::GLRegister theRegister);
-    Y60_GLUTIL_EXPORT GLenum asGLLightEnum(unsigned theLightNum);
-    Y60_GLUTIL_EXPORT GLenum asGLClippingPlaneId(unsigned thePlaneNum);
-    Y60_GLUTIL_EXPORT GLenum asGLTextureTarget(TextureType theTextureType);
-    Y60_GLUTIL_EXPORT GLenum asGLTextureApplyMode(TextureApplyMode theApplyMode);
-    Y60_GLUTIL_EXPORT GLenum asGLTextureWrapMode(TextureWrapMode theWrapMode);
-    Y60_GLUTIL_EXPORT GLenum asGLTextureSampleFilter(TextureSampleFilter theSampleFilter, bool theMipmapsFlag=false);
-    Y60_GLUTIL_EXPORT GLenum asGLTextureInternalFormat(TextureInternalFormat theFormat);
-    Y60_GLUTIL_EXPORT GLenum asGLTexCoordMode(TexCoordMode theMode);
-    Y60_GLUTIL_EXPORT GLenum asGLBlendEquation(const BlendEquation & theBlendEquation);
-    Y60_GLUTIL_EXPORT GLenum asGLCubemapFace(unsigned theFace);
+    Y60_GLUTIL_DECL GLenum asGLBlendFunction(BlendFunction theFunction);
+    Y60_GLUTIL_DECL GLenum asGLTextureRegister(unsigned theIndex);
+    Y60_GLUTIL_DECL GLenum asGLTextureRegister(y60::GLRegister theRegister);
+    Y60_GLUTIL_DECL GLenum asGLLightEnum(unsigned theLightNum);
+    Y60_GLUTIL_DECL GLenum asGLClippingPlaneId(unsigned thePlaneNum);
+    Y60_GLUTIL_DECL GLenum asGLTextureTarget(TextureType theTextureType);
+    Y60_GLUTIL_DECL GLenum asGLTextureApplyMode(TextureApplyMode theApplyMode);
+    Y60_GLUTIL_DECL GLenum asGLTextureWrapMode(TextureWrapMode theWrapMode);
+    Y60_GLUTIL_DECL GLenum asGLTextureSampleFilter(TextureSampleFilter theSampleFilter, bool theMipmapsFlag=false);
+    Y60_GLUTIL_DECL GLenum asGLTextureInternalFormat(TextureInternalFormat theFormat);
+    Y60_GLUTIL_DECL GLenum asGLTexCoordMode(TexCoordMode theMode);
+    Y60_GLUTIL_DECL GLenum asGLBlendEquation(const BlendEquation & theBlendEquation);
+    Y60_GLUTIL_DECL GLenum asGLCubemapFace(unsigned theFace);
 
     TextureInternalFormat fromGLTextureInternalFormat(GLenum theFormat);
 
@@ -183,17 +183,17 @@ namespace y60 {
      */
 
     /// Query for supported capability.
-    Y60_GLUTIL_EXPORT bool hasCap(unsigned int theCap);
+    Y60_GLUTIL_DECL bool hasCap(unsigned int theCap);
     /// Query for supported OpenGL *extension*.
-    Y60_GLUTIL_EXPORT bool hasCap(const std::string & theCapsStr);
+    Y60_GLUTIL_DECL bool hasCap(const std::string & theCapsStr);
 
-    Y60_GLUTIL_EXPORT std::string getGLVersionString();
-    Y60_GLUTIL_EXPORT std::string getGLVendorString();
-    Y60_GLUTIL_EXPORT std::string getGLRendererString();
+    Y60_GLUTIL_DECL std::string getGLVersionString();
+    Y60_GLUTIL_DECL std::string getGLVendorString();
+    Y60_GLUTIL_DECL std::string getGLRendererString();
 #ifndef _AC_NO_CG_
-    Y60_GLUTIL_EXPORT std::string getLatestCgProfileString();
+    Y60_GLUTIL_DECL std::string getLatestCgProfileString();
 #endif
-    Y60_GLUTIL_EXPORT unsigned int getGLExtensionStrings(std::vector<std::string> & theTokens);    
+    Y60_GLUTIL_DECL unsigned int getGLExtensionStrings(std::vector<std::string> & theTokens);    
 }
 
 #endif // _ac_render_GLUtils_h_

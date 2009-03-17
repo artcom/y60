@@ -61,7 +61,7 @@ const int MAX_UDP_PACKET_SIZE = 1472;
  *  Low-Level Socket operations.
  *
  **/
-class ASL_NET_EXPORT Socket {
+class ASL_NET_DECL Socket {
     public:
         /// creates a new socket with local endpoint on theport and interface thehost.
         Socket(asl::Unsigned32 thehost, asl::Unsigned16 theport);

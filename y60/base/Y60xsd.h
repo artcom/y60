@@ -68,7 +68,7 @@
 
 namespace y60 {
 
-extern Y60_BASE_EXPORT const std::string ourY60xsd;
+extern Y60_BASE_DECL const std::string ourY60xsd;
 
 }
 

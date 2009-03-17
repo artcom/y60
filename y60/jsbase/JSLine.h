@@ -80,7 +80,7 @@ typedef float RayNumber;
 typedef float LineSegmentNumber;
 
 template <class NATIVE_LINE>
-class Y60_JSBASE_EXPORT JSGenericLine : public JSWrapper<NATIVE_LINE>
+class Y60_JSBASE_DECL JSGenericLine : public JSWrapper<NATIVE_LINE>
 {
     typedef JSWrapper<NATIVE_LINE> Base;
     JSGenericLine() {}
@@ -119,20 +119,20 @@ typedef JSGenericLine<asl::Line<LineNumber> > JSLine;
 typedef JSGenericLine<asl::Ray<LineNumber> > JSRay;
 typedef JSGenericLine<asl::LineSegment<LineNumber> > JSLineSegment;
 
-Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Line<LineNumber> & theLine);
-Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, const asl::Line<LineNumber>  & theValue);
+Y60_JSBASE_DECL bool convertFrom(JSContext *cx, jsval theValue, asl::Line<LineNumber> & theLine);
+Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, const asl::Line<LineNumber>  & theValue);
 //jsval as_jsval(JSContext *cx, dom::ValuePtr theValue, asl::Line<LineNumber> * theLine);
-Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, JSLine::NativeValuePtr theLine);
+Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, JSLine::NativeValuePtr theLine);
 
-Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Ray<LineNumber> & theLine);
-Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, const asl::Ray<LineNumber>  & theValue);
+Y60_JSBASE_DECL bool convertFrom(JSContext *cx, jsval theValue, asl::Ray<LineNumber> & theLine);
+Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, const asl::Ray<LineNumber>  & theValue);
 //jsval as_jsval(JSContext *cx, dom::ValuePtr theValue, asl::Ray<LineNumber> * theLine);
-Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, JSRay::NativeValuePtr theLine);
+Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, JSRay::NativeValuePtr theLine);
 
-Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::LineSegment<LineNumber> & theLine);
-Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, const asl::LineSegment<LineNumber> & theValue);
+Y60_JSBASE_DECL bool convertFrom(JSContext *cx, jsval theValue, asl::LineSegment<LineNumber> & theLine);
+Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, const asl::LineSegment<LineNumber> & theValue);
 //jsval as_jsval(JSContext *cx, dom::ValuePtr theValue, asl::LineSegment<LineNumber> * theLine);
-Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, JSLineSegment::NativeValuePtr theLine);
+Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, JSLineSegment::NativeValuePtr theLine);
 
 template <class NATIVE_LINE>
 struct JSLineClassTraits : public JSClassTraitsWrapper<NATIVE_LINE, JSGenericLine<NATIVE_LINE> > {};

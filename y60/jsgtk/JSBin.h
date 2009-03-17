@@ -139,7 +139,7 @@ template <>
 struct JSClassTraits<JSBin::NATIVE>
     : public JSClassTraitsWrapper<JSBin::NATIVE, JSBin> {};
 
-Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSBin::OWNERPTR theOwner, JSBin::NATIVE * theBin);
+Y60_JSGTK_DECL jsval as_jsval(JSContext *cx, JSBin::OWNERPTR theOwner, JSBin::NATIVE * theBin);
 
 } // namespace
 

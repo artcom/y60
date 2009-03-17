@@ -122,10 +122,10 @@ template <>
 struct JSClassTraits<JSACIconFactory::NATIVE>
     : public JSClassTraitsWrapper<JSACIconFactory::NATIVE, JSACIconFactory> {};
 
-Y60_JSGTK_EXPORT bool convertFrom(JSContext *cx, jsval theValue, JSACIconFactory::OWNERPTR & theRequest);
+Y60_JSGTK_DECL bool convertFrom(JSContext *cx, jsval theValue, JSACIconFactory::OWNERPTR & theRequest);
 
-Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSACIconFactory::OWNERPTR theOwner);
-//Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSACIconFactory::OWNERPTR theOwner, JSACIconFactory::NATIVE * theSerial);
+Y60_JSGTK_DECL jsval as_jsval(JSContext *cx, JSACIconFactory::OWNERPTR theOwner);
+//Y60_JSGTK_DECL jsval as_jsval(JSContext *cx, JSACIconFactory::OWNERPTR theOwner, JSACIconFactory::NATIVE * theSerial);
 
 }
 

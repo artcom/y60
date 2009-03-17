@@ -137,7 +137,7 @@ template <>
 struct JSClassTraits<JSDrawingArea::NATIVE>
     : public JSClassTraitsWrapper<JSDrawingArea::NATIVE, JSDrawingArea> {};
 
-Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSDrawingArea::OWNERPTR theOwner, JSDrawingArea::NATIVE * theDrawingArea);
+Y60_JSGTK_DECL jsval as_jsval(JSContext *cx, JSDrawingArea::OWNERPTR theOwner, JSDrawingArea::NATIVE * theDrawingArea);
 
 } // namespace
 

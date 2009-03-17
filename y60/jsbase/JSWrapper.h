@@ -634,7 +634,7 @@ struct VectorValueAccessProtocol {
     }
 };
 
-class Y60_JSBASE_EXPORT JSWrapperBase {
+class Y60_JSBASE_DECL JSWrapperBase {
 public:
     static JSWrapperBase * getBasePtr(JSContext *cx, JSObject *obj) {
         JSWrapperBase * myJSWrapper = static_cast<JSWrapperBase*>(JS_GetPrivate(cx,obj));
@@ -942,14 +942,14 @@ struct JSClassTraitsWrapper {
 
 DEFINE_EXCEPTION(BadArgumentException, asl::Exception);
 
-Y60_JSBASE_EXPORT void
+Y60_JSBASE_DECL void
 checkForUndefinedArguments(const std::string & theMethodName, uintN argc, jsval *argv);
 
-Y60_JSBASE_EXPORT void
+Y60_JSBASE_DECL void
 checkArguments(const std::string & theMethodName, uintN argc, jsval *argv, 
         unsigned theRequiredArguments);
 
-Y60_JSBASE_EXPORT bool
+Y60_JSBASE_DECL bool
 isCalledForConversion(JSContext * cx, uintN argc, jsval * argv);
 
 }

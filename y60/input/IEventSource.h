@@ -69,7 +69,7 @@ namespace y60 {
 
     typedef std::vector<EventPtr> EventPtrList;
 
-    struct Y60_INPUT_EXPORT IEventSource {
+    struct Y60_INPUT_DECL IEventSource {
         virtual ~IEventSource() {}
         virtual void init() {}
         virtual EventPtrList poll() = 0;

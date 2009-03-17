@@ -73,7 +73,7 @@ namespace jslib {
 
 typedef dom::GenericEvent<JSObject*> GenericJSDomEvent;
 
-class Y60_JSBASE_EXPORT JSDomEvent : public JSWrapper<GenericJSDomEvent, asl::Ptr<GenericJSDomEvent, dom::ThreadingModel>, StaticAccessProtocol>
+class Y60_JSBASE_DECL JSDomEvent : public JSWrapper<GenericJSDomEvent, asl::Ptr<GenericJSDomEvent, dom::ThreadingModel>, StaticAccessProtocol>
 {
         JSDomEvent() {}
     public:
@@ -146,12 +146,12 @@ struct JSClassTraits<GenericJSDomEvent> : public JSClassTraitsWrapper<GenericJSD
 template <>
 struct JSClassTraits<dom::Event> : public JSClassTraitsWrapper<GenericJSDomEvent, JSDomEvent> {};
 
-Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, dom::EventPtr & theEvent);
+Y60_JSBASE_DECL bool convertFrom(JSContext *cx, jsval theValue, dom::EventPtr & theEvent);
 
-Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, dom::EventPtr theOwner);
-Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, dom::EventPtr, JSDomEvent::NATIVE * theEvent);
+Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, dom::EventPtr theOwner);
+Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, dom::EventPtr, JSDomEvent::NATIVE * theEvent);
 
-Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, dom::EventTargetPtr theOwner);
+Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, dom::EventTargetPtr theOwner);
 
 struct JSDomEventListener : public dom::EventListener {
     JSDomEventListener(JSContext * theContext, JSObject * theEventListener, const std::string & theMethodName = "handleEvent");

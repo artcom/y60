@@ -289,11 +289,11 @@ namespace y60 {
         return unsigned(myBytesUsed);
     }
 
-    Y60_IMAGE_EXPORT bool mapPixelEncodingToFormat(const PixelEncoding & theEncoding,
+    Y60_IMAGE_DECL bool mapPixelEncodingToFormat(const PixelEncoding & theEncoding,
             PLPixelFormat & theFormat);
-    Y60_IMAGE_EXPORT bool mapFormatToPixelEncoding(const PLPixelFormat & theFormat,
+    Y60_IMAGE_DECL bool mapFormatToPixelEncoding(const PLPixelFormat & theFormat,
             PixelEncoding & theEncoding);
-    Y60_IMAGE_EXPORT TextureInternalFormat getInternalPixelFormat(PixelEncoding theEncoding);
+    Y60_IMAGE_DECL TextureInternalFormat getInternalPixelFormat(PixelEncoding theEncoding);
 }
 
 #endif

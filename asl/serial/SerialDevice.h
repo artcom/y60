@@ -57,7 +57,7 @@ namespace asl {
      * getSerialDevice() or getSerialDeviceByName() to obtain the right
      * object for the current platform.
      */
-    class ASL_SERIAL_EXPORT SerialDevice {
+    class ASL_SERIAL_DECL SerialDevice {
         public:
             virtual ~SerialDevice();
 
@@ -69,7 +69,7 @@ namespace asl {
                 ParityModeEnum_MAX
             };
 
-            DEFINE_ENUM( ParityMode, ParityModeEnum, ASL_SERIAL_EXPORT );
+            DEFINE_ENUM( ParityMode, ParityModeEnum, ASL_SERIAL_DECL );
 
             /// Status line bits.
             enum StatusBits {

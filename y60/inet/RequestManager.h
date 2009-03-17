@@ -82,7 +82,7 @@ namespace inet {
      * @relates Request
      *
      */    
-    class Y60_INET_EXPORT RequestManager {
+    class Y60_INET_DECL RequestManager {
         public:
             RequestManager();
             ~RequestManager();

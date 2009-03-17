@@ -144,7 +144,7 @@ namespace y60 {
      * vertex buffers and is some sort of representation of the graphics hardware.
      * It is used by the TextureManager in Scene. Implemented as a singleton.
      */
-    class Y60_GLRENDER_EXPORT GLResourceManager : public ResourceManager, public asl::Singleton<GLResourceManager> {
+    class Y60_GLRENDER_DECL GLResourceManager : public ResourceManager, public asl::Singleton<GLResourceManager> {
     public:
         DEFINE_NESTED_EXCEPTION(GLResourceManager, TextureException, asl::Exception);
 

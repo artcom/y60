@@ -141,7 +141,7 @@ template <>
 struct JSClassTraits<JSTreeView::NATIVE>
     : public JSClassTraitsWrapper<JSTreeView::NATIVE, JSTreeView> {};
 
-Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSTreeView::OWNERPTR theOwner, JSTreeView::NATIVE * theTreeView);
+Y60_JSGTK_DECL jsval as_jsval(JSContext *cx, JSTreeView::OWNERPTR theOwner, JSTreeView::NATIVE * theTreeView);
 
 } // namespace
 

@@ -74,7 +74,7 @@
 
 namespace jslib {
 
-Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, dom::NodePtr::ptr_type theNode);
+Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, dom::NodePtr::ptr_type theNode);
 
 inline
 jsval as_jsval(JSContext *cx, dom::Node::NodeType theValue) {
@@ -82,23 +82,23 @@ jsval as_jsval(JSContext *cx, dom::Node::NodeType theValue) {
 }
 
 
-Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, dom::ValuePtr theValue);
+Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, dom::ValuePtr theValue);
 
 // this function will take a jsval and try create a ValuePtr from it
 //bool convertFrom(JSContext *cx, jsval theValue, dom::ValuePtr & theValuePtr);
 
 // this function will take a jsval, try to convert it to theTypeName and create a ValuePtr from it
-Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, const std::string & theTypeName, dom::ValuePtr & theValuePtr);
+Y60_JSBASE_DECL bool convertFrom(JSContext *cx, jsval theValue, const std::string & theTypeName, dom::ValuePtr & theValuePtr);
 
-Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, dom::Node::CloneDepth & theDest);
+Y60_JSBASE_DECL bool convertFrom(JSContext *cx, jsval theValue, dom::Node::CloneDepth & theDest);
 
-Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, dom::NodePtr & thePtr);
+Y60_JSBASE_DECL bool convertFrom(JSContext *cx, jsval theValue, dom::NodePtr & thePtr);
 
-Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, dom::Node & thePtr);
+Y60_JSBASE_DECL bool convertFrom(JSContext *cx, jsval theValue, dom::Node & thePtr);
 #if 1
-Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, const dom::Node * & theNode);
+Y60_JSBASE_DECL bool convertFrom(JSContext *cx, jsval theValue, const dom::Node * & theNode);
 #endif
-class Y60_JSBASE_EXPORT JSNode : public JSWrapperBase {
+class Y60_JSBASE_DECL JSNode : public JSWrapperBase {
 public:
     typedef dom::NodePtr NativeValuePtr;
 

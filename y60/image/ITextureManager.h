@@ -81,7 +81,7 @@ namespace y60 {
      * Abstract Interface for a Texturemanager. The Interface for the TextureManager
      * is made here, because it is needed in the image module. 
      */
-    class Y60_IMAGE_EXPORT  ITextureManager {
+    class Y60_IMAGE_DECL  ITextureManager {
     public:
         /**
          * Sets the Priority of the Texture theTexture to thePriority. The Texture priority

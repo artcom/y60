@@ -85,7 +85,7 @@
 
 namespace acgtk {
 
-class Y60_ACGTK_EXPORT TNTThresholdList : public Gtk::TreeView {
+class Y60_ACGTK_DECL TNTThresholdList : public Gtk::TreeView {
     public:
         TNTThresholdList();
         virtual ~TNTThresholdList();

@@ -100,7 +100,7 @@ struct Cursor {
 typedef std::map<int, Cursor> CursorMap;
 
 
-	class Y60_VIDEOPROCESSING_EXPORT Blobs : public Algorithm {
+	class Y60_VIDEOPROCESSING_DECL Blobs : public Algorithm {
 		public:
             Blobs(const std::string & theName);
 

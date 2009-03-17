@@ -147,8 +147,8 @@ template <>
 struct JSClassTraits<JSDragButton::NATIVE> 
     : public JSClassTraitsWrapper<JSDragButton::NATIVE, JSDragButton> {};
 
-Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSDragButton::NATIVE * theWindow);
-Y60_JSGTK_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<acgtk::DragButton> & theDragButton);
+Y60_JSGTK_DECL jsval as_jsval(JSContext *cx, JSDragButton::NATIVE * theWindow);
+Y60_JSGTK_DECL bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<acgtk::DragButton> & theDragButton);
 
 } // namespace
 

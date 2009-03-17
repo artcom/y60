@@ -79,7 +79,7 @@ namespace y60 {
     class ElementBuilder;
     class CameraBuilder;
 
-    class Y60_SCENE_EXPORT ShapeBuilder : public BuilderBase {
+    class Y60_SCENE_DECL ShapeBuilder : public BuilderBase {
     public:
         ShapeBuilder(const std::string & theName,
                      bool theTestAlmostEqualFlag = false);

@@ -64,7 +64,7 @@ namespace asl {
      * is 0, a call to wait blocks until the semaphore is incremented
      * from somewhere else.
      */
-    class ASL_BASE_EXPORT ThreadSemaphore {
+    class ASL_BASE_DECL ThreadSemaphore {
     public:
         enum {
             WAIT_INFINITE = ~0  ///< Wait forever or until the condition is met

@@ -163,9 +163,9 @@ namespace asl {
          MatrixTypeEnum_MAX
      };
      
-     //template class ASL_MATH_EXPORT asl::Enum<MatrixTypeEnum, MatrixTypeEnum_MAX>;
+     //template class ASL_MATH_DECL asl::Enum<MatrixTypeEnum, MatrixTypeEnum_MAX>;
      
-     DEFINE_ENUM( MatrixType, MatrixTypeEnum, ASL_MATH_EXPORT );
+     DEFINE_ENUM( MatrixType, MatrixTypeEnum, ASL_MATH_DECL );
 
 
     template <class Number>

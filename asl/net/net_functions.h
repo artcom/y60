@@ -61,14 +61,14 @@
 
 namespace asl {
 
-    ASL_NET_EXPORT std::string localhostname();
-    ASL_NET_EXPORT std::string hostname(unsigned long hostAddress);
-    ASL_NET_EXPORT unsigned long hostaddress(const std::string & theHost);
+    ASL_NET_DECL std::string localhostname();
+    ASL_NET_DECL std::string hostname(unsigned long hostAddress);
+    ASL_NET_DECL unsigned long hostaddress(const std::string & theHost);
 
-    ASL_NET_EXPORT unsigned long from_dotted_address(const std::string & dottedAddress);
-    ASL_NET_EXPORT std::string as_dotted_address(unsigned long theAdress);
+    ASL_NET_DECL unsigned long from_dotted_address(const std::string & dottedAddress);
+    ASL_NET_DECL std::string as_dotted_address(unsigned long theAdress);
 
-    ASL_NET_EXPORT asl::Block getHardwareAddress(const std::string & theInterfaceName = "");
+    ASL_NET_DECL asl::Block getHardwareAddress(const std::string & theInterfaceName = "");
 } //Namespace asl
 
 #endif

@@ -119,9 +119,9 @@ template <>
 struct JSClassTraits<JSSigConnection::NATIVE>
     : public JSClassTraitsWrapper<JSSigConnection::NATIVE, JSSigConnection> {};
 
-Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSSigConnection::OWNERPTR theOwner, JSSigConnection::NATIVE * theNative);
+Y60_JSGTK_DECL jsval as_jsval(JSContext *cx, JSSigConnection::OWNERPTR theOwner, JSSigConnection::NATIVE * theNative);
 
-Y60_JSGTK_EXPORT bool convertFrom(JSContext *cx, jsval theValue, JSSigConnection::NATIVE * & theConnection);
+Y60_JSGTK_DECL bool convertFrom(JSContext *cx, jsval theValue, JSSigConnection::NATIVE * & theConnection);
 
 } // namespace
 

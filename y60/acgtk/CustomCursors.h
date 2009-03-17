@@ -83,7 +83,7 @@ using namespace std;
 
 namespace acgtk {
 
-class Y60_ACGTK_EXPORT CustomCursors {
+class Y60_ACGTK_DECL CustomCursors {
     public:
         static void init();
 

@@ -113,25 +113,25 @@ namespace asl {
         return asl::parseVector<T>(is, t);
     }
 
-    Y60_BASE_EXPORT std::ostream &
+    Y60_BASE_DECL std::ostream &
     operator << (std::ostream & theStream, const y60::VectorOfBool & theVector);
 
-    Y60_BASE_EXPORT std::ostream &
+    Y60_BASE_DECL std::ostream &
     operator << (std::ostream & theStream, const y60::VectorOfUnsignedInt & theVector);
 
-    Y60_BASE_EXPORT std::ostream &
+    Y60_BASE_DECL std::ostream &
     operator << (std::ostream & theStream, const y60::VectorOfSignedInt & theVector);
 
-    Y60_BASE_EXPORT std::ostream &
+    Y60_BASE_DECL std::ostream &
     operator << (std::ostream & theStream, const y60::VectorOfFloat & theVector);
 
-    Y60_BASE_EXPORT std::ostream &
+    Y60_BASE_DECL std::ostream &
     operator << (std::ostream & theStream, const y60::VectorOfString & theStringVector);
 
-    Y60_BASE_EXPORT std::istream &
+    Y60_BASE_DECL std::istream &
     operator >> (std::istream & theStream, y60::VectorOfString & theStringVector);
 
-    Y60_BASE_EXPORT std::ostream &
+    Y60_BASE_DECL std::ostream &
     operator << (std::ostream & theStream, const dom::ResizeableVector & theVector);
 
 //

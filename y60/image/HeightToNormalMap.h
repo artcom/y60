@@ -72,7 +72,7 @@
 
 class PLBmp;
 
-class Y60_IMAGE_EXPORT HeightToNormalMap : public PLFilter {
+class Y60_IMAGE_DECL HeightToNormalMap : public PLFilter {
     public:
         HeightToNormalMap();
         virtual ~HeightToNormalMap();

@@ -54,7 +54,7 @@ namespace asl {
 
 //! Conduit policy for TCP-based communication.   
 
-class ASL_IPC_EXPORT TCPPolicy : public SocketPolicy {
+class ASL_IPC_DECL TCPPolicy : public SocketPolicy {
     public:
         typedef INetEndpoint Endpoint;
         /// Creates a (client) conduit connected to the remote endpoint

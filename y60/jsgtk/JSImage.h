@@ -137,7 +137,7 @@ template <>
 struct JSClassTraits<JSImage::NATIVE>
     : public JSClassTraitsWrapper<JSImage::NATIVE, JSImage> {};
 
-Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSImage::OWNERPTR theOwner, JSImage::NATIVE * theImage);
+Y60_JSGTK_DECL jsval as_jsval(JSContext *cx, JSImage::OWNERPTR theOwner, JSImage::NATIVE * theImage);
 
 } // namespace
 

@@ -106,7 +106,7 @@ namespace y60 {
 
     DEFINE_EXCEPTION(FFMpegDecoderException, asl::Exception);
 
-    class Y60_FFMPEGDECODER1_EXPORT FFMpegDecoder1 : 
+    class Y60_FFMPEGDECODER1_DECL FFMpegDecoder1 : 
         public MovieDecoderBase,
         public asl::PlugInBase
     {

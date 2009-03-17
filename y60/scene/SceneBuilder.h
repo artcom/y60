@@ -95,7 +95,7 @@ namespace y60 {
      * Builds a scene. Wraps an initial scene. Use the appendXYZ methods
      * to add stuff.
      */
-    class Y60_SCENE_EXPORT SceneBuilder : public BuilderBase {
+    class Y60_SCENE_DECL SceneBuilder : public BuilderBase {
         public:
             SceneBuilder(dom::DocumentPtr theDocument);
 

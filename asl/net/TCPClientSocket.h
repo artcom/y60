@@ -51,7 +51,7 @@ namespace inet {
      * Implements a TCP Client.
      *
      */
-    class ASL_NET_EXPORT TCPClientSocket : public TCPSocket {
+    class ASL_NET_DECL TCPClientSocket : public TCPSocket {
         public:
             TCPClientSocket();
             void connect();

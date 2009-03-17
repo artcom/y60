@@ -66,7 +66,7 @@ namespace asl {
         The statistic class calculates maximum, minimum, average, variance
         and standard deviation for any number of samples of the type double
     */
-    class ASL_MATH_EXPORT Statistic {
+    class ASL_MATH_DECL Statistic {
         public:
 
             /**
@@ -178,7 +178,7 @@ namespace asl {
     /**
         BoolStatistic should be used to count successes and failures
     */
-    class ASL_MATH_EXPORT BoolStatistic : public Statistic {
+    class ASL_MATH_DECL BoolStatistic : public Statistic {
         public:
             BoolStatistic();
             BoolStatistic(char * theName, int theOutputIntervalSamples);
@@ -211,7 +211,7 @@ namespace asl {
         FrequencyStatistic should be used to determine how often an event occurs per
         second
     */
-    class ASL_MATH_EXPORT FrequencyStatistic : public Statistic {
+    class ASL_MATH_DECL FrequencyStatistic : public Statistic {
         public:
             FrequencyStatistic();
             FrequencyStatistic(char * theName, int theOutputIntervalSamples);

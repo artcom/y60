@@ -53,7 +53,7 @@ namespace asl {
     /*! \addtogroup aslbase */
     /* @{ */
 
-    class ASL_BASE_EXPORT Exception {
+    class ASL_BASE_DECL Exception {
     public:
 
         Exception(const std::string & what = "", const std::string & where ="");
@@ -107,11 +107,11 @@ namespace asl {
         static bool _ourDumpStackTraceFlag;
     };
 
-	ASL_BASE_EXPORT std::string file_string(const char* file_name);
-    ASL_BASE_EXPORT std::string line_string(unsigned line_number);
-    ASL_BASE_EXPORT std::string location_string(const char* file_name, unsigned line_number);
+	ASL_BASE_DECL std::string file_string(const char* file_name);
+    ASL_BASE_DECL std::string line_string(unsigned line_number);
+    ASL_BASE_DECL std::string location_string(const char* file_name, unsigned line_number);
 
-    ASL_BASE_EXPORT std::string compose_message(const Exception & ex);
+    ASL_BASE_DECL std::string compose_message(const Exception & ex);
 
     inline
     std::ostream& operator<<(std::ostream& os,const Exception & ex) {

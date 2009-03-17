@@ -138,8 +138,8 @@ template <>
 struct JSClassTraits<JSTestSubject::NATIVE> 
     : public JSClassTraitsWrapper<JSTestSubject::NATIVE, JSTestSubject> {};
 
-Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSTestSubject::NATIVE * theWindow);
-Y60_JSGTK_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<TestSubject> & theTestSubject);
+Y60_JSGTK_DECL jsval as_jsval(JSContext *cx, JSTestSubject::NATIVE * theWindow);
+Y60_JSGTK_DECL bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<TestSubject> & theTestSubject);
 }
 
 #endif

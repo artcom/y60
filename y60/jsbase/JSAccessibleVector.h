@@ -74,7 +74,7 @@
 
 namespace jslib {
 
-class Y60_JSBASE_EXPORT JSAccessibleVector
+class Y60_JSBASE_DECL JSAccessibleVector
     : public JSWrapper<dom::AccessibleVector,
                        dom::ValuePtr,
                        VectorValueAccessProtocol> // TODO: verify if correct, probably is not
@@ -129,7 +129,7 @@ template <>
 struct JSClassTraits<dom::AccessibleVector>
     : public JSClassTraitsWrapper<dom::AccessibleVector, JSAccessibleVector> {};
 
-Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, dom::ValuePtr theValuePtr, dom::AccessibleVector * theVectorPtr);
+Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, dom::ValuePtr theValuePtr, dom::AccessibleVector * theVectorPtr);
 
 }
 

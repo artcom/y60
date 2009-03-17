@@ -64,7 +64,7 @@
 #include "TransformBuilderBase.h"
 
 namespace y60 {
-    class Y60_SCENE_EXPORT BodyBuilder : public TransformBuilderBase {
+    class Y60_SCENE_DECL BodyBuilder : public TransformBuilderBase {
         public:
             BodyBuilder(const dom::NodePtr & theNode) :
                 TransformBuilderBase(theNode)

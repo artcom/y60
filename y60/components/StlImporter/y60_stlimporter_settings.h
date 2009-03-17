@@ -4,9 +4,9 @@
 #include <asl/base/settings.h>
 
 #ifdef y60StlImporter_EXPORTS
-#   define Y60_STLIMPORTER_EXPORT AC_DLL_EXPORT
+#   define Y60_STLIMPORTER_DECL AC_DLL_EXPORT
 #else
-#   define Y60_STLIMPORTER_EXPORT AC_DLL_IMPORT
+#   define Y60_STLIMPORTER_DECL AC_DLL_IMPORT
 #endif
 
 #endif // Y60_STLIMPORTER_SETTING_INCLUDED

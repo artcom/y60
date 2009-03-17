@@ -58,7 +58,7 @@ namespace asl {
 
 //! Conduit policy for Win32 Named Pipe-based communication (Windows only).  
     
-class ASL_IPC_EXPORT NamedPipePolicy : public ConduitPolicy {
+class ASL_IPC_DECL NamedPipePolicy : public ConduitPolicy {
     public:
         typedef std::string Endpoint; 
 

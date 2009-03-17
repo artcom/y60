@@ -136,10 +136,10 @@ struct JSClassTraits<y60::SDLWindow> : public JSClassTraitsWrapper<y60::SDLWindo
     }
 };
 
-Y60_SDLENGINE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, y60::SDLWindow *& theRenderWindow);
-Y60_SDLENGINE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, jslib::AbstractRenderWindow *& theRenderWindow);
+Y60_SDLENGINE_DECL bool convertFrom(JSContext *cx, jsval theValue, y60::SDLWindow *& theRenderWindow);
+Y60_SDLENGINE_DECL bool convertFrom(JSContext *cx, jsval theValue, jslib::AbstractRenderWindow *& theRenderWindow);
 
-Y60_SDLENGINE_EXPORT jsval as_jsval(JSContext *cx, asl::Ptr<y60::SDLWindow> theOwner);
+Y60_SDLENGINE_DECL jsval as_jsval(JSContext *cx, asl::Ptr<y60::SDLWindow> theOwner);
 
 }
 

@@ -57,7 +57,7 @@ namespace asl {
 /*! \addtogroup aslbase */
 /* @{ */
 
-class ASL_BASE_EXPORT Arguments {
+class ASL_BASE_DECL Arguments {
 public:
     enum { MAX_OPTIONS = 100 };
 

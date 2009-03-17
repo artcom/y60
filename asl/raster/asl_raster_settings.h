@@ -6,9 +6,9 @@
 #include <asl/base/settings.h>
 
 #ifdef aslraster_EXPORTS
-#   define ASL_RASTER_EXPORT AC_DLL_EXPORT
+#   define ASL_RASTER_DECL AC_DLL_EXPORT
 #else
-#   define ASL_RASTER_EXPORT AC_DLL_IMPORT
+#   define ASL_RASTER_DECL AC_DLL_IMPORT
 #endif
 
 #endif // ASL_RASTER_SETTING_INCLUDED

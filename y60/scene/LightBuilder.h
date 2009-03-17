@@ -77,7 +77,7 @@
 
 namespace y60 {
 
-    class Y60_SCENE_EXPORT LightBuilder : public TransformBuilderBase {
+    class Y60_SCENE_DECL LightBuilder : public TransformBuilderBase {
         public:
             LightBuilder(const std::string & theLightSourceId, const std::string & theName);
             virtual ~LightBuilder();

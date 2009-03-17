@@ -121,10 +121,10 @@ struct JSClassTraits<JSTCPServer::NATIVE>
 
 } // namespace jslib
 
-Y60_NET_EXPORT bool convertFrom(JSContext *cx, jsval theValue, JSTCPServer::NATIVE & theTCPServer);
+Y60_NET_DECL bool convertFrom(JSContext *cx, jsval theValue, JSTCPServer::NATIVE & theTCPServer);
 
-Y60_NET_EXPORT jsval as_jsval(JSContext *cx, JSTCPServer::OWNERPTR theOwner);
-Y60_NET_EXPORT jsval as_jsval(JSContext *cx, JSTCPServer::OWNERPTR theOwner, JSTCPServer::NATIVE * theTCPServer);
+Y60_NET_DECL jsval as_jsval(JSContext *cx, JSTCPServer::OWNERPTR theOwner);
+Y60_NET_DECL jsval as_jsval(JSContext *cx, JSTCPServer::OWNERPTR theOwner, JSTCPServer::NATIVE * theTCPServer);
 
 #endif
 

@@ -83,7 +83,7 @@ namespace y60 {
 
     DEFINE_EXCEPTION(AnimationManagerException, asl::Exception);
 
-    class Y60_SCENE_EXPORT AnimationManager {
+    class Y60_SCENE_DECL AnimationManager {
         public:
             AnimationManager();
             virtual ~AnimationManager();

@@ -52,7 +52,7 @@ namespace asl {
     //
     ////////////////////////////////////////////////////////////////////////////////
     
-    class ASL_MATH_EXPORT YrSpline
+    class ASL_MATH_DECL YrSpline
     {
       public:
     		    YrSpline	    ( void ) { }
@@ -74,7 +74,7 @@ namespace asl {
     
     enum HermiteInitMode { catmull_rom, minimize_fluctuations, minimize_fluctuations_forward, weighted_ratio };	// how to init Hermite
     
-    class ASL_MATH_EXPORT Hermite : public YrSpline
+    class ASL_MATH_DECL Hermite : public YrSpline
     {
       public:
     		    Hermite	    ( void );

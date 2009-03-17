@@ -73,7 +73,7 @@
 
 namespace jslib {
 
-class Y60_JSBASE_EXPORT JSFrustum : public JSWrapper<asl::Frustum > {
+class Y60_JSBASE_DECL JSFrustum : public JSWrapper<asl::Frustum > {
     JSFrustum() {}
 public:
     typedef JSWrapper<asl::Frustum > Base;
@@ -154,11 +154,11 @@ template <>
 struct JSClassTraits<asl::Frustum >
     : public JSClassTraitsWrapper<asl::Frustum , JSFrustum> {};
 
-Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, JSFrustum::NativeValuePtr & theFrustum);
-Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Frustum  & theFrustum);
+Y60_JSBASE_DECL bool convertFrom(JSContext *cx, jsval theValue, JSFrustum::NativeValuePtr & theFrustum);
+Y60_JSBASE_DECL bool convertFrom(JSContext *cx, jsval theValue, asl::Frustum  & theFrustum);
 
-Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, const asl::Frustum  & theValue);
-Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, JSFrustum::NativeValuePtr theValue);
+Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, const asl::Frustum  & theValue);
+Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, JSFrustum::NativeValuePtr theValue);
 
 }
 

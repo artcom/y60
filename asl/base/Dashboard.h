@@ -382,7 +382,7 @@ namespace asl {
             bool    _isRunning;
     };
 
-    class ASL_BASE_EXPORT Dashboard : public Singleton<Dashboard> {
+    class ASL_BASE_DECL Dashboard : public Singleton<Dashboard> {
     public:
         Dashboard() : _myLastFrameRateTime(0), _myFrameRate(0) {}
         TimerPtr getTimer(const std::string & theName);
@@ -424,7 +424,7 @@ namespace asl {
         TimerPtr _myTimer;
     };
 
-    ASL_BASE_EXPORT extern Dashboard & getDashboard();
+    ASL_BASE_DECL extern Dashboard & getDashboard();
     inline TimerPtr getDashboardTimer(const std::string theName) {
         return getDashboard().getTimer(theName);
     }

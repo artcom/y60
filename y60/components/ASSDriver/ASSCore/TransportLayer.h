@@ -98,7 +98,7 @@ enum CommandResponse {
 };
 
 
-DEFINE_ENUM( DriverState, DriverStateEnum, Y60_ASSCORE_EXPORT );
+DEFINE_ENUM( DriverState, DriverStateEnum, Y60_ASSCORE_DECL );
 
 
 class ASSDriver;

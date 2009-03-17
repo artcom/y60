@@ -93,7 +93,7 @@ namespace y60 {
     * @ingroup y60image
     * Facade for an image node in the dom.
     */
-    class Y60_IMAGE_EXPORT Image :
+    class Y60_IMAGE_DECL Image :
         public dom::Facade,
         public IdTag::Plug,
         public NameTag::Plug,

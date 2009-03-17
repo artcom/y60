@@ -77,7 +77,7 @@ namespace xpath {
     ** 
     ** Paths are immutable and cheap to copy. 
     */
-    class ASL_XPATH_EXPORT Path {
+    class ASL_XPATH_DECL Path {
     public:
         struct StepList;
     

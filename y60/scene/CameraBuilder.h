@@ -67,7 +67,7 @@
 
 namespace y60 {
 
-    class Y60_SCENE_EXPORT CameraBuilder : public TransformBuilderBase {
+    class Y60_SCENE_DECL CameraBuilder : public TransformBuilderBase {
         public:
             CameraBuilder(const std::string & theName);
             virtual ~CameraBuilder();

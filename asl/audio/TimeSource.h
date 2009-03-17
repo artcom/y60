@@ -49,7 +49,7 @@
 
 namespace asl {
  
-class ASL_AUDIO_EXPORT TimeSource {
+class ASL_AUDIO_DECL TimeSource {
     public:
         virtual Time getCurrentTime() = 0;
         virtual ~TimeSource() {}

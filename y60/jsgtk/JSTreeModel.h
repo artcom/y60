@@ -134,7 +134,7 @@ template <>
 struct JSClassTraits<JSTreeModel::NATIVE>
     : public JSClassTraitsWrapper<JSTreeModel::NATIVE, JSTreeModel> {};
 
-Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSTreeModel::OWNERPTR theOwner, JSTreeModel::NATIVE * theTreeModel);
+Y60_JSGTK_DECL jsval as_jsval(JSContext *cx, JSTreeModel::OWNERPTR theOwner, JSTreeModel::NATIVE * theTreeModel);
 
 }
 

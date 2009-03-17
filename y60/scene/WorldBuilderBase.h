@@ -77,7 +77,7 @@
 
 namespace y60 {
 
-    class Y60_SCENE_EXPORT WorldBuilderBase : public BuilderBase {
+    class Y60_SCENE_DECL WorldBuilderBase : public BuilderBase {
         public:
             WorldBuilderBase(const std::string & theNodeName);
 

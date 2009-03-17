@@ -86,7 +86,7 @@ namespace jslib {
     }
 
     template<class NATIVE_VECTOR>
-    Y60_JSBASE_EXPORT bool JSVector<NATIVE_VECTOR>::matchesClassOf(JSContext *cx, jsval theVal) {
+    Y60_JSBASE_DECL bool JSVector<NATIVE_VECTOR>::matchesClassOf(JSContext *cx, jsval theVal) {
         JSObject * myObj;
         if (JSVAL_IS_VOID(theVal)) {
             JS_ReportError(cx,"matchesClassOf: passed 'undefined' as object");
@@ -618,12 +618,12 @@ namespace jslib {
     }
 
     template<class NATIVE_VECTOR>
-    Y60_JSBASE_EXPORT JSObject * JSVector<NATIVE_VECTOR>::Construct(JSContext *cx, jsval theVectorArgument) {
+    Y60_JSBASE_DECL JSObject * JSVector<NATIVE_VECTOR>::Construct(JSContext *cx, jsval theVectorArgument) {
         return JS_ConstructObjectWithArguments(cx, Class(), 0, 0, 1, &theVectorArgument);
     }
 
     template<class NATIVE_VECTOR>
-    Y60_JSBASE_EXPORT JSObject * JSVector<NATIVE_VECTOR>::Construct(JSContext *cx, uintN argc, jsval *argv) {
+    Y60_JSBASE_DECL JSObject * JSVector<NATIVE_VECTOR>::Construct(JSContext *cx, uintN argc, jsval *argv) {
         JSObject * myNewObj = JS_ConstructObjectWithArguments(cx, Class(), 0, 0, argc, argv);
         JSVector * myJSVector = getJSWrapperPtr(cx, myNewObj);
         if (!myJSVector->getOwner()) {
@@ -634,7 +634,7 @@ namespace jslib {
     }
 
     template<class NATIVE_VECTOR>
-    Y60_JSBASE_EXPORT JSObject * JSVector<NATIVE_VECTOR>::Construct(JSContext *cx, const NATIVE_VECTOR & theVector) {
+    Y60_JSBASE_DECL JSObject * JSVector<NATIVE_VECTOR>::Construct(JSContext *cx, const NATIVE_VECTOR & theVector) {
          JSObject * myNewObj = JS_ConstructObject(cx, Class(), 0, 0);
          JSVector * myJSVector = getJSWrapperPtr(cx, myNewObj);
          *myJSVector = JSVector(theVector);
@@ -642,7 +642,7 @@ namespace jslib {
     }
 
     template<class NATIVE_VECTOR>
-    Y60_JSBASE_EXPORT JSObject * JSVector<NATIVE_VECTOR>::Construct(JSContext *cx, NativeValuePtr theVector) {
+    Y60_JSBASE_DECL JSObject * JSVector<NATIVE_VECTOR>::Construct(JSContext *cx, NativeValuePtr theVector) {
          JSObject * myNewObj = JS_ConstructObject(cx, Class(), 0, 0);
          JSVector * myJSVector = getJSWrapperPtr(cx, myNewObj);
          *myJSVector = JSVector(cx, theVector);
@@ -757,7 +757,7 @@ namespace jslib {
     }
 
     template<class NATIVE_VECTOR>
-    Y60_JSBASE_EXPORT JSObject * JSVector<NATIVE_VECTOR>::initClass(JSContext *cx, JSObject *theGlobalObject) {
+    Y60_JSBASE_DECL JSObject * JSVector<NATIVE_VECTOR>::initClass(JSContext *cx, JSObject *theGlobalObject) {
         DOC_MODULE_CREATE("Math",JSVector);
         JSObject * myProtoObj = JS_InitClass(cx, theGlobalObject, NULL, Class(),
                 /* native constructor function and min arg count */

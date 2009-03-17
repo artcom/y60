@@ -71,7 +71,7 @@ namespace asl {
     typedef Ptr<HWSampleSink, MultiProcessor, PtrHeapAllocator<MultiProcessor> > HWSampleSinkPtr;
     typedef WeakPtr<HWSampleSink, MultiProcessor, PtrHeapAllocator<MultiProcessor> > HWSampleSinkWeakPtr;
     
-    class ASL_AUDIO_EXPORT HWSampleSink: public SampleSource, public AudioTimeSource, public ISampleSink
+    class ASL_AUDIO_DECL HWSampleSink: public SampleSource, public AudioTimeSource, public ISampleSink
     {
     public:
         enum State {STOPPED,            // No sound is playing.

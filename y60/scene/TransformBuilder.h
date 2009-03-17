@@ -66,7 +66,7 @@
 
 namespace y60 {
 
-    class Y60_SCENE_EXPORT TransformBuilder : public TransformBuilderBase {
+    class Y60_SCENE_DECL TransformBuilder : public TransformBuilderBase {
         public:
             TransformBuilder(const std::string & theName);
             virtual ~TransformBuilder() {};

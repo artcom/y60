@@ -167,7 +167,7 @@ namespace asl {
               
     };    
     
-    class ASL_MATH_EXPORT CoordSpline
+    class ASL_MATH_DECL CoordSpline
     {
       public:
     	    CoordSpline		    ( void );

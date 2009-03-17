@@ -157,8 +157,8 @@ template <>
 struct JSClassTraits<JSCWRuler::NATIVE> 
     : public JSClassTraitsWrapper<JSCWRuler::NATIVE, JSCWRuler> {};
 
-Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSCWRuler::NATIVE * theWindow);
-Y60_JSGTK_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<acgtk::CWRuler> & theCWRuler);
+Y60_JSGTK_DECL jsval as_jsval(JSContext *cx, JSCWRuler::NATIVE * theWindow);
+Y60_JSGTK_DECL bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<acgtk::CWRuler> & theCWRuler);
 
 } // namespace
 

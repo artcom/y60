@@ -136,7 +136,7 @@ template <>
 struct JSClassTraits<JSRadioMenuItem::NATIVE>
     : public JSClassTraitsWrapper<JSRadioMenuItem::NATIVE, JSRadioMenuItem> {};
 
-Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSRadioMenuItem::OWNERPTR theOwner, JSRadioMenuItem::NATIVE * theNative);
+Y60_JSGTK_DECL jsval as_jsval(JSContext *cx, JSRadioMenuItem::OWNERPTR theOwner, JSRadioMenuItem::NATIVE * theNative);
 
 } // namespace
 

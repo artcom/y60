@@ -46,9 +46,9 @@
 #include <string>
 
 namespace inet {
-    ASL_NET_EXPORT void initSockets();
-    ASL_NET_EXPORT void terminateSockets();
-    ASL_NET_EXPORT int getLastSocketError();
-    ASL_NET_EXPORT std::string getSocketErrorMessage(int ErrorID);
+    ASL_NET_DECL void initSockets();
+    ASL_NET_DECL void terminateSockets();
+    ASL_NET_DECL int getLastSocketError();
+    ASL_NET_DECL std::string getSocketErrorMessage(int ErrorID);
 }
 #endif

@@ -58,7 +58,7 @@
 
 namespace asl {
 
-class ASL_AUDIO_EXPORT Pump : public AudioTimeSource, private PosixThread 
+class ASL_AUDIO_DECL Pump : public AudioTimeSource, private PosixThread 
 {
     public:
         Pump(SampleFormat mySF, unsigned myTimeStartDelay);

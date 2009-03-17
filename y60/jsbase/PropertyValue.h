@@ -71,7 +71,7 @@
 
 namespace y60 {
 
-class Y60_JSBASE_EXPORT PropertyValue {
+class Y60_JSBASE_DECL PropertyValue {
 public:
     PropertyValue(JSContext *cx, jsval * theJSVal) :
         _myCx(cx), _myJsVal(theJSVal)

@@ -127,7 +127,7 @@ template <>
 struct JSClassTraits<JSHRuler::NATIVE>
     : public JSClassTraitsWrapper<JSHRuler::NATIVE, JSHRuler> {};
 
-Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSHRuler::OWNERPTR theOwner, JSHRuler::NATIVE * theHRuler);
+Y60_JSGTK_DECL jsval as_jsval(JSContext *cx, JSHRuler::OWNERPTR theOwner, JSHRuler::NATIVE * theHRuler);
 
 } // namespace
 

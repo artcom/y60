@@ -93,7 +93,7 @@ namespace y60 {
       */
     DEFINE_EXCEPTION(DecoderManagerException, asl::Exception);
 
-class Y60_BASE_EXPORT DecoderManager : public asl::Singleton<DecoderManager> {
+class Y60_BASE_DECL DecoderManager : public asl::Singleton<DecoderManager> {
     public:
         DecoderManager() {};
         virtual ~DecoderManager() {};

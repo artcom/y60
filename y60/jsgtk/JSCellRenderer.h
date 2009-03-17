@@ -139,7 +139,7 @@ template <>
 struct JSClassTraits<JSCellRenderer::NATIVE>
     : public JSClassTraitsWrapper<JSCellRenderer::NATIVE, JSCellRenderer> {};
 
-Y60_JSGTK_EXPORT jsval 
+Y60_JSGTK_DECL jsval 
 as_jsval(JSContext *cx, JSCellRenderer::OWNERPTR theOwner,
          JSCellRenderer::NATIVE * theCellRenderer);
 

@@ -75,7 +75,7 @@ namespace jslib {
 
 typedef float PlaneNumber;
 
-class Y60_JSBASE_EXPORT JSPlane : public JSWrapper<asl::Plane<PlaneNumber> > {
+class Y60_JSBASE_DECL JSPlane : public JSWrapper<asl::Plane<PlaneNumber> > {
     JSPlane() {}
 public:
     typedef JSWrapper<asl::Plane<PlaneNumber> > Base;
@@ -129,11 +129,11 @@ template <>
 struct JSClassTraits<asl::Plane<PlaneNumber> >
     : public JSClassTraitsWrapper<asl::Plane<PlaneNumber> , JSPlane> {};
 
-Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Plane<PlaneNumber>  & thePlane);
+Y60_JSBASE_DECL bool convertFrom(JSContext *cx, jsval theValue, asl::Plane<PlaneNumber>  & thePlane);
 
-Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, const asl::Plane<PlaneNumber>  & theValue);
+Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, const asl::Plane<PlaneNumber>  & theValue);
 
-Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, JSPlane::NativeValuePtr theValue);
+Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, JSPlane::NativeValuePtr theValue);
 // NOT IMPLEMENTED jsval as_jsval(JSContext *cx, dom::ValuePtr theValue, asl::Plane<PlaneNumber>  * thePlane);
 
 }

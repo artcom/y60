@@ -74,10 +74,10 @@ namespace y60 {
     class Scene;
 
     //                  theTagName                theType        theAttributeName                    theDefault
-    DEFINE_ATTRIBUT_TAG(CanvasBackgroundColorTag, asl::Vector4f, CANVAS_BACKGROUNDCOLOR_ATTRIB, asl::Vector4f(0,0,0,1), Y60_SCENE_EXPORT);
-    DEFINE_ATTRIBUT_TAG(CanvasTargetTag,          std::string,   CANVAS_TARGET_ATTRIB, "", Y60_SCENE_EXPORT);
+    DEFINE_ATTRIBUT_TAG(CanvasBackgroundColorTag, asl::Vector4f, CANVAS_BACKGROUNDCOLOR_ATTRIB, asl::Vector4f(0,0,0,1), Y60_SCENE_DECL);
+    DEFINE_ATTRIBUT_TAG(CanvasTargetTag,          std::string,   CANVAS_TARGET_ATTRIB, "", Y60_SCENE_DECL);
 
-    class Y60_SCENE_EXPORT Canvas :
+    class Y60_SCENE_DECL Canvas :
         public dom::Facade,
 		public IdTag::Plug,
 		public NameTag::Plug,

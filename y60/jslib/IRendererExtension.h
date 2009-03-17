@@ -72,7 +72,7 @@ namespace y60 {
 
 class Renderer;
 
-class Y60_JSLIB_EXPORT IRendererExtension {
+class Y60_JSLIB_DECL IRendererExtension {
     public:
         IRendererExtension(const std::string & theExtensionName) :
             _myExtensionName(theExtensionName)

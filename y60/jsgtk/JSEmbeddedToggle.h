@@ -146,8 +146,8 @@ template <>
 struct JSClassTraits<JSEmbeddedToggle::NATIVE> 
     : public JSClassTraitsWrapper<JSEmbeddedToggle::NATIVE, JSEmbeddedToggle> {};
 
-Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSEmbeddedToggle::NATIVE * theWindow);
-Y60_JSGTK_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<acgtk::EmbeddedToggle> & theEmbeddedToggle);
+Y60_JSGTK_DECL jsval as_jsval(JSContext *cx, JSEmbeddedToggle::NATIVE * theWindow);
+Y60_JSGTK_DECL bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<acgtk::EmbeddedToggle> & theEmbeddedToggle);
 
 } // namespace
 

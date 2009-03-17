@@ -148,7 +148,7 @@ template <>
 struct JSClassTraits<JSButton::NATIVE>
     : public JSClassTraitsWrapper<JSButton::NATIVE, JSButton> {};
 
-Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSButton::OWNERPTR theOwner, JSButton::NATIVE * theButton);
+Y60_JSGTK_DECL jsval as_jsval(JSContext *cx, JSButton::OWNERPTR theOwner, JSButton::NATIVE * theButton);
 
 inline
 jsval

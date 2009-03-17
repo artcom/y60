@@ -74,7 +74,7 @@ class IDecoder;
 
 typedef asl::Ptr<IDecoder> IDecoderPtr;
 
-class Y60_BASE_EXPORT IDecoder {
+class Y60_BASE_DECL IDecoder {
     public:
         typedef asl::WeakPtr<IDecoder> WPtr;
 

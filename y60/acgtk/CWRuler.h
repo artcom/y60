@@ -82,7 +82,7 @@
 
 namespace acgtk {
 
-class Y60_ACGTK_EXPORT CWRuler : public Gtk::DrawingArea {
+class Y60_ACGTK_DECL CWRuler : public Gtk::DrawingArea {
     public:
         enum Mode {
             MODE_THRESHOLD, // [DS] ... think this is deprecated

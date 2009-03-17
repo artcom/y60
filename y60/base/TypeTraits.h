@@ -145,7 +145,7 @@ namespace y60 {
         "texturewrapmode",
         ""
     };
-    DEFINE_ENUM(TypeId, TypeIdEnum, Y60_BASE_EXPORT);   
+    DEFINE_ENUM(TypeId, TypeIdEnum, Y60_BASE_DECL);   
 
     template <class T> struct NO_SUCH_SPECIALIZATION;
 

@@ -74,24 +74,24 @@
 
 namespace y60 {
     //                  theTagName           theType           theAttributeName               theDefault
-    DEFINE_ATTRIBUT_TAG(PositionTag,         asl::Vector3f,    POSITION_ATTRIB,          asl::Vector3f(0,0,0), Y60_SCENE_EXPORT);
-    DEFINE_ATTRIBUT_TAG(OrientationTag,      asl::Quaternionf, ORIENTATION_ATTRIB,       asl::Quaternionf(0,0,0,1), Y60_SCENE_EXPORT);
-    DEFINE_ATTRIBUT_TAG(ScaleTag,            asl::Vector3f,    SCALE_ATTRIB,             asl::Vector3f(1,1,1), Y60_SCENE_EXPORT);
-    DEFINE_ATTRIBUT_TAG(PivotTag,            asl::Vector3f,    PIVOT_ATTRIB,             asl::Vector3f(0,0,0), Y60_SCENE_EXPORT);
-    DEFINE_ATTRIBUT_TAG(InsensibleTag,       bool,             INSENSIBLE_ATTRIB,        false, Y60_SCENE_EXPORT);
-    DEFINE_ATTRIBUT_TAG(BillboardTag,        std::string,      BILLBOARD_ATTRIB,         "", Y60_SCENE_EXPORT);
-    DEFINE_ATTRIBUT_TAG(CullableTag,         bool,             CULLABLE_ATTRIB,          true, Y60_SCENE_EXPORT);
-    DEFINE_ATTRIBUT_TAG(ClippingPlanesTag,   VectorOfString,   CLIPPING_PLANES_ATTRIB,   VectorOfString(), Y60_SCENE_EXPORT);
-    DEFINE_ATTRIBUT_TAG(ScissorTag,          std::string,      SCISSOR_ATTRIB,           "", Y60_SCENE_EXPORT);
-    DEFINE_ATTRIBUT_TAG(StickyTag,           bool,             STICKY_ATTRIB,            false, Y60_SCENE_EXPORT);
-    DEFINE_ATTRIBUT_TAG(EventsTag,           VectorOfString,   "events",                 VectorOfString(), Y60_SCENE_EXPORT);
+    DEFINE_ATTRIBUT_TAG(PositionTag,         asl::Vector3f,    POSITION_ATTRIB,          asl::Vector3f(0,0,0), Y60_SCENE_DECL);
+    DEFINE_ATTRIBUT_TAG(OrientationTag,      asl::Quaternionf, ORIENTATION_ATTRIB,       asl::Quaternionf(0,0,0,1), Y60_SCENE_DECL);
+    DEFINE_ATTRIBUT_TAG(ScaleTag,            asl::Vector3f,    SCALE_ATTRIB,             asl::Vector3f(1,1,1), Y60_SCENE_DECL);
+    DEFINE_ATTRIBUT_TAG(PivotTag,            asl::Vector3f,    PIVOT_ATTRIB,             asl::Vector3f(0,0,0), Y60_SCENE_DECL);
+    DEFINE_ATTRIBUT_TAG(InsensibleTag,       bool,             INSENSIBLE_ATTRIB,        false, Y60_SCENE_DECL);
+    DEFINE_ATTRIBUT_TAG(BillboardTag,        std::string,      BILLBOARD_ATTRIB,         "", Y60_SCENE_DECL);
+    DEFINE_ATTRIBUT_TAG(CullableTag,         bool,             CULLABLE_ATTRIB,          true, Y60_SCENE_DECL);
+    DEFINE_ATTRIBUT_TAG(ClippingPlanesTag,   VectorOfString,   CLIPPING_PLANES_ATTRIB,   VectorOfString(), Y60_SCENE_DECL);
+    DEFINE_ATTRIBUT_TAG(ScissorTag,          std::string,      SCISSOR_ATTRIB,           "", Y60_SCENE_DECL);
+    DEFINE_ATTRIBUT_TAG(StickyTag,           bool,             STICKY_ATTRIB,            false, Y60_SCENE_DECL);
+    DEFINE_ATTRIBUT_TAG(EventsTag,           VectorOfString,   "events",                 VectorOfString(), Y60_SCENE_DECL);
 
-    DEFINE_FACADE_ATTRIBUTE_TAG(LocalMatrixTag,      asl::Matrix4f,    LOCAL_MATRIX_ATTRIB,      asl::Matrix4f::Identity(), Y60_SCENE_EXPORT);
-    DEFINE_FACADE_ATTRIBUTE_TAG(GlobalMatrixTag,     asl::Matrix4f,    GLOBAL_MATRIX_ATTRIB,     asl::Matrix4f::Identity(), Y60_SCENE_EXPORT);
-    DEFINE_FACADE_ATTRIBUTE_TAG(InverseGlobalMatrixTag, asl::Matrix4f, INVERSE_GLOBAL_MATRIX_ATTRIB,     asl::Matrix4f::Identity(), Y60_SCENE_EXPORT);
+    DEFINE_FACADE_ATTRIBUTE_TAG(LocalMatrixTag,      asl::Matrix4f,    LOCAL_MATRIX_ATTRIB,      asl::Matrix4f::Identity(), Y60_SCENE_DECL);
+    DEFINE_FACADE_ATTRIBUTE_TAG(GlobalMatrixTag,     asl::Matrix4f,    GLOBAL_MATRIX_ATTRIB,     asl::Matrix4f::Identity(), Y60_SCENE_DECL);
+    DEFINE_FACADE_ATTRIBUTE_TAG(InverseGlobalMatrixTag, asl::Matrix4f, INVERSE_GLOBAL_MATRIX_ATTRIB,     asl::Matrix4f::Identity(), Y60_SCENE_DECL);
 
 
-    class Y60_SCENE_EXPORT TransformHierarchyFacade :
+    class Y60_SCENE_DECL TransformHierarchyFacade :
         public dom::Facade,
         public IdTag::Plug,
         public NameTag::Plug,

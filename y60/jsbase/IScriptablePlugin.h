@@ -77,7 +77,7 @@ struct JSObject;
 
 namespace jslib {
 
-    struct Y60_JSBASE_EXPORT IScriptablePlugin {
+    struct Y60_JSBASE_DECL IScriptablePlugin {
         virtual ~IScriptablePlugin() {}
         virtual void initClasses(JSContext * theContext, JSObject *theGlobalObject);
 

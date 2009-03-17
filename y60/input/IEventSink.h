@@ -75,7 +75,7 @@
 
 namespace y60 {
 
-    class Y60_INPUT_EXPORT IEventSink {
+    class Y60_INPUT_DECL IEventSink {
         public:
             virtual void handle(EventPtr theEvent) = 0;
             virtual ~IEventSink() {}

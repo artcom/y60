@@ -34,7 +34,7 @@ namespace asl {
 
 DEFINE_EXCEPTION(ZipFileException, asl::Exception);
     
-class ASL_ZIP_EXPORT ZipReader {
+class ASL_ZIP_DECL ZipReader {
     public:
         struct Entry {
             Path filename;

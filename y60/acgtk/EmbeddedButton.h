@@ -73,7 +73,7 @@
 
 namespace acgtk {
 
-class Y60_ACGTK_EXPORT EmbeddedButton : public Gtk::EventBox {
+class Y60_ACGTK_DECL EmbeddedButton : public Gtk::EventBox {
     public:
         EmbeddedButton();
         EmbeddedButton(const std::string & theIconFile);

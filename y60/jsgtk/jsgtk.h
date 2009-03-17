@@ -101,7 +101,7 @@ bool convertFrom(JSContext *cx, jsval theValue, Glib::RefPtr<TARGET> & theTarget
     return ConvertFrom<TARGET>::convert(cx, theValue, theTarget);
 }
 
-Y60_JSGTK_EXPORT jsval gtk_jsval(JSContext *cx, Gtk::Widget * theWidget, bool takeOwnership = false);
+Y60_JSGTK_DECL jsval gtk_jsval(JSContext *cx, Gtk::Widget * theWidget, bool takeOwnership = false);
 
 
 } // namespace

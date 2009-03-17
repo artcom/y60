@@ -68,23 +68,23 @@
 
 namespace jslib {
 
-Y60_JSLIB_EXPORT jsval as_jsval(JSContext *cx, const y60::Primitive::Intersection & theIntersection, 
+Y60_JSLIB_DECL jsval as_jsval(JSContext *cx, const y60::Primitive::Intersection & theIntersection, 
         const asl::Matrix4f & myTransformation, const asl::Matrix4f & myInverseTransformation);
 
-Y60_JSLIB_EXPORT jsval as_jsval(JSContext *cx, const y60::Primitive::IntersectionList & theVector, 
+Y60_JSLIB_DECL jsval as_jsval(JSContext *cx, const y60::Primitive::IntersectionList & theVector, 
         const asl::Matrix4f & theMatrix, const asl::Matrix4f & theInverseMatrix);
 
-Y60_JSLIB_EXPORT jsval as_jsval(JSContext *cx, const y60::IntersectionInfo  & theInfo);
+Y60_JSLIB_DECL jsval as_jsval(JSContext *cx, const y60::IntersectionInfo  & theInfo);
 
-Y60_JSLIB_EXPORT jsval as_jsval(JSContext *cx, const asl::SweptSphereContact<float> & theContact);
+Y60_JSLIB_DECL jsval as_jsval(JSContext *cx, const asl::SweptSphereContact<float> & theContact);
 
-Y60_JSLIB_EXPORT jsval as_jsval(JSContext *cx, const y60::Primitive::SphereContacts & theContacts, 
+Y60_JSLIB_DECL jsval as_jsval(JSContext *cx, const y60::Primitive::SphereContacts & theContacts, 
         const asl::Matrix4f & theTransformation);
 
-Y60_JSLIB_EXPORT jsval as_jsval(JSContext *cx, const y60::Primitive::SphereContactsList & theVector, 
+Y60_JSLIB_DECL jsval as_jsval(JSContext *cx, const y60::Primitive::SphereContactsList & theVector, 
         const asl::Matrix4f & theTransformation);
 
-Y60_JSLIB_EXPORT jsval as_jsval(JSContext *cx, const y60::CollisionInfo & theInfo);
+Y60_JSLIB_DECL jsval as_jsval(JSContext *cx, const y60::CollisionInfo & theInfo);
 
 }
 

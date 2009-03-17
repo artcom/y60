@@ -80,7 +80,7 @@
 
 namespace y60 {
     class AnimationBuilder;
-    class Y60_SCENE_EXPORT ClipBuilder : public BuilderBase {
+    class Y60_SCENE_DECL ClipBuilder : public BuilderBase {
         public:
             ClipBuilder(const std::string & theName);
             virtual ~ClipBuilder();

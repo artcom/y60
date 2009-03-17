@@ -136,9 +136,9 @@ template <>
 struct JSClassTraits<JSTreeIter::NATIVE>
     : public JSClassTraitsWrapper<JSTreeIter::NATIVE, JSTreeIter> {};
 
-Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSTreeIter::OWNERPTR theOwner, JSTreeIter::NATIVE * theNative);
+Y60_JSGTK_DECL jsval as_jsval(JSContext *cx, JSTreeIter::OWNERPTR theOwner, JSTreeIter::NATIVE * theNative);
 
-Y60_JSGTK_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<Gtk::TreeIter> & theNativePtr);
+Y60_JSGTK_DECL bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<Gtk::TreeIter> & theNativePtr);
 
 }
 

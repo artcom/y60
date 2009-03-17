@@ -33,7 +33,7 @@ namespace asl {
 
 DEFINE_EXCEPTION(ZipWriterException, asl::Exception);
     
-class ASL_ZIP_EXPORT ZipWriter {
+class ASL_ZIP_DECL ZipWriter {
     public:
         ZipWriter(const char * theOutputFileName);
         ZipWriter(const std::string & theOutputFileName);

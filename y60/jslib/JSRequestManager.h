@@ -121,12 +121,12 @@ class JSRequestManager : public JSWrapper<inet::RequestManager, asl::Ptr<inet::R
 template <>
 struct JSClassTraits<inet::RequestManager> : public JSClassTraitsWrapper<inet::RequestManager, JSRequestManager> {};
 
-Y60_JSLIB_EXPORT bool convertFrom(JSContext *cx, jsval theValue, JSRequestManager::OWNERPTR & theRequest);
-Y60_JSLIB_EXPORT bool convertFrom(JSContext *cx, jsval theValue, JSRequestManager::NATIVE & theRequest);
-Y60_JSLIB_EXPORT bool convertFrom(JSContext *cx, jsval theValue, JSRequestManager::NATIVE *& theRequest);
+Y60_JSLIB_DECL bool convertFrom(JSContext *cx, jsval theValue, JSRequestManager::OWNERPTR & theRequest);
+Y60_JSLIB_DECL bool convertFrom(JSContext *cx, jsval theValue, JSRequestManager::NATIVE & theRequest);
+Y60_JSLIB_DECL bool convertFrom(JSContext *cx, jsval theValue, JSRequestManager::NATIVE *& theRequest);
 
-Y60_JSLIB_EXPORT jsval as_jsval(JSContext *cx, JSRequestManager::OWNERPTR theOwner);
-Y60_JSLIB_EXPORT jsval as_jsval(JSContext *cx, JSRequestManager::OWNERPTR theOwner, JSRequestManager::NATIVE * theManager);
+Y60_JSLIB_DECL jsval as_jsval(JSContext *cx, JSRequestManager::OWNERPTR theOwner);
+Y60_JSLIB_DECL jsval as_jsval(JSContext *cx, JSRequestManager::OWNERPTR theOwner, JSRequestManager::NATIVE * theManager);
 
 }
 

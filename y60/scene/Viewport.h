@@ -72,27 +72,27 @@
 namespace y60 {
 
     //                  theTagName                  theType        theAttributeName                      theDefault
-    DEFINE_ATTRIBUT_TAG(ViewportOrientationTag,     std::string,   ORIENTATION_ATTRIB,              LANDSCAPE_ORIENTATION, Y60_SCENE_EXPORT);
-    DEFINE_ATTRIBUT_TAG(CameraTag,                  std::string,   CAMERA_ATTRIB,                   "", Y60_SCENE_EXPORT);
-    DEFINE_ATTRIBUT_TAG(Size2DTag,                  asl::Vector2f, VIEWPORT_SIZE_ATTRIB,            asl::Vector2f(1,1), Y60_SCENE_EXPORT);
-    DEFINE_ATTRIBUT_TAG(ViewportLeftTag,            int,           VIEWPORT_LEFT_ATTRIB,            0, Y60_SCENE_EXPORT);
-    DEFINE_ATTRIBUT_TAG(ViewportTopTag,             int,           VIEWPORT_TOP_ATTRIB,             0, Y60_SCENE_EXPORT);
-    DEFINE_ATTRIBUT_TAG(ViewportHeightTag,          unsigned,      VIEWPORT_HEIGHT_ATTRIB,          0, Y60_SCENE_EXPORT);
-    DEFINE_ATTRIBUT_TAG(ViewportWidthTag,           unsigned,      VIEWPORT_WIDTH_ATTRIB,           0, Y60_SCENE_EXPORT);
+    DEFINE_ATTRIBUT_TAG(ViewportOrientationTag,     std::string,   ORIENTATION_ATTRIB,              LANDSCAPE_ORIENTATION, Y60_SCENE_DECL);
+    DEFINE_ATTRIBUT_TAG(CameraTag,                  std::string,   CAMERA_ATTRIB,                   "", Y60_SCENE_DECL);
+    DEFINE_ATTRIBUT_TAG(Size2DTag,                  asl::Vector2f, VIEWPORT_SIZE_ATTRIB,            asl::Vector2f(1,1), Y60_SCENE_DECL);
+    DEFINE_ATTRIBUT_TAG(ViewportLeftTag,            int,           VIEWPORT_LEFT_ATTRIB,            0, Y60_SCENE_DECL);
+    DEFINE_ATTRIBUT_TAG(ViewportTopTag,             int,           VIEWPORT_TOP_ATTRIB,             0, Y60_SCENE_DECL);
+    DEFINE_ATTRIBUT_TAG(ViewportHeightTag,          unsigned,      VIEWPORT_HEIGHT_ATTRIB,          0, Y60_SCENE_DECL);
+    DEFINE_ATTRIBUT_TAG(ViewportWidthTag,           unsigned,      VIEWPORT_WIDTH_ATTRIB,           0, Y60_SCENE_DECL);
 
-    DEFINE_ATTRIBUT_TAG(ViewportBackfaceCullingTag, bool,          VIEWPORT_BACKFACECULLING_ATTRIB, true, Y60_SCENE_EXPORT);
-    DEFINE_ATTRIBUT_TAG(ViewportWireframeTag,       bool,          VIEWPORT_WIREFRAME_ATTRIB,       false, Y60_SCENE_EXPORT);
-    DEFINE_ATTRIBUT_TAG(ViewportLightingTag,        bool,          VIEWPORT_LIGHTING_ATTRIB,        true, Y60_SCENE_EXPORT);
-    DEFINE_ATTRIBUT_TAG(ViewportFlatshadingTag,     bool,          VIEWPORT_FLATSHADING_ATTRIB,     false, Y60_SCENE_EXPORT);
-    DEFINE_ATTRIBUT_TAG(ViewportCullingTag,         bool,          VIEWPORT_CULLING_ATTRIB,         true, Y60_SCENE_EXPORT);
-    DEFINE_ATTRIBUT_TAG(ViewportDebugCullingTag,    bool,          VIEWPORT_DEBUGCULLING_ATTRIB,    false, Y60_SCENE_EXPORT);
-    DEFINE_ATTRIBUT_TAG(ViewportTexturingTag,       bool,          VIEWPORT_TEXTURING_ATTRIB,       true, Y60_SCENE_EXPORT);
+    DEFINE_ATTRIBUT_TAG(ViewportBackfaceCullingTag, bool,          VIEWPORT_BACKFACECULLING_ATTRIB, true, Y60_SCENE_DECL);
+    DEFINE_ATTRIBUT_TAG(ViewportWireframeTag,       bool,          VIEWPORT_WIREFRAME_ATTRIB,       false, Y60_SCENE_DECL);
+    DEFINE_ATTRIBUT_TAG(ViewportLightingTag,        bool,          VIEWPORT_LIGHTING_ATTRIB,        true, Y60_SCENE_DECL);
+    DEFINE_ATTRIBUT_TAG(ViewportFlatshadingTag,     bool,          VIEWPORT_FLATSHADING_ATTRIB,     false, Y60_SCENE_DECL);
+    DEFINE_ATTRIBUT_TAG(ViewportCullingTag,         bool,          VIEWPORT_CULLING_ATTRIB,         true, Y60_SCENE_DECL);
+    DEFINE_ATTRIBUT_TAG(ViewportDebugCullingTag,    bool,          VIEWPORT_DEBUGCULLING_ATTRIB,    false, Y60_SCENE_DECL);
+    DEFINE_ATTRIBUT_TAG(ViewportTexturingTag,       bool,          VIEWPORT_TEXTURING_ATTRIB,       true, Y60_SCENE_DECL);
     DEFINE_ATTRIBUT_TAG(ViewportAlphaTestTag,       bool,          VIEWPORT_ALPHATEST_ATTRIB,
-    true, Y60_SCENE_EXPORT);
-    DEFINE_ATTRIBUT_TAG(ViewportDrawGlowTag,        bool,          VIEWPORT_GLOW_ATTRIB,            false, Y60_SCENE_EXPORT);
-    DEFINE_ATTRIBUT_TAG(ViewportDrawNormalsTag,     bool,          VIEWPORT_DRAWNORMALS_ATTRIB,     false, Y60_SCENE_EXPORT);
+    true, Y60_SCENE_DECL);
+    DEFINE_ATTRIBUT_TAG(ViewportDrawGlowTag,        bool,          VIEWPORT_GLOW_ATTRIB,            false, Y60_SCENE_DECL);
+    DEFINE_ATTRIBUT_TAG(ViewportDrawNormalsTag,     bool,          VIEWPORT_DRAWNORMALS_ATTRIB,     false, Y60_SCENE_DECL);
 
-    class Y60_SCENE_EXPORT Viewport :
+    class Y60_SCENE_DECL Viewport :
         public dom::Facade,
         public IdTag::Plug,
 		public NameTag::Plug,

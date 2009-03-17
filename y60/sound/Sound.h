@@ -78,7 +78,7 @@ typedef asl::WeakPtr<Sound> SoundWeakPtr;
 
 DEFINE_EXCEPTION(SoundException, asl::Exception);
 
-class Y60_SOUND_EXPORT Sound :     
+class Y60_SOUND_DECL Sound :     
     public asl::TimeSource, public asl::ISampleSink
 {
     public:

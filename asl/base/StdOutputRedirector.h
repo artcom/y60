@@ -55,7 +55,7 @@ namespace asl {
     /* @{ */
 
     class Arguments;
-    class ASL_BASE_EXPORT StdOutputRedirector : public Singleton<StdOutputRedirector> {
+    class ASL_BASE_DECL StdOutputRedirector : public Singleton<StdOutputRedirector> {
         friend class SingletonManager;        
         public:
             void init(const Arguments & theArguments);

@@ -74,7 +74,7 @@
 
 namespace jslib {
 
-class Y60_JSBASE_EXPORT JSMatrix : public JSWrapper<asl::Matrix4f>
+class Y60_JSBASE_DECL JSMatrix : public JSWrapper<asl::Matrix4f>
 {
 public:
     typedef JSWrapper<asl::Matrix4f> Base;
@@ -138,12 +138,12 @@ public:
 template <>
 struct JSClassTraits<asl::Matrix4f> : public JSClassTraitsWrapper<asl::Matrix4f, JSMatrix> {};
 
-Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, JSMatrix::NativeValuePtr & theMatrix);
+Y60_JSBASE_DECL bool convertFrom(JSContext *cx, jsval theValue, JSMatrix::NativeValuePtr & theMatrix);
 //bool convertFrom(JSContext *cx, jsval theValue, asl::Matrix4f const * & theMatrix);
-Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Matrix4f & theMatrix);
+Y60_JSBASE_DECL bool convertFrom(JSContext *cx, jsval theValue, asl::Matrix4f & theMatrix);
 
-Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, const asl::Matrix4f & theValue);
-Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, JSMatrix::NativeValuePtr theValue);
+Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, const asl::Matrix4f & theValue);
+Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, JSMatrix::NativeValuePtr theValue);
 
 }
 

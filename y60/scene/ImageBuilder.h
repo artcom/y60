@@ -67,7 +67,7 @@
 
 namespace y60 {
 
-    class Y60_SCENE_EXPORT ImageBuilder : public BuilderBase {
+    class Y60_SCENE_DECL ImageBuilder : public BuilderBase {
         public:
             DEFINE_EXCEPTION(ImageBuilderException, asl::Exception);
 

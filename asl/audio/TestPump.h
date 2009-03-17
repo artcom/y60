@@ -55,7 +55,7 @@
 #include <string>
 #include <asl/base/UnitTest.h>
 
-class ASL_AUDIO_EXPORT TestPump: public UnitTest{
+class ASL_AUDIO_DECL TestPump: public UnitTest{
     public:
         TestPump (const char * myName)
             : UnitTest(myName) {}

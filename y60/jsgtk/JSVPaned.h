@@ -136,7 +136,7 @@ template <>
 struct JSClassTraits<JSVPaned::NATIVE>
     : public JSClassTraitsWrapper<JSVPaned::NATIVE, JSVPaned> {};
 
-Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSVPaned::OWNERPTR theOwner, JSVPaned::NATIVE * theBin);
+Y60_JSGTK_DECL jsval as_jsval(JSContext *cx, JSVPaned::OWNERPTR theOwner, JSVPaned::NATIVE * theBin);
 
 } // namespace
 

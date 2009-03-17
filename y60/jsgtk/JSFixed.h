@@ -136,7 +136,7 @@ template <>
 struct JSClassTraits<JSFixed::NATIVE>
     : public JSClassTraitsWrapper<JSFixed::NATIVE, JSFixed> {};
 
-Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSFixed::OWNERPTR theOwner, JSFixed::NATIVE * theBin);
+Y60_JSGTK_DECL jsval as_jsval(JSContext *cx, JSFixed::OWNERPTR theOwner, JSFixed::NATIVE * theBin);
 
 } // namespace
 

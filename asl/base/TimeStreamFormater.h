@@ -63,7 +63,7 @@ namespace asl {
 /*! \addtogroup aslbase */
 /* @{ */
     
-class ASL_BASE_EXPORT TimeStreamFormater {
+class ASL_BASE_DECL TimeStreamFormater {
     public:
         TimeStreamFormater(const char * theFormatString);
         TimeStreamFormater(const TimeStreamFormater & otherFormater);
@@ -80,10 +80,10 @@ class ASL_BASE_EXPORT TimeStreamFormater {
         const char * _myFormatString;
 };
 
-ASL_BASE_EXPORT TimeStreamFormater
+ASL_BASE_DECL TimeStreamFormater
 formatTime(const char * theFormatString);
 
-ASL_BASE_EXPORT std::ostream &
+ASL_BASE_DECL std::ostream &
 operator<< (std::ostream & theStream, const TimeStreamFormater & theFormater);
 
 }

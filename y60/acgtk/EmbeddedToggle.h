@@ -72,7 +72,7 @@
 
 namespace acgtk {
 
-class Y60_ACGTK_EXPORT EmbeddedToggle : public EmbeddedButton {
+class Y60_ACGTK_DECL EmbeddedToggle : public EmbeddedButton {
     public:
         EmbeddedToggle();
         EmbeddedToggle(const std::string & theDefaultIcon,

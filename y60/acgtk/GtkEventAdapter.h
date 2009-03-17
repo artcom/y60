@@ -75,7 +75,7 @@
 #include <gdk/gdkevents.h>
 #include <vector>
 
-class Y60_ACGTK_EXPORT GtkEventAdapter : public y60::IEventSource {
+class Y60_ACGTK_DECL GtkEventAdapter : public y60::IEventSource {
     public:
         // GtkEventAdapter();
         // virtual void init();

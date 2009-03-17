@@ -70,7 +70,7 @@
 
 namespace jslib {
 
-class Y60_JSBASE_EXPORT JSNodeList: public JSWrapper<dom::NodeList,dom::NodePtr,StaticAccessProtocol> {
+class Y60_JSBASE_DECL JSNodeList: public JSWrapper<dom::NodeList,dom::NodePtr,StaticAccessProtocol> {
 public:
     typedef JSWrapper<dom::NodeList,dom::NodePtr,StaticAccessProtocol> Base;
 
@@ -109,8 +109,8 @@ public:
     static JSObject * initClass(JSContext *cx, JSObject *theGlobalObject); 
 };
 
-Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, dom::NodePtr theNode, dom::NodeList * theNodeList);
-Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, dom::NodeList  & theNodeList);
+Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, dom::NodePtr theNode, dom::NodeList * theNodeList);
+Y60_JSBASE_DECL bool convertFrom(JSContext *cx, jsval theValue, dom::NodeList  & theNodeList);
 }
 
 #endif

@@ -65,7 +65,7 @@
 
 namespace y60 {
 
-extern Y60_GLRENDER_EXPORT const std::string ourShaderLibraryxsd;
+extern Y60_GLRENDER_DECL const std::string ourShaderLibraryxsd;
 
 }
 

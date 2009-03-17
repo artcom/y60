@@ -744,7 +744,7 @@ Bool RegisterAcXmlExporter(void)
     GePrint("ART+COM Y60 Exporter - Build " + String(__DATE__));
 
     // decide by name if the plugin shall be registered - just for user convenience
-    String myName = GeLoadString(IDS_Y60_XML_EXPORT);
+    String myName = GeLoadString(IDS_Y60_XML_DECL);
     if (!myName.Content()) 
         return FALSE;
 
@@ -753,7 +753,7 @@ Bool RegisterAcXmlExporter(void)
         return FALSE;
     }
 
-    myName = GeLoadString(IDS_Y60_BINARY_EXPORT);
+    myName = GeLoadString(IDS_Y60_BINARY_DECL);
     if (!myName.Content()) 
         return FALSE;
 

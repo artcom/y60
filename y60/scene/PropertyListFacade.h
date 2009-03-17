@@ -76,7 +76,7 @@
 #include <vector>
 
 namespace y60 {
-	class Y60_SCENE_EXPORT PropertyListFacade : public dom::Facade {
+	class Y60_SCENE_DECL PropertyListFacade : public dom::Facade {
 		public:
 			PropertyListFacade(dom::Node & theNode) : dom::Facade(theNode), _myNodeVersion(0) {}
 			void ensureProperties() const {

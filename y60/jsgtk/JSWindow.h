@@ -143,7 +143,7 @@ template <>
 struct JSClassTraits<JSWindow::NATIVE>
     : public JSClassTraitsWrapper<JSWindow::NATIVE, JSWindow> {};
 
-Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSWindow::OWNERPTR theOwner, JSWindow::NATIVE * theNative);
+Y60_JSGTK_DECL jsval as_jsval(JSContext *cx, JSWindow::OWNERPTR theOwner, JSWindow::NATIVE * theNative);
 
 } // namespace
 

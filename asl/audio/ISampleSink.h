@@ -49,7 +49,7 @@
 
 namespace asl {
 
-class ASL_AUDIO_EXPORT ISampleSink
+class ASL_AUDIO_DECL ISampleSink
 {
     public:
         virtual ~ISampleSink() {};

@@ -137,7 +137,7 @@ template <>
 struct JSClassTraits<JSArrow::NATIVE>
     : public JSClassTraitsWrapper<JSArrow::NATIVE, JSArrow> {};
 
-Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSArrow::OWNERPTR theOwner, JSArrow::NATIVE * theArrow);
+Y60_JSGTK_DECL jsval as_jsval(JSContext *cx, JSArrow::OWNERPTR theOwner, JSArrow::NATIVE * theArrow);
 
 } // namespace
 

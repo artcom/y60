@@ -121,7 +121,7 @@ template <>
 struct JSClassTraits<JSGtk::NATIVE>
     : public JSClassTraitsWrapper<JSGtk::NATIVE, JSGtk> {};
 
-Y60_JSGTK_EXPORT jsval as_jsval(JSContext *cx, JSGtk::OWNERPTR theOwner, JSGtk::NATIVE * theBin);
+Y60_JSGTK_DECL jsval as_jsval(JSContext *cx, JSGtk::OWNERPTR theOwner, JSGtk::NATIVE * theBin);
 
 } // namespace
 

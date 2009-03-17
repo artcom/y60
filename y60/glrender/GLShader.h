@@ -22,7 +22,7 @@ namespace y60 {
 
     class ShaderLibrary;
 
-    class Y60_GLRENDER_EXPORT GLShader : public y60::IShader {
+    class Y60_GLRENDER_DECL GLShader : public y60::IShader {
         public:
             enum ShaderMatch {
                 FULL_MATCH, WILDCARD_MATCH, NO_MATCH

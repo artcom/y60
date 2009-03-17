@@ -72,7 +72,7 @@
 
 namespace acgtk {
 
-class Y60_ACGTK_EXPORT DragButton : public EmbeddedButton {
+class Y60_ACGTK_DECL DragButton : public EmbeddedButton {
     public:
         DragButton();
         DragButton(const std::string & theIconFile);

@@ -78,7 +78,7 @@ namespace y60 {
     * parameters should contain necessary image ids
     * ouput is handled by result()
     */
-    class Y60_VIDEOPROCESSING_EXPORT Algorithm {
+    class Y60_VIDEOPROCESSING_DECL Algorithm {
     public:
         Algorithm(const std::string & theName) { 
             _myName = theName;

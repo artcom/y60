@@ -66,7 +66,7 @@ namespace asl {
  * 
  * 
  */
-class ASL_BASE_EXPORT ThreadLock {
+class ASL_BASE_DECL ThreadLock {
     public:
         ThreadLock();
         virtual ~ThreadLock();

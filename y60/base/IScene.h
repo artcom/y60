@@ -74,7 +74,7 @@
 
 namespace y60 {
     class IResourceManager;
-    class Y60_BASE_EXPORT IScene {
+    class Y60_BASE_DECL IScene {
         public:
             virtual ~IScene();
             virtual const IResourceManager * getResourceManager() const = 0;

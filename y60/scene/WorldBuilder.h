@@ -67,7 +67,7 @@
 
 namespace y60 {
 
-    class Y60_SCENE_EXPORT WorldBuilder : public WorldBuilderBase {
+    class Y60_SCENE_DECL WorldBuilder : public WorldBuilderBase {
         public:
             WorldBuilder();
             WorldBuilder(dom::NodePtr theNode) : WorldBuilderBase(theNode) {};

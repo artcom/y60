@@ -97,7 +97,7 @@ namespace y60 {
         0
     };
 
-    class Y60_GLTEXT_EXPORT BitmapTextRenderer : public TextRenderer{
+    class Y60_GLTEXT_DECL BitmapTextRenderer : public TextRenderer{
     	public:
     		BitmapTextRenderer();
     		~BitmapTextRenderer();

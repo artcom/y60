@@ -51,7 +51,7 @@
 
 namespace asl {
  
-class ASL_AUDIO_EXPORT AudioTimeSource {
+class ASL_AUDIO_DECL AudioTimeSource {
     public:
         AudioTimeSource(unsigned myInitialDelay, unsigned mySampleRate);
         virtual ~AudioTimeSource();

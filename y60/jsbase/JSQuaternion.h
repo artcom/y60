@@ -84,7 +84,7 @@ namespace jslib {
 
 typedef float QuaternionNumber;
 
-class Y60_JSBASE_EXPORT JSQuaternion : public JSWrapper<asl::Quaternion<QuaternionNumber> > {
+class Y60_JSBASE_DECL JSQuaternion : public JSWrapper<asl::Quaternion<QuaternionNumber> > {
     JSQuaternion() {}
 public:
     typedef JSWrapper<asl::Quaternion<QuaternionNumber> > Base;
@@ -141,11 +141,11 @@ template <>
 struct JSClassTraits<asl::Quaternion<QuaternionNumber> >
     : public JSClassTraitsWrapper<asl::Quaternion<QuaternionNumber> , JSQuaternion> {};
 
-Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, JSQuaternion::NativeValuePtr & theQuaternion);
-Y60_JSBASE_EXPORT bool convertFrom(JSContext *cx, jsval theValue, asl::Quaternion<QuaternionNumber>  & theQuaternion);
+Y60_JSBASE_DECL bool convertFrom(JSContext *cx, jsval theValue, JSQuaternion::NativeValuePtr & theQuaternion);
+Y60_JSBASE_DECL bool convertFrom(JSContext *cx, jsval theValue, asl::Quaternion<QuaternionNumber>  & theQuaternion);
 
-Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, const asl::Quaternion<QuaternionNumber> & theValue);
-Y60_JSBASE_EXPORT jsval as_jsval(JSContext *cx, JSQuaternion::NativeValuePtr theValue);
+Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, const asl::Quaternion<QuaternionNumber> & theValue);
+Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, JSQuaternion::NativeValuePtr theValue);
 
 }
 

@@ -145,8 +145,8 @@ namespace asl {
                 _theThreadLock_.increment();
             }
         private:
-            ASL_BASE_EXPORT static ReferenceCounter<ThreadingModel> * volatile _theFreeListHead_;
-            ASL_BASE_EXPORT static AtomicCount<MultiProcessor> _theThreadLock_;
+            ASL_BASE_DECL static ReferenceCounter<ThreadingModel> * volatile _theFreeListHead_;
+            ASL_BASE_DECL static AtomicCount<MultiProcessor> _theThreadLock_;
     };
 
     // This is a thread safe free-list using version of the allocator
@@ -222,7 +222,7 @@ namespace asl {
                 (void)status;
             }
         private:
-            ASL_BASE_EXPORT static pthread_key_t _theKey_;
+            ASL_BASE_DECL static pthread_key_t _theKey_;
     };
 
     // This is thread-safe free-list version of the allocator using pthread mutexes
@@ -251,8 +251,8 @@ namespace asl {
                 pthread_mutex_unlock(&_theMutex_);
             }
         private:
-            ASL_BASE_EXPORT static ReferenceCounter<ThreadingModel> * _theFreeListHead_;
-            ASL_BASE_EXPORT static pthread_mutex_t _theMutex_;
+            ASL_BASE_DECL static ReferenceCounter<ThreadingModel> * _theFreeListHead_;
+            ASL_BASE_DECL static pthread_mutex_t _theMutex_;
 };
 
     // PtrMultiFreeListAllocator is not really thread-safe by using multiple free list heads
@@ -310,7 +310,7 @@ namespace asl {
                 }
             }
         private:
-            ASL_BASE_EXPORT static ReferenceCounter<ThreadingModel> * _theFreeListHead_;
+            ASL_BASE_DECL static ReferenceCounter<ThreadingModel> * _theFreeListHead_;
     };
 #if 0
     DBP2(
@@ -376,7 +376,7 @@ namespace asl {
                 */
             }
         private:
-            ASL_BASE_EXPORT static ReferenceCounter<ThreadingModel> * _theFreeListHead_;
+            ASL_BASE_DECL static ReferenceCounter<ThreadingModel> * _theFreeListHead_;
     };
 
     template <class ThreadingModel>

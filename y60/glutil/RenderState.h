@@ -95,7 +95,7 @@ namespace y60 {
 
     class Viewport;
 
-    class Y60_GLUTIL_EXPORT RenderState {
+    class Y60_GLUTIL_DECL RenderState {
         public:
             RenderState();
             void init();

@@ -430,7 +430,7 @@ namespace asl
     template <class Threading> class AtomicCount;
 
     template <>
-    class ASL_BASE_EXPORT AtomicCount<SingleThreaded> {
+    class ASL_BASE_DECL AtomicCount<SingleThreaded> {
     public:
         explicit AtomicCount(long v) {
             value = v;

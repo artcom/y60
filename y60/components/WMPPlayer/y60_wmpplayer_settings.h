@@ -4,9 +4,9 @@
 #include <asl/base/settings.h>
 
 #ifdef y60wmpplayer_EXPORTS
-#   define Y60_WMPPLAYER_EXPORT AC_DLL_EXPORT
+#   define Y60_WMPPLAYER_DECL AC_DLL_EXPORT
 #else
-#   define Y60_WMPPLAYER_EXPORT AC_DLL_IMPORT
+#   define Y60_WMPPLAYER_DECL AC_DLL_IMPORT
 #endif
 
 #endif // Y60_WMPPLAYER_SETTING_INCLUDED

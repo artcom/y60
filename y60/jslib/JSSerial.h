@@ -142,10 +142,10 @@ class JSSerial : public JSWrapper<asl::SerialDevice, asl::Ptr<asl::SerialDevice>
 template <>
 struct JSClassTraits<asl::SerialDevice> : public JSClassTraitsWrapper<asl::SerialDevice, JSSerial> {};
 
-Y60_JSLIB_EXPORT bool convertFrom(JSContext *cx, jsval theValue, JSSerial::NATIVE & theSerial);
+Y60_JSLIB_DECL bool convertFrom(JSContext *cx, jsval theValue, JSSerial::NATIVE & theSerial);
 
-Y60_JSLIB_EXPORT jsval as_jsval(JSContext *cx, JSSerial::OWNERPTR theOwner);
-Y60_JSLIB_EXPORT jsval as_jsval(JSContext *cx, JSSerial::OWNERPTR theOwner, JSSerial::NATIVE * theSerial);
+Y60_JSLIB_DECL jsval as_jsval(JSContext *cx, JSSerial::OWNERPTR theOwner);
+Y60_JSLIB_DECL jsval as_jsval(JSContext *cx, JSSerial::OWNERPTR theOwner, JSSerial::NATIVE * theSerial);
 
 }
 
