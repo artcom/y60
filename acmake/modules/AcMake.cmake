@@ -68,5 +68,7 @@ ac_done_registering_build_types()
 
 include(AcDocumentation)
 
+include(AcInstaller)
+
 include(AcAddPro60Dependencies)
 

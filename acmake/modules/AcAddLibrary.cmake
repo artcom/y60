@@ -52,9 +52,10 @@
 macro(ac_add_library LIBRARY_NAME LIBRARY_PATH)
     # put arguments into the THIS_LIBRARY namespace
     parse_arguments(THIS_LIBRARY
-        "SOURCES;HEADERS;DEPENDS;EXTERNS;TESTS"
+        "SOURCES;HEADERS;DEPENDS;EXTERNS;TESTS;RUNTIME_INSTALL_COMPONENT;DEVELOPMENT_INSTALL_COMPONENT"
         "DONT_INSTALL"
-        ${ARGN})
+        ${ARGN}
+    )
     
     # do the same manually for name and path
     set(THIS_LIBRARY_NAME "${LIBRARY_NAME}")
@@ -142,18 +143,40 @@ macro(ac_add_library LIBRARY_NAME LIBRARY_PATH)
     
     # define installation
     if(NOT THIS_LIBRARY_DONT_INSTALL)
-        # XXX: handle header only lib
+        # figure out components to install into
+        set(COMPONENT_RUNTIME)
+        set(COMPONENT_DEVELOPMENT)
+        if(ACMAKE_CURRENT_PROJECT)
+            if(THIS_LIBRARY_RUNTIME_INSTALL_COMPONENT)
+                set(COMPONENT_RUNTIME     "${THIS_LIBRARY_RUNTIME_INSTALL_COMPONENT}")
+            else(THIS_LIBRARY_RUNTIME_INSTALL_COMPONENT)
+                set(COMPONENT_RUNTIME     "${ACMAKE_CURRENT_PROJECT}_runtime")
+            endif(THIS_LIBRARY_RUNTIME_INSTALL_COMPONENT)
+            if(THIS_LIBRARY_DEVELOPMENT_INSTALL_COMPONENT)
+                set(COMPONENT_DEVELOPMENT "${THIS_LIBRARY_DEVELOPMENT_INSTALL_COMPONENT}")
+            else(THIS_LIBRARY_DEVELOPMENT_INSTALL_COMPONENT)
+                set(COMPONENT_DEVELOPMENT "${ACMAKE_CURRENT_PROJECT}_development")
+            endif(THIS_LIBRARY_DEVELOPMENT_INSTALL_COMPONENT)
+            if(WIN32)
+                set(COMPONENT_LIBRARY ${COMPONENT_DEVELOPMENT})
+            else(WIN32)
+                set(COMPONENT_LIBRARY ${COMPONENT_RUNTIME})
+            endif(WIN32)
+        endif(ACMAKE_CURRENT_PROJECT)
+        # register target for installation
         install(
             TARGETS ${THIS_LIBRARY_NAME}
-                DESTINATION lib # XXX I think this is a hack to shut up cmake.
-            EXPORT  ${CMAKE_PROJECT_NAME}
             RUNTIME
                 DESTINATION bin
+                COMPONENT ${COMPONENT_RUNTIME}
             LIBRARY
                 DESTINATION lib
+                COMPONENT ${COMPONENT_LIBRARY}
             PUBLIC_HEADER
                 DESTINATION include/${THIS_LIBRARY_PATH}
+                COMPONENT ${COMPONENT_DEVELOPMENT}
         )
+
     endif(NOT THIS_LIBRARY_DONT_INSTALL)
 
     # create tests

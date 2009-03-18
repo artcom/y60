@@ -75,12 +75,26 @@ endif(GTKMM_FOUND AND GTKGLEXT_FOUND AND GLADEMM_FOUND)
 if(Y60_WITH_GTK)
     add_subdirectory(acgtk)
     add_subdirectory(jsgtk)
+
+    # XXX: these must come after some actual
+    #      use of the components due to a CPack bug
+    ac_add_installer_component(
+        G60_runtime
+        DISPLAY_NAME "G60 Runtime"
+        DESCRIPTION "Y60 GTK"
+    )
+    ac_add_installer_component(
+        G60_development
+        DISPLAY_NAME "G60 Development"
+        DESCRIPTION  "Y60 GTK"
+    )
 endif(Y60_WITH_GTK)
 
 # Install script library
 install(
     DIRECTORY js
     DESTINATION lib/y60
+    COMPONENT Y60_runtime
     FILES_MATCHING
         PATTERN "*.js"
         PATTERN ".svn" EXCLUDE
@@ -90,6 +104,7 @@ install(
 install(
     DIRECTORY shader
     DESTINATION lib/y60
+    COMPONENT Y60_runtime
     FILES_MATCHING
         PATTERN "*.cg"
         PATTERN "*.xml"
@@ -105,7 +120,7 @@ add_subdirectory(components)
 ac_add_doxygen(Y60 ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}/doc/doxygen Doxyfile.in)
 ac_add_xsddoc(Y60 ${CMAKE_CURRENT_SOURCE_DIR}/base/Y60.xsd ${CMAKE_CURRENT_BINARY_DIR}/doc/schema)
 
-# Generate Y60 javascript api reference
+# Generate Y60 javascript api reference (XXX: broken)
 make_directory(${CMAKE_CURRENT_BINARY_DIR}/doc/jsapi)
 add_custom_target(
     Y60-jsapi

@@ -3,6 +3,13 @@
 include(AcMake)
 
 function(y60_begin_application NAME)
+    parse_arguments(
+        APP
+        "DISPLAY_NAME;DESCRIPTION;DEPENDS;INSTALL_TYPES"
+        ""
+        ${ARGN}
+    )
+
     # Check for nesting
     if(Y60_CURRENT_APPLICATION)
         message(FATAL_ERROR "Y60 application ${NAME} nested in ${Y60_CURRENT_APPLICATION}")
@@ -19,6 +26,12 @@ function(y60_begin_application NAME)
 
     set_global(${NAME}_BUILD_PATH   "${CMAKE_CURRENT_BINARY_DIR};${CMAKE_CURRENT_SOURCE_DIR}")
     set_global(${NAME}_INSTALL_PATH ".")
+
+    # XXX: passthrough for late installer registration
+    set_global(${NAME}_DISPLAY_NAME  ${APP_DISPLAY_NAME})
+    set_global(${NAME}_DESCRIPTION   ${APP_DESCRIPTION})
+    set_global(${NAME}_INSTALL_TYPES ${APP_INSTALL_TYPES})
+    set_global(${NAME}_DEPENDS       ${APP_DEPENDS})
 endfunction(y60_begin_application)
 
 function(y60_add_assets DIRECTORY)
@@ -40,6 +53,7 @@ function(y60_add_assets DIRECTORY)
     install(
         DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/${DIRECTORY}/"
         DESTINATION "lib/${APPLICATION}/${DIRECTORY_NAME}"
+        COMPONENT ${APPLICATION}
         FILES_MATCHING
            ${THIS_ASSETS_PATTERNS}
            PATTERN ".svn" EXCLUDE
@@ -55,6 +69,7 @@ macro(y60_add_component COMPONENT_NAME)
     ac_add_plugin(
         ${COMPONENT_NAME} y60/components
         ${ARGN}
+        # XXX: install component
     )
     # XXX: semi-dirty path hack
     if(UNIX AND Y60_CURRENT_APPLICATION)
@@ -128,6 +143,7 @@ macro(y60_add_launcher NAME)
         )
         install(
             FILES ${CMAKE_CURRENT_BINARY_DIR}/${ACMAKE_BINARY_SUBDIR}/${NAME}
+            COMPONENT ${APPLICATION}
             DESTINATION bin/
             PERMISSIONS OWNER_EXECUTE GROUP_EXECUTE WORLD_EXECUTE
                         OWNER_READ    GROUP_READ    WORLD_READ
@@ -143,6 +159,21 @@ function(y60_end_application NAME)
 
     get_global(${NAME}_BUILD_PATH BUILD_PATH)
     get_global(${NAME}_INSTALL_PATH INSTALL_PATH)
+
+    get_global(${NAME}_DISPLAY_NAME  APP_DISPLAY_NAME)
+    get_global(${NAME}_DESCRIPTION   APP_DESCRIPTION)
+    get_global(${NAME}_INSTALL_TYPES APP_INSTALL_TYPES)
+    get_global(${NAME}_DEPENDS       APP_DEPENDS)
+
+    if(ACMAKE_CURRENT_PROJECT)
+        ac_add_installer_component(
+            ${NAME}
+            DISPLAY_NAME "${APP_DISPLAY_NAME}"
+            DESCRIPTION  "${APP_DESCRIPTION}"
+            INSTALL_TYPES ${APP_INSTALL_TYPES}
+            DEPENDS       ${APP_DEPENDS}
+        )
+    endif(ACMAKE_CURRENT_PROJECT)
 
     set(Y60_CURRENT_APPLICATION)
 endfunction(y60_end_application)

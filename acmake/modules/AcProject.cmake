@@ -73,6 +73,22 @@ macro(ac_is_integrated PROJECT_NAME OUT)
     set(_IS)
 endmacro(ac_is_integrated)
 
+set(PROJECT_ARGUMENTS
+    REQUIRED_PACKAGES
+    OPTIONAL_PACKAGES
+    REQUIRED_PKGCONFIG
+    OPTIONAL_PKGCONFIG
+    CUSTOM_SCRIPTS
+    CUSTOM_TEMPLATES
+    DEFINITIONS
+    # NOTE: installer stuff follows
+    VENDOR
+    CONTACT
+    DESCRIPTION
+    DESCRIPTION_FILE
+    LICENSE_FILE
+)
+
 # Add a project to the current build.
 #
 # This takes a name and some keyword arguments declaring
@@ -80,9 +96,10 @@ endmacro(ac_is_integrated)
 #
 macro(ac_add_project PROJECT_NAME)
     parse_arguments(THIS_PROJECT
-        "REQUIRED_PACKAGES;OPTIONAL_PACKAGES;REQUIRED_PKGCONFIG;OPTIONAL_PKGCONFIG;CUSTOM_SCRIPTS;CUSTOM_TEMPLATES;DEFINITIONS"
-        ";"
-        ${ARGN})
+        "${PROJECT_ARGUMENTS}"
+        "${PROJECT_FLAGS}"
+        ${ARGN}
+    )
 
     # Check for nesting
     if(ACMAKE_CURRENT_PROJECT)
@@ -183,7 +200,16 @@ macro(ac_add_project PROJECT_NAME)
     # Add project-wide cpp definitions
     # XXX: This is a bad place for this
     add_definitions(${THIS_PROJECT_DEFINITIONS})
-
+    
+    # Integrate with the installation framework
+    _ac_package_project(
+        ${PROJECT_NAME}
+        VENDOR           ${THIS_PROJECT_VENDOR}
+        CONTACT          ${THIS_PROJECT_CONTACT}
+        DESCRIPTION      ${THIS_PROJECT_DESCRIPTION}
+        DESCRIPTION_FILE ${THIS_PROJECT_DESCRIPTION_FILE}
+        LICENSE_FILE     ${THIS_PROJECT_LICENSE_FILE}
+    )    
 endmacro(ac_add_project PROJECT_NAME)
 
 # Internal method for adding targets into the current project.
@@ -410,11 +436,13 @@ macro(ac_end_project PROJECT_NAME)
             ${THIS_PROJECT_BINARY_DIR}/Find${PROJECT_NAME}Targets.cmake
             ${THIS_PROJECT_CUSTOM_SCRIPTS}
 	    DESTINATION share/cmake-2.6/Modules
+        COMPONENT ${PROJECT_NAME}_development
     )
     install(
         FILES
             ${THIS_PROJECT_CUSTOM_TEMPLATES}
 	    DESTINATION share/cmake-2.6/Templates
+        COMPONENT ${PROJECT_NAME}_development
     )
 
     # Remove our local copy of the project

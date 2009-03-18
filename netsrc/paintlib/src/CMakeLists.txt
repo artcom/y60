@@ -202,6 +202,7 @@ set_property(
 install(
     DIRECTORY Filter
     DESTINATION include/paintlib
+    COMPONENT Paintlib_development
     FILES_MATCHING
         PATTERN "*.h"
         PATTERN ".svn" EXCLUDE

@@ -43,7 +43,7 @@
 macro(ac_add_executable EXECUTABLE_NAME)
     # put arguments into the THIS_EXECUTABLE namespace
     parse_arguments(THIS_EXECUTABLE
-        "SOURCES;HEADERS;DEPENDS;EXTERNS"
+        "SOURCES;HEADERS;DEPENDS;EXTERNS;INSTALL_COMPONENT"
         "DONT_INSTALL;NO_REVISION_INFO"
         ${ARGN})
 
@@ -95,10 +95,18 @@ macro(ac_add_executable EXECUTABLE_NAME)
 
     # define installation
     if(NOT THIS_EXECUTABLE_DONT_INSTALL)
+        # figure out the component to install into
+        if(THIS_EXECUTABLE_INSTALL_COMPONENT)
+            set(COMPONENT "${THIS_EXECUTABLE_INSTALL_COMPONENT}")
+        else(THIS_EXECUTABLE_INSTALL_COMPONENT)
+            set(COMPONENT "${ACMAKE_CURRENT_PROJECT}_runtime")
+        endif(THIS_EXECUTABLE_INSTALL_COMPONENT)
+        # register executable for installation
         install(
             TARGETS ${THIS_EXECUTABLE_NAME}
-            EXPORT ${CMAKE_PROJECT_NAME}
-            RUNTIME DESTINATION bin
+            RUNTIME
+                DESTINATION bin
+                COMPONENT ${COMPONENT}
         )
     endif(NOT THIS_EXECUTABLE_DONT_INSTALL)
     

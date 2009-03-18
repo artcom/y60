@@ -27,9 +27,31 @@ set(ACMAKE_INTEGRATED_BUILD YES)
 set(ACMAKE_BUILDINFO_TEMPLATE
     ${CMAKE_CURRENT_SOURCE_DIR}/asl/base/buildinfo.cpp.in)
 
+
+
 # add and load acmake
 add_subdirectory(acmake)
 include(AcMake)
+
+ac_begin_solution(
+    PRO60
+    CONTACT     "info@y60.artcom.de"
+    VENDOR      "ART+COM AG"
+    DESCRIPTION "PRO60 Environment"
+)
+
+# XXX: define the component for AcMake.
+#      this can only be done once CPack has
+#      been loaded, which can't be done before
+#      defining our AcMake solution
+if(ACMAKE_BUILD_PACKAGES)
+cpack_add_component(
+    AcMake
+    DISPLAY_NAME "AcMake"
+    DESCRIPTION "ART+COM CMake Library"
+    INSTALL_TYPES development
+)
+endif(ACMAKE_BUILD_PACKAGES)
 
 # add our packages
 add_subdirectory(netsrc)
@@ -43,3 +65,5 @@ endif(EXISTS ${CMAKE_SOURCE_DIR}/../testmodels)
 if(EXISTS ${CMAKE_SOURCE_DIR}/../tutorials)
   add_subdirectory(../tutorials ${CMAKE_CURRENT_BINARY_DIR}/tutorials)
 endif(EXISTS ${CMAKE_SOURCE_DIR}/../tutorials)
+
+ac_end_solution(PRO60)

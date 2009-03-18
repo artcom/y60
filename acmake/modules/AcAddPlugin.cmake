@@ -50,7 +50,7 @@
 macro(ac_add_plugin PLUGIN_NAME PLUGIN_PATH)
     # put arguments into the THIS_PLUGIN namespace
     parse_arguments(THIS_PLUGIN
-        "SOURCES;HEADERS;DEPENDS;EXTERNS"
+        "SOURCES;HEADERS;DEPENDS;EXTERNS;DEVELOPMENT_INSTALL_COMPONENT;RUNTIME_INSTALL_COMPONENT"
         "DONT_INSTALL"
         ${ARGN})
     
@@ -108,15 +108,38 @@ macro(ac_add_plugin PLUGIN_NAME PLUGIN_PATH)
     
     # define installation
     if(NOT THIS_PLUGIN_DONT_INSTALL)
+        # figure out components to install into
+        set(COMPONENT_RUNTIME)
+        set(COMPONENT_DEVELOPMENT)
+        if(ACMAKE_CURRENT_PROJECT)
+            if(THIS_PLUGIN_RUNTIME_INSTALL_COMPONENT)
+                set(COMPONENT_RUNTIME     "${THIS_PLUGIN_RUNTIME_INSTALL_COMPONENT}")
+            else(THIS_PLUGIN_RUNTIME_INSTALL_COMPONENT)
+                set(COMPONENT_RUNTIME     "${ACMAKE_CURRENT_PROJECT}_runtime")
+            endif(THIS_PLUGIN_RUNTIME_INSTALL_COMPONENT)
+            if(THIS_PLUGIN_DEVELOPMENT_INSTALL_COMPONENT)
+                set(COMPONENT_DEVELOPMENT "${THIS_PLUGIN_DEVELOPMENT_INSTALL_COMPONENT}")
+            else(THIS_PLUGIN_DEVELOPMENT_INSTALL_COMPONENT)
+                set(COMPONENT_DEVELOPMENT "${ACMAKE_CURRENT_PROJECT}_development")
+            endif(THIS_PLUGIN_DEVELOPMENT_INSTALL_COMPONENT)
+            if(WIN32)
+                set(COMPONENT_LIBRARY ${COMPONENT_DEVELOPMENT})
+            else(WIN32)
+                set(COMPONENT_LIBRARY ${COMPONENT_RUNTIME})
+            endif(WIN32)
+        endif(ACMAKE_CURRENT_PROJECT)
+        # register target for installation
         install(
             TARGETS ${THIS_PLUGIN_NAME}
-            EXPORT ${CMAKE_PROJECT_NAME}
             RUNTIME
                 DESTINATION lib/${THIS_PLUGIN_PATH}
+                COMPONENT ${COMPONENT_RUNTIME}
             LIBRARY
                 DESTINATION lib/${THIS_PLUGIN_PATH}
+                COMPONENT ${COMPONENT_LIBRARY}
             PUBLIC_HEADER
                 DESTINATION include/${THIS_PLUGIN_PATH}/${THIS_PLUGIN_NAME}
+                COMPONENT ${COMPONENT_DEVELOPMENT}
         )
     endif(NOT THIS_PLUGIN_DONT_INSTALL)
 

@@ -7,6 +7,7 @@ ac_add_executable(
           y60glrender y60glutil y60gltext y60jsbase y60jslib
           y60modelling y60sdlengine y60acgtk y60jsgtk
           aslzip ${JSDEPENDS}
+  INSTALL_COMPONENT G60_runtime
 )
 
 # fix OpenGL/X11 link cycle problem
