@@ -64,6 +64,24 @@ macro(ac_end_solution NAME)
     endif(ACMAKE_CURRENT_PROJECT)
 endmacro(ac_end_solution)
 
+# Declare an additional install type.
+#
+# ac_add_install_type(
+#  name
+#  DISPLAY_NAME displayname
+# )
+#
+# Declares an additional type of installation.
+# These can be mentioned in components to
+# provide a pre-selected set of them for
+# specific installation use cases.
+#
+# This does not require a project context.
+#
+macro(ac_add_install_type NAME)
+    cpack_add_install_type(${NAME} ${ARGN})
+endmacro(ac_add_install_type)
+
 # Declare an installer component in the current project.
 #
 # ac_add_installer_component(
