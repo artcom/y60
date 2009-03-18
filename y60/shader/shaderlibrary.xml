@@ -2119,6 +2119,28 @@
             </properties>
         </fragmentshader>        
     </shader>    
+    <shader id="s1414141413" name="rgba2movies_inverted" cost="10">
+        <supports>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="texcoord" values="[`uv_map`]"/>
+            <feature class="option" values="[`rgba2movies_inverted`]"/>
+            <feature class="textures" values="[`paint`, `paint`]"/>            
+        </supports>
+        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`]" files="[`yuv2rgb.cg`]" entryfunctions="[`mainVertex`]">
+            <properties>
+            </properties>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`]" files="[`yuv2rgb.cg`]" entryfunctions="[`mainFragmentRGBA_inverted`]">
+            <properties>
+                <sampler2d name="tex0">0</sampler2d>
+                <sampler2d name="tex1">1</sampler2d>
+            </properties>
+        </fragmentshader>        
+    </shader>            
 </shaders>
 <combiners>
     <!-- 'previous' + 'texture' -->

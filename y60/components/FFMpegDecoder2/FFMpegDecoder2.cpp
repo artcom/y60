@@ -745,7 +745,6 @@ namespace y60 {
     void FFMpegDecoder2::setupVideo(const std::string & theFilename) {
         AC_DEBUG << "FFMpegDecoder2::setupVideo";
         AVCodecContext * myVCodec = _myVStream->codec;
-
         // open codec
         AVCodec * myCodec = avcodec_find_decoder(myVCodec->codec_id);
         if (!myCodec) {
@@ -913,13 +912,18 @@ namespace y60 {
     void FFMpegDecoder2::addCacheFrame(AVFrame* theFrame, double theTime) {
 		AC_DEBUG << "---- try to add frame at " << theTime;
         VideoMsgPtr myVideoFrame = createFrame(theTime);
-        if (_myDestinationPixelFormat == PIX_FMT_YUV420P ) {
+        AVCodecContext * myVCodec = _myVStream->codec;
+        if (myVCodec->pix_fmt==PIX_FMT_PAL8) {
             copyPlaneToRaster(myVideoFrame->getBuffer(0), theFrame->data[0], theFrame->linesize[0], _myFrameWidth, _myFrameHeight);
-            copyPlaneToRaster(myVideoFrame->getBuffer(1), theFrame->data[1], theFrame->linesize[1], _myFrameWidth/2, _myFrameHeight/2);
-            copyPlaneToRaster(myVideoFrame->getBuffer(2), theFrame->data[2], theFrame->linesize[2], _myFrameWidth/2, _myFrameHeight/2);
         } else {
-            convertFrame(theFrame, myVideoFrame->getBuffer());
-        }       
+            if (_myDestinationPixelFormat == PIX_FMT_YUV420P ) {
+                copyPlaneToRaster(myVideoFrame->getBuffer(0), theFrame->data[0], theFrame->linesize[0], _myFrameWidth, _myFrameHeight);
+                copyPlaneToRaster(myVideoFrame->getBuffer(1), theFrame->data[1], theFrame->linesize[1], _myFrameWidth/2, _myFrameHeight/2);
+                copyPlaneToRaster(myVideoFrame->getBuffer(2), theFrame->data[2], theFrame->linesize[2], _myFrameWidth/2, _myFrameHeight/2);
+            } else {
+                convertFrame(theFrame, myVideoFrame->getBuffer());            
+            }       
+        }
         _myMsgQueue.push_back(myVideoFrame);
         
         AC_DEBUG << "---- Added Frame to cache, Frame # : "
