@@ -79,7 +79,9 @@ endmacro(ac_end_solution)
 # This does not require a project context.
 #
 macro(ac_add_install_type NAME)
-    cpack_add_install_type(${NAME} ${ARGN})
+    if(ACMAKE_BUILD_PACKAGES)
+        cpack_add_install_type(${NAME} ${ARGN})
+    endif(ACMAKE_BUILD_PACKAGES)
 endmacro(ac_add_install_type)
 
 # Declare an installer component in the current project.
