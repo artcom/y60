@@ -12,9 +12,11 @@ struct simple_class {
 };
 
 Y60_APE_MODULE( ape_test_simple ) {
-    
+    using namespace y60::ape;
+
     Y60_APE_NS_SCOPE()
-        . function( "func", func );
+        . function( "func", func )
+        ;
 
     class_<simple_class>("simple_class")
         . function( "mem_func",        & simple_class::mem_func)

@@ -30,9 +30,6 @@ class binding {
         struct unique_id : boost::mpl::vector2<LocalUniqueId, UserModule> {};
 
     protected:
-        binding() {
-        }
-
         template <typename LocalUniqueId>
         detail::namespace_helper< typename unique_id<LocalUniqueId>::type >
         namespace_scope() {
@@ -40,26 +37,23 @@ class binding {
             return detail::namespace_helper<id>();
         }
 
-        template <typename Class>
-        detail::class_helper<Class>
-        class_(const char * name) {
-            typedef typename unique_id<Class>::type id;
-            typedef boost::shared_ptr<detail::class_desc<Class> > cp;
-            // XXX ugly
-            cp cd( new detail::class_desc<Class>(name,
-                            detail::current_scope->property_flags()));
-            detail::current_scope->add( cd );
-            detail::scope_lock class_scope_lock( new detail::scope(cd));
-            return detail::class_helper<Class>( class_scope_lock );
-        }
-
-        void enumerate(bool flag) {
-            detail::current_scope->enumerate(flag);
-        }
-
-        template <typename Class> friend class class_wrapper;
-    private:
 };
+
+template <typename Class>
+detail::class_helper<Class>
+class_(const char * name) {
+    typedef boost::shared_ptr<detail::class_desc<Class> > cp;
+    // XXX ugly
+    cp cd( new detail::class_desc<Class>(name,
+                    detail::current_scope->property_flags()));
+    detail::current_scope->add( cd );
+    detail::scope_lock class_scope_lock( new detail::scope(cd));
+    return detail::class_helper<Class>( class_scope_lock );
+}
+
+void enumerate(bool flag) {
+    detail::current_scope->enumerate(flag);
+}
 
 template <typename Binding>
 class module : public detail::ape_thing {
