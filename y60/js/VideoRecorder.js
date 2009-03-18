@@ -85,7 +85,7 @@ function VideoRecorder(theFramesPerSecond, theDirectory, theRenderWindow) {
         }
     }
 
-    Public.onFrame = function() {
+    Public.onFrame = function(theRenderArea) {
         if (_myEnabledFlag) {
             var myFileName = _myDirectory + "/frame";
             myFileName += padStringFront(_myFrameCount++, "0", 5);
