@@ -458,9 +458,15 @@ namespace y60 {
 
     inline unsigned
     SDLTextRenderer::parseNewline(const string & theText, unsigned thePos) {
-        if (theText[thePos] == '\n' && thePos < theText.size()) {
+        if (thePos < theText.size() && theText[thePos] == '\x0A')
+        {
             return 1;
         }
+        if (thePos + 1 < theText.size() && theText[thePos] == '\x0D' && theText[thePos+1] == '\x0A') 
+        {
+            return 2;
+        }
+        
         if (theText.size() > thePos + 3 && theText[thePos] == '<' &&
             theText[thePos + 2] == '/' && theText[thePos + 3] == '>')
         {
