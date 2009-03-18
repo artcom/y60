@@ -35,9 +35,11 @@ include(AcMake)
 
 ac_begin_solution(
     PRO60
-    CONTACT     "info@y60.artcom.de"
-    VENDOR      "ART+COM AG"
-    DESCRIPTION "PRO60 Environment"
+    DESCRIPTION  "PRO60 Environment"
+    VENDOR       "ART+COM AG"
+    CONTACT      "info@y60.artcom.de"
+    DESCRIPTION_FILE "${CMAKE_SOURCE_DIR}/DESCRIPTION.txt"
+    LICENSE_FILE     "${CMAKE_SOURCE_DIR}/LICENSE.txt"
 )
 
 # XXX: define the component for AcMake.

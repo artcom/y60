@@ -64,6 +64,11 @@ set(_AC_PROJECT_VARIABLES
     OPTIONAL_PKGCONFIG # bilist of all optional pkg-config packages
     CUSTOM_SCRIPTS   # custom scripts to be included in the find-package
     CUSTOM_TEMPLATES # custom templates for use by the find-package
+    VENDOR           # string describing the vendor
+    CONTACT          # contact information (email address)
+    DESCRIPTION      # short human-readable description
+    DESCRIPTION_FILE # build-time location of description file
+    LICENSE_FILE     # build-time location of license file
 )
 
 # Static method: check if a project is integrated or not
@@ -161,6 +166,13 @@ macro(ac_add_project PROJECT_NAME)
     set_global(${PROJECT_NAME}_CUSTOM_SCRIPTS   ${THIS_PROJECT_CUSTOM_SCRIPTS})
     set_global(${PROJECT_NAME}_CUSTOM_TEMPLATES ${THIS_PROJECT_CUSTOM_TEMPLATES})
 
+    # Remember various installer-related things
+    set_global(${PROJECT_NAME}_VENDOR           ${THIS_PROJECT_VENDOR})
+    set_global(${PROJECT_NAME}_CONTACT          ${THIS_PROJECT_CONTACT})
+    set_global(${PROJECT_NAME}_DESCRIPTION      ${THIS_PROJECT_DESCRIPTION})
+    set_global(${PROJECT_NAME}_DESCRIPTION_FILE ${THIS_PROJECT_DESCRIPTION_FILE})
+    set_global(${PROJECT_NAME}_LICENSE_FILE     ${THIS_PROJECT_LICENSE_FILE})
+
     # Add required cmake-packaged externals
     foreach(PACKAGE ${THIS_PROJECT_REQUIRED_PACKAGES})
         ac_project_add_extern_package(${PACKAGE} REQUIRED)
@@ -201,15 +213,6 @@ macro(ac_add_project PROJECT_NAME)
     # XXX: This is a bad place for this
     add_definitions(${THIS_PROJECT_DEFINITIONS})
     
-    # Integrate with the installation framework
-    _ac_package_project(
-        ${PROJECT_NAME}
-        VENDOR           ${THIS_PROJECT_VENDOR}
-        CONTACT          ${THIS_PROJECT_CONTACT}
-        DESCRIPTION      ${THIS_PROJECT_DESCRIPTION}
-        DESCRIPTION_FILE ${THIS_PROJECT_DESCRIPTION_FILE}
-        LICENSE_FILE     ${THIS_PROJECT_LICENSE_FILE}
-    )    
 endmacro(ac_add_project PROJECT_NAME)
 
 # Internal method for adding targets into the current project.
@@ -238,16 +241,14 @@ macro(ac_project_add_target TARGET_TYPE_PLURAL TARGET_NAME)
         set_global(${TARGET_NAME}_INCLUDE_DIRS ${CMAKE_INSTALL_PREFIX}/include)
         set_global(${TARGET_NAME}_LIBRARY_DIRS ${CMAKE_INSTALL_PREFIX}/lib)
 
-        # add externs to project object
-        foreach(EXTERN ${THIS_TARGET_EXTERNS})
-            append_global_unique(${ACMAKE_CURRENT_PROJECT}_EXTERNS ${EXTERN})
-        endforeach(EXTERN ${THIS_TARGET_EXTERNS})
+        if(THIS_TARGET_EXTERNS)
+            # add externs to project object
+            append_global_unique(${ACMAKE_CURRENT_PROJECT}_EXTERNS ${THIS_TARGET_EXTERNS})
 
-        # add externs to target object
-        foreach(EXTERN ${THIS_TARGET_EXTERNS})
-            debug_exports("Target depends on extern ${EXTERN}")
-            append_global_unique(${TARGET_NAME}_EXTERNS ${EXTERN})
-        endforeach(EXTERN ${THIS_TARGET_EXTERNS})
+            # add externs to target object
+            debug_exports("Target depends on externs: ${THIS_TARGET_EXTERNS}")
+            append_global_unique(${TARGET_NAME}_EXTERNS ${THIS_TARGET_EXTERNS})
+        endif(THIS_TARGET_EXTERNS)
 
         # add externs to target object
         foreach(DEPEND ${THIS_TARGET_DEPENDS})
@@ -447,6 +448,16 @@ macro(ac_end_project PROJECT_NAME)
 
     # Remove our local copy of the project
     clear_locals(THIS_PROJECT ${_AC_PROJECT_VARIABLES})
+
+    # Integrate with the installation framework
+    _ac_package_project(
+        ${PROJECT_NAME}
+        VENDOR           ${THIS_PROJECT_VENDOR}
+        CONTACT          ${THIS_PROJECT_CONTACT}
+        DESCRIPTION      ${THIS_PROJECT_DESCRIPTION}
+        DESCRIPTION_FILE ${THIS_PROJECT_DESCRIPTION_FILE}
+        LICENSE_FILE     ${THIS_PROJECT_LICENSE_FILE}
+    )
 
     # Leave the project context
     set(ACMAKE_CURRENT_PROJECT)

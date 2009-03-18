@@ -131,6 +131,7 @@ macro(ac_add_installer_component NAME)
             DISPLAY_NAME "${THIS_COMPONENT_DISPLAY_NAME}"
             DESCRIPTION  "${THIS_COMPONENT_DESCRIPTION}"
             INSTALL_TYPES ${THIS_COMPONENT_INSTALL_TYPES}
+            DEPENDS       ${THIS_COMPONENT_DEPENDS}
             ${GROUP_MEMBERSHIP}
         )
     endif(ACMAKE_BUILD_PACKAGES)
@@ -159,6 +160,20 @@ macro(_ac_package_project NAME)
             set(GROUP_MEMBERSHIP GROUP "${NAME}")
         endif(SOLUTION)
         
+        # collect dependencies to other projects in this build
+        set(DEVELOPMENT_DEPENDS)
+        set(RUNTIME_DEPENDS)
+        get_global(${NAME}_REQUIRED_PACKAGES REQ_PACKAGES)
+        get_global(${NAME}_OPTIONAL_PACKAGES OPT_PACKAGES)
+        foreach(PACKAGE ${REQ_PACKAGES} ${OPT_PACKAGES})
+            get_global(${PACKAGE}_IS_PROJECT    IS_PROJECT)
+            get_global(${PACKAGE}_IS_INTEGRATED IS_INTEGRATED)
+            if(IS_PROJECT AND IS_INTEGRATED)
+                list(APPEND DEVELOPMENT_DEPENDS "${PACKAGE}_development")
+                list(APPEND RUNTIME_DEPENDS     "${PACKAGE}_runtime")
+            endif(IS_PROJECT AND IS_INTEGRATED)
+        endforeach(PACKAGE ${REQ_PACKAGES} ${OPT_PACKAGES})
+
         # declare standard components that every
         # projects gets: one for the runtime and
         # one for development files
@@ -166,6 +181,7 @@ macro(_ac_package_project NAME)
             "${NAME}_runtime"
             DISPLAY_NAME "${NAME} Runtime"
             DESCRIPTION  "Runtime files for ${NAME}"
+            DEPENDS ${RUNTIME_DEPENDS}
             INSTALL_TYPES runtime development
             ${GROUP_MEMBERSHIP}
         )
@@ -173,7 +189,7 @@ macro(_ac_package_project NAME)
             "${NAME}_development"
             DISPLAY_NAME "${NAME} Development"
             DESCRIPTION  "Development files for ${NAME}"
-            DEPENDS "${NAME}_runtime"
+            DEPENDS "${NAME}_runtime" "AcMake" ${DEVELOPMENT_DEPENDS}
             INSTALL_TYPES development
             ${GROUP_MEMBERSHIP}
         )
