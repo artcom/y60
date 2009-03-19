@@ -13,4 +13,5 @@ y60_add_component(
     HEADERS ${HEADERS}
     DEPENDS y60jslib ${JSDEPENDS}
     EXTERNS  GLEW OPENEXR ${JSEXTERN}
+    DONT_INSTALL
 )
