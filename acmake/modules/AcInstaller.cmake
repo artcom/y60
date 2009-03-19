@@ -226,7 +226,7 @@ macro(_ac_declare_installer NAME)
     # parse arguments
     parse_arguments(
         INSTALLER
-        "CONTACT;VENDOR;DESCRIPTION;DESCRIPTION_FILE;LICENSE_FILE"
+        "CONTACT;VENDOR;DESCRIPTION;DESCRIPTION_FILE;LICENSE_FILE;PACKAGE_ICON;INSTALLER_ICON;UNINSTALLER_ICON"
         ""
         ${ARGN}
     )
@@ -248,6 +248,7 @@ macro(_ac_declare_installer NAME)
         set(CPACK_PACKAGE_NAME              ${NAME})
         set(CPACK_PACKAGE_INSTALL_DIRECTORY ${NAME})
 
+
         set(CPACK_PACKAGE_CONTACT ${INSTALLER_CONTACT})
         set(CPACK_PACKAGE_VENDOR  ${INSTALLER_VENDOR})
 
@@ -259,6 +260,15 @@ macro(_ac_declare_installer NAME)
         set(CPACK_PACKAGE_VERSION_MAJOR "1")
         set(CPACK_PACKAGE_VERSION_MINOR "0")
         set(CPACK_PACKAGE_VERSION_PATCH "0")
+
+        if(WIN32)
+            file(TO_NATIVE_PATH "${INSTALLER_PACKAGE_ICON}" PACKAGE_ICON_NSIS)
+            file(TO_NATIVE_PATH "${INSTALLER_INSTALLER_ICON}" INSTALLER_ICON_NSIS)
+            file(TO_NATIVE_PATH "${INSTALLER_UNINSTALLER_ICON}" UNINSTALLER_ICON_NSIS)
+            set(CPACK_PACKAGE_ICON     ${PACKAGE_ICON_NSIS})
+            set(CPACK_NSIS_MUI_ICON    ${INSTALLER_ICON_NSIS})
+            set(CPACK_NSIS_MUI_UNIICON ${UNINSTALLER_ICON_NSIS})
+        endif(WIN32)
 
         # load cpack helper
         include(CPack)

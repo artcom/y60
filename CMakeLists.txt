@@ -40,6 +40,9 @@ ac_begin_solution(
     CONTACT      "info@y60.artcom.de"
     DESCRIPTION_FILE "${CMAKE_SOURCE_DIR}/DESCRIPTION.txt"
     LICENSE_FILE     "${CMAKE_SOURCE_DIR}/LICENSE.txt"
+    PACKAGE_ICON     "${CMAKE_SOURCE_DIR}/installer/windows/NSIS-Header.bmp"
+    INSTALLER_ICON   "${CMAKE_SOURCE_DIR}/installer/windows/shopping_bag.ico"
+    UNINSTALLER_ICON "${CMAKE_SOURCE_DIR}/installer/windows/shopping_bag_grey.ico"
 )
 
 # XXX: define the component for AcMake.
