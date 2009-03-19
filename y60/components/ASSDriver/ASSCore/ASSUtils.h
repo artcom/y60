@@ -108,7 +108,7 @@ inline std::ostream & operator<<(std::ostream & os, const ASSEvent &theEvent) {
 
 DEFINE_EXCEPTION( ASSException, asl::Exception );
 
-dom::NodePtr getASSSettings(dom::NodePtr theSettings);
+Y60_ASSCORE_DECL dom::NodePtr getASSSettings(dom::NodePtr theSettings);
 
 
 

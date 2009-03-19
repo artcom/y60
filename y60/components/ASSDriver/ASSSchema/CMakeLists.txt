@@ -13,4 +13,6 @@ y60_add_component(
     HEADERS ${HEADERS}
     DEPENDS asldom y60input y60jsbase
     EXTERNS ${EXTERNALS}
+    RUNTIME_INSTALL_COMPONENT ASS_runtime
+    DEVELOPMENT_INSTALL_COMPONENT ASS_development
 )

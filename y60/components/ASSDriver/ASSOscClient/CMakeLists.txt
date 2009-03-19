@@ -11,16 +11,11 @@ JSASSOscClient.h
 y60_oscclient_settings.h
 )
 
-list( APPEND EXTERNALS OPENEXR )   
-
-if(WIN32)
-    list( APPEND EXTERNALS PTHREADVC )
-endif(WIN32)
-
 y60_add_component(
-    y60ASSOscPlugin 
+    y60ASSOscClient
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
-    EXTERNS ${EXTERNALS}
+    DEPENDS y60jslib y60ASSCore oscpackip oscpackosc
+    RUNTIME_INSTALL_COMPONENT ASS_runtime
+    DEVELOPMENT_INSTALL_COMPONENT ASS_development
 )
-

@@ -27,4 +27,6 @@ ac_add_library(
     HEADERS ${HEADERS}
     DEPENDS asldom aslmath y60jsbase y60jslib y60image y60scene 
     EXTERNS ${EXTERNALS}
+    RUNTIME_INSTALL_COMPONENT ASS_runtime
+    DEVELOPMENT_INSTALL_COMPONENT ASS_development
 )
