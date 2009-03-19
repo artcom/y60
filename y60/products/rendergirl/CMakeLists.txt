@@ -4,7 +4,7 @@ y60_begin_application(
     DISPLAY_NAME "Rendergirl"
     DESCRIPTION  "Gtk-based Y60 scene viewer"
     DEPENDS G60_runtime
-    INSTALL_TYPES development modelling
+    INSTALL_TYPES development
 )
 
 y60_add_assets(
