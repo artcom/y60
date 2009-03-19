@@ -32,7 +32,7 @@ DEALINGS IN THE SOFTWARE.
 
 -------------------------------------------------------------------------------
 The Y60 Media Engine is licensed under the GNU
-General Public License (GPL) in Version 3 as shown below.
+General Public License (GPL), version 3, as shown below.
 -------------------------------------------------------------------------------
 
                     GNU GENERAL PUBLIC LICENSE
@@ -659,7 +659,7 @@ copy of the Program in return for a fee.
 
 -------------------------------------------------------------------------------
 ACSDLTTF is based on SDL_ttf2, which is licensed under the
-GNU Library General Public license, Version 2, as shown below.
+GNU Library General Public license, version 2, as shown below.
 -------------------------------------------------------------------------------
 
 		  GNU LIBRARY GENERAL PUBLIC LICENSE
