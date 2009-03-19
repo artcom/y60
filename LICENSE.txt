@@ -2,8 +2,9 @@
 PRO60 is an aggregate of several components with differing licenses.
 
 -------------------------------------------------------------------------------
-The ART+COM Standard Library (ASL) is licensed under the
-terms of the Boost Software License as shown below.
+The ART+COM Standard Library (ASL) and the ART+COM CMake Library
+are licensed under the terms of the Boost Software License
+as shown below.
 -------------------------------------------------------------------------------
 Boost Software License - Version 1.0 - August 17th, 2003
 
