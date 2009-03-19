@@ -157,11 +157,6 @@ macro(ac_add_library LIBRARY_NAME LIBRARY_PATH)
             else(THIS_LIBRARY_DEVELOPMENT_INSTALL_COMPONENT)
                 set(COMPONENT_DEVELOPMENT "${ACMAKE_CURRENT_PROJECT}_development")
             endif(THIS_LIBRARY_DEVELOPMENT_INSTALL_COMPONENT)
-            if(WIN32)
-                set(COMPONENT_LIBRARY ${COMPONENT_DEVELOPMENT})
-            else(WIN32)
-                set(COMPONENT_LIBRARY ${COMPONENT_RUNTIME})
-            endif(WIN32)
         endif(ACMAKE_CURRENT_PROJECT)
         # register target for installation
         install(
@@ -171,7 +166,10 @@ macro(ac_add_library LIBRARY_NAME LIBRARY_PATH)
                 COMPONENT ${COMPONENT_RUNTIME}
             LIBRARY
                 DESTINATION lib
-                COMPONENT ${COMPONENT_LIBRARY}
+                COMPONENT ${COMPONENT_RUNTIME}
+            ARCHIVE
+                DESTINATION lib
+                COMPONENT ${COMPONENT_DEVELOPMENT}
             PUBLIC_HEADER
                 DESTINATION include/${THIS_LIBRARY_PATH}
                 COMPONENT ${COMPONENT_DEVELOPMENT}

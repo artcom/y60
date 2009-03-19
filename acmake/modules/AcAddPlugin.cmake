@@ -122,11 +122,6 @@ macro(ac_add_plugin PLUGIN_NAME PLUGIN_PATH)
             else(THIS_PLUGIN_DEVELOPMENT_INSTALL_COMPONENT)
                 set(COMPONENT_DEVELOPMENT "${ACMAKE_CURRENT_PROJECT}_development")
             endif(THIS_PLUGIN_DEVELOPMENT_INSTALL_COMPONENT)
-            if(WIN32)
-                set(COMPONENT_LIBRARY ${COMPONENT_DEVELOPMENT})
-            else(WIN32)
-                set(COMPONENT_LIBRARY ${COMPONENT_RUNTIME})
-            endif(WIN32)
         endif(ACMAKE_CURRENT_PROJECT)
         # register target for installation
         install(
@@ -136,7 +131,10 @@ macro(ac_add_plugin PLUGIN_NAME PLUGIN_PATH)
                 COMPONENT ${COMPONENT_RUNTIME}
             LIBRARY
                 DESTINATION lib/${THIS_PLUGIN_PATH}
-                COMPONENT ${COMPONENT_LIBRARY}
+                COMPONENT ${COMPONENT_RUNTIME}
+            ARCHIVE
+                DESTINATION lib/${THIS_PLUGIN_PATH}
+                COMPONENT ${COMPONENT_DEVELOPMENT}
             PUBLIC_HEADER
                 DESTINATION include/${THIS_PLUGIN_PATH}/${THIS_PLUGIN_NAME}
                 COMPONENT ${COMPONENT_DEVELOPMENT}
