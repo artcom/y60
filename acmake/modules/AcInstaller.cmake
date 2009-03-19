@@ -268,6 +268,8 @@ macro(_ac_declare_installer NAME)
             set(CPACK_PACKAGE_ICON     ${PACKAGE_ICON_NSIS})
             set(CPACK_NSIS_MUI_ICON    ${INSTALLER_ICON_NSIS})
             set(CPACK_NSIS_MUI_UNIICON ${UNINSTALLER_ICON_NSIS})
+            # XXX: should be configurable
+            set(CPACK_NSIS_MODIFY_PATH ON)
         endif(WIN32)
 
         # load cpack helper
