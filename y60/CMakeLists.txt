@@ -49,11 +49,6 @@ ac_add_project(Y60
         ${Y60_EXTRA_DEFINITIONS}
 )
 
-ac_add_install_type(
-    modelling
-    DISPLAY_NAME "Modelling"
-)
-
 # Make sure we can access our includes without staging
 include_directories(../ ${CMAKE_CURRENT_BINARY_DIR}/../)
 
