@@ -39,6 +39,11 @@ if(WIN32)
     # we need some flavour of ATL for the WMV and WMA components
     list(APPEND REQ_PACKAGES ATL)
 
+    # we always need to add FakeATL here so it will
+    # be in the dependency list in the installer
+    #  XXX: diry hack? does anything bad come from this?
+    list(APPEND REQ_PACKAGES FakeATL)
+
     # cairo backend
     list(APPEND REQ_PKGCONFIG CAIRO cairo-win32)
 
