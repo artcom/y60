@@ -22,32 +22,10 @@
 # __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 #
 
-option(ACMAKE_DEBUG_LINKAGE "Debug acmake target-specific linkage" NO)
-macro(debug_linkage)
-    if(ACMAKE_DEBUG_LINKAGE)
-        message("LINKAGE: ${ARGN}")
-    endif(ACMAKE_DEBUG_LINKAGE)
-endmacro(debug_linkage)
-
-option(ACMAKE_DEBUG_SEARCHPATH "Debug acmake target-specific searchpaths" NO)
-macro(debug_searchpath)
-    if(ACMAKE_DEBUG_SEARCHPATH)
-        message("SEARCHPATH: ${ARGN}")
-    endif(ACMAKE_DEBUG_SEARCHPATH)
-endmacro(debug_searchpath)
-
-option(ACMAKE_DEBUG_DEFINITIONS "Debug acmake target-specific definitions" NO)
-macro(debug_definitions)
-    if(ACMAKE_DEBUG_DEFINITIONS)
-        message("DEFINITIONS: ${ARGN}")
-    endif(ACMAKE_DEBUG_DEFINITIONS)
-endmacro(debug_definitions)
-
-macro(debug_target)
-    if(ACMAKE_DEBUG_LINKAGE OR ACMAKE_DEBUG_SEARCHPATH OR ACMAKE_DEBUG_DEFINITIONS)
-        message("TARGET: ${ARGN}")
-    endif(ACMAKE_DEBUG_LINKAGE OR ACMAKE_DEBUG_SEARCHPATH OR ACMAKE_DEBUG_DEFINITIONS)
-endmacro(debug_target)
+ac_define_debug_channel(target      "Debug target analysis")
+ac_define_debug_channel(linkage     "Debug target linkage")
+ac_define_debug_channel(searchpaths "Debug target searchpaths")
+ac_define_debug_channel(definitions "Debug target definitions")
 
 # utility function for extending FLAGS-like target properties
 function(_ac_prepend_target_flag TARGET PROPERTY VALUE)
@@ -58,7 +36,7 @@ endfunction(_ac_prepend_target_flag TARGET PROPERTY VALUE)
 # add include path to a target for its own use
 # PROPAGATE indicates if this path should be used in dependents
 function(_ac_add_include_path TARGET PATH PROPAGATE)
-    debug_searchpath("${TARGET} gets include path ${PATH}")
+    ac_debug_searchpaths("${TARGET} gets include path ${PATH}")
     if(MSVC)
         _ac_prepend_target_flag(${TARGET} COMPILE_FLAGS "/I \"${PATH}\"")
     else(MSVC)
@@ -72,7 +50,7 @@ endfunction(_ac_add_include_path TARGET PATH)
 # add library path to a target for its own use
 # PROPAGATE indicates if this path should be used in dependents
 function(_ac_add_library_path TARGET PATH PROPAGATE)
-    debug_searchpath("${TARGET} gets library path ${PATH}")
+    ac_debug_searchpaths("${TARGET} gets library path ${PATH}")
     if(MSVC)
         _ac_prepend_target_flag(${TARGET} LINK_FLAGS "/LIBPATH:\"${PATH}\"")
     else(MSVC)
@@ -231,7 +209,7 @@ endfunction(_ac_compute_dependencies)
 # attach libraries from DEPENDS and EXTERNS to TARGET
 macro(_ac_attach_depends TARGET DEPENDS EXTERNS)
 
-    debug_target("Attaching dependencies for ${TARGET}")
+    ac_debug_target("attaching dependencies for ${TARGET}")
 
     ### COLLECT DEFINITIONS
 
@@ -259,7 +237,7 @@ macro(_ac_attach_depends TARGET DEPENDS EXTERNS)
 
     # report definitions
     if(ALL_DEFINITIONS)
-        debug_definitions("${TARGET} will be compiled with definitions ${ALL_DEFINITIONS}")
+        ac_debug_definitions("${TARGET} will be compiled with definitions ${ALL_DEFINITIONS}")
     endif(ALL_DEFINITIONS)
 
 
@@ -312,16 +290,16 @@ macro(_ac_attach_depends TARGET DEPENDS EXTERNS)
 
     # link common libraries
     target_link_libraries(${TARGET} ${COMMON_LIBRARIES})
-    debug_linkage("${TARGET} always links against ${COMMON_LIBRARIES}")
+    ac_debug_linkage("${TARGET} always links against ${COMMON_LIBRARIES}")
 
     # link variant-specific libraries one by one
     foreach(LIBRARY ${DEBUG_LIBRARIES})
         target_link_libraries(${TARGET} debug ${LIBRARY})
-        debug_linkage("${TARGET}, when compiled debug, links against ${LIBRARY}")
+        ac_debug_linkage("${TARGET}, when compiled debug, links against ${LIBRARY}")
     endforeach(LIBRARY ${DEBUG_LIBRARIES})
     foreach(LIBRARY ${OPTIMIZED_LIBRARIES})
         target_link_libraries(${TARGET} optimized ${LIBRARY})
-        debug_linkage("${TARGET}, when compiled optimized, links against ${LIBRARY}")
+        ac_debug_linkage("${TARGET}, when compiled optimized, links against ${LIBRARY}")
     endforeach(LIBRARY ${OPTIMIZED_LIBRARIES})
 
 
@@ -364,7 +342,7 @@ macro(_ac_collect_dependency_paths TARGET LIBS INCS DEPENDS EXTERNS)
     set(_LIBRARY)
     set(_INCLUDE)
 
-    debug_searchpath("Collecting search paths for ${TARGET}")
+    ac_debug_searchpaths("collecting paths for dependencies of ${TARGET}")
 
     foreach(DEPEND ${DEPENDS})
         get_global(${DEPEND}_LIBRARY_DIRS ${DEPEND}_LIBRARY_DIRS)

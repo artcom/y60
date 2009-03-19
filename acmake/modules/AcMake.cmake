@@ -44,6 +44,8 @@ include(FindPkgConfig)
 
 include(AcGlobal)
 
+include(AcDebug)
+
 include(AcBoostUtils)
 include(AcFileUtils)
 include(AcVariableUtils)

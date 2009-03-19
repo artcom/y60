@@ -24,12 +24,8 @@
 # __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 #
 
-option(ACMAKE_DEBUG_EXPORTS "Debug acmake project export mechanism" NO)
-macro(debug_exports)
-    if(ACMAKE_DEBUG_EXPORTS)
-        message("EXPORTS: ${ARGN}")
-    endif(ACMAKE_DEBUG_EXPORTS)
-endmacro(debug_exports)
+ac_define_debug_channel(project "Debug project analysis")
+ac_define_debug_channel(exports "Debug project exports")
 
 # Class declaration for projects.
 #
@@ -105,6 +101,8 @@ macro(ac_add_project PROJECT_NAME)
         "${PROJECT_FLAGS}"
         ${ARGN}
     )
+
+    ac_debug_project("${PROJECT_NAME} begins")
 
     # Check for nesting
     if(ACMAKE_CURRENT_PROJECT)
@@ -226,7 +224,7 @@ macro(ac_project_add_target TARGET_TYPE_PLURAL TARGET_NAME)
 
     # if we are not in a project, we ignore the call
     if(ACMAKE_CURRENT_PROJECT)
-        debug_exports("Registering target ${TARGET_NAME} into ${TARGET_TYPE_PLURAL} of ${ACMAKE_CURRENT_PROJECT}")
+        ac_debug_project("registering target ${TARGET_NAME} with project ${ACMAKE_CURRENT_PROJECT} under ${TARGET_TYPE_PLURAL}")
 
         # mark the target as coming from this project
         set_global(${TARGET_NAME}_PROJECT ${ACMAKE_CURRENT_PROJECT})
@@ -234,29 +232,35 @@ macro(ac_project_add_target TARGET_TYPE_PLURAL TARGET_NAME)
         # add the target to the projects list for the appropriate type
         append_global(${ACMAKE_CURRENT_PROJECT}_${TARGET_TYPE_PLURAL} ${TARGET_NAME})
 
-        # fill the target object
+        # fill out the target object
         set_global(${TARGET_NAME}_LIBRARIES    ${TARGET_NAME})
         set_global(${TARGET_NAME}_DEPENDS      "")
         set_global(${TARGET_NAME}_EXTERNS      "")
         set_global(${TARGET_NAME}_INCLUDE_DIRS ${CMAKE_INSTALL_PREFIX}/include)
         set_global(${TARGET_NAME}_LIBRARY_DIRS ${CMAKE_INSTALL_PREFIX}/lib)
 
+        # add externs to target object
         if(THIS_TARGET_EXTERNS)
+            ac_debug_exports("target has externs ${THIS_TARGET_EXTERNS}")
+
             # add externs to project object
             append_global_unique(${ACMAKE_CURRENT_PROJECT}_EXTERNS ${THIS_TARGET_EXTERNS})
 
             # add externs to target object
-            debug_exports("Target depends on externs: ${THIS_TARGET_EXTERNS}")
             append_global_unique(${TARGET_NAME}_EXTERNS ${THIS_TARGET_EXTERNS})
         endif(THIS_TARGET_EXTERNS)
 
-        # add externs to target object
-        foreach(DEPEND ${THIS_TARGET_DEPENDS})
-            debug_exports("Target depends on depend ${DEPEND}")
-            append_global_unique(${TARGET_NAME}_DEPENDS ${DEPEND})
-        endforeach(DEPEND ${THIS_TARGET_DEPENDS})
+        # add depends to target object
+        if(THIS_TARGET_DEPENDS)
+            ac_debug_exports("target has depends: ${THIS_TARGET_DEPENDS}")
+
+            foreach(DEPEND ${THIS_TARGET_DEPENDS})
+                append_global_unique(${TARGET_NAME}_DEPENDS ${DEPEND})
+            endforeach(DEPEND ${THIS_TARGET_DEPENDS})
+        endif(THIS_TARGET_DEPENDS)
 
         # for each depend, add the externs it pulls in
+        set(_ALL_IMPLICIT_EXTERNS)
         foreach(DEPEND ${THIS_TARGET_DEPENDS})
             # we need to know from which project the depend comes
             get_global(${DEPEND}_PROJECT _DEPEND_PROJECT )
@@ -264,10 +268,13 @@ macro(ac_project_add_target TARGET_TYPE_PLURAL TARGET_NAME)
             get_global(${_DEPEND_PROJECT}_${DEPEND}_EXTERNS _IMPLICIT_EXTERNS )
             # and add it if there is anything to add
             if(_IMPLICIT_EXTERNS)
-                debug_exports("Found ${DEPEND} to require ${_IMPLICIT_EXTERNS}")
                 append_global_unique(${TARGET_NAME}_EXTERNS ${_IMPLICIT_EXTERNS})
+                list(APPEND _ALL_IMPLICIT_EXTERNS ${_IMPLICIT_EXTERNS})
             endif(_IMPLICIT_EXTERNS)
         endforeach(DEPEND ${THIS_TARGET_DEPENDS})
+        if(_ALL_IMPLICIT_EXTERNS)
+            ac_debug_exports("target has transient externs: ${_ALL_IMPLICIT_EXTERNS}")
+        endif(_ALL_IMPLICIT_EXTERNS)
     endif(ACMAKE_CURRENT_PROJECT)
 endmacro(ac_project_add_target TARGET_TYPE_PLURAL TARGET_NAME)
 
@@ -461,4 +468,6 @@ macro(ac_end_project PROJECT_NAME)
 
     # Leave the project context
     set(ACMAKE_CURRENT_PROJECT)
+
+    ac_debug_project("${PROJECT_NAME} ends")
 endmacro(ac_end_project PROJECT_NAME)
