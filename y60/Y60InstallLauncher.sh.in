@@ -3,21 +3,14 @@
 wdir="@THIS_LAUNCHER_INSTALL_WORKING_DIR@"
 
 loc=`which $0`
-echo "BINLOC ${loc}"
 dir=`dirname ${loc}`
-echo "BINDIR ${dir}"
 pfx="${dir}/.."
-echo "PREFIX ${pfx}"
 
 if [ -n "${wdir}" ]; then
-    echo "we got a wdir"
     if [ "${wdir}" = "ASSETS" ]; then
-        echo "changing to ${pfx}/lib/@APPLICATION@"
         cd "${pfx}/lib/@APPLICATION@"
     else
-        echo "changing to ${pfx}"
         cd "${pfx}"
-        echo "changing to ${wdir}"
         cd "${wdir}"
     fi
 fi
@@ -29,7 +22,6 @@ spath=`echo ${relpath} | tr ';' ' '`
 for path in ${spath}; do
     n="${pfx}/lib/@APPLICATION@/${path}"
     npath="${n};${npath}"
-    echo "converted path ${path} to ${n}"
 done
 
 
