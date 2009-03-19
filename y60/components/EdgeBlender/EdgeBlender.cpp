@@ -52,7 +52,11 @@
 //    overall review status  : unknown
 //
 //    recommendations: 
-//       - unknown
+//          - use pixelspace instead of texturespace [DS]
+//          - avoid rotations; use symmetric bars and corner tiles [DS]
+//          - store vertexdata on the GPU; it's constant [DS]
+//          - maybe this thing shouldn't exist at all. maybe it's better to do
+//            it in a postproc shader? [DS]
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
@@ -108,6 +112,16 @@ class EdgeBlender :
         }
 
     private:
+        inline
+        float
+        getXBlendWidth() const {
+            return float(_myBlendWidth[0]) / _myWindowWidth;
+        }
+        inline
+        float
+        getYBlendWidth() const {
+            return float(_myBlendWidth[1]) / _myWindowHeight;
+        }
         void renderMultiScreen();
         void renderBlending();
 
@@ -118,8 +132,9 @@ class EdgeBlender :
         void renderTexture(float thePosX, float thePosY,
                 float theStartX, float theStartY, float theEndX, float theEndY);
         void rotateTo(unsigned theEdge);
-        void drawBlendedEdge(float theStart, float theEnd, float theMargin = 0.0f);
-        void drawBlendedCorner(float theMarginX, float theMarginY);
+        void drawBlendedEdge(float theStart, float theEnd, float theBlendWidth, float theMargin = 0.0f);
+        void drawBlendedCorner(float theMarginX, float theMarginY, 
+                float theXSize, float theYSize);
         void drawBlackLevel(float theLeft, float theTop, float theRight, float theBottom);
         float getBlendValue(float theValue);
         GLint _mySavedViewport[4];
@@ -173,9 +188,10 @@ class EdgeBlender :
         };
         unsigned  _myEdges;
 
-        unsigned _myRowCount, _myColumnCount;
+        unsigned _myRowCount;
+        unsigned _myColumnCount;
 
-        float _myBlendWidth;
+        asl::Vector2f _myBlendWidth; // in pixels
         unsigned _myNumSubdivisions;
 
         float _myBlackLevel;
@@ -196,29 +212,30 @@ class EdgeBlender :
 
 EdgeBlender::EdgeBlender(asl::DLHandle theDLHandle) :
     asl::PlugInBase(theDLHandle),
-    IRendererExtension("EdgeBlender")
-{
-    _myMode = MODE_MULTI_SCREEN;
-    _myEdges = 0;
-    _myBlendWidth = 0.2f;
-    _myNumSubdivisions = 32;
-    _myBlackLevel = 0.1f;
-    _myBlPosOffset = asl::Vector2f(0.0f, 0.0f);
-    _myPower = 1.5f;
-    _myGamma = 1.2f;
-    _myRowCount = 1;
-    _myColumnCount = 2;
+    IRendererExtension("EdgeBlender"),
 
-    _myPreGridFlag = _myPostGridFlag = false;
-    _myBlendingFlag = true;
-    _myBlackLevelFlag = true;
+    _myMode(MODE_MULTI_SCREEN),
 
-    _myCopyFrameBufferFlag = false;
-    _myFrameBuffer = 0;
-}
+    _myEdges( 0 ),
+    _myRowCount(1),
+    _myColumnCount(2),
+    _myBlendWidth( 96.f, 96.f ),
+    _myNumSubdivisions( 32 ),
+    _myBlackLevel( 0.1f ),
+    _myBlPosOffset(0.0f, 0.0f),
+    _myPower(1.5f),
+    _myGamma(1.2f),
+
+    _myPreGridFlag(false),
+    _myPostGridFlag(false),
+    _myBlendingFlag(true),
+    _myBlackLevelFlag(true),
+
+    _myCopyFrameBufferFlag(false),
+    _myFrameBuffer(0)
+{}
 
 EdgeBlender::~EdgeBlender() {
-
     if (_myFrameBuffer) {
         delete[] _myFrameBuffer;
     }
@@ -263,7 +280,7 @@ EdgeBlender::onGetProperty(const std::string & thePropertyName,
     if (thePropertyName == "edges") {
         theReturnValue.set<unsigned>(_myEdges);
     } else if (thePropertyName == "blendwidth") {
-        theReturnValue.set<float>(_myBlendWidth);
+        theReturnValue.set<asl::Vector2f>(_myBlendWidth);
     } else if (thePropertyName == "subdivisions") {
         theReturnValue.set<unsigned>(_myNumSubdivisions);
     } else if (thePropertyName == "blacklevel") {
@@ -301,7 +318,7 @@ EdgeBlender::onSetProperty(const std::string & thePropertyName,
     if (thePropertyName == "edges") {
         _myEdges = thePropertyValue.get<unsigned>();
     } else if (thePropertyName == "blendwidth") {
-        _myBlendWidth = thePropertyValue.get<float>();
+        _myBlendWidth = thePropertyValue.get<asl::Vector2f>();
     } else if (thePropertyName == "subdivisions") {
         _myNumSubdivisions = thePropertyValue.get<unsigned>();
     } else if (thePropertyName == "blacklevel") {
@@ -411,13 +428,14 @@ EdgeBlender::drawGrid(const asl::Vector4f & theColor, unsigned theGridSize)
 void
 EdgeBlender::renderMultiScreen()
 {
-	//return;
     copyToTexture();
-    //glClear(GL_COLOR_BUFFER_BIT); // UH: not necessary since we overwrite the entire screen
+
+    float myXBlendWidth = getXBlendWidth();
+    float myYBlendWidth = getYBlendWidth();
 
     // draw scene texture to suitable parts of the screen w/o any blending
-    float myTextureOffsetX = (_myColumnCount-1) * _myBlendWidth * 0.5f;
-    float myTextureOffsetY = (_myRowCount-1) * _myBlendWidth * 0.5f;
+    float myTextureOffsetX = (_myColumnCount-1) * myXBlendWidth * 0.5f;
+    float myTextureOffsetY = (_myRowCount-1) * myYBlendWidth * 0.5f;
     float myTexCoordY0 = myTextureOffsetY;
 
     // draw scene texture
@@ -432,9 +450,9 @@ EdgeBlender::renderMultiScreen()
             float myTexCoordX1 = myTexCoordX0 + 1.0f / _myColumnCount;
 
             renderTexture(myX, myY, myTexCoordX0, myTexCoordY0, myTexCoordX1, myTexCoordY1);
-            myTexCoordX0 = myTexCoordX1 - _myBlendWidth;
+            myTexCoordX0 = myTexCoordX1 - myXBlendWidth;
         }
-        myTexCoordY0 = myTexCoordY1 - _myBlendWidth;
+        myTexCoordY0 = myTexCoordY1 - myYBlendWidth;
     }
     glDisable(GL_TEXTURE_2D);
 
@@ -442,10 +460,10 @@ EdgeBlender::renderMultiScreen()
     if (_myBlendingFlag) {
         for(unsigned i = 0; i < _myRowCount; ++i) {
             float myY  = float(i) / _myRowCount;
-            float myY0 = (i > 0 ? myY + _myBlendWidth : myY);
+            float myY0 = (i > 0 ? myY + myYBlendWidth : myY);
             float myY1 = float(i+1) / _myRowCount;
             if (i < _myRowCount-1) {
-                myY1 -= _myBlendWidth;
+                myY1 -= myYBlendWidth;
             }
             if (_myBlackLevelFlag) {
                 myY0 += i > 0 ? _myBlPosOffset[1] : 0.0f;
@@ -454,10 +472,10 @@ EdgeBlender::renderMultiScreen()
             
             for(unsigned j = 0; j < _myColumnCount; ++j) {
                 float myX  = float(j) / _myColumnCount;
-                float myX0 = (j > 0 ? myX + _myBlendWidth : myX);
+                float myX0 = (j > 0 ? myX + myXBlendWidth : myX);
                 float myX1 = float(j+1) / _myColumnCount;
                 if (j < _myColumnCount-1) {
-                    myX1 -= _myBlendWidth;
+                    myX1 -= myXBlendWidth;
                 }
 
                 if (_myBlackLevelFlag) {
@@ -468,25 +486,26 @@ EdgeBlender::renderMultiScreen()
 
                 if (j > 0) {
                     rotateTo(BLEND_EDGE_RIGHT);
-                    drawBlendedEdge(myY0, myY1, myX);
+                    drawBlendedEdge(myY0, myY1, myXBlendWidth, myX);
                     rotateTo(BLEND_EDGE_LEFT);
-                    drawBlendedEdge(myY0, myY1, myX);
+                    drawBlendedEdge(myY0, myY1, myXBlendWidth, myX);
                 }
                 if (i > 0) {
                     rotateTo(BLEND_EDGE_UP);
-                    drawBlendedEdge(myX0, myX1, myY);
+                    drawBlendedEdge(myX0, myX1, myYBlendWidth, myY);
                     rotateTo(BLEND_EDGE_DOWN);
-                    drawBlendedEdge(myX0, myX1, myY);
+                    drawBlendedEdge(myX0, myX1, myYBlendWidth, myY);
                 }
                 if (j > 0 && i > 0) {
+                    // XXX TODO Corners!!!
                     rotateTo(BLEND_EDGE_LEFT);
-                    drawBlendedCorner(myX, myY);
+                    drawBlendedCorner(myX, myY, myXBlendWidth, myYBlendWidth);
                     rotateTo(BLEND_EDGE_UP);
-                    drawBlendedCorner(myY, myX);
+                    drawBlendedCorner(myY, myX, myYBlendWidth, myXBlendWidth);
                     rotateTo(BLEND_EDGE_RIGHT);
-                    drawBlendedCorner(myX, myY);
+                    drawBlendedCorner(myX, myY, myXBlendWidth, myYBlendWidth);
                     rotateTo(BLEND_EDGE_DOWN);
-                    drawBlendedCorner(myY, myX);
+                    drawBlendedCorner(myY, myX, myYBlendWidth, myXBlendWidth);
                 }
             }
         }
@@ -495,64 +514,66 @@ EdgeBlender::renderMultiScreen()
 
 void
 EdgeBlender::renderBlending() {
+    float myXBlendWidth = getXBlendWidth();
+    float myYBlendWidth = getYBlendWidth();
 
     // blended edges
     if (_myEdges & BLEND_EDGE_LEFT) {
         float myStart = (_myEdges & BLEND_EDGE_UP) ?
-            _myBlendWidth : 0.0f;
+            myYBlendWidth : 0.0f;
         float myEnd = (_myEdges & BLEND_EDGE_DOWN) ?
-            1.0f - _myBlendWidth : 1.0f;
+            1.0f - myYBlendWidth : 1.0f;
         rotateTo(BLEND_EDGE_LEFT);
-        drawBlendedEdge(myStart, myEnd);
+        drawBlendedEdge(myStart, myEnd, myXBlendWidth);
     }
     if (_myEdges & BLEND_EDGE_RIGHT) {
         float myStart = (_myEdges & BLEND_EDGE_DOWN) ?
-            _myBlendWidth : 0.0f;
+            myYBlendWidth : 0.0f;
         float myEnd = (_myEdges & BLEND_EDGE_UP) ?
-            1.0f - _myBlendWidth : 1.0f;
+            1.0f - myYBlendWidth : 1.0f;
         rotateTo(BLEND_EDGE_RIGHT);
-        drawBlendedEdge(myStart, myEnd);
+        drawBlendedEdge(myStart, myEnd, myXBlendWidth);
     }
     if (_myEdges & BLEND_EDGE_UP) {
         float myStart = (_myEdges & BLEND_EDGE_RIGHT) ?
-            _myBlendWidth : 0.0f;
+            myXBlendWidth : 0.0f;
         float myEnd = (_myEdges & BLEND_EDGE_LEFT) ?
-            1.0f - _myBlendWidth : 1.0f;
+            1.0f - myXBlendWidth : 1.0f;
         rotateTo(BLEND_EDGE_UP);
-        drawBlendedEdge(myStart, myEnd);
+        drawBlendedEdge(myStart, myEnd, myYBlendWidth);
     }
     if (_myEdges & BLEND_EDGE_DOWN) {
         float myStart = (_myEdges & BLEND_EDGE_LEFT) ?
-            _myBlendWidth : 0.0f;
+            myXBlendWidth : 0.0f;
         float myEnd = (_myEdges & BLEND_EDGE_RIGHT) ?
-            1.0f - _myBlendWidth : 1.0f;
+            1.0f - myXBlendWidth : 1.0f;
         rotateTo(BLEND_EDGE_DOWN);
-        drawBlendedEdge(myStart, myEnd);
+        drawBlendedEdge(myStart, myEnd, myYBlendWidth);
     }
 
     // corners
     if (_myEdges & BLEND_EDGE_LEFT && _myEdges & BLEND_EDGE_UP) {
         rotateTo(BLEND_EDGE_LEFT);
-        drawBlendedCorner(0.0f, 0.0f);
+        drawBlendedCorner(0.0f, 0.0f, myXBlendWidth, myYBlendWidth);
     }
     if (_myEdges & BLEND_EDGE_UP && _myEdges & BLEND_EDGE_RIGHT) {
         rotateTo(BLEND_EDGE_UP);
-        drawBlendedCorner(0.0f, 0.0f);
+        drawBlendedCorner(0.0f, 0.0f, myYBlendWidth, myXBlendWidth);
     }
     if (_myEdges & BLEND_EDGE_RIGHT && _myEdges & BLEND_EDGE_DOWN) {
         rotateTo(BLEND_EDGE_RIGHT);
-        drawBlendedCorner(0.0f, 0.0f);
+        drawBlendedCorner(0.0f, 0.0f, myXBlendWidth, myYBlendWidth);
     }
     if (_myEdges & BLEND_EDGE_DOWN && _myEdges & BLEND_EDGE_LEFT) {
         rotateTo(BLEND_EDGE_DOWN);
-        drawBlendedCorner(0.0f, 0.0f);
+        drawBlendedCorner(0.0f, 0.0f, myYBlendWidth, myXBlendWidth);
     }
 
     // blacklevel
-    float myLeft = _myEdges & BLEND_EDGE_LEFT ? _myBlendWidth : 0.0f;
-    float myRight = _myEdges & BLEND_EDGE_RIGHT ? 1.0f - _myBlendWidth : 1.0f;
-    float myTop = _myEdges & BLEND_EDGE_UP ? _myBlendWidth : 0.0f;
-    float myBottom = _myEdges & BLEND_EDGE_DOWN ? 1.0f - _myBlendWidth : 1.0f;
+    float myLeft = _myEdges & BLEND_EDGE_LEFT ? myXBlendWidth : 0.0f;
+    float myRight = _myEdges & BLEND_EDGE_RIGHT ? 1.0f - myXBlendWidth : 1.0f;
+    float myTop = _myEdges & BLEND_EDGE_UP ? myYBlendWidth : 0.0f;
+    float myBottom = _myEdges & BLEND_EDGE_DOWN ? 1.0f - myYBlendWidth : 1.0f;
     drawBlackLevel(myLeft, myTop, myRight, myBottom);
 }
 
@@ -684,7 +705,7 @@ EdgeBlender::rotateTo(unsigned theEdge) {
  * satisfies f(x) + f(1-x) = 1 forall x
  */
 void
-EdgeBlender::drawBlendedEdge(float theStart, float theEnd, float theMargin) {
+EdgeBlender::drawBlendedEdge(float theStart, float theEnd, float theBlendWidth, float theMargin) {
 
     AC_DEBUG << "drawBlendedEdge start " << theStart << " end " << theEnd;
     float myDelta = 1.0f / _myNumSubdivisions;
@@ -697,7 +718,7 @@ EdgeBlender::drawBlendedEdge(float theStart, float theEnd, float theMargin) {
         //glColor4f(0.0f, myBlendValue, 0.0f, max(0.2f, 1.0f - myBlendValue));
         glColor4f(0.0f, 0.0f, 0.0f, 1.0f - myBlendValue);
 
-        float myXPos = theMargin + myX * _myBlendWidth;
+        float myXPos = theMargin + myX * theBlendWidth;
         glVertex2f(myXPos, theStart);
         glVertex2f(myXPos, theEnd);
     }
@@ -715,7 +736,8 @@ EdgeBlender::drawBlendedEdge(float theStart, float theEnd, float theMargin) {
  * g(x,y) + g(1-x,y) + g(x,1-y) + g(1-x,1-y) = 1 forall x,y
  */
 void
-EdgeBlender::drawBlendedCorner(float theMarginX, float theMarginY) {
+EdgeBlender::drawBlendedCorner(float theMarginX, float theMarginY,
+        float theXSize, float theYSize) {
 
     for (unsigned i = 0; i < _myNumSubdivisions; ++i) {
         float myY = float(i) / _myNumSubdivisions;
@@ -727,8 +749,8 @@ EdgeBlender::drawBlendedCorner(float theMarginX, float theMarginY) {
             float myX = float(j) / _myNumSubdivisions;
             float myXBlendValue = getBlendValue( myX);
 
-            float myXPos = theMarginX + myX * _myBlendWidth;
-            float myYPos = theMarginY + myY * _myBlendWidth;
+            float myXPos = theMarginX + myX * theXSize;
+            float myYPos = theMarginY + myY * theYSize;
 
             float myBlendValue = myXBlendValue * myY1BlendValue;
             //glColor4f(myBlendValue, 0.0f, 0.0f, max(0.2f, 1.0f - myBlendValue));
@@ -738,7 +760,7 @@ EdgeBlender::drawBlendedCorner(float theMarginX, float theMarginY) {
             myBlendValue = myXBlendValue * myY2BlendValue;
             //glColor4f(myBlendValue, 0.0f, 0.0f, max(0.2f, 1.0f - myBlendValue));
             glColor4f(0.0f, 0.0f, 0.0f, 1.0f - myBlendValue);
-            glVertex2f(myXPos, myYPos + _myBlendWidth / _myNumSubdivisions);
+            glVertex2f(myXPos, myYPos + theYSize / _myNumSubdivisions);
 
             AC_DEBUG << "x " << myX << "y " << myY << " blend=" << myBlendValue;
         }
@@ -803,6 +825,6 @@ EdgeBlender::renderTexture(float thePosX, float thePosY,
 }
 
 extern "C"
-EXPORT asl::PlugInBase* y60EdgeBlender_instantiatePlugIn(asl::DLHandle myDLHandle) {
+EXPORT asl::PlugInBase* EdgeBlender_instantiatePlugIn(asl::DLHandle myDLHandle) {
     return new EdgeBlender(myDLHandle);
 }

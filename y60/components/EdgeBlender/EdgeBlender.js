@@ -57,7 +57,7 @@
 */
 
 use("SceneViewer.js");
-plug("y60EdgeBlender");
+plug("EdgeBlender");
 
 
 function EdgeBlendViewer(theArguments) {
@@ -93,10 +93,12 @@ EdgeBlendViewer.prototype.Constructor = function(self, theArguments) {
         window.addExtension(_myEdgeBlender);
         self.registerSettingsListener(_myEdgeBlender, "EdgeBlender");
 
-        window.camera.hfov = 0;
-        window.camera.width = theWidth;
+        window.camera.frustum.hfov = 0;
+        window.camera.frustum.width = theWidth;
         window.camera.position = new Vector3f(0,0,1);
-        window.camera.orientation = new Quaternionf();
+        window.camera.orientation.assignFromEuler( new Vector3f(0,0,0));
+
+        window.canvas.backgroundcolor = [0.5, 0.5, 0.5, 1.0];
     }
 
     Base.onKey = self.onKey;
