@@ -259,7 +259,7 @@ macro(_ac_declare_installer NAME)
 
         set(CPACK_PACKAGE_VERSION_MAJOR "1")
         set(CPACK_PACKAGE_VERSION_MINOR "0")
-        set(CPACK_PACKAGE_VERSION_PATCH "0")
+        set(CPACK_PACKAGE_VERSION_PATCH "1")
 
         if(WIN32)
             file(TO_NATIVE_PATH "${INSTALLER_PACKAGE_ICON}" PACKAGE_ICON_NSIS)

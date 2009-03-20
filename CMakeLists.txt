@@ -36,7 +36,7 @@ include(AcMake)
 ac_begin_solution(
     PRO60
     DESCRIPTION  "PRO60 Environment"
-    VENDOR       "ART+COM AG"
+    VENDOR       "ART+COM Technologies GmbH"
     CONTACT      "info@y60.artcom.de"
     DESCRIPTION_FILE "${CMAKE_SOURCE_DIR}/DESCRIPTION.txt"
     LICENSE_FILE     "${CMAKE_SOURCE_DIR}/LICENSE.txt"
