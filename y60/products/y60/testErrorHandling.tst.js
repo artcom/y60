@@ -146,6 +146,45 @@ FailedDomEventTest.prototype.Constructor = function(obj, theName) {
     }
 }
 
+function OnFrameUnitTest() {
+    this.Constructor(this, "OnFrameUnitTest");
+};
+
+
+OnFrameUnitTest.prototype.Constructor = function(obj, theName) {
+
+    UnitTest.prototype.Constructor(obj, theName);
+
+    obj.onFrame = function(theTime) {
+       var myArray = [];
+       myArray[1].foo = "bar";
+       FAILURE("No exception thrown");
+    } 
+
+    obj.run = function() {
+        obj.myVar = 1;
+        ENSURE('obj.myVar == 1');
+        ENSURE('1 + 1 == 2');
+        
+        try {
+            var myArray = [];
+            print( myArray[1].foo = "bar" ); 
+            FAILURE("No exception thrown");
+        } catch (ex) {
+            SUCCESS("Exception thrown and caught:"+ex);
+        }        
+        
+        var window = new RenderWindow();
+        window.onFrame = obj.onFrame;
+        try {
+            window.go();
+            FAILURE("No exception thrown");
+        } catch (ex) {
+            SUCCESS("Exception thrown and caught:"+ex);
+        }        
+    }
+};
+
 print("the next error is intentional");
 try {
     crash1();
@@ -159,6 +198,7 @@ var mySuite = new UnitTestSuite(myTestName);
 
 mySuite.addTest(new MyClassUnitTest());
 mySuite.addTest(new FailedDomEventTest());
+mySuite.addTest(new OnFrameUnitTest());
 mySuite.run();
 
 print(">> Finished test suite '"+myTestName+"', return status = " + mySuite.returnStatus() + "");

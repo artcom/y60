@@ -78,13 +78,13 @@ namespace jslib {
         }
 
         myNativePtr->go( cx, myObject );
-        return JS_TRUE;
+        return !JS_IsExceptionPending(cx); // propagate js exception when js code was executed from the native function;
 
     }
 
     void JSEventLoop::go( JSContext *cx, JSObject *obj ) {
 
-        AC_PRINT << "JSEventLoop::go!";
+        AC_INFO << "JSEventLoop::go!";
         
         _myJSContext = cx;
         _myEventListener = obj;
@@ -102,8 +102,9 @@ namespace jslib {
                 arg = as_jsval( _myJSContext, 
                                 (time_t)(myCurrentTime.millis() - myStartTime.millis())
                                 / 1000 );
-                JSA_CallFunctionName( _myJSContext, _myEventListener, 
-                                      "onFrame", 1, &arg, &rval );
+                if (!JSA_CallFunctionName( _myJSContext, _myEventListener, "onFrame", 1, &arg, &rval )) {
+                    return;
+                }
             }
 
             asl::msleep(10);

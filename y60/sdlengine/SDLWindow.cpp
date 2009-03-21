@@ -787,7 +787,9 @@ SDLWindow::mainLoop() {
 
     if (_myEventListener && jslib::JSA_hasFunction(_myJSContext, _myEventListener, "onStartMainLoop")) {
         jsval argv[1], rval;
-        jslib::JSA_CallFunctionName(_myJSContext, _myEventListener, "onStartMainLoop", 0, argv, &rval);
+        if (!jslib::JSA_CallFunctionName(_myJSContext, _myEventListener, "onStartMainLoop", 0, argv, &rval)) {
+            return;
+        }
     }
 
     while ( ! _myAppQuitFlag ) {
@@ -803,17 +805,25 @@ SDLWindow::mainLoop() {
 
         START_TIMER(dispatchEvents);
         EventDispatcher::get().dispatch();
+        if (JS_IsExceptionPending(_myJSContext)) {
+            return;
+        }
         STOP_TIMER(dispatchEvents);
 
         START_TIMER(handleRequests);
         _myRequestManager.handleRequests();
+        if (JS_IsExceptionPending(_myJSContext)) {
+            return;
+        }
         STOP_TIMER(handleRequests);
 
         // Call onProtoFrame (a second onframe that can be used to automatically run tutorials)
         if ( jslib::JSA_hasFunction(_myJSContext, _myEventListener, "onProtoFrame")) {
             jsval argv[1], rval;
             argv[0] = jslib::as_jsval(_myJSContext, _myElapsedTime);
-            jslib::JSA_CallFunctionName(_myJSContext, _myEventListener, "onProtoFrame", 1, argv, &rval);
+            if (!jslib::JSA_CallFunctionName(_myJSContext, _myEventListener, "onProtoFrame", 1, argv, &rval)) {
+                return;
+            }
         }
 
         onFrame();
@@ -876,7 +886,6 @@ SDLWindow::go() {
     try {
         AbstractRenderWindow::go();
         mainLoop();
-        myResult = true;
     } catch (const asl::Exception & ex) {
         AC_ERROR << "Exception caught in SDLWindow::go(): " << ex;
     } catch (const exception & ex) {
@@ -888,7 +897,7 @@ SDLWindow::go() {
     }
     // release mouse capture
     setCaptureMouseCursor(false);
-    return myResult;
+    return !JS_IsExceptionPending(_myJSContext);
 }
 
 void SDLWindow::setEventRecorderMode(EventRecorder::Mode theMode, bool theDiscardFlag) {
