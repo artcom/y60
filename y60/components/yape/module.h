@@ -67,7 +67,7 @@ class module : public detail::ape_thing {
             if ( imported ) {
                 std::ostringstream os;
                 os << "module '" << get_name() << "' is already imported.";
-                throw ape_error(os.str(), PLUS_FILE_LINE);
+                throw script_error(os.str(), PLUS_FILE_LINE);
             }
             {
                 Binding b;
@@ -169,8 +169,8 @@ class Y60_APE_BNAME(name) : public y60::ape::binding< Y60_APE_BNAME(name) > {   
         friend class y60::ape::module< Y60_APE_BNAME(name) >;                   \
         void bind();                                                            \
     protected:                                                                  \
-        Y60_APE_BNAME(name)() :                \
-                y60::ape::binding< Y60_APE_BNAME(name) >() {}                \
+        Y60_APE_BNAME(name)() :                                                 \
+                y60::ape::binding< Y60_APE_BNAME(name) >() {}                   \
 };                                                                              \
                                                                                 \
 extern "C" Y60_APE_MODULE_DECL                                                  \

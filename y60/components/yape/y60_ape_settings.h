@@ -8,7 +8,7 @@
 
 // Maximum number of function arguments
 #ifndef Y60_APE_MAX_ARITY
-#   define Y60_APE_MAX_ARITY 3
+#   define Y60_APE_MAX_ARITY 10
 #endif
 
 #include "logger_settings.h"

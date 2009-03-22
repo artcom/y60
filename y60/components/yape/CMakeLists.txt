@@ -26,7 +26,6 @@ find_path(
 )
 
 if(TEMPLOG_INCLUDE_DIR)
-    message("-- Y60 Ape: Found templog")
     set(Y60_APE_HAVE_TEMPLOG ON)
     include_directories( ${TEMPLOG_INCLUDE_DIR} )
 endif(TEMPLOG_INCLUDE_DIR)

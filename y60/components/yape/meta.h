@@ -58,7 +58,8 @@ template <int LineNumber> struct line_number {};
 // many times but does not contribute any valuable information. With namespaces
 // it still is too long.
 template <typename Id, typename Appendix> struct eid {
-    typedef Appendix index_type;    
+    typedef Id       context_type;
+    typedef Appendix index_type;
 }; 
 
 }}}

@@ -70,6 +70,7 @@ class class_wrapper {
         inline
         void
         init_property_accessors( AllItems const& all_items ) {
+            
         }
 
         static inline JSClass * js_class_ptr() { return & js_class_; }
@@ -125,7 +126,8 @@ class class_helper {
         function(const char * name, F f) {
             typedef eid<C, boost::mpl::long_<FIdx> > uid;
             current_scope->add( ape_thing_ptr(
-                        new function_desc<F,uid>(name,f,current_scope->property_flags())));
+                        new function_desc<F,uid>(name,f,
+                            current_scope->property_flags())));
 
             typedef class_helper<C, FIdx + 1, PIdx> next_type;
             return next_type(scope_lock_);
@@ -135,7 +137,18 @@ class class_helper {
         property(const char * name, T v) {
             typedef eid<C, boost::mpl::long_<PIdx> > uid;
             current_scope->add( ape_thing_ptr(
-                        new property_desc<T,uid>(name,v,current_scope->property_flags())));
+                        new property_desc<T,uid>(name,v,
+                            current_scope->property_flags())));
+            typedef class_helper<C, FIdx, PIdx + 1> next_type;
+            return next_type(scope_lock_);
+        }
+        template <typename T>
+        class_helper<C, FIdx, PIdx + 1>
+        property_ro(const char * name, T v) {
+            typedef eid<C, boost::mpl::long_<PIdx> > uid;
+            current_scope->add( ape_thing_ptr(
+                        new property_desc<T,uid>(name,v,
+                            current_scope->property_flags() | JSPROP_READONLY)));
             typedef class_helper<C, FIdx, PIdx + 1> next_type;
             return next_type(scope_lock_);
         }
