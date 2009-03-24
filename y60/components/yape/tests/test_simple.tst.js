@@ -16,4 +16,7 @@ print( s.data_member );
 s.read_only_member = 15;
 print( s.read_only_member );
 
+print( t.simple_class.static_data_member );
+t.simple_class.static_data_member = 15;
+print( t.simple_class.static_data_member );
 print( t.simple_class.static_mem_func() );

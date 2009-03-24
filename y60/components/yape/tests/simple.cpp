@@ -8,7 +8,10 @@ struct simple_class {
 
     int data_member;
     int read_only_member;
+    static int static_data_member;
 };
+
+int simple_class::static_data_member = 0;
 
 Y60_APE_MODULE( ape_test_simple ) {
     using namespace y60::ape;
@@ -18,10 +21,11 @@ Y60_APE_MODULE( ape_test_simple ) {
         ;
 
     class_<simple_class>("simple_class")
-        . function("mem_func", & simple_class::mem_func)
-        . function("static_mem_func", & simple_class::static_mem_func)
-        . property("data_member", & simple_class::data_member)
-        . property_ro("read_only_member",  & simple_class::read_only_member)
+        . function("mem_func",          & simple_class::mem_func)
+        . function("static_mem_func",   & simple_class::static_mem_func)
+        . property("data_member",       & simple_class::data_member)
+        . property("read_only_member",  & simple_class::read_only_member, read_only())
+        . property("static_data_member", simple_class::static_data_member)
         ;
 }
 

@@ -108,12 +108,14 @@ class module_loader : public asl::PlugInBase,
     private:
         void
         init_module(JSContext * cx, JSObject * global, JSObject * ns) {
+            APE_LOG(log::import,log::inf,log::dev) 
+                << "importing module " << module_name_;
             module_ptr_type mod(new module<ModuleBinding>(module_name_));
             detail::scope module_scope(mod);
 
             mod->import(cx, ns);
             // TODO: policy-fy
-            announce_module_in_namespace(cx, ns, detail::current_scope->get_name());
+            announce_module_in_namespace(cx, ns, module_name_);
         }
 
         void announce_module_in_namespace(JSContext * cx, JSObject * obj,

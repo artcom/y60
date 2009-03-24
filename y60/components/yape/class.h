@@ -96,8 +96,8 @@ class class_desc : public ape_thing {
         void 
         import(JSContext * cx, JSObject * ns, monkey_data &) {
             typedef log::import log_t;
-            APE_LOG(log_t,log::inf,log::usr) << "importing class '"
-                << get_name() << "'";
+            APE_LOG(log_t,log::dbg,log::dev) << "importing class "
+                << get_name();
 
             import_children(cx, ns, wrapper_type::specs());
             wrapper_type::init_class(cx, ns, get_name());
@@ -134,21 +134,11 @@ class class_helper {
         }
         template <typename T>
         class_helper<C, FIdx, PIdx + 1>
-        property(const char * name, T v) {
+        property(const char * name, T v, uint8 more_flags = 0) {
             typedef eid<C, boost::mpl::long_<PIdx> > uid;
             current_scope->add( ape_thing_ptr(
                         new property_desc<T,uid>(name,v,
-                            current_scope->property_flags())));
-            typedef class_helper<C, FIdx, PIdx + 1> next_type;
-            return next_type(scope_lock_);
-        }
-        template <typename T>
-        class_helper<C, FIdx, PIdx + 1>
-        property_ro(const char * name, T v) {
-            typedef eid<C, boost::mpl::long_<PIdx> > uid;
-            current_scope->add( ape_thing_ptr(
-                        new property_desc<T,uid>(name,v,
-                            current_scope->property_flags() | JSPROP_READONLY)));
+                            current_scope->property_flags() | more_flags )));
             typedef class_helper<C, FIdx, PIdx + 1> next_type;
             return next_type(scope_lock_);
         }

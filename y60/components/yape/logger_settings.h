@@ -45,7 +45,7 @@ namespace log {
             audience_list<dev,usr> >  
                                                                 module;
     typedef logger<module,
-            dbg,
+            msg,
             audience_list<dev,usr> >  
                                                                     import;
 
@@ -57,7 +57,7 @@ namespace log {
 #else // Y60_APE_HAVE_TEMPLOG
 
 #   include <asl/base/Logger.h>
-#   define APE_LOG( logger, sev, aud ) AC_PRINT
+#   define APE_LOG( logger, sev, aud ) AC_TRACE
 
 #endif // Y60_APE_HAVE_TEMPLOG
 

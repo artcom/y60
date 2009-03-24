@@ -3,7 +3,6 @@
 
 #include "y60_ape_settings.h"
 
-#include <boost/mpl/if.hpp>
 #include <boost/type_traits/is_member_function_pointer.hpp>
 
 #include "ape_thing.h"
@@ -27,12 +26,12 @@ class function_desc : public ape_thing {
         void
         import(JSContext * cx, JSObject * ns, monkey_data & ape_ctx) {
             if ( boost::is_member_function_pointer<F>::value ) {
-                APE_LOG(log::import,log::inf,log::usr) 
-                    << "importing member function '" << get_name() << "'";
+                APE_LOG(log::import,log::dbg,log::dev) 
+                    << "importing member function " << get_name();
                 ape_ctx.functions.add( fs_ );
             } else {
-                APE_LOG(log::import,log::inf,log::usr) 
-                    << "importing static function '" << get_name() << "'";
+                APE_LOG(log::import,log::dbg,log::dev) 
+                    << "importing static function " << get_name();
                 ape_ctx.static_functions.add( fs_ );
             }
         }

@@ -7,12 +7,17 @@
 
 #include <asl/base/TraceUtils.h>
 
-namespace y60 { namespace ape { namespace detail {
+namespace y60 { namespace ape {
+    
+inline uint8 read_only() { return JSPROP_READONLY; }
+
+namespace detail {
 
 template <bool IsDataMember> struct accessor_tag_ {};
 
 template <typename T>
-struct accessor_tag : accessor_tag_<boost::is_member_object_pointer<T>::value> {};
+struct accessor_tag :
+    accessor_tag_<boost::is_member_object_pointer<T>::value> {};
 
 template <typename T, typename Id>
 inline
@@ -26,10 +31,26 @@ get_property(accessor_tag_<true>, T v, JSContext * cx, JSObject * obj, jsval * v
 template <typename T, typename Id>
 inline
 void
-set_property(accessor_tag_<true>, T & v, JSContext * cx, JSObject * obj, jsval * vp) {
+get_property(accessor_tag_<false>, T const& v, JSContext * cx, JSObject * obj, jsval * vp) {
+    *vp = jslib::as_jsval(cx, v );
+}
+
+template <typename T, typename Id>
+inline
+void
+set_property(accessor_tag_<true>, T v, JSContext * cx, JSObject * obj, jsval * vp) {
     typedef typename Id::context_type C;
     C * n = class_wrapper<C>::unwrap_native(cx, obj);
     if ( ! jslib::convertFrom(cx, *vp, (*n.*v) ) ) {
+        throw script_error("conversion failed.", PLUS_FILE_LINE);
+    }
+}
+
+template <typename T, typename Id>
+inline
+void
+set_property(accessor_tag_<false>, T & v, JSContext * cx, JSObject * obj, jsval * vp) {
+    if ( ! jslib::convertFrom(cx, *vp, v) ) {
         throw script_error("conversion failed.", PLUS_FILE_LINE);
     }
 }
@@ -78,12 +99,12 @@ class property_desc : public ape_thing {
         void
         import(JSContext * cx, JSObject * ns, monkey_data & ape_ctx) {
             if ( boost::is_member_object_pointer<T>::value ) {
-                APE_LOG(log::import,log::inf,log::usr) 
-                    << "importing property '" << get_name() << "'";
+                APE_LOG(log::import,log::dbg,log::dev) 
+                    << "importing property " << get_name();
                 ape_ctx.properties.add( ps_ );
             } else {
-                APE_LOG(log::import,log::inf,log::usr) 
-                    << "importing static property '" << get_name() << "'";
+                APE_LOG(log::import,log::dbg,log::dev) 
+                    << "importing static property " << get_name();
                 ape_ctx.static_properties.add( ps_ );
             }
         }
@@ -91,6 +112,6 @@ class property_desc : public ape_thing {
         JSPropertySpec ps_;
 };
 
-}}} // end of namespace ape, y60
+}}} // end of namespace detail, ape, y60
 
 #endif // Y60_APE_PROPERTY_INCLUDED
