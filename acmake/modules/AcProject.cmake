@@ -343,6 +343,11 @@ macro(ac_project_add_extern_pkgconfig PACKAGE_NAME PKGCONFIG_NAME)
     endif(ACMAKE_CURRENT_PROJECT)
 endmacro(ac_project_add_extern_pkgconfig PACKAGE_NAME)
 
+macro(ac_emit_property FILE NAME)
+    file(APPEND ${FILE} "set(${NAME} \"${ARGN}\")\n")
+    file(APPEND ${FILE} "set_property(GLOBAL PROPERTY ${NAME} \"${ARGN}\")\n")
+endmacro(ac_emit_property)
+
 # End declaration of a project.
 #
 # This is where find-files are generated.
@@ -412,8 +417,8 @@ macro(ac_end_project PROJECT_NAME)
         endif(WIN32)
 
         file(APPEND ${EXT} "# executable target ${EXECUTABLE}\n")
-        file(APPEND ${EXT} "set(${EXECUTABLE}_PROJECT ${PROJECT_NAME})\n")
-        file(APPEND ${EXT} "set(${EXECUTABLE}_LOCATION \"${LOCATION}\")\n")
+        ac_emit_property(${EXT} ${EXECUTABLE}_PROJECT ${PROJECT_NAME})
+        ac_emit_property(${EXT} ${EXECUTABLE}_LOCATION "${LOCATION}")
     endforeach(EXECUTABLE ${THIS_PROJECT_EXECUTABLES})
     foreach(LIBRARY ${THIS_PROJECT_LIBRARIES})
         get_globals(${LIBRARY} THIS_LIBRARY "LIBRARIES;INCLUDE_DIRS;LIBRARY_DIRS;DEPENDS;EXTERNS") # XXX: classify
@@ -427,12 +432,12 @@ macro(ac_end_project PROJECT_NAME)
         endif(WIN32)
 
         file(APPEND ${EXT} "# library target ${LIBRARY}\n")
-        file(APPEND ${EXT} "set(${LIBRARY}_PROJECT ${PROJECT_NAME})\n")
-        file(APPEND ${EXT} "set(${LIBRARY}_DEPENDS ${THIS_LIBRARY_DEPENDS})\n")
-        file(APPEND ${EXT} "set(${LIBRARY}_EXTERNS ${THIS_LIBRARY_EXTERNS})\n")
-        file(APPEND ${EXT} "set(${LIBRARY}_OBJECT_LOCATION \"${OBJECT_LOCATION}\")\n")
+        ac_emit_property(${EXT} ${LIBRARY}_PROJECT ${PROJECT_NAME})
+        ac_emit_property(${EXT} ${LIBRARY}_DEPENDS ${THIS_LIBRARY_DEPENDS})
+        ac_emit_property(${EXT} ${LIBRARY}_EXTERNS ${THIS_LIBRARY_EXTERNS})
+        ac_emit_property(${EXT} ${LIBRARY}_OBJECT_LOCATION "${OBJECT_LOCATION}")
         if(IMPLIB_LOCATION)
-            file(APPEND ${EXT} "set(${LIBRARY}_IMPLIB_LOCATION \"${IMPLIB_LOCATION}\")\n")
+            ac_emit_property(${EXT} ${LIBRARY}_IMPLIB_LOCATION "${IMPLIB_LOCATION}")
         endif(IMPLIB_LOCATION)
     endforeach(LIBRARY ${THIS_PROJECT_LIBRARIES})
 
