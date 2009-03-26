@@ -22,6 +22,7 @@
 # __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 #
 
+# define some debug hooks for tracing
 ac_define_debug_channel(target      "Debug target analysis")
 ac_define_debug_channel(linkage     "Debug target linkage")
 ac_define_debug_channel(searchpaths "Debug target searchpaths")
@@ -34,7 +35,7 @@ function(_ac_prepend_target_flag TARGET PROPERTY VALUE)
 endfunction(_ac_prepend_target_flag TARGET PROPERTY VALUE)
 
 # add include path to a target for its own use
-# PROPAGATE indicates if this path should be used in dependents
+# PROPAGATE indicates if this path should be used by dependents
 function(_ac_add_include_path TARGET PATH PROPAGATE)
     ac_debug_searchpaths("${TARGET} gets include path ${PATH}")
     if(MSVC)
@@ -48,7 +49,7 @@ function(_ac_add_include_path TARGET PATH PROPAGATE)
 endfunction(_ac_add_include_path TARGET PATH)
 
 # add library path to a target for its own use
-# PROPAGATE indicates if this path should be used in dependents
+# PROPAGATE indicates if this path should be used by dependents
 function(_ac_add_library_path TARGET PATH PROPAGATE)
     ac_debug_searchpaths("${TARGET} gets library path ${PATH}")
     if(MSVC)
@@ -86,13 +87,19 @@ function(_ac_collect_depend_libraries OUT)
     set(${OUT} "${LIBRARIES}" PARENT_SCOPE)
 endfunction(_ac_collect_depend_libraries)
 
-# given set of depends, gives set of externs to be included for them
+# given set of depends, gives set of externs to be used for them to work
 function(_ac_collect_depend_externs OUT)
     set(EXTERNS)
     foreach(DEPEND ${ARGN})
         get_global(${DEPEND}_PROJECT _PROJECT)
+        # we only concern ourselves with depends that come
+        # from acmake projects as only those will export
+        # the necessary information
         if(_PROJECT)
-            # XXX: we should not fiddle with this internal property
+            # ignore externs for targets that are defined
+            # within the current project as those will
+            # have specified the necessary information
+            # as part of their declaration
             if(NOT ACMAKE_CURRENT_PROJECT STREQUAL ${_PROJECT})
                 list(APPEND EXTERNS ${_PROJECT})
             endif(NOT ACMAKE_CURRENT_PROJECT STREQUAL ${_PROJECT})
@@ -114,9 +121,10 @@ function(_ac_collect_extern_definitions OUT)
     set(${OUT} "${DEFINITIONS}" PARENT_SCOPE)
 endfunction(_ac_collect_extern_definitions)
 
-# given set of externs, gives three sets
-# (common, optimized, debug) sets of libraries
-# to be linked for them
+# given set of externs, gives three sets (common, optimized, debug)
+# of libraries to be linked when using them
+#
+# returns results in ${OUT}_COMMON, ${OUT}_OPTIMIZED and ${OUT}_DEBUG
 function(_ac_collect_extern_libraries OUT)
     set(COMMON)
     set(DEBUG)
@@ -125,15 +133,16 @@ function(_ac_collect_extern_libraries OUT)
         if(${EXTERN}_IS_PROJECT)
             # if the extern is a project, its libs
             # do not need to be collected as they
-            # are registered as external targets
+            # are registered as targets and will
+            # be handled by automatic transient linkage
         elseif(EXTERN MATCHES ".*\\.framework/?$")
             # frameworks are trivial
             list(APPEND COMMON ${EXTERN})
         else(${EXTERN}_IS_PROJECT)
-            # libraries have two cases
+            # normal libraries have two cases
 
             if(${EXTERN}_LIBRARIES_D OR ${EXTERN}_LIBRARY_D OR ${EXTERN}_LIBRARIES_C OR ${EXTERN}_LIBRARY_C)
-                # case 1: split debug and optimized
+                # case 1: split debug, optimized and common given by package
 
                 if(${EXTERN}_LIBRARIES_D)
                     list(APPEND DEBUG ${${EXTERN}_LIBRARIES_D})
@@ -154,7 +163,7 @@ function(_ac_collect_extern_libraries OUT)
                 endif(${EXTERN}_LIBRARIES_C)
 
             else(${EXTERN}_LIBRARIES_D OR ${EXTERN}_LIBRARY_D OR ${EXTERN}_LIBRARIES_C OR ${EXTERN}_LIBRARY_C)
-                # case 2: only one variant
+                # case 2: only one variant that will go into the common set
 
                 if(${EXTERN}_LIBRARIES)
                     list(APPEND COMMON ${${EXTERN}_LIBRARIES})
@@ -166,11 +175,16 @@ function(_ac_collect_extern_libraries OUT)
         endif(${EXTERN}_IS_PROJECT)
     endforeach(EXTERN)
 
+    # set result variables
     set(${OUT}_COMMON    "${COMMON}"    PARENT_SCOPE)
     set(${OUT}_DEBUG     "${DEBUG}"     PARENT_SCOPE)
     set(${OUT}_OPTIMIZED "${OPTIMIZED}" PARENT_SCOPE)
 endfunction(_ac_collect_extern_libraries)
-    
+
+# do dependency expansion (of DEPEND and EXTERN dependencies)
+# for the given target, reading and destructively modifying
+# the given variables, which shall contain the set of
+# externs and depends that the target requires
 function(_ac_compute_dependencies TARGET DEPENDS_VAR EXTERNS_VAR)
     set(DEPENDS ${${DEPENDS_VAR}})
     set(EXTERNS ${${EXTERNS_VAR}})
@@ -195,18 +209,20 @@ function(_ac_compute_dependencies TARGET DEPENDS_VAR EXTERNS_VAR)
 
     # merge externs
     list(APPEND EXTERNS ${DEPEND_EXTERNS})
-
-    # make externs unique
     if(EXTERNS)
         list(REMOVE_DUPLICATES EXTERNS)
     endif(EXTERNS)
 
 
+    # set result variables
     set(${DEPENDS_VAR} ${DEPENDS} PARENT_SCOPE)
     set(${EXTERNS_VAR} ${EXTERNS} PARENT_SCOPE)
 endfunction(_ac_compute_dependencies)
 
 # attach libraries from DEPENDS and EXTERNS to TARGET
+#
+# this will collect definitions and linkable libraries,
+# attaching them to the target for use in compilation and linkage
 macro(_ac_attach_depends TARGET DEPENDS EXTERNS)
 
     ac_debug_target("attaching dependencies for ${TARGET}")
@@ -292,14 +308,14 @@ macro(_ac_attach_depends TARGET DEPENDS EXTERNS)
     target_link_libraries(${TARGET} ${COMMON_LIBRARIES})
     ac_debug_linkage("${TARGET} always links against ${COMMON_LIBRARIES}")
 
-    # link variant-specific libraries one by one
+    # link variant-specific libraries
+    ac_debug_linkage("${TARGET}, when compiled debug, links against ${DEBUG_LIBRARIES}")
     foreach(LIBRARY ${DEBUG_LIBRARIES})
         target_link_libraries(${TARGET} debug ${LIBRARY})
-        ac_debug_linkage("${TARGET}, when compiled debug, links against ${LIBRARY}")
     endforeach(LIBRARY ${DEBUG_LIBRARIES})
+    ac_debug_linkage("${TARGET}, when compiled optimized, links against ${OPTIMIZED_LIBRARIES}")
     foreach(LIBRARY ${OPTIMIZED_LIBRARIES})
         target_link_libraries(${TARGET} optimized ${LIBRARY})
-        ac_debug_linkage("${TARGET}, when compiled optimized, links against ${LIBRARY}")
     endforeach(LIBRARY ${OPTIMIZED_LIBRARIES})
 
 
@@ -318,9 +334,8 @@ macro(_ac_attach_depends TARGET DEPENDS EXTERNS)
     )
 endmacro(_ac_attach_depends)
 
-# declare include and library search paths for the given EXTERNS
-# on a global scope from this directory downward
-# (used by target declarators to globally pull in paths)
+# add include and library search paths for the given
+# EXTERNS and DEPENDS to the given TARGET
 macro(_ac_add_dependency_paths TARGET DEPENDS EXTERNS)
     _ac_collect_dependency_paths(${TARGET} LIBRARY_DIRS INCLUDE_DIRS "${DEPENDS}" "${EXTERNS}")
     
@@ -393,10 +408,10 @@ macro(_ac_collect_dependency_paths TARGET LIBS INCS DEPENDS EXTERNS)
 endmacro(_ac_collect_dependency_paths)
 
 # optionally add an rpath to installed binaries
+# (configurable to enable movable builds)
 if(NOT WIN32)
     option(ACMAKE_INSTALL_WITH_RPATH "Should binaries be installed with an rpath?" YES)
 endif(NOT WIN32)
-
 
 macro(_ac_attach_rpath TARGET)
     if(NOT WIN32)
@@ -412,6 +427,8 @@ macro(_ac_attach_rpath TARGET)
     endif(NOT WIN32)
 endmacro(_ac_attach_rpath)
 
+# optionally create a symlink from the binary directory to the source directory
+# (this feature is for development comfort in unixoid systems)
 if(NOT WIN32)
     option(ACMAKE_SYMLINK_SOURCES_TO_BUILDTREE "Create symlinks <bindir>/src -> <srcdir>" YES)
 endif(NOT WIN32)

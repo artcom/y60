@@ -17,6 +17,7 @@
 
 ### SCOPED PROPERTIES
 
+# Shortcut for clearing several local vars with a common prefix
 macro(clear_locals LOCAL_PREFIX)
     foreach(SUFFIX ${ARGN})
         set(${LOCAL_PREFIX}_${SUFFIX})
@@ -25,14 +26,17 @@ endmacro(clear_locals LOCAL_PREFIX SUFFIXES)
 
 ### GLOBAL PROPERTIES
 
+# Shortcut for setting a global property
 macro(set_global NAME)
     set_property(GLOBAL PROPERTY ${NAME} ${ARGN})
 endmacro(set_global NAME)
 
+# Shortcut for appending to a list in a global property
 macro(append_global NAME)
     set_property(GLOBAL APPEND PROPERTY ${NAME} ${ARGN})
 endmacro(append_global NAME)
 
+# Shortcut for uniquely appending to a list in a global property
 macro(append_global_unique NAME)
     get_global(${NAME} _TMP)
     list(APPEND _TMP ${ARGN})
@@ -40,23 +44,29 @@ macro(append_global_unique NAME)
     set_global(${NAME} ${_TMP})
 endmacro(append_global_unique NAME)
 
+# Shortcut for prepending to a list in a global property
 macro(prepend_global NAME)
     get_global(${NAME} _V)
     list(INSERT _V 0 ${ARGN})
     set_global(${NAME} ${_V})
 endmacro(prepend_global NAME)
 
+# Shortcut for retrieving a global property
 macro(get_global NAME INTO)
     set(${INTO})
     get_property(${INTO} GLOBAL PROPERTY ${NAME})
 endmacro(get_global NAME INTO)
 
+# Shortcut for copying a common-prefixed set of
+# properties from the global namespace to scoped vars
 macro(get_globals GLOBAL_PREFIX LOCAL_PREFIX)
     foreach(SUFFIX ${ARGN})
         get_global(${GLOBAL_PREFIX}_${SUFFIX} ${LOCAL_PREFIX}_${SUFFIX})
     endforeach(SUFFIX)
 endmacro(get_globals GLOBAL_PREFIX LOCAL_PREFIX SUFFIXES)
 
+# Shortcut for copying a common-prefixed set of
+# properties from the scoped namespaces to global props
 macro(set_globals LOCAL_PREFIX GLOBAL_PREFIX)
     foreach(SUFFIX ${ARGN})
         set_global(${GLOBAL_PREFIX}_${SUFFIX} ${${LOCAL_PREFIX}_${SUFFIX}})

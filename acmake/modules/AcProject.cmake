@@ -24,6 +24,7 @@
 # __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 #
 
+# define debug channels
 ac_define_debug_channel(project "Debug project analysis")
 ac_define_debug_channel(exports "Debug project exports")
 
@@ -74,6 +75,8 @@ macro(ac_is_integrated PROJECT_NAME OUT)
     set(_IS)
 endmacro(ac_is_integrated)
 
+# list of arguments and flags to project declarations
+# externalized to reduce clutter in the declaration macro
 set(PROJECT_ARGUMENTS
     REQUIRED_PACKAGES
     OPTIONAL_PACKAGES
@@ -88,6 +91,8 @@ set(PROJECT_ARGUMENTS
     DESCRIPTION
     DESCRIPTION_FILE
     LICENSE_FILE
+)
+set(PROJECT_FLAGS
 )
 
 # Add a project to the current build.
@@ -208,12 +213,13 @@ macro(ac_add_project PROJECT_NAME)
     endif(THIS_PROJECT_OPTIONAL_PKGCONFIG)
 
     # Add project-wide cpp definitions
-    # XXX: This is a bad place for this
+    # XXX: It might be better to attach this directly to targets
+    #      instead of propagating it with the directory hierarchy.
     add_definitions(${THIS_PROJECT_DEFINITIONS})
     
 endmacro(ac_add_project PROJECT_NAME)
 
-# Internal method for adding targets into the current project.
+# Internal method for adding targets to the current project.
 #
 macro(ac_project_add_target TARGET_TYPE_PLURAL TARGET_NAME)
     parse_arguments(THIS_TARGET
@@ -263,9 +269,9 @@ macro(ac_project_add_target TARGET_TYPE_PLURAL TARGET_NAME)
         set(_ALL_IMPLICIT_EXTERNS)
         foreach(DEPEND ${THIS_TARGET_DEPENDS})
             # we need to know from which project the depend comes
-            get_global(${DEPEND}_PROJECT _DEPEND_PROJECT )
+            get_global(${DEPEND}_PROJECT _DEPEND_PROJECT)
             # then we get its externs list
-            get_global(${_DEPEND_PROJECT}_${DEPEND}_EXTERNS _IMPLICIT_EXTERNS )
+            get_global(${_DEPEND_PROJECT}_${DEPEND}_EXTERNS _IMPLICIT_EXTERNS)
             # and add it if there is anything to add
             if(_IMPLICIT_EXTERNS)
                 append_global_unique(${TARGET_NAME}_EXTERNS ${_IMPLICIT_EXTERNS})
@@ -279,6 +285,9 @@ macro(ac_project_add_target TARGET_TYPE_PLURAL TARGET_NAME)
 endmacro(ac_project_add_target TARGET_TYPE_PLURAL TARGET_NAME)
 
 # Internal method for adding find_package-dependencies to the current project
+#
+# XXX: this is a wart and should be replaced with a project-scoped macro
+#      that allows passing more arguments to the search call
 #
 macro(ac_project_add_extern_package PACKAGE_NAME)
     parse_arguments(THIS_PACKAGE
@@ -296,7 +305,7 @@ macro(ac_project_add_extern_package PACKAGE_NAME)
             set_global(${ACMAKE_CURRENT_PROJECT}_EXTERN_${PACKAGE_NAME}_IS_REQUIRED YES)
         endif(THIS_PACKAGE_REQUIRED)
         
-        # load the package description (XXX: wart)
+        # load the package description
         find_package(${PACKAGE_NAME} ${PACKAGE_REQUIRED})
         
         # register the dependency (XXX: no found check, relevant for optionals)
@@ -310,6 +319,9 @@ macro(ac_project_add_extern_package PACKAGE_NAME)
 endmacro(ac_project_add_extern_package PACKAGE_NAME)
 
 # Internal method for adding pkg-config-dependencies to the current project
+#
+# XXX: this is a wart and should be replaced with a project-scoped macro
+#      that allows passing more arguments to the search call
 #
 macro(ac_project_add_extern_pkgconfig PACKAGE_NAME PKGCONFIG_NAME)
     parse_arguments(THIS_PKGCONFIG
@@ -327,7 +339,7 @@ macro(ac_project_add_extern_pkgconfig PACKAGE_NAME PKGCONFIG_NAME)
             set_global(${ACMAKE_CURRENT_PROJECT}_EXTERN_${PACKAGE_NAME}_IS_REQUIRED YES)
         endif(THIS_PKGCONFIG_REQUIRED)
 
-        # load the pkg-config module (XXX: wart)
+        # load the module
         pkg_search_module(${PACKAGE_NAME} ${PKGCONFIG_REQUIRED} ${PKGCONFIG_NAME})
 
         # register the dependency if we found it
@@ -343,6 +355,9 @@ macro(ac_project_add_extern_pkgconfig PACKAGE_NAME PKGCONFIG_NAME)
     endif(ACMAKE_CURRENT_PROJECT)
 endmacro(ac_project_add_extern_pkgconfig PACKAGE_NAME)
 
+# Helper for emitting a property into a file,
+# stuffing it both into the global and scoped namespace.
+# XXX: This is a kludge prompting for a cleanup of AcFind.cmake.in.
 macro(ac_emit_property FILE NAME)
     file(APPEND ${FILE} "set(${NAME} \"${ARGN}\")\n")
     file(APPEND ${FILE} "set_property(GLOBAL PROPERTY ${NAME} \"${ARGN}\")\n")
@@ -376,6 +391,8 @@ macro(ac_end_project PROJECT_NAME)
     set(EXT "${THIS_PROJECT_BINARY_DIR}/Find${PROJECT_NAME}Dependencies.cmake")
     file(WRITE ${EXT} "# This generated script resolves external dependencies for ${PROJECT_NAME}\n")
     file(WRITE ${EXT} "include(FindPkgConfig)\n")
+
+    # load lines for find packages
     foreach(PACKAGE ${THIS_PROJECT_REQUIRED_PACKAGES})
         file(APPEND ${EXT} "find_package(${PACKAGE} REQUIRED)\n")
     endforeach(PACKAGE ${THIS_PROJECT_REQUIRED_PACKAGES})
@@ -383,6 +400,7 @@ macro(ac_end_project PROJECT_NAME)
         file(APPEND ${EXT} "find_package(${PACKAGE})\n")
     endforeach(PACKAGE ${THIS_PROJECT_OPTIONAL_PACKAGES})
 
+    # load lines for pkgconfig packages
     set(_LST ${THIS_PROJECT_REQUIRED_PKGCONFIG})
     while(_LST)
         list(GET _LST 0 PKG_PREFIX)
@@ -403,12 +421,11 @@ macro(ac_end_project PROJECT_NAME)
         file(APPEND ${EXT} "pkg_search_module(${PKG_PREFIX} ${PKG_PACKAGE})\n")
     endwhile(_LST)
 
-    # Generate target declaration script
-    # XXX: not implemented for plugins
+    # Generate target information script (XXX: plugin export not implemented)
     set(EXT "${THIS_PROJECT_BINARY_DIR}/Find${PROJECT_NAME}Targets.cmake")
     file(WRITE ${EXT} "# This generated script defines target dependencies for ${PROJECT_NAME}\n")
     foreach(EXECUTABLE ${THIS_PROJECT_EXECUTABLES})
-        get_globals(${EXECUTABLE} THIS_EXECUTABLE "LIBRARIES;INCLUDE_DIRS;LIBRARY_DIRS;DEPENDS;EXTERNS") # XXX: classify
+        get_globals(${EXECUTABLE} THIS_EXECUTABLE "LIBRARIES;INCLUDE_DIRS;LIBRARY_DIRS;DEPENDS;EXTERNS") # XXX: make class for this
 
         if(WIN32)
             set(LOCATION  "${CMAKE_INSTALL_PREFIX}/bin/${EXECUTABLE}.exe")
@@ -421,7 +438,7 @@ macro(ac_end_project PROJECT_NAME)
         ac_emit_property(${EXT} ${EXECUTABLE}_LOCATION "${LOCATION}")
     endforeach(EXECUTABLE ${THIS_PROJECT_EXECUTABLES})
     foreach(LIBRARY ${THIS_PROJECT_LIBRARIES})
-        get_globals(${LIBRARY} THIS_LIBRARY "LIBRARIES;INCLUDE_DIRS;LIBRARY_DIRS;DEPENDS;EXTERNS") # XXX: classify
+        get_globals(${LIBRARY} THIS_LIBRARY "LIBRARIES;INCLUDE_DIRS;LIBRARY_DIRS;DEPENDS;EXTERNS") # XXX: make class for this
 
         if(WIN32)
             set(OBJECT_LOCATION  "${CMAKE_INSTALL_PREFIX}/bin/${LIBRARY}.dll")
@@ -474,5 +491,5 @@ macro(ac_end_project PROJECT_NAME)
     # Leave the project context
     set(ACMAKE_CURRENT_PROJECT)
 
-    ac_debug_project("${PROJECT_NAME} ends")
+    ac_debug_project("${PROJECT_NAME} has ended")
 endmacro(ac_end_project PROJECT_NAME)
