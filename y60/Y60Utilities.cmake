@@ -117,10 +117,7 @@ macro(y60_add_launcher NAME)
     endif(THIS_LAUNCHER_BUILD_WORKING_DIR STREQUAL SOURCE)
 
     # choose working dir for running from install
-    if(THIS_LAUNCHER_INSTALL_WORKING_DIR STREQUAL ASSETS)
-        # the shell script will do the right thing
-        set(THIS_LAUNCHER_INSTALL_WORKING_DIR ASSETS)
-    elseif(NOT THIS_LAUNCHER_INSTALL_WORKING_DIR)
+    if(NOT THIS_LAUNCHER_INSTALL_WORKING_DIR)
         # the prefered default is to run from ${PWD}
         set(THIS_LAUNCHER_INSTALL_WORKING_DIR "")
     endif(THIS_LAUNCHER_INSTALL_WORKING_DIR STREQUAL ASSETS)
@@ -135,7 +132,7 @@ macro(y60_add_launcher NAME)
             ${CMAKE_CURRENT_BINARY_DIR}/${NAME}
             @ONLY
         )
-        # generate launcher shell script for build tree runs
+        # generate launcher shell script for installed tree runs
         configure_file(
             ${Y60_TEMPLATE_DIR}/Y60InstallLauncher.sh.in
             ${CMAKE_CURRENT_BINARY_DIR}/${ACMAKE_BINARY_SUBDIR}/${NAME}
@@ -150,6 +147,22 @@ macro(y60_add_launcher NAME)
                         OWNER_WRITE
         )
     endif(UNIX)
+
+    if(WIN32)
+        configure_file(
+            ${Y60_TEMPLATE_DIR}/Y60InstallLauncher.bat.in
+            ${CMAKE_CURRENT_BINARY_DIR}/${ACMAKE_BINARY_SUBDIR}/${NAME}.bat
+            @ONLY
+        )
+        install(
+            FILES ${CMAKE_CURRENT_BINARY_DIR}/${ACMAKE_BINARY_SUBDIR}/${NAME}.bat
+            COMPONENT ${APPLICATION}
+            DESTINATION bin/
+            PERMISSIONS OWNER_EXECUTE GROUP_EXECUTE WORLD_EXECUTE
+                        OWNER_READ    GROUP_READ    WORLD_READ
+                        OWNER_WRITE
+        )
+    endif(WIN32)
 endmacro(y60_add_launcher)
 
 function(y60_end_application NAME)
