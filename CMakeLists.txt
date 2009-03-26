@@ -33,6 +33,13 @@ set(ACMAKE_BUILDINFO_TEMPLATE
 add_subdirectory(acmake)
 include(AcMake)
 
+set(CPACK_NSIS_EXTRA_INSTALL_COMMANDS   "
+CreateShortCut \\\"\$SMPROGRAMS\\\\\$STARTMENU_FOLDER\\\\Rendergirl.lnk\\\" \\\"\$INSTDIR\\\\bin\\\\rendergirl.bat\\\"
+")
+set(CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS "
+Delete \\\"\$SMPROGRAMS\\\\\$STARTMENU_FOLDER\\\\Rendergirl.lnk\\\"
+")
+
 ac_begin_solution(
     PRO60
     DESCRIPTION  "PRO60 Environment"
