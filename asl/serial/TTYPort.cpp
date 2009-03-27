@@ -95,8 +95,8 @@ TTYPort::open(unsigned int theBaudRate, unsigned int theDataBits,
                 "'. Device allready open.", PLUS_FILE_LINE);
     }
 
-    if (isNoisy()) {
-        cerr << "Opening " << getDeviceName() << " with " << endl;
+    if (AC_TRACE_ON || isNoisy()) {
+        cerr << "Opening '" << getDeviceName() << "' with " << endl;
         cerr << "    baudrate:     " << theBaudRate << endl;
         cerr << "    databits:     " << theDataBits << endl;
         cerr << "    partity mode: " << theParityMode << endl;
@@ -105,9 +105,10 @@ TTYPort::open(unsigned int theBaudRate, unsigned int theDataBits,
     }
 
     mode_t myOpenMode = O_RDWR | O_NOCTTY;
+    mode_t myOpenNonBlockMode = 0;
 
     if (theMinBytesPerRead == 0 && theTimeout == 0) {
-        myOpenMode |= O_NONBLOCK;
+        myOpenNonBlockMode = O_NONBLOCK;
     } else {
         if (theMinBytesPerRead > 255) {
             AC_WARNING << "TTYPort::open(): theMinBytesPerRead to large. Clamping to 255.";
@@ -118,12 +119,18 @@ TTYPort::open(unsigned int theBaudRate, unsigned int theDataBits,
             theTimeout = 255;
         }
     }
-
-    _myPortHandle = ::open(getDeviceName().c_str(), myOpenMode);
+#ifdef OSX
+    AC_DEBUG << "open flags = " << (myOpenMode|O_NONBLOCK);
+    _myPortHandle = ::open(getDeviceName().c_str(), myOpenMode|O_NONBLOCK);
+#else
+    AC_DEBUG << "open flags = " << (myOpenMode|myOpenNonBlockMode);
+    _myPortHandle = ::open(getDeviceName().c_str(), myOpenMode|myOpenNonBlockMode);
+#endif
     if (_myPortHandle < 0) {
         throw SerialPortException(string("Can not open device '") + getDeviceName() + "': " +
                                 strerror(errno), PLUS_FILE_LINE);
     }
+    AC_TRACE << "TTYPort successfully opened, fd="<<_myPortHandle;
 
     int myBaudRate    = convertBaudRate(theBaudRate);
     int myDataBits    = convertDataBits(theDataBits);
@@ -133,6 +140,7 @@ TTYPort::open(unsigned int theBaudRate, unsigned int theDataBits,
 
     struct termios myTermIO;
     tcgetattr(_myPortHandle, & myTermIO);
+    AC_TRACE << "TTYPort: got port handle";
 
     myTermIO.c_cflag = myBaudRate | myDataBits | myParityMode |
                        myStopBits | myFlowControl | CLOCAL | CREAD;
@@ -146,6 +154,7 @@ TTYPort::open(unsigned int theBaudRate, unsigned int theDataBits,
     tcflush(_myPortHandle, TCIOFLUSH);
 
     isOpen(true);
+    AC_TRACE << "TTYPort: setting tty attributes";
 
     if (tcsetattr(_myPortHandle, TCSANOW, & myTermIO) != 0) {
         close();
@@ -153,6 +162,19 @@ TTYPort::open(unsigned int theBaudRate, unsigned int theDataBits,
                                getDeviceName() + ".",
                                PLUS_FILE_LINE);
     }
+#ifdef OSX
+    if (fcntl(_myPortHandle,F_SETFL,myOpenMode|myOpenNonBlockMode)<0) {
+       throw SerialPortException(string("Can not set device mode for '") + getDeviceName() + "': " +
+                                strerror(errno), PLUS_FILE_LINE);
+    }
+    int myFlags = fcntl(_myPortHandle,F_GETFL);
+    if (myFlags<0) {
+       throw SerialPortException(string("Can not get device mode for '") + getDeviceName() + "': " +
+                                strerror(errno), PLUS_FILE_LINE);
+    }
+     AC_TRACE << "TTYPort: myFlags=" <<myFlags;
+#endif
+     AC_TRACE << "TTYPort: open done";
 }
 
 void
@@ -248,7 +270,7 @@ TTYPort::getStatusLine() {
     if (myStatus & TIOCM_DTR) {
         myStatusMask |= DTR;
     }
-    if (isNoisy()) {
+    if (AC_TRACE_ON || isNoisy()) {
         cerr << "TTYPort::getStatusLine(): status mask=0x" << hex << myStatusMask << dec << endl;
     }
 
@@ -257,6 +279,7 @@ TTYPort::getStatusLine() {
 
 bool
 TTYPort::read(char * theBuffer, size_t & theSize) {
+    AC_TRACE << "TTYPort::read from fd="<<_myPortHandle<<" theSize="<<theSize<<" into buffer "<<(void*)theBuffer;
     if ( ! isOpen()) {
         throw SerialPortException(string("Can not read from device ") + getDeviceName() +
                                ". Device is not open.", PLUS_FILE_LINE);
@@ -265,6 +288,7 @@ TTYPort::read(char * theBuffer, size_t & theSize) {
     if (myReadBytes == -1) {
         if (errno == EAGAIN) {
             theSize = 0;
+            AC_TRACE << "TTYPort: read: no data read";
             return false;
         } else {
             throw SerialPortException(string("Failed to read from device ") + getDeviceName()
@@ -272,14 +296,16 @@ TTYPort::read(char * theBuffer, size_t & theSize) {
         }
     }
 
-    if (isNoisy() && myReadBytes > 0) {
+    if ((AC_TRACE_ON || isNoisy()) && myReadBytes > 0) {
         cerr << "TTYPort::read(): '" << Block((unsigned char *)theBuffer,
             (unsigned char *)(theBuffer + myReadBytes)) << "'" << endl;
     }
 
     if (myReadBytes == theSize) {
+        AC_TRACE << "TTYPort: read all " << myReadBytes << " bytes";
         return true;
     } else {
+        AC_TRACE << "TTYPort: read " << myReadBytes << " of " << theSize << " bytes";
         theSize = myReadBytes;
         return false;
     }
@@ -291,7 +317,7 @@ TTYPort::write(const char * theBuffer, size_t theSize) {
         throw SerialPortException(string("Can not write to device ") + getDeviceName() +
                                ". Device is not open.", PLUS_FILE_LINE);
     }
-    if (isNoisy()) {
+    if (AC_TRACE_ON || isNoisy()) {
         cerr << "TTYPort::write(): '" << Block((unsigned char *)theBuffer,
             (unsigned char *)(theBuffer + theSize)) << "'" << endl;
     }

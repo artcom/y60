@@ -298,6 +298,7 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
                 }
                 _myValue     = _myNode.firstChild.nodeValue;
                 _myArrayFlag = (_myValue[0] == "[");
+                _myStringFlag = (Number(_myValue).toString() == "NaN");
                 _myArray     = stringToArray(_myValue);
             }
             
@@ -315,7 +316,11 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
             if (_myArrayFlag) {
                 return Number(_myArray[_myArrayPos]);
             } else {
-                return Number(_myValue);
+                if (_myStringFlag) {
+                    return _myValue;
+                } else {
+                    return Number(_myValue);
+                }
             }
         }
         
@@ -353,6 +358,10 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
                 theFastFlag = false;
             }
 
+            if (_myStringFlag) {
+                return;
+            }
+
             var myValue = Number(_myValue);
             if (_myArrayFlag) {
                 myValue = Number(_myArray[_myArrayPos]);
@@ -386,6 +395,10 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
         this.decrement = function(theFastFlag) {
             if (theFastFlag == undefined) {
                 theFastFlag = false;
+            }
+
+            if (_myStringFlag) {
+                return;
             }
 
             var myValue = Number(_myValue);

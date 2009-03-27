@@ -89,6 +89,7 @@ class SerialTransport : public TransportLayer {
         bool _myUseUSBFlag; // used by the linux implementation, because
                             // USB TTYs have a diffrent naming scheme
         int  _myPortNum;
+        std::string _myPortName;
         int  _myBaudRate;
         int  _myBitsPerSerialWord;
         int  _myStopBits;

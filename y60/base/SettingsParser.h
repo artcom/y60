@@ -103,6 +103,13 @@ getConfigSetting(dom::NodePtr theSettings, const std::string & theName, Enum & t
     return getConfigSetting( theSettings, theName, theValue, Enum( theDefault ));
 }
 
+inline
+bool
+getConfigSettingString(dom::NodePtr theSettings, const std::string & theName, std::string & theValue, const std::string & theDefault)
+{
+    return getConfigSetting( theSettings, theName, theValue, theDefault);
+}
+
 }
 
 
