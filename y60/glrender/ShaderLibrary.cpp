@@ -162,12 +162,17 @@ namespace y60 {
 
         // determine vertex shader profile name according to following priority:
         // 1) function args, 2) environment var. 3) ask Cg library
+
+        _myVertexProfileName = "";
         if (theVertexProfileName == "") {
             if (!asl::get_environment_var("Y60_VERTEX_SHADER_PROFILE", _myVertexProfileName)) {
                 if (ShaderLibrary::GLisReady()) {
                     CGprofile myShaderProfile = cgGLGetLatestProfile(CG_GL_VERTEX);
-                    _myVertexProfileName = cgGetProfileString(myShaderProfile);
-                } else {
+                    if(myShaderProfile != CG_PROFILE_UNKNOWN) {
+                        _myVertexProfileName = cgGetProfileString(myShaderProfile);
+                    }
+                }
+                if(_myVertexProfileName == "") {
                     AC_ERROR << "Could not determine vertex shader profile, must open a render window before loading shader library, falling back to 'arbvp1' profile";
                     _myVertexProfileName = "arbvp1";
                 }
@@ -176,12 +181,16 @@ namespace y60 {
             _myVertexProfileName = theVertexProfileName;
         }
 
+        _myFragmentProfileName = "";
         if (theFragmentProfileName == "") {
             if (!asl::get_environment_var("Y60_FRAGMENT_SHADER_PROFILE", _myFragmentProfileName)) {
                 if (ShaderLibrary::GLisReady()) {
                     CGprofile myShaderProfile = cgGLGetLatestProfile(CG_GL_FRAGMENT);
-                    _myFragmentProfileName = cgGetProfileString(myShaderProfile);
-                } else {
+                    if(myShaderProfile != CG_PROFILE_UNKNOWN) {
+                        _myFragmentProfileName = cgGetProfileString(myShaderProfile);
+                    }
+                }
+                if(_myFragmentProfileName == "") {
                     AC_ERROR << "Could not determine fragment shader profile, must open a render window before loading shader library, falling back to 'arbfp1' profile";
                     _myFragmentProfileName = "arbfp1";
                 }
