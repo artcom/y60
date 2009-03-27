@@ -79,6 +79,7 @@ SerialTransport::SerialTransport(const dom::NodePtr & theSettings) :
     _mySerialPort( 0 ),
     _myUseUSBFlag( false ),
     _myPortNum( -1 ),
+    _myPortName("-"),
     _myBaudRate( 57600 ),
     _myBitsPerSerialWord( 8 ),
     _myStopBits( 1 ),
@@ -103,6 +104,7 @@ SerialTransport::settingsChanged(dom::NodePtr theSettings) {
     myChangedFlag |= settingChanged( theSettings, "TransportLayer", _myTransportName);
 
     myChangedFlag |= settingChanged( theSettings, "SerialPort", _myPortNum );
+    myChangedFlag |= settingChanged( theSettings, "SerialPortName", _myPortName );
     myChangedFlag |= settingChanged( theSettings, "UseUSB", _myUseUSBFlag );
     myChangedFlag |= settingChanged( theSettings, "BaudRate", _myBaudRate );
     myChangedFlag |= settingChanged( theSettings, "BitsPerWord", _myBitsPerSerialWord );
@@ -118,6 +120,7 @@ SerialTransport::init(dom::NodePtr theSettings) {
     //AC_PRINT << "SerialTransport::init()";
 
     getConfigSetting( theSettings, "SerialPort", _myPortNum, -1 );
+    getConfigSettingString( theSettings, "SerialPortName", _myPortName, "-" );
     getConfigSetting( theSettings, "UseUSB", _myUseUSBFlag, false );
     getConfigSetting( theSettings, "BaudRate", _myBaudRate, 57600 );
     getConfigSetting( theSettings, "BitsPerWord", _myBitsPerSerialWord, 8 );
@@ -134,6 +137,8 @@ SerialTransport::establishConnection() {
     if (_myPortNum >= 0 ) {
         _myLastComTestTime = asl::Time();
         _myNumReceivedBytes = 0;
+
+    if (_myPortName == "-") {
 
 #ifdef _WIN32
         _mySerialPort = getSerialDevice( _myPortNum );
@@ -154,8 +159,11 @@ SerialTransport::establishConnection() {
         // where [devid] is a string that is flashed into the FTDI chip. I'll
         // check that the other day.
         AC_PRINT << "TODO: implement device name handling for FTDI USB->RS232 "
-            << "virtual TTYs on Mac OS X.";
+            << "virtual TTYs on Mac OS X., set SerialPortName setting to correct devicename, e.g. /dev/tty.usbserial-A600465T";
 #endif
+        } else {
+            _mySerialPort = getSerialDeviceByName( _myPortName );
+        }
 
         if (_mySerialPort) {
             try {
@@ -164,7 +172,8 @@ SerialTransport::establishConnection() {
                 _mySerialPort->setStatusLine( SerialDevice::RTS);
 
                 setState( SYNCHRONIZING );
-            } catch (const asl::SerialPortException & /*ex*/) {
+            } catch (const asl::SerialPortException & ex) {
+                AC_DEBUG << "Transportlayer: Exception while establishing connection:"<<ex;
                 if ( _mySerialPort ) {
                     delete _mySerialPort;
                     _mySerialPort = 0;
@@ -215,8 +224,8 @@ SerialTransport::readData() {
         _myTmpBuffer.insert( _myTmpBuffer.end(),
                 _myReceiveBuffer.begin(), _myReceiveBuffer.begin() + myMaxBytes );
         //dumpBuffer( _myFrameBuffer );
-    } catch (const SerialPortException & /*ex*/) {
-        //AC_WARNING << ex;
+    } catch (const SerialPortException & ex) {
+        AC_DEBUG << "SerialTransport: Exception while reading:" << ex;
         //_myDriver->createTransportLayerEvent( "lost_communication" );
         MAKE_SCOPE_TIMER(SerialTransport_serialPortException);
         _myFrameQueueLock.lock();
