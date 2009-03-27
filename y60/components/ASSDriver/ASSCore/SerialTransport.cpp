@@ -193,6 +193,10 @@ SerialTransport::readData() {
             }
         }
 
+        if(!_mySerialPort) {
+            return;
+        }
+
         // [DS] If the serial port is removed a non-blocking read returns EAGAIN
         // for some reason. Peek throws an exception which is just what we want.
         _mySerialPort->peek();
