@@ -20,15 +20,18 @@ set( LIB_HEADERS
 )
 
 # look for templog
-find_path(
-        TEMPLOG_INCLUDE_DIR templog/logging.h
-        PATHS ${CMAKE_CURRENT_SOURCE_DIR}
-)
+find_path(TEMPLOG_INCLUDE_DIR templog/logging.h)
 
 if(TEMPLOG_INCLUDE_DIR)
     set(Y60_APE_HAVE_TEMPLOG ON)
     include_directories( ${TEMPLOG_INCLUDE_DIR} )
 endif(TEMPLOG_INCLUDE_DIR)
+
+find_path(READLINE_INCLUDE_DIR readline/readline.h)
+find_library(READLINE_LIBRARY readline)
+if(READLINE_LIBRARY AND READLINE_INCLUDE_DIR)
+    set(Y60_APE_HAVE_READLINE ON)
+endif(READLINE_LIBRARY AND READLINE_INCLUDE_DIR)
 
 # XXX talk to ingo about per library config headers
 ac_configure_file(
@@ -39,9 +42,25 @@ ac_configure_file(
 
 ac_add_library(
     yape
-    HEADERS ${LIB_HEADERS} ${TEMPLOG_HEADERS}
+    HEADERS ${LIB_HEADERS}
     DEPENDS y60jsbase y60jslib ${JSDEPENDS}
+    EXTERNS Boost ${JSEXTERN} READLINE
+)
+
+find_package( Boost COMPONENTS system program_options filesystem)
+
+ac_add_executable(
+    apesh
+    SOURCES apesh.cpp
+    DEPENDS yape ${JSDEPENDS}
     EXTERNS Boost ${JSEXTERN}
+)
+
+ac_add_executable(
+    jsval_void
+    SOURCES jsval_void.cpp
+    DEPENDS ${JSDEPENDS} aslbase
+    EXTERNS ${JSEXTERN}
 )
 
 set(Y60_APE_LINK_ARGS

@@ -11,6 +11,8 @@ namespace y60 { namespace ape {
 DEFINE_EXCEPTION( script_error, asl::Exception );
 DEFINE_EXCEPTION( bad_arguments, script_error);
 DEFINE_EXCEPTION( bad_call, script_error);
+DEFINE_EXCEPTION( compilation_error, script_error);
+DEFINE_EXCEPTION( runtime_error, script_error);
 
 DEFINE_EXCEPTION( internal_error, asl::Exception);
 DEFINE_EXCEPTION( monkey_error, internal_error );

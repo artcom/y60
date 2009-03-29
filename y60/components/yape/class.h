@@ -66,13 +66,6 @@ class class_wrapper {
             }
         }
 
-        template <typename AllItems>
-        inline
-        void
-        init_property_accessors( AllItems const& all_items ) {
-            
-        }
-
         static inline JSClass * js_class_ptr() { return & js_class_; }
         static inline monkey_data & specs() { return specs_; }
     private:
@@ -90,8 +83,7 @@ class class_desc : public ape_thing {
         typedef class_wrapper<C> wrapper_type;
 
         class_desc(const char* name, uint8 flags) :
-            ape_thing( ape_class, name, flags),
-            property_accessors_created_( false ) {}
+            ape_thing( ape_class, name, flags) {}
 
         void 
         import(JSContext * cx, JSObject * ns, monkey_data &) {
@@ -102,17 +94,6 @@ class class_desc : public ape_thing {
             import_children(cx, ns, wrapper_type::specs());
             wrapper_type::init_class(cx, ns, get_name());
         }
-        template <typename AllItems>
-        inline
-        void
-        init_property_accessors( AllItems const& all_items ) {
-            if ( ! property_accessors_created_ ) {
-                wrapper_type::init_property_accessors( all_items );
-                property_accessors_created_ = true;
-            }
-        }
-    private:
-        bool property_accessors_created_;
 }; 
 
 template <typename C, int FIdx = 0, int PIdx = 0>

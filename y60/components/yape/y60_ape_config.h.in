@@ -8,5 +8,6 @@
 #define Y60_APE_CONFIG_INCLUDED
 
 #cmakedefine Y60_APE_HAVE_TEMPLOG
+#cmakedefine Y60_APE_HAVE_READLINE
 
 #endif // Y60_APE_CONFIG_INCLUDED
