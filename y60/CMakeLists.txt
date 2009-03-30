@@ -44,6 +44,7 @@ ac_add_project(Y60
     CUSTOM_TEMPLATES
         Y60BuildLauncher.sh.in
         Y60InstallLauncher.sh.in
+        Y60InstallLauncher.bat.in
     DEFINITIONS
         -DAC_BUILT_WITH_CMAKE
         ${Y60_EXTRA_DEFINITIONS}

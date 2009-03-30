@@ -179,13 +179,13 @@ function(y60_end_application NAME)
     get_global(${NAME}_DEPENDS       APP_DEPENDS)
 
     if(ACMAKE_CURRENT_PROJECT)
-        ac_add_installer_component(
-            ${NAME}
-            DISPLAY_NAME "${APP_DISPLAY_NAME}"
-            DESCRIPTION  "${APP_DESCRIPTION}"
-            INSTALL_TYPES ${APP_INSTALL_TYPES}
-            DEPENDS       ${APP_DEPENDS}
-        )
+          ac_add_installer_component(
+              ${NAME}
+              DISPLAY_NAME "${APP_DISPLAY_NAME}"
+              DESCRIPTION  "${APP_DESCRIPTION}"
+              INSTALL_TYPES ${APP_INSTALL_TYPES}
+              DEPENDS       ${APP_DEPENDS}
+          )
     endif(ACMAKE_CURRENT_PROJECT)
 
     set(Y60_CURRENT_APPLICATION)

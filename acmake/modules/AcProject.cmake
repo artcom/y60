@@ -216,6 +216,16 @@ macro(ac_add_project PROJECT_NAME)
     # XXX: It might be better to attach this directly to targets
     #      instead of propagating it with the directory hierarchy.
     add_definitions(${THIS_PROJECT_DEFINITIONS})
+
+    # Integrate with the installation framework
+    _ac_package_project(
+        ${PROJECT_NAME}
+        VENDOR           ${THIS_PROJECT_VENDOR}
+        CONTACT          ${THIS_PROJECT_CONTACT}
+        DESCRIPTION      ${THIS_PROJECT_DESCRIPTION}
+        DESCRIPTION_FILE ${THIS_PROJECT_DESCRIPTION_FILE}
+        LICENSE_FILE     ${THIS_PROJECT_LICENSE_FILE}
+    )
     
 endmacro(ac_add_project PROJECT_NAME)
 
@@ -477,16 +487,6 @@ macro(ac_end_project PROJECT_NAME)
 
     # Remove our local copy of the project
     clear_locals(THIS_PROJECT ${_AC_PROJECT_VARIABLES})
-
-    # Integrate with the installation framework
-    _ac_package_project(
-        ${PROJECT_NAME}
-        VENDOR           ${THIS_PROJECT_VENDOR}
-        CONTACT          ${THIS_PROJECT_CONTACT}
-        DESCRIPTION      ${THIS_PROJECT_DESCRIPTION}
-        DESCRIPTION_FILE ${THIS_PROJECT_DESCRIPTION_FILE}
-        LICENSE_FILE     ${THIS_PROJECT_LICENSE_FILE}
-    )
 
     # Leave the project context
     set(ACMAKE_CURRENT_PROJECT)

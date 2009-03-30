@@ -22,6 +22,9 @@
 # __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 #
 
+# Debug channel
+ac_define_debug_channel(installer "Installer framework debugging")
+
 # Option for disabling the whole installer subsystem.
 option(ACMAKE_BUILD_PACKAGES "Allow building packages with CPack" NO)
 
@@ -80,6 +83,8 @@ endmacro(ac_end_solution)
 #
 macro(ac_add_install_type NAME)
     if(ACMAKE_BUILD_PACKAGES)
+        ac_debug_installer("Adding install type ${NAME}")
+
         cpack_add_install_type(${NAME} ${ARGN})
     endif(ACMAKE_BUILD_PACKAGES)
 endmacro(ac_add_install_type)
@@ -106,6 +111,8 @@ macro(ac_add_installer_component NAME)
             ${ARGN}
         )
     
+        ac_debug_installer("Adding installer component ${NAME} depending on ${THIS_COMPONENT_DEPENDS}")
+
         set(PROJECT ${ACMAKE_CURRENT_PROJECT})
         
         get_global(ACMAKE_SOLUTION SOLUTION)
@@ -151,6 +158,22 @@ macro(_ac_package_project NAME)
     if(ACMAKE_BUILD_PACKAGES)
         get_global(ACMAKE_SOLUTION SOLUTION)
 
+        # if we are not in a solution then we try to assume
+        # responsibility for creating an installer based
+        # on our project declaration
+        if(NOT SOLUTION)
+            # ensure we are not declaring multiple project packages outside a solution build
+            get_global(ACMAKE_INSTALLER_PROJECT INSTALLER_PROJECT)
+            if(INSTALLER_PROJECT)
+                message(FATAL_ERROR "Trying to define more than one project for installation without a solution.")
+            endif(INSTALLER_PROJECT)
+            set_global(ACMAKE_INSTALLER_PROJECT ${NAME})
+            
+            # set up CPack, passing through the installer-specific
+            # keyword arguments given to us by the project framework
+            _ac_declare_installer(${NAME} ${ARGN})
+        endif(NOT SOLUTION)
+
         # if we are in a solution then we put our
         # components into a project-specific group
         if(SOLUTION)
@@ -176,6 +199,13 @@ macro(_ac_package_project NAME)
             endif(IS_PROJECT AND IS_INTEGRATED)
         endforeach(PACKAGE ${REQ_PACKAGES} ${OPT_PACKAGES})
 
+        ac_is_integrated(AcMake ACMAKE_INTEGRATED)
+        if(ACMAKE_INTEGRATED)
+            set(ACMAKE_DEPENDENCY "AcMake")
+        else(ACMAKE_INTEGRATED)
+            set(ACMAKE_DEPENDENCY)
+        endif(ACMAKE_INTEGRATED)
+
         # declare standard components that every
         # projects gets: one for the runtime and
         # one for development files
@@ -191,26 +221,11 @@ macro(_ac_package_project NAME)
             "${NAME}_development"
             DISPLAY_NAME "${NAME} Development"
             DESCRIPTION  "Development files for ${NAME}"
-            DEPENDS "${NAME}_runtime" "AcMake" ${DEVELOPMENT_DEPENDS}
+            DEPENDS "${NAME}_runtime" ${ACMAKE_DEPENDENCY} ${DEVELOPMENT_DEPENDS}
             INSTALL_TYPES development
             ${GROUP_MEMBERSHIP}
         )
 
-        # if we are not in a solution then we try to assume
-        # responsibility for creating an installer based
-        # on our project declaration
-        if(NOT SOLUTION)
-            # ensure we are not declaring multiple project packages outside a solution build
-            get_global(ACMAKE_INSTALLER_PROJECT INSTALLER_PROJECT)
-            if(INSTALLER_PROJECT)
-                message(FATAL_ERROR "Trying to define more than one project for installation without a solution.")
-            endif(INSTALLER_PROJECT)
-            set_global(ACMAKE_INSTALLER_PROJECT ${NAME})
-            
-            # set up CPack, passing through the installer-specific
-            # keyword arguments given to us by the project framework
-            _ac_declare_installer(${NAME} ${ARGN})
-        endif(NOT SOLUTION)
     endif(ACMAKE_BUILD_PACKAGES)
 endmacro(_ac_package_project)
 
@@ -231,6 +246,8 @@ macro(_ac_declare_installer NAME)
         ${ARGN}
     )
 
+    ac_debug_installer("Setting up installer named ${NAME}")
+
     # check arguments
     if(NOT INSTALLER_CONTACT)
         message(FATAL_ERROR "You need to provide a contact mail address for the installer ${NAME}.")
@@ -247,7 +264,6 @@ macro(_ac_declare_installer NAME)
         # set up cpack globals
         set(CPACK_PACKAGE_NAME              ${NAME})
         set(CPACK_PACKAGE_INSTALL_DIRECTORY ${NAME})
-
 
         set(CPACK_PACKAGE_CONTACT ${INSTALLER_CONTACT})
         set(CPACK_PACKAGE_VENDOR  ${INSTALLER_VENDOR})
@@ -271,6 +287,8 @@ macro(_ac_declare_installer NAME)
             # XXX: should be configurable
             set(CPACK_NSIS_MODIFY_PATH ON)
         endif(WIN32)
+
+        ac_debug_installer("CPack is being initialized")
 
         # load cpack helper
         include(CPack)
