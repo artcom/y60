@@ -102,6 +102,8 @@ TTYPort::open(unsigned int theBaudRate, unsigned int theDataBits,
         cerr << "    partity mode: " << theParityMode << endl;
         cerr << "    stopbits:     " << theStopBits << endl;
         cerr << "    hw handshake: " << theHWHandShakeFlag << endl;
+        cerr << "    theMinBytesPerRead: " << theMinBytesPerRead << endl;
+        cerr << "    theTimeout: " << theTimeout << endl;
     }
 
     mode_t myOpenMode = O_RDWR | O_NOCTTY;
@@ -119,7 +121,7 @@ TTYPort::open(unsigned int theBaudRate, unsigned int theDataBits,
             theTimeout = 255;
         }
     }
-#ifdef OSX
+#ifdef OSX_N
     AC_DEBUG << "open flags = " << (myOpenMode|O_NONBLOCK);
     _myPortHandle = ::open(getDeviceName().c_str(), myOpenMode|O_NONBLOCK);
 #else
@@ -141,9 +143,20 @@ TTYPort::open(unsigned int theBaudRate, unsigned int theDataBits,
     struct termios myTermIO;
     tcgetattr(_myPortHandle, & myTermIO);
     AC_TRACE << "TTYPort: got port handle";
-
+#ifndef OSX
     myTermIO.c_cflag = myBaudRate | myDataBits | myParityMode |
                        myStopBits | myFlowControl | CLOCAL | CREAD;
+#else
+    myTermIO.c_cflag = myDataBits | myParityMode |
+                       myStopBits | myFlowControl | CLOCAL | CREAD;
+    
+   if (cfsetspeed(&myTermIO, myBaudRate) != 0) {
+        close();
+        throw SerialPortException(string("Failed to set requested baud rate on ") +
+                               getDeviceName() + ".",
+                               PLUS_FILE_LINE);
+    }
+#endif
     myTermIO.c_iflag = IGNPAR;
     myTermIO.c_oflag = 0;
     myTermIO.c_lflag = 0;
@@ -162,7 +175,7 @@ TTYPort::open(unsigned int theBaudRate, unsigned int theDataBits,
                                getDeviceName() + ".",
                                PLUS_FILE_LINE);
     }
-#ifdef OSX
+#ifdef OSX_N
     if (fcntl(_myPortHandle,F_SETFL,myOpenMode|myOpenNonBlockMode)<0) {
        throw SerialPortException(string("Can not set device mode for '") + getDeviceName() + "': " +
                                 strerror(errno), PLUS_FILE_LINE);
