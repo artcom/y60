@@ -59,8 +59,6 @@ using namespace std;
 
 namespace asl {
 
-    const unsigned READ_BUFFER_SIZE = 1024;
-
     ComPort::ComPort(const std::string & theDeviceName) :
         SerialDevice(theDeviceName),
         _myBlockingFlag(false)
@@ -101,6 +99,7 @@ namespace asl {
                                    NULL);
         checkError(PLUS_FILE_LINE);
 
+        // configure signalling mode
         DCB myDCB;
         if ( ! GetCommState(_myPortHandle, & myDCB)) {
             checkError(PLUS_FILE_LINE);
@@ -116,9 +115,10 @@ namespace asl {
             checkError(PLUS_FILE_LINE);
         }
 
-        // see MSDN docs about COMMTIMEOUTS,
-        //     Stevens - Advanced Programming in the Unix Environment (pp.352)
-        //     and termios man page
+        // configure blocking timeouts
+        //  see MSDN docs about COMMTIMEOUTS,
+        //      Stevens - Advanced Programming in the Unix Environment (pp.352)
+        //      and termios man page
         if ( theMinBytesPerRead == 0 && theTimeout == 0) {
             _myTimeouts.ReadIntervalTimeout = MAXDWORD;
             _myTimeouts.ReadTotalTimeoutMultiplier = 0;
@@ -151,6 +151,9 @@ namespace asl {
             checkError(PLUS_FILE_LINE);
         }
 
+        // increase buffer size to something reasonable
+        SetupComm(_myPortHandle, 2048, 2048);
+
         isOpen(true);
     }
 
@@ -166,7 +169,7 @@ namespace asl {
     }
 
     bool
-    ComPort::readFromDevice(unsigned char * theBuffer, size_t & theSize) {
+    ComPort::read(char * theBuffer, size_t & theSize) {
         if ( ! isOpen()) {
             throw SerialPortException(string("Can not read from device '") + getDeviceName() +
                                    "'. Device is not open.", PLUS_FILE_LINE);
@@ -179,84 +182,6 @@ namespace asl {
         } else {
             theSize = myReadBytes;
             return false;
-        }
-    }
-
-    bool
-    ComPort::readBlocking(unsigned char * theBuffer, size_t & theSize) {
-        size_t myMinReadBytes = _myMinReadBytes == 0 ? theSize : _myMinReadBytes;
-        if (_myBuffer.size() < myMinReadBytes) {
-            size_t myBytesToRead = myMinReadBytes - _myBuffer.size();
-            asl::Block myTmpBuffer(myBytesToRead);
-            readFromDevice(myTmpBuffer.begin(), myBytesToRead);
-            myTmpBuffer.resize( myBytesToRead );
-
-            _myBuffer.append( myTmpBuffer );
-        }
-        size_t myBytesToReturn = asl::minimum(theSize, _myBuffer.size() );
-        _myBuffer.readBytes(theBuffer, myBytesToReturn, 0);
-        size_t myRestSize = _myBuffer.size() - myBytesToReturn;
-        _myBuffer.readBytes(_myBuffer.begin(), myRestSize, myBytesToReturn);
-        _myBuffer.resize( myRestSize );
-
-        if (myBytesToReturn == theSize) {
-            return true;
-        } else {
-            theSize = myBytesToReturn;
-            return false;
-        }
-    }
-
-    bool
-    ComPort::readNonBlocking(unsigned char * theBuffer, size_t & theSize) {
-        size_t mySize;
-        mySize = asl::maximum(theSize, READ_BUFFER_SIZE);
-        asl::Block myTmpBuffer(mySize);
-        readFromDevice(myTmpBuffer.begin(), mySize);
-        myTmpBuffer.resize(mySize);
-
-        _myBuffer.append(myTmpBuffer);
-        DB(cerr << "_myBuffer post readDev:" << _myBuffer << endl);
-        size_t myReadBytes = 0;
-        if (_myBuffer.size() > theSize) {
-            // copy data from internal buffer to outside buffer
-            _myBuffer.readBytes(theBuffer, theSize, 0);
-            // copy rest of buffer to begin
-            size_t myRestSize = _myBuffer.size() - theSize;
-            _myBuffer.readBytes(_myBuffer.begin(), myRestSize, theSize);
-            DB(cerr << "myRestSize = " << myRestSize << endl);
-            _myBuffer.resize(myRestSize);
-            myReadBytes = theSize;
-        } else {
-            // hand out all we have
-            myReadBytes = _myBuffer.size();
-            _myBuffer.readBytes(theBuffer, myReadBytes, 0);
-            _myBuffer.resize(0);
-        }
- 
-        DB(cerr << "_myBuffer at end      :" << _myBuffer << endl);
-
-
-        if (isNoisy() && myReadBytes > 0) {
-            cerr << "ComPort::read(): '" << Block((unsigned char *)theBuffer,
-                (unsigned char *)(theBuffer + myReadBytes)) << "'" << endl;
-        }
-
-        if (theSize == myReadBytes) {
-            return true;
-        } else {
-            theSize = myReadBytes;
-            return false;
-        }
-    }
-
-    bool
-    ComPort::read(char * theBuffer, size_t & theSize) {
-        DB(cerr << "_myBuffer at start    :" << _myBuffer << endl);
-        if (_myBlockingFlag) {
-            return readBlocking( (unsigned char*) theBuffer, theSize );
-        } else {
-            return readNonBlocking( (unsigned char*) theBuffer, theSize );
         }
     }
 
@@ -288,38 +213,11 @@ namespace asl {
             throw SerialPortException(string("Can not peek device '") + getDeviceName() +
                                    "'. Device is not open.", PLUS_FILE_LINE);
         }
-#ifdef WINDOWS_WOULD_BE_CONSISTENT_WE_COULD_USE
-        DWORD myAvailableBytes = 0;
-        if (!PeekNamedPipe(_myPortHandle, NULL, 0, 0, &myAvailableBytes, NULL)) {
-            checkError("ComPort::peek()");
-        }
-        return myAvailableBytes;
-#else // but we need:
-        size_t mySize = READ_BUFFER_SIZE;
-        asl::Block myTmpBuffer(mySize);
-        if ( _myBlockingFlag) {
-            COMMTIMEOUTS myNonBlockingTimeouts;
-            myNonBlockingTimeouts.ReadIntervalTimeout = MAXDWORD;
-            myNonBlockingTimeouts.ReadTotalTimeoutMultiplier = 0;
-            myNonBlockingTimeouts.ReadTotalTimeoutConstant = 0;
-            myNonBlockingTimeouts.WriteTotalTimeoutConstant = 0;
-            myNonBlockingTimeouts.WriteTotalTimeoutMultiplier = 0;
-            if ( ! SetCommTimeouts(_myPortHandle, & myNonBlockingTimeouts)) {
-                checkError(PLUS_FILE_LINE);
-            }
-
-        }
-        readFromDevice(myTmpBuffer.begin(), mySize);
-        if ( _myBlockingFlag ) {
-            if ( ! SetCommTimeouts(_myPortHandle, & _myTimeouts)) {
-                checkError(PLUS_FILE_LINE);
-            }
-        }
-        myTmpBuffer.resize(mySize);
-        _myBuffer.append(myTmpBuffer);
-        return _myBuffer.size();
-#endif
+        // XXX: never guarantee anything.
+        //      this is correct but possibly confusing.
+        return 0;
     }
+
     void 
     ComPort::flush() {
         if (!isOpen()) {

@@ -83,17 +83,15 @@ namespace asl {
 
         private:
             ComPort();
-            bool readFromDevice(unsigned char * theBuffer, size_t & theSize);
-            bool readBlocking(unsigned char * theBuffer, size_t & theSize);
-            bool readNonBlocking(unsigned char * theBuffer, size_t & theSize);
+
             void checkError(const std::string & theLocationString);
+
             DWORD convertBaudRate(unsigned int theBaudRate);
             BYTE convertParity(ParityMode theParity);
             BYTE convertStopBits(unsigned int  theStopBits);
 
             HANDLE       _myPortHandle;
             COMMTIMEOUTS _myTimeouts;
-            Block        _myBuffer;
             bool         _myBlockingFlag;
             unsigned     _myMinReadBytes;
     };
