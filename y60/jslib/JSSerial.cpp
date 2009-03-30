@@ -101,6 +101,8 @@ open(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_PARAM_OPT("theParity", "Parity",    DOC_TYPE_ENUMERATION, DEFAULT_PARITY);
     DOC_PARAM_OPT("theStopBits", "Stop Bits", DOC_TYPE_INTEGER, DEFAULT_STOP_BITS);
     DOC_PARAM_OPT("theHandshake", "Hardware handshake", DOC_TYPE_BOOLEAN, DEFAULT_HW_HANDSHAKE);
+    DOC_PARAM_OPT("theMinBytesPerRead", "minimum bytes per read", DOC_TYPE_INTEGER, 0);
+    DOC_PARAM_OPT("theTimeout", "timeout in ms", DOC_TYPE_INTEGER, 0);
     DOC_END;
 
     try {
@@ -109,6 +111,8 @@ open(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         unsigned myParity      = DEFAULT_PARITY;
         unsigned myStopBits    = DEFAULT_STOP_BITS;
         bool     myHwHandshake = DEFAULT_HW_HANDSHAKE;
+        int     myMinBytesPerRead = 0;
+        int     myTimeOut = 0;
 
         for (unsigned i = 0; i < argc; ++i) {
             if (JSVAL_IS_VOID(argv[i])) {
@@ -153,13 +157,25 @@ open(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             }
         }
         if (argc > 5) {
+            if (!convertFrom(cx, argv[5], myMinBytesPerRead)) {
+                JS_ReportError(cx, "JSSerial::open(): argument #6 must be an integer (MinBytesPerRead)");
+                return JS_FALSE;
+            }
+        }
+        if (argc > 6) {
+            if (!convertFrom(cx, argv[6], myTimeOut)) {
+                JS_ReportError(cx, "JSSerial::open(): argument #6 must be a integer (Timeout)");
+                return JS_FALSE;
+            }
+        }
+         if (argc > 7) {
             JS_ReportError(cx, "JSSerial::open(): Wrong number of arguments, between 0 and 5 expected.");
             return JS_FALSE;
         }
 
         JSSerial::getJSWrapper(cx,obj).openNative().open(myBaudRate, myBits,
             SerialDevice::ParityMode(SerialDevice::ParityModeEnum(myParity)),
-            myStopBits, myHwHandshake);
+            myStopBits, myHwHandshake, myMinBytesPerRead, myTimeOut);
         JSSerial::getJSWrapper(cx,obj).closeNative();
 
         return JS_TRUE;
@@ -605,7 +621,7 @@ JSSerial::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, j
 JSBool
 JSSerial::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Creates a new serial device");
-    DOC_PARAM("thePort", "Zero based com-port number. Use port '999' to create a debug loopback device.", DOC_TYPE_INTEGER);
+    DOC_PARAM("thePort", "Zero based com-port number or device name. Use port '999' to create a debug loopback device.", DOC_TYPE_INTEGER);
     DOC_END;
     if (JSA_GetClass(cx,obj) != Class()) {
         JS_ReportError(cx,"Constructor for %s  bad object; did you forget a 'new'?",ClassName());
