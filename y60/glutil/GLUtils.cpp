@@ -687,9 +687,18 @@ void * aglGetProcAddress (char * pszProc)
     std::string
     getLatestCgProfileString() {
         CGprofile myVertexProfile = cgGLGetLatestProfile(CG_GL_VERTEX);
-        CGprofile myFragmentProfile = cgGLGetLatestProfile(CG_GL_FRAGMENT);
+        string myVertexProfileName = "NONE";
+        if(myVertexProfile != CG_PROFILE_UNKNOWN) {
+            myVertexProfileName = string(cgGetProfileString(myVertexProfile));
+        }
 
-        return string(cgGetProfileString(myVertexProfile)) + "/" + string(cgGetProfileString(myFragmentProfile));
+        CGprofile myFragmentProfile = cgGLGetLatestProfile(CG_GL_FRAGMENT);
+        string myFragementProfileName = "NONE";
+        if(myFragmentProfile != CG_PROFILE_UNKNOWN) {
+            myFragementProfileName = string(cgGetProfileString(myFragmentProfile));
+        }
+
+        return myVertexProfileName + "/" + myFragementProfileName;
     }
 #endif
 }
