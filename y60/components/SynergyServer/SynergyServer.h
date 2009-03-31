@@ -107,10 +107,10 @@ class SynergyPacket {
                 return false;
             }
 
-            unsigned int myLen =   ((*_myPacketIt  ) << 24) 
-                                 + ((*_myPacketIt+1) << 16) 
-                                 + ((*_myPacketIt+2) <<  8) 
-                                 +  (*_myPacketIt+3); 
+            unsigned int myLen =   ((*(_myPacketIt  )) << 24) 
+                                 + ((*(_myPacketIt+1)) << 16) 
+                                 + ((*(_myPacketIt+2)) <<  8) 
+                                 +  (*(_myPacketIt+3)); 
             _myPacketIt+=4;
                     
             AC_TRACE << "message length: " << myLen;
