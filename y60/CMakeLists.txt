@@ -69,6 +69,7 @@ add_subdirectory(jsbase)
 add_subdirectory(jslib)
 add_subdirectory(sdlengine)
 
+# Handle optional gtk support
 if(GTKMM_FOUND AND GTKGLEXT_FOUND AND GLADEMM_FOUND)
     option(Y60_WITH_GTK "Build javascript gtk bindings and g60 frontend" ON)
 endif(GTKMM_FOUND AND GTKGLEXT_FOUND AND GLADEMM_FOUND)
@@ -77,8 +78,6 @@ if(Y60_WITH_GTK)
     add_subdirectory(acgtk)
     add_subdirectory(jsgtk)
 
-    # XXX: these must come after some actual
-    #      use of the components due to a CPack bug
     ac_add_installer_component(
         G60_runtime
         DISPLAY_NAME "G60 Runtime"
@@ -116,6 +115,7 @@ install(
         PATTERN ".svn" EXCLUDE
 )
 
+# Register executables and plugins/components
 add_subdirectory(products)
 add_subdirectory(components)
 
@@ -123,15 +123,22 @@ add_subdirectory(components)
 ac_add_doxygen(Y60 ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}/doc/doxygen Doxyfile.in)
 ac_add_xsddoc(Y60 ${CMAKE_CURRENT_SOURCE_DIR}/base/Y60.xsd ${CMAKE_CURRENT_BINARY_DIR}/doc/schema)
 
-# Generate Y60 javascript api reference (XXX: broken)
+# Generate Y60 javascript api specification in xml and html
 make_directory(${CMAKE_CURRENT_BINARY_DIR}/doc/jsapi)
+get_target_property(Y60_LOCATION y60 LOCATION)
 add_custom_target(
     Y60-jsapi
-    ${CMAKE_CURRENT_BINARY_DIR}/products/y60/y60
-        -I "${CMAKE_CURRENT_SOURCE_DIR}/js;"
-    ${CMAKE_CURRENT_SOURCE_DIR}/js/create_documentation_xml.js
-    ${CMAKE_CURRENT_BINARY_DIR}/doc/jsapi
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}    
+    ${Y60_LOCATION} create_documentation_xml.js
+        ${CMAKE_CURRENT_BINARY_DIR}/doc/jsapi
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+    DEPENDS y60
+    VERBATIM
+)
+add_custom_target(
+    Y60-jsdoc
+    ${Y60_LOCATION} create_documentation.js
+        ${CMAKE_CURRENT_BINARY_DIR}/doc/jsdoc
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     DEPENDS y60
     VERBATIM
 )

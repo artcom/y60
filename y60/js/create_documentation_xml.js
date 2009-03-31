@@ -96,7 +96,8 @@ function main() {
             myModules[myModuleNames[i]] = getDocumentation(myModuleNames[i]);
         }
         createIndex(myModules);
-        createTutorials();
+        //XXX
+        //createTutorials();
         generateJSLibDocumentation(myModules);
         print("Successfully created documentation " + ourDirectory + "/jslibdoc.xml");
     } catch (ex) {
