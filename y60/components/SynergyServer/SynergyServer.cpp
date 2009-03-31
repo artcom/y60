@@ -92,6 +92,8 @@ SynergyServer::SynergyServer( asl::Unsigned32 theHost, asl::Unsigned16 thePort )
     _myClientScreenSize(0,0)
 {
     AC_TRACE << "ASS_Mouse::SynergyServer";
+
+    // XXX: never start threads from CTORs. they might run into uninitialized virtuals.
     fork();
 }
 
@@ -201,6 +203,11 @@ void SynergyServer::run() {
 
     while (!shouldTerminate()) {
 
+        // XXX: replace this with blocking io.
+        //      receive should be simple blocking socket io.
+        //      sending can be done without going through a queue.
+        asl::msleep(10);
+
         try {
  
             if (NULL == _mySocket) {
@@ -263,7 +270,7 @@ void SynergyServer::send( const std::string & theMessage,
                      const std::vector<unsigned char> theData ) 
 {
 
-    AC_TRACE << "SynergyServer::send(" << theMessage << ")";
+    AC_DEBUG << "SynergyServer::send(" << theMessage << ")";
 
     size_t myMsgLen = theMessage.size() + theData.size();
     std::vector<unsigned char> myData;
@@ -334,6 +341,13 @@ bool SynergyServer::timedOut() {
     return myAlarm;
 }
 
+static bool messageStartsWith(std::vector<unsigned char> theMessage, std::string thePrefix) {
+    if(theMessage.size() >= thePrefix.size()) {
+        return std::equal(thePrefix.begin(), thePrefix.end(), theMessage.begin());
+    } else {
+        return false;
+    }
+}
 
 void SynergyServer::processMessages() {
 
@@ -346,18 +360,18 @@ void SynergyServer::processMessages() {
         std::vector<unsigned char> myMsg = _myMessageQueue.front();
         _myMessageQueue.pop();
 
-        if (std::string(myMsg.begin(), myMsg.begin() + 7) == "Synergy") {
-            AC_TRACE << "Got hello message";
+        if (messageStartsWith(myMsg, "Synergy")) {
+            AC_DEBUG << "Got hello message";
             send( "QINF" );
             resetKeepalive();
         }
-        else if (std::string(myMsg.begin(), myMsg.begin() + 4) == "CALV") {
-            AC_TRACE << "Got keep alive message";
+        else if (messageStartsWith(myMsg, "CALV")) {
+            AC_DEBUG << "Got keep alive message";
             send( "CALV" );
             resetKeepalive();
         }
-        else if (std::string(myMsg.begin(), myMsg.begin() + 4) == "DINF") {
-            AC_TRACE << "Got DInfo message";
+        else if (messageStartsWith(myMsg, "DINF")) {
+            AC_DEBUG << "Got DInfo message";
             parseClientInfo(myMsg);
             send( "CIAK" );            
             if (!_myIsConnected) { 
@@ -371,12 +385,12 @@ void SynergyServer::processMessages() {
             resetKeepalive();
             _myIsConnected = true;
         }
-        else if (std::string(myMsg.begin(), myMsg.begin() + 4) == "CNOP") {
-            AC_TRACE << "Got NOP message";
+        else if (messageStartsWith(myMsg, "CNOP")) {
+            AC_DEBUG << "Got NOP message";
             // do nothing
         }
-        else if (std::string(myMsg.begin(), myMsg.begin() + 4) == "CCLP") {
-            AC_TRACE << "Got Clipboard message";
+        else if (messageStartsWith(myMsg, "CCLP")) {
+            AC_DEBUG << "Got Clipboard message";
             // do nothing (yet)
         }
         else {

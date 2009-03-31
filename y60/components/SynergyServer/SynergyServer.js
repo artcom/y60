@@ -57,8 +57,9 @@
 */
 
 plug( "y60EventLoop" );
-plug( "y60ASSEventSource" );
 plug( "y60SynergyServer" );
+
+var myASSEventSource = plug( "y60ASSEventSource" );
 
 const DEFAULT_MODE = 0;
 const CLICKONPOINT_MODE = 1;
@@ -113,7 +114,6 @@ for (var i = 0; i < arguments.length; i++) {
 
 
 var mySynergyServer = new SynergyServer( myHost, myPort );
-var myASSEventSource = new ASSEventSource();
 
 var mySettings = new Node();
 mySettings.parseFile( "settings.xml" );
@@ -169,7 +169,7 @@ function onASSEvent( theEvent ) {
 }
 
 
-var myEventLoop = new EventLoop();
+var myEventLoop = new y60EventLoop();
 myEventLoop.go(this);
 
 
