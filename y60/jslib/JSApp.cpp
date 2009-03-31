@@ -1623,7 +1623,11 @@ JSApp::setupPath(const std::string & theIncludePath) {
         || asl::fileExists(asl::normalizeDirectory(myApplicationDirectory + "/../../CMakeFiles", true)))
     {
         AC_INFO << "Running from build directory, adding appropriate paths";
-        // XXX: find component directory / directories
+#ifdef CMAKE_INTDIR
+        myPacketManager->add(std::string(CMAKE_BINARY_DIR) + "/lib/" + std::string(CMAKE_INTDIR));
+#else
+        myPacketManager->add(std::string(CMAKE_BINARY_DIR) + "/lib");
+#endif
         myPacketManager->add(std::string(CMAKE_SOURCE_DIR) + "/y60/shader");
         myPacketManager->add(std::string(CMAKE_SOURCE_DIR) + "/y60/js");
     } else {
