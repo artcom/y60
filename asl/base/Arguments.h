@@ -114,17 +114,17 @@ public:
 private:
     void addUsageString(std::ostringstream & os) const;
 
-	// storage of the parsed arguments
+    // storage of the parsed arguments
     std::map<std::string,int> _options;
     std::vector<std::string> _allArguments;
     std::string _programName;
-	std::vector<int> _justArguments;
+    std::vector<int> _justArguments;
 		
-	// storage of the argument specification
+    // storage of the argument specification
     std::map<std::string,std::string> _allowedOptions;
     std::map<std::string,std::string> _optionDescriptions;
 	
-	std::vector<std::string> _argumentNames;
+    std::vector<std::string> _argumentNames;
     std::vector<std::string> _argumentDescriptions;
 
     std::string _myGeneralShortDescription;
