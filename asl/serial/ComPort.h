@@ -92,7 +92,6 @@ namespace asl {
 
             HANDLE       _myPortHandle;
             COMMTIMEOUTS _myTimeouts;
-            bool         _myBlockingFlag;
             unsigned     _myMinReadBytes;
     };
 

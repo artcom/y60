@@ -60,8 +60,7 @@ using namespace std;
 namespace asl {
 
     ComPort::ComPort(const std::string & theDeviceName) :
-        SerialDevice(theDeviceName),
-        _myBlockingFlag(false)
+        SerialDevice(theDeviceName)
     {}
 
     ComPort::~ComPort() {
@@ -123,22 +122,18 @@ namespace asl {
             _myTimeouts.ReadIntervalTimeout = MAXDWORD;
             _myTimeouts.ReadTotalTimeoutMultiplier = 0;
             _myTimeouts.ReadTotalTimeoutConstant = 0;
-            _myBlockingFlag = false;
         } else if (theMinBytesPerRead > 0 && theTimeout == 0) {
             _myTimeouts.ReadIntervalTimeout = 0;
             _myTimeouts.ReadTotalTimeoutMultiplier = 0;
             _myTimeouts.ReadTotalTimeoutConstant = 0;
-            _myBlockingFlag = true;
         } else if (theMinBytesPerRead > 0 && theTimeout > 0) {
             _myTimeouts.ReadIntervalTimeout = theTimeout * 100;
             _myTimeouts.ReadTotalTimeoutMultiplier = 0;
             _myTimeouts.ReadTotalTimeoutConstant = 0;
-            _myBlockingFlag = true;
         } else if (theMinBytesPerRead == 0 && theTimeout > 0) {
             _myTimeouts.ReadIntervalTimeout = MAXDWORD;
             _myTimeouts.ReadTotalTimeoutMultiplier = MAXDWORD;
             _myTimeouts.ReadTotalTimeoutConstant = theTimeout * 100;
-            _myBlockingFlag = true;
         }
 
         // TODO: Think about write timeouts
