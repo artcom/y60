@@ -149,6 +149,9 @@ class TransportLayer :  public asl::PosixThread {
         void sendCommand( const std::string & theCommand );
         void handleConfigurationCommand();
 
+        void syncLost();
+        void connectionLost();
+
         unsigned readStatusToken( std::vector<unsigned char>::iterator & theIt, const char theToken );
         unsigned getBytesPerStatusLine();
         size_t getBytesPerFrame();

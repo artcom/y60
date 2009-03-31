@@ -195,8 +195,9 @@ SerialTransport::readData() {
         if (myCurrentTimeStamp - _myLastComTestTime > NO_DATA_TIMEOUT) {
             _myLastComTestTime = myCurrentTimeStamp;
             if (_myNumReceivedBytes == 0 ) {
-                AC_WARNING << "ASSDriver lost communication";
-                throw SerialPortException("CommuncationLost", PLUS_FILE_LINE);
+                AC_WARNING << "Data timeout.";
+                connectionLost();
+                return;
             } else {
                 _myNumReceivedBytes = 0;
             }
@@ -225,14 +226,8 @@ SerialTransport::readData() {
                 _myReceiveBuffer.begin(), _myReceiveBuffer.begin() + myMaxBytes );
         //dumpBuffer( _myFrameBuffer );
     } catch (const SerialPortException & ex) {
-        AC_DEBUG << "SerialTransport: Exception while reading:" << ex;
-        //_myDriver->createTransportLayerEvent( "lost_communication" );
-        MAKE_SCOPE_TIMER(SerialTransport_serialPortException);
-        _myFrameQueueLock.lock();
-        _myFrameQueue.push( ASSEvent( ASS_LOST_COM ));
-        _myFrameQueueLock.unlock();
-        _myDeviceLostCounter++;
-        setState(NOT_CONNECTED);
+        AC_WARNING << "Exception while reading from serial port: " << ex;
+        connectionLost();
     }
 }
 

@@ -346,11 +346,8 @@ TransportLayer::parseStatusLine(/*RasterPtr & theTargetRaster*/) {
             _myExpectedLine = 1;
         }
     } catch ( const ASSStatusTokenException & ex) {
-        // XXX Workaround Bug 595
-        AC_WARNING << ex;
-        AC_WARNING << "Workaround for Bug 595. Resync.";
-        _mySyncLostCounter += 1;
-        setState( SYNCHRONIZING );
+        AC_WARNING << "Error parsing status: " << ex;
+        syncLost();
     }
 }
 
@@ -383,14 +380,9 @@ TransportLayer::readSensorValues(/* RasterPtr theTargetRaster */) {
             parseStatusLine(/*theTargetRaster*/);
         } else {
             if ( _myTmpBuffer[0] != MAGIC_TOKEN || _myTmpBuffer[1] != _myExpectedLine) {
-                AC_WARNING << "Sync error.";
-                exit( 1 );
-                //_mySyncLostCounter++;
-                //_myFrameQueueLock.lock();
-                //_myFrameQueue.push( ASSEvent( ASS_LOST_SYNC ));
-                //_myFrameQueueLock.unlock();
-                //setState( SYNCHRONIZING );
-                //return;
+                AC_WARNING << "Framing error in sensor data.";
+                syncLost();
+                return;
             }
             int myRowIdx = _myTmpBuffer[1] - 1;
             //AC_PRINT << "Got row: " << myRowIdx;
@@ -602,23 +594,36 @@ TransportLayer::getCommandResponse() {
 void
 TransportLayer::sendCommand( const std::string & theCommand ) {
     try {
-        AC_PRINT << "Sending command: '" << theCommand << "'";
+        AC_INFO << "Sending command: " << theCommand;
         std::string myCommand( theCommand );
         myCommand.append("\r");
         writeData( myCommand.c_str(), myCommand.size() );
         _myLastCommandTime = double( asl::Time() );
     } catch (const SerialPortException & ex) {
-        AC_WARNING << ex;
-	MAKE_SCOPE_TIMER(TransportLayer_sendCommand);
-        _myFrameQueueLock.lock();
-        _myFrameQueue.push( ASSEvent( ASS_LOST_COM ));
-        _myFrameQueueLock.unlock();
-        _myDeviceLostCounter++;
-        setState(NOT_CONNECTED);
+        AC_WARNING << "Error while sending command: " << ex;
+        connectionLost();
     }
 }
 
+void
+TransportLayer::syncLost() {
+    AC_WARNING << "Sync lost. Resynchronizing.";
+    _mySyncLostCounter++;
+    _myFrameQueueLock.lock();
+    _myFrameQueue.push( ASSEvent( ASS_LOST_SYNC ));
+    _myFrameQueueLock.unlock();
+    setState( SYNCHRONIZING );
+}
 
+void
+TransportLayer::connectionLost() {
+    AC_WARNING << "Connection lost. Reconnecting.";
+    _myDeviceLostCounter++;
+    _myFrameQueueLock.lock();
+    _myFrameQueue.push( ASSEvent( ASS_LOST_COM ));
+    _myFrameQueueLock.unlock();
+    setState(NOT_CONNECTED);
+}
 
 DriverState
 TransportLayer::getState() const {
