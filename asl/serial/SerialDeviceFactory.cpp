@@ -56,7 +56,7 @@ namespace asl {
 SerialDevice * 
 getSerialDevice(unsigned int theIndex) {
 #ifdef _WIN32
-    return new ComPort(std::string("COM") + as_string(theIndex + 1) + ":");
+    return new ComPort(std::string("\\\\.\\COM") + as_string(theIndex + 1));
 #else
     return new TTYPort(std::string("/dev/ttyS") + as_string(theIndex));
 #endif
