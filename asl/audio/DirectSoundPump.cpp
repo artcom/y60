@@ -40,7 +40,7 @@
 
 #include "DirectSoundPump.h"
 
-#include "DSMessages.h"
+#include "DirectSoundMessages.h"
 
 #include <asl/base/Logger.h>
 #include <asl/base/os_functions.h>

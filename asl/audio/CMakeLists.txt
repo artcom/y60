@@ -53,7 +53,7 @@ endif(LINUX)
 
 if(WIN32)
     set(SOURCES ${SOURCES} DirectSoundPump.cpp)
-    set(HEADERS ${HEADERS} DirectSoundPump.h DSMessages.h)
+    set(HEADERS ${HEADERS} DirectSoundPump.h DirectSoundMessages.h)
     list(APPEND EXTERNS WINMM DIRECTX)
 endif(WIN32)
 
