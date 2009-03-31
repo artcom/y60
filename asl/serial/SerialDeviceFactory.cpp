@@ -93,7 +93,7 @@ void getSerialDeviceNames(const std::string theDevicePrefix, std::vector<std::st
     std::vector<std::string> myDeviceNames;
     if (listDirectory("/dev", myDeviceNames) ) {
         for (unsigned i = 0; i <  myDeviceNames.size();++i) {
-            if (myDeviceNames[i].find("cu.") == 0) {
+            if (myDeviceNames[i].find(theDevicePrefix) == 0) {
                 theSerialDevicesNames.push_back(std::string("/dev/"+myDeviceNames[i]));
                 AC_DEBUG << "Found serial device #" << theSerialDevicesNames.size()-1 << " , name = "<<theSerialDevicesNames.back();
             }
@@ -111,7 +111,7 @@ bool getSerialDeviceNames(std::vector<std::string> & theSerialDevicesNames) {
 
 #ifdef LINUX
 bool getSerialDeviceNames(std::vector<std::string> & theSerialDevicesNames) {
-    theSerialDevicesNames.resize(0);;
+    theSerialDevicesNames.resize(0);
     getSerialDeviceNames("ttyUSB",theSerialDevicesNames);
     getSerialDeviceNames("ttyACM",theSerialDevicesNames);
     getSerialDeviceNames("ttyS",theSerialDevicesNames);
@@ -122,9 +122,10 @@ bool getSerialDeviceNames(std::vector<std::string> & theSerialDevicesNames) {
 
 SerialDevice * 
 getSerialDevice(unsigned int theIndex) {
-#ifdef _WIN32
+#ifdef WIN32
     return new ComPort(std::string("\\\\.\\COM") + as_string(theIndex + 1));
-#else
+#endif
+#ifdef OSX
     std::vector<std::string> myDevicesNames;
     if (!getSerialDeviceNames(myDevicesNames)) {;
         AC_WARNING << "No serial devices found.";
@@ -137,7 +138,8 @@ getSerialDevice(unsigned int theIndex) {
     }
 #endif
 #ifdef LINUX
-    //return new TTYPort(std::string("/dev/ttyS") + as_string(theIndex));
+    // XXX: need this ATM so the first is actually ttyS0, which is tested.
+    return new TTYPort(std::string("/dev/ttyS") + as_string(theIndex));
 #endif
 }
 
