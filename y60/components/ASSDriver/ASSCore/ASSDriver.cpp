@@ -1410,6 +1410,7 @@ namespace y60 {
             /*} else {
               AC_ERROR << "driver setup: no TransportLayer setting found.";*/
             _myTransportLayer->fork();
+            _myTransportLayer->setRealtimePriority();
         }
 
         getConfigSetting( theSettings, "ComponentThreshold", _myComponentThreshold, 5 );
