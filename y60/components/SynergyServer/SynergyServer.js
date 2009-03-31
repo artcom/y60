@@ -61,6 +61,8 @@ plug( "y60SynergyServer" );
 
 var myASSEventSource = plug( "y60ASSEventSource" );
 
+myASSEventSource.disconnect();
+
 const DEFAULT_MODE = 0;
 const CLICKONPOINT_MODE = 1;
 const RELATIVE_MODE = 2;
@@ -121,7 +123,7 @@ myASSEventSource.onUpdateSettings( mySettings );
 
 // wait until we have a connection with the synergy client
 while (!mySynergyServer.isConnected()) {
-    ;
+    msleep(250);
 }
 
 
@@ -170,6 +172,7 @@ function onASSEvent( theEvent ) {
 
 
 var myEventLoop = new y60EventLoop();
+myASSEventSource.connect();
 myEventLoop.go(this);
 
 
