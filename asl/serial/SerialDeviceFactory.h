@@ -45,6 +45,7 @@
 #include "asl_serial_settings.h"
 
 #include <string>
+#include <vector>
 
 namespace asl {
 
@@ -68,6 +69,7 @@ namespace asl {
      *                  /dev/ttyUSB0
      */
     ASL_SERIAL_DECL SerialDevice * getSerialDeviceByName(const std::string & theDevice);
+    ASL_SERIAL_DECL bool getSerialDeviceNames(std::vector<std::string> & theSerialDevicesNames);
 
     /* @} */
 }

@@ -121,13 +121,10 @@ TTYPort::open(unsigned int theBaudRate, unsigned int theDataBits,
             theTimeout = 255;
         }
     }
-#ifdef OSX_N
-    AC_DEBUG << "open flags = " << (myOpenMode|O_NONBLOCK);
-    _myPortHandle = ::open(getDeviceName().c_str(), myOpenMode|O_NONBLOCK);
-#else
-    AC_DEBUG << "open flags = " << (myOpenMode|myOpenNonBlockMode);
+    AC_TRACE << "open flags = " << (myOpenMode|myOpenNonBlockMode);
+    
     _myPortHandle = ::open(getDeviceName().c_str(), myOpenMode|myOpenNonBlockMode);
-#endif
+    
     if (_myPortHandle < 0) {
         throw SerialPortException(string("Can not open device '") + getDeviceName() + "': " +
                                 strerror(errno), PLUS_FILE_LINE);
@@ -147,6 +144,7 @@ TTYPort::open(unsigned int theBaudRate, unsigned int theDataBits,
     myTermIO.c_cflag = myBaudRate | myDataBits | myParityMode |
                        myStopBits | myFlowControl | CLOCAL | CREAD;
 #else
+    // POSIX conform Baud rate setting required for OSX
     myTermIO.c_cflag = myDataBits | myParityMode |
                        myStopBits | myFlowControl | CLOCAL | CREAD;
     
@@ -175,19 +173,7 @@ TTYPort::open(unsigned int theBaudRate, unsigned int theDataBits,
                                getDeviceName() + ".",
                                PLUS_FILE_LINE);
     }
-#ifdef OSX_N
-    if (fcntl(_myPortHandle,F_SETFL,myOpenMode|myOpenNonBlockMode)<0) {
-       throw SerialPortException(string("Can not set device mode for '") + getDeviceName() + "': " +
-                                strerror(errno), PLUS_FILE_LINE);
-    }
-    int myFlags = fcntl(_myPortHandle,F_GETFL);
-    if (myFlags<0) {
-       throw SerialPortException(string("Can not get device mode for '") + getDeviceName() + "': " +
-                                strerror(errno), PLUS_FILE_LINE);
-    }
-     AC_TRACE << "TTYPort: myFlags=" <<myFlags;
-#endif
-     AC_TRACE << "TTYPort: open done";
+    AC_TRACE << "TTYPort: open done";
 }
 
 void

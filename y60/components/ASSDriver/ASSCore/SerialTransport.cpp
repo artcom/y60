@@ -77,7 +77,7 @@ class ASSDriver;
 SerialTransport::SerialTransport(const dom::NodePtr & theSettings) :
     TransportLayer( "serial", theSettings ),
     _mySerialPort( 0 ),
-    _myUseUSBFlag( false ),
+//    _myUseUSBFlag( false ),
     _myPortNum( -1 ),
     _myPortName("-"),
     _myBaudRate( 57600 ),
@@ -105,7 +105,7 @@ SerialTransport::settingsChanged(dom::NodePtr theSettings) {
 
     myChangedFlag |= settingChanged( theSettings, "SerialPort", _myPortNum );
     myChangedFlag |= settingChanged( theSettings, "SerialPortName", _myPortName );
-    myChangedFlag |= settingChanged( theSettings, "UseUSB", _myUseUSBFlag );
+    //myChangedFlag |= settingChanged( theSettings, "UseUSB", _myUseUSBFlag );
     myChangedFlag |= settingChanged( theSettings, "BaudRate", _myBaudRate );
     myChangedFlag |= settingChanged( theSettings, "BitsPerWord", _myBitsPerSerialWord );
     myChangedFlag |= settingChanged( theSettings, "Parity", _myParity );
@@ -121,7 +121,7 @@ SerialTransport::init(dom::NodePtr theSettings) {
 
     getConfigSetting( theSettings, "SerialPort", _myPortNum, -1 );
     getConfigSettingString( theSettings, "SerialPortName", _myPortName, "-" );
-    getConfigSetting( theSettings, "UseUSB", _myUseUSBFlag, false );
+   // getConfigSetting( theSettings, "UseUSB", _myUseUSBFlag, false );
     getConfigSetting( theSettings, "BaudRate", _myBaudRate, 57600 );
     getConfigSetting( theSettings, "BitsPerWord", _myBitsPerSerialWord, 8 );
 
@@ -139,7 +139,8 @@ SerialTransport::establishConnection() {
         _myNumReceivedBytes = 0;
 
     if (_myPortName == "-") {
-
+        _mySerialPort = getSerialDevice( _myPortNum );
+#if 0 
 #ifdef _WIN32
         _mySerialPort = getSerialDevice( _myPortNum );
 #endif
@@ -161,10 +162,10 @@ SerialTransport::establishConnection() {
         AC_PRINT << "TODO: implement device name handling for FTDI USB->RS232 "
             << "virtual TTYs on Mac OS X., set SerialPortName setting to correct devicename, e.g. /dev/tty.usbserial-A600465T";
 #endif
+#endif
         } else {
             _mySerialPort = getSerialDeviceByName( _myPortName );
         }
-
         if (_mySerialPort) {
             try {
                 _mySerialPort->open( _myBaudRate, _myBitsPerSerialWord,

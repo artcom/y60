@@ -649,6 +649,20 @@ bool isDirectory(const std::string & theUTF8Path) {
     return false;
 }
 
+bool listDirectory(const std::string & theUTF8Path, std::vector<string> & theContent) {
+    DIR * myDirHandle = opendir(Path(theUTF8Path, UTF8).toLocale().c_str());
+    if (myDirHandle) {
+        theContent.resize(0);
+        struct dirent * myItem = 0;
+        while ( (myItem = readdir(myDirHandle)) != 0) {
+            theContent.push_back(myItem->d_name);
+        }
+        closedir(myDirHandle);
+        return true;
+    }
+    return false;
+}
+
 std::string
 evaluateRelativePath(const std::string & theBaseDirectory,
                      const std::string & theAbsolutePath,

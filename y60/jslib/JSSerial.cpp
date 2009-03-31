@@ -694,9 +694,25 @@ JSSerial::StaticProperties() {
     return myProperties;
 }
 
+static JSBool
+getSerialDeviceNames(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Returns the names of the serial ports on the system");
+    DOC_END;
+    try {
+        std::vector<std::string> myPortNames;
+        if (asl::getSerialDeviceNames(myPortNames)) {
+             *rval = as_jsval(cx, myPortNames);
+        }
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
 JSFunctionSpec *
 JSSerial::StaticFunctions() {
-    static JSFunctionSpec myFunctions[] = {{0}};
+    static JSFunctionSpec myFunctions[] = {
+        // name                    native               nargs
+        {"getSerialDeviceNames",   getSerialDeviceNames,  0},
+        {0}};
     return myFunctions;
 }
 

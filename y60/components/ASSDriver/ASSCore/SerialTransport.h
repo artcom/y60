@@ -86,8 +86,8 @@ class SerialTransport : public TransportLayer {
     private:
 
         asl::SerialDevice * _mySerialPort;
-        bool _myUseUSBFlag; // used by the linux implementation, because
-                            // USB TTYs have a diffrent naming scheme
+        //bool _myUseUSBFlag; // used by the linux implementation, because
+        //                    // USB TTYs have a diffrent naming scheme
         int  _myPortNum;
         std::string _myPortName;
         int  _myBaudRate;
