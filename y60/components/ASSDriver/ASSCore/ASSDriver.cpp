@@ -1565,8 +1565,6 @@ namespace y60 {
             }
             _myTransportLayer->unlockFrameQueue();
             AC_TRACE << "frame queue size after unlocking = " << myFrameQueue.size();
-        } else {
-            AC_PRINT << "No TransportLayer";
         }
     }
 
