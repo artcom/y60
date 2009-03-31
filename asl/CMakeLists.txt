@@ -26,8 +26,8 @@ endif(LINUX)
 if(OSX)
     find_library(CARBON     Carbon)
     find_library(AUDIO_UNIT AudioUnit)
-    mark_as_advanced( CARBON )
-    mark_as_advanced( AUDIO_UNIT )
+    mark_as_advanced(CARBON)
+    mark_as_advanced(AUDIO_UNIT)
 endif(OSX)
 
 include(ASLUtilities)
@@ -59,6 +59,12 @@ add_subdirectory(net)
 add_subdirectory(ipc)
 add_subdirectory(zip)
 add_subdirectory(utilities)
+
+# Handle aslunused
+option(ASL_WITH_UNUSED "If the aslunused library should be compiled, containing various experimental and obsolete components." YES)
+if(ASL_WITH_UNUSED)
+    add_subdirectory(unused)
+endif(ASL_WITH_UNUSED)
 
 ac_add_doxygen(ASL ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}/doc/doxygen Doxyfile.in)
 
