@@ -367,7 +367,6 @@ void SynergyServer::processMessages() {
         }
         else if (messageStartsWith(myMsg, "CALV")) {
             AC_DEBUG << "Got keep alive message";
-            send( "CALV" );
             resetKeepalive();
         }
         else if (messageStartsWith(myMsg, "DINF")) {
