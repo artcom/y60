@@ -19,12 +19,12 @@
         <CaptureSensorData min="0" max="1" step="1" >0</CaptureSensorData>
         <CurrentValueDisplay min="0" max="2">0.00000</CurrentValueDisplay>
         <EventQueueSize>100</EventQueueSize>
-        <TransportLayer>socket</TransportLayer>
+        <TransportLayer>serial</TransportLayer>
         <IpAddress>10.1.0.101</IpAddress>
         <Port>10001</Port>
-        <SerialPort>1</SerialPort>
+        <SerialPort>5</SerialPort>
         <UseUSB min="0" max="1">1</UseUSB>
-        <BaudRate>230400</BaudRate>
+        <BaudRate>115200</BaudRate>
         <BitsPerWord min="5" max="8">8</BitsPerWord>
         <Parity>no_parity</Parity>
         <StopBits min="1" max="2">1</StopBits>
