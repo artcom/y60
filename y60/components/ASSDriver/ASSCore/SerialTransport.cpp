@@ -85,8 +85,8 @@ SerialTransport::SerialTransport(const dom::NodePtr & theSettings) :
     _myStopBits( 1 ),
     _myHandshakingFlag( false ),
     _myParity( SerialDevice::NO_PARITY ),
-    _myLastComTestTime( 0 ),
-    _myNumReceivedBytes( 0 )
+    _myNumReceivedBytes( 0 ),
+    _myLastComTestTime( 0 )
 
 {
     init( theSettings );
@@ -133,56 +133,42 @@ SerialTransport::init(dom::NodePtr theSettings) {
 
 void 
 SerialTransport::establishConnection() {
-    //AC_PRINT << "SerialTransport::establishConnection()";
-    if (_myPortNum >= 0 ) {
-        _myLastComTestTime = asl::Time();
-        _myNumReceivedBytes = 0;
+    AC_DEBUG << "SerialTransport::establishConnection()";
+
+    _myNumReceivedBytes = 0;
+    _myLastComTestTime = asl::Time();
+
+    if(_mySerialPort) {
+	delete _mySerialPort;
+	_mySerialPort = 0;
+    }
 
     if (_myPortName == "-") {
-        _mySerialPort = getSerialDevice( _myPortNum );
-#if 0 
-#ifdef _WIN32
-        _mySerialPort = getSerialDevice( _myPortNum );
-#endif
-#ifdef LINUX
-        if (_myUseUSBFlag) {
-            string myDeviceName("/dev/ttyUSB");
-            myDeviceName += as_string( _myPortNum );
-            if ( fileExists( myDeviceName ) ) {
-                _mySerialPort = getSerialDeviceByName( myDeviceName );
-            }
-        } else {
-            _mySerialPort = getSerialDevice( _myPortNum );
-        }
-#endif
-#ifdef OSX
-        // [DS] IIRC the FTDI devices on Mac OS X appear as /dev/tty.usbserial-[devid]
-        // where [devid] is a string that is flashed into the FTDI chip. I'll
-        // check that the other day.
-        AC_PRINT << "TODO: implement device name handling for FTDI USB->RS232 "
-            << "virtual TTYs on Mac OS X., set SerialPortName setting to correct devicename, e.g. /dev/tty.usbserial-A600465T";
-#endif
-#endif
-        } else {
-            _mySerialPort = getSerialDeviceByName( _myPortName );
-        }
-        if (_mySerialPort) {
-            try {
-                _mySerialPort->open( _myBaudRate, _myBitsPerSerialWord,
-                        _myParity, _myStopBits, _myHandshakingFlag, 0 , 1);
-                _mySerialPort->setStatusLine( SerialDevice::RTS);
-
-                setState( SYNCHRONIZING );
-            } catch (const asl::SerialPortException & ex) {
-                AC_DEBUG << "Transportlayer: Exception while establishing connection:"<<ex;
-                if ( _mySerialPort ) {
-                    delete _mySerialPort;
-                    _mySerialPort = 0;
-                }
-            }
-        }
+	if (_myPortNum >= 0 ) {
+	    _mySerialPort = getSerialDevice(_myPortNum);
+	}
     } else {
-        AC_PRINT << "scanForSerialPort() No port configured.";
+	_mySerialPort = getSerialDeviceByName(_myPortName);
+    }
+
+    if (!_mySerialPort) {
+	AC_WARNING << "ASS does not have a serial port configured";
+	return;
+    }
+
+    try {
+	_mySerialPort->open(_myBaudRate, _myBitsPerSerialWord,
+			    _myParity, _myStopBits, _myHandshakingFlag, 0 , 1);
+	
+	_mySerialPort->setStatusLine(SerialDevice::RTS);
+	
+	setState( SYNCHRONIZING );
+    } catch (const asl::SerialPortException & ex) {
+	AC_WARNING << "Exception while opening serial: " << ex;
+	if ( _mySerialPort ) {
+	    delete _mySerialPort;
+	    _mySerialPort = 0;
+	}
     }
 }
 
