@@ -114,7 +114,7 @@ bool getSerialDeviceNames(std::vector<std::string> & theSerialDevicesNames) {
 bool getSerialDeviceNames(std::vector<std::string> & theSerialDevicesNames) {
     theSerialDevicesNames.resize(0);
     getSerialDeviceNames("ttyS",theSerialDevicesNames);
-	getSerialDeviceNames("ttyUSB",theSerialDevicesNames);
+    getSerialDeviceNames("ttyUSB",theSerialDevicesNames);
     getSerialDeviceNames("ttyACM",theSerialDevicesNames);
     return theSerialDevicesNames.size() != 0;
 }
@@ -132,7 +132,7 @@ getSerialDevice(unsigned int theIndex) {
 #ifdef WIN32
         return new ComPort(myDevicesNames[theIndex]);
 #else
-		return new TTYPort(myDevicesNames[theIndex]);
+        return new TTYPort(myDevicesNames[theIndex]);
 #endif
     } else {
         AC_ERROR << "getSerialDevice: index out of range, index = "<<theIndex<<", max ="<<myDevicesNames.size()-1;
