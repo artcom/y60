@@ -249,7 +249,10 @@ Logger::log(Time theTime, Severity theSeverity, const char * theModule, int theI
     } else {
         myMessage = theText;
     }
-    for (std::vector<Ptr<MessageSink> >::size_type i = 0; i < _myMessageSinks.size(); ++i) {     
+    for (std::vector<Ptr<MessageSink> >::size_type i = 0; i < _myMessageSinks.size(); ++i) {
+        if (theSeverity > _mySinkSeverityFilter[i]) {
+            continue;
+        }
         if (theSeverity > SEV_PRINT) {
             if (_mySinkFormatter[i]) {
                 myMessage = _mySinkFormatter[i]->format(theTime, theSeverity, theModule, theId, theText);
