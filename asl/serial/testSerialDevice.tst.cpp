@@ -61,36 +61,49 @@ class SerialDeviceUnitTest : public UnitTest {
 public:
     SerialDeviceUnitTest() : UnitTest("SerialDeviceUnitTest") {  }
     void run() {
-        SerialDevice * myPort = getSerialDevice(0);
+        int openablePort = -1;
+        int unOpenablePort = -1;
+        std::vector<std::string> myDeviceNames;
+        if (getSerialDeviceNames(myDeviceNames)) {
+            for (unsigned i = 0; i < myDeviceNames.size();++i) {
+                SerialDevice * myPort = getSerialDevice(i);
 #ifdef _WIN32
-        ENSURE_MSG(myPort->getDeviceName() == "\\\\.\\COM1", "Testing name factory")
+                ENSURE_MSG(myPort->getDeviceName() == (std::string("\\\\.\\COM")+asl::as_string(i)), "Testing name factory");
 #else
-        ENSURE_MSG(myPort->getDeviceName() == "/dev/ttyS0", "Testing name factory")
+                ENSURE_MSG(myPort->getDeviceName() == myDeviceNames[i], "Testing name factory");
 #endif
-        try {
-            myPort->open(9600, 8, SerialDevice::NO_PARITY, 1);
-        } catch (SerialPortException ex) {
-            cerr << "###WARNING: Cannot open serial device '" << myPort->getDeviceName() <<
-                    "': " << ex << " skipping serial device tests" << endl; 
-            return;
+                try {
+                    myPort->open(9600, 8, SerialDevice::NO_PARITY, 1);
+                } catch (SerialPortException ex) {
+                    cerr << "###WARNING: Cannot open serial device '" << myPort->getDeviceName() <<
+                        "': " << ex << " skipping serial device tests" << endl; 
+                    unOpenablePort = i;
+                    continue;
+                }
+                openablePort = i;
+                ENSURE(myPort->isOpen());
+                myPort->close();
+                ENSURE( ! myPort->isOpen());
+                delete myPort;
+            }
         }
         
-        ENSURE(myPort->isOpen());
-        myPort->close();
-        ENSURE( ! myPort->isOpen());
-        delete myPort;
-        
-        // WARNING this test may fail if you have more than 500 serial ports ;-)
-        SerialDevice * otherPort = getSerialDevice(500);
-        ENSURE_EXCEPTION(otherPort->open(9600, 8, SerialDevice::NO_PARITY, 1), SerialPortException);
-        ENSURE( ! otherPort->isOpen());
-        ENSURE_EXCEPTION(otherPort->write("ttt", 3), SerialPortException);
-        char myBuffer[3];
-        size_t mySize = 3;
-        ENSURE_EXCEPTION(otherPort->read(myBuffer, mySize), SerialPortException);
+        // WARNING this test may fail if you have more than 5000 serial ports ;-)
+        ENSURE(getSerialDevice(5000) == 0);
 
-        ENSURE_EXCEPTION(otherPort->close(), SerialPortException);
-        delete otherPort;
+        // test error handling
+        if (unOpenablePort >= 0) { 
+                SerialDevice * otherPort = getSerialDevice(unOpenablePort);
+                ENSURE_EXCEPTION(otherPort->open(9600, 8, SerialDevice::NO_PARITY, 1), SerialPortException);
+                ENSURE( ! otherPort->isOpen());
+                ENSURE_EXCEPTION(otherPort->write("ttt", 3), SerialPortException);
+                char myBuffer[3];
+                size_t mySize = 3;
+                ENSURE_EXCEPTION(otherPort->read(myBuffer, mySize), SerialPortException);
+
+                ENSURE_EXCEPTION(otherPort->close(), SerialPortException);
+                delete otherPort;
+        }
 
         // at least instatiate this thing once ... [DS]
         SerialDevice * myDebugPort = new DebugPort("Debug Port");
