@@ -52,7 +52,6 @@ error_functions.h
 Exception.h
 ExitHandler.h
 file_functions.h
-GarbageCollector.h
 initialization.h
 ITimeSource.h
 Logger.h
@@ -103,7 +102,6 @@ Dashboard
 Enum
 Exception
 _file_functions
-#GarbageCollector
 Logger
 MappedBlock
 MemoryPool

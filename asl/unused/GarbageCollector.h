@@ -40,25 +40,27 @@
 #ifndef _included_asl_GarbageCollector_h_
 #define _included_asl_GarbageCollector_h_
 
-#include "asl_base_settings.h"
+#include "asl_unused_settings.h"
 
-#include "settings.h"
-#include "RangeSet.h"
-#include "Exception.h"
-#include "string_functions.h"
-#include "Singleton.h"
+#include <asl/base/settings.h>
+#include <asl/base/RangeSet.h>
+#include <asl/base/Exception.h>
+#include <asl/base/string_functions.h>
+#include <asl/base/Singleton.h>
 
-#include "Time.h"
-#include "Dashboard.h"
+#include <asl/base/Time.h>
+#include <asl/base/Dashboard.h>
 
-#include "AtomicCount.h"
-#include "MemoryPool.h"
-#ifdef _WIN32
+#include <asl/base/AtomicCount.h>
+#include <asl/base/MemoryPool.h>
+
+#ifdef WIN32
 #include <stddef.h>
 #endif
 
 #include <assert.h>
 #include <pthread.h>
+
 #ifdef OSX
 #include <malloc/malloc.h>
 #else
