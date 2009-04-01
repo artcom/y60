@@ -64,7 +64,7 @@ bool getSerialDeviceNames(std::vector<std::string> & theSerialDevicesNames) {
     //Iterate through all possible 255 COM ports and see if we can open them or fail in a way that indicates they exist 
     for (unsigned i=1; i<256; i++) {
         std::string myPort = std::string("\\\\.\\COM")+asl::as_string(i);
-        bool exists = FALSE;
+        bool exists = false;
 
         HANDLE hPort = ::CreateFile(myPort.c_str(), GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, 0, 0);
 
@@ -72,18 +72,18 @@ bool getSerialDeviceNames(std::vector<std::string> & theSerialDevicesNames) {
             DWORD dwError = GetLastError();
             //Check to see if the error was because some other app had the port open or a general failure
             if (dwError == ERROR_ACCESS_DENIED || dwError == ERROR_GEN_FAILURE || dwError == ERROR_SHARING_VIOLATION || dwError == ERROR_SEM_TIMEOUT) {
-                exists = TRUE;
-            } else {
-                //The port was opened successfully
-                exists = TRUE;
-                CloseHandle(hPort);
-            }
-            if (exists) {
-                theSerialDevicesNames.push_back(myPort);
-                AC_DEBUG << "Found serial device #" << theSerialDevicesNames.size()-1 << " , name = "<<theSerialDevicesNames.back();
-            }
-        }
-    }
+                exists = true;
+			}
+		} else {
+			//The port was opened successfully
+			exists = true;
+			CloseHandle(hPort);
+		}
+		if (exists) {
+			theSerialDevicesNames.push_back(myPort);
+			AC_DEBUG << "Found serial device #" << theSerialDevicesNames.size()-1 << " , name = "<<theSerialDevicesNames.back();
+		}
+	}
     return theSerialDevicesNames.size() != 0;
 }
 
@@ -112,9 +112,9 @@ bool getSerialDeviceNames(std::vector<std::string> & theSerialDevicesNames) {
 #ifdef LINUX
 bool getSerialDeviceNames(std::vector<std::string> & theSerialDevicesNames) {
     theSerialDevicesNames.resize(0);
-    getSerialDeviceNames("ttyUSB",theSerialDevicesNames);
-    getSerialDeviceNames("ttyACM",theSerialDevicesNames);
     getSerialDeviceNames("ttyS",theSerialDevicesNames);
+	getSerialDeviceNames("ttyUSB",theSerialDevicesNames);
+    getSerialDeviceNames("ttyACM",theSerialDevicesNames);
     return theSerialDevicesNames.size() != 0;
 }
 #endif
@@ -122,24 +122,28 @@ bool getSerialDeviceNames(std::vector<std::string> & theSerialDevicesNames) {
 
 SerialDevice * 
 getSerialDevice(unsigned int theIndex) {
-#ifdef WIN32
-    return new ComPort(std::string("\\\\.\\COM") + as_string(theIndex + 1));
-#endif
-#ifdef OSX
+
     std::vector<std::string> myDevicesNames;
     if (!getSerialDeviceNames(myDevicesNames)) {;
         AC_WARNING << "No serial devices found.";
     }
     if (theIndex < myDevicesNames.size()) {
-        return new TTYPort(myDevicesNames[theIndex]);
+#ifdef WIN32
+        return new ComPort(myDevicesNames[theIndex]);
+#else
+		return new TTYPort(myDevicesNames[theIndex]);
+#endif
     } else {
         AC_ERROR << "getSerialDevice: index out of range, index = "<<theIndex<<", max ="<<myDevicesNames.size()-1;
         return 0;
     }
+
+#ifdef WIN32
+    // return new ComPort(std::string("\\\\.\\COM") + as_string(theIndex + 1));
 #endif
 #ifdef LINUX
     // XXX: need this ATM so the first is actually ttyS0, which is tested.
-    return new TTYPort(std::string("/dev/ttyS") + as_string(theIndex));
+    // return new TTYPort(std::string("/dev/ttyS") + as_string(theIndex));
 #endif
 }
 

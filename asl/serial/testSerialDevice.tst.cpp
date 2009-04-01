@@ -66,12 +66,9 @@ public:
         std::vector<std::string> myDeviceNames;
         if (getSerialDeviceNames(myDeviceNames)) {
             for (unsigned i = 0; i < myDeviceNames.size();++i) {
+				DPRINT(myDeviceNames[i]);
                 SerialDevice * myPort = getSerialDevice(i);
-#ifdef _WIN32
-                ENSURE_MSG(myPort->getDeviceName() == (std::string("\\\\.\\COM")+asl::as_string(i)), "Testing name factory");
-#else
                 ENSURE_MSG(myPort->getDeviceName() == myDeviceNames[i], "Testing name factory");
-#endif
                 try {
                     myPort->open(9600, 8, SerialDevice::NO_PARITY, 1);
                 } catch (SerialPortException ex) {
