@@ -282,13 +282,14 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
     }
 
     function Setting(theNode) {
-        var _myNode      = theNode;
-        var _myArrayPos  = null;
-        var _myValue     = null;
-        var _myArrayFlag = null;
-        var _myArray     = null;
+        var _myNode       = theNode;
+        var _myArrayPos   = null;
+        var _myValue      = null;
+        var _myArrayFlag  = null;
+        var _myArray      = null;
+        var _myStringFlag = null;
 
-        function setup() {
+        this.setup = function() {
             _myArrayPos  = 0;
             if(_myNode.firstChild) {
                 if(_myNode.firstChild.nodeType != Node.TEXT_NODE) {
@@ -296,12 +297,19 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
                     Logger.warning("Node " + _myNode.nodeName + " has no value");
                     return;
                 }
-                _myValue     = _myNode.firstChild.nodeValue;
-                _myArrayFlag = (_myValue[0] == "[");
-                _myStringFlag = (Number(_myValue).toString() == "NaN");
-                _myArray     = stringToArray(_myValue);
+                _myValue      = _myNode.firstChild.nodeValue;
+                _myArrayFlag  = (_myValue[0] == "[");
+                _myArray      = stringToArray(_myValue);
+                if(_myArrayFlag) {
+                    _myStringFlag = false;
+                    for(var myValue in _myArray) {
+                        _myStringFlag |= (Number(_myArray[0]).toString() == "NaN");
+                    }
+                } else {
+                    _myStringFlag = (Number(_myValue).toString() == "NaN");
+                }
             }
-            
+
         }
         
         this.name = function() {
@@ -337,7 +345,7 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
                 _myArrayPos++;
             } else {
                 _myNode = nextNode(_myNode);
-                setup();
+                this.setup();
             }
         }
 
@@ -346,7 +354,7 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
                 _myArrayPos--;
             } else {
                 _myNode = previousNode(_myNode);
-                setup();
+                this.setup();
                 if (_myArrayFlag) {
                     _myArrayPos = _myArray.length - 1;
                 }
@@ -432,7 +440,7 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
         if (!isValidNode(_myNode)) {
             _myNode = nextNode(_myNode);
         } else {
-            setup();
+            this.setup();
         }
     }
 
