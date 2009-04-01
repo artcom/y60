@@ -92,6 +92,7 @@ bool getSerialDeviceNames(std::vector<std::string> & theSerialDevicesNames) {
 void getSerialDeviceNames(const std::string theDevicePrefix, std::vector<std::string> & theSerialDevicesNames) {
     std::vector<std::string> myDeviceNames;
     if (listDirectory("/dev", myDeviceNames) ) {
+        std::sort(myDeviceNames.begin(), myDeviceNames.end());
         for (unsigned i = 0; i <  myDeviceNames.size();++i) {
             if (myDeviceNames[i].find(theDevicePrefix) == 0) {
                 theSerialDevicesNames.push_back(std::string("/dev/"+myDeviceNames[i]));
