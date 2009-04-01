@@ -30,6 +30,7 @@
 
 using namespace std;
 
+// XXX: This considers only cerr and cout as TTYs, which is somewhat incorrect.
 bool asl::isTTY(ostream & os) {
 #ifndef _WIN32
     int myFD = -1;
@@ -40,6 +41,10 @@ bool asl::isTTY(ostream & os) {
         myFD = fileno(stderr);
     }
 
+    if(myFD == -1) {
+        return false;
+    }
+
     return isatty( myFD );
 #else
     int myFD = -1;
@@ -48,6 +53,10 @@ bool asl::isTTY(ostream & os) {
     }
     if (&os == &cerr) {
         myFD = _fileno(stderr);
+    }
+
+    if(myFD == -1) {
+        return false;
     }
 
     return 0 != _isatty( myFD );
