@@ -251,7 +251,7 @@ if (__main__ == "ASSDriverTest") {
     try {
         var ourASSDriverTestApp = new ASSDriverTestApp(arguments);
         //ourASSDriverTestApp.setup(600, 600, "ASSDriverTest");
-        ourASSDriverTestApp.setup(1400, 660, "ASSDriverTest");
+        ourASSDriverTestApp.setup(1400, 770, "ASSDriverTest");
         //ourASSDriverTestApp.setup(1920, 1280, "ASSDriverTest");
         ourASSDriverTestApp.go();
     } catch (ex) {
