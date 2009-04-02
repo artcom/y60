@@ -1597,10 +1597,14 @@ static JSClass global_class = {
 
 void
 JSApp::Process(JSContext *cx, JSObject *obj, const char *filename) {
-    JSScript *script;
+    JSScript *script = 0;
     jsval result;
     DoBeginRequest(cx);
-    script = JS_CompileFile(cx, obj, filename);
+    if (filename[0] != ':') {
+        script = JS_CompileFile(cx, obj, filename);
+    } else {
+        script = JS_CompileScript(cx, obj, filename+1, strlen(filename)-1, "commandline", 0);
+    }
     if (script) {
         (void)JS_ExecuteScript(cx, obj, script, &result);
         JS_DestroyScript(cx, script);
@@ -1701,7 +1705,12 @@ JSApp::processArguments(JSContext * theContext, JSObject * theGlobalObject,
     }
 
     setupPath(theIncludePath);
-    string myScriptFile = getPackageManager()->searchFile(theScriptFilename);
+    string myScriptFile;
+    if (theScriptFilename[0] != ':') {
+        myScriptFile = getPackageManager()->searchFile(theScriptFilename);
+    } else {
+        myScriptFile = theScriptFilename;
+    }
 
     if (myScriptFile.empty()) {
         AC_ERROR << "File '" << theScriptFilename << "' not found in " << getPackageManager()->getSearchPath() << std::endl;

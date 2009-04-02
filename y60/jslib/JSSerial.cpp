@@ -718,7 +718,7 @@ JSSerial::StaticFunctions() {
 
 JSObject *
 JSSerial::initClass(JSContext *cx, JSObject *theGlobalObject) {
-    JSObject * myClass = Base::initClass(cx, theGlobalObject, ClassName(), Constructor, Properties(), Functions(), ConstIntProperties());
+    JSObject * myClass = Base::initClass(cx, theGlobalObject, ClassName(), Constructor, Properties(), Functions(), ConstIntProperties(),0,StaticFunctions());
     DOC_CREATE(JSSerial);
     return myClass;
 }

@@ -98,6 +98,7 @@ const asl::Arguments::AllowedOptionWithDocumentation ourAllowedOptions[] = {
 #ifdef AC_BUILT_WITH_CMAKE
     {"--buildinfo","component|'all'", "print details about this build and exit"},
 #endif
+//    {"--exec", "", "treat first argument expression and execute it"},
     {"--help", "", "print this text and exit."},
      //y60 will quit automatically after some frames taking a screen shot.
     {"", "jsmain",   "file containing javascript code"},
