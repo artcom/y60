@@ -57,12 +57,15 @@
 */
 
 #include "SerialTransport.h"
-#include "ASSUtils.h"
-#include "ASSDriver.h"
 
 #include <asl/base/file_functions.h>
+
 #include <asl/serial/SerialDeviceFactory.h>
+
 #include <y60/base/SettingsParser.h>
+
+#include "ASSUtils.h"
+#include "ASSDriver.h"
 
 using namespace std;
 using namespace asl;
@@ -87,10 +90,14 @@ SerialTransport::SerialTransport(const dom::NodePtr & theSettings) :
     _myLastDataTime()
 
 {
-    init( theSettings );
+    AC_DEBUG << "SerialTransport::SerialTransport()";
+
+    init(theSettings);
 }
 
 SerialTransport::~SerialTransport() {
+    AC_DEBUG << "SerialTransport::~SerialTransport()";
+
     stopThread();
     closeConnection();
 }
@@ -100,7 +107,6 @@ SerialTransport::settingsChanged(dom::NodePtr theSettings) {
     bool myChangedFlag = false;
 
     myChangedFlag |= settingChanged( theSettings, "TransportLayer", _myTransportName);
-
     myChangedFlag |= settingChanged( theSettings, "SerialPort", _myPortNum );
     myChangedFlag |= settingChanged( theSettings, "SerialPortName", _myPortName );
     myChangedFlag |= settingChanged( theSettings, "BaudRate", _myBaudRate );
@@ -114,17 +120,13 @@ SerialTransport::settingsChanged(dom::NodePtr theSettings) {
 
 void 
 SerialTransport::init(dom::NodePtr theSettings) {
-    //AC_PRINT << "SerialTransport::init()";
-
-    getConfigSetting( theSettings, "SerialPort", _myPortNum, -1 );
-    getConfigSettingString( theSettings, "SerialPortName", _myPortName, "-" );
-   // getConfigSetting( theSettings, "UseUSB", _myUseUSBFlag, false );
-    getConfigSetting( theSettings, "BaudRate", _myBaudRate, 57600 );
-    getConfigSetting( theSettings, "BitsPerWord", _myBitsPerSerialWord, 8 );
-
-    getConfigSetting( theSettings, "Parity", _myParity, SerialDevice::NO_PARITY );
-    getConfigSetting( theSettings, "StopBits", _myStopBits, 1 );
-    getConfigSetting( theSettings, "Handshaking", _myHandshakingFlag, false );
+    getConfigSetting(theSettings, "SerialPort", _myPortNum, -1);
+    getConfigSettingString(theSettings, "SerialPortName", _myPortName, "-");
+    getConfigSetting(theSettings, "BaudRate", _myBaudRate, 57600);
+    getConfigSetting(theSettings, "BitsPerWord", _myBitsPerSerialWord, 8);
+    getConfigSetting(theSettings, "Parity", _myParity, SerialDevice::NO_PARITY);
+    getConfigSetting(theSettings, "StopBits", _myStopBits, 1);
+    getConfigSetting(theSettings, "Handshaking", _myHandshakingFlag, false);
 }
 
 
@@ -132,7 +134,7 @@ void
 SerialTransport::establishConnection() {
     AC_DEBUG << "SerialTransport::establishConnection()";
 
-    if(_mySerialPort) {
+    if (_mySerialPort) {
         delete _mySerialPort;
         _mySerialPort = 0;
     }
@@ -146,7 +148,7 @@ SerialTransport::establishConnection() {
     }
 
     if (!_mySerialPort) {
-        AC_WARNING << "ASS does not have a serial port configured";
+        AC_ERROR << "ASS does not have a serial port configured";
         return;
     }
 
@@ -156,10 +158,10 @@ SerialTransport::establishConnection() {
 
         _mySerialPort->setStatusLine(SerialDevice::RTS);
 
-        setState( SYNCHRONIZING );
+        setState(SYNCHRONIZING);
     } catch (const asl::SerialPortException & ex) {
         AC_WARNING << "Exception while opening serial: " << ex;
-        if ( _mySerialPort ) {
+        if (_mySerialPort) {
             delete _mySerialPort;
             _mySerialPort = 0;
         }
@@ -228,7 +230,7 @@ SerialTransport::readData() {
                 AC_WARNING << "Input buffer is running over. Currently at " << _myTmpBuffer.size() << " bytes.";
             }
 
-            // queue the data into to protocol parser
+            // queue the data into the protocol parser buffer
             _myTmpBuffer.insert(_myTmpBuffer.end(), _myReceiveBuffer.begin(), _myReceiveBuffer.begin() + myBytesReceived);
         } else {
             AC_TRACE << "Read returned nothing.";
@@ -258,29 +260,19 @@ SerialTransport::writeData(const char * theData, size_t theSize) {
 
 void 
 SerialTransport::closeConnection() {
-    //AC_PRINT << "SerialTransport::closeConnection()";
-    if (_mySerialPort) {
-        //AC_PRINT << "Disabling RTS";
-        // XXX this disables both RTS and DTR ... the current (Win32) API does not permit to
-        //     retrive the current state of the outbound lines...
-        try {
-            _mySerialPort->setStatusLine( 0 );
-        } catch ( const asl::SerialPortException & /*ex*/ ) {
-            //AC_WARNING << "Failed to disable RTS line: " << ex;
-        }
+    AC_DEBUG << "SerialTransport::closeConnection()";
 
-        /*
-        if ( _mySerialPort->getStatusLine() & SerialDevice::RTS) {
-            AC_PRINT << "RTS is on";
-        } else {
-            AC_PRINT << "RTS is off";
+    if (_mySerialPort) {
+        try {
+            // XXX: This resets all outgoing status lines. It should only reset CTS.
+            _mySerialPort->setStatusLine(0);
+        } catch (const asl::SerialPortException & ex) {
+            AC_WARNING << "Exception while resetting status lines: " << ex;
         }
-        */
 
         delete _mySerialPort;
         _mySerialPort = 0;
     }
 }
-
 
 } // end of namespace

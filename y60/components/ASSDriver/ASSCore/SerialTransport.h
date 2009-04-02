@@ -61,35 +61,37 @@
 
 #include "y60_asscore_settings.h"
 
-#include "TransportLayer.h"
-
 #include <asl/serial/SerialDevice.h>
+
+#include "TransportLayer.h"
 
 namespace y60 {
 
-class ASSDriver;
+    class ASSDriver;
 
-class SerialTransport : public TransportLayer {
+    class SerialTransport : public TransportLayer {
     public:
         SerialTransport(const dom::NodePtr & theSettings);
         ~SerialTransport();
 
 
     protected:
-        virtual bool settingsChanged(dom::NodePtr theSettings);
         void init(dom::NodePtr theSettings);
+
+        virtual bool settingsChanged(dom::NodePtr theSettings);
 
         void establishConnection();
         void readData();
-        void closeConnection();
         void writeData(const char * theData, size_t theSize);
-    private:
+        void closeConnection();
 
+
+    private:
         asl::SerialDevice * _mySerialPort;
-        //bool _myUseUSBFlag; // used by the linux implementation, because
-        //                    // USB TTYs have a diffrent naming scheme
+
         int  _myPortNum;
         std::string _myPortName;
+
         int  _myBaudRate;
         int  _myBitsPerSerialWord;
         int  _myStopBits;
@@ -97,7 +99,7 @@ class SerialTransport : public TransportLayer {
         asl::SerialDevice::ParityMode _myParity;
 
         asl::Time _myLastDataTime;
-};
+    };
 
 } // end of namespace
 
