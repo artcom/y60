@@ -316,7 +316,7 @@ TransportLayer::parseStatusLine(/*RasterPtr & theTargetRaster*/) {
                 _myReceiveBuffer.resize( getBytesPerFrame() );
             }
 
-            //AC_PRINT << "local sum: " << _myChecksum << " packet checksum: " << myChecksum;
+            AC_TRACE << "local sum: " << _myChecksum << " packet checksum: " << myChecksum;
             if (_myFirstFrameFlag ) {
                 dumpControllerStatus();
                 _myFirstFrameFlag = false;
@@ -376,6 +376,22 @@ TransportLayer::readSensorValues(/* RasterPtr theTargetRaster */) {
     while ( _myTmpBuffer.size() >= ( _myExpectedLine == 0 ? 
                 getBytesPerStatusLine() : valuesPerLine() + 2 ))
     {
+        //std::string hexDump;
+        //asl::binToString(&_myTmpBuffer[0], _myTmpBuffer.size(), hexDump);
+        //AC_TRACE << "Buffered bytes: " << hexDump;
+
+        //std::string ascDump;
+        //for(unsigned i = 0; i < _myTmpBuffer.size(); i++) {
+        //    unsigned char c = _myTmpBuffer[i];
+        //    ascDump += " ";
+        //    if(c >= 32 && c < 127) {
+        //        ascDump += c;
+        //    } else {
+        //        ascDump += ".";
+        //    }
+        //}
+        //AC_TRACE << "Buffered chars: " << ascDump;
+
         if ( _myExpectedLine == 0 ) {
             parseStatusLine(/*theTargetRaster*/);
         } else {
@@ -609,6 +625,7 @@ void
 TransportLayer::syncLost() {
     AC_WARNING << "Sync lost. Resynchronizing.";
     _mySyncLostCounter++;
+    _myTmpBuffer.clear();
     _myFrameQueueLock.lock();
     _myFrameQueue.push( ASSEvent( ASS_LOST_SYNC ));
     _myFrameQueueLock.unlock();
@@ -619,6 +636,7 @@ void
 TransportLayer::connectionLost() {
     AC_WARNING << "Connection lost. Reconnecting.";
     _myDeviceLostCounter++;
+    _myTmpBuffer.clear();
     _myFrameQueueLock.lock();
     _myFrameQueue.push( ASSEvent( ASS_LOST_COM ));
     _myFrameQueueLock.unlock();
