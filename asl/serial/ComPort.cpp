@@ -50,6 +50,7 @@
 #include <asl/base/Block.h>
 #include <asl/base/Logger.h>
 
+#include <asl/base/error_functions.h>
 #include <asl/base/string_functions.h>
 #include <asl/math/numeric_functions.h>
 
@@ -109,6 +110,7 @@ namespace asl {
         myDCB.StopBits = convertStopBits(theStopBits);
         myDCB.fRtsControl = (theHWHandShakeFlag ? RTS_CONTROL_HANDSHAKE : RTS_CONTROL_DISABLE);
         myDCB.fDtrControl = (theHWHandShakeFlag ? DTR_CONTROL_HANDSHAKE : DTR_CONTROL_DISABLE);
+        myDCB.fAbortOnError = false;
 
         if ( ! SetCommState(_myPortHandle, & myDCB)) {
             checkError(PLUS_FILE_LINE);
@@ -119,18 +121,22 @@ namespace asl {
         //      Stevens - Advanced Programming in the Unix Environment (pp.352)
         //      and termios man page
         if ( theMinBytesPerRead == 0 && theTimeout == 0) {
+            // nonblocking
             _myTimeouts.ReadIntervalTimeout = MAXDWORD;
             _myTimeouts.ReadTotalTimeoutMultiplier = 0;
             _myTimeouts.ReadTotalTimeoutConstant = 0;
         } else if (theMinBytesPerRead > 0 && theTimeout == 0) {
+            // fully blocking
             _myTimeouts.ReadIntervalTimeout = 0;
             _myTimeouts.ReadTotalTimeoutMultiplier = 0;
             _myTimeouts.ReadTotalTimeoutConstant = 0;
         } else if (theMinBytesPerRead > 0 && theTimeout > 0) {
+            // blocking with time limit starting at first received
             _myTimeouts.ReadIntervalTimeout = theTimeout * 100;
             _myTimeouts.ReadTotalTimeoutMultiplier = 0;
             _myTimeouts.ReadTotalTimeoutConstant = 0;
         } else if (theMinBytesPerRead == 0 && theTimeout > 0) {
+            // blocking with time limit starting at call
             _myTimeouts.ReadIntervalTimeout = MAXDWORD;
             _myTimeouts.ReadTotalTimeoutMultiplier = MAXDWORD;
             _myTimeouts.ReadTotalTimeoutConstant = theTimeout * 100;
@@ -170,7 +176,11 @@ namespace asl {
                                    "'. Device is not open.", PLUS_FILE_LINE);
         }
         size_t myReadBytes;
-        ReadFile(_myPortHandle, theBuffer, DWORD(theSize), (DWORD *) & myReadBytes, NULL);
+        if(!ReadFile(_myPortHandle, theBuffer, DWORD(theSize), (DWORD *) & myReadBytes, NULL)) {
+            AC_WARNING << "ReadFile failed: " << asl::errorDescription(asl::lastError());
+            theSize = 0;
+            return false;
+        }
 
         if (theSize == myReadBytes) {
             return true;
