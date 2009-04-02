@@ -96,9 +96,7 @@ class SerialTransport : public TransportLayer {
         bool _myHandshakingFlag;
         asl::SerialDevice::ParityMode _myParity;
 
-        unsigned _myNumReceivedBytes;
-        double _myLastComTestTime;
-
+        asl::Time _myLastDataTime;
 };
 
 } // end of namespace

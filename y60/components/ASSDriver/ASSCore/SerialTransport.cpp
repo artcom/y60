@@ -70,23 +70,21 @@ using namespace y60;
 
 namespace y60 {
 
-static const unsigned NO_DATA_TIMEOUT = 3;
+static const double NO_DATA_TIMEOUT = 3.0;
 
 class ASSDriver;
 
 SerialTransport::SerialTransport(const dom::NodePtr & theSettings) :
-    TransportLayer( "serial", theSettings ),
-    _mySerialPort( 0 ),
-//    _myUseUSBFlag( false ),
-    _myPortNum( -1 ),
+    TransportLayer("serial", theSettings),
+    _mySerialPort(0),
+    _myPortNum(-1),
     _myPortName("-"),
-    _myBaudRate( 57600 ),
-    _myBitsPerSerialWord( 8 ),
-    _myStopBits( 1 ),
-    _myHandshakingFlag( false ),
-    _myParity( SerialDevice::NO_PARITY ),
-    _myNumReceivedBytes( 0 ),
-    _myLastComTestTime( 0 )
+    _myBaudRate(57600),
+    _myBitsPerSerialWord(8),
+    _myStopBits(1),
+    _myHandshakingFlag(false),
+    _myParity(SerialDevice::NO_PARITY),
+    _myLastDataTime()
 
 {
     init( theSettings );
@@ -105,7 +103,6 @@ SerialTransport::settingsChanged(dom::NodePtr theSettings) {
 
     myChangedFlag |= settingChanged( theSettings, "SerialPort", _myPortNum );
     myChangedFlag |= settingChanged( theSettings, "SerialPortName", _myPortName );
-    //myChangedFlag |= settingChanged( theSettings, "UseUSB", _myUseUSBFlag );
     myChangedFlag |= settingChanged( theSettings, "BaudRate", _myBaudRate );
     myChangedFlag |= settingChanged( theSettings, "BitsPerWord", _myBitsPerSerialWord );
     myChangedFlag |= settingChanged( theSettings, "Parity", _myParity );
@@ -135,62 +132,57 @@ void
 SerialTransport::establishConnection() {
     AC_DEBUG << "SerialTransport::establishConnection()";
 
-    _myNumReceivedBytes = 0;
-    _myLastComTestTime = asl::Time();
-
     if(_mySerialPort) {
-	delete _mySerialPort;
-	_mySerialPort = 0;
+        delete _mySerialPort;
+        _mySerialPort = 0;
     }
 
     if (_myPortName == "-") {
-	if (_myPortNum >= 0 ) {
-	    _mySerialPort = getSerialDevice(_myPortNum);
-	}
+        if (_myPortNum >= 0 ) {
+            _mySerialPort = getSerialDevice(_myPortNum);
+        }
     } else {
-	_mySerialPort = getSerialDeviceByName(_myPortName);
+        _mySerialPort = getSerialDeviceByName(_myPortName);
     }
 
     if (!_mySerialPort) {
-	AC_WARNING << "ASS does not have a serial port configured";
-	return;
+        AC_WARNING << "ASS does not have a serial port configured";
+        return;
     }
 
     try {
-	_mySerialPort->open(_myBaudRate, _myBitsPerSerialWord,
-			    _myParity, _myStopBits, _myHandshakingFlag, 0 , 1);
-	
-	_mySerialPort->setStatusLine(SerialDevice::RTS);
-	
-	setState( SYNCHRONIZING );
+        _mySerialPort->open(_myBaudRate, _myBitsPerSerialWord,
+           _myParity, _myStopBits, _myHandshakingFlag, 0, 1);
+
+        _mySerialPort->setStatusLine(SerialDevice::RTS);
+
+        setState( SYNCHRONIZING );
     } catch (const asl::SerialPortException & ex) {
-	AC_WARNING << "Exception while opening serial: " << ex;
-	if ( _mySerialPort ) {
-	    delete _mySerialPort;
-	    _mySerialPort = 0;
-	}
+        AC_WARNING << "Exception while opening serial: " << ex;
+        if ( _mySerialPort ) {
+            delete _mySerialPort;
+            _mySerialPort = 0;
+        }
     }
+
+    _myLastDataTime.setNow();
+    _mySerialPort->flush();
 }
 
 void 
 SerialTransport::readData() {
+    // XXX: this looks odd and suspicious. remove, test and fix.
+    if(!_mySerialPort) {
+        return;
+    }
+
     try {
-        //AC_PRINT << "SerialTransport::readData()";
-        size_t myMaxBytes = _myReceiveBuffer.size();
-
-        double myCurrentTimeStamp = asl::Time();
-        if (myCurrentTimeStamp - _myLastComTestTime > NO_DATA_TIMEOUT) {
-            _myLastComTestTime = myCurrentTimeStamp;
-            if (_myNumReceivedBytes == 0 ) {
-                AC_WARNING << "Data timeout.";
-                connectionLost();
-                return;
-            } else {
-                _myNumReceivedBytes = 0;
-            }
-        }
-
-        if(!_mySerialPort) {
+        // check for timeout
+        asl::Time myNow;
+        double myTimeSinceLastData = myNow - _myLastDataTime;
+        if(myTimeSinceLastData > NO_DATA_TIMEOUT) {
+            AC_WARNING << "No data received for " << myTimeSinceLastData << " seconds.";
+            connectionLost();
             return;
         }
 
@@ -198,33 +190,69 @@ SerialTransport::readData() {
         // for some reason. Peek throws an exception which is just what we want.
         _mySerialPort->peek();
 
-        AC_DEBUG << "bytes received within the last " << NO_DATA_TIMEOUT 
-                 << " seconds: " << _myNumReceivedBytes;
-        /*
-        AC_PRINT << "SerialTransport::readData() pending bytes: " << myPendingBytes
-                 << " max: " << myMaxBytes;
-                 */
-        
-        _mySerialPort->read( reinterpret_cast<char*>(& ( * _myReceiveBuffer.begin())),
-                myMaxBytes );
-        _myNumReceivedBytes += myMaxBytes;
+        // read, blocking when there is no data
+        asl::Time myBefore, myAfter;
+        size_t myBytesReceived = _myReceiveBuffer.size();
+        _mySerialPort->read(reinterpret_cast<char*>(& ( * _myReceiveBuffer.begin())), myBytesReceived);
+        myAfter.setNow();
 
-        _myTmpBuffer.insert( _myTmpBuffer.end(),
-                _myReceiveBuffer.begin(), _myReceiveBuffer.begin() + myMaxBytes );
-        //dumpBuffer( _myFrameBuffer );
+        AC_TRACE << "Read took " << myAfter.millis() - myBefore.millis() << " milliseconds.";
+
+        if(myBytesReceived > 0) {
+            // update data timeout reference
+            _myLastDataTime.setNow();
+            
+            // report the read
+            AC_DEBUG << "Received " << myBytesReceived << " with " << _myTmpBuffer.size() << " queued.";
+
+            //// dump data in hex
+            //std::string hexDump;
+            //asl::binToString(&_myReceiveBuffer[0], myBytesReceived, hexDump);
+            //AC_TRACE << "Received bytes: " << hexDump;
+
+            //// and also in ascii
+            //std::string ascDump;
+            //for(unsigned i = 0; i < myBytesReceived; i++) {
+            //    unsigned char c = _myReceiveBuffer[i];
+            //    ascDump += " ";
+            //    if(c >= 32 && c < 127) {
+            //        ascDump += c;
+            //    } else {
+            //        ascDump += ".";
+            //    }
+            //}
+            //AC_TRACE << "Received chars: " << ascDump;
+
+            //// warn about overrunning buffer
+            if(_myTmpBuffer.size() > 1024) {
+                AC_WARNING << "Input buffer is running over. Currently at " << _myTmpBuffer.size() << " bytes.";
+            }
+
+            // queue the data into to protocol parser
+            _myTmpBuffer.insert(_myTmpBuffer.end(), _myReceiveBuffer.begin(), _myReceiveBuffer.begin() + myBytesReceived);
+        } else {
+            AC_TRACE << "Read returned nothing.";
+        }
+
     } catch (const SerialPortException & ex) {
-        AC_WARNING << "Exception while reading from serial port: " << ex;
+        AC_WARNING << "Exception while reading: " << ex;
         connectionLost();
     }
 }
 
 void 
 SerialTransport::writeData(const char * theData, size_t theSize) {
-    if ( _mySerialPort ) {
-        _mySerialPort->write( theData, theSize );
-    } else {
+    // XXX: this looks highly suspicious. remove and test.
+    if (!_mySerialPort) {
         AC_WARNING << "Can not write data. No serial port.";
-        setState( NOT_CONNECTED );
+        setState(NOT_CONNECTED);
+    }
+
+    try {
+        _mySerialPort->write( theData, theSize );
+    } catch (const SerialPortException & ex) {
+        AC_WARNING << "Exception while writing: " << ex;
+        connectionLost();
     }
 }
 
