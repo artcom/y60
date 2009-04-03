@@ -39,6 +39,7 @@ SimpleBench
 UnitTest
 VectorOfString
 Y60JSSL
+ImageClone
 )
 
 foreach(TEST ${JSTESTS})

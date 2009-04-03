@@ -266,7 +266,9 @@ namespace dom {
               _mySavePosition(0), _myChildrenPosition(0), _mySaveEndPosition(0),
               _myChildrenList(this), _myAttributes(this),
               _myValue(theValue.clone(this))
-        {}
+        {
+            _myValue->setSelf(_myValue);
+        }
 
         /** create Entity Reference, Entity, ProcessingInstruction or Notation node
             or any of the above nodes by supplying a special Value Type Ptr;
@@ -280,6 +282,7 @@ namespace dom {
             _myValue(theValuePtr)
         {
             if (_myValue) {
+                _myValue->setSelf(_myValue);
                 _myValue->setNodePtr(this);
             }
         }
@@ -504,6 +507,7 @@ namespace dom {
                     _myValue->set(theValue.accessReadableBlock()); // fastest, just copy the data
                 } else {
                     _myValue = theValue.clone(this); // make a binary clone
+                    _myValue->setSelf(_myValue);
                     _myValue->setNodePtr(this);
                 }
             }

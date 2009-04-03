@@ -575,6 +575,7 @@ dom::Node::ensureValue() const {
                 const_cast<ValuePtr&>(_myValue)
                     = _mySchemaInfo->_myValueFactory->createValue(_mySchemaInfo->getTypeName(), const_cast<Node*>(this));
                 if (_myValue) {
+                    const_cast<ValuePtr&>(_myValue)->setSelf(const_cast<ValuePtr&>(_myValue));
                     return;
                 }
                 AC_WARNING << "no factory method found for type '"<<_mySchemaInfo->getTypeName()<<"'"<<endl;
@@ -585,6 +586,7 @@ dom::Node::ensureValue() const {
         // TODO: consult schema and valuefactory to select apropriate type
         DBS(AC_TRACE << "ensureValue(): creating string value for unknown type "<< endl);
         const_cast<ValuePtr&>(_myValue) = ValuePtr(new StringValue(const_cast<Node*>(this)));
+        const_cast<ValuePtr&>(_myValue)->setSelf(const_cast<ValuePtr&>(_myValue));
     }
 }
 // check if value exist; otherwise create one
@@ -603,6 +605,7 @@ dom::Node::assignValue(const asl::ReadableBlock & theValue, bool theNotifyChange
                 DB2(AC_TRACE << "assignValue(): creating value for type '" <<_mySchemaInfo->getTypeName()<<"'"<< endl);
                 _myValue = _mySchemaInfo->_myValueFactory->createValue(_mySchemaInfo->getTypeName(), theValue, this);
                 if (_myValue) {
+                    _myValue->setSelf(_myValue);
                     if (theNotifyChangedFlag) {
                         _myValue->notifyValueChanged();
                     }
@@ -1139,6 +1142,7 @@ dom::Node::Node(const Node & n, Node * theParent) :
     _mySchemaInfo(n._mySchemaInfo)
 {
     if (_myValue) {
+        _myValue->setSelf(_myValue);
         _myValue->update();
     }
     for (NodeList::size_type child = 0; child < n.getChildren().size(); ++child) {
@@ -1157,6 +1161,10 @@ dom::Node::Node(const Node & n) :
     _myValue(n._myValue ? n._myValue->clone(this) : n._myValue),
     _mySchemaInfo(n._mySchemaInfo)
 {
+    if (_myValue) {
+        _myValue->setSelf(_myValue);
+        _myValue->update();
+    }
     for (TypedNamedNodeMap::size_type attr = 0; attr < n._myAttributes.size(); ++attr) {
         _myAttributes.appendWithoutReparenting(n._myAttributes.item(attr)->cloneNode(DEEP,this));
     }
