@@ -146,7 +146,7 @@ Logger::Logger() :
     _myGlobalVerbosity(SEV_WARNING)
 {
     Ptr<LogMessageFormatter> myConsoleFormatter = createFormatter(LOG_CONSOLE_FORMAT_ENV, TerseLogMessageFormatter::name(), "console");
-    Severity myConsoleSeverity = getSeverityFromEnv(LOG_CONSOLE_FILTER_ENV, SEV_WARNING);
+    Severity myConsoleSeverity = getSeverityFromEnv(LOG_CONSOLE_FILTER_ENV, SEV_TRACE);
     if (myConsoleSeverity != SEV_DISABLED) {  
         addMessageSink(Ptr<MessageSink>(new StreamPrinter(std::cerr)), myConsoleFormatter, myConsoleSeverity);
     }
