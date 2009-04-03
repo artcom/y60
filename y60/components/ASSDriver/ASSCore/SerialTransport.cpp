@@ -206,7 +206,7 @@ SerialTransport::readData() {
             _myLastDataTime.setNow();
             
             // report the read
-            AC_DEBUG << "Received " << myBytesReceived << " with " << _myTmpBuffer.size() << " queued.";
+            AC_TRACE << "Received " << myBytesReceived << " with " << _myTmpBuffer.size() << " queued.";
 
             //// dump data in hex
             //std::string hexDump;
