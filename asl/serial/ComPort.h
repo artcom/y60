@@ -87,12 +87,10 @@ namespace asl {
             void checkError(const std::string & theLocationString);
 
             DWORD convertBaudRate(unsigned int theBaudRate);
-            BYTE convertParity(ParityMode theParity);
-            BYTE convertStopBits(unsigned int  theStopBits);
+            BYTE  convertParity  (ParityMode theParity);
+            BYTE  convertStopBits(unsigned int  theStopBits);
 
-            HANDLE       _myPortHandle;
-            COMMTIMEOUTS _myTimeouts;
-            unsigned     _myMinReadBytes;
+            HANDLE       _myHandle;
     };
 
     /* @} */

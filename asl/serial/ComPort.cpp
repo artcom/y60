@@ -61,10 +61,15 @@ using namespace std;
 namespace asl {
 
     ComPort::ComPort(const std::string & theDeviceName) :
-        SerialDevice(theDeviceName)
-    {}
+        SerialDevice(theDeviceName),
+        _myHandle(INVALID_HANDLE_VALUE)
+    {
+        AC_DEBUG << "ComPort::ComPort()";
+    }
 
     ComPort::~ComPort() {
+        AC_DEBUG << "ComPort::~ComPort()";
+
         if (isOpen()) {
             close();
         }
@@ -76,9 +81,11 @@ namespace asl {
                   bool theHWHandShakeFlag,
                   int theMinBytesPerRead, int theTimeout)
     {
+        AC_DEBUG << "ComPort::open()";
+
         if (isOpen()) {
             throw SerialPortException(string("Can not open device '") + getDeviceName() +
-                                   "'. Device allready open.", PLUS_FILE_LINE);
+                                             "'. Device allready open.", PLUS_FILE_LINE);
         }
 
         if (isNoisy()) {
@@ -90,78 +97,103 @@ namespace asl {
             cerr << "    hw handshake: " << theHWHandShakeFlag << endl;
         }
 
-        _myPortHandle = CreateFile(getDeviceName().c_str(),
-                                   GENERIC_READ | GENERIC_WRITE,
-                                   0,
-                                   NULL,
-                                   OPEN_EXISTING,
-                                   0,
-                                   NULL);
-        checkError(PLUS_FILE_LINE);
-
-        // configure signalling mode
-        DCB myDCB;
-        if ( ! GetCommState(_myPortHandle, & myDCB)) {
-            checkError(PLUS_FILE_LINE);
-        }
-        myDCB.BaudRate = convertBaudRate(theBaudRate);
-        myDCB.ByteSize = static_cast<BYTE>(theDataBits);
-        myDCB.Parity   = convertParity(theParityMode);
-        myDCB.StopBits = convertStopBits(theStopBits);
-        myDCB.fRtsControl = (theHWHandShakeFlag ? RTS_CONTROL_HANDSHAKE : RTS_CONTROL_DISABLE);
-        myDCB.fDtrControl = (theHWHandShakeFlag ? DTR_CONTROL_HANDSHAKE : DTR_CONTROL_DISABLE);
-        myDCB.fAbortOnError = false;
-
-        if ( ! SetCommState(_myPortHandle, & myDCB)) {
+        // open our handle
+        AC_TRACE << "Opening device";
+        HANDLE myHandle = CreateFile(getDeviceName().c_str(),
+                                     GENERIC_READ | GENERIC_WRITE,
+                                     0,
+                                     NULL,
+                                     OPEN_EXISTING,
+                                     0,
+                                     NULL);
+        if(myHandle == INVALID_HANDLE_VALUE) {
             checkError(PLUS_FILE_LINE);
         }
 
-        // configure blocking timeouts
-        //  see MSDN docs about COMMTIMEOUTS,
-        //      Stevens - Advanced Programming in the Unix Environment (pp.352)
-        //      and termios man page
-        if ( theMinBytesPerRead == 0 && theTimeout == 0) {
+        // get the comm properties for use during initialization
+        AC_TRACE << "Getting comm properties";
+        COMMPROP myProperties;
+        if(!GetCommProperties(myHandle, &myProperties)) {
+            checkError(PLUS_FILE_LINE);
+        }
+
+        // configure device control parameters
+        //   XXX: verify if we set enough fields.
+        //        there might be environmental state leaks in this.
+        DCB myControlBlock;
+
+        AC_TRACE << "Getting comm state";
+        if (!GetCommState(myHandle, &myControlBlock)) {
+            checkError(PLUS_FILE_LINE);
+        }
+
+        // normal COM port parameters
+        myControlBlock.BaudRate = convertBaudRate(theBaudRate);
+        myControlBlock.ByteSize = static_cast<BYTE>(theDataBits);
+        myControlBlock.Parity   = convertParity(theParityMode);
+        myControlBlock.StopBits = convertStopBits(theStopBits);
+        myControlBlock.fRtsControl = (theHWHandShakeFlag ? RTS_CONTROL_HANDSHAKE : RTS_CONTROL_DISABLE);
+        myControlBlock.fDtrControl = (theHWHandShakeFlag ? DTR_CONTROL_HANDSHAKE : DTR_CONTROL_DISABLE);
+
+        myControlBlock.fAbortOnError = false;
+
+        AC_TRACE << "Setting comm state";
+        if (!SetCommState(myHandle, &myControlBlock)) {
+            checkError(PLUS_FILE_LINE);
+        }
+
+        // configure device timing parameters
+
+        COMMTIMEOUTS myTimeouts;
+        if (theMinBytesPerRead == 0 && theTimeout == 0) {
             // nonblocking
-            _myTimeouts.ReadIntervalTimeout = MAXDWORD;
-            _myTimeouts.ReadTotalTimeoutMultiplier = 0;
-            _myTimeouts.ReadTotalTimeoutConstant = 0;
+            myTimeouts.ReadIntervalTimeout = MAXDWORD;
+            myTimeouts.ReadTotalTimeoutMultiplier = 0;
+            myTimeouts.ReadTotalTimeoutConstant = 0;
         } else if (theMinBytesPerRead > 0 && theTimeout == 0) {
             // fully blocking
-            _myTimeouts.ReadIntervalTimeout = 0;
-            _myTimeouts.ReadTotalTimeoutMultiplier = 0;
-            _myTimeouts.ReadTotalTimeoutConstant = 0;
+            myTimeouts.ReadIntervalTimeout = 0;
+            myTimeouts.ReadTotalTimeoutMultiplier = 0;
+            myTimeouts.ReadTotalTimeoutConstant = 0;
         } else if (theMinBytesPerRead > 0 && theTimeout > 0) {
             // blocking with time limit starting at first received
-            _myTimeouts.ReadIntervalTimeout = theTimeout * 100;
-            _myTimeouts.ReadTotalTimeoutMultiplier = 0;
-            _myTimeouts.ReadTotalTimeoutConstant = 0;
+            myTimeouts.ReadIntervalTimeout = theTimeout * 100;
+            myTimeouts.ReadTotalTimeoutMultiplier = 0;
+            myTimeouts.ReadTotalTimeoutConstant = 0;
         } else if (theMinBytesPerRead == 0 && theTimeout > 0) {
             // blocking with time limit starting at call
-            _myTimeouts.ReadIntervalTimeout = MAXDWORD;
-            _myTimeouts.ReadTotalTimeoutMultiplier = MAXDWORD;
-            _myTimeouts.ReadTotalTimeoutConstant = theTimeout * 100;
+            myTimeouts.ReadIntervalTimeout = MAXDWORD;
+            myTimeouts.ReadTotalTimeoutMultiplier = MAXDWORD;
+            myTimeouts.ReadTotalTimeoutConstant = theTimeout * 100;
         }
 
         // TODO: Think about write timeouts
-        _myTimeouts.WriteTotalTimeoutConstant = 0;
-        _myTimeouts.WriteTotalTimeoutMultiplier = 0;
+        myTimeouts.WriteTotalTimeoutConstant = 0;
+        myTimeouts.WriteTotalTimeoutMultiplier = 0;
 
-        _myMinReadBytes = theMinBytesPerRead;
-
-        if ( ! SetCommTimeouts(_myPortHandle, & _myTimeouts)) {
+        AC_TRACE << "Setting comm timeouts";
+        if (!SetCommTimeouts(myHandle, &myTimeouts)) {
             checkError(PLUS_FILE_LINE);
         }
 
-        // increase buffer size to something reasonable
-        SetupComm(_myPortHandle, 2048, 2048);
+        // set buffer size to maximum
+        AC_TRACE << "Setting comm buffer sizes";
+        if(!SetupComm(myHandle, 8192, 8192)) {
+            checkError(PLUS_FILE_LINE);
+        }
+
+        // finally, set our handle
+        _myHandle = myHandle;
 
         isOpen(true);
     }
 
     void
     ComPort::close() {
+        AC_DEBUG << "ComPort::close()";
         if (isOpen()) {
-            CloseHandle(_myPortHandle);
+            CloseHandle(_myHandle);
+            _myHandle = INVALID_HANDLE_VALUE;
             isOpen(false);
         } else {
             throw SerialPortException(string("Can not close device ") + getDeviceName() +
@@ -171,15 +203,22 @@ namespace asl {
 
     bool
     ComPort::read(char * theBuffer, size_t & theSize) {
-        if ( ! isOpen()) {
+        if (!isOpen()) {
             throw SerialPortException(string("Can not read from device '") + getDeviceName() +
-                                   "'. Device is not open.", PLUS_FILE_LINE);
+                                             "'. Device is not open.", PLUS_FILE_LINE);
         }
+
         size_t myReadBytes;
-        if(!ReadFile(_myPortHandle, theBuffer, DWORD(theSize), (DWORD *) & myReadBytes, NULL)) {
-            AC_WARNING << "ReadFile failed: " << asl::errorDescription(asl::lastError());
-            theSize = 0;
-            return false;
+        if(!ReadFile(_myHandle, theBuffer, DWORD(theSize), (DWORD *) & myReadBytes, NULL)) {
+            DWORD myError = GetLastError();
+            if(myError != ERROR_OPERATION_ABORTED) {
+                checkError(PLUS_FILE_LINE);
+            } else {
+                // we accept and ignore OPERATION_ABORTED, which is the win32 equivalent of EAGAIN
+                // XXX: we might want to re-read, but handling that might be horror
+                theSize = 0;
+                return false;
+            }
         }
 
         if (theSize == myReadBytes) {
@@ -203,7 +242,19 @@ namespace asl {
         }
 
         size_t myWrittenBytes;
-        WriteFile(_myPortHandle, theBuffer, theSize,  (DWORD *)& myWrittenBytes, NULL);
+        if(!WriteFile(_myHandle, theBuffer, theSize,  (DWORD *)& myWrittenBytes, NULL)) {
+            DWORD myError = GetLastError();
+            if(myError != ERROR_OPERATION_ABORTED) {
+                checkError(PLUS_FILE_LINE);
+            } else {
+                // we accept and ignore OPERATION_ABORTED, which is the win32 equivalent of EAGAIN.
+                // however, since we do not offer an incremental writing interface, we are bound to fail.
+                myWrittenBytes = 0;
+            }
+        }
+
+        // XXX: the following "error handling" is total utter bullshit and should be replaced with
+        //      either queueing or incremental write support (returning a written-byte count).
         if (theSize != myWrittenBytes) {
             throw SerialPortException(string("Can not write ") + asl::as_string(theSize) +
                                    " bytes to device '" + getDeviceName() +
@@ -229,7 +280,7 @@ namespace asl {
             throw SerialPortException(string("Can not flush device '") + getDeviceName() +
                     "'. Device is not open.", PLUS_FILE_LINE);
         }
-        if ( ! PurgeComm( _myPortHandle, PURGE_RXCLEAR | PURGE_TXCLEAR ) ) {
+        if ( ! PurgeComm( _myHandle, PURGE_RXCLEAR | PURGE_TXCLEAR ) ) {
             checkError("ComPort::flush()");
         }
     }
@@ -241,11 +292,11 @@ namespace asl {
                 getDeviceName() + "'. Device is not open.", PLUS_FILE_LINE);
         }
 
-        if (!EscapeCommFunction(_myPortHandle, (theStatusMask & DTR ? SETDTR : CLRDTR))) {
+        if (!EscapeCommFunction(_myHandle, (theStatusMask & DTR ? SETDTR : CLRDTR))) {
             throw SerialPortException(string("Unable to modify DTR on device '") +
                 getDeviceName() + "'.", PLUS_FILE_LINE);
         }
-        if (!EscapeCommFunction(_myPortHandle, (theStatusMask & RTS ? SETRTS : CLRRTS))) {
+        if (!EscapeCommFunction(_myHandle, (theStatusMask & RTS ? SETRTS : CLRRTS))) {
             throw SerialPortException(string("Unable to modify RTS on device '") +
                 getDeviceName() + "'.", PLUS_FILE_LINE);
         }
@@ -259,7 +310,7 @@ namespace asl {
         }
 
         DWORD dwModemStatus = 0;
-        if (!GetCommModemStatus(_myPortHandle, &dwModemStatus)) {
+        if (!GetCommModemStatus(_myHandle, &dwModemStatus)) {
             throw SerialPortException(string("Unable to get status bits on device '") +
                 getDeviceName() + "'. Error getting status.", PLUS_FILE_LINE);
         }
