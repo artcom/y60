@@ -164,6 +164,7 @@ SerialTransport::establishConnection() {
         if (_mySerialPort) {
             delete _mySerialPort;
             _mySerialPort = 0;
+            return;
         }
     }
 
