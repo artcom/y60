@@ -9,8 +9,7 @@ namespace jslib {
 
 class IJSModuleLoader {
     public:
-        virtual void initClasses( JSContext * cx, JSObject * global,
-                JSObject * ns) = 0;
+        virtual void initClasses( JSContext * cx, JSObject * ns) = 0;
         virtual ~IJSModuleLoader() {}
 };
 
