@@ -1,7 +1,7 @@
-#ifndef Y60_APE_CALLER_INCLUDED
-#define Y60_APE_CALLER_INCLUDED
+#ifndef Y60_APE_FUNCTION_WRAPPER_INCLUDED
+#define Y60_APE_FUNCTION_WRAPPER_INCLUDED
 
-#include "y60_ape_settings.h"
+#include <y60/components/yape/y60_ape_settings.h>
 
 #include "invoke.h"
 #include "arguments.h"
@@ -9,7 +9,7 @@
 namespace y60 { namespace ape { namespace detail {
 
 template <typename F, typename Id, typename Sig>
-class caller {
+class function_wrapper {
     public:
         static
         JSBool
@@ -31,16 +31,16 @@ class caller {
         static F f_;
 };
 
-template <typename F, typename Id, typename Sig> F caller<F, Id, Sig>::f_ = 0;
+template <typename F, typename Id, typename Sig> F function_wrapper<F, Id, Sig>::f_ = 0;
 
 template <typename F, typename Id, typename Sig>
 JSNative
-get_caller( F f, Sig const& sig) {
-    typedef caller<F,Id,Sig> caller_type;
-    caller_type::init( f );
-    return & caller_type::call;
+get_function_wrapper( F f, Sig const& sig) {
+    typedef function_wrapper<F,Id,Sig> function_wrapper_type;
+    function_wrapper_type::init( f );
+    return & function_wrapper_type::call;
 }
 
 }}} // end of namespace detail, ape, y60
 
-#endif // Y60_APE_CALLER_INCLUDED
+#endif // Y60_APE_FUNCTION_WRAPPER_INCLUDED

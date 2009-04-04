@@ -2,7 +2,7 @@
 #   ifndef Y60_APE_INVOKE_INCLUDED
 #       define Y60_APE_INVOKE_INCLUDED
 
-#       include "y60_ape_settings.h"
+#       include <y60/components/yape/y60_ape_settings.h>
 
 #       include <boost/tuple/tuple.hpp>
 #       include <boost/type_traits/is_member_function_pointer.hpp>
@@ -29,7 +29,7 @@ template <typename C> class class_wrapper;
 #       define Y60_APE_ARG_REF(z, n, var) boost::get< n >( var )
 
 #       define BOOST_PP_ITERATION_PARAMS_1 \
-            (3, (0, Y60_APE_MAX_ARITY, <y60/components/yape/invoke.h>))
+            (3, (0, Y60_APE_MAX_ARITY, <y60/components/yape/detail/invoke.h>))
 #       include BOOST_PP_ITERATE()
 
 

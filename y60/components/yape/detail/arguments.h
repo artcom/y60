@@ -1,7 +1,7 @@
 #ifndef Y60_APE_ARGUMENTS_INCLUDED
 #define Y60_APE_ARGUMENTS_INCLUDED
 
-#include "y60_ape_settings.h"
+#include <y60/components/yape/y60_ape_settings.h>
 
 #include <boost/tuple/tuple.hpp> 
 
@@ -22,6 +22,7 @@
 #include <boost/mpl/size.hpp>
 #include <boost/mpl/transform_view.hpp>
 
+#include <y60/jsbase/JScppUtils.h>
 #include "typelist.h"
 #include "meta.h"
 

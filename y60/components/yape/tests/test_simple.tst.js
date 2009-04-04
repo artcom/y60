@@ -20,3 +20,7 @@ print( t.simple_class.static_data_member );
 t.simple_class.static_data_member = 15;
 print( t.simple_class.static_data_member );
 print( t.simple_class.static_mem_func() );
+print("============================");
+for (p in t) {
+    print(p);
+}

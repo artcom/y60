@@ -1,7 +1,7 @@
 #ifndef Y60_APE_APE_THING_INCLUDED
 #define Y60_APE_APE_THING_INCLUDED
 
-#include "y60_ape_settings.h"
+#include <y60/components/yape/y60_ape_settings.h>
 
 #include <iostream>
 #include <boost/shared_ptr.hpp>
@@ -17,6 +17,7 @@ enum ape_type {
     ape_class
 };
 
+inline
 std::ostream &
 operator<<(std::ostream & os, ape_type type) {
     switch (type) {
@@ -45,8 +46,6 @@ class ape_thing {
         virtual void import(JSContext * cx, JSObject * ns, monkey_data & ape_ctx) = 0;
 
         inline void add( ape_thing_ptr child ) {
-            APE_LOG(log::import,log::dbg,log::dev) << "adding "
-                << child->get_type() << " " << child->get_name();
             children_.push_back( child ); 
         }
 
@@ -76,7 +75,8 @@ class ape_thing {
         std::vector<ape_thing_ptr> children_;
         uint8                      property_flags_;
 
-        static const uint8 default_flags = JSPROP_ENUMERATE;
+        static const uint8 default_flags = JSPROP_ENUMERATE | JSPROP_PERMANENT |
+            JSPROP_SHARED;
 };
 
 }}} // end of namespace detail, ape, y60

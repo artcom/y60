@@ -1,7 +1,7 @@
 #ifndef Y60_APE_CV_QUALIFIER_MACROS_INCLUDED
 #define Y60_APE_CV_QUALIFIER_MACROS_INCLUDED
 
-#include "y60_ape_settings.h"
+#include <y60/components/yape/y60_ape_settings.h>
 
 # define Y60_APE_APPLY(x) BOOST_PP_CAT(Y60_APE_APPLY_, x)
 

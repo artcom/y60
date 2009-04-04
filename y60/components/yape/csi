@@ -1,0 +1,42 @@
+#!/usr/bin/env perl
+
+use strict; use warnings;
+
+sub headers_not_including {
+    my $head = shift;
+    return `grep -L $head src/*.h | grep -v $head`;
+}
+
+sub not_in_cmake {
+    opendir(DIR, "src/");
+    my @files = grep(/\.h$/,readdir(DIR));
+    closedir(DIR);
+
+    my @result;
+    foreach my $file (@files) {
+        my $found=`grep $file src/CMakeLists.txt`;
+        if ( ! $found ) {
+            push @result, "$file\n";
+        }
+    }
+    return @result;
+}
+
+print "=== CODE SICHERHEITS BERICHT ================================\n";
+my $no_settings=headers_not_including("y60_ape_settings.h");
+my $num = 0;
+if ($no_settings) {
+    print ++$num, ") INCLUDE HYGIENE:\n";
+    print "y60_ape_settings.h KONNTE IN FOLGENDEN OBJEKTEN NICHT ANGETROFFEN ",
+         "WERDEN:\n";
+    print $no_settings;
+}
+
+my @missing_in_cmake=not_in_cmake();
+if (@missing_in_cmake) {
+    print ++$num, ") SUBVERSIVE UNTERWANDERUNG VON CMAKE:\n";
+    print @missing_in_cmake;
+}
+if (0 == $num) {
+    print "KEINE BESONDEREN VORKOMNISSE\n";
+}

@@ -1,9 +1,13 @@
 #ifndef Y60_APE_LOGGER_SETTINGS_INCLUDED
 #define Y60_APE_LOGGER_SETTINGS_INCLUDED
 
-#include "y60_ape_settings.h"
+#include <y60/components/yape/y60_ape_settings.h>
 
 #ifdef Y60_APE_HAVE_TEMPLOG
+
+#ifdef nil
+#   undef nil
+#endif
 
 #include <templog/logging.h>
 

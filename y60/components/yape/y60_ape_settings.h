@@ -15,6 +15,4 @@
 // See https://bugzilla.mozilla.org/show_bug.cgi?id=438633
 //#define Y60_APE_WORKAROUND_SPIDERMONKEY_BUG_438633
 
-#include "logger_settings.h"
-
 #endif // Y60_APE_SETTING_INCLUDED

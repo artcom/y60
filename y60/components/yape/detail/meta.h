@@ -1,7 +1,7 @@
 #ifndef Y60_APE_META_INCLUDED
 #define Y60_APE_META_INCLUDED
 
-#include "y60_ape_settings.h"
+#include <y60/components/yape/y60_ape_settings.h>
 
 #include <boost/type_traits/function_traits.hpp> 
 #include <boost/type_traits/is_void.hpp> 

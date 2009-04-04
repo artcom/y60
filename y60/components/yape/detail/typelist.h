@@ -1,7 +1,7 @@
 #ifndef Y60_APE_TYPE_LIST_INCLUDED
 #define Y60_APE_TYPE_LIST_INCLUDED
 
-#include "y60_ape_settings.h"
+#include <y60/components/yape/y60_ape_settings.h>
 
 #define Y60_APE_LIST_SIZE Y60_APE_MAX_ARITY
 

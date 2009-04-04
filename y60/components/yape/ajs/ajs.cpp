@@ -1,11 +1,11 @@
-#include "y60_ape_settings.h"
+#include "y60_ajs_settings.h"
 
 #include <iostream>
 
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
 
-#ifdef Y60_APE_HAVE_READLINE
+#ifdef Y60_AJS_HAVE_READLINE
 #   include <readline/readline.h>
 #   include <readline/history.h>
 #endif
@@ -13,21 +13,83 @@
 #include <asl/base/file_functions.h>
 #include <asl/base/buildinfo.h>
 
-#include <y60/components/yape/js_engine.h>
+#include <y60/components/yape/yape.h>
+#include <y60/components/yape/module_loader.h>
+
+#include "custom_globals.h"
 
 // Undo Apple namespace pollution
 #ifdef check
 #   undef check
 #endif
 
+struct version {
+    version(unsigned maj, unsigned min, unsigned pat,
+            const char * xtra = 0) :
+            major(maj), minor(min), patch(pat), extra(xtra) {}
+    const unsigned major;
+    const unsigned minor;
+    const unsigned patch;
+    const char * const extra;
+};
+
+inline
+std::ostream &
+operator<<(std::ostream & os, version const& v) {
+    os << v.major << "." << v.minor << "." << v.patch;
+    if ( ! std::string(v.extra).empty() ) {
+        os << "-" << v.extra;
+    }
+    return os;
+}
+
 std::string program_name;
+
+version ajs_version(Y60_AJS_VERSION_MAJOR, Y60_AJS_VERSION_MINOR,
+        Y60_AJS_VERSION_PATCH, Y60_AJS_VERSION_EXTRA);
+
+
+class custom_global_factory : public y60::ape::standard_global_factory {
+    public:
+        custom_global_factory(std::vector<std::string> const& include_dirs,
+                std::vector<std::string> const& arguments) :
+            include_dirs_(include_dirs), arguments_(arguments)
+        {}
+
+        virtual
+        JSObject *
+        create(JSContext * cx) const {
+            using namespace y60::ape;
+
+            JSObject * global = standard_global_factory::create(cx);
+
+            Y60_APE_IMPORT_MODULE(cx, global, custom_globals );
+            using y60::ape::module_loader_binding;
+            Y60_APE_IMPORT_MODULE(cx, global, module_loader );
+
+            to_js_converter<std::vector<std::string> > conv(cx);
+
+            Object obj(cx, global);
+            obj[properties::arguments]    = conv(arguments_);
+            obj[prop_include_path] = conv(include_dirs_);
+
+            return global;
+        }
+    private:
+        std::vector<std::string> include_dirs_;
+        std::vector<std::string> arguments_;
+};
+
+typedef y60::ape::js_engine<custom_global_factory> jse;
 
 struct handled_options {
     handled_options() :
         interactive(false),
         expression(false),
         strict(false),
-        werror(false){}
+        werror(false),
+        rt_size(jse::default_runtime_size),
+        sc_size(jse::default_stack_chunk_size){}
 
     std::string main;
     std::vector<std::string> include_dirs;
@@ -36,15 +98,17 @@ struct handled_options {
     bool expression;
     bool strict;
     bool werror;
+    int  rt_size;
+    int  sc_size;
 };
 
 enum exit_code {
     exit_ok = EXIT_SUCCESS,
 exit_error_begin = 64,
-    exit_argument_error = exit_error_begin,
+    exit_js_error = exit_error_begin,
     exit_file_not_found,
-    exit_compilation_error,
-    exit_runtime_error,
+    exit_argument_error,
+    exit_other_error,
 exit_error_end,
     do_not_exit,
 };
@@ -55,8 +119,8 @@ operator<<(std::ostream & os, exit_code c) {
         case exit_ok: os << "success"; break;
         case exit_argument_error: os << "argument error"; break;
         case exit_file_not_found: os << "file not found"; break;
-        case exit_runtime_error: os << "runtime error"; break;
-        case exit_compilation_error: os << "compilation error"; break;
+        case exit_js_error: os << "javascript error"; break;
+        case exit_other_error: os << "other error"; break;
 
         case exit_error_end: break;
         case do_not_exit: break;
@@ -84,7 +148,7 @@ extract_result(y60::ape::value const& v) {
 
 bool
 get_line(const char * prompt, std::string & buffer) {
-#ifdef Y60_APE_HAVE_READLINE
+#ifdef Y60_AJS_HAVE_READLINE
     char * line;
     if ((line = readline(prompt)) == NULL) {
         return false;
@@ -104,7 +168,7 @@ get_line(const char * prompt, std::string & buffer) {
 }
 
 int
-interactive_session(y60::ape::js_engine & js) {
+interactive_session(jse & js) {
     bool hit_eof = false;
     bool got_quit = false;
     int line_number = 1;
@@ -129,7 +193,7 @@ interactive_session(y60::ape::js_engine & js) {
             try {
                 y60::ape::value result = js.exec(buffer, "console");
                 if ( *result.val_ptr() != JSVAL_VOID) {
-                    std::cout << result.to_string() << std::endl;
+                    std::cout << result.toString() << std::endl;
                 }
             } catch (y60::ape::script_error const&) {
                 // silently trap script errors
@@ -144,16 +208,10 @@ int
 execute_javascript(handled_options const& opts)
 {
     using namespace y60::ape;
-    js_engine js;
+    custom_global_factory g(opts.include_dirs, opts.arguments);
+    jse js(g, opts.rt_size, opts.sc_size);
     js.strict(opts.strict);
     js.werror(opts.werror);
-
-    if (opts.interactive) {
-        std::cout 
-            << "==="  << std::endl
-            << "=== " << program_name << " interactive session" << std::endl
-            << "==="  << std::endl;
-    }
 
     if ( ! opts.main.empty() ) {
         if (opts.interactive) {
@@ -184,13 +242,22 @@ handle_arguments( int argc, char * argv[], handled_options & opts) {
     po::variables_map options;
     po::options_description cmdline_options("Options");
     cmdline_options.add_options()
-        ("include-path,I",  po::value<vector<string> >(), "add arg as an "
+        ("include-dir,I",  po::value<vector<string> >(), "add arg as an "
                                         "additional include directory")
         ("exec,e", po::value<string>(), "execute arg as a javascript "
                                         "expression and exit")
         ("jsfile", po::value<string>(), "run file and enter interactive mode")
+#ifdef Y60_AJS_DEBUGGER
+        ("debug",                       "run javascript debugger")
+#endif
         ("strict",                      "warn on dubious practice")
         ("werror",                      "convert warnings to errors")
+        ("rt-size",
+         po::value<int>()->default_value(jse::default_runtime_size),
+                                        "initial size of the runtime in MB")
+        ("sc-size",
+         po::value<int>()->default_value(jse::default_stack_chunk_size),
+                                        "stack chunk size in bytes (advanced)")
         ("jshelp",                      "print this text and exit")
         ("buildinfo", po::value<string>()->implicit_value(program_name),
                                         "print details about this build and "
@@ -266,8 +333,8 @@ handle_arguments( int argc, char * argv[], handled_options & opts) {
         opts.main = options["file"].as<string>();
     }
 
-    if ( options.count("include-path")) {
-        opts.include_dirs = options["include-path"].
+    if ( options.count("include-dir")) {
+        opts.include_dirs = options["include-dir"].
             as<vector<string> >();
     }
 
@@ -308,11 +375,35 @@ handle_arguments( int argc, char * argv[], handled_options & opts) {
     if ( options.count("werror") ) {
         opts.werror = true;
     }
+    if ( options.count("rt-size") ) {
+        opts.rt_size = options["rt-size"].as<int>();
+    }
+    if ( options.count("sc-size") ) {
+        opts.sc_size = options["sc-size"].as<int>();
+    }
     if (! opts.main.empty() && ! opts.expression) {
         if ( ! boost::filesystem::exists(opts.main)) {
             cerr << opts.main << ": file not found" << endl;
             return exit_file_not_found;
         }
+    }
+    if (opts.interactive) {
+        cout << program_name << " " << ajs_version;
+        asl::build_information::const_iterator it =
+            asl::build_information::get().find(program_name);
+        if (it != asl::build_information::get().end()) {
+            asl::build_target_info const& info = it->second;
+            cout << " (" << info.history_id() << ", " 
+                 << info.build_date() << ", "
+                 << info.build_time() << ")" << endl
+                 << "[" << info.compiler() << " "
+                 << info.compiler_version() << " "
+                 << info.build_config() << "]";
+            if ( std::string::npos == info.repository_id().find("trunk") ) {
+                cout << endl << info.repository_id();
+            }
+        }
+        cout << endl;
     }
     return do_not_exit;
 }
@@ -327,10 +418,22 @@ int main(int argc, char * argv[]) {
             return result;
         }
         return execute_javascript(opts);
-    } catch (y60::ape::compilation_error const& ex) {
-        result = exit_compilation_error;
-    } catch (y60::ape::runtime_error const& ex) {
-        result = exit_runtime_error;
+    } catch (y60::ape::js_error const& ex) {
+        std::cerr << "javascript error" << std::endl;
+        result = exit_js_error;
+    } catch (boost::program_options::error const& ex) {
+        std::cerr << "argument error: " << ex.what() << std::endl;
+        result = exit_argument_error;
+    } catch (asl::Exception const& ex) {
+        std::cerr << "exception: " << ex;
+        result = exit_other_error;
+    } catch (std::exception const& ex) {
+        std::cerr << "exception: " << ex.what() << std::endl;
+        result = exit_other_error;
+    } catch (...) {
+        std::cerr << "unknown exception" << std::endl;
+        result = exit_other_error;
     }
     return result;
 }
+

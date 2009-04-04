@@ -1,13 +1,14 @@
 #ifndef Y60_APE_SCOPE_INCLUDED
 #define Y60_APE_SCOPE_INCLUDED
 
-#include "y60_ape_settings.h"
+#include <y60/components/yape/y60_ape_settings.h>
 
 #include "ape_thing.h"
+#include "logger_settings.h"
 
 namespace y60 { namespace ape { namespace detail {
 
-ape_thing_ptr current_scope = ape_thing_ptr();
+extern ape_thing_ptr current_scope;
 
 
 struct scope {
