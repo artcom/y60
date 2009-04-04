@@ -176,6 +176,8 @@ class build_target_info {
         }
         std::string const& build_date() const { return build_date_; }
         std::string const& build_time() const { return build_time_; }
+        std::string const& compiler() const { return detected_compiler::name(); }
+        std::string const& compiler_version() const { return detected_compiler::version_str(); }
 
         std::ostream & print( std::ostream & os ) const {
             os << "=== Build Information =========================" << std::endl
@@ -192,7 +194,7 @@ class build_target_info {
         }
     private:
         std::string name_;
-        target_t        target_type_;
+        target_t    target_type_;
         std::string build_config_;
         std::string build_date_;
         std::string build_time_;
