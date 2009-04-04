@@ -85,3 +85,9 @@ else(UNIX)
     endif (CMAKE_GENERATOR MATCHES "Visual Studio.*")
 endif(UNIX)
 
+ac_configure_file(
+        ${ACMAKE_TEMPLATES_DIR}/AcModuleName.h.in
+        ${CMAKE_BINARY_DIR}/include/acmake/module_name.h
+        "${CMAKE_CURRENT_LIST_FILE}"
+)
+
