@@ -105,14 +105,14 @@ class ASL_BASE_DECL PosixThread {
 
         virtual void run();
 
-        pthread_t   _myThread;
-        pthread_t   _myCreator;
-        int         _mySchedPolicy;
-        int         _myPriority;
-        bool        _myIsActive;
-        WorkFunc *  _myWorkFunc;
-        void *      _myWorkArgs;
-        bool        _myShouldTerminate; // if this is true, join() has been called.
+        pthread_t     _myThread;
+        pthread_t     _myCreator;
+        int           _mySchedPolicy;
+        int           _myPriority;
+        bool          _myIsActive;
+        WorkFunc *    _myWorkFunc;
+        void *        _myWorkArgs;
+        volatile bool _myShouldTerminate; // if this is true, join() has been called.
 
         friend void * threadFunc (void * This);
 
