@@ -265,6 +265,22 @@ macro(_ac_attach_depends TARGET DEPENDS EXTERNS)
     # externs too
     _ac_collect_extern_libraries(EXTERN_LIBRARIES ${EXTERNS})
 
+    # XXX Hack to filter "optimzed" and "debug" keywords left by FindBoost
+    #     Probably something Ingo wants to take a look at. [DS]
+    string(REPLACE "optimized" "" tmp "${EXTERN_LIBRARIES_COMMON}")
+    set(EXTERN_LIBRARIES_COMMON ${tmp})
+    string(REPLACE "debug" "" tmp "${EXTERN_LIBRARIES_COMMON}")
+    set(EXTERN_LIBRARIES_COMMON ${tmp})
+    string(REPLACE "optimized" "" tmp "${EXTERN_LIBRARIES_DEBUG}")
+    set(EXTERN_LIBRARIES_DEBUG ${tmp})
+    string(REPLACE "debug" "" tmp "${EXTERN_LIBRARIES_DEBUG}")
+    set(EXTERN_LIBRARIES_DEBUG ${tmp})
+    string(REPLACE "optimized" "" tmp "${EXTERN_LIBRARIES_OPTIMIZED}")
+    set(EXTERN_LIBRARIES_OPTIMIZED ${tmp})
+    string(REPLACE "debug" "" tmp "${EXTERN_LIBRARIES_OPTIMIZED}")
+    set(EXTERN_LIBRARIES_OPTIMIZED ${tmp})
+
+
     # set of all libraries
     set(ALL_LIBRARIES
         ${DEPEND_LIBRARIES}
