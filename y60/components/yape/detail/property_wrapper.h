@@ -1,6 +1,8 @@
 #ifndef Y60_APE_PROPERTY_WRAPPER_INCLUDED
 #define Y60_APE_PROPERTY_WRAPPER_INCLUDED
 
+#include <y60/components/yape/y60_ape_settings.h>
+
 #include <boost/type_traits/is_member_object_pointer.hpp>
 
 #include <y60/jsbase/JScppUtils.h>

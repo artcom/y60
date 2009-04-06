@@ -14,8 +14,9 @@
 
 namespace y60 { namespace ape {
 
+#if 0 
 template <typename Class>
-detail::class_helper<Class>
+detail::context_decorator<Class>
 class_(const char * name) {
     typedef boost::shared_ptr<detail::class_descriptor<Class> > cp;
     // XXX ugly
@@ -23,8 +24,29 @@ class_(const char * name) {
                     detail::current_scope->property_flags()));
     detail::current_scope->add( cd );
     detail::scope_lock class_scope_lock( new detail::scope(cd));
-    return detail::class_helper<Class>( class_scope_lock );
+    return detail::context_decorator<Class>( class_scope_lock );
 }
+
+#endif
+
+template <typename Class>
+class class_ : public detail::context_decorator<Class> {
+    public:
+        class_(const char * name) :
+            scope_( init( name ) )
+        {
+            
+        }
+    private:
+        detail::ape_thing_ptr init( const char * name) {
+            typedef boost::shared_ptr<detail::class_descriptor<Class> > desc_type;
+            desc_type desc( new detail::class_descriptor<Class>(name,
+                    detail::current_scope->property_flags()));
+            detail::current_scope->add( desc );
+            return desc;
+        }
+        detail::scope scope_;
+};
 
 }} // end of namespace ape, y60
 

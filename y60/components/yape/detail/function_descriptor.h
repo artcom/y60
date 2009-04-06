@@ -1,6 +1,8 @@
 #ifndef Y60_APE_FUNCTOR_DESCRIPTOR_INCLUDED
 #define Y60_APE_FUNCTOR_DESCRIPTOR_INCLUDED
 
+#include <y60/components/yape/y60_ape_settings.h>
+
 #include "function_wrapper.h"
 #include "signature.h"
 

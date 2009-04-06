@@ -4,14 +4,18 @@ set( LIB_HEADERS
     detail/ape_exceptions.h
     detail/ape_thing.h
     detail/arguments.h
+    detail/class_descriptor.h
     detail/class_wrapper.h
+    detail/context_decorator.h
     detail/cv_qualifier_macros.h
+    detail/function_descriptor.h
     detail/function_wrapper.h
     detail/invoke.h
     detail/logger_settings.h
     detail/meta.h
     detail/monkey_headers.h
     detail/monkey_utilities.h
+    detail/property_descriptor.h
     detail/property_wrapper.h
     detail/scope.h
     detail/signature.h

@@ -7,9 +7,10 @@ namespace {
 Y60_APE_MODULE( ape_bench_ape_binding ) {
     using namespace y60::ape;
     using namespace y60::ape::bench;
+
     Y60_APE_NS_SCOPE()
-        . function( "ape_add", add )
-        . function( "ape_add8", add8)
+        . function( "ape_add", y60::ape::bench::add )
+        . function( "ape_add8", y60::ape::bench::add8)
         ;
 
     class_<adder>("ape_adder")

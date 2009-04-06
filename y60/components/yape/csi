@@ -4,11 +4,12 @@ use strict; use warnings;
 
 sub headers_not_including {
     my $head = shift;
-    return `grep -L $head src/*.h | grep -v $head`;
+    return `grep -L $head src/*.h src/detail/*.h | grep -v $head`;
 }
 
 sub not_in_cmake {
-    opendir(DIR, "src/");
+    my $dir = shift;
+    opendir(DIR, $dir);
     my @files = grep(/\.h$/,readdir(DIR));
     closedir(DIR);
 
@@ -32,7 +33,8 @@ if ($no_settings) {
     print $no_settings;
 }
 
-my @missing_in_cmake=not_in_cmake();
+my @missing_in_cmake=not_in_cmake("src");
+push @missing_in_cmake, not_in_cmake("src/detail");
 if (@missing_in_cmake) {
     print ++$num, ") SUBVERSIVE UNTERWANDERUNG VON CMAKE:\n";
     print @missing_in_cmake;

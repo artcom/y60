@@ -16,10 +16,11 @@
 #include "detail/ape_exceptions.h"
 #include "detail/monkey_utilities.h"
 #include "detail/scope.h"
-#include "detail/chain_helpers.h"
+#include "detail/context_decorator.h"
 
 namespace y60 { namespace ape {
 
+#if 0
 template <typename UserModule>
 class binding {
     private:
@@ -28,16 +29,20 @@ class binding {
 
     protected:
         template <typename LocalUniqueId>
-        detail::namespace_helper< typename unique_id<LocalUniqueId>::type >
+        detail::context_decorator< typename unique_id<LocalUniqueId>::type >
         namespace_scope() {
             typedef typename unique_id<LocalUniqueId>::type id;
-            return detail::namespace_helper<id>();
+            return detail::context_decorator<id>();
         }
 
 };
+#endif 
 
 template <typename Binding>
 class module : public detail::ape_thing {
+    private:
+        template <typename LocalUniqueId>
+        struct unique_id : boost::mpl::vector2<LocalUniqueId, Binding> {};
     public:
         module(const char * name) : detail::ape_thing(detail::ape_module, name) {}
         void import(JSContext * cx, JSObject * ns) {
@@ -50,10 +55,9 @@ class module : public detail::ape_thing {
                 os << "module '" << get_name() << "' is already imported.";
                 throw script_error(os.str(), PLUS_FILE_LINE);
             }
-            {
-                Binding b;
-                b.bind();
-            }
+
+            static_cast<Binding&>(*this).bind();
+
             import_children(cx, ns, ns_scope);
             if ( ! ns_scope.static_functions.empty()) {
                 if ( ! JS_DefineFunctions(cx, ns, ns_scope.static_functions.ptr())) {
@@ -61,6 +65,13 @@ class module : public detail::ape_thing {
                 }
             }
             imported = true;
+        }
+    protected:
+        template <typename LocalUniqueId>
+        detail::context_decorator< typename unique_id<LocalUniqueId>::type >
+        namespace_scope() {
+            typedef typename unique_id<LocalUniqueId>::type id;
+            return detail::context_decorator<id>();
         }
     private:
         static detail::monkey_data ns_scope;
@@ -137,13 +148,13 @@ typedef jslib::IJSModuleLoader * (*init_function)(asl::DLHandle theDLHandle);
 
 
 #define Y60_APE_MODULE_DECL( name )                                             \
-class Y60_APE_BNAME(name) : public y60::ape::binding< Y60_APE_BNAME(name) > {   \
+class Y60_APE_BNAME(name) : public y60::ape::module< Y60_APE_BNAME(name) > {    \
     public:                                                                     \
         friend class y60::ape::module< Y60_APE_BNAME(name) >;                   \
         void bind();                                                            \
     protected:                                                                  \
         Y60_APE_BNAME(name)() :                                                 \
-                y60::ape::binding< Y60_APE_BNAME(name) >() {}                   \
+                y60::ape::module< Y60_APE_BNAME(name) >(#name) {}               \
 };
 
 // TODO: deprecate this
