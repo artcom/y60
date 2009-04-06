@@ -152,7 +152,7 @@ class TransportLayer :  public asl::PosixThread {
         void syncLost();
         void connectionLost();
 
-        unsigned readStatusToken( std::vector<unsigned char>::iterator & theIt, const char theToken );
+        unsigned readStatusToken(std::deque<unsigned char>::iterator & theIt, const char theToken);
         unsigned getBytesPerStatusLine();
         size_t getBytesPerFrame();
         void parseStatusLine(/*RasterPtr & theTargetRaster*/);
@@ -160,8 +160,8 @@ class TransportLayer :  public asl::PosixThread {
         void synchronize();
         const char * getFirmwareModeName(unsigned theId) const;
 
-        void addLineToChecksum(std::vector<unsigned char>::const_iterator theLineIt,
-                               std::vector<unsigned char>::const_iterator theEnd );
+        void addLineToChecksum(std::deque<unsigned char>::const_iterator theLineIt,
+                               std::deque<unsigned char>::const_iterator theEnd );
 
         unsigned valuesPerLine() const;
 
@@ -176,8 +176,7 @@ class TransportLayer :  public asl::PosixThread {
         std::string    _myTransportName;
         volatile bool  _myRunningFlag;
         DriverState    _myState;
-        std::vector<unsigned char> _myTmpBuffer;
-        std::vector<unsigned char> _myReceiveBuffer;
+        std::deque<unsigned char> _myTmpBuffer;
         unsigned char * _myFrameBuffer;
 
         asl::Vector2i _myGridSize;
@@ -185,17 +184,17 @@ class TransportLayer :  public asl::PosixThread {
         bool _myMagicTokenFlag;
         int _myExpectedLine;
 
-        //dom::NodePtr _mySettings;
-        //ASSDriver * _myDriver;
-
+        // queue transporting data from transport to driver
         std::queue<ASSEvent> _myFrameQueue;
-        asl::ThreadLock _myFrameQueueLock;
+        asl::ThreadLock      _myFrameQueueLock;
+        std::queue<ASSEvent>::size_type _myEventQueueSize; // XXX: why?
 
-        std::queue<std::string> _myCommandQueue; // TODO: use a queue?
-        asl::ThreadLock _myCommandQueueLock;
+        // queue transporting commands from driver to transport
+        std::queue<std::string> _myCommandQueue;
+        asl::ThreadLock         _myCommandQueueLock;
+
         CommandState _myConfigureState;
         double       _myLastCommandTime;
-        std::queue<ASSEvent>::size_type _myEventQueueSize;
 
         // Controller Status
         // TODO: expose to JavaScript

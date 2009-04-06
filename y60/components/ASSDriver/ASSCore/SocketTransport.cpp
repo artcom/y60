@@ -131,25 +131,19 @@ namespace y60 {
     void 
     SocketTransport::readData() {
         try {
-            size_t myMaxBytes = _myReceiveBuffer.size();
-
-            // [DS] If the serial port is removed a non-blocking read returns EAGAIN
-            // for some reason. Peek throws an exception which is just what we want.
-            //_mySerialPort->peek();
-
             AC_DEBUG << "bytes received within the last " << NO_DATA_TIMEOUT 
                      << " seconds: " << _myNumReceivedBytes;
-            size_t myCurrentReceivedBytes = _mySocket->receive(reinterpret_cast<char*>(& ( * _myReceiveBuffer.begin())),
-                                                               myMaxBytes );
+
+            char myReceiveBuffer[1024];
+            size_t myMaxBytes = sizeof(myReceiveBuffer);
+            size_t myCurrentReceivedBytes = _mySocket->receive(myReceiveBuffer, myMaxBytes);
 
             _myNumReceivedBytes += myCurrentReceivedBytes;
             AC_TRACE << "SocketTransport::readData() received bytes: " << myCurrentReceivedBytes
-                     << " total received: " << _myNumReceivedBytes 
-                     << " receivebuffer size : " << _myReceiveBuffer.size();
+                     << " total received: " << _myNumReceivedBytes;
 
-            _myTmpBuffer.insert( _myTmpBuffer.end(),
-                                 _myReceiveBuffer.begin(), _myReceiveBuffer.begin() + myCurrentReceivedBytes );
-            //dumpBuffer( _myReceiveBuffer );
+            _myTmpBuffer.insert(_myTmpBuffer.end(), myReceiveBuffer, myReceiveBuffer + myCurrentReceivedBytes);
+            //dumpBuffer( myReceiveBuffer );
         } catch (const SocketException & ex) {
             /*MAKE_SCOPE_TIMER(SocketTransport_serialPortException);
               _myFrameQueueLock.lock();

@@ -110,7 +110,6 @@ TransportLayer::TransportLayer(const char * theTransportName, const dom::NodePtr
     asl::PosixThread( threadMain ),
     _myGridSize(-1, -1),
     _myState( NOT_CONNECTED ),
-    _myReceiveBuffer( 1024 ),
     _myMagicTokenFlag( false ),
     _myExpectedLine( 0 ),
     _myFirmwareVersion( -1 ),
@@ -200,7 +199,7 @@ TransportLayer::poll() {
 }
 
 unsigned
-TransportLayer::readStatusToken( std::vector<unsigned char>::iterator & theIt, const char theToken ) {
+TransportLayer::readStatusToken( std::deque<unsigned char>::iterator & theIt, const char theToken ) {
     if ( * theIt != theToken ) {
         throw ASSStatusTokenException(string("Failed to parse status token '") + theToken + "'. Got '" +
                 char(* theIt) + "'", PLUS_FILE_LINE );
@@ -256,7 +255,7 @@ TransportLayer::parseStatusLine(/*RasterPtr & theTargetRaster*/) {
         if ( _myTmpBuffer.size() >= getBytesPerStatusLine() ) {
             ASSURE( _myTmpBuffer[0] == MAGIC_TOKEN );
             ASSURE( _myTmpBuffer[1] == _myExpectedLine );
-            std::vector<unsigned char>::iterator myIt = _myTmpBuffer.begin() + 2;
+            std::deque<unsigned char>::iterator myIt = _myTmpBuffer.begin() + 2;
             _myFirmwareVersion = readStatusToken( myIt, 'V' );
             Vector2i myGridSize;
             unsigned myChecksum = 0;
@@ -313,7 +312,6 @@ TransportLayer::parseStatusLine(/*RasterPtr & theTargetRaster*/) {
             if ( _myGridSize != myGridSize ) {
                 _myGridSize = myGridSize;
                 ASSURE(_myTmpBuffer.front() == MAGIC_TOKEN);
-                _myReceiveBuffer.resize( getBytesPerFrame() );
             }
 
             AC_TRACE << "local sum: " << _myChecksum << " packet checksum: " << myChecksum;
@@ -352,8 +350,8 @@ TransportLayer::parseStatusLine(/*RasterPtr & theTargetRaster*/) {
 }
 
 void
-TransportLayer::addLineToChecksum(std::vector<unsigned char>::const_iterator theLineIt,
-                                  std::vector<unsigned char>::const_iterator theEnd )
+TransportLayer::addLineToChecksum(std::deque<unsigned char>::const_iterator theLineIt,
+                                  std::deque<unsigned char>::const_iterator theEnd)
 {
     while ( theLineIt != theEnd) {
         _myChecksum +=  * theLineIt;
@@ -413,7 +411,7 @@ TransportLayer::readSensorValues(/* RasterPtr theTargetRaster */) {
             if (_myMultiplexMax == 0) {
                 std::copy(_myTmpBuffer.begin() + 2, _myTmpBuffer.begin() + 2 + _myGridSize[0], myRowPtr);
             } else {
-                std::vector<unsigned char>::iterator myInput = _myTmpBuffer.begin() + 2;
+                std::deque<unsigned char>::iterator myInput = _myTmpBuffer.begin() + 2;
                 myRowPtr += _myCurrentMultiplex;
                 for (unsigned i = 0; i < valuesPerLine(); ++i) {
                     * myRowPtr = * myInput;

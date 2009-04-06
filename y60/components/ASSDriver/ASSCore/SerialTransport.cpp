@@ -195,8 +195,9 @@ SerialTransport::readData() {
 
         // read, blocking when there is no data
         asl::Time myBefore, myAfter;
-        size_t myBytesReceived = _myReceiveBuffer.size();
-        _mySerialPort->read(reinterpret_cast<char*>(& ( * _myReceiveBuffer.begin())), myBytesReceived);
+        char myReceiveBuffer[1024];
+        size_t myBytesReceived = sizeof(myReceiveBuffer);
+        _mySerialPort->read(myReceiveBuffer, myBytesReceived);
         myAfter.setNow();
 
         AC_TRACE << "Read took " << myAfter.millis() - myBefore.millis() << " milliseconds.";
@@ -210,13 +211,13 @@ SerialTransport::readData() {
 
             //// dump data in hex
             //std::string hexDump;
-            //asl::binToString(&_myReceiveBuffer[0], myBytesReceived, hexDump);
+            //asl::binToString(myReceiveBuffer, myBytesReceived, hexDump);
             //AC_TRACE << "Received bytes: " << hexDump;
 
             //// and also in ascii
             //std::string ascDump;
             //for(unsigned i = 0; i < myBytesReceived; i++) {
-            //    unsigned char c = _myReceiveBuffer[i];
+            //    unsigned char c = myReceiveBuffer[i];
             //    ascDump += " ";
             //    if(c >= 32 && c < 127) {
             //        ascDump += c;
@@ -232,7 +233,7 @@ SerialTransport::readData() {
             }
 
             // queue the data into the protocol parser buffer
-            _myTmpBuffer.insert(_myTmpBuffer.end(), _myReceiveBuffer.begin(), _myReceiveBuffer.begin() + myBytesReceived);
+            _myTmpBuffer.insert(_myTmpBuffer.end(), myReceiveBuffer, myReceiveBuffer + myBytesReceived);
         } else {
             AC_TRACE << "Read returned nothing.";
         }
