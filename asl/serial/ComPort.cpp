@@ -347,7 +347,7 @@ namespace asl {
             myErrorString.append((LPTSTR) myMessageBuffer);
             LocalFree(myMessageBuffer);
             SetLastError(0);
-            throw SerialPortException(myErrorString, PLUS_FILE_LINE);
+            throw SerialPortException(myErrorString, theLocationString);
         }
     }
 
