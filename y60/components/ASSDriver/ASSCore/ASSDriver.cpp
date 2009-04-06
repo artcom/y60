@@ -170,14 +170,15 @@ namespace y60 {
         _myTransformEventScale(1.0f,1.0f),
         _myTransformEventPosition(0.0f,0.0f)
     {
+        AC_DEBUG << "ASSDriver::ASSDriver()";
 #ifdef ASS_LATENCY_TEST
         _myLatencyTestPort = asl::getSerialDevice( 0 );
         _myLatencyTestPort->open( 9600, 8, SerialDevice::NO_PARITY, 1, false);
 #endif
-        AC_PRINT << "Ctor done";
     }
 
     ASSDriver::~ASSDriver() {
+        AC_DEBUG << "ASSDriver::~ASSDriver()";
 #ifdef ASS_LATENCY_TEST
         if ( _myLatencyTestPort ) {
             delete _myLatencyTestPort;
@@ -193,7 +194,6 @@ namespace y60 {
         _myScene = theWindow->getCurrentScene();
         // TODO: trigger raster reallocation
         //setState(NOT_CONNECTED);
-        AC_PRINT << "onSceneLoaded done";
         return true;
     }
 
@@ -203,7 +203,6 @@ namespace y60 {
 
     void
     ASSDriver::allocateGridBuffers(const asl::Vector2i & theGridSize ) {
-        AC_PRINT << "allocateGridBuffers";
         _myGridSize = theGridSize;
 
         _myPoTSize[0] = nextPowerOfTwo( _myGridSize[0] );
@@ -214,17 +213,14 @@ namespace y60 {
         _myDenoisedRaster = allocateRaster(FILTERED_RASTER, _myPoTSize[0], _myPoTSize[1]);
         _myMomentRaster = allocateRaster(MOMENT_RASTER, _myPoTSize[0], _myPoTSize[1]);
 
-	std::fill(_myRawRaster.raster->pixels().begin(), _myRawRaster.raster->pixels().end(), 0);
-	std::fill(_myDenoisedRaster.raster->pixels().begin(), _myDenoisedRaster.raster->pixels().end(), 0);
-	std::fill(_myMomentRaster.raster->pixels().begin(), _myMomentRaster.raster->pixels().end(), 0);
+        std::fill(_myRawRaster.raster->pixels().begin(), _myRawRaster.raster->pixels().end(), 0);
+        std::fill(_myDenoisedRaster.raster->pixels().begin(), _myDenoisedRaster.raster->pixels().end(), 0);
+        std::fill(_myMomentRaster.raster->pixels().begin(), _myMomentRaster.raster->pixels().end(), 0);
 
+        // XXX: resampling
         unsigned myWidth = nextPowerOfTwo(_myGridSize[0] * GRID_SCALE_X );
         unsigned myHeight = nextPowerOfTwo( _myGridSize[1] * GRID_SCALE_Y );
-        AC_PRINT << "Allocating" << myWidth << " " << myHeight;
         _myResampledRaster = allocateRaster("resampled_raster", myWidth, myHeight);
-        AC_PRINT << "Alloc done";
-
-        // XXX brute force resampling
     
         createTransportLayerEvent( "configure" );
     }
@@ -1385,8 +1381,6 @@ namespace y60 {
         if ( _myTransportLayer && _myTransportLayer->settingsChanged( theSettings ) ) {
             _myTransportLayer = TransportLayerPtr();
         }
-
-        AC_DEBUG << "driver setup: transport layer is '" << _myTransportLayer << "'";
 
         if ( ! _myTransportLayer ) {
             string myTransportName;
