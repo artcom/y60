@@ -155,6 +155,8 @@ class TransportLayer :  public asl::PosixThread {
         void connectionLost();
         void setState(DriverState theState); // XXX: should be private
 
+        void receivedData(char* theData, size_t theSize);
+
     private:
 
         // thread main function
@@ -197,6 +199,7 @@ private:
         DriverState     _myState;
         CommandState    _myConfigureState;
         double          _myLastCommandTime;
+        asl::Time       _myLastDataTime;
         unsigned char*  _myFrameBuffer;
         asl::Unsigned16 _myChecksum;
         bool            _myFirstFrameFlag;
@@ -205,9 +208,7 @@ private:
         int             _myExpectedLine;
 
         // incoming data buffer
-protected: // XXX: should not be
         std::deque<unsigned char> _myTmpBuffer;
-private:
 
         // queue transporting data from transport to driver
         std::queue<ASSEvent> _myFrameQueue;

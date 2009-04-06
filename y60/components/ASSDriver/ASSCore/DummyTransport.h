@@ -99,6 +99,8 @@ class DummyTransport : public TransportLayer {
         std::vector<unsigned char> _myStatusLine;
         std::vector<unsigned char> _myGridValues;
 
+        std::vector<unsigned char> _myTmpBuffer;
+
 };
 
 } // end of namespace

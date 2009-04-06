@@ -74,22 +74,21 @@ class SocketTransport : public TransportLayer {
         SocketTransport(const dom::NodePtr & theSettings);
         ~SocketTransport();
 
-
     protected:
         virtual bool settingsChanged(dom::NodePtr theSettings);
+
         void init(dom::NodePtr theSettings);
 
         void establishConnection();
         void readData();
         void closeConnection();
         void writeData(const char * theData, size_t theSize);
-    private:
 
-        //asl::SerialDevice * _mySerialPort;
+    private:
         std::string  _myIpAddressString;
         unsigned int _myPort;
+
         inet::TCPClientSocketPtr  _mySocket;
-        unsigned _myNumReceivedBytes;
 };
 
 } // end of namespace

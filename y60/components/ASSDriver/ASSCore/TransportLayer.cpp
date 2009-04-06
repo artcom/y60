@@ -164,8 +164,20 @@ TransportLayer::stopThread() {
     join();
 }
 
+static const double NO_DATA_TIMEOUT = 3.0;
+
 void 
 TransportLayer::poll() {
+    // check for data timeout
+    if(_myState != NOT_CONNECTED) {
+        asl::Time myNow;
+        double myTimeSinceLastData = myNow - _myLastDataTime;
+        if(myTimeSinceLastData > NO_DATA_TIMEOUT) {
+            AC_WARNING << "No data received for " << myTimeSinceLastData << " seconds.";
+            connectionLost();
+            return;
+        }
+    }
 
     _myFrameQueueLock.lock();
     if (_myFrameQueue.size() > _myEventQueueSize) {
@@ -487,6 +499,7 @@ TransportLayer::setState( DriverState theState ) {
             closeConnection();
             break;
         case SYNCHRONIZING:
+            _myLastDataTime.setNow();
             sendCommand( CMD_LEAVE_CONFIG_MODE );
             _myMagicTokenFlag = false;
             _myGridSize = Vector2i(-1, -1);
@@ -614,6 +627,12 @@ TransportLayer::sendCommand( const std::string & theCommand ) {
         AC_WARNING << "Error while sending command: " << ex;
         connectionLost();
     }
+}
+
+void
+TransportLayer::receivedData(char* theData, size_t theSize) {
+    _myTmpBuffer.insert(_myTmpBuffer.end(), theData, theData + theSize);
+    _myLastDataTime.setNow();
 }
 
 void

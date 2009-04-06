@@ -75,14 +75,16 @@ namespace y60 {
     class ASSDriver;
 
     SocketTransport::SocketTransport(const dom::NodePtr & theSettings) :
-        TransportLayer( "socket", theSettings ),
-        _myNumReceivedBytes( 0 )
-
+        TransportLayer( "socket", theSettings )
     {
-        init( theSettings );
+        AC_DEBUG << "SocketTransport::SocketTransport()";
+
+        init(theSettings);
     }
 
     SocketTransport::~SocketTransport() {
+        AC_DEBUG << "SocketTransport::~SocketTransport()";
+
         stopThread();
         closeConnection();
     }
@@ -100,15 +102,14 @@ namespace y60 {
 
     void 
     SocketTransport::init(dom::NodePtr theSettings) {
-        //AC_PRINT << "SocketTransport::init()";
         getConfigSetting( theSettings, "IpAddress", _myIpAddressString, std::string("127.0.0.1" ));
         getConfigSetting<unsigned>( theSettings, "Port", _myPort, 5000 );
     }
 
-
     void 
     SocketTransport::establishConnection() {
-        AC_PRINT << "SocketTransport::establishConnection()";
+        AC_DEBUG << "SocketTransport::establishConnection()";
+
         _mySocket = TCPClientSocketPtr(new TCPClientSocket());
 
         Unsigned32 inHostAddress = getHostAddress(_myIpAddressString.c_str());
@@ -131,43 +132,40 @@ namespace y60 {
     void 
     SocketTransport::readData() {
         try {
-            AC_DEBUG << "bytes received within the last " << NO_DATA_TIMEOUT 
-                     << " seconds: " << _myNumReceivedBytes;
-
             char myReceiveBuffer[1024];
-            size_t myMaxBytes = sizeof(myReceiveBuffer);
-            size_t myCurrentReceivedBytes = _mySocket->receive(myReceiveBuffer, myMaxBytes);
+            size_t myBytesReceived = sizeof(myReceiveBuffer);
+            myBytesReceived = _mySocket->receive(myReceiveBuffer, myBytesReceived);
 
-            _myNumReceivedBytes += myCurrentReceivedBytes;
-            AC_TRACE << "SocketTransport::readData() received bytes: " << myCurrentReceivedBytes
-                     << " total received: " << _myNumReceivedBytes;
-
-            _myTmpBuffer.insert(_myTmpBuffer.end(), myReceiveBuffer, myReceiveBuffer + myCurrentReceivedBytes);
-            //dumpBuffer( myReceiveBuffer );
-        } catch (const SocketException & ex) {
-            /*MAKE_SCOPE_TIMER(SocketTransport_serialPortException);
-              _myFrameQueueLock.lock();
-              _myFrameQueue.push( ASSEvent( ASS_LOST_COM ));
-              _myFrameQueueLock.unlock();*/
-            AC_ERROR <<  ex;
-            setState(NOT_CONNECTED);
+            receivedData(myReceiveBuffer, myBytesReceived);
+        } catch (const SocketException& ex) {
+            AC_WARNING << "Exception while reading: " << ex;
+            connectionLost();
         }
     }
 
     void 
     SocketTransport::writeData(const char * theData, size_t theSize) {
-        if ( _mySocket ) {
-            _mySocket->send(theData, theSize);
-        } else {
+        if (!_mySocket) {
             AC_WARNING << "Can not write data. No socket.";
-            setState( NOT_CONNECTED );
+            setState(NOT_CONNECTED);
+        }
+
+        try {
+            _mySocket->send(theData, theSize);
+        } catch (const SocketException& ex) {
+            AC_WARNING << "Exception while writing: " << ex;
+            connectionLost();
         }
     }
 
     void 
     SocketTransport::closeConnection() {
-        _mySocket->close();
-        _mySocket = TCPClientSocketPtr();
+        AC_DEBUG << "SocketTransport::closeConnection()";
+
+        if(_mySocket) {
+            _mySocket->close();
+            _mySocket = TCPClientSocketPtr();
+        }
     }
 
 

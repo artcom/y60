@@ -73,8 +73,6 @@ using namespace y60;
 
 namespace y60 {
 
-static const double NO_DATA_TIMEOUT = 3.0;
-
 class ASSDriver;
 
 SerialTransport::SerialTransport(const dom::NodePtr & theSettings) :
@@ -86,9 +84,7 @@ SerialTransport::SerialTransport(const dom::NodePtr & theSettings) :
     _myBitsPerSerialWord(8),
     _myStopBits(1),
     _myHandshakingFlag(false),
-    _myParity(SerialDevice::NO_PARITY),
-    _myLastDataTime()
-
+    _myParity(SerialDevice::NO_PARITY)
 {
     AC_DEBUG << "SerialTransport::SerialTransport()";
 
@@ -168,7 +164,6 @@ SerialTransport::establishConnection() {
         }
     }
 
-    _myLastDataTime.setNow();
     _mySerialPort->flush();
 }
 
@@ -180,15 +175,6 @@ SerialTransport::readData() {
     }
 
     try {
-        // check for timeout
-        asl::Time myNow;
-        double myTimeSinceLastData = myNow - _myLastDataTime;
-        if(myTimeSinceLastData > NO_DATA_TIMEOUT) {
-            AC_WARNING << "No data received for " << myTimeSinceLastData << " seconds.";
-            connectionLost();
-            return;
-        }
-
         // [DS] If the serial port is removed a non-blocking read returns EAGAIN
         // for some reason. Peek throws an exception which is just what we want.
         _mySerialPort->peek();
@@ -203,37 +189,10 @@ SerialTransport::readData() {
         AC_TRACE << "Read took " << myAfter.millis() - myBefore.millis() << " milliseconds.";
 
         if(myBytesReceived > 0) {
-            // update data timeout reference
-            _myLastDataTime.setNow();
-            
-            // report the read
-            AC_TRACE << "Received " << myBytesReceived << " with " << _myTmpBuffer.size() << " queued.";
+            AC_TRACE << "Received " << myBytesReceived << " bytes.";
 
-            //// dump data in hex
-            //std::string hexDump;
-            //asl::binToString(myReceiveBuffer, myBytesReceived, hexDump);
-            //AC_TRACE << "Received bytes: " << hexDump;
-
-            //// and also in ascii
-            //std::string ascDump;
-            //for(unsigned i = 0; i < myBytesReceived; i++) {
-            //    unsigned char c = myReceiveBuffer[i];
-            //    ascDump += " ";
-            //    if(c >= 32 && c < 127) {
-            //        ascDump += c;
-            //    } else {
-            //        ascDump += ".";
-            //    }
-            //}
-            //AC_TRACE << "Received chars: " << ascDump;
-
-            //// warn about overrunning buffer
-            if(_myTmpBuffer.size() > 1024) {
-                AC_WARNING << "Input buffer is running over. Currently at " << _myTmpBuffer.size() << " bytes.";
-            }
-
-            // queue the data into the protocol parser buffer
-            _myTmpBuffer.insert(_myTmpBuffer.end(), myReceiveBuffer, myReceiveBuffer + myBytesReceived);
+            // queue the data to the protocol parser
+            receivedData(myReceiveBuffer, myBytesReceived);
         } else {
             AC_TRACE << "Read returned nothing.";
         }
@@ -253,7 +212,7 @@ SerialTransport::writeData(const char * theData, size_t theSize) {
     }
 
     try {
-        _mySerialPort->write( theData, theSize );
+        _mySerialPort->write(theData, theSize);
     } catch (const SerialPortException & ex) {
         AC_WARNING << "Exception while writing: " << ex;
         connectionLost();

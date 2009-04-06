@@ -104,6 +104,8 @@ void DummyTransport::establishConnection() {
 void DummyTransport::readData() {
     DB(AC_TRACE << "DummyTransport::readData()";)
     
+    _myTmpBuffer.clear();
+
     buildStatusLine();
     generateGridValues(); 
     calculateChecksum(); // save the new checksum for the next frame
@@ -122,7 +124,7 @@ void DummyTransport::readData() {
                              _myGridValues.begin() + i*_myGridWidth );
     }
     
-
+    receivedData((char*)&_myTmpBuffer[0], _myTmpBuffer.size());
 }
 
 

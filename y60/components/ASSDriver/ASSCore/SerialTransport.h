@@ -97,8 +97,6 @@ namespace y60 {
         int  _myStopBits;
         bool _myHandshakingFlag;
         asl::SerialDevice::ParityMode _myParity;
-
-        asl::Time _myLastDataTime;
     };
 
 } // end of namespace
