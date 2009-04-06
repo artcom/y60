@@ -165,10 +165,8 @@ class TransportLayer :  public asl::PosixThread {
 
         unsigned valuesPerLine() const;
 
-        // establishConnection is not abstract, because it will get
-        // called BEFORE the derived object is created
-        virtual void establishConnection() {}
-
+        // interface to be implemented by transport layer
+        virtual void establishConnection() = 0;
         virtual void readData() = 0;
         virtual void writeData(const char * theData, size_t theSize) = 0;
         virtual void closeConnection() = 0;
