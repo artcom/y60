@@ -160,7 +160,7 @@ namespace asl {
             return _myFrameRate;
     }
 
-    const double FRAME_AVERAGING_TIME = 2;
+    const double FRAME_AVERAGING_TIME = 1;
 
     void Dashboard::cycle(unsigned int theGroup, unsigned long theIncrement) {
         _myGroupCounters[theGroup].count(theIncrement);

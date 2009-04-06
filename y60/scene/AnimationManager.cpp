@@ -229,6 +229,27 @@ namespace y60 {
                                     myAnimatedAttribute, 0, myAngleAttribute));
                     }
                     myTypeStringIsValid = true;
+                } else if (myTypeName == SOM_VECTOR_VECTOR2F_NAME) {
+                    const asl::Vector2f * myValue = myAnimatedAttribute->nodeValuePtr<asl::Vector2f>();
+                    if (myValue) {
+                        return AnimationPtr(new Animation<asl::Vector2f>(theNode, myValueList, 
+                                                                    myAnimatedAttribute, 0, myAngleAttribute));
+                    }
+                    myTypeStringIsValid = true;
+                } else if (myTypeName == SOM_VECTOR_VECTOR3F_NAME) {
+                    const asl::Vector3f * myValue = myAnimatedAttribute->nodeValuePtr<asl::Vector3f>();
+                    if (myValue) {
+                        return AnimationPtr(new Animation<asl::Vector3f>(theNode, myValueList, 
+                                                                         myAnimatedAttribute, 0, myAngleAttribute));
+                    }
+                    myTypeStringIsValid = true;
+                } else if (myTypeName == SOM_VECTOR_VECTOR4F_NAME) {
+                    const asl::Vector4f * myValue = myAnimatedAttribute->nodeValuePtr<asl::Vector4f>();
+                    if (myValue) {
+                        return AnimationPtr(new Animation<asl::Vector4f>(theNode, myValueList, 
+                                                                         myAnimatedAttribute, 0, myAngleAttribute));
+                    }
+                    myTypeStringIsValid = true;
                 } else if (myTypeName == SOM_VECTOR_STRING_NAME) {
                     const string * myValue = myAnimatedAttribute->nodeValuePtr<string>();
                     if (myValue) {

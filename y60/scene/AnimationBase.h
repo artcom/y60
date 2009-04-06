@@ -88,11 +88,12 @@ namespace y60 {
         public:
             enum AttributeComponent {
                 SCALAR = -1,
+                ALL = -1,
                 X,
                 Y,
                 Z,
                 W,
-                HFOV
+                HFOV,
             };
 
             AnimationBase(dom::NodePtr theNode, bool theAngleAnimation);

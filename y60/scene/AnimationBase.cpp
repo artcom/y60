@@ -139,10 +139,6 @@ namespace y60 {
 
         _myCurrentDirection = _myPlayType;
 
-        // ???
-        //if (_myPlayType == REVERSE) {
-        //    _myCurrentDirection = REVERSE;
-        //}
     }
 
     bool

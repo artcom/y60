@@ -228,7 +228,7 @@ namespace y60 {
                 unsigned int myResult = calcIndicies(myLowerIndex, myUpperIndex, myAlpha,
                                                      theTime, myValues.size());
                 if (myResult == 0) {
-                    return false;
+                    return true;
                 } else if (myResult == 1) {
                     setToEndValue();
                     return false;

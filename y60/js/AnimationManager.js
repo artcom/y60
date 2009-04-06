@@ -239,6 +239,7 @@ AnimationManager.prototype.Constructor = function(obj, theSceneViewer) {
             theEnable = true;
         }
         _myEnabled = theEnable;
+        _myUpdated = true;
     }
 
     obj.onFrame = function(theTime) {
@@ -356,7 +357,6 @@ AnimationManager.prototype.Constructor = function(obj, theSceneViewer) {
         _myLastImageStripFrame = theFrameCount-1;
         obj.saveImageStrip(thePrefix, theDirectory, theOverwriteFlag);
     }
-
 
     obj.saveStripByNodeId = function(theNodeId, thePrefix, theDirectory, theOverwriteFlag) {
         var myCameraAnimations = window.scene.animations.findAll(".//*[@node = '" + theNodeId + "']");
