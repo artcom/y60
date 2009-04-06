@@ -172,7 +172,6 @@ class TransportLayer :  public asl::PosixThread {
         virtual void closeConnection() = 0;
 
         std::string    _myTransportName;
-        volatile bool  _myRunningFlag;
         DriverState    _myState;
         std::deque<unsigned char> _myTmpBuffer;
         unsigned char * _myFrameBuffer;

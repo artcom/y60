@@ -126,7 +126,6 @@ TransportLayer::TransportLayer(const char * theTransportName, const dom::NodePtr
     _myFirstFrameFlag( true ),
     _myLastCommandTime( asl::Time() ),
     _myFrameBuffer( 0 ),
-    _myRunningFlag( true ),
     _myTransportName( theTransportName ),
     _myCurrentMultiplex( 0 ),
     _myMultiplexMax( 0 )
@@ -158,8 +157,7 @@ TransportLayer::~TransportLayer() {
 
 void 
 TransportLayer::stopThread() {
-    AC_PRINT << "Waiting for IO thread shutdown.";
-    _myRunningFlag = false;
+    AC_INFO << "Shutting down proximatrix thread.";
     join();
 }
 
@@ -725,24 +723,11 @@ void
 TransportLayer::threadMain( asl::PosixThread & theThread ) {
     TransportLayer & mySelf = dynamic_cast<TransportLayer&>( theThread );
 
-    try {
-        AC_PRINT << "IO thread launched";
-        while (mySelf._myRunningFlag) {
-            mySelf.poll();
-
-        }
-        AC_PRINT << "IO thread done";
-    } catch (const asl::Exception & ex) {
-        AC_ERROR << "asl::Exception in thread: " << ex;
-        throw;
-    } catch (const std::exception & ex ) {
-        AC_ERROR << "std::exception in thread: " << ex.what();
-        throw;
-    } catch (...) {
-        AC_ERROR << "Unknown exception in thread: ";
-        throw;
-        
+    AC_DEBUG << "Proximatrix thread running";
+    while (!mySelf.shouldTerminate()) {
+        mySelf.poll();
     }
+    AC_DEBUG << "Proximatrix thread terminating";
 }
 
 } // end of namespace
