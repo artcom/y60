@@ -84,6 +84,8 @@ enum DriverStateEnum {
     DriverStateEnum_MAX
 };
 
+DEFINE_ENUM(DriverState, DriverStateEnum, Y60_ASSCORE_DECL);
+
 enum CommandState {
     SEND_CONFIG_COMMANDS,
     WAIT_FOR_RESPONSE,
@@ -98,88 +100,114 @@ enum CommandResponse {
 };
 
 
-DEFINE_ENUM( DriverState, DriverStateEnum, Y60_ASSCORE_DECL );
-
-
-class ASSDriver;
-
 class TransportLayer :  public asl::PosixThread {
-    public:
+    protected:
+
+        // protected constructor (abstract class)
         TransportLayer(const char * theTransportName, const dom::NodePtr & theSettings);
+        
+    public:
+
         virtual ~TransportLayer();
 
-        void poll( /*RasterPtr theTargetRaster*/);
-        //virtual void onUpdateSettings(dom::NodePtr theSettings) = 0;
         virtual bool settingsChanged(dom::NodePtr theSettings) = 0;
-
 
         void stopThread();
 
+        // interface for retrieving frames and events
         void lockFrameQueue() {
-            _myFrameQueueLock.lock();    
+            _myFrameQueueLock.lock();
         }
         void unlockFrameQueue() {
-            _myFrameQueueLock.unlock();    
+            _myFrameQueueLock.unlock();
         }
         std::queue<ASSEvent> & getFrameQueue() {
             return _myFrameQueue;
         }
 
+        // command submission by clients
         void queueCommand( const char * theCommand );
 
+        // exposed state
         DriverState getState() const;
+        int getLastFrameNumber() const;
+        int getLastChecksum() const;
 
+        // controller configuration
         const asl::Vector2i & getGridSize() const;
-        int getGridSpacing() const; // XXX
+        int getGridSpacing() const;
         int getFirmwareVersion() const;
         int getFirmwareStatus() const;
         int getControllerId() const;
         int getFirmwareMode() const;
-        int getFramerate() const; // XXX
-        int getLastFrameNumber() const;
-        int getLastChecksum() const;
-
+        int getFramerate() const;
 
     protected:
-        static void threadMain( asl::PosixThread & theThread );
 
-        void dumpControllerStatus() const;
-        CommandResponse getCommandResponse();
-        void setState( DriverState theState );
-        void sendCommand( const std::string & theCommand );
-        void handleConfigurationCommand();
+        // interface to be implemented by concrete subclasses
+        virtual void establishConnection() = 0;
+        virtual void readData() = 0;
+        virtual void writeData(const char* theData, size_t theSize) = 0;
+        virtual void closeConnection() = 0;
 
+        // interface provided for conrete subclasses
         void syncLost();
         void connectionLost();
+        void setState(DriverState theState); // XXX: should be private
+
+    private:
+
+        // thread main function
+        static void threadMain( asl::PosixThread & theThread );
+
+        // command submit/response
+        CommandResponse getCommandResponse();
+        void sendCommand(const std::string & theCommand);
+
+        // driving methods
+        void poll();
+        void synchronize();
+        void parseStatusLine();
+        void readSensorValues();
+        void handleConfigurationCommand();
+
+        // informational dumps
+        void dumpConfiguration() const;
+        void dumpStatistics() const;
+
+        // parsing helpers
+        void addLineToChecksum(std::deque<unsigned char>::const_iterator theLineIt,
+                               std::deque<unsigned char>::const_iterator theEnd);
+
+        size_t getBytesPerFrame();
+        unsigned valuesPerLine() const;
 
         unsigned readStatusToken(std::deque<unsigned char>::iterator & theIt, const char theToken);
         unsigned getBytesPerStatusLine();
-        size_t getBytesPerFrame();
-        void parseStatusLine(/*RasterPtr & theTargetRaster*/);
-        void readSensorValues( /*RasterPtr theTargetRaster*/ );
-        void synchronize();
+
+         // XXX: enum conversion
         const char * getFirmwareModeName(unsigned theId) const;
 
-        void addLineToChecksum(std::deque<unsigned char>::const_iterator theLineIt,
-                               std::deque<unsigned char>::const_iterator theEnd );
-
-        unsigned valuesPerLine() const;
-
-        // interface to be implemented by transport layer
-        virtual void establishConnection() = 0;
-        virtual void readData() = 0;
-        virtual void writeData(const char * theData, size_t theSize) = 0;
-        virtual void closeConnection() = 0;
-
+        // transport configuration
+protected: // XXX: should not be
         std::string    _myTransportName;
-        DriverState    _myState;
-        std::deque<unsigned char> _myTmpBuffer;
-        unsigned char * _myFrameBuffer;
+private:
 
-        asl::Vector2i _myGridSize;
-        int           _myGridSpacing;
-        bool _myMagicTokenFlag;
-        int _myExpectedLine;
+        // transport state
+        DriverState     _myState;
+        CommandState    _myConfigureState;
+        double          _myLastCommandTime;
+        unsigned char*  _myFrameBuffer;
+        asl::Unsigned16 _myChecksum;
+        bool            _myFirstFrameFlag;
+
+        bool            _myMagicTokenFlag;
+        int             _myExpectedLine;
+
+        // incoming data buffer
+protected: // XXX: should not be
+        std::deque<unsigned char> _myTmpBuffer;
+private:
 
         // queue transporting data from transport to driver
         std::queue<ASSEvent> _myFrameQueue;
@@ -190,30 +218,25 @@ class TransportLayer :  public asl::PosixThread {
         std::queue<std::string> _myCommandQueue;
         asl::ThreadLock         _myCommandQueueLock;
 
-        CommandState _myConfigureState;
-        double       _myLastCommandTime;
-
-        // Controller Status
-        // TODO: expose to JavaScript
+        // controller configuration
         int _myFirmwareVersion;
         int _myFirmwareStatus;
+        asl::Vector2i _myGridSize;
+        int _myGridSpacing;
         int _myControllerId;
         int _myFirmwareMode;
         int _myFramerate;
         int _myFrameNo;
         int _myCurrentMultiplex;
         int _myMultiplexMax;
-        asl::Unsigned16 _myChecksum;
 
-        bool _myFirstFrameFlag;
-
+        // communication statistics
         unsigned _mySyncLostCounter;
         unsigned _myDeviceLostCounter;
         unsigned _myReceivedFrames;    
         unsigned _myChecksumErrorCounter;
-    private:
-        //TransportLayer();
 
+        // latency test support
 #ifdef TL_LATENCY_TEST
         asl::SerialDevice * _myLatencyTestPort;
 #endif
