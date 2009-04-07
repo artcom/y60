@@ -99,7 +99,12 @@ namespace y60 {
 
     void
     TextureManager::setTextureList(dom::NodePtr theTextureListNode) {
+#if 0
         _myTextureList = theTextureListNode;
+#else
+        // speedup getElementByName
+        _myTextureList = theTextureListNode->getRootNode()->self().lock();
+#endif
     }
 
     void
@@ -115,6 +120,7 @@ namespace y60 {
     void
     TextureManager::unbindTextures() {
         AC_DEBUG << "TextureManager::unbindTextures";
+#if 0
         unsigned myTextureCount = _myTextureList->childNodesLength();
         for (unsigned i = 0; i < myTextureCount; ++i) {
             dom::NodePtr myTextureNode = _myTextureList->childNode(i);
@@ -123,6 +129,12 @@ namespace y60 {
                 unbindTexture(myTexture.get());
             }
         }
+#else
+        std::vector<TexturePtr> myTextures = _myTextureList->getAllFacades<Texture>(TEXTURE_NODE_NAME);
+        for (unsigned i = 0; i < myTextures.size(); ++i) {
+            unbindTexture(myTextures[i].get());
+        }
+#endif
     }
 
     int

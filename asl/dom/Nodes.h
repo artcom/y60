@@ -1170,11 +1170,53 @@ namespace dom {
         /// Does not return the document node, but the root element node
         /// A better name would is getRootElement(), but the name getRootNode() is defined
         /// in the dom-standard. Use "getRealRootNode()" or getDocumentNode() to get the document node.
+#define DONT_INLINE_ROOT_FINDERS
+#ifdef DONT_INLINE_ROOT_FINDERS
         const Node * getRootNode() const;
         Node * getRootNode();
         const Node * getRealRootNode() const;
         Node * getRealRootNode();
+#else
+        Node * getRootNode() {
+            Node * myNode = this;
+            while (myNode->parentNode()) {
+                if (myNode->parentNode()->nodeType() == DOCUMENT_NODE) {
+                    break;
+                }
+                myNode = myNode->parentNode();
+            }
+            return myNode;
+        }
         
+        const Node * getRootNode() const
+        {
+            const Node * myNode = this;
+            while (myNode->parentNode()) {
+                if (myNode->parentNode()->nodeType() == DOCUMENT_NODE) {
+                    break;
+                }
+                myNode = myNode->parentNode();
+            }
+            return myNode;
+        }
+        
+        Node * getRealRootNode() {
+            Node * myNode = this;
+            while (myNode->parentNode()) {
+                myNode = myNode->parentNode();
+            }
+            return myNode;
+        }
+        
+        const Node * getRealRootNode() const
+        {
+            const Node * myNode = this;
+            while (myNode->parentNode()) {
+                myNode = myNode->parentNode();
+            }
+            return myNode;
+        }
+#endif        
         // some better names for above functions
         const Node * getRootElement() const {return getRootNode();}
         Node * getRootElement() {return getRootNode();}
@@ -1208,6 +1250,16 @@ namespace dom {
             }
             return _myIDRegistry;
         }
+        const NodeIDRegistry & getIDRegistryRef() const {
+            if (_myParent) {
+                return _myParent->getIDRegistryRef();
+            }
+            if (!_myIDRegistry) {
+                _myIDRegistry = NodeIDRegistryPtr(new NodeIDRegistry);
+            }
+            return *_myIDRegistry;
+        }
+        
         const NodeIDRefRegistryPtr getIDRefRegistry() const {
             if (_myParent) {
                 return _myParent->getIDRefRegistry();
@@ -1255,6 +1307,15 @@ Dependent on node type allowed children are:<p>
                 _myIDRegistry = NodeIDRegistryPtr(new NodeIDRegistry);
             }
             return _myIDRegistry;
+        }
+        NodeIDRegistry & getIDRegistryRef() {
+            if (_myParent) {
+                return _myParent->getIDRegistryRef();
+            }
+            if (!_myIDRegistry) {
+                _myIDRegistry = NodeIDRegistryPtr(new NodeIDRegistry);
+            }
+            return *_myIDRegistry;
         }
         NodeIDRefRegistryPtr getIDRefRegistry() {
             if (_myParent) {

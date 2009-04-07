@@ -68,6 +68,30 @@
 
 using namespace std;
 
+namespace {
+    
+    template<typename Value>
+    class NativeRef {
+    public:
+        NativeRef(JSContext *cx, JSObject *obj)
+        : cx_(cx), obj_(obj), value_(jslib::JSClassTraits<Value>::openNativeRef(cx, obj))
+        { }
+        
+        Value& getValue() {
+            return value_;
+        }
+        
+        ~NativeRef() {
+            jslib::JSClassTraits<Value>::closeNativeRef(cx_, obj_);
+        }
+    private:
+        JSContext *cx_;
+        JSObject  *obj_;
+        Value &    value_;
+    };
+    
+}
+
 namespace jslib {
 typedef dom::ResizeableRaster NATIVE;
 typedef JSWrapper<NATIVE,dom::ValuePtr> Base;

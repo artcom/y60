@@ -76,6 +76,7 @@ namespace y60 {
     const IdTag::TYPE IdTag::getDefault() {
         asl::Block myIdBlock;
         unsigned int myCounter = ++IdTag::get().counter;
+#ifdef UNIQUE_IDS
         if (myCounter == 0) {
             IdTag::get().myStartTime = asl::Time().secs() - 1117122059;
         }
@@ -93,7 +94,9 @@ namespace y60 {
         }
         myIdBlock.appendUnsigned16((unsigned short)asl::getThreadId() & 0xFFFF);
         myIdBlock.appendUnsigned(IdTag::get().myStartTime);
-
+#else
+        myIdBlock.appendUnsigned(myCounter);
+#endif
         std::string myId;
         binToBase64(myIdBlock, myId);
         return myId;

@@ -1035,8 +1035,7 @@ AC_TRACE << "throwing OffsetNotFound";
 const NodePtr
 Node::getElementById(const DOMString & theId, const DOMString & theIdAttribute) const {
     if (_mySchemaInfo) {
-        const NodeIDRegistryPtr myIDRegistry = getIDRegistry();
-        const NodePtr myResult = myIDRegistry->getElementById(theId, theIdAttribute);
+        const NodePtr myResult = getIDRegistryRef().getElementById(theId, theIdAttribute);
         if (myResult) {
             return myResult;
         }
@@ -1055,8 +1054,7 @@ Node::getElementById(const DOMString & theId, const DOMString & theIdAttribute) 
 NodePtr
 Node::getElementById(const DOMString & theId, const DOMString & theIdAttribute) {
     if (_mySchemaInfo) {
-        NodeIDRegistryPtr myIDRegistry = getIDRegistry();
-        NodePtr myResult = myIDRegistry->getElementById(theId, theIdAttribute);
+        NodePtr myResult = getIDRegistryRef().getElementById(theId, theIdAttribute);
         if (myResult) {
             return myResult;
         }
@@ -2914,6 +2912,7 @@ dom::Node::removeChild(dom::NodePtr theChild) {
     return getChildren().removeItem(getChildren().findIndex(theChild.get()));
 }
 
+#ifdef DONT_INLINE_ROOT_FINDERS
 // Does not return the document node, but the root element node
 // A better name would be getRootElement(), but the name is defined
 // in the dom-standard. Use "getRealRootNode()" to get the document node.
@@ -2960,7 +2959,7 @@ Node::getRealRootNode() const
     }
     return myNode;
 }
-
+#endif
 
 bool
 Node::hasFacade() const {

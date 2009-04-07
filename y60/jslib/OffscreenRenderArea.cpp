@@ -184,12 +184,20 @@ OffscreenRenderArea::renderToCanvas(bool theCopyToImageFlag, unsigned theCubemap
     
 
     {
-        MAKE_SCOPE_TIMER(OffscreenRenderArea_render);
-        preRender();
-        render();
-        postRender();
+        {
+            MAKE_SCOPE_TIMER(OffscreenRenderArea_prerender);
+            preRender();
+        }
+        {
+            MAKE_SCOPE_TIMER(OffscreenRenderArea_render);
+            render();
+        }
+        {
+            MAKE_SCOPE_TIMER(OffscreenRenderArea_postrender);
+            postRender();
+        }
     }
-
+    MAKE_SCOPE_TIMER(OffscreenRenderArea_deactivate);
     deactivate(theCopyToImageFlag);
 }
 
