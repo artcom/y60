@@ -21,7 +21,8 @@ namespace y60 { namespace ape {
 
 namespace detail {
 
-#ifndef Y60_APE_USE_TRACEMONKEY
+// historic spidermonkey does not have JSCLASS_GLOBAL_FLAGS
+#ifndef JSCLASS_GLOBAL_FLAGS
 #   define JSCLASS_GLOBAL_FLAGS 0
 #endif
 
@@ -146,12 +147,16 @@ class js_engine {
 
         void set_option(uint32 option, bool v = true) {
             if (v) {
-                JS_SetOptions( context_->js_context(), JS_GetOptions(context_->js_context()) | option );
+                JS_SetOptions( context_->js_context(),
+                        JS_GetOptions(context_->js_context()) | option );
             } else {
-                JS_SetOptions( context_->js_context(), JS_GetOptions(context_->js_context()) & ~ option );
+                JS_SetOptions( context_->js_context(),
+                        JS_GetOptions(context_->js_context()) & ~ option );
             }
         }
-        bool get_option(uint32 option) { return JS_GetOptions(context_->js_context()) & option; }
+        bool get_option(uint32 option) {
+            return JS_GetOptions(context_->js_context()) & option;
+        }
 
         value exec_script(JSScript * s) {
             return script(context_->js_context(),s).exec(global_object_);

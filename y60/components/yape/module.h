@@ -20,24 +20,6 @@
 
 namespace y60 { namespace ape {
 
-#if 0
-template <typename UserModule>
-class binding {
-    private:
-        template <typename LocalUniqueId>
-        struct unique_id : boost::mpl::vector2<LocalUniqueId, UserModule> {};
-
-    protected:
-        template <typename LocalUniqueId>
-        detail::context_decorator< typename unique_id<LocalUniqueId>::type >
-        namespace_scope() {
-            typedef typename unique_id<LocalUniqueId>::type id;
-            return detail::context_decorator<id>();
-        }
-
-};
-#endif 
-
 template <typename Binding>
 class module : public detail::ape_thing {
     private:

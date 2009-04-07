@@ -43,11 +43,11 @@ last_error_impl() {
         std::ostringstream os;
         os << error_code;
         return os.str();
+    } else {
+        std::string error_message((LPCTSTR)message_buffer);
+        LocalFree( lpMsgBuf );
+        return error_message;
     }
-
-    std::string error_message((LPCTSTR)message_buffer);
-    LocalFree( lpMsgBuf );
-    return error_message;
 }
 
 #else // _WIN32
