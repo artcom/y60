@@ -83,9 +83,6 @@ namespace y60 {
         _myScissorParams(0,0,1,1),
         _myCullFaces(GL_BACK)
     {
-#ifndef OSX
-        init(); // on OSX, we need to initialize after we have a valid GL context
-#endif
     }
 
     void

@@ -110,7 +110,8 @@ namespace y60 {
 			//GLIContext           _myGLIContext;
 			CGLContextObj       _myCGLContext;
 	#endif
-            RenderStatePtr _myStateCache;
+            mutable RenderStatePtr _myStateCache;
+            mutable bool           _myStateCacheInitialized;
     };
 
     typedef asl::Ptr<GLContext> GLContextPtr;

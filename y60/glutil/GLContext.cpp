@@ -85,6 +85,7 @@ namespace y60 {
 #endif
     { 
         _myStateCache = RenderStatePtr(new RenderState());
+        _myStateCacheInitialized = false;
     }
 
     GLContext::~GLContext() {
@@ -131,7 +132,11 @@ namespace y60 {
             return false;
         }
 #endif
-         return true;
+        if(!_myStateCacheInitialized) {
+            _myStateCache->init();
+            _myStateCacheInitialized = true;
+        }
+        return true;
     }
 
     bool GLContext::isActive() {
