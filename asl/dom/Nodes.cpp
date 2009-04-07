@@ -543,6 +543,8 @@ namespace dom {
                     }
                 }
                 i = next_pos;
+            } else if ((s[i] == C10) || (s[i] == C13)) {
+                ++i;                      
             } else {
                 result+=s[i];
                 ++i;
