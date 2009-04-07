@@ -10,7 +10,15 @@
 #   define Y60_APE_MAX_ARITY 10
 #endif
 
-//#define Y60_APE_USE_TRACEMONKEY
+#ifdef Y60_WITH_TRACEMONKEY
+#   define Y60_APE_USE_TRACEMONKEY
+#endif
+
+#ifdef Y60_APE_USE_TRACEMONKEY
+#   define Y60_APE_MONKEY_HEADER( name ) <js/name>
+#else
+#   define Y60_APE_MONKEY_HEADER( name ) <js/spidermonkey/name>
+#endif
 
 // See https://bugzilla.mozilla.org/show_bug.cgi?id=438633
 //#define Y60_APE_WORKAROUND_SPIDERMONKEY_BUG_438633

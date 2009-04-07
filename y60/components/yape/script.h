@@ -5,7 +5,8 @@
 
 #include <boost/utility.hpp>
 
-#include "detail/monkey_headers.h"
+#include Y60_APE_MONKEY_HEADER(jsapi.h)
+
 #include "js_value.h"
 
 namespace y60 { namespace ape {

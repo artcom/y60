@@ -23,6 +23,7 @@ class context_decorator {
             typedef context_decorator<C, FIdx + 1, PIdx> next_type;
             return next_type();
         }
+
         context_decorator<C, FIdx + 1, PIdx>
         function(const char * name, JSNative f, uintN min_arity) {
             typedef eid<C, boost::mpl::long_<FIdx> > uid;
@@ -34,15 +35,30 @@ class context_decorator {
             typedef context_decorator<C, FIdx + 1, PIdx> next_type;
             return next_type();
         }
+
         template <typename T>
         context_decorator<C, FIdx, PIdx + 1>
-        property(const char * name, T v, uint8 more_flags = 0) {
+        property(const char * name, T v) {
+            add_property(name, v, 0);
+            typedef context_decorator<C, FIdx, PIdx + 1> next_type;
+            return next_type();
+        }
+        template <typename T>
+        context_decorator<C, FIdx, PIdx + 1>
+        property_readonly(const char * name, T v) {
+            add_property(name, v, JSPROP_READONLY);
+            typedef context_decorator<C, FIdx, PIdx + 1> next_type;
+            return next_type();
+        }
+        // TODO: properties with setters and getters
+    private:
+        template <typename T>
+        void
+        add_property(const char * name, T v, uint8 more_flags) {
             typedef eid<C, boost::mpl::long_<PIdx> > uid;
             current_scope->add( ape_thing_ptr(
                         new property_descriptor<T,uid>(name,v,
                             current_scope->property_flags() | more_flags )));
-            typedef context_decorator<C, FIdx, PIdx + 1> next_type;
-            return next_type();
         }
 };
 

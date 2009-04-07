@@ -24,7 +24,7 @@ Y60_APE_MODULE( ape_test_simple ) {
         . function("mem_func",          & simple_class::mem_func)
         . function("static_mem_func",   & simple_class::static_mem_func)
         . property("data_member",       & simple_class::data_member)
-        . property("read_only_member",  & simple_class::read_only_member, read_only())
+        . property_readonly("read_only_member",  & simple_class::read_only_member)
         . property("static_data_member", simple_class::static_data_member)
         ;
 }

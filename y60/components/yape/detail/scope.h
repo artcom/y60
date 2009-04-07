@@ -10,7 +10,6 @@ namespace y60 { namespace ape { namespace detail {
 
 extern ape_thing_ptr current_scope;
 
-
 struct scope {
     scope( ape_thing_ptr s) :
         previous_( current_scope )

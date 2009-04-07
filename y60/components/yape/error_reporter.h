@@ -6,7 +6,7 @@
 #include <iostream>
 #include <boost/shared_ptr.hpp>
 
-#include "detail/monkey_headers.h"
+#include Y60_APE_MONKEY_HEADER(jsstddef.h)
 
 namespace y60 { namespace ape {
 

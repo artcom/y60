@@ -3,7 +3,8 @@
 
 #include <y60/components/yape/y60_ape_settings.h>
 
-#include <js/spidermonkey/jsapi.h>
+#include Y60_APE_MONKEY_HEADER(jsapi.h)
+
 #include <asl/base/begin_end.h>
 
 #include "ape_exceptions.h"

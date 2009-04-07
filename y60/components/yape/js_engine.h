@@ -5,7 +5,8 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include "detail/monkey_headers.h"
+#include Y60_APE_MONKEY_HEADER(jsapi.h)
+
 #include "detail/ape_exceptions.h"
 #include "error_reporter.h"
 #include "js_value.h"
