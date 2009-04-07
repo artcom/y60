@@ -543,7 +543,8 @@ namespace dom {
                     }
                 }
                 i = next_pos;
-            } else if ((s[i] == C10) || (s[i] == C13)) {
+            } else if (s[i] == C13) {
+				// remove all CR in the input stream, leave only LF
                 ++i;                      
             } else {
                 result+=s[i];
