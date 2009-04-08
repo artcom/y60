@@ -205,7 +205,6 @@ SerialUnitTest.prototype.Constructor = function(obj, theName) {
 
         obj.mySerialDevice.setPacketFormat(255, 254, 2, SerialDevice.CHECKSUM_CHECKING);
         obj.mySerialDevice.printPacketFormat();
-        obj.mySerialDevice.setNoisy(true);
         obj.mySerialDevice.write("test");
         //obj.mySerialDevice.sendPacket(String.fromCharCode(146,64));
         obj.mySerialDevice.sendPacket([146,64]);
