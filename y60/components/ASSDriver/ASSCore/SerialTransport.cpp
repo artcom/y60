@@ -163,8 +163,6 @@ SerialTransport::establishConnection() {
             return;
         }
     }
-
-    _mySerialPort->flush();
 }
 
 void 
@@ -181,7 +179,7 @@ SerialTransport::readData() {
 
         // read, blocking when there is no data
         asl::Time myBefore, myAfter;
-        char myReceiveBuffer[1024];
+        char myReceiveBuffer[64*1024];
         size_t myBytesReceived = sizeof(myReceiveBuffer);
         _mySerialPort->read(myReceiveBuffer, myBytesReceived);
         myAfter.setNow();
