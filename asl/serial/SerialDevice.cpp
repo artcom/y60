@@ -64,7 +64,6 @@ namespace asl {
 
     SerialDevice::SerialDevice(const std::string & theDeviceName) :
         _isOpen(false),
-        _myNoisyFlag(false),
         _myDeviceName(theDeviceName)
     {}
 

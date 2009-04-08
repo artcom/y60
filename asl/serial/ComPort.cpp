@@ -83,19 +83,16 @@ namespace asl {
     {
         AC_DEBUG << "ComPort::open()";
 
-        if (isOpen()) {
-            throw SerialPortException(string("Can not open device '") + getDeviceName() +
-                                             "'. Device allready open.", PLUS_FILE_LINE);
+        if(isOpen()) {
+            throw SerialPortException("Failure in open: device allready open", PLUS_FILE_LINE);
         }
 
-        if (isNoisy()) {
-            cerr << "Opening " << getDeviceName() << " with " << endl;
-            cerr << "    baudrate:     " << theBaudRate << endl;
-            cerr << "    databits:     " << theDataBits << endl;
-            cerr << "    partity mode: " << theParityMode << endl;
-            cerr << "    stopbits:     " << theStopBits << endl;
-            cerr << "    hw handshake: " << theHWHandShakeFlag << endl;
-        }
+        AC_DEBUG << "Opening " << getDeviceName() << " with: "
+                 << " baudrate: "  << theBaudRate
+                 << " bits: "      << theDataBits
+                 << " parity: "   << theParityMode
+                 << " stopbits: "  << theStopBits
+                 << " handshake: " << theHWHandShakeFlag << endl;
 
         // open our handle
         AC_TRACE << "Opening device";
@@ -107,14 +104,15 @@ namespace asl {
                                      0,
                                      NULL);
         if(myHandle == INVALID_HANDLE_VALUE) {
-            checkError(PLUS_FILE_LINE);
+            handleSystemError("CreateFile", PLUS_FILE_LINE);
         }
 
         // get the comm properties for use during initialization
+        //  XXX: not used right now but might be needed
         AC_TRACE << "Getting comm properties";
         COMMPROP myProperties;
         if(!GetCommProperties(myHandle, &myProperties)) {
-            checkError(PLUS_FILE_LINE);
+            handleSystemError("GetCommProperties", PLUS_FILE_LINE);
         }
 
         // configure device control parameters
@@ -124,26 +122,25 @@ namespace asl {
 
         AC_TRACE << "Getting comm state";
         if (!GetCommState(myHandle, &myControlBlock)) {
-            checkError(PLUS_FILE_LINE);
+            handleSystemError("GetCommState", PLUS_FILE_LINE);
         }
 
         // normal COM port parameters
-        myControlBlock.BaudRate = convertBaudRate(theBaudRate);
+        myControlBlock.BaudRate = theBaudRate;
         myControlBlock.ByteSize = static_cast<BYTE>(theDataBits);
         myControlBlock.Parity   = convertParity(theParityMode);
         myControlBlock.StopBits = convertStopBits(theStopBits);
         myControlBlock.fRtsControl = (theHWHandShakeFlag ? RTS_CONTROL_HANDSHAKE : RTS_CONTROL_DISABLE);
         myControlBlock.fDtrControl = (theHWHandShakeFlag ? DTR_CONTROL_HANDSHAKE : DTR_CONTROL_DISABLE);
 
-        myControlBlock.fAbortOnError = false;
+        myControlBlock.fAbortOnError = true;
 
         AC_TRACE << "Setting comm state";
         if (!SetCommState(myHandle, &myControlBlock)) {
-            checkError(PLUS_FILE_LINE);
+            handleSystemError("SetCommState", PLUS_FILE_LINE);
         }
 
         // configure device timing parameters
-
         COMMTIMEOUTS myTimeouts;
         if (theMinBytesPerRead == 0 && theTimeout == 0) {
             // nonblocking
@@ -156,12 +153,12 @@ namespace asl {
             myTimeouts.ReadTotalTimeoutMultiplier = 0;
             myTimeouts.ReadTotalTimeoutConstant = 0;
         } else if (theMinBytesPerRead > 0 && theTimeout > 0) {
-            // blocking with time limit starting at first received
+            // blocking until interframe timeout
             myTimeouts.ReadIntervalTimeout = theTimeout * 100;
             myTimeouts.ReadTotalTimeoutMultiplier = 0;
             myTimeouts.ReadTotalTimeoutConstant = 0;
         } else if (theMinBytesPerRead == 0 && theTimeout > 0) {
-            // blocking with time limit starting at call
+            // blocking until at least one byte arrives
             myTimeouts.ReadIntervalTimeout = MAXDWORD;
             myTimeouts.ReadTotalTimeoutMultiplier = MAXDWORD;
             myTimeouts.ReadTotalTimeoutConstant = theTimeout * 100;
@@ -173,13 +170,13 @@ namespace asl {
 
         AC_TRACE << "Setting comm timeouts";
         if (!SetCommTimeouts(myHandle, &myTimeouts)) {
-            checkError(PLUS_FILE_LINE);
+            handleSystemError("SetCommTimeouts", PLUS_FILE_LINE);
         }
 
         // set buffer size to maximum
         AC_TRACE << "Setting comm buffer sizes";
-        if(!SetupComm(myHandle, 8192, 8192)) {
-            checkError(PLUS_FILE_LINE);
+        if(!SetupComm(myHandle, 64*1024, 64*1024)) {
+            handleSystemError("SetupComm", PLUS_FILE_LINE);
         }
 
         // finally, set our handle
@@ -191,28 +188,30 @@ namespace asl {
     void
     ComPort::close() {
         AC_DEBUG << "ComPort::close()";
-        if (isOpen()) {
-            CloseHandle(_myHandle);
-            _myHandle = INVALID_HANDLE_VALUE;
-            isOpen(false);
-        } else {
-            throw SerialPortException(string("Can not close device ") + getDeviceName() +
-                                   ". Device is not open.", PLUS_FILE_LINE);
+
+        ensureDeviceOpen("close", PLUS_FILE_LINE);
+
+        if(!CloseHandle(_myHandle)) {
+            handleSystemError("CloseHandle", PLUS_FILE_LINE);
         }
+
+        _myHandle = INVALID_HANDLE_VALUE;
+        isOpen(false);
     }
 
     bool
     ComPort::read(char * theBuffer, size_t & theSize) {
-        if (!isOpen()) {
-            throw SerialPortException(string("Can not read from device '") + getDeviceName() +
-                                             "'. Device is not open.", PLUS_FILE_LINE);
-        }
+        AC_TRACE << "ComPort::read()";
 
+        ensureDeviceOpen("read", PLUS_FILE_LINE);
+        checkCommError(PLUS_FILE_LINE);
+
+        AC_TRACE << "Reading from device";
         size_t myReadBytes;
         if(!ReadFile(_myHandle, theBuffer, DWORD(theSize), (DWORD *) & myReadBytes, NULL)) {
             DWORD myError = GetLastError();
             if(myError != ERROR_OPERATION_ABORTED) {
-                checkError(PLUS_FILE_LINE);
+                handleSystemError("ReadFile", PLUS_FILE_LINE, myError);
             } else {
                 // we accept and ignore OPERATION_ABORTED, which is the win32 equivalent of EAGAIN
                 // XXX: we might want to re-read, but handling that might be horror
@@ -231,21 +230,17 @@ namespace asl {
 
     void
     ComPort::write(const char * theBuffer, size_t theSize) {
-        if (!isOpen()) {
-            throw SerialPortException(string("Can not write to device '") + getDeviceName() +
-                                      "'. Device is not open.", PLUS_FILE_LINE);
-        }
+        AC_TRACE << "ComPort::write()";
 
-        if (isNoisy()) {
-            cerr << "ComPort::write(): '" << Block((unsigned char *)theBuffer,
-                (unsigned char *)(theBuffer + theSize)) << "'" << endl;
-        }
+        ensureDeviceOpen("write", PLUS_FILE_LINE);
+        checkCommError(PLUS_FILE_LINE);
 
+        AC_TRACE << "Writing to device";
         size_t myWrittenBytes;
         if(!WriteFile(_myHandle, theBuffer, theSize,  (DWORD *)& myWrittenBytes, NULL)) {
             DWORD myError = GetLastError();
             if(myError != ERROR_OPERATION_ABORTED) {
-                checkError(PLUS_FILE_LINE);
+                handleSystemError("WriteFile", PLUS_FILE_LINE, myError);
             } else {
                 // we accept and ignore OPERATION_ABORTED, which is the win32 equivalent of EAGAIN.
                 // however, since we do not offer an incremental writing interface, we are bound to fail.
@@ -265,32 +260,22 @@ namespace asl {
 
     unsigned
     ComPort::peek() {
-         if (!isOpen()) {
-            throw SerialPortException(string("Can not peek device '") + getDeviceName() +
-                                   "'. Device is not open.", PLUS_FILE_LINE);
-        }
-        // XXX: never guarantee anything.
-        //      this is correct but possibly confusing.
+        ensureDeviceOpen("peek", PLUS_FILE_LINE);
+        // XXX: this should be implemented...
         return 0;
     }
 
     void 
     ComPort::flush() {
-        if (!isOpen()) {
-            throw SerialPortException(string("Can not flush device '") + getDeviceName() +
-                    "'. Device is not open.", PLUS_FILE_LINE);
-        }
-        if ( ! PurgeComm( _myHandle, PURGE_RXCLEAR | PURGE_TXCLEAR ) ) {
-            checkError("ComPort::flush()");
+        ensureDeviceOpen("flush", PLUS_FILE_LINE);
+        if (!PurgeComm( _myHandle, PURGE_RXCLEAR | PURGE_TXCLEAR)) {
+            handleSystemError("PurgeComm", PLUS_FILE_LINE);
         }
     }
 
     void
     ComPort::setStatusLine(unsigned theStatusMask) {
-        if (!isOpen()) {
-            throw SerialPortException(string("Unable to set status bits on device '") +
-                getDeviceName() + "'. Device is not open.", PLUS_FILE_LINE);
-        }
+        ensureDeviceOpen("setStatusLine", PLUS_FILE_LINE);
 
         if (!EscapeCommFunction(_myHandle, (theStatusMask & DTR ? SETDTR : CLRDTR))) {
             throw SerialPortException(string("Unable to modify DTR on device '") +
@@ -304,15 +289,11 @@ namespace asl {
 
     unsigned
     ComPort::getStatusLine() {
-        if (!isOpen()) {
-            throw SerialPortException(string("Unable to get status bits on device '") +
-                getDeviceName() + "'. Device is not open.", PLUS_FILE_LINE);
-        }
+        ensureDeviceOpen("getStatusLine", PLUS_FILE_LINE);
 
         DWORD dwModemStatus = 0;
         if (!GetCommModemStatus(_myHandle, &dwModemStatus)) {
-            throw SerialPortException(string("Unable to get status bits on device '") +
-                getDeviceName() + "'. Error getting status.", PLUS_FILE_LINE);
+            handleSystemError("GetCommModemStatus", PLUS_FILE_LINE);
         }
 
         unsigned myStatusMask = 0;
@@ -328,33 +309,72 @@ namespace asl {
         if (dwModemStatus & MS_RLSD_ON) {
             myStatusMask |= CD;
         }
-        if (isNoisy()) {
-            cerr << "ComPort::peek(): status mask=0x" << hex << myStatusMask << dec << endl;
-        }
 
         return myStatusMask;
     }
 
     void
-    ComPort::checkError(const std::string & theLocationString) {
-        DWORD myRetVal = GetLastError();
-        if (myRetVal) {
+    ComPort::checkCommError(const std::string & theLocation) {
+        AC_TRACE << "Clearing and handling comm errors";
+
+        DWORD myCommErrors = 0;
+        if(!ClearCommError(_myHandle, &myCommErrors, NULL)) {
+            handleSystemError("ClearCommError", PLUS_FILE_LINE);
+        }
+
+        if(myCommErrors) {
+            std::string myErrorString;
+            commErrorsToString(myCommErrors, myErrorString);
+            throw SerialPortException(
+                "The following communication errors have occured on serial port " +
+                getDeviceName() + ":" + myErrorString, theLocation);
+        }
+    }
+
+    void
+    ComPort::commErrorsToString(DWORD theErrors, std::string & theString) {
+        if(theErrors & CE_OVERRUN) {
+            theString += " OVERRUN";
+        }
+        if(theErrors & CE_FRAME) {
+            theString += " FRAMING";
+        }
+        if(theErrors & CE_BREAK) {
+            theString += " BREAK";
+        }
+        if(theErrors & CE_RXOVER) {
+            theString += " RX_OVERRUN";
+        }
+        if(theErrors & CE_RXPARITY) {
+            theString += " RX_PARITY";
+        }
+        if(theErrors & CE_IOE) {
+            theString += " IO_ERROR";
+        }
+        if(theErrors & CE_TXFULL) {
+            theString += " TX_FULL";
+        }
+    }
+
+    void
+    ComPort::handleSystemError(const std::string& theSystemCall, const std::string & theLocationString, const DWORD theError) {
+        if (theError) {
             LPVOID myMessageBuffer;
             FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM |
-                          FORMAT_MESSAGE_IGNORE_INSERTS, NULL, myRetVal, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                          FORMAT_MESSAGE_IGNORE_INSERTS, NULL, theError, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
                           (LPTSTR) & myMessageBuffer, 0, NULL);
-            string myErrorString = string("'")+getDeviceName() + "': ";
+            string myErrorString = theSystemCall + " on serial port " + getDeviceName() + " failed: ";
             myErrorString.append((LPTSTR) myMessageBuffer);
             LocalFree(myMessageBuffer);
-            SetLastError(0);
             throw SerialPortException(myErrorString, theLocationString);
         }
     }
 
-    DWORD
-    ComPort::convertBaudRate(unsigned int theBaudRate) {
-        // On Win32 you can just pass the actual baudrate [DS]
-        return theBaudRate;
+    void
+    ComPort::ensureDeviceOpen(const std::string & theMethodCall, const std::string & theLocationString) {
+        if(!isOpen()) {
+            throw SerialPortException(theMethodCall + " on serial port " + getDeviceName() + " failed: Device not open", theLocationString);
+        }
     }
 
     BYTE

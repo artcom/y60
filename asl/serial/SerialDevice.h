@@ -144,14 +144,6 @@ namespace asl {
             bool isBlocking() const;
             const std::string & getDeviceName() const;
 
-            /// Enable/disable debug messages.
-            void setNoisy(bool theNoisyFlag) {
-                _myNoisyFlag = theNoisyFlag;
-            }
-            bool isNoisy() const {
-                return _myNoisyFlag;
-            }
-
         protected:
             SerialDevice(const std::string & theDeviceName);
             void isOpen(bool theFlag);
@@ -159,7 +151,6 @@ namespace asl {
         private:
             SerialDevice();
 
-            bool        _myNoisyFlag;
             bool        _isOpen;
             std::string _myDeviceName;
     };

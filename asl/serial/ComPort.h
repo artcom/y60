@@ -67,29 +67,37 @@ namespace asl {
             ComPort(const std::string & theDeviceName);
             virtual ~ComPort();
 
+            // opening and closing
             void open(unsigned int theBaudRate, unsigned int theDataBits,
                       ParityMode theParityMode, unsigned int theStopBits,
                       bool theHWHandShakeFlag,
                       int theMinBytesPerRead, int theTimeout );
             void close();
 
+            // input and output
             bool read(char * theBuffer, size_t & theSize);
             void write(const char * theBuffer, size_t theSize);
             unsigned peek();
             void flush();
 
+            // status line access
             void setStatusLine(unsigned theStatusMask);
             unsigned getStatusLine();
 
         private:
             ComPort();
 
-            void checkError(const std::string & theLocationString);
+            // error handling
+            void ensureDeviceOpen(const std::string & theMethodCall, const std::string & theLocationString);
+            void handleSystemError(const std::string & theSystemCall, const std::string & theLocation, DWORD theError = GetLastError());
+            void checkCommError(const std::string & theLocation);
+            void commErrorsToString(DWORD theErrors, std::string & theString);
 
-            DWORD convertBaudRate(unsigned int theBaudRate);
+            // value conversion routines
             BYTE  convertParity  (ParityMode theParity);
             BYTE  convertStopBits(unsigned int  theStopBits);
 
+            // members
             HANDLE       _myHandle;
     };
 
