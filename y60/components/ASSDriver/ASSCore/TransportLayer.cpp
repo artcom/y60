@@ -103,8 +103,7 @@ const unsigned int MAX_NUM_STATUS_TOKENS(12);
 const unsigned int BYTES_PER_STATUS_TOKEN(5);
 const unsigned int MAX_STATUS_LINE_LENGTH(MAX_NUM_STATUS_TOKENS * BYTES_PER_STATUS_TOKEN + 2);
 
-// XXX Workaround Bug 595
-DEFINE_EXCEPTION( ASSStatusTokenException, asl::Exception );
+DEFINE_EXCEPTION(ASSStatusLineException, asl::Exception);
 
 TransportLayer::TransportLayer(const char * theTransportName, const dom::NodePtr & theSettings) :
     asl::PosixThread(TransportLayer::threadMain),
@@ -214,8 +213,7 @@ TransportLayer::poll() {
 unsigned
 TransportLayer::readStatusToken(std::deque<unsigned char>::iterator & theIt, const char theToken) {
     if (*theIt != theToken) {
-        throw ASSStatusTokenException(string("Failed to parse status token '") + theToken + "'. Got '" +
-                char(* theIt) + "'", PLUS_FILE_LINE);
+        throw ASSStatusLineException(string("Failed to parse status token ") + theToken, PLUS_FILE_LINE);
     }
     theIt += 1;
     istringstream myStream;
@@ -250,7 +248,7 @@ TransportLayer::getBytesPerStatusLine() {
         //             <checksum>
         return 12 * BYTES_PER_STATUS_TOKEN + 2;
     }
-    throw ASSException(string("Unknown firmware version: ") + as_string(_myFirmwareVersion),
+    throw ASSStatusLineException(string("Unknown firmware version: ") + as_string(_myFirmwareVersion),
             PLUS_FILE_LINE );
 }
 
@@ -307,7 +305,7 @@ TransportLayer::parseStatusLine() {
                 _myCurrentMultiplex = readStatusToken( myIt, 'x' );
                 myChecksum = readStatusToken( myIt, 'C' );
             } else {
-                throw ASSException(string("Unknown firmware version: ") + as_string(_myFirmwareVersion),
+                throw ASSStatusLineException(string("Unknown firmware version: ") + as_string(_myFirmwareVersion),
                         PLUS_FILE_LINE );
             }
 
@@ -354,8 +352,8 @@ TransportLayer::parseStatusLine() {
             _myTmpBuffer.erase( _myTmpBuffer.begin(), myIt);
             _myExpectedLine = 1;
         }
-    } catch ( const ASSStatusTokenException & ex) {
-        AC_WARNING << "Error parsing status: " << ex;
+    } catch (const ASSStatusLineException & ex) {
+        AC_WARNING << "Failed to parse status line: " << ex;
         syncLost();
     }
 }
