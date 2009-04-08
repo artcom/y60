@@ -481,41 +481,6 @@ sendPacket(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 }
 
 static JSBool
-setNoisy(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Sets the serial device to noisy mode for debug purposes");
-    DOC_PARAM("theNosiyFlag", "Noisy Flag", DOC_TYPE_BOOLEAN);
-    DOC_END;
-    try {
-        if (argc > 1) {
-            JS_ReportError(cx, "JSSerial::setNoisy(): Wrong number of arguments, "
-                               "expected one (noisy flag), got %d.", argc);
-            return JS_FALSE;
-        }
-
-        bool myNoisyFlag = true;
-        //if (argc == 0) {
-        //    myNoisyFlag = true;
-        //}
-
-        if (argc == 1) {
-            if (JSVAL_IS_VOID(argv[0])) {
-                JS_ReportError(cx, "JSSerial::setNoisy(): Argument #0 is undefined");
-                return JS_FALSE;
-            }
-
-            if (!convertFrom(cx, argv[0], myNoisyFlag)) {
-                JS_ReportError(cx, "JSSerial::setNoisy(): Argument #1 must be boolean (noisy flag)");
-                return JS_FALSE;
-            }
-        }
-
-        JSSerial::getJSWrapper(cx,obj).openNative().setNoisy(myNoisyFlag);
-        JSSerial::getJSWrapper(cx,obj).closeNative();
-        return JS_TRUE;
-    } HANDLE_CPP_EXCEPTION;
-}
-
-static JSBool
 printPacketStatistic(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Prints out statistics about send/received/lost packets");
     DOC_END;
@@ -562,7 +527,6 @@ JSSerial::Functions() {
         {"receivePacket",        receivePacket,           0},
         {"setPacketFormat",      setPacketFormat,         4},
         {"sendPacket",           sendPacket,              1},
-        {"setNoisy",             setNoisy,                1},
         {"printPacketStatistic", printPacketStatistic,    0},
         {"printPacketFormat",    printPacketFormat,       0},
         {0}
