@@ -184,7 +184,13 @@ SerialTransport::readData() {
         _mySerialPort->read(myReceiveBuffer, myBytesReceived);
         myAfter.setNow();
 
-        AC_TRACE << "Read took " << myAfter.millis() - myBefore.millis() << " milliseconds.";
+        unsigned myBlockingDuration = myAfter.millis() - myBefore.millis();
+
+        AC_TRACE << "Read took " << myBlockingDuration << " milliseconds.";
+
+        if(myBlockingDuration > 150) {
+            AC_WARNING << "Blocked for more than 150 msec. The OS is blocking longer than it should or is busy.";
+        }
 
         if(myBytesReceived > 0) {
             AC_TRACE << "Received " << myBytesReceived << " bytes.";
