@@ -95,16 +95,12 @@ TTYPort::open(unsigned int theBaudRate, unsigned int theDataBits,
                 "'. Device allready open.", PLUS_FILE_LINE);
     }
 
-    if (AC_TRACE_ON || isNoisy()) {
-        cerr << "Opening '" << getDeviceName() << "' with " << endl;
-        cerr << "    baudrate:     " << theBaudRate << endl;
-        cerr << "    databits:     " << theDataBits << endl;
-        cerr << "    partity mode: " << theParityMode << endl;
-        cerr << "    stopbits:     " << theStopBits << endl;
-        cerr << "    hw handshake: " << theHWHandShakeFlag << endl;
-        cerr << "    theMinBytesPerRead: " << theMinBytesPerRead << endl;
-        cerr << "    theTimeout: " << theTimeout << endl;
-    }
+    AC_DEBUG << "Opening " << getDeviceName() << " with: "
+             << " baudrate: "  << theBaudRate
+             << " bits: "      << theDataBits
+             << " parity: "   << theParityMode
+             << " stopbits: "  << theStopBits
+             << " handshake: " << theHWHandShakeFlag << endl;
 
     mode_t myOpenMode = O_RDWR | O_NOCTTY;
     mode_t myOpenNonBlockMode = 0;
@@ -269,9 +265,6 @@ TTYPort::getStatusLine() {
     if (myStatus & TIOCM_DTR) {
         myStatusMask |= DTR;
     }
-    if (AC_TRACE_ON || isNoisy()) {
-        cerr << "TTYPort::getStatusLine(): status mask=0x" << hex << myStatusMask << dec << endl;
-    }
 
     return myStatusMask;
 }
@@ -295,11 +288,6 @@ TTYPort::read(char * theBuffer, size_t & theSize) {
         }
     }
 
-    if ((AC_TRACE_ON || isNoisy()) && myReadBytes > 0) {
-        cerr << "TTYPort::read(): '" << Block((unsigned char *)theBuffer,
-            (unsigned char *)(theBuffer + myReadBytes)) << "'" << endl;
-    }
-
     if (myReadBytes == theSize) {
         AC_TRACE << "TTYPort: read all " << myReadBytes << " bytes";
         return true;
@@ -316,10 +304,7 @@ TTYPort::write(const char * theBuffer, size_t theSize) {
         throw SerialPortException(string("Can not write to device ") + getDeviceName() +
                                ". Device is not open.", PLUS_FILE_LINE);
     }
-    if (AC_TRACE_ON || isNoisy()) {
-        cerr << "TTYPort::write(): '" << Block((unsigned char *)theBuffer,
-            (unsigned char *)(theBuffer + theSize)) << "'" << endl;
-    }
+
     ssize_t myWrittenBytes = ::write(_myPortHandle, theBuffer, theSize);
     if (/* ! blocking && */ myWrittenBytes == -1 && errno == EAGAIN) {
         AC_WARNING << "EAGAIN: write() would block.";
