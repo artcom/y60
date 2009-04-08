@@ -1518,15 +1518,13 @@ namespace y60 {
         MAKE_SCOPE_TIMER(ASSDriver_processInput);
 
         if (_myTransportLayer) {
-            _myTransportLayer->lockFrameQueue();
+            std::vector<ASSEvent> myFrames;
+            _myTransportLayer->getEvents(myFrames);
 
-            std::queue<ASSEvent> & myFrameQueue = _myTransportLayer->getFrameQueue();
+            AC_DEBUG << "Got " << myFrames.size() << " frames.";
 
-            AC_TRACE << "frame queue size = " << myFrameQueue.size();
-
-            while ( ! myFrameQueue.empty() ) {
-                ASSEvent myEvent = myFrameQueue.front();
-                myFrameQueue.pop();
+            for(std::vector<ASSEvent>::iterator i = myFrames.begin(); i != myFrames.end(); i++) {
+                ASSEvent& myEvent = *i;
 
                 //AC_TRACE << "popped event " << myEvent;
 
@@ -1558,8 +1556,6 @@ namespace y60 {
                         break;
                 }
             }
-            _myTransportLayer->unlockFrameQueue();
-            AC_TRACE << "frame queue size after unlocking = " << myFrameQueue.size();
         }
     }
 

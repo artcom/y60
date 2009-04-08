@@ -115,14 +115,14 @@ class TransportLayer :  public asl::PosixThread {
         void stopThread();
 
         // interface for retrieving frames and events
-        void lockFrameQueue() {
+        void getEvents(std::vector<ASSEvent>& theDestination) {
+            theDestination.clear();
             _myFrameQueueLock.lock();
-        }
-        void unlockFrameQueue() {
+            while(!_myFrameQueue.empty()) {
+                theDestination.push_back(_myFrameQueue.front());
+                _myFrameQueue.pop();
+            }
             _myFrameQueueLock.unlock();
-        }
-        std::queue<ASSEvent> & getFrameQueue() {
-            return _myFrameQueue;
         }
 
         // command submission by clients
