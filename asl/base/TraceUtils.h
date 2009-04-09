@@ -82,7 +82,7 @@ demangled(const char * theName) {
 template <typename T>
 std::string
 demangled_name() {
-    return demangle(typeid(T).name());
+    return demangled(typeid(T).name());
 }
 
 /** returns the demangled name of the return type of an expression as a string */

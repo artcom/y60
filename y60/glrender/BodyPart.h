@@ -91,7 +91,7 @@ namespace y60 {
                             material(theMaterial), 
                             body(theBody)
                         {}
-
+#if 1
                         bool operator <(const Key & second) const {
                             if (this->alphaBit_ZDepth < second.alphaBit_ZDepth) {
                                 return true;
@@ -104,6 +104,21 @@ namespace y60 {
                             } 
                             return false;
                         }
+#else
+                        // slower, but deterministic rendering order by id
+                        bool operator <(const Key & second) const {
+                            if (this->alphaBit_ZDepth < second.alphaBit_ZDepth) {
+                                return true;
+                            } else if (this->alphaBit_ZDepth == second.alphaBit_ZDepth) {
+                                if (this->material->get<IdTag>() < second.material->get<IdTag>()) {
+                                    return true;
+                                } else if (this->material->get<IdTag>() == second.material->get<IdTag>()) {
+                                    return (this->body->get<IdTag>() < second.body->get<IdTag>());
+                                }
+                            } 
+                            return false;
+                        }
+#endif
 
                 bool getTransparencyFlag() const {
                     return 0 != (alphaBit_ZDepth >> 15);

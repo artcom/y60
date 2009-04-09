@@ -1127,6 +1127,8 @@ namespace dom {
     
     // interface for vector element access and resizing
     struct ResizeableVector : public virtual AccessibleVector {
+        virtual ValuePtr getItem(asl::AC_SIZE_TYPE theIndex) const = 0;
+        virtual void setItem(asl::AC_SIZE_TYPE theIndex, const ValueBase & theValue) = 0;
         virtual void resize(asl::AC_SIZE_TYPE newSize) = 0;
         virtual ValuePtr getList(asl::AC_SIZE_TYPE theIndex, asl::AC_SIZE_TYPE theCount) const = 0;
         virtual void setList(asl::AC_SIZE_TYPE theIndex, const ValueBase & theValues) = 0;

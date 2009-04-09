@@ -256,7 +256,7 @@ namespace y60 {
         }
         for (unsigned myRegister = 0; myRegister < MAX_REGISTER; ++myRegister) {
             bool myEnable = false;
-
+#if 1
             if (myVertexRegisterFlags[myRegister] && !_myLastVertexRegisterFlags[myRegister]) {
                 myEnable = true;
             } else if (!myVertexRegisterFlags[myRegister] && _myLastVertexRegisterFlags[myRegister]) {
@@ -264,6 +264,9 @@ namespace y60 {
             } else {
                 continue;
             }
+#else
+            myEnable = myVertexRegisterFlags[myRegister];
+#endif
 
             switch (myRegister) {
                 case POSITION_REGISTER:
