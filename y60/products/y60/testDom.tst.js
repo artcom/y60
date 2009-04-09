@@ -438,10 +438,120 @@ DomEventTest.prototype.Constructor = function(obj, theName) {
         print("eventListener: " + theEvent);
     }
 }
+function ValueUnitTest() {
+    this.Constructor(this, "SchemaUnitTest");
+}
+
+ValueUnitTest.prototype.Constructor = function(obj, theName) {
+    
+    UnitTest.prototype.Constructor(obj, theName);
+    
+    obj.run = function() {
+        DTITLE("Starting Vector Value Tests");
+		obj.mySchema = new Node(
+                                "<xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'>"
+                                +"   <xs:simpleType name='Vector3f'>\n"
+                                +"       <xs:restriction base='xs:string' />\n"
+                                +"   </xs:simpleType>\n"
+                                +"   <xs:simpleType name='VectorOfVector3f'>\n"
+                                +"       <xs:restriction base='xs:string' />\n"
+                                +"   </xs:simpleType>\n"
+                                +"   <xs:simpleType name='VectorOfFloat'>\n"
+                                +"       <xs:restriction base='xs:string' />\n"
+                                +"   </xs:simpleType>\n"
+                                +"	<xs:element name='scene'>\n"
+                                +"		<xs:complexType>\n"
+                                +"			<xs:sequence>\n"
+                                +"				<xs:element ref='vectoroffloat'/>\n"
+                                +"				<xs:element ref='vectorofvector3f'/>\n"
+                                +"			</xs:sequence>\n"
+                                +"			<xs:attribute name='version' type='xs:unsignedLong'/>\n"
+                                +"           <xs:attribute name=\"id\" type=\"xs:ID\"/>\n"
+                                +"		</xs:complexType>\n"
+                                +"	</xs:element>\n"
+
+                                +"    <xs:element name=\"vectorofvector3f\">\n"
+                                +"        <xs:complexType>\n"
+                                +"            <xs:simpleContent>\n"
+                                +"                <xs:extension base=\"VectorOfVector3f\">\n"
+                                +"                    <xs:attribute name=\"id\" type=\"xs:ID\"/>\n"
+                                +"                    <xs:attribute name=\"name\" type=\"xs:string\"/>\n"
+                                +"                </xs:extension>\n"
+                                +"            </xs:simpleContent>\n"
+                                +"        </xs:complexType>\n"
+                                +"    </xs:element>\n"
+                                +"    <xs:element name=\"vectoroffloat\">\n"
+                                +"        <xs:complexType>\n"
+                                +"            <xs:simpleContent>\n"
+                                +"                <xs:extension base=\"VectorOfFloat\">\n"
+                                +"                    <xs:attribute name=\"id\" type=\"xs:ID\"/>\n"
+                                +"                    <xs:attribute name=\"name\" type=\"xs:string\"/>\n"
+                                +"                </xs:extension>\n"
+                                +"            </xs:simpleContent>\n"
+                                +"        </xs:complexType>\n"
+                                +"    </xs:element>\n"
+                                +"</xs:schema>\n"
+                                );
+		ENSURE('mySchema.ok');
+		obj.myDocument = Node.createDocument();
+		obj.myDocument.useFactories("w3c-schema,som");
+		obj.myDocument.addSchema(obj.mySchema,"");
+		SUCCESS("added Schema");
+		DPRINT('obj.myDocument.schema');
+		obj.myDocument.parse(
+                              "<scene version='214'>"
+                             +"	   <vectorofvector3f id='iv' name='vectors'>\n"
+                             +"       [[0,0,0],[1,1,1]]"
+                             +"    </vectorofvector3f>"
+                             +"	   <vectoroffloat id='fv' name='floats'>\n"
+                             +"       [0,1,2,3]"
+                             +"    </vectoroffloat>"
+                             +"</scene>\n"
+                             );
+		ENSURE('myDocument.ok');
+		//myDocument.getSchema()->dump();
+		ENSURE('myDocument.firstChild.nodeName == "scene"');
+        
+        obj.myFloats = obj.myDocument.getElementById("fv");
+        ENSURE('myFloats.name == "floats"');
+        obj.myFloatVectorNode = obj.myFloats.firstChild;
+        DPRINT('myFloatVectorNode');
+        DPRINT('myFloatVectorNode.nodeValueTypeName');
+        ENSURE('myFloatVectorNode.nodeValueTypeName == "VectorOfFloat"');
+        
+        obj.myFloatVector = obj.myFloatVectorNode.nodeValue;
+        obj.myFullList = obj.myFloatVector.getList(0,obj.myFloatVector.length);
+        ENSURE("myFullList.length == myFloatVector.length");
+        ENSURE("myFloatVector[0] == 0");
+        ENSURE("myFloatVector.getItem(0) == 0");
+        obj.myFloatVector.setItem(0,5);
+        ENSURE("myFloatVector.getItem(0) == 5");
+        obj.myFloatVector.setItem(0,0);
+        obj.myFloatVector.appendList(obj.myFullList);
+        ENSURE("myFullList.length*2 == myFloatVector.length");
+        ENSURE("myFullList.length*2 == obj.myFloatVectorNode.nodeValue.length");
+        
+        obj.myFloatVector.eraseList(0, obj.myFullList.length);
+        ENSURE("myFullList.length == myFloatVector.length");
+        obj.myFloatVector.eraseItem(0);
+        obj.myFloatVector.eraseItem(obj.myFloatVector.length-1);
+        ENSURE("myFullList.length - 2 == myFloatVector.length");
+        ENSURE_EXCEPTION("myFloatVector.eraseItem(myFloatVector.length)");
+        obj.myFloatVector.eraseList(0, obj.myFloatVector.length);
+        ENSURE("0 == myFloatVector.length");
+        obj.myFloatVector.appendItem(23);
+        ENSURE("myFloatVector.getItem(0) == 23");
+        obj.myFloatVector.insertItemBefore(0,42);
+        ENSURE("myFloatVector.getItem(0) == 42");
+        obj.myFloatVector.insertListBefore(0,obj.myFullList);
+        ENSURE("myFullList.length + 2 == myFloatVector.length");
+	}
+}
 
 var myTestName = "testDOM.tst.js";
 var mySuite = new UnitTestSuite(myTestName);
 
+mySuite.addTest(new ValueUnitTest());
 mySuite.addTest(new DomEventTest());
 mySuite.addTest(new DomParseUnitTest());
 mySuite.addTest(new SchemaUnitTest());

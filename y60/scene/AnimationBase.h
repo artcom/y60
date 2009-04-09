@@ -87,13 +87,14 @@ namespace y60 {
     class AnimationBase {
         public:
             enum AttributeComponent {
-                SCALAR = -1,
-                ALL = -1,
-                X,
-                Y,
-                Z,
-                W,
-                HFOV,
+                FULL_VALUE = -11,
+                X = -10,
+                Y = -9,
+                Z = -8,
+                W = -7,
+                HFOV = -6,
+                MIN_INDEX = 0,
+                MAX_INDEX = 2<<23
             };
 
             AnimationBase(dom::NodePtr theNode, bool theAngleAnimation);

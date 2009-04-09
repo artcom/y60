@@ -160,13 +160,14 @@ namespace dom {
     DEFINE_VALUE_WRAPPER_TEMPLATE2(y60::VectorOfVector4f, VectorValue, dom::MakeResizeableVector);
     DEFINE_VALUE_WRAPPER_TEMPLATE2(y60::VectorOfQuaternionf, VectorValue, dom::MakeResizeableVector);
     DEFINE_VALUE_WRAPPER_TEMPLATE3(y60::VectorOfString, ComplexValue, dom::MakeResizeableVector, StringValue);
-    DEFINE_VALUE_WRAPPER_TEMPLATE2(y60::VectorOfVectorOfString, ComplexValue, dom::MakeResizeableVector);
-    DEFINE_VALUE_WRAPPER_TEMPLATE2(y60::VectorOfVectorOfFloat, ComplexValue, dom::MakeResizeableVector);
+    DEFINE_VALUE_WRAPPER_TEMPLATE3(y60::VectorOfVectorOfString, ComplexValue, dom::MakeResizeableVector, dom::ValueWrapper<y60::VectorOfString>::Type);
+    DEFINE_VALUE_WRAPPER_TEMPLATE3(y60::VectorOfVectorOfFloat, ComplexValue, dom::MakeResizeableVector, dom::ValueWrapper<y60::VectorOfFloat>::Type );
     
     DEFINE_VALUE_WRAPPER_TEMPLATE3(y60::RankedFeature, ComplexValue, dom::MakeOpaqueVector, void);
-    DEFINE_VALUE_WRAPPER_TEMPLATE2(y60::VectorOfRankedFeature, ComplexValue, dom::MakeResizeableVector);
+    DEFINE_VALUE_WRAPPER_TEMPLATE3(y60::VectorOfRankedFeature, ComplexValue, dom::MakeResizeableVector, dom::ValueWrapper<y60::RankedFeature>::Type);
 
     DEFINE_VALUE_WRAPPER_TEMPLATE(y60::BlendEquation, SimpleValue);
+    DEFINE_VALUE_WRAPPER_TEMPLATE(y60::RenderStyle, SimpleValue);
     DEFINE_VALUE_WRAPPER_TEMPLATE(y60::RenderStyles, SimpleValue);
     DEFINE_VALUE_WRAPPER_TEMPLATE(y60::VertexBufferUsage, SimpleValue);
     DEFINE_VALUE_WRAPPER_TEMPLATE2(y60::VectorOfBlendFunction, VectorValue, dom::MakeResizeableVector);
@@ -203,25 +204,25 @@ namespace dom {
 
     DEFINE_VALUE_WRAPPER_TEMPLATE(y60::TargetBuffers, SimpleValue);
 
-    DEFINE_VALUE_WRAPPER_TEMPLATE2(y60::RasterOfRGB, ComplexValue, dom::MakeResizeableRaster);
-    DEFINE_VALUE_WRAPPER_TEMPLATE2(y60::RasterOfRGBA, ComplexValue, dom::MakeResizeableRaster);
-    DEFINE_VALUE_WRAPPER_TEMPLATE2(y60::RasterOfBGR, ComplexValue, dom::MakeResizeableRaster);
-    DEFINE_VALUE_WRAPPER_TEMPLATE2(y60::RasterOfBGRA, ComplexValue, dom::MakeResizeableRaster);
-    DEFINE_VALUE_WRAPPER_TEMPLATE2(y60::RasterOfABGR, ComplexValue, dom::MakeResizeableRaster);
-    DEFINE_VALUE_WRAPPER_TEMPLATE2(y60::RasterOfGRAY, ComplexValue, dom::MakeResizeableRaster);
-    DEFINE_VALUE_WRAPPER_TEMPLATE2(y60::RasterOfGRAY16, ComplexValue, dom::MakeResizeableRaster);
-    DEFINE_VALUE_WRAPPER_TEMPLATE2(y60::RasterOfGRAY32, ComplexValue, dom::MakeResizeableRaster);
-    DEFINE_VALUE_WRAPPER_TEMPLATE2(y60::RasterOfGRAYS16, ComplexValue, dom::MakeResizeableRaster);
+    DEFINE_VALUE_WRAPPER_TEMPLATE3(y60::RasterOfRGB, ComplexValue, dom::MakeResizeableRaster, dom::ValueWrapper<asl::RGB>::Type);
+    DEFINE_VALUE_WRAPPER_TEMPLATE3(y60::RasterOfRGBA, ComplexValue, dom::MakeResizeableRaster, dom::ValueWrapper<asl::RGBA>::Type);
+    DEFINE_VALUE_WRAPPER_TEMPLATE3(y60::RasterOfBGR, ComplexValue, dom::MakeResizeableRaster, dom::ValueWrapper<asl::BGR>::Type);
+    DEFINE_VALUE_WRAPPER_TEMPLATE3(y60::RasterOfBGRA, ComplexValue, dom::MakeResizeableRaster, dom::ValueWrapper<asl::BGRA>::Type);
+    DEFINE_VALUE_WRAPPER_TEMPLATE3(y60::RasterOfABGR, ComplexValue, dom::MakeResizeableRaster, dom::ValueWrapper<asl::ABGR>::Type);
+    DEFINE_VALUE_WRAPPER_TEMPLATE3(y60::RasterOfGRAY, ComplexValue, dom::MakeResizeableRaster, dom::ValueWrapper<asl::GRAY>::Type);
+    DEFINE_VALUE_WRAPPER_TEMPLATE3(y60::RasterOfGRAY16, ComplexValue, dom::MakeResizeableRaster, dom::ValueWrapper<asl::GRAY16>::Type);
+    DEFINE_VALUE_WRAPPER_TEMPLATE3(y60::RasterOfGRAY32, ComplexValue, dom::MakeResizeableRaster, dom::ValueWrapper<asl::GRAY32>::Type);
+    DEFINE_VALUE_WRAPPER_TEMPLATE3(y60::RasterOfGRAYS16, ComplexValue, dom::MakeResizeableRaster, dom::ValueWrapper<asl::GRAYS16>::Type);
     
-    DEFINE_VALUE_WRAPPER_TEMPLATE2(y60::RasterOfDXT1, ComplexValue, dom::MakeResizeableRaster);
-    DEFINE_VALUE_WRAPPER_TEMPLATE2(y60::RasterOfDXT1a, ComplexValue, dom::MakeResizeableRaster);
-    DEFINE_VALUE_WRAPPER_TEMPLATE2(y60::RasterOfDXT3, ComplexValue, dom::MakeResizeableRaster);
-    DEFINE_VALUE_WRAPPER_TEMPLATE2(y60::RasterOfDXT5, ComplexValue, dom::MakeResizeableRaster);
+    DEFINE_VALUE_WRAPPER_TEMPLATE3(y60::RasterOfDXT1, ComplexValue, dom::MakeResizeableRaster, dom::ValueWrapper<asl::DXT1>::Type);
+    DEFINE_VALUE_WRAPPER_TEMPLATE3(y60::RasterOfDXT1a, ComplexValue, dom::MakeResizeableRaster, dom::ValueWrapper<asl::DXT1a>::Type);
+    DEFINE_VALUE_WRAPPER_TEMPLATE3(y60::RasterOfDXT3, ComplexValue, dom::MakeResizeableRaster, dom::ValueWrapper<asl::DXT3>::Type);
+    DEFINE_VALUE_WRAPPER_TEMPLATE3(y60::RasterOfDXT5, ComplexValue, dom::MakeResizeableRaster, dom::ValueWrapper<asl::DXT5>::Type);
 
-    DEFINE_VALUE_WRAPPER_TEMPLATE2(y60::RasterOfRGBA_HALF, ComplexValue, dom::MakeResizeableRaster);
-    DEFINE_VALUE_WRAPPER_TEMPLATE2(y60::RasterOfRGB_HALF, ComplexValue, dom::MakeResizeableRaster);
-    DEFINE_VALUE_WRAPPER_TEMPLATE2(y60::RasterOfRGBA_FLOAT, ComplexValue, dom::MakeResizeableRaster);
-    DEFINE_VALUE_WRAPPER_TEMPLATE2(y60::RasterOfRGB_FLOAT, ComplexValue, dom::MakeResizeableRaster);
+    DEFINE_VALUE_WRAPPER_TEMPLATE3(y60::RasterOfRGBA_HALF, ComplexValue, dom::MakeResizeableRaster, dom::ValueWrapper<asl::RGBA_HALF>::Type);
+    DEFINE_VALUE_WRAPPER_TEMPLATE3(y60::RasterOfRGB_HALF, ComplexValue, dom::MakeResizeableRaster, dom::ValueWrapper<asl::RGB_HALF>::Type);
+    DEFINE_VALUE_WRAPPER_TEMPLATE3(y60::RasterOfRGBA_FLOAT, ComplexValue, dom::MakeResizeableRaster, dom::ValueWrapper<asl::RGBA_FLOAT>::Type);
+    DEFINE_VALUE_WRAPPER_TEMPLATE3(y60::RasterOfRGB_FLOAT, ComplexValue, dom::MakeResizeableRaster, dom::ValueWrapper<asl::RGB_FLOAT>::Type);
 }
 
 #endif

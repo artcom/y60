@@ -60,23 +60,29 @@ std::string beautify(const std::string & theSymbol);
 // TODO: put the rest of this in namespace asl
 namespace asl {
 
-/** returns the demangled name of a type as a string */
-template <typename T>
+inline
 std::string
-demangled_name() {
+demangled(const char * theName) {
 #   ifdef __GNUC__
         const size_t name_buffer_size = 1024;
         size_t size = name_buffer_size;
         char buffer[name_buffer_size];
         int status = 0;
-        abi::__cxa_demangle(typeid(T).name(), buffer, & size, & status);
+        abi::__cxa_demangle(theName, buffer, & size, & status);
         if ( ! status ) {
             return std::string( buffer );
         }
-        return std::string( typeid(T).name() );
+        return std::string(theName);
 #   else
-        return std::string(typeid(T).name());
+        return std::string(theName);
 #   endif
+}
+
+/** returns the demangled name of a type as a string */
+template <typename T>
+std::string
+demangled_name() {
+    return demangle(typeid(T).name());
 }
 
 /** returns the demangled name of the return type of an expression as a string */

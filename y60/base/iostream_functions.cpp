@@ -189,7 +189,7 @@ namespace asl {
             if (i) {
                 theStream << ",";
             }
-            theStream << theVector.getElement(i)->getString();
+            theStream << theVector.getItem(i)->getString();
         }
         theStream << "]";
         return theStream;

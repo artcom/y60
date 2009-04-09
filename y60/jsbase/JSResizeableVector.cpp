@@ -58,6 +58,7 @@
 
 // own header
 #include "JSResizeableVector.h"
+#include "JSAccessibleVector.h"
 
 #include "JSNode.h"
 #include "JSWrapper.impl"
@@ -67,30 +68,6 @@
 
 using namespace std;
 using namespace asl;
-
-namespace {
-    
-    template<typename Value>
-    class NativeRef {
-    public:
-        NativeRef(JSContext *cx, JSObject *obj)
-        : cx_(cx), obj_(obj), value_(jslib::JSClassTraits<Value>::openNativeRef(cx, obj))
-        { }
-        
-        Value& getValue() {
-            return value_;
-        }
-        
-        ~NativeRef() {
-            jslib::JSClassTraits<Value>::closeNativeRef(cx_, obj_);
-        }
-    private:
-        JSContext *cx_;
-        JSObject  *obj_;
-        Value &    value_;
-    };
-    
-}
 
 namespace jslib {
 
@@ -109,26 +86,63 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 }
 
 static JSBool
-item(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+getItem(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Returns an element from the vector. Throws an exception, if index is out of bounds.");
     DOC_PARAM("theIndex", "Index of the element to retrieve.", DOC_TYPE_INTEGER);
     DOC_RVAL("theElement", DOC_TYPE_OBJECT);
     DOC_END;
     typedef dom::ValuePtr (NATIVE_VECTOR::*MyMethod)(int);
-    return Method<NATIVE_VECTOR>::call((MyMethod)&NATIVE_VECTOR::getElement,cx,obj,argc,argv,rval);
+    return Method<NATIVE_VECTOR>::call((MyMethod)&NATIVE_VECTOR::getItem,cx,obj,argc,argv,rval);
 }
+
+static JSBool
+setItem(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("sets an element in the vector. Throws an exception, if index is out of bounds.");
+    DOC_PARAM("theIndex", "Index of the element to set.", DOC_TYPE_INTEGER);
+    DOC_RVAL("theElement", DOC_TYPE_OBJECT);
+    DOC_RVAL("success", DOC_TYPE_BOOLEAN);
+    DOC_END;
+    try {
+        if (argc != 2) {
+            JS_ReportError(cx, "setItem(thePos, theElement): needs two arguments");
+            return JS_FALSE;
+        }
+        
+        NativeRef<dom::ResizeableVector> myNativeRef(cx,obj);
+        dom::ResizeableVector & myNative = myNativeRef.getValue();
+        asl::AC_SIZE_TYPE myArg0;
+        dom::ValuePtr myArg1;
+        if (convertFrom(cx, argv[0], myArg0)) {
+            if (convertFrom(cx, argv[1], myNative.elementName(), myArg1)) {
+                myNative.setItem(myArg0, *myArg1);
+                return JS_TRUE;
+            } else {
+                JS_ReportError(cx, (string("JSResizeableVector::setItem:") + "could not convert second argumentvalue "
+                                    +as_string(cx, argv[1])+" to type " + myNative.elementName()).c_str());
+                return JS_FALSE;
+            }
+        } else {
+            JS_ReportError(cx, (string("JSResizeableVector::setItem:") + "could not convert first argument value "
+                                +as_string(cx, argv[0])+" to type unsigned integer").c_str());
+            return JS_FALSE;
+        }
+        
+    } HANDLE_CPP_EXCEPTION;
+    return JS_TRUE;
+}
+
 static JSBool
 resize(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Resizes the vector to the requested size, adding default elements or removing superflous elements.");
     DOC_PARAM("theSize", "The new size of the vector", DOC_TYPE_INTEGER);
     DOC_END;
-    typedef void (NATIVE_VECTOR::*MyMethod)(int);
+    typedef void (NATIVE_VECTOR::*MyMethod)(unsigned);
     return Method<NATIVE_VECTOR>::call((MyMethod)&NATIVE_VECTOR::resize,cx,obj,argc,argv,rval);
 }
 
 
 static JSBool
-append(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+appendItem(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("appends an element to the vector");
     DOC_PARAM("theElement", "The element to append", DOC_TYPE_OBJECT);
     DOC_END;
@@ -142,7 +156,7 @@ append(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         dom::ResizeableVector & myNative = myNativeRef.getValue();
         dom::ValuePtr myArg;
         if (convertFrom(cx, argv[0], myNative.elementName(), myArg)) {
-            myNative.append(*myArg);
+            myNative.appendItem(*myArg);
         } else {
             JS_ReportError(cx, (string("JSResizeableVector::append:") + "could not convert argument value "
                                 +as_string(cx, argv[0])+" to type " + myNative.elementName()).c_str());
@@ -152,27 +166,56 @@ append(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     } HANDLE_CPP_EXCEPTION;
     return JS_TRUE;    
 }
-
+    
 static JSBool
-erase(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+appendList(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("appends a list of elements to the vector");
+    DOC_PARAM("theList", "The list of elements to append", DOC_TYPE_OBJECT);
+    DOC_END;
+    try {
+        if (argc == 0) {
+            JS_ReportError(cx, "JSResizeableVector::appendList(theList): needs an argument");
+            return JS_FALSE;
+        }
+        NativeRef<dom::ResizeableVector> myNativeRef(cx,obj);
+        if (!JSVAL_IS_OBJECT(argv[0])) {
+            JS_ReportError(cx, "JSResizeableVector::appendList(theList): argument is not an object");
+            return JS_FALSE;
+        }
+        const dom::ResizeableVector & myVector = JSClassTraits<dom::ResizeableVector>::getNativeRef(cx, JSVAL_TO_OBJECT(argv[0]));
+        const dom::ValueBase & myVectorValue = dynamic_cast<const dom::ValueBase &>(myVector);
+        myNativeRef.getValue().appendList(myVectorValue);
+    } HANDLE_CPP_EXCEPTION;
+    return JS_TRUE;    
+}
+    
+static JSBool
+eraseItem(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Erases one element from the vector");
     DOC_PARAM("theIndex", "The index of the element to erase", DOC_TYPE_INTEGER);
-    DOC_RVAL("true, if successfull", DOC_TYPE_BOOLEAN);
     DOC_END;
-    typedef bool (NATIVE_VECTOR::*MyMethod)(int);
-    return Method<NATIVE_VECTOR>::call((MyMethod)&NATIVE_VECTOR::erase,cx,obj,argc,argv,rval);
+    typedef void (NATIVE_VECTOR::*MyMethod)(asl::AC_SIZE_TYPE);
+    return Method<NATIVE_VECTOR>::call((MyMethod)&NATIVE_VECTOR::eraseItem,cx,obj,argc,argv,rval);
+}
+static JSBool
+eraseList(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Erases elements from the vector");
+    DOC_PARAM("theIndex", "The index of the element to erase", DOC_TYPE_INTEGER);
+    DOC_PARAM("theCount", "The count of the element to erase", DOC_TYPE_INTEGER);
+    DOC_END;
+    typedef void (NATIVE_VECTOR::*MyMethod)(asl::AC_SIZE_TYPE,asl::AC_SIZE_TYPE);
+    return Method<NATIVE_VECTOR>::call((MyMethod)&NATIVE_VECTOR::eraseList,cx,obj,argc,argv,rval);
 }
 
-
 static JSBool
-insertBefore(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("insertBefore insert an element in the vector before thePosition");
+insertItemBefore(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("insertItemBefore inserts an element in the vector before thePosition");
     DOC_PARAM("thePosition", "The position to insert before", DOC_TYPE_INTEGER);
     DOC_PARAM("theElement", "The element to insert", DOC_TYPE_OBJECT);
     DOC_END;
     try {
         if (argc != 2) {
-            JS_ReportError(cx, "insertBefore(thePos, theElement): needs two arguments");
+            JS_ReportError(cx, "insertItemBefore(thePos, theElement): needs two arguments");
             return JS_FALSE;
         }
         
@@ -182,14 +225,14 @@ insertBefore(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
         dom::ValuePtr myArg1;
         if (convertFrom(cx, argv[0], myArg0)) {
             if (convertFrom(cx, argv[1], myNative.elementName(), myArg1)) {
-                myNative.insertBefore(myArg0, *myArg1);
+                myNative.insertItemBefore(myArg0, *myArg1);
             } else {
-                JS_ReportError(cx, (string("JSResizeableVector::insertBefore:") + "could not convert second argumentvalue "
+                JS_ReportError(cx, (string("JSResizeableVector::insertItemBefore:") + "could not convert second argumentvalue "
                                     +as_string(cx, argv[1])+" to type " + myNative.elementName()).c_str());
                 return JS_FALSE;
             }
         } else {
-            JS_ReportError(cx, (string("JSResizeableVector::insertBefore:") + "could not convert first argument value "
+            JS_ReportError(cx, (string("JSResizeableVector::insertItemBefore:") + "could not convert first argument value "
                                 +as_string(cx, argv[0])+" to type unsigned integer").c_str());
             return JS_FALSE;
         }
@@ -197,19 +240,99 @@ insertBefore(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
     } HANDLE_CPP_EXCEPTION;
     return JS_TRUE;    
 }
-
+static JSBool
+insertListBefore(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("insertListBefore insert a list of elements in the vector before thePosition");
+    DOC_PARAM("thePosition", "The position to insert before", DOC_TYPE_INTEGER);
+    DOC_PARAM("theList", "The list of elements to insert", DOC_TYPE_OBJECT);
+    DOC_END;
+    try {
+        if (argc != 2) {
+            JS_ReportError(cx, "insertListBefore(thePos, theList): needs two arguments");
+            return JS_FALSE;
+        }
+        
+        asl::AC_SIZE_TYPE thePos;
+        dom::ValuePtr myArg1;
+        if (convertFrom(cx, argv[0], thePos)) {
+            NativeRef<dom::ResizeableVector> myNativeRef(cx,obj);
+            if (!JSVAL_IS_OBJECT(argv[1])) {
+                JS_ReportError(cx, "JSResizeableVector::insertListBefore(thePos, theList): argument #2 is not an object");
+                return JS_FALSE;
+            }
+            const dom::ResizeableVector & myVector = JSClassTraits<dom::ResizeableVector>::getNativeRef(cx, JSVAL_TO_OBJECT(argv[1]));
+            const dom::ValueBase & myVectorValue = dynamic_cast<const dom::ValueBase &>(myVector);
+            myNativeRef.getValue().insertListBefore(thePos, myVectorValue);
+        } else {
+            JS_ReportError(cx, (string("JSResizeableVector::insertListBefore(thePos, theList):") + "could not convert first argument value "
+                                +as_string(cx, argv[0])+" to type unsigned integer").c_str());
+            return JS_FALSE;
+        }
+        
+    } HANDLE_CPP_EXCEPTION;
+    return JS_TRUE;    
+}
+static JSBool
+setList(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("setList overwrites a list of elements in the vector starting at thePosition");
+    DOC_PARAM("thePosition", "The first  position to overwrite", DOC_TYPE_INTEGER);
+    DOC_PARAM("theList", "The list of elements", DOC_TYPE_OBJECT);
+    DOC_END;
+    try {
+        if (argc != 2) {
+            JS_ReportError(cx, "JSResizeableVector::setList(thePos, theList): needs two arguments");
+            return JS_FALSE;
+        }
+        
+        asl::AC_SIZE_TYPE thePos;
+        dom::ValuePtr myArg1;
+        if (convertFrom(cx, argv[0], thePos)) {
+            NativeRef<dom::ResizeableVector> myNativeRef(cx,obj);
+            if (!JSVAL_IS_OBJECT(argv[1])) {
+                JS_ReportError(cx, "JSResizeableVector::setList(thePos, theList): argument #2 is not an object");
+                return JS_FALSE;
+            }
+            const dom::ResizeableVector & myVector = JSClassTraits<dom::ResizeableVector>::getNativeRef(cx, JSVAL_TO_OBJECT(argv[1]));
+            const dom::ValueBase & myVectorValue = dynamic_cast<const dom::ValueBase &>(myVector);
+            myNativeRef.getValue().setList(thePos, myVectorValue);
+        } else {
+            JS_ReportError(cx, (string("JSResizeableVector::setList(thePos, theList):") + "could not convert first argument value "
+                                +as_string(cx, argv[0])+" to type unsigned integer").c_str());
+            return JS_FALSE;
+        }
+        
+    } HANDLE_CPP_EXCEPTION;
+    return JS_TRUE;    
+}
+    
+static JSBool
+getList(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("gets elements from the vector");
+    DOC_PARAM("theIndex", "The start index of the elements to return", DOC_TYPE_INTEGER);
+    DOC_PARAM("theCount", "The count of elements to return", DOC_TYPE_INTEGER);
+    DOC_RVAL("the requested list", DOC_TYPE_OBJECT);
+    DOC_END;
+    typedef dom::ValuePtr (NATIVE_VECTOR::*MyMethod)(asl::AC_SIZE_TYPE,asl::AC_SIZE_TYPE);
+    return Method<NATIVE_VECTOR>::call((MyMethod)&NATIVE_VECTOR::getList,cx,obj,argc,argv,rval);
+}
 
 JSFunctionSpec *
 JSResizeableVector::Functions() {
     AC_DEBUG << "Registering class '"<<ClassName()<<"'"<<endl;
     static JSFunctionSpec myFunctions[] = {
-        /* name         native          nargs    */
-        {"toString",         toString,        0},
-        {"item",             item,            1},
-        {"resize",           resize,          1},
-        {"append",           append,          1},
-        {"erase",            erase,           1},
-        {"insertBefore",     insertBefore,    2},
+        /* name                  native          nargs    */
+        {"toString",             toString,        0},
+        {"getItem",              getItem,         1},
+        {"setItem",              setItem,         2},
+        {"setList",              setList,         2},
+        {"getList",              getList,         2},
+        {"resize",               resize,          1},
+        {"appendItem",           appendItem,      1},
+        {"appendList",           appendList,      1},
+        {"eraseItem",            eraseItem,       1},
+        {"eraseList",            eraseList,       2},
+        {"insertItemBefore",     insertItemBefore,    2},
+        {"insertListBefore",     insertListBefore,    2},
         {0}
     };
     return myFunctions;
@@ -257,7 +380,9 @@ JSResizeableVector::getPropertySwitch(unsigned long theID, JSContext *cx, JSObje
 }
 
 JSBool JSResizeableVector::getPropertyIndex(unsigned long theIndex, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
-    *vp = as_jsval(cx, getNative().getElement(theIndex));
+    try {
+        *vp = as_jsval(cx, getNative().getItem(theIndex));
+    } HANDLE_CPP_EXCEPTION;
     return JS_TRUE;
 }
 
@@ -270,15 +395,10 @@ JSBool JSResizeableVector::setPropertySwitch(unsigned long theID, JSContext *cx,
 JSBool JSResizeableVector::setPropertyIndex(unsigned long theIndex, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
     dom::ValuePtr myArg;
     if (convertFrom(cx, *vp, getNative().elementName(), myArg)) {
-        //AC_TRACE << "JSResizeableVector::setPropertyIndex theIndex =" << theIndex << " myArg: " << myArg->getString() << endl;
-        bool mySuccess = openNative().setElement(theIndex,*myArg);
-        closeNative();
-        if (!mySuccess) {
-            JS_ReportError(cx, (string("JSResizeableVector::setPropertyIndex:") +
-                        " setElement failed: theIndex =" + as_string(theIndex) + " myArg: " +
-                          myArg->getString()).c_str());
-            return JS_FALSE;
-        }
+        NativeRef<dom::ResizeableVector> myNativeRef(cx,obj);
+        try {
+            myNativeRef.getValue().setItem(theIndex,*myArg);
+        } HANDLE_CPP_EXCEPTION;
         return JS_TRUE;
     }
     JS_ReportError(cx, (string("JSResizeableVector::setPropertyIndex:")

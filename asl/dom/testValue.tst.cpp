@@ -30,6 +30,7 @@
 
 #include <asl/base/UnitTest.h>
 #include <asl/base/Enum.h>
+#include <asl/base/string_functions.h>
 #include <asl/math/linearAlgebra.h>
 #include <asl/raster/raster.h>
 #include <asl/raster/standard_pixel_types.h>
@@ -48,9 +49,9 @@ using namespace dom;
 namespace dom {
     typedef asl::raster<asl::RGB> RasterOfRGB;
     typedef asl::raster<asl::gray<float> > RasterOfGRAYF;
-    DEFINE_VALUE_WRAPPER_TEMPLATE2(RasterOfRGB, dom::ComplexValue, dom::MakeResizeableRaster);
+    DEFINE_VALUE_WRAPPER_TEMPLATE3(RasterOfRGB, dom::ComplexValue, dom::MakeResizeableRaster, dom::SimpleValue<asl::RGB>);
     DEFINE_VALUE_WRAPPER_TEMPLATE(asl::RGB, SimpleValue);
-    DEFINE_VALUE_WRAPPER_TEMPLATE2(RasterOfGRAYF, dom::ComplexValue, dom::MakeResizeableRaster);
+    DEFINE_VALUE_WRAPPER_TEMPLATE3(RasterOfGRAYF, dom::ComplexValue, dom::MakeResizeableRaster, dom::SimpleValue<asl::gray<float> >);
     DEFINE_VALUE_WRAPPER_TEMPLATE(asl::gray<float>, SimpleValue);
 }
 
@@ -230,15 +231,16 @@ template <template <class,
                     template<class,class,class> class,
                     class > 
          class VALUE,
-         class T> 
+         class T,
+         class ELEMENT_VALUE> 
 struct ValueTraits;
 
-template<class T> struct ValueTraits<ComplexValue,T> {
-    typedef ComplexValue<T> ValueType;
+template<class T, class ElementValue> struct ValueTraits<ComplexValue,T, ElementValue> {
+    typedef ComplexValue<T, MakeResizeableVector, ElementValue> ValueType;
 };
 
-template<class T> struct ValueTraits<VectorValue,T> {
-    typedef VectorValue<T> ValueType;
+template<class T, class ElementValue> struct ValueTraits<VectorValue,T,ElementValue> {
+    typedef VectorValue<T, MakeResizeableVector, ElementValue> ValueType;
 };
 
 
@@ -246,7 +248,8 @@ template <template <class,
                     template<class,class,class> class,
                     class > 
          class VALUE, 
-         class T>
+         class T,
+         class ELEMENT_VALUE>
 class XmlVectorValueUnitTest : public TemplateUnitTest {
 public:
     XmlVectorValueUnitTest(const char * theTemplateArgument, T testValue) 
@@ -254,15 +257,18 @@ public:
           _someVariable(testValue), _myTypeName(theTemplateArgument) {}
     void run() {
 
-        typedef typename ValueTraits<VALUE,T>::ValueType ValueType;
+        typedef typename ValueTraits<VALUE,T,ELEMENT_VALUE>::ValueType ValueType;
 		
 		ValueType myDefaultConstructedValue(0);
 		SUCCESS("myDefaultConstructedValue");
 
 		ValueType myInitializedValue(_someVariable, 0);
 		ENSURE(myInitializedValue.getValue() == _someVariable);
+        ValueType myOriginalValue(_someVariable, 0);
+        T myOriginalVector = _someVariable;
 
-		ValueType myStringInitializedValue(asl::as_string(_someVariable), 0);
+        std::string myValueString = asl::as_string(_someVariable);
+		ValueType myStringInitializedValue(myValueString, 0);
 		ENSURE(myStringInitializedValue.getValue() == _someVariable);
 
         T mySavedValue = _someVariable;
@@ -302,6 +308,130 @@ public:
 		ENSURE(myBinValue);
 		ENSURE(dom::dynamic_cast_Value<T>(myBinValue.get()));
 		ENSURE(*dom::dynamic_cast_Value<T>(myBinValue.get()) == _someVariable);
+        
+        // now test vector operations
+        ValueType myTestValue(myOriginalVector, 0); // should contain three value
+        ENSURE(myTestValue.length() == myOriginalVector.size());
+        typedef typename ValueType::ACCESS_TYPE::ELEMENT_VALUE_TYPE ELEMENT_VALUE_TYPE;
+        //typedef Ptr<ELEMENT_VALUE_TYPE,dom::ThreadingModel> ELEMENT_VALUE_PTR;
+
+        //DPRINT(myTestValue.getString());
+        for (unsigned i = 0; i < myTestValue.length(); ++i) {
+            ValuePtr myElement = myTestValue.getItem(i);
+            ENSURE(myElement);
+            DPRINT(myElement->getString());
+            ENSURE(myElement->getString() == asl::as_string(myOriginalVector[i]));
+        }
+        ValuePtr myElement0 = myTestValue.getItem(0);
+        ENSURE(myElement0);
+        ValuePtr myElement1 = myTestValue.getItem(1);
+        ENSURE(myElement1);
+        ValuePtr myElement2 = myTestValue.getItem(2);
+        ENSURE(myElement2);
+        
+        // test item append
+        //DPRINT(myTestValue.getString());
+        myTestValue.appendItem(*myTestValue.getItem(0));
+        //DPRINT(myTestValue.getString());
+        ENSURE(myTestValue.length() == myOriginalVector.size()+1);
+        ENSURE(myTestValue.getItem(myTestValue.length()-1)->getString() == myTestValue.getItem(0)->getString());
+        
+        // test list get and append
+        ValuePtr myList = myTestValue.getList(1,2);
+        ENSURE(myList);
+        //DPRINT(myList->getString());
+        myTestValue.appendList(*myList);
+        //DPRINT(myList->getString());
+        //DPRINT(myTestValue.getString());
+        ENSURE(myTestValue.length() == myOriginalVector.size()+3);
+        ENSURE(myTestValue.getItem(myTestValue.length()-1)->getString() == myTestValue.getItem(2)->getString());
+        ENSURE(myTestValue.getItem(myTestValue.length()-2)->getString() == myTestValue.getItem(1)->getString());
+        //DPRINT(myTestValue.getString());
+        ValuePtr myFullList = myTestValue.getList(0,myTestValue.length());
+        ENSURE(myFullList);
+        ENSURE(myTestValue.getString() == myFullList->getString());
+        
+        // test item insertion
+        myTestValue.insertItemBefore(0, *myElement0);
+        ENSURE(myTestValue.getItem(0)->getString() == myElement0->getString());
+        ENSURE(myTestValue.length() == myOriginalVector.size()+4);
+        //DPRINT(myTestValue.getString());
+
+        myTestValue.insertItemBefore(1, *myElement1);
+        ENSURE(myTestValue.getItem(0)->getString() == myElement0->getString());
+        //DPRINT(myTestValue.getString());
+
+        myTestValue.insertItemBefore(2, *myElement2);
+        ENSURE(myTestValue.length() == myOriginalVector.size()+6);
+        DPRINT(myTestValue.getString());
+        
+        ValuePtr myNewList = myTestValue.getList(3,myTestValue.length()-3);
+        ENSURE(myNewList->getString() == myFullList->getString());
+        //DPRINT(myFullList->getString());
+        //DPRINT(myNewList->getString());
+
+        // list insertion
+        myFullList = myTestValue.getList(0,myTestValue.length());
+        myTestValue.insertListBefore(0, *myList);
+        //DPRINT(myTestValue.getString());
+        myNewList = myTestValue.getList(2,myTestValue.length()-2);
+        ENSURE(myNewList->getString() == myFullList->getString());
+        ValuePtr myInsertedList = myTestValue.getList(0,2);
+        ENSURE(myInsertedList->getString() == myList->getString());
+        //DPRINT(myInsertedList->getString());
+        //DPRINT(myTestValue.getString());
+        
+        // item erase
+        myNewList = myTestValue.getList(1,myTestValue.length()-1);
+        unsigned myCurLen = myTestValue.length();
+        myTestValue.eraseItem(0);
+        ENSURE_EXCEPTION(myTestValue.eraseItem(myTestValue.length()), AccessibleVector::IndexOutOfRange);
+        ENSURE(myTestValue.length() == myCurLen - 1);
+        myFullList = myTestValue.getList(0,myTestValue.length());
+        //DPRINT(myTestValue.getString());
+        ENSURE(myNewList->getString() == myFullList->getString());
+        
+        myNewList = myTestValue.getList(2,myTestValue.length()-2);
+        ENSURE(myNewList);
+        myTestValue.eraseItem(1);
+        myFullList = myTestValue.getList(1,myTestValue.length()-1);
+        ENSURE(myNewList->getString() == myFullList->getString());
+        //DPRINT(myTestValue.getString());
+        
+        myTestValue.setItem(0,*myElement0); // make list nice
+        
+        myNewList = myTestValue.getList(0,myTestValue.length()-1);
+        myTestValue.eraseItem(myTestValue.length()-1); // end
+        myFullList = myTestValue.getList(0,myTestValue.length());
+        ENSURE(myNewList->getString() == myFullList->getString());
+
+        //DPRINT(myTestValue.getString());
+        
+        // range erase
+        myNewList = myTestValue.getList(2,myTestValue.length()-2);
+        myCurLen = myTestValue.length();
+        myTestValue.eraseList(0,2);
+        ENSURE_EXCEPTION(myTestValue.eraseList(myTestValue.length(),1), AccessibleVector::IndexOutOfRange);
+        ENSURE(myTestValue.length() == myCurLen - 2);
+        myFullList = myTestValue.getList(0,myTestValue.length());
+        //DPRINT(myTestValue.getString());
+        ENSURE(myNewList->getString() == myFullList->getString());
+        
+        myNewList = myTestValue.getList(3,myTestValue.length()-3);
+        ENSURE(myNewList);
+        myTestValue.eraseList(1,2);
+        myFullList = myTestValue.getList(1,myTestValue.length()-1);
+        ENSURE(myNewList->getString() == myFullList->getString());
+        //DPRINT(myTestValue.getString());
+                
+        myNewList = myTestValue.getList(0,myTestValue.length()-2);
+        myTestValue.eraseList(myTestValue.length()-2,2); // end
+        myFullList = myTestValue.getList(0,myTestValue.length());
+        ENSURE(myNewList->getString() == myFullList->getString());
+        
+        //DPRINT(myTestValue.getString());
+        myTestValue.eraseList(0, myTestValue.length()); // all
+        ENSURE(myTestValue.length() == 0);
     }
 private:
     T _someVariable;
@@ -639,16 +769,17 @@ public:
         
         addTest(new XmlValueUnitTest<int>("int",23));
         addTest(new XmlValueUnitTest<float>("float",43.23f));
-        float myNumber[3] = { 1.0f, 2.0f, 3.0f };
+        
+        float myNumber[3] = { 0.0f, 1.0f, 2.0f };
         std::vector<float> myVec(myNumber, myNumber + 3);
-        addTest(new XmlVectorValueUnitTest<dom::VectorValue,std::vector<float> >("vector<float>",myVec));
+        addTest(new XmlVectorValueUnitTest<dom::VectorValue,std::vector<float>,SimpleValue<float> >("vector<float>",myVec));
 
         char * myStrings[5] = { "onehunderedtwentyonethousendfivehunderes","",
             "two", "threemillionfourhundredthousandandfourbillion",
         ""};
-        std::vector<std::string> myStringVec(myStrings, myStrings + 4);
-        addTest(new BinarizeVectorUnitTest<std::vector<std::string> >("vector<string>",myStringVec));
-        addTest(new XmlVectorValueUnitTest<dom::ComplexValue,std::vector<std::string> >("vector<string>",myStringVec));
+        std::vector<DOMString> myStringVec(myStrings, myStrings + 4);
+        addTest(new BinarizeVectorUnitTest<std::vector<DOMString> >("vector<string>",myStringVec));
+        addTest(new XmlVectorValueUnitTest<dom::ComplexValue,std::vector<DOMString>,StringValue >("vector<string>",myStringVec));
 
         asl::raster<asl::RGB> myRaster(3,4,RGB(10,11,12));
         myRaster(0,0) = RGB(20,21,22);

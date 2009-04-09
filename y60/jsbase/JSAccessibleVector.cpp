@@ -70,9 +70,11 @@
 #include "JSNode.h"
 #include "JSWrapper.impl"
 
+#include <asl/base/string_functions.h>
 #include <iostream>
 
 using namespace std;
+using namespace asl;
 
 namespace jslib {
 
@@ -82,20 +84,57 @@ typedef JSWrapper<NATIVE_VECTOR,dom::ValuePtr> Base;
 template class JSWrapper<NATIVE_VECTOR, dom::ValuePtr, VectorValueAccessProtocol>;
 
 static JSBool
-item(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+getItem(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Returns one item of the vector");
     DOC_PARAM("theIndex", "The index of the item to get", DOC_TYPE_INTEGER);
     DOC_RVAL("The item", DOC_TYPE_OBJECT);
     DOC_END;
     typedef dom::ValuePtr (NATIVE_VECTOR::*MyMethod)(int);
-    return Method<NATIVE_VECTOR>::call((MyMethod)&NATIVE_VECTOR::getElement,cx,obj,argc,argv,rval);
+    return Method<NATIVE_VECTOR>::call((MyMethod)&NATIVE_VECTOR::getItem,cx,obj,argc,argv,rval);
 }
+    
+static JSBool
+setItem(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("sets an element in the vector. Throws an exception, if index is out of bounds.");
+    DOC_PARAM("theIndex", "Index of the element to set.", DOC_TYPE_INTEGER);
+    DOC_RVAL("theElement", DOC_TYPE_OBJECT);
+    DOC_RVAL("success", DOC_TYPE_BOOLEAN);
+    DOC_END;
+    try {
+        if (argc != 2) {
+            JS_ReportError(cx, "setItem(thePos, theElement): needs two arguments");
+            return JS_FALSE;
+        }
+        
+        NativeRef<dom::AccessibleVector> myNativeRef(cx,obj);
+        dom::AccessibleVector & myNative = myNativeRef.getValue();
+        unsigned int myArg0;
+        dom::ValuePtr myArg1;
+        if (convertFrom(cx, argv[0], myArg0)) {
+            if (convertFrom(cx, argv[1], myNative.elementName(), myArg1)) {
+                myNative.setItem(myArg0, *myArg1);
+            } else {
+                JS_ReportError(cx, (string("JSAccessibleVector::setItem:") + "could not convert second argumentvalue "
+                                    +as_string(cx, argv[1])+" to type " + myNative.elementName()).c_str());
+                return JS_FALSE;
+            }
+        } else {
+            JS_ReportError(cx, (string("JSAccessibleVector::setItem:") + "could not convert first argument value "
+                                +as_string(cx, argv[0])+" to type unsigned integer").c_str());
+            return JS_FALSE;
+        }
+        
+    } HANDLE_CPP_EXCEPTION;
+    return JS_TRUE;
+}
+    
 JSFunctionSpec *
 JSAccessibleVector::Functions() {
     AC_DEBUG << "Registering class '"<<ClassName()<<"'"<<endl;
     static JSFunctionSpec myFunctions[] = {
         /* name         native          nargs    */
-        {"item",             item,            1},
+        {"getItem",             getItem,            1},
+        {"setItem",             setItem,            2},
         {0}
     };
     return myFunctions;
@@ -144,7 +183,9 @@ JSAccessibleVector::getPropertySwitch(unsigned long theID, JSContext *cx, JSObje
 }
 
 JSBool JSAccessibleVector::getPropertyIndex(unsigned long theIndex, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
-    *vp = as_jsval(cx, getNative().getElement(theIndex));
+    try {
+        *vp = as_jsval(cx, getNative().getItem(theIndex));
+    } HANDLE_CPP_EXCEPTION;
     return JS_TRUE;
 }
 
@@ -157,17 +198,20 @@ JSBool JSAccessibleVector::setPropertySwitch(unsigned long theID, JSContext *cx,
 JSBool JSAccessibleVector::setPropertyIndex(unsigned long theIndex, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
     dom::ValuePtr myArg;
     if (convertFrom(cx, *vp, getNative().elementName(), myArg)) {
-        //IF_NOISY_Y(AC_TRACE << "JSAccessibleVector::setPropertyIndex theIndex =" << theIndex << " myArg: " << (void*)myArg.get() << endl);
-        openNative().setElement(theIndex,*myArg);
-        closeNative();
+        NativeRef<dom::AccessibleVector> myNativeRef(cx,obj);
+        try {
+            myNativeRef.getValue().setItem(theIndex,*myArg);
+        } HANDLE_CPP_EXCEPTION;
         return JS_TRUE;
     }
-    return JS_TRUE;
+    JS_ReportError(cx, (string("JSResizeableVector::setPropertyIndex:")
+                        + "convertFrom failed: theIndex = " + as_string(theIndex)).c_str());
+    return JS_FALSE;
 }
 
 JSBool
 JSAccessibleVector::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Constructs a new accessible vecotr");
+    DOC_BEGIN("Constructs a new accessible vector");
     DOC_END;
     IF_NOISY2(AC_TRACE << "Constructor argc =" << argc << endl);
     if (JSA_GetClass(cx,obj) != Class()) {

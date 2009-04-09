@@ -33,6 +33,7 @@
 #include <asl/raster/pixels.h>
 #include <asl/base/Logger.h>
 
+#include <istream>
 #include <map>
 #define USE_SINGLE_ID_ATTRIB
 #ifdef USE_SINGLE_ID_ATTRIB
@@ -111,6 +112,25 @@ namespace asl {
         //  thePixel.get(alpha<VALUE>()).set(theValue);
     }
  }
+
+#if 0
+inline
+std::ostream & operator<<(std::ostream & os, const std::vector<unsigned char> & theBlock) {
+    for (unsigned i = 0; i < theBlock.size(); ++i) {
+        os << theBlock[i];
+    }
+    return os;
+}
+
+inline
+std::istream & operator>>(std::istream & is, std::vector<unsigned char> & theBlock) {
+    unsigned char c;
+    while(is >> c) {
+        theBlock.push_back(c);
+    }
+    return is;
+}
+#endif
 
 #define DBE(x) x
 namespace dom {
@@ -1069,24 +1089,72 @@ namespace dom {
         mutable bool _myValueHasChanged;
         bool _isValueWriteable;
     };
+    
+    DEFINE_EXCEPTION(IndexOutOfRange,asl::Exception);
+
 
     // interface for vector element access
     struct AccessibleVector {
+        DEFINE_NESTED_EXCEPTION(AccessibleVector,IndexOutOfRange,asl::Exception);
+        DEFINE_NESTED_EXCEPTION(AccessibleVector,TypeMismatch,asl::Exception);
         virtual const char * elementName() const = 0;
+        virtual const char * vectorName() const = 0;
+        virtual const char * valueName() const = 0;
         virtual asl::AC_SIZE_TYPE length() const = 0;
-        virtual ValuePtr getElement(asl::AC_SIZE_TYPE theIndex) const = 0;
-        virtual bool setElement(asl::AC_SIZE_TYPE theIndex, const ValueBase & theValue) = 0;
+        virtual ValuePtr getItem(asl::AC_SIZE_TYPE theIndex) const = 0;
+        virtual void setItem(asl::AC_SIZE_TYPE theIndex, const ValueBase & theValue) = 0;
         virtual ~AccessibleVector() {};
     };
-
+    
+    // helper function to access the native accessible_vector type
+    typedef asl::Ptr<AccessibleVector, dom::ThreadingModel> AccessibleVectorPtr;
+    inline
+    AccessibleVectorPtr accessible_vector_cast(ValuePtr & p) {
+        return dynamic_cast_Ptr<AccessibleVector>(p);
+    }
+    inline
+    const AccessibleVectorPtr accessible_vector_cast(const ValuePtr & p) {
+        return dynamic_cast_Ptr<AccessibleVector>(p);
+    }
+    inline
+    AccessibleVector & accessible_vector_cast(ValueBase & v) {
+        return dynamic_cast<AccessibleVector &>(v);
+    }
+    inline
+    const AccessibleVector & accessible_vector_cast(const ValueBase & v) {
+        return dynamic_cast<const AccessibleVector &>(v);
+    }
+    
     // interface for vector element access and resizing
-    struct ResizeableVector : public AccessibleVector {
+    struct ResizeableVector : public virtual AccessibleVector {
         virtual void resize(asl::AC_SIZE_TYPE newSize) = 0;
-        virtual bool append(const ValueBase & theValue) = 0;
-        virtual bool erase(asl::AC_SIZE_TYPE theIndex) = 0;
-        virtual bool insertBefore(asl::AC_SIZE_TYPE theIndex, const ValueBase & theValue) = 0;
-        virtual ~ResizeableVector() {};
+        virtual ValuePtr getList(asl::AC_SIZE_TYPE theIndex, asl::AC_SIZE_TYPE theCount) const = 0;
+        virtual void setList(asl::AC_SIZE_TYPE theIndex, const ValueBase & theValues) = 0;
+        virtual void appendItem(const ValueBase & theValue) = 0;
+        virtual void appendList(const ValueBase & theValues) = 0;
+        virtual void eraseItem(asl::AC_SIZE_TYPE theIndex) = 0;
+        virtual void eraseList(asl::AC_SIZE_TYPE theIndex, asl::AC_SIZE_TYPE theCount) = 0;
+        virtual void insertItemBefore(asl::AC_SIZE_TYPE theIndex, const ValueBase & theValue) = 0;
+        virtual void insertListBefore(asl::AC_SIZE_TYPE theIndex, const ValueBase & theValue) = 0;
     };
+    // helper function to access the native resizeable_vector type
+    typedef asl::Ptr<ResizeableVector, dom::ThreadingModel> ResizeableVectorPtr;
+    inline
+    ResizeableVectorPtr resizeable_vector_cast(ValuePtr & p) {
+        return dynamic_cast_Ptr<ResizeableVector>(p);
+    }
+    inline
+    const ResizeableVectorPtr resizeable_vector_cast(const ValuePtr & p) {
+        return dynamic_cast_Ptr<ResizeableVector>(p);
+    }
+    inline
+    ResizeableVector & resizeable_vector_cast(ValueBase & v) {
+        return dynamic_cast<ResizeableVector &>(v);
+    }
+    inline
+    const ResizeableVector & resizeable_vector_cast(const ValueBase & v) {
+        return dynamic_cast<const ResizeableVector &>(v);
+    }
     
     // interface for raster element access and resizing
     // TODO: this should be moved somewhere else
@@ -1432,9 +1500,14 @@ namespace dom {
         MakeOpaqueVector(VECTOR_VALUE & ) {}
     };
 
+    template <class VECTOR_VALUE, class T, class ELEMENT_VALUE> struct MakeAccessibleVector;
+    template <class VECTOR_VALUE, class T, class ELEMENT_VALUE> struct MakeResizeableVector;
+    template < class T, template<class,class,class> class ACCESS = MakeAccessibleVector, class ELEMENT_VALUE = SimpleValue<typename T::value_type> > class VectorValue;
+    template < class T, template<class,class,class> class ACCESS, class ELEMENT_VALUE> class VectorValue;
+    
     // A Mixin-template that turns a VectorValue into a AccessibleVector
     template <class VECTOR_VALUE, class T, class ELEMENT_VALUE>
-    struct MakeAccessibleVector : public AccessibleVector {
+    struct MakeAccessibleVector : public virtual AccessibleVector {
         typedef typename T::value_type ELEM;
 
         MakeAccessibleVector(VECTOR_VALUE & theVectorValue) : _myVectorValue(theVectorValue) {}
@@ -1442,129 +1515,229 @@ namespace dom {
         const char * elementName() const {
             return typeid(ELEM).name();
         }
+        const char * vectorName() const {
+            return typeid(T).name();
+        }
+        const char * valueName() const {
+            return typeid(VECTOR_VALUE).name();
+        }
 
         asl::AC_SIZE_TYPE length() const {
             return _myVectorValue.getValue().size();
         }
-        ValuePtr getElement(asl::AC_SIZE_TYPE theIndex) const {
+        ValuePtr getItem(asl::AC_SIZE_TYPE theIndex) const {
             if (theIndex < length()) {
                 ValuePtr myElem = ValuePtr(new ELEMENT_VALUE(_myVectorValue.getValue()[theIndex],
                     const_cast<VECTOR_VALUE &>(_myVectorValue).getNodePtr()));
                 return myElem;
             }
-            return ValuePtr();
+            throw IndexOutOfRange(JUST_FILE_LINE);
         }
-        bool setElement(asl::AC_SIZE_TYPE theIndex, const ValueBase & theValue) {
+        void setItem(asl::AC_SIZE_TYPE theIndex, const ValueBase & theValue) {
             const ELEM * myElem = dynamic_cast_Value<ELEM>(&theValue);
             if (!myElem) {
                 // fall back to string conversion
                 ELEM myElement = asl::as<ELEM>(theValue.getString());
                 _myVectorValue.openWriteableValue()[theIndex]=myElement;
                 _myVectorValue.closeWriteableValue();
-                return true;
+                return;
             }
             if (theIndex < length()) {
                 _myVectorValue.openWriteableValue()[theIndex]=*myElem;
                 _myVectorValue.closeWriteableValue();
-                return true;
+                return;
             }
-            return false;
+            throw IndexOutOfRange(JUST_FILE_LINE);
         }
+
     protected:
         void tryResize(asl::AC_SIZE_TYPE newSize) {}
-    private:
         VECTOR_VALUE & _myVectorValue;
     };
 
+
     // A Mixin-template that turns a VectorValue into a ResizeableVector
     template <class VECTOR_VALUE, class T, class ELEMENT_VALUE>
-    struct MakeResizeableVector : public ResizeableVector {
+    struct MakeResizeableVector : public virtual ResizeableVector, public MakeAccessibleVector<VECTOR_VALUE,T,ELEMENT_VALUE> {
         typedef typename T::value_type ELEM;
-
-        MakeResizeableVector(VECTOR_VALUE & theVectorValue) : _myVectorValue(theVectorValue) {}
+        typedef MakeAccessibleVector<VECTOR_VALUE,T,ELEMENT_VALUE> Base;
+        typedef ELEMENT_VALUE ELEMENT_VALUE_TYPE;
+        
+        MakeResizeableVector(VECTOR_VALUE & theVectorValue) : MakeAccessibleVector<VECTOR_VALUE,T,ELEMENT_VALUE>(theVectorValue) {}
         const char * elementName() const {
             return typeid(ELEM).name();
         }
-
+        const char * vectorName() const {
+            return typeid(T).name();
+        }
+        const char * valueName() const {
+            return typeid(VECTOR_VALUE).name();
+        }
+        
         asl::AC_SIZE_TYPE length() const {
-            return _myVectorValue.getValue().size();
+            return Base::_myVectorValue.getValue().size();
         }
-        ValuePtr getElement(asl::AC_SIZE_TYPE theIndex) const {
-            if (theIndex < length()) {
-                ValuePtr myElem = ValuePtr(new ELEMENT_VALUE(_myVectorValue.getValue()[theIndex],
-                                    const_cast<VECTOR_VALUE &>(_myVectorValue).getNodePtr()));
-                return myElem;
-            }
-            return ValuePtr();
+        ValuePtr getItem(asl::AC_SIZE_TYPE theIndex) const {
+            return Base::getItem(theIndex);
         }
-        bool setElement(asl::AC_SIZE_TYPE theIndex, const ValueBase & theValue) {
-            const ELEM * myElem = dynamic_cast_Value<ELEM>(&theValue);
-            if (!myElem) {
-                // fall back to string conversion
-                ELEM myElement = asl::as<ELEM>(theValue.getString());
-                _myVectorValue.openWriteableValue()[theIndex]=myElement;
-                _myVectorValue.closeWriteableValue();
-                return true;
+        
+        ValuePtr getList(asl::AC_SIZE_TYPE theIndex, asl::AC_SIZE_TYPE theCount) const {
+            if (theIndex+theCount <= length()) {
+                ValuePtr myResultValue = Base::_myVectorValue.create(0);
+                const T & myVector = Base::_myVectorValue.getValue();
+                T * myResults = dynamic_cast_and_openWriteableValue<T>(&*myResultValue);
+                myResults->resize(theCount);
+                for (asl::AC_SIZE_TYPE i = theIndex; i < theIndex + theCount;++i) {
+                    (*myResults)[i-theIndex] = myVector[i];
+                }
+                dynamic_cast_and_closeWriteableValue<T>(&*myResultValue);
+                return myResultValue;
             }
-            if (theIndex < length()) {
-                _myVectorValue.openWriteableValue()[theIndex]=*myElem;
-                _myVectorValue.closeWriteableValue();
-                return true;
+            throw AccessibleVector::IndexOutOfRange(std::string("getList: index+coount out of bounds, vector size = ")+asl::as_string(length())+
+                                 +", theIndex = "+asl::as_string(theIndex)+", theCount = "+asl::as_string(theCount),PLUS_FILE_LINE);
+        }
+        void setList(asl::AC_SIZE_TYPE theIndex, const ValueBase & theValue) {
+            const AccessibleVector * myArgument = dynamic_cast<const AccessibleVector *>(&theValue);
+            if (myArgument) {
+                asl::AC_SIZE_TYPE myArgumentLength = myArgument->length();
+                asl::AC_SIZE_TYPE myLength = this->length();
+                if (theIndex + myArgumentLength <= myLength) {
+                    for (asl::AC_SIZE_TYPE i = 0; i <  myArgumentLength;++i) {
+                        this->setItem(theIndex + i, *myArgument->getItem(i));
+                    }
+                    return;
+                }
+                throw AccessibleVector::IndexOutOfRange(std::string("setList: too many elements to fit into existing vector, vector size = ")+
+                                                    asl::as_string(myLength)+", start index = "+asl::as_string(theIndex)+
+                                                    ", argument element count = "+asl::as_string(myArgumentLength),PLUS_FILE_LINE);
             }
-            return false;
+            throw AccessibleVector::TypeMismatch("setList: argument is not a vector",PLUS_FILE_LINE);
+        }
+        
+        void setItem(asl::AC_SIZE_TYPE theIndex, const ValueBase & theValue) {
+            Base::setItem(theIndex, theValue);
         }
 
         void resize(asl::AC_SIZE_TYPE newSize) {
-            _myVectorValue.openWriteableValue().resize(newSize);
-            _myVectorValue.closeWriteableValue();
+            Base::_myVectorValue.openWriteableValue().resize(newSize);
+            Base::_myVectorValue.closeWriteableValue();
         }
 
-       bool append(const ValueBase & theValue) {
+       void appendItem(const ValueBase & theValue) {
            const ELEM * myElem = dynamic_cast_Value<ELEM>(&theValue);
-            if (myElem) {
-                asl::AC_SIZE_TYPE myLength = length();
-                T & myValue = _myVectorValue.openWriteableValue();
-                myValue.resize(myLength+1);
-                myValue[myLength]=*myElem;
-                _myVectorValue.closeWriteableValue();
-                return true;
-            }
-            return false;
+           asl::AC_SIZE_TYPE myLength = length();
+           if (!myElem) {
+               // try fall back to string conversion, will throw on failure
+               ELEM myElement = asl::as<ELEM>(theValue.getString());
+               T & myValue = Base::_myVectorValue.openWriteableValue();
+               myValue.resize(myLength+1);
+               myValue[myLength]= myElement;
+               Base::_myVectorValue.closeWriteableValue();
+               return;
+           } else {
+               T & myValue = Base::_myVectorValue.openWriteableValue();
+               myValue.resize(myLength+1);
+               myValue[myLength]= *myElem;
+               Base::_myVectorValue.closeWriteableValue();
+               return;
+           }
+           throw AccessibleVector::TypeMismatch(std::string("appendItem: argument is can not be converted to type ")+elementName(), PLUS_FILE_LINE);
         }
-        bool erase(asl::AC_SIZE_TYPE theIndex) {
+        void appendList(const ValueBase & theValue) {
+            try {
+                const AccessibleVector & myArgument = accessible_vector_cast(theValue);
+                asl::AC_SIZE_TYPE myArgumentLength = myArgument.length();
+                asl::AC_SIZE_TYPE myLength = this->length();
+                resize(myLength+myArgumentLength);
+                setList(myLength, theValue);
+                return;
+            } catch (std::bad_cast &) {
+            }
+            throw AccessibleVector::TypeMismatch("appendList: argument is not a vector", PLUS_FILE_LINE);
+        }
+        void eraseItem(asl::AC_SIZE_TYPE theIndex) {
             if (theIndex < length()) {
                 asl::AC_SIZE_TYPE myLength = length()-1;
-                T & myValue = _myVectorValue.openWriteableValue();
+                T & myValue = Base::_myVectorValue.openWriteableValue();
                 for (asl::AC_SIZE_TYPE i = theIndex; i < myLength; ++i) {
                     myValue[i] = myValue[i+1];
                 }
                 myValue.resize(myLength);
-                _myVectorValue.closeWriteableValue();
-                return true;
+                Base::_myVectorValue.closeWriteableValue();
+                return;
             }
-            return false;
+            throw AccessibleVector::IndexOutOfRange(std::string("eraseItem: index out of bounds, index =  ")+asl::as_string(theIndex)+
+                                              ", vector size = "+asl::as_string(length()), PLUS_FILE_LINE);
         }
-        bool insertBefore(asl::AC_SIZE_TYPE theIndex, const ValueBase & theValue) {
-            const ELEM * myElem = dynamic_cast_Value<ELEM>(&theValue);
-            if (myElem && theIndex <= length()) {
-                asl::AC_SIZE_TYPE myLength = length();
-                T & myValue = _myVectorValue.openWriteableValue();
-                myValue.resize(myLength+1);
+        void eraseList(asl::AC_SIZE_TYPE theIndex, asl::AC_SIZE_TYPE theCount) {
+            if (theIndex+theCount <= length()) {
+                asl::AC_SIZE_TYPE myLength = length()-theCount;
+                T & myValue = Base::_myVectorValue.openWriteableValue();
                 for (asl::AC_SIZE_TYPE i = theIndex; i < myLength; ++i) {
-                    myValue[i+1] = myValue[i];
+                    myValue[i] = myValue[i+theCount];
                 }
-                myValue[theIndex]=*myElem;
-                _myVectorValue.closeWriteableValue();
-                return true;
+                myValue.resize(myLength);
+                Base::_myVectorValue.closeWriteableValue();
+                return;
             }
-            return false;
+            throw AccessibleVector::IndexOutOfRange(std::string("eraseList: index+count out of bounds, index =  ")+asl::as_string(theIndex)+
+                                   ", count = "+asl::as_string(theCount)+", vector size = "+asl::as_string(length()),PLUS_FILE_LINE);
+        }
+        void insertItemBefore(asl::AC_SIZE_TYPE theIndex, const ValueBase & theValue) {
+            const ELEM * myElem = dynamic_cast_Value<ELEM>(&theValue);
+            if (theIndex <= length()) {
+                asl::AC_SIZE_TYPE myLength = length();
+                if (!myElem) {
+                    // try fall back to string conversion, will throw on failure
+                    ELEM myElement = asl::as<ELEM>(theValue.getString());
+                    T & myValue = Base::_myVectorValue.openWriteableValue();
+                    myValue.resize(myLength+1);
+                    for (asl::AC_SIZE_TYPE i = myLength; i > theIndex; --i) {
+                        myValue[i] = myValue[i-1];
+                    }
+                    myValue[theIndex]=myElement;
+                    Base::_myVectorValue.closeWriteableValue();
+                    return;
+                } else {
+                    T & myValue = Base::_myVectorValue.openWriteableValue();
+                    myValue.resize(myLength+1);
+                    for (asl::AC_SIZE_TYPE i = myLength; i > theIndex; --i) {
+                        myValue[i] = myValue[i-1];
+                    }
+                    myValue[theIndex]=*myElem;
+                    Base::_myVectorValue.closeWriteableValue();
+                    return;
+                }
+            }
+            throw AccessibleVector::IndexOutOfRange(std::string("insertItemBefore: index out of bounds, index =  ")+asl::as_string(theIndex)+
+                                              ", vector size = "+asl::as_string(length()), PLUS_FILE_LINE);
+        }
+        void insertListBefore(asl::AC_SIZE_TYPE theIndex, const ValueBase & theValue) {
+            const AccessibleVector * myArgument = dynamic_cast<const AccessibleVector *>(&theValue);
+            if (myArgument) {
+                asl::AC_SIZE_TYPE myArgumentLength = myArgument->length();
+                asl::AC_SIZE_TYPE myLength = this->length();
+                if (theIndex <= myLength && myArgumentLength > 0) {
+                    // make gap
+                    T & myValue = Base::_myVectorValue.openWriteableValue();
+                    myValue.resize(myLength+myArgumentLength);
+                    for (asl::AC_SIZE_TYPE i = myLength+myArgumentLength-1; i >= theIndex + myArgumentLength; --i) {
+                        myValue[i] = myValue[i-myArgumentLength];
+                    }
+                    Base::_myVectorValue.closeWriteableValue();
+                    // insert values
+                    setList(theIndex, theValue);
+                    return;
+                }
+                throw AccessibleVector::IndexOutOfRange(std::string("insertListBefore: index out of bounds, index =  ")+asl::as_string(theIndex)+
+                                                    ", vector size = "+asl::as_string(length()), PLUS_FILE_LINE);
+            }
+            throw AccessibleVector::TypeMismatch("appendList: argument is not a vector", PLUS_FILE_LINE);
         }
     protected:
         void tryResize(asl::AC_SIZE_TYPE newSize) {
             resize(newSize);
         }
-    private:
-        VECTOR_VALUE & _myVectorValue;
     };
 
     template<class T>
@@ -1576,8 +1749,8 @@ namespace dom {
     // template class for all vector and raster types
     template <
         class T,
-        template<class,class,class> class ACCESS = MakeAccessibleVector,
-        class ELEMENT_VALUE = SimpleValue<typename T::value_type>
+        template<class,class,class> class ACCESS,
+        class ELEMENT_VALUE
     >
     class VectorValue :
         public SimpleValue<T>,
@@ -1712,15 +1885,22 @@ namespace dom {
     // You have to provide binarize(), debinarize(), operator<<() and operator>>()
     // in order to use your class wrapped by ComplexValue.
     // Note that already a std::vector<std::string> must be wrapped as ComplexValue.
+    /*
     template <
-        class T,
-        template<class,class,class> class ACCESS = MakeOpaqueVector,
-        class ELEMENT_VALUE = SimpleValue<typename T::value_type>
+    class T,
+    template<class,class,class> class ACCESS = MakeOpaqueVector,
+    class ELEMENT_VALUE = SimpleValue<typename T::value_type>
+    >
+     */
+    template <
+    class T,
+    template<class,class,class> class ACCESS,
+    class ELEMENT_VALUE
     >
     class ComplexValue :
         public Value<T>,
         public ACCESS<ComplexValue<T,ACCESS,ELEMENT_VALUE>,T,ELEMENT_VALUE>,
-        public asl::PoolAllocator<ComplexValue<T> >
+        public asl::PoolAllocator<ComplexValue<T,ACCESS,ELEMENT_VALUE> >
     {
     public:
         typedef typename T::value_type ELEM;

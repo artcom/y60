@@ -32,20 +32,17 @@ Value.h
 
 set(TESTS
 Facade
-#UTF8
-#Value
+# UTF8
+Value
 XmlDom
 Xml
 )
-
-# XXX hack to find boost for OSX
-# include_directories(/opt/local/include)
 
 ac_add_library(
     asldom asl/dom
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     TESTS   ${TESTS}
-    DEPENDS aslbase aslraster
+    DEPENDS aslbase aslraster aslmath
     EXTERNS OPENEXR
 )
