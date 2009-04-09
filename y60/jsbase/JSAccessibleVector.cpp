@@ -89,7 +89,7 @@ getItem(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_PARAM("theIndex", "The index of the item to get", DOC_TYPE_INTEGER);
     DOC_RVAL("The item", DOC_TYPE_OBJECT);
     DOC_END;
-    typedef dom::ValuePtr (NATIVE_VECTOR::*MyMethod)(int);
+    typedef dom::ValuePtr (NATIVE_VECTOR::*MyMethod)(asl::AC_SIZE_TYPE) const;
     return Method<NATIVE_VECTOR>::call((MyMethod)&NATIVE_VECTOR::getItem,cx,obj,argc,argv,rval);
 }
     
@@ -98,7 +98,6 @@ setItem(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("sets an element in the vector. Throws an exception, if index is out of bounds.");
     DOC_PARAM("theIndex", "Index of the element to set.", DOC_TYPE_INTEGER);
     DOC_RVAL("theElement", DOC_TYPE_OBJECT);
-    DOC_RVAL("success", DOC_TYPE_BOOLEAN);
     DOC_END;
     try {
         if (argc != 2) {
