@@ -95,7 +95,8 @@ namespace y60 {
            _myCurrentDirection(FORWARD),
            _myPreviousAnimTime(-1),
            _myEffectiveRuntime(0),
-           _myDomVersion(0)
+           _myDomVersion(0),
+           _isEnabled(false)
     {
         update();
     }
@@ -140,6 +141,11 @@ namespace y60 {
             _myPlayType = (AnimationDirection)(asl::getEnumFromString(
                 myAttribute->nodeValue(), AnimationDirectionString));
         }
+        
+        myAttribute = _myNode->getAttribute(ANIM_ENABLED_ATTRIB);
+        if (myAttribute) {
+            _isEnabled = myAttribute->dom::Node::nodeValueRef<bool>();
+        }
 
         _myCurrentDirection = _myPlayType;
         _myDomVersion = _myNode->nodeVersion();
@@ -148,7 +154,10 @@ namespace y60 {
 
     bool
     AnimationBase::isEnabled() const {
-        return _myNode->dom::Node::getAttributeValue<bool>(ANIM_ENABLED_ATTRIB);
+        if (_myDomVersion != _myNode->nodeVersion()) {
+            const_cast<AnimationBase*>(this)->update();
+        }
+        return _isEnabled;
     }
 
     double

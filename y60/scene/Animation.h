@@ -103,9 +103,14 @@ namespace asl {
 
 namespace y60 {
 
+    DEFINE_EXCEPTION(TypeMismatch, asl::Exception);
+
     template <class T, class ANIMATED_ATTRIBUTE_VALUE>
     class AnimationValueSetter {
-        public:
+    public:
+        typedef typename dom::ValueWrapper<ANIMATED_ATTRIBUTE_VALUE>::Type AnimatedValueType;
+        typedef asl::Ptr<AnimatedValueType, dom::ThreadingModel> AnimatedValuePtr;
+        
         AnimationValueSetter(dom::NodePtr theAnimatedValue, unsigned theAnimatedIndex) 
             : _myAnimatedAttribute(theAnimatedValue),
               _myAnimatedIndex(theAnimatedIndex)
@@ -116,17 +121,34 @@ namespace y60 {
         }
         void setValue(const T & theNewValue) {
                 if (!(theNewValue == _myPreviousValue)) {
+#if 0
                     dom::Node::WritableValue<ANIMATED_ATTRIBUTE_VALUE> myAnimatedAttributeLock(_myAnimatedAttribute);
                     ANIMATED_ATTRIBUTE_VALUE & myAnimatedAttributeValue = myAnimatedAttributeLock.get();
                     myAnimatedAttributeValue[_myAnimatedIndex] = theNewValue;
                     _myPreviousValue  = theNewValue;
+#else
+                    updateAnimatedValuePtr();
+                    ANIMATED_ATTRIBUTE_VALUE & myAnimatedAttributeValue = _myAnimatedValuePtr->openWriteableValue();
+                    myAnimatedAttributeValue[_myAnimatedIndex] = theNewValue;
+                    _myAnimatedValuePtr->closeWriteableValue();
+                    _myPreviousValue  = theNewValue;
+#endif
                 }
             }
-
+        void updateAnimatedValuePtr() {
+            dom::ValuePtr myValuePtr = _myAnimatedAttribute->nodeValueWrapperPtr();
+            if (_myAnimatedValuePtr != &*myValuePtr) {
+                _myAnimatedValuePtr = dynamic_cast<AnimatedValueType*>(&*myValuePtr);
+                if (!_myAnimatedValuePtr) {
+                    throw TypeMismatch(std::string("Animated Value is not of type")+asl::demangled_name<AnimatedValueType>(), PLUS_FILE_LINE);
+                }
+            }
+        }
          private:
             dom::NodePtr     _myAnimatedAttribute;
             unsigned         _myAnimatedIndex;
             T                _myPreviousValue;
+            AnimatedValueType * _myAnimatedValuePtr; 
     };
 
     template <>
@@ -208,14 +230,30 @@ namespace y60 {
             Animation(dom::NodePtr theNode, dom::NodePtr theValueList, dom::NodePtr theAnimatedAttribute, unsigned theAnimatedIndex, bool theAngleAnimation)
                 : AnimationBase(theNode, theAngleAnimation),
                 _myValuesNode(theValueList->childNode(0)),
-                _myValueSetter(theAnimatedAttribute, theAnimatedIndex)
-            {}
+                _myValueSetter(theAnimatedAttribute, theAnimatedIndex),
+                _myValues(0),
+                _myValuesBase(0)
+            {
+            }
             
             Animation(dom::NodePtr theNode, dom::NodePtr theValueList, dom::NodePtr theAnimatedAttribute, bool theAngleAnimation)
                 : AnimationBase(theNode, theAngleAnimation),
                 _myValuesNode(theValueList->childNode(0)),
-                _myValueSetter(theAnimatedAttribute, 0)
-            {}
+                _myValueSetter(theAnimatedAttribute, 0),
+                _myValues(0),
+                _myValuesBase(0)
+
+            {
+            }
+            
+            // just dynamic_cast once or when the ValuePtr has changed, which almost never happens
+            const std::vector<T> & getValues() {
+                if (_myValuesBase != &(_myValuesNode->dom::Node::nodeValueWrapper())) {
+                    _myValues = &(_myValuesNode->dom::Node::nodeValueRef<std::vector<T> >());
+                    _myValuesBase = &(_myValuesNode->dom::Node::nodeValueWrapper());
+                }
+                return *_myValues;
+            }
 
             virtual ~Animation() {}
 
@@ -224,7 +262,8 @@ namespace y60 {
                 int     myUpperIndex = 0;
                 double  myAlpha = 0;
 
-                const std::vector<T> & myValues = _myValuesNode->dom::Node::nodeValueRef<std::vector<T> >();
+                //const std::vector<T> & myValues = _myValuesNode->dom::Node::nodeValueRef<std::vector<T> >();
+                const std::vector<T> & myValues = getValues();
                 unsigned int myResult = calcIndicies(myLowerIndex, myUpperIndex, myAlpha,
                                                      theTime, myValues.size());
                 if (myResult == 0) {
@@ -242,12 +281,15 @@ namespace y60 {
             Animation();
 
             dom::NodePtr          _myValuesNode;
+            const std::vector<T> * _myValues;
+            const dom::ValueBase * _myValuesBase;
             AnimationValueSetter<T, ANIMATED_ATTRIBUTE_VALUE> _myValueSetter;
             
             void setToEndValue() {
                 // TODO: Account for clipping.
-                const std::vector<T> & myValues = _myValuesNode->dom::Node::nodeValueRef<std::vector<T> >();
-                if (getCurrentDirection() == FORWARD) {
+                //const std::vector<T> & myValues = _myValuesNode->dom::Node::nodeValueRef<std::vector<T> >();
+                const std::vector<T> & myValues = getValues();
+               if (getCurrentDirection() == FORWARD) {
                     _myValueSetter.setValue(myValues[myValues.size() - 1]);
                 } else {
                     _myValueSetter.setValue(myValues[0]);

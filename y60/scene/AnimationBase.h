@@ -142,6 +142,7 @@ namespace y60 {
             double           _myPreviousAnimTime;
             double           _myEffectiveRuntime;
             asl::Unsigned64   _myDomVersion;
+            bool              _isEnabled;
     };
 
     typedef asl::Ptr<AnimationBase> AnimationPtr;
