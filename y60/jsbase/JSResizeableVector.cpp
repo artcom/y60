@@ -165,6 +165,24 @@ appendItem(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     } HANDLE_CPP_EXCEPTION;
     return JS_TRUE;    
 }
+
+static 
+dom::ValuePtr makeListValue(JSContext *cx, NativeRef<dom::ResizeableVector> & theNativeRef, jsval theArg) {
+    try {
+        const dom::ValueBase & thisValue = dynamic_cast<const dom::ValueBase &>(theNativeRef.getValue());
+        dom::ValuePtr newValue = thisValue.create(as_string(cx, theArg), 0);
+        return newValue;
+    } catch (dom::ConversionFailed &) {}
+    
+    // try argument conversion by string
+    std::string myArrayString;
+    if (JSA_ArrayToString(cx, &theArg, myArrayString)) {
+        const dom::ValueBase & thisValue = dynamic_cast<const dom::ValueBase &>(theNativeRef.getValue());
+        return thisValue.create(myArrayString, 0);
+    } else {
+        return dom::ValuePtr();
+    }
+}
     
 static JSBool
 appendList(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -181,9 +199,21 @@ appendList(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             JS_ReportError(cx, "JSResizeableVector::appendList(theList): argument is not an object");
             return JS_FALSE;
         }
-        const dom::ResizeableVector & myVector = JSClassTraits<dom::ResizeableVector>::getNativeRef(cx, JSVAL_TO_OBJECT(argv[0]));
-        const dom::ValueBase & myVectorValue = dynamic_cast<const dom::ValueBase &>(myVector);
-        myNativeRef.getValue().appendList(myVectorValue);
+        try {
+            const dom::ResizeableVector & myVector = JSClassTraits<dom::ResizeableVector>::getNativeRef(cx, JSVAL_TO_OBJECT(argv[0]));
+            const dom::ValueBase & myVectorValue = dynamic_cast<const dom::ValueBase &>(myVector);
+            myNativeRef.getValue().appendList(myVectorValue);
+            return JS_TRUE;
+        } catch (jslib::BadJSNative &) {}
+
+        dom::ValuePtr myNewValue = makeListValue(cx, myNativeRef, argv[0]);
+        if (myNewValue) {
+            myNativeRef.getValue().appendList(*myNewValue);
+        } else {
+            JS_ReportError(cx, "JSResizeableVector::appendList(theList): argument conversion failed");
+            return JS_FALSE;
+        }
+
     } HANDLE_CPP_EXCEPTION;
     return JS_TRUE;    
 }
@@ -259,9 +289,21 @@ insertListBefore(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
                 JS_ReportError(cx, "JSResizeableVector::insertListBefore(thePos, theList): argument #2 is not an object");
                 return JS_FALSE;
             }
-            const dom::ResizeableVector & myVector = JSClassTraits<dom::ResizeableVector>::getNativeRef(cx, JSVAL_TO_OBJECT(argv[1]));
-            const dom::ValueBase & myVectorValue = dynamic_cast<const dom::ValueBase &>(myVector);
-            myNativeRef.getValue().insertListBefore(thePos, myVectorValue);
+
+            try {
+                const dom::ResizeableVector & myVector = JSClassTraits<dom::ResizeableVector>::getNativeRef(cx, JSVAL_TO_OBJECT(argv[1]));
+                const dom::ValueBase & myVectorValue = dynamic_cast<const dom::ValueBase &>(myVector);
+                myNativeRef.getValue().insertListBefore(thePos, myVectorValue);
+                return JS_TRUE;
+            } catch (jslib::BadJSNative &) {}
+
+            dom::ValuePtr myNewValue = makeListValue(cx, myNativeRef, argv[1]);
+            if (myNewValue) {
+                myNativeRef.getValue().insertListBefore(thePos, *myNewValue);
+            } else {
+                JS_ReportError(cx, "JSResizeableVector::insertListBefore(thePos, theList): argument conversion failed");
+                return JS_FALSE;
+            }
         } else {
             JS_ReportError(cx, (string("JSResizeableVector::insertListBefore(thePos, theList):") + "could not convert first argument value "
                                 +as_string(cx, argv[0])+" to type unsigned integer").c_str());
@@ -291,9 +333,21 @@ setList(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
                 JS_ReportError(cx, "JSResizeableVector::setList(thePos, theList): argument #2 is not an object");
                 return JS_FALSE;
             }
-            const dom::ResizeableVector & myVector = JSClassTraits<dom::ResizeableVector>::getNativeRef(cx, JSVAL_TO_OBJECT(argv[1]));
-            const dom::ValueBase & myVectorValue = dynamic_cast<const dom::ValueBase &>(myVector);
-            myNativeRef.getValue().setList(thePos, myVectorValue);
+         
+            try {
+                const dom::ResizeableVector & myVector = JSClassTraits<dom::ResizeableVector>::getNativeRef(cx, JSVAL_TO_OBJECT(argv[1]));
+                const dom::ValueBase & myVectorValue = dynamic_cast<const dom::ValueBase &>(myVector);
+                myNativeRef.getValue().setList(thePos, myVectorValue);
+                return JS_TRUE;
+            } catch (jslib::BadJSNative &) {}
+
+            dom::ValuePtr myNewValue = makeListValue(cx, myNativeRef, argv[1]);
+            if (myNewValue) {
+                myNativeRef.getValue().setList(thePos, *myNewValue);
+            } else {
+                JS_ReportError(cx, "JSResizeableVector::setList(thePos, theList): argument conversion failed");
+                return JS_FALSE;
+            }
         } else {
             JS_ReportError(cx, (string("JSResizeableVector::setList(thePos, theList):") + "could not convert first argument value "
                                 +as_string(cx, argv[0])+" to type unsigned integer").c_str());

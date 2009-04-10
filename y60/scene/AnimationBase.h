@@ -108,7 +108,12 @@ namespace y60 {
             void setForwardDirection(bool theFlag);
 
             unsigned int getLoops();
-
+            asl::Unsigned64 getVersion() {
+                return _myDomVersion;
+            }
+            dom::NodePtr getNode() {
+                return _myNode;
+            }
 
         protected:
             unsigned int calcIndicies(int & theLowerIndex, int & theUpperIndex, double & theAlpha,
@@ -116,6 +121,9 @@ namespace y60 {
 
             bool isAngleAnimation();
             AnimationDirection getCurrentDirection();
+            void setVersion(asl::Unsigned64 myVersion) {
+                _myDomVersion = myVersion;
+            }
 
         private:
             double getRealDuration();
@@ -133,6 +141,7 @@ namespace y60 {
             AnimationDirection _myCurrentDirection;
             double           _myPreviousAnimTime;
             double           _myEffectiveRuntime;
+            asl::Unsigned64   _myDomVersion;
     };
 
     typedef asl::Ptr<AnimationBase> AnimationPtr;

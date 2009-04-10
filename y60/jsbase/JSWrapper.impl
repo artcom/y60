@@ -81,14 +81,14 @@ JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL> *
 JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL>::getJSWrapperPtr(JSContext *cx, JSObject *obj)
 {
     if (JSA_GetClass(cx,obj) != Class()) {
-        JS_ReportError(cx,"JSWrapper::getJSWrapperPtr: class type %s expected",ClassName());
+        //JS_ReportError(cx,"JSWrapper::getJSWrapperPtr: class type %s expected",ClassName());
         return 0;
     }
     JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL> * myJSWrapper = 
             static_cast<JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL>*>(JS_GetPrivate(cx,obj));
-    if (!myJSWrapper) {
-        JS_ReportError(cx,"JSWrapper::getJSWrapperPtr: internal error, binding object does not exist");
-    }
+    //if (!myJSWrapper) {
+    //    JS_ReportError(cx,"JSWrapper::getJSWrapperPtr: internal error, binding object does not exist");
+    //}
     return myJSWrapper;
 }
 
@@ -97,12 +97,13 @@ template <class NATIVE, class OWNERPTR,
 JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL> & 
 JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL>::getJSWrapper(JSContext *cx, JSObject *obj) 
 {
-    JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL> * myJSWrapper = getJSWrapperPtr(cx,obj);
+    if (JSA_GetClass(cx,obj) != Class()) {
+        throw BadJSNative(std::string("JSWrapper::getJSWrapper: class type'")+ClassName()+"'expected",PLUS_FILE_LINE);
+    }
+    JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL> * myJSWrapper = 
+            static_cast<JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL>*>(JS_GetPrivate(cx,obj));
     if (!myJSWrapper) {
-        JS_ReportError(cx,
-                "JSWrapper::getJSWrapper: internal error, binding object does not exist");
-        static JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL> myDummy;
-        return myDummy;
+        throw BadJSNative("JSWrapper::getJSWrapper: internal error, binding object does not exist", PLUS_FILE_LINE);
     }
     return *myJSWrapper;
 }

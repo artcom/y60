@@ -112,7 +112,7 @@ namespace asl {
     as(const std::string & theString) {
         T outValue;
         if (!asl::fromString(theString,outValue)) {
-            throw ParseException("as","could not convert to desired type");
+            throw ParseException("as<T>",std::string("could not convert '")+theString+"' to type "+demangled_name<T>());
         };
         return outValue;
     }

@@ -84,7 +84,7 @@ using namespace dom;
 namespace y60 {
 
     AnimationClip::AnimationClip(NodePtr theNode, AnimationManager & theAnimationManager, dom::NodePtr theWorld) :
-            _myNode(theNode), _isActive(false)
+            _myNode(theNode), _isActive(false), _myDomVersion(0)
     {
         load(theAnimationManager, theWorld);
     }
@@ -94,6 +94,9 @@ namespace y60 {
 
     void
     AnimationClip::load(AnimationManager & theAnimationManager, dom::NodePtr theWorld) {
+        if (_myDomVersion == _myNode->nodeVersion()) {
+            return;
+        }
         dom::NodePtr myAttribute = _myNode->getAttribute(NAME_ATTRIB);
         if (myAttribute) {
             _myName = myAttribute->dom::Node::nodeValue();
@@ -114,8 +117,55 @@ namespace y60 {
                 _myAnimations.push_back(theAnimationManager.createAnimation(myChildNode, theWorld));
             }
         }
+        _myDomVersion = _myNode->nodeVersion();
     }
-
+    void
+    AnimationClip::reload(NodePtr theNode, AnimationManager & theAnimationManager, dom::NodePtr theWorld) {
+        if (!theNode->isSameNode(_myNode)) {
+            _myAnimations .resize(0);
+             _isActive=false;
+             _myDomVersion=0;
+             _myNode = theNode;
+             load(theAnimationManager, theWorld);
+             return;
+        }
+        if (_myDomVersion == _myNode->nodeVersion()) {
+            return;
+        }
+        dom::NodePtr myAttribute = _myNode->getAttribute(NAME_ATTRIB);
+        if (myAttribute) {
+            _myName = myAttribute->dom::Node::nodeValue();
+        }
+        DB(AC_DEBUG << "Clip reloaded: " << _myName << endl);
+        unsigned myAnimationCount = _myNode->childNodesLength();
+        unsigned myAnimation = 0;
+        for (unsigned i = 0; i < myAnimationCount; ++i) {
+            const dom::NodePtr myChildNode = _myNode->childNode(i);
+            if (myChildNode->nodeType() == dom::Node::ELEMENT_NODE &&
+                myChildNode->nodeName() == ANIMATION_NODE_NAME)
+            {
+                string myAnimName = "";
+                dom::NodePtr myAnimNameAttribute = myChildNode->getAttribute(NAME_ATTRIB);
+                if (myAnimNameAttribute) {
+                    myAnimName = myAnimNameAttribute->dom::Node::nodeValue();
+                }
+                DB(AC_DEBUG << "     Animation created: " << myAnimName << endl);
+                if (myAnimation < _myAnimations.size()) {
+                    if (_myAnimations[myAnimation]->getNode()->isSameNode(myChildNode)) {
+                        _myAnimations[myAnimation]->update();
+                        myAnimation++;
+                    } else {
+                        _myAnimations.erase(_myAnimations.begin()+myAnimation, _myAnimations.end());
+                    }
+                } else {
+                    _myAnimations.push_back(theAnimationManager.createAnimation(myChildNode, theWorld));
+                    myAnimation++;
+                }
+            }
+        }
+        _myDomVersion = _myNode->nodeVersion();
+    }
+    
     void
     AnimationClip::update() {
         for (unsigned i = 0; i < _myAnimations.size(); ++i) {

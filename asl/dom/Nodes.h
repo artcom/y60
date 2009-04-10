@@ -1161,7 +1161,16 @@ namespace dom {
                                   const DOMString & theAttributeValue,
                                   bool theDeepSearchFlag,
                                   std::vector<NodePtr> & theResults) const;
-
+        dom::NodePtr
+        Node::getElementByAttribute(const DOMString & theElementName,
+                          const DOMString & theAttributeName,
+                          const DOMString & theAttributeValue);
+                          
+        const dom::NodePtr
+        Node::getElementByAttribute(const DOMString & theElementName,
+                          const DOMString & theAttributeName,
+                          const DOMString & theAttributeValue) const;
+                          
         const NodePtr getChildElementById(const DOMString & theId, const DOMString & theIdAttribute) const;
         NodePtr getChildElementById(const DOMString & theId, const DOMString & theIdAttribute);
         const NodePtr getElementById(const DOMString & theId, const DOMString & theIdAttribute="id") const;

@@ -94,13 +94,17 @@ namespace y60 {
            _myPlayType(FORWARD),
            _myCurrentDirection(FORWARD),
            _myPreviousAnimTime(-1),
-           _myEffectiveRuntime(0)
+           _myEffectiveRuntime(0),
+           _myDomVersion(0)
     {
         update();
     }
 
     void
     AnimationBase::update() {
+        if (_myDomVersion == _myNode->nodeVersion()) {
+            return;
+        }
         dom::NodePtr myAttribute = _myNode->getAttribute(ANIM_BEGIN_ATTRIB);
         if (myAttribute) {
             _myBegin = myAttribute->dom::Node::nodeValueRef<float>();
@@ -138,6 +142,7 @@ namespace y60 {
         }
 
         _myCurrentDirection = _myPlayType;
+        _myDomVersion = _myNode->nodeVersion();
 
     }
 

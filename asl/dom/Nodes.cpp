@@ -895,6 +895,56 @@ dom::Node::childNodeByAttribute(const DOMString & theElementName,
     return dom::NodePtr();
 }
 
+dom::NodePtr
+Node::getElementByAttribute(const DOMString & theElementName,
+                          const DOMString & theAttributeName,
+                          const DOMString & theAttributeValue)
+{
+    for (NodeList::size_type i = 0; i < childNodes().length(); ++i) {
+        NodePtr myChild = childNode(i);
+        if (myChild->nodeType() == dom::Node::ELEMENT_NODE) {
+            const NodePtr myAttribute = myChild->getAttribute(theAttributeName);
+            const DOMString & myElementName = myChild->nodeName();
+            if (myAttribute && (theElementName.size() == 0 || myElementName == theElementName)) {
+                const DOMString & myElementValue = myAttribute->nodeValue();
+                if (theAttributeValue.size() == 0 || myElementValue == theAttributeValue) {
+                    return myChild;
+                }
+            }
+            NodePtr myResult = myChild->getElementByAttribute(theElementName, theAttributeName, theAttributeValue);
+            if (myResult) {
+                return myResult;
+            }
+        }
+    }
+    return NodePtr();
+}
+
+const dom::NodePtr
+Node::getElementByAttribute(const DOMString & theElementName,
+                          const DOMString & theAttributeName,
+                          const DOMString & theAttributeValue) const
+{
+    for (NodeList::size_type i = 0; i < childNodes().length(); ++i) {
+        const NodePtr myChild = childNode(i);
+        if (myChild->nodeType() == dom::Node::ELEMENT_NODE) {
+            const NodePtr myAttribute  = myChild->getAttribute(theAttributeName);
+            const DOMString & myElementName  = myChild->nodeName();
+            if (myAttribute && (theElementName.size() == 0 || myElementName == theElementName)) {
+                const DOMString & myElementValue = myAttribute->nodeValue();
+                if (theAttributeValue.size() == 0 || myElementValue == theAttributeValue) {
+                    return myChild;
+                }
+            }
+            const NodePtr myResult = myChild->getElementByAttribute(theElementName, theAttributeName, theAttributeValue);
+            if (myResult) {
+                return myResult;
+            }
+        }
+    }
+    return NodePtr();
+}
+
 void
 Node::getNodesByAttribute(const DOMString & theElementName,
                           const DOMString & theAttributeName,
@@ -907,9 +957,9 @@ Node::getNodesByAttribute(const DOMString & theElementName,
         if (myChild->nodeType() == dom::Node::ELEMENT_NODE) {
             const NodePtr myAttribute      = myChild->getAttribute(theAttributeName);
             const DOMString & myElementName  = myChild->nodeName();
-            if (myAttribute && (theElementName == "" || myElementName == theElementName)) {
+            if (myAttribute && (theElementName.size() == 0 || myElementName == theElementName)) {
                 const DOMString & myElementValue = myAttribute->nodeValue();
-                if (theAttributeValue == "" || myElementValue == theAttributeValue) {
+                if (theAttributeValue.size() == 0 || myElementValue == theAttributeValue) {
                     theResults.push_back(myChild);
                 }
             }

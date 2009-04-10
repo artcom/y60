@@ -243,7 +243,7 @@ namespace y60 {
 
             dom::NodePtr          _myValuesNode;
             AnimationValueSetter<T, ANIMATED_ATTRIBUTE_VALUE> _myValueSetter;
-
+            
             void setToEndValue() {
                 // TODO: Account for clipping.
                 const std::vector<T> & myValues = _myValuesNode->dom::Node::nodeValueRef<std::vector<T> >();

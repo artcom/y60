@@ -941,6 +941,7 @@ struct JSClassTraitsWrapper {
 };
 
 DEFINE_EXCEPTION(BadArgumentException, asl::Exception);
+DEFINE_EXCEPTION(BadJSNative, asl::Exception);
 
 Y60_JSBASE_DECL void
 checkForUndefinedArguments(const std::string & theMethodName, uintN argc, jsval *argv);

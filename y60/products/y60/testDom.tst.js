@@ -545,17 +545,26 @@ ValueUnitTest.prototype.Constructor = function(obj, theName) {
         ENSURE("myFloatVector.getItem(0) == 42");
         obj.myFloatVector.insertListBefore(0,obj.myFullList);
         ENSURE("myFullList.length + 2 == myFloatVector.length");
+        
+        obj.myFloatVector.eraseList(0, obj.myFloatVector.length);
+        obj.myFloatVector.appendList(new Vector4f(0,1,2,3));
+        SUCCESS("appendList(new Vector4f(0,1,2,3))");
+        ENSURE("4 == myFloatVector.length");
+        obj.myFloatVector.appendList([0,1,2,3]);
+        SUCCESS("appendList([0,1,2,3])");
+        ENSURE("8 == myFloatVector.length");
+
 	}
 }
 
 var myTestName = "testDOM.tst.js";
 var mySuite = new UnitTestSuite(myTestName);
 
-mySuite.addTest(new ValueUnitTest());
 mySuite.addTest(new DomEventTest());
 mySuite.addTest(new DomParseUnitTest());
 mySuite.addTest(new SchemaUnitTest());
 mySuite.addTest(new NodeUnitTest());
+mySuite.addTest(new ValueUnitTest());
 mySuite.run();
 
 print(">> Finished test suite '"+myTestName+"', return status = " + mySuite.returnStatus() + "");

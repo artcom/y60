@@ -91,7 +91,8 @@ namespace y60 {
             bool isActive();
             void setActive();
             void setLoops(unsigned int theLoops);
-            void setForwardDirection(bool theFlag);            
+            void setForwardDirection(bool theFlag);  
+            void reload(dom::NodePtr theNode, AnimationManager & theAnimationManager, dom::NodePtr theWorld);          
             
             unsigned int getLoops();
 
@@ -103,6 +104,7 @@ namespace y60 {
             dom::NodePtr     _myNode;
             double           _myStartTime;
             bool             _isActive;
+            asl::Unsigned64  _myDomVersion;
 
     };
     typedef asl::Ptr<AnimationClip> AnimationClipPtr;

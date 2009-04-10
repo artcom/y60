@@ -108,13 +108,25 @@ namespace y60 {
         } else if (myName == "frustum.hfov") {
             theComponent = AnimationBase::HFOV;
             myName = "frustum";
-        } else if (int myPos = myName.find_first_of(".[") != std::string::npos) {
-            if (myName[myPos] == '.') {
-                theComponent = AnimationBase::AttributeComponent(asl::as<int>(myName.substr(myPos+1, myName.length())));
-            } else {
-                theComponent = AnimationBase::AttributeComponent(asl::as<int>(myName.substr(myPos+1, myName.length()-1)));
+        } else {
+            size_t myPos = myName.find('[');
+            if (myPos != std::string::npos) {
+                size_t myCPos = myName.find(']');
+                if (myCPos != std::string::npos) {
+                    std::string myNumberString = myName.substr(myPos+1, myCPos-myPos-1);
+                    size_t myIndex;
+                    if (asl::fromString(myNumberString, myIndex)) {
+                        theComponent = AnimationBase::AttributeComponent(myIndex);
+                    } else {
+                        throw AnimationManagerException(string("Malformed animation target name '") + theName +
+                            "' , could not convert '"+ myNumberString+ " to unsigned integer", PLUS_FILE_LINE);   
+                    }
+                } else {
+                    throw AnimationManagerException(string("Malformed animation target name '") + theName +
+                        "' , missing ]", PLUS_FILE_LINE);   
+                }
+                myName = myName.substr(0,myPos);
             }
-            myName = myName.substr(0,myPos);
         }
         return myName;
     }
@@ -183,11 +195,18 @@ namespace y60 {
                     }
                 }
 #else
+#if 0
                 std::string myExpression = std::string(".//*[@name = '") + myAttributeRef + "']";
                 dom::NodePtr myPropPtr = xpath::find(myExpression, myAnimatedNode);
                 if (myPropPtr) {
                     myAnimatedAttribute = myPropPtr->firstChild();
                 }
+#else
+                dom::NodePtr myPropPtr = myAnimatedNode->getElementByAttribute("","name",myAttributeRef);
+                if (myPropPtr) {
+                    myAnimatedAttribute = myPropPtr->firstChild();
+                }
+#endif
 #endif
                 if (!myAnimatedAttribute) {
                     throw AnimationManagerException(string("Property with name '") + myAttributeRef + "' not defined in \n" +
@@ -391,7 +410,11 @@ namespace y60 {
 
     void
     AnimationManager::loadGlobals(const dom::NodePtr theNode, dom::NodePtr theWorld) {
-        _myGlobalAnimations = AnimationClipPtr(new AnimationClip(theNode, *this, theWorld));
+        if (!_myGlobalAnimations) {
+            _myGlobalAnimations = AnimationClipPtr(new AnimationClip(theNode, *this, theWorld));
+        } else {
+            _myGlobalAnimations->reload(theNode, *this, theWorld);
+        }
         _myGlobalAnimations->setActive();
     }
 
