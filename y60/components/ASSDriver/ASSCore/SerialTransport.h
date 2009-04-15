@@ -89,14 +89,9 @@ namespace y60 {
     private:
         asl::SerialDevice * _mySerialPort;
 
-        int  _myPortNum;
+        int         _myPortNum;
         std::string _myPortName;
-
-        int  _myBaudRate;
-        int  _myBitsPerSerialWord;
-        int  _myStopBits;
-        bool _myHandshakingFlag;
-        asl::SerialDevice::ParityMode _myParity;
+        int         _myBaudRate;
     };
 
 } // end of namespace

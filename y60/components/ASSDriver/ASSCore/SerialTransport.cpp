@@ -80,11 +80,7 @@ SerialTransport::SerialTransport(const dom::NodePtr & theSettings) :
     _mySerialPort(0),
     _myPortNum(-1),
     _myPortName("-"),
-    _myBaudRate(57600),
-    _myBitsPerSerialWord(8),
-    _myStopBits(1),
-    _myHandshakingFlag(false),
-    _myParity(SerialDevice::NO_PARITY)
+    _myBaudRate(460800)
 {
     AC_DEBUG << "SerialTransport::SerialTransport()";
 
@@ -106,10 +102,6 @@ SerialTransport::settingsChanged(dom::NodePtr theSettings) {
     myChangedFlag |= settingChanged( theSettings, "SerialPort", _myPortNum );
     myChangedFlag |= settingChanged( theSettings, "SerialPortName", _myPortName );
     myChangedFlag |= settingChanged( theSettings, "BaudRate", _myBaudRate );
-    myChangedFlag |= settingChanged( theSettings, "BitsPerWord", _myBitsPerSerialWord );
-    myChangedFlag |= settingChanged( theSettings, "Parity", _myParity );
-    myChangedFlag |= settingChanged( theSettings, "StopBits", _myStopBits );
-    myChangedFlag |= settingChanged( theSettings, "Handshaking", _myHandshakingFlag );
 
     return myChangedFlag;
 }
@@ -118,11 +110,7 @@ void
 SerialTransport::init(dom::NodePtr theSettings) {
     getConfigSetting(theSettings, "SerialPort", _myPortNum, -1);
     getConfigSettingString(theSettings, "SerialPortName", _myPortName, "-");
-    getConfigSetting(theSettings, "BaudRate", _myBaudRate, 57600);
-    getConfigSetting(theSettings, "BitsPerWord", _myBitsPerSerialWord, 8);
-    getConfigSetting(theSettings, "Parity", _myParity, SerialDevice::NO_PARITY);
-    getConfigSetting(theSettings, "StopBits", _myStopBits, 1);
-    getConfigSetting(theSettings, "Handshaking", _myHandshakingFlag, false);
+    getConfigSetting(theSettings, "BaudRate", _myBaudRate, 460800);
 }
 
 
@@ -149,8 +137,7 @@ SerialTransport::establishConnection() {
     }
 
     try {
-        _mySerialPort->open(_myBaudRate, _myBitsPerSerialWord,
-           _myParity, _myStopBits, _myHandshakingFlag, 0, 1);
+        _mySerialPort->open(_myBaudRate, 8, SerialDevice::NO_PARITY, 1, false, 0, 1);
 
         _mySerialPort->setStatusLine(SerialDevice::RTS);
 

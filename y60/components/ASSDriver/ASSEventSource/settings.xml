@@ -24,11 +24,7 @@
         <Port>10001</Port>
         <SerialPort>-1</SerialPort>
         <SerialPortName>/dev/ttyUSB0</SerialPortName>
-        <BaudRate>230400</BaudRate>
-        <BitsPerWord min="5" max="8">8</BitsPerWord>
-        <Parity>no_parity</Parity>
-        <StopBits min="1" max="2">1</StopBits>
-        <Handshaking min="0" max="1">0</Handshaking>
+        <BaudRate>460800</BaudRate>
         <MinTouchInterval step="0.01">0.2</MinTouchInterval>
         <MinTouchThreshold step="0.1">9.0</MinTouchThreshold>
         <InterpolationMethod min="0" max="1" step="1">1</InterpolationMethod>
