@@ -1,6 +1,6 @@
 /* __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Copyright (C) 1993-2008, ART+COM AG Berlin, Germany <www.artcom.de>
+// Copyright (C) 1993-2009, ART+COM AG Berlin, Germany <www.artcom.de>
 //
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
@@ -55,23 +55,6 @@
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
-
-spark.nameToIdMap = {};
-
-spark.registerNode = function(theName, theNode) {
-    if(theName in spark.nameToIdMap) {
-        throw new Exception("Spark-registered node name used twice.");
-    }
-    spark.nameToIdMap[theName] = theNode.id;
-};
-
-spark.getNode = function(theName) {
-    if(theName in spark.nameToIdMap) {
-        return window.scene.dom.getElementById(spark.nameToIdMap[theName]);
-    } else {
-        return null;
-    }
-};
 
 spark.cachedImages = {};
 

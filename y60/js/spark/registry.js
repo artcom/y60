@@ -56,30 +56,19 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-// object system
-use("common.js");
+spark.nameToIdMap = {};
 
-/**
- * The SPARK namespace.
- * 
- * Everything defined by the spark library goes into this namespace.
- */
-var spark = Namespace("spark");
+spark.registerNode = function(theName, theNode) {
+    if(theName in spark.nameToIdMap) {
+        throw new Exception("Spark-registered node name used twice.");
+    }
+    spark.nameToIdMap[theName] = theNode.id;
+};
 
-// component instantiator
-use("meta.js");
-// spark file (and dom) loader
-use("load.js");
-// hacks around y60 text rendering
-use("text.js");
-// component registry
-use("registry.js");
-// image caching
-use("cache.js");
-// basic component classes
-use("components.js");
-
-// XXX: spark widgets
-if ("useSparkWidgets" in this) {
-    use("widgets.js");
-}
+spark.getNode = function(theName) {
+    if(theName in spark.nameToIdMap) {
+        return window.scene.dom.getElementById(spark.nameToIdMap[theName]);
+    } else {
+        return null;
+    }
+};

@@ -95,11 +95,14 @@ spark.loadDocument = function(theNode, theParent) {
 spark.instantiateRecursively = function(theNode, theParent) {
 
     if (!theNode){
-        Logger.error("no node given.");
-        exit(1);
+        Logger.fatal("Internal fault: instantiateRecursively called without a node.");
     }
 
-    // shortcut for defining template classes
+    // XXX: this is how templates are registered and coerced into
+    //      template classes. this mechanism might be generalizable
+    //      and generally useful. Think "node handlers vs component instantiation",
+    //      where the former could, for example, be components that can be given
+    //      child nodes that are purely descriptive.
     if(theNode.nodeName == "Template") {
         var myFile = theNode.src;
         var myName = theNode.name;
@@ -108,14 +111,16 @@ spark.instantiateRecursively = function(theNode, theParent) {
         return null;
     }
 
+    // ignore comments
     if(theNode.nodeName == "#comment") {
         return null;
     }
 
     var myName = theNode.nodeName;
+    
+    // ignore and warn about unknown component classes
     if (! (myName in spark.componentClasses)){
-        Logger.warning("Skipping node '" +  myName + 
-                     "'. No matching component found.");
+        Logger.warning("Unknown component class " +  myName + ". Ignoring definition.");
         return null;
     }
 
@@ -135,7 +140,7 @@ spark.instantiateRecursively = function(theNode, theParent) {
 };
 
 /**
- * Internal: instantiate a component
+ * Internal: instantiate a single component
  */
 spark.instantiateComponent = function(theNode) {
     Logger.info("Instantiating " + theNode.nodeName + ("name" in theNode ? " named " + theNode.name : ""));
