@@ -104,7 +104,7 @@ function Inherit(theClass) {
     theClass.Constructor.apply(this, myArguments);
 };
 
-function InheritForeign(theClass) {
+function InheritOldschool(theClass) {
     var myArguments = Array.prototype.slice.call(arguments);
     theClass.prototype.Constructor.apply(this, myArguments);
 };

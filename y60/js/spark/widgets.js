@@ -292,7 +292,6 @@ spark.Widget.Constructor = function(Protected) {
         return _myOrigin.y;
     };
 
-
     Protected.originZ getter = function() {
         return _myOrigin.z;
     };
@@ -410,10 +409,9 @@ spark.Widget.Constructor = function(Protected) {
                                        Protected.getNumber("y", 0.0),
                                        Protected.getNumber("z", 0.0));
         
-        // XXX: this really must go. soon.
-        var myPos = Protected.getArray("pos", []);
-        if(myPos.length > 0) {
-            Public.position = new Vector3f(myPos);    
+        var myPosition = Protected.getArray("position", []);
+        if(myPosition.length > 0) {
+            Public.position = new Vector3f(myPosition);    
         }
                                        
         Public.scale = new Vector3f(Protected.getNumber("scaleX", 1.0),
@@ -758,40 +756,46 @@ spark.Text.Constructor = function(Protected) {
     
     Base.realize = Public.realize;
     Public.realize = function() {
-        // get attributes
-        _mySize = new Vector2f(Protected.getNumber("width", 0),
-                               Protected.getNumber("height", 0));
-                               
+        // size is mandatory
+        _mySize = new Vector2f(Protected.getNumber("width"),
+                               Protected.getNumber("height"));
+        
         // retrieve text
         _myText = Protected.getString("text", "");
-        // maybe overwrite with a language dependent version        
-        _myText = Protected.realizeI18N(_myText);
         
+        // handle internationalization
+        _myTextId = Protected.getString("textId", "");
+        if(_myTextId != "") {
+            var myI18nText = Protected.getI18nText(_myTextId);
+            if(myI18nText) {
+                _myText = myI18nText;
+            }
+        }
+        
+        // extract font style
         _myStyle = spark.fontStyleFromNode(Public.node);
-        // construct scene
-        _myImage    = spark.createTextImage(_mySize);
-        _myImage.name = Public.name + "-image";
-        _myTexture  = Modelling.createTexture(window.scene, _myImage);
-        _myTexture.name = Public.name + "-texture";
+        
+        // construct scene representation
+        _myImage      = spark.createTextImage(_mySize);
+        _myImage.name = Public.name + "-image"; // XXX: must have name
+        
+        _myTexture          = Modelling.createTexture(window.scene, _myImage);
+        _myTexture.name     = Public.name + "-texture"; // XXX: must have name
         _myTexture.wrapmode = "clamp_to_edge";
         
-        // render
-        render();
-        _myInitialSize = getImageSize(_myImage);
-        if(_mySize)
-        _myMaterial = Modelling.createUnlitTexturedMaterial(window.scene, _myTexture, Public.name + "-material", true);
+        _myMaterial = Modelling.createUnlitTexturedMaterial(window.scene, _myTexture, Public.name + "-material", true); // XXX: must have name
         
-        _myShape    = Modelling.createQuad(window.scene, _myMaterial.id, new Vector3f(0,0,0),
-                                           new Vector3f(_myInitialSize.x, _myInitialSize.y, 0));
-        _myShape.name = Public.name + "-shape";
+        _myShape      = Modelling.createQuad(window.scene, _myMaterial.id, new Vector3f(0,0,0),
+                                             new Vector3f(_myInitialSize.x, _myInitialSize.y, 0));
+        _myShape.name = Public.name + "-shape"; // XXX: must have name
 
-        _myBody  = Modelling.createBody(Public.parent.sceneNode, _myShape.id);
-        _myBody.name = Public.name;
+        _myBody      = Modelling.createBody(Public.parent.sceneNode, _myShape.id);
+        _myBody.name = Public.name; // XXX: must have name
         
-        // render
+        // finally, render the text
         render();
 
-	    // initialize upwards
+        // initialize upwards
         Base.realize(_myBody);
     };
 };
@@ -872,32 +876,33 @@ spark.Movie.Constructor = function(Protected) {
 
 };
 
-
 // XXX: revisit. good idea though.
 spark.Model = spark.ComponentClass("Model");
 
 spark.Model.Constructor = function(Protected) {
     var Base = {};
     var Public = this;
-    this.Inherit(spark.Body);    
+    
+    this.Inherit(spark.Body);
+        
     Base.realize = Public.realize;
     Public.realize = function() {
-        var myY60Name = Protected.getString("y60_name", "");  
-        if (myY60Name != "") {                           
-            var myY60DomObject = window.scene.dom.find("//*[@name='" + myY60Name + "']");
-            var myPosition = new Vector3f(myY60DomObject.position);
-            var myOrientation = new Quaternionf(myY60DomObject.orientation);
-            var myScale = new Vector3f(myY60DomObject.scale);
-            Base.realize(myY60DomObject);            
-            Public.position = myPosition;
-            Public.orientation = myOrientation;
-            Public.scale = myScale;
-        }
+        var myY60Name = Protected.getString("rootName");  
+        var myY60DomObject = window.scene.dom.find("//*[@name='" + myY60Name + "']");
+        var myPosition = new Vector3f(myY60DomObject.position);
+        var myOrientation = new Quaternionf(myY60DomObject.orientation);
+        var myScale = new Vector3f(myY60DomObject.scale);
+        Base.realize(myY60DomObject);            
+        Public.position = myPosition;
+        Public.orientation = myOrientation;
+        Public.scale = myScale;
     }
+    
     Base.postRealize = Public.postRealize;
     Public.postRealize = function() {
         Base.postRealize();
     }
+    
     Base.propagateAlpha = Public.propagateAlpha;
     Public.propagateAlpha = function() {
         Base.propagateAlpha();

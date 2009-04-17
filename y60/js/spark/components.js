@@ -146,11 +146,6 @@ spark.Component.Constructor = function(Protected) {
         }
     };
     
-    // XXX: this is a very very ugly hack
-    Public.acquisition = function(theComponentTypeName, theItemId) {
-        return (_myNode.nodeName == theComponentTypeName &&  Public.node.getElementById(theItemId)) ? _myNode:null;
-    }
-
     // XXX: I18N should be implemented with a property type
     Protected.realizeI18N = function(theItem, theAttribute) {
         var myConcreteItem = theItem;
@@ -238,66 +233,58 @@ spark.Container.Constructor = function(Protected) {
 
     this.Inherit(spark.Component);
 
-    var _myChildArray = [];
-    var _myChildMap   = {};
+    var _myChildren = [];
+    var _myNamedChildMap   = {};
 
     Public.children getter = function() {
-        return _myChildArray; // XXX: clone?
+        return _myChildren; // XXX: clone?
     };
 
     Public.addChild = function(theChild) {
-        _myChildArray.push(theChild);
+        _myChildren.push(theChild);
         if(theChild.name) {
-            _myChildMap[theChild.name] = theChild;
+            _myNamedChildMap[theChild.name] = theChild;
         }
         theChild.parent = Public;
     };
 
-    // XXX: why was this introduced?
-    Public.getChildAt = function(theIndex) {
-        return _myChildArray[theIndex];
-    };
-
     Public.getChildByName = function(theName) {
-        if (theName in _myChildMap) {
-            return _myChildMap[theName];
+        if (theName in _myNamedChildMap) {
+            return _myNamedChildMap[theName];
         } else {
             return null;
         }
     };
-
-    // XXX: very very dirty hack
-    Public.acquisition = function(theComponentTypeName, theItemId) {
-        if (Public.node.nodeName == theComponentTypeName &&  
-            (theItemId==undefined || Public.node.getElementById(theItemId))) {
-            return Public.node;
-        } 
-        for(var i = 0; i < _myChildArray.length; i++) {
-           if (_myChildArray[i].node.nodeName == theComponentTypeName  &&  
-               (theItemId==undefined || _myChildArray[i].node.getElementById(theItemId))) {
-                return _myChildArray[i];
-            }       
+    
+    Public.findChildrenByName = function(theName) {
+        var myChildren = [];
+        var myOwnChild = Public.getChildByName(theName);
+        if(myOwnChild) {
+            myChildren.push(myOwnChild);
         }
-        if (Public.parent) {
-            return Public.parent.acquisition(theComponentTypeName, theItemId);
-        } else {
-            return null;
+        for(var i = 0; i < _myChildren.length; i++) {
+            var myGrandchildren = myChild.findChildrenByName();
+            if(myGrandchildren.length > 0) {
+                myChildren = myChildren.concat(myGrandchildren);
+            }
         }
-    }
+        return myChildren;
+    };
 
     // XXX: rework realization
     Base.realize = Public.realize;
     Public.realize = function() {
         Base.realize();
-        for(var i = 0; i < _myChildArray.length; i++) {
-            _myChildArray[i].realize();
+        for(var i = 0; i < _myChildren.length; i++) {
+            _myChildren[i].realize();
         }
-    };    
+    };
+        
     Base.postRealize = Public.postRealize;
     Public.postRealize = function() {
         Base.postRealize();
-        for(var i = 0; i < _myChildArray.length; i++) {
-            _myChildArray[i].postRealize();
+        for(var i = 0; i < _myChildren.length; i++) {
+            _myChildren[i].postRealize();
         }
     };
 
@@ -308,5 +295,4 @@ spark.Container.Constructor = function(Protected) {
         }
     };
 };
-
 
