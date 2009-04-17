@@ -606,9 +606,19 @@ spark.Image.Constructor = function(Protected) {
 
     Base.realize = Public.realize;
     Public.realize = function() {
-        var myImageSource = Protected.getString("src");
-        
-        _myImage    = spark.getCachedImage(myImageSource);
+        var myImageSource = Protected.getString("src", "");
+
+        var myWidth;
+        var myHeight;
+        if(myImageSource == "") {
+            myWidth  = Protected.getNumber("width");
+            myHeight = Protected.getNumber("height");
+            _myImage = Modelling.createImage(window.scene, myWidth, myHeight, "BGRA");
+        } else {
+            _myImage = spark.getCachedImage(myImageSource);
+            myWidth  = Protected.getNumber("width" , _myImage.raster.width);
+            myHeight = Protected.getNumber("height", _myImage.raster.height);
+        }
 
         _myTexture  = Modelling.createTexture(window.scene, _myImage);
         _myTexture.name = Public.name + "-texture";
@@ -616,8 +626,7 @@ spark.Image.Constructor = function(Protected) {
 
         _myMaterial = Modelling.createUnlitTexturedMaterial(window.scene, _myTexture, Public.name + "-material", true);
 
-        var mySize = new Vector3f(Protected.getNumber("width" , _myImage.raster.width),
-                               Protected.getNumber("height", _myImage.raster.height), 0);
+        var mySize = new Vector3f(myWidth, myHeight, 0);
                                
         Protected.origin = Protected.getVector3f("origin", [0,0,0]);
         var myLowerLeft = new Vector3f(-Protected.origin.x,-Protected.origin.y,-Protected.origin.z);
