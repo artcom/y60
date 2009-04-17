@@ -110,6 +110,11 @@ spark.LoadedClass = function(theClassName, theFile) {
     // get the template base class constructor
     var myTemplateNode = myDocument.firstChild;
     var myBaseClass = myTemplateNode.nodeName;
+
+    if(!(myBaseClass in spark.componentClasses)) {
+        Logger.error("Component class " + myBaseClass + " is unknown at this point");
+    }
+
     var myBaseConstructor = spark.componentClasses[myBaseClass];
     
     // build a constructor wrapper
@@ -126,6 +131,10 @@ spark.LoadedClass = function(theClassName, theFile) {
 
         // call the base class constructor
         myBaseConstructor.call(this, myWovenNode);
+
+        // override the objects class
+        this._className_ = theClassName;
+        this._class_     = myInitializingConstructor;
 
         // instantiate children
         this.instantiateChildren(myWovenNode);
