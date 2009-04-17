@@ -57,7 +57,7 @@
 */
 
 /**
- * Scene nodes wrap Y60 scene objects.
+ * Widgets wrap Y60 scene objects.
  * 
  * This is where positioning, orientation, scaling,
  * visibility and sensibility go.
@@ -68,17 +68,32 @@ spark.Widget.Constructor = function(Protected) {
     var Base = {};
     var Public = this;
 
-    this.Inherit(spark.Container);
+    this.Inherit(spark.EventDispatcher);
 
     var _mySceneNode   = null;
-    
-    // XXX: what the fuck?
-    var _myPressedFlag = new Array();
     
     // XXX: try to get rid of this.
     Public.sceneNode getter = function() {
         return _mySceneNode;
     };
+
+    // XXX: function for getting screen-aligned bounds
+    Public.worldposition getter = function() {
+        return _mySceneNode.globalmatrix.getTranslation();
+    };
+
+    // XXX: function for getting bounds
+    Public.size getter = function() {
+        var myBoundingBox = _mySceneNode.boundingbox;
+        var myWidth = 0;
+        if(myBoundingBox == "[]"){
+            Logger.warning("BoundingBox not initialized - size getter not yet implemented")
+            return new Vector2f(0,0);
+        } else {
+            return myBoundingBox.size;
+        }
+        
+    }
 
 
     // ALPHA
@@ -123,11 +138,6 @@ spark.Widget.Constructor = function(Protected) {
     };
     
     
-    // XXX: this needs a place. here can't be it. thank you.
-    Public.isPressed = function(theButton) {
-        return _myPressedFlag[theButton];
-    }
-    
     // VISIBILITY
 
     Public.visible getter = function() {
@@ -165,19 +175,6 @@ spark.Widget.Constructor = function(Protected) {
     }
     
     // SIZE
-
-    // XXX: good idea. bad implementation.
-    Public.size getter = function() {
-        var myBoundingBox = _mySceneNode.boundingbox;
-        var myWidth = 0;
-        if(myBoundingBox == "[]"){
-            Logger.warning("BoundingBox not initialized - size getter not yet implemented")
-            return new Vector2f(0,0);
-        } else {
-            return myBoundingBox.size;
-        }
-        
-    }
     
     Public.width getter = function(){
         return Public.size.x;
@@ -224,11 +221,6 @@ spark.Widget.Constructor = function(Protected) {
         _mySceneNode.position.z = theValue.z + _myOrigin.z;
     };
     
-    // XXX: huh!? this seems like a pretty special thing to me.
-    Public.worldposition getter = function() {
-        return _mySceneNode.globalmatrix.getTranslation();
-    };
-
     // SCALE
     
     Public.scaleX getter = function() {
@@ -388,10 +380,6 @@ spark.Widget.Constructor = function(Protected) {
 
     Base.realize = Public.realize;
     Public.realize = function(theSceneNode) {
-        _myPressedFlag[LEFT_BUTTON]   = false;    
-        _myPressedFlag[MIDDLE_BUTTON] = false;    
-        _myPressedFlag[RIGHT_BUTTON]  = false;    
-        
         _mySceneNode = theSceneNode;
 
         _mySceneNode.sticky = true;
@@ -429,27 +417,8 @@ spark.Widget.Constructor = function(Protected) {
     Base.postRealize = Public.postRealize;
     Public.postRealize = function() {
         Public.sensible = Protected.getBoolean("sensible", false);
-        /*if (Public.sensible) {
-            spark.onClickListeners[Public.sceneNode.id] = Public;
-            spark.onReleaseListeners[Public.sceneNode.id] = Public;                        
-            spark.onMoveListeners[Public.sceneNode.id] = Public;
-        }*/
-        Base.postRealize();
-        
-    };  
-    
-    // XXX: accept as temporary hack. introduce real events at some point.
-    Public.onClick = function (theButton, thePickedBodyId, theButtonState, theX, theY) {
-        _myPressedFlag[theButton] = theButtonState;
-        if (theButtonState) {
-            Logger.info("Widget('" + Public.name + "') ::onClick() " + " " + theButton + " " + theButtonState + " " + theX + " " + theY)        
-        }
-    }
-    
-    Public.onMove = function (theX, theY) {
-        Logger.info("Widget('" + Public.name + "') ::onMove() " + " " + theX + " " + theY)        
-    }
-
+        Base.postRealize();        
+    };
 };
 
 
@@ -929,6 +898,8 @@ spark.Model.Constructor = function(Protected) {
 }
 
 
+if("useQuirkySparkWidgets" in this) {
+
 // XXX: non-generic component
 spark.Button = spark.ComponentClass("Button");
 
@@ -1069,5 +1040,7 @@ spark.LanguageButton.Constructor = function(Protected) {
             _myTriggeredLanguage = theLanguage;            
         }
     }
+
+}
 
 }

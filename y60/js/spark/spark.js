@@ -78,6 +78,8 @@ use("registry.js");
 use("cache.js");
 // basic component classes
 use("components.js");
+// event handling
+use("events.js");
 
 // XXX: spark widgets
 if ("useSparkWidgets" in this) {
