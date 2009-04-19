@@ -113,7 +113,7 @@ spark.Event.Constructor = function(Protected, theType, theBubbles, theCancelable
     Public.dispatchTo = function(theCurrentTarget, theCurrentPhase) {
         _myCurrentTarget = theCurrentTarget;
         _myCurrentPhase  = theCurrentPhase;
-    }
+    };
 
 };
 
@@ -231,4 +231,30 @@ spark.TestEvent.Constructor = function(Protected) {
 
     this.Inherit(spark.Event, "test-event");
 
+};
+
+spark.MouseEvent = spark.Class("MouseEvent");
+
+spark.MouseEvent.CLICK = "mouse-click";
+spark.MouseEvent.ENTER = "mouse-enter";
+spark.MouseEvent.LEAVE = "mouse-leave";
+
+spark.MouseEvent.Constructor = function(Protected, theType, theX, theY) {
+    var Public = this;
+    
+    this.Inherit(spark.Event, theType);
+    
+    
+    var _myScreenX = theX;
+    
+    Public.screenX getter = function() {
+        return _myScreenX;
+    };
+    
+    var _myScreenY = theY;
+
+    Public.screenY getter = function() {
+        return _myScreenY;
+    };
+    
 };

@@ -68,6 +68,7 @@ spark.loadString = function(theString, theParent) {
  * Load an xml file into the spark world.
  */
 spark.loadFile = function(theFile, theParent) {
+    Logger.info("Loading spark file " + theFile);
     var myNode = new Node();
     myNode.parseFile(theFile);
     return spark.loadDocument(myNode, theParent);

@@ -72,6 +72,8 @@ use("meta.js");
 use("load.js");
 // hacks around y60 text rendering
 use("text.js");
+// camera utility functions
+use("camera.js");
 // component registry
 use("registry.js");
 // image caching
