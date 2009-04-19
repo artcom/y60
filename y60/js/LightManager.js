@@ -195,7 +195,6 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
 
     obj.enableSunlight = function(theFlag) {
         _mySunLight.visible = theFlag;
-        dumpstack();
     }
 
     obj.onFrame = function(theTime) {
