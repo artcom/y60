@@ -718,7 +718,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     var _myMaterialTable = null;
     var _myDrawCameraFrustumFlag = false;
 
-    self.__defineGetter__('_myPicking', function() { return _myPicking; });
+    self.__defineGetter__('picking', function() { return _myPicking; });
 
     self.__defineGetter__('drawFrustums', function() { return _myDrawCameraFrustumFlag; });
     self.__defineSetter__('drawFrustums', function(theFlag) { _myDrawCameraFrustumFlag = theFlag; });
