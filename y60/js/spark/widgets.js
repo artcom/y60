@@ -450,6 +450,8 @@ spark.Switch.Constructor = function(Protected) {
 
                 myChild.visible = (myChild == myWanted);
             }
+        } else {
+            Logger.error("Switch widget does not contain child named " + theName);
         }
     };
 };
@@ -779,7 +781,7 @@ spark.I18N.Constructor = function(Protected) {
         var myI18NItem = Public.node.getElementById(theId);
         if (myI18NItem) {
             var myLanguageNode = myI18NItem.childNode(_myActiveTag);
-            myResult = myLanguageNode.childNode(0).nodeValue
+            myResult = myLanguageNode.childNode(0).nodeValue;
         }
         return myResult;
     }
@@ -791,7 +793,7 @@ spark.I18N.Constructor = function(Protected) {
     Base.realize = Public.realize;
     Public.realize = function() {
         Base.realize();
-        _myActiveTag = Protected.getString("default", "de")
+        _myActiveTag = Protected.getString("default", "de");
     }   
     Public.update = function() {
         for (var myI18NClientKey in _myI18NComponents) {
@@ -840,6 +842,7 @@ spark.Text.Constructor = function(Protected) {
     var _myInitialSize = null;
     var _myStyle = null;
     var _myText  = "";
+    var _myTextId = null;
     
     Public.text getter = function() {
         return _myText;
@@ -876,7 +879,7 @@ spark.Text.Constructor = function(Protected) {
         
         // retrieve text
         _myText = Protected.getString("text", "");
-        
+
         // handle internationalization
         _myTextId = Protected.getString("textId", "");
         if(_myTextId != "") {
@@ -900,7 +903,7 @@ spark.Text.Constructor = function(Protected) {
         _myMaterial = Modelling.createUnlitTexturedMaterial(window.scene, _myTexture, Public.name + "-material", true); // XXX: must have name
         
         _myShape      = Modelling.createQuad(window.scene, _myMaterial.id, new Vector3f(0,0,0),
-                                             new Vector3f(_myInitialSize.x, _myInitialSize.y, 0));
+                                             new Vector3f(_mySize.x, _mySize.y, 0));
         _myShape.name = Public.name + "-shape"; // XXX: must have name
 
         _myBody      = Modelling.createBody(Public.parent.sceneNode, _myShape.id);

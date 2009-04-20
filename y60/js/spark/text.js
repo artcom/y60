@@ -84,9 +84,9 @@ spark.loadFont = function(theName, theSize, theStyle) {
         // XXX: inconsistent hinting!?
         if (theStyle != "normal") {
            // enforce loadttf of a normal font, otherwise we get an exception
-           window.loadTTF(myName, myFontPath, theSize, Renderer.AUTOHINTING , fontStyleFromString("normal"));
+           window.loadTTF(myName, myFontPath, theSize, Renderer.AUTOHINTING , spark.styleFromString("normal"));
         }
-        window.loadTTF(myName, myFontPath, theSize, Renderer.NOHINTING , fontStyleFromString(theStyle));
+        window.loadTTF(myName, myFontPath, theSize, Renderer.NOHINTING , spark.styleFromString(theStyle));
         
         spark.ourLoadedFonts[myName] = true;
     }

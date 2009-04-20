@@ -106,6 +106,16 @@ spark.Component.Constructor = function(Protected) {
         _myParent = theParent;
     };
 
+    var _myRoot = null;
+
+    Public.root getter = function() {
+        var myCurrent = Public;
+        while(Public.parent != null) {
+            myCurrent = Public.parent;
+        }
+        return myCurrent;
+    };
+
     
     var _myNode = null;
     

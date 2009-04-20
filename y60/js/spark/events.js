@@ -63,7 +63,7 @@ spark.EventPhase = {
 };
 
 
-spark.Event = spark.AbstractClass("Event");
+spark.Event = spark.Class("Event");
 
 spark.Event.Constructor = function(Protected, theType, theBubbles, theCancelable) {
     var Public = this;
