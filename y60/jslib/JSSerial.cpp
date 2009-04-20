@@ -190,14 +190,6 @@ close(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 }
 
 static JSBool
-peek(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Reads the size of the input buffer, without removing data from it.");
-    DOC_RVAL("Number of bytes in the input buffer", DOC_TYPE_INTEGER);
-    DOC_END;
-    return Method<JSSerial::NATIVE>::call(&JSSerial::NATIVE::peek,cx,obj,argc,argv,rval);
-}
-
-static JSBool
 flush(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Flushes IO buffers.");
     DOC_END;
@@ -520,7 +512,6 @@ JSSerial::Functions() {
         {"close",                close,                   0},
         {"read",                 read,                    1},
         {"readBlock",            readBlock,               1},
-        {"peek",                 peek,                    0},
         {"flush",                flush,                   0},
         {"write",                write,                   1},
         {"writeBlock",           writeBlock,              1},        

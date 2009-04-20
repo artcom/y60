@@ -134,7 +134,6 @@ namespace asl {
              */
             virtual bool read(char * theBuffer, size_t & theSize) = 0;
             virtual void write(const char * theBuffer, size_t theSize) = 0;
-            virtual unsigned peek() = 0;
             virtual void flush() = 0;
 
             virtual void setStatusLine(unsigned theStatusMask) = 0;

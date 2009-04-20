@@ -258,13 +258,6 @@ namespace asl {
         }
     }
 
-    unsigned
-    ComPort::peek() {
-        ensureDeviceOpen("peek", PLUS_FILE_LINE);
-        // XXX: this should be implemented...
-        return 0;
-    }
-
     void 
     ComPort::flush() {
         ensureDeviceOpen("flush", PLUS_FILE_LINE);

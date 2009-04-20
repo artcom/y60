@@ -114,12 +114,14 @@ SensorServer::handleLines(string & theBuffer, SensorData & theData) {
 
 void 
 SensorServer::poll(SensorData & theData) {
-    size_t myNumBytes = _myComPort->peek();
-    if (myNumBytes) {
-        vector<char> myBuffer(myNumBytes+1);
-        _myComPort->read(&myBuffer[0], myNumBytes);
-        myBuffer[myNumBytes] = 0;
-        _myFifo += string(&myBuffer[0]);
+    char myBuffer[1024];
+    size_t myBytesRead = sizeof(myBuffer);
+
+    _myComPort->read(myBuffer, myBytesRead);
+
+    if(myBytesRead) {
+        string myData(myBuffer, myBytesRead);
+        _myFifo += myData;
         handleLines(_myFifo, theData);
     }
 }

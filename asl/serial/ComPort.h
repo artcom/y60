@@ -77,7 +77,6 @@ namespace asl {
             // input and output
             bool read(char * theBuffer, size_t & theSize);
             void write(const char * theBuffer, size_t theSize);
-            unsigned peek();
             void flush();
 
             // status line access

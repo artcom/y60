@@ -160,10 +160,6 @@ SerialTransport::readData() {
     }
 
     try {
-        // [DS] If the serial port is removed a non-blocking read returns EAGAIN
-        // for some reason. Peek throws an exception which is just what we want.
-        _mySerialPort->peek();
-
         // read, blocking when there is no data
         asl::Time myBefore, myAfter;
         char myReceiveBuffer[64*1024];

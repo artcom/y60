@@ -184,23 +184,6 @@ TTYPort::close() {
 
 }
 
-unsigned
-TTYPort::peek() {
-    if (!isOpen()) {
-        throw SerialPortException(string("Can not peek from device ") + getDeviceName() +
-                               ". Device is not open.", PLUS_FILE_LINE);
-    }
-
-    int myResult;
-    int myErrorCode = ioctl(_myPortHandle, FIONREAD, &myResult);    
-    if (myErrorCode != 0) {
-        throw SerialPortException(string("Can not peek from device ") + getDeviceName() +
-                               ": " + strerror(errno), PLUS_FILE_LINE);
-    }
-    
-    return myResult;
-}
-
 void 
 TTYPort::flush() {
     if (!isOpen()) {
