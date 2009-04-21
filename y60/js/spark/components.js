@@ -148,7 +148,7 @@ spark.Component.Constructor = function(Protected) {
         if(theName in _myNode) {
             return _myNode[theName];
         } else {
-            if(theDefault == null) {
+            if(arguments.length < 2) {
                 Logger.error(_myNode.nodeName + " requires attribute " + theName);
             } else {
                 return theDefault;
@@ -182,7 +182,7 @@ spark.Component.Constructor = function(Protected) {
         if(theName in _myNode) {
             return (_myNode[theName] == "true");
         } else {
-            if(theDefault == null) {
+            if(arguments.length < 2) {
                 Logger.error(_myNode.nodeName + " requires attribute " + theName);
             } else {
                 return theDefault;
@@ -203,7 +203,7 @@ spark.Component.Constructor = function(Protected) {
         if(theName in _myNode) {
             return Number(_myNode[theName]);
         } else {
-            if(theDefault == null) {
+            if(arguments.length < 2) {
                 Logger.error(_myNode.nodeName + " requires attribute " + theName);
             } else {
                 return theDefault;
@@ -216,7 +216,7 @@ spark.Component.Constructor = function(Protected) {
         if(theName in _myNode) {
             return _myNode[theName].substring(1, _myNode[theName].length -1).replace(/ /g,"").split(",");
         } else {
-            if(theDefault == null) {
+            if(arguments.length < 2) {
                 Logger.error(_myNode.nodeName + " requires attribute " + theName);
             } else {
                 return theDefault;
