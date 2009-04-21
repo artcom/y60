@@ -146,7 +146,7 @@ spark.Widget.Constructor = function(Protected) {
     };
     
     
-    // VISIBILITY
+    // VISIBILITY AND SENSIBLITY
 
     Public.visible getter = function() {
         return _mySceneNode.visible;
@@ -154,19 +154,23 @@ spark.Widget.Constructor = function(Protected) {
 
     Public.visible setter = function(theValue) {
         _mySceneNode.visible = theValue;
+        Public.sensible = Public.sensible;
     };
 
-
-    // SENSIBILITY
+    var _myRealSensiblity = true;
 
     Public.sensible getter = function() {
-        return !_mySceneNode.insensible;
+        return _myRealSensiblity;
     };
 
     Public.sensible setter = function(theValue) {
-        _mySceneNode.insensible = !theValue;
+        _myRealSensiblity = theValue;
+
+        var myActualSensibility = theValue && _mySceneNode.visible;
+
+        _mySceneNode.insensible = !myActualSensibility;
     };
-    
+
     // POSITION
 
     Public.x getter = function() {
@@ -366,7 +370,6 @@ spark.Widget.Constructor = function(Protected) {
         _mySceneNode = theSceneNode;
 
         _mySceneNode.sticky = true;
-        _mySceneNode.insensible = false;
 
         spark.sceneNodeMap[_mySceneNode.id] = Public;
 
@@ -398,7 +401,7 @@ spark.Widget.Constructor = function(Protected) {
         Public.sensible = Protected.getBoolean("sensible", true);
         
     };
-    
+
 };
 
 
@@ -974,6 +977,11 @@ spark.Movie.Constructor = function(Protected) {
         var myBody  = Modelling.createBody(Public.parent.sceneNode, _myShape.id);
         myBody.name = Public.name;
 	
+        var myInitialPlaymode = Protected.getString("playmode", "stop");
+        _myMovie.playmode = myInitialPlaymode;
+        var myInitialLoopcount = Protected.getString("loopcount", "1");
+        _myMovie.loopcount = myInitialLoopcount;
+
         Base.realize(myBody);
     };
 
