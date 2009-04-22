@@ -78,7 +78,8 @@ function HeartbeatThrober(theEnableFlag, theFrequency, theFilename) {
             var myDeltaTime = theTime - _myLastThrobTime;
             if (myDeltaTime > _myFrequency || _myFirstThrob) {
                 _myFirstThrob = false;
-                var mySecondsSince1970 = Date.parse(Date());
+                // we want seconds but Date returns milliseconds
+                var mySecondsSince1970 = Date.parse(Date())/1000;
                 var myHeartbeatString =
                     '<heartbeat secondsSince1970="' + mySecondsSince1970 +'" >\n' +
                     '</heartbeat>';
