@@ -11,12 +11,23 @@ endif(WIN32)
 
 include_directories(.) 
 
+include(TestBigEndian)
+
+test_big_endian(OSCPACK_BIG_ENDIAN)
+
+if(OSCPACK_BIG_ENDIAN)
+    set(OSCPACK_ENDIAN_DEFINITION -DOSC_HOST_BIG_ENDIAN)
+else(OSCPACK_BIG_ENDIAN)
+    set(OSCPACK_ENDIAN_DEFINITION -DOSC_HOST_LITTLE_ENDIAN)
+endif(OSCPACK_BIG_ENDIAN)
+
 ac_add_project(
     OSCPACK 
     REQUIRED_PACKAGES
         ${REQ_PACKAGES}
     DEFINITIONS
         -DAC_BUILT_WITH_CMAKE
+        ${OSCPACK_ENDIAN_DEFINITION}
 )
 
 add_subdirectory(osc)
