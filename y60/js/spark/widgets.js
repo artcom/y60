@@ -681,7 +681,8 @@ spark.Image.Constructor = function(Protected) {
     var _myTexture  = null;
     var _myMaterial = null;
     var _myShape    = null;
-    var _myBody     = null;    
+    var _myBody     = null;
+    var _myVertices = null;
     
     Public.image getter = function() {
         return _myImage;
@@ -695,12 +696,22 @@ spark.Image.Constructor = function(Protected) {
     // XXX: this should not exist.
     Public.texture getter = function() {
         return _myTexture;
-    };
+    }
     
     // XXX: this should not exist.
     Public.textureId setter = function(theTextureId) {
         _myMaterial.childNode("textureunits").firstChild.texture = theTextureId;
-    };
+    }
+
+    Public.width setter = function(w) {
+        _myVertices[1] = [w, 0, 0];
+        _myVertices[3] = [w, Public.size.y, 0];
+    }
+    
+    Public.height setter = function(h) {
+        _myVertices[2] = [0, h, 0];
+        _myVertices[3] = [Public.size.x, h, 0];
+    }
     
     Protected.material getter = function() {
         return _myMaterial;
@@ -744,6 +755,8 @@ spark.Image.Constructor = function(Protected) {
         
         _myShape    = Modelling.createQuad(window.scene, _myMaterial.id, myLowerLeft, myUpperRight);
         _myShape.name = Public.name + "-shape";
+
+        _myVertices = _myShape.find(".//*[@name='position']").firstChild.nodeValue;
         
         var myBody  = Modelling.createBody(Public.parent.sceneNode, _myShape.id);
         myBody.name = Public.name;
