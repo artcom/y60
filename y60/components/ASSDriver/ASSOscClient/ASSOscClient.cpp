@@ -172,11 +172,16 @@ ASSOscClient::createEvent( int theID, const std::string & theType,
 
 void
 ASSOscClient::createTransportLayerEvent( const std::string & theType) {
+
+    if(_myOSCStreams.size() == 0) {
+        AC_WARNING << "Ignoring event " << theType << " because there are no streams.";
+        return;
+    }
     
     std::string myAddress("/");
     myAddress += theType;
-    *_myOSCStreams[_myStreamIndex] << osc::BeginMessage( myAddress.c_str() )
-                 << _myIDCounter++;
+    *_myOSCStreams[_myStreamIndex] << osc::BeginMessage( myAddress.c_str() );
+    *_myOSCStreams[_myStreamIndex] << _myIDCounter++;
 
     if (theType == "configure") {
         *_myOSCStreams[_myStreamIndex] << _myGridSize[0] << _myGridSize[1];
@@ -190,11 +195,15 @@ ASSOscClient::createTransportLayerEvent( const std::string & theType) {
 void 
 ASSOscClient::onUpdateSettings( dom::NodePtr theSettings ) {
 
-    AC_DEBUG << "updating osc sender settings";
+    AC_WARNING << "updating osc sender settings";
 
     ASSDriver::onUpdateSettings( theSettings );
 
+    AC_WARNING << "ASSDriver was happy";
+
     dom::NodePtr mySettings = getASSSettings( theSettings );
+
+    AC_WARNING << "at client port";
 
     int myClientPort;
     getConfigSetting( mySettings, "ClientPort", myClientPort, 7001 );
@@ -205,6 +214,8 @@ ASSOscClient::onUpdateSettings( dom::NodePtr theSettings ) {
         }
     }
 
+    AC_WARNING << "at server port";
+
     int myServerPort;
     getConfigSetting( mySettings, "ServerPort", myServerPort, 7000 );
     if ( myServerPort != _myServerPort ) {
@@ -214,25 +225,29 @@ ASSOscClient::onUpdateSettings( dom::NodePtr theSettings ) {
         }
     }
 
+    AC_WARNING << "at receivers";
+    
     _myOSCStreams.clear();
     if (mySettings->childNode("OscReceiverList")) {
         for (int oscReceiverIndex = 0; 
              oscReceiverIndex < static_cast<int>(mySettings->childNode("OscReceiverList")->childNodesLength()); 
              oscReceiverIndex++) {
+            AC_WARNING << "recv " << oscReceiverIndex;
+
             dom::NodePtr myReceiverNode = mySettings->childNode("OscReceiverList")->childNode(oscReceiverIndex);
-            if (static_cast<int>(_myReceivers.size()> - 2) < static_cast<int>(oscReceiverIndex) ){
+            if (oscReceiverIndex >= _myReceivers.size()){
+                AC_WARNING << "pushing one recv";
                 _myReceivers.push_back(Receiver("invalid address", UDPConnectionPtr(0)));
             }
             string myAddress = myReceiverNode->getAttributeString("ip");
-            if ( myAddress.compare(_myReceivers[oscReceiverIndex].address) != 0 ) {
+            AC_WARNING << "addr " << myAddress;
+            AC_WARNING << "cursize: " << _myReceivers.size();
                 AC_DEBUG << "adding '" << myAddress << "' to the osc receiver list";
                 _myReceivers[oscReceiverIndex].address =myAddress;
                 _myReceivers[oscReceiverIndex].udpConnection = UDPConnectionPtr( 0 );
                 char* myBuffer = new char[ BUFFER_SIZE ];
                 _myOSCStreams.push_back(OutboundPacketStreamPtr(new osc::OutboundPacketStream( myBuffer, BUFFER_SIZE )));            
-            } else {
-                AC_PRINT << "sollte hier nicht vorbei kommen";
-            }
+            AC_WARNING << "region";
             asl::Vector2i myRegion(-1,-1);
             if (myReceiverNode->getAttribute("wire_range")) {
                myRegion = myReceiverNode->getAttributeValue<asl::Vector2i>("wire_range");

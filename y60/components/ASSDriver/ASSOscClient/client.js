@@ -56,8 +56,8 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-plug("y60ASSOscPlugin");
-var myClient = new ASSOscClient();
+plug("y60ASSOscClient");
+var myClient = new y60ASSOscClient();
 
 print("client: " + myClient);
 

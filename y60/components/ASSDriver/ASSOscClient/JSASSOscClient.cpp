@@ -113,8 +113,10 @@ OnUpdateSettings(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
 
         dom::NodePtr mySettings;
         convertFrom(cx, argv[0], mySettings);
+        AC_WARNING << "Settings: " << *mySettings;
 
         ASSOscClient & myOscClient = myObj.getNative();
+
         myOscClient.onUpdateSettings( mySettings );
 
         return JS_TRUE;

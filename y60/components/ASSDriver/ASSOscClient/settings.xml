@@ -18,33 +18,20 @@
         <DebugTouchEvents min="0" max="1" step="1">0</DebugTouchEvents>
         <CurrentValueDisplay min="0" max="2">0.00000</CurrentValueDisplay>
         <EventQueueSize>100</EventQueueSize>
-        <TransportLayer>socket</TransportLayer>
-	    <IpAddress>192.168.7.50</IpAddress>
+        <TransportLayer>serial</TransportLayer>
+	<IpAddress>192.168.7.50</IpAddress>
         <Port>10001</Port>
-        <UseUSB min="0" max="1">1</UseUSB>
-        <BaudRate>230400</BaudRate>
-        <BitsPerWord min="5" max="8">8</BitsPerWord>
-        <Parity>no_parity</Parity>
-        <StopBits min="1" max="2">1</StopBits>
-        <Handshaking min="0" max="1">0</Handshaking>
+        <SerialPortName>/dev/ttyUSB0</SerialPortName>
+        <BaudRate>460800</BaudRate>
         <MinTouchInterval step="0.01">0.2</MinTouchInterval>
         <ClampToScreen>0</ClampToScreen>
         <MinTouchThreshold>9</MinTouchThreshold>
         <InterpolationMethod>1</InterpolationMethod>
         <CureBrokenElectrodes>0</CureBrokenElectrodes>
         <OscReceiverList>    
-            <OscReceiver ip="192.168.6.50"/>
-            <OscReceiver ip="192.168.6.51"/>
-            <OscReceiver ip="192.168.6.52"/>
-            <OscReceiver ip="192.168.6.53"/>
-            <OscReceiver ip="192.168.6.54"/>
-            <OscReceiver ip="192.168.6.55"/>
-            <OscReceiver ip="192.168.6.56"/>
-            <OscReceiver ip="192.168.6.57"/>
-            <OscReceiver ip="192.168.6.58"/>
-            <OscReceiver ip="10.1.2.59" wire_range="[6,11]"/>
+            <OscReceiver ip="10.1.2.76"/>
         </OscReceiverList>            
-        <ServerPort>12000</ServerPort>
+        <ServerPort>12345</ServerPort>
         <ClientPort>7001</ClientPort>
     </ASSDriver>
 </settings>
