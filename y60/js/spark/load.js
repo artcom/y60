@@ -82,7 +82,7 @@ spark.loadFile = function(theFile, theParent) {
  * independence, clone your dom first.
  */
 spark.loadDocument = function(theNode, theParent) {
-    var myRoot = theNode.firstChild;
+    var myRoot = spark.findRootElement(theNode);
     var myComponent = spark.instantiateRecursively(myRoot, theParent);
     myComponent.realize();
     myComponent.postRealize();
