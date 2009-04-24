@@ -19,16 +19,14 @@ endif (NOT Y60_WITH_TRACEMONKEY)
 
 # external dependencies
 list(APPEND REQ_PACKAGES SDL GLEW NvidiaCg OpenEXR GLIB2)
-list(APPEND OPT_PACKAGES Maya C4D)
+list(APPEND OPT_PACKAGES Maya)
 
 # gtk and consorts
-list(APPEND OPT_PKGCONFIG GSTREAMER gstreamer-0.10)
-
 list(APPEND OPT_PACKAGES GTKMM)
 list(APPEND OPT_PACKAGES GTKGLEXT)
 
 # media codecs
-list(APPEND REQ_PACKAGES FFMPEG )
+list(APPEND REQ_PACKAGES FFMPEG)
 
 
 if(WIN32)
@@ -41,18 +39,26 @@ if(WIN32)
 
     # we always need to add FakeATL here so it will
     # be in the dependency list in the installer
-    #  XXX: diry hack? does anything bad come from this?
+    #  XXX: dirty hack? does anything bad come from this?
     list(APPEND REQ_PACKAGES FakeATL)
 
     # cairo backend
     list(APPEND REQ_PKGCONFIG CAIRO cairo-win32)
 
+    # windows media sdk
     list(APPEND REQ_PACKAGES Wmsdk)
-    
+
+    # cinema 4d
+    list(APPEND OPT_PACKAGES C4D)
+
 elseif(LINUX)
 
     # cairo backend
     list(APPEND REQ_PKGCONFIG CAIRO cairo-xlib)
+
+    # gstreamer
+    # XXX: might work on OSX
+    list(APPEND OPT_PKGCONFIG GSTREAMER gstreamer-0.10)
     
 elseif(OSX)
 
