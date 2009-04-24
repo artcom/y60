@@ -422,7 +422,7 @@ SimWater::splash(const asl::Vector2i & thePosition, float theMagnitude, int theR
 
 const char *
 SimWater::ClassName() {
-    static const char * myClassName = "SimWater";
+    static const char * myClassName = "y60SimWater";
     return myClassName;
 }
 
