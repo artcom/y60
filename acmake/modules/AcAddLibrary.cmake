@@ -91,7 +91,7 @@ macro(ac_add_library LIBRARY_NAME LIBRARY_PATH)
                         -E copy_if_different ${ACMAKE_TEMPLATES_DIR}/AcCMakeHeaderOnlyWorkaround.cpp
                                              ${_OUT_FILE}
                 DEPENDS ${THIS_LIBRARY_HEADERS}
-                COMMENT "Creating CMake header only workaround"
+                COMMENT "Generating header-only stub for library ${THIS_LIBRARY_NAME}"
         )
         set( THIS_LIBRARY_SOURCES ${_OUT_FILE} )
         set(THIS_LIBRARY_BUILDINFO_FILE)
