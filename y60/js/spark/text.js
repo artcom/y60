@@ -72,9 +72,13 @@ spark.loadFont = function(theName, theSize, theStyle) {
             myFontPath = "FONTS/" + theName + "-" + theStyle + ".otf";
         } else if (fileExists("FONTS/" + theName + "-" + theStyle + ".ttf")) {
             myFontPath = "FONTS/" + theName + "-" + theStyle + ".ttf";
+        } else if (fileExists("FONTS/" + theName + ".otf")) {
+            myFontPath = "FONTS/" + theName + ".otf";
+        } else if (fileExists("FONTS/" + theName + ".ttf")) {
+            myFontPath = "FONTS/" + theName + ".ttf";
         } else {
-            Logger.error("FONTS/" + theName + "-" + theStyle + ".ttf doesn't exist");
-            exit(1);
+            throw new Error("FONTS/" + theName + "-" + theStyle + ".[ttf|otf] nor " +
+                    theName + ".[ttf|otf] does not exist");
         }
         
         // blurry aber gutes spacing -> No Hinting (Renderer.NOHINTING)
@@ -165,7 +169,7 @@ spark.alignmentFromString = function(theString) {
         return Renderer.RIGHT_ALIGNMENT;
     if(theString == "center")
         return Renderer.CENTER_ALIGNMENT;
-    throw new Exception("Unknown alignment: " + theString);
+    throw new Error("Unknown alignment: " + theString);
 };
 
 spark.styleFromString = function(theString) {
@@ -177,7 +181,7 @@ spark.styleFromString = function(theString) {
         return Renderer.ITALIC;
     if(theString == "bolditalic")
         return Renderer.BOLDITALIC;
-    throw new Exception("Unknown font style: " + theString);
+    throw new Error("Unknown font style: " + theString);
 };
 
 spark.createTextImage = function(theSize) {
@@ -206,8 +210,7 @@ spark.renderText = function(theImage, theText, theStyle, theSize) {
     
     // XXX: uhm. well. this needs fixing.
     if((theText == "") && (mySize.x == 0 || mySize.y == 0 )) {
-        Logger.error("text is empty and size is 0 -> this doesn't work");
-        exit(1);
+        throw new Error("text is empty and size is 0 -> this doesn't work");
     }
         
     var myTextSize =
