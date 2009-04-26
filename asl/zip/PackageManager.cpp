@@ -75,7 +75,8 @@ PackageManager::add(const std::string & thePaths) {
     std::vector<std::string> myPathVector;
     splitPaths(thePaths, myPathVector);
     AC_DEBUG << "adding " << myPathVector.size() << " packages";
-    for (unsigned i = 0; i < myPathVector.size(); ++i) {
+    for (int i = myPathVector.size() - 1; i >= 0; i--) {
+        AC_WARNING << "adding " << i;
         std::string normalizedPath = normalizeDirectory(myPathVector[i], true);
 
         if (!fileExists(normalizedPath)) {
