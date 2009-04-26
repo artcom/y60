@@ -63,7 +63,7 @@
 
 #include <y60/glutil/GLUtils.h>
 
-#define USE_AGP_MEMORY
+//#define USE_AGP_MEMORY
 
 #if defined(LINUX) || defined(OSX)
     #define AC_USE_X11
