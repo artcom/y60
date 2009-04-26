@@ -769,8 +769,8 @@ spark.Image.Constructor = function(Protected) {
 // XXX: I18N
 spark.I18N = spark.ComponentClass("I18N");
 
-const GERMAN  = "de";
-const ENGLISH = "en";
+spark.GERMAN  = "de";
+spark.ENGLISH = "en";
 
 spark.I18N.Constructor = function(Protected) {
     var Base = {};
