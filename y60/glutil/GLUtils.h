@@ -68,6 +68,12 @@
 #   include <GL/glxew.h>
 #endif
 
+// XXX: X11 defines this
+#ifdef GenericEvent
+#warning undefing polluting GenericEvent from X11
+#undef GenericEvent
+#endif
+
 #include <limits.h>
 
 #include <asl/base/Exception.h>
