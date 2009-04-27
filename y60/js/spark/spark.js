@@ -66,7 +66,6 @@ use("common.js");
  */
 var spark = Namespace("spark");
 
-// XXX does not belong here.
 spark.findRootElement = function(theDocument) {
     var myRoot = theDocument.firstChild;
     // firstChild might be a xml processing instruction, a

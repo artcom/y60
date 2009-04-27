@@ -663,11 +663,124 @@ spark.Body.Constructor = function(Protected) {
     };
 };
 
+spark.ResizableRectangle = spark.AbstractClass("ResizableRectangle");
+
+spark.ResizableRectangle.Constructor = function(Protected) {
+    var Base = {};
+    var Public = this;
+
+    this.Inherit(spark.Body);
+
+    var _myWidth;
+    var _myHeight;
+    var _myMaterial;
+    var _myShape;
+    var _myVertices;
+
+    Base.realize = Public.realize;
+    Public.realize = function(theMaterialOrImageOrShape) {
+        if (theMaterialOrImageOrShape.nodeName == "shape") {
+            _myShape = theMaterialOrImageOrShape;
+            var myMateriaId = _myShape
+                . childNode("primitives")
+                . childNode("elements").material;
+            _myMaterial = _myShape.getElementById(myMateriaId);
+        } else if (theMaterialOrImageOrShape.nodeName == "material") {
+            _myMaterial = theMaterialOrImageOrShape;
+        }
+
+        if ( ! _myShape) {
+            var tu = _myMaterial.find("./textureunits/textureunit");
+            if (tu) {
+               var raster = tu.$texture.$image.raster;
+               _myWidth  = Protected.getNumber("width", raster.width);
+               _myHeight = Protected.getNumber("height", raster.height);
+            } else {
+               _myWidth  = Protected.getNumber("width");
+               _myHeight = Protected.getNumber("height");
+            }
+
+            var mySize = new Vector3f(_myWidth, _myHeight, 0);
+                               
+            Protected.origin = Protected.getVector3f("origin", [0,0,0]);
+            var myLowerLeft = product( Protected.origin, -1);
+            var myUpperRight = difference( mySize, Protected.origin);
+
+            _myShape = Modelling.createQuad(window.scene, _myMaterial.id,
+                    myLowerLeft, myUpperRight);
+            _myShape.name = Public.name + "-shape";
+        }
+
+        _myVertices = _myShape.find(".//*[@name='position']").firstChild.nodeValue;
+        
+        var myBody  = Modelling.createBody(Public.parent.sceneNode, _myShape.id);
+        myBody.name = Public.name;
+	
+        Base.realize(myBody);        
+    };
+
+    // XXX untested with non-zero origin
+    Public.width getter = function() { return _myWidth; }
+    Public.width setter = function(w) {
+        if (w != _myWidth) {
+            var o = Protected.origin;
+            _myVertices[1] = [w - o.x, -o.y, -o.z];
+            _myVertices[3] = [w - o.x, _myHeight - o.y, o.z];
+            _myWidth = w;
+        }
+    }
+    
+    Public.height getter = function() { return _myHeight; }
+    Public.height setter = function(h) {
+        if (h != _myHeight) {
+            var o = Protected.origin;
+            _myVertices[2] = [-o.x, h - o.y, -o.z];
+            _myVertices[3] = [_myWidth - o.x, h - o.y, -o.z];
+            _myHeight = h;
+        }
+    }
+    Public.size getter = function() { return new Vector2f(_myWidth, _myHeight);}
+    Public.size setter = function(s) {
+        Public.width = s.x;
+        Public.height = s.y;
+    }
+    
+    Protected.material getter = function() { return _myMaterial; }
+    Protected.shape    getter = function() { return _myShape; }
+    Protected.vertices getter = function() { return _myVertices; }
+}
+
+spark.Rectangle = spark.ComponentClass("Rectangle");
+
+spark.Rectangle.Constructor = function(Protected) {
+    var Base = {};
+    var Public = this;
+
+    this.Inherit(spark.ResizableRectangle);
+
+    var _myColor;
+    Base.realize = Public.realize;
+    Public.realize = function(theMaterialOrShape) {
+
+        _myColor = Protected.getVector3f("color", [1,1,1]);
+
+        var myMaterial = Modelling.createColorMaterial(window.scene, new Vector4f(_myColor[0], _myColor[1], _myColor[2], Public.alpha));
+        myMaterial.transparent = true;
+
+        Base.realize(myMaterial);        
+    };
+
+    Public.color getter = function() {
+        var c = _myMaterial.properties.surfacecolor;
+        return new Vector3f(c.r, c.g, c.b);
+    }
+}
 
 /**
  * A simple Quad-image.
  * 
- * NOTE: does not adjust it's size when image is changed.
+ * NOTE: does not adjust it's size when image is changed. However, the size
+ *       can be changed by setting the width, height and size properties.
  */
 spark.Image = spark.ComponentClass("Image");
 
@@ -675,13 +788,10 @@ spark.Image.Constructor = function(Protected) {
     var Base = {};
     var Public = this;
 
-    this.Inherit(spark.Body);
+    this.Inherit(spark.ResizableRectangle);
 
     var _myImage    = null;
     var _myTexture  = null;
-    var _myMaterial = null;
-    var _myShape    = null;
-    var _myBody     = null;
     var _myVertices = null;
     
     Public.image getter = function() {
@@ -701,28 +811,6 @@ spark.Image.Constructor = function(Protected) {
     // XXX: this should not exist.
     Public.textureId setter = function(theTextureId) {
         _myMaterial.childNode("textureunits").firstChild.texture = theTextureId;
-    }
-
-    Public.width setter = function(w) {
-        _myVertices[1] = [w, 0, 0];
-        _myVertices[3] = [w, Public.size.y, 0];
-    }
-    
-    Public.height setter = function(h) {
-        _myVertices[2] = [0, h, 0];
-        _myVertices[3] = [Public.size.x, h, 0];
-    }
-    
-    Protected.material getter = function() {
-        return _myMaterial;
-    }
-    
-    Protected.body getter = function() {
-        return _myBody;
-    }
-    
-    Protected.shape getter = function() {
-        return _myShape;
     }
 
     Base.realize = Public.realize;
@@ -745,23 +833,10 @@ spark.Image.Constructor = function(Protected) {
         _myTexture.name = Public.name + "-texture";
         _myTexture.wrapmode = "clamp_to_edge";
 
-        _myMaterial = Modelling.createUnlitTexturedMaterial(window.scene, _myTexture, Public.name + "-material", true);
+        var myMaterial = Modelling.createUnlitTexturedMaterial(window.scene,
+                _myTexture, Public.name + "-material", true);
 
-        var mySize = new Vector3f(myWidth, myHeight, 0);
-                               
-        Protected.origin = Protected.getVector3f("origin", [0,0,0]);
-        var myLowerLeft = new Vector3f(-Protected.origin.x,-Protected.origin.y,-Protected.origin.z);
-        var myUpperRight = new Vector3f(mySize.x - Protected.origin.x, mySize.y - Protected.origin.y, mySize.z - Protected.origin.z);
-        
-        _myShape    = Modelling.createQuad(window.scene, _myMaterial.id, myLowerLeft, myUpperRight);
-        _myShape.name = Public.name + "-shape";
-
-        _myVertices = _myShape.find(".//*[@name='position']").firstChild.nodeValue;
-        
-        var myBody  = Modelling.createBody(Public.parent.sceneNode, _myShape.id);
-        myBody.name = Public.name;
-	
-        Base.realize(myBody);        
+        Base.realize(myMaterial);        
     };
 };
 
@@ -846,53 +921,40 @@ spark.Text.Constructor = function(Protected) {
     var Base = {};
     var Public = this;
 
-    this.Inherit(spark.Body);
+    this.Inherit(spark.ResizableRectangle);
 
-    var _myImage    = null;
-    var _myTexture  = null;
-    var _myMaterial = null;
-    var _myShape    = null;
-    var _myBody     = null;
-
-    var _mySize  = null;
-    var _myInitialSize = null;
     var _myStyle = null;
     var _myText  = "";
     var _myTextId = null;
-    
-    Public.text getter = function() {
-        return _myText;
-    };
 
+    var _myImage;
+    var _myTexture;
+    
+    Public.text getter = function() { return _myText; };
     Public.text setter = function(theValue) {
-        _myText = theValue;
-        render(_mySize);
-        if(_myInitialSize != getImageSize(_myImage)) {
-            var myXFactor = getImageSize(_myImage).x/_myInitialSize.x;
-            var myYFactor = getImageSize(_myImage).y/_myInitialSize.y;
-           _myBody.scale = new Vector3f(myXFactor, myYFactor, 1);
-        }
+        _myText = Protected.performLayout(theValue);
+        Protected.render(Public.size);
     };
     
     Public.style getter = function() {
         return _myStyle;
     };
 
-    function render(theSize) {
-        spark.renderText(_myImage, _myText, _myStyle, theSize);
-    }
-    
     // XXX: I18N
     Public.updateI18N = function() {   
         Public.text = Protected.realizeI18N(_myText);
-    }        
+    }
+
+    Protected.performLayout = function(theText) {return theText;}
+
+    Protected.render = function(theSize) {
+        if (_myText) {
+            return spark.renderText(_myImage, _myText, _myStyle, Public.size);
+        }
+    }
     
     Base.realize = Public.realize;
     Public.realize = function() {
-        // size is mandatory
-        _mySize = new Vector2f(Protected.getNumber("width"),
-                               Protected.getNumber("height"));
-        
         // retrieve text
         _myText = Protected.getString("text", "");
 
@@ -908,29 +970,23 @@ spark.Text.Constructor = function(Protected) {
         // extract font style
         _myStyle = spark.fontStyleFromNode(Public.node);
         
-        // construct scene representation
-        _myImage      = spark.createTextImage(_mySize);
-        _myImage.name = Public.name + "-image"; // XXX: must have name
-        
-        _myTexture          = Modelling.createTexture(window.scene, _myImage);
-        _myTexture.name     = Public.name + "-texture"; // XXX: must have name
+        var myWidth  = Protected.getNumber("width");
+        var myHeight = Protected.getNumber("height");
+        _myImage = Modelling.createImage(window.scene, myWidth, myHeight, "BGRA");
+        _myTexture  = Modelling.createTexture(window.scene, _myImage);
+        _myTexture.name = Public.name + "-texture";
         _myTexture.wrapmode = "clamp_to_edge";
-        
-        _myMaterial = Modelling.createUnlitTexturedMaterial(window.scene, _myTexture, Public.name + "-material", true); // XXX: must have name
-        
-        _myShape      = Modelling.createQuad(window.scene, _myMaterial.id, new Vector3f(0,0,0),
-                                             new Vector3f(_mySize.x, _mySize.y, 0));
-        _myShape.name = Public.name + "-shape"; // XXX: must have name
+        var myMaterial = Modelling.createUnlitTexturedMaterial(window.scene,
+                _myTexture, Public.name + "-material", true);
 
-        _myBody      = Modelling.createBody(Public.parent.sceneNode, _myShape.id);
-        _myBody.name = Public.name; // XXX: must have name
-        
+        Base.realize(myMaterial);        
+
+        _myText = Protected.performLayout(_myText);
+
         // finally, render the text
-        render();
-
-        // initialize upwards
-        Base.realize(_myBody);
+        Protected.render();
     };
+    Protected.image getter = function() {return _myImage;}
 };
 
 
@@ -943,6 +999,7 @@ spark.Movie.Constructor = function(Protected) {
     var Base = {};
     var Public = this;
 
+    // XXX: refactor to ResizableRectangle
     this.Inherit(spark.Body);
 
     var _myMovie    = null;

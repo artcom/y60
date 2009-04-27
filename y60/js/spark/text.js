@@ -209,7 +209,8 @@ spark.renderText = function(theImage, theText, theStyle, theSize) {
     }
     
     // XXX: uhm. well. this needs fixing.
-    if((theText == "") && (mySize.x == 0 || mySize.y == 0 )) {
+    // TODO: retest ... actually this might not be necessary any more
+    if(theText == "" && (mySize.x == 0 || mySize.y == 0)) {
         throw new Error("text is empty and size is 0 -> this doesn't work");
     }
         
@@ -227,4 +228,5 @@ spark.renderText = function(theImage, theText, theStyle, theSize) {
     window.setHTextAlignment(Renderer.LEFT_ALIGNMENT);
     window.setVTextAlignment(Renderer.TOP_ALIGNMENT);
     window.setTextPadding(0,0,0,0);
+    return myTextSize;
 };
