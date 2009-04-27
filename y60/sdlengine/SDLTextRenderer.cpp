@@ -227,6 +227,10 @@ namespace y60 {
         MAKE_GL_SCOPE_TIMER(SDLTextRenderer_renderTextAsImage2);
         Vector2i myTextSize = createTextSurface(theText, theFontName, getTextColor(),
             theTargetWidth, theTargetHeight);
+        if ( myTextSize[0] == 0 && myTextSize[1] == 0) {
+            myImage->getRasterPtr()->clear();
+            return myTextSize;
+        }
 
         unsigned int myImageDataSize = _myTextureSurface->w * _myTextureSurface->h * sizeof(asl::RGBA);
 
@@ -749,6 +753,9 @@ namespace y60 {
 
         vector<Word> myWords;
         parseWords(theText, myWords);
+        if (myWords.empty()) {
+            return Vector2i(0,0);
+        }
         renderWords(myWords, theFontName, theTextColor);
 
         if (theTargetWidth == 0) {
