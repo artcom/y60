@@ -208,12 +208,6 @@ spark.renderText = function(theImage, theText, theStyle, theSize) {
         mySize = theSize;
     }
     
-    // XXX: uhm. well. this needs fixing.
-    // TODO: retest ... actually this might not be necessary any more
-    if(theText == "" && (mySize.x == 0 || mySize.y == 0)) {
-        throw new Error("text is empty and size is 0 -> this doesn't work");
-    }
-        
     var myTextSize =
         window.renderTextAsImage(theImage,
                                  theText, 
