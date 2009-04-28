@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<job id="create-shortcuts">
+    <script language="JScript" src="ArgumentDiscombobulator.js"/>
+    <script language="JScript">
+        <![CDATA[
+            var shell = WScript.CreateObject("WScript.Shell");
+            
+            var installDirectory = arguments[0];
+            var startMenuFolder  = arguments[1];
+            
+            function defineShortcut(theName, theIcon, theDescription, theWorkingDirectory, theCommand, theArguments) {
+                var shortcut = shell.CreateShortcut(startMenuFolder + "\\" + theName + ".lnk");
+                shortcut.TargetPath = installDirectory + "\\" + theCommand;
+                if(theDescription) {
+                    shortcut.Description = theDescription;
+                }
+                if(theArguments) {
+                    shortcut.Arguments = theArguments;
+                }
+                if(theIcon) {
+                    shortcut.IconLocation = installDirectory + "\\" + theIcon + ", 0";
+                }
+                if(theWorkingDirectory) {
+                    shortcut.WorkingDirectory = installDirectory + "\\" + theWorkingDirectory;
+                } else {
+                    shortcut.WorkingDirectory = installDirectory;
+                }
+                shortcut.Save();
+            }
+        ]]>
+    </script>
+    <script language="JScript" src="Shortcuts.js"/>
+</job>

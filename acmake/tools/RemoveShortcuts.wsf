@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<job id="create-shortcuts">
+    <script language="JScript" src="ArgumentDiscombobulator.js"/>
+    <script language="JScript">
+        <![CDATA[
+            var fs = null;
+            
+            try {
+                fs = new ActiveXObject("Scripting.FileSystemObject");
+            } catch (e) {
+                WScript.Echo("Could not create Scripting.FileSystemObject. Shortcuts will not be removed.");
+                WScript.Echo("Please notify ingo. The exception was \"" + e + "\"");
+                WScript.Quit(0);
+            }
+            
+            var installDirectory = arguments[0];
+            var startMenuFolder  = arguments[1];
+            
+            function defineShortcut(theName, theIcon, theDescription, theWorkingDirectory, theCommand, theArguments) {
+                var filename = startMenuFolder + "\\" + theName + ".lnk"; 
+                WScript.Echo("Trying to delete " + filename);
+                if(fs.FileExists(filename)) {
+                    fs.DeleteFile(filename);
+                } else {
+                    WScript.Echo("Does not exist.");
+                }
+            }
+        ]]>
+    </script>
+    <script language="JScript" src="Shortcuts.js"/>
+</job>

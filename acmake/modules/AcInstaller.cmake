@@ -146,6 +146,20 @@ macro(ac_add_installer_component NAME)
     endif(ACMAKE_BUILD_PACKAGES)
 endmacro(ac_add_installer_component)
 
+set(ACMAKE_SHORTCUT_FILE "${CMAKE_BINARY_DIR}/${ACMAKE_BINARY_SUBDIR}/Shortcuts.js")
+
+macro(_ac_init_installer_shortcuts)
+    file(WRITE ${ACMAKE_SHORTCUT_FILE} "// This generated file lists all shortcuts\n")
+    install(
+        FILES ${ACMAKE_SHORTCUT_FILE}
+        DESTINATION share/cmake-2.6/Tools
+    )
+endmacro(_ac_init_installer_shortcuts)
+
+macro(ac_add_installer_shortcut NAME ICON DESCRIPTION WORKINGDIR COMMAND ARGUMENTS)
+    file(APPEND ${ACMAKE_SHORTCUT_FILE} "defineShortcut(\"${NAME}\", \"${ICON}\", \"${DESCRIPTION}\", \"${WORKINGDIR}\", \"${COMMAND}\", \"${ARGUMENTS}\")\n")
+endmacro(ac_add_installer_shortcut)
+
 # Internal: handle installation for a specific project.
 #
 # This should be called by projects at some point
@@ -260,7 +274,6 @@ macro(_ac_declare_installer NAME)
     endif(NOT INSTALLER_DESCRIPTION)
 
     if(ACMAKE_BUILD_PACKAGES)
-
         # set up cpack globals
         set(CPACK_PACKAGE_NAME              ${NAME})
         set(CPACK_PACKAGE_INSTALL_DIRECTORY ${NAME})
@@ -278,14 +291,25 @@ macro(_ac_declare_installer NAME)
         set(CPACK_PACKAGE_VERSION_PATCH "1")
 
         if(WIN32)
-            file(TO_NATIVE_PATH "${INSTALLER_PACKAGE_ICON}" PACKAGE_ICON_NSIS)
-            file(TO_NATIVE_PATH "${INSTALLER_INSTALLER_ICON}" INSTALLER_ICON_NSIS)
-            file(TO_NATIVE_PATH "${INSTALLER_UNINSTALLER_ICON}" UNINSTALLER_ICON_NSIS)
-            set(CPACK_PACKAGE_ICON     ${PACKAGE_ICON_NSIS})
-            set(CPACK_NSIS_MUI_ICON    ${INSTALLER_ICON_NSIS})
-            set(CPACK_NSIS_MUI_UNIICON ${UNINSTALLER_ICON_NSIS})
-            # XXX: should be configurable
+            _ac_init_installer_shortcuts()
+        
+            # XXX: configurable?
             set(CPACK_NSIS_MODIFY_PATH ON)
+
+            file(TO_NATIVE_PATH "${INSTALLER_PACKAGE_ICON}" PACKAGE_ICON_NSIS)
+            set(CPACK_PACKAGE_ICON     ${PACKAGE_ICON_NSIS})
+            file(TO_NATIVE_PATH "${INSTALLER_INSTALLER_ICON}" INSTALLER_ICON_NSIS)
+            set(CPACK_NSIS_MUI_ICON    ${INSTALLER_ICON_NSIS})
+            file(TO_NATIVE_PATH "${INSTALLER_UNINSTALLER_ICON}" UNINSTALLER_ICON_NSIS)
+            set(CPACK_NSIS_MUI_UNIICON ${UNINSTALLER_ICON_NSIS})
+
+            set(CPACK_NSIS_EXTRA_INSTALL_COMMANDS "
+                ExecShell \\\"\\\" \\\"$INSTDIR\\\\share\\\\cmake-2.6\\\\Tools\\\\CreateShortcuts.wsf\\\" \\\"% \\\$INSTDIR % \\\$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\"
+            ")
+#             set(CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS "
+#                 ExecShell \\\"\\\" \\\"$INSTDIR\\\\share\\\\cmake-2.6\\\\Tools\\\\RemoveShortcuts.wsf\\\" \\\"% \\\$INSTDIR % \\\$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\"
+#             ")
+
         endif(WIN32)
 
         ac_debug_installer("CPack is being initialized")

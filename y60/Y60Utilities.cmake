@@ -149,6 +149,7 @@ macro(y60_add_launcher NAME)
     endif(UNIX)
 
     if(WIN32)
+        # generate launcher batch script for installed tree runs
         configure_file(
             ${Y60_TEMPLATE_DIR}/Y60InstallLauncher.bat.in
             ${CMAKE_CURRENT_BINARY_DIR}/${ACMAKE_BINARY_SUBDIR}/${NAME}.bat
@@ -162,6 +163,8 @@ macro(y60_add_launcher NAME)
                         OWNER_READ    GROUP_READ    WORLD_READ
                         OWNER_WRITE
         )
+
+        ac_add_installer_shortcut(${NAME} "" "" "" "bin\\\\\\\\${NAME}.bat" "")
     endif(WIN32)
 endmacro(y60_add_launcher)
 

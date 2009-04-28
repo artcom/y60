@@ -47,6 +47,8 @@ install(
 set(EXTRA_TOOLS)
 if(WIN32)
     list(APPEND EXTRA_TOOLS PATTERN "*.bat")
+    list(APPEND EXTRA_TOOLS PATTERN "*.wsf")
+    list(APPEND EXTRA_TOOLS PATTERN "*.js")
 endif(WIN32)
 install(
     DIRECTORY tools/
