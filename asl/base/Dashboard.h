@@ -286,6 +286,7 @@ namespace asl {
             };
             Timer(const Timer & theTimer)
                 : 
+                _myLastElapsed(theTimer._myLastElapsed),
                 _myElapsed(theTimer._myElapsed),
                 _myStartTime(theTimer._myStartTime),
                 _myMinTime(theTimer._myMinTime),
@@ -297,6 +298,7 @@ namespace asl {
             {
             }
             Timer & operator=(const Timer & theTimer) {
+                _myLastElapsed = theTimer._myLastElapsed;
                 _myElapsed = theTimer._myElapsed;
                 _myStartTime = theTimer._myStartTime;
                 _myGroup = theTimer._myGroup;
@@ -313,23 +315,31 @@ namespace asl {
                     _isRunning = true;
                 }
             };
+            void setName(const std::string theName) {
+                _myName = theName;
+            }
+            const std::string & getName() const {
+                return _myName;
+            }
+                       
             void stop(unsigned long count = 1){
                 if (_isRunning) {
-                    asl::NanoTime myTimeDiff = asl::NanoTime() - _myStartTime;
-                    _myElapsed += myTimeDiff;
+                    _myLastElapsed = asl::NanoTime() - _myStartTime;
+                    _myElapsed += _myLastElapsed;
                     _isRunning = false;
                     _myCounter.count(count);
-                    if (myTimeDiff < _myMinTime) {
-                        _myMinTime = myTimeDiff;
+                    if (_myLastElapsed < _myMinTime) {
+                        _myMinTime = _myLastElapsed;
                     }
-                    if (myTimeDiff > _myMaxTime) {
-                        _myMaxTime = myTimeDiff;
+                    if (_myLastElapsed > _myMaxTime) {
+                        _myMaxTime = _myLastElapsed;
                     }
                 }
             };
             void reset(){
                 _isRunning = false;
                 _myElapsed = 0;
+                _myLastElapsed = 0;
                 _myStartTime = 0;
                 _myMinTime.setNow();  // This is a time difference, but setNow should be large enough...
                 _myMaxTime = 0;
@@ -368,9 +378,13 @@ namespace asl {
             const asl::NanoTime & getMax() const {
                 return _myMaxTime;
             }
+            const asl::NanoTime & getLastElapsed() const {
+                return _myLastElapsed;
+            }
 
 
         private:
+            asl::NanoTime   _myLastElapsed;
             asl::NanoTime	_myElapsed;
             asl::NanoTime   _myStartTime;
             asl::NanoTime   _myMinTime;
@@ -379,6 +393,7 @@ namespace asl {
             TimerPtr _myParent;
             unsigned long _myGroup;
             Counter _myCounter;
+            std::string _myName;
             bool    _isRunning;
     };
 
@@ -398,6 +413,10 @@ namespace asl {
         void cycle(unsigned int theGroup = 1, unsigned long theIncrement=1);
         double getFrameRate();
         TimerPtr findParent();
+        
+        // returns a sorted list of timers where lastElapsedTime matches maxTime and is greater than theThreshold
+        // the Limit is the Number of Top item to be returned, 0 for all items
+        std::vector<TimerPtr> getNewMaxTimers(asl::NanoTime theElapsedThreshold, asl::NanoTime theAgeLimit, size_t theCountLimit);
     private:
         std::map<std::string,TimerPtr> _myTimers;
         std::map<std::string,CounterPtr> _myCounters;

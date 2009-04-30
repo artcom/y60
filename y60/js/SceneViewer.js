@@ -81,6 +81,7 @@ use("shutter.js");
 use("OnScreenDisplay.js");
 use("MemoryMeter.js");
 use("VideoRecorder.js");
+use("PerfMeter.js");
 
 //if (operatingSystem() == "WIN32") {
 //    plug("y60QuicktimeDecoder"); // turn quicktime decoder on for windows and better mov decoder support
@@ -166,6 +167,12 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         Logger.warning("ImageManager is deprecated.");
         return _myImageManager;
     }
+    self.getPerfMeter = function() {
+        if (!_myPerfMeter) {
+            _myPerfMeter = new PerfMeter(self);
+        }
+        return _myPerfMeter;
+    }
 
     self.setSplashScreen = function(theFlag) {
         _mySplashScreenFlag = theFlag;
@@ -212,7 +219,11 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         if(_myConfigurator) {
             _myConfigurator.onFrame(theTime);
         }
-    }
+        if (_myPerfMeter) {
+            _myPerfMeter.onFrame(theTime);
+        }
+         
+    } 
 
     self.onPreRender = function() {
     }
@@ -228,6 +239,9 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         }
         if (_myMemoryMeter) {
             _myMemoryMeter.onPostRender();
+        }
+        if (_myPerfMeter) {
+            _myPerfMeter.onPostRender();
         }
         if (_myOnScreenStatistics > 0) {
             showStatistics();
@@ -413,6 +427,9 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
                         _myMemoryMeter = new MemoryMeter(self);
                     }
                     _myMemoryMeter.toggleEnableFlag();
+                    break;
+                case 'T':
+                    self.getPerfMeter().toggleEnableFlag();
                     break;
                 case '0':
                 case '1':
@@ -728,6 +745,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
          print("    P          prints a list of all nodes that have changed since last print");
          print("    U          flush currently unused nodes in lazy loading mode");
          print("    u          toggle used memory display");
+         print("    T          toggle timing display");
          print("    e          re-evaluate all include-files");
          print("    i          Cycles window swap interval");
          print("    +          increase zoom factor");
@@ -780,6 +798,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
     var _myOnScreenDisplay       = null;
     var _mySetDefaultRenderingCap= true;
     var _myMemoryMeter           = null;
+    var _myPerfMeter             = null;
     var _myOnScreenStatistics    = 0;
     var _myVideoRecorder         = null;
     var _myStatisticColor        = [1,1,1,1];

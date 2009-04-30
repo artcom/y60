@@ -54,6 +54,7 @@
 
 #include <iomanip>
 #include <iostream>
+#include <algorithm>
 
 #define DB(x) // x
 
@@ -116,6 +117,7 @@ namespace asl {
                 TimerPtr myParent   = findParent();
                 TimerPtr myNewTimer = TimerPtr(new Timer(myParent));
                 _myTimers[theName]  = myNewTimer;
+                myNewTimer->setName(theName);
                 _mySortedTimers.push_back(std::make_pair(theName, myNewTimer));
                 return myNewTimer;
             }
@@ -191,11 +193,31 @@ namespace asl {
         }
     }
 
+    struct less_max {
+        bool operator()(const TimerPtr & a, const TimerPtr & b) const { return a->getMax() < b->getMax(); }
+    };
+
+    std::vector<TimerPtr> 
+    Dashboard::getNewMaxTimers(asl::NanoTime theElapsedThreshold, asl::NanoTime theAgeLimit, size_t theCountLimit) {
+        asl::NanoTime now;
+        std::vector<TimerPtr> myResult;
+        for (std::map<std::string,TimerPtr>::iterator it=_myTimers.begin();
+            it != _myTimers.end(); ++it)
+        {
+            if ((it->second->getLastElapsed() > theElapsedThreshold) && (it->second->getStartTime()+theAgeLimit > now)) {
+                myResult.push_back(it->second);
+                AC_TRACE << "Pushing "<<it->second->getName()<<",lastElapsed="<<it->second->getLastElapsed().ticks()<<",start="<<it->second->getStartTime().ticks();
+            }
+        }
+        std::sort(myResult.begin(), myResult.end(), less_max());
+        if (theCountLimit != 0) {
+            myResult.resize(theCountLimit < myResult.size() ? theCountLimit : myResult.size());
+        }
+        return myResult;
+    }
+
     void
         Dashboard::printTimers(Table & theTable, TimerPtr theParent, const std::string & theIndent) {
-            //for (std::map<std::string,TimerPtr>::iterator it=_myTimers.begin();
-            //	it != _myTimers.end(); ++it)
-            //{
 
             for (unsigned i = 0; i < _mySortedTimers.size(); ++i) {
                 std::string & myTimerName = _mySortedTimers[i].first;

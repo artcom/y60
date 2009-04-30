@@ -62,6 +62,7 @@
 #include <y60/jsbase/Documentation.h>
 #include <y60/jsbase/JSWrapper.impl>
 #include <asl/base/LogMessageSinks.h>
+#include <asl/base/Dashboard.h>
 #include <iostream>
 
 using namespace asl;
@@ -150,7 +151,6 @@ static JSBool addFarewellSink(JSContext *cx, JSObject *obj, uintN argc, jsval *a
 
 }
 
-
 static JSBool
 setVerbosity(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Set global Verbosity of Logger.");
@@ -184,6 +184,99 @@ setVerbosity(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
     } HANDLE_CPP_EXCEPTION;
 }
 
+// This is not exactly a logger function, it accesses the Dashboard, but it seems to be better here than in window
+static JSBool getLastElapsed(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("returns the lastElapsed value of a named dashboard timer, returns undefined if timer does not exist");
+    DOC_PARAM("thTimerName", "", DOC_TYPE_STRING);
+    DOC_RVAL("theLastElapsedSeconds", DOC_TYPE_FLOAT);
+    DOC_END;
+    try {
+        ensureParamCount(argc, 1);
+        std::string myTimerName;
+        convertFrom(cx, argv[0], myTimerName);
+        asl::TimerPtr myTimer = asl::getDashboard().getTimer(myTimerName);
+        if (myTimer) {
+            *rval = as_jsval(cx, myTimer->getLastElapsed().seconds());
+        }
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+jsval as_jsval(JSContext *cx, const asl::Timer & theTimer)
+{
+    JSObject * myReturnObject = JS_NewArrayObject(cx, 0, NULL);
+    jsval rval = OBJECT_TO_JSVAL(myReturnObject);
+    if (!JS_DefineProperty(cx, myReturnObject, "lastelapsed", as_jsval(cx, theTimer.getLastElapsed().seconds()), 0,0, JSPROP_ENUMERATE)) return JSVAL_VOID;
+    if (!JS_DefineProperty(cx, myReturnObject, "elapsed", as_jsval(cx, theTimer.getElapsed().seconds()), 0,0, JSPROP_ENUMERATE)) return JSVAL_VOID;
+    if (!JS_DefineProperty(cx, myReturnObject, "starttime", as_jsval(cx, theTimer.getStartTime().seconds()), 0,0, JSPROP_ENUMERATE)) return JSVAL_VOID;
+    if (!JS_DefineProperty(cx, myReturnObject, "isRunning", as_jsval(cx, theTimer.isRunning()), 0,0, JSPROP_ENUMERATE)) return JSVAL_VOID;
+    if (!JS_DefineProperty(cx, myReturnObject, "min", as_jsval(cx, theTimer.getMin().seconds()), 0,0, JSPROP_ENUMERATE)) return JSVAL_VOID;
+    if (!JS_DefineProperty(cx, myReturnObject, "max", as_jsval(cx, theTimer.getMax().seconds()), 0,0, JSPROP_ENUMERATE)) return JSVAL_VOID;
+    if (!JS_DefineProperty(cx, myReturnObject, "count", as_jsval(cx, theTimer.getCounter().getCount()), 0,0, JSPROP_ENUMERATE)) return JSVAL_VOID;
+    if (!JS_DefineProperty(cx, myReturnObject, "name", as_jsval(cx, theTimer.getName()), 0,0, JSPROP_ENUMERATE)) return JSVAL_VOID;
+    
+   return rval;
+}
+
+
+jsval as_jsval(JSContext *cx, const std::vector<asl::TimerPtr> & theTimers) {
+    JSObject * myReturnObject = JS_NewArrayObject(cx, 0, NULL);
+    jsval rval = OBJECT_TO_JSVAL(myReturnObject);
+    for (size_t i = 0; i < theTimers.size(); ++i) {
+        jsval myValue = as_jsval(cx, *theTimers[i]);
+        if (!JS_SetElement(cx, myReturnObject, i, &myValue)) {
+            return JS_FALSE;
+        }
+    }
+    return rval;
+}
+
+// This is not exactly a logger function, it accesses the Dashboard, but it seems to be better here than in window
+static JSBool getTimer(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("returns the values of a named dashboard timer, returns undefined if timer does not exist");
+    DOC_PARAM("thTimerName", "", DOC_TYPE_STRING);
+    DOC_RVAL("timer object", DOC_TYPE_OBJECT);
+    DOC_END;
+    try {
+        ensureParamCount(argc, 1);
+        std::string myTimerName;
+        convertFrom(cx, argv[0], myTimerName);
+        asl::TimerPtr myTimer = asl::getDashboard().getTimer(myTimerName);
+        if (myTimer) {
+            *rval = as_jsval(cx, *myTimer);
+        }
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+// This is not exactly a logger function, it accesses the Dashboard, but it seems to be better here than in window
+static JSBool getNewMaxTimers(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("returns a sorted list of timers where lastElapsedTime is greater than theElapsedThreshold,"
+               "The startTime is larger theAgeThreshold, and the Limit is the Number of top items to be returned, 0 for all items");
+    DOC_PARAM("theElapsedThreshold", "", DOC_TYPE_FLOAT);
+    DOC_PARAM("theAgeThreshold", "", DOC_TYPE_FLOAT);
+    DOC_PARAM("theTimerCountLimit", "", DOC_TYPE_INTEGER);
+    DOC_RVAL("list of timer objects", DOC_TYPE_OBJECT);
+    DOC_END;
+    try {
+        ensureParamCount(argc, 3);
+        double myThreshold = 0;
+        convertFrom(cx, argv[0], myThreshold);
+        unsigned long long myThresholdTicks = myThreshold * asl::NanoTime::perSecond();
+        double myAgeThreshold = 0;
+        convertFrom(cx, argv[1], myAgeThreshold);
+        unsigned long long myAgeThresholdTicks = myAgeThreshold * asl::NanoTime::perSecond();
+        size_t myCount = 0;
+        convertFrom(cx, argv[2], myCount);
+        AC_TRACE << "myThresholdTicks=" << myThresholdTicks << ", myAgeThresholdTicks="<<myAgeThresholdTicks<<",myCount="<<myCount;
+        std::vector<asl::TimerPtr> myTimers = asl::getDashboard().getNewMaxTimers(myThresholdTicks, myAgeThresholdTicks, myCount);
+        if (myTimers.size()) {
+            *rval = as_jsval(cx, myTimers);
+        }
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
 JSFunctionSpec *
 JSLogger::StaticFunctions() {
     AC_DEBUG << "Registering class '"<<ClassName()<<"'"<<endl;
@@ -198,10 +291,14 @@ JSLogger::StaticFunctions() {
         {"setVerbosity", setVerbosity, 4},
         {"addFileSink", addFileSink, 1},
         {"addFarewellSink", addFarewellSink, 0},
+        {"getLastElapsed", getLastElapsed, 1},
+        {"getTimer", getTimer, 1},
+        {"getNewMaxTimers", getNewMaxTimers, 2},
         {0}
     };
     return myFunctions;
 }
+
 JSFunctionSpec *
 JSLogger::Functions() {
     AC_DEBUG << "Registering class '"<<ClassName()<<"'"<<endl;
