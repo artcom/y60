@@ -83,12 +83,9 @@ namespace y60 {
             void setup(MaterialBase & theMaterial);
 
         private:
-            typedef std::map<std::string, VectorOfMatrix4f > JointSpaceMap;
-            typedef std::map<std::string, std::vector<JointFacadePtr> > JointsMap;
-
             dom::NodePtr                 _myBoneMatrixPropertyNode;
-            JointsMap                    _myJoints;
-            JointSpaceMap                _myJointSpaceTransforms;
+            std::vector<JointFacadePtr>  _myJoints;
+            std::vector<asl::Matrix4f>   _myJointSpaceTransforms;
             dom::NodePtr                 _myBoundingBoxNode;
 
     };

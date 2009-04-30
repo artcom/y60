@@ -758,12 +758,9 @@ namespace y60 {
                 unsigned mySize = cgGetArraySize(curParam._myParameter, 0);
                 for (unsigned i = 0; i < mySize; ++i) {
                     CGparameter myParam = cgGetArrayParameter(curParam._myParameter, i);
-                    Matrix4f myMatrix = theMaterial.getTextureUnit(i).getTexture()->getImage()->get<ImageMatrixTag>();
-                    myMatrix.postMultiply( theMaterial.getTextureUnit(i).getTexture()->get<TextureMatrixTag>() );
-                    myMatrix.postMultiply( theMaterial.getTextureUnit(i).get<TextureUnitMatrixTag>() );
-                    
-                    { AC_TRACE << "setting texture matrix << " << i << " param=" << myParam << " to " << myMatrix; }
-                    cgGLSetMatrixParameterfc(myParam, myMatrix.getData());
+                    Matrix4f myTextureMatrix = theMaterial.getTextureUnit(i).get<TextureUnitMatrixTag>();
+                        {AC_TRACE << "setting texture matrix << " << i << " param=" << myParam << " to " << myTextureMatrix;}
+                    cgGLSetMatrixParameterfc(myParam, myTextureMatrix.getData());
                 }
                 break;
             }
@@ -1038,7 +1035,7 @@ namespace y60 {
     CgProgramInfo::setCgUnsizedArrayParameter(const CgProgramAutoParam & theParam,
                                               const vector<asl::Vector4f> & theValue)
     {
-        int mySize = theValue.size(); // _myUnsizedArrayAutoParamSizes[theParam._myID];
+        int mySize = _myUnsizedArrayAutoParamSizes[theParam._myID];
         // int mySize = cgGetArraySize(theParam._myParameter, 0);
         if (mySize != static_cast<int>(theValue.size())) {
             AC_ERROR << "BUG 391: Cg Array " << theParam._myName << " expects " << mySize <<
