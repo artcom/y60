@@ -282,7 +282,9 @@ namespace y60 {
         }    
         
 
-        // now select matching compiler args; either one same set for all profiles or exactly one set per profile are allowed
+        // now select matching compiler args; 
+        // either one same set for all profiles or exactly one set per profile are allowed
+        //
         if (theShaderNode->getAttribute(CG_COMPILERARGS2_PROPERTY)) {
             VectorOfVectorOfString myCompilerArgs = theShaderNode->getAttributeValue<VectorOfVectorOfString>(CG_COMPILERARGS2_PROPERTY);
             VectorOfVectorOfString::size_type myCompilerArgsIndex = 0;
@@ -301,12 +303,15 @@ namespace y60 {
             }    
         }    
 
-        // now add the include path to the shader args
+        // now add the include path to the compiler args 
         PackageList myPackages = AppPackageManager::get().getPtr()->getPackageList();
         PackageList::const_iterator it = myPackages.begin();
         while( it != myPackages.end() ) {
-            std::string myArg = " -I" + (*it++)->getPath();
-            theShader._myCompilerArgs.push_back( myArg );
+            std::string myPath = (*it++)->getPath();
+            if (!myPath.empty()) {
+                std::string myArg = " -I" + myPath;
+                theShader._myCompilerArgs.push_back( myArg );
+            }
         }
 
 #if 0

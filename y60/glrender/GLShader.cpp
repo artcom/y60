@@ -294,6 +294,9 @@ namespace y60 {
             } else {
                 glDisable(GL_DEPTH_TEST);
             }
+        } else {
+            // on by default
+            glEnable(GL_DEPTH_TEST);
         }
         CHECK_OGL_ERROR;
 
