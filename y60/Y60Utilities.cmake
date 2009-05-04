@@ -80,22 +80,29 @@ endmacro(y60_add_component)
 macro(y60_add_launcher NAME)
     parse_arguments(
         THIS_LAUNCHER
-        "ENGINE;MAIN_SCRIPT;BUILD_WORKING_DIR;INSTALL_WORKING_DIR"
+        "COMMAND_NAME;DESCRIPTION;CATEGORIES;ENGINE;MAIN_SCRIPT;BUILD_WORKING_DIR;INSTALL_WORKING_DIR;MIME_TYPES"
         ""
         ${ARGN}
     )
 
     set(APPLICATION ${Y60_CURRENT_APPLICATION})
 
-    get_global(${APPLICATION}_BUILD_PATH THIS_APPLICATION_BUILD_PATH)
+    get_global(${APPLICATION}_BUILD_PATH   THIS_APPLICATION_BUILD_PATH)
     get_global(${APPLICATION}_INSTALL_PATH THIS_APPLICATION_INSTALL_PATH)
-    get_global(${APPLICATION}_BINARY_DIR THIS_APPLICATION_BINARY_DIR)
-    get_global(${APPLICATION}_SOURCE_DIR THIS_APPLICATION_SOURCE_DIR)
+    get_global(${APPLICATION}_BINARY_DIR   THIS_APPLICATION_BINARY_DIR)
+    get_global(${APPLICATION}_SOURCE_DIR   THIS_APPLICATION_SOURCE_DIR)
+
+    set(THIS_LAUNCHER_NAME "${NAME}")
 
     if(NOT THIS_LAUNCHER_ENGINE)
         set(THIS_LAUNCHER_ENGINE y60)
     endif(NOT THIS_LAUNCHER_ENGINE)
 
+    if(NOT THIS_LAUNCHER_COMMAND_NAME)
+        string(TOLOWER "${THIS_LAUNCHER_NAME}" THIS_LAUNCHER_COMMAND_NAME)
+    endif(NOT THIS_LAUNCHER_COMMAND_NAME)
+
+    # handle being called by an importer
     get_global(Y60_IS_INTEGRATED Y60_IS_INTEGRATED)
     if(Y60_IS_INTEGRATED)
             get_global(Y60_SOURCE_DIR Y60_SOURCE_DIR)
@@ -129,17 +136,17 @@ macro(y60_add_launcher NAME)
         # generate launcher shell script for build tree runs
         configure_file(
             ${Y60_TEMPLATE_DIR}/Y60BuildLauncher.sh.in
-            ${CMAKE_CURRENT_BINARY_DIR}/${NAME}
+            ${CMAKE_CURRENT_BINARY_DIR}/${COMMAND_NAME}
             @ONLY
         )
         # generate launcher shell script for installed tree runs
         configure_file(
             ${Y60_TEMPLATE_DIR}/Y60InstallLauncher.sh.in
-            ${CMAKE_CURRENT_BINARY_DIR}/${ACMAKE_BINARY_SUBDIR}/${NAME}
+            ${CMAKE_CURRENT_BINARY_DIR}/${ACMAKE_BINARY_SUBDIR}/${THIS_LAUNCHER_COMMAND_NAME}
             @ONLY
         )
         install(
-            FILES ${CMAKE_CURRENT_BINARY_DIR}/${ACMAKE_BINARY_SUBDIR}/${NAME}
+            FILES ${CMAKE_CURRENT_BINARY_DIR}/${ACMAKE_BINARY_SUBDIR}/${THIS_LAUNCHER_COMMAND_NAME}
             COMPONENT ${APPLICATION}
             DESTINATION bin/
             PERMISSIONS OWNER_EXECUTE GROUP_EXECUTE WORLD_EXECUTE
@@ -147,6 +154,25 @@ macro(y60_add_launcher NAME)
                         OWNER_WRITE
         )
     endif(UNIX)
+
+    if(LINUX)
+        # generate xdg desktop entry
+        set(THIS_LAUNCHER_DESKTOP_FILE ${CMAKE_CURRENT_BINARY_DIR}/${THIS_LAUNCHER_COMMAND_NAME}.desktop)
+
+        file(WRITE  ${THIS_LAUNCHER_DESKTOP_FILE} "[Desktop Entry]\n")
+        file(APPEND ${THIS_LAUNCHER_DESKTOP_FILE} "Type=Application\n")
+        file(APPEND ${THIS_LAUNCHER_DESKTOP_FILE} "Name=${THIS_LAUNCHER_NAME}\n")
+        file(APPEND ${THIS_LAUNCHER_DESKTOP_FILE} "TryExec=${THIS_LAUNCHER_COMMAND_NAME}\n")
+        file(APPEND ${THIS_LAUNCHER_DESKTOP_FILE} "Exec=${THIS_LAUNCHER_COMMAND_NAME} %U\n")
+        file(APPEND ${THIS_LAUNCHER_DESKTOP_FILE} "Categories=${THIS_LAUNCHER_CATEGORIES}\n")
+        file(APPEND ${THIS_LAUNCHER_DESKTOP_FILE} "MimeType=${THIS_LAUNCHER_MIME_TYPES}\n")
+
+        install(
+            FILES ${THIS_LAUNCHER_DESKTOP_FILE}
+            COMPONENT ${APPLICATION}
+            DESTINATION share/applications
+        )
+    endif(LINUX)
 
     if(WIN32)
         # generate launcher batch script for installed tree runs

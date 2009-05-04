@@ -74,6 +74,7 @@ if(GTKMM_FOUND AND GTKGLEXT_FOUND AND GLADEMM_FOUND)
     option(Y60_WITH_GTK "Build javascript gtk bindings and g60 frontend" ON)
 endif(GTKMM_FOUND AND GTKGLEXT_FOUND AND GLADEMM_FOUND)
 
+# Add optional gtk-based components
 if(Y60_WITH_GTK)
     add_subdirectory(acgtk)
     add_subdirectory(jsgtk)
@@ -142,5 +143,14 @@ add_custom_target(
     DEPENDS y60
     VERBATIM
 )
+
+# Install XDG MIME definition
+if(LINUX)
+    install(
+        FILES mime.xml
+        RENAME y60.xml
+        DESTINATION share/mime/packages
+    )
+endif(LINUX)
 
 ac_end_project(Y60)

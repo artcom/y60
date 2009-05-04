@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mime-info xmlns='http://www.freedesktop.org/standards/shared-mime-info'>
+  <mime-type type="model/x-artcom-x60">
+    <comment>Y60 scene (XML)</comment>
+    <glob pattern="*.x60"/>
+  </mime-type>
+  <mime-type type="model/x-artcom-b60">
+    <comment>Y60 scene (binary)</comment>
+    <glob pattern="*.b60"/>
+  </mime-type>
+  <mime-type type="model/x-artcom-d60">
+    <comment>Y60 scene (binary with catalog)</comment>
+    <glob pattern="*.d60"/>
+  </mime-type>
+  <mime-type type="image/x-artcom-i60">
+    <comment>Y60 image</comment>
+    <glob pattern="*.i60"/>
+  </mime-type>
+  <mime-type type="video/x-artcom-m60">
+    <comment>Y60 movie</comment>
+    <glob pattern="*.m60"/>
+  </mime-type>
+  <mime-type type="application/x-artcom-c60">
+    <comment>Y60 scene catalog</comment>
+    <glob pattern="*.c60"/>
+  </mime-type>
+  <mime-type type="application/x-artcom-p60">
+    <comment>Y60 scene patch</comment>
+    <glob pattern="*.p60"/>
+  </mime-type>
+</mime-info>
