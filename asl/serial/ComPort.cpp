@@ -120,12 +120,13 @@ namespace asl {
         //        there might be environmental state leaks in this.
         DCB myControlBlock;
 
+        // initialize control block with current state
         AC_TRACE << "Getting comm state";
         if (!GetCommState(myHandle, &myControlBlock)) {
             handleSystemError("GetCommState", PLUS_FILE_LINE);
         }
 
-        // normal COM port parameters
+        // common serial port parameters
         myControlBlock.BaudRate = theBaudRate;
         myControlBlock.ByteSize = static_cast<BYTE>(theDataBits);
         myControlBlock.Parity   = convertParity(theParityMode);
@@ -133,8 +134,11 @@ namespace asl {
         myControlBlock.fRtsControl = (theHWHandShakeFlag ? RTS_CONTROL_HANDSHAKE : RTS_CONTROL_DISABLE);
         myControlBlock.fDtrControl = (theHWHandShakeFlag ? DTR_CONTROL_HANDSHAKE : DTR_CONTROL_DISABLE);
 
+        // make handle unusable when it errors
+        // handle can be reset by reading comm errors
         myControlBlock.fAbortOnError = true;
 
+        // apply control block settings
         AC_TRACE << "Setting comm state";
         if (!SetCommState(myHandle, &myControlBlock)) {
             handleSystemError("SetCommState", PLUS_FILE_LINE);
@@ -153,12 +157,12 @@ namespace asl {
             myTimeouts.ReadTotalTimeoutMultiplier = 0;
             myTimeouts.ReadTotalTimeoutConstant = 0;
         } else if (theMinBytesPerRead > 0 && theTimeout > 0) {
-            // blocking until interframe timeout
+            // block until interframe timeout
             myTimeouts.ReadIntervalTimeout = theTimeout * 100;
             myTimeouts.ReadTotalTimeoutMultiplier = 0;
             myTimeouts.ReadTotalTimeoutConstant = 0;
         } else if (theMinBytesPerRead == 0 && theTimeout > 0) {
-            // blocking until at least one byte arrives
+            // block until at least one byte arrives
             myTimeouts.ReadIntervalTimeout = MAXDWORD;
             myTimeouts.ReadTotalTimeoutMultiplier = MAXDWORD;
             myTimeouts.ReadTotalTimeoutConstant = theTimeout * 100;
@@ -168,6 +172,7 @@ namespace asl {
         myTimeouts.WriteTotalTimeoutConstant = 0;
         myTimeouts.WriteTotalTimeoutMultiplier = 0;
 
+        // apply blocking configuration
         AC_TRACE << "Setting comm timeouts";
         if (!SetCommTimeouts(myHandle, &myTimeouts)) {
             handleSystemError("SetCommTimeouts", PLUS_FILE_LINE);
@@ -196,6 +201,7 @@ namespace asl {
         }
 
         _myHandle = INVALID_HANDLE_VALUE;
+
         isOpen(false);
     }
 
