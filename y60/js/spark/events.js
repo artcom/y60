@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: Event handling
 //
 // Last Review: NEVER, NOONE
 //
@@ -121,8 +121,6 @@ spark.EventDispatcher = spark.AbstractClass("EventDispatcher");
 
 spark.EventDispatcher.Constructor = function(Protected) {
     var Public = this;
-
-    this.Inherit(spark.Container);
 
     var _myListenersByType = {};
 

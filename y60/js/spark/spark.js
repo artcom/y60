@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: Top-level load file for SPARK
 //
 // Last Review: NEVER, NOONE
 //
@@ -95,6 +95,8 @@ use("cache.js");
 use("components.js");
 // event handling
 use("events.js");
+// internationalization
+use("internationalization.js");
 
 // XXX: spark widgets
 if ("useSparkWidgets" in this) {

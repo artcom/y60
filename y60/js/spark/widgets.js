@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: Standard widgets
 //
 // Last Review: NEVER, NOONE
 //
@@ -68,6 +68,7 @@ spark.Widget.Constructor = function(Protected) {
     var Base = {};
     var Public = this;
 
+    this.Inherit(spark.Container);
     this.Inherit(spark.EventDispatcher);
 
     var _mySceneNode   = null;
@@ -806,12 +807,12 @@ spark.Image.Constructor = function(Protected) {
     // XXX: this should not exist.
     Public.texture getter = function() {
         return _myTexture;
-    }
+    };
     
     // XXX: this should not exist.
     Public.textureId setter = function(theTextureId) {
         _myMaterial.childNode("textureunits").firstChild.texture = theTextureId;
-    }
+    };
 
     Base.realize = Public.realize;
     Public.realize = function() {
@@ -838,78 +839,8 @@ spark.Image.Constructor = function(Protected) {
 
         Base.realize(myMaterial);        
     };
+    
 };
-
-
-// XXX: I18N
-spark.I18N = spark.ComponentClass("I18N");
-
-spark.GERMAN  = "de";
-spark.ENGLISH = "en";
-
-spark.I18N.Constructor = function(Protected) {
-    var Base = {};
-    var Public = this;
-    var _myActiveTag = "";
-
-    var _myI18NComponents = [];
-    
-    this.Inherit(spark.Container);
-    
-    Public.language getter = function() {
-        return _myActiveTag;
-    }
-    
-    Public.language setter = function(theLanguage) {
-        if (_myActiveTag != theLanguage) {
-            _myActiveTag = theLanguage;
-            Public.update();      
-        }
-    }
-
-    Public.getActiveItem = function(theId) {
-        var myResult = null;
-        var myI18NItem = Public.node.getElementById(theId);
-        if (myI18NItem) {
-            var myLanguageNode = myI18NItem.childNode(_myActiveTag);
-            myResult = myLanguageNode.childNode(0).nodeValue;
-        }
-        return myResult;
-    }
-    
-    Public.registerListener = function(theListener) {
-        _myI18NComponents[theListener.name] = theListener;    
-    }
-    
-    Base.realize = Public.realize;
-    Public.realize = function() {
-        Base.realize();
-        _myActiveTag = Protected.getString("default", "de");
-    }   
-    Public.update = function() {
-        for (var myI18NClientKey in _myI18NComponents) {
-            _myI18NComponents[myI18NClientKey].updateI18N();
-        }
-    }    
-}
-
-spark.I18NItem = spark.ComponentClass("I18NItem");
-
-spark.I18NItem.Constructor = function(Protected) {
-    var Base = {};
-    var Public = this;
-   
-    this.Inherit(spark.Container);
-
-
-    Base.realize = Public.realize;
-    Public.realize = function() {
-        Base.realize();
-    }   
-    
-    Public.instantiateChildren = function(theNode) {}
-}
-
 
 
 /**
@@ -943,7 +874,7 @@ spark.Text.Constructor = function(Protected) {
     // XXX: I18N
     Public.updateI18N = function() {   
         Public.text = Protected.realizeI18N(_myText);
-    }
+    };
 
     Protected.performLayout = function(theText) {return theText;}
 
@@ -951,7 +882,7 @@ spark.Text.Constructor = function(Protected) {
         if (_myText) {
             return spark.renderText(_myImage, _myText, _myStyle, Public.size);
         }
-    }
+    };
     
     Base.realize = Public.realize;
     Public.realize = function() {
