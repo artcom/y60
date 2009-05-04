@@ -146,18 +146,24 @@ macro(ac_add_installer_component NAME)
     endif(ACMAKE_BUILD_PACKAGES)
 endmacro(ac_add_installer_component)
 
-set(ACMAKE_SHORTCUT_FILE "${CMAKE_BINARY_DIR}/${ACMAKE_BINARY_SUBDIR}/Shortcuts.js")
+if(WIN32)
+    set(ACMAKE_SHORTCUT_FILE "${CMAKE_BINARY_DIR}/${ACMAKE_BINARY_SUBDIR}/Shortcuts.js")
+endif(WIN32)
 
 macro(_ac_init_installer_shortcuts)
-    file(WRITE ${ACMAKE_SHORTCUT_FILE} "// This generated file lists all shortcuts\n")
-    install(
-        FILES ${ACMAKE_SHORTCUT_FILE}
-        DESTINATION share/cmake-2.6/Tools
-    )
+    if(WIN32)
+        file(WRITE ${ACMAKE_SHORTCUT_FILE} "// This generated file lists all shortcuts\n")
+        install(
+            FILES ${ACMAKE_SHORTCUT_FILE}
+            DESTINATION share/cmake-2.6/Tools
+            )
+    endif(WIN32)
 endmacro(_ac_init_installer_shortcuts)
 
 macro(ac_add_installer_shortcut NAME ICON DESCRIPTION WORKINGDIR COMMAND ARGUMENTS)
-    file(APPEND ${ACMAKE_SHORTCUT_FILE} "defineShortcut(\"${NAME}\", \"${ICON}\", \"${DESCRIPTION}\", \"${WORKINGDIR}\", \"${COMMAND}\", \"${ARGUMENTS}\")\n")
+    if(WIN32)
+        file(APPEND ${ACMAKE_SHORTCUT_FILE} "defineShortcut(\"${NAME}\", \"${ICON}\", \"${DESCRIPTION}\", \"${WORKINGDIR}\", \"${COMMAND}\", \"${ARGUMENTS}\")\n")
+    endif(WIN32)
 endmacro(ac_add_installer_shortcut)
 
 # Internal: handle installation for a specific project.
