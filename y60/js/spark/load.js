@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: Document loader and instantiation engine
 //
 // Last Review: NEVER, NOONE
 //

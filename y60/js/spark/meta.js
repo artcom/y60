@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: Component class registry and template processor
 //
 // Last Review: NEVER, NOONE
 //
