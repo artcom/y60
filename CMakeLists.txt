@@ -33,6 +33,7 @@ set(ACMAKE_BUILDINFO_TEMPLATE
 add_subdirectory(acmake)
 include(AcMake)
 
+# declare our packaging solution
 ac_begin_solution(
     PRO60
     DESCRIPTION  "PRO60 Environment"
@@ -45,10 +46,7 @@ ac_begin_solution(
     UNINSTALLER_ICON "${CMAKE_SOURCE_DIR}/installer/windows/shopping_bag_grey.ico"
 )
 
-# XXX: define the component for AcMake.
-#      this can only be done once CPack has
-#      been loaded, which can't be done before
-#      defining our AcMake solution
+# define the installer component for AcMake
 if(ACMAKE_BUILD_PACKAGES)
 cpack_add_component(
     AcMake
@@ -63,7 +61,7 @@ add_subdirectory(netsrc)
 add_subdirectory(asl)
 add_subdirectory(y60)
 
-# XXX hack for testing the scenetests and tutorials
+# integrate testmodels and tutorials if present
 if(EXISTS ${CMAKE_SOURCE_DIR}/../testmodels)
   add_subdirectory(../testmodels ${CMAKE_CURRENT_BINARY_DIR}/testmodels)
 endif(EXISTS ${CMAKE_SOURCE_DIR}/../testmodels)
