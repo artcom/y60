@@ -134,25 +134,25 @@ macro(y60_add_launcher NAME)
 
     if(UNIX)
         # generate launcher shell script for build tree runs
-#        configure_file(
-#            ${Y60_TEMPLATE_DIR}/Y60BuildLauncher.sh.in
-#            ${CMAKE_CURRENT_BINARY_DIR}/${COMMAND_NAME}
-#            @ONLY
-#        )
+        configure_file(
+            ${Y60_TEMPLATE_DIR}/Y60BuildLauncher.sh.in
+            ${CMAKE_CURRENT_BINARY_DIR}/${THIS_LAUNCHER_COMMAND_NAME}
+            @ONLY
+        )
         # generate launcher shell script for installed tree runs
-#        configure_file(
-#            ${Y60_TEMPLATE_DIR}/Y60InstallLauncher.sh.in
-#            ${CMAKE_CURRENT_BINARY_DIR}/${ACMAKE_BINARY_SUBDIR}/${THIS_LAUNCHER_COMMAND_NAME}
-#            @ONLY
-#        )
-#        install(
-#            FILES ${CMAKE_CURRENT_BINARY_DIR}/${ACMAKE_BINARY_SUBDIR}/${THIS_LAUNCHER_COMMAND_NAME}
-#            COMPONENT ${APPLICATION}
-#            DESTINATION bin/
-#            PERMISSIONS OWNER_EXECUTE GROUP_EXECUTE WORLD_EXECUTE
-#                        OWNER_READ    GROUP_READ    WORLD_READ
-#                        OWNER_WRITE
-#        )
+        configure_file(
+            ${Y60_TEMPLATE_DIR}/Y60InstallLauncher.sh.in
+            ${CMAKE_CURRENT_BINARY_DIR}/${ACMAKE_BINARY_SUBDIR}/${THIS_LAUNCHER_COMMAND_NAME}
+            @ONLY
+        )
+        install(
+            FILES ${CMAKE_CURRENT_BINARY_DIR}/${ACMAKE_BINARY_SUBDIR}/${THIS_LAUNCHER_COMMAND_NAME}
+            COMPONENT ${APPLICATION}
+            DESTINATION bin/
+            PERMISSIONS OWNER_EXECUTE GROUP_EXECUTE WORLD_EXECUTE
+                        OWNER_READ    GROUP_READ    WORLD_READ
+                        OWNER_WRITE
+        )
     endif(UNIX)
 
     if(LINUX)
