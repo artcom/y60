@@ -90,6 +90,7 @@ spark.I18nContext.Constructor = function(Protected) {
     
 };
 
+
 spark.I18nEvent = spark.Class("I18nEvent");
 
 spark.I18nEvent.LANGUAGE = "language";
@@ -106,7 +107,18 @@ spark.I18nEvent.Constructor = function(Protected, theLanguage) {
         return _myLanguage;
     };
 
+    var _myData = null;
+
+    Public.data getter = function() {
+        return _myData;
+    };
+
+    Public.data setter = function(theValue) {
+        _myData = theValue;
+    };
+
 };
+
 
 spark.I18nItem = spark.AbstractClass("I18nItem");
 
@@ -121,7 +133,7 @@ spark.I18nItem.Constructor = function(Protected) {
 
     var _myLanguageNodes = {};
 
-    Public.languageNodes = function() {
+    Protected.languageNodes = function() {
         return _myLanguageNodes;
     };
 
@@ -134,12 +146,28 @@ spark.I18nItem.Constructor = function(Protected) {
         }
     };
 
+    Protected.createEvent = function(theLanguage) {
+        return new spark.I18nEvent(theLanguage);
+    };
+
+    Protected.getNode = function(theLanguage) {
+        if(!(theLanguage in _myLanguageNodes)) {
+            throw new Error("I18n item " + Public.name + " does not contain language " + theLanguage);
+        } else {
+            return _myLanguageNodes[theLanguage];
+        }
+    };
+
     Public.switchLanguage = function(theLanguage) {
         if(theLanguage == _myLanguage) {
             return;
         }
+
+        if(!(theLanguage in _myLanguageNodes)) {
+            throw new Error("I18n item " + Public.name + " does not contain language " + theLanguage);
+        }
         
-        var myEvent = new spark.I18nEvent(theLanguage);
+        var myEvent = Protected.createEvent(theLanguage);
         Public.dispatchEvent(myEvent);
 
         _myLanguage = theLanguage;
@@ -159,6 +187,14 @@ spark.I18nText.Constructor = function(Protected) {
     Public.realize = function() {
         Base.realize();
     };
+
+    Base.createEvent = Protected.createEvent;
+    Protected.createEvent = function(theLanguage) {
+        var myNode = Protected.getNode(theLanguage);
+        var myEvent = Base.createEvent(theLanguage);
+        myEvent.data = myNode.childNode("#text").nodeValue;
+        return myEvent;
+    };
 };
 
 spark.I18nImage = spark.ComponentClass("I18nImage");
@@ -172,5 +208,14 @@ spark.I18nImage.Constructor = function(Protected) {
     Base.realize = Public.realize;
     Public.realize = function() {
         Base.realize();
-    };    
+    };
+
+    Base.createEvent = Protected.createEvent;
+    Protected.createEvent = function(theLanguage) {
+        var myNode = Protected.getNode(theLanguage);
+        var myEvent = Base.createEvent(theLanguage);
+        var mySource = myNode.childNode("#text").nodeValue;
+        myEvent.data = spark.getCachedImage(mySource);
+        return myEvent;
+    };
 };
