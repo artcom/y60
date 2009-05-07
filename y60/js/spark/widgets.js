@@ -929,11 +929,6 @@ spark.Image.Constructor = function(Protected) {
         var myItem = Public.getI18nItemByName(theItemId);
         myItem.addEventListener(spark.I18nEvent.LANGUAGE,
             function(e) {
-                                    var ac = Public.i18nContexts;
-                                    Logger.error("LIST OF CONTEXTS: ");
-                                    for(var i = 0; i < ac.length; i++) {
-                                        Logger.error(i + ": " + ac[i].name);
-                                    }
                 Public.image = myItem.image;
             }
         );
