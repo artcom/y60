@@ -348,9 +348,37 @@ spark.Widget.Constructor = function(Protected) {
             if(Public.parent) {
                 return Public.parent.i18nContext;
             } else {
-                throw new Error("Could not find an internationalization context");
+                return null;
             }
         }
+    };
+
+    Public.i18nContexts getter = function() {
+        var myContexts = [];
+        var myCurrent = Public;
+        while(myCurrent) {
+            if(myContexts.length > 0) {
+                var myContext = myCurrent.i18nContext;
+                if(myContexts[myContexts.length - 1] != myContext) {
+                }
+            } else {
+                myContexts.push(myCurrent.i18nContext);
+            }
+            myCurrent = myCurrent.parent;
+        }
+        return myContexts;
+    };
+
+    Public.getI18nItemByName = function(theName) {
+        var myContexts = Public.i18nContexts;
+        for(var i = 0; i < myContexts.length; i++) {
+            var myContext = myContexts[i];
+            var myItem = myContext.getChildByName(theName);
+            if(myItem) {
+                return myItem;
+            }
+        }
+        return null;
     };
 
     // ANIMATION HELPERS
@@ -898,10 +926,14 @@ spark.Image.Constructor = function(Protected) {
     };
 
     function attachToI18nItem(theItemId) {
-        var myContext = Public.i18nContext;
-        var myItem = myContext.getChildByName(theItemId);
+        var myItem = Public.getI18nItemByName(theItemId);
         myItem.addEventListener(spark.I18nEvent.LANGUAGE,
             function(e) {
+                                    var ac = Public.i18nContexts;
+                                    Logger.error("LIST OF CONTEXTS: ");
+                                    for(var i = 0; i < ac.length; i++) {
+                                        Logger.error(i + ": " + ac[i].name);
+                                    }
                 Public.image = myItem.image;
             }
         );
