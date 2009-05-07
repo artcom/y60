@@ -223,14 +223,6 @@ spark.EventDispatcher.Constructor = function(Protected) {
 
 };
 
-spark.TestEvent = spark.Class("TestEvent");
-
-spark.TestEvent.Constructor = function(Protected) {
-
-    this.Inherit(spark.Event, "test-event");
-
-};
-
 spark.MouseEvent = spark.Class("MouseEvent");
 
 spark.MouseEvent.CLICK = "mouse-click";
