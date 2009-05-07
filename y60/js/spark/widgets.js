@@ -337,6 +337,21 @@ spark.Widget.Constructor = function(Protected) {
         _mySceneNode.orientation = myQuaternion;
     };
 
+    // INTERNATIONALISATION HOOKS
+
+    var _myI18nContext = null;
+
+    Public.i18nContext getter = function() {
+        if(_myI18nContext) {
+            return _myI18nContext;
+        } else {
+            if(Public.parent) {
+                return Public.parent.i18nContext;
+            } else {
+                throw new Error("Could not find an internationalization context");
+            }
+        }
+    };
 
     // ANIMATION HELPERS
 
@@ -399,12 +414,20 @@ spark.Widget.Constructor = function(Protected) {
                                        
         Public.pivot = Protected.getVector3f("pivot", new Vector3f(0,0,0));
 
-        Public.sensible = Protected.getBoolean("sensible", true);
-        
+        Public.sensible = Protected.getBoolean("sensible", true);        
     };
 
-};
+    Base.postRealize = Public.postRealize;
+    Public.postRealize = function() {
+        var myContextName = Protected.getString("i18nContext", "");
+        if(myContextName != "") {
+            _myI18nContext = Public.getChildByName(myContextName);
+        }
 
+        Base.postRealize();
+    };
+    
+}
 
 /**
  * Container wrapping a DOM transform.
@@ -791,7 +814,12 @@ spark.Image.Constructor = function(Protected) {
 
     this.Inherit(spark.ResizableRectangle);
 
-    var _myImage    = null;
+    var _mySource = null;
+    var _mySourceId = null;
+
+    var _myImage = null;
+    var _myImageOwned = false;
+    
     var _myTexture  = null;
     var _myVertices = null;
     
@@ -800,8 +828,28 @@ spark.Image.Constructor = function(Protected) {
     };
 
     Public.image setter = function(theNode) {
+        if(_myImageOwned) {
+            _myImage.parentNode.removeChild(_myImage);
+            _myImageOwned = false;
+            _myImage = null;
+        }
         _myImage = theNode;
         _myTexture.image = theNode.id;
+        Public.width  = _myImage.width;
+        Public.height = _myImage.height;
+    };
+
+    Public.src getter = function() {
+        return _mySource;
+    };
+
+    Public.srcId getter = function() {
+        return _mySourceId;
+    };
+
+    Public.srcId setter = function(theValue) {
+        _mySourceId = theValue;
+        attachToI18nItem(theValue);
     };
 
     // XXX: this should not exist.
@@ -810,24 +858,26 @@ spark.Image.Constructor = function(Protected) {
     };
     
     // XXX: this should not exist.
-    Public.textureId setter = function(theTextureId) {
-        _myMaterial.childNode("textureunits").firstChild.texture = theTextureId;
-    };
+    //    Public.textureId setter = function(theTextureId) {
+    //        _myMaterial.childNode("textureunits").firstChild.texture = theTextureId;
+    //    };
 
     Base.realize = Public.realize;
     Public.realize = function() {
         var myImageSource = Protected.getString("src", "");
+        var myImageSourceId = Protected.getString("srcId", "");
 
-        var myWidth;
-        var myHeight;
         if(myImageSource == "") {
-            myWidth  = Protected.getNumber("width");
-            myHeight = Protected.getNumber("height");
-            _myImage = Modelling.createImage(window.scene, myWidth, myHeight, "BGRA");
+            var myWidth  = Protected.getNumber("width", 1);
+            var myHeight = Protected.getNumber("height", 1);
+            _myImage      = Modelling.createImage(window.scene, myWidth, myHeight, "BGRA");
+            _myImageOwned = true;
+            if(myImageSourceId != "") {
+                _mySourceId = myImageSourceId;
+            }
         } else {
             _myImage = spark.getCachedImage(myImageSource);
-            myWidth  = Protected.getNumber("width" , _myImage.raster.width);
-            myHeight = Protected.getNumber("height", _myImage.raster.height);
+            _mySource = myImageSource;
         }
 
         _myTexture  = Modelling.createTexture(window.scene, _myImage);
@@ -837,9 +887,27 @@ spark.Image.Constructor = function(Protected) {
         var myMaterial = Modelling.createUnlitTexturedMaterial(window.scene,
                 _myTexture, Public.name + "-material", true);
 
-        Base.realize(myMaterial);        
+        Base.realize(myMaterial);
     };
-    
+
+    Base.postRealize = Public.postRealize;
+    Public.postRealize = function() {
+        if(_mySourceId) {
+            attachToI18nItem(_mySourceId);
+        }
+    };
+
+    function attachToI18nItem(theItemId) {
+        var myContext = Public.i18nContext;
+        var myItem = myContext.getChildByName(theItemId);
+        myItem.addEventListener(spark.I18nEvent.LANGUAGE,
+            function(e) {
+                Public.image = myItem.image;
+            }
+        );
+        Public.image = myItem.image
+    };
+
 };
 
 

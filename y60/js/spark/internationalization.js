@@ -72,10 +72,6 @@ spark.I18nContext.Constructor = function(Protected) {
     };
 
     Public.switchLanguage = function(theLanguage) {
-        if(theLanguage == _myLanguage) {
-            return;
-        }
-
         var myContextEvent = new spark.I18nEvent(theLanguage);
         Public.dispatchEvent(myContextEvent);
 
@@ -86,6 +82,13 @@ spark.I18nContext.Constructor = function(Protected) {
         }
 
         _myLanguage = theLanguage;
+    };
+
+    Base.postRealize = Public.postRealize;
+    Public.postRealize = function() {
+        Base.postRealize();
+        var myDefaultLanguage = Protected.getString("defaultLanguage", "en");
+        Public.switchLanguage(myDefaultLanguage);
     };
     
 };
@@ -107,16 +110,6 @@ spark.I18nEvent.Constructor = function(Protected, theLanguage) {
         return _myLanguage;
     };
 
-    var _myData = null;
-
-    Public.data getter = function() {
-        return _myData;
-    };
-
-    Public.data setter = function(theValue) {
-        _myData = theValue;
-    };
-
 };
 
 
@@ -131,6 +124,10 @@ spark.I18nItem.Constructor = function(Protected) {
 
     var _myLanguage = "";
 
+    Public.language getter = function() {
+        return _myLanguage;
+    }
+
     var _myLanguageNodes = {};
 
     Protected.languageNodes = function() {
@@ -139,6 +136,7 @@ spark.I18nItem.Constructor = function(Protected) {
 
     Base.realize = Public.realize;
     Public.realize = function() {
+        Base.realize();
         var myNode = Public.node;
         for(var i = 0; i < myNode.childNodesLength(); i++) {
             var myChild = myNode.childNode(i);
@@ -166,11 +164,12 @@ spark.I18nItem.Constructor = function(Protected) {
         if(!(theLanguage in _myLanguageNodes)) {
             throw new Error("I18n item " + Public.name + " does not contain language " + theLanguage);
         }
+
+        _myLanguage = theLanguage;
         
         var myEvent = Protected.createEvent(theLanguage);
         Public.dispatchEvent(myEvent);
 
-        _myLanguage = theLanguage;
     };
     
 };
@@ -183,18 +182,17 @@ spark.I18nText.Constructor = function(Protected) {
 
     this.Inherit(spark.I18nItem);
 
-    Base.realize = Public.realize;
-    Public.realize = function() {
-        Base.realize();
-    };
-
     Base.createEvent = Protected.createEvent;
     Protected.createEvent = function(theLanguage) {
-        var myNode = Protected.getNode(theLanguage);
         var myEvent = Base.createEvent(theLanguage);
-        myEvent.data = myNode.childNode("#text").nodeValue;
+        myEvent.text = Public.text;
         return myEvent;
     };
+
+    Public.text getter = function() {
+        var myNode = Protected.getNode(Public.language);
+        return myNode.childNode("#text").nodeValue;
+    }
 };
 
 spark.I18nImage = spark.ComponentClass("I18nImage");
@@ -205,17 +203,16 @@ spark.I18nImage.Constructor = function(Protected) {
 
     this.Inherit(spark.I18nItem);
 
-    Base.realize = Public.realize;
-    Public.realize = function() {
-        Base.realize();
-    };
-
     Base.createEvent = Protected.createEvent;
     Protected.createEvent = function(theLanguage) {
-        var myNode = Protected.getNode(theLanguage);
         var myEvent = Base.createEvent(theLanguage);
-        var mySource = myNode.childNode("#text").nodeValue;
-        myEvent.data = spark.getCachedImage(mySource);
+        myEvent.image = Public.image;
         return myEvent;
+    };
+
+    Public.image getter = function() {
+        var myNode = Protected.getNode(Public.language);
+        var mySource = myNode.childNode("#text").nodeValue;
+        return spark.getCachedImage(mySource);
     };
 };
