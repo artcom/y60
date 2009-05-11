@@ -1041,6 +1041,20 @@ spark.Movie.Constructor = function(Protected) {
     Public.stop = function() {
         _myMovie.playmode = "stop";
     };
+    // XXX A decent movie API should only have two states: playing or stopped. The stopped state
+    //     should display the current frame and not blackness, like the y60 player currently does.
+    //     To get the functionality I need I have to clutter spark with a bit of y60 legacy. Sorry.
+    //     [DS]
+    Public.pause = function() {
+        _myMovie.playmode = "pause";
+    }
+
+    Public.currentFrame getter = function() { return _myMovie.currentframe;}
+    Public.currentFrame setter = function(f) {
+        _myMovie.currentframe = f;
+    }
+
+    Public.movieNode getter = function()  { return _myMovie;}
 
     Public.loopcount getter = function() {
         return _myMovie.loopcount;
@@ -1091,6 +1105,11 @@ spark.Movie.Constructor = function(Protected) {
         _myMovie.resize = "none";
         _myMovie.loopcount = 1;
         _myMovie.playmode = "stop";
+
+        // XXX: hmmm ...
+        if (/.*\.mp4/.exec(theFilename)) {
+            _myMovie.decoderhint = "y60FFMpegDecoder2";
+        }
 
         window.scene.loadMovieFrame(_myMovie);
     };
