@@ -761,10 +761,16 @@ namespace y60 {
         if (theTargetWidth == 0) {
             // Use the surface width and (if not given) height
             unsigned myWidth = 0;
+            unsigned myMaxWidth = 0;
             for (unsigned i = 0; i < myWords.size(); ++i) {
                 myWidth += myWords[i].surface->w;
+                if (myWords[i].newline) {
+                    myMaxWidth = std::max( myMaxWidth, myWidth );
+                    myWidth = 0;
+                }
             }
-            mySurfaceWidth  = myWidth + _myRightPadding + _myLeftPadding;
+            myMaxWidth = std::max( myMaxWidth, myWidth );
+            mySurfaceWidth  = myMaxWidth + _myRightPadding + _myLeftPadding;
 
             DB2(AC_TRACE << "Set auto-width to " << mySurfaceWidth << endl;)
             if (theTargetHeight == 0) {
