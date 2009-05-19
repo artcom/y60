@@ -353,6 +353,10 @@ spark.Widget.Constructor = function(Protected) {
         }
     };
 
+    Public.i18nContext setter = function(theValue) {
+        _myI18nContext = theValue; // XXX: re-trigger i18n events? how?
+    };
+
     Public.i18nContexts getter = function() {
         var myContexts = [];
         var myCurrent = Public;
@@ -615,8 +619,8 @@ spark.SceneViewer.Constructor = function(Protected) {
         var myWidget = Public.pickWidget(theX, theY);
         if(myWidget) {
             if(myWidget != _myMouseFocusedWidget) {
-                Logger.info("Mouse focuses " + myWidget.name
-                            + (_myMouseFocusedWidget ? ", leaving " + _myMouseFocusedWidget.name : ""));
+                Logger.debug("Mouse focuses " + myWidget.name
+                             + (_myMouseFocusedWidget ? ", leaving " + _myMouseFocusedWidget.name : ""));
                 
                 if(_myMouseFocusedWidget) {
                     var myLeaveEvent = new spark.MouseEvent(spark.MouseEvent.LEAVE, theX, theY);
@@ -630,7 +634,7 @@ spark.SceneViewer.Constructor = function(Protected) {
             }
         } else {
             if(_myMouseFocusedWidget) {
-                Logger.info("Mouse leaves " + _myMouseFocusedWidget.name);
+                Logger.debug("Mouse leaves " + _myMouseFocusedWidget.name);
                 var myLeaveEvent = new spark.MouseEvent(spark.MouseEvent.LEAVE, theX, theY);
                 _myMouseFocusedWidget.dispatchEvent(myLeaveEvent);
             }
@@ -961,15 +965,18 @@ spark.Text.Constructor = function(Protected) {
         _myText = Protected.performLayout(theValue);
         Protected.render(Public.size);
     };
+
+    Public.textId getter = function() { return _myTextId; };
+    Public.textId setter = function(theValue) {
+        // XXX: re-trigger i18n events? how?
+        _myTextId = theValue;
+    };
     
     Public.style getter = function() {
         return _myStyle;
     };
 
-    // XXX: I18N
-    Public.updateI18N = function() {   
-        Public.text = Protected.realizeI18N(_myText);
-    };
+
 
     Protected.performLayout = function(theText) {return theText;}
 
