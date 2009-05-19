@@ -72,6 +72,8 @@ spark.I18nContext.Constructor = function(Protected) {
     };
 
     Public.switchLanguage = function(theLanguage) {
+        Logger.info("I18n context " + Public.name + " switching to language " + theLanguage);
+
         var myContextEvent = new spark.I18nEvent(theLanguage);
         Public.dispatchEvent(myContextEvent);
 
@@ -128,10 +130,10 @@ spark.I18nItem.Constructor = function(Protected) {
         return _myLanguage;
     }
 
-    var _myLanguageNodes = {};
+    var _myLanguageData = {};
 
-    Protected.languageNodes = function() {
-        return _myLanguageNodes;
+    Protected.languageData = function() {
+        return _myLanguageData;
     };
 
     Base.realize = Public.realize;
@@ -140,7 +142,9 @@ spark.I18nItem.Constructor = function(Protected) {
         var myNode = Public.node;
         for(var i = 0; i < myNode.childNodesLength(); i++) {
             var myChild = myNode.childNode(i);
-            _myLanguageNodes[myChild.nodeName] = myChild;
+            var myLang = myChild.nodeName;
+            var myData = myChild.childNode("#text").nodeValue;
+            Public.addLanguageData(myLang, myData);
         }
     };
 
@@ -148,11 +152,12 @@ spark.I18nItem.Constructor = function(Protected) {
         return new spark.I18nEvent(theLanguage);
     };
 
-    Protected.getNode = function(theLanguage) {
-        if(!(theLanguage in _myLanguageNodes)) {
-            throw new Error("I18n item " + Public.name + " does not contain language " + theLanguage);
+    Protected.getLanguageData = function(theLanguage) {
+        if(!(theLanguage in _myLanguageData)) {
+            Logger.warning("I18n item " + Public.name + " does not contain language " + theLanguage);
+            return null;
         } else {
-            return _myLanguageNodes[theLanguage];
+            return _myLanguageData[theLanguage];
         }
     };
 
@@ -161,8 +166,8 @@ spark.I18nItem.Constructor = function(Protected) {
             return;
         }
 
-        if(!(theLanguage in _myLanguageNodes)) {
-            throw new Error("I18n item " + Public.name + " does not contain language " + theLanguage);
+        if(!(theLanguage in _myLanguageData)) {
+            Logger.warning("I18n item " + Public.name + " does not contain language " + theLanguage);
         }
 
         _myLanguage = theLanguage;
@@ -170,6 +175,14 @@ spark.I18nItem.Constructor = function(Protected) {
         var myEvent = Protected.createEvent(theLanguage);
         Public.dispatchEvent(myEvent);
 
+    };
+
+    Public.addLanguageData = function(theLanguage, theData) {
+        Logger.info("ALD " + Public.name + " in " + theLanguage + ": " + theData);
+        if(theLanguage in _myLanguageData) {
+            Logger.warning("duplicate i18n data for item " + Public.name + " in language " + theLanguage);
+        }
+        _myLanguageData[theLanguage] = theData;
     };
     
 };
@@ -190,8 +203,12 @@ spark.I18nText.Constructor = function(Protected) {
     };
 
     Public.text getter = function() {
-        var myNode = Protected.getNode(Public.language);
-        return myNode.childNode("#text").nodeValue;
+        var myData = Protected.getLanguageData(Public.language);
+        if(myData == null) {
+            return "MISSING";
+        } else {
+            return myData;
+        }
     }
 };
 
@@ -211,8 +228,10 @@ spark.I18nImage.Constructor = function(Protected) {
     };
 
     Public.image getter = function() {
-        var myNode = Protected.getNode(Public.language);
-        var mySource = myNode.childNode("#text").nodeValue;
-        return spark.getCachedImage(mySource);
+        var myData = Protected.getLanguageData(Public.language);
+        if(myData == null) {
+            return spark.getDummyImage();
+        }
+        return spark.getCachedImage(myData);
     };
 };
