@@ -56,6 +56,15 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+spark.dummyImage = null;
+
+spark.getDummyImage = function() {
+    if(spark.dummyImage == null) {
+        spark.dummyImage = Modelling.createImage(window.scene, 1, 1, "BGRA");
+    }
+    return spark.dummyImage;
+};
+
 spark.cachedImages = {};
 
 spark.getCachedImage = function(thePath) {
