@@ -34,6 +34,16 @@ function(y60_begin_application NAME)
     set_global(${NAME}_DEPENDS       ${APP_DEPENDS})
 endfunction(y60_begin_application)
 
+function(y60_add_asset FILE)
+    set(APPLICATION ${Y60_CURRENT_APPLICATION})
+
+    install(
+        FILES "${FILE}"
+        DESTINATION "lib/${APPLICATION}"
+        COMPONENT ${APPLICATION}
+    )
+endfunction(y60_add_asset)
+
 function(y60_add_assets DIRECTORY)
     parse_arguments(
         THIS_ASSETS
