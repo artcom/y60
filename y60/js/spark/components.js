@@ -90,6 +90,13 @@ spark.Component.Constructor = function(Protected) {
         return _myName;
     };
 
+    Public.name setter = function(theValue) {
+        if(_myName != null) {
+            throw new Error("the name of a component can only be set once");
+        }
+        _myName = theValue;
+    };
+
     // XXX: really bad solution.
     //      this should be higher up and more informative.
     Public.toString = function (){
