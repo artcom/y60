@@ -205,7 +205,20 @@ spark.EventDispatcher.Constructor = function(Protected) {
     };
 
     Public.removeEventListener = function(theType, theListener, theUseCapture) {
-        Logger.fatal("removeEventListener has not been implemented yet");
+        if(theUseCapture == null) {
+            theUseCapture = false;
+        }
+
+        var myListeners = _myListenersByType[theType];
+        for(var i = 0; i < myListeners.length; i++) {
+            var myListener = myListeners[i];
+            if(myListener.type == theType 
+               && myListener.listener == theListener
+               && myListener.useCapture == theUseCapture) {
+                myListeners.splice(i, 1);
+                break;
+            }
+        }
     };
 
     Public.willTrigger = function(theType) {
