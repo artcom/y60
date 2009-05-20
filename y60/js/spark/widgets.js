@@ -566,7 +566,8 @@ spark.SceneViewer.Constructor = function(Protected) {
                      Protected.getNumber("height", 480),
                      Protected.getBoolean("fullscreen", false),
                      Protected.getString("title", "SPARK Application"));
-        
+
+        window.showMouseCursor = Protected.getBoolean("mouseCursor", false);        
         window.swapInterval = Protected.getNumber("swapInterval", 1);
         
         spark.setupCameraOrtho(window.scene.dom.find(".//camera"), window.width, window.height);
