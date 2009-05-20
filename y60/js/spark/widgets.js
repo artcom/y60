@@ -364,6 +364,7 @@ spark.Widget.Constructor = function(Protected) {
             if(myContexts.length > 0) {
                 var myContext = myCurrent.i18nContext;
                 if(myContexts[myContexts.length - 1] != myContext) {
+                    myContexts.push(myCurrent.i18nContext);
                 }
             } else {
                 myContexts.push(myCurrent.i18nContext);
