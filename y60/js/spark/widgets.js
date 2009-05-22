@@ -856,6 +856,8 @@ spark.Image.Constructor = function(Protected) {
     
     var _myTexture  = null;
     var _myVertices = null;
+
+    var _myImageChangedHanlder = null;
     
     Public.image getter = function() {
         return _myImage;
@@ -871,6 +873,9 @@ spark.Image.Constructor = function(Protected) {
         _myTexture.image = theNode.id;
         Public.width  = _myImage.width;
         Public.height = _myImage.height;
+        if (_myImageChangedHanlder) {
+            _myImageChangedHanlder();
+        }
     };
 
     Public.src getter = function() {
@@ -940,6 +945,9 @@ spark.Image.Constructor = function(Protected) {
         );
         Public.image = myItem.image
     };
+
+    Public.onImageChanged getter = function()  { return _myImageChangedHanlder; }
+    Public.onImageChanged setter = function(h) { _myImageChangedHanlder = h; }
 
 };
 
