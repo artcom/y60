@@ -850,6 +850,7 @@ spark.Image.Constructor = function(Protected) {
 
     var _mySource = null;
     var _mySourceId = null;
+    var _mySourceItem = null;
 
     var _myImage = null;
     var _myImageOwned = false;
@@ -859,6 +860,10 @@ spark.Image.Constructor = function(Protected) {
 
     var _myImageChangedHanlder = null;
     
+    // XXX crude hack starts here
+    var _myOnImageChanged = null;
+    // XXX crude hack ends here
+
     Public.image getter = function() {
         return _myImage;
     };
@@ -873,9 +878,12 @@ spark.Image.Constructor = function(Protected) {
         _myTexture.image = theNode.id;
         Public.width  = _myImage.width;
         Public.height = _myImage.height;
-        if (_myImageChangedHanlder) {
-            _myImageChangedHanlder();
+
+        // XXX crude hack starts here
+        if(_myOnImageChanged) {
+            _myOnImageChanged();
         }
+        // XXX crude hack ends here
     };
 
     Public.src getter = function() {
@@ -936,19 +944,35 @@ spark.Image.Constructor = function(Protected) {
         }
     };
 
+    function handleI18nLanguage(e) {
+        Public.image = _mySourceItem.image;
+    }
+
     function attachToI18nItem(theItemId) {
-        var myItem = Public.getI18nItemByName(theItemId);
-        myItem.addEventListener(spark.I18nEvent.LANGUAGE,
-            function(e) {
-                Public.image = myItem.image;
-            }
-        );
-        Public.image = myItem.image
+        if(_mySourceItem) {
+            _mySourceItem.removeEventListener(spark.I18nEvent.LANGUAGE,
+                                              handleI18nLanguage);
+            _mySourceItem = null;
+        }
+        _mySourceItem = Public.getI18nItemByName(theItemId);
+        if(!_mySourceItem) {
+            Logger.fatal("no i18n item named " + theItemId);
+        }
+        _mySourceItem.addEventListener(spark.I18nEvent.LANGUAGE,
+                                       handleI18nLanguage);
+        Public.image = _mySourceItem.image;
     };
 
-    Public.onImageChanged getter = function()  { return _myImageChangedHanlder; }
-    Public.onImageChanged setter = function(h) { _myImageChangedHanlder = h; }
+    // XXX crude hack starts here
 
+    Public.onImageChanged getter = function() {
+        return _myOnImageChanged;
+    };
+    Public.onImageChanged setter = function(f) {
+        _myOnImageChanged = f;
+    };
+
+    // XXX crude hack ends here
 };
 
 

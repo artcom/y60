@@ -92,6 +92,14 @@ spark.I18nContext.Constructor = function(Protected) {
         var myDefaultLanguage = Protected.getString("defaultLanguage", "en");
         Public.switchLanguage(myDefaultLanguage);
     };
+
+    Base.addChild = Public.addChild;
+    Public.addChild = function(theChild) {
+        Base.addChild(theChild);
+        if(_myLanguage != "") {
+            theChild.switchLanguage(_myLanguage);
+        }
+    };
     
 };
 
