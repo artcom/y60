@@ -898,6 +898,9 @@ spark.Image.Constructor = function(Protected) {
         _mySourceId = theValue;
         attachToI18nItem(theValue);
     };
+    Public.i18nItem getter = function() { return Public.srcId; }
+    Public.i18nItem setter = function(i) { Public.srcId = i; }
+
 
     // XXX: this should not exist.
     Public.texture getter = function() {
@@ -1005,6 +1008,8 @@ spark.Text.Constructor = function(Protected) {
         // XXX: re-trigger i18n events? how?
         _myTextId = theValue;
     };
+    Public.i18nItem getter = function() { return Public.textId; }
+    Public.i18nItem setter = function(i) { Public.textId = i; }
     
     Public.style getter = function() {
         return _myStyle;
