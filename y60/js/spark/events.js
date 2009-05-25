@@ -205,6 +205,8 @@ spark.EventDispatcher.Constructor = function(Protected) {
     };
 
     Public.removeEventListener = function(theType, theListener, theUseCapture) {
+        var myDidRemove = false;
+
         if(theUseCapture == null) {
             theUseCapture = false;
         }
@@ -216,8 +218,13 @@ spark.EventDispatcher.Constructor = function(Protected) {
                && myListener.listener == theListener
                && myListener.useCapture == theUseCapture) {
                 myListeners.splice(i, 1);
+                myDidRemove = true;
                 break;
             }
+        }
+
+        if(!myDidRemove) {
+            Logger.error("Tried to remove nonexistent handler on " + Public.name + "." + theType);
         }
     };
 
