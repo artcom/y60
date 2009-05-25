@@ -500,18 +500,14 @@ spark.Switch.Constructor = function(Protected) {
     };
 
     Public.shown setter = function(theName) {
+        _myShown = theName;
+
         var myWanted = Public.getChildByName(theName);
-        if(myWanted) {
-            _myShown = theName;
 
-            var myChildren = Public.children;
-            for(var i = 0; i < myChildren.length; i++) {
-                var myChild = myChildren[i];
-
-                myChild.visible = (myChild == myWanted);
-            }
-        } else {
-            Logger.error("Switch widget does not contain child named " + theName);
+        var myChildren = Public.children;
+        for(var i = 0; i < myChildren.length; i++) {
+            var myChild = myChildren[i];
+            myChild.visible = (myWanted != null) && (myChild == myWanted);
         }
     };
 };
