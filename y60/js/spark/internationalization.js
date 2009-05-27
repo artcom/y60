@@ -186,7 +186,6 @@ spark.I18nItem.Constructor = function(Protected) {
     };
 
     Public.addLanguageData = function(theLanguage, theData) {
-        Logger.info("ALD " + Public.name + " in " + theLanguage + ": " + theData);
         if(theLanguage in _myLanguageData) {
             Logger.warning("duplicate i18n data for item " + Public.name + " in language " + theLanguage);
         }
