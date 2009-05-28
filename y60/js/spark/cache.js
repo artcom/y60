@@ -60,7 +60,8 @@ spark.dummyImage = null;
 
 spark.getDummyImage = function() {
     if(spark.dummyImage == null) {
-        spark.dummyImage = Modelling.createImage(window.scene, 1, 1, "BGRA");
+        spark.dummyImage = Modelling.createImage(window.scene, 16, 16, "BGRA");
+        spark.dummyImage.name = "SparkDummyImage";
     }
     return spark.dummyImage;
 };

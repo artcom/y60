@@ -212,7 +212,7 @@ spark.I18nText.Constructor = function(Protected) {
     Public.text getter = function() {
         var myData = Protected.getLanguageData(Public.language);
         if(myData == null) {
-            return "MISSING";
+            return "";
         } else {
             return myData;
         }
@@ -236,7 +236,7 @@ spark.I18nImage.Constructor = function(Protected) {
 
     Public.image getter = function() {
         var myData = Protected.getLanguageData(Public.language);
-        if(myData == null) {
+        if( ! myData || myData.length == 0) {
             return spark.getDummyImage();
         }
         return spark.getCachedImage(myData);
