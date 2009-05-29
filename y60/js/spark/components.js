@@ -252,16 +252,41 @@ spark.Container.Constructor = function(Protected) {
     var _myNamedChildMap   = {};
 
     Public.children getter = function() {
-        return _myChildren; // XXX: clone?
+        return _myChildren.slice(0); // XXX: clone?
     };
 
     Public.addChild = function(theChild) {
         _myChildren.push(theChild);
+
         if(theChild.name) {
             _myNamedChildMap[theChild.name] = theChild;
         }
+
         theChild.parent = Public;
     };
+
+    Public.removeChild = function(theChild) {
+        var myChildIndex = _myChildren.indexOf(theChild);
+
+        if(myChildIndex == -1) {
+            throw new Error("Could not remove " + theChild.name + " from " + Public.name + " because its not a child");
+        }
+
+        _myChildren.splice(myChildIndex, 1);
+
+        if(theChild.name) {
+            delete _myNamedChildMap[theChild.name];
+        }
+
+        theChild.parent = null;
+    };
+
+    Public.removeAllChildren = function() {
+        var myChildren = Public.children;
+        for(var i = 0; i < myChildren.length; i++) {
+            Public.removeChild(myChildren[i]);
+        }
+    }
 
     Public.getChildByName = function(theName) {
         if (theName in _myNamedChildMap) {
