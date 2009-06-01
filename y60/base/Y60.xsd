@@ -1015,8 +1015,8 @@ This element can contain any number of world elements.</xs:documentation>
     </xs:element>
     <xs:element name="records">
         <xs:annotation>
-            <xs:documentation>Toplevel element for all worlds in the scenegraph.
-This element can contain any number of world elements.</xs:documentation>
+            <xs:documentation>Toplevel element for all records in the scenegraph.
+This element can contain any number of record elements.</xs:documentation>
         </xs:annotation>
         <xs:complexType>
             <xs:sequence minOccurs="0" maxOccurs="unbounded">
