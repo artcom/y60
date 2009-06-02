@@ -210,8 +210,8 @@ class RequestTest : public UnitTest {
             ENSURE(myShortRequest->getResponseString().size());
             
             ENSURE(myPageNotFoundRequest->_myDataReceivedFlag);
-            ENSURE(myPageNotFoundRequest->_myErrorCalledFlag == false);
-            ENSURE(myPageNotFoundRequest->_myDoneCalledFlag == true);
+            ENSURE(myPageNotFoundRequest->_myErrorCalledFlag == true);
+            ENSURE(myPageNotFoundRequest->_myDoneCalledFlag == false);
             ENSURE(myPageNotFoundRequest->getResponseCode() == 404);
             
             ENSURE(myNoServerRequest->_myDataReceivedFlag == false);
