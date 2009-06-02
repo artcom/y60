@@ -401,10 +401,15 @@ namespace asl {
 
     bool deleteFile(const std::string & theUTF8Filename) {
 #ifdef _WIN32
-        return _unlink(Path(theUTF8Filename, UTF8).toLocale().c_str()) == 0;
+        if(_unlink(Path(theUTF8Filename, UTF8).toLocale().c_str()) == 0) {
 #else
-        return unlink(Path(theUTF8Filename, UTF8).toLocale().c_str()) == 0;
+        if(unlink(Path(theUTF8Filename, UTF8).toLocale().c_str()) == 0) {
 #endif
+            return true;
+        } else {
+            AC_WARNING << "deleteFile failed, theFile="<<theUTF8Filename<<" ,reason:"<<asl::errorDescription(lastError());
+            return false;
+        }
     }
 
     bool
@@ -496,15 +501,43 @@ namespace asl {
     }
 
     void
-    removeDirectory(const std::string & theUTF8Path) {
+    removeDirectory(const std::string & theUTF8Path, const bool theRecursive) {
+        if(!isDirectory(theUTF8Path)) {
+            throw NotADirectory(std::string(theUTF8Path + " does not name a directory"), PLUS_FILE_LINE);
+        }
+
+        if(theRecursive) {
+            std::vector<std::string> myChildren;
+            listDirectory(theUTF8Path, myChildren);
+            if(myChildren.size() > 0) {
+                for(unsigned i = 0; i < myChildren.size(); i++) {
+                    std::string & myChild = myChildren[i];
+                    std::string myChildPath = theUTF8Path + "/" + myChild;
+                    if(isDirectory(myChildPath)) {
+                        if(myChild != "." && myChild != "..") {
+                            AC_WARNING << "abt removeDirectory " << myChildPath;
+                            removeDirectory(myChildPath, true);
+                            AC_WARNING << "did removeDirectory " << myChildPath;
+                        }
+                    } else {
+                        AC_WARNING << "deleteFile " << myChildPath;
+                        deleteFile(myChildPath);
+                    }
+                }
+            }
+        }
+
         Path myPath(theUTF8Path, UTF8);
+
+        AC_WARNING << "REALLYDEL " << theUTF8Path;
+
 #ifdef _WIN32
         if (RemoveDirectory(myPath.toLocale().c_str()) == 0) {
 #else
         if (rmdir(myPath.toLocale().c_str()) != 0) {
 #endif
+            AC_WARNING << "removeDirectory failed, theDirectory="<<theUTF8Path<<" ,reason:"<<asl::errorDescription(lastError());
             throw RemoveDirectoryFailed(std::string("theDirectory=")+theUTF8Path+" ,reason:"+asl::errorDescription(lastError()), PLUS_FILE_LINE);
-            //AC_WARNING << "removeDirectory failed, theDirectory="<<theDirectory<<" ,reason:"<<asl::errorDescription(lastError()), PLUS_FILE_LINE);
         };
     }
 

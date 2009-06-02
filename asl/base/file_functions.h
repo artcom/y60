@@ -57,6 +57,7 @@ namespace asl {
 /* @{ */
 
 DEFINE_EXCEPTION(FileOpenFailed, asl::Exception);
+DEFINE_EXCEPTION(NotADirectory, asl::Exception);
 DEFINE_EXCEPTION(FileNotFoundException, asl::Exception);
 DEFINE_EXCEPTION(CreateDirectoryFailed, asl::Exception);
 DEFINE_EXCEPTION(RemoveDirectoryFailed, asl::Exception);
@@ -69,8 +70,8 @@ ASL_BASE_DECL std::vector<std::string> getDirectoryEntries(const std::string & t
 /** creates a new directory in an existing directory */
 ASL_BASE_DECL void createDirectory(const std::string & theDirectory);
 
-/** removes an empty directory directory */
-ASL_BASE_DECL void removeDirectory(const std::string & theDirectory);
+/** removes a directory, recursively or flat */
+ASL_BASE_DECL void removeDirectory(const std::string & theDirectory, const bool theRecursive = false);
 
 /** list names contained in a directory in theContent, returns false on error */
 ASL_BASE_DECL bool listDirectory(const std::string & theDirectory, std::vector<std::string> & theContent);
