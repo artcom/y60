@@ -137,10 +137,11 @@ namespace inet {
                 Request * myRequest = 0; 
                 curl_easy_getinfo(myEasyHandle, CURLINFO_PRIVATE, &myRequest);
                 if (myMessage->msg == CURLMSG_DONE) {
-                    if (myMessage->data.result == CURLE_OK) {
+                    long myResponseCode = myRequest->getResponseCode();
+                    if (myMessage->data.result == CURLE_OK && (myResponseCode / 100 == 2)) {
                         myRequest->onDone();
                     } else {
-                        myRequest->onError(myMessage->data.result);
+                        myRequest->onError(myResponseCode);
                     }
                     removeRequest(myRequest);
                 } else {

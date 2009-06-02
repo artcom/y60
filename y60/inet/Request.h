@@ -162,7 +162,7 @@ namespace inet {
             // callback hooks
             virtual void onStart();
             virtual size_t onData(const char * theData, size_t theLength);
-            virtual void onError(CURLcode theCode);
+            virtual void onError(long theCode);
             virtual bool onProgress(double theDownloadTotal, double theCurrentDownload,
                 double theUploadTotal, double theCurrentUpload);  // return false to abort transfer
             virtual void onDone();

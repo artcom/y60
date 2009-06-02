@@ -86,7 +86,7 @@ void JSRequest::setJSListener(JSContext * theContext, JSObject * theListener) {
 }
 
 void
-JSRequest::onError(CURLcode theErrorCode) {
+JSRequest::onError(long theErrorCode) {
     DB(AC_TRACE << "onError for '" << getURL() << "' triggered" << endl); 
     if (hasCallback("onError")) {
         jsval argv[1], rval;
