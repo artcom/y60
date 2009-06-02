@@ -691,6 +691,8 @@ spark.SceneViewer.Constructor = function(Protected) {
     Public.onExit = function() {
         Base.onExit();
     };
+    Public.title getter = function()  { return window.title; }
+    Public.title setter = function(t) { window.title = title; }
 };
 
 /**
