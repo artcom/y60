@@ -209,7 +209,7 @@ removeDirectory(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
     try {
         string myPath;
 
-        if (argc != 1) {
+        if (argc < 1 || argc > 2) {
             JS_ReportError(cx, "'removeDirectory takes a filepath as argument");
             return JS_FALSE;
         }
@@ -221,9 +221,17 @@ removeDirectory(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
         }
         myPath = asl::expandEnvironment(myString);
 
+        bool myRecursive = false;
+        if(argc > 1) {
+            if(!convertFrom(cx, argv[1], myRecursive)) {
+                JS_ReportError(cx, "removeDirectory() could not convert argument value to boolean.");
+                return JS_FALSE;
+            }
+        }
+
         try {
-            if (asl::fileExists(myPath) ) {
-                asl::removeDirectory(myPath);
+            if (asl::fileExists(myPath) ) { // XXX: this line is preposterous. totally misplaced and bug-provoking.
+                asl::removeDirectory(myPath, myRecursive);
                 *rval = as_jsval(cx, true);
             }
         } catch (asl::RemoveDirectoryFailed & ex) {
