@@ -515,12 +515,9 @@ namespace asl {
                     std::string myChildPath = theUTF8Path + "/" + myChild;
                     if(isDirectory(myChildPath)) {
                         if(myChild != "." && myChild != "..") {
-                            AC_WARNING << "abt removeDirectory " << myChildPath;
                             removeDirectory(myChildPath, true);
-                            AC_WARNING << "did removeDirectory " << myChildPath;
                         }
                     } else {
-                        AC_WARNING << "deleteFile " << myChildPath;
                         deleteFile(myChildPath);
                     }
                 }
@@ -528,8 +525,6 @@ namespace asl {
         }
 
         Path myPath(theUTF8Path, UTF8);
-
-        AC_WARNING << "REALLYDEL " << theUTF8Path;
 
 #ifdef _WIN32
         if (RemoveDirectory(myPath.toLocale().c_str()) == 0) {
