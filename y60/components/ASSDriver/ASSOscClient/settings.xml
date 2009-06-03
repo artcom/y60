@@ -19,7 +19,7 @@
         <CurrentValueDisplay min="0" max="2">0.00000</CurrentValueDisplay>
         <EventQueueSize>100</EventQueueSize>
         <TransportLayer>serial</TransportLayer>
-	<IpAddress>192.168.7.50</IpAddress>
+	    <IpAddress>192.168.7.50</IpAddress>
         <Port>10001</Port>
         <SerialPortName>/dev/ttyUSB0</SerialPortName>
         <BaudRate>460800</BaudRate>
@@ -28,9 +28,9 @@
         <MinTouchThreshold>9</MinTouchThreshold>
         <InterpolationMethod>1</InterpolationMethod>
         <CureBrokenElectrodes>0</CureBrokenElectrodes>
-        <OscReceiverList>    
-            <OscReceiver ip="10.1.2.76"/>
-        </OscReceiverList>            
+        <OscReceiverList>
+            <OscReceiver ip="127.0.0.1"/>
+        </OscReceiverList>
         <ServerPort>12345</ServerPort>
         <ClientPort>7001</ClientPort>
     </ASSDriver>
