@@ -141,14 +141,11 @@ namespace inet {
                     if (myResult == CURLE_OK) {
                         long myResponseCode = myRequest->getResponseCode();
                         if (myResponseCode / 100 == 2) {
-                            AC_WARNING << "response code is 2xx";
                             myRequest->onDone();
                         } else {
-                            AC_WARNING << "response code is not 2xx";
                             myRequest->onError(myResult, myResponseCode);
                         }
                     } else {
-                        AC_WARNING << "other error";
                         AC_ERROR << "curl request failed with error: " << curl_easy_strerror(myResult);
                         myRequest->onError(myResult, 0);
                     }
