@@ -25,6 +25,7 @@
 #    [ EXTERNS imported_package ... ]
 #    [ TESTS   testname ... ]
 #    [ DONT_INSTALL ]
+#    [ STATIC ]
 # )
 #
 # The NAME is used in project exports and for the target name.
@@ -49,11 +50,13 @@
 # DONT_INSTALL can be used to prevent installation of this library.
 # Libraries used only for testing should get this flag.
 #
+# STATIC libraries are supported too.
+#
 macro(ac_add_library LIBRARY_NAME LIBRARY_PATH)
     # put arguments into the THIS_LIBRARY namespace
     parse_arguments(THIS_LIBRARY
         "SOURCES;HEADERS;DEPENDS;EXTERNS;TESTS;RUNTIME_INSTALL_COMPONENT;DEVELOPMENT_INSTALL_COMPONENT"
-        "DONT_INSTALL"
+        "DONT_INSTALL;STATIC"
         ${ARGN}
     )
     
@@ -93,7 +96,7 @@ macro(ac_add_library LIBRARY_NAME LIBRARY_PATH)
                 DEPENDS ${THIS_LIBRARY_HEADERS}
                 COMMENT "Generating header-only stub for library ${THIS_LIBRARY_NAME}"
         )
-        set( THIS_LIBRARY_SOURCES ${_OUT_FILE} )
+        set(THIS_LIBRARY_SOURCES ${_OUT_FILE})
         set(THIS_LIBRARY_BUILDINFO_FILE)
     else(NOT THIS_LIBRARY_SOURCES)
         set(THIS_LIBRARY_HEADER_ONLY OFF)
@@ -101,9 +104,14 @@ macro(ac_add_library LIBRARY_NAME LIBRARY_PATH)
         _ac_buildinfo_filename("${THIS_LIBRARY_NAME}" THIS_LIBRARY_BUILDINFO_FILE)
     endif(NOT THIS_LIBRARY_SOURCES)
         
+    if(THIS_LIBRARY_STATIC)
+        set(THIS_LIBRARY_STYLE STATIC)
+    else(THIS_LIBRARY_STATIC)
+        set(THIS_LIBRARY_STYLE SHARED)
+    endif(THIS_LIBRARY_STATIC)
     # define the library target
     add_library(
-        ${THIS_LIBRARY_NAME} SHARED
+        ${THIS_LIBRARY_NAME} ${THIS_LIBRARY_STYLE}
             ${THIS_LIBRARY_SOURCES}
             ${THIS_LIBRARY_HEADERS}
             ${THIS_LIBRARY_BUILDINFO_FILE}
