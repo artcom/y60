@@ -21,7 +21,7 @@ y60_add_component(
 )
 
 y60_begin_application(
-    asstools
+    proximatrixtools
     DISPLAY_NAME "Proximatrix Tools"
     DESCRIPTION  "Tools for setting up and debugging the ART+COM Proximatrix"
     DEPENDS ASS_runtime Y60_runtime
@@ -34,18 +34,24 @@ y60_add_asset(settings.xml)
 
 y60_add_launcher(
     "Proximatrix Analyzer"
-    DESCRIPTION "Application for displaying Proximatrix sensor images"
+    COMMAND_NAME proximatrix-analyzer
+    DESCRIPTION "Application for displaying Proximatrix sensor input"
     ENGINE y60
     MAIN_SCRIPT demo.js
     BUILD_WORKING_DIR SOURCE
+    CATEGORIES
+        Proximatrix
 )
 
 y60_add_launcher(
     "Proximatrix Dumper"
+    COMMAND_NAME proximatrix-dump
     DESCRIPTION "Application for dumping Proximatrix events"
     ENGINE y60
     MAIN_SCRIPT dump.js
     BUILD_WORKING_DIR SOURCE
+    CATEGORIES
+        Proximatrix
 )
 
-y60_end_application(asstools)
+y60_end_application(proximatrixtools)

@@ -21,7 +21,7 @@ y60_add_component(
 )
 
 y60_begin_application(
-    assoscclient
+    proximatrixosc
     DISPLAY_NAME "Proximatrix OSC Client"
     DESCRIPTION  "OSC touch event sender for the ART+COM Proximatrix"
     DEPENDS ASS_runtime Y60_runtime
@@ -32,12 +32,15 @@ y60_add_asset(client.js)
 y60_add_asset(settings.xml)
 
 y60_add_launcher(
-    "Proximatrix OSC Client"
-    DESCRIPTION "OSC touch event sender for the ART+COM Proximatrix"
+    "Proximatrix OSC Sender"
+    COMMAND_NAME proximatrix-osc
+    DESCRIPTION  "OSC touch event sender for the ART+COM Proximatrix"
     ENGINE y60
     MAIN_SCRIPT client.js
     BUILD_WORKING_DIR SOURCE
     INSTALL_WORKING_DIR ASSETS
+    CATEGORIES
+        Proximatrix
 )
 
-y60_end_application(assoscclient)
+y60_end_application(proximatrixosc)
