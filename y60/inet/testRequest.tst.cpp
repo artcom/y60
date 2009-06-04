@@ -82,17 +82,19 @@ class TestRequest : public Request {
         _myErrorCalledFlag(false),
         _myProgressCalledFlag(false),
         _myTimeoutFlag(false),
-        _myErrorCode(0)
+        _myErrorCode(CURLcode(0)),
+        _myHttpStatus(0)
     {}
 
     virtual size_t onData(const char * theData, size_t theReceivedByteCount) {
         _myDataReceivedFlag = true;
         return Request::onData(theData, theReceivedByteCount);
     };
-    void onError(CURLcode theErrorCode) {
-        cerr << "CURL ERROR: '" << getErrorString() << "' (CODE: "  << theErrorCode << ")" << endl;
+    void onError(CURLcode theError, long theHttpStatus) {
+        cerr << "CURL ERROR: '" << getErrorString() << "' (CODE: "  << theError << "), HTTP status " << theHttpStatus << endl;
         _myErrorCalledFlag = true;
-        _myErrorCode = theErrorCode;
+        _myErrorCode = theError;
+        _myHttpStatus = theHttpStatus;
     };
     bool onProgress(double theDownloadTotal, double theCurrentDownload,
                     double theUploadTotal, double theCurrentUpload) {
@@ -110,7 +112,8 @@ class TestRequest : public Request {
     bool _myErrorCalledFlag;
     bool _myProgressCalledFlag;
     bool _myTimeoutFlag;
-    unsigned _myErrorCode;
+    CURLcode _myErrorCode;
+    long _myHttpStatus;
 };
 typedef asl::Ptr<TestRequest> TestRequestPtr;
 
@@ -213,12 +216,14 @@ class RequestTest : public UnitTest {
             ENSURE(myPageNotFoundRequest->_myErrorCalledFlag == true);
             ENSURE(myPageNotFoundRequest->_myDoneCalledFlag == false);
             ENSURE(myPageNotFoundRequest->getResponseCode() == 404);
+            ENSURE(myPageNotFoundRequest->_myHttpStatus == myPageNotFoundRequest->getResponseCode());
             
             ENSURE(myNoServerRequest->_myDataReceivedFlag == false);
             ENSURE(myNoServerRequest->_myErrorCalledFlag == true);
             ENSURE(myNoServerRequest->_myDoneCalledFlag == false);
             DPRINT(myNoServerRequest->getResponseCode());
             ENSURE(myNoServerRequest->getResponseCode() == 0);
+            ENSURE(myNoServerRequest->_myHttpStatus == myNoServerRequest->getResponseCode());
 
             DPRINT(myUTF8Request->getResponseString().size());
             ENSURE(myUTF8Request->getResponseString().size() == 2);
@@ -229,6 +234,7 @@ class RequestTest : public UnitTest {
             ENSURE(myServerTimeoutRequest->_myDoneCalledFlag == false);
             DPRINT(myServerTimeoutRequest->getResponseCode());
             ENSURE(myServerTimeoutRequest->getResponseCode() == 0);
+            ENSURE(myServerTimeoutRequest->_myHttpStatus == myServerTimeoutRequest->getResponseCode());
 
             ENSURE(myRequestManager.getActiveCount() ==0);
         }

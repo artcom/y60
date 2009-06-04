@@ -80,7 +80,7 @@ class JSRequest : public inet::Request {
 
         void setJSListener(JSContext * theContext, JSObject * theListener);
        
-        void onError(long theErrorCode);
+        void onError(CURLcode theError, long theHttpStatus);
         bool onProgress(double theDownloadTotal, double theCurrentDownload,
                 double theUploadTotal, double theCurrentUpload);
         void onDone();

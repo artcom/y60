@@ -86,13 +86,14 @@ void JSRequest::setJSListener(JSContext * theContext, JSObject * theListener) {
 }
 
 void
-JSRequest::onError(long theErrorCode) {
+JSRequest::onError(CURLcode theError, long theHttpStatus) {
     DB(AC_TRACE << "onError for '" << getURL() << "' triggered" << endl); 
     if (hasCallback("onError")) {
-        jsval argv[1], rval;
-        argv[0] = as_jsval(_myJSContext, theErrorCode);
+        jsval argv[2], rval;
+        argv[0] = as_jsval(_myJSContext, theError);
+        argv[1] = as_jsval(_myJSContext, theHttpStatus);
 
-        /*JSBool ok =*/ JSA_CallFunctionName(_myJSContext, _myJSListener, "onError", 1, argv, &rval);
+        /*JSBool ok =*/ JSA_CallFunctionName(_myJSContext, _myJSListener, "onError", 2, argv, &rval);
     }
 }
 

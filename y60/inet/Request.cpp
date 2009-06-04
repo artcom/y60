@@ -449,8 +449,7 @@ namespace inet {
     };
 
     void
-    Request::onError(long theCode) {
-        AC_ERROR << "CURL error code: " << theCode;
+    Request::onError(CURLcode theError, long theHttpStatus) {
     };
 
     bool

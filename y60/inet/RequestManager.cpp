@@ -137,11 +137,20 @@ namespace inet {
                 Request * myRequest = 0; 
                 curl_easy_getinfo(myEasyHandle, CURLINFO_PRIVATE, &myRequest);
                 if (myMessage->msg == CURLMSG_DONE) {
-                    long myResponseCode = myRequest->getResponseCode();
-                    if (myMessage->data.result == CURLE_OK && (myResponseCode / 100 == 2)) {
-                        myRequest->onDone();
+                    CURLcode myResult = myMessage->data.result;
+                    if (myResult == CURLE_OK) {
+                        long myResponseCode = myRequest->getResponseCode();
+                        if (myResponseCode / 100 == 2) {
+                            AC_WARNING << "response code is 2xx";
+                            myRequest->onDone();
+                        } else {
+                            AC_WARNING << "response code is not 2xx";
+                            myRequest->onError(myResult, myResponseCode);
+                        }
                     } else {
-                        myRequest->onError(myResponseCode);
+                        AC_WARNING << "other error";
+                        AC_ERROR << "curl request failed with error: " << curl_easy_strerror(myResult);
+                        myRequest->onError(myResult, 0);
                     }
                     removeRequest(myRequest);
                 } else {

@@ -119,13 +119,13 @@ AssetRequest::onData(const char * theData, size_t theReceivedByteCount) {
 }
 
 void
-AssetRequest::onError(CURLcode theCode) {
+AssetRequest::onError(CURLcode theCode, long theHttpStatus) {
     if (_myIsDoneFlag) {
         AC_INFO << "aborted download.";
         return;
     }
     _myIsDoneFlag = true;
-    Request::onError(theCode);
+    Request::onError(theCode, theHttpStatus);
     switch (theCode) {
         case CURLE_OK:
             break;

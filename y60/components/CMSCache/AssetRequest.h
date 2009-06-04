@@ -85,7 +85,7 @@ class AssetRequest : public inet::Request {
         bool onProgress(double theDownloadTotal, double theCurrentDownload,
             double theUploadTotal, double theCurrentUpdate);
 
-        void onError(CURLcode theCode);
+        void onError(CURLcode theError, long theHttpStatus);
         void onDone();
         bool onResponseHeader(const std::string & theHeader);
 
