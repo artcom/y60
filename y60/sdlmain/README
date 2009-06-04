@@ -1,0 +1,8 @@
+The Mac OSX SDL.framework comes without the necessary cocoa main() glue. Instead
+these files, namely SDLMain.m and SDLMain.h are provided in separate download:
+
+http://www.libsdl.org/release/SDL-devel-1.2.13-extras.dmg
+
+It is recommended to include these files in the application. Because we have more
+than one SDL application we build a small static library and link it where necessary.
+

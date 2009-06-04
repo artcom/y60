@@ -10,7 +10,7 @@ ac_add_executable(
     DEPENDS aslbase aslmath aslserial aslnet aslipc asldom aslxpath
             y60base y60scene y60image y60video
             y60input y60inet y60glrender y60glutil y60jsbase y60jslib
-            y60gltext y60sdlengine
+            y60gltext y60sdlengine ${Y60_SDLMAIN}
             sdlttf2 jsspidermonkey y60modelling aslzip paintlib
     EXTERNS ${EXTERNALS}
     INSTALL_COMPONENT Y60_utilities

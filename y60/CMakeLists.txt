@@ -68,6 +68,10 @@ add_subdirectory(modelling)
 add_subdirectory(jsbase)
 add_subdirectory(jslib)
 add_subdirectory(sdlengine)
+if(Y60_SDL_IS_FRAMEWORK)
+    add_subdirectory(sdlmain)
+endif(Y60_SDL_IS_FRAMEWORK)
+
 
 # Handle optional gtk support
 if(GTKMM_FOUND AND GTKGLEXT_FOUND AND GLADEMM_FOUND)
