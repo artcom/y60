@@ -64,7 +64,6 @@
 //
 //=============================================================================
 
-includePath("../..");  //TODO: remove this after deprecating  ant-build
 use("../../../video/testLeak.js");
 
 const MOVIE_1 = "../../video/testmovies/1.1.mpg";

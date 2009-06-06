@@ -64,7 +64,6 @@
 //
 //=============================================================================
 
-includePath("../..");  //TODO: remove this after deprecating  ant-build
 use("Overlay.js");
 use("Exception.js");
 use("UnitTest.js");
@@ -73,9 +72,6 @@ plug("y60ProcFunctions");
 
 const START_FRAMES = 200;
 const END_FRAMES   = 4;
-
-var myShaderLibrary = "../../shader/shaderlibrary.xml";
-GLResourceManager.prepareShaderLibrary(myShaderLibrary);
 
 var window     = new RenderWindow();
 window.fixedFrameTime = 0.04;
