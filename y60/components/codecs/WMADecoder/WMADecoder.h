@@ -65,11 +65,7 @@
 #include <asl/audio/ISampleSink.h>
 #include <asl/base/Block.h>
 
-#ifdef AC_BUILT_WITH_CMAKE
-#   include <wmsdk.h>
-#else
-#   include <wmsdk/wmsdk.h>
-#endif
+#include <wmsdk.h>
 
 #ifdef OSX
     extern "C" {
@@ -83,11 +79,7 @@
 #       pragma warning(push,1)
 #   endif
     extern "C" {
-#ifndef AC_BUILT_WITH_CMAKE
-#       include <ffmpeg/avformat.h>
-#else
-#       include <avformat.h>
-#endif
+#   include <avformat.h>
     }
 #   if defined(_MSC_VER)
 #       pragma warning(pop)

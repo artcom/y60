@@ -76,19 +76,11 @@
 #include <asl/base/Exception.h>
 
 #include <windows.h>
-#if(AC_BUILT_WITH_CMAKE)
-#   include <wmsdk.h>
-#else
-#   include <wmsdk/wmsdk.h>
-#endif
+#include <wmsdk.h>
 #include <deque>
 
 extern "C" {
-#ifndef AC_BUILT_WITH_CMAKE
-#       include <ffmpeg/avformat.h>
-#else
-#       include <avformat.h>
-#endif
+#include <avformat.h>
 }
 
 namespace y60 {
