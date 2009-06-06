@@ -195,7 +195,7 @@ namespace y60 {
     TextureManager::reloadTextures() {
         AC_DEBUG << "TextureManager::reloadTextures";
         AC_INFO << "TextureManager::reloadTextures preload() disabled";
-        AC_INFO << StackTrace();
+        AC_DEBUG << StackTrace();
         return;
         //unsigned myTextureCount = _myTextureList->childNodesLength();
         //for (unsigned i = 0; i < myTextureCount; ++i) {
