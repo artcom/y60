@@ -63,7 +63,7 @@ AudioBufferBase * createAudioBuffer(SampleFormat mySampleFormat, unsigned numFra
         case SF_F32:
             return new AudioBuffer<float>(numFrames, numChannels, mySampleRate);
 		default:{
-            AC_ERROR << "Unsupported audio buffer type in createAudioBuffer().";
+            AC_ERROR << "Unsupported audio buffer type " << mySampleFormat << " in asl::createAudioBuffer()";
 			return 0;}
     }
 }
