@@ -76,9 +76,19 @@
 #include <string>
 #include <list>
 
+extern "C"
+#ifdef OSX
+#   include <libavformat/avformat.h>
+#else
+#   include <avformat.h>
+#endif
+
+#ifndef AV_VERSION_INT
+#define AV_VERSION_INT(a,b,c) (a<<16 || b<<8 || c)
+#endif
+
 #ifdef OSX
     extern "C" {
-#       include <libavformat/avformat.h>
 #       if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(51,38,0) 
 #           include <libswscale/swscale.h>
 #       endif
@@ -90,7 +100,6 @@
 #       pragma warning(push,1)
 #   endif
     extern "C" {
-#   include <avformat.h>
 #   if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(51,38,0) 
 #       include <swscale.h>
 #   endif
