@@ -5,6 +5,7 @@
 
 add_subdirectory(ProcFunctions)
 add_subdirectory(ASSDriver)
+add_subdirectory(Cairo)
 add_subdirectory(Cluster)
 add_subdirectory(CMSCache)
 add_subdirectory(DemoBehaviourRendex)
