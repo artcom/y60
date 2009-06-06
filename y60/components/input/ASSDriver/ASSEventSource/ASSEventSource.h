@@ -61,7 +61,7 @@
 
 #include "y60_eventsource_settings.h"
 #ifdef AC_BUILT_WITH_CMAKE
-#   include <y60/components/ASSDriver/ASSCore/ASSDriver.h>
+#   include <y60/components/input/ASSDriver/ASSCore/ASSDriver.h>
 #else
 #   include <y60/ASSCore/ASSDriver.h>
 #endif
