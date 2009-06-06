@@ -5,8 +5,6 @@
 
 add_subdirectory(ProcFunctions)
 add_subdirectory(Cairo)
-add_subdirectory(Cluster)
-add_subdirectory(CMSCache)
 add_subdirectory(EdgeBlender)
 add_subdirectory(EventLoop)
 add_subdirectory(GLBinding)
@@ -41,9 +39,4 @@ if(LINUX)
     add_subdirectory(DVB)
     add_subdirectory(SimWater)
 endif(LINUX)
-
-if(WIN32)
-#    add_subdirectory(DInput)
-#    add_subdirectory(DInputFFB)
-endif(WIN32)
 
