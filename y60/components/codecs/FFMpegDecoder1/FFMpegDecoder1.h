@@ -71,7 +71,7 @@
 #ifdef OSX
     extern "C" {
 #       include <libavformat/avformat.h>
-#       if LIBAVCODEC_VERSION_INT >= ((51<<16)+(38<<8)+0) 
+#       if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(51,38,0) 
 #           include <libswscale/swscale.h>
 #       endif
     }
@@ -83,7 +83,7 @@
 #   endif
     extern "C" {
 #   include <avformat.h>
-#   if LIBAVCODEC_VERSION_INT >= ((51<<16)+(38<<8)+0) 
+#   if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(51,38,0) 
 #       include <swscale.h>
 #   endif
     }
@@ -180,7 +180,14 @@ namespace y60 {
         // time units in movies).
         int64_t           _myStartTimestamp;
         double           _myLastVideoTimestamp;
-        int               _myDestinationPixelFormat;
+
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52,20,0)
+        PixelFormat
+#else
+        int
+#endif
+        _myDestinationPixelFormat;
+
         unsigned          _myBytesPerPixel;
         bool _hasShutDown;
     };

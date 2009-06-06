@@ -515,7 +515,7 @@ namespace y60 {
 
         AVCodecContext * myVCodec = _myVStream->codec;
         
-#if LIBAVCODEC_VERSION_INT < ((51<<16)+(38<<8)+0) 
+#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(51,38,0) 
         START_TIMER(decodeFrame_img_convert);
         img_convert(&myDestPict, _myDestinationPixelFormat,
                     (AVPicture*)theFrame, myVCodec->pix_fmt,

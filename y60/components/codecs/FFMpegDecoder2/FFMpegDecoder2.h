@@ -79,7 +79,7 @@
 #ifdef OSX
     extern "C" {
 #       include <libavformat/avformat.h>
-#       if LIBAVCODEC_VERSION_INT >= ((51<<16)+(38<<8)+0) 
+#       if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(51,38,0) 
 #           include <libswscale/swscale.h>
 #       endif
     }
@@ -91,7 +91,7 @@
 #   endif
     extern "C" {
 #   include <avformat.h>
-#   if LIBAVCODEC_VERSION_INT >= ((51<<16)+(38<<8)+0) 
+#   if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(51,38,0) 
 #       include <swscale.h>
 #   endif
     }
@@ -218,7 +218,12 @@ namespace y60 {
 
         int64_t _myStartTimestamp;
         double _myLastFrameTime;  // Only used for mpeg1/2 end of file handling.
-        int _myDestinationPixelFormat;
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52,20,0)
+        PixelFormat
+#else
+        int
+#endif
+        _myDestinationPixelFormat;
 
         ReSampleContext * _myResampleContext;
         static asl::Block _mySamples;

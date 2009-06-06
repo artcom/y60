@@ -117,7 +117,7 @@ namespace y60 {
         _myAStreamIndex(-1),
         _myAStream(0),
         _myDemux(),
-        _myDestinationPixelFormat(0),
+        _myDestinationPixelFormat(PIX_FMT_BGR24),
         _myResampleContext(0),
         _myNumFramesDecoded(0),
         _myNumIFramesDecoded(0),
@@ -374,7 +374,7 @@ namespace y60 {
         double myTime = thePacket.dts / _myTimeUnitsPerSecond;
         AC_TRACE << "FFMpegDecoder2::addAudioPacket()";
         while (myDataLen > 0) {
-#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(28<<8)+0)
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(51,28,0)
                 // "avcodec_decode_audio2" needs the buffer size for initialization
                 myBytesDecoded = _mySamples.size(); 
                 int myLen = avcodec_decode_audio2(_myAStream->codec,
@@ -528,7 +528,7 @@ namespace y60 {
         myDestPict.linesize[2] = myLineSizeBytes;
 
         AVCodecContext * myVCodec = _myVStream->codec;
-#if LIBAVCODEC_VERSION_INT < ((51<<16)+(38<<8)+0) 
+#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(51,38,0) 
         START_TIMER(decodeFrame_img_convert);
         img_convert(&myDestPict, _myDestinationPixelFormat,
                     (AVPicture*)theFrame, myVCodec->pix_fmt,
