@@ -59,8 +59,8 @@
 
 use("../../../video/testLeak.js");
 
-const MOVIE_1 = "../../video/testmovies/1.1.mpg";
-const MOVIE_2 = "../../video/testmovies/1.4.mpg"
+const MOVIE_1 = "../../../video/testmovies/1.1.mpg";
+const MOVIE_2 = "../../../video/testmovies/1.4.mpg"
 
 var myTestName = "y60FFMpegDecoder1 Leaktest";
 var myDecoderPlug = "y60FFMpegDecoder1";
