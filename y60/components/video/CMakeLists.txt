@@ -13,3 +13,7 @@ if(LINUX)
 
 endif(LINUX)
 
+if(WIN32)
+    #add_subdirectory(WMPPlayer)
+endif(WIN32)
+
