@@ -3,7 +3,13 @@
 #add_subdirectory(PortVideo)
 add_subdirectory(VideoProcessing)
 
-if(LINUX AND GSTREAMER_FOUND)
-    add_subdirectory(GStreamerCapture)
-endif(LINUX AND GSTREAMER_FOUND)
+if(LINUX)
+
+    add_subdirectory(DVB)
+
+    if(GSTREAMER_FOUND)
+        add_subdirectory(GStreamerCapture)
+    endif(GSTREAMER_FOUND)
+
+endif(LINUX)
 
