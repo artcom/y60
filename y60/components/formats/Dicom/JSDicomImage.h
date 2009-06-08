@@ -68,10 +68,8 @@
 #define _ac_y60_components_dicomimage_h_
 
 #include <y60/jsbase/JSWrapper.h>
-#ifndef WIN32
-#include <dicom/osconfig.h>
-#endif
-#include <dcmimage.h>
+#include <dcmtk/config/osconfig.h>
+#include <dcmtk/dcmimgle/dcmimage.h>
 
 class JSDicomImage : public jslib::JSWrapper<DicomImage, asl::Ptr<DicomImage> , jslib::StaticAccessProtocol> {
         JSDicomImage() {}

@@ -68,12 +68,11 @@
 #   pragma warning (pop)
 #endif //defined(_MSC_VER)
 
-#include <osconfig.h>
-#include <dcfilefo.h>
-#include <dcrledrg.h>
-#include <djdecode.h>
-#include <dcmimage.h>
-#include <dcistrma.h>
+#include <dcmtk/config/osconfig.h>
+#include <dcmtk/dcmdata/dcfilefo.h>
+#include <dcmtk/dcmdata/dcrledrg.h>
+#include <dcmtk/dcmjpeg/djdecode.h>
+#include <dcmtk/dcmimgle/dcmimage.h>
 
 using namespace std;
 
