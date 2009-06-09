@@ -1619,7 +1619,6 @@ JSApp::setupPath(const std::string & theIncludePath) {
     // NOTE: Paths are searched in reverse-order and should therefore
     //       be added in order of increasing locality.
 
-#ifdef AC_BUILT_WITH_CMAKE
     // Add standard paths dependent on whether we are in the build directory or installed tree
     std::string myApplicationDirectory = asl::getAppDirectory();
     if(asl::fileExists(asl::normalizeDirectory(myApplicationDirectory + "/CMakeFiles", true))
@@ -1640,11 +1639,6 @@ JSApp::setupPath(const std::string & theIncludePath) {
         myPacketManager->add(myApplicationDirectory + "/../lib/y60/shader");
         myPacketManager->add(myApplicationDirectory + "/../lib/y60/js");
     }
-#else
-    // Add the application directory (the directoy y60.exe is located)
-    // XXX: this is a dirty hack for ANTish packaging and shall be removed soon.
-    myPacketManager->add(asl::getAppDirectory());
-#endif
 
     // Add the Y60_PATH if set
     std::string myY60Path = asl::expandEnvironment("${Y60_PATH}");
@@ -1660,7 +1654,7 @@ JSApp::setupPath(const std::string & theIncludePath) {
     // Add the current working directory
     myPacketManager->add(asl::IPackagePtr(new asl::DirectoryPackage("")));
 
-    // Make plugin manager use them same path we use
+    // Make plugin manager use the same path we use
     //  XXX: this probably does not handle zip archives, right?
     PlugInManager::get().setSearchPath(myPacketManager->getSearchPath());
 }
