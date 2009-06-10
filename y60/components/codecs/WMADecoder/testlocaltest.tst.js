@@ -58,8 +58,10 @@
 
 
 use("UnitTest.js");
+
 plug("Sound");
-plug("y60WMADecoder");
+plug("WMADecoder");
+
 plug("y60ProcFunctions");
 
 function WMADecoder2UnitTest() {

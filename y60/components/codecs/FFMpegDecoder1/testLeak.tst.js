@@ -62,8 +62,8 @@ use("../../../video/testLeak.js");
 const MOVIE_1 = "../../../video/testmovies/1.1.mpg";
 const MOVIE_2 = "../../../video/testmovies/1.4.mpg"
 
-var myTestName = "y60FFMpegDecoder1 Leaktest";
-var myDecoderPlug = "y60FFMpegDecoder1";
+var myTestName = "FFMpegDecoder1 Leaktest";
+var myDecoderPlug = "FFMpegDecoder1";
 var myVideoCount = 500;
 
 var myAllowedLeakage = 50000; // per movie

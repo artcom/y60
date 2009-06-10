@@ -65,7 +65,7 @@ function FFMpegTest(theArguments) {
     var Public = this;
     var Base   = {};
 
-    MovieTestBase(Public, theArguments, "y60FFMpegDecoder2");
+    MovieTestBase(Public, theArguments, "FFMpegDecoder2");
 
 /*
     var _myTestMovies = [

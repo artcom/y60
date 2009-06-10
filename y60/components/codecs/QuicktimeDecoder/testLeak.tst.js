@@ -71,7 +71,7 @@ const MOVIE_2 = "../../../../video/testmovies/1.4.mov"
 
 
 var myTestName = "Quicktimedecoder Leaktest";
-var myDecoderPlug = "y60QuicktimeDecoder";
+var myDecoderPlug = "QuicktimeDecoder";
 var myVideoCount = 1;
 
 var myMovieLeak =  myVideoCount * 250 * 1024; // each qt movie leaks 8kb per movie (not per frame, tolerable)

@@ -241,23 +241,23 @@ Playlist.prototype.Constructor = function(self) {
             theUrl.search(/\.mkv$/i)  != -1 ||
             theUrl.search(/\.m2v$/i) != -1 ) {
             if (theSeekableFlag) {                
-                myDecoderHint = "y60FFMpegDecoder2";
+                myDecoderHint = "FFMpegDecoder2";
             } else {
-                myDecoderHint = "y60FFMpegDecoder2";
+                myDecoderHint = "FFMpegDecoder2";
             }
         }
         if (theUrl.search(/\.mov$/i)  != -1) {
             if (operatingSystem() == "LINUX" || theSeekableFlag) {
-                myDecoderHint = "y60FFMpegDecoder2";
+                myDecoderHint = "FFMpegDecoder2";
             } else {
-                myDecoderHint = "y60QuicktimeDecoder";
+                myDecoderHint = "QuicktimeDecoder";
             }
         }
         if (theUrl.search(/\.wmv$/i)  != -1 ) {
             if (operatingSystem() == "LINUX") {
-                myDecoderHint = "y60FFMpegDecoder2";
+                myDecoderHint = "FFMpegDecoder2";
             } else {
-                myDecoderHint = "y60WMVDecoder";
+                myDecoderHint = "WMVDecoder";
             }
         }
         return myDecoderHint;

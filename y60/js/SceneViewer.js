@@ -83,11 +83,6 @@ use("MemoryMeter.js");
 use("VideoRecorder.js");
 use("PerfMeter.js");
 
-//if (operatingSystem() == "WIN32") {
-//    plug("y60QuicktimeDecoder"); // turn quicktime decoder on for windows and better mov decoder support
-//}
-//plug("y60FFMpegDecoder1");
-
 // Global window object (similar to html window)
 if (window == undefined) var window   = null;
 if (renderer == undefined) var renderer = null;

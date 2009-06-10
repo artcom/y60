@@ -61,7 +61,7 @@ const MOVIE_DEMO = false;
 if (__main__ == undefined) var __main__ = "WiimoteTest";
 
 use("SceneViewer.js");
-plug("y60FFMpegDecoder1");
+plug("FFMpegDecoder1");
 
 window = new RenderWindow();
 

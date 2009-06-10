@@ -384,7 +384,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
             case AUDIO_MEDIA:
                 print("Media: audio");
                 if (OS == "WIN32" && !_myWMAPlugged) {
-                    plug("y60WMADecoder");
+                    plug("WMADecoder");
                     _myWMAPlugged = true;
                 }
                 break;

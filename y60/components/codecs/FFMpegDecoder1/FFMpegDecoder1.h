@@ -167,7 +167,7 @@ namespace y60 {
          */
         double readFrame(double theTime, unsigned theFrame, RasterVector theTargetRaster);
 
-        const char * getName() const { return "y60FFMpegDecoder1"; }
+        const char * getName() const { return "FFMpegDecoder1"; }
 
     private:
         void setMovieParameters(int myIndex);

@@ -9,7 +9,7 @@ y60_demobehaviourrendex_settings.h
 )
 
 y60_add_component(
-    y60DemoBehaviourRendex
+    DemoBehaviourRendex
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     DEPENDS y60jslib

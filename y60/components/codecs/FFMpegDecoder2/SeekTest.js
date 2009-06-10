@@ -64,7 +64,7 @@ function SeekTest(theArguments) {
     var Public = this;
     var Base   = {};
 
-    MovieTestBase(Public, theArguments, "y60FFMpegDecoder2");
+    MovieTestBase(Public, theArguments, "FFMpegDecoder2");
 
     var _myTestMovies = [
         "mjpeg_160x120_25_10_audio.avi",

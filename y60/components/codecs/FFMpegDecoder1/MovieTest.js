@@ -65,7 +65,7 @@ function FFMpegTest(theArguments) {
     var Public = this;
     var Base   = {};
 
-    MovieTestBase(Public, theArguments, "y60FFMpegDecoder1");
+    MovieTestBase(Public, theArguments, "FFMpegDecoder1");
 
     var _myTestMovies = [
         "huffyuv_160x120_25_1_audio.avi",

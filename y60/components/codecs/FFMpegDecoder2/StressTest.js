@@ -73,7 +73,7 @@ var _myMovieQuad;
 var _myMovieBody;
 
 function setup(theViewer) {
-    _myMovieImage = theViewer.getImageManager().createMovie("../FFMpegDecoder/testfiles/counter_short.mpg", "y60FFMpegDecoder2");
+    _myMovieImage = theViewer.getImageManager().createMovie("../FFMpegDecoder/testfiles/counter_short.mpg", "FFMpegDecoder2");
     _myMovieImage.playmode = "play";
     _myMovieImage.audio = false;
     _myMovieMaterial = Modelling.createUnlitTexturedMaterial(theViewer.getScene(), _myMovieImage);  
