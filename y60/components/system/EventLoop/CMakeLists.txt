@@ -9,7 +9,7 @@ y60_eventloop_settings.h
 )
 
 y60_add_component(
-    y60EventLoop
+    EventLoop
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     DEPENDS y60jslib

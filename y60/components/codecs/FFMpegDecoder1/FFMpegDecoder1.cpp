@@ -80,7 +80,7 @@ using namespace std;
 using namespace asl;
 
 extern "C"
-EXPORT asl::PlugInBase * y60FFMpegDecoder1_instantiatePlugIn(asl::DLHandle myDLHandle) {
+EXPORT asl::PlugInBase * FFMpegDecoder1_instantiatePlugIn(asl::DLHandle myDLHandle) {
     return new y60::FFMpegDecoder1(myDLHandle);
 }
 

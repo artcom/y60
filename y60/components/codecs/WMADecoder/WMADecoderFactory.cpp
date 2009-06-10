@@ -70,7 +70,7 @@
 using namespace asl;
 
 extern "C"
-EXPORT asl::PlugInBase * y60WMADecoder_instantiatePlugIn(asl::DLHandle myDLHandle) {
+EXPORT asl::PlugInBase * WMADecoder_instantiatePlugIn(asl::DLHandle myDLHandle) {
 	return new y60::WMADecoderFactory(myDLHandle);
 }
 

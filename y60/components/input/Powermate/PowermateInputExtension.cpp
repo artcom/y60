@@ -261,6 +261,6 @@ PowermateInputExtension::setLED(unsigned char theLevel, int theFileDescriptor)
 
 
 extern "C"
-EXPORT asl::PlugInBase* y60PowermateInputExtension_instantiatePlugIn(asl::DLHandle myDLHandle) {
+EXPORT asl::PlugInBase* Powermate_instantiatePlugIn(asl::DLHandle myDLHandle) {
     return new PowermateInputExtension(myDLHandle);
 }

@@ -10,12 +10,11 @@ y60_procfunctions_settings.h
 )
 
 y60_add_component(
-    y60ProcFunctions
+    ProcessFunctions
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     DEPENDS y60jslib
 )
-
 
 y60_add_jstest(ProcFunctions mod_ProcFunctions)
 y60_add_jstest(ImageLeak mod_ProcFunctions)

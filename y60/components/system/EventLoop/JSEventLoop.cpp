@@ -156,7 +156,7 @@ namespace jslib {
     }
 
     extern "C"
-    EXPORT asl::PlugInBase* y60EventLoop_instantiatePlugIn( asl::DLHandle myDLHandle ) {
+    EXPORT asl::PlugInBase* EventLoop_instantiatePlugIn( asl::DLHandle myDLHandle ) {
         return new JSEventLoop( myDLHandle );
     }
 

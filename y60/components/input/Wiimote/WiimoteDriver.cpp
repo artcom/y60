@@ -303,6 +303,6 @@ WiimoteDriver::SetLED(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsv
 } // end of namespace y60
 
 extern "C"
-EXPORT PlugInBase* y60Wiimote_instantiatePlugIn(DLHandle myDLHandle) {
+EXPORT PlugInBase* Wiimote_instantiatePlugIn(DLHandle myDLHandle) {
     return new y60::WiimoteDriver(myDLHandle);
 }

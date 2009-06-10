@@ -88,7 +88,7 @@ using namespace y60;
 #define DB2(x) //x
 
 extern "C"
-EXPORT asl::PlugInBase * y60WMVDecoder_instantiatePlugIn(asl::DLHandle myDLHandle) {
+EXPORT asl::PlugInBase * WMVDecoder_instantiatePlugIn(asl::DLHandle myDLHandle) {
 	return new y60::WMVDecoder(myDLHandle);
 }
 

@@ -80,7 +80,7 @@ namespace y60 {
 }
 
 extern "C"
-EXPORT asl::PlugInBase * y60ProcFunctions_instantiatePlugIn(asl::DLHandle myDLHandle) {
+EXPORT asl::PlugInBase * ProcessFunctions_instantiatePlugIn(asl::DLHandle myDLHandle) {
     return new y60::ProcFunctionsPlugIn(myDLHandle);
 }
 

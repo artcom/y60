@@ -81,7 +81,7 @@
 using namespace std;
 
 extern "C"
-EXPORT asl::PlugInBase * y60QuicktimeDecoder_instantiatePlugIn(asl::DLHandle myDLHandle) {
+EXPORT asl::PlugInBase * QuicktimeDecoder_instantiatePlugIn(asl::DLHandle myDLHandle) {
     return new y60::QuicktimeDecoder(myDLHandle);
 }
 

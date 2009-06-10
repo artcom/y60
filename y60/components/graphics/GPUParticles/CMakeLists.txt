@@ -12,7 +12,7 @@ y60_particles_settings.h
 )
 
 y60_add_component(
-    y60GPUParticles
+    GPUParticles
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     DEPENDS y60jslib

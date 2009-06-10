@@ -1,5 +1,5 @@
 
-# XXXX: LINUX ONLY. WINDOWS TERRIBLY BROKEN.
+# XXX: LINUX ONLY. WINDOWS TERRIBLY BROKEN.
 
 set(SOURCES
 Liimote.cpp
@@ -18,7 +18,7 @@ WiiScanner.h
 )
 
 y60_add_component(
-    y60Wiimote
+    Wiimote
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     DEPENDS y60jslib y60input ${JSDEPENDS}

@@ -8,7 +8,7 @@ PowermateInputExtension.h
 )
 
 y60_add_component(
-    y60PowermateInputExtension
+    Powermate
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     DEPENDS y60jslib
