@@ -17,7 +17,7 @@ JSCairoSurface.h
 )
 
 y60_add_component(
-    y60Cairo
+    Cairo
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     DEPENDS y60jslib y60input

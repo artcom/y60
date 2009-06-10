@@ -59,7 +59,7 @@
 use("SceneViewer.js");
 use("Overlay.js");
 
-plug("y60Cairo");
+plug("Cairo");
 
 var ourShow = new SceneViewer(arguments);
 var _myImage = null;

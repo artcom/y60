@@ -8,7 +8,7 @@ y60_glbinding_settings.h
 )
 
 y60_add_component(
-    y60GLBinding
+    GLBinding
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     DEPENDS y60jslib
