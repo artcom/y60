@@ -538,6 +538,8 @@ spark.World.Constructor = function(Protected) {
 /**
  * Simple wrapper for the Y60 scene viewer.
  */
+use("SceneViewer.js"); // XXX: bad place for this
+
 spark.SceneViewer = spark.ComponentClass("SceneViewer");
 
 spark.SceneViewer.Constructor = function(Protected) {

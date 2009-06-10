@@ -98,7 +98,7 @@ use("events.js");
 // internationalization
 use("internationalization.js");
 
-// XXX: spark widgets
-if ("useSparkWidgets" in this) {
+// spark widgets
+if (!("disableSparkWidgets" in this)) {
     use("widgets.js");
 }
