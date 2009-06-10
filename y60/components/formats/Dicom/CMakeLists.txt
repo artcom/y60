@@ -12,7 +12,7 @@ set(HEADERS
 )
 
 y60_add_component(
-    y60Dicom
+    Dicom
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     DEPENDS y60jslib

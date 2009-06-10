@@ -9,7 +9,7 @@ y60_x3dimporter_settings.h
 )
 
 y60_add_component(
-    y60X3dImporter
+    X3dImporter
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     DEPENDS y60jslib

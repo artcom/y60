@@ -14,7 +14,7 @@ WaterSimulation.h
 )
 
 y60_add_component(
-    y60SimWater
+    SimWater
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     DEPENDS y60jslib
