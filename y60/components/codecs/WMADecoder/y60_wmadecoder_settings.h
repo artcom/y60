@@ -3,7 +3,7 @@
 
 #include <asl/base/settings.h>
 
-#ifdef y60wmadecoder_EXPORTS
+#ifdef wmadecoder_EXPORTS
 #   define Y60_WMADECODER_DECL AC_DLL_EXPORT
 #else
 #   define Y60_WMADECODER_DECL AC_DLL_IMPORT

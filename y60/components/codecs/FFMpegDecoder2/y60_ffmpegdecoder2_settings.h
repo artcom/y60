@@ -3,7 +3,7 @@
 
 #include <asl/base/settings.h>
 
-#ifdef y60FFMpegDecoder2_EXPORTS
+#ifdef FFMpegDecoder2_EXPORTS
 #   define Y60_FFMPEGDECODER2_DECL AC_DLL_EXPORT
 #else
 #   define Y60_FFMPEGDECODER2_DECL AC_DLL_IMPORT
