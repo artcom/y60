@@ -268,3 +268,37 @@ spark.MouseEvent.Constructor = function(Protected, theType, theX, theY) {
     };
     
 };
+
+spark.Keyboard = {};
+
+spark.Keyboard.SHIFT      = 1;
+spark.Keyboard.ALT        = 2;
+spark.Keyboard.ALT_SHIFT  = spark.Keyboard.ALT | spark.Keyboard.SHIFT;
+spark.Keyboard.CTRL       = 4;
+spark.Keyboard.CTRL_SHIFT = spark.Keyboard.CTRL | spark.Keyboard.SHIFT;
+spark.Keyboard.CTRL_ALT   = spark.Keyboard.CTRL | spark.Keyboard.ALT;
+
+
+spark.KeyboardEvent = spark.Class("KeyEvent");
+
+spark.KeyboardEvent.KEY_DOWN = "keybord-key-down";
+spark.KeyboardEvent.KEY_UP   = "keybord-key-up";
+
+spark.KeyboardEvent.Constructor = function(Protected, theType, theKey, theModifiers) {
+    var Public = this;
+    
+    this.Inherit(spark.Event, theType);
+    
+    var _myKey = theKey;
+    
+    Public.key getter = function() {
+        return _myKey;
+    };
+    
+    var _myModifiers = theModifiers;
+    
+    Public.modifiers getter = function() {
+        return _myModifiers;
+    };
+    
+};

@@ -549,6 +549,14 @@ spark.SceneViewer.Constructor = function(Protected) {
     this.Inherit(spark.Widget);
 
     SceneViewer.prototype.Constructor(this, []);
+
+    Public.title getter = function()  {
+        return window.title;
+    };
+    
+    Public.title setter = function(theTitle) {
+        window.title = theTitle;
+    };
     
     Base.realize = Public.realize;
     Public.realize = function() {
@@ -658,10 +666,21 @@ spark.SceneViewer.Constructor = function(Protected) {
     };
 
     // Will be called on a keyboard event
+    var _myKeyboardFocusedWidget = null;
     Base.onKey = Public.onKey;
     Public.onKey = function(theKey, theKeyState, theX, theY,
                          theShiftFlag, theControlFlag, theAltFlag) {
         Base.onKey(theKey, theKeyState, theX, theY, theShiftFlag, theControlFlag, theAltFlag);
+        
+        if(_myKeyboardFocusedWidget) {
+            var myModifiers =
+                (theShiftFlag ? spark.Keyboard.SHIFT : 0)
+                | (theControlFlag ? spark.Keyboard.CTRL : 0)
+                | (theAltFlag ? spark.Keyboard.ALT : 0);
+            var myType = theKeyState ? spark.KeyboardEvent.KEY_DOWN : spark.KeyboardEvent.KEY_UP;
+            var myEvent = new spark.KeyboardEvent(myType, theKey, myModifiers);
+            _myKeyboardFocusedWidget.dispatchEvent(myEvent);
+        }
     };
 
     // Will be called on a mouse wheel event
@@ -693,8 +712,7 @@ spark.SceneViewer.Constructor = function(Protected) {
     Public.onExit = function() {
         Base.onExit();
     };
-    Public.title getter = function()  { return window.title; }
-    Public.title setter = function(t) { window.title = title; }
+    
 };
 
 /**
