@@ -3,7 +3,7 @@
 
 #include <asl/base/settings.h>
 
-#ifdef y60DShowCapture_EXPORTS
+#ifdef DShowCapture_EXPORTS
 #   define Y60_DSHOWCAPTURE_DECL AC_DLL_EXPORT
 #else
 #   define Y60_DSHOWCAPTURE_DECL AC_DLL_IMPORT

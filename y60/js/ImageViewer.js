@@ -393,10 +393,10 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
                 if (!_myVideoCapturePlugged &&
                     (myFilename.search(/^video:\/\//i) != -1 || myFilename.search(/^dshow:\/\//i) != -1) ) {
                     if (OS == "LINUX") {
-                        plug("y60DC1394");
+                        plug("DC1394");
                         print("plugged dc1394");
                     } else {
-                        plug("y60DShowCapture");
+                        plug("DShowCapture");
                         print("plugged y60DShowCapture");
                     }
                     _myVideoCapturePlugged  = true;

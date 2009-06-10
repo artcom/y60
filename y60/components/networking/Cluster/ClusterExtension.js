@@ -97,7 +97,7 @@ if (master) {
     var renderer = null; // initialized at loadScene
 }
 
-plug("rendexCluster");
+plug("Cluster");
 
 function ClusterExtensionApp(theArguments) {
     this.Constructor(this, theArguments);

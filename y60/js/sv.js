@@ -90,10 +90,10 @@
     var myModel = ourShow.getModelName();
 
     if (myModel && myModel.search(/\.st./) != -1) {
-        plug("y60StlImporter");
+        plug("StlImporter");
     }
     if (myModel && myModel.search(/\.x3d/) != -1) {
-        plug("y60X3dImporter");
+        plug("X3dImporter");
     }
 
     ourShow.setup(1024,768);

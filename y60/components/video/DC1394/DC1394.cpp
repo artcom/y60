@@ -68,7 +68,7 @@
 #include <vector>
 
 extern "C"
-EXPORT asl::PlugInBase * y60DC1394_instantiatePlugIn(asl::DLHandle myDLHandle) {
+EXPORT asl::PlugInBase * DC1394_instantiatePlugIn(asl::DLHandle myDLHandle) {
 	return new y60::DC1394(myDLHandle);
 }
 

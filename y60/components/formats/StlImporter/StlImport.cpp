@@ -95,7 +95,7 @@ using namespace std;
 using namespace asl;
 
 extern "C"
-EXPORT PlugInBase* y60StlImporter_instantiatePlugIn(DLHandle myDLHandle) {
+EXPORT PlugInBase* StlImporter_instantiatePlugIn(DLHandle myDLHandle) {
 	return new y60::StlImport(myDLHandle);
 }
 

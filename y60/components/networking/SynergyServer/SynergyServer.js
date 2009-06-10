@@ -56,10 +56,10 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-plug( "y60EventLoop" );
-plug( "y60SynergyServer" );
+plug("EventLoop");
+plug("SynergyServer");
 
-var myASSEventSource = plug( "y60ASSEventSource" );
+var myASSEventSource = plug("ASSEventSource");
 
 myASSEventSource.disconnect();
 

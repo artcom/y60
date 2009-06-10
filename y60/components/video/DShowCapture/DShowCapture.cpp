@@ -84,7 +84,7 @@ extern "C" {
 }
 
 extern "C"
-EXPORT asl::PlugInBase * y60DShowCapture_instantiatePlugIn(asl::DLHandle myDLHandle) {
+EXPORT asl::PlugInBase * DShowCapture_instantiatePlugIn(asl::DLHandle myDLHandle) {
     return new y60::DShowCapture(myDLHandle);
 }
 

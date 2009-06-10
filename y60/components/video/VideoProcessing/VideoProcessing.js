@@ -67,7 +67,7 @@
 if (__main__ == undefined) var __main__ = "VideoProcessingExtension";
 
 use("ImageViewer.js");
-plug("y60VideoProcessing");
+plug("VideoProcessing");
 
 
 function VideoProcessingExtensionApp(theArguments) {

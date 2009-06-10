@@ -90,7 +90,7 @@ class JSASSOscClient : public jslib::JSWrapper<y60::ASSOscClient,
         virtual ~JSASSOscClient() {};
         
         static const char * ClassName() {
-            return "y60ASSOscClient";
+            return "ASSOscClient";
         }
         static JSFunctionSpec * Functions();
         static JSFunctionSpec * StaticFunctions();

@@ -57,7 +57,7 @@
 */
 
 if ((operatingSystem() == "LINUX" || operatingSystem() == "OSX") && expandEnvironment("${Y60_POWERMATE_SUPPORT}") == 1) {
-    plug("y60PowermateInputExtension");
+    plug("PowermateInputExtension");
 }
 
 var LEFT_BUTTON   = 1;

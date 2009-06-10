@@ -112,6 +112,6 @@ protected:
 };
 
 extern "C"
-EXPORT PlugInBase* y60WindowCW_instantiatePlugIn(DLHandle myDLHandle) {
+EXPORT PlugInBase* WindowCW_instantiatePlugIn(DLHandle myDLHandle) {
     return new WindowCWPlugin(myDLHandle);
 }

@@ -114,6 +114,6 @@ WMPPlayerPlugIn::initClasses(JSContext * theContext, JSObject *theGlobalObject) 
 
 
 extern "C"
-EXPORT PlugInBase* y60WMPPlayer_instantiatePlugIn(DLHandle myDLHandle) {
+EXPORT PlugInBase* WMPPlayer_instantiatePlugIn(DLHandle myDLHandle) {
 	return new y60::WMPPlayerPlugIn(myDLHandle);
 }

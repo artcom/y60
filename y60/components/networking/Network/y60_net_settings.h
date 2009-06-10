@@ -3,7 +3,7 @@
 
 #include <asl/base/settings.h>
 
-#ifdef y60Net_EXPORTS
+#ifdef Network_EXPORTS
 #   define Y60_NET_DECL AC_DLL_EXPORT
 #else
 #   define Y60_NET_DECL AC_DLL_IMPORT

@@ -3,7 +3,7 @@
 
 #include <asl/base/settings.h>
 
-#ifdef y60ASSOscClient_EXPORTS
+#ifdef ASSOscClient_EXPORTS
 #   define Y60_OSCCLIENT_DECL AC_DLL_EXPORT
 #else
 #   define Y60_OSCCLIENT_DECL AC_DLL_IMPORT

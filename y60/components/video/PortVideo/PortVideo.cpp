@@ -65,7 +65,7 @@
 #include <vector>
 
 extern "C"
-EXPORT asl::PlugInBase * y60PortVideo_instantiatePlugIn(asl::DLHandle myDLHandle) {
+EXPORT asl::PlugInBase * PortVideo_instantiatePlugIn(asl::DLHandle myDLHandle) {
 	return new y60::PortVideo(myDLHandle);
 }
 

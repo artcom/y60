@@ -22,7 +22,7 @@ y60_asscore_settings.h
 list(APPEND EXTERNALS GLEW)
 
 ac_add_library(
-    y60ASSCore y60/components/ASSDriver/ASSCore
+    ASSCore y60/components/ASSDriver/ASSCore
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     DEPENDS asldom aslmath y60jsbase y60jslib y60image y60scene 

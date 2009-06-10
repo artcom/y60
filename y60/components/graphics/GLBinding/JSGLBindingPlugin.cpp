@@ -152,6 +152,6 @@ namespace jslib {
 }
 
 extern "C"
-EXPORT asl::PlugInBase * y60GLBinding_instantiatePlugIn(asl::DLHandle myDLHandle) {
+EXPORT asl::PlugInBase * GLBinding_instantiatePlugIn(asl::DLHandle myDLHandle) {
 	return new jslib::GLBinding(myDLHandle);
 }

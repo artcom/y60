@@ -8,7 +8,7 @@ GStreamerCapturePlugin.h
 )
 
 y60_add_component(
-    y60GStreamerCapture
+    GStreamerCapture
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     DEPENDS y60video

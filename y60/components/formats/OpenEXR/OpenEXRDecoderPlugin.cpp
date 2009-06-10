@@ -105,6 +105,6 @@ namespace y60 {
 }
 
 extern "C"
-EXPORT PlugInBase * y60OpenEXR_instantiatePlugIn(DLHandle myDLHandle) {
+EXPORT PlugInBase * OpenEXR_instantiatePlugIn(DLHandle myDLHandle) {
 	return new y60::OpenEXRDecoderPlugin(myDLHandle);
 }

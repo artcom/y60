@@ -79,6 +79,6 @@ namespace y60 {
 }
 
 extern "C"
-EXPORT asl::PlugInBase * y60DVB_instantiatePlugIn(asl::DLHandle myDLHandle) {
+EXPORT asl::PlugInBase * DVB_instantiatePlugIn(asl::DLHandle myDLHandle) {
 	return new y60::JSDvbPlugIn(myDLHandle);
 }

@@ -120,6 +120,6 @@ CTScanPlugIn::initClasses(JSContext * theContext, JSObject *theGlobalObject) {
 
 
 extern "C"
-EXPORT PlugInBase* y60CTScan_instantiatePlugIn(DLHandle myDLHandle) {
+EXPORT PlugInBase* CTScan_instantiatePlugIn(DLHandle myDLHandle) {
 	return new y60::CTScanPlugIn(myDLHandle);
 }

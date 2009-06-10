@@ -71,7 +71,7 @@ OpenEXRUnitTest.prototype.Constructor = function(obj, theName) {
     obj.myHDRWindow = null;
 
     obj.run = function() {
-        plug("y60OpenEXR");
+        plug("OpenEXR");
         GLResourceManager.prepareShaderLibrary("../../shader/shaderlibrary.xml");
         var window = new RenderWindow();
 

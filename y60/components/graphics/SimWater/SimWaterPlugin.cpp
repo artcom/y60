@@ -61,7 +61,7 @@
 #include <asl/base/PlugInBase.h>
 
 extern "C"
-EXPORT asl::PlugInBase* y60SimWater_instantiatePlugIn(asl::DLHandle myDLHandle) {
+EXPORT asl::PlugInBase* SimWater_instantiatePlugIn(asl::DLHandle myDLHandle) {
     return new SimWater(myDLHandle);
 }
 

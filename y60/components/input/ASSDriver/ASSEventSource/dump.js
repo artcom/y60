@@ -56,8 +56,8 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-plug( "y60EventLoop" );
-var myASSEventSource = plug( "y60ASSEventSource" );
+plug("EventLoop");
+var myASSEventSource = plug("ASSEventSource");
 
 var myXOffset = 0;
 var myYOffset = 0;

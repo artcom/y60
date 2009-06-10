@@ -3,7 +3,7 @@
 
 #include <asl/base/settings.h>
 
-#ifdef y60SynergyServer_EXPORTS
+#ifdef SynergyServer_EXPORTS
 #   define Y60_SYNERGYSERVER_DECL AC_DLL_EXPORT
 #else
 #   define Y60_SYNERGYSERVER_DECL AC_DLL_IMPORT

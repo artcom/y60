@@ -59,7 +59,7 @@ if (__main__ == undefined) var __main__ = "SimWaterTest";
 
 use("SceneViewer.js");
 
-plug("y60SimWater");
+plug("SimWater");
 
 window = new RenderWindow();
 

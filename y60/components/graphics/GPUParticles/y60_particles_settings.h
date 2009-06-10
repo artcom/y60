@@ -3,7 +3,7 @@
 
 #include <asl/base/settings.h>
 
-#ifdef y60GPUParticles_EXPORTS
+#ifdef GPUParticles_EXPORTS
 #   define Y60_PARTICLES_DECL AC_DLL_EXPORT
 #else
 #   define Y60_PARTICLES_DECL AC_DLL_IMPORT

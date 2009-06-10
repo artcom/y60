@@ -3,7 +3,7 @@
 
 #include <asl/base/settings.h>
 
-#ifdef y60ClusterExtension_EXPORTS
+#ifdef Cluster_EXPORTS
 #   define Y60_CLUSTEREXTENSION_DECL AC_DLL_EXPORT
 #else
 #   define Y60_CLUSTEREXTENSION_DECL AC_DLL_IMPORT

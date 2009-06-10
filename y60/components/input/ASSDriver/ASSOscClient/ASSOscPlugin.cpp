@@ -103,6 +103,6 @@ ASSOscPlugin::initClasses(JSContext * theContext, JSObject *theGlobalObject) {
 } // end of namespace y60
 
 extern "C"
-EXPORT PlugInBase * y60ASSOscClient_instantiatePlugIn(DLHandle myDLHandle) {
+EXPORT PlugInBase * ASSOscClient_instantiatePlugIn(DLHandle myDLHandle) {
     return new y60::ASSOscPlugin(myDLHandle);
 }

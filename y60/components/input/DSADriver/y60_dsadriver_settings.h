@@ -3,7 +3,7 @@
 
 #include <asl/base/settings.h>
 
-#ifdef y60DSADriver_EXPORTS
+#ifdef DSADriver_EXPORTS
 #   define Y60_DSADRIVER_DECL AC_DLL_EXPORT
 #else
 #   define Y60_DSADRIVER_DECL AC_DLL_IMPORT

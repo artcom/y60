@@ -3,7 +3,7 @@
 
 #include <asl/base/settings.h>
 
-#ifdef y60wiimote_EXPORTS
+#ifdef Wiimote_EXPORTS
 #   define Y60_WIIMOTE_DECL AC_DLL_EXPORT
 #else
 #   define Y60_WIIMOTE_DECL AC_DLL_IMPORT

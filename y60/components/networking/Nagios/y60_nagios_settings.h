@@ -3,7 +3,7 @@
 
 #include <asl/base/settings.h>
 
-#ifdef y60nagios_EXPORTS
+#ifdef Nagios_EXPORTS
 #   define Y60_NAGIOS_DECL AC_DLL_EXPORT
 #else
 #   define Y60_NAGIOS_DECL AC_DLL_IMPORT

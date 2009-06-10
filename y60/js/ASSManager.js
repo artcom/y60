@@ -226,7 +226,7 @@ ASSManager.prototype.Constructor = function(Public, Protected, theViewer, theInh
 
     Protected.setup = function() {
         if ( ! ASSManager.driver ) {
-            ASSManager.driver = plug("y60ASSEventSource");
+            ASSManager.driver = plug("ASSEventSource");
         }
 
         _myDriver = ASSManager.driver;

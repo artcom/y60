@@ -3,7 +3,7 @@
 
 #include <asl/base/settings.h>
 
-#ifdef y60ASSEventSource_EXPORTS
+#ifdef ASSEventSource_EXPORTS
 #   define Y60_EVENTSOURCE_DECL AC_DLL_EXPORT
 #else
 #   define Y60_EVENTSOURCE_DECL AC_DLL_IMPORT

@@ -3,7 +3,7 @@
 
 #include <asl/base/settings.h>
 
-#ifdef y60PortVideo_EXPORTS
+#ifdef PortVideo_EXPORTS
 #   define Y60_PORTVIDEO_DECL AC_DLL_EXPORT
 #else
 #   define Y60_PORTVIDEO_DECL AC_DLL_IMPORT

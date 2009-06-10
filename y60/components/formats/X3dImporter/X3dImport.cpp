@@ -87,7 +87,7 @@
  */
 
 extern "C"
-EXPORT asl::PlugInBase* y60X3dImporter_instantiatePlugIn(asl::DLHandle myDLHandle) {
+EXPORT asl::PlugInBase* X3dImporter_instantiatePlugIn(asl::DLHandle myDLHandle) {
 	return new y60::X3dImport(myDLHandle);
 }
 

@@ -57,7 +57,7 @@
 
 */
 
-plug("y60DVB");
+plug("DVB");
 use("Exception.js");
 use("Y60JSSL.js");
 

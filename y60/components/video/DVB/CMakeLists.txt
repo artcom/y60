@@ -13,7 +13,7 @@ JSDvbTuner.h
 )
 
 y60_add_component(
-    y60DVB
+    DVB
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     DEPENDS y60jslib

@@ -3,7 +3,7 @@
 
 #include <asl/base/settings.h>
 
-#ifdef y60DVB_EXPORTS
+#ifdef DVB_EXPORTS
 #   define Y60_DVB_DECL AC_DLL_EXPORT
 #else
 #   define Y60_DVB_DECL AC_DLL_IMPORT

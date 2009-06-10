@@ -57,7 +57,7 @@
 
 */
 
-plug("y60WMPPlayer");
+plug("WMPPlayer");
 
 var window = new RenderWindow();
 //window.decorations = false;

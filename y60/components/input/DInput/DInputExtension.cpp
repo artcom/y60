@@ -589,7 +589,7 @@ namespace y60 {
 } // end of namespace y60
 
 extern "C"
-EXPORT asl::PlugInBase* y60DInput_instantiatePlugIn(asl::DLHandle myDLHandle) {
+EXPORT asl::PlugInBase* DInput_instantiatePlugIn(asl::DLHandle myDLHandle) {
     return new DInputExtension(myDLHandle);
 }
 

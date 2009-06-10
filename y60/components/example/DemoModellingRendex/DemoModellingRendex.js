@@ -64,7 +64,7 @@ use("SceneViewer.js");
 var window = new RenderWindow();
 
 //window.loadExtension("demoModellingRendex");
-plug("y60DemoModellingRendex");
+plug("DemoModellingRendex");
 
 function DemoModellingRendexApp(theArguments) {
     this.Constructor(this, theArguments);

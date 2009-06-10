@@ -3,7 +3,7 @@
 
 #include <asl/base/settings.h>
 
-#ifdef y60EdgeBlender_EXPORTS
+#ifdef EdgeBlender_EXPORTS
 #   define Y60_EDGEBLENDER_DECL AC_DLL_EXPORT
 #else
 #   define Y60_EDGEBLENDER_DECL AC_DLL_IMPORT
