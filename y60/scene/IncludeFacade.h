@@ -75,7 +75,7 @@
 
 namespace y60 {
     //                  theTagName     theType      theAttributeName         theDefault
-    DEFINE_ATTRIBUT_TAG(IncludeSrcTag, std::string, INCLUDE_SRC_ATTRIB, "", Y60_SCENE_DECL);
+    DEFINE_ATTRIBUTE_TAG(IncludeSrcTag, std::string, INCLUDE_SRC_ATTRIB, "", Y60_SCENE_DECL);
 
 /**
  * @ingroup y60scene

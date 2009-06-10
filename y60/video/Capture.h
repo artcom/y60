@@ -81,8 +81,8 @@ namespace y60 {
     /* @{ */
 
     //                  theTagName    theType      theAttributeName            theDefault
-    DEFINE_ATTRIBUT_TAG(NormTag,      std::string, CAPTURE_NORM_ATTRIB,   "PAL", Y60_VIDEO_DECL);
-    DEFINE_ATTRIBUT_TAG(DeviceTag,    unsigned,    CAPTURE_DEVICE_ATTRIB, 0, Y60_VIDEO_DECL);
+    DEFINE_ATTRIBUTE_TAG(NormTag,      std::string, CAPTURE_NORM_ATTRIB,   "PAL", Y60_VIDEO_DECL);
+    DEFINE_ATTRIBUTE_TAG(DeviceTag,    unsigned,    CAPTURE_DEVICE_ATTRIB, 0, Y60_VIDEO_DECL);
 
     class Y60_VIDEO_DECL CaptureDevice;
 

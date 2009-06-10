@@ -75,15 +75,15 @@
 
 namespace y60 {
 
-    DEFINE_ATTRIBUT_TAG(FrustumTag,       asl::Frustum, FRUSTUM_ATTRIB, asl::Frustum(), Y60_SCENE_DECL);
+    DEFINE_ATTRIBUTE_TAG(FrustumTag,       asl::Frustum, FRUSTUM_ATTRIB, asl::Frustum(), Y60_SCENE_DECL);
     //                  theTagName        theType  theAttributeName      theDefault
     // XXX [DS] these attributes are here for backward compatibility only ...
     // please use the frustum tag instead
     /*
-    DEFINE_ATTRIBUT_TAG(HfovTag,          float,   HORIZONTAL_FOV_ATTRIB, 54.0f, Y60_SCENE_DECL);
-    DEFINE_ATTRIBUT_TAG(OrthoWidthTag,    float,   ORTHO_WIDTH_ATTRIB,    0.0f, Y60_SCENE_DECL);
-    DEFINE_ATTRIBUT_TAG(NearPlaneTag,     float,   NEAR_PLANE_ATTRIB,     0.1f, Y60_SCENE_DECL);
-    DEFINE_ATTRIBUT_TAG(FarPlaneTag,      float,   FAR_PLANE_ATTRIB,      10000.0f, Y60_SCENE_DECL);
+    DEFINE_ATTRIBUTE_TAG(HfovTag,          float,   HORIZONTAL_FOV_ATTRIB, 54.0f, Y60_SCENE_DECL);
+    DEFINE_ATTRIBUTE_TAG(OrthoWidthTag,    float,   ORTHO_WIDTH_ATTRIB,    0.0f, Y60_SCENE_DECL);
+    DEFINE_ATTRIBUTE_TAG(NearPlaneTag,     float,   NEAR_PLANE_ATTRIB,     0.1f, Y60_SCENE_DECL);
+    DEFINE_ATTRIBUTE_TAG(FarPlaneTag,      float,   FAR_PLANE_ATTRIB,      10000.0f, Y60_SCENE_DECL);
 */
 
     class Y60_SCENE_DECL ProjectiveNode : 

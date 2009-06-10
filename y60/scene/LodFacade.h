@@ -67,7 +67,7 @@
 namespace y60 {
 
     //                  theTagName  theType             theAttributeName        theDefault
-    DEFINE_ATTRIBUT_TAG(RangesTag,  VectorOfFloat, LODRANGES_ATTRIB,  TYPE(), Y60_SCENE_DECL);
+    DEFINE_ATTRIBUTE_TAG(RangesTag,  VectorOfFloat, LODRANGES_ATTRIB,  TYPE(), Y60_SCENE_DECL);
 /*
     struct RangesTag {
 		typedef VectorOfFloat TYPE;

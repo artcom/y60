@@ -149,9 +149,9 @@ namespace y60 {
     typedef asl::Ptr<BoundingBoxTree> BoundingBoxTreePtr;
 
     //                  theTagName      theType       theAttributeName        theDefault
-    DEFINE_ATTRIBUT_TAG(RenderStylesTag, RenderStyles, RENDER_STYLE_ATTRIB,    TYPE(), Y60_SCENE_DECL); 
-    DEFINE_ATTRIBUT_TAG(MaterialIdTag,  std::string,   MATERIAL_REF_ATTRIB,    std::string(), Y60_SCENE_DECL); 
-    DEFINE_ATTRIBUT_TAG(PrimitiveTypeTag, PrimitiveType,  PRIMITIVE_TYPE_ATTRIB,    TRIANGLES, Y60_SCENE_DECL); 
+    DEFINE_ATTRIBUTE_TAG(RenderStylesTag, RenderStyles, RENDER_STYLE_ATTRIB,    TYPE(), Y60_SCENE_DECL); 
+    DEFINE_ATTRIBUTE_TAG(MaterialIdTag,  std::string,   MATERIAL_REF_ATTRIB,    std::string(), Y60_SCENE_DECL); 
+    DEFINE_ATTRIBUTE_TAG(PrimitiveTypeTag, PrimitiveType,  PRIMITIVE_TYPE_ATTRIB,    TRIANGLES, Y60_SCENE_DECL); 
 
     class Shape;
      /**

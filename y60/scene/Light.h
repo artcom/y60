@@ -77,7 +77,7 @@
 
 namespace y60 {
     //                  theTagName      theType      theAttributeName          theDefault
-    DEFINE_ATTRIBUT_TAG(LightSourceTag, std::string, LIGHT_SOURCE_ATTRIB, "", Y60_SCENE_DECL);
+    DEFINE_ATTRIBUTE_TAG(LightSourceTag, std::string, LIGHT_SOURCE_ATTRIB, "", Y60_SCENE_DECL);
 
     class Y60_SCENE_DECL Light : 
         public TransformHierarchyFacade,

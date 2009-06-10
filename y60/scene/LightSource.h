@@ -89,7 +89,7 @@
 namespace y60 {
 
     //                  TagName             Type           PropertyName                    Default
-    DEFINE_ATTRIBUT_TAG(LightSourceTypeTag, std::string,   LIGHTSOURCE_TYPE_ATTRIB,   "unsupported", Y60_SCENE_DECL);
+    DEFINE_ATTRIBUTE_TAG(LightSourceTypeTag, std::string,   LIGHTSOURCE_TYPE_ATTRIB,   "unsupported", Y60_SCENE_DECL);
 
     DEFINE_LIGHT_PROPERTY_TAG(LightAmbientTag,     asl::Vector4f, AMBIENT_PROPERTY,          asl::Vector4f(0.2f,0.2f,0.2f,1));
     DEFINE_LIGHT_PROPERTY_TAG(LightDiffuseTag,     asl::Vector4f, DIFFUSE_PROPERTY,          asl::Vector4f(0.8f,0.8f,0.8f,1));

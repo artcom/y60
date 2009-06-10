@@ -76,8 +76,8 @@ namespace y60 {
     class Scene;
 
     //                  theTagName   theType                   theAttributeName        theDefault
-    DEFINE_ATTRIBUT_TAG(ShapeTag,    std::string,              BODY_SHAPE_ATTRIB, "", Y60_SCENE_DECL);
-    DEFINE_ATTRIBUT_TAG(SkeletonTag, std::vector<std::string>, SKELETON_ATTRIB,   TYPE(), Y60_SCENE_DECL);
+    DEFINE_ATTRIBUTE_TAG(ShapeTag,    std::string,              BODY_SHAPE_ATTRIB, "", Y60_SCENE_DECL);
+    DEFINE_ATTRIBUTE_TAG(SkeletonTag, std::vector<std::string>, SKELETON_ATTRIB,   TYPE(), Y60_SCENE_DECL);
 
     class Body;
     typedef asl::Ptr<Body, dom::ThreadingModel> BodyPtr;

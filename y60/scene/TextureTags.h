@@ -95,19 +95,19 @@ namespace dom {
 
 namespace y60 {
     //                  theTagName                theType              theAttributeName                theDefault
-    DEFINE_ATTRIBUT_TAG(TextureImageIdTag,        std::string,         TEXTURE_IMAGE_ATTRIB,           "", Y60_SCENE_DECL);
-    DEFINE_ATTRIBUT_TAG(TexturePixelFormatTag,    std::string,         TEXTURE_PIXELFORMAT_ATTRIB,     "", Y60_SCENE_DECL);
-    DEFINE_ATTRIBUT_TAG(TextureImageIndexTag,     unsigned,            TEXTURE_IMAGE_INDEX,            0, Y60_SCENE_DECL);
-    DEFINE_ATTRIBUT_TAG(TextureMatrixTag,         asl::Matrix4f,       MATRIX_ATTRIB,                  asl::Matrix4f::Identity(), Y60_SCENE_DECL);
-    DEFINE_ATTRIBUT_TAG(TextureMipmapTag,         bool,                TEXTURE_MIPMAP_ATTRIB,          false, Y60_SCENE_DECL);
-    DEFINE_ATTRIBUT_TAG(TextureAnisotropyTag,     float,               TEXTURE_ANISOTROPY_ATTRIB,      1.0f, Y60_SCENE_DECL);
-    DEFINE_ATTRIBUT_TAG(TextureColorBiasTag,      asl::Vector4f,       TEXTURE_COLOR_BIAS_ATTRIB,      asl::Vector4f(0, 0, 0, 0), Y60_SCENE_DECL);
-    DEFINE_ATTRIBUT_TAG(TextureColorScaleTag,     asl::Vector4f,       TEXTURE_COLOR_SCALE_ATTRIB,     asl::Vector4f(1, 1, 1, 1), Y60_SCENE_DECL);
-    DEFINE_ATTRIBUT_TAG(TextureWrapModeTag,       TextureWrapMode,     TEXTURE_WRAPMODE_ATTRIB,        REPEAT, Y60_SCENE_DECL);
-    DEFINE_ATTRIBUT_TAG(TextureMinFilterTag,      TextureSampleFilter, TEXTURE_MIN_FILTER_ATTRIB,      LINEAR, Y60_SCENE_DECL);
-    DEFINE_ATTRIBUT_TAG(TextureMagFilterTag,      TextureSampleFilter, TEXTURE_MAG_FILTER_ATTRIB,      LINEAR, Y60_SCENE_DECL);
+    DEFINE_ATTRIBUTE_TAG(TextureImageIdTag,        std::string,         TEXTURE_IMAGE_ATTRIB,           "", Y60_SCENE_DECL);
+    DEFINE_ATTRIBUTE_TAG(TexturePixelFormatTag,    std::string,         TEXTURE_PIXELFORMAT_ATTRIB,     "", Y60_SCENE_DECL);
+    DEFINE_ATTRIBUTE_TAG(TextureImageIndexTag,     unsigned,            TEXTURE_IMAGE_INDEX,            0, Y60_SCENE_DECL);
+    DEFINE_ATTRIBUTE_TAG(TextureMatrixTag,         asl::Matrix4f,       MATRIX_ATTRIB,                  asl::Matrix4f::Identity(), Y60_SCENE_DECL);
+    DEFINE_ATTRIBUTE_TAG(TextureMipmapTag,         bool,                TEXTURE_MIPMAP_ATTRIB,          false, Y60_SCENE_DECL);
+    DEFINE_ATTRIBUTE_TAG(TextureAnisotropyTag,     float,               TEXTURE_ANISOTROPY_ATTRIB,      1.0f, Y60_SCENE_DECL);
+    DEFINE_ATTRIBUTE_TAG(TextureColorBiasTag,      asl::Vector4f,       TEXTURE_COLOR_BIAS_ATTRIB,      asl::Vector4f(0, 0, 0, 0), Y60_SCENE_DECL);
+    DEFINE_ATTRIBUTE_TAG(TextureColorScaleTag,     asl::Vector4f,       TEXTURE_COLOR_SCALE_ATTRIB,     asl::Vector4f(1, 1, 1, 1), Y60_SCENE_DECL);
+    DEFINE_ATTRIBUTE_TAG(TextureWrapModeTag,       TextureWrapMode,     TEXTURE_WRAPMODE_ATTRIB,        REPEAT, Y60_SCENE_DECL);
+    DEFINE_ATTRIBUTE_TAG(TextureMinFilterTag,      TextureSampleFilter, TEXTURE_MIN_FILTER_ATTRIB,      LINEAR, Y60_SCENE_DECL);
+    DEFINE_ATTRIBUTE_TAG(TextureMagFilterTag,      TextureSampleFilter, TEXTURE_MAG_FILTER_ATTRIB,      LINEAR, Y60_SCENE_DECL);
 #ifdef BAD_TX
-    DEFINE_ATTRIBUT_TAG(TextureImageTag,          ImageWeakPtr,        "textureImage",                 ImagePtr(0), Y60_SCENE_DECL);
+    DEFINE_ATTRIBUTE_TAG(TextureImageTag,          ImageWeakPtr,        "textureImage",                 ImagePtr(0), Y60_SCENE_DECL);
 #endif
     
     DEFINE_FACADE_ATTRIBUTE_TAG(TextureTypeTag,           TextureType,         TEXTURE_TYPE_ATTRIB,            TEXTURE_2D, Y60_SCENE_DECL);

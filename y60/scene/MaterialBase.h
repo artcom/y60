@@ -174,8 +174,8 @@ namespace y60 {
     DEFINE_CHILDNODE_TAG(MaterialPropertiesTag, MaterialBase, MaterialPropertiesFacade, PROPERTY_LIST_NAME);
     DEFINE_CHILDNODE_TAG(MaterialRequirementTag, MaterialBase, MaterialRequirementFacade, REQUIRES_LIST_NAME);
 
-    DEFINE_ATTRIBUT_TAG(TransparencyTag,   bool, TRANSPARENCY_ATTRIB, false, Y60_SCENE_DECL);
-    DEFINE_ATTRIBUT_TAG(EnabledTag,   bool, "enabled", true, Y60_SCENE_DECL);
+    DEFINE_ATTRIBUTE_TAG(TransparencyTag,   bool, TRANSPARENCY_ATTRIB, false, Y60_SCENE_DECL);
+    DEFINE_ATTRIBUTE_TAG(EnabledTag,   bool, "enabled", true, Y60_SCENE_DECL);
 
     class Scene;
 

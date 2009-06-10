@@ -38,7 +38,7 @@ namespace dom {
 #   define ASL_DOM_EXPORT_STATICS(thePlugName,theTagName,theExportToken)
 #endif
 
-#define DEFINE_ATTRIBUT_TAG(theTagName, theType, theAttributeName, theDefault, theExportToken) \
+#define DEFINE_ATTRIBUTE_TAG(theTagName, theType, theAttributeName, theDefault, theExportToken) \
     struct theTagName { \
         typedef theType TYPE; \
         static const char * getName() { return theAttributeName; } \

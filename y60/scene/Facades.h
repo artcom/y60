@@ -90,12 +90,12 @@
 namespace y60 {
 
     //                  theTagName           theType           theAttributeName               theDefault
-    DEFINE_ATTRIBUT_TAG(SkyBoxMaterialTag,   std::string,      SKYBOX_MATERIAL_ATTRIB,   "", Y60_SCENE_DECL);
-    DEFINE_ATTRIBUT_TAG(LodScaleTag,         float,            LODSCALE_ATTRIB,          1, Y60_SCENE_DECL);
-    DEFINE_ATTRIBUT_TAG(FogModeTag,          std::string,      FOGMODE_ATTRIB,           "", Y60_SCENE_DECL);
-    DEFINE_ATTRIBUT_TAG(FogColorTag,         asl::Vector4f,    FOGCOLOR_ATTRIB,          asl::Vector4f(0,0,0,0), Y60_SCENE_DECL);
-    DEFINE_ATTRIBUT_TAG(FogRangeTag,         asl::Vector2f,    FOGRANGE_ATTRIB,          asl::Vector2f(0, 1), Y60_SCENE_DECL);
-    DEFINE_ATTRIBUT_TAG(FogDensityTag,       float,            FOGDENSITY_ATTRIB,        1, Y60_SCENE_DECL);
+    DEFINE_ATTRIBUTE_TAG(SkyBoxMaterialTag,   std::string,      SKYBOX_MATERIAL_ATTRIB,   "", Y60_SCENE_DECL);
+    DEFINE_ATTRIBUTE_TAG(LodScaleTag,         float,            LODSCALE_ATTRIB,          1, Y60_SCENE_DECL);
+    DEFINE_ATTRIBUTE_TAG(FogModeTag,          std::string,      FOGMODE_ATTRIB,           "", Y60_SCENE_DECL);
+    DEFINE_ATTRIBUTE_TAG(FogColorTag,         asl::Vector4f,    FOGCOLOR_ATTRIB,          asl::Vector4f(0,0,0,0), Y60_SCENE_DECL);
+    DEFINE_ATTRIBUTE_TAG(FogRangeTag,         asl::Vector2f,    FOGRANGE_ATTRIB,          asl::Vector2f(0, 1), Y60_SCENE_DECL);
+    DEFINE_ATTRIBUTE_TAG(FogDensityTag,       float,            FOGDENSITY_ATTRIB,        1, Y60_SCENE_DECL);
 
     class WorldFacade :
         public TransformHierarchyFacade,
@@ -131,7 +131,7 @@ namespace y60 {
 
 
     //                  theTagName           theType           theAttributeName               theDefault
-    DEFINE_ATTRIBUT_TAG(JointOrientationTag, asl::Quaternionf, JOINT_ORIENTATION_ATTRIB, asl::Quaternionf(0,0,0,1), Y60_SCENE_DECL);
+    DEFINE_ATTRIBUTE_TAG(JointOrientationTag, asl::Quaternionf, JOINT_ORIENTATION_ATTRIB, asl::Quaternionf(0,0,0,1), Y60_SCENE_DECL);
 
     typedef asl::Ptr<TransformFacade, dom::ThreadingModel> TransformFacadePtr;
 

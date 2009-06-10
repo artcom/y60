@@ -75,13 +75,13 @@
 namespace y60 {
     class Scene;
 
-    DEFINE_ATTRIBUT_TAG(ColorTag, asl::Vector4f, GEOMETRY_COLOR_ATTRIB, asl::Vector4f(0.0, 0.0, 0.0, 1.0), Y60_SCENE_DECL);
+    DEFINE_ATTRIBUTE_TAG(ColorTag, asl::Vector4f, GEOMETRY_COLOR_ATTRIB, asl::Vector4f(0.0, 0.0, 0.0, 1.0), Y60_SCENE_DECL);
     /* [DS] The following tags conflict with material properties, which are of a diffrent type. That's why
      * these are put in a namespace. AG stands for analytic geometry.
      */
     namespace AG {
-        DEFINE_ATTRIBUT_TAG(LineWidthTag, float, GEOMETRY_LINE_WIDTH_ATTRIB, 1.0, Y60_SCENE_DECL);
-        DEFINE_ATTRIBUT_TAG(PointSizeTag, float, GEOMETRY_POINT_SIZE_ATTRIB, 3.0, Y60_SCENE_DECL);
+        DEFINE_ATTRIBUTE_TAG(LineWidthTag, float, GEOMETRY_LINE_WIDTH_ATTRIB, 1.0, Y60_SCENE_DECL);
+        DEFINE_ATTRIBUTE_TAG(PointSizeTag, float, GEOMETRY_POINT_SIZE_ATTRIB, 3.0, Y60_SCENE_DECL);
     }
 
     /* [DS] I think this needs some explanation: This template class uses two of the stranger template
@@ -123,7 +123,7 @@ namespace y60 {
 
 
     //=== Plane ============================================================
-    DEFINE_ATTRIBUT_TAG(PlaneTag,       asl::Planef,   GEOMETRY_VALUE_ATTRIB,    asl::Planef(asl::Vector3f(0,0,1), 0), Y60_SCENE_DECL);
+    DEFINE_ATTRIBUTE_TAG(PlaneTag,       asl::Planef,   GEOMETRY_VALUE_ATTRIB,    asl::Planef(asl::Vector3f(0,0,1), 0), Y60_SCENE_DECL);
     DEFINE_FACADE_ATTRIBUTE_TAG(GlobalPlaneTag, asl::Planef,   GEOMETRY_GLOBAL_VALUE_ATTRIB, asl::Planef(asl::Vector3f(0,0,1), 0), Y60_SCENE_DECL);
     class Y60_SCENE_DECL Plane :
         public Geometry<asl::Planef, PlaneTag, GlobalPlaneTag, Plane>
@@ -145,7 +145,7 @@ namespace y60 {
 
 
     //=== Point ============================================================
-    DEFINE_ATTRIBUT_TAG(PointTag,       asl::Point3f,  GEOMETRY_VALUE_ATTRIB,        asl::Point3f(0,0,0), Y60_SCENE_DECL);
+    DEFINE_ATTRIBUTE_TAG(PointTag,       asl::Point3f,  GEOMETRY_VALUE_ATTRIB,        asl::Point3f(0,0,0), Y60_SCENE_DECL);
     DEFINE_FACADE_ATTRIBUTE_TAG(GlobalPointTag, asl::Point3f,  GEOMETRY_GLOBAL_VALUE_ATTRIB, asl::Point3f(0,0,0), Y60_SCENE_DECL);
     class Y60_SCENE_DECL Point :
         public Geometry<asl::Point3f, PointTag, GlobalPointTag, Point>
@@ -166,7 +166,7 @@ namespace y60 {
     typedef asl::Ptr<Point, dom::ThreadingModel> PointPtr;
 
     //=== Vector ============================================================
-    DEFINE_ATTRIBUT_TAG(VectorTag,       asl::Vector3f,  GEOMETRY_VALUE_ATTRIB,        asl::Vector3f(1,0,0), Y60_SCENE_DECL);
+    DEFINE_ATTRIBUTE_TAG(VectorTag,       asl::Vector3f,  GEOMETRY_VALUE_ATTRIB,        asl::Vector3f(1,0,0), Y60_SCENE_DECL);
     DEFINE_FACADE_ATTRIBUTE_TAG(GlobalVectorTag, asl::Vector3f,  GEOMETRY_GLOBAL_VALUE_ATTRIB, asl::Vector3f(1,0,0), Y60_SCENE_DECL);
     class Y60_SCENE_DECL Vector :
         public Geometry<asl::Vector3f, VectorTag, GlobalVectorTag, Vector>
@@ -187,7 +187,7 @@ namespace y60 {
     typedef asl::Ptr<Vector, dom::ThreadingModel> VectorPtr;
     
     //=== LineSegment ============================================================
-    DEFINE_ATTRIBUT_TAG(LineSegmentTag,       asl::LineSegment<float>,  GEOMETRY_VALUE_ATTRIB,
+    DEFINE_ATTRIBUTE_TAG(LineSegmentTag,       asl::LineSegment<float>,  GEOMETRY_VALUE_ATTRIB,
             asl::LineSegment<float>(asl::Vector3f(0,0,0), asl::Vector3f(1,0,0)), Y60_SCENE_DECL);
     DEFINE_FACADE_ATTRIBUTE_TAG(GlobalLineSegmentTag, asl::LineSegment<float>,  GEOMETRY_GLOBAL_VALUE_ATTRIB,
             asl::LineSegment<float>(asl::Vector3f(0,0,0), asl::Vector3f(1,0,0)), Y60_SCENE_DECL);
