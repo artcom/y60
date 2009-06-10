@@ -109,9 +109,9 @@ function main() {
 }
 
 function plugComponentsForDocumentation() {
-    var myComponents = ["Network", "Sound", "y60ProcFunctions"];
+    var myComponents = ["Network", "Sound", "ProcessFunctions", "Cairo"];
     if (operatingSystem() == "WIN32") {
-        myComponents = myComponents.concat(["TaskManager","y60WMPPlayer"]);
+        myComponents = myComponents.concat(["TaskManager","WMPPlayer"]);
     } else if (operatingSystem() == "LINUX") {
         myComponents = myComponents.concat([]);
     }
