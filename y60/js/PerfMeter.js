@@ -100,7 +100,7 @@ PerfMeter.prototype.Constructor = function(self, theSceneViewer) {
     self.toggleEnableFlag = function() {
         ensureOverlay();
         //if (!_myProcFunctionsPlugged) {
-        //    plug("y60ProcFunctions");
+        //    plug("ProcessFunctions");
         //    _myProcFunctionsPlugged = true;
         //}
         _myOverlay.visible = !_myOverlay.visible;

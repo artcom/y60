@@ -58,7 +58,7 @@
 */
 
 use("UnitTest.js");
-plug("y60ProcFunctions");
+plug("ProcessFunctions");
 
 function TestProcFunctions() {
     this.Constructor(this, "TestProcFunctions");

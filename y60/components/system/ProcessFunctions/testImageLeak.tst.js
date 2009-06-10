@@ -60,7 +60,7 @@ use("Overlay.js");
 use("Exception.js");
 use("UnitTest.js");
 
-plug("y60ProcFunctions");
+plug("ProcessFunctions");
 
 const ALLOWED_MEMORY_USAGE = 1000; // per frame
 

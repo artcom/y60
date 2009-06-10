@@ -57,7 +57,7 @@
 */
 
 includePath("../..");  //TODO: remove this after deprecating  ant-build
-plug("y60ProcFunctions");
+plug("ProcessFunctions");
 use("Y60JSSL.js");
 use("ImageManager.js");
 use("Overlay.js");

@@ -78,7 +78,7 @@ MemoryMeter.prototype.Constructor = function(self, theSceneViewer) {
 
     self.toggleEnableFlag = function() {
         if (!_myProcFunctionsPlugged) {
-            plug("y60ProcFunctions");
+            plug("ProcessFunctions");
             _myProcFunctionsPlugged = true;
         }
         self.enabled = !self.enabled;

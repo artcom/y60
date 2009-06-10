@@ -62,7 +62,7 @@ use("UnitTest.js");
 plug("Sound");
 plug("WMADecoder");
 
-plug("y60ProcFunctions");
+plug("ProcessFunctions");
 
 function WMADecoder2UnitTest() {
     this.Constructor(this, "WMADecoder2UnitTest");

@@ -59,7 +59,7 @@
 use("UnitTest.js");
 
 plug("Sound");
-plug("y60ProcFunctions");
+plug("ProcessFunctions");
 
 //const AUDIO_1 = expandEnvironment("${PRO}/src/y60/sound/testfiles/aussentuer.mp3");
 const AUDIO_1 = searchFile("../sound/testfiles/aussentuer.mp3");
