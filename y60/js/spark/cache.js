@@ -61,7 +61,7 @@ spark.dummyImage = null;
 spark.getDummyImage = function() {
     if(spark.dummyImage == null) {
         spark.dummyImage = Modelling.createImage(window.scene, 16, 16, "BGRA");
-        spark.dummyImage.name = "SparkDummyImage";
+        spark.dummyImage.name = "spark-dummy-image";
     }
     return spark.dummyImage;
 };
@@ -69,7 +69,7 @@ spark.getDummyImage = function() {
 spark.cachedImages = {};
 
 spark.getCachedImage = function(thePath) {
-    var myName = "cached-image-" + thePath;
+    var myName = "spark-cached-image-" + thePath;
     var myImage = spark.getNode(myName);
 
     if(!myImage) {
@@ -83,7 +83,7 @@ spark.getCachedImage = function(thePath) {
 };
 
 spark.getCachedTexture = function(thePath) {
-    var myName = "cached-texture-" + thePath;
+    var myName = "spark-cached-texture-" + thePath;
     var myTexture = spark.getNode(myName);
 
     if(!myTexture) {
