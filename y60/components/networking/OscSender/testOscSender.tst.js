@@ -58,7 +58,8 @@
 */
 
 use("UnitTest.js");
-plug("y60OscSender");
+
+plug("OscSender");
 
 function OscSenderUnitTest() {
     this.Constructor(this, "OscSenderUnitTest");

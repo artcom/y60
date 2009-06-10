@@ -57,7 +57,7 @@
 */
 
 // external dependencies
-plug("y60JSSound");
+plug("Sound");
 
 use("Exception.js");
 use("ASSManager.js");

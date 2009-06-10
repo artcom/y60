@@ -269,3 +269,9 @@ jsval as_jsval( JSContext *cx, JSSynergyServer::OWNERPTR theOwner,
     JSObject * myObject = JSSynergyServer::Construct(cx, theOwner, theSerial);
     return OBJECT_TO_JSVAL(myObject);
 }
+
+
+extern "C"
+EXPORT asl::PlugInBase * SynergyServer_instantiatePlugIn(asl::DLHandle myDLHandle) {
+	return new y60::JSSynergyServerPlugIn(myDLHandle);
+}

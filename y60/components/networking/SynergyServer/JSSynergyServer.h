@@ -152,9 +152,4 @@ namespace y60 {
 };
 }
 
-extern "C"
-EXPORT asl::PlugInBase * y60SynergyServer_instantiatePlugIn(asl::DLHandle myDLHandle) {
-	return new y60::JSSynergyServerPlugIn(myDLHandle);
-}
-
 #endif //_ac_jslib_JSSynergyServer_h_

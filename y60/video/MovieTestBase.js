@@ -57,7 +57,8 @@
 */
 
 use("SceneViewer.js");
-plug("y60JSSound");
+
+plug("Sound");
 
 function MovieTestBase(Public, theArguments, theDecoderName) {
     var Base   = {};

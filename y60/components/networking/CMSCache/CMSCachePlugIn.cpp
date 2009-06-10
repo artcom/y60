@@ -114,6 +114,6 @@ CMSCachePlugIn::initClasses(JSContext * theContext, JSObject *theGlobalObject) {
 
 
 extern "C"
-EXPORT PlugInBase* y60CMSCache_instantiatePlugIn(DLHandle myDLHandle) {
+EXPORT PlugInBase* CMSCache_instantiatePlugIn(DLHandle myDLHandle) {
 	return new y60::CMSCachePlugIn(myDLHandle);
 }

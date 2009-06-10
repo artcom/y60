@@ -190,6 +190,7 @@ NagiosPlugin::onSetProperty(const std::string & thePropertyName,
 }
 
 extern "C"
-EXPORT PlugInBase* y60Nagios_instantiatePlugIn(DLHandle myDLHandle) {
+EXPORT PlugInBase* Nagios_instantiatePlugIn(DLHandle myDLHandle) {
     return new NagiosPlugin(myDLHandle);
 }
+

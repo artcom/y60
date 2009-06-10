@@ -56,9 +56,9 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-includePath("../..");  //TODO: remove this after deprecating  ant-build
 use("UnitTest.js");
-plug("y60JSSound");
+
+plug("Sound");
 plug("y60ProcFunctions");
 
 //const AUDIO_1 = expandEnvironment("${PRO}/src/y60/sound/testfiles/aussentuer.mp3");

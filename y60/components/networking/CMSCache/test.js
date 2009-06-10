@@ -56,7 +56,7 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-plug("y60CMSCache");
+plug("CMSCache");
 
 var myPresentation='<?xml version=\'1.0\' encoding=\'UTF-8\'?>'+ 
 '<presentation title="BMW Welt CMS">'+

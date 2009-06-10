@@ -108,7 +108,8 @@ to debug
 
 */
 
-plug("y60CMSCache");
+plug("CMSCache");
+
 use("SoapWsdl.js");
 
 function CMSHandle(theConfigFile, theLocation) {

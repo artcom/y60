@@ -58,7 +58,7 @@
 
 
 use("UnitTest.js");
-plug("y60JSSound");
+plug("Sound");
 plug("y60WMADecoder");
 plug("y60ProcFunctions");
 

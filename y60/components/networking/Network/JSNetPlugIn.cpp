@@ -54,72 +54,33 @@
 //    recommendations: 
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
-
 */
 
-use("UnitTest.js");
-plug("y60Net");
+#include "JSSocket.h"
+#include "JSTCPServer.h"
 
-function SocketUnitTest() {
-    this.Constructor(this, "SocketUnitTest");
-};
+#include <asl/base/PlugInBase.h>
+#include <y60/jsbase/IScriptablePlugin.h>
 
-SocketUnitTest.prototype.Constructor = function(obj, theName) {
+namespace y60 {
+	class JSNetPlugIn : public asl::PlugInBase, public jslib::IScriptablePlugin {
+    	public:
+    		JSNetPlugIn(asl::DLHandle theDLHandle) : asl::PlugInBase(theDLHandle) {}
 
-    UnitTest.prototype.Constructor(obj, theName);
+    		virtual void initClasses(JSContext * theContext,
+    			JSObject *theGlobalObject) {
+    			JSSocket::initClass(theContext, theGlobalObject);
+    			JSTCPServer::initClass(theContext, theGlobalObject);
+    		}
 
-    obj.run = function() {
-        obj.mySocket1 = new Socket(Socket.UDP, 51101, "127.0.0.1");
-        obj.mySocket2 = new Socket(Socket.UDP, 51102, "127.0.0.1");
+    		const char * ClassName() {
+    		    static const char * myClassName = "Socket";
+    		    return myClassName;
+    		}
+	};
+}
 
-        obj.mySocket1.connect("127.0.0.1", 51102);
-        obj.mySocket2.connect("127.0.0.1", 51101);
-        
-        print(obj.mySocket1);
-        print(obj.mySocket2);
-
-        ENSURE('obj.mySocket1.isValid == true');
-        ENSURE('obj.mySocket2.isValid == true');
-
-        ENSURE('obj.mySocket1.write("hallo") == 5');
-        ENSURE('obj.mySocket2.read() == "hallo"');
-
-        ENSURE('obj.mySocket2.write("hello") == 5');
-        ENSURE('obj.mySocket1.read() == "hello"');
-
-        // binary data test
-        ENSURE('obj.mySocket1.write([65,66,0,67,68]) == 5');
-        ENSURE('obj.mySocket2.readBlock().size == 5');
-
-        ENSURE('obj.mySocket2.write("bello") == 5');
-        msleep(10); // give the socket time to send
-        obj.waitingCount = obj.mySocket1.peek(100);       
-        ENSURE('obj.mySocket1.peek(100) == 5');
-        DPRINT('obj.waitingCount');
-        ENSURE('obj.mySocket1.peek(3) == 3');
-        ENSURE('obj.mySocket1.read() == "bello"');
-        
-        obj.mySocket1.setBlockingMode(false);
-        ENSURE('obj.mySocket1.read() == ""');
-        obj.mySocket1.setBlockingMode(true);
-        
-        obj.mySocket3 = new Socket(Socket.UDP, 51103, "0.0.0.0");
-        obj.mySocket3.connect("BROADCAST", 51101);
-        print(obj.mySocket3);
-
-        ENSURE('obj.mySocket3.write("test") == 4');
-
-        obj.mySocket1.close();
-        obj.mySocket2.close();
-        obj.mySocket3.close();
-    }
-};
-
-var myTestName = "testSocket.tst.js";
-var mySuite = new UnitTestSuite(myTestName);
-
-mySuite.addTest(new SocketUnitTest());
-mySuite.run();
-
-print(">> Finished test suite '"+myTestName+"', return status = " + mySuite.returnStatus() + "");
-exit(mySuite.returnStatus());
+extern "C"
+EXPORT asl::PlugInBase * Network_instantiatePlugIn(asl::DLHandle myDLHandle) {
+	return new y60::JSNetPlugIn(myDLHandle);
+}

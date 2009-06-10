@@ -75,7 +75,7 @@ if (DUMMY_AUDIO_CONTROLLER) {
 
 function initSoundController() {
     try {
-        plug("y60JSSound");
+        plug("Sound");
         ourSoundController = new SoundManager();
     } catch (ex) {
         print("### Warning: Could not construct SoundController. Sound will not work.");

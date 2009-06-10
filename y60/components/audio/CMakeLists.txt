@@ -1,3 +1,3 @@
 
-add_subdirectory(JSSound)
+add_subdirectory(Sound)
 
