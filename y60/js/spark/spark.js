@@ -98,7 +98,17 @@ use("events.js");
 // internationalization
 use("internationalization.js");
 
-// spark widgets
+// widgets
 if (!("disableSparkWidgets" in this)) {
-    use("widgets.js");
+    // base class
+    use("spark/widgets.js");
+    // concrete classes (inheritance-ordered)
+    use("spark/widget/Transform.js");
+    use("spark/widget/Switch.js");
+    use("spark/widget/World.js");
+    use("spark/widget/SceneViewer.js");
+    use("spark/widget/ResizableRectangle.js");
+    use("spark/widget/Rectangle.js");
+    use("spark/widget/Image.js");
+    use("spark/widget/Text.js");
 }
