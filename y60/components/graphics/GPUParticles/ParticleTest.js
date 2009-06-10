@@ -57,7 +57,7 @@
 */
 
 use("SceneViewer.js");
-plug("y60GPUParticles");
+plug("GPUParticles");
 
 function ParticlesTest(theArguments) {
     this.Constructor(this, theArguments);
