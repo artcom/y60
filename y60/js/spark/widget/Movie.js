@@ -14,7 +14,7 @@ spark.Movie.Constructor = function(Protected) {
     var _myTexture  = null;
     var _myMaterial = null;
     var _myShape    = null;
-    var _myBody     = null;    
+    var _myBody     = null;
 
     Public.play = function() {
         _myMovie.playmode = "play";
@@ -34,6 +34,11 @@ spark.Movie.Constructor = function(Protected) {
     Public.currentFrame getter = function() { return _myMovie.currentframe;}
     Public.currentFrame setter = function(f) {
         _myMovie.currentframe = f;
+    }
+
+    Public.src getter = function() { return _myMovie.src;}
+    Public.src setter = function(theFileName) {
+        _myMovie.src = theFileName;
     }
 
     Public.movieNode getter = function()  { return _myMovie;}

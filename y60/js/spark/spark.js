@@ -112,4 +112,5 @@ if (!("disableSparkWidgets" in this)) {
     use("spark/widget/Rectangle.js");
     use("spark/widget/Image.js");
     use("spark/widget/Text.js");
+    use("spark/widget/Movie.js");
 }
