@@ -111,11 +111,13 @@ function main() {
 }
 
 function plugComponentsForDocumentation() {
-    var myComponents = ["Network", "Sound", "ProcessFunctions", "Cairo"];
+    var myComponents = ["Network", "Sound", "ProcessFunctions", "Cairo", "GPUParticles",
+                        "EventLoop", "ASSEventSource", "DSADriver", "VideoProcessing",
+                        "OscReceiver", "SynergyServer"];
     if (operatingSystem() == "WIN32") {
         myComponents = myComponents.concat(["TaskManager","WMPPlayer"]);
     } else if (operatingSystem() == "LINUX") {
-        myComponents = myComponents.concat([]);
+        myComponents = myComponents.concat(["Powermate", "Wiimote"]);
     }
 
     for (var i = 0;i < myComponents.length; ++i) {

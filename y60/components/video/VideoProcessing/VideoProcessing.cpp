@@ -118,7 +118,7 @@ namespace y60 {
 
     VideoProcessingExtension :: VideoProcessingExtension(asl::DLHandle theDLHandle) :
     asl::PlugInBase(theDLHandle),
-        IRendererExtension("VideoProcessingExtension")
+        IRendererExtension("VideoProcessing")
     {}
 
     void

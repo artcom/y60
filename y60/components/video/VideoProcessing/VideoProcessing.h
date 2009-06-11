@@ -114,7 +114,7 @@ namespace y60 {
 
 
                 const char * ClassName() {
-                    static const char * myClassName = "VideoProcessingExtension";
+                    static const char * myClassName = "VideoProcessing";
                     return myClassName;
                 }
         
