@@ -1,11 +1,12 @@
 /**
  * Simple wrapper for the Y60 scene viewer.
  */
+
 use("SceneViewer.js"); // XXX: bad place for this
 
-spark.SceneViewer = spark.ComponentClass("SceneViewer");
+spark.Window = spark.ComponentClass("Window");
 
-spark.SceneViewer.Constructor = function(Protected) {
+spark.Window.Constructor = function(Protected) {
     var Public = this;
     var Base = {};
     
@@ -37,6 +38,8 @@ spark.SceneViewer.Constructor = function(Protected) {
                      Protected.getBoolean("fullscreen", false),
                      Protected.getString("title", "SPARK Application"));
 
+        Public.setMover(null);
+        
         window.showMouseCursor = Protected.getBoolean("mouseCursor", false);        
         window.swapInterval = Protected.getNumber("swapInterval", 1);
         
@@ -59,6 +62,36 @@ spark.SceneViewer.Constructor = function(Protected) {
         return null;
     };
     
+    
+    var _myMousePosition = new Vector2f();
+    
+    Public.mousePosition getter = function() {
+    };
+    
+    Protected.updateMousePosition = function(theX, theY) {
+        _myMousePosition.x = theX;
+        _myMousePosition.y = theY;
+    };
+    
+    
+    var _myMouseFocused = null;
+    
+    Public.mouseFocused getter = function() {
+        return _myMouseFocused;
+    };
+    
+    
+    var _myKeyboardFocused = null;
+    
+    Public.keyboardFocused getter = function() {
+        return _myKeyboardFocused;
+    };
+    
+    Public.focusKeyboard = function(theWidget) {
+        _myKeyboardFocused = theWidget;
+    };
+    
+    
     //////////////////////////////////////////////////////////////////////
     // Callbacks
     //////////////////////////////////////////////////////////////////////
@@ -67,50 +100,57 @@ spark.SceneViewer.Constructor = function(Protected) {
     Base.onFrame = Public.onFrame;
     Public.onFrame = function(theTime) {
         Base.onFrame(theTime);
+        var myEvent = new spark.StageEvent(spark.StageEvent.FRAME, Public);
+        Public.dispatchEvent(myEvent);
     };
 
     // Will be called before rendering the frame
     Base.onPreRender = Public.onPreRender;
     Public.onPreRender = function() {
         Base.onPreRender();
+        var myEvent = new spark.StageEvent(spark.StageEvent.PRE_RENDER, Public);
+        Public.dispatchEvent(myEvent);
     };
 
     // Will be called after rendering the frame, but before swap buffer
     Base.onPostRender = Public.onPostRender;
     Public.onPostRender = function() {
         Base.onPostRender();
+        var myEvent = new spark.StageEvent(spark.StageEvent.POST_RENDER, Public);
+        Public.dispatchEvent(myEvent);
     };
 
     // Will be called on a mouse move
-    var _myMouseFocusedWidget = null;
     Base.onMouseMotion = Public.onMouseMotion;
     Public.onMouseMotion = function(theX, theY) {
         Base.onMouseMotion(theX, theY);
         
+        Protected.updateMousePosition(theX, theY);
+        
         var myWidget = Public.pickWidget(theX, theY);
         if(myWidget) {
-            if(myWidget != _myMouseFocusedWidget) {
-                Logger.debug("Mouse focuses " + myWidget.name
-                             + (_myMouseFocusedWidget ? ", leaving " + _myMouseFocusedWidget.name : ""));
+            if(myWidget != _myMouseFocused) {
+                Logger.debug("Mouse focuses " + myWidget
+                             + (_myMouseFocused ? ", leaving " + _myMouseFocused : ""));
                 
-                if(_myMouseFocusedWidget) {
+                if(_myMouseFocused) {
                     var myLeaveEvent = new spark.MouseEvent(spark.MouseEvent.LEAVE, theX, theY);
-                    _myMouseFocusedWidget.dispatchEvent(myLeaveEvent);
+                    _myMouseFocused.dispatchEvent(myLeaveEvent);
                 }
                 
-                _myMouseFocusedWidget = myWidget;
+                _myMouseFocused = myWidget;
                 
                 var myEnterEvent = new spark.MouseEvent(spark.MouseEvent.ENTER, theX, theY);
                 myWidget.dispatchEvent(myEnterEvent);
             }
         } else {
-            if(_myMouseFocusedWidget) {
-                Logger.debug("Mouse leaves " + _myMouseFocusedWidget.name);
+            if(_myMouseFocused) {
+                Logger.debug("Mouse leaves " + _myMouseFocused);
                 var myLeaveEvent = new spark.MouseEvent(spark.MouseEvent.LEAVE, theX, theY);
-                _myMouseFocusedWidget.dispatchEvent(myLeaveEvent);
+                _myMouseFocused.dispatchEvent(myLeaveEvent);
             }
         }
-        _myMouseFocusedWidget = myWidget;
+        _myMouseFocused = myWidget;
     };
 
     // Will be called on a mouse button
@@ -118,10 +158,12 @@ spark.SceneViewer.Constructor = function(Protected) {
     Public.onMouseButton = function(theButton, theState, theX, theY) {
         Base.onMouseButton(theButton, theState, theX, theY);
         
+        Protected.updateMousePosition(theX, theY);
+        
         if(theState) {
             var myWidget = Public.pickWidget(theX, theY);
             if(myWidget) {
-                Logger.info("Mouse clicks " + myWidget.name);
+                Logger.debug("Mouse clicks " + myWidget);
                 var myEvent = new spark.MouseEvent(spark.MouseEvent.CLICK, theX, theY);
                 myWidget.dispatchEvent(myEvent);
             }
@@ -129,20 +171,20 @@ spark.SceneViewer.Constructor = function(Protected) {
     };
 
     // Will be called on a keyboard event
-    var _myKeyboardFocusedWidget = null;
     Base.onKey = Public.onKey;
     Public.onKey = function(theKey, theKeyState, theX, theY,
                          theShiftFlag, theControlFlag, theAltFlag) {
         Base.onKey(theKey, theKeyState, theX, theY, theShiftFlag, theControlFlag, theAltFlag);
         
-        if(_myKeyboardFocusedWidget) {
+        if(_myKeyboardFocused) {
             var myModifiers =
                 (theShiftFlag ? spark.Keyboard.SHIFT : 0)
                 | (theControlFlag ? spark.Keyboard.CTRL : 0)
                 | (theAltFlag ? spark.Keyboard.ALT : 0);
             var myType = theKeyState ? spark.KeyboardEvent.KEY_DOWN : spark.KeyboardEvent.KEY_UP;
             var myEvent = new spark.KeyboardEvent(myType, theKey, myModifiers);
-            _myKeyboardFocusedWidget.dispatchEvent(myEvent);
+            Logger.debug("Key " + myEvent.keyString + " " + (theKeyState ? "down" : "up") + " on " + _myKeyboardFocused);
+            _myKeyboardFocused.dispatchEvent(myEvent);
         }
     };
 
@@ -150,6 +192,16 @@ spark.SceneViewer.Constructor = function(Protected) {
     Base.onMouseWheel = Public.onMouseWheel;
     Public.onMouseWheel = function(theDeltaX, theDeltaY) {
         Base.onMouseWheel(theDeltaX, theDeltaY);
+        
+        if(_myMouseFocused) {
+            Logger.debug("Mouse scrolls " + _myMouseFocused + " by [" + theDeltaX + "," + theDeltaY + "]");
+            var myEvent = new spark.MouseEvent(
+                spark.MouseEvent.SCROLL,
+                _myMousePosition.x, _myMousePosition.y,
+                theDeltaX, theDeltaY
+            );
+            _myMouseFocused.dispatchEvent(myEvent);
+        }
     };
 
     // Will be called on a joystick axis event

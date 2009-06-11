@@ -100,7 +100,7 @@ spark.Component.Constructor = function(Protected) {
     // XXX: really bad solution.
     //      this should be higher up and more informative.
     Public.toString = function (){
-        return _myName;
+        return "[" + Public._className_ + (_myName ? " named " + _myName : "") + "]";
     };
     
     var _myParent = null;

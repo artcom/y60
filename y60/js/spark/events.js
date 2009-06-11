@@ -57,6 +57,7 @@
 */
 
 spark.EventPhase = {
+    IDLE:      "idle",
     CAPTURING: "capturing",
     TARGET:    "target",
     BUBBLING:  "bubbling"
@@ -87,7 +88,7 @@ spark.Event.Constructor = function(Protected, theType, theBubbles, theCancelable
         return _myCurrentTarget;
     };
 
-    var _myCurrentPhase = spark.EventPhase.CAPTURING;
+    var _myCurrentPhase = spark.EventPhase.IDLE;
 
     Public.currentPhase getter = function() {
         return _myCurrentPhase;
@@ -105,9 +106,31 @@ spark.Event.Constructor = function(Protected, theType, theBubbles, theCancelable
         return _myType;
     };
 
+    var _myDispatching = false;
+    
+    Public.dispatching getter = function() {
+        return _myDispatching;
+    };
 
     Public.startDispatch = function(theTarget) {
+        _myDispatching = true;
         _myTarget = theTarget;
+        _myCurrentPhase  = spark.EventPhase.IDLE;
+        _myCurrentTarget = null;
+    };
+    
+    Public.cancelDispatch = function() {
+        if(_myCancelable) {
+            Public.finishDispatch();
+        } else {
+            Logger.fatal("event of type " + _myType + " is not cancelable");
+        }
+    };
+    
+    Public.finishDispatch = function() {
+        _myDispatching = false;
+        _myCurrentPhase = spark.EventPhase.IDLE;
+        _myCurrentTarget = null;
     };
 
     Public.dispatchTo = function(theCurrentTarget, theCurrentPhase) {
@@ -132,7 +155,7 @@ spark.EventDispatcher.Constructor = function(Protected) {
         var myListener = {
             type:       theType,
             listener:   theListener,
-            useCapture: theUseCapture,
+            useCapture: theUseCapture
         };
 
         if(! (theType in _myListenersByType)) {
@@ -172,6 +195,9 @@ spark.EventDispatcher.Constructor = function(Protected) {
                     var myListener = myListeners[j];
                     if(myListener.useCapture) {
                         myListener.listener.call(myCurrentTarget, theEvent);
+                        if(!theEvent.dispatching) {
+                            return;
+                        }
                     }
                 }
             }
@@ -184,6 +210,9 @@ spark.EventDispatcher.Constructor = function(Protected) {
             for(var j = 0; j < myListeners.length; j++) {
                 var myListener = myListeners[j];
                 myListener.listener.call(Public, theEvent);
+                if(!theEvent.dispatching) {
+                    return;
+                }
             }
         }
 
@@ -192,6 +221,7 @@ spark.EventDispatcher.Constructor = function(Protected) {
             Logger.fatal("spark event bubbling has not been implemented yet");
         }
         
+        theEvent.finishDispatch();        
     };
 
     Public.hasEventListener = function(theType) {
@@ -245,26 +275,39 @@ spark.EventDispatcher.Constructor = function(Protected) {
 
 spark.MouseEvent = spark.Class("MouseEvent");
 
-spark.MouseEvent.CLICK = "mouse-click";
-spark.MouseEvent.ENTER = "mouse-enter";
-spark.MouseEvent.LEAVE = "mouse-leave";
+spark.MouseEvent.CLICK  = "mouse-click";
+spark.MouseEvent.ENTER  = "mouse-enter";
+spark.MouseEvent.LEAVE  = "mouse-leave";
+spark.MouseEvent.SCROLL = "mouse-scroll";
 
-spark.MouseEvent.Constructor = function(Protected, theType, theX, theY) {
+spark.MouseEvent.Constructor = function(Protected, theType, theX, theY, theAmountX, theAmountY) {
     var Public = this;
     
     this.Inherit(spark.Event, theType);
     
     
-    var _myScreenX = theX;
+    var _myStageX = theX;
     
-    Public.screenX getter = function() {
+    Public.stageX getter = function() {
         return _myScreenX;
     };
     
-    var _myScreenY = theY;
+    var _myStageY = theY;
 
-    Public.screenY getter = function() {
+    Public.stageY getter = function() {
         return _myScreenY;
+    };
+    
+    var _myAmountX = theAmountX;
+    
+    Public.amountX getter = function() {
+        return _myAmountX;
+    };
+    
+    var _myAmountY = theAmountY;
+    
+    Public.amountY getter = function() {
+        return _myAmountY;
     };
     
 };
@@ -279,7 +322,7 @@ spark.Keyboard.CTRL_SHIFT = spark.Keyboard.CTRL | spark.Keyboard.SHIFT;
 spark.Keyboard.CTRL_ALT   = spark.Keyboard.CTRL | spark.Keyboard.ALT;
 
 
-spark.KeyboardEvent = spark.Class("KeyEvent");
+spark.KeyboardEvent = spark.Class("KeyboardEvent");
 
 spark.KeyboardEvent.KEY_DOWN = "keybord-key-down";
 spark.KeyboardEvent.KEY_UP   = "keybord-key-up";
@@ -299,6 +342,35 @@ spark.KeyboardEvent.Constructor = function(Protected, theType, theKey, theModifi
     
     Public.modifiers getter = function() {
         return _myModifiers;
+    };
+    
+    Public.keyString getter = function() {
+        var myString =
+              _myModifiers & spark.Keyboard.CTRL  ? "ctrl+"  : ""
+            + _myModifiers & spark.Keyboard.ALT   ? "alt+"   : ""
+            + _myModifiers & spark.Keyboard.SHIFT ? "shift+" : ""
+            + _myKey;
+        return myString;
+    };
+    
+};
+
+
+spark.StageEvent = spark.Class("StageEvent");
+
+spark.StageEvent.FRAME       = "stage-frame";
+spark.StageEvent.PRE_RENDER  = "stage-pre-render";
+spark.StageEvent.POST_RENDER = "stage-post-render";
+
+spark.StageEvent.Constructor = function(Protected, theType, theStage) {
+    var Public = this;
+    
+    this.Inherit(spark.Event, theType);
+    
+    var _myStage = theStage;
+    
+    Public.stage getter = function() {
+        return _myStage;
     };
     
 };

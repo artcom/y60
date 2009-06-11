@@ -106,7 +106,8 @@ if (!("disableSparkWidgets" in this)) {
     use("spark/widget/Transform.js");
     use("spark/widget/Switch.js");
     use("spark/widget/World.js");
-    use("spark/widget/SceneViewer.js");
+    use("spark/widget/Window.js");
+    use("spark/widget/Body.js");
     use("spark/widget/ResizableRectangle.js");
     use("spark/widget/Rectangle.js");
     use("spark/widget/Image.js");

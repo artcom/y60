@@ -102,9 +102,62 @@ spark.Widget.Constructor = function(Protected) {
     Public.height getter = function(){
         return Public.size.y;
     };
+
+
+    // STAGE
+
+    Public.stage getter = function() {
+        var myCurrent = Public;
+        while(myCurrent) {
+            Logger.info("trav " + myCurrent + "/" + myCurrent._className_);
+            if(myCurrent._className_ == "Window") {
+                return myCurrent;
+            }
+            myCurrent = myCurrent.parent;
+        }
+        Logger.fatal("Widget " + Public.name + " is not the child of a valid stage.");
+    };
+
     
+    // STAGE EVENTS
 
+    Base.addEventListener = Public.addEventListener;
+    Public.addEventListener = function(theType, theListener, theUseCapture) {
+        if(Public._className_ != "Window") {
+            switch(theType) {
+            case spark.StageEvent.FRAME:
+            case spark.StageEvent.PRE_RENDER:
+            case spark.StageEvent.POST_RENDER:
+                if(theUseCapture) {
+                    Logger.fatal("Capture of stage events is forbidden.");
+                }
+                Public.stage.addEventListener(
+                    theType,
+                    function(theEvent) {
+                        Public.dispatchEvent(theEvent);
+                    },
+                    false
+                );
+                return;
+            }
+        }
+        Base.addEventListener(theType, theListener, theUseCapture);
+    };
 
+    Base.removeEventListener = Public.removeEventListener;
+    Public.removeEventListener = function(theType, theListener, theUseCapture) {
+        switch(theType) {
+        case spark.StageEvent.FRAME:
+        case spark.StageEvent.PRE_RENDER:
+        case spark.StageEvent.POST_RENDER:
+            Logger.fatal("Removal of stage event listeners is not supported");
+            break;
+        default:
+            Base.removeEventListener(theType, theListener, theUseCapture);
+            break;
+        }
+    };
+    
     // ALPHA
 
     var _myAlpha = 1.0;
