@@ -41,10 +41,10 @@ using namespace asl;
 #define NO_DECL
 
 //                       theTagName     theType         theAttributeName  theDefault
-DEFINE_ATTRIBUT_TAG        (IdTag,         std::string,    "id",             "",    NO_DECL);
-DEFINE_ATTRIBUT_TAG        (FloatTag,      float,          "float",          1,     NO_DECL);
+DEFINE_ATTRIBUTE_TAG        (IdTag,         std::string,    "id",             "",    NO_DECL);
+DEFINE_ATTRIBUTE_TAG        (FloatTag,      float,          "float",          1,     NO_DECL);
 DEFINE_FACADE_ATTRIBUTE_TAG(Float2Tag,     float,          "float2",         1,     NO_DECL);
-DEFINE_ATTRIBUT_TAG        (BoolTag,       bool,           "bool",           false, NO_DECL);
+DEFINE_ATTRIBUTE_TAG        (BoolTag,       bool,           "bool",           false, NO_DECL);
 DEFINE_FACADE_ATTRIBUTE_TAG(HalfFloatTag,  float,          "halffloat",      0.5,   NO_DECL);
 DEFINE_FACADE_ATTRIBUTE_TAG(DoubleParentFloatTag,  float,  "doubleparentfloat", 2,  NO_DECL);
 DEFINE_FACADE_ATTRIBUTE_TAG(ChildFloatSumTag,  float,      "childfloatsumtag", 0,   NO_DECL);
@@ -248,10 +248,10 @@ class ChildFacade :
 };
 
 
-DEFINE_ATTRIBUT_TAG(WidthTag,          float,    "width",      0, NO_DECL);
-DEFINE_ATTRIBUT_TAG(HeightTag,         float,    "height",     0, NO_DECL);
-DEFINE_ATTRIBUT_TAG(AspectRatioTag,    float,    "aspect",     0, NO_DECL);
-DEFINE_ATTRIBUT_TAG(InvAspectRatioTag, float,    "inv-aspect", 0, NO_DECL);
+DEFINE_ATTRIBUTE_TAG(WidthTag,          float,    "width",      0, NO_DECL);
+DEFINE_ATTRIBUTE_TAG(HeightTag,         float,    "height",     0, NO_DECL);
+DEFINE_ATTRIBUTE_TAG(AspectRatioTag,    float,    "aspect",     0, NO_DECL);
+DEFINE_ATTRIBUTE_TAG(InvAspectRatioTag, float,    "inv-aspect", 0, NO_DECL);
 
 class DynamicFacade :
     public IdFacade,
