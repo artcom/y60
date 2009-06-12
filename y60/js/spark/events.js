@@ -289,13 +289,13 @@ spark.MouseEvent.Constructor = function(Protected, theType, theX, theY, theAmoun
     var _myStageX = theX;
     
     Public.stageX getter = function() {
-        return _myScreenX;
+        return _myStageX;
     };
     
     var _myStageY = theY;
 
     Public.stageY getter = function() {
-        return _myScreenY;
+        return _myStageY;
     };
     
     var _myAmountX = theAmountX;

@@ -29,24 +29,27 @@ spark.Movie.Constructor = function(Protected) {
     //     [DS]
     Public.pause = function() {
         _myMovie.playmode = "pause";
-    }
+    };
 
-    Public.currentFrame getter = function() { return _myMovie.currentframe;}
+    Public.currentFrame getter = function() { return _myMovie.currentframe;};
     Public.currentFrame setter = function(f) {
         _myMovie.currentframe = f;
-    }
+    };
 
     Public.src getter = function() { return _myMovie.src;}
     Public.src setter = function(theFileName) {
         _myMovie.src = theFileName;
-    }
+    };
+    
+    Public.framecount getter = function() { return _myMovie.framecount;};
+    
+    Public.playmode getter = function() { return _myMovie.playmode;};
 
-    Public.movieNode getter = function()  { return _myMovie;}
+    Public.movieNode getter = function()  { return _myMovie;};
 
     Public.loopcount getter = function() {
         return _myMovie.loopcount;
     };
-
     Public.loopcount setter = function(theCount) {
         _myMovie.loopcount = theCount;
     };
