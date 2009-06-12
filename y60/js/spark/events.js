@@ -285,7 +285,6 @@ spark.MouseEvent.Constructor = function(Protected, theType, theX, theY, theAmoun
     
     this.Inherit(spark.Event, theType);
     
-    
     var _myStageX = theX;
     
     Public.stageX getter = function() {
@@ -362,15 +361,25 @@ spark.StageEvent.FRAME       = "stage-frame";
 spark.StageEvent.PRE_RENDER  = "stage-pre-render";
 spark.StageEvent.POST_RENDER = "stage-post-render";
 
-spark.StageEvent.Constructor = function(Protected, theType, theStage) {
+spark.StageEvent.Constructor = function(Protected, theType, theStage, theTime, theDeltaT) {
     var Public = this;
     
     this.Inherit(spark.Event, theType);
     
     var _myStage = theStage;
+    var _myTime = theTime != null ? theTime : 0.0;
+    var _myDeltaT = theDeltaT != null ? theDeltaT : 0.0;
     
     Public.stage getter = function() {
         return _myStage;
+    };    
+    
+    Public.currenttime getter = function() {
+        return _myTime;
+    };  
+    
+    Public.deltaT getter = function() {
+        return _myDeltaT;
     };
     
 };
