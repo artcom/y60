@@ -54,6 +54,11 @@ spark.Image.Constructor = function(Protected) {
         return _mySource;
     };
 
+    Public.src setter = function(theSourceFile) {
+        Public.image = spark.getCachedImage(theSourceFile);
+        _mySource = theSourceFile;
+    };
+
     Public.srcId getter = function() {
         return _mySourceId;
     };
