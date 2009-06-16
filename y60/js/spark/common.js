@@ -63,9 +63,14 @@ function Namespace(theName) {
 function AbstractClass(theName) {
     Logger.info("Defining abstract class " + theName);
     var myNamespace = this;
-    return function () {
+    
+    var myConstructor = function () {
         Logger.error("Trying to instantiate abstract class " + myNamespace.name + "." + theName);
     };
+    
+    myConstructor._className_ = theName;
+    
+    return myConstructor;
 };
 
 function Class(theName) {
@@ -80,6 +85,9 @@ function Class(theName) {
         myPublic._protected_ = myProtected;
         myPublic._className_ = theName;
         myPublic._class_     = myNamespace[theName];
+        
+        myPublic._classes_   = {};
+        myPublic._classes_[theName] = myNamespace[theName];
 
         // provide weaving functions
         myPublic.Inherit = Inherit;
@@ -94,6 +102,8 @@ function Class(theName) {
         }
 
     };
+    
+    myConstructor._className_ = theName;
 
     return myConstructor;
 };
@@ -101,6 +111,7 @@ function Class(theName) {
 function Inherit(theClass) {
     var myArguments = [this._protected_];
     myArguments = myArguments.concat(Array.prototype.slice.call(arguments, 1));
+    this._classes_[theClass._className_] = theClass;
     theClass.Constructor.apply(this, myArguments);
 };
 

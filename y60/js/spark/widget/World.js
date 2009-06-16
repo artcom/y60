@@ -12,7 +12,7 @@ spark.World.Constructor = function(Protected) {
     var Base = {};
     var Public = this;
 
-    this.Inherit(spark.Widget);
+    this.Inherit(spark.Stage);
 
     Base.realize = Public.realize;
     Public.realize = function() {

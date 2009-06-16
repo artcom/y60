@@ -9,8 +9,8 @@ spark.Window = spark.ComponentClass("Window");
 spark.Window.Constructor = function(Protected) {
     var Public = this;
     var Base = {};
-    
-    this.Inherit(spark.Widget);
+
+    this.Inherit(spark.Stage);
 
     SceneViewer.prototype.Constructor(this, []);
 

@@ -105,6 +105,7 @@ if (!("disableSparkWidgets" in this)) {
     // concrete classes (inheritance-ordered)
     use("spark/widget/Transform.js");
     use("spark/widget/Switch.js");
+    use("spark/widget/Stage.js");
     use("spark/widget/World.js");
     use("spark/widget/Window.js");
     use("spark/widget/Body.js");

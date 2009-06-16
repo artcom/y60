@@ -109,8 +109,7 @@ spark.Widget.Constructor = function(Protected) {
     Public.stage getter = function() {
         var myCurrent = Public;
         while(myCurrent) {
-            Logger.info("trav " + myCurrent + "/" + myCurrent._className_);
-            if(myCurrent._className_ == "Window") {
+            if("Stage" in myCurrent._classes_) {
                 return myCurrent;
             }
             myCurrent = myCurrent.parent;

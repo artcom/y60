@@ -86,6 +86,9 @@ spark.ComponentClass = function(theName) {
 
     // register this class as a component class
     spark.componentClasses[theName] = myInitializingConstructor;
+    
+    // XXX: give the class a name, as the normal class definer does
+    myInitializingConstructor._className_ = theName;
 
     // return the class so it can be put in the namespace
     return myInitializingConstructor;
