@@ -15,6 +15,7 @@ spark.Movie.Constructor = function(Protected) {
     var _myMaterial = null;
     var _myShape    = null;
     var _myBody     = null;
+    var _myInitialSize = null;
 
     Public.play = function() {
         _myMovie.playmode = "play";
@@ -36,9 +37,17 @@ spark.Movie.Constructor = function(Protected) {
         _myMovie.currentframe = f;
     };
 
-    Public.src getter = function() { return _myMovie.src;}
+    Public.src getter = function() { return _myMovie.src;};
     Public.src setter = function(theFileName) {
         _myMovie.src = theFileName;
+        window.scene.loadMovieFrame(_myMovie);
+        var mySize = getImageSize(_myMovie);
+        internalResize(mySize, Public.sceneNode);
+    };
+    
+    Public.volume getter = function() { return _myMovie.volume; };
+    Public.volume setter = function(theVolume) {
+        _myMovie.volume = theVolume;
     };
     
     Public.framecount getter = function() { return _myMovie.framecount;};
@@ -73,6 +82,8 @@ spark.Movie.Constructor = function(Protected) {
                 
         _myShape    = Modelling.createQuad(window.scene, _myMaterial.id, myLowerLeft, myUpperRight);
         _myShape.name = Public.name + "-shape";
+        
+        _myInitialSize = mySize;
 
         var myBody  = Modelling.createBody(Public.parent.sceneNode, _myShape.id);
         myBody.name = Public.name;
@@ -102,6 +113,19 @@ spark.Movie.Constructor = function(Protected) {
         }
 
         window.scene.loadMovieFrame(_myMovie);
+        _myInitialSize = getImageSize(_myMovie);
+    };
+    
+    function internalResize(theNewSize, theBody) {
+        if(_myInitialSize != theNewSize) {
+            if(theBody == undefined) {
+                dumpstack();
+                exit(1);
+            }
+            var myXFactor = theNewSize.x/_myInitialSize.x;
+            var myYFactor = theNewSize.y/_myInitialSize.y;
+            theBody.scale = new Vector3f(myXFactor, myYFactor, 1);
+        }
     };
 
 };
