@@ -122,7 +122,7 @@ spark.Widget.Constructor = function(Protected) {
 
     Base.addEventListener = Public.addEventListener;
     Public.addEventListener = function(theType, theListener, theUseCapture) {
-        if(Public._className_ != "Window") {
+        if(!("Stage" in Public._classes_)) {
             switch(theType) {
             case spark.StageEvent.FRAME:
             case spark.StageEvent.PRE_RENDER:
@@ -137,7 +137,7 @@ spark.Widget.Constructor = function(Protected) {
                     },
                     false
                 );
-                return;
+                break;
             }
         }
         Base.addEventListener(theType, theListener, theUseCapture);
