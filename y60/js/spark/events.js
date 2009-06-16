@@ -277,6 +277,8 @@ spark.MouseEvent = spark.Class("MouseEvent");
 
 spark.MouseEvent.MOVE   = "mouse-move";
 spark.MouseEvent.CLICK  = "mouse-click";
+spark.MouseEvent.BUTTON_DOWN = "mouse-button-down";
+spark.MouseEvent.BUTTON_UP   = "mouse-button-up";
 spark.MouseEvent.ENTER  = "mouse-enter";
 spark.MouseEvent.LEAVE  = "mouse-leave";
 spark.MouseEvent.SCROLL = "mouse-scroll";

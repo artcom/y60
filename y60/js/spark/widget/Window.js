@@ -163,13 +163,23 @@ spark.Window.Constructor = function(Protected) {
         Base.onMouseButton(theButton, theState, theX, theY);
         
         Protected.updateMousePosition(theX, theY);
+
+        var myWidget = Public.pickWidget(theX, theY);
         
-        if(theState) {
-            var myWidget = Public.pickWidget(theX, theY);
-            if(myWidget) {
+        if(myWidget) {
+            if(theState) {
+                // XXX: click should be more well-defined and button-up-based.
                 Logger.debug("Mouse clicks " + myWidget);
-                var myEvent = new spark.MouseEvent(spark.MouseEvent.CLICK, theX, theY);
-                myWidget.dispatchEvent(myEvent);
+                var myClickEvent = new spark.MouseEvent(spark.MouseEvent.CLICK, theX, theY);
+                myWidget.dispatchEvent(myClickEvent);
+                
+                Logger.debug("Mouse button down on " + myWidget);
+                var myDownEvent = new spark.MouseEvent(spark.MouseEvent.BUTTON_DOWN, theX, theY);
+                myWidget.dispatchEvent(myDownEvent);
+            } else {
+                Logger.debug("Mouse button up on " + myWidget);
+                var myUpEvent = new spark.MouseEvent(spark.MouseEvent.BUTTON_UP, theX, theY);
+                myWidget.dispatchEvent(myUpEvent);                
             }
         }
     };
