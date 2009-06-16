@@ -143,6 +143,10 @@ spark.Window.Constructor = function(Protected) {
                 var myEnterEvent = new spark.MouseEvent(spark.MouseEvent.ENTER, theX, theY);
                 myWidget.dispatchEvent(myEnterEvent);
             }
+
+            Logger.debug("Mouse moves to [" + theX + "," + theY + "] over " + myWidget);
+            var myMoveEvent = new spark.MouseEvent(spark.MouseEvent.MOVE, theX, theY);
+            myWidget.dispatchEvent(myMoveEvent);
         } else {
             if(_myMouseFocused) {
                 Logger.debug("Mouse leaves " + _myMouseFocused);

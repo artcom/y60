@@ -275,6 +275,7 @@ spark.EventDispatcher.Constructor = function(Protected) {
 
 spark.MouseEvent = spark.Class("MouseEvent");
 
+spark.MouseEvent.MOVE   = "mouse-move";
 spark.MouseEvent.CLICK  = "mouse-click";
 spark.MouseEvent.ENTER  = "mouse-enter";
 spark.MouseEvent.LEAVE  = "mouse-leave";
