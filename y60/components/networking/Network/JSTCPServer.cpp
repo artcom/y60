@@ -190,7 +190,7 @@ JSTCPServer::ConstIntProperties() {
 JSObject *
 JSTCPServer::initClass(JSContext *cx, JSObject *theGlobalObject) {
     JSObject *myClass = Base::initClass(cx, theGlobalObject, ClassName(), Constructor, Properties(), Functions(), ConstIntProperties());
-        DOC_MODULE_CREATE("Components", JSTCPServer);
+        DOC_MODULE_CREATE("Network", JSTCPServer);
         return myClass;
 }
 

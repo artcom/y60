@@ -69,11 +69,11 @@ namespace y60 {
             virtual void initClasses(JSContext * theContext,
                     JSObject *theGlobalObject) {
                 JS_DefineFunctions(theContext, theGlobalObject, jslib::JSProcFunctions::Functions());
-                jslib::createFunctionDocumentation("ProcFunctions", jslib::JSProcFunctions::Functions());
+                jslib::createFunctionDocumentation("ProcessFunctions", jslib::JSProcFunctions::Functions());
             }
 
             const char * ClassName() {
-                static const char * myClassName = "ProcFunctions";
+                static const char * myClassName = "ProcessFunctions";
                 return myClassName;
             }
     };

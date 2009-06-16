@@ -263,7 +263,7 @@ JSObject *
 JSOscSender::initClass(JSContext *cx, JSObject *theGlobalObject) {    
     JSObject *myClass = Base::initClass(cx, theGlobalObject, ClassName(), Constructor, Properties(), Functions(), ConstIntProperties());
     AC_PRINT << "JSOscSender::initClasses";
-    DOC_MODULE_CREATE("Components", JSOscSender);
+    DOC_MODULE_CREATE("OscSender", JSOscSender);
     return myClass;
 }
 

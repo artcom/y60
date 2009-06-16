@@ -263,7 +263,7 @@ namespace jslib {
     JSObject *
     JSSound::initClass(JSContext *cx, JSObject *theGlobalObject) {
         JSObject *myClass = Base::initClass(cx, theGlobalObject, ClassName(), Constructor, Properties(), Functions(), ConstIntProperties());
-        DOC_MODULE_CREATE("Components", JSSound);
+        DOC_MODULE_CREATE("Sound", JSSound);
         return myClass;
     }
 

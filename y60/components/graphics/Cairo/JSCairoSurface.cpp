@@ -406,7 +406,7 @@ void
 JSCairoSurface::addClassProperties(JSContext * cx, JSObject * theClassProto) {
     JSA_AddFunctions(cx, theClassProto, Functions());
     JSA_AddProperties(cx, theClassProto, Properties());
-    createClassModuleDocumentation("cairo", ClassName(), Properties(), Functions(), 0, 0, 0);
+    createClassModuleDocumentation("Cairo", ClassName(), Properties(), Functions(), 0, 0, 0);
 }
 
 JSObject *

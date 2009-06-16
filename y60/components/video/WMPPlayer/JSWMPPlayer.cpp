@@ -325,7 +325,7 @@ JSWMPPlayer::initClass(JSContext *cx, JSObject *theGlobalObject) {
 	AC_DEBUG << "JSWMPPlayer::initClass()";
     JSObject *myClass = Base::initClass(cx, theGlobalObject, ClassName(), Constructor, Properties(), Functions(), ConstIntProperties());
 	AC_DEBUG << "Base::initClass done.";
-	DOC_MODULE_CREATE("Components", JSWMPPlayer);
+	DOC_MODULE_CREATE("WMPPlayer", JSWMPPlayer);
 	AC_DEBUG << "JSWMPPlayer::initClass done.";
     return myClass;
 }

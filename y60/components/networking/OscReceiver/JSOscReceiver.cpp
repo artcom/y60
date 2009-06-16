@@ -178,7 +178,7 @@ namespace jslib {
     JSObject *
     JSOscReceiver::initClass(JSContext *cx, JSObject *theGlobalObject) {
         JSObject *myClass = Base::initClass(cx, theGlobalObject, ClassName(), Constructor, Properties(), Functions(), ConstIntProperties());
-        DOC_MODULE_CREATE("Components", JSOscReceiver);
+        DOC_MODULE_CREATE("OscReceiver", JSOscReceiver);
         return myClass;
     }
 

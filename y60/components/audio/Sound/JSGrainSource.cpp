@@ -308,7 +308,7 @@ namespace jslib {
     JSObject *
     JSGrainSource::initClass(JSContext *cx, JSObject *theGlobalObject) {
         JSObject *myClass = Base::initClass(cx, theGlobalObject, ClassName(), Constructor, Properties(), Functions(), ConstIntProperties());
-        DOC_MODULE_CREATE("Components", JSGrainSource);
+        DOC_MODULE_CREATE("Sound", JSGrainSource);
         return myClass;
     }
 

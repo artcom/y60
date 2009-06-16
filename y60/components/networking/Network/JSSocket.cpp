@@ -460,7 +460,7 @@ JSSocket::ConstIntProperties() {
 JSObject *
 JSSocket::initClass(JSContext *cx, JSObject *theGlobalObject) {
     JSObject *myClass = Base::initClass(cx, theGlobalObject, ClassName(), Constructor, Properties(), Functions(), ConstIntProperties());
-    DOC_MODULE_CREATE("Components", JSSocket);
+    DOC_MODULE_CREATE("Network", JSSocket);
     return myClass;
 }
 

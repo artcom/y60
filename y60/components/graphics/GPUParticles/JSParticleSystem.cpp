@@ -283,7 +283,7 @@ JSObject *
 JSParticleSystem::initClass(JSContext *cx, JSObject *theGlobalObject) {
     JSObject *myClass = Base::initClass(cx, theGlobalObject, ClassName(), Constructor, Properties(), 
                                         Functions(), ConstIntProperties(), 0, StaticFunctions());
-    DOC_MODULE_CREATE("Components", JSParticleSystem);
+    DOC_MODULE_CREATE("GPUParticles", JSParticleSystem);
     return myClass;
 }
 

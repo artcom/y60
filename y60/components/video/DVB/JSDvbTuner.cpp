@@ -291,7 +291,7 @@ JSDvbTuner::ConstIntProperties() {
 JSObject *
 JSDvbTuner::initClass(JSContext *cx, JSObject *theGlobalObject) {
     JSObject *myClass = Base::initClass(cx, theGlobalObject, ClassName(), Constructor, Properties(), Functions(), ConstIntProperties(), 0, StaticFunctions());
-    DOC_MODULE_CREATE("Components", JSDvbTuner);
+    DOC_MODULE_CREATE("DVB", JSDvbTuner);
     return myClass;
 }
 
