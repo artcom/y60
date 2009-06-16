@@ -148,7 +148,7 @@ function createIndex(theModules) {
 
 // This function makes sure, some well-known modules come first
 function getModuleNames() {
-    var myModuleNames = ["Global", "Math", "GlobalFunctions", "MathFunctions"];
+    var myModuleNames = ["Global", "Math", "GlobalFunctions", "MathFunctions", "FileFunctions"];
     var myModuleNames2 = getDocumentedModules();
     for (var i = 0; i < myModuleNames2.length; ++i) {
         var myNewModuleFlag = true;
