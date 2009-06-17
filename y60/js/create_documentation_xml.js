@@ -115,7 +115,7 @@ function plugComponentsForDocumentation() {
     if (operatingSystem() == "WIN32") {
         myComponents = myComponents.concat(["TaskManager","WMPPlayer"]);
     } else if (operatingSystem() == "LINUX") {
-        myComponents = myComponents.concat(["Powermate", "Wiimote"]);
+        myComponents = myComponents.concat(["Powermate"]);
     }
 
     for (var i = 0;i < myComponents.length; ++i) {
