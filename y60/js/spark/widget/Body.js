@@ -16,8 +16,11 @@ spark.Body.Constructor = function(Protected) {
         Base.propagateAlpha();
         
         // XXX: why this condition!?
-        if (Public.sceneNode.nodeName == "body") {
-            Modelling.setAlpha(Public.sceneNode, Public.actualAlpha);
+        // XXX: still unknown, but i converted it into an Error
+        if (Public.sceneNode.nodeName != "body") {
+            throw new Error("instance of class Body has a non-body scene node");
         }
+        
+        Modelling.setAlpha(Public.sceneNode, Public.actualAlpha);
     };
 };
