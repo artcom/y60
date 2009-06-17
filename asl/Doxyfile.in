@@ -13,7 +13,7 @@
 DOXYFILE_ENCODING      = UTF-8
 PROJECT_NAME           = ASL
 PROJECT_NUMBER         = 
-OUTPUT_DIRECTORY       = @AC_DOXYGEN_OUTPUT_DIR@
+OUTPUT_DIRECTORY       = "@AC_DOXYGEN_OUTPUT_DIR@"
 CREATE_SUBDIRS         = NO
 OUTPUT_LANGUAGE        = English
 BRIEF_MEMBER_DESC      = YES
@@ -32,7 +32,7 @@ ABBREVIATE_BRIEF       = "The $name class" \
 ALWAYS_DETAILED_SEC    = NO
 INLINE_INHERITED_MEMB  = NO
 FULL_PATH_NAMES        = YES
-STRIP_FROM_PATH        = @AC_DOXYGEN_SOURCE_DIR@
+STRIP_FROM_PATH        = "@AC_DOXYGEN_SOURCE_DIR@"
 STRIP_FROM_INC_PATH    = 
 SHORT_NAMES            = NO
 JAVADOC_AUTOBRIEF      = NO
@@ -97,7 +97,7 @@ WARN_LOGFILE           =
 #---------------------------------------------------------------------------
 # configuration options related to the input files
 #---------------------------------------------------------------------------
-INPUT                  = @AC_DOXYGEN_SOURCE_DIR@
+INPUT                  = "@AC_DOXYGEN_SOURCE_DIR@"
 INPUT_ENCODING         = UTF-8
 FILE_PATTERNS          = *.c \
                          *.cc \
