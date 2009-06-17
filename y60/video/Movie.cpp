@@ -63,6 +63,7 @@
 #include <string.h>
 
 #include "MovieDecoderBase.h"
+#include "AsyncDecoder.h"
 #include "M60Decoder.h"
 
 #include <y60/image/PixelEncoding.h>
@@ -102,6 +103,7 @@ namespace y60 {
         FrameBlendingTag::Plug(theNode),				
         dom::DynamicAttributePlug<MovieTimeTag, Movie>(this, &Movie::getMovieTime),
         dom::DynamicAttributePlug<DecoderTag, Movie>(this, &Movie::getDecoderName),
+        dom::DynamicAttributePlug<HasAudioTag, Movie>(this, &Movie::hasAudio),
         _myDecoder(),
         _myPlayMode(PLAY_MODE_STOP),
         _myLastDecodedFrame(std::numeric_limits<unsigned>::max()),
@@ -460,6 +462,17 @@ namespace y60 {
         MovieDecoderBase & myDecoder = const_cast<MovieDecoderBase&>(*_myDecoder);
         theName = myDecoder.getName();
         AC_DEBUG << "Movie::getDecoderName got " << theName;
+        return true;
+    }
+
+    bool Movie::hasAudio(bool & theHasAudio) const {
+        AsyncDecoder* myDecoder = dynamic_cast<AsyncDecoder*>(const_cast<MovieDecoderBase*>(_myDecoder.get()));
+        if(myDecoder) {
+            theHasAudio = myDecoder->hasAudio();
+        } else {
+            theHasAudio = true;
+            AC_ERROR << "Movie::hasAudio does not work for non-async-decoders for no particular reason (factoring fail)";
+        }
         return true;
     }
 

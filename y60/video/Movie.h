@@ -107,6 +107,7 @@ namespace y60 {
     DEFINE_ATTRIBUTE_TAG(DecoderHintTag,  std::string, MOVIE_DECODERHINT_ATTRIB, "", Y60_VIDEO_DECL);
     DEFINE_ATTRIBUTE_TAG(MovieTimeTag,    double,      MOVIE_MOVIETIME_ATTRIB,   0, Y60_VIDEO_DECL);
     DEFINE_ATTRIBUTE_TAG(DecoderTag,      std::string, MOVIE_DECODER_ATTRIB,     "UNKNOWN", Y60_VIDEO_DECL);
+    DEFINE_ATTRIBUTE_TAG(HasAudioTag,     bool,        MOVIE_HASAUDIO_ATTRIB,    false, Y60_VIDEO_DECL);
 
     /**
     * @ingroup Y60video
@@ -132,7 +133,8 @@ namespace y60 {
         public FrameBlendFactorTag::Plug,
         public FrameBlendingTag::Plug,
         public dom::DynamicAttributePlug<MovieTimeTag, Movie>,
-        public dom::DynamicAttributePlug<DecoderTag, Movie>
+        public dom::DynamicAttributePlug<DecoderTag, Movie>,
+        public dom::DynamicAttributePlug<HasAudioTag, Movie>
     {
     public:
         enum MovieFrameBuffer { PRIMARY_BUFFER = 0, SECONDARY_BUFFER = 1,  THIRD_BUFFER = 2, MAX_BUFFER = 3};
@@ -185,6 +187,7 @@ namespace y60 {
 
         bool getMovieTime(double & theTime) const;
         bool getDecoderName(std::string & theName) const;
+        bool hasAudio(bool & theHasAudio) const;
 
         /**
         * @add another raster to movie.
