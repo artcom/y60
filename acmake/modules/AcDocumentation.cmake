@@ -26,14 +26,14 @@ function(ac_add_doxygen NAME SOURCE_DIR OUTPUT_DIR DOXYFILE_IN)
         set(AC_DOXYGEN_SOURCE_DIR ${SOURCE_DIR})
         set(AC_DOXYGEN_OUTPUT_DIR ${OUTPUT_DIR})
         ac_configure_file(
-            ${DOXYFILE_IN}
-            ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
+            "${DOXYFILE_IN}"
+            "${CMAKE_CURRENT_BINARY_DIR}/Doxyfile"
             "ac_add_doxygen()"
         )
         add_custom_target(
             ${NAME}-doxygen
-                ${DOXYGEN_EXECUTABLE} Doxyfile
-                WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+                "${DOXYGEN_EXECUTABLE}" Doxyfile
+                WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
                 COMMENT "Generating doxygen documentation for ${NAME}"
                 VERBATIM
         )
