@@ -130,32 +130,30 @@ spark.Window.Constructor = function(Protected) {
         Protected.updateMousePosition(theX, theY);
         
         var myWidget = Public.pickWidget(theX, theY);
-        if(myWidget) {
-            if(myWidget != _myMouseFocused) {
-                Logger.debug("Mouse focuses " + myWidget
-                             + (_myMouseFocused ? ", leaving " + _myMouseFocused : ""));
-                
-                if(_myMouseFocused) {
-                    var myLeaveEvent = new spark.MouseEvent(spark.MouseEvent.LEAVE, theX, theY);
-                    _myMouseFocused.dispatchEvent(myLeaveEvent);
-                }
-                
-                _myMouseFocused = myWidget;
-                
-                var myEnterEvent = new spark.MouseEvent(spark.MouseEvent.ENTER, theX, theY);
-                myWidget.dispatchEvent(myEnterEvent);
-            }
-
-            Logger.debug("Mouse moves to [" + theX + "," + theY + "] over " + myWidget);
-            var myMoveEvent = new spark.MouseEvent(spark.MouseEvent.MOVE, theX, theY);
-            myWidget.dispatchEvent(myMoveEvent);
-        } else {
+        
+        if(!myWidget) {
+            myWidget = Public;
+        }
+        
+        if(myWidget != _myMouseFocused) {
+            Logger.debug("Mouse focuses " + myWidget
+                         + (_myMouseFocused ? ", leaving " + _myMouseFocused : ""));
+            
             if(_myMouseFocused) {
-                Logger.debug("Mouse leaves " + _myMouseFocused);
                 var myLeaveEvent = new spark.MouseEvent(spark.MouseEvent.LEAVE, theX, theY);
                 _myMouseFocused.dispatchEvent(myLeaveEvent);
             }
+            
+            _myMouseFocused = myWidget;
+                
+            var myEnterEvent = new spark.MouseEvent(spark.MouseEvent.ENTER, theX, theY);
+            myWidget.dispatchEvent(myEnterEvent);
         }
+
+        Logger.debug("Mouse moves to [" + theX + "," + theY + "] over " + myWidget);
+        var myMoveEvent = new spark.MouseEvent(spark.MouseEvent.MOVE, theX, theY);
+        myWidget.dispatchEvent(myMoveEvent);
+
         _myMouseFocused = myWidget;
     };
 
@@ -242,6 +240,10 @@ spark.Window.Constructor = function(Protected) {
     Base.onExit = Public.onExit;
     Public.onExit = function() {
         Base.onExit();
+    };
+    
+    Public.onASSEvent = function(theEvent) {
+        Logger.info("ASS: "+ theEvent);
     };
     
 };

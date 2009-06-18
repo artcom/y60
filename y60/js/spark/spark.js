@@ -95,6 +95,8 @@ use("cache.js");
 use("components.js");
 // event handling
 use("events.js");
+// multitouch support
+use("multitouch.js");
 // internationalization
 use("internationalization.js");
 
