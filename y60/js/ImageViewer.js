@@ -137,13 +137,13 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
         //window.fixedFrameTime = 1/60;
         //window.swapInterval    = 0;
         
-        for(var i=1; i<theArguments.length; ++i) {
+        for(var i=0; i<theArguments.length; ++i) {
             switch(theArguments[i]) {
             case "recursive": // would like to use '--recursive' but that is rejected by the acxpshell options
                 _myPlaylist.setRecursiveFlag(true);
                 break;
             default:
-                //print("adding entry: " + theArguments[i]);
+                //print("Trying to add entry: " + theArguments[i]);
                 _myPlaylist.addEntry(theArguments[i]);
                 break;
             }
@@ -659,7 +659,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
             //_myMovieNode.maxcachesize = 128;
             // YUV420 pixelformat uses shader to convert colorspace
             var myUseCgFlag = false;
-            if(self.getShaderLibrary().match(/shaderlibrary.xml/)) {
+            if(self.getShaderLibrary() && self.getShaderLibrary().match(/shaderlibrary.xml/)) {
                 myUseCgFlag = true;
             }
             _myMovieNode.targetpixelformat = (myUseCgFlag) ? "YUV420" : "RGB";//"RGBA8";//"ALPHA";//"LUMINANCE8";//"RGBA8" // "ALPHA"

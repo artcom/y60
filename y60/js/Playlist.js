@@ -68,6 +68,7 @@ const VIDEO_MEDIA   = "VIDEO";
 const CAPTURE_MEDIA = "CAPTURE";
 const IMAGE_MEDIA   = "IMAGE";
 const MODEL_MEDIA   = "MODEL";
+const NO_MEDIA      = "NO MEDIA";
 
 const ASX_REGEXP       = /<entry.*?>(?:.*?<title.*?>\s*(.*?)\s*<\/title>)?.*?<ref.+?href\s*=\s*"(.+?)"/gi;
 const ASF_REGEXP       = /Ref\d+=(.*?)\n/gi;
@@ -100,7 +101,7 @@ const MimeTypes = {
     SMIL: 18,
     MP3: 19,
     TXT: 20
-}
+};
 
 // Constructor
 function Playlist() {
@@ -116,7 +117,7 @@ Playlist.prototype.Constructor = function(self) {
 
     self.setRecursiveFlag = function(theFlag) {
         _myRecursiveFlag = theFlag;
-    }
+    };
 
     self.addEntry = function(theUrl, theTitle, theMediaType) {
 
@@ -173,11 +174,11 @@ Playlist.prototype.Constructor = function(self) {
                 }
             }
         }
-    }
+    };
 
     self.getNumEntries = function() {
         return _myPlaylist.length;
-    }
+    };
 
     self.getEntry = function(theIndex) {
         if (theIndex < 0 || theIndex >= _myPlaylist.length) {
@@ -185,7 +186,8 @@ Playlist.prototype.Constructor = function(self) {
         }
         _myPlaylistIndex = theIndex;
         return _myPlaylist[theIndex];
-    }
+    };
+    
     self.getMediaHintFromURL = function(theUrl) {
         //print("####:"+ theUrl);
         if (theUrl.search(/^dshow:\/\//i) != -1 ||
@@ -223,11 +225,28 @@ Playlist.prototype.Constructor = function(self) {
             // one more chance for http audio
             if (theUrl.search(/:\/\//) != -1) {
                 return AUDIO_MEDIA;
-            } else {
+            } else if ( theUrl.search(/\.bmp$/i)  != -1 ||
+                        theUrl.search(/\.gif$/i)  != -1 ||
+                        theUrl.search(/\.iff$/i)  != -1 ||
+                        theUrl.search(/\.jpg$/i)  != -1 ||
+                        theUrl.search(/\.jpeg$/i) != -1 ||
+                        theUrl.search(/\.pcx$/i)  != -1 ||
+                        theUrl.search(/\.pgm$/i)  != -1 ||
+                        theUrl.search(/\.pict$/i) != -1 ||
+                        theUrl.search(/\.png$/i)  != -1 ||
+                        theUrl.search(/\.psd$/i)  != -1 ||
+                        theUrl.search(/\.sgi$/i)  != -1 ||
+                        theUrl.search(/\.tga$/i)  != -1 ||
+                        theUrl.search(/\.tiff$/i) != -1 ||
+                        theUrl.search(/\.wmf$/i)  != -1) 
+            {
                 return IMAGE_MEDIA;
+            } else {
+                return NO_MEDIA;
             }
         }
-    }
+    };
+    
     self.getVideoDecoderHintFromURL = function(theUrl, theSeekableFlag) {
         if (theSeekableFlag == undefined) {
             theSeekableFlag = false;
@@ -250,7 +269,7 @@ Playlist.prototype.Constructor = function(self) {
             if (operatingSystem() == "LINUX" || theSeekableFlag) {
                 myDecoderHint = "FFMpegDecoder2";
             } else {
-                myDecoderHint = "QuicktimeDecoder";
+                myDecoderHint = "FFMpegDecoder2"; //"QuicktimeDecoder";
             }
         }
         if (theUrl.search(/\.wmv$/i)  != -1 ) {
@@ -261,7 +280,7 @@ Playlist.prototype.Constructor = function(self) {
             }
         }
         return myDecoderHint;
-    }
+    };
 
     function pushEntry(theUrl, theTitle, theMediaHint) {
         if (theTitle == undefined) {
@@ -272,8 +291,12 @@ Playlist.prototype.Constructor = function(self) {
         }
         var myEntryNodeString = '<Entry href="' + urlEncode(theUrl) + '" title="' + urlEncode(theTitle) + '" mediaType="' + theMediaHint + '"/>';
         var myEntryNode = new Node(myEntryNodeString);
-        _myPlaylist.push(myEntryNode.firstChild);
-    }
+        if (self.getMediaHintFromURL(theUrl) == NO_MEDIA) {
+            print("Skipping '" + theUrl + "' as it is not known as supported media-file.");
+        } else {
+            _myPlaylist.push(myEntryNode.firstChild);
+        }
+    };
     
     //theString can be a URL, a file, a file extension or a MIME type string
     function getMimeType(theString) {
@@ -366,7 +389,7 @@ Playlist.prototype.Constructor = function(self) {
         }
         //print("###WARNING: Unsupported MIME type ('"+myString+"').");
         return -1;
-    }
+    };
     
     function retrievePlaylist(theUrl) {
         var myPlaylistNode = null;
@@ -378,11 +401,11 @@ Playlist.prototype.Constructor = function(self) {
             //handle URLs
             self.myRequestManager = new RequestManager();
             self.myRequest = new Request(theUrl); //"Mozilla/5.0" or "Windows-Media-Player/10.00.00.3646"
-            self.myRequest.onDone = function() {}
+            self.myRequest.onDone = function() {};
             self.myRequest.onError = function(theCode) {
                 print("### Playlist: CURL error! Error code: "+theCode);
                 return;
-            }
+            };
             self.myRequest.setTimeoutParams(10, 120);
             self.myRequestManager.performRequest(self.myRequest);
             while(self.myRequestManager.activeCount) {
@@ -518,6 +541,6 @@ Playlist.prototype.Constructor = function(self) {
             return;
         }
         //return;
-    }
+    };
 
-}
+};
