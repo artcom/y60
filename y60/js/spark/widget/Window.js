@@ -242,8 +242,78 @@ spark.Window.Constructor = function(Protected) {
         Base.onExit();
     };
     
+    
+    var _myASSCursors = {};
+
     Public.onASSEvent = function(theEvent) {
-        Logger.info("ASS: "+ theEvent);
+        spark.proximatrix.onASSEvent(theEvent);
+        
+        var myId = theEvent.id;
+        
+        switch(theEvent.type) {
+        case "configure":
+            break;
+            
+        case "add":
+        case "move":
+            var myCursor;
+            if(myId in _myASSCursors) {
+                myCursor = _myASSCursors[myId];
+            } else {
+                Logger.debug("Cursor " + myId + " added");
+                myCursor = new spark.Cursor(myId);
+                _myASSCursors[myId] = myCursor;
+            }
+
+            if(theEvent.type == "add") {
+                myCursor.activate();
+            }
+            
+            var myFocused = myCursor.focused;
+            
+            var myPick = Public.pickWidget(theEvent.position3D.x, theEvent.position3D.y);
+            if(!myPick) {
+                myPick = Public;
+            }
+            
+            Logger.debug("Cursor " + myId + " moves to " + theEvent.position3D + " over " + myPick);
+            
+            myCursor.update(theEvent, myPick);
+            
+            if(myPick != myFocused) {
+                Logger.debug("Cursor " + myId + " focuses " + myPick
+                             + (myFocused ? ", leaving " + myFocused : ""));
+                
+                if(myFocused) {
+                    var myLeave = new spark.CursorEvent(spark.CursorEvent.LEAVE, myCursor);
+                    myFocused.dispatchEvent(myLeave);
+                }
+                
+                var myEnter = new spark.CursorEvent(spark.CursorEvent.ENTER, myCursor);
+                myPick.dispatchEvent(myEnter);
+            }
+            break;
+            
+        case "remove":
+            if(myId in _myASSCursors) {
+                Logger.debug("Cursor " + myId + " removed");
+                
+                var myCursor = _myASSCursors[myId];
+                
+                var myFocused = myCursor.focused;
+                
+                myCursor.update(theEvent, myFocused);
+                
+                if(myFocused) {
+                    Logger.debug("Cursor " + myId + " leaves " + myFocused);
+                    var myLeave = new spark.CursorEvent(spark.CursorEvent.LEAVE, myCursor);
+                    myFocused.dispatchEvent(myLeave);
+                }
+                
+                myCursor.deactivate();
+            }
+            break;
+        }
     };
     
 };

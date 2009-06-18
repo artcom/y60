@@ -1,6 +1,12 @@
 
 if("sparkProximatrix" in this) {
-    spark.proximatrix = plug("ASSEventSource");
+    Logger.info("SPARK proximatrix support enabled");
+
+    use("ASSManager.js");
+    
+    spark.enableProximatrix = function(theStage) {
+        spark.proximatrix = new ASSManager(theStage);
+    };
 }
 
 spark.Cursor = spark.Class("Cursor");
@@ -20,47 +26,53 @@ spark.Cursor.Constructor = function(Protected, theId) {
         return _myActive;
     };
     
-    var _myFocused;
+    var _myFocused = null;
     
     Public.focused getter = function() {
         return _myFocused;
     };
     
-    var _myIntensity;
+    var _myIntensity = 0.0;
     
     Public.intensity getter = function() {
         return _myIntensity;
     };
     
-    var _myStageX;
+    var _myStageX = 0.0;
     
     Public.stageX getter = function() {
         return _myStageX;
     };
     
-    var _myStageY;
+    var _myStageY = 0.0;
     
     Public.stageY getter = function() {
         return _myStageY;
     };
     
-    Public.add = function(theProperties, theFocused) {
+    Public.update = function(theProperties, theFocused) {
+        _myFocused = theFocused;
+        updateProperties(theProperties);
+    };
+    
+    Public.activate = function() {
         _myActive = true;
     };
 
-    Public.move = function(theProperties, theFocused) {
+    Public.deactivate = function() {
+        _myActive = false;
     };
     
-    Public.remove = function() {
-        _myActive = false;
+    function updateProperties(theProperties) {
+        _myStageX = theProperties.position3D.x;
+        _myStageY = theProperties.position3D.y;
+        _myIntensity = theProperties.intensity;
     };
     
 };
 
 spark.CursorEvent = spark.Class("CursorEvent");
 
-spark.CursorEvent.ADD    = "cursor-add";
-spark.CursorEvent.REMOVE = "cursor-remove";
 spark.CursorEvent.MOVE   = "cursor-move";
 spark.CursorEvent.ENTER  = "cursor-enter";
 spark.CursorEvent.LEAVE  = "cursor-leave";
@@ -70,7 +82,7 @@ spark.CursorEvent.Constructor = function(Protected, theType, theCursor) {
     
     this.Inherit(spark.Event, theType);
     
-    var _myCursor = theProperties.cursor;
+    var _myCursor = theCursor;
     
     Public.cursor getter = function() {
         return _myCursor;
@@ -82,5 +94,9 @@ spark.CursorEvent.Constructor = function(Protected, theType, theCursor) {
     
     Public.stageY getter = function() {
         return _myCursor.stageY;
+    };
+    
+    Public.intensity getter = function() {
+        return _myCursor.intensity;
     };
 };
