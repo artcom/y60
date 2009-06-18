@@ -111,7 +111,7 @@ spark.Movie.Constructor = function(Protected) {
 
         // XXX: hmmm ...
         if (/.*\.mp4/.exec(theFilename)) {
-            _myMovie.decoderhint = "y60FFMpegDecoder2";
+            _myMovie.decoderhint = "FFMpegDecoder2";
         }
 
         window.scene.loadMovieFrame(_myMovie);
