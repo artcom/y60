@@ -55,6 +55,8 @@ spark.Movie.Constructor = function(Protected) {
     Public.playmode getter = function() { return _myMovie.playmode;};
 
     Public.movieNode getter = function()  { return _myMovie;};
+    
+    Public.hasaudio getter = function() { return _myMovie.has_audio;};
 
     Public.loopcount getter = function() {
         return _myMovie.loopcount;
