@@ -276,8 +276,6 @@ spark.Window.Constructor = function(Protected) {
                 myPick = Public;
             }
             
-            Logger.debug("Cursor " + myId + " moves to " + theEvent.position3D + " over " + myPick);
-            
             myCursor.update(theEvent, myPick);
             
             if(myPick != myFocused) {
@@ -292,6 +290,13 @@ spark.Window.Constructor = function(Protected) {
                 var myEnter = new spark.CursorEvent(spark.CursorEvent.ENTER, myCursor);
                 myPick.dispatchEvent(myEnter);
             }
+            
+            if(theEvent.type == "move") {
+                Logger.debug("Cursor " + myId + " moves to " + theEvent.position3D + " over " + myPick);
+                var myMove = new spark.CursorEvent(spark.CursorEvent.MOVE, myCursor);
+                myPick.dispatchEvent(myMove);
+            }
+            
             break;
             
         case "remove":
