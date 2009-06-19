@@ -40,7 +40,7 @@ spark.Window.Constructor = function(Protected) {
 
         Public.setMover(null);
         
-        window.showMouseCursor = Protected.getBoolean("mouseCursor", false);        
+        window.showMouseCursor = Protected.getBoolean("mouseCursor", true);
         window.swapInterval = Protected.getNumber("swapInterval", 1);
         
         spark.setupCameraOrtho(window.scene.dom.find(".//camera"), window.width, window.height);
@@ -48,6 +48,19 @@ spark.Window.Constructor = function(Protected) {
         Base.realize(window.scene.world);
     };
     
+    // XXX: Override size, width and height properties inherited via Stage->Widget
+    // They do return a boundingbox size which, from class Windows standpoint, is just
+    // crap.
+    Public.size getter = function() {
+        return new Vector2i(window.width, window.height);
+    }
+    Public.width getter = function() {
+        return window.width;
+    }
+    Public.height getter = function() {
+        return window.height;
+    }
+
     const PICK_RADIUS = 1;
     
     Public.pickWidget = function(theX, theY) {
