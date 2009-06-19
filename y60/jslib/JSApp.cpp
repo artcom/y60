@@ -357,10 +357,10 @@ FileLine(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 JS_STATIC_DLL_CALLBACK(JSBool)
 DumpStack(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Dumps the stack to stderr.");
+    DOC_BEGIN("Dumps the stack to cerr.");
     DOC_END;
     try {
-        dumpJSStack(cx, gOutFile);
+        dumpJSStack(cx);
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }

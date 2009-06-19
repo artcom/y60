@@ -278,14 +278,12 @@ void ensureParamCount(uintN argc, int theMinCount, int theMaxCount) {
 };
 
 void 
-dumpJSStack(JSContext *cx, FILE * theTarget) {
+dumpJSStack(JSContext *cx) {
     JSStackFrame* fp;
     JSStackFrame* iter = 0;
-    FILE * myOutFile = theTarget;
     
     int num = 0;
     while(0 != (fp = JS_FrameIterator(cx, &iter))) {
-        fprintf(myOutFile, "Stackframe %d:", num);
         if(!JS_IsNativeFrame(cx, fp)) {
             JSScript* script = JS_GetFrameScript(cx, fp);
             jsbytecode* pc = JS_GetFramePC(cx, fp);
@@ -298,10 +296,10 @@ dumpJSStack(JSContext *cx, FILE * theTarget) {
                 if(fun) {
                     funname = JS_GetFunctionName(fun);
                 }
-                fprintf(myOutFile, "  lineno:%5d filename: '%s' function: %s\n", lineno, filename ? filename : "-", funname ? funname : "-");
+                std::cerr<<"Stackframe "<<num<<":"<<"  lineno: "<<lineno<<" filename: "<<(filename ? filename : "-")<<" function: "<<(funname ? funname : "-")<<endl;
             }
         } else {
-            fprintf(myOutFile, "native\n");
+            std::cerr<<"Stackframe "<<num<<":"<<"native"<<endl;
         }
         ++num;
     }    

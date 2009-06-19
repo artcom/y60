@@ -228,7 +228,7 @@ JSA_GetClass(JSContext *cx, JSObject *obj) {
 
 Y60_JSBASE_DECL void ensureParamCount(uintN argc, int theMinCount, int theMaxCount = 0);
 
-Y60_JSBASE_DECL void dumpJSStack(JSContext *cx, FILE * theTarget = stderr);
+Y60_JSBASE_DECL void dumpJSStack(JSContext *cx);
 Y60_JSBASE_DECL JSStackFrame * getStackFrame(int i, JSContext *cx);
 Y60_JSBASE_DECL bool getFileLine(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, const char * & filename, int & lineno);
 
