@@ -69,6 +69,8 @@ namespace asl {
                         
             std::ofstream    _myOutputStreamOut;
             std::streambuf * _myOutFile;
+            std::streambuf * _myOriginalCoutBuffer;
+            std::streambuf * _myOriginalCerrBuffer;
             long             _myMaximumFileSize;
             std::string      _myOutputFilename;
 

@@ -103,21 +103,19 @@ namespace asl {
         return myTimeString.str();
     }
     
-    StdOutputRedirector::StdOutputRedirector() : _myOutFile(0), _myMaximumFileSize(0), 
-                                                 _myOutputFilename(""), _myStartTime(-1),
+    StdOutputRedirector::StdOutputRedirector() : _myOutFile(0), _myOriginalCoutBuffer(0), _myOriginalCerrBuffer(0),
+                                                 _myMaximumFileSize(0), _myOutputFilename(""), _myStartTime(-1),
                                                  _myOldArchiveFilename(""), _myRemoveOldArchiveFlag(false),
                                                  _myLogInOneFileFlag(false), _myFileSizeCheckFrequInSec(10)
     {}
 
     StdOutputRedirector::~StdOutputRedirector()  {
-        if (_myOutFile) {
-            _myOutputStreamOut.close();            
-        }
+        std::cout.rdbuf(_myOriginalCoutBuffer);
+        std::cerr.rdbuf(_myOriginalCerrBuffer);
     }
     
     void 
     StdOutputRedirector::init(const Arguments & theArguments) {
-        
         if (theArguments.haveOption("--std-logfile")) {
             const char * myEnv = ::getenv(LOG_WRAPAROUND_FILESIZE);       
             if (myEnv) {
@@ -145,7 +143,11 @@ namespace asl {
                                      _myOutputFilename);
             if (!_myLogInOneFileFlag) {
                 _myOutputFilename = myFilenameWithTimestamp;
-            }                                      
+            }     
+            // for syncing c like stderr & c++ cerr
+            // default is true, not syncing is supposted to be faster, so maybe we should disable it
+            //ios_base::sync_with_stdio(false);
+            
             redirect();
             
             // write a timestamp
@@ -164,8 +166,8 @@ namespace asl {
     void
     StdOutputRedirector::removeoldArchives() {
         vector<std::string> myFiles = getDirectoryEntries(getDirectoryPart(_myOutputFilename));
-        // serch the newest
-        int myNewesindex = -1;
+        // search the newest
+        int myNewestIndex = -1;
         time_t myHighestTimeStamp = 0;
         vector<int> myFilesToDelete;
         for (vector<std::string>::size_type myFileIndex = 0; myFileIndex != myFiles.size(); myFileIndex++) {
@@ -176,16 +178,16 @@ namespace asl {
                 time_t myTimeStamp = getLastModified(myFilename);
                 if (myTimeStamp > myHighestTimeStamp) {
                     myHighestTimeStamp = myTimeStamp;
-                    myNewesindex = myFileIndex;
+                    myNewestIndex = myFileIndex;
                 }
                 myFilesToDelete.push_back(myFileIndex);
             }
         }
         for (vector<std::string>::size_type myFileIndex = 0; myFileIndex != myFilesToDelete.size(); myFileIndex++) {
-            if (myFilesToDelete[myFileIndex] != myNewesindex ) {
+            if (myFilesToDelete[myFileIndex] != myNewestIndex ) {
                 deleteFile(getDirectoryPart(_myOutputFilename) + myFiles[myFilesToDelete[myFileIndex]]);                        
             } else {
-                _myOldArchiveFilename = myFiles[myNewesindex];
+                _myOldArchiveFilename = myFiles[myNewestIndex];
             }
         }
     }
@@ -198,8 +200,8 @@ namespace asl {
             _myOutputStreamOut.open(_myOutputFilename.c_str(), ofstream::trunc | ofstream::out);                    
         }
         _myOutFile = _myOutputStreamOut.rdbuf();                    
-        std::cout.rdbuf(_myOutFile);
-        std::cerr.rdbuf(_myOutFile);
+        _myOriginalCoutBuffer = std::cout.rdbuf(_myOutFile);
+        _myOriginalCerrBuffer = std::cerr.rdbuf(_myOutFile);
     }
     
     void
@@ -215,7 +217,8 @@ namespace asl {
                     _myOutputStreamOut.close();
                     // remove old archive
                     if (_myLogInOneFileFlag && _myRemoveOldArchiveFlag && 
-                        _myOldArchiveFilename != "" &&  fileExists(_myOldArchiveFilename)) {
+                        _myOldArchiveFilename != "" &&  fileExists(_myOldArchiveFilename))
+                    {
                         deleteFile(_myOldArchiveFilename);                        
                     }
                     // rename current log to archive version
