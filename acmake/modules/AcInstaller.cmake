@@ -297,6 +297,14 @@ macro(_ac_declare_installer NAME)
         set(CPACK_PACKAGE_VERSION_PATCH "${INSTALLER_VERSION_PATCH}")
 
         if(WIN32)
+            set(CPACK_GENERATOR NSIS ZIP) 
+        endif(WIN32)
+
+        if(LINUX)
+            set(CPACK_GENERATOR DEB RPM TGZ TBZ2)
+        endif(LINUX)
+
+        if(WIN32)
             _ac_init_installer_shortcuts()
         
             # XXX: configurable?
