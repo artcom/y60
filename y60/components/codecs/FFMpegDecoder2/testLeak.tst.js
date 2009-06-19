@@ -73,7 +73,7 @@ const MOVIE_2 = "../../../video/testmovies/1.4.mpg"
 var myTestName = "FFMpegDecoder2 Leaktest";
 var myDecoderPlug = "FFMpegDecoder2";
 var myVideoCount = 500;
-var myAllowedMemoryDiff = 10000;
+var myAllowedMemoryDiff = 11000;
 
 
 
