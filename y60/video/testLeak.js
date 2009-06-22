@@ -76,10 +76,10 @@ const END_FRAMES   = 4;
 var window     = new RenderWindow();
 window.fixedFrameTime = 0.04;
 
-function MovieLeakUnitTest(theName, theFiles, theDecoderHint, theVideoCount, theAllowedMemoryDifference) {
-    this.Constructor(this, theName, theFiles, theDecoderHint, theVideoCount, theAllowedMemoryDifference);
+function MovieLeakUnitTest(theName, theFiles, theDecoderHint, theVideoCount, theAllowedMemoryDifferenceInBytes) {
+    this.Constructor(this, theName, theFiles, theDecoderHint, theVideoCount, theAllowedMemoryDifferenceInBytes);
 };
-MovieLeakUnitTest.prototype.Constructor = function(obj, theName, theFiles, theDecoderHint, theVideoCount, theAllowedMemoryDifference) {
+MovieLeakUnitTest.prototype.Constructor = function(obj, theName, theFiles, theDecoderHint, theVideoCount, theAllowedMemoryDifferenceInBytes) {
     var _myToggle = true;
     var _myMovie   = null;
     var _myFrameCount = 0;
@@ -109,7 +109,7 @@ MovieLeakUnitTest.prototype.Constructor = function(obj, theName, theFiles, theDe
                 //window.scene.save("empty.xml", false);
                 var myUsedMemory = myMem;
                 obj.myMemoryDiff =  myUsedMemory - _myStartMemory;
-                obj.AllowedMemoryUsage = theAllowedMemoryDifference;
+                obj.AllowedMemoryUsage = theAllowedMemoryDifferenceInBytes/1024;
                 obj.myTrend = _myTrend;
                 obj.myMaxFrame = _myMaxFrame;
                 obj.myFrameCount = _myFrameCount;
@@ -117,14 +117,14 @@ MovieLeakUnitTest.prototype.Constructor = function(obj, theName, theFiles, theDe
                 print("-------------------------------------");
                 print("Decoder leak test: " + theName);
                 print("-------------------------------------");
-                print("Memory at frame " + START_FRAMES + " construction time : " + _myStartMemory);
-                print("Memory at app end                       : " + myUsedMemory);
-                print("Difference                              : " + obj.myMemoryDiff);
-                print("Max Memory Usage                        : " + _myMaxMemory);
+                print("Memory at frame " + START_FRAMES + " construction time : " + asMemoryString(_myStartMemory));
+                print("Memory at app end                       : " + asMemoryString(myUsedMemory));
+                print("Difference                              : " + asMemoryString(obj.myMemoryDiff));
+                print("Max Memory Usage                        : " + asMemoryString(_myMaxMemory));
                 print("Max Memory Usage in frame               : " + _myMaxFrame);
                 print("No new maximum for last n frames, n =   : " + (obj.myFrameCount - obj.myMaxFrame));
                 print("Avrg. Difference per Movie              : " + _myTrend.toFixed(0));
-                print("allowed difference per Movie            : " + obj.AllowedMemoryUsage);
+                print("allowed difference per Movie            : " + asMemoryString(obj.AllowedMemoryUsage));
                 ENSURE('obj.myTrend < obj.AllowedMemoryUsage || obj.myFrameCount - obj.myMaxFrame > 50');                
 
                 //window.scene.save("leaktest.x60");
@@ -146,10 +146,10 @@ MovieLeakUnitTest.prototype.Constructor = function(obj, theName, theFiles, theDe
                 _myMinFrame = _myFrameCount;
             }
                 
-            window.renderText([500,150], "Delta memory usage: " + (myMem-_myLastMemory), "Screen15");
-            window.renderText([500,175], "Total memory usage: " + myMem, "Screen15");
+            window.renderText([500,150], "Delta memory usage: " + asMemoryString(myMem-_myLastMemory), "Screen15");
+            window.renderText([500,175], "Total memory usage: " + asMemoryString(myMem), "Screen15");
             window.renderText([500,200], "Trend:              " + _myTrend.toFixed(0), "Screen15");
-            window.renderText([500,225], "Max. memory usage:  " + _myMaxMemory, "Screen15");
+            window.renderText([500,225], "Max. memory usage:  " + asMemoryString(_myMaxMemory), "Screen15");
             window.renderText([500,250], "Max. in Frame       " + _myMaxFrame, "Screen15");
             _myFrameCount++; 
             _myLastMemory = myMem;     

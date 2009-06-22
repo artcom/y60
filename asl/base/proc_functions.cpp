@@ -234,7 +234,7 @@ namespace asl {
             GlobalMemoryStatusEx (&myMemStat);
             myTotalMemory = unsigned(myMemStat.ullTotalPhys / 1024);
 #elif LINUX
-            myTotalMemory = getMemInfo(MEM_TOTAL);
+            myTotalMemory = getMemInfo(MEM_TOTAL) / 1024;
 #elif OSX
             unsigned long long myUsedBytes;
             unsigned long long myFreeBytes;
@@ -254,7 +254,7 @@ namespace asl {
         // Determining used/free memory under Linux is a bit tricky since
         // the kernel usually tries to take all free memory for caching.
         // Free memory is a waste of resources anyway...
-        myUsedMemory = getMemInfo(MEM_USED);
+        myUsedMemory = getMemInfo(MEM_USED) / 1024;
 #elif OSX
         unsigned long long myUsedBytes;
         unsigned long long myFreeBytes;
@@ -308,7 +308,7 @@ namespace asl {
             CloseHandle(hProcess);
         }
 #elif LINUX
-        myMemUsage = getProcMemInfo(thePid);
+        myMemUsage = getProcMemInfo(thePid) / 1024;
 #elif OSX
         kern_return_t myStatus;
 

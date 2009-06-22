@@ -62,7 +62,7 @@ use("UnitTest.js");
 
 plug("ProcessFunctions");
 
-const ALLOWED_MEMORY_USAGE = 1000; // per frame
+const ALLOWED_MEMORY_USAGE_IN_BYTES = 1000; // per frame
 
 const START_FRAMES = 100;
 const END_FRAMES   = 10;
@@ -110,14 +110,14 @@ ImageLeakUnitTest.prototype.Constructor = function(obj, theName) {
 
                 // must be attached to obj for ENSURE to work
                 obj.myMemoryDifff =  (myUsedMemory - _myStartMemory)/IMAGE_COUNT;
-                obj.myAllowedMemoryUsage = ALLOWED_MEMORY_USAGE;
+                obj.myAllowedMemoryUsage = ALLOWED_MEMORY_USAGE_IN_BYTES/1024;
 
                 print("Number of textures                      : " + window.scene.textures.childNodesLength());
                 print("Number of images                        : " + window.scene.images.childNodesLength());
-                print("Memory at first image construction time : " + _myStartMemory);
-                print("Memory at app end                       : " + myUsedMemory);
-                print("Difference per frame                    : " + obj.myMemoryDifff);
-                print("allowed difference                      : " + obj.myAllowedMemoryUsage);
+                print("Memory at first image construction time : " + asMemoryString(_myStartMemory));
+                print("Memory at app end                       : " + asMemoryString(myUsedMemory));
+                print("Difference per frame                    : " + asMemoryString(obj.myMemoryDifff));
+                print("allowed difference                      : " + asMemoryString(obj.myAllowedMemoryUsage));
                 ENSURE("obj.myMemoryDifff < obj.myAllowedMemoryUsage");
                 ENSURE("window.scene.textures.childNodesLength() == 0");
                 ENSURE("window.scene.images.childNodesLength() == 0");

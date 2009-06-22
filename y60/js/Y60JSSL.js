@@ -665,7 +665,17 @@ function countNodes(theNode) {
     return myCount;
 }
 
-function asMemoryString(theBytes) {
+function asMemoryString(theKBytes) {
+    if (theKBytes < 1024) {
+        return theKBytes.toFixed(2) + "K";
+    } else if (theKBytes < 1048576) {
+        return (theKBytes / 1024).toFixed(2) + "M";
+    } else if (theKBytes < 1073741824) {
+        return (theKBytes / 1048576).toFixed(2) + "G";
+    }
+}
+
+function byteAsMemoryString(theBytes) {
     if (theBytes < 1024) {
         return theBytes;
     } else if (theBytes < 1048576) {
@@ -676,6 +686,7 @@ function asMemoryString(theBytes) {
         return (theBytes / (1048576 * 1024)).toFixed(2) + "G";
     }
 }
+
 
 // Removes space, newline and tab characters from front and back of a string
 function trim(theString) {

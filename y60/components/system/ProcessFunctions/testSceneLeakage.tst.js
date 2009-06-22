@@ -56,7 +56,6 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-includePath("../..");  //TODO: remove this after deprecating  ant-build
 plug("ProcessFunctions");
 use("Y60JSSL.js");
 use("ImageManager.js");
@@ -90,9 +89,6 @@ function removeObjects() {
     }
 }
 
-var myShaderLibrary = "../../shader/shaderlibrary.xml";
-GLResourceManager.prepareShaderLibrary(myShaderLibrary);
-
 var window = new RenderWindow();
 
 window.onKey = function(theKey) {
@@ -110,7 +106,7 @@ window.onFrame = function(theTime) {
     }
 
     var currentUsage = getProcessMemoryUsage();
-    Logger.info("intial = " + ourInitialMemory +" kb, current = " + currentUsage + ", delta = " + (currentUsage - ourInitialMemory) + ", ="+(currentUsage - ourInitialMemory)/1024 + " kb");
+    Logger.info("intial = " + ourInitialMemory +" kb, current = " + currentUsage + ", delta = " + (currentUsage - ourInitialMemory) + ", ="+(currentUsage - ourInitialMemory)/1024 + " MB");
     if (ourMemoryStater < -50 || ourExitFlag) {
         var myMemory = getProcessMemoryUsage();
         removeObjects();
@@ -121,7 +117,7 @@ window.onFrame = function(theTime) {
             Logger.error("Nodecount increased by: " + (myNodeCount - ourInitialNodeCount));
             exit(1);
         }
-        var myMemoryIncrease = (myMemory - ourInitialMemory) / 1024;
+        var myMemoryIncrease = (myMemory - ourInitialMemory);
         if (myMemoryIncrease > ALLOWED_MEMORY_INCREASE) {
             Logger.error("Memory usage increased by: " + myMemoryIncrease + " KB");
             exit(1);
