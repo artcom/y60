@@ -137,7 +137,7 @@ function MovieTestBase(Public, theArguments, theDecoderName) {
             _myMovie = 0;
         }
         _myMovie = new MovieOverlay(window.scene, 
-                "../../video/testmovies/"+theMovieName,
+                "../../../video/testmovies/"+theMovieName,
                 new Vector2f(80, 60), null, false, null, _myDecoderName);
         
         _myMovie.playspeed = 1;

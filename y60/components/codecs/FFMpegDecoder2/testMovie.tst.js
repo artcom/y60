@@ -56,7 +56,7 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-use("../../video/MovieTestBase.js");
+use("../../../video/MovieTestBase.js");
 
 const ENDLESS_TEST = false;
 const RANDOM_SEEK_ITERATIONS = 50;
@@ -67,12 +67,6 @@ function FFMpegTest(theArguments) {
 
     MovieTestBase(Public, theArguments, "FFMpegDecoder2");
 
-/*
-    var _myTestMovies = [
-        "mpeg2_160x120_25_1_audio.mpg",
-    ];
-*/
-    
     var _myTestMovies = [
         "huffyuv_160x120_25_1_audio.avi",
         "mjpeg_160x120_25_1_audio.avi",
@@ -91,11 +85,6 @@ function FFMpegTest(theArguments) {
         "xvid_160x120_25_1_noaudio.avi",
     ];
 
-/*
-    var _myTests = [
-        testSeek
-    ];
-*/    
     
     var _myTests = [
         testPlayToEnd,

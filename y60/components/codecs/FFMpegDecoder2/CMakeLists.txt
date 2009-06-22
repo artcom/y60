@@ -29,3 +29,5 @@ y60_add_component(
 )
 
 y60_add_jstest(Leak mod_ffmpeg2)
+y60_add_jstest(Movie mod_ffmpeg2)
+y60_add_jstest(Seek mod_ffmpeg2)
