@@ -111,7 +111,12 @@ function Class(theName) {
 function Inherit(theClass) {
     var myArguments = [this._protected_];
     myArguments = myArguments.concat(Array.prototype.slice.call(arguments, 1));
-    this._classes_[theClass._className_] = theClass;
+	// XXX this is compatibility goo for XIP
+	if("_className_" in theClass) {
+        this._classes_[theClass._className_] = theClass;
+	} else {
+	    Logger.warning("Warning. Inheriting oldschool class without _className_. Precedence lists will be incomplete.");
+	}
     theClass.Constructor.apply(this, myArguments);
 };
 
