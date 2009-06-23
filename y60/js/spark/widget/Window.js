@@ -265,6 +265,7 @@ spark.Window.Constructor = function(Protected) {
         
         switch(theEvent.type) {
         case "configure":
+            Logger.info("proximatrix got configured");
             break;
             
         case "add":
@@ -329,6 +330,8 @@ spark.Window.Constructor = function(Protected) {
                 }
                 
                 myCursor.deactivate();
+                
+                delete _myASSCursors[myId];
             }
             break;
         }
