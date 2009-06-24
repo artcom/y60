@@ -168,6 +168,8 @@ namespace y60 {
         double readFrame(double theTime, unsigned theFrame, RasterVector theTargetRaster);
 
         const char * getName() const { return "FFMpegDecoder1"; }
+        
+        const bool hasAudio() const { AC_WARNING << "hasAudio always returns false for FFMpegDecoder1"; return false; }
 
     private:
         void setMovieParameters(int myIndex);

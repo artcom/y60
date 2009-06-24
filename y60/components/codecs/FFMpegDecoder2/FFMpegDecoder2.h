@@ -168,7 +168,7 @@ namespace y60 {
         void stopMovie(bool theStopAudioFlag = true);
         void closeMovie();
 
-        const char * getName() const { return "y60FFMpegDecoder2"; }
+        const char * getName() const { return "FFMpegDecoder2"; }
         
         void shutdown();
 

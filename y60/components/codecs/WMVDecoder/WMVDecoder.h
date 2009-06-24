@@ -186,7 +186,7 @@ namespace y60 {
         void pauseMovie(bool thePauseAudioFlag = true);
         void closeMovie();
 
-        const char * getName() const { return "y60WMVDecoder"; }
+        const char * getName() const { return "WMVDecoder"; }
     private:
         static const unsigned int MAX_TIMEOUT_FOR_EVENT = 60000;
 

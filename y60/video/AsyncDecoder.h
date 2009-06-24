@@ -94,7 +94,7 @@ namespace y60 {
              * @return true if the file currently decoded has audio
              * derived classes should set _myAudioSink according to media
              */
-            virtual bool hasAudio() const {
+            const bool hasAudio() const {
                 return _myAudioSink != 0;
             }
 

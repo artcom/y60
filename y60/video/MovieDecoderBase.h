@@ -184,7 +184,8 @@ namespace y60 {
              */
             virtual asl::Ptr<MovieDecoderBase> instance() const;
             
-            virtual const char * getName() const { return "";}
+            virtual const char * getName() const = 0;
+            virtual const bool hasAudio() const = 0;
 
         protected:
             const Movie * getMovie() const;

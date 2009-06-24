@@ -466,14 +466,8 @@ namespace y60 {
     }
 
     bool Movie::hasAudio(bool & theHasAudio) const {
-        AsyncDecoder* myDecoder = dynamic_cast<AsyncDecoder*>(const_cast<MovieDecoderBase*>(_myDecoder.get()));
-        if(myDecoder) {
-            theHasAudio = myDecoder->hasAudio();
-        } else {
-            theHasAudio = true;
-            AC_ERROR << "Movie::hasAudio does not work for non-async-decoders for no particular reason (factoring fail)";
-        }
-        return true;
+    	MovieDecoderBase* myDecoder = const_cast<MovieDecoderBase*>(_myDecoder.get());
+        return myDecoder->hasAudio();
     }
 
 

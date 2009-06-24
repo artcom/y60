@@ -114,6 +114,11 @@ namespace y60 {
 
             void stopMovie(bool theStopAudioFlag = true);
             void startMovie(double theStartTime = 0.0, bool theStartAudioFlag = true);
+            
+            const char* getName() const { return "M60Decoder"; }
+            
+            const bool hasAudio() const { return false; }
+            
         private:
             void decodeFrame(unsigned theFrameNumber, dom::ResizeableRasterPtr theTargetRaster);
             MovieEncoding                   _myEncoding;

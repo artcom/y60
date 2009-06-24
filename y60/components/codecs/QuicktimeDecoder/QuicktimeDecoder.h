@@ -132,7 +132,10 @@ namespace y60 {
              */
             double readFrame(double theTime, unsigned theFrame, RasterVector theTargetRaster);
     
-            const char * getName() const { return "y60QuicktimeDecoder"; }
+            const char * getName() const { return "QuicktimeDecoder"; }
+            
+            const bool hasAudio() const { AC_WARNING << "hasAudio always returns false for QuicktimeDecoder"; return false; }
+            
         private:
             void closeMovie();
             void decodeFrame(unsigned theFrameNumber, dom::ResizeableRasterPtr theTargetRaster);
