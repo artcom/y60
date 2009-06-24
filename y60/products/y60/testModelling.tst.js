@@ -57,9 +57,7 @@
 
 */
 
-includePath("../..");  //TODO: remove this after deprecating  ant-build
 use("UnitTest.js");
-//use("ImageManager.js");
 
 function ModellingUnitTest() {
     this.Constructor(this, "ModellingUnitTest");
@@ -92,17 +90,17 @@ ModellingUnitTest.prototype.Constructor = function(obj, theName) {
                                           new Vector3f([-1,-1,0]),
                                           new Vector3f([1,1,0]));
         myQuad.name = "theQuad";
-        ENSURE(getDescendantByName(myScene.dom, "theQuad", true) != undefined);
+        ENSURE(myScene.dom.find(".//*[@name='theQuad']") != undefined);
    
      
         var myFileImage = Modelling.createImage(myScene,
                                                 myTestFile);
         myFileImage.name = "theImage";
-        ENSURE(getDescendantByName(myScene.dom, "theImage", true) != undefined);
+        ENSURE(myScene.dom.find(".//*[@name='theImage']") != undefined);
 
         var myTestImage = Modelling.createImage(myScene, 800, 520, "RGB");
         myTestImage.name = "theTestImage";
-        ENSURE(getDescendantByName(myScene.dom, "theTestImage", true) != undefined);
+        ENSURE(myScene.dom.find(".//*[@name='theTestImage']") != undefined);
 
 
         var myImageMaterial = Modelling.createUnlitTexturedMaterial(myScene,
@@ -112,7 +110,7 @@ ModellingUnitTest.prototype.Constructor = function(obj, theName) {
                                                                     1,
                                                                     myRedColor);
 
-        ENSURE(getDescendantByName(myScene.dom, "theImageMaterial", true) != undefined);
+        ENSURE(myScene.dom.find(".//*[@name='theImageMaterial']") != undefined);
         ENSURE(almostEqual(myImageMaterial.properties.surfacecolor,myRedColor));
 
 
@@ -124,7 +122,7 @@ ModellingUnitTest.prototype.Constructor = function(obj, theName) {
                                                                        myGreenColor,
                                                                        1);
         ENSURE(almostEqual(myTexturedMaterial.properties.surfacecolor,myGreenColor));
-        ENSURE(getDescendantByName(myScene.dom, "theTexturedMaterial", true) != undefined);
+        ENSURE(myScene.dom.find(".//*[@name='theTexturedMaterial']") != undefined);
 
 
         var myLambertMaterial = Modelling.createLambertMaterial(myScene,
@@ -133,24 +131,23 @@ ModellingUnitTest.prototype.Constructor = function(obj, theName) {
         myLambertMaterial.name = "theLambertMaterial";
         ENSURE(almostEqual(myLambertMaterial.properties.diffuse,myBlueColor));
         ENSURE(almostEqual(myLambertMaterial.properties.ambient,myRedColor));
-        ENSURE(getDescendantByName(myScene.dom, "theLambertMaterial", true) != undefined);
+        ENSURE(myScene.dom.find(".//*[@name='theLambertMaterial']") != undefined);
       
   
         var myBody = Modelling.createBody(myScene.world, myQuad);
         myBody.name = "theBody";
-        ENSURE(getDescendantByName(myScene.dom, "theBody", true) != undefined);
+        ENSURE(myScene.dom.find(".//*[@name='theBody']") != undefined);
 
 
         var myCanvas = Modelling.createCanvas(myScene, "theCanvas");
-        ENSURE(getDescendantByName(myScene.dom, "theCanvas", true) != undefined);
-
+        ENSURE(myScene.dom.find(".//*[@name='theCanvas']") != undefined);
 
         var myCrosshair = Modelling.createCrosshair(myScene, 
                                                     myLambertMaterial.id, 
                                                     5,
                                                     10,
                                                     "theCrosshair");
-        ENSURE(getDescendantByName(myScene.dom, "theCrosshair", true) != undefined);
+        ENSURE(myScene.dom.find(".//*[@name='theCrosshair']") != undefined);
 
         //generate same strip positions for all three shapes
         var myNumStripElements = 6;
@@ -166,21 +163,21 @@ ModellingUnitTest.prototype.Constructor = function(obj, theName) {
                                                     myColorMaterial.id,
                                                     myPositions);
         myLineStrip.name = "theLineStrip";
-        ENSURE(getDescendantByName(myScene.dom, "theLineStrip", true) != undefined);
+        ENSURE(myScene.dom.find(".//*[@name='theLineStrip']") != undefined);
         
 
         var myQuadStrip = Modelling.createQuadStrip(myScene,
                                                     myColorMaterial.id,
                                                     myPositions);
         myQuadStrip.name = "theQuadStrip";
-        ENSURE(getDescendantByName(myScene.dom, "theQuadStrip", true) != undefined);
+        ENSURE(myScene.dom.find(".//*[@name='theQuadStrip']") != undefined);
 
 
         var myTriangleStrip = Modelling.createTriangleStrip(myScene,
                                                             myColorMaterial.id,
                                                             myPositions);
         myTriangleStrip.name = "theTriangleStrip";
-        ENSURE(getDescendantByName(myScene.dom, "theTriangleStrip", true) != undefined);
+        ENSURE(myScene.dom.find(".//*[@name='theTriangleStrip']") != undefined);
         
 //         {"createTriangleStack",             CreateQuadStack,         5},
 //         {"createVoxelProxyGeometry",    CreateVoxelProxyGeometry,    7},

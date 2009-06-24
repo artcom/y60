@@ -59,7 +59,6 @@
 // TODO:
 // - Test parent handling
 
-includePath("../..");  //TODO: remove this after deprecating  ant-build
 use("UnitTest.js");
 use("Overlay.js");
 use("Y60JSSL.js");
@@ -87,7 +86,7 @@ OverlayUnitTest.prototype.Constructor = function(obj, theName) {
     }
 
     obj.getLastOverlay = function() {
-        return getDescendantByTagName(obj.myScene.dom, "overlays", true).lastChild;
+        return obj.myScene.dom.find(".//overlays").lastChild;
     }
 
     function testCommonProperties(thePosition, theSize, theColor) {
@@ -108,7 +107,7 @@ OverlayUnitTest.prototype.Constructor = function(obj, theName) {
 
         // Test color convenience property
         obj.myOverlay.color = new Vector4f(4,3,2,1);
-        obj.myColor = getDescendantByName(obj.myOverlay.material, "surfacecolor", true).firstChild.nodeValue;
+        obj.myColor = obj.myOverlay.material.find(".//*[@name='surfacecolor']").firstChild.nodeValue;
         ENSURE('almostEqual(obj.myOverlay.color, obj.myColor)');
 
         // Test move to top
@@ -221,7 +220,7 @@ OverlayUnitTest.prototype.Constructor = function(obj, theName) {
         window = new RenderWindow();
 
         obj.myScene = window.scene;
-        var myViewport = getDescendantByTagName(obj.myScene.dom, "viewport", true);
+        var myViewport = obj.myScene.dom.find(".//viewport");
         obj.myDummyOverlay = new ImageOverlay(obj.myScene, "testfiles/black.rgb");
         obj.myDummyImageId = obj.myScene.images.lastChild.id;
         obj.myOverlay = new Overlay(obj.myScene, new Vector4f(1,2,3,1), [10, 20], [100,200]);
@@ -262,39 +261,13 @@ OverlayUnitTest.prototype.Constructor = function(obj, theName) {
         ///////////////////////////////////////////////////////////////////////////////////////
 
         obj.myMaterialNode = obj.myScene.dom.getElementById(obj.getAttribute(obj.myOverlay, "material"));
-        obj.myTextureUnitNode = getDescendantByTagName(obj.myMaterialNode, "textureunit", true);
+        obj.myTextureUnitNode = obj.myMaterialNode.find(".//textureunit");
         obj.myTextureNode = obj.myMaterialNode.getElementById(obj.myTextureUnitNode.texture);
 
         ENSURE('obj.myTextureNode.image == obj.myOverlay.texture.image');
         ENSURE('obj.myTextureNode.image == obj.myOverlay.image.id');
 
-/*        ENSURE('String(obj.myMaterialNode) == String(obj.myOverlay.material)');
-        ENSURE('String(obj.myTextureNode) == String(obj.myOverlay.texture)');
-        obj.myOverlay.texture = obj.myDummyOverlay.texture;
-        ENSURE('String(obj.myMaterialNode) == String(obj.myOverlay.material)');
-        obj.myTextureNode = getDescendantByTagName(obj.myMaterialNode, "texture", true);
-        ENSURE('String(obj.myTextureNode) == String(obj.myOverlay.texture)');
 
-        ENSURE('obj.myOverlay.texture.image == obj.myDummyImageId');
-        ENSURE('obj.myOverlay.image.id == obj.myDummyImageId');
-        ENSURE('obj.myTextureNode.image == obj.myDummyImageId');
-        obj.myOverlay.image = obj.myScene.dom.getElementById(obj.myImageId);
-        ENSURE('obj.myOverlay.texture.image == obj.myImageId');
-        ENSURE('obj.myOverlay.image.id == obj.myImageId');
-        ENSURE('obj.myTextureNode.image == obj.myImageId');
-
-        obj.myOverlay.image = obj.myDummyOverlay.image;
-        ENSURE('obj.myOverlay.texture.image == obj.myDummyImageId');
-        ENSURE('obj.myOverlay.image.id == obj.myDummyImageId');
-        ENSURE('obj.myTextureNode.image == obj.myDummyImageId');
-
-        obj.myOverlay = new MovieOverlay(obj.myScene, "../../testfiles/testmovie.m60", [40, 50], null, false);
-        Logger.info(obj.myOverlay.movie);
-        ENSURE('obj.myOverlay.movie.audio == false');
-        ENSURE('obj.myOverlay.movie.framecount == 30');
-        testCommonProperties([40,50], [480,16], [1,1,1,1]);
-        testRemoveFromScene();
-        */
     }
 }
 
