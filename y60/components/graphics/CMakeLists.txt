@@ -1,5 +1,8 @@
 
-add_subdirectory(Cairo)
+if(CAIRO_FOUND)
+    add_subdirectory(Cairo)
+endif(CAIRO_FOUND)
+
 add_subdirectory(EdgeBlender)
 add_subdirectory(GLBinding)
 add_subdirectory(GlurFilter)
