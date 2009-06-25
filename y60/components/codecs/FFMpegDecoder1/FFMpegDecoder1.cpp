@@ -259,9 +259,11 @@ namespace y60 {
                 case TEXTURE_IFMT_INTENSITY:
                     myRasterEncoding = GRAY;
                     break;
-                    
+                case TEXTURE_IFMT_RGB:
+                    myRasterEncoding = RGB;
+                    break;    
                 default:
-                	AC_FATAL << "Unsupported pixel format " << myTargetPixelFormat << " in FFMpegDecoder1";
+                	AC_FATAL << "Unsupported pixel format " << myMovie->get<TargetPixelFormatTag>() << " in FFMpegDecoder1";
                 	break;
             }
         }
