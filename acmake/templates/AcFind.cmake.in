@@ -29,14 +29,17 @@ if(@THIS_PROJECT_NAME@_IS_INTEGRATED)
 else(@THIS_PROJECT_NAME@_IS_INTEGRATED)
     # in imported mode, we have to template everything
 
+    # XXX: this is not strictly required.
+    #      it is here to allow our packages to use the Find files provided
+    #      by AcMake. Also, packages providing custom modules with utility
+    #      scripts (ASL, Y60) need this later anyway.
+    find_package(AcMake)
+
     # templated variables
     set(@THIS_PROJECT_NAME@_NAME           @THIS_PROJECT_NAME@)
     set(@THIS_PROJECT_NAME@_FOUND          YES)
     set(@THIS_PROJECT_NAME@_BUILD_TYPE     @THIS_PROJECT_BUILD_TYPE@)
     set(@THIS_PROJECT_NAME@_INSTALL_PREFIX @THIS_PROJECT_INSTALL_PREFIX@)
-    set(@THIS_PROJECT_NAME@_RUNTIME_DIR    @THIS_PROJECT_RUNTIME_DIR@)
-    set(@THIS_PROJECT_NAME@_LIBRARY_DIR    @THIS_PROJECT_LIBRARY_DIR@)
-    set(@THIS_PROJECT_NAME@_INCLUDE_DIR    @THIS_PROJECT_INCLUDE_DIR@)
     set(@THIS_PROJECT_NAME@_DEFINITIONS    @THIS_PROJECT_DEFINITIONS@)
     set(@THIS_PROJECT_NAME@_LIBRARIES      @THIS_PROJECT_LIBRARIES@)
     set(@THIS_PROJECT_NAME@_EXECUTABLES    @THIS_PROJECT_EXECUTABLES@)
@@ -49,6 +52,24 @@ else(@THIS_PROJECT_NAME@_IS_INTEGRATED)
     set(@THIS_PROJECT_NAME@_OPTIONAL_PACKAGES  @THIS_PROJECT_OPTIONAL_PACKAGES@)
     set(@THIS_PROJECT_NAME@_REQUIRED_PKGCONFIG @THIS_PROJECT_REQUIRED_PKGCONFIG@)
     set(@THIS_PROJECT_NAME@_OPTIONAL_PKGCONFIG @THIS_PROJECT_OPTIONAL_PKGCONFIG@)
+
+    # determine our current prefix
+    get_filename_component(@THIS_PROJECT_NAME@_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+    get_filename_component(@THIS_PROJECT_NAME@_PREFIX "${@THIS_PROJECT_NAME@_CMAKE_DIR}/../../.." ABSOLUTE)
+
+    set(@THIS_PROJECT_NAME@_RUNTIME_DIR "${@THIS_PROJECT_NAME@_PREFIX}/bin")
+    set(@THIS_PROJECT_NAME@_LIBRARY_DIR "${@THIS_PROJECT_NAME@_PREFIX}/lib")
+    set(@THIS_PROJECT_NAME@_INCLUDE_DIR "${@THIS_PROJECT_NAME@_PREFIX}/include")
+
+    # since imports can be used both from binary and install trees,
+    # we have to find out in which one we are currently lying
+    if(EXISTS "${@THIS_PROJECT_NAME@_CMAKE_DIR}/../../../CMakeFiles")
+        message("@THIS_PROJECT_NAME@ lies in build prefix ${@THIS_PROJECT_NAME@_PREFIX}")
+    else(EXISTS "${@THIS_PROJECT_NAME@_CMAKE_DIR}/../../../CMakeFiles")
+        # we are being used from an install tree
+        message("@THIS_PROJECT_NAME@ lies in install prefix ${@THIS_PROJECT_NAME@_PREFIX}")
+    endif(EXISTS "${@THIS_PROJECT_NAME@_CMAKE_DIR}/../../../CMakeFiles")
+
 endif(@THIS_PROJECT_NAME@_IS_INTEGRATED)
 
 # create a list of all linkable targets
@@ -60,6 +81,9 @@ set(@THIS_PROJECT_NAME@_PACKAGES
     ${@THIS_PROJECT_NAME@_REQUIRED_PACKAGES}
     ${@THIS_PROJECT_NAME@_OPTIONAL_PACKAGES}
 )
+
+# find out in which directory this file lies
+get_filename_component(@THIS_PROJECT_NAME@_MODULE_LOCATION ${CMAKE_CURRENT_LIST_FILE} PATH)
 
 # include custom scripts
 if(@THIS_PROJECT_NAME@_IS_INTEGRATED)
@@ -77,19 +101,21 @@ if(@THIS_PROJECT_NAME@_IS_INTEGRATED)
             message(FATAL_ERROR "Could not find custom script ${SCRIPT} in project @THIS_PROJECT_NAME@")
         endif(NOT _FOUND)
         set(_FOUND)
-    endforeach(SCRIPT)     
+    endforeach(SCRIPT)
 else(@THIS_PROJECT_NAME@_IS_INTEGRATED)
-    get_filename_component(@THIS_PROJECT_NAME@_MODULE_LOCATION ${CMAKE_CURRENT_LIST_FILE} PATH)
     foreach(SCRIPT ${@THIS_PROJECT_NAME@_CUSTOM_SCRIPTS})
         include(${@THIS_PROJECT_NAME@_MODULE_LOCATION}/${SCRIPT})
     endforeach(SCRIPT)
 endif(@THIS_PROJECT_NAME@_IS_INTEGRATED)
 
+# make our other cmake files loadable
+list(INSERT CMAKE_MODULE_PATH 0 ${@THIS_PROJECT_NAME@_MODULE_LOCATION})
+
 # find external dependencies
-include(Find@THIS_PROJECT_NAME@Dependencies)
+include(@THIS_PROJECT_NAME@Dependencies)
 
 # define targets
-include(Find@THIS_PROJECT_NAME@Targets)
+include(@THIS_PROJECT_NAME@Targets)
 
 # Compute definitions
 set(@THIS_PROJECT_NAME@_EXTRA_DEFINITIONS)
@@ -150,7 +176,7 @@ if(@THIS_PROJECT_NAME@_IS_IMPORTED)
         set_target_properties(
             ${EXECUTABLE}
             PROPERTIES
-                IMPORTED_LOCATION "${${EXECUTABLE}_LOCATION}"
+                IMPORTED_LOCATION "${@THIS_PROJECT_NAME@_PREFIX}/${${EXECUTABLE}_LOCATION}"
         )
     endforeach(EXECUTABLE ${@THIS_PROJECT_NAME@_EXECUTABLES})
 
@@ -160,8 +186,8 @@ if(@THIS_PROJECT_NAME@_IS_IMPORTED)
         set_target_properties(
             ${LIBRARY}
             PROPERTIES
-                IMPORTED_IMPLIB   "${${LIBRARY}_IMPLIB_LOCATION}"
-                IMPORTED_LOCATION "${${LIBRARY}_OBJECT_LOCATION}"
+                IMPORTED_IMPLIB   "${@THIS_PROJECT_NAME@_PREFIX}/${${LIBRARY}_IMPLIB_LOCATION}"
+                IMPORTED_LOCATION "${@THIS_PROJECT_NAME@_PREFIX}/${${LIBRARY}_OBJECT_LOCATION}"
                 IMPORTED_LINK_DEPENDENT_LIBRARIES "${${LIBRARY}_LIBRARIES}"
         )
     endforeach(LIBRARY @THIS_PROJECT_NAME@_LIBRARIES)

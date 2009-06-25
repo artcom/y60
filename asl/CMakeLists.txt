@@ -6,12 +6,11 @@ project(ASL)
 # Include cmake libraries
 include(AcMake)
 
-list(INSERT CMAKE_MODULE_PATH 0 ${ASL_SOURCE_DIR})
-
 set(ACMAKE_BUILDINFO_TEMPLATE
     ${CMAKE_CURRENT_SOURCE_DIR}/base/buildinfo.cpp.in)
 
-set( Boost_ADDITIONAL_VERSIONS 1.37 1.38)
+set(Boost_ADDITIONAL_VERSIONS 1.37 1.38)
+
 set(REQ_PACKAGES ZLIB GLIB2 CURL OpenEXR Boost)
 if(WIN32)
     list(APPEND REQ_PACKAGES PTHREADVC DirectX WINSOCK Winmm Psapi)
@@ -29,8 +28,6 @@ if(OSX)
     mark_as_advanced(CARBON)
     mark_as_advanced(AUDIO_UNIT)
 endif(OSX)
-
-include(ASLUtilities)
 
 ac_add_project(
     ASL

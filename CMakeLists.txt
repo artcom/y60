@@ -5,20 +5,7 @@ cmake_minimum_required(VERSION 2.6.2)
 
 project(PRO60)
 
-# make build-integrated acmake available
-list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_SOURCE_DIR}/acmake/modules)
-
-# make build-integrated packages available
-list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_SOURCE_DIR}/asl)
-list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_BINARY_DIR}/asl)
-list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_SOURCE_DIR}/y60)
-list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_BINARY_DIR}/y60)
-list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_BINARY_DIR}/netsrc/SDL_ttf2)
-list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_BINARY_DIR}/netsrc/paintlib)
-list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_BINARY_DIR}/netsrc/oscpack)
-list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_BINARY_DIR}/netsrc/fakeatl)
-list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_SOURCE_DIR}/netsrc/fakeatl) # XXX: [IA] this should not be needed
-list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_BINARY_DIR}/netsrc/spidermonkey) # XXX: tracemonkey?
+list(INSERT CMAKE_PREFIX_PATH 0 ${CMAKE_BINARY_DIR})
 
 # tell acmake that it is being used in integrated mode
 set(ACMAKE_INTEGRATED_BUILD YES)
@@ -27,11 +14,10 @@ set(ACMAKE_INTEGRATED_BUILD YES)
 set(ACMAKE_BUILDINFO_TEMPLATE
     ${CMAKE_CURRENT_SOURCE_DIR}/asl/base/buildinfo.cpp.in)
 
-
-
-# add and load acmake
+# add acmake to build
 add_subdirectory(acmake)
-include(AcMake)
+
+find_package(AcMake)
 
 # declare our packaging solution
 ac_begin_solution(

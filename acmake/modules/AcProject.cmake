@@ -60,7 +60,6 @@ set(_AC_PROJECT_VARIABLES
     REQUIRED_PKGCONFIG # bilist of all required pkg-config packages
     OPTIONAL_PKGCONFIG # bilist of all optional pkg-config packages
     CUSTOM_SCRIPTS   # custom scripts to be included in the find-package
-    CUSTOM_TEMPLATES # custom templates for use by the find-package
     VENDOR           # string describing the vendor
     CONTACT          # contact information (email address)
     DESCRIPTION      # short human-readable description
@@ -83,7 +82,6 @@ set(PROJECT_ARGUMENTS
     REQUIRED_PKGCONFIG
     OPTIONAL_PKGCONFIG
     CUSTOM_SCRIPTS
-    CUSTOM_TEMPLATES
     DEFINITIONS
     # NOTE: installer stuff follows
     VENDOR
@@ -167,7 +165,6 @@ macro(ac_add_project PROJECT_NAME)
 
     # Remember custom files
     set_global(${PROJECT_NAME}_CUSTOM_SCRIPTS   ${THIS_PROJECT_CUSTOM_SCRIPTS})
-    set_global(${PROJECT_NAME}_CUSTOM_TEMPLATES ${THIS_PROJECT_CUSTOM_TEMPLATES})
 
     # Remember various installer-related things
     set_global(${PROJECT_NAME}_VENDOR           ${THIS_PROJECT_VENDOR})
@@ -226,6 +223,11 @@ macro(ac_add_project PROJECT_NAME)
         DESCRIPTION_FILE ${THIS_PROJECT_DESCRIPTION_FILE}
         LICENSE_FILE     ${THIS_PROJECT_LICENSE_FILE}
     )
+
+    # Load custom scripts
+    foreach(SCRIPT ${THIS_PROJECT_CUSTOM_SCRIPTS})
+        include(${CMAKE_CURRENT_SOURCE_DIR}/${SCRIPT})
+    endforeach(SCRIPT)
     
 endmacro(ac_add_project PROJECT_NAME)
 
@@ -383,6 +385,9 @@ macro(ac_end_project PROJECT_NAME)
         message(FATAL_ERROR "Ending a project that is not the current project.")
     endif(NOT "${PROJECT_NAME}" STREQUAL "${ACMAKE_CURRENT_PROJECT}")
 
+    # Generate lowercase name
+    string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
+
     # Bring object into local namespace
     get_globals(
         ${PROJECT_NAME}
@@ -390,15 +395,22 @@ macro(ac_end_project PROJECT_NAME)
         ${_AC_PROJECT_VARIABLES}
     )
 
+    # Determine build-time location of cmake modules
+    if(WIN32)
+        set(THIS_PROJECT_CMAKE_DIR "${CMAKE_BINARY_DIR}/cmake")
+    else(WIN32)
+        set(THIS_PROJECT_CMAKE_DIR "${CMAKE_BINARY_DIR}/lib/${PROJECT_NAME_LOWER}/cmake")
+    endif(WIN32)
+
     # Generate Find-file
     ac_configure_file(
         ${ACMAKE_TEMPLATES_DIR}/AcFind.cmake.in
-        ${THIS_PROJECT_BINARY_DIR}/Find${PROJECT_NAME}.cmake
+        ${THIS_PROJECT_CMAKE_DIR}/${PROJECT_NAME}Config.cmake
         "ac_end_project()"
     )
 
     # Generate dependency finding script
-    set(EXT "${THIS_PROJECT_BINARY_DIR}/Find${PROJECT_NAME}Dependencies.cmake")
+    set(EXT "${THIS_PROJECT_CMAKE_DIR}/${PROJECT_NAME}Dependencies.cmake")
     file(WRITE ${EXT} "# This generated script resolves external dependencies for ${PROJECT_NAME}\n")
     file(WRITE ${EXT} "include(FindPkgConfig)\n")
 
@@ -432,15 +444,15 @@ macro(ac_end_project PROJECT_NAME)
     endwhile(_LST)
 
     # Generate target information script (XXX: plugin export not implemented)
-    set(EXT "${THIS_PROJECT_BINARY_DIR}/Find${PROJECT_NAME}Targets.cmake")
+    set(EXT "${THIS_PROJECT_CMAKE_DIR}/${PROJECT_NAME}Targets.cmake")
     file(WRITE ${EXT} "# This generated script defines target dependencies for ${PROJECT_NAME}\n")
     foreach(EXECUTABLE ${THIS_PROJECT_EXECUTABLES})
         get_globals(${EXECUTABLE} THIS_EXECUTABLE "LIBRARIES;INCLUDE_DIRS;LIBRARY_DIRS;DEPENDS;EXTERNS") # XXX: make class for this
 
         if(WIN32)
-            set(LOCATION  "${CMAKE_INSTALL_PREFIX}/bin/${EXECUTABLE}.exe")
+            set(LOCATION  "bin/${EXECUTABLE}.exe")
         else(WIN32)
-            set(LOCATION "${CMAKE_INSTALL_PREFIX}/bin/${EXECUTABLE}")
+            set(LOCATION "bin/${EXECUTABLE}")
         endif(WIN32)
 
         file(APPEND ${EXT} "# executable target ${EXECUTABLE}\n")
@@ -451,10 +463,10 @@ macro(ac_end_project PROJECT_NAME)
         get_globals(${LIBRARY} THIS_LIBRARY "LIBRARIES;INCLUDE_DIRS;LIBRARY_DIRS;DEPENDS;EXTERNS") # XXX: make class for this
 
         if(WIN32)
-            set(OBJECT_LOCATION  "${CMAKE_INSTALL_PREFIX}/bin/${LIBRARY}.dll")
-            set(IMPLIB_LOCATION "${CMAKE_INSTALL_PREFIX}/lib/${LIBRARY}.lib")
+            set(OBJECT_LOCATION  "bin/${LIBRARY}.dll")
+            set(IMPLIB_LOCATION "lib/${LIBRARY}.lib")
         else(WIN32)
-            set(OBJECT_LOCATION "${CMAKE_INSTALL_PREFIX}/lib/${CMAKE_SHARED_MODULE_PREFIX}${LIBRARY}${CMAKE_SHARED_MODULE_SUFFIX}")
+            set(OBJECT_LOCATION "lib/${CMAKE_SHARED_MODULE_PREFIX}${LIBRARY}${CMAKE_SHARED_MODULE_SUFFIX}")
             set(IMPLIB_LOCATION)
         endif(WIN32)
 
@@ -469,21 +481,29 @@ macro(ac_end_project PROJECT_NAME)
     endforeach(LIBRARY ${THIS_PROJECT_LIBRARIES})
 
     # Install find fileset
+    if(WIN32)
+        set(THIS_PROJECT_FIND_DESTINATION "cmake")
+    else(WIN32)
+        set(THIS_PROJECT_FIND_DESTINATION "lib/${PROJECT_NAME_LOWER}/cmake")
+    endif(WIN32)
     install(
         FILES
-            ${THIS_PROJECT_BINARY_DIR}/Find${PROJECT_NAME}.cmake
-            ${THIS_PROJECT_BINARY_DIR}/Find${PROJECT_NAME}Dependencies.cmake
-            ${THIS_PROJECT_BINARY_DIR}/Find${PROJECT_NAME}Targets.cmake
+            ${THIS_PROJECT_CMAKE_DIR}/${PROJECT_NAME}Config.cmake
+            ${THIS_PROJECT_CMAKE_DIR}/${PROJECT_NAME}Dependencies.cmake
+            ${THIS_PROJECT_CMAKE_DIR}/${PROJECT_NAME}Targets.cmake
             ${THIS_PROJECT_CUSTOM_SCRIPTS}
-	    DESTINATION share/cmake-2.6/Modules
+	    DESTINATION ${THIS_PROJECT_FIND_DESTINATION}
         COMPONENT ${PROJECT_NAME}_development
     )
-    install(
-        FILES
-            ${THIS_PROJECT_CUSTOM_TEMPLATES}
-	    DESTINATION share/cmake-2.6/Templates
-        COMPONENT ${PROJECT_NAME}_development
-    )
+
+    # Make custom scripts available to build-tree clients
+    foreach(SCRIPT ${THIS_PROJECT_CUSTOM_SCRIPTS})
+        configure_file(
+            "${CMAKE_CURRENT_SOURCE_DIR}/${SCRIPT}"
+            "${THIS_PROJECT_CMAKE_DIR}/${SCRIPT}"
+            COPYONLY
+        )
+    endforeach(SCRIPT)
 
     # Remove our local copy of the project
     clear_locals(THIS_PROJECT ${_AC_PROJECT_VARIABLES})

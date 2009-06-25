@@ -3,22 +3,28 @@ cmake_minimum_required(VERSION 2.6)
 
 project(AcMake)
 
-# installation paths for modules and templates
-set(ACMAKE_TOOLS_SUB share/cmake-2.6/Tools)
-set(ACMAKE_MODULES_SUB share/cmake-2.6/Modules)
-set(ACMAKE_TEMPLATES_SUB share/cmake-2.6/Templates)
-set(ACMAKE_INCLUDE_SUB include )
+# installation paths for our files
+if(WIN32)
+    set(ACMAKE_MODULES_SUB cmake)
+else(WIN32)
+    set(ACMAKE_MODULES_SUB lib/acmake/cmake)
+endif(WIN32)
+set(ACMAKE_TOOLS_SUB lib/acmake/tools)
+set(ACMAKE_TEMPLATES_SUB lib/acmake/templates)
+set(ACMAKE_INCLUDE_SUB include)
 
-# generate config file describing installation
+# determine absolute build time locations of our files
 set(ACMAKE_INSTALLED_TOOLS_DIR ${CMAKE_INSTALL_PREFIX}/${ACMAKE_TOOLS_SUB})
 set(ACMAKE_INSTALLED_MODULES_DIR ${CMAKE_INSTALL_PREFIX}/${ACMAKE_MODULES_SUB})
 set(ACMAKE_INSTALLED_TEMPLATES_DIR ${CMAKE_INSTALL_PREFIX}/${ACMAKE_TEMPLATES_SUB})
 set(ACMAKE_INSTALLED_INCLUDE_DIR ${CMAKE_INSTALL_PREFIX}/${ACMAKE_INCLUDE_SUB})
-configure_file(AcMakeConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/AcMakeConfig.cmake @ONLY)
+
+# generate the config script
+configure_file(AcMakeConfig.cmake.in ${CMAKE_BINARY_DIR}/${ACMAKE_MODULES_SUB}/AcMakeConfig.cmake @ONLY)
 
 # install config file
 install(
-    FILES ${CMAKE_CURRENT_BINARY_DIR}/AcMakeConfig.cmake
+    FILES ${CMAKE_BINARY_DIR}/lib/acmake/cmake/AcMakeConfig.cmake
     COMPONENT AcMake
     DESTINATION ${ACMAKE_MODULES_SUB}
 )

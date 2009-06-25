@@ -1,6 +1,6 @@
 # Some utilities for building Y60-related things
 
-include(AcMake)
+find_package(AcMake)
 
 function(y60_begin_application NAME)
     parse_arguments(
@@ -143,66 +143,66 @@ macro(y60_add_launcher NAME)
     set(THIS_LAUNCHER_INSTALL_ENGINE ${THIS_LAUNCHER_ENGINE})
 
     if(UNIX)
-        # generate launcher shell script for build tree runs
-        configure_file(
-            ${Y60_TEMPLATE_DIR}/Y60BuildLauncher.sh.in
-            ${CMAKE_CURRENT_BINARY_DIR}/${THIS_LAUNCHER_COMMAND_NAME}
-            @ONLY
-        )
-        # generate launcher shell script for installed tree runs
-        configure_file(
-            ${Y60_TEMPLATE_DIR}/Y60InstallLauncher.sh.in
-            ${CMAKE_CURRENT_BINARY_DIR}/${ACMAKE_BINARY_SUBDIR}/${THIS_LAUNCHER_COMMAND_NAME}
-            @ONLY
-        )
-        install(
-            FILES ${CMAKE_CURRENT_BINARY_DIR}/${ACMAKE_BINARY_SUBDIR}/${THIS_LAUNCHER_COMMAND_NAME}
-            COMPONENT ${APPLICATION}
-            DESTINATION bin/
-            PERMISSIONS OWNER_EXECUTE GROUP_EXECUTE WORLD_EXECUTE
-                        OWNER_READ    GROUP_READ    WORLD_READ
-                        OWNER_WRITE
-        )
+#         # generate launcher shell script for build tree runs
+#         configure_file(
+#             ${Y60_TEMPLATE_DIR}/Y60BuildLauncher.sh.in
+#             ${CMAKE_CURRENT_BINARY_DIR}/${THIS_LAUNCHER_COMMAND_NAME}
+#             @ONLY
+#         )
+#         # generate launcher shell script for installed tree runs
+#         configure_file(
+#             ${Y60_TEMPLATE_DIR}/Y60InstallLauncher.sh.in
+#             ${CMAKE_CURRENT_BINARY_DIR}/${ACMAKE_BINARY_SUBDIR}/${THIS_LAUNCHER_COMMAND_NAME}
+#             @ONLY
+#         )
+#         install(
+#             FILES ${CMAKE_CURRENT_BINARY_DIR}/${ACMAKE_BINARY_SUBDIR}/${THIS_LAUNCHER_COMMAND_NAME}
+#             COMPONENT ${APPLICATION}
+#             DESTINATION bin/
+#             PERMISSIONS OWNER_EXECUTE GROUP_EXECUTE WORLD_EXECUTE
+#                         OWNER_READ    GROUP_READ    WORLD_READ
+#                         OWNER_WRITE
+#         )
     endif(UNIX)
 
     if(LINUX)
-        # generate xdg desktop entry
-        set(THIS_LAUNCHER_DESKTOP_FILE ${CMAKE_CURRENT_BINARY_DIR}/${THIS_LAUNCHER_COMMAND_NAME}.desktop)
+#         # generate xdg desktop entry
+#         set(THIS_LAUNCHER_DESKTOP_FILE ${CMAKE_CURRENT_BINARY_DIR}/${THIS_LAUNCHER_COMMAND_NAME}.desktop)
 
-        file(WRITE  ${THIS_LAUNCHER_DESKTOP_FILE} "[Desktop Entry]\n")
-        file(APPEND ${THIS_LAUNCHER_DESKTOP_FILE} "Type=Application\n")
-        file(APPEND ${THIS_LAUNCHER_DESKTOP_FILE} "Name=${THIS_LAUNCHER_NAME}\n")
-        file(APPEND ${THIS_LAUNCHER_DESKTOP_FILE} "TryExec=${THIS_LAUNCHER_COMMAND_NAME}\n")
-        file(APPEND ${THIS_LAUNCHER_DESKTOP_FILE} "Exec=${THIS_LAUNCHER_COMMAND_NAME} %U\n")
-        file(APPEND ${THIS_LAUNCHER_DESKTOP_FILE} "Categories=${THIS_LAUNCHER_CATEGORIES}\n")
-        if(THIS_LAUNCHER_MIME_TYPES)
-            file(APPEND ${THIS_LAUNCHER_DESKTOP_FILE} "MimeType=${THIS_LAUNCHER_MIME_TYPES}\n")
-        endif(THIS_LAUNCHER_MIME_TYPES)
+#         file(WRITE  ${THIS_LAUNCHER_DESKTOP_FILE} "[Desktop Entry]\n")
+#         file(APPEND ${THIS_LAUNCHER_DESKTOP_FILE} "Type=Application\n")
+#         file(APPEND ${THIS_LAUNCHER_DESKTOP_FILE} "Name=${THIS_LAUNCHER_NAME}\n")
+#         file(APPEND ${THIS_LAUNCHER_DESKTOP_FILE} "TryExec=${THIS_LAUNCHER_COMMAND_NAME}\n")
+#         file(APPEND ${THIS_LAUNCHER_DESKTOP_FILE} "Exec=${THIS_LAUNCHER_COMMAND_NAME} %U\n")
+#         file(APPEND ${THIS_LAUNCHER_DESKTOP_FILE} "Categories=${THIS_LAUNCHER_CATEGORIES}\n")
+#         if(THIS_LAUNCHER_MIME_TYPES)
+#             file(APPEND ${THIS_LAUNCHER_DESKTOP_FILE} "MimeType=${THIS_LAUNCHER_MIME_TYPES}\n")
+#         endif(THIS_LAUNCHER_MIME_TYPES)
 
-        install(
-            FILES ${THIS_LAUNCHER_DESKTOP_FILE}
-            COMPONENT ${APPLICATION}
-            DESTINATION share/applications
-        )
+#         install(
+#             FILES ${THIS_LAUNCHER_DESKTOP_FILE}
+#             COMPONENT ${APPLICATION}
+#             DESTINATION share/applications
+#         )
     endif(LINUX)
 
     if(WIN32)
-        # generate launcher batch script for installed tree runs
-        configure_file(
-            ${Y60_TEMPLATE_DIR}/Y60InstallLauncher.bat.in
-            ${CMAKE_CURRENT_BINARY_DIR}/${ACMAKE_BINARY_SUBDIR}/${NAME}.bat
-            @ONLY
-        )
-        install(
-            FILES ${CMAKE_CURRENT_BINARY_DIR}/${ACMAKE_BINARY_SUBDIR}/${NAME}.bat
-            COMPONENT ${APPLICATION}
-            DESTINATION bin/
-            PERMISSIONS OWNER_EXECUTE GROUP_EXECUTE WORLD_EXECUTE
-                        OWNER_READ    GROUP_READ    WORLD_READ
-                        OWNER_WRITE
-        )
+#         # generate launcher batch script for installed tree runs
+#         configure_file(
+#             ${Y60_TEMPLATE_DIR}/Y60InstallLauncher.bat.in
+#             ${CMAKE_CURRENT_BINARY_DIR}/${ACMAKE_BINARY_SUBDIR}/${NAME}.bat
+#             @ONLY
+#         )
+#         install(
+#             FILES ${CMAKE_CURRENT_BINARY_DIR}/${ACMAKE_BINARY_SUBDIR}/${NAME}.bat
+#             COMPONENT ${APPLICATION}
+#             DESTINATION bin/
+#             PERMISSIONS OWNER_EXECUTE GROUP_EXECUTE WORLD_EXECUTE
+#                         OWNER_READ    GROUP_READ    WORLD_READ
+#                         OWNER_WRITE
+#         )
 
-        ac_add_installer_shortcut(${NAME} "" "" "" "bin\\\\\\\\${NAME}.bat" "")
+#         ac_add_installer_shortcut(${NAME} "" "" "" "bin\\\\\\\\${NAME}.bat" "")
     endif(WIN32)
 endmacro(y60_add_launcher)
 

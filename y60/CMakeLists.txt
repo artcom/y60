@@ -3,8 +3,6 @@ cmake_minimum_required(VERSION 2.6.2)
 
 project(Y60)
 
-list(INSERT CMAKE_MODULE_PATH 0 ${Y60_SOURCE_DIR})
-
 option(Y60_WITH_TRACEMONKEY "use latest experimental js interpreter" OFF)
 
 set(ACMAKE_BUILDINFO_TEMPLATE
@@ -19,12 +17,12 @@ else(Y60_WITH_TRACEMONKEY)
 endif(Y60_WITH_TRACEMONKEY)
 
 # Include ACMake
-include(AcMake)
+find_package(AcMake)
 
-# Define some things and discover dependencies
-include(Y60Dependencies)
-include(Y60Utilities)
+# Discover dependencies
+include(Y60Dependencies.cmake)
 
+# Some magic for tracemonkey
 set(Y60_EXTRA_DEFINITIONS)
 if(Y60_WITH_TRACEMONKEY)
     set(Y60_EXTRA_DEFINITIONS -DY60_WITH_TRACEMONKEY)
@@ -41,10 +39,6 @@ ac_add_project(Y60
         ${OPT_PKGCONFIG}
     CUSTOM_SCRIPTS
         Y60Utilities.cmake
-    CUSTOM_TEMPLATES
-        Y60BuildLauncher.sh.in
-        Y60InstallLauncher.sh.in
-        Y60InstallLauncher.bat.in
     DEFINITIONS
         -DAC_BUILT_WITH_CMAKE
         ${Y60_EXTRA_DEFINITIONS}
