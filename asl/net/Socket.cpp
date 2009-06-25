@@ -90,9 +90,8 @@ namespace inet {
 
     void Socket::close() {
         if (isValid()) {
-            int rc;
 #ifdef _WIN32        
-            rc = closesocket(fd);
+            int rc = closesocket(fd);
             if (rc == SOCKET_ERROR) {
                 int err = getLastSocketError();
                 throw SocketException(err, "Socket::close() failed.");
@@ -264,8 +263,8 @@ namespace inet {
     int 
     Socket::getSendBufferSize() const {
         int mySize = 0;
+#ifdef _WIN32
         int myIntSize = sizeof(mySize);
-#ifdef _WIN32        
         if (getsockopt(fd, SOL_SOCKET, SO_SNDBUF, (char*) &mySize, &myIntSize) < 0) {
             AC_ERROR << "Socket::getSendBufferSize: Unable to set SO_SNDBUF";
         }
@@ -289,8 +288,8 @@ namespace inet {
     int 
     Socket::getReceiveBufferSize() const {
         int mySize = 0;
-        int myIntSize = sizeof(mySize);
 #ifdef _WIN32
+        int myIntSize = sizeof(mySize);
         if (getsockopt(fd, SOL_SOCKET, SO_RCVBUF, (char*) &mySize, &myIntSize) < 0) {
             AC_ERROR << "Socket::getReceiveBufferSize: Unable to set SO_SNDBUF";
         }

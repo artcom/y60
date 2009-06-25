@@ -397,7 +397,7 @@ void outputHWParams (snd_pcm_t * theDevice) {
 void
 outputSWParams (snd_pcm_t * theDevice) {
     AC_DEBUG << "SW Params: ";
-    int myDir;
+
     int myRetVal;
     snd_pcm_sw_params_t * myParams;
     snd_pcm_sw_params_malloc(&myParams);

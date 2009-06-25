@@ -132,6 +132,8 @@ namespace y60 {
             case y60::Event::KEY_DOWN:
                 onKey(*theEvent);
                 break;
+            default:
+            	break;
         }
     }
 
