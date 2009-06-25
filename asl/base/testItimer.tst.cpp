@@ -112,7 +112,7 @@ LockUnitTest::run() {
             cerr << "### main thread: Setting max priority failed" << endl;
         }
 
-        cycles_t cycles;
+        cycles_t cycles = 0;
         _myLock.readlock();
         for (int i = 0; i < 10; ++i) {
             cerr << "HIGH_LOCKED_LOOP START " << get_cycles() - cycles << endl;
@@ -200,7 +200,7 @@ LockUnitTest::lowPrioThread() {
         cerr << "### low thread: Setting min priority failed" << endl;
     }
 
-    cycles_t cycles;
+    cycles_t cycles = 0;
 
     try {
         _myLock.readlock();
@@ -232,7 +232,7 @@ LockUnitTest::lowPrioThread() {
 
 void 
 LockUnitTest::mediumPrioThread() {
-    cycles_t cycles;
+    cycles_t cycles = 0;
     while (!_ready) {
         for (int i=0; i < 2; ++i) {
             _myLock.readlock();
