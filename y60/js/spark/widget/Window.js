@@ -42,6 +42,10 @@ spark.Window.Constructor = function(Protected) {
         
         window.showMouseCursor = Protected.getBoolean("mouseCursor", true);
         window.swapInterval = Protected.getNumber("swapInterval", 1);
+        var myFixedDeltaT = Number(eval(Protected.getString("fixedDeltaT", "0"))); // so we can say something like "1/30"
+        if (myFixedDeltaT) {
+            window.swapInterval = myFixedDeltaT; 
+        }
         
         spark.setupCameraOrtho(window.scene.dom.find(".//camera"), window.width, window.height);
         
