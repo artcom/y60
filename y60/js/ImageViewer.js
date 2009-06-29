@@ -653,8 +653,8 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
             _myMovieNode.id = createUniqueId();
             _myMovieNode.playmode = "play";
             _myMovieNode.loopcount = 0;
-            _myMovieNode.audio = false;
-            _myMovieNode.decoderhint = theDecoderHint;            
+            _myMovieNode.audio = 1;
+            _myMovieNode.decoderhint = theDecoderHint;
             _myMovieNode.src = theFilename;
             //_myMovieNode.maxcachesize = 128;
             // YUV420 pixelformat uses shader to convert colorspace
