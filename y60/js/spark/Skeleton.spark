@@ -1,0 +1,27 @@
+<SkeletonImpl
+    name="skeleton"
+    title="skeleton"
+    decorations="false"
+    mouseCursor="false"
+    width="1280"
+    height="1024"
+    swapInterval="1"
+    fixedDeltaT="1/30"
+    i18nContext="global-i18n">    
+    <!--Template name="myTemplate" src="LAYOUT/myTemplate.spark"/-->
+
+    <I18nContext name="global-i18n" defaultLanguage="de">    
+        <I18nText name="Text1">
+            <de>deutsch</de>
+            <en>english</en>
+        </I18nText>
+        <I18nText name="Text2">
+            <de>Skeleton</de>
+            <en>Skeleton</en>
+        </I18nText>
+    </I18nContext>   
+    
+    <NewText name="Language" x="100" y="100" z="5" fontSize="20" lineHeight="24" textColor="FFFFFF" textId="Text1"/>    
+    <NewText name="Language" x="100" y="300" z="10" fontSize="20" lineHeight="24" textColor="FFFFFF" textId="Text2"/>    
+                
+</SkeletonImpl>
