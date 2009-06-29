@@ -1,6 +1,8 @@
 /**
  * And even less done... movie nodes.
  */
+use("BuildUtils.js");
+
 spark.Movie = spark.ComponentClass("Movie");
 
 spark.Movie.Constructor = function(Protected) {
@@ -15,6 +17,8 @@ spark.Movie.Constructor = function(Protected) {
     var _myMaterial = null;
     var _myShape    = null;
     var _myBody     = null;
+
+    
     var _myInitialSize = null;
 
     Public.play = function() {
@@ -69,13 +73,40 @@ spark.Movie.Constructor = function(Protected) {
     Public.realize = function() {
         var myMovieSource = Protected.getString("src");
 
-        setupMovie(myMovieSource);
+        var myTargetPixelFormat = Protected.getString("targetpixelformat", "YUV420");
+        var myAudioFlag = Protected.getBoolean("audio", true);
+        var myLoopcount = Protected.getNumber("loopcount", 1);
+        var myCacheSize = Protected.getNumber("maxcachesize", 32);
+        var myHint = Protected.getString("decoderhint", "FFMpegDecoder2");
+
+        setupMovie(myMovieSource, myAudioFlag, myCacheSize, myTargetPixelFormat, myHint);
 
         _myTexture  = Modelling.createTexture(window.scene, _myMovie);
         _myTexture.name = Public.name + "-texture";
         _myTexture.wrapmode = "clamp_to_edge";
 
         _myMaterial = Modelling.createUnlitTexturedMaterial(window.scene, _myTexture, Public.name + "-material", true);
+
+        if(myTargetPixelFormat == "YUV420") {
+            // YUV targetrasterformat allows us to use a shader to convert YUV2RGB, 
+            // loadMovieFrame created 3 rasters for us, therefore we need 3 textures
+		    _myMaterial.enabled = false;
+		    
+    		for (var i = 1; i < _myMovie.childNodesLength(); i++) {
+        		var myTextureUnit = _myMaterial.childNode("textureunits").appendChild(Node.createElement("textureunit"));
+        		myTextureUnit.applymode = TextureApplyMode.modulate;
+    			var myTexture = Modelling.createTexture(window.scene, _myMovie);
+    			myTexture.image = _myMovie.id;
+    			myTexture.image_index = i;
+        		myTextureUnit.texture   = myTexture.id;
+    	    }
+
+	        var myString = "[100[paint, paint, paint]]";
+    		_myMaterial.requires.textures = myString;
+
+    		addMaterialRequirement(_myMaterial, "option", "[10[yuv2rgb]]");
+            _myMaterial.enabled = true;
+        }
         
         var mySize = new Vector3f(_myMovie.width,_myMovie.height, 0);
         Protected.origin = Protected.getVector3f("origin", [0,0,0]);
@@ -92,13 +123,45 @@ spark.Movie.Constructor = function(Protected) {
 	
         var myInitialPlaymode = Protected.getString("playmode", "stop");
         _myMovie.playmode = myInitialPlaymode;
+        _myMovie.loopcount = myLoopcount;
+        
         var myInitialLoopcount = Protected.getString("loopcount", "1");
         _myMovie.loopcount = myInitialLoopcount;
 
         Base.realize(myBody);
     };
+    
+    // for audio synced video we need a reload, cause y60 looses sync on looping
+    Public.reload = function() {
+        var myTextures = [];
+        if(_myMovie.targetpixelformat== "YUV420") {
+            myTextures  = window.scene.textures.findAll("texture[@image='" + _myMovie.id + "']");
+        } else {
+            myTextures.push_back(window.scene.textures.find("texture[@image='" + _myMovie.id + "']"));
+        }
 
-    function setupMovie(theFilename) {
+        var myMovieNode = Node.createElement("movie");
+        window.scene.images.appendChild(myMovieNode);
+        myMovieNode.src   = _myMovie.src;
+        myMovieNode.name  = _myMovie.name;
+        myMovieNode.audio = _myMovie.audio;
+        myMovieNode.maxcachesize = _myMovie.maxcachesize;
+        myMovieNode.volume      = (_myMovie &&  "volume" in _myMovie) ? _myMovie.volume : 1.0;
+        myMovieNode.loopcount   = _myMovie.loopcount;
+        myMovieNode.resize      = "none";
+        myMovieNode.decoderhint = _myMovie.decoderhint;
+        myMovieNode.targetpixelformat = _myMovie.targetpixelformat;
+
+        window.scene.loadMovieFrame(myMovieNode);
+        _myMovie.parentNode.removeChild(_myMovie);
+        _myMovie = myMovieNode;
+		for (var i = 0; i < myTextures.length; i++) {
+            myTextures[i].image = _myMovie.id;
+			myTextures[i].image_index = i;
+		}
+    }
+
+    function setupMovie(theFilename, theAudioFlag, theCacheSize, theTargetPixelFormat, theHint) {
         _myMovie = Node.createElement("movie");
 
         window.scene.images.appendChild(_myMovie);
@@ -108,11 +171,15 @@ spark.Movie.Constructor = function(Protected) {
         _myMovie.resize = "none";
         _myMovie.loopcount = 1;
         _myMovie.playmode = "stop";
-
+        _myMovie.audio = theAudioFlag
+        _myMovie.maxcachesize = theCacheSize;
+        _myMovie.targetpixelformat = theTargetPixelFormat;
+        _myMovie.decoderhint = theHint;
+        /* hmmmmm 
         // XXX: hmmm ...
         if (/.*\.mp4/.exec(theFilename)) {
             _myMovie.decoderhint = "FFMpegDecoder2";
-        }
+        }*/
 
         window.scene.loadMovieFrame(_myMovie);
         _myInitialSize = getImageSize(_myMovie);
