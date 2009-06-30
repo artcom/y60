@@ -55,7 +55,17 @@ else(@THIS_PROJECT_NAME@_IS_INTEGRATED)
 
     # determine our current prefix
     get_filename_component(@THIS_PROJECT_NAME@_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
-    get_filename_component(@THIS_PROJECT_NAME@_PREFIX "${@THIS_PROJECT_NAME@_CMAKE_DIR}/../../.." ABSOLUTE)
+    # XXX: clean this mess
+    if(WIN32)
+        set(_CMAKE_TO_PREFIX "..")
+    else(WIN32)
+        if(OSX)
+            set(_CMAKE_TO_PREFIX ".")
+        else(OSX)
+            set(_CMAKE_TO_PREFIX "../../..")
+        endif(OSX)
+    endif(WIN32)
+    get_filename_component(@THIS_PROJECT_NAME@_PREFIX "${@THIS_PROJECT_NAME@_CMAKE_DIR}/${_CMAKE_TO_PREFIX}" ABSOLUTE)
 
     set(@THIS_PROJECT_NAME@_RUNTIME_DIR "${@THIS_PROJECT_NAME@_PREFIX}/bin")
     set(@THIS_PROJECT_NAME@_LIBRARY_DIR "${@THIS_PROJECT_NAME@_PREFIX}/lib")
