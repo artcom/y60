@@ -92,7 +92,7 @@ spark.Component.Constructor = function(Protected) {
 
     Public.name setter = function(theValue) {
         if(_myName != null) {
-            throw new Error("the name of a component can only be set once");
+            throw new Error("tried to set the name of component " + Public + ", which already has a name");
         }
         _myName = theValue;
     };
@@ -132,6 +132,9 @@ spark.Component.Constructor = function(Protected) {
     Public.initialize = function(theNode) {
         _myNode   = theNode;
         _myName   = Protected.getString("name", "");
+        if(_myName == "") {
+            _myName = null;
+        }
     };
 
     // XXX: realize and post-realize should be one thing,
