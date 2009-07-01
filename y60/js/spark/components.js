@@ -100,7 +100,7 @@ spark.Component.Constructor = function(Protected) {
     // XXX: really bad solution.
     //      this should be higher up and more informative.
     Public.toString = function (){
-        return "[" + Public._className_ + (_myName ? " named " + _myName : "") + "]";
+        return "[" + Public._className_ + " " + Public.vocation + "]";
     };
     
     var _myParent = null;
@@ -137,33 +137,31 @@ spark.Component.Constructor = function(Protected) {
         }
     };
 
+    Public.vocation getter = function() {
+        if(Public.name) {
+            return "named " + Public.name;
+        }
+        if("id" in Public && Public.id) {
+            return "with id " + Public.id;
+        }
+        return "without a name";
+    }
+
     // XXX: realize and post-realize should be one thing,
     //      with the remaining coupled properties uncoupled.
     Public.realize = function() {
         spark.ourComponentsByNameMap[Public.name] = Public;
-        Logger.info("Realizing component named " + Public.name);
+        Logger.info("Realizing " + Public._className_ + " " + Public.vocation);
     };
+    
     Public.postRealize = function() {
-        Logger.info("Post-Realizing component named " + Public.name);
+        Logger.info("Post-Realizing " + Public._className_ + " " + Public.vocation);
     };
 
     
     Public.instantiateChildren = function() {
     };
 
-    
-    Protected.getString = function(theName, theDefault) {
-        if(theName in _myNode) {
-            return _myNode[theName];
-        } else {
-            if(arguments.length < 2) {
-                Logger.error(_myNode.nodeName + " requires attribute " + theName);
-            } else {
-                return theDefault;
-            }
-        }
-    };
-    
     // XXX: I18N should be implemented with a property type
     Protected.realizeI18N = function(theItem, theAttribute) {
         var myConcreteItem = theItem;
@@ -186,7 +184,34 @@ spark.Component.Constructor = function(Protected) {
         return myConcreteItem;
     }
     
+    
+    Protected.getString = function(theName, theDefault) {
+        if(!_myNode) {
+            if(arguments.length < 2) {
+                Logger.error(Public._className_ + " cannot be instantiated from code because it needs attribute " + theName);
+            } else {
+                return theDefault;
+            }
+        }
+        if(theName in _myNode) {
+            return _myNode[theName];
+        } else {
+            if(arguments.length < 2) {
+                Logger.error(Public._className_ + " requires attribute " + theName);
+            } else {
+                return theDefault;
+            }
+        }
+    };
+    
     Protected.getBoolean = function(theName, theDefault) {
+        if(!_myNode) {
+            if(arguments.length < 2) {
+                Logger.error(Public._className_ + " cannot be instantiated from code because it needs attribute " + theName);
+            } else {
+                return theDefault;
+            }
+        }
         if(theName in _myNode) {
             return (_myNode[theName] == "true");
         } else {
@@ -208,6 +233,13 @@ spark.Component.Constructor = function(Protected) {
     };
 
     Protected.getNumber = function(theName, theDefault) {
+        if(!_myNode) {
+            if(arguments.length < 2) {
+                Logger.error(Public._className_ + " cannot be instantiated from code because it needs attribute " + theName);
+            } else {
+                return theDefault;
+            }
+        }
         if(theName in _myNode) {
             return Number(_myNode[theName]);
         } else {
@@ -221,6 +253,13 @@ spark.Component.Constructor = function(Protected) {
     
     // XXX: this requires a member type. else it don't make no sense.
     Protected.getArray = function(theName, theDefault) {
+        if(!_myNode) {
+            if(arguments.length < 2) {
+                Logger.error(Public._className_ + " cannot be instantiated from code because it needs attribute " + theName);
+            } else {
+                return theDefault;
+            }
+        }
         if(theName in _myNode) {
             return _myNode[theName].substring(1, _myNode[theName].length -1).replace(/ /g,"").split(",");
         } else {
