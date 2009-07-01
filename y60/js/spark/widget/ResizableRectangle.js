@@ -49,7 +49,11 @@ spark.ResizableRectangle.Constructor = function(Protected) {
         _myVertices = _myShape.find(".//*[@name='position']").firstChild.nodeValue;
         
         var myBody  = Modelling.createBody(Public.parent.sceneNode, _myShape.id);
-        myBody.name = Public.name;
+        if(Public.name) {
+            myBody.name = Public.name;
+        } else {
+            myBody.name = "unnamed-spark-body";
+        }
 	
         Base.realize(myBody);        
     };
