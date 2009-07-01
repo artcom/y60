@@ -178,10 +178,15 @@ spark.EventDispatcher.Constructor = function(Protected) {
     Public.dispatchEvent = function(theEvent) {
         theEvent.startDispatch(Public);
 
-        // collect events to capture on
+        // collect dispatchers to capture on
+        var myCurrent = Public;
         var myCaptureList = [Public];
-        while(myCaptureList[0].parent != null) {
-            myCaptureList.unshift(myCaptureList[0].parent);
+        while(myCurrent.parent != null) {
+            var myCurrent = myCurrent.parent;
+            
+            if("EventDispatcher" in myCurrent._classes_) {
+                myCaptureList.unshift(myCurrent);
+            }
         }
         myCaptureList.pop();
 
