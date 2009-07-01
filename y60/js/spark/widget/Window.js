@@ -83,11 +83,23 @@ spark.Window.Constructor = function(Protected) {
     var _myMousePosition = new Vector2f();
     
     Public.mousePosition getter = function() {
+        return _myMousePosition;
     };
     
     Protected.updateMousePosition = function(theX, theY) {
         _myMousePosition.x = theX;
         _myMousePosition.y = theY;
+    };
+    
+    
+    var _myMouseButtonStates = {};
+    
+    Public.mouseButtonStates getter = function() {
+        return _myMouseButtonStates;
+    };
+    
+    Protected.updateMouseButtonState = function(theButton, theState) {
+        _myMouseButtonStates[theButton] = theState;
     };
     
     
@@ -144,6 +156,8 @@ spark.Window.Constructor = function(Protected) {
     Public.onMouseMotion = function(theX, theY) {
         Base.onMouseMotion(theX, theY);
         
+        var myButtonStates = _myMouseButtonStates.clone();
+        
         Protected.updateMousePosition(theX, theY);
         
         var myWidget = Public.pickWidget(theX, theY);
@@ -157,7 +171,7 @@ spark.Window.Constructor = function(Protected) {
                          + (_myMouseFocused ? ", leaving " + _myMouseFocused : ""));
             
             if(_myMouseFocused) {
-                var myLeaveEvent = new spark.MouseEvent(spark.MouseEvent.LEAVE, theX, theY);
+                var myLeaveEvent = new spark.MouseEvent(spark.MouseEvent.LEAVE, theX, theY, 0, 0, null, myButtonStates);
                 _myMouseFocused.dispatchEvent(myLeaveEvent);
             }
             
@@ -179,6 +193,11 @@ spark.Window.Constructor = function(Protected) {
     Public.onMouseButton = function(theButton, theState, theX, theY) {
         Base.onMouseButton(theButton, theState, theX, theY);
         
+        var myButton = spark.Mouse.buttonFromId(theButton);
+        Protected.updateMouseButtonState(myButton, theState);
+        
+        var myButtonStates = _myMouseButtonStates.clone();
+        
         Protected.updateMousePosition(theX, theY);
 
         var myWidget = Public.pickWidget(theX, theY);
@@ -186,17 +205,17 @@ spark.Window.Constructor = function(Protected) {
         if(myWidget) {
             if(theState) {
                 // XXX: click should be more well-defined and button-up-based.
-                Logger.debug("Mouse clicks " + myWidget);
-                var myClickEvent = new spark.MouseEvent(spark.MouseEvent.CLICK, theX, theY);
+                Logger.debug("Mouse clicks " + myWidget + " with button " + myButton);
+                var myClickEvent = new spark.MouseEvent(spark.MouseEvent.CLICK, theX, theY, 0, 0, myButton, myButtonStates);
                 myWidget.dispatchEvent(myClickEvent);
                 
-                Logger.debug("Mouse button down on " + myWidget);
-                var myDownEvent = new spark.MouseEvent(spark.MouseEvent.BUTTON_DOWN, theX, theY);
+                Logger.debug("Mouse " + myButton + " button down on " + myWidget);
+                var myDownEvent = new spark.MouseEvent(spark.MouseEvent.BUTTON_DOWN, theX, theY, 0, 0, myButton, myButtonStates);
                 myWidget.dispatchEvent(myDownEvent);
             } else {
-                Logger.debug("Mouse button up on " + myWidget);
-                var myUpEvent = new spark.MouseEvent(spark.MouseEvent.BUTTON_UP, theX, theY);
-                myWidget.dispatchEvent(myUpEvent);                
+                Logger.debug("Mouse " + myButton + " button up on " + myWidget);
+                var myUpEvent = new spark.MouseEvent(spark.MouseEvent.BUTTON_UP, theX, theY, 0, 0, myButton, myButtonStates);
+                myWidget.dispatchEvent(myUpEvent);
             }
         }
     };
@@ -223,13 +242,15 @@ spark.Window.Constructor = function(Protected) {
     Base.onMouseWheel = Public.onMouseWheel;
     Public.onMouseWheel = function(theDeltaX, theDeltaY) {
         Base.onMouseWheel(theDeltaX, theDeltaY);
+
+        var myButtonStates = _myMouseButtonStates.clone();
         
         if(_myMouseFocused) {
             Logger.debug("Mouse scrolls " + _myMouseFocused + " by [" + theDeltaX + "," + theDeltaY + "]");
             var myEvent = new spark.MouseEvent(
                 spark.MouseEvent.SCROLL,
                 _myMousePosition.x, _myMousePosition.y,
-                theDeltaX, theDeltaY
+                theDeltaX, theDeltaY, null, myButtonStates
             );
             _myMouseFocused.dispatchEvent(myEvent);
         }

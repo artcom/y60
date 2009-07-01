@@ -79,6 +79,8 @@ spark.findRootElement = function(theDocument) {
     return myRoot;
 }
 
+// javascript extensions
+use("jsextensions.js");
 // component instantiator
 use("meta.js");
 // spark file (and dom) loader

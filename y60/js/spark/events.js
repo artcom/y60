@@ -273,6 +273,25 @@ spark.EventDispatcher.Constructor = function(Protected) {
 
 };
 
+spark.Mouse = {};
+
+spark.Mouse.PRIMARY   = "primary";
+spark.Mouse.SECONDARY = "secondary";
+spark.Mouse.TERTIARY  = "tertiary";
+
+spark.Mouse.buttonFromId = function(theId) {
+    switch(theId) {
+    case 1:
+        return spark.Mouse.PRIMARY;
+    case 2:
+        return spark.Mouse.SECONDARY;
+    case 3:
+        return spark.Mouse.TERTIARY;
+    default:
+        Logger.fatal("Unknown mouse button " + theId);
+    }
+};
+
 spark.MouseEvent = spark.Class("MouseEvent");
 
 spark.MouseEvent.MOVE   = "mouse-move";
@@ -283,7 +302,7 @@ spark.MouseEvent.ENTER  = "mouse-enter";
 spark.MouseEvent.LEAVE  = "mouse-leave";
 spark.MouseEvent.SCROLL = "mouse-scroll";
 
-spark.MouseEvent.Constructor = function(Protected, theType, theX, theY, theAmountX, theAmountY) {
+spark.MouseEvent.Constructor = function(Protected, theType, theX, theY, theAmountX, theAmountY, theButton, theButtonStates) {
     var Public = this;
     
     this.Inherit(spark.Event, theType);
@@ -310,6 +329,18 @@ spark.MouseEvent.Constructor = function(Protected, theType, theX, theY, theAmoun
     
     Public.amountY getter = function() {
         return _myAmountY;
+    };
+    
+    var _myButton = theButton;
+    
+    Public.button getter = function() {
+        return _myButton;
+    };
+    
+    var _myButtonStates = theButtonStates;
+    
+    Public.buttonStates getter = function () {
+        return _myButtonStates;
     };
     
 };
