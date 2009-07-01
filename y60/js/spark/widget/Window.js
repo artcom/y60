@@ -49,6 +49,10 @@ spark.Window.Constructor = function(Protected) {
         
         spark.setupCameraOrtho(window.scene.dom.find(".//camera"), window.width, window.height);
         
+        Protected.updateMouseButtonState(spark.Mouse.PRIMARY,   false);
+        Protected.updateMouseButtonState(spark.Mouse.SECONDARY, false);
+        Protected.updateMouseButtonState(spark.Mouse.TERTIARY,  false);
+        
         Base.realize(window.scene.world);
     };
     
