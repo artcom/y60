@@ -65,6 +65,7 @@
 #include <asl/base/file_functions.h>
 #include <asl/base/Dashboard.h>
 #include <asl/base/Logger.h>
+#include <asl/zip/PackageManager.h>
 
 #include <y60/image/Image.h>
 
@@ -131,6 +132,8 @@ namespace y60 {
                               int theHeight, TTFFontInfo::FONTHINTING & theFonthint,
                               TTFFontInfo::FONTTYPE theFontType)
     {
+        const string myFileName = AppPackageManager::get().getPtr()->searchFile(theFileName);
+
         setFontFitting(theHeight);
         TTF_SetFitting((int)theFonthint);
         
@@ -148,17 +151,17 @@ namespace y60 {
             }
         }
 
-        if (!fileExists(theFileName)) {
-            throw GLTextRendererException(string("Font file '") + theFileName + "' does not exist.", PLUS_FILE_LINE);
+        if (!fileExists(myFileName)) {
+            throw GLTextRendererException(string("Font file '") + myFileName + "' does not exist.", PLUS_FILE_LINE);
         }
-        TTF_Font * myFont = TTF_OpenFont(theFileName.c_str(), theHeight);
+        TTF_Font * myFont = TTF_OpenFont(myFileName.c_str(), theHeight);
 
         if (!myFont) {
-            throw GLTextRendererException(string("Could not load font: ") + theName+ ", " + theFileName, PLUS_FILE_LINE);
+            throw GLTextRendererException(string("Could not load font: ") + theName+ ", " + myFileName, PLUS_FILE_LINE);
         }
         _myFonts[myFontName] = SDLFontInfo(myFont, theFontType, theHeight, theFonthint);
 
-        AC_DEBUG << "TTFTextRenderer - loaded font: " << theName << ", " << theFileName << " with size: "
+        AC_DEBUG << "TTFTextRenderer - loaded font: " << theName << ", " << myFileName << " with size: "
                 << theHeight << " and style: " << theFontType << endl;
 
         AC_DEBUG << "Recommended line skip: " << TTF_FontLineSkip(myFont) << endl;
