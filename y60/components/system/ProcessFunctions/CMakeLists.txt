@@ -18,4 +18,5 @@ y60_add_component(
 
 y60_add_jstest(ProcFunctions mod_ProcFunctions)
 y60_add_jstest(ImageLeak mod_ProcFunctions)
-y60_add_jstest(SceneLeakage mod_ProcFunctions)
+#y60_add_jstest(SceneLeakage mod_ProcFunctions)
+
