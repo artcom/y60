@@ -28,12 +28,12 @@ if(Y60_WITH_TRACEMONKEY)
     set(Y60_EXTRA_DEFINITIONS -DY60_WITH_TRACEMONKEY)
 endif(Y60_WITH_TRACEMONKEY)
 
-if(LINUX)
+if(UNIX)
     set(Y60_LAUNCHER_TEMPLATES
         Y60BuildLauncher.sh.in
         Y60InstallLauncher.sh.in
     )
-endif(LINUX)
+endif(UNIX)
 
 if(WIN32)
     set(Y60_LAUNCHER_TEMPLATES

@@ -251,7 +251,6 @@ macro(ac_add_project PROJECT_NAME)
 
     # Make custom scripts available to build-tree clients
     foreach(FILE ${THIS_PROJECT_CUSTOM_SCRIPTS} ${THIS_PROJECT_CUSTOM_TEMPLATES})
-        message("confing file ${CMAKE_CURRENT_SOURCE_DIR}/${FILE} to ${THIS_PROJECT_CMAKE_DIR}/${FILE}")
         configure_file(
             "${CMAKE_CURRENT_SOURCE_DIR}/${FILE}"
             "${THIS_PROJECT_CMAKE_DIR}/${FILE}"
