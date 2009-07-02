@@ -108,22 +108,27 @@ namespace y60 {
         PosixThread(),
         PlugInBase(theDLHandle),
         _myLastVideoFrame(),
+        _myAVCodecLock(),
         _myFormatContext(0),
-        _myFrame(0),
         _myVStreamIndex(-1),
         _myVStream(0),
-        _myStartTimestamp(-1),
-        _myTimeUnitsPerSecond(-1),
         _myAStreamIndex(-1),
         _myAStream(0),
+        _myMsgQueue(),
+        _myFrame(0),
         _myDemux(),
+        _myStartTimestamp(-1),
         _myDestinationPixelFormat(PIX_FMT_BGR24),
         _myResampleContext(0),
         _myNumFramesDecoded(0),
         _myNumIFramesDecoded(0),
         _myDecodedPacketsPerFrame(0),
-        _myBytesPerPixel(1),
+        _myTimeUnitsPerSecond(-1),
+        _myFrameRate(25),
         _myMaxCacheSize(8),
+        _myFrameWidth(0),
+        _myFrameHeight(0),
+        _myBytesPerPixel(1),
         _myLastFrameTime(0),
         _hasShutDown(false)
     {}
@@ -240,11 +245,23 @@ namespace y60 {
     }
 
     void FFMpegDecoder2::startOverAgain() {
-        join();        
+        AC_DEBUG<<"FFMpegDecoder2::startOverAgain";      
+        if (isActive()) {
+            AC_DEBUG << "Joining FFMpegDecoder Thread";
+            join();
+        }
         doSeek(-1);
         setState(RUN);
-        decodeFrame();
-        PosixThread::fork();
+        
+        if (!isActive()) {
+            decodeFrame();
+        }
+        if (!isActive()) {
+            AC_DEBUG << "Forking FFMpegDecoder Thread";
+            PosixThread::fork();
+        } else {
+            AC_DEBUG << "Thread already running. No forking.";
+        }
     }
 
     void FFMpegDecoder2::startMovie(double theStartTime, bool theStartAudioFlag) {
@@ -266,10 +283,10 @@ namespace y60 {
 
         setState(RUN);
         if (!isActive()) {
-            AC_INFO << "Forking FFMpegDecoder Thread";
+            AC_DEBUG << "Forking FFMpegDecoder Thread";
             PosixThread::fork();
         } else {
-            AC_INFO << "Thread already running. No forking.";
+            AC_DEBUG << "Thread already running. No forking.";
         }
         AsyncDecoder::startMovie(theStartTime, theStartAudioFlag);
     }
@@ -280,10 +297,10 @@ namespace y60 {
         _myMaxCacheSize = myMovie->get<MaxCacheSizeTag>();
         setState(RUN);
         if (!isActive()) {
-            AC_TRACE << "Forking FFMpegDecoder Thread";
+            AC_DEBUG << "Forking FFMpegDecoder Thread";
             PosixThread::fork();
         } else {
-            AC_INFO << "Thread already running. No forking.";
+            AC_DEBUG << "Thread already running. No forking.";
         }
         AsyncDecoder::resumeMovie(theStartTime, theResumeAudioFlag);
     }
@@ -718,8 +735,8 @@ namespace y60 {
             bool myAudioEofFlag = false;
             if (hasAudio()&& getDecodeAudioFlag())
             {
-                AC_DEBUG<<"decode audio";
                 myAudioEofFlag = !readAudio();
+                AC_DEBUG<<"decode audio eof: "<<myAudioEofFlag;
             }
             AC_TRACE << "---- Updating cache";
             try {

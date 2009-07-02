@@ -226,7 +226,6 @@ namespace y60 {
         DemuxPtr _myDemux;
 
         int64_t _myStartTimestamp;
-        double _myLastFrameTime;  // Only used for mpeg1/2 end of file handling.
 #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52,20,0)
         PixelFormat
 #else
@@ -252,6 +251,7 @@ namespace y60 {
         int _myFrameWidth;
         int _myFrameHeight;
         unsigned  _myBytesPerPixel;
+        double _myLastFrameTime;  // Only used for mpeg1/2 end of file handling.
         bool _hasShutDown;
 
     };

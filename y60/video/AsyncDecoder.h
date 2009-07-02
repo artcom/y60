@@ -85,9 +85,9 @@ namespace y60 {
     class AsyncDecoder : public MovieDecoderBase {
         public:
             AsyncDecoder() :
+                _myCachingFlag(false),
                 _myState(STOP),
-                _myLastAudioTime(0),
-                _myCachingFlag(false)
+                _myLastAudioTime(0)
             {}
 
             /**
