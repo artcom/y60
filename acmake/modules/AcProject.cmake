@@ -49,6 +49,8 @@ set(_AC_PROJECT_VARIABLES
     RUNTIME_DIR    # absolute install location of binaries (and dlls on windows)
     LIBRARY_DIR    # absolute install location of libraries
     INCLUDE_DIR    # absolute install location of headers
+    CMAKE_DIR      # absolute build/install location of cmake files
+    CMAKE_SUBDIR   # subdir of cmake files in both install and build trees
     DEFINITIONS    # definitions our clients should use when including us
     LIBRARIES      # list of all libraries in the project
     EXECUTABLES    # list of all executables in the project
@@ -59,7 +61,8 @@ set(_AC_PROJECT_VARIABLES
     OPTIONAL_PACKAGES # list of all optional find packages
     REQUIRED_PKGCONFIG # bilist of all required pkg-config packages
     OPTIONAL_PKGCONFIG # bilist of all optional pkg-config packages
-    CUSTOM_SCRIPTS   # custom scripts to be included in the find-package
+    CUSTOM_SCRIPTS   # custom scripts to be loaded by cmake config
+    CUSTOM_TEMPLATES # custom templates for use by cmake configs
     VENDOR           # string describing the vendor
     CONTACT          # contact information (email address)
     DESCRIPTION      # short human-readable description
@@ -82,6 +85,7 @@ set(PROJECT_ARGUMENTS
     REQUIRED_PKGCONFIG
     OPTIONAL_PKGCONFIG
     CUSTOM_SCRIPTS
+    CUSTOM_TEMPLATES
     DEFINITIONS
     # NOTE: installer stuff follows
     VENDOR
@@ -115,6 +119,9 @@ macro(ac_add_project PROJECT_NAME)
     # Enter project context
     set(ACMAKE_CURRENT_PROJECT ${PROJECT_NAME})
 
+    # generate lowercase name for use in paths
+    string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
+
     # Set the name of the object
     set_global(${PROJECT_NAME}_NAME ${PROJECT_NAME})
 
@@ -143,6 +150,18 @@ macro(ac_add_project PROJECT_NAME)
     set_global(${PROJECT_NAME}_LIBRARY_DIR ${CMAKE_INSTALL_PREFIX}/lib)
     set_global(${PROJECT_NAME}_INCLUDE_DIR ${CMAKE_INSTALL_PREFIX}/include)
 
+    # decide where cmake files should go
+    if(WIN32)
+        set(THIS_PROJECT_CMAKE_SUBDIR "cmake")
+    elseif(OSX)
+        set(THIS_PROJECT_CMAKE_SUBDIR ".")
+    elseif(LINUX)
+        set(THIS_PROJECT_CMAKE_SUBDIR "lib/${PROJECT_NAME_LOWER}/cmake")
+    endif(WIN32)
+    set_global(${PROJECT_NAME}_CMAKE_SUBDIR "${THIS_PROJECT_CMAKE_SUBDIR}")
+    set(THIS_PROJECT_CMAKE_DIR "${CMAKE_BINARY_DIR}/${THIS_PROJECT_CMAKE_SUBDIR}")
+    set_global(${PROJECT_NAME}_CMAKE_DIR    "${THIS_PROJECT_CMAKE_DIR}")
+
     # Definitions for our clients
     set_global(${PROJECT_NAME}_DEFINITIONS ${THIS_PROJECT_DEFINITIONS})
 
@@ -165,6 +184,7 @@ macro(ac_add_project PROJECT_NAME)
 
     # Remember custom files
     set_global(${PROJECT_NAME}_CUSTOM_SCRIPTS   ${THIS_PROJECT_CUSTOM_SCRIPTS})
+    set_global(${PROJECT_NAME}_CUSTOM_TEMPLATES ${THIS_PROJECT_CUSTOM_TEMPLATES})
 
     # Remember various installer-related things
     set_global(${PROJECT_NAME}_VENDOR           ${THIS_PROJECT_VENDOR})
@@ -228,6 +248,15 @@ macro(ac_add_project PROJECT_NAME)
     foreach(SCRIPT ${THIS_PROJECT_CUSTOM_SCRIPTS})
         include(${CMAKE_CURRENT_SOURCE_DIR}/${SCRIPT})
     endforeach(SCRIPT)
+
+    # Make custom scripts available to build-tree clients
+    foreach(FILE ${THIS_PROJECT_CUSTOM_SCRIPTS} ${THIS_PROJECT_CUSTOM_TEMPLATES})
+        configure_file(
+            "${CMAKE_CURRENT_SOURCE_DIR}/${FILE}"
+            "${THIS_PROJECT_CMAKE_DIR}/${FILE}"
+            COPYONLY
+        )
+    endforeach(FILE)
     
 endmacro(ac_add_project PROJECT_NAME)
 
@@ -395,17 +424,6 @@ macro(ac_end_project PROJECT_NAME)
         ${_AC_PROJECT_VARIABLES}
     )
 
-    # Determine build-time location of cmake modules
-    if(WIN32)
-        set(THIS_PROJECT_CMAKE_DIR "${CMAKE_BINARY_DIR}/cmake")
-    else(WIN32)
-        if(OSX)
-            set(THIS_PROJECT_CMAKE_DIR "${CMAKE_BINARY_DIR}")
-        else(OSX)
-            set(THIS_PROJECT_CMAKE_DIR "${CMAKE_BINARY_DIR}/lib/${PROJECT_NAME_LOWER}/cmake")
-        endif(OSX)
-    endif(WIN32)
-
     # Generate Find-file
     ac_configure_file(
         ${ACMAKE_TEMPLATES_DIR}/AcFind.cmake.in
@@ -484,34 +502,17 @@ macro(ac_end_project PROJECT_NAME)
         endif(IMPLIB_LOCATION)
     endforeach(LIBRARY ${THIS_PROJECT_LIBRARIES})
 
-    # Install find fileset
-    if(WIN32)
-        set(THIS_PROJECT_FIND_DESTINATION "cmake")
-    else(WIN32)
-        if(OSX)
-            set(THIS_PROJECT_FIND_DESTINATION "")
-        else(OSX)
-            set(THIS_PROJECT_FIND_DESTINATION "lib/${PROJECT_NAME_LOWER}/cmake")
-        endif(OSX)
-    endif(WIN32)
+    # Install cmake files
     install(
         FILES
             ${THIS_PROJECT_CMAKE_DIR}/${PROJECT_NAME}Config.cmake
             ${THIS_PROJECT_CMAKE_DIR}/${PROJECT_NAME}Dependencies.cmake
             ${THIS_PROJECT_CMAKE_DIR}/${PROJECT_NAME}Targets.cmake
             ${THIS_PROJECT_CUSTOM_SCRIPTS}
-	    DESTINATION ${THIS_PROJECT_FIND_DESTINATION}
+            ${THIS_PROJECT_CUSTOM_TEMPLATES}
+	    DESTINATION ${THIS_PROJECT_CMAKE_SUBDIR}
         COMPONENT ${PROJECT_NAME}_development
     )
-
-    # Make custom scripts available to build-tree clients
-    foreach(SCRIPT ${THIS_PROJECT_CUSTOM_SCRIPTS})
-        configure_file(
-            "${CMAKE_CURRENT_SOURCE_DIR}/${SCRIPT}"
-            "${THIS_PROJECT_CMAKE_DIR}/${SCRIPT}"
-            COPYONLY
-        )
-    endforeach(SCRIPT)
 
     # Remove our local copy of the project
     clear_locals(THIS_PROJECT ${_AC_PROJECT_VARIABLES})

@@ -29,10 +29,7 @@ if(@THIS_PROJECT_NAME@_IS_INTEGRATED)
 else(@THIS_PROJECT_NAME@_IS_INTEGRATED)
     # in imported mode, we have to template everything
 
-    # XXX: this is not strictly required.
-    #      it is here to allow our packages to use the Find files provided
-    #      by AcMake. Also, packages providing custom modules with utility
-    #      scripts (ASL, Y60) need this later anyway.
+    # load acmake
     find_package(AcMake)
 
     # templated variables
@@ -58,12 +55,10 @@ else(@THIS_PROJECT_NAME@_IS_INTEGRATED)
     # XXX: clean this mess
     if(WIN32)
         set(_CMAKE_TO_PREFIX "..")
-    else(WIN32)
-        if(OSX)
-            set(_CMAKE_TO_PREFIX ".")
-        else(OSX)
-            set(_CMAKE_TO_PREFIX "../../..")
-        endif(OSX)
+    elseif(OSX)
+        set(_CMAKE_TO_PREFIX ".")
+    elseif(LINUX)
+        set(_CMAKE_TO_PREFIX "../../..")
     endif(WIN32)
     get_filename_component(@THIS_PROJECT_NAME@_PREFIX "${@THIS_PROJECT_NAME@_CMAKE_DIR}/${_CMAKE_TO_PREFIX}" ABSOLUTE)
 
@@ -73,12 +68,12 @@ else(@THIS_PROJECT_NAME@_IS_INTEGRATED)
 
     # since imports can be used both from binary and install trees,
     # we have to find out in which one we are currently lying
-    if(EXISTS "${@THIS_PROJECT_NAME@_CMAKE_DIR}/../../../CMakeFiles")
+    if(EXISTS "${@THIS_PROJECT_NAME@_CMAKE_DIR}/${CMAKE_TO_PREFIX}/CMakeFiles")
         message("@THIS_PROJECT_NAME@ lies in build prefix ${@THIS_PROJECT_NAME@_PREFIX}")
-    else(EXISTS "${@THIS_PROJECT_NAME@_CMAKE_DIR}/../../../CMakeFiles")
+    else(EXISTS "${@THIS_PROJECT_NAME@_CMAKE_DIR}/${CMAKE_TO_PREFIX}/CMakeFiles")
         # we are being used from an install tree
         message("@THIS_PROJECT_NAME@ lies in install prefix ${@THIS_PROJECT_NAME@_PREFIX}")
-    endif(EXISTS "${@THIS_PROJECT_NAME@_CMAKE_DIR}/../../../CMakeFiles")
+    endif(EXISTS "${@THIS_PROJECT_NAME@_CMAKE_DIR}/${CMAKE_TO_PREFIX}/CMakeFiles")
 
 endif(@THIS_PROJECT_NAME@_IS_INTEGRATED)
 

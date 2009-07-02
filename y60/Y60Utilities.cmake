@@ -97,6 +97,12 @@ macro(y60_add_launcher NAME)
 
     set(APPLICATION ${Y60_CURRENT_APPLICATION})
 
+    # if we are in an independent app, this will have been defined
+    # if it wasn't, then get it from project globals
+    if(NOT Y60_CMAKE_DIR)
+        get_global(Y60_CMAKE_DIR Y60_CMAKE_DIR)
+    endif(NOT Y60_CMAKE_DIR)
+
     get_global(${APPLICATION}_BUILD_PATH   THIS_APPLICATION_BUILD_PATH)
     get_global(${APPLICATION}_INSTALL_PATH THIS_APPLICATION_INSTALL_PATH)
     get_global(${APPLICATION}_BINARY_DIR   THIS_APPLICATION_BINARY_DIR)
@@ -111,15 +117,6 @@ macro(y60_add_launcher NAME)
     if(NOT THIS_LAUNCHER_COMMAND_NAME)
         string(TOLOWER "${THIS_LAUNCHER_NAME}" THIS_LAUNCHER_COMMAND_NAME)
     endif(NOT THIS_LAUNCHER_COMMAND_NAME)
-
-    # handle being called by an importer
-    get_global(Y60_IS_INTEGRATED Y60_IS_INTEGRATED)
-    if(Y60_IS_INTEGRATED)
-            get_global(Y60_SOURCE_DIR Y60_SOURCE_DIR)
-            set(Y60_TEMPLATE_DIR ${Y60_SOURCE_DIR})
-    else(Y60_IS_INTEGRATED)
-            set(Y60_TEMPLATE_DIR ${Y60_INSTALL_PREFIX}/share/cmake-2.6/Templates)
-    endif(Y60_IS_INTEGRATED)
 
     # choose working dir for running from build tree
     if(THIS_LAUNCHER_BUILD_WORKING_DIR STREQUAL SOURCE)
@@ -143,66 +140,66 @@ macro(y60_add_launcher NAME)
     set(THIS_LAUNCHER_INSTALL_ENGINE ${THIS_LAUNCHER_ENGINE})
 
     if(UNIX)
-#         # generate launcher shell script for build tree runs
-#         configure_file(
-#             ${Y60_TEMPLATE_DIR}/Y60BuildLauncher.sh.in
-#             ${CMAKE_CURRENT_BINARY_DIR}/${THIS_LAUNCHER_COMMAND_NAME}
-#             @ONLY
-#         )
-#         # generate launcher shell script for installed tree runs
-#         configure_file(
-#             ${Y60_TEMPLATE_DIR}/Y60InstallLauncher.sh.in
-#             ${CMAKE_CURRENT_BINARY_DIR}/${ACMAKE_BINARY_SUBDIR}/${THIS_LAUNCHER_COMMAND_NAME}
-#             @ONLY
-#         )
-#         install(
-#             FILES ${CMAKE_CURRENT_BINARY_DIR}/${ACMAKE_BINARY_SUBDIR}/${THIS_LAUNCHER_COMMAND_NAME}
-#             COMPONENT ${APPLICATION}
-#             DESTINATION bin/
-#             PERMISSIONS OWNER_EXECUTE GROUP_EXECUTE WORLD_EXECUTE
-#                         OWNER_READ    GROUP_READ    WORLD_READ
-#                         OWNER_WRITE
-#         )
+         # generate launcher shell script for build tree runs
+         configure_file(
+             ${Y60_CMAKE_DIR}/Y60BuildLauncher.sh.in
+             ${CMAKE_CURRENT_BINARY_DIR}/${THIS_LAUNCHER_COMMAND_NAME}
+             @ONLY
+         )
+         # generate launcher shell script for installed tree runs
+         configure_file(
+             ${Y60_CMAKE_DIR}/Y60InstallLauncher.sh.in
+             ${CMAKE_CURRENT_BINARY_DIR}/${ACMAKE_BINARY_SUBDIR}/${THIS_LAUNCHER_COMMAND_NAME}
+             @ONLY
+         )
+         install(
+             FILES ${CMAKE_CURRENT_BINARY_DIR}/${ACMAKE_BINARY_SUBDIR}/${THIS_LAUNCHER_COMMAND_NAME}
+             COMPONENT ${APPLICATION}
+             DESTINATION bin/
+             PERMISSIONS OWNER_EXECUTE GROUP_EXECUTE WORLD_EXECUTE
+                         OWNER_READ    GROUP_READ    WORLD_READ
+                         OWNER_WRITE
+         )
     endif(UNIX)
 
     if(LINUX)
-#         # generate xdg desktop entry
-#         set(THIS_LAUNCHER_DESKTOP_FILE ${CMAKE_CURRENT_BINARY_DIR}/${THIS_LAUNCHER_COMMAND_NAME}.desktop)
+         # generate xdg desktop entry
+         set(THIS_LAUNCHER_DESKTOP_FILE ${CMAKE_CURRENT_BINARY_DIR}/${THIS_LAUNCHER_COMMAND_NAME}.desktop)
 
-#         file(WRITE  ${THIS_LAUNCHER_DESKTOP_FILE} "[Desktop Entry]\n")
-#         file(APPEND ${THIS_LAUNCHER_DESKTOP_FILE} "Type=Application\n")
-#         file(APPEND ${THIS_LAUNCHER_DESKTOP_FILE} "Name=${THIS_LAUNCHER_NAME}\n")
-#         file(APPEND ${THIS_LAUNCHER_DESKTOP_FILE} "TryExec=${THIS_LAUNCHER_COMMAND_NAME}\n")
-#         file(APPEND ${THIS_LAUNCHER_DESKTOP_FILE} "Exec=${THIS_LAUNCHER_COMMAND_NAME} %U\n")
-#         file(APPEND ${THIS_LAUNCHER_DESKTOP_FILE} "Categories=${THIS_LAUNCHER_CATEGORIES}\n")
-#         if(THIS_LAUNCHER_MIME_TYPES)
-#             file(APPEND ${THIS_LAUNCHER_DESKTOP_FILE} "MimeType=${THIS_LAUNCHER_MIME_TYPES}\n")
-#         endif(THIS_LAUNCHER_MIME_TYPES)
+         file(WRITE  ${THIS_LAUNCHER_DESKTOP_FILE} "[Desktop Entry]\n")
+         file(APPEND ${THIS_LAUNCHER_DESKTOP_FILE} "Type=Application\n")
+         file(APPEND ${THIS_LAUNCHER_DESKTOP_FILE} "Name=${THIS_LAUNCHER_NAME}\n")
+         file(APPEND ${THIS_LAUNCHER_DESKTOP_FILE} "TryExec=${THIS_LAUNCHER_COMMAND_NAME}\n")
+         file(APPEND ${THIS_LAUNCHER_DESKTOP_FILE} "Exec=${THIS_LAUNCHER_COMMAND_NAME} %U\n")
+         file(APPEND ${THIS_LAUNCHER_DESKTOP_FILE} "Categories=${THIS_LAUNCHER_CATEGORIES}\n")
+         if(THIS_LAUNCHER_MIME_TYPES)
+             file(APPEND ${THIS_LAUNCHER_DESKTOP_FILE} "MimeType=${THIS_LAUNCHER_MIME_TYPES}\n")
+         endif(THIS_LAUNCHER_MIME_TYPES)
 
-#         install(
-#             FILES ${THIS_LAUNCHER_DESKTOP_FILE}
-#             COMPONENT ${APPLICATION}
-#             DESTINATION share/applications
-#         )
+         install(
+             FILES ${THIS_LAUNCHER_DESKTOP_FILE}
+             COMPONENT ${APPLICATION}
+             DESTINATION share/applications
+         )
     endif(LINUX)
 
     if(WIN32)
-#         # generate launcher batch script for installed tree runs
-#         configure_file(
-#             ${Y60_TEMPLATE_DIR}/Y60InstallLauncher.bat.in
-#             ${CMAKE_CURRENT_BINARY_DIR}/${ACMAKE_BINARY_SUBDIR}/${NAME}.bat
-#             @ONLY
-#         )
-#         install(
-#             FILES ${CMAKE_CURRENT_BINARY_DIR}/${ACMAKE_BINARY_SUBDIR}/${NAME}.bat
-#             COMPONENT ${APPLICATION}
-#             DESTINATION bin/
-#             PERMISSIONS OWNER_EXECUTE GROUP_EXECUTE WORLD_EXECUTE
-#                         OWNER_READ    GROUP_READ    WORLD_READ
-#                         OWNER_WRITE
-#         )
+         # generate launcher batch script for installed tree runs
+         configure_file(
+             ${Y60_CMAKE_DIR}/Y60InstallLauncher.bat.in
+             ${CMAKE_CURRENT_BINARY_DIR}/${ACMAKE_BINARY_SUBDIR}/${NAME}.bat
+             @ONLY
+         )
+         install(
+             FILES ${CMAKE_CURRENT_BINARY_DIR}/${ACMAKE_BINARY_SUBDIR}/${NAME}.bat
+             COMPONENT ${APPLICATION}
+             DESTINATION bin/
+             PERMISSIONS OWNER_EXECUTE GROUP_EXECUTE WORLD_EXECUTE
+                         OWNER_READ    GROUP_READ    WORLD_READ
+                         OWNER_WRITE
+         )
 
-#         ac_add_installer_shortcut(${NAME} "" "" "" "bin\\\\\\\\${NAME}.bat" "")
+         ac_add_installer_shortcut(${NAME} "" "" "" "bin\\\\\\\\${NAME}.bat" "")
     endif(WIN32)
 endmacro(y60_add_launcher)
 
@@ -232,51 +229,12 @@ function(y60_end_application NAME)
     set(Y60_CURRENT_APPLICATION)
 endfunction(y60_end_application)
 
-
-macro(collect_path INTO)
-    # collect paths for all plugins
-    collect_plugin_path(_PLUGIN_PATH)
-
-    # add some hard-coded defaults
-    set(_PATH
-        ${Y60_SOURCE_DIR}/js     # javascript library
-        ${Y60_SOURCE_DIR}/shader # shader library
-        ${_PLUGIN_PATH}          # plugin locations
-    )
-
-    # set the output variable
-    set(${INTO} ${_PATH})
-endmacro(collect_path)
-
-macro(collect_plugin_path INTO) 
-    # get list of all plugins in the Y60 project
-    get_global(Y60_PLUGINS PLUGINS)
-
-    # compile list of paths based on locations of plugins
-    set(PLUGIN_DIRS)
-    foreach(PLUGIN ${PLUGINS})
-        get_target_property(PLUGIN_FILE ${PLUGIN} LOCATION_${CMAKE_BUILD_TYPE}) 
-
-        get_filename_component(PLUGIN_PATH ${PLUGIN_FILE} PATH)
-
-        list(APPEND PLUGIN_DIRS ${PLUGIN_PATH})
-    endforeach(PLUGIN)
-
-    if(PLUGIN_DIRS)
-        list(REMOVE_DUPLICATES PLUGIN_DIRS)
-    endif(PLUGIN_DIRS)
-
-    # set output variable
-    set(${INTO} ${PLUGIN_DIRS})
-endmacro(collect_plugin_path)
-
 macro(y60_add_jstest NAME PREFIX)
+    set(_BASE_PATH)
+
     # find y60 executable
     get_target_property(Y60_EXECUTABLE y60 LOCATION_${CMAKE_BUILD_TYPE})
     
-    # collect basic Y60_PATH
-    collect_path(_BASE_PATH)
-
     # extend the path with test-specifics
     set(_PATH ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR} ${_BASE_PATH})
 
@@ -292,8 +250,6 @@ macro(write_scenetest NAME CMAKEFILE DIRNAME IS_CGTEST TOLERANCE THRESHOLD)
   get_target_property(COMPAREIMAGE_EXECUTABLE y60-compare-image LOCATION_${CMAKE_BUILD_TYPE})
   get_target_property(GENMOVIE_EXECUTABLE y60-gen-movie LOCATION_${CMAKE_BUILD_TYPE})
   get_target_property(GENCOMPRESSEDTEX_EXECUTABLE y60-gen-compressed-tex LOCATION_${CMAKE_BUILD_TYPE})
-
-  collect_path(PLUGIN_DIRS) 
   
   if(IS_CGTEST)
     file(WRITE ${CMAKEFILE} "# testscript for cg scenetest ${NAME}\n")
