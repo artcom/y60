@@ -26,6 +26,11 @@ endmacro(clear_locals LOCAL_PREFIX SUFFIXES)
 
 ### GLOBAL PROPERTIES
 
+# Shortcut for clearing a global property
+macro(clear_global NAME)
+    set_property(GLOBAL PROPERTY ${NAME})
+endmacro(clear_global NAME)
+
 # Shortcut for setting a global property
 macro(set_global NAME)
     set_property(GLOBAL PROPERTY ${NAME} ${ARGN})
@@ -35,6 +40,14 @@ endmacro(set_global NAME)
 macro(append_global NAME)
     set_property(GLOBAL APPEND PROPERTY ${NAME} ${ARGN})
 endmacro(append_global NAME)
+
+# Remove an item from a global property list
+macro(remove_global NAME VALUE)
+    get_global(${NAME} _V)
+    list(REMOVE_ITEM _V ${VALUE})
+    set_global(${NAME} ${_V})
+    set(_V)
+endmacro(remove_global NAME VALUE)
 
 # Shortcut for uniquely appending to a list in a global property
 macro(append_global_unique NAME)
