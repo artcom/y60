@@ -279,12 +279,13 @@ void PosixThread::fork () {
     DB(AC_TRACE << "#INFO : PosixThread::fork() : thread has stack size " << stackSize << " bytes" << endl;)
     DB(AC_TRACE << "#INFO : PosixThread::fork() : thread has stack addr " << stackAddr << "." << endl;)
     DB(AC_TRACE << "#INFO : PosixThread::fork() : thread has guard size " << guardSize << " bytes" << endl;)
-
+    _myIsActive = true;
     myRetVal = pthread_create (&_myThread, 0, threadFunc, this);
 
     DB(AC_INFO << "PosixThread::fork() : created thread id " <<getThreadID() << endl);
-    testRetVal (myRetVal, "PosixThread:pthread_create");
-    _myIsActive = true;
+    if (! testRetVal (myRetVal, "PosixThread:pthread_create")) {
+        _myIsActive = false;
+    }
     DB(AC_INFO << "PosixThread::fork() : has set active variable for thread id " <<getThreadID() << endl);
     _myCreator = pthread_self();
 }

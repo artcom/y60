@@ -90,7 +90,7 @@ function FFMpegTest(theArguments) {
         testPlayToEnd,
         testStop,
         testPause,
-        //testLoop, //XXX looping broken on linux
+        testLoop, 
         testPauseStop,
         testStopPause,
         testSeek,
