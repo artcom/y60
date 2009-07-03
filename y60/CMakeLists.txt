@@ -53,6 +53,7 @@ ac_add_project(Y60
     CUSTOM_SCRIPTS
         Y60Utilities.cmake
     CUSTOM_TEMPLATES
+        Y60RenderTest.cmake.in
         ${Y60_LAUNCHER_TEMPLATES}
     DEFINITIONS
         -DAC_BUILT_WITH_CMAKE

@@ -1,0 +1,91 @@
+
+#### PARAMETERS
+
+set(NAME "@TEST_NAME@")
+
+set(Y60_EXECUTABLE "@TEST_Y60_EXECUTABLE@")
+set(Y60_PATH       "@TEST_Y60_PATH@")
+
+set(Y60_COMPARE_IMAGE_EXECUTABLE "@TEST_Y60_COMPARE_IMAGE_EXECUTABLE@")
+
+set(LOAD "@TEST_LOAD@")
+
+set(SOURCE_DIR "@TEST_SOURCE_DIR@")
+set(BINARY_DIR "@TEST_BINARY_DIR@")
+
+set(BASELINE_DIR "@TEST_BASELINE_DIR@")
+set(OUTPUT_DIR   "@TEST_OUTPUT_DIR@")
+
+set(IMAGE_PREFIX "@TEST_IMAGE_PREFIX@")
+set(IMAGE_SUFFIX "@TEST_IMAGE_SUFFIX@")
+
+set(TOLERANCE "@TEST_TOLERANCE@")
+set(THRESHOLD "@TEST_THRESHOLD@")
+
+#### BASELINE IMAGE SEARCH
+
+file(
+    GLOB BASELINE_IMAGES
+    "${BASELINE_DIR}/${IMAGE_PREFIX}.${IMAGE_SUFFIX}.png"
+    "${BASELINE_DIR}/${IMAGE_PREFIX}.*.${IMAGE_SUFFIX}.png"
+)
+
+if(NOT BASELINE_IMAGES)
+    message(FATAL_ERROR "No baseline images found")
+    return()
+endif(NOT BASELINE_IMAGES)
+
+
+#### CLEANUP PHASE
+
+file(
+    GLOB OLD_OUTPUT_IMAGES
+    "${OUTPUT_DIR}/${IMAGE_PREFIX}.*.png"
+)
+
+if(OLD_OUTPUT_IMAGES)
+    file(REMOVE ${OLD_OUTPUT_IMAGES})
+endif(OLD_OUTPUT_IMAGES)
+
+
+#### RENDER PHASE
+
+string(REGEX REPLACE ";" " " LOAD_FOR_PRINTING "${LOAD}")
+
+# NOTE: command duplication is needed for formatting reasons.
+#       please keep the printout and the real command consistent.
+
+message("Executing \"${Y60_EXECUTABLE}\" -I \"${Y60_PATH}\" ${LOAD_FOR_PRINTING} rehearsal \"outputimage=${OUTPUT_DIR}/${IMAGE_PREFIX}\" \"outputsuffix=.${IMAGE_SUFFIX}.png\"")
+
+execute_process(
+    COMMAND "${Y60_EXECUTABLE}" -I "${Y60_PATH}" ${LOAD} rehearsal "outputimage=${OUTPUT_DIR}/${IMAGE_PREFIX}" "outputsuffix=.${IMAGE_SUFFIX}.png"
+    WORKING_DIRECTORY "${BINARY_DIR}"
+    RESULT_VARIABLE RESULT
+)
+
+if(NOT RESULT EQUAL 0)
+    message(FATAL_ERROR "Engine returned non-zero error code ${RESULT}")
+    return()
+endif(NOT RESULT EQUAL 0)
+
+
+#### COMPARISON PHASE
+
+foreach(BASELINE ${BASELINE_IMAGES})
+    get_filename_component(IMAGE "${BASELINE}" NAME)
+    set(OUTPUT "${OUTPUT_DIR}/${IMAGE}")
+
+    message("Comparing ${IMAGE} by executing \"${Y60_COMPARE_IMAGE_EXECUTABLE}\" --tolerance ${TOLERANCE} --threshold ${THRESHOLD} \"${OUTPUT}\" \"${BASELINE}\"")
+
+    execute_process(
+        COMMAND "${Y60_COMPARE_IMAGE_EXECUTABLE}" --tolerance ${TOLERANCE} --threshold ${THRESHOLD} "${OUTPUT}" "${BASELINE}"
+        WORKING_DIRECTORY "${BINARY_DIR}"
+        RESULT_VARIABLE RESULT
+    )
+
+    if(NOT RESULT EQUAL 0)
+        message(FATAL_ERROR "Comparison returned non-zero error code ${RESULT}")
+        return()
+    endif(NOT RESULT EQUAL 0)
+
+endforeach(BASELINE)

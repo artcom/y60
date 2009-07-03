@@ -230,13 +230,11 @@ function(y60_end_application NAME)
 endfunction(y60_end_application)
 
 macro(y60_add_jstest NAME PREFIX)
-    set(_BASE_PATH)
-
     # find y60 executable
     get_target_property(Y60_EXECUTABLE y60 LOCATION_${CMAKE_BUILD_TYPE})
     
-    # extend the path with test-specifics
-    set(_PATH ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR} ${_BASE_PATH})
+    # path with test-specifics
+    set(_PATH ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 
     # register the test
     add_test(${PREFIX}_${NAME}
@@ -244,137 +242,55 @@ macro(y60_add_jstest NAME PREFIX)
     )
 endmacro(y60_add_jstest)
 
-
-macro(write_scenetest NAME CMAKEFILE DIRNAME IS_CGTEST TOLERANCE THRESHOLD)
-  get_target_property(Y60_EXECUTABLE y60 LOCATION_${CMAKE_BUILD_TYPE}) 
-  get_target_property(COMPAREIMAGE_EXECUTABLE y60-compare-image LOCATION_${CMAKE_BUILD_TYPE})
-  get_target_property(GENMOVIE_EXECUTABLE y60-gen-movie LOCATION_${CMAKE_BUILD_TYPE})
-  get_target_property(GENCOMPRESSEDTEX_EXECUTABLE y60-gen-compressed-tex LOCATION_${CMAKE_BUILD_TYPE})
-  
-  if(IS_CGTEST)
-    file(WRITE ${CMAKEFILE} "# testscript for cg scenetest ${NAME}\n")
-  else(IS_CGTEST)
-    file(WRITE ${CMAKEFILE} "# testscript for no cg scenetest ${NAME}\n")
-  endif(IS_CGTEST)
-  file(APPEND ${CMAKEFILE} "#   will be called with cmake -P ${CMAKEFILE}\n\n")
-  if(IS_CGTEST)
-    file(APPEND ${CMAKEFILE} "message(\"*********************** CG *********************\")\n")  
-  else(IS_CGTEST)
-    file(APPEND ${CMAKEFILE} "message(\"*********************** NO CG *********************\")\n")  
-  endif(IS_CGTEST)
-    
-  if(EXISTS ${TESTMODELDIR}/${NAME}.pre.cmake)
-    file(APPEND ${CMAKEFILE} "include(\"${TESTMODELDIR}/${NAME}.pre.cmake\")\n")
-    file(APPEND ${CMAKEFILE} "${NAME}_pre(\"${CMAKE_BINARY_DIR}\" \"${TESTMODELDIR}\" \"${GENMOVIE_EXECUTABLE}\" \"${GENCOMPRESSEDTEX_EXECUTABLE}\") \n\n")
-  endif(EXISTS ${TESTMODELDIR}/${NAME}.pre.cmake)
-
-  file(APPEND ${CMAKEFILE} "message(\"Executing: ${Y60_EXECUTABLE} -I \"${PLUGIN_DIRS}\" ${SCRIPT} ${SCENE} ${SHADERLIB} rehearsal outputimage=${CMAKE_BINARY_DIR}/${DIRNAME}/TestImages/${NAME} outputsuffix=${IMGSUFFIX}\")\n")
-
-  file(APPEND ${CMAKEFILE} "#generate image\n")
-  file(APPEND ${CMAKEFILE} "execute_process(\n")
-  if( NOT ${DIRNAME} STREQUAL "tutorials" )
-    file(APPEND ${CMAKEFILE} "  COMMAND \"${Y60_EXECUTABLE}\" -I \"${PLUGIN_DIRS}\" \"${SCRIPT}\" \"${SCENE}\" \"${SHADERLIB}\" \"rehearsal outputimage=${CMAKE_BINARY_DIR}/${DIRNAME}/TestImages/${NAME}\" \"outputsuffix=${IMGSUFFIX}\"\n")
-  else( NOT ${DIRNAME} STREQUAL "tutorials" )
-    file(APPEND ${CMAKEFILE} "  COMMAND \"${Y60_EXECUTABLE}\" -I \"${PLUGIN_DIRS}\" createTutorialScreenshots.js \"${SCRIPT}\" \"${CMAKE_BINARY_DIR}/${DIRNAME}/TestImages\"\n")
-  endif( NOT ${DIRNAME} STREQUAL "tutorials" )
-  file(APPEND ${CMAKEFILE} "  WORKING_DIRECTORY \"${TESTMODELDIR}\"\n")
-  file(APPEND ${CMAKEFILE} "  RESULT_VARIABLE rv\n")
-  file(APPEND ${CMAKEFILE} ")\n")
-  file(APPEND ${CMAKEFILE} "if(NOT rv EQUAL 0)\n")
-  file(APPEND ${CMAKEFILE} "  message(FATAL_ERROR \"scenetest ${NAME} FAILED\")\n")
-  file(APPEND ${CMAKEFILE} "endif(NOT rv EQUAL 0)\n")  
-  file(APPEND ${CMAKEFILE} "\n")
-  
-  #rename file for comparison
-  if( ${DIRNAME} STREQUAL "tutorials" )
-    file(APPEND ${CMAKEFILE} "configure_file(\"${CMAKE_BINARY_DIR}/${DIRNAME}/TestImages/${NAME}.png\" \"${CMAKE_BINARY_DIR}/${DIRNAME}/TestImages/${NAME}${IMGSUFFIX}\"  COPYONLY) " )
-    file(APPEND ${CMAKEFILE} "\n")
-  endif( ${DIRNAME} STREQUAL "tutorials" )
-    
-  set(COUNT 0)
-  set(TESTIMG ${CMAKE_BINARY_DIR}/${DIRNAME}/TestImages/${NAME}${IMGSUFFIX}) 
-  set(BASELINEIMG ${TESTMODELDIR}/BaselineImages/${NAME}${IMGSUFFIX})
-  
-  while(EXISTS ${BASELINEIMG})
-    file(APPEND ${CMAKEFILE} "#compare image\n")
-    file(APPEND ${CMAKEFILE} "if(rv EQUAL 0)\n")
-    file(APPEND ${CMAKEFILE} "execute_process(\n")
-    file(APPEND ${CMAKEFILE} "  COMMAND \"${COMPAREIMAGE_EXECUTABLE}\" --tolerance ${TOLERANCE} --threshold ${THRESHOLD} \"${TESTIMG}\" \"${BASELINEIMG}\"\n")
-    file(APPEND ${CMAKEFILE} "  WORKING_DIRECTORY \"${TESTMODELDIR}\"\n")
-    file(APPEND ${CMAKEFILE} "  RESULT_VARIABLE rv\n")
-    file(APPEND ${CMAKEFILE} ")\n")
-    file(APPEND ${CMAKEFILE} "endif(rv EQUAL 0)\n")  
-    file(APPEND ${CMAKEFILE} "\n")
-    file(APPEND ${CMAKEFILE} "if(NOT rv EQUAL 0)\n")
-    file(APPEND ${CMAKEFILE} "  message(FATAL_ERROR \"scenetest ${NAME} FAILED\")\n")
-    file(APPEND ${CMAKEFILE} "endif(NOT rv EQUAL 0)\n")  
-    math(EXPR COUNT ${COUNT}+1)
-    set(TESTIMG ${CMAKE_BINARY_DIR}/${DIRNAME}/TestImages/${NAME}.${COUNT}${IMGSUFFIX}) 
-    set(BASELINEIMG ${TESTMODELDIR}/BaselineImages/${NAME}.${COUNT}${IMGSUFFIX})
-  endwhile(EXISTS ${BASELINEIMG})
-  
-  file(APPEND ${CMAKEFILE} "\n") 
-
-endmacro(write_scenetest )
-
-
-
-macro(y60_add_scenetest_custom NAME DIRNAME TOLERANCE THRESHOLD) 
-  #generate  ${NAME}.tst.cmake (will include execute_process y60, ac-compare-image)
-
-  set(TESTMODELDIR ${CMAKE_SOURCE_DIR}/../${DIRNAME})
-  set(SCRIPT ${TESTMODELDIR}/${NAME}.js)
-  if(NOT EXISTS ${SCRIPT})
-    set(SCRIPT ${CMAKE_SOURCE_DIR}/y60/js/scenetest.js)
-  endif(NOT EXISTS ${SCRIPT})
-  set(SCENE ${TESTMODELDIR}/${NAME}.x60)
-  if(NOT EXISTS ${SCENE})
-    set(SCENE_H ${TESTMODELDIR}/${NAME}.b60)
-    if(NOT EXISTS ${SCENE_H})
-      set(SCENE_H "")
-    endif(NOT EXISTS ${SCENE_H})  
-    set(SCENE ${SCENE_H})
-  endif(NOT EXISTS ${SCENE})
-  set(SHADERLIB ${CMAKE_SOURCE_DIR}/y60/shader/shaderlibrary_nocg.xml)
-  set(IMGSUFFIX .nocg.png)
-  set(ONEVERSION 0)
-  set(CMAKEFILE ${CMAKE_BINARY_DIR}/${DIRNAME}/${NAME}.tst.cmake)
-  set(CMAKEFILECG ${CMAKE_BINARY_DIR}/${DIRNAME}/${NAME}.cg.tst.cmake)
-  
-  if(NOT EXISTS ${CMAKE_BINARY_DIR}/${DIRNAME}/TestImages)
-    file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${DIRNAME}/TestImages)
-  endif(NOT EXISTS ${CMAKE_BINARY_DIR}/${DIRNAME}/TestImages)
-  
-  # generate no cg test (if available)
-  if(EXISTS ${TESTMODELDIR}/BaselineImages/${NAME}${IMGSUFFIX})
-    set(ONEVERSION 1)
-    write_scenetest( ${NAME} ${CMAKEFILE} ${DIRNAME} 0 ${TOLERANCE} ${THRESHOLD})
-        
-    # register the created cmake-file as test
-    add_test(${DIRNAME}_${NAME}
-      cmake -P ${CMAKEFILE}
+macro(y60_add_rendertest NAME)
+    parse_arguments(
+        TEST
+        "LOAD;IMAGE_PREFIX;IMAGE_SUFFIX;BASELINE_DIR;OUTPUT_DIR;TOLERANCE;THRESHOLD"
+        ""
+        ${ARGN}
     )
-  endif(EXISTS ${TESTMODELDIR}/BaselineImages/${NAME}${IMGSUFFIX})
-    
-  # generate no cg test (if available)
-  set(SHADERLIB ${CMAKE_SOURCE_DIR}/y60/shader/shaderlibrary.xml)
-  set(IMGSUFFIX .cg.png)
-  if(EXISTS ${TESTMODELDIR}/BaselineImages/${NAME}${IMGSUFFIX})
-    set(ONEVERSION 1)
-    write_scenetest( ${NAME} ${CMAKEFILECG} ${DIRNAME} 1 ${TOLERANCE} ${THRESHOLD})
-  
-    # register the created cmake-file as test
-    add_test(${DIRNAME}_CG_${NAME}
-      cmake -P ${CMAKEFILECG}
+
+    if(NOT TEST_OUTPUT_DIR)
+        set(TEST_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR})
+    endif(NOT TEST_OUTPUT_DIR)
+
+    if(NOT TEST_TOLERANCE)
+        set(TEST_TOLERANCE "0.12")
+    endif(NOT TEST_TOLERANCE)
+
+    if(NOT TEST_THRESHOLD)
+        set(TEST_THRESHOLD "30")
+    endif(NOT TEST_THRESHOLD)
+
+    set(TEST_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+    set(TEST_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
+
+    get_target_property(
+        TEST_Y60_EXECUTABLE
+        y60
+        LOCATION_${CMAKE_BUILD_TYPE}
     )
-  endif(EXISTS ${TESTMODELDIR}/BaselineImages/${NAME}${IMGSUFFIX})
+    get_target_property(
+        TEST_Y60_COMPARE_IMAGE_EXECUTABLE
+        y60-compare-image
+        LOCATION_${CMAKE_BUILD_TYPE}
+    )
 
-  if(${ONEVERSION} EQUAL 0)  
-    message("SKIPPED. (No BaselineImages found for scenetest ${NAME}.)")
-  endif(${ONEVERSION} EQUAL 0)  
-  
-endmacro(y60_add_scenetest_custom)
+    set(TEST_Y60_PATH ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 
-macro(y60_add_scenetest NAME DIRNAME)
-    y60_add_scenetest_custom(${NAME} ${DIRNAME} "0.12" "30") 
-endmacro(y60_add_scenetest NAME DIRNAME)  
+    if(NOT Y60_CMAKE_DIR)
+        get_global(Y60_CMAKE_DIR Y60_CMAKE_DIR)
+    endif(NOT Y60_CMAKE_DIR)
+
+    configure_file(
+        ${Y60_CMAKE_DIR}/Y60RenderTest.cmake.in
+        ${CMAKE_CURRENT_BINARY_DIR}/test_${NAME}.cmake
+        @ONLY
+    )
+
+    add_test(
+        render_${NAME}
+        cmake -P ${CMAKE_CURRENT_BINARY_DIR}/test_${NAME}.cmake
+    )
+endmacro(y60_add_rendertest)
+
