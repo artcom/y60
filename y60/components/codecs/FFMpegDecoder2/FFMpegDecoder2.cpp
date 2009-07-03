@@ -246,10 +246,10 @@ namespace y60 {
 
     void FFMpegDecoder2::startOverAgain() {
         AC_DEBUG<<"FFMpegDecoder2::startOverAgain";      
-        if (isActive()) {
+        //if (isActive()) { //XXX the active flag seems to be broken
             AC_DEBUG << "Joining FFMpegDecoder Thread";
             join();
-        }
+        //}
         doSeek(-1);
         setState(RUN);
         
