@@ -305,8 +305,10 @@ namespace y60 {
     void FFMpegDecoder2::stopMovie(bool theStopAudioFlag) {
         DBI(AC_INFO << "FFMpegDecoder2::stopMovie";)
         
-        DBI(AC_INFO << "Joining FFMpegDecoder Thread");
-        join();
+        if (isActive()) {
+            DBI(AC_INFO << "Joining FFMpegDecoder Thread");
+            join();
+        }
         if (getState() != STOP) {
             DBI(AC_INFO << "Stopping Movie");
             
