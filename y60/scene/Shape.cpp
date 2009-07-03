@@ -235,7 +235,7 @@ namespace y60 {
             }
         }
         throw ShapeException(std::string("Could not find vertex data '")+theDataName+"' in shape '"+get<IdTag>()+"'", "Scene::getListData()");
-        return NodePtr(0); // XXX, breaks testSceneLeakage test but cannot be compiled with boost smartptr (vs)
+        return NodePtr(0); // XXX, needed for testSceneLeakage test but cannot be compiled with boost smartptr (vs)
     }
 
 #if 0 
