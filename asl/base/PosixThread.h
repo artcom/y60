@@ -80,6 +80,7 @@ class ASL_BASE_DECL PosixThread {
         void    fork();
         void    join();
         bool    isActive();
+        bool    isUnjoined();
         void    yield();
 #ifndef _WIN32
         bool    kill(int signalNumber=SIGKILL);
@@ -109,7 +110,8 @@ class ASL_BASE_DECL PosixThread {
         pthread_t     _myCreator;
         int           _mySchedPolicy;
         int           _myPriority;
-        bool          _myIsActive;
+        volatile bool _myIsActive;
+        volatile bool _myIsUnjoined;
         WorkFunc *    _myWorkFunc;
         void *        _myWorkArgs;
         volatile bool _myShouldTerminate; // if this is true, join() has been called.

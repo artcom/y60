@@ -136,6 +136,7 @@ PosixThread::PosixThread(int mySchedPolicy, int myPriority)
     _mySchedPolicy (mySchedPolicy),
     _myPriority (myPriority),
     _myIsActive (false),
+    _myIsUnjoined (false),
     _myWorkFunc(0),
     _myWorkArgs(0),
     _myShouldTerminate(false)
@@ -148,6 +149,7 @@ PosixThread::PosixThread (WorkFunc * workFunc, void * workArgs,
       _mySchedPolicy (mySchedPolicy),
       _myPriority (myPriority),
       _myIsActive (false),
+      _myIsUnjoined (false),
       _myWorkFunc(workFunc),
       _myWorkArgs(workArgs),
       _myShouldTerminate(false)
@@ -159,6 +161,7 @@ PosixThread::PosixThread ()
       _mySchedPolicy (SCHED_OTHER),
       _myPriority (0),
       _myIsActive (false),
+      _myIsUnjoined (false),
       _myWorkFunc(0),
       _myWorkArgs(0),
       _myShouldTerminate(false)
@@ -167,6 +170,9 @@ PosixThread::PosixThread ()
 PosixThread::~PosixThread() {
     if (isActive()) {
         AC_ERROR << "~PosixThread() : destruction of active thread, id =" << _myThread << endl;
+    }
+    if (isUnjoined()) {
+        AC_ERROR << "~PosixThread() : destruction of unjoined thread, id =" << _myThread << endl;
     }
 }
 
@@ -192,8 +198,8 @@ PosixThread::setDefaultPriority() {
 
 bool
 PosixThread::updatePriority() {
-    if (!isActive()) {
-        AC_ERROR << "PosixThread::updatePriority() : thread not active" << endl;
+    if (!isUnjoined()) {
+        AC_ERROR << "PosixThread::updatePriority() : thread is joined" << endl;
         return false;
     }
 
@@ -243,6 +249,10 @@ void PosixThread::fork () {
         AC_ERROR << "PosixThread::fork() called on already active thread" << endl;
         return;
     }
+    if (isUnjoined()) {
+        AC_ERROR << "PosixThread::fork() called on unjoined thread" << endl;
+        return;
+    }
     int myRetVal;
 
     DB(PosixThread * This = dynamic_cast<PosixThread*>(this);
@@ -279,20 +289,19 @@ void PosixThread::fork () {
     DB(AC_TRACE << "#INFO : PosixThread::fork() : thread has stack size " << stackSize << " bytes" << endl;)
     DB(AC_TRACE << "#INFO : PosixThread::fork() : thread has stack addr " << stackAddr << "." << endl;)
     DB(AC_TRACE << "#INFO : PosixThread::fork() : thread has guard size " << guardSize << " bytes" << endl;)
-    _myIsActive = true;
     myRetVal = pthread_create (&_myThread, 0, threadFunc, this);
-
+    _myIsUnjoined = true;
     DB(AC_INFO << "PosixThread::fork() : created thread id " <<getThreadID() << endl);
-    if (! testRetVal (myRetVal, "PosixThread:pthread_create")) {
-        _myIsActive = false;
-    }
+    testRetVal (myRetVal, "PosixThread:pthread_create");
+        
     DB(AC_INFO << "PosixThread::fork() : has set active variable for thread id " <<getThreadID() << endl);
     _myCreator = pthread_self();
 }
 
 void PosixThread::join () {
-    if (!isActive()) {
-        AC_DEBUG << "PosixThread::join() : thread not active" << endl;
+    if (!isUnjoined()) {
+        AC_ERROR << "PosixThread::join() : thread already joined" << endl;
+        return;
     }
     DB(AC_INFO << "PosixThread::join() called for thread id " <<getThreadID() << endl);
     if (pthread_equal(pthread_self(), _myThread) != 0) {
@@ -308,7 +317,7 @@ void PosixThread::join () {
     myRetVal = pthread_join (_myThread, &myThreadRetVal);
     DB(AC_INFO << " PosixThread::joined() thread id " <<getThreadID() << endl);
     testRetVal (myRetVal, "PosixThread:pthread_join");
-    _myIsActive = false;
+    _myIsUnjoined = false;
     _myShouldTerminate = false;
     DB(AC_INFO << "PosixThread::join() : has cleared active variable" << endl);
 }
@@ -346,6 +355,10 @@ PosixThread::kill(int signalNumber) {
 
 bool PosixThread::isActive() {
     return _myIsActive;
+}
+
+bool PosixThread::isUnjoined() {
+    return _myIsUnjoined;
 }
 
 void PosixThread::yield() {

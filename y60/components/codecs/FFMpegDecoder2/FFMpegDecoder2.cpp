@@ -245,8 +245,12 @@ namespace y60 {
     }
 
     void FFMpegDecoder2::startOverAgain() {
-        AC_DEBUG <<"FFMpegDecoder2::startOverAgain, Joining FFMpegDecoder Thread";      
-        join();
+        AC_DEBUG <<"FFMpegDecoder2::startOverAgain, Joining FFMpegDecoder Thread";
+        
+        if (isUnjoined()) {
+            DBI(AC_INFO << "Joining FFMpegDecoder Thread");
+            join();
+        }
         doSeek(-1);
         setState(RUN);
         
@@ -305,7 +309,7 @@ namespace y60 {
     void FFMpegDecoder2::stopMovie(bool theStopAudioFlag) {
         DBI(AC_INFO << "FFMpegDecoder2::stopMovie";)
         
-        if (isActive()) {
+        if (isUnjoined()) {
             DBI(AC_INFO << "Joining FFMpegDecoder Thread");
             join();
         }
@@ -976,7 +980,10 @@ namespace y60 {
 
     void FFMpegDecoder2::seek(double theDestTime) {
         AC_DEBUG << "FFMpegDecoder2::seek: Joining FFMpegDecoder Thread"<<" desttime: "<<theDestTime;
-        join();
+        if (isUnjoined()) {
+            DBI(AC_INFO << "Joining FFMpegDecoder Thread");
+            join();
+        }
         if (_myAudioSink && getDecodeAudioFlag()) {
             _myAudioSink->stop();
         }

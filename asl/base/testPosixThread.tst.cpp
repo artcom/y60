@@ -61,11 +61,10 @@ private:
 void
 PosixThreadUnitTest::run() {
     _myThread1.fork();
-    asl::msleep(10);
-    ENSURE_MSG (_myThread1.isActive(), "Thread sais it's active when it is.");
+    ENSURE_MSG (_myThread1.isUnjoined(), "Thread is joined after forking");
     _myThread1.join();
     ENSURE_MSG (_myThread1.getVar() == 1, "Thread executed successfully");
-    ENSURE_MSG (!_myThread1.isActive(), "Thread sais it isn't active when it isn't.");
+    ENSURE_MSG (!_myThread1.isUnjoined(), "Thread is unjoined after joining");
 
     bool myOK;
     _myThread2.fork();
