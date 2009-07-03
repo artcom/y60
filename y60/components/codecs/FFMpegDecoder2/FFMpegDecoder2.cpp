@@ -245,11 +245,8 @@ namespace y60 {
     }
 
     void FFMpegDecoder2::startOverAgain() {
-        AC_DEBUG<<"FFMpegDecoder2::startOverAgain";      
-        //if (isActive()) { //XXX the active flag seems to be broken
-            AC_DEBUG << "Joining FFMpegDecoder Thread";
-            join();
-        //}
+        AC_DEBUG <<"FFMpegDecoder2::startOverAgain, Joining FFMpegDecoder Thread";      
+        join();
         doSeek(-1);
         setState(RUN);
         
@@ -308,10 +305,8 @@ namespace y60 {
     void FFMpegDecoder2::stopMovie(bool theStopAudioFlag) {
         DBI(AC_INFO << "FFMpegDecoder2::stopMovie";)
         
-        if (isActive()) {
-            DBI(AC_INFO << "Joining FFMpegDecoder Thread");
-            join();
-        }
+        DBI(AC_INFO << "Joining FFMpegDecoder Thread");
+        join();
         if (getState() != STOP) {
             DBI(AC_INFO << "Stopping Movie");
             
