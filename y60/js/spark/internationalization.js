@@ -136,7 +136,7 @@ spark.I18nItem.Constructor = function(Protected) {
 
     Public.language getter = function() {
         return _myLanguage;
-    }
+    };
 
     var _myLanguageData = {};
 
@@ -151,7 +151,11 @@ spark.I18nItem.Constructor = function(Protected) {
         for(var i = 0; i < myNode.childNodesLength(); i++) {
             var myChild = myNode.childNode(i);
             var myLang = myChild.nodeName;
-            var myData = myChild.childNode("#text").nodeValue;
+            var myData = "";
+            var myNumChildren = myChild.childNodesLength();
+            for(var j = 0; j < myNumChildren; j++) {
+                myData += myChild.childNode(j).nodeValue;
+            }
             Public.addLanguageData(myLang, myData);
         }
     };
@@ -216,7 +220,7 @@ spark.I18nText.Constructor = function(Protected) {
         } else {
             return myData;
         }
-    }
+    };
 };
 
 spark.I18nImage = spark.ComponentClass("I18nImage");
