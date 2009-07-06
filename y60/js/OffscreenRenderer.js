@@ -105,6 +105,15 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage,
 
     self.onPreViewport = function(theViewport) {
     }
+    
+    self.resize = function(theNewSize) {
+        if (self.texture.width == 0 || self.texture.width != theNewSize.x || self.texture.height != theNewSize.y) {
+            window.scene.textures.removeChild(self.texture);      
+            self.texture = Modelling.createTexture(window.scene, self.image); 
+            self.texture.name = "newTexture"
+            _myCanvas.target = self.texture.id;       
+        }
+    }
 
     self.setImage = function(theImage) {
         if (!theImage) {
@@ -114,7 +123,6 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage,
         
         self.image = theImage;
         self.texture.image = self.image.id;
-        //_myCanvas.target = self.image.id;
 
         // Flip vertically since framebuffer content is upside-down
         var myMirrorMatrix = new Matrix4f;

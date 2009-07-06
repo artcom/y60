@@ -204,13 +204,13 @@ function buildUnlitTextureMaterialNode(theName, theTextureId) {
     return myMaterialNode;
 
 }
-/*
+
 function addMaterialProperty(theMaterialNode, thePropertyType, theProperty, theValue) {
     var myPropertyString = "<" + thePropertyType +" name='" + theProperty + "'>" + theValue + "</" + thePropertyType + ">";
     var myPropertyDoc = new Node(myPropertyString);
     var myPropertyNode = myPropertyDoc.childNodes[0];
 
-    var myPropertiesNode = getDescendantByTagName(theMaterialNode, "properties", false);
+    var myPropertiesNode = theMaterialNode.find("properties");
     if (!myPropertiesNode) {
         var myPropertiesString = "<properties/>";
         var myPropertiesDoc = new Node(myPropertiesString);
@@ -219,7 +219,7 @@ function addMaterialProperty(theMaterialNode, thePropertyType, theProperty, theV
     }
     myPropertiesNode.appendChild(myPropertyNode);
 }
-*/
+
 function addMaterialRequirements(theMaterialNode, theRequirementlist) {
     var myRequiresNode = theMaterialNode.find(".//requires");
     if (!myRequiresNode) {

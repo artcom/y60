@@ -165,7 +165,6 @@ namespace y60 {
                 MovieDecoderBase::resumeMovie(theStartTime);
                 if (theResumeAudioFlag && _myAudioSink && getDecodeAudioFlag()) {            
                     _myAudioSink->play();
-                    AC_PRINT <<"resumeMovie: _myAudioSink->play()";
                 }
             }
 
