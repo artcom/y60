@@ -90,6 +90,19 @@ fillRect(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 }
 
 static JSBool
+fillRectAlpha(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Fills a recangular region of the raster with alpha.");
+    DOC_PARAM("xmin", "left", DOC_TYPE_INTEGER);
+    DOC_PARAM("ymin", "top", DOC_TYPE_INTEGER);
+    DOC_PARAM("xmax", "right", DOC_TYPE_INTEGER);
+    DOC_PARAM("ymax", "bottom", DOC_TYPE_INTEGER);
+    DOC_PARAM("theAlpha", "the Alpha value between zero and one", DOC_TYPE_FLOAT);
+    DOC_END;
+
+    return Method<NATIVE>::call(&NATIVE::fillRectAlpha,cx,obj,argc,argv,rval);
+}
+
+static JSBool
 randomize(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Fills the raster with random noise.");
     DOC_PARAM("theMinColor", "the lower color bound (per channel)", DOC_TYPE_VECTOR4F);
@@ -282,6 +295,7 @@ JSResizeableRaster::Functions() {
         {"getPixel",    getPixel,         2},
         {"setPixel",    setPixel,         3},
         {"fillRect",    fillRect,         5},
+        {"fillRectAlpha", fillRectAlpha,  5},
         {"randomize",   randomize,        2},
         {"resize",      resize,           2},
         {"resample",    resample,         2},

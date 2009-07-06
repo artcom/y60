@@ -1179,6 +1179,10 @@ namespace dom {
                               asl::AC_SIZE_TYPE xmax, asl::AC_SIZE_TYPE ymax,
                               const asl::Vector4<float> & theColor) = 0;
         
+        virtual void fillRectAlpha(asl::AC_SIZE_TYPE xmin, asl::AC_SIZE_TYPE ymin,
+                              asl::AC_SIZE_TYPE xmax, asl::AC_SIZE_TYPE ymax,
+                              const float theAlpha) = 0;
+        
         virtual void randomize(const asl::Vector4f & theMinColor, const asl::Vector4f & theMaxColor) = 0; 
         
         /*
@@ -1304,6 +1308,21 @@ namespace dom {
             asl::AC_OFFSET_TYPE cymin = asl::minimum(ymin, ymax);
             asl::subraster<PIXEL> myRegion(myNativeRaster, cxmin, cymin, cxmax-cxmin, cymax-cymin);
             std::fill(myRegion.begin(), myRegion.end(), myPixel);
+            _myRasterValue.closeWriteableValue();
+        }
+        
+        virtual void fillRectAlpha(asl::AC_SIZE_TYPE xmin, asl::AC_SIZE_TYPE ymin,
+                                   asl::AC_SIZE_TYPE xmax, asl::AC_SIZE_TYPE ymax,
+                                   const float theAlpha) 
+        {
+            T & myNativeRaster = _myRasterValue.openWriteableValue();
+            
+            for (unsigned x=xmin; x<xmax; ++x) {
+                for (unsigned y=ymin; y<ymax; ++y) {
+                    asl::setAlphaValue(myNativeRaster(x,y), asl::pchar(theAlpha * 255));
+                }
+            }
+
             _myRasterValue.closeWriteableValue();
         }
 
