@@ -234,6 +234,7 @@ Playlist.prototype.Constructor = function(self) {
                         theUrl.search(/\.pgm$/i)  != -1 ||
                         theUrl.search(/\.pict$/i) != -1 ||
                         theUrl.search(/\.png$/i)  != -1 ||
+                        theUrl.search(/\.rgb$/i)  != -1 ||
                         theUrl.search(/\.psd$/i)  != -1 ||
                         theUrl.search(/\.sgi$/i)  != -1 ||
                         theUrl.search(/\.tga$/i)  != -1 ||

@@ -1078,3 +1078,24 @@ function getImageSize(theImage) {
     mySize = product(mySize, myImageMatrix);
     return new Vector2i(Math.abs(Math.round(mySize.x)), Math.abs(Math.round(mySize.y)));
 }
+function setupCameraOrtho(theCamera, theWidth, theHeight, theCameraZ, theFarPlaneDistance) {
+    var myCameraZ = 500;
+    if(theCameraZ != undefined) {
+       myCameraZ = theCameraZ;
+    }
+    var myFarPlaneDistance = myCameraZ*10;
+    if(theFarPlaneDistance != undefined) {
+       myFarPlaneDistance = theFarPlaneDistance;
+    }
+    
+    theCamera.frustum = new Frustum();
+    theCamera.frustum.width = theWidth;
+    theCamera.frustum.height = theHeight;
+    theCamera.frustum.type = ProjectionType.orthonormal;
+    theCamera.position.x = theWidth/2;
+    theCamera.position.y = theHeight/2;
+    theCamera.position.z = myCameraZ;
+    theCamera.frustum.near = 0.1;
+    theCamera.frustum.far  = myFarPlaneDistance; 
+    theCamera.orientation = Quaternionf.createFromEuler(new Vector3f(0,0,0));
+}
