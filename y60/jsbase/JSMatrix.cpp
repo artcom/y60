@@ -340,6 +340,36 @@ WRAP_METHOD_BEGIN(decompose, "Decompose matrix into it's components.");
 }
 WRAP_METHOD_REGISTER(decompose);
 
+WRAP_METHOD_BEGIN(decomposeEuler, "Decompose matrix into it's components.");
+    DOC_RVAL("{scale,shear,orientation,position}", DOC_TYPE_OBJECT);
+    DOC_END;
+    if (argc != 0) {
+        JS_ReportError(cx,"Matrix.decompose: wrong number of parameters: %d, 0 expected", argc);
+        return JS_FALSE;
+    }
+    typedef JSMatrix::NativeValuePtr TYPED_PTR;
+    TYPED_PTR myObjValPtr;
+    if (convertFrom(cx, OBJECT_TO_JSVAL(obj),myObjValPtr)) {
+        asl::Vector3<float> myScale;
+        asl::Vector3<float> myShear;
+        asl::Vector3<float> myOrientation;
+        asl::Vector3<float> myPosition;
+        if  (myObjValPtr->getValue().decompose(myScale, myShear, myOrientation, myPosition)) {
+            JSObject * myReturnObject = JS_NewArrayObject(cx, 0, NULL);
+            if (!JS_DefineProperty(cx, myReturnObject, "scale",       as_jsval(cx, myScale),        0,0, JSPROP_ENUMERATE)) return JSVAL_VOID;
+            if (!JS_DefineProperty(cx, myReturnObject, "shear",       as_jsval(cx, myShear),        0,0, JSPROP_ENUMERATE)) return JSVAL_VOID;
+            if (!JS_DefineProperty(cx, myReturnObject, "orientation", as_jsval(cx, myOrientation),  0,0, JSPROP_ENUMERATE)) return JSVAL_VOID;
+            if (!JS_DefineProperty(cx, myReturnObject, "position",    as_jsval(cx, myPosition),     0,0, JSPROP_ENUMERATE)) return JSVAL_VOID;
+            *rval = OBJECT_TO_JSVAL(myReturnObject);
+            return JS_TRUE;
+        }
+        *rval = JSVAL_VOID;
+        return JS_TRUE;
+    }
+    return JS_FALSE;
+}
+WRAP_METHOD_REGISTER(decomposeEuler);
+
 WRAP_METHOD_BEGIN(toString, "Returns string representation for this matrix.");
     DOC_END;
     std::string myStringRep = asl::as_string(JSMatrix::getJSWrapper(cx,obj).getNative());
@@ -637,6 +667,37 @@ decompose(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 }
 
 static JSBool
+decomposeEuler(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Decompose matrix into it's components.");
+    DOC_RVAL("{scale,shear,orientation,position}", DOC_TYPE_OBJECT);
+    DOC_END;
+    if (argc != 0) {
+        JS_ReportError(cx,"Matrix.decompose: wrong number of parameters: %d, 0 expected", argc);
+        return JS_FALSE;
+    }
+    typedef JSMatrix::NativeValuePtr TYPED_PTR;
+    TYPED_PTR myObjValPtr;
+    if (convertFrom(cx, OBJECT_TO_JSVAL(obj),myObjValPtr)) {
+        asl::Vector3<float> myScale;
+        asl::Vector3<float> myShear;
+        asl::Vector3<float> myOrientation;
+        asl::Vector3<float> myPosition;
+        if  (myObjValPtr->getValue().decompose(myScale, myShear, myOrientation, myPosition)) {
+            JSObject * myReturnObject = JS_NewArrayObject(cx, 0, NULL);
+            if (!JS_DefineProperty(cx, myReturnObject, "scale",       as_jsval(cx, myScale),        0,0, JSPROP_ENUMERATE)) return JSVAL_VOID;
+            if (!JS_DefineProperty(cx, myReturnObject, "shear",       as_jsval(cx, myShear),        0,0, JSPROP_ENUMERATE)) return JSVAL_VOID;
+            if (!JS_DefineProperty(cx, myReturnObject, "orientation", as_jsval(cx, myOrientation),  0,0, JSPROP_ENUMERATE)) return JSVAL_VOID;
+            if (!JS_DefineProperty(cx, myReturnObject, "position",    as_jsval(cx, myPosition),     0,0, JSPROP_ENUMERATE)) return JSVAL_VOID;
+            *rval = OBJECT_TO_JSVAL(myReturnObject);
+            return JS_TRUE;
+        }
+        *rval = JSVAL_VOID;
+        return JS_TRUE;
+    }
+    return JS_FALSE;
+}  
+
+static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Returns string representation for this matrix.");
     DOC_END;
@@ -687,6 +748,7 @@ JSMatrix::Functions() {
         {"getRotation",        getRotation,             0},
         {"getScale",           getScale,                0},
         {"decompose",          decompose,               0},
+        {"decomposeEuler",          decomposeEuler,               0},
         {"toString",           toString,                0},
         {0}
     };
