@@ -44,8 +44,14 @@ ac_add_project(
 # Make sure we can access our includes without staging
 include_directories(../ ${CMAKE_CURRENT_BINARY_DIR}/../)
 
+option(ASL_WITH_THREAD "If the new thread library should be compiled." NO)
+option(ASL_WITH_UNUSED "If the aslunused library should be compiled, containing various experimental and obsolete components." YES)
+
 # Traverse our subdirectories
 add_subdirectory(base)
+if(ASL_WITH_THREAD)
+    add_subdirectory(thread)
+endif(ASL_WITH_THREAD)
 add_subdirectory(math)
 add_subdirectory(audio)
 add_subdirectory(raster)
@@ -56,9 +62,6 @@ add_subdirectory(net)
 add_subdirectory(ipc)
 add_subdirectory(zip)
 add_subdirectory(utilities)
-
-# Handle aslunused
-option(ASL_WITH_UNUSED "If the aslunused library should be compiled, containing various experimental and obsolete components." YES)
 if(ASL_WITH_UNUSED)
     add_subdirectory(unused)
 endif(ASL_WITH_UNUSED)
