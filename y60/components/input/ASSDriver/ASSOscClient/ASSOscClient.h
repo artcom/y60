@@ -101,6 +101,7 @@ namespace y60 {
     private:
 
         void connectToServer(int theIndex);
+        void resetConnections();
 
         struct Receiver{
             Receiver(std::string theAddress, inet::UDPConnectionPtr theConnection):

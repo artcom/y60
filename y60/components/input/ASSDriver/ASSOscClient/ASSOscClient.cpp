@@ -71,23 +71,19 @@ static long ourPacketCounter = 0;
 
 ASSOscClient::ASSOscClient() :
     ASSDriver(),
-    //_myOSCStream( myBuffer, BUFFER_SIZE ),
     _myClientPort( 7001 ),
     _myServerPort( 7000 ),
     _myStreamIndex(0)
 {
-    AC_DEBUG << "created osc sender";
 }
 
 void
 ASSOscClient::poll() {
-
-    
     for (std::vector<Receiver>::size_type i = 0; i < _myReceivers.size(); ++i){
         _myOSCStreams[i]->Clear();
         *_myOSCStreams[i] << osc::BeginBundle(ourPacketCounter++);//Immediate;
 
-        if ( ! _myReceivers[i].udpConnection ) {
+        if (! _myReceivers[i].udpConnection) {
             connectToServer(i);
         
             // Send a new "configure" to all receivers, not only the
@@ -127,10 +123,15 @@ ASSOscClient::poll() {
 
 void
 ASSOscClient::connectToServer(int theIndex) {
-    AC_DEBUG << "connecting to server " << _myReceivers[theIndex].address << ":" << _myServerPort;
-    _myReceivers[theIndex].udpConnection = UDPConnectionPtr( new UDPConnection( INADDR_ANY, static_cast<asl::Unsigned16>(_myClientPort) ));
-    _myReceivers[theIndex].udpConnection->connect( 
-        getHostAddress( _myReceivers[theIndex].address.c_str() ), static_cast<asl::Unsigned16>(_myServerPort) );
+    Receiver& myReceiver = _myReceivers[theIndex];
+
+    AC_DEBUG << "connecting to " << myReceiver.address;
+
+    UDPConnectionPtr myConnection(new UDPConnection( INADDR_ANY, static_cast<asl::Unsigned16>(_myClientPort)));
+
+    myReceiver.udpConnection = myConnection;
+
+    myConnection->connect(getHostAddress( myReceiver.address.c_str() ), _myServerPort);
 }
 
 
@@ -141,17 +142,21 @@ ASSOscClient::createEvent( int theID, const std::string & theType,
         const asl::Box2f & theROI, float theIntensity, const ASSEvent & theEvent)
 {
     // TODO send ROI?
-    //AC_PRINT << "createEvent: " << theType;
+
     unsigned myTargetStream = 0;
     for (unsigned myOscRegionsIndex =0; myOscRegionsIndex < _myOscRegions.size(); myOscRegionsIndex++) {
         if (thePosition3D[0] >= _myOscRegions[myOscRegionsIndex][0] && 
             thePosition3D[0] <= _myOscRegions[myOscRegionsIndex][1] ) {
                 myTargetStream = myOscRegionsIndex;
-                AC_DEBUG << "Dispatch eventpos : " << thePosition3D << " to client # " << myTargetStream << " cause regions fitted: " << _myOscRegions[myOscRegionsIndex];
-                break;    
+                AC_DEBUG << "Dispatching event at " << thePosition3D
+                         << " to client #" << myTargetStream
+                         << " because it is in " << _myOscRegions[myOscRegionsIndex];
+                break;
             }
     }
+
     std::string myAddress("/");
+
     myAddress += theType;   
 
     for (unsigned myOscRegionsIndex =0; myOscRegionsIndex < _myOscRegions.size(); myOscRegionsIndex++) {
@@ -159,15 +164,14 @@ ASSOscClient::createEvent( int theID, const std::string & theType,
              ( thePosition3D[0] >= _myOscRegions[myOscRegionsIndex][0] && 
             thePosition3D[0] <= _myOscRegions[myOscRegionsIndex][1]) ) {
                 
-            // theIntensity argument added after MfN Project (TA, MS 2007-07-30)
-            *_myOSCStreams[myOscRegionsIndex] << osc::BeginMessage( myAddress.c_str() )
+            *_myOSCStreams[myOscRegionsIndex]
+                << osc::BeginMessage( myAddress.c_str() )
                 << theID
                 << thePosition3D[0] << thePosition3D[1] << thePosition3D[2]
-        	<< theIntensity << osc::EndMessage;
-                AC_DEBUG << "Dispatch eventpos : " << thePosition3D << " to client # " << myOscRegionsIndex << " cause regions fitted: " << _myOscRegions[myOscRegionsIndex];
+                << theIntensity
+                << osc::EndMessage;
             }
     }
-
 }
 
 void
@@ -189,75 +193,68 @@ ASSOscClient::createTransportLayerEvent( const std::string & theType) {
     }
 
     *_myOSCStreams[_myStreamIndex] << osc::EndMessage;
+}
 
+void
+ASSOscClient::resetConnections() {
+    for (std::vector<Receiver>::size_type i = 0; i < _myReceivers.size(); ++i) {
+        _myReceivers[i].udpConnection = UDPConnectionPtr( 0 );
+    }
 }
 
 void 
 ASSOscClient::onUpdateSettings( dom::NodePtr theSettings ) {
+    AC_DEBUG << "reconfiguring osc sender";
 
-    AC_WARNING << "updating osc sender settings";
+    ASSDriver::onUpdateSettings(theSettings);
 
-    ASSDriver::onUpdateSettings( theSettings );
-
-    AC_WARNING << "ASSDriver was happy";
-
-    dom::NodePtr mySettings = getASSSettings( theSettings );
-
-    AC_WARNING << "at client port";
+    dom::NodePtr mySettings = getASSSettings(theSettings);
 
     int myClientPort;
     getConfigSetting( mySettings, "ClientPort", myClientPort, 7001 );
-    if ( myClientPort != _myClientPort ) {
+    AC_INFO << "sending from port " << myClientPort;
+    if (myClientPort != _myClientPort) {
         _myClientPort = myClientPort;
-        for (std::vector<Receiver>::size_type i = 0; i < _myReceivers.size(); ++i){
-            _myReceivers[i].udpConnection = UDPConnectionPtr( 0 );
-        }
+        resetConnections();
     }
-
-    AC_WARNING << "at server port";
 
     int myServerPort;
     getConfigSetting( mySettings, "ServerPort", myServerPort, 7000 );
-    if ( myServerPort != _myServerPort ) {
+    AC_INFO << "sending to port " << myServerPort;
+    if (myServerPort != _myServerPort) {
         _myServerPort = myServerPort;
-        for (std::vector<Receiver>::size_type i = 0; i < _myReceivers.size(); ++i){
-            _myReceivers[i].udpConnection = UDPConnectionPtr( 0 );
-        }
+        resetConnections();
     }
-
-    AC_WARNING << "at receivers";
     
     _myOSCStreams.clear();
-    if (mySettings->childNode("OscReceiverList")) {
-        for (int oscReceiverIndex = 0; 
-             oscReceiverIndex < static_cast<int>(mySettings->childNode("OscReceiverList")->childNodesLength()); 
-             oscReceiverIndex++) {
-            AC_WARNING << "recv " << oscReceiverIndex;
+    _myOscRegions.clear();
 
-            dom::NodePtr myReceiverNode = mySettings->childNode("OscReceiverList")->childNode(oscReceiverIndex);
-            if (oscReceiverIndex >= _myReceivers.size()){
-                AC_WARNING << "pushing one recv";
+    dom::NodePtr myReceiverList = mySettings->childNode("OscReceiverList");    
+    if (myReceiverList) {
+        for (unsigned oscReceiverIndex = 0; oscReceiverIndex < myReceiverList->childNodesLength(); oscReceiverIndex++) {
+            dom::NodePtr myReceiverNode = myReceiverList->childNode(oscReceiverIndex);
+
+            if (oscReceiverIndex >= _myReceivers.size()) {
                 _myReceivers.push_back(Receiver("invalid address", UDPConnectionPtr(0)));
             }
+
             string myAddress = myReceiverNode->getAttributeString("ip");
-            AC_WARNING << "addr " << myAddress;
-            AC_WARNING << "cursize: " << _myReceivers.size();
-                AC_DEBUG << "adding '" << myAddress << "' to the osc receiver list";
-                _myReceivers[oscReceiverIndex].address =myAddress;
-                _myReceivers[oscReceiverIndex].udpConnection = UDPConnectionPtr( 0 );
-                char* myBuffer = new char[ BUFFER_SIZE ];
-                _myOSCStreams.push_back(OutboundPacketStreamPtr(new osc::OutboundPacketStream( myBuffer, BUFFER_SIZE )));            
-            AC_WARNING << "region";
+
+            AC_INFO << "sending to " << myAddress;
+
+            _myReceivers[oscReceiverIndex].address = myAddress;
+            _myReceivers[oscReceiverIndex].udpConnection = UDPConnectionPtr(0);
+
+            char* myBuffer = new char[BUFFER_SIZE];
+            _myOSCStreams.push_back(OutboundPacketStreamPtr(new osc::OutboundPacketStream( myBuffer, BUFFER_SIZE )));
+
             asl::Vector2i myRegion(-1,-1);
             if (myReceiverNode->getAttribute("wire_range")) {
-               myRegion = myReceiverNode->getAttributeValue<asl::Vector2i>("wire_range");
+                myRegion = myReceiverNode->getAttributeValue<asl::Vector2i>("wire_range");
             }
             _myOscRegions.push_back(myRegion);
-            AC_DEBUG << "Added Region #: " << oscReceiverIndex << " region: " << myRegion;
         }
     }
 }
 
 } // end of namespace y60
-
-
