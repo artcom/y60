@@ -37,9 +37,9 @@ spark.ResizableRectangle.Constructor = function(Protected) {
 
             var mySize = new Vector3f(_myWidth, _myHeight, 0);
                                
-            Protected.origin = Protected.getVector3f("origin", [0,0,0]);
-            var myLowerLeft = product( Protected.origin, -1);
-            var myUpperRight = difference( mySize, Protected.origin);
+            Public.origin = Protected.getVector3f("origin", Public.origin);
+            var myLowerLeft = product( Public.origin, -1);
+            var myUpperRight = difference( mySize, Public.origin);
 
             _myShape = Modelling.createQuad(window.scene, _myMaterial.id,
                     myLowerLeft, myUpperRight);
@@ -62,7 +62,7 @@ spark.ResizableRectangle.Constructor = function(Protected) {
     Public.width getter = function() { return _myWidth; }
     Public.width setter = function(w) {
         if (w != _myWidth) {
-            var o = Protected.origin;
+            var o = Public.origin;
             _myVertices[1] = [w - o.x, -o.y, -o.z];
             _myVertices[3] = [w - o.x, _myHeight - o.y, o.z];
             _myWidth = w;
@@ -72,7 +72,7 @@ spark.ResizableRectangle.Constructor = function(Protected) {
     Public.height getter = function() { return _myHeight; }
     Public.height setter = function(h) {
         if (h != _myHeight) {
-            var o = Protected.origin;
+            var o = Public.origin;
             _myVertices[2] = [-o.x, h - o.y, -o.z];
             _myVertices[3] = [_myWidth - o.x, h - o.y, -o.z];
             _myHeight = h;

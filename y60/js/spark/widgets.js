@@ -313,26 +313,27 @@ spark.Widget.Constructor = function(Protected) {
 
     // ORIGIN
     // XXX: finish implementing origin wrappers
+    // XXX: origins must be set up before realization
 
     var _myOrigin = new Vector3f(0,0,0);
     
-    Protected.originX getter = function() {
+    Public.originX getter = function() {
         return _myOrigin.x;
     };
 
-    Protected.originY getter = function() {
+    Public.originY getter = function() {
         return _myOrigin.y;
     };
 
-    Protected.originZ getter = function() {
+    Public.originZ getter = function() {
         return _myOrigin.z;
     };
 
-    Protected.origin getter = function() {
+    Public.origin getter = function() {
         return new Vector3f(_myOrigin);
     };
 
-    Protected.origin setter = function(theValue) {
+    Public.origin setter = function(theValue) {
         _myOrigin.x = theValue.x;
         _myOrigin.y = theValue.y;
         _myOrigin.z = theValue.z;        
