@@ -181,7 +181,7 @@ namespace y60 {
             break;
         case PLAY_MODE_PLAY:
             if (_myPlayMode == PLAY_MODE_PAUSE) {
-                if (get<CurrentFrameTag>() == _myLastDecodedFrame) {
+                if (get<CurrentFrameTag>() == static_cast<int>(_myLastDecodedFrame)) {
                     _myDecoder->resumeMovie(getTimeFromFrame(get<CurrentFrameTag>()));
                 } else {
                     _myDecoder->startMovie(getTimeFromFrame(get<CurrentFrameTag>()));

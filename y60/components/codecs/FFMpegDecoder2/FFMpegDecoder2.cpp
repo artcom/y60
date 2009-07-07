@@ -270,6 +270,7 @@ namespace y60 {
         Movie * myMovie = getMovie();
         _myMaxCacheSize = myMovie->get<MaxCacheSizeTag>();
         _myDecodedPacketsPerFrame = 0; // reset counter 
+        _myLastVideoFrame = VideoMsgPtr();
 
         if (theStartAudioFlag && _myAudioSink && getDecodeAudioFlag()) {            
             _myAudioSink->stop();
@@ -296,6 +297,7 @@ namespace y60 {
         AC_INFO << "FFMpegDecoder2::resumeMovie, time: " << theStartTime;
         Movie * myMovie = getMovie();
         _myMaxCacheSize = myMovie->get<MaxCacheSizeTag>();
+        _myLastVideoFrame = VideoMsgPtr();
         setState(RUN);
         if (!isActive()) {
             AC_DEBUG << "Forking FFMpegDecoder Thread";
@@ -317,6 +319,7 @@ namespace y60 {
             DBI(AC_INFO << "Stopping Movie");
             
             _myDecodedPacketsPerFrame = 0; // reset counter    
+            _myLastVideoFrame = VideoMsgPtr();
             
             // seek to start (-1 indicates doSeek() to do so)
             // TODO: only do this on loop?
@@ -578,7 +581,7 @@ namespace y60 {
         //int myBufferSize = 0; 
         vector<unsigned> myBufferSizes;
         switch (_myDestinationPixelFormat) {
-            case PIX_FMT_RGBA32:
+            case PIX_FMT_BGRA:
                 myBufferSizes.push_back(_myFrameWidth * _myFrameHeight * 4);
                 break;
             case PIX_FMT_GRAY8:
