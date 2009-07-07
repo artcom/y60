@@ -98,8 +98,6 @@ namespace y60 {
     DEFINE_ATTRIBUTE_TAG(FrameCountTag,   int,         MOVIE_FRAMECOUNT_ATTRIB,  -1, Y60_VIDEO_DECL);
     DEFINE_ATTRIBUTE_TAG(FrameRateTag,    double,      MOVIE_FRAMERATE_ATTRIB,   25, Y60_VIDEO_DECL);
     DEFINE_ATTRIBUTE_TAG(PlaySpeedTag,    float,       MOVIE_PLAYSPEED_ATTRIB,   1, Y60_VIDEO_DECL);
-    DEFINE_ATTRIBUTE_TAG(FrameBlendingTag,bool,        MOVIE_FRAMEBLENDING_ATTRIB,false, Y60_VIDEO_DECL);
-    DEFINE_ATTRIBUTE_TAG(FrameBlendFactorTag,double,   MOVIE_FRAMEBLENDFACTOR_ATTRIB,  1.0, Y60_VIDEO_DECL);	
     DEFINE_ATTRIBUTE_TAG(PlayModeTag,     std::string, MOVIE_PLAYMODE_ATTRIB,    "play", Y60_VIDEO_DECL);
     DEFINE_ATTRIBUTE_TAG(VolumeTag,       float,       MOVIE_VOLUME_ATTRIB,      1, Y60_VIDEO_DECL);
     DEFINE_ATTRIBUTE_TAG(LoopCountTag,    unsigned,    MOVIE_LOOPCOUNT_ATTRIB,   1, Y60_VIDEO_DECL);
@@ -130,15 +128,12 @@ namespace y60 {
         public AVDelayTag::Plug,
         public AudioTag::Plug,
         public DecoderHintTag::Plug,
-        public FrameBlendFactorTag::Plug,
-        public FrameBlendingTag::Plug,
         public dom::DynamicAttributePlug<MovieTimeTag, Movie>,
         public dom::DynamicAttributePlug<DecoderTag, Movie>,
         public dom::DynamicAttributePlug<HasAudioTag, Movie>
     {
     public:
-        enum MovieFrameBuffer { PRIMARY_BUFFER = 0, SECONDARY_BUFFER = 1,  THIRD_BUFFER = 2, MAX_BUFFER = 3};
-
+        
         Movie(dom::Node & theNode);
         virtual ~Movie();
 
@@ -224,11 +219,6 @@ namespace y60 {
         double                     _myLastCurrentTime;
         unsigned                   _myCurrentLoopCount;
         dom::ValuePtr              _myStreamData;
-
-        // Framemodulation member
-        MovieFrameBuffer           _myNextUsedBuffer;
-        unsigned                   _myFirstBufferFrame;
-        unsigned                   _mySecondBufferFrame;
     };
 
     typedef asl::Ptr<Movie, dom::ThreadingModel> MoviePtr;

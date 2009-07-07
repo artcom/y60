@@ -99,8 +99,6 @@ namespace y60 {
         AVDelayTag::Plug(theNode),
         AudioTag::Plug(theNode),
         DecoderHintTag::Plug(theNode),
-        FrameBlendFactorTag::Plug(theNode),		
-        FrameBlendingTag::Plug(theNode),				
         dom::DynamicAttributePlug<MovieTimeTag, Movie>(this, &Movie::getMovieTime),
         dom::DynamicAttributePlug<DecoderTag, Movie>(this, &Movie::getDecoderName),
         dom::DynamicAttributePlug<HasAudioTag, Movie>(this, &Movie::hasAudio),
@@ -108,10 +106,7 @@ namespace y60 {
         _myPlayMode(PLAY_MODE_STOP),
         _myLastDecodedFrame(std::numeric_limits<unsigned>::max()),
         _myLastCurrentTime(-1.0),
-        _myCurrentLoopCount(0),
-        _myNextUsedBuffer(PRIMARY_BUFFER),
-        _myFirstBufferFrame(0),
-        _mySecondBufferFrame(0)
+        _myCurrentLoopCount(0)
     {
         AC_DEBUG  << "Movie::Movie " << (void*)this;
         if (getNode()) {
@@ -154,7 +149,6 @@ namespace y60 {
         set<PlayModeTag>(asl::getStringFromEnum(PLAY_MODE_STOP, MoviePlayModeStrings));
         set<CurrentFrameTag>(0);
         _myLastDecodedFrame = std::numeric_limits<unsigned>::max();
-        _myNextUsedBuffer = PRIMARY_BUFFER;
         _myCurrentLoopCount = 0;
         dom::ResizeableRasterPtr myRaster = getRasterPtr();
         if (myRaster) {
@@ -165,98 +159,72 @@ namespace y60 {
 
 
     void
-        Movie::restart(double theCurrentTime) {
-            AC_DEBUG  << "Movie::restart";
-            //_myDecoder->stopMovie();
-            _myDecoder->startMovie(0);
-            _myNextUsedBuffer = PRIMARY_BUFFER;
-            double myMovieTime = _myDecoder->getMovieTime(theCurrentTime);
-            decodeFrame(myMovieTime, 0);
-            //		_myLastDecodedFrame = std::numeric_limits<unsigned>::max();
+    Movie::restart(double theCurrentTime) {
+        AC_DEBUG  << "Movie::restart";
+        //_myDecoder->stopMovie();
+        _myLastDecodedFrame = std::numeric_limits<unsigned>::max();        
+        _myDecoder->startMovie(0);
+        double myMovieTime = _myDecoder->getMovieTime(theCurrentTime);
+        decodeFrame(myMovieTime, 0);
     }
 
 
 
     void
-        Movie::setPlayMode(MoviePlayMode thePlayMode) {
-            AC_DEBUG << "Movie::setPlayMode " 
-                << asl::getStringFromEnum(thePlayMode, MoviePlayModeStrings);
-            // process changes
-            switch (thePlayMode) {
-            case PLAY_MODE_STOP:
-                stop();
-                break;
-            case PLAY_MODE_PLAY:
-                if (_myPlayMode == PLAY_MODE_PAUSE) {
+    Movie::setPlayMode(MoviePlayMode thePlayMode) {
+        AC_DEBUG << "Movie::setPlayMode " 
+            << asl::getStringFromEnum(thePlayMode, MoviePlayModeStrings);
+        // process changes
+        switch (thePlayMode) {
+        case PLAY_MODE_STOP:
+            stop();
+            break;
+        case PLAY_MODE_PLAY:
+            if (_myPlayMode == PLAY_MODE_PAUSE) {
+                if (get<CurrentFrameTag>() == _myLastDecodedFrame) {
                     _myDecoder->resumeMovie(getTimeFromFrame(get<CurrentFrameTag>()));
-                } else if (_myPlayMode == PLAY_MODE_STOP){
-                    _myDecoder->startMovie(getTimeFromFrame(get<CurrentFrameTag>()));
                 } else {
-                    AC_DEBUG<< "Movie::setPlayMode already playing";
+                    _myDecoder->startMovie(getTimeFromFrame(get<CurrentFrameTag>()));
                 }
-                break;
-            case PLAY_MODE_PAUSE:
-                if (_myPlayMode == PLAY_MODE_STOP) {
-                    _myDecoder->startMovie(0);
-                }
-                _myDecoder->pauseMovie();
-                break;
-            case PLAY_MODE_NODISK:
-                //XXX check if we need to do something more here
-                AC_INFO << "Movie set to PLAY_MODE_NODISK";
-                break;
+            } else if (_myPlayMode == PLAY_MODE_STOP){
+                _myDecoder->startMovie(getTimeFromFrame(get<CurrentFrameTag>()));
+            } else {
+                AC_DEBUG<< "Movie::setPlayMode already playing";
             }
-            // Synchronize internal and external representation
-            _myPlayMode = thePlayMode;
-            set<PlayModeTag>(asl::getStringFromEnum(thePlayMode, MoviePlayModeStrings));
+            break;
+        case PLAY_MODE_PAUSE:
+            if (_myPlayMode == PLAY_MODE_STOP) {
+                _myDecoder->startMovie(0);
+            }
+            _myDecoder->pauseMovie();
+            break;
+        case PLAY_MODE_NODISK:
+            //XXX check if we need to do something more here
+            AC_INFO << "Movie set to PLAY_MODE_NODISK";
+            break;
+        }
+        // Synchronize internal and external representation
+        _myPlayMode = thePlayMode;
+        set<PlayModeTag>(asl::getStringFromEnum(thePlayMode, MoviePlayModeStrings));
     }
 
-    //    
-    //
-    //    void Movie::decodeFrame(double theTime, unsigned theFrame) {
-    //
-    //		if (theFrame != _myLastDecodedFrame) {
-    //			DB(AC_DEBUG << "Movie::decodeFrame time=" << theTime << " frame=" << theFrame);
-    //			if ( _myNextUsedBuffer == PRIMARY_BUFFER) {
-    //				_myFirstBufferFrame = theFrame;
-    //			} else {
-    //				_mySecondBufferFrame = theFrame;
-    //			}
-    //			_myLastDecodedFrame = theFrame;
-    //
-    //			//AC_PRINT << "Decode frame #" << theFrame << " into " 
-    //            //         << ((_myNextUsedBuffer == PRIMARY_BUFFER) ? 
-    //            //             "PRIMARY_BUFFER":"SECONDARY_BUFFER");
-    //            
-    //			double myReturnTime = _myDecoder->readFrame(theTime, theFrame, 
-    //                                                        getRasterPtr(_myNextUsedBuffer));
-    //			if (get<FrameBlendingTag>()) {
-    //				_myNextUsedBuffer = MovieFrameBuffer((int(_myNextUsedBuffer)+1) % (MAX_BUFFER));
-    //			}
-    //		}
-    //
-    //		if (get<FrameBlendingTag>()) {
-    //			// If the first buffer holds the later frame, invert blendfactor
-    //			if (_myFirstBufferFrame > _mySecondBufferFrame){
-    //				set<FrameBlendFactorTag>((1.0-get<FrameBlendFactorTag>()));
-    //			}
-    //		}
-
-    // TODO: frameblending..
     double Movie::decodeFrame(double theTime, unsigned theFrame) {
         DB(AC_DEBUG << "Movie::decodeFrame time=" << theTime << " frame=" << theFrame);
-        RasterVector myMovieRaster;
-        unsigned myRasterCount = getNode().childNodesLength();
-        for (unsigned i = 0; i < myRasterCount; i++) {
-            myMovieRaster.push_back(getRasterPtr(i));
+        double myReturnTime = theTime;
+        if (theFrame != _myLastDecodedFrame) {
+            RasterVector myMovieRaster;
+            unsigned myRasterCount = getNode().childNodesLength();
+            for (unsigned i = 0; i < myRasterCount; i++) {
+                myMovieRaster.push_back(getRasterPtr(i));
+            }
+            myReturnTime = _myDecoder->readFrame(theTime, theFrame, myMovieRaster);
+            if (myReturnTime != theTime) {
+                _myLastDecodedFrame = getFrameFromTime(myReturnTime);
+            } else {
+                _myLastDecodedFrame = theFrame; // M60
+            }
+            set<CurrentFrameTag>(_myLastDecodedFrame);
         }
-        double myReturnTime = _myDecoder->readFrame(theTime, theFrame, myMovieRaster);
-        if (myReturnTime != theTime) {
-            _myLastDecodedFrame = getFrameFromTime(myReturnTime);
-        } else {
-            _myLastDecodedFrame = theFrame; // M60
-        }
-        set<CurrentFrameTag>(_myLastDecodedFrame);
         return myReturnTime;
     }
 
@@ -274,47 +242,39 @@ namespace y60 {
 
 
     void 
-        Movie::ensureMovieFramecount() {
+    Movie::ensureMovieFramecount() {
+        if (get<FrameCountTag>() == -1) {
+            load(AppPackageManager::get().getPtr()->getSearchPath());
             if (get<FrameCountTag>() == -1) {
-                load(AppPackageManager::get().getPtr()->getSearchPath());
-                if (get<FrameCountTag>() == -1) {
-                    MoviePlayMode myPlayMode = 
-                        MoviePlayMode(asl::getEnumFromString(get<PlayModeTag>(), 
-                        MoviePlayModeStrings));
-                    setPlayMode(PLAY_MODE_PLAY);
-                    _myDecoder->setDecodeAudioFlag(false);
-                    readFrame();
-                    int myFrame = -1;
-                    while (!_myDecoder->getEOF()) {
-                        myFrame++;
-                        double myMovieTime = getTimeFromFrame(myFrame);
-                        decodeFrame(myMovieTime, myFrame);
-                        _myLastDecodedFrame = myFrame;
-                        set<CurrentFrameTag>(myFrame);
-                    }
-                    _myDecoder->setEOF(false);
-                    _myDecoder->setDecodeAudioFlag(true);
-                    restart(0);
-                    setPlayMode(myPlayMode);
+                MoviePlayMode myPlayMode = 
+                    MoviePlayMode(asl::getEnumFromString(get<PlayModeTag>(), 
+                    MoviePlayModeStrings));
+                setPlayMode(PLAY_MODE_PLAY);
+                _myDecoder->setDecodeAudioFlag(false);
+                readFrame();
+                int myFrame = -1;
+                while (!_myDecoder->getEOF()) {
+                    myFrame++;
+                    double myMovieTime = getTimeFromFrame(myFrame);
+                    decodeFrame(myMovieTime, myFrame);
+                    _myLastDecodedFrame = myFrame;
+                    set<CurrentFrameTag>(myFrame);
                 }
-            } 
+                _myDecoder->setEOF(false);
+                _myDecoder->setDecodeAudioFlag(true);
+                restart(0);
+                setPlayMode(myPlayMode);
+            }
+        } 
+        set<CurrentFrameTag>(0);        
+        _myLastDecodedFrame = std::numeric_limits<unsigned>::max();        
     }
 
 
 
     unsigned Movie::getFrameFromTime(double theTime) {
         double myFrameHelper = theTime * get<FrameRateTag>();
-        int myFrame = 0;
-        if (get<FrameBlendingTag>()) {
-            myFrame = int(floor(myFrameHelper));
-            double myNextFrameTimeRatio = ((myFrame+1)/get<FrameRateTag>() - theTime)  
-                / (1.0 / get<FrameRateTag>());
-            set<FrameBlendFactorTag>(myNextFrameTimeRatio);
-            //AC_PRINT << "Frame : " << myFrame << " at time: " << theTime 
-            //         << " and a ratio to next frame: " << get<FrameBlendFactorTag>();
-        } else {
-            myFrame = int(asl::round(myFrameHelper));
-        }
+        int myFrame = int(asl::round(myFrameHelper));
         if (get<FrameCountTag>() == -1) {
             return (unsigned)myFrame;
         } else {
@@ -328,120 +288,89 @@ namespace y60 {
 
 
     void
-        Movie::readFrame() {
-            readFrame(0, true);
+    Movie::readFrame() {
+        readFrame(0, true);
     }
 
 
 
     void
-        Movie::readFrame(double theCurrentTime, bool theIgnoreCurrentTime) {
-            DB(AC_DEBUG << "Movie::readFrame time=" << theCurrentTime 
-                << " src=" << get<ImageSourceTag>());
-            DB(AC_DEBUG << "                 theIgnoreCurrentTime=" << theIgnoreCurrentTime);
-            _myLastCurrentTime = theCurrentTime;
+    Movie::readFrame(double theCurrentTime, bool theIgnoreCurrentTime) {
+        DB(AC_DEBUG << "Movie::readFrame time=" << theCurrentTime 
+            << " src=" << get<ImageSourceTag>());
+        DB(AC_DEBUG << "                 theIgnoreCurrentTime=" << theIgnoreCurrentTime);
+        _myLastCurrentTime = theCurrentTime;
 
-            if (!_myDecoder) {
-                AC_ERROR << "Movie::readFrame not allowed before open";
-                return;
+        if (!_myDecoder) {
+            AC_ERROR << "Movie::readFrame not allowed before open";
+            return;
+        }
+        // Check for playmode changes from javascript
+        MoviePlayMode myPlayMode = 
+            MoviePlayMode(asl::getEnumFromString(get<PlayModeTag>(), MoviePlayModeStrings));
+        if (myPlayMode != _myPlayMode) {
+            setPlayMode(myPlayMode);
+        }
+
+        // Calculate next frame
+        int myNextFrame = 0;
+        double myMovieTime = 0.0;
+        switch (_myPlayMode) {
+        case PLAY_MODE_PAUSE:
+            // next frame from currentframe attribute in movie node
+            myNextFrame = get<CurrentFrameTag>();
+            if (get<FrameCountTag>() != -1) {
+                myNextFrame %= get<FrameCountTag>();
             }
-            // Check for playmode changes from javascript
-            MoviePlayMode myPlayMode = 
-                MoviePlayMode(asl::getEnumFromString(get<PlayModeTag>(), MoviePlayModeStrings));
-            if (myPlayMode != _myPlayMode) {
-                setPlayMode(myPlayMode);
+            while (myNextFrame < 0) {
+                if (get<FrameCountTag>() == -1) {
+                    std::string myErrorMsg = string("Movie: ") + get<NameTag>() 
+                        + " has negative currentframe and a invalid "
+                        + "framecount, trying a wraparound with " 
+                        + "invalid framecount will fail-> calling "
+                        + "explicit ensureMovieFramecount() will help";
+                    ASSURE_MSG(get<FrameCountTag>() != -1, myErrorMsg.c_str());
+                    return;
+                }
+                myNextFrame += get<FrameCountTag>();
             }
+            myMovieTime = getTimeFromFrame(myNextFrame);
+            break;
+        case PLAY_MODE_PLAY:
+            if (theIgnoreCurrentTime) {
+                myMovieTime = 0;
+            } else {
+                myMovieTime = _myDecoder->getMovieTime(theCurrentTime);
+            }
+            myNextFrame = (int)getFrameFromTime(myMovieTime);
+            break;
+        case PLAY_MODE_STOP:
+            myNextFrame = _myLastDecodedFrame;
+            return;
+        case PLAY_MODE_NODISK:
+            //XXX check if we need to do something more here
+            AC_INFO << "Movie has PLAY_MODE_NODISK";
+            break;
+        }                
 
-            // Calculate next frame
-            int myNextFrame = 0;
-            double myMovieTime = 0.0;
-            switch (_myPlayMode) {
-            case PLAY_MODE_PAUSE:
-                // next frame from currentframe attribute in movie node
-                myNextFrame = get<CurrentFrameTag>();
-                if (get<FrameCountTag>() != -1) {
-                    myNextFrame %= get<FrameCountTag>();
-                }
-                while (myNextFrame < 0) {
-                    if (get<FrameCountTag>() == -1) {
-                        std::string myErrorMsg = string("Movie: ") + get<NameTag>() 
-                            + " has negative currentframe and a invalid "
-                            + "framecount, trying a wraparound with " 
-                            + "invalid framecount will fail-> calling "
-                            + "explicit ensureMovieFramecount() will help";
-                        ASSURE_MSG(get<FrameCountTag>() != -1, myErrorMsg.c_str());
-                        return;
-                    }
-                    myNextFrame += get<FrameCountTag>();
-                }
-                myMovieTime = getTimeFromFrame(myNextFrame);
-                break;
-            case PLAY_MODE_PLAY:
-                if (theIgnoreCurrentTime) {
-                    myMovieTime = 0;
-                } else {
-                    myMovieTime = _myDecoder->getMovieTime(theCurrentTime);
-                }
-                myNextFrame = (int)getFrameFromTime(myMovieTime);
-                break;
-            case PLAY_MODE_STOP:
-                myNextFrame = _myLastDecodedFrame;
-                return;
-            case PLAY_MODE_NODISK:
-                //XXX check if we need to do something more here
-                AC_INFO << "Movie has PLAY_MODE_NODISK";
-                break;
-            }                
-
-            if (myNextFrame < 0) {
+        if (myNextFrame < 0) {
+            setPlayMode(PLAY_MODE_STOP);
+        }
+        DB(AC_DEBUG << "Next Frame: " << myNextFrame << ", lastDecodedFrame: " 
+            << _myLastDecodedFrame << ", MovieTime: " << myMovieTime;)
+        set<CurrentFrameTag>(myNextFrame);
+        decodeFrame(myMovieTime, myNextFrame);
+        
+        // check for eof in the decoder
+        if (_myDecoder->getEOF()) {
+            AC_DEBUG << "Movie has EOF, loopCount=" << _myCurrentLoopCount;
+            _myDecoder->setEOF(false);
+            if (get<LoopCountTag>() == 0 || ++_myCurrentLoopCount < get<LoopCountTag>()) {
+                restart(theCurrentTime);
+            } else {
                 setPlayMode(PLAY_MODE_STOP);
             }
-            //double myCurrentTime = myMovieTime;
-            DB(AC_DEBUG << "Next Frame: " << myNextFrame << ", lastDecodedFrame: " 
-                << _myLastDecodedFrame << ", MovieTime: " << myMovieTime;)
-            if (get<FrameBlendingTag>()) {
-                // create correct start position -> 
-                // frame 0 in PRIMARY_BUFFER && frame 1 in SECONDARY_BUFFER
-                if (_myLastDecodedFrame == std::numeric_limits<unsigned>::max()) {
-                    _myNextUsedBuffer = PRIMARY_BUFFER;
-                    decodeFrame(0,0);
-                }
-            }
-            set<CurrentFrameTag>(myNextFrame);
-            // for frame blending we always need a frame in advance
-            if (get<FrameBlendingTag>()) {
-                myMovieTime += (1.0/get<FrameRateTag>());
-                myNextFrame++;
-            }
-            decodeFrame(myMovieTime, myNextFrame);
-            //AC_PRINT << myCurrentTime << " -> " << (get<FrameBlendFactorTag>()*100.0) 
-            //         << "% # " << _myFirstBufferFrame << " / " 
-            //         << ((1.0-get<FrameBlendFactorTag>())*100.0)<<"% # " << _mySecondBufferFrame;
-
-            //<<<<<<< .mine
-            //=======
-            //        //AC_PRINT << "Next Frame: " << myNextFrame << ", lastDecodedFrame: " << _myLastDecodedFrame << ", MovieTime: " << myMovieTime << " movie: " << get<ImageSourceTag>();
-            //        DB(AC_DEBUG << "Next Frame: " << myNextFrame << ", lastDecodedFrame: " << _myLastDecodedFrame << ", MovieTime: " << myMovieTime;)
-            //        if (myNextFrame != _myLastDecodedFrame) {
-            //            MAKE_SCOPE_TIMER(Movie_readFrame);
-            //            double myDecodedTime = decodeFrame(myMovieTime, myNextFrame);
-            //            /*if (!asl::almostEqual(myDecodedTime, myMovieTime, 0.04)) {
-            //                AC_WARNING << "Decoded Time=" << myDecodedTime << " differs from Movie Time=" << myMovieTime << ". Delta=" << myMovieTime-myDecodedTime;
-            //            }*/
-            //        }
-            //
-            //>>>>>>> .r14897
-            // check for eof in the decoder
-            if (_myDecoder->getEOF()) {
-                AC_DEBUG << "Movie has EOF, loopCount=" << _myCurrentLoopCount;
-                _myDecoder->setEOF(false);
-                if (get<LoopCountTag>() == 0 || ++_myCurrentLoopCount < get<LoopCountTag>()) {
-                    restart(theCurrentTime);
-                } else {
-                    setPlayMode(PLAY_MODE_STOP);
-                }
-            }
-            //AC_PRINT << "--------------------";
+        }
     }
 
 
@@ -466,7 +395,7 @@ namespace y60 {
     }
 
     bool Movie::hasAudio(bool & theHasAudio) const {
-    	MovieDecoderBase* myDecoder = const_cast<MovieDecoderBase*>(_myDecoder.get());
+        MovieDecoderBase* myDecoder = const_cast<MovieDecoderBase*>(_myDecoder.get());
         return myDecoder->hasAudio();
     }
 
@@ -536,76 +465,76 @@ namespace y60 {
 
 
     void
-        Movie::load(const std::string & theTexturePath) {
-            loadFile( asl::searchFile(get<ImageSourceTag>(), theTexturePath) );
+    Movie::load(const std::string & theTexturePath) {
+        loadFile( asl::searchFile(get<ImageSourceTag>(), theTexturePath) );
     }
 
 
 
     void
-        Movie::loadStream(asl::Ptr<asl::ReadableStream> theSource, const std::string theUrl) {
-            AC_INFO << "Movie::loadStream " << theUrl;
-            MovieDecoderBasePtr myDecoder = getDecoder(theUrl);
-            if (!myDecoder) {
-                throw MovieException(string("Sorry, could not find a streamable decoder for: ") 
-                    + theUrl, PLUS_FILE_LINE);
+    Movie::loadStream(asl::Ptr<asl::ReadableStream> theSource, const std::string theUrl) {
+        AC_INFO << "Movie::loadStream " << theUrl;
+        MovieDecoderBasePtr myDecoder = getDecoder(theUrl);
+        if (!myDecoder) {
+            throw MovieException(string("Sorry, could not find a streamable decoder for: ") 
+                + theUrl, PLUS_FILE_LINE);
+        }
+        _myDecoder = myDecoder->instance();
+
+        _myDecoder->initialize(this);
+        _myDecoder->load(theSource, theUrl);
+
+        postLoad();
+    }
+
+
+
+    void
+    Movie::loadFile(const std::string & theUrl) {
+
+        const std::string & mySourceFile = get<ImageSourceTag>();
+        if (_myDecoder) {
+            _myDecoder->stopMovie();
+        }
+        //set<CurrentFrameTag>(0);
+        _myLastDecodedFrame = std::numeric_limits<unsigned>::max();
+        _myCurrentLoopCount = 0;
+
+        _myPlayMode = PLAY_MODE_STOP;
+
+        // if imagesource is an url do not take the packetmanager or searchfile new url
+
+        string myFilename;
+        if (mySourceFile.find("://") != string::npos) {
+            myFilename = mySourceFile;
+        } else {
+            myFilename = theUrl;
+        }
+        if (myFilename.empty()) {
+            AC_ERROR << "Unable to find url='" << theUrl << "'" 
+                << ", src='" << mySourceFile << "'";
+            return;
+        }
+        AC_INFO << "Movie::loadFile " << (void*)this << " filename=" << myFilename;
+
+        // First: Look for registered decoders that could handle the source
+        MovieDecoderBasePtr myDecoder = getDecoder(myFilename);
+
+        if (!myDecoder) {
+            // Second: Try m60, by extension
+            string myFileExtension = asl::toLowerCase(asl::getExtension(myFilename));
+            if (myFileExtension == "m60") {
+                _myDecoder = MovieDecoderBasePtr(new M60Decoder());
+            } else {
+                throw MovieException(std::string("Sorry, could not find decoder for: ") 
+                    + myFilename, PLUS_FILE_LINE);
             }
+        } else {
             _myDecoder = myDecoder->instance();
-
-            _myDecoder->initialize(this);
-            _myDecoder->load(theSource, theUrl);
-
-            postLoad();
-    }
-
-
-
-    void
-        Movie::loadFile(const std::string & theUrl) {
-
-            const std::string & mySourceFile = get<ImageSourceTag>();
-            if (_myDecoder) {
-                _myDecoder->stopMovie();
-            }
-            //set<CurrentFrameTag>(0);
-            _myLastDecodedFrame = std::numeric_limits<unsigned>::max();
-            _myCurrentLoopCount = 0;
-
-            _myPlayMode = PLAY_MODE_STOP;
-
-            // if imagesource is an url do not take the packetmanager or searchfile new url
-
-            string myFilename;
-            if (mySourceFile.find("://") != string::npos) {
-                myFilename = mySourceFile;
-            } else {
-                myFilename = theUrl;
-            }
-            if (myFilename.empty()) {
-                AC_ERROR << "Unable to find url='" << theUrl << "'" 
-                    << ", src='" << mySourceFile << "'";
-                return;
-            }
-            AC_INFO << "Movie::loadFile " << (void*)this << " filename=" << myFilename;
-
-            // First: Look for registered decoders that could handle the source
-            MovieDecoderBasePtr myDecoder = getDecoder(myFilename);
-
-            if (!myDecoder) {
-                // Second: Try m60, by extension
-                string myFileExtension = asl::toLowerCase(asl::getExtension(myFilename));
-                if (myFileExtension == "m60") {
-                    _myDecoder = MovieDecoderBasePtr(new M60Decoder());
-                } else {
-                    throw MovieException(std::string("Sorry, could not find decoder for: ") 
-                        + myFilename, PLUS_FILE_LINE);
-                }
-            } else {
-                _myDecoder = myDecoder->instance();
-            }
-            _myDecoder->initialize(this);
-            _myDecoder->load(myFilename);
-            postLoad();
+        }
+        _myDecoder->initialize(this);
+        _myDecoder->load(myFilename);
+        postLoad();
     }
 
 
@@ -634,15 +563,15 @@ namespace y60 {
 
 
     bool
-        Movie::reloadRequired(){
-            bool rc = !_myDecoder || _myLoadedFilename != get<ImageSourceTag>();
-            AC_TRACE << "Movie::reloadRequired " << rc
-                << " with _myLoadedFilename=" << _myLoadedFilename
-                << " ImageSourceTag=" << get<ImageSourceTag>();
-            if (_myLoadedFilename != get<ImageSourceTag>()) {
-                set<FrameCountTag>(-1);            
-            }                 
-            return rc;
+    Movie::reloadRequired(){
+        bool rc = !_myDecoder || _myLoadedFilename != get<ImageSourceTag>();
+        AC_TRACE << "Movie::reloadRequired " << rc
+            << " with _myLoadedFilename=" << _myLoadedFilename
+            << " ImageSourceTag=" << get<ImageSourceTag>();
+        if (_myLoadedFilename != get<ImageSourceTag>()) {
+            set<FrameCountTag>(-1);            
+        }                 
+        return rc;
     }
 
 
