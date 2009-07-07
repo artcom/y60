@@ -505,9 +505,9 @@ macro(ac_end_project PROJECT_NAME)
     # Install cmake files
     install(
         FILES
-            ${THIS_PROJECT_CMAKE_DIR}/${PROJECT_NAME}Config.cmake
-            ${THIS_PROJECT_CMAKE_DIR}/${PROJECT_NAME}Dependencies.cmake
-            ${THIS_PROJECT_CMAKE_DIR}/${PROJECT_NAME}Targets.cmake
+            "${THIS_PROJECT_CMAKE_DIR}/${PROJECT_NAME}Config.cmake"
+            "${THIS_PROJECT_CMAKE_DIR}/${PROJECT_NAME}Dependencies.cmake"
+            "${THIS_PROJECT_CMAKE_DIR}/${PROJECT_NAME}Targets.cmake"
             ${THIS_PROJECT_CUSTOM_SCRIPTS}
             ${THIS_PROJECT_CUSTOM_TEMPLATES}
 	    DESTINATION ${THIS_PROJECT_CMAKE_SUBDIR}
