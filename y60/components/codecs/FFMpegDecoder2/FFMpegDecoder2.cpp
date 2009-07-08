@@ -257,7 +257,7 @@ namespace y60 {
         if (!isActive()) {
             decodeFrame();
         }
-        if (!isActive()) {
+        if (!isUnjoined()) {
             AC_DEBUG << "Forking FFMpegDecoder Thread";
             PosixThread::fork();
         } else {
@@ -284,7 +284,7 @@ namespace y60 {
         }
 
         setState(RUN);
-        if (!isActive()) {
+        if (!isUnjoined()) {
             AC_DEBUG << "Forking FFMpegDecoder Thread";
             PosixThread::fork();
         } else {
@@ -299,7 +299,7 @@ namespace y60 {
         _myMaxCacheSize = myMovie->get<MaxCacheSizeTag>();
         _myLastVideoFrame = VideoMsgPtr();
         setState(RUN);
-        if (!isActive()) {
+        if (!isUnjoined()) {
             AC_DEBUG << "Forking FFMpegDecoder Thread";
             PosixThread::fork();
         } else {
@@ -578,7 +578,6 @@ namespace y60 {
     VideoMsgPtr FFMpegDecoder2::createFrame(double theTimestamp) {
         AC_DEBUG << "FFMpegDecoder2::createFrame";
 
-        //int myBufferSize = 0; 
         vector<unsigned> myBufferSizes;
         switch (_myDestinationPixelFormat) {
             case PIX_FMT_BGRA:
@@ -720,8 +719,7 @@ namespace y60 {
 			AC_WARNING << "---- Neither audio nor video stream in FFMpegDecoder2::run";
             return;
         }
-        //int64_t mySeekTimestamp = AV_NOPTS_VALUE;
-
+        
         // decoder loop
         bool isDone = false;
         while (!shouldTerminate() && !isDone) {
@@ -996,11 +994,17 @@ namespace y60 {
 
         doSeek(theDestTime);
 
-        decodeFrame();
+        if (!isActive()) {
+            decodeFrame();
+        }
         
 
-        AC_DEBUG << "seek: Forking FFMpegDecoder Thread";
-        PosixThread::fork();
+        if (!isUnjoined()) {
+            AC_DEBUG << "seek: Forking FFMpegDecoder Thread";
+            PosixThread::fork();
+        } else {
+            AC_DEBUG << "Thread already running. No forking.";
+        }
     }
     // Uses a heuristic based on the number of I-Frames in the video
     // to find the next IFrame
