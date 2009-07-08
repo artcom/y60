@@ -24,6 +24,7 @@ endif(Y60_WITH_GTK)
 
 if(MAYA_FOUND)
     add_subdirectory(maya-xport)
+    add_subdirectory(maya-utils)
 endif(MAYA_FOUND)
 
 if(C4D_FOUND)
