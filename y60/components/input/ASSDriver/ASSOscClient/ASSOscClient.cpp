@@ -137,7 +137,7 @@ ASSOscClient::onUpdateSettings(dom::NodePtr theSettings) {
             std::string myHost = myReceiverNode->getAttributeString("host");
             asl::Unsigned16 myPort = myReceiverNode->getAttributeValue<asl::Unsigned16>("port");
 
-            AC_INFO << "sending to " << myHost << ":" << myPort;
+            AC_INFO << "Sending from port " << mySourcePort << " to " << myHost << ":" << myPort;
 
             ASSOscReceiverPtr myReceiver(new ASSOscReceiver(myHost, mySourcePort, myPort));
             
