@@ -1514,9 +1514,6 @@ namespace y60 {
 
     void 
     ASSDriver::processInput() {
-
-        MAKE_SCOPE_TIMER(ASSDriver_processInput);
-
         if (_myTransportLayer) {
             std::vector<ASSEvent> myFrames;
             _myTransportLayer->getEvents(myFrames);
@@ -1628,7 +1625,6 @@ namespace y60 {
 
     void
     ASSDriver::queueCommand( const char * theCommand ) {
-        MAKE_SCOPE_TIMER(ASSDriver_queueCommand);
         if (_myTransportLayer) {
             _myTransportLayer->queueCommand( theCommand );
         } else {
