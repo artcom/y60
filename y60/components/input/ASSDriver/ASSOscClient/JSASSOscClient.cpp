@@ -192,14 +192,10 @@ JSASSOscClient::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *arg
         JS_ReportError(cx,"Constructor for %s bad object; did you forget a 'new'?", ClassName());
         return JS_FALSE;
     }
-
+    
     OWNERPTR myNewNative;
     switch (argc) {
         case 0:
-            myNewNative = OWNERPTR(new ASSOscClient());
-            break;
-        case 1:
-            AC_PRINT << "TODO: parse port number";
             myNewNative = OWNERPTR(new ASSOscClient());
             break;
         default:

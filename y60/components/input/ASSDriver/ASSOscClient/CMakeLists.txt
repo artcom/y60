@@ -1,12 +1,14 @@
 
 set(SOURCES
 ASSOscClient.cpp
+ASSOscReceiver.cpp
 ASSOscPlugin.cpp
 JSASSOscClient.cpp
 )
 
 set(HEADERS
 ASSOscClient.h
+ASSOscReceiver.h
 JSASSOscClient.h
 y60_oscclient_settings.h
 )

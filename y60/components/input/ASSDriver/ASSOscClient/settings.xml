@@ -28,10 +28,12 @@
         <MinTouchThreshold>9</MinTouchThreshold>
         <InterpolationMethod>1</InterpolationMethod>
         <CureBrokenElectrodes>0</CureBrokenElectrodes>
-        <OscReceiverList>
-            <OscReceiver ip="127.0.0.1"/>
-        </OscReceiverList>
-        <ServerPort>12345</ServerPort>
-        <ClientPort>7001</ClientPort>
+       	
+        <OscSourcePort>3333</OscSourcePort>
+        
+        <OscReceivers>
+            <OscReceiver host="127.0.0.1" port="3334"/>
+        </OscReceivers>
+        
     </ASSDriver>
 </settings>

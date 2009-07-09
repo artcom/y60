@@ -70,6 +70,7 @@
 #include "y60_oscclient_settings.h"
 
 #include "ASSOscClient.h"
+
 #include <y60/jsbase/JSWrapper.h>
 
 namespace jslib {
@@ -135,6 +136,6 @@ jsval as_jsval(JSContext *cx, JSASSOscClient::OWNERPTR theOwner);
 jsval as_jsval(JSContext *cx, JSASSOscClient::OWNERPTR theOwner, JSASSOscClient::NATIVE * theASSOscClient);
 
 } // namespace jslib
-#endif
 
+#endif
 

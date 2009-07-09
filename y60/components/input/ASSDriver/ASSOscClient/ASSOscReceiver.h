@@ -56,49 +56,79 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
  */
 
-#ifndef ASS_OSC_CLIENT_INCLUDED
-#define ASS_OSC_CLIENT_INCLUDED
+#ifndef ASS_OSC_RECEIVER_INCLUDED
+#define ASS_OSC_RECEIVER_INCLUDED
 
 #include "y60_oscclient_settings.h"
 
-#include <y60/components/input/ASSDriver/ASSCore/ASSDriver.h>
+#include <asl/base/Ptr.h>
 
-#include "ASSOscReceiver.h"
+#include <asl/math/Box.h>
+#include <asl/math/Vector234.h>
+
+#include <asl/net/UDPConnection.h>
+
+#include <oscpack/osc/OscOutboundPacketStream.h>
 
 namespace y60 {
 
-class ASSOscClient : public ASSDriver {
+class ASSOscReceiver {
 public:
 
-	ASSOscClient();
+	ASSOscReceiver(std::string theHost, asl::Unsigned16 theSourcePort, asl::Unsigned16 theDestinationPort);
 
-	virtual ~ASSOscClient();
+	~ASSOscReceiver();
+
+	// build a configure event - used for communicating array configuration.
+	void buildConfigureEvent(asl::Signed32 theWidth, asl::Signed32 theHeight);
+
+	// build a TL event - used for array/driver state notification
+	void buildTransportLayerEvent(const std::string& theType);
 	
-	const char * ClassName() {
-		static const char * myClassName = "ASSOscClient";
-		return myClassName;
-	}
-
-	void poll();
-
-	virtual void onUpdateSettings(dom::NodePtr theSettings);
-
-protected:
+	// build a cursor event
+	void buildCursorEvent(const std::string&   theType,
+	                      int                  theId,
+	                      const asl::Vector3f& thePosition,
+	                      float                theIntensity);
 	
-	virtual void createEvent(int theID, const std::string & theType,
-			const asl::Vector2f & theRawPosition, const asl::Vector3f & thePosition3D,
-			const asl::Box2f & theROI, float theIntensity,
-			const ASSEvent & theEvent);
-
-	virtual void createTransportLayerEvent(const std::string & theType);
+	// install a bounding box for this receiver
+	void restrictToRegion(const asl::Box2f& theRegion);
+	
+	// prepare the receiver for a new cycle,
+	// clearing all state from the previous cycle
+	void prepare();
+	
+	// send everything built in this cycle
+	void send();
+	
+	// reset connection state
+	void reset();
 
 private:
-
-	int _mySourcePort;
 	
-	std::vector<ASSOscReceiverPtr> _myReceivers;
+	static const unsigned ourBufferSize = 1024;
+
+	char* _myBuffer;
+
+	std::string _myHost;
+	asl::Unsigned16 _mySourcePort;
+	asl::Unsigned16 _myDestinationPort;
+
+	inet::UDPConnection _myConnection;
+	
+	osc::OutboundPacketStream _myStream;
+	
+	bool _myEmpty;
+	bool _myConfigured;
+	
+	asl::Unsigned64 _myBundleCounter;
+	
+	bool _myBounded;
+	asl::Box2f _myRegion;
 };
+
+typedef asl::Ptr<ASSOscReceiver> ASSOscReceiverPtr;
 
 } // end of namespace y60
 
-#endif // ASS_OSC_CLIENT_INCLUDED
+#endif // ASS_OSC_RECEIVER_INCLUDED
