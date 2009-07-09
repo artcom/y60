@@ -233,7 +233,7 @@ endfunction(y60_end_application)
 if(CMAKE_BUILD_TYPE)
     string(TOUPPER "${CMAKE_BUILD_TYPE}" Y60_TEST_BUILD_TYPE)
 else(CMAKE_BUILD_TYPE)
-    option(Y60_TEST_BUILD_TYPE "Build type to use for running tests" RELEASE)
+    set(Y60_TEST_BUILD_TYPE RELEASE CACHE STRING "Build type to use for running tests")
 endif(CMAKE_BUILD_TYPE)
 
 # macro for adding javascript execution tests
