@@ -229,9 +229,17 @@ function(y60_end_application NAME)
     set(Y60_CURRENT_APPLICATION)
 endfunction(y60_end_application)
 
+# select build type for running tests
+if(CMAKE_BUILD_TYPE)
+    string(TOUPPER "${CMAKE_BUILD_TYPE}" Y60_TEST_BUILD_TYPE)
+else(CMAKE_BUILD_TYPE)
+    option(Y60_TEST_BUILD_TYPE "Build type to use for running tests" RELEASE)
+endif(CMAKE_BUILD_TYPE)
+
+# macro for adding javascript execution tests
 macro(y60_add_jstest NAME PREFIX)
     # find y60 executable
-    get_target_property(Y60_EXECUTABLE y60 LOCATION_${CMAKE_BUILD_TYPE})
+    get_target_property(Y60_EXECUTABLE y60 LOCATION_${Y60_TEST_BUILD_TYPE})
     
     # path with test-specifics
     set(_PATH ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
@@ -242,6 +250,7 @@ macro(y60_add_jstest NAME PREFIX)
     )
 endmacro(y60_add_jstest)
 
+# macro for adding render tests
 macro(y60_add_rendertest NAME)
     parse_arguments(
         TEST
@@ -268,12 +277,12 @@ macro(y60_add_rendertest NAME)
     get_target_property(
         TEST_Y60_EXECUTABLE
         y60
-        LOCATION_${CMAKE_BUILD_TYPE}
+        LOCATION_${Y60_TEST_BUILD_TYPE}
     )
     get_target_property(
         TEST_Y60_COMPARE_IMAGE_EXECUTABLE
         y60-compare-image
-        LOCATION_${CMAKE_BUILD_TYPE}
+        LOCATION_${Y60_TEST_BUILD_TYPE}
     )
 
     set(TEST_Y60_PATH ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
