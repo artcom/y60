@@ -246,3 +246,28 @@ spark.I18nImage.Constructor = function(Protected) {
         return spark.getCachedImage(myData);
     };
 };
+
+spark.I18nMovie = spark.ComponentClass("I18nMovie");
+
+spark.I18nMovie.Constructor = function(Protected) {
+    var Public = this;
+    var Base = {};
+
+    this.Inherit(spark.I18nItem);
+
+    Base.createEvent = Protected.createEvent;
+    Protected.createEvent = function(theLanguage) {
+        var myEvent = Base.createEvent(theLanguage);
+        myEvent.movie = Public.movie;
+        return myEvent;
+    };
+
+    Public.movie getter = function() {
+        var myData = Protected.getLanguageData(Public.language);
+        if( ! myData || myData.length == 0) {
+            Logger.error("Can't make dummy movies");
+            return null;
+        }
+        return spark.openMovie(myData);
+    };
+};

@@ -21,8 +21,6 @@ spark.Image.Constructor = function(Protected) {
     
     var _myTexture  = null;
     var _myVertices = null;
-
-    var _myImageChangedHanlder = null;
     
     // XXX crude hack starts here
     var _myOnImageChanged = null;

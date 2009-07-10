@@ -97,3 +97,23 @@ spark.getCachedTexture = function(thePath) {
 
     return myTexture;
 };
+
+spark.ourMovieCounter = 0;
+
+spark.openMovie = function(thePath) {
+    var myMovie = Node.createElement("movie");
+    
+    window.scene.images.appendChild(myMovie);
+    
+    myMovie.src = thePath;
+    myMovie.name = "spark-movie-" + spark.ourMovieCounter++;
+    myMovie.resize = "none";
+    myMovie.loopcount = "1";
+    myMovie.playmode = "stop";
+    myMovie.targetpixelformat = "RGB";
+    myMovie.decoderhint = "FFMpegDecoder2";
+    
+    window.scene.loadMovieFrame(myMovie);
+    
+    return myMovie;
+};
