@@ -155,7 +155,7 @@ macro(_ac_init_installer_shortcuts)
         file(WRITE ${ACMAKE_SHORTCUT_FILE} "// This generated file lists all shortcuts\n")
         install(
             FILES ${ACMAKE_SHORTCUT_FILE}
-            DESTINATION share/cmake-2.6/Tools
+            DESTINATION lib/acmake/tools
             )
     endif(WIN32)
 endmacro(_ac_init_installer_shortcuts)
@@ -318,10 +318,10 @@ macro(_ac_declare_installer NAME)
             set(CPACK_NSIS_MUI_UNIICON ${UNINSTALLER_ICON_NSIS})
 
             set(CPACK_NSIS_EXTRA_INSTALL_COMMANDS "
-                ExecShell \\\"\\\" \\\"$INSTDIR\\\\share\\\\cmake-2.6\\\\Tools\\\\CreateShortcuts.wsf\\\" \\\"% \\\$INSTDIR % \\\$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\"
+                ExecShell \\\"\\\" \\\"$INSTDIR\\\\lib\\\\acmake\\\\tools\\\\CreateShortcuts.wsf\\\" \\\"% \\\$INSTDIR % \\\$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\"
             ")
 #             set(CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS "
-#                 ExecShell \\\"\\\" \\\"$INSTDIR\\\\share\\\\cmake-2.6\\\\Tools\\\\RemoveShortcuts.wsf\\\" \\\"% \\\$INSTDIR % \\\$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\"
+#                 ExecShell \\\"\\\" \\\"$INSTDIR\\\\lib\\\\acmake\\\\tools\\\\RemoveShortcuts.wsf\\\" \\\"% \\\$INSTDIR % \\\$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\"
 #             ")
 
         endif(WIN32)
