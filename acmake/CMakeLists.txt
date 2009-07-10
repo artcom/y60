@@ -28,7 +28,7 @@ configure_file(AcMakeConfig.cmake.in ${CMAKE_BINARY_DIR}/${ACMAKE_MODULES_SUB}/A
 
 # install config file
 install(
-    FILES ${CMAKE_BINARY_DIR}/lib/acmake/cmake/AcMakeConfig.cmake
+    FILES ${CMAKE_BINARY_DIR}/${ACMAKE_MODULES_SUB}/AcMakeConfig.cmake
     COMPONENT AcMake
     DESTINATION ${ACMAKE_MODULES_SUB}
 )
