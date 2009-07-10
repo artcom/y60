@@ -692,7 +692,7 @@ saveFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         }
         if (!myBinaryFlag) {
             Path myPath(myFilename, UTF8);
-            std::ofstream myFile(myPath.toLocale().c_str());
+            std::ofstream myFile(myPath.toLocale().c_str(), std::ios::binary);
             if (!myFile) {
                 JS_ReportError(cx, "JSNode::saveFile() - "
                         "Can not open file '%s' for writing.", myFilename.c_str());
