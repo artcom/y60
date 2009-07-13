@@ -37,6 +37,7 @@ spark.NewMovie.Constructor = function(Protected) {
     };
 
     Public.mode getter = function() { return _myMovie.playmode; };
+    Public.mode setter = function(thePlaymode) { _myMovie.playmode = thePlaymode };
 
     Public.loop getter = function() {
         return _myMovie.loopcount == 0;
