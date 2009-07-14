@@ -80,6 +80,7 @@ GUI.Animation.Constructor = function(Public, Protected) {
     var _startTime = 0.0;
     var _progressTime = 0.0;
     var _progress = 0.0;
+    var _finished = false;
 
     var _easing  = function(v) {
         return v;
@@ -195,6 +196,7 @@ GUI.Animation.Constructor = function(Public, Protected) {
 	    _progressTime = 0;
 		_progress = _easing(0.0);
 	    _running = true;
+	    _finished = false;
 		
 	    callOnPlay();
 	    
@@ -214,7 +216,21 @@ GUI.Animation.Constructor = function(Public, Protected) {
             Public.play();
         } else {
             _running = false;
+            _finished = true;
         }
+	};
+	
+	Public.comeToAnEnd = function() {
+        Logger.info("comeToAnEnd " + Public.name);
+        if (_finished) {
+            return;
+        }
+        if (!_running) {
+            Public.play();
+    	    Public.render();	                
+        }
+		Public.finish(true);
+        
 	};
 		
     Public.doFrame = function() {
