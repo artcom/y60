@@ -396,7 +396,8 @@ namespace y60 {
 
     bool Movie::hasAudio(bool & theHasAudio) const {
         MovieDecoderBase* myDecoder = const_cast<MovieDecoderBase*>(_myDecoder.get());
-        return myDecoder->hasAudio();
+        theHasAudio = myDecoder->hasAudio();
+        return true;
     }
 
 
