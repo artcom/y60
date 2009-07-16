@@ -81,6 +81,7 @@ spark.findRootElement = function(theDocument) {
 
 // javascript extensions
 use("jsextensions.js");
+use("lang/jsext.js");
 // component instantiator
 use("meta.js");
 // spark file (and dom) loader
