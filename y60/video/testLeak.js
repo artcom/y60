@@ -123,7 +123,7 @@ MovieLeakUnitTest.prototype.Constructor = function(obj, theName, theFiles, theDe
                 print("Max Memory Usage                        : " + asMemoryString(_myMaxMemory));
                 print("Max Memory Usage in frame               : " + _myMaxFrame);
                 print("No new maximum for last n frames, n =   : " + (obj.myFrameCount - obj.myMaxFrame));
-                print("Avrg. Difference per Movie              : " + _myTrend.toFixed(0));
+                print("Avrg. Difference per Movie              : " + asMemoryString(obj.myTrend));
                 print("allowed difference per Movie            : " + asMemoryString(obj.AllowedMemoryUsage));
                 ENSURE('obj.myTrend < obj.AllowedMemoryUsage || obj.myFrameCount - obj.myMaxFrame > 50');                
 

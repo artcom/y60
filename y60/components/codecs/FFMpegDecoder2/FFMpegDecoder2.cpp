@@ -84,8 +84,6 @@
 #include <stdlib.h>
 
 #define DB(x) //x 
-#define DB2(x) //x
-#define DBI(x) // x
 
 using namespace std;
 using namespace asl;
@@ -134,11 +132,12 @@ namespace y60 {
     {}
 
     FFMpegDecoder2::~FFMpegDecoder2() {
+        DB(AC_DEBUG << "FFMpegDecoder2::~FFMpegDecoder2()");
         shutdown();
     }
     void FFMpegDecoder2::shutdown() {
         if (!_hasShutDown) {
-           DBI(AC_INFO << "FFMpegDecoder2::shutdown()");
+           DB(AC_DEBUG << "FFMpegDecoder2::shutdown()");
            closeMovie();
             if (_myResampleContext) {
                 audio_resample_close(_myResampleContext);
@@ -245,10 +244,10 @@ namespace y60 {
     }
 
     void FFMpegDecoder2::startOverAgain() {
-        AC_DEBUG <<"FFMpegDecoder2::startOverAgain, Joining FFMpegDecoder Thread";
+        AC_DEBUG <<"FFMpegDecoder2::startOverAgain";
         
         if (isUnjoined()) {
-            DBI(AC_INFO << "Joining FFMpegDecoder Thread");
+            DB(AC_DEBUG << "Joining FFMpegDecoder Thread");
             join();
         }
         doSeek(-1);
@@ -309,14 +308,14 @@ namespace y60 {
     }
 
     void FFMpegDecoder2::stopMovie(bool theStopAudioFlag) {
-        DBI(AC_INFO << "FFMpegDecoder2::stopMovie";)
+        AC_DEBUG << "FFMpegDecoder2::stopMovie";
         
         if (isUnjoined()) {
-            DBI(AC_INFO << "Joining FFMpegDecoder Thread");
+            DB(AC_DEBUG << "Joining FFMpegDecoder Thread");
             join();
         }
         if (getState() != STOP) {
-            DBI(AC_INFO << "Stopping Movie");
+            AC_DEBUG << "Stopping Movie";
             
             _myDecodedPacketsPerFrame = 0; // reset counter    
             _myLastVideoFrame = VideoMsgPtr();
@@ -337,7 +336,7 @@ namespace y60 {
 
     void
     FFMpegDecoder2::closeMovie() {
-        DBI(AC_INFO << "FFMpegDecoder2::closeMovie";)
+        AC_DEBUG << "FFMpegDecoder2::closeMovie";
         // stop thread
         stopMovie();
 
@@ -980,9 +979,9 @@ namespace y60 {
     }
 
     void FFMpegDecoder2::seek(double theDestTime) {
-        AC_DEBUG << "FFMpegDecoder2::seek: Joining FFMpegDecoder Thread"<<" desttime: "<<theDestTime;
+        AC_DEBUG << "FFMpegDecoder2::seek() desttime: "<<theDestTime;
         if (isUnjoined()) {
-            DBI(AC_INFO << "Joining FFMpegDecoder Thread");
+            DB(AC_DEBUG << "Joining FFMpegDecoder Thread");
             join();
         }
         if (_myAudioSink && getDecodeAudioFlag()) {
