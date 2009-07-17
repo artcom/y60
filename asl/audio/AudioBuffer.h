@@ -282,7 +282,7 @@ class AudioBuffer: public AudioBufferBase {
                 << ", num channels: " << getNumChannels()
                 << ", sample rate: " << getSampleRate()
                 << ", sample format:" << getSampleFormat() << ")";
-            if (_numChannels != 0) {
+            if (_numChannels != 0 && _numFrames != 0) {
                 dumpSamples(s, 0, 8);
                 unsigned numSamples = getNumFrames()*getNumChannels();
                 dumpSamples(s, numSamples-8, numSamples);
