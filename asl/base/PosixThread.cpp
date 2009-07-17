@@ -63,6 +63,7 @@
 using namespace std;
 
 #define DB(x)  // x
+#define DB2(x) // x
 
 namespace asl {
 
@@ -259,7 +260,7 @@ void PosixThread::fork () {
     {AC_INFO << "PosixThread::fork this = " << this << endl;};
     {AC_INFO << "PosixThread::fork This = " << This << endl;});
 
-    DB(pthread_attr_t   threadAttr;
+    DB2(pthread_attr_t   threadAttr;
        size_t           stackSize = 2;
        size_t           guardSize = 2;
        void *           stackAddr = 0;
@@ -286,15 +287,15 @@ void PosixThread::fork () {
                 << strerror(status) << endl;
        }
     );
-    DB(AC_TRACE << "#INFO : PosixThread::fork() : thread has stack size " << stackSize << " bytes" << endl;)
-    DB(AC_TRACE << "#INFO : PosixThread::fork() : thread has stack addr " << stackAddr << "." << endl;)
-    DB(AC_TRACE << "#INFO : PosixThread::fork() : thread has guard size " << guardSize << " bytes" << endl;)
+    DB2(AC_TRACE << "#INFO : PosixThread::fork() : thread has stack size " << stackSize << " bytes" << endl;)
+    DB2(AC_TRACE << "#INFO : PosixThread::fork() : thread has stack addr " << stackAddr << "." << endl;)
+    DB2(AC_TRACE << "#INFO : PosixThread::fork() : thread has guard size " << guardSize << " bytes" << endl;)
     myRetVal = pthread_create (&_myThread, 0, threadFunc, this);
     _myIsUnjoined = true;
     DB(AC_INFO << "PosixThread::fork() : created thread id " <<getThreadID() << endl);
     testRetVal (myRetVal, "PosixThread:pthread_create");
         
-    DB(AC_INFO << "PosixThread::fork() : has set active variable for thread id " <<getThreadID() << endl);
+    DB(AC_INFO << "PosixThread::fork() : has set unjoined variable for thread id " <<getThreadID() << endl);
     _myCreator = pthread_self();
 }
 
@@ -319,7 +320,7 @@ void PosixThread::join () {
     testRetVal (myRetVal, "PosixThread:pthread_join");
     _myIsUnjoined = false;
     _myShouldTerminate = false;
-    DB(AC_INFO << "PosixThread::join() : has cleared active variable" << endl);
+    DB(AC_INFO << "PosixThread::join() : has cleared unjoined variable" << endl);
 }
 
 #ifndef _WIN32
