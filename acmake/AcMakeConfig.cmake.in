@@ -4,31 +4,59 @@ set(AcMake_FOUND YES)
 
 # determine where our various files are
 if(AcMake_SOURCE_DIR)
+    # we are in an integrated build
+
     set(ACMAKE_TOOLS_DIR ${AcMake_SOURCE_DIR}/tools)
     set(ACMAKE_MODULES_DIR ${AcMake_SOURCE_DIR}/modules)
     set(ACMAKE_TEMPLATES_DIR ${AcMake_SOURCE_DIR}/templates)
     set(ACMAKE_INCLUDE_DIR ${AcMake_SOURCE_DIR}/include)
+
+    # extend the module path to make AcMake loadable
+    list(INSERT CMAKE_MODULE_PATH 0 ${ACMAKE_MODULES_DIR})
+
 else(AcMake_SOURCE_DIR)
+    # we are being used from build or install
+
+    set(AcMake_SOURCE_DIR "@AcMake_SOURCE_DIR@")
+
+    if(WIN32)
+        set(_CMAKE_TO_PREFIX "..")
+    elseif(OSX)
+        set(_CMAKE_TO_PREFIX ".")
+    elseif(LINUX)
+        set(_CMAKE_TO_PREFIX "../../..")
+    endif(WIN32)
     get_filename_component(ACMAKE_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
-    get_filename_component(ACMAKE_PREFIX    "${ACMAKE_CMAKE_DIR}/../../.." ABSOLUTE)
+    get_filename_component(ACMAKE_PREFIX    "${ACMAKE_CMAKE_DIR}/${_CMAKE_TO_PREFIX}" ABSOLUTE)
 
     if(EXISTS "${ACMAKE_PREFIX}/CMakeFiles")
-        message("AcMake lies in build prefix ${ACMAKE_PREFIX}")
-        set(ACMAKE_TOOLS_DIR     "@AcMake_SOURCE_DIR@/tools")
-        set(ACMAKE_MODULES_DIR   "@AcMake_SOURCE_DIR@/modules")
+        message("AcMake loading from build directory ${ACMAKE_PREFIX}")
+
         set(ACMAKE_TEMPLATES_DIR "@AcMake_SOURCE_DIR@/templates")
+        set(ACMAKE_MODULES_DIR   "@AcMake_SOURCE_DIR@/modules")
+        set(ACMAKE_TOOLS_DIR     "@AcMake_SOURCE_DIR@/tools")
         set(ACMAKE_INCLUDE_DIR   "@AcMake_SOURCE_DIR@/include")
+
+        # extend the module path to make AcMake loadable
+        list(INSERT CMAKE_MODULE_PATH 0 ${ACMAKE_MODULES_DIR})
+
+        # add modules in build dir
+        list(INSERT CMAKE_MODULE_PATH 0 "${ACMAKE_PREFIX}/@ACMAKE_MODULES_SUB@")
+
     else(EXISTS "${ACMAKE_PREFIX}/CMakeFiles")
-        message("AcMake lies in install prefix ${ACMAKE_PREFIX}")
+        message("AcMake loading from install prefix ${ACMAKE_PREFIX}")
+
         set(ACMAKE_TEMPLATES_DIR "${ACMAKE_PREFIX}/@ACMAKE_TEMPLATES_SUB@")
         set(ACMAKE_MODULES_DIR   "${ACMAKE_PREFIX}/@ACMAKE_MODULES_SUB@")
         set(ACMAKE_TOOLS_DIR     "${ACMAKE_PREFIX}/@ACMAKE_TOOLS_SUB@")
         set(ACMAKE_INCLUDE_DIR   "${ACMAKE_PREFIX}/@ACMAKE_INCLUDE_SUB@")
-    endif(EXISTS "${ACMAKE_PREFIX}/CMakeFiles")
-endif(AcMake_SOURCE_DIR)
 
-# extend the module path to make AcMake loadable
-list(INSERT CMAKE_MODULE_PATH 0 ${ACMAKE_MODULES_DIR})
+        # extend the module path to make AcMake loadable
+        list(INSERT CMAKE_MODULE_PATH 0 ${ACMAKE_MODULES_DIR})
+
+    endif(EXISTS "${ACMAKE_PREFIX}/CMakeFiles")
+
+endif(AcMake_SOURCE_DIR)
 
 # load the build system
 include(AcMake)
