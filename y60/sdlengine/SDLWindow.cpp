@@ -587,10 +587,17 @@ void SDLWindow::setPosition(asl::Vector2i thePos) {
                    myRect.right-myRect.left,
                    myRect.bottom-myRect.top, true);
     }
-#else
+#endif    
+#ifdef AC_USE_X11
+    wminfo.info.x11.lock_func();
+    XMoveWindow( wminfo.info.x11.display, wminfo.info.x11.wmwindow,
+                 thePos[0], thePos[1]);
+    XSync(wminfo.info.x11.display, false);
+    wminfo.info.x11.unlock_func();
+#endif
+
 #ifdef OSX // TODO PORT
     AC_WARNING << "SDLWindow::setPosition not yet implemented for OSX";    
-#endif
 #endif
 }
 
