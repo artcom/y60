@@ -25,8 +25,6 @@ ac_add_library(
     HEADERS ${OSC_HEADERS}
 )
 
-_ac_add_include_path(oscpackosc ${CMAKE_CURRENT_BINARY_DIR}/../include YES)
-
 # stage headers
 foreach(HEADER ${OSC_HEADERS})
     configure_file(

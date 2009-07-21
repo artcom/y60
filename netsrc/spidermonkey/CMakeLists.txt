@@ -31,7 +31,7 @@ ac_add_project(
     DEFINITIONS "${SPIDERMONKEY_DEFINITIONS}"
 )
 
-include_directories(.)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 set(SOURCES
     jsapi.c jsarena.c jsarray.c jsatom.c jsbool.c jscntxt.c jsdate.c
@@ -99,7 +99,7 @@ ac_add_library(
     HEADERS ${HEADERS}
 )
 
-_ac_add_include_path(spidermonkey ${CMAKE_CURRENT_BINARY_DIR}/include YES)
+ac_project_add_build_include_dir(${CMAKE_CURRENT_BINARY_DIR}/include)
 
 set_target_properties(
     spidermonkey
