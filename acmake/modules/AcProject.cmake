@@ -49,7 +49,6 @@ set(_AC_PROJECT_VARIABLES
     RUNTIME_DIR    # absolute install location of binaries (and dlls on windows)
     LIBRARY_DIR    # absolute install location of libraries
     INCLUDE_DIR    # absolute install location of headers
-    BUILD_INCLUDE_DIRS # include dirs in build tree
     CMAKE_DIR      # absolute build/install location of cmake files
     CMAKE_SUBDIR   # subdir of cmake files in both install and build trees
     DEFINITIONS    # definitions our clients should use when including us
@@ -260,11 +259,6 @@ macro(ac_add_project PROJECT_NAME)
     endforeach(FILE)
     
 endmacro(ac_add_project PROJECT_NAME)
-
-macro(ac_project_add_build_include_dir PATH)
-    append_global(${ACMAKE_CURRENT_PROJECT}_BUILD_INCLUDE_DIRS ${PATH})
-    include_directories(${PATH})
-endmacro(ac_project_add_build_include_dir)
 
 # Internal method for adding targets to the current project.
 #

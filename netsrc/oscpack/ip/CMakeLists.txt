@@ -32,6 +32,8 @@ ac_add_library(
     EXTERNS WINMM WINSOCK
 )
 
+_ac_add_include_path(oscpackip ${CMAKE_CURRENT_BINARY_DIR}/../include YES)
+
 # stage our headers
 foreach(HEADER ${IP_HEADERS})
     configure_file(
