@@ -808,6 +808,10 @@ JSA_ArrayToString(JSContext * cx, jsval * vp, string & theResult) {
         return JS_FALSE;
     }
 
+    if (!myJSArray) {
+        return JS_FALSE;
+    }
+    
     if (!JS_IsArrayObject(cx, myJSArray)) {
         return JS_FALSE;
     }
