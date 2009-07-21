@@ -124,8 +124,8 @@ getPixel(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     convertFrom(cx, argv[0], myXPos);
     int myYPos;
     convertFrom(cx, argv[1], myYPos);
-    if (myXPos < 0 || myYPos < 0 || myXPos >= myNativeRef.getValue().width() ||
-        myYPos >= myNativeRef.getValue().height())
+    if (myXPos < 0 || myYPos < 0 || myXPos >= static_cast<int>(myNativeRef.getValue().width()) ||
+        myYPos >= static_cast<int>(myNativeRef.getValue().height()))
     {
         *rval = JSVAL_NULL;
         return JS_TRUE;
