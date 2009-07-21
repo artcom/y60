@@ -336,8 +336,11 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
             } else {
                 _myDragStart = null;
                 if (_myImageOverlay) {
-                    print("Color: " + _myImageOverlay.image.firstChild.firstChild.nodeValue.
-                        getPixel(theX-_myImageOverlay.position.x,theY-_myImageOverlay.position.y));
+                    var myPixelX = (theX-_myImageOverlay.position.x)/_myZoomFactor;
+                    var myPixelY = (theY-_myImageOverlay.position.y)/_myZoomFactor;
+                    if (myPixelX >= 0 && myPixelY >= 0) {
+                        print("Color: " + _myImageOverlay.image.raster.getPixel(myPixelX, myPixelY));
+                    } 
                 }
             }
         }

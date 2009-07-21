@@ -119,8 +119,19 @@ getPixel(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_PARAM("y", "y pos", DOC_TYPE_INTEGER);
     DOC_RVAL("Color", DOC_TYPE_VECTOR4F);
     DOC_END;
-
-    return Method<NATIVE>::call(&NATIVE::getPixel,cx,obj,argc,argv,rval);
+    NativeRef<dom::ResizeableRaster> myNativeRef(cx,obj);
+    int myXPos;
+    convertFrom(cx, argv[0], myXPos);
+    int myYPos;
+    convertFrom(cx, argv[1], myYPos);
+    if (myXPos < 0 || myYPos < 0 || myXPos >= myNativeRef.getValue().width() ||
+        myYPos >= myNativeRef.getValue().height())
+    {
+        *rval = JSVAL_NULL;
+        return JS_TRUE;
+    } else {
+        return Method<NATIVE>::call(&NATIVE::getPixel,cx,obj,argc,argv,rval);
+    }
 }
 
 static JSBool
