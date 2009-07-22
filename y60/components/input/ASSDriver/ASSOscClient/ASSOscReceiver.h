@@ -117,6 +117,7 @@ private:
 	inet::UDPConnection _myConnection;
 	
 	osc::OutboundPacketStream _myStream;
+	bool _myDidOverflow;
 	
 	bool _myEmpty;
 	bool _myConfigured;

@@ -78,25 +78,37 @@ ASSOscReceiver::~ASSOscReceiver()
 void
 ASSOscReceiver::buildConfigureEvent(int theWidth, int theHeight)
 {
-	_myEmpty = false;
-	
-	_myStream << osc::BeginMessage("/configure")
-			  << 0
-			  << theWidth << theHeight
-			  << osc::EndMessage;	
+	if(!_myDidOverflow) {
+		_myEmpty = false;
+
+		try {
+			_myStream << osc::BeginMessage("/configure")
+					  << 0
+					  << theWidth << theHeight
+					  << osc::EndMessage;
+		} catch (osc::OutOfBufferMemoryException & ex) {
+			_myDidOverflow = true;
+		}
+	}
 }
 
 void
 ASSOscReceiver::buildTransportLayerEvent(const std::string& theType)
 {
-	_myEmpty = false;
+	if(!_myDidOverflow) {
+		_myEmpty = false;
+
+		std::string myAddress("/");
+
+		myAddress += theType;
 	
-    std::string myAddress("/");
-
-    myAddress += theType;
-
-    _myStream << osc::BeginMessage(myAddress.c_str())
-              << osc::EndMessage;
+		try {
+			_myStream << osc::BeginMessage(myAddress.c_str())
+					  << osc::EndMessage;
+		} catch (osc::OutOfBufferMemoryException & ex) {
+			_myDidOverflow = true;
+		}
+	}
 }
 
 void
@@ -105,25 +117,31 @@ ASSOscReceiver::buildCursorEvent(const std::string&   theType,
                                  const asl::Vector3f& thePosition,
                                  float                theIntensity)
 {
-	if(_myBounded) {
-		asl::Vector2f myPosition(thePosition[0], thePosition[1]);
+	if(!_myDidOverflow) {
+		if(_myBounded) {
+			asl::Vector2f myPosition(thePosition[0], thePosition[1]);
+
+			if(!_myRegion.contains(myPosition)) {
+				return;
+			}
+		}
+
+		_myEmpty = false;
+
+		std::string myAddress("/");
+
+		myAddress += theType;
 		
-		if(!_myRegion.contains(myPosition)) {
-			return;
+		try {
+			_myStream << osc::BeginMessage(myAddress.c_str())
+					  << theId
+					  << thePosition[0] << thePosition[1] << thePosition[2]
+					  << theIntensity
+					  << osc::EndMessage;
+		} catch (osc::OutOfBufferMemoryException & ex) {
+			_myDidOverflow = true;
 		}
 	}
-	
-    _myEmpty = false;
-    
-    std::string myAddress("/");
-    
-    myAddress += theType;
-    
-    _myStream << osc::BeginMessage(myAddress.c_str())
-              << theId
-              << thePosition[0] << thePosition[1] << thePosition[2]
-              << theIntensity
-              << osc::EndMessage;
 }
 
 void
@@ -136,6 +154,12 @@ ASSOscReceiver::restrictToRegion(const asl::Box2f& theRegion)
 void
 ASSOscReceiver::prepare()
 {
+	if(_myDidOverflow) {
+        AC_WARNING << "Osc transmit buffer overflow.";
+		_myDidOverflow = false;
+		_myConfigured = false;
+	}
+
 	_myEmpty = true;
 	_myStream.Clear();
 	
@@ -150,7 +174,7 @@ ASSOscReceiver::prepare()
 void
 ASSOscReceiver::send()
 {
-	if(!_myEmpty && _myConfigured) {
+	if(!_myEmpty && !_myDidOverflow && _myConfigured) {
 		_myStream << osc::EndBundle;
 		
 		try {
