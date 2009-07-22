@@ -61,7 +61,7 @@ function(y60_add_assets DIRECTORY)
     get_filename_component(DIRECTORY_NAME "${DIRECTORY}" NAME)
 
     install(
-        DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/${DIRECTORY}/"
+        DIRECTORY "${DIRECTORY}"
         DESTINATION "lib/${APPLICATION}/${DIRECTORY_NAME}"
         COMPONENT ${APPLICATION}
         FILES_MATCHING
@@ -70,7 +70,7 @@ function(y60_add_assets DIRECTORY)
     )
 
     if(THIS_ASSETS_ADD_TO_PATH)
-        append_global(${APPLICATION}_BUILD_PATH   "${CMAKE_CURRENT_SOURCE_DIR}/${DIRECTORY}")
+        append_global(${APPLICATION}_BUILD_PATH   "${DIRECTORY}")
         append_global(${APPLICATION}_INSTALL_PATH "${DIRECTORY_NAME}")
     endif(THIS_ASSETS_ADD_TO_PATH)
 endfunction(y60_add_assets)
@@ -303,3 +303,58 @@ macro(y60_add_rendertest NAME)
     )
 endmacro(y60_add_rendertest)
 
+macro(y60_maya_to_scene MAYA_FILE)
+    parse_arguments(
+        THIS
+        "OUTPUT"
+        "BINARY;INLINE_TEXTURES"
+        ${ARGN}
+    )
+
+    if(MAYA_FOUND)
+
+        set(FILE "${CMAKE_BINARY_DIR}/${ACMAKE_BINARY_SUBDIR}/MayaConversions.make")
+
+        get_global(Y60_MAYA_LIST_STARTED FLAG)
+        if(NOT FLAG)
+            file(WRITE ${FILE} "# This generated makefile converts maya scenes to y60\n")
+            file(APPEND ${FILE} "default: all\n")
+
+            add_custom_target(
+                maya-export ALL
+                make -f ${FILE}
+            )
+
+            set_global(Y60_MAYA_LIST_STARTED YES)
+        endif(NOT FLAG)
+
+        if(NOT THIS_OUTPUT)
+            get_filename_component(THIS_OUTPUT ${MAYA_FILE} NAME_WE)
+            if(THIS_BINARY)
+                set(THIS_OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${THIS_OUTPUT}.b60")
+            else(THIS_BINARY)
+                set(THIS_OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${THIS_OUTPUT}.x60")
+            endif(THIS_BINARY)
+        endif(NOT THIS_OUTPUT)
+        
+        set(I_BINARY)
+        if(THIS_BINARY)
+            set(I_BINARY "binary=1")
+        endif(THIS_BINARY)
+        
+        set(I_INLINE_TEXTURES)
+        if(THIS_INLINE_TEXTURES)
+            set(I_INLINE_TEXTURES "inlineTextures=1")
+        endif(THIS_INLINE_TEXTURES)
+
+        file(APPEND ${FILE}
+            "${THIS_OUTPUT}: ${CMAKE_CURRENT_SOURCE_DIR}/${MAYA_FILE}\n")
+        file(APPEND ${FILE}
+            "\tcd ${CMAKE_CURRENT_SOURCE_DIR} && ${MAYA_EXECUTABLE} -batch -proj \"${CMAKE_CURRENT_SOURCE_DIR}\" -file \"${CMAKE_CURRENT_SOURCE_DIR}/${MAYA_FILE}\" -command \"file -op \\\"${I_BINARY};${I_INLINE_TEXTURES};progressBar=0\\\" -f -ea -type \\\"Y60\\\" \\\"${THIS_OUTPUT}\\\"\"\n")
+        file(APPEND ${FILE}
+            "all:: ${THIS_OUTPUT}\n")
+        
+    else(MAYA_FOUND)
+        message(WARNING "Can't convert ${MAYA_FILE} to scene format without Maya")
+    endif(MAYA_FOUND)
+endmacro(y60_maya_to_scene)
