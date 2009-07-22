@@ -24,8 +24,8 @@ function(y60_begin_application NAME)
     set_global(${NAME}_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
     set_global(${NAME}_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
-    set_global(${NAME}_BUILD_PATH   "${CMAKE_CURRENT_BINARY_DIR};${CMAKE_CURRENT_SOURCE_DIR}")
-    set_global(${NAME}_INSTALL_PATH ".")
+    set_global(${NAME}_BUILD_PATH   "${CMAKE_CURRENT_BINARY_DIR};${CMAKE_CURRENT_SOURCE_DIR};${CMAKE_BINARY_DIR}/lib")
+    set_global(${NAME}_INSTALL_PATH "../y60/components") # XXX: multi-conf
 
     # XXX: passthrough for late installer registration
     set_global(${NAME}_DISPLAY_NAME  ${APP_DISPLAY_NAME})
@@ -81,10 +81,6 @@ macro(y60_add_component COMPONENT_NAME)
         ${ARGN}
         # XXX: install component
     )
-    # XXX: semi-dirty path hack
-    if(UNIX AND Y60_CURRENT_APPLICATION)
-        append_global(${Y60_CURRENT_APPLICATION}_BUILD_PATH ${CMAKE_CURRENT_BINARY_DIR})
-    endif(UNIX AND Y60_CURRENT_APPLICATION)
 endmacro(y60_add_component)
 
 macro(y60_add_launcher NAME)
