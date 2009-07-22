@@ -16,16 +16,19 @@
 #
 
 function(ac_add_documentation_target)
-    get_global(AC_DOCUMENTATION_TARGET_DEFINED FLAG)
-    if(NOT FLAG)
-        add_custom_target(
-            docs
-            COMMENT "Generating documentation"
-        )
-        set_global(AC_DOCUMENTATION_TARGET_DEFINED YES)
-    endif(NOT FLAG)
-
-    add_dependencies(docs ${ARGN})
+# XXX: disabled this because it gets added to ALL_BUILD
+#      in visual studio despite not having the ALL flag.
+#
+#     get_global(AC_DOCUMENTATION_TARGET_DEFINED FLAG)
+#     if(NOT FLAG)
+#         add_custom_target(
+#             docs
+#             COMMENT "Generating documentation"
+#         )
+#         set_global(AC_DOCUMENTATION_TARGET_DEFINED YES)
+#     endif(NOT FLAG)
+#
+#     add_dependencies(docs ${ARGN})
 endfunction(ac_add_documentation_target)
 
 # Doxygen - API reference generator
