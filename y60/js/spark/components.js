@@ -205,14 +205,14 @@ spark.Component.Constructor = function(Protected) {
     };
     
     Protected.getBoolean = function(theName, theDefault) {
-        if(!_myNode) {
+        if (!_myNode) {
             if(arguments.length < 2) {
                 Logger.error(Public._className_ + " cannot be instantiated from code because it needs attribute " + theName);
             } else {
                 return theDefault;
             }
         }
-        if(theName in _myNode) {
+        if (theName in _myNode) {
             return (_myNode[theName] == "true");
         } else {
             if(arguments.length < 2) {
@@ -232,15 +232,24 @@ spark.Component.Constructor = function(Protected) {
         }
     };
 
+    Protected.getVector2f = function(theName, theDefault) {
+        var myArray = Protected.getArray(theName, theDefault);
+        if (myArray.length == 2) {
+            return new Vector2f(myArray[0], myArray[1]);
+        } else {
+            return theDefault;
+        }
+    };
+
     Protected.getNumber = function(theName, theDefault) {
-        if(!_myNode) {
+        if (!_myNode) {
             if(arguments.length < 2) {
                 Logger.error(Public._className_ + " cannot be instantiated from code because it needs attribute " + theName);
             } else {
                 return theDefault;
             }
         }
-        if(theName in _myNode) {
+        if (theName in _myNode) {
             return Number(_myNode[theName]);
         } else {
             if(arguments.length < 2) {
