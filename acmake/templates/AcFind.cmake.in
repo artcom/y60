@@ -36,6 +36,7 @@ else(@THIS_PROJECT_NAME@_IS_INTEGRATED)
     set(@THIS_PROJECT_NAME@_NAME           @THIS_PROJECT_NAME@)
     set(@THIS_PROJECT_NAME@_FOUND          YES)
     set(@THIS_PROJECT_NAME@_BUILD_TYPE     @THIS_PROJECT_BUILD_TYPE@)
+    set(@THIS_PROJECT_NAME@_CONFIGURATION_TYPES @THIS_PROJECT_CONFIGURATION_TYPES@)
     set(@THIS_PROJECT_NAME@_INSTALL_PREFIX @THIS_PROJECT_INSTALL_PREFIX@)
     set(@THIS_PROJECT_NAME@_DEFINITIONS    @THIS_PROJECT_DEFINITIONS@)
     set(@THIS_PROJECT_NAME@_LIBRARIES      @THIS_PROJECT_LIBRARIES@)
@@ -71,9 +72,11 @@ else(@THIS_PROJECT_NAME@_IS_INTEGRATED)
     # we have to find out in which one we are currently lying
     if(EXISTS "${@THIS_PROJECT_NAME@_PREFIX}/CMakeFiles")
         message("@THIS_PROJECT_NAME@ lies in build prefix ${@THIS_PROJECT_NAME@_PREFIX}")
+        set(@THIS_PROJECT_NAME@_IMPORTED_FROM_BUILD YES)
     else(EXISTS "${@THIS_PROJECT_NAME@_PREFIX}/CMakeFiles")
         # we are being used from an install tree
         message("@THIS_PROJECT_NAME@ lies in install prefix ${@THIS_PROJECT_NAME@_PREFIX}")
+        set(@THIS_PROJECT_NAME@_IMPORTED_FROM_INSTALL YES)
     endif(EXISTS "${@THIS_PROJECT_NAME@_PREFIX}/CMakeFiles")
 
 endif(@THIS_PROJECT_NAME@_IS_INTEGRATED)
@@ -176,27 +179,75 @@ endforeach(LIBRARY ${@THIS_PROJECT_NAME@_LIBRARIES})
 
 # Register libraries as imported
 if(@THIS_PROJECT_NAME@_IS_IMPORTED)
-    # register executables as imported
-    foreach(EXECUTABLE ${@THIS_PROJECT_NAME@_EXECUTABLES})
-        add_executable(${EXECUTABLE} IMPORTED)
-        set_target_properties(
-            ${EXECUTABLE}
-            PROPERTIES
-                IMPORTED_LOCATION "${@THIS_PROJECT_NAME@_PREFIX}/${${EXECUTABLE}_LOCATION}"
-        )
-    endforeach(EXECUTABLE ${@THIS_PROJECT_NAME@_EXECUTABLES})
+    if(@THIS_PROJECT_NAME@_IMPORTED_FROM_BUILD AND @THIS_PROJECT_NAME@_CONFIGURATION_TYPES)
+        # register executables as imported
+        foreach(EXECUTABLE ${@THIS_PROJECT_NAME@_EXECUTABLES})
+            add_executable(${EXECUTABLE} IMPORTED)
+            set(LOCATION "${@THIS_PROJECT_NAME@_PREFIX}/${${EXECUTABLE}_LOCATION}")
+            get_filename_component(LOCATION_PATH ${LOCATION} PATH)
+            get_filename_component(LOCATION_NAME ${LOCATION} NAME)
+            foreach(TYPE ${@THIS_PROJECT_NAME@_CONFIGURATION_TYPES})
+                set(REAL_LOCATION "${LOCATION_PATH}/${TYPE}/${LOCATION_NAME}")
+                if(EXISTS ${REAL_LOCATION})
+                    set_target_properties(
+                        ${EXECUTABLE}
+                        PROPERTIES
+                            IMPORTED_LOCATION_${TYPE} ${REAL_LOCATION}
+                    )
+                endif(EXISTS ${REAL_LOCATION})
+            endforeach(TYPE ${@THIS_PROJECT_NAME@_CONFIGURATION_TYPES})
+        endforeach(EXECUTABLE ${@THIS_PROJECT_NAME@_EXECUTABLES})
 
-    # register libraries as imported
-    foreach(LIBRARY ${@THIS_PROJECT_NAME@_LIBRARIES})
-        add_library(${LIBRARY} SHARED IMPORTED)
-        set_target_properties(
-            ${LIBRARY}
-            PROPERTIES
-                IMPORTED_IMPLIB   "${@THIS_PROJECT_NAME@_PREFIX}/${${LIBRARY}_IMPLIB_LOCATION}"
-                IMPORTED_LOCATION "${@THIS_PROJECT_NAME@_PREFIX}/${${LIBRARY}_OBJECT_LOCATION}"
-                IMPORTED_LINK_DEPENDENT_LIBRARIES "${${LIBRARY}_LIBRARIES}"
-        )
-    endforeach(LIBRARY @THIS_PROJECT_NAME@_LIBRARIES)
+        # register libraries as imported
+        foreach(LIBRARY ${@THIS_PROJECT_NAME@_LIBRARIES})
+            add_library(${LIBRARY} SHARED IMPORTED)
+
+            set(IMPLIB_LOCATION "${@THIS_PROJECT_NAME@_PREFIX}/${${LIBRARY}_IMPLIB_LOCATION}")
+            get_filename_component(IMPLIB_LOCATION_PATH ${IMPLIB_LOCATION} PATH)
+            get_filename_component(IMPLIB_LOCATION_NAME ${IMPLIB_LOCATION} NAME)
+
+
+            set(OBJECT_LOCATION "${@THIS_PROJECT_NAME@_PREFIX}/${${LIBRARY}_OBJECT_LOCATION}")
+            get_filename_component(OBJECT_LOCATION_PATH ${OBJECT_LOCATION} PATH)
+            get_filename_component(OBJECT_LOCATION_NAME ${OBJECT_LOCATION} NAME)
+
+            foreach(TYPE ${@THIS_PROJECT_NAME@_CONFIGURATION_TYPES})
+                set(REAL_IMPLIB_LOCATION "${IMPLIB_LOCATION_PATH}/${TYPE}/${IMPLIB_LOCATION_NAME}")
+                set(REAL_OBJECT_LOCATION "${OBJECT_LOCATION_PATH}/${TYPE}/${OBJECT_LOCATION_NAME}")
+                if(EXISTS ${REAL_IMPLIB_LOCATION})
+                    set_target_properties(
+                        ${LIBRARY}
+                        PROPERTIES
+                            IMPORTED_IMPLIB   "${REAL_IMPLIB_LOCATION}"
+                            IMPORTED_LOCATION "${REAL_OBJECT_LOCATION}"
+                            IMPORTED_LINK_DEPENDENT_LIBRARIES "${${LIBRARY}_LIBRARIES}"
+                    )
+                endif(EXISTS ${REAL_IMPLIB_LOCATION})
+            endforeach(TYPE ${@THIS_PROJECT_NAME@_CONFIGURATION_TYPES})
+        endforeach(LIBRARY @THIS_PROJECT_NAME@_LIBRARIES)
+    else(@THIS_PROJECT_NAME@_IMPORTED_FROM_BUILD AND @THIS_PROJECT_NAME@_CONFIGURATION_TYPES)
+        # register executables as imported
+        foreach(EXECUTABLE ${@THIS_PROJECT_NAME@_EXECUTABLES})
+            add_executable(${EXECUTABLE} IMPORTED)
+            set_target_properties(
+                ${EXECUTABLE}
+                PROPERTIES
+                    IMPORTED_LOCATION "${@THIS_PROJECT_NAME@_PREFIX}/${${EXECUTABLE}_LOCATION}"
+            )
+        endforeach(EXECUTABLE ${@THIS_PROJECT_NAME@_EXECUTABLES})
+
+        # register libraries as imported
+        foreach(LIBRARY ${@THIS_PROJECT_NAME@_LIBRARIES})
+            add_library(${LIBRARY} SHARED IMPORTED)
+            set_target_properties(
+                ${LIBRARY}
+                PROPERTIES
+                    IMPORTED_IMPLIB   "${@THIS_PROJECT_NAME@_PREFIX}/${${LIBRARY}_IMPLIB_LOCATION}"
+                    IMPORTED_LOCATION "${@THIS_PROJECT_NAME@_PREFIX}/${${LIBRARY}_OBJECT_LOCATION}"
+                    IMPORTED_LINK_DEPENDENT_LIBRARIES "${${LIBRARY}_LIBRARIES}"
+            )
+        endforeach(LIBRARY @THIS_PROJECT_NAME@_LIBRARIES)
+    endif(@THIS_PROJECT_NAME@_IMPORTED_FROM_BUILD AND @THIS_PROJECT_NAME@_CONFIGURATION_TYPES)
 endif(@THIS_PROJECT_NAME@_IS_IMPORTED)
 
 # Export definitions

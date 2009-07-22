@@ -40,7 +40,8 @@ set(_AC_PROJECT_VARIABLES
     IS_PROJECT     # class tag (for "type checks")
     IS_IMPORTED    # true if project was loaded
     IS_INTEGRATED  # true if project is part of this build
-    BUILD_TYPE     # cmake build type the project was built with (XXX: not with the VS-build)
+    BUILD_TYPE     # cmake build type the project was built with (for single-BT generators only)
+    CONFIGURATION_TYPES # all cmake build types (for multi-BT generators only)
     BINARY_DIR     # root of binary build tree
     SOURCE_DIR     # root of source tree
     INSTALL_PREFIX # install prefix the project was compiled for
@@ -132,6 +133,7 @@ macro(ac_add_project PROJECT_NAME)
     
     # Also remember the build type (if we do not have one, like in VS, just leave it empty)
     set_global(${PROJECT_NAME}_BUILD_TYPE "${CMAKE_BUILD_TYPE}")
+    set_global(${PROJECT_NAME}_CONFIGURATION_TYPES "${CMAKE_CONFIGURATION_TYPES}")
 
     # We are of course FOUND
     set_global(${PROJECT_NAME}_FOUND         YES)
