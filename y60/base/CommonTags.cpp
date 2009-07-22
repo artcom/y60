@@ -76,7 +76,7 @@ namespace y60 {
     const IdTag::TYPE IdTag::getDefault() {
         asl::Block myIdBlock;
         unsigned int myCounter = ++IdTag::get().counter;
-#ifdef UNIQUE_IDS
+#if defined(Y60_BASE_UNIQUE_IDS)
         if (myCounter == 0) {
             IdTag::get().myStartTime = asl::Time().secs() - 1117122059;
         }
@@ -94,8 +94,10 @@ namespace y60 {
         }
         myIdBlock.appendUnsigned16((unsigned short)asl::getThreadId() & 0xFFFF);
         myIdBlock.appendUnsigned(IdTag::get().myStartTime);
-#else
+#elif defined(Y60_BASE_COUNTER_IDS)
         myIdBlock.appendUnsigned(myCounter);
+#else
+#error No ID generation algorithm configured.
 #endif
         std::string myId;
         binToBase64(myIdBlock, myId);

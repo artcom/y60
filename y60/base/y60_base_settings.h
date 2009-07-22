@@ -9,4 +9,7 @@
 #   define Y60_BASE_DECL AC_DLL_IMPORT
 #endif
 
+#define Y60_BASE_UNIQUE_IDS
+#undef  Y60_BASE_COUNTER_IDS
+
 #endif // Y60_BASE_SETTING_INCLUDED
