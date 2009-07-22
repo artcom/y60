@@ -1,0 +1,11 @@
+.project
+.cproject
+CMakeCache.txt
+ACMakeFiles/
+CMakeFiles/
+bin/
+include/
+lib/
+Makefile
+CTestTestfile.cmake
+cmake_install.cmake
