@@ -15,6 +15,19 @@
 # __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 #
 
+function(ac_add_documentation_target)
+    get_global(AC_DOCUMENTATION_TARGET_DEFINED FLAG)
+    if(NOT FLAG)
+        add_custom_target(
+            docs
+            COMMENT "Generating documentation"
+        )
+        set_global(AC_DOCUMENTATION_TARGET_DEFINED YES)
+    endif(NOT FLAG)
+
+    add_dependencies(docs ${ARGN})
+endfunction(ac_add_documentation_target)
+
 # Doxygen - API reference generator
 
 find_package(Doxygen)
@@ -37,6 +50,7 @@ function(ac_add_doxygen NAME SOURCE_DIR OUTPUT_DIR DOXYFILE_IN)
                 COMMENT "Generating doxygen documentation for ${NAME}"
                 VERBATIM
         )
+        ac_add_documentation_target(${NAME}-doxygen)
     endif(DOXYGEN_FOUND)
 endfunction(ac_add_doxygen PROJECT SOURCE DOXYFILE_IN)
 
@@ -61,5 +75,6 @@ function(ac_add_xsddoc NAME SCHEMA DESTINATION)
                 WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                 COMMENT "Generating xml schema documentation for ${SCHEMA}"
         )
+        ac_add_documentation_target(${NAME}-xsddoc)
     endif(JAVA_RUNTIME)
 endfunction(ac_add_xsddoc NAME SCHEMA DESTINATION)

@@ -151,6 +151,7 @@ add_custom_target(
     DEPENDS y60
     VERBATIM
 )
+ac_add_documentation_target(Y60-jsapi)
 add_custom_target(
     Y60-jsdoc
     ${Y60_LOCATION} create_documentation.js
@@ -159,6 +160,7 @@ add_custom_target(
     DEPENDS y60
     VERBATIM
 )
+ac_add_documentation_target(Y60-jsdoc)
 
 # Install XDG MIME definition
 if(LINUX)
