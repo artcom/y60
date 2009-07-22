@@ -60,136 +60,143 @@
 
 namespace y60 {
 
-ASSOscReceiver::ASSOscReceiver(std::string theHost, asl::Unsigned16 theSourcePort, asl::Unsigned16 theDestinationPort)
+ASSOscReceiver::ASSOscReceiver(std::string theHost,
+                               asl::Unsigned16 theSourcePort,
+                               asl::Unsigned16 theDestinationPort)
   : _myBuffer(new char[ourBufferSize]),
-	_myHost(theHost), _mySourcePort(theSourcePort), _myDestinationPort(theDestinationPort),
-	_myConnection(INADDR_ANY, _mySourcePort),
-	_myStream(_myBuffer, ourBufferSize),
-	_myEmpty(true), _myConfigured(false), _myBundleCounter(0),
-	_myBounded(false), _myRegion(0,0,0,0)
+    _myHost(theHost),
+    _mySourcePort(theSourcePort),
+    _myDestinationPort(theDestinationPort),
+    _myConnection(INADDR_ANY, _mySourcePort),
+    _myStream(_myBuffer, ourBufferSize),
+    _myEmpty(true),
+    _myConfigured(false),
+    _myBundleCounter(0),
+    _myBounded(false),
+    _myRegion(0,0,0,0)
 {
 }
 
 ASSOscReceiver::~ASSOscReceiver()
 {
-	delete [] _myBuffer;
+    delete [] _myBuffer;
 }
 
 void
 ASSOscReceiver::buildConfigureEvent(int theWidth, int theHeight)
 {
-	if(!_myDidOverflow) {
-		_myEmpty = false;
+    if(!_myDidOverflow) {
+        _myEmpty = false;
 
-		try {
-			_myStream << osc::BeginMessage("/configure")
-					  << 0
-					  << theWidth << theHeight
-					  << osc::EndMessage;
-		} catch (osc::OutOfBufferMemoryException & ex) {
-			_myDidOverflow = true;
-		}
-	}
+        try {
+            _myStream << osc::BeginMessage("/configure")
+                      << 0
+                      << theWidth << theHeight
+                      << osc::EndMessage;
+        } catch (osc::OutOfBufferMemoryException & ex) {
+            _myDidOverflow = true;
+        }
+    }
 }
 
 void
 ASSOscReceiver::buildTransportLayerEvent(const std::string& theType)
 {
-	if(!_myDidOverflow) {
-		_myEmpty = false;
+    if(!_myDidOverflow) {
+        _myEmpty = false;
 
-		std::string myAddress("/");
+        std::string myAddress("/");
 
-		myAddress += theType;
-	
-		try {
-			_myStream << osc::BeginMessage(myAddress.c_str())
-					  << osc::EndMessage;
-		} catch (osc::OutOfBufferMemoryException & ex) {
-			_myDidOverflow = true;
-		}
-	}
+        myAddress += theType;
+
+        try {
+            _myStream << osc::BeginMessage(myAddress.c_str())
+                      << osc::EndMessage;
+        } catch (osc::OutOfBufferMemoryException & ex) {
+            _myDidOverflow = true;
+        }
+    }
 }
 
 void
 ASSOscReceiver::buildCursorEvent(const std::string&   theType,
-		                         int                  theId,
+                                 int                  theId,
                                  const asl::Vector3f& thePosition,
                                  float                theIntensity)
 {
-	if(!_myDidOverflow) {
-		if(_myBounded) {
-			asl::Vector2f myPosition(thePosition[0], thePosition[1]);
+    if(!_myDidOverflow) {
+        if(_myBounded) {
+            asl::Vector2f myPosition(thePosition[0], thePosition[1]);
 
-			if(!_myRegion.contains(myPosition)) {
-				return;
-			}
-		}
+            if(!_myRegion.contains(myPosition)) {
+                return;
+            }
+        }
 
-		_myEmpty = false;
+        _myEmpty = false;
 
-		std::string myAddress("/");
+        std::string myAddress("/");
 
-		myAddress += theType;
-		
-		try {
-			_myStream << osc::BeginMessage(myAddress.c_str())
-					  << theId
-					  << thePosition[0] << thePosition[1] << thePosition[2]
-					  << theIntensity
-					  << osc::EndMessage;
-		} catch (osc::OutOfBufferMemoryException & ex) {
-			_myDidOverflow = true;
-		}
-	}
+        myAddress += theType;
+
+        try {
+            _myStream << osc::BeginMessage(myAddress.c_str())
+                      << theId
+                      << thePosition[0] << thePosition[1] << thePosition[2]
+                      << theIntensity
+                      << osc::EndMessage;
+        } catch (osc::OutOfBufferMemoryException & ex) {
+            _myDidOverflow = true;
+        }
+    }
 }
 
 void
 ASSOscReceiver::restrictToRegion(const asl::Box2f& theRegion)
 {
-	_myBounded = true;
-	_myRegion = theRegion;
+    _myBounded = true;
+    _myRegion = theRegion;
 }
 
 void
 ASSOscReceiver::prepare()
 {
-	if(_myDidOverflow) {
+    if(_myDidOverflow) {
         AC_WARNING << "Osc transmit buffer overflow.";
-		_myDidOverflow = false;
-		_myConfigured = false;
-	}
+        _myDidOverflow = false;
+        _myConfigured = false;
+    }
 
-	_myEmpty = true;
-	_myStream.Clear();
-	
-	_myStream << osc::BeginBundle(_myBundleCounter);
-	
-	if(!_myConfigured) {
-		buildConfigureEvent(0, 0); // XXX
-		_myConfigured = true;
-	}
+    _myEmpty = true;
+    _myStream.Clear();
+
+    _myStream << osc::BeginBundle(_myBundleCounter);
+
+    if(!_myConfigured) {
+        buildConfigureEvent(0, 0); // XXX
+        _myConfigured = true;
+    }
 }
 
 void
 ASSOscReceiver::send()
 {
-	if(!_myEmpty && !_myDidOverflow && _myConfigured) {
-		_myStream << osc::EndBundle;
-		
-		try {
-			_myConnection.sendTo(inet::getHostAddress(_myHost.c_str()), _myDestinationPort, _myStream.Data(), _myStream.Size());
-		} catch (const inet::SocketException& ex) {
-			AC_WARNING << "Could not send to " << _myHost << ":" << _myDestinationPort << ": " << ex;
-			reset();
-		}
-	}
+    if(!_myEmpty && !_myDidOverflow && _myConfigured) {
+        _myStream << osc::EndBundle;
+
+        try {
+            _myConnection.sendTo(inet::getHostAddress(_myHost.c_str()), _myDestinationPort, _myStream.Data(), _myStream.Size());
+        } catch (const inet::SocketException& ex) {
+            AC_WARNING << "Could not send to " << _myHost << ":" << _myDestinationPort << ": " << ex;
+            reset();
+        }
+    }
 }
 
 void
 ASSOscReceiver::reset()
 {
-	_myConfigured = false;
+    _myConfigured = false;
 }
 
 } // end of namespace y60

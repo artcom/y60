@@ -75,57 +75,57 @@ namespace y60 {
 class ASSOscReceiver {
 public:
 
-	ASSOscReceiver(std::string theHost, asl::Unsigned16 theSourcePort, asl::Unsigned16 theDestinationPort);
+    ASSOscReceiver(std::string theHost, asl::Unsigned16 theSourcePort, asl::Unsigned16 theDestinationPort);
 
-	~ASSOscReceiver();
+    ~ASSOscReceiver();
 
-	// build a configure event - used for communicating array configuration.
-	void buildConfigureEvent(asl::Signed32 theWidth, asl::Signed32 theHeight);
+    // build a configure event - used for communicating array configuration.
+    void buildConfigureEvent(asl::Signed32 theWidth, asl::Signed32 theHeight);
 
-	// build a TL event - used for array/driver state notification
-	void buildTransportLayerEvent(const std::string& theType);
-	
-	// build a cursor event
-	void buildCursorEvent(const std::string&   theType,
-	                      int                  theId,
-	                      const asl::Vector3f& thePosition,
-	                      float                theIntensity);
-	
-	// install a bounding box for this receiver
-	void restrictToRegion(const asl::Box2f& theRegion);
-	
-	// prepare the receiver for a new cycle,
-	// clearing all state from the previous cycle
-	void prepare();
-	
-	// send everything built in this cycle
-	void send();
-	
-	// reset connection state
-	void reset();
+    // build a TL event - used for array/driver state notification
+    void buildTransportLayerEvent(const std::string& theType);
+
+    // build a cursor event
+    void buildCursorEvent(const std::string&   theType,
+                          int                  theId,
+                          const asl::Vector3f& thePosition,
+                          float                theIntensity);
+
+    // install a bounding box for this receiver
+    void restrictToRegion(const asl::Box2f& theRegion);
+
+    // prepare the receiver for a new cycle,
+    // clearing all state from the previous cycle
+    void prepare();
+
+    // send everything built in this cycle
+    void send();
+
+    // reset connection state
+    void reset();
 
 private:
-	
-	static const unsigned ourBufferSize = 1024;
 
-	char* _myBuffer;
+    static const unsigned ourBufferSize = 1024;
 
-	std::string _myHost;
-	asl::Unsigned16 _mySourcePort;
-	asl::Unsigned16 _myDestinationPort;
+    char* _myBuffer;
 
-	inet::UDPConnection _myConnection;
-	
-	osc::OutboundPacketStream _myStream;
-	bool _myDidOverflow;
-	
-	bool _myEmpty;
-	bool _myConfigured;
-	
-	asl::Unsigned64 _myBundleCounter;
-	
-	bool _myBounded;
-	asl::Box2f _myRegion;
+    std::string _myHost;
+    asl::Unsigned16 _mySourcePort;
+    asl::Unsigned16 _myDestinationPort;
+
+    inet::UDPConnection _myConnection;
+
+    osc::OutboundPacketStream _myStream;
+    bool _myDidOverflow;
+
+    bool _myEmpty;
+    bool _myConfigured;
+
+    asl::Unsigned64 _myBundleCounter;
+
+    bool _myBounded;
+    asl::Box2f _myRegion;
 };
 
 typedef asl::Ptr<ASSOscReceiver> ASSOscReceiverPtr;

@@ -94,7 +94,7 @@ ASSOscPlugin::ASSOscPlugin(DLHandle theDLHandle) :
 ASSOscPlugin :: ~ASSOscPlugin() {
 }
 
-void 
+void
 ASSOscPlugin::initClasses(JSContext * theContext, JSObject *theGlobalObject) {
     jslib::JSASSOscClient::initClass(theContext, theGlobalObject);
 }

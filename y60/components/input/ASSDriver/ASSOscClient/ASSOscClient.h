@@ -70,33 +70,33 @@ namespace y60 {
 class ASSOscClient : public ASSDriver {
 public:
 
-	ASSOscClient();
+    ASSOscClient();
 
-	virtual ~ASSOscClient();
-	
-	const char * ClassName() {
-		static const char * myClassName = "ASSOscClient";
-		return myClassName;
-	}
+    virtual ~ASSOscClient();
 
-	void poll();
+    const char * ClassName() {
+        static const char * myClassName = "ASSOscClient";
+        return myClassName;
+    }
 
-	virtual void onUpdateSettings(dom::NodePtr theSettings);
+    void poll();
+
+    virtual void onUpdateSettings(dom::NodePtr theSettings);
 
 protected:
-	
-	virtual void createEvent(int theID, const std::string & theType,
-			const asl::Vector2f & theRawPosition, const asl::Vector3f & thePosition3D,
-			const asl::Box2f & theROI, float theIntensity,
-			const ASSEvent & theEvent);
 
-	virtual void createTransportLayerEvent(const std::string & theType);
+    virtual void createEvent(int theID, const std::string & theType,
+        const asl::Vector2f & theRawPosition, const asl::Vector3f & thePosition3D,
+        const asl::Box2f & theROI, float theIntensity,
+        const ASSEvent & theEvent);
+
+    virtual void createTransportLayerEvent(const std::string & theType);
 
 private:
 
-	int _mySourcePort;
-	
-	std::vector<ASSOscReceiverPtr> _myReceivers;
+    int _mySourcePort;
+
+    std::vector<ASSOscReceiverPtr> _myReceivers;
 };
 
 } // end of namespace y60
