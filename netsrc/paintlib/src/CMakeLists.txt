@@ -173,10 +173,9 @@ Filter/plinplacefilter.h
 
 # stage our headers
 foreach(HEADER ${HEADERS} ${FILTER_HEADERS})
-    get_filename_component(HEADER_FILE ${HEADER} NAME)
     configure_file(
         ${CMAKE_CURRENT_SOURCE_DIR}/${HEADER}
-        ${CMAKE_CURRENT_BINARY_DIR}/../include/paintlib/${HEADER_FILE}
+        ${CMAKE_CURRENT_BINARY_DIR}/../include/paintlib/${HEADER}
         COPYONLY
     )
 endforeach(HEADER ${HEADERS})
