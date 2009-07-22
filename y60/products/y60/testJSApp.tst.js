@@ -57,7 +57,6 @@
 
 */
 
-includePath("../..");  //TODO: remove this after deprecating  ant-build
 use("UnitTest.js");
 
 function JSAppUnitTest() {
@@ -69,36 +68,32 @@ JSAppUnitTest.prototype.Constructor = function(obj, theName) {
     UnitTest.prototype.Constructor(obj, theName);
 
     obj.run = function() {
-        ENSURE('"pickytests" == "pickytests"');
-        /* [DS] disabled because of issues with the new continous build:
-         *      - continous build now runs under cygwin
-         *      - the test seems not to find the 'exec.bat' script
-         *      - I guess this is because of working directory confusion
-         */
-        /*
-        obj.myReturnCode = exec("testfiles/exec.sh", "2");
-        ENSURE('obj.myReturnCode == 2');
-        obj.myReturnCode = exec("testfiles/exec.sh 3");
-        ENSURE('obj.myReturnCode == 3');
-        obj.myReturnCode = exec("testfiles/test.butt");
-        ENSURE('obj.myReturnCode == -1');
-        obj.myReturnCode = exec("testfiles/exec.sh", "2", false);
-        ENSURE('obj.myReturnCode == 0');
+        ENSURE('"pickytests" === "pickytests"');
+        
+        
         if (operatingSystem() == "WIN32") {
-            obj.myReturnCode = exec("..\\..\\testfiles\\exec.bat", "2");
-    		ENSURE('obj.myReturnCode == 2');
-            obj.myReturnCode = exec("..\\..\\testfiles\\exec.bat 3");
-    		ENSURE('obj.myReturnCode == 3');
-            obj.myReturnCode = exec("..\\..\\testfiles\\test.butt");
-    		ENSURE('obj.myReturnCode == -1');
-            obj.myReturnCode = exec("..\\..\\testfiles\\exec.bat", "2", false);
-    		ENSURE('obj.myReturnCode == 0');
-        } else if (operatingSystem() == "LINUX") {
-            ENSURE('"pickytests" == "pickytests"');
-        } else if (operatingSystem() == "OSX") {
-            ENSURE('"pickytests" == "pickytests"');
+            obj.myReturnCode = exec("testfiles\\exec.bat", "2");
+            ENSURE('obj.myReturnCode === 2');
+            obj.myReturnCode = exec("testfiles\\exec.bat 3");
+            ENSURE('obj.myReturnCode === 3');
+            obj.myReturnCode = exec("testfiles\\test.butt");
+            ENSURE('obj.myReturnCode === -1');
+            obj.myReturnCode = exec("testfiles\\exec.bat", "2", false);
+            ENSURE('obj.myReturnCode === 0');
+        } else {
+            obj.myReturnCode = exec("testfiles/exec.sh", "2");
+            ENSURE('obj.myReturnCode === 2');
+            obj.myReturnCode = exec("testfiles/exec.sh 3");
+            ENSURE('obj.myReturnCode === 3');
+            obj.myReturnCode = exec("testfiles/test.butt");
+            ENSURE('obj.myReturnCode === 127');
+            /*
+            command is blocking flag isn't recognized in linux/osx
+            obj.myReturnCode = exec("testfiles/exec.sh", "2", false);
+            ENSURE('obj.myReturnCode === 0');
+            */
         }
-        */
+        
         
     }
 };
@@ -109,7 +104,7 @@ try {
 
     mySuite.addTest(new JSAppUnitTest());
 
-	mySuite.run();
+    mySuite.run();
 
     print(">> Finished test suite '"+myTestName+"', return status = " + mySuite.returnStatus() + "");
     exit(mySuite.returnStatus());
