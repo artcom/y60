@@ -171,14 +171,12 @@ Filter/plhsvconvert.h
 Filter/plinplacefilter.h
 )
 
-include_directories(.)
-include_directories(./Filter)
-
 # stage our headers
 foreach(HEADER ${HEADERS} ${FILTER_HEADERS})
+    get_filename_component(HEADER_FILE ${HEADER} NAME)
     configure_file(
         ${CMAKE_CURRENT_SOURCE_DIR}/${HEADER}
-        ${CMAKE_CURRENT_BINARY_DIR}/../include/paintlib/${HEADER}
+        ${CMAKE_CURRENT_BINARY_DIR}/../include/paintlib/${HEADER_FILE}
         COPYONLY
     )
 endforeach(HEADER ${HEADERS})
@@ -189,6 +187,8 @@ ac_add_library(
     HEADERS ${HEADERS}
     EXTERNS GIF PNG TIFF JPEG OPENEXR CURL
 )
+
+include_directories(. ./Filter)
 
 _ac_add_include_path(paintlib ${CMAKE_CURRENT_BINARY_DIR}/../include YES)
 

@@ -45,6 +45,7 @@ function(_ac_add_include_path TARGET PATH PROPAGATE)
     endif(MSVC)
     if(PROPAGATE)
         prepend_global(${TARGET}_INCLUDE_DIRS "${PATH}")
+        ac_project_add_build_include_dir("${PATH}")
     endif(PROPAGATE)
 endfunction(_ac_add_include_path TARGET PATH)
 

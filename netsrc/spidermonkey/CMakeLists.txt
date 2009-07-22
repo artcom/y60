@@ -31,8 +31,6 @@ ac_add_project(
     DEFINITIONS "${SPIDERMONKEY_DEFINITIONS}"
 )
 
-include_directories(.)
-
 set(SOURCES
     jsapi.c jsarena.c jsarray.c jsatom.c jsbool.c jscntxt.c jsdate.c
     jsdbgapi.c jsdhash.c jsdtoa.c jsemit.c jsexn.c jsfile.c jsfun.c
@@ -92,6 +90,8 @@ foreach(HEADER ${HEADERS})
         COPYONLY
     )
 endforeach(HEADER ${HEADERS})
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 ac_add_library(
     spidermonkey js/spidermonkey

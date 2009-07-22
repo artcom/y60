@@ -43,6 +43,8 @@ ac_add_project(
 
 # Make sure we can access our includes without staging
 include_directories(../ ${CMAKE_CURRENT_BINARY_DIR}/../)
+ac_project_add_build_include_dir(${CMAKE_CURRENT_BINARY_DIR}/../)
+ac_project_add_build_include_dir(${CMAKE_CURRENT_SOURCE_DIR}/../)
 
 option(ASL_WITH_THREAD "If the new thread library should be compiled." NO)
 option(ASL_WITH_UNUSED "If the aslunused library should be compiled, containing various experimental and obsolete components." YES)
