@@ -1,6 +1,6 @@
 <SkeletonImpl
-    name="skeleton"
-    title="skeleton"
+    name="Skeleton"
+    title="Skeleton"
     decorations="false"
     mouseCursor="false"
     width="1280"

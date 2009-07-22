@@ -37,9 +37,9 @@ try {
 
     // wrap onframe to integrate GUI.Animation
     var myRealOnFrame = ourApp.onFrame;
-    ourApp.onFrame = function(theTime) {
+    ourApp.onFrame = function(theTime, theDeltaT) {
         ourAnimationManager.doFrame();
-        myRealOnFrame.call(ourApp, theTime);
+        myRealOnFrame.call(ourApp, theTime, theDeltaT);
     }
 
     // remove mover so input events won't cause display trouble

@@ -62,7 +62,7 @@ echo "      - $PROJECT_NAME.sh"
 ####################################################################
 
 START_SCRIPT=${PROJECT_NAME}.sh
-echo -e "#!/bin/bash\nshow.sh $PROJECT_NAME.js rehearsal" > $START_SCRIPT
+echo -e "#!/bin/bash\ny60 -I \"SCRIPTS\" $PROJECT_NAME.js rehearsal" > $START_SCRIPT
 chmod a+rx $START_SCRIPT
 
 ####################################################################
@@ -72,7 +72,7 @@ echo "      - $PROJECT_NAME.spark"
 # Find Skeleton.spark
 SKELETON="$CHECKOUT_PATH/src/Y60/js/spark/Skeleton.spark"
 if [ ! -e "$SKELETON" ]; then
-    echo "### ERROR: Could not find SparkSkeleton.js"
+    echo "### ERROR: Could not find Skeleton.spark"
     exit 1;
 fi
 
