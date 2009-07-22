@@ -35,9 +35,6 @@ ac_add_plugin(
     DONT_INSTALL
 )
 
-# XXX: hack up something portable
-if(UNIX)
-
 get_property(MAYA_XPORT_PLUGIN_LOCATION TARGET maya-xport PROPERTY LOCATION)
 
 configure_file(
@@ -47,5 +44,3 @@ configure_file(
 )
 
 set(MAYA_XPORT_PLUGIN_LOCATION)
-
-endif(UNIX)

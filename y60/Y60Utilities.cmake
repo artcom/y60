@@ -303,6 +303,12 @@ macro(y60_add_rendertest NAME)
     )
 endmacro(y60_add_rendertest)
 
+if(WIN32)
+    set(MAYA_MAKE nmake /f)
+else(WIN32)
+    set(MAYA_MAKE make -f)
+endif(WIN32)
+
 macro(y60_maya_to_scene MAYA_FILE)
     parse_arguments(
         THIS
@@ -322,7 +328,7 @@ macro(y60_maya_to_scene MAYA_FILE)
 
             add_custom_target(
                 maya-export ALL
-                make -f ${FILE}
+                ${MAYA_MAKE} ${FILE}
             )
 
             set_global(Y60_MAYA_LIST_STARTED YES)
@@ -347,12 +353,16 @@ macro(y60_maya_to_scene MAYA_FILE)
             set(I_INLINE_TEXTURES "inlineTextures=1")
         endif(THIS_INLINE_TEXTURES)
 
+        file(TO_CMAKE_PATH "${CMAKE_CURRENT_SOURCE_DIR}" MK_WORKDIR)
+        file(TO_CMAKE_PATH "${THIS_OUTPUT}" MK_OUTPUT)
+        file(TO_CMAKE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/${MAYA_FILE}" MK_INPUT)
+
         file(APPEND ${FILE}
-            "${THIS_OUTPUT}: ${CMAKE_CURRENT_SOURCE_DIR}/${MAYA_FILE}\n")
+            "${MK_OUTPUT}: ${MK_INPUT}\n")
         file(APPEND ${FILE}
-            "\tcd ${CMAKE_CURRENT_SOURCE_DIR} && ${MAYA_EXECUTABLE} -batch -proj \"${CMAKE_CURRENT_SOURCE_DIR}\" -file \"${CMAKE_CURRENT_SOURCE_DIR}/${MAYA_FILE}\" -command \"file -op \\\"${I_BINARY};${I_INLINE_TEXTURES};progressBar=0\\\" -f -ea -type \\\"Y60\\\" \\\"${THIS_OUTPUT}\\\"\"\n")
+            "\t\"${MAYA_EXECUTABLE}\" -batch -proj \"${MK_WORKDIR}\" -file \"${MK_INPUT}\" -command \"file -op \\\"${I_BINARY};${I_INLINE_TEXTURES};progressBar=0\\\" -f -ea -type \\\"Y60\\\" \\\"${MK_OUTPUT}\\\"\"\n")
         file(APPEND ${FILE}
-            "all:: ${THIS_OUTPUT}\n")
+            "all:: ${MK_OUTPUT}\n")
         
     else(MAYA_FOUND)
         message(WARNING "Can't convert ${MAYA_FILE} to scene format without Maya")
