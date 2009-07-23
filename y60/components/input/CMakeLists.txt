@@ -8,7 +8,7 @@ if(LINUX)
 endif(LINUX)
 
 if(WIN32)
-    #add_subdirectory(DInput)
-    #add_subdirectory(DInputFFB)
+    add_subdirectory(DInput)
+#    add_subdirectory(DInputFFB)
 endif(WIN32)
 

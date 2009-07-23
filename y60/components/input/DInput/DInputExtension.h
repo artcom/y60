@@ -60,15 +60,13 @@
 #define _Y60_INPUT_DINPUTEXTENSION_INCLUDED_
 
 #include <asl/base/Ptr.h>
-#include <asl/base/PluginBase.h>
+#include <asl/base/PlugInBase.h>
 
+#include <y60/base/DataTypes.h>
 #include <y60/input/Event.h>
 #include <y60/input/IEventSource.h>
 
-#include <y60/jsbase/IScriptablePlugin.h>
-
-#include <asl/base/PlugInBase.h>
-#include <y60/base/DataTypes.h>
+#include <y60/jsbase/JSScriptablePlugin.h>
 
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
@@ -89,7 +87,7 @@ namespace y60 {
             virtual y60::EventPtrList poll();
     
             const char * ClassName() {
-                static const char * myClassName = "y60DInput";
+                static const char * myClassName = "DInput";
                 return myClassName;
             }
 

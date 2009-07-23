@@ -59,6 +59,11 @@
 #include "DInputExtension.h"
 
 #include <asl/base/Logger.h>
+#include <asl/base/Assure.h>
+
+#include <y60/jsbase/Documentation.h>
+#include <y60/jsbase/JScppUtils.h>
+
 #include <y60/input/AxisEvent.h>
 #include <y60/input/ButtonEvent.h>
 
@@ -69,10 +74,11 @@
 
 using namespace std;
 using namespace y60;
+using namespace jslib;
 
 #define DB(x) // x
 namespace y60 {
-    
+
     DInputExtension::DInputExtension(asl::DLHandle theDLHandle)
         : asl::PlugInBase(theDLHandle), _myDI(0), _myBufferSize(10), _myForceFeedBackFlag(false)
     {}
@@ -206,28 +212,6 @@ namespace y60 {
             }
             AC_INFO << " as input source.";
         }   
-    }
-
-    void
-    DInputExtension::addJoystick(const DIDEVICEINSTANCE* pdidInstance) {
-        HRESULT hr;
-        LPDIRECTINPUTDEVICE8 curJoystick;
-    
-        hr = _myDI->CreateDevice( pdidInstance->guidInstance, &curJoystick, NULL );
-        if (FAILED(hr)) {
-            AC_WARNING << "Joystick " << pdidInstance->tszInstanceName
-                << ", " << pdidInstance->tszProductName
-                << " found but CreateDevice failed. Ignoring.";
-        } else {
-            _myJoysticks.push_back(curJoystick);
-            AC_INFO << "Added ";
-            if (!strcmp(pdidInstance->tszInstanceName, "?")) {
-                AC_INFO << "Joystick " << _myJoysticks.size()-1;
-            } else {
-                AC_INFO << (char*)(pdidInstance->tszInstanceName);
-            }
-            AC_INFO << " as input source.";
-        }
     }
     
     HWND
@@ -513,7 +497,7 @@ namespace y60 {
             return JS_FALSE;
         }
 
-        asl::Ptr<DInputExtension> myNative = getNativeAs<DInputExtension>(cx, obj);
+        asl::Ptr<DInputExtension> myNative(getNativeAs<DInputExtension>(cx, obj));
         if (myNative) {
             myNative->applyForce(myJoystickIndex, int(myForceX * DI_FFNOMINALMAX), int(myForceY * DI_FFNOMINALMAX));
         } else {
@@ -538,7 +522,7 @@ namespace y60 {
             return JS_FALSE;
         }
     
-        asl::Ptr<DInputExtension> myNative = getNativeAs<DInputExtension>(cx, obj);
+        asl::Ptr<DInputExtension> myNative(getNativeAs<DInputExtension>(cx, obj));
         if (myNative) {
             myNative->stopForce(myJoystickIndex);
         } else {
@@ -567,7 +551,7 @@ namespace y60 {
             return JS_FALSE;
         }
         
-        asl::Ptr<DInputExtension> myNative = getNativeAs<DInputExtension>(cx, obj);
+        asl::Ptr<DInputExtension> myNative(getNativeAs<DInputExtension>(cx, obj));
         if (myNative) {
             myNative->setAutoCentering(myJoystickIndex, myAutoCenteringMode);
         } else {
