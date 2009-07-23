@@ -256,9 +256,9 @@ spark.Widget.Constructor = function(Protected) {
 
     
     Public.position setter = function(theValue) {
-        _mySceneNode.position.x = theValue.x + _myOrigin.x;
-        _mySceneNode.position.y = theValue.y + _myOrigin.y;
-        _mySceneNode.position.z = theValue.z + _myOrigin.z;
+        _mySceneNode.position.x = theValue.x;
+        _mySceneNode.position.y = theValue.y;
+        _mySceneNode.position.z = theValue.z;
     };
     
     // SCALE
