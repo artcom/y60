@@ -25,7 +25,7 @@ function(y60_begin_application NAME)
     set_global(${NAME}_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
     set_global(${NAME}_BUILD_PATH   "${CMAKE_CURRENT_BINARY_DIR};${CMAKE_CURRENT_SOURCE_DIR};${CMAKE_BINARY_DIR}/lib")
-    set_global(${NAME}_INSTALL_PATH "../y60/components") # XXX: multi-conf
+    set_global(${NAME}_INSTALL_PATH ".;../y60/components") # XXX: multi-conf
 
     # XXX: passthrough for late installer registration
     set_global(${NAME}_DISPLAY_NAME  ${APP_DISPLAY_NAME})
@@ -62,7 +62,7 @@ function(y60_add_assets DIRECTORY)
 
     install(
         DIRECTORY "${DIRECTORY}"
-        DESTINATION "lib/${APPLICATION}/${DIRECTORY_NAME}"
+        DESTINATION "lib/${APPLICATION}"
         COMPONENT ${APPLICATION}
         FILES_MATCHING
            ${THIS_ASSETS_PATTERNS}
