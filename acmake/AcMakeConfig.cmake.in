@@ -5,6 +5,10 @@ set(AcMake_FOUND YES)
 # determine where our various files are
 if(AcMake_SOURCE_DIR)
     # we are in an integrated build
+    set(ACMAKE_IS_IMPORTED NO)
+    set(ACMAKE_IS_INTEGRATED YES)
+
+    message("AcMake loading from within the build tree")
 
     set(ACMAKE_TOOLS_DIR ${AcMake_SOURCE_DIR}/tools)
     set(ACMAKE_MODULES_DIR ${AcMake_SOURCE_DIR}/modules)
@@ -13,11 +17,10 @@ if(AcMake_SOURCE_DIR)
 
     # extend the module path to make AcMake loadable
     list(INSERT CMAKE_MODULE_PATH 0 ${ACMAKE_MODULES_DIR})
-
 else(AcMake_SOURCE_DIR)
     # we are being used from build or install
-
-    set(AcMake_SOURCE_DIR "@AcMake_SOURCE_DIR@")
+    set(ACMAKE_IS_IMPORTED YES)
+    set(ACMAKE_IS_INTEGRATED NO)
 
     if(WIN32)
         set(_CMAKE_TO_PREFIX "..")
@@ -55,7 +58,6 @@ else(AcMake_SOURCE_DIR)
         list(INSERT CMAKE_MODULE_PATH 0 ${ACMAKE_MODULES_DIR})
 
     endif(EXISTS "${ACMAKE_PREFIX}/CMakeFiles")
-
 endif(AcMake_SOURCE_DIR)
 
 # load the build system

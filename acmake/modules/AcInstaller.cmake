@@ -156,7 +156,19 @@ macro(_ac_init_installer_shortcuts)
         install(
             FILES ${ACMAKE_SHORTCUT_FILE}
             DESTINATION lib/acmake/tools
+        )
+        # if we are building a package without acmake integrated,
+        # install the shortcut creation and removal scripts into
+        # the new package
+        if(NOT ACMAKE_IS_INTEGRATED)
+            install(
+                FILES
+                    ${ACMAKE_TOOLS_DIR}/ArgumentDiscombobulator.js
+                    ${ACMAKE_TOOLS_DIR}/CreateShortcuts.wsf
+                    ${ACMAKE_TOOLS_DIR}/RemoveShortcuts.wsf
+                DESTINATION lib/acmake/tools
             )
+        endif(NOT ACMAKE_IS_INTEGRATED)
     endif(WIN32)
 endmacro(_ac_init_installer_shortcuts)
 
@@ -318,7 +330,8 @@ macro(_ac_declare_installer NAME)
             set(CPACK_NSIS_MUI_UNIICON ${UNINSTALLER_ICON_NSIS})
 
             set(CPACK_NSIS_EXTRA_INSTALL_COMMANDS "
-                ExecShell \\\"\\\" \\\"$INSTDIR\\\\lib\\\\acmake\\\\tools\\\\CreateShortcuts.wsf\\\" \\\"% \\\$INSTDIR % \\\$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\"
+ExecShell \\\"\\\" \\\"$INSTDIR\\\\lib\\\\acmake\\\\tools\\\\CreateShortcuts.wsf\\\" \\\"% \\\$INSTDIR % \\\$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\"
+${CPACK_NSIS_EXTRA_INSTALL_COMMANDS}
             ")
 #             set(CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS "
 #                 ExecShell \\\"\\\" \\\"$INSTDIR\\\\lib\\\\acmake\\\\tools\\\\RemoveShortcuts.wsf\\\" \\\"% \\\$INSTDIR % \\\$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\"
