@@ -72,17 +72,18 @@ JSAppUnitTest.prototype.Constructor = function(obj, theName) {
         
         
         if (operatingSystem() == "WIN32") {
-            var myShellScript = searchFile("testfiles\\exec.bat");
-            obj.myReturnCode = exec(myShellScript, "2");
+            var myShellScript = searchFile("testfiles/exec.bat");
+            
+            obj.myReturnCode = exec("\"" + myShellScript + "\"", "2");
             ENSURE('obj.myReturnCode === 2');
-            obj.myReturnCode = exec(myShellScript + " 3");
+            obj.myReturnCode = exec("\"" + myShellScript + "\" 3");
             ENSURE('obj.myReturnCode === 3');
             obj.myReturnCode = exec("testfiles\\exec.butt");
             ENSURE('obj.myReturnCode === -1');
             obj.myReturnCode = exec(myShellScript, "2", false);
             ENSURE('obj.myReturnCode === 0');
         } else {
-            var myShellScript = searchFile("testfiles/exec.sh");
+            myShellScript = searchFile("testfiles/exec.sh");
             obj.myReturnCode = exec(myShellScript, "2");
             ENSURE('obj.myReturnCode === 2');
             obj.myReturnCode = exec(myShellScript + " 3");
