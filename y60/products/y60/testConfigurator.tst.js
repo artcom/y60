@@ -57,7 +57,6 @@
 
 */
 
-includePath("../..");  //TODO: remove this after deprecating  ant-build
 use("UnitTest.js");
 use("Configurator.js");
 
@@ -65,10 +64,10 @@ function ConfiguratorUnitTest() {
     this.Constructor(this, "ConfiguratorUnitTest");
 };
 
-const COMMON_SETTINGS = "testfiles/common_settings.xml";
-const MERGED_SETTINGS = "testfiles/merged_settings.xml";
-const LIST_A_SETTINGS = "testfiles/settings_list_a.xml";
-const LIST_B_SETTINGS = "testfiles/settings_list_b.xml";
+const COMMON_SETTINGS = searchFile("testfiles/common_settings.xml");
+const MERGED_SETTINGS = searchFile("testfiles/merged_settings.xml");
+const LIST_A_SETTINGS = searchFile("testfiles/settings_list_a.xml");
+const LIST_B_SETTINGS = searchFile("testfiles/settings_list_b.xml");
 
 ConfiguratorUnitTest.prototype.Constructor = function(obj, theName) {
 
@@ -83,25 +82,30 @@ ConfiguratorUnitTest.prototype.Constructor = function(obj, theName) {
             ENSURE( "obj.mySettingsFileList[0] == LIST_A_SETTINGS && " + 
                     "obj.mySettingsFileList[1] == LIST_B_SETTINGS" );
 
+            var myPath = searchFile(COMMON_SETTINGS);
             testLoadSettings();
             testSaveSettings();
 
         } catch (e) {
             print( e );
+            obj.incrementFailedCount();
         }
     }
 
     function testLoadSettings() {
-        var myConfigurator = new Configurator( null, COMMON_SETTINGS, 
-                                               [LIST_A_SETTINGS, LIST_B_SETTINGS] );
+        try {
+            var myConfigurator = new Configurator( null, COMMON_SETTINGS, 
+                                                   [LIST_A_SETTINGS, LIST_B_SETTINGS] );
 
-        obj.mySettings = myConfigurator.getSettings();
-
-        obj.myResult = new Node();
-        obj.myResult.parseFile( MERGED_SETTINGS );
-        obj.myResult = obj.myResult.firstChild;
-
-        ENSURE("obj.mySettings.toString() == obj.myResult.toString()");
+            obj.mySettings = myConfigurator.getSettings();
+            obj.myResult = new Node();
+            obj.myResult.parseFile( MERGED_SETTINGS );
+            obj.myResult = obj.myResult.firstChild;
+            ENSURE("obj.mySettings.toString() == obj.myResult.toString()");
+        } catch (e) {
+            print( e );
+            obj.incrementFailedCount();
+        }
     }
 
     function testSaveSettings() {

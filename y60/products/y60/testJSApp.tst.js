@@ -72,20 +72,22 @@ JSAppUnitTest.prototype.Constructor = function(obj, theName) {
         
         
         if (operatingSystem() == "WIN32") {
-            obj.myReturnCode = exec("testfiles\\exec.bat", "2");
+            var myShellScript = searchFile("testfiles\\exec.bat");
+            obj.myReturnCode = exec(myShellScript, "2");
             ENSURE('obj.myReturnCode === 2');
-            obj.myReturnCode = exec("testfiles\\exec.bat 3");
+            obj.myReturnCode = exec(myShellScript + " 3");
             ENSURE('obj.myReturnCode === 3');
-            obj.myReturnCode = exec("testfiles\\test.butt");
+            obj.myReturnCode = exec("testfiles\\exec.butt");
             ENSURE('obj.myReturnCode === -1');
-            obj.myReturnCode = exec("testfiles\\exec.bat", "2", false);
+            obj.myReturnCode = exec(myShellScript, "2", false);
             ENSURE('obj.myReturnCode === 0');
         } else {
-            obj.myReturnCode = exec("testfiles/exec.sh", "2");
+            var myShellScript = searchFile("testfiles/exec.sh");
+            obj.myReturnCode = exec(myShellScript, "2");
             ENSURE('obj.myReturnCode === 2');
-            obj.myReturnCode = exec("testfiles/exec.sh 3");
+            obj.myReturnCode = exec(myShellScript + " 3");
             ENSURE('obj.myReturnCode === 3');
-            obj.myReturnCode = exec("testfiles/test.butt");
+            obj.myReturnCode = exec("testfiles/exec.butt");
             ENSURE('obj.myReturnCode === 127');
             /*
             command is blocking flag isn't recognized in linux/osx
