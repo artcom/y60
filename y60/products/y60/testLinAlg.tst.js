@@ -529,265 +529,265 @@ BoxUnitTest.prototype.Constructor = function(obj, theName) {
         testPoint3();
     }
     function testPoint2() {
-		obj.p0 = new Point2f(0.55, 0.6);
-		obj.p1 = new Point2f(1.1, 1.2);
-		obj.p2 = new Point2f(2.3, 2.5);
-		obj.p3 = new Point2f(-1, -1.1);
-		obj.v1 = new Vector2f(2.2, 3.3);
-		SUCCESS("initialized");
-		// Constructor tests
-		{
+        obj.p0 = new Point2f(0.55, 0.6);
+        obj.p1 = new Point2f(1.1, 1.2);
+        obj.p2 = new Point2f(2.3, 2.5);
+        obj.p3 = new Point2f(-1, -1.1);
+        obj.v1 = new Vector2f(2.2, 3.3);
+        SUCCESS("initialized");
+        // Constructor tests
+        {
             obj.b1 = new Box2f();
-			ENSURE('obj.b1.isEmpty');
+            ENSURE('obj.b1.isEmpty');
 
-			obj.b1 = new Box2f(obj.p0, obj.p1);
-			ENSURE('almostEqual(obj.b1.min, obj.p0)');
-			ENSURE('almostEqual(obj.b1.max, obj.p1)');
-			obj.b1 = new Box2f(obj.p1, obj.p0);
-			ENSURE('almostEqual(obj.b1.min, obj.p0)');
-			ENSURE('almostEqual(obj.b1.max, obj.p1)');
-		}
+            obj.b1 = new Box2f(obj.p0, obj.p1);
+            ENSURE('almostEqual(obj.b1.min, obj.p0)');
+            ENSURE('almostEqual(obj.b1.max, obj.p1)');
+            obj.b1 = new Box2f(obj.p1, obj.p0);
+            ENSURE('almostEqual(obj.b1.min, obj.p0)');
+            ENSURE('almostEqual(obj.b1.max, obj.p1)');
+        }
 
-		/*
-		// Test get/set min / max / center
-		{
-			obj.b1 = new Box2f(obj.p0, obj.p1);
-			obj.myCenter = quotient(sum(obj.p0,obj.p1),new Vector2f(2,2));
-			ENSURE('almostEqual(obj.b1.min, obj.p0)');
-			ENSURE('almostEqual(obj.b1.max, obj.p1)');
-			ENSURE('almostEqual(obj.b1.minVector, obj.p0)');
-			ENSURE('almostEqual(obj.b1.maxVector, obj.p1)');
-			ENSURE('almostEqual(obj.b1.center, obj.myCenter)');
+        /*
+        // Test get/set min / max / center
+        {
+            obj.b1 = new Box2f(obj.p0, obj.p1);
+            obj.myCenter = quotient(sum(obj.p0,obj.p1),new Vector2f(2,2));
+            ENSURE('almostEqual(obj.b1.min, obj.p0)');
+            ENSURE('almostEqual(obj.b1.max, obj.p1)');
+            ENSURE('almostEqual(obj.b1.minVector, obj.p0)');
+            ENSURE('almostEqual(obj.b1.maxVector, obj.p1)');
+            ENSURE('almostEqual(obj.b1.center, obj.myCenter)');
 
-			obj.b1.center = obj.p3;
-			ENSURE('almostEqual(obj.b1.center,obj.p3)');
-			obj.b1.sizeVector = obj.v1;
-			ENSURE('almostEqual(obj.b1.sizeVector,obj.v1)');
-		}
+            obj.b1.center = obj.p3;
+            ENSURE('almostEqual(obj.b1.center,obj.p3)');
+            obj.b1.sizeVector = obj.v1;
+            ENSURE('almostEqual(obj.b1.sizeVector,obj.v1)');
+        }
         */
-		// test extendBy
-		{
+        // test extendBy
+        {
             obj.b1 = new Box2f();
-			obj.b1.extendBy(obj.p0);
-			ENSURE('almostEqual(obj.b1.min, obj.p0)');
-			ENSURE('almostEqual(obj.b1.max,obj. p0)');
-			obj.b1.extendBy(obj.p1);
-			ENSURE('almostEqual(obj.b1.min, obj.p0)');
-			ENSURE('almostEqual(obj.b1.max, obj.p1)');
-			obj.b1.extendBy(obj.p2);
-			obj.b1.extendBy(obj.p3);
-			ENSURE('almostEqual(obj.b1.min, obj.p3)');
-			ENSURE('almostEqual(obj.b1.max, obj.p2)');
-			obj.b1.extendBy(obj.b1);
-			obj.b1.makeEmpty();
-			obj.b2 = new Box2f(obj.p1, obj.p2);
+            obj.b1.extendBy(obj.p0);
+            ENSURE('almostEqual(obj.b1.min, obj.p0)');
+            ENSURE('almostEqual(obj.b1.max,obj. p0)');
+            obj.b1.extendBy(obj.p1);
+            ENSURE('almostEqual(obj.b1.min, obj.p0)');
+            ENSURE('almostEqual(obj.b1.max, obj.p1)');
+            obj.b1.extendBy(obj.p2);
+            obj.b1.extendBy(obj.p3);
+            ENSURE('almostEqual(obj.b1.min, obj.p3)');
+            ENSURE('almostEqual(obj.b1.max, obj.p2)');
+            obj.b1.extendBy(obj.b1);
+            obj.b1.makeEmpty();
+            obj.b2 = new Box2f(obj.p1, obj.p2);
 
-			obj.b1.extendBy(obj.b2);
-			ENSURE('almostEqual(obj.b1.min, obj.b2.min)');
-			ENSURE('almostEqual(obj.b1.max, obj.b2.max)');
-			obj.b1.makeEmpty();
-			obj.b1.extendBy(obj.p1);
-			obj.b1.extendBy(obj.b1);
-			ENSURE('obj.b1.isEmpty');
-			ENSURE('obj.b1.hasPosition');
-			ENSURE('!obj.b1.hasSize');
-			obj.b1.extendBy(obj.b2);
-			ENSURE('!obj.b1.isEmpty');
-			ENSURE('obj.b1.hasPosition');
-			ENSURE('obj.b1.hasSize');
-		}
+            obj.b1.extendBy(obj.b2);
+            ENSURE('almostEqual(obj.b1.min, obj.b2.min)');
+            ENSURE('almostEqual(obj.b1.max, obj.b2.max)');
+            obj.b1.makeEmpty();
+            obj.b1.extendBy(obj.p1);
+            obj.b1.extendBy(obj.b1);
+            ENSURE('obj.b1.isEmpty');
+            ENSURE('obj.b1.hasPosition');
+            ENSURE('!obj.b1.hasSize');
+            obj.b1.extendBy(obj.b2);
+            ENSURE('!obj.b1.isEmpty');
+            ENSURE('obj.b1.hasPosition');
+            ENSURE('obj.b1.hasSize');
+        }
         /*
 
-		// test contains
-		{
-			obj.b1 = new Box2f(obj.p0, obj.p2);
-			ENSURE(obj.b1.contains(obj.p1));
-			obj.b1.makeEmpty();
-			ENSURE(!obj.b1.contains(obj.p1));
-		}
+        // test contains
+        {
+            obj.b1 = new Box2f(obj.p0, obj.p2);
+            ENSURE(obj.b1.contains(obj.p1));
+            obj.b1.makeEmpty();
+            ENSURE(!obj.b1.contains(obj.p1));
+        }
 
-		// Test isEmpty, hasPosition, hasSize, hasArea
-		{
-			obj.p1=new Point2f(1, 1);
-			obj.p2=new Point2f(1, 2);
-			obj.p3=new Point2f(2, 2);
+        // Test isEmpty, hasPosition, hasSize, hasArea
+        {
+            obj.p1=new Point2f(1, 1);
+            obj.p2=new Point2f(1, 2);
+            obj.p3=new Point2f(2, 2);
 
-			obj.b1.makeEmpty();
-			ENSURE('obj.b1.isEmpty');
-			ENSURE('!obj.b1.hasPosition');
-			ENSURE('!obj.b1.hasSize');
-			ENSURE('!obj.b1.hasArea');
-			obj.b1.extendBy(obj.p1);
-			ENSURE('obj.b1.isEmpty');
-			ENSURE('obj.b1.hasPosition');
-			ENSURE('!obj.b1.hasSize');
-			ENSURE('!obj.b1.hasArea');
-			obj.b1.extendBy(obj.p1);
-			ENSURE('obj.b1.isEmpty');
-			ENSURE('obj.b1.hasPosition');
-			ENSURE('!obj.b1.hasSize');
-			ENSURE('!obj.b1.hasArea');
-			obj.b1.extendBy(obj.p2);
-			ENSURE('obj.b1.isEmpty');
-			ENSURE('obj.b1.hasPosition');
-			ENSURE('obj.b1.hasSize');
-			ENSURE('!obj.b1.hasArea');
-			obj.b1.extendBy(obj.p3);
-			ENSURE('!obj.b1.isEmpty');
-			ENSURE('obj.b1.hasPosition');
-			ENSURE('obj.b1.hasSize');
-			ENSURE('obj.b1.hasArea');
-		}
-		*/
-	} // function testPoint2
+            obj.b1.makeEmpty();
+            ENSURE('obj.b1.isEmpty');
+            ENSURE('!obj.b1.hasPosition');
+            ENSURE('!obj.b1.hasSize');
+            ENSURE('!obj.b1.hasArea');
+            obj.b1.extendBy(obj.p1);
+            ENSURE('obj.b1.isEmpty');
+            ENSURE('obj.b1.hasPosition');
+            ENSURE('!obj.b1.hasSize');
+            ENSURE('!obj.b1.hasArea');
+            obj.b1.extendBy(obj.p1);
+            ENSURE('obj.b1.isEmpty');
+            ENSURE('obj.b1.hasPosition');
+            ENSURE('!obj.b1.hasSize');
+            ENSURE('!obj.b1.hasArea');
+            obj.b1.extendBy(obj.p2);
+            ENSURE('obj.b1.isEmpty');
+            ENSURE('obj.b1.hasPosition');
+            ENSURE('obj.b1.hasSize');
+            ENSURE('!obj.b1.hasArea');
+            obj.b1.extendBy(obj.p3);
+            ENSURE('!obj.b1.isEmpty');
+            ENSURE('obj.b1.hasPosition');
+            ENSURE('obj.b1.hasSize');
+            ENSURE('obj.b1.hasArea');
+        }
+        */
+    } // function testPoint2
 
     function testPoint3() {
-		obj.p0=new Point3f(0.55, 0.6, 0.7);
-		obj.p1=new Point3f(1.1, 1.2, 1.4);
-		obj.p2=new Point3f(2.3, 2.5, 2.9);
-		obj.p3=new Point3f(-1, -1.1, -1.2);
-		obj.v1=new Vector3f(2.2, 3.3, 5.5);
+        obj.p0=new Point3f(0.55, 0.6, 0.7);
+        obj.p1=new Point3f(1.1, 1.2, 1.4);
+        obj.p2=new Point3f(2.3, 2.5, 2.9);
+        obj.p3=new Point3f(-1, -1.1, -1.2);
+        obj.v1=new Vector3f(2.2, 3.3, 5.5);
 
-		// Constructor tests
-		{
-			obj.b1=new Box3f(obj.p0, obj.p1);
-			ENSURE('almostEqual(obj.b1.min, obj.p0)');
-			ENSURE('almostEqual(obj.b1.max, obj.p1)');
+        // Constructor tests
+        {
+            obj.b1=new Box3f(obj.p0, obj.p1);
+            ENSURE('almostEqual(obj.b1.min, obj.p0)');
+            ENSURE('almostEqual(obj.b1.max, obj.p1)');
 
-			obj.b1=new Box3f(obj.b1.min, obj.b1.max);
-			ENSURE('almostEqual(obj.b1.min, obj.b1.min)');
-			ENSURE('almostEqual(obj.b1.max, obj.b1.max)');
+            obj.b1=new Box3f(obj.b1.min, obj.b1.max);
+            ENSURE('almostEqual(obj.b1.min, obj.b1.min)');
+            ENSURE('almostEqual(obj.b1.max, obj.b1.max)');
 
-			obj.b3=new Box3f(new Point3f(0, 1, 2), new Point3f(3, 4, 5));
-			ENSURE('almostEqual(b3.min, new Point3f(0, 1, 2))');
-			ENSURE('almostEqual(b3.max, new Point3f(3, 4, 5))');
-		}
+            obj.b3=new Box3f(new Point3f(0, 1, 2), new Point3f(3, 4, 5));
+            ENSURE('almostEqual(b3.min, new Point3f(0, 1, 2))');
+            ENSURE('almostEqual(b3.max, new Point3f(3, 4, 5))');
+        }
 
-		// Test get/set min / max / center / size
-		{
-			obj.b1=new Box3f(obj.p0, obj.p1);
-			obj.myCenter = quotient(sum(obj.p0,obj.p1),new Vector3f(2,2,2));
-			ENSURE('almostEqual(obj.b1.min, obj.p0)');
-			ENSURE('almostEqual(obj.b1.max, obj.p1)');
-			ENSURE('almostEqual(obj.b1.center, obj.myCenter)');
+        // Test get/set min / max / center / size
+        {
+            obj.b1=new Box3f(obj.p0, obj.p1);
+            obj.myCenter = quotient(sum(obj.p0,obj.p1),new Vector3f(2,2,2));
+            ENSURE('almostEqual(obj.b1.min, obj.p0)');
+            ENSURE('almostEqual(obj.b1.max, obj.p1)');
+            ENSURE('almostEqual(obj.b1.center, obj.myCenter)');
 
-			obj.b1.center = obj.p3;
-			ENSURE('almostEqual(obj.b1.center,obj.p3)');
-			obj.b1.sizeVector = obj.v1;
-			ENSURE('almostEqual(obj.b1.sizeVector,obj.v1)');
-		}
+            obj.b1.center = obj.p3;
+            ENSURE('almostEqual(obj.b1.center,obj.p3)');
+            obj.b1.sizeVector = obj.v1;
+            ENSURE('almostEqual(obj.b1.sizeVector,obj.v1)');
+        }
 
-		// test extendBy
-		{
-			obj.b1.makeEmpty();
-			obj.b1.extendBy(obj.p0);
-			ENSURE('almostEqual(obj.b1.min, obj.p0)');
-			ENSURE('almostEqual(obj.b1.max, obj.p0)');
-			obj.b1.extendBy(obj.p1);
-			ENSURE('almostEqual(obj.b1.min, obj.p0)');
-			ENSURE('almostEqual(obj.b1.max, obj.p1)');
-			obj.b1.extendBy(obj.p2);
-			obj.b1.extendBy(obj.p3);
-			ENSURE('almostEqual(obj.b1.min, obj.p3)');
-			ENSURE('almostEqual(obj.b1.max, obj.p2)');
-			obj.b1.extendBy(obj.b1);
-			ENSURE('almostEqual(obj.b1.min, obj.b1.min)');
-			ENSURE('almostEqual(obj.b1.max, obj.b1.max)');
-			obj.b1.makeEmpty();
-			obj.b2=new Box3f(obj.p1, obj.p2);
-			obj.b1.extendBy(obj.b2);
-			ENSURE('almostEqual(obj.b1.min, obj.b2.min)');
-			ENSURE('almostEqual(obj.b1.max, obj.b2.max)');
+        // test extendBy
+        {
+            obj.b1.makeEmpty();
+            obj.b1.extendBy(obj.p0);
+            ENSURE('almostEqual(obj.b1.min, obj.p0)');
+            ENSURE('almostEqual(obj.b1.max, obj.p0)');
+            obj.b1.extendBy(obj.p1);
+            ENSURE('almostEqual(obj.b1.min, obj.p0)');
+            ENSURE('almostEqual(obj.b1.max, obj.p1)');
+            obj.b1.extendBy(obj.p2);
+            obj.b1.extendBy(obj.p3);
+            ENSURE('almostEqual(obj.b1.min, obj.p3)');
+            ENSURE('almostEqual(obj.b1.max, obj.p2)');
+            obj.b1.extendBy(obj.b1);
+            ENSURE('almostEqual(obj.b1.min, obj.b1.min)');
+            ENSURE('almostEqual(obj.b1.max, obj.b1.max)');
+            obj.b1.makeEmpty();
+            obj.b2=new Box3f(obj.p1, obj.p2);
+            obj.b1.extendBy(obj.b2);
+            ENSURE('almostEqual(obj.b1.min, obj.b2.min)');
+            ENSURE('almostEqual(obj.b1.max, obj.b2.max)');
 
-			obj.b1.makeEmpty();
-			obj.b1.extendBy(obj.p1);
-			obj.b1.extendBy(obj.b1);
-			ENSURE('obj.b1.isEmpty');
-			ENSURE('obj.b1.hasPosition');
-			ENSURE('!obj.b1.hasSize');
-			ENSURE('!obj.b1.hasArea');
-			ENSURE('!obj.b1.hasVolume');
-			obj.b1.extendBy(obj.b2);
-			ENSURE('!obj.b1.isEmpty');
-			ENSURE('obj.b1.hasPosition');
-			ENSURE('obj.b1.hasSize');
-			ENSURE('obj.b1.hasArea');
-			ENSURE('obj.b1.hasVolume');
-		}
+            obj.b1.makeEmpty();
+            obj.b1.extendBy(obj.p1);
+            obj.b1.extendBy(obj.b1);
+            ENSURE('obj.b1.isEmpty');
+            ENSURE('obj.b1.hasPosition');
+            ENSURE('!obj.b1.hasSize');
+            ENSURE('!obj.b1.hasArea');
+            ENSURE('!obj.b1.hasVolume');
+            obj.b1.extendBy(obj.b2);
+            ENSURE('!obj.b1.isEmpty');
+            ENSURE('obj.b1.hasPosition');
+            ENSURE('obj.b1.hasSize');
+            ENSURE('obj.b1.hasArea');
+            ENSURE('obj.b1.hasVolume');
+        }
 
-		// Test contains
-		{
-			obj.b1=new Box3f(obj.p0, obj.p2);
-			ENSURE('obj.b1.contains(obj.p1)');
-			obj.b1.makeEmpty();
-			ENSURE('!obj.b1.contains(obj.p1)');
-		}
+        // Test contains
+        {
+            obj.b1=new Box3f(obj.p0, obj.p2);
+            ENSURE('obj.b1.contains(obj.p1)');
+            obj.b1.makeEmpty();
+            ENSURE('!obj.b1.contains(obj.p1)');
+        }
 
-		// Test matrix multiply
-		{
-			obj.b1=new Box3f(obj.p0, obj.p2);
-			obj.myMatrix=new Matrix4f() ;
-			obj.myMatrix.makeIdentity();
-			obj.b2 = new Box3f(obj.b1.min, obj.b1.max);
-			obj.b1 = product(obj.b1, obj.myMatrix);
-			ENSURE('almostEqual(obj.b2.min, obj.b1.min)');
-			ENSURE('almostEqual(obj.b2.max, obj.b1.max)');
-			obj.myMatrix.makeScaling(new Vector3f(2,2,2));
-			obj.b2 = new Box3f(obj.b1.min, obj.b1.max);
-			obj.b2.min.mult(new Vector3f(2,2,2)); // TODO: calling a function on a writeable attribute does nothing, and no error occurs
-			obj.b2.max.mult(new Vector3f(2,2,2));
-			obj.b1 = product(obj.b1, obj.myMatrix);
-			print(obj.b1);
-			print(obj.b2.min);
-			print(obj.b2.max);
-			//ENSURE('almostEqual(obj.b2.min, obj.b1.min)');
-			//ENSURE('almostEqual(obj.b2.max, obj.b1.max)');
-		}
+        // Test matrix multiply
+        {
+            obj.b1=new Box3f(obj.p0, obj.p2);
+            obj.myMatrix=new Matrix4f() ;
+            obj.myMatrix.makeIdentity();
+            obj.b2 = new Box3f(obj.b1.min, obj.b1.max);
+            obj.b1 = product(obj.b1, obj.myMatrix);
+            ENSURE('almostEqual(obj.b2.min, obj.b1.min)');
+            ENSURE('almostEqual(obj.b2.max, obj.b1.max)');
+            obj.myMatrix.makeScaling(new Vector3f(2,2,2));
+            obj.b2 = new Box3f(obj.b1.min, obj.b1.max);
+            obj.b2.min.mult(new Vector3f(2,2,2)); // TODO: calling a function on a writeable attribute does nothing, and no error occurs
+            obj.b2.max.mult(new Vector3f(2,2,2));
+            obj.b1 = product(obj.b1, obj.myMatrix);
+            print(obj.b1);
+            print(obj.b2.min);
+            print(obj.b2.max);
+            //ENSURE('almostEqual(obj.b2.min, obj.b1.min)');
+            //ENSURE('almostEqual(obj.b2.max, obj.b1.max)');
+        }
 
-		// Test isEmpty, hasPosition, hasSize, hasArea, hasVolume
-		{
-			obj.p1=new Point3f(1, 1, 1);
-			obj.p2=new Point3f(1, 1, 2);
-			obj.p3=new Point3f(1, 2, 2);
-			obj.p4=new Point3f(2, 2, 2);
+        // Test isEmpty, hasPosition, hasSize, hasArea, hasVolume
+        {
+            obj.p1=new Point3f(1, 1, 1);
+            obj.p2=new Point3f(1, 1, 2);
+            obj.p3=new Point3f(1, 2, 2);
+            obj.p4=new Point3f(2, 2, 2);
 
-			obj.b1.makeEmpty();
-			ENSURE('obj.b1.isEmpty');
-			ENSURE('!obj.b1.hasPosition');
-			ENSURE('!obj.b1.hasSize');
-			ENSURE('!obj.b1.hasArea');
-			ENSURE('!obj.b1.hasVolume');
-			obj.b1.extendBy(obj.p1);
-			ENSURE('obj.b1.isEmpty');
-			ENSURE('obj.b1.hasPosition');
-			ENSURE('!obj.b1.hasSize');
-			ENSURE('!obj.b1.hasArea');
-			ENSURE('!obj.b1.hasVolume');
-			obj.b1.extendBy(obj.p1);
-			ENSURE('obj.b1.isEmpty');
-			ENSURE('obj.b1.hasPosition');
-			ENSURE('!obj.b1.hasSize');
-			ENSURE('!obj.b1.hasArea');
-			ENSURE('!obj.b1.hasVolume');
-			obj.b1.extendBy(obj.p2);
-			ENSURE('obj.b1.isEmpty');
-			ENSURE('obj.b1.hasPosition');
-			ENSURE('obj.b1.hasSize');
-			ENSURE('!obj.b1.hasArea');
-			ENSURE('!obj.b1.hasVolume');
-			obj.b1.extendBy(obj.p3);
-			ENSURE('obj.b1.isEmpty');
-			ENSURE('obj.b1.hasPosition');
-			ENSURE('obj.b1.hasSize');
-			ENSURE('obj.b1.hasArea');
-			ENSURE('!obj.b1.hasVolume');
-			obj.b1.extendBy(obj.p4);
-			ENSURE('!obj.b1.isEmpty');
-			ENSURE('obj.b1.hasPosition');
-			ENSURE('obj.b1.hasSize');
-			ENSURE('obj.b1.hasArea');
-			ENSURE('obj.b1.hasVolume');
-		}
+            obj.b1.makeEmpty();
+            ENSURE('obj.b1.isEmpty');
+            ENSURE('!obj.b1.hasPosition');
+            ENSURE('!obj.b1.hasSize');
+            ENSURE('!obj.b1.hasArea');
+            ENSURE('!obj.b1.hasVolume');
+            obj.b1.extendBy(obj.p1);
+            ENSURE('obj.b1.isEmpty');
+            ENSURE('obj.b1.hasPosition');
+            ENSURE('!obj.b1.hasSize');
+            ENSURE('!obj.b1.hasArea');
+            ENSURE('!obj.b1.hasVolume');
+            obj.b1.extendBy(obj.p1);
+            ENSURE('obj.b1.isEmpty');
+            ENSURE('obj.b1.hasPosition');
+            ENSURE('!obj.b1.hasSize');
+            ENSURE('!obj.b1.hasArea');
+            ENSURE('!obj.b1.hasVolume');
+            obj.b1.extendBy(obj.p2);
+            ENSURE('obj.b1.isEmpty');
+            ENSURE('obj.b1.hasPosition');
+            ENSURE('obj.b1.hasSize');
+            ENSURE('!obj.b1.hasArea');
+            ENSURE('!obj.b1.hasVolume');
+            obj.b1.extendBy(obj.p3);
+            ENSURE('obj.b1.isEmpty');
+            ENSURE('obj.b1.hasPosition');
+            ENSURE('obj.b1.hasSize');
+            ENSURE('obj.b1.hasArea');
+            ENSURE('!obj.b1.hasVolume');
+            obj.b1.extendBy(obj.p4);
+            ENSURE('!obj.b1.isEmpty');
+            ENSURE('obj.b1.hasPosition');
+            ENSURE('obj.b1.hasSize');
+            ENSURE('obj.b1.hasArea');
+            ENSURE('obj.b1.hasVolume');
+        }
     } //function
 };
 

@@ -215,7 +215,6 @@ OverlayUnitTest.prototype.Constructor = function(obj, theName) {
     }
 
     obj.run = function() {
-        GLResourceManager.prepareShaderLibrary("../../shader/shaderlibrary.xml");
         // Create empty scene
         window = new RenderWindow();
 

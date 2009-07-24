@@ -68,43 +68,43 @@ VectorOfStringTest.prototype.Constructor = function(obj, theName) {
     UnitTest.prototype.Constructor(obj, theName);
 
     obj.run = function() {
-		obj.mySchema = new Node(
-			"<xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'>"
-			+"   <xs:simpleType name='VectorOfUnsignedInt'>\n"
-			+"       <xs:restriction base='xs:string' />\n"
-			+"   </xs:simpleType>\n"
-			+"   <xs:simpleType name='VectorOfString'>\n"
-			+"       <xs:restriction base='xs:string' />\n"
-			+"   </xs:simpleType>\n"
-			+"   <xs:simpleType name='VectorOfVector2f'>\n"
-			+"       <xs:restriction base='xs:string' />\n"
-			+"   </xs:simpleType>\n"
-			+"	<xs:element name='root'>\n"
-			+"		<xs:complexType>\n"
-			+"			<xs:sequence>\n"
-			+"				<xs:element ref='vofs'/>\n"
-			+"				<xs:element ref='vofi'/>\n"
-			+"				<xs:element ref='vofv2f'/>\n"
-			+"			</xs:sequence>\n"
-			+"		</xs:complexType>\n"
-			+"	</xs:element>\n"
-            +"	<xs:element name='vofs'>\n"
-            +"		<xs:complexType>\n"
-            +"	            <xs:attribute name='foo' type='VectorOfString' />\n"
-            +"		</xs:complexType>\n"
-            +"	</xs:element>\n"
-            +"	<xs:element name='vofi'>\n"
-            +"		<xs:complexType>\n"
-            +"	            <xs:attribute name='foo' type='VectorOfUnsignedInt' />\n"
-            +"		</xs:complexType>\n"
-            +"	</xs:element>\n"
-            +"	<xs:element name='vofv2f'>\n"
-            +"		<xs:complexType>\n"
-            +"	            <xs:attribute name='foo' type='VectorOfVector2f' />\n"
-            +"		</xs:complexType>\n"
-            +"	</xs:element>\n"
+        obj.mySchema = new Node(
+            "<xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'>"
+            +"   <xs:simpleType name='VectorOfUnsignedInt'>\n"
+            +"       <xs:restriction base='xs:string' />\n"
+            +"   </xs:simpleType>\n"
+            +"   <xs:simpleType name='VectorOfString'>\n"
+            +"       <xs:restriction base='xs:string' />\n"
+            +"   </xs:simpleType>\n"
+            +"   <xs:simpleType name='VectorOfVector2f'>\n"
+            +"       <xs:restriction base='xs:string' />\n"
+            +"   </xs:simpleType>\n"
+            +"    <xs:element name='root'>\n"
+            +"        <xs:complexType>\n"
+            +"            <xs:sequence>\n"
+            +"                <xs:element ref='vofs'/>\n"
+            +"                <xs:element ref='vofi'/>\n"
+            +"                <xs:element ref='vofv2f'/>\n"
+            +"            </xs:sequence>\n"
+            +"        </xs:complexType>\n"
+            +"    </xs:element>\n"
+            +"    <xs:element name='vofs'>\n"
+            +"        <xs:complexType>\n"
+            +"                <xs:attribute name='foo' type='VectorOfString' />\n"
+            +"        </xs:complexType>\n"
+            +"    </xs:element>\n"
+            +"    <xs:element name='vofi'>\n"
+            +"        <xs:complexType>\n"
+            +"                <xs:attribute name='foo' type='VectorOfUnsignedInt' />\n"
+            +"        </xs:complexType>\n"
+            +"    </xs:element>\n"
+            +"    <xs:element name='vofv2f'>\n"
+            +"        <xs:complexType>\n"
+            +"                <xs:attribute name='foo' type='VectorOfVector2f' />\n"
+            +"        </xs:complexType>\n"
+            +"    </xs:element>\n"
             +"</xs:schema>\n"
-		);
+        );
         /*
         <xs:complexType>
             <xs:simpleContent>
@@ -114,20 +114,20 @@ VectorOfStringTest.prototype.Constructor = function(obj, theName) {
             </xs:simpleContent>
         </xs:complexType>
         */
-		ENSURE('mySchema.ok');
-		obj.myDocument = Node.createDocument();
-		obj.myDocument.useFactories("w3c-schema,som");
-		obj.myDocument.addSchema(obj.mySchema,"");
-		SUCCESS("added Schema");
-		obj.myDocument.parse(
-			"<root>"
-			+"	<vofi foo=\"[1,2,3]\"/>\n"
-			+"	<vofs foo=\"[`one`,`two`,`three`]\"/>\n"
-			+"	<vofv2f foo=\"[[0.1,0.2], [2,3]]\"/>\n"
-			+"	<vofs foo=\"[]\"/>\n"
-			+"	<vofs foo=\"[``,`23`,`foo`,``,`bar`,``]\"/>\n"
-			+"</root>\n"
-			);
+        ENSURE('mySchema.ok');
+        obj.myDocument = Node.createDocument();
+        obj.myDocument.useFactories("w3c-schema,som");
+        obj.myDocument.addSchema(obj.mySchema,"");
+        SUCCESS("added Schema");
+        obj.myDocument.parse(
+            "<root>"
+            +"    <vofi foo=\"[1,2,3]\"/>\n"
+            +"    <vofs foo=\"[`one`,`two`,`three`]\"/>\n"
+            +"    <vofv2f foo=\"[[0.1,0.2], [2,3]]\"/>\n"
+            +"    <vofs foo=\"[]\"/>\n"
+            +"    <vofs foo=\"[``,`23`,`foo`,``,`bar`,``]\"/>\n"
+            +"</root>\n"
+            );
         obj.myVectorOfInt = obj.myDocument.firstChild.childNode(0).foo;
         obj.myVectorOfString = obj.myDocument.firstChild.childNode(1).foo;
         obj.myVectorOfVector2f = obj.myDocument.firstChild.childNode(2).foo;

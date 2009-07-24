@@ -69,7 +69,6 @@ TestFileFunctions.prototype.Constructor = function(obj, theName) {
 
     obj.run = function() {
         print("Directory Listing for .: " + getDirectoryEntries("."));
-        print("Directory Listing for ${PRO}: " + getDirectoryEntries("${PRO}"));
         ENSURE('fileExists("bla") == false');
         ENSURE('fileExists(__FILE__()) == true');
         ENSURE('getDirectoryEntries("bla") == null');

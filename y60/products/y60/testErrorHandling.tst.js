@@ -111,27 +111,27 @@ FailedDomEventTest.prototype.Constructor = function(obj, theName) {
     UnitTest.prototype.Constructor(obj, theName);
 
     obj.run = function() {
-    	obj.myDocument = Node.createDocument();
-    	obj.myDocument.parse('<test name="root">\
-    	                      <child1 name="child1">\
-    	                      <child2 name="child2">\
-    	                      <child3 name="child3"></child3></child2></child1>\
-    	                      </test>');
-    	var myChildNode1 = obj.myDocument.childNode(0).childNode(0);
-    	var myChildNode2 = myChildNode1.childNode(0);
-    	var myChildNode3 = myChildNode2.childNode(0);
-    	var myVector = new Vector3f(0,1,2);
-    	var myDomEvent = new DomEvent("testEvent", myVector, true, false, 0.0);
-    	//ENSURE = print;
-    	ENSURE(myDomEvent.stopPropagation());
-    	ENSURE(myDomEvent.preventDefault());
-    	ENSURE(myDomEvent.type == "testEvent");
-    	ENSURE(myDomEvent.eventPhase == 1);
-    	ENSURE(myDomEvent.bubbles == true);
-    	ENSURE(myDomEvent.cancelable == false);
-    	ENSURE(myDomEvent.isDefaultPrevented == true);
+        obj.myDocument = Node.createDocument();
+        obj.myDocument.parse('<test name="root">\
+                              <child1 name="child1">\
+                              <child2 name="child2">\
+                              <child3 name="child3"></child3></child2></child1>\
+                              </test>');
+        var myChildNode1 = obj.myDocument.childNode(0).childNode(0);
+        var myChildNode2 = myChildNode1.childNode(0);
+        var myChildNode3 = myChildNode2.childNode(0);
+        var myVector = new Vector3f(0,1,2);
+        var myDomEvent = new DomEvent("testEvent", myVector, true, false, 0.0);
+        //ENSURE = print;
+        ENSURE(myDomEvent.stopPropagation());
+        ENSURE(myDomEvent.preventDefault());
+        ENSURE(myDomEvent.type == "testEvent");
+        ENSURE(myDomEvent.eventPhase == 1);
+        ENSURE(myDomEvent.bubbles == true);
+        ENSURE(myDomEvent.cancelable == false);
+        ENSURE(myDomEvent.isDefaultPrevented == true);
 
-    	myChildNode2.addEventListener("testEvent", obj, true, "handleEvent");
+        myChildNode2.addEventListener("testEvent", obj, true, "handleEvent");
         try {
             myChildNode3.dispatchEvent(myDomEvent);
             FAILURE("No exception thrown");
