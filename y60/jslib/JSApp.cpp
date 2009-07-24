@@ -1446,7 +1446,7 @@ execute(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     ensureParamCount(argc, 1, 3);
     for (unsigned i = 0; i < argc; ++i) {
         if (JSVAL_IS_VOID(argv[i])) {
-            JS_ReportError(cx, "JSSerial::open(): Argument #%d is undefined", i + 1);
+            JS_ReportError(cx, "JSApp::execute(): Argument #%d is undefined", i + 1);
             return JS_FALSE;
         }
     }
