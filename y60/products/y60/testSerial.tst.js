@@ -110,15 +110,15 @@ SerialUnitTest.prototype.Constructor = function(obj, theName) {
         obj.mySerialDevice.open();
 
         // Test status line
-        ENSURE('obj.mySerialDevice.status & SerialDevice.CTS != 0');
+        ENSURE('(obj.mySerialDevice.status & SerialDevice.CTS) != 0');
         var myStatus = obj.mySerialDevice.status;
         obj.mySerialDevice.status = myStatus | SerialDevice.DTR;
-        ENSURE('obj.mySerialDevice.status & SerialDevice.DTR != 0');
+        ENSURE('(obj.mySerialDevice.status & SerialDevice.DTR) != 0');
 
         // Test read/write
         obj.mySerialDevice.write("schreib mal wieder");
-        ENSURE('obj.mySerialDevice.read() == "schreib mal wieder"');
-        ENSURE('obj.mySerialDevice.read() == ""');
+        ENSURE('obj.mySerialDevice.read() === "schreib mal wieder"');
+        ENSURE('obj.mySerialDevice.read() === ""');
 
         // Test send/receive
         obj.mySerialDevice.printPacketFormat();

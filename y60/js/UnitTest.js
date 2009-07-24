@@ -139,7 +139,7 @@ UnitTest.prototype.Constructor = function(obj, theName) {
             return -1;
         }
     }
-    obj.ensure=function(/*bool*/ myExpressionResult,
+    obj.ensure = function(/*bool*/ myExpressionResult,
             /*string*/ myExpression,
             /*string*/ mySourceLine)
     {
@@ -297,7 +297,7 @@ function ENSURE(theExpression, theMessage) {
 
 function ENSURE_EQUAL(theExpected, theResult, theMessage) {
     try {
-        var myResult = (theExpected == theResult);
+        var myResult = (theExpected === theResult);
     } catch(e) {
         var myResult = false;
         print('###### EXCEPTION:'+e);
@@ -322,7 +322,7 @@ function ENSURE_EQUAL(theExpected, theResult, theMessage) {
 
 function ENSURE_NOT_EQUAL(theExpected, theResult, theMessage) {
     try {
-        var myResult = (theExpected != theResult);
+        var myResult = (theExpected !== theResult);
     } catch(e) {
         var myResult = false;
         print('###### EXCEPTION:'+e);
