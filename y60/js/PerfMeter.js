@@ -200,7 +200,7 @@ PerfMeter.prototype.Constructor = function(self, theSceneViewer) {
 
     function updateTopMaxTimers(T_min, deltaT) {
         var newTopMaxTimers = Logger.getNewMaxTimers(T_min, 1, 8);
-        for (var t in newTopMaxTimers) {
+        for (var t = 0; t < newTopMaxTimers.length; t++) {  
             var myTimer = newTopMaxTimers[t];
             // print("MAX "+ t + ":" + myTimer.name+ ", max = " + myTimer.max);
             if (!(myTimer.name in _myTopMaxTimers) || _myTopMaxTimers[myTimer.name].lastelapsed  > myTimer.lastelapsed) {
@@ -226,11 +226,11 @@ PerfMeter.prototype.Constructor = function(self, theSceneViewer) {
         drawValue(_myFrameCount+1, 0, 1, _myBGColor);
             
         var myTotal = 0;
-        for (var i in _myTimings) {
+        for (var i= 0; i < _myTimings.length; i++) {       
             var myTiming = _myTimings[i];
             myTiming.time = Logger.getLastElapsed(myTiming.name);
             //myTiming.time = 1/100;
-            // print (myTiming.name + myTiming.time);
+            //print (myTiming.name + myTiming.time);
             drawValue(_myFrameCount,  myTotal/T_MAX, (myTotal+myTiming.time)/T_MAX, myTiming.color);
             myTotal += myTiming.time;
         }
@@ -266,7 +266,8 @@ PerfMeter.prototype.Constructor = function(self, theSceneViewer) {
         
         var myViewport = _mySceneViewer.getViewportAtWindowCoordinates(0, 0); // get viewport containing upper left pixel
        
-        for (var i in _myTimings) {
+        for (var i= 0; i < _myTimings.length; i++) {       
+            
             var myTiming = _myTimings[i];
             var myPosition = sum(_myOverlay.position, new Vector2f(-220, BOX_HEIGHT + -(_myTimings.length - i) * 14));
             window.setTextColor(myTiming.color);
@@ -274,7 +275,7 @@ PerfMeter.prototype.Constructor = function(self, theSceneViewer) {
         }
 
         var i = 0;
-        for (var t in _myTopMaxTimers) {
+        for (var i= 0; i < _myTopMaxTimers.length; i++) {       
             var myTiming = _myTopMaxTimers[t];
             //print(":"+i+":"+t+"="+myTiming.name + ", max = " +  myTiming.max+ ", frame = "+myTiming.frame);
             if (myTiming.frame + BOX_WIDTH/SLOT_WIDTH < _myFrameCount) {
