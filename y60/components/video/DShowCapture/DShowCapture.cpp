@@ -79,7 +79,7 @@ extern "C" {
 #       include <avcodec.h>
 #endif
 #if LIBAVCODEC_VERSION_INT >= ((51<<16)+(38<<8)+0) 
-#   include <ffmpeg/swscale.h>
+#   include <libswscale/swscale.h>
 #endif
 }
 
