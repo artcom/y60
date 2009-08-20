@@ -316,8 +316,20 @@ spark.Container.Constructor = function(Protected) {
         theChild.parent = Public;
     };
 
+    // XXX: work around missing JS 1.6 functionality. However, this certainly
+    // does not belong here. Maybe we should put all the nifty things from 1.6
+    // into free functions? [DS]
+    function indexOf(theArray, theItem) {
+        for (var i = 0; i < theArray.length; ++i) {
+            if (theArray[i] === theItem) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     Public.removeChild = function(theChild) {
-        var myChildIndex = _myChildren.indexOf(theChild);
+        var myChildIndex = indexOf(_myChildren, theChild);
 
         if(myChildIndex == -1) {
             throw new Error("Could not remove " + theChild.name + " from " + Public.name + " because its not a child");
