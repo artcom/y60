@@ -32,6 +32,7 @@ spark.Window.Constructor = function(Protected) {
         ];
         
         window.decorations = Protected.getBoolean("decorations", true);
+        window.multisamples = Protected.getString("multisamples", "0")
         
         Public.setup(Protected.getNumber("width", 640),
                      Protected.getNumber("height", 480),
