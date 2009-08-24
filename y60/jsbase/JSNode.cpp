@@ -117,7 +117,7 @@ INSTANTIATE_ENUM_WRAPPER(y60::ImageTypeEnum);
 INSTANTIATE_ENUM_WRAPPER(asl::ResizePolicyEnum);
 INSTANTIATE_ENUM_WRAPPER(asl::ProjectionTypeEnum);
 
-template jsval as_jsval(JSContext *cx, const std::vector<dom::NodePtr> & theVector);
+template Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, const std::vector<dom::NodePtr> & theVector);
 
 namespace {
 
