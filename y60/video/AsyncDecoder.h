@@ -182,6 +182,7 @@ namespace y60 {
                 //AC_DEBUG << "AsyncDecoder::stopMovie";
                 MovieDecoderBase::stopMovie();
                 if (theStopAudioFlag && _myAudioSink && getDecodeAudioFlag()) {            
+                    AC_TRACE << "====== STOPPING AUDIO " << std::endl;
                     _myAudioSink->stop();
                 }
                 setState(STOP);
