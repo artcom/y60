@@ -159,7 +159,7 @@ spark.NewMovie.Constructor = function(Protected) {
         
         if(_myMovie.nodeName != "image") {
             Public.loop = Protected.getBoolean("loop", false);
-            Public.mode = Protected.getBoolean("mode", "stop");
+            Public.mode = Protected.getString("mode", "stop");
         }
     };
 
