@@ -98,9 +98,9 @@ GUI.ParallelAnimation.prototype.Constructor = function(Public, Protected) {
 	Public.doFrame = function()	{
 		var finished = true;
 		for(var i = 0; i < Public.children.length; i++) {
-			Public.children[i].doFrame();
 			if(Public.children[i].running) {
-				finished = false;
+				Public.children[i].doFrame();
+                finished = false;
 			}
 		}
 		
