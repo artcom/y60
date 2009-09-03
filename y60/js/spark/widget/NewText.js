@@ -88,6 +88,7 @@ spark.NewText.Constructor = function(Protected) {
         if (_myTextId) {
             attachToI18nItem(_myTextId);
         }
+        Base.postRealize();                
     }
 
     Public.maxWidth getter = function() { return _myMaxWidth; }
