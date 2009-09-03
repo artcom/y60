@@ -112,6 +112,7 @@ spark.Image.Constructor = function(Protected) {
         if(_mySourceId) {
             attachToI18nItem(_mySourceId);
         }
+        Base.postRealize();        
     };
 
     function handleI18nLanguage(e) {
