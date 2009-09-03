@@ -65,9 +65,6 @@
 
 spark.sceneNodeMap = {};
 spark.ourComponentsByNameMap = {};
-spark.onClickListeners = {};
-spark.onMoveListeners = {};
-spark.onReleaseListeners = {};
 
 spark.Component = spark.AbstractClass("Component");
 

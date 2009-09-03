@@ -22,6 +22,8 @@ spark.NewMovie.Constructor = function(Protected) {
     var _myTexture  = null;
     var _myVertices = null;
 
+    var _myTargetPixelFormat = "";
+    var _myDecoderHint = "";
     // playback control
 
     Public.play = function() {
@@ -105,7 +107,7 @@ spark.NewMovie.Constructor = function(Protected) {
     };
 
     Public.src setter = function(theSourceFile) {
-        Public.movie = spark.openMovie(theSourceFile);
+        Public.movie = spark.openMovie(theSourceFile, _myTargetPixelFormat, _myDecoderHint);
         _mySource = theSourceFile;
     };
 
@@ -139,12 +141,14 @@ spark.NewMovie.Constructor = function(Protected) {
         if(myMovieSource == "") {
             var myWidth  = Protected.getNumber("width", 1);
             var myHeight = Protected.getNumber("height", 1);
-            _myMovie      = Modelling.createImage(window.scene, myWidth, myHeight, "BGR");
+            _myMovie     = Modelling.createImage(window.scene, myWidth, myHeight, "BGR");
             if(myMovieSourceId != "") {
                 _mySourceId = myMovieSourceId;
             }
         } else {
-            _myMovie = spark.openMovie(myMovieSource);
+            _myTargetPixelFormat = Protected.getString("targetpixelformat", "RGB");
+            _myDecoderHint = Protected.getString("decoderhint", "FFMpegDecoder2");
+            _myMovie = spark.openMovie(myMovieSource, _myTargetPixelFormat, _myDecoderHint);
             _mySource = myMovieSource;
         }
 
@@ -160,6 +164,28 @@ spark.NewMovie.Constructor = function(Protected) {
         if(_myMovie.nodeName != "image") {
             Public.loop = Protected.getBoolean("loop", false);
             Public.mode = Protected.getString("mode", "stop");
+            
+            if(_myTargetPixelFormat == "YUV420") {
+                // YUV targetrasterformat allows us to use a shader to convert YUV2RGB, 
+                // loadMovieFrame created 3 rasters for us, therefore we need 3 textures
+                myMaterial.enabled = false;
+                
+                for (var i = 1; i < _myMovie.childNodesLength(); i++) {
+                    var myTextureUnit = myMaterial.childNode("textureunits").appendChild(Node.createElement("textureunit"));
+                    myTextureUnit.applymode = TextureApplyMode.modulate;
+                    var myTexture = Modelling.createTexture(window.scene, _myMovie);
+                    myTexture.image = _myMovie.id;
+                    myTexture.image_index = i;
+                    myTextureUnit.texture   = myTexture.id;
+                }
+    
+                var myString = "[100[paint, paint, paint]]";
+                myMaterial.requires.textures = myString;
+    
+                addMaterialRequirement(myMaterial, "option", "[10[yuv2rgb]]");
+                myMaterial.enabled = true;
+            }
+            
         }
     };
 
