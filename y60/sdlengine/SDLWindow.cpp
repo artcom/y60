@@ -211,7 +211,7 @@ SDLWindow::onResize(Event & theEvent) {
     WindowEvent & myWindowEvent = dynamic_cast<WindowEvent&>(theEvent);
     AC_DEBUG << "Window Resize Event: " << myWindowEvent.width << "x" << myWindowEvent.height;
 #ifdef _WIN32
-    if (!_myWinDecoFlag) {
+    if (!_myDecorationFlag) {
         // Sorry, in case of a non decorated window SDL seems to use getClientRect for getting the window size.
         // This is wrong, because decorations are excluded, and so height and width are not right
         // and the window is too small, use GetWindowRect instead. (VS)
