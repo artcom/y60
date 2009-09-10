@@ -118,16 +118,21 @@ SDLWindow::create() {
 
 SDLWindow::SDLWindow() :
     AbstractRenderWindow(SDLApp::ShellErrorReporter),
+
+    _myVideoInitializedFlag(false),
+
+    _myWidth(800),
+    _myHeight(600),
+    _myFullscreenFlag(false),
+    _myDecorationFlag(false),
+    _myResizableFlag(true), // XXX: backwards compatibility
+
     _myWindowTitle("Y60 Renderer"),
     _myWindowPosX(100),
     _myWindowPosY(100),
+
     _myStandardCursor(0),
     _myUserDefinedCursor(0),
-    _myWindowInitFlag(false),
-    _myFullscreenFlag(false),
-    _myWinDecoFlag(true),
-    _myInitialWidth(800),
-    _myInitialHeight(600),
     _myShowMouseCursorFlag(true),
     _myCaptureMouseCursorFlag(false),
     _myAppQuitFlag(false),
@@ -147,7 +152,6 @@ SDLWindow::~SDLWindow() {
         _myScene->getTextureManager()->unbindTextures();
         // We do not have a valid GLContext after SLD_Quit
         _myScene->getTextureManager()->validateGLContext(false);
-
     }
     SDL_Quit();
 }
@@ -160,33 +164,7 @@ SDLWindow::createTTFRenderer() {
 void
 SDLWindow::activateGLContext() {
     AC_DEBUG << "SDLWindow::activateGLContext";
-    if (!SDL_WasInit(SDL_INIT_VIDEO)) {
-        ensureSDLSubsystem();
-#ifdef _WIN32
-        unsigned int myFlags = SDL_OPENGL | SDL_NOFRAME;
-#else
-        unsigned int myFlags = SDL_OPENGL;
-#endif
-        SDL_SetVideoMode(1, 1, 32, myFlags);
-        
-        // init glew 
-        unsigned int myGlewError = glewInit();
-        if (GLEW_OK != myGlewError) {
-            throw RendererException(std::string("Glew Initialization Error: ") +  
-                    std::string(reinterpret_cast<const char*>(glewGetErrorString(myGlewError))), 
-                    PLUS_FILE_LINE);
-        }
-        
-        GLResourceManager::get().initCaps();
-
-#ifdef _WIN32 
-        _myHasVideoSync = 0 != wglewIsSupported("WGL_EXT_swap_control");
-#elif LINUX
-        _myHasVideoSync = glxewIsSupported("GLX_SGI_video_sync");
-#else
-        _myHasVideoSync = false;
-#endif
-    }
+    ensureVideoInitialized();
 }
 
 void
@@ -258,111 +236,110 @@ SDLWindow::onResize(Event & theEvent) {
 }
 
 void
-SDLWindow::setVideoMode(unsigned theTargetWidth, unsigned theTargetHeight,
-                        bool theFullscreenFlag, bool theInitializeCallFlag)
-{
-    DB(AC_TRACE << "setVideoMode(" << theTargetWidth << ", " << theTargetHeight <<
-            ", Fullscreen: " << theFullscreenFlag << ")");
-    DB(AC_TRACE << "_myWindowInitFlag: " << _myWindowInitFlag);
-    if (!_myWindowInitFlag) {
-        // window not yet set up, defer to later
-        _myInitialWidth = theTargetWidth;
-        _myInitialHeight = theTargetHeight;
-    } else {
-        unsigned int myFlags = SDL_OPENGL;
+SDLWindow::updateVideoMode() {
+	if(!_myVideoInitializedFlag) {
+		return;
+	}
 
-        if (!_myWinDecoFlag) {
-            myFlags |= SDL_NOFRAME;
-        }
-        if (theFullscreenFlag) {
-            myFlags |= SDL_FULLSCREEN;
-        } else {
-            myFlags |= SDL_RESIZABLE;
-        }
+	unsigned int myFlags = 0;
 
-        if (theTargetWidth == 0) {
-            theTargetWidth = getWidth();
-            AC_DEBUG << "keeping width=" << theTargetWidth;
-        }
-        if (theTargetHeight == 0) {
-            theTargetHeight = getHeight();
-            AC_DEBUG << "keeping height=" << theTargetHeight;
-        }
-#ifdef AC_USE_X11
-        SDL_SysWMinfo wminfo;
-        SDL_VERSION(&wminfo.version);
-        if (SDL_GetWMInfo(&wminfo) >= 0) {
-            wminfo.info.x11.lock_func();
-            XSync(wminfo.info.x11.display, true);
-            wminfo.info.x11.unlock_func();
-        }
-#endif
+	myFlags |= SDL_OPENGL;
 
-        if (_myScene) {
-            // unbind all created textures before creating a new context
-            _myScene->getTextureManager()->unbindTextures();
-        }
+	if(!_myDecorationFlag) {
+		myFlags |= SDL_NOFRAME;
+	}
 
-        DB(AC_TRACE << "SDL_SetVideoMode(" << theTargetWidth << ", " << theTargetHeight <<
-                ", FS=" << theFullscreenFlag << ", Deco=" << _myWinDecoFlag << ")" << endl);
-        if ((_myScreen = SDL_SetVideoMode(theTargetWidth, theTargetHeight, 32, myFlags)) == NULL) {
-            throw SDLWindowException(string("Couldn't set SDL-GL mode: ") + SDL_GetError(), PLUS_FILE_LINE);
-        }
+	if(_myFullscreenFlag) {
+		myFlags |= SDL_FULLSCREEN;
+	} else {
+		if(_myResizableFlag) {
+			myFlags |= SDL_RESIZABLE;
+		}
+	}
 
 #ifdef AC_USE_X11
-        if (SDL_GetWMInfo(&wminfo) >= 0) {
-            wminfo.info.x11.lock_func();
-            XSync(wminfo.info.x11.display, true);
-            wminfo.info.x11.unlock_func();
-        }
+	SDL_SysWMinfo wminfo;
+	SDL_VERSION(&wminfo.version);
+	if (SDL_GetWMInfo(&wminfo) >= 0) {
+		wminfo.info.x11.lock_func();
+		XSync(wminfo.info.x11.display, true);
+		wminfo.info.x11.unlock_func();
+	}
 #endif
-        // if we are resetting the video mode (e.g. Fullscreen toggle), then the GL context
-        // will be lost. Reinit GL and setup the textures again
-        if (_myRenderer) {
-            _myRenderer->initGL();
-            ShaderLibraryPtr myShaderLibrary = dynamic_cast_Ptr<ShaderLibrary> (_myRenderer->getShaderLibrary());
-            if (myShaderLibrary) {
-                myShaderLibrary->reload();
-            }
-        }
-        // reinit all extensions, because since the context is reset all opengl bound stuff is invalid
-        for (ExtensionList::iterator it = _myExtensions.begin(); it != _myExtensions.end(); ++it) {
-            std::string myName = (*it)->getName() + "::onStartup";
-            try {
-                (*it)->onStartup(this);
-            } catch (const asl::Exception & ex) {
-                AC_ERROR << "Exception while calling " << myName << ": " << ex;
-            } catch (...) {
-                AC_ERROR << "Unknown exception while calling " << myName;
-            }
-        }
 
-        if (_myScene) {
-            //_myScene->clearShapes();
-            _myScene->updateAllModified();
-            //_myScene->update(Scene::SHAPES); // updated in updateAllModified
-            if (!theInitializeCallFlag) {
-                _myScene->getTextureManager()->reloadTextures();
-            }
-        }
-        if (_myScene) {        
-            xpath::NodeList myResult;
-            xpath::findAll(xpath::Path(std::string("//") + SHAPE_NODE_NAME), _myScene->getShapesRoot(), myResult);
-            for (xpath::NodeList::size_type myIndex = 0; myIndex < myResult.size(); myIndex++) {
-               ShapePtr myShape = myResult[myIndex]->getFacade<Shape>();
-               myShape->enforceReload();             
-            }
+    if (_myScene) {
+        // unbind all created textures before creating a new context
+        _myScene->getTextureManager()->unbindTextures();
+    }
+
+    if ((_myScreen = SDL_SetVideoMode(_myWidth, _myHeight, 32, myFlags)) == NULL) {
+        throw SDLWindowException(string("Couldn't set SDL-GL mode: ") + SDL_GetError(), PLUS_FILE_LINE);
+    }
+
+#ifdef AC_USE_X11
+	SDL_VERSION(&wminfo.version);
+	if (SDL_GetWMInfo(&wminfo) >= 0) {
+		wminfo.info.x11.lock_func();
+		XSync(wminfo.info.x11.display, true);
+		wminfo.info.x11.unlock_func();
+	}
+#endif
+
+    // if we are resetting the video mode (e.g. Fullscreen toggle), then the GL context
+    // will be lost. Reinit GL and setup the textures again
+    if (_myRenderer) {
+        _myRenderer->initGL();
+        ShaderLibraryPtr myShaderLibrary = dynamic_cast_Ptr<ShaderLibrary> (_myRenderer->getShaderLibrary());
+        if (myShaderLibrary) {
+            myShaderLibrary->reload();
         }
     }
-    _myFullscreenFlag = theFullscreenFlag;
+    // reinit all extensions, because since the context is reset all opengl bound stuff is invalid
+    for (ExtensionList::iterator it = _myExtensions.begin(); it != _myExtensions.end(); ++it) {
+        std::string myName = (*it)->getName() + "::onStartup";
+        try {
+            (*it)->onStartup(this);
+        } catch (const asl::Exception & ex) {
+            AC_ERROR << "Exception while calling " << myName << ": " << ex;
+        } catch (...) {
+            AC_ERROR << "Unknown exception while calling " << myName;
+        }
+    }
+
+    if (_myScene) {
+        //_myScene->clearShapes();
+        _myScene->updateAllModified();
+        //_myScene->update(Scene::SHAPES); // updated in updateAllModified
+//        if (!theInitializeCallFlag) {
+//            _myScene->getTextureManager()->reloadTextures();
+//        }
+    }
+    if (_myScene) {
+        xpath::NodeList myResult;
+        xpath::findAll(xpath::Path(std::string("//") + SHAPE_NODE_NAME), _myScene->getShapesRoot(), myResult);
+        for (xpath::NodeList::size_type myIndex = 0; myIndex < myResult.size(); myIndex++) {
+           ShapePtr myShape = myResult[myIndex]->getFacade<Shape>();
+           myShape->enforceReload();
+        }
+    }
+}
+
+void
+SDLWindow::setVideoMode(unsigned theTargetWidth, unsigned theTargetHeight,
+                        bool theFullscreenFlag)
+{
+	_myWidth = theTargetWidth;
+	_myHeight = theTargetHeight;
+	_myFullscreenFlag = theFullscreenFlag;
+
+	updateVideoMode();
 }
 
 void
 SDLWindow::initDisplay() {
-    ensureSDLSubsystem();
-    _myWindowInitFlag = true;
+    ensureVideoInitialized();
 
-    setVideoMode(_myInitialWidth, _myInitialHeight, _myFullscreenFlag, true);
+    //setVideoMode(_myInitialWidth, _myInitialHeight, _myFullscreenFlag, true);
     setWindowTitle("Y60 Renderer");
 
     if (!_myFullscreenFlag) {
@@ -562,7 +539,7 @@ void SDLWindow::setPosition(asl::Vector2i thePos) {
     _myWindowPosX = thePos[0];
     _myWindowPosY = thePos[1];
 
-    if (_myWindowInitFlag == false) {
+    if (!_myVideoInitializedFlag) {
         // _myWindowPosX/_myWindowPosY will be used, when window is opened
         return;
     }
@@ -612,44 +589,81 @@ SDLWindow::getWindowTitle() const {
 }
 
 void SDLWindow::setWinDeco(bool theWinDecoFlag) {
-    if (_myWindowInitFlag && (theWinDecoFlag != _myWinDecoFlag)) {
-        _myWinDecoFlag = theWinDecoFlag;
-        setVideoMode();
-    } else {
-        _myWinDecoFlag = theWinDecoFlag;
-    }
+	bool myMustUpdate = false;
+
+	if(_myDecorationFlag != theWinDecoFlag) {
+		myMustUpdate = true;
+	}
+
+	_myDecorationFlag = theWinDecoFlag;
+
+	if(myMustUpdate) {
+		updateVideoMode();
+	}
 }
 
 bool SDLWindow::getWinDeco() {
-    return _myWinDecoFlag;
+    return _myDecorationFlag;
 }
 
 bool SDLWindow::getFullScreen() {
     return _myFullscreenFlag;
 }
 
-void SDLWindow::ensureSDLSubsystem() {
-    if (!SDL_WasInit(SDL_INIT_VIDEO)) {
-        if (SDL_InitSubSystem(SDL_INIT_VIDEO) == -1) {
-            throw SDLWindowException(string("Could not init SDL video subsystem: ") + SDL_GetError(), PLUS_FILE_LINE);
-        }
-        SDL_GL_SetAttribute( SDL_GL_RED_SIZE, 8 );
-        SDL_GL_SetAttribute( SDL_GL_GREEN_SIZE, 8 );
-        SDL_GL_SetAttribute( SDL_GL_BLUE_SIZE, 8 );
-        SDL_GL_SetAttribute( SDL_GL_ALPHA_SIZE, 8 );
-        SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, 24 );
-        /*SDL_GL_SetAttribute( SDL_GL_ACCUM_RED_SIZE, 16 );
-        SDL_GL_SetAttribute( SDL_GL_ACCUM_GREEN_SIZE, 16 );
-        SDL_GL_SetAttribute( SDL_GL_ACCUM_BLUE_SIZE, 16 );*/
-        SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
+void SDLWindow::ensureVideoInitialized() {
+	if(!_myVideoInitializedFlag) {
+		AC_DEBUG << "Initializing SDL video";
 
-        unsigned mySamples = AbstractRenderWindow::getMultisamples();
-        if (mySamples >= 1) {
-            AC_DEBUG << "Requesting multisampling=" << mySamples;
-            SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
-            SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, mySamples);
-        }
-    }
+		if (!SDL_WasInit(SDL_INIT_VIDEO)) {
+			if (SDL_InitSubSystem(SDL_INIT_VIDEO) == -1) {
+				throw SDLWindowException(string("Could not init SDL video subsystem: ") + SDL_GetError(), PLUS_FILE_LINE);
+			}
+		}
+
+		// enable double-buffering
+		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+
+		// component sizes
+		SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
+		SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
+		SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
+		SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
+
+		// depth buffer
+		SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+
+		// multisampling
+		unsigned mySamples = AbstractRenderWindow::getMultisamples();
+		if (mySamples >= 1) {
+			SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+			SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, mySamples);
+		}
+
+		_myVideoInitializedFlag = true;
+
+		// set the video mode for the first time
+		updateVideoMode();
+
+		// initialize glew
+		unsigned int myGlewError = glewInit();
+		if (GLEW_OK != myGlewError) {
+			throw RendererException(std::string("Glew Initialization Error: ") +
+					std::string(reinterpret_cast<const char*>(glewGetErrorString(myGlewError))),
+					PLUS_FILE_LINE);
+		}
+
+		// initialize glrm
+        GLResourceManager::get().initCaps();
+
+        // find out if vsync is supported
+#ifdef _WIN32
+        _myHasVideoSync = 0 != wglewIsSupported("WGL_EXT_swap_control");
+#elif LINUX
+        _myHasVideoSync = glxewIsSupported("GLX_SGI_video_sync");
+#else
+        _myHasVideoSync = false;
+#endif
+	}
 }
 
 void

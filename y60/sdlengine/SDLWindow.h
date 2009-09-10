@@ -87,7 +87,7 @@ namespace y60 {
             virtual void onResize(Event & theEvent);
 
             void setVideoMode(unsigned theTargetWidth=0, unsigned theTargetHeight=0,
-                              bool theFullscreen=false, bool theInitializeCallFlag = false);
+                              bool theFullscreen=false);
             void dumpSDLGLParams();
             void initDisplay();
 
@@ -126,7 +126,6 @@ namespace y60 {
             bool getWinDeco();
 
             bool getFullScreen();
-            void ensureSDLSubsystem();
 
             /// Set/get mouse cursor visibility.
             void setShowMouseCursor(bool theShowMouseCursor);
@@ -189,7 +188,21 @@ namespace y60 {
         private:
             SDLWindow();
             SDLWindow(const SDLWindow &);
+
             SDLWindow & operator=(const SDLWindow &);
+
+            void updateVideoMode();
+
+            void ensureVideoInitialized();
+
+            bool _myVideoInitializedFlag;
+
+            unsigned int _myWidth;
+            unsigned int _myHeight;
+
+            bool _myFullscreenFlag;
+            bool _myDecorationFlag;
+            bool _myResizableFlag;
 
             SDLEventSource  _mySDLEventSource;
             DebugEventSink  _myEventDumper;
@@ -202,12 +215,6 @@ namespace y60 {
 
             SDL_Cursor * _myStandardCursor;
             SDL_Cursor * _myUserDefinedCursor;
-
-            bool        _myWindowInitFlag;
-            bool        _myFullscreenFlag;
-            bool        _myWinDecoFlag;
-            int         _myInitialWidth;
-            int         _myInitialHeight;
 
             bool        _myShowMouseCursorFlag ;
             bool        _myCaptureMouseCursorFlag;
