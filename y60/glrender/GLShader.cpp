@@ -110,6 +110,7 @@ namespace y60 {
 
     GLShader::GLShader(const dom::NodePtr theNode) 
     :   _myType(FIXED_FUNCTION_MATERIAL),
+        _myHasImagingEXT(hasCap("GL_ARB_imaging")),
         _myHasPointParmatersEXT(hasCap("GL_ARB_point_parameters")),
         _myHasBlendMinMaxEXT(hasCap("GL_EXT_blend_minmax"))
     {
@@ -267,7 +268,7 @@ namespace y60 {
         }
 
         // blend equation
-        if (_myHasBlendMinMaxEXT) {
+        if (_myHasImagingEXT && _myHasBlendMinMaxEXT) {
             const BlendEquation & myBlendEquation = myMaterialPropFacade->get<BlendEquationTag>();
             GLenum myEquation = asGLBlendEquation(myBlendEquation);
             glBlendEquation(myEquation);

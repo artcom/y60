@@ -97,6 +97,7 @@ namespace y60 {
             ShaderFeatureSet          _myFeatureSet;
             std::vector<dom::NodePtr> _myPropertyNodes;
     
+            bool _myHasImagingEXT;
             bool _myHasPointParmatersEXT;
             bool _myHasBlendMinMaxEXT;
     };
