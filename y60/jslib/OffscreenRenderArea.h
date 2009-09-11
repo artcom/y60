@@ -150,8 +150,6 @@ namespace jslib {
             }
 
         private:
-            dom::ResizeableRasterPtr ensureRaster(TexturePtr theTexture);
-
             const TexturePtr getTexture() const;
             TexturePtr getTexture();
 

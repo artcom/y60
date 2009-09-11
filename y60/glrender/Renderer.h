@@ -74,6 +74,7 @@
 #include <y60/scene/Scene.h>
 #include <y60/scene/MaterialBase.h>
 #include <y60/scene/Light.h>
+#include <y60/scene/Facades.h>
 #include <y60/glutil/GLContext.h>
 
 
@@ -209,7 +210,7 @@ namespace y60 {
             /// restore from immediate draw
             void postDraw();
 
-            void enableFog();
+            void enableFog(WorldFacadePtr & theWorld);
             void enableVisibleLights();
             void enableLight(y60::LightPtr & theLight, int theActiveLightIndex);
             void renderSkyBox(const Viewport & theViewport, y60::CameraPtr theCamera);

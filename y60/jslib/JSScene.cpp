@@ -446,6 +446,7 @@ enum PropertyNumbers {
     PROP_statistics,
     PROP_cameras,
     PROP_world,
+    PROP_worlds,
     PROP_canvases,
     PROP_canvas,
     PROP_records,
@@ -536,6 +537,7 @@ JSScene::Properties() {
         {"document",     PROP_document,     JSPROP_ENUMERATE | JSPROP_PERMANENT|JSPROP_SHARED | JSPROP_READONLY},
         {"cameras",      PROP_cameras,      JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED | JSPROP_READONLY},
         {"world",        PROP_world,        JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED | JSPROP_READONLY},
+        {"worlds",       PROP_worlds,       JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED | JSPROP_READONLY},
         {"canvases",     PROP_canvases,     JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED | JSPROP_READONLY},
         {"records",      PROP_records,      JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED | JSPROP_READONLY},
         {"canvas",       PROP_canvas,       JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED | JSPROP_READONLY},
@@ -604,6 +606,9 @@ JSScene::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, js
         case PROP_world:
             *vp = as_jsval(cx, getNative().getWorldRoot());
             return JS_TRUE;
+        case PROP_worlds:
+        	*vp = as_jsval(cx, getNative().getWorldsRoot());
+        	return JS_TRUE;
         case PROP_canvases:
             *vp = as_jsval(cx, getNative().getCanvasRoot());
             return JS_TRUE;

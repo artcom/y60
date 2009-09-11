@@ -803,12 +803,12 @@ namespace y60 {
     }
 #endif
     void
-    Scene::loadAnimations() {
+    Scene::loadAnimations(NodePtr theWorld) {
         NodePtr myAnimationNodes = getNode().childNode(ANIMATION_LIST_NAME);
-        _myAnimationManager.loadGlobals(myAnimationNodes, getWorldRoot());
+        _myAnimationManager.loadGlobals(myAnimationNodes, theWorld);
 
         NodePtr myCharacterNodes = getNode().childNode(CHARACTER_LIST_NAME);
-        _myAnimationManager.loadCharacters(myCharacterNodes, getWorldRoot());
+        _myAnimationManager.loadCharacters(myCharacterNodes, theWorld);
     }
 
     void
@@ -867,7 +867,10 @@ namespace y60 {
         if (theUpdateFlags & ANIMATIONS_LOAD) {
             AC_TRACE << "updateAnimationsReload";
             MAKE_SCOPE_TIMER(updateAnimationsReload);
-            loadAnimations();
+            NodePtr myWorlds = getWorldsRoot();
+            for(unsigned i = 0; i < myWorlds->childNodesLength("world"); i++) {
+            	loadAnimations(myWorlds->childNode("world", i));
+            }
         } else if (theUpdateFlags & ANIMATIONS) {
             AC_TRACE << "updateAnimations";
             MAKE_SCOPE_TIMER(updateAnimations);
@@ -887,7 +890,11 @@ namespace y60 {
             myInitialMatrix.makeIdentity();
             _myLights.clear();
             //_myAnalyticGeometry.clear();
-            updateTransformHierachy(getWorldRoot());
+
+            NodePtr myWorlds = getWorldsRoot();
+            for(unsigned i = 0; i < myWorlds->childNodesLength("world"); i++) {
+            	updateTransformHierachy(myWorlds->childNode("world", i));
+            }
         }
     }
 #if 0
@@ -982,14 +989,25 @@ namespace y60 {
         return getNode().childNode(IMAGE_LIST_NAME);
     }
 
+    NodePtr
+    Scene::getWorldsRoot() {
+        return getNode().childNode(WORLD_LIST_NAME);
+    }
+
+    const NodePtr
+    Scene::getWorldsRoot() const {
+        return getNode().childNode(WORLD_LIST_NAME);
+    }
 
     NodePtr
     Scene::getWorldRoot() {
+    	//AC_WARNING << "getWorldRoot is deprecated";
         return getNode().childNode(WORLD_LIST_NAME)->childNode(WORLD_NODE_NAME);
     }
 
     const NodePtr
     Scene::getWorldRoot() const {
+    	//AC_WARNING << "getWorldRoot is deprecated";
         return getNode().childNode(WORLD_LIST_NAME)->childNode(WORLD_NODE_NAME);
     }
 
@@ -1036,11 +1054,11 @@ namespace y60 {
     float
     Scene::getWorldSize(const NodePtr & theActiveCamera) const {
         AC_TRACE << "getWorldSize()";
-        const NodePtr myWorld = getWorldRoot();
-        WorldFacadePtr myWorldFacade = myWorld->getFacade<WorldFacade>();
+        CameraPtr myCameraFacade = theActiveCamera->getFacade<Camera>();
+        WorldFacadePtr myWorldFacade = myCameraFacade->getWorld()->getFacade<WorldFacade>();
         asl::Box3f myWorldBox = myWorldFacade->get<BoundingBoxTag>();
         
-        asl::Matrix4f myCameraMatrix = theActiveCamera->getFacade<Camera>()->get<GlobalMatrixTag>();
+        asl::Matrix4f myCameraMatrix = myCameraFacade->get<GlobalMatrixTag>();
         asl::Vector3f myCameraPos = myCameraMatrix.getTranslation();
         myWorldBox.extendBy(myCameraPos);
         return asl::distance(myWorldBox[0], myWorldBox[1]);
@@ -1643,7 +1661,10 @@ namespace y60 {
         removeDangelingNodes(mySceneNode.childNode(ANIMATION_LIST_NAME), _mySceneDom);
 
         collectReferences(mySceneNode.childNode(CANVAS_LIST_NAME), myReferences);
-        collectReferences(getWorldRoot(), myReferences);
+        NodePtr myWorlds = getWorldsRoot();
+        for(unsigned i = 0; i < myWorlds->childNodesLength("world"); i++) {
+        	collectReferences(myWorlds->childNode("world", i), myReferences);
+        }
         removeUnreferencedNodes(getNode().childNode(LIGHTSOURCE_LIST_NAME), myReferences);
         removeUnreferencedNodes(getShapesRoot(), myReferences);
 

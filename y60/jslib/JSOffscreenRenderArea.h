@@ -61,6 +61,8 @@
 
 #include "y60_jslib_settings.h"
 
+#include <y60/scene/Scene.h>
+
 #include "OffscreenRenderArea.h"
 #include "JSAbstractRenderWindow.h"
 

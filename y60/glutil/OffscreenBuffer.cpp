@@ -128,7 +128,7 @@ static void checkFramebufferStatus()
 
 
 OffscreenBuffer::OffscreenBuffer() :
-    _myUseFBO(true),
+    _myUseFBO(false),
     _myHasFBO(hasCap("GL_EXT_framebuffer_object")),
     _myHasFBOMultisample(hasCap("GL_EXT_framebuffer_multisample GL_EXT_framebuffer_blit")),
     _myTextureNodeVersion(0),
@@ -206,7 +206,8 @@ void OffscreenBuffer::deactivate(TexturePtr theTexture, bool theCopyToImageFlag)
             glBindTexture(GL_TEXTURE_2D, 0);
         }
     } else {
-        AC_DEBUG << "OffscreenBuffer:deactivate texture id = " << myTextureId << "- zeroing texture"; 
+        AC_DEBUG << "OffscreenBuffer:deactivate texture id = " << myTextureId << "zeroing texture";
+
         // copy backbuffer to texture
         glBindTexture(GL_TEXTURE_2D, myTextureId);
         glCopyTexSubImage2D(GL_TEXTURE_2D, 0 /*MIPMAP level*/, 0, 0,
@@ -259,12 +260,15 @@ void OffscreenBuffer::copyToImage(TexturePtr theTexture)
     AC_TRACE << "pixelformat " << myImage->get<RasterPixelFormatTag>();
     AC_TRACE << "image size " << myWidth << "x" << myHeight;
 
+    dom::ResizeableRasterPtr myRaster = myImage->getRasterPtr();
+    asl::WriteableBlock & myBlock = myRaster->pixels();
+
     glReadPixels(0, 0, myWidth, myHeight,
                 myPixelEncodingInfo.externalformat, myPixelEncodingInfo.pixeltype,
-                myImage->getRasterPtr()->pixels().begin());        
+                myBlock.begin());
     CHECK_OGL_ERROR;
 
-    //theTexture->preload();
+    myImage->getRasterValueNode()->bumpVersion();
 
     if (_myUseFBO) {
         if (_myFrameBufferObject[1]) { // UH: not a bug, to determine if 

@@ -964,7 +964,7 @@ namespace y60 {
         }
 
         // apply lodscale
-        WorldFacadePtr myWorldFacade = _myScene->getWorldRoot()->getFacade<WorldFacade>();
+        WorldFacadePtr myWorldFacade = myLodFacade->getWorld()->getFacade<WorldFacade>();
         float myMetric = myDistance * myWorldFacade->get<LodScaleTag>() * myZoomAdjustment;
 
         const VectorOfFloat & myRanges = myLodFacade->get<RangesTag>();
@@ -1222,6 +1222,7 @@ namespace y60 {
         }
 
         // if we have a camera, render the world
+        dom::NodePtr myWorld; // XXX: referenced by bounding box render
         const std::string & myCameraId =theViewport->get<CameraTag>();
         if ( myCameraId.length() ) {
             dom::NodePtr myCameraNode = theViewport->getNode().getElementById(myCameraId);
@@ -1232,6 +1233,8 @@ namespace y60 {
             CameraPtr myCamera = myCameraNode->getFacade<Camera>();
             bindViewMatrix(myCamera);
             CHECK_OGL_ERROR;
+
+            myWorld = myCamera->getWorld();
 
             if (theViewport->get<ViewportCullingTag>()) {
                 if (theViewport->get<ViewportDebugCullingTag>()) {
@@ -1251,7 +1254,7 @@ namespace y60 {
             CHECK_OGL_ERROR;
 
             // don't render anything if world isn't visible
-            if (_myScene->getWorldRoot()->getFacade<TransformHierarchyFacade>()->get<VisibleTag>()) {
+            if (myWorld->getFacade<TransformHierarchyFacade>()->get<VisibleTag>()) {
 
                 // (2) Create lists of render objects
                 BodyPartMap myBodyParts;
@@ -1260,7 +1263,7 @@ namespace y60 {
                     Matrix4f myEyeSpaceTransform = myCamera->get<InverseGlobalMatrixTag>();
                     asl::Box2f myScissorBox;
                     myScissorBox.makeFull();
-                    createRenderList(_myScene->getWorldRoot(), myBodyParts, myCamera,
+                    createRenderList(myWorld, myBodyParts, myCamera,
                             myEyeSpaceTransform, theViewport, true, std::vector<asl::Planef>(),
                             myScissorBox);
                     DB(AC_TRACE << "created Renderlist, size = "<< myBodyParts.size()); 
@@ -1278,7 +1281,8 @@ namespace y60 {
                     CHECK_OGL_ERROR;
 
                 // (6) enable fog
-                    enableFog();
+                    WorldFacadePtr myWorldFacade = myWorld->getFacade<WorldFacade>();
+                    enableFog(myWorldFacade);
                     CHECK_OGL_ERROR;
 
                 // (7) render bodies
@@ -1334,7 +1338,7 @@ namespace y60 {
         _myState->setIgnoreDepth(false);
 
         if (_myBoundingVolumeMode & BV_HIERARCHY) {
-            renderBoundingBoxHierarchy(_myScene->getWorldRoot());
+            renderBoundingBoxHierarchy(myWorld);
         }
 
         _myTextRendererManager.render(theViewport);
@@ -1510,10 +1514,9 @@ namespace y60 {
     }
 
     void
-    Renderer::enableFog() {
+    Renderer::enableFog(WorldFacadePtr & theWorld) {
         MAKE_GL_SCOPE_TIMER(Renderer_enableFog);
-        WorldFacadePtr myWorldFacade = _myScene->getWorldRoot()->getFacade<WorldFacade>();
-        const string & myFogModeString = myWorldFacade->get<FogModeTag>();
+        const string & myFogModeString = theWorld->get<FogModeTag>();
         if (myFogModeString.size() == 0) {
             return;
         }
@@ -1524,22 +1527,22 @@ namespace y60 {
                 return;
             case FOG_LINEAR :
                 glFogi(GL_FOG_MODE, GL_LINEAR);
-                glFogf(GL_FOG_START, myWorldFacade->get<FogRangeTag>()[0]);
-                glFogf(GL_FOG_END, myWorldFacade->get<FogRangeTag>()[1]);
+                glFogf(GL_FOG_START, theWorld->get<FogRangeTag>()[0]);
+                glFogf(GL_FOG_END, theWorld->get<FogRangeTag>()[1]);
                 break;
             case FOG_EXP :
                 glFogi(GL_FOG_MODE, GL_EXP);
-                glFogf(GL_FOG_DENSITY, myWorldFacade->get<FogDensityTag>());
+                glFogf(GL_FOG_DENSITY, theWorld->get<FogDensityTag>());
                 break;
             case FOG_EXP2 :
                 glFogi(GL_FOG_MODE, GL_EXP2);
-                glFogf(GL_FOG_DENSITY, myWorldFacade->get<FogDensityTag>());
+                glFogf(GL_FOG_DENSITY, theWorld->get<FogDensityTag>());
                 break;
             default :
-                throw RendererException(string("World Fog Mode :'") + myWorldFacade->get<FogModeTag>()+
+                throw RendererException(string("World Fog Mode :'") + theWorld->get<FogModeTag>()+
                             "' unknown", PLUS_FILE_LINE);
         }
-        glFogfv(GL_FOG_COLOR, &(myWorldFacade->get<FogColorTag>()[0]));
+        glFogfv(GL_FOG_COLOR, &(theWorld->get<FogColorTag>()[0]));
         glHint(GL_FOG_HINT, GL_DONT_CARE);
         glEnable(GL_FOG);
     }
@@ -1578,15 +1581,16 @@ namespace y60 {
     }
 
     void
-    Renderer::renderSkyBox(const Viewport & theViewport, CameraPtr theCamera) { 
+    Renderer::renderSkyBox(const Viewport & theViewport, CameraPtr theCamera) {
         MAKE_GL_SCOPE_TIMER(renderSkyBox);
         if (_myRenderedUnderlays) {
             return;
         }
 
         // Get Material
-        const dom::NodePtr & myWorldNode = _myScene->getWorldRoot();
+        const dom::NodePtr myWorldNode = theCamera->getWorld();
         WorldFacadePtr myWorld = myWorldNode->getFacade<WorldFacade>();
+
         if (myWorld->get<SkyBoxMaterialTag>().size() == 0) {
             return;
         }

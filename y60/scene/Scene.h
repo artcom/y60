@@ -306,6 +306,9 @@ namespace y60 {
 
             float getWorldSize(const dom::NodePtr & theActiveCamera) const;
 
+            dom::NodePtr getWorldsRoot();
+            const dom::NodePtr getWorldsRoot() const;
+
             dom::NodePtr getWorldRoot();
             const dom::NodePtr getWorldRoot() const;
 
@@ -427,7 +430,7 @@ namespace y60 {
             //void loadMaterial(dom::NodePtr theMaterialNode);
             //void reloadMaterial(dom::NodePtr theMaterialNode, MaterialBasePtr theMaterial);
             //void rebindMaterials();            
-            void loadAnimations();
+            void loadAnimations(dom::NodePtr theWorld);
             //void updateMaterials();
 
             void collectReferences(dom::NodePtr theNode, std::set<std::string> & theReferences);
