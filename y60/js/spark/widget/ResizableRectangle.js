@@ -48,7 +48,7 @@ spark.ResizableRectangle.Constructor = function(Protected) {
 
         _myVertices = _myShape.find(".//*[@name='position']").firstChild.nodeValue;
         
-        var myBody  = Modelling.createBody(Public.parent.sceneNode, _myShape.id);
+        var myBody  = Modelling.createBody(Public.parent.innerSceneNode, _myShape.id);
         if(Public.name) {
             myBody.name = Public.name;
         } else {
@@ -78,6 +78,7 @@ spark.ResizableRectangle.Constructor = function(Protected) {
             _myHeight = h;
         }
     }
+    
     Public.size getter = function() { return new Vector2f(_myWidth, _myHeight);}
     Public.size setter = function(s) {
         Public.width = s.x;

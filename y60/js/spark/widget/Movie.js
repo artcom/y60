@@ -118,7 +118,7 @@ spark.Movie.Constructor = function(Protected) {
         
         _myInitialSize = mySize;
 
-        var myBody  = Modelling.createBody(Public.parent.sceneNode, _myShape.id);
+        var myBody  = Modelling.createBody(Public.parent.innerSceneNode, _myShape.id);
         myBody.name = Public.name;
 	
         var myInitialPlaymode = Protected.getString("playmode", "stop");

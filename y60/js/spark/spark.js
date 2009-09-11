@@ -120,4 +120,5 @@ if (!("disableSparkWidgets" in this)) {
     use("spark/widget/Movie.js");
     use("spark/widget/NewMovie.js");
     use("spark/widget/NewText.js");
+    use("spark/widget/Canvas.js");
 }

@@ -77,6 +77,11 @@ spark.Widget.Constructor = function(Protected) {
     Public.sceneNode getter = function() {
         return _mySceneNode;
     };
+    
+    // XXX: try to get rid of this.
+    Public.innerSceneNode getter = function() {
+        return _mySceneNode;
+    };
 
     // XXX: function for getting screen-aligned bounds
     Public.worldposition getter = function() {
