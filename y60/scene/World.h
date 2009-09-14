@@ -73,7 +73,7 @@ namespace y60 {
 	DEFINE_ATTRIBUTE_TAG(FogRangeTag,         asl::Vector2f,    FOGRANGE_ATTRIB,          asl::Vector2f(0, 1), Y60_SCENE_DECL);
 	DEFINE_ATTRIBUTE_TAG(FogDensityTag,       float,            FOGDENSITY_ATTRIB,        1, Y60_SCENE_DECL);
 
-	class WorldFacade :
+	class World :
 		public TransformHierarchyFacade,
 		public SkyBoxMaterialTag::Plug,
 		public LodScaleTag::Plug,
@@ -83,7 +83,7 @@ namespace y60 {
 		public FogDensityTag::Plug
 	{
 		public:
-			WorldFacade(dom::Node & theNode) :
+			World(dom::Node & theNode) :
 				TransformHierarchyFacade(theNode),
 				SkyBoxMaterialTag::Plug(theNode),
 				LodScaleTag::Plug(theNode),
@@ -92,10 +92,10 @@ namespace y60 {
 				FogRangeTag::Plug(theNode),
 				FogDensityTag::Plug(theNode)
 		{}
-		IMPLEMENT_FACADE(WorldFacade);
+		IMPLEMENT_FACADE(World);
 	};
 
-	typedef asl::Ptr<WorldFacade, dom::ThreadingModel> WorldFacadePtr;
+	typedef asl::Ptr<World, dom::ThreadingModel> WorldPtr;
 
 }
 

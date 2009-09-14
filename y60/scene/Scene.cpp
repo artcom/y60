@@ -1055,7 +1055,7 @@ namespace y60 {
     Scene::getWorldSize(const NodePtr & theActiveCamera) const {
         AC_TRACE << "getWorldSize()";
         CameraPtr myCameraFacade = theActiveCamera->getFacade<Camera>();
-        WorldFacadePtr myWorldFacade = myCameraFacade->getWorld()->getFacade<WorldFacade>();
+        WorldPtr myWorldFacade = myCameraFacade->getWorld()->getFacade<World>();
         asl::Box3f myWorldBox = myWorldFacade->get<BoundingBoxTag>();
         
         asl::Matrix4f myCameraMatrix = myCameraFacade->get<GlobalMatrixTag>();

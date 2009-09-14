@@ -210,7 +210,7 @@ namespace y60 {
             /// restore from immediate draw
             void postDraw();
 
-            void enableFog(WorldFacadePtr & theWorld);
+            void enableFog(WorldPtr & theWorld);
             void enableVisibleLights();
             void enableLight(y60::LightPtr & theLight, int theActiveLightIndex);
             void renderSkyBox(const Viewport & theViewport, y60::CameraPtr theCamera);

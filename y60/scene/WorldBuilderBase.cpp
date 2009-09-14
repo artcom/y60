@@ -85,7 +85,7 @@ namespace y60 {
             bool myVisible = true;
             getNode()->appendAttribute(VISIBLE_ATTRIB, myVisible);
         } else {
-            WorldFacadePtr myWorld = getNode()->getFacade<WorldFacade>();
+            WorldPtr myWorld = getNode()->getFacade<World>();
             myWorld->set<VisibleTag>(true);
         }
     }

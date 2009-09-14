@@ -94,7 +94,7 @@ namespace y60 {
 
     inline void registerSceneFacades(dom::FacadeFactoryPtr theFactory) {
         theFactory->registerPrototype(SCENE_ROOT_NAME, dom::FacadePtr(new Scene(dom::Node::Prototype)));
-        theFactory->registerPrototype(WORLD_NODE_NAME, dom::FacadePtr(new WorldFacade(dom::Node::Prototype)));
+        theFactory->registerPrototype(WORLD_NODE_NAME, dom::FacadePtr(new World(dom::Node::Prototype)));
         theFactory->registerPrototype(BODY_NODE_NAME, dom::FacadePtr(new Body(dom::Node::Prototype)));
         theFactory->registerPrototype(TRANSFORM_NODE_NAME, dom::FacadePtr(new TransformFacade(dom::Node::Prototype)));
         theFactory->registerPrototype(LOD_NODE_NAME, dom::FacadePtr(new LodFacade(dom::Node::Prototype)));

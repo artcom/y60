@@ -964,8 +964,8 @@ namespace y60 {
         }
 
         // apply lodscale
-        WorldFacadePtr myWorldFacade = myLodFacade->getWorld()->getFacade<WorldFacade>();
-        float myMetric = myDistance * myWorldFacade->get<LodScaleTag>() * myZoomAdjustment;
+        WorldPtr myWorld = myLodFacade->getWorld()->getFacade<World>();
+        float myMetric = myDistance * myWorld->get<LodScaleTag>() * myZoomAdjustment;
 
         const VectorOfFloat & myRanges = myLodFacade->get<RangesTag>();
         if (theNode->childNodesLength() == 1) {
@@ -1281,7 +1281,7 @@ namespace y60 {
                     CHECK_OGL_ERROR;
 
                 // (6) enable fog
-                    WorldFacadePtr myWorldFacade = myWorld->getFacade<WorldFacade>();
+                    WorldPtr myWorldFacade = myWorld->getFacade<World>();
                     enableFog(myWorldFacade);
                     CHECK_OGL_ERROR;
 
@@ -1514,7 +1514,7 @@ namespace y60 {
     }
 
     void
-    Renderer::enableFog(WorldFacadePtr & theWorld) {
+    Renderer::enableFog(WorldPtr & theWorld) {
         MAKE_GL_SCOPE_TIMER(Renderer_enableFog);
         const string & myFogModeString = theWorld->get<FogModeTag>();
         if (myFogModeString.size() == 0) {
@@ -1589,7 +1589,7 @@ namespace y60 {
 
         // Get Material
         const dom::NodePtr myWorldNode = theCamera->getWorld();
-        WorldFacadePtr myWorld = myWorldNode->getFacade<WorldFacade>();
+        WorldPtr myWorld = myWorldNode->getFacade<World>();
 
         if (myWorld->get<SkyBoxMaterialTag>().size() == 0) {
             return;
