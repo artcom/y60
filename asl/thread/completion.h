@@ -1,5 +1,5 @@
-#ifndef ASL_THREAD_CONCURRENT_QUEUE_H_
-#define ASL_THREAD_CONCURRENT_QUEUE_H_
+#ifndef ASL_THREAD_COMPLETION_H_
+#define ASL_THREAD_COMPLETION_H_
 
 #include <boost/thread.hpp>
 
@@ -56,4 +56,4 @@ public:
 }
 }
 
-#endif // !ASL_THREAD_CONCURRENT_QUEUE_H_
+#endif // !ASL_THREAD_COMPLETION_H_
