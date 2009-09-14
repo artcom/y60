@@ -192,7 +192,7 @@ main(int argc, char **argv) {
         }
 
         if (SDL_Init(SDL_INIT_NOPARACHUTE) == -1) { // prevents SDL from catching fatal signals
-            AC_FATAL << SDL_GetError() << endl;
+            AC_FATAL << "Could not initialize SDL: " << SDL_GetError() << endl;
             rv = EXIT_FAILURE;
         } else {
             myApp.setProgramName(ourArguments.getProgramName());
