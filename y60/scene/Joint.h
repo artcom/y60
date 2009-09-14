@@ -1,0 +1,118 @@
+/* __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
+//
+// Copyright (C) 1993-2008, ART+COM AG Berlin, Germany <www.artcom.de>
+//
+// These coded instructions, statements, and computer programs contain
+// proprietary information of ART+COM AG Berlin, and are copy protected
+// by law. They may be used, modified and redistributed under the terms
+// of GNU General Public License referenced below.
+//
+// Alternative licensing without the obligations of the GPL is
+// available upon request.
+//
+// GPL v3 Licensing:
+//
+// This file is part of the ART+COM Y60 Platform.
+//
+// ART+COM Y60 is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// ART+COM Y60 is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
+// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
+//
+// Description: TODO
+//
+// Last Review: NEVER, NOONE
+//
+//  review status report: (perfect, ok, fair, poor, disaster, notapplicable, unknown)
+//    usefullness            : unknown
+//    formatting             : unknown
+//    documentation          : unknown
+//    test coverage          : unknown
+//    names                  : unknown
+//    style guide conformance: unknown
+//    technical soundness    : unknown
+//    dead code              : unknown
+//    readability            : unknown
+//    understandabilty       : unknown
+//    interfaces             : unknown
+//    confidence             : unknown
+//    integration            : unknown
+//    dependencies           : unknown
+//    cheesyness             : unknown
+//
+//    overall review status  : unknown
+//
+//    recommendations:
+//       - unknown
+// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
+*/
+
+#ifndef _scene_Joint_h_
+#define _scene_Joint_h_
+
+#include "y60_scene_settings.h"
+
+#include "TransformHierarchyFacade.h"
+
+namespace y60 {
+
+    //                   theTagName           theType           theAttributeName               theDefault
+    DEFINE_ATTRIBUTE_TAG(JointOrientationTag, asl::Quaternionf, JOINT_ORIENTATION_ATTRIB, asl::Quaternionf(0,0,0,1), Y60_SCENE_DECL);
+
+    typedef asl::Ptr<TransformFacade, dom::ThreadingModel> TransformFacadePtr;
+
+    class JointFacade :
+        public TransformHierarchyFacade,
+        public JointOrientationTag::Plug
+    {
+    public:
+        JointFacade(dom::Node & theNode) :
+            TransformHierarchyFacade(theNode),
+            JointOrientationTag::Plug(theNode)
+        {}
+
+        IMPLEMENT_FACADE(JointFacade);
+
+        void registerDependenciesRegistrators() {
+            TransformHierarchyFacade::registerDependenciesRegistrators();
+            LocalMatrixTag::Plug::setReconnectFunction(&JointFacade::registerDependenciesForLocalMatrix);
+        }
+
+        void registerDependenciesForLocalMatrix() {
+            dom::Node & myNode = getNode();
+            if (myNode) {
+                // local matrix
+                TransformHierarchyFacade::registerDependenciesForLocalMatrix();
+                LocalMatrixTag::Plug::dependsOn<JointOrientationTag>(*this);
+
+                LocalMatrixTag::Plug::setCalculatorFunction(&JointFacade::recalculateLocalMatrix);
+            }
+        }
+
+    protected:
+        void recalculateLocalMatrix() {
+            asl::Matrix4f myMatrix = asl::Matrix4f::Identity();
+            myMatrix.scale(get<ScaleTag>());
+            myMatrix.translate(-get<PivotTag>());
+            asl::Matrix4f myRotation(get<OrientationTag>());
+            myMatrix.postMultiply(myRotation);
+            asl::Matrix4f myJointRotation(get<JointOrientationTag>());
+            myMatrix.postMultiply(myJointRotation);
+            myMatrix.translate(get<PositionTag>() + get<PivotTag>());
+            set<LocalMatrixTag>(myMatrix);
+        }
+    };
+    typedef asl::Ptr<JointFacade, dom::ThreadingModel> JointFacadePtr;
+
+}
+
+#endif

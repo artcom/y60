@@ -79,6 +79,9 @@
 #include "Texture.h"
 #include "Record.h"
 #include "Primitive.h"
+#include "Transform.h"
+#include "World.h"
+#include "Joint.h"
 
 #include <y60/image/Image.h>
 #include <y60/video/Movie.h>
@@ -88,95 +91,6 @@
 #include <asl/math/Matrix4.h>
 
 namespace y60 {
-
-    //                  theTagName           theType           theAttributeName               theDefault
-    DEFINE_ATTRIBUTE_TAG(SkyBoxMaterialTag,   std::string,      SKYBOX_MATERIAL_ATTRIB,   "", Y60_SCENE_DECL);
-    DEFINE_ATTRIBUTE_TAG(LodScaleTag,         float,            LODSCALE_ATTRIB,          1, Y60_SCENE_DECL);
-    DEFINE_ATTRIBUTE_TAG(FogModeTag,          std::string,      FOGMODE_ATTRIB,           "", Y60_SCENE_DECL);
-    DEFINE_ATTRIBUTE_TAG(FogColorTag,         asl::Vector4f,    FOGCOLOR_ATTRIB,          asl::Vector4f(0,0,0,0), Y60_SCENE_DECL);
-    DEFINE_ATTRIBUTE_TAG(FogRangeTag,         asl::Vector2f,    FOGRANGE_ATTRIB,          asl::Vector2f(0, 1), Y60_SCENE_DECL);
-    DEFINE_ATTRIBUTE_TAG(FogDensityTag,       float,            FOGDENSITY_ATTRIB,        1, Y60_SCENE_DECL);
-
-    class WorldFacade :
-        public TransformHierarchyFacade,
-        public SkyBoxMaterialTag::Plug,
-        public LodScaleTag::Plug,
-        public FogModeTag::Plug,
-        public FogColorTag::Plug,
-        public FogRangeTag::Plug,
-        public FogDensityTag::Plug
-    {
-        public:
-            WorldFacade(dom::Node & theNode) :
-                TransformHierarchyFacade(theNode),
-                SkyBoxMaterialTag::Plug(theNode),
-                LodScaleTag::Plug(theNode),
-                FogModeTag::Plug(theNode),
-                FogColorTag::Plug(theNode),
-                FogRangeTag::Plug(theNode),
-                FogDensityTag::Plug(theNode)
-        {}
-        IMPLEMENT_FACADE(WorldFacade);
-    };
-
-    typedef asl::Ptr<WorldFacade, dom::ThreadingModel> WorldFacadePtr;
-
-    class TransformFacade :
-        public TransformHierarchyFacade
-    {
-    public:
-        TransformFacade(dom::Node & theNode) : TransformHierarchyFacade(theNode) {}
-        IMPLEMENT_FACADE(TransformFacade);
-    };
-
-
-    //                  theTagName           theType           theAttributeName               theDefault
-    DEFINE_ATTRIBUTE_TAG(JointOrientationTag, asl::Quaternionf, JOINT_ORIENTATION_ATTRIB, asl::Quaternionf(0,0,0,1), Y60_SCENE_DECL);
-
-    typedef asl::Ptr<TransformFacade, dom::ThreadingModel> TransformFacadePtr;
-
-    class JointFacade :
-        public TransformHierarchyFacade,
-        public JointOrientationTag::Plug
-    {
-    public:
-        JointFacade(dom::Node & theNode) :
-            TransformHierarchyFacade(theNode),
-            JointOrientationTag::Plug(theNode)
-        {}
-
-        IMPLEMENT_FACADE(JointFacade);
-
-        void registerDependenciesRegistrators() {
-            TransformHierarchyFacade::registerDependenciesRegistrators();
-            LocalMatrixTag::Plug::setReconnectFunction(&JointFacade::registerDependenciesForLocalMatrix);
-        }
-
-        void registerDependenciesForLocalMatrix() {
-            dom::Node & myNode = getNode();
-            if (myNode) {
-                // local matrix
-                TransformHierarchyFacade::registerDependenciesForLocalMatrix();
-                LocalMatrixTag::Plug::dependsOn<JointOrientationTag>(*this);
-
-                LocalMatrixTag::Plug::setCalculatorFunction(&JointFacade::recalculateLocalMatrix);
-            }
-        }
-
-    protected:
-        void recalculateLocalMatrix() {
-            asl::Matrix4f myMatrix = asl::Matrix4f::Identity();
-            myMatrix.scale(get<ScaleTag>());
-            myMatrix.translate(-get<PivotTag>());
-            asl::Matrix4f myRotation(get<OrientationTag>());
-            myMatrix.postMultiply(myRotation);
-            asl::Matrix4f myJointRotation(get<JointOrientationTag>());
-            myMatrix.postMultiply(myJointRotation);
-            myMatrix.translate(get<PositionTag>() + get<PivotTag>());
-            set<LocalMatrixTag>(myMatrix);
-        }
-    };
-    typedef asl::Ptr<JointFacade, dom::ThreadingModel> JointFacadePtr;
 
     inline void registerSceneFacades(dom::FacadeFactoryPtr theFactory) {
         theFactory->registerPrototype(SCENE_ROOT_NAME, dom::FacadePtr(new Scene(dom::Node::Prototype)));
@@ -215,23 +129,6 @@ namespace y60 {
         theFactory->registerPrototype(VECTOR_NODE_NAME, dom::FacadePtr(new Vector(dom::Node::Prototype)));
     }
 
-/*
-    template <class T>
-    inline asl::Ptr<T, dom::ThreadingModel>
-    createFacade(dom::NodePtr theParent) {
-        dom::NodePtr myNode = theParent.appendChild(dom::NodePtr(new dom::Element(T::name)));
-        return myNode->getFacade<T>();
-    }
-
-    template <class Body>
-    inline asl::Ptr<Body, dom::ThreadingModel>
-    createFacade(dom::NodePtr theParent, const std::string & theShapeId) {
-        dom::NodePtr myNode = dom::NodePtr(new dom::Element(Body::name()));
-        myNode.appendAttribute(BODY_SHAPE_ATTRIB, theShapeId);
-        myNode = theParent->appendChild(myNode);
-        return myNode->getFacade<Body>();
-    }
-    */
 }
 
 #endif

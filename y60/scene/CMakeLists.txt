@@ -71,6 +71,7 @@ ISceneDecoder.h
 IShader.h
 ImageBuilder.h
 IncludeFacade.h
+Joint.h
 JointBuilder.h
 Light.h
 LightBuilder.h
@@ -98,6 +99,7 @@ TextureBuilder.h
 TextureManager.h
 TextureTags.h
 TextureUnit.h
+Transform.h
 TransformBuilder.h
 TransformBuilderBase.h
 TransformHierarchyFacade.h
@@ -105,6 +107,7 @@ VertexData.h
 VertexDataImpl.h
 VertexMemoryBase.h
 Viewport.h
+World.h
 WorldBuilder.h
 WorldBuilderBase.h
 Y60Decoder.h
