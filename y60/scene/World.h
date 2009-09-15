@@ -62,6 +62,9 @@
 #include "y60_scene_settings.h"
 
 #include "TransformHierarchyFacade.h"
+#include "Light.h"
+
+#include <asl/xpath/xpath_api.h>
 
 namespace y60 {
 
@@ -92,7 +95,23 @@ namespace y60 {
 				FogRangeTag::Plug(theNode),
 				FogDensityTag::Plug(theNode)
 		{}
+
 		IMPLEMENT_FACADE(World);
+
+        const LightVector & getLights() const {
+            return _myLights;
+        }
+
+        void updateLights() {
+        	_myLights.clear();
+        	xpath::NodeList myLightNodes = xpath::findAll(xpath::Path(std::string(".//") + LIGHT_NODE_NAME), getNode().self().lock());
+        	for(xpath::NodeList::size_type i = 0; i < myLightNodes.size(); i++) {
+        		dom::NodePtr myLightNode = myLightNodes[i];
+        		_myLights.push_back(myLightNode->getFacade<Light>());
+        	}
+        }
+
+        LightVector _myLights;
 	};
 
 	typedef asl::Ptr<World, dom::ThreadingModel> WorldPtr;

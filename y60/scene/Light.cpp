@@ -85,7 +85,7 @@ namespace y60 {
     }
 
     const LightSourcePtr 
-    Light::getLightSource() { 
+    Light::getLightSource() const {
         unsigned long long myCurrentVersion = getVersion<LightSourceTag>();
         if (_myLightSourceVersion != myCurrentVersion) {
             dom::NodePtr myLightSource = getNode().getElementById(get<LightSourceTag>());

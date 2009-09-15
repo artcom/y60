@@ -89,10 +89,10 @@ namespace y60 {
             IMPLEMENT_FACADE(Light);
 
             bool isHeadLight() const;
-            const LightSourcePtr getLightSource();
+            const LightSourcePtr getLightSource() const;
         private:
-            LightSourcePtr _myLightSource;
-            unsigned long long _myLightSourceVersion;
+            mutable LightSourcePtr _myLightSource;
+            mutable unsigned long long _myLightSourceVersion;
     };
 
     typedef asl::Ptr<Light, dom::ThreadingModel> LightPtr;

@@ -888,12 +888,14 @@ namespace y60 {
             MAKE_SCOPE_TIMER(updateWorld);
             Matrix4f myInitialMatrix;
             myInitialMatrix.makeIdentity();
-            _myLights.clear();
             //_myAnalyticGeometry.clear();
 
             NodePtr myWorlds = getWorldsRoot();
             for(unsigned i = 0; i < myWorlds->childNodesLength("world"); i++) {
-            	updateTransformHierachy(myWorlds->childNode("world", i));
+            	NodePtr myWorldNode = myWorlds->childNode("world", i);
+            	WorldPtr myWorldFacade = myWorldNode->getFacade<World>();
+            	myWorldFacade->updateLights();
+            	updateTransformHierachy(myWorldNode);
             }
         }
     }
@@ -1114,20 +1116,12 @@ namespace y60 {
         }
     }
 #else
-   void
-   Scene::updateLights() {
-        _myLights = getNode().getAllFacades<Light>(LIGHT_NODE_NAME);
-        AC_TRACE << "lights = "<< _myLights.size();
-        for (LightVector::size_type i = 0; i < _myLights.size();++i) {
-            AC_TRACE << "light["<<i<<"] = "<< _myLights[i]->getNode();
-        }
-    }
     void
     Scene::updateTransformHierachy(NodePtr theNode) {
       
         // TODO: This should be possibly done in a lazy fashion during rendering 
         std::vector<IncludeFacadePtr> myIncludes = theNode->getAllFacades<IncludeFacade>(INCLUDE_NODE_NAME);
-        AC_TRACE << "includes = "<< _myLights.size();
+        AC_TRACE << "includes = "<< myIncludes.size();
         for (unsigned i = 0; i < myIncludes.size();++i) {
             AC_TRACE << "includes["<<i<<"] = "<< myIncludes[i]->getNode();
             IncludeFacadePtr & myInclude = myIncludes[i];
@@ -1783,7 +1777,7 @@ namespace y60 {
     const Scene::Statistics
     Scene::getStatistics() const {
         Scene::Statistics myStatistics = _myStatistics;
-        myStatistics.lightCount     = _myLights.size();
+        myStatistics.lightCount     = -1; // XXX: _myLights.size();
         myStatistics.materialCount  =  getNode().childNode(MATERIAL_LIST_NAME)->childNodesLength();
         return myStatistics;
     }

@@ -352,6 +352,7 @@ namespace y60 {
         DBP(MAKE_GL_SCOPE_TIMER(renderBodyPart));
         DBP2(START_TIMER(renderBodyPart_pre));
 
+        const y60::World & myWorld = theBodyPart.getWorld();
         const y60::Body & myBody = theBodyPart.getBody();
         const y60::Shape & myShape = theBodyPart.getShape();
         bool myBodyHasChanged = (_myPreviousBody != &myBody);
@@ -421,7 +422,7 @@ namespace y60 {
             }
             if (myBodyHasChanged || myMaterialHasChanged) {
                 DBP2(MAKE_GL_SCOPE_TIMER(renderBodyPart_bindBodyParams));
-                myShader->bindBodyParams(myMaterial, theViewport, _myScene->getLights(), myBody, theCamera);
+                myShader->bindBodyParams(myMaterial, theViewport, myWorld.getLights(), myBody, theCamera);
                 CHECK_OGL_ERROR;
             }
         }
@@ -985,7 +986,9 @@ namespace y60 {
     }
 //#define DB(x) x
     void
-    Renderer::createRenderList(const dom::NodePtr & theNode, BodyPartMap & theBodyParts,
+    Renderer::createRenderList(const WorldPtr & theWorld,
+    		                   const dom::NodePtr & theNode,
+    		                   BodyPartMap & theBodyParts,
                                const CameraPtr theCamera,
                                const Matrix4f & theEyeSpaceTransform,
                                ViewportPtr theViewport,
@@ -1058,7 +1061,7 @@ namespace y60 {
         // Check for lodding
         if (theNode->nodeName() == LOD_NODE_NAME) {
             DBP(MAKE_GL_SCOPE_TIMER(createRenderList_lod));
-            createRenderList(getActiveLodChild(theNode, theCamera), theBodyParts,
+            createRenderList(theWorld, getActiveLodChild(theNode, theCamera), theBodyParts,
                     theCamera, theEyeSpaceTransform, theViewport, theOverlapFrustumFlag,
                     theClippingPlanes, theScissorBox);
             DB(AC_TRACE << "createRenderList: lod return";)
@@ -1099,7 +1102,7 @@ namespace y60 {
                     COUNT(OpaquePrimitives);
                 }
 
-                theBodyParts.insert(std::make_pair(myKey, BodyPart(myBody, myShape, myPrimitive, theClippingPlanes, theScissorBox)));
+                theBodyParts.insert(std::make_pair(myKey, BodyPart(*(theWorld),myBody, myShape, myPrimitive, theClippingPlanes, theScissorBox)));
             }
 
             COUNT(RenderedBodies);
@@ -1108,7 +1111,7 @@ namespace y60 {
         {
             DBP(MAKE_GL_SCOPE_TIMER(createRenderList_recurse));
             for (unsigned i = 0; i < theNode->childNodesLength(); ++i) {
-                createRenderList(theNode->childNode(i), theBodyParts, theCamera,
+                createRenderList(theWorld, theNode->childNode(i), theBodyParts, theCamera,
                         theEyeSpaceTransform, theViewport, myOverlapFrustumFlag,
                         theClippingPlanes, theScissorBox);
             }
@@ -1235,6 +1238,7 @@ namespace y60 {
             CHECK_OGL_ERROR;
 
             myWorld = myCamera->getWorld();
+            WorldPtr myWorldFacade = myWorld->getFacade<World>();
 
             if (theViewport->get<ViewportCullingTag>()) {
                 if (theViewport->get<ViewportDebugCullingTag>()) {
@@ -1263,7 +1267,7 @@ namespace y60 {
                     Matrix4f myEyeSpaceTransform = myCamera->get<InverseGlobalMatrixTag>();
                     asl::Box2f myScissorBox;
                     myScissorBox.makeFull();
-                    createRenderList(myWorld, myBodyParts, myCamera,
+                    createRenderList(myWorldFacade, myWorld, myBodyParts, myCamera,
                             myEyeSpaceTransform, theViewport, true, std::vector<asl::Planef>(),
                             myScissorBox);
                     DB(AC_TRACE << "created Renderlist, size = "<< myBodyParts.size()); 
@@ -1277,11 +1281,11 @@ namespace y60 {
                 bindViewMatrix(myCamera);
 
                 // (5) activate all visible lights
-                    enableVisibleLights();
+                    enableVisibleLights(myWorldFacade);
                     CHECK_OGL_ERROR;
 
                 // (6) enable fog
-                    WorldPtr myWorldFacade = myWorld->getFacade<World>();
+
                     enableFog(myWorldFacade);
                     CHECK_OGL_ERROR;
 
@@ -1315,6 +1319,9 @@ namespace y60 {
 
                 // turn fog off again
                 glDisable(GL_FOG);
+
+                // disable lights again
+                disableAllLights();
 
                 // (8) render analytic geometry
                 renderAnalyticGeometry( theViewport, myCamera );
@@ -1394,7 +1401,21 @@ namespace y60 {
     ///////////////////////////////////////////////////////////////////////////////////////////
 
     void
-    Renderer::enableVisibleLights() {
+    Renderer::disableAllLights() {
+        MAKE_GL_SCOPE_TIMER(disableAllLights);
+        static GLint myMaxLights = 0;
+        if (myMaxLights == 0) {
+            glGetIntegerv(GL_MAX_LIGHTS, &myMaxLights);
+        }
+
+        // Disable remaining lights
+        for (GLint i = 0; i < myMaxLights; ++i) {
+            glDisable(asGLLightEnum(i));
+        }
+    }
+
+    void
+    Renderer::enableVisibleLights(WorldPtr & theWorld) {
         MAKE_GL_SCOPE_TIMER(enableVisibleLights);
         static GLint myMaxLights = 0;
         if (myMaxLights == 0) {
@@ -1402,7 +1423,7 @@ namespace y60 {
         }
 
         int myActiveLightCount = 0;
-        LightVector & myLights = _myScene->getLights();
+        const LightVector & myLights = theWorld->getLights();
         DB(AC_TRACE << "enableVisibleLights: numlights=" << myLights.size());
         for (unsigned i = 0; i < myLights.size(); ++i) {
             DB(AC_TRACE << myLights[i]->getNode());
@@ -1430,7 +1451,7 @@ namespace y60 {
     }
 
     void
-    Renderer::enableLight(y60::LightPtr & theLight, int theActiveLightIndex) {
+    Renderer::enableLight(const y60::LightPtr & theLight, int theActiveLightIndex) {
         LightSourcePtr myLightSource = theLight->getLightSource();
 		LightPropertiesFacadePtr myLightPropFacade = myLightSource->getChild<LightPropertiesTag>();
 

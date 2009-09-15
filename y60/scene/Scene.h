@@ -268,10 +268,6 @@ namespace y60 {
             void saveSchema(const std::string & theFilename,
                             int theSchemaIndex, bool theBinaryFlag = false);
 
-            LightVector & getLights() {
-                updateLights();
-                return _myLights;
-            }
 #if 0
             std::vector<dom::NodePtr> & getAnalyticGeometry() {
                 return _myAnalyticGeometry;
@@ -418,7 +414,6 @@ namespace y60 {
 
             IShaderLibraryPtr getShaderLibrary() const;
         private:
-            void updateLights();
             void setSceneDom(dom::DocumentPtr theDocument);
             void updateReferences(dom::NodePtr theRootNode,
                 std::map<std::string, std::string> & theOldToNewIdMap);
@@ -461,7 +456,6 @@ namespace y60 {
             TextureManagerPtr        _myTextureManager;
             AnimationManager         _myAnimationManager;
 
-            LightVector               _myLights;
             //std::vector<dom::NodePtr> _myAnalyticGeometry;
 
             dom::DocumentPtr         _mySceneDom;

@@ -63,6 +63,7 @@
 
 #include <y60/scene/Body.h>
 #include <y60/scene/MaterialBase.h>
+#include <y60/scene/World.h>
 #include <y60/base/NodeNames.h>
 
 #include <asl/base/Dashboard.h>
@@ -129,16 +130,21 @@ namespace y60 {
                 const Body         * body;                
             };
 
-            BodyPart(const Body & theBodyPtr, const Shape & theShape, 
+            BodyPart(const World & theWorldPtr, const Body & theBodyPtr, const Shape & theShape,
                      const Primitive & thePrimitive,
                      const std::vector<asl::Planef> & theClippingPlanes,
                      const asl::Box2f & theScissorBox) :
+                _myWorld(theWorldPtr),
                 _myBody(theBodyPtr), 
                 _myShape(theShape),
                 _myPrimitive(thePrimitive), 
                 _myClippingPlanes(theClippingPlanes),
                 _myScissorBox(theScissorBox)
             {}
+
+            const y60::World & getWorld() const {
+            	return _myWorld;
+            }
 
             const y60::Body & getBody() const {
                 return _myBody;
@@ -160,6 +166,7 @@ namespace y60 {
                 return _myScissorBox;
             }
         private:
+            const World &            _myWorld;
             const Body &             _myBody;
             const Shape &            _myShape;
             const y60::Primitive &   _myPrimitive;

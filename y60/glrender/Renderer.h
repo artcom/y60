@@ -173,7 +173,9 @@ namespace y60 {
 
             dom::NodePtr getActiveLodChild(dom::NodePtr theNode, const y60::CameraPtr theCamera);
 
-            void createRenderList(const dom::NodePtr & theNode, BodyPartMap & theBodyParts,
+            void createRenderList(const WorldPtr & theWorld,
+								  const dom::NodePtr & theNode,
+								  BodyPartMap & theBodyParts,
                                   const y60::CameraPtr theCamera,
                                   const asl::Matrix4f & theEyeSpaceTransform,
                                   ViewportPtr theViewport,
@@ -211,8 +213,9 @@ namespace y60 {
             void postDraw();
 
             void enableFog(WorldPtr & theWorld);
-            void enableVisibleLights();
-            void enableLight(y60::LightPtr & theLight, int theActiveLightIndex);
+            void disableAllLights();
+            void enableVisibleLights(WorldPtr & theWorld);
+            void enableLight(const y60::LightPtr & theLight, int theActiveLightIndex);
             void renderSkyBox(const Viewport & theViewport, y60::CameraPtr theCamera);
             void drawNormals(const Primitive & thePrimitive, float theNormalScale);
 
