@@ -70,4 +70,4 @@ use("Animation/CompositeAnimation.js");
 use("Animation/ParallelAnimation.js");
 use("Animation/SequenceAnimation.js");
 use("Animation/DelayAnimation.js");
-
+use("Animation/QuaternionAnimation.js");
