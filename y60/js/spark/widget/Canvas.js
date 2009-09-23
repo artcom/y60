@@ -40,22 +40,24 @@ spark.Canvas.Constructor = function(Protected) {
     	
     	var myMaterial = Modelling.createUnlitTexturedMaterial(window.scene, myTexture);
     	
-    	var myWorld = Node.createElement("world");
-    	window.scene.worlds.appendChild(myWorld);
-    	_myWorld = myWorld;
+    	_myWorld = Node.createElement("world");
+    	window.scene.worlds.appendChild(_myWorld);
+        _myWorld.name = Public.name + "-world";
     	
     	var myCamera = Node.createElement("camera");
-    	myWorld.appendChild(myCamera);
+    	_myWorld.appendChild(myCamera);
     	
     	spark.setupCameraOrtho(myCamera, myWidth, myHeight);
 
     	var myCanvas = Node.createElement("canvas");
     	myCanvas.target = myTexture.id;
     	window.scene.canvases.appendChild(myCanvas);
+        myCanvas.name = Public.name + "-canvas";
     	
     	var myViewport = Node.createElement("viewport");
     	myViewport.camera = myCamera.id;
     	myCanvas.appendChild(myViewport);
+        myViewport.name = Public.name + "-viewport";
     	
     	_myRenderArea.setSceneAndCanvas(window.scene, myCanvas);
     	

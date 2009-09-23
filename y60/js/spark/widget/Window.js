@@ -48,7 +48,12 @@ spark.Window.Constructor = function(Protected) {
             window.swapInterval = myFixedDeltaT; 
         }
         
-        spark.setupCameraOrtho(window.scene.dom.find(".//camera"), window.width, window.height);
+        // mixed 2D/3D applications might want to keep the original frustum and manage
+        // the screenspace transformation themself. 
+        var mySetupFrustumFlag = Protected.getBoolean("setupFrustum", true);
+        if (mySetupFrustumFlag) {
+            spark.setupCameraOrtho(window.scene.dom.find(".//camera"), window.width, window.height);
+        }
         
         Protected.updateMouseButtonState(spark.Mouse.PRIMARY,   false);
         Protected.updateMouseButtonState(spark.Mouse.SECONDARY, false);
