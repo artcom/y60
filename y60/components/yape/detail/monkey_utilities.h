@@ -5,6 +5,9 @@
 
 #include Y60_APE_MONKEY_HEADER(jsapi.h)
 
+// for memset
+#include <string.h>
+
 #include <asl/base/begin_end.h>
 
 #include "ape_exceptions.h"
