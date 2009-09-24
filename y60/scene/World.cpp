@@ -58,6 +58,8 @@
 
 #include "World.h"
 
+#include <asl/xpath/xpath_api.h>
+
 namespace y60 {
 
 void

@@ -64,8 +64,6 @@
 #include "TransformHierarchyFacade.h"
 #include "Light.h"
 
-#include <asl/xpath/xpath_api.h>
-
 namespace y60 {
 
 	//                  theTagName           theType           theAttributeName               theDefault
