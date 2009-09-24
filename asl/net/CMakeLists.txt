@@ -1,7 +1,6 @@
 
 set(SOURCES
 address.cpp
-Hop.cpp
 INetEndpoint.cpp
 INetMonitor.cpp
 net.cpp
@@ -21,7 +20,6 @@ UDPSocket.cpp
 set(HEADERS
 address.h
 asl_net_settings.h
-Hop.h
 INetEndpoint.h
 INetMonitor.h
 net_functions.h
