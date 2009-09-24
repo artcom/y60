@@ -40,6 +40,7 @@ TransformBuilder.cpp
 TransformBuilderBase.cpp
 TransformHierarchyFacade.cpp
 Viewport.cpp
+World.cpp
 WorldBuilder.cpp
 WorldBuilderBase.cpp
 Y60Decoder.cpp
