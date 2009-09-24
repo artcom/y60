@@ -23,6 +23,14 @@
 #   undef check
 #endif
 
+// Undo GNU namespace pollution
+#ifdef major
+#   undef major
+#endif
+#ifdef minor
+#   undef minor
+#endif
+
 struct version {
     version(unsigned maj, unsigned min, unsigned pat,
             const char * xtra = 0) :
