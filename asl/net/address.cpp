@@ -70,7 +70,7 @@ namespace inet {
 
         int myResult = getHostName(hostaddr, myBuffer, sizeof(myBuffer));
         if (myResult != 0) {
-            throw SocketException(myResult, "getHostName");
+            throw SocketError(myResult, "getHostName");
         } else {
             return string(myBuffer);
         }
@@ -194,7 +194,7 @@ namespace inet {
 #endif            
             if (myHostEnt==0)
             {
-                throw SocketException("getHostAddress()");
+                throw SocketError(0, "getHostAddress()");
             }
             else
             {

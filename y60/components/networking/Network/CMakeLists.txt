@@ -3,11 +3,13 @@ set(SOURCES
 JSNetPlugIn.cpp
 JSSocket.cpp
 JSTCPServer.cpp
+JSFrameSocket.cpp
 )
 
 set(HEADERS
 JSSocket.h
 JSTCPServer.h
+JSFrameSocket.h
 y60_net_settings.h
 )
 

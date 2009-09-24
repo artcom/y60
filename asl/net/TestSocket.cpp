@@ -92,7 +92,6 @@ void TestSocket::testHostAddressMethods () {
         getHostAddress ("does.not.exist");
     }
     catch (SocketException & e) {
-        myErrCode = e.getErrorCode();
         cerr << e.what() << endl;
     }
     ENSURE (myErrCode = HOST_NOT_FOUND);
@@ -126,7 +125,6 @@ void TestSocket::testHostAddressMethods () {
         getHostName(unknownHostAddress);
     }
     catch (SocketException & e) {
-        myErrCode = e.getErrorCode();
         cerr << e.what() << endl;
     }
     ENSURE (myErrCode == HOST_NOT_FOUND ||

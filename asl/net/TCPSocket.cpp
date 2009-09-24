@@ -51,6 +51,7 @@ namespace inet {
         : Socket(thehost, theport)
     {
         open();
+        _myIsConnected = false;
     }
 
     TCPSocket::TCPSocket(int myFD, const INetEndpoint & localEndpoint,
@@ -60,6 +61,7 @@ namespace inet {
           _myLocalEndpoint = localEndpoint;
           _myRemoteEndpoint = remoteEndpoint;
           fd = myFD;
+          _myIsConnected = true;
     }
 
 

@@ -55,6 +55,8 @@
 #define SOCKET_ERROR -1
 #endif
 
+#include <fcntl.h>
+
 using namespace std;
 
 
@@ -72,18 +74,18 @@ namespace inet {
             if (theReusePortFlag) {
                 int myReuseSocketLen = sizeof(bool);
                 if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, (char*)&theReusePortFlag, myReuseSocketLen) == SOCKET_ERROR) {
-                    throw SocketException("TCPServer::TCPServer: can`t set already bound rcv socket to reuse.");
+                    throw SocketError(getLastSocketError(), "TCPServer::TCPServer: can`t set already bound rcv socket to reuse.");
                 }
 
                 if (bind(fd,(struct sockaddr*)&_myFromAddr,sizeof(_myFromAddr))<0 ) {
-                     throw SocketException("TCPServer::TCPServer: can`t bind rcv socket ");
+                     throw SocketError(getLastSocketError(), "TCPServer::TCPServer: can`t bind rcv socket ");
                 }
             } else {
-                throw SocketException("TCPServer::TCPServer: can`t bind socket, already is use.");
+                throw SocketError(getLastSocketError(), "TCPServer::TCPServer: can`t bind socket, already is use.");
             }
         }
         if (listen(fd,8)<0) {
-            throw SocketException("TCPServer::TCPServer: can`t listen ");
+            throw SocketError(getLastSocketError(), "TCPServer::TCPServer: can`t listen ");
         }
     }
 
@@ -114,7 +116,10 @@ namespace inet {
         remoteEndpointLen=sizeof(remoteEndpoint);
         int newFD;
         if ((newFD=accept(fd,(sockaddr *)&remoteEndpoint,&remoteEndpointLen))<0) {
-            SocketException("TCPServer::waitForConnection: can't accept connection");
+        	if(errno != EAGAIN && errno != EWOULDBLOCK) {
+        		throw SocketError(getLastSocketError(), "TCPServer::waitForConnection: can't accept connection");
+        	}
+            return 0;
         }
         TCPSocket * newSocket = new TCPSocket(newFD, _myFromAddr, remoteEndpoint);
 
@@ -125,5 +130,29 @@ namespace inet {
             AC_DEBUG << "from host " << myaddrstr << ',' << " port " << remoteEndpoint.sin_port << endl;
         }
         return newSocket;
+    }
+
+    void TCPServer::setBlockingMode(bool isBlocking) {
+#ifndef _WIN32
+        //    PrintStatus(fd);
+        long theFlag = O_NONBLOCK;
+        if (isBlocking) {
+            theFlag = 0;
+        }
+        if (fcntl(fd, F_SETFL, theFlag)== -1)
+        {
+            throw SocketError(getLastSocketError(), "Socket::setBlockingMode failed");
+        }
+#else
+        u_long theFlag = 1;
+        if (isBlocking) {
+            theFlag = 0;
+        }
+        int theRC = ioctlsocket(fd, FIONBIO, &theFlag);
+        if (theRC == SOCKET_ERROR) {
+            int err = getLastSocketError();
+            throw SocketException(err, "Socket::setBlockingMode failed");
+        }
+#endif
     }
 }

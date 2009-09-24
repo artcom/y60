@@ -42,6 +42,8 @@
 
 #include "asl_net_settings.h"
 
+#include <asl/base/Ptr.h>
+
 #include "SocketException.h"
 #include "INetEndpoint.h"
 #include "address.h"
@@ -75,6 +77,8 @@ class ASL_NET_DECL Socket {
         // at the end of testInet.tst under Linux64 in
         // non-debug mode; reason is not fully understood
         /*virtual*/ bool isValid() const { return (fd != -1); }
+
+        bool isConnected() const { return _myIsConnected; }
 
         virtual void close();
 
@@ -135,10 +139,15 @@ class ASL_NET_DECL Socket {
 
         int fd;
 
+        // XXX: hack for tcp socket disconnect
+        bool _myIsConnected;
+
     private:
 
         unsigned int _myTimeOut;
 };
+
+typedef asl::Ptr<Socket> SocketPtr;
 
 }
 #endif

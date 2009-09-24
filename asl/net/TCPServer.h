@@ -84,6 +84,8 @@ namespace inet {
             // @returns a new TCPSocket for each new connection
             TCPSocket* waitForConnection() const;
 
+            virtual void setBlockingMode(bool isBlocking);
+
             asl::Unsigned32 getHost() {
                 return _myHost;
             }

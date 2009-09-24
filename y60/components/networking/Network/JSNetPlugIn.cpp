@@ -58,6 +58,7 @@
 
 #include "JSSocket.h"
 #include "JSTCPServer.h"
+#include "JSFrameSocket.h"
 
 #include <asl/base/PlugInBase.h>
 #include <y60/jsbase/IScriptablePlugin.h>
@@ -71,6 +72,7 @@ namespace y60 {
     			JSObject *theGlobalObject) {
     			JSSocket::initClass(theContext, theGlobalObject);
     			JSTCPServer::initClass(theContext, theGlobalObject);
+    			JSFrameSocket::initClass(theContext, theGlobalObject);
     		}
 
     		const char * ClassName() {

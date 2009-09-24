@@ -57,17 +57,4 @@ using namespace std;
 
 namespace inet {
 
-
-    SocketException::SocketException(int theErrorCode, const std::string & where)
-        : asl::Exception(getSocketErrorMessage(theErrorCode), where, "inet::SocketException" ), 
-          _myErrorCode ( theErrorCode ) 
-    {
-    }
-    
-    SocketException::SocketException (const std::string & where)
-        : _myErrorCode (getLastSocketError())
-    {
-        set(getSocketErrorMessage(_myErrorCode), where, "inet::SocketException");
-    }
-
 }

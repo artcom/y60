@@ -61,7 +61,7 @@ namespace inet {
 
         if ( ::connect(fd,(struct sockaddr*)&_myRemoteEndpoint,sizeof(_myRemoteEndpoint)) != 0 ) {
             int err = getLastSocketError();
-            throw SocketException(err, "UDPConnection::Connect()");
+            throw SocketError(err, "UDPConnection::Connect()");
         }
         return true;
     }

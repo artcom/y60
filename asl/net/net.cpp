@@ -102,75 +102,75 @@ namespace inet {
     // Note that this list must remain sorted by the error constants'
     // values, because we do a binary search on the list when looking up
     // items.
-    struct SocketError {
+    struct SocketErrorString {
         int ID;
         const char* Message;
 
-        SocketError(int id, const char* msg = 0) : 
+        SocketErrorString(int id, const char* msg = 0) :
             ID(id), 
             Message(msg) 
         { 
         }
 
-        bool operator<(const SocketError& rhs) const {
+        bool operator<(const SocketErrorString& rhs) const {
             return ID < rhs.ID;
         }
     };
 
 #ifdef _WIN32
-    SocketError SocketErrorList[] = {
-        SocketError(0,                  "No error"),
-        SocketError(WSAEINTR,           "Interrupted system call"),
-        SocketError(WSAEBADF,           "Bad file number"),
-        SocketError(WSAEACCES,          "Permission denied"),
-        SocketError(WSAEFAULT,          "Bad address"),
-        SocketError(WSAEINVAL,          "Invalid argument"),
-        SocketError(WSAEMFILE,          "Too many open sockets"),
-        SocketError(WSAEWOULDBLOCK,     "Operation would block"),
-        SocketError(WSAEINPROGRESS,     "Operation now in progress"),
-        SocketError(WSAEALREADY,        "Operation already in progress"),
-        SocketError(WSAENOTSOCK,        "Socket operation on non-socket"),
-        SocketError(WSAEDESTADDRREQ,    "Destination address required"),
-        SocketError(WSAEMSGSIZE,        "Message too long"),
-        SocketError(WSAEPROTOTYPE,      "Protocol wrong type for socket"),
-        SocketError(WSAENOPROTOOPT,     "Bad protocol option"),
-        SocketError(WSAEPROTONOSUPPORT, "Protocol not supported"),
-        SocketError(WSAESOCKTNOSUPPORT, "Socket type not supported"),
-        SocketError(WSAEOPNOTSUPP,      "Operation not supported on socket"),
-        SocketError(WSAEPFNOSUPPORT,    "Protocol family not supported"),
-        SocketError(WSAEAFNOSUPPORT,    "Address family not supported"),
-        SocketError(WSAEADDRINUSE,      "Address already in use"),
-        SocketError(WSAEADDRNOTAVAIL,   "Can't assign requested address"),
-        SocketError(WSAENETDOWN,        "Network is down"),
-        SocketError(WSAENETUNREACH,     "Network is unreachable"),
-        SocketError(WSAENETRESET,       "Net connection reset"),
-        SocketError(WSAECONNABORTED,    "Software caused connection abort"),
-        SocketError(WSAECONNRESET,      "Connection reset by peer"),
-        SocketError(WSAENOBUFS,         "No buffer space available"),
-        SocketError(WSAEISCONN,         "Socket is already connected"),
-        SocketError(WSAENOTCONN,        "Socket is not connected"),
-        SocketError(WSAESHUTDOWN,       "Can't send after socket shutdown"),
-        SocketError(WSAETOOMANYREFS,    "Too many references, can't splice"),
-        SocketError(WSAETIMEDOUT,       "Connection timed out"),
-        SocketError(WSAECONNREFUSED,    "Connection refused"),
-        SocketError(WSAELOOP,           "Too many levels of symbolic links"),
-        SocketError(WSAENAMETOOLONG,    "File name too long"),
-        SocketError(WSAEHOSTDOWN,       "Host is down"),
-        SocketError(WSAEHOSTUNREACH,    "No route to host"),
-        SocketError(WSAENOTEMPTY,       "Directory not empty"),
-        SocketError(WSAEPROCLIM,        "Too many processes"),
-        SocketError(WSAEUSERS,          "Too many users"),
-        SocketError(WSAEDQUOT,          "Disc quota exceeded"),
-        SocketError(WSAESTALE,          "Stale NFS file handle"),
-        SocketError(WSAEREMOTE,         "Too many levels of remote in path"),
-        SocketError(WSASYSNOTREADY,     "Network system is unavailable"),
-        SocketError(WSAVERNOTSUPPORTED, "Winsock version out of range"),
-        SocketError(WSANOTINITIALISED,  "WSAStartup not yet called"),
-        SocketError(WSAEDISCON,         "Graceful shutdown in progress"),
-        SocketError(WSAHOST_NOT_FOUND,  "Host not found"),
-        SocketError(WSANO_DATA,         "No host data of that type was found")
+    SocketErrorMessage SocketErrorList[] = {
+        SocketErrorString(0,                  "No error"),
+        SocketErrorString(WSAEINTR,           "Interrupted system call"),
+        SocketErrorString(WSAEBADF,           "Bad file number"),
+        SocketErrorString(WSAEACCES,          "Permission denied"),
+        SocketErrorString(WSAEFAULT,          "Bad address"),
+        SocketErrorString(WSAEINVAL,          "Invalid argument"),
+        SocketErrorString(WSAEMFILE,          "Too many open sockets"),
+        SocketErrorString(WSAEWOULDBLOCK,     "Operation would block"),
+        SocketErrorString(WSAEINPROGRESS,     "Operation now in progress"),
+        SocketErrorString(WSAEALREADY,        "Operation already in progress"),
+        SocketErrorString(WSAENOTSOCK,        "Socket operation on non-socket"),
+        SocketErrorString(WSAEDESTADDRREQ,    "Destination address required"),
+        SocketErrorString(WSAEMSGSIZE,        "Message too long"),
+        SocketErrorString(WSAEPROTOTYPE,      "Protocol wrong type for socket"),
+        SocketErrorString(WSAENOPROTOOPT,     "Bad protocol option"),
+        SocketErrorString(WSAEPROTONOSUPPORT, "Protocol not supported"),
+        SocketErrorString(WSAESOCKTNOSUPPORT, "Socket type not supported"),
+        SocketErrorString(WSAEOPNOTSUPP,      "Operation not supported on socket"),
+        SocketErrorString(WSAEPFNOSUPPORT,    "Protocol family not supported"),
+        SocketErrorString(WSAEAFNOSUPPORT,    "Address family not supported"),
+        SocketErrorString(WSAEADDRINUSE,      "Address already in use"),
+        SocketErrorString(WSAEADDRNOTAVAIL,   "Can't assign requested address"),
+        SocketErrorString(WSAENETDOWN,        "Network is down"),
+        SocketErrorString(WSAENETUNREACH,     "Network is unreachable"),
+        SocketErrorString(WSAENETRESET,       "Net connection reset"),
+        SocketErrorString(WSAECONNABORTED,    "Software caused connection abort"),
+        SocketErrorString(WSAECONNRESET,      "Connection reset by peer"),
+        SocketErrorString(WSAENOBUFS,         "No buffer space available"),
+        SocketErrorString(WSAEISCONN,         "Socket is already connected"),
+        SocketErrorString(WSAENOTCONN,        "Socket is not connected"),
+        SocketErrorString(WSAESHUTDOWN,       "Can't send after socket shutdown"),
+        SocketErrorString(WSAETOOMANYREFS,    "Too many references, can't splice"),
+        SocketErrorString(WSAETIMEDOUT,       "Connection timed out"),
+        SocketErrorString(WSAECONNREFUSED,    "Connection refused"),
+        SocketErrorString(WSAELOOP,           "Too many levels of symbolic links"),
+        SocketErrorString(WSAENAMETOOLONG,    "File name too long"),
+        SocketErrorString(WSAEHOSTDOWN,       "Host is down"),
+        SocketErrorString(WSAEHOSTUNREACH,    "No route to host"),
+        SocketErrorString(WSAENOTEMPTY,       "Directory not empty"),
+        SocketErrorString(WSAEPROCLIM,        "Too many processes"),
+        SocketErrorString(WSAEUSERS,          "Too many users"),
+        SocketErrorString(WSAEDQUOT,          "Disc quota exceeded"),
+        SocketErrorString(WSAESTALE,          "Stale NFS file handle"),
+        SocketErrorString(WSAEREMOTE,         "Too many levels of remote in path"),
+        SocketErrorString(WSASYSNOTREADY,     "Network system is unavailable"),
+        SocketErrorString(WSAVERNOTSUPPORTED, "Winsock version out of range"),
+        SocketErrorString(WSANOTINITIALISED,  "WSAStartup not yet called"),
+        SocketErrorString(WSAEDISCON,         "Graceful shutdown in progress"),
+        SocketErrorString(WSAHOST_NOT_FOUND,  "Host not found"),
+        SocketErrorString(WSANO_DATA,         "No host data of that type was found")
     };
-    const int NumMessages = sizeof(SocketErrorList) / sizeof(SocketError);
+    const int NumMessages = sizeof(SocketErrorList) / sizeof(SocketErrorString);
 #endif
 
     string 
@@ -182,9 +182,9 @@ namespace inet {
         // Tack appropriate canned message onto end of supplied message 
         // prefix. Note that we do a binary search here: gaErrorList must be
         // sorted by the error constant's value.
-        SocketError* End = SocketErrorList + NumMessages;
-        SocketError Target(ErrorID);
-        SocketError* it = lower_bound(SocketErrorList, End, Target);
+        SocketErrorString* End = SocketErrorList + NumMessages;
+        SocketErrorString Target(ErrorID);
+        SocketErrorString* it = lower_bound(SocketErrorList, End, Target);
         if ((it != End) && (it->ID == Target.ID)) {
             ErrorStr = it->Message;
         }

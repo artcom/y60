@@ -71,7 +71,7 @@ namespace inet {
         
         if( ::connect(fd,(struct sockaddr*)&_myRemoteEndpoint,sizeof(_myRemoteEndpoint)) != 0 ) {
             int err = getLastSocketError();
-            throw SocketException(err, "TCPClientSocket::ConnectSocket()");
+            throw SocketError(err, "TCPClientSocket::ConnectSocket()");
         }
     }
 

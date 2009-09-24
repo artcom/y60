@@ -44,7 +44,10 @@
 #include "asl_net_settings.h"
 
 #include <string>
+
 #include <asl/base/Exception.h>
+
+#include "net.h"
 
 #ifdef _WIN32
 #include <winsock2.h>
@@ -56,22 +59,31 @@
 
 namespace inet {
 
+typedef int SocketErrorCode;
+
 class SocketException : public asl::Exception
 {
-public:
-    SocketException (const std::string & where);
- 
-    SocketException (int theErrorCode, const std::string & where);
- 
-    SocketException (int theErrorCode, const std::string & what, const std::string & where) : 
-        asl::Exception(what, where, "inet::SocketException" ), 
-        _myErrorCode ( theErrorCode ) 
-        {};
-    ~SocketException (){};
+protected:
+    SocketException (const std::string & what, const std::string & where)
+     : asl::Exception(what, where) {}
 
-    int getErrorCode() const { return _myErrorCode; }
-private:
-    int _myErrorCode;
+    virtual ~SocketException() {};
+};
+
+class SocketError : public SocketException {
+public:
+	SocketError(const SocketErrorCode theErrorCode, const std::string & where)
+	 : SocketException(getSocketErrorMessage(theErrorCode), where) {}
+
+	~SocketError() {}
+};
+
+class SocketDisconnected : public SocketException {
+public:
+	SocketDisconnected(const std::string & where)
+	 : SocketException("Socket disconnected.", where) {}
+
+	~SocketDisconnected() {}
 };
 
 }

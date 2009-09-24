@@ -86,8 +86,20 @@ waitForConnection(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *
     DOC_END;
     const inet::TCPServer & myServer = JSTCPServer::getJSWrapper(cx,obj).getNative();
     asl::Ptr<inet::Socket> mySocket(myServer.waitForConnection());
-    *rval = as_jsval(cx, mySocket);
+    if(mySocket) {
+    	*rval = as_jsval(cx, mySocket);
+    } else {
+    	*rval = JSVAL_NULL;
+    }
     return JS_TRUE;
+}
+
+static JSBool
+setBlockingMode(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Set blocking mode on connection");
+    DOC_PARAM("isBlocking", "If false, a read call on the socket will only return if a packet has been received", DOC_TYPE_BOOLEAN);
+    DOC_END;
+    return Method<JSTCPServer::NATIVE>::call(&JSTCPServer::NATIVE::setBlockingMode,cx,obj,argc,argv,rval);
 }
 
 
@@ -100,6 +112,7 @@ JSTCPServer::Functions() {
     static JSFunctionSpec myFunctions[] = {
         // name                  native                   nargs
         {"waitForConnection",    waitForConnection,       0},
+        {"setBlockingMode",      setBlockingMode,         1},
         {0}
     };
     return myFunctions;

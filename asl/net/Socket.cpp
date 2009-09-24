@@ -58,6 +58,8 @@
 #include <iostream>
 #include <assert.h>
 
+#include <string.h>
+
 #include <asl/base/string_functions.h>
 
 #ifdef min
@@ -72,7 +74,8 @@ namespace inet {
     Socket::Socket(asl::Unsigned32 thehost, Unsigned16 theport)
         : fd(-1),
           _myTimeOut(0),
-          _myLocalEndpoint(thehost, theport)
+          _myLocalEndpoint(thehost, theport),
+          _myIsConnected(true)
     {
         initSockets();
     }
@@ -94,7 +97,7 @@ namespace inet {
             int rc = closesocket(fd);
             if (rc == SOCKET_ERROR) {
                 int err = getLastSocketError();
-                throw SocketException(err, "Socket::close() failed.");
+                throw SocketError(err, "Socket::close() failed.");
             }
 #else
             // TODO: error handling.
@@ -107,42 +110,49 @@ namespace inet {
 
     unsigned Socket::receive(void *data, const unsigned maxlen)
     {
+    	if(_myTimeOut) {
+			struct timeval tv;
 
-        if (_myTimeOut != 0){
-            AC_TRACE << "socket timeout is " << _myTimeOut;
-
-            struct timeval tv;
-
-            fd_set readset;
-            FD_ZERO(&readset);
+			fd_set readset;
+			FD_ZERO(&readset);
 #if defined(_MSC_VER)
 #pragma warning(push,1)
 #endif //defined(_MSC_VER)
-            FD_SET(fd, &readset);
+			FD_SET(fd, &readset);
 #if defined(_MSC_VER)
 #pragma warning(pop)
 #endif //defined(_MSC_VER)
 
-            // Initialize time out struct
-            tv.tv_sec = getConnectionTimeout();
-            tv.tv_usec = 0;
+			// Initialize time out struct
+			tv.tv_sec = getConnectionTimeout();
+			tv.tv_usec = 0;
 
-            int result = select(fd + 1, &readset, NULL, NULL, &tv);
-            if (result == 0){
-                int err = getLastSocketError();
-                throw SocketException(err, 
-                                      "lost connection while receiveing from socket " + 
-                                      hostname(getRemoteAddress()) + ":" + as_string(getRemotePort()));
-            }
-        }
+			int result = select(fd + 1, &readset, NULL, NULL, &tv);
+			if (result < 0){
+				int err = getLastSocketError();
+				throw SocketError(err, std::string(
+									  "lost connection while receiveing from socket " +
+									  hostname(getRemoteAddress()) + ":" + as_string(getRemotePort())));
+			}
+			if (result == 0) {
+				return 0;
+			}
 
-        int bytesread;
-        if ((bytesread=recv(fd, (char*)data, maxlen, 0))>=0){
+    	}
+
+        int bytesread = recv(fd, (char*)data, maxlen, 0);
+
+        if (bytesread>0){
             return bytesread;
+        } else if (bytesread == 0) {
+        	_myIsConnected = false; // XXX: hack for tcp disconnect
+        	//throw SocketDisconnected(PLUS_FILE_LINE);
         } else {
             int err = getLastSocketError();
-            if ( err != OS_SOCKET_ERROR(EWOULDBLOCK)){
-                throw SocketException(err, "Socket::receive() failed");
+            if((err == OS_SOCKET_ERROR(EAGAIN)) || (err == OS_SOCKET_ERROR(EWOULDBLOCK))) {
+            	return 0;
+            } else {
+            	throw SocketError(err, "receive() failed");
             }
         }
 
@@ -155,7 +165,7 @@ namespace inet {
         if ((byteswritten=::send(fd, (char*)data, len, 0)) != static_cast<int>(len))
         {
             int err = getLastSocketError();
-            throw SocketException(err, "Socket::write() failed.");
+            throw SocketError(err, "Socket::write() failed.");
         }
         return byteswritten;
     }
@@ -181,7 +191,7 @@ namespace inet {
                 rc = 0;
             } else {
                 delete[] buf;
-                throw SocketException("Socket::peek() failed.");
+                throw SocketError(getLastSocketError(), "Socket::peek() failed.");
             }
         }
         if (!(status & FNONBLOCK)) {
@@ -196,7 +206,7 @@ namespace inet {
 
         if (rc == SOCKET_ERROR) {
             int err = getLastSocketError();
-            throw SocketException(err, "Socket::peek() failed.");
+            throw SocketError(err, "Socket::peek() failed.");
         }
         return min(theBytesInBuffer, static_cast<u_long>(n));  // For compatibility with the linux version.
 #endif
@@ -234,7 +244,7 @@ namespace inet {
         }
         if (fcntl(fd, F_SETFL, theFlag)== -1)
         {
-            throw SocketException("Socket::setBlockingMode failed");
+            throw SocketError(getLastSocketError(), "Socket::setBlockingMode failed");
         }
 #else
         u_long theFlag = 1;
@@ -244,7 +254,7 @@ namespace inet {
         int theRC = ioctlsocket(fd, FIONBIO, &theFlag);
         if (theRC == SOCKET_ERROR) {
             int err = getLastSocketError();
-            throw SocketException(err, "Socket::setBlockingMode failed");
+            throw SocketError(err, "Socket::setBlockingMode failed");
         }
 #endif
     }

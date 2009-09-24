@@ -184,7 +184,7 @@ namespace asl {
 #else
         int fd = socket (AF_INET,SOCK_DGRAM,0);
         if (fd == -1) {
-            throw SocketException(PLUS_FILE_LINE); 
+            throw SocketError(getLastSocketError(), PLUS_FILE_LINE);
         }
 
 #ifdef OSX
@@ -215,8 +215,9 @@ namespace asl {
         const std::string myInterfaceName = theInterfaceName.size() ? theInterfaceName : asl::getenv<std::string>("AC_NET_HWIF", "eth0");
         ifreq myInterface;
         strcpy (myInterface.ifr_name, myInterfaceName.c_str());
-        if (ioctl (fd, SIOCGIFHWADDR, &myInterface) < 0) {
-            throw SocketException(PLUS_FILE_LINE); 
+        int res = ioctl (fd, SIOCGIFHWADDR, &myInterface);
+        if (res < 0) {
+            throw SocketError(getLastSocketError(), PLUS_FILE_LINE);
         }
         myHardwareMac.resize(ETH_ALEN);
         memcpy (&myHardwareMac[0], myInterface.ifr_hwaddr.sa_data, ETH_ALEN);

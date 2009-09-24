@@ -259,13 +259,15 @@ connect(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         }
 
         inet::TCPClientSocket * myTCPClientSocket = dynamic_cast<inet::TCPClientSocket *>(&myScopedSocket.getNative());
-        if (!myTCPClientSocket) {
-            return JS_FALSE;
-        } else {
+        if (myTCPClientSocket) {
             myTCPClientSocket->setRemoteAddr(myRemoteHostAddress, myRemotePort);
             myTCPClientSocket->connect();
             return JS_TRUE;
         }
+
+    	JS_ReportError(cx, "Tried to call connect() on a socket that was instantiated without a socket type");
+        return JS_FALSE;
+
     } HANDLE_CPP_EXCEPTION;
 }
 
@@ -302,6 +304,7 @@ JSPropertySpec *
 JSSocket::Properties() {
     static JSPropertySpec myProperties[] = {
         {"isValid", PROP_isValid, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT},
+        {"isConnected", PROP_isConnected, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT},
         {"sendBufferSize", PROP_sendBufferSize, JSPROP_ENUMERATE|JSPROP_PERMANENT},
         {"receiveBufferSize", PROP_receiveBufferSize, JSPROP_ENUMERATE|JSPROP_PERMANENT},
         {0}
@@ -332,6 +335,9 @@ JSSocket::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, j
         case PROP_isValid:
             *vp = as_jsval(cx, getNative().isValid());
             return JS_TRUE;
+        case PROP_isConnected:
+        	*vp = as_jsval(cx, getNative().isConnected());
+        	return JS_TRUE;
         case PROP_sendBufferSize:
             *vp = as_jsval(cx, getNative().getSendBufferSize());
             return JS_TRUE;

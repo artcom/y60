@@ -20,6 +20,7 @@ UDPSocket.cpp
 set(HEADERS
 address.h
 asl_net_settings.h
+FrameSocket.h
 INetEndpoint.h
 INetMonitor.h
 net_functions.h

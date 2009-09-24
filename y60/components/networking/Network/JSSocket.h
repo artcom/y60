@@ -84,6 +84,7 @@ class JSSocket : public jslib::JSWrapper<inet::Socket, asl::Ptr<inet::Socket> , 
 
         enum PropertyNumbers {
             PROP_isValid = -100,
+            PROP_isConnected,
             PROP_sendBufferSize,
             PROP_receiveBufferSize,
             PROP_UDP,

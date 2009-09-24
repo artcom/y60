@@ -73,12 +73,12 @@ namespace inet {
 
         int broadcast = 1;
         if (setsockopt(fd, SOL_SOCKET, SO_BROADCAST,(char*) &broadcast, sizeof(broadcast)) < 0) {
-            throw SocketException("UDPSocket::open: Can't set broadcast flag");
+            throw SocketError(getLastSocketError(), "UDPSocket::open: Can't set broadcast flag");
         }
 
         if (bind(fd, (struct sockaddr*)&_myLocalEndpoint, sizeof(_myLocalEndpoint)) < 0) {
             AC_TRACE << "UDPSocket::open: Failed to bind to " << hex << ntohl(_myLocalEndpoint.sin_addr.s_addr) << dec << ":" << ntohs(_myLocalEndpoint.sin_port);
-            throw SocketException("UDPSocket::open: Can't bind socket");
+            throw SocketError(getLastSocketError(), "UDPSocket::open: Can't bind socket");
         }
     }
 
@@ -101,7 +101,7 @@ namespace inet {
         }
         else {
             if (errno!=OS_SOCKET_ERROR(EWOULDBLOCK))
-                throw SocketException("UDPSocket::ReadFrom failed");
+                throw SocketError(getLastSocketError(), "UDPSocket::ReadFrom failed");
         }
         AC_TRACE << "Received " << bytesRead << " from " << hex << ntohl(peerAddr.sin_addr.s_addr) << dec << ":" << ntohs(peerAddr.sin_port);
 
@@ -115,7 +115,7 @@ namespace inet {
         int byteswritten;
         AC_TRACE << "Sending to " << hex << _myRemoteEndpoint.sin_addr.s_addr << dec << ":" << _myRemoteEndpoint.sin_port;
         if ((byteswritten=sendto(fd, (char*)data, len, 0, (struct sockaddr*)&_myRemoteEndpoint, sizeof(_myRemoteEndpoint)))!=static_cast<int>(len)) {
-            throw SocketException("UDPSocket::SendTo failed");
+            throw SocketError(getLastSocketError(), "UDPSocket::SendTo failed");
         }
         return byteswritten;
     }
