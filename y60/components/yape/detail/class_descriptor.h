@@ -17,7 +17,9 @@ class class_descriptor : public ape_thing {
 
         void 
         import(JSContext * cx, JSObject * ns, monkey_data &) {
+#ifdef Y60_APE_HAVE_TEMPLOG
             typedef log::import log_t;
+#endif
             APE_LOG(log_t,log::dbg,log::dev) << "importing class "
                 << get_name();
 
