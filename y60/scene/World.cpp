@@ -56,59 +56,18 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-#ifndef _scene_World_h_
-#define _scene_World_h_
-
-#include "y60_scene_settings.h"
-
-#include "TransformHierarchyFacade.h"
-#include "Light.h"
-
-#include <asl/xpath/xpath_api.h>
+#include "World.h"
 
 namespace y60 {
 
-	//                  theTagName           theType           theAttributeName               theDefault
-	DEFINE_ATTRIBUTE_TAG(SkyBoxMaterialTag,   std::string,      SKYBOX_MATERIAL_ATTRIB,   "", Y60_SCENE_DECL);
-	DEFINE_ATTRIBUTE_TAG(LodScaleTag,         float,            LODSCALE_ATTRIB,          1, Y60_SCENE_DECL);
-	DEFINE_ATTRIBUTE_TAG(FogModeTag,          std::string,      FOGMODE_ATTRIB,           "", Y60_SCENE_DECL);
-	DEFINE_ATTRIBUTE_TAG(FogColorTag,         asl::Vector4f,    FOGCOLOR_ATTRIB,          asl::Vector4f(0,0,0,0), Y60_SCENE_DECL);
-	DEFINE_ATTRIBUTE_TAG(FogRangeTag,         asl::Vector2f,    FOGRANGE_ATTRIB,          asl::Vector2f(0, 1), Y60_SCENE_DECL);
-	DEFINE_ATTRIBUTE_TAG(FogDensityTag,       float,            FOGDENSITY_ATTRIB,        1, Y60_SCENE_DECL);
-
-	class World :
-		public TransformHierarchyFacade,
-		public SkyBoxMaterialTag::Plug,
-		public LodScaleTag::Plug,
-		public FogModeTag::Plug,
-		public FogColorTag::Plug,
-		public FogRangeTag::Plug,
-		public FogDensityTag::Plug
-	{
-		public:
-			World(dom::Node & theNode) :
-				TransformHierarchyFacade(theNode),
-				SkyBoxMaterialTag::Plug(theNode),
-				LodScaleTag::Plug(theNode),
-				FogModeTag::Plug(theNode),
-				FogColorTag::Plug(theNode),
-				FogRangeTag::Plug(theNode),
-				FogDensityTag::Plug(theNode)
-		{}
-
-		IMPLEMENT_FACADE(World);
-
-        const LightVector & getLights() const {
-            return _myLights;
-        }
-
-        void updateLights();
-
-        LightVector _myLights;
-	};
-
-	typedef asl::Ptr<World, dom::ThreadingModel> WorldPtr;
-
+void
+World::updateLights() {
+		_myLights.clear();
+		xpath::NodeList myLightNodes = xpath::findAll(xpath::Path(std::string(".//") + LIGHT_NODE_NAME), getNode().self().lock());
+		for(xpath::NodeList::size_type i = 0; i < myLightNodes.size(); i++) {
+			dom::NodePtr myLightNode = myLightNodes[i];
+			_myLights.push_back(myLightNode->getFacade<Light>());
+		}
 }
 
-#endif
+}
