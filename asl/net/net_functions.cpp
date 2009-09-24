@@ -191,7 +191,7 @@ namespace asl {
         const std::string myInterfaceName = theInterfaceName.size() ? theInterfaceName : asl::getenv<std::string>("AC_NET_HWIF", "en0");
         struct ifaddrs *ifap0 = 0;
         if (getifaddrs(&ifap0) < 0) {
-            throw SocketException(PLUS_FILE_LINE); 
+            throw SocketError(getLastSocketError(), PLUS_FILE_LINE);
         }
         struct ifaddrs * ifap = ifap0;
 

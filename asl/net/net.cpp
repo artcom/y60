@@ -69,13 +69,13 @@ namespace inet {
         AC_DEBUG << "Calling WSAStartup().";
         err = WSAStartup( wVersionRequested, &wsaData );
         if ( err != 0 ) {
-            throw SocketException(err, "inet::initSockets()");
+            throw SocketError(err, "inet::initSockets()");
         }
         
         if (LOBYTE( wsaData.wVersion ) != 2 ||
             HIBYTE( wsaData.wVersion ) != 2 )
         {
-            throw SocketException("No appropriate winsock DLL version found. inet::initSockets()");
+            throw SocketError("No appropriate winsock DLL version found. inet::initSockets()");
         }
 #endif
     }
@@ -85,7 +85,7 @@ namespace inet {
         AC_DEBUG << "Calling WSACleanup().";
         if ( WSACleanup() != 0 ) {
             int err = getLastSocketError();
-            throw SocketException(err, "inet::terminateSockets()");
+            throw SocketError(err, "inet::terminateSockets()");
         }
 #endif 
     }
