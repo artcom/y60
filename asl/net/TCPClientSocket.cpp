@@ -73,6 +73,8 @@ namespace inet {
             int err = getLastSocketError();
             throw SocketError(err, "TCPClientSocket::ConnectSocket()");
         }
+
+        _myIsConnected = true;
     }
 
     int TCPClientSocket::retry(int n)
