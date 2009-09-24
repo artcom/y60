@@ -119,7 +119,7 @@ namespace inet {
     };
 
 #ifdef _WIN32
-    SocketErrorMessage SocketErrorList[] = {
+    SocketErrorString SocketErrorList[] = {
         SocketErrorString(0,                  "No error"),
         SocketErrorString(WSAEINTR,           "Interrupted system call"),
         SocketErrorString(WSAEBADF,           "Bad file number"),
