@@ -45,6 +45,7 @@
 
 #include <asl/base/string_functions.h>
 #include <asl/base/Logger.h>
+#include <asl/base/Exception.h>
 
 #include <cstring>
 #include <algorithm>
@@ -75,7 +76,7 @@ namespace inet {
         if (LOBYTE( wsaData.wVersion ) != 2 ||
             HIBYTE( wsaData.wVersion ) != 2 )
         {
-            throw SocketError("No appropriate winsock DLL version found. inet::initSockets()");
+            throw asl::Exception("No appropriate winsock DLL version found. inet::initSockets()", PLUS_FILE_LINE);
         }
 #endif
     }
