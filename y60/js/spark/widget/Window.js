@@ -34,10 +34,17 @@ spark.Window.Constructor = function(Protected) {
         window.decorations = Protected.getBoolean("decorations", true);
         window.multisamples = Protected.getString("multisamples", "0")
         
+        var mySceneFile = Protected.getString("sceneFile", "");
+        if (mySceneFile.length > 0) {
+            Public.setModelName( mySceneFile );
+        }
         Public.setup(Protected.getNumber("width", 640),
                      Protected.getNumber("height", 480),
                      Protected.getBoolean("fullscreen", false),
                      Protected.getString("title", "SPARK Application"));
+        if (mySceneFile.length > 0 && _mySceneLoadedCallback) {
+            _mySceneLoadedCallback(window.scene.dom);
+        }
 
         Public.setMover(null);
         
@@ -130,6 +137,18 @@ spark.Window.Constructor = function(Protected) {
         _myKeyboardFocused = theWidget;
     };
     
+    // XXX: a somewhat hackish callback to get a hand on the scene
+    //      after the model has been loaded but before any spark components
+    //      are added.
+    var _mySceneLoadedCallback;
+
+    Public.onSceneLoaded getter = function() {
+        return _mySceneLoadedCallback;
+    }
+
+    Public.onSceneLoaded setter = function(f) {
+        _mySceneLoadedCallback = f;
+    }
     
     //////////////////////////////////////////////////////////////////////
     // Callbacks
@@ -371,5 +390,4 @@ spark.Window.Constructor = function(Protected) {
             break;
         }
     };
-    
 };
