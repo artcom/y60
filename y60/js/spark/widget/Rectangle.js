@@ -1,3 +1,4 @@
+
 spark.Rectangle = spark.ComponentClass("Rectangle");
 
 spark.Rectangle.Constructor = function(Protected) {
@@ -19,7 +20,11 @@ spark.Rectangle.Constructor = function(Protected) {
     };
 
     Public.color getter = function() {
-        var c = _myMaterial.properties.surfacecolor;
+        var c = Protected.material.properties.surfacecolor;
         return new Vector3f(c.r, c.g, c.b);
-    }
+    };
+
+    Public.color setter = function(theColor) {
+        Protected.material.properties.surfacecolor = theColor;
+    };
 }

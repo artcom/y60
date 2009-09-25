@@ -31,8 +31,8 @@ spark.ResizableRectangle.Constructor = function(Protected) {
                _myWidth  = Protected.getNumber("width", raster.width);
                _myHeight = Protected.getNumber("height", raster.height);
             } else {
-               _myWidth  = Protected.getNumber("width");
-               _myHeight = Protected.getNumber("height");
+               _myWidth  = Protected.getNumber("width", 1);
+               _myHeight = Protected.getNumber("height", 1);
             }
 
             var mySize = new Vector3f(_myWidth, _myHeight, 0);
