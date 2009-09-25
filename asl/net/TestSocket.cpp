@@ -71,7 +71,7 @@ void TestSocket::testHostAddressMethods () {
     const char * inFQHostName = "localhost.localdomain";
     Unsigned32 inHostAddress = 0x7f000001;  // host byte order
 #endif
-    int myErrCode;
+    SocketErrorCode myErrCode;
 
     ENSURE (sizeof(inHostAddress) == 4);
 
@@ -91,8 +91,9 @@ void TestSocket::testHostAddressMethods () {
     try {
         getHostAddress ("does.not.exist");
     }
-    catch (SocketException & e) {
+    catch (SocketError & e) {
         cerr << e.what() << endl;
+        myErrCode = e.getErrorCode();
     }
     ENSURE (myErrCode = HOST_NOT_FOUND);
     myErrCode = 0;
@@ -124,8 +125,9 @@ void TestSocket::testHostAddressMethods () {
     try {
         getHostName(unknownHostAddress);
     }
-    catch (SocketException & e) {
+    catch (SocketError & e) {
         cerr << e.what() << endl;
+        myErrCode = e.getErrorCode();
     }
     ENSURE (myErrCode == HOST_NOT_FOUND ||
             myErrCode == NO_DATA);
@@ -433,7 +435,7 @@ void TestSocket::testConnectionTimeout(){
 
     ENSURE(myClient.getConnectionTimeout() == 1);
 
-    ENSURE_EXCEPTION(myClient.receive(myInputBuffer,5), SocketException);
+    ENSURE_EXCEPTION(myClient.receive(myInputBuffer,5), SocketError);
 
     myClient.close();
 

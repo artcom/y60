@@ -73,9 +73,17 @@ protected:
 class SocketError : public SocketException {
 public:
 	SocketError(const SocketErrorCode theErrorCode, const std::string & where)
-	 : SocketException(getSocketErrorMessage(theErrorCode), where) {}
+	 : SocketException(getSocketErrorMessage(theErrorCode), where), _myErrorCode(theErrorCode) {}
 
 	~SocketError() {}
+
+	SocketErrorCode
+	getErrorCode() {
+	    return _myErrorCode;
+	}
+
+private:
+	SocketErrorCode _myErrorCode;
 };
 
 class SocketDisconnected : public SocketException {
