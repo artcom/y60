@@ -63,29 +63,24 @@ using namespace std;
 namespace inet {
 
     TCPServer::TCPServer(asl::Unsigned32 myHost, asl::Unsigned16 myPort, bool theReusePortFlag)
-        : _myPort(myPort),
-          _myHost(myHost),
+        : _myHost(myHost),
+          _myPort(myPort),
           _myFromAddr(myHost, myPort)
     {
         fd=socket(AF_INET,SOCK_STREAM,0);
 
-        if (bind(fd,(struct sockaddr*)&_myFromAddr,sizeof(_myFromAddr))<0) {
-            // Socket was in use, try again if theReusePortFlag=true
-            if (theReusePortFlag) {
-                int myReuseSocketLen = sizeof(bool);
-                if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, (char*)&theReusePortFlag, myReuseSocketLen) == SOCKET_ERROR) {
-                    throw SocketError(getLastSocketError(), "TCPServer::TCPServer: can`t set already bound rcv socket to reuse.");
-                }
-
-                if (bind(fd,(struct sockaddr*)&_myFromAddr,sizeof(_myFromAddr))<0 ) {
-                     throw SocketError(getLastSocketError(), "TCPServer::TCPServer: can`t bind rcv socket ");
-                }
-            } else {
-                throw SocketError(getLastSocketError(), "TCPServer::TCPServer: can`t bind socket, already is use.");
+        if(theReusePortFlag) {
+            int myReuseSocketLen = sizeof(bool);
+            if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, (char*)&theReusePortFlag, myReuseSocketLen) == SOCKET_ERROR) {
+                throw SocketError(getLastSocketError(), "TCPServer::TCPServer: can`t set SO_REUSEADDR");
             }
         }
+
+        if (bind(fd,(struct sockaddr*)&_myFromAddr,sizeof(_myFromAddr))<0) {
+            throw SocketError(getLastSocketError(), "TCPServer::TCPServer: can`t bind socket");
+        }
         if (listen(fd,8)<0) {
-            throw SocketError(getLastSocketError(), "TCPServer::TCPServer: can`t listen ");
+            throw SocketError(getLastSocketError(), "TCPServer::TCPServer: can`t listen");
         }
     }
 
