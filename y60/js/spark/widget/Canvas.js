@@ -39,6 +39,7 @@ spark.Canvas.Constructor = function(Protected) {
         myFlipMatrix.translate(new Vector3f(0,1,0));
     	
     	var myMaterial = Modelling.createUnlitTexturedMaterial(window.scene, myTexture);
+        myMaterial.transparent = true;
     	
     	_myWorld = Node.createElement("world");
     	window.scene.worlds.appendChild(_myWorld);
