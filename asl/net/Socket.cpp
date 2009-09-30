@@ -128,16 +128,12 @@ namespace inet {
 			tv.tv_usec = 0;
 
 			int result = select(fd + 1, &readset, NULL, NULL, &tv);
-			if (result < 0){
+			if (result <= 0){
 				int err = getLastSocketError();
 				throw SocketError(err, std::string(
-									  "lost connection while receiveing from socket " +
+									  "disconnect or timeout while receiveing from socket " +
 									  hostname(getRemoteAddress()) + ":" + as_string(getRemotePort())));
 			}
-			if (result == 0) {
-				return 0;
-			}
-
     	}
 
         int bytesread = recv(fd, (char*)data, maxlen, 0);
