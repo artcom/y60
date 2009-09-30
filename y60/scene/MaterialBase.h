@@ -104,6 +104,7 @@ namespace y60 {
     DEFINE_MATERIAL_PROPERTY_TAG(TargetBuffersTag, y60::TargetBuffers, TARGETBUFFERS_PROPERTY, TargetBuffers((1<<RED_MASK)|(1<<GREEN_MASK)|(1<<BLUE_MASK)|(1<<ALPHA_MASK)|(1<<DEPTH_MASK)));
     DEFINE_MATERIAL_PROPERTY_TAG(BlendFunctionTag, y60::VectorOfBlendFunction, BLENDFUNCTION_PROPERTY, getDefaultBlendFunction());
     DEFINE_MATERIAL_PROPERTY_TAG(BlendEquationTag, BlendEquation, BLENDEQUATION_PROPERTY, EQUATION_ADD);
+    DEFINE_MATERIAL_PROPERTY_TAG(BlendColorTag, asl::Vector4f, BLENDCOLOR_PROPERTY, asl::Vector4f(0,0,0,0));
     DEFINE_MATERIAL_PROPERTY_TAG(GlowTag, float, GLOW_PROPERTY, 0.0f);
     DEFINE_MATERIAL_PROPERTY_TAG(LineWidthTag, float, LINEWIDTH_PROPERTY, float(1.0));
     DEFINE_MATERIAL_PROPERTY_TAG(PointSizeTag, asl::Vector3f, POINTSIZE_PROPERTY, asl::Vector3f(1,1,1));
@@ -122,9 +123,10 @@ namespace y60 {
         public SurfaceColorTag::Plug,
         public ShininessTag::Plug,
         public BlendFunctionTag::Plug,
+        public BlendEquationTag::Plug,
+        public BlendColorTag::Plug,
         public GlowTag::Plug,
         public TargetBuffersTag::Plug,
-        public BlendEquationTag::Plug,
         public LineWidthTag::Plug,
         public PointSizeTag::Plug,
         public LineSmoothTag::Plug,
@@ -140,9 +142,10 @@ namespace y60 {
                 SurfaceColorTag::Plug(this),
                 ShininessTag::Plug(this),
                 BlendFunctionTag::Plug(this),
+                BlendEquationTag::Plug(this),
+                BlendColorTag::Plug(this),
                 GlowTag::Plug(this),
                 TargetBuffersTag::Plug(this),
-                BlendEquationTag::Plug(this),
                 LineWidthTag::Plug(this),
                 PointSizeTag::Plug(this),
                 LineSmoothTag::Plug(this),

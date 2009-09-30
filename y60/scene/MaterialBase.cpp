@@ -581,6 +581,7 @@ namespace y60 {
         MaterialPropGroup1HashTag::Plug::dependsOn<TargetBuffersTag,MaterialPropertiesFacade>(*this);  
         MaterialPropGroup1HashTag::Plug::dependsOn<BlendFunctionTag,MaterialPropertiesFacade>(*this);  
         MaterialPropGroup1HashTag::Plug::dependsOn<BlendEquationTag,MaterialPropertiesFacade>(*this);  
+        MaterialPropGroup1HashTag::Plug::dependsOn<BlendColorTag,MaterialPropertiesFacade>(*this);
         MaterialPropGroup1HashTag::Plug::dependsOn<GlowTag,MaterialPropertiesFacade>(*this);  
         MaterialPropGroup1HashTag::Plug::dependsOn<LineWidthTag,MaterialPropertiesFacade>(*this);  
         MaterialPropGroup1HashTag::Plug::dependsOn<PointSizeTag,MaterialPropertiesFacade>(*this);  
@@ -600,10 +601,16 @@ namespace y60 {
         appendCRC32(myCRC32, myMasks[BLUE_MASK]);
         appendCRC32(myCRC32, myMasks[ALPHA_MASK]);
         const VectorOfBlendFunction & myBlendFunction = get<BlendFunctionTag>();
-        appendCRC32(myCRC32, myBlendFunction[0]);
-        appendCRC32(myCRC32, myBlendFunction[1]);
-        //appendCRC32(myCRC32, get<BlendFunctionTag>());
+        if(myBlendFunction.size() >= 2) {
+            appendCRC32(myCRC32, myBlendFunction[0]);
+            appendCRC32(myCRC32, myBlendFunction[1]);
+        }
+        if(myBlendFunction.size() >= 4) {
+            appendCRC32(myCRC32, myBlendFunction[2]);
+            appendCRC32(myCRC32, myBlendFunction[3]);
+        }
         appendCRC32(myCRC32, get<BlendEquationTag>());
+        appendCRC32(myCRC32, get<BlendColorTag>());
         appendCRC32(myCRC32, get<GlowTag>());
         appendCRC32(myCRC32, get<LineWidthTag>());
         appendCRC32(myCRC32, get<PointSizeTag>());

@@ -231,40 +231,65 @@ namespace y60 {
             CHECK_OGL_ERROR;
         }
 
-        // blend function
+        // glow, blend function and blend color
+        //
+        // If (obsolete and hacky) glow is enabled we support only two blend functions.
+        // Else, we allow both common and separate blend functions.
+        //
+        // Glow also uses the blend color, so the material blend color is ignored
+        // when glow is enabled.
+        float myGlow = myMaterialPropFacade->get<GlowTag>();
         const VectorOfBlendFunction & myBlendFunction = myMaterialPropFacade->get<BlendFunctionTag>();
-        if (myBlendFunction.size() == 2) {
-#if 0
-            // we do NOT want this version since then a non-glowing material (myGlow=0)
-            // does not overwrite a glowing material behind it.
-            float myGlow = myMaterialPropFacade->get<GlowTag>();
-            if (myGlow > 0.0f && theViewport.get<ViewportDrawGlowTag>()) {
-                glBlendFuncSeparate(asGLBlendFunction(mySrcFunc), asGLBlendFunction(myDstFunc), 
-                                    GL_CONSTANT_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-                glBlendColor(1.0f,1.0f,1.0f, myGlow);
-            } else {
-                glBlendFunc(asGLBlendFunction(mySrcFunc), asGLBlendFunction(myDstFunc)); 
-            }
-#else
-            if (theViewport.get<ViewportDrawGlowTag>()) {
-                AC_TRACE << "setting blendfunction for glow:" << asl::as_string(myBlendFunction);
+        if(theViewport.get<ViewportDrawGlowTag>() && myGlow > 0.0) {
+            if(myBlendFunction.size() == 2) {
                 glBlendFuncSeparate(asGLBlendFunction(myBlendFunction[0]),
-                                    asGLBlendFunction(myBlendFunction[1]), 
+                                    asGLBlendFunction(myBlendFunction[1]),
                                     GL_CONSTANT_ALPHA,
                                     GL_ONE_MINUS_SRC_ALPHA);
                 CHECK_OGL_ERROR;
-                float myGlow = myMaterialPropFacade->get<GlowTag>() + 0.01f; // add 0.01 to workaround an alpha test bug
-                glBlendColor(1.0f,1.0f,1.0f, myGlow);
-                CHECK_OGL_ERROR;
+            } else if(myBlendFunction.size() == 4) {
+                throw ShaderException(string("Blend function for material '")
+                                      + theMaterial.get<NameTag>()
+                                      + "' specifies separate blend functions"
+                                      + ", which is unsupported in combination with glow",
+                                      PLUS_FILE_LINE);
             } else {
-                AC_TRACE << "setting blendfunction:" << asl::as_string(myBlendFunction);
-                glBlendFunc(asGLBlendFunction(myBlendFunction[0]), asGLBlendFunction(myBlendFunction[1])); 
-                CHECK_OGL_ERROR;
+                throw ShaderException(string("Blend function for material '")
+                                      + theMaterial.get<NameTag>()
+                                      + "' has invalid length "
+                                      + asl::as_string(myBlendFunction.size())
+                                      + ", expected 2 or 4",
+                                      PLUS_FILE_LINE);
             }
-#endif
+
+            float myRealGlow = myGlow + 0.01f; // XXX nudge value to work around an alpha test bug
+
+            glBlendColor(1.0,1.0,1.0, myRealGlow);
+            CHECK_OGL_ERROR;
         } else {
-            throw ShaderException(string("Blendfunction for material '") + theMaterial.get<NameTag>() + " has "
-                    + asl::as_string(myBlendFunction.size()) + " elements. Expected two.", PLUS_FILE_LINE);
+            // blend function
+            if(myBlendFunction.size() == 2) {
+                glBlendFunc(asGLBlendFunction(myBlendFunction[0]),
+                            asGLBlendFunction(myBlendFunction[1]));
+            } else if(myBlendFunction.size() == 4) {
+                glBlendFuncSeparate(asGLBlendFunction(myBlendFunction[0]),
+                                    asGLBlendFunction(myBlendFunction[1]),
+                                    asGLBlendFunction(myBlendFunction[2]),
+                                    asGLBlendFunction(myBlendFunction[3]));
+            } else {
+                throw ShaderException(string("Blend function for material '")
+                                      + theMaterial.get<NameTag>()
+                                      + "' has invalid length "
+                                      + asl::as_string(myBlendFunction.size())
+                                      + ", expected 2 or 4",
+                                      PLUS_FILE_LINE);
+            }
+            CHECK_OGL_ERROR;
+
+            // blend color
+            const Vector4f & myBlendColor = myMaterialPropFacade->get<BlendColorTag>();
+            glBlendColor(myBlendColor[0], myBlendColor[1], myBlendColor[2], myBlendColor[3]);
+            CHECK_OGL_ERROR;
         }
 
         // blend equation
