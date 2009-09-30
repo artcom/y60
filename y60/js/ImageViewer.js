@@ -599,10 +599,6 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
                 myString += "avdelay:       " + myNode.avdelay.toPrecision(3) + "\n";
                 myString += "Total frames:  " + _myFrameCounter + "\n";
                 myString += "Decoder:       " + myNode.decoder + "\n";
-                myString += "Frameblending: " + myNode.frameblending + "\n";
-                /*if (myNode.frameblending) {
-					myString += "BlendFactor:   " + myNode.frameblend_factor + "\n";
-                }*/
                 myString += "Misses:  sum:  " + _myMissedFrameCounter + ", max: " + _myMaxMissedFrame + "\n";
             }
             myString += "Zoom:          " + (_myZoomFactor*100).toFixed(1) + "%\n";
@@ -617,7 +613,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
             _myMovieNode = null;
         }
         if (_myCaptureNode) {
-            print("Removing MovieNode");
+            print("Removing CaptureNode");
             window.scene.images.removeChild(_myCaptureNode);
             _myCaptureNode = null;
         }
@@ -660,12 +656,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
             _myMovieNode.decoderhint = theDecoderHint;
             _myMovieNode.src = theFilename;
             //_myMovieNode.maxcachesize = 128;
-            // YUV420 pixelformat uses shader to convert colorspace
-            var myUseCgFlag = false;
-            if(self.getShaderLibrary() && self.getShaderLibrary().match(/shaderlibrary.xml/)) {
-                myUseCgFlag = true;
-            }
-            _myMovieNode.targetpixelformat = (myUseCgFlag) ? "YUV420" : "RGB";//"RGBA8";//"ALPHA";//"LUMINANCE8";//"RGBA8" // "ALPHA"
+            _myMovieNode.targetpixelformat = "RGB";//"YUV420";//"ALPHA";//"LUMINANCE8";//"RGBA8" // "ALPHA"
             if (theEnsureFrameCount) {
                 window.scene.ensureMovieFramecount(_myMovieNode);
             }
@@ -687,6 +678,8 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
 
         if (!_myMovieOverlay) {
             _myMovieOverlay = new MovieOverlay(window.scene, _myMovieNode);
+        } else {
+            _myMovieOverlay.movie = _myMovieNode;
         }
 
         _myMovieNode.playmode = "play";
