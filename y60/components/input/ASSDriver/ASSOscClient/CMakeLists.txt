@@ -31,6 +31,7 @@ y60_begin_application(
 )
 
 y60_add_asset(client.js)
+y60_add_asset(OscMeter.js)
 y60_add_asset(settings.xml)
 
 y60_add_launcher(
@@ -39,6 +40,17 @@ y60_add_launcher(
     DESCRIPTION  "OSC touch event sender for the ART+COM Proximatrix"
     ENGINE y60
     MAIN_SCRIPT client.js
+    BUILD_WORKING_DIR SOURCE
+    INSTALL_WORKING_DIR ASSETS
+    CATEGORIES
+        Proximatrix
+)
+y60_add_launcher(
+    Proximatrix_OSC_Dumper
+    COMMAND_NAME proximatrix-osc-dumper
+    DESCRIPTION  "OSC touch event sender for the ART+COM Proximatrix - Dumper"
+    ENGINE y60
+    MAIN_SCRIPT OscMeter.js
     BUILD_WORKING_DIR SOURCE
     INSTALL_WORKING_DIR ASSETS
     CATEGORIES

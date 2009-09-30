@@ -72,5 +72,5 @@ function onASSEvent( theEvent ) {
     Logger.info(theEvent);
 }
 
-var myEventLoop = new y60EventLoop();
+var myEventLoop = new EventLoop();
 myEventLoop.go(this);
