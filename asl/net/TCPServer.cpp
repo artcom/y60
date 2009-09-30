@@ -70,8 +70,8 @@ namespace inet {
         fd=socket(AF_INET,SOCK_STREAM,0);
 
         if(theReusePortFlag) {
-            int myReuseSocketLen = sizeof(bool);
-            if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, (char*)&theReusePortFlag, myReuseSocketLen) == SOCKET_ERROR) {
+            int myReusePortFlag = theReusePortFlag ? 1 : 0;
+            if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &myReusePortFlag, sizeof(myReusePortFlag)) < 0) {
                 throw SocketError(getLastSocketError(), "TCPServer::TCPServer: can`t set SO_REUSEADDR");
             }
         }
