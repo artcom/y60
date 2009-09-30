@@ -71,7 +71,7 @@ namespace inet {
 
         if(theReusePortFlag) {
             int myReusePortFlag = theReusePortFlag ? 1 : 0;
-            if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &myReusePortFlag, sizeof(myReusePortFlag)) < 0) {
+            if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, (char*)&myReusePortFlag, sizeof(myReusePortFlag)) < 0) {
                 throw SocketError(getLastSocketError(), "TCPServer::TCPServer: can`t set SO_REUSEADDR");
             }
         }
