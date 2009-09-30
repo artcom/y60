@@ -33,7 +33,7 @@ y60_add_asset(dump.js)
 y60_add_asset(settings.xml)
 
 y60_add_launcher(
-    "Proximatrix Analyzer"
+    Proximatrix_Analyzer
     COMMAND_NAME proximatrix-analyzer
     DESCRIPTION "Application for displaying Proximatrix sensor input"
     ENGINE y60
@@ -44,7 +44,7 @@ y60_add_launcher(
 )
 
 y60_add_launcher(
-    "Proximatrix Dumper"
+    Proximatrix_Dumper
     COMMAND_NAME proximatrix-dump
     DESCRIPTION "Application for dumping Proximatrix events"
     ENGINE y60

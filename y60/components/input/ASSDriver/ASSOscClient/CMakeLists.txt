@@ -34,7 +34,7 @@ y60_add_asset(client.js)
 y60_add_asset(settings.xml)
 
 y60_add_launcher(
-    "Proximatrix OSC Sender"
+    Proximatrix_OSC_Sender
     COMMAND_NAME proximatrix-osc
     DESCRIPTION  "OSC touch event sender for the ART+COM Proximatrix"
     ENGINE y60
