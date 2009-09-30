@@ -148,11 +148,11 @@ spark.Component.Constructor = function(Protected) {
     //      with the remaining coupled properties uncoupled.
     Public.realize = function() {
         spark.ourComponentsByNameMap[Public.name] = Public;
-        Logger.info("Realizing " + Public._className_ + " " + Public.vocation);
+        Logger.debug("Realizing " + Public._className_ + " " + Public.vocation);
     };
     
     Public.postRealize = function() {
-        Logger.info("Post-Realizing " + Public._className_ + " " + Public.vocation);
+        Logger.debug("Post-Realizing " + Public._className_ + " " + Public.vocation);
     };
 
     
