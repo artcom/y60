@@ -53,6 +53,7 @@ spark.Canvas.Constructor = function(Protected) {
     	myCanvas.target = myTexture.id;
     	window.scene.canvases.appendChild(myCanvas);
         myCanvas.name = Public.name + "-canvas";
+        myCanvas.backgroundcolor[3] = 0.0;
     	
     	var myViewport = Node.createElement("viewport");
     	myViewport.camera = myCamera.id;
