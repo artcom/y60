@@ -83,7 +83,7 @@ namespace jslib {
         JSEventLoop( asl::DLHandle theDLHandle ) : asl::PlugInBase( theDLHandle ) {};
 
         const char * ClassName() {
-            static const char * myClassName = "y60EventLoop";
+            static const char * myClassName = "EventLoop";
             return myClassName;
         }
 
