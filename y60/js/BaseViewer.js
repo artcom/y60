@@ -317,8 +317,10 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         return theCamera;
     }
 
-    self.addSkyBoxFromImage = function(theImageNode) {
-
+    self.addSkyBoxFromImage = function(theImageNode, theWorld) {
+        if ( ! theWorld ) {
+            theWorld = _myRenderWindow.scene.world;
+        }
         // material
         var myMaterialNode = _myRenderWindow.scene.world.getElementById(_mySkyboxMaterialId);
         if (!myMaterialNode) {
@@ -328,7 +330,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
 
             _mySkyboxMaterialId = myMaterialNode.id;
             _myRenderWindow.scene.materials.appendChild(myMaterialNode);
-            _myRenderWindow.scene.world.skyboxmaterial = _mySkyboxMaterialId;
+            theWorld.skyboxmaterial = _mySkyboxMaterialId;
 
             // add texture units
             var myTextureUnitsNode = new Node("<textureunits><textureunit applymode='decal'/></textureunits>").firstChild;
@@ -358,8 +360,10 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         myTextureNode.image = theImageNode.id;
     }
 
-    self.addSkyBoxFromFile = function(theFileName, theTile) {
-
+    self.addSkyBoxFromFile = function(theFileName, theTile, theWorld) {
+        if ( ! theWorld ) {
+            theWorld = _myRenderWindow.scene.world;
+        }
         if (theTile == undefined) {
             theTile = new Vector2i(1,6);
         }
@@ -372,7 +376,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
             mySkyboxImage.src = theFileName;
             mySkyboxImage.tile = theTile;
             myTexture.wrapmode = "clamp_to_edge";
-            _myRenderWindow.scene.world.skyboxmaterial = _mySkyboxMaterialId;
+            theWorld.skyboxmaterial = _mySkyboxMaterialId;
         } else {
             var myImageId = createUniqueId();
             var mySkyboxImage      = Node.createElement("image");
@@ -391,8 +395,11 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         }
     }
 
-    self.removeSkyBox = function() {
-        _myRenderWindow.scene.world.skyboxmaterial = "";
+    self.removeSkyBox = function(theWorld) {
+        if ( ! theWorld) {
+            theWorld = _myRenderWindow.scene.world;
+        }
+        theWorld.skyboxmaterial = "";
     }
     
     ///////////////////////////////////////////////////////////////////////////////////////////
