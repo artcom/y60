@@ -233,14 +233,16 @@ namespace y60 {
 
         // glow, blend function and blend color
         //
-        // If (obsolete and hacky) glow is enabled we support only two blend functions.
-        // Else, we allow both common and separate blend functions.
+        // If (deprecated) glow is enabled, the alpha blend functions are overridden
+        // and the blend color is ignored. Because of this, separate blend functions
+        // specified on the material are not supported in this mode.
         //
-        // Glow also uses the blend color, so the material blend color is ignored
-        // when glow is enabled.
+        bool myGlobalGlowFlag = theViewport.get<ViewportDrawGlowTag>();
         float myGlow = myMaterialPropFacade->get<GlowTag>();
+        const Vector4f & myBlendColor = myMaterialPropFacade->get<BlendColorTag>();
         const VectorOfBlendFunction & myBlendFunction = myMaterialPropFacade->get<BlendFunctionTag>();
-        if(theViewport.get<ViewportDrawGlowTag>() && myGlow > 0.0) {
+        if(myGlobalGlowFlag) {
+            // blend function for glow
             if(myBlendFunction.size() == 2) {
                 glBlendFuncSeparate(asGLBlendFunction(myBlendFunction[0]),
                                     asGLBlendFunction(myBlendFunction[1]),
@@ -262,10 +264,18 @@ namespace y60 {
                                       PLUS_FILE_LINE);
             }
 
-            float myRealGlow = myGlow + 0.01f; // XXX nudge value to work around an alpha test bug
-
-            glBlendColor(1.0,1.0,1.0, myRealGlow);
-            CHECK_OGL_ERROR;
+            // blend color for glow
+            if(myBlendColor == Vector4f(0,0,0,0)) {
+                float myRealGlow = myGlow + 0.01f; // XXX nudge value to work around an alpha test bug
+                glBlendColor(1.0,1.0,1.0, myRealGlow);
+                CHECK_OGL_ERROR;
+            } else {
+                throw ShaderException(string("Blend color on material '")
+                                      + theMaterial.get<NameTag>()
+                                      + "' has been set,"
+                                      + ", which is unsupported in combination with glow",
+                                      PLUS_FILE_LINE);
+            }
         } else {
             // blend function
             if(myBlendFunction.size() == 2) {
@@ -287,7 +297,6 @@ namespace y60 {
             CHECK_OGL_ERROR;
 
             // blend color
-            const Vector4f & myBlendColor = myMaterialPropFacade->get<BlendColorTag>();
             glBlendColor(myBlendColor[0], myBlendColor[1], myBlendColor[2], myBlendColor[3]);
             CHECK_OGL_ERROR;
         }
