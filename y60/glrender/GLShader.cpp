@@ -272,7 +272,7 @@ namespace y60 {
             } else {
                 throw ShaderException(string("Blend color on material '")
                                       + theMaterial.get<NameTag>()
-                                      + "' has been set,"
+                                      + "' has been set"
                                       + ", which is unsupported in combination with glow",
                                       PLUS_FILE_LINE);
             }
