@@ -58,9 +58,9 @@ spark.NewMovie.Constructor = function(Protected) {
     
     // audio
     
-    Public.audio getter = function() { return _myMovie.audio; };
+    Public.audio getter = function() { return _myMovie.audio == 1; };
     Public.audio setter = function(theFlag) {
-        _myMovie.audio = theFlag;
+        _myMovie.audio = theFlag ? 1 : 0;
     };
     
     Public.volume getter = function() { return _myMovie.volume; };
@@ -160,6 +160,8 @@ spark.NewMovie.Constructor = function(Protected) {
         if(_myMovie.nodeName != "image") {
             Public.loop = Protected.getBoolean("loop", false);
             Public.mode = Protected.getString("mode", "stop");
+            Public.audio = Protected.getBoolean("audio", true);
+            Public.volume = Protected.getNumber("volume", 1.0);
         }
     };
 
