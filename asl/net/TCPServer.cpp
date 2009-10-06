@@ -111,8 +111,9 @@ namespace inet {
         remoteEndpointLen=sizeof(remoteEndpoint);
         int newFD;
         if ((newFD=accept(fd,(sockaddr *)&remoteEndpoint,&remoteEndpointLen))<0) {
-        	if(errno != OS_SOCKET_ERROR(EWOULDBLOCK)) {
-        		throw SocketError(getLastSocketError(), "TCPServer::waitForConnection: can't accept connection");
+            int err = getLastSocketError();
+        	if(err != OS_SOCKET_ERROR(EWOULDBLOCK)) {
+        		throw SocketError(err, "TCPServer::waitForConnection: can't accept connection");
         	}
             return 0;
         }
