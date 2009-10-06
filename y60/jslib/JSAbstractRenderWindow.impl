@@ -600,6 +600,35 @@ JSAbstractRenderWindow<DERIVED>::getTextCursorPosition(JSContext *cx, JSObject *
 
 template<class DERIVED>
 JSBool
+JSAbstractRenderWindow<DERIVED>::getTextLineWidths(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Gets the text width for every line. Can be used after calling renderTextAsImage to be used in subsequent calls.");
+    DOC_RVAL("theLineWidths", DOC_TYPE_ARRAY);
+    DOC_END;
+    try {
+        const std::vector<unsigned int> & myWidths = jslib::JSClassTraits<DERIVED>::openNativeRef(cx, obj).getLineWidths();
+        *rval = as_jsval(cx, myWidths);
+        jslib::JSClassTraits<DERIVED>::closeNativeRef(cx,obj);
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+
+template<class DERIVED>
+JSBool
+JSAbstractRenderWindow<DERIVED>::getTextMaxWidth(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Gets the maximal text width. Can be used after calling renderTextAsImage to be used in subsequent calls.");
+    DOC_RVAL("theMaxWidth", DOC_TYPE_INTEGER);
+    DOC_END;
+    try {
+        const unsigned int & myWidth = jslib::JSClassTraits<DERIVED>::openNativeRef(cx, obj).getMaxWidth();
+        *rval = as_jsval(cx, myWidth);
+        jslib::JSClassTraits<DERIVED>::closeNativeRef(cx,obj);
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+template<class DERIVED>
+JSBool
 JSAbstractRenderWindow<DERIVED>::setTextIndentation(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Sets the indentation for 2nd and following lines of a paragraph");
     DOC_PARAM("theIndentation", "", DOC_TYPE_INTEGER);
@@ -946,6 +975,8 @@ JSFunctionSpec * JSAbstractRenderWindow<DERIVED>::BaseFunctions() {
         {"getTextColor",       getTextColor,             0},
         {"renderTextAsImage",  renderTextAsImage,        5},
         {"getTextCursorPosition", getTextCursorPosition, 0},
+        {"getTextLineWidths", getTextLineWidths, 0},
+        {"getTextMaxWidth", getTextMaxWidth, 0},
         {"setTextPadding",     setTextPadding,           4},
         {"setTextIndentation", setTextIndentation,       1},
         {"setHTextAlignment",  setHTextAlignment,        1},

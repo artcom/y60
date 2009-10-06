@@ -106,7 +106,9 @@ namespace y60 {
                     unsigned int theTargetWidth, unsigned int theTargetHeight,
                     const asl::Vector2i & theCursorPos = asl::Vector2i(0,0));
             const asl::Vector2i & getTextCursorPosition() const;
-
+            const unsigned int & getMaxWidth() const;
+            const std::vector<unsigned int> & getLineWidths() const;
+            
             bool getFontMetrics(const std::string & theFontName,
                     int & theFontHeight,
                     int & theFontAscent, int & theFontDescent,

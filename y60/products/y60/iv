@@ -1,27 +1,6 @@
 #! /bin/bash
-if [ "$USE_CG" == "1" ] ; then
-    SHADERLIB=$PRO/src/y60/shader/shaderlibrary.xml
-else
-	SHADERLIB=$PRO/src/y60/shader/shaderlibrary_nocg.xml
-fi
-
 APPLICATION=y60
-ARGS="-I $PRO/src/y60/js;$PRO/lib $PRO/src/y60/js/ImageViewer.js $SHADERLIB $*"
-
-if [ "$DEBUG" == "1" ] ; then
-    APPLICATION=y60DBG
-fi
-
-if [ "$DEBUG" = "vc" ]; then
-    echo Visual Studio Debuger Setup
-    echo --------------------------------------------------------------------------------------
-    echo $PRO/bin/y60DBG.exe
-    echo $ARGS
-    echo `cmd /C cd`
-    echo --------------------------------------------------------------------------------------
-    exit 0
-fi
-
+ARGS="ImageViewer.js $*"
 
 COMMAND="$APPLICATION $ARGS"
 echo $COMMAND

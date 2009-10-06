@@ -94,7 +94,12 @@ namespace y60 {
             virtual void renderText(TextPtr & theText) = 0;
             const asl::Vector2i & getTextCursorPosition() const {
                 return _myCursorPos;
-            
+            }
+            const unsigned int & getMaxWidth() const {
+                return _myMaxWidth;
+            }
+            const std::vector<unsigned int> & getLineWidths() const {
+                return _myLineWidths;
             }
             void setColor(const asl::Vector4f & theTextColor);
             const asl::Vector4f & getColor();
@@ -114,9 +119,9 @@ namespace y60 {
                 _myTracking = theTracking;
             }
 
-            const unsigned int & getWindowHeight() { return _myWindowHeight; }
-            const unsigned int & getWindowWidth()  { return _myWindowWidth; }
-            const asl::Vector4f & getTextColor()   { return _myCurrentTextColor; }
+            const unsigned int & getWindowHeight() const { return _myWindowHeight; }
+            const unsigned int & getWindowWidth() const { return _myWindowWidth; }
+            const asl::Vector4f & getTextColor() const { return _myCurrentTextColor; }
         protected:
    	        TextAligment  _myHorizontalAlignment;
    	        TextAligment  _myVerticalAlignment;
@@ -132,6 +137,8 @@ namespace y60 {
             float         _myTracking;
             int           _myIndentation;
             asl::Vector2i _myCursorPos;
+            unsigned             _myMaxWidth;
+            std::vector<unsigned> _myLineWidths;
         private:
             unsigned int  _myWindowWidth;
             unsigned int  _myWindowHeight;

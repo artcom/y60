@@ -19,9 +19,10 @@ spark.NewText.Constructor = function(Protected) {
 
     var _myImage = null;
     var _myMaxWidth;
-
+    var _myMaxTextWidth = {};
     var _myLayoutHook;
     var _myTextChangedHook;
+    var _myLineWidths = [];
     
     Public.text getter = function() { return _myText; };
     Public.text setter = function(theValue) {
@@ -46,9 +47,23 @@ spark.NewText.Constructor = function(Protected) {
     Public.upcase getter = function() {
         return _myUpcase;
     };
+    Public.maxTextWidth getter = function() {
+        return _myMaxTextWidth;
+    };
+
+    Public.lineWidths getter = function() {
+        return _myLineWidths;
+    };
+
+    Public.lineCount getter = function() {
+        return _myLineWidths.length;
+    };
 
     Protected.render = function(theSize) {
-        var mySize = spark.renderText(_myImage, _myText, _myStyle, new Vector2i(_myMaxWidth,0));
+        var myWidth = {width:0};
+        _myLineWidths = [];
+        var mySize = spark.renderText(_myImage, _myText, _myStyle, new Vector2i(_myMaxWidth,0), myWidth, _myLineWidths);
+        _myMaxTextWidth =  myWidth.width;
         Public.width = mySize.x;
         Public.height = mySize.y;
         return mySize;

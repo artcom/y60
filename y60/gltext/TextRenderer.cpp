@@ -89,6 +89,7 @@ namespace y60 {
         _myTracking(0.0f),
         _myIndentation(0),
         _myCursorPos(0,0),
+        _myMaxWidth(0),
         _myWindowWidth(0),
         _myWindowHeight(0),
         _myCurrentTextColor(Vector4f(1.0, 1.0, 1.0, 1.0))

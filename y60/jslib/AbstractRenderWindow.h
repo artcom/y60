@@ -197,6 +197,8 @@ namespace jslib {
         void setTextStyle(unsigned int theStyle);
 
         const asl::Vector2i & getTextCursorPosition() const;
+        const std::vector<unsigned int> & getLineWidths() const;
+        const unsigned int & getMaxWidth() const;
         void setTextPadding(int topPadding, int bottomPadding, int leftPadding, int rightPadding);
         void setTextIndentation(int theIndentation);
 

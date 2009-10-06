@@ -191,7 +191,7 @@ spark.createTextImage = function(theSize) {
     return myImage;
 };
 
-spark.renderText = function(theImage, theText, theStyle, theSize) {
+spark.renderText = function(theImage, theText, theStyle, theSize, theMaxTextWidth, theLineWidths) {
     spark.applyStyleDefaults(theStyle);
 
     window.setTextPadding(theStyle.topPad, theStyle.bottomPad, theStyle.leftPad, theStyle.rightPad);
@@ -213,7 +213,17 @@ spark.renderText = function(theImage, theText, theStyle, theSize) {
                                  theText, 
                                  myFont,
                                  mySize.x, mySize.y);
-
+    
+    if (theMaxTextWidth) {
+        theMaxTextWidth.width = window.getTextMaxWidth()/ourSparkFontScale;
+    }
+    if (theLineWidths) {
+        var myLineWidths = window.getTextLineWidths();
+        for (var i = 0; i < myLineWidths.length; ++i) {
+            theLineWidths.push(myLineWidths[i]/ourSparkFontScale);
+        }
+    }
+    
     var myMatrix = new Matrix4f();
     myMatrix.makeScaling(new Vector3f(myTextSize.x / theImage.width, 
                                       myTextSize.y / theImage.height, 1));

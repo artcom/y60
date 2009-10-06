@@ -205,6 +205,24 @@ namespace y60 {
         }
     }
 
+    const unsigned int &
+    TextRendererManager::getMaxWidth() const {
+        if (_myTTFRenderer) {
+            return _myTTFRenderer->getMaxWidth();
+        } else {
+            return _myBitmapRenderer.getMaxWidth();
+        }
+    }
+
+    const vector<unsigned int> &
+    TextRendererManager::getLineWidths() const {
+        if (_myTTFRenderer) {
+            return _myTTFRenderer->getLineWidths();
+        } else {
+            return _myBitmapRenderer.getLineWidths();
+        }
+    }
+
 	void
 	TextRendererManager::setPadding(int topPadding, int bottomPadding, int leftpadding, int rightpadding) {
         _myBitmapRenderer.setPadding(topPadding, bottomPadding, leftpadding, rightpadding);

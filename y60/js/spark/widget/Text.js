@@ -12,7 +12,8 @@ spark.Text.Constructor = function(Protected) {
     var _myStyle = null;
     var _myText  = "";
     var _myTextId = null;
-
+    var _myMaxTextWidth = 0;
+    var _myLineWidths = [];
     var _myImage;
     var _myTexture;
     
@@ -34,13 +35,28 @@ spark.Text.Constructor = function(Protected) {
         return _myStyle;
     };
 
+    Public.maxTextWidth getter = function() {
+        return _myMaxTextWidth;
+    };
+
+    Public.lineWidths getter = function() {
+        return _myLineWidths;
+    };
+
+    Public.lineCount getter = function() {
+        return _myLineWidths.length;
+    };
 
 
     Protected.performLayout = function(theText) {return theText;}
 
     Protected.render = function(theSize) {
         if (_myText) {
-            return spark.renderText(_myImage, _myText, _myStyle, Public.size);
+            var myWidth = {};
+            _myLineWidths = [];
+            var myTextSize = spark.renderText(_myImage, _myText, _myStyle, Public.size, myWidth, _myLineWidths);
+            _myMaxTextWidth = myWidth.width;
+            return myTextSize;
         }
     };
     

@@ -184,7 +184,6 @@ namespace y60 {
             unsigned             _myMaxFontFittingSize;
             std::map<std::string, TTFFontInfo::FONTHINTING> _myFontHintingMap;
             
-            
     };
     typedef asl::Ptr<SDLTextRenderer> SDLTextRendererPtr;
 

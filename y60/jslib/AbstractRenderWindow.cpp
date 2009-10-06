@@ -1047,6 +1047,16 @@ const asl::Vector2i & AbstractRenderWindow::getTextCursorPosition() const
     return _myRenderer->getTextManager().getTextCursorPosition();
 }
 
+const std::vector<unsigned int> & AbstractRenderWindow::getLineWidths() const
+{
+    return _myRenderer->getTextManager().getLineWidths();
+}
+
+const unsigned int & AbstractRenderWindow::getMaxWidth() const
+{
+    return _myRenderer->getTextManager().getMaxWidth();
+}
+
 asl::Vector2i AbstractRenderWindow::renderTextAsImage(dom::NodePtr theImageNode,
                                                       const std::string & theString, const std::string & theFont,
                                                       const unsigned int & theTargetWidth, const unsigned int & theTargetHeight,

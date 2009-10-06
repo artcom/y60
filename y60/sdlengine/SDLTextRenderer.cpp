@@ -802,6 +802,14 @@ namespace y60 {
             mySurfaceHeight = myTotalLineHeight + _myTopPadding +_myCursorPos[1]+ _myBottomPadding;
         }
 
+        _myMaxWidth = 0;
+        _myLineWidths.clear();
+        _myLineWidths.reserve(myLines.size());
+        for (unsigned i = 0; i < myLines.size(); ++i) {
+            _myMaxWidth = std::max(myLines[i].width, _myMaxWidth);
+            _myLineWidths.push_back(myLines[i].width);
+        }
+        
         createTargetSurface( mySurfaceWidth, mySurfaceHeight, theTextColor);
 
         DB2(
