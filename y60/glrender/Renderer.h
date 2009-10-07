@@ -163,7 +163,7 @@ namespace y60 {
 
             void bindViewMatrix(y60::CameraPtr theCamera);
             void setProjection(ViewportPtr theViewport, y60::CameraPtr theCamera);
-            void rotateBillboard(const Body & theBody, const Camera & theCamera);
+            void rotateBillboard(Body & theBody, y60::CameraPtr theCamera);
 
             GLenum getPrimitiveGLType(PrimitiveType theType) const;
 
