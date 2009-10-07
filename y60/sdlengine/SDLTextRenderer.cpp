@@ -94,7 +94,7 @@ namespace y60 {
 
     SDLTextRenderer::SDLTextRenderer() :
          _myTextureSurface(0),
-         _myWordDelimiters(" \t;-:\\/|"), _myMaxFontFittingSize(30)
+         _myWordDelimiters(" \t;-:\\/|")
     {
         if ( TTF_Init() < 0 ) {
             AC_ERROR << "Couldn't initialize TTF: "<< SDL_GetError()<<endl;
@@ -112,15 +112,7 @@ namespace y60 {
         TTF_Quit();
     }
 
-    void
-    SDLTextRenderer::setFontFitting(int theHeight) {
-        /*if (theHeight > _myMaxFontFittingSize) {
-            TTF_SetFitting(0);
-        } else {
-            TTF_SetFitting(1);
-        }*/
-    }
-
+    
     std::string
     SDLTextRenderer::makeFontName(const string & theName, SDLFontInfo::FONTTYPE theFontType) const
     {
@@ -134,7 +126,6 @@ namespace y60 {
     {
         const string myFileName = AppPackageManager::get().getPtr()->searchFile(theFileName);
 
-        setFontFitting(theHeight);
         TTF_SetFitting((int)theFonthint);
         
         string myFontName = makeFontName(theName, theFontType);
@@ -670,8 +661,7 @@ namespace y60 {
     {
         DB2(AC_TRACE << "-------  Render Words  -------" << endl;)
         SDLFontInfo mySDLFontInfo = (getFontInfo(makeFontName(theFontName, SDLFontInfo::NORMAL)));
-        setFontFitting(mySDLFontInfo.getHeight());
-
+        
         TTF_Font * myNormalFont = mySDLFontInfo.getFont();
         if (!myNormalFont) {
             throw GLTextRendererException("Internal error: Normal font not defined.", PLUS_FILE_LINE);

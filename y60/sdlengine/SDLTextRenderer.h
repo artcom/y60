@@ -106,10 +106,7 @@ namespace y60 {
             bool getGlyphMetrics(const std::string & theFontName, const std::string & theCharacter, asl::Box2f & theGlyphBox, double & theAdvance) const;
             double getKerning(const std::string & theFontName, const std::string & theFirstCharacter, const std::string & theSecondCharacter) const;
             bool hasGlyph(const std::string& theFontName, const std::string& theCharacter) const;
-
-            void setMaxFontFittingSize(unsigned theSize) {
-                _myMaxFontFittingSize = theSize;
-            }
+            
         private:
             typedef std::map<std::string, SDLFontInfo> FontLibrary;
 
@@ -167,8 +164,7 @@ namespace y60 {
             std::string makeFontName(const std::string & theName, SDLFontInfo::FONTTYPE theFontType = SDLFontInfo::NORMAL) const;
             const TTF_Font * getFont(const std::string & theName) const;
 
-            void setFontFitting(int theHeight);
-
+            
             void renderWords(std::vector<Word> & theWords,
                     const std::string & theFontName,
                     const asl::Vector4f & theTextColor);
@@ -181,7 +177,6 @@ namespace y60 {
             SDL_Surface *        _myTextureSurface;
             FontLibrary          _myFonts;
             std::string          _myWordDelimiters;
-            unsigned             _myMaxFontFittingSize;
             std::map<std::string, TTFFontInfo::FONTHINTING> _myFontHintingMap;
             
     };

@@ -119,7 +119,6 @@ namespace y60 {
             double getKerning(const std::string & theFontName, const std::string & theFirstCharacter, const std::string & theSecondCharacter) const;
             bool hasGlyph(const std::string & theFontName, const std::string & theCharacter) const;
             void setTracking(float theTracking);
-            void setMaxFontFittingSize(unsigned theSize);
 
         private:
             TextRenderer & getTextRendererByFont(const std::string & theFont);

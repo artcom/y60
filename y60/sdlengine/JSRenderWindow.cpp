@@ -235,25 +235,6 @@ loadTTF(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 }
 
 static JSBool
-setMaxFontFittingSize(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Sets the maximum font size for which font fitting (screen alignment of glyph borders)"
-              "should be used. Must be called before 'loadTTF()'");
-    DOC_PARAM("theSize", "The font size. Use 0 to turn of font fitting.", DOC_TYPE_INTEGER);
-    DOC_END;
-    try {
-        ensureParamCount(argc, 1);
-        unsigned theSize;
-        if (!convertFrom(cx, argv[0], theSize)) {
-            JS_ReportError(cx, "Renderer::setMaxFontFitting(): Argument #1 must be a font size");
-            return JS_FALSE;
-        }
-        JSClassTraits<NATIVE>::ScopedNativeRef myObj(cx, obj);
-        myObj.getNative().getRenderer()->getTextManager().setMaxFontFittingSize(theSize);
-        return JS_TRUE;
-   } HANDLE_CPP_EXCEPTION;
-}
-
-static JSBool
 setMousePosition(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Set the mouse cursor position.");
     DOC_PARAM("theX", "X-Position in pixels", DOC_TYPE_INTEGER);
@@ -324,7 +305,6 @@ JSRenderWindow::Functions() {
         {"go",                   go,                       0},
         {"stop",                 stop,                     0},
         {"loadTTF",              loadTTF,                  4},
-        {"setMaxFontFittingSize", setMaxFontFittingSize,   1},
         {"setMousePosition",     setMousePosition,         2},
         {"setEventRecorderMode", setEventRecorderMode,     1},
         {"getEventRecorderMode", getEventRecorderMode,     0},

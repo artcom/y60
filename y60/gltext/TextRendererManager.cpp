@@ -306,9 +306,5 @@ namespace y60 {
     TextRendererManager::setTracking(float theTracking) {
         _myTTFRenderer->setTracking(theTracking);
     }
-
-    void
-    TextRendererManager::setMaxFontFittingSize(unsigned theSize) {
-        _myTTFRenderer->setMaxFontFittingSize(theSize);
-    }
+    
 }
