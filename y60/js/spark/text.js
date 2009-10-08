@@ -215,12 +215,12 @@ spark.renderText = function(theImage, theText, theStyle, theSize, theMaxTextWidt
                                  mySize.x, mySize.y);
     
     if (theMaxTextWidth) {
-        theMaxTextWidth.width = window.getTextMaxWidth()/ourSparkFontScale;
+        theMaxTextWidth.width = window.getTextMaxWidth();
     }
     if (theLineWidths) {
         var myLineWidths = window.getTextLineWidths();
         for (var i = 0; i < myLineWidths.length; ++i) {
-            theLineWidths.push(myLineWidths[i]/ourSparkFontScale);
+            theLineWidths.push(myLineWidths[i]);
         }
     }
     
