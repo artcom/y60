@@ -202,10 +202,10 @@ namespace y60 {
         unsigned myGain = 0;
 
         if (myFrameWidth == 0) {
-            myFrameWidth = 320;
+            myFrameWidth = 640;
         }
         if (myFrameHeight == 0) {
-            myFrameHeight = 240;
+            myFrameHeight = 480;
         }
 
         ASSURE(NULL == _myGraph);
@@ -281,8 +281,8 @@ namespace y60 {
         _myGraph->setDesiredVideoFormat(myFrameWidth, myFrameHeight, myFrameRate, myBitsPerPixel);
 
         asl::Matrix4f myMatrix;
-        myMatrix.makeScaling(asl::Vector3f(myXResize, - myYResize, 1.0f));
-        myMatrix.translate(asl::Vector3f(0, myYResize, 0));
+        myMatrix.makeScaling(asl::Vector3f(1.0f, - 1.0f, 1.0f));
+        myMatrix.translate(asl::Vector3f(0, 1.0f, 0));
         setImageMatrix(myMatrix);
         // Start Capturing
         _myGraph->CaptureLive(myDeviceId, myInputPinNumber); // set this to false if you don't want the video format dialog.

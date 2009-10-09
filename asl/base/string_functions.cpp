@@ -281,4 +281,40 @@ namespace asl {
             return myNextLine;
         }    
     }
+#ifdef _WIN32
+    char* convertBSTRToLPSTR(BSTR theBSTR) {
+        LPSTR pszOut = NULL;
+        if (theBSTR != NULL) {
+            int nInputStrLen = SysStringLen(theBSTR);
+
+            // Double NULL Termination
+            int nOutputStrLen = WideCharToMultiByte(CP_ACP, 0, theBSTR, nInputStrLen, NULL, 0, 0, 0) + 2; 
+            pszOut = new char [nOutputStrLen];
+
+            if (pszOut) {
+                memset(pszOut, 0x00, sizeof (char)*nOutputStrLen);
+                WideCharToMultiByte(CP_ACP, 0, theBSTR, nInputStrLen, pszOut, nOutputStrLen, 0, 0);
+            }
+        }
+        return pszOut;
+    }
+
+    char* convertLPWSTRToLPSTR(LPWSTR theLPWSTR) {
+        LPSTR pszOut = NULL;
+        if (theLPWSTR != NULL) {
+            int nInputStrLen = wcslen(theLPWSTR);
+
+            // Double NULL Termination
+            int nOutputStrLen = WideCharToMultiByte(CP_ACP, 0, theLPWSTR, nInputStrLen, NULL, 0, 0, 0) + 2;
+            pszOut = new char [nOutputStrLen];
+
+            if (pszOut) {
+                memset(pszOut, 0x00, nOutputStrLen);
+                WideCharToMultiByte(CP_ACP, 0, theLPWSTR, nInputStrLen, pszOut, nOutputStrLen, 0, 0);
+            }
+        }
+        return pszOut;
+    }
+#endif
+
 }

@@ -235,6 +235,10 @@ class string_functions_UnitTest : public UnitTest {
             ENSURE(trim(" Foo Bar ") == "Foo Bar");
 
             testBase64();
+#ifdef _WIN32
+            testWinConversion();
+#endif
+            
 		}
 
         void testBase64Encode(const char * IN, const char * OUT, const Char * CB) {
@@ -319,6 +323,19 @@ class string_functions_UnitTest : public UnitTest {
             ENSURE_EXCEPTION(base64ToBin("!abc", myDest, 10), ParseException);
             ENSURE_EXCEPTION(base64ToBin("abc*", myDest, 10), ParseException);
         }
+#ifdef _WIN32
+        void testWinConversion() {
+            BSTR myBString = SysAllocString (L"Tring, Tring!");
+            LPWSTR myLPWString = L"Tring, Tring!";
+
+            ENSURE(std::string(convertBSTRToLPSTR(myBString)) == "Tring, Tring!");
+            ENSURE(std::string(convertLPWSTRToLPSTR(myLPWString)) == "Tring, Tring!");
+
+            SysFreeString(myBString);
+            delete [] myLPWString;
+        }
+#endif
+        
 };
 
 

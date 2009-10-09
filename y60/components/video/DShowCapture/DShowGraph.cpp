@@ -74,6 +74,7 @@ DEFINE_GUID(PROPSETID_VIDCAP_AVT,
 #include <atlcomcli.h>
 #include <asl/base/Logger.h>
 #include <asl/base/Assure.h>
+#include <asl/base/string_functions.h>
 
 #include <iostream>
 
@@ -357,8 +358,7 @@ HRESULT DShowGraph::findCaptureDevice(IBaseFilter ** ppSrcFilter, int theDeviceI
             if (SUCCEEDED(hr))
             {
                 // Add it to the application's list box.
-                USES_CONVERSION;
-                _myDevice = std::string(OLE2A(varName.bstrVal));
+                _myDevice = std::string(asl::convertBSTRToLPSTR(varName.bstrVal));
                 AC_DEBUG << "Capture Device is: " << _myDevice;
                 VariantClear(&varName); 
             }
@@ -849,8 +849,7 @@ std::vector<std::string> DShowGraph::enumDevices() {
             if (SUCCEEDED(hr))
             {
                 // Add it to the application's list box.
-                USES_CONVERSION;
-                myDeviceList.push_back(std::string(OLE2A(varName.bstrVal)));
+                myDeviceList.push_back(std::string(asl::convertBSTRToLPSTR(varName.bstrVal)));
                 AC_DEBUG << "Found Device " << myDeviceList.size()-1 << ": " << myDeviceList[myDeviceList.size()-1]; 
                 VariantClear(&varName); 
             }

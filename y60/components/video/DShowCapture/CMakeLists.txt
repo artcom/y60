@@ -14,12 +14,12 @@ DXSampleGrabber.h
 y60_dshowcapture_settings.h
 )
 
-set(EXTERNALS FFMPEG PTHREADVC DIRECTX WMSDK ATL WINDOWSSDK)
+set(EXTERNALS FFMPEG STRMIIDS ATL WINDOWSSDK)
 
 y60_add_component(
     DShowCapture
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
-    DEPENDS y60jslib y60video
+    DEPENDS y60video
     EXTERNS ${EXTERNALS}
 )

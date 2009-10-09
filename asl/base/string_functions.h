@@ -28,6 +28,11 @@
 #include <string>
 #include <vector>
 #include <ctype.h>
+
+#ifdef _WIN32
+#   include <wtypes.h> // Platform SDK (for BSTR typedef)
+#endif
+
 #ifdef _SETTING_USE_STRSTREAM_INSTEAD_OF_STRINGSTREAM_
 #  include <strstream.h>
 #else
@@ -237,6 +242,11 @@ namespace asl {
     // string. 
     // Rudimentary, but very helpful when parsing line-based files.
     std::string getNextLine(std::string::size_type& theCurPos, const std::string& theString);
+
+#ifdef _WIN32
+    ASL_BASE_DECL char* convertBSTRToLPSTR(BSTR theBSTR);
+    ASL_BASE_DECL char* convertLPWSTRToLPSTR(LPWSTR theLPWSTR);
+#endif
 
     inline bool is_ascii(Char c) {
         return (c <= 0x7f);

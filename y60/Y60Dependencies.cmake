@@ -56,6 +56,9 @@ if(WIN32)
     # cinema 4d
     list(APPEND OPT_PACKAGES C4D)
 
+    # DirectShow GUIDs (comes with Windows SDK)
+    list(APPEND REQ_PACKAGES Strmiids)
+
 elseif(LINUX)
 
     # cairo backend
