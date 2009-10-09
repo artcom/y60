@@ -450,6 +450,19 @@ spark.Widget.Constructor = function(Protected) {
         return new GUI.PropertyAnimation(theDuration, theEasing, Public, theProperty, theStart, theEnd);
     };
 
+    Public.animateFade = function(theDuration, theEnd, theEasing) {
+        if(!theDuration) {
+            theDuration = 250.0;
+        }
+        if(!theEnd) {
+        	theEnd = 1.0;
+        }
+        if(!theEasing) {
+            theEasing = null;
+        }
+        return Public.animateProperty(theDuration, theEasing, "alpha", Public.alpha, theEnd);
+    };
+    
     Public.animateFadeIn = function(theDuration, theEasing) {
         if(!theDuration) {
             theDuration = 250.0;
