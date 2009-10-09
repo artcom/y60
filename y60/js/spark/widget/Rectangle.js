@@ -21,7 +21,7 @@ spark.Rectangle.Constructor = function(Protected) {
 
     Public.color getter = function() {
         var c = Protected.material.properties.surfacecolor;
-        return new Vector3f(c.r, c.g, c.b);
+        return new Vector4f(c.r, c.g, c.b, c.a);
     };
 
     Public.color setter = function(theColor) {
