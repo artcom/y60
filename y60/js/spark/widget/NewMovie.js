@@ -25,15 +25,21 @@ spark.NewMovie.Constructor = function(Protected) {
     // playback control
 
     Public.play = function() {
-        _myMovie.playmode = "play";
+    	if(_myMovie.nodeName == "movie") {
+    		_myMovie.playmode = "play";
+    	}
     };
     
     Public.stop = function() {
-        _myMovie.playmode = "stop";
+    	if(_myMovie.nodeName == "movie") {
+    		_myMovie.playmode = "stop";
+    	}
     };
 
     Public.pause = function() {
-        _myMovie.playmode = "pause";
+    	if(_myMovie.nodeName == "movie") {
+    		_myMovie.playmode = "pause";
+    	}
     };
 
     Public.mode getter = function() { return _myMovie.playmode; };
