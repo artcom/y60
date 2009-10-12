@@ -52,6 +52,7 @@ spark.Window.Constructor = function(Protected) {
         window.swapInterval = Protected.getNumber("swapInterval", 1);
         var myFixedDeltaT = Number(eval(Protected.getString("fixedDeltaT", "0"))); // so we can say something like "1/30"
         if (myFixedDeltaT) {
+            // XXX What's that? [DS]
             window.swapInterval = myFixedDeltaT; 
         }
         
