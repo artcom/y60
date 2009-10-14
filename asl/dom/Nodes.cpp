@@ -472,6 +472,35 @@ namespace dom {
         return result;
     }
 
+	// this comes from spdiermonkey jsstr.c (vs)
+	/*
+	 * Convert one UCS-4 char and write it into a UTF-8 buffer, which must be at
+	 * least 6 bytes long.  Return the number of UTF-8 bytes of data written.
+	 */
+	static int
+	OneUcs4ToUtf8Char(char *utf8Buffer, unsigned ucs4Char)
+	{
+		int utf8Length = 1;
+		if (ucs4Char < 0x80) {
+			*utf8Buffer = (char)ucs4Char;
+		} else {
+			int i;
+			unsigned a = ucs4Char >> 11;
+			utf8Length = 2;
+			while (a) {
+				a >>= 5;
+				utf8Length++;
+			}
+			i = utf8Length;
+			while (--i) {
+				utf8Buffer[i] = (char)((ucs4Char & 0x3F) | 0x80);
+				ucs4Char >>= 6;
+			}
+			*utf8Buffer = (char)(0x100 - (1 << (8-utf8Length)) + ucs4Char);
+		}
+		return utf8Length;
+	}
+
     String entity_decode_data(const String & s, int global_pos, const Node * doctype) {
         String result;
         result.reserve(s.size());
@@ -502,12 +531,22 @@ namespace dom {
                         asl::copy_between(s,i,ENT_DEC,ENT_SEMI,next_pos,entity_name);
                         unsigned int value;
                         if (asl::is_decimal_number(entity_name,value)) {
-                            result += static_cast<char>(value);
+							char myUTF8Buffer[6];
+							int myLen = OneUcs4ToUtf8Char(myUTF8Buffer, value);
+							for (unsigned i = 0; i < myLen; i++) {
+								result += static_cast<char>(myUTF8Buffer[i]);
+							}
+                            //result += static_cast<char>(value);                            
                         } else
                             if (entity_name[0] == Cx) {
                                 String hex_string = entity_name.substr(1);
                                 if (asl::is_hex_number(hex_string,value)) {
-                                    result += static_cast<char>(value);
+									char myUTF8Buffer[6];
+									int myLen = OneUcs4ToUtf8Char(myUTF8Buffer, value);
+									for (unsigned i = 0; i < myLen; i++) {
+										result += static_cast<char>(myUTF8Buffer[i]);
+									}
+                                    //result += static_cast<char>(value);
                                 } else {
                                     String error_msg;
                                     error_msg = "illegal entity number code '" + s.substr(i,next_pos) + "'";

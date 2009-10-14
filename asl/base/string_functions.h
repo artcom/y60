@@ -47,7 +47,7 @@ namespace asl {
     /* @{ */
 
     typedef unsigned char Char;
-    const int MAX_CHAR_VALUE = 255;
+    const int MAX_CHAR_VALUE = 255 * 16;
 
     ASL_BASE_DECL extern const Char cb64[];
     ASL_BASE_DECL extern const Char cb66[];
