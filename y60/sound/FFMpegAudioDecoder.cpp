@@ -270,37 +270,33 @@ bool FFMpegAudioDecoder::decode() {
                     &myBytesDecoded, myData, myDataLen);
 #endif
 
-            
-            if (myLen > 0 && myBytesDecoded > 0) {
-                int numFrames = myBytesDecoded/(getBytesPerSample(SF_S16)*_myNumChannels);
-                AC_TRACE << "FFMpegAudioDecoder::decode(): Frames per buffer= " << numFrames;
-                AudioBufferPtr myBuffer;
-                if (_myResampleContext) {
-                    numFrames = audio_resample(_myResampleContext, 
-                            (int16_t*)(_myResampledSamples.begin()),
-                            (int16_t*)(_mySamples.begin()), 
-                            numFrames);
-                    myBuffer = Pump::get().createBuffer(numFrames);
-                    myBuffer->convert(_myResampledSamples.begin(), SF_S16, _myNumChannels);
-                } else {
-                    myBuffer = Pump::get().createBuffer(numFrames);
-                    myBuffer->convert(_mySamples.begin(), SF_S16, _myNumChannels);
-                }
-                myBuffer->setStartFrame(_myCurFrame);
-                _myCurFrame += myBuffer->getNumFrames();
-                _mySampleSink->queueSamples(myBuffer);
-                myData += myLen;
-                myDataLen -= myLen;
-            } else {
-                if (myLen <= 0)  {
-                    AC_WARNING << "Unable to avcodec_decode_audio: myLen=" << myLen 
-                            << ", myBytesDecoded=" << myBytesDecoded;
-                } else {
-                    AC_DEBUG << "Unable to avcodec_decode_audio: myLen=" << myLen 
-                            << ", myBytesDecoded=" << myBytesDecoded;
-                }
+            if (myLen < 0) {
+                AC_WARNING << "av_decode_audio error";
                 break;
             }
+            myData += myLen;
+            myDataLen -= myLen;
+            AC_TRACE << "data left " << myDataLen << " read " << myLen;
+            if ( myBytesDecoded <= 0 ) {
+                continue;
+            }
+            int numFrames = myBytesDecoded/(getBytesPerSample(SF_S16)*_myNumChannels);
+            AC_TRACE << "FFMpegAudioDecoder::decode(): Frames per buffer= " << numFrames;
+            AudioBufferPtr myBuffer;
+            if (_myResampleContext) {
+                numFrames = audio_resample(_myResampleContext, 
+                        (int16_t*)(_myResampledSamples.begin()),
+                        (int16_t*)(_mySamples.begin()), 
+                        numFrames);
+                myBuffer = Pump::get().createBuffer(numFrames);
+                myBuffer->convert(_myResampledSamples.begin(), SF_S16, _myNumChannels);
+            } else {
+                myBuffer = Pump::get().createBuffer(numFrames);
+                myBuffer->convert(_mySamples.begin(), SF_S16, _myNumChannels);
+            }
+            myBuffer->setStartFrame(_myCurFrame);
+            _myCurFrame += myBuffer->getNumFrames();
+            _mySampleSink->queueSamples(myBuffer);
         }
     }
     av_free_packet(&myPacket);

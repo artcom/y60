@@ -390,7 +390,7 @@ namespace y60 {
         // decode audio
         int myBytesDecoded = 0; // decompressed sample size in bytes
         unsigned char* myData = thePacket.data;
-        unsigned myDataLen = thePacket.size;
+        int myDataLen = thePacket.size;
         double myTime = thePacket.dts / _myTimeUnitsPerSecond;
         AC_TRACE << "FFMpegDecoder2::addAudioPacket()";
         while (myDataLen > 0) {
@@ -403,9 +403,15 @@ namespace y60 {
             int myLen = avcodec_decode_audio(_myAStream->codec,
                 (int16_t*)_mySamples.begin(), &myBytesDecoded, myData, myDataLen);    
 #endif
-            if (myLen < 0 || myBytesDecoded < 0) {
+            if (myLen < 0) {
                 AC_WARNING << "av_decode_audio error";
                 break;
+            }
+            myData += myLen;
+            myDataLen -= myLen;
+            AC_TRACE << "data left " << myDataLen << " read " << myLen;
+            if ( myBytesDecoded <= 0 ) {
+                continue;
             }
             int myNumChannels = _myAStream->codec->channels;
             int numFrames = myBytesDecoded/(getBytesPerSample(SF_S16)*myNumChannels);
@@ -424,10 +430,6 @@ namespace y60 {
                 myBuffer->convert(_mySamples.begin(), SF_S16, myNumChannels);
             }
             _myAudioSink->queueSamples(myBuffer);
-
-            myData += myLen;
-            myDataLen -= myLen;
-            AC_TRACE << "data left " << myDataLen << " read " << myLen;
 
             AC_TRACE << "decoded audio time=" << myTime;
         } // while
