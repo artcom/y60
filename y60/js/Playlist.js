@@ -194,6 +194,7 @@ Playlist.prototype.Constructor = function(self) {
             theUrl.search(/^video:\/\//i) != -1) {
             return CAPTURE_MEDIA;
         } else if (theUrl.search(/\.mp3$/i)  != -1 ||
+                   theUrl.search(/\.mp2$/i)  != -1 ||
                    theUrl.search(/\.wma$/i)  != -1 ||
                    theUrl.search(/\.rm$/i)   != -1 ||
                    theUrl.search(/\.ra$/i)   != -1 ||
