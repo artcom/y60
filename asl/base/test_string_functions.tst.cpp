@@ -332,7 +332,6 @@ class string_functions_UnitTest : public UnitTest {
             ENSURE(std::string(convertLPWSTRToLPSTR(myLPWString)) == "Tring, Tring!");
 
             SysFreeString(myBString);
-            delete [] myLPWString;
         }
 #endif
         
