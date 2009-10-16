@@ -849,7 +849,7 @@ AbstractRenderWindow::onTouch(y60::Event & theEvent) {
     if (_myEventListener && JSA_hasFunction(_myJSContext, _myEventListener, "onTouch")) {
         y60::TouchEvent & myEvent = dynamic_cast<y60::TouchEvent&>(theEvent);
 
-        jsval argv[6], rval;
+        jsval argv[7], rval;
         int nargs = 0;
         argv[nargs++] = as_jsval(_myJSContext, myEvent.device);
         argv[nargs++] = as_jsval(_myJSContext, myEvent.position[0]);

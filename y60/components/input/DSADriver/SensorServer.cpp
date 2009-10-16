@@ -96,7 +96,7 @@ SensorServer::parseLine(const string & theLine, unsigned & theController, unsign
 
 void
 SensorServer::handleLines(string & theBuffer, SensorData & theData) {
-    std::string::size_type i = theBuffer.find_first_of("\r\n");
+    std::string::size_type i = theBuffer.find("\r\n");
     while(i != string::npos) {
         string myLine = theBuffer.substr(0 ,i);
         if (!myLine.empty()) {
@@ -104,11 +104,8 @@ SensorServer::handleLines(string & theBuffer, SensorData & theData) {
             parseLine(myLine, myController, myBitmask);
             theData.push_back(make_pair(myController, myBitmask));
         }
-        theBuffer = theBuffer.substr(i+1);
-        std::string::size_type nextline_start = theBuffer.find_first_not_of("\r\n");
-        if ( nextline_start != string::npos) {
-            theBuffer = theBuffer.substr(nextline_start);
-        }
+        theBuffer = theBuffer.substr(i+2);
+        i = theBuffer.find("\r\n");
     }
 }
 
