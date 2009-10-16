@@ -157,12 +157,16 @@ TCPServer * TestSocket::createTCPServer(){
     // see http://www.unixguide.net/network/socketfaq/4.5.shtml for more info
 #ifdef _WIN32    
     // try to create a tcp socket twice (already in use test)
+    // since windows 2003 server it's neccessary to open both
+    // sockets with SO_REUSEADDR, not only the second one.
+    // See http://msdn.microsoft.com/en-us/library/ms740621(VS.85).aspx
+    // section: Enhanced Socket Security
     try {
-        myTCPServer = new TCPServer(INADDR_ANY, MIN_PORT);
+        myTCPServer = new TCPServer(INADDR_ANY, MIN_PORT, true);
     }
     catch (SocketException & se)
     {
-        cerr << "TestSocket::TCPTest() " << "failed to listen on port " << MIN_PORT << ":" << se.where() << endl;
+        cerr << "TestSocket::TCPTest() " << "failed to listen on port " << MIN_PORT << ":" << se << endl;
         myTCPServer = 0;
     }
     // do it again
@@ -171,7 +175,7 @@ TCPServer * TestSocket::createTCPServer(){
     }
     catch (SocketException & se)
     {
-        cerr << "TestSocket::TCPTest() " << "failed to listen on port " << MIN_PORT << ":" << se.where() << endl;
+        cerr << "TestSocket::TCPTest() " << "failed to listen on port " << MIN_PORT << ":" << se << endl;
         myTCPServer = 0;
     }
     ENSURE_MSG(myTCPServer!=0, "Reuse a bound tcp server rcv socket");

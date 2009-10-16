@@ -53,6 +53,7 @@
 #ifndef _WIN32
 #include <arpa/inet.h>
 #define SOCKET_ERROR -1
+#define INVALID_SOCKET -1
 #endif
 
 #include <fcntl.h>
@@ -68,18 +69,21 @@ namespace inet {
           _myFromAddr(myHost, myPort)
     {
         fd=socket(AF_INET,SOCK_STREAM,0);
+        if (fd == INVALID_SOCKET) {
+            throw SocketError(getLastSocketError(), "TCPServer::TCPServer: Failed to create socket file descriptor");
+        }
 
         if(theReusePortFlag) {
             int myReusePortFlag = theReusePortFlag ? 1 : 0;
-            if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, (char*)&myReusePortFlag, sizeof(myReusePortFlag)) < 0) {
+            if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, (char*)&myReusePortFlag, sizeof(myReusePortFlag)) == SOCKET_ERROR) {
                 throw SocketError(getLastSocketError(), "TCPServer::TCPServer: can`t set SO_REUSEADDR");
             }
         }
 
-        if (bind(fd,(struct sockaddr*)&_myFromAddr,sizeof(_myFromAddr))<0) {
+        if (bind(fd,(struct sockaddr*)&_myFromAddr,sizeof(_myFromAddr)) == SOCKET_ERROR) {
             throw SocketError(getLastSocketError(), "TCPServer::TCPServer: can`t bind socket");
         }
-        if (listen(fd,8)<0) {
+        if (listen(fd,8) == SOCKET_ERROR) {
             throw SocketError(getLastSocketError(), "TCPServer::TCPServer: can`t listen");
         }
     }
@@ -110,7 +114,7 @@ namespace inet {
 
         remoteEndpointLen=sizeof(remoteEndpoint);
         int newFD;
-        if ((newFD=accept(fd,(sockaddr *)&remoteEndpoint,&remoteEndpointLen))<0) {
+        if ((newFD=accept(fd,(sockaddr *)&remoteEndpoint,&remoteEndpointLen)) == INVALID_SOCKET) {
             int err = getLastSocketError();
         	if(err != OS_SOCKET_ERROR(EWOULDBLOCK)) {
         		throw SocketError(err, "TCPServer::waitForConnection: can't accept connection");
