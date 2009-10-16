@@ -8,23 +8,28 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
+// use this for croase tesselated models. For small triangles a per vertex reflection
+// vector is good enough.
+//#define PER_PIXEL_REFLECT_VECTOR
+
+// TODO: document the other defines
 
 // texture coordinates
 #ifdef OCCLUSION
-    #define OCCLUSION_TEXCOORD TEXCOORD0
-#ifdef PAINT
-    #define PAINT_TEXCOORD     TEXCOORD1
-#if PAINT==2
-    #define PAINT2_TEXCOORD    TEXCOORD2
-#endif
-#endif
+#   define OCCLUSION_TEXCOORD TEXCOORD0
+#   ifdef PAINT
+#       define PAINT_TEXCOORD     TEXCOORD1
+#       if PAINT==2
+#           define PAINT2_TEXCOORD    TEXCOORD2
+#       endif
+#   endif
 #else // WITHOUT OCCLUSION
-#ifdef PAINT
-    #define PAINT_TEXCOORD  TEXCOORD0
-#if PAINT==2
-    #define PAINT2_TEXCOORD TEXCOORD1
-#endif
-#endif
+#   ifdef PAINT
+#       define PAINT_TEXCOORD  TEXCOORD0
+#       if PAINT==2
+#           define PAINT2_TEXCOORD TEXCOORD1
+#       endif
+#   endif
 #endif // OCCLUSION
 
 
@@ -36,9 +41,9 @@ struct app2vert {
 #endif
 #ifdef PAINT
     float2 paintTexCoord   : PAINT_TEXCOORD;
-#if PAINT==2
-    float2 paint2TexCoord  : PAINT2_TEXCOORD;
-#endif
+#   if PAINT==2
+        float2 paint2TexCoord  : PAINT2_TEXCOORD;
+#   endif
 #endif
 };
 
@@ -48,16 +53,18 @@ struct vert2frag {
 #ifdef OCCLUSION
     float2 occlusionTexCoord : OCCLUSION_TEXCOORD;
 #endif
+
 #ifdef PAINT
     float2 paintTexCoord  : PAINT_TEXCOORD;
-#if PAINT==2
-    float2 paint2TexCoord : PAINT2_TEXCOORD;
-#endif
+#   if PAINT==2
+        float2 paint2TexCoord : PAINT2_TEXCOORD;
+#   endif
 #endif
     float3 worldPosition : TEXCOORD3;
     float3 worldNormal   : TEXCOORD4;
+#ifndef PER_PIXEL_REFLECT_VECTOR
     float3 reflectVector : TEXCOORD5;
-    float3 refractVector : TEXCOORD6;
+#endif
 };
 
 
@@ -74,15 +81,20 @@ vert2frag mainVertex(app2vert IN,
 
     float3 myWorldPosition = mul(AC_OBJECTWORLD, IN.Position).xyz;
     float3 myWorldNormal = normalize(mul(AC_OBJECTWORLD_IT, IN.Normal).xyz);
-    float3 myViewVector = normalize(myWorldPosition - AC_CAMERA_POSITION);
 
     OUT.worldPosition = myWorldPosition.xyz;
     OUT.worldNormal = myWorldNormal;
 
+#ifndef PER_PIXEL_REFLECT_VECTOR
+    // compute per vertex reflection vector
+    float3 myViewVector = normalize(myWorldPosition - AC_CAMERA_POSITION);
     OUT.reflectVector = reflect(myViewVector, myWorldNormal);
+
+    // XXX: What is that for? [DS]
     OUT.reflectVector.z = -OUT.reflectVector.z; // inside-out transformation
-#ifdef YFLIP
-    OUT.reflectVector.y = -OUT.reflectVector.y; // needed for dynamic cubemaps
+#   ifdef YFLIP
+        OUT.reflectVector.y = -OUT.reflectVector.y; // needed for dynamic cubemaps
+#   endif
 #endif
 
 #ifdef OCCLUSION
@@ -90,9 +102,9 @@ vert2frag mainVertex(app2vert IN,
 #endif
 #ifdef PAINT
     OUT.paintTexCoord = IN.paintTexCoord;
-#if PAINT==2
-    OUT.paint2TexCoord = IN.paint2TexCoord;
-#endif
+#   if PAINT==2
+        OUT.paint2TexCoord = IN.paint2TexCoord;
+#   endif
 #endif
 
     return OUT;
@@ -105,9 +117,9 @@ float4 mainFragment(vert2frag   IN,
 #endif
 #ifdef PAINT
         uniform sampler2D decalTex,
-#if PAINT==2
+#   if PAINT==2
         uniform sampler2D emissiveTex,
-#endif
+#   endif
 #endif
         uniform samplerCUBE envTex,
         uniform float3 AC_CAMERA_POSITION,
@@ -134,16 +146,23 @@ float4 mainFragment(vert2frag   IN,
     float4 myBaseColor;
 #ifdef PAINT
     myBaseColor = tex2D(decalTex, IN.paintTexCoord);
-#if PAINT==2
-    float4 myBaseColor2 = tex2D(emissiveTex, IN.paint2TexCoord);
-    myBaseColor *= myBaseColor2; // modulate
-#endif
+#   if PAINT==2
+        float4 myBaseColor2 = tex2D(emissiveTex, IN.paint2TexCoord);
+        myBaseColor *= myBaseColor2; // modulate
+#   endif
     myBaseColor *= diffuse;
 #else
     myBaseColor = diffuse;
 #endif
 
-    float3 myEnvTexel = texCUBE(envTex, IN.reflectVector).rgb * reflectivity;
+#ifdef PER_PIXEL_REFLECT_VECTOR
+    float3 myViewVector = normalize(IN.worldPosition - AC_CAMERA_POSITION);
+    float3 reflectVector = reflect(myViewVector, IN.worldNormal);
+#else
+    float3 reflectVector = IN.reflectVector;
+#endif
+
+    float3 myEnvTexel = texCUBE(envTex, reflectVector).rgb * reflectivity;
 
     float4 myLightDiffuse = float4(0,0,0,0);
     float4 myLightSpecular = float4(0,0,0,0);
@@ -210,5 +229,4 @@ float4 mainFragment(vert2frag   IN,
 #endif
 
     return myBlendColor;
-    
 }
