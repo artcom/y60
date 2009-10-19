@@ -53,7 +53,7 @@
 
 namespace asl {
 
-class ProcessException : public asl::Exception {
+class ASL_BASE_DECL ProcessException : public asl::Exception {
 public:
     ProcessException(const std::string & what = "",
                      const std::string & where = "")
@@ -64,7 +64,7 @@ public:
 
 };
 
-class Process {
+class ASL_BASE_DECL Process {
 public:
 
     enum State {
