@@ -126,8 +126,8 @@ UnitTest
 )
 
 if(UNIX)
-    list(APPEND SOURCES signal_functions.cpp)
-    list(APPEND HEADERS signal_functions.h)
+    list(APPEND SOURCES signal_functions.cpp Process.cpp)
+    list(APPEND HEADERS signal_functions.h Process.h)
     list(APPEND TESTS Itimer PrioCeilingRWLock ShellScript)
 endif(UNIX)
 
