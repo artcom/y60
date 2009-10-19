@@ -42,7 +42,7 @@
 
 namespace asl {
 
-#ifdef UNIX
+#ifndef _WIN32
 
 #include <errno.h>
 #include <stdlib.h>
@@ -107,9 +107,7 @@ Process::waitForTermination() {
     }
 }
 
-#endif
-
-#ifdef WIN32
+#else
 
 void
 Process::launch() {

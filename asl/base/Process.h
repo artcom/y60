@@ -43,12 +43,10 @@
 
 #include "asl_base_settings.h"
 
-#ifdef UNIX
-#include <sys/types.h>
-#endif
-
-#ifdef WIN32
+#ifdef _WIN32
 #include <windows.h>
+#else
+#include <sys/types.h>
 #endif
 
 #include <asl/base/Exception.h>
@@ -80,11 +78,10 @@ public:
     Process(const std::string & theCommand)
         : _myCommand(theCommand),
           _myState(PROCESS_INITIALIZED),
-#ifdef UNIX
-          _myPid(-1),
-#endif
 #ifdef WIN32
           _myHandle(INVALID_HANDLE_VALUE),
+#else
+          _myPid(-1),
 #endif
           _myStatusCode(-1)
     { }
@@ -110,7 +107,7 @@ public:
         return _myStatusCode;
     }
 
-#ifdef WIN32
+#ifdef _WIN32
     void handleSystemError(const std::string & theSystemCall, const DWORD theError, const std::string & theLocationString = "");
 #endif
 
@@ -123,11 +120,10 @@ private:
     std::string _myCommand;
 
     State _myState;
-#ifdef UNIX
-    pid_t _myPid;
-#endif
-#ifdef WIN32
+#ifdef _WIN32
     HANDLE _myHandle;
+#else
+    pid_t  _myPid;
 #endif
     int   _myStatusCode;
 };
