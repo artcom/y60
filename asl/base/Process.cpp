@@ -118,13 +118,17 @@ Process::launch() {
     // NOTE CreateProcess mutates this string
     char *myCommandLine = strdup(_myCommand.c_str());
 
+    STARTUPINFO myStartupInfo;
+    ZeroMemory(&myStartupInfo, sizeof(STARTUPINFO));
+    myStartupInfo.cb = sizeof(STARTUPINFO);
+
     PROCESS_INFORMATION myProcessInfo;
-    if(!CreateProcess(NULL, myCommandLine, NULL, NULL, TRUE, 0, NULL, NULL, NULL, &myProcessInfo)) {
-        LocalFree(myCommandLine);
+    if(!CreateProcess(NULL, myCommandLine, NULL, NULL, TRUE, 0, NULL, NULL, &myStartupInfo, &myProcessInfo)) {
+        free(myCommandLine);
         handleSystemError("CreateProcess", GetLastError());
     }
 
-    LocalFree(myCommandLine);
+    free(myCommandLine);
 
     _myHandle = myProcessInfo.hProcess;
     _myState = PROCESS_LAUNCHED;
