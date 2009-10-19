@@ -13,6 +13,7 @@ JSLogger.cpp
 JSModellingFunctions.cpp
 JSOffscreenRenderArea.cpp
 JSPerlinNoise.cpp
+JSProcess.cpp
 JSRenderer.cpp
 JSRequest.cpp
 JSRequestManager.cpp
@@ -48,6 +49,7 @@ JSLogger.h
 JSModellingFunctions.h
 JSOffscreenRenderArea.h
 JSPerlinNoise.h
+JSProcess.h
 JSRenderer.h
 JSRequest.h
 JSRequestManager.h

@@ -80,6 +80,7 @@
 #include "JSSvgPath.h"
 #include "JSPerlinNoise.h"
 #include "JSSerial.h"
+#include "JSProcess.h"
 
 #include <y60/jsbase/JSSphere.h>
 #include <y60/jsbase/JSBox.h>
@@ -197,6 +198,9 @@ bool initCppClasses(JSContext *cx, JSObject *theGlobalObject) {
         return false;
     }
     if (!JSSerial::initClass(cx, theGlobalObject)) {
+        return false;
+    }
+    if (!JSProcess::initClass(cx, theGlobalObject)) {
         return false;
     }
     if (!JSTriangle::initClass(cx, theGlobalObject)) {
