@@ -42,6 +42,8 @@
 
 namespace asl {
 
+#ifdef UNIX
+
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
@@ -104,5 +106,94 @@ Process::waitForTermination() {
         _myState = PROCESS_TERMINATED;
     }
 }
+
+#endif
+
+#ifdef WIN32
+
+void
+Process::launch() {
+    if(_myState != PROCESS_INITIALIZED) {
+        throw ProcessException("Can't launch a process that has allready been launched", PLUS_FILE_LINE);
+    }
+
+    // NOTE CreateProcess mutates this string
+    char *myCommandLine = strdup(_myCommand.c_str());
+
+    PROCESS_INFORMATION myProcessInfo;
+    if(!CreateProcess(NULL, myCommandLine, NULL, NULL, TRUE, 0, NULL, NULL, NULL, &myProcessInfo)) {
+        LocalFree(myCommandLine);
+        handleSystemError("CreateProcess", GetLastError());
+    }
+
+    LocalFree(myCommandLine);
+
+    _myHandle = myProcessInfo.hProcess;
+    _myState = PROCESS_LAUNCHED;
+}
+
+bool
+Process::pollForTermination() {
+    DWORD myResult = WaitForSingleObject(_myHandle, 0);
+
+    if(myResult == WAIT_OBJECT_0) {
+        DWORD myExitCode;
+        if(!GetExitCodeProcess(_myHandle, &myExitCode)) {
+            handleSystemError("Error retrieving exit code", GetLastError());
+        }
+
+        _myStatusCode = myExitCode;
+        _myState = PROCESS_TERMINATED;
+
+        CloseHandle(_myHandle);
+
+        return true;
+    }
+
+    if(myResult == WAIT_FAILED) {
+        handleSystemError("WaitForSingleObject", GetLastError());
+    }
+
+    return false;
+}
+
+void
+Process::waitForTermination() {
+    DWORD myResult = WaitForSingleObject(_myHandle, INFINITE);
+
+    if(myResult == WAIT_OBJECT_0) {
+        DWORD myExitCode;
+        if(!GetExitCodeProcess(_myHandle, &myExitCode)) {
+            handleSystemError("GetExitProcessCode", GetLastError());
+        }
+
+        _myStatusCode = myExitCode;
+        _myState = PROCESS_TERMINATED;
+
+        CloseHandle(_myHandle);
+
+        return;
+    }
+
+    if(myResult == WAIT_FAILED) {
+        handleSystemError("WaitForSingleObject", GetLastError());
+    }
+}
+
+void
+Process::handleSystemError(const std::string & theSystemCall, const DWORD theError, const std::string & theLocationString) {
+    if (theError) {
+        LPVOID myMessageBuffer;
+        FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM |
+                      FORMAT_MESSAGE_IGNORE_INSERTS, NULL, theError, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                      (LPTSTR) & myMessageBuffer, 0, NULL);
+        std::string myErrorString = theSystemCall + " failed: ";
+        myErrorString.append((LPTSTR) myMessageBuffer);
+        LocalFree(myMessageBuffer);
+        throw ProcessException(myErrorString, theLocationString);
+    }
+}
+
+#endif
 
 }

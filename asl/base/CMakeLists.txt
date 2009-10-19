@@ -18,6 +18,7 @@ PlugInBase.cpp
 PlugInManager.cpp
 PosixThread.cpp
 proc_functions.cpp
+Process.cpp
 Ptr.cpp
 ReadWriteLock.cpp
 Revision.cpp
@@ -66,6 +67,7 @@ Path.h
 PlugInBase.h
 PlugInManager.h
 PosixThread.h
+Process.h
 proc_functions.h
 Ptr.h
 RangeSet.h
@@ -126,8 +128,8 @@ UnitTest
 )
 
 if(UNIX)
-    list(APPEND SOURCES signal_functions.cpp Process.cpp)
-    list(APPEND HEADERS signal_functions.h Process.h)
+    list(APPEND SOURCES signal_functions.cpp)
+    list(APPEND HEADERS signal_functions.h)
     list(APPEND TESTS Itimer PrioCeilingRWLock ShellScript)
 endif(UNIX)
 
