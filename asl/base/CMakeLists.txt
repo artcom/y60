@@ -114,6 +114,7 @@ Path
 PlugInManager
 PosixThread
 _proc_functions
+Process
 Ptr
 ReadWriteLock
 RunLengthEncoder

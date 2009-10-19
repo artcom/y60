@@ -78,7 +78,7 @@ public:
     Process(const std::string & theCommand)
         : _myCommand(theCommand),
           _myState(PROCESS_INITIALIZED),
-#ifdef WIN32
+#ifdef _WIN32
           _myHandle(INVALID_HANDLE_VALUE),
 #else
           _myPid(-1),
