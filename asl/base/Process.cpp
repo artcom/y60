@@ -40,16 +40,21 @@
 
 #include "Process.h"
 
-namespace asl {
-
 #ifndef _WIN32
 
 #include <errno.h>
+#include <signal.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
 #include <sys/wait.h>
+
+#endif
+
+namespace asl {
+
+#ifndef _WIN32
 
 void
 Process::launch() {
@@ -68,6 +73,22 @@ Process::launch() {
         // we exit() with errno to pass the cause
         exit(errno);
     }
+}
+
+void
+Process::kill() {
+    if(_myState != PROCESS_LAUNCHED) {
+        throw ProcessException("Can't kill a process that has never been launched", PLUS_FILE_LINE);
+    }
+
+    int myResult = ::kill(_myPid, SIGTERM);
+    if(myResult == -1) {
+        throw ProcessException("Failed to send SIGTERM to process: " + std::string(strerror(errno)), PLUS_FILE_LINE);
+    }
+
+    // XXX we should have some kind of timeout here and send SIGKILL when it is reached
+
+    waitForTermination();
 }
 
 bool
