@@ -67,10 +67,24 @@ Process::launch() {
         _myPid = myPid;
         _myState = PROCESS_LAUNCHED;
     } else {
-        execl("/bin/sh", "sh", "-c", _myCommand.c_str(), NULL);
+        int res;
 
-        // if we reach this point, an error has occured
-        // we exit() with errno to pass the cause
+        if(_myWorkingDirectory.length() > 0) {
+            res = chdir(_myWorkingDirectory.c_str());
+            if(res == -1) {
+                goto bail;
+            }
+        }
+
+        res = execl("/bin/sh", "sh", "-c", _myCommand.c_str(), NULL);
+        if(res == -1) {
+            goto bail;
+        }
+
+bail:
+        // NOTE We exit() with errno to pass the cause.
+        //      This could be used in the parent to
+        //      explain failure, but currently isn't
         exit(errno);
     }
 }
