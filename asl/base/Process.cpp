@@ -122,10 +122,15 @@ Process::launch() {
     ZeroMemory(&myStartupInfo, sizeof(STARTUPINFO));
     myStartupInfo.cb = sizeof(STARTUPINFO);
 
+    const char* myWorkingDirectory = NULL;
+    if(_myWorkingDirectory.length()) {
+        myWorkingDirectory = _myWorkingDirectory.c_str();
+    }
+
     PROCESS_INFORMATION myProcessInfo;
-    if(!CreateProcess(NULL, myCommandLine, NULL, NULL, TRUE, 0, NULL, NULL, &myStartupInfo, &myProcessInfo)) {
+    if(!CreateProcess(NULL, myCommandLine, NULL, NULL, TRUE, 0, NULL, myWorkingDirectory, &myStartupInfo, &myProcessInfo)) {
         free(myCommandLine);
-        handleSystemError("CreateProcess", GetLastError());
+        handleSystemError("CreateProcess", GetLastError(), PLUS_FILE_LINE);
     }
 
     free(myCommandLine);
@@ -134,14 +139,64 @@ Process::launch() {
     _myState = PROCESS_LAUNCHED;
 }
 
+void
+Process::kill() {
+    if(_myState != PROCESS_LAUNCHED) {
+        throw ProcessException("Can't kill a process that has never been launched", PLUS_FILE_LINE);
+    }
+
+    DWORD myThreadId;
+    if(!CreateRemoteThread(_myHandle, NULL, 0, (LPTHREAD_START_ROUTINE)ExitProcess, (LPVOID)0, 0, &myThreadId)) {
+        handleSystemError("CreateRemoteThread", GetLastError(), PLUS_FILE_LINE);
+    }
+
+    DWORD myResult = WaitForSingleObject(_myHandle, 1000);
+
+    if(myResult == WAIT_OBJECT_0) {
+        DWORD myExitCode;
+        if(!GetExitCodeProcess(_myHandle, &myExitCode)) {
+            handleSystemError("GetExitCodeProcess", GetLastError(), PLUS_FILE_LINE);
+        }
+
+        _myStatusCode = myExitCode;
+        _myState = PROCESS_TERMINATED;
+
+        CloseHandle(_myHandle);
+
+        return;
+    }
+    
+    if(myResult == WAIT_FAILED) {
+        handleSystemError("WaitForSingleObject", GetLastError(), PLUS_FILE_LINE);
+    }
+
+    if(!TerminateProcess(_myHandle, 0)) {
+        handleSystemError("TerminateProcess", GetLastError(), PLUS_FILE_LINE);
+    }
+
+    DWORD myExitCode;
+    if(!GetExitCodeProcess(_myHandle, &myExitCode)) {
+        handleSystemError("GetExitCodeProcess", GetLastError(), PLUS_FILE_LINE);
+    }
+
+    _myStatusCode = myExitCode;
+    _myState = PROCESS_TERMINATED;
+
+    CloseHandle(_myHandle);
+}
+
 bool
 Process::pollForTermination() {
+    if(_myState != PROCESS_LAUNCHED) {
+        throw ProcessException("Can't poll for a process that is not running", PLUS_FILE_LINE);
+    }
+
     DWORD myResult = WaitForSingleObject(_myHandle, 0);
 
     if(myResult == WAIT_OBJECT_0) {
         DWORD myExitCode;
         if(!GetExitCodeProcess(_myHandle, &myExitCode)) {
-            handleSystemError("Error retrieving exit code", GetLastError());
+            handleSystemError("GetExitCodeProcess", GetLastError(), PLUS_FILE_LINE);
         }
 
         _myStatusCode = myExitCode;
@@ -153,7 +208,7 @@ Process::pollForTermination() {
     }
 
     if(myResult == WAIT_FAILED) {
-        handleSystemError("WaitForSingleObject", GetLastError());
+        handleSystemError("WaitForSingleObject", GetLastError(), PLUS_FILE_LINE);
     }
 
     return false;
@@ -161,12 +216,16 @@ Process::pollForTermination() {
 
 void
 Process::waitForTermination() {
+    if(_myState != PROCESS_LAUNCHED) {
+        throw ProcessException("Can't wait for a process that is not running", PLUS_FILE_LINE);
+    }
+
     DWORD myResult = WaitForSingleObject(_myHandle, INFINITE);
 
     if(myResult == WAIT_OBJECT_0) {
         DWORD myExitCode;
         if(!GetExitCodeProcess(_myHandle, &myExitCode)) {
-            handleSystemError("GetExitProcessCode", GetLastError());
+            handleSystemError("GetExitProcessCode", GetLastError(), PLUS_FILE_LINE);
         }
 
         _myStatusCode = myExitCode;
@@ -178,7 +237,7 @@ Process::waitForTermination() {
     }
 
     if(myResult == WAIT_FAILED) {
-        handleSystemError("WaitForSingleObject", GetLastError());
+        handleSystemError("WaitForSingleObject", GetLastError(), PLUS_FILE_LINE);
     }
 }
 

@@ -77,6 +77,7 @@ public:
 
     Process(const std::string & theCommand)
         : _myCommand(theCommand),
+          _myWorkingDirectory(),
           _myState(PROCESS_INITIALIZED),
 #ifdef _WIN32
           _myHandle(INVALID_HANDLE_VALUE),
@@ -92,10 +93,6 @@ public:
         return (_myState == PROCESS_TERMINATED);
     }
 
-    const std::string & getCommand() {
-        return _myCommand;
-    }
-
     State getState() {
         return _myState;
     }
@@ -107,17 +104,32 @@ public:
         return _myStatusCode;
     }
 
+    const std::string & getCommand() {
+        return _myCommand;
+    }
+
+    const std::string & getWorkingDirectory() {
+        return _myWorkingDirectory;
+    }
+
+    void setWorkingDirectory(const std::string & theWorkingDirectory) {
+        _myWorkingDirectory = theWorkingDirectory;
+    }
+
+    void launch();
+    void kill();
+
+    bool pollForTermination();
+    void waitForTermination();
+
 #ifdef _WIN32
     void handleSystemError(const std::string & theSystemCall, const DWORD theError, const std::string & theLocationString = "");
 #endif
 
-    void launch();
-    bool pollForTermination();
-    void waitForTermination();
-
 private:
 
     std::string _myCommand;
+    std::string _myWorkingDirectory;
 
     State _myState;
 #ifdef _WIN32
