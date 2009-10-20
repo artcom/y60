@@ -107,6 +107,30 @@ PollForTermination(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval 
     return JS_TRUE;
 }
 
+static JSBool
+SetWorkingDirectory(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Set working directory for this process");
+    DOC_END;
+
+    if (argc != 1) {
+        JS_ReportError(cx, "JSProcess::setWorkingDirectory(): Wrong number of arguments, "
+                           "expected one (the working directory), got %d.", argc);
+        return JS_FALSE;
+    }
+
+    std::string myWorkingDirectory;
+    if(!convertFrom(cx, argv[0], myWorkingDirectory)) {
+        JS_ReportError(cx, "JSProcess::setWorkingDirectory(): Argument 0 must be a string ", argc);
+        return JS_FALSE;
+    }
+
+    JSProcess::getJSWrapper(cx,obj).openNative().setWorkingDirectory(myWorkingDirectory);
+
+    *rval = JSVAL_VOID;
+
+    return JS_TRUE;
+}
+
 JSFunctionSpec *
 JSProcess::Functions() {
     AC_DEBUG << "Registering class '"<<ClassName()<<"'"<<endl;
@@ -115,6 +139,7 @@ JSProcess::Functions() {
         {"launch",               Launch,                    0},
         {"waitForTermination",   WaitForTermination,        0},
         {"pollForTermination",   PollForTermination,        0},
+        {"setWorkingDirectory",  SetWorkingDirectory,       1},
         {0}
     };
     return myFunctions;
