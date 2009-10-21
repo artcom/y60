@@ -310,6 +310,13 @@ spark.Window.Constructor = function(Protected) {
     };
     
     
+    //DSA sensoric 
+    Public.onTouch = function(theEventName, theId, theBitMask, theGridSizeX, theGridSizeY, theCount) { 
+        Logger.trace("onTouch " + theEventName + ", " + theId + ", " + theBitMask + ", " + theGridSizeX + ", " + theGridSizeY + ", " + theCount); 
+        var myEvent = new spark.DSAEvent(spark.DSAEvent.TOUCH, theEventName, theId, theBitMask, new Vector2f(theGridSizeX, theGridSizeY), theCount); 
+        Public.dispatchEvent(myEvent); 
+    } 
+ 	
     var _myASSCursors = {};
 
     Public.onASSEvent = function(theEvent) {

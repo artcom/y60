@@ -9,6 +9,20 @@ if("sparkProximatrix" in this) {
     };
 }
 
+
+
+if("sparkDSASensoric" in this) {
+    Logger.info("DSA sensoric support enabled");
+
+    spark.enableDSASensoric = function(theSettingsFile) {
+        var myDSAConfig = new Node();
+        Logger.info("using DSA sensoric settings " + theSettingsFile);
+        myDSAConfig.parseFile(theSettingsFile);
+        plug("DSADriver", myDSAConfig);
+    };
+}
+
+
 spark.Cursor = spark.Class("Cursor");
 
 spark.Cursor.Constructor = function(Protected, theId) {
