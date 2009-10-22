@@ -280,6 +280,8 @@ namespace y60 {
         AC_TRACE << "cgCompileProgram("<<_myCgProgramID<<")";
         cgCompileProgram(_myCgProgramID);
         assertCg(PLUS_FILE_LINE, _myContext);
+
+        updateTextureUnits();
     }
 
     void
@@ -383,8 +385,9 @@ namespace y60 {
                        // scan for sampler params
                        myParameterType == CG_SAMPLER2D ||
                        myParameterType == CG_SAMPLER3D ||
-                       myParameterType == CG_SAMPLERCUBE ) {
-                _myTextureParams.push_back(CgProgramNamedParam(myParamName, myParam));
+                       myParameterType == CG_SAMPLERCUBE )
+            {
+                _myTextureParams.push_back(CgTextureParam(myParamName, myParam));
             } else {
                 _myMiscParams.push_back(CgProgramNamedParam(myParamName, myParam));
             }
@@ -1062,14 +1065,12 @@ namespace y60 {
     CgProgramInfo::enableTextures() {
         AC_TRACE << "CgProgramInfo::enableTextures - " << ShaderProfileStrings[_myShader._myProfile];
         for (unsigned i=0; i < _myTextureParams.size(); ++i) {
-
-            GLenum myTexUnit = cgGLGetTextureEnum(_myTextureParams[i]._myParameter);
-            glActiveTexture(myTexUnit);
-
-            AC_TRACE << "CgProgramInfo::enableTextures paramName=" << _myTextureParams[i]._myParamName
-                      << " param=" << _myTextureParams[i]._myParameter << " unit=" << hex << myTexUnit << dec;
-            cgGLEnableTextureParameter(_myTextureParams[i]._myParameter);
-            CHECK_OGL_ERROR;
+            if (_myTextureParams[i].isUsedByShader()) {
+                GLenum myTexUnit = cgGLGetTextureEnum(_myTextureParams[i]._myParameter);
+                glActiveTexture(myTexUnit);
+                cgGLEnableTextureParameter(_myTextureParams[i]._myParameter);
+                CHECK_OGL_ERROR;
+            }
         }
     }
 
@@ -1077,15 +1078,23 @@ namespace y60 {
     CgProgramInfo::disableTextures() {
         AC_TRACE << "CgProgramInfo::disableTextures - " << ShaderProfileStrings[_myShader._myProfile];
         for (unsigned i=0; i < _myTextureParams.size(); ++i) {
-
-            GLenum myTexUnit = cgGLGetTextureEnum(_myTextureParams[i]._myParameter);
-            glActiveTexture(myTexUnit);
-
-            AC_TRACE << "CgProgramInfo::disableTextures paramName=" << _myTextureParams[i]._myParamName << " param=" << _myTextureParams[i]._myParameter << " unit=" << hex << myTexUnit << dec;
-            cgGLDisableTextureParameter(_myTextureParams[i]._myParameter);
-            CHECK_OGL_ERROR;
+            if (_myTextureParams[i].isUsedByShader()) {
+                GLenum myTexUnit = _myTextureParams[i].getTextureUnit();
+                glActiveTexture(myTexUnit);
+                cgGLDisableTextureParameter(_myTextureParams[i]._myParameter);
+                CHECK_OGL_ERROR;
+            }
         }
     }
+
+    void
+    CgProgramInfo::updateTextureUnits() {
+        for (unsigned i=0; i < _myTextureParams.size(); ++i) {
+            _myTextureParams[i].updateTextureUnit();
+        }
+    }
+
+
 
     CGprofile
     CgProgramInfo::asCgProfile(const ShaderDescription & theShader) {

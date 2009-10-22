@@ -216,6 +216,47 @@ namespace y60 {
             };
             typedef std::vector<CgProgramNamedParam> CgProgramNamedParamVector;
 
+            class CgTextureParam : public CgProgramNamedParam {
+                public:
+                    CgTextureParam(const std::string & theParamName, CGparameter theParameter) :
+                        CgProgramNamedParam(theParamName, theParameter),
+                        _myTextureUnit(),
+                        _myInUseFlag()
+                    {}
+
+                    void
+                    updateTextureUnit() {
+                        _myTextureUnit = cgGLGetTextureEnum(_myParameter);
+                        CGerror myError = cgGetError();
+                        if (myError == CG_NO_ERROR) {
+                            _myInUseFlag = true;
+                        } else if (myError == CG_INVALID_PARAMETER_ERROR) {
+                            _myInUseFlag = false;
+                        } else {
+                            /* XXX 
+                            throw RendererException(
+                                    std::string("Cg error while getting texture unit of '") +
+                                    _myParamName + "': " + cgGetErrorString(myError),
+                                    PLUS_FILE_LINE);
+                            */
+                        }
+                    }
+
+                    bool
+                    isUsedByShader() const {
+                        return _myInUseFlag;
+                    }
+                    GLenum
+                    getTextureUnit() const {
+                        return _myTextureUnit;
+                    }
+
+                private:
+                    GLenum _myTextureUnit;
+                    bool   _myInUseFlag;
+            };
+            typedef std::vector<CgTextureParam> CgTextureParamVector;
+
             CgProgramInfo();
             CgProgramInfo(const CgProgramInfo &); // disable copy constructor
             CgProgramInfo & operator=(const CgProgramInfo &);     // disable assignment op
@@ -230,6 +271,7 @@ namespace y60 {
             void setCgUnsizedArrayParameter(const CgProgramAutoParam & theParam, const std::vector<asl::Vector3f> & theValue);
             void setCgUnsizedArrayParameter(const CgProgramAutoParam & theParam, const std::vector<asl::Vector4f> & theValue);
             void setCgUnsizedArrayParameter(const CgProgramAutoParam & theParam, const std::vector<float> & theValue);
+            void updateTextureUnits();
 
             ShaderDescription           _myShader;
             CGprogram                   _myCgProgramID;
@@ -237,7 +279,7 @@ namespace y60 {
             std::string                 _myPathName;
             CgProgramGlParamVector      _myGlParams;       // GL-State to CG parameters
             CgProgramAutoParams         _myAutoParams;     // other automatic CG parameters (e.g. CameraPosition)
-            CgProgramNamedParamVector   _myTextureParams;  // Texture parameters
+            CgTextureParamVector        _myTextureParams;  // Texture parameters
             CgProgramNamedParamVector   _myMiscParams;     // material parameter
             std::string                 _myCWD;            // CWD on CG Compilation
             std::map<int,int> _myUnsizedArrayAutoParamSizes;
