@@ -17,5 +17,5 @@ y60_add_component(
     SimWater
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
-    DEPENDS y60jslib
+    DEPENDS y60jslib y60glutil
 )
