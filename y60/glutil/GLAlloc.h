@@ -79,7 +79,7 @@ namespace y60 {
     class Primitive;
 }
 namespace asl {
-    bool initializeGLMemoryExtensions();
+    bool Y60_GLUTIL_DECL initializeGLMemoryExtensions();
     struct Y60_GLUTIL_DECL AGPMemoryFlushSingleton : public asl::Singleton<AGPMemoryFlushSingleton>
     {
         void resetGLAGPMemoryFlush();
