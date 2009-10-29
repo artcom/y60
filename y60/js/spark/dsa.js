@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: Top-level load file for SPARK
+// Description: Event handling
 //
 // Last Review: NEVER, NOONE
 //
@@ -56,71 +56,46 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-// object system
-use("common.js");
+if("sparkDSASensoric" in this) {
+    Logger.info("DSA sensoric support enabled");
 
-/**
- * The SPARK namespace.
- * 
- * Everything defined by the spark library goes into this namespace.
- */
-var spark = Namespace("spark");
-
-spark.findRootElement = function(theDocument) {
-    var myRoot = theDocument.firstChild;
-    // firstChild might be a xml processing instruction, a
-    // comment, a doctype declaration or god knows what else.
-    while (myRoot.nodeType != Node.ELEMENT_NODE) {
-        if ( ! myRoot.nextSibling) {
-            throw new Error("spark document contains no xml element");
-        }
-        myRoot = myRoot.nextSibling;
-    }
-    return myRoot;
+    spark.enableDSASensoric = function(theSettingsFile) {
+        var myDSAConfig = new Node();
+        Logger.info("using DSA sensoric settings " + theSettingsFile);
+        myDSAConfig.parseFile(theSettingsFile);
+        plug("DSADriver", myDSAConfig);
+    };
 }
 
-// javascript extensions
-use("jsextensions.js");
-// component instantiator
-use("meta.js");
-// spark file (and dom) loader
-use("load.js");
-// hacks around y60 text rendering
-use("text.js");
-// camera utility functions
-use("camera.js");
-// component registry
-use("registry.js");
-// image caching
-use("cache.js");
-// basic component classes
-use("components.js");
-// event handling
-use("events.js");
-// multitouch support
-use("multitouch.js");
-// internationalization
-use("internationalization.js");
-// dsa sensor support
-use("dsa.js");
+spark.DSAEvent = spark.Class("DSAEvent");
 
-// widgets
-if (!("disableSparkWidgets" in this)) {
-    // base class
-    use("spark/widgets.js");
-    // concrete classes (inheritance-ordered)
-    use("spark/widget/Transform.js");
-    use("spark/widget/Switch.js");
-    use("spark/widget/Stage.js");
-    use("spark/widget/World.js");
-    use("spark/widget/Window.js");
-    use("spark/widget/Body.js");
-    use("spark/widget/ResizableRectangle.js");
-    use("spark/widget/Rectangle.js");
-    use("spark/widget/Image.js");
-    use("spark/widget/Text.js");
-    use("spark/widget/Movie.js");
-    use("spark/widget/NewMovie.js");
-    use("spark/widget/NewText.js");
-    use("spark/widget/Canvas.js");
-}
+spark.DSAEvent.TOUCH = "dsa-touch";
+
+spark.DSAEvent.Constructor = function(Protected, theType, theEventName, theId, theBitMask, theGridSize, theCount) {
+    var Public = this;
+    
+    this.Inherit(spark.Event, theType);
+    
+    var _myEventName = theEventName;
+    var _myId        = theId;
+    var _myBitMask   = theBitMask;
+    var _myGridSize  = theGridSize;
+    var _myCount     = theCount;
+    
+    Public.id getter = function() {
+        return _myId;
+    };    
+    
+    Public.bitmask getter = function() {
+        return _myBitMask;
+    };    
+    
+    Public.gridsize getter = function() {
+        return _myGridSize;
+    };  
+    
+    Public.count getter = function() {
+        return _myCount;
+    };
+    
+};
