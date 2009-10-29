@@ -346,14 +346,15 @@ namespace jslib {
 
     void
     JSScriptablePlugin::initClass(JSContext *cx, JSObject * theGlobalObject, const char * theClassName,
-            JSFunctionSpec * theFunctions, JSFunctionSpec * theStaticFunctions, JSConstIntPropertySpec * theConstIntProperties)
+            JSFunctionSpec * theFunctions, JSFunctionSpec * theStaticFunctions, JSConstIntPropertySpec * theConstIntProperties,
+            JSPropertySpec * theStaticProperties)
     {
         AC_DEBUG << "JSScriptablePlugin::initClass for class " << theClassName;
 
         std::vector<JSFunctionSpec> myFunctions = mergeFunctions( theFunctions, Functions());
         std::vector<JSFunctionSpec> myStaticFunctions = mergeFunctions( theStaticFunctions, StaticFunctions());
         /*JSObject * myClassObject =*/ JS_InitClass(cx, theGlobalObject, NULL, Class(theClassName),
-                Constructor, 0, Properties(), & ( * myFunctions.begin()), 0,
+                Constructor, 0, Properties(), & ( * myFunctions.begin()), theStaticProperties, // XXX: static property merging?
                 & ( * myStaticFunctions.begin()));
 
         if (theConstIntProperties) {

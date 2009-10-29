@@ -96,6 +96,11 @@ namespace jslib {
         return 0;
     }
     
+    JSPropertySpec * 
+    IScriptablePlugin::StaticProperties() { 
+        return 0;
+    }
+
     JSConstIntPropertySpec * 
     IScriptablePlugin::ConstIntProperties() {
         return 0;
@@ -104,7 +109,7 @@ namespace jslib {
     void
     IScriptablePlugin::initClasses(JSContext * theContext, JSObject *theGlobalObject) {
 	    JSScriptablePlugin::initClass(theContext, theGlobalObject, ClassName(),
-                Functions(), StaticFunctions(), ConstIntProperties());
+                Functions(), StaticFunctions(), ConstIntProperties(), StaticProperties());
     }
 }
 

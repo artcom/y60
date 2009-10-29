@@ -83,6 +83,7 @@ namespace jslib {
 
 
         virtual JSFunctionSpec * StaticFunctions();
+        virtual JSPropertySpec * StaticProperties();
 
         virtual JSFunctionSpec * Functions();
         virtual JSConstIntPropertySpec * ConstIntProperties();
