@@ -1,13 +1,13 @@
 
-if("sparkProximatrix" in this) {
-    Logger.info("SPARK proximatrix support enabled");
-
+spark.enableProximatrix = function(theStage) {
     use("ASSManager.js");
-    
-    spark.enableProximatrix = function(theStage) {
-        spark.proximatrix = new ASSManager(theStage);
-    };
-}
+    spark.proximatrix = new ASSManager(theStage);
+};
+
+spark.enableTuio = function() {
+    plug("TUIO");
+    TUIO.listenToUDP();
+};
 
 spark.Cursor = spark.Class("Cursor");
 
@@ -32,27 +32,23 @@ spark.Cursor.Constructor = function(Protected, theId) {
         return _myFocused;
     };
     
-    var _myIntensity = 0.0;
-    
-    Public.intensity getter = function() {
-        return _myIntensity;
+    var _myStagePosition = new Vector2f();
+
+    Public.stagePosition getter = function() {
+        return _myStagePosition.clone();
     };
-    
-    var _myStageX = 0.0;
-    
+
     Public.stageX getter = function() {
-        return _myStageX;
+        return _myStagePosition.x;
     };
-    
-    var _myStageY = 0.0;
     
     Public.stageY getter = function() {
-        return _myStageY;
+        return _myStagePosition.y;
     };
     
-    Public.update = function(theProperties, theFocused) {
+    Public.update = function(theFocused, theStagePosition) {
         _myFocused = theFocused;
-        updateProperties(theProperties);
+        _myStagePosition = theStagePosition.clone();
     };
     
     Public.activate = function() {
@@ -61,12 +57,6 @@ spark.Cursor.Constructor = function(Protected, theId) {
 
     Public.deactivate = function() {
         _myActive = false;
-    };
-    
-    function updateProperties(theProperties) {
-        _myStageX = theProperties.position3D.x;
-        _myStageY = theProperties.position3D.y;
-        _myIntensity = theProperties.intensity;
     };
     
 };

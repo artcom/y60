@@ -320,12 +320,39 @@ spark.Window.Constructor = function(Protected) {
         Public.dispatchEvent(myEvent);
     };
  	
-    var _myASSCursors = {};
+    var _myMultitouchCursors = {};
 
-    Public.onASSEvent = function(theEvent) {
-        spark.proximatrix.onASSEvent(theEvent);
+    function getMultitouchCursorId(theEvent) {
+        switch(theEvent.callback) {
+        case "onASSEvent":
+            return "pmtx" + theEvent.id;
+        case "onTuioEvent":
+            return "tuio" + theEvent.id;
+        default:
+            Logger.fatal("Unknown multitouch event type");
+            return null;
+        }
+    };
+
+    function getMultitouchCursorPosition(theEvent) {
+        switch(theEvent.callback) {
+        case "onASSEvent":
+            return new Vector2f(theEvent.position3D.x, theEvent.position3D.y);
+        case "onTuioEvent":
+            return new Vector2f(theEvent.position.x * 1920.0,
+                                theEvent.position.y * 1200.0);
+        default:
+            Logger.fatal("Unknown multitouch event type");
+            return null;
+        }
+    };
+
+    function handleMultitouchEvent(theEvent) {
+        if(theEvent.callback == "onASSEvent") {
+            spark.proximatrix.onASSEvent(theEvent);
+        }
         
-        var myId = theEvent.id;
+        var myId = getMultitouchCursorId(theEvent);
         
         switch(theEvent.type) {
         case "configure":
@@ -333,28 +360,30 @@ spark.Window.Constructor = function(Protected) {
             break;
             
         case "add":
-        case "move":
+        case "move": // proximatrix
+        case "update": // tuio
             var myCursor;
-            if(myId in _myASSCursors) {
-                myCursor = _myASSCursors[myId];
+            if(myId in _myMultitouchCursors) {
+                myCursor = _myMultitouchCursors[myId];
             } else {
                 Logger.debug("Cursor " + myId + " added");
                 myCursor = new spark.Cursor(myId);
-                _myASSCursors[myId] = myCursor;
+                _myMultitouchCursors[myId] = myCursor;
             }
 
             if(theEvent.type == "add") {
                 myCursor.activate();
             }
             
+            var myPosition = getMultitouchCursorPosition(theEvent);
             var myFocused = myCursor.focused;
             
-            var myPick = Public.pickWidget(theEvent.position3D.x, theEvent.position3D.y);
+            var myPick = Public.pickWidget(myPosition.x, myPosition.y);
             if(!myPick) {
                 myPick = Public;
             }
             
-            myCursor.update(theEvent, myPick);
+            myCursor.update(myPick, myPosition);
 
             if(theEvent.type == "add") {
                 Logger.debug("Cursor " + myId + " appears in " + myFocused);
@@ -375,8 +404,8 @@ spark.Window.Constructor = function(Protected) {
                 myPick.dispatchEvent(myEnter);
             }
             
-            if(theEvent.type == "move") {
-                Logger.debug("Cursor " + myId + " moves to " + theEvent.position3D + " over " + myPick);
+            if(theEvent.type == "move" || theEvent.type == "update") {
+                Logger.debug("Cursor " + myId + " moves to " + myPosition + " over " + myPick);
                 var myMove = new spark.CursorEvent(spark.CursorEvent.MOVE, myCursor);
                 myPick.dispatchEvent(myMove);
             }
@@ -384,14 +413,15 @@ spark.Window.Constructor = function(Protected) {
             break;
             
         case "remove":
-            if(myId in _myASSCursors) {
+            if(myId in _myMultitouchCursors) {
                 Logger.debug("Cursor " + myId + " removed");
                 
-                var myCursor = _myASSCursors[myId];
+                var myCursor = _myMultitouchCursors[myId];
                 
+                var myPosition = getMultitouchCursorPosition(theEvent);
                 var myFocused = myCursor.focused;
                 
-                myCursor.update(theEvent, myFocused);
+                myCursor.update(myFocused, myPosition);
                 
                 if(myFocused) {
                     Logger.debug("Cursor " + myId + " leaves " + myFocused);
@@ -405,9 +435,13 @@ spark.Window.Constructor = function(Protected) {
                 
                 myCursor.deactivate();
                 
-                delete _myASSCursors[myId];
+                delete _myMultitouchCursors[myId];
             }
             break;
         }
     };
+
+    Public.onASSevent = handleMultitouchEvent;
+    Public.onTuioEvent = handleMultitouchEvent;
+
 };
