@@ -73,6 +73,8 @@ spark.Cursor.Constructor = function(Protected, theId) {
 
 spark.CursorEvent = spark.Class("CursorEvent");
 
+spark.CursorEvent.APPEAR = "cursor-appear";
+spark.CursorEvent.VANISH = "cursor-vanish";
 spark.CursorEvent.MOVE   = "cursor-move";
 spark.CursorEvent.ENTER  = "cursor-enter";
 spark.CursorEvent.LEAVE  = "cursor-leave";

@@ -355,6 +355,11 @@ spark.Window.Constructor = function(Protected) {
             }
             
             myCursor.update(theEvent, myPick);
+
+            if(theEvent.type == "add") {
+                var myAppear = new spark.CursorEvent(spark.CursorEvent.APPEAR, myCursor);
+                myPick.dispatchEvent(myAppear);
+            }
             
             if(myPick != myFocused) {
                 Logger.debug("Cursor " + myId + " focuses " + myPick
@@ -391,6 +396,9 @@ spark.Window.Constructor = function(Protected) {
                     Logger.debug("Cursor " + myId + " leaves " + myFocused);
                     var myLeave = new spark.CursorEvent(spark.CursorEvent.LEAVE, myCursor);
                     myFocused.dispatchEvent(myLeave);
+
+                    var myVanish = new spark.CursorEvent(spark.CursorEvent.VANISH, myCursor);
+                    myFocused.dispatchEvent(myVanish);
                 }
                 
                 myCursor.deactivate();
