@@ -33,6 +33,9 @@ list(APPEND OPT_PACKAGES GTKGLEXT)
 # media codecs
 list(APPEND REQ_PACKAGES FFMPEG)
 
+# input device support
+list(APPEND OPT_PACKAGES TUIO)
+
 
 if(WIN32)
 
