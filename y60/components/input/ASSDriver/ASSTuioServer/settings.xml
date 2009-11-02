@@ -1,0 +1,71 @@
+<settings>
+    <ASSDriver>
+        <!-- Connection parameters -->
+        <TransportLayer>serial</TransportLayer>
+        <IpAddress>10.1.0.101</IpAddress>
+        <Port>10001</Port>
+        <SerialPort>-1</SerialPort>
+        <SerialPortName>\\.\COM4</SerialPortName>
+        <BaudRate>921600</BaudRate>
+        
+        <!-- Enable/disable status and debug display -->
+        <ShowASSData min="0" max="1">1.00000</ShowASSData>
+        <!-- Position of on-screen value probe (for debugging) -->
+        <ProbePosition min="-1" step="1">[2.00000,3.00000]</ProbePosition>
+        <!-- Select between three rasters for debug display.
+             0 - raw input, 1 - denoised, 2 - gain corrected
+           -->
+        <CurrentValueDisplay min="0" max="2">0.00000</CurrentValueDisplay>
+        <!-- Dump values from raster 2 into PNGs -->
+        <CaptureSensorData min="0" max="1" step="1">0</CaptureSensorData>
+        
+        <!-- Origin of sensoric in screen/value space -->
+        <SensorPosition step="1">[32.00000,32.00000]</SensorPosition>
+        <!-- Orientation of value space in radians -->
+        <SensorOrientation step="1.5707963">-0.00000</SensorOrientation>
+        <!-- Scale of value space in steps per sensing line -->
+        <SensorScale step="0.01">[35.50000,35.50000]</SensorScale>
+        <!-- Horizontal mirroring -->
+        <MirrorX min="0" max="1">0.00000</MirrorX>
+        <!-- Vertical mirroring -->
+        <MirrorY min="0" max="1">0.00000</MirrorY>
+        <!-- Clamp values to screen dimensions -->
+        <ClampToScreen min="0" max="1">1</ClampToScreen>
+        
+        <!-- Curing (clamp away known-broken lines) -->
+        <CureBrokenElectrodes min="0" max="1" step="1">0</CureBrokenElectrodes>
+        <CureVLineValues min="-1" step="1">[-1,-1,-1,-1]</CureVLineValues>
+        <CureHLineValues min="-1" step="1">[-1,-1,-1,-1]</CureHLineValues>
+        <CurePoint1 min="-1" step="1">[-1,-1]</CurePoint1>
+        <CurePoint2 min="-1" step="1">[-1,-1]</CurePoint2>
+        <CurePoint3 min="-1" step="1">[-1,-1]</CurePoint3>
+        <CurePoint4 min="-1" step="1">[-1,-1]</CurePoint4>
+        
+        <!-- Step 1 - Denoise with static threshold -->
+        <NoiseThreshold>10</NoiseThreshold>
+        
+        <!-- Step 2 - Gain adjustment (to increase value range coverage) -->
+        <GainPower>3.00000</GainPower>
+        
+        <!-- Step 3 - Find connected components -->
+        <ComponentThreshold>1.50000</ComponentThreshold>
+
+        <!-- Step 4 - Interpolate cursor positions
+             Method 1 - moment analysis
+             Method 0 - interpolation around maximum
+             
+             If CCRegion4MomentumFlag is set, connected component regions
+             will be used as basis for momentum analysis. Else, the user supplied
+             box in MomentumRegion will be used.
+           -->
+        <InterpolationMethod min="0" max="1" step="1">1</InterpolationMethod>
+        <CCRegion4MomentumFlag min="0" max="1" step="1">0.00000</CCRegion4MomentumFlag>
+        <MomentumRegion step="1">[-1.00,-1.00000,1.00,1.00000]</MomentumRegion>
+        
+        <!-- Surface contact detection ("onTouch") -->
+        <FirstDerivativeThreshold step="1">30.00000</FirstDerivativeThreshold>
+        <DebugTouchEvents min="0" max="1" step="1">0</DebugTouchEvents>
+        <MinTouchInterval step="0.01">0.2</MinTouchInterval>
+        <MinTouchThreshold step="0.1">9.0</MinTouchThreshold>
+    </ASSDriver>
+</settings>
