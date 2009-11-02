@@ -1528,6 +1528,7 @@ namespace y60 {
                 switch (myEvent.type) {
                     case ASS_FRAME:
                     {
+                        beginFrame();
                         if (myEvent.size != _myGridSize ) {
                             allocateGridBuffers( myEvent.size );
                         }
@@ -1540,6 +1541,7 @@ namespace y60 {
                             toggleLatencyTestPin();
                         }
 #endif
+                        finishFrame();
                     }
                         break;
                     case ASS_LOST_SYNC:
