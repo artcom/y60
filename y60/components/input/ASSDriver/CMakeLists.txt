@@ -3,7 +3,9 @@ add_subdirectory(ASSCore)
 add_subdirectory(ASSSchema)
 add_subdirectory(ASSEventSource)
 add_subdirectory(ASSOscClient)
-add_subdirectory(ASSTuioServer)
+if(TUIO_LIBRARY) 
+    add_subdirectory(ASSTuioServer)
+endif(TUIO_LIBRARY) 
 
 ac_add_installer_component(
     ASS_runtime
