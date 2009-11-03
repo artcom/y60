@@ -111,11 +111,12 @@ namespace y60 {
             typedef std::map<std::string, SDLFontInfo> FontLibrary;
 
             struct Format {
-                Format() : bold(false), italics(false), underline(false) {}
+                Format() : bold(false), italics(false), underline(false), color(asl::Vector4f(-1,-1,-1,1)) {}
 
                 bool bold;
                 bool italics;
                 bool underline;
+				asl::Vector4f color;
             };
 
             struct Word {

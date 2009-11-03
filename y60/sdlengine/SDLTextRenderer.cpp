@@ -482,7 +482,39 @@ namespace y60 {
     SDLTextRenderer::parseHtmlTag(const string & theText, unsigned thePos, Format & theFormat) {
         bool myOpenFlag = false;
         char myChar     = 0;
-        if (theText.size() > thePos + 2 &&
+        if (theText.size() > thePos + 6 &&
+            theText[thePos] == '<' &&
+            theText[thePos + 6] == '>')
+        {
+			std::string myFontColorTag = theText.substr(thePos,7);
+		    if (myFontColorTag == "</font>") {
+    			theFormat.color[0] = -1.0f;
+    			theFormat.color[1] = -1.0f;
+    			theFormat.color[2] = -1.0f;
+    			return 7;
+    		}
+		} else if (theText.size() > thePos + 21 &&
+            theText[thePos] == '<' &&
+            theText[thePos + 21] == '>')
+        {
+			std::string myFontColorTag = theText.substr(thePos,14);
+			if (myFontColorTag == "<font color='#") {
+				std::string myFontColor = theText.substr(thePos+14,6);
+				unsigned myRed = 0;
+				unsigned myGreen = 0;
+				unsigned myBlue = 0;
+				std::string myRedStr = myFontColor.substr(0,2);
+				asl::is_hex_number(myRedStr, myRed);
+				std::string myGreenStr = myFontColor.substr(2,2);
+				asl::is_hex_number(myGreenStr, myGreen);
+				std::string myBlueStr = myFontColor.substr(4,2);
+				asl::is_hex_number(myBlueStr, myBlue);
+				theFormat.color[0] = myRed/255.0f;
+				theFormat.color[1] = myGreen/255.0f;
+				theFormat.color[2] = myBlue/255.0f;
+				return 22;
+			}
+        } else if (theText.size() > thePos + 2 &&
             theText[thePos] == '<' &&
             theText[thePos + 2] == '>')
         {
@@ -679,6 +711,7 @@ namespace y60 {
                                   Uint8(theTextColor[3] * 255) };
 
         for (unsigned i = 0; i < theWords.size(); ++i) {
+			SDL_Color myWordColor = myTextColor;            
             Word & myWord = theWords[i];
             const TTF_Font * myFont = myNormalFont;
 
@@ -686,6 +719,14 @@ namespace y60 {
             if (myWord.format.underline) {
                 mySDLFormat |= TTF_STYLE_UNDERLINE;
             }
+
+			if(myWord.format.color[0] != -1) {
+				SDL_Color myNewTextColor = { Uint8(myWord.format.color[0] * 255),
+                                Uint8(myWord.format.color[1] * 255),
+                                Uint8(myWord.format.color[2] * 255),
+                                Uint8(myWord.format.color[3] * 255) };
+				myWordColor = myNewTextColor;
+			}
 
             if (myWord.format.bold && myWord.format.italics && myBoldItalicFont) {
                 myFont = myBoldItalicFont;
@@ -710,7 +751,7 @@ namespace y60 {
             DB2(AC_TRACE << "Rendering word: '" << myWord.text << "' with format: " << mySDLFormat << endl;)
             TTF_SetFontStyle((TTF_Font*) myFont, mySDLFormat);
 
-            myWord.surface = renderToSurface(myWord.text, myFont, myTextColor);
+            myWord.surface = renderToSurface(myWord.text, myFont, myWordColor);
             myWord.minx = TTF_CurrentLineMinX();
 
             TTF_SetFontStyle((TTF_Font*) myFont, TTF_STYLE_NORMAL);
