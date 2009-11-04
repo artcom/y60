@@ -75,6 +75,7 @@
 #include <vector>
 
 namespace y60 {
+    DEFINE_EXCEPTION(CgParameterException, asl::Exception);
 
    //=== Cg-GL specific parameter names  ============================================
     // these can be used with a _I, _T or _IT suffix to get the
@@ -146,7 +147,7 @@ namespace y60 {
             void disableProfile();
             void enableTextures();
             void disableTextures();
-            static CGprofile asCgProfile(const ShaderDescription & theShader);
+            CGprofile getCgProfile() const;
 
             void bindMaterialParams(const MaterialBase & theMaterial);
             void bindBodyParams(const MaterialBase & theMaterial,
@@ -225,20 +226,21 @@ namespace y60 {
                     {}
 
                     void
-                    updateTextureUnit() {
+                    updateTextureUnit(std::string const& theShaderName) {
                         _myTextureUnit = cgGLGetTextureEnum(_myParameter);
                         CGerror myError = cgGetError();
                         if (myError == CG_NO_ERROR) {
                             _myInUseFlag = true;
                         } else if (myError == CG_INVALID_PARAMETER_ERROR) {
                             _myInUseFlag = false;
+                            AC_WARNING << "Shaderlibrary declares texture '"
+                                       << _myParamName << "' but shader '"
+                                       << theShaderName << "' does not use it.";
                         } else {
-                            /* XXX 
-                            throw RendererException(
+                            throw CgParameterException(
                                     std::string("Cg error while getting texture unit of '") +
                                     _myParamName + "': " + cgGetErrorString(myError),
                                     PLUS_FILE_LINE);
-                            */
                         }
                     }
 

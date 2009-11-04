@@ -230,7 +230,7 @@ namespace y60 {
             //AC_TRACE << "cgCreateProgram  unsized array fix args = " << myArgStrings;
             _myCgProgramID = cgCreateProgramFromFile(_myContext, CG_SOURCE,
                                                      _myPathName.c_str(),
-                                                     asCgProfile(_myShader),
+                                                     getCgProfile(),
                                                      _myShader._myEntryFunction.c_str(),
                                                      asl::begin_ptr(myArgs));
             DBP2(STOP_TIMER(CgProgramInfo_cgCreateProgramFromFile));
@@ -261,7 +261,7 @@ namespace y60 {
             AC_TRACE << "cgCreateProgram  args = " << myArgs;
             AC_DEBUG << "cgCreateProgram  profile = " << ShaderProfileStrings[_myShader._myProfile] << ", entry= "<<_myShader._myEntryFunction;
             _myCgProgramID = cgCreateProgram(_myContext, CG_SOURCE, _myCgProgramString.c_str(),
-                                             asCgProfile(_myShader), _myShader._myEntryFunction.c_str(),
+                                             getCgProfile(), _myShader._myEntryFunction.c_str(),
                                              asl::begin_ptr(myArgs));
             AC_TRACE << "cgCreateProgram created program id = "<<_myCgProgramID;
 #ifdef _WIN32
@@ -397,15 +397,15 @@ namespace y60 {
 
     void
     CgProgramInfo::enableProfile() {
-        AC_TRACE << "enabled CgProfile(" << asCgProfile(_myShader) << ") - " << ShaderProfileStrings[_myShader._myProfile];
-        cgGLEnableProfile(asCgProfile(_myShader));
+        AC_TRACE << "enabled CgProfile(" << getCgProfile() << ") - " << ShaderProfileStrings[_myShader._myProfile];
+        cgGLEnableProfile(getCgProfile());
         assertCg(PLUS_FILE_LINE, _myContext);
     }
 
     void
     CgProgramInfo::disableProfile() {
-        AC_TRACE << "disabled CgProfile(" << asCgProfile(_myShader) << ") - " << ShaderProfileStrings[_myShader._myProfile];
-        cgGLDisableProfile(asCgProfile(_myShader));
+        AC_TRACE << "disabled CgProfile(" << getCgProfile() << ") - " << ShaderProfileStrings[_myShader._myProfile];
+        cgGLDisableProfile(getCgProfile());
         assertCg(PLUS_FILE_LINE, _myContext);
     }
 
@@ -1090,16 +1090,16 @@ namespace y60 {
     void
     CgProgramInfo::updateTextureUnits() {
         for (unsigned i=0; i < _myTextureParams.size(); ++i) {
-            _myTextureParams[i].updateTextureUnit();
+            _myTextureParams[i].updateTextureUnit(_myShader._myFilename);
         }
     }
 
 
 
     CGprofile
-    CgProgramInfo::asCgProfile(const ShaderDescription & theShader) {
+    CgProgramInfo::getCgProfile() const {
         CGprofile myResult;
-        switch (theShader._myProfile) {
+        switch (_myShader._myProfile) {
         case ARBVP1 :
             myResult = CG_PROFILE_ARBVP1;
             break;
@@ -1146,7 +1146,7 @@ namespace y60 {
 #endif
         default:
             throw RendererException(string("Unknown shaderprofile : ") +
-                                    getStringFromEnum(theShader._myProfile, ShaderProfileStrings),
+                                    getStringFromEnum(_myShader._myProfile, ShaderProfileStrings),
                                     PLUS_FILE_LINE);
         };
         return myResult;
