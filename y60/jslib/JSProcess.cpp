@@ -84,6 +84,18 @@ Launch(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 }
 
 static JSBool
+Kill(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Kills the process.");
+    DOC_END;
+
+    JSProcess::getJSWrapper(cx,obj).openNative().kill();
+
+    *rval = JSVAL_VOID;
+
+    return JS_TRUE;
+}
+
+static JSBool
 WaitForTermination(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Waits until the process terminates.");
     DOC_END;
@@ -137,6 +149,7 @@ JSProcess::Functions() {
     static JSFunctionSpec myFunctions[] = {
         // name                  native                   nargs
         {"launch",               Launch,                    0},
+        {"kill",                 Kill,                      0},
         {"waitForTermination",   WaitForTermination,        0},
         {"pollForTermination",   PollForTermination,        0},
         {"setWorkingDirectory",  SetWorkingDirectory,       1},
