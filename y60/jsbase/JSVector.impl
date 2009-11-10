@@ -234,7 +234,21 @@ namespace jslib {
     DOC_RESET;
     DOC_PARAM("Vector", "", DOC_TYPE_VECTOR3F);
     DOC_END;
-        return callMethod(&NATIVE_VECTOR::add, cx, obj, argc, argv, rval);
+        if (JSVAL_IS_INT(argv[0])) {
+            int myNumber;
+            convertFrom(cx, argv[0], myNumber);
+            (openNativeRef(cx,obj).NATIVE_VECTOR::add)(myNumber);
+            closeNativeRef(cx, obj);
+            return JS_TRUE;    
+        } else if (JSVAL_IS_DOUBLE(argv[0])) {
+            float myNumber;
+            convertFrom(cx, argv[0], myNumber);
+            (openNativeRef(cx,obj).NATIVE_VECTOR::add)(myNumber);
+            closeNativeRef(cx, obj);
+            return JS_TRUE;    
+        } else {
+            return callMethod(&NATIVE_VECTOR::add, cx, obj, argc, argv, rval);
+        }
     }
 
     template<class NATIVE_VECTOR>
@@ -247,7 +261,21 @@ namespace jslib {
     DOC_RESET;
     DOC_PARAM("Vector", "", DOC_TYPE_VECTOR3F);
     DOC_END;
-        return callMethod(&NATIVE_VECTOR::sub, cx, obj, argc, argv, rval);
+        if (JSVAL_IS_INT(argv[0])) {
+            int myNumber;
+            convertFrom(cx, argv[0], myNumber);
+            (openNativeRef(cx,obj).NATIVE_VECTOR::sub)(myNumber);
+            closeNativeRef(cx, obj);
+            return JS_TRUE;    
+        } else if (JSVAL_IS_DOUBLE(argv[0])) {
+            float myNumber;
+            convertFrom(cx, argv[0], myNumber);
+            (openNativeRef(cx,obj).NATIVE_VECTOR::sub)(myNumber);
+            closeNativeRef(cx, obj);
+            return JS_TRUE;    
+        } else {
+            return callMethod(&NATIVE_VECTOR::sub, cx, obj, argc, argv, rval);
+        }
     }
 
     template<class NATIVE_VECTOR>
@@ -260,7 +288,22 @@ namespace jslib {
     DOC_RESET;
     DOC_PARAM("Vector", "", DOC_TYPE_VECTOR3F);
     DOC_END;
-        return callMethod(&NATIVE_VECTOR::mult, cx, obj, argc, argv, rval);
+    
+        if (JSVAL_IS_INT(argv[0])) {
+            int myNumber;
+            convertFrom(cx, argv[0], myNumber);
+            (openNativeRef(cx,obj).NATIVE_VECTOR::mult)(myNumber);
+            closeNativeRef(cx, obj);
+            return JS_TRUE;    
+        } else if (JSVAL_IS_DOUBLE(argv[0])) {
+            float myNumber;
+            convertFrom(cx, argv[0], myNumber);
+            (openNativeRef(cx,obj).NATIVE_VECTOR::mult)(myNumber);
+            closeNativeRef(cx, obj);
+            return JS_TRUE;    
+        } else {
+            return callMethod(&NATIVE_VECTOR::mult, cx, obj, argc, argv, rval);
+        }
     }
 
     template<class NATIVE_VECTOR>
@@ -273,7 +316,21 @@ namespace jslib {
     DOC_RESET;
     DOC_PARAM("Vector", "", DOC_TYPE_VECTOR3F);
     DOC_END;
-        return callMethod(&NATIVE_VECTOR::div, cx, obj, argc, argv, rval);
+        if (JSVAL_IS_INT(argv[0])) {
+            int myNumber;
+            convertFrom(cx, argv[0], myNumber);
+            (openNativeRef(cx,obj).NATIVE_VECTOR::div)(myNumber);
+            closeNativeRef(cx, obj);
+            return JS_TRUE;    
+        } else if (JSVAL_IS_DOUBLE(argv[0])) {
+            float myNumber;
+            convertFrom(cx, argv[0], myNumber);
+            (openNativeRef(cx,obj).NATIVE_VECTOR::div)(myNumber);
+            closeNativeRef(cx, obj);
+            return JS_TRUE;    
+        } else {
+            return callMethod(&NATIVE_VECTOR::div, cx, obj, argc, argv, rval);
+        }
     }
 
     template<class NATIVE_VECTOR>
