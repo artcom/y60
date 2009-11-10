@@ -9,5 +9,6 @@ add_subdirectory(GlurFilter)
 add_subdirectory(GPUParticles)
 add_subdirectory(WindowCW)
 
-add_subdirectory(SimWater)
-
+if(WIN32 OR LINUX)
+    add_subdirectory(SimWater)
+endif(WIN32 OR LINUX)
