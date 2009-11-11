@@ -113,4 +113,12 @@ GUI.CompositeAnimation.Constructor = function(Public, Protected) {
 	    Base.finish();
 	};
     
+    // generic comeToAnEnd
+    Base.comeToAnEnd = Public.comeToAnEnd;
+    Public.comeToAnEnd = function(){
+		for(var i = 0; i < _children.length; i++) {
+			_children[i].comeToAnEnd();
+		}
+	    Base.comeToAnEnd();
+	};
 };
