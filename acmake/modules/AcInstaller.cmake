@@ -67,85 +67,6 @@ macro(ac_end_solution NAME)
     endif(ACMAKE_CURRENT_PROJECT)
 endmacro(ac_end_solution)
 
-# Declare an additional install type.
-#
-# ac_add_install_type(
-#  name
-#  DISPLAY_NAME displayname
-# )
-#
-# Declares an additional type of installation.
-# These can be mentioned in components to
-# provide a pre-selected set of them for
-# specific installation use cases.
-#
-# This does not require a project context.
-#
-macro(ac_add_install_type NAME)
-    if(ACMAKE_BUILD_PACKAGES)
-        ac_debug_installer("Adding install type ${NAME}")
-
-        cpack_add_install_type(${NAME} ${ARGN})
-    endif(ACMAKE_BUILD_PACKAGES)
-endmacro(ac_add_install_type)
-
-# Declare an installer component in the current project.
-#
-# ac_add_installer_component(
-#   name
-#   DISPLAY_NAME displayname
-#   DESCRIPTION  description
-#   [ INSTALL_TYPES installtype ... ]
-#   [ DEPENDS component ... ]
-# )
-#
-# Called from project context, declares an additional
-# component that can be used to group installed files.
-#   
-macro(ac_add_installer_component NAME)
-    if(ACMAKE_BUILD_PACKAGES)
-        parse_arguments(
-            THIS_COMPONENT
-            "DISPLAY_NAME;DESCRIPTION;DEPENDS;INSTALL_TYPES"
-            ""
-            ${ARGN}
-        )
-    
-        ac_debug_installer("Adding installer component ${NAME} depending on ${THIS_COMPONENT_DEPENDS}")
-
-        set(PROJECT ${ACMAKE_CURRENT_PROJECT})
-        
-        get_global(ACMAKE_SOLUTION SOLUTION)
-        
-        if(SOLUTION)
-            set(GROUP_MEMBERSHIP GROUP "${PROJECT}")
-        else(SOLUTION)
-            set(GROUP_MEMBERSHIP)
-        endif(SOLUTION)
-        
-        if(NOT THIS_COMPONENT_DISPLAY_NAME)
-            message(FATAL_ERROR "Installer component ${NAME} from project ${PROJECT} has no display name.")
-        endif(NOT THIS_COMPONENT_DISPLAY_NAME)
-        
-        if(NOT THIS_COMPONENT_DESCRIPTION)
-            message(FATAL_ERROR "Installer component ${NAME} from project ${PROJECT} has no description.")
-        endif(NOT THIS_COMPONENT_DESCRIPTION)
-        
-        if(NOT THIS_COMPONENT_INSTALL_TYPES)
-            set(THIS_COMPONENT_INSTALL_TYPES runtime development)
-        endif(NOT THIS_COMPONENT_INSTALL_TYPES)
-        
-        cpack_add_component(
-            ${NAME}
-            DISPLAY_NAME "${THIS_COMPONENT_DISPLAY_NAME}"
-            DESCRIPTION  "${THIS_COMPONENT_DESCRIPTION}"
-            INSTALL_TYPES ${THIS_COMPONENT_INSTALL_TYPES}
-            DEPENDS       ${THIS_COMPONENT_DEPENDS}
-            ${GROUP_MEMBERSHIP}
-        )
-    endif(ACMAKE_BUILD_PACKAGES)
-endmacro(ac_add_installer_component)
-
 if(WIN32)
     set(ACMAKE_SHORTCUT_FILE "${CMAKE_BINARY_DIR}/${ACMAKE_BINARY_SUBDIR}/Shortcuts.js")
 endif(WIN32)
@@ -205,58 +126,6 @@ macro(_ac_package_project NAME)
             # keyword arguments given to us by the project framework
             _ac_declare_installer(${NAME} ${ARGN})
         endif(NOT SOLUTION)
-
-        # if we are in a solution then we put our
-        # components into a project-specific group
-        if(SOLUTION)
-            cpack_add_component_group(
-                "${NAME}"
-                DISPLAY_NAME "${NAME}"
-                DESCRIPTION "NO DESCRIPTION" # XXX: better argument handling can fix this
-            )
-            set(GROUP_MEMBERSHIP GROUP "${NAME}")
-        endif(SOLUTION)
-        
-        # collect dependencies to other projects in this build
-        set(DEVELOPMENT_DEPENDS)
-        set(RUNTIME_DEPENDS)
-        get_global(${NAME}_REQUIRED_PACKAGES REQ_PACKAGES)
-        get_global(${NAME}_OPTIONAL_PACKAGES OPT_PACKAGES)
-        foreach(PACKAGE ${REQ_PACKAGES} ${OPT_PACKAGES})
-            get_global(${PACKAGE}_IS_PROJECT    IS_PROJECT)
-            get_global(${PACKAGE}_IS_INTEGRATED IS_INTEGRATED)
-            if(IS_PROJECT AND IS_INTEGRATED)
-                list(APPEND DEVELOPMENT_DEPENDS "${PACKAGE}_development")
-                list(APPEND RUNTIME_DEPENDS     "${PACKAGE}_runtime")
-            endif(IS_PROJECT AND IS_INTEGRATED)
-        endforeach(PACKAGE ${REQ_PACKAGES} ${OPT_PACKAGES})
-
-        ac_is_integrated(AcMake ACMAKE_INTEGRATED)
-        if(ACMAKE_INTEGRATED)
-            set(ACMAKE_DEPENDENCY "AcMake")
-        else(ACMAKE_INTEGRATED)
-            set(ACMAKE_DEPENDENCY)
-        endif(ACMAKE_INTEGRATED)
-
-        # declare standard components that every
-        # projects gets: one for the runtime and
-        # one for development files
-        cpack_add_component(
-            "${NAME}_runtime"
-            DISPLAY_NAME "${NAME} Runtime"
-            DESCRIPTION  "Runtime files for ${NAME}"
-            DEPENDS ${RUNTIME_DEPENDS}
-            INSTALL_TYPES runtime development
-            ${GROUP_MEMBERSHIP}
-        )
-        cpack_add_component(
-            "${NAME}_development"
-            DISPLAY_NAME "${NAME} Development"
-            DESCRIPTION  "Development files for ${NAME}"
-            DEPENDS "${NAME}_runtime" ${ACMAKE_DEPENDENCY} ${DEVELOPMENT_DEPENDS}
-            INSTALL_TYPES development
-            ${GROUP_MEMBERSHIP}
-        )
 
     endif(ACMAKE_BUILD_PACKAGES)
 endmacro(_ac_package_project)
@@ -343,17 +212,6 @@ ${CPACK_NSIS_EXTRA_INSTALL_COMMANDS}
 
         # load cpack helper
         include(CPack)
-
-        # declare standard install types
-        cpack_add_install_type(
-            development
-            DISPLAY_NAME "Development"
-        )
-        
-        cpack_add_install_type(
-            runtime
-            DISPLAY_NAME "Runtime"
-        )
 
     endif(ACMAKE_BUILD_PACKAGES)
 endmacro(_ac_declare_installer)

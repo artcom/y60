@@ -5,7 +5,7 @@ find_package(AcMake)
 function(y60_begin_application NAME)
     parse_arguments(
         APP
-        "DISPLAY_NAME;DESCRIPTION;DEPENDS;INSTALL_TYPES"
+        "DISPLAY_NAME;DESCRIPTION;DEPENDS"
         ""
         ${ARGN}
     )
@@ -30,7 +30,6 @@ function(y60_begin_application NAME)
     # XXX: passthrough for late installer registration
     set_global(${NAME}_DISPLAY_NAME  ${APP_DISPLAY_NAME})
     set_global(${NAME}_DESCRIPTION   ${APP_DESCRIPTION})
-    set_global(${NAME}_INSTALL_TYPES ${APP_INSTALL_TYPES})
     set_global(${NAME}_DEPENDS       ${APP_DEPENDS})
 endfunction(y60_begin_application)
 
@@ -211,18 +210,7 @@ function(y60_end_application NAME)
 
     get_global(${NAME}_DISPLAY_NAME  APP_DISPLAY_NAME)
     get_global(${NAME}_DESCRIPTION   APP_DESCRIPTION)
-    get_global(${NAME}_INSTALL_TYPES APP_INSTALL_TYPES)
     get_global(${NAME}_DEPENDS       APP_DEPENDS)
-
-    if(ACMAKE_CURRENT_PROJECT)
-          ac_add_installer_component(
-              ${NAME}
-              DISPLAY_NAME "${APP_DISPLAY_NAME}"
-              DESCRIPTION  "${APP_DESCRIPTION}"
-              INSTALL_TYPES ${APP_INSTALL_TYPES}
-              DEPENDS       ${APP_DEPENDS}
-          )
-    endif(ACMAKE_CURRENT_PROJECT)
 
     set(Y60_CURRENT_APPLICATION)
 endfunction(y60_end_application)
@@ -279,7 +267,7 @@ macro(y60_add_rendertest NAME)
     )
     get_target_property(
         TEST_Y60_COMPARE_IMAGE_EXECUTABLE
-        y60-compare-image
+        compareimage
         LOCATION_${Y60_TEST_BUILD_TYPE}
     )
 

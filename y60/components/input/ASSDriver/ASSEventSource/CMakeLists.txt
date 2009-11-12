@@ -25,7 +25,6 @@ y60_begin_application(
     DISPLAY_NAME "Proximatrix Tools"
     DESCRIPTION  "Tools for setting up and debugging the ART+COM Proximatrix"
     DEPENDS ASS_runtime Y60_runtime
-    INSTALL_TYPES runtime development
 )
 
 y60_add_asset(demo.js)

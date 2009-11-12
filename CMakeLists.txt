@@ -38,7 +38,6 @@ cpack_add_component(
     AcMake
     DISPLAY_NAME "AcMake"
     DESCRIPTION "ART+COM CMake Library"
-    INSTALL_TYPES development
 )
 
 # define debian packages

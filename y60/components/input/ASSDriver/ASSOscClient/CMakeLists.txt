@@ -27,7 +27,6 @@ y60_begin_application(
     DISPLAY_NAME "Proximatrix OSC Client"
     DESCRIPTION  "OSC touch event sender for the ART+COM Proximatrix"
     DEPENDS ASS_runtime Y60_runtime
-    INSTALL_TYPES runtime development
 )
 
 y60_add_asset(client.js)

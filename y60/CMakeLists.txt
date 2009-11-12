@@ -94,19 +94,6 @@ endif(GTKMM_FOUND AND GTKGLEXT_FOUND AND GLADEMM_FOUND)
 if(Y60_WITH_GTK)
     add_subdirectory(acgtk)
     add_subdirectory(jsgtk)
-
-    ac_add_installer_component(
-        G60_runtime
-        DISPLAY_NAME "G60 Runtime"
-        DESCRIPTION "Y60 GTK"
-        DEPENDS Y60_runtime
-    )
-    ac_add_installer_component(
-        G60_development
-        DISPLAY_NAME "G60 Development"
-        DESCRIPTION  "Y60 GTK"
-        DEPENDS Y60_development
-    )
 endif(Y60_WITH_GTK)
 
 # Install script library

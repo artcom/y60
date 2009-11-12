@@ -5,7 +5,7 @@ if(WIN32)
 endif(WIN32)
 
 ac_add_executable(
-    y60-gen-compressed-tex
+    gencompressedtex
     SOURCES generateCompressedTex.cpp
     DEPENDS aslbase aslmath aslserial aslnet aslipc asldom aslxpath
             y60base y60scene y60image y60video

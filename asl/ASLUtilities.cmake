@@ -11,11 +11,11 @@ macro(asl_add_schema XSD)
 
     if(THIS_XSD_CXX_FILE)
         get_target_property(
-            TEXT2SRC asl-text2src LOCATION
+            TEXT2SRC text2src LOCATION
         )
         add_custom_command(
             OUTPUT  ${THIS_XSD_CXX_FILE}
-            DEPENDS ${THIS_XSD_FILE} asl-text2src
+            DEPENDS ${THIS_XSD_FILE} text2src
             WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
             COMMAND 
                 ${TEXT2SRC}
