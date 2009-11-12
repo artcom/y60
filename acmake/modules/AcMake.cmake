@@ -74,3 +74,4 @@ include(AcInstaller)
 
 include(AcAddPro60Dependencies)
 
+include(AcDebian)
