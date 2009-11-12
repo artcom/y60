@@ -76,10 +76,12 @@ function(y60_add_assets DIRECTORY)
 endfunction(y60_add_assets)
 
 macro(y60_add_component COMPONENT_NAME)
+    string(TOLOWER ${COMPONENT_NAME} COMPONENT_NAME_LOWER)
     ac_add_plugin(
         ${COMPONENT_NAME} y60/components
+        RUNTIME_DEBIAN_PACKAGE     y60-plugin-${COMPONENT_NAME_LOWER}
+        DEVELOPMENT_DEBIAN_PACKAGE y60-plugin-${COMPONENT_NAME_LOWER}-dev
         ${ARGN}
-        # XXX: install component
     )
 endmacro(y60_add_component)
 

@@ -50,7 +50,7 @@
 macro(ac_add_plugin PLUGIN_NAME PLUGIN_PATH)
     # put arguments into the THIS_PLUGIN namespace
     parse_arguments(THIS_PLUGIN
-        "SOURCES;HEADERS;DEPENDS;EXTERNS;DEVELOPMENT_INSTALL_COMPONENT;RUNTIME_INSTALL_COMPONENT"
+        "SOURCES;HEADERS;DEPENDS;EXTERNS;DEVELOPMENT_DEBIAN_PACKAGE;DEVELOPMENT_INSTALL_COMPONENT;RUNTIME_INSTALL_COMPONENT;RUNTIME_DEBIAN_PACKAGE"
         "DONT_INSTALL"
         ${ARGN})
     
@@ -123,6 +123,7 @@ macro(ac_add_plugin PLUGIN_NAME PLUGIN_PATH)
                 set(COMPONENT_DEVELOPMENT "plugin_${THIS_PLUGIN_NAME}_development")
             endif(THIS_PLUGIN_DEVELOPMENT_INSTALL_COMPONENT)
         endif(ACMAKE_CURRENT_PROJECT)
+
         # register target for installation
         install(
             TARGETS ${THIS_PLUGIN_NAME}
@@ -139,6 +140,29 @@ macro(ac_add_plugin PLUGIN_NAME PLUGIN_PATH)
                 DESTINATION include/${THIS_PLUGIN_PATH}/${THIS_PLUGIN_NAME}
                 COMPONENT ${COMPONENT_DEVELOPMENT}
         )
+
+        if(ACMAKE_DEBIAN_PACKAGES)
+            string(TOLOWER ${PLUGIN_NAME} PLUGIN_NAME_LOWER)
+            if(NOT THIS_PLUGIN_RUNTIME_DEBIAN_PACKAGE)
+                set(THIS_PLUGIN_RUNTIME_DEBIAN_PACKAGE ${PLUGIN_NAME_LOWER})
+            endif(NOT THIS_PLUGIN_RUNTIME_DEBIAN_PACKAGE)
+            if(NOT THIS_PLUGIN_DEVELOPMENT_DEBIAN_PACKAGE)
+                set(THIS_PLUGIN_DEVELOPMENT_DEBIAN_PACKAGE ${PLUGIN_NAME_LOWER}-dev)
+            endif(NOT THIS_PLUGIN_DEVELOPMENT_DEBIAN_PACKAGE)
+            ac_debian_add_package(
+                ${THIS_PLUGIN_RUNTIME_DEBIAN_PACKAGE}
+                DESCRIPTION "Plugin ${LIBRARY_NAME} runtime"
+                COMPONENTS ${COMPONENT_RUNTIME}
+                SHARED_LIBRARY_DEPENDENCIES
+            )
+            ac_debian_add_package(
+                ${THIS_PLUGIN_DEVELOPMENT_DEBIAN_PACKAGE}
+                DESCRIPTION "Plugin ${LIBRARY_NAME} development"
+                COMPONENTS ${COMPONENT_DEVELOPMENT}
+                DEPENDS ${THIS_PLUGIN_RUNTIME_DEBIAN_PACKAGE}
+                RECOMMENDS acmake
+            )
+        endif(ACMAKE_DEBIAN_PACKAGES)
     endif(NOT THIS_PLUGIN_DONT_INSTALL)
 
     # register plugin with project
