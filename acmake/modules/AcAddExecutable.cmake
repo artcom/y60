@@ -108,10 +108,19 @@ macro(ac_add_executable EXECUTABLE_NAME)
                 DESTINATION bin
                 COMPONENT ${COMPONENT}
         )
-    endif(NOT THIS_EXECUTABLE_DONT_INSTALL)
-    
-    # add our target to the current project
-    if(NOT THIS_EXECUTABLE_DONT_INSTALL)
+
+        if(ACMAKE_DEBIAN_PACKAGES)
+            string(TOLOWER ${EXECUTABLE_NAME} EXECUTABLE_NAME_LOWER)
+            set(PACKAGE ${EXECUTABLE_NAME})
+            ac_debian_add_package(
+                ${PACKAGE}
+                DESCRIPTION "Executable ${LIBRARY_NAME}"
+                COMPONENTS ${COMPONENT}
+                SHARED_LIBRARY_DEPENDENCIES
+            )
+        endif(ACMAKE_DEBIAN_PACKAGES)
+
+        # add our target to the current project
         ac_project_add_target(
             EXECUTABLES ${THIS_EXECUTABLE_NAME}
             EXTERNS     ${THIS_EXECUTABLE_EXTERNS}
