@@ -158,12 +158,12 @@ macro(ac_add_library LIBRARY_NAME LIBRARY_PATH)
             if(THIS_LIBRARY_RUNTIME_INSTALL_COMPONENT)
                 set(COMPONENT_RUNTIME     "${THIS_LIBRARY_RUNTIME_INSTALL_COMPONENT}")
             else(THIS_LIBRARY_RUNTIME_INSTALL_COMPONENT)
-                set(COMPONENT_RUNTIME     "${ACMAKE_CURRENT_PROJECT}_runtime")
+                set(COMPONENT_RUNTIME     "${THIS_LIBRARY_NAME}_library_runtime")
             endif(THIS_LIBRARY_RUNTIME_INSTALL_COMPONENT)
             if(THIS_LIBRARY_DEVELOPMENT_INSTALL_COMPONENT)
                 set(COMPONENT_DEVELOPMENT "${THIS_LIBRARY_DEVELOPMENT_INSTALL_COMPONENT}")
             else(THIS_LIBRARY_DEVELOPMENT_INSTALL_COMPONENT)
-                set(COMPONENT_DEVELOPMENT "${ACMAKE_CURRENT_PROJECT}_development")
+                set(COMPONENT_DEVELOPMENT "${THIS_LIBRARY_NAME}_library_development")
             endif(THIS_LIBRARY_DEVELOPMENT_INSTALL_COMPONENT)
         endif(ACMAKE_CURRENT_PROJECT)
         # register target for installation
@@ -182,7 +182,6 @@ macro(ac_add_library LIBRARY_NAME LIBRARY_PATH)
                 DESTINATION include/${THIS_LIBRARY_PATH}
                 COMPONENT ${COMPONENT_DEVELOPMENT}
         )
-
     endif(NOT THIS_LIBRARY_DONT_INSTALL)
 
     # create tests
