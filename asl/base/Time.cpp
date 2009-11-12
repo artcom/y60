@@ -41,8 +41,6 @@
 // own header
 #include "Time.h"
 
-#include "Logger.h"
-
 #include <cstdlib>
 #include <stdio.h>
 #include <ctype.h>
@@ -428,7 +426,6 @@ static time_t Curl_parsedate(const char *date)
      03:14:07 UTC, January 19, 2038. (Such as AIX 5100-06)
   */
   t = mktime(&tm);
-  AC_TRACE << "mktime returned " << t;
 
   /* time zone adjust */
   if(-1 != t) {
@@ -443,12 +440,9 @@ static time_t Curl_parsedate(const char *date)
       return -1; /* illegal date/time */
     t2 = mktime(gmt);
 
-    AC_TRACE << "mktime(gmt) returned " << t2;
-
     /* Add the time zone diff (between the given timezone and GMT) and the
        diff between the local time zone and GMT. */
     delta = (long)((tzoff!=-1?tzoff:0) + (t - t2));
-    AC_TRACE << "tzoff / diff is " << tzoff << "/" << (t-t2);
 
     if((delta>0) && (t + delta < t))
       return -1; /* time_t overflow */
