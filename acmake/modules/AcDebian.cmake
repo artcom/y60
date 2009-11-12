@@ -23,7 +23,7 @@
 # 2. Assumptions
 #
 # It is expected that all shared libraries provide SOVERSION
-# to be compliant with debian shared library packaging rules
+# to be compliant with debian shared library packaging rules.
 #
 # __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 #
@@ -50,6 +50,9 @@ if(ACMAKE_DEBIAN)
     
     # create infrastructure directory
     make_directory(${ACMAKE_DEBIAN_DIR})
+else(ACMAKE_DEBIAN)
+    # do not define anything unless enabled
+    return()
 endif(ACMAKE_DEBIAN)
 
 
@@ -236,13 +239,6 @@ function(ac_debian_finalize)
     # generate the rules file
     _ac_debian_generate_rules()
 endfunction(ac_debian_finalize)
-
-##### INTERNALS - LOADED ONLY IF ACTUALLY BUILDING DEBIAN PACKAGES #####
-
-# ignore remainder of file if not building debian packages
-if(NOT ACMAKE_DEBIAN)
-    return()
-endif(NOT ACMAKE_DEBIAN)
 
 ### RULES FILE GENERATION ###
 
