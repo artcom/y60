@@ -44,12 +44,26 @@ if(ACMAKE_DEBIAN)
     ac_define_debug_channel(debian "Debug debian packaging")
     
     # location of debian build infrastructure
-    set(ACMAKE_DEBIAN_DIR     "${CMAKE_BINARY_DIR}/debian")
-    set(ACMAKE_DEBIAN_CONTROL "${ACMAKE_DEBIAN_DIR}/control")
-    set(ACMAKE_DEBIAN_RULES   "${ACMAKE_DEBIAN_DIR}/rules")
-    
+    set(ACMAKE_DEBIAN_DIR       "${CMAKE_BINARY_DIR}/debian")
+    set(ACMAKE_DEBIAN_CONTROL   "${ACMAKE_DEBIAN_DIR}/control")
+    set(ACMAKE_DEBIAN_RULES     "${ACMAKE_DEBIAN_DIR}/rules")
+    set(ACMAKE_DEBIAN_CHANGELOG "${ACMAKE_DEBIAN_DIR}/changelog")
+
+    set(ACMAKE_SOURCE_DEBIAN_DIR       "${CMAKE_SOURCE_DIR}/debian")
+    set(ACMAKE_SOURCE_DEBIAN_CHANGELOG "${ACMAKE_SOURCE_DEBIAN_DIR}/changelog")
+
     # create infrastructure directory
     make_directory(${ACMAKE_DEBIAN_DIR})
+
+    # ensure that there is a changelog
+    if(NOT EXISTS ${ACMAKE_SOURCE_DEBIAN_CHANGELOG})
+        message(FATAL_ERROR "You did not provide a debian changelog, which is required.")
+    endif(NOT EXISTS ${ACMAKE_SOURCE_DEBIAN_CHANGELOG})
+
+    if(NOT ${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
+        copy_file(${ACMAKE_SOURCE_DEBIAN_CHANGELOG} ${ACMAKE_DEBIAN_CHANGELOG})
+    endif(NOT ${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
+
 else(ACMAKE_DEBIAN)
     # do not define anything unless enabled
     return()
@@ -91,7 +105,7 @@ function(ac_debian_define_source NAME)
     parse_arguments(
         THIS
         "SECTION;PRIORITY;MAINTAINER;HOMEPAGE;UPLOADERS;BUILD_DEPENDS"
-        ""
+        "PROVIDE_DEBUG_PACKAGE"
         ${ARGN}
     )
 
@@ -116,6 +130,13 @@ function(ac_debian_define_source NAME)
 
     _ac_deb_break(${C})
 
+    if(THIS_PROVIDE_DEBUG_PACKAGE)
+        ac_debug_debian("Defining debug package ${NAME}-dbg")
+        set_global(ACMAKE_DEBIAN_DEBUG_PACKAGE ${NAME}-dbg)
+        ac_debian_add_package(
+            ${NAME}-dbg
+        )
+    endif(THIS_PROVIDE_DEBUG_PACKAGE)
 endfunction(ac_debian_define_source)
 
 # Define a debian binary package
@@ -154,13 +175,30 @@ function(ac_debian_add_package NAME)
     # parse arguments
     parse_arguments(
         THIS
-        "ARCHITECTURE;DESCRIPTION;DEPENDS;RECOMMENDS;PROVIDES;BLURB;COMPONENTS"
+        "ARCHITECTURE;DESCRIPTION;DEPENDS;RECOMMENDS;PROVIDES;LONG_DESCRIPTION;COMPONENTS"
         "SHARED_LIBRARY_DEPENDENCIES;MISC_DEPENDENCIES"
         ${ARGN}
     )
 
     # add ourselves to global list of packages
     append_global(ACMAKE_DEBIAN_PACKAGES ${NAME})
+
+    # default architecture to all
+    if(NOT THIS_ARCHITECTURE)
+        set(THIS_ARCHITECTURE any)
+    endif(NOT THIS_ARCHITECTURE)
+
+    # default description and warning if missing
+    if(NOT THIS_DESCRIPTION)
+        message("Debian package ${NAME} does not provide a description.")
+        set(THIS_DESCRIPTION "No description.")
+    endif(NOT THIS_DESCRIPTION)
+
+    # default blurb and warning if missing
+    if(NOT THIS_LONG_DESCRIPTION)
+        message("Debian package ${NAME} does not provide a long description.")
+        set(THIS_LONG_DESCRIPTION "No description.")
+    endif(NOT THIS_LONG_DESCRIPTION)
 
     # implement shlibdeps
     if(THIS_SHARED_LIBRARY_DEPENDENCIES)
@@ -190,7 +228,7 @@ function(ac_debian_add_package NAME)
     _ac_deb_list(${C} "Recommends" ${THIS_RECOMMENDS})
     _ac_deb_list(${C} "Provides" ${THIS_PROVIDES})
 
-    _ac_deb_text(${C} ${THIS_BLURB})
+    _ac_deb_text(${C} ${THIS_LONG_DESCRIPTION})
 
     _ac_deb_break(${C})
 
@@ -246,6 +284,14 @@ endfunction(ac_debian_finalize)
 function(_ac_debian_generate_rules)
     ac_debug_debian("Generating rules file")
 
+    get_global(ACMAKE_DEBIAN_DEBUG_PACKAGE DEBUG)
+
+    if(DEBUG)
+        set(BUILD_TYPE "RelWithDebInfo")
+    else(DEBUG)
+        set(BUILD_TYPE "Release")
+    endif(DEBUG)
+
     file(WRITE ${ACMAKE_DEBIAN_RULES}
 "#!/usr/bin/make -f
 
@@ -258,8 +304,21 @@ DEB_MAKE_INSTALL_TARGET=install-debian
 # always build in the generated tree
 DEB_SRCDIR=.
 DEB_BUILDDIR=.
+
+# XXX
+#  override standard arguments because they override compiler choice, which leads
+#  to devastating reconfigures that somehow drop our later configuration on the way
+DEB_CMAKE_NORMAL_ARGS=-DCMAKE_INSTALL_PREFIX=$(DEB_CMAKE_INSTALL_PREFIX) -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DCMAKE_VERBOSE_MAKEFILES=YES
+
+# configure acmake for debian packaging
+DEB_CMAKE_EXTRA_FLAGS=-DACMAKE_DEBIAN=YES -DACMAKE_BUILD_TESTS=NO -DY60_WITH_GTK=NO -DACMAKE_DEBUG_DEBIAN=YES
+
 "
     )
+
+    if(DEBUG)
+        file(APPEND ${ACMAKE_DEBIAN_RULES} "DEB_DH_STRIP_ARGS=--dbg-package=${DEBUG}\n")
+    endif(DEBUG)
 
     # XXX this is somewhat disgusting, although it should
     #     not pose a problem as we only run this on linux
@@ -289,18 +348,18 @@ endfunction(_ac_deb_props)
 function(_ac_deb_list FILE NAME)
     list(LENGTH ARGN ARGC)
 
-    file(APPEND ${FILE} "${NAME}:\n")
-
     if(ARGC EQUAL 0)
         return()
     endif(ARGC EQUAL 0)
+
+    file(APPEND ${FILE} "${NAME}: ")
 
     math(EXPR LAST "${ARGC} - 1")
 
     set(I 0)
     while(I LESS ${LAST})
         list(GET ARGN ${I} VALUE)
-        file(APPEND ${FILE} " ${VALUE},\n")
+        file(APPEND ${FILE} "${VALUE}, ")
         math(EXPR I "${I} + 1")
     endwhile(I LESS ${LAST})
 

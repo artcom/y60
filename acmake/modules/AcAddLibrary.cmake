@@ -182,6 +182,25 @@ macro(ac_add_library LIBRARY_NAME LIBRARY_PATH)
                 DESTINATION include/${THIS_LIBRARY_PATH}
                 COMPONENT ${COMPONENT_DEVELOPMENT}
         )
+
+        if(ACMAKE_DEBIAN)
+            string(TOLOWER ${LIBRARY_NAME} LIBRARY_NAME_LOWER)
+            set(PACKAGE_RUNTIME     lib${LIBRARY_NAME_LOWER}${THIS_LIBRARY_VERSION}-${THIS_LIBRARY_SOVERSION})
+            set(PACKAGE_DEVELOPMENT lib${LIBRARY_NAME_LOWER}${THIS_LIBRARY_VERSION}-dev)
+            ac_debian_add_package(
+                ${PACKAGE_RUNTIME}
+                DESCRIPTION "Library ${LIBRARY_NAME} runtime"
+                COMPONENTS ${COMPONENT_RUNTIME}
+                SHARED_LIBRARY_DEPENDENCIES
+            )
+            ac_debian_add_package(
+                ${PACKAGE_DEVELOPMENT}
+                DESCRIPTION "Library ${LIBRARY_NAME} development"
+                COMPONENTS ${COMPONENT_DEVELOPMENT}
+                DEPENDS lib${LIBRARY_NAME}${THIS_LIBRARY_VERSION}
+                RECOMMENDS acmake
+            )
+        endif(ACMAKE_DEBIAN)
     endif(NOT THIS_LIBRARY_DONT_INSTALL)
 
     # create tests

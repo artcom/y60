@@ -34,14 +34,37 @@ ac_begin_solution(
 )
 
 # define the installer component for AcMake
-if(ACMAKE_BUILD_PACKAGES)
 cpack_add_component(
     AcMake
     DISPLAY_NAME "AcMake"
     DESCRIPTION "ART+COM CMake Library"
     INSTALL_TYPES development
 )
-endif(ACMAKE_BUILD_PACKAGES)
+
+# define debian packages
+if(ACMAKE_DEBIAN)
+    ac_debian_define_source(
+        pro60
+        SECTION graphics
+        PRIORITY optional
+        MAINTAINER
+            "Ingo Albrecht <ingo@artcom.de>"
+        HOMEPAGE
+            "http://y60.artcom.de/"
+        PROVIDE_DEBUG_PACKAGE
+    )
+
+    ac_debian_add_package(
+        acmake
+        DESCRIPTION "ART+COM CMake Library"
+        ARCHITECTURE all
+        LONG_DESCRIPTION
+            "AcMake is a set of CMake modules primarily used for building the Y60 Media Engine."
+        DEPENDS cmake
+        RECOMMENDS cdbs
+        COMPONENTS "acmake"
+    )
+endif(ACMAKE_DEBIAN)
 
 # add our packages
 add_subdirectory(netsrc)
@@ -57,3 +80,9 @@ if(EXISTS ${CMAKE_SOURCE_DIR}/../tutorials)
 endif(EXISTS ${CMAKE_SOURCE_DIR}/../tutorials)
 
 ac_end_solution(PRO60)
+
+if(ACMAKE_DEBIAN)
+    message("FINALIZING DEBIAN PACKAGES")
+    ac_debian_finalize()
+endif(ACMAKE_DEBIAN)
+
