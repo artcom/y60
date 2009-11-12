@@ -32,7 +32,7 @@ spark.Window.Constructor = function(Protected) {
         ];
         
         window.decorations = Protected.getBoolean("decorations", true);
-        window.multisamples = Protected.getString("multisamples", "0")
+        window.multisamples = Protected.getNumber("multisamples", 0);
         
         var mySceneFile = Protected.getString("sceneFile", "");
         if (mySceneFile.length > 0) {
