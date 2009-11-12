@@ -55,7 +55,7 @@
 macro(ac_add_library LIBRARY_NAME LIBRARY_PATH)
     # put arguments into the THIS_LIBRARY namespace
     parse_arguments(THIS_LIBRARY
-        "SOURCES;HEADERS;DEPENDS;EXTERNS;TESTS;RUNTIME_INSTALL_COMPONENT;DEVELOPMENT_INSTALL_COMPONENT"
+        "SOURCES;HEADERS;DEPENDS;EXTERNS;TESTS;RUNTIME_INSTALL_COMPONENT;DEVELOPMENT_INSTALL_COMPONENT;SOVERSION;VERSION"
         "DONT_INSTALL;STATIC"
         ${ARGN}
     )
@@ -63,6 +63,16 @@ macro(ac_add_library LIBRARY_NAME LIBRARY_PATH)
     # do the same manually for name and path
     set(THIS_LIBRARY_NAME "${LIBRARY_NAME}")
     set(THIS_LIBRARY_PATH "${LIBRARY_PATH}")
+
+    # determine version information
+    if(NOT THIS_LIBRARY_SOVERSION)
+        message("Library ${LIBRARY_NAME} does not specify a SOVERSION. Defaulting to 1.")
+        set(THIS_LIBRARY_SOVERSION 1)
+    endif(NOT THIS_LIBRARY_SOVERSION)
+    if(NOT THIS_LIBRARY_VERSION)
+        message("Library ${LIBRARY_NAME} does not specify a VERSION. Defaulting to 1.0.0.")
+        set(THIS_LIBRARY_VERSION 1.0.0)
+    endif(NOT THIS_LIBRARY_VERSION)
 
     # generate a header describing our binary, source and install locations
     set(THIS_LIBRARY_PATHS_TEMPLATE ${ACMAKE_TEMPLATES_DIR}/AcPaths.h.in)
@@ -149,6 +159,13 @@ macro(ac_add_library LIBRARY_NAME LIBRARY_PATH)
     # attach depends and externs
     _ac_attach_depends(${THIS_LIBRARY_NAME} "${THIS_LIBRARY_DEPENDS}" "${THIS_LIBRARY_EXTERNS}")
     
+    # apply version properties
+    set_target_properties(
+        ${THIS_LIBRARY_NAME} PROPERTIES
+        VERSION ${THIS_LIBRARY_VERSION}
+        SOVERSION ${THIS_LIBRARY_SOVERSION}
+    )
+
     # define installation
     if(NOT THIS_LIBRARY_DONT_INSTALL)
         # figure out components to install into
