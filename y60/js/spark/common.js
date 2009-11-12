@@ -89,9 +89,16 @@ function Class(theName) {
         myPublic._classes_   = {};
         myPublic._classes_[theName] = myNamespace[theName];
 
+        myPublic._properties_ = {};
+        myPublic._signals_    = {};
+
         // provide weaving functions
-        myPublic.Inherit = Inherit;
-        
+        myPublic.Inherit  = Inherit;
+        myPublic.Getter   = Getter;
+        myPublic.Setter   = Setter;
+        myPublic.Signal   = Signal;
+        myPublic.Property = Property;
+
         // call the real constructor
         var myArguments = [myProtected].concat(Array.prototype.slice.call(arguments));
         if (theName in myNamespace){
@@ -125,3 +132,83 @@ function InheritOldschool(theClass) {
     theClass.prototype.Constructor.apply(this, myArguments);
 };
 
+function Getter(theName, theFunction) {
+    this.__defineGetter__(theName, theFunction);
+};
+
+function Setter(theName, theFunction) {
+    this.__defineSetter__(theName, theFunction);
+};
+
+function Signal(theName) {
+    var mySignal = {};
+
+    var myHandlers = [];
+    var myContexts = [];
+
+    mySignal.signal = function() {
+        var myArguments = Array.prototype.slice.call(arguments);
+        for(var i = 0; i < myHandlers.length; i++) {
+            myHandlers[i].apply(myContexts[i], myArguments);
+        }
+    };
+
+    mySignal.call = function(theHandler, theContext) {
+        myHandlers.push(theHandler);
+        myContexts.push(theContext);
+    };
+
+    this[theName] = mySignal;
+};
+
+var propertyReaders = null;
+var propertyWriters = null;
+
+function initializeSerialization() {
+    var readers = {};
+    var writers = {};
+
+    readers[String] = function(theString) {
+        return theString;
+    };
+    writers[String] = function(theString) {
+        return theString;
+    };
+
+    readers[Boolean] = function(theString) {
+        return !(theString == "false");
+    };
+    writers[Boolean] = function(theBoolean) {
+        return String(theBoolean);
+    };
+
+    readers[Number] = function(theString) {
+        return Number(theString);
+    };
+    writers[Number] = function(theNumber) {
+        return String(theNumber);
+    };
+
+    propertyReaders = readers;
+    propertyWriters = writers;
+};
+
+initializeSerialization();
+
+function Property(theName, theType, theDefault, theHandler) {
+    var myProperty = {};
+
+    var myValue = theDefault;
+
+    this.Getter(theName, function() {
+        return myValue;
+    });
+
+    this.Setter(theName, function(theValue) {
+        myValue = theValue;
+        if(theHandler) {
+            theHandler(theValue);
+        }
+    });
+
+};

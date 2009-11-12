@@ -166,30 +166,30 @@ spark.Widget.Constructor = function(Protected) {
 
     var _myAlpha = 1.0;
 
-    Public.alpha getter = function() {
+    Public.Getter("alpha", function() {
         return _myAlpha;
-    };
+    });
 
-    Public.alpha setter = function(theValue) {
+    Public.Setter("alpha", function(theValue) {
         _myAlpha = theValue;
         Public.propagateAlpha();
-    };
+    });
 
 
     var _myActualAlpha = 1.0;
 
-    Public.actualAlpha getter = function() {
+    Public.Getter("actualAlpha", function() {
         return _myActualAlpha;
-    };
+    });
 
 
-    Public.parentAlpha getter = function() {
+    Public.Getter("parentAlpha", function() {
         var myParentAlpha = 1.0;
         if((Public.parent) && ("actualAlpha" in Public.parent)) {
             myParentAlpha = Public.parent.actualAlpha;
         }
         return myParentAlpha;
-    };
+    });
 
 
     Public.propagateAlpha = function() {
@@ -206,115 +206,77 @@ spark.Widget.Constructor = function(Protected) {
     
     // VISIBILITY AND SENSIBLITY
 
-    Public.visible getter = function() {
-        return _mySceneNode.visible;
-    };
+    Public.Property("visible", Boolean, true,
+                    function(theValue) {
+                        _mySceneNode.visible = theValue;
+                    });
 
-    Public.visible setter = function(theValue) {
-        _mySceneNode.visible = theValue;
-        Public.sensible = Public.sensible;
-    };
-
-    var _myRealSensiblity = true;
-
-    Public.sensible getter = function() {
-        return _myRealSensiblity;
-    };
-
-    Public.sensible setter = function(theValue) {
-        _myRealSensiblity = theValue;
-
-        var myActualSensibility = theValue && _mySceneNode.visible;
-
-        _mySceneNode.insensible = !myActualSensibility;
-    };
+    Public.Property("sensible", Boolean, true,
+                    function(theValue) {
+                        _mySceneNode.insensible = !theValue;
+                    });
 
     // POSITION
 
-    Public.x getter = function() {
-        return _mySceneNode.position.x;
+    Public.Getter("position", function() {
+        return new Vector3f(Public.x, Public.y, Public.z);
+    });
+
+    Public.Setter("position", function(theValue) {
+        Public.x = theValue.x;
+        Public.y = theValue.y;
+        Public.z = theValue.z;
+    });
+
+    this.Property("x", Number, 0.0, applyPosition);
+    this.Property("y", Number, 0.0, applyPosition);
+    this.Property("z", Number, 0.0, applyPosition);
+
+    function applyPosition() {
+        _mySceneNode.position = Public.position;
     };
 
-    Public.x setter = function(theValue) {
-        _mySceneNode.position.x = theValue;
-    };
-
-    Public.y getter = function() {
-        return _mySceneNode.position.y;
-    };
-
-    Public.y setter = function(theValue) {
-        _mySceneNode.position.y = theValue;
-    };
-
-    Public.z getter = function() {
-        return _mySceneNode.position.z;
-    };
-
-    Public.z setter = function(theValue) {
-        _mySceneNode.position.z = theValue;
-    };
-
-    Public.position getter = function() {
-        return _mySceneNode.position;
-    };
-
-    
-    Public.position setter = function(theValue) {
-        _mySceneNode.position.x = theValue.x;
-        _mySceneNode.position.y = theValue.y;
-        _mySceneNode.position.z = theValue.z;
-    };
-    
     // SCALE
     
-    Public.scaleX getter = function() {
-        return _mySceneNode.scale.x;
-    };
+    Public.Getter("scale", function() {
+        return new Vector3f(Public.scaleX, Public.scaleY, Public.scaleZ);
+    });
 
-    Public.scaleX setter = function(theValue) {
-        _mySceneNode.scale.x = theValue;
-    };
+    Public.Setter("scale", function(theValue) {
+        Public.scaleX = theValue.x;
+        Public.scaleY = theValue.y;
+        Public.scaleZ = theValue.z;
+    });
 
-    Public.scaleY getter = function() {
-        return _mySceneNode.scale.y;
-    };
+    this.Property("scaleX", Number, 1.0, applyScale);
+    this.Property("scaleY", Number, 1.0, applyScale);
+    this.Property("scaleZ", Number, 1.0, applyScale);
 
-    Public.scaleY setter = function(theValue) {
-        _mySceneNode.scale.y = theValue;
-    };
-
-    Public.scaleZ getter = function() {
-        return _mySceneNode.scale.z;
-    };
-
-    Public.scaleZ setter = function(theValue) {
-        _mySceneNode.scale.z = theValue;
-    };
-
-    Public.scale getter = function() {
-        return _mySceneNode.scale.clone();
-    };
-
-    Public.scale setter = function(theValue) {
-        _mySceneNode.scale.x = theValue.x;
-        _mySceneNode.scale.y = theValue.y;
-        _mySceneNode.scale.z = theValue.z;
+    function applyScale() {
+        _mySceneNode.scale = Public.scale;
     };
 
 
     // PIVOT
-    // XXX: finish implementing pivot wrappers
 
-    Public.pivot getter = function() {
-        return _mySceneNode.pivot.clone();
+    Public.Getter("pivot", function() {
+        return new Vector3f(Public.pivotX, Public.pivotY, Public.pivotZ);
+    });
+
+    Public.Setter("pivot", function(theValue) {
+        Public.pivotX = theValue.x;
+        Public.pivotY = theValue.y;
+        Public.pivotZ = theValue.z;
+    });
+
+    this.Property("pivotX", Number, 1.0, applyPivot);
+    this.Property("pivotY", Number, 1.0, applyPivot);
+    this.Property("pivotZ", Number, 1.0, applyPivot);
+
+    function applyPivot() {
+        _mySceneNode.pivot = Public.pivot;
     };
 
-    Public.pivot setter = function(theValue) {
-        _mySceneNode.pivot.x = theValue.x;
-        _mySceneNode.pivot.y = theValue.y;
-        _mySceneNode.pivot.z = theValue.z;
-    };
 
     // ORIGIN
     // XXX: finish implementing origin wrappers
@@ -342,53 +304,28 @@ spark.Widget.Constructor = function(Protected) {
         _myOrigin.x = theValue.x;
         _myOrigin.y = theValue.y;
         _myOrigin.z = theValue.z;        
-    }
+    };
     
     // ROTATION
-    var _myRotationDegrees = new Vector3f();
     
-    Public.rotationX getter = function() {
-        return _myRotationDegrees.x;
-    };
+    Public.Getter("rotation", function() {
+        return new Vector3f(Public.rotationX, Public.rotationY, Public.rotationZ);
+    });
 
-    Public.rotationX setter = function(theValue) {
-        _myRotationDegrees.x = theValue;
-        applyRotation();
-    };
+    Public.Setter("rotation", function(theValue) {
+        Public.rotationX = theValue.x;
+        Public.rotationY = theValue.y;
+        Public.rotationZ = theValue.z;
+    });
 
-    Public.rotationY getter = function() {
-        return _myRotationDegrees.y;
-    };
-
-    Public.rotationY setter = function(theValue) {
-        _myRotationDegrees.y = theValue;
-        applyRotation();
-    };
-
-    Public.rotationZ getter = function() {
-        return _myRotationDegrees.z;
-    };
-
-    Public.rotationZ setter = function(theValue) {
-        _myRotationDegrees.z = theValue;
-        applyRotation();
-    };
-
-    Public.rotation getter = function() {
-        return _myRotationDegrees.clone();
-    };
-
-    Public.rotation setter = function(theValue) {
-        _myRotationDegrees.x = theValue.x;
-        _myRotationDegrees.y = theValue.y;
-        _myRotationDegrees.z = theValue.z;
-        applyRotation();
-    };
+    this.Property("rotationX", Number, 0.0, applyRotation);
+    this.Property("rotationY", Number, 0.0, applyRotation);
+    this.Property("rotationZ", Number, 0.0, applyRotation);
 
     function applyRotation() {
-        var myRotation = new Vector3f(radFromDeg(_myRotationDegrees.x),
-                                      radFromDeg(_myRotationDegrees.y),
-                                      radFromDeg(_myRotationDegrees.z));
+        var myRotation = new Vector3f(radFromDeg(Public.rotationX),
+                                      radFromDeg(Public.rotationY),
+                                      radFromDeg(Public.rotationZ));
 
         var myQuaternion = Quaternionf.createFromEuler(myRotation);
 
