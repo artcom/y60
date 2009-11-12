@@ -53,8 +53,44 @@ if(ACMAKE_BUILDINFO)
             endif(SVN_OK)
         endif( EXISTS ${PROJECT_SOURCE_DIR}/.svn )
 
-        # TODO: check for git
+        if(EXISTS ${CMAKE_SOURCE_DIR}/.git)
+            set(GIT_REPOSITORY ${CMAKE_SOURCE_DIR})
+            set(GIT_OK YES)
+            find_program(GIT git git.exe)
+            if(NOT GIT)
+                message("git not found. Disabling repository information.")
+                set(GIT_OK NO)
+            endif(NOT GIT)
+            if(GIT_OK)
+                execute_process(
+                    COMMAND git branch --no-color
+                    WORKING_DIRECTORY ${GIT_REPOSITORY}
+                    OUTPUT_VARIABLE GIT_BRANCHES
+                )
+            
+                string(REGEX MATCH "\\* ([a-zA-Z0-9_-]*)" GIT_BRANCH_MATCH "${GIT_BRANCHES}")
+                set(GIT_BRANCH ${CMAKE_MATCH_1})
 
+                file(STRINGS "${GIT_REPOSITORY}/.git/refs/heads/${GIT_BRANCH}" GIT_COMMIT
+                    REGEX "[a-f0-9]*"
+                    LIMIT_COUNT 1
+                    NO_HEX_CONVERSION
+                )
+
+                set(GIT_DEPEND_FILES
+                    "${GIT_REPOSITORY}/.git/refs/heads/${GIT_BRANCH}"
+                    "${GIT_REPOSITORY}/.git/HEAD"
+                )
+
+                set(GIT_ARGS
+                    -D "GIT_REPOSITORY=${CMAKE_SOURCE_DIR}"
+                    -D "GIT_BRANCH=${GIT_BRANCH}"
+                    -D "GIT_COMMIT=${GIT_COMMIT}"
+                )
+                list(APPEND DETECTED_SCMS GIT)
+            endif(GIT_OK)
+        endif(EXISTS ${CMAKE_SOURCE_DIR}/.git)
+            
         list(LENGTH DETECTED_SCMS NUM_REPOS)
         if(NUM_REPOS EQUAL 0)
             message("No SCM detected.")
@@ -81,7 +117,7 @@ endif( ACMAKE_BUILDINFO )
 
 macro(_ac_add_repository_info TARGET_NAME BUILDINFO_FILENAME TARGET_TYPE)
     if(ACMAKE_BUILDINFO)
-        set(ALL_DEPEND_FILES ${BUILDINFO_SCM_DEPEND_FILES} ${ARGN})
+        set(ALL_DEPEND_FILES ${ACMAKE_BUILDINFO_TEMPLATE} ${BUILDINFO_SCM_DEPEND_FILES} ${ARGN})
         add_custom_command(
                 OUTPUT ${BUILDINFO_FILENAME}
                 COMMAND
@@ -112,4 +148,4 @@ macro(_ac_buildinfo_filename TARGET_NAME OUTPUT_VARIABLE)
     endif(ACMAKE_BUILDINFO)
 endmacro(_ac_buildinfo_filename)
 
-mark_as_advanced( ACMAKE_BUILDINFO_TEMPLATE SVN SVNVERSION )
+mark_as_advanced( ACMAKE_BUILDINFO_TEMPLATE SVN SVNVERSION GIT )

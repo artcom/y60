@@ -8,11 +8,17 @@
 #include <asl/base/buildinfo.h>
 
 #cmakedefine ACMAKE_HAVE_SVN_SCM
+#cmakedefine ACMAKE_HAVE_GIT_SCM
 
-#ifdef ACMAKE_HAVE_SVN_SCM
+#if defined(ACMAKE_HAVE_SVN_SCM)
 #   define ACMAKE_SCM_DATA()                                \
             ACMAKE_SVN_REVISION( "@ACMAKE_SVN_URL@",        \
                                  "@ACMAKE_SVN_REVISION@" )
+#elif defined(ACMAKE_HAVE_GIT_SCM)
+#   define ACMAKE_SCM_DATA()                               \
+            ACMAKE_GIT_REVISION("@ACMAKE_GIT_REPOSITORY@", \
+                                "@ACMAKE_GIT_BRANCH@",     \
+                                "@ACMAKE_GIT_COMMIT@" )
 #else
 #   define ACMAKE_SCM_DATA() ACMAKE_NO_SCM_DATA()
 #endif

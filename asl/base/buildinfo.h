@@ -106,7 +106,6 @@ struct unknown_compiler {
     typedef unknown_compiler detected_compiler;
 #endif
 
-
 class svn_revision {
     public:
         svn_revision(const char * url, const char * revision) :
@@ -117,6 +116,19 @@ class svn_revision {
     private:
         std::string url_;
         std::string revision_;
+};
+
+class git_revision {
+    public:
+        git_revision(const char * repository, const char * branch, const char * commit) :
+            repository_(repository), commit_(commit) {}
+        const char * history_id() const { return commit_.c_str(); }
+        const char * repository_id() const { return repository_.c_str(); }
+        const char * name() const { return "GIT"; }
+    private:
+        std::string repository_;
+        std::string branch_;
+        std::string commit_;
 };
 
 struct no_scm_data {
@@ -298,6 +310,9 @@ class target_info_initializer {
 
 #define ACMAKE_SVN_REVISION(url, revision) \
     asl::svn_revision(url, revision)
+
+#define ACMAKE_GIT_REVISION(repository, branch, commit)  \
+    asl::git_revision(repository, branch, commit)
 
 #define ACMAKE_NO_SCM_DATA() \
     asl::no_scm_data()
