@@ -99,7 +99,7 @@ macro(ac_add_executable EXECUTABLE_NAME)
         if(THIS_EXECUTABLE_INSTALL_COMPONENT)
             set(COMPONENT "${THIS_EXECUTABLE_INSTALL_COMPONENT}")
         else(THIS_EXECUTABLE_INSTALL_COMPONENT)
-            set(COMPONENT "${THIS_EXECUTABLE_NAME}_executable")
+            set(COMPONENT "executable_${THIS_EXECUTABLE_NAME}")
         endif(THIS_EXECUTABLE_INSTALL_COMPONENT)
         # register executable for installation
         install(
