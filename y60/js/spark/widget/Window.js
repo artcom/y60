@@ -441,7 +441,7 @@ spark.Window.Constructor = function(Protected) {
         }
     };
 
-    Public.onASSevent = handleMultitouchEvent;
+    Public.onASSEvent = handleMultitouchEvent;
     Public.onTuioEvent = handleMultitouchEvent;
 
 };
