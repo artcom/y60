@@ -68,7 +68,6 @@ install(
 #install(
 #    DIRECTORY include/
 #    DESTINATION ${ACMAKE_INCLUDE_SUB}
-#    COMPONENT AcMake
 #    FILES_MATCHING
 #        PATTERN "*.h"
 #	PATTERN ".svn" EXCLUDE

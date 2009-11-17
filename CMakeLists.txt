@@ -33,13 +33,6 @@ ac_begin_solution(
     UNINSTALLER_ICON "${CMAKE_SOURCE_DIR}/installer/windows/shopping_bag_grey.ico"
 )
 
-# define the installer component for AcMake
-cpack_add_component(
-    AcMake
-    DISPLAY_NAME "AcMake"
-    DESCRIPTION "ART+COM CMake Library"
-)
-
 # define debian packages
 if(ACMAKE_DEBIAN)
     ac_debian_define_source(
