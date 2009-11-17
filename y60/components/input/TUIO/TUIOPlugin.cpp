@@ -1,6 +1,6 @@
 
-#include <TUIOClient.h>
-#include <TUIOListener.h>
+#include <TuioClient.h>
+#include <TuioListener.h>
 
 #include <asl/base/Auto.h>
 #include <asl/base/ThreadLock.h>

@@ -7,7 +7,7 @@ find_path(
 
 find_library(
     TUIO_LIBRARY
-    NAMES libTUIO tuio
+    NAMES libTUIO tuio TUIO
 )
 
 if(WIN32)
