@@ -88,11 +88,11 @@ namespace y60 {
     //=== AC CG automatic paramters  ============================================
     enum CgAutoParameterID {
         OBJECTWORLD,OBJECTWORLD_I,OBJECTWORLD_T,OBJECTWORLD_IT,
-        CAMERA_POSITION, CAMERA_I, CAMERA_T, VIEWPROJECTION,
+        CAMERA_POSITION, CAMERA_I, CAMERA_T, VIEWPROJECTION, TEXTURE_MATRICES,
         POSITIONAL_LIGHTS, DIRECTIONAL_LIGHTS, SPOT_LIGHTS, 
         POSITIONAL_LIGHTS_DIFFUSE_COLOR, DIRECTIONAL_LIGHTS_DIFFUSE_COLOR, SPOT_LIGHTS_DIFFUSE_COLOR,
         POSITIONAL_LIGHTS_SPECULAR_COLOR, DIRECTIONAL_LIGHTS_SPECULAR_COLOR, SPOT_LIGHTS_SPECULAR_COLOR,
-        AMBIENT_LIGHT_COLOR, TEXTURE_MATRICES,  
+        AMBIENT_LIGHT_COLOR,  
         SPOT_LIGHTS_CUTOFF,
         SPOT_LIGHTS_EXPONENT,
         SPOT_LIGHTS_DIRECTION,
@@ -108,6 +108,7 @@ namespace y60 {
         "AC_CAMERA_I",
         "AC_CAMERA_T",
         "AC_VIEWPROJECTION",
+        "AC_TEXTURE_MATRICES",
         // light position
         "AC_POSITIONAL_LIGHTS",
         "AC_DIRECTIONAL_LIGHTS",
@@ -122,7 +123,6 @@ namespace y60 {
         "AC_SPOT_LIGHTS_SPECULAR_COLOR",
         // ambient color
         "AC_AMBIENT_LIGHT_COLOR",
-        "AC_TEXTURE_MATRICES",
         // spot parameters
         "AC_SPOT_LIGHTS_CUTOFF",
         "AC_SPOT_LIGHTS_EXPONENT",
@@ -288,6 +288,7 @@ namespace y60 {
 
             std::vector<const char *> _myCachedCompilerArgs;
             std::string _myCgProgramString;
+            bool                        _myUsesLights;    
     };
 
     typedef asl::Ptr<CgProgramInfo> CgProgramInfoPtr;

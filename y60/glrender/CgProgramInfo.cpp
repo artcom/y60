@@ -147,7 +147,7 @@ namespace y60 {
 
     CgProgramInfo::CgProgramInfo(const ShaderDescription & myShader,
                                  const CGcontext theCgContext)
-        : _myShader(myShader), _myContext(theCgContext)
+        : _myShader(myShader), _myContext(theCgContext), _myUsesLights(false)
     {
         _myPathName = myShader._myFilename;
 
@@ -381,6 +381,9 @@ namespace y60 {
                 AC_TRACE << "adding auto param " << myParamName << ":" << myParamID << endl;
                 _myAutoParams[myParamID] =
                     CgProgramAutoParam(myParamName, myParam, myParamID, myParameterType);
+                    if (myParamID >= POSITIONAL_LIGHTS && myParamID <= SPOT_LIGHTS_ATTENUATION) {
+                        _myUsesLights = true;
+                    }
             } else if (myParameterType == CG_SAMPLER1D ||
                        // scan for sampler params
                        myParameterType == CG_SAMPLER2D ||
@@ -429,74 +432,77 @@ namespace y60 {
         DBP2(MAKE_GL_SCOPE_TIMER(CgProgramInfo_reloadIfRequired));
         AC_DEBUG << "reloadIfRequired - " << ShaderProfileStrings[_myShader._myProfile];
 
-        DBP2(START_TIMER(CgProgramInfo_reloadIfRequired_count_lights));
-        //look at the number of lights to see if reload is req.
+        bool myReload = false;
         unsigned myPositionalLightCount = 0;
         unsigned myDirectionalLightCount = 0;
         unsigned mySpotLightCount = 0;
-        DBP2(COUNT_N(CgProgramInfo_reloadIfRequired_lights, theLightInstances.size()));
-        for (unsigned i = 0; i < theLightInstances.size(); ++i) {
-            LightPtr myLight = theLightInstances[i];
-            if ( ! myLight->get<VisibleTag>()) {
-                continue;
-            }
-            LightSourcePtr myLightSource = myLight->getLightSource();
-            switch (myLightSource->getType()) {
-            case POSITIONAL:
-                ++myPositionalLightCount;
-                break;
-            case DIRECTIONAL:
-                ++myDirectionalLightCount;
-                break;
-            case SPOT:
-                ++mySpotLightCount;
-                break;
-            case AMBIENT :
-                break;
-            default :
-                AC_WARNING << "Unknown light type for " << myLightSource->get<IdTag>();
-            }
-        }
-        DBP2(STOP_TIMER(CgProgramInfo_reloadIfRequired_count_lights));
-
-        bool myReload = false;
-
-        DBP2(START_TIMER(CgProgramInfo_reloadIfRequired_pos_lights));
-        if (myReload == false /* && _myAutoParams.find(POSITIONAL_LIGHTS) != _myAutoParams.end()*/) {
-            unsigned myLastCount = _myUnsizedArrayAutoParamSizes[POSITIONAL_LIGHTS];
-            if (myLastCount != myPositionalLightCount) {
-                DBP2(COUNT(CgProgramInfo_posLightCount_differ));
-                DBP2(COUNT_N(CgProgramInfo_posLightCountLast, myLastCount));
-                DBP2(COUNT_N(CgProgramInfo_posLightCountNew, myPositionalLightCount));
-                myReload = true;
-            }
-        }
-        DBP2(STOP_TIMER(CgProgramInfo_reloadIfRequired_pos_lights));
-
-        DBP2(START_TIMER(CgProgramInfo_reloadIfRequired_dir_lights));
-        if (myReload == false  /* && _myAutoParams.find(DIRECTIONAL_LIGHTS) != _myAutoParams.end()*/) {
-            unsigned myLastCount = _myUnsizedArrayAutoParamSizes[DIRECTIONAL_LIGHTS];
-            if (myLastCount != myDirectionalLightCount)  {
-                DBP2(COUNT(CgProgramInfo_dirLightCount_differ));
-                DBP2(COUNT_N(CgProgramInfo_dirLightCountLast, myLastCount));
-                DBP2(COUNT_N(CgProgramInfo_dirLightCountNew, myDirectionalLightCount));
-                myReload = true;
-            }
-        }
-        DBP2(STOP_TIMER(CgProgramInfo_reloadIfRequired_dir_lights));
         
-        DBP2(START_TIMER(CgProgramInfo_reloadIfRequired_spot_lights));
-        if (myReload == false /* && _myAutoParams.find(SPOT_LIGHTS) != _myAutoParams.end()*/) {
-            unsigned myLastCount = _myUnsizedArrayAutoParamSizes[SPOT_LIGHTS];
-            if (myLastCount != mySpotLightCount)  {
-                DBP2(COUNT(CgProgramInfo_spotLightCount_differ));
-                DBP2(COUNT_N(CgProgramInfo_spotLightCountLast, myLastCount));
-                DBP2(COUNT_N(CgProgramInfo_spotLightCountNew, mySpotLightCount));
-                myReload = true;
+        if (_myUsesLights) {
+            DBP2(START_TIMER(CgProgramInfo_reloadIfRequired_count_lights));
+            //look at the number of lights to see if reload is req.
+            DBP2(COUNT_N(CgProgramInfo_reloadIfRequired_lights, theLightInstances.size()));
+            for (unsigned i = 0; i < theLightInstances.size(); ++i) {
+                LightPtr myLight = theLightInstances[i];
+                if ( ! myLight->get<VisibleTag>()) {
+                    continue;
+                }
+                LightSourcePtr myLightSource = myLight->getLightSource();
+                switch (myLightSource->getType()) {
+                case POSITIONAL:
+                    ++myPositionalLightCount;
+                    break;
+                case DIRECTIONAL:
+                    ++myDirectionalLightCount;
+                    break;
+                case SPOT:
+                    ++mySpotLightCount;
+                    break;
+                case AMBIENT :
+                    break;
+                default :
+                    AC_WARNING << "Unknown light type for " << myLightSource->get<IdTag>();
+                }
             }
+            DBP2(STOP_TIMER(CgProgramInfo_reloadIfRequired_count_lights));
+    
+            
+            DBP2(START_TIMER(CgProgramInfo_reloadIfRequired_pos_lights));
+            if (myReload == false /* && _myAutoParams.find(POSITIONAL_LIGHTS) != _myAutoParams.end()*/) {
+                unsigned myLastCount = _myUnsizedArrayAutoParamSizes[POSITIONAL_LIGHTS];
+                if (myLastCount != myPositionalLightCount) {
+                    DBP2(COUNT(CgProgramInfo_posLightCount_differ));
+                    DBP2(COUNT_N(CgProgramInfo_posLightCountLast, myLastCount));
+                    DBP2(COUNT_N(CgProgramInfo_posLightCountNew, myPositionalLightCount));
+                    myReload = true;
+                }
+            }
+            DBP2(STOP_TIMER(CgProgramInfo_reloadIfRequired_pos_lights));
+    
+            DBP2(START_TIMER(CgProgramInfo_reloadIfRequired_dir_lights));
+            if (myReload == false  /* && _myAutoParams.find(DIRECTIONAL_LIGHTS) != _myAutoParams.end()*/) {
+                unsigned myLastCount = _myUnsizedArrayAutoParamSizes[DIRECTIONAL_LIGHTS];
+                if (myLastCount != myDirectionalLightCount)  {
+                    DBP2(COUNT(CgProgramInfo_dirLightCount_differ));
+                    DBP2(COUNT_N(CgProgramInfo_dirLightCountLast, myLastCount));
+                    DBP2(COUNT_N(CgProgramInfo_dirLightCountNew, myDirectionalLightCount));
+                    myReload = true;
+                }
+            }
+            DBP2(STOP_TIMER(CgProgramInfo_reloadIfRequired_dir_lights));
+            
+            DBP2(START_TIMER(CgProgramInfo_reloadIfRequired_spot_lights));
+            if (myReload == false /* && _myAutoParams.find(SPOT_LIGHTS) != _myAutoParams.end()*/) {
+                unsigned myLastCount = _myUnsizedArrayAutoParamSizes[SPOT_LIGHTS];
+                if (myLastCount != mySpotLightCount)  {
+                    DBP2(COUNT(CgProgramInfo_spotLightCount_differ));
+                    DBP2(COUNT_N(CgProgramInfo_spotLightCountLast, myLastCount));
+                    DBP2(COUNT_N(CgProgramInfo_spotLightCountNew, mySpotLightCount));
+                    myReload = true;
+                }
+            }
+            DBP2(STOP_TIMER(CgProgramInfo_reloadIfRequired_spot_lights));
         }
-        DBP2(STOP_TIMER(CgProgramInfo_reloadIfRequired_spot_lights));
-
+        
         if (myReload == false /* && _myAutoParams.find(TEXTURE_MATRICES) != _myAutoParams.end() */) {
             unsigned myLastCount = _myUnsizedArrayAutoParamSizes[TEXTURE_MATRICES];
             if (myLastCount != theMaterial.getTextureUnitCount()) {
