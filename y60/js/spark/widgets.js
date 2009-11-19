@@ -206,15 +206,14 @@ spark.Widget.Constructor = function(Protected) {
     
     // VISIBILITY AND SENSIBLITY
 
-    Public.Property("visible", Boolean, true,
-                    function(theValue) {
-                        _mySceneNode.visible = theValue;
-                    });
+    Public.Property("visible", Boolean, true, applyVisibilityAndSensibility);
 
-    Public.Property("sensible", Boolean, true,
-                    function(theValue) {
-                        _mySceneNode.insensible = !theValue;
-                    });
+    Public.Property("sensible", Boolean, true, applyVisibilityAndSensibility);
+
+    function applyVisibilityAndSensibility() {
+        _mySceneNode.insensible = !(Public.visible && Public.sensible);
+        _mySceneNode.visible    = Public.visible;
+    }
 
     // POSITION
 
