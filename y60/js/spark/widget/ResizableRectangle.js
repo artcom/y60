@@ -6,8 +6,28 @@ spark.ResizableRectangle.Constructor = function(Protected) {
 
     this.Inherit(spark.Body);
 
-    var _myWidth;
-    var _myHeight;
+    Public.Getter("size", function() {
+        return new Vector2f(Public.width, Public.height);
+    });
+
+    Public.Setter("size", function(s) {
+        Public.width = s.x;
+        Public.height = s.y;
+    });
+    
+    this.Property("width",  Number, 1, applySize);
+    this.Property("height", Number, 1, applySize);
+
+    function applySize() {
+        if(_myVertices) {
+            var o = Public.origin;
+            // XXX what about 0!?
+            _myVertices[1] = [Public.width - o.x, -o.y, -o.z];
+            _myVertices[2] = [-o.x, Public.height - o.y, -o.z];
+            _myVertices[3] = [Public.width - o.x, Public.height - o.y, -o.z];
+        }
+    };
+
     var _myMaterial;
     var _myShape;
     var _myVertices;
@@ -28,14 +48,11 @@ spark.ResizableRectangle.Constructor = function(Protected) {
             var tu = _myMaterial.find("./textureunits/textureunit");
             if (tu) {
                var raster = tu.$texture.$image.raster;
-               _myWidth  = Protected.getNumber("width", raster.width);
-               _myHeight = Protected.getNumber("height", raster.height);
-            } else {
-               _myWidth  = Protected.getNumber("width", 1);
-               _myHeight = Protected.getNumber("height", 1);
+               Public.width = raster.width;
+               Public.height = raster.height;
             }
 
-            var mySize = new Vector3f(_myWidth, _myHeight, 0);
+            var mySize = new Vector3f(Public.width, Public.height, 0);
                                
             Public.origin = Protected.getVector3f("origin", Public.origin);
             var myLowerLeft = product( Public.origin, -1);
@@ -58,33 +75,6 @@ spark.ResizableRectangle.Constructor = function(Protected) {
         Base.realize(myBody);        
     };
 
-    // XXX untested with non-zero origin
-    Public.width getter = function() { return _myWidth; }
-    Public.width setter = function(w) {
-        if (w != _myWidth) {
-            var o = Public.origin;
-            _myVertices[1] = [w - o.x, -o.y, -o.z];
-            _myVertices[3] = [w - o.x, _myHeight - o.y, o.z];
-            _myWidth = w;
-        }
-    }
-    
-    Public.height getter = function() { return _myHeight; }
-    Public.height setter = function(h) {
-        if (h != _myHeight) {
-            var o = Public.origin;
-            _myVertices[2] = [-o.x, h - o.y, -o.z];
-            _myVertices[3] = [_myWidth - o.x, h - o.y, -o.z];
-            _myHeight = h;
-        }
-    }
-    
-    Public.size getter = function() { return new Vector2f(_myWidth, _myHeight);}
-    Public.size setter = function(s) {
-        Public.width = s.x;
-        Public.height = s.y;
-    }
-    
     Protected.material getter = function() { return _myMaterial; }
     Protected.shape    getter = function() { return _myShape; }
     Protected.vertices getter = function() { return _myVertices; }

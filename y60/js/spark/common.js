@@ -89,15 +89,16 @@ function Class(theName) {
         myPublic._classes_   = {};
         myPublic._classes_[theName] = myNamespace[theName];
 
-        myPublic._properties_ = {};
-        myPublic._signals_    = {};
+        myPublic._properties_ = [];
+        myPublic._signals_    = [];
 
         // provide weaving functions
-        myPublic.Inherit  = Inherit;
-        myPublic.Getter   = Getter;
-        myPublic.Setter   = Setter;
-        myPublic.Signal   = Signal;
-        myPublic.Property = Property;
+        myPublic.Inherit    = Inherit;
+        myPublic.Getter     = Getter;
+        myPublic.Setter     = Setter;
+        myPublic.Signal     = Signal;
+        myPublic.Property   = Property;
+        myPublic.Initialize = Initialize;
 
         // call the real constructor
         var myArguments = [myProtected].concat(Array.prototype.slice.call(arguments));
@@ -161,39 +162,30 @@ function Signal(theName) {
     this[theName] = mySignal;
 };
 
-var propertyReaders = null;
-var propertyWriters = null;
 
-function initializeSerialization() {
-    var readers = {};
-    var writers = {};
-
-    readers[String] = function(theString) {
-        return theString;
-    };
-    writers[String] = function(theString) {
-        return theString;
-    };
-
-    readers[Boolean] = function(theString) {
+function ConvertFromString(theType, theString) {
+    switch(theType) {
+    case Boolean:
         return !(theString == "false");
-    };
-    writers[Boolean] = function(theBoolean) {
-        return String(theBoolean);
-    };
-
-    readers[Number] = function(theString) {
+    case String:
+        return theString;
+    case Number:
         return Number(theString);
-    };
-    writers[Number] = function(theNumber) {
-        return String(theNumber);
-    };
-
-    propertyReaders = readers;
-    propertyWriters = writers;
+    default:
+        throw new Exception("Do not know how to convert to the given type " + theType);
+    }
 };
 
-initializeSerialization();
+function ConvertToString(theType, theValue) {
+    switch(theType) {
+    case Boolean:
+    case Number:
+    case String:    
+        return String(theValue);
+    default:
+        throw new Exception("Do not know how to convert from the given type " + theType);
+    }
+};
 
 function Property(theName, theType, theDefault, theHandler) {
     var myProperty = {};
@@ -207,8 +199,35 @@ function Property(theName, theType, theDefault, theHandler) {
     this.Setter(theName, function(theValue) {
         myValue = theValue;
         if(theHandler) {
-            theHandler(theValue);
+            theHandler(myValue);
         }
     });
 
+    myProperty.name = theName;
+
+    myProperty.setFromString = function(theString) {
+        myValue = ConvertFromString(theType, theString);
+        if(theHandler) {
+            theHandler(myValue);
+        }
+    };
+
+    myProperty.getAsString = function() {
+        return ConvertToString(theType, myValue);
+    };
+
+    this._properties_.push(myProperty);
+};
+
+function Initialize(theNode) {
+    var myProps = this._properties_;
+
+    for(var i = 0; i < myProps.length; i++) {
+        var myProp = myProps[i];
+        var myName = myProp.name;
+        if(myName in theNode) {
+            var myString = theNode[myName];
+            myProp.setFromString(myString);
+        }
+    }
 };

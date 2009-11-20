@@ -206,13 +206,15 @@ spark.Widget.Constructor = function(Protected) {
     
     // VISIBILITY AND SENSIBLITY
 
-    Public.Property("visible", Boolean, true, applyVisibilityAndSensibility);
+    Public.Property("visible", Boolean, true, applyVisibleAndSensible);
 
-    Public.Property("sensible", Boolean, true, applyVisibilityAndSensibility);
+    Public.Property("sensible", Boolean, true, applyVisibleAndSensible);
 
-    function applyVisibilityAndSensibility() {
-        _mySceneNode.insensible = !(Public.visible && Public.sensible);
-        _mySceneNode.visible    = Public.visible;
+    function applyVisibleAndSensible() {
+        if(_mySceneNode) {
+            _mySceneNode.insensible = !(Public.visible && Public.sensible);
+            _mySceneNode.visible    = Public.visible;
+        }
     }
 
     // POSITION
@@ -232,7 +234,9 @@ spark.Widget.Constructor = function(Protected) {
     this.Property("z", Number, 0.0, applyPosition);
 
     function applyPosition() {
-        _mySceneNode.position = Public.position;
+        if(_mySceneNode) {
+            _mySceneNode.position = Public.position;
+        }
     };
 
     // SCALE
@@ -252,7 +256,9 @@ spark.Widget.Constructor = function(Protected) {
     this.Property("scaleZ", Number, 1.0, applyScale);
 
     function applyScale() {
-        _mySceneNode.scale = Public.scale;
+        if(_mySceneNode) {
+            _mySceneNode.scale = Public.scale;
+        }
     };
 
 
@@ -273,38 +279,33 @@ spark.Widget.Constructor = function(Protected) {
     this.Property("pivotZ", Number, 1.0, applyPivot);
 
     function applyPivot() {
-        _mySceneNode.pivot = Public.pivot;
+        if(_mySceneNode) {
+            _mySceneNode.pivot = Public.pivot;
+        }
     };
 
 
     // ORIGIN
-    // XXX: finish implementing origin wrappers
     // XXX: origins must be set up before realization
 
-    var _myOrigin = new Vector3f(0,0,0);
-    
-    Public.originX getter = function() {
-        return _myOrigin.x;
+    Public.Getter("origin", function() {
+        return new Vector3f(Public.originX, Public.originY, Public.originZ);
+    });
+
+    Public.Setter("origin", function(theValue) {
+        Public.originX = theValue.x;
+        Public.originY = theValue.y;
+        Public.originZ = theValue.z;
+    });
+
+    this.Property("originX", Number, 1.0, applyOrigin);
+    this.Property("originY", Number, 1.0, applyOrigin);
+    this.Property("originZ", Number, 1.0, applyOrigin);
+
+    function applyOrigin() {
     };
 
-    Public.originY getter = function() {
-        return _myOrigin.y;
-    };
 
-    Public.originZ getter = function() {
-        return _myOrigin.z;
-    };
-
-    Public.origin getter = function() {
-        return new Vector3f(_myOrigin);
-    };
-
-    Public.origin setter = function(theValue) {
-        _myOrigin.x = theValue.x;
-        _myOrigin.y = theValue.y;
-        _myOrigin.z = theValue.z;        
-    };
-    
     // ROTATION
     
     Public.Getter("rotation", function() {
@@ -322,13 +323,15 @@ spark.Widget.Constructor = function(Protected) {
     this.Property("rotationZ", Number, 0.0, applyRotation);
 
     function applyRotation() {
-        var myRotation = new Vector3f(radFromDeg(Public.rotationX),
-                                      radFromDeg(Public.rotationY),
-                                      radFromDeg(Public.rotationZ));
-
-        var myQuaternion = Quaternionf.createFromEuler(myRotation);
-
-        _mySceneNode.orientation = myQuaternion;
+        if(_mySceneNode) {
+            var myRotation = new Vector3f(radFromDeg(Public.rotationX),
+                                          radFromDeg(Public.rotationY),
+                                          radFromDeg(Public.rotationZ));
+            
+            var myQuaternion = Quaternionf.createFromEuler(myRotation);
+            
+            _mySceneNode.orientation = myQuaternion;
+        }
     };
 
     // INTERNATIONALISATION HOOKS
@@ -430,31 +433,14 @@ spark.Widget.Constructor = function(Protected) {
         spark.sceneNodeMap[_mySceneNode.id] = Public;
 
         Base.realize();
-                
-        Public.visible = Protected.getBoolean("visible", true);
 
-        Public.alpha = Protected.getNumber("alpha", 1.0);
+        applyVisibleAndSensible();
+        applyPosition();
+        applyScale();
+        applyRotation();
+        applyPivot();
 
-        Public.position = new Vector3f(Protected.getNumber("x", 0.0),
-                                       Protected.getNumber("y", 0.0),
-                                       Protected.getNumber("z", 0.0));
-        
-        var myPosition = Protected.getArray("position", []);
-        if(myPosition.length > 0) {
-            Public.position = new Vector3f(myPosition);    
-        }
-                                       
-        Public.scale = new Vector3f(Protected.getNumber("scaleX", 1.0),
-                                    Protected.getNumber("scaleY", 1.0),
-                                    Protected.getNumber("scaleZ", 1.0));
-
-        Public.rotation = new Vector3f(Protected.getNumber("rotationX", 0.0),
-                                       Protected.getNumber("rotationY", 0.0),
-                                       Protected.getNumber("rotationZ", 0.0));
-                                       
-        Public.pivot = Protected.getVector3f("pivot", new Vector3f(0,0,0));
-
-        Public.sensible = Protected.getBoolean("sensible", true);        
+        Public.propagateAlpha();
     };
 
     Base.postRealize = Public.postRealize;

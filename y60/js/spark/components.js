@@ -81,18 +81,10 @@ function unpenner() {
 spark.Component.Constructor = function(Protected) {
     var Public = this;
 
-    var _myName = null;
-    
-    Public.name getter = function() {
-        return _myName;
-    };
+    this.Property("name", String, null, applyName);
 
-    Public.name setter = function(theValue) {
-        if(_myName != null) {
-            throw new Error("tried to set the name of component " + Public + ", which already has a name");
-        }
-        _myName = theValue;
-    };
+    function applyName() {
+    }
 
     // XXX: really bad solution.
     //      this should be higher up and more informative.
@@ -127,11 +119,8 @@ spark.Component.Constructor = function(Protected) {
 
 
     Public.initialize = function(theNode) {
+        this.Initialize(theNode);
         _myNode   = theNode;
-        _myName   = Protected.getString("name", "");
-        if(_myName == "") {
-            _myName = null;
-        }
     };
 
     Public.vocation getter = function() {
