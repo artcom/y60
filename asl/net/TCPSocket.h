@@ -60,6 +60,9 @@ namespace inet {
                       const asl::INetEndpoint & remoteEndpoint);
 
             virtual void open();
+
+        protected:
+            virtual int getSendFlags();
     };
     typedef asl::Ptr<TCPSocket> TCPSocketPtr;    
 }

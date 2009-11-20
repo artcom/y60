@@ -131,6 +131,12 @@ class ASL_NET_DECL Socket {
         // Sets the size of the receive buffer in bytes (windows only for now)
         void setReceiveBufferSize(int theSize);
         int getReceiveBufferSize() const;
+
+    protected:
+        // opportunity for subclasses to pass flags to send(2),
+        // allowing suppresion of SIGPIPE and other gory details.
+        virtual int getSendFlags();
+
     protected:
         asl::INetEndpoint _myLocalEndpoint;
 

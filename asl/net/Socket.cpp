@@ -158,7 +158,7 @@ namespace inet {
     unsigned Socket::send(const void *data, unsigned len)
     {
         int byteswritten;
-        if ((byteswritten=::send(fd, (char*)data, len, 0)) != static_cast<int>(len))
+        if ((byteswritten=::send(fd, (char*)data, len, getSendFlags())) != static_cast<int>(len))
         {
             int err = getLastSocketError();
             throw SocketError(err, "Socket::write() failed.");
@@ -303,6 +303,11 @@ namespace inet {
         AC_WARNING << "Socket::getReceiveBufferSize() not yet implemented for Linux/MaxOS";
 #endif
         return mySize;
+    }
+
+    int
+    Socket::getSendFlags() {
+        return 0;
     }
 
 }

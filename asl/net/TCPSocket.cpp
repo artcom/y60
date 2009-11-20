@@ -69,4 +69,13 @@ namespace inet {
     {
         fd=socket(AF_INET,SOCK_STREAM,0);
     }
+
+    int TCPSocket::getSendFlags()
+    {
+#ifdef WIN32
+        return 0;
+#else
+        return MSG_NOSIGNAL; // suppress SIGPIPE
+#endif
+    }
 }
