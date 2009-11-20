@@ -66,11 +66,9 @@ macro(ac_add_library LIBRARY_NAME LIBRARY_PATH)
 
     # determine version information
     if(NOT THIS_LIBRARY_SOVERSION)
-        message("Library ${LIBRARY_NAME} does not specify a SOVERSION. Defaulting to 0.")
         set(THIS_LIBRARY_SOVERSION 0)
     endif(NOT THIS_LIBRARY_SOVERSION)
     if(NOT THIS_LIBRARY_VERSION)
-        message("Library ${LIBRARY_NAME} does not specify a VERSION. Defaulting to 1.0.0.")
         set(THIS_LIBRARY_VERSION 1.0.0)
     endif(NOT THIS_LIBRARY_VERSION)
 
