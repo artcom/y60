@@ -274,9 +274,9 @@ spark.Widget.Constructor = function(Protected) {
         Public.pivotZ = theValue.z;
     });
 
-    this.Property("pivotX", Number, 1.0, applyPivot);
-    this.Property("pivotY", Number, 1.0, applyPivot);
-    this.Property("pivotZ", Number, 1.0, applyPivot);
+    this.Property("pivotX", Number, 0.0, applyPivot);
+    this.Property("pivotY", Number, 0.0, applyPivot);
+    this.Property("pivotZ", Number, 0.0, applyPivot);
 
     function applyPivot() {
         if(_mySceneNode) {
