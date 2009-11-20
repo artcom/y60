@@ -96,6 +96,7 @@ namespace y60 {
         static const TYPE getDefault();
         unsigned counter;
         unsigned myStartTime;
+        ATTRIBUTE_TAG_NO_DEFAULT_VALUE();
         IdTag();
     };
 
@@ -109,6 +110,7 @@ namespace y60 {
             myEmptyBox.makeEmpty();
             return myEmptyBox;
         }
+        ATTRIBUTE_TAG_NO_DEFAULT_VALUE();
     };
 }
 

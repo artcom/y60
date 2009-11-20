@@ -28,6 +28,8 @@
 #include "Schema.h"
 #include "SchemaStrings.h"
 
+#include "AttributePlug.h"
+
 #include <asl/base/Time.h>
 #include <asl/base/Logger.h>
 #include <asl/base/string_functions.h>
@@ -1168,7 +1170,7 @@ dom::Node::Node(NodeType type,const DOMString & name, const DOMString & value, N
     : _myType(type), _lazyChildren(false), _myName(name), _myParent(theParent),
      _myDocSize(0), _myParseCompletionPos(0), _myVersion(0),
      _mySavePosition(0), _myChildrenPosition(0), _mySaveEndPosition(0),
-     _myChildrenList(this), _myAttributes(this)
+     _myChildrenList(this), _myAttributes(this), _myPlug(0), _myShouldPrint(true)
 {
     storeValue(value); // NVX
 }
@@ -1178,7 +1180,7 @@ dom::Node::Node(NodeType type, Node * theParent) :
     _myType(type), _lazyChildren(false), _myParent(theParent),
     _myDocSize(0), _myParseCompletionPos(0), _myVersion(0),
     _mySavePosition(0), _myChildrenPosition(0), _mySaveEndPosition(0),
-    _myChildrenList(this), _myAttributes(this)
+    _myChildrenList(this), _myAttributes(this), _myPlug(0), _myShouldPrint(true)
 {
     switch (type) {
     case DOCUMENT_NODE:
@@ -1202,7 +1204,7 @@ dom::Node::Node(NodeType type, const String & name_or_value, Node * theParent) :
     _myType(type), _lazyChildren(false), _myParent(theParent),
     _myDocSize(0), _myParseCompletionPos(0), _myVersion(0),
     _mySavePosition(0), _myChildrenPosition(0), _mySaveEndPosition(0),
-    _myChildrenList(this), _myAttributes(this)
+    _myChildrenList(this), _myAttributes(this), _myPlug(0), _myShouldPrint(true)
 {
     switch (type) {
         case TEXT_NODE:
@@ -1229,7 +1231,8 @@ dom::Node::Node(const Node & n, Node * theParent) :
     _mySavePosition(0), _myChildrenPosition(0), _mySaveEndPosition(0),
     _myChildrenList(this), _myAttributes(this),
     _myValue(n._myValue ? n._myValue->clone(this) : n._myValue),
-    _mySchemaInfo(n._mySchemaInfo)
+    _mySchemaInfo(n._mySchemaInfo),
+    _myPlug(0), _myShouldPrint(true)
 {
     if (_myValue) {
         _myValue->setSelf(_myValue);
@@ -1249,7 +1252,8 @@ dom::Node::Node(const Node & n) :
     _mySavePosition(0), _myChildrenPosition(0), _mySaveEndPosition(0),    
     _myChildrenList(this), _myAttributes(this),
     _myValue(n._myValue ? n._myValue->clone(this) : n._myValue),
-    _mySchemaInfo(n._mySchemaInfo)
+    _mySchemaInfo(n._mySchemaInfo),
+    _myPlug(0), _myShouldPrint(true)
 {
     if (_myValue) {
         _myValue->setSelf(_myValue);
@@ -1316,16 +1320,76 @@ dom::Node::setName(const String& name) {
     _myName = name;
 }
 
+bool
+dom::Node::shouldPrint() const {
+    if(!_myShouldPrint) {
+        return false;
+    }
+    switch(_myType) {
+        case ATTRIBUTE_NODE:
+        case ELEMENT_NODE:
+            {
+                if(_myPlug) {
+                    const ValuePtr myDefault = _myPlug->getDefaultValue(*this);
+                    if(myDefault) {
+                        const ValuePtr myValue = _myPlug->getValuePtr();
+                        if(myValue) {
+                            if(myValue->getString() == myDefault->getString()) {
+                                return false;
+                            }
+                        }
+                    }
+                }
+            }
+            break;
+        default:
+        	break;
+    }
+    return true;
+}
+
+bool
+dom::Node::shouldPrintAnyChildren() const {
+    for(unsigned i = 0; i < childNodesLength(); i++) {
+        if(childNode(i)->shouldPrint()) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void
+dom::Node::shouldPrint(bool theValue) {
+    _myShouldPrint = theValue;
+}
+
+
 std::ostream &
-dom::Node::print(std::ostream & os, const String& indent) const {
+dom::Node::print(std::ostream & os, const String& indent, const bool greedy) const {
+	if(greedy && !shouldPrint()) {
+		return os;
+	}
+
+	bool myPrintingAnyChildren;
+	if(greedy) {
+	    myPrintingAnyChildren = shouldPrintAnyChildren();
+	} else {
+	    myPrintingAnyChildren = (childNodesLength() > 0);
+	}
+
     switch (_myType) {
         case ELEMENT_NODE:
             {
                 os << indent << "<" << _myName;
                 for (TypedNamedNodeMap::size_type attr = 0; attr < _myAttributes.size();++attr) {
-                    os << " " << _myAttributes.item(attr)->nodeName() << "=";
-
                     const NodePtr myAttribute = _myAttributes.item(attr);
+
+                    if(greedy && !myAttribute->shouldPrint()) {
+                    	continue;
+                    }
+
+                    os << " " << myAttribute->nodeName() << "=";
+
                     DOMString myAttributeValue;
                     TypedNamedNodeMap::size_type myChildCount = myAttribute->childNodes().length();
                     if (myChildCount == 0) {
@@ -1354,7 +1418,7 @@ dom::Node::print(std::ostream & os, const String& indent) const {
                     }
                     os << myQuote;
                 }
-                if (getChildren().size()==0)
+                if (!myPrintingAnyChildren)
                     os << "/>" << std::endl;
                 else {
                     os << ">";
@@ -1413,7 +1477,7 @@ dom::Node::print(std::ostream & os, const String& indent) const {
 
     switch (nodeType()) {
         case ELEMENT_NODE:
-            if (getChildren().size()>0) {
+            if (myPrintingAnyChildren) {
                 if (getChildren().size() > 1 ||
                         getChildren()[0]._myType == ELEMENT_NODE)
                     os << indent;
@@ -3440,6 +3504,15 @@ dom::Node::printChangedNodes(unsigned long long theLastVersion, int theLevel) co
         for (NodeList::size_type i = 0; i < childNodesLength(); ++i ) {
             childNode(i)->printChangedNodes(theLastVersion, theLevel+1);
         }
+    }
+}
+
+const ValuePtr
+dom::Node::getDefaultValue() const {
+    if(_myPlug) {
+        return _myPlug->getDefaultValue(*const_cast<Node*>(this));
+    } else {
+        return ValuePtr();
     }
 }
 

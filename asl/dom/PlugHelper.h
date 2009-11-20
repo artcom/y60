@@ -30,6 +30,12 @@ namespace dom {
     /*! \addtogroup aslxml */
     /* @{ */
 
+    class PlugBase {
+    public:
+        virtual const ValuePtr getDefaultValue(const Node & theNode) const = 0;
+        virtual const ValuePtr getValuePtr() const = 0;
+    };
+
     template <class VALUE, class WRAPPER>
     struct ValueHelper {
        typedef asl::Ptr<WRAPPER,ThreadingModel> WrapperPtr;

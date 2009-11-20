@@ -43,12 +43,21 @@
 
 #include "asl_dom_settings.h"
 
-#include <asl/dom/Nodes.h>
+#include "asl/dom/Nodes.h"
 #include "PlugHelper.h"
-//#include "AttributePlug.h"
 
 namespace dom {
 
+#define PROPERTY_TAG_DEFAULT_VALUE(theType) \
+    static const dom::ValuePtr getDefaultValue() { \
+        static dom::ValuePtr myValue(new dom::ValueWrapper<theType>::Type(getDefault(), 0)); \
+        return myValue; \
+    }
+
+#define PROPERTY_TAG_NO_DEFAULT_VALUE() \
+    static const dom::ValuePtr getDefaultValue() { \
+        return dom::ValuePtr(); \
+    }
 
 #define DEFINE_PROPERTY_TAG(theTagName, theFacade, theType, theNodeName, thePropertyName, \
     thePropertyListName, theDefault) \
@@ -60,21 +69,33 @@ namespace dom {
     static const char * getName() { return thePropertyName; } \
     static const char * getListName() { return thePropertyListName; } \
     static const TYPE getDefault() { return theDefault; } \
+    PROPERTY_TAG_DEFAULT_VALUE(theType) \
     };
 
-
     template<class TAG, class FACADE>
-    class PropertyPlug {
+    class PropertyPlug : PlugBase {
     public:
         typedef typename TAG::TYPE VALUE;
         typedef typename ValueWrapper<VALUE>::Type WRAPPER;
 
         PropertyPlug(FACADE * theFacade) : _myTextChild(), _myPropertyNode(), _myFacade(theFacade)
         {
-            ensureTextChild(theFacade->getNode());
+            Node& myNode = theFacade->getNode();
+            ensureTextChild(myNode);
+        }
+
+        const ValuePtr getDefaultValue(const Node & theNode) const {
+            if(!_myTextChild) {
+                ensureTextChild(theNode);
+            }
+            return TAG::getDefaultValue();
         }
 
         ValuePtr getValuePtr() {
+            return _myTextChild->nodeValueWrapperPtr();
+        }
+
+        const ValuePtr getValuePtr() const {
             return _myTextChild->nodeValueWrapperPtr();
         }
 
@@ -136,6 +157,7 @@ namespace dom {
                 _myPropertyNode = myPropertyListNode.appendChild(NodePtr(new Element(TAG::getNodeName())));
                 _myPropertyNode->appendAttribute("name", TAG::getName());
             }
+            _myPropertyNode->setPlug(this);
 
             _myTextChild = _myPropertyNode->childNode("#text");
             if (!_myTextChild) {

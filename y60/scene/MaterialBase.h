@@ -161,6 +161,9 @@ namespace y60 {
     };
     typedef asl::Ptr<MaterialPropertiesFacade, dom::ThreadingModel> MaterialPropertiesFacadePtr;
 
+    DEFINE_CHILDNODE_TAG(MaterialPropertiesTag, MaterialBase, MaterialPropertiesFacade, PROPERTY_LIST_NAME);
+
+
     class MaterialRequirementFacade :
         public PropertyListFacade,
         public ReqLightingTag::Plug
@@ -174,8 +177,8 @@ namespace y60 {
     };
     typedef asl::Ptr<MaterialRequirementFacade, dom::ThreadingModel> MaterialRequirementFacadePtr;
 
-    DEFINE_CHILDNODE_TAG(MaterialPropertiesTag, MaterialBase, MaterialPropertiesFacade, PROPERTY_LIST_NAME);
     DEFINE_CHILDNODE_TAG(MaterialRequirementTag, MaterialBase, MaterialRequirementFacade, REQUIRES_LIST_NAME);
+
 
     DEFINE_ATTRIBUTE_TAG(TransparencyTag,   bool, TRANSPARENCY_ATTRIB, false, Y60_SCENE_DECL);
     DEFINE_ATTRIBUTE_TAG(EnabledTag,   bool, "enabled", true, Y60_SCENE_DECL);

@@ -135,6 +135,8 @@ namespace dom {
 
     extern const char * NodeTypeName[16];
 
+    // XXX: reconsider
+    class PlugBase;
 
     /** Base Class for all XML-Node Types, contains almost everything you use.
      *
@@ -241,7 +243,7 @@ namespace dom {
         Node()
             : _myType(X_NO_NODE), _lazyChildren(false), _myParent(0),
             _myDocSize(0), _myParseCompletionPos(0), _myVersion(0), _mySavePosition(0),
-             _myChildrenList(this), _myAttributes(this)
+             _myChildrenList(this), _myAttributes(this), _myPlug(0), _myShouldPrint(true)
         {}
 
         /// create element node with attributes
@@ -249,7 +251,8 @@ namespace dom {
             : _myType(ELEMENT_NODE), _lazyChildren(false), _myName(name), _myParent(theParent), _myDocSize(0),
             _myParseCompletionPos(0), _myVersion(0),
             _mySavePosition(0), _myChildrenPosition(0), _mySaveEndPosition(0),
-            _myChildrenList(this), _myAttributes(attributes, ATTRIBUTE_NODE, this)
+            _myChildrenList(this), _myAttributes(attributes, ATTRIBUTE_NODE, this),
+            _myPlug(0), _myShouldPrint(true)
         {}
 
         /** create Entity Reference, Entity, ProcessingInstruction or Notation node
@@ -265,7 +268,8 @@ namespace dom {
               _myDocSize(0), _myParseCompletionPos(0), _myVersion(0),
               _mySavePosition(0), _myChildrenPosition(0), _mySaveEndPosition(0),
               _myChildrenList(this), _myAttributes(this),
-              _myValue(theValue.clone(this))
+              _myValue(theValue.clone(this)),
+              _myPlug(0), _myShouldPrint(true)
         {
             _myValue->setSelf(_myValue);
         }
@@ -279,7 +283,8 @@ namespace dom {
             _myDocSize(0), _myParseCompletionPos(0), _myVersion(0),
             _mySavePosition(0), _myChildrenPosition(0), _mySaveEndPosition(0),
             _myChildrenList(this), _myAttributes(this),
-            _myValue(theValuePtr)
+            _myValue(theValuePtr),
+            _myPlug(0), _myShouldPrint(true)
         {
             if (_myValue) {
                 _myValue->setSelf(_myValue);
@@ -300,7 +305,8 @@ namespace dom {
             : _myType(type), _lazyChildren(false), _myParent(parent), 
             _myDocSize(0), _myParseCompletionPos(0), _myVersion(0),
             _mySavePosition(0), _myChildrenPosition(0), _mySaveEndPosition(0),
-            _myChildrenList(this), _myAttributes(this)
+            _myChildrenList(this), _myAttributes(this),
+            _myPlug(0), _myShouldPrint(true)
         {
             parseNextNode(xml,pos,parent,doctype);
         }
@@ -309,7 +315,8 @@ namespace dom {
             : _myType(X_NO_NODE), _lazyChildren(false), _myParent(0),
             _myDocSize(0), _myParseCompletionPos(0), _myVersion(0),            
             _mySavePosition(0), _myChildrenPosition(0), _mySaveEndPosition(0),
-            _myChildrenList(this), _myAttributes(this)
+            _myChildrenList(this), _myAttributes(this),
+            _myPlug(0), _myShouldPrint(true)
         {
             parseAll(xml);
         }
@@ -550,9 +557,15 @@ namespace dom {
         /**@name input and output */
         //@{
 
+        /** greedy printing support
+         */
+        virtual bool shouldPrint() const;
+        virtual bool shouldPrintAnyChildren() const;
+        virtual void shouldPrint(bool theValue);
+
         /** print the node and all its children; returns os
         */
-        virtual std::ostream& print(std::ostream& os, const DOMString & indent="") const;
+        virtual std::ostream& print(std::ostream& os, const DOMString & indent="", const bool greedy=true) const;
 
         /** parse the xml-data contained in is starting from pos; returns the position
             of the last parsed character; does not propagate parse exceptions
@@ -1042,6 +1055,13 @@ namespace dom {
         
         virtual void freeCaches() const;
         virtual bool flushUnusedChildren() const;
+
+        const ValuePtr getDefaultValue() const;
+
+        void setPlug(const PlugBase* thePlug) {
+        	_myPlug = thePlug;
+        };
+
     protected:
         NodePtr loadPathById(const DOMString & theId, const DOMString & theIdAttribute);
         void collectOffsets(NodeOffsetCatalog & theCatalog, asl::AC_SIZE_TYPE theParentIndex = asl::AC_SIZE_TYPE(-1)) const {
@@ -1433,7 +1453,7 @@ Dependent on node type allowed children are:<p>
         mutable asl::Unsigned64   _mySavePosition;
         mutable asl::Unsigned64   _myChildrenPosition;
         mutable asl::Unsigned64   _mySaveEndPosition;
-              
+
         // need this ptr
         mutable NodeList  _myChildrenList; // entities when doctype
         TypedNamedNodeMap _myAttributes; // notations when doctype
@@ -1452,6 +1472,9 @@ Dependent on node type allowed children are:<p>
         EventListenerMap  _myEventListeners;
         EventListenerMap  _myCapturingEventListeners;
 
+        const PlugBase* _myPlug;
+        bool _myShouldPrint;
+
         static const Node X_NO_NODE_;
     public:
         static Node Prototype;
@@ -1462,7 +1485,7 @@ Dependent on node type allowed children are:<p>
     */
     inline
         std::ostream& operator<<(std::ostream& os, const Node& n) {
-        return n.print(os,"");
+        return n.print(os);
     }
     /** standard output operator for node type
     @see dom::Node::Parse for details

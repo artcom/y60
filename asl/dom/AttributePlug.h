@@ -23,7 +23,9 @@
 
 #include "asl_dom_settings.h"
 
+#include "typedefs.h"
 #include "Nodes.h"
+#include "Value.h"
 #include "PlugHelper.h"
 #include "PropertyPlug.h"
 
@@ -38,6 +40,17 @@ namespace dom {
 #   define ASL_DOM_EXPORT_STATICS(thePlugName,theTagName,theExportToken)
 #endif
 
+#define ATTRIBUTE_TAG_DEFAULT_VALUE(theType) \
+    static const dom::ValuePtr getDefaultValue() { \
+        static dom::ValuePtr myValue(new dom::ValueWrapper<theType>::Type(getDefault(), 0)); \
+        return myValue; \
+    }
+
+#define ATTRIBUTE_TAG_NO_DEFAULT_VALUE() \
+    static const dom::ValuePtr getDefaultValue() { \
+        return dom::ValuePtr(); \
+    }
+
 #define DEFINE_ATTRIBUTE_TAG(theTagName, theType, theAttributeName, theDefault, theExportToken) \
     struct theTagName { \
         typedef theType TYPE; \
@@ -45,6 +58,7 @@ namespace dom {
         static const TYPE getDefault() { return theDefault; } \
         ASL_DOM_EXPORT_STATICS(dom::AttributePlug,theTagName,theExportToken) \
         typedef dom::AttributePlug<theTagName> Plug; \
+        ATTRIBUTE_TAG_DEFAULT_VALUE(theType); \
     }; 
 
 #define DEFINE_FACADE_ATTRIBUTE_TAG(theTagName, theType, theAttributeName, theDefault, theExportToken) \
@@ -54,6 +68,7 @@ namespace dom {
         static const TYPE getDefault() { return theDefault; } \
         ASL_DOM_EXPORT_STATICS(dom::FacadeAttributePlug,theTagName,theExportToken) \
         typedef dom::FacadeAttributePlug<theTagName> Plug; \
+        ATTRIBUTE_TAG_DEFAULT_VALUE(theType) \
     };
 
     class Connector {
@@ -85,15 +100,30 @@ namespace dom {
     };
 
     template<class TAG>
-    class AttributePlug {
+    class AttributePlug : PlugBase {
     public:
         friend class Connector;
         typedef typename TAG::TYPE VALUE;
         typedef typename ValueWrapper<VALUE>::Type WRAPPER;
 
-        AttributePlug(const Node & theNode) : _myAttribute(ensureAttribute(theNode)) {}
-        AttributePlug(NodePtr theAttribute) : _myAttribute(theAttribute) {}
+        AttributePlug(const Node & theNode) : _myAttribute(ensureAttribute(theNode)) { }
+        AttributePlug(NodePtr theAttribute) : _myAttribute(theAttribute) { _myAttribute->setPlug(this); }
         virtual ~AttributePlug() {}
+
+        const ValuePtr getDefaultValue(const Node & theNode) const {
+        	if(!_myAttribute) {
+        		_myAttribute = ensureAttribute(theNode);
+        	}
+        	return TAG::getDefaultValue();
+        }
+
+        ValuePtr getValuePtr() {
+            return _myAttribute->nodeValueWrapperPtr();
+        }
+
+        const ValuePtr getValuePtr() const {
+            return _myAttribute->nodeValueWrapperPtr();
+        }
 
         const VALUE & getValue(const Node & theNode) const {
             if (!_myAttribute) {
@@ -131,12 +161,14 @@ namespace dom {
             }
             return newValue;
         }
+
 #ifdef DEBUG_VARIANT
         void debug() const {
             getValuePtr()->printPrecursorGraph();
             getValuePtr()->printDependendGraph();
         }
 #endif
+
     protected:
         bool hasOutdatedDependencies() const {
             if (_myAttribute) {
@@ -180,18 +212,11 @@ namespace dom {
                 new CallBack<CONNECTOR>(dynamic_cast_Ptr<CONNECTOR>(mySelf), theConnectFunction)));
         }
 
-        ValuePtr getValuePtr() {
-            return _myAttribute->nodeValueWrapperPtr();
-        }
-        const ValuePtr getValuePtr() const {
-            return _myAttribute->nodeValueWrapperPtr();
-        }
-
         virtual bool updateBeforeRead(VALUE & theValue) const {
             return false;
         };
 
-        static NodePtr ensureAttribute(const Node & theNode) {
+        NodePtr ensureAttribute(const Node & theNode) const {
             if (!theNode) {
                 return NodePtr(); // to allow factory nodes
             }
@@ -204,6 +229,7 @@ namespace dom {
                         "' not found in node:\n" + asl::as_string(theNode), PLUS_FILE_LINE);
                 }
             }
+            myAttribute->setPlug(this);
             ensureSchemaVsFacade(theNode, myAttribute);
             return myAttribute;
         }
