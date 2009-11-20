@@ -135,11 +135,12 @@ namespace y60 {
 #endif
     }
     void
-    Scene::saveAsText(const std::string & theFilename) {
-        std::ofstream myFile(theFilename.c_str());
+    Scene::saveAsText(const std::string & theFilename, bool theGreedyFlag) {
+        std::ofstream myFile(theFilename.c_str(), std::ios_base::trunc | std::ios_base::out);
         if (!myFile) {
             throw OpenFailed(std::string("Can not open file '") + theFilename + "' for writing", "Scene::saveAsText()");
         }
+        _mySceneDom->print(myFile, "", theGreedyFlag);
         myFile << *_mySceneDom;
         if (!myFile) {
             throw WriteFailed(std::string("Could not write text file '") + theFilename + "'", "Scene::saveAsText()");
@@ -190,13 +191,13 @@ namespace y60 {
     }
 
     void
-    Scene::save(const std::string & theFilename, bool theBinaryFlag) {
+    Scene::save(const std::string & theFilename, bool theBinaryFlag, bool theGreedyFlag) {
         AC_INFO << "Saving scene file '" << theFilename << "' ... ";
         asl::Time saveStart;
         if (theBinaryFlag) {
             saveBinary(theFilename);
         } else {
-            saveAsText(theFilename);
+            saveAsText(theFilename, theGreedyFlag);
         }
         asl::Time saveEnd;
         double mySaveTime = saveEnd - saveStart;

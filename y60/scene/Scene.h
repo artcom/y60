@@ -257,12 +257,12 @@ namespace y60 {
              * @param theBinaryFlag if true, the scene is saved in binary b60 format, else
              *        it is saved in xml x60 format.
              */
-            void save(const std::string & theFilename, bool theBinaryFlag = false);
+            void save(const std::string & theFilename, bool theBinaryFlag = false, bool theGreedyFlag = true);
             void saveWithCatalog(const std::string & theFilename, const std::string & theCatalogFilenname, bool theBinaryFlag = true);
 
             // no need to call these threee functions directly, but it does no harm
             void saveBinaryWithCatalog(const std::string & theFilename, const std::string & theCatalogFilenname);
-            void saveAsText(const std::string & theFilename);
+            void saveAsText(const std::string & theFilename, bool theGreedyFlag = true);
             void saveBinary(const std::string & theFilename);
  
             void saveSchema(const std::string & theFilename,

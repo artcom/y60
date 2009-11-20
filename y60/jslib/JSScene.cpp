@@ -771,8 +771,9 @@ JSScene::save(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
     DOC_BEGIN("Saves the scene to a file.");
     DOC_PARAM("theFilename", "", DOC_TYPE_STRING);
     DOC_PARAM("theBinaryFlag", "", DOC_TYPE_BOOLEAN);
+    DOC_PARAM("theGreedyFlag", "", DOC_TYPE_BOOLEAN);
     DOC_END;
-    ensureParamCount(argc, 1, 2);
+    ensureParamCount(argc, 1, 3);
     return Method<JSScene::NATIVE>::call(&JSScene::NATIVE::save,cx,obj,argc,argv,rval);
 }
 
