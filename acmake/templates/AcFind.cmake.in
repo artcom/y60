@@ -272,3 +272,6 @@ find_package_handle_standard_args(
     @THIS_PROJECT_NAME@ DEFAULT_MSG
     @THIS_PROJECT_NAME@_LIBRARIES @THIS_PROJECT_NAME@_INCLUDE_DIR
 )
+
+# hide our directory from the configuration GUI
+mark_as_advanced(@THIS_PROJECT_NAME@_DIR)
