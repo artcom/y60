@@ -72,7 +72,7 @@ namespace inet {
 
     int TCPSocket::getSendFlags()
     {
-#ifdef WIN32
+#ifndef MSG_NOSIGNAL
         return 0;
 #else
         return MSG_NOSIGNAL; // suppress SIGPIPE
