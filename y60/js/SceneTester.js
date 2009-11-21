@@ -210,15 +210,22 @@ SceneTester.prototype.Constructor = function(obj, theArguments) {
     obj.testSaveLoad = function() {
         var myXmlFilename = 'saved_testscene.x60';
         print("Writing scene to xml file: " + myXmlFilename);
-        window.scene.save(myXmlFilename, false);
+        window.scene.save(myXmlFilename, false, false);
 
         var myBinXmlFilename = 'saved_testscene.b60';
         print("Writing scene to binary file: " + myBinXmlFilename);
         window.scene.save(myBinXmlFilename, true);
 
+        print("Loading xml scene");
         var myNewXmlScene = new Scene(myXmlFilename);
+
+        print("Setting up xml scene");
         myNewXmlScene.setup();
+
+        print("Loading binary scene");
         var myNewBinScene = new Scene(myBinXmlFilename);
+
+        print("Setting up binary scene");
         myNewBinScene.setup();
 
         if (myNewXmlScene.dom.toString() != myNewBinScene.dom.toString()) {
