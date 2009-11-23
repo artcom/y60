@@ -96,15 +96,15 @@ GUI.ParallelAnimation.prototype.Constructor = function(Public, Protected) {
 	
     // step all children forward
 	Public.doFrame = function()	{
-		var finished = true;
+		var notFinished = false;
 		for(var i = 0; i < Public.children.length; i++) {
 			if(Public.children[i].running) {
 				Public.children[i].doFrame();
-                finished = !Public.children[i].running;
+                notFinished |= Public.children[i].running;
 			}
 		}
 		
-		if(finished) {
+		if(!notFinished) {
 			Public.finish();
 		}
 	};
