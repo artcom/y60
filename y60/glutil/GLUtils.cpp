@@ -151,6 +151,9 @@ namespace y60 {
             case REPEAT:
                 myTexWrapMode = GL_REPEAT;
                 break;
+            case MIRROR:
+                myTexWrapMode = GL_MIRRORED_REPEAT;
+                break;
             default:
                 throw GlTextureFunctionException("Unknown texture wrap mode.", PLUS_FILE_LINE);
         }
