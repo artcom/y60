@@ -16,12 +16,12 @@ spark.Rectangle.Constructor = function(Protected) {
         var myMaterial = Modelling.createColorMaterial(window.scene, new Vector4f(_myColor[0], _myColor[1], _myColor[2], Public.alpha));
         myMaterial.transparent = true;
 
-        Base.realize(myMaterial);        
+        Base.realize(myMaterial);
     };
 
     Public.color getter = function() {
         var c = Protected.material.properties.surfacecolor;
-        return new Vector4f(c.r, c.g, c.b, c.a);
+        return new Vector4f(c[0], c[1], c[2], c[3]);
     };
 
     Public.color setter = function(theColor) {
