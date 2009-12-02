@@ -226,7 +226,7 @@ GUI.Animation.Constructor = function(Public, Protected) {
             return;
         }
         if (!_running) {
-            Public.play();
+            Public.play(true);
     	    Public.render();	                
         }
 		Public.finish(true);

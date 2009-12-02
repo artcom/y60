@@ -104,12 +104,14 @@ GUI.CompositeAnimation.Constructor = function(Public, Protected) {
 
     // generic finish
     Base.finish = Public.finish;
-    Public.finish = function(){
-		for(var i = 0; i < _children.length; i++) {
-			if(_children[i].running) {
-				_children[i].finish();
-			}
-		}
+    Public.finish = function(theComeToAnEndFlag){
+        if (!theComeToAnEndFlag) {
+            for(var i = 0; i < _children.length; i++) {
+                if(_children[i].running) {
+                    _children[i].finish();
+                }
+            }
+        }
 	    Base.finish();
 	};
     

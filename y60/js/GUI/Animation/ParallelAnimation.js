@@ -87,11 +87,13 @@ GUI.ParallelAnimation.prototype.Constructor = function(Public, Protected) {
 	
     // start playing all children
     Base.play = Public.play;
-	Public.play = function() {
+	Public.play = function(theComeToAnEndFlag) {
 		Base.play();
-		for(var i = 0; i < Public.children.length; i++) {
-			Public.children[i].play();
-		}
+        if (!theComeToAnEndFlag) {
+            for(var i = 0; i < Public.children.length; i++) {
+                Public.children[i].play();
+            }
+        }
 	};
 	
     // step all children forward
