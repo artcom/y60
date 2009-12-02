@@ -65,11 +65,22 @@ namespace y60 {
 void
 World::updateLights() {
 		_myLights.clear();
-		xpath::NodeList myLightNodes = xpath::findAll(xpath::Path(std::string(".//") + LIGHT_NODE_NAME), getNode().self().lock());
-		for(xpath::NodeList::size_type i = 0; i < myLightNodes.size(); i++) {
-			dom::NodePtr myLightNode = myLightNodes[i];
-			_myLights.push_back(myLightNode->getFacade<Light>());
-		}
+
+        dom::Node & myWorldNode = this->getNode();
+
+        std::vector<LightPtr> myAllLights = myWorldNode.getAllFacades<Light>(LIGHT_NODE_NAME);
+
+        for(unsigned i = 0; i < myAllLights.size(); i++) {
+            LightPtr myLight = myAllLights[i];
+            dom::Node * myNode = &myLight->getNode();
+            while(myNode->parentNode()) {
+                if(myNode->parentNode() == &myWorldNode) {
+                    _myLights.push_back(myLight);
+                    break;
+                }
+                myNode = myNode->parentNode();
+            }
+        }
 }
 
 }
