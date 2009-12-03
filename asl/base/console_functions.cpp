@@ -23,6 +23,9 @@
 #include "console_functions.h"
 
 #include "settings.h"
+
+#include <stdio.h>
+
 #ifdef _WIN32
 #include <windows.h>
 #include <io.h>
