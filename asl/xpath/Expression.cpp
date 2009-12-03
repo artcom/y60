@@ -116,17 +116,17 @@ namespace {
     
     inline RelationalExpr::Operator readRelOperator(ParseInput& pi)
     {
-        if( pi.readIf('<') ) {
-            return RelationalExpr::Operator_Less;
-        }
-        if( pi.readIf('>') ) {
-            return RelationalExpr::Operator_Greater;
-        }
         if( pi.readIf("<=") ) {
             return RelationalExpr::Operator_LessEqual;
         }
         if( pi.readIf(">=") ) {
             return RelationalExpr::Operator_GreaterEqual;
+        }
+        if( pi.readIf('<') ) {
+            return RelationalExpr::Operator_Less;
+        }
+        if( pi.readIf('>') ) {
+            return RelationalExpr::Operator_Greater;
         }
         pi.setErrorIndex();
         return RelationalExpr::Operator_Invalid;
