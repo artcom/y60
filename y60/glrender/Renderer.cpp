@@ -963,9 +963,12 @@ namespace y60 {
 
         // compensate for field of view (90? results in factor=1)
         float myZoomAdjustment = 0.0f;
-        float myFOV = theCamera->get<FrustumTag>().getHFov();
-        if (myFOV < 180.0f) {
-            myZoomAdjustment = float(tan(radFromDeg( myFOV / 2.0f)));
+        const asl::Frustum & myFrustum = theCamera->get<FrustumTag>();
+        if(myFrustum.getType() == PERSPECTIVE) {
+            float myFOV = myFrustum.getHFov();
+            if (myFOV < 180.0f) {
+                myZoomAdjustment = float(tan(radFromDeg( myFOV / 2.0f)));
+            }
         }
 
         // apply lodscale
