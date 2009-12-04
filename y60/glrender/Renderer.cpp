@@ -944,37 +944,51 @@ namespace y60 {
 
         postDraw();
     }
-    
+
     dom::NodePtr
     Renderer::getActiveLodChild(dom::NodePtr theNode, const CameraPtr theCamera) {
         MAKE_GL_SCOPE_TIMER(Renderer_getActiveLodChild);
-        
+
+        // get lod facade of given node
         const LodFacadePtr myLodFacade = theNode->getFacade<LodFacade>();
         if (!myLodFacade) {
             throw RendererException(string("Node with id: ") + theNode->getAttributeString(ID_ATTRIB)
                 + " is not a lod node", PLUS_FILE_LINE);
         }
 
-        // Distance from bounding-box-center to camera
+        // we always need the frustum
+        const asl::Frustum & myFrustum = theCamera->get<FrustumTag>();
+
+        // distance decision based on bounding box center
         const asl::Box3f & myBoundingBox = myLodFacade->get<BoundingBoxTag>();
         asl::Point3f myCenterPoint = myBoundingBox.getCenter();
-        asl::Vector3f myCenter(myCenterPoint[0], myCenterPoint[1], myCenterPoint[2]);
-        float myDistance = length(theCamera->get<PositionTag>() - myCenter);
 
-        // compensate for field of view (90? results in factor=1)
-        float myZoomAdjustment = 0.0f;
-        const asl::Frustum & myFrustum = theCamera->get<FrustumTag>();
+        // compute distance to camera depending on projection type
+        float myDistance;
         if(myFrustum.getType() == PERSPECTIVE) {
+            // distance between bbox-center and camera
+            asl::Vector3f myCenter(myCenterPoint[0], myCenterPoint[1], myCenterPoint[2]);
+            myDistance = length(theCamera->get<PositionTag>() - myCenter);
+
+            // compensate for field of view (90deg results in factor=1)
+            float myZoomAdjustment = 0.0f;
             float myFOV = myFrustum.getHFov();
             if (myFOV < 180.0f) {
                 myZoomAdjustment = float(tan(radFromDeg( myFOV / 2.0f)));
             }
+            myDistance *= myZoomAdjustment;
+        } else {
+            // distance between bbox-center and nearest point on cam near plane
+            const asl::Planef &myNearPlane = myFrustum.getNearPlane();
+            asl::Point3f myNearestPoint = asl::nearest(myNearPlane, myCenterPoint);
+            myDistance = asl::distance(myCenterPoint, myNearestPoint);
         }
 
-        // apply lodscale
+        // apply global lod scale
         WorldPtr myWorld = myLodFacade->getWorld()->getFacade<World>();
-        float myMetric = myDistance * myWorld->get<LodScaleTag>() * myZoomAdjustment;
+        float myMetric = myDistance * myWorld->get<LodScaleTag>();
 
+        // select child node to render
         const VectorOfFloat & myRanges = myLodFacade->get<RangesTag>();
         if (theNode->childNodesLength() == 1) {
             return theNode->childNode(0);
