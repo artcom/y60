@@ -94,6 +94,9 @@ namespace y60 {
 
     dom::NodePtr
     createBody(dom::NodePtr theParentNode, const std::string & theShapeId) {
+        if (!theParentNode) {
+            throw asl::Exception("createBody:: theParentNode is null!");
+        }
         dom::NodePtr myNode = dom::NodePtr(new dom::Element(BODY_NODE_NAME));
         myNode->appendAttribute(BODY_SHAPE_ATTRIB, theShapeId);
         myNode = theParentNode->appendChild(myNode);
