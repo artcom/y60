@@ -300,7 +300,7 @@ SceneTester.prototype.Constructor = function(obj, theArguments) {
     var _myOutputImageName      = null;
     var _myOutputSuffix         = null;
     var _myOffscreenFlag        = (expandEnvironment("${AC_NO_OFFSCREEN_TEST}") != 1);
-    var _mySaveLoadFlag         = true;
+    var _mySaveLoadFlag         = false;
     var _myOffscreenRenderer    = null;
 
     for (var i = 0; i < theArguments.length; ++i) {
