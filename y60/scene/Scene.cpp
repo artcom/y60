@@ -141,7 +141,6 @@ namespace y60 {
             throw OpenFailed(std::string("Can not open file '") + theFilename + "' for writing", "Scene::saveAsText()");
         }
         _mySceneDom->print(myFile, "", theGreedyFlag);
-        myFile << *_mySceneDom;
         if (!myFile) {
             throw WriteFailed(std::string("Could not write text file '") + theFilename + "'", "Scene::saveAsText()");
         }
