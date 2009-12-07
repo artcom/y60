@@ -337,10 +337,10 @@ spark.Window.Constructor = function(Protected) {
     function getMultitouchCursorPosition(theEvent) {
         switch(theEvent.callback) {
         case "onASSEvent":
-            return new Vector2f(theEvent.position3D.x, theEvent.position3D.y);
+            return new Point2f(theEvent.position3D.x, theEvent.position3D.y);
         case "onTuioEvent":
-            return new Vector2f(theEvent.position.x * 1920.0,
-                                theEvent.position.y * 1200.0);
+            return new Point2f(theEvent.position.x * 1920.0,  // XXX window size
+                               theEvent.position.y * 1200.0); // XXX window size
         default:
             Logger.fatal("Unknown multitouch event type");
             return null;

@@ -5,8 +5,8 @@ spark.enableProximatrix = function(theStage) {
 };
 
 spark.enableTuio = function() {
-    plug("TUIO");
-    TUIO.listenToUDP();
+    plug("TUIOClient");
+    TUIOClient.listenToUDP();
 };
 
 spark.Cursor = spark.Class("Cursor");
@@ -32,7 +32,7 @@ spark.Cursor.Constructor = function(Protected, theId) {
         return _myFocused;
     };
     
-    var _myStagePosition = new Vector2f();
+    var _myStagePosition = new Point2f();
 
     Public.stagePosition getter = function() {
         return _myStagePosition.clone();

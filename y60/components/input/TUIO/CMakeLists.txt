@@ -17,7 +17,7 @@ if(WIN32)
 endif(WIN32)
 
 y60_add_component(
-    TUIO
+    TUIOClient
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     DEPENDS y60jslib
@@ -31,3 +31,4 @@ asl_add_schema(
     CXX_VARNAME   ourtuioeventxsd
     CXX_INCLUDE   tuioeventxsd.h
 )
+

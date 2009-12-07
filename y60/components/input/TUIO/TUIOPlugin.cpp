@@ -49,7 +49,7 @@ public:
 // IScriptablePlugin
 
     const char * ClassName() {
-        return "TUIO";
+        return "TUIOClient";
     }
 
     JSFunctionSpec *StaticFunctions();
@@ -245,7 +245,7 @@ TUIOPlugin::StaticProperties() {
 }
 
 extern "C"
-EXPORT asl::PlugInBase* TUIO_instantiatePlugIn(asl::DLHandle myDLHandle) {
+EXPORT asl::PlugInBase* TUIOClient_instantiatePlugIn(asl::DLHandle myDLHandle) {
     if(y60::ourTuioPluginInstance) {
         AC_FATAL << "Plugging TUIO more than once";
         return 0;
