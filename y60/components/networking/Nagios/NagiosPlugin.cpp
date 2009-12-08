@@ -102,7 +102,7 @@ public:
     void onSetProperty(const std::string & thePropertyName,
         const PropertyValue & thePropertyValue);
     const char * ClassName() {
-        static const char * myClassName = "NagiosPlugin";
+        static const char * myClassName = "Nagios";
         return myClassName;
     }
 
