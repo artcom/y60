@@ -71,8 +71,10 @@ spark.ResizableRectangle.Constructor = function(Protected) {
         } else {
             myBody.name = "unnamed-spark-body";
         }
-	
-        Base.realize(myBody);        
+
+        Base.realize(myBody);
+
+        applySize();
     };
 
     Protected.material getter = function() { return _myMaterial; }
