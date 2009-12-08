@@ -84,9 +84,11 @@ spark.Image.Constructor = function(Protected) {
         var myImageSource = Protected.getString("src", "");
         var myImageSourceId = Protected.getString("srcId", "");
 
+        var myWidth = 0;
+        var myHeight = 0;
         if(myImageSource == "") {
-            var myWidth  = Protected.getNumber("width", 1);
-            var myHeight = Protected.getNumber("height", 1);
+            myWidth = Protected.getNumber("width", 1);
+            myHeight = Protected.getNumber("height", 1);
             _myImage      = Modelling.createImage(window.scene, myWidth, myHeight, "BGRA");
             _myImageOwned = true;
             if(myImageSourceId != "") {
@@ -95,6 +97,8 @@ spark.Image.Constructor = function(Protected) {
         } else {
             _myImage = spark.getCachedImage(myImageSource);
             _mySource = myImageSource;
+            myWidth = Protected.getNumber("width", _myImage.raster.width);
+            myHeight = Protected.getNumber("height", _myImage.raster.height);
         }
 
         _myTexture  = Modelling.createTexture(window.scene, _myImage);
@@ -105,6 +109,9 @@ spark.Image.Constructor = function(Protected) {
                 _myTexture, Public.name + "-material", true);
 
         Base.realize(myMaterial);
+
+        Public.width = myWidth;
+        Public.height = myHeight;
     };
 
     Base.postRealize = Public.postRealize;
