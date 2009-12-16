@@ -1384,6 +1384,8 @@ namespace dom {
            if (sourceHeight == 0) {
                 sourceHeight = myNativeSource->vsize() - sourceY;
             }
+            
+           if(sourceHeight == 0 || sourceWidth == 0) return;
 
             asl::Box2<asl::AC_OFFSET_TYPE> mySourceRect(sourceX, sourceY, sourceX+sourceWidth, sourceY+sourceHeight);
             asl::Box2<asl::AC_OFFSET_TYPE> mySourceRasterRect(0, 0, myNativeSource->hsize(), myNativeSource->vsize());
