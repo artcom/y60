@@ -77,7 +77,7 @@ namespace y60 {
 
     OscSender::~OscSender()
     {
-        close();
+        if(_myReceiverUDPConnection) close();
     }
     
     bool OscSender::connect(string theReceiverAddress, unsigned theReceiverPort, unsigned theSenderPort) {      
