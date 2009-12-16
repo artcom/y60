@@ -319,43 +319,6 @@ namespace y60 {
     }
 
     void
-    Renderer::rotateBillboard(Body & theBody, const CameraPtr theCamera) {
-        if (theBody.get<BillboardTag>() == AXIS_BILLBOARD) {
-            DBP(MAKE_GL_SCOPE_TIMER(update_billboards));
-            Matrix4f myBillboardTransform = theBody.get<GlobalMatrixTag>();
-            myBillboardTransform.translate(theBody.get<PivotTag>());
-            double myRotation = getBillboardRotation(myBillboardTransform,
-                    theCamera->get<GlobalMatrixTag>());
-            Matrix4f myLocalRotation;
-            myLocalRotation.makeRotating(Vector3f(0,1,0),myRotation);
-            myLocalRotation.postMultiply(myBillboardTransform);
-            theBody.set<GlobalMatrixTag>(myLocalRotation);
-        } else if (theBody.get<BillboardTag>() == POINT_BILLBOARD) {            
-            asl::Vector4f myCamUpVector    = theCamera->get<GlobalMatrixTag>().getRow(1);
-            asl::Vector3f myCamUpVector3(myCamUpVector[0], myCamUpVector[1], myCamUpVector[2]);
-            asl::Vector4f myCamViewVector  = theCamera->get<GlobalMatrixTag>().getRow(2);
-            asl::Vector3f myCamViewVector3(myCamViewVector[0], myCamViewVector[1], myCamViewVector[2]);
-            asl::Vector3f myRightVec       = cross(myCamUpVector3, myCamViewVector3);
-            
-            Matrix4f myGlobalBodyMatrix = theBody.get<GlobalMatrixTag>();
-            asl::Vector3f myBodyPos = myGlobalBodyMatrix.getTranslation();
-            asl::Vector3f myCameraPos = theCamera->get<GlobalMatrixTag>().getTranslation();
-
-            asl::Vector3f myLook = normalized(difference(myCameraPos, myBodyPos));
-            asl::Vector3f myRight = normalized(cross(myCamUpVector3,  myLook));       
-            asl::Vector3f myUp = normalized(cross(myLook, myRight));       
-                
-            asl::Matrix4f myScreenAlignedMatrix;
-            myScreenAlignedMatrix.assign(myRight[0], myRight[1], myRight[2], 0,
-                    myUp[0],myUp[1],myUp[2],0,
-                    myLook[0],myLook[1],myLook[2],0,
-                    myBodyPos[0],myBodyPos[1],myBodyPos[2],1, ROTATING);
-            theBody.set<GlobalMatrixTag>(myScreenAlignedMatrix);
-
-        }
-    }
-
-    void
     Renderer::renderBodyPart(const BodyPart & theBodyPart, const Viewport & theViewport, const Camera & theCamera) {
         DBP(MAKE_GL_SCOPE_TIMER(renderBodyPart));
         DBP2(START_TIMER(renderBodyPart_pre));
@@ -1053,17 +1016,73 @@ namespace y60 {
                 return;
             }
         }
-
-		// Once we collect a body we want to do billboarding, so every following step has the
-        // right globalmatrix        
+        // Once we collect a body we want to do billboarding, so every following step has the
+        // right globalmatrix
+        
         if (theNode->nodeName() == BODY_NODE_NAME) {        
             Body & myBody = *(dynamic_cast_Ptr<Body>(myFacade));
 
-			if (!myBody.get<BillboardTag>().empty()) {
-				rotateBillboard(myBody, theCamera);
-			}
-		}
-
+            // do the billboarding here
+            if (myBody.get<BillboardTag>() == AXIS_BILLBOARD) {
+                DBP(MAKE_GL_SCOPE_TIMER(update_billboards));
+                Matrix4f myBillboardTransform = myBody.get<GlobalMatrixTag>();
+                
+                // calculate absolute scale of transform hierarchy:
+                Vector3f myCurScale = myBody.get<ScaleTag>();
+                const dom::Node* myCurNode = myBody.getNode().parentNode();
+                while(myCurNode->nodeName() != WORLD_NODE_NAME) {
+                    myCurScale *= myCurNode->getFacade<TransformHierarchyFacade>()->get<ScaleTag>();
+                    myCurNode = myCurNode->parentNode();
+                }
+                // get rid of scale in billboards global matrix
+                Vector3f myFinalInverseScale(1.0f/myCurScale[0], 1.0f/myCurScale[1], 1.0f/myCurScale[2]);
+                Matrix4f myBillboardMatrix = myBody.get<GlobalMatrixTag>();
+                myBillboardMatrix.scale(myFinalInverseScale);
+                
+                float myRotation = getBillboardRotationY(myBillboardMatrix,
+                        theCamera->get<GlobalMatrixTag>());
+                Matrix4f myLocalRotation;
+                myLocalRotation.makeRotating(Vector3f(0,1,0),myRotation);
+                myLocalRotation.postMultiply(myBillboardTransform);
+                myBody.set<GlobalMatrixTag>(myLocalRotation);
+            } else if (myBody.get<BillboardTag>() == POINT_BILLBOARD) {                                                               
+                // calculate absolute scale of transform hierarchy:
+                Vector3f myCurScale = myBody.get<ScaleTag>();
+                const dom::Node* myCurNode = myBody.getNode().parentNode();
+                while(myCurNode->nodeName() != WORLD_NODE_NAME) {
+                    myCurScale *= myCurNode->getFacade<TransformHierarchyFacade>()->get<ScaleTag>();
+                    myCurNode = myCurNode->parentNode();
+                }
+                // get rid of scale in billboards global matrix
+                Vector3f myFinalInverseScale(1.0f/myCurScale[0], 1.0f/myCurScale[1], 1.0f/myCurScale[2]);
+                Matrix4f myBillboardMatrix = myBody.get<GlobalMatrixTag>();
+                myBillboardMatrix.scale(myFinalInverseScale);
+                
+                // transform camera into billboard space
+                myBillboardMatrix.invert();
+                Matrix4f myCameraMatrix = theCamera->get<GlobalMatrixTag>();            
+                myCameraMatrix.postMultiply(myBillboardMatrix);
+                
+                // calculate billboard transform matrix
+                Vector4f myCamUpVector    = myCameraMatrix.getRow(1);
+                Vector3f myCamUpVector3(myCamUpVector[0], myCamUpVector[1], myCamUpVector[2]);
+                Vector4f myCamViewVector  = myCameraMatrix.getRow(2);
+                Vector3f myCamViewVector3(myCamViewVector[0], myCamViewVector[1], myCamViewVector[2]);
+                Vector3f myRightVec       = cross(myCamUpVector3, myCamViewVector3);
+                
+                Matrix4f myScreenAlignedMatrix;
+                myScreenAlignedMatrix.assign(myRightVec[0], myRightVec[1], myRightVec[2], 0,
+                        myCamUpVector[0],myCamUpVector[1],myCamUpVector[2], 0,
+                        myCamViewVector[0],myCamViewVector[1],myCamViewVector[2], 0,
+                        0,0,0,1, ROTATING);
+    
+                Matrix4f myBillboardTransform = myBody.get<GlobalMatrixTag>();
+                myScreenAlignedMatrix.postMultiply(myBillboardTransform);
+                    
+                myBody.set<GlobalMatrixTag>(myScreenAlignedMatrix);   
+            }            
+        }
+        
         // Check culling
         bool myOverlapFrustumFlag = true;
         const Frustum & myFrustum = theCamera->get<FrustumTag>();
@@ -1103,13 +1122,15 @@ namespace y60 {
         if (theNode->nodeName() == BODY_NODE_NAME) {
             DB(AC_TRACE << "createRenderList: body processing";)
             DBP(MAKE_GL_SCOPE_TIMER(createRenderList_insertBody));
+
             const Body & myBody = *(dynamic_cast_Ptr<Body>(myFacade));
 
             // Split the body in bodyparts to make material sorted rendering possible
             const Shape & myShape = myBody.getShape();
             const_cast<Shape&>(myShape).set<LastActiveFrameTag>(_myFrameNumber);
             const y60::PrimitiveVector & myPrimitives = myShape.getPrimitives();
-            Matrix4f myTransform = myBody.get<GlobalMatrixTag>();
+
+            Matrix4f myTransform = myBody.get<GlobalMatrixTag>();                                                                
             myTransform.postMultiply(theEyeSpaceTransform);
             double myFarPlane = myFrustum.getFar();
             double myNearPlane = myFrustum.getNear();
@@ -1267,7 +1288,7 @@ namespace y60 {
             CameraPtr myCamera = myCameraNode->getFacade<Camera>();
             bindViewMatrix(myCamera);
             CHECK_OGL_ERROR;
-
+            
             myWorld = myCamera->getWorld();
             WorldPtr myWorldFacade = myWorld->getFacade<World>();
 
@@ -1604,7 +1625,7 @@ namespace y60 {
     ///////////////////////////////////////////////////////////////////////////////////////////
 
     double
-    Renderer::getBillboardRotation(const asl::Matrix4f & theBillboardMatrix,
+    Renderer::getBillboardRotationY(const asl::Matrix4f & theBillboardMatrix,
                                    const asl::Matrix4f & theCameraMatrix)
     {
         asl::Matrix4f myBillboardMatrix = theBillboardMatrix;
@@ -1614,7 +1635,6 @@ namespace y60 {
         asl::Matrix4f myCameraMatrix = theCameraMatrix;
         myCameraMatrix.postMultiply(myBillboardMatrix);
 
-        //asl::Vector3f myViewVector =  myCameraMatrix.getTranslation();
         asl::Vector4f myViewVector4 =  myCameraMatrix.getRow(2);
         asl::Vector3f myViewVector(myViewVector4[0], myViewVector4[1], myViewVector4[2]);
 
@@ -1625,9 +1645,9 @@ namespace y60 {
             return atan(myViewVector[0] / myViewVector[2]) + asl::PI;
         } else {
             if (myViewVector[0] > 0) {
-                return asl::PI / 2;
+                return asl::PI/2;
             } else if (myViewVector[0] < 0) {
-                return - asl::PI / 2;
+                return -asl::PI / 2;
             }
         }
 

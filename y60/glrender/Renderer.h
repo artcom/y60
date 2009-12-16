@@ -219,7 +219,7 @@ namespace y60 {
             void renderSkyBox(const Viewport & theViewport, y60::CameraPtr theCamera);
             void drawNormals(const Primitive & thePrimitive, float theNormalScale);
 
-            double getBillboardRotation(const asl::Matrix4f & theBillboardMatrix,
+            double getBillboardRotationY(const asl::Matrix4f & theBillboardMatrix,
                                         const asl::Matrix4f & theCameraMatrix);
 
             void collectClippingPlanes(dom::NodePtr theNode, std::vector<asl::Planef> & theClippingPlanes);
