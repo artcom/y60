@@ -357,13 +357,10 @@ TTF_Font* TTF_OpenFontIndexRW( SDL_RWops *src, int freesrc, int ptsize, long ind
 	  // if we use font ascender and descender (as proposed in freetype header
 	  // freetype.h line 844-855 the font height is calculated correct
 	  // we keep a fallback if ascender or descender is '0'  (vs /2009)
-	  if (face->ascender != 0 && face->descender != 0) {
-		  font->ascent  = FT_CEIL(FT_MulFix(face->ascender, scale));
-		  font->descent = FT_CEIL(FT_MulFix(face->descender, scale));
-	  } else {
-		font->ascent  = FT_CEIL(FT_MulFix(face->bbox.yMax, scale));
-		font->descent = FT_CEIL(FT_MulFix(face->bbox.yMin, scale));
-	  }
+      // removed fallback to bounding box because freetype already does
+      // exactly what this code tried to do. (ia /20091218)
+      font->ascent  = FT_CEIL(FT_MulFix(face->ascender, scale));
+      font->descent = FT_CEIL(FT_MulFix(face->descender, scale));
 	  font->height  = font->ascent - font->descent + /* baseline */ 1;
 	  font->lineskip = FT_CEIL(FT_MulFix(face->height, scale));
 	  font->underline_offset = FT_FLOOR(FT_MulFix(face->underline_position, scale));
