@@ -67,8 +67,7 @@ using namespace asl;
 
 namespace y60 {
 
-asl::Block FFMpegAudioDecoder::_mySamples(AVCODEC_MAX_AUDIO_FRAME_SIZE);
-asl::Block FFMpegAudioDecoder::_myResampledSamples(AVCODEC_MAX_AUDIO_FRAME_SIZE);
+asl::Block FFMpegAudioDecoder::_myResampledSamples(AVCODEC_MAX_AUDIO_FRAME_SIZE<< 1);
 
 FFMpegAudioDecoder::FFMpegAudioDecoder (const string& myURI)
     : _myURI (myURI),
@@ -91,7 +90,7 @@ FFMpegAudioDecoder::~FFMpegAudioDecoder() {
 
 bool FFMpegAudioDecoder::isSyncDecoder() const {
     // Note that if this is ever changed - i.e. if several decoders run in different 
-    // threads, _mySamples and _myResampledSamples can't be static variables anymore!
+    // threads, _myResampledSamples can't be static variables anymore!
     return true;
 }
 
@@ -255,28 +254,52 @@ bool FFMpegAudioDecoder::decode() {
     }
     if (myPacket.stream_index == _myStreamIndex) {
         int myBytesDecoded = 0;
-        unsigned char* myData = myPacket.data;
-        int myDataLen = myPacket.size;
         
-        int myLen = 0;
-        while (myDataLen > 0) {
-#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(28<<8)+0)
-            // "avcodec_decode_audio2" needs the buffer size for initialization
-            myBytesDecoded = _mySamples.size(); 
-            myLen = avcodec_decode_audio2(myCodec,
-                    (int16_t*)_mySamples.begin(), &myBytesDecoded, myData, myDataLen);
-#else            
-            myLen = avcodec_decode_audio(myCodec, (int16_t*)_mySamples.begin(), 
-                    &myBytesDecoded, myData, myDataLen);
-#endif
-
+        // we need an aligned buffer
+        int16_t * myAlignedBuf;
+        myAlignedBuf = (int16_t *)av_malloc( AVCODEC_MAX_AUDIO_FRAME_SIZE<<1 );
+        
+                 
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52,27,0)
+        AVPacket myTempPacket;
+        av_init_packet(&myTempPacket);
+        myTempPacket.data = myPacket.data;
+        myTempPacket.size = myPacket.size;
+        while (myTempPacket.size > 0) {
+            myBytesDecoded = AVCODEC_MAX_AUDIO_FRAME_SIZE<<1; 
+            int myLen = avcodec_decode_audio3(myCodec,
+                myAlignedBuf, &myBytesDecoded, &myTempPacket);
             if (myLen < 0) {
                 AC_WARNING << "av_decode_audio error";
+                myTempPacket.size = 0;
+                break;
+            }
+            myTempPacket.data += myLen;
+            myTempPacket.size -= myLen;
+            AC_TRACE << "data left " << myTempPacket.size << " read " << myLen;
+            
+#else
+        const uint8_t* myData = myPacket.data;
+        int myDataLen = myPacket.size;
+        while (myDataLen > 0) {
+#   if  LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(51,28,0)            
+            myBytesDecoded = AVCODEC_MAX_AUDIO_FRAME_SIZE<<1; 
+            int myLen = avcodec_decode_audio2(myCodec,
+                myAlignedBuf, &myBytesDecoded, myData, myDataLen);
+#   else            
+            int myLen = avcodec_decode_audio(myCodec,
+                myAlignedBuf, &myBytesDecoded, myData, myDataLen);    
+#   endif
+            if (myLen < 0) {
+                AC_WARNING << "av_decode_audio error";
+                myDataLen = 0;
                 break;
             }
             myData += myLen;
             myDataLen -= myLen;
             AC_TRACE << "data left " << myDataLen << " read " << myLen;
+#endif
+
             if ( myBytesDecoded <= 0 ) {
                 continue;
             }
@@ -286,18 +309,18 @@ bool FFMpegAudioDecoder::decode() {
             if (_myResampleContext) {
                 numFrames = audio_resample(_myResampleContext, 
                         (int16_t*)(_myResampledSamples.begin()),
-                        (int16_t*)(_mySamples.begin()), 
-                        numFrames);
+                        myAlignedBuf, numFrames);
                 myBuffer = Pump::get().createBuffer(numFrames);
                 myBuffer->convert(_myResampledSamples.begin(), SF_S16, _myNumChannels);
             } else {
                 myBuffer = Pump::get().createBuffer(numFrames);
-                myBuffer->convert(_mySamples.begin(), SF_S16, _myNumChannels);
+                myBuffer->convert(myAlignedBuf, SF_S16, _myNumChannels);
             }
             myBuffer->setStartFrame(_myCurFrame);
             _myCurFrame += myBuffer->getNumFrames();
             _mySampleSink->queueSamples(myBuffer);
         }
+        av_free( myAlignedBuf );
     }
     av_free_packet(&myPacket);
     return false;

@@ -335,7 +335,6 @@ namespace y60 {
         }
         AC_INFO << "FFMpegDecoder1::load() " << theFilename << " fps="
                 << myFPS << " framecount=" << getFrameCount();
-               
         _myLastVideoTimestamp = 0;
 
         // Get Starttime
@@ -368,7 +367,6 @@ namespace y60 {
         } else {
             DB(AC_TRACE << "FFMpegDecoder1::readFrame decoded timestamp=" << myFrameTimestamp);
         }
-
         return theTime;
     }
 
@@ -422,7 +420,15 @@ namespace y60 {
                  * chance to get the last frame of the video
                  */
                 int frameFinished = 0;
-                /*int myLen =*/ avcodec_decode_video(_myVStream->codec, _myFrame, &frameFinished, NULL, 0);
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52,27,0)
+                AVPacket myTempPacket;
+                av_init_packet(&myTempPacket);
+                /*int myLen =*/ avcodec_decode_video2(_myVStream->codec, _myFrame,
+                        &frameFinished, &myTempPacket);
+#else                
+                /*int myLen =*/ avcodec_decode_video(_myVStream->codec, _myFrame,
+                        &frameFinished, NULL, 0);
+#endif                        
                 if (frameFinished) {
                     _myLastVideoTimestamp += myTimePerFrame;
 
@@ -448,19 +454,36 @@ namespace y60 {
                 }
 
                 int frameFinished = 0;
+                
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52,27,0)
+                AVPacket myTempPacket;
+                av_init_packet(&myTempPacket);
+                myTempPacket.data = myPacket.data;
+                myTempPacket.size = myPacket.size;
+                while (frameFinished == 0 && myTempPacket.size > 0) {
+                    int myLen = avcodec_decode_video2(_myVStream->codec, _myFrame,
+                            &frameFinished, &myTempPacket);
+                    if (myLen < 0) {
+                        AC_ERROR << "av_decode_video error";
+                        break;
+                    }
+                    myTempPacket.data += myLen;
+                    myTempPacket.size -= myLen;                    
+#else
                 unsigned char* myData = myPacket.data;
                 int myDataLen = myPacket.size;
-
                 while (frameFinished == 0 && myDataLen > 0) {
                     int myLen = avcodec_decode_video(_myVStream->codec,
-                                                     _myFrame, &frameFinished,
-                                                     myData, myDataLen);
+                                                 _myFrame, &frameFinished,
+                                                 myData, myDataLen);
+                    
                     if (myLen < 0) {
                         AC_ERROR << "av_decode_video error";
                         break;
                     }
                     myData += myLen;
                     myDataLen -= myLen;
+#endif                
                 }
 
                 AC_DEBUG << "decoded dts=" << myPacket.dts << " pts=" << myPacket.pts

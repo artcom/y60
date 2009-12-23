@@ -132,7 +132,6 @@ namespace y60 {
         public asl::PosixThread,
         public asl::PlugInBase
     {
-        static const unsigned FRAME_CACHE_SIZE;  ///< Number of frames to cache in the Framecache.
         static const double AUDIO_BUFFER_SIZE;   ///< Audio cache size in seconds.
 
     public:
@@ -234,7 +233,6 @@ namespace y60 {
         _myDestinationPixelFormat;
 
         ReSampleContext * _myResampleContext;
-        static asl::Block _mySamples;
         static asl::Block _myResampledSamples;
 
         int _myNumFramesDecoded;

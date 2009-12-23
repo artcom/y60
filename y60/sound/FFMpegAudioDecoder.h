@@ -86,6 +86,10 @@ extern "C" {
 #endif
 }
 
+#ifndef AV_VERSION_INT
+#define AV_VERSION_INT(a,b,c) (a<<16 | b<<8 | c)
+#endif
+
 namespace y60 {
 
 class Y60_SOUND_DECL FFMpegAudioDecoder: public IAudioDecoder
@@ -117,7 +121,6 @@ class Y60_SOUND_DECL FFMpegAudioDecoder: public IAudioDecoder
         AVFormatContext * _myFormatContext;
 
         int _myStreamIndex;
-        static asl::Block _mySamples;
         static asl::Block _myResampledSamples;
         unsigned _mySampleRate;
         unsigned _myNumChannels;

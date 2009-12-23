@@ -98,8 +98,7 @@ namespace y60 {
 
     const double FFMpegDecoder2::AUDIO_BUFFER_SIZE = 0.5;
 
-    asl::Block FFMpegDecoder2::_myResampledSamples(AVCODEC_MAX_AUDIO_FRAME_SIZE);
-    asl::Block FFMpegDecoder2::_mySamples(AVCODEC_MAX_AUDIO_FRAME_SIZE);
+    asl::Block FFMpegDecoder2::_myResampledSamples(AVCODEC_MAX_AUDIO_FRAME_SIZE*10);
 
     FFMpegDecoder2::FFMpegDecoder2(asl::DLHandle theDLHandle) :
         AsyncDecoder(),
@@ -214,10 +213,6 @@ namespace y60 {
             }
         }
         
-        AC_DEBUG << "r_framerate den: " <<_myVStream->r_frame_rate.den<< "r_framerate num: "<< _myVStream->r_frame_rate.num;
-        AC_DEBUG << " time_base: " << _myVStream->time_base.den << ","<<_myVStream->time_base.num;
-        AC_DEBUG << " time_base2: " << _myVStream->codec->time_base.den << ","<<_myVStream->codec->time_base.num;
-        AC_DEBUG << " formatcontex start_time: " << _myFormatContext->start_time<<" stream start_time:"<<_myVStream->start_time;
         if (_myVStream) {
             setupVideo(theFilename);
         } else {
@@ -363,16 +358,16 @@ namespace y60 {
         AsyncDecoder::closeMovie();
     }
 
+    
     bool FFMpegDecoder2::readAudio() {
         AC_TRACE << "---- FFMpegDecoder2::readAudio:";
-        double myDestBufferedTime = _myAudioSink->getBufferedTime()+2/_myFrameRate;
+        double myDestBufferedTime = _myAudioSink->getBufferedTime()+8/_myFrameRate;
         if (myDestBufferedTime > AUDIO_BUFFER_SIZE) {
             myDestBufferedTime = AUDIO_BUFFER_SIZE;
         }
         while (double(_myAudioSink->getBufferedTime()) < myDestBufferedTime) {
-            AC_TRACE << "---- FFMpegDecoder2::readAudio: getBufferedTime="
+            AC_DEBUG << "---- FFMpegDecoder2::readAudio: getBufferedTime="
                     << _myAudioSink->getBufferedTime();
-//            AC_DEBUG << "---- FFMpegDecoder2::readAudio: getPacket()";
             AVPacket * myPacket = _myDemux->getPacket(_myAStreamIndex);
             if (!myPacket) {
                 _myAudioSink->stop(true);
@@ -387,29 +382,56 @@ namespace y60 {
     }
 
     void FFMpegDecoder2::addAudioPacket(const AVPacket & thePacket) {
-        // decode audio
-        int myBytesDecoded = 0; // decompressed sample size in bytes
-        unsigned char* myData = thePacket.data;
-        int myDataLen = thePacket.size;
-        double myTime = thePacket.dts / _myTimeUnitsPerSecond;
         AC_TRACE << "FFMpegDecoder2::addAudioPacket()";
-        while (myDataLen > 0) {
-#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(51,28,0)
-                // "avcodec_decode_audio2" needs the buffer size for initialization
-                myBytesDecoded = _mySamples.size(); 
-                int myLen = avcodec_decode_audio2(_myAStream->codec,
-                    (int16_t*)_mySamples.begin(), &myBytesDecoded, myData, myDataLen);
-#else            
-            int myLen = avcodec_decode_audio(_myAStream->codec,
-                (int16_t*)_mySamples.begin(), &myBytesDecoded, myData, myDataLen);    
-#endif
+        
+        double myTime = thePacket.dts / _myTimeUnitsPerSecond;
+        
+        // we need an aligned buffer
+        int16_t * myAlignedBuf;
+        myAlignedBuf = (int16_t *)av_malloc( AVCODEC_MAX_AUDIO_FRAME_SIZE *10 );
+        
+        int myBytesDecoded = 0; // decompressed sample size in bytes
+                 
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52,27,0)
+        AVPacket myTempPacket;
+        av_init_packet(&myTempPacket);
+        myTempPacket.data = thePacket.data;
+        myTempPacket.size = thePacket.size;
+        while (myTempPacket.size > 0) {
+            myBytesDecoded = AVCODEC_MAX_AUDIO_FRAME_SIZE *10; 
+            int myLen = avcodec_decode_audio3(_myAStream->codec,
+                myAlignedBuf, &myBytesDecoded, &myTempPacket);
             if (myLen < 0) {
                 AC_WARNING << "av_decode_audio error";
+                myTempPacket.size = 0;
+                break;
+            }
+            myTempPacket.data += myLen;
+            myTempPacket.size -= myLen;
+            AC_TRACE << "data left " << myTempPacket.size << " read " << myLen;
+            
+#else
+        const uint8_t* myData = thePacket.data;
+        int myDataLen = thePacket.size;
+        while (myDataLen > 0) {
+#   if  LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(51,28,0)            
+            myBytesDecoded = AVCODEC_MAX_AUDIO_FRAME_SIZE *10; 
+            int myLen = avcodec_decode_audio2(_myAStream->codec,
+                myAlignedBuf, &myBytesDecoded, myData, myDataLen);
+#   else            
+            int myLen = avcodec_decode_audio(_myAStream->codec,
+                myAlignedBuf, &myBytesDecoded, myData, myDataLen);    
+#   endif
+            if (myLen < 0) {
+                AC_WARNING << "av_decode_audio error";
+                myDataLen = 0;
                 break;
             }
             myData += myLen;
             myDataLen -= myLen;
             AC_TRACE << "data left " << myDataLen << " read " << myLen;
+            
+#endif
             if ( myBytesDecoded <= 0 ) {
                 continue;
             }
@@ -421,26 +443,21 @@ namespace y60 {
             if (_myResampleContext) {
                 numFrames = audio_resample(_myResampleContext,
                         (int16_t*)(_myResampledSamples.begin()),
-                        (int16_t*)(_mySamples.begin()),
-                        numFrames);
+                        myAlignedBuf, numFrames);
                 myBuffer = Pump::get().createBuffer(numFrames);
                 myBuffer->convert(_myResampledSamples.begin(), SF_S16, myNumChannels);
             } else {
                 myBuffer = Pump::get().createBuffer(numFrames);
-                myBuffer->convert(_mySamples.begin(), SF_S16, myNumChannels);
+                myBuffer->convert(myAlignedBuf, SF_S16, myNumChannels);
             }
             _myAudioSink->queueSamples(myBuffer);
-
             AC_TRACE << "decoded audio time=" << myTime;
         } // while
-
+        
+        av_free( myAlignedBuf );
         // adjust volume
         float myVolume = getMovie()->get<VolumeTag>();
         _myAudioSink->setVolume(myVolume);
-        //if (!asl::almostEqual(Pump::get().getVolume(), myVolume)) {
-            //Pump::get().setVolume(myVolume);
-        //}
-
     }
 
     bool FFMpegDecoder2::decodeFrame() {
@@ -459,10 +476,15 @@ namespace y60 {
                 // deliver another frame...
                 AC_DEBUG << "---- decodeFrame: eof";
                 int myFrameCompleteFlag = 0;
-                
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52,27,0)
+                AVPacket myTempPacket;
+                av_init_packet(&myTempPacket);
+                /*int myLen =*/ avcodec_decode_video2(_myVStream->codec, _myFrame,
+                        &myFrameCompleteFlag, &myTempPacket);
+#else                
                 /*int myLen =*/ avcodec_decode_video(_myVStream->codec, _myFrame,
                         &myFrameCompleteFlag, 0, 0);
-                        
+#endif                        
                 if (myFrameCompleteFlag) {
 		            AC_DEBUG << "---- decodeFrame: Last frame.";
                     // The only way to get the timestamp of this frame is to take
@@ -483,9 +505,18 @@ namespace y60 {
                 AC_DEBUG << "---- myPacket->dts=" << myPacket->dts;
                 int myFrameCompleteFlag = 0;
                 START_TIMER(decodeFrame_avcodec_decode);
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52,27,0)
+                AVPacket myTempPacket;
+                av_init_packet(&myTempPacket);
+                myTempPacket.data = myPacket->data;
+                myTempPacket.size = myPacket->size;
+                int myLen = avcodec_decode_video2(_myVStream->codec, _myFrame,
+                        &myFrameCompleteFlag, &myTempPacket);
+#else
                 // try to decode the frame
                 int myLen = avcodec_decode_video(_myVStream->codec, _myFrame,
                         &myFrameCompleteFlag, myPacket->data, myPacket->size);
+#endif                
                 STOP_TIMER(decodeFrame_avcodec_decode);
                 AC_DEBUG <<"FFMpegDecoder2::decodeFrame frame doneflag :  "<< myFrameCompleteFlag<<" len: "<<myLen;
                 AC_DEBUG<< "dts=" << myPacket->dts << ", position=" <<
@@ -882,21 +913,15 @@ namespace y60 {
             }
             myMovie->set<FrameCountTag>(int(myDuration));
 	        _myTimeUnitsPerSecond = 1/ av_q2d(_myVStream->time_base);//_myFrameRate;
-	        if(_myTimeUnitsPerSecond != _myFrameRate){
-	            AC_DEBUG << "FFMpegDecoder2::setupVideo() " << theFilename << " fps="
-                << _myFrameRate << " framecount=" << getFrameCount()<< "time_base: "
-                <<_myTimeUnitsPerSecond;
-                
-                AC_DEBUG << "r_framerate den: " <<_myVStream->r_frame_rate.den<< " r_framerate num: "<< _myVStream->r_frame_rate.num;
-                AC_DEBUG << " time_base: " << _myVStream->time_base.den << ","<<_myVStream->time_base.num;
-                AC_DEBUG << " time_base2: " << _myVStream->codec->time_base.den << ","<<_myVStream->codec->time_base.num;
-                AC_DEBUG << " formatcontex start_time: " << _myFormatContext->start_time<<" stream start_time:"<<_myVStream->start_time;
-	        }
-        }
+	    }
         AC_INFO << "FFMpegDecoder2::setupVideo() " << theFilename << " fps="
-                << _myFrameRate << " framecount=" << getFrameCount()<< "time_base: "
+                << _myFrameRate << " framecount=" << getFrameCount()<< " time_base: "
                 <<_myTimeUnitsPerSecond;
-               
+        AC_INFO << "r_framerate den: " <<_myVStream->r_frame_rate.den<< " r_framerate num: "<< _myVStream->r_frame_rate.num;
+        AC_INFO << "stream time_base: " << _myVStream->time_base.den << ","<<_myVStream->time_base.num;
+        AC_INFO << "codec time_base: " << _myVStream->codec->time_base.den << ","<<_myVStream->codec->time_base.num;
+        AC_INFO << "formatcontex start_time: " << _myFormatContext->start_time<<" stream start_time: "<<_myVStream->start_time;
+        
         // allocate frame for YUV data
         _myFrame = avcodec_alloc_frame();
         _myStartTimestamp = -1;
@@ -925,15 +950,23 @@ namespace y60 {
 
         if (myACodec->sample_rate != static_cast<int>(Pump::get().getNativeSampleRate()))
         {
+            //XXX: find a way to handle ffmpeg::SampleFormat and asl::SampleFormat            
+/*#if  LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(51,28,0)            
+            _myResampleContext = av_audio_resample_init(
+                    myACodec->channels, myACodec->channels,
+                    Pump::get().getNativeSampleRate(), myACodec->sample_rate,
+                    Pump::get().getNativeSampleFormat(), myACodec->sample_fmt,
+                    16, 10, 0, 0.8);
+#else*/            
             _myResampleContext = audio_resample_init(myACodec->channels,
                     myACodec->channels, Pump::get().getNativeSampleRate(),
                     myACodec->sample_rate);
+/*#endif*/            
         }
         AC_TRACE << "FFMpegDecoder2::setupAudio() done. resampling "
             << (_myResampleContext != 0);
     }
     
-
     void FFMpegDecoder2::addCacheFrame(AVFrame* theFrame, double theTime) {
 		AC_DEBUG << "---- try to add frame at " << theTime;
         VideoMsgPtr myVideoFrame = createFrame(theTime);
