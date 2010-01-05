@@ -461,3 +461,17 @@ macro(_ac_create_source_symlinks)
         endif(NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/src)
     endif(ACMAKE_SYMLINK_SOURCES_TO_BUILDTREE)
 endmacro(_ac_create_source_symlinks)
+
+# add properties to an existent set of properties
+macro(ac_add_target_properties _target _name)
+	set(_properties)
+	foreach(_prop ${ARGN})
+		set(_properties "${_properties} ${_prop}")
+	endforeach(_prop)
+	get_target_property(_old_properties ${_target} ${_name})
+	if(NOT _old_properties)
+		# in case it's NOTFOUND
+		set(_old_properties)
+	endif(NOT _old_properties)
+	set_target_properties(${_target} PROPERTIES ${_name} "${_old_properties} ${_properties}")
+endmacro(ac_add_target_properties)
