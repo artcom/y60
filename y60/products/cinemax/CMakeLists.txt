@@ -38,8 +38,9 @@ ac_add_plugin(
     EXTERNS C4D
 )
 
+
 if(WIN32)
-    set_target_properties(c4d-xport PROPERTIES COMPILE_FLAGS "/vmg /vms")
+    ac_add_target_properties(c4d-xport COMPILE_FLAGS "/vmg /vms")
 endif(WIN32)
 
 configure_file(install_c4d_R11.in ${CMAKE_CURRENT_BINARY_DIR}/install_c4d_R11 @ONLY)
