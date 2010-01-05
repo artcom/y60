@@ -36,10 +36,13 @@ if(C4D_SDK AND C4D_VERSION)
         C4D_GV_INCLUDE_DIR
         C4D_CUSTOMGUI_INCLUDE_DIR
     )
-
-    find_library(C4D_LIBRARIES NAMES c4d_api.lib _api_Win32_Release.lib c4d_api_v8OPT)
-    
-    find_library(C4D_LIBRARIES_D NAMES c4d_apid.lib _api_Win32_Debug.lib c4d_api_v8DBG)
+    if(C4D_VERSION MATCHES "R11")
+        find_library(C4D_LIBRARIES NAMES _api_Win32_Release.lib PATHS ENV C4D_SDK PATH_SUFFIXES _api_lib)
+        find_library(C4D_LIBRARIES_D NAMES _api_Win32_Debug.lib PATHS ENV C4D_SDK PATH_SUFFIXES _api_lib)
+    else(C4D_VERSION MATCHES "R11")
+        find_library(C4D_LIBRARIES NAMES c4d_api.lib _api_Win32_Release.lib c4d_api_v8OPT)    
+        find_library(C4D_LIBRARIES_D NAMES c4d_apid.lib _api_Win32_Debug.lib c4d_api_v8DBG)
+    endif(C4D_VERSION MATCHES "R11")
 
     mark_as_advanced(C4D_LIBRARIES C4D_LIBRARIES_D)
 
