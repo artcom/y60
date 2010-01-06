@@ -1,0 +1,467 @@
+--- c4d_memory.cpp	2010-01-06 10:31:58.765625000 +0100
++++ patched/c4d_memory.cpp	2010-01-06 10:24:24.578125000 +0100
+@@ -1,230 +1,234 @@
+-#include <string.h>
+-#include <stdlib.h>
+-#ifdef __MAC
+-	#if defined(__cplusplus) && defined(_MSL_USING_NAMESPACE)
+-		using namespace std;
+-	#endif
+-#endif
+-
+-#include "c4d_memory.h"
+-#include "operatingsystem.h"
+-#include "c4d_general.h"
+-
+-#define	STDLIB_MEM_MAGIC		-1
+-static Bool	stdlib_mem_used = FALSE;												// changed to TRUE if static constructors have allocated memory before c4d's memory management was available
+-
+-void _GeFree(void **Daten)
+-{
+-	if (*Daten)
+-	{
+-		C4DOS.Ge->Free(*Daten);
+-	}
+-	*Daten=0;
+-}
+-
+-Bool	GeGetAllocSize( void *p, VLONG *out_size )
+-{
+-	return C4DOS.Ge->GetAllocSize( p, out_size );
+-}
+-
+-Bool	IsAlienMem( void *p )
+-{
+-	if ( p )
+-	{
+-		if (((VLONG*)p)[-1]==STDLIB_MEM_MAGIC)					// is this a block for the stdlib?
+-			return TRUE;
+-	}	
+-	return FALSE;
+-}
+-
+-void *AlienMem(size_t s, Bool clear)
+-{
+-	if (s<1) s=1;
+-
+-	void *p = malloc(s+sizeof(VLONG));
+-	if (!p) return NULL;
+-	
+-	if (clear) memset(p,0,s+sizeof(VLONG));
+-	*(VLONG *) p = STDLIB_MEM_MAGIC;
+-	p = (void *) ((UCHAR *)p + sizeof(VLONG));
+-	stdlib_mem_used = TRUE;																	// static constructor has allocated memory
+-	return p;
+-}
+-
+-// standard new operators (which theoretically could throw), just for compatibility with 3rd party libs
+-// Consider using gNew/gDelete instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS/GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS. See online help for details.
+-void	*operator new(size_t s)
+-{
+-	if (t_C4DOS) return C4DOS.Ge->Alloc(s<1?1:s,0,NULL);
+-
+-	return AlienMem(s,TRUE);
+-}
+-
+-// Consider using bNew/bDelete instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS/GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS. See online help for details.
+-void	*operator new[](size_t s)
+-{
+-	if (t_C4DOS) return C4DOS.Ge->Alloc(s<1?1:s,0,NULL);
+-
+-	return AlienMem(s,TRUE);
+-}
+-
+-
+-// new operators for c4d (called by gNew and bNew)
+-void* operator new(size_t s,const std::nothrow_t&) throw()
+-{
+-	if (t_C4DOS) return C4DOS.Ge->Alloc(s<1?1:s,0,NULL);
+-
+-	return AlienMem(s,TRUE);
+-}
+-
+-void* operator new(size_t s,const std::nothrow_t&,int line,const CHAR *file) throw()
+-{
+-	if (t_C4DOS) return C4DOS.Ge->Alloc(s<1?1:s,line,file);
+-
+-	return AlienMem(s,TRUE);
+-}
+-
+-void* operator new(size_t s,const std::nothrow_t&,int line,const CHAR *file, Bool clear) throw()
+-{
+-	if (t_C4DOS) 
+-	{
+-		if (clear)
+-			return C4DOS.Ge->Alloc(s<1?1:s,line,file);
+-		else
+-			return C4DOS.Ge->AllocNC(s<1?1:s,line,file);
+-	}
+-
+-	return AlienMem(s,clear);
+-}
+-
+-void* operator new[](size_t s,const std::nothrow_t&) throw()
+-{
+-	if (t_C4DOS) return C4DOS.Ge->Alloc(s<1?1:s,0,NULL);
+-
+-	return AlienMem(s,TRUE);
+-}
+-
+-void* operator new[](size_t s,const std::nothrow_t&,int line,const CHAR *file) throw()
+-{
+-	if (t_C4DOS) return C4DOS.Ge->Alloc(s<1?1:s,line,file);
+-
+-	return AlienMem(s,TRUE);
+-}
+-
+-void* operator new[](size_t s,const std::nothrow_t&,int line,const CHAR *file, Bool clear) throw()
+-{
+-	if (t_C4DOS) 
+-	{
+-		if (clear)
+-			return C4DOS.Ge->Alloc(s<1?1:s,line,file);
+-		else
+-			return C4DOS.Ge->AllocNC(s<1?1:s,line,file);
+-	}
+-
+-	return AlienMem(s,clear);
+-}
+-
+-
+-// delete operators for c4d (called by gDelete and bDelete)
+-void operator delete(void *p)
+-{
+-	if (p)
+-	{
+-		void	*temp = p;
+-
+-		if (stdlib_mem_used)																	// memory allocated by static constructors?
+-		{
+-			if (((VLONG*)p)[-1]==STDLIB_MEM_MAGIC)					// is this a block for the stdlib?
+-			{
+-				free((void*)((UCHAR*)p - sizeof(VLONG)));
+-				return;
+-			}
+-		}
+-		C4DOS.Ge->Free(temp);
+-	}
+-}
+-
+-void operator delete[](void *p)
+-{
+-	if (p)
+-	{
+-		void	*temp = p;
+-
+-		if (stdlib_mem_used)																	// memory allocated by static constructors?
+-		{
+-			if (((VLONG*)p)[-1]==STDLIB_MEM_MAGIC)					// is this a block for the stdlib?
+-			{
+-				free((void*)((UCHAR*)p - sizeof(VLONG)));
+-				return;
+-			}
+-		}
+-		C4DOS.Ge->Free(temp);
+-	}
+-}
+-
+-// usually the nothrow delete operators are not called by the compilers (delete (std::nothrow) is not supported), we define them for completeness
+-void operator delete(void *p,const std::nothrow_t&) throw()
+-{
+-	operator delete( p );
+-}
+-
+-void operator delete[](void *p,const std::nothrow_t&) throw()
+-{
+-	operator delete[]( p );
+-}
+-
+-void operator delete(void *p,const std::nothrow_t&,int line,const CHAR *file) throw()
+-{
+-	operator delete( p );
+-}
+-
+-void operator delete[](void *p,const std::nothrow_t&,int line,const CHAR *file) throw()
+-{
+-	operator delete[]( p );
+-}
+-
+-void operator delete(void *p,const std::nothrow_t&,int line,const CHAR *file, Bool clear) throw()
+-{
+-	operator delete( p );
+-}
+-
+-void operator delete[](void *p,const std::nothrow_t&,int line,const CHAR *file, Bool clear) throw()
+-{
+-	operator delete[]( p );
+-}
+-
+-MemoryPool *MemoryPool::Alloc(VLONG block_size)
+-{
+-	return C4DOS.Pl->Alloc(block_size);
+-}
+-
+-MemoryPool *MemoryPool::Alloc()
+-{
+-	return C4DOS.Pl->Alloc(MEMORYPOOL_DEFAULT_BLOCKSIZE);
+-}
+-
+-void MemoryPool::Free(MemoryPool *&pool)
+-{
+-	if (pool) C4DOS.Pl->Free(pool);
+-	pool=NULL;
+-}
+-
+-void *MemoryPool::MemAlloc(VLONG size, Bool clear)
+-{
+-	return C4DOS.Pl->AllocElement(this,size,clear);
+-}
+-
+-void MemoryPool::MemFree(void *mem, VLONG size)
+-{
+-	C4DOS.Pl->FreeElement(this,mem,size);
+-}
+-
+-void *MemoryPool::MemAllocS(VLONG size, Bool clear)
+-{
+-	return C4DOS.Pl->AllocElementS(this,size,clear);
+-}
+-
+-void MemoryPool::MemFreeS(void *mem)
+-{
+-	C4DOS.Pl->FreeElementS(this,mem);
+-}
++#include <string.h>
++#include <stdlib.h>
++#ifdef __MAC
++	#if defined(__cplusplus) && defined(_MSL_USING_NAMESPACE)
++		using namespace std;
++	#endif
++#endif
++
++#include "c4d_memory.h"
++#include "operatingsystem.h"
++#include "c4d_general.h"
++
++#define	STDLIB_MEM_MAGIC		-1
++static Bool	stdlib_mem_used = FALSE;												// changed to TRUE if static constructors have allocated memory before c4d's memory management was available
++
++void _GeFree(void **Daten)
++{
++	if (*Daten)
++	{
++		C4DOS.Ge->Free(*Daten);
++	}
++	*Daten=0;
++}
++
++Bool	GeGetAllocSize( void *p, VLONG *out_size )
++{
++	return C4DOS.Ge->GetAllocSize( p, out_size );
++}
++
++Bool	IsAlienMem( void *p )
++{
++	if ( p )
++	{
++		if (((VLONG*)p)[-1]==STDLIB_MEM_MAGIC)					// is this a block for the stdlib?
++			return TRUE;
++	}	
++	return FALSE;
++}
++
++void *AlienMem(size_t s, Bool clear)
++{
++	if (s<1) s=1;
++
++	void *p = malloc(s+sizeof(VLONG));
++	if (!p) return NULL;
++	
++	if (clear) memset(p,0,s+sizeof(VLONG));
++	*(VLONG *) p = STDLIB_MEM_MAGIC;
++	p = (void *) ((UCHAR *)p + sizeof(VLONG));
++	stdlib_mem_used = TRUE;																	// static constructor has allocated memory
++	return p;
++}
++
++
++// standard new operators (which theoretically could throw), just for compatibility with 3rd party libs
++// Consider using gNew/gDelete instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS/GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS. See online help for details.
++/*void	*operator new(size_t s)
++{
++	if (t_C4DOS) return C4DOS.Ge->Alloc(s<1?1:s,0,NULL);
++
++	return AlienMem(s,TRUE);
++}
++
++
++// Consider using bNew/bDelete instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS/GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS. See online help for details.
++void	*operator new[](size_t s)
++{
++	if (t_C4DOS) return C4DOS.Ge->Alloc(s<1?1:s,0,NULL);
++
++	return AlienMem(s,TRUE);
++}
++*/
++
++
++// new operators for c4d (called by gNew and bNew)
++void* operator new(size_t s,const std::nothrow_t&) throw()
++{
++	if (t_C4DOS) return C4DOS.Ge->Alloc(s<1?1:s,0,NULL);
++
++	return AlienMem(s,TRUE);
++}
++
++
++void* operator new(size_t s,const std::nothrow_t&,int line,const CHAR *file) throw()
++{
++	if (t_C4DOS) return C4DOS.Ge->Alloc(s<1?1:s,line,file);
++
++	return AlienMem(s,TRUE);
++}
++
++void* operator new(size_t s,const std::nothrow_t&,int line,const CHAR *file, Bool clear) throw()
++{
++	if (t_C4DOS) 
++	{
++		if (clear)
++			return C4DOS.Ge->Alloc(s<1?1:s,line,file);
++		else
++			return C4DOS.Ge->AllocNC(s<1?1:s,line,file);
++	}
++
++	return AlienMem(s,clear);
++}
++
++void* operator new[](size_t s,const std::nothrow_t&) throw()
++{
++	if (t_C4DOS) return C4DOS.Ge->Alloc(s<1?1:s,0,NULL);
++
++	return AlienMem(s,TRUE);
++}
++
++void* operator new[](size_t s,const std::nothrow_t&,int line,const CHAR *file) throw()
++{
++	if (t_C4DOS) return C4DOS.Ge->Alloc(s<1?1:s,line,file);
++
++	return AlienMem(s,TRUE);
++}
++
++void* operator new[](size_t s,const std::nothrow_t&,int line,const CHAR *file, Bool clear) throw()
++{
++	if (t_C4DOS) 
++	{
++		if (clear)
++			return C4DOS.Ge->Alloc(s<1?1:s,line,file);
++		else
++			return C4DOS.Ge->AllocNC(s<1?1:s,line,file);
++	}
++
++	return AlienMem(s,clear);
++}
++
++
++// delete operators for c4d (called by gDelete and bDelete)
++/*void operator delete(void *p)
++{
++	if (p)
++	{
++		void	*temp = p;
++
++		if (stdlib_mem_used)																	// memory allocated by static constructors?
++		{
++			if (((VLONG*)p)[-1]==STDLIB_MEM_MAGIC)					// is this a block for the stdlib?
++			{
++				free((void*)((UCHAR*)p - sizeof(VLONG)));
++				return;
++			}
++		}
++		C4DOS.Ge->Free(temp);
++	}
++}
++
++void operator delete[](void *p)
++{
++	if (p)
++	{
++		void	*temp = p;
++
++		if (stdlib_mem_used)																	// memory allocated by static constructors?
++		{
++			if (((VLONG*)p)[-1]==STDLIB_MEM_MAGIC)					// is this a block for the stdlib?
++			{
++				free((void*)((UCHAR*)p - sizeof(VLONG)));
++				return;
++			}
++		}
++		C4DOS.Ge->Free(temp);
++	}
++}
++*/
++// usually the nothrow delete operators are not called by the compilers (delete (std::nothrow) is not supported), we define them for completeness
++void operator delete(void *p,const std::nothrow_t&) throw()
++{
++	operator delete( p );
++}
++
++void operator delete[](void *p,const std::nothrow_t&) throw()
++{
++	operator delete[]( p );
++}
++
++void operator delete(void *p,const std::nothrow_t&,int line,const CHAR *file) throw()
++{
++	operator delete( p );
++}
++
++void operator delete[](void *p,const std::nothrow_t&,int line,const CHAR *file) throw()
++{
++	operator delete[]( p );
++}
++
++void operator delete(void *p,const std::nothrow_t&,int line,const CHAR *file, Bool clear) throw()
++{
++	operator delete( p );
++}
++
++void operator delete[](void *p,const std::nothrow_t&,int line,const CHAR *file, Bool clear) throw()
++{
++	operator delete[]( p );
++}
++
++MemoryPool *MemoryPool::Alloc(VLONG block_size)
++{
++	return C4DOS.Pl->Alloc(block_size);
++}
++
++MemoryPool *MemoryPool::Alloc()
++{
++	return C4DOS.Pl->Alloc(MEMORYPOOL_DEFAULT_BLOCKSIZE);
++}
++
++void MemoryPool::Free(MemoryPool *&pool)
++{
++	if (pool) C4DOS.Pl->Free(pool);
++	pool=NULL;
++}
++
++void *MemoryPool::MemAlloc(VLONG size, Bool clear)
++{
++	return C4DOS.Pl->AllocElement(this,size,clear);
++}
++
++void MemoryPool::MemFree(void *mem, VLONG size)
++{
++	C4DOS.Pl->FreeElement(this,mem,size);
++}
++
++void *MemoryPool::MemAllocS(VLONG size, Bool clear)
++{
++	return C4DOS.Pl->AllocElementS(this,size,clear);
++}
++
++void MemoryPool::MemFreeS(void *mem)
++{
++	C4DOS.Pl->FreeElementS(this,mem);
++}

@@ -11,7 +11,8 @@ fi
 BIN_DIR="@CMAKE_BINARY_DIR@/lib"
 SOURCE_DIR="@CMAKE_CURRENT_SOURCE_DIR@"
 
-DIST_BIN_DIR="${C4D_SDK}/modules"
+#DIST_BIN_DIR="${C4D_SDK}/modules"
+DIST_BIN_DIR="${C4D_SDK}/../plugins"
 
 if [ "$DEBUG" == "1" ] ; then
     BIN_DIR="$BIN_DIR/Debug"
