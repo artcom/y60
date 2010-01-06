@@ -3,6 +3,7 @@ HOWTO build and install cinema exporter (2010 / vs)
 - set environemtn variable "C4D_SDK" and "C4D_VERSION"
 - execute 'apply_c4d_sdk_patch.sh' to patch sdk files c4d_memory.h and c4d_memory.cpp
 - open '_api.sln' in cinema resource/_api_lib folder and build sdk
+- run cmake-gui to enable C4D for cmake
 - build y60 product 'c4d-xport'
 - execute 'install_c4d_R11' in your object directory+"/y60/product/cinemax" to create and copy cinema plugin resource files
 - be sure to have the right (release/debug) y60 dll's in system path, so cinema can find them, when executing plugin
