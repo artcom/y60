@@ -280,14 +280,6 @@ double ourLastAudioTimeStamp = 0.0;
             startMovie(float(myLastDecodedTimestamp));
         }
 
-        // adjust volume
-        if (_myAudioSink) {
-            float myVolume = getMovie()->get<VolumeTag>();
-            if (!asl::almostEqual(Pump::get().getVolume(), myVolume)) {
-                Pump::get().setVolume(myVolume);
-            } //if          
-        }
-
         asl::AutoLocker<ThreadLock> myLocker(_myLock); // protect shared vars (_myFrameCache, ...)
 		getMovie()->set<CacheSizeTag>(_myFrameCache.size()); // purely informational, sets value in DOM
 

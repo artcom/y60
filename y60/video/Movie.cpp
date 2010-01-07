@@ -74,6 +74,7 @@
 #include <asl/base/PlugInManager.h>
 #include <asl/base/Assure.h>
 #include <asl/base/Dashboard.h>
+#include <asl/math/numeric_functions.h>
 
 using namespace dom;
 using namespace std;
@@ -113,8 +114,13 @@ namespace y60 {
             setup();
         }
     }
-
-
+    
+    void
+    Movie::registerDependenciesRegistrators() {
+        Image::registerDependenciesRegistrators();
+        AC_DEBUG << "Movie::registerDependenciesRegistrators '" << get<NameTag>();
+        VolumeTag::Plug::getValuePtr()->setImmediateCallBack(dynamic_cast_Ptr<Movie>(getSelf()), &Movie::setVolume);
+    }
 
     void Movie::setup() {
 
@@ -383,8 +389,6 @@ namespace y60 {
         return true;
     }
 
-
-
     bool Movie::getDecoderName(std::string & theName) const {
         MovieDecoderBase & myDecoder = const_cast<MovieDecoderBase&>(*_myDecoder);
         theName = myDecoder.getName();
@@ -398,6 +402,15 @@ namespace y60 {
         return true;
     }
 
+    void Movie::setVolume() {
+        MovieDecoderBase* myDecoder = const_cast<MovieDecoderBase*>(_myDecoder.get());
+        float myVolume = get<VolumeTag>();
+        myVolume = asl::clamp(myVolume, 0.0f, 1.0f);
+        if (!almostEqual(myVolume, get<VolumeTag>())) {
+            set<VolumeTag>(myVolume);
+        }
+        myDecoder->setVolume(myVolume);
+    }
 
 
     void Movie::load() {}

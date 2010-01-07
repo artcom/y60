@@ -186,6 +186,8 @@ namespace y60 {
             
             virtual const char * getName() const = 0;
             virtual const bool hasAudio() const = 0;
+            
+            virtual void setVolume(const float theVolume) {};
 
         protected:
             const Movie * getMovie() const;

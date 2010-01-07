@@ -184,6 +184,9 @@ namespace y60 {
         bool getDecoderName(std::string & theName) const;
         bool hasAudio(bool & theHasAudio) const;
 
+        void setVolume();
+        virtual void registerDependenciesRegistrators();
+
         /**
         * @add another raster to movie.
         */

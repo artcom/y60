@@ -98,6 +98,12 @@ namespace y60 {
                 return _myAudioSink != 0;
             }
 
+            virtual void setVolume(const float theVolume) {
+                if (hasAudio()) {
+                    _myAudioSink->setVolume(theVolume);
+                } 
+            }
+
             /**
              * computes the audio time for audio/video sync. If no audio is played,
              * returns theSystemTime.

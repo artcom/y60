@@ -469,9 +469,6 @@ namespace y60 {
         } // while
         
         av_free( myAlignedBuf );
-        // adjust volume
-        float myVolume = getMovie()->get<VolumeTag>();
-        _myAudioSink->setVolume(myVolume);
     }
 
     bool FFMpegDecoder2::decodeFrame() {
@@ -663,6 +660,7 @@ namespace y60 {
             AC_DEBUG << "readFrame: not playing.";
             return theTime;
         }
+        
         VideoMsgPtr myVideoMsg;
         double myStreamTime = theTime;
         if (_myStartTimestamp != -1) {
