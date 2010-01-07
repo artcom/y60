@@ -338,7 +338,7 @@ namespace y60 {
             break;
         case PLAY_MODE_PLAY:
             if (theIgnoreCurrentTime) {
-                myMovieTime = 0;
+                myMovieTime = getTimeFromFrame(get<CurrentFrameTag>());
             } else {
                 myMovieTime = _myDecoder->getMovieTime(theCurrentTime);
             }

@@ -87,7 +87,7 @@ namespace y60 {
             AsyncDecoder() :
                 _myCachingFlag(false),
                 _myState(STOP),
-                _myLastAudioTime(0)
+                _myAudioTimeOffset(0)
             {}
 
             /**
@@ -111,27 +111,14 @@ namespace y60 {
                     AC_DEBUG << "No Audio returning " << MovieDecoderBase::getMovieTime(theSystemTime);
                     return MovieDecoderBase::getMovieTime(theSystemTime);
                 } else {
-                    /*if (_myAudioSink->getState() == asl::HWSampleSink::STOPPED &&
-                            getState() != STOP)
-                    {
-                        // We only get here if video is running way behind audio, resulting in
-                        // the AudioSink being stopped and the video still running. In that
-                        // case, we return a time just after the last audio time that was 
-                        // reported. This is just after the last frame and causes everything
-                        // to be played back.
-                        AC_DEBUG << "AsyncDecoder::getMovieTime: audio eof, returning "
-                                << _myLastAudioTime+0.5;
-                        return _myLastAudioTime+0.5;
-                    } else {*/
-                        AC_DEBUG << " returning audio time " << _myAudioSink->getPumpTime()
+                        AC_DEBUG << " returning audio time " << _myAudioSink->getPumpTime()<<" audioOffset: "<<_myAudioTimeOffset
                                 <<" video time: "<<MovieDecoderBase::getMovieTime(theSystemTime);
-                        _myLastAudioTime = _myAudioSink->getPumpTime();
                         // audio is not running yet, maybe cause we are buffering, so do not show any video frames
                         if (_myAudioSink->getState() == asl::HWSampleSink::STOPPED || _myCachingFlag) {
                             return 0;
                         } else {
                             //return _myAudioSink->getCurrentTime();
-                            return _myAudioSink->getPumpTime();                            
+                            return _myAudioTimeOffset + double(_myAudioSink->getPumpTime());                            
                             //return MovieDecoderBase::getMovieTime(theSystemTime);
                         }
                     //}
@@ -155,6 +142,7 @@ namespace y60 {
                 MovieDecoderBase::startMovie(theStartTime);
                 if (theStartAudioFlag && _myAudioSink && getDecodeAudioFlag()) {            
                     _myAudioSink->play();
+                    _myAudioTimeOffset = theStartTime;
                 }
             }
             /**
@@ -214,10 +202,10 @@ namespace y60 {
         protected:
             asl::HWSampleSinkPtr _myAudioSink;
             bool          _myCachingFlag;
+            double _myAudioTimeOffset;
 
         private:
             DecoderState _myState;
-            double _myLastAudioTime;
 
     };
 }

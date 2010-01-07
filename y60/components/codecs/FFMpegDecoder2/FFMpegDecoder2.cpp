@@ -119,7 +119,6 @@ namespace y60 {
         _myResampleContext(0),
         _myNumFramesDecoded(0),
         _myNumIFramesDecoded(0),
-        _myDecodedPacketsPerFrame(0),
         _myTimeUnitsPerSecond(-1),
         _myFrameRate(25),
         _myMaxCacheSize(8),
@@ -127,6 +126,7 @@ namespace y60 {
         _myFrameHeight(0),
         _myBytesPerPixel(1),
         _myLastFrameTime(0),
+        _myAdjustAudioOffsetFlag(false),
         _hasShutDown(false)
     {}
 
@@ -263,20 +263,30 @@ namespace y60 {
         AC_INFO << "FFMpegDecoder2::startMovie, time: " << theStartTime;
         Movie * myMovie = getMovie();
         _myMaxCacheSize = myMovie->get<MaxCacheSizeTag>();
-        _myDecodedPacketsPerFrame = 0; // reset counter 
         _myLastVideoFrame = VideoMsgPtr();
 
         if (theStartAudioFlag && _myAudioSink && getDecodeAudioFlag()) {            
-            _myAudioSink->stop();
+            _myAudioTimeOffset = theStartTime;
         } 
         
         if (!isActive()) {
+            if(shouldSeek(0, theStartTime)) {
+                _myDemux->clearPacketCache();
+                _myMsgQueue.clear();
+                _myMsgQueue.reset();
+                doSeek(theStartTime);
+                if (hasAudio() && getDecodeAudioFlag()) {
+                    _myAudioTimeOffset = theStartTime;
+                    _myAdjustAudioOffsetFlag = true;
+                }
+            }
+            if (hasAudio() && getDecodeAudioFlag()) {
+                readAudio();
+            }
             decodeFrame();
+            
         }
-        if (hasAudio() && getDecodeAudioFlag()) {
-            readAudio();
-        }
-
+        
         setState(RUN);
         if (!isUnjoined()) {
             AC_DEBUG << "Forking FFMpegDecoder Thread";
@@ -312,7 +322,6 @@ namespace y60 {
         if (getState() != STOP) {
             AC_DEBUG << "Stopping Movie";
             
-            _myDecodedPacketsPerFrame = 0; // reset counter    
             _myLastVideoFrame = VideoMsgPtr();
             
             // seek to start (-1 indicates doSeek() to do so)
@@ -360,8 +369,9 @@ namespace y60 {
 
     
     bool FFMpegDecoder2::readAudio() {
-        AC_TRACE << "---- FFMpegDecoder2::readAudio:";
-        double myDestBufferedTime = _myAudioSink->getBufferedTime()+8/_myFrameRate;
+        AC_TRACE << "---- FFMpegDecoder2::readAudio: "<<_myAudioSink->getPumpTime();
+        //XXX: think about replacing BufferedTime with PumpTime here, as PumpTime is used anywhere else
+        double myDestBufferedTime = double(_myAudioSink->getBufferedTime())+8/_myFrameRate;
         if (myDestBufferedTime > AUDIO_BUFFER_SIZE) {
             myDestBufferedTime = AUDIO_BUFFER_SIZE;
         }
@@ -383,9 +393,16 @@ namespace y60 {
 
     void FFMpegDecoder2::addAudioPacket(const AVPacket & thePacket) {
         AC_TRACE << "FFMpegDecoder2::addAudioPacket()";
-        
-        double myTime = thePacket.dts / _myTimeUnitsPerSecond;
-        
+        int64_t pts = thePacket.dts;
+        if (thePacket.pts != AV_NOPTS_VALUE) {
+            pts = thePacket.pts;
+        }
+        double myTime = pts / (1/av_q2d(_myAStream->time_base));
+        if (_myAdjustAudioOffsetFlag) {
+            _myAdjustAudioOffsetFlag = false;
+            AC_DEBUG<<"adjusting audioTime old: "<<_myAudioTimeOffset<<", new: "<<(myTime - double(_myAudioSink->getBufferedTime()));
+            _myAudioTimeOffset = myTime - double(_myAudioSink->getBufferedTime());
+        }
         // we need an aligned buffer
         int16_t * myAlignedBuf;
         myAlignedBuf = (int16_t *)av_malloc( AVCODEC_MAX_AUDIO_FRAME_SIZE *10 );
@@ -463,6 +480,7 @@ namespace y60 {
     bool FFMpegDecoder2::decodeFrame() {
         AC_DEBUG << "---- FFMpegDecoder2::decodeFrame";
         AVPacket * myPacket = 0;
+        unsigned int myDecodedPacketsPerFrame = 0;
         START_TIMER(decodeFrame_ffmpegdecode);
         // until a frame is found or eof
         bool myEndOfFileFlag = false;
@@ -479,11 +497,13 @@ namespace y60 {
 #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52,27,0)
                 AVPacket myTempPacket;
                 av_init_packet(&myTempPacket);
+                myTempPacket.data = NULL;
+                myTempPacket.size = 0;
                 /*int myLen =*/ avcodec_decode_video2(_myVStream->codec, _myFrame,
                         &myFrameCompleteFlag, &myTempPacket);
 #else                
                 /*int myLen =*/ avcodec_decode_video(_myVStream->codec, _myFrame,
-                        &myFrameCompleteFlag, 0, 0);
+                        &myFrameCompleteFlag, NULL, 0);
 #endif                        
                 if (myFrameCompleteFlag) {
 		            AC_DEBUG << "---- decodeFrame: Last frame.";
@@ -531,8 +551,8 @@ namespace y60 {
                 
                 if(!myFrameCompleteFlag) {
                     // count dropped frames
-                    _myDecodedPacketsPerFrame++;                    
-                    AC_DEBUG << "### needed packets to decode frame: "<<_myDecodedPacketsPerFrame;
+                    myDecodedPacketsPerFrame++;                    
+                    AC_DEBUG << "### needed packets to decode frame: "<<myDecodedPacketsPerFrame;
                 }
                 // start_time indicates the begin of the video
                 if (myFrameCompleteFlag  && (myPacket->dts >= _myVStream->start_time)) {
@@ -658,21 +678,9 @@ namespace y60 {
         try {
             bool useLastVideoFrame = false;
             if (_myLastVideoFrame) {
-                if (getPlayMode() == y60::PLAY_MODE_PAUSE){
-                    if(shouldSeek(_myLastVideoFrame->getTime(), myStreamTime)) {
-                        seek(myStreamTime);
-                        if (hasAudio() && getDecodeAudioFlag()) {
-                            AC_DEBUG << "seek: set Audio";
-                            _myAudioSink->setCurrentTime(theTime);
-                            if (getState() == RUN) {
-                                readAudio();
-                                _myAudioSink->play();
-                            }
-                        }
-                    } else if (hasAudio()&& getDecodeAudioFlag()) {
-                        AC_DEBUG << "video paused no seeking and audio not running-> setcurrenttime: "<<theTime;
-                        _myAudioSink->setCurrentTime(theTime);
-                    }
+                if(shouldSeek(_myLastVideoFrame->getTime(), myStreamTime)) {
+                    seek(myStreamTime);
+                    return myStreamTime;
                 }
                 double myFrameTime = _myLastVideoFrame->getTime();
                 double myFrameDiff = (myStreamTime-myFrameTime)*_myFrameRate;
@@ -1026,9 +1034,21 @@ namespace y60 {
         _myMsgQueue.clear();
         _myMsgQueue.reset();
 
+        while (isUnjoined()) {
+            asl::msleep(10);
+        }
         doSeek(theDestTime);
 
+        _myLastVideoFrame = VideoMsgPtr();
+        if (_myAudioSink && getDecodeAudioFlag()) {
+            _myAudioSink->play();
+            _myAudioTimeOffset = theDestTime;
+            _myAdjustAudioOffsetFlag = true;
+        }
         if (!isActive()) {
+            if (hasAudio() && getDecodeAudioFlag()) {
+                readAudio();
+            }
             decodeFrame();
         }
         
@@ -1048,26 +1068,33 @@ namespace y60 {
         if(theDestTime == -1){
             //seek to begin of file
             AC_DEBUG<<"seeking to start"<<" starttime: "<< _myStartTimestamp;
-            /*int myResult =*/ av_seek_frame(_myFormatContext, _myVStreamIndex, 0, AVSEEK_FLAG_ANY);
+            /*int myResult =*/ av_seek_frame(_myFormatContext, _myVStreamIndex, 0, AVSEEK_FLAG_BACKWARD);
+            if (hasAudio() && getDecodeAudioFlag()) {
+                /*int myResult =*/ av_seek_frame(_myFormatContext, _myAStreamIndex, 0, AVSEEK_FLAG_BACKWARD);
+            }
         } else {
-            unsigned myLastIFrameOffset;
-            if(_myNumIFramesDecoded == 0){
-                myLastIFrameOffset = 1;
-            } else {
+            // beware, modern codecs have as default, up to 250 frames as keyframe interval -> if you want good seeking you have to reduce this interval
+            unsigned myLastIFrameOffset = 25;
+            if(_myNumIFramesDecoded != 0){
                 myLastIFrameOffset = unsigned(2*(_myNumFramesDecoded/_myNumIFramesDecoded));
             }
             AC_DEBUG<<"seekOffset: "<<myLastIFrameOffset<<" numIFrames: "<<_myNumIFramesDecoded;
-            int64_t myDestFrame = int64_t(theDestTime*_myFrameRate);
-            //int64_t myCalculatedSeekTime = int64_t(theDestTime*_myTimeUnitsPerSecond - myLastIFrameOffset*_myTimeUnitsPerSecond/_myFrameRate);
             double myCalculatedSeekTime = theDestTime - myLastIFrameOffset/_myFrameRate;
             myCalculatedSeekTime = ( myCalculatedSeekTime < 0) ? 0 : myCalculatedSeekTime;
             mySeekTimeInTimeBaseUnits = int64_t(myCalculatedSeekTime*_myTimeUnitsPerSecond);
-            AC_DEBUG<<"FFMpegDecoder2::doSeek real destTime: "<<theDestTime<<" destFrame: "<<myDestFrame
-                    <<"calculated SeekTime: "<< myCalculatedSeekTime<<" calculated SeekFrame: "<<myCalculatedSeekTime*_myFrameRate;
+            AC_DEBUG<<"FFMpegDecoder2::doSeek real destTime: "<<theDestTime<<" destFrame: "<<int64_t(theDestTime*_myFrameRate)
+                    <<" calculated SeekTime: "<< myCalculatedSeekTime<<" calculated SeekFrame: "<<myCalculatedSeekTime*_myFrameRate;
+            
+            // AVSEEK_FLAG_ANY: seek to any frame, even non keyframes -> results in artifacts until the next iframe is decoded
+            unsigned char mySeekFlags = /*AVSEEK_FLAG_ANY | */((_myLastVideoFrame && theDestTime < _myLastVideoFrame->getTime()) ? AVSEEK_FLAG_BACKWARD : 0); 
             /*int myResult =*/ av_seek_frame(_myFormatContext, _myVStreamIndex,
-                mySeekTimeInTimeBaseUnits, AVSEEK_FLAG_BACKWARD);
+                                    mySeekTimeInTimeBaseUnits, mySeekFlags);
+            if (hasAudio() && getDecodeAudioFlag()) {
+                mySeekTimeInTimeBaseUnits = int64_t(theDestTime*(1/ av_q2d(_myAStream->time_base)));
+                /*int myResult =*/ av_seek_frame(_myFormatContext, _myAStreamIndex,
+                                         mySeekTimeInTimeBaseUnits, mySeekFlags);
+            }
         }
-        _myDecodedPacketsPerFrame = 0;
         avcodec_flush_buffers(_myVStream->codec);
         if (_myAStream) {
             avcodec_flush_buffers(_myAStream->codec);

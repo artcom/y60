@@ -237,8 +237,7 @@ namespace y60 {
 
         int _myNumFramesDecoded;
         int _myNumIFramesDecoded;
-        int _myDecodedPacketsPerFrame;
-
+        
         //XXX: Since time_base is specified per stream by ffmpeg, we should really be 
         //     calculating this per stream and not per file.
         double _myTimeUnitsPerSecond;
@@ -250,6 +249,7 @@ namespace y60 {
         int _myFrameHeight;
         unsigned  _myBytesPerPixel;
         double _myLastFrameTime;  // Only used for mpeg1/2 end of file handling.
+        bool _myAdjustAudioOffsetFlag;
         bool _hasShutDown;
 
     };
