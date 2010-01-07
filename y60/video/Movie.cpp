@@ -218,7 +218,9 @@ namespace y60 {
                 myMovieRaster.push_back(getRasterPtr(i));
             }
             myReturnTime = _myDecoder->readFrame(theTime, theFrame, myMovieRaster);
-            if (myReturnTime != theTime) {
+            if (myReturnTime == -1) {
+                return myReturnTime;
+            } else if (myReturnTime != theTime) {
                 _myLastDecodedFrame = getFrameFromTime(myReturnTime);
             } else {
                 _myLastDecodedFrame = theFrame; // M60
@@ -257,8 +259,6 @@ namespace y60 {
                     myFrame++;
                     double myMovieTime = getTimeFromFrame(myFrame);
                     decodeFrame(myMovieTime, myFrame);
-                    _myLastDecodedFrame = myFrame;
-                    set<CurrentFrameTag>(myFrame);
                 }
                 _myDecoder->setEOF(false);
                 _myDecoder->setDecodeAudioFlag(true);
@@ -358,7 +358,6 @@ namespace y60 {
         }
         DB(AC_DEBUG << "Next Frame: " << myNextFrame << ", lastDecodedFrame: " 
             << _myLastDecodedFrame << ", MovieTime: " << myMovieTime;)
-        set<CurrentFrameTag>(myNextFrame);
         decodeFrame(myMovieTime, myNextFrame);
         
         // check for eof in the decoder
@@ -379,18 +378,17 @@ namespace y60 {
         //DK my workaround for not knowing how to const_cast the asl::Ptr itself
         MovieDecoderBase & myDecoder = const_cast<MovieDecoderBase&>(*_myDecoder);
         theTime = myDecoder.getMovieTime(_myLastCurrentTime);
-        AC_DEBUG << "Movie::getMovieTime systime " << _myLastCurrentTime
-            << " got " << theTime;
+        DB2(AC_DEBUG << "Movie::getMovieTime systime " << _myLastCurrentTime
+            << " got " << theTime;)
         return true;
     }
 
 
 
     bool Movie::getDecoderName(std::string & theName) const {
-        AC_DEBUG << "Movie::getDecoderName";
         MovieDecoderBase & myDecoder = const_cast<MovieDecoderBase&>(*_myDecoder);
         theName = myDecoder.getName();
-        AC_DEBUG << "Movie::getDecoderName got " << theName;
+        DB2(AC_DEBUG << "Movie::getDecoderName got " << theName;)
         return true;
     }
 

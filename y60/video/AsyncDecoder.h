@@ -86,8 +86,8 @@ namespace y60 {
         public:
             AsyncDecoder() :
                 _myCachingFlag(false),
-                _myState(STOP),
-                _myAudioTimeOffset(0)
+                _myAudioTimeOffset(0),
+                _myState(STOP)
             {}
 
             /**
@@ -111,17 +111,14 @@ namespace y60 {
                     AC_DEBUG << "No Audio returning " << MovieDecoderBase::getMovieTime(theSystemTime);
                     return MovieDecoderBase::getMovieTime(theSystemTime);
                 } else {
-                        AC_DEBUG << " returning audio time " << _myAudioSink->getPumpTime()<<" audioOffset: "<<_myAudioTimeOffset
-                                <<" video time: "<<MovieDecoderBase::getMovieTime(theSystemTime);
-                        // audio is not running yet, maybe cause we are buffering, so do not show any video frames
-                        if (_myAudioSink->getState() == asl::HWSampleSink::STOPPED || _myCachingFlag) {
-                            return 0;
-                        } else {
-                            //return _myAudioSink->getCurrentTime();
-                            return _myAudioTimeOffset + double(_myAudioSink->getPumpTime());                            
-                            //return MovieDecoderBase::getMovieTime(theSystemTime);
-                        }
-                    //}
+                    AC_DEBUG << " returning audio time " << _myAudioSink->getPumpTime()<<" audioOffset: "<<_myAudioTimeOffset
+                            <<" video time: "<<MovieDecoderBase::getMovieTime(theSystemTime);
+                    // audio is not running yet, maybe cause we are buffering, so do not show any video frames
+                    if (_myAudioSink->getState() == asl::HWSampleSink::STOPPED || _myCachingFlag) {
+                        return 0;
+                    } else {
+                        return _myAudioTimeOffset + double(_myAudioSink->getPumpTime());                            
+                    }
                 }
             }
 
