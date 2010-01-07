@@ -97,9 +97,10 @@ namespace y60 {
             Demux(AVFormatContext * myFormatContext);
             virtual ~Demux();
            
-            void enableStream(int theStreamIndex);
-            AVPacket * getPacket(int theStreamIndex);
+            void enableStream(const int theStreamIndex);
+            AVPacket * getPacket(const int theStreamIndex);
             void clearPacketCache();
+            void clearPacketCache(const int theStreamIndex);
             void dump();
             
         private:

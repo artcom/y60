@@ -206,8 +206,7 @@ namespace y60 {
             if (_myVStreamIndex == -1 && myCodecType == CODEC_TYPE_VIDEO) {
                 _myVStreamIndex = i;
                 _myVStream = _myFormatContext->streams[i];
-            }
-            else if (_myAStreamIndex == -1 && myCodecType == CODEC_TYPE_AUDIO) {
+            } else if (_myAStreamIndex == -1 && myCodecType == CODEC_TYPE_AUDIO) {
                 _myAStreamIndex = i;
                 _myAStream = _myFormatContext->streams[i];
             }
@@ -263,17 +262,29 @@ namespace y60 {
 
     void FFMpegDecoder2::startMovie(double theStartTime, bool theStartAudioFlag) {
         AC_INFO << "FFMpegDecoder2::startMovie, time: " << theStartTime;
-        Movie * myMovie = getMovie();
-        _myMaxCacheSize = myMovie->get<MaxCacheSizeTag>();
-        _myLastVideoFrame = VideoMsgPtr();
-
+        if (isUnjoined()) {
+            DB(AC_DEBUG << "Joining FFMpegDecoder Thread");
+            join();
+        }
+        while (isUnjoined()) {
+            asl::msleep(10);
+        }
+        
         if (theStartAudioFlag && hasAudio() && getDecodeAudioFlag()) {            
             _myAudioTimeOffset = theStartTime;
             _myAudioSink->stop();
-        } 
+            // ensure that the audio buffer is stopped and cleared
+            while (_myAudioSink->getState() != HWSampleSink::STOPPED) {
+                asl::msleep(10);
+            }
+        }
+        Movie * myMovie = getMovie();
+        _myMaxCacheSize = myMovie->get<MaxCacheSizeTag>();
+        _myLastVideoFrame = VideoMsgPtr();
+        setState(RUN);
         
         if (!isActive()) {
-            if(shouldSeek(0, theStartTime)) {
+            if (shouldSeek(0, theStartTime)) {
                 _myDemux->clearPacketCache();
                 _myMsgQueue.clear();
                 _myMsgQueue.reset();
@@ -281,6 +292,13 @@ namespace y60 {
                 if (theStartAudioFlag && hasAudio() && getDecodeAudioFlag()) {
                     _myAdjustAudioOffsetFlag = true;
                 }
+            } else if (theStartAudioFlag && hasAudio() && getDecodeAudioFlag()) {
+                _myAdjustAudioOffsetFlag = true;
+                _myDemux->clearPacketCache(_myAStreamIndex);
+                av_seek_frame(_myFormatContext, _myAStreamIndex,
+                              theStartTime, AVSEEK_FLAG_BACKWARD);
+                avcodec_flush_buffers(_myAStream->codec);
+                _myAudioSink->play();
             }
             if (theStartAudioFlag && hasAudio() && getDecodeAudioFlag()) {
                 readAudio();
@@ -288,7 +306,6 @@ namespace y60 {
             decodeFrame();
         }
         
-        setState(RUN);
         if (!isUnjoined()) {
             AC_DEBUG << "Forking FFMpegDecoder Thread";
             PosixThread::fork();
@@ -397,8 +414,8 @@ namespace y60 {
         double myTime = pts / (1/av_q2d(_myAStream->time_base));
         if (_myAdjustAudioOffsetFlag) {
             _myAdjustAudioOffsetFlag = false;
-            AC_DEBUG<<"adjusting audioTime old: "<<_myAudioTimeOffset<<", new: "<<(myTime - double(_myAudioSink->getBufferedTime()));
-            _myAudioTimeOffset = myTime - double(_myAudioSink->getBufferedTime());
+            AC_DEBUG<<"adjusting audioTimeOffset old: "<<_myAudioTimeOffset<<", new: "<<myTime;
+            _myAudioTimeOffset = myTime;
         }
         // we need an aligned buffer
         int16_t * myAlignedBuf;
@@ -465,7 +482,7 @@ namespace y60 {
                 myBuffer->convert(myAlignedBuf, SF_S16, myNumChannels);
             }
             _myAudioSink->queueSamples(myBuffer);
-            AC_TRACE << "decoded audio time=" << myTime;
+            AC_DEBUG << "decoded audio time=" << myTime;
         } // while
         
         av_free( myAlignedBuf );
@@ -915,7 +932,7 @@ namespace y60 {
                 myDuration = (_myFormatContext->duration - _myFormatContext->start_time )*_myFrameRate/(double)AV_TIME_BASE;
             }
             myMovie->set<FrameCountTag>(int(myDuration));
-	        _myTimeUnitsPerSecond = 1/ av_q2d(_myVStream->time_base);//_myFrameRate;
+	        _myTimeUnitsPerSecond = 1/ av_q2d(_myVStream->time_base);
 	    }
         AC_INFO << "FFMpegDecoder2::setupVideo() " << theFilename << " fps="
                 << _myFrameRate << " framecount=" << getFrameCount()<< " time_base: "
@@ -1004,16 +1021,21 @@ namespace y60 {
             DB(AC_DEBUG << "Joining FFMpegDecoder Thread");
             join();
         }
+        while (isUnjoined()) {
+            asl::msleep(10);
+        }
         if (hasAudio() && getDecodeAudioFlag()) {
             _myAudioSink->stop();
+            // ensure that the audio buffer is stopped and cleared
+            while (_myAudioSink->getState() != HWSampleSink::STOPPED) {
+                asl::msleep(10);
+            }
         }
+
         _myDemux->clearPacketCache();
         _myMsgQueue.clear();
         _myMsgQueue.reset();
 
-        while (isUnjoined()) {
-            asl::msleep(10);
-        }
         doSeek(theDestTime);
 
         _myLastVideoFrame = VideoMsgPtr();

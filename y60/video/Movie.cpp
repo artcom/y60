@@ -167,7 +167,6 @@ namespace y60 {
     void
     Movie::restart(double theCurrentTime) {
         AC_DEBUG  << "Movie::restart";
-        //_myDecoder->stopMovie();
         _myLastDecodedFrame = std::numeric_limits<unsigned>::max();        
         _myDecoder->startMovie(0);
         double myMovieTime = _myDecoder->getMovieTime(theCurrentTime);

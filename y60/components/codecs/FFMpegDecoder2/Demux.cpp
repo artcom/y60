@@ -75,12 +75,12 @@ Demux::~Demux()
     clearPacketCache();
 }
 
-void Demux::enableStream(int theStreamIndex)
+void Demux::enableStream(const int theStreamIndex)
 {
     _myPacketLists[theStreamIndex] = PacketList();
 }
 
-AVPacket * Demux::getPacket(int theStreamIndex)
+AVPacket * Demux::getPacket(const int theStreamIndex)
 {
     AC_TRACE << "Demux::getPacket";
     if (_myPacketLists.find(theStreamIndex) == _myPacketLists.end()) {
@@ -131,7 +131,6 @@ AVPacket * Demux::getPacket(int theStreamIndex)
         return myPacket; 
     }
 }
-
 void Demux::clearPacketCache()
 {
     map<int, PacketList>::iterator it;
@@ -144,6 +143,21 @@ void Demux::clearPacketCache()
         }
         thePacketList->clear();
     }
+}
+
+void Demux::clearPacketCache(const int theStreamIndex)
+{
+    if (_myPacketLists.find(theStreamIndex) == _myPacketLists.end()) {
+        AC_ERROR << "Demux::clearPacketCache called with nonexistent stream index " 
+            << theStreamIndex << ".";
+    }
+    PacketList * myCurPacketList = &(_myPacketLists.find(theStreamIndex)->second);
+    PacketList::iterator it;
+    for (it=myCurPacketList->begin(); it != myCurPacketList->end(); ++it) {
+        av_free_packet(*it);
+        delete *it;
+    }
+    myCurPacketList->clear();
 }
 
 void Demux::dump()
