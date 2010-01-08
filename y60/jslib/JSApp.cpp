@@ -68,6 +68,10 @@
 #include <list>
 #include <map>
 
+#ifdef USE_CRYPTOPP
+#include <crypto++/sha.h>
+#endif
+
 #include <asl/base/string_functions.h>
 #include <asl/base/file_functions.h>
 #include <asl/zip/DirectoryPackage.h>
@@ -1356,6 +1360,41 @@ checksumFromString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval 
     return JS_FALSE;
 }
 
+#ifdef USE_CRYPTOPP
+static JSBool
+sha1FromBlock(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Converts a Block into a sha1 checksum.");
+    DOC_PARAM("theBlock", "A Block", DOC_TYPE_OBJECT);
+    DOC_RVAL("A SHA-1 checksum as hex string", DOC_TYPE_STRING);
+    DOC_END;
+    if (argc == 1) {
+        if (JSVAL_IS_VOID(argv[0])) {
+            JS_ReportError(cx, "sha1FromBlock(): Argument #%d is undefined", 1);
+            return JS_FALSE;
+        }
+
+        asl::Block* myContentBlockPtr = 0;
+        if (!convertFrom(cx, argv[0], myContentBlockPtr)) {
+            JS_ReportError(cx, "sha1FromBlock(): argument #1 must be a Block");
+            return JS_FALSE;
+        }
+        // copy block due to garbage collection
+        asl::Ptr<asl::ReadableBlock> myReadableBlockPtr(new asl::Block(*myContentBlockPtr));
+        
+        unsigned char* myDigestBuffer = new unsigned char[CryptoPP::SHA1::DIGESTSIZE];
+        CryptoPP::SHA1().CalculateDigest(myDigestBuffer, myReadableBlockPtr->begin(),
+            myReadableBlockPtr->size());        
+        std::string myFinalHexEncodedShaSum;
+        asl::binToString(myDigestBuffer, CryptoPP::SHA1::DIGESTSIZE, myFinalHexEncodedShaSum);
+        delete [] myDigestBuffer;
+        *rval = as_jsval(cx, myFinalHexEncodedShaSum);
+        return JS_TRUE;
+    }
+    JS_ReportError(cx,"sha1FromBlock: bad number of arguments should be one, got %d", argc);
+    return JS_FALSE;
+}
+#endif
+
 static JSBool
 asHexString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Converts a byte into a string of two hex-characters. (e.g. 255 -> 'FF'");
@@ -1579,6 +1618,9 @@ static JSFunctionSpec glob_functions[] = {
     {"fromHexString",   fromHexString,   1},
     {"asHexString",     asHexString,     1},
     {"checksumFromString",checksumFromString, 1},
+    #ifdef USE_CRYPTOPP
+    {"sha1FromBlock",   sha1FromBlock, 1},
+    #endif
     {"urlEncode",       urlEncode,       1},
     {"urlDecode",       urlDecode,       1},
 

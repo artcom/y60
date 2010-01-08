@@ -36,6 +36,9 @@ list(APPEND REQ_PACKAGES FFMPEG)
 # input device support
 list(APPEND OPT_PACKAGES TUIO)
 
+# crypto++
+list(APPEND OPT_PACKAGES Crypto++)
+
 
 if(WIN32)
 
