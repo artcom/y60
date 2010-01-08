@@ -70,14 +70,23 @@ y60_jslib_settings.h
 
 if(CRYPTOPP_FOUND)
     add_definitions(-DUSE_CRYPTOPP)
+    ac_add_library(
+        y60jslib y60/jslib
+        SOURCES ${SOURCES}
+        HEADERS ${HEADERS}
+        DEPENDS aslbase aslmath asldom aslxpath aslserial
+                y60base y60scene y60image y60video y60input y60inet y60glrender
+                y60glutil y60gltext y60jsbase y60modelling paintlib 
+        EXTERNS CRYPTOPP
+    )
+else(CRYPTOPP_FOUND)
+    ac_add_library(
+        y60jslib y60/jslib
+        SOURCES ${SOURCES}
+        HEADERS ${HEADERS}
+        DEPENDS aslbase aslmath asldom aslxpath aslserial
+                y60base y60scene y60image y60video y60input y60inet y60glrender
+                y60glutil y60gltext y60jsbase y60modelling paintlib 
+    )
 endif(CRYPTOPP_FOUND)
 
-ac_add_library(
-    y60jslib y60/jslib
-    SOURCES ${SOURCES}
-    HEADERS ${HEADERS}
-    DEPENDS aslbase aslmath asldom aslxpath aslserial
-            y60base y60scene y60image y60video y60input y60inet y60glrender
-            y60glutil y60gltext y60jsbase y60modelling paintlib 
-    EXTERNS CRYPTOPP
-)
