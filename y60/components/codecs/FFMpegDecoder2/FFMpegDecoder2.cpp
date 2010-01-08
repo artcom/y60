@@ -281,7 +281,6 @@ namespace y60 {
         Movie * myMovie = getMovie();
         _myMaxCacheSize = myMovie->get<MaxCacheSizeTag>();
         _myLastVideoFrame = VideoMsgPtr();
-        setState(RUN);
         
         if (!isActive()) {
             if (shouldSeek(0, theStartTime)) {
@@ -296,15 +295,15 @@ namespace y60 {
                 _myAdjustAudioOffsetFlag = true;
                 _myDemux->clearPacketCache(_myAStreamIndex);
                 av_seek_frame(_myFormatContext, _myAStreamIndex,
-                              theStartTime, AVSEEK_FLAG_BACKWARD);
+                              (int64_t)floor(theStartTime), AVSEEK_FLAG_BACKWARD);
                 avcodec_flush_buffers(_myAStream->codec);
-                _myAudioSink->play();
             }
             if (theStartAudioFlag && hasAudio() && getDecodeAudioFlag()) {
                 readAudio();
             }
             decodeFrame();
         }
+        setState(RUN);
         
         if (!isUnjoined()) {
             AC_DEBUG << "Forking FFMpegDecoder Thread";
@@ -970,18 +969,17 @@ namespace y60 {
 
         if (myACodec->sample_rate != static_cast<int>(Pump::get().getNativeSampleRate()))
         {
-            //XXX: find a way to handle ffmpeg::SampleFormat and asl::SampleFormat            
-/*#if  LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(51,28,0)            
+#if  LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(52,15,0)         
             _myResampleContext = av_audio_resample_init(
                     myACodec->channels, myACodec->channels,
                     Pump::get().getNativeSampleRate(), myACodec->sample_rate,
-                    Pump::get().getNativeSampleFormat(), myACodec->sample_fmt,
+                    SAMPLE_FMT_S16, myACodec->sample_fmt,
                     16, 10, 0, 0.8);
-#else*/            
+#else
             _myResampleContext = audio_resample_init(myACodec->channels,
                     myACodec->channels, Pump::get().getNativeSampleRate(),
                     myACodec->sample_rate);
-/*#endif*/            
+#endif
         }
         AC_TRACE << "FFMpegDecoder2::setupAudio() done. resampling "
             << (_myResampleContext != 0);
