@@ -67,11 +67,13 @@
 #include <y60/jsbase/JSBox2f.h>
 #include <y60/jsbase/JSMatrix.h>
 #include <y60/jsbase/JSSphere.h>
+#include <y60/jsbase/JSBlock.h>
 
 #include "JSScene.h"
 #include <y60/jsbase/JSWrapper.impl>
 #include <y60/modelling/modelling_functions.h>
 #include <y60/scene/Body.h>
+#include <y60/image/ImageLoader.h>
 
 #include <iostream>
 
@@ -731,6 +733,74 @@ CreateImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
 
 
 JS_STATIC_DLL_CALLBACK(JSBool)
+CreateImageFromBlock(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Creates an image from a readable block (e.g. as provided by a http GET");
+    DOC_PARAM("theScene", "Scene where the image is created", DOC_TYPE_SCENE);
+    DOC_PARAM("theBlock", "Block with the image data", DOC_TYPE_OBJECT);
+    DOC_END;
+
+    try {
+
+        // convert arguments
+
+        ensureParamCount(argc, 2);
+        
+        y60::ScenePtr myScene;
+        if (!convertFrom( cx, argv[0], myScene )) {
+            JS_ReportError( cx, "argument #1 must be a Scene" );
+            return JS_FALSE;
+        }
+
+        asl::Block* myContentPtr = 0;
+        if (!convertFrom( cx, argv[1], myContentPtr )) {
+            JS_ReportError( cx, "argument #2 must be a Block" );
+            return JS_FALSE;
+        }
+
+        // make a copy (or we get problems with the garbage collection)
+//        asl::Block myImageBlock(*myContentPtr); 
+
+        // create image node
+        dom::NodePtr myImageNode = myScene->getImagesRoot()->appendChild(
+            dom::NodePtr(new dom::Element("image")));
+        myImageNode->appendAttribute(ID_ATTRIB, IdTag::getDefault());
+
+        y60::ImagePtr myImage = myImageNode->getFacade<y60::Image>();
+
+        // load image
+        asl::Ptr<asl::ReadableBlock> myImageBlockPtr( new asl::Block(*myContentPtr));
+        asl::Ptr<asl::ReadableBlockHandle> myBlockHandlePtr(new asl::AnyReadableBlockHandle(myImageBlockPtr));
+        y60::ImageLoader myImageLoader( myBlockHandlePtr );
+
+        dom::ResizeableRasterPtr myRaster = myImageLoader.getRaster();
+        y60::PixelEncoding myEncoding = myImageLoader.getEncoding();
+       
+        // remove existing raster
+        if (myImageNode->childNodes().size()) {
+            myImageNode->childNodes().clear();
+        }
+        
+        // Setup raster attributes
+        myImage->set<ImageDepthTag>(1);
+        myImage->set<RasterPixelFormatTag>(getStringFromEnum(myEncoding, PixelEncodingString));
+        myImage->set<ImageBytesPerPixelTag>(float(getBytesRequired(4, myEncoding))/4.0f);   
+
+        // Setup raster nodes
+        dom::DOMString myRasterName = RasterElementNames[myEncoding];
+        dom::NodePtr myRasterChild = myImageNode->appendChild(dom::NodePtr(new dom::Element(myRasterName)));
+        dom::NodePtr myTextChild = myRasterChild->appendChild(dom::NodePtr(new dom::Text()));
+        myTextChild->nodeValueWrapperPtr(myImageLoader.getData());
+
+        myImageNode->bumpVersion();
+
+        *rval = as_jsval(cx, myImageNode);
+        return JS_TRUE;
+
+    } HANDLE_CPP_EXCEPTION;
+}
+
+
+JS_STATIC_DLL_CALLBACK(JSBool)
 CreateColorMaterial(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Creates an untextured and unlit colored material.");
     DOC_PARAM("theScene", "The scene to create the material inside", DOC_TYPE_SCENE);    
@@ -1241,6 +1311,7 @@ JSModellingFunctions::StaticFunctions() {
         {"createQuadStack",             CreateQuadStack,             5},
         {"createTexture",               CreateTexture,               2},
         {"createImage",                 CreateImage,                 4},
+        {"createImageFromBlock",        CreateImageFromBlock,        4},
         {"createLambertMaterial",       CreateLambertMaterial,       3},
         {"createColorMaterial",         CreateColorMaterial,         3},
         {"createUnlitTexturedMaterial", CreateUnlitTexturedMaterial, 7},
