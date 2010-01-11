@@ -1,6 +1,7 @@
 
 add_subdirectory(audio)
 add_subdirectory(codecs)
+add_subdirectory(crypto)
 add_subdirectory(example)
 add_subdirectory(graphics)
 add_subdirectory(formats)
