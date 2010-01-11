@@ -85,7 +85,7 @@ spark.loadFont = function(theName, theSize, theStyle) {
         // crispy aber rottenschlechtes spacing -> Natives Fonthinting (Renderer.NATIVEHINTING)
         // wenig crispy aber okes spacing -> Autohinting (Renderer.AUTOHINTING)
 
-        // XXX: inconsistent hinting!?
+        // XXX: inconsistent hinting!?        
         if (theStyle != "normal") {
            // enforce loadttf of a normal font, otherwise we get an exception
            window.loadTTF(myName, myFontPath, theSize, Renderer.AUTOHINTING , spark.styleFromString("normal"));
@@ -93,6 +93,21 @@ spark.loadFont = function(theName, theSize, theStyle) {
         window.loadTTF(myName, myFontPath, theSize, Renderer.NOHINTING , spark.styleFromString(theStyle));
         
         spark.ourLoadedFonts[myName] = true;
+
+       // always load the bold variant to allow the bold tag <b>...</b> to be used
+       if(spark.styleFromString(theStyle) != Renderer.BOLD) {
+           var myFont = theName.split("-")[0];
+           if (searchFile("FONTS/" + myFont + "-bold" + ".otf")) {
+               myFontPath = searchFile("FONTS/" + myFont + "-bold" + ".otf");
+           } else {
+               myFontPath = searchFile("FONTS/" + myFont + "-bold" + ".ttf");
+           }
+           if (myFontPath != undefined) {
+               Logger.info("loading bold font for " + myName + "," + myFontPath + "," + Renderer.AUTOHINTING + "," + "bold")
+               window.loadTTF(myName, searchFile(myFontPath), theSize, Renderer.AUTOHINTING , Renderer.BOLD);
+           }
+       }
+        
     }
     return myName;
 };
