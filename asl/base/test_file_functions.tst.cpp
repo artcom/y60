@@ -249,12 +249,25 @@ class DirectoryTest : public UnitTest {
             vector<string> myDirEntries = getDirectoryEntries(myDir);
             std::sort(myDirEntries.begin(), myDirEntries.end());
 
-            ENSURE(myDirEntries.size() == 5);
-            //        ENSURE_MSG(myDirEntries[0] == ".svn "found dir .svn, ;-)");
-            ENSURE_MSG(myDirEntries[1] == "a" , "found dir a");
-            ENSURE_MSG(myDirEntries[2] == "b" , "found dir b");
-            ENSURE_MSG(myDirEntries[3] == "c" , "found dir c");
-            ENSURE_MSG(myDirEntries[4] == "d" , "found dir d");
+            if(myDirEntries.size() == 5) { // subversion checkout, .svn present
+
+                ENSURE(myDirEntries.size() == 5);
+
+                ENSURE_MSG(myDirEntries[0] == ".svn", "found dir .svn");
+                ENSURE_MSG(myDirEntries[1] == "a" , "found dir a");
+                ENSURE_MSG(myDirEntries[2] == "b" , "found dir b");
+                ENSURE_MSG(myDirEntries[3] == "c" , "found dir c");
+                ENSURE_MSG(myDirEntries[4] == "d" , "found dir d");
+
+            } else { // git checkout, no metadata directory
+                ENSURE(myDirEntries.size() == 4);
+
+                ENSURE_MSG(myDirEntries[0] == "a" , "found dir a");
+                ENSURE_MSG(myDirEntries[1] == "b" , "found dir b");
+                ENSURE_MSG(myDirEntries[2] == "c" , "found dir c");
+                ENSURE_MSG(myDirEntries[3] == "d" , "found dir d");
+            }
+
 
             ENSURE_EXCEPTION(getDirectoryEntries("../../testdir/a"), OpenDirectoryFailed);
             ENSURE_EXCEPTION(getDirectoryEntries("nonexistingdir"), OpenDirectoryFailed);
