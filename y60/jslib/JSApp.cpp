@@ -1337,7 +1337,7 @@ fromHexString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
 static JSBool
 checksumFromString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Converts a string into a crc checksum.");
-    DOC_PARAM("theString", "A string", DOC_TYPE_INTEGER);
+    DOC_PARAM("theString", "A string", DOC_TYPE_STRING);
     DOC_RVAL("An int representing the checksum", DOC_TYPE_STRING);
     DOC_END;
     if (argc == 1) {
