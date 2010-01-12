@@ -298,9 +298,9 @@ spark.Widget.Constructor = function(Protected) {
         Public.originZ = theValue.z;
     });
 
-    this.Property("originX", Number, 1.0, applyOrigin);
-    this.Property("originY", Number, 1.0, applyOrigin);
-    this.Property("originZ", Number, 1.0, applyOrigin);
+    this.Property("originX", Number, 0.0, applyOrigin);
+    this.Property("originY", Number, 0.0, applyOrigin);
+    this.Property("originZ", Number, 0.0, applyOrigin);
 
     function applyOrigin() {
     };
