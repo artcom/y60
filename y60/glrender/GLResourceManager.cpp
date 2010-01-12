@@ -1092,6 +1092,19 @@ namespace y60 {
         PixelEncodingInfo myEncodingInfo = getDefaultGLTextureParams(myEncoding);
         myEncodingInfo.internalformat = 
             asGLTextureInternalFormat(theTexture->getInternalEncoding());
+        // after loading the bitmap from disk it is not clear wheater gray pixels
+        // were meant as luminance or alpha
+        // we treat them as luminance unless the user specifies the texture pixel format
+        // as alpha (vs/ds, 2010)
+        if (myEncoding == y60::GRAY) {
+            if (myEncodingInfo.internalformat == GL_ALPHA ||
+                myEncodingInfo.internalformat == GL_ALPHA8 ||
+                myEncodingInfo.internalformat == GL_ALPHA16)
+            {
+                myEncodingInfo.externalformat = GL_ALPHA;
+            }
+        }
+
         AC_DEBUG << "GLResourceManager::getPixelEncoding, image raster encoding '" << asl::getStringFromEnum(myEncoding, PixelEncodingString) 
                 << ", texture internal format = " << asl::getStringFromEnum(theTexture->getInternalEncoding(), TextureInternalFormatStrings);
         return myEncodingInfo;
