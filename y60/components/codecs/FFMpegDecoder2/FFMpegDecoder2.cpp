@@ -969,7 +969,7 @@ namespace y60 {
 
         if (myACodec->sample_rate != static_cast<int>(Pump::get().getNativeSampleRate()))
         {
-#if  LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(52,15,0)         
+#if  LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52,15,0)         
             _myResampleContext = av_audio_resample_init(
                     myACodec->channels, myACodec->channels,
                     Pump::get().getNativeSampleRate(), myACodec->sample_rate,
