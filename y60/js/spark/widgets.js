@@ -164,17 +164,11 @@ spark.Widget.Constructor = function(Protected) {
     
     // ALPHA
 
-    var _myAlpha = 1.0;
+    this.Property("alpha", Number, 1.0, applyAlpha);
 
-    Public.Getter("alpha", function() {
-        return _myAlpha;
-    });
-
-    Public.Setter("alpha", function(theValue) {
-        _myAlpha = theValue;
+    function applyAlpha() {
         Public.propagateAlpha();
-    });
-
+    };
 
     var _myActualAlpha = 1.0;
 
@@ -193,7 +187,7 @@ spark.Widget.Constructor = function(Protected) {
 
 
     Public.propagateAlpha = function() {
-        _myActualAlpha = Public.parentAlpha * _myAlpha;
+        _myActualAlpha = Public.parentAlpha * Public.alpha;//_myAlpha;
 
         for(var i = 0; i < Public.children.length; i++) {
             var myChild = Public.children[i];
@@ -439,8 +433,9 @@ spark.Widget.Constructor = function(Protected) {
         applyScale();
         applyRotation();
         applyPivot();
-
-        Public.propagateAlpha();
+        applyAlpha();
+        
+        //Public.propagateAlpha();
     };
 
     Base.postRealize = Public.postRealize;
