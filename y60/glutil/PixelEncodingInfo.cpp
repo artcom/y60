@@ -100,6 +100,7 @@ namespace y60 {
         switch (theFormat) {
             case GL_DEPTH_COMPONENT: return "GL_DEPTH_COMPONENT"; 
             case GL_ALPHA: return "GL_ALPHA"; 
+            case GL_LUMINANCE: return "GL_LUMINANCE"; 
             case GL_LUMINANCE8: return "GL_LUMINANCE8"; 
             case GL_LUMINANCE16: return "GL_LUMINANCE16"; 
             case GL_INTENSITY: return "GL_INTENSITY"; 
