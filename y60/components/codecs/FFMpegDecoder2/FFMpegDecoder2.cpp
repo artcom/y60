@@ -157,6 +157,7 @@ namespace y60 {
             asl::toLowerCase(asl::getExtension(theUrl)) == "mp4" ||
             asl::toLowerCase(asl::getExtension(theUrl)) == "mkv" ||
             asl::toLowerCase(asl::getExtension(theUrl)) == "mov" ||
+            asl::toLowerCase(asl::getExtension(theUrl)) == "flv" ||
             asl::toLowerCase(asl::getExtension(theUrl)) == "mpeg") {
             AC_TRACE << "FFMpegDecoder2 can decode :" << theUrl << endl;
             return MIME_TYPE_MPG;

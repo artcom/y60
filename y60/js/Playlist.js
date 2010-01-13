@@ -195,7 +195,15 @@ Playlist.prototype.Constructor = function(self) {
             return CAPTURE_MEDIA;
         } else if (theUrl.search(/\.mp3$/i)  != -1 ||
                    theUrl.search(/\.mp2$/i)  != -1 ||
+                   theUrl.search(/\.ogg$/i)  != -1 ||
+                   theUrl.search(/\.flac$/i)  != -1 ||
+                   theUrl.search(/\.mpc$/i)  != -1 ||
+                   theUrl.search(/\.ape$/i)  != -1 ||
+                   theUrl.search(/\.ac3$/i)  != -1 ||
+                   theUrl.search(/\.aac$/i)  != -1 ||
                    theUrl.search(/\.wma$/i)  != -1 ||
+                   theUrl.search(/\.aif$/i)  != -1 ||
+                   theUrl.search(/\.aiff$/i)  != -1 ||
                    theUrl.search(/\.rm$/i)   != -1 ||
                    theUrl.search(/\.ra$/i)   != -1 ||
                    theUrl.search(/\.wav$/i)  != -1 ||
@@ -206,13 +214,16 @@ Playlist.prototype.Constructor = function(self) {
             return AUDIO_MEDIA;
         } else if (theUrl.search(/\.m60$/i)  != -1 ||
                    theUrl.search(/\.mp4$/i)  != -1 ||
+                   theUrl.search(/\.m4a$/i)  != -1 ||
                    theUrl.search(/\.mkv$/i)  != -1 ||
+                   theUrl.search(/\.flv$/i)  != -1 ||
                    theUrl.search(/\.mpg$/i)  != -1 ||
                    theUrl.search(/\.mpeg$/i) != -1 ||
                    theUrl.search(/\.divx$/i) != -1 ||
                    theUrl.search(/\.avi$/i)  != -1 ||
                    theUrl.search(/\.wmv$/i)  != -1 ||
                    theUrl.search(/\.mov$/i)  != -1 ||
+                   theUrl.search(/\.m4v$/i)  != -1 ||
                    theUrl.search(/\.m2v$/i)  != -1)
         {
             return VIDEO_MEDIA;
@@ -255,12 +266,17 @@ Playlist.prototype.Constructor = function(self) {
         }
         var myDecoderHint = "";
         if (theUrl.search(/\.mpg$/i)  != -1 ||
+            theUrl.search(/\.mp4$/i)  != -1 ||
+            theUrl.search(/\.m4a$/i)  != -1 ||
+            theUrl.search(/\.mkv$/i)  != -1 ||
+            theUrl.search(/\.flv$/i)  != -1 ||
             theUrl.search(/\.mpeg$/i) != -1 ||
-            theUrl.search(/\.mp4$/i) != -1 ||
             theUrl.search(/\.divx$/i) != -1 ||
             theUrl.search(/\.avi$/i)  != -1 ||
-            theUrl.search(/\.mkv$/i)  != -1 ||
-            theUrl.search(/\.m2v$/i) != -1 ) {
+            theUrl.search(/\.wmv$/i)  != -1 ||
+            theUrl.search(/\.mov$/i)  != -1 ||
+            theUrl.search(/\.m4v$/i)  != -1 ||
+            theUrl.search(/\.m2v$/i)  != -1 ) {
             if (theSeekableFlag) {                
                 myDecoderHint = "FFMpegDecoder2";
             } else {

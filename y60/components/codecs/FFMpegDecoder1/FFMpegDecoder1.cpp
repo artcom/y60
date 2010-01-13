@@ -132,7 +132,13 @@ namespace y60 {
     FFMpegDecoder1::canDecode(const std::string & theUrl, asl::Ptr<asl::ReadableStreamHandle> theStream) {
         string myFilename = asl::toLowerCase(asl::getFilenamePart(theUrl));
         if (asl::toLowerCase(asl::getExtension(theUrl)) == "mpg" ||
+            asl::toLowerCase(asl::getExtension(theUrl)) == "mpeg" ||
             asl::toLowerCase(asl::getExtension(theUrl)) == "m2v" ||
+            asl::toLowerCase(asl::getExtension(theUrl)) == "avi" ||
+            asl::toLowerCase(asl::getExtension(theUrl)) == "mp4" ||
+            asl::toLowerCase(asl::getExtension(theUrl)) == "mkv" ||
+            asl::toLowerCase(asl::getExtension(theUrl)) == "mov" ||
+            asl::toLowerCase(asl::getExtension(theUrl)) == "flv" ||
             myFilename == "dvr0") {
             AC_INFO << "FFMpegDecoder1 can decode :" << theUrl << endl;
             return MIME_TYPE_MPG;
