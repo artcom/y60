@@ -77,6 +77,7 @@
 #include "JSZipWriter.h"
 #include "JSTestServer.h"
 #include "JSBSpline.h"
+#include "JSHermiteSpline.h"
 #include "JSSvgPath.h"
 #include "JSPerlinNoise.h"
 #include "JSSerial.h"
@@ -228,6 +229,9 @@ bool initCppClasses(JSContext *cx, JSObject *theGlobalObject) {
         return false;
     }
     if (!JSBSpline::initClass(cx, theGlobalObject)) {
+        return false;
+    }
+    if (!JSHermiteSpline::initClass(cx, theGlobalObject)) {
         return false;
     }
     if (!JSSvgPath::initClass(cx, theGlobalObject)) {

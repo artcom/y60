@@ -83,16 +83,17 @@ namespace asl {
         void	    print	    ( void );		
         void	    slowdown	    ( const dvector& speed_multiplier );		
         float	    operator ()	    ( float t );		
+        float       evaluate        ( float t , int order ) { return this->operator()(t, order); }
         float	    operator ()	    ( float t, int order );		
         bool	    init	    ( const dvector& x, const dvector& y, const dvector& dy_dx_left, const dvector& dy_dx_right );
         bool	    init	    ( const dvector& x, const dvector& y, HermiteInitMode initMode, bool ascend_only );
         bool	    init	    ( const dvector& x, const dvector& y, const dvector& weight );
         //void	    inverse	    ( const float& in, multiset<float>& out );
-        float	    x_first	    ( void );		
-        float	    x_last	    ( void );
-        float	    y_first	    ( void );		
-        float	    y_last	    ( void );
-        int		    dim		    ( void )  { return _x.size(); }
+        float	    x_first	    ( void ) const;		
+        float	    x_last	    ( void ) const;
+        float	    y_first	    ( void ) const;		
+        float	    y_last	    ( void ) const;
+        int		    dim		    ( void ) const { return _x.size(); }
         float	    x		    ( int i ) { return _x[i]; }
         float	    y		    ( int i ) { return _y[i]; }
         float	    dyl		    ( int i ) { return _dy_dx_left [i]; }

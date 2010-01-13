@@ -153,31 +153,31 @@ namespace asl {
     }
 
     float
-    Hermite::x_first ( void )
+    Hermite::x_first ( void ) const
     {
         if ( _setup_complete ) {
             AC_ERROR << "Hermite::x_first: _setup not complete\n" << endl;
             return 0.0;
         }
-        dvector::iterator i = _x.begin();
+        dvector::const_iterator i = _x.begin();
         return *i;          
     }
 
     float
-    Hermite::x_last ( void )
+    Hermite::x_last ( void ) const
     {    
         if ( ! _setup_complete ) {
             AC_ERROR << "Hermite::x_first: _setup not complete";
             return 0.0;
         }
         
-        dvector::iterator i = _x.end();
+        dvector::const_iterator i = _x.end();
         i--;
         return *i;          
     }
     
     float
-    Hermite::y_first ( void )
+    Hermite::y_first ( void ) const
     {
 
         if ( ! _setup_complete ) {
@@ -185,12 +185,12 @@ namespace asl {
             return 0.0;
         }
 
-        dvector::iterator i = _y.begin();
+        dvector::const_iterator i = _y.begin();
         return *i;          
     }
    
     float
-    Hermite::y_last ( void )
+    Hermite::y_last ( void ) const
     {
     
         if ( ! _setup_complete ) {
@@ -198,7 +198,7 @@ namespace asl {
             return 0.0;
         }
         
-        dvector::iterator i = _y.end();
+        dvector::const_iterator i = _y.end();
         i--;
         return *i;          
     }

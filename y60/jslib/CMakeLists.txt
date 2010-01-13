@@ -18,6 +18,7 @@ JSRenderer.cpp
 JSRequest.cpp
 JSRequestManager.cpp
 JSRequestWrapper.cpp
+JSHermiteSpline.cpp
 JSScene.cpp
 JSSerial.cpp
 JSStringMover.cpp
@@ -54,6 +55,7 @@ JSRenderer.h
 JSRequest.h
 JSRequestManager.h
 JSRequestWrapper.h
+JSHermiteSpline.h
 JSScene.h
 JSSerial.h
 JSStringMover.h
