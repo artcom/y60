@@ -427,36 +427,3 @@ spark.StageEvent.Constructor = function(Protected, theType, theStage, theTime, t
     
 };
 
-
-spark.DSAEvent = spark.Class("DSAEvent");
-
-spark.DSAEvent.TOUCH = "dsa-touch";
-
-spark.DSAEvent.Constructor = function(Protected, theType, theEventName, theId, theBitMask, theGridSize, theCount) {
-    var Public = this;
-    
-    this.Inherit(spark.Event, theType);
-    
-    var _myEventName = theEventName;
-    var _myId        = theId;
-    var _myBitMask   = theBitMask;
-    var _myGridSize  = theGridSize;
-    var _myCount     = theCount;
-    
-    Public.id getter = function() {
-        return _myId;
-    };    
-    
-    Public.bitmask getter = function() {
-        return _myBitMask;
-    };    
-    
-    Public.gridsize getter = function() {
-        return _myGridSize;
-    };  
-    
-    Public.count getter = function() {
-        return _myCount;
-    };
-    
-};
