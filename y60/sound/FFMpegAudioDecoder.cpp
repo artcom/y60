@@ -201,8 +201,16 @@ void FFMpegAudioDecoder::open() {
         AC_DEBUG << "Sample rate: " << _mySampleRate << endl;
 
         if (_mySampleRate != Pump::get().getNativeSampleRate()) {
+#if  LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52,15,0)         
+            _myResampleContext = av_audio_resample_init(
+                    _myNumChannels, _myNumChannels,
+                    Pump::get().getNativeSampleRate(), _mySampleRate,
+                    SAMPLE_FMT_S16, myCodecContext->sample_fmt,
+                    16, 10, 0, 0.8);
+#else
             _myResampleContext = audio_resample_init(_myNumChannels, _myNumChannels,    
                     Pump::get().getNativeSampleRate(), _mySampleRate);
+#endif
         }
     } catch (const DecoderException &) {
         close();
