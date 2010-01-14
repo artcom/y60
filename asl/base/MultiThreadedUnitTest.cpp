@@ -4,16 +4,16 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: MultiThreadedUnitTest.cpp,v $
 //
 //   $Revision: 1.3 $
 //
-// Description: unit test for Ptr class 
+// Description: unit test for Ptr class
 //
 //
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
@@ -29,7 +29,7 @@
 
 #include <iostream>
 
-using namespace std;  
+using namespace std;
 
 namespace asl {
 
@@ -58,12 +58,12 @@ namespace asl {
                     FAILURE("Test is not a PosixThread derived class - not executed");
                 }
 
-                setFailedCount(getFailedCount() + getTest(i)->getFailedCount());       
-                setPassedCount(getPassedCount() + getTest(i)->getPassedCount());       
+                setFailedCount(getFailedCount() + getTest(i)->getFailedCount());
+                setPassedCount(getPassedCount() + getTest(i)->getPassedCount());
                 getTest(i)->teardown();
             }
             asl::Time theFinish;
-            cerr << ">>>> Time required for test suite '" << getMyName() << "' :" 
+            cerr << ">>>> Time required for test suite '" << getMyName() << "' :"
                  << theFinish - theStart << " sec. " << endl;
         }
         catch (asl::Exception & ex) {
@@ -82,9 +82,9 @@ namespace asl {
         cerr << "Running CatchingUnitTestSuite '" << getMyName() << "'"<< endl;
         try {
             asl::Time theStart;
-            UnitTestSuite::run(); 
+            UnitTestSuite::run();
             asl::Time theFinish;
-            cerr << ">>>> Time required for test suite '" << getMyName() << "' :" 
+            cerr << ">>>> Time required for test suite '" << getMyName() << "' :"
                  << theFinish - theStart << " sec. " << endl;
         }
         catch (asl::Exception & ex) {

@@ -4,14 +4,14 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
 // Description: Utilities to provide build related information at runtime.
-//              
+//
 //
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -58,7 +58,7 @@ class gcc_compiler {
         };
 };
 
-// TODO ask Hendrik about the names and version formatting 
+// TODO ask Hendrik about the names and version formatting
 template <unsigned MSCVersion>
 class msvc_compiler {
     public:
@@ -167,7 +167,7 @@ class build_target_info {
             scm_name_( scm_info.name() ), scm_history_id_( scm_info.history_id() ),
             scm_repository_id_( scm_info.repository_id())
         {
-            
+
         }
         std::string const& name() const { return name_; }
         target_t const& target_type() const { return target_type_; }
@@ -282,7 +282,7 @@ class build_information : public Singleton<build_information>,
             return build_target_info("unknown", build_target_info::EXECUTABLE, "",
                     __DATE__, __TIME__, no_scm_data());
         }
-        
+
 };
 
 inline

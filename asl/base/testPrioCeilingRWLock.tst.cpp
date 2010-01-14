@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: testPrioCeilingRWLock.tst.cpp,v $
@@ -44,7 +44,7 @@ public:
     LockUnitTest() : UnitTest("LockUnitTest"), _ready(false) {  }
     void run();
     void mediumPrioThread();
-    void lowPrioThread(); 
+    void lowPrioThread();
 
 private:
     //asl::ReadWriteLock _myLock;
@@ -81,10 +81,10 @@ LockUnitTest::run() {
         SUCCESS("writeunlock");
 
         int myRetVal = pthread_create (&_myMediumThread, 0, threadFuncMedium, this);
-        ENSURE_MSG(myRetVal == 0, "pthread_create (medium) succeeded"); 
+        ENSURE_MSG(myRetVal == 0, "pthread_create (medium) succeeded");
 
         myRetVal = pthread_create (&_myLowThread, 0, threadFuncLow, this);
-        ENSURE_MSG(myRetVal == 0, "pthread_create (low) succeeded"); 
+        ENSURE_MSG(myRetVal == 0, "pthread_create (low) succeeded");
 
         // we are the high priority thread and may be kept by the low prio thread from running
         struct sched_param schedulingParm;
@@ -120,11 +120,11 @@ LockUnitTest::run() {
         // perform many more tests here
         _ready = true;
         void * myThreadRetVal;
-        myRetVal = pthread_join (_myMediumThread, &myThreadRetVal); 
+        myRetVal = pthread_join (_myMediumThread, &myThreadRetVal);
         ENSURE_MSG (myRetVal == 0, "pthread_join succeeded");
-        myRetVal = pthread_join (_myLowThread, &myThreadRetVal); 
+        myRetVal = pthread_join (_myLowThread, &myThreadRetVal);
         ENSURE_MSG (myRetVal == 0, "pthread_join succeeded");
-    } 
+    }
     catch (asl::Exception & ex) {
         FAILURE("Exception");
         cerr << ex << endl;
@@ -134,7 +134,7 @@ LockUnitTest::run() {
 
 }
 
-void 
+void
 LockUnitTest::lowPrioThread() {
 
     struct sched_param schedulingParm;
@@ -188,7 +188,7 @@ LockUnitTest::lowPrioThread() {
     SUCCESS("secondthread came through");
 }
 
-void 
+void
 LockUnitTest::mediumPrioThread() {
     cycles_t cycles = 0;
     while (!_ready) {
@@ -206,7 +206,7 @@ LockUnitTest::mediumPrioThread() {
     }
 }
 
- 
+
 int main(int argc, char *argv[]) {
 
     LockUnitTest myTest;

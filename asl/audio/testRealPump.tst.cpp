@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,14 +33,14 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
 #ifdef _MSC_VER
 // For M_PI
-#define _USE_MATH_DEFINES 
+#define _USE_MATH_DEFINES
 #endif
 #include "TestPump.h"
 
@@ -63,7 +63,7 @@ using namespace asl;
 class TestRealPump: public TestPump {
 public:
     explicit TestRealPump(): TestPump ("TestRealPump") {}
-    
+
     virtual void run() {
         runWithPump(false);
         // 8 hours of noise :-).
@@ -78,7 +78,7 @@ int main( int argc, char *argv[] ) {
 #ifdef USE_DASHBOARD
     Dashboard::get();  // Make sure the dashboard gets deleted after the pumps.
 #endif
-    
+
     // For use in MSDev, where we can't set the environment prior to starting the
     // program.
     //Logger::get().setVerbosity(SEV_DEBUG);

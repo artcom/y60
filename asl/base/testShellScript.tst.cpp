@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: testShellScript.tst.cpp,v $
@@ -30,9 +30,9 @@
 
 #include <sys/types.h>
 #include <unistd.h>
-#include <sys/wait.h>        
+#include <sys/wait.h>
 #include <errno.h>
-#include <libgen.h>  
+#include <libgen.h>
 
 #include "file_functions.h"
 
@@ -76,9 +76,9 @@ int main(int argc, char *argv[]) {
 #ifdef AC_BUILT_WITH_CMAKE
         string(CMAKE_CURRENT_SOURCE_DIR) + theDirectorySeparator + "testShellScript.sh";
 #else
-        string("../../") + myProgramName + ".sh"; 
+        string("../../") + myProgramName + ".sh";
 #endif
-        
+
     cerr << myProgramName << ": executing script '" << myScriptName << "'" << endl;
 
     char * myCommand = strdup(myScriptName.c_str());

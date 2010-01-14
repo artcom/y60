@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: testZipReader.tst.cpp,v $
@@ -29,8 +29,8 @@
 #include <string>
 #include <iostream>
 
-using namespace std; 
-using namespace asl; 
+using namespace std;
+using namespace asl;
 
 class ZipReaderUnitTest : public UnitTest {
     public:
@@ -62,11 +62,11 @@ class ZipWriterUnitTest : public UnitTest {
             string myData("my test data string");
             Block myTestBlock;
             myTestBlock.append(myData.c_str(), myData.size());
-             
+
             ZipWriter myZipWriter(myTestZip);
             myZipWriter.append(myTestBlock, myTestFileInZip);
             myZipWriter.close();
-            
+
             ZipReader myReader(myTestZip);
             asl::Ptr<ReadableBlockHandle> myBlockRead = myReader.getFile(myTestFileInZip);
 

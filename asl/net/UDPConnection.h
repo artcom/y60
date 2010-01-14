@@ -4,12 +4,12 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: 
+// Description:
 //    C++ Library fuer TCP-Sockets (based on Sockets.c++ from Pavel 11.9.92)
 //
 // Last Review:  ms & ab 2007-08-14
@@ -50,7 +50,7 @@
 #include <asl/base/Ptr.h>
 
 namespace inet {
-    /** implements connected UDP 
+    /** implements connected UDP
      *
      * @code
      *
@@ -65,9 +65,9 @@ namespace inet {
      * }
      *
      * inet::asl::Unsigned32 otherAddress = inet::Socket::getHostAddress("www.anyhost.de");
-     * 
+     *
      * myUDPConnection.connect(otherPort, otherAddress);
-     * 
+     *
      * myUDPConnection.read(myInputBuffer,bufferSize);
      * myUDPConnection.write(myOutputBuffer, bufferSize);
      *
@@ -80,6 +80,6 @@ namespace inet {
     };
 
     typedef asl::Ptr<UDPConnection> UDPConnectionPtr;
-    
+
 }
 #endif

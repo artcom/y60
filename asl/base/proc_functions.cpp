@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -210,7 +210,7 @@ namespace asl {
         host_page_size(myHostPort, & myPagesize);
         vm_statistics_data_t myVmStats;
         if (host_statistics(myHostPort, HOST_VM_INFO, (host_info_t) & myVmStats,
-                    & myHostSize) != KERN_SUCCESS) 
+                    & myHostSize) != KERN_SUCCESS)
         {
             throw asl::Exception("Failed to get memory info.", PLUS_FILE_LINE);
         }
@@ -228,7 +228,7 @@ namespace asl {
             // GlobalMemoryStatus may returns incorrect values
             // for systems with more than 2 GB. So we have to use (you guess it)
             // GlobalMemoryStatusEx for that.
-            // TODO this does not work for >4 GB -> make the interface 64Bit 
+            // TODO this does not work for >4 GB -> make the interface 64Bit
             MEMORYSTATUSEX myMemStat;
             myMemStat.dwLength = sizeof (myMemStat);
             GlobalMemoryStatusEx (&myMemStat);

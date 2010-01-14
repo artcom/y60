@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -63,8 +63,8 @@ namespace asl {
  * @ingroup aslbase
  * Threadlock is a wrapper around a mutex. It can be used
  * to protect resources that are shared over multiple threads.
- * 
- * 
+ *
+ *
  */
 class ASL_BASE_DECL ThreadLock {
     public:
@@ -72,7 +72,7 @@ class ASL_BASE_DECL ThreadLock {
         virtual ~ThreadLock();
 
         /**
-         * Locks (acquires a Mutex) for the Thread until the 
+         * Locks (acquires a Mutex) for the Thread until the
          * ThreadLock is unlocked.
          * @warn the internal pthread_mutex has deadlock
          *       prevention enabled, hence a thread can not

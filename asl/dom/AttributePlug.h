@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //   $RCSfile: AttributePlug.h,v $
@@ -59,7 +59,7 @@ namespace dom {
         ASL_DOM_EXPORT_STATICS(dom::AttributePlug,theTagName,theExportToken) \
         typedef dom::AttributePlug<theTagName> Plug; \
         ATTRIBUTE_TAG_DEFAULT_VALUE(theType); \
-    }; 
+    };
 
 #define DEFINE_FACADE_ATTRIBUTE_TAG(theTagName, theType, theAttributeName, theDefault, theExportToken) \
     struct theTagName { \
@@ -190,11 +190,11 @@ namespace dom {
         template <class THE_OTHER_TAG>
         void noLongerAffects(AttributePlug<THE_OTHER_TAG> & theOtherTag) {
             Connector::noLongerAffects(*this, theOtherTag);
-        }         
+        }
         template <class THE_OTHER_TAG>
         bool alreadyAffects(AttributePlug<THE_OTHER_TAG> & theOtherTag) {
             return Connector::alreadyAffects(*this, theOtherTag);
-        }         
+        }
 
         template <class CALCULATOR>
         void setCalculatorFunction(asl::Ptr<CALCULATOR, ThreadingModel> theCalculator, void (CALCULATOR::*theCalculateFunction)()) {
@@ -264,7 +264,7 @@ namespace dom {
                  ,0))
                  )
                  )
-             { 
+             {
                  this->getValuePtr()->setSelf(this->getValuePtr());
              }
 
@@ -279,11 +279,11 @@ namespace dom {
              template <class THE_OTHER_TAG>
              void noLongerDependsOn(AttributePlug<THE_OTHER_TAG> & theOtherTag) {
                  Connector::noLongerDependsOn(*this, theOtherTag);
-             }            
+             }
              template <class THE_OTHER_TAG>
              bool alreadyDependsOn(AttributePlug<THE_OTHER_TAG> & theOtherTag) {
                  return Connector::alreadyDependsOn(*this, theOtherTag);
-             } 
+             }
              void dependsOn(ValuePtr theValue) {
                  AttributePlug<TAG>::_myAttribute->nodeValueWrapperPtr()->registerPrecursor(theValue);
              }
@@ -334,7 +334,7 @@ namespace dom {
 
         static void updateNodeValue(FACADE * theFacade, Node & theAttributeNode) {
 
-            const VALUE & theValue 
+            const VALUE & theValue
                 = ValueHelper<VALUE, WRAPPER>::getValue(theAttributeNode.nodeValueWrapperPtr());
 
             //const typename TAG::TYPE & theValue = theAttributeNode.Node::nodeValueRef<typename TAG::TYPE>();

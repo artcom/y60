@@ -4,12 +4,12 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: 
+// Description:
 //    C++ Library fuer TCP-Sockets (based on Sockets.c++ from Pavel 11.9.92)
 //
 // Last Review:  ms & ab 2007-08-14
@@ -35,7 +35,7 @@
 //
 //    overall review status   :      ok
 //
-//    recommendations: move to inner class of *.tst.cpp file 
+//    recommendations: move to inner class of *.tst.cpp file
 */
 
 //own header
@@ -155,7 +155,7 @@ TCPServer * TestSocket::createTCPServer(){
 
     // TODO: linux test (not that easy, socket to be reused must be in state TIME_WAIT
     // see http://www.unixguide.net/network/socketfaq/4.5.shtml for more info
-#ifdef _WIN32    
+#ifdef _WIN32
     // try to create a tcp socket twice (already in use test)
     // since windows 2003 server it's neccessary to open both
     // sockets with SO_REUSEADDR, not only the second one.
@@ -377,13 +377,13 @@ void * TestSocket::UDPServerThread(void *arg) {
     unsigned short otherPort;
     Unsigned32 otherHost;
 
-#ifdef OSX 
+#ifdef OSX
     // mac doesn't have loopback broadcast capability,
     // so use network broadcast and flood the lan
     Unsigned32 broadcastLoopback = getHostAddress("BROADCAST");
-#else    
+#else
     Unsigned32 broadcastLoopback = getHostAddress("127.255.255.255");
-#endif    
+#endif
 
 
     do {
@@ -431,7 +431,7 @@ void TestSocket::testConnectionTimeout(){
     myClient.receive(myInputBuffer,5);
     ENSURE(strncmp(myInputBuffer,"READY",5)==0);
 
-    // break the server thread 
+    // break the server thread
     myClient.send("BREAK",5);
     int threadResult;
     pthread_join(myThread, (void **)&threadResult);

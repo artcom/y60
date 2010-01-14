@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -45,8 +45,8 @@
 #include <asl/base/Logger.h>
 
 namespace asl {
-    
-AudioTimeSource::AudioTimeSource(unsigned myInitialDelay, unsigned mySampleRate) 
+
+AudioTimeSource::AudioTimeSource(unsigned myInitialDelay, unsigned mySampleRate)
     : _mySentFrames(0),
       _mySysTimeAtLastBuffer(0),
       _myInitialDelay(myInitialDelay),
@@ -67,7 +67,7 @@ void AudioTimeSource::setCurrentTime(asl::Time theTime) {
 
 Time AudioTimeSource::getCurrentTime() {
     if (_myRunning) {
-        // If the time source was just constructed, we might need to wait until 
+        // If the time source was just constructed, we might need to wait until
         // some data has been sent to the sound card to get sensible values.
         while (_mySentFrames < _myInitialDelay) {
             msleep(10);
@@ -79,7 +79,7 @@ Time AudioTimeSource::getCurrentTime() {
         AutoLocker<ThreadLock> myLocker(_myTimeLock);
         return double(_mySentFrames)/_mySampleRate+_myGlobalTimeOffset;
     }
-        
+
 }
 
 void AudioTimeSource::stop() {

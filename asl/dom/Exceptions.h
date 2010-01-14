@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: Exceptions.h,v $
@@ -169,8 +169,8 @@ namespace dom {
 
     // This exception is thrown when you try to access an node value
     // on a node that must not have a node value
-    // 
-    // 
+    //
+    //
     //
     DEFINE_EXCEPTION(ValueNotAllowed, asl::Exception);
 

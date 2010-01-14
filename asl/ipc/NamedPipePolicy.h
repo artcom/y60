@@ -4,12 +4,12 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: 
+// Description:
 //     Classes for networked or local communication between processes
 //
 // Last Review:  ms 2007-08-15
@@ -35,7 +35,7 @@
 //
 //    overall review status   :      ok
 //
-//    recommendations: add high-level documentation, improve doxygen documentation 
+//    recommendations: add high-level documentation, improve doxygen documentation
 */
 #ifndef __asl_NamedPipePolicy_included
 #define __asl_NamedPipePolicy_included
@@ -56,11 +56,11 @@ namespace asl {
 /*! \addtogroup ipcPolicies */
 /* @{ */
 
-//! Conduit policy for Win32 Named Pipe-based communication (Windows only).  
-    
+//! Conduit policy for Win32 Named Pipe-based communication (Windows only).
+
 class ASL_IPC_DECL NamedPipePolicy : public ConduitPolicy {
     public:
-        typedef std::string Endpoint; 
+        typedef std::string Endpoint;
 
         struct PipeInfo {
             PipeInfo() :
@@ -70,7 +70,7 @@ class ASL_IPC_DECL NamedPipePolicy : public ConduitPolicy {
                 {
                     memset(&accept_overlap,0,sizeof(OVERLAPPED));
                 };
-            PipeInfo(HANDLE theInstance, Endpoint theName) : 
+            PipeInfo(HANDLE theInstance, Endpoint theName) :
                 pipeInstance(theInstance), pipeName(theName),
                 isServerHandle(false), isSending(false),
                 outQueue(0), isReceiving(false), inQueue(0), isValid(true)
@@ -96,23 +96,23 @@ class ASL_IPC_DECL NamedPipePolicy : public ConduitPolicy {
         // @throws ConduitException
         static Handle connectTo(Endpoint theRemoteEndpoint);
 
-        static bool isValid(const Handle & theHandle) { 
-            return theHandle.isValid; 
+        static bool isValid(const Handle & theHandle) {
+            return theHandle.isValid;
         }
 
-        /// disconnects a conduit 
+        /// disconnects a conduit
         // @throws ConduitException
         static void disconnect(Handle & theHandle);
-        /// Handles pending IO operations - should be called periodically (e.g. per frame) 
-        // @returns true if the conduit is still valid 
+        /// Handles pending IO operations - should be called periodically (e.g. per frame)
+        // @returns true if the conduit is still valid
         // @throws ConduitException
-        static bool 
+        static bool
         handleIO(Handle & theHandle, BufferQueue & theInQueue, BufferQueue & theOutQueue, int theTimeout = 0);
 
         // Acceptor methods
         static Handle startListening(Endpoint theEndpoint, unsigned theMaxConnectionCount);
         static void stopListening(Handle theHandle);
-        static Handle createOnConnect(Handle & theListenHandle, unsigned theMaxConnectionCount, 
+        static Handle createOnConnect(Handle & theListenHandle, unsigned theMaxConnectionCount,
                 int theTimeout);
 
     private:
@@ -121,8 +121,8 @@ class ASL_IPC_DECL NamedPipePolicy : public ConduitPolicy {
         static void sendNextBuffer(Handle & theHandle);
         static void receiveNextBuffer(Handle & theHandle);
         static Handle createListenHandle(Endpoint theEndpoint, unsigned theMaxConnectionCount, bool theMasterListener);
-        static int waitForOverlapped(Handle & theHandle, LPDWORD theBytesTransferred, 
-                bool isSending, int theTimeout=-1); 
+        static int waitForOverlapped(Handle & theHandle, LPDWORD theBytesTransferred,
+                bool isSending, int theTimeout=-1);
 } ;
 
 inline std::ostream& operator<<(std::ostream & s, const NamedPipePolicy::Handle & h) {

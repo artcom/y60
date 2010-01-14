@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -214,7 +214,7 @@ namespace xpath {
             bool isRoot() const                       {return myAxis_.isRoot();}
 
             std::ostream& streamTo(std::ostream& os) const;
-            
+
             std::string toString() const;
 
             int compare(const LocationStep & rhs) const;
@@ -250,7 +250,7 @@ namespace xpath {
         {step.streamTo(os);return os;}
 
         typedef std::vector<LocationStep>             LocationStepList;
-        
+
         struct StepAppender {
             virtual void operator()(const LocationStep &) const = 0;
             virtual ~StepAppender() {}

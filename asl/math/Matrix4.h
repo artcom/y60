@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -162,9 +162,9 @@ namespace asl {
          UNKNOWN,
          MatrixTypeEnum_MAX
      };
-     
+
      //template class ASL_MATH_DECL asl::Enum<MatrixTypeEnum, MatrixTypeEnum_MAX>;
-     
+
      DEFINE_ENUM( MatrixType, MatrixTypeEnum, ASL_MATH_DECL );
 
 
@@ -565,17 +565,17 @@ namespace asl {
                 _myType = AFFINE;
             }
         }
-        
+
         void makeXYZRotating(const Vector3<Number> & theRotation) {
             base::makeXYZRotating(theRotation);
             _myType = ROTATING;
         }
-        
+
         void makeZYXRotating(const Vector3<Number> & theRotation) {
             base::makeZYXRotating(theRotation);
             _myType = ROTATING;
         }
-        
+
         void rotateXYZ(const Vector3<Number> & theEulerVector) {
             rotateX(theEulerVector[0]);
             rotateY(theEulerVector[1]);
@@ -586,7 +586,7 @@ namespace asl {
             Matrix4<Number> myRotation(theRotation);
             this->postMultiply(myRotation);
         }
-        
+
         bool getRotation(Vector3<Number> & axis, Angle & a) const {
             return base::getRotation(axis,a);
         }
@@ -745,9 +745,9 @@ namespace asl {
                 }
             }
             theOrientation.normalize();
-        }    
-        
-        
+        }
+
+
         void scaleDispatch(const Vector3<Number> & s) {
             if (_myType == IDENTITY) {
                 base::makeScaling(s);
@@ -1090,7 +1090,7 @@ unknown:
         //           to the original values, but to equivalent ones. (e.g. scale [-1,0,0] might return
         //           rotation [0,PI_2,0] or [0,0,PI_2])
         // From gems II, page 320
-        
+
         bool decompose(Vector3<Number> & theScale,
                        Vector3<Number> & theShear,
                        Vector3<Number> & theOrientation,
@@ -1099,7 +1099,7 @@ unknown:
         {
             return decomposeEuler(theScale, theShear, theOrientation, thePosition, theOrder);
         }
-        
+
         bool decomposeEuler(Vector3<Number> & theScale,
                        Vector3<Number> & theShear,
                        Vector3<Number> & theOrientation,
@@ -1166,7 +1166,7 @@ unknown:
             }
 
             // Now, get the rotations (from "Eberly - 3D Game Engine Design", page 19)(vs)
-             
+
             switch (theOrder) {
                 case ROTATION_ORDER_XYZ:
                     if (myM3[0][2] < -1.0) {
@@ -1175,7 +1175,7 @@ unknown:
                     if (myM3[0][2] > 1.0) {
                         myM3[0][2] = 1.0;
                     }
-                    
+
                     theOrientation[1] = asin(myM3[0][2]);
                     if (theOrientation[1] < PI_2) {
                         if (theOrientation[1] > - PI_2) {
@@ -1189,9 +1189,9 @@ unknown:
                         theOrientation[0] = atan2(myM3[1][0], myM3[1][1]);
                         theOrientation[2] = 0;
                     }
-                    
+
                     break;
-                
+
                 case ROTATION_ORDER_ZYX:
                     if (myM3[2][0] < -1.0) {
                         myM3[2][0] = -1.0;
@@ -1199,7 +1199,7 @@ unknown:
                     if (myM3[2][0] > 1.0) {
                         myM3[2][0] = 1.0;
                     }
-                    
+
                     theOrientation[1] = asin(-myM3[2][0]);
                     if (theOrientation[1] < PI_2) {
                         if (theOrientation[1] > - PI_2) {
@@ -1215,7 +1215,7 @@ unknown:
                         theOrientation[0] = atan2(-myM3[0][1], myM3[1][1]);
                         theOrientation[2] = 0;
                     }
-                    
+
                     break;
                 case ROTATION_ORDER_XZY:
                     if (myM3[0][1] < -1.0) {
@@ -1224,7 +1224,7 @@ unknown:
                     if (myM3[0][1] > 1.0) {
                         myM3[0][1] = 1.0;
                     }
-                    
+
                     theOrientation[2] = asin(-myM3[0][1]);
                     if (theOrientation[2] < PI_2) {
                         if (theOrientation[2] > - PI_2) {
@@ -1306,10 +1306,10 @@ unknown:
             theOrientation[0] = - theOrientation[0];
             theOrientation[1] = - theOrientation[1];
             theOrientation[2] = - theOrientation[2];
-            
+
             return true;
         }
-        
+
         // Decomposes affine matrices into a transformation sequence
         // shearing is not taken in account yet!
         bool decompose(Vector3<Number> & theScale,
@@ -1342,8 +1342,8 @@ unknown:
             theScale[0] = length(myM3[0]);
             theScale[1] = length(myM3[1]);
             theScale[2] = length(myM3[2]);
-            
-             
+
+
             if(theScale[0] != 0) {
                 myM3[0][0] /= theScale[0];
                 myM3[0][1] /= theScale[0];
@@ -1359,7 +1359,7 @@ unknown:
                 myM3[2][1] /= theScale[2];
                 myM3[2][2] /= theScale[2];
             }
-  
+
             // Check for a coordinate system flip.  If the determinant
             // is -1, then negate the matrix and the scaling factors.
             if (dot(myM3[0], cross(myM3[1], myM3[2])) < 0) {
@@ -1368,7 +1368,7 @@ unknown:
                 myM3[2] *= -1;
                 theScale *= -1;
             }
-            
+
             Matrix4<Number> myM4;
             myM4[0][0] = myM3[0][0];
             myM4[0][1] = myM3[0][1];
@@ -1388,7 +1388,7 @@ unknown:
             myM4.getRotation(theOrientation);
             return true;
         }
-        
+
         void adjoint() {
             base::adjoint();
         }
@@ -1758,13 +1758,13 @@ unknown:
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -1787,7 +1787,7 @@ unknown:
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */

@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -44,7 +44,7 @@
 //
 //   $Revision: 1.5 $
 //
-// Description: 
+// Description:
 //
 // (CVS log at the bottom of this file)
 //
@@ -65,7 +65,7 @@ namespace asl {
 
     /*! \addtogroup aslbase */
     /* @{ */
-    
+
     class ReadWriteLock;
 
     class ASL_BASE_DECL ScopeLocker {
@@ -90,12 +90,12 @@ namespace asl {
 #else
             enum magic { RW_LOCK_VALID = 0xfacade };
             DEFINE_NAMED_EXCEPTION(MutexInitFailed,ReadWriteLock::MutexInitFailed,Exception);
-            DEFINE_NAMED_EXCEPTION(MutexLockFailed,ReadWriteLock::MutexLockFailed,Exception); 
+            DEFINE_NAMED_EXCEPTION(MutexLockFailed,ReadWriteLock::MutexLockFailed,Exception);
             DEFINE_NAMED_EXCEPTION(MutexUnlockFailed,ReadWriteLock::MutexUnlockFailed,Exception);
-            DEFINE_NAMED_EXCEPTION(CondInitFailed,ReadWriteLock::CondInitFailed,Exception); 
-            DEFINE_NAMED_EXCEPTION(CondWaitFailed,ReadWriteLock::CondWaitFailed,Exception); 
-            DEFINE_NAMED_EXCEPTION(CondSignalFailed,ReadWriteLock::CondSignalFailed,Exception); 
-            DEFINE_NAMED_EXCEPTION(CondBroadcastFailed,ReadWriteLock::CondBroadcastFailed,Exception); 
+            DEFINE_NAMED_EXCEPTION(CondInitFailed,ReadWriteLock::CondInitFailed,Exception);
+            DEFINE_NAMED_EXCEPTION(CondWaitFailed,ReadWriteLock::CondWaitFailed,Exception);
+            DEFINE_NAMED_EXCEPTION(CondSignalFailed,ReadWriteLock::CondSignalFailed,Exception);
+            DEFINE_NAMED_EXCEPTION(CondBroadcastFailed,ReadWriteLock::CondBroadcastFailed,Exception);
             DEFINE_NAMED_EXCEPTION(Invalid,ReadWriteLock::Invalid,Exception);
 #endif
 
@@ -131,32 +131,32 @@ namespace asl {
             pthread_key_create(&_normalPriorityKey,0);
             _ceilingPriority.schedulingParm.sched_priority = sched_get_priority_max(SCHED_FIFO);
             _ceilingPriority.schedulingPolicy = SCHED_FIFO;
-        DB3(_cycles=get_cycles());        
+        DB3(_cycles=get_cycles());
     }
 
         void readlock() {
             raisePriority();
-DB3(std::cerr<<std::endl<<pthread_self()<<" RR "<< get_cycles()-_cycles<<std::endl;_cycles=get_cycles());            
+DB3(std::cerr<<std::endl<<pthread_self()<<" RR "<< get_cycles()-_cycles<<std::endl;_cycles=get_cycles());
             ReadWriteLock::readlock();
-DB3(std::cerr<<pthread_self()<<" RA "<< get_cycles()-_cycles<<std::endl;_cycles=get_cycles());            
+DB3(std::cerr<<pthread_self()<<" RA "<< get_cycles()-_cycles<<std::endl;_cycles=get_cycles());
         }
         void readunlock() {
-            ReadWriteLock::readunlock(); 
-DB3(std::cerr<<pthread_self()<<" RU "<< get_cycles()-_cycles<<std::endl;_cycles=get_cycles());            
-            lowerPriority(); 
-DB3(std::cerr<<pthread_self()<<" RV "<< get_cycles()-_cycles<<std::endl<<std::endl;_cycles=get_cycles());            
+            ReadWriteLock::readunlock();
+DB3(std::cerr<<pthread_self()<<" RU "<< get_cycles()-_cycles<<std::endl;_cycles=get_cycles());
+            lowerPriority();
+DB3(std::cerr<<pthread_self()<<" RV "<< get_cycles()-_cycles<<std::endl<<std::endl;_cycles=get_cycles());
         };
         void writelock() {
             raisePriority();
-DB3(std::cerr<<std::endl<<pthread_self()<<" W^ "<< get_cycles()-_cycles<<std::endl;_cycles=get_cycles());            
+DB3(std::cerr<<std::endl<<pthread_self()<<" W^ "<< get_cycles()-_cycles<<std::endl;_cycles=get_cycles());
             ReadWriteLock::writelock();
-DB3(std::cerr<<pthread_self()<<" WA "<< get_cycles()-_cycles<<std::endl;_cycles=get_cycles());            
+DB3(std::cerr<<pthread_self()<<" WA "<< get_cycles()-_cycles<<std::endl;_cycles=get_cycles());
         }
         void writeunlock() {
             ReadWriteLock::writeunlock();
-DB3(std::cerr<<pthread_self()<<" WU "<< get_cycles()-_cycles<<std::endl;_cycles=get_cycles());            
+DB3(std::cerr<<pthread_self()<<" WU "<< get_cycles()-_cycles<<std::endl;_cycles=get_cycles());
             lowerPriority();
-DB3(std::cerr<<pthread_self()<<" WV "<< get_cycles()-_cycles<<std::endl<<std::endl;_cycles=get_cycles());            
+DB3(std::cerr<<pthread_self()<<" WV "<< get_cycles()-_cycles<<std::endl<<std::endl;_cycles=get_cycles());
         }
 DB3(cycles_t _cycles);
     private:
@@ -167,11 +167,11 @@ DB3(cycles_t _cycles);
         void raisePriority() {
             Priority * myPriority = getPriorityStorage();
             getPriority(myPriority);
-            setPriority(&_ceilingPriority); 
+            setPriority(&_ceilingPriority);
        }
         void lowerPriority() {
             Priority * myPriority = getPriorityStorage();
-            setPriority(myPriority); 
+            setPriority(myPriority);
         }
 
         void setPriority(const Priority * thePriority) {
@@ -209,7 +209,7 @@ DB3(cycles_t _cycles);
             }
             return myPriority;
         }
-        
+
         Priority _ceilingPriority;
         pthread_key_t _normalPriorityKey;
         bool    _disabled;
@@ -219,4 +219,4 @@ DB3(cycles_t _cycles);
 /* @} */
 
 
-#endif 
+#endif

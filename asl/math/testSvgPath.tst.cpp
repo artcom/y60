@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -101,7 +101,7 @@ public:
             SvgPath * mySubPath = myPath.createSubPath(Vector3f(10,0,0), Vector3f(90,0,0));
             DPRINT(mySubPath->getLength());
             ENSURE(mySubPath->getLength() == 80.0f);
-            
+
             SvgPath myBezierPath;
             myBezierPath.move(Vector3f(0,0,0));
             myBezierPath.cbezier(Vector3f( 10, 10, 0), Vector3f( 90, 10, 0), Vector3f(100,0,0));
@@ -110,7 +110,7 @@ public:
             myBezierPath.cbezier(Vector3f(110,-10, 0), Vector3f(190,-10, 0), Vector3f(200,0,0));
             DPRINT(myBezierPath.getLength());
             ENSURE(almostEqual(myBezierPath.getLength(), 204.55f));
-            
+
             SvgPath myBezierFromPointsPath;
             float myHandleLength = sqrt(10.0f * 10.0f + 10.0f * 10.0f);
             myBezierFromPointsPath.move(Vector3f(0,0,0));
@@ -120,8 +120,8 @@ public:
             myBezierFromPointsPath.cbezierFromPoints(Vector3f(100,0,0), Vector3f(200,50,0), Vector3f(300,150,0), Vector3f(400,100,0), myHandleLength);
             DPRINT(myBezierFromPointsPath.getLength());
             ENSURE(almostEqual(myBezierFromPointsPath.getLength(), 349.56f));
-            
-            
+
+
         }
     }
 };

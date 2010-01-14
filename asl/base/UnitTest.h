@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: UnitTest.h,v $
@@ -39,8 +39,8 @@ class ASL_BASE_DECL UnitTest {
 public:
     virtual void run() = 0;
     unsigned int getPassedCount() const;
-    unsigned int getFailedCount() const; 
-    unsigned int getExpectedFailedCount() const; 
+    unsigned int getFailedCount() const;
+    unsigned int getExpectedFailedCount() const;
     const char * getMyName() const;
     virtual ~UnitTest();
     virtual void incrementPassedCount();
@@ -93,7 +93,7 @@ private:
 
 class ASL_BASE_DECL UnitTestSuite : public UnitTest {
 public:
-    explicit UnitTestSuite(const char * myName, int argc, char *argv[]) 
+    explicit UnitTestSuite(const char * myName, int argc, char *argv[])
         : UnitTest(myName), _argc(argc), _argv(argv) {
     }
     ~UnitTestSuite() {
@@ -115,7 +115,7 @@ public:
         }
     }
     virtual void run();
-    
+
     virtual void setup() {
         std::cerr << ">> Launching Test Suite '" << getMyName() << "'" << std::endl;
     }

@@ -5,9 +5,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: testXmlDom.tst.cpp,v $
@@ -120,7 +120,7 @@ class XmlDomUnitTest : public UnitTest {
                     ENSURE(myElement->parentNode() == 0);
                 }
 
-            
+
                 dom::NamedNodeMap myNodeMap(0);
                 dom::NodePtr myAttribNodePtr(new dom::Attribute("attribute","value"));
                 myNodeMap.setNamedItem(myAttribNodePtr);
@@ -199,7 +199,7 @@ class XmlDomUnitTest : public UnitTest {
                 dom::Document myBadDocument7("<bookmark id='SixFaceFreeViewer' name='free' viewtype='free'"
                                              "orientation='[0.11277,-0.376132,-0.305966,0.86729] zoom='0' position='[0,0,0]'/>");
                 ENSURE(!myBadDocument7);
-               
+
                 dom::Document myBadDocument1("bla");
                 ENSURE(!myBadDocument1);
 
@@ -218,7 +218,7 @@ class XmlDomUnitTest : public UnitTest {
                 dom::Document myBadDocument6("<");
                 ENSURE(!myBadDocument6);
 
- 
+
                 dom::Element myElem;
                 myElem.appendAttribute("myattr","myval");
                 ENSURE(myElem["myattr"].nodeValue() == "myval");
@@ -586,7 +586,7 @@ myDocument.getValueFactory()->dump();
                 }
 #endif
 
-                //TODO: The xml spec says: Validity constraint: One ID per Element Type 
+                //TODO: The xml spec says: Validity constraint: One ID per Element Type
                 //TODO: No element type may have more than one ID attribute specified.
                 //TODO: Therefore the following test does not use a valid schema
 
@@ -831,8 +831,8 @@ class XmlCatalogUnitTest : public UnitTest {
                 }
                 {
                     asl::ReadableFile myFile("cattest.b60");
-                    NodePtr myRoot = myIdDocument.getElementById("r0"); 
-                    NodePtr myChild0 = myIdDocument.getElementById("c0"); 
+                    NodePtr myRoot = myIdDocument.getElementById("r0");
+                    NodePtr myChild0 = myIdDocument.getElementById("c0");
                     NodePtr myChild1 = myIdDocument.getElementById("c1");
                     ENSURE(myRoot->removeChild(myChild0));
                     ENSURE(myRoot->removeChild(myChild1));
@@ -850,7 +850,7 @@ class XmlCatalogUnitTest : public UnitTest {
                     ENSURE(myNewChild1->loadElementById("c1","id",myFile, 0, *myDictionaries, myCatalog));
                     DPRINT(myIdDocument);
                 }
-                  
+
                 {
                     DTITLE("Testing Lazy Loading");
                     dom::Document myLazyIdDocument;
@@ -881,16 +881,16 @@ class XmlCatalogUnitTest : public UnitTest {
                     myLazyIdDocument.debinarizeLazy(myFile);
                     ENSURE(myLazyIdDocument);
                     ENSURE(myLazyIdDocument.hasLazyChildren());
-                    
+
                     NodePtr myRoot = myLazyIdDocument.getElementById("r0");
-                    ENSURE(myRoot); 
+                    ENSURE(myRoot);
                     NodePtr myChild0 = myLazyIdDocument.getElementById("c0");
-                    ENSURE(myChild0); 
+                    ENSURE(myChild0);
                     NodePtr myChild1 = myLazyIdDocument.getElementById("c1");
-                    ENSURE(myChild1); 
+                    ENSURE(myChild1);
                     NodePtr myChild8 = myLazyIdDocument.getElementById("gggc0");
-                    ENSURE(myChild8); 
-                    ENSURE(myChild8->getAttribute("id")->nodeValue() == "gggc0"); 
+                    ENSURE(myChild8);
+                    ENSURE(myChild8->getAttribute("id")->nodeValue() == "gggc0");
                     DPRINT(myLazyIdDocument);
                 }
             }
@@ -1238,9 +1238,9 @@ public:
 #define DUMP_NODES
 #ifdef DUMP_NODES
                 cerr <<"myNewDocument:"<<endl;
-                printChangedNodes(myNewDocument, 0xffffffffffffffffULL, 0);           
+                printChangedNodes(myNewDocument, 0xffffffffffffffffULL, 0);
                 cerr <<"myOldDocument (pre patch):"<<endl;
-                printChangedNodes(myOldDocument, 0xffffffffffffffffULL, 0);                
+                printChangedNodes(myOldDocument, 0xffffffffffffffffULL, 0);
 #endif
                 cerr << endl << "applying patch from version "<< myOldVersion << " -> " <<  myNewDocument.nodeVersion() << ", size =" << myPatch.size() << endl;
                 unsigned long long myPrePatchVersion = myOldDocument.nodeVersion();
@@ -1251,17 +1251,17 @@ public:
                 cerr << "myOldDocument.nodeVersion (post patch version) = " <<  myOldDocument.nodeVersion() << endl;
 #ifdef DUMP_NODES
                 cerr <<"myOldDocument (post patch):"<<endl;
-                printChangedNodes(myOldDocument, 0xffffffffffffffffULL, 0);                
-#endif                
+                printChangedNodes(myOldDocument, 0xffffffffffffffffULL, 0);
+#endif
                 // check if the patched document is identical to the original
                 asl::Block myPatchedBlock;
                 cerr << endl << "myNewDocument.binarize (post patch check)"<<endl;
                 myOldDocument.binarize(myPatchedBlock);
-                SUCCESS("binarized old");            
+                SUCCESS("binarized old");
                 asl::Block myNewBlock;
                 cerr << endl << "myNewDocument.binarize (post patch check ref)"<<endl;
                 myNewDocument.binarize(myNewBlock);
-                SUCCESS("binarized new");  
+                SUCCESS("binarized new");
                 ENSURE(myPatchedBlock == myNewBlock);
                 if (myPatchedBlock != myNewBlock) {
                     cerr << "patched myOldDocument:"<< endl;
@@ -1269,7 +1269,7 @@ public:
                     cerr << "myNewDocument:"<< endl;
                     cerr << myNewDocument << endl;
                 }
-                
+
                 // now make a patch of the patched document and see if it matches the applied patch
                 asl::Block myGen2Patch;
                 cerr << endl << "myNewDocument.binarize (post patch patch gen)"<<endl;
@@ -1280,14 +1280,14 @@ public:
                     cerr << "myGen2Patch:" << myGen2Patch << endl;
                 }
 
-                // check the total patch from the first document 
+                // check the total patch from the first document
                 dom::Document myOriginalDocument;
                 setupDocument(myOriginalDocument);;
                 SUCCESS("setup myOriginalDocument");
                 myOriginalDocument.debinarize(theOriginalDocumentBlock);
 #ifdef DUMP_NODES
                 cerr <<"myOriginalDocument:"<<endl;
-                printChangedNodes(myOriginalDocument, 0xffffffffffffffffULL, 0);                
+                printChangedNodes(myOriginalDocument, 0xffffffffffffffffULL, 0);
                 cerr <<"myNewDocument:"<<endl;
                 printChangedNodes(myNewDocument, 0xffffffffffffffffULL, 0);
 #endif
@@ -1296,14 +1296,14 @@ public:
 #ifdef DUMP_NODES
                 cerr <<"myNewDocument again:"<<endl;
                 printChangedNodes(myNewDocument, 0xffffffffffffffffULL, 0);
-#endif                
+#endif
                 ENSURE(myNewDocumentVersionPrePrint == myNewDocument.nodeVersion());
                 asl::Block myCumulatedPatch;
                 cerr <<"changes myOriginalDocument->myNewDocument:"<<endl;
                 myNewDocument.makePatch(myCumulatedPatch, 1);
 #ifdef DUMP_NODES
                 printChangedNodes(myNewDocument, 1, 0);
-#endif                
+#endif
                 cerr << endl << "applying patch from version "<< 1 << " -> " <<  myNewDocument.nodeVersion() << ", size =" << myCumulatedPatch.size() << endl;
                 myOriginalDocument.applyPatch(myCumulatedPatch);
                 SUCCESS("applied cumulated patch");
@@ -1312,7 +1312,7 @@ public:
                 asl::Block myCumPatchedBlock;
                 cerr << endl << "myNewDocument.binarize (post patch check)"<<endl;
                 myOriginalDocument.binarize(myCumPatchedBlock);
-                SUCCESS("binarized old");            
+                SUCCESS("binarized old");
                 ENSURE(myCumPatchedBlock == myNewBlock);
                 if (myCumPatchedBlock != myNewBlock) {
                     cerr << "patched myOldDocument:"<< endl;
@@ -1323,7 +1323,7 @@ public:
             }
         }
         void run() {
-        try {           
+        try {
             DTITLE("Starting patch with Schema tests");
             dom::Document myIdDocument;
             setupDocument(myIdDocument);
@@ -1363,14 +1363,14 @@ public:
             NodePtr myNewAttr = myR0->appendAttribute("newattrib", "newvalue");
             ENSURE(myNewAttr);
 
-            unsigned long long myNewDocumentVersion = myIdDocument.nodeVersion(); 
+            unsigned long long myNewDocumentVersion = myIdDocument.nodeVersion();
             DPRINT(myNewDocumentVersion);
             ENSURE(myNewDocumentVersion > myDocumentVersion);
 #define PERFORM_TEST_PATCH
 #ifdef PERFORM_TEST_PATCH
             testPatch(myIdDocument2, myDocumentVersion, myIdDocument, myBinarizedOriginalDocument);
 #endif
-            
+
             myDocumentVersion = myIdDocument.nodeVersion();
             DOMString myNewAttrStringValue = myNewAttr->nodeValue();
             ENSURE(myDocumentVersion == myIdDocument.nodeVersion());
@@ -1494,7 +1494,7 @@ public:
         addTest(new XmlDomCloneNodeUnitTest);
         addTest(new XmlDomEventsUnitTest);
         addTest(new XmlPatchUnitTest);
-        addTest(new XmlSchemaUnitTest); 
+        addTest(new XmlSchemaUnitTest);
         addTest(new XmlCatalogUnitTest);
      }
 };

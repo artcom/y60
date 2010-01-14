@@ -4,15 +4,15 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
 // Description:  misc operating system & environment helper functions
 //
-// Last Review: pavel 30.11.2005 
+// Last Review: pavel 30.11.2005
 //
 //  review status report: (perfect, ok, fair, poor, disaster)
 //    usefullness            : ok
@@ -96,7 +96,7 @@ namespace asl {
 
     template <class T>
     bool get_environment_var_as(const std::string & theVariable, T& theValue);
-    
+
     template <class T>
     T getenv(const std::string & theVariable, const T & theDefaultValue) {
         T myResult = theDefaultValue;
@@ -105,14 +105,14 @@ namespace asl {
         }
         catch (asl::ParseException & /*ex*/) {
             throw asl::ParseException(std::string("Could not convert value of environment variable '"+theVariable+"' to type "+
-                                      typeid(myResult).name()), PLUS_FILE_LINE); 
+                                      typeid(myResult).name()), PLUS_FILE_LINE);
         }
         return myResult;
     }
 
 #ifdef _WIN32
 		ASL_BASE_DECL bool hResultIsOk(HRESULT hr, std::string & theMessage);
-#endif		
+#endif
     /* @} */
 
 } //Namespace asl

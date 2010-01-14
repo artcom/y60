@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -48,7 +48,7 @@
 //              TODO: - 1d/3d variants
 //
 //=============================================================================
- 
+
 
 //own header
 #include "PerlinNoise.h"
@@ -84,7 +84,7 @@ PrimePool::createNoiseSeed(unsigned theOctaves, NoiseSeed & theSeeds) {
         createPrimeNumberList(700000, 800000, _myPool2);
         createPrimeNumberList(1376310000, 1376320000, _myPool3);
     }
-    
+
     theSeeds.clear();
     for (unsigned i = 0; i < theOctaves; ++i) {
         Vector3i mySeed(getRandomElement(_myPool1),
@@ -94,7 +94,7 @@ PrimePool::createNoiseSeed(unsigned theOctaves, NoiseSeed & theSeeds) {
     }
 }
 
-int 
+int
 PrimePool::getRandomElement(const std::vector<int> & theList) {
     int myIndex = int(float( rand() ) / RAND_MAX * theList.size());
     return theList[myIndex];
@@ -110,22 +110,22 @@ PerlinNoise2D::PerlinNoise2D(const NoiseSeed & theSeeds, float thePersistence) :
     _myPersistence(thePersistence)
 {}
 
-float 
+float
 PerlinNoise2D::operator()(const asl::Vector2f & thePosition) const {
     return (*this)(thePosition[0], thePosition[1]);
 }
 
-float 
+float
 PerlinNoise2D::operator()(float x, float y) const {
     unsigned n = getOctaveCount() - 1;
     float myTotal = 0;
-    for (unsigned i = 0; i < n; ++i) {      
+    for (unsigned i = 0; i < n; ++i) {
         float myFrequency = pow(2.0f, float(i));
-        float myAmplitude = pow(_myPersistence, float(i));        
-        myTotal = myTotal + interpolatedNoise(x * myFrequency, y * myFrequency, i) * myAmplitude;        
+        float myAmplitude = pow(_myPersistence, float(i));
+        myTotal = myTotal + interpolatedNoise(x * myFrequency, y * myFrequency, i) * myAmplitude;
     }
-    
-    return myTotal;    
+
+    return myTotal;
 }
 
 float
@@ -136,22 +136,22 @@ PerlinNoise2D::noise(int theX, int theY, unsigned theOctave) const {
     return float( 1.0 - ( ( n * ( n * n * mySeed[0] + mySeed[1]) + mySeed[2]) & 0x7fffffff) / 1073741824.0);
 }
 
-void 
+void
 PerlinNoise2D::setSeed(const NoiseSeed & theSeeds) {
     _mySeeds = theSeeds;
 }
 
-const NoiseSeed & 
+const NoiseSeed &
 PerlinNoise2D::getSeed() const {
     return _mySeeds;
 }
 
-void 
+void
 PerlinNoise2D::setPersistence(const float & thePersistence) {
     _myPersistence = thePersistence;
 }
 
-const float & 
+const float &
 PerlinNoise2D::getPersistence() const {
     return _myPersistence;
 }
@@ -163,9 +163,9 @@ PerlinNoise2D::getOctaveCount() const {
 
 float
 PerlinNoise2D::smoothedNoise(int x, int y, unsigned theOctave) const {
-    float corners = (noise(x-1, y-1, theOctave) + noise(x+1, y-1, theOctave) + 
+    float corners = (noise(x-1, y-1, theOctave) + noise(x+1, y-1, theOctave) +
                     noise(x-1, y+1, theOctave) + noise(x+1, y+1, theOctave))  / 16.0f;
-    float sides   = (noise(x-1, y, theOctave)  + noise(x+1, y, theOctave)  + 
+    float sides   = (noise(x-1, y, theOctave)  + noise(x+1, y, theOctave)  +
                     noise(x, y-1, theOctave)  + noise(x, y+1, theOctave))  /  8.0f;
     float center  = (noise(x, y, theOctave)) / 4.0f;
 
@@ -173,29 +173,29 @@ PerlinNoise2D::smoothedNoise(int x, int y, unsigned theOctave) const {
 }
 
 float
-PerlinNoise2D::interpolatedNoise(float x, float y, unsigned theOctave) const {    
+PerlinNoise2D::interpolatedNoise(float x, float y, unsigned theOctave) const {
     int integer_X    = int(x);
     float fractional_X = x - integer_X;
-    
+
     int integer_Y    = int(y);
     float fractional_Y = y - integer_Y;
-    
+
     float v1 = smoothedNoise(integer_X,     integer_Y, theOctave);
     float v2 = smoothedNoise(integer_X + 1, integer_Y, theOctave);
     float v3 = smoothedNoise(integer_X,     integer_Y + 1, theOctave);
     float v4 = smoothedNoise(integer_X + 1, integer_Y + 1, theOctave);
-    
+
     float i1 = interpolate(v1 , v2 , fractional_X);
     float i2 = interpolate(v3 , v4 , fractional_X);
-    
+
     return interpolate(i1 , i2 , fractional_Y);
 }
 
 float
 PerlinNoise2D::interpolate(float a, float b, float theGamma) const {
     float ft = float(theGamma * PI);
-    float f = (1 - cos(ft)) * 0.5f;   
-    return  a * ( 1 - f) + b * f;    
+    float f = (1 - cos(ft)) * 0.5f;
+    return  a * ( 1 - f) + b * f;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -204,7 +204,7 @@ PerlinNoise2D::interpolate(float a, float b, float theGamma) const {
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-PerlinNoise3D::PerlinNoise3D(unsigned theOctaveCount, float theAmplitudeFalloff) : 
+PerlinNoise3D::PerlinNoise3D(unsigned theOctaveCount, float theAmplitudeFalloff) :
     _myOctaveCount(theOctaveCount),
     _myAmplitudeFalloff(theAmplitudeFalloff)
 {
@@ -233,7 +233,7 @@ PerlinNoise3D::noise(float f, float f1, float f2) {
     int j = int(f);
     int k = int(f1);
     int l = int(f2);
-    
+
     float f3 = f - float(j);
     float f4 = f1 - float(k);
     float f5 = f2 - float(l);
@@ -278,4 +278,4 @@ PerlinNoise3D::noise(float f, float f1, float f2) {
     }
 
     return f8;
-} 
+}

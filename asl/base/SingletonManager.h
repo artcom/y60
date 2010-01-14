@@ -4,7 +4,7 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -106,7 +106,7 @@ public:
     // needs to be called by each dynamically loaded Plug-In
     // to delegate singleton lookup to the one and only
     // SingletonManager in charge for the running process.
-    void setDelegate(SingletonManager * theDelegate); 
+    void setDelegate(SingletonManager * theDelegate);
 
     template<class T>
     T& getSingletonInstance() const {
@@ -162,14 +162,14 @@ private:
 
 /** SingletonDeleter
  *
- * When using dynamic linking (DLLs) in Windows, DLLs are loaded and unloaded 
- * in some order that the OS determines. Therefor it might happen that a DLL 
- * already is unloaded when the SingletonManager, from its destructor, tries 
- * to call code in that DLL in order to destroy a singleton. 
- * 
- * To prevent this, the global constant singletonDeleter instance, instantiated 
- * once for every DLL, will destroy all singletons from its destructor as soon 
- * as the first DLL is unloaded. 
+ * When using dynamic linking (DLLs) in Windows, DLLs are loaded and unloaded
+ * in some order that the OS determines. Therefor it might happen that a DLL
+ * already is unloaded when the SingletonManager, from its destructor, tries
+ * to call code in that DLL in order to destroy a singleton.
+ *
+ * To prevent this, the global constant singletonDeleter instance, instantiated
+ * once for every DLL, will destroy all singletons from its destructor as soon
+ * as the first DLL is unloaded.
  */
 class ASL_BASE_DECL SingletonDeleter {
 public:

@@ -4,15 +4,15 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
 // Description: command line argument parser
 //
-// Last Review: pavel 30.11.2005 
+// Last Review: pavel 30.11.2005
 //
 //  review status report: (perfect, ok, fair, poor, disaster)
 //    formatting             : perfect
@@ -31,7 +31,7 @@
 //    overall review status  : ok
 //
 //    recommendations: none
-//       
+//
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
@@ -62,7 +62,7 @@ void
 Arguments::addAllowedOptions(const AllowedOption * allowedOptions) {
     int i = 0;
     while ((string(allowedOptions[i].theName) != "" ||  string(allowedOptions[i].theArgumentName) != "")
-            && i < MAX_OPTIONS) 
+            && i < MAX_OPTIONS)
 	{
 		if ( !std::string(allowedOptions[i].theName).empty() ) {
             _allowedOptions[allowedOptions[i].theName] = allowedOptions[i].theArgumentName;
@@ -77,10 +77,10 @@ Arguments::addAllowedOptions(const AllowedOption * allowedOptions) {
     _allowedOptions["--copyright"] = "";
 }
 
-void 
+void
 Arguments::addAllowedOptionsWithDocumentation(const AllowedOptionWithDocumentation * allowedOptions) {
 	int i = 0;
-    while ((string(allowedOptions[i].theName) != "" ||  string(allowedOptions[i].theArgumentName) != "") && i < MAX_OPTIONS) 
+    while ((string(allowedOptions[i].theName) != "" ||  string(allowedOptions[i].theArgumentName) != "") && i < MAX_OPTIONS)
     {
 		if (!std::string(allowedOptions[i].theName).empty() ) {
             _allowedOptions[allowedOptions[i].theName] = allowedOptions[i].theArgumentName;
@@ -278,7 +278,7 @@ Arguments::printHelp() const {
     if (_optionDescriptions.size()) {
         myHelp << "Options:" << endl;
 		for (map<string,string>::const_iterator it = _allowedOptions.begin();
-			 it != _allowedOptions.end(); ++it) 
+			 it != _allowedOptions.end(); ++it)
 		{
            myHelp << "  " << it->first;
            if (it->second != "") {

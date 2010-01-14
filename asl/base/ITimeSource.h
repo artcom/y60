@@ -4,16 +4,16 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description:  Simple time source interface. getCurrentTime() should return 
+// Description:  Simple time source interface. getCurrentTime() should return
 //               the time in seconds since the TimeSource was constructed.
 //
-// Last Review: pavel 30.11.2005 
+// Last Review: pavel 30.11.2005
 //
 //  review status report: (perfect, ok, fair, poor, disaster)
 //    usefullness            : ok
@@ -50,7 +50,7 @@ namespace asl {
 
 /*! \addtogroup aslbase */
 /* @{ */
-    
+
 class ITimeSource {
     public:
         virtual double getCurrentTime() = 0;

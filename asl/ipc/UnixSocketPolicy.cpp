@@ -4,12 +4,12 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: 
+// Description:
 //     Classes for networked or local communication between processes
 //
 // Last Review:  ms 2007-08-15
@@ -35,7 +35,7 @@
 //
 //    overall review status   :      ok
 //
-//    recommendations: add high-level documentation, improve doxygen documentation 
+//    recommendations: add high-level documentation, improve doxygen documentation
 */
 //own header
 #include "UnixSocketPolicy.h"
@@ -63,19 +63,19 @@ UnixAddress::UnixAddress(const std::string & thePath) {
     string myPath = UnixAddress::PIPE_PREFIX+thePath;
     strncpy(sun_path, myPath.c_str(), UNIX_PATH_MAX);
 }
-    
+
 UnixAddress::UnixAddress(const char * thePath) {
     sun_family = AF_UNIX;
     string myPath = UnixAddress::PIPE_PREFIX+thePath;
     strncpy(sun_path, myPath.c_str(), UNIX_PATH_MAX);
 }
-    
+
 UnixAddress::UnixAddress() {
     sun_family = AF_UNIX;
     *sun_path = 0;
 }
 
-std::ostream & 
+std::ostream &
 UnixAddress::print(std::ostream & os) const {
     return os << sun_path;
 }
@@ -84,11 +84,11 @@ std::ostream & operator << (std::ostream & os, const UnixAddress & theAddress) {
     return theAddress.print(os);
 }
 
-UnixSocketPolicy::Handle 
+UnixSocketPolicy::Handle
 UnixSocketPolicy::connectTo(Endpoint theRemoteEndpoint) {
-    Handle myHandle = socket(AF_UNIX,SOCK_STREAM,0);   
+    Handle myHandle = socket(AF_UNIX,SOCK_STREAM,0);
     if (myHandle == INVALID_SOCKET) {
-        throw ConduitException(string("UnixSocketPolicy::ctor: create - ") + 
+        throw ConduitException(string("UnixSocketPolicy::ctor: create - ") +
                 inet::getSocketErrorMessage(inet::getLastSocketError()), PLUS_FILE_LINE);
     }
 
@@ -96,10 +96,10 @@ UnixSocketPolicy::connectTo(Endpoint theRemoteEndpoint) {
     {
         int myLastError = inet::getLastSocketError();
         if (myLastError == ECONNREFUSED) {
-            throw ConduitRefusedException(string("UnixSocketPolicy::ctor: connect - ") + 
+            throw ConduitRefusedException(string("UnixSocketPolicy::ctor: connect - ") +
                 inet::getSocketErrorMessage(inet::getLastSocketError()), PLUS_FILE_LINE);
         } else {
-            throw ConduitException(string("UnixSocketPolicy::ctor: connect - ") + 
+            throw ConduitException(string("UnixSocketPolicy::ctor: connect - ") +
                 inet::getSocketErrorMessage(inet::getLastSocketError()), PLUS_FILE_LINE);
         }
     }
@@ -110,17 +110,17 @@ UnixSocketPolicy::connectTo(Endpoint theRemoteEndpoint) {
 
 UnixSocketPolicy::Handle
 UnixSocketPolicy::startListening(Endpoint theEndpoint, unsigned theMaxConnectionCount) {
-    Handle myHandle=socket(AF_UNIX,SOCK_STREAM,0);    
+    Handle myHandle=socket(AF_UNIX,SOCK_STREAM,0);
     if (myHandle == INVALID_SOCKET) {
-        throw ConduitException(string("UnixSocketPolicy::startListening") + 
-                inet::getSocketErrorMessage(inet::getLastSocketError()) + 
+        throw ConduitException(string("UnixSocketPolicy::startListening") +
+                inet::getSocketErrorMessage(inet::getLastSocketError()) +
                 "'" + as_string(theEndpoint)+"'", PLUS_FILE_LINE);
     }
 
     if (bind(myHandle,(struct sockaddr*)&theEndpoint,sizeof(theEndpoint))<0) {
         int myLastError = inet::getLastSocketError();
         if (myLastError == EADDRINUSE) {
-            throw ConduitInUseException(string("UnixSocketPolicy::bind") + "'" + 
+            throw ConduitInUseException(string("UnixSocketPolicy::bind") + "'" +
                     as_string(theEndpoint)+"'", PLUS_FILE_LINE);
         } else {
             throw ConduitException(string("UnixSocketPolicy::UnixSocketPolicy bind - ")+
@@ -137,7 +137,7 @@ UnixSocketPolicy::startListening(Endpoint theEndpoint, unsigned theMaxConnection
     return myHandle;
 }
 
-void 
+void
 UnixSocketPolicy::stopListening(Handle theHandle) {
     Endpoint localEndpoint;
     socklen_t myNameLength = sizeof(localEndpoint);

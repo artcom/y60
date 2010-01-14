@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: numeric_functions.h,v $
@@ -47,7 +47,7 @@ static const double EULER = 2.7182818284590452354;
 inline double radFromDeg(double theDegree)  { return (theDegree * PI) / 180.0; }
 inline double degFromRad(double theRadiant) { return (theRadiant * 180.0) / PI; }
 
-inline 
+inline
 bool isNaN(const double theNumber) {
 #if defined(_WIN32)
 	return 0 != _isnan(theNumber);
@@ -56,7 +56,7 @@ bool isNaN(const double theNumber) {
 #endif //defined(_WIN32)
 }
 
-inline 
+inline
 bool isFinite(const double theNumber) {
 #if defined(_WIN32)
 	return 0 != _finite(theNumber);

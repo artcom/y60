@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -54,7 +54,7 @@ using namespace std;
 namespace asl {
 
 DEFINE_EXCEPTION(CoreAudioException, Exception);
-    
+
 #define checkStatus(x) if (x) { \
     throw CoreAudioException((char*)(&x), PLUS_FILE_LINE); \
 }
@@ -79,13 +79,13 @@ void PrintStreamDesc (AudioStreamBasicDescription *inDesc)
 }
 
 
-CoreAudioPump::CoreAudioPump () 
+CoreAudioPump::CoreAudioPump ()
     : Pump(SF_F32, 0), _curFrame(0)
 {
     AC_INFO << "CoreAudioPump::CoreAudioPump";
-   
+
     setDeviceName("CoreAudio Sound Device");
-    
+
     setCardName("Dummy Sound Card"); // TODO
 
     _myOutputBuffer.init(512, getNumOutputChannels(), getNativeSampleRate());
@@ -95,15 +95,15 @@ CoreAudioPump::CoreAudioPump ()
     _myRunning = true;
     // setup coreaudio callbacks
     OSStatus err = noErr;
-        
+
     err = setupAudioUnit();
-    checkStatus(err);    
+    checkStatus(err);
 
     err = matchAUFormats(&_myOutputDesc);
     checkStatus(err);
 
     //err = getFileInfo(&fileRef, &musicFileID, &fileASBD, fileName);
-    //checkStatus(err);    
+    //checkStatus(err);
 
     //err = MakeAUConverter(&musicFileID, &converter,&fileASBD, &_myOutputDesc );
     //checkStatus(err);
@@ -131,14 +131,14 @@ Time CoreAudioPump::getCurrentTime () {
     return Time();
 }
 
-OSStatus 
+OSStatus
 CoreAudioPump::setupAudioUnit(){
     OSStatus err;
 
     //An Audio Unit is a OS component
-    //The component description must be setup, then used to 
+    //The component description must be setup, then used to
     //initialize an AudioUnit
-    ComponentDescription desc;  
+    ComponentDescription desc;
 
 
     desc.componentType = kAudioUnitType_Output;
@@ -157,7 +157,7 @@ CoreAudioPump::setupAudioUnit(){
     checkStatus(err);
     // if (err)  exit (-1);
 
-    // Initialize AudioUnit 
+    // Initialize AudioUnit
     err = AudioUnitInitialize(_myOutputUnit);
 
     return err;
@@ -165,23 +165,23 @@ CoreAudioPump::setupAudioUnit(){
 
 }
 
-OSStatus 
-CoreAudioPump::fileRenderProc(void             *inRefCon, 
+OSStatus
+CoreAudioPump::fileRenderProc(void             *inRefCon,
         AudioUnitRenderActionFlags    *inActionFlags,
-        const AudioTimeStamp       *inTimeStamp, 
+        const AudioTimeStamp       *inTimeStamp,
         UInt32                                  inBusNumber,
-        UInt32                                  inNumFrames, 
+        UInt32                                  inNumFrames,
         AudioBufferList                         *ioData)
 {
     CoreAudioPump * mySelf = reinterpret_cast<CoreAudioPump*>(inRefCon);
     return mySelf->pump(inActionFlags, inTimeStamp, inBusNumber, inNumFrames, ioData);
 }
-    
-OSStatus 
+
+OSStatus
 CoreAudioPump::pump(AudioUnitRenderActionFlags    *inActionFlags,
-        const AudioTimeStamp       *inTimeStamp, 
+        const AudioTimeStamp       *inTimeStamp,
         UInt32                                  inBusNumber,
-        UInt32                                  inNumFrames, 
+        UInt32                                  inNumFrames,
         AudioBufferList                         *ioData)
 {
     OSStatus err= noErr;
@@ -190,15 +190,15 @@ CoreAudioPump::pump(AudioUnitRenderActionFlags    *inActionFlags,
     int curBuffer = 0;
     while (myCurFrame != inNumFrames) {
         ::AudioBuffer & myCoreAudioBuffer = ioData->mBuffers[curBuffer];
-        int myFramesToWriteInBuffer = min(inNumFrames-myCurFrame, 
+        int myFramesToWriteInBuffer = min(inNumFrames-myCurFrame,
                 myCoreAudioBuffer.mDataByteSize / _myOutputDesc.mBytesPerFrame);
-        _myOutputBuffer.copyToRawMem(myCoreAudioBuffer.mData, 
-                myCurFrame*_myOutputDesc.mBytesPerFrame, 
+        _myOutputBuffer.copyToRawMem(myCoreAudioBuffer.mData,
+                myCurFrame*_myOutputDesc.mBytesPerFrame,
                 myFramesToWriteInBuffer*_myOutputDesc.mBytesPerFrame);
         myCurFrame += myFramesToWriteInBuffer;
     }
-    
-#if 0    
+
+#if 0
     void *inInputDataProcUserData=NULL;
     AudioStreamPacketDescription* outPacketDescription =NULL;
     err = AudioConverterFillComplexBuffer(converter, ACComplexInputProc ,inInputDataProcUserData , &inNumFrames, ioData, outPacketDescription);
@@ -229,14 +229,14 @@ CoreAudioPump::matchAUFormats (AudioStreamBasicDescription *theDesc)
 {
     UInt32 size = sizeof (AudioStreamBasicDescription);
     memset(theDesc, 0, size);
-    ::Boolean             outWritable;                            
+    ::Boolean             outWritable;
 
     //Gets the size of the Stream Format Property and if it is writable
-    AudioUnitGetPropertyInfo(_myOutputUnit,  
+    AudioUnitGetPropertyInfo(_myOutputUnit,
             kAudioUnitProperty_StreamFormat,
-            kAudioUnitScope_Output, 
-            0, 
-            &size, 
+            kAudioUnitScope_Output,
+            0,
+            &size,
             &outWritable);
     //Get the current stream format of the output
     OSStatus result = AudioUnitGetProperty (_myOutputUnit,
@@ -245,7 +245,7 @@ CoreAudioPump::matchAUFormats (AudioStreamBasicDescription *theDesc)
             0,
             theDesc,
             &size);
-    checkStatus(result); 
+    checkStatus(result);
     theDesc->mSampleRate = getNativeSampleRate();
     //Set the stream format of the output to match the input
     result = AudioUnitSetProperty (_myOutputUnit,
@@ -257,7 +257,7 @@ CoreAudioPump::matchAUFormats (AudioStreamBasicDescription *theDesc)
 
 
     return result;
-} 
+}
 
 OSStatus
 CoreAudioPump::setupCallbacks() {
@@ -268,12 +268,12 @@ CoreAudioPump::setupCallbacks() {
     renderCallback.inputProc = &fileRenderProc;
     renderCallback.inputProcRefCon = this;
 
-    //Sets the callback for the Audio Unit 
-    err = AudioUnitSetProperty (_myOutputUnit, 
-            kAudioUnitProperty_SetRenderCallback, 
-            kAudioUnitScope_Input, 
+    //Sets the callback for the Audio Unit
+    err = AudioUnitSetProperty (_myOutputUnit,
+            kAudioUnitProperty_SetRenderCallback,
+            kAudioUnitScope_Input,
             0,
-            &renderCallback, 
+            &renderCallback,
             sizeof(AURenderCallbackStruct));
 
     checkStatus(err);
@@ -281,7 +281,7 @@ CoreAudioPump::setupCallbacks() {
     return err;
 }
 
-void 
+void
 CoreAudioPump::cleanUp(){
     AC_DEBUG << "finished playing";
 
@@ -294,7 +294,7 @@ CoreAudioPump::cleanUp(){
 void CoreAudioPump::pump()
 {
     static Time lastTime;
-    
+
     msleep(unsigned(1000*getLatency()));
     Time curTime;
     double TimeSinceLastPump = curTime-lastTime;

@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: ZipWriter.cpp,v $
@@ -34,13 +34,13 @@ namespace asl {
 
 #define CHECK_ZIP(x) { int myRetVal(x); if (myRetVal != ZIP_OK) \
     throw ZipWriterException(string("ZIP Error: ")+as_string(myRetVal), PLUS_FILE_LINE); }
-    
-ZipWriter::ZipWriter(const char *  theOutputFileName) : _myZipFile(0) 
+
+ZipWriter::ZipWriter(const char *  theOutputFileName) : _myZipFile(0)
 {
     create(theOutputFileName);
 }
 
-ZipWriter::ZipWriter(const std::string & theOutputFileName) 
+ZipWriter::ZipWriter(const std::string & theOutputFileName)
 {
     create(theOutputFileName.c_str());
 }
@@ -66,10 +66,10 @@ ZipWriter::close() {
     }
 }
 
-void 
+void
 ZipWriter::append(ReadableBlock & theData, const char * theFilename) {
     Path myPath(theFilename, UTF8);
-    CHECK_ZIP(zipOpenNewFileInZip(_myZipFile, myPath.toLocale().c_str(), 
+    CHECK_ZIP(zipOpenNewFileInZip(_myZipFile, myPath.toLocale().c_str(),
             0, // zip_fileinfo
             0, // extrafield_local
             0, // extrafield_local size
@@ -84,7 +84,7 @@ ZipWriter::append(ReadableBlock & theData, const char * theFilename) {
     CHECK_ZIP(zipCloseFileInZip(_myZipFile));
 }
 
-void 
+void
 ZipWriter::append(ReadableBlock & theData, const std::string & theFilename) {
     append(theData, theFilename.c_str());
 }

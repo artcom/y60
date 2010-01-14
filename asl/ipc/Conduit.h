@@ -4,12 +4,12 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: 
+// Description:
 //     Classes for networked or local communication between processes
 //
 // Last Review:  ms 2007-08-15
@@ -35,7 +35,7 @@
 //
 //    overall review status   :      ok
 //
-//    recommendations: add high-level documentation, improve doxygen documentation 
+//    recommendations: add high-level documentation, improve doxygen documentation
 */
 #ifndef __asl_Conduit_included_
 #define __asl_Conduit_included_
@@ -56,7 +56,7 @@ namespace asl {
 /*! \addtogroup aslipc */
 /* @{ */
 
-//! Basic Conduit. Can be used as-is for a non-threaded, client conduit. 
+//! Basic Conduit. Can be used as-is for a non-threaded, client conduit.
 template <class POLICY>
 class Conduit {
     public:
@@ -72,21 +72,21 @@ class Conduit {
             disconnect();
         }
 
-        /// disconnect from the remote endpoint 
+        /// disconnect from the remote endpoint
         void disconnect() {
             if (_myHandle) {
                 POLICY::disconnect(_myHandle);
             }
         }
 
-        /// must be called periodically to handle I/O. 
+        /// must be called periodically to handle I/O.
         virtual bool handleIO(int theTimeout = 0) {
             if (!isValid()) {
                 return false;
             }
-            return POLICY::handleIO(_myHandle, _myInQueue, _myOutQueue, theTimeout); 
+            return POLICY::handleIO(_myHandle, _myInQueue, _myOutQueue, theTimeout);
         }
-        /// Send all outgoing data 
+        /// Send all outgoing data
         virtual bool flush(int theTimeout) {
             Time myTimer;
             long long myEndTime = myTimer.millis() + theTimeout;
@@ -99,7 +99,7 @@ class Conduit {
             }
             return _myOutQueue.empty();
         }
-        
+
         /// check status of the conduit.
         ///@returns true if the conduit is still operational, otherwise false.
         bool isValid() const {
@@ -109,7 +109,7 @@ class Conduit {
         /** @name sending and receiving raw data.
          */
         //@{
-        
+
         /// receive raw data (no framing)
         virtual bool receiveData(CharBuffer & theBuffer) {
             if (!handleIO()) {
@@ -120,7 +120,7 @@ class Conduit {
             }
             theBuffer = *(_myInQueue.front());
             _myInQueue.pop_front();
-            return true; 
+            return true;
         }
 
         /// send raw data (no framing)
@@ -144,23 +144,23 @@ class Conduit {
         //@}
 
         /** @name sending and receiving framed data.
-         * Each frame starts with a one-byte (if smaller than 255 octets) or a 5-byte header (0xff + Unsigned32) 
+         * Each frame starts with a one-byte (if smaller than 255 octets) or a 5-byte header (0xff + Unsigned32)
          * followed by the payload.
          */
         //@{
 
-        /// sends a string as a block (framing). 
+        /// sends a string as a block (framing).
         /**The other side should use a framing call to receive the data */
         virtual bool send(const std::string & theString) {
-            const unsigned char * myStart = reinterpret_cast<const unsigned char *>(theString.c_str()); 
+            const unsigned char * myStart = reinterpret_cast<const unsigned char *>(theString.c_str());
             return send(Block(myStart, myStart+theString.length()));
         }
-        
+
         /// sends a block of data (framing).
         /**The other side should use a framing call to receive the data */
         virtual bool send(const ReadableBlock & theBlock) {
             asl::Unsigned32 mySize = theBlock.size();
-            CharBufferPtr myBuffer(new CharBuffer(mySize+5)); 
+            CharBufferPtr myBuffer(new CharBuffer(mySize+5));
             char * myDataPos = 0;
             if (mySize < 0xff) {
                 myBuffer->resize(1+mySize);
@@ -182,10 +182,10 @@ class Conduit {
             Time myTimer;
             long long myEndTime = myTimer.millis() + theTimeout;
             long long myTimeLeft = myEndTime - myTimer.millis();
-            bool hasReceived = receive(myReceivedString); 
+            bool hasReceived = receive(myReceivedString);
             while (!hasReceived && myTimeLeft > 0 ) {
                 handleIO(static_cast<int>(myTimeLeft));
-                hasReceived = receive(myReceivedString); 
+                hasReceived = receive(myReceivedString);
                 myTimer.setNow();
                 long long myTimeLeft = myEndTime - myTimer.millis();
                 (void)myTimeLeft;
@@ -203,7 +203,7 @@ class Conduit {
             }
             return false;
         }
-        
+
         /// receives a Block of data (framing).
         /**The other side should use a framing call to receive the data */
         virtual bool receive(ResizeableBlock & myReceivedBlock) {
@@ -244,7 +244,7 @@ class Conduit {
             return dataReceived;
         }
         //@}
-       
+
     protected:
         /// create a new conduit using an already connected I/O handle
         Conduit(typename POLICY::Handle theHandle) : _myHandle(theHandle) {

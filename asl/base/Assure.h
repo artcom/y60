@@ -4,15 +4,15 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
 // Description: command line argument parser
 //
-// Last Review: pavel 30.11.2005 
+// Last Review: pavel 30.11.2005
 //
 //  review status report: (perfect, ok, fair, poor, disaster)
 //    usefullness            : fair
@@ -33,7 +33,7 @@
 //
 //    overall review status  : fair
 //
-//    recommendation: 
+//    recommendation:
 //       - improve documentation
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -55,18 +55,18 @@
 /* @{ */
 
 namespace AssurePolicy {
-    
+
     DEFINE_NESTED_EXCEPTION(AssurePolicy, Violation, asl::Exception)
 
 #ifdef check
-	#ifndef _SETTING_NO_UNDEF_WARNING_ 
+	#ifndef _SETTING_NO_UNDEF_WARNING_
 		#warning Symbol >check< defined as macro, undefining. (Outrageous namespace pollution by Apples AssertMacros.h, revealing arrogance and incompetence)
 	#endif
 	#undef check
 #endif
 
     struct Throw {
-            static void check( bool myExpressionResult, const char * myExpression, 
+            static void check( bool myExpressionResult, const char * myExpression,
                     const char * mySourceFileName, unsigned long mySourceLine)
             {
                 if (!myExpressionResult) {
@@ -81,11 +81,11 @@ namespace AssurePolicy {
     };
 
     struct Warn {
-        static void check( bool myExpressionResult, const char * myExpression, 
+        static void check( bool myExpressionResult, const char * myExpression,
                 const char * mySourceFileName, unsigned long mySourceLine)
         {
             if (!myExpressionResult) {
-                AC_WARNING << "AssurePolicy::Warn:check failed: (" << myExpression << ") in " 
+                AC_WARNING << "AssurePolicy::Warn:check failed: (" << myExpression << ") in "
                     << asl::location_string(mySourceFileName, mySourceLine) << std::endl;
             }
         }
@@ -93,11 +93,11 @@ namespace AssurePolicy {
     };
 
     struct Exit {
-        static void check( bool myExpressionResult, const char * myExpression, 
+        static void check( bool myExpressionResult, const char * myExpression,
                 const char * mySourceFileName, unsigned long mySourceLine)
         {
             if (!myExpressionResult) {
-                AC_ERROR << "AssurePolicy::Exit:check failed: (" << myExpression << ") in " 
+                AC_ERROR << "AssurePolicy::Exit:check failed: (" << myExpression << ") in "
                     << asl::location_string(mySourceFileName, mySourceLine) << std::endl;
                 std::cerr << "Exiting with return code -1." << std::endl;
                 exit(-1);
@@ -107,11 +107,11 @@ namespace AssurePolicy {
     };
 
     struct Abort {
-        static void check( bool myExpressionResult, const char * myExpression, 
+        static void check( bool myExpressionResult, const char * myExpression,
                 const char * mySourceFileName, unsigned long mySourceLine)
         {
             if (!myExpressionResult) {
-                AC_FATAL << "AssurePolicy::Exit:check failed: (" << myExpression << ") in " 
+                AC_FATAL << "AssurePolicy::Exit:check failed: (" << myExpression << ") in "
                     << asl::location_string(mySourceFileName, mySourceLine) << std::endl;
                 AC_FATAL << "Aborting immediately." << std::endl;
                 abort();
@@ -127,7 +127,7 @@ struct Assure {
 //   static void check(bool myExpressionResult,
     template< typename T >
     Assure(const T& myExpressionResult,
-           const char * myExpression, 
+           const char * myExpression,
            const char * mySourceFileName,
            unsigned long mySourceLine)
     {

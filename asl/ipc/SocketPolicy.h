@@ -4,12 +4,12 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: 
+// Description:
 //     Classes for networked or local communication between processes
 //
 // Last Review:  ms 2007-08-15
@@ -35,7 +35,7 @@
 //
 //    overall review status   :      ok
 //
-//    recommendations: add high-level documentation, improve doxygen documentation 
+//    recommendations: add high-level documentation, improve doxygen documentation
 */
 #ifndef __asl_SocketPolicy_included
 #define __asl_SocketPolicy_included
@@ -52,25 +52,25 @@ namespace asl {
 /*! \addtogroup ipcPolicies */
 /* @{ */
 
-//! Abstract base class for all socket-based conduit policies.  
-    
+//! Abstract base class for all socket-based conduit policies.
+
 class ASL_IPC_DECL SocketPolicy : public ConduitPolicy {
     public:
-        typedef int Handle; 
+        typedef int Handle;
 
-        static bool isValid(const Handle & theHandle) { 
-            return theHandle != 0; 
+        static bool isValid(const Handle & theHandle) {
+            return theHandle != 0;
         }
-      
+
         static void disconnect(Handle & theHandle);
-        /// Handles pending IO operations - should be called periodically (e.g. per frame) 
-        // @returns true if the conduit is still valid 
+        /// Handles pending IO operations - should be called periodically (e.g. per frame)
+        // @returns true if the conduit is still valid
         // @throws ConduitException
-        static bool 
+        static bool
         handleIO(Handle & theHandle, BufferQueue & theInQueue, BufferQueue & theOutQueue, int theTimeout = 0);
         // Acceptor methods
         static void stopListening(Handle theHandle);
-        static Handle createOnConnect(Handle & theListenHandle, unsigned theMaxConnectionCount, 
+        static Handle createOnConnect(Handle & theListenHandle, unsigned theMaxConnectionCount,
                 int theTimeout);
     protected:
         static bool receiveData(Handle & theHandle, BufferQueue & theInQueue);

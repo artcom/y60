@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -54,14 +54,14 @@
 #include <asl/base/Block.h>
 
 namespace asl {
-    
+
     char crc8(void *buf, int size );
     char crc8i(char init, void *buf, int size );
 
     template <class T>
-    char crc8i(char theInit, T theIt, unsigned theSize) {    
+    char crc8i(char theInit, T theIt, unsigned theSize) {
         char myResult = crc8(&theInit, 1);
-        
+
         for (unsigned i = 0; i < theSize; ++i) {
             myResult ^= *theIt++;
             for (unsigned j = 0; j < 8; ++j) {

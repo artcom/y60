@@ -4,16 +4,16 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: testException.tst.cpp,v $
 //
 //   $Revision: 1.1.1.1 $
 //
-// Description: unit test for Exception classes 
+// Description: unit test for Exception classes
 //
 //
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
@@ -28,7 +28,7 @@
 #include <iostream>
 #include <vector>
 
-using namespace std;  
+using namespace std;
 
 class DerivedException : public asl::Exception {
 public:
@@ -44,7 +44,7 @@ using namespace asl;
 template <class E>
 class ExceptionUnitTest : public TemplateUnitTest {
 public:
-    ExceptionUnitTest(const char * theTemplateArgument) 
+    ExceptionUnitTest(const char * theTemplateArgument)
         : TemplateUnitTest("ExceptionUnitTest",theTemplateArgument) {  }
     void run() {
         try {

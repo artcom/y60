@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -113,7 +113,7 @@ namespace {
         pi.setErrorIndex();
         return AdditiveExpr::Operator_Invalid;
     }
-    
+
     inline RelationalExpr::Operator readRelOperator(ParseInput& pi)
     {
         if( pi.readIf("<=") ) {
@@ -701,15 +701,15 @@ namespace {
     {
         throw xpath::NotImplemented( "Function 'translate()' is not implemented", PLUS_FILE_LINE );
         /*
-        The translate function returns the first argument string with occurrences of characters 
-        in the second argument string replaced by the character at the corresponding position 
-        in the third argument string. For example, translate("bar","abc","ABC") returns the 
-        string "BAr". If there is a character in the second argument string with no character 
-        at a corresponding position in the third argument string (because the second argument 
-        string is longer than the third argument string), then occurrences of that character in 
-        the first argument string are removed. For example, translate("--aaa--","abc-","ABC") 
-        returns "AAA". If a character occurs more than once in the second argument string, then 
-        the first occurrence determines the replacement character. If the third argument string 
+        The translate function returns the first argument string with occurrences of characters
+        in the second argument string replaced by the character at the corresponding position
+        in the third argument string. For example, translate("bar","abc","ABC") returns the
+        string "BAr". If there is a character in the second argument string with no character
+        at a corresponding position in the third argument string (because the second argument
+        string is longer than the third argument string), then occurrences of that character in
+        the first argument string are removed. For example, translate("--aaa--","abc-","ABC")
+        returns "AAA". If a character occurs more than once in the second argument string, then
+        the first occurrence determines the replacement character. If the third argument string
         is longer than the second argument string, then excess characters are ignored.
         */
     }
@@ -729,14 +729,14 @@ namespace {
         if( vt1 != ValueType_Non ) result.push_back(vt1); else return result;
         if( vt2 != ValueType_Non ) result.push_back(vt2); else return result;
         if( vt3 != ValueType_Non ) result.push_back(vt3); else return result;
-        if( vt4 != ValueType_Non ) result.push_back(vt4); 
+        if( vt4 != ValueType_Non ) result.push_back(vt4);
         return result;
     }
 
     typedef asl::static_dict_entry_type<FunctionCallExpr::FunctionInfo>::result_type
                                                   FuncDictEntry;
 
-    const FuncDictEntry funcDictEntries[] = 
+    const FuncDictEntry funcDictEntries[] =
         { FuncDictEntry( "id"               , FunctionCallExpr::FunctionInfo( false, FunctionCallExpr::Func_Id              , buildParameterTypeList( ValueType_Any                                  ), executeFunc_Id              ) )
         , FuncDictEntry( "starts-with"      , FunctionCallExpr::FunctionInfo( true , FunctionCallExpr::Func_StartsWith      , buildParameterTypeList( Value_String, Value_String                     ), executeFunc_StartsWith      ) )
         , FuncDictEntry( "contains"         , FunctionCallExpr::FunctionInfo( true , FunctionCallExpr::Func_Contains        , buildParameterTypeList( Value_String, Value_String                     ), executeFunc_Contains        ) )
@@ -791,7 +791,7 @@ namespace {
 
     inline FuncDict::const_iterator getFunctionInfo(FunctionCallExpr::FunctionType type)
     {
-        const Ft2FdiMap& ft2FdiMap = getFt2FdiMap(); 
+        const Ft2FdiMap& ft2FdiMap = getFt2FdiMap();
         const Ft2FdiMap::const_iterator itFT = ft2FdiMap .find(type);
         assert(itFT != ft2FdiMap.end());
         const FuncDict::const_iterator itFD = itFT->second;
@@ -1284,7 +1284,7 @@ namespace xpath {
                 }
                 if( !result.first->second.implemented ) {
                     pi.setErrorIndex();
-                    throw NotImplemented( std::string("Function '") 
+                    throw NotImplemented( std::string("Function '")
                                         + result.first->first
                                         + "()' is not implemented", PLUS_FILE_LINE );
                 }

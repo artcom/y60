@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -73,7 +73,7 @@ namespace {
 
     typedef asl::static_dict_entry_type<Axis::Type>::result_type
                                                   AxisDictEntry;
-    const AxisDictEntry axisDictEntries[] = 
+    const AxisDictEntry axisDictEntries[] =
         { AxisDictEntry( "ancestor"           , Axis::Type_Ancestor         )
         , AxisDictEntry( "ancestor-or-self"   , Axis::Type_AncestorOrSelf   )
         , AxisDictEntry( "attribute"          , Axis::Type_Attribute        )
@@ -100,7 +100,7 @@ namespace {
     typedef asl::static_dict_entry_type<NodeTest::Type>::result_type
                                                   NodeTestDictEntry;
 
-    const NodeTestDictEntry nodeTestDictEntries[] = 
+    const NodeTestDictEntry nodeTestDictEntries[] =
         { NodeTestDictEntry( "comment"                , NodeTest::Type_CommentTest               )
         , NodeTestDictEntry( "text"                   , NodeTest::Type_TextTest                  )
         , NodeTestDictEntry( "processing-instruction" , NodeTest::Type_ProcessingInstructionTest )
@@ -117,7 +117,7 @@ namespace {
 
     Axis::Type readAbbrevAxis(ParseInput& pi)
     {
-        static const AxisDictEntry axisAbbrevDictEntries[] = 
+        static const AxisDictEntry axisAbbrevDictEntries[] =
             // note: order matters here!
             { AxisDictEntry( ".."   , Axis::Type_Parent           )
             , AxisDictEntry( "."    , Axis::Type_Self             )
@@ -176,7 +176,7 @@ namespace {
                 if( nodeTest.empty() ) {
                     ps.commit();
                     return true;
-                }   
+                }
                 axis = Axis(Axis::Type_Child);
             }
         }
@@ -244,7 +244,7 @@ namespace xpath {
                                                  return true;
                                                  break;
 
-                    case Type_Invalid          : assert(false); 
+                    case Type_Invalid          : assert(false);
                                                  break;
                     default                    : assert(false);
                 }
@@ -359,7 +359,7 @@ namespace xpath {
                 {
                     Object result = doEvaluate(evContext);
                     switch( result.getType() ) {
-                    case Value_Number : 
+                    case Value_Number :
                         return evContext.proximityPos
                             == static_cast<std::size_t>(result.as<NumberValue>().getValue());
                     case Value_NodeSet: // FALL THROUGH
@@ -429,7 +429,7 @@ namespace xpath {
                 }
                 return os;
             }
-            
+
             int LocationStep::compare(const LocationStep& rhs) const
             {
                 const int cmpAxis = myAxis_.compare(rhs.myAxis_);

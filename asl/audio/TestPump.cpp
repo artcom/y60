@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -56,7 +56,7 @@ using namespace std;
 const SampleFormat ourNativeSampleFormat = SF_F32;
 
 void TestPump::runWithPump(bool useDummyPump) {
-        unsigned myBeginMemory = getProcessMemoryUsage(); 
+        unsigned myBeginMemory = getProcessMemoryUsage();
         if (!useDummyPump) {
             ENSURE(0 == dynamic_cast<DummyPump *>(&(Pump::get())));
         }
@@ -69,19 +69,19 @@ void TestPump::runWithPump(bool useDummyPump) {
             Pump::get().setVolume(0);
         }
         Pump::get().setBritzelTest(true);
-        
+
         testBufferAlloc();
 
         // Test different buffer sizes.
 //        playSingleSound(32768);
-        
-        playSingleSound(8); 
-        
-        playSingleSound(19);   
-        playSingleSound(256);  
-        playSingleSound(1024); 
-        playSingleSound(1472); 
-        playSingleSound(8096); 
+
+        playSingleSound(8);
+
+        playSingleSound(19);
+        playSingleSound(256);
+        playSingleSound(1024);
+        playSingleSound(1472);
+        playSingleSound(8096);
 
         testPumpTimer();
         testSinkTimer();
@@ -94,14 +94,14 @@ void TestPump::runWithPump(bool useDummyPump) {
         testDelayed();
 
         stressTest(5);
-        
+
         ENSURE(Pump::get().getNumClicks() == 0);
 
 //        testUnderrun();
 
         AC_DEBUG << "Memory at start: " << myBeginMemory << endl;
         AC_DEBUG << "Memory at end: " << getProcessMemoryUsage() << endl;
-        AC_DEBUG << "Allocated buffers: " << AudioBufferBase::getNumBuffersAllocated() 
+        AC_DEBUG << "Allocated buffers: " << AudioBufferBase::getNumBuffersAllocated()
                  << endl;
 
 #ifdef USE_DASHBOARD
@@ -121,11 +121,11 @@ void TestPump::testBufferAlloc() {
 void TestPump::playSingleSound(unsigned theFramesPerBuffer, unsigned theDuration) {
     Pump & myPump = Pump::get();
     msleep(theDuration);
-    HWSampleSinkPtr mySampleSink = 
+    HWSampleSinkPtr mySampleSink =
         createSampleSink("TestSink", 44100, 2);
     ENSURE(myPump.getNumSinks() == 1);
     msleep(theDuration);
-    queueSineBuffers(mySampleSink, SF_F32, theFramesPerBuffer, 2, 440, 
+    queueSineBuffers(mySampleSink, SF_F32, theFramesPerBuffer, 2, 440,
             44100, 0.0015*theDuration+0.1);
     mySampleSink->play();
     msleep(theDuration);
@@ -138,7 +138,7 @@ void TestPump::playSingleSound(unsigned theFramesPerBuffer, unsigned theDuration
 void TestPump::testUnderrun() {
     Pump & myPump = Pump::get();
     (void)myPump;
-    HWSampleSinkPtr mySampleSink = 
+    HWSampleSinkPtr mySampleSink =
         createSampleSink("TestSink", 44100, 2);
     mySampleSink->play();
     msleep(100);
@@ -152,9 +152,9 @@ void TestPump::testMix() {
     Pump & myPump = Pump::get();
 
     // Mix two sounds.
-    HWSampleSinkPtr mySampleSink1 = 
+    HWSampleSinkPtr mySampleSink1 =
         createSampleSink("TestSinkDouble1", 44100, 2);
-    HWSampleSinkPtr mySampleSink2 = 
+    HWSampleSinkPtr mySampleSink2 =
         createSampleSink("TestSinkDouble2", 44100, 2);
     queueSineBuffers(mySampleSink1, SF_F32, 32, 2, 440, 44100, 2, 0.5);
     queueSineBuffers(mySampleSink2, SF_F32, 33, 2, 440, 44100, 2, 0.5);
@@ -179,7 +179,7 @@ void TestPump::testMultiplePlay() {
     (void)myPump;
 
     // Stop and play again.
-    HWSampleSinkPtr myStopSampleSink = 
+    HWSampleSinkPtr myStopSampleSink =
         createSampleSink("TestStopPlaySink", 44100, 2);
     queueSineBuffers(myStopSampleSink, SF_F32, 1024, 2, 440, 44100, 2, 0.5);
     ENSURE(fabs(myStopSampleSink->getBufferedTime()-2) < 0.1);
@@ -195,7 +195,7 @@ void TestPump::testMultiplePlay() {
     msleep(100);
     ENSURE(fabs(myStopSampleSink->getBufferedTime()-1.9) < 0.2);
     AC_PRINT << "myStopSampleSink->getBufferedTime(): " <<
-            myStopSampleSink->getBufferedTime(); 
+            myStopSampleSink->getBufferedTime();
     myStopSampleSink->play();
     msleep(100);
     myStopSampleSink->stop();
@@ -207,9 +207,9 @@ void TestPump::testSimultaneousPlay() {
     (void)myPump;
 
     // Play two sounds and stop them at the same time.
-    HWSampleSinkPtr myStopSampleSink1 = 
+    HWSampleSinkPtr myStopSampleSink1 =
         createSampleSink("TestSimultaneousStopSink1", 44100, 2);
-    HWSampleSinkPtr myStopSampleSink2 = 
+    HWSampleSinkPtr myStopSampleSink2 =
         createSampleSink("TestSimultaneousStopSink2", 44100, 2);
     queueSineBuffers(myStopSampleSink1, SF_F32, 1024, 2, 440, 44100, 2, 0.5);
     queueSineBuffers(myStopSampleSink2, SF_F32, 1024, 2, 330, 44100, 2, 0.5);
@@ -225,7 +225,7 @@ void TestPump::testConversions() {
     Pump & myPump = Pump::get();
     (void)myPump;
 
-    HWSampleSinkPtr myMonoSampleSink = 
+    HWSampleSinkPtr myMonoSampleSink =
         createSampleSink("TestMonoSink", 44100, 1);
     queueSineBuffers(myMonoSampleSink, SF_F32, 1024, 1, 440, 44100, 2, 1);
     myMonoSampleSink->play();
@@ -235,7 +235,7 @@ void TestPump::testConversions() {
     SUCCESS("Played mono sound on stereo device.");
 
     // Play a sound with signed 16-bit samples.
-    HWSampleSinkPtr myS16SampleSink = 
+    HWSampleSinkPtr myS16SampleSink =
         createSampleSink("TestS16Sink", 44100, 2);
     queueSineBuffers(myS16SampleSink, SF_S16, 1024, 2, 440, 44100, 2, 1);
     myS16SampleSink->play();
@@ -249,7 +249,7 @@ void TestPump::testRunUntilEmpty() {
     Pump & myPump = Pump::get();
     (void)myPump;
 
-    HWSampleSinkPtr mySink = 
+    HWSampleSinkPtr mySink =
         createSampleSink("TestRunUntilEmptySink", 44100, 2);
     queueSineBuffers(mySink, SF_F32, 1024, 2, 440, 44100, 0.4, 1);
     mySink->play();
@@ -264,8 +264,8 @@ void TestPump::testRunUntilEmpty() {
 void TestPump::testDelayed() {
     Pump & myPump = Pump::get();
     (void)myPump;
-    Time curTime; 
-    HWSampleSinkPtr mySink; 
+    Time curTime;
+    HWSampleSinkPtr mySink;
 
     // Simple version.
     mySink = createSampleSink("TestDelayedSink", 44100, 2);
@@ -293,7 +293,7 @@ void TestPump::testDelayed() {
     mySink->stop(true);
     msleep(600);
     ENSURE(mySink->getState() == HWSampleSink::STOPPED);
-    
+
     // Delay continues after a pause()
     mySink = createSampleSink("TestDelayedSink", 44100, 2);
     queueSineBuffers(mySink, SF_F32, 1024, 2, 440, 44100, 0.4, 1);
@@ -325,14 +325,14 @@ void TestPump::testDelayed() {
     ENSURE(double(curTime) > 0.6 && double(curTime) < 1.0);
     ENSURE(mySink->getState() == HWSampleSink::RUNNING);
     mySink->stop();
-*/    
+*/
 }
 
 void TestPump::testVolume() {
     Pump & myPump = Pump::get();
 
     // Test sample sink volume control.
-    HWSampleSinkPtr myVolumeSampleSink = 
+    HWSampleSinkPtr myVolumeSampleSink =
         createSampleSink("TestVolumeSink1", 44100, 2);
     queueSineBuffers(myVolumeSampleSink, SF_F32, 1024, 2, 440, 44100, 2, 1);
     myVolumeSampleSink->play();
@@ -384,7 +384,7 @@ void TestPump::testPumpTimer() {
         AC_TRACE << "Audio time: " << AudioTime << ", System time: " << SystemTime
                  << ", diff: " << AudioTime-SystemTime << endl;
         double myErr = fabs(AudioTime-SystemTime);
-        
+
         if (myErr > maxErr) {
             maxErr = myErr;
         }
@@ -407,10 +407,10 @@ void TestPump::testSinkTimer() {
     Pump & myPump = Pump::get();
     (void)myPump;
 
-    HWSampleSinkPtr mySampleSink = 
+    HWSampleSinkPtr mySampleSink =
         createSampleSink("TestTimerSink", 44100, 2);
     queueSineBuffers(mySampleSink, SF_F32, 1024, 2, 440, 44100, 2, 0.5);
-    Time curTime; 
+    Time curTime;
     ENSURE(double(mySampleSink->getCurrentTime()) == 0.0);
     mySampleSink->play();
     msleep(100);
@@ -443,7 +443,7 @@ void TestPump::testSinkTimer() {
     ENSURE(double(mySampleSink->getCurrentTime()) == 0.0);
 }
 
-HWSampleSinkPtr TestPump::createSampleSink (const string & theName, 
+HWSampleSinkPtr TestPump::createSampleSink (const string & theName,
         unsigned theSampleRate, unsigned NumChannels)
 {
     HWSampleSinkPtr mySampleSink = Pump::get().createSampleSink(theName);
@@ -458,7 +458,7 @@ void TestPump::stressTest(double myDuration) {
     vector<int> myTimeRunning;
     int numTestSounds = 10;
     for (int i=0; i<numTestSounds; i++) {
-        HWSampleSinkPtr mySink = 
+        HWSampleSinkPtr mySink =
             createSampleSink((string("TestSink")+as_string(i)).c_str(), 44100, 2);
         mySinks.push_back(mySink);
         myTimeRunning.push_back(0);
@@ -468,12 +468,12 @@ void TestPump::stressTest(double myDuration) {
     while (++j<(1000/SLEEP_INTERVAL)*myDuration) {
         int i = int((float)numTestSounds*rand()/(RAND_MAX+1.0));
         msleep(SLEEP_INTERVAL);
-        AC_DEBUG << "Mem: " << getProcessMemoryUsage() << ", allocated buffers: " 
+        AC_DEBUG << "Mem: " << getProcessMemoryUsage() << ", allocated buffers: "
             << AudioBufferBase::getNumBuffersAllocated() << endl;
         cerr << ".";
         if (mySinks[i]->getState() == HWSampleSink::STOPPED) {
             //int myBufferSize = 16+int(1000.0*rand()/(RAND_MAX+1.0));
-            queueSineBuffers(mySinks[i], SF_F32, 512, 2, 
+            queueSineBuffers(mySinks[i], SF_F32, 512, 2,
                     unsigned(440*(0.5+i/(float)numTestSounds)), 44100, 3, 0.1);
             mySinks[i]->play();
         } else {
@@ -490,7 +490,7 @@ void TestPump::stressTest(double myDuration) {
         }
     }
     cerr << endl;
-    AC_DEBUG << "Mem1: " << getProcessMemoryUsage() << ", allocated buffers: " 
+    AC_DEBUG << "Mem1: " << getProcessMemoryUsage() << ", allocated buffers: "
         << AudioBufferBase::getNumBuffersAllocated() << endl;
     for (int i=0; i<numTestSounds; i++) {
         HWSampleSinkPtr mySink = mySinks[0];
@@ -509,11 +509,11 @@ void TestPump::queueSineBuffers(asl::HWSampleSinkPtr& mySampleSink, SampleFormat
 {
     switch (mySF) {
         case SF_S16:
-            queueSineBuffers<short>(mySampleSink, mySF, numFramesPerBuffer, numChannels, 
+            queueSineBuffers<short>(mySampleSink, mySF, numFramesPerBuffer, numChannels,
                     myFrequency, mySampleRate, myDuration, myVolume);
             return;
         case SF_F32:
-            queueSineBuffers<float>(mySampleSink, mySF, numFramesPerBuffer, numChannels, 
+            queueSineBuffers<float>(mySampleSink, mySF, numFramesPerBuffer, numChannels,
                     myFrequency, mySampleRate, myDuration, myVolume);
             return;
         default:

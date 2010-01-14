@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: test_string_functions.tst.cpp,v $
@@ -238,7 +238,7 @@ class string_functions_UnitTest : public UnitTest {
 #ifdef _WIN32
             testWinConversion();
 #endif
-            
+
 		}
 
         void testBase64Encode(const char * IN, const char * OUT, const Char * CB) {
@@ -246,22 +246,22 @@ class string_functions_UnitTest : public UnitTest {
         }
         void testBase64Encode(const string & theIn, const string & theOut, const Char * CB) {
             string myIn(theIn);
-            string myOut(theOut); 
-            string myDestination1; 
+            string myOut(theOut);
+            string myDestination1;
             string myDestination2;
-            binToBase64((unsigned char *)&myIn[0], myIn.size(), myDestination1, CB); 
+            binToBase64((unsigned char *)&myIn[0], myIn.size(), myDestination1, CB);
             ENSURE_EQUAL(myDestination1, myOut);
 
             const char SENTINAL = '@';
             myDestination2.resize(myIn.size()+1);
             myDestination2[myIn.size()] = SENTINAL;
-            
+
             unsigned mySize = base64ToBin(myDestination1, (unsigned char *)&myDestination2[0], myIn.size());
             ENSURE_EQUAL(mySize, myIn.size());
             ENSURE_EQUAL(myDestination2[myIn.size()], SENTINAL);
             myDestination2.resize(mySize);
-            ENSURE_EQUAL(myDestination2, myIn); 
-        } 
+            ENSURE_EQUAL(myDestination2, myIn);
+        }
 
         void testBase64() {
             // case 0: Empty file:
@@ -271,7 +271,7 @@ class string_functions_UnitTest : public UnitTest {
             testBase64Encode("A", "QQƒƒ", cb67);
 
             // case 1: One input character:
-            testBase64Encode("A", "QQƒƒ", cb67);            
+            testBase64Encode("A", "QQƒƒ", cb67);
 
             // case 2: Two input characters:
             testBase64Encode("AB", "QUI=", cb64);
@@ -281,9 +281,9 @@ class string_functions_UnitTest : public UnitTest {
 
             // case 4: Four input characters:
     	    testBase64Encode("ABCD", "QUJDRA==", cb64);
-            
+
             testBase64Encode("ABCABCD", "QUJDQUJDRA==", cb64);
- 
+
             // case 5: All chars from 0 to ff, linesize set to 50:
             {
                 string myInput;
@@ -319,7 +319,7 @@ class string_functions_UnitTest : public UnitTest {
             unsigned char myDest[10];
             ENSURE_EXCEPTION(base64ToBin("ABCDE", myDest, 10), ParseException);
             ENSURE_EXCEPTION(base64ToBin("QUI=", myDest, 1), BufferTooSmall);
-            ENSURE_EXCEPTION(base64ToBin("QUJDRA==", myDest, 3), BufferTooSmall); 
+            ENSURE_EXCEPTION(base64ToBin("QUJDRA==", myDest, 3), BufferTooSmall);
             ENSURE_EXCEPTION(base64ToBin("!abc", myDest, 10), ParseException);
             ENSURE_EXCEPTION(base64ToBin("abc*", myDest, 10), ParseException);
         }
@@ -334,7 +334,7 @@ class string_functions_UnitTest : public UnitTest {
             SysFreeString(myBString);
         }
 #endif
-        
+
 };
 
 

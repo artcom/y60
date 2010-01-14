@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -59,7 +59,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -113,14 +113,14 @@ bool isCppComment(const string & myLine, string::size_type myPosInLine) {
 void getLine(const string & myFile, string::size_type myPosInFile, string & myLine, string::size_type & myPosInLine) {
     string::size_type myLineStart = myFile.rfind('\n',myPosInFile) + 1;
     string::size_type myLineEnd = myFile.find('\n',myPosInFile);
-    myLine = myFile.substr(myLineStart, myLineEnd - myLineStart); 
+    myLine = myFile.substr(myLineStart, myLineEnd - myLineStart);
     myPosInLine = myPosInFile - myLineStart;
 }
 
 void getLine(const string & myFile, string::size_type myPosInFile, string::size_type myMatchSize, string & myLine, string::size_type & myPosInLine) {
     string::size_type myLineStart = myFile.rfind('\n',myPosInFile) + 1;
     string::size_type myLineEnd = myFile.find('\n',myPosInFile+myMatchSize);
-    myLine = myFile.substr(myLineStart, myLineEnd - myLineStart); 
+    myLine = myFile.substr(myLineStart, myLineEnd - myLineStart);
     myPosInLine = myPosInFile - myLineStart;
 }
 
@@ -183,7 +183,7 @@ int main(int argc, char *argv[]) {
             }
             string::size_type matchOnlyPos = string::npos;
             if (myArguments.haveOption("-p")) {
-                matchOnlyPos = asl::as<int>(myArguments.getOptionArgument("-p")); 
+                matchOnlyPos = asl::as<int>(myArguments.getOptionArgument("-p"));
             }
 
 
@@ -192,19 +192,19 @@ int main(int argc, char *argv[]) {
                 string myFile;
                 bool hasBeenModified = false;
                 if (readFile(myArguments.getArgument(i), myFile)) {
-                    string::size_type matchPos = 0; 
-                    string::size_type matchLen = searchForString.size(); 
+                    string::size_type matchPos = 0;
+                    string::size_type matchLen = searchForString.size();
                     while ((matchPos = myFile.find(searchForString, matchPos)) != string::npos) {
                         if (matchOnlyPos != string::npos) {
                             if (matchPos > matchOnlyPos) {
-                               break; 
+                               break;
                             }
                             if (matchPos < matchOnlyPos) {
-                               continue; 
+                               continue;
                             }
                        }
-                        
-                        string::size_type matchPos2 = 0; 
+
+                        string::size_type matchPos2 = 0;
                         if (myArguments.haveOption("-2")) {
                             matchPos2 = myFile.find(replaceUntilString, matchPos+searchForString.size());
                             if (matchPos2 == string::npos) {
@@ -212,20 +212,20 @@ int main(int argc, char *argv[]) {
                             }
                             matchLen = matchPos2 - matchPos + replaceUntilString.size();
                         }
-                        
+
                         if (myArguments.haveOption("-w")) {
                             if (matchPos>0) {
-                                if (isNameChar(myFile[matchPos-1]) || 
+                                if (isNameChar(myFile[matchPos-1]) ||
                                         isNameChar(myFile[matchPos+matchLen])) {
                                     ++matchPos;
                                     continue;
                                 }
                             }
                         }
-                        if (!myArguments.haveOption("-s") || 
-                                myArguments.haveOption("-q") || 
-                                myArguments.haveOption("-Q") || 
-                                myArguments.haveOption("-c") || 
+                        if (!myArguments.haveOption("-s") ||
+                                myArguments.haveOption("-q") ||
+                                myArguments.haveOption("-Q") ||
+                                myArguments.haveOption("-c") ||
                                 myArguments.haveOption("-C"))
                         {
 
@@ -259,14 +259,14 @@ int main(int argc, char *argv[]) {
                             }
 
                             if (myArguments.haveOption("-v")) {
-                                cerr << "Match in file '" << myArguments.getArgument(i) << "', pos " 
+                                cerr << "Match in file '" << myArguments.getArgument(i) << "', pos "
                                     << matchPos << ":" << endl;
                                 cerr << "Replacing :" << myLine << endl;
-                                cerr << "     with :"; 
+                                cerr << "     with :";
                             }
                             myLine.replace(myPosInLine, matchLen, replaceWithString);
                             cout << myLine << endl;
-                        } 
+                        }
                         hasBeenModified = true;
                         myFile.replace(matchPos, matchLen, replaceWithString);
                         matchPos+=replaceWithString.size();

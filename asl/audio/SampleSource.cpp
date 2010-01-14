@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -44,7 +44,7 @@ namespace asl {
 
 using namespace std;
 
-    SampleSource::SampleSource(const std::string & theName, SampleFormat theSampleFormat, 
+    SampleSource::SampleSource(const std::string & theName, SampleFormat theSampleFormat,
                                unsigned theSampleRate, unsigned theNumChannels) :
         _numChannels(theNumChannels),
         _mySampleRate(theSampleRate),
@@ -59,15 +59,15 @@ using namespace std;
         AC_DEBUG << "~SampleSource end (" << _myName << ")";
     }
 
-    
+
     unsigned SampleSource::getNumChannels() const {
         return _numChannels;
     }
 
-    
+
     unsigned SampleSource::getSampleRate() const {
-        return _mySampleRate;         
-    }           
+        return _mySampleRate;
+    }
 
 
     inline unsigned SampleSource::getBytesPerSecond() const {
@@ -81,10 +81,10 @@ using namespace std;
 
 
     inline unsigned SampleSource::getBytesPerFrame() const {
-        return _numChannels*getBytesPerSample(getSampleFormat());        
+        return _numChannels*getBytesPerSample(getSampleFormat());
     }
 
-    
+
     std::string SampleSource::getName() const {
         return _myName;
     }

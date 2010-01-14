@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: Events.cpp,v $
@@ -14,7 +14,7 @@
 //   $Revision: 1.3 $
 //
 // Description: tiny fast XML-Parser and DOM
-// 
+//
 //
 //
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
@@ -37,7 +37,7 @@ EventFactory::EventFactory() {
 
 EventPtr
 EventFactory::createEvent(const DOMString & theType) const {
-    EventPtr myPrototype = findPrototype(theType); 
+    EventPtr myPrototype = findPrototype(theType);
     if (myPrototype) {
         DB(AC_TRACE << "EventFactory::createEvent('"<<theType<<"')"<<" returns value"<<std::endl;)
         return myPrototype->clone();

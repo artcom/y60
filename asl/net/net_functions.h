@@ -4,12 +4,12 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: 
+// Description:
 //    C++ Library fuer TCP-Sockets (based on Sockets.c++ from Pavel 11.9.92)
 //
 // Last Review:  ms & ab 2007-08-14
@@ -35,7 +35,7 @@
 //
 //    overall review status   :      ok
 //
-//    recommendations: merge with net_functions.h, translate german comments to english 
+//    recommendations: merge with net_functions.h, translate german comments to english
 */
 
 #ifndef _included_asl_net_functions_

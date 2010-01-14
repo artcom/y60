@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -66,7 +66,7 @@ namespace asl {
             void open(unsigned int theBaudRate, unsigned int theDataBits,
                       ParityMode theParityMode, unsigned int theStopBits,
                       bool theHWHandShakeFlag,
-                      int theMinReadSize, int theInterCharTimeout) 
+                      int theMinReadSize, int theInterCharTimeout)
             {
                 std::cerr << "DebugPort::open() - Opening " << getDeviceName() << " with " << std::endl;
                 std::cerr << "    baudrate:     " << theBaudRate << std::endl;
@@ -89,10 +89,10 @@ namespace asl {
                 theSize = asl::minimum(theSize, _myData.size());
                 std::copy (_myData.begin(), _myData.begin() + theSize, theBuffer);
                 std::cerr << "DebugPort::read() - '" << std::string(_myData.begin(), _myData.begin() + theSize) << "'" << std::endl;
-                _myData.erase(_myData.begin(), _myData.begin() + theSize); 
+                _myData.erase(_myData.begin(), _myData.begin() + theSize);
                 return true;
             }
-            
+
             void write(const char * theBuffer, size_t theSize) {
                 _myData.append(theBuffer, theSize);
                 std::cerr << "DebugPort::write() - '" << std::string(_myData.end() - theSize, _myData.end()) << "'" << std::endl;

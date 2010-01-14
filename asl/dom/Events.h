@@ -4,16 +4,16 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: Events.h,v $
 //
 //   $Revision: 1.5 $
 //
-// Description: dom event interface 
+// Description: dom event interface
 //
 //
 //
@@ -58,8 +58,8 @@ namespace dom {
         virtual const DOMTimeStamp &  timeStamp() const = 0;
         virtual void stopPropagation() = 0;
         virtual void preventDefault() = 0;
-        virtual void initEvent(const DOMString & eventTypeArg, 
-                                bool canBubbleArg, 
+        virtual void initEvent(const DOMString & eventTypeArg,
+                                bool canBubbleArg,
                                 bool cancelableArg,
                                 bool targetOnly= false) = 0;
         /*
@@ -74,9 +74,9 @@ namespace dom {
         virtual bool isDefaultPrevented() const = 0;
         /*
         // Introduced in DOM Level 3:
-        void               initEventNS(in DOMString namespaceURIArg, 
-                                        in DOMString eventTypeArg, 
-                                        in boolean canBubbleArg, 
+        void               initEventNS(in DOMString namespaceURIArg,
+                                        in DOMString eventTypeArg,
+                                        in boolean canBubbleArg,
                                         in boolean cancelableArg);
         */
         // added functions for automatic dispatch and propagation
@@ -96,31 +96,31 @@ namespace dom {
     class ASL_DOM_DECL EventTarget {
     public:
         virtual ~EventTarget() {}
-        virtual void addEventListener(const DOMString & type, 
-                                        EventListenerPtr listener, 
+        virtual void addEventListener(const DOMString & type,
+                                        EventListenerPtr listener,
                                         bool useCapture) = 0;
-        virtual void removeEventListener(const DOMString & type, 
-                                        EventListenerPtr listener, 
+        virtual void removeEventListener(const DOMString & type,
+                                        EventListenerPtr listener,
                                         bool useCapture) = 0;
         // Modified in DOM Level 3:
         virtual bool dispatchEvent(EventPtr evt) = 0;
         /*
         // Introduced in DOM Level 3:
-        void               addEventListenerNS(in DOMString namespaceURI, 
-                                                in DOMString type, 
-                                                in EventListener listener, 
-                                                in boolean useCapture, 
+        void               addEventListenerNS(in DOMString namespaceURI,
+                                                in DOMString type,
+                                                in EventListener listener,
+                                                in boolean useCapture,
                                                 in DOMObject evtGroup);
         // Introduced in DOM Level 3:
-        void               removeEventListenerNS(in DOMString namespaceURI, 
-                                                in DOMString type, 
-                                                in EventListener listener, 
+        void               removeEventListenerNS(in DOMString namespaceURI,
+                                                in DOMString type,
+                                                in EventListener listener,
                                                 in boolean useCapture);
         // Introduced in DOM Level 3:
-        boolean            willTriggerNS(in DOMString namespaceURI, 
+        boolean            willTriggerNS(in DOMString namespaceURI,
                                         in DOMString type);
         // Introduced in DOM Level 3:
-        boolean            hasEventListenerNS(in DOMString namespaceURI, 
+        boolean            hasEventListenerNS(in DOMString namespaceURI,
                                             in DOMString type);
         */
     };
@@ -139,13 +139,13 @@ namespace dom {
         virtual EventPtr createEvent(const DOMString & eventType) = 0; //raises(DOMException);
         /*
         // Introduced in DOM Level 3:
-        boolean            canDispatch(in DOMString namespaceURI, 
+        boolean            canDispatch(in DOMString namespaceURI,
                                         in DOMString type);
         */
     };
 
-    
-#ifdef GenericEvent 
+
+#ifdef GenericEvent
 #error Bla
 #endif
 
@@ -153,12 +153,12 @@ namespace dom {
     class GenericEvent : public Event {
     public:
         GenericEvent(const DOMString theType,
-                     bool canBubbleArg = true, 
+                     bool canBubbleArg = true,
                      bool cancelableArg = true,
                      bool targetOnly = false,
                      DOMTimeStamp theTimeStamp = DOMTimeStamp(),
                      asl::Ptr<AC_PAYLOAD_TPL> thePayload = asl::Ptr<AC_PAYLOAD_TPL>())
-                     : 
+                     :
         _myType(theType),
         _myEventPhase(CAPTURING_PHASE),
         _myBubblesFlag(canBubbleArg),
@@ -202,8 +202,8 @@ namespace dom {
         virtual void preventDefault() {
             _myDefaultPrevented = true;
         }
-        virtual void initEvent(const DOMString & eventTypeArg, 
-                                bool canBubbleArg, 
+        virtual void initEvent(const DOMString & eventTypeArg,
+                                bool canBubbleArg,
                                 bool cancelableArg,
                                 bool targetOnly)
         {
@@ -225,9 +225,9 @@ namespace dom {
         }
         /*
         // Introduced in DOM Level 3:
-        void               initEventNS(in DOMString namespaceURIArg, 
-                                        in DOMString eventTypeArg, 
-                                        in boolean canBubbleArg, 
+        void               initEventNS(in DOMString namespaceURIArg,
+                                        in DOMString eventTypeArg,
+                                        in boolean canBubbleArg,
                                         in boolean cancelableArg);
         */
         asl::Ptr<AC_PAYLOAD_TPL> getPayload() {
@@ -300,7 +300,7 @@ namespace dom {
 /*
 // Introduced in DOM Level 3:
 interface CustomEvent : Event {
-  void               setDispatchState(in EventTarget target, 
+  void               setDispatchState(in EventTarget target,
                                       in unsigned short phase);
   boolean            isPropagationStopped();
   boolean            isImmediatePropagationStopped();
@@ -313,33 +313,33 @@ interface CustomEvent : Event {
 interface UIEvent : Event {
   readonly attribute views::AbstractView view;
   readonly attribute long            detail;
-  void               initUIEvent(in DOMString typeArg, 
-                                 in boolean canBubbleArg, 
-                                 in boolean cancelableArg, 
-                                 in views::AbstractView viewArg, 
+  void               initUIEvent(in DOMString typeArg,
+                                 in boolean canBubbleArg,
+                                 in boolean cancelableArg,
+                                 in views::AbstractView viewArg,
                                  in long detailArg);
   // Introduced in DOM Level 3:
-  void               initUIEventNS(in DOMString namespaceURI, 
-                                   in DOMString typeArg, 
-                                   in boolean canBubbleArg, 
-                                   in boolean cancelableArg, 
-                                   in views::AbstractView viewArg, 
+  void               initUIEventNS(in DOMString namespaceURI,
+                                   in DOMString typeArg,
+                                   in boolean canBubbleArg,
+                                   in boolean cancelableArg,
+                                   in views::AbstractView viewArg,
                                    in long detailArg);
 };
 
 // Introduced in DOM Level 3:
 interface TextEvent : UIEvent {
   readonly attribute DOMString       data;
-  void               initTextEvent(in DOMString typeArg, 
-                                   in boolean canBubbleArg, 
-                                   in boolean cancelableArg, 
-                                   in views::AbstractView viewArg, 
+  void               initTextEvent(in DOMString typeArg,
+                                   in boolean canBubbleArg,
+                                   in boolean cancelableArg,
+                                   in views::AbstractView viewArg,
                                    in DOMString dataArg);
-  void               initTextEventNS(in DOMString namespaceURI, 
-                                     in DOMString type, 
-                                     in boolean canBubbleArg, 
-                                     in boolean cancelableArg, 
-                                     in views::AbstractView viewArg, 
+  void               initTextEventNS(in DOMString namespaceURI,
+                                     in DOMString type,
+                                     in boolean canBubbleArg,
+                                     in boolean cancelableArg,
+                                     in views::AbstractView viewArg,
                                      in DOMString dataArg);
 };
 
@@ -355,38 +355,38 @@ interface MouseEvent : UIEvent {
   readonly attribute boolean         metaKey;
   readonly attribute unsigned short  button;
   readonly attribute EventTarget     relatedTarget;
-  void               initMouseEvent(in DOMString typeArg, 
-                                    in boolean canBubbleArg, 
-                                    in boolean cancelableArg, 
-                                    in views::AbstractView viewArg, 
-                                    in long detailArg, 
-                                    in long screenXArg, 
-                                    in long screenYArg, 
-                                    in long clientXArg, 
-                                    in long clientYArg, 
-                                    in boolean ctrlKeyArg, 
-                                    in boolean altKeyArg, 
-                                    in boolean shiftKeyArg, 
-                                    in boolean metaKeyArg, 
-                                    in unsigned short buttonArg, 
+  void               initMouseEvent(in DOMString typeArg,
+                                    in boolean canBubbleArg,
+                                    in boolean cancelableArg,
+                                    in views::AbstractView viewArg,
+                                    in long detailArg,
+                                    in long screenXArg,
+                                    in long screenYArg,
+                                    in long clientXArg,
+                                    in long clientYArg,
+                                    in boolean ctrlKeyArg,
+                                    in boolean altKeyArg,
+                                    in boolean shiftKeyArg,
+                                    in boolean metaKeyArg,
+                                    in unsigned short buttonArg,
                                     in EventTarget relatedTargetArg);
   // Introduced in DOM Level 3:
-  void               initMouseEventNS(in DOMString namespaceURI, 
-                                      in DOMString typeArg, 
-                                      in boolean canBubbleArg, 
-                                      in boolean cancelableArg, 
-                                      in views::AbstractView viewArg, 
-                                      in long detailArg, 
-                                      in long screenXArg, 
-                                      in long screenYArg, 
-                                      in long clientXArg, 
-                                      in long clientYArg, 
-                                      in boolean ctrlKeyArg, 
-                                      in boolean altKeyArg, 
-                                      in boolean shiftKeyArg, 
-                                      in boolean metaKeyArg, 
-                                      in unsigned short buttonArg, 
-                                      in EventTarget relatedTargetArg, 
+  void               initMouseEventNS(in DOMString namespaceURI,
+                                      in DOMString typeArg,
+                                      in boolean canBubbleArg,
+                                      in boolean cancelableArg,
+                                      in views::AbstractView viewArg,
+                                      in long detailArg,
+                                      in long screenXArg,
+                                      in long screenYArg,
+                                      in long clientXArg,
+                                      in long clientYArg,
+                                      in boolean ctrlKeyArg,
+                                      in boolean altKeyArg,
+                                      in boolean shiftKeyArg,
+                                      in boolean metaKeyArg,
+                                      in unsigned short buttonArg,
+                                      in EventTarget relatedTargetArg,
                                       in boolean altGraphKeyArg);
   // Introduced in DOM Level 3:
   readonly attribute boolean         altGraphKey;
@@ -409,28 +409,28 @@ interface KeyboardEvent : UIEvent {
   readonly attribute boolean         altKey;
   readonly attribute boolean         metaKey;
   readonly attribute boolean         altGraphKey;
-  void               initKeyboardEvent(in DOMString typeArg, 
-                                       in boolean canBubbleArg, 
-                                       in boolean cancelableArg, 
-                                       in views::AbstractView viewArg, 
-                                       in DOMString keyIdentifierArg, 
-                                       in unsigned long keyLocationArg, 
-                                       in boolean ctrlKeyArg, 
-                                       in boolean shiftKeyArg, 
-                                       in boolean altKeyArg, 
-                                       in boolean metaKeyArg, 
+  void               initKeyboardEvent(in DOMString typeArg,
+                                       in boolean canBubbleArg,
+                                       in boolean cancelableArg,
+                                       in views::AbstractView viewArg,
+                                       in DOMString keyIdentifierArg,
+                                       in unsigned long keyLocationArg,
+                                       in boolean ctrlKeyArg,
+                                       in boolean shiftKeyArg,
+                                       in boolean altKeyArg,
+                                       in boolean metaKeyArg,
                                        in boolean altGraphKeyArg);
-  void               initKeyboardEventNS(in DOMString namespaceURI, 
-                                         in DOMString type, 
-                                         in boolean canBubbleArg, 
-                                         in boolean cancelableArg, 
-                                         in views::AbstractView viewArg, 
-                                         in DOMString keyIdentifierArg, 
-                                         in unsigned long keyLocationArg, 
-                                         in boolean ctrlKeyArg, 
-                                         in boolean shiftKeyArg, 
-                                         in boolean altKeyArg, 
-                                         in boolean metaKeyArg, 
+  void               initKeyboardEventNS(in DOMString namespaceURI,
+                                         in DOMString type,
+                                         in boolean canBubbleArg,
+                                         in boolean cancelableArg,
+                                         in views::AbstractView viewArg,
+                                         in DOMString keyIdentifierArg,
+                                         in unsigned long keyLocationArg,
+                                         in boolean ctrlKeyArg,
+                                         in boolean shiftKeyArg,
+                                         in boolean altKeyArg,
+                                         in boolean metaKeyArg,
                                          in boolean altGraphKeyArg);
 };
 
@@ -447,23 +447,23 @@ interface MutationEvent : Event {
   readonly attribute DOMString       newValue;
   readonly attribute DOMString       attrName;
   readonly attribute unsigned short  attrChange;
-  void               initMutationEvent(in DOMString typeArg, 
-                                       in boolean canBubbleArg, 
-                                       in boolean cancelableArg, 
-                                       in Node relatedNodeArg, 
-                                       in DOMString prevValueArg, 
-                                       in DOMString newValueArg, 
-                                       in DOMString attrNameArg, 
+  void               initMutationEvent(in DOMString typeArg,
+                                       in boolean canBubbleArg,
+                                       in boolean cancelableArg,
+                                       in Node relatedNodeArg,
+                                       in DOMString prevValueArg,
+                                       in DOMString newValueArg,
+                                       in DOMString attrNameArg,
                                        in unsigned short attrChangeArg);
   // Introduced in DOM Level 3:
-  void               initMutationEventNS(in DOMString namespaceURI, 
-                                         in DOMString typeArg, 
-                                         in boolean canBubbleArg, 
-                                         in boolean cancelableArg, 
-                                         in Node relatedNodeArg, 
-                                         in DOMString prevValueArg, 
-                                         in DOMString newValueArg, 
-                                         in DOMString attrNameArg, 
+  void               initMutationEventNS(in DOMString namespaceURI,
+                                         in DOMString typeArg,
+                                         in boolean canBubbleArg,
+                                         in boolean cancelableArg,
+                                         in Node relatedNodeArg,
+                                         in DOMString prevValueArg,
+                                         in DOMString newValueArg,
+                                         in DOMString attrNameArg,
                                          in unsigned short attrChangeArg);
 };
 
@@ -472,19 +472,19 @@ interface MutationNameEvent : MutationEvent {
   readonly attribute DOMString       prevNamespaceURI;
   readonly attribute DOMString       prevNodeName;
   // Introduced in DOM Level 3:
-  void               initMutationNameEvent(in DOMString typeArg, 
-                                           in boolean canBubbleArg, 
-                                           in boolean cancelableArg, 
-                                           in Node relatedNodeArg, 
-                                           in DOMString prevNamespaceURI, 
+  void               initMutationNameEvent(in DOMString typeArg,
+                                           in boolean canBubbleArg,
+                                           in boolean cancelableArg,
+                                           in Node relatedNodeArg,
+                                           in DOMString prevNamespaceURI,
                                            in DOMString prevNodeName);
   // Introduced in DOM Level 3:
-  void               initMutationNameEventNS(in DOMString namespaceURI, 
-                                             in DOMString typeArg, 
-                                             in boolean canBubbleArg, 
-                                             in boolean cancelableArg, 
-                                             in Node relatedNodeArg, 
-                                             in DOMString prevNamespaceURI, 
+  void               initMutationNameEventNS(in DOMString namespaceURI,
+                                             in DOMString typeArg,
+                                             in boolean canBubbleArg,
+                                             in boolean cancelableArg,
+                                             in Node relatedNodeArg,
+                                             in DOMString prevNamespaceURI,
                                              in DOMString prevNodeName);
 };
 */

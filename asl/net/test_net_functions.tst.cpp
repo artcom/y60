@@ -4,12 +4,12 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: 
+// Description:
 //    C++ Library fuer TCP-Sockets (based on Sockets.c++ from Pavel 11.9.92)
 //
 // Last Review:  ms & ab 2007-08-14
@@ -35,7 +35,7 @@
 //
 //    overall review status   :      ok
 //
-//    recommendations: add comments 
+//    recommendations: add comments
 */
 
 #include "net_functions.h"
@@ -55,7 +55,7 @@
 
 #include <iostream>
 
-using namespace std;  
+using namespace std;
 using namespace asl;
 
 class net_functions_UnitTest : public UnitTest {
@@ -63,14 +63,14 @@ class net_functions_UnitTest : public UnitTest {
         net_functions_UnitTest() : UnitTest("net_functions_UnitTest") {  }
         void run() {
 
-            DPRINT(localhostname());            
-            ENSURE(localhostname().size());            
-      
+            DPRINT(localhostname());
+            ENSURE(localhostname().size());
+
             ENSURE(from_dotted_address("blafasel") == 0);
             ENSURE(from_dotted_address("255.254.253.252") == 0xfffefdfc);
 
             ENSURE(as_dotted_address(0xfffefdfc) == "255.254.253.252");
-           
+
             ENSURE(hostaddress("255.254.253.252") == 0xfffefdfc);
             ENSURE(hostaddress("gibt-es-nicht.xyz.bla") == 0);
             ENSURE(hostaddress("BROADCAST") == 0xffffffff);
@@ -103,7 +103,7 @@ int main(int argc, char *argv[]) {
 
     cerr << ">> Finished test suite '" << argv[0] << "'"
          << ", return status = " << mySuite.returnStatus() << endl;
-         
+
     inet::terminateSockets();
 
     return mySuite.returnStatus();

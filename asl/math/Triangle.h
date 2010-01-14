@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -57,7 +57,7 @@
 #include "Point234.h"
 #include "Plane.h"
 
-namespace asl {	
+namespace asl {
 
     /*! @addtogroup aslmath */
     /* @{ */
@@ -67,7 +67,7 @@ namespace asl {
 	public:
         typedef TripleOf<Point3<Number> > Base;
 		Triangle() {}
-		Triangle(const Point3<Number> & p1, const Point3<Number> & p2, const Point3<Number> & p3) 
+		Triangle(const Point3<Number> & p1, const Point3<Number> & p2, const Point3<Number> & p3)
             : Base(p1,p2,p3)
         {}
         Vector3<Number> normal() const {
@@ -92,7 +92,7 @@ namespace asl {
         Point3<Number> centroid() const {
             return (this->val[0] + this->val[1] + this->val[2]) / 3;
         }
-        
+
         const Point3<Number> & edgeOrigin(int theEdge) const {
             return this->val[edgeOriginIndex(theEdge)];
         }

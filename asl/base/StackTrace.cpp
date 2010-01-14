@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -53,19 +53,19 @@ StackTracer<TRACE_POLICY>::StackTracer() {
 }
 
 template <class TRACE_POLICY>
-size_t 
+size_t
 StackTracer<TRACE_POLICY>::size() const {
     return _myStack.size();
 }
 
 template <class TRACE_POLICY>
-ostream & 
+ostream &
 StackTracer<TRACE_POLICY>::print(ostream & os) const {
 	for (unsigned i = 0; i < _myStack.size(); ++i) {
         os << "#" << _myStack.size() - 1 - i << " " << beautify( _myStack[i].name ) << endl;
     }
 	if( _myStack.size() == 0 ) {
-		os << "no symbols found" << endl;	
+		os << "no symbols found" << endl;
 	}
     return os;
 }
@@ -78,5 +78,5 @@ template class StackTracer<MachOBacktrace>;
 template class StackTracer<Win32Backtrace>;
 #endif
 
-} // end of namespace 
+} // end of namespace
 

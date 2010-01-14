@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -59,9 +59,9 @@ namespace asl {
 
         static const std::string WindowsError(DWORD lastError) {
             LPVOID lpMsgBuf;
-            if (!FormatMessage( 
-                FORMAT_MESSAGE_ALLOCATE_BUFFER | 
-                FORMAT_MESSAGE_FROM_SYSTEM | 
+            if (!FormatMessage(
+                FORMAT_MESSAGE_ALLOCATE_BUFFER |
+                FORMAT_MESSAGE_FROM_SYSTEM |
                 FORMAT_MESSAGE_IGNORE_INSERTS,
                 NULL,
                 GetLastError(),
@@ -78,12 +78,12 @@ namespace asl {
             LocalFree( lpMsgBuf );
             return result;
         }
-        
+
         static const std::string WindowsError() {
             return DSoundMessages::WindowsError(GetLastError());
         }
 
-        static const std::string ErrorMessage(HRESULT hr) 
+        static const std::string ErrorMessage(HRESULT hr)
         {
             const char* msg;
             // From DirectX SDK
@@ -178,12 +178,12 @@ namespace asl {
 
     class DSException : public AudioException {
     public:
-        DSException(const std::string & what, const std::string & where) 
+        DSException(const std::string & what, const std::string & where)
 		    : AudioException(what, where, "DSException") {}
         DSException(HRESULT error, const std::string & where)
 		    : AudioException(DSoundMessages::ErrorMessage(error), where, "DSException") {}
     protected:
-        DSException(const std::string & what, const std::string & where, const char* name) 
+        DSException(const std::string & what, const std::string & where, const char* name)
 			: AudioException(what, where, name) {}
     };
 

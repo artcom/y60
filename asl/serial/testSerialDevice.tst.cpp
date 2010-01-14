@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -73,7 +73,7 @@ public:
                     myPort->open(9600, 8, SerialDevice::NO_PARITY, 1);
                 } catch (SerialPortException ex) {
                     cerr << "###WARNING: Cannot open serial device '" << myPort->getDeviceName() <<
-                        "': " << ex << " skipping serial device tests" << endl; 
+                        "': " << ex << " skipping serial device tests" << endl;
                     unOpenablePort = i;
                     continue;
                 }
@@ -84,12 +84,12 @@ public:
                 delete myPort;
             }
         }
-        
+
         // WARNING this test may fail if you have more than 5000 serial ports ;-)
         ENSURE(getSerialDevice(5000) == 0);
 
         // test error handling
-        if (unOpenablePort >= 0) { 
+        if (unOpenablePort >= 0) {
                 SerialDevice * otherPort = getSerialDevice(unOpenablePort);
                 ENSURE_EXCEPTION(otherPort->open(9600, 8, SerialDevice::NO_PARITY, 1), SerialPortException);
                 ENSURE( ! otherPort->isOpen());
@@ -105,7 +105,7 @@ public:
         // at least instatiate this thing once ... [DS]
         SerialDevice * myDebugPort = new DebugPort("Debug Port");
         delete myDebugPort;
-        
+
     }
 };
 
@@ -117,9 +117,9 @@ public:
     void run() {
         SerialDevice * myTTY = getSerialDevice(0);
         myTTY->open(9600, 8, SerialDevice::NO_PARITY, 1);
-        
+
         uCCP myUCCP(myTTY);
-        
+
         for (unsigned i = 0; i < 100; ++i) {
             myUCCP.recive();
             msleep(100);
@@ -147,7 +147,7 @@ public:
     }
 };
 
-#endif 
+#endif
 
 
 class MyTestSuite : public UnitTestSuite {

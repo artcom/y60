@@ -4,12 +4,12 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: 
+// Description:
 //    C++ Library fuer TCP-Sockets (based on Sockets.c++ from Pavel 11.9.92)
 //
 // Last Review:  ms & ab 2007-08-14
@@ -84,17 +84,17 @@ namespace inet {
 
     unsigned UDPSocket::receiveFrom(asl::Unsigned32* thehost, asl::Unsigned16 * theport, void *data, const int maxlen)
     {
-#ifdef _WIN32    
+#ifdef _WIN32
         int peerAddrSize;
 #else
         unsigned int peerAddrSize;
-#endif                
+#endif
         peerAddrSize=sizeof(_myLocalEndpoint);
 
         struct sockaddr_in peerAddr;
         int bytesRead;
         if ((bytesRead=recvfrom(fd, (char*)data, maxlen, 0, (struct sockaddr*)&peerAddr, &peerAddrSize))>=0) {
-            if (thehost) 
+            if (thehost)
                 *thehost = ntohl(peerAddr.sin_addr.s_addr);
             if (theport)
                 *theport = ntohs(peerAddr.sin_port);
@@ -120,8 +120,8 @@ namespace inet {
         return byteswritten;
     }
 
-    void UDPSocket::reset() 
-    { 
+    void UDPSocket::reset()
+    {
         close();
         open();
     }

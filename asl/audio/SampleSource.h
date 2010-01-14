@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -57,8 +57,8 @@ namespace asl {
     class ASL_AUDIO_DECL SampleSource;
 
     // Use this pointer as smart pointer to SampleSource. If you use the default Ptr,
-    // you'll get thread-specific free lists. Since lots of pointers are allocated 
-    // in one thread and deleted in another, that will cause memory leaks. The 
+    // you'll get thread-specific free lists. Since lots of pointers are allocated
+    // in one thread and deleted in another, that will cause memory leaks. The
     // PtrHeapAllocator used here is slower but works.
     typedef Ptr<SampleSource, MultiProcessor, PtrHeapAllocator<MultiProcessor> > SampleSourcePtr;
     typedef WeakPtr<SampleSource, MultiProcessor, PtrHeapAllocator<MultiProcessor> > SampleSourceWeakPtr;
@@ -68,7 +68,7 @@ namespace asl {
     {
     public:
 
-        SampleSource(const std::string & myName, SampleFormat mySampleFormat, 
+        SampleSource(const std::string & myName, SampleFormat mySampleFormat,
                      unsigned mySampleRate, unsigned numChannels);
         virtual ~SampleSource();
         std::string getName() const;

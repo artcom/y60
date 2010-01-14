@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -80,29 +80,29 @@ file_as_string(const std::string& file_name)
 int dom_test() {
     {
         dom::Document root;
-        
+
         root.appendChild(dom::Element("scene"));
         root.childNode("scene")->appendAttribute("version",1);
         dom::NodePtr info = root.childNode("scene")->appendChild(dom::Element("info"));
-        
+
         info->appendChild(dom::Element("title"));
         info->childNode("title")->appendChild(dom::Text("Über große und kleine µ-Prozessoren"));
-        
+
         dom::NodePtr actor = info->appendChild(dom::Element("actor"));
         actor->appendChild(dom::Element("name"))->appendChild(dom::Text("Pavel"));
         actor->appendChild(dom::Element("category"))->appendChild(dom::Text("amateur"));
         actor->appendChild(dom::Element("image"))->appendAttribute("url","http://www.artcom.de/images/pavel");
-        
+
         dom::NodePtr model_urls = info->appendChild(dom::Element("model-urls"));
         model_urls->appendChild(dom::Element("model"))->appendAttribute("url","http://www.slashdot.org/");
         model_urls->appendChild(dom::Element("model"))->appendAttribute("url","http://www.heise.de/");
         model_urls->appendChild(dom::Element("model"))->appendAttribute("url","http://www.stadtplandienst.de/");
         model_urls->appendChild(dom::Element("model"))->appendAttribute("url","http://www.teleauskunft.com/");
-        
+
         dom::NodePtr data = info->appendChild(dom::Element("data"));
         data->appendAttribute("url","http://www.artcom.de/model.iv");
         data->appendAttribute("duration","3:43");
-        
+
         std::ofstream out("testdom.xml", std::ios::binary);
         out << root;
     }
@@ -110,19 +110,19 @@ int dom_test() {
         dom::Node root2;
         std::ifstream f2("testdom.xml", std::ios::binary);
         f2 >> root2;
-        
+
         std::ofstream o2("testdom2.xml", std::ios::binary);
         o2 << root2;
-        
+
         dom::NodePtr info = root2.childNode("scene")->childNode("info");
         dom::NodePtr model2 = info->childNode("model-urls")->childNode("model",2);
-        if (model2->getAttribute("url")->nodeValue() == "http://www.stadtplandienst.de/")			
+        if (model2->getAttribute("url")->nodeValue() == "http://www.stadtplandienst.de/")
             std::cerr << root2;
         else
             std::cerr << "failure" << std::endl;
     }
     return 0;
-    
+
 }
 
 #define TESTIF(x) if (!(x)) throw asl::Exception(JUST_FILE_LINE);
@@ -131,7 +131,7 @@ dom::Document * ourTmpRoot = 0;
 int dom_test2() {
     {
         dom::Document root;
-        
+
         root.appendChild(dom::ProcessingInstruction());
         root("#comment") = "This is a artcom model file";
 
@@ -165,20 +165,20 @@ int dom_test2() {
             root(some_elem)[some_attr] = something;
             root("some-elem")["some-attr"] = "something";
             std::cerr << "#### failed to detect second element in document"
-              << std::endl;	
+              << std::endl;
         }
         catch (dom::DomException& de) {
             std::cerr << "correct: refused second element in document: "
-                << de  << std::endl;	
+                << de  << std::endl;
         }
         try {
             root("scene")("data")["duration?"] = "3:43";
-            std::cerr << "#### failed to detect bad name"  << std::endl;	
+            std::cerr << "#### failed to detect bad name"  << std::endl;
         }
         catch (dom::DomException& de) {
-            std::cerr << "correct: detected bad name: "<< de  << std::endl;	
+            std::cerr << "correct: detected bad name: "<< de  << std::endl;
         }
-        
+
         std::ofstream o3("testdom3.xml", std::ios::binary);
         o3 << root;
     }
@@ -186,10 +186,10 @@ int dom_test2() {
         dom::Node root2;
         std::ifstream f2("testdom3.xml", std::ios::binary);
 	    f2  >> root2;
-        
+
         std::ofstream o4("testdom4.xml", std::ios::binary);
         o4 << root2;
-        
+
         try {
             const dom::Node & scene = root2("scene");
             /*const dom::Node & version =*/ scene["version"];
@@ -200,9 +200,9 @@ int dom_test2() {
             TESTIF(root2("scene").getAttributeString("version") == "1.0");
             TESTIF(root2("scene")("info")("title")("#text").nodeValue()=="Über große und kleine µ-Prozessoren");
             TESTIF(root2("scene")("info")("title")("#text").nodeValue()=="Über große und kleine µ-Prozessoren");
-            
+
             TESTIF(root2("scene")("info")("actor"));
-            
+
             TESTIF(root2("scene")("info")("actor")("name")("#text").nodeValue()=="Pavel");
             TESTIF(root2("scene")("info")("actor")("category")("#text").nodeValue()=="amateur");
             TESTIF(root2("scene")("info")("model-urls")("model",0)["url"].nodeValue()=="http://www.slashdot.org/");
@@ -214,7 +214,7 @@ int dom_test2() {
             TESTIF(root2("scene")("data")["url"].nodeValue()== "http://www.artcom.de/model.iv");
             TESTIF(root2("scene")("data").getAttributeString("url")== "http://www.artcom.de/model.iv");
             TESTIF(root2("scene")("data")["duration"].nodeValue()== "3:43");
-            
+
             bool myExceptionCaught = false;
             try {
                 root2("scene")("data").getAttributeString("badurl");
@@ -232,25 +232,25 @@ int dom_test2() {
                 TESTIF (i<10);
             }
             TESTIF(i==4);
-            
+
             // keep in mind: you must not add a second element node to an element node
             // so this behaviour differs from the const behaviour
             TESTIF(root2("scene")("bla")["bla"].nodeValue()== "");
-#if 0 
-            
+#if 0
+
             TESTIF(cn("scene")("bla")["bla"].nodeValue()== "");
             TESTIF(cn("bla")("bla")["bla"].nodeValue()== "");
-#endif    
-        } 
+#endif
+        }
         catch (dom::DomException& de) {
-            std::cerr << "#### fatal failure:" << de << std::endl;	
+            std::cerr << "#### fatal failure:" << de << std::endl;
         }
         catch (asl::Exception& e) {
-            std::cerr << "#### data failure:" << e << std::endl;	
+            std::cerr << "#### data failure:" << e << std::endl;
         }
     }
     return 0;
-    
+
 }
 
 void testSerializer(const dom::Node & n, dom::Node & myRebinarizedDom) {
@@ -260,7 +260,7 @@ void testSerializer(const dom::Node & n, dom::Node & myRebinarizedDom) {
     n.binarize(myBlock);
     asl::Time myFinish;
     double myDuration = myFinish-myStart;
-    std::cerr << "Serialized to " << myBlock.size() << " bytes in " 
+    std::cerr << "Serialized to " << myBlock.size() << " bytes in "
         <<  myDuration << "sec, MB/sec=" << myBlock.size()/myDuration/1024/1024<< std::endl;
 
     asl::Time myStart2;
@@ -270,7 +270,7 @@ void testSerializer(const dom::Node & n, dom::Node & myRebinarizedDom) {
     }
     asl::Time myFinish2;
     double myDuration2 = myFinish2-myStart2;
-    std::cerr << "Debinarized to " << myBlock.size() << " bytes in " 
+    std::cerr << "Debinarized to " << myBlock.size() << " bytes in "
               <<  myDuration2 << "sec, MB/sec=" << myBlock.size()/myDuration2/1024/1024<< std::endl;
 
 }
@@ -294,19 +294,19 @@ int main(int argc, char* argv[])
         const char* file_name;
         file_name = argv[1];
         std::cout << asl::readFile(file_name) << std::endl;
-        
+
         dom::Document dom;
         std::ifstream xml_file(file_name);
-        
+
         if (xml_file >> dom)
             std::cerr << "parse ok" << std::endl;
         else
             std::cerr << "parse failed" << std::endl;
-        std::cout << "------------- parsed until char " << dom.parsedUntil() 
+        std::cout << "------------- parsed until char " << dom.parsedUntil()
             << ", total_size = " << dom.docSize() << std::endl;
-        
+
         std::cout << dom;
-        
+
         //std::cout << "press key & enter to continue" << std::endl;
         //char c; std::cin >> c;
     }
@@ -341,12 +341,12 @@ int main(int argc, char* argv[])
 00:01.252
 
 new file:
- 
+
 00:02.423
 */
 
-#define Nsingle_test        
-#ifndef single_test        
+#define Nsingle_test
+#ifndef single_test
         file_name.push_back("../../testdata/REC.xml");
 
         file_name.push_back("../../testdata/mini.xml");
@@ -358,11 +358,11 @@ new file:
         file_name.push_back("../../testdata/formattest.xml");
         file_name.push_back("../../testdata/System Report.xml");
         file_name.push_back("../../testdata/Nodes.h.xml");
-#endif        
-#ifndef DEBUG_VARIANT        
+#endif
+#ifndef DEBUG_VARIANT
 		file_name.push_back("../../testdata/big.xml");
         file_name.push_back("../../testdata/all.xml");
-#endif        
+#endif
         /*
         file_name.push_back("\\Platform SDK\\Samples\\DataAccess\\TechArticles\\performance\\Code.xml");
         file_name.push_back("\\Platform SDK\\Samples\\Web\\Xml\\Xml_Validator\\WeatherReport.Xml");
@@ -371,11 +371,11 @@ new file:
         file_name.push_back("\\Platform SDK\\Samples\\Web\\Xml\\Stock_Sorter\\Stock-Sorter.Xml");
         */
         for (std::vector<char*>::size_type i = 0; i < file_name.size(); ++i) {
-#ifdef single_test        
+#ifdef single_test
             std::cout << asl::readFile(file_name[i]) << std::endl;
 #endif
             std::cout << "Parsing file '" << file_name[i] << "'" << std::endl;
-            
+
                 asl::Time start_read1;
                 std::string fs1(asl::readFile(file_name[i]));
 
@@ -384,19 +384,19 @@ new file:
                 asl::Time ready1;
                 double total_parse_time1 = ready1-start1;
                 double total_read_time1 = start1-start_read1;
-            
-            std::cout << "------------- parsed until char " << dom.parsedUntil() 
+
+            std::cout << "------------- parsed until char " << dom.parsedUntil()
                 << ", total_size = " << dom.docSize() << std::endl;
 
             std::cout << "read time " << total_read_time1
                         << ", read rate (kb/s):" << fs1.size() / total_read_time1 / 1024.0 << std::endl;
             std::cout << "parse time " << total_parse_time1
                         << ", parse rate (kb/s):" << dom.parsedUntil() / total_parse_time1 / 1024.0 << std::endl;
-            
+
             std::string file1;
             std::string file2;
             if (dom) {
-#ifdef single_test        
+#ifdef single_test
                 std::cerr << dom;
 #endif
                 {
@@ -408,28 +408,28 @@ new file:
                     }
                     asl::Time writeEnd;
                     double myDuration = writeEnd-writeStart;
-                    unsigned long myFileSize =asl::getFileSize("tmpout.xml"); 
-                    std::cerr << "Generated " <<  myFileSize << " xml bytes in " 
+                    unsigned long myFileSize =asl::getFileSize("tmpout.xml");
+                    std::cerr << "Generated " <<  myFileSize << " xml bytes in "
                         <<  myDuration << "sec, MB/sec=" << myFileSize/myDuration/1024/1024 << std::endl;
                 }
-                
-                
+
+
                 std::string fs(asl::readFile("tmpout.xml"));
-                
+
                 asl::Time start;
                 dom::Document dom2(fs);
                 asl::Time ready;
                 total_time = total_time + ready-start;
                 std::cerr << (ready-start) << "\n";
                 if (dom2) {
-                    std::cerr << "reparsed 'tmpout.xml' until char "<< dom2.parsedUntil() 
+                    std::cerr << "reparsed 'tmpout.xml' until char "<< dom2.parsedUntil()
                         << ", total_size = " << dom2.docSize() << std::endl;
-                    
+
                     {
                         std::ofstream of2("tmpout2.xml", std::ios::binary);
                         of2 << dom2;
                     }
-                    
+
                     file1 = asl::readFile("tmpout.xml");
                     file2 = asl::readFile("tmpout2.xml");
                     //file2 = utils::as_string(dom2);
@@ -462,22 +462,22 @@ new file:
 
                 }
                 else {
-                    std::cerr << "failed to reparse 'tmpout.xml' until char "<< dom2.parsedUntil() 
+                    std::cerr << "failed to reparse 'tmpout.xml' until char "<< dom2.parsedUntil()
                         << ", total_size = " << dom2.docSize() << std::endl;
                 }
             }
-            
-#ifdef single_test        
+
+#ifdef single_test
             //std::cerr << "press key & enter to continue" << std::endl;
             //char c; std::cin >> c;
-#endif        
+#endif
         }
-        std::cerr << "parse total_time ="; 
+        std::cerr << "parse total_time =";
         std::cerr << total_time << "\n";
         //std::cerr << "press key & enter to continue" << std::endl;
         // char c; std::cin >> c;
     }
-    } 
+    }
     catch (asl::Exception & myException) {
         std::cerr << myException << std::endl;
         return -1;

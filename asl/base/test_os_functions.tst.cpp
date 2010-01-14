@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: test_os_functions.tst.cpp,v $
@@ -37,7 +37,7 @@
 #endif
 #include <iostream>
 
-using namespace std;  
+using namespace std;
 using namespace asl;
 
 class os_functions_UnitTest : public UnitTest {
@@ -50,7 +50,7 @@ class os_functions_UnitTest : public UnitTest {
 
             DPRINT(asl::appname());
             ENSURE(asl::appname().size());
-            
+
             DPRINT(asl::hostappid());
             ENSURE(asl::hostappid().size());
         }
@@ -93,7 +93,7 @@ int main(int argc, char *argv[]) {
 
     cerr << ">> Finished test suite '" << argv[0] << "'"
          << ", return status = " << mySuite.returnStatus() << endl;
-         
+
     return mySuite.returnStatus();
 
 }

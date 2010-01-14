@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 // Description: static_vector STL container
@@ -34,16 +34,16 @@ namespace asl {
 
     /*! \addtogroup aslbase */
     /* @{ */
-    
+
     /*! vector with compile-time fixed capacity
-    ** 
-    ** This behaves just like 'std::vector<>' except for the following 
-    ** deviations: 
+    **
+    ** This behaves just like 'std::vector<>' except for the following
+    ** deviations:
     ** - it doesn't use dynamic memory, the capacity is determined at compile-
     **   time; there's a static member 'static_max_size' to find out about it
-    ** - its 'swap()' member function is O(n) and might throw, if the 
+    ** - its 'swap()' member function is O(n) and might throw, if the
     **   'value_type's cctor throws
-    ** 
+    **
     ** note  see std::vector documentation for all other members
     */
     template< typename T, std::size_t MAX_SIZE >
@@ -189,7 +189,7 @@ namespace asl {
             at(size_type idx) const {
                 check_index_(idx); return operator[](idx);
             }
-                                                                       
+
             reference
             front() {
                 return elems_[0];
@@ -233,7 +233,7 @@ namespace asl {
             }
 
             void
-            erase(iterator it_beg, iterator it_end) 
+            erase(iterator it_beg, iterator it_end)
             {
                 destroy_( std::copy(it_end,end(),it_beg), end() );
             }
@@ -255,7 +255,7 @@ namespace asl {
 
             // swap
 
-            /*! 
+            /*!
             ** note Contrary to std::vector, this has linear complexity!
             */
             void
@@ -318,11 +318,11 @@ namespace asl {
             template<class FwdIt_, class IterTag_>
             void
             append_(FwdIt_ it_beg, FwdIt_ it_end, IterTag_);
-            
+
             template<class InpIt_>
             void
             append_(InpIt_ it_beg, InpIt_ it_end, std::input_iterator_tag);
-            
+
             void
             destroy_(pointer it_beg, pointer it_end) {for(;it_beg!=it_end;--size_)(--it_end)->~value_type();}
 
@@ -503,7 +503,7 @@ namespace asl {
     void
     static_vector<T,MAX_SIZE>::append_(InpIt_ it_beg, InpIt_ it_end, std::input_iterator_tag) {
         /* note:
-        ** we can't use 'std::uninitialized_copy()' here, because we must not step 
+        ** we can't use 'std::uninitialized_copy()' here, because we must not step
         ** behind it_end which we don't know in advance with input iterators
         */
         pointer start_raw = end();

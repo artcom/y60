@@ -4,16 +4,16 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: testMultiThreadedUnitTest.tst.cpp,v $
 //
 //   $Revision: 1.2 $
 //
-// Description: unit test for MultiThreadUnitTest classes 
+// Description: unit test for MultiThreadUnitTest classes
 //
 //
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
@@ -84,7 +84,7 @@ public:
             myVec.push_back(new TestClassDerived<N>);
         }
         ENSURE(TestClassBase<N>::_theInstanceCount_ == 1000);
-        
+
         std::vector<TestClassDerived<N> * > otherBaseVec;
         otherBaseVec = myVec;
 
@@ -101,9 +101,9 @@ public:
         myBaseVec.resize(0);
         otherBaseVec.resize(0);
         myVec.resize(0);
-        
+
         ENSURE(TestClassBase<N> ::_theInstanceCount_ == 0);
-        
+
     }
 };
 template <int N>
@@ -118,7 +118,7 @@ public:
             TestClassBase<N> * emptyBaseDummy = 0;
             ENSURE(!emptyBaseDummy);
 
-            // Test single non-empty pointer behaviour 
+            // Test single non-empty pointer behaviour
             TestClassBase<N> * myBaseDummy(new TestClassBase<N>);
             ENSURE(myBaseDummy);
             ENSURE(TestClassBase<N>::_theInstanceCount_ == 1);
@@ -137,7 +137,7 @@ public:
                 ENSURE(anotherDummy == myBaseDummy);
                 ENSURE(strcmp("TestClassBase",anotherDummy->getName()) == 0);
                 ENSURE(strcmp("TestClassBase",(*anotherDummy).getName()) == 0);
-            }        
+            }
 
             // Test polymorph behaviour
             TestClassDerived<N> * derivedDummy(new TestClassDerived<N>);
@@ -162,7 +162,7 @@ public:
 
 class MyDummyMultiThreadTest : public MultiThreadedTestSuite  {
 public:
-    MyDummyMultiThreadTest(int argc, char *argv[]) : MultiThreadedTestSuite("PtrMultiThreadTest", argc, argv) { 
+    MyDummyMultiThreadTest(int argc, char *argv[]) : MultiThreadedTestSuite("PtrMultiThreadTest", argc, argv) {
         cerr << "Created PtrMultiThreadTest()" << endl;
     }
 

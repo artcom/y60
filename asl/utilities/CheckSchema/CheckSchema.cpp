@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -99,11 +99,11 @@ main(int argc, char **argv) {
             cout << endl;
             return 1;
         }
-            
+
         asl::Ptr<dom::ValueFactory> myFactory = asl::Ptr<dom::ValueFactory>(new dom::ValueFactory());
         registerStandardTypes(*myFactory);
 //        registerSomTypes(*myFactory);
-        
+
         string mySchemaName = argv[1];
         dom::NodePtr mySchema = dom::NodePtr(new dom::Document());
 //        mySchema->setValueFactory(myFactory);
@@ -125,7 +125,7 @@ main(int argc, char **argv) {
                 return 1;
             }
         }
-    
+
     } catch (asl::Exception & ex) {
         rv = 1;
         AC_FATAL << "Exception caught in main: " << ex << endl;

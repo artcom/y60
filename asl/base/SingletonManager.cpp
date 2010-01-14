@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -68,9 +68,9 @@ SingletonManager::destroyAllSingletons() {
     // will be destroyed at some point.
     static bool mySingletonManagerDestroyed = false;
     if (mySingletonManagerDestroyed) {
-        // XXX: This happens if the SingletonManager destructor and another handler 
+        // XXX: This happens if the SingletonManager destructor and another handler
         //      both call destroyAllSingletons. In that case, this is invalid in the
-        //      second call. 
+        //      second call.
 //        cerr << "  --- Already gone" << endl;
         return;
     }
@@ -90,7 +90,7 @@ SingletonManager::destroyAllSingletons() {
     for (SingletonList::iterator it = _mySingletonList.begin(); it != _mySingletonList.end(); ) {
         // Delete logger last, to allow other singletons to use the logger in their destructor
         if (dynamic_cast_Ptr<Logger>(*it) == 0) {
-            AC_DEBUG << "  destroying singleton " << typeid(**it).name() << " size: " 
+            AC_DEBUG << "  destroying singleton " << typeid(**it).name() << " size: "
                      << _mySingletonList.size() << endl;
             it = _mySingletonList.erase(it);
         } else {

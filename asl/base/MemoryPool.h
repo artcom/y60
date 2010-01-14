@@ -4,15 +4,15 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
 // Description:  A fast allocator for small objects of same size
 //
-// Last Review: pavel 30.11.2005 
+// Last Review: pavel 30.11.2005
 //
 //  review status report: (perfect, ok, fair, poor, disaster)
 //    usefullness            : ok
@@ -129,7 +129,7 @@ MemoryPool<T>::free(void * theDoomed) {
 
 template <class T>
 inline
-void 
+void
 MemoryPool<T>::expandTheFreeList(int theCount) {
     Size mySize = sizeof(T);
     if (mySize < sizeof(MemoryPool<T>*)) {
@@ -164,7 +164,7 @@ public:
     }
     static unsigned long getAllocatedObjectsCount() {
         return getAllocatedObjectsCounter();
-    }    
+    }
     static unsigned long getFreedObjectsCount() {
         return getFreedObjectsCounter();
     }
@@ -196,7 +196,7 @@ public:
     }
     static unsigned long getAllocatedObjectsCount() {
         return getAllocatedObjectsCounter();
-    }    
+    }
     static unsigned long getFreedObjectsCount() {
         return getFreedObjectsCounter();
     }

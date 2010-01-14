@@ -4,15 +4,15 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
 // Description: command line argument parser
 //
-// Last Review: pavel 30.11.2005 
+// Last Review: pavel 30.11.2005
 //
 //  review status report: (perfect, ok, fair, poor, disaster)
 //    usefullness            : perfect
@@ -33,7 +33,7 @@
 //
 //    overall review status  : fair
 //
-//    recommendation: 
+//    recommendation:
 //       - improve documentation
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -86,7 +86,7 @@ public:
     DEFINE_EXCEPTION(IllegalOptionQuery,asl::Exception)
 
     bool haveOption(const std::string & option) const;
-    bool parse(std::vector<std::string> myArgs, StringEncoding theEncoding=UTF8, int errorHandlingPolicy=BailOnUnknownOptions); 
+    bool parse(std::vector<std::string> myArgs, StringEncoding theEncoding=UTF8, int errorHandlingPolicy=BailOnUnknownOptions);
     bool parse(int argc, const char * const argv[], StringEncoding theEncoding=Locale, int errorHandlingPolicy=BailOnUnknownOptions);
     void printUsage() const;
     void printHelp() const;
@@ -119,11 +119,11 @@ private:
     std::vector<std::string> _allArguments;
     std::string _programName;
     std::vector<int> _justArguments;
-		
+
     // storage of the argument specification
     std::map<std::string,std::string> _allowedOptions;
     std::map<std::string,std::string> _optionDescriptions;
-	
+
     std::vector<std::string> _argumentNames;
     std::vector<std::string> _argumentDescriptions;
 

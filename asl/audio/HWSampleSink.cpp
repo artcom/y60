@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -52,7 +52,7 @@ namespace asl {
 
 using namespace std;
 
-HWSampleSink::HWSampleSink(const string & myName, SampleFormat mySampleFormat, 
+HWSampleSink::HWSampleSink(const string & myName, SampleFormat mySampleFormat,
                            unsigned mySampleRate, unsigned numChannels)
     : SampleSource(myName, mySampleFormat, mySampleRate, numChannels),
       AudioTimeSource(0, mySampleRate),
@@ -70,8 +70,8 @@ HWSampleSink::HWSampleSink(const string & myName, SampleFormat mySampleFormat,
     _myFrameCount = 0;
     _myVolume = 1;
     _myVolumeFader = VolumeFaderPtr(new VolumeFader(_mySampleFormat));
-    _myVolumeFader->setVolume(1, 0); 
-    _myBackupBuffer = AudioBufferPtr(createAudioBuffer(_mySampleFormat, 32, 
+    _myVolumeFader->setVolume(1, 0);
+    _myBackupBuffer = AudioBufferPtr(createAudioBuffer(_mySampleFormat, 32,
                                                        _numChannels, SampleSource::_mySampleRate));
     _myBackupBuffer->clear();
 
@@ -117,9 +117,9 @@ void HWSampleSink::pause() {
         changeState(PAUSING_FADE_OUT);
         _myVolumeFader->setVolume(0);
         _myPumpTimeSource->pause();
-        
+
     } else {
-        AC_DEBUG << "HWSampleSink::pause: Pause received in state " << 
+        AC_DEBUG << "HWSampleSink::pause: Pause received in state " <<
                 stateToString(getState()) << ". Ignored.";
     }
 }
@@ -139,7 +139,7 @@ void HWSampleSink::stop(bool theRunUntilEmpty) {
                 _myVolumeFader->setVolume(0);
                 _myStopWhenEmpty = false;
                 AudioTimeSource::stop();
-                //_myPumpTimeSource->stop();                
+                //_myPumpTimeSource->stop();
                 break;
             case PAUSING_FADE_OUT:
                 changeState(STOPPING_FADE_OUT);
@@ -149,16 +149,16 @@ void HWSampleSink::stop(bool theRunUntilEmpty) {
                 changeState(STOPPED);
                 AudioTimeSource::stop();
                 AC_TRACE << "PAUSED: _myBufferQueue.clear();";
-                _myBufferQueue.clear(); 
+                _myBufferQueue.clear();
                 _myPosInInputBuffer = 0;
                 _myStopWhenEmpty = false;
-                _myPumpTimeSource->stop();                
+                _myPumpTimeSource->stop();
 				break;}
             case STOPPED:
                 _myBufferQueue.clear();
                 break;
 			default:{
-                AC_DEBUG << "HWSampleSink::stop: stop received in state " << 
+                AC_DEBUG << "HWSampleSink::stop: stop received in state " <<
 					stateToString(getState()) << ". Ignored.";}
         }
     }
@@ -168,7 +168,7 @@ void HWSampleSink::delayedPlay(asl::Time theTimeToStart) {
     AC_DEBUG << "HWSampleSink::delayedPlay (" << _myName << ")";
     AutoLocker<ThreadLock> myLocker(_myQueueLock);
     // Theoretically, STOPPING_FADE_OUT or PAUSING_FADE_OUT could happen too.
-    ASSURE(_myState == STOPPED || _myState == PAUSED); 
+    ASSURE(_myState == STOPPED || _myState == PAUSED);
     _myTimeToStart = theTimeToStart;
     _myLockedSelf = _mySelf.lock();
     _myVolumeFader->setVolume(_myVolume);
@@ -275,7 +275,7 @@ void HWSampleSink::deliverData(AudioBufferBase& theBuffer) {
 #ifdef USE_DASHBOARD
     MAKE_SCOPE_TIMER(Deliver_Data);
 #endif
-    
+
     AC_TRACE << "HWSampleSink::deliverData";
     dumpState();
     unsigned curOutputFrame = 0;
@@ -321,14 +321,14 @@ void HWSampleSink::deliverData(AudioBufferBase& theBuffer) {
     }
     _myFrameCount += theBuffer.getNumFrames();
     if (_myState != STOPPING_FADE_OUT) {
-        // Keep sample-accurate track of time spent playing. 
-        // In state STOPPING_FADE_OUT, time is set to 0 immediately. It stays 
+        // Keep sample-accurate track of time spent playing.
+        // In state STOPPING_FADE_OUT, time is set to 0 immediately. It stays
         // that way while in that state unless set from the outside (e.g. a seek happens).
         addFramesToTime(theBuffer.getNumFrames());
     }
 //    theBuffer.dumpSamples(cerr, 0, 512);
 /*
-    // This is code to insert debug samples into a stream. By enabling this, you can 
+    // This is code to insert debug samples into a stream. By enabling this, you can
     // see where buffer boundaries are when you record the sound.
     switch(_myState) {
         case RUNNING:
@@ -356,7 +356,7 @@ void HWSampleSink::deliverData(AudioBufferBase& theBuffer) {
         _myPosInInputBuffer = 0;
         _myLockedSelf = HWSampleSinkPtr();
         _myPumpTimeSource->stop();
-        
+
     }
     if (_myState == PAUSING_FADE_OUT && almostEqual(_myVolumeFader->getVolume(), 0.0)) {
         changeState(PAUSED);
@@ -378,7 +378,7 @@ void HWSampleSink::lock() {
 void HWSampleSink::unlock() {
     _myQueueLock.unlock();
 }
-        
+
 void HWSampleSink::changeState(State newState) {
     AC_DEBUG << "HWSampleSink ( " << _myName <<"): " << stateToString(_myState) << " -> "
         << stateToString(newState) << ", " << _isDelayingPlay;
@@ -410,15 +410,15 @@ AudioBufferBase* HWSampleSink::getNextBuffer() {
                 _myStopWhenEmpty = false;
                 changeState(PLAYBACK_DONE);
                 AudioTimeSource::stop();
-                
-            } else if (_myState == PAUSING_FADE_OUT) {                
+
+            } else if (_myState == PAUSING_FADE_OUT) {
                ; //deliverData will hopeful-and-eventually put us into PAUSED state (dk)
 
             } else {
                 _numUnderruns++;
                 //if ((_numUnderruns % 10) == 1) {
                     AC_WARNING << "Underrun for sample sink " << _myName << " num: " << _numUnderruns;
-                //}             
+                //}
             }
         }
         _isUsingBackupBuffer = true;

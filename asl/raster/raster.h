@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: raster.h,v $
@@ -80,7 +80,7 @@ class raster {
     public:
         //  raster specific funtions go here:
         D xsize() const { return _stride;}
-        D hsize() const { return _stride;} 
+        D hsize() const { return _stride;}
         D ysize() const { return _stride ? size() * PackedRaster<T>::Factor / _stride : 0;}
         D vsize() const { return _stride ? size() * PackedRaster<T>::Factor / _stride : 0;}
 
@@ -95,16 +95,16 @@ class raster {
 
         raster(const_iterator first, const_iterator last, size_type stride)
             : _stride(stride), _data(first, last) {}
-        
-        raster(const D& x, const D& y) 
+
+        raster(const D& x, const D& y)
             : _stride(x), _data(x * y / PackedRaster<T>::Factor) {}
 
         raster(const D& x, const D& y, const_iterator first)
             : _stride(x), _data(first, first + x * y / PackedRaster<T>::Factor) {}
-        
+
         raster(const D& x, const D& y,  const T& value)
             : _stride(x), _data(x * y / PackedRaster<T>::Factor, value) {}
-        
+
         raster(const raster<T, Alloc, D>& x, D xmin, D ymin, D xsize, D ysize)
             : _stride(xsize),
               _data(x.begin(xmin,ymin,xsize,ysize),x.end(xmin,ymin,xsize,ysize)) {}
@@ -211,14 +211,14 @@ class raster {
         reverse_iterator rbegin() {
             return std::reverse_iterator<T*>(end());
         }
-        const_reverse_iterator rbegin() const { 
-            return const_reverse_iterator(end()); 
+        const_reverse_iterator rbegin() const {
+            return const_reverse_iterator(end());
         }
         reverse_iterator rend() {
             return std::reverse_iterator<T*>(begin());
         }
-        const_reverse_iterator rend() const { 
-            return const_reverse_iterator(begin()); 
+        const_reverse_iterator rend() const {
+            return const_reverse_iterator(begin());
         }
 
         size_type size() const {
@@ -231,7 +231,7 @@ class raster {
             return size_type(this->end_of_storage - begin());
         }
         bool empty() const {
-            return begin() == end(); 
+            return begin() == end();
         }
         reference operator[](size_type n) {
             return *(begin() + n);
@@ -310,7 +310,7 @@ private:
         }
         void resize_vec(size_type new_size, const T& x) {
 			new_size = new_size / PackedRaster<T>::Factor;
-            if (new_size < size()) 
+            if (new_size < size())
                 erase(begin() + new_size, end());
             else
                 insert(end(), new_size - size(), x);

@@ -4,12 +4,12 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: 
+// Description:
 //     Classes for networked or local communication between processes
 //
 // Last Review:  ms 2007-08-15
@@ -35,7 +35,7 @@
 //
 //    overall review status   :      ok
 //
-//    recommendations: add high-level documentation, improve doxygen documentation 
+//    recommendations: add high-level documentation, improve doxygen documentation
 */
 #ifndef _asl_message_acceptor_included
 #define _asl_message_acceptor_included
@@ -61,15 +61,15 @@ template <class POLICY>
 class MessageAcceptor : public ConduitAcceptor<POLICY> {
     public:
         typedef typename MessageServer<POLICY>::Message Message;
-        MessageAcceptor(typename POLICY::Endpoint theLocalEndpoint, 
-                typename ConduitAcceptor<POLICY>::FACTORYPROC theFactoryMethod=MessageServer<POLICY>::create, 
+        MessageAcceptor(typename POLICY::Endpoint theLocalEndpoint,
+                typename ConduitAcceptor<POLICY>::FACTORYPROC theFactoryMethod=MessageServer<POLICY>::create,
                 unsigned theMaxConnectionCount=32) :
             ConduitAcceptor<POLICY>(theLocalEndpoint, theFactoryMethod, theMaxConnectionCount)
             {
             };
 
         void pushIncomingMessage(Ptr<Message> theMessage) {
-            _myInputQueue.push(theMessage);  
+            _myInputQueue.push(theMessage);
         }
 
         Ptr<Message> popIncomingMessage() {
@@ -77,7 +77,7 @@ class MessageAcceptor : public ConduitAcceptor<POLICY> {
             Ptr<Message> myMessage;
             for (myServer = this->_myServers.begin(); myServer != this->_myServers.end(); ++myServer) {
                 Ptr<ConduitServer<POLICY> > myConduitServer = *myServer;
-                Ptr<MessageServer<POLICY> > myMessageServer = 
+                Ptr<MessageServer<POLICY> > myMessageServer =
                         dynamic_cast_Ptr<MessageServer<POLICY> >(myConduitServer);
                 if (!myMessageServer) {
                     throw ConduitException("MessageAcceptor has a non-MessageServer as a child!", PLUS_FILE_LINE);
@@ -95,14 +95,14 @@ class MessageAcceptor : public ConduitAcceptor<POLICY> {
             return myMessage;
         }
 
-        bool pushOutgoingMessage(WeakPtr< ConduitServer<POLICY> > theServer, 
-                const std::string & thePayload) 
+        bool pushOutgoingMessage(WeakPtr< ConduitServer<POLICY> > theServer,
+                const std::string & thePayload)
         {
             return pushOutgoingMessage(Ptr<Message>(new Message(theServer, thePayload)));
         }
 
-        bool pushOutgoingMessage(WeakPtr< ConduitServer<POLICY> > theServer, 
-                const ReadableBlock & thePayload) 
+        bool pushOutgoingMessage(WeakPtr< ConduitServer<POLICY> > theServer,
+                const ReadableBlock & thePayload)
         {
             return pushOutgoingMessage(Ptr<Message>(new Message(theServer, thePayload)));
         }

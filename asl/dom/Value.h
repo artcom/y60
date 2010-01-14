@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __ */
 
 
@@ -75,7 +75,7 @@ recomputation of dependent values. This is mainly used for FacadeAttributePlugs,
 attributes that can be added to a dom::Node using the Facade-mechanism.
 
 Facade mainly provides fast and type-safe access to attributes and children of dom::Element nodes.
- 
+
 */
 
 
@@ -161,7 +161,7 @@ namespace dom {
         virtual ValuePtr create(const asl::ReadableBlock & theValue, Node * theNode) const = 0;
         virtual void bumpVersion() = 0;
         virtual void notifyValueChanged() = 0;
-        
+
         virtual void set(const ReadableBlock & theBlock) {
             DB(AC_TRACE << "ValueBase::set(): this="<<(void*)this<<" , vtname="<<name());
             assign(theBlock);
@@ -203,7 +203,7 @@ namespace dom {
         typedef typename ValueWrapper<T>::Type CheckType; // make sure only wrapped native values get automatically binarized
         theDest.appendData(myValue);
     }
-    
+
     // automatically reads every POD-Type from a binary stream
     template <class T>
     asl::AC_SIZE_TYPE debinarize(T & myValue, const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos = 0) {
@@ -304,7 +304,7 @@ namespace dom {
             }
             return thePos;
         }
-    
+
     // This is a faster version that reads/writes consecutive chunks of memory
     template <class T>
         asl::AC_SIZE_TYPE debinarizePODT(std::vector<T> & theVector, const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos) {
@@ -400,7 +400,7 @@ namespace dom {
             bumpVersion();
             onSetValue();
         }
-        
+
         virtual const char * name() const {
             return typeid(DOMString).name();
         }
@@ -538,7 +538,7 @@ namespace dom {
     struct UniqueId {
         friend class Node;
         friend ASL_DOM_DECL std::ostream & operator<<(std::ostream& os, const UniqueId & uid);
-        
+
         UniqueId() :  _ptrValue((ptrdiff_t)this), _myCount(_myCounter++)
         { }
         UniqueId(const UniqueId & theID) : _ptrValue(theID._ptrValue), _myCount(theID._myCount)
@@ -711,11 +711,11 @@ namespace dom {
                 return _myParentIndex[theIndex];
             }
             bool findNodeOffset(asl::Unsigned64 theOffset, asl::AC_SIZE_TYPE & theIndex) const {
-                std::vector<asl::Unsigned64>::const_iterator myIndexIt = 
+                std::vector<asl::Unsigned64>::const_iterator myIndexIt =
                     std::lower_bound(_myNodeOffsets.begin(), _myNodeOffsets.end(), theOffset);
                 if (myIndexIt != _myNodeOffsets.end() && !(theOffset < *myIndexIt)) {
                     theIndex = myIndexIt - _myNodeOffsets.begin();
-                    return true; 
+                    return true;
                 }
                 return false;
             }
@@ -746,7 +746,7 @@ namespace dom {
             std::vector<asl::Unsigned64> _myNodeEndOffsets;
             std::vector<asl::AC_SIZE_TYPE> _myParentIndex;
     };
-    
+
     // Registrar that provides fast getElementById access on all attributes that are defined as ID in xml-schema
     class IDValue : public StringValue {
     public:
@@ -931,7 +931,7 @@ namespace dom {
         SimpleValue(const DOMString & theStringValue, Node * theNode) : Value<T>(theNode),
             _myValue(Value<T>::asT(theStringValue)), _myValueHasChanged(true), _isValueWriteable(false)
         {}
-            
+
         SimpleValue(const asl::ReadableBlock & theValue, Node * theNode) : Value<T>(theNode),
             _myValueHasChanged(true), _isValueWriteable(false)
         {
@@ -1089,7 +1089,7 @@ namespace dom {
         mutable bool _myValueHasChanged;
         bool _isValueWriteable;
     };
-    
+
     DEFINE_EXCEPTION(IndexOutOfRange,asl::Exception);
 
 
@@ -1105,7 +1105,7 @@ namespace dom {
         virtual void setItem(asl::AC_SIZE_TYPE theIndex, const ValueBase & theValue) = 0;
         virtual ~AccessibleVector() {};
     };
-    
+
     // helper function to access the native accessible_vector type
     typedef asl::Ptr<AccessibleVector, dom::ThreadingModel> AccessibleVectorPtr;
     inline
@@ -1124,7 +1124,7 @@ namespace dom {
     const AccessibleVector & accessible_vector_cast(const ValueBase & v) {
         return dynamic_cast<const AccessibleVector &>(v);
     }
-    
+
     // interface for vector element access and resizing
     struct ResizeableVector : public virtual AccessibleVector {
         virtual ValuePtr getItem(asl::AC_SIZE_TYPE theIndex) const = 0;
@@ -1157,7 +1157,7 @@ namespace dom {
     const ResizeableVector & resizeable_vector_cast(const ValueBase & v) {
         return dynamic_cast<const ResizeableVector &>(v);
     }
-    
+
     // interface for raster element access and resizing
     // TODO: this should be moved somewhere else
     struct ResizeableRaster {
@@ -1178,13 +1178,13 @@ namespace dom {
         virtual void fillRect(asl::AC_SIZE_TYPE xmin, asl::AC_SIZE_TYPE ymin,
                               asl::AC_SIZE_TYPE xmax, asl::AC_SIZE_TYPE ymax,
                               const asl::Vector4<float> & theColor) = 0;
-        
+
         virtual void fillRectAlpha(asl::AC_SIZE_TYPE xmin, asl::AC_SIZE_TYPE ymin,
                               asl::AC_SIZE_TYPE xmax, asl::AC_SIZE_TYPE ymax,
                               const float theAlpha) = 0;
-        
-        virtual void randomize(const asl::Vector4f & theMinColor, const asl::Vector4f & theMaxColor) = 0; 
-        
+
+        virtual void randomize(const asl::Vector4f & theMinColor, const asl::Vector4f & theMaxColor) = 0;
+
         /*
         virtual ValuePtr getPixel(asl::AC_SIZE_TYPE x, asl::AC_SIZE_TYPE y) const = 0;
         virtual bool setPixel(asl::AC_SIZE_TYPE x, asl::AC_SIZE_TYPE y, const ValueBase & theValue) = 0;
@@ -1227,7 +1227,7 @@ namespace dom {
     template <class RASTER_VALUE, class T, class PIXEL_VALUE>
     struct MakeResizeableRaster : public ResizeableRaster {
         typedef typename T::value_type PIXEL;
-        typedef typename asl::SumTraits<PIXEL>::type SumType; 
+        typedef typename asl::SumTraits<PIXEL>::type SumType;
 
         MakeResizeableRaster(RASTER_VALUE & theRasterValue) : _myRasterValue(theRasterValue) {}
 
@@ -1272,9 +1272,9 @@ namespace dom {
         virtual asl::Vector4<float> getPixel(asl::AC_SIZE_TYPE x, asl::AC_SIZE_TYPE y) const {
             const T & myNativeRaster = _myRasterValue.getValue();
             PIXEL myPixel = myNativeRaster(x,y);
-            asl::Vector4<float> myColor(asl::getRedValue(myPixel)   / 255.f, 
+            asl::Vector4<float> myColor(asl::getRedValue(myPixel)   / 255.f,
                                         asl::getGreenValue(myPixel) / 255.f,
-                                        asl::getBlueValue(myPixel)  / 255.f, 
+                                        asl::getBlueValue(myPixel)  / 255.f,
                                         asl::getAlphaValue(myPixel) / 255.f);
             return myColor;
         }
@@ -1282,7 +1282,7 @@ namespace dom {
         virtual void setPixel(asl::AC_SIZE_TYPE x, asl::AC_SIZE_TYPE y, const asl::Vector4f & theColor) {
             const T & myNativeReadOnlyRaster = _myRasterValue.getValue();
             if (x < static_cast<asl::AC_SIZE_TYPE>(myNativeReadOnlyRaster.hsize()) &&
-                y < static_cast<asl::AC_SIZE_TYPE>(myNativeReadOnlyRaster.vsize())) 
+                y < static_cast<asl::AC_SIZE_TYPE>(myNativeReadOnlyRaster.vsize()))
             {
                 T & myNativeRaster = _myRasterValue.openWriteableValue();
                 setPixel(myNativeRaster(x,y), theColor);
@@ -1310,13 +1310,13 @@ namespace dom {
             std::fill(myRegion.begin(), myRegion.end(), myPixel);
             _myRasterValue.closeWriteableValue();
         }
-        
+
         virtual void fillRectAlpha(asl::AC_SIZE_TYPE xmin, asl::AC_SIZE_TYPE ymin,
                                    asl::AC_SIZE_TYPE xmax, asl::AC_SIZE_TYPE ymax,
-                                   const float theAlpha) 
+                                   const float theAlpha)
         {
             T & myNativeRaster = _myRasterValue.openWriteableValue();
-            
+
             for (unsigned x=xmin; x<xmax; ++x) {
                 for (unsigned y=ymin; y<ymax; ++y) {
                     asl::setAlphaValue(myNativeRaster(x,y), asl::pchar(theAlpha * 255));
@@ -1326,19 +1326,19 @@ namespace dom {
             _myRasterValue.closeWriteableValue();
         }
 
-        virtual void randomize(const asl::Vector4f & theMinColor, 
-                               const asl::Vector4f & theMaxColor)  
+        virtual void randomize(const asl::Vector4f & theMinColor,
+                               const asl::Vector4f & theMaxColor)
         {
             T & myNativeRaster = _myRasterValue.openWriteableValue();
-            
+
             for (unsigned x=0; x<static_cast<unsigned>(myNativeRaster.hsize()); ++x) {
                 for (unsigned y=0; y<static_cast<unsigned>(myNativeRaster.vsize()); ++y) {
                     asl::Vector4f myColor = asl::Vector4f(0.0, 0.0, 0.0, 0.0);
 
                     for (unsigned i=0; i<4; ++i) {
                         float myRange = theMaxColor[i] - theMinColor[i];
-                        if (theMinColor[i] != theMaxColor[i]) { 
-                            float myRandomFloat = myRange * (float)(std::rand() % 1000) / 1000.f; 
+                        if (theMinColor[i] != theMaxColor[i]) {
+                            float myRandomFloat = myRange * (float)(std::rand() % 1000) / 1000.f;
                             myColor[i] = myRandomFloat + theMinColor[i];
                         } else {
                             myColor[i] = theMaxColor[i];
@@ -1347,8 +1347,8 @@ namespace dom {
                     setPixel(myNativeRaster(x,y), myColor);
                 }
             }
-            
-            _myRasterValue.closeWriteableValue(); 
+
+            _myRasterValue.closeWriteableValue();
         }
 
         virtual void pasteRaster(const ValueBase & theSource,
@@ -1376,7 +1376,7 @@ namespace dom {
             }
             //const ResizeableRaster & mySourceRaster = raster_cast( theSource );
             const T * myNativeSource = dynamic_cast_Value<T>( & theSource );
-            
+
             if (sourceWidth == 0) {
                 sourceWidth = myNativeSource->hsize() - sourceX;
             }
@@ -1384,7 +1384,7 @@ namespace dom {
            if (sourceHeight == 0) {
                 sourceHeight = myNativeSource->vsize() - sourceY;
             }
-            
+
            if(sourceHeight == 0 || sourceWidth == 0) return;
 
             asl::Box2<asl::AC_OFFSET_TYPE> mySourceRect(sourceX, sourceY, sourceX+sourceWidth, sourceY+sourceHeight);
@@ -1397,12 +1397,12 @@ namespace dom {
 
             if ( myNativeSource ) {
                 const asl::const_subraster<PIXEL> mySourceRegion(*myNativeSource, sourceX, sourceY, sourceWidth, sourceHeight);
-                if (myTargetRect.getSize() !=mySourceRect.getSize()) { 
+                if (myTargetRect.getSize() !=mySourceRect.getSize()) {
 #ifndef _WIN32
                     asl::resample(mySourceRegion, myTargetRegion, SumType());
 #else
-                    throw asl::NotYetImplemented(JUST_FILE_LINE);                    
-#endif                    
+                    throw asl::NotYetImplemented(JUST_FILE_LINE);
+#endif
                 } else {
                     std::copy(mySourceRegion.begin(), mySourceRegion.end(), myTargetRegion.begin());
                 }
@@ -1417,8 +1417,8 @@ namespace dom {
                           const ValueBase & theSource)
         {
             const ResizeableRaster & mySourceRaster = raster_cast( theSource );
-            pasteRaster(targetX, targetY, theSource, 0, 0, 
-                    asl::AC_OFFSET_TYPE(mySourceRaster.width()), 
+            pasteRaster(targetX, targetY, theSource, 0, 0,
+                    asl::AC_OFFSET_TYPE(mySourceRaster.width()),
                     asl::AC_OFFSET_TYPE(mySourceRaster.height()));
         }
 #endif
@@ -1432,7 +1432,7 @@ namespace dom {
             asl::raster<PIXEL> myTmp(newWidth, newHeight);
 #ifdef _WIN32
             (void)myNative;
-            throw asl::NotYetImplemented(JUST_FILE_LINE);                                
+            throw asl::NotYetImplemented(JUST_FILE_LINE);
 #else
             asl::resample(myNative, myTmp, SumType());
             std::swap(myTmp, myNative);
@@ -1527,7 +1527,7 @@ namespace dom {
     template <class VECTOR_VALUE, class T, class ELEMENT_VALUE> struct MakeResizeableVector;
     template < class T, template<class,class,class> class ACCESS = MakeAccessibleVector, class ELEMENT_VALUE = SimpleValue<typename T::value_type> > class VectorValue;
     template < class T, template<class,class,class> class ACCESS, class ELEMENT_VALUE> class VectorValue;
-    
+
     // A Mixin-template that turns a VectorValue into a AccessibleVector
     template <class VECTOR_VALUE, class T, class ELEMENT_VALUE>
     struct MakeAccessibleVector : public virtual AccessibleVector {
@@ -1585,7 +1585,7 @@ namespace dom {
         typedef typename T::value_type ELEM;
         typedef MakeAccessibleVector<VECTOR_VALUE,T,ELEMENT_VALUE> Base;
         typedef ELEMENT_VALUE ELEMENT_VALUE_TYPE;
-        
+
         MakeResizeableVector(VECTOR_VALUE & theVectorValue) : MakeAccessibleVector<VECTOR_VALUE,T,ELEMENT_VALUE>(theVectorValue) {}
         const char * elementName() const {
             return typeid(ELEM).name();
@@ -1596,14 +1596,14 @@ namespace dom {
         const char * valueName() const {
             return typeid(VECTOR_VALUE).name();
         }
-        
+
         asl::AC_SIZE_TYPE length() const {
             return Base::_myVectorValue.getValue().size();
         }
         ValuePtr getItem(asl::AC_SIZE_TYPE theIndex) const {
             return Base::getItem(theIndex);
         }
-        
+
         ValuePtr getList(asl::AC_SIZE_TYPE theIndex, asl::AC_SIZE_TYPE theCount) const {
             if (theIndex+theCount <= length()) {
                 ValuePtr myResultValue = Base::_myVectorValue.create(0);
@@ -1636,7 +1636,7 @@ namespace dom {
             }
             throw AccessibleVector::TypeMismatch("setList: argument is not a vector",PLUS_FILE_LINE);
         }
-        
+
         void setItem(asl::AC_SIZE_TYPE theIndex, const ValueBase & theValue) {
             Base::setItem(theIndex, theValue);
         }
@@ -1768,7 +1768,7 @@ namespace dom {
         typedef typename T::value_type value_type;
     };
 
-    
+
     // template class for all vector and raster types
     template <
         class T,

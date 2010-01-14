@@ -4,16 +4,16 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: testAssure.tst.cpp,v $
 //
 //   $Revision: 1.2 $
 //
-// Description: unit test for Exception classes 
+// Description: unit test for Exception classes
 //
 //
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
@@ -38,7 +38,7 @@ bool isBigger(int a, int b) {
 
 class AssureUnitTest : public UnitTest {
 public:
-    AssureUnitTest() 
+    AssureUnitTest()
         : UnitTest("AssureUnitTest") {  }
     void run() {
         #undef ASSURE_POLICY
@@ -50,14 +50,14 @@ public:
         ASSURE(isBigger(0,23));
         SUCCESS("Testing function call within ASSURE()");
         #undef ASSURE_POLICY
-      
+
         //Assure<AssurePolicy::Ignore> myTest(isBigger(0,23), "some text", "lalala", 2);
 
         ASSURE_WITH(AssurePolicy::Ignore, 1 + 1 == 2);
         SUCCESS("Explicit AssurePolicy::Ignore true expression");
         ASSURE_WITH(AssurePolicy::Ignore, 1 + 1 == 3);
         SUCCESS("Explicit AssurePolicy::Ignore false expression");
-        
+
         ASSURE_WITH(AssurePolicy::Warn, 1 + 1 == 2);
         SUCCESS("Explicit AssurePolicy::Warn true expression");
         ASSURE_WITH(AssurePolicy::Warn, 1 + 1 == 3);
@@ -74,7 +74,7 @@ public:
             cerr << ex << endl;
         }
 
-#ifndef _WIN32        
+#ifndef _WIN32
         ASSURE_WITH(AssurePolicy::Exit, true);
         SUCCESS("Explicit AssurePolicy::Exit true expression");
         pid_t childs_pid = fork();
@@ -97,7 +97,7 @@ public:
         waitpid(childs_pid, &childStatus, 0);
         DPRINT(WEXITSTATUS(childStatus));
         ENSURE(WTERMSIG(childStatus) == SIGABRT);
-#endif        
+#endif
     }
 };
 

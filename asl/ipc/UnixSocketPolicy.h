@@ -4,12 +4,12 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: 
+// Description:
 //     Classes for networked or local communication between processes
 //
 // Last Review:  ms 2007-08-15
@@ -35,7 +35,7 @@
 //
 //    overall review status   :      ok
 //
-//    recommendations: add high-level documentation, improve doxygen documentation 
+//    recommendations: add high-level documentation, improve doxygen documentation
 */
 #ifndef __asl_UnixSocketPolicy_included
 #define __asl_UnixSocketPolicy_included
@@ -62,7 +62,7 @@ class UnixAddress : public sockaddr_un {
         std::ostream & print(std::ostream & os) const;
 };
 std::ostream & operator << (std::ostream & os, const UnixAddress & theAddress);
-  
+
 /*! Conduit policy for Unix socket-based communication (POSIX only).
 @note there is a typedef to asl::LocalPolicy (POSIX only)
 */

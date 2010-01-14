@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: Schema.h,v $
@@ -14,7 +14,7 @@
 //   $Revision: 1.6 $
 //
 // Description: tiny fast XML-Parser and DOM
-// 
+//
 //
 //
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
@@ -90,7 +90,7 @@ class ASL_DOM_DECL Schema : public DocumentFragment {
 
 		// return a type name for a given xs:attribute node
 		const NodePtr getAttributeType(const NodePtr myAttributeDeclaration) const;
-	
+
 		const NodePtr findElementDeclaration(const DOMString & theParentElementName,
 									const NodePtr theParentElementType,
 									const DOMString & theElementName,
@@ -107,7 +107,7 @@ class ASL_DOM_DECL Schema : public DocumentFragment {
 		dom::NodePtr addDocument(const Node & theDocument, const DOMString & theNSPrefix);
 		void preprocess(const NodePtr theNewBranch, const DOMString & theNSPrefix);
 #ifdef check
-	#ifndef _SETTING_NO_UNDEF_WARNING_ 
+	#ifndef _SETTING_NO_UNDEF_WARNING_
 		#warning Symbol 'check' defined as macro, undefining. (Outrageous namespace pollution by Apples AssertMacros.h, revealing arrogance and incompetence)
 	#endif
 	#undef check

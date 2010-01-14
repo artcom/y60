@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: Exception.cpp,v $
@@ -52,9 +52,9 @@ namespace asl {
             abort();
         }
     };
-    
+
     Exception::Exception(const std::string & what, const std::string & where, const char * name)
-            : _what(what), _where(where), _name(name) 
+            : _what(what), _where(where), _name(name)
     {
         if (abortOnThrow()) {
             cerr << *this;
@@ -106,7 +106,7 @@ asl::location_string(const char* file_name, unsigned line_number) {
 string
 asl::compose_message(const Exception& ex) {
     std::string myMsg;
-    myMsg = 
+    myMsg =
         string(ex.name() ? ex.name() : "Unspecified Exception") +
         string(": ") +
         string(ex.what().size() ? ex.what() : string("Unspecified reason")) +

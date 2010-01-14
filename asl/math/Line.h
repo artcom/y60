@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -59,17 +59,17 @@
 #include <asl/base/Ptr.h>
 #include <iostream>
 
-namespace asl {	
+namespace asl {
 
     /*! @addtogroup aslmath */
     /* @{ */
-    
+
     // a line is of infinite length and has no start or end point
     template<class Number>
 	class Line {
 	public:
 		Line() {};
-		Line(const Line<Number> & l) 
+		Line(const Line<Number> & l)
             : origin(l.origin), direction(l.direction) {}
         Line(const Point3<Number> & theOrigin, const Vector3<Number> & theDirection)
             : origin(theOrigin), direction(theDirection) {}
@@ -97,7 +97,7 @@ namespace asl {
 	class Ray {
 	public:
 		Ray() {};
-		Ray(const Ray<Number> & l) 
+		Ray(const Ray<Number> & l)
             : origin(l.origin), direction(l.direction) {}
         Ray(const Point3<Number> & theOrigin, const Vector3<Number> & theDirection)
             : origin(theOrigin), direction(theDirection) {}
@@ -132,7 +132,7 @@ namespace asl {
 	class LineSegment {
 	public:
 		LineSegment() {};
-		LineSegment(const LineSegment<Number> & l) 
+		LineSegment(const LineSegment<Number> & l)
             : origin(l.origin), end(l.end) {}
         LineSegment(const Point3<Number> & theOrigin, const Point3<Number> & theEnd)
             : origin(theOrigin), end(theEnd) {}
@@ -160,7 +160,7 @@ namespace asl {
     const LineSegment<Number> * asLineSegment(const Point3<Number> * theTwoPoints) {
         return reinterpret_cast<LineSegment<Number>*>(theTwoPoints);
     }
-    
+
     template <class Number>
     LineSegment<Number> & asLineSegment(Point3<Number> & theTwoPoints) {
         return reinterpret_cast<LineSegment<Number>&>(theTwoPoints);
@@ -176,13 +176,13 @@ namespace asl {
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -205,7 +205,7 @@ namespace asl {
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -308,6 +308,6 @@ namespace asl {
 
 }
 
-    
+
 #endif
 

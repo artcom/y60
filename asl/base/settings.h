@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: settings.h,v $
@@ -115,17 +115,17 @@ namespace asl {
     typedef double Float64;
     //typedef long double Float128;
 
-#if 1    
+#if 1
     // 32-bit streams and blocks
     typedef Unsigned32 AC_SIZE_TYPE;
     typedef Signed32 AC_OFFSET_TYPE;
-#else   
+#else
     // TODO: 64-bit streams and blocks
     // not ready yet - have to also think about
     // 64-bit file i/o
     typedef Unsigned32 AC_SIZE_TYPE;
     typedef Unsigned32 AC_OFFSET_TYPE;
-#endif    
+#endif
 
 /* @} */
 };
@@ -170,7 +170,7 @@ namespace asl {
 
 
 #if defined(_WIN32) && defined(AC_BUILT_WITH_CMAKE)
-    //C4661 (no suitable definition provided for explicit template 
+    //C4661 (no suitable definition provided for explicit template
     //instantiation request) -> ToDo: should be removed
 #   pragma warning( disable:  4251 4661)
 #   define AC_DLL_EXPORT __declspec( dllexport )

@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: testAuto.tst.cpp,v $
@@ -23,7 +23,7 @@
 #include "Auto.h"
 #include "UnitTest.h"
 
-using namespace std; 
+using namespace std;
 
 class FakeLock {
     public:
@@ -48,7 +48,7 @@ using namespace asl;
 template <class T>
 class AutoTemplateUnitTest : public TemplateUnitTest {
 public:
-    AutoTemplateUnitTest(const char * theTemplateArgument) 
+    AutoTemplateUnitTest(const char * theTemplateArgument)
         : TemplateUnitTest("AutoTemplateUnitTest",theTemplateArgument) {}
     void run() {
         T myLock;
@@ -68,7 +68,7 @@ public:
         catch (...) {
             SUCCESS("Exception was caught");
         }
-        ENSURE (!myLock.isLocked()); 
+        ENSURE (!myLock.isLocked());
     }
 };
 

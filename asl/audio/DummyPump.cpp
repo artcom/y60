@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -62,18 +62,18 @@ Time DummyPump::getCurrentTime () {
     return Time();
 }
 
-DummyPump::DummyPump () 
+DummyPump::DummyPump ()
     : Pump(SF_F32, 0)
 {
     AC_INFO << "DummyPump::DummyPump";
-   
+
     setDeviceName("Dummy Sound Device");
-    
+
     setCardName("Dummy Sound Card");
 
     _curFrame = 0;
     _myOutputBuffer.init(2048, getNumOutputChannels(), getNativeSampleRate());
-    
+
     dumpState();
     start();
 }
@@ -81,7 +81,7 @@ DummyPump::DummyPump ()
 void DummyPump::pump()
 {
     static Time lastTime;
-    
+
     msleep(unsigned(1000*getLatency()));
     Time curTime;
     double TimeSinceLastPump = curTime-lastTime;

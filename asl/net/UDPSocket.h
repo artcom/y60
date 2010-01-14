@@ -4,12 +4,12 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: 
+// Description:
 //    C++ Library fuer TCP-Sockets (based on Sockets.c++ from Pavel 11.9.92)
 //
 // Last Review:  ms & ab 2007-08-14
@@ -70,7 +70,7 @@ namespace inet {
      *  myUDPSocket->sendTo(broadcastAddress, otherPort, data, sizeof(data));
      *
      *  delete myUDPSocket;
-     *  
+     *
      * @endcode
      *
      * @TODO: create a UDPMulticast subclass (should be easy now)
@@ -79,15 +79,15 @@ namespace inet {
         public:
             /// create a new socket listening on theport on address thehost
             UDPSocket(asl::Unsigned32 thehost, asl::Unsigned16 theport);
-            
+
             virtual void open();
             /// receives data from any host.
             // theport and thehost will contain the origin of the data.
             // @returns number of bytes received
-            virtual unsigned receiveFrom(asl::Unsigned32* thehost, 
-                    asl::Unsigned16 * theport, void *data, const int maxlen); 
+            virtual unsigned receiveFrom(asl::Unsigned32* thehost,
+                    asl::Unsigned16 * theport, void *data, const int maxlen);
             /// sends data either to a host or to a broadcast address.
-            virtual unsigned sendTo(asl::Unsigned32 thehost, 
+            virtual unsigned sendTo(asl::Unsigned32 thehost,
                     asl::Unsigned16 theport, const void *data, unsigned len);
             virtual void reset();
     };

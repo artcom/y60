@@ -4,15 +4,15 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
 // Description:  Collect and Display Profiling Information
 //
-// Last Review: pavel 30.11.2005 
+// Last Review: pavel 30.11.2005
 //
 //  review status report: (perfect, ok, fair, poor, disaster)
 //    usefullness            : perfect
@@ -285,7 +285,7 @@ namespace asl {
                 reset();
             };
             Timer(const Timer & theTimer)
-                : 
+                :
                 _myLastElapsed(theTimer._myLastElapsed),
                 _myElapsed(theTimer._myElapsed),
                 _myStartTime(theTimer._myStartTime),
@@ -321,7 +321,7 @@ namespace asl {
             const std::string & getName() const {
                 return _myName;
             }
-                       
+
             void stop(unsigned long count = 1){
                 if (_isRunning) {
                     _myLastElapsed = asl::NanoTime() - _myStartTime;
@@ -413,7 +413,7 @@ namespace asl {
         void cycle(unsigned int theGroup = 1, unsigned long theIncrement=1);
         double getFrameRate();
         TimerPtr findParent();
-        
+
         // returns a sorted list of timers where lastElapsedTime matches maxTime and is greater than theThreshold
         // the Limit is the Number of Top item to be returned, 0 for all items
         std::vector<TimerPtr> getNewMaxTimers(asl::NanoTime theElapsedThreshold, asl::NanoTime theAgeLimit, size_t theCountLimit);

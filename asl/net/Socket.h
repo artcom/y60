@@ -4,12 +4,12 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: Base class for socket wrappers 
+// Description: Base class for socket wrappers
 //
 // Last Review:  ms & ab 2007-08-14
 //
@@ -70,7 +70,7 @@ class ASL_NET_DECL Socket {
         virtual ~Socket();
 
         /// initializes destination binding address and port.
-        virtual void setRemoteAddr(asl::Unsigned32 thehost, 
+        virtual void setRemoteAddr(asl::Unsigned32 thehost,
                 asl::Unsigned16 theport);
 
         //XXX When the function is virtual there is a segfault

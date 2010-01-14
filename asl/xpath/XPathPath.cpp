@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -127,7 +127,7 @@ namespace xpath {
             ++myImpl_->references;
             myImpl_->steps = stepList.steps;
         }
-        
+
         Path::Path(const Path& rhs)
             : myImpl_(rhs.myImpl_)
         {
@@ -178,7 +178,7 @@ namespace xpath {
         {
             typedef detail::LocationStepList::const_iterator
                                                       const_iterator;
-                                                      
+
                   const_iterator lhs_begin = myImpl_->steps.begin();
             const const_iterator lhs_end   = myImpl_->steps.end  ();
                   const_iterator rhs_begin = rhs.myImpl_->steps.begin();

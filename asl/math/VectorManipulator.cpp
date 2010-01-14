@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -61,14 +61,14 @@ const int FixedVectorStreamFormatter::ourOneElementPerLineFlagIndex( std::ios_ba
 #endif
 
 
-FixedVectorStreamFormatter::FixedVectorStreamFormatter(const char theStartToken, 
-                                                       const char theEndToken, 
-                                                       const char theDelimiter, 
+FixedVectorStreamFormatter::FixedVectorStreamFormatter(const char theStartToken,
+                                                       const char theEndToken,
+                                                       const char theDelimiter,
                                                        bool theOneElementPerLineFlag) :
     _myStartToken(theStartToken),
     _myEndToken(theEndToken),
     _myDelimiter(theDelimiter),
-    _myOneElementPerLineFlag(theOneElementPerLineFlag) 
+    _myOneElementPerLineFlag(theOneElementPerLineFlag)
 {
 }
 
@@ -76,7 +76,7 @@ FixedVectorStreamFormatter::FixedVectorStreamFormatter( const FixedVectorStreamF
     _myStartToken(otherFormatter._myStartToken),
     _myEndToken(otherFormatter._myEndToken),
     _myDelimiter(otherFormatter._myDelimiter),
-    _myOneElementPerLineFlag(otherFormatter._myOneElementPerLineFlag) 
+    _myOneElementPerLineFlag(otherFormatter._myOneElementPerLineFlag)
 {
 };
 
@@ -90,12 +90,12 @@ FixedVectorStreamFormatter::setStreamInfo(std::ios_base & theStream) const {
 }
 
 FixedVectorStreamFormatter
-formatFixedVector(const char theStartToken, 
-                  const char theEndToken, 
-                  const char theDelimiter, 
+formatFixedVector(const char theStartToken,
+                  const char theEndToken,
+                  const char theDelimiter,
                   bool theOneElementPerLineFlag)
 {
-    return FixedVectorStreamFormatter(theStartToken, theEndToken, theDelimiter, 
+    return FixedVectorStreamFormatter(theStartToken, theEndToken, theDelimiter,
                                       theOneElementPerLineFlag);
 }
 

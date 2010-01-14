@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSnumeric: test_numeric_functions.tst.cpp,v $
@@ -51,7 +51,7 @@ class numeric_functions_UnitTest : public UnitTest {
             ENSURE(NumericTraits<int>::max() == INT_MAX);
             ENSURE(NumericTraits<float>::min() == -FLT_MAX);
             ENSURE(NumericTraits<float>::max() == FLT_MAX);
-            
+
             ENSURE(asl::round(0.0f)  == 0);
             ENSURE(asl::round(0.49f) == 0);
             ENSURE(asl::round(0.5f)  == 1);
@@ -63,7 +63,7 @@ class numeric_functions_UnitTest : public UnitTest {
             ENSURE(asl::round(0.51)  == 1);
             ENSURE(asl::round(1.0)   == 1);
             ENSURE(asl::round(-1.0)  == -1);
-            ENSURE(asl::round(-1.4)  == -1);            
+            ENSURE(asl::round(-1.4)  == -1);
             ENSURE(asl::round(-1.6)  == -2);
             ENSURE(asl::round(-2.0)  == -2);
 

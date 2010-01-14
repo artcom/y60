@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: testArguments.tst.cpp,v $
@@ -65,7 +65,7 @@ class ArgumentsUnitTest : public UnitTest {
             SUCCESS( "Reached 2" );
             myArguments.addAllowedOptions(myOptions);
             SUCCESS( "Reached 3" );
-            
+
             try {
                 ENSURE( ! myArguments.haveOption("--blah-fasel"));
                 SUCCESS( "No exception thrown" );
@@ -82,30 +82,30 @@ class ArgumentsUnitTest : public UnitTest {
                 FAILURE("Exception thrown and caught")
             }
 
-            ENSURE( ! myArguments.parse( 0, 0 ));    
+            ENSURE( ! myArguments.parse( 0, 0 ));
 
             int dummyArgcBad = 7;
-            char * dummyArgvBad[] = { 
+            char * dummyArgvBad[] = {
                 "dummyProgramName", "firstFileName", "--bottles-in-fridge", "12" ,
-                "--check-beer-in-the-fridge", "someFileName", "anotherFileName"}; 
+                "--check-beer-in-the-fridge", "someFileName", "anotherFileName"};
 
-            ENSURE( myArguments.parse( 1, dummyArgvBad ));    
+            ENSURE( myArguments.parse( 1, dummyArgvBad ));
 
             ENSURE( ! myArguments.parse(dummyArgcBad, dummyArgvBad));
             ENSURE( ! myArguments.haveOption("--blah-fasel"));
-           
-            ENSURE( !myArguments.parse( 3, dummyArgvBad ));    
-            
+
+            ENSURE( !myArguments.parse( 3, dummyArgvBad ));
+
             myArguments = asl::Arguments(myOptions);
 
             int dummyArgcGood = 7;
-            char * dummyArgvGood[] = { "dummyProgramName", "--blah-fasel", 
-                                       "firstFileName", "--bottles-in-fridge", "12" , 
-                                       "someFileName", "anotherFileName"}; 
+            char * dummyArgvGood[] = { "dummyProgramName", "--blah-fasel",
+                                       "firstFileName", "--bottles-in-fridge", "12" ,
+                                       "someFileName", "anotherFileName"};
             ENSURE( myArguments.parse(dummyArgcGood, dummyArgvGood));
             ENSURE_EQUAL( myArguments.getProgramName() , "dummyProgramName");
-            ENSURE_EQUAL( myArguments.getCount() , 3); 
-            ENSURE_EQUAL( myArguments.getOptionCount() , 2); 
+            ENSURE_EQUAL( myArguments.getCount() , 3);
+            ENSURE_EQUAL( myArguments.getOptionCount() , 2);
             ENSURE( myArguments.haveOption("--blah-fasel"));
             ENSURE_EQUAL( myArguments.getOptionArgument("--bottles-in-fridge"),"12" );
             ENSURE_EQUAL( myArguments.getArgument(0),"firstFileName" );
@@ -118,11 +118,11 @@ class ArgumentsUnitTest : public UnitTest {
             ENSURE_EQUAL( string(dummyArgvGood[2]) , "firstFileName");
             ENSURE_EQUAL( string(dummyArgvGood[3]) , "--bottles-in-fridge");
 
-            { 
+            {
                 myArguments = asl::Arguments(myOptions);
                 // test "--" stops parsing arguments
                 int dummyArgcGood = 7;
-                char * dummyArgvGood[] = { "myProgramName", "foo", "--bottles-in-fridge", "-1", "--", "--not-parsed", "--" }; 
+                char * dummyArgvGood[] = { "myProgramName", "foo", "--bottles-in-fridge", "-1", "--", "--not-parsed", "--" };
                 ENSURE( myArguments.parse(dummyArgcGood, dummyArgvGood));
                 ENSURE( myArguments.haveOption("--bottles-in-fridge"));
                 DPRINT( myArguments.getCount() );
@@ -132,7 +132,7 @@ class ArgumentsUnitTest : public UnitTest {
                 ENSURE_EQUAL( myArguments.getArgument(2) , "--" );
             }
             //exit(1);
-            //FAILURE("test failure");       
+            //FAILURE("test failure");
         }
 };
 
@@ -140,7 +140,7 @@ class ArgumentsUnitTest : public UnitTest {
 template <class T>
 class ArgumentsTemplateUnitTest : public TemplateUnitTest {
 public:
-    ArgumentsTemplateUnitTest(const char * theTemplateArgument) 
+    ArgumentsTemplateUnitTest(const char * theTemplateArgument)
         : TemplateUnitTest("ArgumentsTemplateUnitTest",theTemplateArgument) {}
     void run() {
         T someVariable = 1;

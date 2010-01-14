@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -73,7 +73,7 @@ class AudioBuffer: public AudioBufferBase {
             _mySampleRate = 0;
         }
 
-        AudioBuffer(unsigned numFrames, unsigned numChannels, unsigned mySampleRate) 
+        AudioBuffer(unsigned numFrames, unsigned numChannels, unsigned mySampleRate)
         {
 //            AC_TRACE << "AudioBuffer::AudioBuffer(" << this << ")";
             init (numFrames, numChannels, mySampleRate);
@@ -83,7 +83,7 @@ class AudioBuffer: public AudioBufferBase {
 //            AC_TRACE << "AudioBuffer::~AudioBuffer(" << this << ")";
         }
 
-        void init(unsigned numFrames, unsigned numChannels, unsigned mySampleRate) 
+        void init(unsigned numFrames, unsigned numChannels, unsigned mySampleRate)
         {
             if (numFrames == 0) {
                 AC_DEBUG << "AudioBuffer::init, numFrames=0";
@@ -117,8 +117,8 @@ class AudioBuffer: public AudioBufferBase {
             return newBuffer;
         }
 
-        AudioBufferBase* partialClone(unsigned startFrame, unsigned endFrame) 
-                const 
+        AudioBufferBase* partialClone(unsigned startFrame, unsigned endFrame)
+                const
         {
             AudioBuffer<SAMPLE>* newBuffer;
             unsigned numFrames = endFrame-startFrame;
@@ -128,7 +128,7 @@ class AudioBuffer: public AudioBufferBase {
             return newBuffer;
 
         }
-        
+
         const SAMPLE * begin() const {
             return (const SAMPLE*)_myBlock.begin();
         }
@@ -191,7 +191,7 @@ class AudioBuffer: public AudioBufferBase {
 
         void partialAdd(unsigned theDestStartFrame,
                         const AudioBufferBase& theSrcBuffer,
-                        unsigned theSrcStartFrame, unsigned numFrames) 
+                        unsigned theSrcStartFrame, unsigned numFrames)
         {
             const AudioBuffer<SAMPLE>* mySrcBuffer = getBufferFromInterface(theSrcBuffer);
             //unsigned theSrcNumFrames = theSrcBuffer.getNumFrames();
@@ -203,7 +203,7 @@ class AudioBuffer: public AudioBufferBase {
 //                      << "theSrcNumFrames=" << theSrcNumFrames << ", "
 //                      << "theDestNumFrames=" << theDestNumFrames;
             ASSURE(theSrcBuffer.getNumChannels() == getNumChannels());
-            
+
             SAMPLE * curOutSample = begin() + theDestStartFrame*getNumChannels();
             const SAMPLE * curInSample = mySrcBuffer->begin() + theSrcStartFrame*getNumChannels();
             unsigned numSamples = numFrames * getNumChannels();
@@ -235,11 +235,11 @@ class AudioBuffer: public AudioBufferBase {
             memcpy(begin()+myDestStartSample, mySrcBuffer->begin()+mySrcStartSample, numBytes);
         }
 
-        void convert(void * theReadPtr, SampleFormat theSrcSampleFormat, 
+        void convert(void * theReadPtr, SampleFormat theSrcSampleFormat,
                 unsigned theSrcNumChannels)
         {
-            if (theSrcSampleFormat == getSampleFormat() && 
-                    theSrcNumChannels == getNumChannels()) 
+            if (theSrcSampleFormat == getSampleFormat() &&
+                    theSrcNumChannels == getNumChannels())
             {
                 memcpy(((char*)begin()), theReadPtr, getNumFrames()*getBytesPerFrame());
             } else {
@@ -257,7 +257,7 @@ class AudioBuffer: public AudioBufferBase {
                                     float(SHRT_MAX));
                             begin()[i*2+1] = SAMPLE(*((short*)theReadPtr+i*2+1)/
                                     float(SHRT_MAX));
-                            
+
                         }
                     }
                 } else {
@@ -269,7 +269,7 @@ class AudioBuffer: public AudioBufferBase {
                 }
             }
         }
-            
+
         // TODO: Change interface to use frames, not bytes.
         void copyToRawMem(void * theWritePtr, unsigned theStartByte,
                           unsigned theLength)
@@ -302,7 +302,7 @@ class AudioBuffer: public AudioBufferBase {
         }
 
         virtual bool operator ==(const AudioBufferBase& otherBuffer) const {
-            const AudioBuffer<SAMPLE>* myOtherBuffer = 
+            const AudioBuffer<SAMPLE>* myOtherBuffer =
                     dynamic_cast<const AudioBuffer<SAMPLE>*>(&otherBuffer);
             if (!myOtherBuffer) {
                 AC_WARNING << "Comparing buffers of different types.";
@@ -316,7 +316,7 @@ class AudioBuffer: public AudioBufferBase {
         }
 
         virtual bool almostEqual(const AudioBufferBase& otherBuffer, double theEpsilon) const {
-            const AudioBuffer<SAMPLE>* myOtherBuffer = 
+            const AudioBuffer<SAMPLE>* myOtherBuffer =
                     dynamic_cast<const AudioBuffer<SAMPLE>*>(&otherBuffer);
             if (!myOtherBuffer) {
                 AC_WARNING << "Comparing buffers of different types.";
@@ -330,8 +330,8 @@ class AudioBuffer: public AudioBufferBase {
                 } else {
                     const SAMPLE * otherSample = myOtherBuffer->begin();
                     for (const SAMPLE * mySample = begin(); mySample != end(); ++mySample) {
-                        if (!asl::almostEqual(sampleToFloat(*mySample), 
-                                    sampleToFloat(*otherSample), theEpsilon)) 
+                        if (!asl::almostEqual(sampleToFloat(*mySample),
+                                    sampleToFloat(*otherSample), theEpsilon))
                         {
                             return false;
                         }
@@ -339,14 +339,14 @@ class AudioBuffer: public AudioBufferBase {
                     }
                     return true;
                 }
-            }            
+            }
         }
 
         virtual float getSampleAsFloat(unsigned theFrame, unsigned theChannel) const {
             return sampleToFloat(*(begin()+theFrame*_numChannels+theChannel));
         }
 
-        // Adds a marker into the buffer that can be seen in a waveform editor :-). 
+        // Adds a marker into the buffer that can be seen in a waveform editor :-).
         void setMarker(float theValue) {
             SAMPLE * myPtr = begin();
             unsigned numSamples = 20;
@@ -367,13 +367,13 @@ class AudioBuffer: public AudioBufferBase {
                     << theFirstSample;
                 return true;
             }
-            for (const SAMPLE * mySample = begin()+_numChannels; mySample != end(); 
+            for (const SAMPLE * mySample = begin()+_numChannels; mySample != end();
                     mySample += _numChannels)
             {
-                if (fabs(sampleToFloat(*mySample)-sampleToFloat(*(mySample-_numChannels))) 
-                        > MaxDiff) 
+                if (fabs(sampleToFloat(*mySample)-sampleToFloat(*(mySample-_numChannels)))
+                        > MaxDiff)
                 {
-                    AC_TRACE << "Click at sample " << mySample-begin() << ": " <<  sampleToFloat(*mySample) << " -- " << 
+                    AC_TRACE << "Click at sample " << mySample-begin() << ": " <<  sampleToFloat(*mySample) << " -- " <<
                             sampleToFloat(*(mySample-_numChannels));
                     return true;
                 }

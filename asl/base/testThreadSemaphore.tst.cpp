@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: testThreadSemaphore.tst.cpp,v $
@@ -53,7 +53,7 @@ void *threadFunc (void * This) {
 }
 
 void
-SemaphoreUnitTest::run() {    
+SemaphoreUnitTest::run() {
     _mySemaphore.post();
     _mySemaphore.wait();
     ENSURE_MSG(true, "Simple semaphores work.");
@@ -71,7 +71,7 @@ SemaphoreUnitTest::run() {
     }
     ENSURE_MSG(50000 == _mySemaphore.getValue(), "Posted Semaphore 50000 times");
     int myRetVal = pthread_create (&_myThread, 0, threadFunc, this);
-    ENSURE_MSG (myRetVal == 0, "pthread_create succeeded"); 
+    ENSURE_MSG (myRetVal == 0, "pthread_create succeeded");
 
     // Increment the semaphore
     for (int i = 0; i < 10000; ++i) {
@@ -99,16 +99,16 @@ SemaphoreUnitTest::run() {
     _mySecondSemaphore.wait(1000);
     end = Time();
     diff1 = int((end.micros() - start.micros()) / 1000);
-    
+
     start = Time();
     _mySecondSemaphore.wait(2000);
     end = Time();
     diff2 = int((end.micros() - start.micros()) / 1000);
-    
+
     string msg = string("waiting 2 secs takes roughly twice as long as waiting 1 sec. waited ")
                + as_string(2*diff1) + " vs. " + as_string(diff2) + " milliseconds.";
     ENSURE_MSG(abs(2*diff1 - diff2) < 100, msg.c_str());
-    
+
     ENSURE_MSG(true, "Waiting for 3 seconds");
     ENSURE_MSG(!_mySecondSemaphore.wait(3000), "Timeout works.");
     _mySemaphore.reset(1);
@@ -116,7 +116,7 @@ SemaphoreUnitTest::run() {
     ENSURE_MSG(_mySemaphore.wait(10000), "Non-Timeout in wait returns true");
 }
 
-void 
+void
 SemaphoreUnitTest::secondThread() {
     for (int i = 0; i < 50000; ++i) {
         _mySemaphore.wait();

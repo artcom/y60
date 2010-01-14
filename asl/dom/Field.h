@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: Value.h,v $
@@ -47,7 +47,7 @@ namespace dom {
     template <class IMPL>
     class CallBack : public CallBackBase {
         public:
-            CallBack(asl::Ptr<IMPL, ThreadingModel> theCallBack, void (IMPL::*theCallBackFunction)()) 
+            CallBack(asl::Ptr<IMPL, ThreadingModel> theCallBack, void (IMPL::*theCallBackFunction)())
                 : _myCallBack(theCallBack),
                 _myCallBackFunction(theCallBackFunction)
             {}
@@ -57,10 +57,10 @@ namespace dom {
                 }
             }
         private:
-            asl::WeakPtr<IMPL, ThreadingModel> _myCallBack; 
+            asl::WeakPtr<IMPL, ThreadingModel> _myCallBack;
             void (IMPL::*_myCallBackFunction)();
     };
-    
+
     class Field;
 
     typedef asl::Ptr<Field, ThreadingModel> FieldPtr;
@@ -83,13 +83,13 @@ namespace dom {
 
         Field() : _isDirty(true), _hasOutdatedDependencies(true), _isRecalculating(false), _isReconnecting(false), _myImmediateCB() {}
         virtual ~Field();
-        
+
         // This should only be called by ValueFactory and FacadeAttributePlug, could be private, as soon as we have
         // template friends.
         void setSelf(FieldPtr theSelf) {
             _mySelf = theSelf;
         }
-        
+
         bool isDirty() const {
             return _isDirty;
         }

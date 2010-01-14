@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -60,7 +60,7 @@ namespace asl {
      *
      * Refactored in Rev 7453: [RS, DS]
      *   - linear path segments are now stored as bezier snippets, too.
-     *  
+     *
      */
     class ASL_MATH_DECL SvgPath {
     public:
@@ -301,12 +301,12 @@ namespace asl {
         SvgPath * createSubPath(const PathPoint3f & theStart,
                                 const PathPoint3f & theEnd,
                                 float theMaxLength = -1.0f);
-    
-    
+
+
         asl::Vector3f resolveRelative( const asl::Vector3f & thePos, bool theFlag) const;
         Vector3f getShorthandControlPoint( bool theRelativeFlag);
         Vector3f getLastPosition();
-        
+
     };
 
     ASL_MATH_DECL std::ostream & operator<<(std::ostream & os, const asl::SvgPath & thePath);

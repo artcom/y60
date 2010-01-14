@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: ZipReader.cpp,v $
@@ -36,7 +36,7 @@ namespace asl {
 
 #define CHECK_UNZIP(x) int myRetVal(x); if (myRetVal != UNZ_OK) \
     throw ZipFileException(string("UNZIP Error: ")+as_string(myRetVal), PLUS_FILE_LINE)
-    
+
 ZipReader::ZipReader(const char *  theInputFileName) : _myInputStream(0)
 {
     Path myPath(theInputFileName, UTF8);
@@ -62,10 +62,10 @@ ZipReader::getDirectory() const {
 }
 
 void
-ZipReader::readDirectory() {    
+ZipReader::readDirectory() {
     unz_global_info globalInfo;
     CHECK_UNZIP(unzGetGlobalInfo (_myInputStream, &globalInfo));
-    
+
     for (uLong i=0;i<globalInfo.number_entry;i++)
     {
         char filename_inzip[4096];
@@ -73,7 +73,7 @@ ZipReader::readDirectory() {
         int myError = unzGetCurrentFileInfo(_myInputStream,&file_info,filename_inzip,
                 sizeof(filename_inzip),NULL,0,NULL,0);
         CHECK_UNZIP(myError);
-        
+
         Entry curEntry;
         //TODO: fill in other fields
         DB(AC_TRACE << "found '" << filename_inzip << "'" << endl);
@@ -84,7 +84,7 @@ ZipReader::readDirectory() {
                 filename_inzip[j] = '/';
             }
         }
-        
+
         curEntry.filename = Path(filename_inzip, Locale);
         curEntry.size = file_info.uncompressed_size;
         unz_file_pos myFilePos;
@@ -95,12 +95,12 @@ ZipReader::readDirectory() {
         // if not an empty filename and without
         // a trailing directory seperator, then
         // add the entry to the list
-        if (!curEntry.filename.empty() && 
+        if (!curEntry.filename.empty() &&
             curEntry.filename.toLocale()[curEntry.filename.toLocale().size()-1] != '/')
         {
-            _myDirectory.push_back(curEntry); 
+            _myDirectory.push_back(curEntry);
         }
-        
+
         if ((i+1)<globalInfo.number_entry)
         {
             CHECK_UNZIP(unzGoToNextFile(_myInputStream));
@@ -108,12 +108,12 @@ ZipReader::readDirectory() {
     }
 }
 
-Ptr<ReadableBlockHandle> 
+Ptr<ReadableBlockHandle>
 ZipReader::getFile(int theFileIndex) {
     return getFile(_myDirectory[theFileIndex]);
 }
 
-Ptr<ReadableBlockHandle> 
+Ptr<ReadableBlockHandle>
 ZipReader::getFile(const std::string & theFilePath) {
     Path myPath(theFilePath, UTF8);
     for (Directory::size_type i = 0; i < _myDirectory.size(); ++i) {
@@ -126,7 +126,7 @@ ZipReader::getFile(const std::string & theFilePath) {
     return Ptr<ReadableBlockHandle>();
 }
 
-Ptr<ReadableBlockHandle> 
+Ptr<ReadableBlockHandle>
 ZipReader::getFile(const Entry & theEntry) {
     DB(AC_TRACE << "unzipping '" << theEntry.filename << "', size=" << theEntry.size << endl);
     unz_file_pos myFilePos;
@@ -139,7 +139,7 @@ ZipReader::getFile(const Entry & theEntry) {
     asl::Ptr<ReadableBlockHandle> myHandle(new AnyReadableBlockHandle(myBlock, theEntry.filename.toUTF8()));
     size_t myTotalBytesRead =0;
     while (myTotalBytesRead < theEntry.size) {
-        int myBytesRead = unzReadCurrentFile(_myInputStream, myBlock->begin()+myTotalBytesRead, 
+        int myBytesRead = unzReadCurrentFile(_myInputStream, myBlock->begin()+myTotalBytesRead,
                 theEntry.size-myTotalBytesRead);
         if (myBytesRead < 0) {
             unzCloseCurrentFile(_myInputStream);

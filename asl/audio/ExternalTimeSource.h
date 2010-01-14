@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -52,18 +52,18 @@
 #include <asl/base/settings.h>
 
 namespace asl {
-    
+
     class ExternalTimeSource {
         public:
             ExternalTimeSource();
             virtual ~ExternalTimeSource();
-          
-            Time getCurrentTime() const;    
+
+            Time getCurrentTime() const;
             void stop();
             void pause();
-            void run();    
+            void run();
         private:
-            asl::Time _myStartTime;        
+            asl::Time _myStartTime;
             asl::Time _myTimeOffset;
             asl::Time _myPausedTime;
             bool _myPauseFlag;

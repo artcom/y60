@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: file_functions.cpp,v $
@@ -92,7 +92,7 @@ namespace asl {
         string myProtocol;
         string myPath;
         parseURI(theFileName, &myProtocol, 0, &myPath);
-        
+
 #ifdef _WIN32
         char drive[_MAX_DRIVE];
         char dir[_MAX_DIR];
@@ -104,11 +104,11 @@ namespace asl {
         if (myDirName.empty()) {
             myDirName = "./";
         }
-        
+
         // Remove trailing double slashes
         if (myDirName.length() > 1 &&
-            myDirName.at(myDirName.length()-1) == '/' && 
-            myDirName.at(myDirName.length()-2) == '/') 
+            myDirName.at(myDirName.length()-1) == '/' &&
+            myDirName.at(myDirName.length()-2) == '/')
         {
             myDirName.resize(myDirName.length() - 1);
         }
@@ -167,7 +167,7 @@ namespace asl {
         return "";
     }
 
-    std::string removeExtension(const std::string & theFileName) { 
+    std::string removeExtension(const std::string & theFileName) {
         std::string::size_type myDotPos = theFileName.rfind(".");
         if (myDotPos != std::string::npos) {
             std::string::size_type mySlashPos = theFileName.rfind("/");
@@ -227,7 +227,7 @@ namespace asl {
             }
         }
 
-        std::string::size_type myPathStartPos = (myLoginPathDelimit == std::string::npos ? 0 : myLoginPathDelimit); 
+        std::string::size_type myPathStartPos = (myLoginPathDelimit == std::string::npos ? 0 : myLoginPathDelimit);
         if (thePath) {
             *thePath = theURI.substr(myPathStartPos);
         }
@@ -287,7 +287,7 @@ namespace asl {
 #ifdef LINUX
         if (theFileName.find("/") == std::string::npos) {
             // fix for shared library loading on linux which has a special
-            // treatment for filenames without slashes 
+            // treatment for filenames without slashes
             std::string myLocalFileName("./" + theFileName);
             if (fileExists(myLocalFileName)) {
                 return myLocalFileName;
@@ -310,7 +310,7 @@ namespace asl {
                 if (fileExists(myFileWithPath)) {
                     return myFileWithPath;
                 }
-            } 
+            }
        }
        return "";
     }
@@ -330,7 +330,7 @@ namespace asl {
         }
         return inFile.eof() && !inFile.bad();
     }
-    
+
     /// read lines from a text file and puts it into a vector of strings
     bool readFile(const std::string & theUTF8Filename, std::vector<std::string> & theLines) {
         std::ifstream inFile(Path(theUTF8Filename, UTF8).toLocale().c_str());
@@ -338,7 +338,7 @@ namespace asl {
             while (inFile) {
                 theLines.push_back(std::string());
                 getline(inFile,theLines.back());
-             }    
+             }
         } else {
             return false;
         }
@@ -427,7 +427,7 @@ namespace asl {
         Path myNewFileName(theNewFileName, UTF8);
         LAST_ERROR_TYPE myError = 0;
 #ifdef _WIN32
-        if (MoveFileEx(myOldFileName.toLocale().c_str(), 
+        if (MoveFileEx(myOldFileName.toLocale().c_str(),
                        myNewFileName.toLocale().c_str(), MOVEFILE_COPY_ALLOWED
                                                         +MOVEFILE_REPLACE_EXISTING) == 0)
         {
@@ -544,7 +544,7 @@ namespace asl {
             myPathList.push_back(myPath);
             myPath = getParentDirectory(myPath);
         }
-        int i = myPathList.size()-1; 
+        int i = myPathList.size()-1;
         for (; i >= 0; --i) {
             std::string myDirName = myPathList[i];
             if (myDirName.empty()) {
@@ -598,7 +598,7 @@ namespace asl {
         char appPath[4096];
         snprintf(buffer, sizeof(buffer), "/proc/%d/exe", getpid());
         int myBufferSize = readlink(buffer, appPath, sizeof(appPath)-1); // room for nul char
-        if (myBufferSize < 0) { 
+        if (myBufferSize < 0) {
             throw GetAppDirectoryFailed(std::string("readlink failed for '") + buffer + "'", PLUS_FILE_LINE);
         }
         appPath[myBufferSize] = 0;
@@ -606,12 +606,12 @@ namespace asl {
 #else
 #ifdef OSX
         CFBundleRef myAppsBundle = CFBundleGetMainBundle();
-        if (myAppsBundle == NULL) throw GetAppDirectoryFailed(std::string("CFBundleGetMainBundle failed") 
+        if (myAppsBundle == NULL) throw GetAppDirectoryFailed(std::string("CFBundleGetMainBundle failed")
                 , PLUS_FILE_LINE);
 
         //        CFURLRef myBundleURL = CFBundleCopyExecutableURL(myAppsBundle);
         CFURLRef myBundleURL = CFBundleCopyBundleURL(myAppsBundle);
-        if (myBundleURL == NULL) throw GetAppDirectoryFailed(std::string("CFBundleCopyBundleURL failed, error=") 
+        if (myBundleURL == NULL) throw GetAppDirectoryFailed(std::string("CFBundleCopyBundleURL failed, error=")
                 , PLUS_FILE_LINE);
 
         CFStringRef myPath = CFURLCopyFileSystemPath(myBundleURL,  kCFURLPOSIXPathStyle);
@@ -621,34 +621,34 @@ namespace asl {
         strAppDirectory = myPathCP;
         CFRelease(myPath);
         DisposePtr(myPathCP);
-        return strAppDirectory; 
+        return strAppDirectory;
 #endif
 #endif
 #endif
         return strAppDirectory;
     }
 
-    std::string 
+    std::string
     getCWD() {
-#ifdef _WIN32    
+#ifdef _WIN32
         return std::string(_getcwd( NULL, 0 ));
 #else
         char myBuffer[1024];
         getcwd( myBuffer, 1024);
         return std::string(myBuffer);
-#endif    
+#endif
     }
 
 // TODO: deal with degenerate cases like "C:\" or "/" (root)
-std::string 
-normalizeDirectory(const std::string & theDirectory, bool stripTrailingSlash) { 
+std::string
+normalizeDirectory(const std::string & theDirectory, bool stripTrailingSlash) {
     std::string myDirectory(theDirectory);
     // replace backslashes with forward slashes
     std::string::size_type myBackslashPos;
     while (std::string::npos != (myBackslashPos = myDirectory.find("\\"))) {
         myDirectory.replace(myBackslashPos, 1, "/");
     }
-    // replace double-slashes with single slashes        
+    // replace double-slashes with single slashes
     std::string::size_type myDoubleSlash;
     while (std::string::npos != (myDoubleSlash = myDirectory.find("//"))) {
         myDirectory.replace(myDoubleSlash, 2, "/");
@@ -665,7 +665,7 @@ normalizeDirectory(const std::string & theDirectory, bool stripTrailingSlash) {
             break;
         }
     }
-    return myDirectory;    
+    return myDirectory;
 }
 
 bool isDirectory(const std::string & theUTF8Path) {

@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: Stream.h,v $
@@ -45,7 +45,7 @@ namespace asl {
 
     /*! \addtogroup aslbase */
     /* @{ */
-    
+
     DEFINE_EXCEPTION(StreamException,Exception);
 	DEFINE_EXCEPTION(StreamPositionMismatch, Exception);
 	DEFINE_EXCEPTION(StreamReadFailed, Exception);
@@ -64,7 +64,7 @@ namespace asl {
 	Float64 asFloat;
 	Unsigned64 asUnsigned;
     };
-    
+
     class SameOrder {
     public:
         typedef SameOrder self;
@@ -159,7 +159,7 @@ namespace asl {
 
 
     //-------------------------------------------------------------------------------
-    /** 
+    /**
         ReadableBlock is an interface class.
         It provides an interface for read access to raw byte data
     **/
@@ -192,7 +192,7 @@ namespace asl {
 	    Number32 myTmp;
 	    myTmp.asFloat = theDest;
 	    myTmp.asUnsigned = SWAP_BYTE_ORDER_32(myTmp.asUnsigned);
-	    theDest = myTmp.asFloat; 
+	    theDest = myTmp.asFloat;
         }
     };
     template <>
@@ -201,7 +201,7 @@ namespace asl {
 	    Number64 myTmp;
 	    myTmp.asFloat = theDest;
 	    myTmp.asUnsigned = SWAP_BYTE_ORDER_64(myTmp.asUnsigned);
-	    theDest = myTmp.asFloat; 
+	    theDest = myTmp.asFloat;
         }
     };
 
@@ -231,13 +231,13 @@ namespace asl {
 
         /// copies sizeof(TX) bytes to theDest starting at theOffset
         virtual size_type readBytes(void * theDest, size_type theSize, size_type theReadOffset) const = 0;
-        
-        /// read specialized for asl::Bitsets. Arch independent data size 
+
+        /// read specialized for asl::Bitsets. Arch independent data size
         template <class T>
         size_type readData(asl::Bitset<T> & theDest, size_type theReadOffset) const {
             typename asl::Bitset<T>::int_type myValue;
             size_type myResult = readBytes(&myValue, sizeof(myValue), theReadOffset);
-            NumberReader<typename Arranger::self, typename asl::Bitset<T>::int_type, 
+            NumberReader<typename Arranger::self, typename asl::Bitset<T>::int_type,
                             sizeof(typename asl::Bitset<T>::int_type)>::swapBytes(myValue);
             theDest = myValue;
             return myResult;
@@ -288,7 +288,7 @@ namespace asl {
         virtual size_type readBlock(WriteableBlock & theDest, size_type theReadOffset) const;
 
         size_type readSize(size_type & theDest, size_type theReadOffset) const {
-            return readNumber(theDest, theReadOffset);	
+            return readNumber(theDest, theReadOffset);
         }
 
         size_type readUnsigned(Unsigned64 & theDest, size_type theReadOffset) const {
@@ -345,43 +345,43 @@ namespace asl {
         }
 
         size_type readSigned64(Signed64 & theDest, size_type theReadOffset) const {
-            return readNumber(theDest, theReadOffset);	
+            return readNumber(theDest, theReadOffset);
         }
         size_type readUnsigned64(Unsigned64 & theDest, size_type theReadOffset) const {
-            return readNumber(theDest, theReadOffset);	
+            return readNumber(theDest, theReadOffset);
         }
         size_type readFloat64(Float64 & theDest, size_type theReadOffset) const {
-            return readNumber(theDest, theReadOffset);	
+            return readNumber(theDest, theReadOffset);
         }
         size_type readSigned32(Signed32 & theDest, size_type theReadOffset) const {
-            return readNumber(theDest, theReadOffset);	
+            return readNumber(theDest, theReadOffset);
         }
         size_type readUnsigned32(Unsigned32 & theDest, size_type theReadOffset) const {
-            return readNumber(theDest, theReadOffset);	
+            return readNumber(theDest, theReadOffset);
         }
         size_type readFloat32(Float32 & theDest, size_type theReadOffset) const {
-            return readNumber(theDest, theReadOffset);	
+            return readNumber(theDest, theReadOffset);
         }
         size_type readUnsigned16(Unsigned16 & theDest, size_type theReadOffset) const {
-            return readNumber(theDest, theReadOffset);	
+            return readNumber(theDest, theReadOffset);
         }
         size_type readSigned16(Signed16 & theDest, size_type theReadOffset) const {
-            return readNumber(theDest, theReadOffset);	
+            return readNumber(theDest, theReadOffset);
         }
         size_type readUnsigned8(Unsigned8 & theDest, size_type theReadOffset) const {
-            return readData(theDest, theReadOffset);	
+            return readData(theDest, theReadOffset);
         }
         size_type readSigned8(Signed8 & theDest, size_type theReadOffset) const {
-            return readData(theDest, theReadOffset);	
+            return readData(theDest, theReadOffset);
         }
         size_type readString(std::string & theDest, size_type theStringSize, size_type theReadOffset) const {
             theDest.resize(theStringSize);
-            return readBytes(&theDest[0], theStringSize, theReadOffset);	
+            return readBytes(&theDest[0], theStringSize, theReadOffset);
         }
         size_type readCountedString(std::string & theDest, size_type theReadOffset) const {
             size_type myStringLength;
             theReadOffset = readUnsigned(myStringLength, theReadOffset);
-            return readString(theDest, myStringLength, theReadOffset);	
+            return readString(theDest, myStringLength, theReadOffset);
         }
         virtual operator const void*() const = 0;
         virtual ~ReadableArrangedStream() {};
@@ -399,7 +399,7 @@ namespace asl {
     template <class OUT_BYTE_ORDER, class IN_BYTE_ORDER, class SIZE_TYPE=AC_SIZE_TYPE>
     class ReadableStreamAdapter : public ReadableArrangedStream<OUT_BYTE_ORDER, SIZE_TYPE> {
         typedef ReadableArrangedStream<OUT_BYTE_ORDER, SIZE_TYPE> Base;
-    public:        
+    public:
         ReadableStreamAdapter(ReadableArrangedStream<IN_BYTE_ORDER> & theStream) : _myStream(theStream) {}
         virtual typename Base::size_type size() const {
             return _myStream.size();
@@ -423,7 +423,7 @@ namespace asl {
             : _myFileName(theFileName, UTF8),
              _mySize(getFileSize(theFileName)),
             _myPosition(0)
-            
+
         {
             _myInFile.open(_myFileName.toLocale().c_str() ,std::ios::binary);
         }
@@ -435,7 +435,7 @@ namespace asl {
                 if (_myPosition != theReadOffset) {
                     throw StreamPositionMismatch(
                         std::string("ReadableFile::readBytes(size=")+as_string(theSize)+")",
-                        std::string("Filename='")+ _myFileName.toLocale() + "', desired pos= " + as_string(theReadOffset) 
+                        std::string("Filename='")+ _myFileName.toLocale() + "', desired pos= " + as_string(theReadOffset)
                         + ", actual pos = "+ as_string(_myPosition) );
                 }
             }
@@ -443,7 +443,7 @@ namespace asl {
             if ( static_cast<std::size_t>(_myInFile.gcount()) != theSize) {
                 throw StreamReadFailed(
                     std::string("ReadableFile::readBytes(size=")+as_string(theSize)+")",
-                    std::string("Filename='")+ _myFileName.toLocale() + "', pos = " + as_string(theReadOffset) 
+                    std::string("Filename='")+ _myFileName.toLocale() + "', pos = " + as_string(theReadOffset)
                     + ", actual size read = "+ as_string(_myPosition) );
             }
             _myPosition += _myInFile.gcount();
@@ -478,7 +478,7 @@ namespace asl {
         AlwaysOpenReadableFileHandle(const std::string & theFileName) {
             _myFile = asl::Ptr<ReadableFile>(new ReadableFile(theFileName));
             _myFileName = theFileName;
-        } 
+        }
         ReadableStream & getStream() {
             return *_myFile;
         }
@@ -509,7 +509,7 @@ namespace asl {
 
         /// appends all the bytes from theSource at the end of the WriteableStream
         virtual WriteableStream & append(const ReadableBlock & theSource);
-        
+
         template <class T>
         WriteableStream & appendData(const T & thePlainOldData) {
             return append(&thePlainOldData, sizeof(thePlainOldData));
@@ -569,7 +569,7 @@ namespace asl {
             }
             // Note: relying on Signed64(0xFFFFFFFFFFFFFF80LL) to wrap-around to a negative number
             //       is probably not a good idea. (MS)
-            if ((theCount < Signed64(0x100LL)) && (theCount >= Signed64(0xFFFFFFFFFFFFFF80LL))) {  
+            if ((theCount < Signed64(0x100LL)) && (theCount >= Signed64(0xFFFFFFFFFFFFFF80LL))) {
                 appendSigned8(120);
                 return appendSigned8((Signed8)theCount);
             }
@@ -603,19 +603,19 @@ namespace asl {
 
         WriteableStream & appendSigned64(Signed64 theCount) {
             return appendData(Arranger::get(theCount));
-        }	
+        }
         WriteableStream & appendUnsigned64(Signed64 theCount) {
             return appendData(Arranger::get(theCount));
-        }	
+        }
         WriteableStream & appendFloat64(Float64 theNumber) {
             return appendData(Arranger::getFloatOut(theNumber));
         }
         WriteableStream & appendUnsigned32(Unsigned32 theCount) {
             return appendData(Arranger::get(theCount));
-        }	
+        }
         WriteableStream & appendSigned32(Signed32 theCount) {
             return appendData(Arranger::get(theCount));
-        }	
+        }
         WriteableStream & appendFloat32(Float32 theNumber) {
             return appendData(Arranger::getFloatOut(theNumber));
         }
@@ -659,7 +659,7 @@ namespace asl {
     class WriteableArrangedFile : public WriteableArrangedStream<EXTERNAL_BYTE_ORDER> {
         typedef WriteableArrangedStream<EXTERNAL_BYTE_ORDER> Base;
     public:
-        WriteableArrangedFile(const std::string & theFileName, bool appendToFile = false) : 
+        WriteableArrangedFile(const std::string & theFileName, bool appendToFile = false) :
             _myFileName(theFileName, UTF8)
         {
             if (appendToFile) {

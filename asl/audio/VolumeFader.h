@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -53,7 +53,7 @@ namespace asl {
 class ASL_AUDIO_DECL VolumeFader: public Effect {
 public:
     static const unsigned DEFAULT_FADE_FRAMES = 200;
-    VolumeFader(SampleFormat theSampleFormat); 
+    VolumeFader(SampleFormat theSampleFormat);
 
     void setVolume(float theTargetVolume, unsigned theFadeDurationFrames = DEFAULT_FADE_FRAMES);
     float getVolume() const;
@@ -63,7 +63,7 @@ private:
     template <class SAMPLE>
     class VolumeFaderFunctor : public EffectFunctor<SAMPLE> {
         private:
-            virtual void operator()(Effect* theEffect, AudioBuffer<SAMPLE> & theBuffer, 
+            virtual void operator()(Effect* theEffect, AudioBuffer<SAMPLE> & theBuffer,
                     Unsigned64 theAbsoluteFrame) {
                 VolumeFader * myFader = dynamic_cast<VolumeFader *>(theEffect);
                 ASSURE(myFader);
@@ -72,22 +72,22 @@ private:
                 float myFadeDuration = float(myFader->_myFadeEndFrame - myFader->_myFadeBeginFrame);
 
                 SAMPLE * curSample = theBuffer.begin();
-                Unsigned64 lastFrame = std::min (theAbsoluteFrame+theBuffer.getNumFrames(), 
+                Unsigned64 lastFrame = std::min (theAbsoluteFrame+theBuffer.getNumFrames(),
                         myFader->_myFadeEndFrame);
-                
+
                 for (myFader->_myCurrentFrame = theAbsoluteFrame;
                         myFader->_myCurrentFrame<lastFrame;
                         ++(myFader->_myCurrentFrame))
                 {
                     float myFadePercent = 1.0;
                     if (myFadeDuration) {
-                        myFadePercent = (myFader->_myCurrentFrame - 
+                        myFadePercent = (myFader->_myCurrentFrame -
                                          myFader->_myFadeBeginFrame)/myFadeDuration;
                     }
                     myFader->_myCurrentVolume = myFader->_myBeginVolume+
                             myFadePercent*myVolumeDiff;
-                    for (unsigned myChannel = 0; myChannel<theBuffer.getNumChannels(); 
-                            ++myChannel) 
+                    for (unsigned myChannel = 0; myChannel<theBuffer.getNumChannels();
+                            ++myChannel)
                     {
                         *curSample = (SAMPLE)((*curSample) * myFader->_myCurrentVolume);
                         curSample++;
@@ -110,7 +110,7 @@ private:
 };
 
 typedef Ptr<VolumeFader, MultiProcessor, PtrHeapAllocator<MultiProcessor> > VolumeFaderPtr;
-    
+
 } // namespace
 
 #endif

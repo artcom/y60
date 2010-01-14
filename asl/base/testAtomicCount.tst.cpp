@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: testAtomicCount.tst.cpp,v $
@@ -34,7 +34,7 @@ using namespace asl;
 template <class T>
 class AtomicCountTemplateUnitTest : public TemplateUnitTest {
 public:
-    AtomicCountTemplateUnitTest(const char * theTemplateArgument) 
+    AtomicCountTemplateUnitTest(const char * theTemplateArgument)
         : TemplateUnitTest("AtomicCountTemplateUnitTest",theTemplateArgument) {}
     void run() {
         asl::AtomicCount<T> myCount(0);
@@ -72,26 +72,26 @@ public:
 };
 
 class AtomicThreadSafetyTest: public UnitTest {
-public:    
+public:
     AtomicThreadSafetyTest()
         : UnitTest("AtomicThreadSafetyTest"),
           I(0), D(_myArraySize), _myThread(workFunction, this)
-    { 
+    {
     }
-    
+
     std::vector<Unsigned32> _myIncArray;
-  
+
     AtomicCount<MultiProcessor> I;
     AtomicCount<MultiProcessor> D;
-   
+
     enum {_myArraySize = 2000000};
-    
+
     void run() {
         _myIncArray.resize(_myArraySize);
         std::fill(_myIncArray.begin(), _myIncArray.end(), 0);
         _workThreadCounter = 0;
         _mainThreadCounter = 0;
-        
+
         I.set(1);
         _myThread.fork();
 
@@ -132,7 +132,7 @@ public:
             D.conditional_decrement();
         }
     }
-    
+
 private:
     PosixThread _myThread;
     Unsigned32 _workThreadCounter;

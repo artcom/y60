@@ -29,17 +29,17 @@ public:
 	 * Type of queue elements.
 	 */
     typedef Value_Type_ value_type;
-    
+
     /**
      * Type of the inner queue.
      */
     typedef std::queue<value_type> queue_type;
-    
+
     /**
      * Container type used by the inner queue.
      */
     typedef typename queue_type::container_type container_type;
-    
+
     /**
      * Type for sizes concerning the queue.
      */
@@ -49,7 +49,7 @@ public:
      * Type for size differences concerning the queue.
      */
     typedef typename container_type::difference_type difference_type;
-    
+
     /**
      * Reference type for elements.
      */
@@ -88,17 +88,17 @@ public:
 
         return queue_.empty();
     }
-    
+
     /**
      * Determine the number of elements on the queue.
      */
     size_type size() const
     {
     	boost::mutex::scoped_lock lock(mutex_);
-    	
+
     	return queue_.size();
     }
-	
+
     /**
      * Push an element onto the queue.
      */
@@ -119,7 +119,7 @@ public:
     void flush()
     {
     	boost::mutex::scoped_lock lock(mutex_);
-    	
+
     	while(!queue_.empty()) {
     		queue_.pop();
     	}
@@ -135,7 +135,7 @@ public:
         if(queue_.empty()) {
             return false;
         }
-        
+
         popped_value = queue_.front();
 
         queue_.pop();
@@ -153,7 +153,7 @@ public:
         while(queue_.empty()) {
             condition_variable_.wait(lock);
         }
-        
+
         popped_value = queue_.front();
 
         queue_.pop();
@@ -179,11 +179,11 @@ public:
                 return false;
             }
         }
-        
+
         popped_value = queue_.front();
 
         queue_.pop();
-        
+
         return true;
     }
 

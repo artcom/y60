@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -59,17 +59,17 @@ namespace {
             const bool equal = ( str_path == cmp );
 
             std::ostringstream oss;
-            oss << "String: \"" 
-                << str 
-                << "\" ==> Path: \"" 
-                << str_path << "\" " << (equal ? "==" : "!=") << " \"" 
-                << cmp 
+            oss << "String: \""
+                << str
+                << "\" ==> Path: \""
+                << str_path << "\" " << (equal ? "==" : "!=") << " \""
+                << cmp
                 << '\"';
 
             unitTest.ensure( str_path==cmp, oss.str().c_str(), mySourceFileName, mySourceLine, myExpectedResult);
         } catch( const xpath::XPathError& e ) {
             std::ostringstream oss;
-            oss << "An unexpected exception occurred at " << e.where() 
+            oss << "An unexpected exception occurred at " << e.where()
                 << ": \"" << e.what() << "\" while parsing path \""
                 << str << '\"';
             unitTest.ensure(false, oss.str().c_str(), mySourceFileName, mySourceLine, myExpectedResult);
@@ -249,11 +249,11 @@ namespace {
             const std::string& str_path = myPath.toString();
             if( str_path != cmp_str ) {
                 std::ostringstream oss;
-                oss << "String: \"" 
-                    << str 
-                    << "\" ==> Path: \"" 
-                    << str_path << "\" " << "!=" << " \"" 
-                    << cmp_str 
+                oss << "String: \""
+                    << str
+                    << "\" ==> Path: \""
+                    << str_path << "\" " << "!=" << " \""
+                    << cmp_str
                     << '\"';
                 unitTest.ensure(false, oss.str().c_str(), mySourceFileName, mySourceLine, myExpectedResult);
             } else {
@@ -262,7 +262,7 @@ namespace {
 
                 std::ostringstream oss;
                 if( result == cmp_nodes ) {
-                    oss << '\"' << str << "\" yields the expected node set (" 
+                    oss << '\"' << str << "\" yields the expected node set ("
                         << result.size() << " nodes).";
                 } else {
                     typedef std::pair< xpath::NodeList::const_iterator  // result
@@ -276,8 +276,8 @@ namespace {
                         mismatch_result = std::mismatch( result.begin(), result.end(), cmp_nodes.begin() );
                     }
 
-                    oss << '\"' << str 
-                        << "\" does not yield the expected node set. (" 
+                    oss << '\"' << str
+                        << "\" does not yield the expected node set. ("
                         << result.size() << " nodes instead of " << cmp_nodes.size() << ')';
                     if( !(result.empty() && cmp_nodes.empty()) ) {
                         oss << " First difference is at position "
@@ -301,7 +301,7 @@ namespace {
             }
         } catch( const xpath::ParseError& e ) {
             std::ostringstream oss;
-            oss << "An unexpected exception occurred at " << e.where() 
+            oss << "An unexpected exception occurred at " << e.where()
                 << ": \"" << e.what() << '\"';
             unitTest.ensure(false, oss.str().c_str(), mySourceFileName, mySourceLine, myExpectedResult);
         }
@@ -324,7 +324,7 @@ namespace {
 
             void run() {
 
-                const std::string myXML = 
+                const std::string myXML =
                     "<testDoc>"
                         "<body>"
                             "<junk name='valuable'>"
@@ -438,7 +438,7 @@ namespace {
                 XPATH_TEST_EVALUATOR( "/testDoc/body/junk"
                                     , "/child::testDoc/child::body/child::junk"
                                     , myDom
-                                    , xpath::NodeList() + myDom->childNode(0)->childNode(0)->childNode(0) 
+                                    , xpath::NodeList() + myDom->childNode(0)->childNode(0)->childNode(0)
                                                         + myDom->childNode(0)->childNode(0)->childNode(1) );
 
                 XPATH_TEST_EVALUATOR( "//junk"

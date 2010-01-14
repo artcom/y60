@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -53,7 +53,7 @@ public:
         for (int i = 0; i < myCountCycles; i++) {
             COUNT(CyclesTest);
         }
-        
+
         asl::Dashboard & myDashboard = getDashboard();
         myDashboard.cycle();
         unsigned long myCounterResult = myDashboard.getCounterValue("CyclesTest");
@@ -80,7 +80,7 @@ int main(int argc, char *argv[]) {
         returnStatus = 0;
     } else {
         cerr << "## No tests." << endl;
-        
+
     }
     cerr << ">> Finsihed test suite '" << argv[0] << "', return status = " << returnStatus << endl;
     return returnStatus;

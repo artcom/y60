@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: testReadWriteLock.tst.cpp,v $
@@ -76,7 +76,7 @@ LockUnitTest::run() {
         _mySharedVar = 0;
 
         int myRetVal = pthread_create (&_myThread, 0, threadFunc, this);
-        ENSURE_MSG(myRetVal == 0, "pthread_create succeeded"); 
+        ENSURE_MSG(myRetVal == 0, "pthread_create succeeded");
 
         _myLock.readlock();
         do {
@@ -94,16 +94,16 @@ LockUnitTest::run() {
         // perform many more tests here
 
         void * myThreadRetVal;
-        myRetVal = pthread_join (_myThread, &myThreadRetVal); 
+        myRetVal = pthread_join (_myThread, &myThreadRetVal);
         ENSURE_MSG (myRetVal == 0, "pthread_join succeeded");
-    } 
+    }
     catch (asl::Exception & ex) {
         FAILURE("Exception");
         cerr << ex << endl;
     }
 }
 
-void 
+void
 LockUnitTest::secondThread() {
 
     try {

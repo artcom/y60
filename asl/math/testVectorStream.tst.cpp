@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: testVectorStream.tst.cpp,v $
@@ -36,7 +36,7 @@ class FixedVectorStreamUnitTest : public UnitTest {
     public:
         FixedVectorStreamUnitTest() : UnitTest("FixedVectorStream") {  }
         void setMatrix(Matrix4<float> & a, const Matrix4<float> & b) {
-            a.assign(b[0][0], b[0][1], b[0][2], b[0][3], b[1][0], b[1][1], b[1][2], b[1][3], 
+            a.assign(b[0][0], b[0][1], b[0][2], b[0][3], b[1][0], b[1][1], b[1][2], b[1][3],
                      b[2][0], b[2][1], b[2][2], b[2][3], b[3][0], b[3][1], b[3][2], b[3][3]);
         }
         void run()
@@ -64,19 +64,19 @@ class FixedVectorStreamUnitTest : public UnitTest {
                 DPRINT(myVector2);
             }
 
-            
+
 			{
 		        Matrix4<double> myMatrix;
-        			    	
-		        myMatrix.assign(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15);			
-        		
+
+		        myMatrix.assign(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15);
+
 		        // Test data access
-		        const double * myData = myMatrix.getData();						
-		        for (unsigned i = 0; i < 16; i++) {			
+		        const double * myData = myMatrix.getData();
+		        for (unsigned i = 0; i < 16; i++) {
 			        ENSURE(myData[i] == double(i));
-		        }						
-        		
-			}		
+		        }
+
+			}
             // Test matrix streaming
             {
                 Matrix4<float> myMatrix;
@@ -86,7 +86,7 @@ class FixedVectorStreamUnitTest : public UnitTest {
                 std::string myMatrixString = asl::as_string(myGeneratedMatrix);
                 asl::fromString(myMatrixString, myMatrix);
                 ENSURE_MSG(almostEqual(myMatrix, myGeneratedMatrix), "Testing parsing a x_rotating matrix from string");
-                
+
                 // test printing a matrix to string and parsing a matrix from that string
                 myMatrixString = "unknown[[0,1,2,3],[4,5,6,7],[8,9,10,11],[12,13,14,15]]";
                 asl::fromString(myMatrixString, myMatrix);
@@ -115,7 +115,7 @@ class FixedVectorStreamUnitTest : public UnitTest {
                 Matrix4<float> myParsedMatrix;
                 myIStream >> formatFixedVector('<', '>', '|', false) >> myParsedMatrix;
                 ENSURE_MSG(almostEqual(myParsedMatrix, myMatrix), "Testing manipulated matrix parsing");
-                
+
             }
             {
                 std::string myVector4String("[1.0,2.0,3.0,4.0]");
@@ -126,22 +126,22 @@ class FixedVectorStreamUnitTest : public UnitTest {
                 ENSURE(almostEqual(myVector4[2], 3.0));
                 ENSURE(almostEqual(myVector4[3], 4.0));
             }
-            
+
             {
                 std::string myTruncatedString("[1.0,");
                 ENSURE_EXCEPTION(as<Vector4d>(myTruncatedString), ParseException);
             }
-           
+
             {
                 std::string myFloat5String("[1.0,2.0,3.0,4.0,5.0]");
                 ENSURE_EXCEPTION(as<Vector4d>(myFloat5String), ParseException);
             }
-            
+
             {
                 std::string myWrongEndString("[1.0,2.0,3.0,4.0x");
                 ENSURE_EXCEPTION(as<Vector4d>(myWrongEndString), ParseException);
             }
-            
+
             {
                 Vector4d myVector4(9.8, 7.6, 5.4, 3.2);
                 std::string myVector4String = as_string(myVector4);
@@ -151,28 +151,28 @@ class FixedVectorStreamUnitTest : public UnitTest {
                 ENSURE(almostEqual(myVector4[2], 5.4));
                 ENSURE(almostEqual(myVector4[3], 3.2));
             }
-                          
-            {   
+
+            {
                 Vector3d myVector(0,1,1);
                 std::string myVectorString = as_string(myVector);
                 myVector = as<Vector3d>(myVectorString);
                 ENSURE(myVector[0] == 0);
                 ENSURE(myVector[1] == 1);
-                ENSURE(myVector[2] == 1);        
+                ENSURE(myVector[2] == 1);
             }
             {
                 Box2f b1(1,2,3,4);
                 std::string myBoxString = as_string(b1);
                 DPRINT(myBoxString);
                 Box2f b2 = as<Box2f>(myBoxString);
-                ENSURE(almostEqual(b1, b2)); 
-                
+                ENSURE(almostEqual(b1, b2));
+
                 b1.makeEmpty();
                 myBoxString = as_string(b1);
                 ENSURE(myBoxString == "[]");
                 DPRINT(myBoxString);
                 b2 = as<Box2f>(myBoxString);
-                ENSURE(almostEqual(b1, b2)); 
+                ENSURE(almostEqual(b1, b2));
             }
             {
                 Box2f myTestBox(1, 2, 3, 4);
@@ -203,13 +203,13 @@ class FixedVectorStreamUnitTest : public UnitTest {
                 std::string myBoxString = as_string(b1);
                 cerr << myBoxString << endl;
                 Box3f b2 = as<Box3f>(myBoxString);
-                ENSURE(almostEqual(b1, b2)); 
-                
+                ENSURE(almostEqual(b1, b2));
+
                 b1.makeEmpty();
                 myBoxString = as_string(b1);
                 cerr << myBoxString << endl;
                 b2 = as<Box3f>(myBoxString);
-                ENSURE(almostEqual(b1, b2)); 
+                ENSURE(almostEqual(b1, b2));
             }
         }
 };

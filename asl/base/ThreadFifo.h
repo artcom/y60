@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: ThreadFifo.h,v $
@@ -41,9 +41,9 @@ namespace asl {
 
 /*! \addtogroup aslbase */
 /* @{ */
-    
+
 DEFINE_EXCEPTION(ThreadFifoException, Exception);
-    
+
 class ThreadFifoBase {
 public:
     ThreadFifoBase() {};
@@ -53,7 +53,7 @@ public:
 };
 
 template <class T>
-class ThreadFifo : public ThreadFifoBase 
+class ThreadFifo : public ThreadFifoBase
 {
 public:
     ThreadFifo();
@@ -69,7 +69,7 @@ public:
     int  size() const;
     bool empty() const;
     void clear();
- 
+
     /*
     // remember to lock/unlock the FIFO whe you peek into it!
     const T &   peekElement(unsigned int theIndex);
@@ -137,7 +137,7 @@ ThreadFifo<T>::clear()
 }
 
 template <class T>
-T  
+T
 ThreadFifo<T>::front() const
 {
     ScopeLocker L(_myLock, false);
@@ -148,7 +148,7 @@ ThreadFifo<T>::front() const
 }
 
 template <class T>
-bool  
+bool
 ThreadFifo<T>::empty() const
 {
     ScopeLocker L(_myLock, false);
@@ -157,7 +157,7 @@ ThreadFifo<T>::empty() const
 }
 
 template <class T>
-int  
+int
 ThreadFifo<T>::size() const
 {
     ScopeLocker L(_myLock, false);
@@ -175,7 +175,7 @@ ThreadFifo<T>::pop_blocking(T& val)
 
     int error = _protectionSemaphore->lock();
     assert(error != -1);
-    
+
     if (_signalToStop) {
         _countSemaphore->setValue(1);
         error = _protectionSemaphore->unlock();
@@ -184,10 +184,10 @@ ThreadFifo<T>::pop_blocking(T& val)
     }
 
     if ( ! _queue.empty()) {
-        
+
         val = _queue.front();
         _queue.pop_front();
-        
+
         if (_queue.size() > 0) {
             _countSemaphore->setValue(1);
         } else {
@@ -223,7 +223,7 @@ ThreadFifo<T>::pop_waiting(T& val)
     //    cerr << "_countSemaphore= " << _countSemaphore->getValue() << endl;
     //}
     assert(! _queue.empty());
-    
+
     val = _queue.front();
     _queue.pop_front();
     retval = true;
@@ -256,7 +256,7 @@ ThreadFifo<T>::getFirst_waiting(T& val) {
     }
 
     assert(! _queue.empty());
-    
+
     val = _queue.front();
     retval = true;
 

@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: testBlock.tst.cpp,v $
@@ -202,7 +202,7 @@ public:
         ENSURE(theBlock.size() == 36);
         theBlock.appendUnsigned(0x123456789ABCDEF0ULL);
         ENSURE(theBlock.size() == 45);
-        
+
         myReadPos = 0;
         ENSURE(myReadPos == 0);
         Unsigned64 myValue;
@@ -233,7 +233,7 @@ public:
         myReadPos = theBlock.readUnsigned(myValue, myReadPos);
         ENSURE(myReadPos == 45);
         ENSURE(myValue == 0x123456789ABCDEF0ULL);
-        
+
         theBlock.resize(0);
         theBlock.appendUnsigned8('x');
         theBlock.appendUnsigned8('y');

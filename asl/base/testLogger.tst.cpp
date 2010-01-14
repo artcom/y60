@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: testLogger.tst.cpp,v $
@@ -71,12 +71,12 @@ public:
         const int myTestCount = 100000000;
         asl::Time myStart;
         for (int i = 0; i < myTestCount; ++i) {
-            AC_DEBUG << "This is a Test Warning Log Entry" << wasteTime();       
+            AC_DEBUG << "This is a Test Warning Log Entry" << wasteTime();
             //int * myPtr = new int(1);
         }
         double myTime = asl::Time() - myStart;
         cerr << myTestCount << " logchecks took " << myTime << "secs., " << myTestCount/myTime/(1000*1000) << " mio. checks/sec" << endl;
-       
+
        SUCCESS("ready");
     }
 };
@@ -85,7 +85,7 @@ public:
 #if 0
 
 // TODO: make thread safety test
-void 
+void
 thread1_func(PosixThread & thread) {
     for (int i=0; i < 10000; i++) {
 
@@ -101,7 +101,7 @@ thread1_func(PosixThread & thread) {
     }
 }
 
-void 
+void
 thread2_func(PosixThread & thread) {
     for (int i=0; i < 10000; i++) {
         AC_DB((int)00<<string("0"));
@@ -118,7 +118,7 @@ thread2_func(PosixThread & thread) {
 
 
 int main() {
-    
+
 /*
     DebugLog db;
 
@@ -135,23 +135,23 @@ int main() {
     DebugLog::instance() << 0 << endl;
     DebugLog::instance() << 0.0 << endl;
     DebugLog::instance() << 0.0 << endl;
-    
+
     ThreadSafeDebugLog::instance() << endl;
     ThreadSafeDebugLog::instance() << flush;
     ThreadSafeDebugLog::instance() << "TEST" << endl;
     ThreadSafeDebugLog::instance() << 0 << endl;
     ThreadSafeDebugLog::instance() << 0.0 << endl;
     ThreadSafeDebugLog::instance() << 0.0 << endl;
-    
+
     AC_DB("DebugLevel 1");
     AC_DB2("DebugLevel 2");
     AC_DB3("DebugLevel 3");
     AC_WARNING("Debug Warning" << endl << flush);
     AC_ERROR("Debug Error" << endl);
-    
+
     PosixThread thread1(thread1_func);
     PosixThread thread2(thread2_func);
-    
+
     thread1.fork();
     thread2.fork();
 

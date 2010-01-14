@@ -4,15 +4,15 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
 // Description:  Collect and Display Profiling Information
 //
-// Last Review: pavel 30.11.2005 
+// Last Review: pavel 30.11.2005
 //
 //  review status report: (perfect, ok, fair, poor, disaster)
 //    usefullness            : ok
@@ -66,14 +66,14 @@ DEFINE_EXCEPTION(IllegalEnumValue, asl::Exception);
  * are provided to help with instanciation.
  *
  * @par Limitations:
- *    - The enum must start at zero. 
- *    - The enum must be consecutive. 
+ *    - The enum must start at zero.
+ *    - The enum must be consecutive.
  *    - The enum must be terminated with a special token consisting of the enum's
  *      name plus "_MAX".
  *    - The corresponding char pointer array must be terminated with an empty string.
  *    - The names must only consist of characters and digits (<i>a-z, A-Z, 0-9</i>)
  *      and underscores (<i>_</i>).
- * 
+ *
  *
  * @warning At the moment the verify() method is called during static initialization.
  * It quits the application with exit code 1 if any error is detected. The other solution
@@ -107,7 +107,7 @@ DEFINE_EXCEPTION(IllegalEnumValue, asl::Exception);
  * @endcode
  * And here is how to use the resulting type Fruit
  * @code
- * 
+ *
  * int
  * main(int argc, char * argv[]) {
  *      Fruit myFruit(APPLE);
@@ -120,11 +120,11 @@ DEFINE_EXCEPTION(IllegalEnumValue, asl::Exception);
  *              cerr << "Hmmm ... yummy " << myFruit << endl;
  *              break;
  *      }
- *      
+ *
  *      myFruit = CHERRY;
  *
  *      FruitEnum myNativeFruit = myFruit;
- *      
+ *
  *      myFruit.fromString("passion_fruit");
  *
  *      for (unsigned i = 0; i < Fruit::MAX; ++i) {
@@ -142,9 +142,9 @@ class Enum {
     public:
         typedef ENUM Native;
         Enum() {};
-        Enum( ENUM theValue ) : _myValue(theValue) {} 
-        Enum( const Enum & theOther ) : _myValue(theOther._myValue) {} 
-        
+        Enum( ENUM theValue ) : _myValue(theValue) {}
+        Enum( const Enum & theOther ) : _myValue(theOther._myValue) {}
+
         /** Assignment operator for native enum values. */
         void operator=(ENUM theValue) {
             _myValue = theValue;
@@ -166,7 +166,7 @@ class Enum {
         ENUM max() const {
             return ENUM(THE_MAX);
         }
-        /** Converts @p theString to an enum. 
+        /** Converts @p theString to an enum.
          * @throw IllegalEnumValue @p theString is not a legal identifier.
          * */
         void fromString(const std::string & theString) {
@@ -176,7 +176,7 @@ class Enum {
                     return;
                 }
             }
-            throw IllegalEnumValue(std::string("Illegal enumeration value '") + 
+            throw IllegalEnumValue(std::string("Illegal enumeration value '") +
                     theString + "' for enum " + _ourName, PLUS_FILE_LINE);
         }
 
@@ -200,7 +200,7 @@ class Enum {
                     is.unget();
                     break;
                 }
-            } 
+            }
 
             try {
                 fromString( myWord );
@@ -221,7 +221,7 @@ class Enum {
         std::ostream & print(std::ostream & os = std::cerr) const {
             return os << _ourStrings[_myValue];
         }
-        
+
         /** Static helper function to iterate over valid identifiers. */
         static const char * getString(unsigned theIndex) {
             return _ourStrings[theIndex];
@@ -231,7 +231,7 @@ class Enum {
          * any error is detected. Tries to print helpful error messages.
          */
 #ifdef verify
-	#ifndef _SETTING_NO_UNDEF_WARNING_ 
+	#ifndef _SETTING_NO_UNDEF_WARNING_
 		#warning Symbol 'verify' defined as macro, undefining. (Outrageous namespace pollution by Apples AssertMacros.h, revealing arrogance and incompetence)
 	#endif
 #undef verify
@@ -240,13 +240,13 @@ class Enum {
             for (unsigned i = 0; i < THE_MAX; ++i) {
                 if (_ourStrings[i] == 0 ) {
                     std::cerr << "### FATAL: Not enough strings for enum "
-                              << _ourName << " defined in file '" << theFile 
+                              << _ourName << " defined in file '" << theFile
                               << "' at line " << theLine << std::endl;
                     exit(1);
                 }
             }
             if ( std::string("") != _ourStrings[THE_MAX]) {
-                std::cerr << "### FATAL: The string array for enum " << _ourName 
+                std::cerr << "### FATAL: The string array for enum " << _ourName
                           << " defined in file '" << theFile << "' at line " << theLine
                           << " has too many items or is not terminated with an "
                           << "empty string." << std::endl;
@@ -261,7 +261,7 @@ class Enum {
         ENUM _myValue;
         static const char * const * const _ourStrings ;
         static const char * _ourName ;
-        static bool  _ourVerifiedFlag; 
+        static bool  _ourVerifiedFlag;
 };
 
 
@@ -270,11 +270,11 @@ class Enum {
 template <class THE_ENUM>
 class Bitset : public std::bitset<THE_ENUM::MAX> {
     public:
-        typedef Unsigned32 int_type; 
+        typedef Unsigned32 int_type;
         typedef THE_ENUM Flags;
 
         Bitset(int_type theValue = 0) :
-            std::bitset<THE_ENUM::MAX>(theValue) 
+            std::bitset<THE_ENUM::MAX>(theValue)
         {}
 
         operator int_type () const {
@@ -296,9 +296,9 @@ class Bitset : public std::bitset<THE_ENUM::MAX> {
 
             THE_ENUM myEnum;
             while ( is.good() && ! is.eof() ) {
-                
+
                 myEnum.parse(is);
-                
+
                 if (this->test(myEnum)) {
                     is.setstate(std::ios::failbit);
                 }
@@ -314,7 +314,7 @@ class Bitset : public std::bitset<THE_ENUM::MAX> {
                 } else if (myChar != ',') {
                     is.setstate(std::ios::failbit);
                 }
-            } 
+            }
 
             return is;
         }
@@ -347,7 +347,7 @@ class Bitset : public std::bitset<THE_ENUM::MAX> {
 /* @} */
 
 
-/** ostream operator for Enum 
+/** ostream operator for Enum
  * @relates asl::Enum
  */
 template <class ENUM, int THE_MAX>
@@ -357,7 +357,7 @@ operator<<(std::ostream & os, const asl::Enum<ENUM, THE_MAX> & theEnum) {
     return os;
 }
 
-/** istream operator for Enum 
+/** istream operator for Enum
  * @relates asl::Enum
  */
 template <class ENUM, int THE_MAX>
@@ -367,7 +367,7 @@ operator>>(std::istream & is, asl::Enum<ENUM, THE_MAX> & theEnum) {
     return is;
 }
 
-/** ostream operator for Bitset 
+/** ostream operator for Bitset
  * @relates asl::Bitset
  */
 template <class ENUM>
@@ -377,7 +377,7 @@ operator<<(std::ostream & os, const asl::Bitset<ENUM> & theBitset) {
     return os;
 }
 
-/** istream operator for Bitset 
+/** istream operator for Bitset
  * @relates asl::Bitset
  */
 template <class ENUM>
@@ -402,7 +402,7 @@ operator>>(std::istream & is, asl::Bitset<ENUM> & theBitset) {
  */
 #define DEFINE_ENUM( THE_NAME, THE_ENUM, DLL_EXPORT_TOKEN) \
     ASL_BASE_ENUM_EXPORT_STATICS(THE_ENUM,DLL_EXPORT_TOKEN) \
-    typedef asl::Enum<THE_ENUM, THE_ENUM ## _MAX> THE_NAME; 
+    typedef asl::Enum<THE_ENUM, THE_ENUM ## _MAX> THE_NAME;
 
 
 /** Helper macro. Creates a typedef.
@@ -411,7 +411,7 @@ operator>>(std::istream & is, asl::Bitset<ENUM> & theBitset) {
 #define DEFINE_BITSET( THE_BITSET_NAME, THE_ENUM_NAME, THE_ENUM, DLL_EXPORT_TOKEN) \
     DEFINE_ENUM( THE_ENUM_NAME, THE_ENUM, DLL_EXPORT_TOKEN ) \
     ASL_BASE_BITSET_EXPORT_STATICS(THE_ENUM_NAME,DLL_EXPORT_TOKEN) \
-    typedef asl::Bitset<THE_ENUM_NAME> THE_BITSET_NAME; 
+    typedef asl::Bitset<THE_ENUM_NAME> THE_BITSET_NAME;
 
 /** Helper macro. Runs the verify() method during static initialization.
  * @relates asl::Enum

@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: string_functions.h,v $
@@ -57,7 +57,7 @@ namespace asl {
         Locale,
         UTF8
     };
-    
+
     DEFINE_EXCEPTION(BufferTooSmall, asl::Exception);
 
     /// return every type that has a operator>>(ostream) as string
@@ -237,9 +237,9 @@ namespace asl {
     ASL_BASE_DECL void binToBase64(const unsigned char * theData, unsigned int theLength, std::string & theDest, const Char * theCodeTable = cb66);
     ASL_BASE_DECL unsigned base64ToBin(const std::string & theSource, unsigned char * theDest, unsigned int maxLength);
 
-    // Returns the line in theString starting at theCurPos and ending in \n. 
+    // Returns the line in theString starting at theCurPos and ending in \n.
     // After the call, theCurPos points to the start of the next line in the
-    // string. 
+    // string.
     // Rudimentary, but very helpful when parsing line-based files.
     std::string getNextLine(std::string::size_type& theCurPos, const std::string& theString);
 

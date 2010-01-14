@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: testPixelRaster.tst.cpp,v $
@@ -35,19 +35,19 @@
 #include <asl/base/UnitTest.h>
 #include <asl/base/Time.h>
 
-using namespace std;  
-using namespace asl;  
+using namespace std;
+using namespace asl;
 
 int mydata[] = {
-    0,  10,  20,  30,  40,  50,  60,  70,  80,  90, 
-    100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 
-    200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 
-    300, 310, 320, 330, 340, 350, 360, 370, 380, 390, 
-    400, 410, 420, 430, 440, 450, 460, 470, 480, 490, 
-    500, 510, 520, 530, 540, 550, 560, 570, 580, 590, 
-    600, 610, 620, 630, 640, 650, 660, 670, 680, 690, 
-    700, 710, 720, 730, 740, 750, 760, 770, 780, 790, 
-    800, 810, 820, 830, 840, 850, 860, 870, 880, 890, 
+    0,  10,  20,  30,  40,  50,  60,  70,  80,  90,
+    100, 110, 120, 130, 140, 150, 160, 170, 180, 190,
+    200, 210, 220, 230, 240, 250, 260, 270, 280, 290,
+    300, 310, 320, 330, 340, 350, 360, 370, 380, 390,
+    400, 410, 420, 430, 440, 450, 460, 470, 480, 490,
+    500, 510, 520, 530, 540, 550, 560, 570, 580, 590,
+    600, 610, 620, 630, 640, 650, 660, 670, 680, 690,
+    700, 710, 720, 730, 740, 750, 760, 770, 780, 790,
+    800, 810, 820, 830, 840, 850, 860, 870, 880, 890,
     900, 910, 920, 930, 940, 950, 960, 970, 980, 990
 };
 
@@ -62,10 +62,10 @@ public:
         raster<int> myDest(5, 5, -1);
 
         int myExpectedData[] = {
-            0,  20,  40,  60,  80, 
-            200, 220, 240, 260, 280, 
-            400, 420, 440, 460, 480, 
-            600, 620, 640, 660, 680, 
+            0,  20,  40,  60,  80,
+            200, 220, 240, 260, 280,
+            400, 420, 440, 460, 480,
+            600, 620, 640, 660, 680,
             800, 820, 840, 860, 880
         };
         raster<int> myExpected(5,5,myExpectedData);
@@ -140,7 +140,7 @@ public:
         int expectedResult[] = {0,0,0,10,10,10,20,20,20,20,-1};
         int expectedResultWin[] = {0,0,0,10,10,10,20,20, 20, 30, -1};
 
-        ENSURE(equal(expectedResult,expectedResult+11,result.begin()) || 
+        ENSURE(equal(expectedResult,expectedResult+11,result.begin()) ||
             equal(expectedResultWin,expectedResultWin+11,result.begin()));
         DTITLE("expectedResult:");
         copy(expectedResult, expectedResult+11, ostream_iterator<int>(cerr, " "));cerr<<endl;
@@ -155,11 +155,11 @@ public:
 template <class MAT, class PIX>
 class RasterTest1 : public UnitTest {
 public:
-    RasterTest1(string myTypeName) 
+    RasterTest1(string myTypeName)
         : UnitTest(strdup(string(string("RasterTest1<")+myTypeName+">").c_str())) {  }
     void run() {
 
-        MAT myMap(5,5, 
+        MAT myMap(5,5,
             "ABCDE"
             "FGHIJ"
             "KLMNO"
@@ -174,7 +174,7 @@ public:
 
         ENSURE(myMap == subMap);
 
-        MAT nonSquareMap(7,4,  
+        MAT nonSquareMap(7,4,
             "ABCDEFG"
             "HIJKLMN"
             "OPQRSTU"
@@ -209,7 +209,7 @@ public:
     template <class MMAT>
     void rect_iterator_test(const MMAT & m, int x, int y, int xsize, int ysize) {
         cerr << endl;
-        cerr << "rect_iterator_test: x = " << x << ", y = " << y 
+        cerr << "rect_iterator_test: x = " << x << ", y = " << y
             << ", xsize = " << xsize << ", ysize = " << ysize << ":" << endl;
         typename MMAT::const_sub_iterator bgn = m.begin(x,y,xsize,ysize);
         typename MMAT::const_sub_iterator end = m.end(x,y,xsize,ysize);
@@ -346,7 +346,7 @@ typedef asl::NanoTime ptime;
 template <class mat>
 struct iter_perf
 {
-    iter_perf(char* testname) 
+    iter_perf(char* testname)
     {
         cerr << "==== Testing type : " << testname << endl;
         typedef typename mat::iterator mat_iterator;
@@ -366,11 +366,11 @@ struct iter_perf
                 fill(bgn,end, mat_value_type());
             }
             ptime stop;
-            double duration = ptime(stop-start).seconds(); 
+            double duration = ptime(stop-start).seconds();
 
             cerr << "Size = " << m.xsize() << ' ' << m.ysize() << endl;
-            cerr << "fillrate step:" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl; 
-            cerr << "fillrate step:" << setprecision(4) << (m.size()*n/duration*sizeof(mat_value_type)/1024/1024) << " MB/sec" << endl; 
+            cerr << "fillrate step:" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl;
+            cerr << "fillrate step:" << setprecision(4) << (m.size()*n/duration*sizeof(mat_value_type)/1024/1024) << " MB/sec" << endl;
         }
 
         {
@@ -386,11 +386,11 @@ struct iter_perf
                 pfill(bgn,end, mat_value_type());
             }
             ptime stop;
-            double duration = ptime(stop-start).seconds(); 
+            double duration = ptime(stop-start).seconds();
 
             cerr << "Size = " << m.xsize() << ' ' << m.ysize() << endl;
-            cerr << "pfillrate step:" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl; 
-            cerr << "pfillrate step:" << setprecision(4) << (m.size()*n/duration*sizeof(mat_value_type)/1024/1024) << " MB/sec" << endl; 
+            cerr << "pfillrate step:" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl;
+            cerr << "pfillrate step:" << setprecision(4) << (m.size()*n/duration*sizeof(mat_value_type)/1024/1024) << " MB/sec" << endl;
         }
         {
             // Performance
@@ -405,11 +405,11 @@ struct iter_perf
                 fill(bgn,end, mat_value_type());
             }
             ptime stop;
-            double duration = ptime(stop-start).seconds(); 
+            double duration = ptime(stop-start).seconds();
 
             cerr << "Size = " << m.xsize() << ' ' << m.ysize() << endl;
-            cerr << "fillrate fraction:" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl; 
-            cerr << "fillrate fraction:" << setprecision(4) << (m.size()*n/duration*sizeof(mat_value_type)/1024/1024) << " MB/sec" << endl; 
+            cerr << "fillrate fraction:" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl;
+            cerr << "fillrate fraction:" << setprecision(4) << (m.size()*n/duration*sizeof(mat_value_type)/1024/1024) << " MB/sec" << endl;
         }
 
         {
@@ -425,11 +425,11 @@ struct iter_perf
                 pfill(bgn,end, mat_value_type());
             }
             ptime stop;
-            double duration = ptime(stop-start).seconds(); 
+            double duration = ptime(stop-start).seconds();
 
             cerr << "Size = " << m.xsize() << ' ' << m.ysize() << endl;
-            cerr << "pfillrate fraction:" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl; 
-            cerr << "pfillrate fraction:" << setprecision(4) << (m.size()*n/duration*sizeof(mat_value_type)/1024/1024) << " MB/sec" << endl; 
+            cerr << "pfillrate fraction:" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl;
+            cerr << "pfillrate fraction:" << setprecision(4) << (m.size()*n/duration*sizeof(mat_value_type)/1024/1024) << " MB/sec" << endl;
         }
         {
             // Performance
@@ -442,11 +442,11 @@ struct iter_perf
                 fill(m.begin(), m.end(), mat_value_type());
             }
             ptime stop;
-            double duration = ptime(stop-start).seconds(); 
+            double duration = ptime(stop-start).seconds();
 
             cerr << "Size = " << m.xsize() << ' ' << m.ysize() << endl;
-            cerr << "fillrate :" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl; 
-            cerr << "fillrate :" << setprecision(4) << (m.size()*n/duration*sizeof(mat_value_type)/1024/1024) << " MB/sec" << endl; 
+            cerr << "fillrate :" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl;
+            cerr << "fillrate :" << setprecision(4) << (m.size()*n/duration*sizeof(mat_value_type)/1024/1024) << " MB/sec" << endl;
         }
 
         {
@@ -460,11 +460,11 @@ struct iter_perf
                 pfill(m.begin(), m.end(), mat_value_type());
             }
             ptime stop;
-            double duration = ptime(stop-start).seconds(); 
+            double duration = ptime(stop-start).seconds();
 
             cerr << "Size = " << m.xsize() << ' ' << m.ysize() << endl;
-            cerr << "pfillrate :" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl; 
-            cerr << "pfillrate :" << setprecision(4) << (m.size()*n/duration*sizeof(mat_value_type)/1024/1024) << " MB/sec" << endl; 
+            cerr << "pfillrate :" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl;
+            cerr << "pfillrate :" << setprecision(4) << (m.size()*n/duration*sizeof(mat_value_type)/1024/1024) << " MB/sec" << endl;
         }
 
         {
@@ -478,11 +478,11 @@ struct iter_perf
                 fill(m.begin(), m.end(), mat_value_type());
             }
             ptime stop;
-            double duration = ptime(stop-start).seconds(); 
+            double duration = ptime(stop-start).seconds();
 
             cerr << "Size = " << m.xsize() << ' ' << m.ysize() << endl;
-            cerr << "fillrate :" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl; 
-            cerr << "fillrate :" << setprecision(4) << (m.size()*n/duration*sizeof(mat_value_type)/1024/1024) << " MB/sec" << endl; 
+            cerr << "fillrate :" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl;
+            cerr << "fillrate :" << setprecision(4) << (m.size()*n/duration*sizeof(mat_value_type)/1024/1024) << " MB/sec" << endl;
         }
         {
             // Performance
@@ -495,11 +495,11 @@ struct iter_perf
                 pfill(m.begin(), m.end(), mat_value_type());
             }
             ptime stop;
-            double duration = ptime(stop-start).seconds(); 
+            double duration = ptime(stop-start).seconds();
 
             cerr << "Size = " << m.xsize() << ' ' << m.ysize() << endl;
-            cerr << "pfillrate :" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl; 
-            cerr << "pfillrate :" << setprecision(4) << (m.size()*n/duration*sizeof(mat_value_type)/1024/1024) << " MB/sec" << endl; 
+            cerr << "pfillrate :" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl;
+            cerr << "pfillrate :" << setprecision(4) << (m.size()*n/duration*sizeof(mat_value_type)/1024/1024) << " MB/sec" << endl;
         }
 
         {
@@ -519,11 +519,11 @@ struct iter_perf
                 }
             }
             ptime stop;
-            double duration = ptime(stop-start).seconds(); 
+            double duration = ptime(stop-start).seconds();
 
             cerr << "Size = " << m.xsize() << ' ' << m.ysize() << endl;
-            cerr << "fillrate indexed:" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl; 
-            cerr << "fillrate indexed:" << setprecision(4) << (m.size()*n/duration*sizeof(mat_value_type)/1024/1024) << " MB/sec" << endl; 
+            cerr << "fillrate indexed:" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl;
+            cerr << "fillrate indexed:" << setprecision(4) << (m.size()*n/duration*sizeof(mat_value_type)/1024/1024) << " MB/sec" << endl;
         }
 
         {
@@ -543,11 +543,11 @@ struct iter_perf
                 }
             }
             ptime stop;
-            double duration = ptime(stop-start).seconds(); 
+            double duration = ptime(stop-start).seconds();
 
             cerr << "Size = " << m.xsize() << ' ' << m.ysize() << endl;
-            cerr << "fillrate indexed():" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl; 
-            cerr << "fillrate indexed():" << setprecision(4) << (m.size()*n/duration*sizeof(mat_value_type)/1024/1024) << " MB/sec" << endl; 
+            cerr << "fillrate indexed():" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl;
+            cerr << "fillrate indexed():" << setprecision(4) << (m.size()*n/duration*sizeof(mat_value_type)/1024/1024) << " MB/sec" << endl;
         }
 
         {
@@ -569,11 +569,11 @@ struct iter_perf
                 }
             }
             ptime stop;
-            double duration = ptime(stop-start).seconds(); 
+            double duration = ptime(stop-start).seconds();
 
             cerr << "Size = " << m.xsize() << ' ' << m.ysize() << endl;
-            cerr << "fillrate indexed() optloop:" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl; 
-            cerr << "fillrate indexed() optloop:" << setprecision(4) << (m.size()*n/duration*sizeof(mat_value_type)/1024/1024) << " MB/sec" << endl; 
+            cerr << "fillrate indexed() optloop:" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl;
+            cerr << "fillrate indexed() optloop:" << setprecision(4) << (m.size()*n/duration*sizeof(mat_value_type)/1024/1024) << " MB/sec" << endl;
         }
 
         {
@@ -594,11 +594,11 @@ struct iter_perf
                 }
             }
             ptime stop;
-            double duration = ptime(stop-start).seconds(); 
+            double duration = ptime(stop-start).seconds();
 
             cerr << "Size = " << m.xsize() << ' ' << m.ysize() << endl;
-            cerr << "fillrate sub indexed:" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl; 
-            cerr << "fillrate sub indexed:" << setprecision(4) << (m.size()*n/duration*sizeof(mat_value_type)/1024/1024) << " MB/sec" << endl; 
+            cerr << "fillrate sub indexed:" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl;
+            cerr << "fillrate sub indexed:" << setprecision(4) << (m.size()*n/duration*sizeof(mat_value_type)/1024/1024) << " MB/sec" << endl;
         }
 
         {
@@ -613,11 +613,11 @@ struct iter_perf
                 fill(m.begin(), m.end(), mat_value_type());
             }
             ptime stop;
-            double duration = ptime(stop-start).seconds(); 
+            double duration = ptime(stop-start).seconds();
 
             cerr << "Size = " << m.xsize() << ' ' << m.ysize() << endl;
-            cerr << "fillrate sub:" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl; 
-            cerr << "fillrate sub:" << setprecision(4) << (m.size()*n/duration*sizeof(mat_value_type)/1024/1024) << " MB/sec" << endl; 
+            cerr << "fillrate sub:" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl;
+            cerr << "fillrate sub:" << setprecision(4) << (m.size()*n/duration*sizeof(mat_value_type)/1024/1024) << " MB/sec" << endl;
         }
 
         {
@@ -631,11 +631,11 @@ struct iter_perf
                 fill(m.begin(1, 1, 1278, 1022), m.end(AC_OFFSET_TYPE(1), AC_OFFSET_TYPE(1), 1278, 1022), mat_value_type());
             }
             ptime stop;
-            double duration = ptime(stop-start).seconds(); 
+            double duration = ptime(stop-start).seconds();
 
             cerr << "Size = " << m.xsize() << ' ' << m.ysize() << endl;
-            cerr << "fillrate sub sub:" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl; 
-            cerr << "fillrate sub sub:" << setprecision(4) << (m.size()*n/duration*sizeof(mat_value_type)/1024/1024) << " MB/sec" << endl; 
+            cerr << "fillrate sub sub:" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl;
+            cerr << "fillrate sub sub:" << setprecision(4) << (m.size()*n/duration*sizeof(mat_value_type)/1024/1024) << " MB/sec" << endl;
         }
 
         {
@@ -656,11 +656,11 @@ struct iter_perf
                 }
             }
             ptime stop;
-            double duration = ptime(stop-start).seconds(); 
+            double duration = ptime(stop-start).seconds();
 
             cerr << "Size = " << m.xsize() << ' ' << m.ysize() << endl;
-            cerr << "fillrate sub indexed vertical:" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl; 
-            cerr << "fillrate sub indexed vertical:" << setprecision(4) << (m.size()*n/duration*sizeof(mat_value_type)/1024/1024) << " MB/sec" << endl; 
+            cerr << "fillrate sub indexed vertical:" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl;
+            cerr << "fillrate sub indexed vertical:" << setprecision(4) << (m.size()*n/duration*sizeof(mat_value_type)/1024/1024) << " MB/sec" << endl;
         }
 
         {
@@ -675,11 +675,11 @@ struct iter_perf
                 fill(m.begin(), m.end(), mat_value_type());
             }
             ptime stop;
-            double duration = ptime(stop-start).seconds(); 
+            double duration = ptime(stop-start).seconds();
 
             cerr << "Size = " << m.xsize() << ' ' << m.ysize() << endl;
-            cerr << "fillrate sub vertical:" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl; 
-            cerr << "fillrate sub vertical:" << setprecision(4) << (m.size()*n/duration*sizeof(mat_value_type)/1024/1024) << " MB/sec" << endl; 
+            cerr << "fillrate sub vertical:" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl;
+            cerr << "fillrate sub vertical:" << setprecision(4) << (m.size()*n/duration*sizeof(mat_value_type)/1024/1024) << " MB/sec" << endl;
         }
 
         {
@@ -696,11 +696,11 @@ struct iter_perf
                 while (j--) *it++ = pix;
             }
             ptime stop;
-            double duration = ptime(stop-start).seconds(); 
+            double duration = ptime(stop-start).seconds();
 
             cerr << "Size = " << m.xsize() << ' ' << m.ysize() << endl;
-            cerr << "fillrate explicit:" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl; 
-            cerr << "fillrate explicit:" << setprecision(4) << (m.size()*n/duration*sizeof(mat_value_type)/1024/1024) << " MB/sec" << endl; 
+            cerr << "fillrate explicit:" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl;
+            cerr << "fillrate explicit:" << setprecision(4) << (m.size()*n/duration*sizeof(mat_value_type)/1024/1024) << " MB/sec" << endl;
         }
 
     }
@@ -708,10 +708,10 @@ struct iter_perf
 
 void scale_perf(char* testname)
 {
-    cerr << "starting scale_perf" << endl; 
+    cerr << "starting scale_perf" << endl;
     {
         typedef raster<RGB> mat;
-        //cerr << "starting scale2d RGB=" << endl; 
+        //cerr << "starting scale2d RGB=" << endl;
         int n = 2;
         raster<RGB> m(1280, 1024);
         raster<RGB> zm(1280/2, 1024 / 2);
@@ -721,12 +721,12 @@ void scale_perf(char* testname)
         ptime stop; double duration = ptime(stop-start).seconds();
 
         cerr << "Size = " << m.xsize() << ' ' << m.ysize() << endl;
-        cerr << "scale2d 1/2 explicit RGB rate :" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl; 
-        cerr << "scale2d 1/2 explicit RGB rate :" << setprecision(4) << (m.size()*n/duration*sizeof(mat::value_type)/1024/1024) << " MB/sec" << endl; 
+        cerr << "scale2d 1/2 explicit RGB rate :" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl;
+        cerr << "scale2d 1/2 explicit RGB rate :" << setprecision(4) << (m.size()*n/duration*sizeof(mat::value_type)/1024/1024) << " MB/sec" << endl;
     }
     {
         typedef raster<RGB> mat;
-        //cerr << "starting halfsize RGB=" << endl; 
+        //cerr << "starting halfsize RGB=" << endl;
         int n = 2;
         raster<RGB> m(1280, 1024);
         raster<RGB> zm(1280/2, 1024 / 2);
@@ -736,12 +736,12 @@ void scale_perf(char* testname)
         ptime stop; double duration = ptime(stop-start).seconds();
 
         cerr << "Size = " << m.xsize() << ' ' << m.ysize() << endl;
-        cerr << "halfsize RGB rate :" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl; 
-        cerr << "halfsize RGB rate :" << setprecision(4) << (m.size()*n/duration*sizeof(mat::value_type)/1024/1024) << " MB/sec" << endl; 
+        cerr << "halfsize RGB rate :" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl;
+        cerr << "halfsize RGB rate :" << setprecision(4) << (m.size()*n/duration*sizeof(mat::value_type)/1024/1024) << " MB/sec" << endl;
     }
     {
         typedef raster<char> mat;
-        //cerr << "starting scale_down RGB=" << endl; 
+        //cerr << "starting scale_down RGB=" << endl;
         int n = 2;
         raster<char> m(1280, 1024);
         raster<char> zm(1280/2, 1024 / 2);
@@ -751,12 +751,12 @@ void scale_perf(char* testname)
         ptime stop; double duration = ptime(stop-start).seconds();
 
         cerr << "Size = " << m.xsize() << ' ' << m.ysize() << endl;
-        cerr << "scale2d 1/2 explicit char rate :" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl; 
-        cerr << "scale2d 1/2 explicit char rate :" << setprecision(4) << (m.size()*n/duration*sizeof(mat::value_type)/1024/1024) << " MB/sec" << endl; 
+        cerr << "scale2d 1/2 explicit char rate :" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl;
+        cerr << "scale2d 1/2 explicit char rate :" << setprecision(4) << (m.size()*n/duration*sizeof(mat::value_type)/1024/1024) << " MB/sec" << endl;
     }
     {
         typedef raster<RGB> mat;
-        cerr << "starting scale2d RGB=" << endl; 
+        cerr << "starting scale2d RGB=" << endl;
         int n = 2;
         raster<RGB> m(1280, 1024);
         raster<RGB> zm(600, 500);
@@ -766,12 +766,12 @@ void scale_perf(char* testname)
         ptime stop; double duration = ptime(stop-start).seconds();
 
         cerr << "Size = " << m.xsize() << ' ' << m.ysize() << endl;
-        cerr << "scale2d 600x500 explicit RGB rate :" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl; 
-        cerr << "scale2d 600x500 explicit RGB rate :" << setprecision(4) << (m.size()*n/duration*sizeof(mat::value_type)/1024/1024) << " MB/sec" << endl; 
+        cerr << "scale2d 600x500 explicit RGB rate :" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl;
+        cerr << "scale2d 600x500 explicit RGB rate :" << setprecision(4) << (m.size()*n/duration*sizeof(mat::value_type)/1024/1024) << " MB/sec" << endl;
     }
     {
         typedef raster<RGB> mat;
-        //cerr << "starting scale_down RGB=" << endl; 
+        //cerr << "starting scale_down RGB=" << endl;
         int n = 2;
         raster<RGB> m(1280, 1024);
         raster<RGB> zm(1280/2, 1024 / 2);
@@ -781,12 +781,12 @@ void scale_perf(char* testname)
         ptime stop; double duration = ptime(stop-start).seconds();
 
         cerr << "Size = " << m.xsize() << ' ' << m.ysize() << endl;
-        cerr << "scale_down 1/2 explicit RGB rate :" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl; 
-        cerr << "scale_down 1/2 explicit RGB rate :" << setprecision(4) << (m.size()*n/duration*sizeof(mat::value_type)/1024/1024) << " MB/sec" << endl; 
+        cerr << "scale_down 1/2 explicit RGB rate :" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl;
+        cerr << "scale_down 1/2 explicit RGB rate :" << setprecision(4) << (m.size()*n/duration*sizeof(mat::value_type)/1024/1024) << " MB/sec" << endl;
     }
     {
         typedef raster<char> mat;
-        //cerr << "starting scale_down RGB=" << endl; 
+        //cerr << "starting scale_down RGB=" << endl;
         int n = 2;
         raster<char> m(1280, 1024);
         raster<char> zm(1280/2, 1024 / 2);
@@ -796,12 +796,12 @@ void scale_perf(char* testname)
         ptime stop; double duration = ptime(stop-start).seconds();
 
         cerr << "Size = " << m.xsize() << ' ' << m.ysize() << endl;
-        cerr << "scale_down 1/2 explicit char rate :" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl; 
-        cerr << "scale_down 1/2 explicit char rate :" << setprecision(4) << (m.size()*n/duration*sizeof(mat::value_type)/1024/1024) << " MB/sec" << endl; 
+        cerr << "scale_down 1/2 explicit char rate :" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl;
+        cerr << "scale_down 1/2 explicit char rate :" << setprecision(4) << (m.size()*n/duration*sizeof(mat::value_type)/1024/1024) << " MB/sec" << endl;
     }
     {
         typedef raster<RGB> mat;
-        cerr << "starting scale_down RGB=" << endl; 
+        cerr << "starting scale_down RGB=" << endl;
         int n = 2;
         raster<RGB> m(1280, 1024);
         raster<RGB> zm(600, 500);
@@ -811,12 +811,12 @@ void scale_perf(char* testname)
         ptime stop; double duration = ptime(stop-start).seconds();
 
         cerr << "Size = " << m.xsize() << ' ' << m.ysize() << endl;
-        cerr << "scale_down 600x500 explicit RGB rate :" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl; 
-        cerr << "scale_down 600x500 explicit RGB rate :" << setprecision(4) << (m.size()*n/duration*sizeof(mat::value_type)/1024/1024) << " MB/sec" << endl; 
+        cerr << "scale_down 600x500 explicit RGB rate :" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl;
+        cerr << "scale_down 600x500 explicit RGB rate :" << setprecision(4) << (m.size()*n/duration*sizeof(mat::value_type)/1024/1024) << " MB/sec" << endl;
     }
     {
         typedef raster<RGB> mat;
-        cerr << "starting resample RGB=" << endl; 
+        cerr << "starting resample RGB=" << endl;
         int n = 2;
         raster<RGB> m(1280, 1024);
         raster<RGB> zm(600, 500);
@@ -827,12 +827,12 @@ void scale_perf(char* testname)
         ptime stop; double duration = ptime(stop-start).seconds();
 
         cerr << "Size = " << m.xsize() << ' ' << m.ysize() << endl;
-        cerr << "resample 600x500 explicit RGB rate :" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl; 
-        cerr << "resample 600x500 explicit RGB rate :" << setprecision(4) << (m.size()*n/duration*sizeof(mat::value_type)/1024/1024) << " MB/sec" << endl; 
+        cerr << "resample 600x500 explicit RGB rate :" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl;
+        cerr << "resample 600x500 explicit RGB rate :" << setprecision(4) << (m.size()*n/duration*sizeof(mat::value_type)/1024/1024) << " MB/sec" << endl;
     }
     {
         typedef raster<int> mat;
-        cerr << "starting resample int" << endl; 
+        cerr << "starting resample int" << endl;
         int n = 2;
         raster<int> m(1280, 1024);
         raster<int> zm(600, 500);
@@ -842,12 +842,12 @@ void scale_perf(char* testname)
         ptime stop; double duration = ptime(stop-start).seconds();
 
         cerr << "Size = " << m.xsize() << ' ' << m.ysize() << endl;
-        cerr << "resample 600x500 explicit int rate :" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl; 
-        cerr << "resample 600x500 explicit int rate :" << setprecision(4) << (m.size()*n/duration*sizeof(mat::value_type)/1024/1024) << " MB/sec" << endl; 
+        cerr << "resample 600x500 explicit int rate :" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl;
+        cerr << "resample 600x500 explicit int rate :" << setprecision(4) << (m.size()*n/duration*sizeof(mat::value_type)/1024/1024) << " MB/sec" << endl;
     }
     {
         typedef raster<char> mat;
-        cerr << "starting resample char" << endl; 
+        cerr << "starting resample char" << endl;
         int n = 2;
         mat m(1280, 1024);
         mat zm(600, 500);
@@ -857,12 +857,12 @@ void scale_perf(char* testname)
         ptime stop; double duration = ptime(stop-start).seconds();
 
         cerr << "Size = " << m.xsize() << ' ' << m.ysize() << endl;
-        cerr << "resample 600x500 explicit char rate :" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl; 
-        cerr << "resample 600x500 explicit char rate :" << setprecision(4) << (m.size()*n/duration*sizeof(mat::value_type)/1024/1024) << " MB/sec" << endl; 
+        cerr << "resample 600x500 explicit char rate :" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl;
+        cerr << "resample 600x500 explicit char rate :" << setprecision(4) << (m.size()*n/duration*sizeof(mat::value_type)/1024/1024) << " MB/sec" << endl;
     }
     {
         typedef raster<float> mat;
-        cerr << "starting resample float" << endl; 
+        cerr << "starting resample float" << endl;
         int n = 2;
         raster<float> m(1280, 1024);
         raster<float> zm(600, 500);
@@ -872,8 +872,8 @@ void scale_perf(char* testname)
         ptime stop; double duration = ptime(stop-start).seconds();
 
         cerr << "Size = " << m.xsize() << ' ' << m.ysize() << endl;
-        cerr << "resample 600x500 explicit float rate :" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl; 
-        cerr << "resample 600x500 explicit float rate :" << setprecision(4) << (m.size()*n/duration*sizeof(mat::value_type)/1024/1024) << " MB/sec" << endl; 
+        cerr << "resample 600x500 explicit float rate :" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl;
+        cerr << "resample 600x500 explicit float rate :" << setprecision(4) << (m.size()*n/duration*sizeof(mat::value_type)/1024/1024) << " MB/sec" << endl;
     }
 }
 
@@ -901,8 +901,8 @@ void algo_perf(char* testname)
         ptime stop; double duration = ptime(stop-start).seconds();
 
         cerr << "Size = " << m.xsize() << ' ' << m.ysize() << endl;
-        cerr << "multrate :" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl; 
-        cerr << "multrate :" << setprecision(4) << (m.size()*n/duration*sizeof(mat::value_type)/1024/1024) << " MB/sec" << endl; 
+        cerr << "multrate :" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl;
+        cerr << "multrate :" << setprecision(4) << (m.size()*n/duration*sizeof(mat::value_type)/1024/1024) << " MB/sec" << endl;
     }
 #ifdef ROUTE
     {
@@ -924,8 +924,8 @@ void algo_perf(char* testname)
         ptime stop; double duration = ptime(stop-start).seconds();
 
         cerr << "Size = " << m.xsize() << ' ' << m.ysize() << endl;
-        cerr << "route rate :" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl; 
-        cerr << "route rate :" << setprecision(4) << (m.size()*n/duration*sizeof(mat::value_type)/1024/1024) << " MB/sec" << endl; 
+        cerr << "route rate :" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl;
+        cerr << "route rate :" << setprecision(4) << (m.size()*n/duration*sizeof(mat::value_type)/1024/1024) << " MB/sec" << endl;
     }
 #endif
     {
@@ -943,8 +943,8 @@ void algo_perf(char* testname)
         ptime stop; double duration = ptime(stop-start).seconds();
 
         cerr << "Size = " << m.xsize() << ' ' << m.ysize() << endl;
-        cerr << "RGB->RGBA transform rate :" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl; 
-        cerr << "RGB->RGBA transform rate :" << setprecision(4) << (m.size()*n/duration*sizeof(mat::value_type)/1024/1024) << " MB/sec" << endl; 
+        cerr << "RGB->RGBA transform rate :" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl;
+        cerr << "RGB->RGBA transform rate :" << setprecision(4) << (m.size()*n/duration*sizeof(mat::value_type)/1024/1024) << " MB/sec" << endl;
     }
 #ifdef __sgi
     {
@@ -962,8 +962,8 @@ void algo_perf(char* testname)
         ptime stop; double duration = ptime(stop-start).seconds();
 
         cerr << "Size = " << m.xsize() << ' ' << m.ysize() << endl;
-        cerr << "RGB_to_RGBA_ii max rate :" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl; 
-        cerr << "RGB_to_RGBA_ii max rate :" << setprecision(4) << (m.size()*n/duration*sizeof(mat::value_type)/1024/1024) << " MB/sec" << endl; 
+        cerr << "RGB_to_RGBA_ii max rate :" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl;
+        cerr << "RGB_to_RGBA_ii max rate :" << setprecision(4) << (m.size()*n/duration*sizeof(mat::value_type)/1024/1024) << " MB/sec" << endl;
     }
 
     {
@@ -981,8 +981,8 @@ void algo_perf(char* testname)
         ptime stop; double duration = ptime(stop-start).seconds();
 
         cerr << "Size = " << m.xsize() << ' ' << m.ysize() << endl;
-        cerr << "RGB_to_RGBA_li max rate :" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl; 
-        cerr << "RGB_to_RGBA_li max rate :" << setprecision(4) << (m.size()*n/duration*sizeof(mat::value_type)/1024/1024) << " MB/sec" << endl; 
+        cerr << "RGB_to_RGBA_li max rate :" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl;
+        cerr << "RGB_to_RGBA_li max rate :" << setprecision(4) << (m.size()*n/duration*sizeof(mat::value_type)/1024/1024) << " MB/sec" << endl;
     }
 
     {
@@ -1000,8 +1000,8 @@ void algo_perf(char* testname)
         ptime stop; double duration = ptime(stop-start).seconds();
 
         cerr << "Size = " << m.xsize() << ' ' << m.ysize() << endl;
-        cerr << "RGB_to_RGBA_ll max rate :" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl; 
-        cerr << "RGB_to_RGBA_ll max rate :" << setprecision(4) << (m.size()*n/duration*sizeof(mat::value_type)/1024/1024) << " MB/sec" << endl; 
+        cerr << "RGB_to_RGBA_ll max rate :" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl;
+        cerr << "RGB_to_RGBA_ll max rate :" << setprecision(4) << (m.size()*n/duration*sizeof(mat::value_type)/1024/1024) << " MB/sec" << endl;
     }
 #endif
 #ifdef __sgi
@@ -1020,8 +1020,8 @@ void algo_perf(char* testname)
         ptime stop; double duration = ptime(stop-start).seconds();
 
         cerr << "Size = " << m.xsize() << ' ' << m.ysize() << endl;
-        cerr << "RGB_to_RGBA_bi max rate :" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl; 
-        cerr << "RGB_to_RGBA_bi max rate :" << setprecision(4) << (m.size()*n/duration*sizeof(mat::value_type)/1024/1024) << " MB/sec" << endl; 
+        cerr << "RGB_to_RGBA_bi max rate :" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl;
+        cerr << "RGB_to_RGBA_bi max rate :" << setprecision(4) << (m.size()*n/duration*sizeof(mat::value_type)/1024/1024) << " MB/sec" << endl;
     }
 #endif
 
@@ -1041,8 +1041,8 @@ void algo_perf(char* testname)
         ptime stop; double duration = ptime(stop-start).seconds();
 
         cerr << "Size = " << m.xsize() << ' ' << m.ysize() << endl;
-        cerr << "RGB_to_RGBA max rate :" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl; 
-        cerr << "RGB_to_RGBA max rate :" << setprecision(4) << (m.size()*n/duration*sizeof(mat::value_type)/1024/1024) << " MB/sec" << endl; 
+        cerr << "RGB_to_RGBA max rate :" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl;
+        cerr << "RGB_to_RGBA max rate :" << setprecision(4) << (m.size()*n/duration*sizeof(mat::value_type)/1024/1024) << " MB/sec" << endl;
     }
 #endif
 
@@ -1058,15 +1058,15 @@ void algo_perf(char* testname)
         for (i=0;i<n;i++)
         {
             scale_up(m2.hbegin(), m2.vbegin(),
-                m2.hsize(),m2.vsize(), 
+                m2.hsize(),m2.vsize(),
                 m.hbegin(), m.vbegin(),
                 m.hsize(), m.vsize());
         }
         ptime stop; double duration = ptime(stop-start).seconds();
 
         cerr << "Size = " << m.xsize() << ' ' << m.ysize() << endl;
-        cerr << "scale RGB rate :" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl; 
-        cerr << "scale RGB rate :" << setprecision(4) << (m.size()*n/duration*sizeof(mat::value_type)/1024/1024) << " MB/sec" << endl; 
+        cerr << "scale RGB rate :" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl;
+        cerr << "scale RGB rate :" << setprecision(4) << (m.size()*n/duration*sizeof(mat::value_type)/1024/1024) << " MB/sec" << endl;
     }
 
     if (0) {
@@ -1079,14 +1079,14 @@ void algo_perf(char* testname)
         ptime start;
         for (i=0;i<n;i++)
         {
-            scale_up(m2.hbegin(), m2.vbegin(), m2.hsize(),m2.vsize(), 
+            scale_up(m2.hbegin(), m2.vbegin(), m2.hsize(),m2.vsize(),
                 m.hbegin(), m.vbegin(), m.hsize(), m.vsize());
         }
         ptime stop; double duration = ptime(stop-start).seconds();
 
         cerr << "Size = " << m.xsize() << ' ' << m.ysize() << endl;
-        cerr << "scale int rate :" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl; 
-        cerr << "scale int rate :" << setprecision(4) << (m.size()*n/duration*sizeof(mat::value_type)/1024/1024) << " MB/sec" << endl; 
+        cerr << "scale int rate :" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl;
+        cerr << "scale int rate :" << setprecision(4) << (m.size()*n/duration*sizeof(mat::value_type)/1024/1024) << " MB/sec" << endl;
     }
 #endif
     {
@@ -1119,9 +1119,9 @@ void algo_perf(char* testname)
         ptime stop; double duration = ptime(stop-start).seconds();
 
         cerr << "Size = " << m.xsize() << ' ' << m.ysize() << endl;
-        cerr << "bresenham_fill int rate 1: " << setprecision(4) << (80*n/duration/1024/1024) << " Mpixels/sec" << endl; 
-        cerr << "bresenham_fill int rate 1: " << setprecision(4) << (80*n/duration*sizeof(mat::value_type)/1024/1024) << " MB/sec" << endl; 
-        cerr << "bresenham_fill int rate 1: " << setprecision(4) << (8*n/duration/1024) << " k 10-pix-lines/sec" << endl; 
+        cerr << "bresenham_fill int rate 1: " << setprecision(4) << (80*n/duration/1024/1024) << " Mpixels/sec" << endl;
+        cerr << "bresenham_fill int rate 1: " << setprecision(4) << (80*n/duration*sizeof(mat::value_type)/1024/1024) << " MB/sec" << endl;
+        cerr << "bresenham_fill int rate 1: " << setprecision(4) << (8*n/duration/1024) << " k 10-pix-lines/sec" << endl;
     }
     {
         typedef raster<int> mat;
@@ -1157,9 +1157,9 @@ void algo_perf(char* testname)
         ptime stop; double duration = ptime(stop-start).seconds();
 
         cerr << "Size = " << m.xsize() << ' ' << m.ysize() << endl;
-        cerr << "bresenham_fill int rate 2: " << setprecision(4) << (80*s.size()/duration/1024/1024) << " Mpixels/sec" << endl; 
-        cerr << "bresenham_fill int rate 2: " << setprecision(4) << (80*s.size()/duration*sizeof(mat::value_type)/1024/1024) << " MB/sec" << endl; 
-        cerr << "bresenham_fill int rate 2: " << setprecision(4) << (8*s.size()/duration/1024) << " k 10-pix-lines/sec" << endl; 
+        cerr << "bresenham_fill int rate 2: " << setprecision(4) << (80*s.size()/duration/1024/1024) << " Mpixels/sec" << endl;
+        cerr << "bresenham_fill int rate 2: " << setprecision(4) << (80*s.size()/duration*sizeof(mat::value_type)/1024/1024) << " MB/sec" << endl;
+        cerr << "bresenham_fill int rate 2: " << setprecision(4) << (8*s.size()/duration/1024) << " k 10-pix-lines/sec" << endl;
     }
    	{
         typedef raster<int> mat;
@@ -1195,9 +1195,9 @@ void algo_perf(char* testname)
         ptime stop; double duration = ptime(stop-start).seconds();
 
         cerr << "Size = " << m.xsize() << ' ' << m.ysize() << endl;
-        cerr << "bresenham_fill int rate 3: " << setprecision(4) << (800*s.size()/duration/1024/1024) << " Mpixels/sec" << endl; 
-        cerr << "bresenham_fill int rate 3: " << setprecision(4) << (800*s.size()/duration*sizeof(mat::value_type)/1024/1024) << " MB/sec" << endl; 
-        cerr << "bresenham_fill int rate 3: " << setprecision(4) << (8*s.size()/duration/1024) << " k 100-pix-lines/sec" << endl; 
+        cerr << "bresenham_fill int rate 3: " << setprecision(4) << (800*s.size()/duration/1024/1024) << " Mpixels/sec" << endl;
+        cerr << "bresenham_fill int rate 3: " << setprecision(4) << (800*s.size()/duration*sizeof(mat::value_type)/1024/1024) << " MB/sec" << endl;
+        cerr << "bresenham_fill int rate 3: " << setprecision(4) << (8*s.size()/duration/1024) << " k 100-pix-lines/sec" << endl;
     }
     {
         typedef raster<RGB> mat;
@@ -1233,9 +1233,9 @@ void algo_perf(char* testname)
         ptime stop; double duration = ptime(stop-start).seconds();
 
         cerr << "Size = " << m.xsize() << ' ' << m.ysize() << endl;
-        cerr << "bresenham_fill RGB rate 4: " << setprecision(4) << (80*s.size()/duration/1024/1024) << " Mpixels/sec" << endl; 
-        cerr << "bresenham_fill RGB rate 4: " << setprecision(4) << (80*s.size()/duration*sizeof(mat::value_type)/1024/1024) << " MB/sec" << endl; 
-        cerr << "bresenham_fill RGB rate 4: " << setprecision(4) << (8*s.size()/duration/1024) << " k 10-pix-lines/sec" << endl; 
+        cerr << "bresenham_fill RGB rate 4: " << setprecision(4) << (80*s.size()/duration/1024/1024) << " Mpixels/sec" << endl;
+        cerr << "bresenham_fill RGB rate 4: " << setprecision(4) << (80*s.size()/duration*sizeof(mat::value_type)/1024/1024) << " MB/sec" << endl;
+        cerr << "bresenham_fill RGB rate 4: " << setprecision(4) << (8*s.size()/duration/1024) << " k 10-pix-lines/sec" << endl;
     }
     {
         // Performance
@@ -1271,11 +1271,11 @@ void algo_perf(char* testname)
         ptime stop; double duration = ptime(stop-start).seconds();
 
         cerr << "Size = " << m.xsize() << ' ' << m.ysize() << endl;
-        cerr << "bresenham_fill char rate 5: " << setprecision(4) << (80*s.size()/duration/1024/1024) << " Mpixels/sec" << endl; 
-        cerr << "bresenham_fill char rate 5: " << setprecision(4) << (80*s.size()/duration*sizeof(mat::value_type)/1024/1024) << " MB/sec" << endl; 
-        cerr << "bresenham_fill char rate 5: " << setprecision(4) << (8*s.size()/duration/1024) << " k 10-pix-lines/sec" << endl; 
+        cerr << "bresenham_fill char rate 5: " << setprecision(4) << (80*s.size()/duration/1024/1024) << " Mpixels/sec" << endl;
+        cerr << "bresenham_fill char rate 5: " << setprecision(4) << (80*s.size()/duration*sizeof(mat::value_type)/1024/1024) << " MB/sec" << endl;
+        cerr << "bresenham_fill char rate 5: " << setprecision(4) << (8*s.size()/duration/1024) << " k 10-pix-lines/sec" << endl;
     }
-#ifdef __sgi 
+#ifdef __sgi
     {
         typedef raster<RGB> mat;
         // Performance
@@ -1292,8 +1292,8 @@ void algo_perf(char* testname)
         ptime stop; double duration = ptime(stop-start).seconds();
 
         cerr << "Size = " << m.xsize() << ' ' << m.ysize() << endl;
-        cerr << "RGB_to_RGBA sub rate :" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl; 
-        cerr << "RGB_to_RGBA sub rate :" << setprecision(4) << (m.size()*n/duration*sizeof(mat::value_type)/1024/1024) << " MB/sec" << endl; 
+        cerr << "RGB_to_RGBA sub rate :" << setprecision(4) << (m.size()*n/duration/1024/1024) << " Mpixels/sec" << endl;
+        cerr << "RGB_to_RGBA sub rate :" << setprecision(4) << (m.size()*n/duration*sizeof(mat::value_type)/1024/1024) << " MB/sec" << endl;
     }
 #endif
 }
@@ -1318,8 +1318,8 @@ public:
             ptime stop; double duration = ptime(stop-start).seconds();
 
             cerr << "Size = " << x.size() << endl;
-            cerr << "vec fillrate :" << setprecision(4) << (x.size()*n/duration/1024/1024) << " Mpixels/sec" << endl; 
-            cerr << "vec fillrate :" << setprecision(4) << (x.size()*n/duration*sizeof(v_value_type)/1024/1024) << " MB/sec" << endl; 
+            cerr << "vec fillrate :" << setprecision(4) << (x.size()*n/duration/1024/1024) << " Mpixels/sec" << endl;
+            cerr << "vec fillrate :" << setprecision(4) << (x.size()*n/duration*sizeof(v_value_type)/1024/1024) << " MB/sec" << endl;
         }
         {
             // Performance
@@ -1334,8 +1334,8 @@ public:
             ptime stop; double duration = ptime(stop-start).seconds();
 
             cerr << "Size = " << x.size() << endl;
-            cerr << "vec mem fillrate :" << setprecision(4) << (x.size()*n/duration/1024/1024) << " Mpixels/sec" << endl; 
-            cerr << "vec mem fillrate :" << setprecision(4) << (x.size()*n/duration*sizeof(v_value_type)/1024/1024) << " MB/sec" << endl; 
+            cerr << "vec mem fillrate :" << setprecision(4) << (x.size()*n/duration/1024/1024) << " Mpixels/sec" << endl;
+            cerr << "vec mem fillrate :" << setprecision(4) << (x.size()*n/duration*sizeof(v_value_type)/1024/1024) << " MB/sec" << endl;
         }
         {
             // Performance
@@ -1350,8 +1350,8 @@ public:
             ptime stop; double duration = ptime(stop-start).seconds();
 
             cerr << "Size = " << x.size() << endl;
-            cerr << "vec fillrate :" << setprecision(4) << (x.size()*n/duration/1024/1024) << " Mpixels/sec" << endl; 
-            cerr << "vec fillrate :" << setprecision(4) << (x.size()*n/duration*sizeof(v_value_type)/1024/1024) << " MB/sec" << endl; 
+            cerr << "vec fillrate :" << setprecision(4) << (x.size()*n/duration/1024/1024) << " Mpixels/sec" << endl;
+            cerr << "vec fillrate :" << setprecision(4) << (x.size()*n/duration*sizeof(v_value_type)/1024/1024) << " MB/sec" << endl;
         }
         {
             // Performance
@@ -1366,8 +1366,8 @@ public:
             ptime stop; double duration = ptime(stop-start).seconds();
 
             cerr << "Size = " << x.size() << endl;
-            cerr << "vec mem fillrate :" << setprecision(4) << (x.size()*n/duration/1024/1024) << " Mpixels/sec" << endl; 
-            cerr << "vec mem fillrate :" << setprecision(4) << (x.size()*n/duration*sizeof(v_value_type)/1024/1024) << " MB/sec" << endl; 
+            cerr << "vec mem fillrate :" << setprecision(4) << (x.size()*n/duration/1024/1024) << " Mpixels/sec" << endl;
+            cerr << "vec mem fillrate :" << setprecision(4) << (x.size()*n/duration*sizeof(v_value_type)/1024/1024) << " MB/sec" << endl;
         }
         {
             // Performance
@@ -1383,8 +1383,8 @@ public:
             ptime stop; double duration = ptime(stop-start).seconds();
 
             cerr << "Size = " << x.size() << endl;
-            cerr << "vec copy rate :" << setprecision(4) << (x.size()*n/duration/1024/1024) << " Mpixels/sec" << endl; 
-            cerr << "vec copy rate :" << setprecision(4) << (x.size()*n/duration*sizeof(v_value_type)/1024/1024) << " MB/sec" << endl; 
+            cerr << "vec copy rate :" << setprecision(4) << (x.size()*n/duration/1024/1024) << " Mpixels/sec" << endl;
+            cerr << "vec copy rate :" << setprecision(4) << (x.size()*n/duration*sizeof(v_value_type)/1024/1024) << " MB/sec" << endl;
         }
         {
             // Performance
@@ -1400,8 +1400,8 @@ public:
             ptime stop; double duration = ptime(stop-start).seconds();
 
             cerr << "Size = " << x.size() << endl;
-            cerr << "vec copy rate :" << setprecision(4) << (x.size()*n/duration/1024/1024) << " Mpixels/sec" << endl; 
-            cerr << "vec copy rate :" << setprecision(4) << (x.size()*n/duration*sizeof(v_value_type)/1024/1024) << " MB/sec" << endl; 
+            cerr << "vec copy rate :" << setprecision(4) << (x.size()*n/duration/1024/1024) << " Mpixels/sec" << endl;
+            cerr << "vec copy rate :" << setprecision(4) << (x.size()*n/duration*sizeof(v_value_type)/1024/1024) << " MB/sec" << endl;
         }
         {
             // Performance
@@ -1418,8 +1418,8 @@ public:
             ptime stop; double duration = ptime(stop-start).seconds();
 
             cerr << "Size = " << x.size() << endl;
-            cerr << "vec transform mult rate :" << setprecision(4) << (x.size()*n/duration/1024/1024) << " Mpixels/sec" << endl; 
-            cerr << "vec transform mult rate :" << setprecision(4) << (x.size()*n/duration*sizeof(v_value_type)/1024/1024) << " MB/sec" << endl; 
+            cerr << "vec transform mult rate :" << setprecision(4) << (x.size()*n/duration/1024/1024) << " Mpixels/sec" << endl;
+            cerr << "vec transform mult rate :" << setprecision(4) << (x.size()*n/duration*sizeof(v_value_type)/1024/1024) << " MB/sec" << endl;
         }
         {
             // Performance
@@ -1436,8 +1436,8 @@ public:
             ptime stop; double duration = ptime(stop-start).seconds();
 
             cerr << "Size = " << x.size() << endl;
-            cerr << "vec transform invert rate :" << setprecision(4) << (x.size()*n/duration/1024/1024) << " Mpixels/sec" << endl; 
-            cerr << "vec transform invert rate :" << setprecision(4) << (x.size()*n/duration*sizeof(v_value_type)/1024/1024) << " MB/sec" << endl; 
+            cerr << "vec transform invert rate :" << setprecision(4) << (x.size()*n/duration/1024/1024) << " Mpixels/sec" << endl;
+            cerr << "vec transform invert rate :" << setprecision(4) << (x.size()*n/duration*sizeof(v_value_type)/1024/1024) << " MB/sec" << endl;
         }
 #ifdef __sgi
         {
@@ -1456,8 +1456,8 @@ public:
             ptime stop; double duration = ptime(stop-start).seconds();
 
             cerr << "Size = " << x.size() << endl;
-            cerr << "vec unaligned transform64 invert rate :" << setprecision(4) << (x.size()*n/duration/1024/1024) << " Mpixels/sec" << endl; 
-            cerr << "vec unaligned transform64 invert rate :" << setprecision(4) << (x.size()*n/duration*sizeof(v_value_type)/1024/1024) << " MB/sec" << endl; 
+            cerr << "vec unaligned transform64 invert rate :" << setprecision(4) << (x.size()*n/duration/1024/1024) << " Mpixels/sec" << endl;
+            cerr << "vec unaligned transform64 invert rate :" << setprecision(4) << (x.size()*n/duration*sizeof(v_value_type)/1024/1024) << " MB/sec" << endl;
         }
         {
             // Performance
@@ -1475,8 +1475,8 @@ public:
             ptime stop; double duration = ptime(stop-start).seconds();
 
             cerr << "Size = " << x.size() << endl;
-            cerr << "vec transform64 invert rate :" << setprecision(4) << (x.size()*n/duration/1024/1024) << " Mpixels/sec" << endl; 
-            cerr << "vec transform64 invert rate :" << setprecision(4) << (x.size()*n/duration*sizeof(v_value_type)/1024/1024) << " MB/sec" << endl; 
+            cerr << "vec transform64 invert rate :" << setprecision(4) << (x.size()*n/duration/1024/1024) << " Mpixels/sec" << endl;
+            cerr << "vec transform64 invert rate :" << setprecision(4) << (x.size()*n/duration*sizeof(v_value_type)/1024/1024) << " MB/sec" << endl;
         }
 #endif
         {
@@ -1494,8 +1494,8 @@ public:
             ptime stop; double duration = ptime(stop-start).seconds();
 
             cerr << "Size = " << x.size() << endl;
-            cerr << "vec transform add rate :" << setprecision(4) << (x.size()*n/duration/1024/1024) << " Mpixels/sec" << endl; 
-            cerr << "vec transform add rate :" << setprecision(4) << (x.size()*n/duration*sizeof(v_value_type)/1024/1024) << " MB/sec" << endl; 
+            cerr << "vec transform add rate :" << setprecision(4) << (x.size()*n/duration/1024/1024) << " Mpixels/sec" << endl;
+            cerr << "vec transform add rate :" << setprecision(4) << (x.size()*n/duration*sizeof(v_value_type)/1024/1024) << " MB/sec" << endl;
         }
         {
             // Performance
@@ -1516,8 +1516,8 @@ public:
             ptime stop; double duration = ptime(stop-start).seconds();
 
             cerr << "Size = " << x.size() << endl;
-            cerr << "vec explicit mult rate :" << setprecision(4) << (x.size()*n/duration/1024/1024) << " Mpixels/sec" << endl; 
-            cerr << "vec explicit mult rate :" << setprecision(4) << (x.size()*n/duration*sizeof(v_value_type)/1024/1024) << " MB/sec" << endl; 
+            cerr << "vec explicit mult rate :" << setprecision(4) << (x.size()*n/duration/1024/1024) << " Mpixels/sec" << endl;
+            cerr << "vec explicit mult rate :" << setprecision(4) << (x.size()*n/duration*sizeof(v_value_type)/1024/1024) << " MB/sec" << endl;
         }
         {
             // Performance
@@ -1538,8 +1538,8 @@ public:
             ptime stop; double duration = ptime(stop-start).seconds();
 
             cerr << "Size = " << x.size() << endl;
-            cerr << "vec explicit add rate :" << setprecision(4) << (x.size()*n/duration/1024/1024) << " Mpixels/sec" << endl; 
-            cerr << "vec explicit add rate :" << setprecision(4) << (x.size()*n/duration*sizeof(v_value_type)/1024/1024) << " MB/sec" << endl; 
+            cerr << "vec explicit add rate :" << setprecision(4) << (x.size()*n/duration/1024/1024) << " Mpixels/sec" << endl;
+            cerr << "vec explicit add rate :" << setprecision(4) << (x.size()*n/duration*sizeof(v_value_type)/1024/1024) << " MB/sec" << endl;
         }
 
     }
@@ -1571,9 +1571,9 @@ public:
 #define ALL_TESTS
 #ifdef ALL_TESTS
 
-#ifndef DEBUG_VARIANT        
+#ifndef DEBUG_VARIANT
         addTest(new PerformanceTest);
-#endif        
+#endif
         addTest(new FractionIteratorTest1);
         addTest(new FractionIteratorTest2);
         addTest(new FractionIteratorTest3);

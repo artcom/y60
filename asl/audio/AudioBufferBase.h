@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -63,7 +63,7 @@ class ASL_AUDIO_DECL AudioBufferBase {
         virtual void resize(unsigned numFrames) = 0;
         virtual void clear() = 0;
         virtual AudioBufferBase* clone() const = 0;
-        virtual AudioBufferBase* partialClone(unsigned startFrame, unsigned endFrame) 
+        virtual AudioBufferBase* partialClone(unsigned startFrame, unsigned endFrame)
                 const = 0;
 
         virtual unsigned getNumFrames() const = 0;
@@ -74,10 +74,10 @@ class ASL_AUDIO_DECL AudioBufferBase {
         virtual unsigned getSizeInBytes() const = 0;
 
         virtual AudioBufferBase& operator +=(const AudioBufferBase& theOtherBuffer) = 0;
-        virtual void copyFrames(unsigned theDestStartFrame, 
+        virtual void copyFrames(unsigned theDestStartFrame,
                 const AudioBufferBase& theSrcBuffer,
                 unsigned theSrcStartFrame, unsigned numFrames) = 0;
-        virtual void convert(void * theReadPtr, SampleFormat theSrcSampleFormat, 
+        virtual void convert(void * theReadPtr, SampleFormat theSrcSampleFormat,
                 unsigned theSrcNumChannels) = 0;
         virtual void copyToRawMem(void * theWritePtr, unsigned theStartByte,
                 unsigned theLength) = 0;
@@ -95,7 +95,7 @@ class ASL_AUDIO_DECL AudioBufferBase {
 
         virtual void setMarker(float theValue) = 0;
         virtual bool hasClicks(float theFirstSample) = 0;
-        
+
         // For timed buffers.
         void setStartFrame(int myStartFrame);
         int getStartFrame() const;

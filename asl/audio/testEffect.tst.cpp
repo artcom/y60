@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,14 +33,14 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
 #ifdef _MSC_VER
 // For M_PI
-#define _USE_MATH_DEFINES 
+#define _USE_MATH_DEFINES
 #endif
 #include "Effect.h"
 #include "VolumeFader.h"
@@ -53,18 +53,18 @@
 using namespace asl;
 
 class HalfEffect: public Effect {
-      
+
 private:
     template <class SAMPLE>
         class HalfEffectFunctor : public EffectFunctor<SAMPLE> {
             protected:
-                virtual void operator()(Effect* theEffect, AudioBuffer<SAMPLE> & theBuffer, 
+                virtual void operator()(Effect* theEffect, AudioBuffer<SAMPLE> & theBuffer,
                         Unsigned64 theAbsoluteFrame) {
                     SAMPLE * curSample = theBuffer.begin();
                     for (unsigned curFrame = 0; curFrame<theBuffer.getNumFrames(); ++curFrame)
                     {
-                        for (unsigned myChannel = 0; myChannel<theBuffer.getNumChannels(); 
-                                ++myChannel) 
+                        for (unsigned myChannel = 0; myChannel<theBuffer.getNumChannels();
+                                ++myChannel)
                         {
                             *curSample = (SAMPLE)((*curSample) * 0.5);
                             curSample++;
@@ -74,7 +74,7 @@ private:
         };
 
 public:
-    HalfEffect(SampleFormat theSampleFormat) 
+    HalfEffect(SampleFormat theSampleFormat)
         : Effect(createEffectFunctor<HalfEffectFunctor>(theSampleFormat))
     {
     }
@@ -92,7 +92,7 @@ public:
 
 protected:
     void fillSineBuffer(AudioBufferBase* theAudioBuffer, SampleFormat theSampleFormat,
-            unsigned theFrequency, double theVolume) 
+            unsigned theFrequency, double theVolume)
     {
         switch (theSampleFormat) {
             case SF_S16:
@@ -178,12 +178,12 @@ private:
         ENSURE(::almostEqual(myFader.getVolume(myAudioBuffer->getNumFrames()), 1.0));
         unsigned curFrame = myAudioBuffer->getNumFrames();
         ENSURE(::almostEqual(myFader.getVolume(curFrame), 1.0));
-        
+
         // One buffer full volume
         myAudioBuffer = asl::Ptr<AudioBufferBase>(myBaselineBuffer->clone());
         myFader.apply(*myAudioBuffer, curFrame);
         ENSURE(*myBaselineBuffer == *myAudioBuffer);
-        
+
         // One buffer fadeout
         myFader.setVolume(0.5);
         curFrame += myAudioBuffer->getNumFrames();
@@ -196,7 +196,7 @@ private:
                 myAudioBuffer->getSampleAsFloat(VolumeFader::DEFAULT_FADE_FRAMES-5, 0), 0.001));
         curFrame += myAudioBuffer->getNumFrames();
         ENSURE(::almostEqual(myFader.getVolume(curFrame), 0.5));
-    }    
+    }
 };
 
 int main( int argc, char *argv[] ) {

@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -86,7 +86,7 @@
 
 typedef asl::Unsigned64 cycles_t;
 
-#define USE_TIME_OF_DAY  
+#define USE_TIME_OF_DAY
 
 #ifdef LINUX
 #    if defined __x86_64__
@@ -95,9 +95,9 @@ typedef asl::Unsigned64 cycles_t;
     get_cycles() {
         cycles_t ret;
         asl::Unsigned32 a = 0;
-        asl::Unsigned32 d = 0; 
-        asm volatile("rdtsc" : "=a" (a), "=d" (d)); 
-        (ret) = ((asl::Unsigned64)a) | (((asl::Unsigned64)d)<<32); 
+        asl::Unsigned32 d = 0;
+        asm volatile("rdtsc" : "=a" (a), "=d" (d));
+        (ret) = ((asl::Unsigned64)a) | (((asl::Unsigned64)d)<<32);
         return ret;
     }
 #    endif
@@ -124,7 +124,7 @@ get_cycles() {
 
 #endif
 
-    
+
 namespace asl {
 
 
@@ -154,7 +154,7 @@ namespace asl {
                         setNow();
                 }
                 /**
-                 * Constructor. 
+                 * Constructor.
                  * @param secs Number of seconds. If this has to be a absolute time,
          *             the number of seconds since 1.1.1970 0:00.
                  */
@@ -365,9 +365,9 @@ namespace asl {
 #ifdef _WIN32
                                 QueryPerformanceFrequency((LARGE_INTEGER*)&perSecond);
 #else
-#ifdef USE_TIME_OF_DAY                
-                perSecond = asl::Unsigned64(1000000000); // nsec            
-#else                
+#ifdef USE_TIME_OF_DAY
+                perSecond = asl::Unsigned64(1000000000); // nsec
+#else
                 /*
                 perSecond = cpu_khz;
                 perSecond *=1000;
@@ -379,7 +379,7 @@ namespace asl {
                                 double myCalibDurationTime = Time() - myCalibTime;
                                 unsigned long long myCalibCounterElapsed = get_cycles() - myCalibCounter;
                                 perSecond = static_cast<unsigned long long>(myCalibCounterElapsed/myCalibDurationTime);
-#endif                
+#endif
 #endif
                         }
                         return perSecond;

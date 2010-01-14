@@ -4,12 +4,12 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: 
+// Description:
 //    C++ Library fuer TCP-Sockets (based on Sockets.c++ from Pavel 11.9.92)
 //
 // Last Review:  ms & ab 2007-08-14
@@ -35,9 +35,9 @@
 //
 //    overall review status   :      ok
 //
-//    recommendations: move this to its own component, 
-//                     check interfaces, 
-//                     remove CVS log 
+//    recommendations: move this to its own component,
+//                     check interfaces,
+//                     remove CVS log
 */
 
 //own header
@@ -62,7 +62,7 @@
     #include <algorithm>
 
     #define LAST_ERROR_TYPE int
-    
+
     inline
     LAST_ERROR_TYPE lastError() {
 	    return errno;
@@ -115,7 +115,7 @@ void
 compress(const asl::ReadableBlock & inData, asl::ResizeableBlock & compressedData) {
     compressedData.resize(inData.size() * 101 / 100 + 13);
     unsigned long destLen = compressedData.size();
-#if 1    
+#if 1
     int err = compress((Bytef*)(compressedData.begin()), &destLen, (Bytef*)(inData.begin()), inData.size());
 #else
     string & in_ = const_cast<string&>(inData);
@@ -133,7 +133,7 @@ void
 uncompress(const asl::ReadableBlock & compressedData, asl::ResizeableBlock & uncompressedData, unsigned long uncompressedSize) {
     uncompressedData.resize(uncompressedSize);
     unsigned long destLen = uncompressedData.size();
-#if 1    
+#if 1
     int err = uncompress((Bytef*)(uncompressedData.begin()), &destLen, (Bytef*)(compressedData.begin()), compressedData.size());
 #else
     //int err = uncompress((Bytef*)&uncompressedData[0], &destLen, (Bytef*)&compressedData[0], compressedData.size());
@@ -146,7 +146,7 @@ uncompress(const asl::ReadableBlock & compressedData, asl::ResizeableBlock & unc
         throw asl::Exception(string("Uncompress failed, error = ") + asl::as_string(err), PLUS_FILE_LINE);
     }
     if (destLen != uncompressedData.size()) {
-        throw asl::Exception(string("Uncompress size differs from passed size, passed = ") 
+        throw asl::Exception(string("Uncompress size differs from passed size, passed = ")
             + asl::as_string(uncompressedSize) + ", actual = " + asl::as_string(destLen),
             PLUS_FILE_LINE);
     }
@@ -255,15 +255,15 @@ int main (int argc, char * argv[])
 		n;
 	struct ifreq
 		*ifr; /* points to one interface returned from ioctl */
-	
+
 	fd = socket (PF_INET, SOCK_DGRAM, 0);
-	
+
 	if (fd < 0) {
 		fprintf (stderr, "Opening socket:");
 		fprintf (stderr, "got error %d (%s)\n", errno, strerror(errno));
 		exit(1);
 	}
-	
+
 	memset (&ifc, 0, sizeof(ifc));
 
 	ifc.ifc_buf = NULL;
@@ -277,7 +277,7 @@ int main (int argc, char * argv[])
 	for (;;) {
 		ifc.ifc_len = sizeof(struct ifreq) * numreqs;
 		ifc.ifc_buf = realloc(ifc.ifc_buf, ifc.ifc_len);
-		
+
 		if ((return_val = ioctl(fd, SIOCGIFCONF, &ifc)) < 0) {
 			perror("SIOCGIFCONF");
 			break;
@@ -289,9 +289,9 @@ int main (int argc, char * argv[])
 		}
 		break;
 	}
-	
+
 	if (return_val < 0) {
-		fprintf (stderr, "ioctl:");		
+		fprintf (stderr, "ioctl:");
 		fprintf (stderr, "got error %d (%s)\n", errno, strerror(errno));
 		exit(1);
 	}
@@ -308,7 +308,7 @@ int main (int argc, char * argv[])
 		if (return_val == 0 ) {
 			printf ("ifr_flags %08X\n", ifr->ifr_flags);
 		} else {
-			perror ("Get flags failed");			
+			perror ("Get flags failed");
 		}
 
 		/* Get the Destination Address for this interface */
@@ -318,7 +318,7 @@ int main (int argc, char * argv[])
 				struct sockaddr_in
 					*sin = (struct sockaddr_in *)
 					&ifr->ifr_dstaddr;
-				
+
 				printf ("ifr_dstaddr %s\n",
 					inet_ntoa(sin->sin_addr));
 
@@ -331,7 +331,7 @@ int main (int argc, char * argv[])
 			perror ("Get dest failed");
 		}
 
-		
+
 		/* Get the BROADCAST address */
 		return_val = ioctl(fd,SIOCGIFBRDADDR, ifr);
 		if (return_val == 0 ) {
@@ -339,7 +339,7 @@ int main (int argc, char * argv[])
 				struct sockaddr_in
 					*sin = (struct sockaddr_in *)
 					&ifr->ifr_broadaddr;
-				
+
 				printf ("ifr_broadaddr %s\n",
 					inet_ntoa(sin->sin_addr));
 
@@ -348,7 +348,7 @@ int main (int argc, char * argv[])
 			{
 				printf ("unsupported family for broadcast\n");
 			}
-			
+
 		} else {
 			perror ("Get broadcast failed");
 		}
@@ -360,7 +360,7 @@ int main (int argc, char * argv[])
 	/* we don't need this memory any more */
 	free (ifc.ifc_buf);
 	close (fd);
-	
+
 	return 0;
 }
 #endif
@@ -371,10 +371,10 @@ Station::openStation(unsigned long theBroadcastAddress,
                      unsigned short theBroadcastPort,
                      unsigned short theReceivePort,
                      unsigned long ownIPAddress,
-                     unsigned long theStationID, 
+                     unsigned long theStationID,
                      unsigned long theNetworkID
     )
-{ 
+{
     _myOutgoingMessageNumber = 0;
 
     _myBroadcastPort = theBroadcastPort;
@@ -418,12 +418,12 @@ Station::openStation(unsigned long theBroadcastAddress,
         AC_DEBUG << "setting SO_REUSEPORT socket option";
         throw SetSockOptFailed(errorDescription(lastError()),PLUS_FILE_LINE);
     }
-#endif 
+#endif
 
     if (!disableReceivingFlag()){
         _fromAddress.sin_family = AF_INET;
         _fromAddress.sin_addr.s_addr=htonl(INADDR_ANY);
-        _fromAddress.sin_port = htons(_myReceivePort); 
+        _fromAddress.sin_port = htons(_myReceivePort);
         AC_DEBUG << "Binding Receiver Adress " << asl::as_dotted_address(ntohl(_fromAddress.sin_addr.s_addr)) << " to port " << ntohs(_fromAddress.sin_port) << endl;
 
         if (bind(_myFileDescriptor,(struct sockaddr*)&_fromAddress,sizeof(_fromAddress))<0) {
@@ -435,7 +435,7 @@ Station::openStation(unsigned long theBroadcastAddress,
     _toAddress.sin_addr.s_addr=htonl(_myBroadcastAddress);
     _toAddress.sin_port = htons(_myBroadcastPort);
     AC_DEBUG << "Transmitter Adress is " << asl::as_dotted_address(ntohl(_toAddress.sin_addr.s_addr)) << " port " << ntohs(_toAddress.sin_port) << endl;
-    
+
     _good = true;
 }
 
@@ -444,9 +444,9 @@ Station::closeStation() {
     if (_good) {
         _good = false;
         _myOutgoingMessageNumber = 0;
-#ifdef _WIN32        
+#ifdef _WIN32
             closesocket(_myFileDescriptor);
-#else            
+#else
             ::close(_myFileDescriptor);
 #endif
     }
@@ -465,11 +465,11 @@ Station::getLocalHostAddress() { // returns 127.0.0.1
     return 0xff000001;
 }
 
-ostream & 
+ostream &
 operator<<(ostream & os, const Station::Statistic & theStatistic) {
-    os << "Messages=" << theStatistic._myMessageCount 
+    os << "Messages=" << theStatistic._myMessageCount
        << " ,Packets=" << theStatistic._myPacketCount
-       << " ,Bytes=" << theStatistic._myByteCount; 
+       << " ,Bytes=" << theStatistic._myByteCount;
     return os;
 };
 
@@ -488,7 +488,7 @@ operator-(const Station::Statistic & theOne, const Station::Statistic & theOther
             theOne._myByteCount - theOther._myByteCount);
 }
 
-Station::Statistic 
+Station::Statistic
 maximum(const Station::Statistic & theOne, const Station::Statistic & theOther) {
     return Station::Statistic(asl::maximum(theOne._myMessageCount, theOther._myMessageCount),
             asl::maximum(theOne._myPacketCount, theOther._myPacketCount),
@@ -506,9 +506,9 @@ operator/(const Station::Statistic & theOne, double theTime) {
 
 void
 Station::broadcast(const asl::ReadableBlock & theData) {
-    
+
     asl::ReadableBlock::size_type mySentDataBytes = 0;
-    
+
     Packet myPacket;
     myPacket._myHeader._myMagicNumber = static_cast<unsigned long>(STATION_MESSAGE_MAGIC);
     myPacket._myHeader._mySrcAddress = _ownIPAddress;
@@ -520,7 +520,7 @@ Station::broadcast(const asl::ReadableBlock & theData) {
     asl::Block compressedData;
     if (theData.size() > Packet::PAYLOAD_SIZE) {
         compress(theData,compressedData);
-        myData = &compressedData; 
+        myData = &compressedData;
         myPacket._myHeader._myUncompressedMessageSize = theData.size();
     } else {
         myPacket._myHeader._myUncompressedMessageSize = 0;
@@ -530,10 +530,10 @@ Station::broadcast(const asl::ReadableBlock & theData) {
     myPacket._myHeader._myMessagePartNumber = 0;
 
     while (mySentDataBytes < myData->size()) {
-        myPacket._myHeader._myMessagePartSize 
+        myPacket._myHeader._myMessagePartSize
             = std::min( static_cast<std::size_t>(myData->size() - mySentDataBytes)
                       , static_cast<std::size_t>(Packet::PAYLOAD_SIZE) );
-       
+
         std::copy(myData->begin()+mySentDataBytes,
                   myData->begin()+mySentDataBytes+myPacket._myHeader._myMessagePartSize,
                   myPacket._myData);
@@ -558,14 +558,14 @@ Station::broadcast(const asl::ReadableBlock & theData) {
             throw SendFailed(std::string("toAddress=")+asl::as_dotted_address(ntohl(_toAddress.sin_addr.s_addr))+", port="+asl::as_string(ntohs(_toAddress.sin_port))+", error="+errorDescription(lastError()),PLUS_FILE_LINE);
         }
         mySentDataBytes += myPacket._myHeader._myMessagePartSize;
-        
+
         DB(AC_TRACE << "Sent " << myResult << " bytes,"
              << " message = " <<  myPacket._myHeader._myMessageNumber
-             << " ,part = " << myPacket._myHeader._myMessagePartNumber 
+             << " ,part = " << myPacket._myHeader._myMessagePartNumber
              << " of " << myPacket._myHeader._myMessagePartCount
              << " uncompressed size " << myPacket._myHeader._myUncompressedMessageSize
              << " transmitted size " << myData->size() << endl);
-        
+
         ++myPacket._myHeader._myMessagePartNumber;
 
         ++_myTransmitStatistic._myPacketCount;
@@ -593,7 +593,7 @@ bool Station::receive(asl::ResizeableBlock & theData, unsigned long & theSenderA
                 return false;
             }
             throw RecvFailed(errorDescription(lastError()),PLUS_FILE_LINE);
-        }        
+        }
 #else
         socklen_t mySenderAddrSize = sizeof(sockaddr_in);
         int myResult = recvfrom(_myFileDescriptor, myNewPacket.get(), sizeof(Packet), MSG_DONTWAIT,
@@ -618,14 +618,14 @@ bool Station::receive(asl::ResizeableBlock & theData, unsigned long & theSenderA
             throw SizeMismatch("Size in Header does not match received bytes", PLUS_FILE_LINE);
         }
 
-        unsigned long myPacketSrcAddress = ntohl(mySender.sin_addr.s_addr); 
+        unsigned long myPacketSrcAddress = ntohl(mySender.sin_addr.s_addr);
         if ((myNewPacket->_myHeader._mySrcAddress != myPacketSrcAddress ) &&
             (myPacketSrcAddress != getLocalHostAddress()) &&
             (myPacketSrcAddress != INADDR_LOOPBACK) &&
             (myNewPacket->_myHeader._mySrcAddress !=0) )
         {
-            AC_WARNING << "Packet with mismatching source address received" 
-                    << " IP header src = " << asl::as_dotted_address(myPacketSrcAddress) 
+            AC_WARNING << "Packet with mismatching source address received"
+                    << " IP header src = " << asl::as_dotted_address(myPacketSrcAddress)
                     << " own header src= " << asl::as_dotted_address(myNewPacket->_myHeader._mySrcAddress) << endl;
 
         }
@@ -633,10 +633,10 @@ bool Station::receive(asl::ResizeableBlock & theData, unsigned long & theSenderA
         mySenderDescriptor._separate._myIPAddress = myNewPacket->_myHeader._mySrcAddress;
         mySenderDescriptor._separate._myStationID = myNewPacket->_myHeader._myStationID;
         unsigned long long & mySenderID = mySenderDescriptor._together;
-        
+
          DB(AC_TRACE << "Received " << myResult << " bytes, message=" << myNewPacket->_myHeader._myMessageNumber
-             << " part = " << myNewPacket->_myHeader._myMessagePartNumber 
-             << " of " << myNewPacket->_myHeader._myMessagePartCount 
+             << " part = " << myNewPacket->_myHeader._myMessagePartNumber
+             << " of " << myNewPacket->_myHeader._myMessagePartCount
              << " from = " << asl::as_dotted_address(mySenderID) << endl);
         if (_ownIPAddress &&
             mySenderDescriptor._separate._myIPAddress == _ownIPAddress &&
@@ -645,7 +645,7 @@ bool Station::receive(asl::ResizeableBlock & theData, unsigned long & theSenderA
             DB(AC_TRACE << "*** Station::receive: packet from myself ignored" << endl);
             continue;
         };
-        DB2(AC_TRACE << "Packet Data = '" <<  myNewPacket->_myData << "'" << endl);   
+        DB2(AC_TRACE << "Packet Data = '" <<  myNewPacket->_myData << "'" << endl);
 
         // get a reference to our previous packet store vector
         vector<asl::Ptr<Packet> > & myStoredPackets = _myIncomingPackets[mySenderID];
@@ -655,51 +655,51 @@ bool Station::receive(asl::ResizeableBlock & theData, unsigned long & theSenderA
         ++_myReceiveStatistic._myPacketCount;
         _myReceiveStatistic._myByteCount += myResult;
 
-        if (myNewPacket->_myHeader._myMessagePartNumber + 1 ==  
+        if (myNewPacket->_myHeader._myMessagePartNumber + 1 ==
                 myNewPacket->_myHeader._myMessagePartCount )
         {
             // We received the final packet of a message, lets see if we have all parts
             //unsigned long storedPacketCount = _myIncomingPackets[mySenderID].size();
             if (myNewPacket->_myHeader._myMessagePartCount > myStoredPackets.size()) {
-                // We didnt get all previous packets, lets discard them all 
+                // We didnt get all previous packets, lets discard them all
                 DB(AC_TRACE << "Not enough packets, discarding all,  stored = " << myStoredPackets.size() << endl);
                 myStoredPackets.resize(0);
                 myNewPacket = asl::Ptr<Packet>();
             } else {
                 DB(AC_TRACE << "Final part received, stored = " << myStoredPackets.size() << endl);
-                // The number of packets is sufficient, so look if they belong to the same message 
-                unsigned long myMessageNumber = myNewPacket->_myHeader._myMessageNumber; 
+                // The number of packets is sufficient, so look if they belong to the same message
+                unsigned long myMessageNumber = myNewPacket->_myHeader._myMessageNumber;
                 unsigned long myPartNumber = 0;
                 unsigned long myMessagePartSizeSum = 0;
-                DB(AC_TRACE << "Assembling message number  " << myMessageNumber 
-                                << " consisting of " << myNewPacket->_myHeader._myMessagePartCount 
-                                << " parts, size should be = " << myNewPacket->_myHeader._myMessageSize 
+                DB(AC_TRACE << "Assembling message number  " << myMessageNumber
+                                << " consisting of " << myNewPacket->_myHeader._myMessagePartCount
+                                << " parts, size should be = " << myNewPacket->_myHeader._myMessageSize
                                 <<  endl);
                 unsigned long discardedMessageNumber = 0; // just for statistic gathering
                 for (vector<asl::Ptr<Packet> >::size_type i = 0; i < myStoredPackets.size(); ++i) {
                     if ((myStoredPackets[i]->_myHeader._myMessageNumber == myMessageNumber) &&
                             (myStoredPackets[i]->_myHeader._myMessagePartNumber == myPartNumber)) {
-                        DB(AC_TRACE << "Found correct in-sequence packet " << i 
+                        DB(AC_TRACE << "Found correct in-sequence packet " << i
                                 << " , message=" << myStoredPackets[i]->_myHeader._myMessageNumber
-                                << " part = " << myStoredPackets[i]->_myHeader._myMessagePartNumber 
-                                << " of " << myStoredPackets[i]->_myHeader._myMessagePartCount 
-                                << " , myPartNumber = " << myPartNumber 
+                                << " part = " << myStoredPackets[i]->_myHeader._myMessagePartNumber
+                                << " of " << myStoredPackets[i]->_myHeader._myMessagePartCount
+                                << " , myPartNumber = " << myPartNumber
                                 <<  endl);
                          ++myPartNumber; // count packet
                         myMessagePartSizeSum+= myStoredPackets[i]->_myHeader._myMessagePartSize;
                     } else {
                         // throw away out of sequence packet
-                        AC_DEBUG << "Discarding out of sequence packet " << i 
+                        AC_DEBUG << "Discarding out of sequence packet " << i
                                 << " , message=" << myStoredPackets[i]->_myHeader._myMessageNumber
-                                << " part = " << myStoredPackets[i]->_myHeader._myMessagePartNumber 
-                                << " of " << myStoredPackets[i]->_myHeader._myMessagePartCount 
-                                << " , myMessageNumber is " << myMessageNumber 
-                                << " , expected PartNumber is " << myPartNumber 
+                                << " part = " << myStoredPackets[i]->_myHeader._myMessagePartNumber
+                                << " of " << myStoredPackets[i]->_myHeader._myMessagePartCount
+                                << " , myMessageNumber is " << myMessageNumber
+                                << " , expected PartNumber is " << myPartNumber
                                 <<  endl;
                        ++_myReceiveErrorStatistic._myPacketCount;
                        _myReceiveErrorStatistic._myByteCount += myStoredPackets[i]->_myHeader._myMessagePartSize;
                        if (myStoredPackets[i]->_myHeader._myMessagePartNumber != discardedMessageNumber) {
-                            ++_myReceiveErrorStatistic._myMessageCount;     
+                            ++_myReceiveErrorStatistic._myMessageCount;
                             discardedMessageNumber = myStoredPackets[i]->_myHeader._myMessagePartNumber;
                        }
                        myStoredPackets.erase(myStoredPackets.begin()+i);
@@ -726,14 +726,14 @@ bool Station::receive(asl::ResizeableBlock & theData, unsigned long & theSenderA
                         myResult+=myStoredPackets[i]->_myHeader._myMessagePartSize;
                         //myResult = copy(&myStoredPackets[i]->_myData,
                         //                &myStoredPackets[i]->_myData + myStoredPackets[i]->_myHeader._myMessagePartSize,
-                          //              myResult); 
+                          //              myResult);
                     }
                     // throw away our stored packets
                     myStoredPackets.resize(0);
                     // ... and set other return values before returning
-                    theSenderAddress =mySenderDescriptor._separate._myIPAddress;  
+                    theSenderAddress =mySenderDescriptor._separate._myIPAddress;
                     theStationID = mySenderDescriptor._separate._myStationID;
-                    
+
                     if (myNewPacket->_myHeader._myUncompressedMessageSize) {
                         asl::Block compressedData = theData;
                         uncompress(compressedData,theData, myNewPacket->_myHeader._myUncompressedMessageSize);
@@ -745,8 +745,8 @@ bool Station::receive(asl::ResizeableBlock & theData, unsigned long & theSenderA
                     return true;
                 } else {
                     DB(AC_TRACE << "Could not assemble packet because some parts have been missing:"
-                            << ", stored packets = " << myStoredPackets.size() 
-                            << ", required = " << myNewPacket->_myHeader._myMessagePartCount 
+                            << ", stored packets = " << myStoredPackets.size()
+                            << ", required = " << myNewPacket->_myHeader._myMessagePartCount
                             << endl);
                 }
             }

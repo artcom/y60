@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
@@ -61,10 +61,10 @@ namespace asl {
 
         dvector		time;		//
         dvector		s;		//	dvector is defined in "Spline.h":
-        dvector		sPlanet;	// 
+        dvector		sPlanet;	//
         dvector		speed;		//	typedef vector<float> dvector
-        dvector		weight;		//	
-        dvector		weight_reverse;	//	
+        dvector		weight;		//
+        dvector		weight_reverse;	//
         vector< dvector >	value;		//
         vector<QuaternionKeyframe>::const_iterator	it;
 
@@ -112,8 +112,8 @@ namespace asl {
             asl::Vector3f myViewVector3(myViewVector[0], myViewVector[1], myViewVector[2]);
             asl::Vector3f myRightVec       = cross(myUpVector3, myViewVector3);
 
-            //AC_TRACE <<"right: " <<  myRightVec << endl;   	
-            //AC_TRACE <<"myViewVector3: " <<  myViewVector3 << endl;           	
+            //AC_TRACE <<"right: " <<  myRightVec << endl;
+            //AC_TRACE <<"myViewVector3: " <<  myViewVector3 << endl;
             //hpr2rfu ( hpr, right, front, up );
 
             value[3] [i] = myRightVec[0];
@@ -182,7 +182,7 @@ namespace asl {
         for ( it=keyframes.begin(); it!=keyframes.end(); it++ ) {
             float mySpeed = (*it).getSpeed();
             speed.push_back ( mySpeed );
-        }   
+        }
         _spline[9]->slowdown ( speed );
 
         AC_TRACE << "s(t) after slowdown:" << endl;
@@ -264,7 +264,7 @@ namespace asl {
 
     float
         CoordSpline::s ( float t )
-    {    
+    {
         return (*_spline[9])(t);
     }
 
@@ -278,7 +278,7 @@ namespace asl {
 
     float
         CoordSpline::sPlanet ( float t )
-    {    
+    {
         return (*_spline[10])(t);
     }
 
@@ -292,7 +292,7 @@ namespace asl {
 
     float
         CoordSpline::v ( float t )
-    {    
+    {
         return (*_spline[9]) ( t, 1 );
     }
 
@@ -307,7 +307,7 @@ namespace asl {
 
     float
         CoordSpline::vPlanet ( float s )
-    {    
+    {
         float radius = magnitude(xyz(s));
         float height = radius;// -EarthRadiusD;
         const float min_height = 1.0;
@@ -317,9 +317,9 @@ namespace asl {
         // CHECK HEIGHT VALUE AND CORRECT IT IF NECCESSARY
         if ( height < min_height ) {
             if ( _error_count < _error_maxnum ) {
-                AC_ERROR << "CoordSpline::vPlanet: bad value: height("<<s<<") = "<<height<<endl; 
+                AC_ERROR << "CoordSpline::vPlanet: bad value: height("<<s<<") = "<<height<<endl;
             } else if ( _error_count ==  _error_maxnum ) {
-                AC_ERROR << "CoordSpline::vPlanet: bad value: stop error report"<<endl; 
+                AC_ERROR << "CoordSpline::vPlanet: bad value: stop error report"<<endl;
             }
             ++_error_count;
             height = fabs( height );
@@ -407,11 +407,11 @@ namespace asl {
 
     float
         CoordSpline::getTime ( int i )
-    {        
+    {
         if ( i<0 || i>=_spline[9]->dim() ) {
             AC_ERROR << "CoordSpline::getTime: bad value of arg i = "<< i;
             return 0.0;
-        }       
+        }
         return _spline[9]->x(i);
     }
 
@@ -508,7 +508,7 @@ namespace asl {
         // IF NONE OF THE SAMPLE POINTS IS BELOW THE MIN HEIGHT RETURN
         if( y2 > minHeight ) {
             AC_TRACE << "avoidEarthCollision: segment "<<segment<<" ("<<x1<<", "<<x3<<") is ok";
-            return;	
+            return;
         } else {
             AC_TRACE << "avoidEarthCollision: segment "<<segment<<" ("<<x1<<", "<<x3<<") is bad";
         }

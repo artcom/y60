@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //   $RCSfile: ChildNodePlug.h,v $
@@ -46,7 +46,7 @@ namespace dom {
         public:
 			typedef typename TAG::TYPE VALUE;
 
-            ChildNodePlug(FACADE * theFacade) 
+            ChildNodePlug(FACADE * theFacade)
 			{
                 AC_TRACE << "ChildNodePlug::ChildNodePlug()" ;
                 theFacade->registerChildName(TAG::getName());
@@ -60,13 +60,13 @@ namespace dom {
 			}
 			void ensureDependencies() const {}
 
-			const NodePtr getChildNode(const Node & theNode) const { 
+			const NodePtr getChildNode(const Node & theNode) const {
                 return Facade::ensureChild(theNode, TAG::getName());
 			}
-			NodePtr getChildNode(const Node & theNode) { 
+			NodePtr getChildNode(const Node & theNode) {
                 return Facade::ensureChild(theNode, TAG::getName());
 			}
-				
+
 		private:
             ChildNodePlug() {};
 

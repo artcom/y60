@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: contain.h,v $
@@ -72,13 +72,13 @@ struct Sequence {
     Sequence(const Sequence& s) {
         int i;
         for (i=0;i<size();i++) {
-            value[i] = s[i]; 
+            value[i] = s[i];
         }
     }
     Sequence(const T& v) {
         int i;
         for (i=0;i<size();i++) {
-            value[i] = v; 
+            value[i] = v;
         }
     }
     T& operator[](int i) {return value[i];}
@@ -146,7 +146,7 @@ struct Sequence {
 
 // A base class type for two different value types
 // T1 and T2 must be different types
-// DERIVED is the derived class to allow operators return 
+// DERIVED is the derived class to allow operators return
 // a derived class
 template <class T1, class T2, class DERIVED>
 struct Pair {
@@ -200,7 +200,7 @@ struct Pair {
     DERIVED operator^(const DERIVED & y) const {
         return DERIVED(first() ^ y.first(), second()^ y.second());
     }
-    
+
     template <class NUMBER>
     DERIVED operator*(NUMBER y) const {
         return DERIVED(first() * y, second() * y);
@@ -282,7 +282,7 @@ struct Triple {
     void set(const T1 & x) {first(x);}
     void set(const T2 & x) {second(x);}
     void set(const T3 & x) {third(x);}
-    
+
     my_type & operator+=(const my_type & x) {
         _first+=x.first(); _second+=x.second(); _third+=x.third();return *this;
     }
@@ -317,7 +317,7 @@ struct Triple {
     DERIVED operator^(const DERIVED & y) const {
         return DERIVED(first() ^ y.first(), second()^ y.second(), third() ^ y.third());
     }
-   
+
     template <class NUMBER>
     DERIVED operator*(NUMBER y) const {
         return DERIVED(first() * y, second() * y, third() * y);
@@ -374,7 +374,7 @@ struct Quad  {
     Quad() { }
     Quad(const my_type & x) {
         first(x.first()); second(x.second()); third(x.third());fourth(x.fourth());
-    }    
+    }
 
     Quad(const T1 & x1, const T2 & x2, const T3 & x3, const T4 & x4) {
         first(x1); second(x2); third(x3);fourth(x4);
@@ -450,7 +450,7 @@ struct Quad  {
     DERIVED operator^(const DERIVED & y) const {
         return DERIVED(first() ^ y.first(), second()^ y.second(), third() ^ y.third(), fourth()^y.fourth());
     }
-    
+
     template <class NUMBER>
     DERIVED operator*(NUMBER y) const {
         return DERIVED(first() * y, second() * y, third() * y, fourth() * y);

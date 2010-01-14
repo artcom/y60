@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -50,12 +50,12 @@
 #include <asl/base/settings.h>
 
 namespace asl {
- 
+
 class ASL_AUDIO_DECL AudioTimeSource {
     public:
         AudioTimeSource(unsigned myInitialDelay, unsigned mySampleRate);
         virtual ~AudioTimeSource();
-      
+
         void setCurrentTime(asl::Time theTime);
         virtual Time getCurrentTime();
 
@@ -64,7 +64,7 @@ class ASL_AUDIO_DECL AudioTimeSource {
         void pause();
         void run();
         void addFramesToTime(unsigned numFrames);
-    
+
     private:
         mutable asl::ThreadLock _myTimeLock;
         Unsigned64 _mySentFrames;

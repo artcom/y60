@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: testFrustum.tst.cpp,v $
@@ -27,12 +27,12 @@
 #include <string>
 #include <iostream>
 
-using namespace std; 
+using namespace std;
 using namespace asl;
 
 class FrustumUnitTest : public UnitTest {
 public:
-    FrustumUnitTest() 
+    FrustumUnitTest()
         : UnitTest("FrustumUnitTest") {}
 
     void testCorners(Frustum& theFrustum) {
@@ -61,7 +61,7 @@ public:
         ENSURE(almostEqual(Point3f(1,1,1),   RTBK * myProjection));
         ENSURE(almostEqual(Point3f(-1,-1,1), LBBK * myProjection));
     }
-    
+
     void testPlane(const Plane<float>& thePlane, const Vector3f& theNormal, float theOffset, const std::string & theMsg) {
         ENSURE_MSG(almostEqual(thePlane.normal, theNormal), theMsg.c_str());
         ENSURE_MSG(almostEqual(thePlane.offset, theOffset), theMsg.c_str());
@@ -77,7 +77,7 @@ public:
 
         asl::Box3f myBox3(Point3f(11, 11.5, 9), Point3f(12, 12, 10));
         ENSURE( box3 == intersection(myBox3, theFrustum, isOverlapping));
-        
+
         asl::Box3f myBox4(Point3f(0.5, -1, 4), Point3f(1, 1, 4.5));
         ENSURE( box4 == intersection(myBox4, theFrustum, isOverlapping));
 
@@ -144,7 +144,7 @@ public:
         testPlane(myPlane, Vector3f(0,0,1), -7, "translating far");
 
         testBoxIntersection(theFrustum, false, false, true, false);
-        
+
         myCameraMatrix.makeYRotating(float(asl::PI / 2));
         myCameraMatrix.translate(Vector3f(5, 0, 0));
         myInvertedCameraMatrix = myCameraMatrix;
@@ -185,7 +185,7 @@ public:
         ENSURE( theFrustum.getVShift() == 0.5);
         ENSURE( theFrustum.getHShift() == 0.75);
     }
-       
+
     void run() {
         Frustum myFrustum(-1,1,-1,1,1,5);
         asl::Matrix4f myProjection;
@@ -229,9 +229,9 @@ public:
 
         myAsymFrustum.setVShift( 0 );
         testAsymmetricFrustum( myAsymFrustum );
-        
+
     }
-    
+
 };
 
 

@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -64,7 +64,7 @@ namespace asl {
     /*! @addtogroup aslmath */
     /* @{ */
 
-    /** A 2-tupel of arbitrary (nummeric) type. 
+    /** A 2-tupel of arbitrary (nummeric) type.
     *  @f[ \vec{a} = (a_1, a_2) @f]
     */
     template<class T>
@@ -151,8 +151,8 @@ namespace asl {
         }
     };
 
-    /** A two dimensional vector 
-    * @f[ \vec{v} = (v_x, v_y) @f] 
+    /** A two dimensional vector
+    * @f[ \vec{v} = (v_x, v_y) @f]
     */
     template<class Number>
     class Vector2 : public PairOf<Number> {
@@ -377,8 +377,8 @@ namespace asl {
         return product(v, typename Vector2<Number>::value_type(y));
     }
 
-    /** A three dimensional vector 
-    * @f[ \vec{v} = (v_x, v_y, v_z) @f] 
+    /** A three dimensional vector
+    * @f[ \vec{v} = (v_x, v_y, v_z) @f]
     */
     template<class Number>
     class Vector3 : public TripleOf<Number> {
@@ -527,8 +527,8 @@ namespace asl {
         return product(v, typename Vector3<Number>::value_type(y));
     }
 
-    /** A four dimensional vector 
-    * @f[ \vec{v} = (v_x, v_y, v_z, v_w) @f] 
+    /** A four dimensional vector
+    * @f[ \vec{v} = (v_x, v_y, v_z, v_w) @f]
     */
     template<class Number>
     class Vector4 : public QuadrupleOf<Number> {

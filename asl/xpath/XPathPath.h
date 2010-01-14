@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -72,15 +72,15 @@ namespace xpath {
     DEFINE_EXCEPTION(ParseError    , XPathError    );
     DEFINE_EXCEPTION(SyntaxError   , ParseError    );
     DEFINE_EXCEPTION(NotImplemented, ParseError    );
-    
+
     /*! A parsed XPath path
-    ** 
-    ** Paths are immutable and cheap to copy. 
+    **
+    ** Paths are immutable and cheap to copy.
     */
     class ASL_XPATH_DECL Path {
     public:
         struct StepList;
-    
+
         /*! Parse an XPath from a string
         **
         */
@@ -138,7 +138,7 @@ namespace xpath {
     inline bool operator>=(const Path& lhs, const Path& rhs)
     {return !operator<(lhs,rhs);}
 
-    inline 
+    inline
     std::ostream& operator<<(std::ostream& os, const Path& path)
     {path.streamTo(os);return os;}
 

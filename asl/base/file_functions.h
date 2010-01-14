@@ -4,15 +4,15 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
 // Description:  Cross Platform File I/O helper function
 //
-// Last Review: pavel 30.11.2005 
+// Last Review: pavel 30.11.2005
 //
 //  review status report: (perfect, ok, fair, poor, disaster)
 //    usefullness            : perfect
@@ -52,7 +52,7 @@
 #include <sys/stat.h>
 
 namespace asl {
-    
+
 /*! \addtogroup aslbase */
 /* @{ */
 
@@ -86,23 +86,23 @@ ASL_BASE_DECL std::string getAppDirectory();
 /// returns true if theDirectory is a readable directory, false otherwise
 ASL_BASE_DECL bool isDirectory(const std::string & theDirectory);
 /// converts backslashes to slashes & reduces double slashes to single slashes.
-ASL_BASE_DECL std::string normalizeDirectory(const std::string & theDirectory, bool stripTrailingSlash); 
+ASL_BASE_DECL std::string normalizeDirectory(const std::string & theDirectory, bool stripTrailingSlash);
 
 /// returns the current working directory
 ASL_BASE_DECL std::string getCWD();
 
-/// returns filename without directory     
+/// returns filename without directory
 ASL_BASE_DECL std::string getFilenamePart(const std::string & theFileName);
-/// returns directory without filename     
+/// returns directory without filename
 ASL_BASE_DECL std::string getDirectoryPart(const std::string & theFileName);
 
-/// returns path shortened by last directory component     
+/// returns path shortened by last directory component
 ASL_BASE_DECL std::string getParentDirectory(const std::string & theDirectoryName);
 
 /// return filename extension, or "" if none was found
 // @note: this function should be changed. Now it returns the extension without the "."
 // This is a bad idea, since the filename "foo" and "foo." both return the same string.
-// this makes it impossible to reconstruct the filename from its components. 
+// this makes it impossible to reconstruct the filename from its components.
 ASL_BASE_DECL std::string getExtension(const std::string & theFileName);
 
 /// returns theFileName without extension
@@ -128,8 +128,8 @@ ASL_BASE_DECL unsigned splitPaths(const std::string & theDelimitedPaths, std::ve
 /// return relative path from base directory to absolute path.
 ASL_BASE_DECL std::string evaluateRelativePath(const std::string & theBaseDirectory, const std::string & theAbsolutePath, bool theForceRelativePathFlag = false);
 
-/// searches a file in a semicolon-seperated list of pathes, 
-/// returns the path + file. Embedded environment variables 
+/// searches a file in a semicolon-seperated list of pathes,
+/// returns the path + file. Embedded environment variables
 /// in the form ${VARNAME} are expanded.
 /// @deprecated see asl::PackageManager, which can also search in zip files.
 ASL_BASE_DECL std::string searchFile(const std::string & theFileName, const std::string & theSearchPath);
@@ -177,7 +177,7 @@ ASL_BASE_DECL off_t getFileSize(const std::string& theUTF8Filename);
 #ifdef __cplusplus
 extern "C"
 {
-        
+
 #endif
 #ifdef _WIN32
 
@@ -204,7 +204,7 @@ void          rewinddir(DIR *);
     documentation for any purpose is hereby granted without fee, provided
     that this copyright and permissions notice appear in all copies and
     derivatives.
-    
+
     This software is supplied "as is" without express or implied warranty.
 
     But that said, if there are any problems please get in touch.

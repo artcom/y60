@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: Ptr.h,v $
@@ -67,7 +67,7 @@ namespace asl {
 
     /*! \addtogroup aslbase */
     /* @{ */
-    
+
     DEFINE_EXCEPTION(Forbidden, Exception);
     DEFINE_EXCEPTION(BadWeakPtrException, Exception);
 
@@ -95,7 +95,7 @@ namespace asl {
         AtomicCount<ThreadingModel> smartCount;
 
 	// Note:
-        // weakCount is one higher than the number of weak pointers as long as the smart 
+        // weakCount is one higher than the number of weak pointers as long as the smart
         // count is at least one. This allows an atomic test for destruction of the reference
         // counter: if the weak count is 0, no more references exist.
         AtomicCount<ThreadingModel> weakCount;
@@ -412,7 +412,7 @@ namespace asl {
 
     // template <>
     // class PtrAllocator<MultiProcessor> : public PtrThreadSpecificFreeListChunkAllocator {};
-     
+
     //template <>
     //class PtrAllocator<SingleThreaded> : public PtrHeapAllocator<SingleThreaded> {};
     //template <>
@@ -514,7 +514,7 @@ namespace asl {
             }
 
             template<class D>
-            const Ptr<T,ThreadingModel,Allocator> & operator=(const Ptr<D,ThreadingModel,Allocator> & otherType) 
+            const Ptr<T,ThreadingModel,Allocator> & operator=(const Ptr<D,ThreadingModel,Allocator> & otherType)
             {
                 if (static_cast<const void *>(&otherType) != static_cast<const void*>(this)) {
                     unreference();
@@ -645,7 +645,7 @@ namespace asl {
                     }
                 }
             }
-        
+
         private:
             // do not allow comparison with other types and forbid comparison of bool results
             // template<class D> bool operator==(const WeakPtr<D, ThreadingModel, Allocator> & otherPtr) const;
@@ -709,7 +709,7 @@ namespace asl {
                         try {
                             return Ptr<T, ThreadingModel, Allocator>(_myNativePtr, _myRefCountPtr);
                         } catch (BadWeakPtrException&) {
-                            std::cerr << "BadWeakPtrException: refCount=" << getRefCount() << 
+                            std::cerr << "BadWeakPtrException: refCount=" << getRefCount() <<
                                     ", weakCount=" << getWeakCount() << std::endl;
                         }
                     }
@@ -721,7 +721,7 @@ namespace asl {
                         try {
                             return Ptr<T, ThreadingModel, Allocator>(_myNativePtr, _myRefCountPtr);
                         } catch (BadWeakPtrException&) {
-                            std::cerr << "BadWeakPtrException: refCount=" << getRefCount() << 
+                            std::cerr << "BadWeakPtrException: refCount=" << getRefCount() <<
                                     ", weakCount=" << getWeakCount() << std::endl;
                         }
                     }

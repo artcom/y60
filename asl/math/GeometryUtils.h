@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -53,13 +53,13 @@ namespace asl {
 
     /*! @addtogroup aslmath */
     /* @{ */
-    
+
     template <class Number>
-    Vector3<Number> generateFaceNormal(const Vector3<Number> & theVertexA, 
-                                       const Vector3<Number> & theVertexB, 
+    Vector3<Number> generateFaceNormal(const Vector3<Number> & theVertexA,
+                                       const Vector3<Number> & theVertexB,
                                        const Vector3<Number> & theVertexC) {
         Vector3<Number> myResult = normal(theVertexC - theVertexA, theVertexB - theVertexA);
-        return myResult;         
+        return myResult;
     }
 
     /**
@@ -72,19 +72,19 @@ namespace asl {
      * @return centroid of the triangle defined by the parameters
      */
     template <class Number>
-    Vector3<Number> generateFaceCentroid(const Vector3<Number> & theVertexA, 
-                                         const Vector3<Number> & theVertexB, 
+    Vector3<Number> generateFaceCentroid(const Vector3<Number> & theVertexA,
+                                         const Vector3<Number> & theVertexB,
                                          const Vector3<Number> & theVertexC) {
         Vector3<Number> myResult = (theVertexA + theVertexB + theVertexC) / 3;
-        return myResult;         
+        return myResult;
     }
 
     template <class Number>
-    Number computeFaceArea(const Vector3<Number> & theVertexA, 
-                           const Vector3<Number> & theVertexB, 
+    Number computeFaceArea(const Vector3<Number> & theVertexA,
+                           const Vector3<Number> & theVertexB,
                            const Vector3<Number> & theVertexC) {
         Number myResult = length(cross(theVertexB-theVertexA, theVertexC-theVertexA)) / 2;
-        return myResult;         
+        return myResult;
     }
 
 
@@ -97,12 +97,12 @@ namespace asl {
      * @ingroup asl-math
      */
     class VertexNormalBuilder {
-    public:        
+    public:
         VertexNormalBuilder();
         ~VertexNormalBuilder();
 
         /**
-         * adds a vertex to internal list of vertices 
+         * adds a vertex to internal list of vertices
          * @return size of the internal list of vertices
          * @note you can use the return value subtracted by 1 to retrieve
          *       the index of the added vertex
@@ -110,7 +110,7 @@ namespace asl {
         long addVertex( const Vector3<Number> & theVertex);
 
         /**
-        * adds a triangle faces vertices to the VertexNormalBuilder. 
+        * adds a triangle faces vertices to the VertexNormalBuilder.
         * @param theVertexAIndex index of the faces first vertex
         * @param theVertexBIndex index of the faces second vertex
         * @param theVertexCIndex index of the faces third vertex
@@ -120,12 +120,12 @@ namespace asl {
         /**
          * computes the vertex normal of the vertex theVertexIndex of the face with the
          * normal theFaceNormal.
-         * @param theFaceNormal normal of the face, to identify it. 
+         * @param theFaceNormal normal of the face, to identify it.
          * @param theVertexIndex index of the vertex to compute the normal of.
          * @param theRadAngle angle (in radiants) which demarks the limit.
          * @return vertex normal of the given vertex of the face with normal theFaceNormal.
          */
-        Vector3<Number> getVertexNormal(const Vector3<Number> & theFaceNormal, 
+        Vector3<Number> getVertexNormal(const Vector3<Number> & theFaceNormal,
                       long theVertexIndex, const double theRadAngle = 0.0);
 
     private:
@@ -152,22 +152,22 @@ namespace asl {
 
     template <class Number>
     long
-    VertexNormalBuilder<Number>::addVertex( const Vector3<Number> & theVertex) 
+    VertexNormalBuilder<Number>::addVertex( const Vector3<Number> & theVertex)
     {
         _myVertices.push_back(theVertex);
         return _myVertices.size();
     }
 
     template <class Number>
-    void 
-    VertexNormalBuilder<Number>::addFace(long theVertexAIndex, long theVertexBIndex, long theVertexCIndex ) 
+    void
+    VertexNormalBuilder<Number>::addFace(long theVertexAIndex, long theVertexBIndex, long theVertexCIndex )
     {
         Polygon myNewPoly;
         myNewPoly._myVertexAIndex = theVertexAIndex;
         myNewPoly._myVertexBIndex = theVertexBIndex;
         myNewPoly._myVertexCIndex = theVertexCIndex;
-        myNewPoly._myFaceNormal   = asl::generateFaceNormal( _myVertices[theVertexAIndex], 
-                                                             _myVertices[theVertexBIndex], 
+        myNewPoly._myFaceNormal   = asl::generateFaceNormal( _myVertices[theVertexAIndex],
+                                                             _myVertices[theVertexBIndex],
                                                              _myVertices[theVertexCIndex]);
         _myPolygons.push_back(myNewPoly);
         long myFaceIndex = _myPolygons.size()-1;
@@ -179,9 +179,9 @@ namespace asl {
     }
 
     template <class Number>
-    Vector3<Number> 
-    VertexNormalBuilder<Number>::getVertexNormal( const Vector3<Number> & theFaceNormal, 
-                 long theVertexIndex, const double theRadAngle) 
+    Vector3<Number>
+    VertexNormalBuilder<Number>::getVertexNormal( const Vector3<Number> & theFaceNormal,
+                 long theVertexIndex, const double theRadAngle)
     {
         Vector3<Number> myResult(0,0,0);
         double myCounter = 0;

@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -41,15 +41,15 @@
 #include "ExternalTimeSource.h"
 #include "Pump.h"
 namespace asl {
-    
-ExternalTimeSource::ExternalTimeSource() 
+
+ExternalTimeSource::ExternalTimeSource()
     : _myStartTime(0), _myTimeOffset(0), _myPausedTime(0), _myPauseFlag(false)
 {}
 
 ExternalTimeSource::~ExternalTimeSource() {}
 
 Time ExternalTimeSource::getCurrentTime() const {
-    return Pump::get().getCurrentTime() - _myStartTime - _myTimeOffset;     
+    return Pump::get().getCurrentTime() - _myStartTime - _myTimeOffset;
 }
 
 void ExternalTimeSource::stop() {
@@ -61,8 +61,8 @@ void ExternalTimeSource::stop() {
 
 void ExternalTimeSource::pause() {
     if (!_myPauseFlag) {
-        _myPausedTime = Pump::get().getCurrentTime();   
-        _myPauseFlag = true; 
+        _myPausedTime = Pump::get().getCurrentTime();
+        _myPauseFlag = true;
     }
 }
 

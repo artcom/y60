@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: standard_pixel_types.h,v $
@@ -97,7 +97,7 @@ void setGreenValue(gray<T> & thePixel, unsigned char theValue) {
 
 template <class VALUE>
 VALUE getBlueValue(const gray<VALUE> & thePixel) {
-    return thePixel.get();    
+    return thePixel.get();
 }
 template <class T>
 void setBlueValue(gray<T> & thePixel, unsigned char theValue) {
@@ -108,7 +108,7 @@ void setBlueValue(gray<T> & thePixel, unsigned char theValue) {
 
 inline
 unsigned char getRedValue(const DXT1 & thePixel) {
-    throw NotSupportedException(JUST_FILE_LINE);   
+    throw NotSupportedException(JUST_FILE_LINE);
 }
 inline
 void setRedValue(DXT1 & thePixel, unsigned char theValue) {
@@ -116,7 +116,7 @@ void setRedValue(DXT1 & thePixel, unsigned char theValue) {
 }
 inline
 unsigned char getRedValue(const DXT1a & thePixel) {
-    throw NotSupportedException(JUST_FILE_LINE);   
+    throw NotSupportedException(JUST_FILE_LINE);
 }
 inline
 void setRedValue(DXT1a & thePixel, unsigned char theValue) {
@@ -124,7 +124,7 @@ void setRedValue(DXT1a & thePixel, unsigned char theValue) {
 }
 inline
 unsigned char getRedValue(const DXT3 & thePixel) {
-    throw NotSupportedException(JUST_FILE_LINE);   
+    throw NotSupportedException(JUST_FILE_LINE);
 }
 inline
 void setRedValue(DXT3 & thePixel, unsigned char theValue) {
@@ -132,16 +132,16 @@ void setRedValue(DXT3 & thePixel, unsigned char theValue) {
 }
 inline
 unsigned char getRedValue(const DXT5 & thePixel) {
-    throw NotSupportedException(JUST_FILE_LINE);   
+    throw NotSupportedException(JUST_FILE_LINE);
 }
 inline
 void setRedValue(DXT5 & thePixel, unsigned char theValue) {
     throw NotSupportedException(JUST_FILE_LINE);
 }
-    
+
 inline
 unsigned char getGreenValue(const DXT1 & thePixel) {
-    throw NotSupportedException(JUST_FILE_LINE);   
+    throw NotSupportedException(JUST_FILE_LINE);
 }
 inline
 void setGreenValue(DXT1 & thePixel, unsigned char theValue) {
@@ -149,7 +149,7 @@ void setGreenValue(DXT1 & thePixel, unsigned char theValue) {
 }
 inline
 unsigned char getGreenValue(const DXT1a & thePixel) {
-    throw NotSupportedException(JUST_FILE_LINE);   
+    throw NotSupportedException(JUST_FILE_LINE);
 }
 inline
 void setGreenValue(DXT1a & thePixel, unsigned char theValue) {
@@ -157,7 +157,7 @@ void setGreenValue(DXT1a & thePixel, unsigned char theValue) {
 }
 inline
 unsigned char getGreenValue(const DXT3 & thePixel) {
-    throw NotSupportedException(JUST_FILE_LINE);   
+    throw NotSupportedException(JUST_FILE_LINE);
 }
 inline
 void setGreenValue(DXT3 & thePixel, unsigned char theValue) {
@@ -165,17 +165,17 @@ void setGreenValue(DXT3 & thePixel, unsigned char theValue) {
 }
 inline
 unsigned char getGreenValue(const DXT5 & thePixel) {
-    throw NotSupportedException(JUST_FILE_LINE);   
+    throw NotSupportedException(JUST_FILE_LINE);
 }
 inline
 void setGreenValue(DXT5 & thePixel, unsigned char theValue) {
     throw NotSupportedException(JUST_FILE_LINE);
-}    
+}
 
-    
+
 inline
 unsigned char getBlueValue(const DXT1 & thePixel) {
-    throw NotSupportedException(JUST_FILE_LINE);   
+    throw NotSupportedException(JUST_FILE_LINE);
 }
 inline
 void setBlueValue(DXT1 & thePixel, unsigned char theValue) {
@@ -183,7 +183,7 @@ void setBlueValue(DXT1 & thePixel, unsigned char theValue) {
 }
 inline
 unsigned char getBlueValue(const DXT1a & thePixel) {
-    throw NotSupportedException(JUST_FILE_LINE);   
+    throw NotSupportedException(JUST_FILE_LINE);
 }
 inline
 void setBlueValue(DXT1a & thePixel, unsigned char theValue) {
@@ -191,7 +191,7 @@ void setBlueValue(DXT1a & thePixel, unsigned char theValue) {
 }
 inline
 unsigned char getBlueValue(const DXT3 & thePixel) {
-    throw NotSupportedException(JUST_FILE_LINE);   
+    throw NotSupportedException(JUST_FILE_LINE);
 }
 inline
 void setBlueValue(DXT3 & thePixel, unsigned char theValue) {
@@ -199,18 +199,18 @@ void setBlueValue(DXT3 & thePixel, unsigned char theValue) {
 }
 inline
 unsigned char getBlueValue(const DXT5 & thePixel) {
-    throw NotSupportedException(JUST_FILE_LINE);   
+    throw NotSupportedException(JUST_FILE_LINE);
 }
 inline
 void setBlueValue(DXT5 & thePixel, unsigned char theValue) {
     throw NotSupportedException(JUST_FILE_LINE);
-}    
+}
 
 
-    
+
 inline
 unsigned char getAlphaValue(const DXT1 & thePixel) {
-    throw NotSupportedException(JUST_FILE_LINE);   
+    throw NotSupportedException(JUST_FILE_LINE);
 }
 inline
 void setAlphaValue(DXT1 & thePixel, unsigned char theValue) {
@@ -218,7 +218,7 @@ void setAlphaValue(DXT1 & thePixel, unsigned char theValue) {
 }
 inline
 unsigned char getAlphaValue(const DXT1a & thePixel) {
-    throw NotSupportedException(JUST_FILE_LINE);   
+    throw NotSupportedException(JUST_FILE_LINE);
 }
 inline
 void setAlphaValue(DXT1a & thePixel, unsigned char theValue) {
@@ -226,7 +226,7 @@ void setAlphaValue(DXT1a & thePixel, unsigned char theValue) {
 }
 inline
 unsigned char getAlphaValue(const DXT3 & thePixel) {
-    throw NotSupportedException(JUST_FILE_LINE);   
+    throw NotSupportedException(JUST_FILE_LINE);
 }
 inline
 void setAlphaValue(DXT3 & thePixel, unsigned char theValue) {
@@ -234,12 +234,12 @@ void setAlphaValue(DXT3 & thePixel, unsigned char theValue) {
 }
 inline
 unsigned char getAlphaValue(const DXT5 & thePixel) {
-    throw NotSupportedException(JUST_FILE_LINE);   
+    throw NotSupportedException(JUST_FILE_LINE);
 }
 inline
 void setAlphaValue(DXT5 & thePixel, unsigned char theValue) {
     throw NotSupportedException(JUST_FILE_LINE);
-}    
+}
 
 
 } // namespace asl

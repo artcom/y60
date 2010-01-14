@@ -200,7 +200,7 @@ Process::kill() {
 
         return;
     }
-    
+
     if(myResult == WAIT_FAILED) {
         handleSystemError("WaitForSingleObject", GetLastError(), PLUS_FILE_LINE);
     }

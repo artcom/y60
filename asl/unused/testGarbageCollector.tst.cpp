@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: testGarbageCollector.tst.cpp,v $
@@ -221,7 +221,7 @@ public:
             CollectablePtr<DerivedN,ThreadingModel> derivedPtr(new DerivedN);
             ENSURE(derivedPtr);
             ENSURE(derivedPtr.getRefCount() == 1);
-           
+
             ENSURE(BaseN::_theInstanceCount_ == 2);
             //DPRINT(TestBase::_theInstanceCount_);
 #ifdef perform_std_string_test
@@ -414,7 +414,7 @@ public:
 
         ENSURE(MyCollector::get().getManagedObjectCount() == 0);
         DPRINT(MyCollector::get().getManagedObjectCount());
-        
+
         ENSURE(MyCollector::get().calcManagedPtrCount() == 0);
         DPRINT(MyCollector::get().calcManagedPtrCount());
 
@@ -430,16 +430,16 @@ public:
         }
         ENSURE(BaseN::_theInstanceCount_ == COUNT);
         DPRINT(BaseN::_theInstanceCount_);
-        
+
         ENSURE(MyCollector::get().getRootPtrCount() == COUNT);
         DPRINT(MyCollector::get().getRootPtrCount());
-        
+
         ENSURE(MyCollector::get().getManagedObjectCount() == COUNT);
         DPRINT(MyCollector::get().getManagedObjectCount());
-        
+
         ENSURE(MyCollector::get().calcManagedPtrCount() == 3*COUNT);
         DPRINT(MyCollector::get().calcManagedPtrCount());
-        
+
         DPRINT(" Starting Crosslinks");
         for (int i = 0; i < COUNT; ++i) {
             if (i>0) myVec[i]->myLink1 = myVec[i-1];
@@ -478,7 +478,7 @@ public:
 
         ENSURE(MyCollector::get().getManagedObjectCount() == 0);
         DPRINT(MyCollector::get().getManagedObjectCount());
-        
+
         ENSURE(MyCollector::get().calcManagedPtrCount() == 0);
         DPRINT(MyCollector::get().calcManagedPtrCount());
      }
@@ -563,7 +563,7 @@ public:
         typedef TestClassDerived<N, ThreadingModel> DerivedN;
         typedef CollectablePtr<DerivedN, ThreadingModel> DerivedPtr;
         typedef CollectablePtr<BaseN, ThreadingModel> BasePtr;
-        
+
         typedef std::vector<BasePtr, CollectableContainerAllocator<BasePtr, ThreadingModel> > BaseVector;
         typedef std::vector<DerivedPtr, CollectableContainerAllocator<DerivedPtr, ThreadingModel> > DerivedVector;
         for (int f = 0; f < 4; ++f) {
@@ -613,9 +613,9 @@ public:
 template <class T>
 class RangeSetUnitTest : public TemplateUnitTest {
 public:
-    RangeSetUnitTest(const char * theTemplateArgument, const T & theFirstValue) 
+    RangeSetUnitTest(const char * theTemplateArgument, const T & theFirstValue)
     : TemplateUnitTest("RangeSetUnitTest",theTemplateArgument), firstValue(theFirstValue) {  }
-    
+
     enum {myTestSize = 20};
 
     set<T> mySet;
@@ -631,7 +631,7 @@ public:
         }
         std::cerr << std::endl;
         for (int i = 0; i < v.size();++i) {
-            bool existsInSet = mySet.count(v[i])==1; 
+            bool existsInSet = mySet.count(v[i])==1;
             bool existsInRange = myRange.contains(v[i]);
             bool equallyExists =( existsInSet== existsInRange);
             if (!equallyExists) rVal=false;
@@ -641,7 +641,7 @@ public:
         }
         std::cerr << std::endl;
         std::cerr << myRange << endl;
-        return rVal; 
+        return rVal;
     }
 
     void checkIterating() {
@@ -662,7 +662,7 @@ public:
             }
         }
         ENSURE(myRange.size() == mySet.size());
-    } 
+    }
 
     bool insertTest(const T & bgn, const T & end) {
         checkIterating();
@@ -702,7 +702,7 @@ public:
     }
 
     void run() {
-        
+
         for (int i=0; i< myTestSize;++i) {
             v.push_back(firstValue++);
         }
@@ -712,18 +712,18 @@ public:
         ENSURE(insertTest(v[8],v[9]));
         ENSURE(insertTest(v[6],v[7]));
         ENSURE(insertTest(v[3],v[5]));
-        
+
         ENSURE(insertTest(v[13],v[15]));
         ENSURE(insertTest(v[13],v[15]));
         ENSURE(insertTest(v[13],v[14]));
         ENSURE(insertTest(v[14],v[15]));
         ENSURE(insertTest(v[1],v[16]));
-        
+
         ENSURE(insertTest(v[5],v[6]));
         ENSURE(insertTest(v[0],v[1]));
         ENSURE(insertTest(v[9],v[13]));
         ENSURE(insertTest(v[15],v[19]));
-        
+
         ENSURE(removeTest(v[18],v[19]));
         ENSURE(removeTest(v[0],v[1]));
         ENSURE(removeTest(v[15],v[18]));
@@ -734,15 +734,15 @@ public:
         ENSURE(removeTest(v[6],v[7]));
         ENSURE(removeTest(v[11],v[15]));
         ENSURE(removeTest(v[10],v[11]));
-        
+
     }
 };
 template <class T>
 class RangeSetPerfTest : public TemplateUnitTest {
 public:
-    RangeSetPerfTest(const char * theTemplateArgument, const T & theFirstValue) 
+    RangeSetPerfTest(const char * theTemplateArgument, const T & theFirstValue)
     : TemplateUnitTest("RangeSetUnitTest",theTemplateArgument), firstValue(theFirstValue) {  }
-    
+
     enum {myTestSize = 20};
 
     set<T> mySet;
@@ -757,7 +757,7 @@ public:
             myRandom.push_back(i);
         }
         for (int i = 0; i< n; ++i) {
-            std::swap(myRandom[abs(rand())%n], myRandom[abs(rand())%n]);    
+            std::swap(myRandom[abs(rand())%n], myRandom[abs(rand())%n]);
         }
 
         for (int f = 0; f < 40; ++f)
@@ -882,7 +882,7 @@ public:
         addTest(mySingleProcessorTest);
 #else
         delete mySingleProcessorTest;
-#endif        
+#endif
         addTest(new PtrUnitTest<0,MultiProcessor>);
 
 // the windows release build fails when running under ant
@@ -907,7 +907,7 @@ public:
         addTest(mySingleProcessorPrefTest);
 #else
         delete mySingleProcessorPrefTest;
-#endif        
+#endif
         addTest(new PtrUnitPerfTest<0,MultiProcessor>);
 #endif
     }

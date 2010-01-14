@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -45,13 +45,13 @@
 #include <asl/base/UnitTest.h>
 
 
-using namespace std;  
-using namespace asl;  
+using namespace std;
+using namespace asl;
 
 template <class Int>
 class GCDTest : public UnitTest {
 public:
-    GCDTest(string myTypeName) 
+    GCDTest(string myTypeName)
         : UnitTest(strdup(string(string("GCDTest<")+myTypeName+">").c_str())) {  }
         void run() {
             Int a = 20451;
@@ -88,7 +88,7 @@ private:
 template <class fraction>
 class FractionTest : public UnitTest {
 public:
-    FractionTest(string myTypeName) 
+    FractionTest(string myTypeName)
         : UnitTest(strdup(string(string("FractionTest<")+myTypeName+">").c_str()))
     {  }
     void run() {
@@ -121,24 +121,24 @@ public:
         fraction onetenth(1, 10);
         fraction onetwelvth(1, 12);
 
-        ENSURE(zero == zero); 
-        ENSURE(one == one); 
-        ENSURE(zero + zero == zero); 
-        ENSURE(zero + one == one); 
-        ENSURE(one + zero == one); 
-        ENSURE(one + one == two); 
-        ENSURE(one + two == three); 
-        ENSURE(two + one == three); 
-        ENSURE(two + two == four); 
+        ENSURE(zero == zero);
+        ENSURE(one == one);
+        ENSURE(zero + zero == zero);
+        ENSURE(zero + one == one);
+        ENSURE(one + zero == one);
+        ENSURE(one + one == two);
+        ENSURE(one + two == three);
+        ENSURE(two + one == three);
+        ENSURE(two + two == four);
 
         ENSURE(minusone == -one);
 
-        ENSURE(zero + one == one); 
-        ENSURE(one - zero == one); 
-        ENSURE(one - one == zero); 
-        ENSURE(one - two == minusone); 
-        ENSURE(two - one == one); 
-        ENSURE(two - three == -one); 
+        ENSURE(zero + one == one);
+        ENSURE(one - zero == one);
+        ENSURE(one - one == zero);
+        ENSURE(one - two == minusone);
+        ENSURE(two - one == one);
+        ENSURE(two - three == -one);
 
         ENSURE(one * one == one);
         ENSURE(one * zero == zero);
@@ -250,7 +250,7 @@ public:
     MyTestSuite(const char * myName, int argc, char *argv[]) : UnitTestSuite(myName, argc, argv) {}
     void setup() {
         UnitTestSuite::setup(); // called to print a launch message
-        
+
         addTest(new GCDTest<int>("<int>"));
         addTest(new FractionTest<base_frac<int> >("base_frac<int>"));
         addTest(new FractionTest<frac<int> >("base_frac<int>"));

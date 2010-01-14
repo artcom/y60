@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: ZipFile.h,v $
@@ -33,7 +33,7 @@
 namespace asl {
 
 DEFINE_EXCEPTION(ZipFileException, asl::Exception);
-    
+
 class ASL_ZIP_DECL ZipReader {
     public:
         struct Entry {
@@ -42,7 +42,7 @@ class ASL_ZIP_DECL ZipReader {
             size_t directory_pos;
             size_t file_index;
         };
-        typedef std::vector<Entry> Directory; 
+        typedef std::vector<Entry> Directory;
         ZipReader(const char * theInputFileName);
         virtual ~ZipReader();
         const Directory & getDirectory() const;

@@ -4,12 +4,12 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: 
+// Description:
 //    C++ Library fuer TCP-Sockets (based on Sockets.c++ from Pavel 11.9.92)
 //
 // Last Review:  ms & ab 2007-08-14
@@ -35,7 +35,7 @@
 //
 //    overall review status   :      ok
 //
-//    recommendations: merge with net_functions.h, translate german comments to english 
+//    recommendations: merge with net_functions.h, translate german comments to english
 */
 
 //own header
@@ -80,7 +80,7 @@ namespace inet {
     {
         int myErrorCode = 0;
 
-        asl::Unsigned32 nethostaddr = htonl(hostaddr); 
+        asl::Unsigned32 nethostaddr = htonl(hostaddr);
         struct hostent * myHostEnt = 0;
 
 #ifdef LINUX
@@ -115,7 +115,7 @@ namespace inet {
         } else {
             strncpy(namedest,myHostEnt->h_name, maxnamelen);
             AC_DEBUG <<"getHostName(): address (host byte order) " << hostaddr << " - " << namedest<< endl;
-        } 
+        }
         return myErrorCode;
     }
 
@@ -125,7 +125,7 @@ namespace inet {
         asl::Unsigned32 hostaddr;
 
         sscanf(dotaddr,"%d.%d.%d.%d",&i1,&i2,&i3,&i4);
-        // byte order of host addresses is __BIG_ENDIAN 
+        // byte order of host addresses is __BIG_ENDIAN
         hostaddr=(i1&0xff)<<24 | (i2&0xff)<<16 | (i3&0xff)<<8 | i4&0xff;
 
         AC_DEBUG << "addrFromStr(): address "
@@ -139,7 +139,7 @@ namespace inet {
 
     void addr2Str(asl::Unsigned32 hostaddr, char *dotaddrdest)
     {
-        // byte order of host addresses is __BIG_ENDIAN 
+        // byte order of host addresses is __BIG_ENDIAN
         sprintf(dotaddrdest, "%d.%d.%d.%d",
                 (hostaddr>>24) & 0xff,
                 (hostaddr>>16) & 0xff,
@@ -171,7 +171,7 @@ namespace inet {
         {
             hostaddr=addrFromStr(hostspec);
         }
-        else 
+        else
         {
             struct hostent * myHostEnt;
 
@@ -179,7 +179,7 @@ namespace inet {
             // reentrant version
             char tempBuffer[1024];
             myHostEnt = new hostent;
-            gethostbyname_r(hostspec, myHostEnt, tempBuffer, sizeof(tempBuffer), 
+            gethostbyname_r(hostspec, myHostEnt, tempBuffer, sizeof(tempBuffer),
                             &myHostEnt, &myErrorCode);
 #else
             myHostEnt = gethostbyname(hostspec);
@@ -191,7 +191,7 @@ namespace inet {
                 myErrorCode = h_errno;
 #endif
             }
-#endif            
+#endif
             if (myHostEnt==0)
             {
                 throw SocketError(0, "getHostAddress()");
@@ -204,7 +204,7 @@ namespace inet {
             }
 #ifdef LINUX
             delete myHostEnt;
-#endif            
+#endif
         }
         AC_DEBUG <<"getHostAddress(): address (host byte order) " << hostaddr << endl;
         return (hostaddr);

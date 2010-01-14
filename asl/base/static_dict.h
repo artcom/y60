@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 // Description: static_dict STL container
@@ -35,8 +35,8 @@
 namespace asl {
 
     /*! static dictionary entry type
-    ** 
-    ** use the result_type to crate C arrays to initialize the corresponding 
+    **
+    ** use the result_type to crate C arrays to initialize the corresponding
     ** static_dict objects with
     */
     template< typename T >
@@ -47,9 +47,9 @@ namespace asl {
     };
 
     /*! std::string-to-T static size const dictionary
-    ** 
+    **
     ** initialize with C array of static_dict_entry_type<T>::result_type
-    ** use lookup to find the mapped_type object corresponding to some 
+    ** use lookup to find the mapped_type object corresponding to some
     ** std::string
     */
     template< typename T, std::size_t MaxSize_ >
@@ -82,12 +82,12 @@ namespace asl {
         **
         ** initialize with C array of static_dict_entry_type<T>::result_type
         **
-        ** note  This will throw std::invalid_argument exceptions on duplicate 
+        ** note  This will throw std::invalid_argument exceptions on duplicate
         **       key objects
         **
-        ** note  This will copy the objects (O(N)), then sort the stored 
-        **       entries (O(N)) and finally attempts to find duplicate 
-        **       entries (O(N)). 
+        ** note  This will copy the objects (O(N)), then sort the stored
+        **       entries (O(N)) and finally attempts to find duplicate
+        **       entries (O(N)).
         */
         template< typename InpIt >
         static_dict(InpIt begin, InpIt end);
@@ -135,43 +135,43 @@ namespace asl {
 
         /*! lookup strings, finding matching mapped_type object
         **
-        ** Given an arbitrary string, this will attempt to find an entry with 
-        ** the longest key that matches the beginning of the string. 
-        ** If such a key is found, the first element of the result will be an 
-        ** iterator pointing to that entry. The second element will be the 
-        ** size of that key. 
-        ** Otherwise, the first element of the result will be the dictionary's 
-        ** end iterator. The second element will be the maximum number of 
-        ** characters in the given string which matched the beginning of any 
-        ** key. 
+        ** Given an arbitrary string, this will attempt to find an entry with
+        ** the longest key that matches the beginning of the string.
+        ** If such a key is found, the first element of the result will be an
+        ** iterator pointing to that entry. The second element will be the
+        ** size of that key.
+        ** Otherwise, the first element of the result will be the dictionary's
+        ** end iterator. The second element will be the maximum number of
+        ** characters in the given string which matched the beginning of any
+        ** key.
         */
         std::pair<const_iterator,typename key_type::size_type>
         lookup(const key_type& k, typename key_type::size_type idx = 0) const;
 
-        /*! lookup strings by character iterators, finding matching 
+        /*! lookup strings by character iterators, finding matching
         **  mapped_type object
-        ** 
-        ** Given iterators into an arbitrary character sequence, this will 
-        ** attempt to find an entry with the longest key that matches the 
-        ** beginning of the string. 
-        ** If such a key is found, the first element of the result will be an 
-        ** iterator pointing to that entry. The second element will point at 
-        ** the first non-matching character of that key. 
-        ** Otherwise, the first element of the result will be the dictionary's 
-        ** end iterator. The second element will be the maximum number of 
-        ** characters in the given sequence which matched the beginning of any 
-        ** key. 
+        **
+        ** Given iterators into an arbitrary character sequence, this will
+        ** attempt to find an entry with the longest key that matches the
+        ** beginning of the string.
+        ** If such a key is found, the first element of the result will be an
+        ** iterator pointing to that entry. The second element will point at
+        ** the first non-matching character of that key.
+        ** Otherwise, the first element of the result will be the dictionary's
+        ** end iterator. The second element will be the maximum number of
+        ** characters in the given sequence which matched the beginning of any
+        ** key.
         */
         template< typename FwdIt >
-        std::pair<const_iterator,FwdIt> 
+        std::pair<const_iterator,FwdIt>
         lookup(FwdIt s_b, FwdIt s_e) const;
 
         /*! reverse lookup, finding matching strings
-        ** 
-        ** Given a mapped_type object, this will attempt to find an entry 
-        ** with exactly this object. 
-        ** If such an entry is found, the result is an iterator pointing to 
-        ** it. Otherwise the result is the end iterator. 
+        **
+        ** Given a mapped_type object, this will attempt to find an entry
+        ** with exactly this object.
+        ** If such an entry is found, the result is an iterator pointing to
+        ** it. Otherwise the result is the end iterator.
         */
         const_iterator
         rlookup(const mapped_type& obj) const;
@@ -249,7 +249,7 @@ namespace asl {
         const typename key_type::size_type new_idx = res.second-key.begin();
 
         return result_t( res.first, new_idx );
-        
+
     }
 
     template< typename T, std::size_t MaxSize_ >
@@ -262,7 +262,7 @@ namespace asl {
     }
 
     template< typename T, std::size_t MaxSize_ >
-    typename static_dict<T,MaxSize_>::const_iterator 
+    typename static_dict<T,MaxSize_>::const_iterator
     static_dict<T,MaxSize_>::rlookup(const mapped_type& obj) const
     {
         for( const_iterator it = begin(); it != end(); ++it ) {

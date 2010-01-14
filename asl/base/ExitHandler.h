@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
@@ -19,8 +19,8 @@ namespace asl {
 
 // This class exists so the constructor gets called once on initialization
 // of the program and sets windows exception handling stuff appropriately.
-// There is only one instance and that instance is declared statically in 
-// Exception.cpp. 
+// There is only one instance and that instance is declared statically in
+// Exception.cpp.
 class ExitHandler {
 public:
     ExitHandler();

@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSnumeric: test_linearAlgebra.tst.cpp,v $
@@ -37,7 +37,7 @@ class IntersectionTest : public UnitTest {
             //
             //             *        *
             //             C        E
-            // 
+            //
             Point3f A(-1.0f, 0.0f, 0.0f);
             Point3f B(0.0f, 0.0f, 0.0f);
             Point3f C(1.0f, 1.0f, 0.0f);
@@ -92,7 +92,7 @@ class IntersectionTest : public UnitTest {
             LineSegment<float> mySegment2(Point3f(0.0f,0.5f,0),Point3f(1.0f,0.5f,0));
             float t,s;
             Point3f myIntersectionPoint;
-            bool intersectFlag = intersection(mySegment1,mySegment2,myIntersectionPoint,t,s); 
+            bool intersectFlag = intersection(mySegment1,mySegment2,myIntersectionPoint,t,s);
             ENSURE(intersectFlag == true);
             ENSURE(almostEqual(myIntersectionPoint,Point3f(0.5f,0.5f,0)));
             }
@@ -102,7 +102,7 @@ class IntersectionTest : public UnitTest {
             LineSegment<float> mySegment2(Point3f(0.0f,1.0f,0),Point3f(1.0f,1.0f,0));
             float t,s;
             Point3f myIntersectionPoint;
-            bool intersectFlag = intersection(mySegment1,mySegment2,myIntersectionPoint,t,s); 
+            bool intersectFlag = intersection(mySegment1,mySegment2,myIntersectionPoint,t,s);
             ENSURE(intersectFlag == false);
             }
             // line segments are skew
@@ -111,7 +111,7 @@ class IntersectionTest : public UnitTest {
             LineSegment<float> mySegment2(Point3f(0.0f,1.0f,0),Point3f(1.0f,1.0f,1.0));
             float t,s;
             Point3f myIntersectionPoint;
-            bool intersectFlag = intersection(mySegment1,mySegment2,myIntersectionPoint,t,s); 
+            bool intersectFlag = intersection(mySegment1,mySegment2,myIntersectionPoint,t,s);
             ENSURE(intersectFlag == false);
             }
             // line segments are too short
@@ -120,7 +120,7 @@ class IntersectionTest : public UnitTest {
             LineSegment<float> mySegment2(Point3f(0.0f,0.5f,0),Point3f(0.1f,0.5f,0));
             float t,s;
             Point3f myIntersectionPoint;
-            bool intersectFlag = intersection(mySegment1,mySegment2,myIntersectionPoint,t,s); 
+            bool intersectFlag = intersection(mySegment1,mySegment2,myIntersectionPoint,t,s);
             ENSURE(intersectFlag == false);
             }
             // Plane / Plane intersection
@@ -191,7 +191,7 @@ public:
     void setup() {
         UnitTestSuite::setup(); // called to print a launch message
         addTest(new IntersectionTest);
- 
+
     }
 };
 

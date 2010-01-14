@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -91,13 +91,13 @@ namespace asl {
     {
         Vector3<Number> myOriginToPoint = theEdge.origin - theSphere.center;
         Vector3<Number> myEdgeVector = theEdge.end - theEdge.origin;
-        
+
         Number myEdgeSquared = dot(myEdgeVector, myEdgeVector);
         Number dotEdgeAxisVector = dot(myEdgeVector, theMotionVector);
         Number a = myEdgeSquared * -dot(theMotionVector, theMotionVector) + dotEdgeAxisVector*dotEdgeAxisVector;
         Number dotEdgeOriginToPoint = dot(myEdgeVector, myOriginToPoint);
-        
-        if (almostEqual(a,Number(0))) { // segment and MotionVector are parallel 
+
+        if (almostEqual(a,Number(0))) { // segment and MotionVector are parallel
             if (distance(theSphere.center, Line<Number>(theEdge.origin, theEdge.end)) > theSphere.radius) {
                 return 0;
             }
@@ -140,7 +140,7 @@ namespace asl {
                 f1 = f0;
             }
         }
-        
+
         return mySolutions;
     }
 
@@ -169,7 +169,7 @@ namespace asl {
         if (!mySolutions) {
             return false;
         }
-         
+
         if (theMin_t > theMax_t) {
             std::swap(theMin_t, theMax_t);
         }
@@ -177,8 +177,8 @@ namespace asl {
     }
 
     template <class Number>
-    int clipContacts(Number & theMin_t, Number & theMax_t, Number theMaxRange = Number(1)) {        
-        
+    int clipContacts(Number & theMin_t, Number & theMax_t, Number theMaxRange = Number(1)) {
+
         if (theMin_t < 0 && theMax_t < 0) {
             return 0;
         }
@@ -188,16 +188,16 @@ namespace asl {
 
         // clamp to [0,theMaxRange]
         theMin_t = maximum(Number(0), theMin_t);
-        
+
         theMax_t = minimum(theMaxRange, theMax_t);
-        
+
         if (almostEqual(theMin_t, theMax_t)) {
             return 1;
         }
 
         return 2;
     }
-    
+
     enum ContactType { NO_CONTACT = 0, EMBEDDED, SURFACE_CONTACT, EDGE_CONTACT, VERTEX_CONTACT };
 
 
@@ -207,7 +207,7 @@ namespace asl {
     // positions
     template<class Number>
 	void sortContacts(int i, int theSolutions, ContactType newContact, Number newT0, Number newT1,
-                      ContactType & theMin_contactType, ContactType & theMax_contactType, 
+                      ContactType & theMin_contactType, ContactType & theMax_contactType,
                       Number & theMin_t,  Number & theMax_t,
                       int & theMinIndex, int & theMaxIndex)
     {
@@ -253,7 +253,7 @@ namespace asl {
     // see Kasper Fauerby, Improved Collision Detection and Response, http://www.peroxide.dk
     template<class Number>
 	int contacts(const Sphere<Number> & theSphere,
-	             const Vector3<Number> & theMotionVector, 
+	             const Vector3<Number> & theMotionVector,
                  const Triangle<Number> & theTriangle,
                  const Vector3<Vector3<Number> > * theNormals,
                  SweptSphereContact<Number> & theMin,
@@ -303,7 +303,7 @@ namespace asl {
                 } else {
                     theMin.contactNormal = myTrianglePlane.normal;
                 }
-            
+
                 theMin.contactSphereNormal = -theMin.contactNormal;
                 theMin.contactSphereCenter = theSphere.center+(theMotionVector * theMin.t);
                 if (theMin.t == 0) {
@@ -370,7 +370,7 @@ namespace asl {
         }
 
         if (theMin.contactType == EDGE_CONTACT || theMin.contactType == VERTEX_CONTACT) {
-            theMin.contactSphereCenter = theSphere.center + theMotionVector * theMin.t;     
+            theMin.contactSphereCenter = theSphere.center + theMotionVector * theMin.t;
             if (theMin.contactType == EDGE_CONTACT) {
                 theMin.contactPoint = theTriangle.edgeOrigin(myMinIndex) + theTriangle.edgeVector(myMinIndex) * f0[myMinIndex];
                 if (theNormals) {
@@ -379,7 +379,7 @@ namespace asl {
                 } else {
                     theMin.contactNormal = myTrianglePlane.normal;
                 }
-            } else { 
+            } else {
                 // theMin.contactType == VERTEX_CONTACT
                 theMin.contactPoint = theTriangle[myMinIndex];
                 if (theNormals) {
@@ -390,7 +390,7 @@ namespace asl {
             }
         }
         if (theMax.contactType == EDGE_CONTACT || theMax.contactType == VERTEX_CONTACT) {
-            theMax.contactSphereCenter = theSphere.center + theMotionVector * theMax.t;     
+            theMax.contactSphereCenter = theSphere.center + theMotionVector * theMax.t;
             if (theMax.contactType == EDGE_CONTACT) {
                 theMax.contactPoint = theTriangle.edgeOrigin(myMaxIndex) + theTriangle.edgeVector(myMaxIndex) * f1[myMaxIndex];
                 if (theNormals) {
@@ -399,7 +399,7 @@ namespace asl {
                 } else {
                     theMax.contactNormal = myTrianglePlane.normal;
                 }
-            } else { 
+            } else {
                 // theMax.contactType == VERTEX_CONTACT
                 theMax.contactPoint = theTriangle[myMaxIndex];
                 if (theNormals) {
@@ -429,14 +429,14 @@ namespace asl {
     // see Kasper Fauerby, Improved Collision Detection and Response, http://www.peroxide.dk
     template<class Number>
 	int firstContact(const Sphere<Number> & theSphere,
-	             const Vector3<Number> & theMotionVector, 
+	             const Vector3<Number> & theMotionVector,
                  const Triangle<Number> & theTriangle,
                  const Vector3<Vector3<Number> > * theNormals,
                  const SweptSphereContact<Number> & theCurrentContact,
                  SweptSphereContact<Number> & theContact)
     {
         theContact.contactType = NO_CONTACT;
-        
+
         // check triangle plane
         Number theLastContact = 0;
         Plane<Number> myTrianglePlane = theTriangle.plane();
@@ -448,7 +448,7 @@ namespace asl {
             theLastContact = (-theSphere.radius - myOriginPlaneDistance) / dotPlaneNormalAxis;
             if (theContact.t > theLastContact) {
                 std::swap(theContact.t, theLastContact);
-            }            
+            }
 
             if ((theContact.t > 1) || (theLastContact < 0)) {
                 // whole Sphere in front or behind triangle plane
@@ -487,7 +487,7 @@ namespace asl {
                 } else {
                     theContact.contactNormal = myTrianglePlane.normal;
                 }
-            
+
                 theContact.contactSphereNormal = -theContact.contactNormal;
                 theContact.contactSphereCenter = theSphere.center+(theMotionVector * theContact.t);
                 if (theContact.t == 0) {
@@ -497,14 +497,14 @@ namespace asl {
                 }
             }
         }
-        
+
         if (theContact.contactType == NO_CONTACT) {
             int myMinIndex = -1;
             Number myBestSolution = 1;
             if (theCurrentContact.contactType != NO_CONTACT) {
                 myBestSolution = theCurrentContact.t;
             }
-                
+
             // look for vertex contact first
             for (int i = 0; i < 3; ++i) {
                 Number newT0, newT1;
@@ -519,11 +519,11 @@ namespace asl {
                     }
                 }
             }
-    
+
             // now check for edge contact
             Number x0, x1; // distance of sphere center from Sphere origin, 0 = origin, 1 = end
             Number f0[3], f1[3]; // distance of contact point edge origin, 0 = origin, 1 = end
-    
+
             for (int i = 0; i < 3; ++i) {
                 LineSegment<Number> myEdge(theTriangle.edgeOrigin(i), theTriangle.edgeEnd(i));
                 int mySolutions = contacts(theSphere, theMotionVector, myEdge, x0, x1, f0[i], f1[i]);
@@ -537,9 +537,9 @@ namespace asl {
                     }
                 }
             }
-    
+
             if (theContact.contactType == EDGE_CONTACT || theContact.contactType == VERTEX_CONTACT) {
-                theContact.contactSphereCenter = theSphere.center + theMotionVector * theContact.t;     
+                theContact.contactSphereCenter = theSphere.center + theMotionVector * theContact.t;
                 if (theContact.contactType == EDGE_CONTACT) {
                     theContact.contactPoint = theTriangle.edgeOrigin(myMinIndex) + theTriangle.edgeVector(myMinIndex) * f0[myMinIndex];
                     if (theNormals) {
@@ -548,7 +548,7 @@ namespace asl {
                     } else {
                         theContact.contactNormal = myTrianglePlane.normal;
                     }
-                } else { 
+                } else {
                     // theContact.contactType == VERTEX_CONTACT
                     theContact.contactPoint = theTriangle[myMinIndex];
                     if (theNormals) {

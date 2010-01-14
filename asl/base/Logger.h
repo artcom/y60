@@ -4,16 +4,16 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description:  Simple time source interface. getCurrentTime() should return 
+// Description:  Simple time source interface. getCurrentTime() should return
 //               the time in seconds since the TimeSource was constructed.
 //
-// Last Review: pavel 30.11.2005 
+// Last Review: pavel 30.11.2005
 //
 //  review status report: (perfect, ok, fair, poor, disaster)
 //    usefullness            : perfect
@@ -87,11 +87,11 @@ namespace asl {
 		virtual ~LogMessageFormatter() {}
     };
 
- 
+
 // some assholes at Microsoft define max as macro, so if we want
 // to use std::numeric_traits::max() we have to get rid of it.
 #ifdef max
-	#ifndef _SETTING_NO_UNDEF_WARNING_ 
+	#ifndef _SETTING_NO_UNDEF_WARNING_
 		#warning Symbol 'max' defined as macro, undefining. (Outrageous namespace pollution by Microsoft, revealing arrogance and incompetence)
 	#endif
 #undef max
@@ -181,7 +181,7 @@ namespace asl {
         /** sets the global Message Formatter; the global formatter will be called just once and the result copied to all sinks
         that have no private formatter define */
         void setMessageFormatter(Ptr<LogMessageFormatter> theFormatter);
-        
+
         /** sets a new Message private message Formatter for a sink; if the sink is undefined, an exception is thrown*/
         void setMessageFormatter(Ptr<MessageSink> theSink, Ptr<LogMessageFormatter> theFormatter, Severity theSeverityFilter=SEV_TRACE);
     private:
@@ -236,7 +236,7 @@ namespace asl {
 // Although it might look obscure, this macro should generate no code at all and remove the logging
 // call expression which requires an ostream &; we use it to remove all trace logging when compiling
 // in non-debug mode
-// TODO: make this configurable on the build command line 
+// TODO: make this configurable on the build command line
 #define AC_DONT_LOG 0 && std::cerr
 
 /**
@@ -248,7 +248,7 @@ detected and you are going to abort program execution. */
 #define AC_FATAL AC_LOG(asl::SEV_FATAL, __FILE__, __LINE__)
 #define AC_FATAL_CHECK AC_LOG_CHECK(asl::SEV_FATAL, __FILE__, __LINE__)
 /**
-Use AC_ERROR << "myErrorMessage" in situations when an error occured that 
+Use AC_ERROR << "myErrorMessage" in situations when an error occured that
 is likely to have significant impact on further computation and
 might the reason for undesired or unexpected behavior of the application*/
 #define AC_ERROR AC_LOG(asl::SEV_ERROR, __FILE__, __LINE__)
@@ -283,7 +283,7 @@ to enable them on a per-file basis*/
 
 /**
 Use AC_SPAM << "myDebugMessage" if you think that a message spoils your debugging experience, but
-you do not want to delete it in case it might be handy some day. On per-file basis it may be 
+you do not want to delete it in case it might be handy some day. On per-file basis it may be
 more desirable to use the DB() macro to provide a comple-time switch; AC_SPAM is just useful for
 really annoying mesaages.*/
 #define AC_SPAM AC_DONT_LOG

@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -128,7 +128,7 @@ namespace asl {
                 this->val[0] = myCross[0];
                 this->val[1] = myCross[1];
                 this->val[2] = myCross[2];
-                this->val[3] = magnitude(theSourceVector)*magnitude(theTargetVector) + 
+                this->val[3] = magnitude(theSourceVector)*magnitude(theTargetVector) +
                     dot(theSourceVector, theTargetVector);
                 this->normalize();
             }
@@ -172,7 +172,7 @@ namespace asl {
                 return this->val[3];
             }
 
-            /** Extracts @p theAxis and @p theAngle from normalized quaternion. 
+            /** Extracts @p theAxis and @p theAngle from normalized quaternion.
              * If angle is almost 0, the axis is arbitrary and we
              * return [1,0,0].
              * @returns false if not normalized, otherwise true.
@@ -541,7 +541,7 @@ namespace asl {
                 mySinAt = static_cast<NUMBER>(sin(myAngle * theT));
                 mySinAomt = static_cast<NUMBER>(sin(myAngle*(1-theT)));
                 return (q * mySinAomt + myResult*mySinAt ) / mySinA;
-            } 
+            }
             // if the myAngle is small, use linear interpolation
             return lerp( q, myResult, theT);
     }

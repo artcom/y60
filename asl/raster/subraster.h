@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: subraster.h,v $
@@ -64,7 +64,7 @@ class subraster_base_iterator
 
         base_ptr ptr() const {return _cur;}
 
-        void calc_begin_and_end_of_line() 
+        void calc_begin_and_end_of_line()
         {
             if (_map->xsize() != _map->stride()) {
                 _begin_of_line = _cur - x();
@@ -125,7 +125,7 @@ class subraster_base_iterator
 /// This iterator is the standard iterator type for a subraster container
 /// It uses the origin and the stride from the supplied RASTER class to properly advance
 /// to the next line.
-/// 
+///
 template <class RASTER>
 class subraster_iterator : public subraster_base_iterator<RASTER>
 {
@@ -147,17 +147,17 @@ class subraster_iterator : public subraster_base_iterator<RASTER>
             this->_map = x;
             this->_cur = cur;
             this->calc_begin_and_end_of_line();
-        }	 
+        }
 
         reference operator*() const {
 #ifdef RANGE_CHECK
             if(_cur < _map->find(0, 0).ptr()) {
-                std::cerr << "dereference invalid iterator (too small): " 
+                std::cerr << "dereference invalid iterator (too small): "
                     <<  (void*)_cur << "<" << (void*)_map->find(0, 0).ptr() << " , xy = " << xy() << std::endl;
                 assert(0);
             }
             if(_cur > _map->find(_map->xsize()-1, _map->ysize() -1).ptr())  {
-                std::cerr << "dereference invalid iterator (too large): " 
+                std::cerr << "dereference invalid iterator (too large): "
                     <<  (void*)_cur << ">" << (void*)_map->find(x()-1, y()-1).ptr() << " , xy = " << xy() << std::endl;
                 assert(0);
             };
@@ -169,7 +169,7 @@ class subraster_iterator : public subraster_base_iterator<RASTER>
         iterator& operator--() { this->decrement(); return *this; }
 
 #define RETURN_VALUE_ON_POST_IN_AND_DECREMENT
-#ifdef RETURN_VALUE_ON_POST_IN_AND_DECREMENT    
+#ifdef RETURN_VALUE_ON_POST_IN_AND_DECREMENT
         iterator operator++(int) {
             subraster_iterator tmp = *this;
             this->increment();
@@ -222,7 +222,7 @@ class subraster_const_iterator : public subraster_base_iterator<const RASTER>
         typedef typename RASTER::const_reference const_reference;
         typedef typename RASTER::difference_type difference_type; // avoid gcc warning
         typedef typename RASTER::reference reference; // avoid gcc warning
-        
+
         subraster_const_iterator() {}
         subraster_const_iterator(const RASTER * x) {
             this->_map = x;
@@ -238,23 +238,23 @@ class subraster_const_iterator : public subraster_base_iterator<const RASTER>
         subraster_const_iterator(const subraster_iterator<RASTER> & it) {
             this->_map = it._map;
             this->_cur = it._cur;
-        } 	 
+        }
 
         subraster_const_iterator & operator=(const subraster_iterator<RASTER> & it) {
             this->_map = it._map;
             this->_cur = it._cur;
             return *this;
-        } 	 
+        }
 
         const_reference operator*() const {
 #ifdef RANGE_CHECK
             if(_cur < _map->find(0, 0).ptr()) {
-                std::cerr << "dereference invalid iterator (too small): " 
+                std::cerr << "dereference invalid iterator (too small): "
                     <<  (void*)_cur << "<" << (void*)_map->find(dim_type(0, 0)).ptr() << " , xy = " << xy() << std::endl;
                 assert(0);
             }
             if(_cur > _map->find(_map->xsize()-1, _map->ysize() -1).ptr())  {
-                std::cerr << "dereference invalid iterator (too large): " 
+                std::cerr << "dereference invalid iterator (too large): "
                     <<  (void*)_cur << ">" << (void*)_map->find(dim_type(x()-1, y()-1)).ptr() << " , xy = " << xy() << std::endl;
                 assert(0);
             };
@@ -265,7 +265,7 @@ class subraster_const_iterator : public subraster_base_iterator<const RASTER>
         const_iterator & operator++() { this->increment(); return *this; }
         const_iterator & operator--() { this->decrement(); return *this; }
 
-#ifdef RETURN_VALUE_ON_POST_IN_AND_DECREMENT    
+#ifdef RETURN_VALUE_ON_POST_IN_AND_DECREMENT
         const_iterator operator++(int) {
             subraster_const_iterator tmp = *this;
             this->increment();
@@ -317,17 +317,17 @@ iterator_category(const asl::subraster_const_iterator<RASTER> &) {
 }
 
 template <class RASTER>
-inline 
-typename asl::subraster_const_iterator<RASTER>::value_type * 
-value_type(const asl::subraster_const_iterator<RASTER> &) 
+inline
+typename asl::subraster_const_iterator<RASTER>::value_type *
+value_type(const asl::subraster_const_iterator<RASTER> &)
 {
   return (typename asl::subraster_const_iterator<RASTER>::value_type *)(0);
 }
 
 template <class RASTER>
-inline 
-typename asl::subraster_const_iterator<RASTER>::difference_type * 
-distance_type(const asl::subraster_const_iterator<RASTER> &) 
+inline
+typename asl::subraster_const_iterator<RASTER>::difference_type *
+distance_type(const asl::subraster_const_iterator<RASTER> &)
 {
   return (typename asl::subraster_const_iterator<RASTER>::difference_type *)(0);
 }
@@ -350,7 +350,7 @@ class const_subraster
         typedef subraster_const_iterator<raster_type> const_iterator;
         typedef const T * const_horizontal_line_iterator;
         typedef step_iterator<const T *,T,const T &,D> const_vertical_line_iterator;
-        typedef rect_iterator<const_horizontal_line_iterator, 
+        typedef rect_iterator<const_horizontal_line_iterator,
                 const_vertical_line_iterator, T, const T &, D> const_sub_iterator;
 
         typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
@@ -399,7 +399,7 @@ class const_subraster
             set((End-Begin)%Stride, (End-Begin)/Stride, Stride, Begin);
         }
 
-        const_subraster(D Xsize, D Ysize, D Stride, const_iterator it) { 
+        const_subraster(D Xsize, D Ysize, D Stride, const_iterator it) {
             set(Xsize, Ysize, Stride, &(*it));
         }
 
@@ -494,7 +494,7 @@ class const_subraster
 #else
     protected: // MEMBER FUNCTIONS
 #endif
-        const T * get_ptr(D X, D Y) const { 
+        const T * get_ptr(D X, D Y) const {
             return _dataptr + _stride * Y + X;
         }
     protected: // MEMBER CLASSES
@@ -539,7 +539,7 @@ using the same expression
 template <class T, class Alloc, class D>
 raster<T, Alloc, D>
 make_raster(const raster<T, Alloc, D>& m,
-        D xpos, D ypos, 
+        D xpos, D ypos,
         D xsize, D ysize)
 {
     return const_subraster<T, Alloc, D>(m, xpos, ypos, xsize, ysize).as_raster();
@@ -548,7 +548,7 @@ make_raster(const raster<T, Alloc, D>& m,
 template <class T, class Alloc, class D>
 raster<T, Alloc, D, TPTR>&
 make_raster(const const_subraster<T, Alloc, D>& m,
-        D xpos, D ypos, 
+        D xpos, D ypos,
         D xsize, D ysize)
 {
     return const_subraster<T, Alloc, D>(m, xpos, ypos, xsize, ysize).as_raster();
@@ -625,7 +625,7 @@ class subraster : public const_subraster<T, D>
             set((End-Begin)%Stride, (End-Begin)/Stride, Stride, Begin);
         }
 
-        subraster(D Xsize, D Ysize, D Stride, const_iterator it) { 
+        subraster(D Xsize, D Ysize, D Stride, const_iterator it) {
             set(Xsize, Ysize, Stride, &(*it));
         }
 
@@ -661,7 +661,7 @@ class subraster : public const_subraster<T, D>
         sub_iterator end(D x, D y, D xsize, D ysize) { return sub_iterator(hfind(x, y), vfind(x, y), xsize, hfind(x, y+ysize));}
         const_sub_iterator begin(D x, D y, D xsize, D ysize) const { return const_base::begin(x, y, xsize, ysize); }
         const_sub_iterator end(D x, D y, D xsize, D ysize) const { return const_base::end(x, y, xsize, ysize); }
-        
+
         horizontal_line_iterator hfind(D x = 0, D y = 0) { return horizontal_line_iterator(this->_dataptr + y * this->_stride + x);}
         horizontal_line_iterator hfind(T* ptr) { return hbegin(y(ptr));}
         horizontal_line_iterator hfind(vertical_line_iterator vit) { return horizontal_line_iterator(vit.base());}
@@ -705,7 +705,7 @@ class subraster : public const_subraster<T, D>
 
     protected: // MEMBER FUNCTIONS
 
-        T* get_ptr(D X, D Y) const { 
+        T* get_ptr(D X, D Y) const {
             return this->_dataptr + this->_stride * Y + X;
         }
 
@@ -736,8 +736,8 @@ SubMatrix clip_mat(const SubMatrix& m, int h_pos, int v_pos, int h_clip_size, in
     int h = h_min - h_pos;
     int v = v_min - v_pos;
 
-    return SubMatrix(m, h, v, h_size, v_size);     
-} 
+    return SubMatrix(m, h, v, h_size, v_size);
+}
 
 } // namespace asl
 #endif

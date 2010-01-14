@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -106,7 +106,7 @@ namespace asl {
             return true;
     }
     template<class Number>
-    bool intersection(const LineSegment<Number> & l, const Sphere<Number> & s, 
+    bool intersection(const LineSegment<Number> & l, const Sphere<Number> & s,
         std::vector<Point3<Number> > & P) {
             return intersection(s,l, P);
     }
@@ -134,8 +134,8 @@ namespace asl {
 
     // Line/Line intersection (G.Gems pp 304)
     template<class Number>
-    bool intersection(const Line<Number> & l1,const Line<Number> & l2, Point3<Number> & result, 
-        Number & t, Number & s) 
+    bool intersection(const Line<Number> & l1,const Line<Number> & l2, Point3<Number> & result,
+        Number & t, Number & s)
     {
         const Point3<Number> & p1 = l1.origin;
         const Point3<Number> & p2 = l2.origin;
@@ -146,11 +146,11 @@ namespace asl {
 
         if (almostEqual(cv2,0)) {
             //lines are parallel
-            return false;                
+            return false;
         }
         Vector3<Number> p21 = difference(p2,p1);
         t = det3x3(p21,v2,cv) / cv2;
-        s = det3x3(p21,v1,cv) / cv2;    
+        s = det3x3(p21,v1,cv) / cv2;
 
         if (almostEqual(p1 + t*v1,p2 + s*v2)) {
             //lines intersect
@@ -169,12 +169,12 @@ namespace asl {
     }
 
     template<class Number>
-    bool intersection(const LineSegment<Number> & ls1,const LineSegment<Number> & ls2, 
-        Point3<Number> & result, Number & t, Number & s) 
+    bool intersection(const LineSegment<Number> & ls1,const LineSegment<Number> & ls2,
+        Point3<Number> & result, Number & t, Number & s)
     {
         Line<Number> l1(ls1.origin, ls1.getDirection());
         Line<Number> l2(ls2.origin, ls2.getDirection());
-        bool mayIntersect = intersection(l1, l2, result, t, s);        
+        bool mayIntersect = intersection(l1, l2, result, t, s);
         //here we rely on ls1.getDirection() returning l1.end - l1.origin
         return mayIntersect && t >= 0 && t <= 1 && s >= 0 && s <= 1;
     }
@@ -186,11 +186,11 @@ namespace asl {
     }
 
     template<class Number>
-    bool intersection(const LineSegment<Number> & ls1,const Line<Number> & l2, 
-        Point3<Number> & result, Number & t, Number & s) 
+    bool intersection(const LineSegment<Number> & ls1,const Line<Number> & l2,
+        Point3<Number> & result, Number & t, Number & s)
     {
         Line<Number> l1(ls1.origin, ls1.getDirection());
-        bool mayIntersect = intersection(l1, l2, result, t, s);        
+        bool mayIntersect = intersection(l1, l2, result, t, s);
         //here we rely on ls1.getDirection() returning l1.end - l1.origin
         return mayIntersect && t >= 0 && t <= 1;
     }
@@ -202,8 +202,8 @@ namespace asl {
     }
 
     template<class Number>
-    bool intersection(const Line<Number> & l1,const LineSegment<Number> & ls2, 
-        Point3<Number> & result, Number & t, Number & s) 
+    bool intersection(const Line<Number> & l1,const LineSegment<Number> & ls2,
+        Point3<Number> & result, Number & t, Number & s)
     {
         return intersection(ls2,l1,result,s,t);
     }
@@ -217,12 +217,12 @@ namespace asl {
 
     //line segment - ray intersection
     template<class Number>
-    bool intersection(const LineSegment<Number> & ls1,const Ray<Number> & r2, 
-        Point3<Number> & result, Number & t, Number & s) 
+    bool intersection(const LineSegment<Number> & ls1,const Ray<Number> & r2,
+        Point3<Number> & result, Number & t, Number & s)
     {
         Line<Number> l1(ls1.origin, ls1.getDirection());
         const Line<Number> & l2 = asLine(r2);
-        bool mayIntersect = intersection(l1, l2, result, t, s);        
+        bool mayIntersect = intersection(l1, l2, result, t, s);
         //here we rely on ls1.getDirection() returning l1.end - l1.origin
         return mayIntersect && t >= 0 && t <= 1 && s >= 0;
     }
@@ -234,8 +234,8 @@ namespace asl {
     }
 
     template<class Number>
-    bool intersection(const Ray<Number> & r1,const LineSegment<Number> & ls2, 
-        Point3<Number> & result, Number & t, Number & s) 
+    bool intersection(const Ray<Number> & r1,const LineSegment<Number> & ls2,
+        Point3<Number> & result, Number & t, Number & s)
     {
         return intersection(ls2,r1,result,s,t);
     }
@@ -248,11 +248,11 @@ namespace asl {
 
     //line - ray intersection
     template<class Number>
-    bool intersection(const Line<Number> & l1,const Ray<Number> & r2, 
-        Point3<Number> & result, Number & t, Number & s) 
+    bool intersection(const Line<Number> & l1,const Ray<Number> & r2,
+        Point3<Number> & result, Number & t, Number & s)
     {
         const Line<Number> & l2 = asLine(r2);
-        bool mayIntersect = intersection(l1, l2, result, t, s);        
+        bool mayIntersect = intersection(l1, l2, result, t, s);
         //here we rely on ls1.getDirection() returning l1.end - l1.origin
         return mayIntersect && s >= 0;
     }
@@ -264,8 +264,8 @@ namespace asl {
     }
 
     template<class Number>
-    bool intersection(const Ray<Number> & r1,const Line<Number> & l2, 
-        Point3<Number> & result, Number & t, Number & s) 
+    bool intersection(const Ray<Number> & r1,const Line<Number> & l2,
+        Point3<Number> & result, Number & t, Number & s)
     {
         return intersection(l2,r1,result,s,t);
     }
@@ -341,7 +341,7 @@ namespace asl {
         }
         factor = f;
         //Number dist = clamp(dot(direction, p-l.origin),0.0f,1.0f);
-        return l.origin + direction * clamp(f, 0.0f, 1.0f); 
+        return l.origin + direction * clamp(f, 0.0f, 1.0f);
     }
     template<class Number>
     Point3<Number> nearest(const Point3<Number> & p, const LineSegment<Number> & l) {
@@ -453,7 +453,7 @@ namespace asl {
     template <class Number>
     bool intersection(const Plane<Number> & p1,
         const Plane<Number> & p2,
-        Line<Number> & theResult) 
+        Line<Number> & theResult)
     {
         Vector3<Number> myDirection = cross(p1.normal, p2.normal);
         if (almostEqual(dot(myDirection, myDirection), 0)) {
@@ -465,7 +465,7 @@ namespace asl {
         //for (int i = 0; i < 3; ++i) {
         //    if (!almostEqual(myDirection[i], 0)) {
         //        return true;
-        //    }        
+        //    }
         //}
         //return false;
     }

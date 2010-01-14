@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -145,7 +145,7 @@ namespace asl {
         } else {
             myStart = getLastPosition();
         }
-        
+
         AC_DEBUG << "cbezier: start: " << myStart << " cp0: " << theStartAnchor << " cp1: " << theEndAnchor << " end: " << theEnd;
         BSplinePtr myBezier( new BSplinef(myStart,
                             resolveRelative(theStartAnchor, theRelativeFlag),
@@ -154,7 +154,7 @@ namespace asl {
         appendBezierSegment( myBezier );
     }
 
-    /// Cubic bezier spline from points. 
+    /// Cubic bezier spline from points.
     void SvgPath::cbezierFromPoints(const Vector3f & theBeforeStartPoint,
                                     const Vector3f & theStartPoint,
                                     const Vector3f & theEndPoint,
@@ -179,7 +179,7 @@ namespace asl {
             // TODO: throw: Can't close empty path
         }
         Vector3f myCurrentPoint = getLastPosition();
-        
+
         appendBezierSegment( createLinearBezier( myCurrentPoint, _myOrigin));
         AC_TRACE << "close " << _myOrigin;
     }
@@ -426,7 +426,7 @@ namespace asl {
         _myOrigin = Vector3f(0.0f, 0.0f, 0.0f);
         _myPreviousCommand.token = NONE;
         _myPreviousCommand.command = ' ';
-        _myPreviousCommand.numArgs= 0; 
+        _myPreviousCommand.numArgs= 0;
         _mySegmentLength = 2.0f;
         _myNumSegments = 2;
     }
@@ -444,10 +444,10 @@ namespace asl {
         }
     }
 
- 
+
     void SvgPath::appendBezierSegment( BSplinePtr theSpline) {
         _myBezierSegments.push_back( theSpline );
-        
+
         if ( theSpline->isLineSegment() ) {
             LineSegment3fPtr myElement( new LineSegment<float>( theSpline->getStart(), theSpline->getEnd()));
             _myElements.push_back( myElement );
@@ -647,7 +647,7 @@ namespace asl {
             case QUADRATIC_BEZIER:
                 {
                     // XXX this is not really a quadradic bezier since our BSpline is cubic.
-                    Vector3f myCp1 = Vector3f(theArgs[0], theArgs[1], 0.0f); 
+                    Vector3f myCp1 = Vector3f(theArgs[0], theArgs[1], 0.0f);
                     Vector3f myEnd = Vector3f(theArgs[2], theArgs[3], 0.0f);
                     cbezier( myCp1, myCp1, myEnd, theRelativeFlag );
 
@@ -748,7 +748,7 @@ namespace asl {
 
         return myPath;
     }
-    
+
     asl::Vector3f
     SvgPath::resolveRelative( const asl::Vector3f & thePos, bool theFlag) const {
         asl::Vector3f myResult = thePos;
@@ -762,7 +762,7 @@ namespace asl {
         return myResult;
     }
 
-    Vector3f 
+    Vector3f
     SvgPath::getShorthandControlPoint( bool theRelativeFlag) {
         if ( _myPreviousCommand.token == MOVE_TO || _myBezierSegments.empty()) {
             return _myOrigin;

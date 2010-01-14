@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -83,7 +83,7 @@ static const char * PropertyStrings[] = {
     "petable",
     "ridable",
     "crushable",
-    "" 
+    ""
 };
 
 
@@ -153,7 +153,7 @@ public:
                 //cerr << "kaputt '" << myAnimal << "'" << endl;
                 FAILURE("Switch failed.");
         }
-        
+
         for (unsigned i = 0; i < Animal::MAX; ++i) {
             DPRINT2(i, Animal::getString(i));
             //cerr << i << " = " << Animal::getString(i) << endl;
@@ -293,7 +293,7 @@ int main(int argc, char *argv[]) {
         returnStatus = 0;
     } else {
         cerr << "## No tests." << endl;
-        
+
     }
     cerr << ">> Finsihed test suite '" << argv[0] << "', return status = " << returnStatus << endl;
 

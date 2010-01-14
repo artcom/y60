@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: testPtr.tst.cpp,v $
@@ -436,7 +436,7 @@ public:
         addTest(mySingleProcessorTest);
 #else
         delete mySingleProcessorTest;
-#endif        
+#endif
         addTest(new PtrUnitTest<0,MultiProcessor>);
 
 #if 1
@@ -459,7 +459,7 @@ public:
         addTest(mySingleProcessorPrefTest);
 #else
         delete mySingleProcessorPrefTest;
-#endif        
+#endif
         addTest(new PtrUnitPerfTest<0,MultiProcessor>);
     }
 };

@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: testStatistic.tst.cpp,v $
@@ -27,7 +27,7 @@
 
 #include <math.h>
 
-using namespace std; 
+using namespace std;
 
 class StatisticUnitTest : public UnitTest {
     public:
@@ -39,7 +39,7 @@ class StatisticUnitTest : public UnitTest {
 
     private:
 };
- 
+
 void
 StatisticUnitTest::testStatisticBase() {
     cerr << "Testing asl::Statistic" << endl;
@@ -49,38 +49,38 @@ StatisticUnitTest::testStatisticBase() {
     // Test standard functions
     myStatistic.addSample(1.0);
     myStatistic.addSample(5.0);
-    myStatistic.addSample(3.0);    
-    myStatistic.addSample(3.0);    
+    myStatistic.addSample(3.0);
+    myStatistic.addSample(3.0);
 
     cerr << myStatistic << endl;
-    ENSURE_MSG(myStatistic.getNumberOfSamples() == 4, "getNumberOfSamples == 4"); 
-    ENSURE_MSG(myStatistic.getMaximum() == 5.0, "getMaximum == 5.0"); 
-    ENSURE_MSG(myStatistic.getMinimum() == 1.0, "getMinimum == 1.0"); 
-    ENSURE_MSG(myStatistic.getAverage() == 3.0, "getAverage == 3.0"); 
-    ENSURE_MSG(myStatistic.getVariance() == 2.0, "getVariance == 2.0"); 
-    //ENSURE_MSG(myStatistic.getStandardDeviation() == sqrt(2.0), "getStandardDev. == sqrt(2)");    
+    ENSURE_MSG(myStatistic.getNumberOfSamples() == 4, "getNumberOfSamples == 4");
+    ENSURE_MSG(myStatistic.getMaximum() == 5.0, "getMaximum == 5.0");
+    ENSURE_MSG(myStatistic.getMinimum() == 1.0, "getMinimum == 1.0");
+    ENSURE_MSG(myStatistic.getAverage() == 3.0, "getAverage == 3.0");
+    ENSURE_MSG(myStatistic.getVariance() == 2.0, "getVariance == 2.0");
+    //ENSURE_MSG(myStatistic.getStandardDeviation() == sqrt(2.0), "getStandardDev. == sqrt(2)");
 
     // Test reset
     myStatistic.reset();
     myStatistic.addSample(1.0);
 
     cerr << myStatistic << endl;
-    ENSURE_MSG(myStatistic.getNumberOfSamples() == 1, "getNumberOfSamples == 1"); 
-    ENSURE_MSG(myStatistic.getMaximum() == 1.0, "getMaximum == 1.0"); 
-    ENSURE_MSG(myStatistic.getMinimum() == 1.0, "getMinimum == 1.0"); 
-    ENSURE_MSG(myStatistic.getAverage() == 1.0, "getAverage == 1.0"); 
-    ENSURE_MSG(myStatistic.getVariance() == 0.0, "getVariance == 0.0"); 
-    ENSURE_MSG(myStatistic.getStandardDeviation() == 0.0, "getStandardDev. == 0.0"); 
+    ENSURE_MSG(myStatistic.getNumberOfSamples() == 1, "getNumberOfSamples == 1");
+    ENSURE_MSG(myStatistic.getMaximum() == 1.0, "getMaximum == 1.0");
+    ENSURE_MSG(myStatistic.getMinimum() == 1.0, "getMinimum == 1.0");
+    ENSURE_MSG(myStatistic.getAverage() == 1.0, "getAverage == 1.0");
+    ENSURE_MSG(myStatistic.getVariance() == 0.0, "getVariance == 0.0");
+    ENSURE_MSG(myStatistic.getStandardDeviation() == 0.0, "getStandardDev. == 0.0");
 
     // Test enable/disable
     myStatistic.disable();
     myStatistic.addSample(1.0);
-    ENSURE_MSG(myStatistic.getNumberOfSamples() == 1, "disable statistic"); 
+    ENSURE_MSG(myStatistic.getNumberOfSamples() == 1, "disable statistic");
 
     myStatistic.enable();
     myStatistic.addSample(1.0);
-    ENSURE_MSG(myStatistic.getNumberOfSamples() == 2, "enable statistic");     
- 
+    ENSURE_MSG(myStatistic.getNumberOfSamples() == 2, "enable statistic");
+
     cerr << "Testing Statistic auto-output" << endl;
     asl::Statistic myStatistic2("Output after 2 samples", 2);
     myStatistic2.addSample(0);
@@ -89,7 +89,7 @@ StatisticUnitTest::testStatisticBase() {
 
     asl::Statistic myStatistic3("Output after 0.1 seconds", 0.1);
     myStatistic3.addSample(0);
-    asl::msleep(60);    
+    asl::msleep(60);
     myStatistic3.addSample(1);
     asl::msleep(60);
     myStatistic3.addSample(2);
@@ -106,9 +106,9 @@ StatisticUnitTest::testBoolStatistic() {
     myStatistic.addSample(false);
 
     cerr << myStatistic << endl;
-    ENSURE_MSG(myStatistic.getNumberOfSamples() == 3, "getNumberOfSamples == 3"); 
-    ENSURE_MSG(myStatistic.getMaximum() == 1.0, "getMaximum == 1.0"); 
-    ENSURE_MSG(myStatistic.getMinimum() == 0.0, "getMinimum == 0.0"); 
+    ENSURE_MSG(myStatistic.getNumberOfSamples() == 3, "getNumberOfSamples == 3");
+    ENSURE_MSG(myStatistic.getMaximum() == 1.0, "getMaximum == 1.0");
+    ENSURE_MSG(myStatistic.getMinimum() == 0.0, "getMinimum == 0.0");
     ENSURE_MSG(myStatistic.getNumberOfHits() == 2, "getNumberOfHits == 2");
 
     cerr << "Testing BoolStatistic auto-output" << endl;
@@ -119,7 +119,7 @@ StatisticUnitTest::testBoolStatistic() {
 
     asl::BoolStatistic myStatistic3("Output after 0.1 seconds", 0.1);
     myStatistic3.addSample(true);
-    asl::msleep(60);    
+    asl::msleep(60);
     myStatistic3.addSample(false);
     asl::msleep(60);
     myStatistic3.addSample(true);
@@ -136,23 +136,23 @@ StatisticUnitTest::testFrequencyStatistic() {
     asl::msleep(100);
     myStatistic.addSample();
 
-    ENSURE_MSG(myStatistic.getNumberOfSamples() == 2, "getNumberOfSamples == 2"); 
-    ENSURE_MSG(myStatistic.getMaximum() > 7 , "getMaximum > 7"); 
-    ENSURE_MSG(myStatistic.getMaximum() < 13 , "getMaximum < 13");    
-    ENSURE_MSG(myStatistic.getMinimum() > 7, "getMinimum > 7"); 
-    ENSURE_MSG(myStatistic.getMinimum() < 13, "getMinimum < 13"); 
+    ENSURE_MSG(myStatistic.getNumberOfSamples() == 2, "getNumberOfSamples == 2");
+    ENSURE_MSG(myStatistic.getMaximum() > 7 , "getMaximum > 7");
+    ENSURE_MSG(myStatistic.getMaximum() < 13 , "getMaximum < 13");
+    ENSURE_MSG(myStatistic.getMinimum() > 7, "getMinimum > 7");
+    ENSURE_MSG(myStatistic.getMinimum() < 13, "getMinimum < 13");
 
-    ENSURE_MSG(myStatistic.getAverage() > 7, "getAverage > 7"); 
-    ENSURE_MSG(myStatistic.getAverage() < 13, "getAverage < 13");     
+    ENSURE_MSG(myStatistic.getAverage() > 7, "getAverage > 7");
+    ENSURE_MSG(myStatistic.getAverage() < 13, "getAverage < 13");
 
     cerr << myStatistic << endl;
-    
+
     myStatistic.reset();
     myStatistic.addSample();
     asl::msleep(50);
     myStatistic.addSample();
     ENSURE_MSG(myStatistic.getMaximum() > 15, "reset (maximum > 15)");
-    ENSURE_MSG(myStatistic.getMinimum() > 15, "reset (minimum > 15)");    
+    ENSURE_MSG(myStatistic.getMinimum() > 15, "reset (minimum > 15)");
 
     cerr << myStatistic << endl;
 
@@ -166,7 +166,7 @@ StatisticUnitTest::testFrequencyStatistic() {
 
     asl::FrequencyStatistic myStatistic3("Output after 0.1 seconds", 0.1);
     myStatistic3.addSample();
-    asl::msleep(60);    
+    asl::msleep(60);
     myStatistic3.addSample();
     asl::msleep(60);
     myStatistic3.addSample();

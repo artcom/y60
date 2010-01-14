@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: testThreadLock.tst.cpp,v $
@@ -50,7 +50,7 @@ void *threadFunc (void * This) {
 
 void
 LockUnitTest::run() {
-    
+
     _myLock.lock();
     _myLock.unlock();
     ENSURE_MSG(true, "Simple locks work.");
@@ -58,24 +58,24 @@ LockUnitTest::run() {
     _myLock.lock();
 
     int myRetVal = pthread_create (&_myThread, 0, threadFunc, this);
-    ENSURE_MSG (myRetVal == 0, "pthread_create succeeded"); 
+    ENSURE_MSG (myRetVal == 0, "pthread_create succeeded");
 
     // Do something with the shared variable.
     for (_mySharedVar=0; _mySharedVar<1000;_mySharedVar++) ;
     ENSURE_MSG (_mySharedVar == 1000, "Basic Lock works");
     asl::msleep (500);
     _myLock.unlock();
-    
+
     void * myThreadRetVal;
-    myRetVal = pthread_join (_myThread, &myThreadRetVal); 
+    myRetVal = pthread_join (_myThread, &myThreadRetVal);
     ENSURE_MSG (myRetVal == 0, "pthread_join succeeded");
-    
+
     _myLock.lock();
     _myLock.lock();
     _myLock.unlock();
     _myLock.unlock();
     ENSURE_MSG(true, "Recursive locks are allowed.");
-    
+
     // See if resources are freed.
     for (int i=0; i< 1000000; i++) {
         asl::ThreadLock myLock;
@@ -85,11 +85,11 @@ LockUnitTest::run() {
     ENSURE_MSG(true, "Using a million locks sequentially is possible.");
 }
 
-void 
+void
 LockUnitTest::secondThread() {
     int myRetVal = _myLock.nonblock_lock();
     ENSURE_MSG (myRetVal == EBUSY, "nonblock_lock returns EBUSY");
-    
+
     _myLock.lock();
     // Make sure the first thread had time to run.
     ENSURE (_mySharedVar == 1000);

@@ -5,18 +5,18 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: testValue.tst.cpp,v $
 //
 //   $Revision: 1.15 $
 //
-//      Author: 
+//      Author:
 //
-// Description: 
+// Description:
 //
 //
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
@@ -72,10 +72,10 @@ namespace asl {
                 os << ",";
             }
         }
-        return os << "]";    
-    } 
+        return os << "]";
+    }
 #endif
-    
+
  template <class T>
     std::istream & parseVector(std::istream & is, std::vector<T> & v) {
         char myChar;
@@ -103,7 +103,7 @@ namespace asl {
                 is.setstate(std::ios::failbit);
                 return is;
             }
-            
+
             v.push_back(myElement);
         }
         return is;
@@ -112,7 +112,7 @@ namespace asl {
     template <class T>
     std::ostream & operator<<(std::ostream & os, const std::vector<T> & t) {
         return asl::printVector(os,t,t.size()>4);
-    } 
+    }
 
     template <class T>
     std::istream & operator>>(std::istream & is, std::vector<T> & t) {
@@ -121,7 +121,7 @@ namespace asl {
 
     std::ostream &
     operator << (std::ostream & theStream, const std::vector<std::string> & theStringVector);
-    
+
     std::istream &
     operator >> (std::istream & theStream, std::vector<std::string> & theStringVector);
 
@@ -164,22 +164,22 @@ operator >> (std::istream & theStream, std::vector<std::string> & theStringVecto
                 myElement += myChar;
             }
         } while ( ! theStream.eof());
-            
+
         if (myChar != ']') {
             theStream.setstate(std::ios::failbit);
         }
-        
+
         return theStream;
 }
 
 template <class T>
 class XmlValueUnitTest : public TemplateUnitTest {
 public:
-    XmlValueUnitTest(const char * theTemplateArgument, T testValue) 
+    XmlValueUnitTest(const char * theTemplateArgument, T testValue)
         : TemplateUnitTest("XmlValueUnitTest",theTemplateArgument),
           _someVariable(testValue), _myTypeName(theTemplateArgument) {}
     void run() {
-		
+
 		dom::SimpleValue<T> myDefaultConstructedValue(0);
 		SUCCESS("myDefaultConstructedValue");
 
@@ -198,7 +198,7 @@ public:
 		dom::registerStandardTypes(myValueFactory);
         myValueFactory.registerPrototype(_myTypeName,dom::ValuePtr(new dom::SimpleValue<T>(0)));
 		SUCCESS("Initialized myValueFactory");
-		
+
 		dom::ValuePtr myValue(myValueFactory.createValue(_myTypeName,asl::as_string(_someVariable),0));
 		ENSURE(myValue);
 		ENSURE(dom::dynamic_cast_Value<T>(myValue.get()));
@@ -208,7 +208,7 @@ public:
 		ENSURE(myBinValue);
 		ENSURE(dom::dynamic_cast_Value<T>(myBinValue.get()));
 		ENSURE(*dom::dynamic_cast_Value<T>(myBinValue.get()) == _someVariable);
-		
+
 		{
         	dom::SimpleValue<T> myConfusedValue(_someVariable, 0);
         	//ENSURE(asl::as<T>(myConfusedValue.getStringReference()) == _someVariable); // getStringReference removed from value API
@@ -229,10 +229,10 @@ private:
 
 template <template <class,
                     template<class,class,class> class,
-                    class > 
+                    class >
          class VALUE,
          class T,
-         class ELEMENT_VALUE> 
+         class ELEMENT_VALUE>
 struct ValueTraits;
 
 template<class T, class ElementValue> struct ValueTraits<ComplexValue,T, ElementValue> {
@@ -246,19 +246,19 @@ template<class T, class ElementValue> struct ValueTraits<VectorValue,T,ElementVa
 
 template <template <class,
                     template<class,class,class> class,
-                    class > 
-         class VALUE, 
+                    class >
+         class VALUE,
          class T,
          class ELEMENT_VALUE>
 class XmlVectorValueUnitTest : public TemplateUnitTest {
 public:
-    XmlVectorValueUnitTest(const char * theTemplateArgument, T testValue) 
+    XmlVectorValueUnitTest(const char * theTemplateArgument, T testValue)
         : TemplateUnitTest("XmlValueUnitTest-",theTemplateArgument),
           _someVariable(testValue), _myTypeName(theTemplateArgument) {}
     void run() {
 
         typedef typename ValueTraits<VALUE,T,ELEMENT_VALUE>::ValueType ValueType;
-		
+
 		ValueType myDefaultConstructedValue(0);
 		SUCCESS("myDefaultConstructedValue");
 
@@ -292,13 +292,13 @@ public:
 
         std::cerr << _someVariable << endl;
         std::cerr << myBinaryInitializedValue.getValue() << endl;
-         
+
         ENSURE(myBinaryInitializedValue.getValue() != _someVariable);
-       
+
         dom::ValueFactory myValueFactory;
         myValueFactory.registerPrototype(_myTypeName,dom::ValuePtr(new ValueType(0)));
 		SUCCESS("Initialized myValueFactory");
-		
+
 		dom::ValuePtr myValue(myValueFactory.createValue(_myTypeName,asl::as_string(_someVariable), 0));
 		ENSURE(myValue);
 		ENSURE(dom::dynamic_cast_Value<T>(myValue.get()));
@@ -308,7 +308,7 @@ public:
 		ENSURE(myBinValue);
 		ENSURE(dom::dynamic_cast_Value<T>(myBinValue.get()));
 		ENSURE(*dom::dynamic_cast_Value<T>(myBinValue.get()) == _someVariable);
-        
+
         // now test vector operations
         ValueType myTestValue(myOriginalVector, 0); // should contain three value
         ENSURE(myTestValue.length() == myOriginalVector.size());
@@ -328,14 +328,14 @@ public:
         ENSURE(myElement1);
         ValuePtr myElement2 = myTestValue.getItem(2);
         ENSURE(myElement2);
-        
+
         // test item append
         //DPRINT(myTestValue.getString());
         myTestValue.appendItem(*myTestValue.getItem(0));
         //DPRINT(myTestValue.getString());
         ENSURE(myTestValue.length() == myOriginalVector.size()+1);
         ENSURE(myTestValue.getItem(myTestValue.length()-1)->getString() == myTestValue.getItem(0)->getString());
-        
+
         // test list get and append
         ValuePtr myList = myTestValue.getList(1,2);
         ENSURE(myList);
@@ -350,7 +350,7 @@ public:
         ValuePtr myFullList = myTestValue.getList(0,myTestValue.length());
         ENSURE(myFullList);
         ENSURE(myTestValue.getString() == myFullList->getString());
-        
+
         // test item insertion
         myTestValue.insertItemBefore(0, *myElement0);
         ENSURE(myTestValue.getItem(0)->getString() == myElement0->getString());
@@ -364,7 +364,7 @@ public:
         myTestValue.insertItemBefore(2, *myElement2);
         ENSURE(myTestValue.length() == myOriginalVector.size()+6);
         DPRINT(myTestValue.getString());
-        
+
         ValuePtr myNewList = myTestValue.getList(3,myTestValue.length()-3);
         ENSURE(myNewList->getString() == myFullList->getString());
         //DPRINT(myFullList->getString());
@@ -380,7 +380,7 @@ public:
         ENSURE(myInsertedList->getString() == myList->getString());
         //DPRINT(myInsertedList->getString());
         //DPRINT(myTestValue.getString());
-        
+
         // item erase
         myNewList = myTestValue.getList(1,myTestValue.length()-1);
         unsigned myCurLen = myTestValue.length();
@@ -390,23 +390,23 @@ public:
         myFullList = myTestValue.getList(0,myTestValue.length());
         //DPRINT(myTestValue.getString());
         ENSURE(myNewList->getString() == myFullList->getString());
-        
+
         myNewList = myTestValue.getList(2,myTestValue.length()-2);
         ENSURE(myNewList);
         myTestValue.eraseItem(1);
         myFullList = myTestValue.getList(1,myTestValue.length()-1);
         ENSURE(myNewList->getString() == myFullList->getString());
         //DPRINT(myTestValue.getString());
-        
+
         myTestValue.setItem(0,*myElement0); // make list nice
-        
+
         myNewList = myTestValue.getList(0,myTestValue.length()-1);
         myTestValue.eraseItem(myTestValue.length()-1); // end
         myFullList = myTestValue.getList(0,myTestValue.length());
         ENSURE(myNewList->getString() == myFullList->getString());
 
         //DPRINT(myTestValue.getString());
-        
+
         // range erase
         myNewList = myTestValue.getList(2,myTestValue.length()-2);
         myCurLen = myTestValue.length();
@@ -416,19 +416,19 @@ public:
         myFullList = myTestValue.getList(0,myTestValue.length());
         //DPRINT(myTestValue.getString());
         ENSURE(myNewList->getString() == myFullList->getString());
-        
+
         myNewList = myTestValue.getList(3,myTestValue.length()-3);
         ENSURE(myNewList);
         myTestValue.eraseList(1,2);
         myFullList = myTestValue.getList(1,myTestValue.length()-1);
         ENSURE(myNewList->getString() == myFullList->getString());
         //DPRINT(myTestValue.getString());
-                
+
         myNewList = myTestValue.getList(0,myTestValue.length()-2);
         myTestValue.eraseList(myTestValue.length()-2,2); // end
         myFullList = myTestValue.getList(0,myTestValue.length());
         ENSURE(myNewList->getString() == myFullList->getString());
-        
+
         //DPRINT(myTestValue.getString());
         myTestValue.eraseList(0, myTestValue.length()); // all
         ENSURE(myTestValue.length() == 0);
@@ -447,7 +447,7 @@ private:
 */
 
 //#ifdef _SETTING_GCC_TEMPLATE_BUG_WORKAROUND_
-//template <template <class> class VALUE, 
+//template <template <class> class VALUE,
 //          class T>
 //#else
 template <template <class,template<class,class,class> class,class> class VALUE,
@@ -455,12 +455,12 @@ template <template <class,template<class,class,class> class,class> class VALUE,
 //#endif
 class XmlRasterValueUnitTest : public TemplateUnitTest {
 public:
-    XmlRasterValueUnitTest(const char * theTemplateArgument, T testValue) 
+    XmlRasterValueUnitTest(const char * theTemplateArgument, T testValue)
         : TemplateUnitTest("XmlValueUnitTest-",theTemplateArgument),
           _someVariable(testValue), _myTypeName(theTemplateArgument) {}
         typedef VALUE<T, dom::MakeResizeableRaster, SimpleValue<typename T::value_type> >VALUE_T;
     void run() {
-        
+
 		VALUE_T myDefaultConstructedValue(0);
 		SUCCESS("myDefaultConstructedValue");
 
@@ -488,13 +488,13 @@ public:
 
         std::cerr << _someVariable << endl;
         std::cerr << myBinaryInitializedValue.getValue() << endl;
-         
+
         ENSURE(myBinaryInitializedValue.getValue() != _someVariable);
-       
+
         dom::ValueFactory myValueFactory;
         myValueFactory.registerPrototype(_myTypeName,dom::ValuePtr(new VALUE_T(0)));
 		SUCCESS("Initialized myValueFactory");
-		
+
 		dom::ValuePtr myValue(myValueFactory.createValue(_myTypeName,asl::as_string(_someVariable), 0));
 		ENSURE(myValue);
 		ENSURE(dom::dynamic_cast_Value<T>(myValue.get()));
@@ -504,8 +504,8 @@ public:
 		ENSURE(myBinValue);
 		ENSURE(dom::dynamic_cast_Value<T>(myBinValue.get()));
 		ENSURE(*dom::dynamic_cast_Value<T>(myBinValue.get()) == _someVariable);
-	    
-        ResizeableRaster & myRaster = dynamic_cast<ResizeableRaster&>(*myValue);	
+
+        ResizeableRaster & myRaster = dynamic_cast<ResizeableRaster&>(*myValue);
         myRaster.resize(20, 10);
 #ifdef WIN32
         try {
@@ -516,7 +516,7 @@ public:
         }
 #else
         myRaster.pasteRaster(myInitializedValue);
-#endif        
+#endif
     }
 private:
     T _someVariable;
@@ -526,9 +526,9 @@ private:
 template <class T>
 class BinarizeVectorUnitTest : public TemplateUnitTest {
 public:
-    BinarizeVectorUnitTest(const char * theTemplateArgument, T testValue) 
+    BinarizeVectorUnitTest(const char * theTemplateArgument, T testValue)
         : TemplateUnitTest("BinarizeVectorUnitTest-",theTemplateArgument),
-          _someVariable(testValue), _myTypeName(theTemplateArgument) 
+          _someVariable(testValue), _myTypeName(theTemplateArgument)
     {}
 
     void testString(std::string theString) {
@@ -571,7 +571,7 @@ public:
     }
 
     void run() {
-		
+
         asl::Block myStringBlock;
         std::string myString = "blafasel";
         dom::binarize(myString, myStringBlock);
@@ -583,7 +583,7 @@ public:
         ENSURE(myString == myOtherString);
         std::string secondString = "hallo";
         dom::binarize(secondString,myStringBlock);
-        unsigned long myNewStringBlockSize = myStringBlock.size(); 
+        unsigned long myNewStringBlockSize = myStringBlock.size();
         ENSURE(myNewStringBlockSize);
         std::string myRebinSecondString;
         unsigned long mySecondStringEnd = dom::debinarize(myRebinSecondString,myStringBlock,myStringBlockSize);
@@ -614,7 +614,7 @@ public:
         testString("aa");
         testString("aaaaaabbbbbbbaaaaaaaaaabbbbbbbb");
         testString("abbbbbbbbabaaaaaaaabbbbbbbbaaaaaaaaaaaa");
-        
+
         {
             int myInts[] = {0,1,2,3,4};
             testIntString(myInts,5);
@@ -684,7 +684,7 @@ public:
         } {
             int myInts[] = {0};
             testIntString(myInts,0);
-        } 
+        }
     }
 private:
     T _someVariable;
@@ -705,7 +705,7 @@ static const char * AnimalPropertyStrings[] = {
     "petable",
     "ridable",
     "crushable",
-    "" 
+    ""
 };
 
 #define NOPARAMETER
@@ -730,7 +730,7 @@ class BitsetValueUnitTest : public UnitTest {
             ENSURE( theProps == myNode->nodeValueRef<AnimalProperties>());
 
         }
-        
+
         void run()
         {
             dom::Document mySchema(
@@ -753,10 +753,10 @@ class BitsetValueUnitTest : public UnitTest {
             myDocument.parse("<animal properties='[petable]'/>");
             ENSURE(myDocument);
 
-            testAnimal(myDocument, AnimalProperties()); 
-            testAnimal(myDocument, AnimalProperties(1 << PETABLE)); 
-            testAnimal(myDocument, AnimalProperties((1 << PETABLE) | (1 << CRUSHABLE))); 
-            testAnimal(myDocument, AnimalProperties((1 << PETABLE) | (1 << CRUSHABLE) | (1 << RIDEABLE) | (1 << EDIBLE) )); 
+            testAnimal(myDocument, AnimalProperties());
+            testAnimal(myDocument, AnimalProperties(1 << PETABLE));
+            testAnimal(myDocument, AnimalProperties((1 << PETABLE) | (1 << CRUSHABLE)));
+            testAnimal(myDocument, AnimalProperties((1 << PETABLE) | (1 << CRUSHABLE) | (1 << RIDEABLE) | (1 << EDIBLE) ));
         }
 };
 
@@ -766,10 +766,10 @@ public:
     MyTestSuite(const char * myName, int argc, char *argv[]) : UnitTestSuite(myName, argc, argv) {}
     void setup() {
         UnitTestSuite::setup(); // called to print a launch message
-        
+
         addTest(new XmlValueUnitTest<int>("int",23));
         addTest(new XmlValueUnitTest<float>("float",43.23f));
-        
+
         float myNumber[3] = { 0.0f, 1.0f, 2.0f };
         std::vector<float> myVec(myNumber, myNumber + 3);
         addTest(new XmlVectorValueUnitTest<dom::VectorValue,std::vector<float>,SimpleValue<float> >("vector<float>",myVec));

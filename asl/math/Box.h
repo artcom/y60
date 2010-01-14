@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -189,17 +189,17 @@ namespace asl {
             return bb.hasPosition() && hasPosition() &&
                   (envelopes(bb.getMin()) && envelopes(bb.getMax()));
         }
-        /** Returns TRUE if intersection of given boxes is a non-empty box 
+        /** Returns TRUE if intersection of given boxes is a non-empty box
            Note that in many cases you will prefer to use "touches" for  calculation
            of collision and visibility determination in order to fail on the safe side
            regarding numerical inaccuracies
          * @see touches(const Box2<Number> & pt) const
         */
         bool intersects(const Box2 & theOtherBox) const {
-            return 
-                (asl::maximum(theOtherBox.val[MIN][0], this->val[MIN][0]) < 
+            return
+                (asl::maximum(theOtherBox.val[MIN][0], this->val[MIN][0]) <
                  asl::minimum(theOtherBox.val[MAX][0], this->val[MAX][0])) &&
-                (asl::maximum(theOtherBox.val[MIN][1], this->val[MIN][1]) < 
+                (asl::maximum(theOtherBox.val[MIN][1], this->val[MIN][1]) <
                  asl::minimum(theOtherBox.val[MAX][1], this->val[MAX][1]));
         }
         /** Returns TRUE if at least one point exists that is contained by both boxes;
@@ -208,10 +208,10 @@ namespace asl {
          * @see intersects(const Box2<Number> & pt) const
         */
         bool touches(const Box2 & theOtherBox) const {
-            return 
-                (asl::maximum(theOtherBox.val[MIN][0], this->val[MIN][0]) <= 
+            return
+                (asl::maximum(theOtherBox.val[MIN][0], this->val[MIN][0]) <=
                  asl::minimum(theOtherBox.val[MAX][0], this->val[MAX][0])) &&
-                (asl::maximum(theOtherBox.val[MIN][1], this->val[MIN][1]) <= 
+                (asl::maximum(theOtherBox.val[MIN][1], this->val[MIN][1]) <=
                  asl::minimum(theOtherBox.val[MAX][1], this->val[MAX][1]));
         }
        /** Set the bounding values from a box.  */
@@ -268,7 +268,7 @@ namespace asl {
         void getOrigin(Number & originX, Number & originY) const {
             originX = this->val[MIN][0]; originY = this->val[MIN][1];
         }
-        /** Gets the size of the box as scalars 
+        /** Gets the size of the box as scalars
          * @param sizeX
          * @param sizeY
          */
@@ -475,21 +475,21 @@ namespace asl {
             result[1].sub(y);
             return result;
         }
-        /** Multiplication operator for floats */ 
+        /** Multiplication operator for floats */
         Box2 operator*(const float & y) const {
             Box2 result(*this);
             result[0].mult(Number(y));
             result[1].mult(Number(y));
             return result;
         }
-        /** Multiplication operator for double */ 
+        /** Multiplication operator for double */
         Box2 operator*(const double & y) const {
             Box2 result(*this);
             result[0].mult(Number(y));
             result[1].mult(Number(y));
             return result;
         }
-        /** Multiplication operator for int */ 
+        /** Multiplication operator for int */
         Box2 operator*(const int & y) const {
             Box2 result(*this);
             result[0].mult(Number(y));
@@ -497,21 +497,21 @@ namespace asl {
             return result;
         }
 
-        /** Division operator for float */ 
+        /** Division operator for float */
         Box2 operator/(const float & y) const {
             Box2 result(*this);
             result[0].div(Number(y));
             result[1].div(Number(y));
             return result;
         }
-        /** Division operator for double */ 
+        /** Division operator for double */
         Box2 operator/(const double & y) const {
             Box2 result(*this);
             result[0].div(Number(y));
             result[1].div(Number(y));
             return result;
         }
-        /** Division operator for int */ 
+        /** Division operator for int */
         Box2 operator/(const int & y) const {
             Box2 result(*this);
             result[0].div(Number(y));
@@ -524,7 +524,7 @@ namespace asl {
 
     /** Multiplication operator for float
      * @relates Box2
-     */ 
+     */
     template<class Number>
     Box2<Number> operator*(const float & y, const Box2<Number> & v) {
         Box2<Number> result(v);
@@ -533,7 +533,7 @@ namespace asl {
     }
     /** Multiplication operator for double
      * @relates Box2
-     */ 
+     */
     template<class Number>
     Box2<Number> operator*(const double & y, const Box2<Number> & v) {
         Box2<Number> result(v);
@@ -542,7 +542,7 @@ namespace asl {
     }
     /** Multiplication operator for int
      * @relates Box2
-     */ 
+     */
     template<class Number>
     Box2<Number> operator*(const int & y, const Box2<Number> & v) {
         Box2<Number> result(v);
@@ -704,7 +704,7 @@ namespace asl {
             return bb.hasPosition() && hasPosition() &&
                    (envelopes(bb.getMin()) && envelopes(bb.getMax()));
         }
-        /** Returns TRUE if intersection of given boxes is a non-empty box 
+        /** Returns TRUE if intersection of given boxes is a non-empty box
            Note that in many cases you will prefer to use "touches" for  calculation
            of collision and visibility determination in order to fail on the safe side
            regarding numerical inaccuracies
@@ -712,11 +712,11 @@ namespace asl {
         */
         bool intersects(const Box3 & theOtherBox) const {
             return
-                (asl::maximum(theOtherBox.val[MIN][0], this->val[MIN][0]) < 
+                (asl::maximum(theOtherBox.val[MIN][0], this->val[MIN][0]) <
                  asl::minimum(theOtherBox.val[MAX][0], this->val[MAX][0])) &&
-                (asl::maximum(theOtherBox.val[MIN][1], this->val[MIN][1]) < 
+                (asl::maximum(theOtherBox.val[MIN][1], this->val[MIN][1]) <
                  asl::minimum(theOtherBox.val[MAX][1], this->val[MAX][1])) &&
-                (asl::maximum(theOtherBox.val[MIN][2], this->val[MIN][2]) < 
+                (asl::maximum(theOtherBox.val[MIN][2], this->val[MIN][2]) <
                  asl::minimum(theOtherBox.val[MAX][2], this->val[MAX][2]));
         }
 
@@ -735,11 +735,11 @@ namespace asl {
                 && fabs(myCenterOffset_twice[2]) <= (myDoubleSize[2]);
 #else
            return
-                (asl::maximum(theOtherBox.val[MIN][0], this->val[MIN][0]) <= 
+                (asl::maximum(theOtherBox.val[MIN][0], this->val[MIN][0]) <=
                  asl::minimum(theOtherBox.val[MAX][0], this->val[MAX][0])) &&
-                (asl::maximum(theOtherBox.val[MIN][1], this->val[MIN][1]) <= 
+                (asl::maximum(theOtherBox.val[MIN][1], this->val[MIN][1]) <=
                  asl::minimum(theOtherBox.val[MAX][1], this->val[MAX][1])) &&
-                (asl::maximum(theOtherBox.val[MIN][2], this->val[MIN][2]) <= 
+                (asl::maximum(theOtherBox.val[MIN][2], this->val[MIN][2]) <=
                  asl::minimum(theOtherBox.val[MAX][2], this->val[MAX][2]));
 #endif
         }
@@ -1049,13 +1049,13 @@ namespace asl {
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -1078,7 +1078,7 @@ namespace asl {
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */

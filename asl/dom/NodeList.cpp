@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: NodeList.cpp,v $
@@ -14,7 +14,7 @@
 //   $Revision: 1.17 $
 //
 // Description: tiny fast XML-Parser and DOM
-// 
+//
 //
 //
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
@@ -49,7 +49,7 @@ dom::NodeList::removeItem(size_type i) {
     return NodePtr();
 }
 
-void 
+void
 dom::NodeList::clear() {
     for (size_type i = 0; i < size();++i) {
         if (_myNodes[i]->parentNode() == _myShell) {
@@ -62,7 +62,7 @@ dom::NodeList::clear() {
     }
 }
 
-void 
+void
 dom::NodeList::flush() {
     for (size_type i = 0; i < size();++i) {
         if (_myNodes[i]->parentNode() == _myShell) {
@@ -184,7 +184,7 @@ dom::NodeList::freeCaches() const {
     }
 }
 
-void 
+void
 dom::NodeList::binarize(asl::WriteableStream & theDest, Dictionaries & theDict, unsigned long long theIncludeVersion) const {
     theDest.appendUnsigned(size());
     for (size_type i = 0; i < size();++i) {
@@ -198,7 +198,7 @@ dom::NodeList::binarize(asl::WriteableStream & theDest, Dictionaries & theDict, 
 #define PS(x)
 #endif
 
-asl::AC_SIZE_TYPE 
+asl::AC_SIZE_TYPE
 dom::NodeList::debinarize(const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos, Dictionaries & theDict, OpMode theLoadMode) {
     DB(AC_TRACE << "dom::NodeList::debinarize theSource.size() = " << theSource.size() << ", thePos = " << thePos << endl);
     asl::AC_SIZE_TYPE mySize;
@@ -231,7 +231,7 @@ dom::NodeList::debinarize(const asl::ReadableStream & theSource, asl::AC_SIZE_TY
             bool myUnmodifiedProxyFlag = false;
             if (di < length()) {
                 // try to match existing node
-                theNewPos = item(di)->debinarize(theSource, thePos, theDict, theLoadMode, myUnmodifiedProxyFlag); 
+                theNewPos = item(di)->debinarize(theSource, thePos, theDict, theLoadMode, myUnmodifiedProxyFlag);
             }
             if (theNewPos == thePos) {
                 // unique id did not match
@@ -323,7 +323,7 @@ void dom::NodeList::resize(asl::AC_SIZE_TYPE newSize) {
     _myNodes.resize(newSize);
 }
 
-void 
+void
 dom::NodeList::reparent(Node * theNewParent, Node * theTopNewParent) {
     _myShell = theNewParent;
     for (_myNodeListType::size_type i = 0; i < _myNodes.size(); ++i) {

@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: Dictionary.h,v $
@@ -14,7 +14,7 @@
 //   $Revision: 1.4 $
 //
 // Description: tiny fast XML-Parser and DOM
-// 
+//
 //
 //
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
@@ -45,9 +45,9 @@ namespace dom {
 
 
     struct Entry : public asl::MemoryPool<Entry> {
-        Entry(const std::string & theName, unsigned int theIndex) 
+        Entry(const std::string & theName, unsigned int theIndex)
             :  _myName(theName), _myIndex(theIndex) {}
-        DOMString _myName;    
+        DOMString _myName;
         unsigned int _myIndex;
     };
 
@@ -60,7 +60,7 @@ namespace dom {
     class Dictionary {
     public:
         DEFINE_NESTED_EXCEPTION(Dictionary,IndexOutOfRange,asl::Exception);
-        
+
         enum { DictMagic = 0xb60d1cf0, DictsMagic = 0xb60a11d1 };
 
         Dictionary() {}
@@ -137,7 +137,7 @@ namespace dom {
         unsigned unmodifiedNodes;
 
         void print() {
-            AC_PRINT 
+            AC_PRINT
                 << "newNodes = "<<newNodes
                 <<", newValues = "<<newValues
                 <<", newNames = "<<newNames

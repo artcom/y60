@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -65,7 +65,7 @@ namespace asl {
 
 bool Pump::_myUseRealPump = true;
 
-Pump::Pump (SampleFormat mySF, unsigned myTimeStartDelay) 
+Pump::Pump (SampleFormat mySF, unsigned myTimeStartDelay)
     : AudioTimeSource(myTimeStartDelay, getSampleRateConfig()),
       _myRunning(false),
       _myNumUnderruns(0),
@@ -90,7 +90,7 @@ Pump::Pump (SampleFormat mySF, unsigned myTimeStartDelay)
     get_environment_var_as("Y60_SOUND_SAMPLE_RATE", _mySampleRate);
     _curFrame = 0;
 
-    _myTempBuffer = AudioBufferPtr(createAudioBuffer(getNativeSampleFormat(), 
+    _myTempBuffer = AudioBufferPtr(createAudioBuffer(getNativeSampleFormat(),
             0, getNumOutputChannels(), getNativeSampleRate()));
     _myVolumeFader.setVolume(1.0);
 }
@@ -102,7 +102,7 @@ Pump::~Pump() {
         if (mySink) {
             if (mySink->isEnabled())
             {
-                AC_WARNING << "Audio Pump being deleted, but " << 
+                AC_WARNING << "Audio Pump being deleted, but " <<
                     mySink->getName() << " is still active (state: ";
             }
         }
@@ -113,9 +113,9 @@ Pump::~Pump() {
     }
 }
 
-HWSampleSinkPtr Pump::createSampleSink (const string & theName) 
+HWSampleSinkPtr Pump::createSampleSink (const string & theName)
 {
-    HWSampleSinkPtr mySink = HWSampleSinkPtr(new HWSampleSink(theName, 
+    HWSampleSinkPtr mySink = HWSampleSinkPtr(new HWSampleSink(theName,
                                                               getNativeSampleFormat(), getNativeSampleRate(), getNumOutputChannels()));
     mySink->setSelf(mySink);
     addSink(mySink);
@@ -131,7 +131,7 @@ void Pump::addSampleSource(const SampleSourcePtr& theSampleSource) {
 
 AudioBufferPtr Pump::createBuffer(unsigned theNumFrames)
 {
-    return AudioBufferPtr(createAudioBuffer(getNativeSampleFormat(), theNumFrames, 
+    return AudioBufferPtr(createAudioBuffer(getNativeSampleFormat(), theNumFrames,
             getNumOutputChannels(), getNativeSampleRate()));
 }
 
@@ -145,7 +145,7 @@ Pump& Pump::get() {
     }
     if (_myUseRealPump) {
         try {
-#ifdef _WIN32          
+#ifdef _WIN32
             return Singleton<DirectSoundPump>::get();
 #elif LINUX
             return Singleton<ALSAPump>::get();
@@ -159,10 +159,10 @@ Pump& Pump::get() {
         }
     }
     return Singleton<DummyPump>::get();
-    
+
 }
 
-void 
+void
 Pump::setUseRealPump(bool theRealPumpFlag) {
     _myUseRealPump = theRealPumpFlag;
 }
@@ -170,11 +170,11 @@ Pump::setUseRealPump(bool theRealPumpFlag) {
 void Pump::setVolume (float theVolume) {
     _myVolumeFader.setVolume(theVolume);
 }
-        
+
 void Pump::fadeToVolume(float theVolume, float theTime) {
     _myVolumeFader.setVolume(theVolume, unsigned(theTime*getNativeSampleRate()));
 }
-    
+
 float Pump::getVolume() const {
     return _myVolumeFader.getVolume();
 }
@@ -298,7 +298,7 @@ const std::string& Pump::getCardName() const {
     return _myCardName;
 }
 
-bool 
+bool
 Pump::isRunning() const {
     return _myRunning;
 }
@@ -342,7 +342,7 @@ void Pump::mix(AudioBufferBase& theOutputBuffer, unsigned numFramesToDeliver) {
         AutoLocker<Pump> myLocker(*this);
 #ifdef USE_DASHBOARD
         MAKE_SCOPE_TIMER(Mix_Pump_Lock);
-#endif        
+#endif
         std::vector <SampleSourceWeakPtr>::iterator it;
         removeDeadSinks();
         for (it = _mySampleSinks.begin(); it != _mySampleSinks.end();) {
@@ -362,7 +362,7 @@ void Pump::mix(AudioBufferBase& theOutputBuffer, unsigned numFramesToDeliver) {
             }
             ++it;
         }
-        
+
         {
 #ifdef USE_DASHBOARD
             MAKE_SCOPE_TIMER(Pump_Volume_Fader);

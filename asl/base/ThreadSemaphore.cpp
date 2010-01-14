@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -126,10 +126,10 @@ namespace asl {
             // Convert to timespec
             Time myTime;
             timespec myTimeSpec = timespec(myTime);
-            
+
             myTimeSpec.tv_sec += milliseconds/1000;
             myTimeSpec.tv_nsec += (milliseconds%1000) * 1000;
-            
+
             while (_myValue <= 0)
             {
                 AC_TRACE << "wait::cond_timedwait";
@@ -144,11 +144,11 @@ namespace asl {
                     }
                 }
             }
-            if (0 != myReturnCode) 
+            if (0 != myReturnCode)
             {
                 if (0 != pthread_mutex_unlock(&_myMutex)) {
                     throw ThreadSemaphore::Exception("Unlock Mutex failed in wait", PLUS_FILE_LINE);
-                }                
+                }
                 if (ETIMEDOUT == myReturnCode) {
                     AC_TRACE << "wait::unlocked on timeout";
                     // We have a timeout
@@ -158,7 +158,7 @@ namespace asl {
                     // We have an error
                     throw ThreadSemaphore::Exception("Timedwait failed in wait", PLUS_FILE_LINE);
                 }
-            } 
+            }
         }
         if (!_myCreated) {
             pthread_mutex_unlock(&_myMutex);

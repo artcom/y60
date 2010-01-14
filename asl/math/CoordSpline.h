@@ -4,16 +4,16 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //  Author: Axel Kilian
 //
 //  $Revision: 1.5 $
 //
-//  Description: 
+//  Description:
 //
 //
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
@@ -36,47 +36,47 @@ namespace asl {
     /* @{ */
 
     class Hermite;
-    
+
     class Keyframe
     {
       public:
-    		Keyframe( asl::Vector3f & coord, float theTimeStamp, float theSpeed ) 
+    		Keyframe( asl::Vector3f & coord, float theTimeStamp, float theSpeed )
     		            : xyz(coord), t(theTimeStamp), speed(theSpeed)  {}
     		Keyframe( const Keyframe& theKeyframe) { xyz = theKeyframe.xyz; t = theKeyframe.t; speed = theKeyframe.speed;}
     		Keyframe() {}
-            Keyframe & operator=(const Keyframe & theKeyframe) { 
-                xyz = theKeyframe.xyz; 
-                t = theKeyframe.t; 
-                speed = theKeyframe.speed; 
-                return * this; 
+            Keyframe & operator=(const Keyframe & theKeyframe) {
+                xyz = theKeyframe.xyz;
+                t = theKeyframe.t;
+                speed = theKeyframe.speed;
+                return * this;
             }
 
     		virtual ~Keyframe() {}
     		const asl::Vector3f & getPosition() const { return xyz; }
     		virtual void setPosition(const asl::Vector3f & thePosition) { xyz = thePosition; }
 
-            const float getTime() const { return t; }    
-            void setTime(float theTimeStamp) { t = theTimeStamp; }    
-            const float getSpeed() const { return speed; }    
+            const float getTime() const { return t; }
+            void setTime(float theTimeStamp) { t = theTimeStamp; }
+            const float getSpeed() const { return speed; }
             void setSpeed(float theSpeed) { speed = theSpeed; }
         protected:
 
             asl::Vector3f	xyz;
             float	t;
             float	speed;
-    
+
     };
-    class EulerKeyframe 
+    class EulerKeyframe
     {
       public:
             // XXX don't know if here's actually ZYXRotating needed (gm)
-    		EulerKeyframe( asl::Vector3f & coord, asl::Vector3f & orientation, float theTimeStamp, float theSpeed ) 
+    		EulerKeyframe( asl::Vector3f & coord, asl::Vector3f & orientation, float theTimeStamp, float theSpeed )
     		        : rotation(orientation), xyz(coord), t(theTimeStamp), speed(theSpeed)
     		 {
                 _myOrientationMatrix.makeZYXRotating(rotation);
     		 }
 
-    		EulerKeyframe( const EulerKeyframe& theKeyframe) 
+    		EulerKeyframe( const EulerKeyframe& theKeyframe)
               : rotation(theKeyframe.rotation),
                 xyz(theKeyframe.xyz),
                 t(theKeyframe.t),
@@ -84,12 +84,12 @@ namespace asl {
             {
                 _myOrientationMatrix.makeZYXRotating(rotation);
 		    }
-            EulerKeyframe & operator=(const EulerKeyframe & theKeyframe) { 
+            EulerKeyframe & operator=(const EulerKeyframe & theKeyframe) {
                 rotation = theKeyframe.rotation;
-                xyz = theKeyframe.xyz; 
-                t = theKeyframe.t; 
-                speed = theKeyframe.speed; 
-                return * this; 
+                xyz = theKeyframe.xyz;
+                t = theKeyframe.t;
+                speed = theKeyframe.speed;
+                return * this;
             }
     		EulerKeyframe() {}
     		virtual ~EulerKeyframe() {}
@@ -97,82 +97,82 @@ namespace asl {
     		const asl::Vector3f & getPosition() const { return xyz; }
     		virtual void setPosition(const asl::Vector3f & thePosition) { xyz = thePosition; }
 
-            const float getTime() const { return t; }    
-            void setTime(float theTimeStamp) { t = theTimeStamp; }    
-            const float getSpeed() const { return speed; }    
+            const float getTime() const { return t; }
+            void setTime(float theTimeStamp) { t = theTimeStamp; }
+            const float getSpeed() const { return speed; }
             void setSpeed(float theSpeed) { speed = theSpeed; }
 
 
     		const asl::Vector3f & getOrientation() const { return rotation; }
     		void setOrientation(const asl::Vector3f & theOrientation) {
-    		     rotation = theOrientation; 
+    		     rotation = theOrientation;
                 _myOrientationMatrix.makeZYXRotating(rotation);
     		}
-    		const asl::Matrix4f & getOrientationMatrix() const { return _myOrientationMatrix; }                		
+    		const asl::Matrix4f & getOrientationMatrix() const { return _myOrientationMatrix; }
 
         private:
-            asl::Matrix4f   _myOrientationMatrix;                        
+            asl::Matrix4f   _myOrientationMatrix;
             asl::Vector3f	rotation;
             asl::Vector3f	xyz;
             float	t;
             float	speed;
-              
-    };    
 
-    class QuaternionKeyframe 
+    };
+
+    class QuaternionKeyframe
     {
       public:
-    		QuaternionKeyframe( asl::Vector3f & coord, asl::Quaternionf & orientation, float theTimeStamp, float theSpeed ) 
+    		QuaternionKeyframe( asl::Vector3f & coord, asl::Quaternionf & orientation, float theTimeStamp, float theSpeed )
     		        : _myQuaternion(orientation), xyz(coord), t(theTimeStamp), speed(theSpeed)
             {
-                _myOrientationMatrix = asl::Matrix4f(_myQuaternion);                
+                _myOrientationMatrix = asl::Matrix4f(_myQuaternion);
             }
-    		QuaternionKeyframe( const QuaternionKeyframe& theKeyframe) { 
+    		QuaternionKeyframe( const QuaternionKeyframe& theKeyframe) {
                 _myQuaternion = theKeyframe._myQuaternion;
-                _myOrientationMatrix = asl::Matrix4f(_myQuaternion);   
-                xyz = theKeyframe.xyz; 
+                _myOrientationMatrix = asl::Matrix4f(_myQuaternion);
+                xyz = theKeyframe.xyz;
                 t = theKeyframe.t;
                 speed = theKeyframe.speed;
 		    }
-            QuaternionKeyframe & operator=(const QuaternionKeyframe & theKeyframe) { 
+            QuaternionKeyframe & operator=(const QuaternionKeyframe & theKeyframe) {
                 _myQuaternion = theKeyframe._myQuaternion;
-                xyz = theKeyframe.xyz; 
-                t = theKeyframe.t; 
-                speed = theKeyframe.speed; 
-                return * this; 
+                xyz = theKeyframe.xyz;
+                t = theKeyframe.t;
+                speed = theKeyframe.speed;
+                return * this;
             }
     		QuaternionKeyframe() {}
     		virtual ~QuaternionKeyframe() {}
-    		
+
     		const asl::Vector3f & getPosition() const { return xyz; }
     		virtual void setPosition(const asl::Vector3f & thePosition) { xyz = thePosition; }
 
-            const float getTime() const { return t; }    
-            void setTime(float theTimeStamp) { t = theTimeStamp; }    
-            const float getSpeed() const { return speed; }    
+            const float getTime() const { return t; }
+            void setTime(float theTimeStamp) { t = theTimeStamp; }
+            const float getSpeed() const { return speed; }
             void setSpeed(float theSpeed) { speed = theSpeed; }
 
     		void setOrientation(const asl::Quaternionf & theOrientation) {
-                _myOrientationMatrix = asl::Matrix4f(_myQuaternion);                
+                _myOrientationMatrix = asl::Matrix4f(_myQuaternion);
     		}
     		const asl::Quaternionf & getOrientation() const { return _myQuaternion; }
-    		const asl::Matrix4f & getOrientationMatrix() const { return _myOrientationMatrix; }                		
+    		const asl::Matrix4f & getOrientationMatrix() const { return _myOrientationMatrix; }
 
         private:
             asl::Quaternionf _myQuaternion;
-            asl::Matrix4f   _myOrientationMatrix;                        
+            asl::Matrix4f   _myOrientationMatrix;
             asl::Vector3f	xyz;
             float	t;
             float	speed;
-              
-    };    
-    
+
+    };
+
     class ASL_MATH_DECL CoordSpline
     {
       public:
     	    CoordSpline		    ( void );
     	    ~CoordSpline	    ( void );
-        void    print		    ( void );		
+        void    print		    ( void );
         bool    init		    ( const std::vector<asl::QuaternionKeyframe>& keyframes, float& total_path, bool planet_mode );
         asl::Vector3f xyz			    ( float t );
         asl::Vector3f  getHPR   ( float t );
@@ -184,15 +184,15 @@ namespace asl {
         float  arcElementRot	    ( float t );
         float  getPath		    ( int i );
         float  getTime		    ( int i );
-    
+
     //  private:
-    
+
         typedef std::vector<Hermite*> Spline;
         Spline  _spline;
         bool    _planet_mode;
         int	    _error_count;
         int	    _error_maxnum;
-        
+
         asl::Vector3f vFront		    ( float s );
         asl::Vector3f vRight		    ( float s );
         asl::Vector3f vCamera		    ( float s );
@@ -200,21 +200,21 @@ namespace asl {
         float  rad23		    ( float t );
         float   minRad2		    ( float ax, float bx, float cx, float tol, float *xmin );
     };
-    
-    
-    
+
+
+
     class v_planet {
         public:
     	v_planet ( CoordSpline& c    ) : _c(c   ) {}
     	v_planet ( const v_planet& c ) : _c(c._c) {}
-    	
+
     	float operator()  (float x) { return _c.vPlanet(x); }
-    	
+
         private:
     	CoordSpline& _c;
     };
-    
+
     /* @} */
-    
+
 }
 #endif // _included_asl_CoordSpline_

@@ -4,16 +4,16 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //   $RCSfile: Facade.cpp,v $
 //
 //   $Revision: 1.6 $
 //
-//   Description: 
+//   Description:
 //
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -29,7 +29,7 @@ using namespace std;
 
 namespace dom {
 
-    Facade::Facade(Node & theNode) 
+    Facade::Facade(Node & theNode)
         : TypedNamedNodeMap(dom::Node::ATTRIBUTE_NODE, 0), _myNode(theNode)
         //, _hasRegisteredDependencies(false), _hasOutdatedDependencies(false)
     {}
@@ -48,9 +48,9 @@ namespace dom {
             //markAllDirty();
     }
 
-    void 
+    void
         Facade::markAllDirty() {
-            DB(AC_TRACE << "Facade::markAllDirty: this ="<<(void*)this); 
+            DB(AC_TRACE << "Facade::markAllDirty: this ="<<(void*)this);
 
             Node & myNode = getNode();
             for (size_type i=0; i < myNode.attributes().size(); ++i) {
@@ -61,7 +61,7 @@ namespace dom {
             }
     }
 
-    void 
+    void
         Facade::markPrecursorDependenciesOutdated() {
             for (size_type i=0; i < size(); ++i) {
                 item(i)->nodeValueWrapperPtr()->markPrecursorDependenciesOutdated();
@@ -69,27 +69,27 @@ namespace dom {
     }
 
     Facade *
-        FacadeFactory::createFacade(const DOMString & theType, Node & theNode, 
-        const DOMString & theParentNodeName) const 
+        FacadeFactory::createFacade(const DOMString & theType, Node & theNode,
+        const DOMString & theParentNodeName) const
     {
         DB(AC_TRACE << "FacadeFactory::createFacade('"<<theType<<"','"<<theParentNodeName<<"')"; )
-            FacadePtr myPrototype = findPrototype(FacadeKey(theType, theParentNodeName)); 
+            FacadePtr myPrototype = findPrototype(FacadeKey(theType, theParentNodeName));
         if (myPrototype) {
-            DB(AC_TRACE << "FacadeFactory::createFacade('" << theType << ", " 
+            DB(AC_TRACE << "FacadeFactory::createFacade('" << theType << ", "
                 << theParentNodeName<<"') returns value";)
                 return myPrototype->createNew(theNode);
         }
         DB(AC_TRACE << "FacadeFactory::createFacade('"<<theType<<"') returns 0";)
             return 0;
-    }	
+    }
 
     void
         FacadeFactory::registerPrototype(const DOMString & theType, FacadePtr thePrototype,
-        const DOMString & theParentNodeName) 
+        const DOMString & theParentNodeName)
     {
-        DB(AC_TRACE << "FacadeFactory::registerPrototype('" << theType << ", " 
+        DB(AC_TRACE << "FacadeFactory::registerPrototype('" << theType << ", "
             << theParentNodeName<<"')" << endl;)
-            _myPrototypes[FacadeKey(theType,theParentNodeName)] = FacadePtr(thePrototype->createNew(Node::Prototype));	    
+            _myPrototypes[FacadeKey(theType,theParentNodeName)] = FacadePtr(thePrototype->createNew(Node::Prototype));
     }
 
     const FacadePtr
@@ -99,13 +99,13 @@ namespace dom {
                 return myPrototype->second;
             }
             return FacadePtr();
-    }	
+    }
 
     /******************************************************************
     * Parent Facade
     \*****************************************************************/
 
-    void 
+    void
         Facade::registerChildName(const std::string & theChildName) {
             if (hasRegisteredChild(theChildName)) {
                 throw Facade::DuplicateChildName(theChildName,PLUS_FILE_LINE);
@@ -118,38 +118,38 @@ namespace dom {
     }
     const NodePtr
         Facade::getChildNode(const DOMString & theName) const {
-            if (hasRegisteredChild(theName)) {   
+            if (hasRegisteredChild(theName)) {
                 return Facade::ensureChild(_myNode, theName);
             }
             return NodePtr();
     }
     NodePtr
-        Facade::getChildNode(const DOMString & theName) { 
-            if (hasRegisteredChild(theName)) {   
+        Facade::getChildNode(const DOMString & theName) {
+            if (hasRegisteredChild(theName)) {
                 return Facade::ensureChild(_myNode, theName);
             }
             return NodePtr();
     }
 
 
-    Facade::PropertyMap & 
+    Facade::PropertyMap &
         Facade::getProperties() const {
-            ensureProperties(); 
-            return _myPropertyNodes;                 
+            ensureProperties();
+            return _myPropertyNodes;
     }
 
-    NodePtr 
+    NodePtr
         Facade::getProperty(const std::string & theName) const {
-            ensureProperties(); 
+            ensureProperties();
             PropertyMap::iterator it = _myPropertyNodes.find(theName);
             if (it != _myPropertyNodes.end()) {
-                return it->second; 
+                return it->second;
             } else {
                 return NodePtr();
             }
     }
 
-    void 
+    void
         Facade::setNode( Node & theNode) {
             _myNode = theNode;
     }
@@ -162,7 +162,7 @@ namespace dom {
             }
             return myChild;
     }
-    NodePtr 
+    NodePtr
         Facade::createChild(const Node & theNode, const DOMString & theName) {
             try {
                 return const_cast<Node&>(theNode).appendChild(NodePtr(new Element(theName)) );

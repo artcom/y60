@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -154,11 +154,11 @@ namespace asl {
                 if (_myCycleTimes.size() > 1) {
                     double myFrameTime = (_myCycleTimes.back() - _myCycleTimes.front()) / _myCycleTimes.size();
                     if (myFrameTime > 0) {
-                        _myFrameRate = 1 / myFrameTime;                    
+                        _myFrameRate = 1 / myFrameTime;
                         _myLastFrameRateTime = asl::Time();
                     }
                 }
-            }        
+            }
             return _myFrameRate;
     }
 
@@ -184,10 +184,10 @@ namespace asl {
                 _myCompleteCycleCounters[it->first] = *(it->second);
                 it->second->reset();
             }
-        }        
+        }
 
-        // Calculate an sliding-window average 
-        _myCycleTimes.push_back(Time());        
+        // Calculate an sliding-window average
+        _myCycleTimes.push_back(Time());
         while (_myCycleTimes.size() > 2 && (_myCycleTimes.back() - _myCycleTimes.front()) > FRAME_AVERAGING_TIME) {
             _myCycleTimes.pop_front();
         }
@@ -197,7 +197,7 @@ namespace asl {
         bool operator()(const TimerPtr & a, const TimerPtr & b) const { return a->getMax() < b->getMax(); }
     };
 
-    std::vector<TimerPtr> 
+    std::vector<TimerPtr>
     Dashboard::getNewMaxTimers(asl::NanoTime theElapsedThreshold, asl::NanoTime theAgeLimit, size_t theCountLimit) {
         asl::NanoTime now;
         std::vector<TimerPtr> myResult;

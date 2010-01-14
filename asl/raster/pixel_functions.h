@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: pixel_functions.h,v $
@@ -120,23 +120,23 @@ TO auto_cast(double mySrc) {
 
 template <class TO>
 TO auto_cast(DXT1 mySrc) {
-    throw NotSupportedException(JUST_FILE_LINE); 
+    throw NotSupportedException(JUST_FILE_LINE);
     return mySrc;
 }
 template <class TO>
 TO auto_cast(DXT1a mySrc) {
-    throw NotSupportedException(JUST_FILE_LINE); 
+    throw NotSupportedException(JUST_FILE_LINE);
     return mySrc;
 }
 template <class TO>
 TO auto_cast(DXT3 mySrc) {
-    throw NotSupportedException(JUST_FILE_LINE); 
+    throw NotSupportedException(JUST_FILE_LINE);
     return mySrc;
 }
 
 template <class TO>
 TO auto_cast(DXT5 mySrc) {
-    throw NotSupportedException(JUST_FILE_LINE); 
+    throw NotSupportedException(JUST_FILE_LINE);
     return mySrc;
 }
 
@@ -237,7 +237,7 @@ template <class PIXEL, class COMPONENT>
 COMPONENT channel_min(const PIXEL & p, const COMPONENT & c) {
     COMPONENT result(c);
     for (int i = 0;i<p.size();i++) {
-        if (p[i]<c) 
+        if (p[i]<c)
             result = p[i];
     }
     return result;
@@ -246,7 +246,7 @@ template <class PIXEL, class COMPONENT>
 COMPONENT channel_max(const PIXEL & p, const COMPONENT & c) {
     COMPONENT result(c);
     for (int i = 0;i<p.size();i++) {
-        if (p[i]>c) 
+        if (p[i]>c)
             result = p[i];
     }
     return result;
@@ -330,7 +330,7 @@ template <class SRC, class DEST>
 struct make_hsv_from_rgb : public std::unary_function<SRC, DEST> {
     DEST operator()(const SRC & src) {
 	    DEST result;
-         
+
 	    int red = src.get(RED())();
 	    int green = src.get(GREEN())();
 	    int blue = src.get(BLUE())();
@@ -402,7 +402,7 @@ template <class SRC, class DEST>
 struct imake_hsv_from_rgb : public std::unary_function<SRC, DEST> {
     DEST operator()(const SRC & src) {
 	    DEST result;
-         
+
 	    int red = src.get(RED())();
 	    int green = src.get(GREEN())();
 	    int blue = src.get(BLUE())();
@@ -474,7 +474,7 @@ template <class SRC, class DEST>
 struct make_rgb_from_hsv : public std::unary_function<SRC, DEST> {
     DEST operator()(const SRC & src) {
 	    DEST result;
-         
+
 	    int h = src.get(HUE())();
 	    int s = src.get(SATURATION())();
 	    int v = src.get(GRAY())();

@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: testThreadFifo.tst.cpp,v $
@@ -132,24 +132,24 @@ nonblocking_poper()
     } while (val < NUM_VALUES);
 }
 
-void 
+void
 pusher_thread_func(PosixThread & thread) {
     //int * args = (int * ) thread.getWorkArgs();
     pusher();
 }
 
-void 
+void
 blocking_test_popper_thread_func(PosixThread & thread) {
     blocking_poper();
 }
 
 
-void 
+void
 nonblocking_test_popper_thread_func(PosixThread & thread) {
     nonblocking_poper();
 }
 
-void 
+void
 waiting_test_popper_thread_func(PosixThread & thread) {
     waiting_poper();
 }
@@ -175,7 +175,7 @@ blocking_test(int ac, char** av)
 
     PosixThread pushThread(pusher_thread_func);
     PosixThread popThread(blocking_test_popper_thread_func);
-    
+
     pushThread.fork();
     popThread.fork();
 
@@ -207,7 +207,7 @@ nonblocking_test(int ac, char** av)
 
     PosixThread pushThread(pusher_thread_func);
     PosixThread popThread(nonblocking_test_popper_thread_func);
-    
+
     popThread.fork();
     pushThread.fork();
 
@@ -240,7 +240,7 @@ waiting_test(int ac, char** av)
     PosixThread pushThread(pusher_thread_func);
     PosixThread popThread1(waiting_test_popper_thread_func);
     PosixThread popThread2(waiting_test_popper_thread_func);
-    
+
     pushThread.fork();
     popThread1.fork();
     popThread2.fork();
@@ -251,10 +251,10 @@ waiting_test(int ac, char** av)
 
     sharedFifo->setSignalToStop();
     sharedFifo->push(0); // value will be ignored, just sets semaphores
-    
+
     popThread1.join();
     popThread2.join();
-    
+
     double elapsed_time = getTime() - start_time;
 
     fprintf(stderr, "%d elements queued in %lf seconds.\n", NUM_VALUES, elapsed_time);
@@ -266,12 +266,12 @@ int
 main(int ac, char** av)
 {
     ThreadSemFactory::instance();
-   
+
     if (!nonblocking_test(ac,av)) {
         delete ThreadSemFactory::instance();
         return -1;
     }
-    
+
     if (!blocking_test(ac,av)) {
         delete ThreadSemFactory::instance();
         return -1;

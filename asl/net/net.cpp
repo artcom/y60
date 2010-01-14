@@ -4,12 +4,12 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: 
+// Description:
 //    C++ Library fuer TCP-Sockets (based on Sockets.c++ from Pavel 11.9.92)
 //
 // Last Review:  ms & ab 2007-08-14
@@ -54,7 +54,7 @@
   #include <winsock2.h>
 #else
   #include <errno.h>
-#endif  
+#endif
 
 using namespace std;
 
@@ -66,13 +66,13 @@ namespace inet {
         int err;
 
         wVersionRequested = MAKEWORD( 2, 2 );
-         
+
         AC_DEBUG << "Calling WSAStartup().";
         err = WSAStartup( wVersionRequested, &wsaData );
         if ( err != 0 ) {
             throw SocketError(err, "inet::initSockets()");
         }
-        
+
         if (LOBYTE( wsaData.wVersion ) != 2 ||
             HIBYTE( wsaData.wVersion ) != 2 )
         {
@@ -80,7 +80,7 @@ namespace inet {
         }
 #endif
     }
-    
+
     void terminateSockets() {
 #ifdef _WIN32
         AC_DEBUG << "Calling WSACleanup().";
@@ -88,16 +88,16 @@ namespace inet {
             int err = getLastSocketError();
             throw SocketError(err, "inet::terminateSockets()");
         }
-#endif 
+#endif
     }
 
-    int 
+    int
     getLastSocketError() {
 #ifdef _WIN32
         return WSAGetLastError();
 #else
         return errno;
-#endif                
+#endif
     }
     // List of error constants mapped to an interpretation string.
     // Note that this list must remain sorted by the error constants'
@@ -108,9 +108,9 @@ namespace inet {
         const char* Message;
 
         SocketErrorString(int id, const char* msg = 0) :
-            ID(id), 
-            Message(msg) 
-        { 
+            ID(id),
+            Message(msg)
+        {
         }
 
         bool operator<(const SocketErrorString& rhs) const {
@@ -174,13 +174,13 @@ namespace inet {
     const int NumMessages = sizeof(SocketErrorList) / sizeof(SocketErrorString);
 #endif
 
-    string 
+    string
     getSocketErrorMessage(int ErrorID)
     {
-#ifdef _WIN32    
+#ifdef _WIN32
         string ErrorStr;
 
-        // Tack appropriate canned message onto end of supplied message 
+        // Tack appropriate canned message onto end of supplied message
         // prefix. Note that we do a binary search here: gaErrorList must be
         // sorted by the error constant's value.
         SocketErrorString* End = SocketErrorList + NumMessages;
@@ -199,6 +199,6 @@ namespace inet {
         return ErrorStr;
 #else
         return strerror(ErrorID);
-#endif                
+#endif
     }
 }

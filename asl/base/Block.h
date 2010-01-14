@@ -4,20 +4,20 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
 // Description:  Memory Block handling functions; should be used whenever
 //               using memcpy is considered; features
 //               - typesafe conversion,
-//               - compile-time memory read-write control, 
+//               - compile-time memory read-write control,
 //               - convenient windows api interfaces and
 //               - also a copy-on-write (COW) implementation
 //
-// Last Review: pavel 30.11.2005 
+// Last Review: pavel 30.11.2005
 //
 //  review status report: (perfect, ok, fair, poor, disaster)
 //    usefullness            : perfect
@@ -174,11 +174,11 @@ namespace asl {
     template <class EXTERNAL_BYTE_ORDER, class SIZE_TYPE, class OFFSET_TYPE>
     WriteableArrangedStream<EXTERNAL_BYTE_ORDER, SIZE_TYPE, OFFSET_TYPE> &
     WriteableArrangedStream<EXTERNAL_BYTE_ORDER, SIZE_TYPE, OFFSET_TYPE>
-    ::append(const ReadableBlock & theSource) 
+    ::append(const ReadableBlock & theSource)
     {
        return append(theSource.begin(), theSource.size());
     }
-    /* 
+    /*
     template <class EXTERNAL_BYTE_ORDER, class SIZE_TYPE, class OFFSET_TYPE>
     WriteableArrangedStream<EXTERNAL_BYTE_ORDER, SIZE_TYPE, OFFSET_TYPE> &
     append(WriteableArrangedStream<EXTERNAL_BYTE_ORDER, SIZE_TYPE, OFFSET_TYPE> & theStream,
@@ -284,7 +284,7 @@ SIZE_TYPE
 ReadableArrangedStream<EXTERNAL_BYTE_ORDER, SIZE_TYPE, OFFSET_TYPE>::readBlock(WriteableBlock & theDest, SIZE_TYPE theReadOffset) const {
             return readBytes(theDest.begin(),theDest.size(),theReadOffset);
 }
-    
+
 
     /**
         ResizeableBlock is an interface class extending the WriteableBlock.
@@ -582,9 +582,9 @@ ReadableArrangedStream<EXTERNAL_BYTE_ORDER, SIZE_TYPE, OFFSET_TYPE>::readBlock(W
     inline const unsigned char * end_ptr  (const Block & block) { return block.end  (); }
 
    struct AnyReadableBlockHandle : public ReadableBlockHandle {
-        AnyReadableBlockHandle(asl::Ptr<ReadableBlock> theBlock, const std::string & theName="") 
+        AnyReadableBlockHandle(asl::Ptr<ReadableBlock> theBlock, const std::string & theName="")
             : _myBlock(theBlock), _myName(theName) {}
-        
+
         ReadableBlock & getBlock() {
             return *_myBlock;;
         }
@@ -596,7 +596,7 @@ ReadableArrangedStream<EXTERNAL_BYTE_ORDER, SIZE_TYPE, OFFSET_TYPE>::readBlock(W
         asl::Ptr<ReadableBlock> _myBlock;
         std::string _myName;
     };
-    
+
 
     /**
         SizeBlock extends Block with a member getSizeField() which can

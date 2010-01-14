@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: string_functions.cpp,v $
@@ -270,7 +270,7 @@ namespace asl {
 
         return myDestinationSize;
     }
-    
+
     std::string getNextLine(int& theCurPos, const string& theString) {
         std::string::size_type myCRPos = theString.find("\n", theCurPos);
         if (myCRPos == string::npos) {
@@ -279,7 +279,7 @@ namespace asl {
             string myNextLine = theString.substr(theCurPos, myCRPos-theCurPos);
             theCurPos = myCRPos+1;
             return myNextLine;
-        }    
+        }
     }
 #ifdef _WIN32
     char* convertBSTRToLPSTR(BSTR theBSTR) {
@@ -288,7 +288,7 @@ namespace asl {
             int nInputStrLen = SysStringLen(theBSTR);
 
             // Double NULL Termination
-            int nOutputStrLen = WideCharToMultiByte(CP_ACP, 0, theBSTR, nInputStrLen, NULL, 0, 0, 0) + 2; 
+            int nOutputStrLen = WideCharToMultiByte(CP_ACP, 0, theBSTR, nInputStrLen, NULL, 0, 0, 0) + 2;
             pszOut = new char [nOutputStrLen];
 
             if (pszOut) {

@@ -4,12 +4,12 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: 
+// Description:
 //    C++ Library fuer TCP-Sockets (based on Sockets.c++ from Pavel 11.9.92)
 //
 // Last Review:  ms & ab 2007-08-14
@@ -35,7 +35,7 @@
 //
 //    overall review status   :      ok
 //
-//    recommendations: move to inner class of *.tst.cpp file 
+//    recommendations: move to inner class of *.tst.cpp file
 */
 #ifndef INCL_TESTSOCKETS
 #define INCL_TESTSOCKETS
@@ -57,14 +57,14 @@ class ASL_NET_DECL TestSocket: public UnitTest{
 
         /// creates a new tcp server. you 'll need to delete it
         inet::TCPServer * createTCPServer();
-        
+
         void testHostAddressMethods ();
         void BaseTest();
         void TCPTest();
         void UDPTest();
         void testConnectionTimeout ();
         static void * TCPServerThread(void *arg);
-        static void * UDPServerThread(void *arg); 
+        static void * UDPServerThread(void *arg);
 
 };
 

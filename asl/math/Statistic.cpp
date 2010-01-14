@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -44,7 +44,7 @@
 //
 //   $Revision: 1.2 $
 //
-// Description: 
+// Description:
 //
 // (CVS log at the bottom of this file)
 //
@@ -68,21 +68,21 @@ namespace asl {
 
     Statistic::Statistic() :
         _myName(""), _myOutputIntervalSamples(0), _myOutputIntervalTime(0.0),
-        _isEnabled(true) 
+        _isEnabled(true)
     {
         reset();
     }
 
-    Statistic::Statistic(char * theName, int theOutputIntervalSamples) : 
-        _myName(theName), _myOutputIntervalSamples(theOutputIntervalSamples), 
+    Statistic::Statistic(char * theName, int theOutputIntervalSamples) :
+        _myName(theName), _myOutputIntervalSamples(theOutputIntervalSamples),
         _myOutputIntervalTime(0.0), _isEnabled(true)
     {
         reset();
     }
 
-    Statistic::Statistic(char * theName, double theOutputIntervalTime) : 
+    Statistic::Statistic(char * theName, double theOutputIntervalTime) :
         _myName(theName), _myOutputIntervalSamples(0),
-        _myOutputIntervalTime(theOutputIntervalTime), _isEnabled(true) 
+        _myOutputIntervalTime(theOutputIntervalTime), _isEnabled(true)
     {
         reset();
     }
@@ -95,11 +95,11 @@ namespace asl {
         _myVariance         = 0.0;
         _mySampleSum        = 0.0;
         _mySquaredSampleSum = 0.0;
-        _myLastOutputTime   = asl::Time();        
+        _myLastOutputTime   = asl::Time();
     }
 
     void
-    Statistic::addSample(double theSample) {        
+    Statistic::addSample(double theSample) {
         if (_isEnabled) {
             if (theSample > _myMaximum) {
                 _myMaximum = theSample;
@@ -110,22 +110,22 @@ namespace asl {
             }
 
             _myNumberOfSamples++;
-            _mySampleSum += theSample;            
-            _mySquaredSampleSum += (theSample * theSample); 
-           
-            if ((_myOutputIntervalSamples > 0 &&                     
-                 _myNumberOfSamples >= _myOutputIntervalSamples) ||                        
-               ((_myOutputIntervalTime > 0.0) && 
-                (asl::Time() - _myLastOutputTime) >= _myOutputIntervalTime)) 
+            _mySampleSum += theSample;
+            _mySquaredSampleSum += (theSample * theSample);
+
+            if ((_myOutputIntervalSamples > 0 &&
+                 _myNumberOfSamples >= _myOutputIntervalSamples) ||
+               ((_myOutputIntervalTime > 0.0) &&
+                (asl::Time() - _myLastOutputTime) >= _myOutputIntervalTime))
             {
-                AC_INFO << "*** Statistic: [" << asl::Time() << "] " 
+                AC_INFO << "*** Statistic: [" << asl::Time() << "] "
                     << _myName << ": " << *this << endl;
-                reset();                
+                reset();
             }
         }
     }
 
-    double 
+    double
     Statistic::getAverage() const {
         return (_mySampleSum / _myNumberOfSamples);
     }
@@ -151,7 +151,7 @@ namespace asl {
         Statistic(theName, theOutputIntervalSamples)
     {}
 
-    BoolStatistic::BoolStatistic(char * theName, double theOutputIntervalTime) : 
+    BoolStatistic::BoolStatistic(char * theName, double theOutputIntervalTime) :
         Statistic(theName, theOutputIntervalTime)
     {}
 
@@ -160,21 +160,21 @@ namespace asl {
         Statistic::addSample(double(theSample));
     }
 
-    int 
+    int
     BoolStatistic::getNumberOfHits() const {
         return (int)(getSampleSum());
     }
-    
+
     ///////////////////////////////////////////////////////////////////////////
 
-    FrequencyStatistic::FrequencyStatistic() : Statistic(), _lastAddSampleTime(-1) {        
+    FrequencyStatistic::FrequencyStatistic() : Statistic(), _lastAddSampleTime(-1) {
     }
 
     FrequencyStatistic::FrequencyStatistic(char * theName, int theOutputIntervalSamples) :
         Statistic(theName, theOutputIntervalSamples), _lastAddSampleTime(-1)
     {}
 
-    FrequencyStatistic::FrequencyStatistic(char * theName, double theOutputIntervalTime) : 
+    FrequencyStatistic::FrequencyStatistic(char * theName, double theOutputIntervalTime) :
         Statistic(theName, theOutputIntervalTime), _lastAddSampleTime(-1)
     {}
 
@@ -190,7 +190,7 @@ namespace asl {
         if (isEnabled()) {
             double nowTime = asl::Time();
             if (_lastAddSampleTime > -1) {
-                Statistic::addSample(1. / (nowTime - _lastAddSampleTime));                        
+                Statistic::addSample(1. / (nowTime - _lastAddSampleTime));
             }
             _lastAddSampleTime = nowTime;
         }

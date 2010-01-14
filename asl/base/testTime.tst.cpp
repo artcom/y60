@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: testTime.tst.cpp,v $
@@ -145,11 +145,11 @@ public:
         UnitTestSuite::setup(); // called to print a launch message
         addTest(new TimeParserTest);
         addTest(new TimeUnitTest,100);
-       
+
         // Note: the CPU's TSC is not reliable on multi-core systems, but the new HPEC is not yet widely
         // available, so we now simply use gettimeofday. This only has usec (not nsec) resolution
         // so disable the nsec test
-        
+
         //addTest(new NanoTimeUnitTest,100);
     }
 };

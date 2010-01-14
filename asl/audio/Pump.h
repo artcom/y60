@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -58,14 +58,14 @@
 
 namespace asl {
 
-class ASL_AUDIO_DECL Pump : public AudioTimeSource, private PosixThread 
+class ASL_AUDIO_DECL Pump : public AudioTimeSource, private PosixThread
 {
     public:
         Pump(SampleFormat mySF, unsigned myTimeStartDelay);
         virtual ~Pump();
 
         static Pump& get();
-        
+
         HWSampleSinkPtr createSampleSink(const std::string & theName);
         AudioBufferPtr createBuffer(unsigned theNumFrames);
         void setVolume(float theVolume);
@@ -101,10 +101,10 @@ class ASL_AUDIO_DECL Pump : public AudioTimeSource, private PosixThread
 
         void setDeviceName(const std::string& theName);
         const std::string& getDeviceName() const;
-        
+
         void setCardName(const std::string& theName);
         const std::string& getCardName() const;
-            
+
         void addUnderrun();
         void mix(AudioBufferBase& theOutputBuffer, unsigned numFramesToDeliver);
 
@@ -141,4 +141,4 @@ class ASL_AUDIO_DECL Pump : public AudioTimeSource, private PosixThread
 
 }
 
-#endif 
+#endif

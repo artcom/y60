@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: Nodes.h,v $
@@ -61,12 +61,12 @@ namespace dom {
         thePos = theCatalog.debinarize(theSource, thePos);
         asl::Unsigned64 mySize;
         thePos = theSource.readUnsigned64(mySize, thePos);
-        return thePos; 
+        return thePos;
     }
 
     /// loads dictionaries and catalog from a block determining the position
     /// by reading the last 8 bytes of the block first, expecting it to contain
-    /// the size of dictionaries and catalog 
+    /// the size of dictionaries and catalog
     inline
     asl::AC_SIZE_TYPE
     loadDictionariesAndCatalog(const asl::ReadableStream & theSource,
@@ -80,7 +80,7 @@ namespace dom {
         thePos = theCatalog.debinarize(theSource, thePos);
         asl::Unsigned64 mySize;
         thePos = theSource.readUnsigned64(mySize, thePos);
-        return thePos; 
+        return thePos;
     }
 
     /**
@@ -302,7 +302,7 @@ namespace dom {
         */
         Node(const DOMString & xml, int pos,
             Node * parent, const Node * doctype, NodeType type = X_NO_NODE)
-            : _myType(type), _lazyChildren(false), _myParent(parent), 
+            : _myType(type), _lazyChildren(false), _myParent(parent),
             _myDocSize(0), _myParseCompletionPos(0), _myVersion(0),
             _mySavePosition(0), _myChildrenPosition(0), _mySaveEndPosition(0),
             _myChildrenList(this), _myAttributes(this),
@@ -313,7 +313,7 @@ namespace dom {
 
         Node(const DOMString & xml)
             : _myType(X_NO_NODE), _lazyChildren(false), _myParent(0),
-            _myDocSize(0), _myParseCompletionPos(0), _myVersion(0),            
+            _myDocSize(0), _myParseCompletionPos(0), _myVersion(0),
             _mySavePosition(0), _myChildrenPosition(0), _mySaveEndPosition(0),
             _myChildrenList(this), _myAttributes(this),
             _myPlug(0), _myShouldPrint(true)
@@ -1020,11 +1020,11 @@ namespace dom {
         // function will binarize from the root node of the DOM even when called
         // on a child to avoid partial catalogs
         void binarize(asl::WriteableStream & theDataDest, asl::WriteableStream & theCatalogDest) const;
-       
+
         // debinarize using an existing dictionary which is needed for random element access
         asl::AC_SIZE_TYPE debinarize(Dictionaries & theDictionaries,
                                        const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos) {
-            
+
             bool myUnmodifiedProxyFlag;
             asl::AC_SIZE_TYPE myPos = debinarize(theSource, thePos, theDictionaries, IMMEDIATE, myUnmodifiedProxyFlag);
             return myPos;
@@ -1041,18 +1041,18 @@ namespace dom {
         {
             asl::Unsigned64 myOffset = 0;
             if (theCatalog.getElementOffsetById(theId, theIdAttribute, myOffset)) {
-               
-               debinarize(theDictionaries, theSource, thePos + asl::AC_SIZE_TYPE(myOffset));  
+
+               debinarize(theDictionaries, theSource, thePos + asl::AC_SIZE_TYPE(myOffset));
                return self().lock();
             }
-            return NodePtr(); 
+            return NodePtr();
         }
-          
+
         void makePatch(asl::WriteableStream & thePatch, asl::Unsigned64 theOldVersion) const;
-        
+
         /// return true if something has changed
         bool applyPatch(const asl::ReadableStream & thePatch, asl::AC_SIZE_TYPE thePos = 0);
-        
+
         virtual void freeCaches() const;
         virtual bool flushUnusedChildren() const;
 
@@ -1121,10 +1121,10 @@ namespace dom {
         /// you can check with hasFacade() to avoid exception
         FacadePtr getFacade();
         const FacadePtr getFacade() const;
-        
+
         /// return true if a facade has been already constructed
         bool hasExistingFacade() const;
-            
+
         template <class TARGET_FACADE>
         asl::Ptr<TARGET_FACADE, dom::ThreadingModel> tryGetFacade() {
             return dynamic_cast_Ptr<TARGET_FACADE>(getFacade());
@@ -1185,12 +1185,12 @@ namespace dom {
         getElementByAttribute(const DOMString & theElementName,
                               const DOMString & theAttributeName,
                               const DOMString & theAttributeValue);
-                          
+
         const dom::NodePtr
         getElementByAttribute(const DOMString & theElementName,
                               const DOMString & theAttributeName,
                               const DOMString & theAttributeValue) const;
-                          
+
         const NodePtr getChildElementById(const DOMString & theId, const DOMString & theIdAttribute) const;
         NodePtr getChildElementById(const DOMString & theId, const DOMString & theIdAttribute);
         const NodePtr getElementById(const DOMString & theId, const DOMString & theIdAttribute="id") const;
@@ -1216,7 +1216,7 @@ namespace dom {
             }
             return myNode;
         }
-        
+
         const Node * getRootNode() const
         {
             const Node * myNode = this;
@@ -1228,7 +1228,7 @@ namespace dom {
             }
             return myNode;
         }
-        
+
         Node * getRealRootNode() {
             Node * myNode = this;
             while (myNode->parentNode()) {
@@ -1236,7 +1236,7 @@ namespace dom {
             }
             return myNode;
         }
-        
+
         const Node * getRealRootNode() const
         {
             const Node * myNode = this;
@@ -1245,7 +1245,7 @@ namespace dom {
             }
             return myNode;
         }
-#endif        
+#endif
         // some better names for above functions
         const Node * getRootElement() const {return getRootNode();}
         Node * getRootElement() {return getRootNode();}
@@ -1288,7 +1288,7 @@ namespace dom {
             }
             return *_myIDRegistry;
         }
-        
+
         const NodeIDRefRegistryPtr getIDRefRegistry() const {
             if (_myParent) {
                 return _myParent->getIDRefRegistry();
@@ -1378,7 +1378,7 @@ Dependent on node type allowed children are:<p>
         */
         static void checkName(const DOMString & name, NodeType type);
 
- 
+
         void reparent(Node * theNewParent, Node * theTopNewParent, bool theBumpVersionFlag = true);
 
         std::string::size_type parseNextNode(const DOMString & is, std::string::size_type pos,
@@ -1457,14 +1457,14 @@ Dependent on node type allowed children are:<p>
         // need this ptr
         mutable NodeList  _myChildrenList; // entities when doctype
         TypedNamedNodeMap _myAttributes; // notations when doctype
-        
+
         // self-initializing:
         ValuePtr          _myValue;
         SchemaInfoPtr     _mySchemaInfo;
-        mutable FacadePtr _myFacade;        
+        mutable FacadePtr _myFacade;
         NodeWeakPtr       _mySelf;
         UniqueId          _myUniqueId;
-        
+
         mutable NodeIDRegistryPtr _myIDRegistry;
         mutable NodeIDRegistryWeakPtr _myNameRegistry;
         mutable NodeIDRefRegistryPtr _myIDRefRegistry;
@@ -1675,7 +1675,7 @@ Dependent on node type allowed children are:<p>
         return myNodeCount;
     }
 
- 
+
     /* @} */
 
 } //Namespace dom

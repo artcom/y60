@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
@@ -109,7 +109,7 @@ dom::NodeIDRegistry::unregisterNodeName(dom::Node * theNode) {
     myNodes->second.erase(myEntry);
     if (myNodes->second.size() == 0) {
         _myNodeNames.erase(myNodes);
-    }   
+    }
 }
 
 const NodePtr
@@ -178,15 +178,15 @@ NodeOffsetCatalog::extractFrom(const Node & theRootNode) {
     for (NodeIDRegistry::IDMaps::const_iterator it = theRegistry._myIDMaps.begin();
         it != theRegistry._myIDMaps.end(); ++it) {
             _myIDMaps[it->first] = IDMap();
-            IDMap & myCatalog =_myIDMaps[it->first]; 
+            IDMap & myCatalog =_myIDMaps[it->first];
             for (NodeIDRegistry::IDMap::const_iterator mit = it->second.begin();
-                mit != it->second.end(); ++mit) 
+                mit != it->second.end(); ++mit)
             {
                 myCatalog[mit->first] = mit->second->getSavePosition();
             }
     }
 #else
-    for (NodeIDRegistry::IDMap::const_iterator mit = theRegistry._myIDMap.begin(); mit != theRegistry._myIDMap.end(); ++mit) 
+    for (NodeIDRegistry::IDMap::const_iterator mit = theRegistry._myIDMap.begin(); mit != theRegistry._myIDMap.end(); ++mit)
     {
         _myIDMap[mit->first] = mit->second->getSavePosition();
     }
@@ -204,7 +204,7 @@ NodeOffsetCatalog::binarize(asl::WriteableStream & theDest) const {
         theDest.appendCountedString(it->first);
         theDest.appendUnsigned(it->second.size());
         for (IDMap::const_iterator mit = it->second.begin();
-            mit != it->second.end(); ++mit) 
+            mit != it->second.end(); ++mit)
         {
             theDest.appendCountedString(mit->first);
             theDest.appendUnsigned(mit->second);
@@ -213,7 +213,7 @@ NodeOffsetCatalog::binarize(asl::WriteableStream & theDest) const {
 #else
     theDest.appendUnsigned(_myIDMap.size());
     for (IDMap::const_iterator mit = _myIDMap.begin();
-        mit != _myIDMap.end(); ++mit) 
+        mit != _myIDMap.end(); ++mit)
     {
         theDest.appendCountedString(mit->first);
         theDest.appendUnsigned(mit->second);
@@ -225,7 +225,7 @@ NodeOffsetCatalog::binarize(asl::WriteableStream & theDest) const {
     binarizePODT(_myParentIndex, theDest);
 #if 0
     theDest.appendUnsigned(_myUIDMap.size());
-    for (UIDMap::const_iterator mit = _myUIDMap.begin(); mit != _myUIDMap.end(); ++mit) 
+    for (UIDMap::const_iterator mit = _myUIDMap.begin(); mit != _myUIDMap.end(); ++mit)
     {
         mit->first.append(theDest);
         theDest.appendUnsigned(mit->second);
@@ -249,7 +249,7 @@ NodeOffsetCatalog::debinarize(const asl::ReadableStream & theSource, asl::AC_SIZ
         myError += asl::as_string((void*)myMagic);
         throw FormatCorrupted(myError, PLUS_FILE_LINE, theOldPos);
     }
-#ifndef USE_SINGLE_ID_ATTRIB    
+#ifndef USE_SINGLE_ID_ATTRIB
     _myIDMaps = IDMaps();
     asl::Unsigned64 myCatalogCount;
     thePos = theSource.readUnsigned(myCatalogCount, thePos);
@@ -266,7 +266,7 @@ NodeOffsetCatalog::debinarize(const asl::ReadableStream & theSource, asl::AC_SIZ
             throw FormatCorrupted("empty ID name reading ID catalog",PLUS_FILE_LINE);
         }
         _myIDMaps[myIDName] = IDMap();
-        IDMap & myCatalog =_myIDMaps[myIDName]; 
+        IDMap & myCatalog =_myIDMaps[myIDName];
 
         asl::Unsigned64 myCatalogSize;
         thePos = theSource.readUnsigned(myCatalogSize, thePos);
@@ -323,7 +323,7 @@ NodeOffsetCatalog::debinarize(const asl::ReadableStream & theSource, asl::AC_SIZ
     return thePos;
 }
 
-bool 
+bool
 NodeOffsetCatalog::getElementOffsetById(const DOMString & theId, const DOMString & theIdAttribute,  asl::Unsigned64 & theOffset) const {
 #ifndef USE_SINGLE_ID_ATTRIB
     IDMaps::const_iterator myMap = _myIDMaps.find(theIdAttribute);
@@ -446,7 +446,7 @@ dom::NodeIDRefRegistry::unregisterIDRef(const DOMString & theIDRefAttributeName,
             }
             return;
         }
-    } 
+    }
     throw Node::IDRefValueNotRegistered(string("Internal Error: The Element at "+as_string((void*)theElement)+" with IDRef attribute '")+theIDRefAttributeName+"' of value '"+theIDRefAttributeValue+"' is not registered at the document", PLUS_FILE_LINE);
 }
 #if 0
@@ -462,7 +462,7 @@ NodeIDRefRegistry::getElementsReferencingId(const DOMString & theId, const DOMSt
     for (IDRefMap::const_iterator myIt = myFirstEntry; myIt != myLastEntry; ++myIt) {
         theResult.push_back(myIt->second->self().lock());
     }
-}   
+}
 #endif
 
 void
@@ -659,7 +659,7 @@ void dom::registerStandardTypes(ValueFactory & theFactory) {
 
     theFactory.registerPrototype("ID", ValuePtr(new IDValue(0)));
 
-    ValuePtr myStringValue(new StringValue(0));    
+    ValuePtr myStringValue(new StringValue(0));
 
     //theFactory.registerPrototype("IDREF", ValuePtr(new IDRefValue(0)));
     theFactory.registerPrototype("IDREF", myStringValue);

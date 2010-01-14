@@ -4,20 +4,20 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
 // Description:  Memory Block handling functions; should be used whenever
 //               using memcpy is considered; features
 //               - typesafe conversion,
-//		         - compile-time memory read-write control, 
+//		         - compile-time memory read-write control,
 //               - convenient windows api interfaces and
 //               - also a copy-on-write (COW) implementation
 //
-// Last Review: pavel 30.11.2005 
+// Last Review: pavel 30.11.2005
 //
 //  review status report: (perfect, ok, fair, poor, disaster)
 //    usefullness            : fair
@@ -71,7 +71,7 @@ namespace asl
 
 /*! \addtogroup aslbase */
 /* @{ */
-    
+
 // verify that types are complete for increased safety
 
 template< typename T > inline void checked_delete(T * x)

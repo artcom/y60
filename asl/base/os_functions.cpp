@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 // Description: misc operating system & environment helper functions
@@ -50,10 +50,10 @@ namespace asl {
 
     template ASL_BASE_DECL bool get_environment_var_as(const std::string & theVariable, double& theValue);
     template ASL_BASE_DECL bool get_environment_var_as(const std::string & theVariable, int& theValue);
-    template ASL_BASE_DECL bool get_environment_var_as(const std::string & theVariable, 
+    template ASL_BASE_DECL bool get_environment_var_as(const std::string & theVariable,
             unsigned int& theValue);
     template ASL_BASE_DECL bool get_environment_var_as(const std::string & theVariable, string& theValue);
-    template ASL_BASE_DECL bool get_environment_var_as(const std::string & theVariable, 
+    template ASL_BASE_DECL bool get_environment_var_as(const std::string & theVariable,
             asl::Unsigned16& theValue);
     template ASL_BASE_DECL bool get_environment_var_as(const std::string & theVariable, bool& theValue);
 
@@ -284,7 +284,7 @@ namespace asl {
 
 #ifdef _WIN32
  bool
- hResultIsOk(HRESULT hr, std::string & theMessage) 
+ hResultIsOk(HRESULT hr, std::string & theMessage)
  {
      if (FAILED(hr)) {
          if (FACILITY_WINDOWS == HRESULT_FACILITY(hr)) {

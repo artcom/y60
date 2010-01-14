@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 // Description: command line utility to place long text in source code files
@@ -32,7 +32,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -65,8 +65,8 @@ int main(int argc, char *argv[]) {
         {"", ""}
     };
     std::string newLinePattern = "|<-";
-    std::string myVarName("MyVar");    
- 	std::string myNamespace("MyNamespace");   
+    std::string myVarName("MyVar");
+ 	std::string myNamespace("MyNamespace");
     std::string myInclude("");
 
     // generate prolog
@@ -79,24 +79,24 @@ int main(int argc, char *argv[]) {
 	std::string myConcatenator(") + std::string(");
 	std::string myEpilog(");|<-}");
     unsigned int myMaxLines = 100;
-                                        
-    ostringstream myExample;          
+
+    ostringstream myExample;
 	myExample << "Defaults:" << endl;
 	myExample << " text2cpp --prolog \"" << myProlog << '"' << endl;
 	myExample << "		   --concatenator \"" << myConcatenator << '"' << endl;
 	myExample << "		   --epilog \""<< myEpilog << '"' << endl;
-	myExample << "		   --maxlines " << myMaxLines << endl;	
+	myExample << "		   --maxlines " << myMaxLines << endl;
 	myExample << "		   --newline \"" << newLinePattern << '"' << endl;
-	myExample << "Examples: text2src --namespace y60 --variable ourY60xsd --inputfile Y60.xsd --outputfile Y60xsd.cpp" << endl;	
-	myExample << "          text2src --prolog \"const char * revision=\" --epilog=\";\"  --outputfile revision.cpp \"Rev.12345\"" << endl;	
-	myExample << "    The following line will produce a C++ program that outputs the text from myFile.txt to stdout:" << endl;	
+	myExample << "Examples: text2src --namespace y60 --variable ourY60xsd --inputfile Y60.xsd --outputfile Y60xsd.cpp" << endl;
+	myExample << "          text2src --prolog \"const char * revision=\" --epilog=\";\"  --outputfile revision.cpp \"Rev.12345\"" << endl;
+	myExample << "    The following line will produce a C++ program that outputs the text from myFile.txt to stdout:" << endl;
     myExample << "          text2src --inputfile myFile.txt --outputfile myFile.cpp --epilog \");}|<-#include <iostream>|<-int main() {std::cout << ||||::@@@@;}\"" << endl;
 
     std::string myInputFilename;
 	std::string myOutputFilename;
-	std::string myText;			
-    std::vector<std::string> myInputLines;	
-    	
+	std::string myText;
+    std::vector<std::string> myInputLines;
+
     try {
         Arguments myArguments;
         myArguments.addAllowedOptionsWithDocumentation(myOptions);
@@ -107,7 +107,7 @@ int main(int argc, char *argv[]) {
  			if (myArguments.getCount() && myArguments.haveOption("--inputfile")) {
 				cerr << "### ERROR: text given both on commandline and with --inputfile option, please pick one" << myInputFilename << "'"<< endl;
 				return 1;
-			}	
+			}
             if (myArguments.haveOption("--help")) {
                 myArguments.printHelp();
                 return EXIT_SUCCESS;
@@ -120,56 +120,56 @@ int main(int argc, char *argv[]) {
             }
             if (myArguments.haveOption("--epilog")) {
                 myEpilog = myArguments.getOptionArgument("--epilog");
-            }			
+            }
             if (myArguments.haveOption("--varname")) {
                 myVarName = myArguments.getOptionArgument("--varname");
-            }			
+            }
             if (myArguments.haveOption("--include")) {
                 myInclude = myArguments.getOptionArgument("--include");
             }
             findAndReplace(myProlog, "@@@@", myVarName.c_str());
             findAndReplace(myConcatenator, "@@@", myVarName.c_str());
-            findAndReplace(myEpilog, "@@@@", myVarName.c_str()); 
-            
+            findAndReplace(myEpilog, "@@@@", myVarName.c_str());
+
             if (myArguments.haveOption("--namespace")) {
                 myNamespace = myArguments.getOptionArgument("--namespace");
-            }			
+            }
             findAndReplace(myProlog, "||||", myNamespace.c_str());
             findAndReplace(myConcatenator, "||||", myNamespace.c_str());
-            findAndReplace(myEpilog, "||||", myNamespace.c_str()); 
-            
+            findAndReplace(myEpilog, "||||", myNamespace.c_str());
+
             if (myArguments.haveOption("--newline")) {
                 newLinePattern = myArguments.getOptionArgument("--newline");
-            }	
+            }
             if (newLinePattern.size()) {
                 ostringstream myNewLine;
                 myNewLine << endl;
                 findAndReplace(myProlog, newLinePattern.c_str(), myNewLine.str().c_str());
                 findAndReplace(myConcatenator, newLinePattern.c_str(), myNewLine.str().c_str());
-                findAndReplace(myEpilog, newLinePattern.c_str(), myNewLine.str().c_str()); 
+                findAndReplace(myEpilog, newLinePattern.c_str(), myNewLine.str().c_str());
             }
-            
-            string myFileText;				
+
+            string myFileText;
             if (myArguments.haveOption("--inputfile")) {
                 myInputFilename = myArguments.getOptionArgument("--inputfile");
 				if (!readFile(myInputFilename, myInputLines)) {
                     cerr << "### ERROR: could not read file '" << myInputFilename << "'" << endl;
 					return 1;
 				}
-            }	
+            }
             if (myArguments.haveOption("--outputfile")) {
                 myOutputFilename = myArguments.getOptionArgument("--outputfile");
-            }	
+            }
             if (myArguments.haveOption("--maxlines")) {
                 myMaxLines =  asl::as<int>(myArguments.getOptionArgument("--maxlines"));
-            }	
+            }
 
             if (myArguments.getCount()>0) {
                 for (int i = 0; i < myArguments.getCount(); ++i) {
                     myInputLines.push_back(myArguments.getArgument(i));
                 }
-            }	
-			
+            }
+
 			std::ostringstream myOutput;
 
             myOutput << "/* --- Generated by text2src, do not modify --- */" << endl;
@@ -186,11 +186,11 @@ int main(int argc, char *argv[]) {
                 findAndReplace(myOutputLine, "\\", "\\\\");
                 findAndReplace(myOutputLine, "\"", "\\\"");
 				myOutput << myOutputLine;
-#ifdef NO_LAST_NEWLINE                
+#ifdef NO_LAST_NEWLINE
 				if (myLine+1 < myInputLines.size()) {
 #endif
                     myOutput << "\\n";
-#ifdef NO_LAST_NEWLINE                
+#ifdef NO_LAST_NEWLINE
                 }
 #endif
                 myOutput << '"';
@@ -200,7 +200,7 @@ int main(int argc, char *argv[]) {
 				}
 			}
 			myOutput << myEpilog << endl;
-			
+
 			if (myOutputFilename.size()) {
 				if (!writeFile(myOutputFilename, myOutput.str())) {
                     cerr << "### ERROR: could not write file '" << myInputFilename << "'"<< endl;
@@ -210,13 +210,13 @@ int main(int argc, char *argv[]) {
 				cout << myOutput.str();
 			}
         }
-				
+
     } catch (asl::Exception & ex) {
 			cerr << "### ERROR: " << ex << endl;
         return -1;
     }
     return 0;
-}		
+}
 
 
 #if 0
@@ -258,14 +258,14 @@ bool isCppComment(const string & myLine, string::size_type myPosInLine) {
 void getLine(const string & myFile, string::size_type myPosInFile, string & myLine, string::size_type & myPosInLine) {
     string::size_type myLineStart = myFile.rfind('\n',myPosInFile) + 1;
     string::size_type myLineEnd = myFile.find('\n',myPosInFile);
-    myLine = myFile.substr(myLineStart, myLineEnd - myLineStart); 
+    myLine = myFile.substr(myLineStart, myLineEnd - myLineStart);
     myPosInLine = myPosInFile - myLineStart;
 }
 
 void getLine(const string & myFile, string::size_type myPosInFile, string::size_type myMatchSize, string & myLine, string::size_type & myPosInLine) {
     string::size_type myLineStart = myFile.rfind('\n',myPosInFile) + 1;
     string::size_type myLineEnd = myFile.find('\n',myPosInFile+myMatchSize);
-    myLine = myFile.substr(myLineStart, myLineEnd - myLineStart); 
+    myLine = myFile.substr(myLineStart, myLineEnd - myLineStart);
     myPosInLine = myPosInFile - myLineStart;
 }
 
@@ -328,7 +328,7 @@ int main(int argc, char *argv[]) {
             }
             string::size_type matchOnlyPos = string::npos;
             if (myArguments.haveOption("-p")) {
-                matchOnlyPos = asl::as<int>(myArguments.getOptionArgument("-p")); 
+                matchOnlyPos = asl::as<int>(myArguments.getOptionArgument("-p"));
             }
 
 
@@ -337,19 +337,19 @@ int main(int argc, char *argv[]) {
                 string myFile;
                 bool hasBeenModified = false;
                 if (readFile(myArguments.getArgument(i), myFile)) {
-                    string::size_type matchPos = 0; 
-                    string::size_type matchLen = searchForString.size(); 
+                    string::size_type matchPos = 0;
+                    string::size_type matchLen = searchForString.size();
                     while ((matchPos = myFile.find(searchForString, matchPos)) != string::npos) {
                         if (matchOnlyPos != string::npos) {
                             if (matchPos > matchOnlyPos) {
-                               break; 
+                               break;
                             }
                             if (matchPos < matchOnlyPos) {
-                               continue; 
+                               continue;
                             }
                        }
-                        
-                        string::size_type matchPos2 = 0; 
+
+                        string::size_type matchPos2 = 0;
                         if (myArguments.haveOption("-2")) {
                             matchPos2 = myFile.find(replaceUntilString, matchPos+searchForString.size());
                             if (matchPos2 == string::npos) {
@@ -357,20 +357,20 @@ int main(int argc, char *argv[]) {
                             }
                             matchLen = matchPos2 - matchPos + replaceUntilString.size();
                         }
-                        
+
                         if (myArguments.haveOption("-w")) {
                             if (matchPos>0) {
-                                if (isNameChar(myFile[matchPos-1]) || 
+                                if (isNameChar(myFile[matchPos-1]) ||
                                         isNameChar(myFile[matchPos+matchLen])) {
                                     ++matchPos;
                                     continue;
                                 }
                             }
                         }
-                        if (!myArguments.haveOption("-s") || 
-                                myArguments.haveOption("-q") || 
-                                myArguments.haveOption("-Q") || 
-                                myArguments.haveOption("-c") || 
+                        if (!myArguments.haveOption("-s") ||
+                                myArguments.haveOption("-q") ||
+                                myArguments.haveOption("-Q") ||
+                                myArguments.haveOption("-c") ||
                                 myArguments.haveOption("-C"))
                         {
 
@@ -404,14 +404,14 @@ int main(int argc, char *argv[]) {
                             }
 
                             if (myArguments.haveOption("-v")) {
-                                cerr << "Match in file '" << myArguments.getArgument(i) << "', pos " 
+                                cerr << "Match in file '" << myArguments.getArgument(i) << "', pos "
                                     << matchPos << ":" << endl;
                                 cerr << "Replacing :" << myLine << endl;
-                                cerr << "     with :"; 
+                                cerr << "     with :";
                             }
                             myLine.replace(myPosInLine, matchLen, replaceWithString);
                             cout << myLine << endl;
-                        } 
+                        }
                         hasBeenModified = true;
                         myFile.replace(matchPos, matchLen, replaceWithString);
                         matchPos+=replaceWithString.size();

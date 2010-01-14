@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -41,7 +41,7 @@
 /*
  Copyright (c) 2002
  Author: Konstantin Boukreev
- E-mail: konstantin@mail.primorye.ru 
+ E-mail: konstantin@mail.primorye.ru
  Created: 16.01.2002 12:07:21
  Version: 1.0.0
 
@@ -54,7 +54,7 @@
  It is provided "as is" without express or implied warranty.
 
  set of classes for working with win32 structured exception in C++.
- the example of using Symbol Handler and Debugging service API for printing a call stack's info  
+ the example of using Symbol Handler and Debugging service API for printing a call stack's info
 */
 
 
@@ -63,7 +63,7 @@
 
 #include "TraceUtils.h"
 
-#include <malloc.h> 
+#include <malloc.h>
 #include <tlhelp32.h>
 #include <iostream>
 #pragma comment (lib, "dbghelp")
@@ -84,9 +84,9 @@ using namespace std;
 ///////////////////////////////////////////////////////////////////////
 //
 bool IsNT()
-{	
+{
 	#if 1
-	OSVERSIONINFO vi = { sizeof(vi)};	
+	OSVERSIONINFO vi = { sizeof(vi)};
 	::GetVersionEx(&vi);
 	return vi.dwPlatformId == VER_PLATFORM_WIN32_NT;
 	#else
@@ -117,11 +117,11 @@ namespace asl {
  * http://nedbatchelder.com/blog/20051006T065335.html
  * http://www.codeproject.com/threads/StackWalker.asp
  * http://www.codeproject.com/cpp/exception.asp
- * if trace exceptions for windows don't work in some cases - 
+ * if trace exceptions for windows don't work in some cases -
  * this might be a good starting point
 */
-	
-Win32Backtrace::Win32Backtrace (unsigned address) 
+
+Win32Backtrace::Win32Backtrace (unsigned address)
 	: m_address(address), m_ok(false), m_pframe(0)
 {
 }
@@ -133,9 +133,9 @@ Win32Backtrace::~Win32Backtrace()
 }
 
 
-void 
+void
 Win32Backtrace::trace(std::vector<StackFrame> & theStack, int theMaxDepth) {
-    //Win32Backtrace::stack_trace(theStack, 0); // skip the first frame	
+    //Win32Backtrace::stack_trace(theStack, 0); // skip the first frame
 }
 
 /////////////////////////////////////////////
@@ -143,30 +143,30 @@ Win32Backtrace::trace(std::vector<StackFrame> & theStack, int theMaxDepth) {
 
 struct current_context : CONTEXT
 {
-	HANDLE	thread;	 
+	HANDLE	thread;
 	volatile int signal;
 };
 
 static DWORD WINAPI tproc(void * pv)
-{		
+{
 	current_context * p = reinterpret_cast<current_context*>(pv);
-	
+
 	__try
-	{	
+	{
 		// Konstantin, 14.01.2002 17:21:32
 		// must wait in spin lock until main thread will leave a ResumeThread (must return back to user context)
 		unsigned debug_only = 0;
-		while (p->signal) {		
+		while (p->signal) {
 			if (!SwitchToThread())
-				Sleep(20); // forces switch to another thread 
+				Sleep(20); // forces switch to another thread
 			++debug_only;
 		}
-		
+
 		if (-1 == SuspendThread(p->thread)) {
 			p->signal  = -1;
 			__leave;
 		}
-		
+
 		__try
 		{
 			p->signal = GetThreadContext(p->thread, p) ? 1 : -1;
@@ -174,25 +174,25 @@ static DWORD WINAPI tproc(void * pv)
 		__finally
 		{
 			VERIFY(-1 != ResumeThread(p->thread));
-		}		
+		}
 	}
 	__except(EXCEPTION_EXECUTE_HANDLER)
-	{	
+	{
 		p->signal  = -1;
-	}	
+	}
 	return 0;
 }
 
 
-bool 
+bool
 Win32Backtrace::stack_trace(std::vector<StackFrame> & theStack, unsigned skip)
 {
-	
+
 	// attempts to get current thread's context
 	current_context ctx;
 	memset(&ctx, 0, sizeof current_context);
 
-	BOOL r = DuplicateHandle(GetCurrentProcess(), GetCurrentThread(), GetCurrentProcess(), 
+	BOOL r = DuplicateHandle(GetCurrentProcess(), GetCurrentThread(), GetCurrentProcess(),
 		&ctx.thread, 0, 0, DUPLICATE_SAME_ACCESS);
 
 	_ASSERTE(r);
@@ -204,8 +204,8 @@ Win32Backtrace::stack_trace(std::vector<StackFrame> & theStack, unsigned skip)
 	ctx.ContextFlags = CONTEXT_CONTROL; // CONTEXT_FULL;
 	ctx.signal = -1;
 
-	DWORD dummy;		
-	HANDLE worker = CreateThread(0, 0, tproc, &ctx, CREATE_SUSPENDED, &dummy);	
+	DWORD dummy;
+	HANDLE worker = CreateThread(0, 0, tproc, &ctx, CREATE_SUSPENDED, &dummy);
 	_ASSERTE(worker);
 
 	if (worker) {
@@ -217,48 +217,48 @@ Win32Backtrace::stack_trace(std::vector<StackFrame> & theStack, unsigned skip)
 		} else {
 			VERIFY(TerminateThread(worker, 0));
 		}
-		VERIFY(CloseHandle(worker));		
+		VERIFY(CloseHandle(worker));
 	}
-	
+
 	VERIFY(CloseHandle(ctx.thread));
 
 	if (ctx.signal == -1) {
 		_ASSERTE(0);
 		return false;
 	}
-		
-	// now it can print stack	
-	Win32Backtrace backtracer(0); 
+
+	// now it can print stack
+	Win32Backtrace backtracer(0);
 	stack_trace(backtracer, theStack, &ctx, skip);
-	
+
 	return true;
 }
 
 
-bool 
+bool
 Win32Backtrace::check()
-{	
-	if (!m_ok) 
-		m_ok = guard::instance().init(); 
-	return m_ok; 
+{
+	if (!m_ok)
+		m_ok = guard::instance().init();
+	return m_ok;
 }
 
 
-bool 
+bool
 Win32Backtrace::stack_first (CONTEXT* pctx)
 {
-	if (!pctx || IsBadReadPtr(pctx, sizeof(CONTEXT))) 
+	if (!pctx || IsBadReadPtr(pctx, sizeof(CONTEXT)))
 		return false;
 
 	if (!check())
 		return false;
 
-	if (!m_pframe) 
+	if (!m_pframe)
 	{
 		m_pframe = new STACKFRAME;
 		if (!m_pframe) return false;
 	}
-				
+
 	memset(m_pframe, 0, sizeof(STACKFRAME));
 
     #ifdef _X86_
@@ -283,22 +283,22 @@ Win32Backtrace::stack_first (CONTEXT* pctx)
 	return stack_next();
 }
 
-Win32Backtrace::guard::guard() 
-	: m_ref(0) 
+Win32Backtrace::guard::guard()
+	: m_ref(0)
 {}
 
-Win32Backtrace::guard::~guard() 
-{ 
-	clear(); 
+Win32Backtrace::guard::~guard()
+{
+	clear();
 }
 
-bool 
+bool
 Win32Backtrace::guard::init()
-{	
-	if (!m_ref) 
+{
+	if (!m_ref)
 	{
 		m_ref = -1;
-		
+
 		HANDLE hProc = SymGetProcessHandle();
 		DWORD  dwPid = GetCurrentProcessId();
 
@@ -306,35 +306,35 @@ Win32Backtrace::guard::init()
 		SymSetOptions (SymGetOptions()|SYMOPT_DEFERRED_LOADS|SYMOPT_LOAD_LINES);
 	//	SymSetOptions (SYMOPT_UNDNAME|SYMOPT_LOAD_LINES);
 		if (::SymInitialize(hProc, 0, TRUE))
-		{			
+		{
 			// enumerate modules
-			if (IsNT())		
+			if (IsNT())
 			{
 				typedef BOOL (WINAPI *ENUMPROCESSMODULES)(HANDLE, HMODULE*, DWORD, LPDWORD);
 
 				HINSTANCE hInst = LoadLibrary(_T("psapi.dll"));
 				if (hInst)
-				{				
-					ENUMPROCESSMODULES fnEnumProcessModules = 
+				{
+					ENUMPROCESSMODULES fnEnumProcessModules =
 						(ENUMPROCESSMODULES)GetProcAddress(hInst, "EnumProcessModules");
 					DWORD cbNeeded = 0;
 					if (fnEnumProcessModules &&
 						fnEnumProcessModules(GetCurrentProcess(), 0, 0, &cbNeeded) &&
 						cbNeeded)
-					{	
+					{
 						HMODULE * pmod = (HMODULE *)alloca(cbNeeded);
 						DWORD cb = cbNeeded;
 						if (fnEnumProcessModules(GetCurrentProcess(), pmod, cb, &cbNeeded))
 						{
 							m_ref = 0;
 							for (unsigned i = 0; i < cb / sizeof (HMODULE); ++i)
-							{								
+							{
 								if (!load_module(hProc, pmod[i])) {
 								//	m_ref = -1;
 								//	break;
 									_ASSERTE(0);
-								}									
-							}							
+								}
+							}
 						}
 					}
 					else
@@ -358,14 +358,14 @@ Win32Backtrace::guard::init()
 				MODULEWALK fnModule32First = (MODULEWALK)GetProcAddress(hMod, "Module32First");
 				MODULEWALK fnModule32Next  = (MODULEWALK)GetProcAddress(hMod, "Module32Next");
 
-				if (fnCreateToolhelp32Snapshot && 
-					fnModule32First && 
+				if (fnCreateToolhelp32Snapshot &&
+					fnModule32First &&
 					fnModule32Next)
-				{				
+				{
 					HANDLE hModSnap = fnCreateToolhelp32Snapshot(TH32CS_SNAPMODULE, dwPid);
 					if (hModSnap)
 					{
-						MODULEENTRY32 me32 = {0};						 
+						MODULEENTRY32 me32 = {0};
 						me32.dwSize = sizeof(MODULEENTRY32);
 						if (fnModule32First(hModSnap, &me32))
 						{
@@ -376,17 +376,17 @@ Win32Backtrace::guard::init()
 								{
 								//	m_ref = -1;
 								//	break;
-								}																	
+								}
 							}
 							while(fnModule32Next(hModSnap, &me32));
 						}
-						VERIFY(CloseHandle(hModSnap));						
+						VERIFY(CloseHandle(hModSnap));
 					}
 				}
 			}
 
 			if (m_ref == -1)
-			{				
+			{
 				VERIFY(SymCleanup(SymGetProcessHandle()));
 			}
 		}
@@ -397,7 +397,7 @@ Win32Backtrace::guard::init()
 	}
 	if (m_ref == -1)
 		return false;
-	if (0 == m_ref) 
+	if (0 == m_ref)
 		++m_ref; // lock it once
 //	++m_ref;
 	return true;
@@ -406,29 +406,29 @@ Win32Backtrace::guard::init()
 void Win32Backtrace::guard::clear()
 {
 	if (m_ref ==  0) return;
-	if (m_ref == -1) return;	
+	if (m_ref == -1) return;
 	if (--m_ref == 0)
-	{	 
+	{
 		VERIFY(SymCleanup(SymGetProcessHandle()));
 	}
 }
 
 bool Win32Backtrace::guard::load_module(HANDLE hProcess, HMODULE hMod)
-{	
+{
 	char filename[MAX_PATH];
 	if (!GetModuleFileNameA(hMod, filename, MAX_PATH))
 		return false;
-	
+
 	HANDLE hFile = CreateFile(filename, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, 0);
-	if (hFile == INVALID_HANDLE_VALUE) { 
+	if (hFile == INVALID_HANDLE_VALUE) {
 		CloseHandle(hFile);
 		return false;
 	}
 
-	// "Debugging Applications" John Robbins	
+	// "Debugging Applications" John Robbins
     // For whatever reason, SymLoadModule can return zero, but it still loads the modules. Sheez.
 	SetLastError(ERROR_SUCCESS);
-    if (!SymLoadModule(hProcess, hFile, filename, 0, (DWORD)hMod, 0) && 
+    if (!SymLoadModule(hProcess, hFile, filename, 0, (DWORD)hMod, 0) &&
 		ERROR_SUCCESS != GetLastError())
 	{
 		CloseHandle(hFile);
@@ -440,38 +440,38 @@ bool Win32Backtrace::guard::load_module(HANDLE hProcess, HMODULE hMod)
 
 
 
-bool 
+bool
 Win32Backtrace::stack_next  ()
 {
-	if (!m_pframe || !m_pctx) 
-	{		
+	if (!m_pframe || !m_pctx)
+	{
 		_ASSERTE(0);
 		return false;
 	}
-		
+
 	if (!m_ok)
 	{
 		_ASSERTE(0);
 		return false;
 	}
-	
+
 	SetLastError(0);
 	HANDLE hProc = SymGetProcessHandle();
 	BOOL r = StackWalk (IMAGE_FILE_MACHINE_I386,
-				hProc, 
-				GetCurrentThread(), 
-				m_pframe, 
+				hProc,
+				GetCurrentThread(),
+				m_pframe,
 				m_pctx,
                 (PREAD_PROCESS_MEMORY_ROUTINE)My_ReadProcessMemory,
 				SymFunctionTableAccess,
                 SymGetModuleBase,
 				0);
 
-	if (!r || 
+	if (!r ||
 		!m_pframe->AddrFrame.Offset)
-	{		
+	{
 		return false;
-	}		
+	}
 
 	// "Debugging Applications" John Robbins
 	// Before I get too carried away and start calculating
@@ -480,8 +480,8 @@ Win32Backtrace::stack_next  ()
 	// StackWalk returns TRUE but the address doesn't belong to
 	// a module in the process.
 	DWORD dwModBase = SymGetModuleBase (hProc, m_pframe->AddrPC.Offset);
-	if (!dwModBase) 
-	{	
+	if (!dwModBase)
+	{
 		_ASSERTE(0);
 		return false;
 	}
@@ -492,9 +492,9 @@ Win32Backtrace::stack_next  ()
 
 
 
-bool 
+bool
 Win32Backtrace::get_line_from_addr (HANDLE hProc, unsigned addr, unsigned * pdisplacement, IMAGEHLP_LINE * pLine)
-{	 
+{
 	#ifdef WORK_AROUND_SRCLINE_BUG
 
 	// "Debugging Applications" John Robbins
@@ -504,19 +504,19 @@ Win32Backtrace::get_line_from_addr (HANDLE hProc, unsigned addr, unsigned * pdis
     // find the line and return the proper displacement.
     DWORD displacement = 0 ;
     while (!SymGetLineFromAddr (hProc, addr - displacement, (DWORD*)pdisplacement, pLine))
-    {        
+    {
         if (100 == ++displacement)
-            return false;        
+            return false;
     }
 
 	// "Debugging Applications" John Robbins
     // I found the line, and the source line information is correct, so
     // change the displacement if I had to search backward to find the source line.
-    if (displacement)    
-        *pdisplacement = displacement;    
+    if (displacement)
+        *pdisplacement = displacement;
     return true;
 
-	#else 
+	#else
     return 0 != SymGetLineFromAddr (hProc, addr, (DWORD *) pdisplacement, pLine);
 	#endif
 }
@@ -524,7 +524,7 @@ Win32Backtrace::get_line_from_addr (HANDLE hProc, unsigned addr, unsigned * pdis
 
 unsigned Win32Backtrace::symbol(char * buf, unsigned len, unsigned * pdisplacement)
 {
-	if (!len || !buf || 
+	if (!len || !buf ||
 		IsBadWritePtr(buf, len) ||
 		(pdisplacement && IsBadWritePtr(pdisplacement, sizeof(unsigned))))
 		return 0;
@@ -542,21 +542,21 @@ unsigned Win32Backtrace::symbol(char * buf, unsigned len, unsigned * pdisplaceme
 	DWORD displacement = 0;
 	int r = SymGetSymFromAddr(hProc, m_address, &displacement, pSym);
 	if (!r) return 0;
-	if (pdisplacement) 
+	if (pdisplacement)
 		*pdisplacement = displacement;
 
 	r = _snprintf(buf, len, "%s()", pSym->Name);
-    
+
 	r = r == -1 ? len - 1 : r;
-	buf[r] = 0;	
+	buf[r] = 0;
 	return r;
 }
 
 unsigned Win32Backtrace::fileline (char * buf, unsigned len, unsigned * pline, unsigned * pdisplacement)
 {
-	if (!len || !buf || 
-		IsBadWritePtr(buf, len) || 
-		(pline && IsBadWritePtr(pline, sizeof(unsigned))) || 
+	if (!len || !buf ||
+		IsBadWritePtr(buf, len) ||
+		(pline && IsBadWritePtr(pline, sizeof(unsigned))) ||
 		(pdisplacement && IsBadWritePtr(pdisplacement, sizeof(unsigned))))
 		return 0;
 
@@ -571,9 +571,9 @@ unsigned Win32Backtrace::fileline (char * buf, unsigned len, unsigned * pline, u
 	unsigned displacement = 0;
 	if (!get_line_from_addr(hProc, m_address, &displacement, &img_line))
 		return 0;
-	if (pdisplacement) 
+	if (pdisplacement)
 		*pdisplacement = displacement;
-	if (pline) 
+	if (pline)
 		*pline = img_line.LineNumber;
 	lstrcpynA(buf, img_line.FileName, len);
 	return lstrlenA(buf);
@@ -581,13 +581,13 @@ unsigned Win32Backtrace::fileline (char * buf, unsigned len, unsigned * pline, u
 
 
 
-bool 
-Win32Backtrace::stack_trace(Win32Backtrace& sym, std::vector<StackFrame> & theStack, 
+bool
+Win32Backtrace::stack_trace(Win32Backtrace& sym, std::vector<StackFrame> & theStack,
 							CONTEXT * pctx, unsigned skip)
-{	
-	if (!sym.stack_first(pctx)) 
+{
+	if (!sym.stack_first(pctx))
 		return false;
-				
+
 	StackFrame myItem;
 	//char buf [512] = {0};
 	char fbuf[512] = {0};
@@ -596,22 +596,22 @@ Win32Backtrace::stack_trace(Win32Backtrace& sym, std::vector<StackFrame> & theSt
 	do
 	{
 		if (!skip)
-		{			
+		{
 			unsigned ln = 0;
 			unsigned ld = 0;
 			unsigned sd = 0;
 			char *   pf	= 0;
 			char *   ps = 0;
-			
-			if (!pf) {							
+
+			if (!pf) {
 				pf = (sym.fileline(fbuf, sizeof(fbuf), &ln, &ld)) ? fbuf : " ";
 			}
 			myItem.frame = (ptrdiff_t)pf;
-			
+
 			if	(!ps) {
 				ps = sym.symbol(sbuf, sizeof(sbuf), &sd) ? sbuf : "?()";
 			}
-			
+
 			myItem.name = ps;
 			theStack.push_back(myItem);
 
@@ -624,7 +624,7 @@ Win32Backtrace::stack_trace(Win32Backtrace& sym, std::vector<StackFrame> & theSt
 	while (sym.stack_next());
 	return true;
 }
-        
+
 
 }
 

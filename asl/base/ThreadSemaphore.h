@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -70,7 +70,7 @@ namespace asl {
             WAIT_INFINITE = ~0  ///< Wait forever or until the condition is met
         };
         /**
-         * Constructor. 
+         * Constructor.
          * @param value initial value of the semaphore. Usually this is 0.
          */
         ThreadSemaphore(int value = 0);
@@ -83,8 +83,8 @@ namespace asl {
         /**
          * Tries to decrement the semaphore. If milliseconds ms have passed
          * and the semaphore could not be decremented it abandons the wait
-         * and returns false. If milliseconds is set to 
-         * ThreadSemaphore::WAIT_INFINTE it blocks infinitely (or until the 
+         * and returns false. If milliseconds is set to
+         * ThreadSemaphore::WAIT_INFINTE it blocks infinitely (or until the
          * semaphore is posted.)
          *
          * @param milliseconds milliseconds to wait or ThreadSemaphore::WAIT_INFINTE

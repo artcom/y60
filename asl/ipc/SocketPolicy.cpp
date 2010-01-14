@@ -4,12 +4,12 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: 
+// Description:
 //     Classes for networked or local communication between processes
 //
 // Last Review:  ms 2007-08-15
@@ -35,7 +35,7 @@
 //
 //    overall review status   :      ok
 //
-//    recommendations: add high-level documentation, improve doxygen documentation 
+//    recommendations: add high-level documentation, improve doxygen documentation
 */
 
 //own header
@@ -58,21 +58,10 @@ namespace asl {
 #endif
 
 #define DB(x) // x
-    
+
 void
 SocketPolicy::disconnect(Handle & theHandle) {
-#ifdef _WIN32        
-    closesocket(theHandle);
-#else   
-    ::shutdown(theHandle, SHUT_RDWR);
-    ::close(theHandle);
-#endif
-    theHandle = 0;
-}
-
-void 
-SocketPolicy::stopListening(Handle theHandle) {
-#ifdef _WIN32        
+#ifdef _WIN32
     closesocket(theHandle);
 #else
     ::shutdown(theHandle, SHUT_RDWR);
@@ -81,8 +70,19 @@ SocketPolicy::stopListening(Handle theHandle) {
     theHandle = 0;
 }
 
-SocketPolicy::Handle 
-SocketPolicy::createOnConnect(Handle & theListenHandle, unsigned theMaxConnectionCount, 
+void
+SocketPolicy::stopListening(Handle theHandle) {
+#ifdef _WIN32
+    closesocket(theHandle);
+#else
+    ::shutdown(theHandle, SHUT_RDWR);
+    ::close(theHandle);
+#endif
+    theHandle = 0;
+}
+
+SocketPolicy::Handle
+SocketPolicy::createOnConnect(Handle & theListenHandle, unsigned theMaxConnectionCount,
         int theTimeout) {
 
     int retval = 0;
@@ -107,11 +107,11 @@ SocketPolicy::createOnConnect(Handle & theListenHandle, unsigned theMaxConnectio
     if (retval == 0) {
         return 0;
     }
-    DB(AC_TRACE << theListenHandle << "starting accept call" << endl);  
+    DB(AC_TRACE << theListenHandle << "starting accept call" << endl);
     Handle newFD;
     if ((newFD=accept(theListenHandle, 0, 0))<0) {
         int myLastError = getLastSocketError();
-        DB(AC_TRACE << "accept call error " << myLastError << endl);  
+        DB(AC_TRACE << "accept call error " << myLastError << endl);
 #ifdef _WIN32
         if (myLastError == WSAEINTR) { // interrupted system call
 #else
@@ -123,7 +123,7 @@ SocketPolicy::createOnConnect(Handle & theListenHandle, unsigned theMaxConnectio
                 getSocketErrorMessage(myLastError), PLUS_FILE_LINE);
     }
     DB(AC_TRACE << "accept call successful" << endl);
-#ifdef SO_NOSIGPIPE // turn off SIGPIPE on systems supporting this socket option    
+#ifdef SO_NOSIGPIPE // turn off SIGPIPE on systems supporting this socket option
     socklen_t boolTrue = 1;
     if(setsockopt(newFD, SOL_SOCKET, SO_NOSIGPIPE, (void *)&boolTrue, sizeof(boolTrue)) < 0) {
         throw ConduitException(string("Could not set SO_NOSIGPIPE: ")+
@@ -134,7 +134,7 @@ SocketPolicy::createOnConnect(Handle & theListenHandle, unsigned theMaxConnectio
 }
 
 
-bool 
+bool
 SocketPolicy::handleIO(Handle & theHandle, BufferQueue & theInQueue, BufferQueue & theOutQueue, int theTimeout) {
     int myRetVal = 0;
     fd_set myReadSet;
@@ -194,7 +194,7 @@ bool
 SocketPolicy::receiveData(Handle & theHandle, BufferQueue & theInQueue)
 {
     CharBufferPtr myInputBuffer = CharBufferPtr(new CharBuffer(1024));
- 
+
     int bytesread = recv(theHandle, &((*myInputBuffer)[0]), myInputBuffer->size(), 0);
     if (bytesread == 0) {
         // Client disconnected gracefully
@@ -231,11 +231,11 @@ SocketPolicy::sendData(Handle & theHandle, BufferQueue & theOutQueue)
 
     CharBufferPtr myOutBuffer = theOutQueue.front();
     theOutQueue.pop_front();
-#ifdef MSG_NOSIGNAL // prevent SIGPIPE on systems supporting this flag    
+#ifdef MSG_NOSIGNAL // prevent SIGPIPE on systems supporting this flag
     int byteswritten=::send(theHandle, &((*myOutBuffer)[0]), myOutBuffer->size(), MSG_NOSIGNAL);
 #else
     int byteswritten=::send(theHandle, &((*myOutBuffer)[0]), myOutBuffer->size(), 0);
-#endif    
+#endif
     if (byteswritten < 0)
     {
         int myLastError = getLastSocketError();

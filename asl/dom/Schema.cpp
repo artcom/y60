@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: Schema.cpp,v $
@@ -14,7 +14,7 @@
 //   $Revision: 1.7 $
 //
 // Description: tiny fast XML-Parser and DOM
-// 
+//
 //
 //
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
@@ -38,7 +38,7 @@ Schema::Schema(const dom::DOMString & theSchema, const dom::DOMString & theNSPre
     }
 }
 
-void 
+void
 Schema::collectDeclarations(const NodePtr theNode,
                             const DOMString & theNodeName,
                             const DOMString & theAttributeName,
@@ -80,7 +80,7 @@ Schema::collectSubstitutionGroups(const NodePtr theNode,
                                   int theDepth,
                                   int theMaxDepth,
                                   NameSetMap & theResults,
-                                  const DOMString & theNSPrefix) 
+                                  const DOMString & theNSPrefix)
 {
     DB2(AC_TRACE << "collectSubstitutionGroups theNodeName='"<<theNodeName <<"', theGroupAttributeName="<< theGroupAttributeName <<"', theNameAttributeName=" << theNameAttributeName << endl);
     if (theNode->nodeType() == Node::ELEMENT_NODE) {
@@ -206,7 +206,7 @@ Schema::findTopLevelElementDeclaration(const DOMString & theName) const {
         return NodePtr();
 }
 
-const NodePtr 
+const NodePtr
 Schema::findTopLevelTypeDeclaration(const DOMString & theName) const {
     NodeMap::const_iterator myResult = _myTopLevelTypeDeclarations.find(theName);
     if (myResult != _myTopLevelTypeDeclarations.end()) {
@@ -215,7 +215,7 @@ Schema::findTopLevelTypeDeclaration(const DOMString & theName) const {
     return NodePtr();
 }
 
-const NodePtr 
+const NodePtr
 Schema::findTopLevelAttributeDeclaration(const DOMString & theName) const {
     NodeMap::const_iterator myResult = _myTopLevelAttributeDeclarations.find(theName);
     if (myResult != _myTopLevelAttributeDeclarations.end()) {
@@ -224,7 +224,7 @@ Schema::findTopLevelAttributeDeclaration(const DOMString & theName) const {
     return NodePtr();
 }
 
-const NodePtr 
+const NodePtr
 Schema::findTopLevelGroupDeclaration(const DOMString & theName) const {
     NodeMap::const_iterator myResult = _myTopLevelGroupDeclarations.find(theName);
     if (myResult != _myTopLevelGroupDeclarations.end()) {
@@ -246,7 +246,7 @@ Schema::addDocument(const Node & theDocument, const DOMString & theNSPrefix) {
     return myNewBranch;
 }
 
-NodePtr 
+NodePtr
 Schema::findType(NodePtr theSchemaDeclaration, unsigned long theParsePos) {
     NodePtr myType;
     NodePtr myTypeAttribute = theSchemaDeclaration->getAttribute(ATTR_TYPE);
@@ -300,14 +300,14 @@ const NodePtr
 dom::Schema::tryFindElementDeclaration(const DOMString & theParentElementName,
                                        const NodePtr theParentElementType,
                                        const DOMString & theElementName,
-                                       int theParsePos) 
+                                       int theParsePos)
 {
     DB(AC_TRACE << "Schema::tryFindElementDeclaration(theParentElementName="<<theParentElementName<<","
         << "theParentElementType="<< *theParentElementType << ","
         << "theElementName="<< theElementName << ","<<endl;)
 
         // if parent is a complex type, lets locate our type
-        if (theParentElementType->nodeName() == XS_COMPLEXTYPE || 
+        if (theParentElementType->nodeName() == XS_COMPLEXTYPE ||
             theParentElementType->nodeName() == XS_GROUP ||
             theParentElementType->nodeName() == XS_SEQUENCE ||
             theParentElementType->nodeName() == XS_CHOICE)
@@ -372,15 +372,15 @@ dom::Schema::tryFindElementDeclaration(const DOMString & theParentElementName,
                                 NodePtr myElementDecl = myDecl;
                                 NodePtr myNameAttr = myElementDecl->getAttribute(ATTR_NAME);
                                 if (myNameAttr) {
-                                    if (myNameAttr->nodeValue() == theElementName || 
-                                        substitutionsGroupContains(myNameAttr->nodeValue(),theElementName)) 
+                                    if (myNameAttr->nodeValue() == theElementName ||
+                                        substitutionsGroupContains(myNameAttr->nodeValue(),theElementName))
                                     {
                                         return myElementDecl;
                                     }
                                 } else {
                                     NodePtr myRefAttr = myElementDecl->getAttribute(ATTR_REF);
-                                    if (myRefAttr->nodeValue() == theElementName || 
-                                        substitutionsGroupContains(myRefAttr->nodeValue(),theElementName)) 
+                                    if (myRefAttr->nodeValue() == theElementName ||
+                                        substitutionsGroupContains(myRefAttr->nodeValue(),theElementName))
                                     {
                                         NodePtr myReferencedElementDecl = findTopLevelElementDeclaration(theElementName);
                                         if (myReferencedElementDecl) {
@@ -431,7 +431,7 @@ dom::Schema::tryFindElementDeclaration(const DOMString & theParentElementName,
         return NodePtr();
 }
 // search for the attribute declaration of one the element's attributes
-const NodePtr 
+const NodePtr
 dom::Schema::getAttributeDeclaration(const NodePtr theElementType, const DOMString & theAttributeName) const {
     DB(AC_TRACE << "getAttributeDeclaration("<<theAttributeName<<") const"<< endl);
     if (theElementType->nodeName() == XS_COMPLEXTYPE) {
@@ -474,13 +474,13 @@ dom::Schema::getAttributeDeclaration(const NodePtr theElementType, const DOMStri
                             "dom::Schema::getAttributeDeclaration for attribute '"+theAttributeName+"'");
                     }
                 }
-            } 
+            }
         }
     }
     return NodePtr();
 }
 
-const NodePtr 
+const NodePtr
 dom::Schema::getAttributeType(const NodePtr myAttributeDeclaration) const {
     DB(AC_TRACE<<"getAttributeType: myAttributeDeclaration="<<*myAttributeDeclaration<< endl;)
         // check for type name attribute first
@@ -499,7 +499,7 @@ dom::Schema::getAttributeType(const NodePtr myAttributeDeclaration) const {
         NodePtr myReferencedAttrDecl = findTopLevelAttributeDeclaration(myTypeNameRef->nodeValue());
         return getAttributeType(myReferencedAttrDecl);
     }
-    // now the type can be only a child <simpleType> 
+    // now the type can be only a child <simpleType>
     return myAttributeDeclaration->childNode(XS_SIMPLETYPE);
 }
 

@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
@@ -50,41 +50,41 @@ namespace asl {
             if ( x[i] <= x[i-1] ) {
                 AC_ERROR << "C2: x values not in ascending order (x["<<i<<"] = "<<x[i]<<", x["<<i-1<<"] = "<<x[i-1]<<")"<<endl;            }
         }
-        
+
         return true;
-    
+
     }
-    
+
     float
     YrSpline::operator () ( float t, int order )
-    {          
+    {
         AC_ERROR << "YrSpline::operator (): this function should never be called" << endl;
-        return 0.0;  
+        return 0.0;
     }
-    
-    
-    
- 
+
+
+
+
     Hermite::Hermite(void)
     {
         _setup_complete = false;
     }
-    
-       
+
+
     Hermite::~Hermite(void)
     {
     }
-    
+
     //------------------------------------------------------------------------------
     // GET DERIVATIVES BY THE METHOD OF "minimize_fluctuations" or "catmull_rom"
     //------------------------------------------------------------------------------
-    
+
     bool
     Hermite::init ( const dvector& x, const dvector& y, HermiteInitMode initMode, bool ascend_only )
     {
         _x	    = x;
         _y	    = y;
-            
+
         // CHECK INPUT
         if ( check_input( x, y ) == false ) {
             return false;
@@ -94,46 +94,46 @@ namespace asl {
 
         // CREATE VECTOR OF APPROPRIATE LENGTH
         _dy_dx_left = _dy_dx_right = y;
-        
+
         // GET DERIVATIVES BY THE APPROPRIATE METHOD
         _set_derivatives( initMode, ascend_only );
-        
+
         _setup_complete = true;
         return true;
     }
-    
-    
+
+
     //------------------------------------------------------------------------------
     // GET DERIVATIVES BY THE METHOD OF WEIGHTED RATIO. THE RATIOS ARE CONTAINED IN "weight"
     //------------------------------------------------------------------------------
-    
+
     bool
     Hermite::init ( const dvector& x, const dvector& y, const dvector& weight )
     {
         _x	    = x;
         _y	    = y;
-        
+
         // CHECK INPUT
         if ( check_input( x, y ) == false ) {
             return false;
         } else {
             _dim = x.size();
         }
-    
+
         // CREATE VECTOR OF APPROPRIATE LENGTH
         _dy_dx_left = _dy_dx_right = y;
-        
+
         // GET DERIVATIVES BY THE METHOD OF WEIGHTED RATIO. THE RATIOS ARE CONTAINED IN "weight"
         _set_derivatives( weight );
-        
+
         _setup_complete = true;
         return true;
     }
-    
+
     //------------------------------------------------------------------------------
     // INIT SPLINE WITH PRESCRIBED DERIVATIVES
     //------------------------------------------------------------------------------
-    
+
     bool
     Hermite::init ( const dvector& x, const dvector& y, const dvector& dy_dx_left, const dvector& dy_dx_right )
     {
@@ -141,13 +141,13 @@ namespace asl {
         _y		    = y;
         _dy_dx_left	    = dy_dx_left;
         _dy_dx_right    = dy_dx_right;
-        
+
         // CHECK INPUT
         if ( check_input( x, y ) == false ) {
             return false;
         } else {
             _dim = x.size();
-        }    
+        }
         _setup_complete = true;
         return true;
     }
@@ -160,22 +160,22 @@ namespace asl {
             return 0.0;
         }
         dvector::const_iterator i = _x.begin();
-        return *i;          
+        return *i;
     }
 
     float
     Hermite::x_last ( void ) const
-    {    
+    {
         if ( ! _setup_complete ) {
             AC_ERROR << "Hermite::x_first: _setup not complete";
             return 0.0;
         }
-        
+
         dvector::const_iterator i = _x.end();
         i--;
-        return *i;          
+        return *i;
     }
-    
+
     float
     Hermite::y_first ( void ) const
     {
@@ -186,56 +186,56 @@ namespace asl {
         }
 
         dvector::const_iterator i = _y.begin();
-        return *i;          
+        return *i;
     }
-   
+
     float
     Hermite::y_last ( void ) const
     {
-    
+
         if ( ! _setup_complete ) {
             AC_ERROR << "Hermite::y_first: _setup not complete\n" << endl;
             return 0.0;
         }
-        
+
         dvector::const_iterator i = _y.end();
         i--;
-        return *i;          
+        return *i;
     }
-    
+
     void
     Hermite::changeTension( int keyframe, float factor )
     {
-    
+
         if ( keyframe < 0 || keyframe > dim()-1 ) {
             AC_ERROR << "Hermite::changeTension: bad value of keyframe << " << keyframe << endl;
             return;
         }
-        
+
         _dy_dx_left  [keyframe] *= factor;
         _dy_dx_right [keyframe] *= factor;
-    
+
     }
-     
+
     void
     Hermite::zeroCurvature( void )
     {
-    
+
         // SET DERIVATIVES AT THE ENDPOINTS SUCH THAT THE CURVATURE THERE IS ZERO
         float h, yl, yr, dy_o;
-        h	= _x[1] -_x[0]; 
-        yl	= _y[0]; 
+        h	= _x[1] -_x[0];
+        yl	= _y[0];
         yr	= _y[1];
         dy_o= _dy_dx_left [1];
         _dy_dx_left [     0] = ( -dy_o * h - 3.0f * (yl-yr) ) / ( 2.0f * h );
-        h	= _x[_dim-1] -_x[_dim-2]; 
-        yl	= _y[_dim-2]; 
-        yr	= _y[_dim-1]; 
+        h	= _x[_dim-1] -_x[_dim-2];
+        yl	= _y[_dim-2];
+        yr	= _y[_dim-1];
         dy_o= _dy_dx_left [_dim-2];
         _dy_dx_left [_dim-1] = ( -dy_o * h + 3.0f * (yl-yr) ) / ( 2.0f * h );
-    
+
     }
-    
+
     void
     Hermite::print ( void )
     {
@@ -246,17 +246,17 @@ namespace asl {
         AC_PRINT << "===========================================\n" ;
         for ( int i=0; i<_dim; i++ ) {
             AC_PRINT <<_x[i] << " " << _y[i] << " " << _dy_dx_left[i] << " " << _dy_dx_right[i] << endl;
-        }          
+        }
     }
 
-    
-    
+
+
     ///////////////////////////////////////////////////////////////////////////////
     //
     //	slowdown
     //
     ////////////////////////////////////////////////////////////////////////////////
-    
+
     void
     Hermite::slowdown ( const dvector& speed_multiplier )
     {
@@ -273,24 +273,24 @@ namespace asl {
             AC_ERROR << "Hermite: wrong size of speed_multiplier ("<<sdim<<", should be "<<_dim;
             return;
         }
-    
+
         int i = 0;
-    
+
         // CHECK VALUES OF SPEED_MULTIPLIER
         for ( i=0; i<_dim; i++ ) {
             if ( speed_multiplier[i] < 0.0 ) {
                 AC_ERROR << "Hermite: bad value of speed_multiplier, cannot be negative) m ="<<speed_multiplier[i];
                 return;
             }
-        }          
-    
+        }
+
         // MULTIPLY DERIVATIVES AT THE CONTROL POINTS BY SPEED_MULTIPLIER
         for ( i=0; i<_dim; i++ ) {
             _dy_dx_left  [i] *= speed_multiplier [i];
-        } 
+        }
         _dy_dx_right = _dy_dx_left;
     }
-       
+
     ////////////////////////////////////////////////////////////////////////////////
     //
     //	operator ()
@@ -322,14 +322,14 @@ namespace asl {
                         retval = _spline_segment ( t, _y [i-1], _y [i], _dy_dx_right [i-1], _dy_dx_left [i], _x[i-1], _x[i] );
                         break;
                     }
-                } 
+                }
             }
-            return retval;  
+            return retval;
     }
-       
+
     float
     Hermite::operator () ( float t, int order )
-    {  
+    {
         float retval = 0.0;
 
         if ( ! _setup_complete ) {
@@ -351,12 +351,12 @@ namespace asl {
 
         // BEFORE THE FIRST POINT: RETURN DERIVATIVE AT FIRST POINT
         if ( t < _x[0] ) {
-            t = _x[0];  
+            t = _x[0];
         }
 
         // AFTER THE LAST POINT: RETURN DERIVATIVE AT LAST POINT
         else if ( t > _x[_dim-1] ) {
-            t = _x[_dim-1];  
+            t = _x[_dim-1];
         }
 
         // INBETWEEN THE FIRST AND THE LAST POINT: INTERPOLATE
@@ -365,9 +365,9 @@ namespace asl {
                 retval = _spline_segment ( t, _y[i-1], _y[i], _dy_dx_right[i-1], _dy_dx_left[i], _x[i-1], _x[i], order );
                 break;
             }
-        } 
+        }
 
-        return retval;  
+        return retval;
     }
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -375,13 +375,13 @@ namespace asl {
     //	_set_derivatives
     //
     ////////////////////////////////////////////////////////////////////////////////
-    
+
     void
     Hermite::_set_derivatives ( HermiteInitMode initMode, bool ascend_only )
-    {   
-        int i, j;   
+    {
+        int i, j;
         switch ( initMode ) {
-        
+
             // CASE CATMULL_ROM
         case catmull_rom:
             {
@@ -410,7 +410,7 @@ namespace asl {
                     for ( i=0; i<_dim-1; i++ ) {
                         _new_derivative ( _dy_dx_left[i+1], _dy_dx_left[i], _x[i], _x[i+1], _y[i], _y[i+1] );
                     }
-                }	    
+                }
                 break;
             }
 
@@ -453,7 +453,7 @@ namespace asl {
             // CASE MINIMIZE_FLUCTUATIONS
         case minimize_fluctuations:
             {
-                const float iteration_speed = 0.5;	// must be between 0..1, 
+                const float iteration_speed = 0.5;	// must be between 0..1,
 
                 // INIT
                 _dy_dx_left [0] = (_y[1] -_y[0]) / (_x[1] -_x[0]);
@@ -472,7 +472,7 @@ namespace asl {
                         if (ascend_only) {
                             _new_derivative ( new_dy_dx, _dy_dx_left[i], _x[i], _x[i+1], _y[i], _y[i+1] );
                             if ( i != _dim-1 ) {
-                                _new_derivative ( new_dy_dx, _dy_dx_left[i+2], _x[i+1], _x[i+2], _y[i+1], _y[i+2] );			
+                                _new_derivative ( new_dy_dx, _dy_dx_left[i+2], _x[i+1], _x[i+2], _y[i+1], _y[i+2] );
                             }
                         }
 
@@ -487,7 +487,7 @@ namespace asl {
                         if (ascend_only) {
                             _new_derivative ( _dy_dx_left[i+1], _dy_dx_left[i], _x[i], _x[i+1], _y[i], _y[i+1] );
                             if ( i != _dim-1 ) {
-                                _new_derivative ( _dy_dx_left[i+1], _dy_dx_left[i+2], _x[i+1], _x[i+2], _y[i+1], _y[i+2] );			
+                                _new_derivative ( _dy_dx_left[i+1], _dy_dx_left[i+2], _x[i+1], _x[i+2], _y[i+1], _y[i+2] );
                             }
                         }
                     }
@@ -500,7 +500,7 @@ namespace asl {
                         if (ascend_only) {
                             _new_derivative ( new_dy_dx, _dy_dx_left[i+1], _x[i], _x[i+1], _y[i], _y[i+1] );
                             if ( i != 0 ) {
-                                _new_derivative ( new_dy_dx, _dy_dx_left[i-1], _x[i-1], _x[i], _y[i-1], _y[i] );			
+                                _new_derivative ( new_dy_dx, _dy_dx_left[i-1], _x[i-1], _x[i], _y[i-1], _y[i] );
                             }
                         }
 
@@ -511,7 +511,7 @@ namespace asl {
                         if (ascend_only) {
                             _new_derivative ( _dy_dx_left[i], _dy_dx_left[i+1], _x[i], _x[i+1], _y[i], _y[i+1] );
                             if ( i != 0 ) {
-                                _new_derivative ( _dy_dx_left[i], _dy_dx_left[i-1], _x[i-1], _x[i], _y[i-1], _y[i] );			
+                                _new_derivative ( _dy_dx_left[i], _dy_dx_left[i-1], _x[i-1], _x[i], _y[i-1], _y[i] );
                             }
                         }
                     }
@@ -529,11 +529,11 @@ namespace asl {
     }
 
     // GET DERIVATIVES BY THE METHOD OF WEIGHTED RATIO. THE RATIOS ARE CONTAINED IN "weight"
-    
+
     void
     Hermite::_set_derivatives ( const dvector& weight )
     {
-     
+
         //_dy_dx_left[0] = (_y[1] -_y[0]) / (_x[1] -_x[0]) / 10.0;
         _dy_dx_left[0] = (_y[1] -_y[0]) / (_x[1] -_x[0]);
         for ( int i=1; i<_dim-1; i++ ) {
@@ -547,14 +547,14 @@ namespace asl {
         }
         _dy_dx_left [_dim-1] = (_y[_dim-1] -_y[_dim-2]) / (_x[_dim-1] -_x[_dim-2]);
         //_dy_dx_left [_dim-1] = (_y[_dim-1] -_y[_dim-2]) / (_x[_dim-1] -_x[_dim-2]) / 10.0;
-    
-    
+
+
         // COPY VECTOR
         _dy_dx_right = _dy_dx_left;
     }
-    
-        
-        
+
+
+
     ////////////////////////////////////////////////////////////////////////////////
     //
     //	_new_derivative
@@ -563,7 +563,7 @@ namespace asl {
     //	segment is everywhere non-negative
     //
     ////////////////////////////////////////////////////////////////////////////////
-    
+
     void
     Hermite::_new_derivative ( float& d_to_check, float d_other_side, float x1, float x2, float y1, float y2 )
     {
@@ -591,13 +591,13 @@ namespace asl {
         }
 
     }
-    
+
     ////////////////////////////////////////////////////////////////////////////////
     //
     //	_spline_segment
     //
     ////////////////////////////////////////////////////////////////////////////////
-    
+
     float
     Hermite::_spline_segment ( float x, float y1, float y2, float dy1, float dy2 )
     {
@@ -614,26 +614,26 @@ namespace asl {
 
         return retval;
     }
-    
+
     float
     Hermite::_spline_segment ( float x, float y1, float y2, float dy1, float dy2, float a, float b )
     {
-    
+
         // RETURN SPLINE SEGMENT FOR x = a...b
-        
-    
+
+
         float h = b-a;
         float u = (x-a) / h;
-        
+
         return _spline_segment ( u, y1, y2, dy1*h, dy2*h );
-    
+
     }
-    
-    
-    
+
+
+
     float
     Hermite::_spline_segment ( float x, float y1, float y2, float dy1, float dy2, float a, float b, int order )
-    { 
+    {
         // RETURN 1. DERIVATIVE OF SPLINE SEGMENT FOR X = A...B
 
         if ( x < a ) { AC_ERROR << "Hermite::_spline_segment: bad value x = "<< x;}
@@ -646,65 +646,65 @@ namespace asl {
 
         return retval;
     }
-    
-     
+
+
     C2::C2(void)
     {
         _setup_complete = false;
     }
-    
+
     C2::~C2(void)
     {
     }
-        
+
     bool
     C2::init (	const dvector&	    x,
     		const dvector&	    y,
-    		const C2_InitMode&  initMode, 
+    		const C2_InitMode&  initMode,
     		const float&	    left_gradient,
     		const float&	    right_gradient
     	 )
     {
         _x = x;
         _y = y;
-               
+
         // CHECK INPUT
         if ( check_input( x, y ) == false ) {
     	return false;
         } else {
     	_dim = x.size();
         }
-        
-        
+
+
         // GET _H OF RIGHT SIZE
         _h = x;
-        
-        
+
+
         // GET X-STEPS
         for ( int i=1; i<_dim; i++ ) {
     	_h[i] = _x[i] -_x[i-1];
         }
-        
-        
+
+
         // GET SPLINE PARAMETERS S
         switch ( initMode ) {
-    	
+
     	case setLeftRightDerivatives:
     	    _get_parameters( left_gradient, right_gradient );
     	    break;
-    	
+
     	case leftRightDerivativesAutomatic:
     	    _get_parameters( initMode );
     	    break;
-       
+
     	default:
     	    AC_ERROR << "C2::init: bad value of initMode: "<<initMode;
-    	    return false; 
+    	    return false;
         }
         _setup_complete = true;
         return true;
     }
-   
+
     void
         C2::print ( void ) {
 
@@ -717,38 +717,38 @@ namespace asl {
             AC_PRINT <<  _x[0]<<" "<< _y[0]<<" "<< _s[0] << endl;
             for ( int i=1; i<_dim; i++ ) {
                 AC_PRINT << _x[i]<<" "<< _y[i]<<" "<< _s[i]<<" "<< _h[i] << endl;
-            }          
+            }
             AC_PRINT << "============================================" << endl;
         }
-    
-    
-    
+
+
+
     ////////////////////////////////////////////////////////////////////////////////
     //
     //	operator ()
     //
     ////////////////////////////////////////////////////////////////////////////////
-    
+
     float
     C2::operator () ( float t ) {
-    
+
         float retval = 0.0;
-    
+
         if ( ! _setup_complete ) {
     	return retval;
         }
-        
-              
+
+
         // BEFORE OR AT THE FIRST POINT: RETURN FIRST VALUE
         if ( t <= _x[0] ) {
     	retval = _y[0];
         }
-    
+
         // AFTER OR AT THE LAST POINT: RETURN LAST VALUE
         else if ( t >= _x[_dim-1] ) {
     	retval = _y[_dim-1];
         }
-    
+
         // INBETWEEN THE FIRST AND THE LAST POINT: INTERPOLATE
         else {
     	for ( int i=1; i<_dim; i++ ) {
@@ -759,17 +759,17 @@ namespace asl {
     		    + (_y[i  ] / _h[i] - _s[i  ] * _h[i] / 6.0f)	* (t -_x[i-1])
     		    - (_y[i-1] / _h[i] - _s[i-1] * _h[i] / 6.0f)	* (t -_x[i  ]);
     	    }
-    	} 
+    	}
         }
-              
-        return retval;  
+
+        return retval;
     }
-    
-    
-    
+
+
+
     float
     C2::operator () ( float t, int order ) {
-    
+
         float retval = 0.0;
 
         if ( ! _setup_complete ) {
@@ -779,7 +779,7 @@ namespace asl {
         // ORDER 0: RETURNS FUNCTION
         if ( order == 0 ) {
             return (t);
-        }     
+        }
 
         // ORDER != 1: not supported
         if ( order != 1 ) {
@@ -791,12 +791,12 @@ namespace asl {
 
         // BEFORE THE FIRST POINT: RETURN FIRST POINT
         if ( t < _x[0] ) {
-            t = _x[0];  
+            t = _x[0];
         }
 
         // AFTER THE LAST POINT: RETURN LAST POINT
         else if ( t > _x[_dim-1] ) {
-            t = _x[_dim-1];  
+            t = _x[_dim-1];
         }
 
         // INBETWEEN THE FIRST AND THE LAST POINT: INTERPOLATE
@@ -809,16 +809,16 @@ namespace asl {
                         + (_y[i  ] / _h[i] - _s[i  ] * _h[i] / 6.0f)
                         - (_y[i-1] / _h[i] - _s[i-1] * _h[i] / 6.0f);
                 }
-            } 
+            }
         }
 
-        return retval;  
+        return retval;
     }
 
 
     void
         C2::_get_parameters ( const float& left_gradient, const float& right_gradient )
-    {       
+    {
         dvector  a = _x;
         dvector  b = _x;
 
@@ -844,7 +844,7 @@ namespace asl {
         _s = _x;
         int last = _dim-1;
         _s[0] =
-            ( 
+            (
             - 2.0f *  b[last  ] * _h[last] * _h[last]
             - 1.0f *  b[last-1] * _h[last] * _h[last]
             + 6.0f * _h[last  ] * right_gradient
@@ -860,11 +860,11 @@ namespace asl {
                         _s[i] = a[i] * _s[0] + b[i];
                     }
     }
-    
-    
+
+
     void
     C2::_get_parameters ( const C2_InitMode& initMode )
-    {       
+    {
         dvector  a = _x;
         dvector  b = _x;
 
@@ -877,7 +877,7 @@ namespace asl {
         }
 
     #if 0
-    
+
         // GET a, b
         a[0] =  0.0;
         b[0] =  0.0;
@@ -892,13 +892,13 @@ namespace asl {
     	     + 6.0 * (_y[i  ] -_y[i-1]) / (_h[i  ]*_h[i  ])
     	     - 6.0 * (_y[i-1] -_y[i-2]) / (_h[i-1]*_h[i  ]);
         }
-        
-        
+
+
         // GET _s
         _s = _x;
         _s[0] = 0.0;
         _s[1] =
-        ( 
+        (
     	 (_y[last  ] -_y[last-1])  / _h[last  ]
     	-(_y[last-1] -_y[last-2])  / _h[last-1]
     	-  b[last-2] *_h[last-1]   /  6.0
@@ -909,26 +909,26 @@ namespace asl {
     	  a[last-2] * _h[last-1] / 6.0
     	+ a[last-1] * (_h[last-1] + _h[last]) / 3.0
         );
-    	
+
         for ( i=2; i<last; i++ ) {
     	_s[i] = a[i] * _s[1] + b[i];
         }
         _s[last] = 0.0;
-    
+
     #endif
-    
+
     }
-    
-    
+
+
     Linear::Linear(void)
     {
         _setup_complete = false;
     }
-    
+
      Linear::~Linear(void)
     {
     }
-       
+
     bool
     Linear::init ( const dvector& x, const dvector& y )
     {
@@ -938,17 +938,17 @@ namespace asl {
         } else {
     	_dim = x.size();
         }
-            
+
         _x = x;
-        _y = y;    
+        _y = y;
         _setup_complete = true;
-        
+
         return true;
     }
-        
+
     void
     Linear::print ( void ) {
-    
+
         if ( ! _setup_complete ) {
             AC_ERROR <<"C2: cannot print before setup was succesful";
         }
@@ -957,38 +957,38 @@ namespace asl {
         AC_PRINT << "======================\n";
         for ( int i=0; i<_dim; i++ ) {
             AC_PRINT << _x[i]<<" "<< _y[i]<<endl;
-        }          
+        }
         AC_PRINT << "======================\n";
     }
-    
-    
-    
+
+
+
     ////////////////////////////////////////////////////////////////////////////////
     //
     //	operator ()
     //
     ////////////////////////////////////////////////////////////////////////////////
-    
+
     float
     Linear::operator () ( float t ) {
-    
+
         float retval = 0.0;
-    
+
         if ( ! _setup_complete ) {
     	return retval;
         }
-        
-              
+
+
         // BEFORE OR AT THE FIRST POINT: RETURN FIRST VALUE
         if ( t <= _x[0] ) {
     	retval = _y[0];
         }
-    
+
         // AFTER OR AT THE LAST POINT: RETURN LAST VALUE
         else if ( t >= _x[_dim-1] ) {
     	retval = _y[_dim-1];
         }
-    
+
         // INBETWEEN THE FIRST AND THE LAST POINT: INTERPOLATE
         else {
     	for ( int i=1; i<_dim; i++ ) {
@@ -997,14 +997,14 @@ namespace asl {
     		float dy = _y[i] -_y[i-1];
     		retval = _y[i-1] + (t-_x[i-1]) * dy / dx;
     	    }
-    	} 
+    	}
         }
-              
-        return retval;  
+
+        return retval;
     }
-    
-    
-    
+
+
+
     float
         Linear::operator () ( float t, int order ) {
 
@@ -1012,7 +1012,7 @@ namespace asl {
 
             if ( ! _setup_complete ) {
                 return retval;
-            }       
+            }
 
             // ORDER 0: RETURNS FUNCTION
             if ( order == 0 ) {
@@ -1029,10 +1029,10 @@ namespace asl {
 
             if ( t < _x[0] ) {
                 // BEFORE THE FIRST POINT: RETURN DERIVATIVE AT FIRST POINT
-                t = _x[0];  
+                t = _x[0];
             } else if ( t > _x[_dim-1] ) {
                 // AFTER THE LAST POINT: RETURN DERIVATIVE AT LAST POINT
-                t = _x[_dim-1];  
+                t = _x[_dim-1];
             } else {
                 // INBETWEEN THE FIRST AND THE LAST POINT: INTERPOLATE
                 for ( int i=1; i<_dim; i++ ) {
@@ -1041,9 +1041,9 @@ namespace asl {
                         float dy = _y[i] -_y[i-1];
                         retval = dy / dx;
                     }
-                } 
+                }
             }
-            return retval;  
+            return retval;
         }
 
 }

@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: testUnitTest.tst.cpp,v $
@@ -37,7 +37,7 @@ public:
 #   endif
     void run() {
         setAbortOnFailure(false);
-        DTITLE("------------ This is a Title --------------"); 
+        DTITLE("------------ This is a Title --------------");
         ENSURE(std::string(getMyName())=="TestUnitTest");
         ENSURE(getPassedCount() == 1);
         ENSURE(getFailedCount() == 0);
@@ -71,7 +71,7 @@ public:
 template <class T>
 class myTemplateUnitTest : public TemplateUnitTest {
 public:
-    myTemplateUnitTest(const char * theTemplateArgument) 
+    myTemplateUnitTest(const char * theTemplateArgument)
         : TemplateUnitTest("myTemplateUnitTest",theTemplateArgument) {}
     void run() {
         T someVariable = 1;
@@ -103,7 +103,7 @@ int main(int argc, char *argv[]) {
         returnStatus = 0;
     } else {
         cerr << "## Test were not completed successfully" << endl;
-        
+
     }
     cerr << ">> Finsihed test suite '" << argv[0] << "', return status = " << returnStatus << endl;
     return returnStatus;

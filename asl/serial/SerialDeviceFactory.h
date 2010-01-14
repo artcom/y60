@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -53,15 +53,15 @@ namespace asl {
 
     /*! @addtogroup aslserial */
     /* @{ */
-    
-    /*! This function creates a new serial device. The returned object is 
+
+    /*! This function creates a new serial device. The returned object is
      * either of type TTYPort (*nix like systems) or ComPort (Win32),
      * depending on the platform. The application is responsible to delete
      * the returned object.
      * @param theIndex Zero based index of serial port (0 gives COM1/ttyS0)
      */
     ASL_SERIAL_DECL SerialDevice * getSerialDevice(unsigned int theIndex);
-    /*! This function creates a new serial device. The returned object is 
+    /*! This function creates a new serial device. The returned object is
      * either of type TTYPort (*nix like systems) or ComPort (Win32),
      * depending on the platform. The application is responsible to delete
      * the returned object.

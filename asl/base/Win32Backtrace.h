@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -48,13 +48,13 @@
 #define _WINSOCKAPI_ // prevent winsock.h #include's
 
 #include <crtdbg.h>
-#if _MSC_VER > 1000 
+#if _MSC_VER > 1000
 #pragma once
 #endif // _MSC_VER > 1000
-	
+
 // Exclude rarely-used stuff from Windows headers
 //#define WIN32_LEAN_AND_MEAN
-//#define VC_EXTRALEAN		
+//#define VC_EXTRALEAN
 
 #ifndef _WIN32_WINNT
 #define _WIN32_WINNT 0x0500
@@ -98,7 +98,7 @@
 #pragma warning(disable:4097)		// typedef-name 'identifier1' used as synonym for class-name 'identifier2'
 #pragma warning(disable:4001)		// nonstandard extension 'single line comment' was used
 #pragma warning(disable:4100)		// unreferenced formal parameter
-#pragma warning(disable:4699)		// Note: Creating precompiled header 
+#pragma warning(disable:4699)		// Note: Creating precompiled header
 #pragma warning(disable:4710)		// function not inlined
 #pragma warning(disable:4514)		// unreferenced inline function has been removed
 #pragma warning(disable:4512)		// assignment operator could not be generated
@@ -108,12 +108,12 @@
 
 #include <eh.h>
 
-#pragma warning(push, 3) 
+#pragma warning(push, 3)
 #include <iostream>
 #include <sstream>
 #include <string>
 #include <exception>
-#pragma warning(pop) 
+#pragma warning(pop)
 
 
 #include <stdio.h>
@@ -129,7 +129,7 @@
 namespace asl {
 
 /** Policy to create backtraces on Win32 systems
- * It is used in conjunction with the StackTracer 
+ * It is used in conjunction with the StackTracer
  * template.
  */
 class Win32Backtrace {
@@ -141,10 +141,10 @@ class Win32Backtrace {
 		typedef Win32StackFrame StackFrame;
 
 		static void trace(std::vector<StackFrame> & theStack, int theMaxDepth);
-    
+
 	private:
         Win32Backtrace();
-		
+
 		Win32Backtrace (unsigned);
 		~Win32Backtrace();
 
@@ -154,41 +154,41 @@ class Win32Backtrace {
 
 		void address(unsigned a)		{ m_address = a; }
 		unsigned address(void) const	{ return m_address; }
-	
+
 		// symbol handler queries
 		unsigned symbol  (char *, unsigned, unsigned * = 0);
 		unsigned fileline(char *, unsigned, unsigned *, unsigned * = 0);
 		static bool get_line_from_addr (HANDLE, unsigned, unsigned *, IMAGEHLP_LINE *);
-		
-		static bool stack_trace(std::vector<StackFrame> & theStack, unsigned skip = 1); 			
-		static bool stack_trace(Win32Backtrace&, std::vector<StackFrame> & theStack, CONTEXT *, 
-								unsigned skip = 1);	
+
+		static bool stack_trace(std::vector<StackFrame> & theStack, unsigned skip = 1);
+		static bool stack_trace(Win32Backtrace&, std::vector<StackFrame> & theStack, CONTEXT *,
+								unsigned skip = 1);
 		bool check();
 
 		unsigned		m_address;
 		bool			m_ok;
 		STACKFRAME *	m_pframe;
 		CONTEXT *		m_pctx;
-	
+
 		class guard
-		{	
+		{
 			private:
 				guard();
 			public:
 				~guard();
-				bool init();		
+				bool init();
 				bool fail() const { return m_ref == -1; }
-		
+
 				static guard & instance() {
-					static guard g; 
+					static guard g;
 					return g;
 				}
-			private:		
+			private:
 				void clear();
 				bool load_module(HANDLE, HMODULE);
 				int  m_ref;
 		};
-		
+
 };
 
 }

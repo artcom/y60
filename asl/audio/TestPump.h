@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -45,7 +45,7 @@
 
 #ifdef _MSC_VER
 // For M_PI
-#define _USE_MATH_DEFINES 
+#define _USE_MATH_DEFINES
 #endif
 
 #include "HWSampleSink.h"
@@ -67,19 +67,19 @@ class ASL_AUDIO_DECL TestPump: public UnitTest{
     private:
         void testBufferAlloc();
         void playSingleSound(unsigned theFramesPerBuffer, unsigned theDuration = 100);
-        void testUnderrun(); 
-        void testMix(); 
+        void testUnderrun();
+        void testMix();
         void testMultiplePlay();
         void testSimultaneousPlay();
         void testConversions();
-        void testRunUntilEmpty(); 
+        void testRunUntilEmpty();
         void testVolume();
         void testPumpTimer();
         void testSinkTimer();
         void testDelayed();
-        asl::HWSampleSinkPtr createSampleSink (const std::string & theName, 
+        asl::HWSampleSinkPtr createSampleSink (const std::string & theName,
                 unsigned theSampleRate, unsigned NumChannels);
-        
+
         void queueSineBuffers(asl::HWSampleSinkPtr& mySampleSink, asl::SampleFormat mySF,
                 unsigned numFramesPerBuffer, unsigned numChannels, unsigned myFrequency,
                 unsigned mySampleRate, double myDuration, double myVolume=1.0);
@@ -116,7 +116,7 @@ class ASL_AUDIO_DECL TestPump: public UnitTest{
             myBuffer->convert(mySamples, mySF, numChannels);
             mySampleSink->queueSamples(myBuffer);
         };
-        
+
         bool _myNoisy;
 };
 

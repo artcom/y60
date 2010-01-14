@@ -4,12 +4,12 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: Base class for socket wrappers 
+// Description: Base class for socket wrappers
 //
 // Last Review:  ms & ab 2007-08-14
 //
@@ -34,7 +34,7 @@
 //
 //    overall review status   :      ok
 //
-//    recommendations: change namespace, check coding conventions, check TODOs             
+//    recommendations: change namespace, check coding conventions, check TODOs
 */
 
 //own header
@@ -93,7 +93,7 @@ namespace inet {
 
     void Socket::close() {
         if (isValid()) {
-#ifdef _WIN32        
+#ifdef _WIN32
             int rc = closesocket(fd);
             if (rc == SOCKET_ERROR) {
                 int err = getLastSocketError();
@@ -255,7 +255,7 @@ namespace inet {
 #endif
     }
 
-    void 
+    void
     Socket::setSendBufferSize(int theSize) {
 #ifdef _WIN32
         if (setsockopt(fd, SOL_SOCKET, SO_SNDBUF, (char*) &theSize, sizeof(theSize)) < 0) {
@@ -265,8 +265,8 @@ namespace inet {
         AC_WARNING << "Socket::setSendBufferSize() not yet implemented for Linux/MaxOS";
 #endif
     }
-    
-    int 
+
+    int
     Socket::getSendBufferSize() const {
         int mySize = 0;
 #ifdef _WIN32
@@ -280,7 +280,7 @@ namespace inet {
         return mySize;
     }
 
-    void 
+    void
     Socket::setReceiveBufferSize(int theSize) {
 #ifdef _WIN32
         if (setsockopt(fd, SOL_SOCKET, SO_RCVBUF, (char*) &theSize, sizeof(theSize)) < 0) {
@@ -291,7 +291,7 @@ namespace inet {
 #endif
     }
 
-    int 
+    int
     Socket::getReceiveBufferSize() const {
         int mySize = 0;
 #ifdef _WIN32

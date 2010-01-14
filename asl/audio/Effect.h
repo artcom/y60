@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -49,10 +49,10 @@
 namespace asl {
 
 class Effect;
-    
+
 class EffectFunctorBase {
     public:
-        virtual void operator()(Effect * theEffect, AudioBufferBase & theBuffer, 
+        virtual void operator()(Effect * theEffect, AudioBufferBase & theBuffer,
                 Unsigned64 theAbsoluteFrame) = 0;
         virtual ~EffectFunctorBase() {}
 };
@@ -64,22 +64,22 @@ class ASL_AUDIO_DECL Effect {
 public:
     Effect(asl::Ptr<EffectFunctorBase> myFunctor);
     virtual ~Effect() {}
-    
+
     virtual void apply(AudioBufferBase &, Unsigned64 theAbsoluteFrame);
-    
+
 private:
     asl::Ptr<EffectFunctorBase> _myFunctor;
 };
 
 
 /**
- * 
+ *
  */
 template <class SAMPLE>
 class EffectFunctor: public EffectFunctorBase {
 public:
     void operator()(Effect * theEffect, AudioBufferBase & theBuffer,
-            Unsigned64 theAbsoluteFrame) 
+            Unsigned64 theAbsoluteFrame)
     {
         AudioBuffer<SAMPLE> * myBuffer = dynamic_cast<AudioBuffer<SAMPLE>*>(&theBuffer);
         if (myBuffer) {
@@ -90,7 +90,7 @@ public:
     }
 
 private:
-    virtual void operator()(Effect * theEffect, AudioBuffer<SAMPLE> & theBuffer, 
+    virtual void operator()(Effect * theEffect, AudioBuffer<SAMPLE> & theBuffer,
             Unsigned64 theAbsoluteFrame) = 0;
 };
 
@@ -116,12 +116,12 @@ asl::Ptr<EffectFunctorBase> createEffectFunctor(SampleFormat theSampleFormat) {
 class ASL_AUDIO_DECL NullEffect: public Effect {
 public:
     NullEffect(SampleFormat theSampleFormat);
-        
+
 private:
     template <class SAMPLE>
         class NullEffectFunctor : public EffectFunctor<SAMPLE> {
             protected:
-                virtual void operator()(Effect* theEffect, AudioBuffer<SAMPLE> & theBuffer, 
+                virtual void operator()(Effect* theEffect, AudioBuffer<SAMPLE> & theBuffer,
                         Unsigned64 theAbsoluteFrame) {
                 }
         };

@@ -4,15 +4,15 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
 // Description:  Memory Mapping Classes with asl::Block interface
 //
-// Last Review: pavel 30.11.2005 
+// Last Review: pavel 30.11.2005
 //
 //  review status report: (perfect, ok, fair, poor, disaster)
 //    usefullness            : ok
@@ -576,9 +576,9 @@ namespace asl {
 			}
 		}
         static void remapFile(void * & theData, OFF_T theSize, OFF_T theNewSize) {
-#ifdef OSX 
-            throw MappedIO::MRemapFailed(std::string("DS: The Linux mremap() call is *not* portable ") + 
-                                         "and its use in portable applications is discouraged.", 
+#ifdef OSX
+            throw MappedIO::MRemapFailed(std::string("DS: The Linux mremap() call is *not* portable ") +
+                                         "and its use in portable applications is discouraged.",
                                          PLUS_FILE_LINE);
 #else
             DB(AC_TRACE << "remapFile: theData = "<< theData << ", theSize = "<<theSize<< ", theNewSize = "<<theNewSize<<std::endl);

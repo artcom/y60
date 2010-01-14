@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -145,8 +145,8 @@ namespace dom {
 
         void ensureTextChild(const Node & theNode, const VALUE & theValue) const {
             if (_myTextChild && _myPropertyNode &&
-                _myTextChild->parentNode() && 
-                _myTextChild->parentNode()->parentNode() == _myPropertyNode->parentNode()) 
+                _myTextChild->parentNode() &&
+                _myTextChild->parentNode()->parentNode() == _myPropertyNode->parentNode())
             {
                 // alles super && alles beim alten
                 return;

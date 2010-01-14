@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -56,7 +56,7 @@
 #include "Vector234.h"
 #include <math.h>
 
-namespace asl {	
+namespace asl {
 
     /*! @addtogroup aslmath */
     /* @{ */
@@ -72,7 +72,7 @@ namespace asl {
 		Point2(const Number * t) : Base(t) {};
         explicit Point2(const Number * theBegin, const Number * theEnd) : Base(theBegin, theEnd) {}
 		Point2 & operator=(const Point2 & t) {
-            assign(t);    
+            assign(t);
             return *this;
         }
         template <class otherReal>
@@ -105,7 +105,7 @@ namespace asl {
             result.mult(Number(y));
             return result;
         }
-        
+
         Point2 operator/(const float & y) const {
             Point2 result(*this);
             result.div(Number(y));
@@ -172,7 +172,7 @@ namespace asl {
         Point2<Number> result(v);
         result.mult(y);
         return result;
-    }  
+    }
 
     template<class Number>
     Point2<Number> operator*(const float & y, const Point2<Number> & v) {
@@ -185,8 +185,8 @@ namespace asl {
     template<class Number>
     Point2<Number> operator*(const int & y, const Point2<Number> & v) {
         return product(v, typename Point2<Number>::value_type(y));
-    }  
-    
+    }
+
     template<class Number>
     class Point3 : public TripleOf<Number> {
 	public:
@@ -198,7 +198,7 @@ namespace asl {
 		Point3(const Number* t) : Base(TripleOf<Number>(t)) {};
         Point3(const Number * theBegin, const Number * theEnd) : Base(theBegin, theEnd) {}
 		Point3 & operator=(const Point3 & t) {
-            assign(t);    
+            assign(t);
             return *this;
         }
         template <class otherReal>
@@ -214,7 +214,7 @@ namespace asl {
         }
         void operator*=(const Vector3<Number> & y) {
             mult(y);
-        }       
+        }
 
         Point3 operator*(const float & y) const {
             Point3 result(*this);
@@ -231,7 +231,7 @@ namespace asl {
             result.mult(Number(y));
             return result;
         }
-        
+
         Point3 operator/(const float & y) const {
             Point3 result(*this);
             result.div(Number(y));
@@ -298,7 +298,7 @@ namespace asl {
         Point3<Number> result(v);
         result.mult(y);
         return result;
-    }  
+    }
 
     template<class Number>
     Point3<Number> operator*(const float & y, const Point3<Number> & v) {
@@ -311,7 +311,7 @@ namespace asl {
     template<class Number>
     Point3<Number> operator*(const int & y, const Point3<Number> & v) {
         return product(v, typename Point3<Number>::value_type(y));
-    }  
+    }
 
     template<class Number>
 	class Point4 : public QuadrupleOf<Number> {
@@ -324,7 +324,7 @@ namespace asl {
 		Point4(const Number* t) : Base(QuadrupleOf<Number>(t)) {};
         Point4(const Number * theBegin, const Number * theEnd) : Base(theBegin, theEnd) {}
 		Point4 & operator=(const Point4 & t) {
-            assign(t);    
+            assign(t);
             return *this;
         }
         template <class otherReal>
@@ -357,7 +357,7 @@ namespace asl {
             result.mult(Number(y));
             return result;
         }
-        
+
         Point4 operator/(const float & y) const {
             Point4 result(*this);
             result.div(Number(y));
@@ -424,7 +424,7 @@ namespace asl {
         Point4<Number> result(v);
         result.mult(y);
         return result;
-    }  
+    }
 
     template<class Number>
     Point4<Number> operator*(const float & y, const Point4<Number> & v) {
@@ -437,8 +437,8 @@ namespace asl {
     template<class Number>
     Point4<Number> operator*(const int & y, const Point4<Number> & v) {
         return product(v, typename Point4<Number>::value_type(y));
-    }  
-  
+    }
+
     typedef Point2<float>  Point2f;
     typedef Point2<double> Point2d;
     typedef Point2<int>  Point2i;
@@ -453,46 +453,46 @@ namespace asl {
 
     // sometimes we want to treat vectors as points and vice versa
 	// but we do it explicitly using the following functions:
-    template<class Number> 
+    template<class Number>
 	const Point2<Number> & asPoint(const Vector2<Number> & v) {
 		 return reinterpret_cast<const Point2<Number> &>(v);
 	}
-    template<class Number> 
+    template<class Number>
 	const Point3<Number> & asPoint(const Vector3<Number> & v) {
 		 return reinterpret_cast<const Point3<Number> &>(v);
 	}
-    template<class Number> 
+    template<class Number>
 	const Point4<Number> & asPoint(const Vector4<Number> & v) {
 		 return reinterpret_cast<const Point4<Number> &>(v);
 	}
 
-    template<class Number> 
+    template<class Number>
 	const Vector2<Number> & asVector(const Point2<Number> & p) {
 		 return reinterpret_cast<const Vector2<Number> &>(p);
 	}
-    template<class Number> 
+    template<class Number>
 	const Vector3<Number> & asVector(const Point3<Number> & p) {
 		 return reinterpret_cast<const Vector3<Number> &>(p);
 	}
-    template<class Number> 
+    template<class Number>
 	const Vector4<Number> & asVector(const Point4<Number> & p) {
 		 return reinterpret_cast<const Vector4<Number> &>(p);
 	}
 
     // Vector = Point - Point
-	template<class Number> 
+	template<class Number>
 	Vector2<Number> operator-(const Point2<Number> & a, const Point2<Number> & b) {
 		Vector2<Number> result = asVector(a);
 		result.sub(b);
 		return result;
 	}
-	template<class Number> 
+	template<class Number>
 	Vector3<Number> operator-(const Point3<Number> & a, const Point3<Number> & b) {
 		Vector3<Number> result = asVector(a);
 		result.sub(b);
 		return result;
 	}
-	template<class Number> 
+	template<class Number>
 	Vector4<Number> operator-(const Point4<Number> & a, const Point4<Number> & b) {
 		Vector4<Number> result = asVector(a);
 		result.sub(b);
@@ -500,51 +500,51 @@ namespace asl {
 	}
 
     // Point = Point - Vector
-    template<class Number> 
+    template<class Number>
 	Point2<Number> operator-(const Point2<Number> & a, const Vector2<Number> & b) {
 		Point2<Number> result = a;
 		result.sub(b);
 		return result;
 	}
-    template<class Number> 
+    template<class Number>
 	Point3<Number> operator-(const Point3<Number> & a, const Vector3<Number> & b) {
 		Point3<Number> result = a;
 		result.sub(b);
 		return result;
 	}
-    template<class Number> 
+    template<class Number>
 	Point4<Number> operator-(const Point4<Number> & a, const Vector4<Number> & b) {
 		Point4<Number> result = a;
 		result.sub(b);
 		return result;
 	}
-	
+
     // Point = Point + Vector
-    template<class Number> 
+    template<class Number>
 	Point2<Number> operator+(const Point2<Number> & a, const Vector2<Number> & b) {
 		Point2<Number> result = a;
 		result.add(b);
 		return result;
 	}
-    template<class Number> 
+    template<class Number>
 	Point3<Number> operator+(const Point3<Number> & a, const Vector3<Number> & b) {
 		Point3<Number> result = a;
 		result.add(b);
 		return result;
 	}
-    template<class Number> 
+    template<class Number>
 	Point4<Number> operator+(const Point4<Number> & a, const Vector4<Number> & b) {
 		Point4<Number> result = a;
 		result.add(b);
 		return result;
 	}
-	
+
     // distance vector-vector
     template<class Number>
 	Number distance(const Point2<Number> & p1, const Point2<Number> & p2) {
 		return length(p2-p1);
-	}  
-    
+	}
+
     template<class Number>
 	Number distance(const Point3<Number> & p1, const Point3<Number> & p2) {
 		return length(p2-p1);

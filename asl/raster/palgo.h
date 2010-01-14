@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: palgo.h,v $
@@ -78,7 +78,7 @@ void pfill(ForwardIterator first, ForwardIterator last, const T& value) {
     while (first != last) {*first = value; ++first;}
 }
 
-// lazy input iterator based 1D-scale 
+// lazy input iterator based 1D-scale
 template <
     class InputIterator,
     class OutputIterator,
@@ -87,8 +87,8 @@ template <
     class DestDistance,
     class DestT
 >
-OutputIterator scale1d(InputIterator src_begin, InputIterator src_end, 
-                     OutputIterator dest_begin, OutputIterator dest_end, 
+OutputIterator scale1d(InputIterator src_begin, InputIterator src_end,
+                     OutputIterator dest_begin, OutputIterator dest_end,
                      SrcDistance*, SrcT*, DestDistance*, DestT*)
     {
     SrcDistance src_size = src_end - src_begin;
@@ -104,7 +104,7 @@ OutputIterator scale1d(InputIterator src_begin, InputIterator src_end,
 }
 
 template <class InputIterator, class OutputIterator>
-OutputIterator scale1d(InputIterator src_begin, InputIterator src_end, 
+OutputIterator scale1d(InputIterator src_begin, InputIterator src_end,
                      OutputIterator dest_begin, OutputIterator dest_end)
 {
     return scale1d(src_begin, src_end, dest_begin, dest_end,
@@ -115,13 +115,13 @@ OutputIterator scale1d(InputIterator src_begin, InputIterator src_end,
 template <
     class hInputIterator,   class vInputIterator,
     class hOutputIterator,  class vOutputIterator,
-    class hSrcDistance,     class vSrcDistance, class SrcT, 
+    class hSrcDistance,     class vSrcDistance, class SrcT,
     class hDestDistance,    class vDestDistance, class DestT
 >
-void scale2d(hInputIterator h_src_begin, 
+void scale2d(hInputIterator h_src_begin,
             vInputIterator v_src_begin,
-            hSrcDistance h_src_size, 
-            vSrcDistance v_src_size, 
+            hSrcDistance h_src_size,
+            vSrcDistance v_src_size,
             hOutputIterator h_dest_begin,
             vOutputIterator v_dest_begin,
             hDestDistance h_dest_size,
@@ -154,29 +154,29 @@ void scale2d(hInputIterator h_src_begin,
 
 template <
     class hInputIterator,class vInputIterator,
-    class hSrcDistance, class vSrcDistance,  
+    class hSrcDistance, class vSrcDistance,
     class hOutputIterator,  class vOutputIterator,
     class hDestDistance, class vDestDistance
 >
-void scale2d(hInputIterator h_src_begin, 
+void scale2d(hInputIterator h_src_begin,
                          vInputIterator v_src_begin,
-                         hSrcDistance h_src_size, 
-                         vSrcDistance v_src_size, 
+                         hSrcDistance h_src_size,
+                         vSrcDistance v_src_size,
                          hOutputIterator h_dest_begin,
                          vOutputIterator v_dest_begin,
                          hDestDistance h_dest_size,
                          vDestDistance v_dest_size)
 {
-    scale2d(h_src_begin, v_src_begin, h_src_size, v_src_size, 
+    scale2d(h_src_begin, v_src_begin, h_src_size, v_src_size,
         h_dest_begin, v_dest_begin, h_dest_size, v_dest_size,
-        value_type(h_src_begin), value_type(h_dest_begin));      
+        value_type(h_src_begin), value_type(h_dest_begin));
 }
 
 template <class Srcmat, class Destmat>
 void scale2d(const Srcmat & src, Destmat & dest)
 {
     scale2d(src.hbegin(), src.vbegin(), src.hsize(), src.vsize(),
-           dest.hbegin(), dest.vbegin(), dest.hsize(), dest.vsize()); 
+           dest.hbegin(), dest.vbegin(), dest.hsize(), dest.vsize());
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -224,8 +224,8 @@ template <
     class hDistance, class vDistance,
     class T
 >
-OutputIterator transform_raster(hInputIterator hfirst, vInputIterator vfirst, 
-                                hDistance hsize, vDistance vsize, 
+OutputIterator transform_raster(hInputIterator hfirst, vInputIterator vfirst,
+                                hDistance hsize, vDistance vsize,
                                 OutputIterator result,
                                 IntervalOperation IntervalOp,
                                 const hSubIterator& hsub, const vSubIterator& vsub,
@@ -300,7 +300,7 @@ template <class hiterator, class viterator, class AverageFunction, class Distanc
 void scale_down(hiterator hbegin, viterator vbegin,
                 Distance hsize, Distance vsize,
                 OutputIterator dest,
-                Distance hdestsize, Distance vdestsize, 
+                Distance hdestsize, Distance vdestsize,
                 AverageFunction af, T x)
 {
     typedef step_iterator<hiterator,T, T&,Distance> hscale_iterator;
@@ -313,15 +313,15 @@ void scale_down(hiterator hbegin, viterator vbegin,
         fraction_hscale_iterator h_outer_begin(hbegin, hsize, hdestsize);
         if (vsize % vdestsize) {
             fraction_vscale_iterator v_outer_begin(vbegin, vsize, vdestsize);
-            transform_raster(h_outer_begin, v_outer_begin, hdestsize, vdestsize, dest, 
-                af, 
+            transform_raster(h_outer_begin, v_outer_begin, hdestsize, vdestsize, dest,
+                af,
                 hbegin, vbegin, x );
         }
         else // ganzahliger v - faktor
         {
             vscale_iterator v_outer_begin(vbegin, vsize / vdestsize);
-            transform_raster(h_outer_begin, v_outer_begin, hdestsize, vdestsize, dest, 
-                af, 
+            transform_raster(h_outer_begin, v_outer_begin, hdestsize, vdestsize, dest,
+                af,
                 hbegin, vbegin, x );
         }
     }
@@ -329,15 +329,15 @@ void scale_down(hiterator hbegin, viterator vbegin,
         hscale_iterator h_outer_begin(hbegin, hsize / hdestsize);
         if (vsize % vdestsize) {
             fraction_vscale_iterator v_outer_begin(vbegin, vsize, vdestsize);
-            transform_raster(h_outer_begin, v_outer_begin, hdestsize, vdestsize, dest, 
-                af, 
+            transform_raster(h_outer_begin, v_outer_begin, hdestsize, vdestsize, dest,
+                af,
                 hbegin, vbegin, x );
         }
         else // ganzahliger v - faktor
         {
             vscale_iterator v_outer_begin(vbegin, vsize / vdestsize);
-            transform_raster(h_outer_begin, v_outer_begin, hdestsize, vdestsize, dest, 
-                af, 
+            transform_raster(h_outer_begin, v_outer_begin, hdestsize, vdestsize, dest,
+                af,
                 hbegin, vbegin, x );
         }
 
@@ -353,7 +353,7 @@ SumT rectsum(const Mat& src, int xstart, int ys, int xend, int yend, SumT& sum) 
         }
     }
     return sum;
-} 
+}
 
 template <class Srcmat, class Destmat, class SumT>
 void scale_down(const Srcmat& src, Destmat& dest, int xfactor, int yfactor, const SumT& initval)
@@ -374,7 +374,7 @@ void scale_down(const Srcmat& src, Destmat& dest, int xfactor, int yfactor, cons
             rectsum(src, xstart, ystart, xend, yend, sum);
             dest(x, y) = auto_cast<dest_value_type>(sum/ns);
         }
-    }    
+    }
 }
 
 DEFINE_EXCEPTION(SizeMismatchException, asl::Exception);
@@ -402,19 +402,19 @@ void halfsize(const Srcmat& src, Destmat& dest, const SumT& initval)
             mySum += auto_cast<SumT>(src(sx+1,sy+1));
             dest(x, y) = auto_cast<dest_value_type>(mySum/4);
         }
-    }    
+    }
 }
 //
 // Die folgende skalierroutine arbeitet ganzzahlig und ist geeignet
 // fuer ganzzahlige skalierverhaeltnisse oder starkes nicht - ganzzahliges
 // verkleinern ab Faktor 3
-// 
+//
 template <class Srcmat, class Destmat, class SumT>
 void scale_down(const Srcmat& src, Destmat& dest, const SumT& initval)
 {
     typedef typename Destmat::value_type dest_value_type;
 
-    if ((src.xsize()%dest.xsize() == 0) && 
+    if ((src.xsize()%dest.xsize() == 0) &&
         (src.ysize()%dest.ysize() == 0)) {
             scale_down(src, dest, src.xsize()/dest.xsize(), src.ysize()/dest.ysize(), initval);
         }
@@ -554,14 +554,14 @@ void resample(const Srcmat& src, const asl::Box2<float> & srcRect, Destmat& dest
                 } else {
                     dest(x, y) = auto_cast<dest_value_type>(
                             sample2d(getpixel(src, xsrc,   ysrc),
-                                getpixel(src, xsrc+1, ysrc), 
+                                getpixel(src, xsrc+1, ysrc),
                                 getpixel(src, xsrc,   ysrc+1),
                                 getpixel(src, xsrc+1, ysrc+1),
                                 xratio,
                                 yratio));
                 }
             }
-        }    
+        }
     }
 }
 
@@ -584,13 +584,13 @@ void resample(const Srcmat& src, Destmat& dest, SampleFunction sample, AccessFun
             const float xratio = xsrcf - (float)xsrc;
             dest(x, y) = auto_cast<dest_value_type>(
                  sample(getpixel(src, xsrc,   ysrc),
-                        getpixel(src, xsrc+1, ysrc), 
+                        getpixel(src, xsrc+1, ysrc),
                         getpixel(src, xsrc,   ysrc+1),
                         getpixel(src, xsrc+1, ysrc+1),
                         xratio,
                         yratio));
         }
-    }    
+    }
 }
 
 
@@ -616,12 +616,12 @@ template <
     class hDistance, class vDistance,
     class T
 >
-OutputIterator transform_matrix2(hInputIterator hfirst, const vInputIterator vfirst, 
-                                 hDistance hsize, vDistance vsize, 
+OutputIterator transform_matrix2(hInputIterator hfirst, const vInputIterator vfirst,
+                                 hDistance hsize, vDistance vsize,
                                  OutputIterator result,
                                  IntervalOperation IntervalOp,
                                  const hSubIterator& hsub, const vSubIterator& vsub,
-                                 T) 
+                                 T)
 {
     vInputIterator vend = vfirst + vsize;
     vInputIterator vnext = vfirst + 1;
@@ -649,10 +649,10 @@ OutputIterator transform_matrix2(hInputIterator hfirst, const vInputIterator vfi
     }
     return result;
 }
-//////////////////////////////////////////////////////////////////////////////////		  
+//////////////////////////////////////////////////////////////////////////////////
 
 template <class OutputIterator, class T>
-void bresenham_fill(OutputIterator it, int stride, int dx, int dy, 
+void bresenham_fill(OutputIterator it, int stride, int dx, int dy,
                     const T& fill_value)
 {
     bresenham_iterator<OutputIterator, T, T&, int> begin(it, stride, dx, dy);
@@ -664,7 +664,7 @@ void bresenham_fill(OutputIterator it, int stride, int dx, int dy,
     }
 }
 
-template <class pixelType> 
+template <class pixelType>
 double color_abs (const pixelType& color )
 {
     const int size = color.size ();
@@ -689,7 +689,7 @@ RESULT moment(int p, int q, const RASTER & image, RESULT init) {
             //           cerr << DBG(x) << DBG(y) << DBG(xp) << DBG(yp) << DBG(image(x,y)) << DBG(result) << endl;
         }
 
-    }     
+    }
     return result;
 }
 
@@ -753,7 +753,7 @@ bool analyseMoments(const RASTER & mat, MomentResults & mom)
     mom.major_dir = direction_vector(major_axis_angle);
     // TODO mom.minor_dir = mom.major_dir.ortho();
     // TODO mom.minor_angle = angle_of(mom.minor_dir);
-    
+
     //cerr << DBG(a) << DBG(b) <<DBG(c) <<DBG(mom.l) <<DBG(mom.w) <<
      //       DBG(gcenter) << DBG(mom.major_dir) << DBG(mom.minor_dir) <<endl;
 

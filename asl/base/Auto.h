@@ -4,15 +4,15 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description:  Automatic Resource Management Functions 
+// Description:  Automatic Resource Management Functions
 //
-// Last Review: pavel 30.11.2005 
+// Last Review: pavel 30.11.2005
 //
 //  review status report: (perfect, ok, fair, poor, disaster)
 //    usefullness            : ok
@@ -33,7 +33,7 @@
 //
 //    overall review status  : fair
 //
-//    recommendation: 
+//    recommendation:
 //       - improve documentation
 //       - improve test coverage
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
@@ -56,7 +56,7 @@ namespace asl {
     };
 
 #ifdef _NEEDS_TO_BE_TESTED_BEFORE_USE_
-    /** 
+    /**
      * abstract base class that helps to implements a multi-level lock for a resource so that the
      * the number of lock() and unlock() calls can be balanced; you need to implement the
      * lockOnce() and unlockOnce() function, and this class makes sure that they will be called only once

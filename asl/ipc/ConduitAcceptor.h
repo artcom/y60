@@ -4,12 +4,12 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: 
+// Description:
 //     Classes for networked or local communication between processes
 //
 // Last Review:  ms 2007-08-15
@@ -35,7 +35,7 @@
 //
 //    overall review status   :      ok
 //
-//    recommendations: add high-level documentation, improve doxygen documentation 
+//    recommendations: add high-level documentation, improve doxygen documentation
 */
 #ifndef __asl_ConduitAcceptor_included
 #define __asl_ConduitAcceptor_included
@@ -51,12 +51,12 @@
 #define DB(x) x;
 
 namespace asl {
-    
+
 /*! \addtogroup aslipc */
 /* @{ */
 
-//! Listens on an endpoint and spawns new servers when clients request a new connection. 
-/** 
+//! Listens on an endpoint and spawns new servers when clients request a new connection.
+/**
     The acceptor has its own listener thread. When a client connects, a new ConduitServer
     is created to handle the connection. Each server also has its own thread.
 **/
@@ -70,8 +70,8 @@ class ConduitAcceptor {
           * @param theFactoryMethod factory used to create new servers
           * @param theMaxConnectionCount maximum simutaneous clients
           **/
-        ConduitAcceptor(typename POLICY::Endpoint theLocalEndpoint, 
-                        FACTORYPROC theFactoryMethod, 
+        ConduitAcceptor(typename POLICY::Endpoint theLocalEndpoint,
+                        FACTORYPROC theFactoryMethod,
                         unsigned theMaxConnectionCount=32)
             :
             _myThread(0),
@@ -120,11 +120,11 @@ class ConduitAcceptor {
         typename POLICY::Handle _myListenHandle;
         // factory method pointer
         FACTORYPROC _createServerProc;
-        
+
         static bool isBroken(typename ConduitServer<POLICY>::Ptr & S) {
             return !S->isValid();
         }
-       
+
         void stopAllServers() {
             DB(AC_TRACE << "ACCEPTOR: stopping all servers\n");
 			//int myServerCount = _myServers.size();
@@ -134,13 +134,13 @@ class ConduitAcceptor {
             _myServers.clear();
             DB(AC_TRACE << "ACCEPTOR: servers stopped\n");
         }
-        
+
         void processNewConnections(int theTimeout) {
             typename POLICY::Handle myServerHandle = POLICY::createOnConnect(
                     _myListenHandle, _myMaxConnectionCount, theTimeout);
             //DB(AC_TRACE << " createOnConnect ret " << myServerHandle << std::endl);
             if (myServerHandle) {
-                typename ConduitServer<POLICY>::Ptr 
+                typename ConduitServer<POLICY>::Ptr
                         myNewServer(_createServerProc(myServerHandle));
                 myNewServer->setSelf(myNewServer);
 				myNewServer->setAcceptor(this);
@@ -151,14 +151,14 @@ class ConduitAcceptor {
             _myServers.remove_if(isBroken);
             //DB(AC_TRACE << "ACCEPTOR: still active servers:" << _myServers.size() << std::endl);
         };
-        
+
         static void * mainAcceptorLoop(void * theThisPointer) {
             int myResult = 0;
             int myOldCancelState = 0;
             pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, &myOldCancelState);
             pthread_cleanup_push(onThreadDone, theThisPointer);
             DB(AC_TRACE << "ACCEPTOR: Thread:: init" << std::endl);
-            ConduitAcceptor<POLICY> * mySelf = 
+            ConduitAcceptor<POLICY> * mySelf =
                 reinterpret_cast<ConduitAcceptor<POLICY>*>(theThisPointer);
             for(;;) {
                 try {
@@ -173,9 +173,9 @@ class ConduitAcceptor {
             DB(AC_TRACE << "ACCEPTOR: Exiting normally" << std::endl);
             return (void*)static_cast<ptrdiff_t>(myResult);
         }
-        
+
         static void onThreadDone(void * theThisPointer) {
-            ConduitAcceptor<POLICY> * mySelf = 
+            ConduitAcceptor<POLICY> * mySelf =
                 reinterpret_cast<ConduitAcceptor<POLICY>*>(theThisPointer);
             mySelf->stopAllServers();
             DB(AC_TRACE << "ACCEPTOR: cleanup" << std::endl);

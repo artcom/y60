@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -62,7 +62,7 @@ namespace asl {
 
 /** @relates Frustum */
 DEFINE_EXCEPTION(FrustumException, asl::Exception);
-    
+
 /** @relates Frustum */
 enum ProjectionTypeEnum {
     PERSPECTIVE,
@@ -84,7 +84,7 @@ DEFINE_ENUM( ProjectionType, ProjectionTypeEnum, ASL_MATH_DECL );
  */
 enum ResizePolicyEnum {
     NO_ADAPTION,
-    ADAPT_VERTICAL, // 
+    ADAPT_VERTICAL, //
     ADAPT_HORIZONTAL, // ... the other way round
     ResizePolicyEnum_MAX
 };
@@ -96,13 +96,13 @@ class ASL_MATH_DECL Frustum {
     public:
         Frustum();
         Frustum(const Frustum & otherFrustum);
-        Frustum(float theLeft, float theRight, 
-                float theBottom, float theTop,  
+        Frustum(float theLeft, float theRight,
+                float theBottom, float theTop,
                 float theNear, float theFar, ProjectionType=PERSPECTIVE);
         Frustum(float theX, // HFov or Width
-                float theY, // VFov or Height 
+                float theY, // VFov or Height
                 float theNear, float theFar, ProjectionType=PERSPECTIVE);
-        
+
         virtual ~Frustum();
         /*
         void updateCorners(float theNearPlane, float theFarPlane, float theHFov,
@@ -153,9 +153,9 @@ class ASL_MATH_DECL Frustum {
         void updatePlanes(const asl::Matrix4f & theCameraTransform,
                           const asl::Matrix4f & theCameraTransformI);
 
-        void getCorners(asl::Point3f & theLTF, asl::Point3f & theRBF, 
+        void getCorners(asl::Point3f & theLTF, asl::Point3f & theRBF,
                         asl::Point3f & theRTF, asl::Point3f & theLBF,
-                        asl::Point3f & theLTBK, asl::Point3f & theRBBK, 
+                        asl::Point3f & theLTBK, asl::Point3f & theRBBK,
                         asl::Point3f & theRTBK, asl::Point3f & theLBBK) const;
 
         // values suitable for glFrustum()
@@ -188,8 +188,8 @@ class ASL_MATH_DECL Frustum {
     protected:
     private:
 
-        asl::Vector3f constructPlaneNormal(const asl::Vector3f & v1, 
-                                           const asl::Vector3f & v2, 
+        asl::Vector3f constructPlaneNormal(const asl::Vector3f & v1,
+                                           const asl::Vector3f & v2,
                                            const asl::Matrix4f & T);
 
 

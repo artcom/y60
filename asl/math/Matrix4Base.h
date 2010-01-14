@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -602,12 +602,12 @@ namespace asl {
         }
 		Vector3<Number> getScale() const {
             return Vector3<Number>(this->val[0][0],this->val[1][1],this->val[2][2]);
-		}        
+		}
 		void setScale(const Vector3<Number> & theScale) {
 		    this->val[0][0] = theScale[0];
 		    this->val[1][1] = theScale[1];
-		    this->val[2][2] = theScale[2];            
-		}                
+		    this->val[2][2] = theScale[2];
+		}
         void rotateX(Number cosAngle, Number sinAngle) {
             Number t = this->val[0][1];
             this->val[0][1]= t * cosAngle - this->val[0][2] * sinAngle;

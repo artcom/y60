@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -80,7 +80,7 @@ struct FixedVectorPOD {
     const T& operator[](size_type i) const {
         return reinterpret_cast<const T*>(this)[i];
     }
-    
+
     T * begin() {
         return &(*this)[0];
     }
@@ -97,7 +97,7 @@ struct FixedVectorPOD {
 
 
 /** Replacement type for C-type arrays. Mostly used for numeric n-tuples.
- * 
+ *
  * \f[ \vec{a} = \left( a_1, a_2, \ldots, a_{size} \right) @f]
  *
  * Design Note:
@@ -123,15 +123,15 @@ struct FixedVector  {
     explicit FixedVector(const T * t) {
         size_type i;
         for (i=0;i<SIZE;i++) {
-            val[i] = t[i]; 
+            val[i] = t[i];
         }
     }
-  
+
     /** Initialize from two T pointers/iterators.
      * It is not an error if the size between theBegin and theEnd is larger than
      * the size of the FixedVector. Only SIZE elements will be copied.
-     * @param theBegin 
-     * @param theEnd 
+     * @param theBegin
+     * @param theEnd
      */
     FixedVector(const T * theBegin, const T * theEnd) {
         unsigned mySize = theEnd - theBegin;
@@ -139,7 +139,7 @@ struct FixedVector  {
             mySize = SIZE;
         }
         for (size_type i=0;i<mySize;i++) {
-            val[i] = theBegin[i]; 
+            val[i] = theBegin[i];
         }
     }
     /** Copy constructor.
@@ -147,7 +147,7 @@ struct FixedVector  {
      */
     FixedVector(const FixedVector & otherVector) {
         for (size_type i=0;i<SIZE;i++) {
-            val[i] = otherVector[i]; 
+            val[i] = otherVector[i];
         }
     }
     /** Assignment method.
@@ -155,7 +155,7 @@ struct FixedVector  {
      */
     void assign(const FixedVector & s) {
         for (size_type i=0;i<SIZE;i++) {
-            val[i] = s[i]; 
+            val[i] = s[i];
         }
     }
     /** Assignment operator.
@@ -168,7 +168,7 @@ struct FixedVector  {
     /*
     FixedVector(const T & v) {
         for (size_type i=0;i<SIZE;i++) {
-            val[i] = v; 
+            val[i] = v;
         }
     }
     */
@@ -389,13 +389,13 @@ dot(const FixedVector<SIZE, T> & a, const FixedVector<SIZE, T> & b) {
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -418,17 +418,17 @@ dot(const FixedVector<SIZE, T> & a, const FixedVector<SIZE, T> & b) {
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
 template <class T>
-std::ostream & printVector(std::ostream &os, const T & v, 
+std::ostream & printVector(std::ostream &os, const T & v,
         bool oneElementPerLine = false,
-        const char theStartToken = '[', 
-        const char theEndToken = ']', 
-        const char theDelimiter = ',') 
+        const char theStartToken = '[',
+        const char theEndToken = ']',
+        const char theDelimiter = ',')
 {
     int mySize = v.end() - v.begin();
     os << theStartToken;
@@ -441,24 +441,24 @@ std::ostream & printVector(std::ostream &os, const T & v,
             os << theDelimiter;
         }
     }
-    return os << theEndToken;    
-} 
+    return os << theEndToken;
+}
 
 template <class T>
-std::istream & parseVector(std::istream & is, T & v, 
-                           const char theStartToken = '[', 
-                           const char theEndToken = ']', 
-                           const char theDelimiter = ',') 
+std::istream & parseVector(std::istream & is, T & v,
+                           const char theStartToken = '[',
+                           const char theEndToken = ']',
+                           const char theDelimiter = ',')
 {
 
-    char myChar; 
+    char myChar;
     is >> myChar;
     if ( myChar != theStartToken) {
         is.setstate(std::ios::failbit);
         return is;
     }
 
-    typename T::size_type mySize = v.size(); 
+    typename T::size_type mySize = v.size();
     for (typename T::size_type i = 0; i < mySize; ++i) {
         is >> v[i];
 
@@ -468,8 +468,8 @@ std::istream & parseVector(std::istream & is, T & v,
         }
 
         is >> myChar;
-        if (((i < mySize - 1) &&  myChar != theDelimiter) || 
-                ((i == mySize - 1) &&  myChar != theEndToken)) 
+        if (((i < mySize - 1) &&  myChar != theDelimiter) ||
+                ((i == mySize - 1) &&  myChar != theEndToken))
         {
             is.setstate(std::ios::failbit);
             return is;
@@ -481,8 +481,8 @@ std::istream & parseVector(std::istream & is, T & v,
 template <int SIZE, class T>
 std::istream & operator>>(std::istream & is, asl::FixedVector<SIZE,T> & f) {
     if (is.iword(FixedVectorStreamFormatter::ourIsFormattedFlag)) {
-        return parseVector(is, f, 
-                static_cast<char>(is.iword(FixedVectorStreamFormatter::ourStartTokenIndex)), 
+        return parseVector(is, f,
+                static_cast<char>(is.iword(FixedVectorStreamFormatter::ourStartTokenIndex)),
                 static_cast<char>(is.iword(FixedVectorStreamFormatter::ourEndTokenIndex)),
                 static_cast<char>(is.iword(FixedVectorStreamFormatter::ourDelimiterIndex)) );
     } else {
@@ -491,13 +491,13 @@ std::istream & operator>>(std::istream & is, asl::FixedVector<SIZE,T> & f) {
 }
 
 template <int SIZE, class T>
-std::ostream & operator<<(std::ostream & os, 
+std::ostream & operator<<(std::ostream & os,
         const asl::FixedVector<SIZE,T> & f)
 {
     if (os.iword(FixedVectorStreamFormatter::ourIsFormattedFlag)) {
-        return printVector(os, f, 
+        return printVector(os, f,
                 0 != os.iword(FixedVectorStreamFormatter::ourOneElementPerLineFlagIndex),
-                static_cast<char>(os.iword(FixedVectorStreamFormatter::ourStartTokenIndex)), 
+                static_cast<char>(os.iword(FixedVectorStreamFormatter::ourStartTokenIndex)),
                 static_cast<char>(os.iword(FixedVectorStreamFormatter::ourEndTokenIndex)),
                 static_cast<char>(os.iword(FixedVectorStreamFormatter::ourDelimiterIndex)) );
     } else {
@@ -512,13 +512,13 @@ std::istream & operator>>(std::istream & is, asl::FixedVectorPOD<SIZE,T> & f) {
 }
 
 template <int SIZE, class T>
-std::ostream & operator<<(std::ostream & os, 
+std::ostream & operator<<(std::ostream & os,
         const asl::FixedVectorPOD<SIZE,T> & f)
 {
     if (os.iword(FixedVectorStreamFormatter::ourIsFormattedFlag)) {
-        return printVector(os, f, 
+        return printVector(os, f,
                 0 != os.iword(FixedVectorStreamFormatter::ourOneElementPerLineFlagIndex),
-                static_cast<char>(os.iword(FixedVectorStreamFormatter::ourStartTokenIndex)), 
+                static_cast<char>(os.iword(FixedVectorStreamFormatter::ourStartTokenIndex)),
                 static_cast<char>(os.iword(FixedVectorStreamFormatter::ourEndTokenIndex)),
                 static_cast<char>(os.iword(FixedVectorStreamFormatter::ourDelimiterIndex)) );
     } else {

@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -50,7 +50,7 @@ using namespace std;
 #define DB(x) // x
 
 #ifdef verify
-	#ifndef _SETTING_NO_UNDEF_WARNING_ 
+	#ifndef _SETTING_NO_UNDEF_WARNING_
 		#warning Symbol 'verify' defined as macro, undefining. (Outrageous namespace pollution by Apples AssertMacros.h, revealing arrogance and incompetence)
 	#endif
 #undef verify
@@ -71,7 +71,7 @@ static const char * ResizePolicyStrings[] = {
 };
 IMPLEMENT_ENUM( asl::ResizePolicy, ResizePolicyStrings);
 
-namespace asl { 
+namespace asl {
 
 Frustum::Frustum() :
     _myLeft(0),
@@ -147,7 +147,7 @@ Frustum::operator = (const Frustum & other) {
     return * this;
 }
 
-void 
+void
 Frustum::changeAspectRatio( ResizePolicy thePolicy, float theNewAspect) {
     // save values before members are modified
     float myOldWidth  = getWidth();
@@ -226,7 +226,7 @@ Frustum::getProjectionMatrix(asl::Matrix4f & theProjectionMatrix) const {
                 0.0f, 0.0f, float(-2.0 * _myFar * _myNear / (_myFar - _myNear)), 0.0f);
         return true;
     } else if (_myProjectionType == ORTHONORMAL) {
-        // corrected version - don't trust the red book, trust me! 
+        // corrected version - don't trust the red book, trust me!
         theProjectionMatrix.assign(float(2.0 / (_myRight - _myLeft)), 0.0f, 0.0f, 0.0f,
                 0.0f, float(2.0 / (_myTop - _myBottom)), 0.0f, 0.0f,
                 0.0f, 0.0f, float(-2.0f/(_myFar - _myNear)), 0.0f,
@@ -298,7 +298,7 @@ ProjectionType
 Frustum::getType() const {
     return _myProjectionType;
 }
-void 
+void
 Frustum::setType( ProjectionType theProjection) {
     _myProjectionType = theProjection;
 }
@@ -396,7 +396,7 @@ Frustum::getWidth() const {
     return _myRight - _myLeft;
 }
 
-void 
+void
 Frustum::setWidth( const float & theWidth) {
     float myShift = 0.0;
     if ( ! almostEqual( getWidth(), 0 )) {
@@ -411,7 +411,7 @@ Frustum::getHeight() const {
     return _myTop - _myBottom;
 }
 
-void 
+void
 Frustum::setHeight( const float & theHeight) {
     float myShift = 0.0;
     if ( ! almostEqual( getHeight(), 0 )) {
@@ -425,7 +425,7 @@ float
 Frustum::getHFov() const {
     if (_myProjectionType == PERSPECTIVE ) {
         float myHfov =  float( degFromRad( atan2( _myRight , _myNear ) ) -
-                        degFromRad( atan2( _myLeft, _myNear )) ); 
+                        degFromRad( atan2( _myLeft, _myNear )) );
         return myHfov;
     } else {
         throw FrustumException("Field of view requested on orthonormal frustum.",
@@ -433,7 +433,7 @@ Frustum::getHFov() const {
     }
 }
 
-void 
+void
 Frustum::setHFov(const float & theFOV ) {
     // save value before members are modified
     float myOldShift = getHShift();
@@ -455,7 +455,7 @@ Frustum::getVFov() const {
     }
 }
 
-void 
+void
 Frustum::setVFov(const float & theFOV ) {
     // save value before members are modified
     float myOldShift = getVShift();
@@ -467,7 +467,7 @@ Frustum::setVFov(const float & theFOV ) {
 
 
 
-void 
+void
 Frustum::setHShift(const float & theShift) {
     float myWidth = getWidth();
     float myOffset = theShift * myWidth;
@@ -484,7 +484,7 @@ Frustum::getHShift() const {
     float myWidth = getWidth();
     return  - (_myLeft + 0.5f * myWidth) / myWidth;
 }
-void 
+void
 Frustum::setVShift(const float & theShift) {
     float myHeight = getHeight();
     float myOffset = theShift * myHeight;
@@ -587,7 +587,7 @@ Frustum::getCorners(asl::Point3f & theLTF, asl::Point3f & theRBF,
 }
 
 
-Frustum::TupleT 
+Frustum::TupleT
 Frustum::asTuple() const {
     TupleT myTuple;
     myTuple[0] = _myLeft;
@@ -599,7 +599,7 @@ Frustum::asTuple() const {
     return myTuple;
 }
 
-void 
+void
 Frustum::fromTuple(const TupleT & theTuple) {
     _myLeft   = theTuple[0];
     _myRight  = theTuple[1];

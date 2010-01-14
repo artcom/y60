@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -88,21 +88,21 @@ public:
         ENSURE(myResult[2] == Vector3<T>(1,0,0));
         DPRINT(myResult[3]);
         ENSURE(myResult[4] == myEnd);
-        
+
         // Test getPosition
         {
             Vector3<T> myStart(0,0,0);
             Vector3<T> myEnd(2,0,0);
-    
+
             BSpline<T> myBSpline(myStart, Vector3<T>(1,2,0),
                                  myEnd, Vector3<T>(1,2,0));
-            
+
             ENSURE_EXCEPTION(myBSpline.getArcLength(), asl::Exception);
             ENSURE_EXCEPTION(myBSpline.getPosition(1), asl::Exception);
             myBSpline.calculate(2);
             Vector3<T> myMidPoint = myBSpline.getResult()[1];
             T mySegmentLength = T(sqrt(3.25));
-            ENSURE(almostEqual(myBSpline.getArcLength(), 2 * mySegmentLength));                                 
+            ENSURE(almostEqual(myBSpline.getArcLength(), 2 * mySegmentLength));
             ENSURE(almostEqual(myBSpline.getPosition(0), myStart));
             ENSURE(almostEqual(myBSpline.getPosition(100), myEnd));
             ENSURE(almostEqual(myBSpline.getPosition(mySegmentLength), myMidPoint));

@@ -4,12 +4,12 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: 
+// Description:
 //    C++ Library fuer TCP-Sockets (based on Sockets.c++ from Pavel 11.9.92)
 //
 // Last Review:  ms & ab 2007-08-14
@@ -35,9 +35,9 @@
 //
 //    overall review status   :      ok
 //
-//    recommendations: move this to its own component, 
-//                     check interfaces, 
-//                     remove CVS log 
+//    recommendations: move this to its own component,
+//                     check interfaces,
+//                     remove CVS log
 */
 
 /** The "Station" protokoll is a simple UDP-based broadcast protocol that basically performs
@@ -66,10 +66,10 @@ Usage:
 The interface is quite simple: it consists of the openStation(), closeStation(), broadcast() and receive() calls.
 
 broadcast() takes a block of memory as sole argument and broadcasts it.
-receive() is non-blocking and returns the oldest fully received message when available, together with the 
+receive() is non-blocking and returns the oldest fully received message when available, together with the
 originating host adress and station id.
 
-Caveeats: 
+Caveeats:
 Altough the protocol is fairly simple and easy to use, there are a few things to consider:
 1) Under Linux, unfortunately the SO_REUSEPORT socket option does not exist, which limits the number of
 receiving stations with the same port number on a single linux host to one. Although this can be solved
@@ -92,7 +92,7 @@ but has not be considered to be worth the problems it might add.
 
 3) The protocol will not perform well when packet loss is high and the messages are very long; the
 chances of getting even one message through drops exponentially with the message length:
-prob_msg_lost = prob_packet_lost ^ packets_per_message 
+prob_msg_lost = prob_packet_lost ^ packets_per_message
 
 4) The implementation is non-blocking and well suited to run in a single threaded environment; therefore
 receive() should not be called in a tight loop when there is no work to be performed. A typical usage is

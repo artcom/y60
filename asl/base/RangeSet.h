@@ -4,32 +4,32 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
 // Description:  A hybrid (reference counting & mark-sweep garbage collector
 //
-// Last Review: pavel 30.11.2005 
+// Last Review: pavel 30.11.2005
 //
 //  review status report: (perfect, ok, fair, poor, disaster)
-//    usefullness            : 
-//    formatting             : 
-//    documentation          : 
-//    test coverage          : 
-//    names                  : 
-//    style guide conformance: 
-//    technical soundness    : 
-//    dead code              : 
-//    readability            : 
-//    understandabilty       : 
-//    interfaces             : 
-//    confidence             : 
-//    integration            : 
-//    dependencies           : 
-//    cheesyness             : 
+//    usefullness            :
+//    formatting             :
+//    documentation          :
+//    test coverage          :
+//    names                  :
+//    style guide conformance:
+//    technical soundness    :
+//    dead code              :
+//    readability            :
+//    understandabilty       :
+//    interfaces             :
+//    confidence             :
+//    integration            :
+//    dependencies           :
+//    cheesyness             :
 //
 //    overall review status  :
 //
@@ -84,7 +84,7 @@ typedef unsigned long Size;
         typedef std::vector<T> RangeVector;
     public:
 
-        // returns true if none of the elements have been registered before, otherwise false is returned and nothing is changed 
+        // returns true if none of the elements have been registered before, otherwise false is returned and nothing is changed
         // theBegin must be > theEnd, theEnd is not inclusive
         bool insert(const T & theBegin, const T & theEnd )
         {
@@ -97,7 +97,7 @@ typedef unsigned long Size;
             }
             typename RangeVector::iterator lb = std::lower_bound(myValues.begin(),myValues.end(), theBegin);
             // check for end of container
-            if (lb == myValues.end()) { 
+            if (lb == myValues.end()) {
                 push_back2(theBegin, theEnd);
                 return true;
             }
@@ -107,7 +107,7 @@ typedef unsigned long Size;
             return insert(theElement, theElement+1);
         }
 
-        // returns true if none of the elements have been registered before, otherwise false is returned and nothing is changed 
+        // returns true if none of the elements have been registered before, otherwise false is returned and nothing is changed
         // theBegin must be > theEnd, theEnd is not inclusive
         bool remove(const T & theBegin, const T & theEnd )
         {
@@ -126,7 +126,7 @@ typedef unsigned long Size;
             }
              typename RangeVector::iterator lb = std::lower_bound(myValues.begin(),myValues.end(), theBegin);
             // check for end of container
-            if (lb == myValues.end()) { 
+            if (lb == myValues.end()) {
                 return false;
             }
             return insert_remove<1>(lb, theBegin, theEnd);
@@ -164,7 +164,7 @@ typedef unsigned long Size;
                         return true;
                     }
                     if (theEnd < myValues[i]) { // new range ends before end of current range
-                        insert2(lb, theBegin, theEnd); // (!) odd insert redefines splits range 
+                        insert2(lb, theBegin, theEnd); // (!) odd insert redefines splits range
                         return true;
                     }
                     // new range overlaps with existing range
@@ -204,9 +204,9 @@ typedef unsigned long Size;
                 if (theValue < myValues[i]) {
                     return true; // stop ptr includes our position
                 }
-                return false;    
+                return false;
             } else {
-                // lb is a start ptr or end   
+                // lb is a start ptr or end
                 if (theValue < myValues[i]) { // check for < begin
                     return false;
                 }
@@ -239,13 +239,13 @@ typedef unsigned long Size;
                     return true; // stop ptr includes our position
                 }
                 if (i == myValues.size() - 1) {
-                    return false;    
+                    return false;
                 }
                 // advance to next start
                 theValue = myValues[i+1];
-                return true; 
+                return true;
             } else {
-                // lb is a start ptr or end   
+                // lb is a start ptr or end
                 if (theValue+1 < myValues[i]) { // check for < begin
                     theValue = myValues[0];
                     return true;

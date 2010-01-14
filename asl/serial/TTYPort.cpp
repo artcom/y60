@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -65,9 +65,9 @@ namespace asl {
 
 // XXX Q: What in eris' name is this? -IA (8. Nov 2007)
 //     A: IIRC this is hack by Christian Hardenberg to work around a missing define
-//        in his hopelessly outdated kernel headers. I think it should be safe to 
+//        in his hopelessly outdated kernel headers. I think it should be safe to
 //        remove it.
-//        IMHO it would be better to use TIOCINQ anyway, because we are dealing with 
+//        IMHO it would be better to use TIOCINQ anyway, because we are dealing with
 //        a terminal here. [DS]
 #ifndef FIONREAD
 #define FIONREAD       0x541B
@@ -118,9 +118,9 @@ TTYPort::open(unsigned int theBaudRate, unsigned int theDataBits,
         }
     }
     AC_TRACE << "open flags = " << (myOpenMode|myOpenNonBlockMode);
-    
+
     _myPortHandle = ::open(getDeviceName().c_str(), myOpenMode|myOpenNonBlockMode);
-    
+
     if (_myPortHandle < 0) {
         throw SerialPortException(string("Can not open device '") + getDeviceName() + "': " +
                                 strerror(errno), PLUS_FILE_LINE);
@@ -143,7 +143,7 @@ TTYPort::open(unsigned int theBaudRate, unsigned int theDataBits,
     // POSIX conform Baud rate setting required for OSX
     myTermIO.c_cflag = myDataBits | myParityMode |
                        myStopBits | myFlowControl | CLOCAL | CREAD;
-    
+
    if (cfsetspeed(&myTermIO, myBaudRate) != 0) {
         close();
         throw SerialPortException(string("Failed to set requested baud rate on ") +
@@ -184,7 +184,7 @@ TTYPort::close() {
 
 }
 
-void 
+void
 TTYPort::flush() {
     if (!isOpen()) {
         throw SerialPortException(string("Can not flush device ") + getDeviceName() +

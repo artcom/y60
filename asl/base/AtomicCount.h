@@ -4,14 +4,14 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 // Description: atomic counter for different processing models
 //
-// Last Review: pavel 30.11.2005 
+// Last Review: pavel 30.11.2005
 //
 //  review status report: (perfect, ok, fair, poor, disaster)
 //    usefullness            : perfect
@@ -32,7 +32,7 @@
 //
 //    overall review status  : fair
 //
-//    recommendation: 
+//    recommendation:
 //       - improve documentation
 //       - reduce number of #ifdefs
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
@@ -52,7 +52,7 @@
 /*! \addtogroup aslbase */
 /* @{ */
 
-// ATTENTION: The Mac OS X atomic counter is not tested on multiprocessor 
+// ATTENTION: The Mac OS X atomic counter is not tested on multiprocessor
 //            machines because I don't have one. (HINT!) DS
 
 #if defined(LINUX) || defined(OSX_X86)
@@ -67,20 +67,20 @@ typedef struct { asl::Signed32 counter; } atomic_t;
 /**
 * atomic_read - read atomic variable
 * @v: pointer of type atomic_t
-* 
+*
 * Atomically reads the value of @v.  Note that the guaranteed
 * useful range of an atomic_t is only 24 bits.
-*/ 
+*/
 #define atomic_read(v)		((v)->counter)
 
 /**
 * atomic_set - set atomic variable
 * @v: pointer of type atomic_t
 * @i: required value
-* 
+*
 * Atomically sets the value of @v to @i.  Note that the guaranteed
 * useful range of an atomic_t is only 24 bits.
-*/ 
+*/
 #define atomic_set(v,i)		(((v)->counter) = (i))
 #define ATOMIC_INIT(i)	{ (i) }
 #define atomic_read(v)		((v)->counter)
@@ -106,7 +106,7 @@ static __inline__ void atomic_inc(atomic_t *v)
 
 static __inline__ int atomic_post_inc(atomic_t *v)
 {
-    register int result = 1; 
+    register int result = 1;
     __asm__ __volatile__(
         "lock; xaddl %0, %1;"
         :"=r"(result)
@@ -191,7 +191,7 @@ static __inline__ void atomic_inc_SingleProcessor(atomic_t *v)
 
 static __inline__ int atomic_post_inc_SingleProcessor(atomic_t *v)
 {
-    register int result = 1; 
+    register int result = 1;
     __asm__ __volatile__(
         "xaddl %1, %0"
         :"=m" (v->counter), "=q"(result)
@@ -374,7 +374,7 @@ inline int atomic_conditional_increment_SingleProcessor(int volatile* pw) {
 #ifdef _WIN32
 extern "C" __declspec(dllimport) long __stdcall InterlockedIncrement(long volatile *);
 extern "C" __declspec(dllimport) long __stdcall InterlockedDecrement(long volatile *);
-extern "C" __declspec(dllimport) long __stdcall 
+extern "C" __declspec(dllimport) long __stdcall
 InterlockedCompareExchange( long volatile *, long, long );
 
 inline int atomic_conditional_increment(long volatile * pw )
@@ -496,7 +496,7 @@ namespace asl
         }
         inline
             void increment() {
-#ifdef UNIX_X86 
+#ifdef UNIX_X86
                 atomic_inc_SingleProcessor(&value);
 #endif
 #ifdef _WIN32
@@ -554,7 +554,7 @@ namespace asl
             return value;
 #endif
         }
-        inline void set(long i) 
+        inline void set(long i)
         {
 #ifdef UNIX_X86
             atomic_set(&value, i);
@@ -662,7 +662,7 @@ namespace asl
             return value;
 #endif
         }
-        inline void set(long i) 
+        inline void set(long i)
         {
 #ifdef UNIX_X86
             atomic_set(&value, i);
@@ -693,4 +693,4 @@ namespace asl
 /* @} */
 
 
-#endif 
+#endif

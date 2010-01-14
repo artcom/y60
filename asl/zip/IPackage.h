@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: IPackage.h,v $
@@ -54,7 +54,7 @@ class ASL_ZIP_DECL IPackage {
 
         /// opens a stream to a contained file.
         virtual Ptr<ReadableStreamHandle> getStream(const std::string & theRelativePath) = 0;
-        
+
         /// get the contents of a contained file.
         virtual Ptr<ReadableBlockHandle> getFile(const std::string & theRelativePath) = 0;
 };

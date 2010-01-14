@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: testMappedBlock.tst.cpp,v $
@@ -50,7 +50,7 @@ public:
 		perform_putget(testFileName, 20*65536);
 		perform_putget(testFileName, 20*65536+1);
 		perform_putget(testFileName, 0);
-	}  
+	}
 
 
 	void perform_putget(const string & testFileName, int contentSize) {
@@ -60,23 +60,23 @@ public:
 		for (int i = 0; i< contentSize; ++i) {
 			largeTestContent[i] = ' ' + i%(255-' ');
 		}
-		perform_putget(testFileName, largeTestContent); 
+		perform_putget(testFileName, largeTestContent);
 	}
 	void perform_putget(const string & testFileName, const asl::ReadableBlock & testContent) {
 		ENSURE(writeFile(testFileName,testContent));
 		asl::Block fromFile;
 		ENSURE(readFile(testFileName,fromFile));
-		ENSURE(fromFile == testContent);  
+		ENSURE(fromFile == testContent);
 		ENSURE(fileExists(testFileName));
         ENSURE( static_cast<asl::AC_SIZE_TYPE>(getFileSize(testFileName)) == testContent.size());
-        
+
         {
             ConstMappedBlock myBlock(testFileName);
-		    ENSURE(fromFile == myBlock);  
+		    ENSURE(fromFile == myBlock);
         }
         {
 		    ConstMappedBlock mySizedBlock(testFileName,fromFile.size());
-		    ENSURE(fromFile == mySizedBlock); 
+		    ENSURE(fromFile == mySizedBlock);
         }
 
 		string otherTestFileName = std::string("WRB1-") + testFileName;
@@ -90,11 +90,11 @@ public:
 				myWriteableBlock[i] = 'A' + i%26;
 				otherContent[i] = myWriteableBlock[i];
 			}
-			ENSURE(testContent.size()==0 || testContent != myWriteableBlock); 
+			ENSURE(testContent.size()==0 || testContent != myWriteableBlock);
 		}
 		asl::Block fromMappedFile;
 		ENSURE(readFile(otherTestFileName,fromMappedFile));
-		ENSURE(fromMappedFile == otherContent);  
+		ENSURE(fromMappedFile == otherContent);
 
         asl::deleteFile(testFileName);
         asl::deleteFile(otherTestFileName);
@@ -110,7 +110,7 @@ public:
 		perform_resize(testFileName, 1);
 		perform_resize(testFileName, 2);
 		perform_resize(testFileName, 5);
-        
+
 		perform_resize(testFileName, 65536-1);
 		perform_resize(testFileName, 65536);
 		perform_resize(testFileName, 65536+1);
@@ -139,7 +139,7 @@ public:
         testResizePerformance(testFileName, 1024*1024, 50);
         testResizePerformance(testFileName, 1024*1024, 300);
         */
-    }  
+    }
 
 	void perform_resize(const string & testFileName, int contentSize) {
 		DPRINT2("Resize Test with content of size", contentSize);
@@ -197,7 +197,7 @@ public:
         ENSURE(ConstMappedBlock("medium.testfile").size() == asl::getFileSize("medium.testfile"));
         ENSURE(ConstMappedBlock("large.testfile").size() == asl::getFileSize("large.testfile"));
         ENSURE(NewMappedBlock("xlarge.testfile",1024*1024*257).size() == 1024*1024*257);
-#endif     
+#endif
         const string testMapFileName = string("xmapped-")+testFileName;
         {
 		    MappedBlock mappedTestContent(testMapFileName, 0);
@@ -236,10 +236,10 @@ public:
         }
         return myData;
     }
-    
+
 	void run() {
 		const string testFileName = "AppendMappedBlockTest.testoutput";
-        
+
         string myData1 = createData(1,1000);
         string myData2 = createData(1000,2000);
         DPRINT(myData1.size());
@@ -250,7 +250,7 @@ public:
             MappedBlock myBlock(testFileName);
             myBlock.append(myData1.c_str(), myData1.size());
             //myBlock.reserve(myBlock.size()); // this should not be necessary
-            
+
             // if we don't call reserve, the file size is wrong.
             // this is bad if e.g. while downloading the program is interrupted
             // with CTRL-C since there will then be garbage behind the data.
@@ -264,12 +264,12 @@ public:
             // MappedBlock myBlock(testFileName, myData1.size()); // but we need this
             DPRINT(myBlock.size());
             myBlock.append(myData2.c_str(), myData2.size());
-            // myBlock.reserve(myBlock.size()); // this should not be necessary 
-            ENSURE(getFileSize(testFileName) == totalSize);   
+            // myBlock.reserve(myBlock.size()); // this should not be necessary
+            ENSURE(getFileSize(testFileName) == totalSize);
         }
         DPRINT(totalSize);
         DPRINT(getFileSize(testFileName));
-        ENSURE(getFileSize(testFileName) == totalSize);   
+        ENSURE(getFileSize(testFileName) == totalSize);
         ENSURE(readFile(testFileName) == myData1+myData2);
     }
 };

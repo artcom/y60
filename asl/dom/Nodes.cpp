@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: Nodes.cpp,v $
@@ -538,7 +538,7 @@ namespace dom {
 							for (unsigned i = 0; i < myLen; i++) {
 								result += static_cast<char>(myUTF8Buffer[i]);
 							}
-                            //result += static_cast<char>(value);                            
+                            //result += static_cast<char>(value);
                         } else
                             if (entity_name[0] == Cx) {
                                 String hex_string = entity_name.substr(1);
@@ -586,7 +586,7 @@ namespace dom {
                 i = next_pos;
             } else if (s[i] == C13) {
 				// remove all CR in the input stream, leave only LF
-                ++i;                      
+                ++i;
             } else {
                 result+=s[i];
                 ++i;
@@ -767,7 +767,7 @@ dom::Node::setUpstreamVersion(asl::Unsigned64 theVersion) {
 #ifdef RECURSIVE_BUMP
 #define NO_BUMP_REFERENCES
 #ifdef BUMP_REFERENCES
-void 
+void
 dom::Node::getReferencingNodes(std::vector<NodePtr> & theResult) {
     NodeIDRefRegistryPtr myIDRefRegistry = getIDRefRegistry();
     for (unsigned i = 0; i < _myAttributes.size();++i) {
@@ -778,7 +778,7 @@ dom::Node::getReferencingNodes(std::vector<NodePtr> & theResult) {
     }
 }
 
-asl::Unsigned64 
+asl::Unsigned64
 dom::Node::bumpVersion() {
     Node * myRoot = getRealRootNode();
     DBV(AC_TRACE << "Node::bumpVersion(): this="<<(void*)this<<" , root="<<(void*)myRoot<<" , root version = "<<myRoot->_myVersion);
@@ -796,7 +796,7 @@ dom::Node::bumpVersion() {
 
 #  else
 
-asl::Unsigned64 
+asl::Unsigned64
 dom::Node::bumpVersion() {
     if (_myParent) {
         _myVersion = _myParent->bumpVersion();
@@ -808,7 +808,7 @@ dom::Node::bumpVersion() {
 #  endif
 #else
 // iterative bump
-asl::Unsigned64 
+asl::Unsigned64
 dom::Node::bumpVersion() {
     Node * myNode = this;
     asl::Unsigned64 myVersion=0;
@@ -990,7 +990,7 @@ void
 Node::getNodesByAttribute(const DOMString & theElementName,
                           const DOMString & theAttributeName,
                           const DOMString & theAttributeValue,
-                          bool theDeepSearchFlag,                          
+                          bool theDeepSearchFlag,
                           std::vector<NodePtr> & theResults) const
 {
     for (NodeList::size_type i = 0; i < childNodes().length(); ++i) {
@@ -1078,8 +1078,8 @@ Node::loadPathById(const DOMString & theId, const DOMString & theIdAttribute) {
     asl::Unsigned64 myOffset = 0;
     NodeIDRegistryPtr myIDRegistry = getIDRegistry();
     if (myIDRegistry->hasOffsetCatalog() &&
-            myIDRegistry->getStorage() && 
-            myIDRegistry->getDictionaries()) 
+            myIDRegistry->getStorage() &&
+            myIDRegistry->getDictionaries())
     {
         DictionariesPtr myDictsPtr = myIDRegistry->getDictionaries();
         //asl::ReadableStream & mySource = myIDRegistry->getStorage()->getStream();
@@ -1097,7 +1097,7 @@ AC_TRACE << "pushing " << myIndex;
                 }
 AC_TRACE << "done " << myPath.size();
                 // traverse downstream from root loading children on path
-                Node * myNode = getRealRootNode(); 
+                Node * myNode = getRealRootNode();
                 for (std::deque<asl::AC_SIZE_TYPE>::size_type i = 0; i < myPath.size(); ++i) {
 AC_TRACE << "myPath["<<i<<"]= " << myPath[i];
 AC_TRACE << "myNode->nodeName = '"<<myNode->nodeName()<<"'";
@@ -1117,15 +1117,15 @@ AC_TRACE << "throwing OffsetNotFound";
                 // our node should be loaded now
                 NodePtr myResult = myIDRegistry->getElementById(theId, theIdAttribute);
                 if (!myResult) {
-                    throw InternalLoaderError("Element found in persistent DOM, but did not load or register properly",PLUS_FILE_LINE); 
+                    throw InternalLoaderError("Element found in persistent DOM, but did not load or register properly",PLUS_FILE_LINE);
                 }
-                return myResult; 
+                return myResult;
             }
         }
     }
     return NodePtr();
 }
- 
+
 const NodePtr
 Node::getElementById(const DOMString & theId, const DOMString & theIdAttribute) const {
     if (_mySchemaInfo) {
@@ -1249,7 +1249,7 @@ dom::Node::Node(const Node & n, Node * theParent) :
 dom::Node::Node(const Node & n) :
     _myType(n._myType), _lazyChildren(false), _myName(n._myName),
     _myParent(0), _myDocSize(n._myDocSize), _myParseCompletionPos(n._myParseCompletionPos), _myVersion(0),
-    _mySavePosition(0), _myChildrenPosition(0), _mySaveEndPosition(0),    
+    _mySavePosition(0), _myChildrenPosition(0), _mySaveEndPosition(0),
     _myChildrenList(this), _myAttributes(this),
     _myValue(n._myValue ? n._myValue->clone(this) : n._myValue),
     _mySchemaInfo(n._mySchemaInfo),
@@ -1270,7 +1270,7 @@ dom::Node::Node(const Node & n) :
 /// makes a deep copy
 Node &
 dom::Node::operator=(const Node & n) {
-    unregisterName(); 
+    unregisterName();
     _myName.resize(0);
     //_myParent = 0;
     //_mySelf = NodePtr(0);
@@ -2133,7 +2133,7 @@ dom::Node::replaceChild(NodePtr theNewChild, NodePtr theOldChild) {
 NodePtr
 dom::Node::appendChild(NodePtr theNewChild) {
     if ( ! theNewChild ) {
-       return NodePtr(); 
+       return NodePtr();
     }
 
     checkName(theNewChild->nodeName(), theNewChild->nodeType());
@@ -2224,7 +2224,7 @@ dom::Node::compareByDocumentOrder(const NodePtr theNode) const
     return 0;
 }
 
-NodePtr 
+NodePtr
 dom::Node::insertBefore(NodePtr theNewChild, NodePtr theRefChild) {
     int myRefIndex = getChildren().findIndex(theRefChild.get());
     if (myRefIndex < 0) {
@@ -2641,11 +2641,11 @@ dom::Node::binarize(asl::WriteableStream & theDest, Dictionaries & theDicts, asl
     unsigned int myNameIndex = 0;
     if (nodeName().size() &&
         !(myNodeType&isUnmodifiedProxy) &&
-        nodeType()!=TEXT_NODE && 
-        nodeType()!=DOCUMENT_NODE && 
-        nodeType()!=CDATA_SECTION_NODE && 
-        nodeType()!=COMMENT_NODE && 
-        nodeType()!=DOCUMENT_FRAGMENT_NODE) 
+        nodeType()!=TEXT_NODE &&
+        nodeType()!=DOCUMENT_NODE &&
+        nodeType()!=CDATA_SECTION_NODE &&
+        nodeType()!=COMMENT_NODE &&
+        nodeType()!=DOCUMENT_FRAGMENT_NODE)
     {
         myNodeType|=hasName;
         if (nodeType() == ELEMENT_NODE) {
@@ -2672,7 +2672,7 @@ dom::Node::binarize(asl::WriteableStream & theDest, Dictionaries & theDicts, asl
     }
     DB(AC_TRACE << "Write uniqueID (LongLong+Long) = " << getUniqueId() << endl);
     getUniqueId().append(theDest);
-   
+
     DB(AC_TRACE << "Write myNodeType (Word) = " << myNodeType << endl);
     DB(dumpType(myNodeType));
 
@@ -2745,7 +2745,7 @@ Node::binarize(asl::WriteableStream & theDataDest, asl::WriteableStream & theCat
         myCatalog.extractFrom(*this);
         myCatalog.binarize(theCatalogDest);
         asl::Unsigned64 myEndPos = theCatalogDest.getByteCounter();
-        theCatalogDest.appendUnsigned64(myEndPos - myStartPos + sizeof(asl::Unsigned64)); 
+        theCatalogDest.appendUnsigned64(myEndPos - myStartPos + sizeof(asl::Unsigned64));
     }
 }
 
@@ -2756,14 +2756,14 @@ Node::makePatch(asl::WriteableStream & thePatch, asl::Unsigned64 theOldVersion) 
 }
 
 /// return true if something has changed
-bool 
+bool
 Node::applyPatch(const asl::ReadableStream & thePatch, asl::AC_SIZE_TYPE thePos) {
     bool myUnmodifiedProxyFlag = false;
     Dictionaries myDicts;
     debinarize(thePatch, thePos, myDicts, PATCH, myUnmodifiedProxyFlag);
     return !myUnmodifiedProxyFlag;
 }
-        
+
 #ifdef PATCH_STATISTIC
 #define PS(x) x
 #else
@@ -2773,7 +2773,7 @@ Node::applyPatch(const asl::ReadableStream & thePatch, asl::AC_SIZE_TYPE thePos)
 // lazy children loader
 void
 dom::Node::loadChildren() {
-    AC_INFO << "loadChildren of " << getUniqueId() << ", name="<<nodeName(); 
+    AC_INFO << "loadChildren of " << getUniqueId() << ", name="<<nodeName();
     if (!_lazyChildren) {
         throw NoLazyChildren(JUST_FILE_LINE);
     }
@@ -2796,9 +2796,9 @@ dom::Node::loadChildren() {
     _lazyChildren = false;
 }
 
-bool 
+bool
 dom::Node::debinarizeLazy(asl::Ptr<asl::ReadableStreamHandle> theSource) {
-    AC_DEBUG << "debinarizeLazy '" << theSource->getName()<<"'"; 
+    AC_DEBUG << "debinarizeLazy '" << theSource->getName()<<"'";
     const asl::ReadableStream & mySource = theSource->getStream();
 
     // allocate and load dicts and catalog
@@ -2818,9 +2818,9 @@ dom::Node::debinarizeLazy(asl::Ptr<asl::ReadableStreamHandle> theSource) {
     return true; // TODO: return false in failure
 }
 
-bool 
+bool
 dom::Node::debinarizeLazy(asl::Ptr<asl::ReadableStreamHandle> theSource, asl::Ptr<asl::ReadableStreamHandle> theCatalogSource) {
-    AC_DEBUG << "debinarizeLazy source='" << theSource->getName()<<"', catalog='"<<theCatalogSource->getName()<<"'"; 
+    AC_DEBUG << "debinarizeLazy source='" << theSource->getName()<<"', catalog='"<<theCatalogSource->getName()<<"'";
     const asl::ReadableStream & mySource = theSource->getStream();
 
     // allocate and load dicts and catalog
@@ -2883,7 +2883,7 @@ dom::Node::debinarize(const asl::ReadableStream & theSource,
         }
         if (myUniqueID == getUniqueId()) {
             return thePos;
-        } 
+        }
         //else {
         //    throw PatchMismatch("Encountered 'unmodified proxy' with no corresponding patch", PLUS_FILE_LINE);
         //}
@@ -3072,7 +3072,7 @@ dom::Node::removeChild(dom::NodePtr theChild) {
 // Does not return the document node, but the root element node
 // A better name would be getRootElement(), but the name is defined
 // in the dom-standard. Use "getRealRootNode()" to get the document node.
-Node * 
+Node *
 Node::getRootNode() {
     Node * myNode = this;
     while (myNode->parentNode()) {
@@ -3097,7 +3097,7 @@ Node::getRootNode() const
     return myNode;
 }
 
-Node * 
+Node *
 Node::getRealRootNode() {
     Node * myNode = this;
     while (myNode->parentNode()) {
@@ -3127,7 +3127,7 @@ Node::hasFacade() const {
         if (myFactory) {
             _myFacade = FacadePtr(myFactory->createFacade(nodeName(), *const_cast<Node*>(this)));
             if (!_myFacade && parentNode()) {
-                _myFacade = FacadePtr(myFactory->createFacade(nodeName(), 
+                _myFacade = FacadePtr(myFactory->createFacade(nodeName(),
                     *const_cast<Node*>(this), parentNode()->nodeName()));
             }
         }
@@ -3135,7 +3135,7 @@ Node::hasFacade() const {
             _myFacade->setSelf(_myFacade);
         } else {
             return false;
-        }        
+        }
     }
     return true;
 }
@@ -3187,7 +3187,7 @@ Node::markPrecursorDependenciesOutdated() {
     }
     if (_myFacade) {
         _myFacade->markPrecursorDependenciesOutdated();
-    } 
+    }
 }
 void
 Node::freeCaches() const {
@@ -3205,44 +3205,44 @@ Node::flushUnusedChildren() const {
         return false;
     }
     if (_lazyChildren) {
-        AC_DEBUG << "flushUnusedChildren(): dont need to flush because not yet loaded " << getUniqueId() << ", name="<<nodeName(); 
+        AC_DEBUG << "flushUnusedChildren(): dont need to flush because not yet loaded " << getUniqueId() << ", name="<<nodeName();
         return true;
     }
-    bool flushMyChildren = true;   
+    bool flushMyChildren = true;
     for (NodeList::size_type i = 0; i< getChildren().length(); ++i) {
         if (!getChildren()[i].flushUnusedChildren()) {
-            AC_DEBUG << "flushUnusedChildren() not flushing  " << getUniqueId() << ", name="<<nodeName() << " because child " << i << " is modified or referenced"; 
+            AC_DEBUG << "flushUnusedChildren() not flushing  " << getUniqueId() << ", name="<<nodeName() << " because child " << i << " is modified or referenced";
             flushMyChildren = false;
         }
     }
     if (flushMyChildren && getChildren().length()) {
-        AC_DEBUG << "flushUnusedChildren() flushing children of" << getUniqueId() << ", name="<<nodeName(); 
+        AC_DEBUG << "flushUnusedChildren() flushing children of" << getUniqueId() << ", name="<<nodeName();
         const_cast<Node&>(*this).getChildren().flush();
         _lazyChildren = true;
     }
 
     if (nodeVersion() != 1) {
-        AC_DEBUG << "flushUnusedChildren() not flushing  " << getUniqueId() << ", name="<<nodeName() << " because nodeVersion() is " << nodeVersion(); 
+        AC_DEBUG << "flushUnusedChildren() not flushing  " << getUniqueId() << ", name="<<nodeName() << " because nodeVersion() is " << nodeVersion();
         return false;
     }
     if (self().use_count() !=1) {
-        AC_DEBUG << "flushUnusedChildren() not flushing  " << getUniqueId() << ", name="<<nodeName() << " because refcount() is " << self().use_count(); 
+        AC_DEBUG << "flushUnusedChildren() not flushing  " << getUniqueId() << ", name="<<nodeName() << " because refcount() is " << self().use_count();
         return false;
     }
     if (nodeType() == ATTRIBUTE_NODE) {
-        AC_DEBUG << "flushUnusedChildren() attribute " << getUniqueId() << ", name="<<nodeName() << " is unchanged and not externally referenced, flushMyChildren="<<flushMyChildren; 
+        AC_DEBUG << "flushUnusedChildren() attribute " << getUniqueId() << ", name="<<nodeName() << " is unchanged and not externally referenced, flushMyChildren="<<flushMyChildren;
         return flushMyChildren;
     }
     for (NamedNodeMap::size_type i = 0; i< _myAttributes.length(); ++i) {
         if (!_myAttributes[i].flushUnusedChildren()) {
-            AC_DEBUG << "flushUnusedChildren() not flushing  " << getUniqueId() << ", name="<<nodeName() << " because attribute " << i << " is modified or referenced"; 
+            AC_DEBUG << "flushUnusedChildren() not flushing  " << getUniqueId() << ", name="<<nodeName() << " because attribute " << i << " is modified or referenced";
             return false;
         }
     }
     return flushMyChildren;
  }
- 
-// theNewParent is the new parent for the node, theTopNewParent is the same node 
+
+// theNewParent is the new parent for the node, theTopNewParent is the same node
 // on the first call, but stays the same during the recursion when reparenting
 // the children in case a whole subtree is reparented.
 
@@ -3257,21 +3257,21 @@ Node::unregisterName() {
     }
 }
 
-void 
+void
 Node::registerName() {
     if (nodeType() == ELEMENT_NODE) {
         _myNameRegistry = getIDRegistry();
         _myNameRegistry.lock()->registerNodeName(this);
     }
  }
- 
+
 void
 Node::reparent(Node * theNewParent, Node * theTopNewParent, bool theBumpVersionFlag) {
     //Node * myOldParent = _myParent;
     _myParent = theNewParent;
     unregisterName();
     if (theTopNewParent) {
-        registerName(); 
+        registerName();
     }
     if (_myValue) {
         _myValue->reparent();
@@ -3280,19 +3280,19 @@ Node::reparent(Node * theNewParent, Node * theTopNewParent, bool theBumpVersionF
     getChildren().reparent(this, theTopNewParent);
 
     markPrecursorDependenciesOutdated();
-        
+
     // [CH] Some thoughts about the next step:
     // - The problem is that the parent node might have 'implicit' dependencies, i.e.
     //   an attribute might depend on all child nodes (such as the bounding box)
     // - This dependencies must be kept up to date, if new children arrive or leave
-    // - There are two possibilities: 
+    // - There are two possibilities:
     //   (a) The child is responsible for telling the parent 'here I am', by the
     //       'affects' command. Therefore the child facade has to be created here and now.
     //   (b) The parents dependencies could be marked outdated. Then the parent will reset
-    //       its dependencies, on first get-value, which would trigger the creation of 
+    //       its dependencies, on first get-value, which would trigger the creation of
     //       the child facade
     // - The old variant (a), had two disadvantages:
-    //   (a) The facade is created earlier than neccessary, creating headaces with 
+    //   (a) The facade is created earlier than neccessary, creating headaces with
     //       construction order in some cases.
     //   (b) The 'affects' command is nessessary in the child facade.
 
@@ -3392,7 +3392,7 @@ dom::Node::removeEventListener(const DOMString & type,
 bool
 dom::Node::dispatchEvent(EventPtr evt) {
     std::vector<NodePtr> myTargets;
-    
+
     // set event target
     evt->target(self().lock());
 
@@ -3414,7 +3414,7 @@ dom::Node::dispatchEvent(EventPtr evt) {
             myTargets[i]->callListeners(myTargets[i]->_myCapturingEventListeners, evt);
         }
     }
-    
+
     // at target
     if (!evt->isPropagationStopped()) {
         evt->eventPhase(Event::AT_TARGET);

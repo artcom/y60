@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -88,14 +88,14 @@ namespace asl {
              *
              * The default is to open the port in non-blocking mode. If the @p
              * theMinBytesPerRead and @p theTimeout arguments are non zero,
-             * the port is opened in blocking mode. 
+             * the port is opened in blocking mode.
              *
              * Four diffrent behaviours are supported:
              *    - @p theMinBytesPerRead = 0 @p theTimeout = 0
              *       - perform non-blocking IO
              *    - @p theMinBytesPerRead = 0 @p theTimeout > 0
              *       - the timer is started when read is called.
-             *       - read() returns all currently available bytes, or the 
+             *       - read() returns all currently available bytes, or the
              *         first byte received or nothing if the timer expires
              *         before a byte becomes available.
              *    - @p theMinBytesPerRead > 0 @p theTimeout > 0

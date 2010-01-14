@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSnumeric: test_linearAlgebra.tst.cpp,v $
@@ -35,14 +35,14 @@ using namespace asl;
 
 class GeometryUtilsUnitTest : public UnitTest {
 
-    static void addTriangle(vector<Point3f> & theTriangles, 
+    static void addTriangle(vector<Point3f> & theTriangles,
                             const Point3f &a, const Point3f &b, const Point3f &c)
     {
         theTriangles.push_back(a);
         theTriangles.push_back(b);
         theTriangles.push_back(c);
-    }    
-            
+    }
+
     public:
         GeometryUtilsUnitTest() : UnitTest("GeometryUtilsUnitTest") {  }
         void run() {
@@ -83,13 +83,13 @@ class GeometryUtilsUnitTest : public UnitTest {
             //test polyhedra volume
             {
                 vector<Point3f> myTetrahedron; //its irregular, but its easy to define
-            
+
                 addTriangle(myTetrahedron,Point3f(0,1,0),Point3f(1,0,0),Point3f(0,0,0));
                 addTriangle(myTetrahedron,Point3f(0,1,0),Point3f(0,0,1),Point3f(1,0,0));
                 addTriangle(myTetrahedron,Point3f(0,1,0),Point3f(0,0,0),Point3f(0,0,1));
                 addTriangle(myTetrahedron,Point3f(0,0,0),Point3f(1,0,0),Point3f(0,0,1));
                 double myVolume = calculatePolyhedraVolume(myTetrahedron);
-                
+
                 //the volume of any pyramid is 1/3 * area_base * height...
                 //our tetrahedron can be seen as a pyramid with its base given by the first triangle
                 double myRealVolume = 1.0/3.0 * 1.0/2.0 * 1;
@@ -98,11 +98,11 @@ class GeometryUtilsUnitTest : public UnitTest {
             }
             {
                 vector<Point3f> myCube;
-                
+
                 //top
                 addTriangle(myCube,Point3f(0,1,0),Point3f(0,1,1),Point3f(1,1,1));
                 addTriangle(myCube,Point3f(0,1,0),Point3f(1,1,1),Point3f(1,1,0));
-                
+
                 //bottom
                 addTriangle(myCube,Point3f(0,0,0),Point3f(1,0,0),Point3f(1,0,1));
                 addTriangle(myCube,Point3f(0,0,0),Point3f(1,0,1),Point3f(0,0,1));
@@ -110,34 +110,34 @@ class GeometryUtilsUnitTest : public UnitTest {
                 //sides
                 addTriangle(myCube,Point3f(1,1,0),Point3f(0,0,0),Point3f(0,1,0));
                 addTriangle(myCube,Vector3f(1,1,0),Point3f(1,0,0),Point3f(0,0,0));
-                
+
                 addTriangle(myCube,Point3f(1,1,0),Point3f(1,1,1),Point3f(1,0,1));
                 addTriangle(myCube,Point3f(1,1,0),Point3f(1,0,1),Point3f(1,0,0));
-                
+
                 addTriangle(myCube,Point3f(0,1,1),Point3f(0,0,1),Point3f(1,0,1));
                 addTriangle(myCube,Point3f(0,1,1),Point3f(1,0,1),Point3f(1,1,1));
-                
+
                 addTriangle(myCube,Point3f(0,1,1),Point3f(0,1,0),Point3f(0,0,0));
                 addTriangle(myCube,Point3f(0,1,1),Point3f(0,0,0),Point3f(0,0,1));
-                
-                
+
+
                 double myVolume = calculatePolyhedraVolume(myCube);
-                //double myRealVolume = 1;  
-                
+                //double myRealVolume = 1;
+
                 // cerr << myVolume << " - " << myRealVolume << endl;
                 ENSURE_MSG(almostEqual(myVolume, 1), "calculatePolyhedraVolume");
             }
             // test Area
             {
                 double myArea = computeFaceArea(
-                    Vector3d(0,0,0), 
+                    Vector3d(0,0,0),
                     Vector3d(1,0,0),
                     Vector3d(0,1,0));
                 ENSURE_MSG(almostEqual(myArea, 0.5), "computeFaceArea");
             }
             {
                 float myArea = computeFaceArea(
-                    Vector3f(0,0,4), 
+                    Vector3f(0,0,4),
                     Vector3f(1,0,4),
                     Vector3f(0,1,4));
                 ENSURE_MSG(almostEqual(myArea, 0.5f), "computeFaceArea");
@@ -151,7 +151,7 @@ public:
     void setup() {
         UnitTestSuite::setup(); // called to print a launch message
         addTest(new GeometryUtilsUnitTest);
- 
+
     }
 };
 

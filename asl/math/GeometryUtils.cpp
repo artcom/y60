@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -42,7 +42,7 @@
 //   $Author: pavel $
 //   $Revision: 1.9 $
 //   $Date: 2005/04/24 00:30:18 $
-//   
+//
 //
 //  Description: Various geometry utilities
 //
@@ -61,7 +61,7 @@
 using namespace std;
 
 namespace asl {
-    
+
 
 double calculatePolyhedraVolume(const vector<Point3f> & theTriangleVertices)
 {
@@ -70,15 +70,15 @@ double calculatePolyhedraVolume(const vector<Point3f> & theTriangleVertices)
         const Triangle<float> & myTriangle = asTriangle(theTriangleVertices[i]);
         Vector3f myNormal = myTriangle.normal();
         Vector3f myPosition = myTriangle.centroid(); //this is just fancy. we could take a vertex instead
-        
+
         DB(AC_TRACE << " triangle " << myTriangle << endl);
         DB(AC_TRACE << " P " << myPosition << " N " << myNormal << " A " << myTriangle.area() << endl);
         DB(AC_TRACE << " adding " << dot(myPosition,myNormal)*myTriangle.area()/3 << endl);
 
-        myVolume += dot(myPosition,myNormal)*myTriangle.area()/3;        
-    } 
+        myVolume += dot(myPosition,myNormal)*myTriangle.area()/3;
+    }
     return myVolume;
-    
+
 };
 
 } //namespace

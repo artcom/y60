@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -58,7 +58,7 @@
 #include "numeric_functions.h"
 #include <math.h>
 
-namespace asl { 
+namespace asl {
 
     /*! @addtogroup aslmath */
     /* @{ */
@@ -182,40 +182,40 @@ namespace asl {
 
         // point is inside or on surface
         bool contains(const Point3<Number> & pt) const {
-            return distance(pt,center) <= radius; 
-        }      
+            return distance(pt,center) <= radius;
+        }
         // point is inside or on surface
         bool touches(const Point3<Number> & pt) const {
-            return contains(pt); 
+            return contains(pt);
         }
         // point is inside
         bool envelopes(const Point3<Number> & pt) const {
-            return distance(pt,center) < radius; 
+            return distance(pt,center) < radius;
         }
         // other sphere is inside or same
         bool contains(const Sphere<Number> & s) const {
-            return !s.isEmpty() && distance(s.center,center) + s.radius <= radius; 
-        } 
+            return !s.isEmpty() && distance(s.center,center) + s.radius <= radius;
+        }
         // other sphere is inside
         bool envelopes(const Sphere<Number> & s) const {
-            return !s.isEmpty() && distance(s.center,center)+s.radius < radius; 
-        } 
+            return !s.isEmpty() && distance(s.center,center)+s.radius < radius;
+        }
         // intersection is non-empty
         bool intersects(const Sphere<Number> & s) const {
             return !s.isEmpty() && !isEmpty() &&
-                distance(s.center,center) < s.radius + radius; 
-        } 
+                distance(s.center,center) < s.radius + radius;
+        }
         // intersect or no distance between closest points
         bool touches(const Sphere<Number> & s) const {
             return !s.isEmpty() && !isEmpty() &&
-                distance(s.center,center) <= s.radius + radius; 
-        } 
+                distance(s.center,center) <= s.radius + radius;
+        }
     public:
         Point3<Number> center;
         Number radius;
     };
 
-   
+
     template<class Number>
     Point3<Number> nearest(const Sphere<Number> & s,const Point3<Number> & P) {
         return s.center + s.radius * normalized(P-s.center);
@@ -231,13 +231,13 @@ namespace asl {
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -260,7 +260,7 @@ namespace asl {
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */

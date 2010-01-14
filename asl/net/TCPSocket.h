@@ -4,12 +4,12 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: 
+// Description:
 //    C++ Library fuer TCP-Sockets (based on Sockets.c++ from Pavel 11.9.92)
 //
 // Last Review:  ms & ab 2007-08-14
@@ -56,7 +56,7 @@ namespace inet {
             TCPSocket(asl::Unsigned32 thehost, asl::Unsigned16 theport);
 
             // Used by TCPServer.
-            TCPSocket(int myFD, const asl::INetEndpoint & localEndpoint, 
+            TCPSocket(int myFD, const asl::INetEndpoint & localEndpoint,
                       const asl::INetEndpoint & remoteEndpoint);
 
             virtual void open();
@@ -64,6 +64,6 @@ namespace inet {
         protected:
             virtual int getSendFlags();
     };
-    typedef asl::Ptr<TCPSocket> TCPSocketPtr;    
+    typedef asl::Ptr<TCPSocket> TCPSocketPtr;
 }
 #endif

@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -63,12 +63,12 @@ template <class T>
 class QuaternionTest : public TemplateUnitTest {
     public:
         QuaternionTest(const char * theTemplateArgument) :
-               TemplateUnitTest("Quaternion", theTemplateArgument) 
+               TemplateUnitTest("Quaternion", theTemplateArgument)
         {}
         void run() {
-            
+
 			Ball<T> myBall;
-			Quaternion<T> myQuat1(1.0, 2.0, 3.0, 4.0);                        
+			Quaternion<T> myQuat1(1.0, 2.0, 3.0, 4.0);
             Quaternion<T> myQuat2(5.0, 6.0, 7.0, 8.0);
 
             // Test getters
@@ -78,18 +78,18 @@ class QuaternionTest : public TemplateUnitTest {
             // Test multiplication
             Quaternion<T> myMultResult = myQuat1 * myQuat2;
             Quaternion<T> myExpectedMultResult;
-                
-            myExpectedMultResult.setImaginaryPart(cross(myQuat1.getImaginaryPart(), myQuat2.getImaginaryPart()) 
+
+            myExpectedMultResult.setImaginaryPart(cross(myQuat1.getImaginaryPart(), myQuat2.getImaginaryPart())
                 + myQuat2.getRealPart() * myQuat1.getImaginaryPart() + myQuat1.getRealPart() * myQuat2.getImaginaryPart());
 
-            myExpectedMultResult.setRealPart(myQuat1.getRealPart() * myQuat2.getRealPart() - 
+            myExpectedMultResult.setRealPart(myQuat1.getRealPart() * myQuat2.getRealPart() -
                 dot(myQuat1.getImaginaryPart(), myQuat2.getImaginaryPart()));
 
             ENSURE_MSG(almostEqual(myMultResult, myExpectedMultResult), "Testing quaternion multiplication");
 
             // Test normalize
             myQuat1.normalize();
-            Quaternion<T> myExpectedNorm(T(1.0 / sqrt(30.0)), T(2.0 / sqrt(30.0)), 
+            Quaternion<T> myExpectedNorm(T(1.0 / sqrt(30.0)), T(2.0 / sqrt(30.0)),
                                          T(3.0 / sqrt(30.0)), T(4.0 / sqrt(30.0)));
             ENSURE_MSG(almostEqual(myQuat1, myExpectedNorm), "Testing quaternion normalization");
 
@@ -98,16 +98,16 @@ class QuaternionTest : public TemplateUnitTest {
             Quaternion<T> myExpectedQuat3(0.0, 0.0, -1.0, 0.0);
             ENSURE_MSG(almostEqual(myQuat3, myExpectedQuat3), "Testing axis, angle constructur");
             Quaternion<T> myQuat4(Vector3<T>(10.0, 20.0, 30.0), 10.0);
-            Quaternion<T> myExpectedQuat4(T((-10.0 / 37.4165739) * sin(10.0 / 2)), 
-                                          T((-20.0 / 37.4165739) * sin(10.0 / 2)), 
-                                          T((-30.0 / 37.4165739) * sin(10.0 / 2)), 
-                                          T(cos(10.0 / 2)));            
+            Quaternion<T> myExpectedQuat4(T((-10.0 / 37.4165739) * sin(10.0 / 2)),
+                                          T((-20.0 / 37.4165739) * sin(10.0 / 2)),
+                                          T((-30.0 / 37.4165739) * sin(10.0 / 2)),
+                                          T(cos(10.0 / 2)));
             ENSURE_MSG(almostEqual(myQuat4, myExpectedQuat4), "Testing axis, angle constructur");
-                        
+
             {
                 // Test construction from Euler XYZ
                 Quaternion<T> myQuatNeutral(Quaternion<T>::createFromEuler(Vector3<T>(0.0, 0.0, 0.0)));
-                ENSURE_MSG(almostEqual(myQuatNeutral, Quaternion<T>(T(0),T(0),T(0),T(1))), 
+                ENSURE_MSG(almostEqual(myQuatNeutral, Quaternion<T>(T(0),T(0),T(0),T(1))),
                         "Euler Constructor, neutral");
 
                 Quaternion<T> myQuat1 = Quaternion<T>::createFromEuler(Vector3<T>(T(PI_2),0,0));
@@ -144,10 +144,10 @@ class QuaternionTest : public TemplateUnitTest {
                 Vector3<T> myResult(myPoint);
                 ENSURE(almostEqual(myResult, myFirstVector));
             }
-            
+
             {   // test quaternion calculus
-                
-                // Vector * Quaternion 
+
+                // Vector * Quaternion
                 asl::Vector4<T> myVector(-1,0,0,1);
                 Quaternion<T> myQuat1 = Quaternion<T>::createFromEuler(Vector3<T>(0,0,T(PI_2)));
                 asl::Vector4<T> myResultVector = product(myVector, myQuat1);
@@ -155,28 +155,28 @@ class QuaternionTest : public TemplateUnitTest {
 
                 // Quaternion * Vector
                 ENSURE_EXCEPTION(product(myQuat1, myVector), asl::Exception);
-                
-                // Quaternion * Scalar and Scalar * Quaternion 
+
+                // Quaternion * Scalar and Scalar * Quaternion
                 Quaternion<T> myQuat2 = Quaternion<T>::createFromEuler(Vector3<T>(0,0,T(PI_2)));
                 Quaternion<T> myQuat3 = Quaternion<T>::createFromEuler(Vector3<T>(0,0,T(PI_2)));
                 Quaternion<T> myResultQuaternion = product(myQuat3, T(0.5));
                 Quaternion<T> myResultQuaternion2 = T(2.0) * myResultQuaternion;
-                ENSURE(almostEqual(myQuat2, myResultQuaternion2));                
+                ENSURE(almostEqual(myQuat2, myResultQuaternion2));
 
 
-                // Quaternion + Quaternion 
+                // Quaternion + Quaternion
                 Quaternion<T> myQuat4 = Quaternion<T>::createFromEuler(Vector3<T>(0,0,T(PI_2)));
                 Quaternion<T> myQuat5 = Quaternion<T>::createFromEuler(Vector3<T>(0,T(PI_2),0));
                 Quaternion<T> myExpectedResult2(0, T(sqrt(2.0) * -0.5), T(sqrt(2.0) * -0.5), T(sqrt(2.0) ) ) ;
                 Quaternion<T> myResultQuaternion3 = sum(myQuat4,myQuat5);
-                ENSURE(almostEqual(myResultQuaternion3, myExpectedResult2));                
-                
-                // Quaternion - Quaternion 
+                ENSURE(almostEqual(myResultQuaternion3, myExpectedResult2));
+
+                // Quaternion - Quaternion
                 Quaternion<T> myQuat6 = Quaternion<T>::createFromEuler(Vector3<T>(0,0,T(PI_2)));
                 Quaternion<T> myQuat7 = Quaternion<T>::createFromEuler(Vector3<T>(0,-T(PI_2),0));
                 Quaternion<T> myExpectedResult3(0, T(sqrt(2.0) * -0.5), T(sqrt(2.0) * -0.5), 0 ) ;
                 Quaternion<T> myResultQuaternion4 = difference(myQuat6, myQuat7);
-                ENSURE(almostEqual(myResultQuaternion4, myExpectedResult3));                
+                ENSURE(almostEqual(myResultQuaternion4, myExpectedResult3));
 
 
                 // Quaternion / Scalar
@@ -184,10 +184,10 @@ class QuaternionTest : public TemplateUnitTest {
                 Quaternion<T> myQuat9 = Quaternion<T>::createFromEuler(Vector3<T>(0,0,T(PI_2)));
                 Quaternion<T> myResultQuaternion5 = quotient(myQuat3, T(2.0));
                 Quaternion<T> myResultQuaternion6 = quotient(myResultQuaternion5, T(0.5));
-                ENSURE(almostEqual(myQuat9, myResultQuaternion6));                
+                ENSURE(almostEqual(myQuat9, myResultQuaternion6));
 
             }
-            
+
             {
                 // Test lerp (linear interpolation)
                 Quaternion<T> myQuat1 = Quaternion<T>::createFromEuler(Vector3<T>(0,0,0));

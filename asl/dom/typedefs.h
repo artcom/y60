@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: typedefs.h,v $
@@ -14,7 +14,7 @@
 //   $Revision: 1.6 $
 //
 // Description: tiny fast XML-Parser and DOM
-// 
+//
 //
 //
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
@@ -26,7 +26,7 @@
 
 #include "asl_dom_settings.h"
 
-#include "ThreadingModel.h" 
+#include "ThreadingModel.h"
 #include <asl/base/Ptr.h>
 #include <asl/base/Time.h>
 #include <string>
@@ -39,7 +39,7 @@ namespace dom {
     class Node;
     typedef asl::Ptr<Node,ThreadingModel> NodePtr;
     typedef asl::WeakPtr<Node,ThreadingModel> NodeWeakPtr;
-    
+
     class Schema;
     typedef asl::Ptr<Schema,ThreadingModel> SchemaPtr;
 
@@ -72,7 +72,7 @@ namespace dom {
 
     struct Dictionaries;
     typedef asl::Ptr<Dictionaries,ThreadingModel> DictionariesPtr;
-    
+
     enum OpMode { IMMEDIATE, PATCH, LAZY};
     /* @} */
 } //Namespace dom

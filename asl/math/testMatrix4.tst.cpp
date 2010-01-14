@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //   $RCSfile: testMatrix4.tst.cpp,v $
@@ -703,7 +703,7 @@ class Matrix4UnitTest : public UnitTest {
 
             myMatrix.makeXYZRotating(Vector3<T>(1,2,3));
             ENSURE_MSG(myMatrix.getType() == ROTATING, "Test getType()");
-            
+
             myMatrix.makeZYXRotating(Vector3<T>(1,2,3));
             ENSURE_MSG(myMatrix.getType() == ROTATING, "Test getType()");
         }
@@ -990,7 +990,7 @@ class Matrix4UnitTest : public UnitTest {
             myMatrix1.assign(1,2,3,6,4,5,6,7,7,8,9,8,1,2,3,19,UNKNOWN);
             testRotateHelper(myMatrix1, UNKNOWN);
         }
-        
+
         void testRandomMatrixDecomposition(const unsigned theTestCount) {
             unsigned mySuccededTests = 0;
             DecomposedQuaternionMatrix myResult;
@@ -1026,7 +1026,7 @@ class Matrix4UnitTest : public UnitTest {
             }
 
         }
-        
+
         void testRandomMatrixDecompositionWithEuler(const unsigned theTestCount) {
             unsigned mySuccededTests = 0;
             DecomposedMatrix myResult;
@@ -1059,7 +1059,7 @@ class Matrix4UnitTest : public UnitTest {
             }
 
         }
-        
+
         float randomHelper(int theLowerbound, int theUpperbound,
                            int theBadValue = std::numeric_limits<int>::max())
         {
@@ -1071,13 +1071,13 @@ class Matrix4UnitTest : public UnitTest {
                return myRandom;
            }
         }
-        
+
         void testRotationOrderXYZ() {
             Quaternion<T> myOrientation;
             Vector3<T> myScale;
             Vector3<T> myShear;
             Vector3<T> myPosition;
-            
+
             Matrix4<T> myMatrix1;
             myMatrix1.makeXRotating(T(1.234));
             Matrix4<T> myMatrix2;
@@ -1093,9 +1093,9 @@ class Matrix4UnitTest : public UnitTest {
             myMatrix3.makeRotating(Vector3<T>(0,0,1), T(1.234));
             myMatrix1.postMultiply(myMatrix2);
             myMatrix1.postMultiply(myMatrix3);
-            
+
             myMatrix1.decompose(myScale, myShear, myOrientation, myPosition);
-            
+
             myMatrix1.getRotation(myOrientation);
             //myScale = myMatrix1.getScale();
             myPosition = myMatrix1.getTranslation();
@@ -1105,7 +1105,7 @@ class Matrix4UnitTest : public UnitTest {
             myMatrix2.translate(myPosition);
             ENSURE_MSG(transformationIsEquivalent(myResultMatrix, myMatrix2),
                 (string("Matrix makeRotating() && getRotation() , type: " + myMatrix1.getTypeString())).c_str());
-            
+
             myMatrix1.decompose(myScale, myShear, myOrientation, myPosition);
             myMatrix2.makeIdentity();
             myMatrix2.scale(myScale);
@@ -1113,23 +1113,23 @@ class Matrix4UnitTest : public UnitTest {
             myMatrix2.translate(myPosition);
             ENSURE_MSG(transformationIsEquivalent(myResultMatrix, myMatrix2),
                 (string("Matrix makeRotating() && decompose() , type: " + myMatrix1.getTypeString())).c_str());
-            
-            
+
+
             // test makeXYZRotating
             myMatrix1.makeXYZRotating(Vector3<T>( static_cast<T>(1.234), static_cast<T>(1.234), static_cast<T>(1.234) ));
-            
+
             myMatrix1.decompose(myScale, myShear, myOrientation, myPosition);
             myMatrix1.getRotation(myOrientation);
             //myScale = myMatrix1.getScale();
             myPosition = myMatrix1.getTranslation();
-            
+
             myMatrix2.makeIdentity();
             myMatrix2.scale(myScale);
             myMatrix2.rotate(myOrientation);
             myMatrix2.translate(myPosition);
             ENSURE_MSG(transformationIsEquivalent(myResultMatrix, myMatrix2),
                 (string("Matrix makeXYZRotating() && getRotation() , type: " + myMatrix1.getTypeString())).c_str());
-            
+
             myMatrix1.decompose(myScale, myShear, myOrientation, myPosition);
             myMatrix2.makeIdentity();
             myMatrix2.scale(myScale);
@@ -1137,23 +1137,23 @@ class Matrix4UnitTest : public UnitTest {
             myMatrix2.translate(myPosition);
             ENSURE_MSG(transformationIsEquivalent(myResultMatrix, myMatrix2),
                 (string("Matrix makeXYZRotating() && decompose() , type: " + myMatrix1.getTypeString())).c_str());
-                        
+
             // test rotateXYZ
             myMatrix1.makeIdentity();
             myMatrix1.rotateXYZ(Vector3<T>( static_cast<T>(1.234), static_cast<T>(1.234), static_cast<T>(1.234) ));
-            
+
             myMatrix1.decompose(myScale, myShear, myOrientation, myPosition);
             myMatrix1.getRotation(myOrientation);
             //myScale = myMatrix1.getScale();
             myPosition = myMatrix1.getTranslation();
-            
+
             myMatrix2.makeIdentity();
             myMatrix2.scale(myScale);
             myMatrix2.rotate(myOrientation);
             myMatrix2.translate(myPosition);
             ENSURE_MSG(transformationIsEquivalent(myResultMatrix, myMatrix2),
                 (string("Matrix rotateXYZ() && getRotation() , type: " + myMatrix1.getTypeString())).c_str());
-            
+
             myMatrix1.decompose(myScale, myShear, myOrientation, myPosition);
             myMatrix2.makeIdentity();
             myMatrix2.scale(myScale);
@@ -1161,22 +1161,22 @@ class Matrix4UnitTest : public UnitTest {
             myMatrix2.translate(myPosition);
             ENSURE_MSG(transformationIsEquivalent(myResultMatrix, myMatrix2),
                 (string("Matrix rotateXYZ() && decompose() , type: " + myMatrix1.getTypeString())).c_str());
-            
+
             // test Matrix  Quaternion ctor
             Matrix4<T> myRotationM(Quaternion<T>::createFromEuler(Vector3<T>( static_cast<T>(1.234), static_cast<T>(1.234), static_cast<T>(1.234) )));
-            
+
             myMatrix1.decompose(myScale, myShear, myOrientation, myPosition);
             myMatrix1.getRotation(myOrientation);
             //myScale = myMatrix1.getScale();
             myPosition = myMatrix1.getTranslation();
-            
+
             myMatrix2.makeIdentity();
             myMatrix2.scale(myScale);
             myMatrix2.rotate(myOrientation);
             myMatrix2.translate(myPosition);
             ENSURE_MSG(transformationIsEquivalent(myResultMatrix, myMatrix2),
                 (string("Matrix Quaternion Ctor && getRotation() , type: " + myMatrix1.getTypeString())).c_str());
-            
+
             myMatrix1.decompose(myScale, myShear, myOrientation, myPosition);
             myMatrix2.makeIdentity();
             myMatrix2.scale(myScale);
@@ -1184,15 +1184,15 @@ class Matrix4UnitTest : public UnitTest {
             myMatrix2.translate(myPosition);
             ENSURE_MSG(transformationIsEquivalent(myResultMatrix, myMatrix2),
                 (string("Matrix Quaternion Ctor && decompose() , type: " + myMatrix1.getTypeString())).c_str());
-            
+
         }
-        
+
         void testRotationOrderXYZEuler() {
             Vector3<T> myOrientation;
             Vector3<T> myScale;
             Vector3<T> myShear;
             Vector3<T> myPosition;
-            
+
             Matrix4<T> myMatrix1;
             myMatrix1.makeXRotating(T(1.234));
             Matrix4<T> myMatrix2;
@@ -1202,26 +1202,26 @@ class Matrix4UnitTest : public UnitTest {
             myMatrix1.postMultiply(myMatrix2);
             myMatrix1.postMultiply(myMatrix3);
             Matrix4<T> myResultMatrix = myMatrix1;
-            
+
             // test makeRotating
             myMatrix1.makeRotating(Vector3<T>(1,0,0), T(1.234));
             myMatrix2.makeRotating(Vector3<T>(0,1,0), T(1.234));
             myMatrix3.makeRotating(Vector3<T>(0,0,1), T(1.234));
             myMatrix1.postMultiply(myMatrix2);
             myMatrix1.postMultiply(myMatrix3);
-            
+
             myMatrix1.decomposeEuler(myScale, myShear, myOrientation, myPosition);
             myMatrix1.getRotation(myOrientation);
             //myScale = myMatrix1.getScale();
             myPosition = myMatrix1.getTranslation();
-            
+
             myMatrix2.makeIdentity();
             myMatrix2.scale(myScale);
             myMatrix2.rotateXYZ(myOrientation);
             myMatrix2.translate(myPosition);
             ENSURE_MSG(transformationIsEquivalent(myResultMatrix, myMatrix2),
                 (string("Matrix makeRotating() && getRotation() , type: " + myMatrix1.getTypeString())).c_str());
-            
+
             myMatrix1.decomposeEuler(myScale, myShear, myOrientation, myPosition);
             myMatrix2.makeIdentity();
             myMatrix2.scale(myScale);
@@ -1229,24 +1229,24 @@ class Matrix4UnitTest : public UnitTest {
             myMatrix2.translate(myPosition);
             ENSURE_MSG(transformationIsEquivalent(myResultMatrix, myMatrix2),
                 (string("Matrix makeRotating() && decomposeEuler() , type: " + myMatrix1.getTypeString())).c_str());
-            
-            
-            
+
+
+
             // test makeXYZRotating
             myMatrix1.makeXYZRotating(Vector3<T>( static_cast<T>(1.234), static_cast<T>(1.234), static_cast<T>(1.234) ));
-            
+
             myMatrix1.decomposeEuler(myScale, myShear, myOrientation, myPosition);
             myMatrix1.getRotation(myOrientation);
             //myScale = myMatrix1.getScale();
             myPosition = myMatrix1.getTranslation();
-            
+
             myMatrix2.makeIdentity();
             myMatrix2.scale(myScale);
             myMatrix2.rotateXYZ(myOrientation);
             myMatrix2.translate(myPosition);
             ENSURE_MSG(transformationIsEquivalent(myResultMatrix, myMatrix2),
                 (string("Matrix makeXYZRotating() && getRotation() , type: " + myMatrix1.getTypeString())).c_str());
-            
+
             myMatrix1.decomposeEuler(myScale, myShear, myOrientation, myPosition);
             myMatrix2.makeIdentity();
             myMatrix2.scale(myScale);
@@ -1254,23 +1254,23 @@ class Matrix4UnitTest : public UnitTest {
             myMatrix2.translate(myPosition);
             ENSURE_MSG(transformationIsEquivalent(myResultMatrix, myMatrix2),
                 (string("Matrix makeXYZRotating() && decomposeEuler() , type: " + myMatrix1.getTypeString())).c_str());
-            
+
             // test rotateXYZ
             myMatrix1.makeIdentity();
             myMatrix1.rotateXYZ(Vector3<T>( static_cast<T>(1.234), static_cast<T>(1.234), static_cast<T>(1.234) ));
-            
+
             myMatrix1.decomposeEuler(myScale, myShear, myOrientation, myPosition);
             myMatrix1.getRotation(myOrientation);
             //myScale = myMatrix1.getScale();
             myPosition = myMatrix1.getTranslation();
-            
+
             myMatrix2.makeIdentity();
             myMatrix2.scale(myScale);
             myMatrix2.rotateXYZ(myOrientation);
             myMatrix2.translate(myPosition);
             ENSURE_MSG(transformationIsEquivalent(myResultMatrix, myMatrix2),
                 (string("Matrix rotateXYZ() && getRotation() , type: " + myMatrix1.getTypeString())).c_str());
-            
+
             myMatrix1.decomposeEuler(myScale, myShear, myOrientation, myPosition);
             myMatrix2.makeIdentity();
             myMatrix2.scale(myScale);
@@ -1278,22 +1278,22 @@ class Matrix4UnitTest : public UnitTest {
             myMatrix2.translate(myPosition);
             ENSURE_MSG(transformationIsEquivalent(myResultMatrix, myMatrix2),
                 (string("Matrix rotateXYZ() && decomposeEuler() , type: " + myMatrix1.getTypeString())).c_str());
-            
+
             // test Matrix  Quaternion ctor
             Matrix4<T> myRotationM(Quaternion<T>::createFromEuler(Vector3<T>( static_cast<T>(1.234), static_cast<T>(1.234), static_cast<T>(1.234) )));
-            
+
             myMatrix1.decomposeEuler(myScale, myShear, myOrientation, myPosition);
             myMatrix1.getRotation(myOrientation);
             //myScale = myMatrix1.getScale();
             myPosition = myMatrix1.getTranslation();
-            
+
             myMatrix2.makeIdentity();
             myMatrix2.scale(myScale);
             myMatrix2.rotateXYZ(myOrientation);
             myMatrix2.translate(myPosition);
             ENSURE_MSG(transformationIsEquivalent(myResultMatrix, myMatrix2),
                 (string("Matrix Quaternion Ctor && getRotation() , type: " + myMatrix1.getTypeString())).c_str());
-            
+
             myMatrix1.decomposeEuler(myScale, myShear, myOrientation, myPosition);
             myMatrix2.makeIdentity();
             myMatrix2.scale(myScale);
@@ -1301,7 +1301,7 @@ class Matrix4UnitTest : public UnitTest {
             myMatrix2.translate(myPosition);
             ENSURE_MSG(transformationIsEquivalent(myResultMatrix, myMatrix2),
                 (string("Matrix Quaternion Ctor && decomposeEuler() , type: " + myMatrix1.getTypeString())).c_str());
-            
+
         }
 
         void testPostMultiply() {
@@ -1813,13 +1813,13 @@ class Matrix4UnitTest : public UnitTest {
             Vector3<T> orientation;
             Vector3<T> position;
         };
-        
+
         struct DecomposedQuaternionMatrix {
             Vector3<T> scale;
             Quaternion<T> orientation;
             Vector3<T> position;
         };
-        
+
 
         bool
         testEulerDecompositionHelper(const Matrix4<T> & theMatrix,
@@ -1834,7 +1834,7 @@ class Matrix4UnitTest : public UnitTest {
             Matrix4<T> myMatrix = Matrix4<T>::Identity();
             myMatrix.scale(myScale);
             Matrix4<T> myRotation = Matrix4<T>::Identity();
-            
+
             switch (theOrder) {
                 case Matrix4<T>::ROTATION_ORDER_XYZ:
                     myRotation.rotateXYZ(myOrientation);
@@ -1843,31 +1843,31 @@ class Matrix4UnitTest : public UnitTest {
                     myRotation.makeZYXRotating(myOrientation);
                     break;
                 case Matrix4<T>::ROTATION_ORDER_XZY:
-                    
+
                     break;
                 case Matrix4<T>::ROTATION_ORDER_YXZ:
-                    
+
                     break;
                 case Matrix4<T>::ROTATION_ORDER_YZX:
-                    
+
                     break;
                 case Matrix4<T>::ROTATION_ORDER_ZXY:
                     break;
             }
-            
+
             myMatrix.postMultiply(myRotation);
             myMatrix.translate(myPosition);
             bool myResult = transformationIsEquivalent(myMatrix, theMatrix);
             ENSURE_MSG(myResult,
                 (string("Matrix decomposition , type: " + theMatrix.getTypeString())).c_str());
-            
+
             // Clear result
             theResult.scale       = Vector3<T>(1,1,1);
             theResult.orientation = Vector3<T>(0,0,0);
             theResult.position    = Vector3<T>(0,0,0);
             return myResult;
         }
-        
+
         bool
         testDecompositionHelper(const Matrix4<T> & theMatrix,
                                      DecomposedQuaternionMatrix & theResult)
@@ -1893,7 +1893,7 @@ class Matrix4UnitTest : public UnitTest {
             theResult.position    = Vector3<T>(0,0,0);
             return myResult;
         }
-        
+
         bool
         testRandomMatrixDecompositionHelper(const Matrix4<T> & theMatrix,
                                      DecomposedQuaternionMatrix & theResult)
@@ -1912,8 +1912,8 @@ class Matrix4UnitTest : public UnitTest {
             AC_INFO<<" decomposed scale: "<<myScale<<" , orientation: "<<myOrientation;
             return transformationIsEquivalent(myMatrix, theMatrix, 1E-2);
         }
-        
-        
+
+
         bool
         testRandomMatrixDecompositionHelperEuler(const Matrix4<T> & theMatrix,
                                      DecomposedMatrix & theResult)
@@ -1931,8 +1931,8 @@ class Matrix4UnitTest : public UnitTest {
             AC_INFO<<" decomposed scale: "<<myScale<<" , orientation: "<<myOrientation;
             return transformationIsEquivalent(myMatrix, theMatrix, 1E-2);
         }
-        
-        
+
+
         bool
         transformationIsEquivalent(Matrix4<T> a, Matrix4<T> b, double thePrecision = 1E-5) {
             bool myResult = almostEqual(Point3<T>(1,1,1) * a, Point3<T>(1,1,1) * b, thePrecision);
@@ -1949,7 +1949,7 @@ class Matrix4UnitTest : public UnitTest {
             std::string myOutLine;
             cerr << myOutLine;
             _myPerformanceString += myOutLine;
-            
+
             Matrix4<T> myMatrix = Matrix4<T>::Identity();
             myMatrix.scale(Vector3<T>(randomHelper(-10,10,0), randomHelper(-10,10,0), randomHelper(-10,10,0)));
             Matrix4<T> myRotation(Quaternion<T>::createFromEuler(Vector3<T>(randomHelper(-10,10), randomHelper(-10,10), randomHelper(-10,10))));
@@ -1959,7 +1959,7 @@ class Matrix4UnitTest : public UnitTest {
             Vector3<T> myOrientationV;
             Quaternion<T> myOrientation;
             Vector3<T> myPosition;
-            
+
             // decompose with euler angle
             asl::NanoTime myFullTimer;
             for (unsigned i = 0; i < ourNumberOfDecomps; ++i) {
@@ -1994,9 +1994,9 @@ class Matrix4UnitTest : public UnitTest {
             }
             cerr << myOutLine;
             _myPerformanceString += myOutLine;
-            
+
         }
-        
+
         void testMatrixDecompositionEuler() {
             DecomposedMatrix myResult;
             myResult.scale       = Vector3<T>(1,1,1);
@@ -2096,7 +2096,7 @@ class Matrix4UnitTest : public UnitTest {
             myMatrix.makeScaling(myResult.scale);
             myMatrix.rotateX(-5);
             testEulerDecompositionHelper(myMatrix, myResult);
-            
+
             myResult.scale = Vector3<T>(-3,-2,-1);
             myResult.orientation = Vector3<T>(1,0,0);
             myMatrix = Matrix4<T>::Identity();
@@ -2104,16 +2104,16 @@ class Matrix4UnitTest : public UnitTest {
             Matrix4<T> myRotation2(Quaternion<T>::createFromEuler(myResult.orientation));
             myMatrix.postMultiply(myRotation2);
             testEulerDecompositionHelper(myMatrix, myResult);
-            
+
             // Test scale which results in combination of scaling & rotation
             myResult.orientation = Vector3<T>(0,0,0);
             myResult.scale = Vector3<T>(-0.5,-0.5,1);
             myMatrix.makeScaling(Vector3<T>(-0.5,-0.5,1));
             testEulerDecompositionHelper(myMatrix, myResult);
-            
+
         }
-        
-        
+
+
         void testMatrixDecomposition() {
             DecomposedQuaternionMatrix myResult;
             myResult.scale       = Vector3<T>(1,1,1);
@@ -2225,7 +2225,7 @@ class Matrix4UnitTest : public UnitTest {
             myResult.scale = Vector3<T>(-0.5,-0.5,1);
             myMatrix.makeScaling(Vector3<T>(-0.5,-0.5,1));
             testDecompositionHelper(myMatrix, myResult);
-            
+
         }
 
         void testGetRotationQuaternionHelper(const Quaternion<T> & theRotation) {
@@ -2235,13 +2235,13 @@ class Matrix4UnitTest : public UnitTest {
             myMatrix.getRotation(myResult);
 
             Matrix4<T> myResultMatrix(myResult);
-            
+
             ENSURE_MSG(almostEqual(myMatrix, myResultMatrix),
                 (string("getRotation(Quaternion), rotation: " + as_string(theRotation) +
                  " result: ") + as_string(myResult)).c_str());
 
         }
-        
+
         void testGetRotationHelper(const Vector3<T> & theRotation) {
             Matrix4<T> myMatrix;
             Matrix4<T> myResultMatrix;
@@ -2366,7 +2366,7 @@ class Matrix4UnitTest : public UnitTest {
             testGetRotationHelper(Vector3<T>(40,50,60));
             testGetRotationHelper(Vector3<T>(-40,50,-0.5));
             testGetRotationHelper(Vector3<T>(0,0,0));
-            
+
             testGetRotationQuaternionHelper(Quaternion<T>::createFromEuler(Vector3<T>(T(PI_4),0,0)));
             testGetRotationQuaternionHelper(Quaternion<T>::createFromEuler(Vector3<T>(0,T(PI_4),0)));
             testGetRotationQuaternionHelper(Quaternion<T>::createFromEuler(Vector3<T>(0,0,T(PI_4))));
@@ -2503,15 +2503,15 @@ class Matrix4UnitTest : public UnitTest {
 
             myMatrix.makeLookAt(myEye, myCenter, myUp);
 
-            ENSURE(myMatrix.getTranslation() == Vector3<T>(-1,-1,-1)); 
-            ENSURE(almostEqual(myMatrix.getRow(0), Vector4<T>(0.57735f,0,-0.57735f,0))); 
-            ENSURE(almostEqual(myMatrix.getRow(1), Vector4<T>(-0.333333f,0.666667f,-0.333333f,0))); 
-            ENSURE(almostEqual(myMatrix.getRow(2), Vector4<T>(0.57735f,0.57735f,0.57735f,0))); 
+            ENSURE(myMatrix.getTranslation() == Vector3<T>(-1,-1,-1));
+            ENSURE(almostEqual(myMatrix.getRow(0), Vector4<T>(0.57735f,0,-0.57735f,0)));
+            ENSURE(almostEqual(myMatrix.getRow(1), Vector4<T>(-0.333333f,0.666667f,-0.333333f,0)));
+            ENSURE(almostEqual(myMatrix.getRow(2), Vector4<T>(0.57735f,0.57735f,0.57735f,0)));
 
             //std::cout << myMatrix << std::endl;
         }
 
-            
+
 };
 
 class MyTestSuite : public UnitTestSuite {

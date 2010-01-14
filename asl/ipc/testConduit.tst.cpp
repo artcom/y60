@@ -4,12 +4,12 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: 
+// Description:
 //     Classes for networked or local communication between processes
 //
 // Last Review:  ms 2007-08-15
@@ -35,7 +35,7 @@
 //
 //    overall review status   :      ok
 //
-//    recommendations: add high-level documentation, improve doxygen documentation 
+//    recommendations: add high-level documentation, improve doxygen documentation
 */
 #include "ConduitServer.h"
 
@@ -66,25 +66,25 @@ using namespace std;
 
 //
 // As simple server which echos back strings
-// converted to lower case. 
+// converted to lower case.
 //
 // All we need is a constructor, a static factory method
 // and a processData() method.
 //
-// Pass the factory method to the ConduitAcceptor 
+// Pass the factory method to the ConduitAcceptor
 // and it will then spawn your server class for each
 // incoming connection.
 //
 template <class POLICY>
 class myLowercaseServer : public ConduitServer<POLICY> {
     public:
-        static typename ConduitServer<POLICY>::Ptr 
-            create(typename POLICY::Handle theHandle) 
+        static typename ConduitServer<POLICY>::Ptr
+            create(typename POLICY::Handle theHandle)
         {
             return typename ConduitServer<POLICY>::Ptr(new myLowercaseServer(theHandle));
         }
         myLowercaseServer(typename POLICY::Handle theHandle) :
-           ConduitServer<POLICY>(theHandle) {}; 
+           ConduitServer<POLICY>(theHandle) {};
 
         virtual bool processData() {
             CharBuffer myInputBuffer;
@@ -103,10 +103,10 @@ template <class POLICY>
 class MessageConduitTest : public TemplateUnitTest {
     public:
         typedef asl::Ptr<typename asl::MessageAcceptor<POLICY> > AcceptorPtr;
-        MessageConduitTest(const char * theTemplateArgument, typename POLICY::Endpoint theEndpoint) 
+        MessageConduitTest(const char * theTemplateArgument, typename POLICY::Endpoint theEndpoint)
             : TemplateUnitTest("MessageConduitTest", theTemplateArgument),
-            _myLocalEndpoint(theEndpoint), 
-            _myAcceptor(0)  
+            _myLocalEndpoint(theEndpoint),
+            _myAcceptor(0)
             {  }
 
         void setup() {
@@ -123,7 +123,7 @@ class MessageConduitTest : public TemplateUnitTest {
             // send a message
             string myOutputString("Hello\0World!");
             myClient->send(myOutputString);
-            
+
 			// did the message get to the server?
             asl::Ptr<typename MessageAcceptor<POLICY>::Message> myMessage;
             while (!(myMessage = _myAcceptor->popIncomingMessage())) {
@@ -151,7 +151,7 @@ template<class POLICY>
 class BrokenPipeTest : public TemplateUnitTest {
     public:
         typedef asl::Ptr<typename asl::ConduitAcceptor<POLICY> > AcceptorPtr;
-        BrokenPipeTest(const char * theTemplateArgument, typename POLICY::Endpoint theEndpoint) 
+        BrokenPipeTest(const char * theTemplateArgument, typename POLICY::Endpoint theEndpoint)
             : TemplateUnitTest("BrokenPipeTest", theTemplateArgument),
             _myLocalEndpoint(theEndpoint)
             {  }
@@ -167,10 +167,10 @@ class BrokenPipeTest : public TemplateUnitTest {
             int myIterations = 10; // aborting is VERY slow in windows.
 #else
             int myIterations = 100; // don't increase this or the socket table will fill up with TIME_WAIT sockets, waiting to die
-#endif            
+#endif
             for (int i = 0; i < myIterations; ++i) {
                 // start server thread
-                AcceptorPtr myAcceptor = AcceptorPtr(new ConduitAcceptor<POLICY>(_myLocalEndpoint, 
+                AcceptorPtr myAcceptor = AcceptorPtr(new ConduitAcceptor<POLICY>(_myLocalEndpoint,
                         myLowercaseServer<POLICY>::create));
                 ENSURE(myAcceptor->start());
                 // start client
@@ -204,18 +204,18 @@ template <class POLICY>
 class ConduitTest : public TemplateUnitTest {
     public:
         typedef asl::Ptr<typename asl::ConduitAcceptor<POLICY> > AcceptorPtr;
-        ConduitTest(const char * theTemplateArgument, typename POLICY::Endpoint theEndpoint) 
+        ConduitTest(const char * theTemplateArgument, typename POLICY::Endpoint theEndpoint)
             : TemplateUnitTest("ConduitTest", theTemplateArgument),
             _myLocalEndpoint(theEndpoint),
-            _myAcceptor(0)  
+            _myAcceptor(0)
             {  }
 
         void run() {
             // start server thread
-            _myAcceptor = AcceptorPtr(new ConduitAcceptor<POLICY>(_myLocalEndpoint, 
+            _myAcceptor = AcceptorPtr(new ConduitAcceptor<POLICY>(_myLocalEndpoint,
                         myLowercaseServer<POLICY>::create));
             ENSURE(_myAcceptor->start());
-            
+
              // XXX uncomment this to play with telnet
              //while (true);
 
@@ -244,7 +244,7 @@ class ConduitTest : public TemplateUnitTest {
                 CharBuffer myInputBuffer(5,0);
                 typename Conduit<POLICY>::Ptr myClient(new Conduit<POLICY>(_myLocalEndpoint));
                 ENSURE(myClient);
-                //msleep(100); 
+                //msleep(100);
                 string myOutput("Q");
                 myOutput += as_string(i);
 
@@ -289,7 +289,7 @@ class ConduitTest : public TemplateUnitTest {
                     myBigString += as_string(i);
                 }
                 CharBuffer myInputBuffer;
-                
+
                 typename Conduit<POLICY>::Ptr myClient(new Conduit<POLICY>(_myLocalEndpoint));
                 ENSURE(myClient);
                 ENSURE(myClient->sendData(myBigString.c_str(), myBigString.length()));
@@ -304,10 +304,10 @@ class ConduitTest : public TemplateUnitTest {
             // check already-is-use behaviour
             {
                 AcceptorPtr myAcceptor;
-                ENSURE_EXCEPTION(myAcceptor = AcceptorPtr(new ConduitAcceptor<POLICY>(_myLocalEndpoint, 
+                ENSURE_EXCEPTION(myAcceptor = AcceptorPtr(new ConduitAcceptor<POLICY>(_myLocalEndpoint,
                         myLowercaseServer<POLICY>::create)), ConduitInUseException);
             }
-			
+
             // close the server (also test if the server is cancelable)
             msleep(100);
             ENSURE_MSG(_myAcceptor->stop(), "Cancelling server thread");
@@ -329,18 +329,18 @@ public:
         AC_PRINT << "Using port " << myTestPort << " for tests";
 
         UnitTestSuite::setup(); // called to print a launch message
-        addTest(new BrokenPipeTest<TCPPolicy>("TCPPolicy", 
+        addTest(new BrokenPipeTest<TCPPolicy>("TCPPolicy",
                     TCPPolicy::Endpoint("127.0.0.1",myTestPort)));
-        addTest(new ConduitTest<TCPPolicy>("TCPPolicy", 
+        addTest(new ConduitTest<TCPPolicy>("TCPPolicy",
                     TCPPolicy::Endpoint("127.0.0.1",myTestPort)));
-        addTest(new MessageConduitTest<TCPPolicy>("TCPPolicy", 
+        addTest(new MessageConduitTest<TCPPolicy>("TCPPolicy",
                     TCPPolicy::Endpoint("127.0.0.1",myTestPort)));
 #ifndef WIN32
         deleteFile(UnixAddress::PIPE_PREFIX + "TestConduit");
-#endif   
-        addTest(new ConduitTest<LocalPolicy>("LocalPolicy", 
+#endif
+        addTest(new ConduitTest<LocalPolicy>("LocalPolicy",
                     "TestConduit"));
-        addTest(new MessageConduitTest<LocalPolicy>("LocalPolicy", 
+        addTest(new MessageConduitTest<LocalPolicy>("LocalPolicy",
                     "TestConduit"));
         addTest(new BrokenPipeTest<LocalPolicy>("LocalPolicy", "TestConduit"));
     }

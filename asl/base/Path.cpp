@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description:  UTF-8 to locale encoding conversion class 
+// Description:  UTF-8 to locale encoding conversion class
 //
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -27,7 +27,7 @@
 
 #ifdef _WIN32
 
-BOOL IsWin2kSP4OrLater() 
+BOOL IsWin2kSP4OrLater()
 {
    OSVERSIONINFOEX osvi;
    DWORDLONG dwlConditionMask = 0;
@@ -52,8 +52,8 @@ BOOL IsWin2kSP4OrLater()
    // Perform the test.
 
    return VerifyVersionInfo(
-      &osvi, 
-      VER_MAJORVERSION | VER_MINORVERSION | 
+      &osvi,
+      VER_MAJORVERSION | VER_MINORVERSION |
       VER_SERVICEPACKMAJOR | VER_SERVICEPACKMINOR,
       dwlConditionMask);
 }
@@ -65,7 +65,7 @@ int getMultibyteToWideCharFlags() {
 
 namespace asl {
 
-DEFINE_EXCEPTION(UnicodeException, Exception);    
+DEFINE_EXCEPTION(UnicodeException, Exception);
 
 Path::Path() {
 #ifndef OSX
@@ -131,7 +131,7 @@ Path::assign(const char * theString, StringEncoding theEncoding) {
                 // convert from UTF8 to WideChars
                 AC_SIZE_TYPE myWCharSize = MultiByteToWideChar(CP_UTF8, getMultibyteToWideCharFlags(), theString, -1, 0, 0);
                 if (myWCharSize == 0) {
-                    throw UnicodeException(errorDescription(lastError()), PLUS_FILE_LINE); 
+                    throw UnicodeException(errorDescription(lastError()), PLUS_FILE_LINE);
                 }
                 LPWSTR myWChars = new WCHAR[myWCharSize];
                 MultiByteToWideChar(CP_UTF8, getMultibyteToWideCharFlags(), theString, -1, myWChars, myWCharSize);
@@ -139,7 +139,7 @@ Path::assign(const char * theString, StringEncoding theEncoding) {
                 // convert from WideChars to current codepage
                 AC_SIZE_TYPE myLocaleSize = WideCharToMultiByte(CP_ACP, 0, myWChars, -1, 0, 0, 0, 0);
                 if (myLocaleSize == 0) {
-                    throw UnicodeException(errorDescription(lastError()), PLUS_FILE_LINE); 
+                    throw UnicodeException(errorDescription(lastError()), PLUS_FILE_LINE);
                 }
                 _myLocaleChars = static_cast<char *>(malloc(myLocaleSize));
                 WideCharToMultiByte(CP_ACP, 0, myWChars, -1, _myLocaleChars, myLocaleSize, 0, 0);
@@ -156,12 +156,12 @@ Path::assign(const char * theString, StringEncoding theEncoding) {
 #elif _WIN32
             _myLocaleChars = _strdup(theString);
 #else
-            _myLocaleChars = g_strdup(theString); 
+            _myLocaleChars = g_strdup(theString);
 #endif
             break;
     }
 }
-    
+
 std::string
 Path::toLocale() const {
 #ifdef OSX
@@ -176,7 +176,7 @@ Path::toLocale() const {
 		ASSURE_WITH(AssurePolicy::Throw, myExCharCount == myCharCount);
 	}
 	return myResult;
-#else    
+#else
     if (_myLocaleChars == 0) {
         return std::string();
     }
@@ -184,7 +184,7 @@ Path::toLocale() const {
 #endif
 }
 
-std::string 
+std::string
 Path::toUTF8() const {
 #ifdef OSX
 	CFRange myRange = CFRangeMake(0, CFStringGetLength(_myString));
@@ -205,7 +205,7 @@ Path::toUTF8() const {
     // convert from active codepage to WideChars
     AC_SIZE_TYPE myWCharSize = MultiByteToWideChar(CP_ACP, getMultibyteToWideCharFlags(), _myLocaleChars, -1, 0, 0);
     if (myWCharSize == 0) {
-        throw UnicodeException(errorDescription(lastError()), PLUS_FILE_LINE); 
+        throw UnicodeException(errorDescription(lastError()), PLUS_FILE_LINE);
     }
     LPWSTR myWChars = new WCHAR[myWCharSize];
     MultiByteToWideChar(CP_ACP, getMultibyteToWideCharFlags(), _myLocaleChars, -1, myWChars, myWCharSize);
@@ -213,11 +213,11 @@ Path::toUTF8() const {
     // convert from WideChars to UTF8
     AC_SIZE_TYPE myUTF8Size = WideCharToMultiByte(CP_UTF8, 0, myWChars, -1, 0, 0, 0, 0);
     if (myUTF8Size == 0) {
-        throw UnicodeException(errorDescription(lastError()), PLUS_FILE_LINE); 
+        throw UnicodeException(errorDescription(lastError()), PLUS_FILE_LINE);
     }
     char * myUTF8Chars = new char[myUTF8Size];
     WideCharToMultiByte(CP_UTF8, 0, myWChars, -1, myUTF8Chars, myUTF8Size, 0, 0);
-    
+
     std::string myUTF8String(myUTF8Chars);
     delete [] myWChars;
     delete [] myUTF8Chars;
@@ -238,7 +238,7 @@ Path::toUTF8() const {
 }
 
 
-Path & 
+Path &
 Path::operator=(const Path& theOther) {
 	if (this == &theOther) {
 		return *this;

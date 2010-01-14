@@ -4,12 +4,12 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: 
+// Description:
 //     Classes for networked or local communication between processes
 //
 // Last Review:  ms 2007-08-15
@@ -35,7 +35,7 @@
 //
 //    overall review status   :      ok
 //
-//    recommendations: add high-level documentation, improve doxygen documentation 
+//    recommendations: add high-level documentation, improve doxygen documentation
 */
 #ifndef _asl_message_server_included
 #define _asl_message_server_included
@@ -56,8 +56,8 @@ namespace asl {
 /*! \addtogroup aslipc */
 /* @{ */
 
-//! Thread-safe Message-based Server.  
-/** 
+//! Thread-safe Message-based Server.
+/**
     Used Threadsafe FIFO queues for incoming and outgoing messages. Internally, the server thread sends and
     receives data in the background. The application can use thread-safe methods to pick up and send queued messages
     without worrying about threading issues.
@@ -114,7 +114,7 @@ class MessageServer : public ConduitServer<POLICY> {
         virtual bool isValid() const {
             return ConduitServer<POLICY>::isValid() || hasPendingInput();
         }
-       
+
     private:
         virtual bool processData() {
             // get incoming messages;

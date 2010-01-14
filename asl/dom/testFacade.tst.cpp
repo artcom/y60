@@ -5,9 +5,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: testFacade.tst.cpp,v $
@@ -681,7 +681,7 @@ int main(int argc, char *argv[]) {
 #ifdef FULL_HEAP_DEBUG
     _CrtSetReportMode( _CRT_ERROR, _CRTDBG_MODE_FILE );
     _CrtSetReportFile( _CRT_ERROR, _CRTDBG_FILE_STDERR );
-    
+
     // Set the debug-heap flag to keep freed blocks in the
     // heap's linked list - This will allow us to catch any
     // inadvertent use of freed memory

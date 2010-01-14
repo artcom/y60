@@ -4,12 +4,12 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: 
+// Description:
 //     Classes for networked or local communication between processes
 //
 // Last Review:  ms 2007-08-15
@@ -35,7 +35,7 @@
 //
 //    overall review status   :      ok
 //
-//    recommendations: add high-level documentation, improve doxygen documentation 
+//    recommendations: add high-level documentation, improve doxygen documentation
 */
 #ifndef _asl_ipc_threadedConduit_included_
 #define _asl_ipc_threadedConduit_included_
@@ -52,7 +52,7 @@ namespace asl {
 /* @{ */
 
 //! A Conduit which uses threads for I/O
-/** 
+/**
     Each ThreadedConduit uses its own thread for I/O. Implement processData() in your derived class.
     @note: the I/O routines offered by the base class Conduit should only be called from the I/O thread, i.e. inside
     processData(). That's why we use protected inheritance to hide these routines from the outside.
@@ -62,7 +62,7 @@ template <class POLICY>
 class ThreadedConduit : protected Conduit<POLICY> {
     public:
         /// create a new client connected to theRemoteEndpoint
-        ThreadedConduit(typename POLICY::Endpoint theRemoteEndpoint) 
+        ThreadedConduit(typename POLICY::Endpoint theRemoteEndpoint)
             : Conduit<POLICY>(theRemoteEndpoint), _myThread(0), _cancelFlag(false)
         {
         };
@@ -97,12 +97,12 @@ class ThreadedConduit : protected Conduit<POLICY> {
         /// the conduit-thread's main loop (called in a tight loop).
         /** This is called from the thread context of the conduit. Be sure to
              use only thread-safe communication with the main application thread.
-             Remember: processData is called in a tight loop in its own thread. On the one hand, 
+             Remember: processData is called in a tight loop in its own thread. On the one hand,
              this permits the use of blocking i/o calls without slowing the main application. On the
-             other hand, if you return immediately, you will waste CPU time (busy waiting). 
+             other hand, if you return immediately, you will waste CPU time (busy waiting).
           @returns true if the connection should be terminated.
           @code Example: a simple conduit which sends everything back.
-          
+
 virtual bool processData() {
     CharBuffer myInputBuffer;
     if (this->receiveData(myInputBuffer)) { // blocking call
@@ -128,7 +128,7 @@ virtual bool processData() {
             int myOldCancelState = 0;
             pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, &myOldCancelState);
             pthread_cleanup_push(onThreadDone, theThisPointer);
-            ThreadedConduit<POLICY> * mySelf = 
+            ThreadedConduit<POLICY> * mySelf =
                 reinterpret_cast<ThreadedConduit<POLICY>*>(theThisPointer);
             try {
                 for(;;) {

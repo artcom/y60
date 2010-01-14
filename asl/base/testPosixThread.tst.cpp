@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: testPosixThread.tst.cpp,v $
@@ -30,7 +30,7 @@ using namespace std;
 using namespace asl;
 
 class DerivedThread: public PosixThread {
-public:    
+public:
     DerivedThread (): PosixThread() { _myVar = 0; };
     virtual ~DerivedThread () {};
 
@@ -41,7 +41,7 @@ private:
         _myVar = 1;
         while (!shouldTerminate()) {
             asl::msleep(1000);
-        }            
+        }
     }
     int _myVar;
 };
@@ -54,7 +54,7 @@ public:
 private:
     DerivedThread _myThread1;
     DerivedThread _myThread2;
-    
+
 };
 
 

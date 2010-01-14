@@ -4,16 +4,16 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: net_functions.cpp,v $
 //
 //   $Revision: 1.3 $
 //
-// Description: misc operating system & environment helper functions 
+// Description: misc operating system & environment helper functions
 //
 //
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
@@ -68,7 +68,7 @@ using namespace inet;
 namespace asl {
 
     string hostname(unsigned long hostAddress) {
-        unsigned long netHostAddr = htonl(hostAddress); 
+        unsigned long netHostAddr = htonl(hostAddress);
 
         struct hostent *hp;
         hp=gethostbyaddr((char *)&netHostAddr, sizeof(netHostAddr),AF_INET);
@@ -141,7 +141,7 @@ namespace asl {
         }
         return myResult;
     }
-    
+
     asl::Block getHardwareAddress(const std::string & theInterfaceName) {
         asl::Block myHardwareMac;
 #ifdef _WIN32

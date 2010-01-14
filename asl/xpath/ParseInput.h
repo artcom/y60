@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -102,7 +102,7 @@ namespace xpath {
             void forwardTo(index_type idx)              {idx_=idx;}
 
             // note: const_cast in order to circumvent GCC bug where the string changes when calling begin()
-            void forwardTo(const_iterator it)           {idx_ = (it-const_cast<const std::string&>(str_).begin());} 
+            void forwardTo(const_iterator it)           {idx_ = (it-const_cast<const std::string&>(str_).begin());}
 
             char getNextChar(bool skipWs = true)        {if(eof(true)) return '\0'; else return str_[idx_++];}
 

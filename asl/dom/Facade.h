@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //   $RCSfile: Facade.h,v $
@@ -74,7 +74,7 @@ namespace dom {
 
             void registerChildName(const std::string & theChildName);
             bool hasRegisteredChild(const std::string & theChildName) const;
-            
+
             typedef std::map<std::string, NodePtr> PropertyMap;
             PropertyMap & getProperties() const;
             NodePtr getProperty(const std::string & theName) const;
@@ -87,7 +87,7 @@ namespace dom {
         protected:
            Facade(Node & theNode);
            virtual void ensureProperties() const {};
-           mutable PropertyMap   _myPropertyNodes; 
+           mutable PropertyMap   _myPropertyNodes;
 
            void setNode( Node & theNode);
 
@@ -95,10 +95,10 @@ namespace dom {
            Facade(); // no default constructor. Otherwise the member
            // _myNode points to nirvana [DS]
 
-           std::set<std::string>          _myChildNames;             
+           std::set<std::string>          _myChildNames;
            Node &                         _myNode;
-           FacadeWeakPtr                  _mySelf; 
-    }; 
+           FacadeWeakPtr                  _mySelf;
+    };
 
 #define IMPLEMENT_FACADE(CLASS) \
     dom::Facade * \
@@ -156,11 +156,11 @@ namespace dom {
     struct FacadeKey {
         DOMString _myNodeName;
         DOMString _myParentName;
-        FacadeKey(const DOMString & theType, const DOMString & theParentNodeName = "") 
+        FacadeKey(const DOMString & theType, const DOMString & theParentNodeName = "")
             : _myNodeName(theType), _myParentName(theParentNodeName){}
         bool operator<(const FacadeKey & second) const {
-            return (this->_myNodeName < second._myNodeName ||  
-                    (this->_myNodeName == second._myNodeName && 
+            return (this->_myNodeName < second._myNodeName ||
+                    (this->_myNodeName == second._myNodeName &&
                      this->_myParentName < second._myParentName) );
         }
     };
@@ -171,7 +171,7 @@ namespace dom {
                                   const DOMString & theParentNodeName = "") const;
             void registerPrototype(const DOMString & theType, FacadePtr thePrototype,
                                    const DOMString & theParentNodeName = "");
-            const FacadePtr findPrototype(const FacadeKey & thePrototypeKey) const;            
+            const FacadePtr findPrototype(const FacadeKey & thePrototypeKey) const;
         private:
             typedef std::map<FacadeKey, FacadePtr> ProtoMap;
             ProtoMap _myPrototypes;

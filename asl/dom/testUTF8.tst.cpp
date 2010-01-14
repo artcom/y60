@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: testAuto.tst.cpp,v $
@@ -27,9 +27,9 @@
 #endif
 #include <sstream>
 
-using namespace std; 
-using namespace asl; 
-using namespace dom; 
+using namespace std;
+using namespace asl;
+using namespace dom;
 
 class XMLUTF_8Test : public UnitTest {
     public:
@@ -40,8 +40,8 @@ class XMLUTF_8Test : public UnitTest {
             {
                 string myString = myDoc.childNode("utf8-test")->getAttributeString("auml");
                 ENSURE(myString.size() == 2); // 2 bytes
-                ENSURE(myString[0] == char(0xC3)); 
-                ENSURE(myString[1] == char(0xA4)); 
+                ENSURE(myString[0] == char(0xC3));
+                ENSURE(myString[1] == char(0xA4));
                 //ENSURE(g_utf8_strlen(myString.c_str(), -1) == 1); // one utf8 char
             }
 
@@ -52,11 +52,11 @@ class XMLUTF_8Test : public UnitTest {
             {
                 string myString = myOtherDoc.childNode("utf8-test")->getAttributeString("auml");
                 ENSURE(myString.size() == 2); // 2 bytes
-                ENSURE(myString[0] == char(0xC3)); 
-                ENSURE(myString[1] == char(0xA4)); 
+                ENSURE(myString[0] == char(0xC3));
+                ENSURE(myString[1] == char(0xA4));
                 //ENSURE(g_utf8_strlen(myString.c_str(), -1) == 1); // one utf8 char
             }
-            
+
         }
 };
 

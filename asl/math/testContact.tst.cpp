@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSnumeric: test_linearAlgebra.tst.cpp,v $
@@ -32,11 +32,11 @@ using namespace asl;
 template<class Number>
 class SweptSpherePointContact : public TemplateUnitTest {
     public:
-        SweptSpherePointContact(const char * theTemplateArgument) 
+        SweptSpherePointContact(const char * theTemplateArgument)
             : TemplateUnitTest("SweptSpherePointContact",theTemplateArgument) {}
 
         void run() {
-          
+
             Sphere<Number> mySphere(Point3<Number>(1,2,3), 0.5);
             Vector3<Number> myMotion(5, 0, 0);
 
@@ -44,7 +44,7 @@ class SweptSpherePointContact : public TemplateUnitTest {
                 Number firstContact;
                 Number lastContact;
                 Point3<Number> myVertex(1.0,0.0,3.0);
-                
+
                 int myContacts = contacts(mySphere, myMotion, myVertex, firstContact, lastContact);
                 ENSURE_MSG(myContacts == 0, "Vertex is too far away");
 
@@ -54,7 +54,7 @@ class SweptSpherePointContact : public TemplateUnitTest {
                 Number firstContact;
                 Number lastContact;
                 Point3<Number> myVertex(0.0,2.0,3.0);
-                
+
                 int myContacts = contacts(mySphere, myMotion, myVertex, firstContact, lastContact);
                 DPRINT(myContacts);
                 DPRINT(firstContact);
@@ -68,7 +68,7 @@ class SweptSpherePointContact : public TemplateUnitTest {
                 Number firstContact;
                 Number lastContact;
                 Point3<Number> myVertex(0.5,2.0,3.0);
-                
+
                 int myContacts = contacts(mySphere, myMotion, myVertex, firstContact, lastContact);
                 DPRINT(myContacts);
                 DPRINT(firstContact);
@@ -78,12 +78,12 @@ class SweptSpherePointContact : public TemplateUnitTest {
                 ENSURE_MSG(myInBounds == 1, "   ...and touching the first sphere");
                 ENSURE(almostEqual(firstContact, Number(0.0)));
             }
-     
+
             {
                 Number firstContact;
                 Number lastContact;
                 Point3<Number> myVertex(6.5,2.0,3.0);
-                
+
                 int myContacts = contacts(mySphere, myMotion, myVertex, firstContact, lastContact);
                 DPRINT(myContacts);
                 DPRINT(firstContact);
@@ -98,7 +98,7 @@ class SweptSpherePointContact : public TemplateUnitTest {
                 Number firstContact;
                 Number lastContact;
                 Point3<Number> myVertex(Number(3.0),Number(2.2),Number(3.0));
-                
+
                 int myContacts = contacts(mySphere, myMotion, myVertex, firstContact, lastContact);
                 DPRINT(myContacts);
                 DPRINT(firstContact);
@@ -113,7 +113,7 @@ class SweptSpherePointContact : public TemplateUnitTest {
                 Number lastContact;
                 Point3<Number> myVertex(Number(1.1),Number(2.1),3);
                 Vector3<Number> myTinyMotion(Number(0.1), 0.0, 0.0);
-                
+
                 int myContacts = contacts(mySphere, myTinyMotion, myVertex, firstContact, lastContact);
                 DPRINT(myContacts);
                 DPRINT(firstContact);
@@ -131,7 +131,7 @@ class SweptSpherePointContact : public TemplateUnitTest {
 template<class Number>
 class SweptSphereEdgeContact : public TemplateUnitTest {
     public:
-        SweptSphereEdgeContact(const char * theTemplateArgument) 
+        SweptSphereEdgeContact(const char * theTemplateArgument)
             : TemplateUnitTest("SweptSphereEdgeContact",theTemplateArgument) {}
 
         void run() {
@@ -145,7 +145,7 @@ class SweptSphereEdgeContact : public TemplateUnitTest {
                 Number lineFirstContact;
                 Number lineLastContact;
                 LineSegment<Number> mySegment(Point3<Number>(1.0,0.0,3.0), Point3<Number>(1.0,-1.0,3.0));
-                
+
                 int myContacts = contacts(mySphere, myMotion, mySegment, firstContact, lastContact, lineFirstContact, lineLastContact);
                 DPRINT(myContacts);
                 DPRINT(firstContact);
@@ -153,7 +153,7 @@ class SweptSphereEdgeContact : public TemplateUnitTest {
                 ENSURE_MSG(myContacts == 0, "Segment is too far away");
 
             }
-            
+
             {
                 // segment crosses the path completely (perpendicular)
                 Number firstContact;
@@ -161,7 +161,7 @@ class SweptSphereEdgeContact : public TemplateUnitTest {
                 Number lineFirstContact;
                 Number lineLastContact;
                 LineSegment<Number> mySegment(Point3<Number>(3.0,4.0,3.0), Point3<Number>(3.0,0.0,3.0));
-                
+
                 int myContacts = contacts(mySphere, myMotion, mySegment, firstContact, lastContact, lineFirstContact, lineLastContact);
                 DPRINT(myContacts);
                 DPRINT(firstContact);
@@ -169,7 +169,7 @@ class SweptSphereEdgeContact : public TemplateUnitTest {
                 ENSURE_MSG(myContacts == 2, "Segement gets swept completely by sphere");
                 int myInBounds = clipContacts(firstContact, lastContact);
                 ENSURE_MSG(myInBounds == 2, "   ...and extends beyond the swept sphere in both directions");
-                // the contact points should be (2+0.5)/5 and (2-0.5)/5 
+                // the contact points should be (2+0.5)/5 and (2-0.5)/5
                 ENSURE(almostEqual(firstContact,Number(0.3)));
                 ENSURE(almostEqual(lastContact,Number(0.5)));
             }
@@ -181,7 +181,7 @@ class SweptSphereEdgeContact : public TemplateUnitTest {
                 Number lineFirstContact;
                 Number lineLastContact;
                 LineSegment<Number> mySegment(Point3<Number>(0.0,2.0,3.0), Point3<Number>(7.0,2.0,3.0));
-                
+
                 int myContacts = contacts(mySphere, myMotion, mySegment, firstContact, lastContact, lineFirstContact, lineLastContact);
                 DPRINT(myContacts);
                 DPRINT(firstContact);
@@ -197,7 +197,7 @@ class SweptSphereEdgeContact : public TemplateUnitTest {
                 Number lineFirstContact;
                 Number lineLastContact;
                 LineSegment<Number> mySegment(Point3<Number>(0.0,2.0,3.0), Point3<Number>(4.0,2.0,3.0));
-                
+
                 int myContacts = contacts(mySphere, myMotion, mySegment, firstContact, lastContact, lineFirstContact, lineLastContact);
                 DPRINT(myContacts);
                 DPRINT(firstContact);
@@ -213,12 +213,12 @@ class SweptSphereEdgeContact : public TemplateUnitTest {
 template<class Number>
 class SweptSphereTriangleContact : public TemplateUnitTest {
     public:
-        SweptSphereTriangleContact(const char * theTemplateArgument) 
+        SweptSphereTriangleContact(const char * theTemplateArgument)
             : TemplateUnitTest("SweptSphereTriangleContact",theTemplateArgument) {}
 
         void gridTest_Z(const Point3<Number> & theContactSphereOrigin, const Triangle<Number> & theTriangle,
                         Number theRadius, const Point3<Number> & theContactPoint) {
-          
+
             Sphere<Number> mySphere(theContactSphereOrigin, theRadius);
             mySphere.center[2] -= theRadius*2;
             Vector3<Number>myMotion(0,0,theRadius*4);
@@ -318,18 +318,18 @@ class SweptSphereTriangleContact : public TemplateUnitTest {
         }
 
 
-        void run() {          
+        void run() {
             Sphere<Number> mySphere(Point3<Number>(1,2,3), 0.5);
             Vector3<Number> myMotion(5, 0, 0);
             SweptSphereContact<Number> myMinContact;
             SweptSphereContact<Number> myMaxContact;
-            
+
             {
                 // triangle-plane is parallel and too far away
                 Triangle<Number> myTriangle(Point3<Number>(0,0,0), Point3<Number>(5,0,0), Point3<Number>(1,0,0));
                 Vector3<Number> myNormal = myTriangle.normal();
                 Vector3<Vector3<Number> > myNormals(myNormal, myNormal, myNormal);
-                            
+
                 int myContacts = contacts(mySphere, myMotion, myTriangle, &myNormals, myMinContact, myMaxContact);
                 ENSURE_MSG(myContacts == 0, "triangle-plane is parallel and too far away");
             }
@@ -337,7 +337,7 @@ class SweptSphereTriangleContact : public TemplateUnitTest {
             {
                 // triangle-plane is parallel and embedded - triangle is too far away
                 Triangle<Number> myTriangle(Point3<Number>(0,4,3), Point3<Number>(5,4,3), Point3<Number>(3,5,3));
-                            
+
                 int myContacts = contacts<Number>(mySphere, myMotion, myTriangle, 0, myMinContact, myMaxContact);
                 ENSURE_MSG(myContacts == 0, "triangle-plane is parallel and embedded - triangle is too far away");
             }
@@ -348,20 +348,20 @@ class SweptSphereTriangleContact : public TemplateUnitTest {
                 Triangle<Number> myTriangle(Point3<Number>(0,0,3), Point3<Number>(0,4,3), Point3<Number>(20,2,3));
                 Vector3<Number> myNormal = myTriangle.normal();
                 Vector3<Vector3<Number> > myNormals(myNormal, myNormal, myNormal);
-                            
+
                 int myContacts = contacts<Number>(mySphere, myMotion, myTriangle, 0, myMinContact, myMaxContact);
                 ENSURE_MSG(myContacts == 2, "triangle-plane is parallel and embedded - triangle encompasses capsule");
                 ENSURE(myMinContact.contactType == EMBEDDED);
                 ENSURE(myMinContact.t == 0);
                 ENSURE(myMinContact.contactPoint == Point3<Number>(1, 2, 3));
                 ENSURE(myMinContact.contactSphereCenter == Point3<Number>(1, 2, 3));
-                ENSURE(myMinContact.contactSphereNormal == -myNormal); 
+                ENSURE(myMinContact.contactSphereNormal == -myNormal);
                 ENSURE(myMinContact.contactNormal == myNormal);
                 ENSURE(myMaxContact.contactType == EMBEDDED);
                 ENSURE(myMaxContact.t == 1);
                 ENSURE(myMaxContact.contactPoint == Point3<Number>(6, 2, 3));
                 ENSURE(myMaxContact.contactSphereCenter == Point3<Number>(6, 2, 3));
-                ENSURE(myMaxContact.contactSphereNormal == -myNormal); 
+                ENSURE(myMaxContact.contactSphereNormal == -myNormal);
                 ENSURE(myMaxContact.contactNormal == myNormal);
                 DPRINT("=======");
                 gridTest();

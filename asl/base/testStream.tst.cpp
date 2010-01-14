@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: testStream.tst.cpp,v $
@@ -97,7 +97,7 @@ public:
         theOutputStream.appendSigned(17592186044416000LL);
         theOutputStream.appendSigned(4503599627370496000LL);
     }
-    
+
     template <class AC_BYTE_ORDER, class SIZE_TYPE, class OFFSET_TYPE>
     void perform_get(const asl::ReadableArrangedStream<AC_BYTE_ORDER, SIZE_TYPE, OFFSET_TYPE> & theInputStream) {
 
@@ -133,13 +133,13 @@ public:
             asl::Float64 iid=0;
             p = theInputStream.readFloat64(iid, p);               // 8
             ENSURE(p == k + 30);
-            ENSURE(iid == static_cast<asl::Float64>(i)); 
+            ENSURE(iid == static_cast<asl::Float64>(i));
 
             iiul=0;
             p = theInputStream.readSigned32(ii, p);              // 4
             ENSURE(p == k + 34);
             ENSURE(ii == static_cast<Signed32>(i));
-            
+
             Unsigned32 iiui=0;
             p = theInputStream.readUnsigned32(iiui, p);          // 4
             ENSURE(p == k + 38);
@@ -148,7 +148,7 @@ public:
             asl::Float32 iif=0;
             p = theInputStream.readFloat32(iif, p);               // 4
             ENSURE(p == k + 42);
-            ENSURE(iif == static_cast<asl::Float32>(i)); 
+            ENSURE(iif == static_cast<asl::Float32>(i));
 
             short iis=0;
             p = theInputStream.readSigned16(iis, p);               // 2
@@ -168,7 +168,7 @@ public:
             signed char iisc = 0;
             p = theInputStream.readSigned8(iisc, p);         // 1
             ENSURE(p == k + 48);
-            ENSURE(iisc == i); 
+            ENSURE(iisc == i);
 
             string iistr;
             p = theInputStream.readString(iistr, as_string(i).size(), p);// 1
@@ -298,7 +298,7 @@ public:
         ENSURE(mySignedResult == 17592186044416000LL);
 
         p = theInputStream.readSigned(mySignedResult, p);
-        ENSURE(p == mySize + 45);    
+        ENSURE(p == mySize + 45);
         ENSURE(mySignedResult == 4503599627370496000LL);
 
     }
@@ -346,9 +346,9 @@ public:
             ReadableStreamAdapter<X86ByteOrder, PowerPCByteOrder> myInputAdapter(myInputFile);
             perform_get(myInputAdapter);
         }
-        
+
         ENSURE( asl::ConstMappedBlock(myFileName) == asl::ConstMappedBlock(myMappedFileName));
-         
+
         {
             WriteableArrangedFile<PowerPCByteOrder> myOutputFile(myFileName);
             perform_put(myOutputFile);

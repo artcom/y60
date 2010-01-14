@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -66,11 +66,11 @@ namespace asl {
                     _mySpline(theSpline),
                     _myStrokeSize(theStrokeSize)
                 {}
-    
+
                 Vector3<T> operator()(unsigned x, unsigned y) const {
                     const std::vector<Vector3<T> > & myPoints = _mySpline.getResult();
                     if (x >= myPoints.size()) {
-                        throw asl::Exception(std::string("Invalid x value for bspline-position: ") + 
+                        throw asl::Exception(std::string("Invalid x value for bspline-position: ") +
                             as_string(x) + ". Must be less than " +
                             as_string(myPoints.size()), PLUS_FILE_LINE);
                     }
@@ -87,7 +87,7 @@ namespace asl {
                         return Vector3<T>(myPoints[x] + mySideVector);
                     }
                 }
-    
+
             private:
                 const BSpline & _mySpline;
                 const float & _myStrokeSize;
@@ -103,7 +103,7 @@ namespace asl {
                 Vector3<T> operator()(unsigned x, unsigned y) const {
                     const std::vector<Vector3<T> > & myPoints = _mySpline.getResult();
                     if (x >= myPoints.size()) {
-                        throw asl::Exception(std::string("Invalid x value for bspline-normal: ") + 
+                        throw asl::Exception(std::string("Invalid x value for bspline-normal: ") +
                             as_string(x) + ". Must be less than " +
                             as_string(myPoints.size()), PLUS_FILE_LINE);
                     }
@@ -113,7 +113,7 @@ namespace asl {
                     Vector3<T> mySideVector;
                     Vector3<T> myUpVector;
                     _mySpline.getSideAndUpVector(myPoints[x + 1] - myPoints[x], mySideVector, myUpVector);
-                    
+
                     return myUpVector;
                 }
 
@@ -166,7 +166,7 @@ namespace asl {
                 _myCoeff[2][i] = 3 * (theEndHandle[i] - theStartHandle[i]) - _myCoeff[1][i];
                 _myCoeff[3][i] = theEnd[i] - theStart[i] - _myCoeff[1][i] - _myCoeff[2][i];
             }
-            
+
             clearResultCache();
 
             _myStart       = theStart;
@@ -201,15 +201,15 @@ namespace asl {
         const Vector3<T> & getStart() const {
             return _myStart;
         }
-        
+
         const Vector3<T> & getEnd() const {
             return _myEnd;
         }
-        
+
         const Vector3<T> & getStartHandle() const {
             return _myStartHandle;
         }
-        
+
         const Vector3<T> & getEndHandle() const {
             return _myEndHandle;
         }
@@ -266,18 +266,18 @@ namespace asl {
         T getArcLength() {
             if (_myResult.empty()) {
                 throw asl::Exception("Could not get arc length, because spline is not calculated, yet.", PLUS_FILE_LINE);
-            }                        
+            }
 
             // Distances are calculated lazily
             if (_myDistances.empty()) {
                 _myDistances.resize(_myResult.size());
-                
+
                 _myDistances[0] = 0;
                 for (unsigned i = 1; i < _myResult.size(); ++i) {
-                    _myDistances[i] = _myDistances[i-1] + length(_myResult[i] - _myResult[i-1]);   
+                    _myDistances[i] = _myDistances[i-1] + length(_myResult[i] - _myResult[i-1]);
                 }
             }
-            
+
             return _myDistances.back();
         }
 
@@ -296,7 +296,7 @@ namespace asl {
             _myResult.reserve(theResolution + 1);
             for (unsigned i = 0; i < theResolution + 1; ++i) {
                 _myResult.push_back(evaluate(i / T(theResolution), theEaseIn, theEaseOut));
-            }            
+            }
 
             return _myResult;
         }
@@ -315,25 +315,25 @@ namespace asl {
             theUpVector = cross(theForwardVector, theSideVector);
             theUpVector = normalized(theUpVector);
         }
-        
+
         Vector3<T> getPosition(T theDistance) {
             if (theDistance >= getArcLength()) {
                 return _myResult.back();
             }
-            
+
             // Find the last point that is within the given distance
             unsigned myIndex = 1;
             while (myIndex < _myDistances.size() && _myDistances[myIndex] < theDistance) {
                 ++myIndex;
             }
             --myIndex;
-                                
-            T myRemainingDistance = theDistance - _myDistances[myIndex];            
+
+            T myRemainingDistance = theDistance - _myDistances[myIndex];
             Vector3<T> myDirection = normalized(_myResult[myIndex+1] - _myResult[myIndex]);
-            
+
             return _myResult[myIndex] + myDirection * myRemainingDistance;
         }
-        
+
         bool isLineSegment() const {
             return almostEqual( _myStart, _myStartHandle) && almostEqual( _myEnd, _myEndHandle );
         }
@@ -343,7 +343,7 @@ namespace asl {
             _myResult.clear();
             _myDistances.clear();
         }
-    
+
         // evaluate at 't'
         Vector3<T> getValue(T t) const {
 
@@ -374,20 +374,20 @@ namespace asl {
 
             return myNormal;
         }
-        
+
         Vector3<T> _myCoeff[4];
-        
+
         Vector3<T> _myStart;
         Vector3<T> _myEnd;
         Vector3<T> _myStartHandle;
         Vector3<T> _myEndHandle;
 
-        
+
         // The sampled points
         std::vector< Vector3<T> > _myResult;
-        
+
         // The distance to each sampled point in _myResult from the spline start
-        std::vector<T> _myDistances;         
+        std::vector<T> _myDistances;
     };
 
     typedef BSpline<float> BSplinef;
@@ -405,7 +405,7 @@ namespace asl {
     }
 
     /* @} */
-    
+
 
 } // namespace asl
 #endif

@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -62,7 +62,7 @@ namespace asl {
 
 void checkRetVal (int theRetVal, const char * theMsg, const string& theWhere);
 void outputInfo (snd_pcm_t * theDevice);
-void outputHWParams (snd_pcm_t * theDevice); 
+void outputHWParams (snd_pcm_t * theDevice);
 void outputSWParams (snd_pcm_t * theDevice);
 
 ALSAPump::~ALSAPump ()
@@ -82,7 +82,7 @@ void ALSAPump::dumpState () const {
     }
 }
 
-ALSAPump::ALSAPump () 
+ALSAPump::ALSAPump ()
     : Pump(SF_F32, 1),
       _myIsOutOpen(false)
 {
@@ -94,10 +94,10 @@ ALSAPump::ALSAPump ()
     // xxx to get easy access to the plugin mechanism of alsa via ~/.asoundrc:
     string myDeviceName = "default";
     get_environment_var_as("Y60_SOUND_DEVICE_NAME", myDeviceName);
-    
+
     AC_DEBUG << "ALSA Device name: \"" << myDeviceName << "\"";
     setDeviceName(myDeviceName);
-    
+
     myRetVal = snd_output_stdio_attach(&myOutput, stdout, 0);
     checkRetVal (myRetVal, "failed", PLUS_FILE_LINE);
 
@@ -112,7 +112,7 @@ ALSAPump::openOutput() {
     AC_INFO << "ALSAPump::openOutput";
     if (isOutputOpen()) {
         AC_WARNING << "ALSAPump::openOutput: Device already open";
-        return; 
+        return;
     }
 
     _myOutputDevice = openDevice(SND_PCM_STREAM_PLAYBACK) ;
@@ -123,7 +123,7 @@ ALSAPump::openOutput() {
     checkRetVal (myRetVal, "Prepare output device error: ", PLUS_FILE_LINE);
 
     _myOutputBuffer.init(_myFramesPerBuffer, getNumOutputChannels(), getNativeSampleRate());
-    
+
     _myIsOutOpen = true;
 }
 
@@ -138,7 +138,7 @@ ALSAPump::closeOutput() {
 }
 
 
-bool 
+bool
 ALSAPump::isOutputOpen() const {
     return _myIsOutOpen;
 }
@@ -152,7 +152,7 @@ ALSAPump::openDevice(snd_pcm_stream_t theStreamType) {
     // if the device isn't available.
     myRetVal = snd_pcm_open(&myDevice, getDeviceName().c_str(), theStreamType,
             SND_PCM_NONBLOCK);
-    checkRetVal (myRetVal, (string("Opening ") + getDeviceName() + " failed: ").c_str(), 
+    checkRetVal (myRetVal, (string("Opening ") + getDeviceName() + " failed: ").c_str(),
             PLUS_FILE_LINE);
     snd_pcm_close (myDevice);
 
@@ -183,7 +183,7 @@ ALSAPump::setHWParams(snd_pcm_t * theDevice, int myNumChannels) {
 
     // This is CPU-specific endianness.
     myRetVal = snd_pcm_hw_params_set_format(theDevice, myHWParams, SND_PCM_FORMAT_FLOAT);
-    checkRetVal (myRetVal, "Sample format SND_PCM_FORMAT_FLOAT not available", 
+    checkRetVal (myRetVal, "Sample format SND_PCM_FORMAT_FLOAT not available",
             PLUS_FILE_LINE);
 
     unsigned myRate = static_cast<unsigned>(getNativeSampleRate());
@@ -192,7 +192,7 @@ ALSAPump::setHWParams(snd_pcm_t * theDevice, int myNumChannels) {
             + snd_strerror(myRetVal) + ". ").c_str(), PLUS_FILE_LINE);
 
     myRetVal = snd_pcm_hw_params_set_channels(theDevice, myHWParams, myNumChannels);
-    checkRetVal(myRetVal, (string("ALSAPump: Channel count ") + as_string(myNumChannels) 
+    checkRetVal(myRetVal, (string("ALSAPump: Channel count ") + as_string(myNumChannels)
                 + " not available: " + snd_strerror(myRetVal) + ". ").c_str(), PLUS_FILE_LINE);
 
     snd_pcm_uframes_t myBufferSize = nextPowerOfTwo(int(getLatency() * getNativeSampleRate()));
@@ -261,12 +261,12 @@ void ALSAPump::pump()
         // XXX: Not sure why this happens, but it does.
         return;
     }
-    
+
     // The ALSA example has this code. It seems to be utterly useless, but who knows.
     if (numFramesToDeliver > _myFramesPerBuffer) {
         numFramesToDeliver = _myFramesPerBuffer;
-    }    
-    
+    }
+
     mix(_myOutputBuffer, numFramesToDeliver);
 
     AC_TRACE << "ALSAPump::pump called with " << numFramesToDeliver << " frames";
@@ -275,11 +275,11 @@ void ALSAPump::pump()
 #ifdef USE_DASHBOARD
         MAKE_SCOPE_TIMER(Write_to_Card);
 #endif
-        myRetVal = snd_pcm_writei(_myOutputDevice, _myOutputBuffer.begin(), 
+        myRetVal = snd_pcm_writei(_myOutputDevice, _myOutputBuffer.begin(),
                 numFramesToDeliver);
         handleUnderrun(myRetVal);
     }
-    
+
     addFramesToTime(numFramesToDeliver);
 }
 
@@ -288,7 +288,7 @@ ALSAPump::handleUnderrun (int err) {
     if (err == -EPIPE || err == -EBADFD) {
         int myRetVal;
         myRetVal = snd_pcm_prepare(_myOutputDevice);
-        checkRetVal (myRetVal, "Can't recover from underrun, prepare failed: ", 
+        checkRetVal (myRetVal, "Can't recover from underrun, prepare failed: ",
                 PLUS_FILE_LINE);
         if (err == -EPIPE) {
             if (getNumUnderruns() == 0) {
@@ -311,7 +311,7 @@ ALSAPump::handleUnderrun (int err) {
 
 void ALSAPump::determineName() {
     snd_pcm_info_t * myInfo;
-    
+
     snd_pcm_info_malloc(&myInfo);
     snd_pcm_info(_myOutputDevice, myInfo);
 
@@ -330,7 +330,7 @@ checkRetVal (int theRetVal, const char * theMsg, const string& theWhere) {
 
 void outputInfo (snd_pcm_t * theDevice) {
     snd_pcm_info_t * myInfo;
-    
+
     snd_pcm_info_malloc(&myInfo);
     snd_pcm_info(theDevice, myInfo);
 
@@ -354,7 +354,7 @@ void outputHWParams (snd_pcm_t * theDevice) {
     snd_pcm_hw_params_t * myParams;
     snd_pcm_hw_params_malloc(&myParams);
     snd_pcm_hw_params_current(theDevice, myParams);
-    
+
     snd_pcm_uframes_t mySize;
     myRetVal = snd_pcm_hw_params_get_period_size(myParams, & mySize, & myDir);
     AC_DEBUG << "  Period size: " << mySize;
@@ -378,7 +378,7 @@ void outputHWParams (snd_pcm_t * theDevice) {
 
     AC_DEBUG << "  Significant bits per sample: " << snd_pcm_hw_params_get_sbits (myParams);
     snd_pcm_subformat_t mySubFormat;
-    
+
     myRetVal = snd_pcm_hw_params_get_subformat(myParams, & mySubFormat);
     checkRetVal (myRetVal, "Unable to get subformat: ", PLUS_FILE_LINE);
 

@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: fraction.h,v $
@@ -70,7 +70,7 @@ inline Int gcd(Int u, Int v) {
 
 /// base_frac ist Bruchklasse, die maximal schnell bei arithmetischen
 /// Operationen ist; Zaehler und Nenner koennen aber evtl. sehr gross
-/// werden zum kuerzen kann explicit norm() gerufen werden. 
+/// werden zum kuerzen kann explicit norm() gerufen werden.
 /// Das Vorzeichen sollte im Zaehler stehen,.d.h. der Nenner positiv
 /// sein; norm() stellt auch dieses sicher.
 /// Wenn haufig ein Ergebnis in gekuerzter Form benoetigt wird,
@@ -115,14 +115,14 @@ struct base_frac {
         if (q != f.q) {
             p = p * f.q + f.p * q;
             q = q * f.q;
-        } 
+        }
         else p+=f.p;
     }
     void subtract(const base_frac& f) {
         if (q != f.q) {
             p = p * f.q - f.p * q;
             q = q * f.q;
-        } 
+        }
         else p-=f.p;
     }
     void mult(const base_frac& f) {
@@ -284,7 +284,7 @@ Int round(const asl::base_frac<Int>& f) {
         //	return (2*f.p-f.q)/(2*f.q);
         return floor(f + asl::base_frac<Int>(1, 2));
     }
-} 
+}
 template <class Int>
 asl::base_frac<Int> round_fraction(const asl::base_frac<Int>& f) {
     return f - round(f);
@@ -302,7 +302,7 @@ double as_double(const base_frac<Int>& f) {
 }
 
 /// frac ist Bruchklasse, die Zaehler und Nenner automatisch so
-/// klein wie moeglich haelt. 
+/// klein wie moeglich haelt.
 
 template <class Int>
 struct frac : base_frac<Int> {
@@ -418,7 +418,7 @@ template <class Int>
 inline bool operator!=(const frac<Int>& f1, const frac<Int>& f2){
     return f1.not_equal_to(f2);
 }
-    
+
 template <class Int>
 inline std::ostream& operator<<(std::ostream& o, const frac<Int>& f)
 {
@@ -477,7 +477,7 @@ Int round(const asl::frac<Int>& f) {
         //	return (2*f.p-f.q)/(2*f.q);
         return floor(f + asl::frac<int>(1, 2));
     }
-} 
+}
 
 template <class Int>
 asl::frac<Int> round_fraction(const asl::frac<Int>& f) {

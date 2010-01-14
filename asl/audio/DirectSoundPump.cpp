@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -71,9 +71,9 @@ using namespace std;
 namespace asl {
 	typedef map<string,LPGUID> SoundDeviceMap;
 
-	BOOL CALLBACK enumerateDSSoundCards(LPGUID theId, 
+	BOOL CALLBACK enumerateDSSoundCards(LPGUID theId,
 				LPSTR theDescription,
-				LPSTR theDriverName, 
+				LPSTR theDriverName,
 				LPVOID theStorage )
 	{
 		LPGUID myIdPtr = NULL;
@@ -120,7 +120,7 @@ Time DirectSoundPump::getCurrentTime() {
     return double(_myFramesPlayed)/getNativeSampleRate();
 }
 
-DirectSoundPump::DirectSoundPump () 
+DirectSoundPump::DirectSoundPump ()
     : Pump(SF_F32, 1),
       _myIsOutOpen(false),
       _myDS(NULL),
@@ -135,7 +135,7 @@ DirectSoundPump::DirectSoundPump ()
     _myFramesPerBuffer = unsigned(getLatency() * getNativeSampleRate())*2;
 
 	string myDeviceName = "DirectSound default device";//default";
-    get_environment_var_as("Y60_SOUND_DEVICE_NAME", myDeviceName);    
+    get_environment_var_as("Y60_SOUND_DEVICE_NAME", myDeviceName);
     AC_DEBUG << "DirectSound Device name: \"" << myDeviceName << "\"";
     setDeviceName(myDeviceName);
 
@@ -151,14 +151,14 @@ DirectSoundPump::DirectSoundPump ()
 void
 DirectSoundPump::handleDeviceSelection() {
 	unsigned myDeviceNum = 0;
-	get_environment_var_as("Y60_SOUND_DEVICE_NUM", myDeviceNum);    
+	get_environment_var_as("Y60_SOUND_DEVICE_NUM", myDeviceNum);
     AC_DEBUG << "DirectSound Device num: \"" << myDeviceNum << "\"";
 	SoundDeviceMap mySoundCardMap;
 	if (FAILED(DirectSoundEnumerate((LPDSENUMCALLBACK)enumerateDSSoundCards, (LPVOID)&mySoundCardMap))) {
 		AC_WARNING << "Sorry, an error occured while enumerating sounddevices";
     }
 	if (myDeviceNum > mySoundCardMap.size()-1) {
-		AC_WARNING << "Sorry, Y60_SOUND_DEVICE_NUM: " << myDeviceNum << " invalid, there are only " 
+		AC_WARNING << "Sorry, Y60_SOUND_DEVICE_NUM: " << myDeviceNum << " invalid, there are only "
 			       << mySoundCardMap.size()-1 << " sounddevices";
 	}
 	SoundDeviceMap::iterator myBegin = mySoundCardMap.begin();
@@ -173,7 +173,7 @@ DirectSoundPump::handleDeviceSelection() {
 		myCounter++;
 	}
 	openOutput();
-	
+
 	myBegin = mySoundCardMap.begin();
 	myEnd = mySoundCardMap.end();
 	for (;myBegin !=  myEnd; myBegin++) {
@@ -187,14 +187,14 @@ DirectSoundPump::openOutput() {
     AC_INFO << "DirectSoundPump::openOutput";
     if (isOutputOpen()) {
         AC_WARNING << "DirectSoundPump::openOutput: Device already open";
-        return; 
+        return;
     }
     HRESULT theRetVal;
 
     theRetVal = DirectSoundCreate8(_mySoundCardId, &_myDS, NULL);
     checkDSRetVal(theRetVal, PLUS_FILE_LINE);
 
-    // Determine window. This stuff is mostly bullshit because SetCooperativeLevel 
+    // Determine window. This stuff is mostly bullshit because SetCooperativeLevel
     // really doesn't do anything for WDM sound cards.
     HWND myWindow = NULL;
     myWindow = ::GetForegroundWindow();
@@ -204,7 +204,7 @@ DirectSoundPump::openOutput() {
     if (myWindow) {
         theRetVal = _myDS->SetCooperativeLevel(myWindow, DSSCL_PRIORITY);
         checkDSRetVal(theRetVal, PLUS_FILE_LINE);
-    } 
+    }
     ASSURE_MSG(myWindow, "Could not retrieve a window and hence could not set Cooperative level");
     ZeroMemory(&_myDSCaps, sizeof(DSCAPS));
     _myDSCaps.dwSize = sizeof(DSCAPS);
@@ -247,7 +247,7 @@ DirectSoundPump::closeOutput() {
 }
 
 
-bool 
+bool
 DirectSoundPump::isOutputOpen() const {
     return _myIsOutOpen;
 }
@@ -279,22 +279,22 @@ void DirectSoundPump::initPrimaryBuffer() {
 }
 
 void DirectSoundPump::initSecondaryBuffer() {
-    WAVEFORMATEX* myWF = 0; 
-    DSBUFFERDESC dsbdesc; 
-    HRESULT hr; 
- 
+    WAVEFORMATEX* myWF = 0;
+    DSBUFFERDESC dsbdesc;
+    HRESULT hr;
+
     switch (getNativeSampleFormat()) {
         case SF_S16:
         case SF_S8:
             {
                 myWF = new WAVEFORMATEX;
-                // Set up wave format structure. 
+                // Set up wave format structure.
                 memset(myWF, 0, sizeof(WAVEFORMATEX));
-                myWF->wFormatTag = WAVE_FORMAT_PCM; 
+                myWF->wFormatTag = WAVE_FORMAT_PCM;
                 myWF->nChannels = static_cast<WORD>(getNumOutputChannels());
                 // This is really frames (samples per channel) per second...
-                myWF->nSamplesPerSec = getNativeSampleRate(); 
-                myWF->wBitsPerSample = static_cast<WORD>(getBytesPerSample(getNativeSampleFormat())*8); 
+                myWF->nSamplesPerSec = getNativeSampleRate();
+                myWF->wBitsPerSample = static_cast<WORD>(getBytesPerSample(getNativeSampleFormat())*8);
                 myWF->nBlockAlign = static_cast<WORD>(getOutputBytesPerFrame());
                 myWF->nAvgBytesPerSec = myWF->nSamplesPerSec * myWF->nBlockAlign;
                 myWF->cbSize = sizeof(WAVEFORMATEX);
@@ -304,15 +304,15 @@ void DirectSoundPump::initSecondaryBuffer() {
             {
                 WAVEFORMATEXTENSIBLE * myFloatWF = new WAVEFORMATEXTENSIBLE;
 //                WAVEFORMATIEEEFLOATEX * myFloatWF = new WAVEFORMATIEEEFLOATEX;
-                // Set up wave format structure. 
+                // Set up wave format structure.
                 memset(myFloatWF, 0, sizeof(WAVEFORMATEXTENSIBLE));
-                myFloatWF->Format.wFormatTag = WAVE_FORMAT_EXTENSIBLE; 
+                myFloatWF->Format.wFormatTag = WAVE_FORMAT_EXTENSIBLE;
                 myFloatWF->Format.nChannels = static_cast<WORD>(getNumOutputChannels());
                 // This is really frames (samples per channel) per second...
-                myFloatWF->Format.nSamplesPerSec = getNativeSampleRate(); 
+                myFloatWF->Format.nSamplesPerSec = getNativeSampleRate();
                 myFloatWF->Format.wBitsPerSample = static_cast<WORD>(getBytesPerSample(getNativeSampleFormat())*8);
                 myFloatWF->Format.nBlockAlign = static_cast<WORD>(getOutputBytesPerFrame());
-                myFloatWF->Format.nAvgBytesPerSec = myFloatWF->Format.nSamplesPerSec * 
+                myFloatWF->Format.nAvgBytesPerSec = myFloatWF->Format.nSamplesPerSec *
                         myFloatWF->Format.nBlockAlign;
                 myFloatWF->Format.cbSize = sizeof(WAVEFORMATEXTENSIBLE);
                 myFloatWF->Samples.wValidBitsPerSample = static_cast<WORD>(getBytesPerSample(getNativeSampleFormat())*8);
@@ -324,17 +324,17 @@ void DirectSoundPump::initSecondaryBuffer() {
         default:
             ASSURE_MSG(false, "Illegal sample format in DSSampleSink::createDSBuffer");
     }
- 
-    // Set up DSBUFFERDESC structure. 
-    memset(&dsbdesc, 0, sizeof(DSBUFFERDESC)); 
-    dsbdesc.dwSize = sizeof(DSBUFFERDESC); 
 
-    dsbdesc.dwFlags = DSBCAPS_CTRLPAN | DSBCAPS_CTRLPOSITIONNOTIFY | 
+    // Set up DSBUFFERDESC structure.
+    memset(&dsbdesc, 0, sizeof(DSBUFFERDESC));
+    dsbdesc.dwSize = sizeof(DSBUFFERDESC);
+
+    dsbdesc.dwFlags = DSBCAPS_CTRLPAN | DSBCAPS_CTRLPOSITIONNOTIFY |
             DSBCAPS_CTRLVOLUME | DSBCAPS_GETCURRENTPOSITION2 | DSBCAPS_STICKYFOCUS | DSBCAPS_GLOBALFOCUS;
     dsbdesc.dwBufferBytes = _myFramesPerBuffer*getOutputBytesPerFrame();
-    dsbdesc.lpwfxFormat = (LPWAVEFORMATEX)myWF; 
- 
-    // Create buffer. 
+    dsbdesc.lpwfxFormat = (LPWAVEFORMATEX)myWF;
+
+    // Create buffer.
     IDirectSoundBuffer * myDSBuffer;
     hr = _myDS->CreateSoundBuffer(&dsbdesc, &myDSBuffer, NULL);
     checkDSRetVal(hr, PLUS_FILE_LINE);
@@ -351,9 +351,9 @@ void DirectSoundPump::initSecondaryBuffer() {
 void
 DirectSoundPump::initNotification()
 {
-    LPDIRECTSOUNDNOTIFY8 myDsNotify; 
-    HRESULT hr = _myDSBuffer->QueryInterface(IID_IDirectSoundNotify8, 
-            (LPVOID *)&myDsNotify); 
+    LPDIRECTSOUNDNOTIFY8 myDsNotify;
+    HRESULT hr = _myDSBuffer->QueryInterface(IID_IDirectSoundNotify8,
+            (LPVOID *)&myDsNotify);
     checkDSRetVal (hr, PLUS_FILE_LINE);
 
     _myWakeup0Handle = CreateEvent(NULL, FALSE, TRUE, NULL);
@@ -375,17 +375,17 @@ DirectSoundPump::initNotification()
 
 void DirectSoundPump::zeroDSBuffer()
 {
-    HRESULT hr; 
+    HRESULT hr;
     BYTE * myBufferData = NULL;
     DWORD myDataLen;
     unsigned myBytesToWrite = _myFramesPerBuffer*getOutputBytesPerFrame();
-    
+
     hr = _myDSBuffer->Lock(0, myBytesToWrite, (LPVOID*) &myBufferData, &myDataLen, NULL, 0, 0);
     checkDSRetVal (hr, PLUS_FILE_LINE);
     ZeroMemory(myBufferData, myDataLen);
     hr = _myDSBuffer->Unlock(myBufferData, myDataLen, NULL, 0);
     checkDSRetVal (hr, PLUS_FILE_LINE);
-    
+
 }
 
 void DirectSoundPump::pump()
@@ -403,7 +403,7 @@ void DirectSoundPump::pump()
     if (mySignaledIndex == WAIT_TIMEOUT) {
         AC_WARNING << "Timeout while waiting for event from buffer";
     } else if (mySignaledIndex == WAIT_FAILED) {
-        AC_WARNING << "Error in DirectSoundPump::pump():" 
+        AC_WARNING << "Error in DirectSoundPump::pump():"
                 << DSoundMessages::WindowsError(GetLastError());
    } else if (mySignaledIndex == 2) {
        AC_DEBUG << "DirectSoundPump::pump: Stop signaled." << endl;
@@ -413,7 +413,7 @@ void DirectSoundPump::pump()
 }
 
 void DirectSoundPump::writeToDS() {
-    HRESULT hr; 
+    HRESULT hr;
 
     DWORD myPlayCursor;
     DWORD myWriteCursor;
@@ -422,47 +422,47 @@ void DirectSoundPump::writeToDS() {
 
     unsigned numBytesToDeliver ;
     if (myPlayCursor > _myWriteCursor) {
-        numBytesToDeliver = myPlayCursor-_myWriteCursor; 
+        numBytesToDeliver = myPlayCursor-_myWriteCursor;
     } else {
         numBytesToDeliver = myPlayCursor+(_myFramesPerBuffer*getOutputBytesPerFrame())
                 -_myWriteCursor;
     }
-    AC_TRACE << "_myWriteCursor: " << _myWriteCursor << ", numBytesToDeliver: " 
+    AC_TRACE << "_myWriteCursor: " << _myWriteCursor << ", numBytesToDeliver: "
             << numBytesToDeliver << endl;
-    AC_TRACE << "Before mix: DS PlayCursor: " << myPlayCursor 
+    AC_TRACE << "Before mix: DS PlayCursor: " << myPlayCursor
             << ", DS Write Cursor: " << myWriteCursor << endl;
     unsigned oldWriteCursor = _myWriteCursor;
 
     unsigned numFramesToDeliver = numBytesToDeliver/getOutputBytesPerFrame();
     // Obtain memory address of write block. This will be in two parts
     // if the block wraps around.
-    void * myWritePtr1; 
-    unsigned long myWriteBytes1; 
-    void * myWritePtr2; 
-    unsigned long myWriteBytes2; 
+    void * myWritePtr1;
+    unsigned long myWriteBytes1;
+    void * myWritePtr2;
+    unsigned long myWriteBytes2;
     mix(_myOutputBuffer, numFramesToDeliver);
     hr = _myDSBuffer->GetCurrentPosition(&myPlayCursor, &myWriteCursor);
     checkDSRetVal(hr, PLUS_FILE_LINE);
-    AC_TRACE << "After mix: DS PlayCursor: " << myPlayCursor 
+    AC_TRACE << "After mix: DS PlayCursor: " << myPlayCursor
             << ", DS Write Cursor: " << myWriteCursor << endl;
 
 #ifdef USE_DASHBOARD
     MAKE_SCOPE_TIMER(DSBufferLock);
 #endif
-    hr = _myDSBuffer->Lock(_myWriteCursor, numBytesToDeliver, &myWritePtr1, 
-            &myWriteBytes1, &myWritePtr2, &myWriteBytes2, 0);     
-    // If the buffer was lost, restore and retry lock. 
+    hr = _myDSBuffer->Lock(_myWriteCursor, numBytesToDeliver, &myWritePtr1,
+            &myWriteBytes1, &myWritePtr2, &myWriteBytes2, 0);
+    // If the buffer was lost, restore and retry lock.
     // (I don't think this ever happens with current drivers/os'es)
-    if (DSERR_BUFFERLOST == hr) 
+    if (DSERR_BUFFERLOST == hr)
     {
         AC_DEBUG << "Lost buffer!";
-        _myDSBuffer->Restore(); 
-        hr = _myDSBuffer->Lock(_myWriteCursor, numBytesToDeliver, &myWritePtr1, 
-                &myWriteBytes1, &myWritePtr2, &myWriteBytes2, 0); 
+        _myDSBuffer->Restore();
+        hr = _myDSBuffer->Lock(_myWriteCursor, numBytesToDeliver, &myWritePtr1,
+                &myWriteBytes1, &myWritePtr2, &myWriteBytes2, 0);
     }
     checkDSRetVal(hr, PLUS_FILE_LINE);
-    
-    // Copy data to DirectSound memory. 
+
+    // Copy data to DirectSound memory.
     _myOutputBuffer.copyToRawMem(myWritePtr1, 0, myWriteBytes1);
     _myWriteCursor += myWriteBytes1;
     if (myWritePtr2 != 0) {
@@ -471,13 +471,13 @@ void DirectSoundPump::writeToDS() {
     }
     _myWriteCursor %= _myFramesPerBuffer*getOutputBytesPerFrame();
 
-    // Release the data back to DirectSound. 
+    // Release the data back to DirectSound.
     hr = _myDSBuffer->Unlock(myWritePtr1, myWriteBytes1, myWritePtr2, myWriteBytes2);
-    checkDSRetVal (hr, PLUS_FILE_LINE);     
-    
+    checkDSRetVal (hr, PLUS_FILE_LINE);
+
     // Test for buffer underrun
     hr = _myDSBuffer->GetCurrentPosition(&myPlayCursor, &myWriteCursor);
-    checkDSRetVal (hr, PLUS_FILE_LINE);     
+    checkDSRetVal (hr, PLUS_FILE_LINE);
     if (myPlayCursor < myWriteCursor) {
         // Nonusable part of buffer isn't split.
         if (oldWriteCursor < myWriteCursor && oldWriteCursor > myPlayCursor) {
@@ -506,18 +506,18 @@ void DirectSoundPump::updateFramesPlayed() {
     AutoLocker<ThreadLock> myLocker(_myTimeLock);
     HRESULT hr = _myDSBuffer->GetCurrentPosition(&myPlayCursor, 0);
     checkDSRetVal (hr, PLUS_FILE_LINE);
-    int myDelta = (int)myPlayCursor/getOutputBytesPerFrame() 
+    int myDelta = (int)myPlayCursor/getOutputBytesPerFrame()
             - int(_myFramesPlayed % _myFramesPerBuffer);
     if (myDelta < 0) {
         myDelta += _myFramesPerBuffer;
         AC_TRACE << "### Wrap around.";
     }
     _myFramesPlayed+=myDelta;
-} 
+}
 
 void dumpDSCaps(const DSCAPS& theDSCaps) {
     AC_DEBUG << "DirectSound driver caps:";
-    AC_DEBUG << "  Certified or WDM driver: " << 
+    AC_DEBUG << "  Certified or WDM driver: " <<
         ((theDSCaps.dwFlags & DSCAPS_CERTIFIED) ? "true" : "false");
     AC_DEBUG << "  " << ((theDSCaps.dwFlags & DSCAPS_CONTINUOUSRATE ) ? "Supports" : "Does not support")
          << " variable sample rate playback.";

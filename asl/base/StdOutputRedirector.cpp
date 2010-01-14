@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -57,14 +57,14 @@
 using namespace std;
 
 namespace asl {
-    
-    const char * LOG_WRAPAROUND_FILESIZE = "AC_LOG_WRAPAROUND_FILESIZE";    
-    const char * LOG_WRAPAROUND_CHECK_SEC = "AC_LOG_WRAPAROUND_CHECK_SEC";    
-    const char * LOG_CREATE_ON_EACH_RUN   = "AC_CREATE_LOG_ON_EACH_RUN";   
-    const char * LOG_REMOVE_OLD_ARCHIVE   = "AC_LOG_REMOVE_OLD_ARCHIVE";   
-     
+
+    const char * LOG_WRAPAROUND_FILESIZE = "AC_LOG_WRAPAROUND_FILESIZE";
+    const char * LOG_WRAPAROUND_CHECK_SEC = "AC_LOG_WRAPAROUND_CHECK_SEC";
+    const char * LOG_CREATE_ON_EACH_RUN   = "AC_CREATE_LOG_ON_EACH_RUN";
+    const char * LOG_REMOVE_OLD_ARCHIVE   = "AC_LOG_REMOVE_OLD_ARCHIVE";
+
     const char * ourAppStartMessage = "--------- Application startup, archive filename: ";
-    
+
     std::string expandString(const std::string & theString, std::string & theShortname) {
 
         std::string myString = theString;
@@ -102,7 +102,7 @@ namespace asl {
         myTimeString << asl::formatTime(myFormatString) << now;
         return myTimeString.str();
     }
-    
+
     StdOutputRedirector::StdOutputRedirector() : _myOutFile(0), _myOriginalCoutBuffer(0), _myOriginalCerrBuffer(0),
                                                  _myMaximumFileSize(0), _myOutputFilename(""), _myStartTime(-1),
                                                  _myOldArchiveFilename(""), _myRemoveOldArchiveFlag(false),
@@ -113,56 +113,56 @@ namespace asl {
         std::cout.rdbuf(_myOriginalCoutBuffer);
         std::cerr.rdbuf(_myOriginalCerrBuffer);
     }
-    
-    void 
+
+    void
     StdOutputRedirector::init(const Arguments & theArguments) {
         if (theArguments.haveOption("--std-logfile")) {
-            const char * myEnv = ::getenv(LOG_WRAPAROUND_FILESIZE);       
+            const char * myEnv = ::getenv(LOG_WRAPAROUND_FILESIZE);
             if (myEnv) {
-                string mylogFileSize(myEnv);             
-                _myMaximumFileSize = asl::as<long>(mylogFileSize);    
+                string mylogFileSize(myEnv);
+                _myMaximumFileSize = asl::as<long>(mylogFileSize);
             }
-            myEnv = ::getenv(LOG_CREATE_ON_EACH_RUN); 
-            if (myEnv) { 
+            myEnv = ::getenv(LOG_CREATE_ON_EACH_RUN);
+            if (myEnv) {
                 string myTmpStr(myEnv);
-                _myLogInOneFileFlag = !(strcmp(toLowerCase(myTmpStr).c_str(), "true") == 0);  
+                _myLogInOneFileFlag = !(strcmp(toLowerCase(myTmpStr).c_str(), "true") == 0);
             }
-            myEnv = ::getenv(LOG_REMOVE_OLD_ARCHIVE); 
-            if (myEnv) { 
+            myEnv = ::getenv(LOG_REMOVE_OLD_ARCHIVE);
+            if (myEnv) {
                 string myTmpStr(myEnv);
                 _myRemoveOldArchiveFlag = (strcmp(toLowerCase(myTmpStr).c_str(), "true") == 0);
             }
-            
-            myEnv = ::getenv(LOG_WRAPAROUND_CHECK_SEC); 
-            if (myEnv) { 
+
+            myEnv = ::getenv(LOG_WRAPAROUND_CHECK_SEC);
+            if (myEnv) {
                 string myTmpStr(myEnv);
-                _myFileSizeCheckFrequInSec = asl::as<long>(myTmpStr);     
+                _myFileSizeCheckFrequInSec = asl::as<long>(myTmpStr);
             }
-                    
-            std::string myFilenameWithTimestamp = expandString(theArguments.getOptionArgument("--std-logfile"), 
+
+            std::string myFilenameWithTimestamp = expandString(theArguments.getOptionArgument("--std-logfile"),
                                      _myOutputFilename);
             if (!_myLogInOneFileFlag) {
                 _myOutputFilename = myFilenameWithTimestamp;
-            }     
+            }
             // for syncing c like stderr & c++ cerr
             // default is true, not syncing is supposted to be faster, so maybe we should disable it
             //ios_base::sync_with_stdio(false);
-            
+
             redirect();
-            
+
             // write a timestamp
-            cout <<  ourAppStartMessage << myFilenameWithTimestamp << endl;            
+            cout <<  ourAppStartMessage << myFilenameWithTimestamp << endl;
             cout << "Timestamp: " << getCurrentTimeString() << endl;
-            cout << "---------" << endl;            
+            cout << "---------" << endl;
 
             // remove all but latest archives
             if (_myRemoveOldArchiveFlag) {
-                removeoldArchives();           
-            }  
+                removeoldArchives();
+            }
 
         }
     }
-           
+
     void
     StdOutputRedirector::removeoldArchives() {
         vector<std::string> myFiles = getDirectoryEntries(getDirectoryPart(_myOutputFilename));
@@ -172,7 +172,7 @@ namespace asl {
         vector<int> myFilesToDelete;
         for (vector<std::string>::size_type myFileIndex = 0; myFileIndex != myFiles.size(); myFileIndex++) {
             string myFilename = myFiles[myFileIndex];//getDirectoryPart(_myOutputFilename) + myFiles[myFileIndex];
-            string mySearchString(removeExtension(_myOutputFilename) + "logarchive_" );                    
+            string mySearchString(removeExtension(_myOutputFilename) + "logarchive_" );
             size_t myPos = myFilename.rfind(mySearchString.c_str() ,0, mySearchString.size());
             if (myPos != string::npos) {
                 time_t myTimeStamp = getLastModified(myFilename);
@@ -185,49 +185,49 @@ namespace asl {
         }
         for (vector<std::string>::size_type myFileIndex = 0; myFileIndex != myFilesToDelete.size(); myFileIndex++) {
             if (myFilesToDelete[myFileIndex] != myNewestIndex ) {
-                deleteFile(getDirectoryPart(_myOutputFilename) + myFiles[myFilesToDelete[myFileIndex]]);                        
+                deleteFile(getDirectoryPart(_myOutputFilename) + myFiles[myFilesToDelete[myFileIndex]]);
             } else {
                 _myOldArchiveFilename = myFiles[myNewestIndex];
             }
         }
     }
-    
+
     void
     StdOutputRedirector::redirect() {
         if (_myLogInOneFileFlag) {
-            _myOutputStreamOut.open(_myOutputFilename.c_str(), ofstream::app | ofstream::out);                    
+            _myOutputStreamOut.open(_myOutputFilename.c_str(), ofstream::app | ofstream::out);
         } else {
-            _myOutputStreamOut.open(_myOutputFilename.c_str(), ofstream::trunc | ofstream::out);                    
+            _myOutputStreamOut.open(_myOutputFilename.c_str(), ofstream::trunc | ofstream::out);
         }
-        _myOutFile = _myOutputStreamOut.rdbuf();                    
+        _myOutFile = _myOutputStreamOut.rdbuf();
         _myOriginalCoutBuffer = std::cout.rdbuf(_myOutFile);
         _myOriginalCerrBuffer = std::cerr.rdbuf(_myOutFile);
     }
-    
+
     void
     StdOutputRedirector::checkForFileWrapAround()  {
         if (_myMaximumFileSize > 0) {
             if (_myStartTime == -1) {
                 _myStartTime = (long long)asl::Time().millis();
             }
-            long long myDelta = asl::Time().millis() - _myStartTime;            
+            long long myDelta = asl::Time().millis() - _myStartTime;
             if (myDelta > (_myFileSizeCheckFrequInSec * 1000)) {
                 long myCurrentSize = getFileSize(_myOutputFilename);
                 if (myCurrentSize >= _myMaximumFileSize) {
                     _myOutputStreamOut.close();
                     // remove old archive
-                    if (_myLogInOneFileFlag && _myRemoveOldArchiveFlag && 
+                    if (_myLogInOneFileFlag && _myRemoveOldArchiveFlag &&
                         _myOldArchiveFilename != "" &&  fileExists(_myOldArchiveFilename))
                     {
-                        deleteFile(_myOldArchiveFilename);                        
+                        deleteFile(_myOldArchiveFilename);
                     }
                     // rename current log to archive version
-                    string myNewFilename = removeExtension(_myOutputFilename) + "logarchive_" + 
+                    string myNewFilename = removeExtension(_myOutputFilename) + "logarchive_" +
                                                            getCurrentTimeString() + (".log");
 #ifdef _WIN32
-                    MoveFileEx(_myOutputFilename.c_str(), 
-                               myNewFilename.c_str(), 
-                               MOVEFILE_COPY_ALLOWED | MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH);                    
+                    MoveFileEx(_myOutputFilename.c_str(),
+                               myNewFilename.c_str(),
+                               MOVEFILE_COPY_ALLOWED | MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH);
 #else
                     rename(_myOutputFilename.c_str(), myNewFilename.c_str());
 #endif
@@ -238,6 +238,6 @@ namespace asl {
             }
         }
     }
-    
+
 }
 

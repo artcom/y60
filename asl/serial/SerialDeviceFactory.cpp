@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -57,11 +57,11 @@ namespace asl {
 
 
 
-#ifdef _WIN32 
+#ifdef _WIN32
 bool getSerialDeviceNames(std::vector<std::string> & theSerialDevicesNames) {
     theSerialDevicesNames.resize(0);;
 
-    //Iterate through all possible 255 COM ports and see if we can open them or fail in a way that indicates they exist 
+    //Iterate through all possible 255 COM ports and see if we can open them or fail in a way that indicates they exist
     for (unsigned i=1; i<256; i++) {
         std::string myPort = std::string("\\\\.\\COM")+asl::as_string(i);
         bool exists = false;
@@ -121,7 +121,7 @@ bool getSerialDeviceNames(std::vector<std::string> & theSerialDevicesNames) {
 #endif
 #endif
 
-SerialDevice * 
+SerialDevice *
 getSerialDevice(unsigned int theIndex) {
 
     std::vector<std::string> myDevicesNames;

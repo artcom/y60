@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: piterator.h,v $
@@ -88,10 +88,10 @@ inline T* iseek(T*a, Iterator b) {
 /////////////////////////////////////////////////////////////////////////////////
 
 template <class RandomAccessIterator, class T, class Reference = T&,
-          class Distance = asl::AC_OFFSET_TYPE> 
+          class Distance = asl::AC_OFFSET_TYPE>
 class step_iterator {
     typedef step_iterator<RandomAccessIterator, T, Reference, Distance> self;
-    
+
 //todo:    friend self operator+ <>(const self& a, T* b);
 //todo:    friend T* operator+(T* a, const self& b);
 public:
@@ -163,11 +163,11 @@ public:
     bool operator<=(const self& y) const {
         return !(y > *this);
     }
- 
-    Distance operator-(const self & y) const { 
+
+    Distance operator-(const self & y) const {
         return (current - y.current) / step; //TODO: check if like in original
     }
- 
+
 };
 // iseek:
 
@@ -206,7 +206,7 @@ namespace asl {
  */
 /*==============================================================================*/
 
-template <class hiterator, class viterator,class T, class Reference = T &, class Distance = asl::AC_OFFSET_TYPE> 
+template <class hiterator, class viterator,class T, class Reference = T &, class Distance = asl::AC_OFFSET_TYPE>
 class rect_iterator {
     typedef rect_iterator<hiterator, viterator, T, Reference, Distance> self;
     typedef T* ptr_T;
@@ -244,8 +244,8 @@ public:
     } viter;
 public:
     rect_iterator() {}
-    rect_iterator(const rect_iterator& x) 
-        :   current(x.current), 
+    rect_iterator(const rect_iterator& x)
+        :   current(x.current),
             begin_of_line(x.begin_of_line),
             end_of_line(x.end_of_line),
             hiter(x.hiter),
@@ -253,7 +253,7 @@ public:
     { }
 
     rect_iterator(hiterator hbegin, viterator vbegin, Distance h_size)
-        : current(hbegin), hiter(hbegin), viter(vbegin)  
+        : current(hbegin), hiter(hbegin), viter(vbegin)
         {
             //      assert(pointer(hbegin, ptr_T()) == pointer(vbegin, ptr_T()));
             // std::cerr <<"rect_iterator( hbegin = " << (void*)&(*hbegin) << ", vbegin = " << (void*)&(*vbegin) << ", h_size = " << h_size <<  std::endl;
@@ -266,12 +266,12 @@ public:
 
     /**
     This method constructs an iterator and initializes it with an arbitrary value;
-    it is typically use to implement the raster's end(..) method 
+    it is typically use to implement the raster's end(..) method
         (hbegin, vbegin) designate origin of rectangle
         (hsize) designates width of rectangle
         (cur) designates the initializiation value and must be within the rectangular bottomless
               area given by (hbegin...hbegin + hsize, vbegin)
-    
+
     Note that no heigth is needed as this is just an iterator; the heigth is determined
     by another iterator typically returned by an raster's end(..) method.
     */
@@ -308,7 +308,7 @@ public:
     }
 
     hiterator base() { return current; }
-    Reference operator*() const { 
+    Reference operator*() const {
                 // std::cerr << "mat_it deref @" << (void*)&(*current) << ", val = " << *current << std::endl;
         return *current;
     }
@@ -485,8 +485,8 @@ public:
     }
 };
 
-template <class hIterator, class vIterator,class T, class Reference, class Distance, class DestIterator> 
-inline rect_iterator<hIterator, vIterator, T, Reference, Distance> 
+template <class hIterator, class vIterator,class T, class Reference, class Distance, class DestIterator>
+inline rect_iterator<hIterator, vIterator, T, Reference, Distance>
 iseek(const rect_iterator<hIterator, vIterator, T, Reference, Distance>& a, const DestIterator& b) {
     return rect_iterator<hIterator, vIterator, T, Reference, Distance>(
           a.hiter.begin, a.viter.begin, a.hsize(), iseek(a.current, b));
@@ -494,18 +494,18 @@ iseek(const rect_iterator<hIterator, vIterator, T, Reference, Distance>& a, cons
 
 } // namespace asl
 
-template <class hIterator, class vIterator,class T, class Reference, class Distance > 
+template <class hIterator, class vIterator,class T, class Reference, class Distance >
 inline std::random_access_iterator_tag
 iterator_category(const asl::rect_iterator<hIterator, vIterator, T, Reference, Distance>&) {
   return std::random_access_iterator_tag();
 }
 
-template <class hIterator, class vIterator,class T, class Reference, class Distance > 
+template <class hIterator, class vIterator,class T, class Reference, class Distance >
 inline T* value_type(const asl::rect_iterator<hIterator, vIterator, T, Reference, Distance>&) {
   return (T*) 0;
 }
 
-template <class hIterator, class vIterator,class T, class Reference, class Distance > 
+template <class hIterator, class vIterator,class T, class Reference, class Distance >
 inline Distance* distance_type(const asl::rect_iterator<hIterator, vIterator, T, Reference, Distance>&) {
   return (Distance*) 0;
 }
@@ -520,7 +520,7 @@ namespace asl {
  */
 /*==============================================================================*/
 
-template <class RandomAccessIterator, class T, class Reference = T &, class Distance = asl::AC_OFFSET_TYPE> 
+template <class RandomAccessIterator, class T, class Reference = T &, class Distance = asl::AC_OFFSET_TYPE>
 class fraction_iterator {
     typedef fraction_iterator<RandomAccessIterator, T, Reference, Distance> self;
     //typedef frac<Distance> fraction;
@@ -557,28 +557,28 @@ public:
 
     // Virtual_steps should be >=RealSteps:
 
-    fraction_iterator(RandomAccessIterator x, Distance Real_steps, Distance Virtual_steps) 
+    fraction_iterator(RandomAccessIterator x, Distance Real_steps, Distance Virtual_steps)
         : current(x),
           stepsize((fraction)Real_steps/(fraction)Virtual_steps),
-          current_fraction(stepsize - floor(stepsize)) 
+          current_fraction(stepsize - floor(stepsize))
     {
-        
+
         //  std::cerr << " current = " << (void*)&(*current) << std::endl;
         //  std::cerr << " stepsize = " << stepsize << std::endl;
         //  std::cerr << " current_fraction = " << current_fraction << std::endl;
     }
-    fraction_iterator(RandomAccessIterator x, fraction Stepsize, fraction Current_fraction) 
+    fraction_iterator(RandomAccessIterator x, fraction Stepsize, fraction Current_fraction)
         : current(x) ,stepsize(Stepsize), current_fraction(Current_fraction) {
 
             //  std::cerr << " current = " << (void*)&(*current) << std::endl;
             //  std::cerr << " stepsize = " << stepsize << std::endl;
             //  std::cerr << " current_fraction = " << current_fraction << std::endl;
         }
-    fraction_iterator(RandomAccessIterator x, fraction Stepsize) 
+    fraction_iterator(RandomAccessIterator x, fraction Stepsize)
         //  : current(x) ,stepsize(Stepsize), current_fraction(1, 2) {
         : current(x),
           stepsize(Stepsize),
-          current_fraction(stepsize - floor(stepsize)) 
+          current_fraction(stepsize - floor(stepsize))
         {
             //  std::cerr << " current = " << (void*)&(*current) << std::endl;
             //  std::cerr << " stepsize = " << stepsize << std::endl;
@@ -604,7 +604,7 @@ public:
 #ifdef DEBUG_FRACTION_ITERATOR
         std::cerr << " n = " << n << std::endl;
 #endif
-        current_fraction -= fraction(n); 
+        current_fraction -= fraction(n);
 #ifdef DEBUG_FRACTION_ITERATOR
         std::cerr << " current_fraction -= n= " << current_fraction << std::endl;
 #endif
@@ -616,7 +616,7 @@ public:
     void decrement() {
         current_fraction-=stepsize;
         Distance n = floor(current_fraction);
-        current_fraction += fraction(n); 
+        current_fraction += fraction(n);
         current-=n;
     }
     void add(Distance f) {
@@ -627,7 +627,7 @@ public:
         //  std::cerr << " current_fraction += stepsize= " << current_fraction << std::endl;
         Distance n = (Distance)floor(current_fraction);
         //  std::cerr << " n = " << n << std::endl;
-        current_fraction -= fraction(n); 
+        current_fraction -= fraction(n);
         //  std::cerr << " current_fraction -= n= " << current_fraction << std::endl;
         current+=n;
         //  std::cerr << " current += n= " << (void*)&(*current) << std::endl;
@@ -635,7 +635,7 @@ public:
     void subtract(Distance f) {
         current_fraction-=stepsize*f;
         Distance n = Distance(floor(current_fraction));
-        current_fraction += fraction(n); 
+        current_fraction += fraction(n);
         current-=n;
     }
 
@@ -703,8 +703,8 @@ public:
     bool operator<=(const self& y) const {
         return !(y > *this);
     }
- 
-    Distance operator-(const self & y) const { 
+
+    Distance operator-(const self & y) const {
         // [DS, TS] the volatile keyword is required to prevent gcc from optimizing this stuff.
         // If anybody has a better solution or understanding what is going on here, please tell me.
         volatile fraction f(fraction(current - y.current));
@@ -715,8 +715,8 @@ public:
 };
 
 
-template <class RandomAccessIterator, class T, class Reference, class Distance, class DestIterator> 
-inline fraction_iterator<RandomAccessIterator, T, Reference, Distance> 
+template <class RandomAccessIterator, class T, class Reference, class Distance, class DestIterator>
+inline fraction_iterator<RandomAccessIterator, T, Reference, Distance>
 iseek(const fraction_iterator<RandomAccessIterator, T, Reference, Distance>& a, const DestIterator& b) {
     RandomAccessIterator ni = iseek(a.base(), b);
     return fraction_iterator<RandomAccessIterator, T, Reference, Distance>(ni, a.stepsize);
@@ -755,7 +755,7 @@ template <
     class T,
     class Reference = T&,
     class Distance = asl::AC_OFFSET_TYPE
-> 
+>
 class bresenham_iterator {
     typedef bresenham_iterator<RandomAccessIterator, T, Reference, Distance> self;
 protected:
@@ -785,7 +785,7 @@ public:
 
     bresenham_iterator(RandomAccessIterator it, Distance Stride, Distance H, Distance V)
         : current(it) {
-#if 0    
+#if 0
             std::cerr << "bresenham_iterator = " << (void*)(&(*it)) << std::endl;
             std::cerr << "Stride = " << Stride << std::endl;
             std::cerr << "dh = " << H << std::endl;

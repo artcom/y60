@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -54,7 +54,7 @@
 #warning asl::Logger debugging is enable
 #include "Dashboard.h"
 #else
-#define MAKE_SCOPE_TIMER(NAME) 
+#define MAKE_SCOPE_TIMER(NAME)
 #endif
 
 namespace asl {
@@ -121,7 +121,7 @@ createFormatter(const char * theFormatterNameVar, const char * theDefaultFormatt
 static Severity getSeverityFromString(const std::string & theSeverityString,
                                       Severity theDefaultValue)
 {
-    try {            
+    try {
         Severity mySeverity = (Severity) getEnumFromString(theSeverityString, SeverityName);
         return mySeverity;
     }
@@ -147,12 +147,12 @@ Logger::Logger() :
 {
     Ptr<LogMessageFormatter> myConsoleFormatter = createFormatter(LOG_CONSOLE_FORMAT_ENV, TerseLogMessageFormatter::name(), "console");
     Severity myConsoleSeverity = getSeverityFromEnv(LOG_CONSOLE_FILTER_ENV, SEV_TRACE);
-    if (myConsoleSeverity != SEV_DISABLED) {  
+    if (myConsoleSeverity != SEV_DISABLED) {
         addMessageSink(Ptr<MessageSink>(new StreamPrinter(std::cerr)), myConsoleFormatter, myConsoleSeverity);
     }
 
 #ifndef _SETTING_WITH_TRACE_LOG_
-     if (myConsoleSeverity == SEV_TRACE) {  
+     if (myConsoleSeverity == SEV_TRACE) {
             std::cerr << "### WARNING: Logger: TRACE requested, but traces were disabled at compile time in release build. Compile with -DWITH_TRACE_LOG to compile with tracing, use debug build or modify settings.h "<<std::endl;
     }
 #endif
@@ -161,13 +161,13 @@ Logger::Logger() :
 #ifdef _WIN32
     Ptr<LogMessageFormatter> myVisualStudioFormatter = createFormatter(LOG_VISUAL_STUDIO_FORMAT_ENV, VisualStudioLogMessageFormatter::name(), "console");
     Severity myVisualStudioSeverity = getSeverityFromEnv(LOG_VISUAL_STUDIO_FILTER_ENV, SEV_DISABLED);
-    if (myVisualStudioSeverity != SEV_DISABLED) {  
+    if (myVisualStudioSeverity != SEV_DISABLED) {
         addMessageSink(Ptr<MessageSink>(new OutputWindowPrinter), myVisualStudioFormatter, myVisualStudioSeverity);
     }
 #endif
     Ptr<LogMessageFormatter> myFileFormatter = createFormatter(LOG_FILE_FORMAT_ENV, FullLogMessageFormatter::name(), "console");
     Severity myFileSeverity = getSeverityFromEnv(LOG_FILE_FILTER_ENV, SEV_DISABLED);
-    if (myFileSeverity != SEV_DISABLED) { 
+    if (myFileSeverity != SEV_DISABLED) {
         char * myLogFileName = getenv(LOG_FILE_NAME_ENV);
         if (!myLogFileName) {
             myLogFileName = "asl_logfile.txt";
@@ -345,7 +345,7 @@ Logger::setModuleVerbosity(const std::string & theVerbosityString) {
     }
     setModuleVerbosity(mySeverity, myModule, myMinId, myMaxId);
 }
- 
+
 void
 Logger::addMessageSink(Ptr<MessageSink> theSink, Ptr<LogMessageFormatter> theFormatter, Severity theSeverityFilter) {
     _myMessageSinks.push_back(theSink);

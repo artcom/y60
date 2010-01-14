@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //    $RCSfile: testPackageManager.tst.cpp,v $
@@ -30,8 +30,8 @@
 #include <string>
 #include <iostream>
 
-using namespace std; 
-using namespace asl; 
+using namespace std;
+using namespace asl;
 
 class PackageManagerUnitTest : public UnitTest {
     public:
@@ -84,11 +84,11 @@ class PackageManagerUnitTest : public UnitTest {
                 DPRINT(myTestString);
                 ENSURE(myExpectedString == myTestString);
             }
-            {                
+            {
                 asl::Ptr<ReadableBlockHandle> myFile = myPackageManager.readFile("File One.txt","test.zip");
                 ENSURE( ! myFile);
             }
-            { 
+            {
                 myPackageManager.add(IPackagePtr(new ZipPackage("../../testfiles/test2.zip")));
                 IPackage::FileList myEntries;
 
@@ -97,32 +97,32 @@ class PackageManagerUnitTest : public UnitTest {
                     cerr << "entry " << myEntries[i] << endl;
                     cerr << "path " << myPackageManager.searchFile(myEntries[i]) << endl;
                 }
-                
+
                 //list all files in relative dir. testfiles/
-                myEntries = myPackageManager.findFiles("testfiles");                 
+                myEntries = myPackageManager.findFiles("testfiles");
                 for(IPackage::FileList::size_type i = 0;i < myEntries.size(); ++i) {
                     cerr << "listing '" << myEntries[i] << "'" << endl;
                 }
                 //list all files in package ../../testfiles
                 // *this is a different thing than the above*
-                myEntries = myPackageManager.findFiles("", "../../testfiles"); 
+                myEntries = myPackageManager.findFiles("", "../../testfiles");
                 ENSURE(myEntries.size() == 2);
                 for (unsigned i = 0;i < myEntries.size(); ++i) {
                     cerr << "listing '" << myEntries[i] << "'" << endl;
                 }
                 //list all files in package ../../testfiles/test.zip
-                myEntries = myPackageManager.findFiles("","../../testfiles/test.zip"); 
+                myEntries = myPackageManager.findFiles("","../../testfiles/test.zip");
                 for(IPackage::FileList::size_type i = 0;i < myEntries.size(); ++i) {
                     cerr << "listing '" << myEntries[i] << "'" << endl;
                 }
-                
+
                 myEntries = myPackageManager.findFiles("d"); //d is dir in test2.zip
                 ENSURE(myEntries.size() == 3);
 
                 myPackageManager.add("../../testfiles/testdir");
                 myEntries = myPackageManager.findFiles("subdir1", "../../testfiles/testdir");
                 ENSURE(myEntries.size() == 1);
-            }  
+            }
             ENSURE(!myPackageManager.searchFile("testfiles/test.zip").empty())
             ENSURE(myPackageManager.remove("../.."));
             ENSURE(myPackageManager.remove("../../testfiles"));

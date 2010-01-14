@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -62,7 +62,7 @@ class CoreAudioPump : public Singleton<CoreAudioPump>, public Pump
         friend class SingletonManager;
     public:
         virtual ~CoreAudioPump();
-        
+
         virtual Time getCurrentTime();
 
     private:
@@ -71,18 +71,18 @@ class CoreAudioPump : public Singleton<CoreAudioPump>, public Pump
         OSStatus matchAUFormats (AudioStreamBasicDescription *theDesc);
         OSStatus setupCallbacks();
         void cleanUp();
-        static OSStatus fileRenderProc(void *inRefCon, 
+        static OSStatus fileRenderProc(void *inRefCon,
                              AudioUnitRenderActionFlags *inActionFlags,
-                             const AudioTimeStamp *inTimeStamp, 
+                             const AudioTimeStamp *inTimeStamp,
                              UInt32 inBusNumber,
-                             UInt32 inNumFrames, 
+                             UInt32 inNumFrames,
                              AudioBufferList *ioData);
         OSStatus pump(AudioUnitRenderActionFlags *inActionFlags,
-                    const AudioTimeStamp *inTimeStamp, 
+                    const AudioTimeStamp *inTimeStamp,
                     UInt32 inBusNumber,
-                    UInt32 inNumFrames, 
+                    UInt32 inNumFrames,
                     AudioBufferList *ioData);
-        
+
         unsigned _curFrame;
         AudioBuffer<float> _myOutputBuffer;
         AudioUnit _myOutputUnit;
@@ -93,5 +93,5 @@ class CoreAudioPump : public Singleton<CoreAudioPump>, public Pump
 
 }
 
-#endif 
+#endif
 

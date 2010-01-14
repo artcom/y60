@@ -4,13 +4,13 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -33,7 +33,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -59,9 +59,9 @@ namespace asl {
 
 class ASL_MATH_DECL FixedVectorStreamFormatter {
     public:
-        FixedVectorStreamFormatter(const char theStartToken, 
-                                   const char theEndToken, 
-                                   const char theDelimiter, 
+        FixedVectorStreamFormatter(const char theStartToken,
+                                   const char theEndToken,
+                                   const char theDelimiter,
                                    bool theOneElementPerLineFlag);
         FixedVectorStreamFormatter( const FixedVectorStreamFormatter & otherFormatter);
 
@@ -75,7 +75,7 @@ class ASL_MATH_DECL FixedVectorStreamFormatter {
         static const int ourOneElementPerLineFlagIndex;
 
 
-        
+
     private:
         FixedVectorStreamFormatter();
         FixedVectorStreamFormatter & operator=(const FixedVectorStreamFormatter & otherFormatter);
@@ -83,13 +83,13 @@ class ASL_MATH_DECL FixedVectorStreamFormatter {
         const char _myStartToken;
         const char _myEndToken;
         const char _myDelimiter;
-        bool       _myOneElementPerLineFlag; 
+        bool       _myOneElementPerLineFlag;
 };
 
 ASL_MATH_DECL FixedVectorStreamFormatter
-formatFixedVector(const char theStartToken, 
-                  const char theEndToken, 
-                  const char theDelimiter, 
+formatFixedVector(const char theStartToken,
+                  const char theEndToken,
+                  const char theDelimiter,
                   bool theOneElementPerLineFlag);
 
 ASL_MATH_DECL std::ostream &

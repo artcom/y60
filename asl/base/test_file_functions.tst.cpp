@@ -4,9 +4,9 @@
 //
 // This file is part of the ART+COM Standard Library (asl).
 //
-// It is distributed under the Boost Software License, Version 1.0. 
+// It is distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)             
+//  http://www.boost.org/LICENSE_1_0.txt)
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
@@ -105,9 +105,9 @@ class file_functions_UnitTest : public UnitTest {
 
 #ifndef AC_BUILT_WITH_CMAKE
             // XXX: fix these up to work with the cmake build
-            ENSURE(searchFile(getFilenamePart(__FILE__), "/;.;../..") == std::string("../../") + getFilenamePart(__FILE__));            
-            ENSURE(searchFile(getFilenamePart(__FILE__), "") == "");            
-            ENSURE(searchFile(getFilenamePart(__FILE__), "../..") == std::string("../../") + getFilenamePart(__FILE__));            
+            ENSURE(searchFile(getFilenamePart(__FILE__), "/;.;../..") == std::string("../../") + getFilenamePart(__FILE__));
+            ENSURE(searchFile(getFilenamePart(__FILE__), "") == "");
+            ENSURE(searchFile(getFilenamePart(__FILE__), "../..") == std::string("../../") + getFilenamePart(__FILE__));
 #ifdef LINUX
             ENSURE(searchFile(getFilenamePart(__FILE__), "/:.:../..") == std::string("../../") + getFilenamePart(__FILE__));
 #endif
@@ -144,14 +144,14 @@ class file_functions_UnitTest : public UnitTest {
             for (int i = 0; i< contentSize; ++i) {
                 largeTestContent[i] = ' ' + i%63;
             }
-            perform_putget(testFileName, largeTestContent); 
+            perform_putget(testFileName, largeTestContent);
             perform_putget_binary(testFileName,contentSize);
         }
         void perform_putget(const string & testFileName, const string & testContent) {
             ENSURE(writeFile(testFileName,testContent));
             string fromFile;
             ENSURE(readFile(testFileName,fromFile));
-            ENSURE(fromFile == testContent);   
+            ENSURE(fromFile == testContent);
             ENSURE(readFile(testFileName) == testContent);
             ENSURE(fileExists(testFileName));
             ENSURE( static_cast<unsigned long>(getFileSize(testFileName)) == testContent.size() );
@@ -163,13 +163,13 @@ class file_functions_UnitTest : public UnitTest {
             for (int i = 0; i< contentSize; ++i) {
                 largeTestContent[i] = ' ' + i%255;
             }
-            perform_putget(testFileName, largeTestContent); 
+            perform_putget(testFileName, largeTestContent);
         }
         void perform_putget(const string & testFileName, const asl::ResizeableBlock & testContent) {
             ENSURE(writeFile(testFileName,testContent));
             asl::Block fromFile;
             ENSURE(readFile(testFileName,fromFile));
-            ENSURE(fromFile == testContent);   
+            ENSURE(fromFile == testContent);
             //ENSURE(readFile(testFileName) == testContent);
             ENSURE(fileExists(testFileName));
             ENSURE( static_cast<unsigned long>(getFileSize(testFileName)) == testContent.size() );
@@ -298,7 +298,7 @@ class DirectoryTest : public UnitTest {
                 string("../../")
 #endif
 	        + "dates.tst";
-	    
+
             writeFile(myFile, "foo");
 
             time_t myZeroTime = 0;
@@ -307,8 +307,8 @@ class DirectoryTest : public UnitTest {
                 myTimeStruct.tm_year = 100;
                 myTimeStruct.tm_mon = 1;
 
-                time_t myTime = mktime(&myTimeStruct);  
-                setLastModified(myFile, myTime); 
+                time_t myTime = mktime(&myTimeStruct);
+                setLastModified(myFile, myTime);
 
                 DPRINT(myTime);
                 ENSURE_EQUAL(myTime, getLastModified(myFile));
@@ -317,8 +317,8 @@ class DirectoryTest : public UnitTest {
                 myTimeStruct.tm_year = 100;
                 myTimeStruct.tm_mon = 7;
 
-                time_t myTime = mktime(&myTimeStruct);  
-                setLastModified(myFile, myTime); 
+                time_t myTime = mktime(&myTimeStruct);
+                setLastModified(myFile, myTime);
 
                 DPRINT(myTime);
                 ENSURE_EQUAL(myTime, getLastModified(myFile));
