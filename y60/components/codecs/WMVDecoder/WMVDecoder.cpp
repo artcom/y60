@@ -138,9 +138,9 @@ namespace y60 {
         _myFirstFrameDelivered(false),
         _myLastVideoTimeStamp(0.0),
         _myLastAudioTimeStamp(0.0),
-        _myAudioVideoDelay(0.0),
         _myResampleContext(0),
-        _myReadEOF(false)
+        _myReadEOF(false),
+        _hasShutDown(false)
     { 
         AC_DEBUG << "WMVDecoder::WMVDecoder " << (void*)this;
         CoInitialize(0);
@@ -151,31 +151,37 @@ namespace y60 {
         }
     }
 
+    void WMVDecoder::shutdown() {
+        if (!_hasShutDown) {
+            DB(AC_DEBUG << "WMVDecoder::shutdown()");
+            closeMovie();
+            releaseBuffers();
+
+            if (_myEvent) {
+                CloseHandle(_myEvent);
+                _myEvent = 0;
+            }
+
+            if (_myReader) {
+                _myReader->Release();
+                _myReader = NULL;
+            }
+
+            if (_myResampleContext) {
+                audio_resample_close(_myResampleContext);
+                _myResampleContext = 0;
+            }
+
+            if (_myReferenceCount != 0) {
+                AC_WARNING << "Still have " << _myReferenceCount << " references to WMVDecoder";
+            }
+            CoUninitialize();
+        }
+        _hasShutDown = true;
+    }
     WMVDecoder::~WMVDecoder() {
         AC_DEBUG << "WMVDecoder::~WMVDecoder " << (void*)this;
-
-        closeMovie();
-        releaseBuffers();
-
-        if (_myEvent) {
-            CloseHandle(_myEvent);
-            _myEvent = 0;
-        }
-
-        if (_myReader) {
-            _myReader->Release();
-            _myReader = NULL;
-        }
-
-        if (_myResampleContext) {
-            audio_resample_close(_myResampleContext);
-            _myResampleContext = 0;
-        }
-
-        if (_myReferenceCount != 0) {
-            AC_WARNING << "Still have " << _myReferenceCount << " references to WMVDecoder";
-        }
-        CoUninitialize();
+        shutdown();
     }
 
     asl::Ptr<MovieDecoderBase> WMVDecoder::instance() const {
@@ -209,11 +215,6 @@ namespace y60 {
             _myFrameCache.pop_back();
         }
 #endif
-    }
-
-    double
-    WMVDecoder::getAudioVideoDelay() const {
-        return _myAudioVideoDelay;
     }
 
     void
@@ -255,11 +256,10 @@ namespace y60 {
         setupVideoAndAudio(theUrl);
         AC_DEBUG << "+++ Open succeeded url=" << theUrl;
     }
-double ourLastVideoTimeStamp = 0.0;
-double ourLastAudioTimeStamp = 0.0;
+
     double
-    WMVDecoder::readFrame(double theTime, unsigned theFrame, RasterVector theTargetRaster) {
-        //AC_PRINT << "WMVDecoder::readFrame: " << theTime;
+    WMVDecoder::readFrame(double theTime, unsigned /*theFrame*/, RasterVector theTargetRaster) {
+        AC_DEBUG << "WMVDecoder::readFrame: " << theTime;
         // EOF and framecache empty?
         if (_myReadEOF && _myFrameCache.size() <= 1) {
             AC_DEBUG << "EoF and FrameCache empty";
@@ -295,13 +295,10 @@ double ourLastAudioTimeStamp = 0.0;
         }
 
         if (theTime > _myLastVideoTimeStamp) {
-            //AC_PRINT << "WMVDecoder::readFrame FrameCache underrun, time=" << theTime << " last in cache " << _myLastVideoTimeStamp;
+            AC_TRACE << "WMVDecoder::readFrame FrameCache underrun, time=" << theTime << " last in cache " << _myLastVideoTimeStamp;
             theTime = _myLastVideoTimeStamp;
         }
 
-        /*if (_myAudioSink) {
-            AC_PRINT << "************* audio time = " << _myAudioSink->getCurrentTime();
-        }*/
         // Find 'closest' frame in VideoFrameCache
         double myMinTimeDiff = 1000000.0;
         VideoFramePtr myBestFrame;
@@ -312,12 +309,12 @@ double ourLastAudioTimeStamp = 0.0;
             VideoFramePtr myVideoFrame(*it);
             //double myTimeDiff = fabs(theTime - myVideoFrame->getTimestamp());
             double myTimeDiff = theTime - myVideoFrame->getTimestamp();
-            //AC_PRINT << "timediff : " << myTimeDiff;
+            AC_TRACE << "timediff : " << myTimeDiff;
             if (myTimeDiff >= 0.0 && myTimeDiff < myMinTimeDiff) {
                 myMinTimeDiff = myTimeDiff;
                 myBestFrame = myVideoFrame;
                 myFoundCachePosition = myCachePosition;
-                //AC_PRINT << "WMVDecoder::readFrame Found frame=" << myVideoFrame->getTimestamp() << " for time=" << theTime << "(frame: " << theFrame << ")";
+                AC_TRACE << "WMVDecoder::readFrame Found frame=" << myVideoFrame->getTimestamp() << " for time=" << theTime;
             }
             ++myCachePosition;
         }
@@ -327,18 +324,6 @@ double ourLastAudioTimeStamp = 0.0;
             return theTime;
         }
 
-        /*if (myMinTimeDiff > 0.03) {
-            AC_PRINT << "frame-to-sample Tdiff=" << myMinTimeDiff;
-        }*/
-        //AC_PRINT << "bestFrameTimestamp=" << myBestFrame->getTimestamp() << ", wanted timestamp=" << theTime << ", frame-to-sample Tdiff=" << myMinTimeDiff<< ", videotime diff to last=" << (myBestFrame->getTimestamp() - ourLastVideoTimeStamp) << ", audiotime diff to last: " << (theTime- ourLastAudioTimeStamp);
-#if 0
-        //AC_TRACE << "bestFrameTimestamp=" << myBestFrame->getTimestamp() << " at cache pos=" << myFoundCachePosition;
-        //AC_TRACE << "frame-to-sample Tdiff=" << myMinTimeDiff;
-        double myChoosenTimediff = fabs(theTime - myBestFrame->getTimestamp());
-        if (myChoosenTimediff > 0.08) {
-            //AC_TRACE << "difftime : " << myChoosenTimediff << ", theTime: " << theTime << ", choosen frame Timestamp: " << myBestFrame->getTimestamp();
-        }
-#endif
 
         // drop all frames older than the one we just found
         for (;;) {
@@ -351,9 +336,6 @@ double ourLastAudioTimeStamp = 0.0;
 
         BYTE * myBuffer;
         DWORD myBufferLength;
-        //AC_PRINT << "bestFrameTimestamp=" << myBestFrame->getTimestamp() << " diff to last=" << (myBestFrame->getTimestamp() - ourLastVideoTimeStamp);
-        ourLastVideoTimeStamp = myBestFrame->getTimestamp();
-        ourLastAudioTimeStamp = theTime;
         HRESULT hr = myBestFrame->getBuffer()->GetBufferAndLength(&myBuffer, &myBufferLength);
         if (checkForError(hr, "GetBufferAndLength failed", PLUS_FILE_LINE)) {
 
@@ -376,20 +358,19 @@ double ourLastAudioTimeStamp = 0.0;
 
     void
     WMVDecoder::resumeMovie(double theStartTime, bool theResumeAudioFlag) {
-        AC_INFO << "WMVDecoder::resumeMovie " << (void*)this << " time=" << theStartTime;
+        AC_DEBUG << "WMVDecoder::resumeMovie " << (void*)this << " time=" << theStartTime;
         if (_myReader) {
             resetEvent();
             asl::AutoLocker<ThreadLock> myLocker(_myLock);
             HRESULT hr = _myReader->Resume();
             checkForError(hr, "Could not resume WMVDecoder", PLUS_FILE_LINE);
         }
-        AC_PRINT << "WMVDecoder::resumeMovie caching: " <<  _myCachingFlag;
         AsyncDecoder::resumeMovie(theStartTime, !_myCachingFlag);
     }
 
     void
     WMVDecoder::startMovie(double theStartTime, bool theStartAudioFlag) {
-        //AC_PRINT << "WMVDecoder::startMovie()";        
+        AC_DEBUG << "WMVDecoder::startMovie()";        
         if (_myReader) {
             resetEvent();
             _myCurrentPlaySpeed = getMovie()->get<PlaySpeedTag>();
@@ -413,8 +394,7 @@ double ourLastAudioTimeStamp = 0.0;
 
     void
     WMVDecoder::stopMovie(bool theStopAudioFlag) {
-        //AC_PRINT << "WMVDecoder::stopMovie()";
-        AC_INFO << "WMVDecoder::stopMovie";
+        AC_DEBUG << "WMVDecoder::stopMovie()";
         if (_myReader) {
             resetEvent();
             HRESULT hr = _myReader->Stop();
@@ -432,9 +412,8 @@ double ourLastAudioTimeStamp = 0.0;
 
     void
     WMVDecoder::pauseMovie(bool thePauseAudioFlag) {
-        //AC_PRINT << "WMVDecoder::pauseMovie()";
+        AC_DEBUG << "WMVDecoder::pauseMovie()";
         asl::AutoLocker<ThreadLock> myLocker(_myLock);
-        AC_INFO << "WMVDecoder::pauseMovie";
         if (_myReader) {
             resetEvent();
             HRESULT hr = _myReader->Pause();
@@ -445,7 +424,7 @@ double ourLastAudioTimeStamp = 0.0;
 
     void
     WMVDecoder::closeMovie() {
-        AC_INFO << "WMVDecoder::closeMovie";
+        AC_DEBUG << "WMVDecoder::closeMovie";
         if (_myReader) {
             /*HRESULT hr =*/ _myReader->Close();
             //checkForError(hr, "Could not close Reader.", PLUS_FILE_LINE);
@@ -606,7 +585,11 @@ double ourLastAudioTimeStamp = 0.0;
                 _myVideoOutputId = i;
             } else if (myMajorType == WMMEDIATYPE_Audio) {
                 AC_DEBUG << "Output " << i << " is an audio stream";
-                _myAudioOutputId = i;
+                if (getAudioFlag()) {
+                    _myAudioOutputId = i;
+                } else {
+                    AC_DEBUG<<"video has audio but it's disabled";
+                }
             } else if (myMajorType == WMMEDIATYPE_Script) {
                 AC_DEBUG << "Output " << i << " is an script stream";
             } else if (myMajorType == WMMEDIATYPE_FileTransfer) {
@@ -710,7 +693,7 @@ double ourLastAudioTimeStamp = 0.0;
             AC_INFO << "WMVDecoder::setupAudio() done. resampling " 
                     << (_myResampleContext != 0);
 
-        } else {
+        } else if (getAudioFlag()){
             AC_INFO << "Movie '" << theUrl << "' does not contain audio.";
         }
 
@@ -779,10 +762,12 @@ double ourLastAudioTimeStamp = 0.0;
             double myStartTime = (_myFrameCacheSize/2) / _myFrameRate;
             if (_myCachingFlag &&
                 ((_myFrameCache.size() >= _myFrameCacheSize/2) || (_myLastAudioTimeStamp >= myStartTime))) {
-                AC_PRINT << "Starting A/V playback, FrameCache size=" << _myFrameCache.size() << " max cache size=" << _myFrameCacheSize;
-                AC_PRINT << "                       LastAudioTimeStamp=" << _myLastAudioTimeStamp << " StartTime=" << myStartTime;
+                AC_DEBUG << "Starting A/V playback, FrameCache size=" << _myFrameCache.size() << " max cache size=" << _myFrameCacheSize;
+                AC_DEBUG << "                       LastAudioTimeStamp=" << _myLastAudioTimeStamp << " StartTime=" << myStartTime;
                 _myCachingFlag = false;
-                _myAudioSink->play();
+                if (_myAudioSink) {
+                    _myAudioSink->play();
+                }
             }
 
             // Signal, new buffer is ready

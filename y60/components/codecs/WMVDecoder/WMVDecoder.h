@@ -158,7 +158,6 @@ namespace y60 {
         //
         // Methods of MovieDecoderBase
         //
-        double getAudioVideoDelay() const;
         std::string canDecode(const std::string & theUrl, asl::Ptr<asl::ReadableStreamHandle> theStream = asl::Ptr<asl::ReadableStreamHandle>());
 
         void load(const std::string & theUrl);
@@ -215,6 +214,7 @@ namespace y60 {
          * Empties the sample queue. Call this to empty the internal cache
          */
         void releaseBuffers();
+        void shutdown();
         HRESULT setupMultiChannel();
 
         //asl::ThreadLock _myLock;
@@ -235,7 +235,6 @@ namespace y60 {
         bool          _myFirstFrameDelivered;
         double        _myLastVideoTimeStamp;
         double        _myLastAudioTimeStamp;
-        double        _myAudioVideoDelay;
         
         ReSampleContext *   _myResampleContext;
         unsigned      _myAudioNumberOfChannels;
@@ -243,6 +242,7 @@ namespace y60 {
         static asl::Block     _mySamples;
         static asl::Block     _myResampledSamples;
         bool _myReadEOF;
+        bool _hasShutDown;
         asl::ThreadLock _myLock;
     };
     typedef asl::Ptr<WMVDecoder> WMVDecoderPtr;
