@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -184,7 +184,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
     }
 
     self.BaseViewer.onFrame = self.onFrame;
-    self.onFrame = function(theTime) {        
+    self.onFrame = function(theTime) {
         self.BaseViewer.onFrame(theTime);
         _myCurrentTime = theTime;
         if (_myShutter) {
@@ -217,8 +217,8 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         if (_myPerfMeter) {
             _myPerfMeter.onFrame(theTime);
         }
-         
-    } 
+
+    }
 
     self.onPreRender = function() {
     }
@@ -242,7 +242,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
             showStatistics();
         }
     }
-    
+
     self.onKey = function(theKey, theKeyState, theX, theY, theShiftFlag, theCtrlFlag, theAltFlag) {
         var myMover = self.getMover(self.getActiveViewport());
     	if (myMover) {
@@ -560,14 +560,14 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
             myScene.setup();
         }
         var myCanvas = myScene.dom.find("/scene/canvases/canvas");
-        
+
         self.setScene(myScene, myCanvas, theSwitchNodeFlag);
         renderer = window.getRenderer();
 
-        
+
         // Turn on sync to V-Blank
         window.swapInterval = 1;
-        
+
         window.decorations = true;
 
         // standard movers
@@ -598,7 +598,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
                 //Logger.error( "Couldn't find settings file " + SETTINGS_FILE_NAMES[i] );
             }
         }
-        
+
         // look for host dependent settings file
         var myHostSettingsFile = "";
         var myHostFiles = ["settings-" + hostname() + ".xml",

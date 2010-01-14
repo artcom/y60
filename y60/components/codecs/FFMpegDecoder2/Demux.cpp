@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -84,7 +84,7 @@ AVPacket * Demux::getPacket(const int theStreamIndex)
 {
     AC_TRACE << "Demux::getPacket";
     if (_myPacketLists.find(theStreamIndex) == _myPacketLists.end()) {
-        AC_ERROR << "Demux::getPacket called with nonexistent stream index " 
+        AC_ERROR << "Demux::getPacket called with nonexistent stream index "
             << theStreamIndex << ".";
     }
     PacketList & myCurPacketList = _myPacketLists.find(theStreamIndex)->second;
@@ -101,7 +101,7 @@ AVPacket * Demux::getPacket(const int theStreamIndex)
             AC_TRACE << "Demux::getPacket: read.";
             myPacket = new AVPacket;
             memset(myPacket, 0, sizeof(AVPacket));
-            
+
             myEndOfFileFlag = (av_read_frame(_myFormatContext, myPacket) < 0);
             if (myEndOfFileFlag) {
                 AC_DEBUG << "Demux::getPacket: end of file.";
@@ -113,10 +113,10 @@ AVPacket * Demux::getPacket(const int theStreamIndex)
             if (myPacket->stream_index != theStreamIndex) {
                 if (_myPacketLists.find(myPacket->stream_index) != _myPacketLists.end()) {
                     AC_TRACE << "Demux::getPacket: caching packet.";
-                    // Without av_dup_packet, ffmpeg reuses myPacket->data at first 
+                    // Without av_dup_packet, ffmpeg reuses myPacket->data at first
                     // opportunity and trashes our memory.
                     av_dup_packet(myPacket);
-                    PacketList& myOtherPacketList = 
+                    PacketList& myOtherPacketList =
                             _myPacketLists.find(myPacket->stream_index)->second;
                     myOtherPacketList.push_back(myPacket);
                 } else {
@@ -128,7 +128,7 @@ AVPacket * Demux::getPacket(const int theStreamIndex)
             }
         } while (!myPacket || myPacket->stream_index != theStreamIndex);
         AC_TRACE << "Demux::getPacket: end.";
-        return myPacket; 
+        return myPacket;
     }
 }
 void Demux::clearPacketCache()
@@ -148,7 +148,7 @@ void Demux::clearPacketCache()
 void Demux::clearPacketCache(const int theStreamIndex)
 {
     if (_myPacketLists.find(theStreamIndex) == _myPacketLists.end()) {
-        AC_ERROR << "Demux::clearPacketCache called with nonexistent stream index " 
+        AC_ERROR << "Demux::clearPacketCache called with nonexistent stream index "
             << theStreamIndex << ".";
     }
     PacketList * myCurPacketList = &(_myPacketLists.find(theStreamIndex)->second);

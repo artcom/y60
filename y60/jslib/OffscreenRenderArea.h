@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -69,12 +69,12 @@
 
 /**
  * @ingroup Y60jslib
- */ 
+ */
 namespace jslib {
 
     class y60::Texture;
     typedef asl::Ptr<y60::Texture, dom::ThreadingModel> TexturePtr;
-    
+
     class OffscreenRenderArea : public y60::OffscreenBuffer, public AbstractRenderWindow {
         public:
             static asl::Ptr<OffscreenRenderArea> create();
@@ -82,21 +82,21 @@ namespace jslib {
             /**
              * Allows Offscreen rendering into a texture.
              * Renders by default into the backbuffer
-             * Renders into an offscreen framebuffer using the 
-             * EXT_framebuffer_object GL extension if 
+             * Renders into an offscreen framebuffer using the
+             * EXT_framebuffer_object GL extension if
              * my rendercaps include y60::FRAMEBUFFER_SUPPORT
              */
             OffscreenRenderArea();
             virtual ~OffscreenRenderArea();
 
             /**
-             * renders my current scene onto the texture 
-             * given by the target attribute of my canvas. 
-             * @param theCopyToImageFlag if true 
+             * renders my current scene onto the texture
+             * given by the target attribute of my canvas.
+             * @param theCopyToImageFlag if true
              * the underlying raster value is ignored
              * else the texture is copied into the raster.
              */
-            void renderToCanvas(bool theCopyToImageFlag = false, unsigned theCubemapFace = 0, bool theClearColorBufferFlag = true, bool theClearDepthBufferFlag = true); 
+            void renderToCanvas(bool theCopyToImageFlag = false, unsigned theCubemapFace = 0, bool theClearColorBufferFlag = true, bool theClearDepthBufferFlag = true);
 
             /**
              * sets my canvas (calling base function)
@@ -140,7 +140,7 @@ namespace jslib {
             //TODO make some stuff from AbstractRenderWindow private
 
             // activates the offscreen buffer as render target
-            void activate(unsigned theCubemapFace = 0); 
+            void activate(unsigned theCubemapFace = 0);
             void deactivate(bool theCopyToImageFlag = false);
 
         protected:

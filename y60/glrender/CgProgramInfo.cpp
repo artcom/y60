@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -115,7 +115,7 @@ namespace y60 {
     }
     std::ostream & operator<<(std::ostream & os, const std::vector<string> & t) {
         return asl::operator<<(os,t);
-    }   
+    }
     std::ostream & operator<<(std::ostream & os, const std::vector<const char*> & t) {
         os << "[array size ="<<t.size()<<"]"<<endl;
         for (unsigned i = 0; i < t.size(); ++i) {
@@ -127,7 +127,7 @@ namespace y60 {
         }
         return os;
     }
-    
+
     void
     assertCg(const std::string & theWhere, const CGcontext theCgContext) {
         CGerror myCgError = cgGetError();
@@ -142,7 +142,7 @@ namespace y60 {
 #ifdef DEBUG_VARIANT
 #define ASSERTCG(where, what) assertCg(where, what)
 #else
-#define ASSERTCG(where, what) 
+#define ASSERTCG(where, what)
 #endif
 
     CgProgramInfo::CgProgramInfo(const ShaderDescription & myShader,
@@ -166,7 +166,7 @@ namespace y60 {
         _myUnsizedArrayAutoParamSizes[SPOT_LIGHTS_EXPONENT] = 0;
         _myUnsizedArrayAutoParamSizes[SPOT_LIGHTS_DIRECTION] = 0;
         _myUnsizedArrayAutoParamSizes[SPOT_LIGHTS_ATTENUATION] = 0;
-        
+
         _myUnsizedArrayAutoParamSizes[TEXTURE_MATRICES] = 0; // bug in Cg prevents unsized arrays of type float4x4 of size 0 to compile
 
         //VS: 100 punkte
@@ -189,7 +189,7 @@ namespace y60 {
     // This should go away when the cg bug will be fixed that prevents vertex shaders to accept
     // unsized arrays of size 0; theArgs pointer will also become invalid after destruction of theArgsStrings, so take care
     void CgProgramInfo::appendUnsizedArrayBugWorkaroundCompilerArgs(std::vector<std::string> & theArgStrings, std::vector<const char*> & theArgs) const {
-        for (std::map<int,int>::const_iterator it = _myUnsizedArrayAutoParamSizes.begin(); 
+        for (std::map<int,int>::const_iterator it = _myUnsizedArrayAutoParamSizes.begin();
              it !=_myUnsizedArrayAutoParamSizes.end(); ++it)
         {
             const std::string myParamName = asl::getStringFromEnum(it->first, CgAutoParameterString);
@@ -202,7 +202,7 @@ namespace y60 {
             theArgs.push_back(theArgStrings[i].c_str());
         }
     }
-                                                   
+
     void CgProgramInfo::createAndCompileProgram() {
         AC_DEBUG << "createAndCompileProgram '" << _myPathName.c_str() <<"', profile = " << ShaderProfileStrings[_myShader._myProfile];
         DBP2(MAKE_GL_SCOPE_TIMER(CgProgramInfo_createAndCompileProgram));
@@ -217,7 +217,7 @@ namespace y60 {
                 AC_DEBUG << "Using arg '" << _myShader._myCompilerArgs[i].c_str() << "'" << endl;
                 _myCachedCompilerArgs.push_back(_myShader._myCompilerArgs[i].c_str());
             }
-            
+
             //_myCachedCompilerArgs.push_back(0);
 
             AC_DEBUG << "cgCreateProgramFromFile profile = " << ShaderProfileStrings[_myShader._myProfile] << ", entry= "<<_myShader._myEntryFunction;
@@ -252,7 +252,7 @@ namespace y60 {
              _chdir( _myCWD.c_str());
 #else
              chdir( _myCWD.c_str());
-#endif             
+#endif
             std::vector<string> myArgStrings;
             std::vector<const char *> myArgs = _myCachedCompilerArgs;
             appendUnsizedArrayBugWorkaroundCompilerArgs(myArgStrings, myArgs);
@@ -265,9 +265,9 @@ namespace y60 {
                                              asl::begin_ptr(myArgs));
             AC_TRACE << "cgCreateProgram created program id = "<<_myCgProgramID;
 #ifdef _WIN32
-            _chdir( myCWD.c_str());                                     
+            _chdir( myCWD.c_str());
 #else
-            chdir( myCWD.c_str());                                     
+            chdir( myCWD.c_str());
 #endif
             assertCg(PLUS_FILE_LINE, _myContext);
         }
@@ -298,7 +298,7 @@ namespace y60 {
         _myAutoParams.clear();
         _myTextureParams.clear();
         _myMiscParams.clear();
-        
+
         for (CGparameter myParam = cgGetFirstParameter(_myCgProgramID, CG_PROGRAM);
              myParam != 0;  myParam = cgGetNextParameter(myParam))
         {
@@ -436,7 +436,7 @@ namespace y60 {
         unsigned myPositionalLightCount = 0;
         unsigned myDirectionalLightCount = 0;
         unsigned mySpotLightCount = 0;
-        
+
         if (_myUsesLights) {
             DBP2(START_TIMER(CgProgramInfo_reloadIfRequired_count_lights));
             //look at the number of lights to see if reload is req.
@@ -464,8 +464,8 @@ namespace y60 {
                 }
             }
             DBP2(STOP_TIMER(CgProgramInfo_reloadIfRequired_count_lights));
-    
-            
+
+
             DBP2(START_TIMER(CgProgramInfo_reloadIfRequired_pos_lights));
             if (myReload == false /* && _myAutoParams.find(POSITIONAL_LIGHTS) != _myAutoParams.end()*/) {
                 unsigned myLastCount = _myUnsizedArrayAutoParamSizes[POSITIONAL_LIGHTS];
@@ -477,7 +477,7 @@ namespace y60 {
                 }
             }
             DBP2(STOP_TIMER(CgProgramInfo_reloadIfRequired_pos_lights));
-    
+
             DBP2(START_TIMER(CgProgramInfo_reloadIfRequired_dir_lights));
             if (myReload == false  /* && _myAutoParams.find(DIRECTIONAL_LIGHTS) != _myAutoParams.end()*/) {
                 unsigned myLastCount = _myUnsizedArrayAutoParamSizes[DIRECTIONAL_LIGHTS];
@@ -489,7 +489,7 @@ namespace y60 {
                 }
             }
             DBP2(STOP_TIMER(CgProgramInfo_reloadIfRequired_dir_lights));
-            
+
             DBP2(START_TIMER(CgProgramInfo_reloadIfRequired_spot_lights));
             if (myReload == false /* && _myAutoParams.find(SPOT_LIGHTS) != _myAutoParams.end()*/) {
                 unsigned myLastCount = _myUnsizedArrayAutoParamSizes[SPOT_LIGHTS];
@@ -502,7 +502,7 @@ namespace y60 {
             }
             DBP2(STOP_TIMER(CgProgramInfo_reloadIfRequired_spot_lights));
         }
-        
+
         if (myReload == false /* && _myAutoParams.find(TEXTURE_MATRICES) != _myAutoParams.end() */) {
             unsigned myLastCount = _myUnsizedArrayAutoParamSizes[TEXTURE_MATRICES];
             if (myLastCount != theMaterial.getTextureUnitCount()) {
@@ -510,22 +510,22 @@ namespace y60 {
                 myReload = true;
             }
         }
-                
+
         if (myReload) {
             //change unsized array sizes here
             AC_DEBUG << "Cg program reload required";
-            
+
             DBP2(MAKE_GL_SCOPE_TIMER(CgProgramInfo_reloadIfRequired_reload));
             AC_DEBUG << "#of positional lights:" << myPositionalLightCount;
             _myUnsizedArrayAutoParamSizes[POSITIONAL_LIGHTS] = myPositionalLightCount;
             _myUnsizedArrayAutoParamSizes[POSITIONAL_LIGHTS_DIFFUSE_COLOR] = myPositionalLightCount;
             _myUnsizedArrayAutoParamSizes[POSITIONAL_LIGHTS_SPECULAR_COLOR] = myPositionalLightCount;
-            
+
             AC_DEBUG << "#of directional lights:" << myDirectionalLightCount;
             _myUnsizedArrayAutoParamSizes[DIRECTIONAL_LIGHTS] = myDirectionalLightCount;
             _myUnsizedArrayAutoParamSizes[DIRECTIONAL_LIGHTS_DIFFUSE_COLOR] = myDirectionalLightCount;
             _myUnsizedArrayAutoParamSizes[DIRECTIONAL_LIGHTS_SPECULAR_COLOR] = myDirectionalLightCount;
-            
+
             AC_DEBUG << "#of spot lights:" << mySpotLightCount;
             _myUnsizedArrayAutoParamSizes[SPOT_LIGHTS] = mySpotLightCount;
             _myUnsizedArrayAutoParamSizes[SPOT_LIGHTS_DIFFUSE_COLOR] = mySpotLightCount;
@@ -534,7 +534,7 @@ namespace y60 {
             _myUnsizedArrayAutoParamSizes[SPOT_LIGHTS_EXPONENT] = mySpotLightCount;
             _myUnsizedArrayAutoParamSizes[SPOT_LIGHTS_DIRECTION] = mySpotLightCount;
             _myUnsizedArrayAutoParamSizes[SPOT_LIGHTS_ATTENUATION] = mySpotLightCount;
-            
+
             AC_DEBUG << "#of texture matrices:" << theMaterial.getTextureUnitCount();
             _myUnsizedArrayAutoParamSizes[TEXTURE_MATRICES] = theMaterial.getTextureUnitCount();
 
@@ -546,25 +546,25 @@ namespace y60 {
             cgGLLoadProgram(_myCgProgramID);
             STOP_TIMER(CgProgramInfo_reloadIfRequired_reload_load);
             assertCg(PLUS_FILE_LINE, _myContext);
-            
+
             DBP2(START_TIMER(CgProgramInfo_reloadIfRequired_enableProfile));
             enableProfile();
             DBP2(STOP_TIMER(CgProgramInfo_reloadIfRequired_enableProfile));
-            
+
             DBP2(START_TIMER(CgProgramInfo_reloadIfRequired_bindMaterialParams));
             bindMaterialParams(theMaterial);
             DBP2(STOP_TIMER(CgProgramInfo_reloadIfRequired_bindMaterialParams));
-            
+
             DBP2(START_TIMER(CgProgramInfo_reloadIfRequired_enableTextures));
             enableTextures();
             DBP2(STOP_TIMER(CgProgramInfo_reloadIfRequired_enableTextures));
 
             assertCg(PLUS_FILE_LINE, _myContext);
         }
-        
+
         return myReload;
     }
-    
+
     void
     CgProgramInfo::bindBodyParams(
         const MaterialBase & theMaterial,
@@ -574,9 +574,9 @@ namespace y60 {
         const Camera & theCamera)
     {
         AC_TRACE << "CgProgramInfo::bindBodyParams for shader filename=" << _myShader._myFilename << " entry=" << _myShader._myEntryFunction
-                 << " body=" << theBody.get<NameTag>()<< " material=" << theMaterial.get<NameTag>() 
+                 << " body=" << theBody.get<NameTag>()<< " material=" << theMaterial.get<NameTag>()
                  << " camera=" << theCamera.get<NameTag>() << " viewport=" << theViewport.get<NameTag>();
-                 
+
         MAKE_GL_SCOPE_TIMER(CgProgramInfo_bindBodyParams);
         setCGGLParameters();
 
@@ -629,7 +629,7 @@ namespace y60 {
             {
                 const Matrix4f & myGlobalMatrix = myLight->get<GlobalMatrixTag>();
                 Vector4f myDirection = myGlobalMatrix.getRow(2);
-                myDirection.mult(-1.0);                        
+                myDirection.mult(-1.0);
                 mySpotLightDirection.push_back(normalized(Vector3f(myDirection[0],myDirection[1],myDirection[2])));
                 mySpotLights.push_back(myGlobalMatrix.getTranslation());
                 mySpotLightDiffuseColors.push_back(myLightPropFacade->get<LightDiffuseTag>());
@@ -807,23 +807,23 @@ namespace y60 {
 
                 if (myIter->second == 0){
                     AC_ERROR << "material property "
-                             << _myMiscParams[i]._myParamName 
+                             << _myMiscParams[i]._myParamName
                              << " not defined!";
                     return;
-                } 
+                }
 
-                setCgMaterialParameter(_myMiscParams[i]._myParameter, *(myIter->second), 
-                                       _myMiscParams[i]._myParamName, theMaterial);                
+                setCgMaterialParameter(_myMiscParams[i]._myParameter, *(myIter->second),
+                                       _myMiscParams[i]._myParamName, theMaterial);
             }
         }
         for (unsigned i=0; i < _myTextureParams.size(); ++i) {
             Facade::PropertyMap::const_iterator myIter = myProperties.find(_myTextureParams[i]._myParamName);
             if (myIter != myProperties.end()) {
 
-                setCgMaterialParameter(_myTextureParams[i]._myParameter, *(myIter->second), 
-                                       _myTextureParams[i]._myParamName, theMaterial);                
+                setCgMaterialParameter(_myTextureParams[i]._myParameter, *(myIter->second),
+                                       _myTextureParams[i]._myParamName, theMaterial);
             }
-        }                        
+        }
     }
 
     void

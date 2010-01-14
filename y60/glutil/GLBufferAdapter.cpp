@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -97,27 +97,27 @@ namespace y60 {
     BufferAdapter::~BufferAdapter() {
     }
 
-    void 
+    void
     BufferAdapter::alloc(const unsigned myMemorySize) {
         _myData.resize(myMemorySize);
     }
-        
+
     asl::Block &
     BufferAdapter::getBlock() {
         return _myData;
     }
 
-    unsigned 
+    unsigned
     BufferAdapter::getWidth() const {
         return _myWidth;
     }
 
-    unsigned 
+    unsigned
     BufferAdapter::getHeight() const {
         return _myHeight;
     }
 
-    unsigned 
+    unsigned
     BufferAdapter::getComponents() const {
         return _myComponents;
     }
@@ -152,7 +152,7 @@ namespace y60 {
         }
         return myFormat;
     }
-    
+
     void
     BufferAdapter::performAction(GLSourceBuffer theSourceBuffer) {
         GLenum myFormat = getBufferFormat(theSourceBuffer);
@@ -164,16 +164,16 @@ namespace y60 {
         glReadPixels(0, 0, _myWidth, _myHeight, myFormat, GL_UNSIGNED_BYTE, _myData.begin());
     }
 
-    // ----------------------------------------------------------------------------------------    
+    // ----------------------------------------------------------------------------------------
     BufferToFile::BufferToFile(const std::string & theFilename, unsigned theFormat,
-            unsigned theWidth, unsigned theHeight, unsigned theComponents) : 
+            unsigned theWidth, unsigned theHeight, unsigned theComponents) :
         BufferAdapter(theWidth, theHeight, theComponents),
         _myFilename(theFilename), _myFormat(theFormat)
     {
     }
-    
+
     BufferToFile::~BufferToFile() {
-    }    
+    }
 
     void
     BufferToFile::performAction(GLSourceBuffer theSourceBuffer)
@@ -200,46 +200,46 @@ namespace y60 {
 
         PLPixelFormat pf;
         if (!mapPixelEncodingToFormat(myEncoding, pf)) {
-            throw GLBufferAdapterException(std::string("unsupported pixel format"), PLUS_FILE_LINE); 
+            throw GLBufferAdapterException(std::string("unsupported pixel format"), PLUS_FILE_LINE);
         }
-        myBmp.Create( getWidth(), getHeight(), pf, 
+        myBmp.Create( getWidth(), getHeight(), pf,
                       getBlock().begin() + getWidth() * (getHeight()-1) * getComponents(), -1 * getWidth() * getComponents());
 
         switch(_myFormat) {
             case PL_FT_PNG:
                 {
                     PLPNGEncoder myEncoder;
-                    myEncoder.MakeFileFromBmp(myPath.toLocale().c_str(), &myBmp);               
+                    myEncoder.MakeFileFromBmp(myPath.toLocale().c_str(), &myBmp);
                 }
                 break;
             case PL_FT_JPEG:
                 {
                     PLJPEGEncoder myEncoder;
                     myBmp.ApplyFilter(PLFilterFlipRGB());
-                    myEncoder.MakeFileFromBmp(myPath.toLocale().c_str(), &myBmp);               
+                    myEncoder.MakeFileFromBmp(myPath.toLocale().c_str(), &myBmp);
                 }
                 break;
             case PL_FT_WINBMP:
                 {
                     PLBmpEncoder myEncoder;
                     myBmp.ApplyFilter(PLFilterFlipRGB());
-                    myEncoder.MakeFileFromBmp(myPath.toLocale().c_str(), &myBmp);               
+                    myEncoder.MakeFileFromBmp(myPath.toLocale().c_str(), &myBmp);
                 }
                 break;
             case PL_FT_TIFF:
                 {
                     PLTIFFEncoder myEncoder;
                     myBmp.ApplyFilter(PLFilterFlipRGB());
-                    myEncoder.MakeFileFromBmp(myPath.toLocale().c_str(), &myBmp);               
+                    myEncoder.MakeFileFromBmp(myPath.toLocale().c_str(), &myBmp);
                 }
                 break;
              default:
                 throw GLBufferAdapterException(std::string("Unknown target image format: " ) + asl::as_string(_myFormat),
                                                PLUS_FILE_LINE);
         }
-    }        
+    }
 
-    // ----------------------------------------------------------------------------------------    
+    // ----------------------------------------------------------------------------------------
     BufferToTexture::BufferToTexture(TexturePtr theTexture, const asl::Vector2i & theOffset, bool theCopyToImageFlag) :
         BufferAdapter(theTexture->get<TextureWidthTag>(), theTexture->get<TextureHeightTag>(), 4),
         _myTexture(theTexture), _myOffset(theOffset), _myCopyToImage(theCopyToImageFlag)

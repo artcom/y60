@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -67,7 +67,7 @@ EXPORT asl::PlugInBase * GStreamerCapture_instantiatePlugIn(asl::DLHandle myDLHa
 namespace y60 {
 
     const int MAX_PORTS = 4;
-    
+
     GStreamerCapturePlugin::GStreamerCapturePlugin(asl::DLHandle theDLHandle) : PlugInBase(theDLHandle), _myBufferSize(0)
     {
         memset( _myBuffer, 0, sizeof( _myBuffer ));
@@ -76,7 +76,7 @@ namespace y60 {
     GStreamerCapturePlugin::~GStreamerCapturePlugin() {
     }
 
-    void GStreamerCapturePlugin::handoff( GstElement *fakesrc, GstBuffer *buffer, 
+    void GStreamerCapturePlugin::handoff( GstElement *fakesrc, GstBuffer *buffer,
                                           GstPad *pad) {
 
         int buffer_size = GST_BUFFER_SIZE (buffer);
@@ -84,7 +84,7 @@ namespace y60 {
 
         assert( buffer_size < sizeof( _myBuffer ) );
         asl::AutoLocker<asl::ThreadLock> myAutoLocker(_myBufferLock);
-        std::copy( buffer_data, buffer_data + buffer_size, _myBuffer ); 
+        std::copy( buffer_data, buffer_data + buffer_size, _myBuffer );
         _myBufferSize = buffer_size;
     }
 
@@ -124,9 +124,9 @@ namespace y60 {
         asl::AutoLocker<asl::ThreadLock> myAutoLocker(_myBufferLock);
         memcpy(theTargetRaster->pixels().begin(), _myBuffer, _myBufferSize);
     }
-    
+
     bool dumpPads( GstElement* theElement ) {
-        AC_PRINT << "dumping pads .."; 
+        AC_PRINT << "dumping pads ..";
         GstIterator* myPadIterator =  gst_element_iterate_src_pads( theElement );
         GstPad* myPad = NULL;
 
@@ -141,7 +141,7 @@ namespace y60 {
                     break;
                 case GST_ITERATOR_DONE:
                     return true;
-                default: 
+                default:
                     return false;
             }
         }
@@ -152,7 +152,7 @@ namespace y60 {
         if (myIdx != std::string::npos) {
             return theInputStr.substr(0, myIdx);
         }
-        return theInputStr; 
+        return theInputStr;
     }
 
     void GStreamerCapturePlugin::load(const std::string & theFilename) {
@@ -161,34 +161,34 @@ namespace y60 {
         gst_init( NULL, NULL );
 
         // grab version information
-        // 
+        //
         const gchar *nano_str;
         guint major, minor, micro, nano;
-      
+
         gst_version (&major, &minor, &micro, &nano);
-      
+
         if (nano == 1)
           nano_str = "(CVS)";
         else if (nano == 2)
           nano_str = "(Prerelease)";
         else
           nano_str = "";
-        
+
         AC_INFO << "Plugging GStreamer Plugin using GStreamer version "
                 << major << "." << minor << "." << micro << "." << std::string(nano_str);
 
         AC_PRINT << "Using URL: " << getUrl( theFilename );
 
-        std::string myPipelineStr = "rtspsrc location=" + getUrl(theFilename) 
+        std::string myPipelineStr = "rtspsrc location=" + getUrl(theFilename)
                                     + " ! rtpmp4vdepay ! ffdec_mpeg4 ! ffmpegcolorspace !"
                                     + "capsfilter caps=video/x-raw-rgb ! fakesink "
                                     + "name=fakesink";
 
         GstElement *myFirstPipeline;
         GError* error = NULL;
-        myFirstPipeline = 
+        myFirstPipeline =
             (GstElement*) gst_parse_launch((const gchar*)myPipelineStr.c_str(), &error);
-       
+
         if (error) {
            AC_ERROR << "Cannot link gstreamer elements!" << error;
         }
@@ -200,8 +200,8 @@ namespace y60 {
         GstElement* myFakeSink = gst_bin_get_by_name( GST_BIN( myPipeline ), "fakesink" );
 
         g_object_set( G_OBJECT( myFakeSink ), "signal-handoffs", TRUE, NULL );
-        g_signal_connect( myFakeSink, "handoff", 
-                          G_CALLBACK( cb_handoff ), 
+        g_signal_connect( myFakeSink, "handoff",
+                          G_CALLBACK( cb_handoff ),
                           this );
 
         gst_element_set_state( myPipeline, GST_STATE_PLAYING );
@@ -211,8 +211,8 @@ namespace y60 {
     }
 
 
-    std::string GStreamerCapturePlugin::canDecode( const std::string & theUrl, 
-                                                   asl::Ptr<asl::ReadableStreamHandle> 
+    std::string GStreamerCapturePlugin::canDecode( const std::string & theUrl,
+                                                   asl::Ptr<asl::ReadableStreamHandle>
                                                    theStream)
     {
         if (theUrl.find("rtsp://") != std::string::npos) {
@@ -230,7 +230,7 @@ namespace y60 {
     void GStreamerCapturePlugin::stopCapture() {
         CaptureDevice::stopCapture();
     }
-    
+
     void GStreamerCapturePlugin::startCapture() {
         CaptureDevice::startCapture();
     }

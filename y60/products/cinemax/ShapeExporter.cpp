@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -142,7 +142,7 @@ ShapeExporter::writeShape(BaseObject * theNode, BaseObject * thePolygonNode, boo
                 myMaterialList.push_back(std::pair<TextureTag*,UVWTag*>(myTextureTag, myUvTag));
             }
         }
-        
+
         // write selection
         std::string myShapeId = writeSelection(theNode, thePolygonNode,
                                                 mySelection, myBaseSelection, myMaterialList, myUVTagList,
@@ -162,7 +162,7 @@ ShapeExporter::writeShape(BaseObject * theNode, BaseObject * thePolygonNode, boo
         myTextureTag->GetParameter(DescID(TEXTURETAG_RESTRICTION), myData, 0);
         String myRestriction = myData.GetString();
         // do not take account for material, that are used in other selections
-        if (myBaseSelection->GetName() == myRestriction ||  myRestriction == "") {            
+        if (myBaseSelection->GetName() == myRestriction ||  myRestriction == "") {
             UVWTag * myUvTag = static_cast<UVWTag*>(thePolygonNode->GetTag(Tuvw, i));
             if (!myUvTag) {
                 myUvTag = GenerateUVW(theNode, theNode->GetMg(),myTextureTag, myTextureTag->GetMl(), NULL);
@@ -291,7 +291,7 @@ std::string ShapeExporter::writeSelection(BaseObject * theNode, BaseObject * the
     }
 
     map<string,bool> myCreatedUVBins;
-    // create uvsets 
+    // create uvsets
     LONG myUVSetIndex = 0;
     for (; myUVSetIndex < myUVSetCount; ++myUVSetIndex) {
         if (myMaterialInfo._myTexureMapping.size() > static_cast<std::size_t>(myUVSetIndex)
@@ -348,20 +348,20 @@ std::string ShapeExporter::writeSelection(BaseObject * theNode, BaseObject * the
          && myMaterialInfo._myTexureMapping[myTextureIndex] == UV_MAP &&
             myCreatedUVBins.find(myBinName) == myCreatedUVBins.end())
         {
-    
+
 
             // do we have enough uvsets for our Y60 textures, if not,take the first uv set
             if (myUVSetCount < myY60TextureCount) {
                 myBinName = "UVCoords_0";
             }
-            GePrint(String(myName.c_str()) + ": Creating index bin=" + String(myBinName.c_str()) + 
+            GePrint(String(myName.c_str()) + ": Creating index bin=" + String(myBinName.c_str()) +
                                             " myTexIndex=" + LongToString(myTextureIndex));
             myElementBuilder.createIndex(myBinName, getTextureRole(myTextureIndex), 1);
             myCreatedUVBins[myBinName] = true;
 
         }
     }
-    
+
     asl::Vector3f myMinCoord(asl::NumericTraits<float>::max(), asl::NumericTraits<float>::max(), asl::NumericTraits<float>::max());
     asl::Vector3f myMaxCoord(-asl::NumericTraits<float>::max(), -asl::NumericTraits<float>::max(), -asl::NumericTraits<float>::max());
 
@@ -387,7 +387,7 @@ std::string ShapeExporter::writeSelection(BaseObject * theNode, BaseObject * the
             Vector myVertexA = myVertices[a];
             Vector myVertexB = myVertices[b];
             Vector myVertexC = myVertices[c];
-            
+
             // find the minimum of all vertices
             findExtrema(myMinCoord, myVertexA, true);
             findExtrema(myMinCoord, myVertexB, true);
@@ -424,8 +424,8 @@ std::string ShapeExporter::writeSelection(BaseObject * theNode, BaseObject * the
 
             // Export texture coordinates
             if (theUVTagList.size() == 0 && myY60TextureCount > 0) {
-                throw ExportException(std::string("Sorry, shape: ") + string(getString(thePolygonNode->GetName())) + 
-                                     string(" does not have any uvsets, but textures: ") + 
+                throw ExportException(std::string("Sorry, shape: ") + string(getString(thePolygonNode->GetName())) +
+                                     string(" does not have any uvsets, but textures: ") +
                         std::string(asl::as_string(myY60TextureCount)), PLUS_FILE_LINE);
             }
             vector<int> myUVIndexA;
@@ -449,7 +449,7 @@ std::string ShapeExporter::writeSelection(BaseObject * theNode, BaseObject * the
                         myUVIndexB.push_back(myShapeBuilder.appendVertexData(myBinName, asl::Vector2f(myUVCoords.b.x, myUVCoords.b.y)));
                         myUVIndexC.push_back(myShapeBuilder.appendVertexData(myBinName, asl::Vector2f(myUVCoords.c.x, myUVCoords.c.y)));
                     } else {
-                        throw ExportException(std::string("Could not get uvset for texture: ") + 
+                        throw ExportException(std::string("Could not get uvset for texture: ") +
                             std::string(asl::as_string(myTexIndex)), PLUS_FILE_LINE);
                     }
                 }
@@ -493,7 +493,7 @@ std::string ShapeExporter::writeSelection(BaseObject * theNode, BaseObject * the
                             UVWStruct myUVCoords = myUvTag->Get(myPolyIndex);
                             myUVIndexD.push_back(myShapeBuilder.appendVertexData(myBinName, asl::Vector2f(myUVCoords.d.x, myUVCoords.d.y)));
                         } else {
-                            throw ExportException(std::string("Could not get uvset for texture: ") + 
+                            throw ExportException(std::string("Could not get uvset for texture: ") +
                                                 std::string(asl::as_string(myTexIndex)), PLUS_FILE_LINE);
                         }
                     }
@@ -508,8 +508,8 @@ std::string ShapeExporter::writeSelection(BaseObject * theNode, BaseObject * the
     if (!myVerticesFound) {
         return "";
     }
-    _myMaterialExporter.writeMaterial(myMaterialInfo, thePolygonNode, 
-                                      theMaterialList, _mySceneBuilder, 
+    _myMaterialExporter.writeMaterial(myMaterialInfo, thePolygonNode,
+                                      theMaterialList, _mySceneBuilder,
                                       myMinCoord, myMaxCoord);
 
     myShapeBuilder.appendElements(myElementBuilder);

@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -85,7 +85,7 @@ namespace TexGen {
         assert(lightMap.GetBitsPerPixel() == 8);
         assert(destMap.GetBitsPerPixel() == 8);
 
-        PLBYTE ** myLightMapLines   = lightMap.GetLineArray(); 
+        PLBYTE ** myLightMapLines   = lightMap.GetLineArray();
         PLBYTE ** myDestMapLines = destMap.GetLineArray();
 
         PLBYTE myScale;
@@ -94,23 +94,23 @@ namespace TexGen {
                 PLBYTE& col = myDestMapLines[y][x];
                 myScale =  PLBYTE(myLightMapLines[y][x]);
                 int tempInt = (col*myScale)/255;
-                col = static_cast<PLBYTE>(min(tempInt, 255)); 
+                col = static_cast<PLBYTE>(min(tempInt, 255));
             }
         }
     }
 
-    void applyMultiplicationMap (PLBmp & textureBmp, const PLBmp & attnBmp, 
-            const PLRect & srcRect, double myLightingFactor) 
-    {  
+    void applyMultiplicationMap (PLBmp & textureBmp, const PLBmp & attnBmp,
+            const PLRect & srcRect, double myLightingFactor)
+    {
         assert(attnBmp.GetBitsPerPixel() == 8);
         assert(textureBmp.GetBitsPerPixel() == 32);
         assert (srcRect.Width() > 0 && srcRect.Height() > 0);
-        
+
         double Scale = double(srcRect.Width())/textureBmp.GetWidth();
         double YScale = double(srcRect.Height())/textureBmp.GetHeight();
         assert (Scale == YScale); (void)YScale;
 
-        PLBYTE ** myAttnBmpLines   = attnBmp.GetLineArray(); 
+        PLBYTE ** myAttnBmpLines   = attnBmp.GetLineArray();
         PLPixel32 ** myTextureBmpLines = (PLPixel32**)textureBmp.GetLineArray();
 
         if (Scale > 0.99) {
@@ -124,8 +124,8 @@ namespace TexGen {
                     int tempIntR = int((myLightingFactor * col.GetR() * myScale)/256);
                     int tempIntG = int((myLightingFactor * col.GetG() * myScale)/256);
                     int tempIntB = int((myLightingFactor * col.GetB() * myScale)/256);
-                    col.Set( static_cast<PLBYTE>(min(tempIntR,255)), 
-                             static_cast<PLBYTE>(min(tempIntG,255)), 
+                    col.Set( static_cast<PLBYTE>(min(tempIntR,255)),
+                             static_cast<PLBYTE>(min(tempIntG,255)),
                              static_cast<PLBYTE>(min(tempIntB,255)), 255 );
                 }
             }
@@ -143,7 +143,7 @@ namespace TexGen {
                 for (int x=0;x<textureBmp.GetWidth(); x++) {
                     PLPixel32& col = myTextureBmpLines[y][x];
                     double xSrcPos = Scale*x+srcRect.tl.x;
-                    int xLightPos = int (xSrcPos); 
+                    int xLightPos = int (xSrcPos);
                     double xLightFade = fmod (xSrcPos, 1);
                     if (xLightPos >= MaxX) {
                         xLightPos = MaxX - 1;
@@ -151,21 +151,21 @@ namespace TexGen {
                     }
 
                     double myScale = double(myAttnBmpLines[yLightPos][xLightPos])*
-                                      (1-xLightFade)*(1-yLightFade) + 
+                                      (1-xLightFade)*(1-yLightFade) +
                                   double(myAttnBmpLines[yLightPos][xLightPos+1])*
-                                      xLightFade*(1-yLightFade) + 
+                                      xLightFade*(1-yLightFade) +
                                   double(myAttnBmpLines[yLightPos+1][xLightPos])*
-                                      (1-xLightFade)*yLightFade + 
+                                      (1-xLightFade)*yLightFade +
                                   double(myAttnBmpLines[yLightPos+1][xLightPos+1])*
                                       xLightFade*yLightFade;
-                    
+
                     int tempIntR = int((myLightingFactor * col.GetR() * myScale) /256);
                     int tempIntG = int((myLightingFactor * col.GetG() * myScale) /256);
                     int tempIntB = int((myLightingFactor * col.GetB() * myScale) /256);
-                    col.Set( static_cast<PLBYTE>(min(tempIntR,255)), 
-                             static_cast<PLBYTE>(min(tempIntG,255)), 
+                    col.Set( static_cast<PLBYTE>(min(tempIntR,255)),
+                             static_cast<PLBYTE>(min(tempIntG,255)),
                              static_cast<PLBYTE>(min(tempIntB,255)),
-                             255);                               
+                             255);
                 }
             }
         }

@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -69,13 +69,13 @@ function playerInfoToExcel(thePlayersNode) {
         if (thePlayersNode.nodeType == Node.DOCUMENT_NODE) {
             thePlayersNode = thePlayersNode.firstChild;
         }
-        
+
         var myTemplateNode = new Node();
         myTemplateNode.parseFile("CONFIG/excel_template.xml");
-    
+
         var myTableNode = myTemplateNode.find("//Table");
         var myRowNode = myTableNode.find("//*[@name = 'y60:name']").parentNode.parentNode;
-    
+
         for (var i=0;i<thePlayersNode.childNodesLength("player");++i) {
             var myNewRow = myRowNode.cloneNode(true);
             var myPlayer = thePlayersNode.childNode("player", i);
@@ -118,7 +118,7 @@ function getNodeByName(theName) {
 function getCachedImage(theImagePath) {
     var myImageName = "image-" + theImagePath;
     var myImage = getNodeByName(myImageName);
-    
+
     if(!myImage) {
         myImage = Modelling.createImage(window.scene, theImagePath);
         myImage.name = myImageName;
@@ -130,7 +130,7 @@ function getCachedImage(theImagePath) {
 function getCachedMovie(theMoviePath) {
     var myMovieName = "movie-" + theMoviePath;
     var myMovie = getNodeByName(myMovieName);
-    
+
     if(!myMovie) {
         myMovie = Node.createElement("movie");
         window.scene.images.appendChild(myMovie);
@@ -147,16 +147,16 @@ function getCachedTexture(theImagePath) {
     var myTextureName = "image-texture-" + theImagePath;
 
     Logger.info("Computing image texture for " + theImagePath);
-    
+
     var myImage = getCachedImage(theImagePath);
     var myTexture = getNodeByName(myTextureName);
-    
+
     if(!myTexture) {
         myTexture = Modelling.createTexture(window.scene, myImage);
         myTexture.name = myTextureName;
         registerNode(myTextureName, myTexture);
     }
-    
+
     return myTexture;
 }
 
@@ -171,7 +171,7 @@ function getCachedImageMaterial(theImagePath) {
 
     var myMaterial =
         Modelling.createUnlitTexturedMaterial(window.scene, myTexture, myMaterialName);
-    
+
     return myMaterial;
 }
 
@@ -186,7 +186,7 @@ function getCachedMovieMaterial(theMoviePath) {
 
     var myMaterial =
         Modelling.createUnlitTexturedMaterial(window.scene, myTexture, myMaterialName);
-    
+
     return myMaterial;
 }
 
@@ -322,13 +322,13 @@ function applyStyleDefaults(theStyle) {
     !theStyle.getAttribute("bottomPad") ? theStyle.bottomPad = 0 : null;
     !theStyle.getAttribute("rightPad")  ? theStyle.rightPad  = 0 : null;
     !theStyle.getAttribute("leftPad")   ? theStyle.leftPad   = 0 : null;
-    
+
     !theStyle.getAttribute("tracking")   ? theStyle.tracking   = 0 : null;
     !theStyle.getAttribute("lineHeight") ? theStyle.lineHeight = 0 : null;
-    
+
     !theStyle.getAttribute("hAlign")    ? theStyle.hAlign    = "left" : null;
     !theStyle.getAttribute("vAlign")    ? theStyle.vAlign    = "top"  : null;
-    
+
     !theStyle.getAttribute("textColor")       ? theStyle.textColor        = "FFFFFF" : null;
     !theStyle.getAttribute("backgroundColor") ? theStyle.backgroundColor  = "000000" : null;
 }
@@ -344,7 +344,7 @@ function textAsImage(theText, theStyle, theSize) {
     window.scene.images.appendChild(myImage);
 
     textToImage(myImage, theText, theStyle, theSize);
-    
+
     return myImage;
 }
 
@@ -364,13 +364,13 @@ function textToImage(theImage, theText, theStyle, theSize) {
 
     var myTextSize =
         window.renderTextAsImage(theImage,
-                                 theText, 
-                                 fontForStyle(theStyle), 
+                                 theText,
+                                 fontForStyle(theStyle),
                                  theSize.x, theSize.y,
                                  new Vector2i(0,0));
 
     var myMatrix = new Matrix4f();
-    myMatrix.makeScaling(new Vector3f(myTextSize.x / theImage.width, 
+    myMatrix.makeScaling(new Vector3f(myTextSize.x / theImage.width,
                                       myTextSize.y / theImage.height, 1));
     theImage.matrix = myMatrix;
 
@@ -396,7 +396,7 @@ function getBodyOwner(theBody) {
     if (theBody.id in ourBodyOwners) {
         return ourBodyOwners[theBody.id];
     }
-    
+
     return null;
 }
 
@@ -415,16 +415,16 @@ function NumberToLocalString(theNumber) {
         Logger.warning("The parameter '" + theNumber + "'can not be convertet to Number.");
         return "";
     }
-    
+
     var myInt = Math.floor(myNumber);
     var myFrc = Math.round((myNumber%1)*100);
-    
+
     var myResult = "";
     while (myInt >= 1000) {
         myInt /= 1000;
         myResult = "." + padStringFront(Math.round((myInt%1)*1000), "0", 3) + myResult;
         myInt = Math.floor(myInt);
     }
-    
+
     return myInt + myResult + "," + padStringFront(Math.abs(myFrc), "0", 2);
 }

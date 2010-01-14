@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -96,7 +96,7 @@ WiiRemote::WiiRemote(PosixThread::WorkFunc theThreadFunction ) :
     _myButtons.push_back(Button("Down",	0x0400));
     _myButtons.push_back(Button("Right", 0x0200));
     _myButtons.push_back(Button("Left",	0x0100));
-            
+
     registerStandardTypes( * _myValueFactory );
     registerSomTypes( * _myValueFactory );
 
@@ -105,7 +105,7 @@ WiiRemote::WiiRemote(PosixThread::WorkFunc theThreadFunction ) :
 WiiRemote::~WiiRemote() {
 }
 
-void 
+void
 WiiRemote::dispatchInputReport(const unsigned char * theBuffer, int theOffset) {
 
     const unsigned char * myAddress = theBuffer + theOffset;
@@ -152,8 +152,8 @@ WiiRemote::getButton(std::string label) {
     throw WiiException(string("Could not find button with label '") + label + "'",
     										 PLUS_FILE_LINE);
 }
-    
-    
+
+
 std::vector<Button>
 WiiRemote::setButtons(int code) {
     std::vector<Button> changed_state;
@@ -161,7 +161,7 @@ WiiRemote::setButtons(int code) {
         if (_myButtons[i].setCode(code))
             changed_state.push_back(_myButtons[i]);
     }
-    
+
     return changed_state;
 }
 
@@ -253,8 +253,8 @@ WiiRemote::handleIREvents( const unsigned char * theInputReport ) {
     Vector2f myNormalizedScreenCoordinates(0.0f, 0.0f);
     float angle = 0.0;
 
-    
-    
+
+
     if (mySizeHint[0] < 15 && mySizeHint[1] < 15) {
         int myLeftIndex = _myLeftPoint;
         int myRightIndex;
@@ -281,27 +281,27 @@ WiiRemote::handleIREvents( const unsigned char * theInputReport ) {
 
         float dx = float( myIRPositions[ myRightIndex ][0] - myIRPositions[ myLeftIndex ][0]);
         float dy = float( myIRPositions[ myRightIndex ][1] - myIRPositions[ myLeftIndex ][1]);
-		
+
         float d = sqrt( dx * dx + dy * dy);
-		
-		
+
+
         // normalized distance between bright spots
         dx /= d;
         dy /= d;
-		
+
         angle = atan2(dy, dx);
 
         //AC_PRINT << angle;
-    
+
         float cx = float( myIRPositions[ myLeftIndex ][0] + myIRPositions[ myRightIndex ][0]) / 1024.0f - 1.0f;
         float cy = float( myIRPositions[ myLeftIndex ][1] + myIRPositions[ myRightIndex ][1]) / 1024.0f - .75f;
-		
+
         ox = -dy * cy - dx * cx;
         oy = -dx * cy + dy * cx;
 
         myNormalizedScreenCoordinates[0] = ox;
         myNormalizedScreenCoordinates[1] = oy;
-    
+
         //AC_PRINT << "x: " << ox << " y: " << oy;
 
     } else {
@@ -313,18 +313,18 @@ WiiRemote::handleIREvents( const unsigned char * theInputReport ) {
             _myLeftPoint = -1;
         }
     }
-    
+
     createEvent( myIRPositions, myNormalizedScreenCoordinates, angle );
 }
 
 
-void 
+void
 WiiRemote::startThread() {
     _myInputListening = true;
     fork();
 }
 
-    
+
 void
 WiiRemote::stopThread() {
     if (isActive()) {
@@ -335,33 +335,33 @@ WiiRemote::stopThread() {
     closeDevice();
 }
 
-bool 
+bool
 WiiRemote::getListeningFlag() const {
     return _myInputListening;
 }
 
-void 
+void
 WiiRemote::setRumble( bool theFlag) {
     _myRumbleFlag = theFlag;
     // There is no explicit output report to control the rumbler. Instead
     // bit zero of the first payload byte of every output report contains
-    // the rumbler state. So we abuse the LED output report to set the 
+    // the rumbler state. So we abuse the LED output report to set the
     // rumble bit.
     setLEDState();
 }
 
-bool 
+bool
 WiiRemote::isRumbling() const {
     return _myRumbleFlag;
 }
 
-void 
+void
 WiiRemote::setLED(int theIndex, bool theFlag) {
     _myLEDState[ theIndex ] = theFlag;
     setLEDState();
 }
 
-void 
+void
 WiiRemote::setLEDs(bool theLED0, bool theLED1, bool theLED2, bool theLED3 ) {
     _myLEDState[ 0 ] = theLED0;
     _myLEDState[ 1 ] = theLED1;
@@ -387,7 +387,7 @@ WiiRemote::setLEDState() {
     sendOutputReport( myLedReport, 2 );
 }
 
-void 
+void
 WiiRemote::sendOutputReport(unsigned char theOutputReport[], unsigned theNumBytes) {
     // preserve current state ... add the rumble bit
     theOutputReport[1] |= _myRumbleFlag ? 0x01 : 0x00;
@@ -397,12 +397,12 @@ WiiRemote::sendOutputReport(unsigned char theOutputReport[], unsigned theNumByte
     }
 }
 
-void 
+void
 WiiRemote::setContinousReportFlag( bool theFlag ) {
     _myContinousReportFlag = theFlag;
 }
 
-bool 
+bool
 WiiRemote::getContinousReportFlag() const {
     return _myContinousReportFlag;
 }
@@ -413,7 +413,7 @@ WiiRemote::addContinousReportBit( unsigned char * theOutputReport ) {
     theOutputReport[1] |= _myContinousReportFlag ? 0x04 : 0x00;
 }
 
-void 
+void
 WiiRemote::writeMemoryOrRegister(Unsigned32 theAddress, unsigned char * theData,
                                  unsigned theNumBytes, bool theWriteRegisterFlag)
 {
@@ -435,12 +435,12 @@ WiiRemote::writeMemoryOrRegister(Unsigned32 theAddress, unsigned char * theData,
     sendOutputReport( myOutputReport, 16 + 6); // allways send 16 data bytes
 }
 
-bool 
+bool
 WiiRemote::isConnected() const {
     return _isConnected;
 }
 
-void 
+void
 WiiRemote::disconnect() {
     _isConnected = false;
     _myLock.lock();
@@ -448,7 +448,7 @@ WiiRemote::disconnect() {
     _myLock.unlock();
 }
 
-void 
+void
 WiiRemote::setReportMode( WiiReportMode theReportMode ) {
     switch (theReportMode) {
         case BUTTON:
@@ -464,7 +464,7 @@ WiiRemote::setReportMode( WiiReportMode theReportMode ) {
     _myReportMode = theReportMode;
 }
 
-WiiReportMode 
+WiiReportMode
 WiiRemote::getReportMode() const {
     return _myReportMode;
 }
@@ -530,7 +530,7 @@ WiiRemote::requestStatusReport() {
     sendOutputReport(myStatusInformationRequest, 2);
 }
 
-void 
+void
 WiiRemote::pollEvents( y60::EventPtrList & theEventList, std::vector<std::string> & theLostWiiIds ) {
     if ( _myLock.nonblock_lock() == 0) {
 
@@ -595,4 +595,4 @@ WiiRemote::setId( const char * theId) {
     _myControllerId = theId;
 }
 
-} // end of namespace 
+} // end of namespace

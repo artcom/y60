@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -153,7 +153,7 @@ ASSManager.prototype.Constructor = function(Public, Protected, theViewer, theInh
     }
 
     Public.onUpdateSettings = function( theSettings ) {
-        
+
         _mySettings = theSettings;
 
         if (_myValueOverlay) {
@@ -177,7 +177,7 @@ ASSManager.prototype.Constructor = function(Public, Protected, theViewer, theInh
             _myValueOverlay.position = _mySettings.childNode("SensorPosition").childNode("#text");
             _myValueOverlay.rotation = new Number( _mySettings.childNode("SensorOrientation").childNode("#text") );
             var myOldScale = new Vector2f( _myValueOverlay.scale );
-            _myValueOverlay.scale =  _mySettings.childNode("SensorScale").childNode("#text"); 
+            _myValueOverlay.scale =  _mySettings.childNode("SensorScale").childNode("#text");
             var myMirrorXFlag = new Number( _mySettings.childNode("MirrorX").childNode("#text"));
             var mySize = product( myOldScale, _myGridSize);
             if (myMirrorXFlag != 0) {
@@ -209,7 +209,7 @@ ASSManager.prototype.Constructor = function(Public, Protected, theViewer, theInh
             _myDriver.transformEventPosition = _myValueOverlay.position;
             _myDriver.transformEventScale = _myValueOverlay.scale;
             _myDriver.transformEventOrientation = _myValueOverlay.rotation;
-            
+
             _myInitialSettingsLoaded = true;
         }
     }
@@ -297,7 +297,7 @@ ASSManager.prototype.Constructor = function(Public, Protected, theViewer, theInh
         }
         var myIndex = 0;
         if ( _mySettings ) {
-            myIndex = new Number( 
+            myIndex = new Number(
                     _mySettings.childNode("CurrentValueDisplay", 0).childNode("#text"));
         }
         if (myIndex < 0 || myIndex >= myRasterNames.length) {

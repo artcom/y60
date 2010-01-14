@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -112,7 +112,7 @@ namespace y60 {
             virtual void registerDependenciesForGlobalPrimitive();
             virtual void registerDependenciesForBoundingBox();
     };
-    
+
 
 
 #define IMPLEMENT_GEOMETRY_FACADE( CLASS, NODE_NAME ) \
@@ -137,10 +137,10 @@ namespace y60 {
             IMPLEMENT_GEOMETRY_FACADE(Plane, PLANE_NODE_NAME);
 
         protected:
-            virtual void recalculateBoundingBox();            
+            virtual void recalculateBoundingBox();
             // [DS] would be nice to implement this in the base class, because it's the same for all primitives
-            virtual void recalculateGlobalPrimitive();            
-    };        
+            virtual void recalculateGlobalPrimitive();
+    };
     typedef asl::Ptr<Plane, dom::ThreadingModel> PlanePtr;
 
 
@@ -159,10 +159,10 @@ namespace y60 {
             IMPLEMENT_GEOMETRY_FACADE(Point, POINT_NODE_NAME);
 
         protected:
-            virtual void recalculateBoundingBox();            
+            virtual void recalculateBoundingBox();
             virtual void recalculateGlobalPrimitive();
 
-    };        
+    };
     typedef asl::Ptr<Point, dom::ThreadingModel> PointPtr;
 
     //=== Vector ============================================================
@@ -180,12 +180,12 @@ namespace y60 {
             IMPLEMENT_GEOMETRY_FACADE(Vector, POINT_NODE_NAME);
 
         protected:
-            virtual void recalculateBoundingBox();            
+            virtual void recalculateBoundingBox();
             virtual void recalculateGlobalPrimitive();
 
-    };        
+    };
     typedef asl::Ptr<Vector, dom::ThreadingModel> VectorPtr;
-    
+
     //=== LineSegment ============================================================
     DEFINE_ATTRIBUTE_TAG(LineSegmentTag,       asl::LineSegment<float>,  GEOMETRY_VALUE_ATTRIB,
             asl::LineSegment<float>(asl::Vector3f(0,0,0), asl::Vector3f(1,0,0)), Y60_SCENE_DECL);
@@ -203,10 +203,10 @@ namespace y60 {
             IMPLEMENT_GEOMETRY_FACADE(LineSegment, LINE_SEGMENT_NODE_NAME);
 
         protected:
-            virtual void recalculateBoundingBox();            
+            virtual void recalculateBoundingBox();
             virtual void recalculateGlobalPrimitive();
 
-    };        
+    };
     typedef asl::Ptr<LineSegment, dom::ThreadingModel> LineSegmentPtr;
 
 }

@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -63,8 +63,8 @@
 namespace asl {
 
     template <class InputIterator,class OutputIterator,class Tin, class Tout>
-        OutputIterator multi_chan_discriminate(InputIterator begin, InputIterator end, OutputIterator out, 
-                const Tin& cut_value, const Tout& below_value, const Tout& above_value) 
+        OutputIterator multi_chan_discriminate(InputIterator begin, InputIterator end, OutputIterator out,
+                const Tin& cut_value, const Tout& below_value, const Tout& above_value)
         {
             InputIterator in = begin;
             if (cut_value.size()!=below_value.size()) {
@@ -85,9 +85,9 @@ namespace asl {
         }
 
     template <class InputIterator,class OutputIterator,class Tin, class Tout>
-        OutputIterator chan_discriminate(InputIterator begin, InputIterator end, OutputIterator out, 
-                const Tin& zero_value, const Tin& cut_value, 
-                const Tout& below_value, const Tout& above_value) 
+        OutputIterator chan_discriminate(InputIterator begin, InputIterator end, OutputIterator out,
+                const Tin& zero_value, const Tin& cut_value,
+                const Tout& below_value, const Tout& above_value)
         {
             InputIterator in = begin;
             while (in!=end) {
@@ -105,15 +105,15 @@ namespace asl {
 //        bool Pixel::operator<(const asl::gray<T> & first, const asl::gray<T> & second) const {
 //            return first.get() < second.get();
 //        }
-//    
+//
 //    template <class T>
 //        bool Pixel::operator>(const asl::gray<T> & first, const asl::gray<T> & second) const {
 //            return first.get() > second.get();
 //        }
 
     template <class InputIterator,class OutputIterator,class Tin, class Tout>
-        OutputIterator discriminate(InputIterator begin, InputIterator end, OutputIterator out, 
-                const Tin& cut_value, const Tout& below_value, const Tout& above_value) 
+        OutputIterator discriminate(InputIterator begin, InputIterator end, OutputIterator out,
+                const Tin& cut_value, const Tout& below_value, const Tout& above_value)
         {
             InputIterator in = begin;
             while (in!=end) {
@@ -162,7 +162,7 @@ namespace asl {
             //   cerr << "lowpas(3):count = " << count << ",trail = " << trail - begin <<",lead = " << lead - begin << endl;
             while (trail!=end && count>=radius) {
                 //       cerr << "lowpas(T):out = " << out-first_out << " count = " << count-1 << ",trail = " << trail - begin <<",lead = " << lead - begin << endl;
-                value = value - auto_cast<T>(*trail++);        
+                value = value - auto_cast<T>(*trail++);
                 *out++ = auto_cast<typename std::iterator_traits<OutputIterator>::value_type>(value/count);
                 count--;
             }

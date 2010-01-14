@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -69,15 +69,15 @@ namespace jslib {
     template class JSWrapper<y60::OscReceiver, y60::OscReceiverPtr, jslib::StaticAccessProtocol>;
 
     static JSBool
-    Stop(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) { 
+    Stop(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         DOC_BEGIN("Start listening for osc events in a seperate thread (fork)");
         DOC_END;
-   
+
         return Method<JSOscReceiver::NATIVE>::call(&JSOscReceiver::NATIVE::stop,cx,obj,argc,argv,rval);
     }
 
     static JSBool
-    Start(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) { 
+    Start(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         DOC_BEGIN("Stop listening for osc events in a seperate thread (join).");
         DOC_END;
         AC_DEBUG << "JSOscReceiver Start";
@@ -85,7 +85,7 @@ namespace jslib {
         return Method<JSOscReceiver::NATIVE>::call(&JSOscReceiver::NATIVE::start,cx,obj,argc,argv,rval);
     }
 
-    JSFunctionSpec * 
+    JSFunctionSpec *
     JSOscReceiver::Functions() {
         static JSFunctionSpec myFunctions[] = {
             {"start", Start, 0},

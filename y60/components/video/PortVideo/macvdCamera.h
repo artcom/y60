@@ -21,13 +21,13 @@
 
 #include "cameraEngine.h"
 #include "vdigGrab.h"
-		
+
 class macvdCamera : public cameraEngine
 {
 public:
 	macvdCamera();
 	~macvdCamera();
-	
+
 	bool findCamera();
 	bool initCamera(int width, int height, bool colour);
 	bool startCamera();
@@ -36,9 +36,9 @@ public:
 	bool stillRunning();
 	bool resetCamera();
 	bool closeCamera();
-	
+
 	void showSettingsDialog();
-	
+
 private:
 	VdigGrab  *pVdg;
 	ImageDescriptionHandle vdImageDesc;

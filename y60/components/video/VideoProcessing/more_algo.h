@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -182,7 +182,7 @@ OutputIterator lowpass(int radius,InputIterator begin, InputIterator end, Output
  //   cerr << "lowpas(3):count = " << count << ",trail = " << trail - begin <<",lead = " << lead - begin << endl;
     while (trail!=end && count>=radius) {
  //       cerr << "lowpas(T):out = " << out-first_out << " count = " << count-1 << ",trail = " << trail - begin <<",lead = " << lead - begin << endl;
-        value = value - convert(*trail++, init);        
+        value = value - convert(*trail++, init);
         *out++ = convert(value/count,*out);
         count--;
     }
@@ -196,7 +196,7 @@ OutputIterator avrg_pass(InputIterator begin, InputIterator end, OutputIterator 
         T trail_value = *begin >> 1;
         InputIterator lead = begin+1;
         InputIterator lend = end;
-        T lead_value;      
+        T lead_value;
         while (lead!=lend) {
             lead_value = *lead >> 1;
             ++lead;
@@ -235,16 +235,16 @@ void avrg_pass_2d(const IN_RASTER& in, OUT_RASTER& out, const DUMMY_T& dt) {
     h_avrg_pass(in, out,dt);
 //    ptime lp2start;
     v_avrg_pass(out, out,dt);
-#if 0       
+#if 0
     double h_lp_time = ptime() - lp2start;
     double v_lp_time = lp2start - lp1start;
-    int hsize = in.hsize();  
-    int vsize = in.vsize();  
-    cerr << "Time to h_avrg_pass_2d " <<  DMS(h_lp_time) << " " << hsize*vsize/h_lp_time/1024/1024 << " Mpix/s" << endl;          
-    cerr << "Time to v_avrg_pass_2d " <<  DMS(v_lp_time) << " " << hsize*vsize/v_lp_time/1024/1024 << " Mpix/s" << endl;          
+    int hsize = in.hsize();
+    int vsize = in.vsize();
+    cerr << "Time to h_avrg_pass_2d " <<  DMS(h_lp_time) << " " << hsize*vsize/h_lp_time/1024/1024 << " Mpix/s" << endl;
+    cerr << "Time to v_avrg_pass_2d " <<  DMS(v_lp_time) << " " << hsize*vsize/v_lp_time/1024/1024 << " Mpix/s" << endl;
 #endif
 }
-    
+
 
 template <class InputIterator,class OutputIterator,class T>
 OutputIterator gradient(int radius,InputIterator begin, InputIterator end, OutputIterator out, const T& init) {
@@ -383,8 +383,8 @@ void expand(int radius, InputIterator begin, InputIterator end, OutputIterator o
     int out_count = 0;
     bool in_region = false;
     InputIterator first = begin;
-    
-    if (begin != end) 
+
+    if (begin != end)
         in_region = (*begin == region_value);
     else
         return;
@@ -400,7 +400,7 @@ void expand(int radius, InputIterator begin, InputIterator end, OutputIterator o
         }
         ++out;
     }
-    // jetzt rueckwaerts 
+    // jetzt rueckwaerts
     do {
         --begin;
         --out;
@@ -412,7 +412,7 @@ void expand(int radius, InputIterator begin, InputIterator end, OutputIterator o
         } else {
             *out = *begin;
         }
-    } while(begin != first); 
+    } while(begin != first);
 }
 
 template <class InputIterator, class OutputIterator, class T>
@@ -420,8 +420,8 @@ void erode(int radius, InputIterator begin, InputIterator end, OutputIterator ou
     int out_count = 0;
     bool in_region = false;
     InputIterator first = begin;
-    
-    if (begin != end) 
+
+    if (begin != end)
         in_region = (*begin == region_value);
     else
         return;
@@ -440,7 +440,7 @@ void erode(int radius, InputIterator begin, InputIterator end, OutputIterator ou
         }
         ++out;
     }
-    // jetzt rueckwaerts 
+    // jetzt rueckwaerts
     do {
         --begin;
         --out;
@@ -517,14 +517,14 @@ void v_erode(int radius, const IN_RASTER& in, OUT_RASTER& out, const PIXEL& regi
 }
 
 //template <class PIXEL>
-//void erode2d(int radius, 
+//void erode2d(int radius,
 //                const const_submat<PIXEL>& in,
-//                const submat<PIXEL>& out, 
+//                const submat<PIXEL>& out,
 //                const PIXEL& region_value,const PIXEL& eroded_value) {
 template <class IN_RASTER, class OUT_RASTER, class PIXEL>
-void erode2d(int radius, 
+void erode2d(int radius,
                 const IN_RASTER& in,
-                OUT_RASTER& out, 
+                OUT_RASTER& out,
                 const PIXEL& region_value,const PIXEL& eroded_value) {
 //    h_erode(radius, in, submat<PIXEL>(out),region_value,eroded_value);
 //    v_erode(radius, const_submat<PIXEL>(out), out,region_value,eroded_value);
@@ -825,8 +825,8 @@ OutputIterator discriminate(InputIterator begin, InputIterator end, OutputIterat
 template <class RASTER,class INPIXEL, class OUTPIXEL>
 matrix<OUTPIXEL> discriminated_mat(const RASTER& m,
                                 const INPIXEL& cut_value,
-                                const OUTPIXEL& below_eq_value, 
-                                const OUTPIXEL& above_value) 
+                                const OUTPIXEL& below_eq_value,
+                                const OUTPIXEL& above_value)
 {
     matrix<OUTPIXEL> result(m.hsize(),m.vsize());
     discriminate(m.begin(),m.end(),result.begin(),cut_value,below_eq_value,above_value);
@@ -856,8 +856,8 @@ OutputIterator chan_discriminate(InputIterator begin, InputIterator end, OutputI
 template <class RASTER,class INPIXEL, class OUTPIXEL>
 matrix<OUTPIXEL> chan_discriminated_mat(const RASTER& m,
                                 const INPIXEL& cut_value,
-                                const OUTPIXEL& below_value, 
-                                const OUTPIXEL& above_value) 
+                                const OUTPIXEL& below_value,
+                                const OUTPIXEL& above_value)
 {
     matrix<OUTPIXEL> result(m.hsize(),m.vsize());
     chan_discriminate(m.begin(),m.end(),result.begin(),cut_value,below_value,above_value);
@@ -924,7 +924,7 @@ OutputIterator squared_diff(InputIterator begin, InputIterator end, InputIterato
 }
 
 template <class InputIterator,class OutputIterator,class IN_VALUE, class OUT_VALUE>
-OutputIterator normalize(InputIterator begin, InputIterator end, OutputIterator out, 
+OutputIterator normalize(InputIterator begin, InputIterator end, OutputIterator out,
                             const IN_VALUE& max_in, const OUT_VALUE& max_out) {
     if (max_in != 0) {
         while (begin!=end) {
@@ -947,10 +947,10 @@ matrix<OUT_VALUE> normalized(const RASTER& m, const OUT_VALUE& max_out)
 }
 
 template <class InputIterator,class OutputIterator,class IN_VALUE, class OUT_VALUE,class ARITH_TYPE>
-OutputIterator normalize(InputIterator begin, InputIterator end, OutputIterator out, 
+OutputIterator normalize(InputIterator begin, InputIterator end, OutputIterator out,
                             const IN_VALUE& max_in, const OUT_VALUE& max_out,
                             const ARITH_TYPE &arith) {
-    
+
     if (all_non_zero(max_in)) {
         while (begin!=end) {
             *out++ = convert(convert(*begin++,arith) * convert(max_out,arith) / convert(max_in,arith),*out);
@@ -967,16 +967,16 @@ matrix<OUT_VALUE> normalized(const RASTER& m, const OUT_VALUE& max_out,const ARI
 {
     matrix<OUT_VALUE> result(m.hsize(),m.vsize());
     typename RASTER::value_type max_in = maximum(m.begin(),m.end(),typename RASTER::value_type(0));
-    
+
     normalize(m.begin(),m.end(),result.begin(),max_in,max_out,arith);
     return result;
 }
 
 template <class InputIterator,class OutputIterator,class IN_VALUE, class OUT_VALUE,class ARITH_TYPE>
-OutputIterator chan_normalize(InputIterator begin, InputIterator end, OutputIterator out, 
+OutputIterator chan_normalize(InputIterator begin, InputIterator end, OutputIterator out,
                             const IN_VALUE& max_in, const OUT_VALUE& max_out,
                             const ARITH_TYPE &arith) {
-    
+
    while (begin!=end) {
          *out++ = convert(convert(*begin++,arith) * convert(max_out,arith) / convert(max_in,arith),*out);
     }
@@ -987,7 +987,7 @@ matrix<OUT_VALUE> chan_normalized(const RASTER& m, const OUT_VALUE& max_out,cons
 {
     matrix<OUT_VALUE> result(m.hsize(),m.vsize());
     typename RASTER::value_type max_in = chan_maximum(m.begin(),m.end(),typename RASTER::value_type(0));
-    
+
     cerr << DBG(max_in) <<endl;
     chan_normalize(m.begin(),m.end(),result.begin(),max_in,max_out,arith);
     return result;
@@ -996,7 +996,7 @@ matrix<OUT_VALUE> chan_normalized(const RASTER& m, const OUT_VALUE& max_out,cons
 
 template <class InputIterator,class OutputIterator,class T>
 OutputIterator run_sum(InputIterator begin, InputIterator end, OutputIterator out, const T& init) {
-    
+
     T rs = convert(*begin++,init);
     if (begin!=end)
         *out++ = rs;
@@ -1038,7 +1038,7 @@ template <class IN_RASTER, class OUT_RASTER, class SUM_T>
 
 template <class IN_RASTER, class SUM_T>
 SUM_T get_run_rect_sum(const IN_RASTER& run_sums, int h, int v, int hsize, int vsize,const SUM_T& init) {
-    if ((hsize<=0) || (vsize<=0)) 
+    if ((hsize<=0) || (vsize<=0))
         return init;
     h = h - 1;
     v = v - 1;
@@ -1107,10 +1107,10 @@ template <class IN_RASTER, class OUT_RASTER, class DIV_T>
 void abs_gradient(int radius, const IN_RASTER& in, OUT_RASTER& out, const DIV_T& divt) {
     matrix<typename IN_RASTER::value_type> h_tmp(in.hsize(),in.vsize());
     matrix<typename IN_RASTER::value_type> v_tmp(in.hsize(),in.vsize());
-    
+
     h_abs_gradient(radius, in, h_tmp,divt);
     v_abs_gradient(radius, in, v_tmp,divt);
-    
+
     paverage(h_tmp.begin(), h_tmp.end(), v_tmp.begin(), out.begin(), DIV_T(2));
 }
 template <class IN_RASTER, class OUT_RASTER, class SUM_T>
@@ -1140,10 +1140,10 @@ template <class IN_RASTER, class OUT_RASTER, class DIV_T>
 void gradient(int radius, const IN_RASTER& in, OUT_RASTER& out, const DIV_T& divt) {
     matrix<typename IN_RASTER::value_type> h_tmp(in.hsize(),in.vsize());
     matrix<typename IN_RASTER::value_type> v_tmp(in.hsize(),in.vsize());
-    
+
     h_gradient(radius, in, h_tmp,divt);
     v_gradient(radius, in, v_tmp,divt);
-    
+
     paverage(h_tmp.begin(), h_tmp.end(), v_tmp.begin(), out.begin(), DIV_T(2));
 }
 
@@ -1200,8 +1200,8 @@ RESULT moment(int p, int q, const MATRIX& image, RESULT init) {
             result += (RESULT)xp * (RESULT)yp * (RESULT)image(x,y);
 //           cerr << DBG(x) << DBG(y) << DBG(xp) << DBG(yp) << DBG(image(x,y)) << DBG(result) << endl;
         }
-            
-    }     
+
+    }
     return result;
 }
 
@@ -1222,7 +1222,7 @@ Delta_value delta(InputIterator begin1, InputIterator end1, InputIterator2 begin
     Delta_value result = init;
     while (begin1!=end1) {
         result = result + pixel_abs(convert(*begin1++,init) - convert(*begin2++,init));
-        
+
     }
     return result;
 }
@@ -1250,7 +1250,7 @@ float correlation(InputIterator begin1, InputIterator end1, InputIterator2 begin
         float b = *begin2++;
         ab += a*b;
         aa += a*a;
-        bb += b*b; 
+        bb += b*b;
     }
     float corr = ab*ab / sqrt(aa * aa * bb * bb);
     return corr;
@@ -1268,7 +1268,7 @@ float correlation(const RASTER1& r1, const RASTER2& r2,
         float b = r2(h,v);
         ab += a*b;
         aa += a*a;
-        bb += b*b; 
+        bb += b*b;
         ++begin;
     }
     float corr = ab*ab / sqrt(aa * aa * bb * bb);
@@ -1295,7 +1295,7 @@ struct hit_list {
         list = hl.get_list();
    }
    int size() const {
-        return list.size(); 
+        return list.size();
    }
    const pair<SCORE,ITEM>& operator[](int i) {
         return list[i];
@@ -1315,24 +1315,24 @@ struct hit_list {
    const vector<pair<SCORE,ITEM> >& get_list() const {
         return list;
    }
-protected:    
+protected:
    int max_size;
    vector<pair<SCORE,ITEM> > list;
 };
 
 template <class RASTER>
 vector<vec2<int> > get_extreme_coords(const RASTER& r, int num_best = 16) {
-    
+
     hit_list<int,vec2<int>,less_first<pair<int,vec2<int> > > > small_n(num_best);
     hit_list<int,vec2<int>,greater_first<pair<int,vec2<int> > > > large_n(num_best);
 
     for (int v = 0; v < r.vsize();v++) {
         for (int h = 0; h < r.hsize();h++) {
-            small_n.push(r(h,v),vec2<int>(h,v));    
-            large_n.push(r(h,v),vec2<int>(h,v));    
+            small_n.push(r(h,v),vec2<int>(h,v));
+            large_n.push(r(h,v),vec2<int>(h,v));
         }
     }
-    
+
     vector<vec2<int> > result(small_n.size()+large_n.size());
     for (int i=0;i<small_n.size();i++) {
         result[i] = small_n.item(i);
@@ -1372,7 +1372,7 @@ int grad_feature_richness(const RASTER& r) {
 //    if  htol or vtol are nonzero, h_best and v_best are considered as start positions,
 //        and the search for inner_mat is performed within a region from {best-tol} to {best+tol}
 //        including both
-//        if the hints are invalid, the whole region is searched  
+//        if the hints are invalid, the whole region is searched
 
 
 template <class outer_mat, class inner_mat>
@@ -1385,19 +1385,19 @@ bool match_matrix_sub_pixel(const outer_mat& outer,
                                vec2<float>& match_center,
                                      float& quality,
                                         int num_best = 1) {
-    
 
-#if 0    
+
+#if 0
     cerr << DBG(outer.hsize()) << endl;
     cerr << DBG(outer.vsize()) << endl;
     cerr << DBG(inner.hsize()) << endl;
     cerr << DBG(inner.vsize()) << endl;
-    
+
     cerr << DBG(inner_pos) << endl;
     cerr << DBG(inner_center) << endl;
     cerr << DBG(search_tol) << endl;
 #endif
-   
+
     int h_start = 0;
     int v_start = 0;
     int h_offs_end = outer.hsize() - inner.hsize();
@@ -1406,16 +1406,16 @@ bool match_matrix_sub_pixel(const outer_mat& outer,
     int v_best = inner_pos[1];
     int h_tol = search_tol[0];
     int v_tol = search_tol[1];
-    
+
     if (h_tol && (h_best>=h_tol))
         h_start = h_best - h_tol;
 
     if (v_tol && (v_best>=v_tol))
         v_start = v_best - v_tol;
-    
+
     if (h_tol && (h_best + h_tol + 1< h_offs_end))
         h_offs_end = h_best + h_tol + 1;
-    
+
     if (v_tol && (v_best + v_tol + 1< v_offs_end))
         v_offs_end = v_best + v_tol + 1;
 
@@ -1423,15 +1423,15 @@ bool match_matrix_sub_pixel(const outer_mat& outer,
     if ((h_start >= h_offs_end) || (v_start>= v_offs_end)) {
         return 0;
     }
-        
+
 //    cerr << DBG(h_start)<< DBG(h_offs_end)<< DBG(v_start)<< DBG(v_offs_end)<<endl;
 #define N_correl_match
 #ifdef correl_match
     hit_list<float,vec2<int> > best_n(num_best);
-#else    
+#else
     hit_list<int,vec2<int>,less_first<pair<int,vec2<int> > > > best_n(num_best);
 #endif
-ptime match_start;    
+ptime match_start;
     int init_type(0);
 
     for (int h = h_start; h < h_offs_end; h++) {
@@ -1449,18 +1449,18 @@ ptime match_time = ptime() - match_start;
 //    cerr << DMS(match_time) << endl;
 
     vec2<int> mbs(num_best/2,num_best/2);
-    box2<vec2<int> > match_bounds(best_n.item(0)-mbs,best_n.item(0)+mbs); 
-    
+    box2<vec2<int> > match_bounds(best_n.item(0)-mbs,best_n.item(0)+mbs);
+
     if (!best_n.size()) {
         cerr << "WARNING: match_matrix_sub_pixel: no search area, returning" << endl;
         return 0;
     } else {
-        
+
     }
-    
+
     typedef pair<vec2<int>,int> point_match;
     hit_list<int,point_match> rich_n(num_best);
-    
+
     // compute sum of match
 #ifdef correl_match
     float total_score = 0;
@@ -1499,12 +1499,12 @@ ptime match_time = ptime() - match_start;
         cerr << "WARNING: match_matrix_sub_pixel: no best_inside features" << endl;
         return 0;
     };
-    
+
     best_match_pos = rich_n.item(0).first;
 //    best_match_pos = best_n.item(0);
 //    best_match_pos = best_inside.item(0);
 //    cerr << DBG(total_score) << DBG (best_match_pos) << endl;
-    
+
     // compute weighted average
     float h_best_f = 0;
     float v_best_f = 0;
@@ -1520,7 +1520,7 @@ ptime match_time = ptime() - match_start;
             weight = ( total_score - score * score) / (total_score * (best_inside.size()-1.0));
 #endif
         }
-        else 
+        else
             weight = 1;
         total_weight += weight;
         h_best_f += static_cast<float>(best_inside.item(j)[0]) * weight;
@@ -1529,14 +1529,14 @@ ptime match_time = ptime() - match_start;
 //        best_bounds.extendBy(best_inside.item(j));
     }
 //    cerr << DBG(total_weight)<<endl;
-    
+
     vec2<float> center_offs = vec2<float>(h_best_f,v_best_f) - float_vec(best_match_pos);
-    
+
     vec2<float> fix_center = vec2<float>(inner.hsize(),inner.vsize()) /2.0;
     vec2<float> new_center = inner_center + center_offs;
     match_center = ((7 * new_center + fix_center) / 8.0);
 //    match_center = new_center;
-    
+
     int num_val = inner.hsize()*inner.vsize();
 #ifdef correl_match
     quality = total_score / 4;
@@ -1546,14 +1546,14 @@ ptime match_time = ptime() - match_start;
         quality = best_inside.size() / rel_score;
     else
         quality = largest(float());
-#endif    
+#endif
 //    cerr << DBG(best_match_pos) <<DBG(inner_center)<<DBG(inner_pos)<<DBG(center_offs)<<DBG(h_best_f)<< DBG(v_best_f)<<DBG(match_center) <<DBG(quality)<<endl;
-    
+
 //    cerr << DBG(best_bounds) << endl;
-    
+
 //    int h_scatter,v_scatter;
 //    best_bounds.getSize(h_scatter,v_scatter);
-    
+
     bool good =  (best_inside.size() >= num_best/2);
     if (!good) {
         cerr << "less than half of required inside a rect [-req/2..+req/2]" << endl;
@@ -1567,7 +1567,7 @@ ptime match_time = ptime() - match_start;
 //    if  htol or vtol are nonzero, h_best and v_best are considered as start positions,
 //        and the search for inner_mat is performed within a region from {best-tol} to {best+tol}
 //        including both
-//        if the hints are invalid, the whole region is searched  
+//        if the hints are invalid, the whole region is searched
 
 template <class outer_mat, class inner_mat>
 bool pre_match_matrix(const outer_mat& outer,
@@ -1577,12 +1577,12 @@ bool pre_match_matrix(const outer_mat& outer,
                             vec2<int>& new_inner_pos,
                             vec2<int>& new_search_tol,
                         int num_best = 2) {
-    
+
     int h_start = 0;
     int v_start = 0;
     int h_offs_end = outer.hsize() - inner.hsize();
     int v_offs_end = outer.vsize() - inner.vsize();
-    
+
     int h_best = inner_pos[0];
     int v_best = inner_pos[1];
     int h_tol = search_tol[0];
@@ -1591,19 +1591,19 @@ bool pre_match_matrix(const outer_mat& outer,
     float best_match = -1;
     int match_result;
     int init_type(0);
-    
+
     if (h_tol && (h_best>=h_tol))
         h_start = h_best - h_tol;
 
     if (v_tol && (v_best>=v_tol))
         v_start = v_best - v_tol;
-    
+
     if (h_tol && (h_best + h_tol + 1< h_offs_end))
         h_offs_end = h_best + h_tol + 1;
-    
+
     if (v_tol && (v_best + v_tol + 1< v_offs_end))
         v_offs_end = v_best + v_tol + 1;
-        
+
     vector<vec2<int> > extreme_points = get_extreme_coords(inner,12);
 
 #ifdef correl_match
@@ -1622,14 +1622,14 @@ bool pre_match_matrix(const outer_mat& outer,
             best_n.push(match_result,vec2<int>(h,v));
         }
     }
-    
+
     box2<vec2<int> > best_bounds;
     for (int j = 0;j < best_n.size();j++) {
         best_bounds.extendBy(best_n.item(j));
     }
     new_inner_pos = best_bounds.getCenter();
     new_search_tol = best_bounds.getSize()+vec2<int>(1,1);
-    
+
     return 1;
 }
 template <class outer_mat, class inner_mat>
@@ -1743,7 +1743,7 @@ bool analyze_moments(const MATRIX& mat, moment_results& mom)
     mom.major_dir = direction_vector(major_axis_angle);
     mom.minor_dir = mom.major_dir.ortho();
     mom.minor_angle = angle_of(mom.minor_dir);
-    
+
     //cerr << DBG(a) << DBG(b) <<DBG(c) <<DBG(mom.l) <<DBG(mom.w) <<
      //       DBG(gcenter) << DBG(mom.major_dir) << DBG(mom.minor_dir) <<endl;
 
@@ -1779,12 +1779,12 @@ bool try_feature( const point_int_pair& new_feature,point_int_vector& features, 
 //        cerr << "// insert feature << " << new_feature << " because it is the first" << endl;
     } else {
         // fast small feature check
-        if ((features.size()>=max_features) && (new_feature.second <= features.back().second)) 
+        if ((features.size()>=max_features) && (new_feature.second <= features.back().second))
             return false;
 
         // remove all intersecting features with lower priority
         point_int_vector::iterator which;
-        while ((which = intersection(new_feature.first[0],new_feature.first[1],hsize,vsize, features.begin(), features.end())) 
+        while ((which = intersection(new_feature.first[0],new_feature.first[1],hsize,vsize, features.begin(), features.end()))
                 != features.end()) {
             // "which" contains largest intersecting element
 //            cerr << "// 'which' contains largest intersecting element" << endl;
@@ -1817,11 +1817,11 @@ bool try_feature( const point_int_pair& new_feature,point_int_vector& features, 
         }
     }
 //cerr << "// try_feature ready, return true" << endl;
-    return true;         
+    return true;
 }
 
 template <class RASTER>
-point_int_vector 
+point_int_vector
 find_features(const RASTER& sums, int hsize, int vsize, int  max_features) {
     int hlim = sums.hsize() - hsize;
     int vlim = sums.vsize() - vsize;
@@ -1837,7 +1837,7 @@ find_features(const RASTER& sums, int hsize, int vsize, int  max_features) {
             int totalw = channel_sum(weight,int(0));
 //            cerr << "try " << DBG(hp) << DBG (vp) << DBG(totalw) << endl;
 
-            try_feature(make_pair(vec2<int>(hp,vp),totalw),features, max_features, hsize, vsize); 
+            try_feature(make_pair(vec2<int>(hp,vp),totalw),features, max_features, hsize, vsize);
 //                for (int f = 0;f<features.size();f++) {
 //                    cerr << f << ") pos = " << features[f].first << "val = " << features[f].second << endl;
 //                }
@@ -1846,7 +1846,7 @@ find_features(const RASTER& sums, int hsize, int vsize, int  max_features) {
     }
 //    cerr << endl << "end find_features" << endl;
     return features;
-}    
+}
 
 template <class PIXEL, class SUM_T>
 fill_test(vec2<int> pos, const submat<PIXEL>& testmap, float radius, SUM_T max) {

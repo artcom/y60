@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -94,9 +94,9 @@ namespace y60 {
 
     M60Decoder::~M60Decoder() {
     }
-    
-    std::string M60Decoder::canDecode(const std::string & theUrl, 
-                                        asl::Ptr<asl::ReadableStreamHandle> theStream) 
+
+    std::string M60Decoder::canDecode(const std::string & theUrl,
+                                        asl::Ptr<asl::ReadableStreamHandle> theStream)
     {
         if (theUrl.find(".m60") != std::string::npos) {
             return "video/x-m60";
@@ -162,7 +162,7 @@ namespace y60 {
     M60Decoder::startMovie(double theStartTime, bool theStartAudioFlag) {
         _myLastDecodedFrame = std::numeric_limits<unsigned>::max();
         MovieDecoderBase::startMovie(theStartTime, theStartAudioFlag);
-        
+
     }
 
     double
@@ -174,13 +174,13 @@ namespace y60 {
             return theTime;
         }
         bool myReverseFlag = getMovie()->get<PlaySpeedTag>() < 0;
-        
+
         // Handle frame wrap around
         if (_myLastDecodedFrame > theFrame) {
             if ( _myLastDecodedFrame != std::numeric_limits<unsigned>::max()  && !myReverseFlag) {
                 setEOF(true);
                 DB(AC_DEBUG << "Wraparound detected");
-                return theTime;                
+                return theTime;
             } else {
                 _myFilePos = _myMovieHeaderSize;
                 decodeFrame(0, theTargetRaster[0]);

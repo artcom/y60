@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -85,7 +85,7 @@ namespace y60 {
     		~DInputExtension();
             virtual void init();
             virtual y60::EventPtrList poll();
-    
+
             const char * ClassName() {
                 static const char * myClassName = "DInput";
                 return myClassName;
@@ -94,7 +94,7 @@ namespace y60 {
             void setBufferSize(unsigned theSize) {
                 _myBufferSize = theSize;
             }
-    
+
             unsigned getBufferSize() const {
                 return _myBufferSize;
             }
@@ -105,32 +105,32 @@ namespace y60 {
             virtual void onSetProperty(const std::string & thePropertyName,
                                const y60::PropertyValue & thePropertyValue) {}
             virtual void onUpdateSettings(dom::NodePtr theSettings) {}
-            
-            JSFunctionSpec * Functions();                
-    
+
+            JSFunctionSpec * Functions();
+
             void applyForce(unsigned theJoystickIndex, int theXMagnitude, int theYMagnitude);
             void stopForce(unsigned theJoystickIndex);
             void setAutoCentering(unsigned theJoystickIndex, bool theFlag);
 
-        private:			
-            void initJoysticks(DWORD theFlags, DWORD theCoopLevel);                
+        private:
+            void initJoysticks(DWORD theFlags, DWORD theCoopLevel);
 
     		static int CALLBACK EnumJoysticksCallback(const DIDEVICEINSTANCE* pdidInstance,
                     void* This);
-    
+
             void createForceEffect(LPDIRECTINPUTDEVICE8 & theJoystick, LPDIRECTINPUTEFFECT & theEffect);
-            
+
             void addJoystick(const DIDEVICEINSTANCE* pdidInstance);
             HWND findSDLWindow();
-    
+
             void printErrorState(const std::string & theCall, HRESULT hr);
-    
+
             LPDIRECTINPUT8 _myDI;
             std::vector<LPDIRECTINPUTDEVICE8> _myJoysticks;
             unsigned                          _myBufferSize;
-            std::vector<LPDIRECTINPUTEFFECT>  _myForceEffects;      
-            bool                              _myForceFeedBackFlag;  
-    
+            std::vector<LPDIRECTINPUTEFFECT>  _myForceEffects;
+            bool                              _myForceFeedBackFlag;
+
     };
 }
 #endif

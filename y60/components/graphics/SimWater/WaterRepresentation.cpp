@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -101,7 +101,7 @@ using namespace asl;  // manually added!
 
 namespace y60 {
 
-const string WaterRepresentation::TextureClassNames[] = 
+const string WaterRepresentation::TextureClassNames[] =
 { "#nomap", "floormaps", "surfacemaps", "cubemaps", "puzzlemaps" };
 
 const float WATER_LEVEL = -200.f;
@@ -179,7 +179,7 @@ WaterRepresentation::~WaterRepresentation() {
     }
 }
 
-void    
+void
 WaterRepresentation::resetParameters() {
     _reflectionAlphaBias = 0.05f;
     _normalMax = .5f;
@@ -194,18 +194,18 @@ WaterRepresentation::resetParameters() {
 
 
 // init internal data to fit water array size
-void    
+void
 WaterRepresentation::init(WaterSimulationPtr waterSim, int width, int height,
-                          int dataOffsetX, int dataOffsetY, 
+                          int dataOffsetX, int dataOffsetY,
                           int sceneDisplayWidth, int sceneDisplayHeight,
                           int displayWidth, int displayHeight,
                           int displayOffsetX, int displayOffsetY,
-                          BufferAllocatorPtr bufferAllocator) 
+                          BufferAllocatorPtr bufferAllocator)
 {
     cerr << "WaterRepresentation::init " << endl
          << "dataWidth=" << width << ", dataHeight= " << height << endl
          << ", dataOffsetX= " << dataOffsetX << ", dataOffsetY= " << dataOffsetY << endl
-         << ", sceneDisplayWidth= " << sceneDisplayWidth 
+         << ", sceneDisplayWidth= " << sceneDisplayWidth
          << ", sceneDisplayHeight= " << sceneDisplayHeight << endl
          << ", displayWidth= " << displayWidth << ", displayHeight= " << displayHeight << endl
          << ", displayOffsetX= " << displayOffsetX << ", displayOffsetY= " << displayOffsetY
@@ -228,11 +228,11 @@ WaterRepresentation::init(WaterSimulationPtr waterSim, int width, int height,
     int stripLength = computeStripLength();
     int floatsToAllocate = (_dataHeight+1)*(_dataWidth+1) * VERTEX_DATA_STRIDE;
     int bytesToAllocate = floatsToAllocate * sizeof(GLfloat);
-    
+
     cerr << "   stripLength=" << stripLength << ", bytesToAllocate= " << bytesToAllocate << endl;
-    
+
     _stripIndices = new GLuint[numLinesPerBuffer * stripLength];
-    
+
     if (bufferAllocator) {
         _vertexBuffer = (GLfloat*) bufferAllocator->allocateSingleBuffer(
                                                 bytesToAllocate);
@@ -243,31 +243,31 @@ WaterRepresentation::init(WaterSimulationPtr waterSim, int width, int height,
     assert(_vertexBuffer);
 
     assert((_dataHeight % NUM_VAR_BUFFERS) == 0);
-    
-    
+
+
     for(int i=0; i < NUM_VAR_BUFFERS; i++) {
-        _varBuffer[i]._pointer = _vertexBuffer + (i * _dataWidth * 
+        _varBuffer[i]._pointer = _vertexBuffer + (i * _dataWidth *
                                  computeNumLinesPerBuffer() * VERTEX_DATA_STRIDE);
     }
     for (int i=0; i<floatsToAllocate; i++) {
         _vertexBuffer[i] = 0;
     }
-    
-    
+
+
     for (int j=0; j < numLinesPerBuffer; j++) {
-       
+
         int currStripIndex = stripLength * j;
-        
+
         _stripIndices[currStripIndex] = j * _dataWidth;
         _stripIndices[currStripIndex+1] = (j+1) * _dataWidth;
-        
+
         for (int i=2; i< stripLength; i++) {
             _stripIndices[currStripIndex+i] = _stripIndices[currStripIndex+i-2] + 1;
         }
     }
-   
+
     for (int currentBuffer=0; currentBuffer < NUM_VAR_BUFFERS; currentBuffer++) {
-        
+
         GLfloat * v = _varBuffer[currentBuffer]._pointer;
         for (int j = 0; j <= numLinesPerBuffer; j++) {
 
@@ -275,7 +275,7 @@ WaterRepresentation::init(WaterSimulationPtr waterSim, int width, int height,
 
             for (int i=0; i<= _dataWidth; i++) {
                 vertexLinePtr[0] = i - ((float)(_dataWidth)/ 2.f);  // xpos
-                vertexLinePtr[1] = currentBuffer * numLinesPerBuffer + j - 
+                vertexLinePtr[1] = currentBuffer * numLinesPerBuffer + j -
                                     ((float)(_dataHeight) / 2.f);  // ypos
 
                 vertexLinePtr[0] += (float) _displayOffsetX;
@@ -292,17 +292,17 @@ WaterRepresentation::init(WaterSimulationPtr waterSim, int width, int height,
 
     _objectPosScaleX = (double(sceneDisplayWidth) / 10000.);
     _objectPosScaleY = (double(sceneDisplayHeight) / 10000.);
-    
-    _objectPosOffsetX = double(_displayOffsetX) - (double(_dataWidth) / 2.) - 
+
+    _objectPosOffsetX = double(_displayOffsetX) - (double(_dataWidth) / 2.) -
                         double(_dataOffsetX);
-    _objectPosOffsetY = double(_displayOffsetY) - (double(_dataHeight) / 2.) - 
+    _objectPosOffsetY = double(_displayOffsetY) - (double(_dataHeight) / 2.) -
                         double(_dataOffsetY);
 
     cerr << "WaterRepresentation::init _objectPosScaleX= " << _objectPosScaleX
          << ", _objectPosScaleY= "  << _objectPosScaleY
          << ", _objectPosOffsetX= " << _objectPosOffsetX
          << ", _objectPosOffsetY= " << _objectPosOffsetY << endl;
-        
+
     initRender();
     AC_DEBUG << "WaterRepresentation::init() finished";
 }
@@ -329,14 +329,14 @@ void
 WaterRepresentation::copyWaterDataToVertexBuffer() {
     for (int currentBuffer=0; currentBuffer < NUM_VAR_BUFFERS; currentBuffer++) {
         copyWaterDataToVertexBuffer(currentBuffer);
-    }    
+    }
 }
 
 void
 WaterRepresentation::copyWaterDataToVertexBuffer(int currentBuffer) {
 
     assert(_waterSimulation);
-    
+
     int     numLinesPerBuffer = computeNumLinesPerBuffer();
     int     startLine = currentBuffer * numLinesPerBuffer;
     int     endLine = startLine + numLinesPerBuffer;
@@ -346,21 +346,21 @@ WaterRepresentation::copyWaterDataToVertexBuffer(int currentBuffer) {
     Texture & myFloorMap = currentTexture(floormaps);
     const float texFactorX = (_displayWidth / float(myFloorMap.myWidth)) / (float)_dataWidth;
     const float texFactorY = (_displayHeight / float(myFloorMap.myHeight)) / (float)_dataHeight;
-   
+
     int currentLine = 0;
 #ifdef COMPUTE_WATER_DEPTH
     float minWaterDepth = FLT_MAX;
     float maxWaterDepth = FLT_MIN;
 #endif
     for(int j = startLine ; j <= endLine; j++ ) {
-    
+
         register GLfloat * vertexLinePtr = v + currentLine * _dataWidth * VERTEX_DATA_STRIDE;
 
-        GLfloat * waterDataLine = _waterSimulation->getWaterDataLine(_dataOffsetY + j) + 
+        GLfloat * waterDataLine = _waterSimulation->getWaterDataLine(_dataOffsetY + j) +
                                     _dataOffsetX;
-        GLfloat * prevWaterDataLine = _waterSimulation->getWaterDataLine(_dataOffsetY + j - 1) + 
+        GLfloat * prevWaterDataLine = _waterSimulation->getWaterDataLine(_dataOffsetY + j - 1) +
                                     _dataOffsetX;
-        GLfloat * nextWaterDataLine = _waterSimulation->getWaterDataLine(_dataOffsetY + j + 1) + 
+        GLfloat * nextWaterDataLine = _waterSimulation->getWaterDataLine(_dataOffsetY + j + 1) +
                                     _dataOffsetX;
 
         for( int i=0 ; i < _dataWidth ; i++ ) {
@@ -374,8 +374,8 @@ WaterRepresentation::copyWaterDataToVertexBuffer(int currentBuffer) {
             }
             if (waterDataLine[i] > maxWaterDepth) {
                 maxWaterDepth = waterDataLine[i];
-            }    
-#endif            
+            }
+#endif
             //  compute normal
             float normalX;
             float normalY;
@@ -384,30 +384,30 @@ WaterRepresentation::copyWaterDataToVertexBuffer(int currentBuffer) {
 
             normalX = clamp(normalX, -_normalMax, _normalMax);
             normalY = clamp(normalY, -_normalMax, _normalMax);
-          
+
             // normale eintragen, opengl normalisiert selbst
             vertexLinePtr[3] = normalX * _reflectionNormalScale;
             vertexLinePtr[4] = normalY * _reflectionNormalScale;
             //vertexLinePtr[5] = 1;
 
             // compute texture coordinates
-            vertexLinePtr[6] = (((float)i) - 
+            vertexLinePtr[6] = (((float)i) -
                             (normalX * _refractionScale * waterDataLine[i])) * texFactorX;
             vertexLinePtr[7] = (((float)
-                            (_displayHeight-j))+  
+                            (_displayHeight-j))+
                             (normalY * _refractionScale * waterDataLine[i])) * texFactorY;
 
             float heightValue = maximum(-1.f, minimum(1.f, waterDataLine[i]));
-            float colorValue = _causticBias + ((heightValue > 0) ? 
+            float colorValue = _causticBias + ((heightValue > 0) ?
                                         (_causticScale * heightValue +
                                         _causticSqrScale * SQR(heightValue)) :
                                         (_causticNegativeScale * (heightValue)));
 
             vertexLinePtr[8] = colorValue;
             vertexLinePtr[9] = colorValue;
-            vertexLinePtr[10] = colorValue;        
+            vertexLinePtr[10] = colorValue;
 
-            float alphaValue = _reflectionAlphaBias + 
+            float alphaValue = _reflectionAlphaBias +
                                _reflectionAlphaScale * (normalX + normalY);
             vertexLinePtr[11] = alphaValue;
 
@@ -439,7 +439,7 @@ WaterRepresentation::loadCubeMapTexture(TextureClass theClassID,
                                         const string textureFileNames[])
 {
 
-   cerr << "#INFO : loading cube texture map class " << TextureClassName(theClassID) 
+   cerr << "#INFO : loading cube texture map class " << TextureClassName(theClassID)
          << " into map object= " << theObjectID << endl;
 
     Texture & myTexture = _myTextures[theClassID][theObjectID];
@@ -470,14 +470,14 @@ WaterRepresentation::loadCubeMapTexture(TextureClass theClassID,
 
     int & imageWidth = myTexture.myWidth;
     int & imageHeight = myTexture.myHeight;
-    
+
     imageWidth=0;
     imageHeight = 0;
 
 	for(unsigned int i=0; i<6; i++) {
         PLAnyBmp myBmp;
-        
-        cerr << "Loading bitmap for cube map '" 
+
+        cerr << "Loading bitmap for cube map '"
             << textureFileNames[i].c_str() << "'..." << flush;
         try {
             myDecoder.MakeBmpFromFile (textureFileNames[i].c_str(), &myBmp);
@@ -489,8 +489,8 @@ WaterRepresentation::loadCubeMapTexture(TextureClass theClassID,
         DB(cerr << "image alpha : " << myBmp.HasAlpha() << endl);
         DB(cerr << "image width : " << myBmp.GetWidth() << endl);
         DB(cerr << "image height : " << myBmp.GetHeight() << endl);
-		glTexImage2D(_cubeMapSideID[i], 0, 
-                     GL_RGBA8, myBmp.GetWidth(), 
+		glTexImage2D(_cubeMapSideID[i], 0,
+                     GL_RGBA8, myBmp.GetWidth(),
                      myBmp.GetHeight(),
 					 0,  (myBmp.HasAlpha()) ? GL_BGRA : GL_BGR, GL_UNSIGNED_BYTE, myBmp.GetPixels());
         if (imageWidth) {
@@ -513,7 +513,7 @@ WaterRepresentation::loadTexture(TextureClass theClassID,
                                  const char * theTextureFileName)
 {
 
-    AC_PRINT << "#INFO : loading texture map class " << TextureClassName(theClassID) 
+    AC_PRINT << "#INFO : loading texture map class " << TextureClassName(theClassID)
          << " into map object= " << theObjectID;
 
     Texture & myTexture = _myTextures[theClassID][theObjectID];
@@ -532,7 +532,7 @@ WaterRepresentation::loadTexture(TextureClass theClassID,
 	PLAnyPicDecoder myDecoder;
     PLAnyBmp myBmp;
 
-    cerr << "Loading bitmap for texture '" 
+    cerr << "Loading bitmap for texture '"
          << theTextureFileName << "' .." << flush;
     try {
         myDecoder.MakeBmpFromFile (theTextureFileName, &myBmp);
@@ -548,16 +548,16 @@ WaterRepresentation::loadTexture(TextureClass theClassID,
              << ". Resizing the texture internally..." << endl;
         myBmp.ApplyFilter(PLFilterResizeBilinear(256, 256));
     }
-    
+
     //Store that section. ..
     /*
-    glTexImage2D(GL_TEXTURE_2D, 0, 
-            (myBmp.HasAlpha()) ? GL_RGBA8 : GL_RGB8, myBmp.GetWidth(), 
+    glTexImage2D(GL_TEXTURE_2D, 0,
+            (myBmp.HasAlpha()) ? GL_RGBA8 : GL_RGB8, myBmp.GetWidth(),
             myBmp.GetHeight(),
             0, (myBmp.HasAlpha()) ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, myBmp.GetPixels());
     */
-    glTexImage2D(GL_TEXTURE_2D, 0, 
-            (myBmp.HasAlpha()) ? GL_RGBA8 : GL_RGB8, myBmp.GetWidth(), 
+    glTexImage2D(GL_TEXTURE_2D, 0,
+            (myBmp.HasAlpha()) ? GL_RGBA8 : GL_RGB8, myBmp.GetWidth(),
             myBmp.GetHeight(),
             0, (myBmp.HasAlpha()) ? GL_BGRA : GL_BGR, GL_UNSIGNED_BYTE, myBmp.GetPixels());
 
@@ -570,13 +570,13 @@ WaterRepresentation::loadTexture(TextureClass theClassID,
 bool
 WaterRepresentation::activateTexture(TextureClass theClassID, short newObjectID) {
     if (_myTextures.find(theClassID) == _myTextures.end()) {
-        AC_ERROR << "WaterRepresentation::activateTexture: no texture class "  
+        AC_ERROR << "WaterRepresentation::activateTexture: no texture class "
              << TextureClassName(theClassID);
         return false;
     }
     if (_myTextures[theClassID].find(newObjectID) != _myTextures[theClassID].end()) {
         _currentID[theClassID] = newObjectID;
-        AC_DEBUG << "#INFO : WaterRepresentation::activateTexture: activating map object id = " << newObjectID 
+        AC_DEBUG << "#INFO : WaterRepresentation::activateTexture: activating map object id = " << newObjectID
              << " class " << TextureClassName(theClassID);
         return true;
     }
@@ -590,22 +590,22 @@ bool
 WaterRepresentation::activateTextureIndex(TextureClass theClassID, int newIndex) {
 
     if (_myTextures.find(theClassID) == _myTextures.end()) {
-        cerr << "#ERROR : WaterRepresentation::activateTextureIndex: no texture class "  
+        cerr << "#ERROR : WaterRepresentation::activateTextureIndex: no texture class "
              << TextureClassName(theClassID) << endl;
         return false;
     }
 
-    map<short,Texture>::iterator it = _myTextures[theClassID].begin(); 
+    map<short,Texture>::iterator it = _myTextures[theClassID].begin();
     for (int i = 0; i < newIndex ; ++i) {
         if (it == _myTextures[theClassID].end()) {
             cerr << "#ERROR : map index " << newIndex << " for"
-                 << " class " << TextureClassNames[theClassID]            
+                 << " class " << TextureClassNames[theClassID]
                  << " is not defined, only " << i << " textures defined." << endl;
             return false;
         }
         ++it;
     }
-    
+
     _currentID[theClassID] = it->first;
 
     cerr << "#INFO : WaterRepresentation::activateTextureIndex: new current id for"
@@ -619,7 +619,7 @@ bool WaterRepresentation::getTextureIndex(TextureClass theClassID,
                                           int & theResultIndex) {
 
     if (_myTextures.find(theClassID) == _myTextures.end()) {
-        cerr << "#ERROR : WaterRepresentation::getTextureIndex: no texture class "  
+        cerr << "#ERROR : WaterRepresentation::getTextureIndex: no texture class "
              << TextureClassName(theClassID) << endl;
         return false;
     }
@@ -645,14 +645,14 @@ bool
 WaterRepresentation::activateOtherTexture(TextureClass theClassID, int theIndexOffset) {
 
     if (_myTextures.find(theClassID) == _myTextures.end()) {
-        cerr << "#ERROR : WaterRepresentation::activateOtherTexture: no texture class "  
+        cerr << "#ERROR : WaterRepresentation::activateOtherTexture: no texture class "
              << TextureClassName(theClassID) << endl;
         return false;
     }
 
     int myIndex;
     if (getTextureIndex(theClassID, _currentID[theClassID], myIndex)) {
-        return activateTextureIndex(theClassID, myIndex + theIndexOffset); 
+        return activateTextureIndex(theClassID, myIndex + theIndexOffset);
     }
     return false;
 }
@@ -662,7 +662,7 @@ WaterRepresentation::initRender() {
     AC_DEBUG << "WaterRepresentation::initRender()";
 
     assert(_vertexBuffer);
-    
+
     // check extensions
     if (!initExtensions("GL_NV_vertex_array_range")) {
         return false;
@@ -693,12 +693,12 @@ WaterRepresentation::initRender() {
 	glDepthFunc( GL_LEQUAL );
 	glDisable( GL_CULL_FACE );
     glEnable( GL_NORMALIZE );
-    
+
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
     glEnableClientState(GL_VERTEX_ARRAY_RANGE_NV);
 
-    glVertexArrayRangeNV((_dataHeight+1)*(_dataWidth+1)*VERTEX_DATA_STRIDE*sizeof(GLfloat), 
+    glVertexArrayRangeNV((_dataHeight+1)*(_dataWidth+1)*VERTEX_DATA_STRIDE*sizeof(GLfloat),
                          _vertexBuffer);
 
 #ifdef USE_VAR_FENCE // XXX never defined
@@ -713,23 +713,23 @@ WaterRepresentation::initRender() {
     _cubeMapSideID[3] = GL_TEXTURE_CUBE_MAP_NEGATIVE_Y_ARB;
     _cubeMapSideID[4] = GL_TEXTURE_CUBE_MAP_POSITIVE_Z_ARB;
     _cubeMapSideID[5] = GL_TEXTURE_CUBE_MAP_NEGATIVE_Z_ARB;
-    
+
     AC_DEBUG << "WaterRepresentation::initRender() finished";
-    
+
     return true;
 }
 
 
 
-void 
+void
 WaterRepresentation::preRender() {
 
     copyWaterDataToVertexBuffer();
 }
 
-void 
+void
 WaterRepresentation::renderSurface() {
-    
+
     if (hasTexture(surfacemaps, _currentID[surfacemaps])) {
         // set up texture
         Texture & myTexture = currentTexture(surfacemaps);
@@ -756,8 +756,8 @@ WaterRepresentation::renderSurface() {
     Vector2f    v0, v1;
     dataCoordToScreenCoord(Vector2f(float(_dataOffsetX), float(_dataOffsetY)), v0);
     dataCoordToScreenCoord(Vector2f(float(_dataOffsetX + _dataWidth), float(_dataOffsetY+_dataHeight)), v1);
-            
-    glColor4f(1, 1, 1, _surfaceOpacity); 
+
+    glColor4f(1, 1, 1, _surfaceOpacity);
     glBegin(GL_POLYGON);
     glTexCoord2f(0.f, 0.f);
     glVertex3f(v0[0], v0[1], z);
@@ -775,7 +775,7 @@ WaterRepresentation::renderSurface() {
 
 }
 
-void 
+void
 WaterRepresentation::render() {
 
     MAKE_SCOPE_TIMER(WaterRepresentation_render);
@@ -792,18 +792,18 @@ WaterRepresentation::render() {
         glPolygonMode( GL_BACK, GL_FILL );
     }
     */
-    
 
-    
+
+
     glActiveTexture(GL_TEXTURE0_ARB);
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
     glEnableClientState(GL_VERTEX_ARRAY_RANGE_NV);
-    
+
     glEnable( GL_BLEND );
     glBlendFunc(GL_SRC_ALPHA, GL_DST_ALPHA);
     glDisable( GL_DEPTH_TEST );
-    
+
     int stripLength = computeStripLength();
     int numLinesPerBuffer = computeNumLinesPerBuffer();
 
@@ -816,7 +816,7 @@ WaterRepresentation::render() {
 
         if (_drawRefractions) {
             glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-        } else{ 
+        } else{
             glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
         }
 
@@ -825,7 +825,7 @@ WaterRepresentation::render() {
         glEnableClientState(GL_COLOR_ARRAY);
 
         glTranslatef(0, 0, WATER_DEPTH);
-        
+
         //  although currently not used, we keep the code to be able to reenable it again
         for (int currentBuffer = 0; currentBuffer < NUM_VAR_BUFFERS; currentBuffer ++) {
 
@@ -839,14 +839,14 @@ WaterRepresentation::render() {
             for (int currentStrip = 0; currentStrip < numLinesPerBuffer; currentStrip++) {
                 GLuint * strip = &_stripIndices[currentStrip * stripLength];
 
-                glDrawElements(GL_QUAD_STRIP, stripLength, 
+                glDrawElements(GL_QUAD_STRIP, stripLength,
                         GL_UNSIGNED_INT, strip);
-                
+
             }
-        } 
-        
+        }
+
         glTranslatef(0, 0, -WATER_DEPTH);
-        
+
         glDisableClientState(GL_COLOR_ARRAY);
 
         glDisableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -857,9 +857,9 @@ WaterRepresentation::render() {
         //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glBlendFunc(GL_SRC_ALPHA, GL_DST_ALPHA);
     }
-    
+
     if (_drawReflections) {
-        
+
         glActiveTexture(GL_TEXTURE0_ARB);
         glClientActiveTexture(GL_TEXTURE1_ARB);
         //Enable cube mapping.
@@ -868,7 +868,7 @@ WaterRepresentation::render() {
         glDisable(GL_TEXTURE_2D);
 
         //Enable cube mapping
-    	glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_REFLECTION_MAP_ARB);    
+    	glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_REFLECTION_MAP_ARB);
         glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_REFLECTION_MAP_ARB);
         glTexGeni(GL_R, GL_TEXTURE_GEN_MODE, GL_REFLECTION_MAP_ARB);
         glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
@@ -889,24 +889,24 @@ WaterRepresentation::render() {
             GLfloat *v = _varBuffer[currentBuffer]._pointer;
 
             glVertexPointer(3, GL_FLOAT, VERTEX_DATA_STRIDE * sizeof(GLfloat), v);
-            if (currentSurface.myID) {            
+            if (currentSurface.myID) {
                 glTexCoordPointer(2, GL_FLOAT, VERTEX_DATA_STRIDE * sizeof(GLfloat), (v + 6));
             }
-            
+
             glNormalPointer(GL_FLOAT, VERTEX_DATA_STRIDE * sizeof(GLfloat), (v + 3) );
             glColorPointer(4, GL_FLOAT, VERTEX_DATA_STRIDE * sizeof(GLfloat), (v + 8) );
 
-            for (int currentStrip = 0; currentStrip < numLinesPerBuffer; 
-                 currentStrip++) 
+            for (int currentStrip = 0; currentStrip < numLinesPerBuffer;
+                 currentStrip++)
             {
                 GLuint * strip = &_stripIndices[currentStrip * stripLength];
-                
-                glDrawElements(GL_QUAD_STRIP, stripLength, 
+
+                glDrawElements(GL_QUAD_STRIP, stripLength,
                                GL_UNSIGNED_INT, strip);
             }
         }
     }
-    
+
     if (_drawCaustics) {
         glEnable( GL_DEPTH_TEST );
         glDisable( GL_BLEND );
@@ -930,36 +930,36 @@ WaterRepresentation::render() {
 
 void
 WaterRepresentation::setDefaultGLState() {
-    
+
     glEnable( GL_DEPTH_TEST );
     glDisable( GL_BLEND );
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    
+
     glPolygonMode( GL_FRONT, GL_FILL );//solid
     glPolygonMode( GL_BACK, GL_FILL );
-    
+
     glDisableClientState(GL_COLOR_ARRAY);
     glDisableClientState(GL_VERTEX_ARRAY_RANGE_NV);
-    
+
     glActiveTexture(GL_TEXTURE0_ARB);
     glClientActiveTexture(GL_TEXTURE0_ARB);
     glDisable(GL_TEXTURE_CUBE_MAP_ARB);
     glDisable(GL_TEXTURE_GEN_S);
     glDisable(GL_TEXTURE_GEN_T);
     glDisable(GL_TEXTURE_GEN_R);
-    
+
     glBindTexture(GL_TEXTURE_2D, 0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP_ARB, 0);
-    
+
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
     // texture unit 2
-    
+
     glActiveTexture(GL_TEXTURE1_ARB);
     glClientActiveTexture(GL_TEXTURE1_ARB);
-    
+
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-    
+
     glDisable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, 0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP_ARB, 0);

@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -63,7 +63,7 @@
 //   $Revision: 1.3 $
 //
 //
-// Description: 
+// Description:
 //
 //=============================================================================
 
@@ -110,7 +110,7 @@ namespace TexGen {
 const int MAX_TEXTURE_SIZE=2048;
 
 TerrainTexGen::TerrainTexGen (const TextureDefinitionMap & myTextureDefinitionMap,
-        double myBlendRadius, PLAnyBmp * myIndexBmp, 
+        double myBlendRadius, PLAnyBmp * myIndexBmp,
         PLAnyBmp * myAttenuationMapBmp,
         int myScale)
     : _myTextureDefinitionMap (myTextureDefinitionMap),
@@ -131,10 +131,10 @@ TerrainTexGen::TerrainTexGen (const TextureDefinitionMap & myTextureDefinitionMa
     init();
 }
 
-TerrainTexGen::TerrainTexGen (const TextureDefinitionMap & myTextureMap, 
+TerrainTexGen::TerrainTexGen (const TextureDefinitionMap & myTextureMap,
             const dom::Node& myMapNode, int myScale)
     : _myScale(myScale), _myTextureDefinitionMap(myTextureMap), _myAttenuationMapBmp(0)
-{    
+{
     _myIndexBmp = new PLAnyBmp;
     _myBlendRadius = getFloatXMLParam (myMapNode, "blend");
     if (_myBlendRadius > 0.5 || _myBlendRadius < 0) {
@@ -164,14 +164,14 @@ TerrainTexGen::TerrainTexGen (const TextureDefinitionMap & myTextureMap,
                  myLightMapBmp.GetHeight() != _myAttenuationMapBmp->GetHeight()) {
              string s;
              s = string("Lightmap (") + myMapNode("Lightmap")("#text").nodeValue() + ", "+
-                 as_string(myLightMapBmp.GetWidth()) + "x" + 
-                 as_string(myLightMapBmp.GetHeight()) + 
+                 as_string(myLightMapBmp.GetWidth()) + "x" +
+                 as_string(myLightMapBmp.GetHeight()) +
                  ") \nand Attenuationmap (" + myMapNode ("Attenuationmap")("#text").nodeValue()+ ", "+
-                 as_string(_myAttenuationMapBmp->GetWidth()) + "x" + 
+                 as_string(_myAttenuationMapBmp->GetWidth()) + "x" +
                  as_string(_myAttenuationMapBmp->GetHeight()) +
                  ") have different sizes";
              throw (invalid_argument(s));
-         } 
+         }
          // build attenuation map
          generateMultiplicationMap(myLightMapBmp, *_myAttenuationMapBmp);
 
@@ -188,7 +188,7 @@ TerrainTexGen::TerrainTexGen (const TextureDefinitionMap & myTextureMap,
 
 TerrainTexGen::~TerrainTexGen() {
 
-    for (std::vector<PLBmp*>::size_type i=0; i<_myMipMaps.size(); i++)  
+    for (std::vector<PLBmp*>::size_type i=0; i<_myMipMaps.size(); i++)
         delete _myMipMaps[i];
 
     delete _myIndexBmp;
@@ -199,7 +199,7 @@ TerrainTexGen::~TerrainTexGen() {
 #endif
 }
 
-void 
+void
 TerrainTexGen::init() {
     createPalette();
     createMipmaps();
@@ -208,13 +208,13 @@ TerrainTexGen::init() {
     _myLastTextureDefinition = NULL;
 
     _myMissingTexDef = new TextureDefinition (-1);
-    _myMissingTexDef->addLayer 
+    _myMissingTexDef->addLayer
             (new LayerDefinition (PLPixel32 (255,0,0), 1.0f));
 
 }
 
-void 
-TerrainTexGen::loadBitmap (const dom::Node& myIndexNode, 
+void
+TerrainTexGen::loadBitmap (const dom::Node& myIndexNode,
                            const std::string& myFileName, PLBmp* myBmp)
 {
     PLAnyPicDecoder myDecoder;
@@ -242,8 +242,8 @@ TerrainTexGen::printStatistic() const {
 }
 #endif
 
-TextureDefinition * TerrainTexGen::getSafeTextureDefinition 
-        (int x, int y, double theScaleFactor) const 
+TextureDefinition * TerrainTexGen::getSafeTextureDefinition
+        (int x, int y, double theScaleFactor) const
 {
     if (x<0 || y<0 || x>=_myIndexBmp->GetWidth() || y>=_myIndexBmp->GetHeight()) {
         return NULL;
@@ -252,14 +252,14 @@ TextureDefinition * TerrainTexGen::getSafeTextureDefinition
     // WARNING
     // Do not cache a texturedefinition with one const size
     // and return this sized texturedefinition by the next
-    // index,  maybe demanding a DIFFERENT SIZE. 
+    // index,  maybe demanding a DIFFERENT SIZE.
     // OR resize as well
     if (theIndex == _myLastTextureIndex) {
-        _myLastTextureDefinition->setTileSize (theScaleFactor * double(_myScale)); 
+        _myLastTextureDefinition->setTileSize (theScaleFactor * double(_myScale));
         return _myLastTextureDefinition;
     } else {
         TextureDefinitionMap::const_iterator curDefinitionIter;
-        curDefinitionIter = _myTextureDefinitionMap.find(theIndex); 
+        curDefinitionIter = _myTextureDefinitionMap.find(theIndex);
 
         // Check if a texture bitmap with this index is available.
         if (curDefinitionIter == _myTextureDefinitionMap.end()) {
@@ -276,24 +276,24 @@ TextureDefinition * TerrainTexGen::getSafeTextureDefinition
     }
 }
 
-void TerrainTexGen::createNonBlendArea (const PLRect & theArea, 
+void TerrainTexGen::createNonBlendArea (const PLRect & theArea,
                                         const TextureDefinition * theTextureDefinition,
                                         const PLPoint & theTileOffset,
                                         PLBmp& resultBmp) const
 {
     if (theArea.Width() > 0) {
         for (int y = theArea.tl.y; y < theArea.br.y; ++y) {
-            
-            if (theTextureDefinition->getLayerCount() == 1 && 
-                theArea.Width() <= theTextureDefinition->getCurSize()) 
+
+            if (theTextureDefinition->getLayerCount() == 1 &&
+                theArea.Width() <= theTextureDefinition->getCurSize())
             {
-                PLPixel32* resultLine = 
-                    (PLPixel32 *)(resultBmp.GetLineArray()[y]);     
-                const PLPixel32* textureLine = 
-                    theTextureDefinition->getPixelLine(theTileOffset.x+theArea.tl.x, 
+                PLPixel32* resultLine =
+                    (PLPixel32 *)(resultBmp.GetLineArray()[y]);
+                const PLPixel32* textureLine =
+                    theTextureDefinition->getPixelLine(theTileOffset.x+theArea.tl.x,
                             y+theTileOffset.y);
                 memcpy(resultLine+theArea.tl.x, textureLine, theArea.Width()*4);
-            } else { 
+            } else {
                 for (int x = theArea.tl.x; x < theArea.br.x; ++x) {
                     int theTileX = x+theTileOffset.x;
                     int theTileY = y+theTileOffset.y;
@@ -315,7 +315,7 @@ void TerrainTexGen::createBlendedQuadrant (TextureDefinition*(& theDefinitions)[
     assert (theDestRect.Width()< MAX_TEXTURE_SIZE);
     bool bBlendTop = (theDefinitions[0][0] != theDefinitions[0][1]);
     bool bBlendBottom = (theDefinitions[1][0] != theDefinitions[1][1]);
-       
+
     for (int i=0; i<theDestRect.Width(); i++) {
         myXWeights[i] = (256*(theBlendRect.br.x-i-theDestRect.tl.x))/theBlendRect.Width();
         if (myXWeights[i] < 0) {
@@ -337,12 +337,12 @@ void TerrainTexGen::createBlendedQuadrant (TextureDefinition*(& theDefinitions)[
         }
         int theTileY = y+theTileOffset.y;
         int theTileX = theDestRect.tl.x+theTileOffset.x;
-        PLPixel32 topColor; 
+        PLPixel32 topColor;
         PLPixel32 bottomColor;
         for (int x=theDestRect.tl.x; x < theDestRect.br.x; ++x) {
             if (bBlendTop) {
                 topColor = PLPixel32::Blend (
-                        myXWeights[x-theDestRect.tl.x], 
+                        myXWeights[x-theDestRect.tl.x],
                         theDefinitions[0][0]->getPixel (theTileX, theTileY),
                         theDefinitions[0][1]->getPixel (theTileX, theTileY));
             } else {
@@ -351,21 +351,21 @@ void TerrainTexGen::createBlendedQuadrant (TextureDefinition*(& theDefinitions)[
 
             if (bBlendBottom) {
                 bottomColor = PLPixel32::Blend (
-                        myXWeights[x-theDestRect.tl.x], 
+                        myXWeights[x-theDestRect.tl.x],
                         theDefinitions[1][0]->getPixel (theTileX, theTileY),
                         theDefinitions[1][1]->getPixel (theTileX, theTileY));
             } else {
-                bottomColor = theDefinitions[1][0]->getPixel (theTileX, theTileY); 
+                bottomColor = theDefinitions[1][0]->getPixel (theTileX, theTileY);
             }
-            resultBmp.SetPixel (x,y, 
+            resultBmp.SetPixel (x,y,
                     PLPixel32::Blend (curYWeight, topColor, bottomColor));
-            theTileX++;        
+            theTileX++;
         }
     }
 }
 
-void TerrainTexGen::createBlendedTile (const PLPoint& theSrcOffset, 
-        const PLPoint& theTilePos, 
+void TerrainTexGen::createBlendedTile (const PLPoint& theSrcOffset,
+        const PLPoint& theTilePos,
         double theXScaleFactor,
         double theYScaleFactor,
         PLBmp & resultBmp) const
@@ -376,27 +376,27 @@ void TerrainTexGen::createBlendedTile (const PLPoint& theSrcOffset,
                     int(theYScaleFactor*theSrcTilePos.y),
                     int(theXScaleFactor*(theSrcTilePos.x+1)),
                     int(theYScaleFactor*(theSrcTilePos.y+1)));
-    
+
     // in case of scaleFactors below 1.0, like 0.5 !!!! ;-)
     // tileRect dimensions can be zero (x1==x2 && y1==y2)-> act
 
     if (tileRect.Width()==0){
-        tileRect.br.x = tileRect.br.x + 1;    
+        tileRect.br.x = tileRect.br.x + 1;
     }
     if (tileRect.Height()==0){
-        tileRect.br.y = tileRect.br.y + 1;    
+        tileRect.br.y = tileRect.br.y + 1;
     }
 
 
-    PLPoint curTileOffset (int(theXScaleFactor*theSrcOffset.x), 
+    PLPoint curTileOffset (int(theXScaleFactor*theSrcOffset.x),
                            int(theYScaleFactor*theSrcOffset.y));
 
-    PLPoint theBlendDist (int(_myBlendRadius*tileRect.Width()), 
+    PLPoint theBlendDist (int(_myBlendRadius*tileRect.Width()),
             int(_myBlendRadius*tileRect.Height()));
     if ((theBlendDist.x == 0) || theXScaleFactor < 1.01) {
         TextureDefinition* texture = getSafeTextureDefinition (theTilePos.x, theTilePos.y,
                 theXScaleFactor);
-        createNonBlendArea (tileRect, 
+        createNonBlendArea (tileRect,
                             texture,
                             curTileOffset,
                             resultBmp);
@@ -412,14 +412,14 @@ void TerrainTexGen::createBlendedTile (const PLPoint& theSrcOffset,
                                                      theXScaleFactor);
                 if (curDefinition == NULL) {
                     // For the edges of the image, we use the middle tile.
-                    curDefinition = getSafeTextureDefinition (theTilePos.x, 
+                    curDefinition = getSafeTextureDefinition (theTilePos.x,
                                                               theTilePos.y,
                                                               theXScaleFactor);
                 }
                 theDefinitionMatrix[y][x] = curDefinition;
             }
         }
- 
+
         // for each quadrant do...
         for (y=0; y<2; ++y) {
             for (x=0; x<2; ++x) {
@@ -431,16 +431,16 @@ void TerrainTexGen::createBlendedTile (const PLPoint& theSrcOffset,
                 curDefinitionMatrix[1][1] = theDefinitionMatrix[y+1][x+1];
 
                 // Calculate quadrant boundaries
-                PLRect curDestRect (tileRect.tl.x+(x*tileRect.Width())/2, 
-                                    tileRect.tl.y+(y*tileRect.Height())/2, 
-                                    tileRect.tl.x+((x+1)*tileRect.Width())/2, 
+                PLRect curDestRect (tileRect.tl.x+(x*tileRect.Width())/2,
+                                    tileRect.tl.y+(y*tileRect.Height())/2,
+                                    tileRect.tl.x+((x+1)*tileRect.Width())/2,
                                     tileRect.tl.y+((y+1)*tileRect.Height())/2);
 
-                if ( (curDefinitionMatrix[0][0] == curDefinitionMatrix[0][1] && 
+                if ( (curDefinitionMatrix[0][0] == curDefinitionMatrix[0][1] &&
                       curDefinitionMatrix[0][0] == curDefinitionMatrix[1][0] &&
                       curDefinitionMatrix[0][0] == curDefinitionMatrix[1][1]))  {
                     // All tiles are the same -> no blending nessesary
-                    createNonBlendArea (curDestRect, curDefinitionMatrix[0][0], 
+                    createNonBlendArea (curDestRect, curDefinitionMatrix[0][0],
                                         curTileOffset, resultBmp);
                 }
                 else
@@ -450,13 +450,13 @@ void TerrainTexGen::createBlendedTile (const PLPoint& theSrcOffset,
                             tileRect.tl.y+y*tileRect.Height());
                     PLRect curBlendRect (curCorner-theBlendDist,curCorner+theBlendDist);
 
-                    createBlendedQuadrant (curDefinitionMatrix, curDestRect, 
+                    createBlendedQuadrant (curDefinitionMatrix, curDestRect,
                             curBlendRect, curTileOffset, resultBmp);
                 }
             }
         }
     }
-} 
+}
 
 void TerrainTexGen::createSmallTexture (const PLRect& srcRect,
                                         const PLPoint& resultSize,
@@ -464,45 +464,45 @@ void TerrainTexGen::createSmallTexture (const PLRect& srcRect,
 {
     PLAnyBmp theTempBmp;
     assert (srcRect.Width() > 0 && srcRect.Height() > 0);
-    if (srcRect.tl.x == 0 && srcRect.tl.y == 0 && 
-        srcRect.Width() == _myIndexBmp->GetWidth() && 
+    if (srcRect.tl.x == 0 && srcRect.tl.y == 0 &&
+        srcRect.Width() == _myIndexBmp->GetWidth() &&
         srcRect.Height() == _myIndexBmp->GetHeight()) {
         cout << ".";
         resultBmp.CreateCopy (*_myIndexBmp, PLPixelFormat::X8R8G8B8);
     } else {
-        PLAnyBmp theTempBmp;        
+        PLAnyBmp theTempBmp;
         cout << ".";
         theTempBmp.CreateFilteredCopy (*_myIndexBmp, PLFilterCrop (srcRect));
         resultBmp.CreateCopy (theTempBmp, PLPixelFormat::X8R8G8B8);
     }
-    cout << "." ;    
+    cout << "." ;
     resultBmp.ApplyFilter (PLFilterResizeBilinear(resultSize.x, resultSize.y));
 }
 
 
 void TerrainTexGen::createLargeTexture (const PLRect& srcRect,
         double theXScaleFactor,
-        double theYScaleFactor,  
+        double theYScaleFactor,
         PLBmp & resultBmp) const
 {
-    if ((theXScaleFactor-floor(theXScaleFactor) >0.001) && (theXScaleFactor>1.0) || 
+    if ((theXScaleFactor-floor(theXScaleFactor) >0.001) && (theXScaleFactor>1.0) ||
         ((1.0f/theXScaleFactor-floor(1.0f/theXScaleFactor) >0.001)&&(theXScaleFactor<1.0)) )
         cout <<"theXScaleFactor: "<<theXScaleFactor<<" not an integer"<<endl;
 
     for (int y=srcRect.tl.y; y<srcRect.br.y; ++y) {
         for (int x=srcRect.tl.x; x<srcRect.br.x; ++x) {
-            createBlendedTile (srcRect.tl, PLPoint(x, y), 
+            createBlendedTile (srcRect.tl, PLPoint(x, y),
                                theXScaleFactor, theYScaleFactor, resultBmp);
         }
     }
 }
 
-void TerrainTexGen::createPartialTexture (const PLRect& srcRect, 
-        const PLPoint resultSize, 
+void TerrainTexGen::createPartialTexture (const PLRect& srcRect,
+        const PLPoint resultSize,
         PLBmp & resultBmp) const
 {
     assert(srcRect.tl.x >=0 && srcRect.tl.y >=0 &&
-           srcRect.br.x <= _myIndexBmp->GetWidth() && 
+           srcRect.br.x <= _myIndexBmp->GetWidth() &&
            srcRect.br.y <= _myIndexBmp->GetHeight());
     assert (srcRect.Width() > 0 && srcRect.Height() > 0);
     double theXScaleFactor = double(resultSize.x)/srcRect.Width();
@@ -521,7 +521,7 @@ void TerrainTexGen::createPartialTexture (const PLRect& srcRect,
 }
 
 
-void TerrainTexGen::createTexture (const PLPoint & resultSize, 
+void TerrainTexGen::createTexture (const PLPoint & resultSize,
                                    PLBmp & resultBmp) const
 {
     PLRect srcRect (0,0, _myIndexBmp->GetWidth(), _myIndexBmp->GetHeight());
@@ -533,22 +533,22 @@ void TerrainTexGen::createPalette () const {
     for (int i=0; i<256; i++) {
         _myIndexBmp->SetPaletteEntry ( static_cast<PLBYTE>(i), 255, 0, 0, 255);
     }
-    for (TextureDefinitionMap::const_iterator iter=_myTextureDefinitionMap.begin(); 
-         iter != _myTextureDefinitionMap.end(); 
-         ++iter) 
+    for (TextureDefinitionMap::const_iterator iter=_myTextureDefinitionMap.begin();
+         iter != _myTextureDefinitionMap.end();
+         ++iter)
     {
         TextureDefinition* curDefinition = iter->second;
         PLPixel32 curColor = curDefinition->getAvgColor();
-        _myIndexBmp->SetPaletteEntry(static_cast<PLBYTE>(iter->first), 
-                                     curColor.GetR(), curColor.GetG(), curColor.GetB(), 
+        _myIndexBmp->SetPaletteEntry(static_cast<PLBYTE>(iter->first),
+                                     curColor.GetR(), curColor.GetG(), curColor.GetB(),
                                      255 );
     }
-   
+
 }
 
-void TerrainTexGen::getTexture (const PLRect& mySrcRect, 
-        const PLPoint& resultSize, 
-        PLBmp & resultBmp) 
+void TerrainTexGen::getTexture (const PLRect& mySrcRect,
+        const PLPoint& resultSize,
+        PLBmp & resultBmp)
 {
     PLRect srcRect = mySrcRect;
     srcRect.tl.x *= _myScale;
@@ -562,20 +562,20 @@ void TerrainTexGen::getTexture (const PLRect& mySrcRect,
     //cout <<t<<endl;
     if (t >20.0) {
         printStatistic();
-        _myRunTime.SetNow();        
+        _myRunTime.SetNow();
     }
     ptime StartTime;
 #endif
- 
+
     assert (resultSize.x == resultSize.y);
     double Scale = srcRect.Width()/resultSize.x;
     double logscale =  log (double(Scale))/log(2.0);
     double epsilon = fabs(logscale-floor(logscale+0.5));
     if ((logscale > 1) && (epsilon<0.001)) {
         assert (logscale < _myMipMaps.size()+2);
-        int curMipMapLevel = (_myMipMaps.size()+1)-int (floor (logscale+0.5)); 
+        int curMipMapLevel = (_myMipMaps.size()+1)-int (floor (logscale+0.5));
         PLBmp * curMipMap = _myMipMaps[curMipMapLevel];
-        PLRect destRect (int(srcRect.tl.x/Scale), int(srcRect.tl.y/Scale), 
+        PLRect destRect (int(srcRect.tl.x/Scale), int(srcRect.tl.y/Scale),
                          int(srcRect.br.x/Scale), int(srcRect.br.y/Scale));
         assert (destRect.Width() > 0 && destRect.Height() > 0);
         resultBmp.CreateFilteredCopy (*curMipMap, PLFilterCrop (destRect));
@@ -584,7 +584,7 @@ void TerrainTexGen::getTexture (const PLRect& mySrcRect,
             cerr <<"Strange scale"<<endl;
         reallyCreateTexture (srcRect, resultSize, resultBmp);
     }
-    
+
 #ifdef TEXGEN_GENERATE_STATISTICS
     ptime EndTime;
     double time = (EndTime - StartTime);
@@ -608,7 +608,7 @@ void TerrainTexGen::createMipmaps () {
     if (_myIndexBmp->GetWidth() > 2048) {
         PLRect mySrcRect (0, 0, _myIndexBmp->GetWidth(), _myIndexBmp->GetHeight());
         int i;
-        int myMipmapCount = int(floor(log(double(min(_myIndexBmp->GetHeight(), 
+        int myMipmapCount = int(floor(log(double(min(_myIndexBmp->GetHeight(),
                                               _myIndexBmp->GetWidth())+0.5))
                                      /log(2.0)) -1);
         for (i=0; i<myMipmapCount; i++) {
@@ -621,7 +621,7 @@ void TerrainTexGen::createMipmaps () {
         cerr << myMipmapCount-1 << ":" << 4;
         curMipMap->CreateFilteredCopy (*_myIndexBmp, FilterIntDownscale (4));
         applyAttenuationMap (mySrcRect, resultSize, *curMipMap);
-        
+
         for (i=myMipmapCount-2; i>=0; i--) {
             int curFactor = int (pow (2.0,(myMipmapCount-i+1)));
             cerr <<"."<<i<<":"<<curFactor;
@@ -629,15 +629,15 @@ void TerrainTexGen::createMipmaps () {
             theTempBmp.CreateCopy (*_myMipMaps[i+1]);
             _myMipMaps[i]->CreateCopy (theTempBmp, PLPixelFormat::X8R8G8B8);
             _myMipMaps[i]->ApplyFilter (
-                    PLFilterResizeBilinear(_myIndexBmp->GetWidth()/curFactor, 
+                    PLFilterResizeBilinear(_myIndexBmp->GetWidth()/curFactor,
                                            _myIndexBmp->GetHeight()/curFactor) );
         }
         cerr <<" done"<<endl;
-    } 
+    }
 }
 
-void TerrainTexGen::reallyCreateTexture (const PLRect& srcRect, 
-        const PLPoint& resultSize, 
+void TerrainTexGen::reallyCreateTexture (const PLRect& srcRect,
+        const PLPoint& resultSize,
         PLBmp & resultBmp)
 {
     createPartialTexture(srcRect, resultSize, resultBmp);
@@ -645,17 +645,17 @@ void TerrainTexGen::reallyCreateTexture (const PLRect& srcRect,
     applyAttenuationMap (srcRect, resultSize, resultBmp);
 }
 
-void TerrainTexGen::applyAttenuationMap (const PLRect& srcRect, const PLPoint& resultSize, 
+void TerrainTexGen::applyAttenuationMap (const PLRect& srcRect, const PLPoint& resultSize,
         PLBmp & resultBmp)
 {
     if (_myAttenuationMapBmp) {
-        applyMultiplicationMap(resultBmp, *_myAttenuationMapBmp, 
+        applyMultiplicationMap(resultBmp, *_myAttenuationMapBmp,
                 srcRect, _myLightingFactor);
     }
 }
 
 void TerrainTexGen::dumpRect (const string& myName, const PLRect& myRect) {
-    cout << myName << " (" << myRect.tl.x << ", " << myRect.tl.y << ") - (" 
+    cout << myName << " (" << myRect.tl.x << ", " << myRect.tl.y << ") - ("
          << myRect.br.x << ", " << myRect.br.y << ")" << endl;
 }
 

@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -77,9 +77,9 @@ function CharacterSoup(theFontname, theFontFilename, theSizes, theGlurRadi,
                      theGlyphPadding);
 }
 
-CharacterSoup.prototype.Constructor = function(self, theFontname, 
-                                               theFontFilename, theSizes, 
-                                               theGlurRadi, theGlyphPadding) 
+CharacterSoup.prototype.Constructor = function(self, theFontname,
+                                               theFontFilename, theSizes,
+                                               theGlurRadi, theGlyphPadding)
 {
 
     var _myAlphabetMap = [];
@@ -95,7 +95,7 @@ CharacterSoup.prototype.Constructor = function(self, theFontname,
     var _myParagraphTopOffset    = 0;
     var _myParagraphBottomOffset = 0;
     var _myLineHeight            = 0;
-    
+
     const CHARACTERS_PER_LINE = 32; // must be power-of-two
 
 
@@ -137,13 +137,13 @@ CharacterSoup.prototype.Constructor = function(self, theFontname,
     self.getPadding = function() {
         return _myGlyphPadding;
     }
-    
-    self.__defineGetter__('lineheight', function() { return _myLineHeight; } );    
-    self.__defineSetter__('lineheight', function(theLineHeight) { _myLineHeight = theLineHeight; } );    
-    
+
+    self.__defineGetter__('lineheight', function() { return _myLineHeight; } );
+    self.__defineSetter__('lineheight', function(theLineHeight) { _myLineHeight = theLineHeight; } );
+
     self.setParagraph = function(theTopOffset, theBottomOffset) {
         _myParagraphTopOffset    = theTopOffset;
-        _myParagraphBottomOffset = theBottomOffset;        
+        _myParagraphBottomOffset = theBottomOffset;
     }
     self.getParagraph = function() {
         return {topoffset:_myParagraphTopOffset, bottomoffset:_myParagraphBottomOffset};
@@ -158,7 +158,7 @@ CharacterSoup.prototype.Constructor = function(self, theFontname,
     self.createUnicodeText = function(theText, theSize) {
 
         if (!(theSize in _myAlphabetMap)) {
-            Logger.warning("CharacterSoup.createText: No such size '" + 
+            Logger.warning("CharacterSoup.createText: No such size '" +
                            theSize + "'");
             self.setupFont(theSize);
         }
@@ -172,11 +172,11 @@ CharacterSoup.prototype.Constructor = function(self, theFontname,
         var myTexCoord = new Vector2f(0,0);
         var myTexSize = new Vector2f(0,0);
 
-                
+
         for (var i = 0; i < theText.length; ++i) {
             var myChar = theText[i];
             var myFound = window.hasGlyph(myFontName, myChar);
-            if (!myFound || myChar == "\n" || myChar == "\r" || myChar == "\t") 
+            if (!myFound || myChar == "\n" || myChar == "\r" || myChar == "\t")
             {
                 // map white space characters to space
                 myChar = " ";
@@ -184,46 +184,46 @@ CharacterSoup.prototype.Constructor = function(self, theFontname,
             var myCharacter = null;
 
             if (!(myChar in _myAlphabetMap[theSize])) {
-                
+
                 var mySlot = new Vector2f(_myAlphabetMap[theSize].nextCharSlot);
                 var myMetric = window.getGlyphMetrics(myFontName, myChar);
 
                 //print("char="+myChar,"max="+myMetric.max,
-                //      "min="+myMetric.min,"advance="+myMetric.advance, 
+                //      "min="+myMetric.min,"advance="+myMetric.advance,
                 //      "found="+myFound);
 
                 var myGlyphWidth = myMetric.max.x - myMetric.min.x + 1;
                 var myHeight = window.getFontMetrics(myFontName).height;
-                // pad with one extra pixel to prevent filtering artefacts 
-                var myPaddedSize = new Vector2f(myGlyphWidth + 
+                // pad with one extra pixel to prevent filtering artefacts
+                var myPaddedSize = new Vector2f(myGlyphWidth +
                                                 _myGlyphPadding * 2,
-                                                myHeight + 
+                                                myHeight +
                                                 _myGlyphPadding * 2);
-                
-                if (_myAlphabetMap[theSize].nextCharSlot.x >= 
-                    (myFontImage.width - myPaddedSize[0])) 
-                {   
+
+                if (_myAlphabetMap[theSize].nextCharSlot.x >=
+                    (myFontImage.width - myPaddedSize[0]))
+                {
                     _myAlphabetMap[theSize].nextCharSlot.x = 0;
                     _myAlphabetMap[theSize].nextCharSlot.y += myCellSize;
                     if (_myAlphabetMap[theSize].nextCharSlot.y >=
-                        myFontImage.height - (2*myCellSize)) 
+                        myFontImage.height - (2*myCellSize))
                     {
-                        Logger.error("Sorry, alphabet reached " + 
+                        Logger.error("Sorry, alphabet reached " +
                                      (CHARACTERS_PER_LINE*CHARACTERS_PER_LINE) +
                                      " chars.");
                         exit(1);
                     }
                 }
-                
-                var myTmpImage = Modelling.createImage(window.scene, 
+
+                var myTmpImage = Modelling.createImage(window.scene,
                                                        myPaddedSize[0],
                                                        myPaddedSize[1],
                                                        "RGBA");
-                var surfaceWidth = myMetric.advance + _myGlyphPadding 
+                var surfaceWidth = myMetric.advance + _myGlyphPadding
                                    + Math.abs(myMetric.min.x);
                 var surfaceHeight = myHeight+_myGlyphPadding;
-                var mySurfaceSize = window.renderTextAsImage(myTmpImage, 
-                                                             myChar, 
+                var mySurfaceSize = window.renderTextAsImage(myTmpImage,
+                                                             myChar,
                                                              myFontName,
                                                              surfaceWidth,
                                                              surfaceHeight,
@@ -233,9 +233,9 @@ CharacterSoup.prototype.Constructor = function(self, theFontname,
                 //print("myTmpImage.size:[",myTmpImage.width,",",
                 //      myTmpImage.height,"]");
                 // saveImage(myTmpImage, ""+myChar + "_" + theSize + ".png");
-                
+
                 if (_myGlurRadi[theSize] > 0) {
-                    var myBlurParams = [_myGlurRadi[theSize], 
+                    var myBlurParams = [_myGlurRadi[theSize],
                                         myPaddedSize[0],
                                         myPaddedSize[1],
                                         1.3];
@@ -250,7 +250,7 @@ CharacterSoup.prototype.Constructor = function(self, theFontname,
                 //      " height=",myFontMetrics.height,
                 //      " ascent=",myFontMetrics.ascent,
                 //      " descent=",myFontMetrics.descent);
-                
+
                 // blur/glow
                 //if (_myGlurRadi[theSize] > 0) {
                 //    applyGlurFilter(_myGlurRadi[theSize], myTmpImage);
@@ -279,10 +279,10 @@ CharacterSoup.prototype.Constructor = function(self, theFontname,
                 // position of next character
                 //var advance = myMetric.advance + 2 * _myGlyphPadding;
                 _myAlphabetMap[theSize].nextCharSlot.x += myPaddedSize[0] + 1;
-               
-                myCharacter = new Character(myChar, 
-                                            myTexCoord, 
-                                            myTexSize, 
+
+                myCharacter = new Character(myChar,
+                                            myTexCoord,
+                                            myTexSize,
                                             myMetric);
                 _myAlphabetMap[theSize][myChar] = myCharacter;
             } else {
@@ -299,7 +299,7 @@ CharacterSoup.prototype.Constructor = function(self, theFontname,
     self.setupFont = function(theSize) {
 
         if (theSize in _myAlphabetMap) {
-            Logger.warning("Font '" + theFontname + 
+            Logger.warning("Font '" + theFontname +
                            "' size=" + theSize + " is already in map");
             return;
         }
@@ -309,29 +309,29 @@ CharacterSoup.prototype.Constructor = function(self, theFontname,
         window.loadTTF(myFontName, expandEnvironment(theFontFilename), theSize);
 
         var myFontMetrics = window.getFontMetrics(myFontName);
-        var myCellSize = nextPowerOfTwo(myFontMetrics.height + 
+        var myCellSize = nextPowerOfTwo(myFontMetrics.height +
                                         2 * _myGlyphPadding);
-        Logger.info("CharacterSoup.setupFont " + theFontname, 
+        Logger.info("CharacterSoup.setupFont " + theFontname,
                     "size=" + theSize, "cellsize=" + myCellSize);
 
         var myFontImageSize = myCellSize * CHARACTERS_PER_LINE;
-        var myFontImage = Modelling.createImage(window.scene, 
-                                                myFontImageSize, 
-                                                myFontImageSize, 
+        var myFontImage = Modelling.createImage(window.scene,
+                                                myFontImageSize,
+                                                myFontImageSize,
                                                 "RGBA");
         myFontImage.resize = "pad";
         //myFontImage.wrapmode = "clamp";
         //myFontImage.mipmap = false;
 //        var myFakeImage = Modelling.createImage(window.scene,
 //                                                "dropshadow_fake.png");
-//       var myMaterial = 
-//            buildUnlitTextureMaterialNode(myFontName + "_material", 
+//       var myMaterial =
+//            buildUnlitTextureMaterialNode(myFontName + "_material",
 //                                          myFontImage.id);
        var myMaterial = Modelling.createUnlitTexturedMaterial(window.scene, myFontImage);
          //print(myMaterial);
          //print(myFontImage);
-//       var myMaterial = 
-//            buildUnlitTextureMaterialNode(myFontName + "_material", 
+//       var myMaterial =
+//            buildUnlitTextureMaterialNode(myFontName + "_material",
 //                                          myFakeImage.id);
         myMaterial.name = myFontName + "_material";
         addMaterialRequirement(myMaterial, "vertexparams", "[10[color]]");
@@ -347,7 +347,7 @@ CharacterSoup.prototype.Constructor = function(self, theFontname,
         _myAlphabetMap[theSize].fontmetrics = myFontMetrics;
 
         var initial_slot = new Vector2f(0,0);
-        _myAlphabetMap[theSize].nextCharSlot = initial_slot; 
+        _myAlphabetMap[theSize].nextCharSlot = initial_slot;
 
         window.scene.update(Scene.MATERIALS);
     }
@@ -419,12 +419,12 @@ function test() {
     use("SceneViewer.js");
 
     var mySceneViewer = new SceneViewer(null);
-    mySceneViewer.setup(800, 600, false, "PathText");    
-    window.setTextPadding(0,0,0,0);    
-    const FONT_FILE_INVERSE = "FONTS/TxCaAc__.ttf"; 
-    const TICKERFONT_SIZE = 24;    
-    var _myCharacterSoup = new CharacterSoup("Ticker", FONT_FILE_INVERSE, [TICKERFONT_SIZE]);        
-    _myCharacterSoup.createUnicodeText("Schweden",  TICKERFONT_SIZE);  
+    mySceneViewer.setup(800, 600, false, "PathText");
+    window.setTextPadding(0,0,0,0);
+    const FONT_FILE_INVERSE = "FONTS/TxCaAc__.ttf";
+    const TICKERFONT_SIZE = 24;
+    var _myCharacterSoup = new CharacterSoup("Ticker", FONT_FILE_INVERSE, [TICKERFONT_SIZE]);
+    _myCharacterSoup.createUnicodeText("Schweden",  TICKERFONT_SIZE);
 
 }
 

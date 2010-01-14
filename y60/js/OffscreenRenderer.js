@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,23 +51,23 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
 use("Y60JSSL.js");
 
-function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage, 
+function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage,
                            theCanvas, theUseFBOFlag, theMultisamples) {
     var self = this;
-    
+
     self.overlays getter = function() {
         if (!_myViewport.childNode("overlays")) {
             var myNode = new Node("<overlays/>");
             _myViewport.appendChild(myNode.firstChild);
         }
-        return _myViewport.childNode("overlays"); 
+        return _myViewport.childNode("overlays");
     }
 
     self.underlays getter = function() {
@@ -75,17 +75,17 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage,
             var myNode = new Node("<underlays/>");
             _myViewport.appendChild(myNode.firstChild);
         }
-        return _myViewport.childNode("underlays"); 
+        return _myViewport.childNode("underlays");
     }
 
     self.renderarea getter = function() {
         return _myOffscreenRenderArea;
     }
-    
+
     self.canvas getter = function() {
         return _myCanvas;
     }
- 
+
     self.viewport getter = function() {
         return _myViewport;
     }
@@ -105,13 +105,13 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage,
 
     self.onPreViewport = function(theViewport) {
     }
-    
+
     self.resize = function(theNewSize) {
         if (self.texture.width == 0 || self.texture.width != theNewSize.x || self.texture.height != theNewSize.y) {
-            window.scene.textures.removeChild(self.texture);      
-            self.texture = Modelling.createTexture(window.scene, self.image); 
+            window.scene.textures.removeChild(self.texture);
+            self.texture = Modelling.createTexture(window.scene, self.image);
             self.texture.name = "newTexture"
-            _myCanvas.target = self.texture.id;       
+            _myCanvas.target = self.texture.id;
         }
     }
 
@@ -120,7 +120,7 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage,
             _myCanvas.target = "";
             return;
         }
-        
+
         self.image = theImage;
         self.texture.image = self.image.id;
 
@@ -146,7 +146,7 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage,
         }
 
         if (_myOffscreenNodes.length == 1 && _myOffscreenNodes[0].nodeName == "world") {
-            var myWasVisible = _myOffscreenNodes[0].visible 
+            var myWasVisible = _myOffscreenNodes[0].visible
             _myOffscreenNodes[0].visible = true;
             _myOffscreenRenderArea.renderToCanvas(theReadbackFlag);
             _myOffscreenNodes[0].visible = myWasVisible;
@@ -173,7 +173,7 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage,
         //if (theReadbackFlag || _myScreenshotName) {
         if (_myScreenshotName) {
             var myFilename = (_myScreenshotName!=null)?_myScreenshotName:"dump_"+self.image.id + "face" + theCubemapFace +".png";
-            
+
             saveImageFiltered(self.image, myFilename, ["flip"], [[]]);
             _myScreenshotName = null;
         }
@@ -219,7 +219,7 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage,
             theImage = Modelling.createImage(window.scene, theSize[0], theSize[1], thePixelFormat);
             theImage.resize = "none"; // use non-power of two textures
         }
-        self.image = theImage;    
+        self.image = theImage;
         self.image.name = "OffscreenBuffer_Image";
 
         self.texture = Modelling.createTexture(window.scene, self.image);
@@ -228,7 +228,7 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage,
         // Flip vertically since framebuffer content is upside-down
         var myMirrorMatrix = new Matrix4f;
         myMirrorMatrix.makeScaling(new Vector3f(1,-1,1));
-        self.image.matrix.postMultiply(myMirrorMatrix);  
+        self.image.matrix.postMultiply(myMirrorMatrix);
 
         // Setup canvas and viewport
         if (theCanvas == undefined) {
@@ -295,7 +295,7 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage,
         _myOffscreenRenderArea.canvas = _myCanvas;
         _myOffscreenRenderArea.eventListener = self;
     }
-  
+
     function isOffscreenNode(theNode) {
         for (var i=0; i<_myOffscreenNodes.length; ++i) {
             if (theNode.id == _myOffscreenNodes[i].id) {

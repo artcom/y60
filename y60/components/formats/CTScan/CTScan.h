@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -103,13 +103,13 @@ class CTScan {
         enum Orientation {
             IDENTITY,
             Y2Z,
-            X2Z, 
+            X2Z,
             ARBITRARY
         };
         CTScan();
         // CTScan(const std::string & theInputSpec, asl::PackageManager & thePackageManager);
         virtual ~CTScan();
-       
+
         int loadSlices(asl::PackageManager & thePackageManager, const std::string & theSubDir, const std::string& thePackage);
         int loadSphere(const asl::Vector3i & size);
         int setSlices(std::vector<dom::ResizeableRasterPtr> theSlices);
@@ -124,11 +124,11 @@ class CTScan {
         /** Returns the number of voxels in x/y/z direction */
         asl::Vector3i getVoxelDimensions() const;
 
-        /** Returns the size of a single voxel (in meters) in x/y/z direction. 
+        /** Returns the size of a single voxel (in meters) in x/y/z direction.
          *  Any component may be 0 = unknown. */
         asl::Vector3f getVoxelSize() const;
 
-        /** Set the size of a single voxel (in meters) in x/y/z direction. 
+        /** Set the size of a single voxel (in meters) in x/y/z direction.
          */
         void setVoxelSize(const asl::Vector3f & theSize);
 
@@ -142,21 +142,21 @@ class CTScan {
         /** Returns the minimum/maximum voxel value that actually occurs in the dataset */
         asl::Vector2d getOccurringValueRange();
 
-        asl::Vector2i countTrianglesGlobal(const asl::Box3i & theVoxelBox, 
+        asl::Vector2i countTrianglesGlobal(const asl::Box3i & theVoxelBox,
             double theThresholdMin, double theThresholdMax, int theDownSampleRate, bool theCloseAtClippingBoxFlag);
 
         asl::Vector2i countTrianglesInVolumeMeasurement(const asl::Box3i & theVoxelBox, dom::NodePtr theVolumeNode,
                     dom::NodePtr theThresholdPalette, int theDownSampleRate, bool theCloseAtClippingBoxFlag);
 
         /** Create an isosurface from the voxel dataset */
-        ScenePtr polygonizeGlobal(const asl::Box3i & theVoxelBox, double theThresholdMin, double theThresholdMax, 
-            int theDownSampleRate, bool theCloseAtClippingBoxFlag, bool theCreateNormalsFlag, 
-            asl::PackageManagerPtr thePackageManager, 
+        ScenePtr polygonizeGlobal(const asl::Box3i & theVoxelBox, double theThresholdMin, double theThresholdMax,
+            int theDownSampleRate, bool theCloseAtClippingBoxFlag, bool theCreateNormalsFlag,
+            asl::PackageManagerPtr thePackageManager,
             unsigned int theNumVertices = 0, unsigned int theNumTriangles = 0);
 
-        ScenePtr polygonizeVolumeMeasurement(const asl::Box3i & theVoxelBox, dom::NodePtr theVolumeNode, 
-            dom::NodePtr theThresholdPalette, int theDownSampleRate, bool theCloseAtClippingBoxFlag, 
-            bool theCreateNormalsFlag, asl::PackageManagerPtr thePackageManager, 
+        ScenePtr polygonizeVolumeMeasurement(const asl::Box3i & theVoxelBox, dom::NodePtr theVolumeNode,
+            dom::NodePtr theThresholdPalette, int theDownSampleRate, bool theCloseAtClippingBoxFlag,
+            bool theCreateNormalsFlag, asl::PackageManagerPtr thePackageManager,
             unsigned int theNumVertices = 0, unsigned int theNumTriangles = 0);
 
         /** Create a downscaled 3D texture from the dataset */
@@ -164,15 +164,15 @@ class CTScan {
 
         /** Progress signal for loading */
         sigc::signal<bool, double, Glib::ustring> signal_progress() const { return _myProgressSignal; }
-        
+
         /** Computes the histogram of a given volume of interest */
         void
         computeHistogram(const asl::Box3i & theVOI, std::vector<unsigned> & theHistogram,
                          bool useOccurringRange = true);
 
-        // add a the grey value of a single voxel to the profile 
+        // add a the grey value of a single voxel to the profile
         void computeProfile(const asl::Point3i & thePoint, std::vector<asl::Signed32> & theProfile);
-        // add the grey values of all voxels in the multiline defined by thePoints to theProfile  
+        // add the grey values of all voxels in the multiline defined by thePoints to theProfile
         void computeProfile(const std::vector<asl::Point3i> & thePoints,
                 std::vector<asl::Signed32> & theProfile, std::vector<asl::Point3i> & thePointsSampled);
 
@@ -182,7 +182,7 @@ class CTScan {
         getSlicePtr(int theIndex) {
             return reinterpret_cast<VoxelT *>(_mySlices[theIndex]->pixels().begin());
         }
-        
+
         template <class VoxelT>
         const VoxelT *
         getSlicePtr(int theIndex) const {
@@ -193,20 +193,20 @@ class CTScan {
         static dom::NodePtr createGrayImage(dom::NodePtr theParent, int theWidth, int theHeight, int theValue);
         static dom::NodePtr createRGBAImage(dom::NodePtr theParent, int theWidth, int theHeight, int theValue);
         static void resizeVoxelVolume(dom::NodePtr theVoxelVolumeNode, const asl::Box3f & theDirtyBox);
-        static void copyCanvasToVoxelVolume(dom::NodePtr theMeasurement, dom::NodePtr theCanvas, 
+        static void copyCanvasToVoxelVolume(dom::NodePtr theMeasurement, dom::NodePtr theCanvas,
                                             const asl::Box3f & theDirtyBox, Orientation theOrientation,
                                             dom::NodePtr thePaletteNode);
         template <class VoxelT>
-        static void copyVoxelVolumeToCanvasImpl(dom::NodePtr theMeasurement, 
-            unsigned theGlobalThresholdIndex, dom::NodePtr theCanvas, 
+        static void copyVoxelVolumeToCanvasImpl(dom::NodePtr theMeasurement,
+            unsigned theGlobalThresholdIndex, dom::NodePtr theCanvas,
             dom::NodePtr theReconstructedImage,unsigned theSliceIndex,
             Orientation theOrientation, dom::NodePtr thePaletteNode);
 
-        static void copyVoxelVolumeToCanvas(dom::NodePtr theMeasurement, 
-            unsigned theGlobalThresholdIndex, dom::NodePtr theCanvas, 
+        static void copyVoxelVolumeToCanvas(dom::NodePtr theMeasurement,
+            unsigned theGlobalThresholdIndex, dom::NodePtr theCanvas,
             dom::NodePtr theReconstructedImage,unsigned theSliceIndex,
             Orientation theOrientation, dom::NodePtr thePaletteNode);
-        
+
 
         static void applyBrush(dom::NodePtr theCanvasImage, unsigned theX, unsigned theY,
                                dom::NodePtr theBrushImage, const asl::Vector4f & theColor);
@@ -217,7 +217,7 @@ class CTScan {
 
         // input in Voxels, output in VoxelSpace
         asl::Planef getVoxelPlane(const asl::Quaternionf & theOrientation, float theMetricOffset);
-        
+
         // everything below this line is deprecated
         bool verifyCompleteness();
         void clear();
@@ -239,13 +239,13 @@ class CTScan {
         sigc::signal<bool, double, Glib::ustring> _myProgressSignal;
         void prepareBox(asl::Box3i & theVoxelBox);
         void findOccurringValueRange();
-        
+
         y60::PixelEncoding _myEncoding;
         std::vector<dom::ResizeableRasterPtr> _mySlices;
         asl::Vector2f _myDefaultWindow;
         asl::Vector3f _myVoxelSize;
 
-        inline bool 
+        inline bool
         isInside(int x, int y, int z) {
             if ((z < 0 || z >= _mySlices.size()) ||
                 (y < 0 || y >= _mySlices[0]->height()) ||
@@ -254,10 +254,10 @@ class CTScan {
                 return false;
             } else {
                 return true;
-            }                
+            }
         }
 
-        void getReconstructionBounds(const asl::Quaterniond & theOrientation, 
+        void getReconstructionBounds(const asl::Quaterniond & theOrientation,
                 asl::Box3d & theBounds, asl::Vector3i & theSize) const;
 
         asl::Box3f computeProjectionBounds(const asl::Matrix4f & theProjection) const;
@@ -284,20 +284,20 @@ class CTScan {
         fastValueAt(const asl::Vector3d & thePosition);
 
         template <class VoxelT>
-        void reconstructToImageImpl(const asl::Quaternionf & theOrientation, const asl::Vector3f & theSlicePosition, 
+        void reconstructToImageImpl(const asl::Quaternionf & theOrientation, const asl::Vector3f & theSlicePosition,
                                     dom::NodePtr & theImageNode, bool theTrilliniarInterpolate = true);
 
         template <class VoxelT>
         void reconstructToImageImpl(Orientation theOrientation, int theSliceIndex, dom::NodePtr & theImageNode);
 
         asl::Vector2d _myOccurringValueRange;
-        
+
         template <class VoxelT, class SegmentationPolicy>
         bool
         countMarchingCubes(const asl::Box3i & theVoxelBox, int theDownSampleRate, bool theCloseAtClippingBoxFlag,
                            SegmentationPolicy & theSegmentizer,
                            unsigned int & theVertexCount, unsigned int & theTriangleCount);
-        template <class VoxelT, class SegmentationPolicy> 
+        template <class VoxelT, class SegmentationPolicy>
         bool
         applyMarchingCubes(const asl::Box3i & theVoxelBox, int theDownSampleRate, bool theCloseAtClippingBoxFlag,
                              bool theCreateNormalsFlag, ScenePtr theScene,
@@ -307,20 +307,20 @@ class CTScan {
         void
         countVoxelValues(const asl::Box3i & theVOI, std::vector<unsigned> & theHistogram,
                          bool useOccurringRange);
-        
+
         // computes the grey-scale profile of all voxels
         // from [theStart, theEnd[  (without theEnd)
         // Can be used in a loop to compute multilines,
         // but don't forget to profile the very last voxel
         // separatly.
-        void computeLineSegmentProfile(const asl::Point3i & theStart, 
-                                       const asl::Point3i & theEnd, 
+        void computeLineSegmentProfile(const asl::Point3i & theStart,
+                                       const asl::Point3i & theEnd,
                                        std::vector<asl::Signed32> & theProfile,
                                        std::vector<asl::Point3i> & thePointsSampled);
-        
-        
+
+
         int appendTo3DTexture(int theSlice, asl::Block & the3dTexture, int theXSize, int theYSize);
-        template<class PIXEL> 
+        template<class PIXEL>
         void appendEmptySlices(asl::Block & the3DTexture, unsigned theSliceCount, int theBytesPerSlice);
 
         std::string setupMaterial(y60::SceneBuilderPtr theSceneBuilder, bool theCreateNormalsFlag);
@@ -348,7 +348,7 @@ class CTScan {
             asl::Vector2<VoxelT> thresholds;
             unsigned char index;
             PaletteInfo() {};
-            PaletteInfo(asl::Vector2<VoxelT> theThreshold, unsigned char theIndex) : 
+            PaletteInfo(asl::Vector2<VoxelT> theThreshold, unsigned char theIndex) :
                 thresholds(theThreshold), index(theIndex) {}
         };
 
@@ -357,15 +357,15 @@ class CTScan {
             asl::Vector2<VoxelT> thresholds;
             asl::Vector3i color;
             PaletteItem() {};
-            PaletteItem(const asl::Vector2<VoxelT> & theThreshold, const asl::Vector3i & theColor) : 
+            PaletteItem(const asl::Vector2<VoxelT> & theThreshold, const asl::Vector3i & theColor) :
                 thresholds(theThreshold), color(theColor) {}
         };
 
-        template <class VoxelT> 
-        class PaletteTable : public std::vector<PaletteItem<VoxelT> >             
+        template <class VoxelT>
+        class PaletteTable : public std::vector<PaletteItem<VoxelT> >
         {
             typedef std::vector<PaletteItem<VoxelT> > Base;
-        public: 
+        public:
             PaletteTable(size_t theSize, const PaletteItem<VoxelT> & theItem) : Base(theSize, theItem) {}
         };
 

@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -185,7 +185,7 @@ WiimoteTestApp.prototype.Constructor = function(self, theArguments) {
 
     const MOVIE_WIDTH = 1;
     const MOVIE_HEIGHT = 0.66;
-    
+
     var _myMasterWii = null;
     var _myWiiCount = 0;
     var _myLowPassedDownVector = new Vector3f( 0, 1, 0 );
@@ -204,7 +204,7 @@ WiimoteTestApp.prototype.Constructor = function(self, theArguments) {
     var _myMovieBody = new Array(2);
     var _myMovieControlFlag = false;
     var _myCurrentMovieImage = null;
-    
+
     var _myCurrentCursorOwner = null;
 
     var _myWiimoteDriver = null;
@@ -215,7 +215,7 @@ WiimoteTestApp.prototype.Constructor = function(self, theArguments) {
     // public members
     //
     //////////////////////////////////////////////////////////////////////
-   
+
     // setup
     Base.setup = self.setup;
     self.setup = function(theWidth, theHeight, theTitle) {
@@ -238,15 +238,15 @@ WiimoteTestApp.prototype.Constructor = function(self, theArguments) {
         myClone.position.x += 2;
         myClone.name = "clone";
         window.scene.world.appendChild(myClone);
-        
+
         _myOrientationVector = Node.createElement("vector");
         window.scene.world.appendChild( _myOrientationVector );
         _myOrientationVector.color = new Vector4f(1,1,1,1);
         _myOrientationVector.scale = [1,1,1];
         */
-        
+
         _myPlane = new Planef(new Vector3f(0,0,1), 0);
-        
+
         //_myCrosshair = new ImageOverlay(window.scene, "tex/pointer.png", [0,0], window.scene.overlays);
         //_myCrosshair.position = [window.width/2.0, window.height/2.0];
 
@@ -262,8 +262,8 @@ WiimoteTestApp.prototype.Constructor = function(self, theArguments) {
                 _myMovieImage[i].audio = false;
                 _myMovieImage[i].loopcount = 0;
 
-                _myMovieMaterial[i] = Modelling.createUnlitTexturedMaterial(window.scene, _myMovieImage[i]);  
-                _myMovieQuad[i] = Modelling.createQuad(window.scene, _myMovieMaterial[i].id, [-MOVIE_WIDTH/2,-MOVIE_HEIGHT/2,0], 
+                _myMovieMaterial[i] = Modelling.createUnlitTexturedMaterial(window.scene, _myMovieImage[i]);
+                _myMovieQuad[i] = Modelling.createQuad(window.scene, _myMovieMaterial[i].id, [-MOVIE_WIDTH/2,-MOVIE_HEIGHT/2,0],
                         [MOVIE_WIDTH/2,MOVIE_HEIGHT/2,0]);
                 _myMovieBody[i] = Modelling.createBody(window.scene.world, _myMovieQuad[i].id);
                 _myMovieBody[i].name = "movie"+i;
@@ -272,7 +272,7 @@ WiimoteTestApp.prototype.Constructor = function(self, theArguments) {
             }
         }
 
-        
+
     }
 
     Base.onFrame = self.onFrame;
@@ -345,7 +345,7 @@ WiimoteTestApp.prototype.Constructor = function(self, theArguments) {
         if('screenposition' in theEvent && _myPickedBody) {
             _myPickedBody.position = _myPicking.pickPointOnPlane(_myLastPosition.x, _myLastPosition.y, _myPlane);
         }
-        
+
         if (theEvent.type == "button" && theEvent.buttonname == "B" && theEvent.pressed == 1
             && theEvent.id == _myCurrentCursorOwner)
         {
@@ -358,13 +358,13 @@ WiimoteTestApp.prototype.Constructor = function(self, theArguments) {
                         }
                     }
                 }
-            } 
+            }
             print("Picked body: " + _myPickedBody);
         }
         if (theEvent.type == "button" && theEvent.buttonname == "B" && theEvent.pressed == 0) {
             _myPickedBody = null;
         }
-        
+
         if (theEvent.type == "button" && theEvent.buttonname == "A") {
             _myWiimoteDriver.setRumble( theEvent.id, theEvent.pressed );
         }
@@ -372,10 +372,10 @@ WiimoteTestApp.prototype.Constructor = function(self, theArguments) {
         if (theEvent.type == "button" && theEvent.buttonname == "+" && theEvent.pressed == 0) {
             _myWiimoteDriver.requestStatusReport( theEvent.id );
         }
-        
+
         if (theEvent.type == "motiondata") {
             //print(theEvent);
-            
+
             var myDownVector = new Vector3f( theEvent.motiondata.x, theEvent.motiondata.y,
                                              theEvent.motiondata.z );
 
@@ -420,7 +420,7 @@ WiimoteTestApp.prototype.Constructor = function(self, theArguments) {
         }
 
         if (theEvent.type == "infrareddata" && theEvent.id == _myCurrentCursorOwner) {
-            
+
             var myPosition = new Vector2f(window.width - ((theEvent.screenposition.x * window.width/2.0) + window.width/2.0),
                                           (theEvent.screenposition.y * window.height/2.0) + window.height/2.0 );
             _myCrosshair.position = myPosition;
@@ -440,7 +440,7 @@ WiimoteTestApp.prototype.Constructor = function(self, theArguments) {
 
         if( theNode.type == "found_wii") {
         }
-        
+
         // media system control :)
         if (MOVIE_DEMO && theEvent.type == "button" && theEvent.buttonname == "1" && theEvent.pressed == 1) {
             if( _myCurrentMovieImage.playmode == "pause" ){
@@ -455,10 +455,10 @@ WiimoteTestApp.prototype.Constructor = function(self, theArguments) {
                 _myCurrentMovieImage.playspeed = 1.0;
             }
         }
-        
+
         */
     }
-    
+
     self.getWiimoteDriver = function() {
         return _myWiimoteDriver;
     }
@@ -473,7 +473,7 @@ WiimoteTestApp.prototype.Constructor = function(self, theArguments) {
         return _myWiimotes[ theId ];
     }
     ///////////////////////////////////////////////////////
-    // private funtions 
+    // private funtions
     ///////////////////////////////////////////////////////
 
     function createNewIds(theNode) {

@@ -13,9 +13,9 @@ struct BitChar {
   const unsigned char *bitmap;
 } ;
 
-/** 
+/**
   Structure for storing all the characters of one Bitmap Font.
-  
+
   There are no functions to enumrate the various fonts, retrieve them by name
   or do other fancy stuff. This would require a constructor to run for each
   font that has been compiled in - a confusing perspective...

@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -62,7 +62,7 @@ namespace jslib {
 
 template <class NATIVE, class OWNERPTR,
           template <class, class> class ACCESS_PROTOCOL>
-bool JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL>::matchesClassOf(JSContext *cx, jsval theVal) 
+bool JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL>::matchesClassOf(JSContext *cx, jsval theVal)
 {
     JSObject * myObj;
     if (JSVAL_IS_VOID(theVal)) {
@@ -77,14 +77,14 @@ bool JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL>::matchesClassOf(JSContext *cx,
 
 template <class NATIVE, class OWNERPTR,
           template <class, class> class ACCESS_PROTOCOL>
-JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL> * 
+JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL> *
 JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL>::getJSWrapperPtr(JSContext *cx, JSObject *obj)
 {
     if (JSA_GetClass(cx,obj) != Class()) {
         //JS_ReportError(cx,"JSWrapper::getJSWrapperPtr: class type %s expected",ClassName());
         return 0;
     }
-    JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL> * myJSWrapper = 
+    JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL> * myJSWrapper =
             static_cast<JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL>*>(JS_GetPrivate(cx,obj));
     //if (!myJSWrapper) {
     //    JS_ReportError(cx,"JSWrapper::getJSWrapperPtr: internal error, binding object does not exist");
@@ -94,13 +94,13 @@ JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL>::getJSWrapperPtr(JSContext *cx, JSO
 
 template <class NATIVE, class OWNERPTR,
           template <class, class> class ACCESS_PROTOCOL>
-JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL> & 
-JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL>::getJSWrapper(JSContext *cx, JSObject *obj) 
+JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL> &
+JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL>::getJSWrapper(JSContext *cx, JSObject *obj)
 {
     if (JSA_GetClass(cx,obj) != Class()) {
         throw BadJSNative(std::string("JSWrapper::getJSWrapper: class type'")+ClassName()+"'expected",PLUS_FILE_LINE);
     }
-    JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL> * myJSWrapper = 
+    JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL> * myJSWrapper =
             static_cast<JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL>*>(JS_GetPrivate(cx,obj));
     if (!myJSWrapper) {
         throw BadJSNative("JSWrapper::getJSWrapper: internal error, binding object does not exist", PLUS_FILE_LINE);
@@ -112,7 +112,7 @@ template <class NATIVE, class OWNERPTR,
           template <class, class> class ACCESS_PROTOCOL>
 void JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL>::finalizeImpl(JSContext *cx, JSObject *obj) {
     if (JS_GetPrivate(cx,obj) != Class()) {
-        JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL> * myImpl = 
+        JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL> * myImpl =
                 static_cast<JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL>*>(JS_GetPrivate(cx,obj));
         delete myImpl;
     }
@@ -136,7 +136,7 @@ JSBool JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL>::getPropertySwitch(unsigned 
 
 template <class NATIVE, class OWNERPTR,
           template <class, class> class ACCESS_PROTOCOL>
-JSBool JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL>::getPropertyIndex(unsigned long theIndex, JSContext *cx, JSObject *obj, jsval id, jsval *vp) 
+JSBool JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL>::getPropertyIndex(unsigned long theIndex, JSContext *cx, JSObject *obj, jsval id, jsval *vp)
 {
     JS_ReportError(cx,"JSWrapper::getPropertyIndex: index %d out of range", theIndex);
     return JS_FALSE;
@@ -144,7 +144,7 @@ JSBool JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL>::getPropertyIndex(unsigned l
 
 template <class NATIVE, class OWNERPTR,
           template <class, class> class ACCESS_PROTOCOL>
-JSBool JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL>::getPropertyByNumericId(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) 
+JSBool JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL>::getPropertyByNumericId(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp)
 {
     if ((theID >= 0) && (theID < length())) {
         return getPropertyIndex(theID, cx, obj, id, vp);
@@ -154,14 +154,14 @@ JSBool JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL>::getPropertyByNumericId(unsi
 
 template <class NATIVE, class OWNERPTR,
           template <class, class> class ACCESS_PROTOCOL>
-JSBool JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL>::getPropertyByLiteralId(const std::string & theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) 
+JSBool JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL>::getPropertyByLiteralId(const std::string & theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp)
 {
     return JS_TRUE;
 }
 
 template <class NATIVE, class OWNERPTR,
           template <class, class> class ACCESS_PROTOCOL>
-JSBool JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL>::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) 
+JSBool JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL>::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp)
 {
     JS_ReportError(cx,"JSWrapper::setPropertySwitch: index %d out of range", theID);
     return JS_FALSE;
@@ -169,7 +169,7 @@ JSBool JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL>::setPropertySwitch(unsigned 
 
 template <class NATIVE, class OWNERPTR,
           template <class, class> class ACCESS_PROTOCOL>
-JSBool JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL>::setPropertyIndex(unsigned long theIndex, JSContext *cx, JSObject *obj, jsval id, jsval *vp) 
+JSBool JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL>::setPropertyIndex(unsigned long theIndex, JSContext *cx, JSObject *obj, jsval id, jsval *vp)
 {
     JS_ReportError(cx,"JSWrapper::setPropertyIndex: index %d out of range", theIndex);
     return JS_FALSE;
@@ -178,7 +178,7 @@ JSBool JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL>::setPropertyIndex(unsigned l
 
 template <class NATIVE, class OWNERPTR,
           template <class, class> class ACCESS_PROTOCOL>
-JSBool JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL>::setPropertyByNumericId(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) 
+JSBool JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL>::setPropertyByNumericId(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp)
 {
     if ((theID >= 0) && (theID < length())) {
         return setPropertyIndex(theID, cx, obj, id, vp);
@@ -188,7 +188,7 @@ JSBool JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL>::setPropertyByNumericId(unsi
 
 template <class NATIVE, class OWNERPTR,
           template <class, class> class ACCESS_PROTOCOL>
-JSBool JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL>::setPropertyByLiteralId(const std::string & theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) 
+JSBool JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL>::setPropertyByLiteralId(const std::string & theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp)
 {
     return JS_TRUE;
 };
@@ -299,7 +299,7 @@ JSObject * JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL>::Construct(JSContext *cx
 template <class NATIVE, class OWNERPTR,
           template <class, class> class ACCESS_PROTOCOL>
 JSObject *
-JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL>::ConstructWithArgs(JSContext * cx, OWNERPTR theOwner, NATIVE * theNative, 
+JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL>::ConstructWithArgs(JSContext * cx, OWNERPTR theOwner, NATIVE * theNative,
             uintN argc, jsval * argv)
 {
     JSObject * myNewObj = JS_ConstructObjectWithArguments(cx, Class(),
@@ -336,7 +336,7 @@ JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL>::JSWrapper()
 /*
 template <class NATIVE, class OWNERPTR,
           template <class, class> class ACCESS_PROTOCOL>
-JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL>::~JSWrapper() 
+JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL>::~JSWrapper()
 {
 }
 */
@@ -386,18 +386,18 @@ JSObject * JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL>::initClass(JSContext *cx
 
 }
 namespace {
-    
+
     template<typename Value>
     class NativeRef {
     public:
         NativeRef(JSContext *cx, JSObject *obj)
         : cx_(cx), obj_(obj), value_(jslib::JSClassTraits<Value>::openNativeRef(cx, obj))
         { }
-        
+
         Value& getValue() {
             return value_;
         }
-        
+
         ~NativeRef() {
             jslib::JSClassTraits<Value>::closeNativeRef(cx_, obj_);
         }
@@ -406,6 +406,6 @@ namespace {
         JSObject  *obj_;
         Value &    value_;
     };
-    
+
 }
 /* vim: set filetype=cpp : */

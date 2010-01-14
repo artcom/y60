@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -76,8 +76,8 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Returns information about the ParticleSystem."); DOC_END;
     //const ParticleSystem & myParticleSystem = JSParticleSystem::getJSWrapper(cx,obj).getNative();
 
-    std::string myStatusString("\nStatus: is emitting..."); 
-    
+    std::string myStatusString("\nStatus: is emitting...");
+
     *rval = as_jsval(cx, myStatusString);
     return JS_TRUE;
 }
@@ -101,13 +101,13 @@ create(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     Vector3f myInitialDirection = Vector3f(0.0f, 1.0f, 0.0f);
     Vector2f myScattering = Vector2f(0.0f, 45.0f);
     Vector2f mySpeedRange = Vector2f(10.0, 20.0);
-    
+
     try {
         if (argc > 6) {
             JS_ReportError(cx, "JSParticleSystem::create: needs between 0 and 5 arguments!");
             return JS_FALSE;
         }
-        
+
         if (argc >= 1) {
             if (!convertFrom(cx, argv[0], myParentNode)) {
                 JS_ReportError(cx, "JSParticleSystem::create: argument #1 must be an integer");
@@ -121,35 +121,35 @@ create(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
                 return JS_FALSE;
             }
         }
-        
+
         if (argc >= 3) {
             if (!convertFrom(cx, argv[2], myTextureName)) {
                 JS_ReportError(cx, "JSParticleSystem::create: argument #3 must be a string");
                 return JS_FALSE;
             }
         }
-        
+
         if (argc >= 4) {
             if (!convertFrom(cx, argv[3], myInitialDirection)) {
                 JS_ReportError(cx, "JSParticleSystem::create: argument #4 must be a vector3f");
                 return JS_FALSE;
             }
         }
-        
+
         if (argc >= 5) {
             if (!convertFrom(cx, argv[4], myScattering)) {
                 JS_ReportError(cx, "JSParticleSystem::create: argument #5 must be a vector2f");
                 return JS_FALSE;
             }
         }
-        
+
         if (argc >= 6) {
             if (!convertFrom(cx, argv[5], mySpeedRange)) {
                 JS_ReportError(cx, "JSParticleSystem::create: argument #6 must be a vetor2f");
                 return JS_FALSE;
             }
         }
-            
+
         return Method<JSParticleSystem::NATIVE>::call(&JSParticleSystem::NATIVE::create, cx, obj, argc, argv, rval);
     } HANDLE_CPP_EXCEPTION;
 }
@@ -217,10 +217,10 @@ JSParticleSystem::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject
             return JS_TRUE;
         case PROP_animation:
             *vp = as_jsval(cx, getNative().getAnimationNode());
-            return JS_TRUE; 
+            return JS_TRUE;
         case PROP_image:
             *vp = as_jsval(cx, getNative().getImageNode());
-            return JS_TRUE; 
+            return JS_TRUE;
         default:
             JS_ReportError(cx,"JSParticleSystem::getProperty: index %d out of range", theID);
             return JS_FALSE;
@@ -230,7 +230,7 @@ JSParticleSystem::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject
 // setproperty handling
 JSBool
 JSParticleSystem::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
-    
+
     //switch (theID) {
     //    default:
             JS_ReportError(cx,"JSParticleSystem::setPropertySwitch: index %d out of range", theID);
@@ -243,28 +243,28 @@ JSParticleSystem::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *a
     DOC_BEGIN("Creates a ParticleSystem Device. Call tuneChannel to tune for a certain channel");
     DOC_PARAM("theScene", "the scene Object", DOC_TYPE_NODE);
     DOC_END;
-    
+
     try{
         ensureParamCount(argc, 1);
         if (JSA_GetClass(cx,obj) != Class()) {
             JS_ReportError(cx,"Constructor for %s bad object; did you forget a 'new'?", ClassName());
             return JS_FALSE;
         }
-        
+
         y60::ScenePtr myScene;
         if (!convertFrom(cx, argv[0], myScene)) {
             JS_ReportError(cx, "JSParticleSystem::Constructor: argument #1 must be the scene");
             return JS_FALSE;
         }
-    
+
         OWNERPTR myParticleSystem = OWNERPTR(new ParticleSystem(myScene));
         JSParticleSystem * myNewObject = new JSParticleSystem(myParticleSystem, myParticleSystem.get());
-    
+
         if (myNewObject) {
             JS_SetPrivate(cx, obj, myNewObject);
             return JS_TRUE;
-        } 
-    
+        }
+
         JS_ReportError(cx,"JSParticleSystem::Constructor: bad parameters");
 
         return JS_FALSE;
@@ -281,7 +281,7 @@ JSParticleSystem::ConstIntProperties() {
 
 JSObject *
 JSParticleSystem::initClass(JSContext *cx, JSObject *theGlobalObject) {
-    JSObject *myClass = Base::initClass(cx, theGlobalObject, ClassName(), Constructor, Properties(), 
+    JSObject *myClass = Base::initClass(cx, theGlobalObject, ClassName(), Constructor, Properties(),
                                         Functions(), ConstIntProperties(), 0, StaticFunctions());
     DOC_MODULE_CREATE("GPUParticles", JSParticleSystem);
     return myClass;

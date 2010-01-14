@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 
@@ -76,10 +76,10 @@ ConfiguratorUnitTest.prototype.Constructor = function(obj, theName) {
     obj.run = function() {
         try {
 
-            var myConfigurator = new Configurator( null, COMMON_SETTINGS, 
+            var myConfigurator = new Configurator( null, COMMON_SETTINGS,
                                                    [LIST_A_SETTINGS, LIST_B_SETTINGS] );
             obj.mySettingsFileList = myConfigurator.getSettingsFileList();
-            ENSURE( "obj.mySettingsFileList[0] == LIST_A_SETTINGS && " + 
+            ENSURE( "obj.mySettingsFileList[0] == LIST_A_SETTINGS && " +
                     "obj.mySettingsFileList[1] == LIST_B_SETTINGS" );
 
             var myPath = searchFile(COMMON_SETTINGS);
@@ -94,7 +94,7 @@ ConfiguratorUnitTest.prototype.Constructor = function(obj, theName) {
 
     function testLoadSettings() {
         try {
-            var myConfigurator = new Configurator( null, COMMON_SETTINGS, 
+            var myConfigurator = new Configurator( null, COMMON_SETTINGS,
                                                    [LIST_A_SETTINGS, LIST_B_SETTINGS] );
 
             obj.mySettings = myConfigurator.getSettings();
@@ -109,7 +109,7 @@ ConfiguratorUnitTest.prototype.Constructor = function(obj, theName) {
     }
 
     function testSaveSettings() {
-            
+
         const COMMON_SETTINGS_COPY = "common_settings_copy.xml";
         const LIST_A_SETTINGS_COPY = "settings_list_a_copy.xml";
         const LIST_B_SETTINGS_COPY = "settings_list_b_copy.xml";
@@ -121,7 +121,7 @@ ConfiguratorUnitTest.prototype.Constructor = function(obj, theName) {
 
         // initialize the configurator with our copies
         var myConfigurator = new Configurator( null, COMMON_SETTINGS_COPY,
-                                               [LIST_A_SETTINGS_COPY, 
+                                               [LIST_A_SETTINGS_COPY,
                                                 LIST_B_SETTINGS_COPY] );
 
         // create our expected results:
@@ -138,7 +138,7 @@ ConfiguratorUnitTest.prototype.Constructor = function(obj, theName) {
         obj.myListASettingsResult.childNode( "CommonAndListASection" )
                                  .childNode( "CommonAndListA" )
                                  .childNode( "#text" ).nodeValue = "Altered";
-        
+
         obj.myListBSettingsResult = new Node();
         obj.myListBSettingsResult.parseFile( LIST_B_SETTINGS );
         obj.myListBSettingsResult = obj.myListBSettingsResult.firstChild;
@@ -173,7 +173,7 @@ ConfiguratorUnitTest.prototype.Constructor = function(obj, theName) {
         obj.myCommonSettingsSaved = new Node();
         obj.myCommonSettingsSaved.parseFile( COMMON_SETTINGS_COPY );
         obj.myCommonSettingsSaved = obj.myCommonSettingsSaved.firstChild;
-        
+
         obj.myListASettingsSaved = new Node();
         obj.myListASettingsSaved.parseFile( LIST_A_SETTINGS_COPY );
         obj.myListASettingsSaved = obj.myListASettingsSaved.firstChild;
@@ -181,16 +181,16 @@ ConfiguratorUnitTest.prototype.Constructor = function(obj, theName) {
         obj.myListBSettingsSaved = new Node();
         obj.myListBSettingsSaved.parseFile( LIST_B_SETTINGS_COPY );
         obj.myListBSettingsSaved = obj.myListBSettingsSaved.firstChild;
-        
-        ENSURE( "obj.myCommonSettingsResult.toString() " + 
+
+        ENSURE( "obj.myCommonSettingsResult.toString() " +
                 "== obj.myCommonSettingsSaved.toString()" );
-        ENSURE( "obj.myListASettingsResult.toString() " + 
+        ENSURE( "obj.myListASettingsResult.toString() " +
                 "== obj.myListASettingsSaved.toString()" );
-        ENSURE( "obj.myListBSettingsResult.toString() " + 
+        ENSURE( "obj.myListBSettingsResult.toString() " +
                 "== obj.myListBSettingsSaved.toString()" );
 
         obj.myCurrentSettings = myConfigurator.getSettings();
-        ENSURE( "obj.myClonedMergedSettings.toString() " + 
+        ENSURE( "obj.myClonedMergedSettings.toString() " +
                 "== obj.myCurrentSettings.toString()" );
 
         deleteFile( COMMON_SETTINGS_COPY );

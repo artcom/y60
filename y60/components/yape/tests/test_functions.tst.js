@@ -31,7 +31,7 @@ var suite = new UnitTestSuite(test_name);
 suite.addTest(new ape_function_test());
 suite.run();
 
-print(">> Finished test suite '" + test_name + "', return status = " 
+print(">> Finished test suite '" + test_name + "', return status = "
         + suite.returnStatus() + "");
 exit( suite.returnStatus() );
 

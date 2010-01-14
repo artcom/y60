@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -116,14 +116,14 @@ namespace y60 {
         shutdown();
         DB(AC_DEBUG << "destroyed an FFMpegDecoder1...");
     }
-    
+
     void FFMpegDecoder1::shutdown() {
         if (!_hasShutDown) {
             closeMovie();
         }
         _hasShutDown = true;
    }
-    
+
     asl::Ptr<MovieDecoderBase> FFMpegDecoder1::instance() const {
         return asl::Ptr<MovieDecoderBase>(new FFMpegDecoder1(getDLHandle()));
     }
@@ -251,10 +251,10 @@ namespace y60 {
             switch(myTargetPixelFormat) {
                 case TEXTURE_IFMT_YUV420:
                     myRasterEncoding = YUV420;
-                    break;                
+                    break;
                 case TEXTURE_IFMT_RGBA8:
                     myRasterEncoding = RGBA;
-                    break;                
+                    break;
                 case TEXTURE_IFMT_ALPHA:
                     myRasterEncoding = ALPHA;
                     break;
@@ -267,7 +267,7 @@ namespace y60 {
                     break;
                 case TEXTURE_IFMT_RGB:
                     myRasterEncoding = RGB;
-                    break;    
+                    break;
                 default:
                 	AC_FATAL << "Unsupported pixel format " << myMovie->get<TargetPixelFormatTag>() << " in FFMpegDecoder1";
                 	break;
@@ -297,9 +297,9 @@ namespace y60 {
 				{AC_TRACE << "Using YUV420 pixels";}
 				_myDestinationPixelFormat = PIX_FMT_YUV420P;
                 myMovie->createRaster(myWidth, myHeight, 1, y60::GRAY);
-                myMovie->addRasterValue(createRasterValue( y60::GRAY, myWidth/2, myHeight/2), y60::GRAY, 1);                
-                myMovie->addRasterValue(createRasterValue( y60::GRAY, myWidth/2, myHeight/2), y60::GRAY, 1);    
-                break;                            
+                myMovie->addRasterValue(createRasterValue( y60::GRAY, myWidth/2, myHeight/2), y60::GRAY, 1);
+                myMovie->addRasterValue(createRasterValue( y60::GRAY, myWidth/2, myHeight/2), y60::GRAY, 1);
+                break;
             case RGB:
             default:
 				{AC_TRACE << "Using BGR pixels";}
@@ -319,14 +319,14 @@ namespace y60 {
 
         // duration
         AVCodecContext * myVCodec = _myVStream->codec;
-        
+
         if (myVCodec->codec_id == CODEC_ID_MPEG1VIDEO || myVCodec->codec_id == CODEC_ID_MPEG2VIDEO )
         {
             // For some codecs, the duration value is not set. For MPEG1 and MPEG2,
             // ffmpeg gives often a wrong value.
             myMovie->set<FrameCountTag>(-1);
-            
-        } else if (myVCodec->codec_id == CODEC_ID_WMV1 || myVCodec->codec_id == CODEC_ID_WMV2 || 
+
+        } else if (myVCodec->codec_id == CODEC_ID_WMV1 || myVCodec->codec_id == CODEC_ID_WMV2 ||
                    myVCodec->codec_id == CODEC_ID_WMV3)
         {
             myMovie->set<FrameCountTag>(int(_myVStream->duration * myFPS / 1000));
@@ -419,7 +419,7 @@ namespace y60 {
             int myError;
             if ((myError = av_read_frame(_myFormatContext, &myPacket)) < 0) {
                 av_free_packet(&myPacket);
-#if 1 
+#if 1
                 /*
                  * Some codecs, such as MPEG, transmit the I and P frame with a
                  * latency of one frame. You must do the following to have a
@@ -431,10 +431,10 @@ namespace y60 {
                 av_init_packet(&myTempPacket);
                 /*int myLen =*/ avcodec_decode_video2(_myVStream->codec, _myFrame,
                         &frameFinished, &myTempPacket);
-#else                
+#else
                 /*int myLen =*/ avcodec_decode_video(_myVStream->codec, _myFrame,
                         &frameFinished, NULL, 0);
-#endif                        
+#endif
                 if (frameFinished) {
                     _myLastVideoTimestamp += myTimePerFrame;
 
@@ -460,7 +460,7 @@ namespace y60 {
                 }
 
                 int frameFinished = 0;
-                
+
 #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52,27,0)
                 AVPacket myTempPacket;
                 av_init_packet(&myTempPacket);
@@ -474,7 +474,7 @@ namespace y60 {
                         break;
                     }
                     myTempPacket.data += myLen;
-                    myTempPacket.size -= myLen;                    
+                    myTempPacket.size -= myLen;
 #else
                 unsigned char* myData = myPacket.data;
                 int myDataLen = myPacket.size;
@@ -482,14 +482,14 @@ namespace y60 {
                     int myLen = avcodec_decode_video(_myVStream->codec,
                                                  _myFrame, &frameFinished,
                                                  myData, myDataLen);
-                    
+
                     if (myLen < 0) {
                         AC_ERROR << "av_decode_video error";
                         break;
                     }
                     myData += myLen;
                     myDataLen -= myLen;
-#endif                
+#endif
                 }
 
                 AC_DEBUG << "decoded dts=" << myPacket.dts << " pts=" << myPacket.pts
@@ -509,7 +509,7 @@ namespace y60 {
         }
 
         if (_myDestinationPixelFormat == PIX_FMT_YUV420P ) {
-            Movie * myMovie = getMovie();            
+            Movie * myMovie = getMovie();
             myMovie->getRasterPtr(0)->resize(getFrameWidth(), getFrameHeight());
             myMovie->getRasterPtr(1)->resize(getFrameWidth()/2, getFrameHeight()/2);
             myMovie->getRasterPtr(2)->resize(getFrameWidth()/2, getFrameHeight()/2);
@@ -518,7 +518,7 @@ namespace y60 {
             copyPlaneToRaster(myMovie->getRasterPtr(2)->pixels().begin(), _myFrame->data[2], _myFrame->linesize[2], getFrameWidth()/2, getFrameHeight()/2);
         } else {
             convertFrame(_myFrame, theTargetRaster);
-        }       
+        }
         // store actual timestamp
 
         theTimestamp = double(myPacket.dts);
@@ -549,30 +549,30 @@ namespace y60 {
 
 
         AVCodecContext * myVCodec = _myVStream->codec;
-        
-#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(51,38,0) 
+
+#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(51,38,0)
         START_TIMER(decodeFrame_img_convert);
         img_convert(&myDestPict, _myDestinationPixelFormat,
                     (AVPicture*)theFrame, myVCodec->pix_fmt,
                     myVCodec->width, myVCodec->height);
         STOP_TIMER(decodeFrame_img_convert);
-                        
+
 #else
     START_TIMER(decodeFrame_sws_scale);
-                
-        int mySWSFlags = SWS_FAST_BILINEAR;//SWS_BICUBIC;           
+
+        int mySWSFlags = SWS_FAST_BILINEAR;//SWS_BICUBIC;
         SwsContext * img_convert_ctx = sws_getContext(myVCodec->width, myVCodec->height,
             myVCodec->pix_fmt,
             myVCodec->width, myVCodec->height,
             _myDestinationPixelFormat,
             mySWSFlags, NULL, NULL, NULL);
-        sws_scale(img_convert_ctx, ((AVPicture*)theFrame)->data, 
-            ((AVPicture*)theFrame)->linesize, 0, myVCodec->height, 
+        sws_scale(img_convert_ctx, ((AVPicture*)theFrame)->data,
+            ((AVPicture*)theFrame)->linesize, 0, myVCodec->height,
             myDestPict.data, myDestPict.linesize);
-        
+
         sws_freeContext(img_convert_ctx);
     STOP_TIMER(decodeFrame_sws_scale);
-                
+
 #endif
     }
 }

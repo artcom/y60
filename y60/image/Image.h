@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -105,8 +105,8 @@ namespace y60 {
         public ImageTileTag::Plug,
         public ImageDepthTag::Plug,
         public TargetPixelFormatTag::Plug,
-        public dom::FacadeAttributePlug<RasterPixelFormatTag>,   
-        public dom::FacadeAttributePlug<ImageBytesPerPixelTag>,        
+        public dom::FacadeAttributePlug<RasterPixelFormatTag>,
+        public dom::FacadeAttributePlug<ImageBytesPerPixelTag>,
         public dom::FacadeAttributePlug<ImageWidthTag>,
         public dom::FacadeAttributePlug<ImageHeightTag>,
         public dom::FacadeAttributePlug<LastActiveFrameTag>
@@ -126,23 +126,23 @@ namespace y60 {
         /**
         * Creates a new empty raster with the given properties
         */
-        dom::ResizeableRasterPtr createRaster(unsigned theWidth, unsigned theHeight, 
+        dom::ResizeableRasterPtr createRaster(unsigned theWidth, unsigned theHeight,
             unsigned theDepth,
-            PixelEncoding theEncoding); 
+            PixelEncoding theEncoding);
 
         /**
         * Creates a new raster with the given properties and pixels
         */
-        dom::ResizeableRasterPtr createRaster(unsigned theWidth, unsigned theHeight, 
+        dom::ResizeableRasterPtr createRaster(unsigned theWidth, unsigned theHeight,
             unsigned theDepth,
             PixelEncoding theEncoding,
-            const asl::ReadableBlock & thePixels); 
+            const asl::ReadableBlock & thePixels);
 
         void blitImage(const asl::Ptr<Image, dom::ThreadingModel> & theSourceImage,
             const asl::Vector2i & theTargetPos,
             const asl::Box2i * theSourceRect = 0);
 
-        // Returns the pixel encoding of the raster image 
+        // Returns the pixel encoding of the raster image
         PixelEncoding getRasterEncoding() const;
 
         unsigned getMemUsed() const {
@@ -158,9 +158,9 @@ namespace y60 {
             const VectorOfString & theFilter = VectorOfString(),
             const VectorOfVectorOfFloat & theFilterParams = VectorOfVectorOfFloat());
 
-        /** Apply filter to the image. 
+        /** Apply filter to the image.
         */
-        void applyFilter(const std::string & theFilter, 
+        void applyFilter(const std::string & theFilter,
             const VectorOfFloat & theFilterParam);
 
         /// Get the node version number.
@@ -195,7 +195,7 @@ namespace y60 {
                     myValueNode = getRasterValueNode();
                     if (myValueNode) {
                         return myValueNode->nodeValueWrapperPtr();
-                    } 
+                    }
                 } else {
                     return myValue;
                 }
@@ -227,7 +227,7 @@ namespace y60 {
         void calculateWidth();
         void calculateHeight();
 
-        dom::ResizeableRasterPtr setRasterValue(dom::ValuePtr theRaster, 
+        dom::ResizeableRasterPtr setRasterValue(dom::ValuePtr theRaster,
             PixelEncoding theEncoding, unsigned theDepth);
 
         void convertToPLBmp(PLAnyBmp & theBitmap);

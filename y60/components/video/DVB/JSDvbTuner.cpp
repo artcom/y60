@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -78,11 +78,11 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     const DvbTuner & myDvbTuner = JSDvbTuner::getJSWrapper(cx,obj).getNative();
 
     std::string myStatusString = "";
-    myStatusString = std::string("\nStatus: is open [videoPID: ") + asl::as_string(myDvbTuner.getVideoPID()) + 
+    myStatusString = std::string("\nStatus: is open [videoPID: ") + asl::as_string(myDvbTuner.getVideoPID()) +
         ", audioPID: " + asl::as_string(myDvbTuner.getAudioPID()) +
         ", videoTextPID:" + asl::as_string(myDvbTuner.getVideoTextPID()) +
-        "]"; 
-    
+        "]";
+
     std::string myStringRep = string("DVB Device: [deviceName: " +
                                      myDvbTuner.getDeviceName() + "]" +
                                      myStatusString );
@@ -212,13 +212,13 @@ JSDvbTuner::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj,
         return JS_TRUE;
     case PROP_videoTextPID:
         *vp = as_jsval(cx, getNative().getVideoTextPID());
-        return JS_TRUE; 
+        return JS_TRUE;
     case PROP_deviceName:
         *vp = as_jsval(cx, getNative().getDeviceName());
-        return JS_TRUE; 
+        return JS_TRUE;
     case PROP_channel:
         *vp = as_jsval(cx, getNative().getChannelName());
-        return JS_TRUE; 
+        return JS_TRUE;
     default:
         JS_ReportError(cx,"JSDvbTuner::getProperty: index %d out of range", theID);
         return JS_FALSE;
@@ -241,18 +241,18 @@ JSDvbTuner::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, j
     DOC_BEGIN("Creates a DvbTuner Device. Call tuneChannel to tune for a certain channel");
     DOC_PARAM_OPT("theDvbDevice", "The dvb device of desire.", DOC_TYPE_STRING, "/dev/dvb/adapter0");
     DOC_END;
-    
+
     try{
         ensureParamCount(argc, 1, 2);
-        
+
         if (JSA_GetClass(cx,obj) != Class()) {
             JS_ReportError(cx,"Constructor for %s bad object; did you forget a 'new'?", ClassName());
             return JS_FALSE;
         }
-        
+
         JSDvbTuner * myNewObject = 0;
         string myDeviceName = "/dev/dvb/adapter0";
-        
+
         dom::NodePtr myConfigurationNode;
         if (!convertFrom(cx, argv[0], myConfigurationNode)) {
             JS_ReportError(cx, "JSDvbTuner::Constructor: argument #1 must be a node (channel configuration node)");
@@ -265,15 +265,15 @@ JSDvbTuner::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, j
                 return JS_FALSE;
             }
         }
-    
+
         OWNERPTR myDvbTuner = OWNERPTR(new DvbTuner(myConfigurationNode, myDeviceName));
         myNewObject = new JSDvbTuner(myDvbTuner, myDvbTuner.get());
-    
+
         if (myNewObject) {
             JS_SetPrivate(cx, obj, myNewObject);
             return JS_TRUE;
         }
-    
+
         JS_ReportError(cx,"JSDvbTuner::Constructor: bad parameters");
 
         return JS_FALSE;

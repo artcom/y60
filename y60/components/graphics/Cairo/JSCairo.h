@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -99,7 +99,7 @@ namespace jslib {
 
             PROP_FILL_RULE_WINDING,
             PROP_FILL_RULE_EVEN_ODD,
-            
+
             PROP_LINE_CAP_BUTT,
             PROP_LINE_CAP_ROUND,
             PROP_LINE_CAP_SQUARE,
@@ -140,13 +140,13 @@ namespace jslib {
             PROP_SUBPIXEL_ORDER_BGR,
             PROP_SUBPIXEL_ORDER_VRGB,
             PROP_SUBPIXEL_ORDER_VBGR,
-            
+
             PROP_HINT_STYLE_DEFAULT,
             PROP_HINT_STYLE_NONE,
             PROP_HINT_STYLE_SLIGHT,
             PROP_HINT_STYLE_MEDIUM,
             PROP_HINT_STYLE_FULL,
-            
+
             PROP_HINT_METRICS_DEFAULT,
             PROP_HINT_METRICS_OFF,
             PROP_HINT_METRICS_ON,
@@ -199,7 +199,7 @@ namespace jslib {
 
     jsval as_jsval(JSContext *cx, JSCairo::OWNERPTR theOwner, JSCairo::NATIVE * theContext);
     jsval as_jsval(JSContext *cx, JSCairo::OWNERPTR theOwner, cairo_t * theContext);
-    
+
     bool convertFrom(JSContext *cx, jsval theValue, JSCairo::NATIVE *& theContext);
     bool convertFrom(JSContext *cx, jsval theValue, cairo_t *& theContext);
 }

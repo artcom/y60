@@ -22,10 +22,10 @@
 macvdCamera::macvdCamera()
 {
 	cameraID = -1;
-	
+
 	buffer = NULL;
 	cameraName = new char[256];
-	
+
 	dstPort = NULL;
 	vdImageDesc = NULL;
 	pVdg = NULL;
@@ -40,13 +40,13 @@ macvdCamera::~macvdCamera()
 bool macvdCamera::findCamera() {
 
 	OSErr err;
-	
+
 	if(!(pVdg = vdgNew()))
 	{
 		AC_ERROR << "no camera found, vdgNew: failed to allocate";
 		return false;
 	}
-	
+
 	if(err = vdgInit(pVdg))
 	{
 		AC_ERROR << "no camera found, vdgInit err="<<err;
@@ -90,7 +90,7 @@ bool macvdCamera::initCamera(int width, int height, bool colour) {
                <<",framerate="<<framerate<<", bytesPerSecond="<<bytesPerSecond;
     }
 
-	fps = vdgGetFrameRate(pVdg);	
+	fps = vdgGetFrameRate(pVdg);
 	AC_DEBUG << "fps=" << fps;
 
 	if(err = vdgPreflightGrabbing(pVdg))
@@ -98,9 +98,9 @@ bool macvdCamera::initCamera(int width, int height, bool colour) {
 		AC_ERROR << "vdgPreflightGrabbing err="<<err;
 		return false;
 	}
-	
+
 	vdImageDesc = (ImageDescriptionHandle)NewHandle(0);
-	if (err = vdgGetImageDescription( pVdg, 
+	if (err = vdgGetImageDescription( pVdg,
 									  vdImageDesc))
 	{
 		AC_ERROR << "vdgGetImageDescription err="<<err;
@@ -125,22 +125,22 @@ bool macvdCamera::initCamera(int width, int height, bool colour) {
 										&dstPortBounds))
 	{
 		AC_ERROR << "createOffscreenGWorld err="<<err;
-		return false;	
+		return false;
 	}
-	
+
 	// Get buffer from GWorld
 	pDstData = GetPixBaseAddr(GetGWorldPixMap(dstPort));
-	dstDataSize = GetPixRowBytes(GetGWorldPixMap(dstPort)) * (dstPortBounds.bottom - dstPortBounds.top); 
+	dstDataSize = GetPixRowBytes(GetGWorldPixMap(dstPort)) * (dstPortBounds.bottom - dstPortBounds.top);
 	dstDisplayBounds = dstPortBounds;
 
-	
+
 	// Set the decompression destination to the offscreen GWorld
 	if (err = vdgSetDestination(	pVdg, dstPort ))
 	{
 		AC_ERROR << "vdgSetDestination err="<<err;
 		return false;
 	}
-    
+
     AC_DEBUG << "macvdCamera::initCamera() buffer w="<<this->width<<",h="<<this->height<<", bytes="<<bytes;
 	buffer = new unsigned char[this->width*this->height*bytes];
 	return true;
@@ -162,13 +162,13 @@ unsigned char* macvdCamera::getFrame()
 		AC_ERROR << "could not grab frame, vdgIdle err="<<err;
 		return NULL;
 	}
-	
+
 	if (isUpdated)
 	{
         AC_DEBUG << "macvdCamera::getFrame() isUpdated";
 		unsigned char *src = (unsigned char*)pDstData;
 		unsigned char *dest = buffer;
-		
+
 		switch (colour) {
 			case true: {
                 AC_DEBUG << "macvdCamera::getFrame() uyvy2rgb w="<<width<<",h="<<height<<", src="<<(void*)src<<",dest="<<(void*)dest;
@@ -243,7 +243,7 @@ bool macvdCamera::closeCamera()
 		vdgUninit(pVdg);
 		vdgDelete(pVdg);
 		pVdg = NULL;
-	}	
+	}
 
 	return true;
 }

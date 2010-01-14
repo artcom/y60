@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -79,17 +79,17 @@ namespace y60 {
 
     typedef asl::Ptr<GrainSource, asl::MultiProcessor, asl::PtrHeapAllocator<asl::MultiProcessor> > GrainSourcePtr;
     typedef asl::WeakPtr<GrainSource, asl::MultiProcessor, asl::PtrHeapAllocator<asl::MultiProcessor> > GrainSourceWeakPtr;
-    
+
     class Y60_SOUND_DECL GrainSource :
         public asl::SampleSource, public asl::ISampleSink
     {
 
     public:
 
-        GrainSource(const std::string& theName, 
-                    asl::SampleFormat theSampleFormat, 
-                    unsigned theSampleRate, 
-                    unsigned theNumChannels, 
+        GrainSource(const std::string& theName,
+                    asl::SampleFormat theSampleFormat,
+                    unsigned theSampleRate,
+                    unsigned theNumChannels,
                     unsigned theGrainSize=50,
                     unsigned theGrainRate=25);
         virtual ~GrainSource();
@@ -100,7 +100,7 @@ namespace y60 {
         // inherited from ISampleSink
         virtual bool queueSamples(asl::AudioBufferPtr& theBuffer); // use it to fill the internal audio data buffer
 
-        void clearAudioData(); 
+        void clearAudioData();
 
         void setAudioData(const asl::AudioBufferPtr& theAudioData);
 
@@ -116,7 +116,7 @@ namespace y60 {
         void setGrainRateJitter(unsigned theJitter);
         unsigned getGrainRateJitter() const;
 
-        void setGrainPosition(float thePosition); 
+        void setGrainPosition(float thePosition);
         float getGrainPosition() const;
 
         void setGrainPositionJitter(float theJitter);
@@ -145,14 +145,14 @@ namespace y60 {
         unsigned _myGrainSizeJitter;
         unsigned _myGrainRate;              // time interval when the next grain should be played (in ms)
         unsigned _myGrainRateJitter;
-        float    _myGrainPosition;          // relative position in the audiobuffer where the grain is taken from 
-        float    _myGrainPositionJitter;    
+        float    _myGrainPosition;          // relative position in the audiobuffer where the grain is taken from
+        float    _myGrainPositionJitter;
         float    _myRatio;                  // transposition ratio
-        float    _myRatioJitter;    
+        float    _myRatioJitter;
         // XXXX panning stuff
 
         asl::Unsigned64 _myAbsoluteFrames;
-        
+
         // some effect(-functors) to operate on the audio buffers
         asl::VolumeFaderPtr    _myVolumeFader;
         y60::ResamplerPtr      _myResampler;

@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -102,7 +102,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
     var _myLastFrame          = 0;
     var _myFrameCounter       = 0;
     var _myTheaterFlag        = false;
-    
+
     //////////////////////////////////////////////////////////////////////
     //
     // Constructor
@@ -123,20 +123,20 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
     self.setup = function(theWidth, theHeight, theTitle, theTheaterFlag) {
         self.setSplashScreen(false);
         Base.setup(theWidth, theHeight, false, theTitle);
-        _myTheaterFlag    = theTheaterFlag;        
+        _myTheaterFlag    = theTheaterFlag;
         if (_myTheaterFlag) {
             window.decorations     = false;
-            window.backgroundColor = [0.0, 0.0, 0.0];            
-            window.position        = [0.0, 0.0];            
+            window.backgroundColor = [0.0, 0.0, 0.0];
+            window.position        = [0.0, 0.0];
             window.showMouseCursor = false;
             window.swapInterval    = 2;
-            
+
         } else {
             window.canvas.backgroundcolor = [0.5,0.5,0.5,1];
         }
         //window.fixedFrameTime = 1/60;
         //window.swapInterval    = 0;
-        
+
         for(var i=0; i<theArguments.length; ++i) {
             switch(theArguments[i]) {
             case "recursive": // would like to use '--recursive' but that is rejected by the acxpshell options
@@ -222,7 +222,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
                         break;
                     case "/":
                         seekToOffset(false, 100);
-                        break;        
+                        break;
                     case "h":
                         self.setMessage("ImageViewer help:");
                         self.setMessage("   space           - show/hide text overlay");
@@ -340,7 +340,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
                     var myPixelY = (theY-_myImageOverlay.position.y)/_myZoomFactor;
                     if (myPixelX >= 0 && myPixelY >= 0) {
                         print("Color: " + _myImageOverlay.image.raster.getPixel(myPixelX, myPixelY));
-                    } 
+                    }
                 }
             }
         }
@@ -458,7 +458,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
             }
         }
     }
-    
+
     function seekToOffset(theForwardFlag, theSeekOffset) {
         if (_myMovieNode && _myMovieOverlay.visible) {
             _myMovieNode.playmode = "pause";
@@ -778,7 +778,7 @@ try {
         var myHeight = 600;
         var myTheaterFlag = false;
         var ourImageViewerApp = new ImageViewerApp(arguments);
-        
+
         print(arguments)
         for (var i = 0; i < arguments.length; ++i) {
             if (arguments[i].search(/resolution/) != -1) {

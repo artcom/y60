@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -85,7 +85,7 @@ namespace y60 {
 
         AC_DEBUG << "Initiated osc receiver on port: " << thePort;
         _myOscReceiverSocket = asl::Ptr<UdpListeningReceiveSocket>(
-            new UdpListeningReceiveSocket(IpEndpointName(IpEndpointName::ANY_ADDRESS, 
+            new UdpListeningReceiveSocket(IpEndpointName(IpEndpointName::ANY_ADDRESS,
                                                          thePort), this));
 
         y60::EventDispatcher::get().addSource(this);
@@ -101,7 +101,7 @@ namespace y60 {
 
         _myCurrentY60Events.clear();
 
-        while (!_myNewMessages.empty()){            
+        while (!_myNewMessages.empty()){
             _myCurrentY60Events.push_back(createY60Event(_myNewMessages.front()));
             _myNewMessages.pop_front();
         }
@@ -128,7 +128,7 @@ namespace y60 {
     void OscReceiver::run( ) {
         try {
             AC_DEBUG << "launched the osc receiver thread";
-    
+
             _myOscReceiverSocket->Run();
 
             AC_DEBUG << "receiver thread finished";
@@ -139,7 +139,7 @@ namespace y60 {
     }
 
 
-    
+
     EventPtr OscReceiver::createY60Event(const string& theMessage){
         y60::GenericEventPtr myY60Event( new GenericEvent("onOscEvent", _myEventSchema, _myValueFactory));
 
@@ -152,7 +152,7 @@ namespace y60 {
             //    appendAttribute<string>("when", myOldEvent->getAttributeString("when"));
             myNode->firstChild()->
                 appendAttribute<string>("callback", myOldEvent->getAttributeString("callback"));
-            myY60Event->when = as<double>(myNode->firstChild()->getAttributeString("when"));   
+            myY60Event->when = as<double>(myNode->firstChild()->getAttributeString("when"));
             AC_TRACE << "new osc event: " << *myY60Event->getNode();
         } catch (...){
             AC_ERROR << "bad osc message: "<< endl << theMessage;
@@ -168,78 +168,78 @@ namespace y60 {
         char myBuffer[IpEndpointName::ADDRESS_STRING_LENGTH];
         theRemoteEndpoint.AddressAsString(myBuffer);
 
-        osc::ReceivedMessage::const_iterator myArgItr = 
+        osc::ReceivedMessage::const_iterator myArgItr =
             theMessage.ArgumentsBegin();
         string myArguments = "";
         while ( myArgItr != theMessage.ArgumentsEnd() ){
-       
+
             if (myArgItr->IsString()){
-                myArguments += "<string>" + 
-                    asl::as_string(myArgItr->AsString()) + 
+                myArguments += "<string>" +
+                    asl::as_string(myArgItr->AsString()) +
                     "</string>";
             } else if (myArgItr->IsFloat()){
-                myArguments += "<float>" + 
-                    asl::as_string(myArgItr->AsFloat()) + 
+                myArguments += "<float>" +
+                    asl::as_string(myArgItr->AsFloat()) +
                     "</float>";
             } else if (myArgItr->IsBool()){
-                myArguments += "<bool>" + 
-                    asl::as_string(myArgItr->AsBool()) + 
+                myArguments += "<bool>" +
+                    asl::as_string(myArgItr->AsBool()) +
                     "</bool>";
             } else if (myArgItr->IsInt32()){
-                myArguments += "<int>" + 
-                    asl::as_string(myArgItr->AsInt32()) + 
+                myArguments += "<int>" +
+                    asl::as_string(myArgItr->AsInt32()) +
                     "</int>";
             } else if (myArgItr->IsInt64()){
-                myArguments += "<int>" + 
-                    asl::as_string(myArgItr->AsInt64()) + 
+                myArguments += "<int>" +
+                    asl::as_string(myArgItr->AsInt64()) +
                     "</int>";
             } else if (myArgItr->IsDouble()){
-                myArguments += "<double>" + 
-                    asl::as_string(myArgItr->AsDouble()) + 
+                myArguments += "<double>" +
+                    asl::as_string(myArgItr->AsDouble()) +
                     "</double>";
             } else {
                 AC_ERROR << "unknown osc message received";
                 break;
             }
-            
+
             myArgItr++;
 
         }
-        string myMessageString = "<generic type='" + 
+        string myMessageString = "<generic type='" +
             string(theMessage.AddressPattern()).substr(1) +
-            "' when='" + asl::as_string(_myCurrentBundleTimeTag) + 
+            "' when='" + asl::as_string(_myCurrentBundleTimeTag) +
             "' sender='" + string(myBuffer) + "'>";
         myMessageString += myArguments;
         myMessageString += "</generic>";
         return myMessageString;
     }
-    void OscReceiver::ProcessBundle( const osc::ReceivedBundle& theBundle, 
+    void OscReceiver::ProcessBundle( const osc::ReceivedBundle& theBundle,
                                      const IpEndpointName& remoteEndpoint ) {
         _myCurrentBundleTimeTag = static_cast<long>(theBundle.TimeTag());
         OscPacketListener::ProcessBundle(theBundle, remoteEndpoint);
     }
 
-    void OscReceiver::ProcessMessage( const osc::ReceivedMessage& theMessage, 
+    void OscReceiver::ProcessMessage( const osc::ReceivedMessage& theMessage,
                                       const IpEndpointName& theRemoteEndpoint ){
 
         try{
             _myThreadLock.lock();
 
 
-            string myMessageString = 
+            string myMessageString =
                 createMessageString(theMessage, theRemoteEndpoint);
             _myNewMessages.push_front(myMessageString);
 
-            
+
             //AC_TRACE << "c++: adding osc event " << *myNode;
             _myThreadLock.unlock();
-            
+
         }catch( OscException& e ){
-            // any parsing errors such as unexpected argument types, or 
+            // any parsing errors such as unexpected argument types, or
             // missing arguments get thrown as exceptions.
             std::cout << "error while parsing message: "
                       << theMessage.AddressPattern() << ": " << e.what() << "\n";
             _myThreadLock.unlock();
         }
-    }    
+    }
 }

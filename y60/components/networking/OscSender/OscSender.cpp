@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -70,7 +70,7 @@ using namespace inet;
 
 namespace y60 {
     static long ourPacketCounter = 0;
-    OscSender::OscSender() : 
+    OscSender::OscSender() :
         _myReceiverAddress(""), _myReceiverPort(0), _myReceiverUDPConnection()
     {
     }
@@ -79,15 +79,15 @@ namespace y60 {
     {
         if(_myReceiverUDPConnection) close();
     }
-    
-    bool OscSender::connect(string theReceiverAddress, unsigned theReceiverPort, unsigned theSenderPort) {      
+
+    bool OscSender::connect(string theReceiverAddress, unsigned theReceiverPort, unsigned theSenderPort) {
         _myReceiverAddress = theReceiverAddress;
         _myReceiverPort    = theReceiverPort;
-        
+
         _myReceiverUDPConnection = UDPConnectionPtr( new UDPConnection( INADDR_ANY, static_cast<asl::Unsigned16>(theSenderPort) ));
         _myReceiverUDPConnection->connect( getHostAddress( theReceiverAddress.c_str() ), static_cast<asl::Unsigned16>(theReceiverPort));
         AC_DEBUG << "Connected to : " << theReceiverAddress << " with port : " << theReceiverPort << " and sender port: " << theSenderPort;
-        return true; 
+        return true;
     }
 
 
@@ -102,17 +102,17 @@ namespace y60 {
         if (_myReceiverUDPConnection) {
             string myValidationMessage = "";
             bool myValidPacket = true;
-            char myBuffer[ MAX_UDP_PACKET_SIZE ];        
+            char myBuffer[ MAX_UDP_PACKET_SIZE ];
             osc::OutboundPacketStream myOSCStream( myBuffer, MAX_UDP_PACKET_SIZE);
             myOSCStream << osc::BeginBundle(ourPacketCounter++);
-            
+
             std::string myAddress("/");
-            if (theOscEvent->getAttribute("type") ) {                
+            if (theOscEvent->getAttribute("type") ) {
                 myAddress += theOscEvent->getAttributeString("type");
                 myOSCStream << osc::BeginMessage( myAddress.c_str() );
             } else {
                 myValidationMessage = "No type attribute found!";
-                myValidPacket = false;  
+                myValidPacket = false;
             }
 
             for (unsigned myChildIndex = 0 ; myChildIndex < theOscEvent->childNodesLength(); myChildIndex++) {
@@ -135,16 +135,16 @@ namespace y60 {
                     myOSCStream << string(myChildNode->childNode("#text")->nodeValue()).c_str();
                 }
             }
-            
-            
+
+
             if (myValidPacket) {
                 myOSCStream << osc::EndMessage;
                 myOSCStream << osc::EndBundle;
                 ASSURE( myOSCStream.IsReady() );
-                if ( myOSCStream.Size() > 16 ) { // empty bundles have size 16                
+                if ( myOSCStream.Size() > 16 ) { // empty bundles have size 16
                     try {
-                        // determined experimentally ... ain't nice                    
-                        _myReceiverUDPConnection->send( myOSCStream.Data(), myOSCStream.Size() );                            
+                        // determined experimentally ... ain't nice
+                        _myReceiverUDPConnection->send( myOSCStream.Data(), myOSCStream.Size() );
                     } catch (const inet::SocketException & ex) {
                         AC_WARNING << "Failed to send to " << _myReceiverAddress << " at port "
                                    << _myReceiverPort << ": " << ex;

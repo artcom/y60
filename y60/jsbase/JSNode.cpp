@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -261,7 +261,7 @@ namespace {
             ourKnownTypes[typeid(dom::IDValue).name()] = myIndex++;
             _myValuePtrFromJSValFunctions.push_back( convertFromString ); //TODO ??
             _myJSValFromValuePtrFunctions.push_back( jsvalFromIDValue );
-            
+
             ourKnownTypes[typeid(dom::IDRefValue).name()] = myIndex++;
             _myValuePtrFromJSValFunctions.push_back( convertFromString ); //TODO ??
             _myJSValFromValuePtrFunctions.push_back( jsvalFromIDRefValue );
@@ -300,7 +300,7 @@ namespace {
             REGISTER_BYREFERENCE_CONVERTER(Box3f);
             REGISTER_BYREFERENCE_CONVERTER(Box2f);
             REGISTER_BYREFERENCE_CONVERTER(Triangle<TriangleNumber>);
-            // XXX: The following lines introduce a dependency from jsbase to y60::base. 
+            // XXX: The following lines introduce a dependency from jsbase to y60::base.
             REGISTER_BYREFERENCE_CONVERTER(y60::RenderStyles);
 
             REGISTER_BYREFERENCE_CONVERTER(y60::BlendEquation);
@@ -584,7 +584,7 @@ static JSBool
 bumpVersion(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Bump nodeversion");
     DOC_END;
-    try {        
+    try {
         dom::NodePtr myNode;
         if (!convertFrom(cx, OBJECT_TO_JSVAL(obj),myNode)) {
             JS_ReportError(cx,"JSNode::bumpVersion() - Could not convert object to node");
@@ -593,7 +593,7 @@ bumpVersion(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
             myNode->bumpVersion();
             return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
-    
+
 }
 
 static JSBool
@@ -823,15 +823,15 @@ getNodesByTagName(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *
     if (argc == 1 || argc == 2) {
         bool myDeepSearchFlag = true;
         if (argc == 2) {
-            convertFrom(cx, argv[1], myDeepSearchFlag);            
+            convertFrom(cx, argv[1], myDeepSearchFlag);
         }
         convertFrom(cx, argv[0], myElementName);
         myNode->getNodesByTagName(myElementName, myDeepSearchFlag, myResults);
     } else {
         JS_ReportError(cx,"JSNode::getNodesByTagName: wrong number of parameters: %d, 1 or 2 expected", argc);
-        return JS_FALSE;            
+        return JS_FALSE;
     }
-    
+
     *rval = as_jsval(cx, myResults);
     return JS_TRUE;
 }
@@ -842,20 +842,20 @@ getNodesByAttribute(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval
     DOC_PARAM("theElementName", "", DOC_TYPE_STRING);
     DOC_PARAM("theAttributeName", "", DOC_TYPE_STRING);
     DOC_PARAM_OPT("theAttributeValue", "", DOC_TYPE_STRING, "");
-    DOC_PARAM_OPT("theDeepSearchFlag (default is true)", "", DOC_TYPE_BOOLEAN, "");    
+    DOC_PARAM_OPT("theDeepSearchFlag (default is true)", "", DOC_TYPE_BOOLEAN, "");
     DOC_RVAL("Array of matching nodes (may be empty)", DOC_TYPE_ARRAY);
     DOC_END;
     dom::DOMString myElementName;
     dom::DOMString myAttributeName;
     dom::DOMString myAttributeValue = "";
     dom::NodePtr myNode;
-    bool myDeepSearchFlag = true;    
+    bool myDeepSearchFlag = true;
     convertFrom(cx, OBJECT_TO_JSVAL(obj),myNode);
 
     std::vector<dom::NodePtr> myResults;
     switch (argc) {
         case 4:
-            convertFrom(cx, argv[3], myDeepSearchFlag);                        
+            convertFrom(cx, argv[3], myDeepSearchFlag);
         case 3:
             convertFrom(cx, argv[2], myAttributeValue);
         case 2:
@@ -865,9 +865,9 @@ getNodesByAttribute(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval
             break;
         default:
             JS_ReportError(cx,"JSNode::getNodesByAttribute: wrong number of parameters: %d, 3 or 4 expected", argc);
-            return JS_FALSE;            
+            return JS_FALSE;
     }
-    
+
     *rval = as_jsval(cx, myResults);
     return JS_TRUE;
 }
@@ -979,14 +979,14 @@ addEventListener(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
     dom::DOMString myEventtype;
     dom::DOMString myHandlerMethodName = "";
     dom::EventListenerPtr myListener;
-    bool myUseCaptureFlag = true;    
+    bool myUseCaptureFlag = true;
     dom::NodePtr myNode;
     JSDomEventListenerPtr myJSListener;
-    
+
     convertFrom(cx, OBJECT_TO_JSVAL(obj),myNode);
     switch (argc) {
         case 4:
-            convertFrom(cx, argv[3], myHandlerMethodName);                        
+            convertFrom(cx, argv[3], myHandlerMethodName);
         case 3:
             convertFrom(cx, argv[2], myUseCaptureFlag);
             convertFrom(cx, argv[1], myListener);
@@ -1000,7 +1000,7 @@ addEventListener(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
             break;
         default:
             JS_ReportError(cx,"JSNode::addEventListener: wrong number of parameters: %d, 3 or 4 expected", argc);
-            return JS_FALSE;            
+            return JS_FALSE;
     }
     return JS_TRUE;
 #else
@@ -1074,19 +1074,19 @@ nodeValueDependsOn(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval 
     DOC_BEGIN("Registers a node whose value the object's value depends on; the function assigned to the nodeValueCalculateFunction property is called at least once before reading the Node value to allow recomputation when the upstream nodeValue has changed");
     DOC_PARAM("theUpstreamNode", "", DOC_TYPE_NODE);
     DOC_END;
-    
+
     dom::NodePtr myNode;
     if (!convertFrom(cx, OBJECT_TO_JSVAL(obj),myNode)) {
         JS_ReportError(cx,"JSNode::nodeValueDependsOn() - Could not convert object to node");
     }
     dom::NodePtr myDependsOnNode;
-    if (!convertFrom(cx, argv[0], myDependsOnNode)) {                    
+    if (!convertFrom(cx, argv[0], myDependsOnNode)) {
         JS_ReportError(cx,"JSNode::nodeValueDependsOn() - argument not a node");
         return JS_FALSE;
     }
-    AC_DEBUG << "Registering dependency for value of node" << myNode->nodeTypeName() << " '"<< myNode->nodeName() 
+    AC_DEBUG << "Registering dependency for value of node" << myNode->nodeTypeName() << " '"<< myNode->nodeName()
              <<"', V="<<myNode->nodeVersion()<<", UID="<<myNode->getUniqueId()
-             << ", depends on value of node " << myDependsOnNode->nodeTypeName() 
+             << ", depends on value of node " << myDependsOnNode->nodeTypeName()
              << " '"<< myDependsOnNode->nodeName() <<"', V="<<myDependsOnNode->nodeVersion()
              <<", UID="<<myDependsOnNode->getUniqueId();
     myNode->nodeValueWrapperPtr()->registerPrecursor(myDependsOnNode->nodeValueWrapperPtr());
@@ -1337,9 +1337,9 @@ JSNode::Properties() {
         {"nodeVersion",     PROP_nodeVersion,    JSPROP_ENUMERATE|JSPROP_READONLY|JSPROP_PERMANENT|JSPROP_SHARED},   // readonly attribute string
         {"nodeUniqueId",    PROP_nodeUniqueId,   JSPROP_ENUMERATE|JSPROP_READONLY|JSPROP_PERMANENT|JSPROP_SHARED},   // readonly attribute string
         {"nodeValueTypeName",PROP_nodeValueTypeName,JSPROP_ENUMERATE|JSPROP_READONLY|JSPROP_PERMANENT|JSPROP_SHARED},   // readonly attribute string
-        {"onOutdatedValue",PROP_onOutdatedValue,JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},   // function 
-        {"onSetValue",PROP_onSetValue,JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},   // function 
-        {"onReconnect",PROP_onReconnect,JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},   // function 
+        {"onOutdatedValue",PROP_onOutdatedValue,JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},   // function
+        {"onSetValue",PROP_onSetValue,JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},   // function
+        {"onReconnect",PROP_onReconnect,JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},   // function
         {0}
     };
     return myProperties;
@@ -1560,7 +1560,7 @@ JSNode::getProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
 					}
 
                     // Finally we check for the raster property in images, because there
-                    // is just no way to stick the polymophic raster values in one of the 
+                    // is just no way to stick the polymophic raster values in one of the
                     // plugs above. If you know one, let me know.
                     if (myProperty == "raster") {
                         y60::ImagePtr myImage = myNode->getFacade<y60::Image>();

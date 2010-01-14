@@ -3,7 +3,7 @@
 
 #include "y60_ape_settings.h"
 
-#include <boost/enable_shared_from_this.hpp> 
+#include <boost/enable_shared_from_this.hpp>
 
 #include "dynamic_loader.h"
 
@@ -27,7 +27,7 @@ class runtime :
 
         ~runtime() {
             if ( rt_ ) {
-                JS_DestroyRuntime( rt_ );    
+                JS_DestroyRuntime( rt_ );
             }
         }
         inline pointer ptr() {

@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -86,7 +86,7 @@ namespace y60 {
         AC_DEBUG << "StlCodec destroyed.";
     }
 
-    template <class AC_BYTE_ORDER_LOCAL> void 
+    template <class AC_BYTE_ORDER_LOCAL> void
     StlCodec::exportHeader(const std::string & theName, unsigned theNumShapes, WriteableArrangedStream<AC_BYTE_ORDER_LOCAL> & theStream) {
         // Append 80 chars of entity name
         std::string myEntityName;
@@ -98,7 +98,7 @@ namespace y60 {
         theStream.appendSigned32(theNumShapes);
     }
 
-    template <class AC_BYTE_ORDER_LOCAL> void 
+    template <class AC_BYTE_ORDER_LOCAL> void
     StlCodec::exportFacet(const StlFacet & theFacet, WriteableArrangedStream<AC_BYTE_ORDER_LOCAL> & theStream) {
         theStream.appendFloat32(theFacet.normal[0]);
         theStream.appendFloat32(theFacet.normal[1]);
@@ -111,9 +111,9 @@ namespace y60 {
         theStream.appendSigned16(0);
     }
 
-    template <class AC_BYTE_ORDER_LOCAL> void 
+    template <class AC_BYTE_ORDER_LOCAL> void
     StlCodec::exportShapeToStream(const ShapePtr theShape, WriteableArrangedStream<AC_BYTE_ORDER_LOCAL> & theStream, bool theWriteHeadersFlag) {
-        const PrimitiveVector & myPrimitiveVector = theShape->getPrimitives();        
+        const PrimitiveVector & myPrimitiveVector = theShape->getPrimitives();
         std::string myName = theShape->getNode().nodeName();
         for (unsigned i = 0; i < myPrimitiveVector.size(); ++i) {
             const Primitive & myPrimitive = (*myPrimitiveVector[i]);
@@ -186,7 +186,7 @@ namespace y60 {
         } // for
     } // StlImport::exportShape
 
-    void 
+    void
     StlCodec::exportShape(const dom::NodePtr theNode) {
         ShapePtr myShape = theNode->getFacade<Shape>();
         if (myShape) {
@@ -206,7 +206,7 @@ namespace y60 {
         }
     }
 
-    void 
+    void
     StlCodec::exportShapes(const dom::NodePtr theNode, const std::vector<std::string> & theIds) {
         //int myNumChildren = theNode->childNodesLength();
         int myNumFaces = 0;
@@ -227,7 +227,7 @@ namespace y60 {
                     case TRIANGLES:
                         myNumFaces += myVSize / 3;
                         break;
-                    case QUADS: 
+                    case QUADS:
                         myNumFaces += myVSize / 2;
                         break;
                     default:
@@ -266,8 +266,8 @@ namespace y60 {
                         exportShapeToStream(myShape, *_myBlock, false);
                         break;
                 }
-            } 
-        } 
+            }
+        }
     }
 
 

@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -65,21 +65,21 @@ using namespace std;
 
 namespace inet {
 
-ConduitServer<TCPPolicy>::Ptr 
+ConduitServer<TCPPolicy>::Ptr
 StatusServer::create(TCPPolicy::Handle theHandle) {
     return ConduitServer<TCPPolicy>::Ptr(new StatusServer(theHandle));
 }
-    
+
 StatusServer::StatusServer(TCPPolicy::Handle theHandle) : ConduitServer<TCPPolicy>(theHandle)
 {
-}; 
+};
 
-void 
+void
 StatusServer::sendString(const std::string theData) {
     this->sendData(theData.c_str(), theData.length());
 }
 
-void 
+void
 StatusServer::sendResponseHeader(int theResponseCode) {
     sendResponseHeader(theResponseCode, "utf-8");
 }
@@ -94,21 +94,21 @@ StatusServer::sendResponseHeader(int theResponseCode, const std::string & theCha
     sendString("Content-Type: text/plain; charset="+theCharset+"\n");
 }
 
-void 
+void
 StatusServer::sendResponseBody(const std::string & theBody) {
     sendString("Content-Length: "+as_string(theBody.length())+"\n\n");
     sendString(theBody);
 }
 
-std::string 
+std::string
 StatusServer::getUrl(const std::string & theRequest) {
     std::string::size_type getPos = theRequest.find("GET");
     std::string::size_type httpPos = theRequest.find("HTTP");
     std::string myUrl = theRequest.substr(getPos+5, httpPos-getPos-6);
     return myUrl;
 }
-    
-bool 
+
+bool
 StatusServer::processData() {
     CharBuffer myInputBuffer;
     if (this->receiveData(myInputBuffer)) {

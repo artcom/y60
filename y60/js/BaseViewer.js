@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -81,7 +81,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     }
 
     self.glow getter = function() {
-        return _myGlow ? _myGlow.getEnabled() : false; 
+        return _myGlow ? _myGlow.getEnabled() : false;
     }
     self.glow setter = function(theMode) {
         if (theMode) {
@@ -108,11 +108,11 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         }
         return _myAutoClicker;
     }
-    
+
     self.setModelName = function(theModelName) {
         _myModelName = theModelName;
     }
-    
+
     self.getModelName = function() {
         return _myModelName;
     }
@@ -132,7 +132,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     self.getActiveViewport = function() {
         return _activeViewport;
     }
-    
+
     self.getViewportAtWindowCoordinates = function(theX, theY) {
         var myLowestPos = new Vector2f(10000,10000);
         var myBestChoice = _activeViewport;
@@ -150,10 +150,10 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
                 myLowestPos.x = myViewPortPos[0];
                 myLowestPos.y = myViewPortPos[1];
             }
-        }        
+        }
         return myBestChoice;
     }
-    
+
     self.getActiveCamera = function() {
         var myViewport = self.getActiveViewport();
         return myViewport.getElementById(myViewport.camera);
@@ -343,7 +343,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
 
         // texture unit
         var myTextureUnitNode = myMaterialNode.childNode("textureunits").firstChild;
- 
+
         // texture
         var myTextureNode = myMaterialNode.getElementById(myTextureUnitNode.texture);
         if (!myTextureNode) {
@@ -368,7 +368,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
             theTile = new Vector2i(1,6);
         }
         if (_mySkyboxMaterialId) {
-            var mySkyboxMaterial = 
+            var mySkyboxMaterial =
                 _myRenderWindow.scene.world.getElementById(_mySkyboxMaterialId);
             var myTextureId = mySkyboxMaterial.childNode("textureunits").firstChild.texture;
             var myTexture = window.scene.textures.getElementById(myTextureId);
@@ -401,7 +401,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         }
         theWorld.skyboxmaterial = "";
     }
-    
+
     ///////////////////////////////////////////////////////////////////////////////////////////
     //
     //  RenderWindow callback handlers
@@ -418,14 +418,14 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
             var myDoc = new Node();
             if (!fileExists(theFilename)) {
                 Logger.info(theFilename+" does not exist. Could not apply MaterialTable");
-                return new Node("<materialtable/>").firstChild; 
+                return new Node("<materialtable/>").firstChild;
             }
             myDoc.parseFile(theFilename);
             if (myDoc.firstChild && myDoc.firstChild.nodeName == "materialtable") {
-                _myMaterialTable = myDoc.firstChild;    
+                _myMaterialTable = myDoc.firstChild;
             } else {
                 Logger.info("Could not apply MaterialTable: "+theFilename+" does not seem to contain a valid xml-structure.")
-                return new Node("<materialtable/>").firstChild; 
+                return new Node("<materialtable/>").firstChild;
             }
         }
 
@@ -445,7 +445,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
                 if (mySwitchNode.nodeName == "body") {
                     Logger.info("Switchnode found in materialtable: "+mySwitchNode.name);
                     var myShape = mySwitchNode.getElementById(mySwitchNode.shape);
-                    var myMaterialId = myShape.find("primitives").firstChild.material; 
+                    var myMaterialId = myShape.find("primitives").firstChild.material;
                     myMaterial = mySwitchNode.getElementById(myMaterialId);
                     mergeMaterialProperties(myMaterial, myNode.childNode("properties"));
                 } else {
@@ -595,7 +595,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         if (_myAutoClicker != null) {
             _myAutoClicker.onFrame();
         }
-        
+
         _myLightManager.onFrame(theTime);
     }
 
@@ -718,7 +718,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     var _myNagiosPlugin          = null;
     var _myPicking               = null;
     var _myAutoClicker           = null;
-    
+
     var _mySwitchNodes  = new Array();
     var _myMSwitchNodes = new Array();
     var _myTSwitchNodes = new Array();
@@ -824,7 +824,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         _mySwitchNodes  = new Array();
         _myMSwitchNodes = new Array();
         _myTSwitchNodes = new Array();
-    
+
         if (theNode == null) {
             collectSwitchNodes(window.scene.world);
         } else {
@@ -849,7 +849,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         if (theScene) {
             // Cache main scene nodes for fast access
             var myWorlds    = theScene.dom.find("/scene/worlds");
-            
+
             _myWorld        = theScene.world;
             _myMaterials    = theScene.materials;
             _myLightSources = theScene.lightsources;

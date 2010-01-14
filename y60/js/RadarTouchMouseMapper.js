@@ -5,7 +5,7 @@ spark.RadarTouchMouseMapper.Constructor = function(Protected, theApp) {
     var Base   = {};
 
     this.Inherit(spark.EventDispatcher);
-    
+
     var _myApp = theApp;
     var _myCursorId = null;
     var _myLastPosition = null;
@@ -22,7 +22,7 @@ spark.RadarTouchMouseMapper.Constructor = function(Protected, theApp) {
         var myCursor = theEvent.cursor;
         if (myCursor.id == _myCursorId) {
             if (_myLastPosition === null) {
-                _myApp.onMouseButton(LEFT_BUTTON, BUTTON_DOWN, myCursor.stageX, myCursor.stageY); 
+                _myApp.onMouseButton(LEFT_BUTTON, BUTTON_DOWN, myCursor.stageX, myCursor.stageY);
             }
             _myApp.onMouseMotion(myCursor.stageX, myCursor.stageY);
             _myLastPosition = [myCursor.stageX, myCursor.stageY];

@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -204,18 +204,18 @@ namespace y60 {
         theFactory.registerPrototype("TextureSampleFilter", dom::ValuePtr(new dom::ValueWrapper<y60::TextureSampleFilter>::Type(y60::TextureSampleFilter(LINEAR),0)));
         theFactory.registerPrototype("TextureWrapMode", dom::ValuePtr(new dom::ValueWrapper<y60::TextureWrapMode>::Type(y60::TextureWrapMode(REPEAT),0)));
 
-        theFactory.registerPrototype("TextureType", dom::ValuePtr(new dom::ValueWrapper<y60::TextureType>::Type(y60::TextureType(TEXTURE_2D),0)));        
-        theFactory.registerPrototype("TextureUsage", dom::ValuePtr(new dom::ValueWrapper<y60::TextureUsage>::Type(y60::TextureUsage(PAINT),0)));        
-        theFactory.registerPrototype("ResizePolicy", dom::ValuePtr(new dom::ValueWrapper<asl::ResizePolicy>::Type(asl::ResizePolicy(asl::ADAPT_VERTICAL),0)));        
+        theFactory.registerPrototype("TextureType", dom::ValuePtr(new dom::ValueWrapper<y60::TextureType>::Type(y60::TextureType(TEXTURE_2D),0)));
+        theFactory.registerPrototype("TextureUsage", dom::ValuePtr(new dom::ValueWrapper<y60::TextureUsage>::Type(y60::TextureUsage(PAINT),0)));
+        theFactory.registerPrototype("ResizePolicy", dom::ValuePtr(new dom::ValueWrapper<asl::ResizePolicy>::Type(asl::ResizePolicy(asl::ADAPT_VERTICAL),0)));
 
-        theFactory.registerPrototype("ImageType", dom::ValuePtr(new dom::ValueWrapper<y60::ImageType>::Type(y60::ImageType(SINGLE),0)));        
-        theFactory.registerPrototype("PrimitiveType", dom::ValuePtr(new dom::ValueWrapper<y60::PrimitiveType>::Type(y60::PrimitiveType(POINTS),0)));        
+        theFactory.registerPrototype("ImageType", dom::ValuePtr(new dom::ValueWrapper<y60::ImageType>::Type(y60::ImageType(SINGLE),0)));
+        theFactory.registerPrototype("PrimitiveType", dom::ValuePtr(new dom::ValueWrapper<y60::PrimitiveType>::Type(y60::PrimitiveType(POINTS),0)));
     }
 
     void registerSomTypes(dom::ValueFactory & theFactory) {
         registerSomMathTypes(theFactory);
         registerSomVectorTypes(theFactory);
         registerSomImageTypes(theFactory);
-        registerEnumBitsetTypes(theFactory);        
+        registerEnumBitsetTypes(theFactory);
     }
 }

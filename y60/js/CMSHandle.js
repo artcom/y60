@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -101,7 +101,7 @@ try {
 ========================================================*/
 
 /*
-Check Server-Side logs at 
+Check Server-Side logs at
 /opt/oracle/ocs/apps/j2ee/OC4J_Content/application-deployments/content/OC4J_Content_default_island_1/application.log
 
 to debug
@@ -127,7 +127,7 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile, theLocation) {
 
     obj.synchronize = function(theRandomWaitDuration) {
         if ( _mySyncFlag && _myPresentation === null) {
-            obj.fetchPresentation(theRandomWaitDuration); 
+            obj.fetchPresentation(theRandomWaitDuration);
         } else if ( _myLocalFallback && fileExists(_myLocalFallback) ) {
             Logger.info("CMS synchronization disabled.");
             Logger.info("Using local fallback presentation file '" + _myLocalFallback + "'.");
@@ -168,7 +168,7 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile, theLocation) {
             function() { return _myLocalFallback; } );
 
     obj.__defineGetter__('syncFlag', function() { return _mySyncFlag; } );
-    
+
     obj.__defineSetter__('syncFlag', function(theFlag) { _mySyncFlag=theFlag; } );
 
     obj.__defineGetter__('assetDir', function() { return _myLocalPath; } );
@@ -185,8 +185,8 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile, theLocation) {
         }
         var myCMSConfig  = _myConfig.childNode("cmscache", 0);
         var myUsername   = _myConfig.username;
-        if ("domain" in myCMSConfig && 
-            myCMSConfig.domain.length && 
+        if ("domain" in myCMSConfig &&
+            myCMSConfig.domain.length &&
             String(myCMSConfig.backend).toUpperCase() == "OCS") {
             myUsername += "@" + myCMSConfig.domain;
         }
@@ -244,8 +244,8 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile, theLocation) {
         var myParams = new SOAPClientParameters();
         var myUsername = _myConfig.username;
         var myPassword = _myConfig.password;
-        if ("domain" in myCMSConfig && 
-            myCMSConfig.domain.length && 
+        if ("domain" in myCMSConfig &&
+            myCMSConfig.domain.length &&
             String(myCMSConfig.backend).toUpperCase() == "OCS") {
             myUsername += "@" + myCMSConfig.domain;
         }
@@ -256,9 +256,9 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile, theLocation) {
         var myThemePool = _myPresentation.childNode('presentation').childNode('themepool');
         var wsdlUrl = myThemePool.server+":"+myThemePool.wsdlport;
 
-        //var myResponse = SOAPClient.invoke('http://ocs.pi-center.muc:7778/content/wsdl/RemoteLoginManager.wsdl', 
+        //var myResponse = SOAPClient.invoke('http://ocs.pi-center.muc:7778/content/wsdl/RemoteLoginManager.wsdl',
         //        "RemoteLoginManagerService","RemoteLoginManager", "login", myParams, null );
-        var myResponse = SOAPClient.invoke('http://'+wsdlUrl+'/content/wsdl/RemoteLoginManager.wsdl', 
+        var myResponse = SOAPClient.invoke('http://'+wsdlUrl+'/content/wsdl/RemoteLoginManager.wsdl',
                 "RemoteLoginManagerService","RemoteLoginManager", "login", myParams, null );
         if (myResponse.responseCode > 299) {
             Logger.warning("Could not retrieve session cookie from OCS:" + myResponse.responseCode);
@@ -279,7 +279,7 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile, theLocation) {
     function logout() {
         if (_myOCSCookie) {
             var myParams = new SOAPClientParameters();
-            var myResponse = SOAPClient.invoke('http://ocs.pi-center.muc:7778/content/wsdl/RemoteLoginManager.wsdl', 
+            var myResponse = SOAPClient.invoke('http://ocs.pi-center.muc:7778/content/wsdl/RemoteLoginManager.wsdl',
                     "RemoteLoginManagerService","RemoteLoginManager", "logout", myParams, [ _myOCSCookie ]);
             if (myResponse.responseCode > 299) {
                 Logger.warning("Could not logout from OCS:" + myResponse.responseCode);
@@ -297,7 +297,7 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile, theLocation) {
         }
         _myPresentation = Node.createDocument();
         _myZopeCookies = [];
-        
+
         var myErrorOccurred = false;
         var myZopeConfig = _myConfig.childNode("zopeconfig", 0);
         if ('loginpage' in myZopeConfig && myZopeConfig.loginpage) {
@@ -379,7 +379,7 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile, theLocation) {
         if (theLocation && _myConfigDoc.childNodesLength() > 1) {
             _myConfig = _myConfigDoc.find("//*[@location = '" + theLocation + "']");
         }
-        
+
         if (!_myConfig) {
             _myConfig = _myConfigDoc.childNode("cmsconfig");
         }

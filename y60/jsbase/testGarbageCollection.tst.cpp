@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -157,7 +157,7 @@ static JSFunctionSpec global_functions[] = {
     {0}
 };
 
-char * filenames[] = { 
+char * filenames[] = {
     TEST_DATA_DIR "/emptyScript.js",
     TEST_DATA_DIR "/testJSObjects.js",
     TEST_DATA_DIR "/testManyObjects.js",
@@ -170,7 +170,7 @@ char * filenames[] = {
 
 class GarbageCollectionTest : public UnitTest {
 public:
-    GarbageCollectionTest() : 
+    GarbageCollectionTest() :
         UnitTest("GarbageCollectionUnitTest")
     {}
 
@@ -234,7 +234,7 @@ public:
 
         ENSURE(globalObject);
         ENSURE(JSVector<asl::Vector3f>::initClass(cx, globalObject));
-    }        
+    }
 
     void checkInit() {
         // actually, we don't check anything here.
@@ -289,7 +289,7 @@ public:
             (void)JS_ExecuteScript(cx, globalObject, script, &result);
             JS_DestroyScript(cx, script);
 #ifdef USE_SPIDERMONKEY_INCREMENTAL_GC
-            AC_PRINT << "GC Objects after execution of script [" 
+            AC_PRINT << "GC Objects after execution of script ["
                      << theFileName << "]: " << cx->runtime->gcObjects;
 #endif
         } else {
@@ -298,7 +298,7 @@ public:
         ENSURE(result);
     }
 
-private: 
+private:
 
     JSContext *cx;
     JSRuntime *rt;
@@ -324,9 +324,9 @@ int main(int argc, char *argv[]) {
         returnStatus = 0;
     } else {
         cerr << "## No tests." << endl;
-        
+
     }
-    cerr << ">> Finsihed test suite '" << argv[0] 
+    cerr << ">> Finsihed test suite '" << argv[0]
          << "', return status = " << returnStatus << endl;
     return returnStatus;
 

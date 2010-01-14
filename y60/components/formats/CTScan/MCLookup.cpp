@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -81,7 +81,7 @@ struct Pattern {
         }
     }
     const int _myFaces[15];
-    
+
 };
 Pattern ourPatterns[] = {
 // these are the base 15 pattern from Lorensen and Cline, (Sharman,1998)
@@ -151,7 +151,7 @@ MCLookup::rotatePattern(int & theCubeCase, vector<int> & theFaces, const int * t
   }
 }
 
-void 
+void
 MCLookup::addPattern(int thePatternIndex, map<int,int> & theMatchedMap) {
     int myCubeCase = ourPatterns[thePatternIndex].cubeCase;
     vector<int> myFaces;
@@ -192,8 +192,8 @@ MCLookup::initFaceData() {
     map<int, int> myMatchedCases;
     for (int i = 0; i < sizeof(ourPatterns)/sizeof(ourPatterns[0]); ++i) {
         addPattern(i, myMatchedCases);
-    } 
-       
+    }
+
     /*
     for (int i = 0; i < 256; ++i) {
         std::vector<int> & myLine = cubeCases[i].faces;
@@ -234,7 +234,7 @@ MCLookup::initHalfEdgeData() {
         const std::vector<int> & myFaces = cubeCases[i].faces;
         for (int j = 0; j < myFaces.size(); ++j) {
             int curEdge = myFaces[j];
-            int nextEdge = myFaces[ (j/3)*3 + ((j+1)%3) ]; 
+            int nextEdge = myFaces[ (j/3)*3 + ((j+1)%3) ];
             HalfEdgeNeighbor myNeighbor;
             myNeighbor.type = classifyEdge(curEdge, nextEdge );
             if (myNeighbor.type == INTERNAL) {
@@ -279,7 +279,7 @@ MCLookup::classifyEdge(int theCurEdge, int theNextEdge) {
     const int MAX_Y_EDGES[] = {9,1,10,5};
     const int MIN_Z_EDGES[] = {0,1,2,3};
     const int MAX_Z_EDGES[] = {4,5,6,7};
-   
+
     if (intInArray(theCurEdge, MIN_X_EDGES) && intInArray(theNextEdge, MIN_X_EDGES)) {
         return MIN_X;
     }

@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -98,7 +98,7 @@ using namespace asl;
 
 namespace asl {
 
-std::string 
+std::string
 as_string(JSContext *cx, jsval theVal) {
     JSString *myJSStr = JS_ValueToString(cx, theVal);
     if (!myJSStr) {
@@ -107,20 +107,20 @@ as_string(JSContext *cx, jsval theVal) {
 #ifdef _WIN32
 #if _MSC_VER >= 1500
     const LPWSTR myWChars = reinterpret_cast<LPWSTR>(JS_GetStringChars(myJSStr));
-#else 
+#else
     const LPWSTR myWChars = static_cast<LPWSTR>(JS_GetStringChars(myJSStr));
 #endif
     AC_SIZE_TYPE myUTF8Size = WideCharToMultiByte(CP_UTF8, 0, myWChars, -1, 0, 0, 0, 0);
     if (myUTF8Size == 0) {
         DWORD myLastError = GetLastError();
-        throw jslib::UnicodeException(errorDescription(myLastError), PLUS_FILE_LINE); 
+        throw jslib::UnicodeException(errorDescription(myLastError), PLUS_FILE_LINE);
     }
     char * myUTF8Chars = new char[myUTF8Size];
     WideCharToMultiByte(CP_UTF8, 0, myWChars, -1, myUTF8Chars, myUTF8Size, 0, 0);
     std::string myResult = std::string(myUTF8Chars);
     delete [] myUTF8Chars;
     return myResult;
-#else    
+#else
     size_t srcLen = JS_GetStringLength(myJSStr);
 
     // get pointer to 16-bit chars
@@ -128,19 +128,19 @@ as_string(JSContext *cx, jsval theVal) {
 
     // now convert to utf-8 encoded c-string
     glong targetLen;
-    gchar * myUTF8 = g_utf16_to_utf8(myData, srcLen * sizeof(gunichar2), 0, &targetLen, 0); 
+    gchar * myUTF8 = g_utf16_to_utf8(myData, srcLen * sizeof(gunichar2), 0, &targetLen, 0);
 
     // now convert to std::string
     if ( ! myUTF8) {
         throw jslib::UnicodeException("Failed to convert UTF8 from UTF16.", PLUS_FILE_LINE);
     }
-    
+
     std::string myResult = std::string(myUTF8);
 
     // clean up
     g_free(myUTF8);
     return myResult;
-#endif    
+#endif
 }
 
 std::string as_string(JSContext *cx, JSObject *theObj) {
@@ -210,7 +210,7 @@ jsval as_jsval(JSContext *cx, int theValue) {
     return INT_TO_JSVAL(theValue);
 }
 
-jsval 
+jsval
 as_jsval(JSContext *cx, const char * theU8String) {
     // convert from UTF8 to WideChars/UTF16
 #ifdef _WIN32
@@ -222,7 +222,7 @@ as_jsval(JSContext *cx, const char * theU8String) {
         for (unsigned i = 0; i < strlen(theU8String); ++i) {
             os << " " << std::hex << int(reinterpret_cast<const unsigned char*>(theU8String)[i]);
         }
-        throw jslib::UnicodeException(os.str(), PLUS_FILE_LINE); 
+        throw jslib::UnicodeException(os.str(), PLUS_FILE_LINE);
     }
     LPWSTR myWChars = new WCHAR[myWCharSize];
     MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, theU8String, -1, myWChars, myWCharSize);
@@ -240,14 +240,14 @@ as_jsval(JSContext *cx, const char * theU8String) {
         }
         os << ", reason: "<<error->message;
         //g_clear_error(&error);
-        throw jslib::UnicodeException(os.str(), PLUS_FILE_LINE); 
+        throw jslib::UnicodeException(os.str(), PLUS_FILE_LINE);
     }
-    
+
     JSString * myString = JS_NewUCStringCopyZ(cx,reinterpret_cast<jschar*>(myUTF16));
     g_free(myUTF16);
 
     return STRING_TO_JSVAL(myString);
-#endif    
+#endif
 }
 
 jsval as_jsval(JSContext *cx, const std::string & theValue) {
@@ -256,7 +256,7 @@ jsval as_jsval(JSContext *cx, const std::string & theValue) {
 
 jsval as_jsval(JSContext *cx, const std::basic_string<asl::Unsigned16> & theUTF16String) {
     JSString * myString = JS_NewUCStringCopyZ(cx,reinterpret_cast<const jschar*>(theUTF16String.c_str()));
-    return STRING_TO_JSVAL(myString);    
+    return STRING_TO_JSVAL(myString);
 }
 
 template Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, const std::vector<bool> & theVector);
@@ -267,21 +267,21 @@ template Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, const std::vector<unsigne
 template Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, const std::vector<float> & theVector);
 template Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, const std::vector<double> & theVector);
 template Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, const std::vector<std::string> & theVector);
-         
+
 void ensureParamCount(uintN argc, int theMinCount, int theMaxCount) {
     if ( static_cast<int>(argc) < theMinCount) {
         throw Exception(string("Not enough arguments, ")+as_string(theMinCount)+" expected.");
-    }    
+    }
     if (theMaxCount && static_cast<int>(argc) > theMaxCount) {
         throw Exception(string("Too many arguments, ")+as_string(theMaxCount)+" accepted.");
     }
 };
 
-void 
+void
 dumpJSStack(JSContext *cx) {
     JSStackFrame* fp;
     JSStackFrame* iter = 0;
-    
+
     int num = 0;
     while(0 != (fp = JS_FrameIterator(cx, &iter))) {
         if(!JS_IsNativeFrame(cx, fp)) {
@@ -302,7 +302,7 @@ dumpJSStack(JSContext *cx) {
             std::cerr<<"Stackframe "<<num<<":"<<"native"<<endl;
         }
         ++num;
-    }    
+    }
 }
 
 JSStackFrame *
@@ -811,7 +811,7 @@ JSA_ArrayToString(JSContext * cx, jsval * vp, string & theResult) {
     if (!myJSArray) {
         return JS_FALSE;
     }
-    
+
     if (!JS_IsArrayObject(cx, myJSArray)) {
         return JS_FALSE;
     }

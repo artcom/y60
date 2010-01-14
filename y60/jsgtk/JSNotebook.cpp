@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -86,7 +86,7 @@ static JSBool
 append_page(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
-/*    
+/*
 int 	append_page (Widget& child)
 int 	append_page (Widget& child, Widget& tab_label)
 int 	append_page (Widget& child, Widget& tab_label, Widget& menu_label)
@@ -98,7 +98,7 @@ int 	append_page (Widget& child, const Glib::ustring& tab_label, const Glib::ust
 
         Gtk::Notebook * mySelf = 0;
         convertFrom(cx, OBJECT_TO_JSVAL(obj), mySelf);
-        
+
         int myRetVal = 0;
         // first argument must be a widget
         Gtk::Widget * myChild;
@@ -117,12 +117,12 @@ int 	append_page (Widget& child, const Glib::ustring& tab_label, const Glib::ust
                 }
             }
         }
-        
+
         switch (argc) {
             case 1:
                 myRetVal = mySelf->append_page(*myChild);
                 break;
-            case 2: 
+            case 2:
                 if (myWidgetLabel) {
                     myRetVal = mySelf->append_page(*myChild, *myWidgetLabel);
                 } else {
@@ -180,7 +180,7 @@ static JSBool
 remove_page(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
-/*    
+/*
 int 	append_page (Widget& child)
 int 	append_page (Widget& child, Widget& tab_label)
 int 	append_page (Widget& child, Widget& tab_label, Widget& menu_label)
@@ -192,7 +192,7 @@ int 	append_page (Widget& child, const Glib::ustring& tab_label, const Glib::ust
 
         Gtk::Notebook * mySelf = 0;
         convertFrom(cx, OBJECT_TO_JSVAL(obj), mySelf);
-        
+
         // first argument must be a widget or an int
         Gtk::Widget * myPageToRemove = 0;
         int myIndexToRemove = 0;
@@ -217,7 +217,7 @@ static JSBool
 set_tab_label_text(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
-/*    
+/*
 void 	set_tab_label_text(Widget& child, const Glib::ustring& tab_label)
 */
     try {
@@ -225,7 +225,7 @@ void 	set_tab_label_text(Widget& child, const Glib::ustring& tab_label)
 
         Gtk::Notebook * mySelf = 0;
         convertFrom(cx, OBJECT_TO_JSVAL(obj), mySelf);
-        
+
         // first argument must be a widget or an int
         Gtk::Widget * myPage = 0;
 
@@ -337,7 +337,7 @@ JSNotebook::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, j
     JSNotebook * myNewObject = 0;
 
     if (argc == 0) {
-        newNative = new NATIVE(); 
+        newNative = new NATIVE();
         myNewObject = new JSNotebook(OWNERPTR(newNative), newNative);
     } else {
         JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected none () %d",ClassName(), argc);

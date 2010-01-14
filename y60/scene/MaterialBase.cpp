@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -81,11 +81,11 @@ using namespace dom;
 
 namespace y60 {
 
-    MaterialBase::MaterialBase(dom::Node & theNode): 
+    MaterialBase::MaterialBase(dom::Node & theNode):
         Facade(theNode),
         IdTag::Plug(theNode),
         MaterialPropertiesTag::Plug(this),
-        MaterialRequirementTag::Plug(this),  
+        MaterialRequirementTag::Plug(this),
         NameTag::Plug(theNode),
         TransparencyTag::Plug(theNode),
         EnabledTag::Plug(theNode),
@@ -100,23 +100,23 @@ namespace y60 {
 
     MaterialBase::~MaterialBase() {
         //AC_TRACE << "~MaterialBase() id=" << get<IdTag>() <<", name="<<get<NameTag>();
-        AC_TRACE << "~MaterialBase() @"<<(void*)this; 
+        AC_TRACE << "~MaterialBase() @"<<(void*)this;
     }
 
     Scene &
     MaterialBase::getScene() {
         Node * myRoot = getNode().getRootElement();
-        return *myRoot->getFacade<Scene>(); 
+        return *myRoot->getFacade<Scene>();
     }
     const Scene &
     MaterialBase::getScene() const {
         const Node * myRoot = getNode().getRootElement();
-        return *myRoot->getFacade<Scene>(); 
+        return *myRoot->getFacade<Scene>();
     }
 
     void
     MaterialBase::registerDependenciesRegistrators() {
-        Facade::registerDependenciesRegistrators();        
+        Facade::registerDependenciesRegistrators();
         getChild<MaterialPropertiesTag>()->registerDependenciesRegistrators();
     }
 
@@ -140,7 +140,7 @@ namespace y60 {
             }
         }
      }
-    
+
 
     bool
     MaterialBase::reloadRequired() const {
@@ -160,7 +160,7 @@ namespace y60 {
         return getChild<MaterialPropertiesTag>()->get<MaterialPropGroup1HashTag>();
     }
 /*
-    bool 
+    bool
     MaterialBase::rebindRequired() {
 		if (getNode().getAttribute(ID_ATTRIB)->nodeVersion() != _myIdTagVersion) {
             _myIdTagVersion = getNode().getAttribute(ID_ATTRIB)->nodeVersion();
@@ -192,7 +192,7 @@ namespace y60 {
             load();
         }
     }
-#if 1	
+#if 1
     //TODO: we should not load every time a property has changed, only when the requirements change
    void MaterialBase::ensureProperties() const {
        if (!_ensuring && getNode().nodeVersion() != _myMaterialVersion) {
@@ -294,7 +294,7 @@ namespace y60 {
             } else {
                 throw ShaderException("Shader has none or more than one lightingmodels.I do not know how to light this buddy.",
                     PLUS_FILE_LINE);
-            } 
+            }
             myShader->setup(*this);
         } else {
             _myLightingModel = UNLIT;
@@ -320,14 +320,14 @@ namespace y60 {
 
         MaterialPropertiesFacadePtr myReqFacade = getChild<MaterialPropertiesTag>();
         //const Facade::PropertyMap & myPropertyMap = myReqFacade->getProperties();
-        
-        dom::NodePtr myMaterialProperty = 
+
+        dom::NodePtr myMaterialProperty =
             myReqFacade->getProperty(theShaderPropertyNode->getAttributeString(NAME_ATTRIB));
 
         if (!myMaterialProperty) {
             // the shader has properties not in the material list, add'em
             if (theShaderPropertyNode->nodeType() == dom::Node::ELEMENT_NODE &&
-                theShaderPropertyNode->nodeName() != "#comment") 
+                theShaderPropertyNode->nodeName() != "#comment")
             {
                 AC_TRACE << "MaterialBase::mergeProperties(): adding property "<<*theShaderPropertyNode<<" from shader to material:" << getNode();
                 getNode().childNode(PROPERTY_LIST_NAME)->appendChild(
@@ -338,9 +338,9 @@ namespace y60 {
             // set the value of the material property with the shader's property
             // in case the property was created by the facade using a default value
             // because the property did not exist in the material node
-            
+
             AC_TRACE << "MaterialBase::mergeProperties(): setting material property to property from shader:"<< *theShaderPropertyNode<<" into material "<< getNode();
-            
+
             myMaterialProperty->nodeValue((*theShaderPropertyNode)("#text").nodeValue());
             AC_TRACE << "MaterialBase::mergeProperties(): done: setting material property to property from shader:"<< *theShaderPropertyNode<<" into material "<< getNode();
         }
@@ -349,13 +349,13 @@ namespace y60 {
     TextureUsage MaterialBase::getTextureUsage(unsigned theTextureSlot) const {
         VectorOfTextureUsage myFeatures = _myShader->getTextureFeature();
         if (theTextureSlot >= myFeatures.size()) {
-            throw ShaderException(string("Shader '" + _myShader->getName() 
+            throw ShaderException(string("Shader '" + _myShader->getName()
                         + "' cannot handle " + asl::as_string(theTextureSlot) + " textures\n")
                     + as_string(myFeatures), PLUS_FILE_LINE);
         }
         return myFeatures[theTextureSlot];
     }
-    
+
     void
     MaterialBase::addTextures(const dom::NodePtr theTextureUnitListNode,
                                TextureManagerPtr theTextureManager)
@@ -387,7 +387,7 @@ namespace y60 {
                     for (unsigned j = 0; j < curPropList->childNodesLength(); ++j) {
                         // Q: What about the other samplers (sampler3d, samplerCube, etc)? [DS]
                         dom::NodePtr mySamplerNode = curPropList->childNode(j);
-                        if (isSampler(mySamplerNode->nodeName())) { 
+                        if (isSampler(mySamplerNode->nodeName())) {
                             unsigned myTextureIndex = (*mySamplerNode)("#text").dom::Node::nodeValueAs<unsigned>();
                             if (myTextureIndex >= _myTextureUnits.size()) {
                                 string myTextureName = mySamplerNode->getAttributeString("name");
@@ -409,7 +409,7 @@ namespace y60 {
 
         AC_DEBUG << "MaterialBase::addTexture " << *theTextureUnitNode;
         unsigned myMaxUnits = _myShader->getMaxTextureUnits();
-        if (_myTextureUnits.size() < myMaxUnits) {            
+        if (_myTextureUnits.size() < myMaxUnits) {
             TextureUnitPtr myTextureUnit = theTextureUnitNode->getFacade<TextureUnit>();
             myTextureUnit->setTextureManager(theTextureManager);
             _myTextureUnits.push_back(myTextureUnit);
@@ -419,7 +419,7 @@ namespace y60 {
                 //myTexture->preload();
             }
         } else {
-            AC_WARNING << "Your OpenGL implementation only supports " 
+            AC_WARNING << "Your OpenGL implementation only supports "
                  << asl::as_string(myMaxUnits) << " texture units, "
                  << endl << "              ignoring: "
                  << theTextureUnitNode->getAttributeString(TEXTUREUNIT_TEXTURE_ATTRIB)
@@ -482,14 +482,14 @@ namespace y60 {
 
             VectorOfRankedFeature myTexCoordFeatures = myMappingRequirement->nodeValueAs<VectorOfRankedFeature>();
             if (myTexCoordFeatures.size() > 0) {
- 
+
                 const VectorOfString & myTexCoordFeature = myTexCoordFeatures[0]._myFeature;
                 for (unsigned myTexUnit = 0 ; myTexUnit < myTexCoordFeature.size(); ++myTexUnit) {
                 AC_TRACE << " MaterialBase::updateParams(): myTexCoordFeature[="<<myTexUnit<<"]='"<<myTexCoordFeature[myTexUnit]<<"'";
                     TexGenMode myTexGenModes;
                     TexGenParams myTexGenParams;
 
-                    TexCoordMapping myTexCoordMode = TexCoordMapping( 
+                    TexCoordMapping myTexCoordMode = TexCoordMapping(
                             asl::getEnumFromString(myTexCoordFeature[myTexUnit], TexCoordMappingStrings));
 
                     // if any texunit has non-uvmap then texgen is on for the material
@@ -534,7 +534,7 @@ namespace y60 {
                             break;
                         case PERSPECTIVE_PROJECTION:
                         default:
-                            throw ShaderException(string("Invalid texgenmode '") + myTexCoordFeature[myTexUnit] + 
+                            throw ShaderException(string("Invalid texgenmode '") + myTexCoordFeature[myTexUnit] +
                                     "' in material " + get<NameTag>(), PLUS_FILE_LINE);
                     }
 
@@ -542,7 +542,7 @@ namespace y60 {
                     if (myTexCoordMode != UV_MAP &&
                         myTexCoordMode != SPHERICAL_PROJECTION &&
                         myTexCoordMode != REFLECTIVE) {
- 
+
                         // fetch texgen params
                         MaterialPropertiesFacadePtr myPropertyFacade = getChild<MaterialPropertiesTag>();
                         string myTexGenParamName = string("texgenparam") + asl::as_string(myTexUnit);
@@ -578,18 +578,18 @@ namespace y60 {
 
     void
     MaterialPropertiesFacade::registerDependenciesForMaterialPropGroup1HashTag() {
-        MaterialPropGroup1HashTag::Plug::dependsOn<TargetBuffersTag,MaterialPropertiesFacade>(*this);  
-        MaterialPropGroup1HashTag::Plug::dependsOn<BlendFunctionTag,MaterialPropertiesFacade>(*this);  
-        MaterialPropGroup1HashTag::Plug::dependsOn<BlendEquationTag,MaterialPropertiesFacade>(*this);  
+        MaterialPropGroup1HashTag::Plug::dependsOn<TargetBuffersTag,MaterialPropertiesFacade>(*this);
+        MaterialPropGroup1HashTag::Plug::dependsOn<BlendFunctionTag,MaterialPropertiesFacade>(*this);
+        MaterialPropGroup1HashTag::Plug::dependsOn<BlendEquationTag,MaterialPropertiesFacade>(*this);
         MaterialPropGroup1HashTag::Plug::dependsOn<BlendColorTag,MaterialPropertiesFacade>(*this);
-        MaterialPropGroup1HashTag::Plug::dependsOn<GlowTag,MaterialPropertiesFacade>(*this);  
-        MaterialPropGroup1HashTag::Plug::dependsOn<LineWidthTag,MaterialPropertiesFacade>(*this);  
-        MaterialPropGroup1HashTag::Plug::dependsOn<PointSizeTag,MaterialPropertiesFacade>(*this);  
-        MaterialPropGroup1HashTag::Plug::dependsOn<LineSmoothTag,MaterialPropertiesFacade>(*this);  
+        MaterialPropGroup1HashTag::Plug::dependsOn<GlowTag,MaterialPropertiesFacade>(*this);
+        MaterialPropGroup1HashTag::Plug::dependsOn<LineWidthTag,MaterialPropertiesFacade>(*this);
+        MaterialPropGroup1HashTag::Plug::dependsOn<PointSizeTag,MaterialPropertiesFacade>(*this);
+        MaterialPropGroup1HashTag::Plug::dependsOn<LineSmoothTag,MaterialPropertiesFacade>(*this);
 
         MaterialPropertiesFacadePtr mySelf = dynamic_cast_Ptr<MaterialPropertiesFacade>(getSelf());
         MaterialPropGroup1HashTag::Plug::getValuePtr()->setCalculatorFunction(mySelf, &MaterialPropertiesFacade::updateGroup1Hash);
-        
+
     }
 
     void
@@ -614,7 +614,7 @@ namespace y60 {
         appendCRC32(myCRC32, get<GlowTag>());
         appendCRC32(myCRC32, get<LineWidthTag>());
         appendCRC32(myCRC32, get<PointSizeTag>());
-        appendCRC32(myCRC32, get<LineSmoothTag>());        
+        appendCRC32(myCRC32, get<LineSmoothTag>());
 
         string myMaterialName = getNode().parentNode()->getFacade<MaterialBase>()->get<NameTag>();
         set<MaterialPropGroup1HashTag>(myCRC32);

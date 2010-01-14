@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -74,14 +74,14 @@
 #include <gst/gst.h>
 
 namespace y60 {
-    
+
     class GStreamerCapturePlugin : public CaptureDevice, public asl::PlugInBase {
     public:
         GStreamerCapturePlugin(asl::DLHandle theDLHandle);
         ~GStreamerCapturePlugin();
         virtual asl::Ptr<CaptureDevice> instance() const;
-        std::string canDecode(const std::string & theUrl, 
-                              asl::Ptr<asl::ReadableStreamHandle> theStream = 
+        std::string canDecode(const std::string & theUrl,
+                              asl::Ptr<asl::ReadableStreamHandle> theStream =
                               asl::Ptr<asl::ReadableStreamHandle>());
         virtual void readFrame(dom::ResizeableRasterPtr theTargetRaster);
         virtual void load(const std::string & theFilename);
@@ -89,23 +89,23 @@ namespace y60 {
         virtual void startCapture();
         virtual void stopCapture();
         virtual void pauseCapture();
-    private: 
+    private:
         static void cb_handoff( GstElement *fakesrc, GstBuffer *buffer, GstPad *pad,
                                 gpointer user_data ) {
-            GStreamerCapturePlugin* that = 
+            GStreamerCapturePlugin* that =
                 reinterpret_cast<GStreamerCapturePlugin*>(user_data);
             that->handoff(fakesrc, buffer, pad);
         }
-        
+
         void handoff( GstElement *fakesrc, GstBuffer *buffer, GstPad *pad);
-        
+
         static gboolean cb_buscallback( GstBus *bus, GstMessage* message,
                                     gpointer user_data ) {
-            GStreamerCapturePlugin* that = 
+            GStreamerCapturePlugin* that =
                 reinterpret_cast<GStreamerCapturePlugin*>(user_data);
             return that->buscallback(bus, message);
         }
-        
+
         gboolean buscallback( GstBus *bus, GstMessage* message );
 
         std::string getUrl( const std::string & theConfigStr );

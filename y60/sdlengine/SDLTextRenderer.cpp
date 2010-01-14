@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -112,7 +112,7 @@ namespace y60 {
         TTF_Quit();
     }
 
-    
+
     std::string
     SDLTextRenderer::makeFontName(const string & theName, SDLFontInfo::FONTTYPE theFontType) const
     {
@@ -127,7 +127,7 @@ namespace y60 {
         const string myFileName = AppPackageManager::get().getPtr()->searchFile(theFileName);
 
         TTF_SetFitting((int)theFonthint);
-        
+
         string myFontName = makeFontName(theName, theFontType);
         if (_myFonts.find(myFontName) != _myFonts.end()) {
             // Font already loaded
@@ -135,7 +135,7 @@ namespace y60 {
         }
         _myFontHintingMap[theName] = theFonthint;
         TTF_SetFitting((int)_myFontHintingMap[theName]);
-        
+
         if (theFontType != SDLFontInfo::NORMAL) {
             if (_myFonts.find(makeFontName(theName, SDLFontInfo::NORMAL)) == _myFonts.end()) {
                 throw GLTextRendererException("You must register a normal style font with the same name, before registering bold or italic fonts", PLUS_FILE_LINE);
@@ -460,11 +460,11 @@ namespace y60 {
         {
             return 1;
         }
-        if (thePos + 1 < theText.size() && theText[thePos] == '\x0D' && theText[thePos+1] == '\x0A') 
+        if (thePos + 1 < theText.size() && theText[thePos] == '\x0D' && theText[thePos+1] == '\x0A')
         {
             return 2;
         }
-        
+
         if (theText.size() > thePos + 3 && theText[thePos] == '<' &&
             theText[thePos + 2] == '/' && theText[thePos + 3] == '>')
         {
@@ -555,7 +555,7 @@ namespace y60 {
             if (theText[thePos] == _myWordDelimiters[i]) {
                 string::size_type myNextWordPos;
                 myNextWordPos = theText.find_first_not_of(_myWordDelimiters, thePos);
-                
+
                 if (myNextWordPos == string::npos) {
                     return theText.size() - thePos;
                 } else {
@@ -573,19 +573,19 @@ namespace y60 {
         unsigned myWordStart = 0;
         unsigned myWordEnd   = 0;
         unsigned myNextWordOffset = 0;
-        
+
         Format myFormat;
         Format myNewFormat;
-        
+
         while (myTextPos < theText.size()) {
             unsigned myOffset = 0;
-           
+
             if (myNextWordOffset > 0) {
                 myTextPos += myNextWordOffset;
                 myWordEnd   = myTextPos;
                 myNextWordOffset = 0;
             }
-            
+
             if ( 0 != (myOffset = parseNewline(theText, myTextPos)) ) {
                 theResult.push_back(Word(theText.substr(myWordStart, myWordEnd - myWordStart)));
                 theResult.back().newline = true;
@@ -606,15 +606,15 @@ namespace y60 {
                 myTextPos  += myOffset;
                 myWordStart = myTextPos;
                 myWordEnd   = myTextPos;
-            } else if ( 0 != (myOffset = parseWord(theText, myTextPos))) {  
+            } else if ( 0 != (myOffset = parseWord(theText, myTextPos))) {
                 if (_myHorizontalAlignment == RIGHT_ALIGNMENT) {
                     theResult.push_back(Word(theText.substr(myWordStart, myWordEnd - myWordStart)));
-                    myNextWordOffset = myOffset; 
+                    myNextWordOffset = myOffset;
                 } else {
                     theResult.push_back(Word(theText.substr(myWordStart, myWordEnd + myOffset - myWordStart)));
                     myTextPos  += myOffset;
                 }
-                
+
                 theResult.back().format = myFormat;
                 myWordStart = myTextPos;
                 myWordEnd   = myTextPos;
@@ -693,7 +693,7 @@ namespace y60 {
     {
         DB2(AC_TRACE << "-------  Render Words  -------" << endl;)
         SDLFontInfo mySDLFontInfo = (getFontInfo(makeFontName(theFontName, SDLFontInfo::NORMAL)));
-        
+
         TTF_Font * myNormalFont = mySDLFontInfo.getFont();
         if (!myNormalFont) {
             throw GLTextRendererException("Internal error: Normal font not defined.", PLUS_FILE_LINE);
@@ -711,7 +711,7 @@ namespace y60 {
                                   Uint8(theTextColor[3] * 255) };
 
         for (unsigned i = 0; i < theWords.size(); ++i) {
-			SDL_Color myWordColor = myTextColor;            
+			SDL_Color myWordColor = myTextColor;
             Word & myWord = theWords[i];
             const TTF_Font * myFont = myNormalFont;
 
@@ -777,7 +777,7 @@ namespace y60 {
     {
         unsigned mySurfaceWidth  = 0;
         unsigned mySurfaceHeight = 0;
-        
+
         DB2(
             {AC_TRACE << "----------------------------------" << endl;}
             {AC_TRACE << "Rendering text: " << theText << endl;}
@@ -840,7 +840,7 @@ namespace y60 {
             _myMaxWidth = std::max(myLines[i].width, _myMaxWidth);
             _myLineWidths.push_back(myLines[i].width);
         }
-        
+
         createTargetSurface( mySurfaceWidth, mySurfaceHeight, theTextColor);
 
         DB2(

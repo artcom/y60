@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -193,7 +193,7 @@ WiiScanner::collectNewWiiControllers() {
 
         if (myDeviceCount == -1) {
             // Sometimes the inquiry fails with "device or resource busy". This probably
-            // happens when the system hci daemon performs a inquiry. So we handle this 
+            // happens when the system hci daemon performs a inquiry. So we handle this
             // gracefully.
             // This seems to happen more often with low batteries
             if (_myConsecutiveInquiryFailures < MAX_CONSECUTIVE_ERRORS) {
@@ -249,7 +249,7 @@ WiiScanner::collectNewWiiControllers() {
                 _myConsecutiveTimeouts = 0;
 
                 if (myDeviceList[i].dev_class[0] != WIIMOTE_CLASS_0 ||
-                        myDeviceList[i].dev_class[1] != WIIMOTE_CLASS_1 || 
+                        myDeviceList[i].dev_class[1] != WIIMOTE_CLASS_1 ||
                         myDeviceList[i].dev_class[2] != WIIMOTE_CLASS_2 ||
                         strncmp( myNameBuffer, WIIMOTE_NAME, WIIMOTE_NAME_LENGTH))
                 {
@@ -297,7 +297,7 @@ WiiScanner::collectNewWiiControllers() {
     HIDD_ATTRIBUTES						Attributes;
     SP_DEVICE_INTERFACE_DATA			devInfoData;
     int									MemberIndex = 0;
-    LONG								Result;	
+    LONG								Result;
     GUID								HidGuid;
     PSP_DEVICE_INTERFACE_DETAIL_DATA	detailData;
 
@@ -306,7 +306,7 @@ WiiScanner::collectNewWiiControllers() {
     detailData = NULL;
     DeviceHandle = NULL;
 
-    HidD_GetHidGuid(&HidGuid);	
+    HidD_GetHidGuid(&HidGuid);
 
     hDevInfo = SetupDiGetClassDevs(&HidGuid, NULL, NULL, DIGCF_PRESENT|DIGCF_INTERFACEDEVICE);
 
@@ -316,28 +316,28 @@ WiiScanner::collectNewWiiControllers() {
     do {
         // Got any more devices?
         Result = SetupDiEnumDeviceInterfaces (hDevInfo, 0, &HidGuid, MemberIndex,	&devInfoData);
-       
+
         if( !Result ){
             break;
         }
-        
+
         // Call once to get the needed buffer length
         Result = SetupDiGetDeviceInterfaceDetail(hDevInfo, &devInfoData, NULL, 0, &Length, NULL);
-        
+
         detailData = (PSP_DEVICE_INTERFACE_DETAIL_DATA)malloc(Length);
         detailData->cbSize = sizeof(SP_DEVICE_INTERFACE_DETAIL_DATA);
 
         // After allocating, call again to get data
-        Result = SetupDiGetDeviceInterfaceDetail(hDevInfo, &devInfoData, detailData, Length, 
+        Result = SetupDiGetDeviceInterfaceDetail(hDevInfo, &devInfoData, detailData, Length,
                                                  &Required, NULL);
-        DeviceHandle = CreateFile(detailData->DevicePath, 0, FILE_SHARE_READ|FILE_SHARE_WRITE, 
+        DeviceHandle = CreateFile(detailData->DevicePath, 0, FILE_SHARE_READ|FILE_SHARE_WRITE,
                                   (LPSECURITY_ATTRIBUTES)NULL, OPEN_EXISTING,	0, NULL);
-        
+
         Attributes.Size = sizeof(Attributes);
-        
+
         Result = HidD_GetAttributes(DeviceHandle, &Attributes);
-          
-        
+
+
         if (Attributes.VendorID == WIIMOTE_VENDOR_ID && Attributes.ProductID == WIIMOTE_PRODUCT_ID) {
             // --------
 //        PHIDP_PREPARSED_DATA PreparsedData;
@@ -345,9 +345,9 @@ WiiScanner::collectNewWiiControllers() {
 //	    HidD_GetPreparsedData(DeviceHandle, &PreparsedData);
 //	    HidP_GetCaps(PreparsedData, &_myCapabilities);
 //	    HidD_FreePreparsedData(PreparsedData);
-//    
+//
 //        //AC_PRINT << "winscanner " << detailData->DevicePath;
-//        HANDLE myWriteHandle = CreateFile(detailData->DevicePath, GENERIC_WRITE, FILE_SHARE_READ|FILE_SHARE_WRITE, 
+//        HANDLE myWriteHandle = CreateFile(detailData->DevicePath, GENERIC_WRITE, FILE_SHARE_READ|FILE_SHARE_WRITE,
 //                                    (LPSECURITY_ATTRIBUTES)NULL, OPEN_EXISTING, 0, NULL);
 //        DWORD myRetVal = GetLastError();
 //        if (myRetVal) {
@@ -364,9 +364,9 @@ WiiScanner::collectNewWiiControllers() {
 //        if(myWriteHandle == INVALID_HANDLE_VALUE) {
 //            //CloseHandle(myWriteHandle);
 //            AC_PRINT << "invalid write handle";
-//            break;   
+//            break;
 //        }
-        
+
             vector<WiiRemotePtr> myNewWiis;
             set<string>::iterator myIt = _myKnownWiiIds.find( detailData->DevicePath);
             if (myIt == _myKnownWiiIds.end() ) {
@@ -374,7 +374,7 @@ WiiScanner::collectNewWiiControllers() {
                 myNewWiis.push_back( myWii );
                 _myKnownWiiIds.insert( detailData->DevicePath );
             }
-            
+
             _myLock.lock();
             for (unsigned i = 0; i < myNewWiis.size(); ++i) {
                 _myNewWiiQueue.push( myNewWiis[i] );
@@ -388,14 +388,14 @@ WiiScanner::collectNewWiiControllers() {
         } else {
             CloseHandle(DeviceHandle);
         }
-        
+
         free(detailData);
         MemberIndex = MemberIndex + 1;
-        
+
     } while(true);
     SetupDiDestroyDeviceInfoList(hDevInfo);
 #endif
 }
-    
+
 } // end of namespace
 

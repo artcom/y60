@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -78,11 +78,11 @@ typedef asl::WeakPtr<Sound> SoundWeakPtr;
 
 DEFINE_EXCEPTION(SoundException, asl::Exception);
 
-class Y60_SOUND_DECL Sound :     
+class Y60_SOUND_DECL Sound :
     public asl::TimeSource, public asl::ISampleSink
 {
     public:
-        Sound (std::string myURI,  IAudioDecoder * myDecoder, SoundCacheItemPtr myCacheItem, 
+        Sound (std::string myURI,  IAudioDecoder * myDecoder, SoundCacheItemPtr myCacheItem,
                 bool myLoop = false);
         virtual ~Sound();
         void setSelf(const SoundPtr& mySelf);
@@ -107,17 +107,17 @@ class Y60_SOUND_DECL Sound :
 
         // Interface to Media.
         void update(double theTimeSlice);
-    
+
         // ISampleSink interface (to Decoder)
         bool queueSamples(asl::AudioBufferPtr& theBuffer);
-        
+
         static int getNumSoundsAllocated();
-        
+
     private:
         void open();
         void close();
         bool decode();
-        
+
         mutable asl::ThreadLock _myLock;
 
         std::string _myURI;
@@ -141,4 +141,4 @@ class Y60_SOUND_DECL Sound :
 
 } // namespace
 
-#endif 
+#endif

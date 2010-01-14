@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -62,7 +62,7 @@
 
 namespace y60 {
 
-    WindowFunction::WindowFunction(asl::SampleFormat theSampleFormat) 
+    WindowFunction::WindowFunction(asl::SampleFormat theSampleFormat)
         : asl::Effect(asl::createEffectFunctor<MultiplierFunctor>(theSampleFormat))
     {
         _myWindow.push_back(1.0);
@@ -90,7 +90,7 @@ namespace y60 {
         _myWindow.reserve(theSize);
         for (unsigned i = 0; i < theSize; i++) {
             float value = 0.5f * (1.0f - cosf(2.f*3.14159265f*i/(theSize-1.f))); // Hann Window
-            _myWindow.push_back(value); 
+            _myWindow.push_back(value);
         }
     }
 }

@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -75,11 +75,11 @@ PathAlign.prototype.Constructor = function(self, thePath) {
     self.getPath = function() {
         return _myPath;
     }
-    
+
     /// Reset alignment to start from the path beginning.
     self.resetToStartPos = function() {
         _myCurrentSegment = 0;
-        _myCurrentPosition = _myPath.getElement(_myCurrentSegment).origin;            
+        _myCurrentPosition = _myPath.getElement(_myCurrentSegment).origin;
     }
     self.getNormalAtCurrentPosition = function() {
         return _myPath.normal(_myCurrentPosition, new Vector3f(0,0,-1)).normal;
@@ -104,10 +104,10 @@ PathAlign.prototype.Constructor = function(self, thePath) {
     self.fitsAdvancement = function(theLength, theSegment, theCurrentPosition) {
         if (theSegment == undefined) {
             theSegment = _myCurrentSegment;
-        }        
+        }
         if (theCurrentPosition == undefined) {
             theCurrentPosition = _myCurrentPosition;
-        }        
+        }
         var myElement = _myPath.getElement(theSegment);
         var myRemainSegment = difference(myElement.end, theCurrentPosition);
         var myRemainLength = magnitude(myRemainSegment);
@@ -121,7 +121,7 @@ PathAlign.prototype.Constructor = function(self, thePath) {
             }
         }
     }
-    
+
     /**
      * Advance on path for the given length.
      * NOTE: 'theStartPosition' must not be used by external applications!
@@ -208,7 +208,7 @@ PathAlign.prototype.Constructor = function(self, thePath) {
     var _myCurrentPosition = null;
 
     function setup() {
-        _myCurrentPosition = _myPath.getElement(_myCurrentSegment).origin;    
+        _myCurrentPosition = _myPath.getElement(_myCurrentSegment).origin;
     }
 
     setup();
@@ -230,7 +230,7 @@ function test_PathAlign() {
         var mySvgNode = new Node(mySvgFile);
 
         var myPaths = mySvgNode.findAll(".//path");
-        
+
         myPath = new SvgPath(myPaths[6].d);
     } else {
         const __PATHALIGN_TESTS = [

@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -79,7 +79,7 @@
 #endif
 
 namespace y60 {
-    
+
 class WaterSimulation {
 public:
 
@@ -99,7 +99,7 @@ public:
     // good for larger arrays (width > 100 ???)
     // better use of L2 cache : stripSize = 5;
     void    simulationMultiStep(float gTimeStep, int numSteps, int stripSize=5);
-    void    simulationMultiStepInThread(asl::ThreadSemaphore & threadLock, float gTimeStep, int 
+    void    simulationMultiStepInThread(asl::ThreadSemaphore & threadLock, float gTimeStep, int
                                 numSteps, int stripSize=5);
 
 
@@ -115,7 +115,7 @@ public:
     inline float   * getWaterArray() {
         return _waterArray[_currentBuffer] + _numAllocatedColumns + 1;
     }
-    
+
     inline float * getWaterDataLine(int lineNum) {
         assert(lineNum >= 0);
         assert(lineNum < _numAllocatedRows);
@@ -129,7 +129,7 @@ public:
         assert(y < _numAllocatedRows);
         return *(_waterArray[_currentBuffer] + (y+1) * _numAllocatedColumns + (x+1));
     }
-    
+
     float & getWaterValue(int buffer, int x, int y) {
         assert(x >= 0);
         assert(x < _numAllocatedColumns);
@@ -137,11 +137,11 @@ public:
         assert(y < _numAllocatedRows);
         return *(_waterArray[buffer] + (y+1) * _numAllocatedColumns + (x+1));
     }
-    
+
     inline float   * getDampingArray() {
         return _dampingArray;
     }
-    
+
     float & getDampingValue(int x, int y) {
         assert(x >= 0);
         assert(x < _numAllocatedColumns);
@@ -160,7 +160,7 @@ public:
     void    setDefaultDampingCoefficient(float theValue) {
         _defaultDampingCoefficient = theValue;
     }
-    
+
 private:
     asl::Vector2i _mySize;
     int     _numAllocatedRows;
@@ -176,31 +176,31 @@ private:
     inline float waveSpeed() const { // "c"
         return 2.f;
     }
-    
+
     inline float waveCoefficient() const { // "h"
-//        return 2*float(0.1*c*sqrt(2)); 
-        return 2.f*float( 0.1f * waveSpeed() * M_SQRT2); 
+//        return 2*float(0.1*c*sqrt(2));
+        return 2.f*float( 0.1f * waveSpeed() * M_SQRT2);
     }
-    
+
     inline float getDampingValueFAST(int x, int y) const {
         return *(_dampingArray + y * _numAllocatedColumns + x + 1);
     }
-    
+
     void        switchBuffers();
 
 
-    
+
     class ComputeThread: public asl::PosixThread {
-    public:    
+    public:
             ComputeThread (WaterSimulation & simulation) : PosixThread(),
-                          _simulation(simulation), 
+                          _simulation(simulation),
                           _doQuit(false),
                           _threadLock(0)
             { }
-            
+
             virtual ~ComputeThread() {}
 
-            void    setup(asl::ThreadSemaphore & threadLock, float dt, 
+            void    setup(asl::ThreadSemaphore & threadLock, float dt,
                           int numSteps, int stripSize) {
                 _threadLock = & threadLock;
                 _timeStep = dt;
@@ -218,14 +218,14 @@ private:
         int             _numSteps;
         int             _stripSize;
         bool            _doQuit;
-        
+
         WaterSimulation &   _simulation;
             virtual void run ();
     };
 
     ComputeThread *    _computeThread;
     asl::ThreadSemaphore *   _computeLock;
-};   
+};
 
 typedef asl::Ptr<WaterSimulation> WaterSimulationPtr;
 

@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -82,7 +82,7 @@ extern "C" {
 
 #ifdef OSX
     extern "C" {
-#       if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(51,38,0) 
+#       if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(51,38,0)
 #           include <libswscale/swscale.h>
 #       endif
     }
@@ -93,7 +93,7 @@ extern "C" {
 #       pragma warning(push,1)
 #   endif
     extern "C" {
-#   if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(51,38,0) 
+#   if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(51,38,0)
 #       include <swscale.h>
 #   endif
     }
@@ -108,7 +108,7 @@ namespace y60 {
 
     DEFINE_EXCEPTION(FFMpegDecoderException, asl::Exception);
 
-    class Y60_FFMPEGDECODER1_DECL FFMpegDecoder1 : 
+    class Y60_FFMPEGDECODER1_DECL FFMpegDecoder1 :
         public MovieDecoderBase,
         public asl::PlugInBase
     {
@@ -154,7 +154,7 @@ namespace y60 {
         void load(asl::Ptr<asl::ReadableStream> theSource, const std::string & theFilename) {
             throw asl::NotYetImplemented(JUST_FILE_LINE);
         }
-    
+
         virtual asl::Ptr<MovieDecoderBase> instance() const;
         std::string canDecode(const std::string & theUrl, asl::Ptr<asl::ReadableStreamHandle> theStream = asl::Ptr<asl::ReadableStreamHandle>());
 
@@ -168,7 +168,7 @@ namespace y60 {
         double readFrame(double theTime, unsigned theFrame, RasterVector theTargetRaster);
 
         const char * getName() const { return "FFMpegDecoder1"; }
-        
+
         const bool hasAudio() const { AC_WARNING << "hasAudio always returns false for FFMpegDecoder1"; return false; }
 
     private:
@@ -177,7 +177,7 @@ namespace y60 {
 
         /// Decode frame at theTimestamp into theTargetRaster. Returns true if EOF was met.
         bool decodeFrame(double & theTimestamp, dom::ResizeableRasterPtr theTargetRaster);
-    
+
         // Convert frame from yuv to rgb
         void convertFrame(AVFrame* theFrame, dom::ResizeableRasterPtr theTargetRaster);
     private:

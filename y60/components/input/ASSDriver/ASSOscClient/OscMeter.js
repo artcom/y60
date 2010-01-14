@@ -2,7 +2,7 @@ use("SceneViewer.js");
 
 const BOX_WIDTH         = 600;
 const BOX_HEIGHT        = 200;
-const T_MAX             = 0.1; // 500 ms 
+const T_MAX             = 0.1; // 500 ms
 const SLOT_WIDTH        = 2;
 const H_VALUES          = (BOX_WIDTH-2*SLOT_WIDTH)/SLOT_WIDTH;
 
@@ -28,7 +28,7 @@ function OscMeter(theArguments, theWidth, theHeight, theTitle) {
     var _myBGColor           = _myTranspColor;
     var _myOscPacketCount = 0;
     var _lastTime = 0;
-        
+
     Public.Constructor = function() {
         window = new RenderWindow();
         window.position = [0, 0];
@@ -37,7 +37,7 @@ function OscMeter(theArguments, theWidth, theHeight, theTitle) {
         Public.setup(theWidth, theHeight, false, theTitle);
         window.swapInterval    = 0;
         window.canvas.backgroundcolor = asColor("000000");
-    
+
         var myReceivePort = 6567;
         var myArgs = parseArguments(theArguments, { "port" : "%s",
                                                     "mode" : "%s",
@@ -55,18 +55,18 @@ function OscMeter(theArguments, theWidth, theHeight, theTitle) {
             Logger.debug("socket: " + _myUdpSocket);
         } else {
             plug("OscReceiver");
-            
+
             _myOscReceiver = new OscReceiver(myReceivePort);
-            _myOscReceiver.start();        
+            _myOscReceiver.start();
         }
 
         var myResult = createPerfOverlay();
         _myOverlay =  myResult.overlay;
         _myImage = myResult.image;
-        
+
         print("Running in " + (_myUdpSocket?"UDP":"OSC") + "-mode on port " + myReceivePort + ".");
     }
-    
+
     function createPerfOverlay() {
         var myImage = window.scene.images.find("image[@name = 'PERF_Overlay']");
         if(!myImage) {
@@ -99,14 +99,14 @@ function OscMeter(theArguments, theWidth, theHeight, theTitle) {
 
     function drawValue(theFrame, theBaseValue, theValue, theColor) {
         var mySlotPos = (theFrame % H_VALUES)*SLOT_WIDTH;
-        _myImage.raster.fillRect(mySlotPos,YtoMap(theValue), mySlotPos+SLOT_WIDTH,YtoMap(theBaseValue), theColor);  
-        _myImage.raster.fillRect(mySlotPos+SLOT_WIDTH, YtoMap(1),BOX_WIDTH, YtoMap(0), _myTranspColor);  
+        _myImage.raster.fillRect(mySlotPos,YtoMap(theValue), mySlotPos+SLOT_WIDTH,YtoMap(theBaseValue), theColor);
+        _myImage.raster.fillRect(mySlotPos+SLOT_WIDTH, YtoMap(1),BOX_WIDTH, YtoMap(0), _myTranspColor);
      }
 
     function simulationStep(theTime){
         var deltaT = theTime - _lastTime;
         if ((_myOscPacketCount % H_VALUES) == 0) {
-            _myImage.raster.fillRect(0, YtoMap(1),BOX_WIDTH, YtoMap(0), _myTranspColor);  
+            _myImage.raster.fillRect(0, YtoMap(1),BOX_WIDTH, YtoMap(0), _myTranspColor);
             if (_myTimeColor.x == 1) {
                 _myTimeColor = new Vector4f(0,1,0,1);
             } else {
@@ -115,7 +115,7 @@ function OscMeter(theArguments, theWidth, theHeight, theTitle) {
         }
         drawValue(_myOscPacketCount,  0, deltaT/T_MAX, _myTimeColor);
         _myOscPacketCount++;
-        _lastTime = theTime; 
+        _lastTime = theTime;
     }
 
     //////////////////////////////////////////////////////////////////////
@@ -131,7 +131,7 @@ function OscMeter(theArguments, theWidth, theHeight, theTitle) {
     Base.onFrame = Public.onFrame;
     Public.onFrame = function(theTime) {
         Base.onFrame(theTime);
-        
+
         if (_myUdpSocket) {
             while (_myUdpSocket.peek(1)) {
                 var myPacket = _myUdpSocket.read();
@@ -149,7 +149,7 @@ function OscMeter(theArguments, theWidth, theHeight, theTitle) {
 
         if (theControlFlag) {
             Base.onKey(theKey, theKeyState, theX, theY, theShiftFlag, theControlFlag, theAltFlag);
-        } else if (theKeyState) {    
+        } else if (theKeyState) {
             var cmd = "";
             switch (theKey) {
                 case 'space':

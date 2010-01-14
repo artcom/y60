@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -78,19 +78,19 @@ const unsigned DEFAULT_Y60_MAX_OPEN_SOUNDS = 200;
 
 SoundManager::SoundManager()
     : _myMaxCacheSize (128*1024*1024), // 128 MB Cache
-      _myMaxCacheItemSize (60*2*sizeof(float)*48000) 
+      _myMaxCacheItemSize (60*2*sizeof(float)*48000)
                 // One minute stereo float samples = 22 MB per sound.
 {
     AC_DEBUG << "SoundManager::SoundManager";
-    
-    // Initialize ffmpeg 
+
+    // Initialize ffmpeg
     AC_DEBUG << "Soundmanager: using " << LIBAVCODEC_IDENT << endl;
     //av_log_set_level(AV_LOG_ERROR);
     av_register_all();
-    
+
     _myFFMpegAudioDecoderFactory = new FFMpegAudioDecoderFactory;
     registerDecoderFactory(_myFFMpegAudioDecoderFactory);
-    
+
     Y60_MAX_OPEN_SOUNDS = asl::getenv("Y60_MAX_OPEN_SOUNDS", DEFAULT_Y60_MAX_OPEN_SOUNDS);
 
     // XXX: forking here is dangerous because virtuals are not yet
@@ -103,7 +103,7 @@ SoundManager::~SoundManager() {
     AC_DEBUG << "SoundManager::~SoundManager";
     msleep(50);
     if (_mySounds.size() != 0) {
-        AC_DEBUG << "Deleting SoundManager, but " << _mySounds.size() << 
+        AC_DEBUG << "Deleting SoundManager, but " << _mySounds.size() <<
                 " sounds are still active.";
         stopAll();
     }
@@ -115,13 +115,13 @@ SoundManager::~SoundManager() {
         AC_WARNING << _myDecoderFactories.size() << " decoder factories still registered.";
     }
     if (AudioBufferBase::getNumBuffersAllocated() > 1) {
-        AC_WARNING << "SoundManager being deleted, but " << 
-                AudioBufferBase::getNumBuffersAllocated()-1 << 
+        AC_WARNING << "SoundManager being deleted, but " <<
+                AudioBufferBase::getNumBuffersAllocated()-1 <<
                 " buffers are still allocated.";
     }
     if (Sound::getNumSoundsAllocated() > 0) {
-        AC_WARNING << "SoundManager being deleted, but " << 
-                Sound::getNumSoundsAllocated() << 
+        AC_WARNING << "SoundManager being deleted, but " <<
+                Sound::getNumSoundsAllocated() <<
                 " Sounds are still allocated.";
     }
 }
@@ -150,19 +150,19 @@ void SoundManager::registerDecoderFactory(IAudioDecoderFactory* theFactory) {
             lower_bound(_myDecoderFactories.begin(), _myDecoderFactories.end(),
                     theFactory, lessFactory),
             theFactory);
-    
+
 }
 
 void SoundManager::unregisterDecoderFactory(IAudioDecoderFactory* theFactory) {
     std::vector <IAudioDecoderFactory*>::iterator it;
-    
+
     for (it=_myDecoderFactories.begin(); it != _myDecoderFactories.end(); ++it) {
         if (*it == theFactory) {
             _myDecoderFactories.erase(it);
             return;
         }
     }
-    AC_WARNING << "unregisterDecoderFactory: Factory at " << (void *)theFactory << 
+    AC_WARNING << "unregisterDecoderFactory: Factory at " << (void *)theFactory <<
             " not registered.";
 }
 
@@ -181,7 +181,7 @@ SoundPtr SoundManager::createSound(const string & theURI, bool theLoop,
 {
     // We need a factory function so we can set the Sound's mySelf pointer and
     // do some decoder creation and cache management magic.
-    AC_TRACE << "SoundManager::createSound " << theURI << ", loop: " << theLoop 
+    AC_TRACE << "SoundManager::createSound " << theURI << ", loop: " << theLoop
             << ", use cache: " << theUseCache;
     AutoLocker<ThreadLock> myLocker(_myLock);
     if (getNumOpenSounds() >= getMaxOpenSounds()) {
@@ -283,9 +283,9 @@ unsigned SoundManager::getNumItemsInCache() const {
 void SoundManager::stopAll() {
     AC_TRACE << "SoundManager::stopAll";
     unsigned myNumSoundsStopped = 0;
-    
+
     std::vector<SoundPtr> mySounds;
-    
+
     {
         AutoLocker<ThreadLock> myLocker(_myLock);
         std::vector<SoundWeakPtr>::iterator wi;
@@ -296,14 +296,14 @@ void SoundManager::stopAll() {
             }
         }
     }
-    
+
     std::vector<SoundPtr>::iterator si;
     for(si = mySounds.begin(); si != mySounds.end(); si++) {
         AC_TRACE << "stopAll: Stopping " << (*si)->getName();
         (*si)->stop();
         myNumSoundsStopped++;
     }
-    
+
     if (myNumSoundsStopped) {
         AC_TRACE << "stopAll: " << myNumSoundsStopped << " sounds stopped.";
     }
@@ -349,12 +349,12 @@ IAudioDecoder * SoundManager::createDecoder(const std::string & theURI) {
         }
     }
     if (myDecoder == 0) {
-        throw DecoderException(std::string("No suitable decoder for ")+theURI+" found.", 
+        throw DecoderException(std::string("No suitable decoder for ")+theURI+" found.",
                 PLUS_FILE_LINE);
     }
     return myDecoder;
 }
-        
+
 void SoundManager::addCacheItem(SoundCacheItemPtr theItem) {
     string myURI = theItem->getURI();
     CacheMap::iterator it;
@@ -381,7 +381,7 @@ void SoundManager::checkCacheSize() {
     if (getCacheMemUsed() > _myMaxCacheSize) {
         AC_TRACE << "SoundManager: removing excess items from cache.";
     }
-    
+
     // TODO: Check if searching linearly is a performance hit and change if needed.
     // -> Maybe also move the cache to a separate class when that's nessesary.
     int myIteration = 0;
@@ -393,7 +393,7 @@ void SoundManager::checkCacheSize() {
             SoundCacheItemPtr myItem = it->second;
             if (!myItem->isInUse() &&
                 myItem->isFull() &&
-                myItem->getLastUsedTime() < myOldestItem->second->getLastUsedTime()) 
+                myItem->getLastUsedTime() < myOldestItem->second->getLastUsedTime())
             {
                 myOldestItem = it;
             }

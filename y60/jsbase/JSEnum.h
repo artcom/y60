@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -72,7 +72,7 @@
 
 namespace jslib {
 
-template <class ENUM>    
+template <class ENUM>
 class JSEnum : public JSWrapper<ENUM> {
     private:
         JSEnum();  // hide default constructor
@@ -97,7 +97,7 @@ class JSEnum : public JSWrapper<ENUM> {
             static std::string myClassName = buildClassName( ENUM::getName());
             return myClassName.c_str();
         };
-        
+
         virtual unsigned long length() const {
             return 1;
         }
@@ -129,11 +129,11 @@ class JSEnum : public JSWrapper<ENUM> {
         JSObject * Construct(JSContext *cx, OWNERPTR theOwner, NATIVE * theNative) {
             return Base::Construct(cx, theOwner, theNative);
         }
-        
+
         JSEnum(NativeValuePtr theValue)
             : Base(theValue, 0)
         {}
-        
+
         static JSObject * initClass(JSContext *cx, JSObject *theGlobalObject);
 
     private:
@@ -165,8 +165,8 @@ bool convertFrom(JSContext *cx, jsval theValue, asl::Enum<NATIVE_ENUM, THE_MAX> 
     return false;
 }
 template <class NATIVE_ENUM, int THE_MAX>
-bool convertFrom(JSContext *cx, jsval theValue, 
-        asl::Ptr<dom::SimpleValue<asl::Enum<NATIVE_ENUM, THE_MAX> >, dom::ThreadingModel> theNativeValue) 
+bool convertFrom(JSContext *cx, jsval theValue,
+        asl::Ptr<dom::SimpleValue<asl::Enum<NATIVE_ENUM, THE_MAX> >, dom::ThreadingModel> theNativeValue)
 {
     if (JSVAL_IS_STRING(theValue)) {
         std::string myString;
@@ -178,8 +178,8 @@ bool convertFrom(JSContext *cx, jsval theValue,
     return false;
 }
 
-template <class ENUM>    
-JSObject * 
+template <class ENUM>
+JSObject *
 JSEnum<ENUM>::initClass(JSContext *cx, JSObject *theGlobalObject) {
     JSObject * myClassObject = Base::initClass(cx, theGlobalObject, ClassName(), Constructor, 0, 0, 0, 0, 0);
     if (myClassObject) {

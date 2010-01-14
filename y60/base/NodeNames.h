@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -170,7 +170,7 @@ namespace y60 {
     const char * const PRIMITIVE_TYPE_ATTRIB          = "type";
 
     const char * const VERTEX_BUFFER_USAGE_ATTRIB     = "vertexbufferusage";
- 
+
     const char * const TEXTUREUNIT_LIST_NAME     = "textureunits";
     const char * const TEXTUREUNIT_NODE_NAME     = "textureunit";
     const char * const TEXTUREUNIT_TEXTURE_ATTRIB   = "texture";
@@ -291,7 +291,7 @@ namespace y60 {
     const char * const IMAGE_TYPE_ATTRIB               = "type";
     const char * const IMAGE_BYTESPERPIXEL_ATTRIB      = "bytesperpixel";
     const char * const IMAGE_RASTER_PIXELFORMAT_ATTRIB = "rasterpixelformat";
-    const char * const IMAGE_TARGET_PIXELFORMAT_ATTRIB = "targetpixelformat";    
+    const char * const IMAGE_TARGET_PIXELFORMAT_ATTRIB = "targetpixelformat";
     const char * const IMAGE_RESIZE_ATTRIB             = "resize";
     const char * const IMAGE_FILTER_ATTRIB             = "filter";
     const char * const IMAGE_FILTER_PARAMS_ATTRIB      = "filter_params";
@@ -305,10 +305,10 @@ namespace y60 {
     const char * const MOVIE_AVDELAY_ATTRIB        = "avdelay";
     const char * const MOVIE_FRAMERATE_ATTRIB      = "fps";
     const char * const MOVIE_FRAMECOUNT_ATTRIB     = "framecount";
-    const char * const MOVIE_FRAMEBLENDFACTOR_ATTRIB = "frameblend_factor";	
-    const char * const MOVIE_FRAMEBLENDING_ATTRIB  = "frameblending";	
+    const char * const MOVIE_FRAMEBLENDFACTOR_ATTRIB = "frameblend_factor";
+    const char * const MOVIE_FRAMEBLENDING_ATTRIB  = "frameblending";
     const char * const MOVIE_HASAUDIO_ATTRIB       = "has_audio";
-	
+
     const char * const MOVIE_PLAYSPEED_ATTRIB      = "playspeed";
     const char * const MOVIE_PLAYMODE_ATTRIB       = "playmode";
     const char * const MOVIE_VOLUME_ATTRIB         = "volume";

@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -136,7 +136,7 @@ AnimationExporter::exportCharacter(BaseObject * theNode, const std::string & the
 }
 
 void
-AnimationExporter::exportGlobal(BaseObject * theNode, const std::string & theNodeId, 
+AnimationExporter::exportGlobal(BaseObject * theNode, const std::string & theNodeId,
                                 ClipBuilderPtr theClipBuilder) {
     std::string myName = getString(theNode->GetName());
 
@@ -154,8 +154,8 @@ AnimationExporter::exportGlobal(BaseObject * theNode, const std::string & theNod
     }
 }
 
-bool 
-AnimationExporter::WriteTrack(CTrack* theTrack, const std::string & theNodeId, 
+bool
+AnimationExporter::WriteTrack(CTrack* theTrack, const std::string & theNodeId,
                                 ClipBuilderPtr theClipBuilder)
 {
 
@@ -179,7 +179,7 @@ AnimationExporter::WriteTrack(CTrack* theTrack, const std::string & theNodeId,
         float myFps = _myDocument->GetFps();
         myAnimationBuilder.setDuration(myValues.size() / myFps);
         if (theClipBuilder) {
-            theClipBuilder->appendAnimation(myAnimationBuilder);                
+            theClipBuilder->appendAnimation(myAnimationBuilder);
         }
     } else {
         if (myAttributeC4DName == C4D_ROTATION_X || myAttributeC4DName == C4D_ROTATION_Y || myAttributeC4DName == C4D_ROTATION_Z) {
@@ -191,8 +191,8 @@ AnimationExporter::WriteTrack(CTrack* theTrack, const std::string & theNodeId,
     return true;
 }
 
-bool 
-AnimationExporter::exportRotationAnimation(const std::string & theNodeId, 
+bool
+AnimationExporter::exportRotationAnimation(const std::string & theNodeId,
                                 ClipBuilderPtr theClipBuilder) {
     y60::AnimationBuilder myAnimationBuilder;
     std::string myId = _mySceneBuilder.appendAnimation(myAnimationBuilder);
@@ -200,7 +200,7 @@ AnimationExporter::exportRotationAnimation(const std::string & theNodeId,
     myAnimationBuilder.setName("orientation");
     myAnimationBuilder.setNodeRef(theNodeId);
     myAnimationBuilder.setDuration(10.0f);
-    
+
     std::vector<float> & theRotateH = _myRotationMap[C4D_ROTATION_Y];
     std::vector<float> & theRotateP = _myRotationMap[C4D_ROTATION_X];
     std::vector<float> & theRotateB = _myRotationMap[C4D_ROTATION_Z];
@@ -223,13 +223,13 @@ AnimationExporter::exportRotationAnimation(const std::string & theNodeId,
     float myFps = _myDocument->GetFps();
     myAnimationBuilder.setDuration(myValues.size() / myFps);
     if (theClipBuilder) {
-        theClipBuilder->appendAnimation(myAnimationBuilder);                
+        theClipBuilder->appendAnimation(myAnimationBuilder);
     }
 
     return true;
 }
 
-bool 
+bool
 AnimationExporter::WriteCurve(CCurve* theCurve, std::vector<float> & theValues, bool theInverseFlag)
 {
      LONG myKeyCount = theCurve->GetKeyCount();

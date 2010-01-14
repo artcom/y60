@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -99,7 +99,7 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
     var _myBlurXRenderArea = null;
     var _myBlurYRenderArea = null;
 
-    var _myBufferBits = null; 
+    var _myBufferBits = null;
     const OFFSCREEN_RESOLUTION_RATIO = 4;
 
     obj.getEnabled = function() {
@@ -155,7 +155,7 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
                 //_myOffscreenRenderArea.downloadFromViewport(_myDebugImage); // XXX must be given a texture node
                 saveImage(_myDebugImage, "debug.png");
             }
- 
+
             // render blur_x
             _myBlurXOverlay.visible = true;
             _myBlurXRenderArea.activate();
@@ -186,7 +186,7 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
         window.render();
         window.postRender();
         window.swapBuffers();
-        
+
         window.scene.world.visible = true;
 
     }

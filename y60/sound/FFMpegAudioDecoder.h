@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -104,7 +104,7 @@ class Y60_SOUND_DECL FFMpegAudioDecoder: public IAudioDecoder
         virtual asl::Time getDuration() const;
         std::string getName() const;
         virtual void setSampleSink(asl::ISampleSink* mySampleSink);
-        virtual unsigned getCurFrame() const; 
+        virtual unsigned getCurFrame() const;
         virtual void decodeEverything();
 
         virtual bool isSyncDecoder() const;
@@ -116,7 +116,7 @@ class Y60_SOUND_DECL FFMpegAudioDecoder: public IAudioDecoder
 
          // avcodec open/close must be protected by locks
         asl::ThreadLock _myAVCodecLock;
-        
+
         std::string _myURI;
         AVFormatContext * _myFormatContext;
 
@@ -126,7 +126,7 @@ class Y60_SOUND_DECL FFMpegAudioDecoder: public IAudioDecoder
         unsigned _myNumChannels;
         ReSampleContext * _myResampleContext;
         asl::ISampleSink* _mySampleSink;
-        
+
         unsigned _myCurFrame;
 
 };
@@ -136,9 +136,9 @@ class FFMpegAudioDecoderFactory: public IAudioDecoderFactory
     public:
         FFMpegAudioDecoderFactory();
         virtual IAudioDecoder* tryCreateDecoder(const std::string& myURI);
-        virtual int getPriority() const; 
+        virtual int getPriority() const;
 };
 
 } // namespace
 
-#endif 
+#endif

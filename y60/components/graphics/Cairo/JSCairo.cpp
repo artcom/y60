@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -155,7 +155,7 @@ getTarget(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_END;
     cairo_t *myContext;
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myContext);
-    
+
     ensureParamCount(argc, 0);
 
     cairo_surface_t *myTarget = cairo_get_target(myContext);
@@ -323,13 +323,13 @@ getSource(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_END;
     cairo_t *myContext;
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myContext);
-    
+
     ensureParamCount(argc, 0);
 
     cairo_pattern_t *myPattern = cairo_get_source(myContext);
 
     *rval = as_jsval(cx, myPattern);
-    
+
     return checkForErrors(cx, myContext);
 }
 
@@ -629,9 +629,9 @@ clipPreserve(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 //    ensureParamCount(argc, 0);
 //
 //    double myX1, myY1, myX2, myY2;
-//    
+//
 //    cairo_clip_extents(myContext, &myX1, &myY1, &myX2, &myY2);
-//    
+//
 //    Vector4d myResult(myX1, myY1, myX2, myY2);
 //    *rval = as_jsval(cx, myResult);
 //
@@ -692,16 +692,16 @@ getFillExtents(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
     DOC_END;
     cairo_t *myContext;
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myContext);
-    
+
     ensureParamCount(argc, 0);
-    
+
     double myX1, myY1, myX2, myY2;
-    
+
     cairo_fill_extents(myContext, &myX1, &myY1, &myX2, &myY2);
-    
+
     Vector4d myResult(myX1, myY1, myX2, myY2);
     *rval = as_jsval(cx, myResult);
-    
+
     return JS_TRUE;
 }
 
@@ -738,8 +738,8 @@ mask(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     convertFrom(cx, argv[0], myPattern);
 
     cairo_mask(myContext, myPattern);
-    
-    return checkForErrors(cx, myContext);     
+
+    return checkForErrors(cx, myContext);
 }
 
 static JSBool
@@ -761,8 +761,8 @@ maskSurface(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
     convertFrom(cx, argv[2], mySurfaceY);
 
     cairo_mask_surface(myContext, mySurface, mySurfaceX, mySurfaceY);
-    
-    return checkForErrors(cx, myContext);     
+
+    return checkForErrors(cx, myContext);
 }
 
 static JSBool
@@ -775,8 +775,8 @@ paint(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     ensureParamCount(argc, 0);
 
     cairo_paint(myContext);
-    
-    return checkForErrors(cx, myContext); 
+
+    return checkForErrors(cx, myContext);
 }
 
 static JSBool
@@ -792,8 +792,8 @@ paintWithAlpha(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
     convertFrom(cx, argv[0], myAlpha);
 
     cairo_paint_with_alpha(myContext, myAlpha);
-    
-    return checkForErrors(cx, myContext); 
+
+    return checkForErrors(cx, myContext);
 }
 
 static JSBool
@@ -806,8 +806,8 @@ stroke(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     ensureParamCount(argc, 0);
 
     cairo_stroke(myContext);
-    
-    return checkForErrors(cx, myContext); 
+
+    return checkForErrors(cx, myContext);
 }
 
 static JSBool
@@ -830,16 +830,16 @@ getStrokeExtents(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
     DOC_END;
     cairo_t *myContext;
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myContext);
-    
+
     ensureParamCount(argc, 0);
-    
+
     double myX1, myY1, myX2, myY2;
-    
+
     cairo_stroke_extents(myContext, &myX1, &myY1, &myX2, &myY2);
-    
+
     Vector4d myResult(myX1, myY1, myX2, myY2);
     *rval = as_jsval(cx, myResult);
-    
+
     return JS_TRUE;
 }
 
@@ -917,7 +917,7 @@ arc(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
     double myX, myY, myRadius, myAngle1, myAngle2;
     ensureParamCount(argc, 5);
-    
+
     convertFrom(cx, argv[0], myX);
     convertFrom(cx, argv[1], myY);
     convertFrom(cx, argv[2], myRadius);
@@ -925,8 +925,8 @@ arc(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     convertFrom(cx, argv[4], myAngle2);
 
     cairo_arc(myContext, myX, myY, myRadius, myAngle1, myAngle2);
-    
-    return checkForErrors(cx, myContext); 
+
+    return checkForErrors(cx, myContext);
 }
 
 static JSBool
@@ -938,7 +938,7 @@ arcNegative(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
 
     double myX, myY, myRadius, myAngle1, myAngle2;
     ensureParamCount(argc, 5);
-    
+
     convertFrom(cx, argv[0], myX);
     convertFrom(cx, argv[1], myY);
     convertFrom(cx, argv[2], myRadius);
@@ -946,8 +946,8 @@ arcNegative(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
     convertFrom(cx, argv[4], myAngle2);
 
     cairo_arc_negative(myContext, myX, myY, myRadius, myAngle1, myAngle2);
-    
-    return checkForErrors(cx, myContext); 
+
+    return checkForErrors(cx, myContext);
 }
 
 static JSBool
@@ -959,7 +959,7 @@ curveTo(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
     double myX1, myY1, myX2, myY2, myX3, myY3;
     ensureParamCount(argc, 6);
-    
+
     convertFrom(cx, argv[0], myX1);
     convertFrom(cx, argv[1], myY1);
     convertFrom(cx, argv[2], myX2);
@@ -968,8 +968,8 @@ curveTo(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     convertFrom(cx, argv[5], myY3);
 
     cairo_curve_to(myContext, myX1, myY1, myX2, myY2, myX3, myY3);
-    
-    return checkForErrors(cx, myContext); 
+
+    return checkForErrors(cx, myContext);
 }
 
 static JSBool
@@ -981,13 +981,13 @@ lineTo(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
     double myX, myY;
     ensureParamCount(argc, 2);
-    
+
     convertFrom(cx, argv[0], myX);
     convertFrom(cx, argv[1], myY);
 
     cairo_line_to(myContext, myX, myY);
-    
-    return checkForErrors(cx, myContext); 
+
+    return checkForErrors(cx, myContext);
 }
 
 static JSBool
@@ -999,13 +999,13 @@ moveTo(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
     double myX, myY;
     ensureParamCount(argc, 2);
-    
+
     convertFrom(cx, argv[0], myX);
     convertFrom(cx, argv[1], myY);
 
     cairo_move_to(myContext, myX, myY);
-    
-    return checkForErrors(cx, myContext); 
+
+    return checkForErrors(cx, myContext);
 }
 
 static JSBool
@@ -1017,15 +1017,15 @@ rectangle(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
     double myX, myY, myWidth, myHeight;
     ensureParamCount(argc, 2);
-    
+
     convertFrom(cx, argv[0], myX);
     convertFrom(cx, argv[1], myY);
     convertFrom(cx, argv[2], myWidth);
     convertFrom(cx, argv[3], myHeight);
 
     cairo_rectangle(myContext, myX, myY, myWidth, myHeight);
-    
-    return checkForErrors(cx, myContext); 
+
+    return checkForErrors(cx, myContext);
 }
 
 // MISSING:
@@ -1041,20 +1041,20 @@ relCurveTo(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_END;
     cairo_t * myContext;
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myContext);
-   
+
     double myX1, myY1, myX2, myY2, myX3, myY3;
     ensureParamCount(argc, 6);
-    
+
     convertFrom(cx, argv[0], myX1);
     convertFrom(cx, argv[1], myY1);
     convertFrom(cx, argv[2], myX2);
     convertFrom(cx, argv[3], myY2);
     convertFrom(cx, argv[4], myX3);
     convertFrom(cx, argv[5], myY3);
-    
+
     cairo_rel_curve_to(myContext, myX1, myY1, myX2, myY2, myX3, myY3);
-    
-    return checkForErrors(cx, myContext); 
+
+    return checkForErrors(cx, myContext);
 }
 
 static JSBool
@@ -1066,13 +1066,13 @@ relLineTo(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
     double myX, myY;
     ensureParamCount(argc, 2);
-    
+
     convertFrom(cx, argv[0], myX);
     convertFrom(cx, argv[1], myY);
 
     cairo_rel_line_to(myContext, myX, myY);
-    
-    return checkForErrors(cx, myContext); 
+
+    return checkForErrors(cx, myContext);
 }
 
 static JSBool
@@ -1084,13 +1084,13 @@ relMoveTo(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
     double myX, myY;
     ensureParamCount(argc, 2);
-    
+
     convertFrom(cx, argv[0], myX);
     convertFrom(cx, argv[1], myY);
 
     cairo_rel_move_to(myContext, myX, myY);
-    
-    return checkForErrors(cx, myContext); 
+
+    return checkForErrors(cx, myContext);
 }
 
 //
@@ -1106,13 +1106,13 @@ translate(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
     double myX, myY;
     ensureParamCount(argc, 2);
-    
+
     convertFrom(cx, argv[0], myX);
     convertFrom(cx, argv[1], myY);
 
     cairo_translate(myContext, myX, myY);
-    
-    return checkForErrors(cx, myContext); 
+
+    return checkForErrors(cx, myContext);
 }
 
 static JSBool
@@ -1124,13 +1124,13 @@ scale(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
     double myX, myY;
     ensureParamCount(argc, 2);
-    
+
     convertFrom(cx, argv[0], myX);
     convertFrom(cx, argv[1], myY);
 
     cairo_scale(myContext, myX, myY);
-    
-    return checkForErrors(cx, myContext); 
+
+    return checkForErrors(cx, myContext);
 }
 
 static JSBool
@@ -1142,12 +1142,12 @@ rotate(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
     double myAngle;
     ensureParamCount(argc, 1);
-    
+
     convertFrom(cx, argv[0], myAngle);
 
     cairo_rotate(myContext, myAngle);
-    
-    return checkForErrors(cx, myContext); 
+
+    return checkForErrors(cx, myContext);
 }
 
 static JSBool
@@ -1361,8 +1361,8 @@ selectFontFace(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
     convertFrom(cx, argv[2], myWeight);
 
     cairo_select_font_face(myContext, myFamily.c_str(), (cairo_font_slant_t)mySlant, (cairo_font_weight_t)myWeight);
-    
-    return checkForErrors(cx, myContext);     
+
+    return checkForErrors(cx, myContext);
 }
 
 static JSBool
@@ -1411,8 +1411,8 @@ showText(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     convertFrom(cx, argv[0], myText);
 
     cairo_show_text(myContext, myText.c_str());
-    
-    return checkForErrors(cx, myContext);     
+
+    return checkForErrors(cx, myContext);
 }
 
 // void        cairo_show_glyphs               (cairo_t *cr,
@@ -1435,7 +1435,7 @@ JSCairo::Functions() {
     static JSFunctionSpec myFunctions[] = {
         // name                  native                   nargs
         {"toString",             toString,                0},
-        
+
         // Drawing: cairo_t
         {"save",                 save,                    0},
         {"restore",              restore,                 0},
@@ -1496,10 +1496,10 @@ JSCairo::Functions() {
 
         // Drawing: Paths
         {"arc",                  arc,                     0},
-        {"arcNegative",          arcNegative,             0}, 
+        {"arcNegative",          arcNegative,             0},
         {"curveTo",              curveTo,                 0},
         {"lineTo",               lineTo,                  0},
-        {"moveTo",               moveTo,                  0}, 
+        {"moveTo",               moveTo,                  0},
         {"rectangle",            rectangle,               0},
         {"relCurveTo",           relCurveTo,              0},
         {"relLineTo",            relLineTo,               0},
@@ -1625,7 +1625,7 @@ JSCairo::ConstIntProperties() {
 
         {"FILL_RULE_WINDING",  PROP_FILL_RULE_WINDING,  CAIRO_FILL_RULE_WINDING},
         {"FILL_RULE_EVEN_ODD", PROP_FILL_RULE_EVEN_ODD, CAIRO_FILL_RULE_EVEN_ODD},
-        
+
         {"LINE_CAP_BUTT",      PROP_LINE_CAP_BUTT,      CAIRO_LINE_CAP_BUTT},
         {"LINE_CAP_ROUND",     PROP_LINE_CAP_ROUND,     CAIRO_LINE_CAP_ROUND},
         {"LINE_CAP_SQUARE",    PROP_LINE_CAP_SQUARE,    CAIRO_LINE_CAP_SQUARE},
@@ -1660,7 +1660,7 @@ JSCairo::ConstIntProperties() {
 
         {"FONT_WEIGHT_NORMAL", PROP_FONT_WEIGHT_NORMAL,         CAIRO_FONT_WEIGHT_NORMAL},
         {"FONT_WEIGHT_BOLD",   PROP_FONT_WEIGHT_BOLD,           CAIRO_FONT_WEIGHT_BOLD},
-        
+
         {"SUBPIXEL_ORDER_DEFAULT", PROP_SUBPIXEL_ORDER_DEFAULT, CAIRO_SUBPIXEL_ORDER_DEFAULT},
         {"SUBPIXEL_ORDER_RGB",     PROP_SUBPIXEL_ORDER_RGB,     CAIRO_SUBPIXEL_ORDER_RGB},
         {"SUBPIXEL_ORDER_BGR",     PROP_SUBPIXEL_ORDER_BGR,     CAIRO_SUBPIXEL_ORDER_BGR},

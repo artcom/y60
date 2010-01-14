@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -87,13 +87,13 @@ append(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     try {
         Gtk::Toolbar * myNative;
         convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
-        
+
         Gtk::ToolItem * myItem(0);
         convertFrom(cx, argv[0], myItem);
 
         myNative->append( * myItem);
         return JS_TRUE;
-        
+
     } HANDLE_CPP_EXCEPTION;
 }
 

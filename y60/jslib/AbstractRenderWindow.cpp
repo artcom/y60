@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -103,7 +103,7 @@ _myMultisamples(0),
 _myElapsedTime(0.0),
 _myVisiblityFlag(true),
 _myFixedDeltaT(0.0),
-_myStartTime(-1.0), 
+_myStartTime(-1.0),
 _myPauseTime(0.0),
 _myPauseFlag(false),
 _myForceFullGC(false)
@@ -370,12 +370,12 @@ AbstractRenderWindow::getPause() const {
     return _myPauseFlag;
 }
 
-void 
+void
 AbstractRenderWindow::setForceFullGC(bool theForceFullGC) {
     _myForceFullGC = theForceFullGC;
 }
 
-bool 
+bool
 AbstractRenderWindow::getForceFullGC() const {
     return _myForceFullGC;
 }
@@ -897,11 +897,11 @@ AbstractRenderWindow::onButton(y60::Event & theEvent) {
     }
 }
 
-void 
+void
 AbstractRenderWindow::onGenericEvent(y60::Event & theEvent) {
     y60::GenericEvent & myEvent = dynamic_cast<y60::GenericEvent&>( theEvent );
     dom::NodePtr myEventNode = myEvent.asNode();
-    std::string myCallback( myEventNode->getAttribute("callback") ? 
+    std::string myCallback( myEventNode->getAttribute("callback") ?
         myEventNode->getAttributeValue<std::string>("callback") : "onEvent");
     if (_myEventListener ) {
         if (JSA_hasFunction(_myJSContext, _myEventListener, myCallback.c_str())) {
@@ -1028,7 +1028,7 @@ AbstractRenderWindow::performRequest(const jslib::JSRequestPtr & theRequest) {
 void AbstractRenderWindow::renderText(const asl::Vector2f & thePixelPosition, const std::string & theString,
                                       const std::string & theFont, const y60::ViewportPtr & theViewport)
 {
-    asl::Vector2f myRelativePosition(thePixelPosition[0] / (getWidth() * theViewport->get<Size2DTag>()[0]), 
+    asl::Vector2f myRelativePosition(thePixelPosition[0] / (getWidth() * theViewport->get<Size2DTag>()[0]),
         thePixelPosition[1] / (getHeight() * theViewport->get<Size2DTag>()[1]));
     _myRenderer->getTextManager().addText(myRelativePosition, theString, theFont, theViewport);
 }

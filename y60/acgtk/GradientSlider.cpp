@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -82,7 +82,7 @@ GradientSlider::GradientSlider() :
 GradientSlider::~GradientSlider() {
 }
 
-bool 
+bool
 GradientSlider::on_expose_event(GdkEventExpose * theEvent) {
     DrawingArea::on_expose_event(theEvent);
     _myWindow->clear();
@@ -95,7 +95,7 @@ GradientSlider::on_expose_event(GdkEventExpose * theEvent) {
             int myXStart = convertValueToScreenPos(float(mySelectedCenter) - 0.25f * float(mySelectedWidth));
             int myXEnd = convertValueToScreenPos(float(mySelectedCenter) + 0.25f * float(mySelectedWidth));
 
-            _myWindow->draw_rectangle(get_style()->get_dark_gc(get_state()), true, myXStart, 0, 
+            _myWindow->draw_rectangle(get_style()->get_dark_gc(get_state()), true, myXStart, 0,
                     myXEnd - myXStart, get_allocation().get_height());
 
         }
@@ -117,7 +117,7 @@ GradientSlider::on_expose_event(GdkEventExpose * theEvent) {
     return true;
 }
 
-void 
+void
 GradientSlider::drawMarker(float thePosition, Glib::RefPtr<Gdk::GC> theBackgroundGC,
                     Glib::RefPtr<Gdk::GC> theOutlineGC )
 {
@@ -136,7 +136,7 @@ GradientSlider::drawMarker(float thePosition, Glib::RefPtr<Gdk::GC> theBackgroun
     }
 }
 
-bool 
+bool
 GradientSlider::on_button_press_event(GdkEventButton * theEvent) {
     if (_mySelectedColor) {
         int myCenter = _mySelectedColor->getAttributeValue<int>("value");
@@ -167,7 +167,7 @@ GradientSlider::on_button_press_event(GdkEventButton * theEvent) {
     return true;
 }
 
-bool 
+bool
 GradientSlider::on_button_release_event(GdkEventButton * theEvent) {
     if (_myState == CHANGE_SELECTION && _mySelectionCandidate) {
         int myCenter = _mySelectionCandidate->getAttributeValue<int>("value");
@@ -183,7 +183,7 @@ GradientSlider::on_button_release_event(GdkEventButton * theEvent) {
     return true;
 }
 
-bool 
+bool
 GradientSlider::on_motion_notify_event(GdkEventMotion * theEvent) {
     if (_mySelectedColor) {
         int myValue = int( convertScreenPosToValue(int(theEvent->x)));
@@ -231,7 +231,7 @@ GradientSlider::on_motion_notify_event(GdkEventMotion * theEvent) {
     return true;
 }
 
-void 
+void
 GradientSlider::on_realize() {
     Gtk::DrawingArea::on_realize();
     _myWindow = get_window();
@@ -252,19 +252,19 @@ GradientSlider::getSelectedColor() const {
     return _mySelectedColor;
 }
 
-void 
+void
 GradientSlider::setTransferFunction(dom::NodePtr theTransferFunction) {
     _myTransferFunction = theTransferFunction;
     setSelectedColor(dom::NodePtr());
     queue_draw();
 }
 
-dom::NodePtr 
+dom::NodePtr
 GradientSlider::getTransferFunction() const {
     return _myTransferFunction;
 }
 
-void 
+void
 GradientSlider::setValueRange(const asl::Vector2f & theValueRange) {
     _myValueRange = theValueRange;
     queue_draw();
@@ -275,13 +275,13 @@ GradientSlider::getValueRange() const {
     return _myValueRange;
 }
 
-int 
+int
 GradientSlider::convertValueToScreenPos(const float & theValue) {
     int myWidth = get_allocation().get_width();
     return int((theValue - _myValueRange[0])* float(myWidth) / (_myValueRange[1] - _myValueRange[0]));
 }
 
-float 
+float
 GradientSlider::convertScreenPosToValue(const int & theScreenPos) {
     int myWidth = get_allocation().get_width();
     return (theScreenPos * (_myValueRange[1] - _myValueRange[0]) / myWidth) + _myValueRange[0];
@@ -299,4 +299,4 @@ GradientSlider::intersectWithMarker(GdkEventButton * theEvent, int theMarkerPos)
 }
 
 
-} // end of namespace 
+} // end of namespace

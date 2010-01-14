@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -84,9 +84,9 @@ namespace y60 {
                     _myPropertyNodes.clear();
                     unsigned mySize = getNode().childNodesLength();
 					for (unsigned i = 0; i < mySize; ++i) {
-						dom::NodePtr myNode = getNode().childNode(i); 
+						dom::NodePtr myNode = getNode().childNode(i);
 						if (myNode->nodeType() == dom::Node::ELEMENT_NODE &&
-                            myNode->nodeName() != "#comment") 
+                            myNode->nodeName() != "#comment")
                         {
                             std::string myName = myNode->getAttributeString(NAME_ATTRIB);
 							if (_myPropertyNodes.find(myName) == _myPropertyNodes.end()) {

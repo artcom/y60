@@ -19,7 +19,7 @@ namespace tuttle {
 
         bool_t launch(void);
         bool_t shutdown(void);
-	
+
 	void execute(Command *theCommand);
 
 #define CLISH_BUILTIN(name, symbol)                               \
@@ -35,7 +35,7 @@ namespace tuttle {
 
     private:
         Debugger  &_myDebugger;
-        
+
         JSContext *_myContext;
         JSObject  *_myGlobal;
 

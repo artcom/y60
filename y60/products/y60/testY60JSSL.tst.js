@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 
@@ -89,7 +89,7 @@ Y60JSSLUnitTest.prototype.Constructor = function(obj, theName) {
     function testRemoveAttribute() {
         DTITLE("removing attributes");
 
-        var myNode = Node.createElement("testNode");        
+        var myNode = Node.createElement("testNode");
         myNode.test = "testval";
         myNode.test2 = "testval2";
         var myAttributeCount = myNode.attributes.length;
@@ -112,13 +112,13 @@ Y60JSSLUnitTest.prototype.Constructor = function(obj, theName) {
         ENSURE( 'degBetween(0,0) == 0');
         ENSURE( 'degBetween(0, 90) == -90 ' );
         ENSURE( 'degBetween(90, 0) == 90 ' );
-        
+
         ENSURE( 'degBetween(370, 350) == 20 ' );
         ENSURE( 'degBetween(10, 350) == 20 ' );
-        
+
         ENSURE( 'degBetween(350, 370) == -20 ' );
         ENSURE( 'degBetween(350, 10) == -20 ' );
-        
+
         ENSURE( 'degBetween(190, 170) == 20 ' );
         ENSURE( 'degBetween(170, 190) == -20 ' );
     }

@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -76,7 +76,7 @@ Trackball.prototype.Constructor = function(obj) {
         var prevVector = projectOnSphere(thePrevMousePos);
         var curVector = projectOnSphere(theCurMousePos);
         var moveRotation = getRotationFromMove(prevVector,curVector);
-        
+
         _curQuat = product(moveRotation, _curQuat);
     }
 
@@ -99,14 +99,14 @@ Trackball.prototype.Constructor = function(obj) {
         var dsqr = theVector.x * theVector.x + theVector.y * theVector.y;
         var myProjectedVector = new Vector3f(theVector.x, theVector.y, 0);
         // if relatively "inside" sphere project to sphere else on hyperbolic sheet
-        if(dsqr<(rsqr*0.5))	{ 
+        if(dsqr<(rsqr*0.5))	{
             myProjectedVector.z = Math.sqrt(rsqr-dsqr);
         } else {
             myProjectedVector.z = rsqr/(2*Math.sqrt(dsqr));
         }
         return myProjectedVector;
     }
-    
+
 	function getRotationFromMove ( theVector0, theVector1 ) {
         // calculate axis of rotation and correct it to avoid "near zero length" rot axis
 		var myRotAxis = cross(theVector1, theVector0);
@@ -118,7 +118,7 @@ Trackball.prototype.Constructor = function(obj) {
 		var t = magnitude(d) /(2.0*_mySphereRadius);
 		t = clamp(t,-1.0,1.0);
 		var phi = 2.0 * Math.asin(t);
-		return new Quaternionf(myRotAxis, phi); 
+		return new Quaternionf(myRotAxis, phi);
 	}
 }
 

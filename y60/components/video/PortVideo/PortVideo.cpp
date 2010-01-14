@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -74,7 +74,7 @@ using namespace asl;
 
 namespace y60 {
 
-    PortVideo::PortVideo(asl::DLHandle theDLHandle) : 
+    PortVideo::PortVideo(asl::DLHandle theDLHandle) :
         PlugInBase(theDLHandle), PosixThread(),
         _myCamera(NULL), _mySourceDepth(24), _myDestDepth(24),
         //_mySourceBuffer(NULL),
@@ -83,12 +83,12 @@ namespace y60 {
         _myBytesPerSourcePixel(_mySourceDepth/8), _myBytesPerDestPixel(_myDestDepth/8),
         _myIsRunning(false),
         _async(false)
-    { 
+    {
     }
 
     PortVideo::~PortVideo() {
         freeBuffers();
-        
+
         _myCamera->closeCamera();
         delete _myCamera;
     }
@@ -98,16 +98,16 @@ namespace y60 {
     }
 
     bool PortVideo::setupCamera() {
-        _myCamera = cameraTool::findCamera();	
+        _myCamera = cameraTool::findCamera();
         if (_myCamera == NULL) {
             return false;
         }
-    
+
         bool myColor = false;
         if (_mySourceDepth==24) {
             myColor = true;
         }
-        
+
         bool mySuccess = _myCamera->initCamera(_myWidth, _myHeight, myColor);
 
         if(mySuccess) {
@@ -127,36 +127,36 @@ namespace y60 {
 
     void PortVideo::allocateBuffers() {
         AC_INFO << "Allocating buffers";
-        _myBytesPerSourcePixel = _mySourceDepth/8;	
+        _myBytesPerSourcePixel = _mySourceDepth/8;
         _myBytesPerDestPixel = _myDestDepth/8;
         //_mySourceBuffer = new unsigned char[_myWidth*_myHeight*_myBytesPerSourcePixel];
         //_myDestBuffer = new unsigned char[_myWidth*_myHeight*_myBytesPerDestPixel];
         //_myCameraBuffer = NULL;
-        
+
         AC_DEBUG << "Allocating ringbuffer w="<<_myWidth <<",h="<<_myHeight<<" bypp="<< _myBytesPerSourcePixel;
         _myRingBuffer = new RingBuffer(_myWidth*_myHeight*_myBytesPerSourcePixel);
         AC_DEBUG << "buffer allocation done.";
     }
-  
+
     void PortVideo::run() {
         unsigned char * myCameraBuffer = NULL;
         unsigned char * myCameraWriteBuffer = NULL;
         AC_DEBUG << "PortVideo::run()";
-	    
-        while (_myCamera) {	
+
+        while (_myCamera) {
             if (_myIsRunning && _myRingBuffer) {
                 _myLock.lock();
                 AC_DEBUG << "PortVideo::run() cam->getFrame()";
                 myCameraBuffer = _myCamera->getFrame();
                 AC_DEBUG << "PortVideo::run() cam->getFrame() returned "<<(void*)myCameraBuffer;
-                
+
                 if (myCameraBuffer != NULL) {
                     myCameraWriteBuffer = _myRingBuffer->getNextBufferToWrite();
                     if (myCameraWriteBuffer != NULL) {
                         memcpy(myCameraWriteBuffer, myCameraBuffer, _myRingBuffer->size());
                         _myRingBuffer->writeFinished();
                     }
-                } 
+                }
                 _myLock.unlock();
                 msleep(10);
             }
@@ -166,9 +166,9 @@ namespace y60 {
 
     void PortVideo::readFrame(dom::ResizeableRasterPtr theTargetRaster) {
         AC_DEBUG << "PortVideo: reading frame";
-        
+
         unsigned char * myCameraReadBuffer = NULL;
-        
+
 		// loop until we get access to a frame
 		myCameraReadBuffer = _myRingBuffer->getNextBufferToRead();
         if (_async && !myCameraReadBuffer) {
@@ -183,14 +183,14 @@ namespace y60 {
             AC_ERROR << "target raster and video-in buffer size mismatch, targetraster="<<theTargetRaster->pixels().size()
                      <<", in-buffer ="<<_myRingBuffer->size();
             throw BufferSizeMismatch(JUST_FILE_LINE);
-        }	
-	
+        }
+
 		// try again if we can get a more recent frame
 		do {
 			memcpy(theTargetRaster->pixels().begin(), myCameraReadBuffer, _myRingBuffer->size());
 			_myRingBuffer->readFinished();
 			myCameraReadBuffer = _myRingBuffer->getNextBufferToRead();
-		} while( myCameraReadBuffer != NULL ); 
+		} while( myCameraReadBuffer != NULL );
     }
 
     void PortVideo::load(const std::string & theFilename) {
@@ -260,7 +260,7 @@ namespace y60 {
         }
         idx = theFilename.find("deinterlace=");
         if (idx != std::string::npos && theFilename.substr(idx+12).length() > 0) {
-            _myDeinterlaceFlag = asl::as_int(theFilename.substr(idx+12)) == 1 ? true:false;            
+            _myDeinterlaceFlag = asl::as_int(theFilename.substr(idx+12)) == 1 ? true:false;
         }
 #endif
         if(setupCamera()) {
@@ -272,7 +272,7 @@ namespace y60 {
     }
 
     std::string PortVideo::canDecode(const std::string & theUrl, asl::Ptr<asl::ReadableStreamHandle> theStream) {
-        AC_DEBUG << "PortVideo::canDecode: theUrl=" << theUrl << ", theStream = " << (void*)theStream.getNativePtr(); 
+        AC_DEBUG << "PortVideo::canDecode: theUrl=" << theUrl << ", theStream = " << (void*)theStream.getNativePtr();
         if (theUrl.find("portvideo://") != std::string::npos) {
             return MIME_TYPE_CAMERA;
         } else {
@@ -285,20 +285,20 @@ namespace y60 {
     }
 
     void PortVideo::stopCapture() {
-        _myIsRunning = true; 
+        _myIsRunning = true;
 		_myCamera->stopCamera();
         CaptureDevice::stopCapture();
     }
-    
+
     void PortVideo::startCapture() {
         AC_INFO << "startCapture";
         _myCamera->startCamera();
         CaptureDevice::startCapture();
-        _myIsRunning = true; 
+        _myIsRunning = true;
     }
 
     void PortVideo::pauseCapture() {
-        _myIsRunning = false; 
+        _myIsRunning = false;
         CaptureDevice::pauseCapture();
     }
 }

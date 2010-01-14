@@ -19,14 +19,14 @@ namespace tuttle {
                 const lub_argv_t    *theArguments,
                 JSTrapStatus        *theTrapStatus);
 
-    class Command {        
+    class Command {
     public:
 
         Command(Builtin  theBuiltin,
                 Shell   *theShell,
                 const clish_shell_t *theClish,
                 const lub_argv_t *theArguments);
-        
+
         bool execute(JSTrapStatus *theTrapStatus);
 
     private:

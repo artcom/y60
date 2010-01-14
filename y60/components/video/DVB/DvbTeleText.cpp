@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -101,12 +101,12 @@ DvbTeleText::DvbTeleText(const string & theDemuxDeviceName)
     , _myPid(0)
     , _myChannelHasLock(false)
 {
-    
+
 }
 
 DvbTeleText::~DvbTeleText()
 {
-    
+
 }
 
 void
@@ -131,7 +131,7 @@ DvbTeleText::run(){
         }
 
         set_filter();
-    
+
         while (!shouldTerminate()){
             processStream();
         }
@@ -143,7 +143,7 @@ DvbTeleText::run(){
 void
 DvbTeleText::startDecoderThread(const int & thePid){
     _myPid = thePid;
-    
+
     if(!isActive()) {
         fork();
     }
@@ -176,13 +176,13 @@ DvbTeleText::getPage(const unsigned thePageNumber) {
 void
 DvbTeleText::set_filter(){
     struct dmx_pes_filter_params f;
-    
+
     f.pid = _myPid;
     f.input = DMX_IN_FRONTEND;
     f.output = DMX_OUT_TAP;
     f.pes_type = DMX_PES_OTHER; /* DMX_PES_TELETEXT if you want vbi insertion */
     f.flags = DMX_IMMEDIATE_START;
-    
+
     if (ioctl(_myDemuxFd, DMX_SET_PES_FILTER, &f) == -1) {
         throw(DvbTeleTextException("Error doing ioctl DMX_SET_PES_FILTER" , PLUS_FILE_LINE));
     }
@@ -209,7 +209,7 @@ DvbTeleText::processStream(){
     // main loop for through the videotext data
     unsigned char buf[MAX_PES_SIZE];
     int i, plen, hlen, sid, lines, l;
-    
+
     // search for start of next PES data block 0x000001bd
     for (;;) {
         safe_read(buf, 1);
@@ -224,40 +224,40 @@ DvbTeleText::processStream(){
         safe_read(buf, 1);
         if (buf[0] == 0xbd)
             break;
-    } 
-    
+    }
+
     safe_read(buf, 5);
-    
-    // PES packet length 
+
+    // PES packet length
     plen = ((buf[0] << 8) | buf[1]) & 0xffff;
-    
-    // PES header data length 
+
+    // PES header data length
     hlen = buf[4];
     if (hlen != 0x24) {
         throw(DvbTeleTextException("PES header data length != 0x24", PLUS_FILE_LINE));
-    } 
-    
+    }
+
     // skip rest of PES header
     safe_read(buf, hlen);
-    
-    // read stream ID 
+
+    // read stream ID
     safe_read(buf, 1);
     sid = buf[0];
     if (sid < 0x10 || sid > 0x1f) {
         throw(DvbTeleTextException("non-EBU stream ID", PLUS_FILE_LINE));
     }
-    
-    // number of VBI lines 
+
+    // number of VBI lines
     lines = (plen + 6) / 46 - 1;
-    
-    // read VBI data 
+
+    // read VBI data
     for (l = 0; l < lines-2; l++) {
 
         safe_read(buf, 46);
         if (buf[1] != 44) {
             throw(DvbTeleTextException("VBI line has invalid length", PLUS_FILE_LINE));
         }
-        
+
         // framing code, should be 11100100b
         // if (buf[3] != 0x27) {
         //     fprintf(stderr, "error: wrong framing code\n");
@@ -285,7 +285,7 @@ DvbTeleText::processStream(){
             bool isSet = buf[5] & (1 << (bc*2));
             myRowNumber |= (isSet << (3-bc));
         }
-         
+
         // parse header
         if (myRowNumber == 0) {
             if (_myCurrentPageBuffer.size()){
@@ -293,16 +293,16 @@ DvbTeleText::processStream(){
                 _myTeleTextBuffer[_myCurrentPageNumber] = _myCurrentPageBuffer;
                 _myCurrentPageBuffer.clear();
             }
-            
+
             int myPageUnits = 0;
             int myPageTens  = 0;
-            
-            // buf[6] page number 
+
+            // buf[6] page number
             for (int bc = 0; bc < 4; bc++) {
                 bool isSet = buf[6] & (1 << (bc*2));
                 myPageUnits |= (isSet << (3-bc));
             }
-            
+
             for (int bc = 0; bc < 4; bc++) {
                 bool isSet = buf[7] & (1 << (bc*2));
                 myPageTens |= (isSet << (3-bc));
@@ -310,13 +310,13 @@ DvbTeleText::processStream(){
 
             _myCurrentPageNumber = 100*myMagazineNumber + 10*myPageTens + myPageUnits;
         } else {
-            if (myMagazineNumber == (_myCurrentPageNumber/100)) { 
-                // bit twiddling 
+            if (myMagazineNumber == (_myCurrentPageNumber/100)) {
+                // bit twiddling
                 for (i = 7; i < 46; i++) {
                     _myCurrentPageBuffer.append(1, Unsigned16(::reverse[buf[i]]));
                 }
-               
-                _myCurrentPageBuffer.append(1, Unsigned16(0x0A)); // line feed 
+
+                _myCurrentPageBuffer.append(1, Unsigned16(0x0A)); // line feed
             }
         }
     }

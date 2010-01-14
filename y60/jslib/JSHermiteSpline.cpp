@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -69,7 +69,7 @@ namespace jslib {
 
     template <>
     struct JSClassTraits<asl::Hermite >
-    : public JSClassTraitsWrapper<asl::Hermite, JSHermiteSpline> 
+    : public JSClassTraitsWrapper<asl::Hermite, JSHermiteSpline>
     {
     };
 
@@ -89,12 +89,12 @@ namespace jslib {
             return JS_FALSE;
         }
 
-        if (argc == 4) {           
+        if (argc == 4) {
             std::vector<float> x, y;
             asl::HermiteInitMode initMode;
             std::string initModeString;
-            bool ascendOnly;                        
-            
+            bool ascendOnly;
+
             if (JSVAL_IS_VOID(argv[0]) || !convertFrom(cx, argv[0], x)) {
                 JS_ReportError(cx, "JSHermiteSpline: argument #1 must be an array of floats");
                 return JS_FALSE;
@@ -104,14 +104,14 @@ namespace jslib {
                 return JS_FALSE;
             }
             if (JSVAL_IS_VOID(argv[2]) || !convertFrom(cx, argv[2], initModeString)) {
-                JS_ReportError(cx, "JSHermiteSpline: argument #3 must be a string");                
+                JS_ReportError(cx, "JSHermiteSpline: argument #3 must be a string");
                 return JS_FALSE;
             }
             if (JSVAL_IS_VOID(argv[3]) || !convertFrom(cx, argv[3], ascendOnly)) {
                 JS_ReportError(cx, "JSHermiteSpline: argument #4 must be a bool");
                 return JS_FALSE;
-            }           
-            
+            }
+
             if(initModeString == "catmull_rom") {
                 initMode = asl::catmull_rom;
             } else if(initModeString == "weighted_ratio") {
@@ -122,9 +122,9 @@ namespace jslib {
                 initMode = asl::minimize_fluctuations;
             } else {
                 JS_ReportError(cx, "JSHermiteSpline: unsupported initMode");
-                return JS_FALSE;                        
-            }                        
-            
+                return JS_FALSE;
+            }
+
             myNative->init(x, y, initMode, ascendOnly);
             return JS_TRUE;
         }
@@ -137,9 +137,9 @@ namespace jslib {
     evaluate(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
     {
         DOC_BEGIN("Calculate y from x on the Spline.");
-        DOC_PARAM("theCurveParameter", "Position along the curve.", DOC_TYPE_FLOAT);     
+        DOC_PARAM("theCurveParameter", "Position along the curve.", DOC_TYPE_FLOAT);
         DOC_PARAM_OPT("order", "order of derivative", DOC_TYPE_INTEGER, 0);
-        DOC_RVAL("Point on Spline.", DOC_TYPE_FLOAT);        
+        DOC_RVAL("Point on Spline.", DOC_TYPE_FLOAT);
         DOC_END;
 
         if (argc < 1) {
@@ -167,7 +167,7 @@ namespace jslib {
                     JS_ReportError(cx, "JSHermiteSpline: argument #2 must be an int");
                     return JS_FALSE;
                 }
-            }            
+            }
             *rval = as_jsval(cx, myNative->evaluate(myCurveParameter, order));
             return JS_TRUE;
         } HANDLE_CPP_EXCEPTION;
@@ -259,7 +259,7 @@ namespace jslib {
             JS_ReportError(cx, "Constructor for %s: bad number of arguments: expected 0, got %d", ClassName(), argc);
             return JS_FALSE;
         }
-        
+
         if (myNewObject) {
             JS_SetPrivate(cx, obj, myNewObject);
             return JS_TRUE;

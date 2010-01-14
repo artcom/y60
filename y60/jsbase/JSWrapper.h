@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -561,7 +561,7 @@ struct Method {
             RESULT_TYPE myResult;
 
             if (convertFrom(cx, argv[0], myArg0)) {
-                if (convertFrom(cx, argv[1], myArg1)) { 
+                if (convertFrom(cx, argv[1], myArg1)) {
                     if (convertFrom(cx, argv[2], myArg2)) {
                         typename JSClassTraits<CLASS>::ScopedNativeRef myObj(cx, obj);
                         if (((myObj.getNative()).*theMethod)(myArg0, myArg1, myArg2, myResult)) {
@@ -644,7 +644,7 @@ public:
         return myJSWrapper;
     }
     virtual const void * getNativeAdress() const = 0;
-    virtual ~JSWrapperBase() {}; 
+    virtual ~JSWrapperBase() {};
 };
 
 
@@ -661,36 +661,36 @@ public:
 
     static
     JSWrapper * getJSWrapperPtr(JSContext *cx, JSObject *obj);
-    
+
     static
     JSWrapper & getJSWrapper(JSContext *cx, JSObject *obj);
 
-    static void finalizeImpl(JSContext *cx, JSObject *obj); 
+    static void finalizeImpl(JSContext *cx, JSObject *obj);
 
-    virtual unsigned long length() const; 
+    virtual unsigned long length() const;
 
-    virtual JSBool getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, 
-            jsval id, jsval *vp); 
-
-    virtual JSBool getPropertyIndex(unsigned long theIndex, JSContext *cx, JSObject *obj, 
-            jsval id, jsval *vp); 
-
-    virtual JSBool getPropertyByNumericId(unsigned long theID, JSContext *cx, JSObject *obj, 
+    virtual JSBool getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj,
             jsval id, jsval *vp);
 
-    virtual JSBool getPropertyByLiteralId(const std::string & theID, JSContext *cx, 
+    virtual JSBool getPropertyIndex(unsigned long theIndex, JSContext *cx, JSObject *obj,
+            jsval id, jsval *vp);
+
+    virtual JSBool getPropertyByNumericId(unsigned long theID, JSContext *cx, JSObject *obj,
+            jsval id, jsval *vp);
+
+    virtual JSBool getPropertyByLiteralId(const std::string & theID, JSContext *cx,
             JSObject *obj, jsval id, jsval *vp);
 
-    virtual JSBool setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, 
-            jsval id, jsval *vp);
-    
-    virtual JSBool setPropertyIndex(unsigned long theIndex, JSContext *cx, JSObject *obj, 
+    virtual JSBool setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj,
             jsval id, jsval *vp);
 
-    virtual JSBool setPropertyByNumericId(unsigned long theID, JSContext *cx, JSObject *obj, 
+    virtual JSBool setPropertyIndex(unsigned long theIndex, JSContext *cx, JSObject *obj,
             jsval id, jsval *vp);
 
-    virtual JSBool setPropertyByLiteralId(const std::string & theID, JSContext *cx, 
+    virtual JSBool setPropertyByNumericId(unsigned long theID, JSContext *cx, JSObject *obj,
+            jsval id, jsval *vp);
+
+    virtual JSBool setPropertyByLiteralId(const std::string & theID, JSContext *cx,
             JSObject *obj, jsval id, jsval *vp);
 
     static JSFunctionSpec * Functions() {
@@ -706,7 +706,7 @@ public:
 // which is being closed, even in case of exceptions between open and close
 public:
     virtual NATIVE & openNative();
-    virtual void closeNative(); 
+    virtual void closeNative();
 
 public:
     class WritableNative {
@@ -725,7 +725,7 @@ public:
             NATIVE & _myNative;
             JSWrapper * _myWrapper;
     };
-    
+
     virtual const void * getNativeAdress() const {
         return &getNative();
     }
@@ -736,12 +736,12 @@ public:
 
     static JSBool
     getProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp);
-    
+
     static JSBool
     setProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp);
 
     static JSBool
-    newResolve(JSContext *cx, JSObject *obj, jsval id, uintN flags, JSObject **objp); 
+    newResolve(JSContext *cx, JSObject *obj, jsval id, uintN flags, JSObject **objp);
 
     class JSClassSingleton :
         public asl::Singleton<JSClassSingleton>
@@ -756,16 +756,16 @@ public:
         }
         std::vector<JSFunctionSpec> & getMethodsRef() {
             return myMethods;
-        } 
+        }
         std::vector<JSPropertySpec> & getPropertiesRef() {
-            return  myProperties; 
+            return  myProperties;
         }
         std::vector<JSFunctionSpec> & getStaticFunctionsRef() {
             return myStaticFunctions;
-        } 
+        }
         std::vector<JSPropertySpec> & getStaticPropertiesRef() {
             return myStaticProperties;
-        } 
+        }
      private:
         JSClassSingleton() {
             JSClass myTempClass = {
@@ -807,25 +807,25 @@ public:
         }
     private:
         JSClass _myJSClass;
-        std::vector<JSFunctionSpec> myMethods; 
-        std::vector<JSPropertySpec> myProperties; 
-        std::vector<JSFunctionSpec> myStaticFunctions; 
-        std::vector<JSPropertySpec> myStaticProperties; 
+        std::vector<JSFunctionSpec> myMethods;
+        std::vector<JSPropertySpec> myProperties;
+        std::vector<JSFunctionSpec> myStaticFunctions;
+        std::vector<JSPropertySpec> myStaticProperties;
     }; // end JSClassSingleton
 
-    static JSClass * Class(const char * theName = 0); 
+    static JSClass * Class(const char * theName = 0);
 
-    static const char * ClassName(const char * theName = 0); 
+    static const char * ClassName(const char * theName = 0);
 
     static
-    JSObject * Construct(JSContext *cx, OWNERPTR theOwner, NATIVE * theNative); 
-    
+    JSObject * Construct(JSContext *cx, OWNERPTR theOwner, NATIVE * theNative);
+
     static JSObject *
-    ConstructWithArgs(JSContext * cx, OWNERPTR theOwner, NATIVE * theNative, 
+    ConstructWithArgs(JSContext * cx, OWNERPTR theOwner, NATIVE * theNative,
                 uintN argc, jsval * argv);
 
     static JSObject *
-    asJSVal(JSContext * cx, OWNERPTR theOwner, NATIVE * theNative); 
+    asJSVal(JSContext * cx, OWNERPTR theOwner, NATIVE * theNative);
 
 protected:
     JSWrapper(OWNERPTR theOwner, NATIVE * theNative);
@@ -894,7 +894,7 @@ protected:
                                  JSPropertyOp theSetter) {
         return registerProperty(JSClassSingleton::get().getPropertiesRef(), theName, theGetter, theSetter);
     }
-private:    
+private:
     OWNERPTR _myOwner;
     NATIVE * _myNative; // only used when instantiated with NATIVE_ACCESS_PROTOCOL = StaticAccessProtocol
 };
@@ -947,7 +947,7 @@ Y60_JSBASE_DECL void
 checkForUndefinedArguments(const std::string & theMethodName, uintN argc, jsval *argv);
 
 Y60_JSBASE_DECL void
-checkArguments(const std::string & theMethodName, uintN argc, jsval *argv, 
+checkArguments(const std::string & theMethodName, uintN argc, jsval *argv,
         unsigned theRequiredArguments);
 
 Y60_JSBASE_DECL bool

@@ -22,7 +22,7 @@ macsgCamera::macsgCamera()
 {
 	cameraID = -1;
 	buffer = NULL;
-	pbuffer = NULL;	
+	pbuffer = NULL;
 }
 
 macsgCamera::~macsgCamera()
@@ -35,18 +35,18 @@ bool macsgCamera::findCamera() {
 	int num_components = 0;
 	Component c = 0;
 	ComponentDescription cd;
-     
+
 	cd.componentType = SeqGrabComponentType;
 	cd.componentSubType = 0;
 	cd.componentManufacturer = 0;
 	cd.componentFlags = 0;
 	cd.componentFlagsMask = 0;
-     
+
 	while((c = FindNextComponent(c, &cd)) != 0) {
 		// add component c to the list
-		num_components++;  
+		num_components++;
 	}
-            
+
     //fprintf(stdout, "number of SGcomponents: %d\n",num_components);
 
 	if(num_components==0) {
@@ -66,10 +66,10 @@ bool macsgCamera::initCamera(int width, int height, bool colour) {
 	this->height = height;
 	this->colour = colour;
 	this->fps = 30;
-	
+
 	bytes = (colour?3:1);
 	int rowlength= width*bytes;
-	
+
 	switch (colour) {
 		case false: {
 			pixelFormat = k8IndexedGrayPixelFormat;
@@ -78,29 +78,29 @@ bool macsgCamera::initCamera(int width, int height, bool colour) {
 		} case true: {
 			pixelFormat = k24RGBPixelFormat;
 			break;
-		} 
+		}
 	}
-	
+
 	OSErr result;
     Rect srcRect = {0,0, height, width};
-   
+
     sg = OpenDefaultComponent(SeqGrabComponentType, 0);
     if(sg==NULL){
 		fprintf(stderr, "could not open default component\n");
     }
-	
+
 	result = SGInitialize(sg);
     if(result!=noErr){
          fprintf(stdout, "could not initialize SG\n");
     }
-    
-	
+
+
     result = SGSetDataRef(sg, 0, 0, seqGrabDontMakeMovie);
         if (result != noErr){
              fprintf(stdout, "dataref failed\n");
         }
-        
-    result = SGNewChannel(sg, VideoMediaType, &vc);		
+
+    result = SGNewChannel(sg, VideoMediaType, &vc);
     if(result!=noErr){
          //fprintf(stdout, "could not make new SG channnel\n");
 		 return false;
@@ -110,22 +110,22 @@ bool macsgCamera::initCamera(int width, int height, bool colour) {
     if(result!=noErr){
          fprintf(stdout, "could not get settings from dialog\n");
     }
-    
+
     result = SGSetChannelBounds(vc, &srcRect);
     if(result!=noErr){
          fprintf(stdout, "could not set SG ChannelBounds\n");
     }
-	
+
 	/*result = SGSetFrameRate (vc, fps);
     if(result!=noErr){
          fprintf(stdout, "could not set SG FrameRate\n");
     }*/
-      
+
     result = SGSetChannelUsage(vc, seqGrabPreview);
     if(result!=noErr){
          fprintf(stdout, "could not set SG ChannelUsage\n");
     }
-    
+
 	result = SGSetChannelPlayFlags(vc, channelPlayAllData);
 	if(result!=noErr){
          fprintf(stdout, "could not set SG AllData\n");
@@ -135,21 +135,21 @@ bool macsgCamera::initCamera(int width, int height, bool colour) {
 
 	result = QTNewGWorldFromPtr (&srcGWorld,
 									pixelFormat,
-                                    &srcRect, 
-                                    NULL, 
-                                    NULL, 
-                                    0, 
-                                    buffer, 
+                                    &srcRect,
+                                    NULL,
+                                    NULL,
+                                    0,
+                                    buffer,
                                     rowlength);
-        
+
 	if (result!= noErr)
   	{
 		fprintf(stdout, "%d error at QTNewGWorldFromPtr\n", result);
 		delete []buffer;
 		buffer = NULL;
 		return false;
-	}  
-	
+	}
+
     if (srcGWorld == NULL)
 	{
 		fprintf(stdout, "Could not allocate off screen\n");
@@ -157,7 +157,7 @@ bool macsgCamera::initCamera(int width, int height, bool colour) {
 		buffer = NULL;
 		return false;
 	}
-	
+
     result = SGSetGWorld(sg,(CGrafPtr)srcGWorld, NULL);
 	if (result != noErr) {
 		fprintf(stdout, "Could not set SGSetGWorld\n");
@@ -182,7 +182,7 @@ unsigned char* macsgCamera::getFrame()
             fprintf(stderr, "SGIdle failed\n");
 			return NULL;
 	}
-	
+
 	switch (colour) {
 		case false: {
 			for(int i=0;i<width*height;i++) {
@@ -195,7 +195,7 @@ unsigned char* macsgCamera::getFrame()
 			break;
 		}
 	}
-	
+
 	return pbuffer;
 }
 
@@ -242,7 +242,7 @@ bool macsgCamera::closeCamera()
 			srcGWorld = NULL;
 		}
     }
-	
+
 	return true;
 }
 

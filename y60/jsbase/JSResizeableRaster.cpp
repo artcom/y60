@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -149,7 +149,7 @@ static JSBool
 resize(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Destructive resize of the raster; the content is undefined after the operation, use 'resample' to create a smaller or larger version of the raster.");
 
-    DOC_PARAM("theWidth", "New width of the raster", DOC_TYPE_INTEGER); 
+    DOC_PARAM("theWidth", "New width of the raster", DOC_TYPE_INTEGER);
     DOC_PARAM("theHeight", "New height of the raster", DOC_TYPE_INTEGER);
     DOC_END;
     return Method<NATIVE>::call(&NATIVE::resize,cx,obj,argc,argv,rval);
@@ -158,7 +158,7 @@ resize(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 resample(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Resizes the raster using bilinear resampling. Does not work on DXT compressed formats. Top and left edge of the sampling area are the top resp. left edge of the source area. The bottom and right edge of the source raster are never reached during resampling. Therefore it is possible to create a mosaic of resampled images by using a one pixel overlap for the source rectangles.");
-    DOC_PARAM("theWidth", "New width of the raster", DOC_TYPE_INTEGER); 
+    DOC_PARAM("theWidth", "New width of the raster", DOC_TYPE_INTEGER);
     DOC_PARAM("theHeight", "New height of the raster", DOC_TYPE_INTEGER);
     DOC_END;
     return Method<NATIVE>::call(&NATIVE::resample,cx,obj,argc,argv,rval);
@@ -167,9 +167,9 @@ resample(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 assignBlock(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("assigns a block of raw memory as new pixel data; width and height of the raster are set to argument values; the pixelformat and the width/height must match the raw data to get the expected result");
-    DOC_PARAM("theWidth", "New width of the raster", DOC_TYPE_INTEGER); 
+    DOC_PARAM("theWidth", "New width of the raster", DOC_TYPE_INTEGER);
     DOC_PARAM("theHeight", "New height of the raster", DOC_TYPE_INTEGER);
-    DOC_PARAM("thePixels", "Block of raw memory containing pixel data", DOC_TYPE_BLOCK); 
+    DOC_PARAM("thePixels", "Block of raw memory containing pixel data", DOC_TYPE_BLOCK);
     DOC_END;
     NativeRef<dom::ResizeableRaster> myNativeRef(cx, obj);
     try {
@@ -188,15 +188,15 @@ assignBlock(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
 static JSBool
 pasteRaster(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("pastes a rectangular region from another raster into a rectangular region of this raster; when source rectangle and target rectangle differ, bilinear resampling will be performed. When 0 or no argument is passed in the width or height arguments, then the width or height is the 'rest' of the region from the specified origin to the rightmost or bottommost coordinate is used");
-    DOC_PARAM("theSource", "The source raster ", DOC_TYPE_RASTER); 
-    DOC_PARAM_OPT("sourceX", "left bound of the source rectangle in the source raster", DOC_TYPE_INTEGER, 0); 
-    DOC_PARAM_OPT("sourceY", "top bound of the source rectangle in the source raster", DOC_TYPE_INTEGER, 0); 
-    DOC_PARAM_OPT("sourceWidth", "width of the source rectangle in the source raster", DOC_TYPE_INTEGER,"theSource.width-sourceX"); 
+    DOC_PARAM("theSource", "The source raster ", DOC_TYPE_RASTER);
+    DOC_PARAM_OPT("sourceX", "left bound of the source rectangle in the source raster", DOC_TYPE_INTEGER, 0);
+    DOC_PARAM_OPT("sourceY", "top bound of the source rectangle in the source raster", DOC_TYPE_INTEGER, 0);
+    DOC_PARAM_OPT("sourceWidth", "width of the source rectangle in the source raster", DOC_TYPE_INTEGER,"theSource.width-sourceX");
     DOC_PARAM_OPT("sourceHeight", "height of the source rectangle in the source raster", DOC_TYPE_INTEGER,"theSource.height-sourceX");
-    DOC_PARAM_OPT("targetX", "left bound of the target rectangle in the raster", DOC_TYPE_INTEGER, 0); 
-    DOC_PARAM_OPT("targetY", "top bound of the target rectangle in the raster", DOC_TYPE_INTEGER, 0); 
-    DOC_PARAM_OPT("targetWidth", "width of the target rectangle in the raster", DOC_TYPE_INTEGER,"this.width-targetX"); 
-    DOC_PARAM_OPT("targetHeight", "height of the target rectangle in the raster", DOC_TYPE_INTEGER,"this.height-targetY"); 
+    DOC_PARAM_OPT("targetX", "left bound of the target rectangle in the raster", DOC_TYPE_INTEGER, 0);
+    DOC_PARAM_OPT("targetY", "top bound of the target rectangle in the raster", DOC_TYPE_INTEGER, 0);
+    DOC_PARAM_OPT("targetWidth", "width of the target rectangle in the raster", DOC_TYPE_INTEGER,"this.width-targetX");
+    DOC_PARAM_OPT("targetHeight", "height of the target rectangle in the raster", DOC_TYPE_INTEGER,"this.height-targetY");
     DOC_END;
 
     if (argc == 0) {
@@ -207,13 +207,13 @@ pasteRaster(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
     NativeRef<dom::ResizeableRaster> myNativeRef(cx,obj);
     try {
         if (!JSVAL_IS_OBJECT(argv[0])) {
-            throw BadArgumentException("pasteRaster: argument 0 is not a raster",PLUS_FILE_LINE); 
+            throw BadArgumentException("pasteRaster: argument 0 is not a raster",PLUS_FILE_LINE);
         }
         const dom::ResizeableRaster & mySourceRaster = JSClassTraits<dom::ResizeableRaster>::getNativeRef(cx, JSVAL_TO_OBJECT(argv[0]));
         asl::AC_OFFSET_TYPE myArg[8]={0,0,0,0,0,0,0,0};
         for (uintN i = 0; i < argc-1; ++i) {
             if (!convertFrom(cx,argv[i+1],myArg[i])) {
-                throw BadArgumentException(std::string("pasteRaster: argument ")+asl::as_string(i+1)+" is not a valid number",PLUS_FILE_LINE); 
+                throw BadArgumentException(std::string("pasteRaster: argument ")+asl::as_string(i+1)+" is not a valid number",PLUS_FILE_LINE);
             }
         }
         const dom::ValueBase & myRasterValue = dynamic_cast<const dom::ValueBase &>(mySourceRaster);
@@ -264,9 +264,9 @@ save(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 load(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("loads a block of raw data as new pixel data; width and height of the raster are set to argument values; the pixelformat and the width/height must match the raw data to get the expected result");
-    DOC_PARAM("theWidth", "New width of the raster", DOC_TYPE_INTEGER); 
+    DOC_PARAM("theWidth", "New width of the raster", DOC_TYPE_INTEGER);
     DOC_PARAM("theHeight", "New height of the raster", DOC_TYPE_INTEGER);
-    DOC_PARAM("theFileName", "raw file containing pixel data", DOC_TYPE_STRING); 
+    DOC_PARAM("theFileName", "raw file containing pixel data", DOC_TYPE_STRING);
     DOC_END;
     NativeRef<dom::ResizeableRaster> myNativeRef(cx, obj);
     try {

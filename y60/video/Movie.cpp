@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -86,7 +86,7 @@ using namespace asl;
 
 namespace y60 {
 
-    Movie::Movie(dom::Node & theNode): 
+    Movie::Movie(dom::Node & theNode):
         Image(theNode),
         FrameCountTag::Plug(theNode),
         CurrentFrameTag::Plug(theNode),
@@ -114,7 +114,7 @@ namespace y60 {
             setup();
         }
     }
-    
+
     void
     Movie::registerDependenciesRegistrators() {
         Image::registerDependenciesRegistrators();
@@ -167,7 +167,7 @@ namespace y60 {
     void
     Movie::restart(double theCurrentTime) {
         AC_DEBUG  << "Movie::restart";
-        _myLastDecodedFrame = std::numeric_limits<unsigned>::max();        
+        _myLastDecodedFrame = std::numeric_limits<unsigned>::max();
         _myDecoder->startMovie(0);
         double myMovieTime = _myDecoder->getMovieTime(theCurrentTime);
         decodeFrame(myMovieTime, 0);
@@ -177,7 +177,7 @@ namespace y60 {
 
     void
     Movie::setPlayMode(MoviePlayMode thePlayMode) {
-        AC_DEBUG << "Movie::setPlayMode " 
+        AC_DEBUG << "Movie::setPlayMode "
             << asl::getStringFromEnum(thePlayMode, MoviePlayModeStrings);
         // process changes
         switch (thePlayMode) {
@@ -248,13 +248,13 @@ namespace y60 {
 
 
 
-    void 
+    void
     Movie::ensureMovieFramecount() {
         if (get<FrameCountTag>() == -1) {
             load(AppPackageManager::get().getPtr()->getSearchPath());
             if (get<FrameCountTag>() == -1) {
-                MoviePlayMode myPlayMode = 
-                    MoviePlayMode(asl::getEnumFromString(get<PlayModeTag>(), 
+                MoviePlayMode myPlayMode =
+                    MoviePlayMode(asl::getEnumFromString(get<PlayModeTag>(),
                     MoviePlayModeStrings));
                 setPlayMode(PLAY_MODE_PLAY);
                 _myDecoder->setDecodeAudioFlag(false);
@@ -270,9 +270,9 @@ namespace y60 {
                 restart(0);
                 setPlayMode(myPlayMode);
             }
-        } 
-        set<CurrentFrameTag>(0);        
-        _myLastDecodedFrame = std::numeric_limits<unsigned>::max();        
+        }
+        set<CurrentFrameTag>(0);
+        _myLastDecodedFrame = std::numeric_limits<unsigned>::max();
     }
 
 
@@ -301,7 +301,7 @@ namespace y60 {
 
     void
     Movie::readFrame(double theCurrentTime, bool theIgnoreCurrentTime) {
-        DB(AC_DEBUG << "Movie::readFrame time=" << theCurrentTime 
+        DB(AC_DEBUG << "Movie::readFrame time=" << theCurrentTime
             << " src=" << get<ImageSourceTag>());
         DB(AC_DEBUG << "                 theIgnoreCurrentTime=" << theIgnoreCurrentTime);
         _myLastCurrentTime = theCurrentTime;
@@ -311,7 +311,7 @@ namespace y60 {
             return;
         }
         // Check for playmode changes from javascript
-        MoviePlayMode myPlayMode = 
+        MoviePlayMode myPlayMode =
             MoviePlayMode(asl::getEnumFromString(get<PlayModeTag>(), MoviePlayModeStrings));
         if (myPlayMode != _myPlayMode) {
             setPlayMode(myPlayMode);
@@ -329,9 +329,9 @@ namespace y60 {
             }
             while (myNextFrame < 0) {
                 if (get<FrameCountTag>() == -1) {
-                    std::string myErrorMsg = string("Movie: ") + get<NameTag>() 
+                    std::string myErrorMsg = string("Movie: ") + get<NameTag>()
                         + " has negative currentframe and a invalid "
-                        + "framecount, trying a wraparound with " 
+                        + "framecount, trying a wraparound with "
                         + "invalid framecount will fail-> calling "
                         + "explicit ensureMovieFramecount() will help";
                     ASSURE_MSG(get<FrameCountTag>() != -1, myErrorMsg.c_str());
@@ -356,15 +356,15 @@ namespace y60 {
             //XXX check if we need to do something more here
             AC_INFO << "Movie has PLAY_MODE_NODISK";
             break;
-        }                
+        }
 
         if (myNextFrame < 0) {
             setPlayMode(PLAY_MODE_STOP);
         }
-        DB(AC_DEBUG << "Next Frame: " << myNextFrame << ", lastDecodedFrame: " 
+        DB(AC_DEBUG << "Next Frame: " << myNextFrame << ", lastDecodedFrame: "
             << _myLastDecodedFrame << ", MovieTime: " << myMovieTime;)
         decodeFrame(myMovieTime, myNextFrame);
-        
+
         // check for eof in the decoder
         if (_myDecoder->getEOF()) {
             AC_DEBUG << "Movie has EOF, loopCount=" << _myCurrentLoopCount;
@@ -421,9 +421,9 @@ namespace y60 {
         * XXX
         * decide here wether you want to use the stream interface of thePackageManager
         * advantage: you could load mpegs which are in a zip file known to thePackageManager
-        * disadvantages: 1) big files (> 200MB) are AFAIK currently not handled by 
+        * disadvantages: 1) big files (> 200MB) are AFAIK currently not handled by
         *                   thePackageManager
-        *                2) loadStream currently does not fallback to loadFile for WMV 
+        *                2) loadStream currently does not fallback to loadFile for WMV
         *                   and alike
         * DK
         */
@@ -437,7 +437,7 @@ namespace y60 {
 
 
     MovieDecoderBasePtr Movie::getDecoder(const std::string theFilename) {
-        MovieDecoderBasePtr myDecoder = 
+        MovieDecoderBasePtr myDecoder =
             DecoderManager::get().findDecoder<MovieDecoderBase>(theFilename);
 
         const std::string & myDecoderHint = get<DecoderHintTag>();
@@ -456,19 +456,19 @@ namespace y60 {
             }
             if (!foundDecoderFlag) {
                 // we did not find a decoder for the decoderhint, plug it and try to use it
-                asl::PlugInBasePtr myPlugIn = 
+                asl::PlugInBasePtr myPlugIn =
                     asl::PlugInManager::get().getPlugIn(myDecoderHint);
                 if (IDecoderPtr myDecoderPlug = dynamic_cast_Ptr<IDecoder>(myPlugIn)) {
                     AC_INFO << "Plug: " << myDecoderHint << ": as Decoder" << endl;
                     DecoderManager::get().addDecoder(myDecoderPlug);
                     myDecoder = dynamic_cast_Ptr<MovieDecoderBase>(myDecoderPlug);
                 } else {
-                    throw MovieException(std::string("Unable to plug decoder: ") 
+                    throw MovieException(std::string("Unable to plug decoder: ")
                         + myDecoderHint, PLUS_FILE_LINE);
                 }
             }
         }
-        //        AC_INFO << "using decoder " << myDecoder->getName() << " for decoding " 
+        //        AC_INFO << "using decoder " << myDecoder->getName() << " for decoding "
         //                << theFilename << " hint " << myDecoderHint;
         return myDecoder;
     }
@@ -487,7 +487,7 @@ namespace y60 {
         AC_INFO << "Movie::loadStream " << theUrl;
         MovieDecoderBasePtr myDecoder = getDecoder(theUrl);
         if (!myDecoder) {
-            throw MovieException(string("Sorry, could not find a streamable decoder for: ") 
+            throw MovieException(string("Sorry, could not find a streamable decoder for: ")
                 + theUrl, PLUS_FILE_LINE);
         }
         _myDecoder = myDecoder->instance();
@@ -522,7 +522,7 @@ namespace y60 {
             myFilename = theUrl;
         }
         if (myFilename.empty()) {
-            AC_ERROR << "Unable to find url='" << theUrl << "'" 
+            AC_ERROR << "Unable to find url='" << theUrl << "'"
                 << ", src='" << mySourceFile << "'";
             return;
         }
@@ -537,7 +537,7 @@ namespace y60 {
             if (myFileExtension == "m60") {
                 _myDecoder = MovieDecoderBasePtr(new M60Decoder());
             } else {
-                throw MovieException(std::string("Sorry, could not find decoder for: ") 
+                throw MovieException(std::string("Sorry, could not find decoder for: ")
                     + myFilename, PLUS_FILE_LINE);
             }
         } else {
@@ -553,22 +553,22 @@ namespace y60 {
     void Movie::postLoad() {
 
         /*
-        * UH: theUrl is mangled by the PackageManager and is not necessarily the same 
+        * UH: theUrl is mangled by the PackageManager and is not necessarily the same
         * as the ImageSourceTag.
         * this leads to multiple load() calls by the TextureManager since reloadRequired checks
         * _myLoadedFilename against ImageSourceTag and finds them to differ.
         */
         _myLoadedFilename = get<ImageSourceTag>();
-        if (get<ImageResizeTag>() == IMAGE_RESIZE_PAD) { 
-            float myXResize = float(get<ImageWidthTag>()) 
+        if (get<ImageResizeTag>() == IMAGE_RESIZE_PAD) {
+            float myXResize = float(get<ImageWidthTag>())
                 / asl::nextPowerOfTwo(get<ImageWidthTag>());
-            float myYResize = float(get<ImageHeightTag>()) 
+            float myYResize = float(get<ImageHeightTag>())
                 / asl::nextPowerOfTwo(get<ImageHeightTag>());
 
             asl::Matrix4f myMatrix;
             myMatrix.makeScaling(asl::Vector3f(myXResize, myYResize, 1.0f));
             set<ImageMatrixTag>(myMatrix);
-        }        
+        }
     }
 
 
@@ -580,21 +580,21 @@ namespace y60 {
             << " with _myLoadedFilename=" << _myLoadedFilename
             << " ImageSourceTag=" << get<ImageSourceTag>();
         if (_myLoadedFilename != get<ImageSourceTag>()) {
-            set<FrameCountTag>(-1);            
-        }                 
+            set<FrameCountTag>(-1);
+        }
         return rc;
     }
 
 
 
     dom::ResizeableRasterPtr
-        Movie::addRasterValue(dom::ValuePtr theRaster, PixelEncoding theEncoding, 
-        unsigned theDepth)    
+        Movie::addRasterValue(dom::ValuePtr theRaster, PixelEncoding theEncoding,
+        unsigned theDepth)
     {
         AC_DEBUG << "Movie::addRasterValue '" << get<NameTag>() << "' id=" << get<IdTag>();
         // Setup raster nodes
         dom::DOMString myRasterName = RasterElementNames[theEncoding];
-        dom::NodePtr myRasterChild = 
+        dom::NodePtr myRasterChild =
             getNode().appendChild(dom::NodePtr(new dom::Element(myRasterName)));
         dom::NodePtr myTextChild = myRasterChild->appendChild(dom::NodePtr(new dom::Text()));
 

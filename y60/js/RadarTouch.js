@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -71,23 +71,23 @@ RadarTouch.prototype.Constructor = function(Public, theEventListener) {
     var _myOscReceiver = null;
     var _myLastReceivedTime = 0;
     var _myTimeoutCallback = null;
-    
+
     var _myLastPosition = [0,0];
 
     var _myCursors = [];
-    
+
     var _myEventListener = theEventListener;
 
     Public.Constructor = function() {
     }
-    
+
     Public.start = function(thePort) {
         print("Starting OSC receiver on port: " + thePort);
 
         _myOscReceiver = new OscReceiver(thePort);
         _myOscReceiver.start();
     }
-    
+
     Public.stop = function() {
         if (_myOscReceiver) {
             _myOscReceiver.stop();
@@ -95,11 +95,11 @@ RadarTouch.prototype.Constructor = function(Public, theEventListener) {
             _myOscReceiver = null;
         }
     }
-    
+
     Public.registerTimeoutCallback = function(theFunc) {
         _myTimeoutCallback = theFunc;
     }
-    
+
 
     //////////////////////////////////////////////////////////////////////
     // Callbacks
@@ -111,14 +111,14 @@ RadarTouch.prototype.Constructor = function(Public, theEventListener) {
         var myArgs = [];
         var myEventName = "";
 
-        
+
         Logger.trace("osc node: " + theNode);
-        
+
         _myLastReceivedTime = millisec();
-                
+
         for (var i = 0; i < theNode.childNodesLength(); i++) {
             var myChild = theNode.childNode(i);
-            if (myChild.nodeName == "float" || 
+            if (myChild.nodeName == "float" ||
                 myChild.nodeName == "int") {
                 myArgs.push(Number(myChild.childNode("#text").nodeValue));
             } else {
@@ -133,7 +133,7 @@ RadarTouch.prototype.Constructor = function(Public, theEventListener) {
                 if (myArgs.length == 1) {
                     var myCursor = new spark.Cursor(myArgs[0]);
                     _myCursors[myArgs[0]] = myCursor;
-                    _myEventListener.dispatchEvent( new spark.CursorEvent( spark.CursorEvent.ENTER, myCursor ) ); 
+                    _myEventListener.dispatchEvent( new spark.CursorEvent( spark.CursorEvent.ENTER, myCursor ) );
                 }
                 break;
             case "remove":
@@ -147,7 +147,7 @@ RadarTouch.prototype.Constructor = function(Public, theEventListener) {
                 break;
             case "move":
                 if (myArgs.length == 3) {
-                    var myCoords = planeToWindowCoords(myArgs[1], myArgs[2]); 
+                    var myCoords = planeToWindowCoords(myArgs[1], myArgs[2]);
                     var myCursor = _myCursors[myArgs[0]];
                     var myProperties = {
                         position3D : new Vector3f( myCoords[0], myCoords[1], 0 ),
@@ -165,7 +165,7 @@ RadarTouch.prototype.Constructor = function(Public, theEventListener) {
         }
 
     }
-    
+
     Public.onFrame = function(theTime) {
         if (theTime - _myLastReceivedTime > RECEIVE_TIMEOUT) {
             Logger.warning("OSC: Input Device timed out.");
@@ -173,13 +173,13 @@ RadarTouch.prototype.Constructor = function(Public, theEventListener) {
                 _myTimeoutCallback();
             }
             _myLastReceivedTime = theTime;
-        }        
+        }
     }
 
     //////////////////////////////////////////////////////////////////////
     // Private
     //////////////////////////////////////////////////////////////////////
-    
+
     function planeToWindowCoords(theX, theY) {
         return [theX * window.width, (1-theY) * window.height];
     }

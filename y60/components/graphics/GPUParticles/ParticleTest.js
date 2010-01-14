@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -95,11 +95,11 @@ ParticlesTest.prototype.Constructor = function(self, theArguments) {
 
         // position camera
         window.camera.position    = [-1.07385, 2.57901, 0.630398];
-        window.camera.orientation = [0.615412, 0, 0, 0.788205]; 
+        window.camera.orientation = [0.615412, 0, 0, 0.788205];
 
         // create particles
         _myParticleSystem = new GPUParticles(window.scene);
-        _myParticleSystem.create( window.scene.world, 
+        _myParticleSystem.create( window.scene.world,
                                   50, // number of particles
                                   "2.png", // 3d texture
                                   [1.0, -0.5, 0.0], // initial emitting direction
@@ -109,14 +109,14 @@ ParticlesTest.prototype.Constructor = function(self, theArguments) {
         _myParticleSystem.material.properties.timetolive = 1.0;
         _myParticleSystem.material.properties.gravity = [0.0, 0.5, 0.0, 0.0];
         _myParticleSystem.material.properties.size = [20.0, 2.0, 640.0];
-        window.scene.update(Scene.ANIMATIONS_LOAD); 
+        window.scene.update(Scene.ANIMATIONS_LOAD);
 
         window.canvas.backgroundcolor = [0.6,0.6,0.75,1.0];
     }
 
     self.SceneViewer.onFrame = self.onFrame;
     self.onFrame = function(theTime) {
-        self.SceneViewer.onFrame(theTime); 
+        self.SceneViewer.onFrame(theTime);
     }
 
     self.onPostRender = function() {

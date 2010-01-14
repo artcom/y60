@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -75,12 +75,12 @@ LCDControler_EASER202NRW.prototype.Constructor = function(self, theSerialPortNum
 
     LCDControlerBase.prototype.Constructor(self, theSerialPortNum);
     self.LCDControlerBase = [];
-    var _mySerialDevice = self._mySerialDevice; 
+    var _mySerialDevice = self._mySerialDevice;
 
     self.reset = function() {
         _mySerialDevice.write("\x1BR");
     }
-    
+
     self.setBacklight = function(theBacklightFlag) {
         if ( theBacklightFlag ) {
             _mySerialDevice.write("\x1BL\x01");
@@ -125,13 +125,13 @@ LCDControler_EASER202NRW.prototype.Constructor = function(self, theSerialPortNum
     }
 
     self.setCursorPos = function(theLine, theChar) {
-        _mySerialDevice.write([0x1B,theChar,theLine]); 
+        _mySerialDevice.write([0x1B,theChar,theLine]);
         msleep(10);
     }
 
 /*
     self.testUserChars = function() {
-print("TEST");   
+print("TEST");
 self.clear();
         var myGlyphBytes;
         myGlyphBytes = [27,90,1,0x1f,0x1f,0,0,16,16,15,0];

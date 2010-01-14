@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -91,12 +91,12 @@ namespace y60 {
     }
 
     SceneOptimizer::PrimitiveCachePtr
-    SceneOptimizer::SuperShape::getPrimitive(const std::string & theType, const std::string & theMaterial, 
+    SceneOptimizer::SuperShape::getPrimitive(const std::string & theType, const std::string & theMaterial,
                                              const RenderStyles & theRenderStyles, unsigned theAdditionalKeyValue) {
         std::string myKey = theType + "_" + theMaterial + "_" + as_string(theRenderStyles);
         if (theAdditionalKeyValue > 0) {
             myKey += std::string("_") + asl::as_string(theAdditionalKeyValue);
-            
+
         }
         PrimitiveCachePtr myPrimitiveCache;
         if (_myPrimitiveMap.find(myKey) == _myPrimitiveMap.end()) {
@@ -263,7 +263,7 @@ namespace y60 {
         }
 
         dom::NodePtr myParentNode    = theNode->parentNode()->self().lock();
-        TransformHierarchyFacadePtr myFacade = theNode->getFacade<TransformHierarchyFacade>();        
+        TransformHierarchyFacadePtr myFacade = theNode->getFacade<TransformHierarchyFacade>();
         std::string myParentNodeName = myParentNode->nodeName();
         std::string myNodeName       = theNode->nodeName();
 
@@ -429,7 +429,7 @@ namespace y60 {
     SceneOptimizer::mergePrimitives(const dom::NodePtr & theElements, bool theFlipFlag,
                                     VertexDataMap & theVertexDataOffsets, const RenderStyles & theRenderStyles,
                                     unsigned theBeginIndex, unsigned theEndIndex) {
-                                        
+
         // Get element type
         std::string myNewPrimitiveType = theElements->getAttributeString(PRIMITIVE_TYPE_ATTRIB);
         if (myNewPrimitiveType == PrimitiveTypeStrings[QUADS]) {
@@ -445,11 +445,11 @@ namespace y60 {
         dom::NodePtr mySrcIndex = theElements->childNode(0);
         //const VectorOfUnsignedInt & mySrc = mySrcIndex->firstChild()->nodeValueRef<VectorOfUnsignedInt>();
 
-        PrimitiveCachePtr myDstElements = _mySuperShape->getPrimitive(myNewPrimitiveType, myMaterialRef, theRenderStyles, myDstElementCounter);            
+        PrimitiveCachePtr myDstElements = _mySuperShape->getPrimitive(myNewPrimitiveType, myMaterialRef, theRenderStyles, myDstElementCounter);
         dom::NodePtr myDstIndex         = myDstElements->getIndex(POSITION_ROLE, POSITION_ROLE);
         unsigned myOffset               = myDstIndex->firstChild()->nodeValueRef<VectorOfUnsignedInt>().size();
 
-        unsigned mySrcVertices = (theEndIndex - theBeginIndex)+1;        
+        unsigned mySrcVertices = (theEndIndex - theBeginIndex)+1;
         while (mySrcVertices + myOffset  > 1024*64 ) {
             AC_WARNING << "Sorry, supershapes primitive will have more then 64k vertices -> use new element";
             myDstElementCounter++;
@@ -473,7 +473,7 @@ namespace y60 {
             unsigned myVertexDataOffset       = theVertexDataOffsets[myRole];
             // Triangulate quads
             std::string myOldPrimitiveType = theElements->getAttributeString(PRIMITIVE_TYPE_ATTRIB);
-            
+
             if (myOldPrimitiveType == PrimitiveTypeStrings[QUADS]) {
                 myDst.resize(unsigned(1.5 * myNumSrcVertices + myOffset));
                 //unsigned mySrcSize = mySrc.size();
@@ -595,7 +595,7 @@ namespace y60 {
                     myElementRenderStyles[FRONT] = true;
                     myRewindFlag                  = !myRewindFlag;
                 }
-                
+
                 dom::NodePtr mySrcIndex = myElements->childNode(0);
                 const VectorOfUnsignedInt & mySrc = mySrcIndex->firstChild()->nodeValueRef<VectorOfUnsignedInt>();
                 // iterate over src primitve in steps of 64k vertices
@@ -608,14 +608,14 @@ namespace y60 {
                     if (myPrimitiveType == PrimitiveTypeStrings[QUADS]) {
                         myDivisorTarget = 4;
                     }
-                    
+
                     unsigned int myCount = (myEndIndex - myBeginIndex)+1;
                     float myDivisor = (float)myCount / (myDivisorTarget);
                     size_t myEndIndex = static_cast<size_t>( (floor(myDivisor) * myDivisorTarget) + myBeginIndex -1 );
                     mergePrimitives(myElements, myRewindFlag, myVertexDataOffsets, myElementRenderStyles, myBeginIndex, myEndIndex);
                     size_t myOldEndIndex = myEndIndex;
                     myBeginIndex = myEndIndex+1;
-                    myEndIndex = std::min(myOldEndIndex + (1024*64), mySrc.size())-1;   
+                    myEndIndex = std::min(myOldEndIndex + (1024*64), mySrc.size())-1;
                 }
             }
             return true;
@@ -826,7 +826,7 @@ namespace y60 {
         for (signed i = myNumChildren - 1; i >= 0; --i) {
             dom::NodePtr myChild = theNode->childNode(i);
             myTransformNode->appendChild(myChild);
-        } 
+        }
 
         // Remove the node and append transform
         theNode->parentNode()->replaceChild(myTransformNode, theNode);

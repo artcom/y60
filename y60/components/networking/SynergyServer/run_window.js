@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -68,7 +68,7 @@ function SynergyServerSpike(theArguments, theWidth, theHeight, theTitle) {
     //////////////////////////////////////////////////////////////////////
     // Baseclass construction
     //////////////////////////////////////////////////////////////////////
-   
+
     var _mySynergyServer = null;
     var _myASSManager = null;
 
@@ -81,9 +81,9 @@ function SynergyServerSpike(theArguments, theWidth, theHeight, theTitle) {
 
     var _myHost = "localhost";
 
-    const MOVE_VELOCITY = 50; 
-    const RESIZE_VELOCITY = 20; 
-    const DAMPING_FACTOR = 1.3; 
+    const MOVE_VELOCITY = 50;
+    const RESIZE_VELOCITY = 20;
+    const DAMPING_FACTOR = 1.3;
 
     const WINDOW_POSITION = [0, 0];
 
@@ -100,7 +100,7 @@ function SynergyServerSpike(theArguments, theWidth, theHeight, theTitle) {
         Public.setup(theWidth, theHeight, false, theTitle);
         window.swapInterval    = 0;
 
-        if (theArguments.length == 3) { 
+        if (theArguments.length == 3) {
             _myHost = theArguments[2];
         }
 
@@ -126,15 +126,15 @@ function SynergyServerSpike(theArguments, theWidth, theHeight, theTitle) {
 
         if (_myTargetPosition) {
 
-            var myPosition = product( sum( product( _myMousePosition, 
-                                                    MOVE_VELOCITY), 
-                                           _myTargetPosition), 
-                                      1 / (MOVE_VELOCITY + 1)); 
-            _myMousePosition = myPosition; 
+            var myPosition = product( sum( product( _myMousePosition,
+                                                    MOVE_VELOCITY),
+                                           _myTargetPosition),
+                                      1 / (MOVE_VELOCITY + 1));
+            _myMousePosition = myPosition;
             if (distance( _myMousePosition, _myTargetPosition ) < 0.01) {
                 _myTargetPosition = null;
             }
-            _mySynergyServer.onMouseMotion( _myMousePosition.x + WINDOW_POSITION[0], 
+            _mySynergyServer.onMouseMotion( _myMousePosition.x + WINDOW_POSITION[0],
                                        _myMousePosition.y + WINDOW_POSITION[1] );
 
         }
@@ -158,7 +158,7 @@ function SynergyServerSpike(theArguments, theWidth, theHeight, theTitle) {
     Public.onMouseMotion = function(theX, theY) {
         Base.onMouseMotion(theX, theY);
         if (_myHost != "localhost") {
-            _mySynergyServer.onMouseMotion( theX + WINDOW_POSITION[0], 
+            _mySynergyServer.onMouseMotion( theX + WINDOW_POSITION[0],
                                        theY + WINDOW_POSITION[1] );
         }
     }
@@ -177,7 +177,7 @@ function SynergyServerSpike(theArguments, theWidth, theHeight, theTitle) {
     Public.onKey = function(theKey, theKeyState, theX, theY,
                          theShiftFlag, theControlFlag, theAltFlag)
     {
-        Base.onKey( theKey, theKeyState, theX, theY, theShiftFlag, theControlFlag, 
+        Base.onKey( theKey, theKeyState, theX, theY, theShiftFlag, theControlFlag,
                     theAltFlag);
     }
 
@@ -244,7 +244,7 @@ function SynergyServerSpike(theArguments, theWidth, theHeight, theTitle) {
             }
         } else if ( theNode.type == "move" ) {
             if (_myMouseMoveId == theNode.id) {
-                _myTargetPosition = new Vector2f( theNode.position3D.x, 
+                _myTargetPosition = new Vector2f( theNode.position3D.x,
                                                   theNode.position3D.y );
             }
         }

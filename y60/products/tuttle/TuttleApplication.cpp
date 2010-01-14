@@ -14,7 +14,7 @@ namespace tuttle {
     {
         uintN i, n;
         JSString *str;
-        
+
         for (i = n = 0; i < argc; i++) {
             str = JS_ValueToString(cx, argv[i]);
             if (!str)
@@ -44,13 +44,13 @@ namespace tuttle {
     Application::Application() :
         _myTerminate(false), _myInterval(100000), _myDebugger(0) {
 
-        JSRuntime *myRuntime = JS_NewRuntime(JS_HEAP_SIZE);        
+        JSRuntime *myRuntime = JS_NewRuntime(JS_HEAP_SIZE);
 
         JSContext *myContext = JS_NewContext(myRuntime, JS_STACK_CHUNK);
         JS_ToggleOptions(myContext, JSOPTION_STRICT);
-        
+
         JSObject  *myGlobal  = JS_NewObject(myContext, &tuttle_global_class, NULL, NULL);
-        
+
         JS_InitStandardClasses(myContext, myGlobal);
 
         JS_DefineFunctions(myContext, myGlobal, tuttle_global_functions);
@@ -62,13 +62,13 @@ namespace tuttle {
 
     bool Application::run() {
         while(!_myTerminate) {
-            
+
             if(!handleRequests())
                 goto fail;
 
             if(!process())
                 goto fail;
-            
+
             usleep(_myInterval);
         }
 

@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -60,7 +60,7 @@
 //
 //     $Author: uzadow $
 //
-// Description: 
+// Description:
 //
 //=============================================================================
 
@@ -86,9 +86,9 @@ public:
     LayerDefinition (const PLPixel32 myColor, float opacity);
     LayerDefinition (PLBmp* myBmp, int myWidthInTiles, int myHeightInTiles, float opacity);
     virtual ~LayerDefinition();
-    
+
     void setTileSize (double myTileSize);
-    int getCurSize () const 
+    int getCurSize () const
         { return _myActualBmp->GetWidth(); };
     const PLPixel32 getPixel(int x, int y) const;
     PLPixel32 getAvgColor () const { return _myAvgColor; }
@@ -98,7 +98,7 @@ private:
     LayerDefinition(const LayerDefinition &);
     const LayerDefinition & operator=(const LayerDefinition &);
     void calcAvgColor ();
-    
+
     PLBmp* _myBmp;
     std::map<int, PLBmp*> _myResizedBmpCache;
     PLBmp* _myActualBmp;
@@ -119,7 +119,7 @@ inline const PLPixel32* LayerDefinition::getPixelLine(int x, int y) const {
 inline const PLPixel32 LayerDefinition::getPixel(int x, int y) const {
     assert (_myTileSize != -1);
     PLASSERT_VALID (_myActualBmp);
-    return _myActualBmp->GetPixel32 (x%_myActualBmp->GetWidth(), 
+    return _myActualBmp->GetPixel32 (x%_myActualBmp->GetWidth(),
                                     y%_myActualBmp->GetHeight())*_myOpacity;
 }
 

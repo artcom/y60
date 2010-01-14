@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -69,7 +69,7 @@ using namespace std;
 
 namespace jslib {
 
-template class JSWrapper<std::locale, asl::Ptr<std::locale>, StaticAccessProtocol>; 
+template class JSWrapper<std::locale, asl::Ptr<std::locale>, StaticAccessProtocol>;
 
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -80,7 +80,7 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     return JS_TRUE;
 }
 
-static JSBool 
+static JSBool
 parseFloat(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("string-to-float conversion");
     DOC_PARAM("theMessage", "", DOC_TYPE_STRING);
@@ -96,7 +96,7 @@ parseFloat(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         float myFloat;
         myStream >> myFloat;
         if (myStream.fail()) {
-            *rval = JS_GetNaNValue(cx); 
+            *rval = JS_GetNaNValue(cx);
         } else {
             *rval = as_jsval(cx, myFloat);
         }
@@ -104,7 +104,7 @@ parseFloat(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     } HANDLE_CPP_EXCEPTION;
 }
 
-static JSBool 
+static JSBool
 formatFloat(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("string-to-float conversion");
     DOC_PARAM("theMessage", "", DOC_TYPE_STRING);
@@ -249,14 +249,14 @@ JSLocale::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsv
         }
 
         try {
-            OWNERPTR myNewOwner = OWNERPTR(new NATIVE(myLocaleString.c_str()));        
+            OWNERPTR myNewOwner = OWNERPTR(new NATIVE(myLocaleString.c_str()));
             myNewObject = new JSLocale(myNewOwner, myNewOwner.get());
         } catch (const exception & ex) {
-            AC_ERROR << "Error while creating locale for `" << myLocaleString << "`. Using `C` as default. Exception thrown: " << ex.what();  
+            AC_ERROR << "Error while creating locale for `" << myLocaleString << "`. Using `C` as default. Exception thrown: " << ex.what();
             OWNERPTR myNewOwner = OWNERPTR(new NATIVE());
             myNewObject = new JSLocale(myNewOwner, myNewOwner.get());
         }
-        
+
     } else {
         JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected 1 (locale) %d",ClassName(), argc);
         return JS_FALSE;

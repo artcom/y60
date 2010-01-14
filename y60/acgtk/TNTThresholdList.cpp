@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -84,7 +84,7 @@ TNTThresholdList::TNTThresholdList() :
     append_column( "Name",  _myColumns.name );
     append_column( "Lower", _myColumns.lowerThreshold );
     append_column( "Upper", _myColumns.upperThreshold );
-    
+
 }
 
 
@@ -96,7 +96,7 @@ TNTThresholdList::clear() {
     _myListModel->clear();
 }
 
-void 
+void
 TNTThresholdList::refresh(dom::NodePtr thePaletteNode) {
     clear();
     Gtk::TreeModel::Row myRow;
@@ -110,7 +110,7 @@ TNTThresholdList::refresh(dom::NodePtr thePaletteNode) {
         myRow = * (_myListModel->append());
         myRow[_myColumns.name] = thePaletteNode->childNode(i)->getAttributeString("name");
         myRow[_myColumns.lowerThreshold] = int( myThresholds[0] );
-        myRow[_myColumns.upperThreshold] = int( myThresholds[1] ); 
+        myRow[_myColumns.upperThreshold] = int( myThresholds[1] );
         myRow[_myColumns.index] = myIndex;
         myColor = thePaletteNode->childNode(i)->getAttributeValue<Vector3i>("color");
         myGdkColor.set_rgb_p( float(myColor[0]) / 255,

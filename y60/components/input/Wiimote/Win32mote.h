@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -88,19 +88,19 @@ extern "C" {
 #endif
 
 namespace y60 {
-            
+
     class Win32mote :
         public WiiRemote
-    { 
+    {
     public:
         Win32mote(PSP_DEVICE_INTERFACE_DETAIL_DATA & detailData, HANDLE & theDevice);
         virtual ~Win32mote();
-            
+
         //static std::vector<WiiRemotePtr> discover();
 
     protected:
         void send(unsigned char theOutputReport[], unsigned theNumBytes);
-        static void Win32mote::inputReportListener(PosixThread & theThread); 
+        static void Win32mote::inputReportListener(PosixThread & theThread);
         void closeDevice();
 
         HIDP_CAPS       _myCapabilities;
@@ -111,7 +111,7 @@ namespace y60 {
         OVERLAPPED      _myHIDOverlap;
 
         LPCTSTR _myDevicePath;
-        
+
     private:
         void PrepareForOverlappedTransfer();
         void GetDeviceCapabilities();
@@ -119,7 +119,7 @@ namespace y60 {
         Win32mote();
     };
     typedef asl::Ptr<Win32mote> Win32motePtr;
-    
+
 }
 
 #endif // _Y60_WIN32MOTE_DRIVER_INCLUDED_

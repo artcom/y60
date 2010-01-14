@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -78,7 +78,7 @@ namespace y60 {
 
     std::string
     AnimationManager::splitNameAndComponent( const std::string & theName,
-        AnimationBase::AttributeComponent & theComponent ) 
+        AnimationBase::AttributeComponent & theComponent )
     {
         std::string myName( theName );
 
@@ -119,11 +119,11 @@ namespace y60 {
                         theComponent = AnimationBase::AttributeComponent(myIndex);
                     } else {
                         throw AnimationManagerException(string("Malformed animation target name '") + theName +
-                            "' , could not convert '"+ myNumberString+ " to unsigned integer", PLUS_FILE_LINE);   
+                            "' , could not convert '"+ myNumberString+ " to unsigned integer", PLUS_FILE_LINE);
                     }
                 } else {
                     throw AnimationManagerException(string("Malformed animation target name '") + theName +
-                        "' , missing ]", PLUS_FILE_LINE);   
+                        "' , missing ]", PLUS_FILE_LINE);
                 }
                 myName = myName.substr(0,myPos);
             }
@@ -139,9 +139,9 @@ namespace y60 {
         string myAttributeName = theAttributeRef;
 
         myAttributeName = splitNameAndComponent( myAttributeName, theAttributeComponent );
-            
+
         dom::NodePtr myAnimatedAttribute = theNode->getAttribute(myAttributeName);
-        
+
         if (!myAnimatedAttribute) {
             throw AnimationManagerException(string("Animated attribute '") + myAttributeName +
                 "' not found in \n" + as_string(*theNode), PLUS_FILE_LINE);
@@ -153,7 +153,7 @@ namespace y60 {
     AnimationPtr
     AnimationManager::createAnimation(const dom::NodePtr theNode, dom::NodePtr theWorld) {
         // Find node to be animated
-        dom::NodePtr myAnimatedNode;        
+        dom::NodePtr myAnimatedNode;
 		dom::NodePtr myNodeRefAttribute = theNode->getAttribute(ANIM_NODEREF_ATTRIB);
         string myNodeRef;
         if (myNodeRefAttribute) {
@@ -212,13 +212,13 @@ namespace y60 {
                     throw AnimationManagerException(string("Property with name '") + myAttributeRef + "' not defined in \n" +
                                                     as_string(*myPropPtr), PLUS_FILE_LINE);
                 }
-                
+
             } else {
                 throw AnimationManagerException(string("Attribute 'attribute' or 'property' not defined in \n") +
                                                 as_string(*theNode), PLUS_FILE_LINE);
             }
         }
-        
+
         // Get type of animated values
         dom::NodePtr myValueList;
         for (unsigned i = 0; i < theNode->childNodesLength(); ++i) {
@@ -247,14 +247,14 @@ namespace y60 {
                 if (myTypeName == SOM_VECTOR_FLOAT_NAME) {
                     const asl::Vector3f * myVector3fValue = myAnimatedAttribute->nodeValuePtr<asl::Vector3f>();
                     if (myVector3fValue) {
-                        return AnimationPtr(new Animation<float, asl::Vector3f>(theNode, 
-                                                                                myValueList, myAnimatedAttribute, myAttributeComponent - AnimationBase::X, 
+                        return AnimationPtr(new Animation<float, asl::Vector3f>(theNode,
+                                                                                myValueList, myAnimatedAttribute, myAttributeComponent - AnimationBase::X,
                                                                                 myAngleAttribute));
                     }
                     const asl::Vector4f * myVector4fValue =  myAnimatedAttribute->nodeValuePtr<asl::Vector4f>();
                     if (myVector4fValue) {
-                        return AnimationPtr(new Animation<float, asl::Vector4f>(theNode, 
-                                                                                myValueList, myAnimatedAttribute, myAttributeComponent - AnimationBase::X, 
+                        return AnimationPtr(new Animation<float, asl::Vector4f>(theNode,
+                                                                                myValueList, myAnimatedAttribute, myAttributeComponent - AnimationBase::X,
                                                                                 myAngleAttribute));
                     }
                     myTypeStringIsValid = true;
@@ -264,8 +264,8 @@ namespace y60 {
                 if (myTypeName == SOM_VECTOR_FLOAT_NAME) {
                     const Frustum * myValue = myAnimatedAttribute->nodeValuePtr<Frustum>();
                     if (myValue) {
-                        return AnimationPtr(new Animation<float, Frustum>(theNode, 
-                                                                          myValueList, myAnimatedAttribute, myAttributeComponent, 
+                        return AnimationPtr(new Animation<float, Frustum>(theNode,
+                                                                          myValueList, myAnimatedAttribute, myAttributeComponent,
                                                                           myAngleAttribute));
                     }
                     myTypeStringIsValid = true;
@@ -275,57 +275,57 @@ namespace y60 {
                 if (myTypeName == SOM_VECTOR_BOOL_NAME) {
                     const bool * myValue = myAnimatedAttribute->nodeValuePtr<bool>();
                     if (myValue) {
-                        return AnimationPtr(new Animation<AcBool>(theNode, myValueList, 
+                        return AnimationPtr(new Animation<AcBool>(theNode, myValueList,
                                     myAnimatedAttribute, myAttributeComponent, myAngleAttribute));
                     }
                     myTypeStringIsValid = true;
                 } else if (myTypeName == SOM_VECTOR_FLOAT_NAME) {
                     const float * myValue = myAnimatedAttribute->nodeValuePtr<float>();
                     if (myValue) {
-                        return AnimationPtr(new Animation<float>(theNode, myValueList, 
+                        return AnimationPtr(new Animation<float>(theNode, myValueList,
                                     myAnimatedAttribute, myAttributeComponent, myAngleAttribute));
                     }
                     myTypeStringIsValid = true;
                 } else if (myTypeName == SOM_VECTOR_UNSIGNED_NAME) {
                     const unsigned * myValue = myAnimatedAttribute->nodeValuePtr<unsigned>();
                     if (myValue) {
-                        return AnimationPtr(new Animation<unsigned>(theNode, myValueList, 
+                        return AnimationPtr(new Animation<unsigned>(theNode, myValueList,
                                     myAnimatedAttribute, myAttributeComponent, myAngleAttribute));
                     }
                     myTypeStringIsValid = true;
                 } else if (myTypeName == SOM_VECTOR_VECTOR2F_NAME) {
                     const asl::Vector2f * myValue = myAnimatedAttribute->nodeValuePtr<asl::Vector2f>();
                     if (myValue) {
-                        return AnimationPtr(new Animation<asl::Vector2f>(theNode, myValueList, 
+                        return AnimationPtr(new Animation<asl::Vector2f>(theNode, myValueList,
                                                                     myAnimatedAttribute, myAttributeComponent, myAngleAttribute));
                     }
                     myTypeStringIsValid = true;
                 } else if (myTypeName == SOM_VECTOR_VECTOR3F_NAME) {
                     const asl::Vector3f * myValue = myAnimatedAttribute->nodeValuePtr<asl::Vector3f>();
                     if (myValue) {
-                        return AnimationPtr(new Animation<asl::Vector3f>(theNode, myValueList, 
+                        return AnimationPtr(new Animation<asl::Vector3f>(theNode, myValueList,
                                                                          myAnimatedAttribute, myAttributeComponent, myAngleAttribute));
                     }
                     myTypeStringIsValid = true;
                 } else if (myTypeName == SOM_VECTOR_VECTOR4F_NAME) {
                     const asl::Vector4f * myValue = myAnimatedAttribute->nodeValuePtr<asl::Vector4f>();
                     if (myValue) {
-                        return AnimationPtr(new Animation<asl::Vector4f>(theNode, myValueList, 
+                        return AnimationPtr(new Animation<asl::Vector4f>(theNode, myValueList,
                                                                          myAnimatedAttribute,myAttributeComponent, myAngleAttribute));
                     }
                     myTypeStringIsValid = true;
                 } else if (myTypeName == SOM_VECTOR_STRING_NAME) {
                     const string * myValue = myAnimatedAttribute->nodeValuePtr<string>();
                     if (myValue) {
-                        return AnimationPtr(new Animation<string>(theNode, myValueList, 
+                        return AnimationPtr(new Animation<string>(theNode, myValueList,
                                     myAnimatedAttribute, myAttributeComponent, myAngleAttribute));
                     }
                     myTypeStringIsValid = true;
                 } else if (myTypeName == SOM_VECTOR_QUATERNIONF_NAME) {
-                    const asl::Quaternionf * myValue = 
+                    const asl::Quaternionf * myValue =
                             myAnimatedAttribute->nodeValuePtr<asl::Quaternionf>();
                     if (myValue) {
-                        return AnimationPtr(new Animation<asl::Quaternionf>(theNode, 
+                        return AnimationPtr(new Animation<asl::Quaternionf>(theNode,
                                 myValueList, myAnimatedAttribute, myAttributeComponent, myAngleAttribute));
                     }
                     myTypeStringIsValid = true;
@@ -336,56 +336,56 @@ namespace y60 {
                 if (myTypeName == SOM_VECTOR_BOOL_NAME) {
                     const VectorOfBool * myValue = myAnimatedAttribute->nodeValuePtr<VectorOfBool>();
                     if (myValue) {
-                        return AnimationPtr(new Animation<AcBool,VectorOfBool>(theNode, myValueList, 
+                        return AnimationPtr(new Animation<AcBool,VectorOfBool>(theNode, myValueList,
                                              myAnimatedAttribute, myAttributeComponent, myAngleAttribute));
                     }
                     myTypeStringIsValid = true;
                 } else if (myTypeName == SOM_VECTOR_FLOAT_NAME) {
                     const VectorOfFloat * myValue = myAnimatedAttribute->nodeValuePtr<VectorOfFloat>();
                     if (myValue) {
-                        return AnimationPtr(new Animation<float, VectorOfFloat>(theNode, myValueList, 
+                        return AnimationPtr(new Animation<float, VectorOfFloat>(theNode, myValueList,
                                              myAnimatedAttribute, myAttributeComponent, myAngleAttribute));
                     }
                     myTypeStringIsValid = true;
                 } else if (myTypeName == SOM_VECTOR_UNSIGNED_NAME) {
                     const VectorOfUnsignedInt * myValue = myAnimatedAttribute->nodeValuePtr<VectorOfUnsignedInt>();
                     if (myValue) {
-                        return AnimationPtr(new Animation<unsigned,VectorOfUnsignedInt>(theNode, myValueList, 
+                        return AnimationPtr(new Animation<unsigned,VectorOfUnsignedInt>(theNode, myValueList,
                                               myAnimatedAttribute, myAttributeComponent, myAngleAttribute));
                     }
                     myTypeStringIsValid = true;
                 } else if (myTypeName == SOM_VECTOR_VECTOR2F_NAME) {
                     const VectorOfVector2f * myValue = myAnimatedAttribute->nodeValuePtr<VectorOfVector2f>();
                     if (myValue) {
-                        return AnimationPtr(new Animation<asl::Vector2f,VectorOfVector2f>(theNode, myValueList, 
+                        return AnimationPtr(new Animation<asl::Vector2f,VectorOfVector2f>(theNode, myValueList,
                                              myAnimatedAttribute, myAttributeComponent, myAngleAttribute));
                     }
                     myTypeStringIsValid = true;
                 } else if (myTypeName == SOM_VECTOR_VECTOR3F_NAME) {
                     const VectorOfVector3f * myValue = myAnimatedAttribute->nodeValuePtr<VectorOfVector3f>();
                     if (myValue) {
-                        return AnimationPtr(new Animation<asl::Vector3f,VectorOfVector3f>(theNode, myValueList, 
+                        return AnimationPtr(new Animation<asl::Vector3f,VectorOfVector3f>(theNode, myValueList,
                                              myAnimatedAttribute, myAttributeComponent, myAngleAttribute));
                     }
                     myTypeStringIsValid = true;
                 } else if (myTypeName == SOM_VECTOR_VECTOR4F_NAME) {
                     const VectorOfVector4f * myValue = myAnimatedAttribute->nodeValuePtr<VectorOfVector4f>();
                     if (myValue) {
-                        return AnimationPtr(new Animation<asl::Vector4f,VectorOfVector4f>(theNode, myValueList, 
+                        return AnimationPtr(new Animation<asl::Vector4f,VectorOfVector4f>(theNode, myValueList,
                                              myAnimatedAttribute,myAttributeComponent, myAngleAttribute));
                     }
                     myTypeStringIsValid = true;
                 } else if (myTypeName == SOM_VECTOR_STRING_NAME) {
                     const VectorOfString * myValue = myAnimatedAttribute->nodeValuePtr<VectorOfString>();
                     if (myValue) {
-                        return AnimationPtr(new Animation<string,VectorOfString>(theNode, myValueList, 
+                        return AnimationPtr(new Animation<string,VectorOfString>(theNode, myValueList,
                                              myAnimatedAttribute, myAttributeComponent, myAngleAttribute));
                     }
                     myTypeStringIsValid = true;
                 } else if (myTypeName == SOM_VECTOR_QUATERNIONF_NAME) {
                     const VectorOfQuaternionf * myValue =  myAnimatedAttribute->nodeValuePtr<VectorOfQuaternionf>();
                     if (myValue) {
-                        return AnimationPtr(new Animation<asl::Quaternionf, VectorOfQuaternionf>(theNode, 
+                        return AnimationPtr(new Animation<asl::Quaternionf, VectorOfQuaternionf>(theNode,
                                             myValueList, myAnimatedAttribute, myAttributeComponent, myAngleAttribute));
                     }
                     myTypeStringIsValid = true;

@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -84,9 +84,9 @@ namespace y60 {
     //=== Plane ============================================================
     Plane::Plane(dom::Node & theNode) : GeometryBase( theNode ) {}
     Plane::~Plane() { AC_TRACE << "Plane DTOR " << this << endl; }
-    
+
     void
-    Plane::recalculateBoundingBox() {  
+    Plane::recalculateBoundingBox() {
         if (get<VisibleTag>()) {
 
             Box3f myBoundingBox;
@@ -112,11 +112,11 @@ namespace y60 {
     Point::~Point() {
         AC_TRACE << "Point DTOR " << this << endl;
     }
-    
+
     void
-    Point::recalculateBoundingBox() {  
+    Point::recalculateBoundingBox() {
         if (get<VisibleTag>()) {
-            // TODO: extend box by geometric primitives that have a valid box 
+            // TODO: extend box by geometric primitives that have a valid box
             //       ... like sphere, box, point ... plane doesn't have one ...
             Box3f myBoundingBox;
             myBoundingBox.makeEmpty();
@@ -139,11 +139,11 @@ namespace y60 {
     Vector::~Vector() {
         AC_TRACE << "Vector DTOR " << this << endl;
     }
-    
+
     void
-    Vector::recalculateBoundingBox() {  
+    Vector::recalculateBoundingBox() {
         if (get<VisibleTag>()) {
-            // TODO: extend box by geometric primitives that have a valid box 
+            // TODO: extend box by geometric primitives that have a valid box
             //       ... like sphere, box, point ... plane doesn't have one ...
             Box3f myBoundingBox;
             myBoundingBox.makeEmpty();
@@ -168,11 +168,11 @@ namespace y60 {
     LineSegment::~LineSegment() {
         AC_TRACE << "LineSegment DTOR " << this << endl;
     }
-    
+
     void
-    LineSegment::recalculateBoundingBox() {  
+    LineSegment::recalculateBoundingBox() {
         if (get<VisibleTag>()) {
-            // TODO: extend box by geometric primitives that have a valid box 
+            // TODO: extend box by geometric primitives that have a valid box
             //       ... like sphere, box, point ... plane doesn't have one ...
             Box3f myBoundingBox;
             myBoundingBox.makeEmpty();
@@ -195,7 +195,7 @@ namespace y60 {
     //=== Geometry Baseclass ===============================================
     template <class PRIMITIVE, class PRIMITIVE_TAG, class GLOBAL_PRIMITIVE_TAG, class DERIVED_FACADE>
     Geometry<PRIMITIVE, PRIMITIVE_TAG, GLOBAL_PRIMITIVE_TAG, DERIVED_FACADE>::
-    Geometry( dom::Node & theNode) : 
+    Geometry( dom::Node & theNode) :
             TransformHierarchyFacade( theNode ),
             PRIMITIVE_TAG::Plug( theNode ),
             dom::FacadeAttributePlug<GLOBAL_PRIMITIVE_TAG>( this ),
@@ -209,7 +209,7 @@ namespace y60 {
     ~Geometry() {}
 
     template <class PRIMITIVE, class PRIMITIVE_TAG, class GLOBAL_PRIMITIVE_TAG, class DERIVED_FACADE>
-    asl::Ptr<DERIVED_FACADE, dom::ThreadingModel> 
+    asl::Ptr<DERIVED_FACADE, dom::ThreadingModel>
     Geometry<PRIMITIVE, PRIMITIVE_TAG, GLOBAL_PRIMITIVE_TAG, DERIVED_FACADE>::
     create(dom::NodePtr theParent, const PRIMITIVE & thePrimitive) {
         dom::NodePtr myNode = dom::NodePtr(new dom::Element( DERIVED_FACADE::getNodeName() ));
@@ -219,7 +219,7 @@ namespace y60 {
     }
 
     template <class PRIMITIVE, class PRIMITIVE_TAG, class GLOBAL_PRIMITIVE_TAG, class DERIVED_FACADE>
-    void 
+    void
     Geometry<PRIMITIVE, PRIMITIVE_TAG, GLOBAL_PRIMITIVE_TAG, DERIVED_FACADE>::
     registerDependenciesRegistrators() {
         TransformHierarchyFacade::registerDependenciesRegistrators();
@@ -228,7 +228,7 @@ namespace y60 {
     }
 
     template <class PRIMITIVE, class PRIMITIVE_TAG, class GLOBAL_PRIMITIVE_TAG, class DERIVED_FACADE>
-    void 
+    void
     Geometry<PRIMITIVE, PRIMITIVE_TAG, GLOBAL_PRIMITIVE_TAG, DERIVED_FACADE>::
     registerDependenciesForGlobalPrimitive() {
         if (getNode()) {
@@ -242,7 +242,7 @@ namespace y60 {
     }
 
     template <class PRIMITIVE, class PRIMITIVE_TAG, class GLOBAL_PRIMITIVE_TAG, class DERIVED_FACADE>
-    void 
+    void
     Geometry<PRIMITIVE, PRIMITIVE_TAG, GLOBAL_PRIMITIVE_TAG, DERIVED_FACADE>::
     registerDependenciesForBoundingBox() {
         if (getNode()) {

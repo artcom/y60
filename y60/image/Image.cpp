@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -132,7 +132,7 @@ namespace y60 {
     Image::createRaster(unsigned theWidth,
                         unsigned theHeight,
                         unsigned theDepth,
-                        PixelEncoding theEncoding) 
+                        PixelEncoding theEncoding)
     {
         return setRasterValue(createRasterValue(theEncoding, theWidth, theHeight), theEncoding, theDepth);
     }
@@ -143,7 +143,7 @@ namespace y60 {
                         unsigned theHeight,
                         unsigned theDepth,
                         PixelEncoding theEncoding,
-                        const asl::ReadableBlock & thePixels) 
+                        const asl::ReadableBlock & thePixels)
     {
         unregisterRasterValue();
         return setRasterValue(createRasterValue(theEncoding, theWidth, theHeight, thePixels), theEncoding, theDepth);
@@ -153,7 +153,7 @@ namespace y60 {
     Image::registerDependenciesRegistrators() {
         Facade::registerDependenciesRegistrators();
         AC_DEBUG << "Image::registerDependenciesRegistrators '" << get<NameTag>();
-        
+
         ImageSourceTag::Plug::getValuePtr()->setImmediateCallBack(dynamic_cast_Ptr<Image>(getSelf()), &Image::load);
 
         dom::ValuePtr myRasterValue = getRasterValue();
@@ -166,12 +166,12 @@ namespace y60 {
             const char * myRasterPixelFormat = getStringFromEnum(myEncoding, PixelEncodingString);
             // AC_DEBUG << "myRasterPixelFormat="<<int(myRasterPixelFormat);
             set<RasterPixelFormatTag>(myRasterPixelFormat);
-            set<ImageBytesPerPixelTag>(float(getBytesRequired(4, myEncoding))/4.0f);   
+            set<ImageBytesPerPixelTag>(float(getBytesRequired(4, myEncoding))/4.0f);
 
             registerDependenciesForRasterValueUpdate();
         } else {
             // Load the raster value, and register dependency update functions
-            load();            
+            load();
         }
 
         ImageWidthTag::Plug::setReconnectFunction(&Image::registerDependenciesForImageWidthUpdate);
@@ -179,14 +179,14 @@ namespace y60 {
     }
 
     void
-    Image::registerDependenciesForRasterValueUpdate() {        
+    Image::registerDependenciesForRasterValueUpdate() {
         if (getNode()) {
             dom::ValuePtr myRasterValue = getRasterValue();
             //myRasterValue->registerPrecursor(ImageSourceTag::Plug::getValuePtr());
             myRasterValue->registerPrecursor(ImageResizeTag::Plug::getValuePtr());
             myRasterValue->registerPrecursor(ImageFilterTag::Plug::getValuePtr());
             myRasterValue->registerPrecursor(ImageFilterParamsTag::Plug::getValuePtr());
-            myRasterValue->setCalculatorFunction(dynamic_cast_Ptr<Image>(getSelf()), 
+            myRasterValue->setCalculatorFunction(dynamic_cast_Ptr<Image>(getSelf()),
                 &Image::load);
             myRasterValue->setClean();
 
@@ -194,7 +194,7 @@ namespace y60 {
     }
 
     void
-    Image::registerDependenciesForImageWidthUpdate() {        
+    Image::registerDependenciesForImageWidthUpdate() {
         if (getNode()) {
             ImageWidthTag::Plug::dependsOn(getRasterValue());
             ImageWidthTag::Plug::getValuePtr()->setCalculatorFunction(
@@ -203,7 +203,7 @@ namespace y60 {
     }
 
     void
-    Image::registerDependenciesForImageHeightUpdate() {        
+    Image::registerDependenciesForImageHeightUpdate() {
         if (getNode()) {
             ImageHeightTag::Plug::dependsOn(getRasterValue());
             ImageHeightTag::Plug::getValuePtr()->setCalculatorFunction(
@@ -233,7 +233,7 @@ namespace y60 {
 
     void
     Image::load() {
-        // facade contruction will always lead to a raster ctor, 
+        // facade contruction will always lead to a raster ctor,
         // we do not want this behaviour for inlining textures
         if (!allowInlineFlag) {
             return;
@@ -254,7 +254,7 @@ namespace y60 {
 
         AC_INFO << "Image::load loading '" << get<ImageSourceTag>() << "'";
         unsigned myDepth = get<ImageDepthTag>();
-        ImageLoader myImageLoader(get<ImageSourceTag>(), AppPackageManager::get().getPtr(), 
+        ImageLoader myImageLoader(get<ImageSourceTag>(), AppPackageManager::get().getPtr(),
             ITextureManagerPtr(), myDepth);
 
         string myFilter = get<ImageFilterTag>();
@@ -270,7 +270,7 @@ namespace y60 {
         // Drop alpha channel if unused
         myImageLoader.removeUnusedAlpha();
 
-        set<ImageMatrixTag>(myImageLoader.getImageMatrix());    
+        set<ImageMatrixTag>(myImageLoader.getImageMatrix());
         setRasterValue(myImageLoader.getData(), myImageLoader.getEncoding(), myDepth);
     }
 
@@ -286,7 +286,7 @@ namespace y60 {
         // Setup raster attributes
         set<ImageDepthTag>(theDepth);
         set<RasterPixelFormatTag>(getStringFromEnum(theEncoding, PixelEncodingString));
-        set<ImageBytesPerPixelTag>(float(getBytesRequired(4, theEncoding))/4.0f);   
+        set<ImageBytesPerPixelTag>(float(getBytesRequired(4, theEncoding))/4.0f);
 
         // Setup raster nodes
         dom::DOMString myRasterName = RasterElementNames[theEncoding];
@@ -295,7 +295,7 @@ namespace y60 {
         myTextChild->nodeValueWrapperPtr(theRaster);
 
         // We have to reconnect the dependency graph, because the value has changed
-        registerDependenciesForRasterValueUpdate();        
+        registerDependenciesForRasterValueUpdate();
 
         return dynamic_cast_Ptr<dom::ResizeableRaster>(theRaster);
     }
@@ -353,7 +353,7 @@ namespace y60 {
 
         if (getRasterEncoding() != mySourceEncoding) {
             throw ImageException(std::string("Image::convertFromPLBmp(): Encoding do not match: destination : ") +
-                getStringFromEnum(getRasterEncoding(), PixelEncodingString) + " source : " + 
+                getStringFromEnum(getRasterEncoding(), PixelEncodingString) + " source : " +
                 getStringFromEnum(mySourceEncoding, PixelEncodingString), PLUS_FILE_LINE);
 
         }

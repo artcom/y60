@@ -16,20 +16,20 @@
 #include <OpenEXR/ImfRgbaFile.h>
 #include <OpenEXR/ImathBox.h>
 
-#include <maya/MString.h> 
-#include <maya/MSyntax.h> 
-#include <maya/MArgDatabase.h> 
-#include <maya/MSelectionList.h> 
-#include <maya/MFnDependencyNode.h> 
-#include <maya/MArgList.h> 
-#include <maya/MFnPlugin.h> 
-#include <maya/MPxCommand.h> 
+#include <maya/MString.h>
+#include <maya/MSyntax.h>
+#include <maya/MArgDatabase.h>
+#include <maya/MSelectionList.h>
+#include <maya/MFnDependencyNode.h>
+#include <maya/MArgList.h>
+#include <maya/MFnPlugin.h>
+#include <maya/MPxCommand.h>
 
 #include <iostream>
 #include <iomanip>
 #include <sstream>
-#include <cstdio> 
-#include <math.h> 
+#include <cstdio>
+#include <math.h>
 
 
 #include "KSAnimationSampler.h"
@@ -58,10 +58,10 @@ static const char * SAMPLES_V_L("-samplesV");
 static const char * SCALE("-sc");
 static const char * SCALE_L("-scale");
 
-class ColorAtPointHDR : public MPxCommand { 
-    public: 
-        MStatus        doIt( const MArgList& args ); 
-        static void*   creator(); 
+class ColorAtPointHDR : public MPxCommand {
+    public:
+        MStatus        doIt( const MArgList& args );
+        static void*   creator();
 
         static MSyntax newSyntax();
     private:
@@ -78,7 +78,7 @@ class ColorAtPointHDR : public MPxCommand {
                 const double & theMinV, const double & theMaxV,
                 const long & theSamplesU, const long & theSamplesV,
                 const double & theScale);
-}; 
+};
 
 #if WIN32
 #   define DLL_EXPORT __declspec(dllexport)
@@ -87,30 +87,30 @@ class ColorAtPointHDR : public MPxCommand {
 #endif
 
 DLL_EXPORT
-MStatus 
-initializePlugin( MObject obj ) { 
-    MFnPlugin plugin( obj, "ART+COM", "1.0", "Any" ); 
+MStatus
+initializePlugin( MObject obj ) {
+    MFnPlugin plugin( obj, "ART+COM", "1.0", "Any" );
     plugin.registerCommand( "colorAtPointHDR",
                             ColorAtPointHDR::creator,
-                            ColorAtPointHDR::newSyntax); 
+                            ColorAtPointHDR::newSyntax);
     plugin.registerCommand( "sampleKSAnimation",
                             KSAnimationSampler::creator,
                             KSAnimationSampler::newSyntax );
-    return MS::kSuccess; 
-} 
+    return MS::kSuccess;
+}
 
 DLL_EXPORT
-MStatus 
-uninitializePlugin( MObject obj ) { 
-    MFnPlugin plugin( obj ); 
-    plugin.deregisterCommand( "colorAtPointHDR" ); 
-    plugin.deregisterCommand( "sampleKSAnimation" ); 
-    return MS::kSuccess; 
-} 
+MStatus
+uninitializePlugin( MObject obj ) {
+    MFnPlugin plugin( obj );
+    plugin.deregisterCommand( "colorAtPointHDR" );
+    plugin.deregisterCommand( "sampleKSAnimation" );
+    return MS::kSuccess;
+}
 
 
 MStatus
-ColorAtPointHDR::doIt( const MArgList& args ) { 
+ColorAtPointHDR::doIt( const MArgList& args ) {
     try {
         MObject myObject;
         double myMinU, myMaxU, myMinV, myMaxV;
@@ -120,24 +120,24 @@ ColorAtPointHDR::doIt( const MArgList& args ) {
                 mySamplesU, mySamplesV, myScale);
         std::string myFilename;
         MStatus myStatus = composeFilename( myObject, myFilename );
-        //cout << "Sampling " << myFilename << endl; 
+        //cout << "Sampling " << myFilename << endl;
 
         sampleTexture( myFilename , myMinU, myMaxU, myMinV, myMaxV,
                 mySamplesU, mySamplesV, myScale);
     } catch (const std::exception & ex) {
         cerr << "std::exception: " << ex.what();
-        return MS::kFailure; 
+        return MS::kFailure;
     } catch (...) {
-        cerr << "EXCEPTION" << endl;    
+        cerr << "EXCEPTION" << endl;
     }
 
-    return MS::kSuccess; 
-} 
+    return MS::kSuccess;
+}
 
 void *
-ColorAtPointHDR::creator() { 
-    return new ColorAtPointHDR; 
-} 
+ColorAtPointHDR::creator() {
+    return new ColorAtPointHDR;
+}
 
 MSyntax
 ColorAtPointHDR::newSyntax() {
@@ -192,7 +192,7 @@ ColorAtPointHDR::composeFilename( MObject theTextureNode, std::string & theFilen
 
         //cerr << "frame: " << theFilename << endl;
     }
-        
+
     return MS::kSuccess;
 }
 
@@ -227,7 +227,7 @@ ColorAtPointHDR::sampleTexture( const std::string & theFilename,
 
     for (unsigned myUSteps = 0; myUSteps < theSamplesU; ++myUSteps) {
         float myU = (theMinU + myUSteps * du) * (myWidth - 1);
-        int myLowerU = int( floor( myU + 0.5 )); 
+        int myLowerU = int( floor( myU + 0.5 ));
         //cerr << "u: " << myU << " int u: " << myLowerU << endl;
         int myUpperU = min( myLowerU + 1, (myWidth - 1) ); // XXX
         float myUWeight = myU - myLowerU;
@@ -235,7 +235,7 @@ ColorAtPointHDR::sampleTexture( const std::string & theFilename,
         for (unsigned myVSteps = 0; myVSteps < theSamplesV; ++myVSteps) {
             float myV = (theMinV + myVSteps * dv) * (myHeight - 1);
             myV = (myHeight -1) - myV;
-            int myLowerV = int( floor( myV  + 0.5)); 
+            int myLowerV = int( floor( myV  + 0.5));
             int myUpperV = min( myLowerV + 1, (myHeight - 1 )); // XXX
             float myVWeight = myV - myLowerV;
 
@@ -249,7 +249,7 @@ ColorAtPointHDR::sampleTexture( const std::string & theFilename,
     }
 }
 
-void 
+void
 ColorAtPointHDR::parseArgs(const MArgList & theArgs,
         MObject & theTextureNode,
         double & theMinU, double & theMaxU, double & theMinV, double & theMaxV,
@@ -288,17 +288,17 @@ ColorAtPointHDR::parseArgs(const MArgList & theArgs,
         theMaxV = 1.0;
     }
     if (myParser.isFlagSet( SAMPLES_U )) {
-        theSamplesU = myParser.flagArgumentInt( SAMPLES_U, 0 );    
+        theSamplesU = myParser.flagArgumentInt( SAMPLES_U, 0 );
     } else {
         theSamplesU = 1;
     }
     if (myParser.isFlagSet( SAMPLES_V )) {
-        theSamplesV = myParser.flagArgumentInt( SAMPLES_V, 0 );    
+        theSamplesV = myParser.flagArgumentInt( SAMPLES_V, 0 );
     } else {
         theSamplesV = 1;
     }
     if (myParser.isFlagSet( SCALE )) {
-        theScale = myParser.flagArgumentDouble( SCALE, 0 );    
+        theScale = myParser.flagArgumentDouble( SCALE, 0 );
     } else {
         theScale = 1.0;
     }

@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -72,16 +72,16 @@ function SynergyEventHandler( theSynergyServer, theSettings ) {
     this.Constructor( this, Protected, theSynergyServer, theSettings );
 }
 
-SynergyEventHandler.prototype.Constructor = function( Public, Protected, theSynergyServer, 
-                                                      theSettings ) 
+SynergyEventHandler.prototype.Constructor = function( Public, Protected, theSynergyServer,
+                                                      theSettings )
 {
-    
+
     var _myFirstEvents = [];
     var _mySecondEvents = [];
 
     var _mySettings = theSettings;
     var _mySynergyServer = theSynergyServer;
- 
+
     var _myScreenSize = _mySynergyServer.getScreenSize();
     var _myGridSize = new Vector2f( 1, 1 );
     var _myMirror = new Vector2i(0,0);
@@ -101,7 +101,7 @@ SynergyEventHandler.prototype.Constructor = function( Public, Protected, theSyne
 
     var _myMousePosition = new Vector2f(0,0);
     var _myTargetPosition = null;
-    
+
 
     // TODO: implement onAddFirst, onMoveFirst, onAddSecond, onMoveSecond ...
     Public.onRemoveFirst = function( theEvent ) {}
@@ -111,21 +111,21 @@ SynergyEventHandler.prototype.Constructor = function( Public, Protected, theSyne
 
         if (_myTargetPosition) {
 
-            var myPosition = product( sum( product( _myMousePosition, 
-                                                    MOVE_VELOCITY), 
-                                           _myTargetPosition), 
-                                      1 / (MOVE_VELOCITY + 1)); 
-            _myMousePosition = myPosition; 
+            var myPosition = product( sum( product( _myMousePosition,
+                                                    MOVE_VELOCITY),
+                                           _myTargetPosition),
+                                      1 / (MOVE_VELOCITY + 1));
+            _myMousePosition = myPosition;
             if (distance( _myMousePosition, _myTargetPosition ) < 0.1) {
                 _myTargetPosition = null;
             }
-            _mySynergyServer.onMouseMotion( _myMousePosition.x + _myPositionOffset[0], 
+            _mySynergyServer.onMouseMotion( _myMousePosition.x + _myPositionOffset[0],
                                             _myMousePosition.y + _myPositionOffset[1] );
 
         }
 
     }
-    
+
 
     Public.onASSEvent = function( theEvent ) {
 
@@ -138,19 +138,19 @@ SynergyEventHandler.prototype.Constructor = function( Public, Protected, theSyne
             }
         }
         else if (theEvent.type == "remove") {
-            if (_myFirstEvents.length > 0 
-                && _myFirstEvents[0].id == theEvent.id) 
+            if (_myFirstEvents.length > 0
+                && _myFirstEvents[0].id == theEvent.id)
             {
                 _myFirstEvents = [];
-                
+
                 Public.onRemoveFirst( theEvent );
                 if (_mySecondEvents.length > 0) {
                     _myFirstEvents = _mySecondEvents;
                     _mySecondEvents = [];
                 }
             }
-            else if (_mySecondEvents.length > 0 
-                     && _mySecondEvents[0].id == theEvent.id) 
+            else if (_mySecondEvents.length > 0
+                     && _mySecondEvents[0].id == theEvent.id)
             {
                 _mySecondEvents = [];
                 Public.onRemoveSecond( theEvent );
@@ -158,12 +158,12 @@ SynergyEventHandler.prototype.Constructor = function( Public, Protected, theSyne
 
         }
         else if (theEvent.type == "move") {
-            if (_myFirstEvents.length > 0 
-                && _myFirstEvents[0].id == theEvent.id) 
+            if (_myFirstEvents.length > 0
+                && _myFirstEvents[0].id == theEvent.id)
             {
                 Protected.pushEvent( _myFirstEvents, theEvent );
-            } else if (_mySecondEvents.length > 0 
-                       && _mySecondEvents[0].id == theEvent.id) 
+            } else if (_mySecondEvents.length > 0
+                       && _mySecondEvents[0].id == theEvent.id)
             {
                 Protected.pushEvent( _mySecondEvents, theEvent );
             }
@@ -184,7 +184,7 @@ SynergyEventHandler.prototype.Constructor = function( Public, Protected, theSyne
     Protected.mousePosition getter = function() {
         return _myMousePosition;
     }
-    
+
     Protected.mousePosition setter = function( theMousePosition ) {
         _myMousePosition = theMousePosition;
     }
@@ -192,7 +192,7 @@ SynergyEventHandler.prototype.Constructor = function( Public, Protected, theSyne
     Protected.firstEvents getter = function() {
         return _myFirstEvents;
     }
-    
+
     Protected.firstEvents setter = function( theEventQueue ) {
         _myFirstEvents = theEventQueue;
     }
@@ -212,7 +212,7 @@ SynergyEventHandler.prototype.Constructor = function( Public, Protected, theSyne
     Protected.positionOffset setter = function( thePositionOffset ) {
         _myPositionOffset = thePositionOffset;
     }
-    
+
     Protected.positionOffset getter = function() {
         return _myPositionOffset;
     }
@@ -229,15 +229,15 @@ SynergyEventHandler.prototype.Constructor = function( Public, Protected, theSyne
         if (_myMirror.x > 0) {
             myRawX = _myGridSize.x - theRawPosition.x;
         }
-        var myX = myRawX / _myGridSize.x 
+        var myX = myRawX / _myGridSize.x
                   * (_myScreenSize.x + _mySizeOffset[0]);
-                  
+
         var myRawY = theRawPosition.y;
         if (_myMirror.y > 0) {
             myRawY = _myGridSize.y - theRawPosition.y;
         }
-                  
-        var myY = myRawY / _myGridSize.y 
+
+        var myY = myRawY / _myGridSize.y
                   * (_myScreenSize.y + _mySizeOffset[1]);
         var myMousePosition = new Vector2f( myX, myY );
 
@@ -245,9 +245,9 @@ SynergyEventHandler.prototype.Constructor = function( Public, Protected, theSyne
 
         return myMousePosition;
     }
-    
+
     Protected.outOfBounds = function( thePosition ) {
-        return ( thePosition.x < 0 || thePosition.x > _myScreenSize.x || 
+        return ( thePosition.x < 0 || thePosition.x > _myScreenSize.x ||
                  thePosition.y < 0 || thePosition.y > _myScreenSize.y );
     }
 
@@ -257,8 +257,8 @@ SynergyEventHandler.prototype.Constructor = function( Public, Protected, theSyne
     }
 
     Protected.dualCursor = function( theEvent ) {
-        return (_myFirstEvents.length > 0 && _mySecondEvents.length > 0 
-                && (_myFirstEvents[0].id == theEvent.id 
+        return (_myFirstEvents.length > 0 && _mySecondEvents.length > 0
+                && (_myFirstEvents[0].id == theEvent.id
                     || _mySecondEvents[0].id == theEvent.id));
     }
 

@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -173,7 +173,7 @@ TNTMeasurementList::append(dom::NodePtr theMeasurementNode, const Glib::ustring 
         throw asl::Exception(std::string("Could not find icon for type '") +
                              myType + "'.", PLUS_FILE_LINE);
     }
-    
+
     myRow[_myColumns.is_visible] = theMeasurementNode->getAttribute("visible")->nodeValueRef<bool>();
     myRow[_myColumns.type_icon] = myIt->second;
     myRow[_myColumns.type] = myType;
@@ -190,7 +190,7 @@ TNTMeasurementList::clear() {
 }
 
 
-void 
+void
 TNTMeasurementList::createDummyRows() {
     cerr << "TNTMeasurementList::createDummyRows()" << endl;
     std::vector<Glib::RefPtr<Gdk::Pixbuf> > myTypeList;
@@ -224,7 +224,7 @@ TNTMeasurementList::onEditableToggled(const Glib::ustring & thePathString) {
     _myLockedToggledSignal.emit(myRow[_myColumns.xml_id]);
 }
 
-bool 
+bool
 TNTMeasurementList::on_button_press_event(GdkEventButton* event) {
     //Call base class, to allow normal handling,
     //such as allowing the row to be selected by the right-click:
@@ -232,7 +232,7 @@ TNTMeasurementList::on_button_press_event(GdkEventButton* event) {
 
     //Then do our custom stuff:
     if( (event->type == GDK_BUTTON_PRESS) && (event->button == 3) ) {
-        _myRightClickSignal.emit(); 
+        _myRightClickSignal.emit();
     }
     return return_value;
 }
@@ -290,7 +290,7 @@ TNTMeasurementList::isEndIter(const Gtk::TreeIter & theIter) {
     return (theIter == _myListModel->children().end());
 }
 
-TNTMeasurementList::Children::iterator 
+TNTMeasurementList::Children::iterator
 TNTMeasurementList::findRowById(const Glib::ustring & theId) {
     Children myChildren = _myListModel->children();
     for(Children::iterator iter = myChildren.begin(); iter != myChildren.end(); ++iter) {
@@ -302,8 +302,8 @@ TNTMeasurementList::findRowById(const Glib::ustring & theId) {
         theId + "'.", PLUS_FILE_LINE);
 }
 
-Gtk::TreeIter 
-TNTMeasurementList::update(dom::NodePtr theMeasurementNode, const Glib::ustring & theDisplayValue) {    
+Gtk::TreeIter
+TNTMeasurementList::update(dom::NodePtr theMeasurementNode, const Glib::ustring & theDisplayValue) {
     Children::iterator myIter = findRowById(theMeasurementNode->getAttributeString("id"));
     Gtk::TreeModel::Row myRow = *myIter;
 
@@ -313,7 +313,7 @@ TNTMeasurementList::update(dom::NodePtr theMeasurementNode, const Glib::ustring 
         throw asl::Exception(std::string("Could not find icon for type '") +
                              myType + "'.", PLUS_FILE_LINE);
     }
-    
+
     myRow[_myColumns.is_visible] = theMeasurementNode->getAttribute("visible")->nodeValueRef<bool>();
     myRow[_myColumns.type_icon] = myIt->second;
     myRow[_myColumns.type] = myType;
@@ -324,7 +324,7 @@ TNTMeasurementList::update(dom::NodePtr theMeasurementNode, const Glib::ustring 
     return myIter;
 }
 
-void 
+void
 TNTMeasurementList::onNameEdited(const Glib::ustring & thePath, const Glib::ustring & theValue) {
     //AC_INFO << "Got NameEdited from: " << thePath << " to " << theValue;
     Gtk::TreeModel::Row myRow = * (_myListModel->get_iter(Gtk::TreeModel::Path(thePath)));

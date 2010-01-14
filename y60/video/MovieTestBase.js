@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -116,7 +116,7 @@ function MovieTestBase(Public, theArguments, theDecoderName) {
     Base.onPostRender = Public.onPostRender;
     Public.onPostRender = function() {
         Base.onPostRender();
-        
+
         var myPos = 10;
         window.setTextColor([1,1,1,1]);
         if (_myMovie) {
@@ -128,23 +128,23 @@ function MovieTestBase(Public, theArguments, theDecoderName) {
             window.renderText([10, myPos], myText, "Screen15");
         }
     }
-    
-    
+
+
     function initMovie(theMovieName) {
         if (_myMovie) {
             _myMovie.removeFromScene();
             delete _myMovie;
             _myMovie = 0;
         }
-        _myMovie = new MovieOverlay(window.scene, 
+        _myMovie = new MovieOverlay(window.scene,
                 "../../../video/testmovies/"+theMovieName,
                 new Vector2f(80, 60), null, false, null, _myDecoderName);
-        
+
         _myMovie.playspeed = 1;
         _myMovie.loopcount = 1;
         _myMovie.avdelay = 0;
     }
- 
+
     Public.nextTest = function() {
         _myCurTestIndex++;
         if (_myCurTestIndex < _myTests.length) {
@@ -154,7 +154,7 @@ function MovieTestBase(Public, theArguments, theDecoderName) {
         }
         initMovie(_myMovies[_myCurMovieIndex]);
     }
-    
+
     function nextMovie() {
         _myCurMovieIndex++;
         if (_myCurMovieIndex < _myMovies.length) {
@@ -185,7 +185,7 @@ function MovieTestBase(Public, theArguments, theDecoderName) {
         _myMovies = theMovies;
         _myTests = theTests;
     }
-    
+
     Public.assure_msg = function(theCondition, theMsg) {
         if (!theCondition) {
             print("    FAILED : "+theMsg);
@@ -195,5 +195,5 @@ function MovieTestBase(Public, theArguments, theDecoderName) {
             _mySuccessCount++;
         }
     }
-   
+
 }

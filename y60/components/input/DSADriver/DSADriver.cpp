@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -121,7 +121,7 @@ void DSADriver::onUpdateSettings(dom::NodePtr theConfiguration) {
             }
             mySensorArray = SensorArrayPtr(new SensorArray(myArrayName,myGridSize));
             _mySensorArray[myArrayID] = mySensorArray;
-            
+
             /*
              * regular grid
              * [portID,controllerID,bitNumber]
@@ -131,10 +131,10 @@ void DSADriver::onUpdateSettings(dom::NodePtr theConfiguration) {
                     std::string myData = (*myArrayNode)("#text").nodeValue();
                     typedef std::vector< std::vector< asl::Vector3i > > VectorOfVectorOfVector3i;
                     VectorOfVectorOfVector3i mySensorMapping = asl::as<VectorOfVectorOfVector3i>(myData);
-    
+
                     for (int row = 0; row < myGridSize[1]; ++row) {
                         for (int col = 0; col < myGridSize[0]; ++col) {
-    
+
                             unsigned myPortId, myControllerId, myBitNumber;
                             myPortId = mySensorMapping[row][col][0];
                             myControllerId = mySensorMapping[row][col][1];
@@ -145,7 +145,7 @@ void DSADriver::onUpdateSettings(dom::NodePtr theConfiguration) {
                                 AC_WARNING << "DSADriver: Ignoring sensor " << myPortId << "/" << myControllerId << "/" << myBitNumber;
                                 continue;
                             }
-    
+
                             SensorServerList::iterator it = _mySensorServers.find(myPortId);
                             if (it == _mySensorServers.end()) {
                                 AC_WARNING << "DSADriver: No such port for sensor " << myPortId << "/" << myControllerId << "/" << myBitNumber << "; sensor ignored";
@@ -173,7 +173,7 @@ vector<y60::EventPtr> DSADriver::poll()
 
         SensorServer::SensorData mySensorData;
         ssli->second->poll(mySensorData);
-        
+
         for (SensorArrayList::iterator sali = _mySensorArray.begin();
              sali != _mySensorArray.end(); ++sali) {
 
@@ -181,7 +181,7 @@ vector<y60::EventPtr> DSADriver::poll()
             for(SensorServer::SensorData::iterator sdi = mySensorData.begin();
                 sdi != mySensorData.end(); ++sdi) {
                 if (sali->second->getGridSize()[0] == 0 &&
-                    sali->second->getGridSize()[1] == 0) 
+                    sali->second->getGridSize()[1] == 0)
                 {
                     // TODO: Raw Events for multiple Ports
                     sali->second->createRawEvents(myRawEvents,

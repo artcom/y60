@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -82,15 +82,15 @@ namespace y60 {
 	class VideoProcessingExtension :
         public asl::PlugInBase,
 		public y60::IRendererExtension,
-        public jslib::IScriptablePlugin 
+        public jslib::IScriptablePlugin
             {
-           
+
             public:
                 // VideoProcessingExtension();
                 // virtual ~VideoProcessingExtension();
 
                 VideoProcessingExtension(asl::DLHandle theDLHandle);
-             
+
                 void init(y60::ScenePtr theScene);
                 void onStartup(jslib::AbstractRenderWindow * theWindow) {};
                 bool onSceneLoaded(jslib::AbstractRenderWindow *) {
@@ -99,14 +99,14 @@ namespace y60 {
                 void handle(jslib::AbstractRenderWindow * theWindow, y60::EventPtr theEvent) {};
                 void onFrame(jslib::AbstractRenderWindow * theWindow , double t);
 
-                void onGetProperty(const std::string & thePropertyName, 
+                void onGetProperty(const std::string & thePropertyName,
                                    PropertyValue & theReturnValue) const;
-                void onSetProperty(const std::string & thePropertyName, 
+                void onSetProperty(const std::string & thePropertyName,
                                    const PropertyValue & thePropertyValue);
 
                 void onPreRender(jslib::AbstractRenderWindow * theRenderer) {};
                 void onPostRender(jslib::AbstractRenderWindow * theRenderer) {};
-        
+
                 typedef VideoProcessingExtension NATIVE;
                 typedef asl::Ptr<NATIVE> OWNERPTR;
                 typedef jslib::JSWrapper<NATIVE, OWNERPTR,
@@ -117,8 +117,8 @@ namespace y60 {
                     static const char * myClassName = "VideoProcessing";
                     return myClassName;
                 }
-        
-             
+
+
                 virtual JSFunctionSpec* StaticFunctions();
                 virtual JSFunctionSpec* Functions();
 
@@ -134,7 +134,7 @@ namespace y60 {
                 RendererPtr _myRenderer;
                 dom::Node _myResultsNode;
             };
-    
+
     typedef asl::Ptr<VideoProcessingExtension> VideoProcessingExtensionPtr;
 } // end namspace
 

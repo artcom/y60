@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -72,7 +72,7 @@ public:
         MSG_FRAME,
         MSG_EOF
     };
-    
+
     // Time is in seconds.
     VideoMsg(VideoMsgType theType, double theTime, std::vector<unsigned> theFrameSizes);
     ~VideoMsg();
@@ -92,9 +92,9 @@ private:
 // Needed since the default pointer class uses an allocator with a thread-local
 // free list that breaks when all rasters are allocated in one thread and deallocated
 // in another.
-typedef asl::Ptr<VideoMsg, asl::MultiProcessor, 
+typedef asl::Ptr<VideoMsg, asl::MultiProcessor,
         asl::PtrHeapAllocator<asl::MultiProcessor> > VideoMsgPtr;
-    
+
 }
 
 #endif

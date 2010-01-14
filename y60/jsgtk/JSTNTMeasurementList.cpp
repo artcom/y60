@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -72,7 +72,7 @@ using namespace asl;
 
 namespace jslib {
 
-template class JSWrapper<acgtk::TNTMeasurementList, asl::Ptr<acgtk::TNTMeasurementList>, 
+template class JSWrapper<acgtk::TNTMeasurementList, asl::Ptr<acgtk::TNTMeasurementList>,
         StaticAccessProtocol>;
 
 static JSBool
@@ -88,7 +88,7 @@ static JSBool
 registerTypeIcon(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
-    
+
     try {
 
         ensureParamCount(argc, 2);
@@ -114,14 +114,14 @@ registerTypeIcon(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
         return JS_TRUE;
 
     } HANDLE_CPP_EXCEPTION;
-    
+
 }
 
 static JSBool
 append(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
-    
+
     try {
 
         ensureParamCount(argc, 2);
@@ -153,7 +153,7 @@ static JSBool
 update(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
-    
+
     try {
 
         ensureParamCount(argc, 2);
@@ -185,7 +185,7 @@ static JSBool
 remove(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
-    
+
     try {
 
         ensureParamCount(argc, 1);
@@ -215,13 +215,13 @@ static JSBool
 clear(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
-    
+
     try {
         ensureParamCount(argc, 0);
 
         acgtk::TNTMeasurementList * myNative;
         convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
-        
+
         myNative->clear();
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;

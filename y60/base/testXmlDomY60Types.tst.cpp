@@ -6,8 +6,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -29,7 +29,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -52,7 +52,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 
@@ -80,11 +80,11 @@ using namespace std;
 template <class T>
 class XmlValueUnitTest : public TemplateUnitTest {
 public:
-    XmlValueUnitTest(const char * theTemplateArgument, T testValue) 
+    XmlValueUnitTest(const char * theTemplateArgument, T testValue)
         : TemplateUnitTest("XmlValueUnitTest",theTemplateArgument),
           _someVariable(testValue), _myTypeName(theTemplateArgument) {}
     void run() {
-		
+
 		dom::SimpleValue<T> myDefaultConstructedValue(0);
 		SUCCESS("myDefaultConstructedValue");
 
@@ -98,7 +98,7 @@ public:
 		dom::registerStandardTypes(myValueFactory);
         myValueFactory.registerPrototype(_myTypeName,dom::ValuePtr(new dom::SimpleValue<T>(0)));
 		SUCCESS("Initialized myValueFactory");
-		
+
 		dom::ValuePtr myValue(myValueFactory.createValue(_myTypeName,asl::as_string(_someVariable), 0));
 		ENSURE(myValue);
 		ENSURE(dom::dynamic_cast_Value<T>(myValue.get()));
@@ -119,11 +119,11 @@ private:
 template <class T>
 class XmlVectorValueUnitTest : public TemplateUnitTest {
 public:
-    XmlVectorValueUnitTest(const char * theTemplateArgument, T testValue) 
+    XmlVectorValueUnitTest(const char * theTemplateArgument, T testValue)
         : TemplateUnitTest("XmlVectorValueUnitTest",theTemplateArgument),
           _someVariable(testValue), _myTypeName(theTemplateArgument) {}
     void run() {
-		
+
 		dom::VectorValue<T> myDefaultConstructedValue(0);
 		SUCCESS("myDefaultConstructedValue");
 
@@ -136,7 +136,7 @@ public:
 		dom::ValueFactory myValueFactory;
         myValueFactory.registerPrototype(_myTypeName,dom::ValuePtr(new dom::VectorValue<T>(0)));
 		SUCCESS("Initialized myValueFactory");
-		
+
 		dom::ValuePtr myValue(myValueFactory.createValue(_myTypeName,asl::as_string(_someVariable), 0));
 		ENSURE(myValue);
 		ENSURE(dom::dynamic_cast_Value<T>(myValue.get()));
@@ -177,7 +177,7 @@ using namespace asl;
 template <class T>
 class BinarizeVectorUnitTest : public TemplateUnitTest {
 public:
-    BinarizeVectorUnitTest(const char * theTemplateArgument, std::vector<T> testValue) 
+    BinarizeVectorUnitTest(const char * theTemplateArgument, std::vector<T> testValue)
         : TemplateUnitTest("BinarizeVectorUnitTest-",theTemplateArgument),
           _someVariable(testValue), _myTypeName(theTemplateArgument) {}
     void run() {
@@ -212,10 +212,10 @@ public:
         myVector.push_back(asl::Vector3d(1,2,3));
         myVector.push_back(asl::Vector3d(4,5,6));
         addTest(new XmlVectorValueUnitTest<VectorOfVector3d>("VectorOfVector3d",myVector));
-   
+
         std::string myFeatureString = "[10[bla,blub],11[huhu],23[none]]";
         y60::VectorOfRankedFeature myFeatureVector = asl::as<y60::VectorOfRankedFeature>(myFeatureString);
-        addTest(new BinarizeVectorUnitTest<y60::RankedFeature>("VectorOfRankedFeature",myFeatureVector)); 
+        addTest(new BinarizeVectorUnitTest<y60::RankedFeature>("VectorOfRankedFeature",myFeatureVector));
     }
 };
 

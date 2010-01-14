@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -67,8 +67,8 @@ namespace y60 {
     PixelEncodingInfo
     getDefaultGLTextureParams(PixelEncoding theEncoding) {
         switch (theEncoding) {
-            case y60::DEPTH: return PixelEncodingInfo(GL_DEPTH_COMPONENT, 4, false, GL_DEPTH_COMPONENT, GL_FLOAT); 
-            case y60::ALPHA: return PixelEncodingInfo(GL_ALPHA, 1, false, GL_ALPHA); 
+            case y60::DEPTH: return PixelEncodingInfo(GL_DEPTH_COMPONENT, 4, false, GL_DEPTH_COMPONENT, GL_FLOAT);
+            case y60::ALPHA: return PixelEncodingInfo(GL_ALPHA, 1, false, GL_ALPHA);
             case y60::GRAY: return PixelEncodingInfo(GL_LUMINANCE8, 1, false, GL_LUMINANCE); // maybe we have to put GL_LUMINANCE or GL_ALPHA here
             case y60::GRAY16: return PixelEncodingInfo(GL_LUMINANCE16, 2, false, GL_LUMINANCE, GL_UNSIGNED_SHORT);
             case y60::GRAYS16:return PixelEncodingInfo(GL_LUMINANCE16, 2, false, GL_LUMINANCE, GL_SHORT);
@@ -98,38 +98,38 @@ namespace y60 {
     }
     std::string getGLEnumString(GLenum theFormat) {
         switch (theFormat) {
-            case GL_DEPTH_COMPONENT: return "GL_DEPTH_COMPONENT"; 
-            case GL_ALPHA: return "GL_ALPHA"; 
-            case GL_LUMINANCE: return "GL_LUMINANCE"; 
-            case GL_LUMINANCE8: return "GL_LUMINANCE8"; 
-            case GL_LUMINANCE16: return "GL_LUMINANCE16"; 
-            case GL_INTENSITY: return "GL_INTENSITY"; 
-            case GL_RGB8: return "GL_RGB8"; 
-            case GL_RGB: return "GL_RGB"; 
-            case GL_BGR: return "GL_BGR"; 
-            case GL_RGBA8: return "GL_RGBA8"; 
-            case GL_BGRA: return "GL_BGRA"; 
-            case GL_RGBA: return "GL_RGBA"; 
-            case GL_UNSIGNED_BYTE: return "GL_UNSIGNED_BYTE"; 
-            case GL_UNSIGNED_SHORT: return "GL_UNSIGNED_SHORT"; 
-            case GL_SHORT: return "GL_SHORT"; 
-            case GL_UNSIGNED_INT: return "GL_UNSIGNED_INT"; 
-            case GL_COMPRESSED_RGB_ARB: return "GL_COMPRESSED_RGB_ARB"; 
-            case GL_COMPRESSED_RGBA_ARB: return "GL_COMPRESSED_RGBA_ARB"; 
-            case GL_COMPRESSED_ALPHA_ARB: return "GL_COMPRESSED_ALPHA_ARB"; 
-            case GL_COMPRESSED_LUMINANCE_ARB: return "GL_COMPRESSED_LUMINANCE_ARB"; 
-            case GL_COMPRESSED_LUMINANCE_ALPHA_ARB: return "GL_COMPRESSED_LUMINANCE_ALPHA_ARB"; 
-            case GL_COMPRESSED_INTENSITY_ARB: return "GL_COMPRESSED_INTENSITY_ARB"; 
-            case GL_COMPRESSED_RGB_S3TC_DXT1_EXT: return "GL_COMPRESSED_RGB_S3TC_DXT1_EXT"; 
-            case GL_COMPRESSED_RGBA_S3TC_DXT1_EXT: return "GL_COMPRESSED_RGBA_S3TC_DXT1_EXT"; 
-            case GL_COMPRESSED_RGBA_S3TC_DXT3_EXT: return "GL_COMPRESSED_RGBA_S3TC_DXT3_EXT"; 
-            case GL_COMPRESSED_RGBA_S3TC_DXT5_EXT: return "GL_COMPRESSED_RGBA_S3TC_DXT5_EXT"; 
-            case GL_RGBA16F_ARB: return "GL_RGBA16F_ARB"; 
-            case GL_RGB16F_ARB: return "GL_RGB16F_ARB"; 
-            case GL_RGBA_FLOAT32_ATI: return "GL_RGBA_FLOAT32_ATI"; 
-            case GL_RGB_FLOAT32_ATI: return "GL_RGB_FLOAT32_ATI"; 
-            case GL_HALF_FLOAT_ARB: return "GL_HALF_FLOAT_ARB"; 
-            case GL_FLOAT: return "GL_FLOAT"; 
+            case GL_DEPTH_COMPONENT: return "GL_DEPTH_COMPONENT";
+            case GL_ALPHA: return "GL_ALPHA";
+            case GL_LUMINANCE: return "GL_LUMINANCE";
+            case GL_LUMINANCE8: return "GL_LUMINANCE8";
+            case GL_LUMINANCE16: return "GL_LUMINANCE16";
+            case GL_INTENSITY: return "GL_INTENSITY";
+            case GL_RGB8: return "GL_RGB8";
+            case GL_RGB: return "GL_RGB";
+            case GL_BGR: return "GL_BGR";
+            case GL_RGBA8: return "GL_RGBA8";
+            case GL_BGRA: return "GL_BGRA";
+            case GL_RGBA: return "GL_RGBA";
+            case GL_UNSIGNED_BYTE: return "GL_UNSIGNED_BYTE";
+            case GL_UNSIGNED_SHORT: return "GL_UNSIGNED_SHORT";
+            case GL_SHORT: return "GL_SHORT";
+            case GL_UNSIGNED_INT: return "GL_UNSIGNED_INT";
+            case GL_COMPRESSED_RGB_ARB: return "GL_COMPRESSED_RGB_ARB";
+            case GL_COMPRESSED_RGBA_ARB: return "GL_COMPRESSED_RGBA_ARB";
+            case GL_COMPRESSED_ALPHA_ARB: return "GL_COMPRESSED_ALPHA_ARB";
+            case GL_COMPRESSED_LUMINANCE_ARB: return "GL_COMPRESSED_LUMINANCE_ARB";
+            case GL_COMPRESSED_LUMINANCE_ALPHA_ARB: return "GL_COMPRESSED_LUMINANCE_ALPHA_ARB";
+            case GL_COMPRESSED_INTENSITY_ARB: return "GL_COMPRESSED_INTENSITY_ARB";
+            case GL_COMPRESSED_RGB_S3TC_DXT1_EXT: return "GL_COMPRESSED_RGB_S3TC_DXT1_EXT";
+            case GL_COMPRESSED_RGBA_S3TC_DXT1_EXT: return "GL_COMPRESSED_RGBA_S3TC_DXT1_EXT";
+            case GL_COMPRESSED_RGBA_S3TC_DXT3_EXT: return "GL_COMPRESSED_RGBA_S3TC_DXT3_EXT";
+            case GL_COMPRESSED_RGBA_S3TC_DXT5_EXT: return "GL_COMPRESSED_RGBA_S3TC_DXT5_EXT";
+            case GL_RGBA16F_ARB: return "GL_RGBA16F_ARB";
+            case GL_RGB16F_ARB: return "GL_RGB16F_ARB";
+            case GL_RGBA_FLOAT32_ATI: return "GL_RGBA_FLOAT32_ATI";
+            case GL_RGB_FLOAT32_ATI: return "GL_RGB_FLOAT32_ATI";
+            case GL_HALF_FLOAT_ARB: return "GL_HALF_FLOAT_ARB";
+            case GL_FLOAT: return "GL_FLOAT";
             default:return std::string("UNKNOWN_GL_ENUM=0x")+asl::as_string((void*)theFormat);
         }
     }

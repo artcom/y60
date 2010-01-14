@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -63,7 +63,7 @@
 //   $Revision: 1.2 $
 //
 //
-// Description: 
+// Description:
 //
 // (CVS log at the bottom of this file)
 //
@@ -107,7 +107,7 @@ using namespace asl;
 namespace TexGen {
 
 TextureGenerator::TextureGenerator (const dom::Node* myNode, bool dummy)
-    : _myCityTexGen(0) 
+    : _myCityTexGen(0)
 {
     try {
         const Node & theTextureNode = (*myNode)("Texture");
@@ -120,13 +120,13 @@ TextureGenerator::TextureGenerator (const dom::Node* myNode, bool dummy)
         }
         const Node & myTileNode = (theTextureNode)("Tiles");
         loadTiles (myTileNode);
-        _myTerrainTexGen = new TerrainTexGen 
+        _myTerrainTexGen = new TerrainTexGen
                 (_myTextureDefinitionMap, theCountrysideNode, 1);
 
         const Node & theCityNode = (theTextureNode)("City");
         if (theCityNode) {
             string myPosString = theCityNode("Pos")("#text").nodeValue();
-            sscanf (myPosString.c_str(), "%i,%i,%i,%i", 
+            sscanf (myPosString.c_str(), "%i,%i,%i,%i",
                     &_myCityPosition.tl.x, &_myCityPosition.tl.y,
                     &_myCityPosition.br.x, &_myCityPosition.br.y);
             cerr <<"Virtual city coords x1: "<<_myCityPosition.tl.x<<
@@ -136,9 +136,9 @@ TextureGenerator::TextureGenerator (const dom::Node* myNode, bool dummy)
             _myCityTexGen = new TerrainTexGen (_myTextureDefinitionMap, theCityNode, 8);
 /*            if (fabs((double(_myCityPosition.Width())/_myCityPosition.Height() -
                 double(_myCityIndexBmp.GetWidth())/_myCityIndexBmp.GetHeight())) > 0.001) {
-                throw (invalid_argument 
+                throw (invalid_argument
                     ("City bitmap proportions and coordinates in xml definition file don't match."));
-            }      
+            }
 */
         } else {
             cout << "Warning: no city texture!" << endl;
@@ -158,26 +158,26 @@ TextureGenerator::~TextureGenerator() {
     delete _myTerrainTexGen;
     delete _myCityTexGen;
     TextureDefinitionMap::iterator iter;
-    for (iter=_myTextureDefinitionMap.begin(); 
-         iter != _myTextureDefinitionMap.end(); 
+    for (iter=_myTextureDefinitionMap.begin();
+         iter != _myTextureDefinitionMap.end();
          ++iter)
     {
         delete (iter->second);
     }
- 
+
 }
 
-void 
+void
 TextureGenerator::loadTiles (const dom::Node & myTilesNode) {
     using namespace dom;
     string myTileDirectory = getRequiredXMLField(myTilesNode, "directory");
-    myTileDirectory += "/"; 
-    
+    myTileDirectory += "/";
+
     int i=0;
     while (const Node & curTileNode = myTilesNode("Tile",i)) {
-        TextureDefinition * newTextureDefinition = 
+        TextureDefinition * newTextureDefinition =
                 new TextureDefinition(curTileNode, myTileDirectory, true);
-        _myTextureDefinitionMap[newTextureDefinition->getIndex()] = 
+        _myTextureDefinitionMap[newTextureDefinition->getIndex()] =
                 newTextureDefinition;
         i++;
     }
@@ -195,19 +195,19 @@ void TextureGenerator::createTexture (PLRect& srcRect,
     assert (resultSize.x == resultSize.y);
     assert (srcRect.Width()>0 && srcRect.Height()>0);
     assert (srcRect.tl.x >= 0 && srcRect.tl.y >= 0 &&
-            srcRect.br.x <= 65536 && srcRect.br.y <= 65536); 
-    
+            srcRect.br.x <= 65536 && srcRect.br.y <= 65536);
+
     PLRect normedRect;
     if (_myCityTexGen &&
-        srcRect.tl.x >= _myCityPosition.tl.x && 
-        srcRect.tl.y >= _myCityPosition.tl.y && 
-        srcRect.br.x <= _myCityPosition.br.x && 
+        srcRect.tl.x >= _myCityPosition.tl.x &&
+        srcRect.tl.y >= _myCityPosition.tl.y &&
+        srcRect.br.x <= _myCityPosition.br.x &&
         srcRect.br.y <= _myCityPosition.br.y)
-    { 
+    {
         // Inside city area.
-        normedRect = PLRect (int(srcRect.tl.x-_myCityPosition.tl.x)/8, 
+        normedRect = PLRect (int(srcRect.tl.x-_myCityPosition.tl.x)/8,
                 int(srcRect.tl.y-_myCityPosition.tl.y)/8,
-                int(srcRect.br.x-_myCityPosition.tl.x)/8, 
+                int(srcRect.br.x-_myCityPosition.tl.x)/8,
                 int(srcRect.br.y-_myCityPosition.tl.y)/8);
         if (normedRect.Width() == 0 || normedRect.Height() == 0) {
             cerr << "Warning: Texture smaller than indexmap pixel can't be generated." << endl;
@@ -215,17 +215,17 @@ void TextureGenerator::createTexture (PLRect& srcRect,
                                   srcRect.br.x << ", " << srcRect.br.y << ")" << endl;
         }
         _myCityTexGen->getTexture(normedRect , resultSize, resultBmp);
-        
+
         // In the border area, we call both TerrainTexGens and blend.
-        const int BORDER_WIDTH = 256; 
-//        const int BORDER_WIDTH = 1024; 
+        const int BORDER_WIDTH = 256;
+//        const int BORDER_WIDTH = 1024;
         PLPoint myMiddle ((srcRect.br.x+srcRect.tl.x)/2, (srcRect.br.y+srcRect.tl.y)/2);
-        int myDist = min (myMiddle.x - _myCityPosition.tl.x, 
+        int myDist = min (myMiddle.x - _myCityPosition.tl.x,
                           myMiddle.y - _myCityPosition.tl.y);
         myDist = min (myDist, _myCityPosition.br.x - myMiddle.x);
         myDist = min (myDist, _myCityPosition.br.y - myMiddle.y);
         if (myDist < BORDER_WIDTH) {
-            normedRect = PLRect (int(srcRect.tl.x/8), int(srcRect.tl.y/8), 
+            normedRect = PLRect (int(srcRect.tl.x/8), int(srcRect.tl.y/8),
                     int(srcRect.br.x/8), int(srcRect.br.y/8) );
             PLAnyBmp myBlendBmp;
             _myTerrainTexGen->getTexture(normedRect, resultSize, myBlendBmp);
@@ -233,7 +233,7 @@ void TextureGenerator::createTexture (PLRect& srcRect,
             blendBitmaps (resultBmp, myBlendBmp, myBlendFactor);
         }
     } else {
-        normedRect = PLRect (int(srcRect.tl.x/8), int(srcRect.tl.y/8), 
+        normedRect = PLRect (int(srcRect.tl.x/8), int(srcRect.tl.y/8),
                 int(srcRect.br.x/8), int(srcRect.br.y/8) );
         if (normedRect.Width() == 0 || normedRect.Height() == 0) {
             cerr << "Warning: Texture smaller than indexmap pixel can't be generated." << endl;
@@ -294,8 +294,8 @@ void TextureGenerator::createTexture (PLRect& srcRect,
     }
 }
 
-void 
-TextureGenerator::blendBitmaps 
+void
+TextureGenerator::blendBitmaps
         (PLBmp & myResultBmp, const PLBmp & myBlendBmp, double myBlendFactor) const
 {
     assert (myResultBmp.GetWidth() == myBlendBmp.GetWidth() &&
@@ -304,18 +304,18 @@ TextureGenerator::blendBitmaps
         PLPixel32 * myResultLine = myResultBmp.GetLineArray32()[y];
         PLPixel32 * myBlendLine = myBlendBmp.GetLineArray32()[y];
         for (int x = 0; x < myResultBmp.GetWidth(); x++) {
-            myResultLine[x].SetR( static_cast<PLBYTE>( int(myResultLine[x].GetR()*   myBlendFactor + 
+            myResultLine[x].SetR( static_cast<PLBYTE>( int(myResultLine[x].GetR()*   myBlendFactor +
                                                            myBlendLine [x].GetR()*(1-myBlendFactor))) );
-            myResultLine[x].SetG( static_cast<PLBYTE>( int (myResultLine[x].GetG()*   myBlendFactor + 
+            myResultLine[x].SetG( static_cast<PLBYTE>( int (myResultLine[x].GetG()*   myBlendFactor +
                                                             myBlendLine [x].GetG()*(1-myBlendFactor))) );
-            myResultLine[x].SetB( static_cast<PLBYTE>( int (myResultLine[x].GetB()*    myBlendFactor + 
+            myResultLine[x].SetB( static_cast<PLBYTE>( int (myResultLine[x].GetB()*    myBlendFactor +
                                                             myBlendLine [x].GetB()*(1-myBlendFactor))) );
         }
     }
 
 }
 
-void 
+void
 TextureGenerator::kaputt (const char * msg) {
     cerr << "################################################################" << endl;
     cerr << "################################################################" << endl;

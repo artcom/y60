@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -111,13 +111,13 @@ namespace y60 {
     Primitive::~Primitive() {
         AC_TRACE << "~Primitive()" << this << endl;
     }
-    
+
     Shape & Primitive::getShape() {
         return *getNode().parentNode()->parentNode()->getFacade<Shape>();
     }
     const Shape & Primitive::getShape() const {
         return *getNode().parentNode()->parentNode()->getFacade<Shape>();
-    }  
+    }
 
     void
     Primitive::load(ResourceManager* theResourceManager, dom::NodePtr theIndicesNode, dom::NodePtr theDataNode)
@@ -141,14 +141,14 @@ namespace y60 {
 
         TypeId myTypeId;
         myTypeId.fromString(theDataNode->nodeName());
-        
+
         VertexBufferUsage myUsage = getDefaultVertexBufferUsage();
         if (theDataNode->getAttribute(VERTEX_BUFFER_USAGE_ATTRIB)) {
             myUsage = theDataNode->getAttributeValue<VertexBufferUsage>(VERTEX_BUFFER_USAGE_ATTRIB);
         }
-        AC_DEBUG << "Primitive::load " << theDataNode->parentNode()->parentNode()->getAttributeString(NAME_ATTRIB) 
+        AC_DEBUG << "Primitive::load " << theDataNode->parentNode()->parentNode()->getAttributeString(NAME_ATTRIB)
                  << ", usage:" << myUsage << " for role: " << myRoleString;
-        
+
         VertexDataBasePtr myVertexData = createVertexDataBin(theResourceManager, myTypeId, myRole, myUsage);
         if (myVertexData) {
             DB(AC_TRACE << "uploading Vertex Data role=" << myRole);
@@ -192,8 +192,8 @@ namespace y60 {
     }
 
     VertexDataBasePtr
-    Primitive::createVertexDataBin(ResourceManager* theResourceManager, TypeId theBinType, VertexDataRole theRole, 
-                                   const VertexBufferUsage & theUsage) 
+    Primitive::createVertexDataBin(ResourceManager* theResourceManager, TypeId theBinType, VertexDataRole theRole,
+                                   const VertexBufferUsage & theUsage)
    {
         switch (theBinType) {
             case VECTOR_OF_VECTOR2F:
@@ -259,9 +259,9 @@ namespace y60 {
         return myDataBin;
     }
 
-    void 
+    void
     Primitive::updateVertexData() {
-        Shape & myShape = getShape(); 
+        Shape & myShape = getShape();
         dom::Node & myElementsNode = getNode();
         ResourceManager * myResourceManager = myShape.getScene().getTextureManager()->getResourceManager();
         unsigned myIndicesCount = myElementsNode.childNodesLength(VERTEX_INDICES_NAME);
@@ -275,7 +275,7 @@ namespace y60 {
 
     void Primitive::reverseUpdateVertexData() {
         dom::Node & myElementsNode = getNode();
-        Shape & myShape = getShape(); 
+        Shape & myShape = getShape();
         unsigned myIndicesCount = myElementsNode.childNodesLength(VERTEX_INDICES_NAME);
         for (unsigned k = 0; k < myIndicesCount; ++k) {
             dom::NodePtr myIndicesNode = myElementsNode.childNode(VERTEX_INDICES_NAME, k);
@@ -751,7 +751,7 @@ namespace y60 {
             myInfo._myNormal   = theNormal;
         }
     };
-    
+
     bool
     Primitive::intersect(const asl::LineSegment<float> & theStick,  IntersectionList & theIntersectionInfo) {
 

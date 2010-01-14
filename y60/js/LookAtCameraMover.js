@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -72,8 +72,8 @@ LookAtCameraMover.prototype.Constructor = function(obj, theCamera, theNodeToFoll
     const CAMERA_FRONT_DIRECTION = new Vector3f(0,0,1);;
     const CAMERA_UP_DIRECTION    = new Vector3f(0,1,0);
     const CAMERA_RIGHT_DIRECTION = cross(CAMERA_FRONT_DIRECTION, CAMERA_UP_DIRECTION);
-    
-    obj.setup = function() {      
+
+    obj.setup = function() {
         obj.reset();
     }
     obj.reset = function() {
@@ -107,13 +107,13 @@ LookAtCameraMover.prototype.Constructor = function(obj, theCamera, theNodeToFoll
         _mySpringStrength = theSpringStrength;
         _mySpringCoef     = calcSpringCoef(theSpringStrength);
     }
-       
+
     obj.getSpringStrength = function() {
         return _mySpringStrength;
     }
-       
+
     obj.setOrientation = function(theOrientation) {
-        _myOrientation = theOrientation;        
+        _myOrientation = theOrientation;
     }
 
     obj.getCamera = function() {
@@ -123,7 +123,7 @@ LookAtCameraMover.prototype.Constructor = function(obj, theCamera, theNodeToFoll
     obj.getLookAtPosition = function() {
         return _myLookAtPosition;
     }
-    
+
     obj.update = function(theTime, theDeltaT) {
         if (_myLastTime == null) {
             _myLastTime = theTime;
@@ -133,11 +133,11 @@ LookAtCameraMover.prototype.Constructor = function(obj, theCamera, theNodeToFoll
             Logger.warning("No node to follow specified.");
             return;
         }
-        
+
         var myDeltaTime = theDeltaT ? theDeltaT : (theTime - _myLastTime);
 
         _myLastTime = theTime;
-        
+
         var myRotationMatrix = null;
         if (_myOrientation) {
             myRotationMatrix = new Matrix4f(_myOrientation);
@@ -156,10 +156,10 @@ LookAtCameraMover.prototype.Constructor = function(obj, theCamera, theNodeToFoll
                 myMotionFactor = 1;
             }
             var myDistance = difference(myEyePosition, _myCamera.position);
-            _myCamera.position = sum(_myCamera.position, product(myDistance, myMotionFactor));      
+            _myCamera.position = sum(_myCamera.position, product(myDistance, myMotionFactor));
 
             myDistance = difference(myLookAtPosition, _myLookAtPosition);
-            _myLookAtPosition = sum(_myLookAtPosition, product(myDistance, myMotionFactor)); 
+            _myLookAtPosition = sum(_myLookAtPosition, product(myDistance, myMotionFactor));
         } else {
             _myCamera.position = myEyePosition;
             _myLookAtPosition = myLookAtPosition;
@@ -178,7 +178,7 @@ LookAtCameraMover.prototype.Constructor = function(obj, theCamera, theNodeToFoll
         var myViewVector = normalized(difference(_myLookAtPosition, _myCamera.position));
         _myCamera.orientation = getOrientationFromDirection(myViewVector, CAMERA_UP_DIRECTION);
     }
-    
+
     function calcSpringCoef(theSpringStrength) {
         return Math.atan(theSpringStrength * 0.1) / PI_2;
     }

@@ -7,10 +7,10 @@
 /////////////////////////////////////////////////////////////
 
 // Starts the plugin registration
-#include <c4d.h> 
+#include <c4d.h>
 
 
-// forward declarations 
+// forward declarations
 Bool RegisterAcXmlExporter(void);
 
 Bool _cdecl PluginStart(void) {
@@ -18,7 +18,7 @@ Bool _cdecl PluginStart(void) {
     if (!RegisterAcXmlExporter()) {
         return FALSE;
     }
-    
+
     return TRUE;
 }
 
@@ -27,15 +27,15 @@ void _cdecl PluginEnd(void) {
 
 Bool _cdecl PluginMessage(LONG id, void *data) {
     //use the following lines to set a plugin priority
-    
+
     switch (id)    {
         case C4DPL_INIT_SYS:
             if (!resource.Init()) return FALSE; // don't start plugin without resource
             return TRUE;
 
-        case C4DMSG_PRIORITY: 
+        case C4DMSG_PRIORITY:
             return TRUE;
     }
-    
+
     return FALSE;
 }

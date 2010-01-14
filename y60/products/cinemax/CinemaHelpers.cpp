@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -74,7 +74,7 @@
 
 using namespace asl;
 
-void 
+void
 displayMessage(const String & theMessage) {
     displayMessage(getString(theMessage));
 }
@@ -83,37 +83,37 @@ void displayMessage(const char * theMessage) {
     displayMessage(std::string(theMessage));
 }
 
-void 
+void
 displayMessage(const std::string & theMessage) {
-    class MyDialog : public GeModalDialog {  
+    class MyDialog : public GeModalDialog {
     public:
         void setMessage(const std::string & theMessage) {
             _myMessage = theMessage;
         }
-    
-    private:  
+
+    private:
         Bool CreateLayout() {
             SetTitle("ART+COM Y60 Exporter");
-    
+
             GroupBegin(100010, 0, 1, 0, "", 0); {
                 GroupSpace(4, 4);
                 GroupBorderSpace(40, 20, 40, 20);
-    
+
                 AddStaticText(100011, 0, 0, 0, _myMessage.c_str(), 0);
                 GePrint("### " + String(_myMessage.c_str()));
             }
             GroupEnd();
-    
+
             AddDlgGroup(DLG_OK);
             return TRUE;
         }
-        
+
         std::string _myMessage;
     };
-    
+
     GePrint(theMessage.c_str());
 
-    MyDialog myDialog;        
+    MyDialog myDialog;
     myDialog.setMessage(theMessage);
     myDialog.Open();
 }
@@ -123,21 +123,21 @@ getString(const String & theC4dString) {
     static int mySize = 1000;
     static std::string myString;
     static char * myBuffer = new char [mySize];
-    
+
     if (theC4dString.GetLength() > mySize) {
         mySize = theC4dString.GetLength();
         delete [] myBuffer;
         myBuffer = new char [mySize];
     }
-    
-    theC4dString.GetCString(myBuffer, theC4dString.GetLength() + 1, St7bit);                            
-    
+
+    theC4dString.GetCString(myBuffer, theC4dString.GetLength() + 1, St7bit);
+
     myString = myBuffer;
-    
+
     return myString;
 }
 
-const String 
+const String
 getTreeName(BaseObject * theNode) {
     BaseObject* myNode = theNode;
     String myTreeName = myNode->GetName();
@@ -158,25 +158,25 @@ displayChannelProperties(BaseChannel * theChannel) {
 
     Real myBrightness = myBaseContainer.GetReal(BASECHANNEL_BRIGHTNESS_EX);
     myMessage += "Brightness: " + as_string(myBrightness) + " | ";
-    
+
     String myTexture = myBaseContainer.GetString(BASECHANNEL_TEXTURE);
     myMessage += "Texture: " + getString(myTexture) + " | ";
-        
+
     Real myBlurOffset = myBaseContainer.GetReal(BASECHANNEL_BLUR_OFFSET);
     myMessage += "Blur offset: " + as_string(myBlurOffset) + " | ";
-        
+
     Real myBlurStrength = myBaseContainer.GetReal(BASECHANNEL_BLUR_STRENGTH);
     myMessage += "Blur strength: " + as_string(myBlurStrength) + " | ";
-    
+
     LONG myInterpolation = myBaseContainer.GetReal(BASECHANNEL_INTERPOLATION);
     myMessage += "Interpolation: " + as_string(myInterpolation) + " | ";
-    
+
     LONG myMixmode = myBaseContainer.GetReal(BASECHANNEL_MIXMODE_EX);
     myMessage += "Mix mode: " + as_string(myMixmode) + " | ";
-    
+
     Real myMixStrength = myBaseContainer.GetReal(BASECHANNEL_MIXSTRENGTH_EX);
     myMessage += "Mix strength: " + as_string(myMixStrength);
-        
+
     displayMessage(myMessage);
 }
 

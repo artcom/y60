@@ -12,13 +12,13 @@
 #if Y60_APE_LIST_SIZE >  48
 #   error Arities above 48 are not supported y60 ape. You might want to \
           rethink your design anyway.
-#elif Y60_APE_LIST_SIZE >  38 
+#elif Y60_APE_LIST_SIZE >  38
 #   include <boost/mpl/vector/vector50.hpp>
-#elif Y60_APE_LIST_SIZE >  28 
+#elif Y60_APE_LIST_SIZE >  28
 #   include <boost/mpl/vector/vector40.hpp>
-#elif Y60_APE_LIST_SIZE >  18 
+#elif Y60_APE_LIST_SIZE >  18
 #   include <boost/mpl/vector/vector30.hpp>
-#elif Y60_APE_LIST_SIZE >  8 
+#elif Y60_APE_LIST_SIZE >  8
 #   include <boost/mpl/vector/vector20.hpp>
 #else
 #   include <boost/mpl/vector/vector10.hpp>

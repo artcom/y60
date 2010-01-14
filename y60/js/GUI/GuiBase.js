@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -76,14 +76,14 @@ GuiBase.prototype.Constructor = function(self, theArguments) {
     var _myPointerBodies = {};
     var _myPointerObjects = {};
     var _myMousePointer = false;
-    
+
     var _myTestMode = false;
-    
+
     var _myHeartBeatNode = new Node("<heartbeat/>").firstChild;
     var _myHeartBeatFile = "";
     var _myHeartBeatFrequency = 0;
-    var _myLastHeartBeatTime = 0; 
-    
+    var _myLastHeartBeatTime = 0;
+
     var _myWidth  = 800;
     var _myHeight = 600;
 
@@ -92,7 +92,7 @@ GuiBase.prototype.Constructor = function(self, theArguments) {
     //////////////////////////////////////////////////////////////////
     // Public
     //////////////////////////////////////////////////////////////////
-    
+
     Base.onExit = Public.onExit;
     Public.onExit = function() {
         window.showTaskbar  = true;
@@ -117,8 +117,8 @@ GuiBase.prototype.Constructor = function(self, theArguments) {
         window.showTaskbar  = !Public.getReleaseMode();
 
         Base.setup(_myWidth, _myHeight, false, theTitle);
-        
-        window.showMouseCursor = !Public.getReleaseMode(); 
+
+        window.showMouseCursor = !Public.getReleaseMode();
         window.swapInterval = 1;
 
         setupCamera();
@@ -136,7 +136,7 @@ GuiBase.prototype.Constructor = function(self, theArguments) {
         var myLayoutConfig = "CONFIG/layers.xml";
         if (theLayoutConfig) {
             myLayoutConfig = theLayoutConfig;
-        } 
+        }
 
         _myLayoutConfig = new Node();
         _myLayoutConfig.parseFile(myLayoutConfig);
@@ -153,12 +153,12 @@ GuiBase.prototype.Constructor = function(self, theArguments) {
         // if (NAGIOS_PORT == undefined) {
         //     Public.enableNagios(NAGIOS_PORT);
         // }
-        
+
         // settings
         //  do this late so we can count on everything being
         //  initialized before the first settings event.
-        Public.registerSettingsListener(Public, "GuiBase"); 
-        
+        Public.registerSettingsListener(Public, "GuiBase");
+
         //setup heartbeat
         // TODO: implement somthing clever [sh]
         if (false) {
@@ -200,14 +200,14 @@ GuiBase.prototype.Constructor = function(self, theArguments) {
     ////////////////////////////////////////
     // frame callback dispatch
     ////////////////////////////////////////
-    
+
     Public.getButtonByName = function(theName) {
         for (var i=0; i<ourButtons.length; ++i) {
             if (ourButtons[i].buttonname == theName) {
                 return ourButtons[i];
             }
         }
-        
+
         return null;
     }
 
@@ -217,10 +217,10 @@ GuiBase.prototype.Constructor = function(self, theArguments) {
             Logger.warning("Button '"+theName+"' not found");
             return;
         }
-        
+
         if (myButton.enabled) {
             myButton.onPointerClickWithSelf("bla", myButton);
-        } 
+        }
     }
 
     Base.onFrame = Public.onFrame;
@@ -241,13 +241,13 @@ GuiBase.prototype.Constructor = function(self, theArguments) {
                 _myLayerManager.layers[i].onFrame(theTime);
             }
         }
-        
-        if (_myTestMode) { 
+
+        if (_myTestMode) {
             if (Math.random() < 0.1) {
                 var myCount = 0;
                 for (var c=0; c<ourButtons.length; ++c) {
                     myCount++;
-                }   
+                }
                 var myRand = Math.floor(Math.random() * myCount);
                 for (var a=0; a<ourButtons.length; ++a) {
                     if (myRand==0 && ourButtons[a].body.visible) {
@@ -267,7 +267,7 @@ GuiBase.prototype.Constructor = function(self, theArguments) {
         Logger.debug("Adding pointer " + thePointer + " at [" + theX + "," + theY + "]");
 
         var myClosest = _myPicking.pickBody(theX, theY);
-        
+
         if(myClosest) {
             var myCoords = translateScreenToShape(myClosest, theX, theY);
             var myObject = getBodyOwner(myClosest);
@@ -288,10 +288,10 @@ GuiBase.prototype.Constructor = function(self, theArguments) {
             }
         }
     }
-    
+
     function onPointerMove(thePointer, theX, theY) {
         Logger.debug("Moving pointer " + thePointer + " to [" + theX + "," + theY + "]");
-        
+
         if(thePointer in _myPointerObjects) {
             var myClosest = _myPointerBodies[thePointer];
             var myObject  = _myPointerObjects[thePointer];
@@ -304,10 +304,10 @@ GuiBase.prototype.Constructor = function(self, theArguments) {
             }
         }
     }
-    
+
     function onPointerRemove(thePointer) {
         Logger.debug("Removing pointer " + thePointer);
-        
+
         if(thePointer in _myPointerObjects) {
             var myObject = _myPointerObjects[thePointer];
 
@@ -366,7 +366,7 @@ GuiBase.prototype.Constructor = function(self, theArguments) {
             onPointerMove("MOUSE", theX, theY);
         }
     }
-    
+
     Base.onMouseButton = Public.onMouseButton;
     Public.onMouseButton = function(theButton, theState, theX, theY) {
         if(theButton == LEFT_BUTTON) {
@@ -404,7 +404,7 @@ GuiBase.prototype.Constructor = function(self, theArguments) {
                 Logger.info("Key pressed: " + theKey);
 
                 var myLayer = null;
-                
+
                 switch(theKey) {
                 case "t":
                     _myTestMode = !_myTestMode;

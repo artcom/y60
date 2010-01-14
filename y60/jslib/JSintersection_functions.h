@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -68,20 +68,20 @@
 
 namespace jslib {
 
-Y60_JSLIB_DECL jsval as_jsval(JSContext *cx, const y60::Primitive::Intersection & theIntersection, 
+Y60_JSLIB_DECL jsval as_jsval(JSContext *cx, const y60::Primitive::Intersection & theIntersection,
         const asl::Matrix4f & myTransformation, const asl::Matrix4f & myInverseTransformation);
 
-Y60_JSLIB_DECL jsval as_jsval(JSContext *cx, const y60::Primitive::IntersectionList & theVector, 
+Y60_JSLIB_DECL jsval as_jsval(JSContext *cx, const y60::Primitive::IntersectionList & theVector,
         const asl::Matrix4f & theMatrix, const asl::Matrix4f & theInverseMatrix);
 
 Y60_JSLIB_DECL jsval as_jsval(JSContext *cx, const y60::IntersectionInfo  & theInfo);
 
 Y60_JSLIB_DECL jsval as_jsval(JSContext *cx, const asl::SweptSphereContact<float> & theContact);
 
-Y60_JSLIB_DECL jsval as_jsval(JSContext *cx, const y60::Primitive::SphereContacts & theContacts, 
+Y60_JSLIB_DECL jsval as_jsval(JSContext *cx, const y60::Primitive::SphereContacts & theContacts,
         const asl::Matrix4f & theTransformation);
 
-Y60_JSLIB_DECL jsval as_jsval(JSContext *cx, const y60::Primitive::SphereContactsList & theVector, 
+Y60_JSLIB_DECL jsval as_jsval(JSContext *cx, const y60::Primitive::SphereContactsList & theVector,
         const asl::Matrix4f & theTransformation);
 
 Y60_JSLIB_DECL jsval as_jsval(JSContext *cx, const y60::CollisionInfo & theInfo);

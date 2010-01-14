@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -78,12 +78,12 @@ namespace y60 {
         : _myHdc(0), _myHglrc(0)
 #endif
 #ifdef AC_USE_X11
-        : _myDisplay(0), _myDrawable(0), _myGLXContext(0)  
+        : _myDisplay(0), _myDrawable(0), _myGLXContext(0)
 #endif
 #ifdef AC_USE_OSX_CGL
 		: _myCGLContext(0)
 #endif
-    { 
+    {
         _myStateCache = RenderStatePtr(new RenderState());
         _myStateCacheInitialized = false;
     }
@@ -147,10 +147,10 @@ namespace y60 {
         return (_myDisplay && _myDrawable && _myGLXContext);
 #endif
 #ifdef AC_USE_OSX_CGL
-		return (_myCGLContext); 
+		return (_myCGLContext);
 #endif
     }
-    
+
 
     void
     GLContext::checkLastError(const std::string & theScope)

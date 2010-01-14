@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -80,14 +80,14 @@ function getFilenameDialog(theTitleOrParams, theAction) {
     } else {
         myArgs = theTitleOrParams;
     }
-    
+
     if (theAction !== undefined ) { myArgs.action = theAction; };
 
     var myFileChooserDialog = new FileChooserDialog(myArgs.title, myArgs.action);
 
     if ('patterns' in myArgs && myArgs.patterns) {
         for (var i = 0; i < myArgs.patterns.length; ++i) {
-            myFileChooserDialog.add_filter_pattern( myArgs.patterns[i].pattern, 
+            myFileChooserDialog.add_filter_pattern( myArgs.patterns[i].pattern,
                     myArgs.patterns[i].name + " (" + myArgs.patterns[i].pattern + ")");
         }
     }
@@ -137,7 +137,7 @@ function askUserForFilename(theTitleOrParams, theSuffix) {
         myArgs = theTitleOrParams;
     }
     if (theSuffix !== undefined ) { myArgs.suffix = theSuffix; };
-    
+
     var myWriteItFlag = false;
     while ( true ) {
         var myDialogArgs = {};
@@ -159,7 +159,7 @@ function askUserForFilename(theTitleOrParams, theSuffix) {
             }
             if (fileExists(myFilename)) {
                 var myDialog = new MessageDialog("<b>File exists.</b>\nDo you want to overwrite it?",
-                                                 true, MessageDialog.MESSAGE_QUESTION, 
+                                                 true, MessageDialog.MESSAGE_QUESTION,
                                                  MessageDialog.BUTTONS_YES_NO, true);
                 var myResponse = myDialog.run();
                 // :-( otherwise dialog won't close before mainwindow gets focus
@@ -173,7 +173,7 @@ function askUserForFilename(theTitleOrParams, theSuffix) {
                 myWriteItFlag = true;
                 break;
             }
-        } else { 
+        } else {
             break;
         }
     }

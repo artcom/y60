@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -65,7 +65,7 @@ function getSelectedMaterial() {
 
 function hideFloatSliders() {
     for (var i=0; i<10; ++i) {
-        ourGlade.get_widget("float_slider"+i).hide();      
+        ourGlade.get_widget("float_slider"+i).hide();
         ourGlade.get_widget("float_label"+i).text = "inactive";
         ourGlade.get_widget("float_label"+i).hide();
         ourGlade.get_widget("float_value"+i).hide();
@@ -81,27 +81,27 @@ function updateMaterialEditor() {
 
     for (var i=0; i<mySelectedMaterial.properties.childNodesLength(); ++i) {
         var myChildNode = mySelectedMaterial.properties.childNode(i);
-        // handle vector4f  
+        // handle vector4f
         if (myChildNode.nodeName == "vector4f") {
             updateColorElement(myChildNode);
         } else if (myChildNode.nodeName == "float") {
             var mySlider = ourGlade.get_widget("float_slider"+myActiveFloatValue);
             var myLabel  = ourGlade.get_widget("float_label"+myActiveFloatValue);
             var myValue  = ourGlade.get_widget("float_value"+myActiveFloatValue);
-            
+
             if (myChildNode.name == "shininess") {
                 mySlider.setRange(2.0,100.0);
             } else {
                 mySlider.setRange(0.0,1.0);
             }
-            
+
             var myProperty = getDescendantByName(mySelectedMaterial, myChildNode.name, true);
             mySlider.value = myProperty.firstChild.nodeValue;
-       
+
             mySlider.show();
             myLabel.show();
             myValue.show();
-            
+
             myValue.text = myProperty.firstChild.nodeValue.toFixed(3);
             myLabel.text = " "+myChildNode.name;
 
@@ -117,7 +117,7 @@ function updateMaterialEditor() {
                  "        ourGlade.get_widget(\"float_value"+myActiveFloatValue+"\").text = \" \"+(myValue.toFixed(3));"+
                  "    }\n"+
                  "}\n");
-            
+
             myActiveFloatValue++;
         }
     }
@@ -129,10 +129,10 @@ function updateMaterialEditor() {
 function updateMaterial(thePropertyName, theValue) {
 	var isPaused = window.pause;
     window.pause = true;
-    
+
     var myMaterial = getSelectedMaterial();
     var myPropertyNode = getDescendantByName(myMaterial.childNode("properties"), thePropertyName);
-    
+
     if (myPropertyNode.nodeName == "vector4f") {
         var myColorPicker = ourGlade.get_widget(thePropertyName+"_color");
 
@@ -144,7 +144,7 @@ function updateMaterial(thePropertyName, theValue) {
             "] ";
 
         myPropertyNode.firstChild.nodeValue = myColorPicker.color;
-        
+
     } else if (myPropertyNode.nodeName == "float") {
         myPropertyNode.firstChild.nodeValue = theValue;
     }
@@ -152,13 +152,13 @@ function updateMaterial(thePropertyName, theValue) {
 }
 
 function updateColorElement(theNode) {
-	
+
     var myColorPicker = ourGlade.get_widget(theNode.name+"_color");
-   
+
     // colorpicker
     myColorPicker.use_alpha = true;
     myColorPicker.signal_color_set.connect(ourHandler, "on_"+theNode.name+"_color_changed");
-   
+
     var myMaterial = getSelectedMaterial();
     var myPropertyNode = getDescendantByName(myMaterial.childNode("properties"), theNode.name);
     myColorPicker.color = myPropertyNode.firstChild.nodeValue;

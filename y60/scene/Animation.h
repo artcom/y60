@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -96,7 +96,7 @@ namespace asl {
 
     inline
     asl::Quaternionf interpolate(const asl::Quaternionf & a, const asl::Quaternionf & b, const double & theAlpha) {
-        return slerp(a , b, float(theAlpha)); 
+        return slerp(a , b, float(theAlpha));
     }
 
 }
@@ -110,12 +110,12 @@ namespace y60 {
     public:
         typedef typename dom::ValueWrapper<ANIMATED_ATTRIBUTE_VALUE>::Type AnimatedValueType;
         typedef asl::Ptr<AnimatedValueType, dom::ThreadingModel> AnimatedValuePtr;
-        
-        AnimationValueSetter(dom::NodePtr theAnimatedValue, unsigned theAnimatedIndex) 
+
+        AnimationValueSetter(dom::NodePtr theAnimatedValue, unsigned theAnimatedIndex)
             : _myAnimatedAttribute(theAnimatedValue),
               _myAnimatedIndex(theAnimatedIndex)
         {
-            const ANIMATED_ATTRIBUTE_VALUE & myAnimatedAttributeValue = 
+            const ANIMATED_ATTRIBUTE_VALUE & myAnimatedAttributeValue =
                 _myAnimatedAttribute->dom::Node::nodeValueRef<ANIMATED_ATTRIBUTE_VALUE>();
             _myPreviousValue  = myAnimatedAttributeValue[_myAnimatedIndex];
         }
@@ -148,16 +148,16 @@ namespace y60 {
             dom::NodePtr     _myAnimatedAttribute;
             unsigned         _myAnimatedIndex;
             T                _myPreviousValue;
-            AnimatedValueType * _myAnimatedValuePtr; 
+            AnimatedValueType * _myAnimatedValuePtr;
     };
 
     template <>
     class AnimationValueSetter<float, asl::Frustum> {
         public:
-        AnimationValueSetter(dom::NodePtr theAnimatedValue, unsigned) 
+        AnimationValueSetter(dom::NodePtr theAnimatedValue, unsigned)
             : _myAnimatedAttribute(theAnimatedValue)
         {
-            const asl::Frustum & myAnimatedAttributeValue = 
+            const asl::Frustum & myAnimatedAttributeValue =
                     _myAnimatedAttribute->dom::Node::nodeValueRef<asl::Frustum>();
             _myPreviousValue  = myAnimatedAttributeValue.getHFov();
         }
@@ -178,10 +178,10 @@ namespace y60 {
     template<>
     class AnimationValueSetter<AcBool, AcBool> {
         public:
-        AnimationValueSetter(dom::NodePtr theAnimatedValue, unsigned) 
+        AnimationValueSetter(dom::NodePtr theAnimatedValue, unsigned)
             : _myAnimatedAttribute(theAnimatedValue)
         {
-            const bool & myAnimatedAttributeValue = 
+            const bool & myAnimatedAttributeValue =
                 _myAnimatedAttribute->dom::Node::nodeValueRef<bool>();
             _myPreviousValue  = myAnimatedAttributeValue;
         }
@@ -202,10 +202,10 @@ namespace y60 {
     template <class ANIMATED_ATTRIBUTE_VALUE>
     class AnimationValueSetter<ANIMATED_ATTRIBUTE_VALUE,ANIMATED_ATTRIBUTE_VALUE> {
         public:
-        AnimationValueSetter(dom::NodePtr theAnimatedValue, unsigned) 
+        AnimationValueSetter(dom::NodePtr theAnimatedValue, unsigned)
             : _myAnimatedAttribute(theAnimatedValue)
         {
-            const ANIMATED_ATTRIBUTE_VALUE & myAnimatedAttributeValue = 
+            const ANIMATED_ATTRIBUTE_VALUE & myAnimatedAttributeValue =
                 _myAnimatedAttribute->dom::Node::nodeValueRef<ANIMATED_ATTRIBUTE_VALUE>();
             _myPreviousValue  = myAnimatedAttributeValue;
         }
@@ -235,7 +235,7 @@ namespace y60 {
                 _myValuesBase(0)
             {
             }
-            
+
             Animation(dom::NodePtr theNode, dom::NodePtr theValueList, dom::NodePtr theAnimatedAttribute, bool theAngleAnimation)
                 : AnimationBase(theNode, theAngleAnimation),
                 _myValuesNode(theValueList->childNode(0)),
@@ -245,7 +245,7 @@ namespace y60 {
 
             {
             }
-            
+
             // just dynamic_cast once or when the ValuePtr has changed, which almost never happens
             const std::vector<T> & getValues() {
                 if (_myValuesBase != &(_myValuesNode->dom::Node::nodeValueWrapper())) {
@@ -284,7 +284,7 @@ namespace y60 {
             const std::vector<T> * _myValues;
             const dom::ValueBase * _myValuesBase;
             AnimationValueSetter<T, ANIMATED_ATTRIBUTE_VALUE> _myValueSetter;
-            
+
             void setToEndValue() {
                 // TODO: Account for clipping.
                 //const std::vector<T> & myValues = _myValuesNode->dom::Node::nodeValueRef<std::vector<T> >();

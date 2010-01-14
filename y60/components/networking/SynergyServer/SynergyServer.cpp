@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -68,7 +68,7 @@ const unsigned char SYNERGY_VERSION[4] = {0,1,0,3};
 const unsigned int BITMASK = 0x000000FF;
 const long long KEEP_ALIVE_TIMEOUT = 3000;
 const long long HEART_BEAT_TIMEOUT = 500;
-        
+
 unsigned char MOUSE_WHEEL_DOWN[4] = {0x00, 0x00, 0xFF, 0x88};
 unsigned char MOUSE_WHEEL_UP[4] = {0x00, 0x00, 0x00, 0x78};
 
@@ -119,7 +119,7 @@ void SynergyServer::onMouseMotion( unsigned theX, unsigned theY ) {
     myMouseData.push_back(theX & BITMASK);
     myMouseData.push_back((theY >> 8) & BITMASK);
     myMouseData.push_back(theY & BITMASK);
-    
+
     send( "DMMV", myMouseData );
 
 }
@@ -138,13 +138,13 @@ void SynergyServer::onRelMouseMotion( int theDeltaX, int theDeltaY ) {
     myMouseData.push_back(theDeltaX & BITMASK);
     myMouseData.push_back((theDeltaY >> 8) & BITMASK);
     myMouseData.push_back(theDeltaY & BITMASK);
-    
+
     send( "DMRM", myMouseData );
 
 }
 
 void SynergyServer::onMouseButton( unsigned char theButton, bool theState ) {
-    
+
     AC_TRACE << "SynergyServer::onMouseButton";
 
     if (!_myIsConnected) {
@@ -158,29 +158,29 @@ void SynergyServer::onMouseButton( unsigned char theButton, bool theState ) {
     } else if (theButton == 3) {
         myButton[0] = 2;
     }
-    
+
     if (theState) {
         send( "DMDN", myButton );
     } else {
         send( "DMUP", myButton );
     }
-    
+
 }
 
 
 void SynergyServer::onMouseWheel( int theDeltaX, int theDeltaY ) {
-    
+
     if (!_myIsConnected) {
         return;
     }
-    
+
     if (theDeltaY == 1) {
-        send( "DMWM", std::vector<unsigned char>( MOUSE_WHEEL_DOWN, 
-                                                  MOUSE_WHEEL_DOWN 
+        send( "DMWM", std::vector<unsigned char>( MOUSE_WHEEL_DOWN,
+                                                  MOUSE_WHEEL_DOWN
                                                   + sizeof(MOUSE_WHEEL_DOWN) ) );
     } else if (theDeltaY == -1) {
-        send( "DMWM", std::vector<unsigned char>( MOUSE_WHEEL_UP, 
-                                                  MOUSE_WHEEL_UP 
+        send( "DMWM", std::vector<unsigned char>( MOUSE_WHEEL_UP,
+                                                  MOUSE_WHEEL_UP
                                                   + sizeof(MOUSE_WHEEL_UP) ) );
     }
 
@@ -209,15 +209,15 @@ void SynergyServer::run() {
         asl::msleep(10);
 
         try {
- 
+
             if (NULL == _mySocket) {
-                AC_PRINT << "Waiting for synergy connection on " 
+                AC_PRINT << "Waiting for synergy connection on "
                          << asl::as_dotted_address(_myTCPServer.getHost())
                          << " at port " <<  _myTCPServer.getPort() << ".";
                 _mySocket = _myTCPServer.waitForConnection();
                 _mySocket->setBlockingMode(false);
                 std::vector<unsigned char> myVersion;
-                myVersion.insert( myVersion.end(), SYNERGY_VERSION, SYNERGY_VERSION + 
+                myVersion.insert( myVersion.end(), SYNERGY_VERSION, SYNERGY_VERSION +
                                   sizeof( SYNERGY_VERSION ) );
                 send( "Synergy", myVersion );
                 resetKeepalive();
@@ -238,20 +238,20 @@ void SynergyServer::run() {
             }
 
             receive();
-            processMessages(); 
-            
+            processMessages();
+
             if (_myIsConnected) {
                 sendHeartBeat();
             }
-            
+
             while (!_mySendMsgQueue.empty()) {
                 if (_mySocket != NULL && _mySocket->isValid()) {
                     _myLock.lock();
-                    std::vector<unsigned char> myMsg = 
+                    std::vector<unsigned char> myMsg =
                         std::vector<unsigned char>(_mySendMsgQueue.front());
                     _mySendMsgQueue.pop();
                     _myLock.unlock();
-                    _mySocket->send( reinterpret_cast<char*>(asl::begin_ptr(myMsg)), 
+                    _mySocket->send( reinterpret_cast<char*>(asl::begin_ptr(myMsg)),
                                      myMsg.size() );
                 }
             }
@@ -266,8 +266,8 @@ void SynergyServer::run() {
 }
 
 
-void SynergyServer::send( const std::string & theMessage, 
-                     const std::vector<unsigned char> theData ) 
+void SynergyServer::send( const std::string & theMessage,
+                     const std::vector<unsigned char> theData )
 {
 
     AC_DEBUG << "SynergyServer::send(" << theMessage << ")";
@@ -297,7 +297,7 @@ void SynergyServer::receive() {
         while (_mySocket->isValid() && _mySocket->peek(1)) {
             char myInputBuffer[READ_BUFFER_SIZE];
             memset( myInputBuffer, 0, sizeof( myInputBuffer ) );
-            unsigned myNumBytes = _mySocket->receive( myInputBuffer, 
+            unsigned myNumBytes = _mySocket->receive( myInputBuffer,
                                                       sizeof( myInputBuffer ) );
             myData.insert( myData.end(), myInputBuffer, myInputBuffer + myNumBytes );
         }
@@ -352,9 +352,9 @@ static bool messageStartsWith(std::vector<unsigned char> theMessage, std::string
 void SynergyServer::processMessages() {
 
     AC_TRACE << "SynergyServer::processMessages";
-    
+
     while (!_myMessageQueue.empty()) {
-    
+
         AC_TRACE << "have " << _myMessageQueue.size() << " messages in my queue!";
 
         std::vector<unsigned char> myMsg = _myMessageQueue.front();
@@ -372,13 +372,13 @@ void SynergyServer::processMessages() {
         else if (messageStartsWith(myMsg, "DINF")) {
             AC_DEBUG << "Got DInfo message";
             parseClientInfo(myMsg);
-            send( "CIAK" );            
-            if (!_myIsConnected) { 
+            send( "CIAK" );
+            if (!_myIsConnected) {
                 send( "CROP" );
                 std::vector<unsigned char> myOptions(4,0);
-                send( "DSOP", myOptions ); 
+                send( "DSOP", myOptions );
                 std::vector<unsigned char> myScreenPos(10,0);
-                send( "CINN", myScreenPos ); 
+                send( "CINN", myScreenPos );
                 send( "CALV" );
             }
             resetKeepalive();
@@ -393,29 +393,29 @@ void SynergyServer::processMessages() {
             // do nothing (yet)
         }
         else {
-            AC_PRINT << "Got strange message: " << std::string( myMsg.begin(), 
+            AC_PRINT << "Got strange message: " << std::string( myMsg.begin(),
                                                                 myMsg.begin() + 4 );
         }
     }
 
 }
-       
+
 void SynergyServer::parseClientInfo( const std::vector<unsigned char> & theMsg ) {
 
     if( std::string( theMsg.begin(), theMsg.begin() + 4 ) != "DINF" ) {
         AC_ERROR << "No client-info message!";
         return;
     }
-    
+
     if (theMsg.size() != 18) {
         AC_ERROR << "Client info incomplete! Got only " << theMsg.size() << "bytes!";
-        // reconnect... 
+        // reconnect...
         _mySocket->close();
         delete _mySocket;
         _mySocket = NULL;
         return;
     }
-    
+
     _myLock.lock();
     _myClientScreenSize[0] = (theMsg[8] << 8) + theMsg[9];
     _myClientScreenSize[1] = (theMsg[10] << 8) + theMsg[11];

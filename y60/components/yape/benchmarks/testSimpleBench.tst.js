@@ -17,7 +17,7 @@ function report( expr, duration, iterations, binding, num_args ) {
     if ( ! (num_args.toString() in results)) {
         results[num_args.toString()] = {};
     }
-    results[num_args.toString()][binding] = { mps: millions_per_second}; 
+    results[num_args.toString()][binding] = { mps: millions_per_second};
 }
 
 function create_csvs() {

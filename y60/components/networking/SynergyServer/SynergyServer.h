@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -75,8 +75,8 @@ void printVectorAsHex( const std::vector<unsigned char> & theMessage );
 
 class SynergyPacket {
 
-    public: 
-        
+    public:
+
         SynergyPacket() {
             _myPacketIt = _myPacket.begin();
         };
@@ -107,12 +107,12 @@ class SynergyPacket {
                 return false;
             }
 
-            unsigned int myLen =   ((*(_myPacketIt  )) << 24) 
-                                 + ((*(_myPacketIt+1)) << 16) 
-                                 + ((*(_myPacketIt+2)) <<  8) 
-                                 +  (*(_myPacketIt+3)); 
+            unsigned int myLen =   ((*(_myPacketIt  )) << 24)
+                                 + ((*(_myPacketIt+1)) << 16)
+                                 + ((*(_myPacketIt+2)) <<  8)
+                                 +  (*(_myPacketIt+3));
             _myPacketIt+=4;
-                    
+
             AC_TRACE << "message length: " << myLen;
             if (static_cast<long>(myLen) > static_cast<long>(_myPacket.end() - _myPacketIt)) {
                 // broken packet
@@ -135,10 +135,10 @@ class SynergyPacket {
 };
 
 class SynergyServer : public asl::PosixThread {
-    
+
     public:
 
-        SynergyServer( asl::Unsigned32 theHost, 
+        SynergyServer( asl::Unsigned32 theHost,
                   asl::Unsigned16 thePort );
         ~SynergyServer();
 
@@ -161,7 +161,7 @@ class SynergyServer : public asl::PosixThread {
         void stop();
         void processMessages();
         void receive();
-        void send( const std::string & theMsgType, 
+        void send( const std::string & theMsgType,
                    const std::vector<unsigned char> theData = std::vector<unsigned char>());
         void resetKeepalive();
         void sendHeartBeat();

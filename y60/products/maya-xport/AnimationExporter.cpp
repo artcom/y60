@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -118,7 +118,7 @@ AnimationExporter::exportSampledData(y60::AnimationBuilder & theAnimBuilder,
                                      const std::string & theAttributeName,
                                      MTime theStartTime,
                                      MTime theDuration,
-                                     bool thePropertyFlag) 
+                                     bool thePropertyFlag)
 {
     START_TIMER(exportAnimation_myAnimationBuilder);
     theAnimBuilder.setName(theCurveName);
@@ -218,8 +218,8 @@ AnimationExporter::getInitialOrientation(const MFnDagNode & theDagNode) {
         throw ExportException(string("Could not get rotation from MFnTransform: ")+
                 myStatus.errorString().asChar(), PLUS_FILE_LINE);
     }
-    
-    return asl::Vector3f(float(myRotation[0]), float(myRotation[1]), float(myRotation[2]));    
+
+    return asl::Vector3f(float(myRotation[0]), float(myRotation[1]), float(myRotation[2]));
 }
 
 void
@@ -324,10 +324,10 @@ AnimationExporter::exportCharacter(const MObject & theNode, std::map<std::string
                             }
                         }
                     }
-                                        
+
                     success = true;
                 } else {
-                    myClipBuilder.appendAnimation(myAnimationBuilder);                
+                    myClipBuilder.appendAnimation(myAnimationBuilder);
                     myAnimationBuilder.setEnable(false);
                     success = exportCurve<float>(myAnimationBuilder,
                                                 myCurves[myCurveIndex],
@@ -338,7 +338,7 @@ AnimationExporter::exportCharacter(const MObject & theNode, std::map<std::string
                                                 myMapIter->second->_myPropertyFlag);
                 }
             } else if (myMapIter->second->_myTypeName == "bool") {
-                    myClipBuilder.appendAnimation(myAnimationBuilder);                
+                    myClipBuilder.appendAnimation(myAnimationBuilder);
                     myAnimationBuilder.setEnable(false);
                     success = exportCurve<AcBool>(myAnimationBuilder,
                                                 myCurves[myCurveIndex],
@@ -358,8 +358,8 @@ AnimationExporter::exportCharacter(const MObject & theNode, std::map<std::string
             }
 
         } //next curve
-        
-        // export all rotation animations per node        
+
+        // export all rotation animations per node
         RotationMap::iterator myIter = myRotations.begin();
         for (;myIter != myRotations.end(); ++myIter) {
             AnimationBuilder myAnimationBuilder;
@@ -371,7 +371,7 @@ AnimationExporter::exportCharacter(const MObject & theNode, std::map<std::string
             MTime myEndTime(0.0);
             bool foundCurve = false;
             MFnAnimCurve::InfinityType myPostInfinity;
-            
+
             if (myIter->second.myRotationX) {
                 foundCurve = true;
                 myAnimCurveName = string(myIter->second.myRotationX->name().asChar());
@@ -403,7 +403,7 @@ AnimationExporter::exportCharacter(const MObject & theNode, std::map<std::string
                     foundCurve = true;
                 }
             }
-            
+
             exportQuaternionAnimation(myAnimationBuilder, myIter->second.myRotationX, myIter->second.myRotationY, myIter->second.myRotationZ,
                                       myStartTime, myEndTime, myIter->second.myInitialEuler,
                                       myId, "orientation", myPostInfinity, myAnimCurveName);
@@ -436,7 +436,7 @@ AnimationExporter::exportGlobal(const MFnDagNode & theDagNode, const std::string
     exportAnimation<float>(theDagNode, "transparencyR", theNodeId, "diffuse.a", & transparencyToAlpha);
 }
 
-void 
+void
 AnimationExporter::exportLambertFeatures(const MFnLambertShader & theDagNode,
                                          const std::string & theNodeId)
 {
@@ -463,7 +463,7 @@ AnimationExporter::exportQuaternionAnimation(y60::AnimationBuilder & theAnimBuil
 
     MTime mySampleTime = theStartTime;
     mySampleTime.setUnit(MTime::uiUnit());
-    
+
     std::vector<asl::Quaternionf> myValues;
     unsigned mySampleCount = static_cast<unsigned>((theEndTime - theStartTime).value());
     myValues.reserve(mySampleCount);
@@ -492,10 +492,10 @@ AnimationExporter::exportQuaternionAnimation(y60::AnimationBuilder & theAnimBuil
         myValues.push_back(Quaternionf::createFromEuler(myCurrentEuler));
         DB(AC_TRACE << "Exporting " << theAttributeName << ": " << "Euler=" << myCurrentEuler << "| Quat=" << Quaternionf::createFromEuler(myCurrentEuler) << std::endl);
     }
-    
+
     exportSampledData(theAnimBuilder, myValues, theAnimCurveName, thePostInfinity,
             theNodeId, theAttributeName, theStartTime, myDuration, false);
-            
+
 }
 
 
@@ -573,7 +573,7 @@ AnimationExporter::exportRotatingAnimation(const MFnDagNode & theDagNode, const 
     MObject myXNode = getAnimationNode(theDagNode, "rotateX");
     MObject myYNode = getAnimationNode(theDagNode, "rotateY");
     MObject myZNode = getAnimationNode(theDagNode, "rotateZ");
-    if ( ! (myXNode.isNull() && myYNode.isNull() && myZNode.isNull() ) ) {        
+    if ( ! (myXNode.isNull() && myYNode.isNull() && myZNode.isNull() ) ) {
         y60::AnimationBuilder myAnimationBuilder;
         std::string myId = _mySceneBuilder.appendAnimation(myAnimationBuilder);
 
@@ -647,13 +647,13 @@ AnimationExporter::exportCurve(y60::AnimationBuilder & theAnimBuilder,
     }
 
     DB(AC_TRACE << "Exporting animation curve: " << myAnimCurveName << std::endl);
-    
+
     MTime myEndTime    = theAnimCurve.time(theAnimCurve.numKeys()-1);
     MTime myStartTime  = theAnimCurve.time(0);
     MTime myDuration   = myEndTime - myStartTime;
 
     DB(AC_TRACE << " start: " << myStartTime << ", end " << myEndTime << std::endl);
-        
+
     MTime mySampleTime = myStartTime;
     // mySampleTime.setUnit(ourSamplingUnit);
     mySampleTime.setUnit(MTime::uiUnit());
@@ -700,8 +700,8 @@ AnimationExporter::exportCurve(y60::AnimationBuilder & theAnimBuilder,
 #           pragma warning(pop)
         }
     }
-    exportSampledData(theAnimBuilder, myValues, theAnimCurve.name().asChar(), 
-            theAnimCurve.postInfinityType(), theNodeId, theAttributeName, 
+    exportSampledData(theAnimBuilder, myValues, theAnimCurve.name().asChar(),
+            theAnimCurve.postInfinityType(), theNodeId, theAttributeName,
             myStartTime, myDuration, thePropertyFlag);
     return true;
 }

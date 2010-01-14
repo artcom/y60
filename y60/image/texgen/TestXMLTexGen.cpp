@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -63,7 +63,7 @@
 //   $Revision: 1.2 $
 //
 //
-// Description: 
+// Description:
 //
 //=============================================================================
 
@@ -71,7 +71,7 @@
 
 #include <string>
 #include <iomanip>
-#include <fstream>  
+#include <fstream>
 #include <stdexcept>
 #include <sstream>
 
@@ -104,45 +104,45 @@ TestXMLTexGen::TestXMLTexGen (): UnitTest ("TestXMLTexGen") {
 
 TestXMLTexGen::~TestXMLTexGen () {
     TextureDefinitionMap::iterator iter;
-    for (iter=_myTextureDefinitionMap->begin(); 
-            iter != _myTextureDefinitionMap->end(); 
+    for (iter=_myTextureDefinitionMap->begin();
+            iter != _myTextureDefinitionMap->end();
             ++iter)
     {
         delete (iter->second);
     }
 }
 
-TexGen::TextureDefinitionMap * 
+TexGen::TextureDefinitionMap *
 TestXMLTexGen::createColorDefinitions () {
-    TextureDefinitionMap * theDefinitions = 
+    TextureDefinitionMap * theDefinitions =
         new TextureDefinitionMap;
 
     for (int i=0; i<8; i+=2) {
         PLPixel32 theTileColor;
         switch (i) {
-            case 0: 
+            case 0:
                 theTileColor.Set (255, 0, 0);
                 break;
-            case 2: 
+            case 2:
                 theTileColor.Set (0, 255, 0);
                 break;
-            case 4: 
+            case 4:
                 theTileColor.Set (0, 0, 255);
                 break;
-            case 6: 
+            case 6:
                 theTileColor.Set (255, 255, 255);
                 break;
         }
 
         (*theDefinitions)[i] = new TextureDefinition (i);
-        (*theDefinitions)[i]->addLayer (new LayerDefinition (theTileColor, 1.0)); 
+        (*theDefinitions)[i]->addLayer (new LayerDefinition (theTileColor, 1.0));
     }
 
     return theDefinitions;
 }
 
 string TestXMLTexGen::makeXMLTileDef (const string & theFileName) {
-    
+
     // Load XML file
     ifstream theXMLFile ((myTestDir+theFileName).c_str());
     if (!theXMLFile) {
@@ -161,16 +161,16 @@ void TestXMLTexGen::runFileNotFoundTest () {
     dom::Document theDocument (theDefStr);
 
     // Change indexfile to bogus.
-    theDocument("Texture")("Countryside")("Indexmap")("#text").nodeValue( "blafasel");    
+    theDocument("Texture")("Countryside")("Indexmap")("#text").nodeValue( "blafasel");
 
     bool ok = false;
     try {
         // Make filter from XML string.
-        TerrainTexGen theFilter (*_myTextureDefinitionMap, 
+        TerrainTexGen theFilter (*_myTextureDefinitionMap,
                                  theDocument("Texture")("Countryside"), 1);
     } catch (const PLTextException &) {
 //        cerr << getTracePrefix() << (const char *)e;
-        ok = true;        
+        ok = true;
     }
     ENSURE_MSG (ok, "File not found exception handling.");
 }
@@ -178,7 +178,7 @@ void TestXMLTexGen::runFileNotFoundTest () {
 void TestXMLTexGen::runTypeErrorTest () {
     string theDefStr = makeXMLTileDef("noblend_test.xml");
     int charIndex = theDefStr.find("\"0\"");
-    
+
     // Change index to non-numeric value.
     theDefStr[charIndex+1] = 'a';
     dom::Document theDocument (theDefStr);
@@ -186,11 +186,11 @@ void TestXMLTexGen::runTypeErrorTest () {
     bool ok = false;
     try {
         // Make filter from XML string.
-        TerrainTexGen theFilter (*_myTextureDefinitionMap, 
+        TerrainTexGen theFilter (*_myTextureDefinitionMap,
                                  theDocument("Texture")("Countryside"), 1);
     } catch (invalid_argument e) {
 //        cerr << getTracePrefix() << e.what() << endl;
-        ok = true;        
+        ok = true;
     }
     ENSURE_MSG (ok, "Argument type exception handling.");
 }
@@ -198,26 +198,26 @@ void TestXMLTexGen::runTypeErrorTest () {
 void TestXMLTexGen::runArgMissingErrorTest () {
     // Create XML Texture definition with field missing...
     string s;
-    s = string("<?xml version=\"1.0\"?>\n") + 
+    s = string("<?xml version=\"1.0\"?>\n") +
         "<Texture>" +
         "  <Tile/>" +
-        "</Texture>\n"; 
+        "</Texture>\n";
     dom::Document theDocument (s);
-     
+
     bool ok = false;
     try {
         // Make filter from XML string.
-        TerrainTexGen theFilter (*_myTextureDefinitionMap, 
+        TerrainTexGen theFilter (*_myTextureDefinitionMap,
                                  theDocument("Texture")("Countryside"), 1);
     } catch (invalid_argument e) {
 //        cerr << getTracePrefix() << e.what() << endl;
-        ok = true;        
+        ok = true;
     }
     ENSURE_MSG (ok, "Argument missing exception handling.");
 }
 
 void TestXMLTexGen::runGenerator (const TerrainTexGen & theFilter,
-                                  const string & expectedResultFileName) 
+                                  const string & expectedResultFileName)
 {
     PLAnyPicDecoder theDecoder;
 
@@ -238,7 +238,7 @@ void TestXMLTexGen::runGenerator (const TerrainTexGen & theFilter,
     ENSURE (resultBmp.GetWidth() == 128);
     ENSURE (resultBmp.GetHeight() == 128);
     PLAnyBmp expected_resultBmp;
-    theDecoder.MakeBmpFromFile ((myTestDir+expectedResultFileName+".png").c_str(), 
+    theDecoder.MakeBmpFromFile ((myTestDir+expectedResultFileName+".png").c_str(),
             &expected_resultBmp, PLPixelFormat::X8R8G8B8);
     ENSURE (expected_resultBmp.AlmostEqual (resultBmp, 4));
 
@@ -267,11 +267,11 @@ void TestXMLTexGen::runBlendTest () {
 
     PLAnyPicDecoder theDecoder;
     PLAnyBmp *theIndexBmp = new PLAnyBmp;
-    theDecoder.MakeBmpFromFile ((myTestDir+"TestImages/xml_blend_index.png").c_str(), 
+    theDecoder.MakeBmpFromFile ((myTestDir+"TestImages/xml_blend_index.png").c_str(),
                                 theIndexBmp);
 
     // Make filter.
-    TerrainTexGen theFilter (*_myTextureDefinitionMap, 
+    TerrainTexGen theFilter (*_myTextureDefinitionMap,
                              theDocument("Texture")("Countryside"),1);
 
     runGenerator (theFilter, "TestImages/xml_blend_expectedresult");

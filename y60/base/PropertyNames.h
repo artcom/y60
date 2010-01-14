@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -87,14 +87,14 @@ namespace y60 {
     const char * const BLENDEQUATION_PROPERTY     = "blendequation";
     const char * const BLENDCOLOR_PROPERTY        = "blendcolor";
     const char * const GLOW_PROPERTY              = "glow";
-    const char * const POINTSIZE_PROPERTY         = "pointsize"; // PointSize, PointSizeMin, PointSizeMax 
+    const char * const POINTSIZE_PROPERTY         = "pointsize"; // PointSize, PointSizeMin, PointSizeMax
                                                                   // (last two work with attenuation)
     const char * const POINTATTENUATION_PROPERTY  = "pointattenuation"; // v[0] + v[1] * d + v[2] * d ^ 2;
 
     const char * const AUTOTEXCOORDMODES_PROPERTY   = "autotexcoordmodes"; //[U_Mode, V_Mode, W_Mode, Q_Mode] where each
                                                                             // mode is one of OBJECT_LINEAR, EYE_LINEAR, SPHERE_MAP
     const char * const AUTOTEXCOORDPARAMS_PROPERTY = "autotexcoordparams"; // [U_Params, V_Params, W_Params, Q_Params]
-                                                                            // Sphere mapped coords are not supported yet ... 
+                                                                            // Sphere mapped coords are not supported yet ...
                                                                             // see also OGL Redbook p.413 ff
     const char * const TARGETBUFFERS_PROPERTY     = "targetbuffers";
     const char * const DEPTHTEST_PROPERTY         = "depthtest";

@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -49,7 +49,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -165,7 +165,7 @@ namespace y60 {
         _myCureHLines(-1,-1,-1,-1),
         _myCurePoints(0),
         _myShearX(0.0),
-        _myShearY(0.0),        
+        _myShearY(0.0),
         _myTransformEventOrientation(0.0f),
         _myTransformEventScale(1.0f,1.0f),
         _myTransformEventPosition(0.0f,0.0f)
@@ -221,7 +221,7 @@ namespace y60 {
         unsigned myWidth = nextPowerOfTwo(_myGridSize[0] * GRID_SCALE_X );
         unsigned myHeight = nextPowerOfTwo( _myGridSize[1] * GRID_SCALE_Y );
         _myResampledRaster = allocateRaster("resampled_raster", myWidth, myHeight);
-    
+
         createTransportLayerEvent( "configure" );
     }
 
@@ -230,7 +230,7 @@ namespace y60 {
         if (_myScene) {
             dom::NodePtr myImage = _myScene->getSceneDom()->getElementById(theName);
             if (myImage) {
-                myImage->getFacade<y60::Image>()->createRaster( 
+                myImage->getFacade<y60::Image>()->createRaster(
                     theWidth, theHeight, 1, y60::GRAY);
                 _myRasterNames.push_back( theName );
                 return RasterHandle( myImage->childNode(0)->childNode(0)->nodeValueWrapperPtr());
@@ -251,7 +251,7 @@ namespace y60 {
             RasterHandle myHandle(createRasterValue(y60::GRAY, theWidth, theHeight));
             myHandle.raster->clear();
             return myHandle;
-                
+
         }
     }
 
@@ -311,10 +311,10 @@ namespace y60 {
                     res.max = mat(x,y).get();
                     res.center[0] = static_cast<float>(x);
                     res.center[1] = static_cast<float>(y);
-                }   
-            }   
-        }       
-    
+                }
+            }
+        }
+
     }
 
     template <class RASTER>
@@ -332,7 +332,7 @@ namespace y60 {
 
         unsigned char * myBrokenLine = _myRawRaster.raster->pixels().begin() +
             theLineNo * _myPoTSize[0];
-    
+
 
         unsigned char * myUpperNeighbour = 0;
         unsigned char * myLowerNeighbour = 0;
@@ -388,7 +388,7 @@ namespace y60 {
     ASSDriver::curePoint( unsigned theX, unsigned theY ) {
         unsigned char * myBrokenPoint = _myRawRaster.raster->pixels().begin() +
             theY * _myPoTSize[0] + theX;
-    
+
         unsigned char * myNeighbours[NUM_NEIGHBOURS];
 
         if (theY == 0) {
@@ -399,7 +399,7 @@ namespace y60 {
             myNeighbours[UPPER] = myBrokenPoint - _myPoTSize[0];
             myNeighbours[LOWER] = myBrokenPoint + _myPoTSize[0];
         }
-    
+
         if (theX == 0) {
             myNeighbours[LEFT] = 0;
         } else if ( theX == static_cast<unsigned>(_myGridSize[0]) - 1 ) {
@@ -408,16 +408,16 @@ namespace y60 {
             myNeighbours[LEFT] = myBrokenPoint - 1;
             myNeighbours[RIGHT] = myBrokenPoint + 1;
         }
-    
+
         unsigned myNumSamples = 0;
         int mySum = 0;
         for (unsigned i = 0; i < NUM_NEIGHBOURS; ++i) {
             if (myNeighbours[i]) {
                 mySum += *myNeighbours[i];
                 myNumSamples += 1;
-            }    
+            }
         }
-    
+
 
 
         *myBrokenPoint = (unsigned char)(mySum / myNumSamples);
@@ -454,7 +454,7 @@ namespace y60 {
 
     void
     ASSDriver::updateDerivedRasters() {
-    
+
         if(_myCureBrokenElectrodesFlag) {
             cureBrokenElectrodes();
         }
@@ -479,7 +479,7 @@ namespace y60 {
 
         // XXX brute force resampling
         if (RESAMPLING) {
-            _myResampledRaster.raster->pasteRaster( * _myMomentRaster.value, 0, 0, _myGridSize[0], _myGridSize[1], 
+            _myResampledRaster.raster->pasteRaster( * _myMomentRaster.value, 0, 0, _myGridSize[0], _myGridSize[1],
                                                     0,0, _myGridSize[0] * GRID_SCALE_X, _myGridSize[1] * GRID_SCALE_Y);
         }
     }
@@ -503,15 +503,15 @@ namespace y60 {
         BlobListPtr myROIs;
         if (RESAMPLING) {
             //myROIs = connectedComponents( _myResampledRaster.raster, _myComponentThreshold);
-        
-            // take the peaks 
+
+            // take the peaks
             y60::RasterOfGRAY & myResampledRaster = *
                 dom::dynamic_cast_and_openWriteableValue<y60::RasterOfGRAY>(&* (_myResampledRaster.value) );
 
             // std::transform( myResampledRaster.begin(), myResampledRaster.end(),
             //     myResampledRaster.begin(),
             //     Threshold<gray<unsigned char> >( _myComponentThreshold ));
-        
+
             asl::GRAY *pixels = myResampledRaster.begin();
             unsigned width = _myResampledRaster.raster->width();
             unsigned height = _myResampledRaster.raster->height();
@@ -524,10 +524,10 @@ namespace y60 {
                         _myTmpPositions.push_back( Vector2f(static_cast<float>(x/GRID_SCALE_X)
                                                            ,static_cast<float>(y/GRID_SCALE_Y)));
                     }
-                }   
-            }       
+                }
+            }
             dom::dynamic_cast_and_closeWriteableValue<y60::RasterOfGRAY>(&* (_myResampledRaster.value) );
-        
+
 
         } else {
             myROIs = connectedComponents( _myMomentRaster.raster, _myComponentThreshold);
@@ -543,17 +543,17 @@ namespace y60 {
             updateCursors( 1.0 / _myTransportLayer->getFramerate(), theEvent );
         }
 
-    
+
     }
 
-    asl::Vector2f 
+    asl::Vector2f
     ASSDriver::interpolateMaximum(const asl::Vector2f theCenter, float theMaximum) {
         Vector2f myResult(0.0,0.0);
 
         y60::RasterOfGRAY & myDenoisedRaster = *
             dom::dynamic_cast_and_openWriteableValue<y60::RasterOfGRAY>(&* (_myDenoisedRaster.value) );
 
-    
+
         float x0y0 = myDenoisedRaster((unsigned)theCenter[0]-1, (unsigned)theCenter[1]-1).get();
         float x1y0 = myDenoisedRaster((unsigned)theCenter[0], (unsigned)theCenter[1]-1).get();
         float x2y0 = myDenoisedRaster((unsigned)theCenter[0]+1, (unsigned)theCenter[1]-1).get();
@@ -587,22 +587,22 @@ namespace y60 {
 
     template<>
     void
-    ASSDriver::computeCursorPositions<MomentResults>( std::vector<MomentResults> & theCurrentPositions, 
+    ASSDriver::computeCursorPositions<MomentResults>( std::vector<MomentResults> & theCurrentPositions,
                                                       const BlobListPtr & theROIs)
     {
         typedef subraster<gray<unsigned char> > SubRaster;
         if (RESAMPLING) {
-            _myResampledRaster.raster->pasteRaster( * _myDenoisedRaster.value, 0, 0, _myGridSize[0], _myGridSize[1], 
+            _myResampledRaster.raster->pasteRaster( * _myDenoisedRaster.value, 0, 0, _myGridSize[0], _myGridSize[1],
                                                     0,0, _myGridSize[0] * GRID_SCALE_X, _myGridSize[1] * GRID_SCALE_Y);
         }
         for (BlobList::const_iterator it = theROIs->begin(); it != theROIs->end(); ++it) {
             Box2i myBox = (*it)->bbox();
-        
+
             FindMaximum<SubRaster> myMaxAnalysis;
             _myDenoisedRaster.raster->apply( myBox[Box2i::MIN][0], myBox[Box2i::MIN][1],
                                              myBox[Box2i::MAX][0] + 1, myBox[Box2i::MAX][1] + 1, myMaxAnalysis);
-       
-        
+
+
             if (!_myUseCCRegionForMomentumFlag) {
                 Point2i myCenter = (*it)->bbox().getCenter();
                 Point2i myUpperLeft;
@@ -610,7 +610,7 @@ namespace y60 {
                 Point2i myLowerLeft;
                 Point2i myLowerRight;
                 _myUserDefinedMomentumBox.getCorners(myUpperLeft, myLowerRight, myUpperRight, myLowerLeft);
-                myBox = Box2i(max(0, myCenter[0] + myUpperLeft[0]) , max(0,myCenter[1] + myUpperLeft[1]), 
+                myBox = Box2i(max(0, myCenter[0] + myUpperLeft[0]) , max(0,myCenter[1] + myUpperLeft[1]),
                               min(_myGridSize[0], myCenter[0] + myLowerRight[0]) ,min(_myGridSize[1], myCenter[1] + myLowerRight[1]));
             }
             AnalyseMoment<SubRaster> myMomentAnalysis;
@@ -628,7 +628,7 @@ namespace y60 {
             MomentResults myResult = myMomentAnalysis.result;
             myResult.center += Vector2f( float(myBox[Box2i::MIN][0]),
                                          float(myBox[Box2i::MIN][1]));
-        
+
             AC_TRACE << "moment position " << myResult.center;
             theCurrentPositions.push_back( myResult );
         }
@@ -637,32 +637,32 @@ namespace y60 {
 
     template<>
     void
-    ASSDriver::computeCursorPositions<MaximumResults>( std::vector<MaximumResults> & theCurrentPositions, 
+    ASSDriver::computeCursorPositions<MaximumResults>( std::vector<MaximumResults> & theCurrentPositions,
                                                        const BlobListPtr & theROIs)
 
     {
         typedef subraster<gray<unsigned char> > SubRaster;
         if (RESAMPLING) {
-            _myResampledRaster.raster->pasteRaster( * _myDenoisedRaster.value, 0, 0, _myGridSize[0], _myGridSize[1], 
+            _myResampledRaster.raster->pasteRaster( * _myDenoisedRaster.value, 0, 0, _myGridSize[0], _myGridSize[1],
                                                     0,0, _myGridSize[0] * GRID_SCALE_X, _myGridSize[1] * GRID_SCALE_Y);
         }
         for (BlobList::const_iterator it = theROIs->begin(); it != theROIs->end(); ++it) {
             Box2i myBox = (*it)->bbox();
-        
+
             FindMaximum<SubRaster> myMaxAnalysis;
             _myDenoisedRaster.raster->apply( myBox[Box2i::MIN][0], myBox[Box2i::MIN][1],
                                              myBox[Box2i::MAX][0] + 1, myBox[Box2i::MAX][1] + 1, myMaxAnalysis);
-        
+
             MaximumResults myResult = myMaxAnalysis.result;
 
             myResult.center += Vector2f( float(myBox[Box2i::MIN][0]),
                                          float(myBox[Box2i::MIN][1]));
 
-        
+
             myResult.center = interpolateMaximum(myResult.center, myResult.max);
 
             AC_TRACE << "maximum position " << myResult.center;
-            
+
             theCurrentPositions.push_back( myResult );
         }
 
@@ -674,7 +674,7 @@ namespace y60 {
         return n * n;
     }
 
-    void 
+    void
     ASSDriver::updateCursors(double theDeltaT, const ASSEvent & theEvent) {
         /*y60::RasterOfGRAY & myDenoisedRaster = **/
             dom::dynamic_cast_and_openWriteableValue<y60::RasterOfGRAY>(&* (_myDenoisedRaster.value) );
@@ -694,18 +694,18 @@ namespace y60 {
     ASSDriver::findTouch(CursorMap::iterator & theCursorIt, double theDeltaT,
                          const ASSEvent & theEvent)
     {
-    
+
         float myFirstDerivative = float((theCursorIt->second.intensity -
                                          theCursorIt->second.previousIntensity) / theDeltaT);
         //float myFirstDerivative = (theCursorIt->second.intensity - theCursorIt->second.getMinIntensity()) / theDeltaT;
-        theCursorIt->second.firstDerivative = myFirstDerivative; 
-    
+        theCursorIt->second.firstDerivative = myFirstDerivative;
+
         float myTouch = 0;
         if ( myFirstDerivative > _myFirstDerivativeThreshold  &&
              _myRunTime - theCursorIt->second.lastTouchTime > _myMinTouchInterval &&
              theCursorIt->second.intensity > _myMinTouchThreshold)
         {
-            myTouch = theCursorIt->second.intensity;   
+            myTouch = theCursorIt->second.intensity;
             //AC_PRINT << "touched me! at " << _myRunTime;
             theCursorIt->second.lastTouchTime = _myRunTime;
             createEvent( theCursorIt->first, "touch", theCursorIt->second.position,
@@ -713,7 +713,7 @@ namespace y60 {
                          theCursorIt->second.roi, theCursorIt->second.intensity, theEvent );
             _myTouchHistory.push_back( TouchEvent(_myRunTime, theCursorIt->second.position ));
         }
-   
+
         theCursorIt->second.intensityHistory.push_back( theCursorIt->second.intensity );
         if( theCursorIt->second.intensityHistory.size() > MAX_HISTORY_LENGTH ) {
             theCursorIt->second.intensityHistory.pop_front();
@@ -730,7 +730,7 @@ namespace y60 {
     ASSDriver::computeIntensity(CursorMap::iterator & theCursorIt, const y60::RasterOfGRAY & theRaster) {
 
         const Vector2f & myPosition = theCursorIt->second.position;
-    
+
         Vector2i myTopLeft;
         myTopLeft[0] = int( floor( myPosition[0] ));
         myTopLeft[1] = int( floor( myPosition[1] ));
@@ -745,12 +745,12 @@ namespace y60 {
         myWeight[1] *= 1 - 2 * myHeadRoom;
         myWeight[1] += myHeadRoom;
 
-        float myV00 = sqrt( float( theRaster[ theRaster.hsize() * myTopLeft[1] + myTopLeft[0] ].get())); 
+        float myV00 = sqrt( float( theRaster[ theRaster.hsize() * myTopLeft[1] + myTopLeft[0] ].get()));
         float myV10 = sqrt( float( theRaster[ theRaster.hsize() * myTopLeft[1] + myTopLeft[0] + 1].get()));
         float myV01 = sqrt( float( theRaster[ theRaster.hsize() * (myTopLeft[1] + 1) + myTopLeft[0]].get()));
         float myV11 = sqrt( float( theRaster[ theRaster.hsize() * (myTopLeft[1] + 1) + myTopLeft[0] + 1].get()));
 
-        float myIntensity = myV11 * myWeight[0]  * myWeight[1]+ 
+        float myIntensity = myV11 * myWeight[0]  * myWeight[1]+
             myV01 * (1 - myWeight[0]) * myWeight[1] +
             myV10 * myWeight[0] * (1 - myWeight[1]) +
             myV00 * (1 - myWeight[0]) * (1 - myWeight[1]);
@@ -764,7 +764,7 @@ namespace y60 {
             myROIChanged = int(myIntensity);
             myIntensity = (theCursorIt->second.previousIntensity + myIntensity) / 2;
         }
-    
+
 
         if (theCursorIt->second.previousIntensity == 0.0) {
             theCursorIt->second.previousIntensity = myIntensity;
@@ -806,9 +806,9 @@ namespace y60 {
     }
 
 #define PAVELS_CORRELATOR
-#ifdef PAVELS_CORRELATOR 
+#ifdef PAVELS_CORRELATOR
     template<>
-    void 
+    void
     ASSDriver::correlatePositions<MomentResults>( const std::vector<MomentResults> & theCurrentPositions,
                                                   const BlobListPtr theROIs, const ASSEvent & theEvent)
 
@@ -821,7 +821,7 @@ namespace y60 {
 
         const BlobList & myROIs = * theROIs;
 
-        // populate a map with all distances between existing cursors and new positions 
+        // populate a map with all distances between existing cursors and new positions
         typedef std::multimap<float, std::pair<int,int> > DistanceMap;
         DistanceMap myDistanceMap;
         float myDistanceThreshold = 4.0;
@@ -849,7 +849,7 @@ namespace y60 {
         AC_TRACE << "distance map is " << myDistanceMap.size() << " elements long.";
 
         // iterate through the distance map and correlate cursors in increasing distance order
-        for (DistanceMap::iterator dit = myDistanceMap.begin(); 
+        for (DistanceMap::iterator dit = myDistanceMap.begin();
              dit!=myDistanceMap.end(); ++dit)
         {
             // check if we already have correlated one of our nodes
@@ -869,7 +869,7 @@ namespace y60 {
                     myCursor.position = theCurrentPositions[myPositionIndex].center;
                     myCursor.major_direction = theCurrentPositions[myPositionIndex].major_dir;
                     myCursor.minor_direction = theCurrentPositions[myPositionIndex].minor_dir;
-                    // TODO: intensity is not up-to-date yet, so we the previous intensity will be posted in the move event 
+                    // TODO: intensity is not up-to-date yet, so we the previous intensity will be posted in the move event
                     //myCursor.previousIntensity = myCursor.intensity;
                     //myCursor.intensity = theCurrentPositions[myPositionIndex].intensity;
                     myCursor.previousRoi = myCursor.roi;
@@ -918,11 +918,11 @@ namespace y60 {
             myIt = nextIt;
         }
 
-        dom::dynamic_cast_and_closeWriteableValue<y60::RasterOfGRAY>(&* (_myRawRaster.value) ); 
+        dom::dynamic_cast_and_closeWriteableValue<y60::RasterOfGRAY>(&* (_myRawRaster.value) );
     }
 
     template<>
-    void 
+    void
     ASSDriver::correlatePositions<MaximumResults>( const std::vector<MaximumResults> & theCurrentPositions,
                                                    const BlobListPtr theROIs, const ASSEvent & theEvent)
 
@@ -935,7 +935,7 @@ namespace y60 {
 
         const BlobList & myROIs = * theROIs;
 
-        // populate a map with all distances between existing cursors and new positions 
+        // populate a map with all distances between existing cursors and new positions
         typedef std::multimap<float, std::pair<int,int> > DistanceMap;
         DistanceMap myDistanceMap;
         float myDistanceThreshold = 4.0;
@@ -963,7 +963,7 @@ namespace y60 {
         AC_TRACE << "distance map is " << myDistanceMap.size() << " elements long.";
 
         // iterate through the distance map and correlate cursors in increasing distance order
-        for (DistanceMap::iterator dit = myDistanceMap.begin(); 
+        for (DistanceMap::iterator dit = myDistanceMap.begin();
              dit!=myDistanceMap.end(); ++dit)
         {
             // check if we already have correlated one of our nodes
@@ -981,7 +981,7 @@ namespace y60 {
                     // update cursor with new position
                     myCursor.motion = theCurrentPositions[myPositionIndex].center - myCursor.position;
                     myCursor.position = theCurrentPositions[myPositionIndex].center;
-                    // TODO: intensity is not up-to-date yet, so we the previous intensity will be posted in the move event 
+                    // TODO: intensity is not up-to-date yet, so we the previous intensity will be posted in the move event
                     //myCursor.previousIntensity = myCursor.intensity;
                     //myCursor.intensity = theCurrentPositions[myPositionIndex].intensity;
                     myCursor.previousRoi = myCursor.roi;
@@ -1030,10 +1030,10 @@ namespace y60 {
             myIt = nextIt;
         }
 
-        dom::dynamic_cast_and_closeWriteableValue<y60::RasterOfGRAY>(&* (_myRawRaster.value) ); 
+        dom::dynamic_cast_and_closeWriteableValue<y60::RasterOfGRAY>(&* (_myRawRaster.value) );
     }
 #else
-    void 
+    void
     ASSDriver::correlatePositions( const std::vector<MomentResults> & theCurrentPositions,
                                    const BlobListPtr theROIs)
     {
@@ -1118,7 +1118,7 @@ namespace y60 {
             Point2i myLowerLeft;
             Point2i myLowerRight;
             _myUserDefinedMomentumBox.getCorners(myUpperLeft, myLowerRight, myUpperRight, myLowerLeft);
-            myBox = Box2f(myCenter[0] + myUpperLeft[0], myCenter[1] + myUpperLeft[1], 
+            myBox = Box2f(myCenter[0] + myUpperLeft[0], myCenter[1] + myUpperLeft[1],
                           myCenter[0] + myLowerRight[0], myCenter[1] + myLowerRight[1]);
         }
         Point2f myUpperLeft;
@@ -1133,7 +1133,7 @@ namespace y60 {
         glVertex2fv(myLowerRight.begin());
         glVertex2fv(myUpperRight.begin());
         glEnd();
- 
+
     }
 
     void
@@ -1171,14 +1171,14 @@ namespace y60 {
     ASSDriver::drawMarkers() {
         // draw origin
         drawCircle( Vector2f(0.0, 0.0), 0.15f, 36, _myGridColor );
-    
+
         /*
           std::vector<asl::Vector2f>::iterator myIt = _myTmpPositions.begin();
           for (; myIt != _myTmpPositions.end(); ++myIt ) {
           drawCircle(*myIt, 0.15f, 36, _myTouchColor);
           }
         */
-    
+
         // draw cursors
         CursorMap::iterator myIt = _myCursors.begin();
         for (; myIt != _myCursors.end(); ++myIt ) {
@@ -1210,7 +1210,7 @@ namespace y60 {
         if (_myProbePosition[0] >= 0 && _myProbePosition[1] >= 0) {
             drawCircle( _myProbePosition, 0.15f, 36, _myProbeColor);
         }
-    
+
     }
 
     void
@@ -1255,7 +1255,7 @@ namespace y60 {
                         glPushMatrix();
                         Matrix4f myMat = getTransformationMatrix();
                         glLoadMatrixf( static_cast<const GLfloat*>( myMat.getData()));
-                    
+
                         glDisable( GL_DEPTH_TEST );
 
                         drawGrid();
@@ -1290,7 +1290,7 @@ namespace y60 {
         theReturnValue.set( theVar );           \
         return;                                 \
     }
-    
+
 #define RO_PROP( theName )                                          \
     if (thePropertyName == #theName) {                              \
         AC_ERROR << "Property '" << #theName << "' is read only.";  \
@@ -1348,10 +1348,10 @@ namespace y60 {
         SET_PROP( transformEventOrientation, _myTransformEventOrientation );
 
         // ensure overlay for legacy reasons
-        if (_myOverlay) {        
+        if (_myOverlay) {
             y60::Overlay & myOverlay = *(_myOverlay->getFacade<y60::Overlay>());
             myOverlay.set<Position2DTag>(_myTransformEventPosition);
-            myOverlay.set<Scale2DTag>(_myTransformEventScale); 
+            myOverlay.set<Scale2DTag>(_myTransformEventScale);
             myOverlay.set<Rotation2DTag>(_myTransformEventOrientation);
         }
 
@@ -1423,22 +1423,22 @@ namespace y60 {
 
         asl::Vector4f myMomentumRegion;
         getConfigSetting( theSettings, "MomentumRegion", myMomentumRegion, asl::Vector4f(-1,-1,1,1));
-        _myUserDefinedMomentumBox = Box2i(int(myMomentumRegion[0]), int(myMomentumRegion[1]), int(myMomentumRegion[2]), int(myMomentumRegion[3])); 
+        _myUserDefinedMomentumBox = Box2i(int(myMomentumRegion[0]), int(myMomentumRegion[1]), int(myMomentumRegion[2]), int(myMomentumRegion[3]));
 
-    
+
         asl::Vector4f myCureVLines;
         getConfigSetting( theSettings, "CureVLineValues", myCureVLines, asl::Vector4f(-1,-1,-1,-1));
-        _myCureVLines = Vector4f(myCureVLines[0], myCureVLines[1], myCureVLines[2], myCureVLines[3]); 
+        _myCureVLines = Vector4f(myCureVLines[0], myCureVLines[1], myCureVLines[2], myCureVLines[3]);
 
         asl::Vector4f myCureHLines;
         getConfigSetting( theSettings, "CureHLineValues", myCureHLines, asl::Vector4f(-1,-1,-1,-1));
-        _myCureHLines = Vector4f(myCureHLines[0], myCureHLines[1], myCureHLines[2], myCureHLines[3]); 
+        _myCureHLines = Vector4f(myCureHLines[0], myCureHLines[1], myCureHLines[2], myCureHLines[3]);
 
         asl::Vector2f myCurePoint1;
         asl::Vector2f myCurePoint2;
         asl::Vector2f myCurePoint3;
         asl::Vector2f myCurePoint4;
-    
+
         _myCurePoints.clear();
         getConfigSetting( theSettings, "CurePoint1", myCurePoint1, asl::Vector2f(-1,-1));
         _myCurePoints.push_back(myCurePoint1);
@@ -1467,17 +1467,17 @@ namespace y60 {
             _myTransformEventScale[1] *= -1;
         }
         // ensure overlay for legacy reasons
-        if (_myOverlay) {        
+        if (_myOverlay) {
             y60::Overlay & myOverlay = *(_myOverlay->getFacade<y60::Overlay>());
             myOverlay.set<Position2DTag>(_myTransformEventPosition);
-            myOverlay.set<Scale2DTag>(_myTransformEventScale); 
+            myOverlay.set<Scale2DTag>(_myTransformEventScale);
             myOverlay.set<Rotation2DTag>(_myTransformEventOrientation);
         }
-        
-    
+
+
     }
 
-    Vector3f 
+    Vector3f
     ASSDriver::applyTransform( const Vector2f & theRawPosition,
                                const Matrix4f & theTransform )
     {
@@ -1496,7 +1496,7 @@ namespace y60 {
             my3DPosition[0] = clamp( my3DPosition[0], 0.0f, float(myCanvas->getWidth()) );
             my3DPosition[1] = clamp( my3DPosition[1], 0.0f, float(myCanvas->getHeight()) );
         }
-        return my3DPosition;    
+        return my3DPosition;
     }
 
 #ifdef ASS_LATENCY_TEST
@@ -1512,7 +1512,7 @@ namespace y60 {
     }
 #endif
 
-    void 
+    void
     ASSDriver::processInput() {
         if (_myTransportLayer) {
             std::vector<ASSEvent> myFrames;
@@ -1533,7 +1533,7 @@ namespace y60 {
                             allocateGridBuffers( myEvent.size );
                         }
                         copyFrame( myEvent.data );
-                        // TODO use smart pointers 
+                        // TODO use smart pointers
                         delete [] myEvent.data;
                         processSensorValues(myEvent);
 #ifdef ASS_LATENCY_TEST
@@ -1571,7 +1571,7 @@ namespace y60 {
             dom::NodePtr myImage = _myScene->getSceneDom()->getElementById(MOMENT_RASTER);
             std::ostringstream streamer;
             streamer << setw(5) << setfill('0') << _myCapturedFrameCounter++;
-            
+
             myImage->getFacade<y60::Image>()->saveToFile("SensorData" + streamer.str() + ".png");
 
         } else {
@@ -1581,7 +1581,7 @@ namespace y60 {
 
     void
     ASSDriver::copyFrame(unsigned char * theData ) {
-    
+
         /*y60::RasterOfGRAY & myRaster = **/
             dom::dynamic_cast_and_openWriteableValue<y60::RasterOfGRAY>(&* (_myRawRaster.value) );
 
@@ -1597,13 +1597,13 @@ namespace y60 {
         dom::dynamic_cast_and_closeWriteableValue<y60::RasterOfGRAY>(&* (_myRawRaster.value) );
     }
 
-    void 
+    void
     ASSDriver::performTara() {
         //AC_PRINT << "ASSDriver::performTara()";
         queueCommand( CMD_PERFORM_TARA );
     }
 
-    void 
+    void
     ASSDriver::callibrateTransmissionLevels() {
         //AC_PRINT << "ASSDriver::callibrateTransmissionLevels()";
         queueCommand( CMD_CALLIBRATE_TRANSMISSION_LEVEL );
@@ -1635,10 +1635,10 @@ namespace y60 {
     }
 
     static JSBool
-    PerformTara(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) { 
+    PerformTara(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         DOC_BEGIN("");
         DOC_END;
-   
+
         asl::Ptr<ASSDriver> myNative = getNativeAs<ASSDriver>(cx, obj);
         if (myNative) {
             myNative->performTara();
@@ -1649,10 +1649,10 @@ namespace y60 {
     }
 
     static JSBool
-    Connect(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) { 
+    Connect(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         DOC_BEGIN("");
         DOC_END;
-   
+
         asl::Ptr<ASSDriver> myNative = getNativeAs<ASSDriver>(cx, obj);
         if (myNative) {
             myNative->connect();
@@ -1663,10 +1663,10 @@ namespace y60 {
     }
 
     static JSBool
-    Disconnect(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) { 
+    Disconnect(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         DOC_BEGIN("");
         DOC_END;
-   
+
         asl::Ptr<ASSDriver> myNative = getNativeAs<ASSDriver>(cx, obj);
         if (myNative) {
             myNative->disconnect();
@@ -1677,10 +1677,10 @@ namespace y60 {
     }
 
     static JSBool
-    CallibrateTransmissionLevels(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) { 
+    CallibrateTransmissionLevels(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         DOC_BEGIN("");
         DOC_END;
-   
+
         asl::Ptr<ASSDriver> myNative = getNativeAs<ASSDriver>(cx, obj);
         if (myNative) {
             myNative->callibrateTransmissionLevels();
@@ -1691,10 +1691,10 @@ namespace y60 {
     }
 
     static JSBool
-    QueryConfigMode(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) { 
+    QueryConfigMode(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         DOC_BEGIN("");
         DOC_END;
-   
+
         asl::Ptr<ASSDriver> myNative = getNativeAs<ASSDriver>(cx, obj);
         if (myNative) {
             myNative->queryConfigMode();
@@ -1704,7 +1704,7 @@ namespace y60 {
         return JS_TRUE;
     }
 
-    JSFunctionSpec * 
+    JSFunctionSpec *
     ASSDriver::Functions() {
         static JSFunctionSpec myFunctions[] = {
             {"connect", Connect, 0},

@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -304,7 +304,7 @@ namespace y60 {
                const IProgressNotifierPtr & theNotifier,
                bool useSchema, bool loadLazy)
     {
-        
+
         AC_DEBUG << "Scene::load: loadLazy="<<loadLazy;
         asl::Time loadStart;
 
@@ -312,7 +312,7 @@ namespace y60 {
         if (useSchema) {
             setupEmptyDocument(*mySceneDom, "");
         }
-       
+
         if (!DecoderManager::get().findDecoder<ISceneDecoder>("dummy.x60", asl::Ptr<asl::ReadableStreamHandle>())) {
             DecoderManager::get().addDecoder(IDecoderPtr(new Y60Decoder()));
         }
@@ -489,7 +489,7 @@ namespace y60 {
         for (unsigned i = 0; i < myShapeCount; ++i) {
             NodePtr myShapeNode = myShapeListNode->childNode(i);
             ShapePtr myShape = myShapeNode->getFacade<Shape>();
-            
+
             NodePtr myPrimitiveListNode = myShapeNode->childNode(PRIMITIVE_LIST_NAME);
             if (myPrimitiveListNode) {
                 unsigned myPrimitiveCount = myPrimitiveListNode->childNodesLength(ELEMENTS_NODE_NAME);
@@ -502,11 +502,11 @@ namespace y60 {
                     myPrimitive.setMaterial(myNewMaterial);
                 }
             }
-        }        
+        }
     }
-#endif 
+#endif
 
-#if 0 
+#if 0
     void
     Scene::reloadMaterial(NodePtr theMaterialNode, MaterialBasePtr theMaterial) {
         // Find all primitives that reference the material
@@ -595,7 +595,7 @@ namespace y60 {
         }
         theShape->set<BoundingBoxTag>(myBoundingBox);
     }
-#endif 
+#endif
 #if 0
     unsigned
     Scene::findMaxIndexSize(NodePtr theElementsNode) {
@@ -922,7 +922,7 @@ namespace y60 {
                     myMaterialRebindFlag = true;
                 }
 
-               
+
             } else {
                 const std::string myMaterialId = myMaterialNode->getAttributeString("id");
                 AC_TRACE << "could not find material " << myMaterialId << ", loading";
@@ -1059,7 +1059,7 @@ namespace y60 {
         CameraPtr myCameraFacade = theActiveCamera->getFacade<Camera>();
         WorldPtr myWorldFacade = myCameraFacade->getWorld()->getFacade<World>();
         asl::Box3f myWorldBox = myWorldFacade->get<BoundingBoxTag>();
-        
+
         asl::Matrix4f myCameraMatrix = myCameraFacade->get<GlobalMatrixTag>();
         asl::Vector3f myCameraPos = myCameraMatrix.getTranslation();
         myWorldBox.extendBy(myCameraPos);
@@ -1118,8 +1118,8 @@ namespace y60 {
 #else
     void
     Scene::updateTransformHierachy(NodePtr theNode) {
-      
-        // TODO: This should be possibly done in a lazy fashion during rendering 
+
+        // TODO: This should be possibly done in a lazy fashion during rendering
         std::vector<IncludeFacadePtr> myIncludes = theNode->getAllFacades<IncludeFacade>(INCLUDE_NODE_NAME);
         AC_TRACE << "includes = "<< myIncludes.size();
         for (unsigned i = 0; i < myIncludes.size();++i) {
@@ -1324,7 +1324,7 @@ namespace y60 {
     template <class VISITOR>
     bool
     Scene::visitBodys(VISITOR & theVisitor,
-                      NodePtr theNode, 
+                      NodePtr theNode,
                       bool theIntersectInvisibleBodysFlag)
     {
         bool myResult = false;
@@ -1370,7 +1370,7 @@ namespace y60 {
         const asl::Sphere<float> & _mySphere;
         const Vector3<float> & _myMotion;
         CollisionInfoVector & _myList;
-        
+
         SweepSphereAllContactsVisitor(const asl::Sphere<float> & theSphere, const Vector3f & theMotion,
             CollisionInfoVector & theList) :
             _mySphere(theSphere), _myMotion(theMotion), _myList(theList) {

@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -69,7 +69,7 @@ PerfMeter.prototype.Constructor = function(self, theSceneViewer) {
     const BOX_HEIGHT        = 200;
     const SLOT_WIDTH        = 2;
     const H_VALUES          = (BOX_WIDTH-2*SLOT_WIDTH)/SLOT_WIDTH;
-    const T_MAX             = 0.1; // 500 ms 
+    const T_MAX             = 0.1; // 500 ms
 
     const FILTER_WINDOW = 20;
     const FILTER = 1/FILTER_WINDOW;
@@ -91,7 +91,7 @@ PerfMeter.prototype.Constructor = function(self, theSceneViewer) {
     var _myFrameCount = 0;
     var _myAvrgT = 0;
     var _lastTime = 0;
-    
+
     self.setFontname = function(theFontname) {
         _myFontname = theFontname;
     }
@@ -122,7 +122,7 @@ PerfMeter.prototype.Constructor = function(self, theSceneViewer) {
             _myImage = myResult.image;
             // print(myResult.image);
         }
-    } 
+    }
 
     function createPerfOverlay() {
         var myImage = window.scene.images.find("image[@name = 'PERF_Overlay']");
@@ -152,7 +152,7 @@ PerfMeter.prototype.Constructor = function(self, theSceneViewer) {
     var _myLineColor       = new Vector4f(0.5, 0.5, 0.5, 1);
     //var _myBGColor           = new Vector4f(1,0,0,0.3);
     var _myBGColor           = _myTranspColor;
-    var _myTimings = [ { "name" : "postRender",         "color" : new Vector4f(1,0,1,1), "time" : 0 }, 
+    var _myTimings = [ { "name" : "postRender",         "color" : new Vector4f(1,0,1,1), "time" : 0 },
                        { "name" : "onFrame_JSCallback", "color" : new Vector4f(0,1,0,1), "time" : 0 },
                        { "name" : "SDL_GL_SwapBuffers", "color" : new Vector4f(1,1,0,1), "time" : 0 },
                        { "name" : "render",             "color" : new Vector4f(0,0,1,1), "time" : 0 }
@@ -190,8 +190,8 @@ PerfMeter.prototype.Constructor = function(self, theSceneViewer) {
     function drawValue(theFrame, theBaseValue, theValue, theColor) {
         //print("from "+theBaseValue+" to" + theValue);
         var mySlotPos = XtoMap(theFrame);
-        // print("coord:"+mySlotPos+","+(BOX_HEIGHT*(1-theValue))+","+(mySlotPos+SLOT_WIDTH)+","+((BOX_HEIGHT-1)*(1-theBaseValue))+","+ theColor); 
-        _myImage.raster.fillRect(mySlotPos,YtoMap(theValue), mySlotPos+SLOT_WIDTH,YtoMap(theBaseValue), theColor);  
+        // print("coord:"+mySlotPos+","+(BOX_HEIGHT*(1-theValue))+","+(mySlotPos+SLOT_WIDTH)+","+((BOX_HEIGHT-1)*(1-theBaseValue))+","+ theColor);
+        _myImage.raster.fillRect(mySlotPos,YtoMap(theValue), mySlotPos+SLOT_WIDTH,YtoMap(theBaseValue), theColor);
      }
 
     function drawLine(theFrame, theValue, theColor) {
@@ -200,7 +200,7 @@ PerfMeter.prototype.Constructor = function(self, theSceneViewer) {
 
     function updateTopMaxTimers(T_min, deltaT) {
         var newTopMaxTimers = Logger.getNewMaxTimers(T_min, 1, 8);
-        for (var t = 0; t < newTopMaxTimers.length; t++) {  
+        for (var t = 0; t < newTopMaxTimers.length; t++) {
             var myTimer = newTopMaxTimers[t];
             // print("MAX "+ t + ":" + myTimer.name+ ", max = " + myTimer.max);
             if (!(myTimer.name in _myTopMaxTimers) || _myTopMaxTimers[myTimer.name].lastelapsed  > myTimer.lastelapsed) {
@@ -224,9 +224,9 @@ PerfMeter.prototype.Constructor = function(self, theSceneViewer) {
         drawValue(_myFrameCount,  0, deltaT/T_MAX, _myTimeColor);
         //print("\n");
         drawValue(_myFrameCount+1, 0, 1, _myBGColor);
-            
+
         var myTotal = 0;
-        for (var i= 0; i < _myTimings.length; i++) {       
+        for (var i= 0; i < _myTimings.length; i++) {
             var myTiming = _myTimings[i];
             myTiming.time = Logger.getLastElapsed(myTiming.name);
             //myTiming.time = 1/100;
@@ -234,7 +234,7 @@ PerfMeter.prototype.Constructor = function(self, theSceneViewer) {
             drawValue(_myFrameCount,  myTotal/T_MAX, (myTotal+myTiming.time)/T_MAX, myTiming.color);
             myTotal += myTiming.time;
         }
-        drawLine(_myFrameCount, (1/30)/T_MAX, _myLineColor); 
+        drawLine(_myFrameCount, (1/30)/T_MAX, _myLineColor);
         drawLine(_myFrameCount, (1/60)/T_MAX, _myLineColor);
         //drawLine(_myFrameCount, _myBaseLine, _myMaxColor);
         drawLine(_myFrameCount, _myAvrgT/T_MAX, _myMaxColor);
@@ -245,7 +245,7 @@ PerfMeter.prototype.Constructor = function(self, theSceneViewer) {
         }
 
         _myBaseLine = _myAvrgT/T_MAX * 2;
-/*        
+/*
         if (XtoMap(_myFrameCount) < SLOT_WIDTH) {
             _myBaseLine = deltaT/T_MAX;
         } else {
@@ -256,18 +256,18 @@ PerfMeter.prototype.Constructor = function(self, theSceneViewer) {
         }
 */
         ++_myFrameCount;
-        _lastTime = theTime; 
+        _lastTime = theTime;
    }
 
     self.onPostRender = function() {
          if (!_myOverlay.visible) {
             return;
         }
-        
+
         var myViewport = _mySceneViewer.getViewportAtWindowCoordinates(0, 0); // get viewport containing upper left pixel
-       
-        for (var i= 0; i < _myTimings.length; i++) {       
-            
+
+        for (var i= 0; i < _myTimings.length; i++) {
+
             var myTiming = _myTimings[i];
             var myPosition = sum(_myOverlay.position, new Vector2f(-220, BOX_HEIGHT + -(_myTimings.length - i) * 14));
             window.setTextColor(myTiming.color);
@@ -275,7 +275,7 @@ PerfMeter.prototype.Constructor = function(self, theSceneViewer) {
         }
 
         var i = 0;
-        for (var i= 0; i < _myTopMaxTimers.length; i++) {       
+        for (var i= 0; i < _myTopMaxTimers.length; i++) {
             var myTiming = _myTopMaxTimers[t];
             //print(":"+i+":"+t+"="+myTiming.name + ", max = " +  myTiming.max+ ", frame = "+myTiming.frame);
             if (myTiming.frame + BOX_WIDTH/SLOT_WIDTH < _myFrameCount) {
@@ -309,7 +309,7 @@ PerfMeter.prototype.Constructor = function(self, theSceneViewer) {
                 myTextColor = [0,0,0,1];
             }
             var myViewport = theSceneViewer.getViewportAtWindowCoordinates(0, 0); // get viewport containing upper left pixel
-            
+
             window.setTextColor(myTextColor);
             window.renderText(new Vector2f(10, 10), asMemoryString(getProcessMemoryUsage()), "Screen8", myViewport);
 

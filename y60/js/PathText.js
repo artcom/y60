@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -104,12 +104,12 @@ PathText.prototype.Constructor = function(self, theText, theFontSize, theCharact
      * Align this text along given path.
      * - if given, start near 'thePos'; default is start of path.
      * - if given, start at character 'theFirstCharacter'; default is 0.
-     * - if given, end at character 'theLastCharacter'; 
+     * - if given, end at character 'theLastCharacter';
      *   default is last character in text.
      */
-    self.align = function(thePathAlign, thePos, theFirstCharacter, 
-                          theLastCharacter, doTheWrapAroundFlag, theFlipFlag, 
-                          theAutoNewlineFlag) 
+    self.align = function(thePathAlign, thePos, theFirstCharacter,
+                          theLastCharacter, doTheWrapAroundFlag, theFlipFlag,
+                          theAutoNewlineFlag)
     {
         var myXMirror = 1;
         if (theFlipFlag != undefined) {
@@ -174,7 +174,7 @@ PathText.prototype.Constructor = function(self, theText, theFontSize, theCharact
                     // do some newline magic
                     thePathAlign.resetToStartPos();
                     var myLineSkip = myLineHeight;
-                    myLineSkip += myParagraphInfo.topoffset + myParagraphInfo.bottomoffset;  
+                    myLineSkip += myParagraphInfo.topoffset + myParagraphInfo.bottomoffset;
                     myLineOffset = sum(myLineOffset,product(thePathAlign.getNormalAtCurrentPosition(), myLineSkip));
                     myNewLineFlag = true;
                     continue;
@@ -193,8 +193,8 @@ PathText.prototype.Constructor = function(self, theText, theFontSize, theCharact
             if (i > 0 && i < (_myText.length-1)) {
                 var myNextCharacter = _myCharacters[i+1];
                 if (myNextCharacter != null) {
-                    var myKerning = window.getKerning(theCharacterSoup.getFontName(theFontSize), 
-                                                      myCharacter.unicode, 
+                    var myKerning = window.getKerning(theCharacterSoup.getFontName(theFontSize),
+                                                      myCharacter.unicode,
                                                       myNextCharacter.unicode);
                     if (myKerning != 0.0) {
                         //print("kern=" + myKerning, "char=" + myCharacter.unicode, "next=" + myNextCharacter.unicode, "advance="+myCharacter.metric.advance);
@@ -220,11 +220,11 @@ PathText.prototype.Constructor = function(self, theText, theFontSize, theCharact
             var myForwardVector = difference(mySegment.end, mySegment.start);
             var padding = theCharacterSoup.getPadding();
             var paddingVector = product(normalized(myForwardVector),padding);
-            var myAdvanceVector = product(normalized(myForwardVector), 
+            var myAdvanceVector = product(normalized(myForwardVector),
                                           myCharacter.metric.advance);
-            var myMinVector = product(normalized(myForwardVector), 
+            var myMinVector = product(normalized(myForwardVector),
                                       myCharacter.metric.min.x);
-            var myMaxVector = product(normalized(myForwardVector), 
+            var myMaxVector = product(normalized(myForwardVector),
                                       myCharacter.metric.max.x+1);
 
             var myLeftVector = normalized(cross(UP_VECTOR, myForwardVector));
@@ -234,7 +234,7 @@ PathText.prototype.Constructor = function(self, theText, theFontSize, theCharact
             switch (_myAlignment) {
                 case TOP_ALIGNMENT:
                     myTop = (myFontMetrics.height - myFontMetrics.ascent);
-                    myBottom = -(myFontMetrics.ascent - myFontMetrics.descent) 
+                    myBottom = -(myFontMetrics.ascent - myFontMetrics.descent)
                                + myTop;
                     break;
                 case BOTTOM_ALIGNMENT:
@@ -242,8 +242,8 @@ PathText.prototype.Constructor = function(self, theText, theFontSize, theCharact
                     myBottom = 0;
                     break;
                 case CENTER_ALIGNMENT:
-                    myTop = myAlphabetMap.cellsize * 0.5 
-                            - (myAlphabetMap.cellsize - myFontMetrics.height) 
+                    myTop = myAlphabetMap.cellsize * 0.5
+                            - (myAlphabetMap.cellsize - myFontMetrics.height)
                             * 0.5;
                     myBottom = -myTop;
                     break;
@@ -252,9 +252,9 @@ PathText.prototype.Constructor = function(self, theText, theFontSize, theCharact
                     myBottom = myFontMetrics.descent;
                     break;
             }
-            var myTopOffset = product(myLeftVector, 
+            var myTopOffset = product(myLeftVector,
                                       myXMirror * myTop + padding);
-            var myBottomOffset = product(myLeftVector, 
+            var myBottomOffset = product(myLeftVector,
                                          myXMirror * myBottom - padding);
 
             var myStart = difference(sum(mySegment.start,myMinVector),
@@ -270,7 +270,7 @@ PathText.prototype.Constructor = function(self, theText, theFontSize, theCharact
             }
             myStart = difference(myStart, myLineCorrection);
             myEnd = difference(myEnd, myLineCorrection);
-            myPositions.push(sum(sum(myStart, myBottomOffset), myLineOffset));            
+            myPositions.push(sum(sum(myStart, myBottomOffset), myLineOffset));
             myPositions.push(sum(sum(myEnd, myBottomOffset), myLineOffset));
             myPositions.push(sum(sum(myEnd, myTopOffset), myLineOffset));
             myPositions.push(sum(sum(myStart, myTopOffset), myLineOffset));
@@ -332,7 +332,7 @@ PathText.prototype.Constructor = function(self, theText, theFontSize, theCharact
         var myMaterialId = theCharacterSoup.getAlphabetMap(theFontSize).material.id;
         var myMaterial = window.scene.dom.getElementById(myMaterialId);
         var myTextureUnits = myMaterial.childNode("textureunits");
-        
+
         _myTextureCount = myTextureUnits.childNodesLength();
         if (thePrebuildFlag) {
             var myAlphabetMap = theCharacterSoup.getAlphabetMap(theFontSize);
@@ -402,7 +402,7 @@ function test_PathText() {
 
         var mySvgPaths = []
         var myPaths = mySvgNode.findAll(".//path");
-        
+
         for (var i = 0; i < myPaths.length; ++i) {
             mySvgPaths.push(new SvgPath(myPaths[i].d));
         }

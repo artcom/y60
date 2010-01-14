@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -95,7 +95,7 @@ unsigned SoundCacheItem::getMemUsed() const {
 }
 
 bool SoundCacheItem::isFull() const {
-    AC_TRACE << "SoundCacheItem::isFull: _myTotalFrames= " << _myTotalFrames 
+    AC_TRACE << "SoundCacheItem::isFull: _myTotalFrames= " << _myTotalFrames
             << ", _myFramesDecoded= " << _myFramesDecoded;
     return (_myTotalFrames == _myFramesDecoded);
 }
@@ -105,11 +105,11 @@ void SoundCacheItem::doneCaching(int theTotalFrames) {
         _myTotalFrames = theTotalFrames;
         if (_myTotalFrames < _myFramesDecoded) {
             AC_WARNING << "Decoded frames > total frames. That doesn't make sense.";
-            AC_WARNING << "_myTotalFrames = " << _myTotalFrames << 
+            AC_WARNING << "_myTotalFrames = " << _myTotalFrames <<
                 ", _myFramesDecoded = " << _myFramesDecoded;
         }
     }
-    AC_TRACE << "SoundCacheItem::doneCaching: _myTotalFrames= " << _myTotalFrames 
+    AC_TRACE << "SoundCacheItem::doneCaching: _myTotalFrames= " << _myTotalFrames
             << ", _myFramesDecoded= " << _myFramesDecoded;
     if (!isFull()) {
         SoundManager::get().deleteCacheItem(_myURI);
@@ -173,17 +173,17 @@ bool SoundCacheItem::queueSamples(asl::AudioBufferPtr& theBuffer) {
         --it;
         AudioBufferPtr myLastBuffer = it->second;
         //int myLastFrame = myLastBuffer->getEndFrame();
-        ASSURE_MSG(theBuffer->getStartFrame() == myLastBuffer->getEndFrame()+1, 
+        ASSURE_MSG(theBuffer->getStartFrame() == myLastBuffer->getEndFrame()+1,
                 "Adding buffer to SoundCacheItem that doesn't fit to end of current buffer list.");
     }
-    
+
     // Actually append the buffer.
     _myBuffers[theBuffer->getStartFrame()] = theBuffer;
     _myFramesDecoded += theBuffer->getNumFrames();
 
     if (getMemUsed() > SoundManager::get().getMaxCacheItemSize()) {
         AC_WARNING << "SoundCacheItem::queueSamples: Max. memory usage per cache item exceeded.";
-        AC_WARNING << "    Sound: " << _myURI << ", Max. mem: " 
+        AC_WARNING << "    Sound: " << _myURI << ", Max. mem: "
                 << SoundManager::get().getMaxCacheItemSize();
         AC_WARNING << "    Disabling cache for this item.";
         SoundManager::get().deleteCacheItem(_myURI);

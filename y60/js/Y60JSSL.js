@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -67,11 +67,11 @@ var TWO_PI = Math.PI * 2.0;
 
 // This only works with native js objects or
 // properly wrapped hosted objects.
-// 
+//
 // However, neither the prototype chain of objects
 // nor the scope chain of function objects will be copied. Thus,
 // "clone" is a rather euphemistic name for this function.
-// 
+//
 // Looking at the details, things become a bit ugly, though:
 //
 // JSNode objects for example react differently when properties
@@ -79,8 +79,8 @@ var TWO_PI = Math.PI * 2.0;
 //
 // someNode["nodeValue"]
 //
-// will throw a DOMException, while with the dot notation: 
-// 
+// will throw a DOMException, while with the dot notation:
+//
 // var i = "nodeValue";
 // var ival = node.i
 //
@@ -93,7 +93,7 @@ function clone(theObject, theMode) {
     if (theObject instanceof Node) {
 	var attrs = theObject.attributes;
         for (var i = 0; i <attrs.length; i++) {
-	    myNewObject[attrs[i].nodeName] = attrs[i].nodeValue;	
+	    myNewObject[attrs[i].nodeName] = attrs[i].nodeValue;
         }
 	return myNewObject;
     }
@@ -389,7 +389,7 @@ function getDescendantById(theNode, theId, doDeepSearch) {
     }
     Logger.warning("getDescendantById is deprecated");
     dumpstack();
-    var myResult = theNode.getNodesByAttribute("", "id",  theId, doDeepSearch);    
+    var myResult = theNode.getNodesByAttribute("", "id",  theId, doDeepSearch);
     return myResult.length == 0 ? null:myResult[0];
 }
 
@@ -399,7 +399,7 @@ function getDescendantByName(theNode, theName, doDeepSearch) {
     }
     Logger.warning("getDescendantByName is deprecated");
     dumpstack();
-    var myResult = theNode.getNodesByAttribute("", "name",  theName, doDeepSearch);    
+    var myResult = theNode.getNodesByAttribute("", "name",  theName, doDeepSearch);
     return myResult.length == 0 ? null:myResult[0];
 }
 
@@ -421,7 +421,7 @@ function getDescendantByAttributeName(theNode, theAttribute, doDeepSearch) {
     }
     Logger.warning("getDescendantByAttributeName is deprecated");
     dumpstack();
-    var myResult = theNode.getNodesByAttribute("", theAttribute, "", doDeepSearch);    
+    var myResult = theNode.getNodesByAttribute("", theAttribute, "", doDeepSearch);
     return myResult.length == 0 ? null:myResult[0];
 }
 
@@ -433,7 +433,7 @@ function getDescendantByAttribute(theNode, theAttribute, theValue, doDeepSearch)
     }
     Logger.warning("getDescendantByAttribute is deprecated");
     dumpstack();
-    var myResult = theNode.getNodesByAttribute("", theAttribute, theValue, doDeepSearch);    
+    var myResult = theNode.getNodesByAttribute("", theAttribute, theValue, doDeepSearch);
     return myResult.length == 0 ? null:myResult[0];
 }
 
@@ -445,7 +445,7 @@ function getDescendantsByAttribute(theNode, theAttribute, theValue, doDeepSearch
     }
     Logger.warning("getDescendantsByAttribute is deprecated");
     dumpstack();
-    var myResult = theNode.getNodesByAttribute("", theAttribute, theValue, doDeepSearch);    
+    var myResult = theNode.getNodesByAttribute("", theAttribute, theValue, doDeepSearch);
     return myResult;
 }
 
@@ -455,7 +455,7 @@ function getDescendantsByAttributeName(theNode, theAttribute, doDeepSearch) {
     }
     Logger.warning("getDescendantsByAttributeName is deprecated");
     dumpstack();
-    var myResult = theNode.getNodesByAttribute("", theAttribute, "", doDeepSearch);    
+    var myResult = theNode.getNodesByAttribute("", theAttribute, "", doDeepSearch);
     return myResult;
 }
 
@@ -466,7 +466,7 @@ function getDescendantByTagName(theNode, theTagName, doDeepSearch) {
     }
     Logger.warning("getDescendantByTagName is deprecated");
     dumpstack();
-    var myResult = theNode.getNodesByTagName(theTagName, doDeepSearch);    
+    var myResult = theNode.getNodesByTagName(theTagName, doDeepSearch);
     return myResult.length == 0 ? null:myResult[0];
 }
 
@@ -477,7 +477,7 @@ function getDescendantsByTagName(theNode, theTagName, doDeepSearch) {
     }
     Logger.warning("getDescendantsByTagName is deprecated");
     dumpstack();
-    var myResult = theNode.getNodesByTagName(theTagName, doDeepSearch);        
+    var myResult = theNode.getNodesByTagName(theTagName, doDeepSearch);
     return myResult;
 }
 
@@ -812,8 +812,8 @@ function transformScreenToWorld(theScreenPixelX, theScreenPixelY, theViewport, t
     }
     var myViewportPixelX = theScreenPixelX - theViewport.left;
     var myViewportPixelY = theScreenPixelY - theViewport.top;
-    Logger.trace("Pixelcoordinates in viewport: [" + 
-                 myViewportPixelX + ", " + 
+    Logger.trace("Pixelcoordinates in viewport: [" +
+                 myViewportPixelX + ", " +
                  myViewportPixelY + "]");
     var myClipPosX = 2 * myViewportPixelX/theViewport.width  - 1;
     var myClipPosY = - (2 * myViewportPixelY/theViewport.height - 1);
@@ -920,7 +920,7 @@ function rcurry() {
 function createMirrorCamera(theCamera, thePlane) {
     var myPlaneNormal = thePlane.normal;
     var myInvertedPlaneNormal = product(myPlaneNormal, -1);
-    
+
     var myMatrix = theCamera.globalmatrix;
     var myRight = myMatrix.getRow(0);
     var myUp = myMatrix.getRow(1);
@@ -933,10 +933,10 @@ function createMirrorCamera(theCamera, thePlane) {
     var myCamPosPoi = new Point3f(myPos.x, myPos.y, myPos.z)
     var myCamUpVec  = new Vector3f(myUp.x, myUp.y, myUp.z);
     var myCamRightVec = new Vector3f(myRight.x, myRight.y, myRight.z);
-    
+
 
     // reflect cameraposition
-    var myPlaneProjectedCamPosLine = new Line(myCamPosPoi, myInvertedPlaneNormal); 
+    var myPlaneProjectedCamPosLine = new Line(myCamPosPoi, myInvertedPlaneNormal);
     var myCameraPlaneProjectionPos = intersection(myPlaneProjectedCamPosLine, thePlane);
     var myCameraPlaneProjectionVec = difference(myCameraPlaneProjectionPos, myCamPosVec);
     myCameraPlaneProjectionVec = product(myCameraPlaneProjectionVec,2);
@@ -945,22 +945,22 @@ function createMirrorCamera(theCamera, thePlane) {
     // reflect camera up
     var myCameraUpVec = sum(myCamPosVec, normalized(myCamUpVec));
     var myCameraUpPoi = new Point3f(myCameraUpVec.x, myCameraUpVec.y,myCameraUpVec.z);
-	
-    var myPlaneProjectedCamUpLine = new Line(myCameraUpPoi, myInvertedPlaneNormal); 
+
+    var myPlaneProjectedCamUpLine = new Line(myCameraUpPoi, myInvertedPlaneNormal);
     var myCameraPlaneProjectionUpPos = intersection(myPlaneProjectedCamUpLine, thePlane);
-    
+
     var myCameraPlaneProjectionUpVec = difference(myCameraPlaneProjectionUpPos, myCameraUpVec);
     myCameraPlaneProjectionUpVec = product(myCameraPlaneProjectionUpVec,2);
     var myNewCameraUpVec = sum(myCameraUpVec, myCameraPlaneProjectionUpVec);
-    
+
     var myNewUpVector = normalized(difference(myNewCameraUpVec, myNewCameraPos));
-    
-    
+
+
     // reflect the view vector across the plane
     var myViewVector = normalized( new Vector3f( -myFwd.x, -myFwd.y, -myFwd.z ) );
     var myProjection = projection( myViewVector, thePlane.normal );
     var myNewCameraView = normalized( sum( myViewVector, product( myProjection, -2 ) ) );
-    
+
     var myOrientation = getOrientationFromDirection(myNewCameraView, myNewUpVector);
 
     return {orientation : myOrientation, position : myNewCameraPos};
@@ -1038,7 +1038,7 @@ function parseVectorOfRankedFeature(theVectorOfString) {
 
 // prepare identifiers for use as attribute values
 //
-// filters out everything except for 
+// filters out everything except for
 // whitespace, alphanumeric characters and the dot.
 //
 // can be used to convert a filename into a ?dom ID?
@@ -1049,13 +1049,13 @@ function stripIdentifier(theIdentifier) {
 
 function preloadImages() {
     for (var i = 0; i < window.scene.images.childNodes.length; i++) {
-        preLoad(window.scene.images.childNode(i));        
+        preLoad(window.scene.images.childNode(i));
     }
 }
 
 function preloadTextures() {
     for (var i = 0; i < window.scene.textures.childNodes.length; i++) {
-        preLoad(window.scene.textures.childNode(i));   
+        preLoad(window.scene.textures.childNode(i));
     }
 }
 
@@ -1087,7 +1087,7 @@ function setupCameraOrtho(theCamera, theWidth, theHeight, theCameraZ, theFarPlan
     if(theFarPlaneDistance != undefined) {
        myFarPlaneDistance = theFarPlaneDistance;
     }
-    
+
     theCamera.frustum = new Frustum();
     theCamera.frustum.width = theWidth;
     theCamera.frustum.height = theHeight;
@@ -1096,6 +1096,6 @@ function setupCameraOrtho(theCamera, theWidth, theHeight, theCameraZ, theFarPlan
     theCamera.position.y = theHeight/2;
     theCamera.position.z = myCameraZ;
     theCamera.frustum.near = 0.1;
-    theCamera.frustum.far  = myFarPlaneDistance; 
+    theCamera.frustum.far  = myFarPlaneDistance;
     theCamera.orientation = Quaternionf.createFromEuler(new Vector3f(0,0,0));
 }

@@ -17,7 +17,7 @@
 */
 
 #include "cameraTool.h"
-	
+
 cameraEngine* cameraTool::findCamera() {
 
 	cameraEngine* camera = NULL;
@@ -28,22 +28,22 @@ cameraEngine* cameraTool::findCamera() {
 
 	#ifdef __APPLE__
 	camera = new macvdCamera();
-	#endif		
-		
+	#endif
+
 	#ifdef LINUX
 	camera = new linuxfwCamera();
-	if( !camera->findCamera() ){ 
+	if( !camera->findCamera() ){
 		delete camera;
 		// check video4linux
 		camera = new v4linuxCamera();
 	}
 	#endif
-	
-	if( !camera->findCamera() ) { 
+
+	if( !camera->findCamera() ) {
 		delete camera;
 		camera = NULL;
-	} 
-	
+	}
+
 	return camera;
 }
 

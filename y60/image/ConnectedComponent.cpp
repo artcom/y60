@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -86,7 +86,7 @@ Run::center() {
     return Vector2f( _myStartCol + length() * 0.5f, float(_myRow) );
 }
 
-int 
+int
 Run::length() {
     return _myEndCol - _myStartCol + 1;
 }
@@ -135,7 +135,7 @@ Blob::bbox() const {
     return Box2i(x1,y1,x2,y2);
 }
 
-int 
+int
 Blob::area(){
     int res = 0;
     for(RunList::iterator r = _myRuns.begin(); r != _myRuns.end(); r++){
@@ -182,7 +182,7 @@ void store_runs(ComponentMap  & theComponents, RunList & theRuns1, RunList & the
    }
 }
 
-RunPtr 
+RunPtr
 new_run(ComponentMap & comps, int row, int col1, int col2)
 {
     RunPtr run( new Run(row, col1, col2));
@@ -253,7 +253,7 @@ BlobListPtr connectedComponents(dom::ResizeableRasterPtr image, int object_thres
             result->push_back(b->second);
         }
     }
-    
+
     if (myCleanupRuns1) delete myCleanupRuns1;
     if (myCleanupRuns2) delete myCleanupRuns2;
 

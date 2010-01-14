@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -72,7 +72,7 @@ namespace y60 {
 /**
  * Mesh operations on a Shape Node.
  * @ingroup Y60componentsctscan
- */ 
+ */
 class Mesh {
 public:
     Mesh(dom::NodePtr theShapeNode);
@@ -91,12 +91,12 @@ public:
     static bool test(dom::NodePtr theShapeNode);
     void setColor(unsigned theColor);
     DEFINE_EXCEPTION(InconsistencyException, asl::Exception);
-    static unsigned colorScreenSpaceLasso(const dom::NodePtr & theLassoBody, 
+    static unsigned colorScreenSpaceLasso(const dom::NodePtr & theLassoBody,
                             const dom::NodePtr & theTransformationRoot,
                             const asl::Matrix4f & theViewProjection,
                             unsigned int theColor);
-    static unsigned colorSweptSphere(const asl::Sphere<float> & theSphere, 
-        const asl::Vector3f & theMotion, 
+    static unsigned colorSweptSphere(const asl::Sphere<float> & theSphere,
+        const asl::Vector3f & theMotion,
         const dom::NodePtr & theTransformationRoot, unsigned int theColor);
     bool notifyProgress(double theProgress, const std::string & theMessage);
     /** Progress signal for simplification */

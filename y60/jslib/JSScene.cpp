@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -122,7 +122,7 @@ class ProgressCallback : public y60::IProgressNotifier {
 
 typedef y60::Scene NATIVE;
 
-dom::NodePtr 
+dom::NodePtr
 getSingleViewport(const y60::Scene & theNative) {
     if (theNative.getCanvasRoot()->childNodesLength(CANVAS_NODE_NAME) != 1) {
         throw asl::Exception("single-viewport convenience call used when multiple canvases exist!",
@@ -161,7 +161,7 @@ intersectBodies(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
     DOC_PARAM("theBox", "", DOC_TYPE_BOX3F);
     DOC_RVAL("IntersectionInfoVector", DOC_TYPE_ARRAY)
     DOC_PARAM_OPT("theIntersectInvisibleBodysFlag", "Intersect invisible bodies, default is true.", DOC_TYPE_BOOLEAN, true);
-    
+
     DOC_END;
     try {
         ensureParamCount(argc, 2, 3);
@@ -171,7 +171,7 @@ intersectBodies(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
         convertFrom(cx, argv[0], myBodies);
         bool theIntersectInvisibleBodysFlag = true;
         if (argc >= 2) {
-            convertFrom(cx, argv[2], theIntersectInvisibleBodysFlag);            
+            convertFrom(cx, argv[2], theIntersectInvisibleBodysFlag);
         }
         if (JSLineSegment::matchesClassOf(cx, argv[1])) {
             asl::LineSegment<float> myStick;

@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -81,19 +81,19 @@ function SwitchNodeHandlerBase( Public, Protected, theNode ) {
     Public.childCount getter = function() {
         return _myNode.childNodesLength();
     }
-    
+
     Public.activeChild getter = function() {
-        return _myNode.childNode( _myActiveChild ); 
+        return _myNode.childNode( _myActiveChild );
     }
 
     Public.activeIndex getter = function() {
         return _myActiveChild;
     }
 
-    Public.activeName getter = function() { 
+    Public.activeName getter = function() {
         return _myNode.childNode( _myActiveChild ).name;
     }
-    
+
     Public.activeIndex setter = function(theIndex) {
         _myActiveChild = theIndex;
     }
@@ -114,7 +114,7 @@ function SwitchNodeHandler( theNode, theActiveIndex ) {
 SwitchNodeHandler.prototype.Constructor = function( obj, theNode, theActiveIndex ) {
     var Public    = obj;
     var Protected = {}
-    
+
     SwitchNodeHandlerBase( Public, Protected, theNode );
 
     function setup( theActiveChild ) {
@@ -181,17 +181,17 @@ function MSwitchNodeHandler( theNode ) {
 MSwitchNodeHandler.prototype.Constructor = function( obj, theNode ) {
     var Public    = obj;
     var Protected = {}
-    
+
     SwitchNodeHandlerBase(Public, Protected, theNode);
 
     function setup() {
     }
-        
+
     Public.setActiveChild = function( theIndex ) {
         setMaterial(Public.activeChild.name);
         Public.activeIndex = theIndex;
     }
-    
+
     Public.setActiveChildByName = function(theName, theSubnameFlag, theIgnoreCaseFlag) {
         for (var i=0; i<Public.childCount; ++i) {
             var myChildNode = Public.node.childNode(i);
@@ -207,8 +207,8 @@ MSwitchNodeHandler.prototype.Constructor = function( obj, theNode ) {
 
     function findTargetMaterial() {
         var myTargetMaterial = null;
-        
-        // searching for 
+
+        // searching for
         var myRegExp = /^(.*switch_(.*))$/;
         var myResult = myRegExp.exec(Public.switchName);
 
@@ -232,7 +232,7 @@ MSwitchNodeHandler.prototype.Constructor = function( obj, theNode ) {
         if (!myTargetMaterial) {
             Logger.error("Could not find target material for switch " + Public.switchName);
         }
-        
+
         return myTargetMaterial;
     }
 
@@ -249,7 +249,7 @@ MSwitchNodeHandler.prototype.Constructor = function( obj, theNode ) {
         }
         return true;
     }
-    
+
     function replaceMaterialIds(theOldId, theNewId, theRequiredCount) {
         var myNodes = window.scene.shapes.getNodesByAttribute("elements", "material", theOldId);
         var skippedAnyNodes = false;
@@ -269,14 +269,14 @@ MSwitchNodeHandler.prototype.Constructor = function( obj, theNode ) {
         }
         return skippedAnyNodes == false;
     }
-    
+
     function findOcclusionMap(theMaterial) {
         var mySampler2d = theMaterial.getNodesByAttribute("", "name", "occlusionTex");
         if (mySampler2d.length == 1) {
             var myIndex = mySampler2d[0].childNode("#text").nodeValue;
             var myTextureUnitsNode = theMaterial.childNode("textureunits");
-            if (myIndex !== null 
-                && myIndex < myTextureUnitsNode.childNodesLength("textureunit")) 
+            if (myIndex !== null
+                && myIndex < myTextureUnitsNode.childNodesLength("textureunit"))
             {
                 return myTexturesNode.childNode("textureunit", myIndex);
             }
@@ -284,7 +284,7 @@ MSwitchNodeHandler.prototype.Constructor = function( obj, theNode ) {
 
         return null;
     }
-        
+
     function prependFeature(theFeatureList, theValue) {
         var myRegExp = /\[(\d{1,3})\[(.*)\]\]/;
         var myResults = myRegExp.exec(theFeatureList);
@@ -294,9 +294,9 @@ MSwitchNodeHandler.prototype.Constructor = function( obj, theNode ) {
             return "[" + myResults[1] + "[" + myFeatures.toString() + "]]";
         }
     }
-    
+
     function getTexcoordCount(theMaterialNode) {
-        
+
         var myRequires = theMaterialNode.childNode('requires');
         var myFeatureList = myRequires.find("*[@name = 'texcoord']").childNode("#text").nodeValue;
         var myCount = 0;
@@ -312,7 +312,7 @@ MSwitchNodeHandler.prototype.Constructor = function( obj, theNode ) {
             return myCount;
         }
     }
-    
+
     function setMaterial(theMaterialCode) {
         //print("switchMaterials(", theMaterialCode, " ", Public.node);
 
@@ -322,7 +322,7 @@ MSwitchNodeHandler.prototype.Constructor = function( obj, theNode ) {
             var myChild = Public.node.childNode( i );
             if (myChild.name.indexOf(theMaterialCode) != -1) {
                 var myShapeId = "";
-                
+
                 if (myChild.nodeName == "body") {
                     myShapeId = myChild.shape;
                 } else if ((myChild.nodeName == "transform")
@@ -339,7 +339,7 @@ MSwitchNodeHandler.prototype.Constructor = function( obj, theNode ) {
                     return false;
                 }
                 var myElement = myShape.find(".//elements");
-                
+
                 mySwitchMat = myElement.getElementById(myElement.material);
             }
         }
@@ -371,14 +371,14 @@ MSwitchNodeHandler.prototype.Constructor = function( obj, theNode ) {
                                     myNewTargetMat.childNode("properties"));
         var myProperties = myNewTargetMat.childNode("properties");
         var i = 0;
-        while ( i < myProperties.childNodesLength() ) {        
+        while ( i < myProperties.childNodesLength() ) {
             if (myProperties.childNode(i).nodeName.indexOf("sampler") == 0) {
                 myProperties.removeChild(myProperties.childNode(i));
             } else {
                 ++i;
             }
         }
-        
+
         // replace the "textures" node
         myNewTargetMat.replaceChild(mySwitchMat.childNode("textureunits").cloneNode(true),
                                     myNewTargetMat.childNode("textureunits"));
@@ -399,9 +399,9 @@ MSwitchNodeHandler.prototype.Constructor = function( obj, theNode ) {
                 myNewTargetMat.childNode("textureunits").insertBefore(myOcclusionMap,
                         myNewTargetMat.childNode("textureunits").firstChild);
                 var myRequires = myNewTargetMat.childNode('requires');
-                myRequires.find("*[@name = 'textures']").childNode("#text").nodeValue = 
+                myRequires.find("*[@name = 'textures']").childNode("#text").nodeValue =
                     prependFeature(mySwitchMat.requires.textures, "occlusion");
-                myRequires.find("*[@name = 'texcoord']").childNode("#text").nodeValue = 
+                myRequires.find("*[@name = 'texcoord']").childNode("#text").nodeValue =
                         prependFeature(mySwitchMat.requires.texcoord, "uv_map");
             }
             //quickfix for missing occlusionmap after more then one switch, cleanup is on it's way [jb]
@@ -439,7 +439,7 @@ function TSwitchNodeHandler( theNode ) {
 TSwitchNodeHandler.prototype.Constructor = function( obj, theNode) {
     var Public    = obj;
     var Protected = {}
-    
+
     SwitchNodeHandlerBase(Public, Protected, theNode);
 
     // overwrite some getters and setters because they have to
@@ -449,31 +449,31 @@ TSwitchNodeHandler.prototype.Constructor = function( obj, theNode) {
     }
 
     Public.activeIndex getter = function() {
-        Logger.error("Implement me!"); 
+        Logger.error("Implement me!");
     }
 
-    Public.activeName getter = function() { 
+    Public.activeName getter = function() {
         if (_myActiveChild && "name" in _myActiveChild) {
             return _myActiveChild.name;
         }
         return null;
     }
-    
+
     function setup() {
         var myName = new String(Public.switchName);
-        
+
         if ( ! myName.match(/^tswitch_.*/)) {
             Logger.warning("TSwitch node '" + Public.switchName + " doesn't obey the " +
                 "naming conventions. Name should start with 'tswitch_'.");
         }
-        
+
         // find the transform node with the texture references first
         var myReferenceNode = window.scene.world.find(".//*[@name = 'textureswitches']");
         if (!myReferenceNode) {
             Logger.error("Could not find reference node for textureswitches");
             return;
         }
-       
+
         for (var i=0; i<myReferenceNode.childNodesLength(); ++i) {
             var myNode = myReferenceNode.childNode(i);
             if ((myNode.name.indexOf(myName) != -1) ||
@@ -488,14 +488,14 @@ TSwitchNodeHandler.prototype.Constructor = function( obj, theNode) {
             return;
         }
     }
-    
+
     function switchTexture(theNode) {
         _myActiveChild = theNode;
 
         // get texture id for the new textureunit
         var myShape = theNode.getElementById(theNode.shape);
         var myMaterialId = myShape.childNode("primitives").childNode("elements").material;
-        
+
         var myMaterial = theNode.getElementById(myMaterialId);
         var myTexture = myMaterial.childNode("textureunits").firstChild.texture;
 
@@ -507,7 +507,7 @@ TSwitchNodeHandler.prototype.Constructor = function( obj, theNode) {
         } else {
             var myTexturesLength = Public.node.childNode("textureunits").childNodesLength();
             var myNewTexturesLength = myMaterial.childNode("textureunits").childNodesLength();
-    
+
             // calculate textures offset
             var myTextureOffset = myTexturesLength - myNewTexturesLength;
             if (myTextureOffset < 0) {
@@ -515,18 +515,18 @@ TSwitchNodeHandler.prototype.Constructor = function( obj, theNode) {
                              " textures while the original material '"+myMaterial.name+"' has " + myTexturesLength);
                 return;
             }
-    
+
             // set new textures
             for (var i=0; i<myMaterial.childNode("textureunits").childNodesLength(); ++i) {
                 var myTexture = myMaterial.childNode("textureunits").childNode(i).texture;
-                Public.node.childNode("textureunits").childNode(i+myTextureOffset).texture = myTexture;  
+                Public.node.childNode("textureunits").childNode(i+myTextureOffset).texture = myTexture;
             }
         }
     }
-    
+
     function switchOcclusionMap(theOldId, theNewId, theMaterialNode) {
         //change textureunits texture ids
-        var myNodes = 
+        var myNodes =
             window.scene.materials.getNodesByAttribute("textureunit", "texture", theOldId);
         for (var i = 0; i < myNodes.length; ++i) {
             var myNode = myNodes[i];
@@ -546,7 +546,7 @@ TSwitchNodeHandler.prototype.Constructor = function( obj, theNode) {
             }
         }
     }
-    
+
     Public.setActiveChildByName = function(theName, theSubnameFlag, theIgnoreCaseFlag) {
         if (!_mySwitches) {
             return;
@@ -563,7 +563,7 @@ TSwitchNodeHandler.prototype.Constructor = function( obj, theNode) {
 
         Logger.error("Failed to activate child '" + theName + "' for switchnode '" + Public.switchName + "'.");
     }
-    
+
     Public.setActiveChildBySubName = function(theSubName, theIgnoreCaseFlag) {
         Public.setActiveChildByName(theSubName, true, theIgnoreCaseFlag);
     }

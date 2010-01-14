@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -91,7 +91,7 @@ HeightToNormalMap::Apply(PLBmpBase * theSource, PLBmp * theDestination) const {
     for (int y = 0; y < theSource->GetHeight(); ++y) {
         PLPixel8  * mySourceLine = mySourceLines[y];
         PLPixel32 * myDestinationLine = myDestinationLines[y];
-        
+
         PLPixel8 * myNextLine;
         if (y + 1 == theSource->GetHeight()) {
             myNextLine = mySourceLines[y];
@@ -110,7 +110,7 @@ HeightToNormalMap::Apply(PLBmpBase * theSource, PLBmp * theDestination) const {
             myHeight /= 255;
             aboveNeighbourHeight /= 255;
             rightNeighbourHeight /= 255;
-            float myZ = 1.0f / float((sqrt(pow(myHeight - aboveNeighbourHeight, 2) + 
+            float myZ = 1.0f / float((sqrt(pow(myHeight - aboveNeighbourHeight, 2) +
                                     pow(myHeight - rightNeighbourHeight, 2) + 1)));
             float myX = (myHeight - rightNeighbourHeight) * myZ;
             float myY = (myHeight - aboveNeighbourHeight) * myZ;

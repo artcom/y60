@@ -42,11 +42,11 @@ class ape_thing {
         {}
     public:
         virtual ~ape_thing() {}
-        
+
         virtual void import(JSContext * cx, JSObject * ns, monkey_data & ape_ctx) = 0;
 
         inline void add( ape_thing_ptr child ) {
-            children_.push_back( child ); 
+            children_.push_back( child );
         }
 
         inline const char * get_name() const { return name_; }
@@ -54,7 +54,7 @@ class ape_thing {
 
         inline uint8 property_flags() const { return property_flags_; }
         inline void set_property_flags(uint8 flags) { property_flags_ = flags; }
-        
+
         void enumerate(bool flag) {
             if ( flag ) {
                 property_flags_ |= JSPROP_ENUMERATE;

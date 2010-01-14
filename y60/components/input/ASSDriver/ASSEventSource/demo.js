@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -98,19 +98,19 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
     var _myASSManager = null;
     var _myDummyAppContainer = null;
     var _myWorldCross = null;
-    
+
     var _myPicking     = null;
 
     var _myDisplayImage = null;
     var _myDisplayMaterial = null;
     var _myDisplayBody = null;
-    
+
     //////////////////////////////////////////////////////////////////////
     //
     // public members
     //
     //////////////////////////////////////////////////////////////////////
-   
+
     // setup
     Base.setup = self.setup;
     self.setup = function(theWidth, theHeight, theTitle) {
@@ -136,10 +136,10 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
 
         //window.canvas.backgroundcolor = [1,1,1,1];
 
-        
+
 
         //_myASSManager.textColor = [0,0,0,1];
-        
+
 
         if (LATENCY_TEST) {
             ourLatencyTestPort = new SerialDevice(0);
@@ -216,7 +216,7 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
             //print("event " + theNode.type );
         } else if ( theNode.type == "touch") {
             var myBody = _myPicking.pickBody(theNode.position3D.x, theNode.position3D.y);
-            if(myBody) {                
+            if(myBody) {
                 for(var i=0; i<ourButtons.length; ++i ) {
                     if (myBody.id == ourButtons[i].body.id) {
                         ourButtons[i].press();
@@ -238,12 +238,12 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
         }
         _myLastEventTime = theNode.when;
     }
-    
+
 
     ///////////////////////////////////////////////////////
-    // private funtions 
+    // private funtions
     ///////////////////////////////////////////////////////
-   
+
 
 }
 

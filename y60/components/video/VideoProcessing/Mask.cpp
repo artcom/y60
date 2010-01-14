@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -67,13 +67,13 @@ namespace y60 {
     Mask::Mask(const std::string & theName) :
         Algorithm(theName),
         _myResultNode("result")
-    {   
+    {
     }
-  
 
-    void 
+
+    void
     Mask::configure(const dom::Node & theNode) {
-        
+
         for( unsigned int i=0; i<theNode.childNodesLength(); i++) {
             const std::string myName = theNode.childNode("property",i)->getAttribute("name")->nodeValue();
             const std::string myValue = theNode.childNode("property",i)->getAttribute("value")->nodeValue();
@@ -86,18 +86,18 @@ namespace y60 {
                     _myTargetImage = myImage->getFacade<y60::Image>();
                 } else if( myName == "maskimage") {
                     _myMaskImage = myImage->getFacade<y60::Image>();
-                } 
+                }
             }
-        }   
+        }
     }
 
-    void 
+    void
     Mask::onFrame(double t) {
-        const BGRRaster * mySourceFrame = 
+        const BGRRaster * mySourceFrame =
             dom::dynamic_cast_Value<BGRRaster>(_mySourceImage->getRasterValue().get());
-        const BGRRaster * myMaskFrame   = 
+        const BGRRaster * myMaskFrame   =
             dom::dynamic_cast_Value<BGRRaster>(_myMaskImage->getRasterValue().get());
-        const BGRRaster * myTargetFrame = 
+        const BGRRaster * myTargetFrame =
             dom::dynamic_cast_Value<BGRRaster>(_myTargetImage->getRasterValue().get());
 
         BGRRaster::iterator itSrc   = const_cast<BGRRaster::iterator>(mySourceFrame->begin());

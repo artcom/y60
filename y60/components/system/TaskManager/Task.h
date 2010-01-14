@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -78,7 +78,7 @@
 #include <windows.h>
 
 namespace y60 {
-            
+
     enum TaskCallback;
     class TaskWindow;
 
@@ -96,18 +96,18 @@ namespace y60 {
             Task(std::string theCommand, std::string thePath, bool theShowFlag);
             Task();
             ~Task();
-           
+
             // Terminates a process non-gracefully
-            void terminate(); 
-            
+            void terminate();
+
             // returns if the task is ready for user input or timeout expired
             bool waitForInputIdle(unsigned theTimeout);
-            
+
             /// Takes a screenshot
-            void captureDesktop(std::string theFilename); 
-            
-            bool isActive() const;  
-            void setPriority(int thePrio);     
+            void captureDesktop(std::string theFilename);
+
+            bool isActive() const;
+            void setPriority(int thePrio);
 
             /// Add windows to the task that do not belong to the process
             void addExternalWindow(std::string theWindowName);

@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -88,19 +88,19 @@
 namespace y60 {
 	class DICOMPlugIn :
 		public asl::PlugInBase,
-#ifdef PL_DECOCDER    
+#ifdef PL_DECOCDER
         public IPaintLibExtension,
         public ::PLDecoderFactory
-#endif    
+#endif
         public jslib::IScriptablePlugin
 	{
 	public:
 		DICOMPlugIn (asl::DLHandle theDLHandle);
-#ifdef PL_DECOCDER        
+#ifdef PL_DECOCDER
 		PLDecoderFactory * getDecoderFactory() const;
         ::PLPicDecoder * CreateDecoder() const;
         bool CanDecode(PLBYTE * pData, int DataLen) const;
-#endif        
+#endif
    		void initClasses(JSContext * theContext, JSObject *theGlobalObject);
         const char * ClassName() {
             static const char * myClassName = "Dicom";
@@ -137,7 +137,7 @@ bool DICOMPlugIn :: CanDecode(PLBYTE * pData, int DataLen) const {
         if (!ret) {
             cerr << "DICOMPlugIn :: CanDecode: DICOM signature missing. Not a valid DICOm file" << endl;
         } else {
-            cerr << "DICOMPlugIn :: CanDecode: found DICM signature." << endl;     
+            cerr << "DICOMPlugIn :: CanDecode: found DICM signature." << endl;
         }
     } else {
         cerr << "DICOMPlugIn :: CanDecode: File is too small to be a valid DICOM file" << endl;
@@ -147,7 +147,7 @@ bool DICOMPlugIn :: CanDecode(PLBYTE * pData, int DataLen) const {
 }
 #endif
 
-void 
+void
 DICOMPlugIn::initClasses(JSContext * theContext, JSObject *theGlobalObject) {
     JSDicomImage::initClass(theContext, theGlobalObject);
 }

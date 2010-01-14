@@ -4,7 +4,7 @@
 #include "y60_ape_settings.h"
 
 namespace y60 { namespace ape {
-    
+
 //inline uint8 read_only() { return JSPROP_READONLY; }
 
 }} // end of namespace ape, y60

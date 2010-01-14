@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -68,15 +68,15 @@ use("Y60JSSL.js");
 
 function Configurator(theSceneViewer, theSettingsFile, theSettingsFileList) {
     this.Constructor(this, theSceneViewer, theSettingsFile, theSettingsFileList);
-}       
+}
 
-Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsFile, 
-                                               theSettingsFileList) 
+Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsFile,
+                                               theSettingsFileList)
 {
     const DISPLAY_DURATION  = 3;
     const FADE_DURATION     = 1;
     const BOX_SIZE          = [600,100];
-    
+
     obj.getSettings = function() {
         if (_myMergedSettings) {
             return _myMergedSettings;
@@ -131,7 +131,7 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
         for (var i = 0; i < _myMergedSettings.childNodes.length; ++i) {
             var myChild = _myMergedSettings.childNode(i);
             for (var j = 0; j < myChild.childNodes.length; ++j) {
-                myChild.childNode(j).firstChild.nodeValue = 
+                myChild.childNode(j).firstChild.nodeValue =
                     _myOriginalMergedSettings.childNode(i).childNode(j).firstChild;
             }
         }
@@ -142,7 +142,7 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
         setup( obj, theSceneViewer, _myCommonSettingsFile );
         notifyListeners();
     }
-    
+
     function saveSection( theSourceSection, theTargetSection ) {
         // save common setting values
         for (var i = 0; i < theTargetSection.childNodesLength(); i++) {
@@ -151,7 +151,7 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
             if (mySourceNode) {
                 theTargetSection.replaceChild( mySourceNode.cloneNode(true), myTargetNode );
                 // remove them from merged section
-                theSourceSection.removeChild( mySourceNode ); 
+                theSourceSection.removeChild( mySourceNode );
             }
         }
     }
@@ -159,8 +159,8 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
     function saveSetting( theSetting, theSettingsFile, theCurrentMergedSettings ) {
 
         for (var j = 0; j < theSetting.childNodesLength(); j++) {
-            var myCurrentSection = theSetting.childNode( j );    
-            var myMergedSection = 
+            var myCurrentSection = theSetting.childNode( j );
+            var myMergedSection =
                 theCurrentMergedSettings.childNode( myCurrentSection.nodeName );
             if ( myMergedSection ) {
                 saveSection( myMergedSection, myCurrentSection );
@@ -168,23 +168,23 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
                     theCurrentMergedSettings.removeChild( myMergedSection );
                 }
             }
-        } 
+        }
         theSetting.saveFile( theSettingsFile );
     }
 
     obj.saveSettings = function() {
         var myCommonSettingsFileSavedFlag = false;
-        var myCurrentMergedSettings = _myMergedSettings.cloneNode( true ); 
-        for (var i = _mySettingsList.length - 1; i >= 0; i--) { 
+        var myCurrentMergedSettings = _myMergedSettings.cloneNode( true );
+        for (var i = _mySettingsList.length - 1; i >= 0; i--) {
             var myCurrentSettings = _mySettingsList[i];
-            saveSetting( myCurrentSettings, _mySettingsFileList[i], 
+            saveSetting( myCurrentSettings, _mySettingsFileList[i],
                          myCurrentMergedSettings );
             if(_mySettingsFileList[i] == _myCommonSettingsFile) {
                 myCommonSettingsFileSavedFlag = true;
             }
         }
         if(!myCommonSettingsFileSavedFlag) {
-            saveSetting( _myOriginalCommonSettings, _myCommonSettingsFile, 
+            saveSetting( _myOriginalCommonSettings, _myCommonSettingsFile,
                          myCurrentMergedSettings );
         }
     }
@@ -197,18 +197,18 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
             }
         }
     }
-    
+
     obj.addListener = function(theListener, theSection) {
         if (!_myMergedSettings) {
             return;
         }
-        
+
         if (theSection) {
             var mySection = _myMergedSettings.childNode(theSection);
             if (!mySection) {
                 throw new Exception("Section " + theSection + " does not exist.", fileline());
             }
-            
+
             theListener.onUpdateSettings(mySection);
         } else {
             theListener.onUpdateSettings(_myMergedSettings);
@@ -311,7 +311,7 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
             }
 
         }
-        
+
         this.name = function() {
             var myName = _myNode.nodeName
             if (_myArrayFlag) {
@@ -319,7 +319,7 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
             }
             return myName;
         }
-        
+
         this.value = function() {
             if (_myArrayFlag) {
                 return Number(_myArray[_myArrayPos]);
@@ -331,13 +331,13 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
                 }
             }
         }
-        
+
         this.help = function() {
             if ("help" in _myNode) {
-                return _myNode.help;   
+                return _myNode.help;
             } else {
                 return "";
-            }            
+            }
         }
 
         this.next = function() {
@@ -383,7 +383,7 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
             }
 
             myValue += myStep;
-            
+
             if ("max" in _myNode) {
                 var myMax   = Number(_myNode.max);
                 if (myValue > myMax) {
@@ -510,7 +510,7 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
                     print("Using settings from '" + mySettingsFile + "'");
                     mergeSettings( mySettings );
                 } else {
-                    Logger.warning( 'Settings file "' + mySettingsFile 
+                    Logger.warning( 'Settings file "' + mySettingsFile
                                     + '" does not exist!');
                 }
             }
@@ -519,14 +519,14 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
             // set default current settings
             _myCurrentSection = _myMergedSettings.firstChild;
             _myCurrentSetting = new Setting(_myCurrentSection.firstChild);
-            
+
         } else {
             // XXX todo: no settings.xml -> no configurator?
-            //throw new Exception( "Settings file " + _myCommonSettingsFile + 
+            //throw new Exception( "Settings file " + _myCommonSettingsFile +
             //                     "does not exist!", fileline() );
         }
-            
-        
+
+
     }
 
     function notifyListeners() {
@@ -550,11 +550,11 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
         if (!theSecondLine) {
             theSecondLine = "";
         }
-        
+
         if (!theThirdLine) {
             theThirdLine = "";
         }
-        
+
         _mySceneViewer.setMessage("", 0);
         _mySceneViewer.setMessage(theFirstLine, 1);
         _mySceneViewer.setMessage(theSecondLine, 2);
@@ -585,7 +585,7 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
             }
             mergeSection( myCommonSection, mySection );
         }
-        
+
     }
 
     function mergeSection(theCommonSection, theSection) {
@@ -598,7 +598,7 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
                 // Use the attributes from the common node
                 var myAttributes = myCommonNode.attributes;
                 for (var j = 0; j < myAttributes.length; ++j) {
-                    myNode[myAttributes[j].nodeName] = 
+                    myNode[myAttributes[j].nodeName] =
                         myCommonNode[myAttributes[j].nodeName];
                 }
                 // Replace the common node with new node
@@ -611,7 +611,7 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
     }
 
     var _mySceneViewer            = theSceneViewer;
-    var _myMergedSettings         = null;   
+    var _myMergedSettings         = null;
     var _myOriginalCommonSettings = null;
     var _myOriginalMergedSettings = null;
     var _myCommonSettingsFile     = null;
@@ -629,9 +629,9 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
 // A generic XML-to-JavaScript converter.
 //
 // Usage:
-// (1) Setup: 
+// (1) Setup:
 // self.registerSettingsListener(ourSettings, "MySettingsNode");
-// (2) Access: 
+// (2) Access:
 // var myValue = ourSettings.value;
 //
 
@@ -639,7 +639,7 @@ function Settings() {
     this.onUpdateSettings = function(theNode) {
         for (var i = 0; i < theNode.childNodes.length; ++i) {
             var myChild = theNode.childNodes[i];
-            this[myChild.nodeName] = myChild.firstChild.nodeValue;                
+            this[myChild.nodeName] = myChild.firstChild.nodeValue;
         }
     }
 }

@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -152,7 +152,7 @@ namespace dys {
     inline bool is_hexdigit(Char c) {
         return is_digit(c) || is_ABCDEF(c) || is_abcdef(c);
     }
-    
+
     inline unsigned int digit_to_num(Char digit) {
         return digit - '0';
     }
@@ -247,7 +247,7 @@ namespace dys {
             ++pos;
         }
         return pos;
-    }    
+    }
     // returns the position of the first non-digit char
     int read_digits(const String & is, int pos) {
         while (pos < is.size() && (is_digit(is[pos]))) {
@@ -379,7 +379,7 @@ namespace dys {
     */
     // returns position past second qoute char if at pos is a qoute char
     int read_quoted_text(const String & is,int pos,
-        Char opening_qoute,Char closing_qoute ) 
+        Char opening_qoute,Char closing_qoute )
     {
         int npos = pos;
         if (is[npos]==opening_qoute) {
@@ -427,12 +427,12 @@ namespace dys {
         }
         return pos;
     }
-    
+
     typedef unsigned long TokenId;
 
     class Token {
     public:
-        Token(TokenId theId, unsigned int theBegin, unsigned int theEnd) 
+        Token(TokenId theId, unsigned int theBegin, unsigned int theEnd)
             : myBegin(theBegin), myEnd(theEnd), myId(theId) {}
             virtual TokenId getId() const {
                 return myId;
@@ -461,52 +461,52 @@ namespace dys {
     struct ExactString : public Definition {
         ExactString(const String & theWord) : myWord(theWord) {}
         unsigned int match(const String & is, unsigned int pos) const {
-            return read_if_string(is, pos, myWord); 
+            return read_if_string(is, pos, myWord);
         }
         const String myWord;
     };
     struct ExactChar : public Definition {
         ExactChar(Char theChar) : myChar(theChar) {}
         unsigned int match(const String & is, unsigned int pos) const {
-            return read_if_char(is, pos, myChar); 
+            return read_if_char(is, pos, myChar);
         }
         const Char myChar;
     };
 
     struct WhiteSpace : public Definition {
         unsigned int match(const String & is, unsigned int pos) const {
-            return read_whitespace(is, pos); 
+            return read_whitespace(is, pos);
         }
     };
 
     struct Identifier : public Definition {
         unsigned int match(const String & is, unsigned int pos) const {
-            return read_name(is, pos); 
+            return read_name(is, pos);
         }
     };
     struct StringLiteral : public Definition {
         unsigned int match(const String & is, unsigned int pos) const {
-            return read_quoted_text(is, pos); 
+            return read_quoted_text(is, pos);
         }
     };
     struct DecimalLiteral : public Definition {
         unsigned int match(const String & is, unsigned int pos) const {
-            return read_decimal(is, pos); 
+            return read_decimal(is, pos);
         }
     };
     struct HexLiteral : public Definition {
         unsigned int match(const String & is, unsigned int pos) const {
-            return read_hex(is, pos); 
+            return read_hex(is, pos);
         }
     };
     struct OctalLiteral : public Definition {
         unsigned int match(const String & is, unsigned int pos) const {
-            return read_octal(is, pos); 
+            return read_octal(is, pos);
         }
     };
     struct FloatLiteral : public Definition {
         unsigned int match(const String & is, unsigned int pos) const {
-            return read_float(is, pos); 
+            return read_float(is, pos);
         }
     };
     struct BooleanLiteral : public Definition {
@@ -516,17 +516,17 @@ namespace dys {
     };
     struct CComment : public Definition {
         unsigned int match(const String & is, unsigned int pos) const {
-            return read_if_between(is, pos, "/*", "*/"); 
+            return read_if_between(is, pos, "/*", "*/");
         }
     };
     struct CppComment : public Definition {
         unsigned int match(const String & is, unsigned int pos) const {
-            return read_if_match_until_lineterm(is, pos, "//"); 
+            return read_if_match_until_lineterm(is, pos, "//");
         }
     };
     struct LineTermination : public Definition {
         unsigned int match(const String & is, unsigned int pos) const {
-            return read_lineterm(is, pos); 
+            return read_lineterm(is, pos);
         }
     };
     typedef std::vector<asl::Ptr<Token> > TokenList;
@@ -552,13 +552,13 @@ namespace dys {
                 }
                 if (myMatchIndex < _myDefinitions.size()) {
                     DB2(AC_TRACE << "Lexer::tokenize: best match " << getTokenName(myMatchIndex) << std::endl);
-                    theTokens.push_back(TokenPtr(new Token(myMatchIndex, pos, myMaxPos))); 
+                    theTokens.push_back(TokenPtr(new Token(myMatchIndex, pos, myMaxPos)));
                     pos = myMaxPos;
                 } else {
                     std::cerr << "Lexer::tokenize: Error: no matching definition found" << std::endl;
                     std::cerr << is.substr(0,pos+1) << std::endl;
                     std::cerr << "<-- Lexer::tokenize: Error: no matching definition found" << std::endl;
-                    std::cerr << is.substr(pos,100) << std::endl;               
+                    std::cerr << is.substr(pos,100) << std::endl;
                     return false;
                 }
             } while (pos < is.size());
@@ -677,8 +677,8 @@ namespace dys {
             DEFINITION(TRY, ExactString("try")),
             DEFINITION(CATCH, ExactString("catch"))
             {}
-    
-        
+
+
         // literals
         const TokenId STRING_LITERAL;
         const TokenId DECIMAL_LITERAL;
@@ -739,7 +739,7 @@ namespace dys {
         const TokenId ASSIGN_SHIFT_LEFT;
         const TokenId ASSIGN_SHIFT_RIGHT;
         const TokenId ASSIGN_SHIFT_RIGHT_UNSIGNED;
- 
+
         // reserved words
         const TokenId BREAK;
         const TokenId FOR;
@@ -772,7 +772,7 @@ namespace dys {
         const TokenId IMPORT;
         const TokenId TRY;
         const TokenId CATCH;
-        
+
         // whitespace and general identifier have lower priority
         const TokenId WHITE_SPACE;
         const TokenId IDENTIFIER;

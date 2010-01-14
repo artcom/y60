@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,16 +51,16 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
 // own header
-#include "Viewport.h" 
+#include "Viewport.h"
 
-#include "Canvas.h" 
-#include "Camera.h" 
+#include "Canvas.h"
+#include "Camera.h"
 
 #include <asl/base/Logger.h>
 
@@ -70,7 +70,7 @@ using namespace std;
 
 namespace y60 {
 
-bool 
+bool
 Viewport::getLeft(int & theLeft) const {
     const Node * myCanvasNode = this->getNode().parentNode();
     if (myCanvasNode) {
@@ -81,20 +81,20 @@ Viewport::getLeft(int & theLeft) const {
          }
     } else {
         AC_ERROR << "Canvas is null!";
-    } 
+    }
     return false;
 }
 
-int 
-Viewport::getLower() const { 
+int
+Viewport::getLower() const {
     const Node * myCanvasNode = this->getNode().parentNode();
     if (myCanvasNode) {
         return int((1.0 - get<Position2DTag>()[1] - get<Size2DTag>()[1]) * myCanvasNode->getFacade<Canvas>()->getHeight());
-    } 
+    }
     return 0;
 }
 
-bool 
+bool
 Viewport::getTop(int & theTop) const {
     const Node * myCanvasNode = this->getNode().parentNode();
     if (myCanvasNode) {
@@ -109,8 +109,8 @@ Viewport::getTop(int & theTop) const {
     return false;
 }
 
-bool 
-Viewport::getWidth(unsigned & theWidth) const { 
+bool
+Viewport::getWidth(unsigned & theWidth) const {
     const Node * myCanvasNode = this->getNode().parentNode();
     if (myCanvasNode) {
         const CanvasPtr & myCanvas = myCanvasNode->getFacade<Canvas>();
@@ -119,11 +119,11 @@ Viewport::getWidth(unsigned & theWidth) const {
             theWidth = newWidth;
             return true;
         }
-    } 
+    }
     return false;
 }
 
-bool 
+bool
 Viewport::getHeight(unsigned & theHeight) const {
     const Node * myCanvasNode = this->getNode().parentNode();
     if (myCanvasNode) {
@@ -132,11 +132,11 @@ Viewport::getHeight(unsigned & theHeight) const {
             theHeight = newHeight;
             return true;
         }
-    } 
+    }
     return false;
 }
 
-void 
+void
 Viewport::applyAspectToCamera() {
     dom::NodePtr myCameraNode = getNode().getElementById( get<CameraTag>() );
     if (myCameraNode) {

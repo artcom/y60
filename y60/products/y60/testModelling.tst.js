@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 
@@ -71,8 +71,8 @@ ModellingUnitTest.prototype.Constructor = function(obj, theName) {
     obj.run = function() {
         var myScene = new Scene();
         myScene.setup();
-        var myRedColor = new Vector4f([1,0,0,1]); 
-        var myGreenColor = new Vector4f([0,1,0,1]); 
+        var myRedColor = new Vector4f([1,0,0,1]);
+        var myGreenColor = new Vector4f([0,1,0,1]);
         var myBlueColor = new Vector4f([0,0,1,1]);
         var myTestFile = "testfiles/DiffuseRamp.png";
 
@@ -83,16 +83,16 @@ ModellingUnitTest.prototype.Constructor = function(obj, theName) {
 
         var myColorMaterial = Modelling.createColorMaterial(myScene , myBlueColor);
         ENSURE(almostEqual(myColorMaterial.properties.surfacecolor, myBlueColor));
-   
-     
-        var myQuad = Modelling.createQuad(myScene, 
-                                          myColorMaterial.id, 
+
+
+        var myQuad = Modelling.createQuad(myScene,
+                                          myColorMaterial.id,
                                           new Vector3f([-1,-1,0]),
                                           new Vector3f([1,1,0]));
         myQuad.name = "theQuad";
         ENSURE(myScene.dom.find(".//*[@name='theQuad']") != undefined);
-   
-     
+
+
         var myFileImage = Modelling.createImage(myScene,
                                                 myTestFile);
         myFileImage.name = "theImage";
@@ -132,8 +132,8 @@ ModellingUnitTest.prototype.Constructor = function(obj, theName) {
         ENSURE(almostEqual(myLambertMaterial.properties.diffuse,myBlueColor));
         ENSURE(almostEqual(myLambertMaterial.properties.ambient,myRedColor));
         ENSURE(myScene.dom.find(".//*[@name='theLambertMaterial']") != undefined);
-      
-  
+
+
         var myBody = Modelling.createBody(myScene.world, myQuad);
         myBody.name = "theBody";
         ENSURE(myScene.dom.find(".//*[@name='theBody']") != undefined);
@@ -142,8 +142,8 @@ ModellingUnitTest.prototype.Constructor = function(obj, theName) {
         var myCanvas = Modelling.createCanvas(myScene, "theCanvas");
         ENSURE(myScene.dom.find(".//*[@name='theCanvas']") != undefined);
 
-        var myCrosshair = Modelling.createCrosshair(myScene, 
-                                                    myLambertMaterial.id, 
+        var myCrosshair = Modelling.createCrosshair(myScene,
+                                                    myLambertMaterial.id,
                                                     5,
                                                     10,
                                                     "theCrosshair");
@@ -164,7 +164,7 @@ ModellingUnitTest.prototype.Constructor = function(obj, theName) {
                                                     myPositions);
         myLineStrip.name = "theLineStrip";
         ENSURE(myScene.dom.find(".//*[@name='theLineStrip']") != undefined);
-        
+
 
         var myQuadStrip = Modelling.createQuadStrip(myScene,
                                                     myColorMaterial.id,
@@ -178,7 +178,7 @@ ModellingUnitTest.prototype.Constructor = function(obj, theName) {
                                                             myPositions);
         myTriangleStrip.name = "theTriangleStrip";
         ENSURE(myScene.dom.find(".//*[@name='theTriangleStrip']") != undefined);
-        
+
 //         {"createTriangleStack",             CreateQuadStack,         5},
 //         {"createVoxelProxyGeometry",    CreateVoxelProxyGeometry,    7},
 //         {"setAlpha",                    SetAlpha,                    2},

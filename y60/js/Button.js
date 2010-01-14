@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -129,7 +129,7 @@ ButtonBase.prototype.Constructor = function(Public, Protected, theScene, theId,
     Public.onMouseButton = function(theState, theX, theY, theRadius) {
         if (Public.enabled && Protected.isVisible(Public.node)) {
             if (theState == MOUSE_UP && Protected.isPressed) {
-    	        Logger.trace("Unpressing button " + Public.id);	
+    	        Logger.trace("Unpressing button " + Public.id);
                 Public.setPressed(false);
         		if (Public.touches(theX, theY, theRadius)) {
                     Public.onClick(Public);
@@ -177,7 +177,7 @@ ButtonBase.prototype.Constructor = function(Public, Protected, theScene, theId,
     }
 
     Public.setClickOnMouseDown = function() {
-        // Replace the onMouseButton function with something more advanced        
+        // Replace the onMouseButton function with something more advanced
         Public.onMouseButton = function(theState, theX, theY, theRadius) {
             if (theState == MOUSE_UP) {
                 Public.setPressed(false);
@@ -189,7 +189,7 @@ ButtonBase.prototype.Constructor = function(Public, Protected, theScene, theId,
             }
         }
     }
-    
+
     ///////////////////////////////////////////////////////////////////////////////////////////
     // Protected
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -269,7 +269,7 @@ DualImageButton.prototype.Constructor = function(Public, Protected, theScene, th
     var Base      = [];
     ButtonBase.prototype.Constructor(Public, Protected, theScene, theId,
                [1,1], thePosition, theStyle, theParent);
-    Protected.myCachedImages = [];    
+    Protected.myCachedImages = [];
     for (var myIndex = 0; myIndex < theSources.length; myIndex++) {
         var myImage = 0;
         if (typeof(theSources[myIndex]) == "object") {
@@ -282,10 +282,10 @@ DualImageButton.prototype.Constructor = function(Public, Protected, theScene, th
             Public.width  = mySize.x;
             Public.height = mySize.y;
             Public.srcsize.x = 1;
-            Public.srcsize.y = 1;            
+            Public.srcsize.y = 1;
         }
-        Protected.myCachedImages.push(myImage);   
-             
+        Protected.myCachedImages.push(myImage);
+
     }
     Public.setImage(Protected.myCachedImages[0]);
 
@@ -296,7 +296,7 @@ DualImageButton.prototype.Constructor = function(Public, Protected, theScene, th
             Public.color = Public.style.selectedColor;
             //Logger.trace("setting image to " +Protected.myCachedImages[1]);
             Public.image = Protected.myCachedImages[1];
-            
+
         } else {
             //Logger.trace("setUnPressed");
             Public.color = Public.style.color;
@@ -330,13 +330,13 @@ DualImageTextButton.prototype.Constructor = function(Public, Protected, theScene
 
     ButtonBase.prototype.Constructor(Public, Protected, theScene, theId,
                [1,1], thePosition, theStyle, theParent);
-               
-    Protected.myCachedImages = [];    
+
+    Protected.myCachedImages = [];
     for (var myIndex = 0; myIndex < theSources.length; myIndex++) {
         var myImage = 0;
         if (typeof(theSources[myIndex]) == "object") {
             myImage = theSources[myIndex];
-            //Protected.addTexture(myImage.id);            
+            //Protected.addTexture(myImage.id);
         } else {
             myImage = theScene.images.appendChild(new Node("<image/>").firstChild);
             myImage.resize = "pad";
@@ -345,10 +345,10 @@ DualImageTextButton.prototype.Constructor = function(Public, Protected, theScene
             Public.width  = mySize.x;
             Public.height = mySize.y;
             Public.srcsize.x = 1;
-            Public.srcsize.y = 1;            
+            Public.srcsize.y = 1;
         }
-        Protected.myCachedImages.push(myImage);   
-             
+        Protected.myCachedImages.push(myImage);
+
     }
     Public.setActive = function(theState) {
         Public.image = Protected.myCachedImages[theState?1:0];

@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -525,13 +525,13 @@ void SDLWindow::setVisibility(bool theFlag) {
         if (theFlag) {
             SetForegroundWindow(myRenderGirlWindow);
         }
-        
+
     }
 #else
 #ifdef OSX // TODO PORT
-    AC_WARNING << "SDLWindow::setVisibility not yet implemented for OSX";    
+    AC_WARNING << "SDLWindow::setVisibility not yet implemented for OSX";
 #endif
-#endif        
+#endif
     AC_TRACE << "SDLWindow::setVisibility : " << theFlag;
     }
 
@@ -564,7 +564,7 @@ void SDLWindow::setPosition(asl::Vector2i thePos) {
                    myRect.right-myRect.left,
                    myRect.bottom-myRect.top, true);
     }
-#endif    
+#endif
 #ifdef AC_USE_X11
     wminfo.info.x11.lock_func();
     XMoveWindow( wminfo.info.x11.display, wminfo.info.x11.wmwindow,
@@ -574,7 +574,7 @@ void SDLWindow::setPosition(asl::Vector2i thePos) {
 #endif
 
 #ifdef OSX // TODO PORT
-    AC_WARNING << "SDLWindow::setPosition not yet implemented for OSX";    
+    AC_WARNING << "SDLWindow::setPosition not yet implemented for OSX";
 #endif
 }
 
@@ -985,7 +985,7 @@ SDLWindow::setSwapInterval(unsigned theInterval)
     }
 #endif
 #ifdef AC_USE_OSX_CGL
-    const GLint myInterval = theInterval;  
+    const GLint myInterval = theInterval;
     CGLError myError = CGLSetParameter(CGLGetCurrentContext(), kCGLCPSwapInterval, &myInterval);
     if (myError != 0) {
         AC_WARNING << "Cannot set swap interval, error=" << CGLErrorString(myError) << ", " <<

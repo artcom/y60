@@ -20,7 +20,7 @@ try {
         adjustNodeId(myImageClone, true);
         window.scene.images.appendChild(myImageClone);
         var myImageSize = getImageSize(myImageClone);
-        print("Accessing the image reveals the error, i.w. getImageSize() : " + myImageSize);        
+        print("Accessing the image reveals the error, i.w. getImageSize() : " + myImageSize);
     }
     var framecount = 0;
     ourShow.onFrame = function() {

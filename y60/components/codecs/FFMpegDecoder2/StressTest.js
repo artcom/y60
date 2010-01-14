@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -76,7 +76,7 @@ function setup(theViewer) {
     _myMovieImage = theViewer.getImageManager().createMovie("../FFMpegDecoder/testfiles/counter_short.mpg", "FFMpegDecoder2");
     _myMovieImage.playmode = "play";
     _myMovieImage.audio = false;
-    _myMovieMaterial = Modelling.createUnlitTexturedMaterial(theViewer.getScene(), _myMovieImage);  
+    _myMovieMaterial = Modelling.createUnlitTexturedMaterial(theViewer.getScene(), _myMovieImage);
     _myMovieQuad = Modelling.createQuad(theViewer.getScene(), _myMovieMaterial.id, [-100,-100,0], [100,100,0]);
     _myMovieBody = Modelling.createBody(theViewer.getScene().world, _myMovieQuad.id);
     _myMovieBody.position.z = -100;
@@ -110,7 +110,7 @@ try {
         }
         myFrameCount++;
     }
-        
+
 
     ourShow.setup(400, 400);
     setup(ourShow);

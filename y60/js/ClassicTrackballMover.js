@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -105,7 +105,7 @@ ClassicTrackballMover.prototype.Constructor = function(obj, theViewport, theCent
     var _myFixedCenter  = false;
     var _myPowerMateButtonState = BUTTON_UP;
     var _myPickInvisibleBodies = true;
-  
+
     var _myZoomSpeed = ZOOM_SPEED;
     var _myRotateSpeed = ROTATE_SPEED;
     //////////////////////////////////////////////////////////////////////
@@ -119,7 +119,7 @@ ClassicTrackballMover.prototype.Constructor = function(obj, theViewport, theCent
     obj.setup = function() {
         setupTrackball(null);
     }
-    
+
     obj.zoomspeed setter = function(theZoomSpeed) {
         _myZoomSpeed = theZoomSpeed;
     }
@@ -133,7 +133,7 @@ ClassicTrackballMover.prototype.Constructor = function(obj, theViewport, theCent
     obj.rotatespeed getter = function() {
         return _myRotateSpeed;
     }
-    
+
     obj.Mover.onMouseButton = obj.onMouseButton;
     obj.onMouseButton = function(theButton, theState, theX, theY) {
         obj.Mover.onMouseButton(theButton, theState, theX, theY);
@@ -207,7 +207,7 @@ ClassicTrackballMover.prototype.Constructor = function(obj, theViewport, theCent
         _myMousePosY = theY;
     }
 
-    
+
     obj.onAxis = function(theDevice, theAxis, theValue) {
         /*if( _myPowerMateButtonState == BUTTON_UP) {
           _myTrackballOrientation.y += theValue / TWO_PI;
@@ -255,7 +255,7 @@ ClassicTrackballMover.prototype.Constructor = function(obj, theViewport, theCent
         var myGlobalPosition = obj.getMoverObject().globalmatrix.getTranslation();
         var myRotation = obj.getMoverObject().globalmatrix.getRotation();
         var myRadiusVector = normalized(difference(myGlobalPosition, _myTrackBallCenter));
-        
+
         if (obj.getMoverObject().globalmatrix.getRow(1).y > 0) {
             _myTrackballOrientation.x = - Math.asin(myRadiusVector.y);
             _myTrackballOrientation.y = Math.atan2(myRadiusVector.x, myRadiusVector.z);
@@ -263,7 +263,7 @@ ClassicTrackballMover.prototype.Constructor = function(obj, theViewport, theCent
             _myTrackballOrientation.x = Math.PI + Math.asin(myRadiusVector.y);
             _myTrackballOrientation.y = Math.atan2(myRadiusVector.x, myRadiusVector.z) - Math.PI;
         }
-        
+
         calculateTrackball();
     }
 
@@ -273,7 +273,7 @@ ClassicTrackballMover.prototype.Constructor = function(obj, theViewport, theCent
         var myY = myTrackballRadius * Math.sin(- _myTrackballOrientation.x);
         var myZ = myTrackballRadius * Math.cos(- _myTrackballOrientation.x) * Math.cos(_myTrackballOrientation.y);
         var myGlobalMatrix = new Matrix4f(Quaternionf.createFromEuler(_myTrackballOrientation));
-        
+
         myGlobalMatrix.translate(sum(_myTrackBallCenter, new Vector3f(myX, myY, myZ)));
         var myParentMatrix = new Matrix4f(obj.getMoverObject().parentNode.globalmatrix);
         myParentMatrix.invert();
@@ -306,7 +306,7 @@ ClassicTrackballMover.prototype.Constructor = function(obj, theViewport, theCent
             }
             myPos =  sum(myPosition, product(myViewVector, myTrackballRadius));
         }
-        
+
         return myPos;
     }
 
@@ -315,7 +315,7 @@ ClassicTrackballMover.prototype.Constructor = function(obj, theViewport, theCent
         // Implement function:
         // window.screenToWorldSpace(theX, theY, NEAR_PLANE);
         var myPickedBody = null;
-        
+
         var myViewport = obj.getViewport();
         var myPosX = 2 * (theX-myViewport.left) / myViewport.width  - 1;
         var myPosY = - (2 * (theY-myViewport.top) / myViewport.height - 1);

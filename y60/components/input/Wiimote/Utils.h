@@ -22,7 +22,7 @@ DEFINE_EXCEPTION( WiiException, asl::Exception );
 class MotionData {
 public:
     char x, y, z;
-    
+
     MotionData() : x(0), y(0), z(0) {}
     MotionData(unsigned char x, unsigned char y, unsigned char z) {
         this->x = x + 128;
@@ -38,19 +38,19 @@ protected:
     int		_myCode;
     bool	_myState;
     bool _myChangedFlag;
-    
+
 public:
     Button(std::string name, int code) : _myName(name), _myCode(code), _myState(false), _myChangedFlag( false) {};
     std::string	getName() const { return _myName; }
     int		getCode() const { return _myCode; }
     bool	pressed() const { return _myState; }
     bool  hasChanged()  { bool myFlag = _myChangedFlag; _myChangedFlag = false; return myFlag; }
-    
+
     void setState(const bool set) { _myState = set; }
     bool setCode(const int code) {
-        
+
         bool myNewState  = (bool)(code & _myCode);
-        
+
 //        if (myNewState) {
 //            std::cerr << "==== PRESSED: " << _myName << std::endl;
 //        }
@@ -60,7 +60,7 @@ public:
 //        }
 
         _myChangedFlag = _myState != myNewState;
-        
+
         _myState = myNewState;
 
 

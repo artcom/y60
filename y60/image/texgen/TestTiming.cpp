@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -63,7 +63,7 @@
 //   $Revision: 1.3 $
 //
 //
-// Description: 
+// Description:
 //
 //=============================================================================
 
@@ -108,7 +108,7 @@ void TestTiming::run() {
     try {
 
         Node theTexDef;
-        ifstream theXMLFile (myXMLFileName.c_str());    
+        ifstream theXMLFile (myXMLFileName.c_str());
         if (!theXMLFile) {
             ENSURE_MSG (false, ("Can't open " +myXMLFileName).c_str());
         }
@@ -131,7 +131,7 @@ void TestTiming::run() {
                 counter = counter % 4;
             }
         }
-        theEncoder.MakeFileFromBmp((myDirectory+"timingTest_index.png").c_str(),&indexMap );    
+        theEncoder.MakeFileFromBmp((myDirectory+"timingTest_index.png").c_str(),&indexMap );
         exit(1);
 #endif
 
@@ -140,7 +140,7 @@ void TestTiming::run() {
         cout << "Generating textures (target size is 64x64)..." << endl;
         PLPoint myTargetSize (64, 64);
         double TotalTime = 0;
-        for (int i=0; i<10; i++)  { 
+        for (int i=0; i<10; i++)  {
             int myIndexSize = int(pow(2.0,i));
             cout << "Testing index bmp size: " << myIndexSize << endl;
             myIndexSize *=8;
@@ -169,7 +169,7 @@ void TestTiming::run() {
         cout <<"Paintlib exception occurred :"<<(const char *)e<<endl;
     }
     ENSURE (true);
-         
+
 }
 
 

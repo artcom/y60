@@ -3,18 +3,18 @@
 
 #include <y60/components/yape/y60_ape_settings.h>
 
-#include <boost/type_traits/function_traits.hpp> 
-#include <boost/type_traits/is_void.hpp> 
-#include <boost/type_traits/remove_pointer.hpp> 
-#include <boost/type_traits/remove_reference.hpp> 
-#include <boost/mpl/if.hpp> 
-#include <boost/mpl/front.hpp> 
-#include <boost/mpl/at.hpp> 
+#include <boost/type_traits/function_traits.hpp>
+#include <boost/type_traits/is_void.hpp>
+#include <boost/type_traits/remove_pointer.hpp>
+#include <boost/type_traits/remove_reference.hpp>
+#include <boost/mpl/if.hpp>
+#include <boost/mpl/front.hpp>
+#include <boost/mpl/at.hpp>
 
 namespace y60 { namespace ape { namespace detail {
 
 template <typename Sig>
-struct get_member_function_class : 
+struct get_member_function_class :
     boost::remove_reference<
             typename boost::mpl::at_c<Sig, 1 >::type > {};
 
@@ -60,7 +60,7 @@ template <int LineNumber> struct line_number {};
 template <typename Id, typename Appendix> struct eid {
     typedef Id       context_type;
     typedef Appendix index_type;
-}; 
+};
 
 }}}
 

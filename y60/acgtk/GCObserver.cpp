@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -64,7 +64,7 @@
 namespace jslib {
 
 using namespace std;
-    
+
 GCObserver::GCObserver() : _myContext(0), _myPrevCallback(0) {
     AC_TRACE << "CTOR" << endl;
 }
@@ -78,14 +78,14 @@ GCObserver::~GCObserver() {
     AC_TRACE << "DTOR" << endl;
 }
 #ifdef USE_LEGACY_SPIDERMONKEY
-JSBool JS_DLL_CALLBACK 
+JSBool JS_DLL_CALLBACK
 #else
 JS_PUBLIC_API(JSBool)
 #endif
 GCObserver::callbackHook(JSContext *cx, JSGCStatus status) {
     return GCObserver::get().onGarbageCollected(cx, status);
 }
-    
+
 void
 GCObserver::attach(JSContext * cx) {
     AC_TRACE << "attaching";
@@ -94,7 +94,7 @@ GCObserver::attach(JSContext * cx) {
 }
 
 #ifdef USE_LEGACY_SPIDERMONKEY
-JSBool JS_DLL_CALLBACK 
+JSBool JS_DLL_CALLBACK
 #else
 JS_PUBLIC_API(JSBool)
 #endif
@@ -102,7 +102,7 @@ GCObserver::onGarbageCollected(JSContext *cx, JSGCStatus status) {
     if (status == JSGC_MARK_END) {
         // now go through all the objects in our map and emit the signal if
         // the object is about to be finalized. Then, remove the object from
-        // our map. 
+        // our map.
         for (ObjectMap::iterator i = _myObjectMap.begin(); i != _myObjectMap.end();) {
             JSObject * myWatchedObject = i->first;
             FinalizeSignal & mySignal = i->second;
@@ -122,7 +122,7 @@ GCObserver::onGarbageCollected(JSContext *cx, JSGCStatus status) {
     }
 }
 
-GCObserver::FinalizeSignal 
+GCObserver::FinalizeSignal
 GCObserver::watchObject(JSObject * theWatchedObject) {
     AC_TRACE << "adding finalizer watch to JSObject @ " << theWatchedObject;
     pair<ObjectMap::iterator,bool> status = _myObjectMap.insert(

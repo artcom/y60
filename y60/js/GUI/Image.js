@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -61,7 +61,7 @@ function Image(theParent, theImageNode, theDepth) {
 }
 
 Image.prototype.Constructor = function(Public, theParent, theImageNode, theDepth) {
-    
+
     ////////////////////////////////////////
     // Member
     ////////////////////////////////////////
@@ -84,13 +84,13 @@ Image.prototype.Constructor = function(Public, theParent, theImageNode, theDepth
     Public.bodies getter = function() {
         return [_myQuad.body];
     }
-    
+
     Public.clone = function() {
         var myNode = clone(_myNode);
         myNode.name = _myNode.name + "_copy";
         return new Image(_myParent, myNode, _myDepth);
     }
-   
+
     Public.name getter = function() {
         return _myName;
     }
@@ -98,7 +98,7 @@ Image.prototype.Constructor = function(Public, theParent, theImageNode, theDepth
     Public.body getter = function() {
         return _myQuad.body;
     }
-    
+
     Public.insensible setter = function(theInsensible) {
         _myQuad.body.insensible = theInsensible;
     }
@@ -106,13 +106,13 @@ Image.prototype.Constructor = function(Public, theParent, theImageNode, theDepth
     Public.material getter = function() {
         return _myMaterial;
     }
-    
+
     Public.alpha getter = function() {
-        return _myAlpha; 
+        return _myAlpha;
     }
-    
+
     Public.alpha setter = function(theAlpha) {
-        _myAlpha = theAlpha; 
+        _myAlpha = theAlpha;
         Modelling.setAlpha(_myQuad.body, Math.min(_myMaxAlpha, _myAlpha));
     }
 
@@ -120,60 +120,60 @@ Image.prototype.Constructor = function(Public, theParent, theImageNode, theDepth
         _myMaxAlpha = theAlpha;
         Public.alpha = _myAlpha;
     }
-    
+
     Public.visible getter = function() {
         return Public.body.visible;
     }
-    
+
     Public.visible setter = function(theVisibility) {
         Public.body.visible = theVisibility;
     }
-    
+
     Public.texture getter = function() {
         var myTextureUnit = _myMaterial.childNode("textureunits").firstChild;
         return window.scene.dom.getElementById(myTextureUnit.texture);
     }
-    
+
     Public.image setter = function(theImage) {
-        Public.texture.image = theImage.id; 
+        Public.texture.image = theImage.id;
     }
-    
+
     Public.image getter = function() {
         return window.scene.dom.getElementById(Public.texture.image);
     }
-    
+
     Public.wrapmode getter = function() {
         return Public.texture.wrapmode;
     }
-    
+
     Public.wrapmode setter = function(theWrapmode) {
         Public.texture.wrapmode = theWrapmode;
     }
-    
+
     Public.width getter = function() {
         return _myWidth;
     }
-    
+
     Public.width setter = function(theWidth) {
         _myWidth = theWidth;
     }
-    
+
     Public.height getter = function() {
         return _myHeight;
     }
-    
+
     Public.height setter = function(theHeight) {
         _myHeight = theHeight;
     }
-    
+
     Public.z getter = function() {
         return Public.body.position.z;
     }
-    
+
     Public.z setter = function(v) {
         Public.body.position.z = v;
     }
-    
+
     Public.playmode getter = function() {
         if ("playmode" in Public.image) {
             return Public.image.playmode;
@@ -189,10 +189,10 @@ Image.prototype.Constructor = function(Public, theParent, theImageNode, theDepth
     ////////////////////////////////////////
     // setup
     ////////////////////////////////////////
-        
+
     Public.setup = function() {
         Logger.info("Setting up image " + _myName);
-        
+
         if("z" in _myNode) {
             _myDepth += Number(_myNode.z);
         }
@@ -200,15 +200,15 @@ Image.prototype.Constructor = function(Public, theParent, theImageNode, theDepth
         var myFile = CONTENT + "/" + _myNode.file;
         _myMaterial = getCachedImageMaterial(myFile);
         _myMaterial.transparent = true;
- 
+
         _myWidth = _myNode.width;
         _myHeight = _myNode.height;
- 
+
         var myInsensible = true;
         if ("insensible" in _myNode) {
             myInsensible = _myNode.insensible;
         }
-         
+
         _myQuad = createQuad(_myParent, _myName,
                              new Vector2f(_myWidth,_myHeight),
                              new Vector3f(_myNode.x,_myNode.y, _myDepth),
@@ -220,11 +220,11 @@ Image.prototype.Constructor = function(Public, theParent, theImageNode, theDepth
             _myQuad.body.orientation =
                 Quaternionf.createFromEuler(new Vector3f(0,0,radFromDeg(_myNode.angle)));
         }
-         
+
         if ("wrapmode" in _myNode) {
             Public.wrapmode = _myNode.wrapmode;
         }
-    } 
-    
+    }
+
     Public.setup();
 }

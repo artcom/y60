@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -97,7 +97,7 @@ typedef unsigned char VmDataValue;
 namespace y60 {
 
     DEFINE_EXCEPTION(MarchingCubesException, asl::Exception);
-    
+
     const int numSegments = 16;
 
     template <class VoxelT, class OutputPolicy, class SegmentationPolicy>
@@ -106,7 +106,7 @@ namespace y60 {
         friend class ExportShapePolicy<VoxelT, SegmentationPolicy>;
         public:
 
-            MarchingCubes(int theDownSampleRate, bool theCloseAtClippingBoxFlag, 
+            MarchingCubes(int theDownSampleRate, bool theCloseAtClippingBoxFlag,
                           OutputPolicy & theOutputPolicy,
                           SegmentationPolicy & theSegmentizer, CTScan * theVoxelData) :
                 _myOutputPolicy(theOutputPolicy),
@@ -120,13 +120,13 @@ namespace y60 {
                 if ( ! _myVoxelData) {
                     throw MarchingCubesException("CTScan ptr is zero.", PLUS_FILE_LINE);
                 }
-                _myVoxelSize = theVoxelData->getVoxelAspect() * theDownSampleRate; 
+                _myVoxelSize = theVoxelData->getVoxelAspect() * theDownSampleRate;
                 _myLineStride = theVoxelData->getVoxelDimensions()[0];
-                
+
                 _myDimensions[0] = theVoxelData->getVoxelDimensions()[0] / _myDownSampleRate;
                 _myDimensions[1] = theVoxelData->getVoxelDimensions()[1] / _myDownSampleRate;
                 _myDimensions[2] = theVoxelData->getVoxelDimensions()[2] / _myDownSampleRate;
-                
+
                 _myVBox.makeEmpty();
                 _myVBox.extendBy(asl::Vector3i(0, 0, 0));
                 _myVBox.extendBy(asl::Vector3i(_myDimensions[0] - 1,
@@ -166,13 +166,13 @@ namespace y60 {
                 }
             }
             void setMarchSegment(int theSegment) {
-                _myMarchSegment[theSegment] = 1; 
+                _myMarchSegment[theSegment] = 1;
             }
 
             const asl::Vector3i & getDataDimension() const {
                 return _myDimensions;
             }
-            
+
             bool march() {
                 AC_TRACE << "MarchingCubes::march()";
 #ifdef DISABLE_LOGGING
@@ -193,9 +193,9 @@ namespace y60 {
                     kBoxEnd++;
                 }
 
-                AC_TRACE << "Data dimension: X(" << _myDimensions[0] << "), Y(" 
+                AC_TRACE << "Data dimension: X(" << _myDimensions[0] << "), Y("
                     << _myDimensions[1] << "), Z(" << _myDimensions[2] << ")\n";
-                AC_TRACE << "Box           : X[" << iBoxStart << ", " 
+                AC_TRACE << "Box           : X[" << iBoxStart << ", "
                     << iBoxEnd << "], Y[" << jBoxStart;
                 AC_TRACE << ", " << jBoxEnd << "], Z[" << kBoxStart << ", " << kBoxEnd << "]\n";
 
@@ -220,29 +220,29 @@ namespace y60 {
                     _myKCache->reset(-1);
                     int kCubeIndex = 0;
                     if (k < _myVBox[asl::Box3i::MIN][2]) {
-                        kCubeIndex |= BIT_0 | BIT_1 | BIT_2 | BIT_3; 
+                        kCubeIndex |= BIT_0 | BIT_1 | BIT_2 | BIT_3;
                     }
                     if (k >= _myVBox[asl::Box3i::MAX][2]) {
-                        kCubeIndex |= BIT_4 | BIT_5 | BIT_6 | BIT_7; 
+                        kCubeIndex |= BIT_4 | BIT_5 | BIT_6 | BIT_7;
                     }
                     for(j = jBoxStart; j < jBoxEnd; j++) {
                         int jCubeIndex = 0;
                         if (j < _myVBox[asl::Box3i::MIN][1]) {
-                            jCubeIndex |= BIT_0 | BIT_3 | BIT_4 | BIT_7; 
+                            jCubeIndex |= BIT_0 | BIT_3 | BIT_4 | BIT_7;
                         }
                         if (j >= _myVBox[asl::Box3i::MAX][1]) {
-                            jCubeIndex |= BIT_1 | BIT_2 | BIT_5 | BIT_6; 
+                            jCubeIndex |= BIT_1 | BIT_2 | BIT_5 | BIT_6;
                         }
                         // add empty value at iBoxStart-1
-                        if (_myCloseAtClippingBoxFlag) { 
+                        if (_myCloseAtClippingBoxFlag) {
                             int myCubeIndex = kCubeIndex | jCubeIndex
-                                              | BIT_0 | BIT_1 | BIT_4 | BIT_5; 
+                                              | BIT_0 | BIT_1 | BIT_4 | BIT_5;
                             getCubeIndex(iBoxStart-1, j, k, myCubeIndex);
                             if((myCubeIndex > 0) && (myCubeIndex < 255)) {
                                 _mySegmentizer.fillThresholdCube(iBoxStart-1, j, k);
                                 fillVoxelCube(iBoxStart-1, j, k, _myCurrent);
                                 asl::Vector3i myVoxel(iBoxStart-1, j, k);
-                                triangulateVoxel(myCubeIndex, myVoxel, *_myCache[1-myUpperCacheIndex], 
+                                triangulateVoxel(myCubeIndex, myVoxel, *_myCache[1-myUpperCacheIndex],
                                         *_myCache[myUpperCacheIndex], *_myKCache);
                             }
                         }
@@ -252,26 +252,26 @@ namespace y60 {
                             // the rightmost voxels. Visual results are kindof strange. We
                             // could make it check against the myCubeIndex so we at least close
                             // everything we can... but that would still be strange...
-                            int myCubeIndex = kCubeIndex | jCubeIndex; 
+                            int myCubeIndex = kCubeIndex | jCubeIndex;
                             getCubeIndex(i, j, k, myCubeIndex);
                             if((myCubeIndex > 0) && (myCubeIndex < 255)) {
                                 _mySegmentizer.fillThresholdCube(i, j, k);
                                 fillVoxelCube(i, j, k, _myCurrent);
                                 asl::Vector3i myVoxel(i, j, k);
-                                triangulateVoxel(myCubeIndex, myVoxel, *_myCache[1-myUpperCacheIndex], 
+                                triangulateVoxel(myCubeIndex, myVoxel, *_myCache[1-myUpperCacheIndex],
                                         *_myCache[myUpperCacheIndex], *_myKCache);
                             }
                         }
                         // add empty value at iBoxEnd
-                        if (_myCloseAtClippingBoxFlag) { 
+                        if (_myCloseAtClippingBoxFlag) {
                             int myCubeIndex = kCubeIndex | jCubeIndex
-                                | BIT_2 | BIT_3 | BIT_6 | BIT_7; 
+                                | BIT_2 | BIT_3 | BIT_6 | BIT_7;
                             getCubeIndex(iBoxEnd, j, k, myCubeIndex);
                             if((myCubeIndex > 0) && (myCubeIndex < 255)) {
                                 _mySegmentizer.fillThresholdCube(iBoxEnd, j, k);
                                 fillVoxelCube(iBoxEnd, j, k, _myCurrent);
                                 asl::Vector3i myVoxel(iBoxEnd, j, k);
-                                triangulateVoxel(myCubeIndex, myVoxel, *_myCache[1-myUpperCacheIndex], 
+                                triangulateVoxel(myCubeIndex, myVoxel, *_myCache[1-myUpperCacheIndex],
                                         *_myCache[myUpperCacheIndex], *_myKCache);
                             }
                         }
@@ -301,7 +301,7 @@ namespace y60 {
             void checkBox(asl::Box3i & theBox) {
                 std::string myBoxIsBrokenMsg(std::string("MarchingCubes::CheckBox: Wrong box size! ") +
                                 "(Dimension: min: 2x2x2, max: " + asl::as_string(_myDimensions[0]) + "x" +
-                                asl::as_string(_myDimensions[1]) + "x" + asl::as_string( _myDimensions[2]) + ")"+ 
+                                asl::as_string(_myDimensions[1]) + "x" + asl::as_string( _myDimensions[2]) + ")"+
                                 asl::as_string(theBox));
                 if (theBox.isEmpty()) {
                     throw MarchingCubesException(myBoxIsBrokenMsg, PLUS_FILE_LINE);
@@ -316,8 +316,8 @@ namespace y60 {
                 }
             }
 
-            inline void triangulateVoxel(int theCubeIndex, const asl::Vector3i & theMarchPos, 
-                    IJCache & theLowerCache, IJCache & theUpperCache, KCache & theKCache) 
+            inline void triangulateVoxel(int theCubeIndex, const asl::Vector3i & theMarchPos,
+                    IJCache & theLowerCache, IJCache & theUpperCache, KCache & theKCache)
             {
                 std::vector<int> myEdgeTable;
                 myEdgeTable.resize(12, -1);
@@ -326,7 +326,7 @@ namespace y60 {
                 int jMarch = theMarchPos[1];
                 int kMarch = theMarchPos[2];
                 int myPositionIndex;
-                const MCLookup::CubeCase & myCubeCase = _myMCLookup.cubeCases[theCubeIndex]; 
+                const MCLookup::CubeCase & myCubeCase = _myMCLookup.cubeCases[theCubeIndex];
 
                 DB(AC_TRACE << "triangulateVoxel(" << theCubeIndex << ", " << jMarch << "," << iMarch << "," << kMarch << ")");
                 const std::vector<int> & myEdges = myCubeCase.edges;
@@ -402,16 +402,16 @@ namespace y60 {
                 _myOutputPolicy.onHalfEdges(myCubeCase, myEdgeTable);
             }
 
-            inline void 
-            computeGradient(unsigned theCubeIndex, const asl::Vector3i & thePosition, 
-                asl::Vector3f & theGradient, bool theUpperFlag) const 
+            inline void
+            computeGradient(unsigned theCubeIndex, const asl::Vector3i & thePosition,
+                asl::Vector3f & theGradient, bool theUpperFlag) const
             {
                 asl::Vector3i myDoublePos = 2*_myCubeTable[theCubeIndex];
 
                 for (int i = 0; i < 3; ++i) {
                     int myIndex = _myAdjacents[theCubeIndex][i];
                     asl::Vector3i myOffset = myDoublePos - _myCubeTable[myIndex];
-                    theGradient[i] = _mySegmentizer.interpolateNormal(_myCurrent[myIndex], myIndex, 
+                    theGradient[i] = _mySegmentizer.interpolateNormal(_myCurrent[myIndex], myIndex,
                             clampedAt(thePosition + myOffset), thePosition + myOffset, theUpperFlag) / _myVoxelSize[i];
                     if (_myCubeTable[myIndex][i]) {
                         theGradient[i] = -theGradient[i];
@@ -420,8 +420,8 @@ namespace y60 {
                 theGradient.normalize();
             }
 
-            inline void computeVertexPosition (int n, const asl::Vector3i & theMarchPos, 
-                            asl::Point3f & thePosition, asl::Vector3f * theNormal = 0) const 
+            inline void computeVertexPosition (int n, const asl::Vector3i & theMarchPos,
+                            asl::Point3f & thePosition, asl::Vector3f * theNormal = 0) const
             {
                 int iMarch = theMarchPos[0];
                 int jMarch = theMarchPos[1];
@@ -433,7 +433,7 @@ namespace y60 {
                 switch(n) {
                     case 0:
                         li = _mySegmentizer.interpolatePosition(_myCurrent, 0,1, myInsideOutFlag);
-                        
+
                         thePosition[0] = (float)(iMarch) * _myVoxelSize[0];
                         thePosition[1] = ((float)jMarch + li) * _myVoxelSize[1];
                         thePosition[2] = (float)(kMarch) * _myVoxelSize[2];
@@ -445,7 +445,7 @@ namespace y60 {
 
                     case 1:
                         li = _mySegmentizer.interpolatePosition(_myCurrent, 1,2, myInsideOutFlag);
-                        
+
                         thePosition[0] = ((float)iMarch + li) * _myVoxelSize[0];
                         thePosition[1] = (float)(jMarch + 1) * _myVoxelSize[1];
                         thePosition[2] = (float)(kMarch) * _myVoxelSize[2];
@@ -590,30 +590,30 @@ namespace y60 {
             }
 
             /**
-             * Gets a (downsampled) value from the Voxel data. 
+             * Gets a (downsampled) value from the Voxel data.
              */
             inline
-            VoxelT 
+            VoxelT
             at(const asl::Vector3i & thePosition) const {
                 return at(thePosition[0], thePosition[1], thePosition[2]);
             }
 
             /**
-             * Gets a (downsampled) value from the Voxel data. 
+             * Gets a (downsampled) value from the Voxel data.
              */
             inline
-            VoxelT 
+            VoxelT
             at(int x, int y, int z) const {
                 if (_myDownSampleRate == 1) {
                     return _mySlices[z*_myDownSampleRate][(_myLineStride*y + x)*_myDownSampleRate];
-                } else { 
+                } else {
                     int myCount = 0;
                     float myValue = 0.0f;
                     for (int i = 0; i < _myDownSampleRate; ++i) {
                         for (int j = 0; j < _myDownSampleRate; ++j) {
                             for (int k = 0; k < _myDownSampleRate; ++k) {
                                 myCount++;
-                                myValue +=_mySlices[z*_myDownSampleRate+i][_myLineStride* (y*_myDownSampleRate+j)+ 
+                                myValue +=_mySlices[z*_myDownSampleRate+i][_myLineStride* (y*_myDownSampleRate+j)+
                                                     x*_myDownSampleRate+k];
                             }
                         }
@@ -627,19 +627,19 @@ namespace y60 {
              */
             /*
             inline
-            VoxelT 
+            VoxelT
             at(const asl::Vector2i & theOffset) const {
                 return _mySlices[theOffset[1]][theOffset[0]];
             }
             */
             inline
-            VoxelT 
+            VoxelT
             clampedAt(int x, int y, int z) const {
                 return clampedAt(asl::Vector3i(x,y,z));
             }
 
             inline
-            VoxelT 
+            VoxelT
             clampedAt(const asl::Vector3i & thePosition) const {
                 if ((thePosition[0] >= _myVBox[asl::Box3i::MIN][0]) && (thePosition[0] <= _myVBox[asl::Box3i::MAX][0])
                  && (thePosition[1] >= _myVBox[asl::Box3i::MIN][1]) && (thePosition[1] <= _myVBox[asl::Box3i::MAX][1])
@@ -718,14 +718,14 @@ namespace y60 {
                 _myBitMaskTable[4] = BIT_4;
                 _myBitMaskTable[5] = BIT_5;
                 _myBitMaskTable[6] = BIT_6;
-                _myBitMaskTable[7] = BIT_7;                
+                _myBitMaskTable[7] = BIT_7;
                 unsigned int ADJACENTS[8][3] = {{3, 1, 4}, {2, 0, 5}, {1, 3, 6}, {0, 2, 7}, {7, 5, 0}, {6, 4, 1}, {5, 7, 2}, {4, 6, 3}};
                 for (int i = 0; i < 8 * 3; ++i) {
                     _myAdjacents[i/3][i%3] = ADJACENTS[i/3][i%3];
                 }
             }
 
-            inline void 
+            inline void
             getCubeIndex(int theI, int theJ, int theK, int & theBitMask) const {
                 if( ((theBitMask & BIT_0) == 0) && _mySegmentizer.isOutside(theI, theJ, theK, at(theI, theJ, theK))) {
                     theBitMask |= BIT_0;
@@ -787,7 +787,7 @@ namespace y60 {
             /// first coordinate is the voxel id in the cube, the second coordiate
             /// is the axis (i,j,k).
             /// i.E.: _myAdjacents[3][1] tells us the neighbor voxel of voxel 3 in j direction
-            unsigned int                 _myAdjacents[8][3]; 
+            unsigned int                 _myAdjacents[8][3];
 
     };
 

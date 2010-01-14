@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -176,7 +176,7 @@ namespace y60 {
 
         // enable vertex arrays
         glEnableClientState(GL_VERTEX_ARRAY);
-        
+
         glEnable(GL_MULTISAMPLE_ARB);
     }
 
@@ -214,8 +214,8 @@ namespace y60 {
     }
 
     bool
-    Renderer::switchMaterial(const Viewport & theViewport, 
-                             const MaterialBase & theMaterial, 
+    Renderer::switchMaterial(const Viewport & theViewport,
+                             const MaterialBase & theMaterial,
                              bool isOverlay) {
         if (_myPreviousMaterial == &theMaterial) {
             return false;
@@ -240,7 +240,7 @@ namespace y60 {
             // The renderer should just take the scene information and render it as it is.
             // Right now in Shader.activate() the material representation is updated.
             // The scene should be responsible for that.
-            if (myShader) { 
+            if (myShader) {
                 myShader->activate(const_cast<MaterialBase &>(theMaterial), theViewport, _myPreviousMaterial);
             } else {
                 AC_ERROR << "Material has no shader, material id = " << theMaterial.get<IdTag>();
@@ -377,7 +377,7 @@ namespace y60 {
         DBP2(START_TIMER(renderBodyPart_materialChanged));
         glMatrixMode( GL_TEXTURE );
         for (unsigned myTexUnit = 0; myTexUnit < myMaterial.getTextureUnitCount(); ++myTexUnit) {
-            glActiveTexture(asGLTextureRegister(myTexUnit));                
+            glActiveTexture(asGLTextureRegister(myTexUnit));
             glPushMatrix();
         }
         glMatrixMode( GL_MODELVIEW );
@@ -1003,7 +1003,7 @@ namespace y60 {
             }
 
             myFacade = theNode->tryGetFacade<TransformHierarchyFacade>();
-            
+
             // skip non-hierarchy nodes
             if (!myFacade) {
                 DB(AC_TRACE << "createRenderList: no transform return");
@@ -1018,15 +1018,15 @@ namespace y60 {
         }
         // Once we collect a body we want to do billboarding, so every following step has the
         // right globalmatrix
-        
-        if (theNode->nodeName() == BODY_NODE_NAME) {        
+
+        if (theNode->nodeName() == BODY_NODE_NAME) {
             Body & myBody = *(dynamic_cast_Ptr<Body>(myFacade));
 
             // do the billboarding here
             if (myBody.get<BillboardTag>() == AXIS_BILLBOARD) {
                 DBP(MAKE_GL_SCOPE_TIMER(update_billboards));
                 Matrix4f myBillboardTransform = myBody.get<GlobalMatrixTag>();
-                
+
                 // calculate absolute scale of transform hierarchy:
                 Vector3f myCurScale = myBody.get<ScaleTag>();
                 const dom::Node* myCurNode = myBody.getNode().parentNode();
@@ -1038,14 +1038,14 @@ namespace y60 {
                 Vector3f myFinalInverseScale(1.0f/myCurScale[0], 1.0f/myCurScale[1], 1.0f/myCurScale[2]);
                 Matrix4f myBillboardMatrix = myBody.get<GlobalMatrixTag>();
                 myBillboardMatrix.scale(myFinalInverseScale);
-                
+
                 float myRotation = getBillboardRotationY(myBillboardMatrix,
                         theCamera->get<GlobalMatrixTag>());
                 Matrix4f myLocalRotation;
                 myLocalRotation.makeRotating(Vector3f(0,1,0),myRotation);
                 myLocalRotation.postMultiply(myBillboardTransform);
                 myBody.set<GlobalMatrixTag>(myLocalRotation);
-            } else if (myBody.get<BillboardTag>() == POINT_BILLBOARD) {                                                               
+            } else if (myBody.get<BillboardTag>() == POINT_BILLBOARD) {
                 // calculate absolute scale of transform hierarchy:
                 Vector3f myCurScale = myBody.get<ScaleTag>();
                 const dom::Node* myCurNode = myBody.getNode().parentNode();
@@ -1057,32 +1057,32 @@ namespace y60 {
                 Vector3f myFinalInverseScale(1.0f/myCurScale[0], 1.0f/myCurScale[1], 1.0f/myCurScale[2]);
                 Matrix4f myBillboardMatrix = myBody.get<GlobalMatrixTag>();
                 myBillboardMatrix.scale(myFinalInverseScale);
-                
+
                 // transform camera into billboard space
                 myBillboardMatrix.invert();
-                Matrix4f myCameraMatrix = theCamera->get<GlobalMatrixTag>();            
+                Matrix4f myCameraMatrix = theCamera->get<GlobalMatrixTag>();
                 myCameraMatrix.postMultiply(myBillboardMatrix);
-                
+
                 // calculate billboard transform matrix
                 Vector4f myCamUpVector    = myCameraMatrix.getRow(1);
                 Vector3f myCamUpVector3(myCamUpVector[0], myCamUpVector[1], myCamUpVector[2]);
                 Vector4f myCamViewVector  = myCameraMatrix.getRow(2);
                 Vector3f myCamViewVector3(myCamViewVector[0], myCamViewVector[1], myCamViewVector[2]);
                 Vector3f myRightVec       = cross(myCamUpVector3, myCamViewVector3);
-                
+
                 Matrix4f myScreenAlignedMatrix;
                 myScreenAlignedMatrix.assign(myRightVec[0], myRightVec[1], myRightVec[2], 0,
                         myCamUpVector[0],myCamUpVector[1],myCamUpVector[2], 0,
                         myCamViewVector[0],myCamViewVector[1],myCamViewVector[2], 0,
                         0,0,0,1, ROTATING);
-    
+
                 Matrix4f myBillboardTransform = myBody.get<GlobalMatrixTag>();
                 myScreenAlignedMatrix.postMultiply(myBillboardTransform);
-                    
-                myBody.set<GlobalMatrixTag>(myScreenAlignedMatrix);   
-            }            
+
+                myBody.set<GlobalMatrixTag>(myScreenAlignedMatrix);
+            }
         }
-        
+
         // Check culling
         bool myOverlapFrustumFlag = true;
         const Frustum & myFrustum = theCamera->get<FrustumTag>();
@@ -1096,7 +1096,7 @@ namespace y60 {
                     DB(AC_TRACE << "createRenderList: cull return";)
                     return;
                 }
-            } 
+            }
         }
 
         // Collect clipping planes and scissoring
@@ -1130,7 +1130,7 @@ namespace y60 {
             const_cast<Shape&>(myShape).set<LastActiveFrameTag>(_myFrameNumber);
             const y60::PrimitiveVector & myPrimitives = myShape.getPrimitives();
 
-            Matrix4f myTransform = myBody.get<GlobalMatrixTag>();                                                                
+            Matrix4f myTransform = myBody.get<GlobalMatrixTag>();
             myTransform.postMultiply(theEyeSpaceTransform);
             double myFarPlane = myFrustum.getFar();
             double myNearPlane = myFrustum.getNear();
@@ -1237,8 +1237,8 @@ namespace y60 {
 
         // This prevents translucent pixels from being drawn. This way the
         // background can shine through.
-        if (!theViewport->get<ViewportAlphaTestTag>() 
-            || theViewport->get<ViewportDrawGlowTag>()) 
+        if (!theViewport->get<ViewportAlphaTestTag>()
+            || theViewport->get<ViewportDrawGlowTag>())
         {
             glDisable(GL_ALPHA_TEST);
         } else {
@@ -1257,7 +1257,7 @@ namespace y60 {
         MAKE_GL_SCOPE_TIMER(render);
         _myRenderedUnderlays = false;
         ++_myFrameNumber;
-        
+
         // Setup viewport, parameters are in screen space
         glViewport(theViewport->get<ViewportLeftTag>(), theViewport->getLower(),
                    theViewport->get<ViewportWidthTag>(), theViewport->get<ViewportHeightTag>());
@@ -1288,7 +1288,7 @@ namespace y60 {
             CameraPtr myCamera = myCameraNode->getFacade<Camera>();
             bindViewMatrix(myCamera);
             CHECK_OGL_ERROR;
-            
+
             myWorld = myCamera->getWorld();
             WorldPtr myWorldFacade = myWorld->getFacade<World>();
 
@@ -1322,7 +1322,7 @@ namespace y60 {
                     createRenderList(myWorldFacade, myWorld, myBodyParts, myCamera,
                             myEyeSpaceTransform, theViewport, true, std::vector<asl::Planef>(),
                             myScissorBox);
-                    DB(AC_TRACE << "created Renderlist, size = "<< myBodyParts.size()); 
+                    DB(AC_TRACE << "created Renderlist, size = "<< myBodyParts.size());
                 }
 
                 // (3) render skybox
@@ -1353,8 +1353,8 @@ namespace y60 {
                     //int i = 0;
                     bool currentMaterialHasAlpha = false;
                     for (BodyPartMap::const_iterator it = myBodyParts.begin(); it != myBodyParts.end(); ++it) {
-                        if (theViewport->get<ViewportAlphaTestTag>() 
-                            && !currentMaterialHasAlpha && it->first.getTransparencyFlag()) 
+                        if (theViewport->get<ViewportAlphaTestTag>()
+                            && !currentMaterialHasAlpha && it->first.getTransparencyFlag())
                         {
                             glEnable(GL_ALPHA_TEST);
                             currentMaterialHasAlpha = true;
@@ -1380,7 +1380,7 @@ namespace y60 {
             }
         }
 
-        
+
         {
             MAKE_GL_SCOPE_TIMER(renderOverlays);
             renderOverlays(*theViewport, OVERLAY_LIST_NAME);
@@ -1413,7 +1413,7 @@ namespace y60 {
         //AC_PRINT << "Renderer::setProjection(): setting proj matrix to " << myProjectionMatrix << endl;
         glLoadMatrixf(static_cast<const GLfloat *>(myProjectionMatrix.getData()));
         if (theViewport->get<ViewportOrientationTag>()
-            == PORTRAIT_ORIENTATION) 
+            == PORTRAIT_ORIENTATION)
         {
             asl::Matrix4f myRotationMatrix;
             myRotationMatrix.makeZRotating(-float(asl::PI_2));
@@ -1841,9 +1841,9 @@ namespace y60 {
         glMatrixMode(GL_MODELVIEW);
 
         glPopAttrib();
-        
+
         _myState->setBackfaceCulling(theViewport.get<ViewportBackfaceCullingTag>());
-        
+
         _myRenderedUnderlays = true;
     }
 
@@ -2007,7 +2007,7 @@ namespace y60 {
         CHECK_OGL_ERROR;
     }
 #if 0
-    void 
+    void
     Renderer::renderAnalyticGeometry( ViewportPtr theViewport, CameraPtr theCamera) {
         const Frustum & myFrustum = theCamera->get<FrustumTag>();
         bool myOverlapFrustumFlag = true;
@@ -2050,7 +2050,7 @@ namespace y60 {
         }
     }
 #else
-    void 
+    void
     Renderer::renderAnalyticGeometry(ViewportPtr theViewport, CameraPtr theCamera) {
         const Frustum & myFrustum = theCamera->get<FrustumTag>();
         bool myOverlapFrustumFlag = true;
@@ -2071,7 +2071,7 @@ namespace y60 {
         std::vector<PointPtr> myPoints = mySceneNode.getAllFacades<Point>(POINT_NODE_NAME);
         for (unsigned i = 0; i < myPoints.size();++i) {
             PointPtr & myFacade = myPoints[i];
-            if (!theViewport->get<ViewportCullingTag>() || !myFacade->get<CullableTag>() || 
+            if (!theViewport->get<ViewportCullingTag>() || !myFacade->get<CullableTag>() ||
                     intersection(myFacade->get<BoundingBoxTag>(), myFrustum, myOverlapFrustumFlag)) {
                 draw( asVector(myFacade->get<GlobalPointTag>()), myFacade->get<ColorTag>(), myMatrix, myFacade->get<AG::PointSizeTag>(), "");
             }
@@ -2080,7 +2080,7 @@ namespace y60 {
         std::vector<VectorPtr> myVectors = mySceneNode.getAllFacades<Vector>(VECTOR_NODE_NAME);
         for (unsigned i = 0; i < myVectors.size();++i) {
             VectorPtr & myFacade = myVectors[i];
-            if (!theViewport->get<ViewportCullingTag>() || !myFacade->get<CullableTag>() || 
+            if (!theViewport->get<ViewportCullingTag>() || !myFacade->get<CullableTag>() ||
                     intersection(myFacade->get<BoundingBoxTag>(), myFrustum, myOverlapFrustumFlag)) {
                 asl::LineSegment<float> myLineSegment( myFacade->get<GlobalMatrixTag>().getTranslation(), myFacade->get<GlobalVectorTag>() );
                 draw( myLineSegment, myFacade->get<ColorTag>(), myMatrix, myFacade->get<AG::LineWidthTag>(), "");
@@ -2088,7 +2088,7 @@ namespace y60 {
             }
         }
     }
-    
+
 #endif
 
 

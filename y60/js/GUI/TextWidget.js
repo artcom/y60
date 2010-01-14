@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -60,7 +60,7 @@ function TextWidget() {
 }
 
 TextWidget.prototype.Constructor = function(Public, Protected, theParent, theTextWidgetNode, theDepth) {
-    
+
     ////////////////////////////////////////
     // Member
     ////////////////////////////////////////
@@ -151,7 +151,7 @@ TextWidget.prototype.Constructor = function(Public, Protected, theParent, theTex
     Protected.redraw = function() {
         var mySurface = new CairoSurface(_myImage);
         var myContext = new Cairo(mySurface);
-        
+
         Protected.cairoSurface   = mySurface;
         Protected.cairoContext   = myContext;
         Protected.cursorPosition = drawText();
@@ -159,12 +159,12 @@ TextWidget.prototype.Constructor = function(Public, Protected, theParent, theTex
         Protected.draw();
 
         mySurface.triggerUpload();
-        
+
         Protected.cairoSurface   = null;
         Protected.cairoContext   = null;
         Protected.cursorPosition = null;
     }
-    
+
     Protected.draw = function() {
         var mySurface = Protected.cairoSurface;
         var myContext = Protected.cairoContext;
@@ -189,18 +189,18 @@ TextWidget.prototype.Constructor = function(Public, Protected, theParent, theTex
              myContext.setSourceSurface(myBackground,myOffsetX,myOffsetY);
              myContext.rectangle(myOffsetX,myOffsetY,myBackgroundWidth,myBackgroundHeight);
              myContext.fill();
-        } else { 
+        } else {
              var myLeft = new CairoSurface(_myLeft);
              myContext.setSourceSurface(myLeft,0,0);
              myContext.rectangle(0,0,_myLeft.raster.width, _myHeight);
              myContext.fill();
-             
+
              var myRight = new CairoSurface(_myRight);
              var myRightOffset = _myTextX + myCursor[0] + (_myTextX-_myLeft.raster.width);
              myContext.setSourceSurface(myRight,myRightOffset,0);
              myContext.rectangle(myRightOffset, 0, _myRight.raster.width, _myHeight);
              myContext.fill();
-             
+
              var myBetween = new CairoSurface(_myBetween);
              var myBetweenPattern = new CairoPattern(myBetween);
              myBetweenPattern.setExtend(Cairo.EXTEND_REPEAT);
@@ -226,7 +226,7 @@ TextWidget.prototype.Constructor = function(Public, Protected, theParent, theTex
     function drawText() {
         textToImage(_myTextImage, _myText, _myTextStyle, new Vector2f(_myTextSurfaceWidth, _myTextHeight));
         saveImage(_myTextImage, "tmp.png");
-        
+
         window.scene.images.removeChild(_myTextImage);
         _myTextSurface = new CairoSurface("tmp.png");
         var myCursor = window.getTextCursorPosition();
@@ -236,7 +236,7 @@ TextWidget.prototype.Constructor = function(Public, Protected, theParent, theTex
     ////////////////////////////////////////
     // setup
     ////////////////////////////////////////
-        
+
     Protected.setup = function() {
         // background images
         if("leftImage" in _myNode && "rightImage" in _myNode && "betweenImage" in _myNode) {
@@ -250,7 +250,7 @@ TextWidget.prototype.Constructor = function(Public, Protected, theParent, theTex
             _myBackground = getCachedImage(CONTENT + "/" + _myNode.backgroundImage);
             _myBackground.resize = "none";
         }
-        
+
         if("z" in _myNode) {
             _myDepth += Number(_myNode.z);
         }
@@ -259,7 +259,7 @@ TextWidget.prototype.Constructor = function(Public, Protected, theParent, theTex
         _myTextImage = Modelling.createImage(window.scene, _myTextSurfaceWidth, _myTextHeight, "RGBA");
         _myTextImage.name = _myName + "-text";
         _myTextImage.resize = "none";
-        
+
         // our texture
         _myImage = Modelling.createImage(window.scene, _myWidth, _myHeight, "BGRA");
         _myImage.name = _myName + "-surface";
@@ -268,12 +268,12 @@ TextWidget.prototype.Constructor = function(Public, Protected, theParent, theTex
         // our material
         _myMaterial = Modelling.createUnlitTexturedMaterial(window.scene, _myImage, true);
         _myMaterial.transparent = true;
-        
+
         print(_myMaterial);
         print(_myMaterial.childNode("textureunits").firstChild.texture);
         // _myImage.resize = "none";
         // _myImage.wrapmode = "clamp";
-        
+
         // our body and shape
         _myQuad = createQuad(theParent, _myName, new Vector2f(_myWidth, _myHeight),
                              new Vector3f(_myNode.x, _myNode.y, _myDepth),
@@ -285,5 +285,5 @@ TextWidget.prototype.Constructor = function(Public, Protected, theParent, theTex
 
         // do a redraw
         Protected.redraw();
-    }  
+    }
 }

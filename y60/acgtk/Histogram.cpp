@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -131,26 +131,26 @@ Histogram::on_realize() {
 }
 
 /*
-bool 
+bool
 Histogram::on_button_press_event(GdkEventButton * theEvent) {
     //cerr << "Histogram::on_button_press_event()" << endl;
     _myLogarithmicScaleFlag = ! _myLogarithmicScaleFlag;
     queue_draw();
     return true;
 }
-bool 
+bool
 Histogram::on_button_release_event(GdkEventButton * theEvent) {
     //cerr << "Histogram::on_button_release_event()" << endl;
     return true;
 }
 
-bool 
+bool
 Histogram::on_motion_notify_event(GdkEventMotion * theEvent) {
     return true;
 }
 */
 
-void 
+void
 Histogram::on_size_request(Gtk::Requisition* requisition)
 {
   *requisition = Gtk::Requisition();
@@ -161,7 +161,7 @@ Histogram::on_size_request(Gtk::Requisition* requisition)
   requisition->width = 257;
 }
 
-bool 
+bool
 Histogram::on_configure_event(GdkEventConfigure * theEvent) {
     //cerr << "Histogram::on_configure_event()" << endl;
     DrawingArea::on_configure_event(theEvent);
@@ -182,14 +182,14 @@ Histogram::on_expose_event(GdkEventExpose * theEvent) {
 
     // TODO: handle myBarWidth < 1.0
     float myBarWidth = float(myWidth) / myBinCount;
-    
+
     Glib::RefPtr<Gdk::GC> myGC = get_style()->get_black_gc();
 
     unsigned myCount;
     // AC_WARNING << "drawing " << _myBins.size() << " bins, value range is " << _myValueRange;
     for (unsigned i = 0; i < _myBins.size(); ++i) {
         myCount = convertSampleCountToScreenPos(_myBins[i], _myMaxCount);
-        _myWindow->draw_rectangle(myGC, true, int(i * myBarWidth), myHeight - myCount, 
+        _myWindow->draw_rectangle(myGC, true, int(i * myBarWidth), myHeight - myCount,
                 int(ceilf(myBarWidth)), myCount);
     }
 
@@ -227,14 +227,14 @@ Histogram::rebuildBins() {
     if (myWidth < _mySampleData.size()) {
         _myBins.clear();
         _myBins.resize(myWidth);
-        
+
         // set up some pointers to simulate paintlib's linearray
-        unsigned int * mySrcLinePtr = (&_mySampleData[0]); 
-        unsigned int * myDestLinePtr = (&_myBins[0]); 
+        unsigned int * mySrcLinePtr = (&_mySampleData[0]);
+        unsigned int * myDestLinePtr = (&_myBins[0]);
         // PLGaussianContribDef f;
         PLBilinearContribDef f(2.0);
         C2PassScale <CData_UnsignedInt> sS(f);
-        // and start it 
+        // and start it
         sS.Scale( (CData_UnsignedInt::_RowType*)(&mySrcLinePtr), _mySampleData.size(), 1,
                   (CData_UnsignedInt::_RowType*)(&myDestLinePtr), _myBins.size(), 1);
     } else {
@@ -254,12 +254,12 @@ Histogram::findMaxCount() {
     return int( 1.1 * myMax); // make 10% headroom
 }
 
-int 
+int
 Histogram::convertSampleCountToScreenPos(int theSampleCount, int theMaxSampleCount) {
     int myHeight   = get_allocation().get_height();
     if (theMaxSampleCount == 0) {
         return myHeight / 2;
-    } 
+    }
     if (_myLogarithmicScaleFlag) {
         return int( log( float(theSampleCount)) * myHeight / log(float(theMaxSampleCount)));
     } else {
@@ -267,13 +267,13 @@ Histogram::convertSampleCountToScreenPos(int theSampleCount, int theMaxSampleCou
     }
 }
 
-void 
+void
 Histogram::setHistogram(const std::vector<unsigned> & theSamples) {
     _mySampleData = theSamples;
     rebuildBins();
     queue_draw();
 }
-void 
+void
 Histogram::setShowWindow(bool theFlag) {
     _myDrawWindowFlag = theFlag;
     queue_draw();
@@ -295,31 +295,31 @@ Histogram::getShowWindowCenter() const {
     return _myDrawCenterFlag;
 }
 
-void 
+void
 Histogram::setWindowCenter(float theValue) {
     _myWindowCenter = theValue;
     queue_draw();
 }
 
-void 
+void
 Histogram::setWindowWidth(float theValue) {
     _myWindowWidth = theValue;
     queue_draw();
 }
 
-void 
+void
 Histogram::setLower(float theValue) {
     _myLower = theValue;
     queue_draw();
 }
 
-void 
+void
 Histogram::setUpper(float theValue) {
     _myUpper = theValue;
     queue_draw();
 }
 
-void 
+void
 Histogram::setValueRange(const asl::Vector2f & theRange) {
     _myValueRange = theRange;
 }
@@ -329,7 +329,7 @@ Histogram::getValueRange() const {
     return _myValueRange;
 }
 
-void 
+void
 Histogram::setLogarithmicScale(bool theFlag) {
     _myLogarithmicScaleFlag = theFlag;
     queue_draw();
@@ -340,7 +340,7 @@ Histogram::getLogarithmicScale() const {
     return _myLogarithmicScaleFlag;
 }
 
-int 
+int
 Histogram::convertValueToScreenPos(const float & theValue) {
     int myWidth = get_allocation().get_width();
     return int((theValue - _myValueRange[0])* float(myWidth) / (_myValueRange[1] - _myValueRange[0]));

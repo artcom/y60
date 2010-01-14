@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -113,7 +113,7 @@ function buildMaterialNode(theMaterialName,
     myMaterialNode.name = theMaterialName;
 
     var myMaterialParent = window.scene.dom.find("//materials");
-    
+
     myMaterialParent.appendChild(myMaterialNode);
 
     if (theDiffuseColor == undefined) {
@@ -140,7 +140,7 @@ function buildMaterialNode(theMaterialName,
             '</textureunits>';
         var myTexturesDoc = new Node(myTexturesString);
         var myTexturesNode = myTexturesDoc.firstChild;
-        myMaterialNode.appendChild(myTexturesNode);        
+        myMaterialNode.appendChild(myTexturesNode);
     }
 
     return myMaterialNode;
@@ -161,7 +161,7 @@ function buildUnlitTextureMaterialNode(theName, theTextureId) {
     myMaterialNode.id = createUniqueId(); //"m" + theName;
     myMaterialNode.name = theName;
     var myMaterialParent = window.scene.dom.find("//materials");
-    
+
     myMaterialParent.appendChild(myMaterialNode);
     var myTextureFeatures = new Node('<feature name="textures">[10[]]</feature>\n').firstChild;
     myMaterialNode.requires.appendChild(myTextureFeatures);
@@ -242,7 +242,7 @@ function addMaterialRequirement(theMaterialNode, theRequirementClass, theRequire
     var myRequirementDoc = new Node(myRequirementString);
     var myRequirementNode = myRequirementDoc.childNodes[0];
     var myRequiresDocNode = theMaterialNode.find("requires");
-    
+
     if (!myRequiresDocNode) {
         var myRequiresString = "<requires/>";
         var myRequiresDoc = new Node(myRequiresString);
@@ -257,7 +257,7 @@ function removeMaterialRequirement(theMaterialNode, theRequirementClass) {
     var myRequiresDocNode = theMaterialNode.find("requires");
 
     if (myRequiresDocNode) {
-        var myRequirement = myRequiresDocNode.find(".//*[@name='" + 
+        var myRequirement = myRequiresDocNode.find(".//*[@name='" +
                                                    theRequirementClass +
                                                    "']");
         myRequiresDocNode.removeChild(myRequirement);

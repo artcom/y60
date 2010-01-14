@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -92,7 +92,7 @@ class Statistic {
     public:
        Statistic() : time(0.0f), counter(0) {}
        double time;
-       int counter; 
+       int counter;
 };
 
 #endif
@@ -101,22 +101,22 @@ class TerrainTexGen
 {
 public:
     TerrainTexGen (const TextureDefinitionMap & myTextureMap,
-            double myBlendRadius, PLAnyBmp * myIndexBmp, 
+            double myBlendRadius, PLAnyBmp * myIndexBmp,
             PLAnyBmp * myAttenuationMapBmp, int myScale);
     TerrainTexGen (const TextureDefinitionMap & myTextureMap, const dom::Node& myMapNode,
             int myScale);
 
     virtual ~TerrainTexGen();
-    void createTexture (const PLPoint& resultSize, 
+    void createTexture (const PLPoint& resultSize,
                         PLBmp & resultBmp) const;
-    void createPartialTexture (const PLRect& srcRect, 
+    void createPartialTexture (const PLRect& srcRect,
                                const PLPoint resultSize, PLBmp & resultBmp) const;
 
     void createMipmaps ();
-    void reallyCreateTexture (const PLRect& srcRect, 
-                              const PLPoint& resultSize, 
+    void reallyCreateTexture (const PLRect& srcRect,
+                              const PLPoint& resultSize,
                               PLBmp & resultBmp);
-    void getTexture (const PLRect& srcRect, const PLPoint& resultSize, 
+    void getTexture (const PLRect& srcRect, const PLPoint& resultSize,
             PLBmp & resultBmp);
 
   private:
@@ -127,15 +127,15 @@ public:
     // Initialization.
     TextureDefinition * loadTextureDefinition (const dom::Node & myNode, int * theIndex);
     void init();
-//    void initTextures (const xml::Node &myTextureNode, 
+//    void initTextures (const xml::Node &myTextureNode,
 //            const string& myDirectory);
-    void loadBitmap (const dom::Node &myIndexNode, 
+    void loadBitmap (const dom::Node &myIndexNode,
         const std::string& myFileName, PLBmp* myBmp);
 
     // Algorithm
-    TextureDefinition * getSafeTextureDefinition (int x, int y, 
+    TextureDefinition * getSafeTextureDefinition (int x, int y,
                                                   double theScaleFactor) const;
-    void createNonBlendArea (const PLRect & theArea, 
+    void createNonBlendArea (const PLRect & theArea,
             const TextureDefinition * theTextureDefinition,
             const PLPoint & theTileOffset,
             PLBmp& resultBmp) const;
@@ -144,20 +144,20 @@ public:
             const PLRect & theBlendRect,
             const PLPoint & theTileOffset,
             PLBmp & resultBmp) const;
-    void createBlendedTile (const PLPoint& theSrcOffset, 
-            const PLPoint& theTilePos, 
+    void createBlendedTile (const PLPoint& theSrcOffset,
+            const PLPoint& theTilePos,
             double theXScaleFactor,
             double theYScaleFactor,
             PLBmp & resultBmp) const;
     void createLargeTexture (const PLRect& srcRect,
             double theXScaleFactor,
-            double theYScaleFactor,  
+            double theYScaleFactor,
             PLBmp & resultBmp) const;
     void createSmallTexture (const PLRect& srcRect,
             const PLPoint& resultSize,
             PLBmp & resultBmp) const;
     void createPalette () const;
-    void applyAttenuationMap (const PLRect& srcRect, const PLPoint& resultSize, 
+    void applyAttenuationMap (const PLRect& srcRect, const PLPoint& resultSize,
         PLBmp & resultBmp) ;
     void dumpRect (const std::string& myName, const PLRect& myRect);
 
@@ -166,15 +166,15 @@ public:
 
     double _myBlendRadius;
 
-    PLAnyBmp* _myIndexBmp;  
-    PLAnyBmp* _myAttenuationMapBmp;    
-    
+    PLAnyBmp* _myIndexBmp;
+    PLAnyBmp* _myAttenuationMapBmp;
+
     std::vector<PLBmp*> _myMipMaps;
     int                 _myScale;
     double              _myLightingFactor;
 
     mutable int                 _myLastTextureIndex;
-    mutable TextureDefinition * _myLastTextureDefinition;    
+    mutable TextureDefinition * _myLastTextureDefinition;
 
 #ifdef TEXGEN_GENERATE_STATISTICS
     mutable std::map<int, Statistic> _myStatisticMap;

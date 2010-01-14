@@ -16,7 +16,7 @@ namespace fs = boost::filesystem;
 struct load_error_reporter :
     error_reporter<load_error_reporter>
 {
-    load_error_reporter(JSContext * cx) : 
+    load_error_reporter(JSContext * cx) :
         y60::ape::error_reporter<load_error_reporter>(cx) {}
 
     static
@@ -33,7 +33,7 @@ struct load_error_reporter :
         }
 
         previous_(cx, msg, report);
-        
+
     }
 };
 
@@ -107,7 +107,7 @@ get_namespace(JSContext * cx, JSObject * global, fs::path const& path) {
 
 const char * const init_filename = "__init__.js";
 
-//static bool load(Object & global, arg_array & arguments, value & rval) 
+//static bool load(Object & global, arg_array & arguments, value & rval)
 static
 JSBool
 load(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {

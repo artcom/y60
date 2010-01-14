@@ -33,15 +33,15 @@ public:
 	virtual unsigned char* getFrame() = 0;
 	virtual bool stopCamera() = 0;
 	virtual bool resetCamera() = 0;
-	virtual bool closeCamera() = 0;	
+	virtual bool closeCamera() = 0;
 	virtual bool stillRunning() = 0;
 	virtual void showSettingsDialog() = 0;
-		
+
 	int getFps() { return fps; }
 	int getWidth() { return width; }
 	int getHeight() { return height; }
 	char* getName() { return cameraName; }
-	
+
 protected:
 	int cameraID;
 	char* cameraName;
@@ -52,12 +52,12 @@ protected:
 
 	unsigned char* buffer;
 	int bytes;
-	
+
 	int width;
 	int height;
 	int fps;
 	bool colour;
-	
+
 	void uyvy2gray(int width, int heigth, unsigned char *src, unsigned char *dest) {
 				for(int y=0;y<height;y++) {
 					for(int x=0;x<width/2;++x) {
@@ -68,9 +68,9 @@ protected:
 					}
 				}
 	}
-	
+
 	void uyvy2rgb(int width, int height, unsigned char *src, unsigned char *dest) {
-	
+
 			/*int R,G,B;
 			int Y[2];
 			int U,V;
@@ -81,23 +81,23 @@ protected:
 					Y[0] = *src++;
 					V    = *src++ -128;
 					Y[1] = *src++;
-										
+
 					// conversion
-					for (int i=0;i<2;i++) {	
+					for (int i=0;i<2;i++) {
 						R = (int)(Y[i] + 1.370705f * V);					//R
 						G = (int)(Y[i] - 0.698001f * V - 0.337633f * U);	//G
 						B = (int)(Y[i] + 1.732446f * U);					//B
-						
+
 						SAT(R);
 						SAT(G);
 						SAT(B);
-	
+
 						*dest++ = R;
 						*dest++ = G;
 						*dest++ = B;
 					}
 				}
-			}*/			
+			}*/
 
 			int R,G,B;
 			int Y[2];
@@ -107,29 +107,29 @@ protected:
 				for(int x=0;x<width/2;x++) {
 					cB   = ((*src - 128) * 454) >> 8;
 					cG   = (*src++ - 128) * 88;
-					Y[0] = *src++;  
+					Y[0] = *src++;
 					cR   = ((*src - 128) * 359) >> 8;
 					cG   = (cG + (*src++ - 128) * 183) >> 8;
 					Y[1] = *src++;
-					
+
 					// conversion
-					for (int i=0;i<2;i++) {	
+					for (int i=0;i<2;i++) {
 
 						R = Y[i] + cR;
 						G = Y[i] + cG;
 						B = Y[i] + cB;
-						
+
 						SAT(R);
 						SAT(G);
 						SAT(B);
-	
+
 						*dest++ = R;
 						*dest++ = G;
 						*dest++ = B;
 					}
 				}
-			}		
-	
+			}
+
 	};
 };
 

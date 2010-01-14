@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -107,7 +107,7 @@ namespace y60 {
         dom::FacadeAttributePlug<LastActiveFrameTag>(this),
         _myResourceManager(0),
         _myRefCount(0),
-        _myTextureId(0), 
+        _myTextureId(0),
         _myPixelBufferId(0),
         _myImageNodeVersion(0)
     {
@@ -152,10 +152,10 @@ namespace y60 {
     Texture::registerDependenciesForTextureUpdate() {
         if (getNode()) {
 #ifdef BAD_TX
-            TextureIdTag::Plug::dependsOn<TextureImageTag>(*this);  
+            TextureIdTag::Plug::dependsOn<TextureImageTag>(*this);
 #endif
-            TextureIdTag::Plug::dependsOn<TextureColorBiasTag>(*this);  
-            TextureIdTag::Plug::dependsOn<TextureColorScaleTag>(*this); 
+            TextureIdTag::Plug::dependsOn<TextureColorBiasTag>(*this);
+            TextureIdTag::Plug::dependsOn<TextureColorScaleTag>(*this);
             TextureIdTag::Plug::dependsOn<TextureMipmapTag>(*this);
             TextureIdTag::Plug::dependsOn<TextureInternalFormatTag>(*this);
             //TextureIdTag::Plug::getValuePtr()->setCalculatorFunction(
@@ -164,11 +164,11 @@ namespace y60 {
     }
 
     void
-    Texture::registerDependenciesForTextureWidthUpdate() {        
+    Texture::registerDependenciesForTextureWidthUpdate() {
         AC_TRACE << "Texture::registerDependenciesForTextureWidthUpdate";
         if (getNode()) {
 #ifdef BAD_TX
-            TextureWidthTag::Plug::dependsOn<TextureImageTag>(*this);  
+            TextureWidthTag::Plug::dependsOn<TextureImageTag>(*this);
 #endif
             /*TextureWidthTag::Plug::getValuePtr()->setCalculatorFunction(
                 dynamic_cast_Ptr<Texture>(getSelf()), &Texture::calculateWidth);*/
@@ -176,11 +176,11 @@ namespace y60 {
     }
 
     void
-    Texture::registerDependenciesForTextureHeightUpdate() {        
+    Texture::registerDependenciesForTextureHeightUpdate() {
         AC_TRACE << "Texture::registerDependenciesForTextureHeightUpdate";
         if (getNode()) {
 #ifdef BAD_TX
-            TextureHeightTag::Plug::dependsOn<TextureImageTag>(*this);  
+            TextureHeightTag::Plug::dependsOn<TextureImageTag>(*this);
 #endif
             /*TextureHeightTag::Plug::getValuePtr()->setCalculatorFunction(
                 dynamic_cast_Ptr<Texture>(getSelf()), &Texture::calculateHeight);*/
@@ -238,7 +238,7 @@ namespace y60 {
         AC_TRACE << "Texture::ensureResourceManager '" << get<NameTag>() << "' _myResourceManager=" << (void*)_myResourceManager;
         if (_myResourceManager == 0) {
             if (getNode()) {
-                IScenePtr myScene = getNode().parentNode()->parentNode()->getFacade<IScene>();                
+                IScenePtr myScene = getNode().parentNode()->parentNode()->getFacade<IScene>();
                 _myResourceManager = myScene->getResourceManager();
             }
         }
@@ -250,7 +250,7 @@ namespace y60 {
         AC_TRACE << "Texture::ensureResourceManager '" << get<NameTag>() << "' _myResourceManager=" << (void*)_myResourceManager;
         if (_myResourceManager == 0) {
             if (getNode()) {
-                IScenePtr myScene = getNode().getRootNode()->getFacade<IScene>();                
+                IScenePtr myScene = getNode().getRootNode()->getFacade<IScene>();
                 _myResourceManager = myScene->getResourceManager();
             }
         }
@@ -278,9 +278,9 @@ namespace y60 {
 
 
 
-    void 
+    void
     Texture::calculateInternalFormat() {
-        std::string myInternalFormat = get<TexturePixelFormatTag>();     
+        std::string myInternalFormat = get<TexturePixelFormatTag>();
         if (myInternalFormat.size()) {
             // If there is an texture pixel format set from outside, we use it
         } else {
@@ -292,24 +292,24 @@ namespace y60 {
             }
 
             PixelEncoding myRasterFormat = myImage->getRasterEncoding();
-            bool myAlphaChannelRequired = (get<TextureColorScaleTag>()[3] < 1.0f 
+            bool myAlphaChannelRequired = (get<TextureColorScaleTag>()[3] < 1.0f
                                            || get<TextureColorBiasTag>()[3] > 0.0f);
 
-            if (myAlphaChannelRequired 
-                && (myRasterFormat == y60::RGB || myRasterFormat == y60::BGR)) 
+            if (myAlphaChannelRequired
+                && (myRasterFormat == y60::RGB || myRasterFormat == y60::BGR))
             {
                 // If a change in colorscale introduces an alpha channel ensure
                 // that internal format has alpha
-                myInternalFormat = getStringFromEnum(TEXTURE_IFMT_RGBA8, 
+                myInternalFormat = getStringFromEnum(TEXTURE_IFMT_RGBA8,
                                                      TextureInternalFormatStrings);
             } else {
-                TextureInternalFormat myInternalPixelFormat = 
+                TextureInternalFormat myInternalPixelFormat =
                     getInternalPixelFormat(myRasterFormat);
-                myInternalFormat = getStringFromEnum(myInternalPixelFormat, 
+                myInternalFormat = getStringFromEnum(myInternalPixelFormat,
                                                      TextureInternalFormatStrings);
             }
         }
-        AC_DEBUG << "Texture::calculateInternalFormat '" << get<NameTag>() 
+        AC_DEBUG << "Texture::calculateInternalFormat '" << get<NameTag>()
                  << "' internalFormat=" << myInternalFormat;
         set<TextureInternalFormatTag>(myInternalFormat);
     }
@@ -333,7 +333,7 @@ namespace y60 {
                              << " (texture_2D), assuming texture_2D";
                 }
             }
-            AC_DEBUG << "Texture::calculateTextureType '" << get<NameTag>() 
+            AC_DEBUG << "Texture::calculateTextureType '" << get<NameTag>()
                      << "' textureType=" << myType;
             set<TextureTypeTag>(myType);
         }
@@ -362,16 +362,16 @@ namespace y60 {
         AC_INFO << "TextureManager::reloadTextures preload() disabled;";
         applyTexture();
     }
-   
-    unsigned 
+
+    unsigned
     Texture::applyTexture() {
 
         ensureResourceManager();
 
         AC_TRACE << "Texture::applyTexture '" << get<NameTag>() << "' id=" << get<IdTag>() << " texId=" << _myTextureId;
-        
+
         TexturePtr myTexture = dynamic_cast_Ptr<Texture>(getSelf());
-        
+
         bool myForceSetupFlag = isDirty<TextureIdTag>();
         AC_TRACE << "ForceSetupFlag(0) : " << myForceSetupFlag;
         myForceSetupFlag |= get<TextureIdTag>() ? false:true;
@@ -393,7 +393,7 @@ namespace y60 {
 
             //_myImageNodeVersion = myImage->getNode().nodeVersion();
             _myImageNodeVersion = static_cast<unsigned>(myImage->getRasterValueNode()->nodeVersion());
-        } 
+        }
 
         // perform actions
         if (myForceSetupFlag && _myTextureId != 0) {
@@ -410,7 +410,7 @@ namespace y60 {
             if (isDirty<TextureParamChangedTag>()) {
                 _myResourceManager->updateTextureParams(myTexture);
                 (void) get<TextureParamChangedTag>();
-            } 
+            }
 
             if (myImageContentChangedFlag) {
                 _myResourceManager->updateTextureData(myTexture);
@@ -473,7 +473,7 @@ namespace y60 {
         return TextureInternalFormat(getEnumFromString(get<TextureInternalFormatTag>(), TextureInternalFormatStrings));
     }
 
-    void 
+    void
     Texture::removeTextureFromResourceManager() {
         //AC_DEBUG << "removeTextureFromResourceManager '" << get<NameTag>() << "' id=" << get<IdTag>() << " texId=" << _myTextureId;
         if (_myTextureId == 0) {
@@ -493,13 +493,13 @@ namespace y60 {
     Texture::getMinFilter() const {
         return get<TextureMinFilterTag>();
     }
-    
+
     TextureSampleFilter
     Texture::getMagFilter() const {
         return get<TextureMagFilterTag>();
     }
 
-    void 
+    void
     Texture::unbind() {
         if (_myTextureId == 0) {
             return;

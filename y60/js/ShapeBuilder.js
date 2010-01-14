@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -140,7 +140,7 @@ ShapeBuilder.prototype.Constructor = function(obj) {
             }
             for (var myUVCoordIndexListIndex = 0; myUVCoordIndexListIndex < myElement.texcoords.length; myUVCoordIndexListIndex++) {
                 if (myElement.texcoords[myUVCoordIndexListIndex].length > 0) {
-                    myShapeString +='   <indices vertexdata="map' + (myUVCoordIndexListIndex + 1) + 
+                    myShapeString +='   <indices vertexdata="map' + (myUVCoordIndexListIndex + 1) +
                                      '"role="texcoord' + myUVCoordIndexListIndex + '">' + arrayToString(myElement.texcoords[myUVCoordIndexListIndex]) + '</indices>\n';
                 }
             }
@@ -191,7 +191,7 @@ ShapeBuilder.prototype.Constructor = function(obj) {
                 theElement.texcoords.push([]);
             }
         }
-        
+
         var myIndex = _myUVCoords[theTextureSlot].length;
         _myUVCoords[theTextureSlot].push(theTexCoord);
         theElement.texcoords[theTextureSlot].push(myIndex);
@@ -277,7 +277,7 @@ ShapeBuilder.prototype.Constructor = function(obj) {
             _myUVCoords[0].push(theUVcoords[0]);
             _myUVCoords[0].push(theUVcoords[1]);
             _myUVCoords[0].push(theUVcoords[2]);
-            _myUVCoords[0].push(theUVcoords[3]);            
+            _myUVCoords[0].push(theUVcoords[3]);
         }
         theElement.texcoords[0].push(myTexIndex,myTexIndex+1,myTexIndex+2,myTexIndex+3);
     }
@@ -327,13 +327,13 @@ ShapeBuilder.prototype.Constructor = function(obj) {
 
         var myColorIndex = _myColors.length;
         if (theGenSingleVertexColorFlag || theGenSingleVertexColorFlag == undefined) {
-            _myColors.push([1,1,1,1]);        
+            _myColors.push([1,1,1,1]);
             theElement.colors.push(myColorIndex, myColorIndex, myColorIndex, myColorIndex);
         } else {
-            _myColors.push([1,1,1,1]);        
-            _myColors.push([1,1,1,1]);        
-            _myColors.push([1,1,1,1]);        
-            _myColors.push([1,1,1,1]);        
+            _myColors.push([1,1,1,1]);
+            _myColors.push([1,1,1,1]);
+            _myColors.push([1,1,1,1]);
+            _myColors.push([1,1,1,1]);
             theElement.colors.push(myColorIndex, myColorIndex+1, myColorIndex+2, myColorIndex+3);
         }
     }

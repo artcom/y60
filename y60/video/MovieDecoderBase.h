@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -91,7 +91,7 @@ namespace y60 {
     typedef std::vector<dom::ResizeableRasterPtr> RasterVector;
 
     Y60_VIDEO_DECL void copyPlaneToRaster(unsigned char * theDestination, unsigned char * theSource, int theStride, unsigned theWidth, unsigned theHeight);
-    
+
     class Movie;
     /**
      * @ingroup Y60video
@@ -106,7 +106,7 @@ namespace y60 {
 
             void initialize(Movie * theMovie);
 /*
-            virtual std::string canDecode(const std::string & theUrl, 
+            virtual std::string canDecode(const std::string & theUrl,
                     asl::Ptr<asl::ReadableStreamHandle> theStream = asl::Ptr<asl::ReadableStreamHandle>(0));
 */
             /**
@@ -116,7 +116,7 @@ namespace y60 {
              *                      if the audioclock or the framecache are used.
              * @return current movie time
              */
-            virtual double getMovieTime(double theSystemTime); 
+            virtual double getMovieTime(double theSystemTime);
 
             /**
              * Reads a frame from the decoder.
@@ -137,20 +137,20 @@ namespace y60 {
              * loads a movie from the stream given by theSource
              * @param theFilename file to identify theSource
              */
-            virtual void load(asl::Ptr<asl::ReadableStream> theSource, 
+            virtual void load(asl::Ptr<asl::ReadableStream> theSource,
                     const std::string & theFilename);
 
-            int getFrameCount() const; 
-            unsigned getFrameWidth() const; 
-            unsigned getFrameHeight() const; 
+            int getFrameCount() const;
+            unsigned getFrameWidth() const;
+            unsigned getFrameHeight() const;
             double getFrameRate() const;
-            bool getAudioFlag() const; 
-            const asl::Matrix4f & getImageMatrix() const; 
-            MoviePlayMode getPlayMode() const; 
-            bool getEOF() const; 
-            void setEOF(bool theEndOfFileFlag); 
+            bool getAudioFlag() const;
+            const asl::Matrix4f & getImageMatrix() const;
+            MoviePlayMode getPlayMode() const;
+            bool getEOF() const;
+            void setEOF(bool theEndOfFileFlag);
             void setDecodeAudioFlag(bool theDecodeAudioFlag);
-            
+
             /**
              * Starts the movie playback at theStartTime.
              * @param theStartTime start time of the movie. Defaults to 0.0
@@ -160,20 +160,20 @@ namespace y60 {
             /**
              * Is called before start movie, if a movie was paused before.
              */
-            virtual void resumeMovie(double theStartTime = 0.0, bool theResumeAudioFlag = true); 
+            virtual void resumeMovie(double theStartTime = 0.0, bool theResumeAudioFlag = true);
 
             /**
-             * Stops the movie playback. Future calls of startMovie will start from the 
+             * Stops the movie playback. Future calls of startMovie will start from the
              * beginning of the movie.
              */
             virtual void stopMovie(bool theStopAudioFlag = true);
-            
+
             /**
              * Pauses the current movie. Playback will continue at the current position after startMovie
              * is called.
              */
             virtual void pauseMovie(bool thePauseAudioFlag = true);
-            
+
             /**
              * Closes the current movie and releases all internal data.
              */
@@ -183,15 +183,15 @@ namespace y60 {
              * @return new instance of the concrete MovieDecoder.
              */
             virtual asl::Ptr<MovieDecoderBase> instance() const;
-            
+
             virtual const char * getName() const = 0;
             virtual const bool hasAudio() const = 0;
-            
+
             virtual void setVolume(const float theVolume) {};
 
         protected:
             const Movie * getMovie() const;
-            Movie * getMovie(); 
+            Movie * getMovie();
             bool getDecodeAudioFlag() const;
 
         private:

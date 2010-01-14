@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -89,7 +89,7 @@ FFMpegAudioDecoder::~FFMpegAudioDecoder() {
 }
 
 bool FFMpegAudioDecoder::isSyncDecoder() const {
-    // Note that if this is ever changed - i.e. if several decoders run in different 
+    // Note that if this is ever changed - i.e. if several decoders run in different
     // threads, _myResampledSamples can't be static variables anymore!
     return true;
 }
@@ -115,7 +115,7 @@ void FFMpegAudioDecoder::decodeEverything() {
 
 Time FFMpegAudioDecoder::getDuration() const {
     if (_myFormatContext) {
-        AVStream * myStream = _myFormatContext->streams[_myStreamIndex];	
+        AVStream * myStream = _myFormatContext->streams[_myStreamIndex];
 #if LIBAVCODEC_BUILD >= 0x5100
         return (double(myStream->duration)*av_q2d(myStream->time_base));
 #else
@@ -132,7 +132,7 @@ void FFMpegAudioDecoder::seek (Time thePosition)
 #if (LIBAVCODEC_BUILD < 4738)
     int ret = av_seek_frame(_myFormatContext, -1, (long long)(thePosition*AV_TIME_BASE));
 #else
-    int ret = av_seek_frame(_myFormatContext, -1, (long long)(thePosition*AV_TIME_BASE), 
+    int ret = av_seek_frame(_myFormatContext, -1, (long long)(thePosition*AV_TIME_BASE),
             AVSEEK_FLAG_BACKWARD);
 #endif
     if (ret < 0) {
@@ -143,19 +143,19 @@ void FFMpegAudioDecoder::seek (Time thePosition)
 
 void FFMpegAudioDecoder::open() {
     AC_DEBUG << "FFMpegAudioDecoder::open (" << _myURI << ")" << _myURI;
-        
+
     try {
         int err;
         if ((err = av_open_input_file(&_myFormatContext, _myURI.c_str(), 0, 0, 0)) < 0) {
             if (err == -6) {
                 throw DecoderException(std::string("Can't decode ")+_myURI, PLUS_FILE_LINE);
             } else {
-                throw FileNotFoundException(std::string("Unable to open input file, errno=") + 
+                throw FileNotFoundException(std::string("Unable to open input file, errno=") +
                     asl::as_string(err) + "("+strerror(AVERROR(err))+"): " + _myURI, PLUS_FILE_LINE);
             }
         }
         if ((err = av_find_stream_info(_myFormatContext)) < 0) {
-            throw DecoderException(std::string("Unable to find stream info, err=") + 
+            throw DecoderException(std::string("Unable to find stream info, err=") +
                     asl::as_string(err) + ": " + _myURI, PLUS_FILE_LINE);
         }
         // find first audio stream
@@ -171,7 +171,7 @@ void FFMpegAudioDecoder::open() {
             }
         }
         if (_myStreamIndex < 0) {
-            throw DecoderException(std::string("No audio stream found: ") + _myURI, 
+            throw DecoderException(std::string("No audio stream found: ") + _myURI,
                     PLUS_FILE_LINE);
         }
 
@@ -183,14 +183,14 @@ void FFMpegAudioDecoder::open() {
 #endif
         AVCodec * myCodec = avcodec_find_decoder(myCodecContext->codec_id);
         if (!myCodec) {
-            throw DecoderException(std::string("Unable to find decoder: ") + _myURI, 
+            throw DecoderException(std::string("Unable to find decoder: ") + _myURI,
                     PLUS_FILE_LINE);
         }
-        
+
         {
             AutoLocker<ThreadLock> myLocker(_myAVCodecLock);
             if (avcodec_open(myCodecContext, myCodec) < 0 ) {
-                throw DecoderException(std::string("Unable to open codec: ") + _myURI, 
+                throw DecoderException(std::string("Unable to open codec: ") + _myURI,
                         PLUS_FILE_LINE);
             }
         }
@@ -201,14 +201,14 @@ void FFMpegAudioDecoder::open() {
         AC_DEBUG << "Sample rate: " << _mySampleRate << endl;
 
         if (_mySampleRate != Pump::get().getNativeSampleRate()) {
-#if  LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52,15,0)         
+#if  LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52,15,0)
             _myResampleContext = av_audio_resample_init(
                     _myNumChannels, _myNumChannels,
                     Pump::get().getNativeSampleRate(), _mySampleRate,
                     SAMPLE_FMT_S16, myCodecContext->sample_fmt,
                     16, 10, 0, 0.8);
 #else
-            _myResampleContext = audio_resample_init(_myNumChannels, _myNumChannels,    
+            _myResampleContext = audio_resample_init(_myNumChannels, _myNumChannels,
                     Pump::get().getNativeSampleRate(), _mySampleRate);
 #endif
         }
@@ -255,26 +255,26 @@ bool FFMpegAudioDecoder::decode() {
 #else
     AVCodecContext * myCodec = &(_myFormatContext->streams[_myStreamIndex]->codec);
 #endif
-    
+
     int err = av_read_frame(_myFormatContext, &myPacket);
     if (err < 0) {
         return true;
     }
     if (myPacket.stream_index == _myStreamIndex) {
         int myBytesDecoded = 0;
-        
+
         // we need an aligned buffer
         int16_t * myAlignedBuf;
         myAlignedBuf = (int16_t *)av_malloc( AVCODEC_MAX_AUDIO_FRAME_SIZE<<1 );
-        
-                 
+
+
 #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52,27,0)
         AVPacket myTempPacket;
         av_init_packet(&myTempPacket);
         myTempPacket.data = myPacket.data;
         myTempPacket.size = myPacket.size;
         while (myTempPacket.size > 0) {
-            myBytesDecoded = AVCODEC_MAX_AUDIO_FRAME_SIZE<<1; 
+            myBytesDecoded = AVCODEC_MAX_AUDIO_FRAME_SIZE<<1;
             int myLen = avcodec_decode_audio3(myCodec,
                 myAlignedBuf, &myBytesDecoded, &myTempPacket);
             if (myLen < 0) {
@@ -285,18 +285,18 @@ bool FFMpegAudioDecoder::decode() {
             myTempPacket.data += myLen;
             myTempPacket.size -= myLen;
             AC_TRACE << "data left " << myTempPacket.size << " read " << myLen;
-            
+
 #else
         const uint8_t* myData = myPacket.data;
         int myDataLen = myPacket.size;
         while (myDataLen > 0) {
-#   if  LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(51,28,0)            
-            myBytesDecoded = AVCODEC_MAX_AUDIO_FRAME_SIZE<<1; 
+#   if  LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(51,28,0)
+            myBytesDecoded = AVCODEC_MAX_AUDIO_FRAME_SIZE<<1;
             int myLen = avcodec_decode_audio2(myCodec,
                 myAlignedBuf, &myBytesDecoded, myData, myDataLen);
-#   else            
+#   else
             int myLen = avcodec_decode_audio(myCodec,
-                myAlignedBuf, &myBytesDecoded, myData, myDataLen);    
+                myAlignedBuf, &myBytesDecoded, myData, myDataLen);
 #   endif
             if (myLen < 0) {
                 AC_WARNING << "av_decode_audio error";
@@ -315,7 +315,7 @@ bool FFMpegAudioDecoder::decode() {
             AC_TRACE << "FFMpegAudioDecoder::decode(): Frames per buffer= " << numFrames;
             AudioBufferPtr myBuffer;
             if (_myResampleContext) {
-                numFrames = audio_resample(_myResampleContext, 
+                numFrames = audio_resample(_myResampleContext,
                         (int16_t*)(_myResampledSamples.begin()),
                         myAlignedBuf, numFrames);
                 myBuffer = Pump::get().createBuffer(numFrames);
@@ -345,14 +345,14 @@ unsigned FFMpegAudioDecoder::getNumChannels() {
 FFMpegAudioDecoderFactory::FFMpegAudioDecoderFactory() {
 }
 
-IAudioDecoder* FFMpegAudioDecoderFactory::tryCreateDecoder(const std::string& myURI) 
+IAudioDecoder* FFMpegAudioDecoderFactory::tryCreateDecoder(const std::string& myURI)
 {
     AC_DEBUG << "FFMpegAudioDecoderFactory::tryCreateDecoder (" << myURI << ")";
     return new FFMpegAudioDecoder(myURI);
 }
 
 int FFMpegAudioDecoderFactory::getPriority() const {
-    return 1; 
+    return 1;
 }
 
 }

@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -75,7 +75,7 @@
 #ifdef AC_BUILT_WITH_CMAKE
 #include "res/description/Facxmlexport.h"
 #include "res/description/Facbinaryexport.h"
-#else 
+#else
 #include "res/Facxmlexport.h"
 #include "res/Facbinaryexport.h"
 #endif
@@ -381,7 +381,7 @@ SceneExporter::writeBody(y60::WorldBuilderBasePtr theTransformBuilder,
     if (_myExportedShapes.find(myNodeId) == _myExportedShapes.end()) {
         return myBodyBuilder;
     }
-    
+
     y60::WorldBuilderBasePtr myParentBuilder = theTransformBuilder;
     bool myTransformFlag = theTransformFlag;
     std::string myBaseName = getString(theNode->GetName()) + theNameAppendix;
@@ -525,7 +525,7 @@ SceneExporter::writeObjects(y60::WorldBuilderBasePtr theTransformBuilder,
    }
 }
 
-bool 
+bool
 SceneExporter::writeObject(y60::WorldBuilderBasePtr theTransformBuilder,
                             BaseObject * & theNode,
                             y60::WorldBuilderBasePtr & theParentBuilder,
@@ -571,11 +571,11 @@ SceneExporter::writeObject(y60::WorldBuilderBasePtr theTransformBuilder,
                     theParentBuilder = writeTransform(theTransformBuilder, theNode);
                 }
                 {
-                    /* we have already written the transform of the instance so export 
+                    /* we have already written the transform of the instance so export
                        untransformed linked object only if it is not a transform node */
                     LONG myInstancedNodeType = myLinkedObject->GetType();
                     if (myInstancedNodeType != Onull) {
-                        writeObject(theParentBuilder, myLinkedObject, 
+                        writeObject(theParentBuilder, myLinkedObject,
                                     theParentBuilder, false, theForceFrontBackFacing, "_instance");
                     }
                 }
@@ -631,7 +631,7 @@ SceneExporter::writeObject(y60::WorldBuilderBasePtr theTransformBuilder,
             theParentBuilder = writeBody(theTransformBuilder, theNode, theTransformFlag, theForceFrontBackFacing, theNameAppendix);
             break;
     }
-    
+
     if (theParentBuilder && theParentBuilder->getNode()) {
         // export animation if any exists
         AnimationExporter myAnimationExporter(*_mySceneBuilder,_myDocument);
@@ -745,7 +745,7 @@ Bool RegisterAcXmlExporter(void)
 
     // decide by name if the plugin shall be registered - just for user convenience
     String myName = GeLoadString(IDS_Y60_XML_DECL);
-    if (!myName.Content()) 
+    if (!myName.Content())
         return FALSE;
 
     // be sure to use a unique ID obtained from www.plugincafe.com
@@ -754,7 +754,7 @@ Bool RegisterAcXmlExporter(void)
     }
 
     myName = GeLoadString(IDS_Y60_BINARY_DECL);
-    if (!myName.Content()) 
+    if (!myName.Content())
         return FALSE;
 
     if (!RegisterSceneSaverPlugin(1000002, myName, 0, SceneExporter::AllocBinary, "Facbinaryexport", "b60")) {

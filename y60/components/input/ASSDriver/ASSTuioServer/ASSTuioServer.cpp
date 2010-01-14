@@ -158,7 +158,7 @@ OnUpdateSettings(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
 }
 
 
-JSFunctionSpec * 
+JSFunctionSpec *
 ASSTuioServer::StaticFunctions() {
     static JSFunctionSpec myFunctions[] = {
         {"sendUDP", SendUDP, 0},

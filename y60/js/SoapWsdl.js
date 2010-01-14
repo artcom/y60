@@ -10,20 +10,20 @@
  @author: Matteo Casati, Ihar Voitka - http://www.guru4.net/
  @description: (1) SOAPClientParameters.add() method returns 'this' pointer.
                (2) "_getElementsByTagName" method added for xpath queries.
-               (3) "_getXmlHttpPrefix" refactored to "_getXmlHttpProgID" (full 
+               (3) "_getXmlHttpPrefix" refactored to "_getXmlHttpProgID" (full
                    ActiveX ProgID).
-               
+
  @version: 1.3 - 2005.12.06
  @author: Matteo Casati - http://www.guru4.net/
- @description: callback function now receives (as second - optional - parameter) 
+ @description: callback function now receives (as second - optional - parameter)
                the SOAP response too. Thanks to Ihar Voitka.
-               
+
  @version: 1.2 - 2005.12.02
  @author: Matteo Casati - http://www.guru4.net/
  @description: (1) fixed update in v. 1.1 for no string params.
-               (2) the "_loadWsdl" method has been updated to fix a bug when 
+               (2) the "_loadWsdl" method has been updated to fix a bug when
                the wsdl is cached and the call is sync. Thanks to Linh Hoang.
-               
+
  @version: 1.1 - 2005.11.11
  @author: Matteo Casati - http://www.guru4.net/
  @description: the SOAPClientParameters.toXML method has been updated to allow
@@ -38,10 +38,10 @@
 function SOAPClientParameters()
 {
 	var _pl = new Array();
-	this.add = function(name, value) 
+	this.add = function(name, value)
 	{
-		_pl[name] = value; 
-		return this; 
+		_pl[name] = value;
+		return this;
 	}
 	this.toXml = function()
 	{
@@ -51,7 +51,7 @@ function SOAPClientParameters()
 			if(typeof(_pl[p]) != "function")
 				xml += "<" + p + ">" + _pl[p].toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") + "</" + p + ">";
 		}
-		return xml;	
+		return xml;
 	}
 }
 
@@ -91,7 +91,7 @@ SOAPClient._sendSoapRequest = function(theService, thePort, theOperation, thePar
 {
 	// get namespace
     var ns =  (theWSDL.childNode('wsdl:definitions').targetNamespace);
-	// build SOAP request 
+	// build SOAP request
     var soapRequest = '<?xml version="1.0" encoding="UTF-8"?>'+
 '<soapenv:Envelope'+
 ' xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"'+
@@ -144,6 +144,6 @@ theParams.toXml()+
     var myResponseXML = new Node(xmlHttp.responseString);
 
     // TODO: parse the response acccording to the WSDL
-    return xmlHttp;		
+    return xmlHttp;
 }
 

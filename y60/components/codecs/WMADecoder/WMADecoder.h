@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -92,7 +92,7 @@ class WMADecoder: public IAudioDecoder, public IWMReaderCallback
 {
         static const unsigned int MAX_TIMEOUT_FOR_EVENT = 15000;
     public:
-    
+
         WMADecoder (const std::string& myURI);
         virtual ~WMADecoder();
 
@@ -108,15 +108,15 @@ class WMADecoder: public IAudioDecoder, public IWMReaderCallback
         virtual void setSampleSink(asl::ISampleSink* mySampleSink);
         virtual bool isSyncDecoder() const;
         virtual void setTime(asl::Time myTime);
-        
-        virtual unsigned getCurFrame() const; 
+
+        virtual unsigned getCurFrame() const;
         virtual void decodeEverything();
-        
+
         //
         // Methods of IUnknown
         //
 
-        HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, 
+        HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid,
                 void __RPC_FAR *__RPC_FAR *ppvObject);
         ULONG STDMETHODCALLTYPE AddRef();
         ULONG STDMETHODCALLTYPE Release();
@@ -160,7 +160,7 @@ class WMADecoder: public IAudioDecoder, public IWMReaderCallback
         bool _myUseUserClock;
         ReSampleContext * _myResampleContext;
         asl::Block _myResampledSamples;
-        
+
         enum State {STOPPED, PAUSED, PLAYING};
         State _myState;
 
@@ -171,4 +171,4 @@ class WMADecoder: public IAudioDecoder, public IWMReaderCallback
 
 } // namespace
 
-#endif 
+#endif

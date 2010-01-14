@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -84,7 +84,7 @@ function CreateTestMovie(theArguments) {
     var _myMaterial = null;
     var _myShape    = null;
     var _myBody     = null;
-    
+
     var _my10secMaterial = null;
     var _my10secShape    = null;
     var _my10secBody     = null;
@@ -97,9 +97,9 @@ function CreateTestMovie(theArguments) {
         Public.setSplashScreen(false);
         Base.setup(MOVIE_WIDTH, MOVIE_HEIGHT);
         window.eventListener = Public;
-        
+
         print("creating images");
-        
+
         _myMaterial = Modelling.createColorMaterial(window.scene, [1,1,1,1]);
         _myShape    = Modelling.createQuad(window.scene, _myMaterial.id, [-1,-1,-5], [1,1,-5]);
         _myBody     = Modelling.createBody(window.scene.world, _myShape.id);
@@ -109,7 +109,7 @@ function CreateTestMovie(theArguments) {
         _my10secShape    = Modelling.createQuad(window.scene, _my10secMaterial.id, [-1,-1,-5], [1,1,-5]);
         _my10secBody     = Modelling.createBody(window.scene.world, _my10secShape.id);
         _my10secBody.visible =  false;
-        
+
         window.swapInterval = SWAP_INTERVAL;
         window.fixedFrameTime = FIXED_FRAME_TIME;
 
@@ -118,7 +118,7 @@ function CreateTestMovie(theArguments) {
     Base.onFrame = Public.onFrame;
     Public.onFrame = function(theTime) {
         Base.onFrame(theTime);
-        
+
         var myMinutes = Math.floor(_myFrameCount/(60*FRAMERATE));
         var mySeconds = Math.floor(_myFrameCount/FRAMERATE) % 60;
         var myFrames  = _myFrameCount % FRAMERATE;
@@ -132,7 +132,7 @@ function CreateTestMovie(theArguments) {
         var myPos = [MOVIE_WIDTH/2 - 30, MOVIE_HEIGHT/2];
         window.setTextColor([1,0,0,1]);
         window.renderText(myPos, myTimeString, "Screen15");
-        
+
         if(myFrames < 0.1) {
             if (mySeconds % 10 == 0){
                 _my10secBody.visible = true;
@@ -143,21 +143,21 @@ function CreateTestMovie(theArguments) {
             _myBody.visible = false;
             _my10secBody.visible = false;
         }
-        
+
     }
 
     Base.onPostRender = Public.onPostRender;
     Public.onPostRender = function() {
         Base.onPostRender();
-        
+
         var myFileName = _myDirectory + "/" + MOVIE_WIDTH + "x" + MOVIE_HEIGHT + "_frame";
         myFileName += padStringFront(_myFrameCount, "0", 7);
         myFileName += ".png";
         window.saveBuffer(myFileName);
-        
+
         if (_myFrameCount >= MOVIE_LENGTH*FRAMERATE) {
             print("images created");
-            exit(0);    
+            exit(0);
         }
         _myFrameCount++;
     }

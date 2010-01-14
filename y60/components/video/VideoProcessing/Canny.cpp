@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -71,7 +71,7 @@ Canny::Canny( const string & theName ) : Algorithm( theName ) {
 
 void Canny::onFrame( double t ) {
 
-    const GRAYRaster * mySourceFrame = 
+    const GRAYRaster * mySourceFrame =
         dom::dynamic_cast_Value<GRAYRaster>(_mySourceImage->getRasterValue().get());
     dom::Node::WritableValue<GRAYRaster> myTargetFrameLock(_myTargetImage->getRasterValueNode());
     GRAYRaster & myTargetFrame = myTargetFrameLock.get();
@@ -92,17 +92,17 @@ void Canny::onFrame( double t ) {
 //                gx += mySobelX[i++] * mySrcFloat;
 //                gy += mySobelY[i++] * mySrcFloat;
 //            }
-//            float myGradient = sqrt(gx*gx + gy*gy);            
-//            _myGradients[y * _myWidth + x] = myGradient; 
+//            float myGradient = sqrt(gx*gx + gy*gy);
+//            _myGradients[y * _myWidth + x] = myGradient;
 //            if (_myMaxGradient < myGradient) {
 //                _myMaxGradient = myGradient;
 //            }
-//            
+//
 //            float myDirection = 0.0f;
 //            if (gx == 0 && gy != 0) {
 //                myDirection = 0.5 * PI;
 //            } else {
-//                myDirection = atan(gy/gx);            
+//                myDirection = atan(gy/gx);
 //            }
 //            // round to 0, 1/4pi, 1/2pi, 3/4pi
 //            if (myDirection > 0.125 * PI && myDirection < 0.375 * PI) {
@@ -138,8 +138,8 @@ void Canny::onFrame( double t ) {
 //                for (int j = -1; j <= 1; j=j+2) {
 //                    if (!isOnEdge(myIndex, i, j)) {
 //                        if (!(i==0 && j==0)) {
-//                            if (_myGradients[(y+j) * _myWidth + (x+i)] 
-//                                > _myGradients[myIndex]) 
+//                            if (_myGradients[(y+j) * _myWidth + (x+i)]
+//                                > _myGradients[myIndex])
 //                            {
 //                                _myResultImage[myIndex] = 0;
 //                            }
@@ -179,11 +179,11 @@ void Canny::onFrame( double t ) {
 //    }
 //
 //    bool myDone = false;
-//    for (unsigned i = 0; myDone = false || i < 500; i++) { 
+//    for (unsigned i = 0; myDone = false || i < 500; i++) {
 //        myDone = doHysteresisStep();
 //    }
 //
-//    dom::Node::WritableValue<GRAYRaster>    
+//    dom::Node::WritableValue<GRAYRaster>
 //        myDirectionFrameLock(_myDirectionImage->getRasterValueNode());
 //    GRAYRaster & myDirectionFrame = myDirectionFrameLock.get();
 //    GRAYRaster::iterator itDir = myDirectionFrame.begin();
@@ -199,7 +199,7 @@ void Canny::onFrame( double t ) {
                     (*itTrgt++) = mySrcValue > _myGradientThreshold ? 255 : 0;
                     break;
                 case GRADIENT_OUTPUT:
-                    (*itTrgt++) = 
+                    (*itTrgt++) =
                         static_cast<unsigned char>((_myGradients[myIndex]) * 255);
                     break;
                 case DIRECTION_OUTPUT:
@@ -225,7 +225,7 @@ bool Canny::doHysteresisStep() {
                    }
                    if (hasMarkedNeighbour) {
                        _myResult[myIndex] = 1;
-                       myDone = false; 
+                       myDone = false;
                    }
                 }
             }
@@ -239,7 +239,7 @@ bool Canny::isOnEdge( unsigned theIndex, int theXOffset, int theYOffset) {
     if (_myDirections[theIndex] == 0) {
         return theYOffset == 0;
     } else if (_myDirections[theIndex] == 0.25*PI) {
-        return theXOffset * theYOffset == -1; 
+        return theXOffset * theYOffset == -1;
     } else if (_myDirections[theIndex] == 0.5*PI) {
         return theXOffset == 0;
     } else {
@@ -251,9 +251,9 @@ bool Canny::isOnEdge( unsigned theIndex, int theXOffset, int theYOffset) {
 void Canny::configure( const dom::Node & theNode ) {
 
     for (unsigned i = 0; i < theNode.childNodesLength(); i++) {
-        const std::string myName = 
+        const std::string myName =
             theNode.childNode("property",i)->getAttribute("name")->nodeValue();
-        const std::string myValue = 
+        const std::string myValue =
             theNode.childNode("property",i)->getAttribute("value")->nodeValue();
 
         dom::NodePtr myImage = _myScene->getSceneDom()->getElementById(myValue);

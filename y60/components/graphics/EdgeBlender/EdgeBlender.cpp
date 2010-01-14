@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //          - use pixelspace instead of texturespace [DS]
 //          - avoid rotations; use symmetric bars and corner tiles [DS]
 //          - store vertexdata on the GPU; it's constant [DS]
@@ -133,7 +133,7 @@ class EdgeBlender :
                 float theStartX, float theStartY, float theEndX, float theEndY);
         void rotateTo(unsigned theEdge);
         void drawBlendedEdge(float theStart, float theEnd, float theBlendWidth, float theMargin = 0.0f);
-        void drawBlendedCorner(float theMarginX, float theMarginY, 
+        void drawBlendedCorner(float theMarginX, float theMarginY,
                 float theXSize, float theYSize);
         void drawBlackLevel(float theLeft, float theTop, float theRight, float theBottom);
         float getBlendValue(float theValue);
@@ -368,7 +368,7 @@ EdgeBlender::onUpdateSettings(dom::NodePtr theSettings) {
     _myBlackLevelFlag = 0 != getSetting(theSettings, "blacklevelFlag", int(_myBlackLevelFlag));
     _myCopyFrameBufferFlag = 0 != getSetting(theSettings, "copyFrameBufferFlag", int(_myCopyFrameBufferFlag));
     _myFrameBufferArea = getSetting(theSettings, "frameBufferArea", _myFrameBufferArea);
-    
+
 }
 
 void
@@ -469,7 +469,7 @@ EdgeBlender::renderMultiScreen()
                 myY0 += i > 0 ? _myBlPosOffset[1] : 0.0f;
                 myY1 -= i < _myRowCount-1 ? _myBlPosOffset[1] : 0.0f;
             }
-            
+
             for(unsigned j = 0; j < _myColumnCount; ++j) {
                 float myX  = float(j) / _myColumnCount;
                 float myX0 = (j > 0 ? myX + myXBlendWidth : myX);
@@ -591,7 +591,7 @@ EdgeBlender::preRender() {
     glPushMatrix();
     glLoadIdentity();
     gluOrtho2D(0.0f, 1.0f, 1.0f, 0.0f);
-    
+
     // store that section
     glGetIntegerv(GL_VIEWPORT, _mySavedViewport);
 
@@ -608,7 +608,7 @@ EdgeBlender::preRender() {
     glPushMatrix();
     glLoadIdentity();
 
-    
+
     // load attribs
     glPushAttrib(GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT | GL_TEXTURE_BIT | GL_POLYGON_BIT); // GL_ALL_ATTRIB_BITS);
 
@@ -627,7 +627,7 @@ EdgeBlender::postRender() {
     glMatrixMode(GL_PROJECTION);
     // restore viewport
     glViewport(_mySavedViewport[0], _mySavedViewport[1], _mySavedViewport[2], _mySavedViewport[3]);
-    
+
     glPopMatrix();
 
     glMatrixMode(GL_TEXTURE);

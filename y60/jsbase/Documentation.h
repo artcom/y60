@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -161,7 +161,7 @@ namespace jslib {
     static const std::string DocTypeDescription[] = {
         "__intern__",
         "string", "int", "float", "bool", "enum", "array",
-        "Vector2i", "Vector2f", "Vector3i", "Vector3f", "Vector4f", "VectorOfFloat", "Point2f", "Point3f", "Quaternion", "Matrix", 
+        "Vector2i", "Vector2f", "Vector3i", "Vector3f", "Vector4f", "VectorOfFloat", "Point2f", "Point3f", "Quaternion", "Matrix",
         "Box2f", "Box3f",
         "Line", "Ray", "LineSegment", "Plane", "Triangle", "Sphere", "Frustum",
         "Node", "NodeList", "Request", "object", "Block", "Scene",

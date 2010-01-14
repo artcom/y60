@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -76,9 +76,9 @@ namespace y60 {
             mySource      += theStride;
             myDestination += theWidth;
         }
-    
+
     }
-    
+
     MovieDecoderBase::MovieDecoderBase() :
         _myEndOfFileFlag(false), _myMovieTime(0.0), _myLastSystemTime(-1.0), _myDecodeAudioFlag(true)
     {}
@@ -89,16 +89,16 @@ namespace y60 {
         _myMovie = theMovie;
     }
 #if 0
-    std::string MovieDecoderBase::canDecode(const std::string & theUrl, 
-            asl::Ptr<asl::ReadableStreamHandle> theStream) 
+    std::string MovieDecoderBase::canDecode(const std::string & theUrl,
+            asl::Ptr<asl::ReadableStreamHandle> theStream)
     {
-        AC_WARNING << "MovieDecoderBase::canDecode: Using deprecated interface";  
+        AC_WARNING << "MovieDecoderBase::canDecode: Using deprecated interface";
         return canDecode(theUrl, theStream::getStream());
     }
 #endif
     double MovieDecoderBase::getMovieTime(double theSystemTime) {
-        AC_DEBUG << "getMovieTime start: _myMovieTime: " << _myMovieTime 
-                << ", theSystemTime: " << theSystemTime << ", _myLastSystemTime: " 
+        AC_DEBUG << "getMovieTime start: _myMovieTime: " << _myMovieTime
+                << ", theSystemTime: " << theSystemTime << ", _myLastSystemTime: "
                 << _myLastSystemTime;
         if (theSystemTime <= _myLastSystemTime) {
             return _myMovieTime;
@@ -106,14 +106,14 @@ namespace y60 {
         float myPlaySpeed = _myMovie->get<PlaySpeedTag>();
         if (_myLastSystemTime >= 0) {
             _myMovieTime += (theSystemTime - _myLastSystemTime) * myPlaySpeed;
-            
+
             // Calculate the wraparaound for reverse playback
             if (_myMovieTime < 0) {
                 unsigned myFrameCount = getFrameCount();
                 if (myFrameCount == static_cast<unsigned>(-1) || myFrameCount == 0) {
-                    AC_WARNING << "Movie cannot play backwards, because its framecount is unknown (framecount=" 
-                               << myFrameCount << ")";   
-                    _myMovieTime = 0;                              
+                    AC_WARNING << "Movie cannot play backwards, because its framecount is unknown (framecount="
+                               << myFrameCount << ")";
+                    _myMovieTime = 0;
                 } else {
                     double myIncrement = getFrameCount() / getFrameRate();
                     while (_myMovieTime < 0) {
@@ -123,21 +123,21 @@ namespace y60 {
             }
         }
         _myLastSystemTime = theSystemTime;
-        AC_DEBUG << "getMovieTime end: _myMovieTime: " << _myMovieTime 
-                << ", theSystemTime: " << theSystemTime << ", _myLastSystemTime: " 
+        AC_DEBUG << "getMovieTime end: _myMovieTime: " << _myMovieTime
+                << ", theSystemTime: " << theSystemTime << ", _myLastSystemTime: "
                 << _myLastSystemTime;
         return _myMovieTime;
     }
 
-    void MovieDecoderBase::load(asl::Ptr<asl::ReadableStream> theSource, 
-            const std::string & theFilename)  
+    void MovieDecoderBase::load(asl::Ptr<asl::ReadableStream> theSource,
+            const std::string & theFilename)
     {
         throw asl::NotYetImplemented(JUST_FILE_LINE);
     }
     void MovieDecoderBase::setDecodeAudioFlag(bool theDecodeAudioFlag) {
         _myDecodeAudioFlag = theDecodeAudioFlag;
     }
-    
+
     bool MovieDecoderBase::getDecodeAudioFlag() const {
         return _myDecodeAudioFlag;
     }
@@ -180,7 +180,7 @@ namespace y60 {
                 throw asl::Exception("no decodable video stream found. (are width and height both multiples of two?) ", PLUS_FILE_LINE);
             }
             AC_DEBUG << "!!!!!!MovieDecoderBase::setEOF setting FrameCountTag: " <<_myMovie->get<CurrentFrameTag>();
-            _myMovie->set<FrameCountTag>(_myMovie->get<CurrentFrameTag>());            
+            _myMovie->set<FrameCountTag>(_myMovie->get<CurrentFrameTag>());
         }
     }
 
@@ -198,7 +198,7 @@ namespace y60 {
 
     void MovieDecoderBase::stopMovie(bool theStopAudioFlag) {
         AC_DEBUG << "MovieDecoderBase::stopMovie";
-        _myMovieTime = 0.0; 
+        _myMovieTime = 0.0;
         _myLastSystemTime = -1.0;
     }
 

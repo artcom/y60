@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -155,74 +155,74 @@ class JSAbstractRenderWindow :  public JSWrapper<DERIVED, asl::Ptr<DERIVED>, Sta
         static JSBool
         addExtension(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool
-        renderText(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval); 
+        renderText(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool
-        setTextColor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval); 
+        setTextColor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool
-        getTextColor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval); 
+        getTextColor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool
-        renderTextAsImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval); 
+        renderTextAsImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool
-        setTextPadding(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval); 
+        setTextPadding(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool
-        getTextCursorPosition(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval); 
+        getTextCursorPosition(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool
-        getTextLineWidths(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval); 
+        getTextLineWidths(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool
-        getTextMaxWidth(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval); 
+        getTextMaxWidth(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool
-        setTextIndentation(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval); 
+        setTextIndentation(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool
-        setHTextAlignment(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval); 
+        setHTextAlignment(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool
-        setVTextAlignment(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval); 
+        setVTextAlignment(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool
-        setLineHeight(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval); 
+        setLineHeight(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool
-        setParagraph(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval); 
+        setParagraph(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool
-        getFontMetrics(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval); 
+        getFontMetrics(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool
-        getGlyphMetrics(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval); 
+        getGlyphMetrics(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool
-        getKerning(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval); 
+        getKerning(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool
-        hasGlyph(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval); 
+        hasGlyph(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool
-        setTracking(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval); 
+        setTracking(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool
-        playClip(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval); 
+        playClip(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool
-        setClipLoops(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval); 
+        setClipLoops(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool
-        setClipForwardDirection(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval); 
+        setClipForwardDirection(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool
-        getLoops(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval); 
+        getLoops(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool
-        runAnimations(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval); 
+        runAnimations(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool
-        isClipActive(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval); 
+        isClipActive(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool
-        isCharacterActive(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval); 
+        isCharacterActive(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool
-        stopCharacter(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval); 
+        stopCharacter(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool
-        activateGLContext(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval); 
+        activateGLContext(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool
-        deactivateGLContext(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval); 
+        deactivateGLContext(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool
-        clearBuffers(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval); 
+        clearBuffers(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool
-        preRender(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval); 
+        preRender(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool
         render(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool
-        postRender(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval); 
+        postRender(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool
-        swapBuffers(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval); 
+        swapBuffers(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSFunctionSpec * BaseStaticFunctions();
-        static JSFunctionSpec * BaseFunctions(); 
-        static JSConstIntPropertySpec * ConstIntProperties(); 
+        static JSFunctionSpec * BaseFunctions();
+        static JSConstIntPropertySpec * ConstIntProperties();
         static JSPropertySpec * BaseProperties();
 
 // These methods were declared but never defined. Ok to delete? -uz

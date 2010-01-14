@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -87,7 +87,7 @@ using namespace y60;
 
 namespace y60 {
 
-    CgShader::CgShader(const dom::NodePtr theNode, 
+    CgShader::CgShader(const dom::NodePtr theNode,
                        const std::string & theVertexProfileName,
                        const std::string & theFragmentProfileName) : GLShader(theNode), _myFragmentShader()
     {
@@ -208,9 +208,9 @@ namespace y60 {
     {
         MAKE_GL_SCOPE_TIMER(CgShader_loadShaderProperties);
         ShaderProfile myRequestedProfile = ShaderProfile(asl::getEnumFromString(theProfileName, ShaderProfileStrings));
-        
+
         GLShader::loadShaderProperties(theShaderNode, theShader);
-        
+
         theShader._myPossibleProfileNames = theShaderNode->getAttributeValue<VectorOfString>(CG_PROFILES_PROPERTY);
         VectorOfString::size_type myProfileIndex = static_cast<VectorOfString::size_type>(-1);
         for (VectorOfString::size_type i=0; i<theShader._myPossibleProfileNames.size();++i) {
@@ -221,7 +221,7 @@ namespace y60 {
         }
         if ((myProfileIndex >= 0) && (myProfileIndex < theShader._myPossibleProfileNames.size())) {
             // There is a profile entry in the shader definition that matches the requested profile
-            AC_DEBUG << "profile '" << theProfileName << "' has index "<< myProfileIndex << " in shader description"; 
+            AC_DEBUG << "profile '" << theProfileName << "' has index "<< myProfileIndex << " in shader description";
             theShader._myProfile = ShaderProfile(asl::getEnumFromString(theProfileName, ShaderProfileStrings));
         } else {
             // we have no profile match:
@@ -234,7 +234,7 @@ namespace y60 {
             if (myShadersBestProfile < myRequestedProfile) {
                 AC_INFO << "Shader description does not contain requested profile '"<<theProfileName<<"', using shader's best profile '"<<myShadersBestProfileName<<"'";
                 theShader._myProfile = myShadersBestProfile;
-            } else {     
+            } else {
                 AC_DEBUG << "Engine profile does not match any given profile in shader description, library node =" << *theShaderNode;
                 theShader._myProfile = NO_PROFILE;
                 return;
@@ -259,8 +259,8 @@ namespace y60 {
             }
         } else {
             throw ShaderException(string("bad number of program file names")+as_string(*theShaderNode), PLUS_FILE_LINE);
-        }    
-        
+        }
+
         // now select matching entry function; either one same entry for all profiles or exactly one per profile are allowed
         const VectorOfString myEntryFunctions = theShaderNode->getAttributeValue<VectorOfString>(CG_ENTRY_FUNCTIONS_PROPERTY);
         VectorOfString::size_type myEntryIndex = 0;
@@ -279,8 +279,8 @@ namespace y60 {
             }
         } else {
             throw ShaderException("bad number of entry function names", PLUS_FILE_LINE);
-        }    
-        
+        }
+
 
         // now select matching compiler args; either one same set for all profiles or exactly one set per profile are allowed
         if (theShaderNode->getAttribute(CG_COMPILERARGS2_PROPERTY)) {
@@ -298,8 +298,8 @@ namespace y60 {
                 theShader._myCompilerArgs = myCompilerArgs[myCompilerArgsIndex];
             } else {
                 throw ShaderException("bad number of compiler arg sets", PLUS_FILE_LINE);
-            }    
-        }    
+            }
+        }
 
         // now add the include path to the shader args
         PackageList myPackages = AppPackageManager::get().getPtr()->getPackageList();

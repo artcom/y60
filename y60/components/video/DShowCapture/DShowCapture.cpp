@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -78,7 +78,7 @@ extern "C" {
 #else
 #       include <avcodec.h>
 #endif
-#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(38<<8)+0) 
+#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(38<<8)+0)
 #   include <libswscale/swscale.h>
 #endif
 }
@@ -112,46 +112,46 @@ namespace y60 {
                     int myPixelFormat = PIX_FMT_BGR24;
                     unsigned myBytesPerPixel = 3;
                     unsigned int myLineSizeBytes = _myGraph->getWidth() * myBytesPerPixel;
-            
+
                     AVPicture myYUVPict;
                     asl::Ptr<asl::Block> myBlock(new asl::Block(myBufferLength));
                     unsigned size = _myGraph->getWidth() * _myGraph->getHeight();
                     myYUVPict.data[0] = myBlock->begin();
                     myYUVPict.data[1] = myYUVPict.data[0] + size;
                     myYUVPict.data[2] = myYUVPict.data[1] + size;
-            
+
                     myYUVPict.linesize[0] = _myGraph->getWidth();
                     myYUVPict.linesize[1] = _myGraph->getWidth();
                     myYUVPict.linesize[2] = _myGraph->getWidth();
-                                
+
                     AVPicture mySrcPict;
                     mySrcPict.data[0] = myData;
                     mySrcPict.data[1] = myData+1;
                     mySrcPict.data[2] = myData+2;
-            
+
                     mySrcPict.linesize[0] = myLineSizeBytes;
                     mySrcPict.linesize[1] = myLineSizeBytes;
                     mySrcPict.linesize[2] = myLineSizeBytes;
 
                     int myDestPixelFormat = PIX_FMT_YUV444P;
-#if LIBAVCODEC_VERSION_INT < ((51<<16)+(38<<8)+0) 
+#if LIBAVCODEC_VERSION_INT < ((51<<16)+(38<<8)+0)
                     img_convert(&myYUVPict, myDestPixelFormat, &mySrcPict, myPixelFormat,
-                                _myGraph->getWidth(), _myGraph->getHeight());                    
+                                _myGraph->getWidth(), _myGraph->getHeight());
 #else
-                    int mySWSFlags = SWS_FAST_BILINEAR;//SWS_BICUBIC;           
+                    int mySWSFlags = SWS_FAST_BILINEAR;//SWS_BICUBIC;
                     SwsContext * img_convert_ctx = sws_getContext(_myGraph->getWidth(), _myGraph->getHeight(),
                         myPixelFormat,
                         _myGraph->getWidth(), _myGraph->getHeight(),
                         myDestPixelFormat,
                         mySWSFlags, NULL, NULL, NULL);
-                    sws_scale(img_convert_ctx, mySrcPict.data, 
-                        mySrcPict.linesize, 0, _myGraph->getHeight(), 
+                    sws_scale(img_convert_ctx, mySrcPict.data,
+                        mySrcPict.linesize, 0, _myGraph->getHeight(),
                         myYUVPict.data, myYUVPict.linesize);
-                    
+
                     sws_freeContext(img_convert_ctx);
-#endif        
-                    
-                    avpicture_deinterlace(&myYUVPict, &myYUVPict, myDestPixelFormat,  _myGraph->getWidth(), _myGraph->getHeight());                    
+#endif
+
+                    avpicture_deinterlace(&myYUVPict, &myYUVPict, myDestPixelFormat,  _myGraph->getWidth(), _myGraph->getHeight());
 
                     AVPicture myDestPict;
                     myDestPict.data[0] = theTargetRaster->pixels().begin();
@@ -161,22 +161,22 @@ namespace y60 {
                     myDestPict.linesize[1] = myLineSizeBytes;
                     myDestPict.linesize[2] = myLineSizeBytes;
 
-#if LIBAVCODEC_VERSION_INT < ((51<<16)+(38<<8)+0) 
+#if LIBAVCODEC_VERSION_INT < ((51<<16)+(38<<8)+0)
                     img_convert(&myDestPict, myPixelFormat, &myYUVPict, myDestPixelFormat,
-                                _myGraph->getWidth(), _myGraph->getHeight());                    
+                                _myGraph->getWidth(), _myGraph->getHeight());
 #else
                     img_convert_ctx = sws_getCachedContext(img_convert_ctx, _myGraph->getWidth(), _myGraph->getHeight(),
                         myDestPixelFormat,
                         _myGraph->getWidth(), _myGraph->getHeight(),
                         myPixelFormat,
                         mySWSFlags, NULL, NULL, NULL);
-                    sws_scale(img_convert_ctx, myYUVPict.data, 
-                        myYUVPict.linesize, 0, _myGraph->getHeight(), 
+                    sws_scale(img_convert_ctx, myYUVPict.data,
+                        myYUVPict.linesize, 0, _myGraph->getHeight(),
                         myDestPict.data, myDestPict.linesize);
-                    
+
                     sws_freeContext(img_convert_ctx);
-#endif        
-                    
+#endif
+
                 } else {
                     memcpy(theTargetRaster->pixels().begin(), myData, myBufferLength);
                 }
@@ -261,13 +261,13 @@ namespace y60 {
 
         idx = theFilename.find("deinterlace=");
         if (idx != std::string::npos && theFilename.substr(idx+12).length() > 0) {
-            _myDeinterlaceFlag = asl::as_int(theFilename.substr(idx+12)) == 1 ? true:false;            
+            _myDeinterlaceFlag = asl::as_int(theFilename.substr(idx+12)) == 1 ? true:false;
         }
-        
+
         std::vector<std::string> myDevices = _myGraph->enumDevices();
         if (myDeviceId >= myDevices.size()) {
             throw DShowCapture::Exception("No such Device. Highest available DeviceId is: " + myDevices.size()-1, PLUS_FILE_LINE);
-        } 
+        }
 
         setName(myDevices[myDeviceId]);
         setFrameRate(myFrameRate);
@@ -292,8 +292,8 @@ namespace y60 {
         _myGraph->setCameraParams(myWhitebalanceU, myWhitebalanceV, myShutter, myGain);
     }
 
-    std::string DShowCapture::canDecode(const std::string & theUrl, 
-                                        asl::Ptr<asl::ReadableStreamHandle> theStream) 
+    std::string DShowCapture::canDecode(const std::string & theUrl,
+                                        asl::Ptr<asl::ReadableStreamHandle> theStream)
     {
         if (theUrl.find("dshow://") != std::string::npos) {
             return MIME_TYPE_CAMERA;
@@ -310,7 +310,7 @@ namespace y60 {
         _myGraph->Stop();
         CaptureDevice::stopCapture();
     }
-    
+
     void DShowCapture::startCapture() {
         _myGraph->Play();
         CaptureDevice::startCapture();

@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -89,25 +89,25 @@ EmbeddedButton::setup() {
     myFlags |= Gdk::LEAVE_NOTIFY_MASK;
     myFlags |= Gdk::BUTTON_RELEASE_MASK;
     set_events(myFlags);
-    
+
     modify_bg(Gtk::STATE_ACTIVE, Gdk::Color("#AAAAAA"));
 
     show_all();
 }
 
-bool 
+bool
 EmbeddedButton::on_leave_notify_event(GdkEventCrossing * /*theEvent*/) {
     leave();
     return true;
 }
 
-bool 
+bool
 EmbeddedButton::on_button_press_event(GdkEventButton * /*theEvent*/) {
     pressed();
     return true;
 }
 
-void 
+void
 EmbeddedButton::pressed() {
     _myClickAheadFlag = true;
     set_state(Gtk::STATE_ACTIVE);
@@ -128,13 +128,13 @@ EmbeddedButton::leave() {
     set_state(Gtk::STATE_NORMAL);
 }
 
-bool 
+bool
 EmbeddedButton::on_button_release_event(GdkEventButton * /*theEvent*/) {
     released();
     return true;
 }
 
-void 
+void
 EmbeddedButton::on_clicked() {
     _myClickedSignal.emit();
 }

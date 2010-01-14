@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -90,16 +90,16 @@ using namespace std;
 using namespace asl;
 
 PLFilterWindowCW :: PLFilterWindowCW(float theWindowCenter, float theWindowWidth) :
-    _myCenter(theWindowCenter), _myWidth(theWindowWidth) 
-{ 
+    _myCenter(theWindowCenter), _myWidth(theWindowWidth)
+{
     DB(cerr << "PLFilterWindowCW :: PLFilterWindowCW(" << theWindowCenter << "," << theWindowWidth << ")" << endl);
 }
 
 template<int WORDSIZE>  // 16 > WRODSIZE > 8
-unsigned int getWordAtIndex(void * theData, int theIndex) {    
-    int myFirstByte = (theIndex*WORDSIZE) / 8;    
+unsigned int getWordAtIndex(void * theData, int theIndex) {
+    int myFirstByte = (theIndex*WORDSIZE) / 8;
     int myFirstByteBitOffset = (theIndex*WORDSIZE) % 8;
-    
+
     unsigned char * myData = (unsigned char *)theData;
     // this assumes most significant bit first and most significant byte first
     return (myData[myFirstByte] << myFirstByteBitOffset) | (myData[myFirstByte+1] >> (8 - myFirstByteBitOffset));
@@ -110,7 +110,7 @@ PLFilterWindowCW::Apply(PLBmpBase * theSource, PLBmp * theDestination) const {
     DB(cerr << "windowcw:: apply" << endl);
     int mySrcBPP = theSource->GetBitsPerPixel();
     DB(cerr << "bpp=" << mySrcBPP << endl);
-    if ( mySrcBPP != 16 && mySrcBPP != 12 && mySrcBPP != 10 && mySrcBPP != 8) {      
+    if ( mySrcBPP != 16 && mySrcBPP != 12 && mySrcBPP != 10 && mySrcBPP != 8) {
         ostringstream ss;
         ss << "PLFilterWindowCW supports 8, 10, 12 and 16 bit sources only.";
         ss << "(" << mySrcBPP << "bit given)";
@@ -125,7 +125,7 @@ PLFilterWindowCW::Apply(PLBmpBase * theSource, PLBmp * theDestination) const {
     float m = 1.0f / _myWidth;
     float d = 0.5f - m * _myCenter;
     for (int i=0; i<myLUTSize; ++i) {
-        float x = (float)i / (float)myLUTSize;        
+        float x = (float)i / (float)myLUTSize;
         float y = m * x + d;
         int o = (int)(y * 256.0f);
         if (o < 0) {
@@ -138,7 +138,7 @@ PLFilterWindowCW::Apply(PLBmpBase * theSource, PLBmp * theDestination) const {
     }
 
     theDestination->Create(theSource->GetWidth(), theSource->GetHeight(), PLPixelFormat::L8, 0, 0, theSource->GetResolution());
-    
+
     PLBYTE ** pSrcLineArray = theSource->GetLineArray();
     PLBYTE ** pDstLineArray = theDestination->GetLineArray();
 
@@ -153,7 +153,7 @@ PLFilterWindowCW::Apply(PLBmpBase * theSource, PLBmp * theDestination) const {
 
         for (unsigned y = 0; y < mySourceHeight; ++y) {
             unsigned char * pSrcLine = pSrcLineArray[y];
-            unsigned char* pDstLine = pDstLineArray[y];            
+            unsigned char* pDstLine = pDstLineArray[y];
             for (unsigned i = 0; i < mySourceWidth; ++i) {
                 *pDstLine++ = myLUT[*pSrcLine++];
             }
@@ -161,22 +161,22 @@ PLFilterWindowCW::Apply(PLBmpBase * theSource, PLBmp * theDestination) const {
     } else if (mySrcBPP == 16) {
         for (unsigned y = 0; y < mySourceHeight; ++y) {
             unsigned short * pSrcLine = (unsigned short*)pSrcLineArray[y];
-            unsigned char * pDstLine = pDstLineArray[y];            
+            unsigned char * pDstLine = pDstLineArray[y];
             for (unsigned i = 0; i < mySourceWidth; ++i) {
                 *pDstLine++ = myLUT[*pSrcLine++];
             }
         }
     } else if (mySrcBPP == 10) {
         for (unsigned y = 0; y < mySourceHeight; ++y) {
-            unsigned char * pDstLine = pDstLineArray[y];            
-            for (unsigned i = 0; i < mySourceWidth; ++i) {        
+            unsigned char * pDstLine = pDstLineArray[y];
+            for (unsigned i = 0; i < mySourceWidth; ++i) {
                 *pDstLine++ = myLUT[getWordAtIndex<10>(pSrcLineArray[y], i)];
             }
         }
     } else if (mySrcBPP == 12) {
         for (unsigned y = 0; y < mySourceHeight; ++y) {
-            unsigned char * pDstLine = pDstLineArray[y];            
-            for (unsigned i = 0; i < mySourceWidth; ++i) {        
+            unsigned char * pDstLine = pDstLineArray[y];
+            for (unsigned i = 0; i < mySourceWidth; ++i) {
                 *pDstLine++ = myLUT[getWordAtIndex<12>(pSrcLineArray[y], i)];
             }
         }

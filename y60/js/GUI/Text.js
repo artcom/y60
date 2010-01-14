@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -61,7 +61,7 @@ function Text(theParent, theTextNode, theDepth) {
 }
 
 Text.prototype.Constructor = function(Public, theParent, theTextNode, theDepth) {
-    
+
     ////////////////////////////////////////
     // Member
     ////////////////////////////////////////
@@ -105,7 +105,7 @@ Text.prototype.Constructor = function(Public, theParent, theTextNode, theDepth) 
     Public.bodies getter = function() {
         return [_myQuad.body];
     }
-    
+
     Public.body getter = function() {
         return _myQuad.body;
     }
@@ -117,15 +117,15 @@ Text.prototype.Constructor = function(Public, theParent, theTextNode, theDepth) 
     Public.color setter = function(theColor) {
         _myStyle.textColor = theColor;
     }
-    
+
     Public.visible getter = function() {
         return Public.body.visible;
     }
-    
+
     Public.visible setter = function(theVisibility) {
         Public.body.visible = theVisibility;
     }
-    
+
     Public.alpha getter = function() {
         return _myMaterial.properties.surfacecolor[3];
     }
@@ -133,19 +133,19 @@ Text.prototype.Constructor = function(Public, theParent, theTextNode, theDepth) 
     Public.alpha setter = function(theAlpha) {
         Modelling.setAlpha(_myQuad.body, theAlpha);
     }
-    
+
     Public.width getter = function() {
         return _myWidth;
     }
-    
+
     Public.width setter = function(theWidth) {
         _myWidth = theWidth;
     }
-    
+
     Public.height getter = function() {
         return _myHeight;
     }
-    
+
     Public.height setter = function(theHeight) {
         _myHeight = theHeight;
     }
@@ -157,7 +157,7 @@ Text.prototype.Constructor = function(Public, theParent, theTextNode, theDepth) 
     function draw() {
         textToImage(_myImage, _myText, _myStyle, _mySize);
     }
-        
+
     function setup() {
         Logger.info("Setting up text " + _myName);
 
@@ -166,11 +166,11 @@ Text.prototype.Constructor = function(Public, theParent, theTextNode, theDepth) 
         } else {
             _myText = "";
         }
-        
+
         if("z" in _myNode) {
             _myDepth += Number(_myNode.z);
         }
-        
+
         _myWidth = _myNode.width;
         _myHeight = _myNode.height;
 
@@ -189,6 +189,6 @@ Text.prototype.Constructor = function(Public, theParent, theTextNode, theDepth) 
                              /* insensible */ true,
                              /* visible */    true);
     }
-    
+
     setup();
 }

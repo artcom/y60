@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -70,7 +70,7 @@ class Y60_SOUND_DECL IAudioDecoder
 {
     public:
         virtual ~IAudioDecoder() {};
-        
+
         virtual void seek(asl::Time thePosition) = 0;
         virtual unsigned getSampleRate() = 0;
         virtual unsigned getNumChannels() = 0;
@@ -78,17 +78,17 @@ class Y60_SOUND_DECL IAudioDecoder
         virtual std::string getName() const = 0;
         virtual void setSampleSink(asl::ISampleSink* mySampleSink) = 0;
         virtual void setTime(asl::Time myTime) {};
-        virtual unsigned getCurFrame() const = 0; // This is the total number of frames that 
+        virtual unsigned getCurFrame() const = 0; // This is the total number of frames that
                                  // have been decoded. It doesn't take into account seeks etc.
         virtual void decodeEverything() = 0;
-       
+
         // There are two types of decoders. Sync decoders don't have their own
         // decoding thread. Buffering is handled externally - the Decoder client
         // calls decode() until enough data has been buffered.
         // Async decoders have an internal thread that decodes the data and do their
         // own buffering, so they need to know when playback is running.
         virtual bool isSyncDecoder() const = 0;
-        
+
         // Sync decoder methods
         virtual bool decode() { return false; };
 
@@ -101,4 +101,4 @@ class Y60_SOUND_DECL IAudioDecoder
 
 } // namespace
 
-#endif 
+#endif

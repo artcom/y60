@@ -76,7 +76,7 @@ class module_importer {
     private:
         void
         init_module(JSContext * cx, JSObject * ns) {
-            APE_LOG(log::import,log::inf,log::dev) 
+            APE_LOG(log::import,log::inf,log::dev)
                 << "importing module " << module_name_;
             module_ptr_type mod(new module<ModuleBinding>(module_name_));
             detail::scope module_scope(mod);
@@ -113,7 +113,7 @@ typedef jslib::IJSModuleLoader * (*init_function)(asl::DLHandle theDLHandle);
 #if defined(WIN32)
 #   define Y60_APE_MODULE_EXPORT __declspec( dllexport )
 #else
-#   define Y60_APE_MODULE_EXPORT 
+#   define Y60_APE_MODULE_EXPORT
 #endif
 
 #define Y60_APE_BNAME( name ) \

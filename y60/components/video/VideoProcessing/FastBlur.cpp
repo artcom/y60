@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -68,18 +68,18 @@ namespace y60 {
         Algorithm(theName),
         _myResultNode("result"),
         _myImageNodeVersion(0)
-    {   
+    {
     }
-  
-    FastBlur::~FastBlur() 
-    {   
+
+    FastBlur::~FastBlur()
+    {
         delete [] _myFloatImage;
-    }   
+    }
 
 
-    void 
+    void
     FastBlur::configure(const dom::Node & theNode) {
-        
+
         for( unsigned int i=0; i<theNode.childNodesLength(); i++) {
             const std::string myName = theNode.childNode("property",i)->getAttribute("name")->nodeValue();
             const std::string myValue = theNode.childNode("property",i)->getAttribute("value")->nodeValue();
@@ -95,26 +95,26 @@ namespace y60 {
 
                 } else if( myName == "targetimage") {
                     _myTargetImage = myImage->getFacade<y60::Image>();
-                } 
+                }
             } else {
                 if( myName == "strength") {
                     asl::fromString(myValue, _myStrength);
                 }
             }
-        }   
+        }
     }
 
-    void 
+    void
     FastBlur::onFrame(double t) {
-        asl::Unsigned64 myImageNodeVersion = _mySourceImage->getRasterValueNode()->nodeVersion(); 
+        asl::Unsigned64 myImageNodeVersion = _mySourceImage->getRasterValueNode()->nodeVersion();
         if (myImageNodeVersion > _myImageNodeVersion) {
             _myImageNodeVersion = myImageNodeVersion;
         } else {
             return;
         }
-        
+
         const GRAYRaster * mySourceFrame = dom::dynamic_cast_Value<GRAYRaster>(_mySourceImage->getRasterValue().get());
-        
+
         // float!
         GRAYRaster::const_iterator itSrc = mySourceFrame->begin();
         unsigned int i=0;
@@ -127,12 +127,12 @@ namespace y60 {
         for (i=1; i<_myWidth*_myHeight; ++i) {
             _myFloatImage[i] = revlookup(_myFloatImage[i]) + lookup(_myFloatImage[i-1]);
         }
-        
+
         // right-to-left horizontal pass
         for (i=_myWidth*_myHeight-1; i>1; --i) {
             _myFloatImage[i-1] = revlookup(_myFloatImage[i-1]) + lookup(_myFloatImage[i]);
         }
-         
+
         // up-down vertical pass
         for (unsigned int w=0; w<_myWidth; w++) {
             for (unsigned int h=1; h<_myHeight; h++) {
@@ -148,28 +148,28 @@ namespace y60 {
             for (unsigned int h=_myHeight-1; h>0; h--) {
                 unsigned int pos0 = w+_myWidth*(h-1);
                 unsigned int pos1 = w+_myWidth*(h);
-                
+
                 _myFloatImage[pos0] = revlookup(_myFloatImage[pos0]) + lookup(_myFloatImage[pos1]);
             }
-        } 
-        
+        }
+
         // reverse float
         // float!
         dom::Node::WritableValue<GRAYRaster> myTargetFrameLock(_myTargetImage->getRasterValueNode());
         GRAYRaster & myTargetFrame = myTargetFrameLock.get();
         GRAYRaster::iterator itTrgt = myTargetFrame.begin();
-     
+
         i=0;
         for (itTrgt; itTrgt != myTargetFrame.end(); ++itTrgt, ++i) {
             (*itTrgt) = static_cast<unsigned char>(_myFloatImage[i]);
-        }   
+        }
 	}
 
     float
     FastBlur::lookup(float theValue) {
         return (float) (theValue * _myStrength);
     }
-    
+
     float
     FastBlur::revlookup(float theValue) {
         return (float) (theValue * (1.0f - _myStrength));

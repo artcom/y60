@@ -27,8 +27,8 @@ namespace y60 {
             enum ShaderMatch {
                 FULL_MATCH, WILDCARD_MATCH, NO_MATCH
             };
- 
-            DEFINE_EXCEPTION(GLShaderException, asl::Exception);  
+
+            DEFINE_EXCEPTION(GLShaderException, asl::Exception);
             GLShader(const dom::NodePtr theNode);
             virtual ~GLShader();
 
@@ -43,8 +43,8 @@ namespace y60 {
 
             const MaterialType & getType() const;
             float getCosts() const;
-            ShaderMatch matches(const std::string & theFeatureClass, 
-                         const VectorOfString & theRequirementList) const; 
+            ShaderMatch matches(const std::string & theFeatureClass,
+                         const VectorOfString & theRequirementList) const;
 
             // implementation of IShader:
             virtual const std::string & getName() const;
@@ -56,10 +56,10 @@ namespace y60 {
             virtual bool hasFeature(const std::string & theFeatureClass) const;
 
             virtual void activateGroup1(MaterialBase & theMaterial, const Viewport & theViewport);
-            
+
             virtual void activate(MaterialBase & theMaterial, const Viewport & theViewport, const MaterialBase * theLastMaterial);
             virtual void deactivate(const MaterialBase & theMaterial);
-            
+
             virtual void enableTextures(const MaterialBase & theMaterial);
             virtual void disableTextures(const MaterialBase & theMaterial);
             virtual unsigned getMaxTextureUnits() const;
@@ -68,19 +68,19 @@ namespace y60 {
             virtual void bindBodyParams(const MaterialBase & theMaterial,
                     const Viewport & theViewport,
                     const LightVector & theLights,
-                    const Body & theBody, 
+                    const Body & theBody,
                     const Camera & theCamera);
-            virtual void bindOverlayParams(const MaterialBase & theMaterial) {};            
+            virtual void bindOverlayParams(const MaterialBase & theMaterial) {};
 
             void enableTextureProjection(const MaterialBase & theMaterial,
                                          const Viewport & theViewport,
                                          const Camera & theCamera);
 
        protected:
-            virtual void loadShaderProperties(const dom::NodePtr theShaderNode, 
+            virtual void loadShaderProperties(const dom::NodePtr theShaderNode,
                                       ShaderDescription & theShader);
-            void loadParameters(const dom::NodePtr theParameterListNode, 
-                                      ShaderDescription & theShader); 
+            void loadParameters(const dom::NodePtr theParameterListNode,
+                                      ShaderDescription & theShader);
             MaterialType            _myType;
 
        private:
@@ -93,10 +93,10 @@ namespace y60 {
             std::string             _myName;
             float                   _myCost;
             dom::NodePtr            _myDefaultTextures;
-            
+
             ShaderFeatureSet          _myFeatureSet;
             std::vector<dom::NodePtr> _myPropertyNodes;
-    
+
             bool _myHasImagingEXT;
             bool _myHasPointParmatersEXT;
             bool _myHasBlendMinMaxEXT;

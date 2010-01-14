@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -67,24 +67,24 @@ using namespace asl;
 using namespace y60;
 namespace jslib {
     typedef bool DummyT;
-    
+
 	class GLBinding : public asl::PlugInBase, public jslib::IScriptablePlugin {
     	public:
             typedef DummyT NATIVE;
             typedef asl::Ptr<DummyT> OWNERPTR;
             typedef JSWrapper<NATIVE,OWNERPTR,StaticAccessProtocol> Base;
-    	
+
     		GLBinding(asl::DLHandle theDLHandle) : asl::PlugInBase(theDLHandle) {}
 
             virtual JSFunctionSpec * StaticFunctions();
             virtual JSConstIntPropertySpec * ConstIntProperties();
-            
+
     		const char * ClassName() {
     		    static const char * myClassName = "gl";
     		    return myClassName;
     		}
 	};
-	
+
     JS_STATIC_DLL_CALLBACK(JSBool)
     Enable(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) {
         try {
@@ -96,10 +96,10 @@ namespace jslib {
             if (!convertFrom(cx, argv[0], myGLFlag)) {
                 JS_ReportError(cx,"Enable: argument 1 is not a unsigned");
                 return JS_FALSE;
-            }            
+            }
             ::glEnable(myGLFlag);
             return JS_TRUE;
-    
+
         } HANDLE_CPP_EXCEPTION;
     }
     JS_STATIC_DLL_CALLBACK(JSBool)
@@ -113,10 +113,10 @@ namespace jslib {
             if (!convertFrom(cx, argv[0], myGLFlag)) {
                 JS_ReportError(cx,"Disable: argument 1 is not a unsigned");
                 return JS_FALSE;
-            }            
+            }
             ::glDisable(myGLFlag);
             return JS_TRUE;
-    
+
         } HANDLE_CPP_EXCEPTION;
     }
 
@@ -129,7 +129,7 @@ namespace jslib {
     JSConstIntPropertySpec *
     GLBinding::ConstIntProperties() {
         const unsigned short BLENDING = GL_BLEND;
-        
+
         static JSConstIntPropertySpec myProperties[] = {
                 DEFINE_PROPERTY(BLENDING),
         {0}
@@ -139,16 +139,16 @@ namespace jslib {
 
 
 
-	
+
     JSFunctionSpec * GLBinding::StaticFunctions() {
         static JSFunctionSpec myFunctions[] = {
-            // name                         native                       nargs    
+            // name                         native                       nargs
             {"Enable",             Enable,             1},
             {"Disable",            Disable,             1},
             {0}
         };
         return myFunctions;
-    }    
+    }
 }
 
 extern "C"

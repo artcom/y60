@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -77,10 +77,10 @@ namespace y60 {
 
 namespace y60 {
 
-    DEFINE_EXCEPTION(VertexVectorException, asl::Exception); 
-    DEFINE_EXCEPTION(VertexObjectNotLocked,VertexVectorException); 
-    DEFINE_EXCEPTION(TooManyVertexVectorUnlocks,VertexVectorException);  
-    DEFINE_EXCEPTION(CanNotBindLockedVertexVector,VertexVectorException);  
+    DEFINE_EXCEPTION(VertexVectorException, asl::Exception);
+    DEFINE_EXCEPTION(VertexObjectNotLocked,VertexVectorException);
+    DEFINE_EXCEPTION(TooManyVertexVectorUnlocks,VertexVectorException);
+    DEFINE_EXCEPTION(CanNotBindLockedVertexVector,VertexVectorException);
 
     inline GLenum asGLEnum(VertexBufferUsage & theEnum) {
         switch (theEnum) {
@@ -89,7 +89,7 @@ namespace y60 {
             case VERTEX_USAGE_STREAM_READ:
                 return GL_STREAM_READ_ARB;
             case VERTEX_USAGE_STREAM_COPY:
-                return GL_STREAM_COPY_ARB; 
+                return GL_STREAM_COPY_ARB;
             case VERTEX_USAGE_STATIC_DRAW:
                 return GL_STATIC_DRAW_ARB;
             case VERTEX_USAGE_STATIC_READ:
@@ -107,7 +107,7 @@ namespace y60 {
         throw VertexVectorException(std::string("Unknown VBO usage flag '") + theEnum.asString() + "'", PLUS_FILE_LINE);
     }
 
-  
+
     template <class T>
     class VertexVector {
     public:
@@ -326,14 +326,14 @@ namespace y60 {
         reverse_iterator rbegin() {
             return std::reverse_iterator<T*>(this->end());
         }
-        const_reverse_iterator rbegin() const { 
-            return const_reverse_iterator(this->end()); 
+        const_reverse_iterator rbegin() const {
+            return const_reverse_iterator(this->end());
         }
         reverse_iterator rend() {
             return std::reverse_iterator<T*>(this->begin());
         }
-        const_reverse_iterator rend() const { 
-            return const_reverse_iterator(this->begin()); 
+        const_reverse_iterator rend() const {
+            return const_reverse_iterator(this->begin());
         }
 
         size_type size() const {
@@ -346,7 +346,7 @@ namespace y60 {
             return _myCapacity;
         }
         bool empty() const {
-            return size() != 0; 
+            return size() != 0;
         }
         reference operator[](size_type n) {
             return *(begin() + n);
@@ -362,7 +362,7 @@ namespace y60 {
                 bindMe();
                 upload(myData,x.size(), x.size());
                 x.unlock();
-            }            
+            }
             return *this;
         };
         void swap(VertexVector<T> & x) {
@@ -451,7 +451,7 @@ namespace y60 {
         }
         void resize_vec(size_type new_size, const T& x) {
         new_size = new_size / PackedRaster<T>::Factor;
-        if (new_size < size()) 
+        if (new_size < size())
         erase(begin() + new_size, end());
         else
         insert(end(), new_size - size(), x);

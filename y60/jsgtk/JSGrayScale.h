@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -87,7 +87,7 @@ class JSGrayScale : public JSWrapper<acgtk::GrayScale, asl::Ptr<acgtk::GrayScale
         JSGrayScale();  // hide default constructor
         typedef JSDrawingArea JSBASE;
     public:
-        virtual ~JSGrayScale() { 
+        virtual ~JSGrayScale() {
         }
         typedef acgtk::GrayScale NATIVE;
         typedef asl::Ptr<acgtk::GrayScale> OWNERPTR;
@@ -99,22 +99,22 @@ class JSGrayScale : public JSWrapper<acgtk::GrayScale, asl::Ptr<acgtk::GrayScale
 
         static JSFunctionSpec * Functions();
 
-        
+
         enum PropertyNumbers {
             PROP_END = JSBASE::PROP_END,
         };
-        
+
         static JSPropertySpec * Properties();
 
         virtual unsigned long length() const {
             return 1;
         }
 
-        static JSBool getPropertySwitch(NATIVE & theNative, unsigned long theID, 
-                JSContext *cx, JSObject *obj, jsval id, jsval *vp); 
+        static JSBool getPropertySwitch(NATIVE & theNative, unsigned long theID,
+                JSContext *cx, JSObject *obj, jsval id, jsval *vp);
         virtual JSBool getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp);
-        static JSBool setPropertySwitch(NATIVE & theNative, unsigned long theID, JSContext *cx, 
-                JSObject *obj, jsval id, jsval *vp); 
+        static JSBool setPropertySwitch(NATIVE & theNative, unsigned long theID, JSContext *cx,
+                JSObject *obj, jsval id, jsval *vp);
         virtual JSBool setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp);
 
         static JSBool
@@ -141,7 +141,7 @@ class JSGrayScale : public JSWrapper<acgtk::GrayScale, asl::Ptr<acgtk::GrayScale
 };
 
 template <>
-struct JSClassTraits<JSGrayScale::NATIVE> 
+struct JSClassTraits<JSGrayScale::NATIVE>
     : public JSClassTraitsWrapper<JSGrayScale::NATIVE, JSGrayScale> {};
 
 Y60_JSGTK_DECL jsval as_jsval(JSContext *cx, JSGrayScale::NATIVE * theWindow);
@@ -149,6 +149,6 @@ Y60_JSGTK_DECL bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<acgtk::G
 
 } // namespace
 
-#endif  
+#endif
 
 

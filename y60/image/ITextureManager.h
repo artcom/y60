@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -77,9 +77,9 @@ namespace y60 {
 
     /**
      * @ingroup Y60image
-     * 
+     *
      * Abstract Interface for a Texturemanager. The Interface for the TextureManager
-     * is made here, because it is needed in the image module. 
+     * is made here, because it is needed in the image module.
      */
     class Y60_IMAGE_DECL  ITextureManager {
     public:
@@ -107,7 +107,7 @@ namespace y60 {
         /**
          * @return the maximum texture size supported by the current hardware
          */
-        virtual int getMaxTextureSize(int theDimensions) const = 0; 
+        virtual int getMaxTextureSize(int theDimensions) const = 0;
 
         /**
          * @upload image data
@@ -124,7 +124,7 @@ namespace y60 {
             return myTextureLimit;
         }
         virtual ~ITextureManager() {}
- 
+
     };
 
     typedef asl::Ptr<ITextureManager> ITextureManagerPtr;

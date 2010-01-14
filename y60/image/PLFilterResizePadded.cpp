@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -109,12 +109,12 @@ PLFilterResizePadded::Apply(PLBmpBase * theSource, PLBmp * theDestination) const
     unsigned myDestBytesPerLine = myBytesPerPixel * _myNewWidth;
     unsigned mySourceHeight     = theSource->GetHeight();
 
-    unsigned myRemainingBytes = myDestBytesPerLine - mySrcBytesPerLine;    
+    unsigned myRemainingBytes = myDestBytesPerLine - mySrcBytesPerLine;
     //AC_PRINT << "myRemainingBytes: " << myRemainingBytes << " bytesPerPixel: " << myBytesPerPixel;
     for (unsigned y = 0; y < mySourceHeight; ++y) {
         PLBYTE * pSrcLine = pSrcLineArray[y];
         PLBYTE * pDstLine = pDstLineArray[y];
-        
+
         // Copy the image itself
         memcpy (pDstLine, pSrcLine, mySrcBytesPerLine);
 
@@ -122,29 +122,29 @@ PLFilterResizePadded::Apply(PLBmpBase * theSource, PLBmp * theDestination) const
         if (myRemainingBytes >= myBytesPerPixel) {
             memcpy(pDstLine + mySrcBytesPerLine, pSrcLine + mySrcBytesPerLine - myBytesPerPixel, myBytesPerPixel);
         }
-        
+
         // Repeat the fist column (to prevent texture repeat artefacts)
         if (myRemainingBytes >= (myBytesPerPixel * 2)) {
             memcpy(pDstLine + myDestBytesPerLine - myBytesPerPixel, pSrcLine, myBytesPerPixel);
         }
 
-        // Pad the remaining columns with black pixels (to improve compression ratios)        
+        // Pad the remaining columns with black pixels (to improve compression ratios)
         if (myRemainingBytes > (myBytesPerPixel * 2)) {
             memset(pDstLine + mySrcBytesPerLine + myBytesPerPixel, 0, myRemainingBytes - (2 * myBytesPerPixel));
-        } 
+        }
     }
-    
-    for (unsigned y = mySourceHeight; y < _myNewHeight; ++y) {        
-        PLBYTE * pDstLine = pDstLineArray[y];        
+
+    for (unsigned y = mySourceHeight; y < _myNewHeight; ++y) {
+        PLBYTE * pDstLine = pDstLineArray[y];
         if (y == mySourceHeight) {
             // Repeat the last line (to prevent texture repeate artefacts)
             memcpy(pDstLine, pDstLineArray[mySourceHeight - 1], myDestBytesPerLine);
         } else if (y == _myNewHeight - 1) {
             // Repeat the first line (to prevent texture repeate artefacts)
-            memcpy(pDstLine, pDstLineArray[0], myDestBytesPerLine);        
-        } else {        
+            memcpy(pDstLine, pDstLineArray[0], myDestBytesPerLine);
+        } else {
             // Set the remaining lines to black (to improve compression ratios)
             memset(pDstLine, 0, myDestBytesPerLine);
         }
-    } 
+    }
 }

@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -71,7 +71,7 @@ namespace y60 {
 
     public:
 
-        Resampler(asl::SampleFormat theSampleFormat) 
+        Resampler(asl::SampleFormat theSampleFormat)
             : asl::Effect(asl::createEffectFunctor<ResamplerFunctor>(theSampleFormat)),
               _myTargetFrames(441)
               //              _myRatio(1.0f)
@@ -105,12 +105,12 @@ namespace y60 {
                 unsigned myOldNumFrames = theBuffer.getNumFrames();
                 //                unsigned myNewNumFrames = (unsigned)(myOldNumFrames * (1.f/myResampler->getRatio()));
                 unsigned myNewNumFrames = myResampler->getTargetFrames();
-                asl::AudioBuffer<SAMPLE> theTempBuffer = asl::AudioBuffer<SAMPLE>(myNewNumFrames, theBuffer.getNumChannels(), 
+                asl::AudioBuffer<SAMPLE> theTempBuffer = asl::AudioBuffer<SAMPLE>(myNewNumFrames, theBuffer.getNumChannels(),
                                                                                   theBuffer.getSampleRate());
 
                 SAMPLE* curSample = theTempBuffer.begin();
                 unsigned myNumChannels = theBuffer.getNumChannels();
-                
+
                 for (unsigned myCurrentFrame = 0; myCurrentFrame < myNewNumFrames-1; myCurrentFrame++) {
                     for (unsigned myChannel = 0; myChannel < myNumChannels; myChannel++) {
                         float myPos = (float)myCurrentFrame / (float)myNewNumFrames;
@@ -143,7 +143,7 @@ namespace y60 {
 } // namespace <y60>
 
 #endif // INCL_Y60_RESAMPLER_H
-        
-        
-        
+
+
+
 

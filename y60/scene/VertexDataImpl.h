@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -61,7 +61,7 @@
 //   $Revision: 1.1 $
 //   $Date: 2005/04/21 16:25:02 $
 //
-//  Description: 
+//  Description:
 //
 //=============================================================================
 
@@ -99,22 +99,22 @@ namespace y60 {
             }
         }
         void load(const VectorOfUnsignedInt & theIndices,
-            dom::NodePtr theVertexDataNode)  
+            dom::NodePtr theVertexDataNode)
         {
-            const std::vector<T> & mySource = 
+            const std::vector<T> & mySource =
                 theVertexDataNode->dom::Node::nodeValueRef<std::vector<T> >();
 
-            unsigned mySize = _myData.size(); 
-            
+            unsigned mySize = _myData.size();
+
             _myData.resize(mySize + theIndices.size());
 
             lock(true, false);
             for (unsigned i = 0; i < theIndices.size(); ++i) {
                 _myData[mySize+i] = mySource[theIndices[i]];
-            }        
+            }
             unlock();
         }
-        
+
         // write back vertex data to dom source arrays
         void unload(const VectorOfUnsignedInt & theIndices,
             dom::NodePtr theVertexDataNode) const
@@ -128,7 +128,7 @@ namespace y60 {
 
             for (unsigned i = 0; i < theIndices.size(); ++i) {
                 mySource[theIndices[i]] = _myData[i];
-            }        
+            }
         }
         void lock(bool forWriting = true, bool forReading = false) const {}
         void unlock() const {}

@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -63,7 +63,7 @@
 //   $Revision: 1.5 $
 //
 //=============================================================================
- 
+
 #ifndef _ac_video_AsyncDecoder_h_
 #define _ac_video_AsyncDecoder_h_
 
@@ -77,7 +77,7 @@
 #include <asl/audio/HWSampleSink.h>
 
 namespace y60 {
-    
+
     /**
      * @ingroup y60video
      * Abstract base class for asynchronous decoders for audio/video movies.
@@ -101,17 +101,17 @@ namespace y60 {
             virtual void setVolume(const float theVolume) {
                 if (hasAudio()) {
                     _myAudioSink->setVolume(theVolume);
-                } 
+                }
             }
 
             /**
              * computes the audio time for audio/video sync. If no audio is played,
              * returns theSystemTime.
              * @param theSystemTime playbacktime passed since start of playback
-             * @return if the movie has audio, the audio-time that audio is currently 
+             * @return if the movie has audio, the audio-time that audio is currently
              *         played back, else theSystemTime
              */
-             
+
             double getMovieTime(double theSystemTime) {
                 if (!hasAudio() || !getDecodeAudioFlag()) {
                     AC_DEBUG << "No Audio returning " << MovieDecoderBase::getMovieTime(theSystemTime);
@@ -123,7 +123,7 @@ namespace y60 {
                     if (_myAudioSink->getState() == asl::HWSampleSink::STOPPED || _myCachingFlag) {
                         return 0;
                     } else {
-                        return _myAudioTimeOffset + double(_myAudioSink->getPumpTime());                            
+                        return _myAudioTimeOffset + double(_myAudioSink->getPumpTime());
                     }
                 }
             }
@@ -133,7 +133,7 @@ namespace y60 {
              */
             virtual void pauseMovie(bool thePauseAudioFlag = true) {
                 AC_INFO << "AsyncDecoder::pauseMovie";
-                if (thePauseAudioFlag && _myAudioSink && getDecodeAudioFlag()) {            
+                if (thePauseAudioFlag && _myAudioSink && getDecodeAudioFlag()) {
                     _myAudioSink->pause();
                 }
                 setState(PAUSE);
@@ -143,7 +143,7 @@ namespace y60 {
             void startMovie(double theStartTime, bool theStartAudioFlag = true) {
                 AC_DEBUG << "AsyncDecoder::startMovie";
                 MovieDecoderBase::startMovie(theStartTime);
-                if (theStartAudioFlag && _myAudioSink && getDecodeAudioFlag()) {            
+                if (theStartAudioFlag && _myAudioSink && getDecodeAudioFlag()) {
                     _myAudioSink->play();
                     _myAudioTimeOffset = theStartTime;
                 }
@@ -154,7 +154,7 @@ namespace y60 {
             void resumeMovie(double theStartTime, bool theResumeAudioFlag = true) {
                 AC_DEBUG << "AsyncDecoder::resumeMovie";
                 MovieDecoderBase::resumeMovie(theStartTime);
-                if (theResumeAudioFlag && _myAudioSink && getDecodeAudioFlag()) {            
+                if (theResumeAudioFlag && _myAudioSink && getDecodeAudioFlag()) {
                     _myAudioSink->play();
                 }
             }
@@ -164,21 +164,21 @@ namespace y60 {
                 PAUSE,
                 STOP
             };
-            
+
             /**
-             * Stops the current playback. Future calls to play will start from the beginning of 
-             * the movie as if it was 
+             * Stops the current playback. Future calls to play will start from the beginning of
+             * the movie as if it was
              */
             virtual void stopMovie(bool theStopAudioFlag = true) {
                 //AC_DEBUG << "AsyncDecoder::stopMovie";
                 MovieDecoderBase::stopMovie();
-                if (theStopAudioFlag && _myAudioSink && getDecodeAudioFlag()) {            
+                if (theStopAudioFlag && _myAudioSink && getDecodeAudioFlag()) {
                     AC_TRACE << "====== STOPPING AUDIO " << std::endl;
                     _myAudioSink->stop();
                 }
                 setState(STOP);
             }
-            
+
             static std::string getStateString(DecoderState theState) {
                 switch (theState) {
                     case RUN:
@@ -191,17 +191,17 @@ namespace y60 {
                         return "Unknown state";
                 }
             }
-            
+
             DecoderState getState() const {
                 return _myState;
             }
 
             void setState(DecoderState theState) {
-                //AC_DEBUG << "AsyncDecoder::setState State change: " << getStateString(_myState) << " --> " 
+                //AC_DEBUG << "AsyncDecoder::setState State change: " << getStateString(_myState) << " --> "
                 //        << getStateString(theState);
                 _myState = theState;
             }
-            
+
         protected:
             asl::HWSampleSinkPtr _myAudioSink;
             bool          _myCachingFlag;

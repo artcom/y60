@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -91,7 +91,7 @@ namespace jslib {
     template struct Y60_JSBASE_DECL ArgumentHolder<float const &>;
     template struct Y60_JSBASE_DECL ArgumentHolder<double>;
     template struct Y60_JSBASE_DECL ArgumentHolder<double const &>;
-                 
+
     template struct Y60_JSBASE_DECL ArgumentHolder<asl::Vector2<int> >;
     template struct Y60_JSBASE_DECL ArgumentHolder<asl::Vector3<int> >;
     template struct Y60_JSBASE_DECL ArgumentHolder<asl::Vector4<int> >;
@@ -105,7 +105,7 @@ namespace jslib {
     template struct Y60_JSBASE_DECL ArgumentHolder<asl::Point3<float> >;
     template struct Y60_JSBASE_DECL ArgumentHolder<asl::Point4<float> >;
     template struct Y60_JSBASE_DECL ArgumentHolder<asl::Time>;
- 
+
     template struct Y60_JSBASE_DECL ArgumentHolder<asl::Vector2<int> const &>;
     template struct Y60_JSBASE_DECL ArgumentHolder<asl::Vector3<int> const &>;
     template struct Y60_JSBASE_DECL ArgumentHolder<asl::Vector4<int> const &>;
@@ -115,22 +115,22 @@ namespace jslib {
     template struct Y60_JSBASE_DECL ArgumentHolder<asl::Vector2<double> const &>;
     template struct Y60_JSBASE_DECL ArgumentHolder<asl::Vector3<double> const &>;
     template struct Y60_JSBASE_DECL ArgumentHolder<asl::Vector4<double> const &>;
-                    
+
     template struct Y60_JSBASE_DECL ArgumentHolder<asl::Point2<float> const &>;
     template struct Y60_JSBASE_DECL ArgumentHolder<asl::Point3<float> const &>;
     template struct Y60_JSBASE_DECL ArgumentHolder<asl::Point4<float> const &>;
     template struct Y60_JSBASE_DECL ArgumentHolder<asl::Time const&>;
-                
+
     template struct Y60_JSBASE_DECL ArgumentHolder<std::vector<unsigned int> const &>;
     template struct Y60_JSBASE_DECL ArgumentHolder<std::vector<float> >;
     template struct Y60_JSBASE_DECL ArgumentHolder<std::vector<std::string> const &>;
-                 
+
     template struct Y60_JSBASE_DECL ArgumentHolder<asl::Quaternion<float> const &>;
     template struct Y60_JSBASE_DECL ArgumentHolder<asl::Sphere<float> const &>;
     template struct Y60_JSBASE_DECL ArgumentHolder<asl::Box2<float> const &>;
     template struct Y60_JSBASE_DECL ArgumentHolder<asl::Box3<float> const &>;
     template struct Y60_JSBASE_DECL ArgumentHolder<asl::Matrix4<float> const &>;
-               
+
     template struct Y60_JSBASE_DECL ArgumentHolder<std::string>;
     template struct Y60_JSBASE_DECL ArgumentHolder<std::string const &>;
     template struct Y60_JSBASE_DECL ArgumentHolder<dom::Node const &>;
@@ -160,7 +160,7 @@ namespace jslib {
     template struct Y60_JSBASE_DECL ResultConverter<asl::Vector3<double> >;
     template struct Y60_JSBASE_DECL ResultConverter<asl::Vector4<double> >;
     template struct Y60_JSBASE_DECL ResultConverter<std::vector<asl::Vector3<float> > >;
-                 
+
     template struct Y60_JSBASE_DECL ResultConverter<asl::Point2<int> >;
     template struct Y60_JSBASE_DECL ResultConverter<asl::Point3<int> >;
     template struct Y60_JSBASE_DECL ResultConverter<asl::Point4<int> >;
@@ -170,9 +170,9 @@ namespace jslib {
     template struct Y60_JSBASE_DECL ResultConverter<asl::Point2<double> >;
     template struct Y60_JSBASE_DECL ResultConverter<asl::Point3<double> >;
     template struct Y60_JSBASE_DECL ResultConverter<asl::Point4<double> >;
-                   
+
     template struct Y60_JSBASE_DECL ResultConverter<std::vector<asl::Point3<float> > >;
     template struct Y60_JSBASE_DECL ResultConverter<asl::Quaternion<float> >;
     template struct Y60_JSBASE_DECL ResultConverter<dom::NodePtr>;
     template struct Y60_JSBASE_DECL ResultConverter<dom::ValuePtr>;
-}                   
+}

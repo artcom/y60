@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -78,7 +78,7 @@ var myHeightOffset = 0;
 var myMode = DEFAULT_MODE;
 for (var i = 0; i < arguments.length; i++) {
 
-    var myArgumentStrings = arguments[i].split('='); 
+    var myArgumentStrings = arguments[i].split('=');
     if (myArgumentStrings[0] == "host") {
         myHost = myArgumentStrings[1];
         print( "Hostname:", myHost );
@@ -130,8 +130,8 @@ while (!mySynergyServer.isConnected()) {
 
 if (myMode == CLICKONPOINT_MODE) {
 
-    // ClickOnPointHandler: 
-    //      Hand positions the mouse cursor directly and on every touch ("add") event, 
+    // ClickOnPointHandler:
+    //      Hand positions the mouse cursor directly and on every touch ("add") event,
     //      a Left-Button-Click is performed until the hand is removed again.
     //      Both hands moved up or down are interpreted as mousewheel.
 
@@ -142,7 +142,7 @@ if (myMode == CLICKONPOINT_MODE) {
 
     // RelativeMouseHandler:
     //      hand movement moves the mouse cursor only a certain amount in move-direction.
-    //      cursor clicks are done with a second touch on the same position where you lifted 
+    //      cursor clicks are done with a second touch on the same position where you lifted
     //      your hand before.
 
     print( "Using relative mouse handler" );
@@ -150,10 +150,10 @@ if (myMode == CLICKONPOINT_MODE) {
     var myEventHandler = new RelativeMouseHandler( mySynergyServer, mySettings );
 } else {
     // ClickWithSecondHand:
-    //      Hand positions the mouse cursor just as normal mouse motion. When you put your 
-    //      other hand on the table you get a mouse click until you lift one or both hand 
+    //      Hand positions the mouse cursor just as normal mouse motion. When you put your
+    //      other hand on the table you get a mouse click until you lift one or both hand
     //      off the table.
-    
+
     print( "Using standard event handler" );
     use( "ClickWithSecondHand.js" );
     var myEventHandler = new ClickWidthSecondHand( mySynergyServer, mySettings );
@@ -167,7 +167,7 @@ function onFrame( theTime ) {
 }
 
 function onASSEvent( theEvent ) {
-    myEventHandler.onASSEvent( theEvent ); 
+    myEventHandler.onASSEvent( theEvent );
 }
 
 

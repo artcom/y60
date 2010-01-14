@@ -20,8 +20,8 @@ class class_wrapper {
                 return JS_SetPrivate(cx, obj, static_cast<void *>( new C() ));
             } Y60_APE_CATCH_BLOCKS;
         }
-        static 
-        void 
+        static
+        void
         finalize(JSContext * cx, JSObject * obj) {
             delete unwrap_native(cx, obj);
         }
@@ -30,8 +30,8 @@ class class_wrapper {
         unwrap_native(JSContext * cx, JSObject * obj, jsval * argv = NULL) {
             return static_cast<C*>( JS_GetInstancePrivate( cx, obj, & js_class_, argv));
         }
-        static 
-        void 
+        static
+        void
         init_class(JSContext * cx, JSObject * ns, const char * name) {
             js_class_.name        = name;
             // TODO: class flags

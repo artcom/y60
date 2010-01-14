@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -81,7 +81,7 @@ static void checkFramebufferStatus()
 
     bool isOK = false;
     ostringstream os;
-    switch(myStatus) {                                          
+    switch(myStatus) {
         case GL_FRAMEBUFFER_COMPLETE_EXT: // Everything's OK
             isOK = true;
             break;
@@ -96,7 +96,7 @@ static void checkFramebufferStatus()
         case GL_FRAMEBUFFER_INCOMPLETE_DUPLICATE_ATTACHMENT_EXT:
             os << "GL_FRAMEBUFFER_INCOMPLETE_DUPLICATE_ATTACHMENT_EXT" << endl;
             break;
-#else 
+#else
 // EXT_framebuffer_object version >= 117
 //   GL_FRAMEBUFFER_INCOMPLETE_DUPLICATE_ATTACHMENT_EXT has been removed from the extension [sh]
 #endif
@@ -138,7 +138,7 @@ OffscreenBuffer::OffscreenBuffer() :
 }
 
 OffscreenBuffer::~OffscreenBuffer() {
-    AC_DEBUG << "OffscreenBuffer:dtor called."; 
+    AC_DEBUG << "OffscreenBuffer:dtor called.";
 }
 
 void OffscreenBuffer::setUseFBO(bool theUseFlag)
@@ -152,11 +152,11 @@ void OffscreenBuffer::setUseFBO(bool theUseFlag)
 }
 
 
-void OffscreenBuffer::activate(TexturePtr theTexture, unsigned theSamples, 
+void OffscreenBuffer::activate(TexturePtr theTexture, unsigned theSamples,
                                unsigned theCubmapFace)
 {
     unsigned myTextureId = theTexture->getTextureId();
-    AC_DEBUG << "OffscreenBuffer:activate texture id = " << myTextureId << "theSamples = "<<theSamples; 
+    AC_DEBUG << "OffscreenBuffer:activate texture id = " << myTextureId << "theSamples = "<<theSamples;
     if (myTextureId == 0) {
         // ensure texture object exists
         myTextureId = theTexture->applyTexture();
@@ -171,11 +171,11 @@ void OffscreenBuffer::activate(TexturePtr theTexture, unsigned theSamples,
 void OffscreenBuffer::deactivate(TexturePtr theTexture, bool theCopyToImageFlag)
 {
     unsigned myTextureId = theTexture->getTextureId();
-    AC_DEBUG << "OffscreenBuffer:deactivate texture id = " << myTextureId << ", theCopyToImageFlag = "<<theCopyToImageFlag; 
+    AC_DEBUG << "OffscreenBuffer:deactivate texture id = " << myTextureId << ", theCopyToImageFlag = "<<theCopyToImageFlag;
 
     if (_myUseFBO) {
         if (_myFrameBufferObject[1]) {
-            AC_DEBUG << "OffscreenBuffer:deactivate texture id = " << myTextureId << ", blit multisample buffer to texture"; 
+            AC_DEBUG << "OffscreenBuffer:deactivate texture id = " << myTextureId << ", blit multisample buffer to texture";
             // blit multisample buffer to texture
             glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, _myFrameBufferObject[1]);
             glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, _myFrameBufferObject[0]);
@@ -193,7 +193,7 @@ void OffscreenBuffer::deactivate(TexturePtr theTexture, bool theCopyToImageFlag)
             glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, 0);
             glDrawBuffer(GL_BACK);
         } else {
-            AC_DEBUG << "OffscreenBuffer:deactivate texture id = " << myTextureId << ", unbinding framebuffer"; 
+            AC_DEBUG << "OffscreenBuffer:deactivate texture id = " << myTextureId << ", unbinding framebuffer";
             glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
         }
         CHECK_OGL_ERROR;
@@ -238,21 +238,21 @@ void OffscreenBuffer::copyToImage(TexturePtr theTexture)
         AC_ERROR << "OffscreenBuffer::copyToImage: Texture id='" << theTexture->get<IdTag>() << "' has no image associated";
         return;
     }
-    AC_DEBUG << "OffscreenBuffer::copyToImage texture=" << theTexture->get<NameTag>() 
+    AC_DEBUG << "OffscreenBuffer::copyToImage texture=" << theTexture->get<NameTag>()
              << " image=" << myImage->get<NameTag>();
 
     if (_myUseFBO) {
-        if (_myFrameBufferObject[1]) { // UH: not a bug, to determine if 
+        if (_myFrameBufferObject[1]) { // UH: not a bug, to determine if
                                        // multisampling is enabled
             glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, _myFrameBufferObject[0]);
         } else {
             glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _myFrameBufferObject[0]);
         }
     }
- 
-    PixelEncodingInfo myPixelEncodingInfo = 
+
+    PixelEncodingInfo myPixelEncodingInfo =
         getDefaultGLTextureParams(myImage->getRasterEncoding());
-    myPixelEncodingInfo.internalformat = 
+    myPixelEncodingInfo.internalformat =
         asGLTextureInternalFormat(theTexture->getInternalEncoding());
 
     unsigned myWidth = myImage->get<ImageWidthTag>();
@@ -271,7 +271,7 @@ void OffscreenBuffer::copyToImage(TexturePtr theTexture)
     myImage->getRasterValueNode()->bumpVersion();
 
     if (_myUseFBO) {
-        if (_myFrameBufferObject[1]) { // UH: not a bug, to determine if 
+        if (_myFrameBufferObject[1]) { // UH: not a bug, to determine if
                                        // multisampling is enabled
             glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, 0);
         } else {
@@ -290,16 +290,16 @@ void OffscreenBuffer::reset()
 }
 
 
-void OffscreenBuffer::bindOffscreenFrameBuffer(TexturePtr theTexture, unsigned theSamples, 
+void OffscreenBuffer::bindOffscreenFrameBuffer(TexturePtr theTexture, unsigned theSamples,
                                                unsigned theCubemapFace)
 {
     AC_DEBUG << "OffscreenBuffer::bindOffscreenFrameBuffer to texture=" << theTexture->get<IdTag>();
 
     // rebind texture if target image has changed
-    if (_myFrameBufferObject[0] 
-        && theTexture->getNode().nodeVersion() != _myTextureNodeVersion) 
+    if (_myFrameBufferObject[0]
+        && theTexture->getNode().nodeVersion() != _myTextureNodeVersion)
     {
-        AC_DEBUG << "Tearing down FBO since Texture has changed " 
+        AC_DEBUG << "Tearing down FBO since Texture has changed "
                  << theTexture->getNode().nodeVersion() << " != " << _myTextureNodeVersion;
 
         glDeleteFramebuffersEXT(2, &_myFrameBufferObject[0]);
@@ -315,11 +315,11 @@ void OffscreenBuffer::bindOffscreenFrameBuffer(TexturePtr theTexture, unsigned t
         /*
          * create FBO
          */
-        unsigned myWidth = theTexture->get<TextureWidthTag>(); 
-        unsigned myHeight = theTexture->get<TextureHeightTag>(); 
-        AC_DEBUG << "setup RTT framebuffer texture=" << theTexture->get<NameTag>() 
+        unsigned myWidth = theTexture->get<TextureWidthTag>();
+        unsigned myHeight = theTexture->get<TextureHeightTag>();
+        AC_DEBUG << "setup RTT framebuffer texture=" << theTexture->get<NameTag>()
                  << " size=" << myWidth << "x" << myHeight;
-        if (theSamples >= 1 && !_myHasFBOMultisample) 
+        if (theSamples >= 1 && !_myHasFBOMultisample)
         {
             AC_WARNING << "Multisampling requested but not supported, turning it off";
             theSamples = 0;
@@ -332,7 +332,7 @@ void OffscreenBuffer::bindOffscreenFrameBuffer(TexturePtr theTexture, unsigned t
              */
             GLint myMaxSamples;
             glGetIntegerv(GL_MAX_SAMPLES_EXT, &myMaxSamples);
-            AC_DEBUG << "setup multisample framebuffer multisampling samples=" 
+            AC_DEBUG << "setup multisample framebuffer multisampling samples="
                      << theSamples << " max.samples=" << myMaxSamples;
 
             // color buffer
@@ -340,7 +340,7 @@ void OffscreenBuffer::bindOffscreenFrameBuffer(TexturePtr theTexture, unsigned t
             glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, _myColorBuffer[1]);
             TextureInternalFormat myImageFormat = theTexture->getInternalEncoding();
             glRenderbufferStorageMultisampleEXT(GL_RENDERBUFFER_EXT,
-                                                theSamples, 
+                                                theSamples,
                                                 asGLTextureInternalFormat(myImageFormat),
                                                 myWidth, myHeight);
             checkOGLError(PLUS_FILE_LINE);
@@ -370,7 +370,7 @@ void OffscreenBuffer::bindOffscreenFrameBuffer(TexturePtr theTexture, unsigned t
         _myTextureNodeVersion = theTexture->getNode().nodeVersion();
         _myColorBuffer[0] = myTextureId;
 
-        AC_TRACE << "nodeVersion=" << _myTextureNodeVersion << " textureID=" 
+        AC_TRACE << "nodeVersion=" << _myTextureNodeVersion << " textureID="
                  << _myColorBuffer[0];
 
         // framebuffer
@@ -402,7 +402,7 @@ void OffscreenBuffer::bindOffscreenFrameBuffer(TexturePtr theTexture, unsigned t
             // depth buffer (only necessary when not multisampling)
             glGenRenderbuffersEXT(1, &_myDepthBuffer[0]);
             glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, _myDepthBuffer[0]);
-            glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT24, 
+            glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT24,
                                      myWidth, myHeight);
             checkOGLError(PLUS_FILE_LINE);
             glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT,

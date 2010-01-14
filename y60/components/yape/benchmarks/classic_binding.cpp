@@ -106,7 +106,7 @@ typedef jslib::JSWrapper<NATIVE,OWNERPTR, jslib::StaticAccessProtocol> Base;
         }
 
         virtual JSBool getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp);
-        virtual JSBool setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp); 
+        virtual JSBool setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp);
         static JSBool
         Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 
@@ -190,14 +190,14 @@ JSClassicAdder::ConstIntProperties() {
 
 // getproperty handling
 JSBool
-JSClassicAdder::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) 
+JSClassicAdder::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp)
 {
     return JS_TRUE;
 }
 
 // setproperty handling
 JSBool
-JSClassicAdder::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) 
+JSClassicAdder::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp)
 {
     return JS_TRUE;
 }
@@ -221,7 +221,7 @@ JSClassicAdder::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *arg
 
 
 JSObject *
-JSClassicAdder::initClass(JSContext *cx, JSObject *theGlobalObject) {    
+JSClassicAdder::initClass(JSContext *cx, JSObject *theGlobalObject) {
     JSObject *myClass = Base::initClass(cx, theGlobalObject, ClassName(), Constructor, Properties(), Functions(), ConstIntProperties());
     DOC_MODULE_CREATE("Components", JSClassicAdder);
     return myClass;

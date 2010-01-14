@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -75,7 +75,7 @@ SvgPolygon.prototype.Constructor = function(self, theMaterial) {
     self.getBody = function() {
         return _myBody;
     }
-   
+
     self.createPolygonShapeByVectorList = function(theId, theVector2fList) {
         _myShape = Modelling.createSurface2DFromContour(window.scene, theMaterial.id, theVector2fList, "Surface2d");
         //print(theVector2fList);
@@ -89,7 +89,7 @@ SvgPolygon.prototype.Constructor = function(self, theMaterial) {
         var myShapeElement = null;
         var myShapeElement = myShapeBuilder.appendElement("linestrip", _myMaterial.id);
         for(var myPointIndex = 0; myPointIndex < theVector2fList.length; myPointIndex++) {
-            var myVertex = new Vector3f(theVector2fList[myPointIndex].x, theVector2fList[myPointIndex].y, 0);            
+            var myVertex = new Vector3f(theVector2fList[myPointIndex].x, theVector2fList[myPointIndex].y, 0);
             push(myShapeBuilder, myShapeElement, myVertex);
         }
         // create shape, body
@@ -99,26 +99,26 @@ SvgPolygon.prototype.Constructor = function(self, theMaterial) {
 
        _myBody = Modelling..createBody(window.scene, _myShape.id);
         _myBody.name = "Body_" + theId;
-        window.scene.update(Scene.SHAPES | Scene.MATERIALS);        
+        window.scene.update(Scene.SHAPES | Scene.MATERIALS);
     }
-    
+
     self.createPolygonShapeByNode = function(theSvgNode, theOffset) {
         if (theOffset == undefined) {
             theOffset = new Vector2f(0,0);
         }
         var myPointString = theSvgNode.points;
         var myPoints = myPointString.split(" ");
-        
+
         var myVector2fList = [];
         for(var myPointIndex = 0; myPointIndex < (myPoints.length); myPointIndex++) {
-            
+
             var myPoint = trim(myPoints[myPointIndex]);
             if (myPoint.length >0 ) {
                 var myCoordinates = myPoint.split(",");
                 var myVertex = new Vector2f(Number(myCoordinates[0]) + theOffset.x, Number(myCoordinates[1]) + theOffset.y);
                 myVector2fList.push(myVertex);
             }
-        }        
+        }
         _myShape = Modelling.createSurface2DFromContour(window.scene, theMaterial.id, myVector2fList, "Surface2d");
         _myBody = Modelling.createBody(window.scene, _myShape.id);
         _myBody.name = "Body_" + theSvgNode.id;
@@ -179,7 +179,7 @@ SvgPolygon.prototype.Constructor = function(self, theMaterial) {
             theShapeBuilder.appendTexCoord(theElement, theTexCoord);
         }
     }
-    
+
     function setup() {
         if (theMaterial == undefined) {
             _myMaterial = Modelling.createUnlitTexturedMaterial(window.scene);
@@ -188,7 +188,7 @@ SvgPolygon.prototype.Constructor = function(self, theMaterial) {
         } else {
             _myMaterial = theMaterial;
         }
-        _myColor = new Vector4f(1,1,1,1); // boring ol' white               
+        _myColor = new Vector4f(1,1,1,1); // boring ol' white
     }
 
     var _myMaterial = null;

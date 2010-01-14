@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -76,11 +76,11 @@
 #endif //defined(_MSC_VER)
 
 namespace y60 {
- 
+
     enum GLSourceBuffer {
         FRAME_BUFFER,
         DEPTH_BUFFER
-    };   
+    };
 
     DEFINE_EXCEPTION(GLBufferAdapterException, asl::Exception);
     class Y60_GLUTIL_DECL BufferAdapter {
@@ -120,7 +120,7 @@ namespace y60 {
 #define PL_FT_PSD    14
 #define PL_FT_SGI    15
 */
-    
+
     class Y60_GLUTIL_DECL BufferToFile : public BufferAdapter {
         public:
             BufferToFile(const std::string & theFilename, unsigned theFormat,
@@ -131,7 +131,7 @@ namespace y60 {
             std::string _myFilename;
             unsigned _myFormat;
     };
- 
+
     class Y60_GLUTIL_DECL BufferToTexture : public BufferAdapter {
         public:
             BufferToTexture(TexturePtr theTexture, const asl::Vector2i & theOffset, bool theCopyToImageFlag = false);

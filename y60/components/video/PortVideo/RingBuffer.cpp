@@ -22,7 +22,7 @@ RingBuffer::RingBuffer(int size) {
 	readIndex  = 0;
 	writeIndex = 0;
 	bufferSize = size;
-	
+
 	buffer[0] = new unsigned char[bufferSize];
 	buffer[1] = new unsigned char[bufferSize];
 	buffer[2] = new unsigned char[bufferSize];

@@ -18,7 +18,7 @@ using namespace y60;
 void
 testShaderLibrary(const std::string & theLibraryFileName, const std::string theVertexProfileName, const std::string theFragmentProfileName) {
     cerr << "Testing shader library file'"<< theLibraryFileName
-         << " with vertex profile '" << theVertexProfileName 
+         << " with vertex profile '" << theVertexProfileName
          << "' and fragment profile '" << theFragmentProfileName  << "'" << endl;
     ShaderLibrary myShaderLibrary;
     myShaderLibrary.load(theLibraryFileName, theVertexProfileName, theFragmentProfileName);
@@ -32,9 +32,9 @@ testShaderLibrary(const std::string & theLibraryFileName, const std::string theV
         if (myShader) {
             const VectorOfString & myFragmentShaders = myShader->getShader(FRAGMENT_SHADER)._myPossibleProfileNames;
             const VectorOfString & myVertexShaders = myShader->getShader(VERTEX_SHADER)._myPossibleProfileNames;
-            bool matchesFragmentShader = 
+            bool matchesFragmentShader =
                 (std::find(myFragmentShaders.begin(), myFragmentShaders.end(), theFragmentProfileName) != myFragmentShaders.end());
-            bool matchesVertexShader = 
+            bool matchesVertexShader =
                 (std::find(myVertexShaders.begin(), myVertexShaders.end(), theVertexProfileName) != myVertexShaders.end());
             if (matchesFragmentShader != matchesVertexShader) {
                 cerr << "##### WARNING: vertex and fragment profiles of different generation";
@@ -60,14 +60,14 @@ int main(int argc, char * argv[]) {
 
     try {
         testShaderLibrary(SHADER_DIR "shaderlibrary_nocg.xml","","");
-        
+
         std::vector<std::pair<std::string, std::string> > myProfiles;
         myProfiles.push_back(std::make_pair("arbvp1", "arbfp1"));
         myProfiles.push_back(std::make_pair("vp20", "fp20"));
         myProfiles.push_back(std::make_pair("vp30", "fp30"));
         myProfiles.push_back(std::make_pair("vp40", "fp40"));
         myProfiles.push_back(std::make_pair("gp4vp", "gp4fp"));
-        
+
         for (std::vector<std::pair<std::string, std::string> >::size_type i = 0; i < myProfiles.size(); ++i) {
             //testShaderLibrary(myLibraryDir+"toonshaders.xml", myProfiles[i].first, myProfiles[i].second);
             testShaderLibrary(SHADER_DIR "shaderlibrary.xml", myProfiles[i].first, myProfiles[i].second);

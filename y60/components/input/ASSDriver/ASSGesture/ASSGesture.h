@@ -53,11 +53,11 @@ class ASSGesture : public asl::PlugInBase,
         dom::NodePtr                    _myGestureSchema;
         asl::Ptr<dom::ValueFactory>     _myValueFactory;
         y60::EventPtrList               _myEvents;
-        
+
         std::map<int, Position3fVector> _myCursorHistory;
         std::map<int, Position3fVector> _myLastAverageList;
         std::map<int, Position3fVector> _myInitialPosition;
-        
+
         CursorList                      _myCursorList;
         std::map<int, asl::Vector3f>    _myVectorHistory;
         std::map<int, float>            _myFirstZoomDistance;
@@ -71,9 +71,9 @@ class ASSGesture : public asl::PlugInBase,
         int                             _myMaxClickDistance;
         double                          _myMaxClickTime;
         double                          _myMinClickTime;
-        
-        
-        
+
+
+
 };
 
 } // end of namespace y60

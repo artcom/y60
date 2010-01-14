@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -62,12 +62,12 @@ function GtkSwitchNodeGroupHandler( theSwitchHandler, theParentMenu ) {
 }
 
 GtkSwitchNodeGroupHandler.prototype.Constructor = function( obj, theSwitchHandler, theParentMenu ) {
-    
+
     function setup() {
         buildMenuItem(theSwitchHandler, theParentMenu);
         _myHandlers.push(theSwitchHandler);
     }
-    
+
     function removeMenuItem() {
         for (var h in _mySignalHandlers) {
             _mySignalHandlers[h].disconnect();
@@ -82,7 +82,7 @@ GtkSwitchNodeGroupHandler.prototype.Constructor = function( obj, theSwitchHandle
         if (_myItem) {
             removeMenuItem();
         }
-        
+
         var myLabel = theHandler.switchName;
         if (theLabel != undefined) {
             myLabel = theLabel;
@@ -92,7 +92,7 @@ GtkSwitchNodeGroupHandler.prototype.Constructor = function( obj, theSwitchHandle
         _myTearOff = new TearoffMenuItem();
         _myTearOff.show();
         theMenu.append(_myItem);
-        _myItem.show();       
+        _myItem.show();
         _mySubMenu = new Menu();
         _mySubMenu.append(_myTearOff);
         _myItem.submenu = _mySubMenu;
@@ -115,7 +115,7 @@ GtkSwitchNodeGroupHandler.prototype.Constructor = function( obj, theSwitchHandle
             for (var i=0; i<myReferenceNode.childNodesLength(); ++i) {
                 var myChildNode = myReferenceNode.childNode(i);
                 if ((myChildNode.name.indexOf(myNode.name) != -1) || ((myChildNode.name+"M").indexOf(myNode.name) != -1)) {
-                   
+
                     for (var j=0; j<myChildNode.childNodesLength(); ++j) {
                         var myChild = myChildNode.childNode(j);
                         var myItem = createSubmenuItem(myChild, theSubMenu, myGroupItem);
@@ -128,7 +128,7 @@ GtkSwitchNodeGroupHandler.prototype.Constructor = function( obj, theSwitchHandle
             }
             return;
         }
-                    
+
         // material and geometry switches
         for (var i = 0; i < myNode.childNodesLength(); ++i) {
             var myChild = myNode.childNode( i );
@@ -142,7 +142,7 @@ GtkSwitchNodeGroupHandler.prototype.Constructor = function( obj, theSwitchHandle
                 myItem.active = true;
             } else {
                 if (myChild.visible) {
-                    myGroupItem.active = false; 
+                    myGroupItem.active = false;
                 }
                 myItem.active = myChild.visible;
             }
@@ -152,7 +152,7 @@ GtkSwitchNodeGroupHandler.prototype.Constructor = function( obj, theSwitchHandle
     function createSubmenuItem(theNode, theSubMenu, theGroupItem) {
         var myLabelString = theNode.name.replace(/_/g, " ");
         var myItem = new RadioMenuItem(myLabelString, false);
-        
+
         if (theGroupItem) {
             myItem.setGroupFromItem(theGroupItem);
         }
@@ -164,9 +164,9 @@ GtkSwitchNodeGroupHandler.prototype.Constructor = function( obj, theSwitchHandle
 
         var myFunctionString = 'this.onSwitchNodeSwitched(\'' + theNode.name + '\');';
         obj['_myGtkSwitchNodeHandler_'+theNode.name] = new Function (myFunctionString);
-        
-        
-        
+
+
+
         _mySignalHandlers[ theNode.name ] =
             myItem.signal_activate.connect( obj, "_myGtkSwitchNodeHandler_" + theNode.name);
 
@@ -178,29 +178,29 @@ GtkSwitchNodeGroupHandler.prototype.Constructor = function( obj, theSwitchHandle
              _myHandlers[0].activeName == theName) {
             return;
         }
-       
+
         if ( _myChildren[ theName ].active ) {
             // get previous item and disable it.
             if (_myHandlers[0].activeName) {
                 _myChildren[ _myHandlers[0].activeName ].active = false;
             }
-            
+
             // activate new one.
             for (var i=0; i < _myHandlers.length; ++i) {
                 _myHandlers[i].setActiveChildByName( theName );
             }
         }
-    
+
         if (_myHandlers.length > 0) {
             // remember last switched material for use in materialtable
             Logger.info("onSwitchNodeSwitched: "+theName+" switchName: "+_myHandlers[0].switchName);
             ourViewer.lastSwitched[_myHandlers[0].switchName] = theName;
         }
-        
+
         if (ourMaterialComboBox != null) {
             updateMaterialEditor();
         }
-        
+
     }
 
     obj.finalize = function() {
@@ -215,7 +215,7 @@ GtkSwitchNodeGroupHandler.prototype.Constructor = function( obj, theSwitchHandle
 
         // unfortunately there is no other way of changing the menuitem label
         // than to destroy it and make new one [jb]
-        buildMenuItem(theSwitchHandler, theParentMenu, 
+        buildMenuItem(theSwitchHandler, theParentMenu,
                 _myHandlers[0].switchName + " (" + String(_myHandlers.length) + ")");
 
         // make sure all similar nodes added to this menu item are in the same condition as the first one
@@ -228,7 +228,7 @@ GtkSwitchNodeGroupHandler.prototype.Constructor = function( obj, theSwitchHandle
     var _myTearOff = null;
     var _myChildren = {};
     var _mySignalHandlers = {};
-    
+
     setup();
 }
 
@@ -245,7 +245,7 @@ SwitchNodeMenu.prototype.Constructor = function( obj ) {
             return 1;
         } else if (a.switchName < b.switchName) {
             return -1;
-        } 
+        }
         return 0;
     }
 
@@ -259,11 +259,11 @@ SwitchNodeMenu.prototype.Constructor = function( obj ) {
                 return 1;
             } else if (a.childCount < b. childCount){
                 return -1;
-            } 
+            }
             return 0;
         }
     }
-    
+
     function hasDescendantWithCode(theNode, theCode) {
         if ((theNode.name.search(/_(.+?)_/) != -1) && (theCode == RegExp.$1)) {
             return true;
@@ -283,7 +283,7 @@ SwitchNodeMenu.prototype.Constructor = function( obj ) {
         if (a.childCount != b.childCount) {
             return false;
         }
-        
+
         if (a.switchName == b.switchName) {
             var i = 0;
             while (i < a.childCount) {
@@ -296,12 +296,12 @@ SwitchNodeMenu.prototype.Constructor = function( obj ) {
                 }
                 ++i;
             }
-            
+
             return true;
         }
         return false;
     }
-    
+
     obj.setup = function( theViewer ) {
         _mySwitchNodeMenuItem = ourGlade.get_widget("switchnode_menu");
         _mySwitchNodeMenu = new Menu();
@@ -311,19 +311,19 @@ SwitchNodeMenu.prototype.Constructor = function( obj ) {
         var mySwitchNodes  = theViewer.getSwitchNodes();
         var myMSwitchNodes = theViewer.getMaterialSwitchNodes();
         var myTSwitchNodes = theViewer.getTextureSwitchNodes();
-        
+
         Logger.info("Geometry switches found: " + mySwitchNodes.length);
         Logger.info("Material switches found: " + myMSwitchNodes.length);
         Logger.info("Texture switches found: " + myTSwitchNodes.length);
-        
+
         //material switches
         if ( myMSwitchNodes.length > 0) {
             myMSwitchNodes.sort(sortSwitchNodes);
             for (var i = 0; i < myMSwitchNodes.length; ++i) {
-                
+
                 _myHandlers.push( new GtkSwitchNodeGroupHandler( myMSwitchNodes[i],
                                             _mySwitchNodeMenu ) );
-            }            
+            }
             _mySeparatorItems.push( new SeparatorMenuItem() );
             _mySwitchNodeMenu.append( _mySeparatorItems[_mySeparatorItems.length - 1] );
             _mySeparatorItems[_mySeparatorItems.length - 1].show();
@@ -332,10 +332,10 @@ SwitchNodeMenu.prototype.Constructor = function( obj ) {
         //geometry switches
         if ( mySwitchNodes.length > 0) {
             mySwitchNodes.sort(sortSwitchNodes);
-            
+
             var mySwitchNodesSameName;
             for (var i = 0; i < mySwitchNodes.length; ++i) {
-                
+
                 if (i > 0 && areEqualSwitchNodes(mySwitchNodes[i], mySwitchNodes[i-1])) {
                     _myHandlers[_myHandlers.length - 1].addSwitchNode(mySwitchNodes[i]);
                 } else {
@@ -356,13 +356,13 @@ SwitchNodeMenu.prototype.Constructor = function( obj ) {
                                             _mySwitchNodeMenu ) );
             }
         }
-        
+
         _mySwitchNodeMenuItem.sensitive = _myHandlers.length > 0;
     }
 
     obj.finalize = function() {
         for (var i = 0; i < _myHandlers.length; ++i) {
-            _myHandlers[i].finalize();        
+            _myHandlers[i].finalize();
         }
         if (_mySwitchNodeMenuItem) {
             _mySwitchNodeMenuItem.submenu = null;
@@ -371,7 +371,7 @@ SwitchNodeMenu.prototype.Constructor = function( obj ) {
         _mySeparatorItems = [];
         gc();
     }
-    
+
     var _mySwitchNodeMenu = null;
     var _mySwitchNodeMenuItem = null;
     var _mySeparatorItems = [];

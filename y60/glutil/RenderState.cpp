@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -89,7 +89,7 @@ namespace y60 {
     RenderState::init() {
         commitWireframe(_myWireframeFlag);
         commitLighting(_myLightingFlag);
-        commitBackfaceCulling(_myBackfaceCullingFlag);        
+        commitBackfaceCulling(_myBackfaceCullingFlag);
         commitFlatShading(_myFlatShadingFlag);
         commitTexturing(_myTexturingFlag);
         commitIgnoreDepth(_myIgnoreDepthFlag);
@@ -101,7 +101,7 @@ namespace y60 {
         commitFrontFaceCCW(_myFrontFaceCCWFlag);
     }
 
-    
+
     void
     RenderState::commitFrontFaceCCW(bool theFlag) {
         if (theFlag) {
@@ -173,7 +173,7 @@ namespace y60 {
         _myTexturingFlag = theFlag;
     }
 
-    void 
+    void
     RenderState::setClippingPlanes(const std::vector<asl::Planef> & thePlanes) {
         for (unsigned i = 0; i < thePlanes.size(); ++i) {
             GLenum myGLPlaneId = asGLClippingPlaneId(i);
@@ -185,7 +185,7 @@ namespace y60 {
         }
         _myEnabledClippingPlanes = thePlanes.size();
     }
-    void 
+    void
     RenderState::setScissorBox(const asl::Box2f & theBox, const Viewport & theViewport) {
         if (theBox.contains(asl::Box2f(0,0,1,1))) {
             // box is >= screen, turn off scissor test
@@ -195,7 +195,7 @@ namespace y60 {
         setScissorTest(true);
         asl::Vector4i myParams(0,0,0,0);
         if (!theBox.isEmpty()) {
-            // transform box to screen (pixel) coords 
+            // transform box to screen (pixel) coords
             const dom::Node * myCanvasNode = theViewport.getNode().parentNode();
             const CanvasPtr & myCanvas = myCanvasNode->getFacade<Canvas>();
             int myHeight = myCanvas->getHeight();
@@ -215,7 +215,7 @@ namespace y60 {
     }
 
     void
-    RenderState::commitIgnoreDepth(bool theFlag) {                    
+    RenderState::commitIgnoreDepth(bool theFlag) {
         if (theFlag) {
             glDepthFunc(GL_ALWAYS); // has no effect since disabled
             glDisable(GL_DEPTH_TEST);
@@ -227,7 +227,7 @@ namespace y60 {
     }
 
     void
-    RenderState::commitDepthWrites(bool theFlag) {                    
+    RenderState::commitDepthWrites(bool theFlag) {
         if (theFlag) {
             glDepthMask(GL_TRUE);
         } else {
@@ -237,7 +237,7 @@ namespace y60 {
     }
 
     void
-    RenderState::commitPolygonOffset(bool theFlag) {                    
+    RenderState::commitPolygonOffset(bool theFlag) {
         if (theFlag) {
             glEnable(GL_POLYGON_OFFSET_POINT);
             glEnable(GL_POLYGON_OFFSET_LINE);

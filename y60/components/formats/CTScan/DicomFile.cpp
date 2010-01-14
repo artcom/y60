@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -175,7 +175,7 @@ DicomFile::getEncoding() const {
     }
 }
 
-dom::ResizeableRasterPtr 
+dom::ResizeableRasterPtr
 DicomFile::getRaster(int theFrame) {
     E_TransferSyntax xfer = _myDicomFile->getDataset()->getOriginalXfer();
     DicomImage myDicomImage(_myDicomFile, xfer, 0lu, static_cast<unsigned long>(theFrame), 1lu);
@@ -189,7 +189,7 @@ DicomFile::getRaster(int theFrame) {
 
     const unsigned char * myRawData = reinterpret_cast<const unsigned char*>(myPixelData->getData());
 
-    asl::ReadableBlockAdapter myRawBlock(myRawData, myRawData + getBytesRequired(myPixelData->getCount(), myEncoding)); 
+    asl::ReadableBlockAdapter myRawBlock(myRawData, myRawData + getBytesRequired(myPixelData->getCount(), myEncoding));
     AC_TRACE << "creating frame " << theFrame << ", " << myDicomImage.getWidth() << "x" << myDicomImage.getHeight();
     return dynamic_cast_Ptr<dom::ResizeableRaster>(
             createRasterValue(myEncoding, myDicomImage.getWidth(), myDicomImage.getHeight(), myRawBlock));
@@ -201,17 +201,17 @@ DicomFile::~DicomFile() {
     }
 }
 
-int 
+int
 DicomFile::getFrameCount() const {
     return _myFrameCount;
 };
 
-asl::Vector3f 
+asl::Vector3f
 DicomFile::getVoxelSize() const {
     return _myVoxelSize;
 }
 
-float 
+float
 DicomFile::getZPos(int theFrame) const {
     return _myImagePosition[2]+_myVoxelSize[2]*theFrame;
 }

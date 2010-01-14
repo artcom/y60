@@ -22,7 +22,7 @@ template <class F>
 struct invoke_tag : invoke_tag_<
                     returns_void<F>::value,
                     boost::is_member_function_pointer<F>::value,
-                    arity<F>::value > {}; 
+                    arity<F>::value > {};
 
 template <typename C> class class_wrapper;
 

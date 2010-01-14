@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,12 +51,12 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-#include "VideoProcessing.h" 
+#include "VideoProcessing.h"
 
 #include "ShotDetection.h"
 #include "ColorDetection.h"
@@ -98,8 +98,8 @@ namespace y60 {
         REGISTER_ALGORITHM(Histogram);
         REGISTER_ALGORITHM(TestAlgorithm);
         REGISTER_ALGORITHM(ShotDetectionAlgorithm);
-        REGISTER_ALGORITHM(BackgroundSubtraction); 
-        REGISTER_ALGORITHM(FastBlur); 
+        REGISTER_ALGORITHM(BackgroundSubtraction);
+        REGISTER_ALGORITHM(FastBlur);
         REGISTER_ALGORITHM(Contrast);
         REGISTER_ALGORITHM(Blobs);
         REGISTER_ALGORITHM(AdaptiveBackground);
@@ -126,22 +126,22 @@ namespace y60 {
         PropertyValue & theReturnValue) const
     {
         AC_DEBUG << "onGetProperty " << thePropertyName;
-        if (thePropertyName == "result") {           
-            dom::Element myResultsNode("results");      
+        if (thePropertyName == "result") {
+            dom::Element myResultsNode("results");
             for (AlgorithmList::const_iterator it = _myAlgorithmList.begin(); it != _myAlgorithmList.end(); ++it) {
                 dom::NodePtr myResultNode = myResultsNode.appendChild((*it)->result());
-                myResultNode->appendAttribute("name", (*it)->getAlgorithmName());    
+                myResultNode->appendAttribute("name", (*it)->getAlgorithmName());
             }
-            //be cool & lazy and return a copy 
+            //be cool & lazy and return a copy
             theReturnValue.set<NodePtr>(NodePtr(new Node(myResultsNode)));
         }
     }
 
-    void 
+    void
         VideoProcessingExtension::init(y60::ScenePtr theScene) {
             _myScene = theScene;
             _myAlgorithmList.clear();
-    }   
+    }
 
     void
         VideoProcessingExtension::onSetProperty(const std::string & thePropertyName,
@@ -150,28 +150,28 @@ namespace y60 {
         AC_INFO << "onSetProperty " << thePropertyName;
 
         if (thePropertyName == "configuration") {
-            dom::Node myConfig = *thePropertyValue.get<dom::NodePtr>();           
-            for( unsigned int i=0; i<myConfig.childNodesLength(); i++)  {   
+            dom::Node myConfig = *thePropertyValue.get<dom::NodePtr>();
+            for( unsigned int i=0; i<myConfig.childNodesLength(); i++)  {
                 AC_INFO << "config " << myConfig.childNode("algorithm", i)->getAttribute("name")->nodeValue();
                 dom::NodePtr myAlgorithmNode = myConfig.childNode("algorithm", i);
                 const std::string myAlgorithmName = myAlgorithmNode->getAttribute("name")->nodeValue();
 
-                AlgorithmPtr myAlgorithm = createAlgorithm(myAlgorithmName); 
+                AlgorithmPtr myAlgorithm = createAlgorithm(myAlgorithmName);
                 if( myAlgorithm ) {
                     myAlgorithm->setScene(_myScene);
-                    myAlgorithm->configure(*myAlgorithmNode); 
+                    myAlgorithm->configure(*myAlgorithmNode);
                 } else {
-                    AC_WARNING << "no algorithm set but got a configuration. ignored. " 
+                    AC_WARNING << "no algorithm set but got a configuration. ignored. "
                         << thePropertyValue.get<dom::NodePtr>();
-                    return;     
+                    return;
                 }
                 _myAlgorithmList.push_back(myAlgorithm);
-            }                      
+            }
             AC_INFO << "videoprocessingextension :: configuration se prop " << _myScene;
-        }    
-    }           
+        }
+    }
 
-    void    
+    void
         VideoProcessingExtension::onFrame(AbstractRenderWindow * theWindow , double t) {
             if ( _myAlgorithmList.size() > 0 ) {
                 for (AlgorithmList::iterator it = _myAlgorithmList.begin(); it != _myAlgorithmList.end(); ++it) {
@@ -183,9 +183,9 @@ namespace y60 {
     ///////////////////////////////////////////////////////////////////////////////
     // JavaScript binding
 
-    static JSBool Init(JSContext* cx, JSObject* obj, uintN argc, jsval* argv, 
-        jsval* rval) 
-    {           
+    static JSBool Init(JSContext* cx, JSObject* obj, uintN argc, jsval* argv,
+        jsval* rval)
+    {
         DOC_BEGIN("");
         DOC_END;
 
@@ -205,12 +205,12 @@ namespace y60 {
     // IScriptablePlugin
 
     JSFunctionSpec * VideoProcessingExtension::Functions() {
-        static JSFunctionSpec functions[] = {   
-            {"init", Init, 1},  
-            {0} 
-        };  
+        static JSFunctionSpec functions[] = {
+            {"init", Init, 1},
+            {0}
+        };
         return functions;
-    }   
+    }
 
 
     JSFunctionSpec * VideoProcessingExtension::StaticFunctions() {

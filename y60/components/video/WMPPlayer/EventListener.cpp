@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -61,13 +61,13 @@
 #include <asl/base/Logger.h>
 
 HRESULT EventListener::Invoke(
-                            DISPID  dispIdMember,      
-                            REFIID  riid,              
-                            LCID  lcid,                
-                            WORD  wFlags,              
-                            DISPPARAMS FAR*  pDispParams,  
-                            VARIANT FAR*  pVarResult,  
-                            EXCEPINFO FAR*  pExcepInfo,  
+                            DISPID  dispIdMember,
+                            REFIID  riid,
+                            LCID  lcid,
+                            WORD  wFlags,
+                            DISPPARAMS FAR*  pDispParams,
+                            VARIANT FAR*  pVarResult,
+                            EXCEPINFO FAR*  pExcepInfo,
                             unsigned int FAR*  puArgErr )
 {
     if (!pDispParams)
@@ -94,19 +94,19 @@ HRESULT EventListener::Invoke(
     return( hr );
 }
 
-void 
+void
 EventListener::init() {
     _myLoadedFlag = false;
     _myErrorFlag = false;
 }
-bool 
+bool
 EventListener::isLoaded() {
     return _myLoadedFlag;
-}	   
-bool 
+}
+bool
 EventListener::gotError() {
     return _myErrorFlag;
-}	   
+}
 
 // Sent when the control changes OpenState
 void EventListener::OpenStateChange(long NewState)

@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -73,17 +73,17 @@ namespace y60 {
         _myResultNode("result"),
         _myCounter(0),
         _myImageNodeVersion(0)
-    {   
+    {
     }
-  
 
-    void 
+
+    void
     BackgroundSubtraction::configure(const dom::Node & theNode) {
-        
+
         for( unsigned int i=0; i<theNode.childNodesLength(); i++) {
-            const std::string myName = 
+            const std::string myName =
                 theNode.childNode("property",i)->getAttribute("name")->nodeValue();
-            const std::string myValue = 
+            const std::string myValue =
                 theNode.childNode("property",i)->getAttribute("value")->nodeValue();
             dom::NodePtr myImage = _myScene->getSceneDom()->getElementById(myValue);
 
@@ -96,7 +96,7 @@ namespace y60 {
                     _myBackgroundImage = myImage->getFacade<y60::Image>();
                 } else if( myName == "targetimage") {
                     _myTargetImage = myImage->getFacade<y60::Image>();
-                } 
+                }
             } else {
                 if( myName == "threshold") {
                     asl::fromString(myValue, _myThreshold);
@@ -105,27 +105,27 @@ namespace y60 {
                 }
 
             }
-        }   
+        }
         // TODO:  add colorspace and dimension checking! [sh]
     }
 
-	void 
+	void
     BackgroundSubtraction::onFrame(double t) {
-        
-        asl::Unsigned64 myImageNodeVersion = _mySourceImage->getRasterValueNode()->nodeVersion(); 
+
+        asl::Unsigned64 myImageNodeVersion = _mySourceImage->getRasterValueNode()->nodeVersion();
         if (myImageNodeVersion > _myImageNodeVersion) {
             _myImageNodeVersion = myImageNodeVersion;
         } else {
             return;
         }
 
-        const GRAYRaster & mySourceFrame =  
+        const GRAYRaster & mySourceFrame =
             _mySourceImage->getRasterValueNode()->nodeValueRef<GRAYRaster>();
-        dom::Node::WritableValue<GRAYRaster> 
+        dom::Node::WritableValue<GRAYRaster>
             myBackgroundLock(_myBackgroundImage->getRasterValueNode());
         dom::Node::WritableValue<GRAYRaster>
             myTargetLock(_myTargetImage->getRasterValueNode());
-      
+
         GRAYRaster & myBackgroundFrame = myBackgroundLock.get();
         GRAYRaster::iterator itBg   = myBackgroundFrame.begin();
 
@@ -134,18 +134,18 @@ namespace y60 {
 
         //float myAlpha = _myWeight;
         asl::gray<unsigned char> mySrcIntensity;
-        asl::gray<unsigned char> myBgIntensity;   
+        asl::gray<unsigned char> myBgIntensity;
         asl::gray<unsigned char> myTrgtIntensity;
-        
-        for (GRAYRaster::const_iterator itSrc = mySourceFrame.begin(); 
-             itSrc != mySourceFrame.end(); 
-             ++itSrc,++itBg, ++itTrgt) 
+
+        for (GRAYRaster::const_iterator itSrc = mySourceFrame.begin();
+             itSrc != mySourceFrame.end();
+             ++itSrc,++itBg, ++itTrgt)
         {
         #if 1 // motion difference
-            myTrgtIntensity = clampedSub((*itBg).get(), (*itSrc).get());  
-            //AC_PRINT << myTrgtIntensity;            
+            myTrgtIntensity = clampedSub((*itBg).get(), (*itSrc).get());
+            //AC_PRINT << myTrgtIntensity;
             (*itTrgt) = myTrgtIntensity;
-        #else    
+        #else
             //"adaptive" background
             if (_myCounter >= COUNTER__) {
                 (*itBg) = myAlpha * (*itSrc).get() + (1-myAlpha)*(*itBg).get();
@@ -154,7 +154,7 @@ namespace y60 {
             (*itBg) = (*itSrc).get();
         }
 	}
-    
+
     unsigned char
     BackgroundSubtraction::clampedSub(unsigned char theFirstValue, unsigned char theSecondValue) {
         return asl::maximum<unsigned char>(theFirstValue, theSecondValue) -  asl::minimum<unsigned char>(theFirstValue, theSecondValue);

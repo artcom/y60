@@ -27,7 +27,7 @@ class macsgCamera : public cameraEngine
 public:
 	macsgCamera();
 	~macsgCamera();
-	
+
 	bool findCamera();
 	bool initCamera(int width, int height, bool colour);
 	bool startCamera();
@@ -36,9 +36,9 @@ public:
 	bool stillRunning();
 	bool resetCamera();
 	bool closeCamera();
-	
+
 	void showSettingsDialog();
-	
+
 private:
 	unsigned char *pbuffer;
 	SeqGrabComponent		sg;		// Sequence Grabber Component

@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 
@@ -297,10 +297,10 @@ SchemaUnitTest.prototype.Constructor = function(obj, theName) {
         print(obj.myScene.attributes);
         obj.myVersionAttrNode = obj.myScene.attributes.getNamedItem("version");
         obj.myUVSet = obj.myScene.find("//uvset").firstChild;
-        
+
         ENSURE("myVersionAttrNode.isSameNode(myScene.getAttributeNode('version'))");;
         //obj.myVersionAttrNode.nodeValueDependsOn(obj.myDocument.firstChild.firstChild.firstChild);
-        
+
         print("onReconnect="+obj.myVersionAttrNode.onReconnect);
         obj.myVersionAttrNode.onReconnect = function() {
             print("onReconnect:");
@@ -309,34 +309,34 @@ SchemaUnitTest.prototype.Constructor = function(obj, theName) {
             this.nodeValueDependsOn(this.rootNode.find("//uvset").firstChild);
         };
         print("onReconnect="+obj.myVersionAttrNode.onReconnect);
-        
+
         print("onOutdatedValue="+obj.myVersionAttrNode.onOutdatedValue);
         obj.myVersionAttrNode.onOutdatedValue = function() {
             print("recalculating myVersionAttrNode, this="+this);
             this.nodeValue = this.rootNode.find("//uvset").firstChild.nodeValue * 10;
         };
         print("onOutdatedValue="+obj.myVersionAttrNode.onOutdatedValue);
-        
+
         print("onSetValue="+obj.myVersionAttrNode.onSetValue);
         obj.myVersionAttrNode.onSetValue = function() {print("onSet, this="+this)};
         print("onSetValue="+obj.myVersionAttrNode.onSetValue);
-       
-        gc(); 
+
+        gc();
         print("onReconnect="+obj.myVersionAttrNode.onReconnect);
         print("onOutdatedValue="+obj.myVersionAttrNode.onOutdatedValue);
         print("onSetValue="+obj.myVersionAttrNode.onSetValue);
-        
+
         obj.myDocument.firstChild.firstChild.firstChild.onSetValue = function() {
             print("scene version onSetValue("+this.nodeValue+")");
-        } 
+        }
         obj.myUVSet.onSetValue = function() {
             print("UVSet onSetValue("+this.nodeValue+")");
-        }; 
+        };
         print("reading myVersionAttrNode.nodeValue");
         print(obj.myVersionAttrNode.nodeValue);
         ENSURE("myVersionAttrNode.nodeValue == 230");
         print("assigning 42 to myUVSet.nodeValue");
-        obj.myUVSet.nodeValue = 42; 
+        obj.myUVSet.nodeValue = 42;
         print("reading myVersionAttrNode.nodeValue");
         print(obj.myVersionAttrNode.nodeValue);
         print("reading myVersionAttrNode.nodeValue");
@@ -442,9 +442,9 @@ function ValueUnitTest() {
 }
 
 ValueUnitTest.prototype.Constructor = function(obj, theName) {
-    
+
     UnitTest.prototype.Constructor(obj, theName);
-    
+
     obj.run = function() {
         DTITLE("Starting Vector Value Tests");
         obj.mySchema = new Node(
@@ -510,14 +510,14 @@ ValueUnitTest.prototype.Constructor = function(obj, theName) {
         ENSURE('myDocument.ok');
         //myDocument.getSchema()->dump();
         ENSURE('myDocument.firstChild.nodeName == "scene"');
-        
+
         obj.myFloats = obj.myDocument.getElementById("fv");
         ENSURE('myFloats.name == "floats"');
         obj.myFloatVectorNode = obj.myFloats.firstChild;
         DPRINT('myFloatVectorNode');
         DPRINT('myFloatVectorNode.nodeValueTypeName');
         ENSURE('myFloatVectorNode.nodeValueTypeName == "VectorOfFloat"');
-        
+
         obj.myFloatVector = obj.myFloatVectorNode.nodeValue;
         obj.myFullList = obj.myFloatVector.getList(0,obj.myFloatVector.length);
         ENSURE("myFullList.length == myFloatVector.length");
@@ -529,7 +529,7 @@ ValueUnitTest.prototype.Constructor = function(obj, theName) {
         obj.myFloatVector.appendList(obj.myFullList);
         ENSURE("myFullList.length*2 == myFloatVector.length");
         ENSURE("myFullList.length*2 == obj.myFloatVectorNode.nodeValue.length");
-        
+
         obj.myFloatVector.eraseList(0, obj.myFullList.length);
         ENSURE("myFullList.length == myFloatVector.length");
         obj.myFloatVector.eraseItem(0);
@@ -544,7 +544,7 @@ ValueUnitTest.prototype.Constructor = function(obj, theName) {
         ENSURE("myFloatVector.getItem(0) == 42");
         obj.myFloatVector.insertListBefore(0,obj.myFullList);
         ENSURE("myFullList.length + 2 == myFloatVector.length");
-        
+
         obj.myFloatVector.eraseList(0, obj.myFloatVector.length);
         obj.myFloatVector.appendList(new Vector4f(0,1,2,3));
         SUCCESS("appendList(new Vector4f(0,1,2,3))");

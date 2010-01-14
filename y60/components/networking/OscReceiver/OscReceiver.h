@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -80,15 +80,15 @@ namespace y60 {
         public y60::IEventSource,
         public asl::PosixThread {
 
-    public: 
+    public:
             struct OscMessageInfo {
-                OscMessageInfo(const std::string& theMessage, 
-                               const IpEndpointName& theSender) : 
+                OscMessageInfo(const std::string& theMessage,
+                               const IpEndpointName& theSender) :
                     _myMessage(theMessage), _mySender(theSender) {}
                 std::string          _myMessage;
-                IpEndpointName       _mySender;    
+                IpEndpointName       _mySender;
             };
-            
+
             OscReceiver(int thePort);
             virtual ~OscReceiver();
 
@@ -112,14 +112,14 @@ namespace y60 {
 
             static void threadMain( asl::PosixThread & theThread );
 
-            virtual void ProcessMessage( const osc::ReceivedMessage& m, 
+            virtual void ProcessMessage( const osc::ReceivedMessage& m,
                                          const IpEndpointName& remoteEndpoint );
-            virtual void ProcessBundle( const osc::ReceivedBundle& theBundle, 
+            virtual void ProcessBundle( const osc::ReceivedBundle& theBundle,
                                          const IpEndpointName& remoteEndpoint );
 
     private:
 
-            std::string createMessageString(const osc::ReceivedMessage& m, 
+            std::string createMessageString(const osc::ReceivedMessage& m,
                                             const IpEndpointName& remoteEndpoint);
 
             y60::EventPtr createY60Event(const std::string& theMessage);

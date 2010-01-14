@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -75,7 +75,7 @@ ASSOSD.prototype.Constructor = function(Public, Protected, theViewer) {
     ////////////////////////////////////////
     // Inheritance
     ////////////////////////////////////////
-    
+
     ASSManager.prototype.Constructor(Public, Protected, theViewer, true);
 
     ////////////////////////////////////////
@@ -92,22 +92,22 @@ ASSOSD.prototype.Constructor = function(Public, Protected, theViewer) {
     ////////////////////////////////////////
     // Public
     ////////////////////////////////////////
-    
+
     Public.setOSDInvisible = function() {
         _myQuitOSD.visible = false;
-        _myQuitCursorEvent = null;         
+        _myQuitCursorEvent = null;
     }
 
     function tryPressQuitCancelButton( theEventNode ) {
         if (_myQuitOSD.visible) {
-            var myPosition = theEventNode.position3D;                    
-            _myQuitCancelButton.onMouseButton(MOUSE_DOWN, myPosition.x, 
+            var myPosition = theEventNode.position3D;
+            _myQuitCancelButton.onMouseButton(MOUSE_DOWN, myPosition.x,
                                               myPosition.y, 20);
-            _myQuitCancelButton.onMouseButton(MOUSE_UP, myPosition.x, 
+            _myQuitCancelButton.onMouseButton(MOUSE_UP, myPosition.x,
                                               myPosition.y, 20);
-            _myQuitConfirmButton.onMouseButton(MOUSE_DOWN, myPosition.x, 
+            _myQuitConfirmButton.onMouseButton(MOUSE_DOWN, myPosition.x,
                                                myPosition.y, 20);
-            _myQuitConfirmButton.onMouseButton(MOUSE_UP, myPosition.x, 
+            _myQuitConfirmButton.onMouseButton(MOUSE_UP, myPosition.x,
                                                myPosition.y, 20);
         }
     }
@@ -127,9 +127,9 @@ ASSOSD.prototype.Constructor = function(Public, Protected, theViewer) {
             break;
         case "move":
             if (_myQuitCursorEvent && _myQuitCursorEvent.id == theEventNode.id) {
-                var myTouchDuration = theEventNode.simulation_time 
+                var myTouchDuration = theEventNode.simulation_time
                                       - _myQuitCursorEvent.simulation_time;
-                var myHandTraveled = distance(theEventNode.position3D, 
+                var myHandTraveled = distance(theEventNode.position3D,
                                               _myQuitCursorEvent.position3D);
                 if (myHandTraveled > ENABLE_QUIT_OSD_DISTANCE) {
                     _myQuitCursorEvent = null;
@@ -137,7 +137,7 @@ ASSOSD.prototype.Constructor = function(Public, Protected, theViewer) {
                     if(_myQuitOSD.visible == false) {
                         _myQuitOSD.moveToTop();
                         _myQuitOSD.visible = true;
-                        window.setTimeout("setOSDInvisible", 5.0*1000, Public);     
+                        window.setTimeout("setOSDInvisible", 5.0*1000, Public);
                     }
                 }
             } else {
@@ -180,7 +180,7 @@ ASSOSD.prototype.Constructor = function(Public, Protected, theViewer) {
 	        Logger.error("Could not find a font for rendering");
             }
         }
-        
+
         const myStyle = {
             color:             asColor("FFFFFF"),
             selectedColor:     asColor("FFFFFF"),
@@ -189,7 +189,7 @@ ASSOSD.prototype.Constructor = function(Public, Protected, theViewer) {
             HTextAlign:        Renderer.LEFT_ALIGNMENT,
             fontsize:          18
         }
-        
+
         var myOSDSize = new Vector2i(300, 80);
         var myImageSrc = null;
         if (OSD_FILE != undefined) {
@@ -197,11 +197,11 @@ ASSOSD.prototype.Constructor = function(Public, Protected, theViewer) {
         } else {
             myImageSrc = "shadertex/on_screen_display.rgb";
         }
-        
+
         _myQuitOSD = new ImageOverlay(theViewer.getScene(), myImageSrc);
         var myImageSize = getImageSize(_myQuitOSD.image);
         _myQuitOSD.visible = false;
-        
+
         var myColor = 0.3
         var myQuitText="";
         var myContinueText="";
@@ -217,7 +217,7 @@ ASSOSD.prototype.Constructor = function(Public, Protected, theViewer) {
         }
         _myQuitOSD.position = new Vector2f((window.width - _myQuitOSD.width) / 2,
                                            (window.height - _myQuitOSD.height) / 2);
-        
+
         var myButtonSize = new Vector2i((_myQuitOSD.width/2)-10,(_myQuitOSD.height/2)-10);
         var myButtonPos = new Vector2f(10,10);
         _myQuitConfirmButton = new TextButton(window.scene, "Confirm_Quit", myQuitText, myButtonSize, myButtonPos, myStyle, _myQuitOSD);

@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -75,21 +75,21 @@ namespace y60 {
     class Primitive;
 
     class BodyPart {
-        public:     
+        public:
 
-            // key structure 
+            // key structure
             // bits    | 1  |     15     |      32 or 64          |      32 or 64      |
             // purpose | tr |     zd     |      material *        |       body *       |
             //
             // tr         = transparency bit
-            // zd         = Z depth 
+            // zd         = Z depth
             // material * = the material pointer
             // body *     = the body pointer
 
             struct Key {
                 Key(const MaterialBase * theMaterial, const Body * theBody, asl::Unsigned16 theAlphaBit_ZDepth) :
                         alphaBit_ZDepth(theAlphaBit_ZDepth),
-                            material(theMaterial), 
+                            material(theMaterial),
                             body(theBody)
                         {}
 #if 1
@@ -102,7 +102,7 @@ namespace y60 {
                                 } else if (this->material == second.material) {
                                     return (this->body < second.body);
                                 }
-                            } 
+                            }
                             return false;
                         }
 #else
@@ -116,7 +116,7 @@ namespace y60 {
                                 } else if (this->material->get<IdTag>() == second.material->get<IdTag>()) {
                                     return (this->body->get<IdTag>() < second.body->get<IdTag>());
                                 }
-                            } 
+                            }
                             return false;
                         }
 #endif
@@ -124,10 +124,10 @@ namespace y60 {
                 bool getTransparencyFlag() const {
                     return 0 != (alphaBit_ZDepth >> 15);
                 }
-                
+
                 asl::Unsigned16      alphaBit_ZDepth;
                 const MaterialBase * material;
-                const Body         * body;                
+                const Body         * body;
             };
 
             BodyPart(const World & theWorldPtr, const Body & theBodyPtr, const Shape & theShape,
@@ -135,9 +135,9 @@ namespace y60 {
                      const std::vector<asl::Planef> & theClippingPlanes,
                      const asl::Box2f & theScissorBox) :
                 _myWorld(theWorldPtr),
-                _myBody(theBodyPtr), 
+                _myBody(theBodyPtr),
                 _myShape(theShape),
-                _myPrimitive(thePrimitive), 
+                _myPrimitive(thePrimitive),
                 _myClippingPlanes(theClippingPlanes),
                 _myScissorBox(theScissorBox)
             {}

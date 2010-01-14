@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -84,7 +84,7 @@ namespace y60 {
             ~SDLTextRenderer();
 
             void loadFont(const std::string & theName, const std::string & theFileName,
-                    int theHeight, TTFFontInfo::FONTHINTING & theFonthint, 
+                    int theHeight, TTFFontInfo::FONTHINTING & theFonthint,
                     TTFFontInfo::FONTTYPE theFontType);
             TextPtr createText(const asl::Vector2f & thePos,
                     const std::string & theString,
@@ -106,7 +106,7 @@ namespace y60 {
             bool getGlyphMetrics(const std::string & theFontName, const std::string & theCharacter, asl::Box2f & theGlyphBox, double & theAdvance) const;
             double getKerning(const std::string & theFontName, const std::string & theFirstCharacter, const std::string & theSecondCharacter) const;
             bool hasGlyph(const std::string& theFontName, const std::string& theCharacter) const;
-            
+
         private:
             typedef std::map<std::string, SDLFontInfo> FontLibrary;
 
@@ -161,11 +161,11 @@ namespace y60 {
             int calcVerticalAlignment(unsigned theTextHeight, unsigned theBlockHeight);
             SDLFontInfo & getFontInfo(const std::string & theName);
             const TTFFontInfo::FONTHINTING & getFontHint(const std::string & theName) const;
-            
+
             std::string makeFontName(const std::string & theName, SDLFontInfo::FONTTYPE theFontType = SDLFontInfo::NORMAL) const;
             const TTF_Font * getFont(const std::string & theName) const;
 
-            
+
             void renderWords(std::vector<Word> & theWords,
                     const std::string & theFontName,
                     const asl::Vector4f & theTextColor);
@@ -179,7 +179,7 @@ namespace y60 {
             FontLibrary          _myFonts;
             std::string          _myWordDelimiters;
             std::map<std::string, TTFFontInfo::FONTHINTING> _myFontHintingMap;
-            
+
     };
     typedef asl::Ptr<SDLTextRenderer> SDLTextRendererPtr;
 

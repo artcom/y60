@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -65,7 +65,7 @@ onMouseMotion(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
     DOC_BEGIN("Sends mouse move data to synergy clients.");
     DOC_END;
 
-    return Method<JSSynergyServer::NATIVE>::call( &JSSynergyServer::NATIVE::onMouseMotion, 
+    return Method<JSSynergyServer::NATIVE>::call( &JSSynergyServer::NATIVE::onMouseMotion,
                                                   cx, obj, argc, argv, rval);
 }
 
@@ -75,7 +75,7 @@ onRelMouseMotion(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
     DOC_END;
 
     return Method<JSSynergyServer::NATIVE>
-           ::call( &JSSynergyServer::NATIVE::onRelMouseMotion, 
+           ::call( &JSSynergyServer::NATIVE::onRelMouseMotion,
                    cx, obj, argc, argv, rval);
 }
 
@@ -84,7 +84,7 @@ onMouseButton(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
     DOC_BEGIN("Sends mouse button data to synergy clients.");
     DOC_END;
 
-    return Method<JSSynergyServer::NATIVE>::call( &JSSynergyServer::NATIVE::onMouseButton, 
+    return Method<JSSynergyServer::NATIVE>::call( &JSSynergyServer::NATIVE::onMouseButton,
                                                   cx, obj, argc, argv, rval);
 }
 
@@ -93,7 +93,7 @@ onMouseWheel(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
     DOC_BEGIN("Sends mouse wheel data to synergy clients.");
     DOC_END;
 
-    return Method<JSSynergyServer::NATIVE>::call( &JSSynergyServer::NATIVE::onMouseWheel, 
+    return Method<JSSynergyServer::NATIVE>::call( &JSSynergyServer::NATIVE::onMouseWheel,
                                                   cx, obj, argc, argv, rval);
 }
 
@@ -102,7 +102,7 @@ getScreenSize(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
     DOC_BEGIN("Get the screen size from the synergy client.");
     DOC_END;
 
-    return Method<JSSynergyServer::NATIVE>::call( &JSSynergyServer::NATIVE::getScreenSize, 
+    return Method<JSSynergyServer::NATIVE>::call( &JSSynergyServer::NATIVE::getScreenSize,
                                                   cx, obj, argc, argv, rval);
 }
 
@@ -111,7 +111,7 @@ isConnected(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval){
     DOC_BEGIN("Returns true if the handshake with the client software is complete.");
     DOC_END;
 
-    return Method<JSSynergyServer::NATIVE>::call( &JSSynergyServer::NATIVE::isConnected, 
+    return Method<JSSynergyServer::NATIVE>::call( &JSSynergyServer::NATIVE::isConnected,
                                                   cx, obj, argc, argv, rval);
 }
 
@@ -162,8 +162,8 @@ JSSynergyServer::StaticFunctions() {
 
 // getproperty handling
 JSBool
-JSSynergyServer::getPropertySwitch( unsigned long theID, JSContext *cx, JSObject *obj, 
-                                    jsval id, jsval *vp) 
+JSSynergyServer::getPropertySwitch( unsigned long theID, JSContext *cx, JSObject *obj,
+                                    jsval id, jsval *vp)
 {
     //switch (theID) {
     //default:
@@ -174,42 +174,42 @@ JSSynergyServer::getPropertySwitch( unsigned long theID, JSContext *cx, JSObject
 
 // setproperty handling
 JSBool
-JSSynergyServer::setPropertySwitch( unsigned long theID, JSContext *cx, JSObject *obj, 
-                                    jsval id, jsval *vp) 
+JSSynergyServer::setPropertySwitch( unsigned long theID, JSContext *cx, JSObject *obj,
+                                    jsval id, jsval *vp)
 {
     //switch (theID) {
     //default:
-        JS_ReportError( cx,"JSSynergyServer::setPropertySwitch: index %d out of range", 
+        JS_ReportError( cx,"JSSynergyServer::setPropertySwitch: index %d out of range",
                         theID);
         return JS_FALSE;
     //}
 }
 
 JSBool
-JSSynergyServer::Constructor( JSContext *cx, JSObject *obj, uintN argc, jsval *argv, 
-                              jsval *rval) 
+JSSynergyServer::Constructor( JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
+                              jsval *rval)
 {
     DOC_BEGIN("Creates a SynergyServer Device.");
-    DOC_PARAM_OPT("theHostName", "The host name of the server.", DOC_TYPE_STRING, 
+    DOC_PARAM_OPT("theHostName", "The host name of the server.", DOC_TYPE_STRING,
                   "localhost");
     DOC_PARAM_OPT("thePort", "The port of the server.", DOC_TYPE_STRING, "24800");
     DOC_END;
-    
+
     try{
 
         ensureParamCount(argc, 2);
-        
+
         if (JSA_GetClass(cx,obj) != Class()) {
-            JS_ReportError( cx, "Constructor for %s bad object; did you forget a 'new'?", 
+            JS_ReportError( cx, "Constructor for %s bad object; did you forget a 'new'?",
                             ClassName());
             return JS_FALSE;
         }
-        
+
         JSSynergyServer * myNewObject = 0;
 
-        std::string myHostName; 
+        std::string myHostName;
         if (!convertFrom(cx, argv[0], myHostName)) {
-            JS_ReportError( cx, 
+            JS_ReportError( cx,
                             "JSSynergyServer::Constructor: argument #1 must be a "
                             "string)" );
             return JS_FALSE;
@@ -218,13 +218,13 @@ JSSynergyServer::Constructor( JSContext *cx, JSObject *obj, uintN argc, jsval *a
 
         unsigned myPort;
         if (!convertFrom(cx, argv[1], myPort)) {
-            JS_ReportError( cx, 
+            JS_ReportError( cx,
                             "JSSynergyServer::Constructor: argument #2 must be a "
                             "Number)" );
             return JS_FALSE;
         }
 
-        OWNERPTR mySynergyServer = OWNERPTR(new SynergyServer( myHostAddress, 
+        OWNERPTR mySynergyServer = OWNERPTR(new SynergyServer( myHostAddress,
                                                                static_cast<asl::Unsigned16>(myPort) ));
         myNewObject = new JSSynergyServer(mySynergyServer, mySynergyServer.get());
 
@@ -232,7 +232,7 @@ JSSynergyServer::Constructor( JSContext *cx, JSObject *obj, uintN argc, jsval *a
             JS_SetPrivate(cx, obj, myNewObject);
             return JS_TRUE;
         }
-    
+
         JS_ReportError(cx,"JSSynergyServer::Constructor: bad parameters");
 
         return JS_FALSE;
@@ -250,8 +250,8 @@ JSSynergyServer::ConstIntProperties() {
 
 JSObject *
 JSSynergyServer::initClass(JSContext *cx, JSObject *theGlobalObject) {
-    JSObject *myClass = Base::initClass( cx, theGlobalObject, ClassName(), Constructor, 
-                                         Properties(), Functions(), ConstIntProperties(), 
+    JSObject *myClass = Base::initClass( cx, theGlobalObject, ClassName(), Constructor,
+                                         Properties(), Functions(), ConstIntProperties(),
                                          0, StaticFunctions());
     DOC_MODULE_CREATE("SynergyServer", JSSynergyServer);
     return myClass;
@@ -263,8 +263,8 @@ jsval as_jsval(JSContext *cx, JSSynergyServer::OWNERPTR theOwner) {
 }
 
 
-jsval as_jsval( JSContext *cx, JSSynergyServer::OWNERPTR theOwner, 
-                JSSynergyServer::NATIVE * theSerial ) 
+jsval as_jsval( JSContext *cx, JSSynergyServer::OWNERPTR theOwner,
+                JSSynergyServer::NATIVE * theSerial )
 {
     JSObject * myObject = JSSynergyServer::Construct(cx, theOwner, theSerial);
     return OBJECT_TO_JSVAL(myObject);

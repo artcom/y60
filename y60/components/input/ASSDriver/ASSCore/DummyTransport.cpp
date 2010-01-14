@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -103,11 +103,11 @@ void DummyTransport::establishConnection() {
 
 void DummyTransport::readData() {
     DB(AC_TRACE << "DummyTransport::readData()";)
-    
+
     _myTmpBuffer.clear();
 
     buildStatusLine();
-    generateGridValues(); 
+    generateGridValues();
     calculateChecksum(); // save the new checksum for the next frame
     ++_myFrameCount;
 
@@ -115,15 +115,15 @@ void DummyTransport::readData() {
     _myTmpBuffer.push_back(0);
 
     _myTmpBuffer.insert( _myTmpBuffer.end(), _myStatusLine.begin(), _myStatusLine.end() );
-    
+
     for (unsigned char i = 1; i <= _myGridHeight; i++) {
         _myTmpBuffer.push_back(255);
         _myTmpBuffer.push_back(i);
 
-        _myTmpBuffer.insert( _myTmpBuffer.end(), _myGridValues.begin() + (i-1)*_myGridWidth, 
+        _myTmpBuffer.insert( _myTmpBuffer.end(), _myGridValues.begin() + (i-1)*_myGridWidth,
                              _myGridValues.begin() + i*_myGridWidth );
     }
-    
+
     receivedData((char*)&_myTmpBuffer[0], _myTmpBuffer.size());
 }
 
@@ -140,7 +140,7 @@ void DummyTransport::closeConnection() {
 
 void DummyTransport::buildStatusLine() {
     DB(AC_TRACE << "DummyTransport::buildStatusLine()";)
-    
+
     _myStatusLine.clear();
     char myStatusHeader[] = "V0105S0000I0000M0002F1000";
     unsigned myHeaderSize = strlen(myStatusHeader);
@@ -153,24 +153,24 @@ void DummyTransport::buildStatusLine() {
     writeStatusToken( 'H', _myGridHeight );
     writeStatusToken( 'G', _myGridSpacing );
     writeStatusToken( 'N', _myFrameCount );
-    writeStatusToken( 'C', _myGenCheckSum ); 
+    writeStatusToken( 'C', _myGenCheckSum );
 }
 
 
 void DummyTransport::writeStatusToken( const char theToken, unsigned theNumber ) {
     DB(AC_TRACE << "DummyTransport::writeStatusToken()";)
-    
+
     ostringstream myStream;
-    myStream << theToken; 
-    myStream.width(4); 
-    myStream.fill('0'); 
+    myStream << theToken;
+    myStream.width(4);
+    myStream.fill('0');
     myStream.setf( ios::hex, ios::basefield );
-    myStream << theNumber; 
+    myStream << theNumber;
 
     string myString = myStream.str();
 
     _myStatusLine.insert( _myStatusLine.end(), myString.begin(), myString.end() );
-    
+
 }
 
 // XXX replace with more sophisticated blob generation (i.e. from mouse data)

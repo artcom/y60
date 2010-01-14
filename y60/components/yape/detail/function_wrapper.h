@@ -21,7 +21,7 @@ class function_wrapper {
             } Y60_APE_CATCH_BLOCKS;
         }
         static void init(F func) {
-            if (f_ != 0) { 
+            if (f_ != 0) {
                 throw ape_error("duplicate initialization of function pointer",
                         PLUS_FILE_LINE);
             }

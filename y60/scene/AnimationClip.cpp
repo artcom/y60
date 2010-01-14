@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -165,7 +165,7 @@ namespace y60 {
         }
         _myDomVersion = _myNode->nodeVersion();
     }
-    
+
     void
     AnimationClip::update() {
         for (unsigned i = 0; i < _myAnimations.size(); ++i) {
@@ -182,7 +182,7 @@ namespace y60 {
                 if (_myAnimations[i]->isEnabled() ) {
                     _isActive |= _myAnimations[i]->run(theTime);
                 }
-            } 
+            }
         }
     }
 
@@ -192,24 +192,24 @@ namespace y60 {
        unsigned myAnimationsCount = _myAnimations.size();
        for (unsigned i = 0; i < myAnimationsCount; ++i) {
             _myAnimations[i]->play(theTime);
-       }        
+       }
        _isActive = true;
     }
 
-    void 
+    void
     AnimationClip::setLoops(unsigned int theLoops) {
        unsigned myAnimationsCount = _myAnimations.size();
        for (unsigned i = 0; i < myAnimationsCount; ++i) {
             _myAnimations[i]->setLoops(theLoops);
-       }        
+       }
     }
-    
-    void 
+
+    void
     AnimationClip::setForwardDirection(bool theFlag) {
        unsigned myAnimationsCount = _myAnimations.size();
        for (unsigned i = 0; i < myAnimationsCount; ++i) {
             _myAnimations[i]->setForwardDirection(theFlag);
-       }        
+       }
     }
 
     unsigned int
@@ -221,7 +221,7 @@ namespace y60 {
         }
     }
 
-    
+
     bool
     AnimationClip::isActive() {
         return _isActive;

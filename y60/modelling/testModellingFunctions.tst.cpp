@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 
@@ -468,7 +468,7 @@ public:
                                                     625,626,627,628,629,630,631,632,633,634,635,636,637,638,639,640,641,642,643,644,645,646,647,648,
                                                     649,650,651,652,653,654,655,656,657,658,659,660,661,662,663,664,665,666,667,668,669,670,671,672,
                                                     673,674,675,676,677,678,679,680,681,682,683,684,685,686,687,688,689,690,691,692,693,694,695,696,
-                                                    697,698};            
+                                                    697,698};
             dom::NodePtr myShape = createSurface2DFromContour(myScene, myMaterial->getAttributeString("id"),
                                                               myCountour, "TestSurface2DShape");
             dom::NodePtr myIndicesNode = myShape->childNode("primitives")->childNode(0)->childNode(0)->childNode("#text");
@@ -482,7 +482,7 @@ public:
                     break;
                 }
             }
-            
+
             ENSURE_MSG(mySuccess, "Tesselation of Italien outline");
             return;
 

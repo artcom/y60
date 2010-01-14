@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -61,7 +61,7 @@ function TextBox(theParent, theTextBoxNode, theDepth) {
 }
 
 TextBox.prototype.Constructor = function(Public, Protected, theParent, theTextBoxNode, theDepth) {
-    
+
     const EM = 25; // XXX: this should come from the font renderer
 
     ////////////////////////////////////////
@@ -100,7 +100,7 @@ TextBox.prototype.Constructor = function(Public, Protected, theParent, theTextBo
     ////////////////////////////////////////
     // Public
     ////////////////////////////////////////
-    
+
     Public.onKey = function(theKey) {
         switch(theKey) {
         case "<--":
@@ -133,7 +133,7 @@ TextBox.prototype.Constructor = function(Public, Protected, theParent, theTextBo
         var myCursor  = Protected.cursorPosition;
 
         Base.draw();
-        
+
         var myCursorX = myCursor[0];
         if(myCursorX > _myTextWidth) {
             myCursorX = _myTextWidth;
@@ -160,12 +160,12 @@ TextBox.prototype.Constructor = function(Public, Protected, theParent, theTextBo
         }
 
         Public.text += theCharacter;
-        
+
         textChanged();
 
         return true;
     }
-    
+
     function removeFinalCharacter() {
         var myOld = Public.text;
         if(myOld.length > 0) {
@@ -184,13 +184,13 @@ TextBox.prototype.Constructor = function(Public, Protected, theParent, theTextBo
     ////////////////////////////////////////
     // setup
     ////////////////////////////////////////
-        
+
     Base.setup = Protected.setup;
     Protected.setup = function() {
         Logger.info("Setting up text box " + _myName);
-        
+
         Base.setup();
-    }  
-    
+    }
+
     Protected.setup();
 }

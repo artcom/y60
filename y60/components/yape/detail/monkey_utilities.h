@@ -35,9 +35,9 @@ template <typename Spec>
 class monkey_specs {
     public:
         monkey_specs() : terminated_( false ) {}
-        inline void add(Spec const& s) { 
+        inline void add(Spec const& s) {
             ensure_terminated(false);
-            specs_.push_back( s ); 
+            specs_.push_back( s );
         }
         inline bool empty() const { return specs_.empty(); }
         inline size_t size() const {
@@ -46,7 +46,7 @@ class monkey_specs {
             } else if ( terminated_ ) {
                 return specs_.size() - 1;
             } else {
-                return specs_.size(); 
+                return specs_.size();
             }
         }
         inline void terminate() {

@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -78,16 +78,16 @@ using namespace std;
 using namespace asl;
 
 namespace jslib {
-    
+
 static JSFunctionSpec glob_functions[] = {
     {0}
 };
 
-GTKApp::GTKApp() 
+GTKApp::GTKApp()
 {
 }
 
-bool 
+bool
 GTKApp::initClasses(JSContext * theContext, JSObject * theGlobalObject) {
     GCObserver::get().attach(theContext);
     if (!JSApp::initClasses(theContext, theGlobalObject)) {
@@ -118,10 +118,10 @@ GTKApp::deleteSignalHandler(GObject* theSource, gpointer theUserData) {
     return 0;
 }
 
-void 
+void
 GTKApp::addSignalHandler(const gchar *theHandlerName, GObject *theSource, const gchar *theSignalName,
                    const gchar *theSignalData, GObject *theConnectObject, gboolean theAfterFlag,
-                   gpointer theAutoconnectInfo) 
+                   gpointer theAutoconnectInfo)
 {
     JSAutoconnectInfo * myInfo = static_cast<JSAutoconnectInfo*>(theAutoconnectInfo);
     GObject * mySignalSource = theSource;
@@ -134,11 +134,11 @@ GTKApp::addSignalHandler(const gchar *theHandlerName, GObject *theSource, const 
     SignalAdapterMap::iterator it = _mySignalAdapterMap_.find(mySignalSource);
     if (it == _mySignalAdapterMap_.end()) {
         it = _mySignalAdapterMap_.insert(make_pair(mySignalSource, JSGladeSignalAdapterVector())).first;
-        g_signal_connect(mySignalSource, "delete_event", 
+        g_signal_connect(mySignalSource, "delete_event",
                 G_CALLBACK(GTKApp::deleteSignalHandler), mySignalSource);
     }
 
-    JSGladeSignalAdapterPtr myAdapter(new JSGladeSignalAdapter(theHandlerName, mySignalSource, theSignalName, 
+    JSGladeSignalAdapterPtr myAdapter(new JSGladeSignalAdapter(theHandlerName, mySignalSource, theSignalName,
                 theSignalData, theConnectObject, theAfterFlag, myInfo->context, myInfo->object));
     it->second.push_back(myAdapter);
     return;

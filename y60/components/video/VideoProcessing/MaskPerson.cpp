@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -83,27 +83,27 @@ void MaskPerson::onFrame( double t ) {
     lowpass2d(3, 3, mySumRaster, myBlurRaster, asl::gray<unsigned int>(0));
 
     raster<asl::GRAY> myBinaryRaster(mySourceRaster->hsize(), mySourceRaster->vsize());
-    discriminate(myBlurRaster.begin(), myBlurRaster.end(), myBinaryRaster.begin(), 
-        asl::GRAY(static_cast<asl::pchar>(_myThreshold)), asl::GRAY(255), asl::GRAY(0)); 
+    discriminate(myBlurRaster.begin(), myBlurRaster.end(), myBinaryRaster.begin(),
+        asl::GRAY(static_cast<asl::pchar>(_myThreshold)), asl::GRAY(255), asl::GRAY(0));
 
     std::copy(myBinaryRaster.begin(), myBinaryRaster.end(), myMaskRaster.begin());
-    
+
 //    raster<asl::GRAY> myBluredBinary(mySourceRaster->hsize(), mySourceRaster->vsize());
-//    lowpass2d(_myBlurRadius, _myBlurRadius, myBinaryRaster, myBluredBinary, 
+//    lowpass2d(_myBlurRadius, _myBlurRadius, myBinaryRaster, myBluredBinary,
 //              asl::gray<unsigned int>(0));
 
     raster<asl::gray<int> > myHGradient(mySourceRaster->hsize(), mySourceRaster->vsize());
-    h_gradient(_myGradientRadius, myBinaryRaster, myHGradient, asl::gray<int>(0)); 
+    h_gradient(_myGradientRadius, myBinaryRaster, myHGradient, asl::gray<int>(0));
 
     raster<asl::gray<int> > myVGradient(mySourceRaster->hsize(), mySourceRaster->vsize());
-    v_gradient(_myGradientRadius, myBinaryRaster, myVGradient, asl::gray<int>(0)); 
+    v_gradient(_myGradientRadius, myBinaryRaster, myVGradient, asl::gray<int>(0));
 
     raster<asl::BGR>::iterator itTrgt = myTargetRaster.begin();
-    raster<asl::gray<int> >::iterator itHGrad = myHGradient.begin();    
-    raster<asl::gray<int> >::iterator itVGrad = myVGradient.begin();    
-    raster<asl::GRAY>::iterator itBlur = myBinaryRaster.begin();//myBluredBinary.begin();     
-    for (;   
-         itTrgt != myTargetRaster.end(); 
+    raster<asl::gray<int> >::iterator itHGrad = myHGradient.begin();
+    raster<asl::gray<int> >::iterator itVGrad = myVGradient.begin();
+    raster<asl::GRAY>::iterator itBlur = myBinaryRaster.begin();//myBluredBinary.begin();
+    for (;
+         itTrgt != myTargetRaster.end();
          ++itTrgt, ++itHGrad, ++itVGrad, ++itBlur)
     {
         (*itTrgt) = asl::BGR( static_cast<asl::pchar>((itHGrad->get() + 255)/2)
@@ -115,9 +115,9 @@ void MaskPerson::onFrame( double t ) {
 void MaskPerson::configure( const dom::Node & theNode ) {
 
     for (unsigned i = 0; i < theNode.childNodesLength(); i++) {
-        const std::string myName = 
+        const std::string myName =
             theNode.childNode("property",i)->getAttribute("name")->nodeValue();
-        const std::string myValue = 
+        const std::string myValue =
             theNode.childNode("property",i)->getAttribute("value")->nodeValue();
 
         dom::NodePtr myImage = _myScene->getSceneDom()->getElementById(myValue);

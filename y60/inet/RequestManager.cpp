@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -93,14 +93,14 @@ namespace inet {
         curl_global_init(CURL_GLOBAL_ALL);
         _myCurlMultiHandle = curl_multi_init();
     }
-   
+
     RequestManager::~RequestManager() {
         while (!_myRequests.empty()) {
             RequestPtr myRequest = _myRequests.back();
             curl_multi_remove_handle(_myCurlMultiHandle, myRequest->getHandle());
             _myRequests.pop_back();
         }
-             
+
         CURLMcode myStatus = curl_multi_cleanup(_myCurlMultiHandle);
         checkCurlStatus(myStatus, PLUS_FILE_LINE);
     }
@@ -110,13 +110,13 @@ namespace inet {
         theRequest->onStart();
         curl_multi_add_handle(_myCurlMultiHandle, theRequest->getHandle());
         _myRequests.push_back(theRequest);
-        
+
     }
 
     void
     RequestManager::removeRequest(Request* theRequest) {
         vector<RequestPtr>::iterator it;
-        
+
         for (it=_myRequests.begin();  it != _myRequests.end(); ++it) {
             if (&(*(*it)) == theRequest) {
                 curl_multi_remove_handle(_myCurlMultiHandle, theRequest->getHandle());
@@ -134,7 +134,7 @@ namespace inet {
             myMessage = curl_multi_info_read(_myCurlMultiHandle, &myMessageCount);
             if (myMessage) {
                 CURL * myEasyHandle = myMessage->easy_handle;
-                Request * myRequest = 0; 
+                Request * myRequest = 0;
                 curl_easy_getinfo(myEasyHandle, CURLINFO_PRIVATE, &myRequest);
                 if (myMessage->msg == CURLMSG_DONE) {
                     CURLcode myResult = myMessage->data.result;
@@ -151,18 +151,18 @@ namespace inet {
                     }
                     removeRequest(myRequest);
                 } else {
-                    throw INetException("RequestManager::handleMessages(): unknown curl msg", PLUS_FILE_LINE); 
+                    throw INetException("RequestManager::handleMessages(): unknown curl msg", PLUS_FILE_LINE);
                 }
             }
         } while (myMessage);
 
-        
+
     }
-    
-    int 
+
+    int
     RequestManager::handleRequests(bool theBlockingFlag) {
         CURLMcode myStatus;
-        
+
         AC_TRACE << "handleRequests("<<theBlockingFlag<<");";
 
         if (theBlockingFlag) {
@@ -194,8 +194,8 @@ namespace inet {
             DB(AC_TRACE << "curl multi perform returned " << myRunningHandles << " running handles. More Data..." << endl);
 
             handleMessages();
-            
-        } while (myStatus == CURLM_CALL_MULTI_PERFORM);    
+
+        } while (myStatus == CURLM_CALL_MULTI_PERFORM);
         return myRunningHandles;
     }
 }

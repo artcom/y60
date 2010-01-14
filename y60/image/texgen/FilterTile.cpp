@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -63,7 +63,7 @@
 //   $Revision: 1.2 $
 //
 //
-// Description: 
+// Description:
 //
 //=============================================================================
 
@@ -91,14 +91,14 @@ FilterTile::FilterTile(const vector<PLBmp*> myTileBmps)
     if (myTileBmps.empty()) {
         throw out_of_range ("No texture bitmaps available.");
     }
-    _myTileWidth = myTileBmps[0]->GetWidth();  
+    _myTileWidth = myTileBmps[0]->GetWidth();
     _myTileHeight = myTileBmps [0]->GetHeight();
 
     testTileSizes();
 }
 
 FilterTile::~FilterTile() {
-  
+
 }
 
 void FilterTile::Apply(PLBmp *indexBmp, PLBmp * resultBmp) const {
@@ -107,21 +107,21 @@ void FilterTile::Apply(PLBmp *indexBmp, PLBmp * resultBmp) const {
     int resultWidth = _myTileWidth * indexBmp->GetWidth();
     int resultHeight = _myTileHeight * indexBmp->GetHeight();
     resultBmp->Create (resultWidth, resultHeight, PLPixelFormat::X8R8G8B8);
-    
+
     for (int y=0; y<indexBmp->GetHeight(); ++y) {
         for (int x=0; x<indexBmp->GetWidth(); ++x) {
             PLBYTE curTileIndex = (indexBmp->GetLineArray()[y])[x];
             // Check if we have enough texture bitmaps available.
             if (curTileIndex >= _myTileBmps.size()) {
                 ostringstream st;
-                st << "Pixel (" << x << ", " << y << 
+                st << "Pixel (" << x << ", " << y <<
                       ") in index bitmap out of bounds." << ends;
                 throw out_of_range (st.str());
             }
             PLBmp * curTileBmp = _myTileBmps[curTileIndex];
             for (int tileY = 0; tileY < _myTileHeight; ++ tileY) {
                 PLPixel32* curTileLine = (PLPixel32 *)(curTileBmp->GetLineArray()[tileY]);
-                PLPixel32* resultLine = 
+                PLPixel32* resultLine =
                     (PLPixel32 *)(resultBmp->GetLineArray()[y*_myTileHeight+tileY]);
                 for (int tileX = 0; tileX < _myTileWidth; ++tileX) {
                     resultLine[x*_myTileWidth+tileX] = curTileLine[tileX];
@@ -134,12 +134,12 @@ void FilterTile::Apply(PLBmp *indexBmp, PLBmp * resultBmp) const {
 void FilterTile::testTileSizes() const {
     // Check if all the texture bitmaps have the same height and width.
     for (int i=0; i<_myTileBmps.size(); ++i) {
-        if (_myTileBmps[i]->GetWidth() != _myTileWidth || 
+        if (_myTileBmps[i]->GetWidth() != _myTileWidth ||
             _myTileBmps[i]->GetHeight() != _myTileHeight) {
             throw invalid_argument ("Texture sizes not equal.");
         }
     }
 }
- 
+
 }
 

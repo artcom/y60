@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -128,26 +128,26 @@ void multAndStore(PLPixel32 & theResult, PLPixel32 * theSource, int theScale ) {
     theResult.SetA( static_cast<PLBYTE>(minimum(theResult.GetA() + (((theSource->GetA() * theScale)+128) / 256), 255)) );
 }
 template<>
-void multAndStore(PLPixel24& theResult, PLPixel24 * theSource, int theScale ) { 
+void multAndStore(PLPixel24& theResult, PLPixel24 * theSource, int theScale ) {
     theResult.SetR( static_cast<PLBYTE>(minimum(theResult.GetR() + (((theSource->GetR() * theScale)+128) / 256), 255)) );
     theResult.SetG( static_cast<PLBYTE>(minimum(theResult.GetG() + (((theSource->GetG() * theScale)+128) / 256), 255)) );
     theResult.SetB( static_cast<PLBYTE>(minimum(theResult.GetB() + (((theSource->GetB() * theScale)+128) / 256), 255)) );
 
 }
 template<>
-void multAndStore(PLPixel16& theResult, PLPixel16 * theSource, int theScale ) { 
+void multAndStore(PLPixel16& theResult, PLPixel16 * theSource, int theScale ) {
     theResult.SetR( static_cast<PLBYTE>(minimum(theResult.GetR() + ((theSource->GetR() * theScale) / 256), 255)) );
     theResult.SetG( static_cast<PLBYTE>(minimum(theResult.GetG() + ((theSource->GetG() * theScale) / 256), 255)) );
     theResult.SetB( static_cast<PLBYTE>(minimum(theResult.GetB() + ((theSource->GetB() * theScale) / 256), 255)) );
 }
 template<>
-void multAndStore(PLPixel8 & theResult, PLPixel8 * theSource, int theScale ) { 
+void multAndStore(PLPixel8 & theResult, PLPixel8 * theSource, int theScale ) {
     theResult.Set( static_cast<PLBYTE>(minimum(theResult.Get() + ((theSource->Get() * theScale) / 256), 255)) );
 }
 
 template <class PIXELTYPE>
 void
-gaussianblur(PLBmpBase * theSource, PLBmp * theDestination, const KernelVec & theKernel, double theRadius, 
+gaussianblur(PLBmpBase * theSource, PLBmp * theDestination, const KernelVec & theKernel, double theRadius,
              unsigned theRealWidth, unsigned theRealHeight, double theSigma) {
     int myIntRadius = int(ceil(double(theRadius)));
 
@@ -167,7 +167,7 @@ gaussianblur(PLBmpBase * theSource, PLBmp * theDestination, const KernelVec & th
         for (unsigned y=0; y < mySrcHeight; ++y) {
             for(unsigned x=0; x<myDestWidth; ++x) {
                 PIXELTYPE myColor;
-                clearPixel(myColor);      
+                clearPixel(myColor);
                 for(int w=0; w<myIntRadius; ++w) {
                     int xs = x + w - myOffset;
                     PIXELTYPE myKernelPixel;
@@ -193,7 +193,7 @@ gaussianblur(PLBmpBase * theSource, PLBmp * theDestination, const KernelVec & th
                     }
                     multAndStore(myColor, &myKernelPixel, theKernel[w+myIntRadius]);
                 }
-                myTempBmp->SetPixel(x,y,myColor);                
+                myTempBmp->SetPixel(x,y,myColor);
             }
         }
     }
@@ -201,7 +201,7 @@ gaussianblur(PLBmpBase * theSource, PLBmp * theDestination, const KernelVec & th
     for(unsigned x=0; x<myDestWidth; ++x) {
         for (unsigned y=0; y < myDestHeight; ++y) {
             PIXELTYPE myColor;
-            clearPixel(myColor);      
+            clearPixel(myColor);
             for(int w=0; w<myIntRadius; ++w) {
                 int ys = y + w - myOffset;
                 PIXELTYPE myKernelPixel;
@@ -228,11 +228,11 @@ gaussianblur(PLBmpBase * theSource, PLBmp * theDestination, const KernelVec & th
                 }
                 multAndStore(myColor, &myKernelPixel, theKernel[w+myIntRadius]);
             }
-            theDestination->SetPixel(x,y,myColor);                
+            theDestination->SetPixel(x,y,myColor);
         }
     }
     delete myTempBmp;
-} 
+}
 
 void
 PLFilterGaussianBlur::Apply(PLBmpBase * theSource, PLBmp * theDestination) const {

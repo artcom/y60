@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -89,7 +89,7 @@ namespace y60 {
         closeConnection();
     }
 
-    bool 
+    bool
     SocketTransport::settingsChanged(dom::NodePtr theSettings) {
         bool myChangedFlag = false;
 
@@ -100,13 +100,13 @@ namespace y60 {
         return myChangedFlag;
     }
 
-    void 
+    void
     SocketTransport::init(dom::NodePtr theSettings) {
         getConfigSetting( theSettings, "IpAddress", _myIpAddressString, std::string("127.0.0.1" ));
         getConfigSetting<unsigned>( theSettings, "Port", _myPort, 5000 );
     }
 
-    void 
+    void
     SocketTransport::establishConnection() {
         AC_DEBUG << "SocketTransport::establishConnection()";
 
@@ -125,11 +125,11 @@ namespace y60 {
             std::vector<unsigned char> myTrashBuffer;
             myTrashBuffer.resize(1024 * 1024);
             _mySocket->receive(reinterpret_cast<char*>(& ( * myTrashBuffer.begin())),
-                               myTrashBuffer.size() );        
+                               myTrashBuffer.size() );
         }
     }
 
-    void 
+    void
     SocketTransport::readData() {
         try {
             char myReceiveBuffer[1024];
@@ -143,7 +143,7 @@ namespace y60 {
         }
     }
 
-    void 
+    void
     SocketTransport::writeData(const char * theData, size_t theSize) {
         if (!_mySocket) {
             AC_WARNING << "Can not write data. No socket.";
@@ -158,7 +158,7 @@ namespace y60 {
         }
     }
 
-    void 
+    void
     SocketTransport::closeConnection() {
         AC_DEBUG << "SocketTransport::closeConnection()";
 

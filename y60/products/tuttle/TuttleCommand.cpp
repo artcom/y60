@@ -9,7 +9,7 @@ namespace tuttle {
                      const lub_argv_t *theArguments)
         : _myBuiltin(theBuiltin), _myShell(theShell), _myClish(theClish), _myArguments(theArguments) {
     }
-    
+
     bool
     Command::execute(JSTrapStatus *theTrapStatus) {
         *theTrapStatus = JSTRAP_CONTINUE;

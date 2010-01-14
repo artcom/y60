@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -73,16 +73,16 @@
 
 namespace y60 {
 
-    const unsigned long CURRENT_MOVIE_FORMAT_VERSION = 4; 
+    const unsigned long CURRENT_MOVIE_FORMAT_VERSION = 4;
     const char * M60_MAGIC_NUMBER = "m60 ";
 
 	/**
 	 * @ingroup y60-video
      * Header for M60 Files.
-	 * 
+	 *
 	 */
     struct M60Header {
-        
+
         // For reading movies
         M60Header(const asl::ReadableStream & theStream) {
             // TODO: This only works on windows and linux, for MacOS we need to swap some
@@ -99,9 +99,9 @@ namespace y60 {
         }
 
         bool checkMagicNumber() {
-            return (magicnumber[0] == M60_MAGIC_NUMBER[0] && 
+            return (magicnumber[0] == M60_MAGIC_NUMBER[0] &&
                     magicnumber[1] == M60_MAGIC_NUMBER[1] &&
-                    magicnumber[2] == M60_MAGIC_NUMBER[2] && 
+                    magicnumber[2] == M60_MAGIC_NUMBER[2] &&
                     magicnumber[3] == M60_MAGIC_NUMBER[3]);
         }
 

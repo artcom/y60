@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -82,28 +82,28 @@ namespace y60 {
     DInputExtension::DInputExtension(asl::DLHandle theDLHandle)
         : asl::PlugInBase(theDLHandle), _myDI(0), _myBufferSize(10), _myForceFeedBackFlag(false)
     {}
-    
-    
+
+
     DInputExtension::~DInputExtension() {
         _myDI->Release();
         for (unsigned i = 0; i < _myJoysticks.size(); ++i) {
             _myJoysticks[i]->Release();
         }
     }
-    
+
     BOOL CALLBACK DInputExtension::EnumJoysticksCallback(const DIDEVICEINSTANCE* pdidInstance,
                                         void* This)
     {
         ((DInputExtension*)This)->addJoystick(pdidInstance);
         return DIENUM_CONTINUE;
     }
-    
+
     void DInputExtension::init() {
         DWORD myStyle = DIEDFL_ATTACHEDONLY | DIEDFL_FORCEFEEDBACK;
         DWORD myCoopLevel = DISCL_EXCLUSIVE | DISCL_FOREGROUND;
         initJoysticks(myStyle, myCoopLevel);
         _myForceFeedBackFlag = _myJoysticks.size() >0;
-        
+
         if (!_myForceFeedBackFlag) {
             // try again for non forcefeedbacks
             myStyle = DIEDFL_ATTACHEDONLY;
@@ -117,13 +117,13 @@ namespace y60 {
             AC_WARNING << "DInputExtension - No DInput device found.";
             return;
         }
-    
+
     }
-    
-    void 
+
+    void
     DInputExtension::initJoysticks(DWORD theFlags, DWORD theCoopLevel) {
         HRESULT hr;
-    
+
         hr = DirectInput8Create(GetModuleHandle(NULL), DIRECTINPUT_VERSION,
                                 IID_IDirectInput8, (void**)&_myDI, NULL );
         if (FAILED(hr)) {
@@ -131,7 +131,7 @@ namespace y60 {
             _myDI = 0;
             return;
         }
-    
+
         hr = _myDI->EnumDevices(DI8DEVCLASS_GAMECTRL,
                                 EnumJoysticksCallback,
                                 this, theFlags);
@@ -140,7 +140,7 @@ namespace y60 {
             _myDI = 0;
             return;
         }
-    
+
         hr = _myDI->EnumDevices(DI8DEVTYPE_DRIVING,
                                 EnumJoysticksCallback,
                                 this, DIEDFL_ATTACHEDONLY);
@@ -149,10 +149,10 @@ namespace y60 {
             _myDI = 0;
             return;
         }
-    
+
         for (unsigned i = 0; i < _myJoysticks.size(); ++i) {
             LPDIRECTINPUTDEVICE8 curJoystick = _myJoysticks[i];
-    
+
             // Setup buffering
             DIPROPDWORD  dipdw;
             HRESULT      hr;
@@ -161,42 +161,42 @@ namespace y60 {
             dipdw.diph.dwObj = 0;
             dipdw.diph.dwHow = DIPH_DEVICE;
             dipdw.dwData     = _myBufferSize;
-    
+
             hr = curJoystick->SetProperty(DIPROP_BUFFERSIZE, &dipdw.diph);
             if (FAILED(hr)) {
                 printErrorState("SetProperty(DIPROP_BUFFERSIZE)", hr);
                 continue;
             }
-    
+
             hr = curJoystick->SetDataFormat(&c_dfDIJoystick);
             //hr = curJoystick->SetDataFormat(&c_dfDIJoystick2);
             if (FAILED(hr)) {
                 AC_ERROR << "SetDataFormat() failed.";
                 continue;
             }
-    
+
             HWND mainHWND = findSDLWindow();
-    
+
             hr = curJoystick->SetCooperativeLevel(mainHWND, theCoopLevel );
             if (FAILED(hr)) {
                 AC_ERROR << "SetCooperativeLevel() failed.";
                 continue;
             }
-        
+
             hr = curJoystick->Acquire();
             if (FAILED(hr)) {
                 AC_ERROR << "Acquire() failed.";
                 continue;
             }
-                
+
         }
     }
-    
+
     void
     DInputExtension::addJoystick(const DIDEVICEINSTANCE* pdidInstance) {
         HRESULT hr;
         LPDIRECTINPUTDEVICE8 curJoystick;
-    
+
         hr = _myDI->CreateDevice( pdidInstance->guidInstance, &curJoystick, NULL );
         if (FAILED(hr)) {
             AC_WARNING << "Joystick " << pdidInstance->tszInstanceName
@@ -211,9 +211,9 @@ namespace y60 {
                 AC_INFO << (char*)(pdidInstance->tszInstanceName);
             }
             AC_INFO << " as input source.";
-        }   
+        }
     }
-    
+
     HWND
     DInputExtension::findSDLWindow() {
         SDL_SysWMinfo myInfo;
@@ -226,15 +226,15 @@ namespace y60 {
         }
         return myInfo.window;
     }
-    
+
     EventPtrList
     DInputExtension::poll() {
         HRESULT hr;
         EventPtrList curEvents;
-    
+
         for (unsigned i=0; i<_myJoysticks.size(); i++) {
             LPDIRECTINPUTDEVICE8 curJoystick = _myJoysticks[i];
-    
+
             hr = curJoystick->Poll();
             if (FAILED(hr)) {
                 // DInput is telling us that the input stream has been
@@ -251,7 +251,7 @@ namespace y60 {
                 LPDIDEVICEOBJECTDATA myBufferedJEvent = new DIDEVICEOBJECTDATA[_myBufferSize];
                 DWORD myNumberOfInputs = _myBufferSize;
                 hr = curJoystick->GetDeviceData(sizeof(DIDEVICEOBJECTDATA), myBufferedJEvent, &myNumberOfInputs, 0);
-    
+
                 if (SUCCEEDED(hr)) {
                     AC_DEBUG << "DInputExtension::poll() - Number of inputs read: " << myNumberOfInputs;
                     if (hr == DI_BUFFEROVERFLOW) {
@@ -261,10 +261,10 @@ namespace y60 {
                     AC_WARNING << "GetDeviceState() failed.";
                     continue;
                 }
-    
+
                 for (unsigned j = 0; j < myNumberOfInputs; ++j) {
                     DIDEVICEOBJECTDATA myJEvent = myBufferedJEvent[j];
-    
+
                     switch (myJEvent.dwOfs) {
                         case DIJOFS_X:
                             curEvents.push_back(EventPtr(new AxisEvent(i, 0, myJEvent.dwData - 32768)));
@@ -291,7 +291,7 @@ namespace y60 {
                             curEvents.push_back(EventPtr(new AxisEvent(i, 7, myJEvent.dwData - 32768)));
                             break;
                     }
-    
+
                     for (unsigned myButtonIndex = 0; myButtonIndex < 32; ++myButtonIndex) {
                         if (myJEvent.dwOfs == DIJOFS_BUTTON(myButtonIndex)) {
                             Event::Type myType;
@@ -304,7 +304,7 @@ namespace y60 {
                         }
                     }
                 }
-    
+
                 delete [] myBufferedJEvent;
             }
         }
@@ -315,32 +315,32 @@ namespace y60 {
             HRESULT hr;
             DIEFFECT diEffect;               // parameters for created effect
             ZeroMemory( &diEffect, sizeof( diEffect ) );
-            
+
             DWORD    dwAxes[2] = { DIJOFS_X, DIJOFS_Y };
             LONG     lDirection[2] = { 18000, 0 };
-            
-            DICONSTANTFORCE diConstantForce; 
-            
+
+            DICONSTANTFORCE diConstantForce;
+
             diConstantForce.lMagnitude =0;//DI_FFNOMINALMAX;   // Full force
-            
-            diEffect.dwSize          = sizeof(DIEFFECT); 
-            diEffect.dwFlags         = DIEFF_CARTESIAN | DIEFF_OBJECTOFFSETS; 
+
+            diEffect.dwSize          = sizeof(DIEFFECT);
+            diEffect.dwFlags         = DIEFF_CARTESIAN | DIEFF_OBJECTOFFSETS;
             diEffect.dwDuration      = INFINITE;//(DWORD)(10.5 * DI_SECONDS);
-            diEffect.dwSamplePeriod  = 0;                 // = default 
+            diEffect.dwSamplePeriod  = 0;                 // = default
             diEffect.dwGain          = DI_FFNOMINALMAX;   // No scaling
             diEffect.dwTriggerButton = DIEB_NOTRIGGER;    // Not a button response
             diEffect.dwTriggerRepeatInterval = 0;         // Not applicable
-            diEffect.cAxes                   = 2; 
-            diEffect.rgdwAxes                = dwAxes; 
-            diEffect.rglDirection            = lDirection; 
-            diEffect.lpEnvelope              = NULL; 
+            diEffect.cAxes                   = 2;
+            diEffect.rgdwAxes                = dwAxes;
+            diEffect.rglDirection            = lDirection;
+            diEffect.lpEnvelope              = NULL;
             diEffect.cbTypeSpecificParams    = sizeof(DICONSTANTFORCE);
-            diEffect.lpvTypeSpecificParams   = &diConstantForce;  
-            
+            diEffect.lpvTypeSpecificParams   = &diConstantForce;
+
             hr = theJoystick->CreateEffect(GUID_ConstantForce,
                                        &diEffect,
                                        &theEffect,
-                                       NULL);  
+                                       NULL);
             if (FAILED(hr)) {
                 AC_ERROR << "createForceEffect() failed.";
             }
@@ -376,7 +376,7 @@ namespace y60 {
                 break;
         }
     }
-    void 
+    void
     DInputExtension::applyForce(unsigned theJoystickIndex, int theXMagnitude, int theYMagnitude) {
         if (!_myForceFeedBackFlag) {
             AC_INFO << "DInputExtension::setAutoCentering: calling a forcefeedback method on a non forcefeedback joystick, sorry!";
@@ -391,18 +391,18 @@ namespace y60 {
         if (!_myForceEffects[theJoystickIndex]) {
             createForceEffect(_myJoysticks[theJoystickIndex], _myForceEffects[theJoystickIndex]);
         }
-    
+
         HRESULT hr;
-    
+
         LONG rglDirection[2] = { 0, 0 };
-    
+
         DICONSTANTFORCE cf;
         rglDirection[0] = theXMagnitude;
         rglDirection[1] = theYMagnitude;
-        
+
         cf.lMagnitude = ( DWORD )sqrt( ( double )theXMagnitude * ( double )theXMagnitude +
                                        ( double )theYMagnitude * ( double )theYMagnitude );
-    
+
         DIEFFECT eff;
         ZeroMemory( &eff, sizeof( eff ) );
         eff.dwSize = sizeof( DIEFFECT );
@@ -423,10 +423,10 @@ namespace y60 {
         hr =  _myForceEffects[theJoystickIndex]->SetParameters( &eff, DIEP_DIRECTION |
                                          DIEP_TYPESPECIFICPARAMS |
                                          DIEP_START );
-        
+
     }
-    
-    void 
+
+    void
     DInputExtension::setAutoCentering(unsigned theJoystickIndex, bool theFlag) {
         if (!_myForceFeedBackFlag) {
             AC_INFO << "DInputExtension::setAutoCentering: calling a forcefeedback method on a non forcefeedback joystick, sorry!";
@@ -453,9 +453,9 @@ namespace y60 {
         if( FAILED( hr) ) {
             AC_WARNING << "DInputExtension::setAutoCentering: disable autocentering failed";
         }
-        
+
     }
-    void 
+    void
     DInputExtension::stopForce(unsigned theJoystickIndex) {
         if (!_myForceFeedBackFlag) {
             AC_INFO << "DInputExtension::setAutoCentering: calling a forcefeedback method on a non forcefeedback joystick, sorry!";
@@ -468,11 +468,11 @@ namespace y60 {
         if (_myForceEffects[theJoystickIndex]) {
             _myForceEffects[theJoystickIndex]->Stop();
         }
-    
+
     }
-    
+
     static JSBool
-    ApplyForce(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) { 
+    ApplyForce(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         DOC_BEGIN("");
         DOC_END;
 
@@ -480,7 +480,7 @@ namespace y60 {
             JS_ReportError(cx, "DInputExtension::ApplyForce(): not enough arguments, must be 3");
             return JS_FALSE;
         }
-        
+
         unsigned myJoystickIndex = 0;
         if (!convertFrom(cx, argv[0], myJoystickIndex)) {
             JS_ReportError(cx, "DInputExtension::ApplyForce(): argument #1 must be a unsigned int");
@@ -505,9 +505,9 @@ namespace y60 {
         }
         return JS_TRUE;
     }
-    
+
     static JSBool
-    StopForce(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) { 
+    StopForce(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         DOC_BEGIN("");
         DOC_END;
 
@@ -515,13 +515,13 @@ namespace y60 {
             JS_ReportError(cx, "DInputExtension::StopForce(): not enough arguments, must be 1");
             return JS_FALSE;
         }
-        
+
         unsigned myJoystickIndex = 0;
         if (!convertFrom(cx, argv[0], myJoystickIndex)) {
             JS_ReportError(cx, "DInputExtension::StopForce(): argument #1 must be a unsigned int");
             return JS_FALSE;
         }
-    
+
         asl::Ptr<DInputExtension> myNative(getNativeAs<DInputExtension>(cx, obj));
         if (myNative) {
             myNative->stopForce(myJoystickIndex);
@@ -531,26 +531,26 @@ namespace y60 {
         return JS_TRUE;
     }
     static JSBool
-    SetAutoCentering(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) { 
+    SetAutoCentering(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         DOC_BEGIN("");
         DOC_END;
         if (argc != 2) {
             JS_ReportError(cx, "DInputExtension::SetAutoCentering(): not enough arguments, must be 2");
             return JS_FALSE;
         }
-        
+
         unsigned myJoystickIndex = 0;
         if (!convertFrom(cx, argv[0], myJoystickIndex)) {
             JS_ReportError(cx, "DInputExtension::SetAutoCentering(): argument #1 must be a unsigned int");
             return JS_FALSE;
         }
-        
+
         bool myAutoCenteringMode = false;
         if (!convertFrom(cx, argv[1], myAutoCenteringMode)) {
             JS_ReportError(cx, "DInputExtension::SetAutoCentering(): argument #2 must be a boolean");
             return JS_FALSE;
         }
-        
+
         asl::Ptr<DInputExtension> myNative(getNativeAs<DInputExtension>(cx, obj));
         if (myNative) {
             myNative->setAutoCentering(myJoystickIndex, myAutoCenteringMode);
@@ -559,13 +559,13 @@ namespace y60 {
         }
         return JS_TRUE;
     }
-    
-    JSFunctionSpec * 
+
+    JSFunctionSpec *
     DInputExtension::Functions() {
         static JSFunctionSpec myFunctions[] = {
-            {"applyForce", ApplyForce, 0},        
-            {"stopForce", StopForce, 0},        
-            {"setAutoCentering", SetAutoCentering, 0},        
+            {"applyForce", ApplyForce, 0},
+            {"stopForce", StopForce, 0},
+            {"setAutoCentering", SetAutoCentering, 0},
             {0}
         };
         return myFunctions;

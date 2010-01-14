@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -78,7 +78,7 @@ namespace jslib {
                 JS_ReportError(cx, "sha1FromBlock(): Argument #%d is undefined", 1);
                 return JS_FALSE;
             }
-    
+
             asl::Block* myContentBlockPtr = 0;
             if (!convertFrom(cx, argv[0], myContentBlockPtr)) {
                 JS_ReportError(cx, "sha1FromBlock(): argument #1 must be a Block");
@@ -86,10 +86,10 @@ namespace jslib {
             }
             // copy block due to garbage collection
             asl::Ptr<asl::ReadableBlock> myReadableBlockPtr(new asl::Block(*myContentBlockPtr));
-            
+
             unsigned char* myDigestBuffer = new unsigned char[CryptoPP::SHA1::DIGESTSIZE];
             CryptoPP::SHA1().CalculateDigest(myDigestBuffer, myReadableBlockPtr->begin(),
-                myReadableBlockPtr->size());        
+                myReadableBlockPtr->size());
             std::string myFinalHexEncodedShaSum;
             asl::binToString(myDigestBuffer, CryptoPP::SHA1::DIGESTSIZE, myFinalHexEncodedShaSum);
             delete [] myDigestBuffer;
@@ -98,7 +98,7 @@ namespace jslib {
         }
         JS_ReportError(cx,"sha1FromBlock: bad number of arguments should be one, got %d", argc);
         return JS_FALSE;
-    }    
+    }
 
     JSFunctionSpec *
     JSHashingFunctions::Functions() {

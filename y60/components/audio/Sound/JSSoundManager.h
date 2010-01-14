@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -66,27 +66,27 @@
 
 namespace jslib {
 
-    class JSSoundManager : public jslib::JSWrapper<y60::SoundManager, 
-                                  y60::SoundManager *, jslib::StaticAccessProtocol> 
+    class JSSoundManager : public jslib::JSWrapper<y60::SoundManager,
+                                  y60::SoundManager *, jslib::StaticAccessProtocol>
     {
             JSSoundManager() {}
         public:
             typedef y60::SoundManager NATIVE;
             typedef y60::SoundManager * OWNERPTR;
             typedef jslib::JSWrapper<NATIVE, OWNERPTR, jslib::StaticAccessProtocol> Base;
-    
+
             JSSoundManager(OWNERPTR theOwner, NATIVE * theNative)
                 : Base(theOwner, theNative)
             {}
-    
+
             ~JSSoundManager() {};
-            
+
             static const char * ClassName() {
                 return "SoundManager";
             }
             static JSFunctionSpec * Functions();
             static JSFunctionSpec * StaticFunctions();
-    
+
             enum PropertyNumbers {
                 PROP_volume = -100,
                 PROP_running,
@@ -95,38 +95,38 @@ namespace jslib {
 
             static JSPropertySpec * Properties();
             static JSPropertySpec * StaticProperties();
-    
+
             virtual unsigned long length() const {
                 return 1;
             }
-    
-            virtual JSBool getPropertySwitch(unsigned long theID, JSContext *cx, 
+
+            virtual JSBool getPropertySwitch(unsigned long theID, JSContext *cx,
                     JSObject *obj, jsval id, jsval *vp);
-            virtual JSBool setPropertySwitch(unsigned long theID, JSContext *cx, 
+            virtual JSBool setPropertySwitch(unsigned long theID, JSContext *cx,
                     JSObject *obj, jsval id, jsval *vp);
-    
+
             static JSBool
             Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
-    
+
             static
             JSObject * Construct(JSContext *cx, OWNERPTR theOwner, NATIVE * theNative) {
                 return Base::Construct(cx, theOwner, theNative);
-            }        
-    
+            }
+
             static jslib::JSConstIntPropertySpec * ConstIntProperties();
             static JSObject * initClass(JSContext *cx, JSObject *theGlobalObject);
-    
+
             static JSSoundManager & getObject(JSContext *cx, JSObject * obj) {
                 return dynamic_cast<JSSoundManager &>(JSSoundManager::getJSWrapper(cx,obj));
             }
     };
 
     jsval as_jsval(JSContext *cx, JSSoundManager::OWNERPTR theOwner);
-    jsval as_jsval(JSContext *cx, JSSoundManager::OWNERPTR theOwner, 
+    jsval as_jsval(JSContext *cx, JSSoundManager::OWNERPTR theOwner,
             JSSoundManager::NATIVE * theNative);
 
     template <>
-    struct JSClassTraits<JSSoundManager::NATIVE> 
+    struct JSClassTraits<JSSoundManager::NATIVE>
         : public JSClassTraitsWrapper<JSSoundManager::NATIVE, JSSoundManager> {};
 
 }

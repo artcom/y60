@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 
@@ -75,7 +75,7 @@ SocketUnitTest.prototype.Constructor = function(obj, theName) {
 
         obj.mySocket1.connect("127.0.0.1", 51102);
         obj.mySocket2.connect("127.0.0.1", 51101);
-        
+
         print(obj.mySocket1);
         print(obj.mySocket2);
 
@@ -94,16 +94,16 @@ SocketUnitTest.prototype.Constructor = function(obj, theName) {
 
         ENSURE('obj.mySocket2.write("bello") == 5');
         msleep(10); // give the socket time to send
-        obj.waitingCount = obj.mySocket1.peek(100);       
+        obj.waitingCount = obj.mySocket1.peek(100);
         ENSURE('obj.mySocket1.peek(100) == 5');
         DPRINT('obj.waitingCount');
         ENSURE('obj.mySocket1.peek(3) == 3');
         ENSURE('obj.mySocket1.read() == "bello"');
-        
+
         obj.mySocket1.setBlockingMode(false);
         ENSURE('obj.mySocket1.read() == ""');
         obj.mySocket1.setBlockingMode(true);
-        
+
         obj.mySocket3 = new Socket(Socket.UDP, 51103, "0.0.0.0");
         obj.mySocket3.connect("BROADCAST", 51101);
         print(obj.mySocket3);

@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 
@@ -64,11 +64,11 @@ function TestUnitTest() {
 };
 
 TestUnitTest.prototype.Constructor = function(obj, theName) {
-    
+
     UnitTest.prototype.Constructor(obj, theName);
-    
+
     obj.run = function() {
-        //DTITLE("------------ This is a Title --------------"); 
+        //DTITLE("------------ This is a Title --------------");
         ENSURE('obj.getMyName()=="TestUnitTest"');
 
         ENSURE('obj.getPassedCount() == 1');
@@ -95,7 +95,7 @@ TestUnitTest.prototype.Constructor = function(obj, theName) {
         ENSURE_EXCEPTION("throw 'ex'","ex");
         ENSURE_EXCEPTION("throw Exception('MyMessage', {file:'MyFile', line:0}, 'MyName')",
                         Exception('MyMessage', {file:'MyFile', line:0}, 'MyName'));
-    } 
+    }
 };
 
 var myTestName = tail(__FILE__());

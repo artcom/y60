@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -80,13 +80,13 @@ StateMachine.prototype.Constructor = function(obj, theInitalState, theDefaultSta
     var _myStateChangeAnims     = [];  // a array of possible statechanges and animations
     var _myStateChangeParams    = [];  // a array of possible statechanges and params
     var _mySyncClips            = [];  // Clips that are played back synchronized in another character
-    
+
     var _myDefaultState         = theDefaultState;
-    
+
     const TRIM_QUEUE_LENGTH = 2;
 
     // add a state and a corresponding loop animation.
-    // theLoopAnimation can be undefined or a string or a list of animations, 
+    // theLoopAnimation can be undefined or a string or a list of animations,
     // devided by '|'
     obj.addState = function(theState, theLoopAnimation) {
         var myAnimations = null;
@@ -107,8 +107,8 @@ StateMachine.prototype.Constructor = function(obj, theInitalState, theDefaultSta
     obj.pushState = function(theDestState) {
         var myPreviousState = _myStateQueue[_myStateQueue.length - 1];
         //print("push state: " + myPreviousState + " -> "+ theDestState);
-        
-        if (myPreviousState in _myStateChangeAnims && 
+
+        if (myPreviousState in _myStateChangeAnims &&
             theDestState in _myStateChangeAnims[myPreviousState])
         {
             // A fitting state change is registered
@@ -166,7 +166,7 @@ StateMachine.prototype.Constructor = function(obj, theInitalState, theDefaultSta
         var myQueueLength = _myStateQueue.length;
         if (myQueueLength == 1) {
             var myState = _myStateQueue[0];
-            if (myState in _myStateAnims && _myStateAnims[myState]) {                
+            if (myState in _myStateAnims && _myStateAnims[myState]) {
                 changeClip(randomElement(_myStateAnims[myState]));
             }
             //print("quequed state: "+myState);
@@ -189,22 +189,22 @@ StateMachine.prototype.Constructor = function(obj, theInitalState, theDefaultSta
                 startClip(theAnimName, true)
             } else {
                 startClip(theAnimName, false)
-            }            
+            }
         }
     }
-    
+
     function startClip(theAnimName, theDirection) {
         //print("startClip " + theAnimName);
         _myAnimationManager.setClipForwardDirection(_myCharacterName, theAnimName, theDirection);
         _myAnimationManager.setClipLoops(_myCharacterName, theAnimName, 1);
-        _myAnimationManager.startClip(_myCharacterName, theAnimName);     
-        
+        _myAnimationManager.startClip(_myCharacterName, theAnimName);
+
         if (theAnimName in _mySyncClips) {
             var mySyncClip = _mySyncClips[theAnimName];
             _myAnimationManager.setClipForwardDirection(mySyncClip.character, mySyncClip.clip, theDirection);
             _myAnimationManager.setClipLoops(mySyncClip.character, mySyncClip.clip, 1);
-            _myAnimationManager.startClip(mySyncClip.character, mySyncClip.clip);                 
-        }   
+            _myAnimationManager.startClip(mySyncClip.character, mySyncClip.clip);
+        }
     }
 
     function stateChangeExist(theSourceState, theDestState) {

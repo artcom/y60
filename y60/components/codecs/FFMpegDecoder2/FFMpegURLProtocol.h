@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -62,30 +62,30 @@
 #include "y60_ffmpegdecoder2_settings.h"
 
 namespace y60 {
-    
+
     /**
      * registers an open stream so that ffmpeg can use it.
      * the stream will be de-registered automatically by ffmpeg on close.
      * @param theUrl identifies the stream
-     * @param theSource 
+     * @param theSource
      */
     void registerStream(std::string theUrl, asl::Ptr<asl::ReadableStream> theSource);
 
-    
+
     /**
      * @ingroup Y60video
-     * A generic ReadableStream adapter for streams 
+     * A generic ReadableStream adapter for streams
      * that need to remember the current stream position
-     * it behaves like the file protocol in C. supports read & seek 
+     * it behaves like the file protocol in C. supports read & seek
      *
      */
     class RelativeReadableStream {
         public:
             RelativeReadableStream() : _mySource() {}
-            RelativeReadableStream( asl::Ptr<asl::ReadableStream> theSource) 
+            RelativeReadableStream( asl::Ptr<asl::ReadableStream> theSource)
                 : _mySource(theSource), _myOffset(0) {}
 
-            unsigned long read(void *theDest, unsigned long theSize);         
+            unsigned long read(void *theDest, unsigned long theSize);
             unsigned long seek(int pos, int whence);
 
         private:

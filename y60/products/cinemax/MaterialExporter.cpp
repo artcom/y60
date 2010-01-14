@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -213,11 +213,11 @@ MaterialExporter::exportTexture(Material* theMaterial, y60::MaterialBuilderPtr t
 
     // color scale
     Real myMixStrength = theContainer->GetReal(BASECHANNEL_MIXSTRENGTH_EX, 1.0);
-    GePrint("isAlphaChannel=" + LongToString(isAlphaChannel) + " mix=" 
+    GePrint("isAlphaChannel=" + LongToString(isAlphaChannel) + " mix="
             + RealToString(myMixStrength));
     asl::Vector4f myColorScale;
     if (isAlphaChannel) {
-        myColorScale = asl::Vector4f(myMixStrength, myMixStrength, myMixStrength, 
+        myColorScale = asl::Vector4f(myMixStrength, myMixStrength, myMixStrength,
                                      myMixStrength);
     } else {
         myColorScale = asl::Vector4f(myMixStrength, myMixStrength, myMixStrength, 1);
@@ -225,14 +225,14 @@ MaterialExporter::exportTexture(Material* theMaterial, y60::MaterialBuilderPtr t
 
     // setup color bias so that colors aren't blacked out
     asl::Vector4f myColorBias = asl::Vector4f(1,1,1,1) - myColorScale;
-    GePrint(myMaterialName + ": colorScale=" + String(asl::as_string(myColorScale).c_str()) 
+    GePrint(myMaterialName + ": colorScale=" + String(asl::as_string(myColorScale).c_str())
             + " colorBias=" + String(asl::as_string(myColorBias).c_str()));
 
     // Texture
     bool myCreateMipmapFlag = (theUsage == PAINT);
-    
+
     dom::NodePtr myImageNode;
-    
+
     String myTextureName = theContainer->GetString(BASECHANNEL_TEXTURE);
     if (myTextureName.GetLength()) {
         std::string myTextureFilename = getTexturePath(_myImpl->_myDocumentPath, myTextureName);
@@ -250,7 +250,7 @@ MaterialExporter::exportTexture(Material* theMaterial, y60::MaterialBuilderPtr t
                     break;
                 case BITMAPSHADER_TIMING_MODE_PINGPONG:
                     myLoopCount = 0;
-                    displayMessage(std::string("Ping-Pong Mode is not supported: ") 
+                    displayMessage(std::string("Ping-Pong Mode is not supported: ")
                                    + getString(myTextureName));
                     break;
             }
@@ -270,7 +270,7 @@ MaterialExporter::exportTexture(Material* theMaterial, y60::MaterialBuilderPtr t
 
     // wrap mode
     TextureWrapMode myWrapMode = REPEAT; // TODO: extract wrap mode
-    
+
     // Texture projection
     std::string myTextureMappingMode = "";
     Matrix4f myTextureMatrix;
@@ -373,7 +373,7 @@ MaterialExporter::exportTexture(Material* theMaterial, y60::MaterialBuilderPtr t
         }
     }
     GePrint("Texture InternalFormat=" + String(myInternalFormat.c_str()));
-    
+
     dom::NodePtr myTextureNode = theMaterialBuilder->createTextureNode(theSceneBuilder, getString(myTextureName),
                                           myImageNode->getAttributeString(ID_ATTRIB),
                                           myWrapMode, myCreateMipmapFlag,
@@ -383,7 +383,7 @@ MaterialExporter::exportTexture(Material* theMaterial, y60::MaterialBuilderPtr t
     // texture unit
     theMaterialBuilder->createTextureUnitNode(myTextureNode->getAttributeString(ID_ATTRIB),
         myApplyMode, theUsage, myTextureMappingMode, asl::Matrix4f::Identity());
-                                          
+
     return myDiffuseColorFlag;
 }
 
@@ -396,7 +396,7 @@ MaterialExporter::exportShader(PluginShader * theShader,
                                y60::SceneBuilder & theSceneBuilder,
                                BaseContainer * theColorContainer,
                                TextureTag * theTextureTag,
-                               const asl::Vector3f & theMinCoord, 
+                               const asl::Vector3f & theMinCoord,
                                const asl::Vector3f & theMaxCoord,
                                bool isAlphaChannel, bool isEnvMap)
 {
@@ -574,12 +574,12 @@ MaterialExporter::writeMaterial(const ExportedMaterialInfo & theMaterialInfo, Ba
                     bool myDiffuseColorFlag = false;
                     PluginShader  * myShader = myColorChannel->GetShader();
                     if (!myShader) {
-                        
+
                         // Note: We do not export the diffuse color if a texture is present, because we are
                         // currently not able to support the mix-mode feature of cinema 4d
                         asl::Vector4f myDiffuseColor(1,1,1,1);
                         getColor(myColorChannel, myDiffuseColor);
-                        
+
                         setPropertyValue<asl::Vector4f>(_myImpl->_myMaterialBuilder->getNode(), "vector4f", y60::DIFFUSE_PROPERTY, myDiffuseColor);
 
                         asl::Vector4f myAmbientColor = product(myDiffuseColor, AMBIENT_COLOR);
@@ -696,7 +696,7 @@ MaterialExporter::writeMaterial(const ExportedMaterialInfo & theMaterialInfo, Ba
                     // TODO: Find the best formula (use vrml exporter in cinema for reference results)
                     // Suggested formula: shininess = (specular_width + (1 - specular_height) * 128) / 2
                     // (VS) Lets try: SpecularHeight scales the color -> is something like brightness
-                    //                SpecularWidth sharpens the highlight 
+                    //                SpecularWidth sharpens the highlight
                     //                  (OpenGL: 0 -> large hightlight, 128 -> small highlight
                     float myShininess = 128.0 - mySpecularWidth * 128;
                     setPropertyValue<float>(_myImpl->_myMaterialBuilder->getNode(), "float", y60::SHININESS_PROPERTY, myShininess);

@@ -29,7 +29,7 @@ in particular:
 
 hardcoded types (atoms):
 
-atomic types: bool byte char int float name var? op? type? 
+atomic types: bool byte char int float name var? op? type?
 
 literals:
 bool: true, false
@@ -78,15 +78,15 @@ name
 
 type<
 
-var<bool> = name("myValue"); 
+var<bool> = name("myValue");
 myValue = bool(true);
 
-name<myValue> 
+name<myValue>
 
 
 type name op expression;
 
-interface <var<bool> 
+interface <var<bool>
 
 
 
@@ -94,7 +94,7 @@ interface <var<bool>
 
 type: literal type bool byte word char int float double name string block raster map vector list expression statement scope
 
-bool: 
+bool:
 
 
 
@@ -132,7 +132,7 @@ map: ( x = 1, y = 2 , z = 3) // any type
 - a type is also a value
 
 <int> a; // binds name a to a value of type int
-a = 2; // assign 2 
+a = 2; // assign 2
 
 a = <int>
 
@@ -140,7 +140,7 @@ a = <int>
 
 
 
-myFunction 
+myFunction
 
 
 function myFunction = (bool x = true, count y = 0) : { x * y };
@@ -163,7 +163,7 @@ x = { 1,2,3 }
 
 y = [4, 5, 6]
 
-define abs(x) = { if (x > 0) 
+define abs(x) = { if (x > 0)
 
 
 program = {statement}
@@ -254,11 +254,11 @@ Loop
 using namespace std;
 
 #undef MAKE_SCOPE_TIMER
-#define MAKE_SCOPE_TIMER(x) 
+#define MAKE_SCOPE_TIMER(x)
 
 namespace dys {
 
-    typedef asl::SingleThreaded ThreadingModel; 
+    typedef asl::SingleThreaded ThreadingModel;
 
     class Scope;
     class ValueBase;
@@ -285,7 +285,7 @@ namespace dys {
             return *this;
         }
         virtual unsigned int parse(const String & theProgram, const TokenList & theTokenList, unsigned int theTokenIndex) {
-            return _myRule->parse(theProgram, theTokenList, theTokenIndex);  
+            return _myRule->parse(theProgram, theTokenList, theTokenIndex);
         }
         RulePtr clone() const {
             return RulePtr(new RuleHolder(*_myRule));
@@ -467,7 +467,7 @@ namespace dys {
         RuleHolder SourceElements;
         RuleHolder SourceElement;
 
-        DyscriptParser() 
+        DyscriptParser()
         {
             Statement =
                 Block |
@@ -555,15 +555,15 @@ namespace dys {
         }
         virtual bool getBool() const = 0;
         virtual void setBool(bool b) = 0;
-        
+
         virtual int getInt() const = 0;
         virtual void setInt(int i) = 0;
-        
+
         virtual std::string getString() const = 0;
         virtual void setString(const string & theString) = 0;
 
         virtual void setBlock(const asl::ReadableBlock & theBlock) = 0;
-        
+
         virtual void assign(const ValueBase & theValue) = 0;
 
         virtual asl::Matrix4f * getMatrix4f() {
@@ -598,7 +598,7 @@ namespace dys {
         }
     };
 
-    template<> 
+    template<>
     struct RTTI_Traits<asl::Matrix4f> {
         template <class U>
         static
@@ -610,7 +610,7 @@ namespace dys {
             return up;
         }
     };
-    template<> 
+    template<>
     struct RTTI_Traits<ScriptFunctionPtr> {
         template <class U>
         static
@@ -672,7 +672,7 @@ namespace dys {
    private:
         asl::FixedBlock<T> _myValue;
     };
-    
+
     void incrementOp(int & i) {
         ++i;
     }
@@ -795,13 +795,13 @@ namespace dys {
         void passParameters(ValueListPtr theValues);
     };
     typedef asl::Ptr<Function,ThreadingModel> FunctionPtr;
-  */ 
-     
+  */
+
 
     class Scope : public Expression {
     public:
         Scope() : _myParent(0) {}
-        Scope(NameValueListPtr theParameters) 
+        Scope(NameValueListPtr theParameters)
             : _myParameters(theParameters), _myParent(0)
         {
         }
@@ -947,7 +947,7 @@ namespace dys {
         void dump(const std::string & theHeader) {
             cerr<<theHeader<<endl;
             for (NameValueMap::const_iterator myIterator = _myVariables.begin();
-                myIterator !=_myVariables.end(); ++myIterator) 
+                myIterator !=_myVariables.end(); ++myIterator)
             {
                 cerr << myIterator->first << " = " << myIterator->second->getString()<<endl;
             }
@@ -961,7 +961,7 @@ namespace dys {
                 theValue = _myReturnValues.back();
                 _myReturnValues.pop_back();
                 return true;
-            } 
+            }
             return false;
         }
         */
@@ -986,9 +986,9 @@ namespace dys {
 #endif
         NameValueListPtr _myParameters;
         NameValueMap _myVariables;
-        std::vector<StatementPtr> _myStatements; 
+        std::vector<StatementPtr> _myStatements;
         Scope * _myParent;
-        //std::vector<ValuePtr> _myReturnValues; 
+        //std::vector<ValuePtr> _myReturnValues;
     };
     typedef asl::Ptr<Scope,ThreadingModel> ScopePtr;
     /*
@@ -1001,7 +1001,7 @@ namespace dys {
     class ArgumentList /* : public Statement*/ {
     public:
         ArgumentList() {}
-        ArgumentList(std::vector<ExpressionPtr> theExpressions) 
+        ArgumentList(std::vector<ExpressionPtr> theExpressions)
             : _myArgumentExpressions(theExpressions)
         {}
         void exec(Scope * theScope, Scope * theFunctionScope) {
@@ -1066,7 +1066,7 @@ namespace dys {
 */
     class FunctionCall : public Expression {
     public:
-        FunctionCall(const Name & theName, ArgumentListPtr theArgumentList) 
+        FunctionCall(const Name & theName, ArgumentListPtr theArgumentList)
             : _myName(theName), _myArgumentList(theArgumentList), _myCachedFunction(0) {}
 
         void exec(Scope * theScope) {
@@ -1078,7 +1078,7 @@ namespace dys {
                         _myCachedFunction = myScriptFunction.getNativePtr();
 #if 1
                     } else {
-                        cerr << "#ERROR: FunctionCall: argument not a function" << endl; 
+                        cerr << "#ERROR: FunctionCall: argument not a function" << endl;
                     }
 #else
                     } else {
@@ -1105,7 +1105,7 @@ namespace dys {
 
     class Declaration : public Statement {
     public:
-        Declaration(const Name & theName, ValuePtr theValue, ExpressionPtr theExpression) 
+        Declaration(const Name & theName, ValuePtr theValue, ExpressionPtr theExpression)
             : _myName(theName), _myInitExpression(theExpression), _myValue(theValue)
         {}
         void exec(Scope * theScope) {
@@ -1120,7 +1120,7 @@ namespace dys {
 
     class Return : public Statement {
     public:
-        Return(ExpressionPtr theExpression) 
+        Return(ExpressionPtr theExpression)
             : _myExpression(theExpression)
         {}
         void exec(Scope * theScope) {
@@ -1134,12 +1134,12 @@ namespace dys {
     public:
         ValueExpression(ValuePtr theValue) : _myValue(theValue) {}
         ValueBase * eval(Scope *) {
-            return _myValue.getNativePtr();    
+            return _myValue.getNativePtr();
         }
     private:
         ValuePtr _myValue;
     };
-    
+
     class Variable : public Expression {
     public:
         Variable(const Name & theName) : _myName(theName), _myValueCache(0) {}
@@ -1156,7 +1156,7 @@ namespace dys {
         Name _myName;
 //        ValuePtr _myValueOwner;
     };
-    
+
     class TimerStarter : public Statement {
     public:
         TimerStarter(const Name & theName)  {
@@ -1168,7 +1168,7 @@ namespace dys {
     private:
         asl::TimerPtr _myTimer;
     };
-    
+
     class TimerStopper : public Statement {
     public:
         TimerStopper(const Name & theName, unsigned long theCount) : _myCount(theCount)  {
@@ -1257,7 +1257,7 @@ namespace dys {
         ExpressionPtr _mySubExpression;
         Expression * _myExpCache;
     };
-   
+
     class FastUnaryStatement : public Statement {
     public:
         FastUnaryStatement(UnaryIntOp theOperation, ExpressionPtr theSubExpression)
@@ -1279,7 +1279,7 @@ namespace dys {
             ExpressionPtr theSubExpression0,
             ExpressionPtr theSubExpression1,
             ValuePtr theReturnValue)
-            : 
+            :
             _myOperation(theOperation),
             _mySubExpression0(theSubExpression0),
             _mySubExpression1(theSubExpression1),
@@ -1311,8 +1311,8 @@ namespace dys {
 
     class Assignment : public Statement {
     public:
-        Assignment(ExpressionPtr theLHS, ExpressionPtr theRHS) 
-            : _myLHS(theLHS), _myRHS(theRHS) 
+        Assignment(ExpressionPtr theLHS, ExpressionPtr theRHS)
+            : _myLHS(theLHS), _myRHS(theRHS)
         {}
         void exec(Scope * theScope) {
             ValueBase * myRHSVal = _myRHS->eval(theScope);
@@ -1326,7 +1326,7 @@ namespace dys {
 
     class AssignBinaryIntOpResult : public Statement {
     public:
-        AssignBinaryIntOpResult(ExpressionPtr theLHS, 
+        AssignBinaryIntOpResult(ExpressionPtr theLHS,
                                 BinaryIntOp theOp,
                                 ExpressionPtr theArg0,
                                 ExpressionPtr theArg1)
@@ -1349,7 +1349,7 @@ namespace dys {
             ExpressionPtr theSubExpression0,
             ExpressionPtr theSubExpression1,
             ValuePtr theReturnValue)
-            : 
+            :
             _mySubExpression0(theSubExpression0),
             _mySubExpression1(theSubExpression1),
             _myReturnValue(theReturnValue)
@@ -1366,7 +1366,7 @@ namespace dys {
 
     class ConstValue : public Expression {
     public:
-        ConstValue(ValuePtr theValue) 
+        ConstValue(ValuePtr theValue)
             : _myValue(theValue)
         {}
         ValueBase * eval(Scope * theScope) {
@@ -1393,13 +1393,13 @@ namespace dys {
     */
     class ForLoop : public Statement {
     public:
-        ForLoop(StatementPtr theInit, ExpressionPtr theCondition, StatementPtr thePostBody, StatementPtr theBody) 
+        ForLoop(StatementPtr theInit, ExpressionPtr theCondition, StatementPtr thePostBody, StatementPtr theBody)
             : _myInit(theInit), _myCondition(theCondition), _myPostBody(thePostBody),  _myBody(theBody)
         {}
         void exec(Scope * theScope) {
             _myInit->exec(theScope);
             if (_myBody) {
-                for (; _myCondition->eval(theScope)->getBool(); _myPostBody->exec(theScope)) 
+                for (; _myCondition->eval(theScope)->getBool(); _myPostBody->exec(theScope))
                 {
                     _myBody->exec(theScope);
                 }
@@ -1416,17 +1416,17 @@ namespace dys {
 
     class WhileLoop : public Statement {
     public:
-        WhileLoop(ExpressionPtr theCondition, StatementPtr theBody) 
+        WhileLoop(ExpressionPtr theCondition, StatementPtr theBody)
             :  _myCondition(theCondition), _myBody(theBody)
         {}
         void exec(Scope * theScope) {
             if (_myBody) {
-                while (_myCondition->eval(theScope)->getBool()) 
+                while (_myCondition->eval(theScope)->getBool())
                 {
                     _myBody->exec(theScope);
                 }
             } else {
-                while (_myCondition->eval(theScope)->getBool()) {} 
+                while (_myCondition->eval(theScope)->getBool()) {}
             }
         }
     private:
@@ -1446,7 +1446,7 @@ namespace dys {
 */
     class RepeatN : public Statement {
     public:
-        RepeatN(ExpressionPtr theCount, StatementPtr theBody) 
+        RepeatN(ExpressionPtr theCount, StatementPtr theBody)
             : _myCount(theCount), _myBody(theBody)
         {}
         void exec(Scope * theScope) {
@@ -1495,7 +1495,7 @@ namespace dys {
         // int x = 1
         myProgram.append(StatementPtr(new Declaration("x",ValuePtr(new Value<int>(0)),
             ExpressionPtr(new ConstValue(ValuePtr(new Value<int>(1)))))));
-        
+
         // x = x + 1
         myProgram.append(
             StatementPtr(new Assignment(
@@ -1556,17 +1556,17 @@ namespace dys {
             myProgram.append(StatementPtr(new Declaration("product", ValuePtr(new ScriptFunctionValue(ScriptFunctionPtr(0))),
                 ExpressionPtr(new ValueExpression(myFunctionValue)))));
         }
-//--------------------  
+//--------------------
 #if 1
         {
             int n = 5000000;
-            myProgram.append(StatementPtr(new TimerStarter("while (i<n) i = add(i,1)"))); 
+            myProgram.append(StatementPtr(new TimerStarter("while (i<n) i = add(i,1)")));
 
             ScopePtr myLoopScope = ScopePtr(new Scope);
             ArgumentListPtr myArguments(new ArgumentList);
             myArguments->append(ExpressionPtr(new Variable("i")));
             myArguments->append(ExpressionPtr(new ConstValue(ValuePtr(new Value<int>(1)))));
-            
+
             myLoopScope->append(StatementPtr(new Assignment(
                     ExpressionPtr(new Variable("i")),
                     ExpressionPtr(new FunctionCall("add", myArguments)))));
@@ -1575,7 +1575,7 @@ namespace dys {
                     ExpressionPtr(new ConstValue(ValuePtr(new Value<int>(0))))
                 ))
             );
-            myProgram.append(StatementPtr(new WhileLoop(                
+            myProgram.append(StatementPtr(new WhileLoop(
                 ExpressionPtr(new BinaryExpression(
                     &Op::less,
                     ExpressionPtr(new Variable("i")),
@@ -1584,14 +1584,14 @@ namespace dys {
                 )),
                 myLoopScope
             )));
-            myProgram.append(StatementPtr(new TimerStopper("while (i<n) i = add(i,1)",n/1000))); 
+            myProgram.append(StatementPtr(new TimerStopper("while (i<n) i = add(i,1)",n/1000)));
         }
 #endif
-//--------------------  
+//--------------------
 #if 1
         {
             int n = 2000000;
-            
+
             myProgram.append(StatementPtr(new Declaration("m1",ValuePtr(new Value<asl::Matrix4f>()),
                 ExpressionPtr(new ConstValue(ValuePtr(new Value<asl::Matrix4f>(asl::Matrix4f::Identity())))))));
 
@@ -1601,7 +1601,7 @@ namespace dys {
             myProgram.append(StatementPtr(new Declaration("m3",ValuePtr(new Value<asl::Matrix4f>()),
                 ExpressionPtr(new ConstValue(ValuePtr(new Value<asl::Matrix4f>()))))));
 
-            myProgram.append(StatementPtr(new TimerStarter("repeat(n) c = product(m1,m2)"))); 
+            myProgram.append(StatementPtr(new TimerStarter("repeat(n) c = product(m1,m2)")));
 
             ScopePtr myLoopScope = ScopePtr(new Scope);
             ArgumentListPtr myArguments(new ArgumentList);
@@ -1627,14 +1627,14 @@ namespace dys {
                  ))
             );
 
-            myProgram.append(StatementPtr(new TimerStopper("repeat(n) c = product(m1,m2)",n/1000))); 
+            myProgram.append(StatementPtr(new TimerStopper("repeat(n) c = product(m1,m2)",n/1000)));
         }
 #endif
-        //--------------------       
+        //--------------------
         {
             int n = 5000000;
-            myProgram.append(StatementPtr(new TimerStarter("for x=x+2"))); 
- 
+            myProgram.append(StatementPtr(new TimerStarter("for x=x+2")));
+
             ScopePtr myLoopScope = ScopePtr(new Scope);
 #ifdef SLOW_FLEX
             myLoopScope->append(
@@ -1685,12 +1685,12 @@ namespace dys {
 #endif
                 myLoopScope
             )));
-            myProgram.append(StatementPtr(new TimerStopper("for x=x+2",n/1000))); 
+            myProgram.append(StatementPtr(new TimerStopper("for x=x+2",n/1000)));
         }
 //--------------------
         {
             int n = 5000000;
-            myProgram.append(StatementPtr(new TimerStarter("for add(2,3)"))); 
+            myProgram.append(StatementPtr(new TimerStarter("for add(2,3)")));
 
             ScopePtr myLoopScope = ScopePtr(new Scope);
             ArgumentListPtr myArguments(new ArgumentList);
@@ -1720,12 +1720,12 @@ namespace dys {
 #endif
                 myLoopScope
             )));
-            myProgram.append(StatementPtr(new TimerStopper("for add(2,3)",n/1000))); 
+            myProgram.append(StatementPtr(new TimerStopper("for add(2,3)",n/1000)));
         }
 //--------------------
         {
             int n = 5000000;
-            myProgram.append(StatementPtr(new TimerStarter("while(i<n)i+=1"))); 
+            myProgram.append(StatementPtr(new TimerStarter("while(i<n)i+=1")));
 
             ScopePtr myLoopScope = ScopePtr(new Scope);
             ArgumentListPtr myArguments(new ArgumentList);
@@ -1738,7 +1738,7 @@ namespace dys {
             //    ))
             //);
             myProgram.append(StatementPtr(new WhileLoop(
-                
+
                 ExpressionPtr(new BinaryExpression(
                     &Op::less,
                     ExpressionPtr(new Variable("i")),
@@ -1749,12 +1749,12 @@ namespace dys {
                     ExpressionPtr(new Variable("i"))
                 ))
             )));
-            myProgram.append(StatementPtr(new TimerStopper("while(i<n)i+=1",n/1000))); 
+            myProgram.append(StatementPtr(new TimerStopper("while(i<n)i+=1",n/1000)));
         }
 //--------------------
         {
             int n = 8000000;
-            myProgram.append(StatementPtr(new TimerStarter("for m.mult(ident)"))); 
+            myProgram.append(StatementPtr(new TimerStarter("for m.mult(ident)")));
 
             ScopePtr myLoopScope = ScopePtr(new Scope);
 
@@ -1795,12 +1795,12 @@ namespace dys {
 #endif
                 myLoopScope
             )));
-            myProgram.append(StatementPtr(new TimerStopper("for m.mult(ident)",n/1000))); 
+            myProgram.append(StatementPtr(new TimerStopper("for m.mult(ident)",n/1000)));
         }
 //--------------------
         {
             int n = 80000000;
-            myProgram.append(StatementPtr(new TimerStarter("repeat ++o"))); 
+            myProgram.append(StatementPtr(new TimerStarter("repeat ++o")));
             myProgram.append(StatementPtr(new Declaration("o",ValuePtr(new Value<int>(0)),
                 ExpressionPtr(new ConstValue(ValuePtr(new Value<int>(0)))))));
             myProgram.append(
@@ -1813,12 +1813,12 @@ namespace dys {
                 ))
             );
 
-            myProgram.append(StatementPtr(new TimerStopper("repeat ++o",n/1000))); 
+            myProgram.append(StatementPtr(new TimerStopper("repeat ++o",n/1000)));
         }
 //--------------------
         {
             int n = 10000000;
-            myProgram.append(StatementPtr(new TimerStarter("repeat op ++p"))); 
+            myProgram.append(StatementPtr(new TimerStarter("repeat op ++p")));
             myProgram.append(StatementPtr(new Declaration("p",ValuePtr(new Value<int>(0)),
                 ExpressionPtr(new ConstValue(ValuePtr(new Value<int>(0)))))));
             myProgram.append(
@@ -1831,12 +1831,12 @@ namespace dys {
                 ))
             );
 
-            myProgram.append(StatementPtr(new TimerStopper("repeat op ++p",n/1000))); 
+            myProgram.append(StatementPtr(new TimerStopper("repeat op ++p",n/1000)));
         }
    //--------------------
         {
             int n = 80000000;
-            myProgram.append(StatementPtr(new TimerStarter("repeat inc ++q"))); 
+            myProgram.append(StatementPtr(new TimerStarter("repeat inc ++q")));
             myProgram.append(StatementPtr(new Declaration("q",ValuePtr(new Value<int>(0)),
                 ExpressionPtr(new ConstValue(ValuePtr(new Value<int>(0)))))));
             myProgram.append(
@@ -1848,13 +1848,13 @@ namespace dys {
                 ))
             );
 
-            myProgram.append(StatementPtr(new TimerStopper("repeat inc ++q",n/1000))); 
+            myProgram.append(StatementPtr(new TimerStopper("repeat inc ++q",n/1000)));
         }
-        
+
 //--------------------
         {
             int n = 8000000;
-            myProgram.append(StatementPtr(new TimerStarter("repeat m.mult(ident)"))); 
+            myProgram.append(StatementPtr(new TimerStarter("repeat m.mult(ident)")));
 
             ScopePtr myLoopScope = ScopePtr(new Scope);
 
@@ -1880,7 +1880,7 @@ namespace dys {
                             myLoopScope
                         ))
             );
-            myProgram.append(StatementPtr(new TimerStopper("repeat m.mult(ident)",n/1000))); 
+            myProgram.append(StatementPtr(new TimerStopper("repeat m.mult(ident)",n/1000)));
         }
 //--------------------
          //--------------------
@@ -2004,7 +2004,7 @@ function assign(int theValue, int *theVariable) {
     *theVariable = theValue;
 }
 
-int program[] = { { ASSIGN, 5000000, "n"}, {IF   
+int program[] = { { ASSIGN, 5000000, "n"}, {IF
 
     void testStateMachPerf() {
         int pc = 0;
@@ -2029,7 +2029,7 @@ int program[] = { { ASSIGN, 5000000, "n"}, {IF
         op16, op17, op18, op19, op20, op21, op22, op23,
         op24, op25, op26, op27, op28, op29, op30, op31
     };
-    
+
     int arithSpeed(int n, int myA, Operator myOp, const char * theOpName) {
         asl::NanoTime start;
         int a = myA;
@@ -2348,7 +2348,7 @@ int program[] = { { ASSIGN, 5000000, "n"}, {IF
         virtual void incPtr(IntPtr theVal) = 0;
         virtual void inc(int * theVal) = 0;
     };
-   
+
     class Derived : public Base {
     public:
         virtual void inc(int * theVal) {
@@ -2362,7 +2362,7 @@ int program[] = { { ASSIGN, 5000000, "n"}, {IF
             Base * myBase = theBase;
             myBase->inc(theVal);
         }
-        static 
+        static
         void incIndirectDyn(Base * theBase, int * theVal) {
             Derived * myDerived = dynamic_cast<Derived*>(theBase);
             myDerived->inc(theVal);
@@ -2409,14 +2409,14 @@ int program[] = { { ASSIGN, 5000000, "n"}, {IF
 #else
         //fastest:
         __asm {
-            push        esi  
-            mov         esi, theCount 
-            push        edi  
+            push        esi
+            mov         esi, theCount
+            push        edi
             mov         edi, 0FFFFFFFFh
 
             test        esi, esi
             je          _ready
-_loop:            
+_loop:
             xor         edi,esi
             dec         esi
             je          _ready
@@ -2427,7 +2427,7 @@ _loop:
 
             xor         edi,esi
             dec         esi
-            jne          _loop 
+            jne          _loop
 
 _ready:     mov         a, edi
             pop edi
@@ -2437,31 +2437,31 @@ _ready:     mov         a, edi
 #endif
 #if 0
         __asm {
-            push        esi  
-            mov         esi, theCount 
-            push        edi  
+            push        esi
+            mov         esi, theCount
+            push        edi
             mov         edi, 0FFFFFFFFh
-_loop:            
+_loop:
             test        esi, esi
             je          _ready
             jne         _again
 _loop2:
-            sub         esi, 1 
+            sub         esi, 1
             xor         edi,esi
             test        esi,esi
             jne         _loop
             jmp         _ready
 _loop1:
-            sub         esi, 1 
+            sub         esi, 1
             xor         edi,esi
             test        esi,esi
             jne         _loop2
             jmp         _ready
-_again:           
-            sub         esi, 1 
+_again:
+            sub         esi, 1
             xor         edi,esi
             test        esi,esi
-            jne         _loop1   
+            jne         _loop1
 
 _ready:      mov         a, edi
             pop edi
@@ -2470,18 +2470,18 @@ _ready:      mov         a, edi
 #endif
 #if 0
         __asm {
-            push        esi  
-            mov         esi, theCount 
-            push        edi  
+            push        esi
+            mov         esi, theCount
+            push        edi
             mov         edi, 0FFFFFFFFh
-            
+
             test        esi, esi
             je          _ready
 _loop:
-            dec         esi  
+            dec         esi
             xor         edi,esi
             test        esi,esi
-            jne         _loop   
+            jne         _loop
 
 _ready:      mov         a, edi
             pop edi
@@ -2490,16 +2490,16 @@ _ready:      mov         a, edi
 #endif
 #if 0
         __asm {
-            push        ecx  
-            mov         ecx, theCount 
-            push        edi  
+            push        ecx
+            mov         ecx, theCount
+            push        edi
             mov         edi, 0FFFFFFFFh
-            
+
             test        ecx, ecx
             je          _ready
 _loop:
             xor         edi,ecx
-            loopne         _loop   
+            loopne         _loop
 
 _ready:      mov         a, edi
             pop edi
@@ -2541,19 +2541,19 @@ _ready:      mov         a, edi
         );
 #else
          __asm {
-            push        esi  
-            mov         esi, theCount 
-            push        edi  
+            push        esi
+            mov         esi, theCount
+            push        edi
             mov         edi, 0FFFFFFFFh
 
             test        esi, esi
             je          _ready
-_loop:            
+_loop:
             sub         esi,1
             je          _ready
 
             sub         esi,1
-            jne          _loop 
+            jne          _loop
 
 _ready:     mov         a, edi
             pop edi
@@ -2577,7 +2577,7 @@ _ready:     mov         a, edi
         cerr << "a = " << a << endl;
         double myTime = stop.seconds()-start.seconds();
         cerr << "loopSpeedReg Baseline = " <<  myTime << ", mio. per sec.= "<< n/myTime/1000000<< endl;
-   };   
+   };
     void loopSpeedWhile(int theCount) {
         register int n = theCount;//1000 * 1000000;
         register int a = 0xffffffff;
@@ -2653,7 +2653,7 @@ _ready:     mov         a, edi
         double myTime = stop.seconds()-start.seconds();
         cerr << "loopFunc2Speed Baseline = " <<  myTime << ", mio. per sec.= "<< n/myTime/1000000<< endl;
    };
-  
+
    void testCPPSpeed() {
         loopSpeedAsmMax(1000 * 1000000);
         loopSpeedAsm(1000 * 1000000);
@@ -2664,7 +2664,7 @@ _ready:     mov         a, edi
         aluSpeed(10 * 1000000, 0, opPlus, "opPlus");
         aluSpeed(10 * 1000000, 0, opOr, "opOr");
         aluSpeed(10 * 1000000, 0, opAnd, "opAnd");
-     
+
         procSpeed(10 * 1000000, 0, opPlus, "opPlus");
         procSpeed(10 * 1000000, 0, opOr, "opOr");
         procSpeed(10 * 1000000, 0, opAnd, "opAnd");
@@ -2765,7 +2765,7 @@ _ready:     mov         a, edi
 
     }
 //////////////////////////////////////////////////////////
-    
+
     inline int my_add(int a, int b) {
         return a + b;
     };
@@ -2802,7 +2802,7 @@ _ready:     mov         a, edi
         int n = 2000000000;
         int j = 1;
 
-        asl::NanoTime start; 
+        asl::NanoTime start;
 
         for (i = 0; i < n; i+=1) { j^=i;}
         //for (i = 0; i < n; i+=1) {}
@@ -3023,7 +3023,7 @@ main(int argc, char **argv)
     if (ourArguments.haveOption("--analyze")) {
         dys::analyze(myFilenames);
     }
-  
+
     /*
 	if (-1 == SDL_Init(SDL_INIT_NOPARACHUTE)) { // prevents SDL from catching fatal signals
 		cerr << SDL_GetError() << endl;

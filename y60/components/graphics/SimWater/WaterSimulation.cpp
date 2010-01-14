@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -113,7 +113,7 @@ WaterSimulation::WaterSimulation(asl::Vector2i theSimulationSize, float defaultD
     //  we allocate an array that is slightly larger (for computation of normals!)
     _numAllocatedRows = _mySize[1] + 2;
     _numAllocatedColumns = _mySize[0] + 2;
-    
+
     /*
     _waterArray[0] = (float*) malloc(_numAllocatedRows * _numAllocatedColumns * sizeof(float));
     _waterArray[1] = (float*) malloc(_numAllocatedRows * _numAllocatedColumns * sizeof(float));
@@ -127,28 +127,28 @@ WaterSimulation::WaterSimulation(asl::Vector2i theSimulationSize, float defaultD
 
 WaterSimulation::~WaterSimulation() {
     cerr << "================== DTOR ========================" << endl;
-    
+
     if (_computeThread) {
         cerr << "deleting thread" << endl;
         _computeThread->join();
         delete _computeThread;
         _computeThread = 0;
     }
-    
+
     if (_waterArray[0]) {
         cerr << "deleting water[0]" << endl;
         //free(_waterArray[0]);
         //_waterArray[0] = 0;
         delete [] _waterArray[0];
     }
-    
+
     if (_waterArray[1]) {
         cerr << "deleting water[1]" << endl;
         //free(_waterArray[1]);
         //_waterArray[1] = 0;
         delete [] _waterArray[1];
     }
-    
+
     if (_dampingArray) {
         cerr << "deleting damping array" << endl;
         //free(_dampingArray);
@@ -169,14 +169,14 @@ WaterSimulation::init() {
     setDamping(_defaultDampingCoefficient);
 }
 
-void    
+void
 WaterSimulation::reset() {
-    
+
     for(int j = 0; j < _numAllocatedRows ; j++ ) {
 
         GLfloat * currBufferLine = _waterArray[_currentBuffer] + j * _numAllocatedColumns;
         GLfloat * prevBufferLine = _waterArray[1 - _currentBuffer] + j * _numAllocatedColumns;
-        
+
         for( int i=0 ; i < _numAllocatedColumns ; i++ ) {
             prevBufferLine[i] = 0;
             currBufferLine[i] = 0;
@@ -184,18 +184,18 @@ WaterSimulation::reset() {
     }
 }
 
-void    
+void
 WaterSimulation::setDamping(float theDampingValue) {
-    
+
     //float   dampValue = freeze ? 0.f : _defaultDampingCoefficient;
-    
+
     for(int j = 0; j < _numAllocatedRows ; j++ ) {
 
         GLfloat * dampBufferLine = _dampingArray + j * _numAllocatedColumns;
-        
+
         for( int i= 0 ; i < _numAllocatedColumns ; i++ ) {
-            
-            
+
+
             dampBufferLine[i] = theDampingValue;
         }
     }
@@ -214,7 +214,7 @@ WaterSimulation::simulationStep(const float dt) {
     //precalculate coefficients
 //    const float A = (c*dt/_h)*(_c*dt/_h);
     const float A = SQR(waveSpeed() * dt / waveCoefficient());
-    
+
     //	const float AD = A/sqrt(2);
     const float B = 2.f - 4.f*A;// - 4*AD;
 
@@ -228,9 +228,9 @@ WaterSimulation::simulationStep(const float dt) {
         GLfloat * thisLine = currBuffer + j * _numAllocatedColumns;
         GLfloat * prevLine = currLine - _numAllocatedColumns;
         GLfloat * nextLine = currLine + _numAllocatedColumns;
-        
+
         for( int i=1 ; i<_numAllocatedColumns-1 ; i++ ) {
-            
+
             thisLine[i] = (A*( prevLine[i] + nextLine[i] + currLine[i-1] + currLine[i+1] ) +
                 + B * currLine[i]
                 - thisLine[i]) * getDampingValueFAST(i, j);
@@ -240,7 +240,7 @@ WaterSimulation::simulationStep(const float dt) {
 }
 #endif
 
-#if 1 
+#if 1
 
 #define register
 
@@ -263,9 +263,9 @@ WaterSimulation::simulationStep(const float dt) {
         GLfloat * prevLine = currLine - _numAllocatedColumns;
         GLfloat * nextLine = currLine + _numAllocatedColumns;
         GLfloat * dampingLine = _dampingArray + j * _numAllocatedColumns;
-          
+
         for( int i=1 ; i<_numAllocatedColumns-1 ; i++ ) {
-            
+
             thisLine[i] = (A*( prevLine[i] + nextLine[i] + currLine[i-1] + currLine[i+1] ) +
                 + B * currLine[i]
                 - thisLine[i]) * dampingLine[i];
@@ -295,11 +295,11 @@ WaterSimulation::simulationStep(const float dt) {
 
 void
 WaterSimulation::simulationMultiStep(float dt, int numSteps, int stripSize) {
-    
+
 //precalculate coefficients
 //    const float A = (c*dt/_h)*(_c*dt/_h);
     register const float A = SQR(waveSpeed() * dt / waveCoefficient());
-    
+
     //	const float AD = A/sqrt(2);
     register const float B = 2.f - 4.f*A;// - 4*AD;
 
@@ -308,7 +308,7 @@ WaterSimulation::simulationMultiStep(float dt, int numSteps, int stripSize) {
 
     int startLine = 0;
     int endLine = 0;
-    
+
     int     currentBuffer = _currentBuffer;
     float * currBuffer = 0;
     float * prevBuffer = 0;
@@ -316,20 +316,20 @@ WaterSimulation::simulationMultiStep(float dt, int numSteps, int stripSize) {
 
     int currentStrip = 0;
     int numStrips = (_mySize[1] / stripSize);
-    
+
     // Phase 1: First strip
 //cerr << "P1\n";
 //cerr << "strip= " << 0 << endl;
 
     for (int step = 0; step < numSteps; step++) {
-//cerr << "step= " << step << endl;         
+//cerr << "step= " << step << endl;
 
         currBuffer = _waterArray[currentBuffer];
         prevBuffer = _waterArray[1 - currentBuffer];
 
         startLine = 1;
         endLine = startLine + stripSize - 1;
-        
+
         for(int j = startLine; j < endLine-step ; j++ ) {
 //cerr << j << endl;
             register GLfloat * thisLine = currBuffer + j * _numAllocatedColumns;
@@ -339,36 +339,36 @@ WaterSimulation::simulationMultiStep(float dt, int numSteps, int stripSize) {
             GLfloat * dampingLine = _dampingArray + j * _numAllocatedColumns;
 
             for( int i=1 ; i<_numAllocatedColumns-1 ; i++ ) {
-                
+
 #ifdef DAMPING_TEST
                 if (dampingLine[i] == 0. && thisLine[i] != .0f) {
                     dampingLine[i] = _defaultDampingCoefficient;
                     continue;
                 }
-#endif                      
-                
+#endif
+
                 thisLine[i] = (A*( prevLine[i] + nextLine[i] + currLine[i-1] + currLine[i+1] ) +
                         + B * currLine[i]
                         - thisLine[i]) * dampingLine[i];
-                        
-          
+
+
             }
         }
         currentBuffer = 1- currentBuffer;
     }
 
     // Phase 2: intermediate strips
-    
+
 //cerr << "P2\n";
     currentStrip = 1;
-    
+
     for ( ; currentStrip < numStrips; currentStrip++) {
 //cerr << "strip= " << currentStrip << endl;
-       
+
         currentBuffer = _currentBuffer;
- 
+
         for (int step = 0; step < numSteps; step++) {
-//cerr << "step= " << step << endl;     
+//cerr << "step= " << step << endl;
 
             currBuffer = _waterArray[currentBuffer];
             prevBuffer = _waterArray[1 - currentBuffer];
@@ -377,7 +377,7 @@ WaterSimulation::simulationMultiStep(float dt, int numSteps, int stripSize) {
             endLine = startLine + stripSize;
 
             int j = startLine-step;
-            
+
             register GLfloat * thisLine = currBuffer + j * _numAllocatedColumns;
             register GLfloat * currLine = prevBuffer + j * _numAllocatedColumns;
             GLfloat * prevLine = currLine - _numAllocatedColumns;
@@ -394,7 +394,7 @@ WaterSimulation::simulationMultiStep(float dt, int numSteps, int stripSize) {
                         dampingLine[i] = _defaultDampingCoefficient;
                         continue;
                     }
-#endif 
+#endif
                     thisLine[i] = (A*( prevLine[i] + nextLine[i] + currLine[i-1] + currLine[i+1] ) +
                             + B * currLine[i]
                             - thisLine[i]) * dampingLine[i];
@@ -411,20 +411,20 @@ WaterSimulation::simulationMultiStep(float dt, int numSteps, int stripSize) {
 
     // Phase 3: last strip
     currentBuffer = _currentBuffer;
-    
+
 //cerr << "P3\n";
 //cerr << "strip= " << currentStrip << endl;
 
     for (int step = 0; step < numSteps; step++) {
-//cerr << "step= " << step << endl;        
+//cerr << "step= " << step << endl;
 
         currBuffer = _waterArray[currentBuffer];
         prevBuffer = _waterArray[1 - currentBuffer];
 
         startLine = currentStrip * stripSize;
         endLine = _numAllocatedRows-1;
-//cerr << "startLine= " << startLine << endl; 
-//cerr << "endLine= " << endLine << endl; 
+//cerr << "startLine= " << startLine << endl;
+//cerr << "endLine= " << endLine << endl;
 
         for(int j = startLine-step; j < endLine ; j++ ) {
 //cerr << j << endl;
@@ -441,7 +441,7 @@ WaterSimulation::simulationMultiStep(float dt, int numSteps, int stripSize) {
                     dampingLine[i] = _defaultDampingCoefficient;
                     continue;
                 }
-#endif 
+#endif
                 thisLine[i] = (A*( prevLine[i] + nextLine[i] + currLine[i-1] + currLine[i+1] ) +
                         + B * currLine[i]
                         - thisLine[i]) * dampingLine[i];
@@ -456,14 +456,14 @@ WaterSimulation::simulationMultiStep(float dt, int numSteps, int stripSize) {
 
 
 void
-WaterSimulation::simulationMultiStepInThread(asl::ThreadSemaphore & threadLock, float dt, 
+WaterSimulation::simulationMultiStepInThread(asl::ThreadSemaphore & threadLock, float dt,
                                              int numSteps, int stripSize)
 {
 
     if (!_computeThread) {
 
         cerr << "Generating compute thread" << endl;
-        
+
         //assert(asl::ThreadSemFactory::instance());
         assert(_computeLock == 0);
         _computeLock = new asl::ThreadSemaphore(); //asl::ThreadSemFactory::instance()->newLock();
@@ -471,23 +471,23 @@ WaterSimulation::simulationMultiStepInThread(asl::ThreadSemaphore & threadLock, 
 
         cerr << "WaterSimulation::simulationMultiStepInThread: _computeLock.lock()" << endl;
         _computeLock->post();
-        
+
         cerr << "WaterSimulation::simulationMultiStepInThread: threadLock.lock()" << endl;
         threadLock.post();
-        
+
         _computeThread = new ComputeThread(*this);
         cerr << "forking compute thread" << endl;
         _computeThread->fork();
-        
+
         sched_yield();
     }
     assert(_computeThread);
-    
+
     _computeThread->setup(threadLock, dt, numSteps, stripSize);
-    
+
     //cerr << "WaterSimulation::simulationMultiStepInThread: _computeLock.unlock()" << endl;
     _computeLock->wait();
-    
+
     // now executing computeThread
 }
 
@@ -496,9 +496,9 @@ WaterSimulation::switchBuffers() {
     _currentBuffer = 1 - _currentBuffer;
 }
 
-void 
+void
 WaterSimulation::parabolicSplash(int xpos, int ypos, int magnitude, int radius) {
-	
+
 	for ( int x = xpos - radius; x < xpos + radius; ++x) {
 		for (int y = ypos - radius; y < ypos + radius; ++y) {
 			double dx = xpos - x;
@@ -509,7 +509,7 @@ WaterSimulation::parabolicSplash(int xpos, int ypos, int magnitude, int radius) 
 				weight *= weight;
 				if (x >= 0 && x <= _mySize[0] && y >= 0 && y <= _mySize[1]) {
 //					(*z)[y][x] = (*z1)[y][x] = -weight * magnitude;
-					getWaterValue(0, x, y) = getWaterValue(1, x, y) = 
+					getWaterValue(0, x, y) = getWaterValue(1, x, y) =
                         -weight * magnitude;
 				}
 			}
@@ -517,12 +517,12 @@ WaterSimulation::parabolicSplash(int xpos, int ypos, int magnitude, int radius) 
 	}
 }
 
-void 
+void
 WaterSimulation::sinoidSplash(int xpos, int ypos, float magnitude, int radius, int frequency) {
 
     /*
     cerr << "WaterSimulation::sinoidSplash() x: " << xpos << " y: " << ypos
-        << " magnitude: " << magnitude << " radius: " << radius 
+        << " magnitude: " << magnitude << " radius: " << radius
         << " frequency: " << frequency << endl;
 */
 
@@ -538,7 +538,7 @@ WaterSimulation::sinoidSplash(int xpos, int ypos, float magnitude, int radius, i
 				if (x >= 0 && x < _mySize[0] && y >= 0 && y < _mySize[1] ) {
 //#ifdef AIR_SPLASH
 //					(*z)[y][x] = (*z1)[y][x] = (*z)[y][x] -sin(weight*frequency*3.14159/2) * magnitude;
-					getWaterValue(0, x, y) = getWaterValue(1, x, y) = 
+					getWaterValue(0, x, y) = getWaterValue(1, x, y) =
                         getWaterValue(0, x, y) - float(sin(weight*frequency*3.14159/2)) * magnitude;
                     getDampingValue(x, y) = _defaultDampingCoefficient;
 //#else
@@ -553,26 +553,26 @@ WaterSimulation::sinoidSplash(int xpos, int ypos, float magnitude, int radius, i
 
 void
 WaterSimulation::ComputeThread::run() {
-    
+
     for(;;) {
 
 //        cerr << "WaterSimulation::ComputeThread::run() START" << endl;
-        
+
 //        cerr << "ComputeThread::run(): _computeLock.lock()" << endl;
         // waiting for main thread to let us loose
         _simulation.getComputeLock().post();
 
         assert(_threadLock);
-        
+
         _simulation.simulationMultiStep(_timeStep, _numSteps, _stripSize);
-        
+
         // signalling calling (main) thread that we are finished
         assert(_threadLock);
 //        cerr << "ComputeThread::run(): threadLock.lock()" << endl;
         _threadLock->wait();
-        
+
 //        cerr << "WaterSimulation::ComputeThread::run() END" << endl;
-        
+
 //        cerr << "ComputeThread::run(): _computeLock.lock()" << endl;
         _simulation.getComputeLock().wait();
 

@@ -3,7 +3,7 @@
 
 #include <y60/components/yape/y60_ape_settings.h>
 
-#include <boost/tuple/tuple.hpp> 
+#include <boost/tuple/tuple.hpp>
 
 #include <boost/mpl/advance.hpp>
 #include <boost/mpl/at.hpp>
@@ -43,7 +43,7 @@ class get_arguments {
     public:
         typedef typename boost::mpl::if_<
             boost::mpl::greater< boost::mpl::size<Sig>, first_arg_idx >,
-                boost::mpl::iterator_range< 
+                boost::mpl::iterator_range<
                     typename boost::mpl::advance<typename boost::mpl::begin<Sig>::type, first_arg_idx>::type,
                     typename boost::mpl::end<Sig>::type>,
                 boost::mpl::vector0<> >::type type;
@@ -57,14 +57,14 @@ struct storage_type {
 };
 
 template <typename Seq>
-struct get_storage_types : 
+struct get_storage_types :
         boost::mpl::transform_view< Seq, storage_type > {};
 
 template <typename Arguments>
 struct tuple_for_args :
     boost::mpl::reverse_fold<
             typename get_storage_types< Arguments >::type,
-                    boost::tuples::null_type, 
+                    boost::tuples::null_type,
                     boost::tuples::cons<boost::mpl::_2, boost::mpl::_1> > {};
 
 template <typename F, typename Sig>
@@ -97,7 +97,7 @@ class convert_arguments {
                 JS_RemoveRoot(cx_, & js_string );
                 std::ostringstream os;
                 os << "could not convert argument " << I::value << " with value '"
-                    << js_string_rep << "' to native type '" 
+                    << js_string_rep << "' to native type '"
                     << asl::demangled_name< typename boost::mpl::at_c<Types, I::value>::type >() << "'";
                 throw bad_arguments(os.str(), PLUS_FILE_LINE);
             }
@@ -110,14 +110,14 @@ class convert_arguments {
 
 template <typename F, typename Sig>
 class  arguments : public
-    tuple_for_args< typename get_arguments<F,Sig>::type>::type 
+    tuple_for_args< typename get_arguments<F,Sig>::type>::type
 {
         typedef typename get_arguments<F,Sig>::type argument_types;
         typedef typename get_storage_types<argument_types>::type storage_types;
     public:
-        
+
         arguments( JSContext * cx, uintN argc, jsval * argv ) {
-            check_arity<F,Sig>(argc);    
+            check_arity<F,Sig>(argc);
             typedef boost::mpl::range_c<uintN, 0, arity<F>::value> R;
             boost::mpl::for_each< R >(
                     convert_arguments<arguments, storage_types>( cx, argv, *this ) );

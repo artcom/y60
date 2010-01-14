@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -129,14 +129,14 @@ LabelBase.prototype.Constructor = function(Public, Protected, theScene,
         window.setLineHeight(lineHeight);
         var myFontName = loadFont(myStyle.font, myStyle.fontsize);
         var myImage = Protected.getImageNode();
-        
+
         _myTextSize = window.renderTextAsImage(myImage, theText, myFontName,
                         theSize&&theSize[0]>0?Public.width:null,
                         theSize&&theSize[1]>0?Public.height:null,
                         Public.textCursorPos);
-                        
+
         _myCursorPos = window.getTextCursorPosition();
-                        
+
         Public.srcsize.x = _myTextSize[0] / myImage.width;
         Public.srcsize.y = _myTextSize[1] / myImage.height;
         window.setHTextAlignment(Renderer.LEFT_ALIGNMENT);
@@ -190,7 +190,7 @@ LabelBase.prototype.Constructor = function(Public, Protected, theScene,
     }
 
     Public.setImage = function(theSource) {
-        if (typeof(theSource) == "string") {        
+        if (typeof(theSource) == "string") {
             var myImage = Protected.getImageNode();
             myImage.src = theSource;
             var mySize = getImageSize(myImage);
@@ -200,7 +200,7 @@ LabelBase.prototype.Constructor = function(Public, Protected, theScene,
             Public.srcsize.y = 1;
         } else if (typeof(theSource) == "object") {
             if (Public.image == null) {
-                Protected.addImage(theSource);                
+                Protected.addImage(theSource);
                 Public.image = theSource;
                 var mySize = getImageSize(theSource);
                 Public.width  = mySize.x;

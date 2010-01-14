@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -78,7 +78,7 @@ DEFINE_EXCEPTION(BufferSizeMismatch, asl::Exception);
     public:
         PortVideo(asl::DLHandle theDLHandle);
         ~PortVideo();
-        
+
         virtual asl::Ptr<CaptureDevice> instance() const;
         std::string canDecode(const std::string & theUrl, asl::Ptr<asl::ReadableStreamHandle> theStream = asl::Ptr<asl::ReadableStreamHandle>(0));
         virtual void readFrame(dom::ResizeableRasterPtr theTargetRaster);
@@ -91,29 +91,29 @@ DEFINE_EXCEPTION(BufferSizeMismatch, asl::Exception);
     private:
         // const dc1394camera_t & getDeviceHandle() const { return (*_myDevices)[getDevice()]; };
         // dc1394camera_t & getDeviceHandle() { return (*_myDevices)[getDevice()]; };
-        cameraEngine * _myCamera; 
+        cameraEngine * _myCamera;
         //unsigned char * _myCameraBuffer;
         bool _myIsRunning;
 
-        RingBuffer * _myRingBuffer; 
+        RingBuffer * _myRingBuffer;
 
         //unsigned char * _mySourceBuffer;
         //unsigned char * _myDestBuffer;
 
         unsigned int _myWidth, _myHeight, _mySourceDepth, _myDestDepth;
-        unsigned int _myBytesPerDestPixel, _myBytesPerSourcePixel; 
-        
+        unsigned int _myBytesPerDestPixel, _myBytesPerSourcePixel;
+
         asl::ThreadLock _myLock;
         bool _async;
-   
+
         void freeBuffers();
         bool setupCamera();
         void allocateBuffers();
-        
+
         // thread function
         void run();
     };
 /* @} */
 }
 
-#endif // _AC_PORTVIDEO_H__ 
+#endif // _AC_PORTVIDEO_H__

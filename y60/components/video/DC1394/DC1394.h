@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -75,7 +75,7 @@
 #include <dc1394/dc1394.h>
 
 namespace y60 {
-    
+
     const std::string MIME_TYPE_CAMERA = "video/camera";
 
     class DC1394 : public CaptureDevice, public asl::PlugInBase {
@@ -83,8 +83,8 @@ namespace y60 {
         DC1394(asl::DLHandle theDLHandle);
         ~DC1394();
         virtual asl::Ptr<CaptureDevice> instance() const;
-        std::string canDecode( const std::string & theUrl, 
-                               asl::Ptr<asl::ReadableStreamHandle> theStream = 
+        std::string canDecode( const std::string & theUrl,
+                               asl::Ptr<asl::ReadableStreamHandle> theStream =
                                    asl::Ptr<asl::ReadableStreamHandle>(0) );
         virtual void readFrame(dom::ResizeableRasterPtr theTargetRaster);
         virtual void load(const std::string & theFilename);
@@ -97,18 +97,18 @@ namespace y60 {
 
         std::vector<dc1394camera_t*> _myDevices;
 
-        dc1394video_mode_t _myVideoMode; 
+        dc1394video_mode_t _myVideoMode;
 
-        const dc1394camera_t & getDeviceHandle() const { 
-            return *_myDevices[getDevice()]; 
+        const dc1394camera_t & getDeviceHandle() const {
+            return *_myDevices[getDevice()];
         };
 
-        dc1394camera_t & getDeviceHandle() { 
-            return *_myDevices[getDevice()]; 
+        dc1394camera_t & getDeviceHandle() {
+            return *_myDevices[getDevice()];
         };
 
-        template<typename T> 
-        void getOption( const std::string & theOptionString, 
+        template<typename T>
+        void getOption( const std::string & theOptionString,
                         const std::string & theUrl,
                         T & theOption );
 

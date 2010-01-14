@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -72,10 +72,10 @@ namespace y60 {
     class Cursor {
 
     public:
-    
-        
-        Cursor() 
-            : position(0.0, 0.0), 
+
+
+        Cursor()
+            : position(0.0, 0.0),
             major_direction(0.0, 0.0),
             minor_direction(0.0, 0.0),
             intensity(0.0),
@@ -88,9 +88,9 @@ namespace y60 {
             roi.makeEmpty();
             previousRoi.makeEmpty();
         }
-        
+
         Cursor(const asl::Box2f & theBox)
-            : position(0.0, 0.0), 
+            : position(0.0, 0.0),
             major_direction(0.0, 0.0),
             minor_direction(0.0, 0.0),
             roi( theBox),
@@ -113,25 +113,25 @@ namespace y60 {
         float         previousIntensity;
         float         firstDerivative;
         double        lastTouchTime;
-        
+
         std::deque<float> intensityHistory;
         asl::Vector2f motion;
         int correlatedPosition;
     };
 
     class MomentCursor : public Cursor {
-    public: 
+    public:
         MomentCursor( const asl::MomentResults & theMomentResult, const asl::Box2f & theBox )
             : Cursor( theBox )
-        { 
-            position =  theMomentResult.center; 
+        {
+            position =  theMomentResult.center;
         }
-    }; 
+    };
 
     class MaximumCursor :public Cursor {
-    public: 
+    public:
     MaximumCursor(const MaximumResults & theMaximumResult, const asl::Box2f & theBox)
-        : Cursor( theBox ) 
+        : Cursor( theBox )
         {
             position = theMaximumResult.center;
         }

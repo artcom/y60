@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -82,7 +82,7 @@ IMPLEMENT_ENUM(inet::AuthentType, inet::AuthentTypeStrings);
 
 namespace inet {
 
-    Request::Request(const string & theURL, const string & theUserAgent) 
+    Request::Request(const string & theURL, const string & theUserAgent)
         : _myURL(theURL),
         _myUserAgent(theUserAgent),
         _myCurlHandle(0),
@@ -96,28 +96,28 @@ namespace inet {
         CURLcode myStatus;
         _myCurlHandle = curl_easy_init();
         DB(AC_TRACE << "got new handle: " << _myCurlHandle << " for " << theURL << endl);
-        
+
         myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_URL, _myURL.c_str());
         checkCurlStatus(myStatus, PLUS_FILE_LINE);
-        
+
         curl_easy_setopt(_myCurlHandle, CURLOPT_ERRORBUFFER, asl::begin_ptr(_myErrorBuffer));
         checkCurlStatus(myStatus, PLUS_FILE_LINE);
-        
+
         setVerbose(CURL_VERBOSE);
         verifyPeer(true); // default: check ssl cert
-        
+
         // curl handles can save a single user-data char *
         // we abuse this to save a this backpointer
         myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_PRIVATE, this);
         checkCurlStatus(myStatus, PLUS_FILE_LINE);
-        
+
         DB(AC_TRACE << "registering callbacks" << endl);
         // register onData callback
         myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_WRITEFUNCTION, &Request::curlWriteCallback);
         checkCurlStatus(myStatus, PLUS_FILE_LINE);
         myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_WRITEDATA, this);
         checkCurlStatus(myStatus, PLUS_FILE_LINE);
-        
+
         // register onProgress callback
         myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_PROGRESSFUNCTION, &Request::curlProgressCallback);
         checkCurlStatus(myStatus, PLUS_FILE_LINE);
@@ -125,18 +125,18 @@ namespace inet {
         checkCurlStatus(myStatus, PLUS_FILE_LINE);
         myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_NOPROGRESS, false);
         checkCurlStatus(myStatus, PLUS_FILE_LINE);
-        
+
         // register onHeader callback
         myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_HEADERFUNCTION, &Request::curlHeaderCallback);
         checkCurlStatus(myStatus, PLUS_FILE_LINE);
         myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_WRITEHEADER, this);
         checkCurlStatus(myStatus, PLUS_FILE_LINE);
-        
+
         // set User-Agent <g>
         myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_USERAGENT, _myUserAgent.c_str());
         checkCurlStatus(myStatus, PLUS_FILE_LINE);
     }
-    
+
     Request::~Request() {
         DB(AC_TRACE << "cleaning up " << _myURL << endl);
         curl_slist_free_all (_myHttpHeaderList);
@@ -396,7 +396,7 @@ namespace inet {
         checkCurlStatus(myStatus, PLUS_FILE_LINE);
     }
 
-    void 
+    void
     Request::setCookie(const std::string & theCookie) {
         if ( !_myCookieBuffer.empty()) {
             _myCookieBuffer += ";";
@@ -413,7 +413,7 @@ namespace inet {
         checkCurlStatus(myStatus, PLUS_FILE_LINE);
     };
 
-    void 
+    void
     Request::setCookies(const CookieJar & theCookies) {
         _myCookieBuffer = "";
         for (CookieJar::const_iterator i=theCookies.begin(); i != theCookies.end(); ++i) {

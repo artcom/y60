@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -70,12 +70,12 @@ namespace y60 {
         _myLower(0),
         _myUpper(255),
         _myImageNodeVersion(0)
-    {   
+    {
     }
 
-    void 
+    void
     Contrast::configure(const dom::Node & theNode) {
-        
+
         for( unsigned int i=0; i<theNode.childNodesLength(); i++) {
             const std::string myName = theNode.childNode("property",i)->getAttribute("name")->nodeValue();
             const std::string myValue = theNode.childNode("property",i)->getAttribute("value")->nodeValue();
@@ -86,7 +86,7 @@ namespace y60 {
                     _mySourceImage = myImage->getFacade<y60::Image>();
                 } else if( myName == "targetimage") {
                     _myTargetImage = myImage->getFacade<y60::Image>();
-                } 
+                }
             } else {
                 if( myName == "lower") {
                     asl::fromString(myValue, _myLower);
@@ -96,10 +96,10 @@ namespace y60 {
                     updateLookupTable();
                 }
             }
-        }   
+        }
     }
 
-    void 
+    void
     Contrast::updateLookupTable() {
         _myLookupTable.clear();
 
@@ -120,26 +120,26 @@ namespace y60 {
         }
     }
 
-    void 
+    void
     Contrast::onFrame(double t) {
-        asl::Unsigned64 myImageNodeVersion = _mySourceImage->getRasterValueNode()->nodeVersion(); 
+        asl::Unsigned64 myImageNodeVersion = _mySourceImage->getRasterValueNode()->nodeVersion();
         if (myImageNodeVersion > _myImageNodeVersion) {
             _myImageNodeVersion = myImageNodeVersion;
         } else {
             return;
         }
-        
+
         const GRAYRaster * mySourceFrame = dom::dynamic_cast_Value<GRAYRaster>(_mySourceImage->getRasterValue().get());
-        
+
         dom::ResizeableRasterPtr myResizeableRasterPtr = _mySourceImage->getRasterPtr();
 
         // // left-to-right horizontal pass
         GRAYRaster::iterator itSrc = const_cast<GRAYRaster::iterator>(mySourceFrame->begin());
-        
+
         dom::Node::WritableValue<GRAYRaster> myTargetFrameLock(_myTargetImage->getRasterValueNode());
         GRAYRaster & myTargetFrame = myTargetFrameLock.get();
         GRAYRaster::iterator itTrgt = myTargetFrame.begin();
-        
+
         for (itSrc; itSrc != mySourceFrame->end(); ++itSrc, ++itTrgt) {
             (*itTrgt) = _myLookupTable[(*itSrc).get()];
         }

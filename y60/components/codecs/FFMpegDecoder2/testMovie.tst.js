@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -85,12 +85,12 @@ function FFMpegTest(theArguments) {
         "xvid_160x120_25_1_noaudio.avi",
     ];
 
-    
+
     var _myTests = [
         testPlayToEnd,
         testStop,
         testPause,
-        testLoop, 
+        testLoop,
         testPauseStop,
         testStopPause,
         testSeek,
@@ -98,12 +98,12 @@ function FFMpegTest(theArguments) {
     ];
 
     this.initTests(_myTestMovies, _myTests);
-    
+
     function testPlayToEnd(This, theTestFrame, theMovieName, theMovie) {
         switch(theTestFrame) {
             case 0:
                 print("  Play to end...");
-                This.assure_msg(theMovie.framecount == 26 || theMovie.framecount == -1, 
+                This.assure_msg(theMovie.framecount == 26 || theMovie.framecount == -1,
                         "Movie framecount is correct.");
                 break;
             case 1:
@@ -146,7 +146,7 @@ function FFMpegTest(theArguments) {
                 break;
         }
     }
-    
+
     function testPause(This, theTestFrame, theMovieName, theMovie) {
         switch(theTestFrame) {
             case 0:
@@ -168,7 +168,7 @@ function FFMpegTest(theArguments) {
                 break;
         }
     }
-    
+
     function testLoop(This, theTestFrame, theMovieName, theMovie) {
         switch(theTestFrame) {
             case 0:
@@ -189,8 +189,8 @@ function FFMpegTest(theArguments) {
                 This.nextTest();
                 break;
         }
-    }  
-  
+    }
+
     function testPauseStop(This, theTestFrame, theMovieName, theMovie) {
         switch(theTestFrame) {
             case 0:
@@ -223,7 +223,7 @@ function FFMpegTest(theArguments) {
                 break;
         }
     }
-    
+
     function testStopPause(This, theTestFrame, theMovieName, theMovie) {
         switch(theTestFrame) {
             case 0:
@@ -288,7 +288,7 @@ function FFMpegTest(theArguments) {
                 break;
         }
     }
-    
+
     function testRandomSeek(This, theTestFrame, theMovieName, theMovie) {
         switch(theTestFrame) {
             case 0:
@@ -296,11 +296,11 @@ function FFMpegTest(theArguments) {
 /*
                 if (theMovieName == "mpeg1_160x120_25_1_audio.mpg" ||
                     theMovieName == "mpeg2_160x120_25_1_audio.mpg" ||
-                    theMovieName == "mpeg2intra_160x120_25_1_audio.mpg") 
+                    theMovieName == "mpeg2intra_160x120_25_1_audio.mpg")
                 {
                     This.nextTest();
                 }
-*/                
+*/
                 break;
             case RANDOM_SEEK_ITERATIONS+3:
                 This.assure_msg(theMovie.playmode == "play", "Playback after random seeks.");

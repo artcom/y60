@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -72,7 +72,7 @@ GUI.Animation.Constructor = function(Public, Protected) {
 
     var _id = Animation.idCounter++;
     var _name = null;
-		
+
     var _parent = null;
     var _duration = 100.0;
     var _loop = false;
@@ -85,20 +85,20 @@ GUI.Animation.Constructor = function(Public, Protected) {
     var _easing  = function(v) {
         return v;
     };
-		
+
     var _onPlay        = null;
     var _onFinish      = null;
     var _onCancel      = null;
 
     ////////////////////////////////////////
     // Properties
-    ////////////////////////////////////////		
-		
-    // getter / setter 
+    ////////////////////////////////////////
+
+    // getter / setter
     Public.id getter = function() {
         return _id;
 	};
-		
+
     Public.path getter = function() {
         var r = "" + _id;
 	    var p = _parent;
@@ -108,35 +108,35 @@ GUI.Animation.Constructor = function(Public, Protected) {
 	    }
 	    return r;
 	};
-		
+
     Public.name getter = function() {
 		return _name;
 	};
-		
+
     Public.name setter = function(v) {
 		_name = v;
 	};
-    
+
     Public.progress getter = function() {
 		return _progress;
 	};
-		
+
     Public.progress setter = function(p) {
 		_progress = p;
 	};
-		
+
     Public.easing getter = function() {
         return _easing;
 	};
-	
+
 	Public.easing setter = function(theEasing) {
         _easing = theEasing;
 	};
-		
+
     Public.duration getter = function() {
         return _duration;
 	};
-    
+
     Protected.duration setter = function(d) {
         _duration = d;
         Protected.durationChanged();
@@ -149,39 +149,39 @@ GUI.Animation.Constructor = function(Public, Protected) {
     Public.loop setter = function(l) {
         _loop = l;
     };
-    	
+
     Public.running getter = function()	{
 		return _running;
 	};
-		
+
     Public.parent getter = function() {
 		return _parent;
 	};
-		
+
     Public.parent setter = function(a) {
 		_parent = a;
 	};
-		
+
     Public.onPlay getter = function() {
 		return _onPlay;
 	};
-		
+
     Public.onPlay setter = function(f) {
 		_onPlay = f;
 	};
-		
+
     Public.onCancel getter = function()	{
 		return _onCancel;
 	};
-		
+
     Public.onCancel setter = function(f) {
 		_onCancel = f;
 	};
-		
+
     Public.onFinish getter = function()	{
 		return _onFinish;
 	};
-		
+
     Public.onFinish setter = function(f) {
 		_onFinish = f;
 	};
@@ -197,18 +197,18 @@ GUI.Animation.Constructor = function(Public, Protected) {
 		_progress = _easing(0.0);
 	    _running = true;
 	    _finished = false;
-		
+
 	    callOnPlay();
-	    
+
 	    Public.render();
 	};
-		
+
     Public.cancel = function() {
         Logger.debug("Cancelled " + this);
 		_running = false;
 	    callOnCancel();
 	};
-		
+
     Public.finish = function() {
         Logger.debug("Finished " + this);
 		callOnFinish();
@@ -219,7 +219,7 @@ GUI.Animation.Constructor = function(Public, Protected) {
             _finished = true;
         }
 	};
-	
+
 	Public.comeToAnEnd = function() {
         Logger.debug("comeToAnEnd " + Public.name);
         if (_finished) {
@@ -227,30 +227,30 @@ GUI.Animation.Constructor = function(Public, Protected) {
         }
         if (!_running) {
             Public.play(true);
-    	    Public.render();	                
+    	    Public.render();
         }
 		Public.finish(true);
-        
+
 	};
-		
+
     Public.doFrame = function() {
         _progressTime = (millisec() - _startTime);
 		_progress = _easing(_progressTime / _duration);
-	    
+
 	    var finished = (_progressTime >= _duration);
-	    
+
 	    if(finished) {
 			_progressTime = _duration;
 		    _progress = 1.0;
 		}
-	    
+
 	    Public.render();
-	    
+
 	    if(finished) {
 			Public.finish();
 		}
 	};
-		
+
     Public.render = function() {
     };
 
@@ -267,11 +267,11 @@ GUI.Animation.Constructor = function(Public, Protected) {
 			_parent.childDurationChanged(Public);
 		}
     };
-		
+
     Protected.standardToString = function(cls) {
 		return cls + " " + Public.path + ((Public.name != null) ? (" (" + Public.name + ") ") : "");
 	};
-	
+
     ////////////////////////////////////////
     // Private
     ////////////////////////////////////////
@@ -281,13 +281,13 @@ GUI.Animation.Constructor = function(Public, Protected) {
             _onPlay.call(Public);
         }
     };
-    
+
     function callOnFinish() {
         if(_onFinish != null) {
             _onFinish.call(Public);
         }
     };
-    
+
     function callOnCancel() {
         if(_onCancel != null) {
             _onCancel.call(Public);

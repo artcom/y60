@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -94,7 +94,7 @@ namespace y60 {
     void applyCustomFilter(PLBmp & theBitmap, ImageFilter theFilter,
                            const std::vector<float> & theFilterparams);
 
-    void applyCustomFilter(PLBmp & theBitmap, const std::string & theFilterName, 
+    void applyCustomFilter(PLBmp & theBitmap, const std::string & theFilterName,
                            const VectorOfFloat & theFilterparams);
 
     DEFINE_EXCEPTION(ImageLoaderException, asl::Exception);
@@ -104,14 +104,14 @@ namespace y60 {
         //! Creates an empty bitmap.
         ImageLoader(const ITextureManagerPtr & theTextureManager = ITextureManagerPtr());
         //! Creates and loads a bitmap from a block.
-        ImageLoader(asl::Ptr<asl::ReadableBlockHandle> theInputBlock, 
+        ImageLoader(asl::Ptr<asl::ReadableBlockHandle> theInputBlock,
                     const std::string & theFileDescription="",
-                    const ITextureManagerPtr & theTextureManager = ITextureManagerPtr(), 
+                    const ITextureManagerPtr & theTextureManager = ITextureManagerPtr(),
                     unsigned theDepth = 1);
         //! Creates and loads a bitmap, using an optional package manager to search for the file.
-        ImageLoader(const std::string & theFilename, 
-               asl::Ptr<asl::PackageManager> thePackageManager = asl::Ptr<asl::PackageManager>(), 
-               const ITextureManagerPtr & theTextureManager = ITextureManagerPtr(), 
+        ImageLoader(const std::string & theFilename,
+               asl::Ptr<asl::PackageManager> thePackageManager = asl::Ptr<asl::PackageManager>(),
+               const ITextureManagerPtr & theTextureManager = ITextureManagerPtr(),
                unsigned theDepth = 1);
 
         //! Destroys the bitmap.

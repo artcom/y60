@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -79,12 +79,12 @@ namespace y60 {
         _myIDCounter(0),
         _myDistanceThreshold(0),
         _myCarCounter(0)
-    {   
+    {
     }
-  
-    void 
+
+    void
     Blobs::configure(const dom::Node & theNode) {
-        
+
         for( unsigned int i=0; i<theNode.childNodesLength(); i++) {
             const std::string myName = theNode.childNode("property",i)->getAttribute("name")->nodeValue();
             const std::string myValue = theNode.childNode("property",i)->getAttribute("value")->nodeValue();
@@ -95,7 +95,7 @@ namespace y60 {
                     _mySourceImage = myNode->getFacade<y60::Image>();
                 } else if( myName == "targetimage") {
                     _myTargetImage = myNode->getFacade<y60::Image>();
-                } 
+                }
             } else {
                 if( myName == "threshold") {
                     asl::fromString(myValue, _myThreshold);
@@ -106,12 +106,12 @@ namespace y60 {
                     _myOverlay = myResults[0];
                 } else if( myName == "distance") {
                     asl::fromString(myValue, _myDistanceThreshold);
-                }      
+                }
             }
-        }   
+        }
     }
 
-    void 
+    void
     Blobs::onFrame(double t) {
         y60::ImagePtr myGrayImage = _mySourceImage;
 
@@ -123,24 +123,24 @@ namespace y60 {
         // // left-to-right horizontal pass
         GRAYRaster::iterator itSrc = const_cast<GRAYRaster::iterator>(mySourceFrame->begin());
         GRAYRaster::iterator itTarget = const_cast<GRAYRaster::iterator>(myTargetFrame->begin());
-        
+
         for (itSrc; itSrc != mySourceFrame->end(); ++itSrc, ++itTarget) {
             (*itTarget) = (*itSrc);
         }
-        
+
         BlobListPtr myBlobs = connectedComponents( _myTargetImage->getRasterPtr(), static_cast<int>(_myThreshold));
-        
+
         correlatePositions(myBlobs, t);
 	}
 
-    void 
+    void
     Blobs::correlatePositions(BlobListPtr & theROIs, double t)
     {
         Matrix4f myTransform = getTransformationMatrix();
 
         const BlobList & myROIs = * theROIs;
 
-        // populate a map with all distances between existing cursors and new positions 
+        // populate a map with all distances between existing cursors and new positions
         typedef std::multimap<float, std::pair<int,int> > DistanceMap;
         DistanceMap myDistanceMap;
         float myDistanceThreshold = _myDistanceThreshold;
@@ -149,7 +149,7 @@ namespace y60 {
         for (; myCursorIt != _myCursors.end(); ++myCursorIt ) {
             myCursorIt->second.correlatedPosition = -1;
             for (unsigned i = 0; i < myROIs.size(); ++i) {
-                
+
                 float myDistance = magnitude( myCursorIt->second.position + myCursorIt->second.motion
                                               -  (*theROIs)[i]->center());
                 //AC_INFO << myDistance << " id " << myCursorIt->first;
@@ -166,14 +166,14 @@ namespace y60 {
 
         //AC_INFO << "myCars" << _myCarCounter;
         _myResultNode = dom::Element("result");
-        _myResultNode.appendChild(Element("cars")); 
-        _myResultNode.childNode("cars")->appendChild(Text("")); 
+        _myResultNode.appendChild(Element("cars"));
+        _myResultNode.childNode("cars")->appendChild(Text(""));
         dom::Node & centerNode = *(_myResultNode.childNode("cars"));
         centerNode.childNode("#text")->nodeValue(asl::as_string(_myCarCounter));
-        
-        
+
+
         // iterate through the distance map and correlate cursors in increasing distance order
-        for (DistanceMap::iterator dit = myDistanceMap.begin(); 
+        for (DistanceMap::iterator dit = myDistanceMap.begin();
              dit!=myDistanceMap.end(); ++dit)
             {
                 // check if we already have correlated one of our nodes
@@ -195,16 +195,16 @@ namespace y60 {
                         // update cursor with new position
                         asl::Vector2f myCenter = (*theROIs)[myPositionIndex]->center();
                         myPosition.appendAttribute("current", asl::as_string(myCenter));
-                        
+
                         // update cursor with new position
                         myPosition.appendAttribute("lifetime", asl::as_string(t - myCursor.creationTime));
-                        
+
                         myCursor.motion = myCenter - myCursor.position;
                         myCursor.position = myCenter;
                         myCursor.previousRoi = myCursor.roi;
                         myCursor.roi = asBox2f( (*theROIs)[myPositionIndex]->bbox() );
 
-                        _myResultNode.appendChild(myPosition); 
+                        _myResultNode.appendChild(myPosition);
                     }
                     // place an "else" block here for code if we want to allow to correlate multiple cursors to the same position,
                     // but he have to take care that they will be separated at some later point again
@@ -265,7 +265,7 @@ namespace y60 {
         return myTransform;
     }
 
-    
+
 
 
 }

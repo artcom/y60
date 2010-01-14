@@ -120,7 +120,7 @@ struct to_js_converter<std::vector<T> > {
         std::vector<jsval> vec(v.size());
 
         std::transform(v.begin(), v.end(),
-                vec.begin(), to_js_converter<T>(cx_) ); 
+                vec.begin(), to_js_converter<T>(cx_) );
 
         JSObject * array =
             JS_NewArrayObject(cx_, vec.size(), &*vec.begin());

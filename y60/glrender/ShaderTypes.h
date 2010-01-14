@@ -23,7 +23,7 @@
 //#       define AC_SHOWWARNING                             __FILE__ "(" AC_STRINGIZE(__LINE__) "): warning: "
 //#       pragma message(AC_SHOWWARNING"CG Version < 2, compiling without gp4 support")
 //#   else
-//#        warning "CG Version < 2, compiling without gp4 support" 
+//#        warning "CG Version < 2, compiling without gp4 support"
 //#   endif
 #endif
 
@@ -37,7 +37,7 @@ namespace y60 {
     GLSLC, GP4FP, GP4VP, GP4GP
 #   endif
     };
-    
+
     const char * const ShaderProfileStrings[] = {
         "no-profile",
         "glslv",

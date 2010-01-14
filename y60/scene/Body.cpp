@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -91,7 +91,7 @@ namespace y60 {
     }
 
     void
-    Body::registerDependenciesForBoundingBox() {        
+    Body::registerDependenciesForBoundingBox() {
         if (getNode()) {
             TransformHierarchyFacade::registerDependenciesForBoundingBox();
             BoundingBoxTag::Plug::dependsOn<ShapeTag>(*this);
@@ -105,7 +105,7 @@ namespace y60 {
     Body::~Body() {
         AC_TRACE << "Body DTOR " << this << endl;
     }
-    
+
     static bool isSupportedPrimitive(const Primitive & thePrimitive) {
         switch (thePrimitive.get<PrimitiveTypeTag>()) {
             case TRIANGLES:
@@ -115,33 +115,33 @@ namespace y60 {
             default:
                 return false;
         }
-    }    
-	ShapePtr 
+    }
+	ShapePtr
 	Body::getShapePtr() {
         dom::NodePtr myShapeNode = getNode().getElementById(get<ShapeTag>());
         if (!myShapeNode) {
             throw asl::Exception(string("Body ") + get<NameTag>() + ": Could not find shape with id: " + get<ShapeTag>(), PLUS_FILE_LINE);
         } else {
             return myShapeNode->getFacade<Shape>();
-        }         
+        }
 	}
-	const ShapePtr 
+	const ShapePtr
 	Body::getShapePtr() const {
         const dom::NodePtr myShapeNode = getNode().getElementById(get<ShapeTag>());
         if (!myShapeNode) {
             throw asl::Exception(string("Body ") + get<NameTag>() + ": Could not find shape with id: " + get<ShapeTag>(), PLUS_FILE_LINE);
         } else {
             return myShapeNode->getFacade<Shape>();
-        }         
+        }
 	}
 
-    Shape & 
-    Body::getShape() { 
+    Shape &
+    Body::getShape() {
         return *(getShapePtr());
     }
-    
-    const Shape & 
-    Body::getShape() const { 
+
+    const Shape &
+    Body::getShape() const {
         return *(getShapePtr());
     }
 
@@ -149,48 +149,48 @@ namespace y60 {
         double myVolume = 0;
 
         //Logger::get().setVerbosity(SEV_DEBUG);
-        AC_DEBUG << " for body " << get<NameTag>() << endl; 
-        
+        AC_DEBUG << " for body " << get<NameTag>() << endl;
+
         const Shape & myShape = getShape();
         const PrimitiveVector & myPrimitives = myShape.getPrimitives();
-        
-        //AC_DEBUG << " analyzing " << myShape.get<NameTag>() 
-        //         << myPrimitives.size() << " primitives " << endl; 
+
+        //AC_DEBUG << " analyzing " << myShape.get<NameTag>()
+        //         << myPrimitives.size() << " primitives " << endl;
 
         for (PrimitiveVector::size_type i = 0; i < myPrimitives.size(); ++i) {
 
 
             if ( ! isSupportedPrimitive(*myPrimitives[i])) {
                 /*AC_ERROR << " at shape " << myShape.get<NameTag>()
-                         << " skipping unsupported primitive of type " 
+                         << " skipping unsupported primitive of type "
                          << PrimitiveTypeString[ myPrimitives[i].getType() ]
                          << endl;*/
                 continue;
             }
-            
+
             const Matrix4f & myBodyMatrix = get<GlobalMatrixTag>();
-            
+
             asl::Ptr<ConstVertexDataAccessor<Vector3f> > myPositionAccessor = myPrimitives[i]->getConstLockingPositionsAccessor();
             const VertexData3f & myPositions = myPositionAccessor->get();
-            AC_DEBUG << " have " << myPositions.size() << " positions " << endl; 
-            AC_DEBUG << " applying global transform " << myBodyMatrix << endl; 
+            AC_DEBUG << " have " << myPositions.size() << " positions " << endl;
+            AC_DEBUG << " applying global transform " << myBodyMatrix << endl;
 
             vector<Point3f> myTriangles(myPositions.size());
             for(VertexData3f::size_type j = 0;j < myPositions.size(); ++j) {
                 myTriangles[j] = product( asPoint(myPositions[j]), myBodyMatrix);
-                //AC_DEBUG << "P " << myPositions[j] << " - " << myTriangles[j] << endl; 
+                //AC_DEBUG << "P " << myPositions[j] << " - " << myTriangles[j] << endl;
             }
-            
+
 
             myVolume += calculatePolyhedraVolume(myTriangles);
-            AC_DEBUG << " and got a volume " << endl; 
-            
+            AC_DEBUG << " and got a volume " << endl;
+
         }
         return myVolume;
     }
- 
+
     void
-    Body::recalculateBoundingBox() {  
+    Body::recalculateBoundingBox() {
         const Shape & myShape = getShape();
         // Get shape bounding box
         const asl::Box3f & myShapeBoundingBox = myShape.get<BoundingBoxTag>();
@@ -204,7 +204,7 @@ namespace y60 {
         set<BoundingBoxTag>(myBoundingBox);
     }
 
-    BodyPtr 
+    BodyPtr
     Body::create(dom::NodePtr theParent, const std::string & theShapeId) {
         dom::NodePtr myNode = dom::NodePtr(new dom::Element(BODY_NODE_NAME));
         myNode->appendAttribute(BODY_SHAPE_ATTRIB, theShapeId);

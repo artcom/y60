@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -92,8 +92,8 @@ namespace y60 {
         public dom::FacadeAttributePlug<BoundingBoxTag>,
         public dom::FacadeAttributePlug<LastActiveFrameTag>
     {
-        public:        
-            Shape(dom::Node & theNode) : 
+        public:
+            Shape(dom::Node & theNode) :
                 dom::Facade(theNode),
                 IdTag::Plug(theNode),
                 NameTag::Plug(theNode),
@@ -110,21 +110,21 @@ namespace y60 {
 
             IMPLEMENT_FACADE(Shape);
 #if 0
-            Primitive & createPrimitive(PrimitiveType theType, 
-                    MaterialBasePtr theMaterial, unsigned int theDomIndex) 
-            {    
-                _myPrimitives.push_back(PrimitivePtr(new Primitive(theType, theMaterial, 
-                                getNode().getAttributeString("id"), theDomIndex)));    
+            Primitive & createPrimitive(PrimitiveType theType,
+                    MaterialBasePtr theMaterial, unsigned int theDomIndex)
+            {
+                _myPrimitives.push_back(PrimitivePtr(new Primitive(theType, theMaterial,
+                                getNode().getAttributeString("id"), theDomIndex)));
                 return *_myPrimitives.back();
             }
 #endif
             const PrimitiveVector & getPrimitives() const {
-                const_cast<Shape*>(this)->update(); 
-                return _myPrimitives; 
+                const_cast<Shape*>(this)->update();
+                return _myPrimitives;
             }
             PrimitiveVector & getPrimitives() {
-                update(); 
-                return _myPrimitives; 
+                update();
+                return _myPrimitives;
             }
             void update();
             void build();
@@ -133,20 +133,20 @@ namespace y60 {
             dom::NodePtr getVertexDataNode(const std::string & theDataName);
             void reverseUpdate();
             /*
-            const RenderStyles & getRenderStyles() const { 
-                return _myRenderStyles; 
+            const RenderStyles & getRenderStyles() const {
+                return _myRenderStyles;
             }
-            RenderStyles & getRenderStyles() { 
-                return _myRenderStyles; 
+            RenderStyles & getRenderStyles() {
+                return _myRenderStyles;
             }
             */
-            dom::NodePtr getXmlNode() { 
+            dom::NodePtr getXmlNode() {
                 return getNode().self().lock();
             }
-            const dom::NodePtr getXmlNode() const { 
+            const dom::NodePtr getXmlNode() const {
                 return getNode().self().lock();
             }
-            unsigned long getVertexCount() const { 
+            unsigned long getVertexCount() const {
                 return _myVertexCount;
             }
             unsigned long long getLastRenderVersion() const {
@@ -202,7 +202,7 @@ namespace y60 {
             Shape(const Shape &);
             Shape & operator=(const Shape &);
 
-            PrimitiveVector    _myPrimitives;   
+            PrimitiveVector    _myPrimitives;
             unsigned long      _myVertexCount;
             unsigned long long _myLastRenderVersion;
     };

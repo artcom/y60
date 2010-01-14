@@ -10,13 +10,13 @@
 #include <string>
 #include <vector>
 
-namespace y60 {    
-    
+namespace y60 {
+
     struct ShaderDescription {
-        ShaderDescription() : 
+        ShaderDescription() :
             _myType(NO_SHADER_TYPE),
             _myProgramIndex(-1)
-            
+
         {}
         ShaderType                       _myType;
         std::string                      _myFilename;
@@ -24,14 +24,14 @@ namespace y60 {
         y60::MaterialParameterVector     _myVertexParameters;
         int                              _myProgramIndex;
         std::string                      _myEntryFunction;
-        std::vector<std::string>         _myCompilerArgs; 
+        std::vector<std::string>         _myCompilerArgs;
         y60::VertexRegisterFlags         _myVertexRegisterFlags;
         y60::VectorOfString              _myPossibleProfileNames;
     };
 
 #if 0
     struct ShaderDescription {
-        ShaderDescription() : 
+        ShaderDescription() :
             _myType(NO_SHADER_TYPE),
             _myProgramIndex(-1),
             _myPreferedFile(-1),
@@ -52,7 +52,7 @@ namespace y60 {
         VectorOfString                   _myEntryFunctions;
         int                              _myPreferedEntryFunction;
 
-        VectorOfVectorOfString           _myCompilerArgs; 
+        VectorOfVectorOfString           _myCompilerArgs;
         int                              _myPreferedCompilerArgs;
 
         y60::VertexRegisterFlags         _myVertexRegisterFlags;

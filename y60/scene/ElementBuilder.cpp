@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -127,7 +127,7 @@ namespace y60 {
         }
     }
 
-    void 
+    void
     ElementBuilder::copyIndexBin(const VertexDataRole & theSourceRole,
                                  const VertexDataRole & theTargetRole,
                                  const std::string & theTargetVertexDataName)
@@ -143,9 +143,9 @@ namespace y60 {
         myTargetIndicesLock.get() = mySourceIndices;
     }
 
-    void 
+    void
     ElementBuilder::appendHalfEdge(int theTwin) {
-        dom::NodePtr myHalfEdgeNode = getNode()->childNode(HALFEDGES_NODE_NAME);        
+        dom::NodePtr myHalfEdgeNode = getNode()->childNode(HALFEDGES_NODE_NAME);
         dom::Node::WritableValue<VectorOfSignedInt> myHalfEdgesLock(myHalfEdgeNode->childNode(0));
         VectorOfSignedInt & myHalfEdges = myHalfEdgesLock.get();
         myHalfEdges.push_back(theTwin);
@@ -172,14 +172,14 @@ namespace y60 {
         return myTextChild;
     }
 
-    int 
+    int
     ElementBuilder::getHalfEdgeSize() const {
         dom::NodePtr myHalfEdgeNode = getNode()->childNode(HALFEDGES_NODE_NAME);
         dom::Node::WritableValue<VectorOfSignedInt> myHalfEdgesLock(myHalfEdgeNode->childNode(0));
         return myHalfEdgesLock.get().size();
 
     }
-    
+
     void ElementBuilder::generateHalfEdges() {
         int myNumFaceVertices;
         if (_myPrimitiveType == "triangles") {
@@ -197,9 +197,9 @@ namespace y60 {
 
         EdgeMap myEdgeMap;
 
-        dom::NodePtr myPositionsNode = getNode()->childNodeByAttribute(VERTEX_INDICES_NAME, 
+        dom::NodePtr myPositionsNode = getNode()->childNodeByAttribute(VERTEX_INDICES_NAME,
             VERTEX_DATA_ROLE_ATTRIB, POSITION_ROLE);
-        const VectorOfUnsignedInt & myPositions = 
+        const VectorOfUnsignedInt & myPositions =
             myPositionsNode->childNode(0)->nodeValueRef<VectorOfUnsignedInt>();
 
         dom::NodePtr myHalfEdgesNode = getNode()->appendChild(dom::Element(HALFEDGES_NODE_NAME));

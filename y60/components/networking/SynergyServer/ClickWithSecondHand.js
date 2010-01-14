@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -63,18 +63,18 @@ function ClickWidthSecondHand( theSynergyServer, theSettings ) {
     this.Constructor( this, theSynergyServer, theSettings );
 }
 
-ClickWidthSecondHand.prototype.Constructor = function( Public, theSynergyServer, 
-                                                       theSettings ) 
+ClickWidthSecondHand.prototype.Constructor = function( Public, theSynergyServer,
+                                                       theSettings )
 {
 
     var Protected = [];
-    SynergyEventHandler.prototype.Constructor( Public, Protected, theSynergyServer, 
+    SynergyEventHandler.prototype.Constructor( Public, Protected, theSynergyServer,
                                                theSettings );
     var Base = [];
 
     var _mySynergyServer = theSynergyServer;
 
-    const MOVE_VELOCITY = 40; 
+    const MOVE_VELOCITY = 40;
 
     var _myVelocity = new Vector2f(0,0);
     var _myMouseMoveId = null;
@@ -86,7 +86,7 @@ ClickWidthSecondHand.prototype.Constructor = function( Public, theSynergyServer,
             print( "mouse button released" );
             _mySynergyServer.onMouseButton( 1, false );
             _myMouseButtonPressed = false;
-        } 
+        }
     }
 
 
@@ -103,16 +103,16 @@ ClickWidthSecondHand.prototype.Constructor = function( Public, theSynergyServer,
 
     Base.onASSEvent = Public.onASSEvent;
     Public.onASSEvent = function( theEvent ) {
-        
+
         Base.onASSEvent( theEvent );
-        
+
         if ( theEvent.type == "add") {
             if (Protected.firstEvents.length == 1) {
                 Protected.targetPosition = null;
                 var myMousePosition = Protected.getMousePos( theEvent.raw_position );
-                _mySynergyServer.onMouseMotion( myMousePosition.x 
-                                                + Protected.positionOffset[0], 
-                                                myMousePosition.y 
+                _mySynergyServer.onMouseMotion( myMousePosition.x
+                                                + Protected.positionOffset[0],
+                                                myMousePosition.y
                                                 + Protected.positionOffset[1]);
 //                if (_myButtonPressedId) {
 //                    _mySynergyServer.onMouseButton( 1, true );
@@ -123,7 +123,7 @@ ClickWidthSecondHand.prototype.Constructor = function( Public, theSynergyServer,
                 _mySynergyServer.onMouseButton( 1, true );
                 _myMouseButtonPressed = true;
             }
-        } 
+        }
         else if ( theEvent.type == "move" ) {
             if (Protected.singleCursor( theEvent )) {
                 Protected.targetPosition = Protected.getMousePos( theEvent.raw_position );

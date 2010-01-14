@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -77,7 +77,7 @@ function TestGStreamerCapture(theArguments, theWidth, theHeight, theTitle) {
     //////////////////////////////////////////////////////////////////
     // Public
     ///////////////////////////////////////////////////////////////////
-    
+
     Base.setup = Public.setup;
     Public.setup = function() {
         Logger.info("Setting up...");
@@ -88,15 +88,15 @@ function TestGStreamerCapture(theArguments, theWidth, theHeight, theTitle) {
         window.position     = [0, 0];
 
         Base.setup(WINDOW_WIDTH, WINDOW_HEIGHT, false, theTitle);
-        
-        _myCameraInput = createGrabber( "video://video_mode=640x480_YUV422,fps=30", [0,0] ); 
+
+        _myCameraInput = createGrabber( "video://video_mode=640x480_YUV422,fps=30", [0,0] );
         //_myCameraInput = Modelling.createImage( window.scene, "test.png" );
 
         var myOverlay = new ImageOverlay( window.scene, _myCameraInput );
-        
+
 
         //window.camera.position = new Vector3f( 0.0, 0.0, 500.0 );
-        
+
 
     }
 
@@ -117,7 +117,7 @@ function TestGStreamerCapture(theArguments, theWidth, theHeight, theTitle) {
         Base.onFrame(theTime);
     }
 
- 
+
     //////////////////////////////////////////////////////////////////
     // Private
     //////////////////////////////////////////////////////////////////

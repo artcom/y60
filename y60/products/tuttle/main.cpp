@@ -29,13 +29,13 @@ main(int argc, char **argv)
     bool_t mySuccess;
 
     sigsegv_install_handler(&sigsegv_handler);
-  
+
     mySuccess = myShell.launch();
 
     myApplication.run();
 
     sigsegv_deinstall_handler();
-  
+
     return mySuccess ? 0 : 1;
 
 }

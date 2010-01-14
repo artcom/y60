@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -81,12 +81,12 @@ namespace y60 {
             CountPolygonPolicy() : _myVertexCount(0), _myHalfEdgeCount(0) {};
 
             int onVertex(const MyMarcher & theMarchingCubes,
-                        int n, const asl::Vector3i & theMarchPos) 
+                        int n, const asl::Vector3i & theMarchPos)
             {
 	    	    return ++_myVertexCount;
 		    }
 
-            bool ignoreHalfEdges() const { 
+            bool ignoreHalfEdges() const {
                 return true;
             }
             void onHalfEdges(const MCLookup::CubeCase & theCubeCase, const std::vector<int> & theEdgeTable) {
@@ -121,7 +121,7 @@ namespace y60 {
                               ExportShapePolicy<VoxelT, SegmentationPolicy>,
                               SegmentationPolicy > MyMarcher;
         public:
-            ExportShapePolicy(SceneBuilderPtr theSceneBuilder, 
+            ExportShapePolicy(SceneBuilderPtr theSceneBuilder,
                               const std::string & theShapeName,
                               const std::string & theMaterialId,
                               unsigned theNumVertices, unsigned theNumTriangles,
@@ -141,11 +141,11 @@ namespace y60 {
             };
 
             int onVertex(const MyMarcher & theMarchingCubes,
-                        int n, const asl::Vector3i & theMarchPos) 
+                        int n, const asl::Vector3i & theMarchPos)
             {
                 asl::Point3f myVertexPosition;
                 asl::Vector3f myVertexNormal;
-                theMarchingCubes.computeVertexPosition(n, theMarchPos, myVertexPosition, 
+                theMarchingCubes.computeVertexPosition(n, theMarchPos, myVertexPosition,
                                 _myVertexNormalFlag ? &myVertexNormal : 0 );
                 if (_myInvertNormalsFlag) {
                     myVertexNormal = -myVertexNormal;
@@ -160,11 +160,11 @@ namespace y60 {
                 DB(AC_TRACE << "new size " << _myVertices->size());
                 return _myVertices->size()-1;
             }
-            bool ignoreHalfEdges() const { 
+            bool ignoreHalfEdges() const {
                 return false;
             }
-            void genHalfEdges(bool theFlag) { 
-                _myHalfEdgeFlag = theFlag; 
+            void genHalfEdges(bool theFlag) {
+                _myHalfEdgeFlag = theFlag;
             }
             std::string getDescription() const {
                 return std::string("Polygonizing...");
@@ -219,14 +219,14 @@ namespace y60 {
                         DB(AC_TRACE << "   size is now " << _myHalfEdges->size());
                     }
                     _myIndices->push_back(myIndex);
-                    DB(AC_TRACE << myIndex << (*_myVertices)[myIndex]); 
+                    DB(AC_TRACE << myIndex << (*_myVertices)[myIndex]);
                 }
             }
             dom::NodePtr getShapeNode() const {
                 return _myShapeNode;
             }
             void done() {
-                _myHalfEdgeCache.clear();                
+                _myHalfEdgeCache.clear();
                 if(_myVertexColorFlag) {
                     dom::Node::WritableValue<VectorOfUnsignedInt> myColorIndexLock(_myColorIndexNode);
                     VectorOfUnsignedInt & myColorIndex = myColorIndexLock.get();
@@ -249,7 +249,7 @@ namespace y60 {
             dom::NodePtr _myColorIndexNode;
             std::vector<asl::Vector3f> * _myVertices;
             std::vector<signed int>    * _myHalfEdges;
-            std::vector<asl::Vector3f> * _myNormals;            
+            std::vector<asl::Vector3f> * _myNormals;
             std::vector<unsigned int>  * _myIndices;
             bool _myHalfEdgeFlag;
             int  _myHalfEdgeCount;
@@ -259,16 +259,16 @@ namespace y60 {
             bool _myInvertNormalsFlag;
             EdgeCache                    _myHalfEdgeCache;
 
-            dom::NodePtr prepareShapeBuilder(SceneBuilderPtr theSceneBuilder, 
+            dom::NodePtr prepareShapeBuilder(SceneBuilderPtr theSceneBuilder,
                                              const std::string & theShapeName,
-                                             const std::string & theMaterialId) 
-            { 
+                                             const std::string & theMaterialId)
+            {
                 _myShapeBuilder = ShapeBuilderPtr( new ShapeBuilder(theShapeName) );
                 theSceneBuilder->appendShape( * _myShapeBuilder );
 
                 _myElementBuilder = ElementBuilderPtr(
                         new ElementBuilder(PRIMITIVE_TYPE_TRIANGLES, theMaterialId) );
-                
+
                 _myShapeBuilder->appendElements( * _myElementBuilder );
 
                 // UH: the ShapeBuilder:: prefix is necessary for gcc to work
@@ -298,7 +298,7 @@ namespace y60 {
                 if (_myVertexColorFlag) {
                     dom::NodePtr myColorNode = _myShapeBuilder->ShapeBuilder::createVertexDataBin<asl::Vector4f>(COLOR_ROLE);
                     std::vector<asl::Vector4f> * myColors = myColorNode->dom::Node::nodeValuePtrOpen<std::vector<asl::Vector4f> >();
-                    myColors->reserve(6);                    
+                    myColors->reserve(6);
                     myColors->push_back(asl::Vector4f(189.0f/255.0f,191.0f/255.0f,136.0f/255.0f,1.0f));
                     myColors->push_back(asl::Vector4f(1,0,0,1));
                     myColors->push_back(asl::Vector4f(0,1,0,1));
@@ -341,41 +341,41 @@ namespace y60 {
         public:
             GlobalThresholdSegmentationPolicy(const VoxelT & theLower, const VoxelT & theUpper) :
                 _myThresholds( theLower, theUpper ) {}
-        
+
             GlobalThresholdSegmentationPolicy(const asl::Vector2<VoxelT> & theThresholds) :
                 _myThresholds( theThresholds ) {}
-        
+
             inline bool
             isOutside(int x, int y, int z, VoxelT theValue) const {
                 return theValue < _myThresholds[0] || theValue > _myThresholds[1];
             }
 
             inline float interpolatePosition(const std::vector<VoxelT> & theVoxelCube,
-                         int theFirstIndex, int theSecondIndex, bool & theInsideOutFlag) const 
+                         int theFirstIndex, int theSecondIndex, bool & theInsideOutFlag) const
             {
                 const VoxelT & firstValue = theVoxelCube[theFirstIndex];
                 const VoxelT & secondValue = theVoxelCube[theSecondIndex];
 
                 if ((firstValue <= _myThresholds[0] && secondValue >= _myThresholds[0]) ||
-                    (firstValue >= _myThresholds[0] && secondValue <= _myThresholds[0])) 
+                    (firstValue >= _myThresholds[0] && secondValue <= _myThresholds[0]))
                 {
                     float li = (float)(_myThresholds[0] - firstValue) / (float)(secondValue - firstValue);
                     theInsideOutFlag = false;
                     return li;
                 } else {
                     if ((firstValue <= _myThresholds[1] && secondValue >= _myThresholds[1]) ||
-                        (firstValue >= _myThresholds[1] && secondValue <= _myThresholds[1])) 
+                        (firstValue >= _myThresholds[1] && secondValue <= _myThresholds[1]))
                     {
                         float li = (float)(_myThresholds[1] - firstValue) / (float)(secondValue - firstValue);
                         theInsideOutFlag = true;
                         return li;
                     } else {
-                        throw MCPolicyException(std::string("Threshold is neither crossed from top or bottom with first: " ) + 
+                        throw MCPolicyException(std::string("Threshold is neither crossed from top or bottom with first: " ) +
                             asl::as_string(int(firstValue)) + " and second: " + asl::as_string(int(secondValue)), PLUS_FILE_LINE);
                     }
                 }
-            }       
-            inline float interpolateNormal(const VoxelT & theFirstValue, int theFirstIndex, const VoxelT & theSecondValue, 
+            }
+            inline float interpolateNormal(const VoxelT & theFirstValue, int theFirstIndex, const VoxelT & theSecondValue,
                 const asl::Vector3i & theSecondPosition, bool theUpperFlag) const
             {
                 return float(theSecondValue - theFirstValue);
@@ -398,11 +398,11 @@ namespace y60 {
     class PerVoxelThresholdSegmentationPolicy {
         public:
             PerVoxelThresholdSegmentationPolicy(dom::NodePtr thePaletteNode, dom::NodePtr theMeasurement,
-                                                int theDownsampleRate) : 
+                                                int theDownsampleRate) :
                 _myThresholdCube(8),
                 _myThresholdPalette(256),
                 _myDownSampleRate( theDownsampleRate)
-            
+
             {
                 for (unsigned i = 0; i < thePaletteNode->childNodesLength("thresholdcolor"); ++i) {
                     dom::NodePtr myPaletteItem = thePaletteNode->childNode("thresholdcolor", i);
@@ -433,7 +433,7 @@ namespace y60 {
                 return theValue < myThreshold[0] || theValue > myThreshold[1];
             }
 
-            inline float interpolateNormal(const VoxelT & theFirstValue, int theFirstIndex, const VoxelT & theSecondValue, 
+            inline float interpolateNormal(const VoxelT & theFirstValue, int theFirstIndex, const VoxelT & theSecondValue,
                 const asl::Vector3i & theSecondPosition, bool theUpperFlag) const
             {
                 const asl::Vector2<VoxelT> & myFirstThreshold  = _myThresholdCube[theFirstIndex];
@@ -445,32 +445,32 @@ namespace y60 {
                 }
             }
 
-            inline float 
+            inline float
             interpolatePosition(const std::vector<VoxelT> & theVoxelCube,
-                int theFirstIndex, int theSecondIndex, bool & theInsideOutFlag) const 
+                int theFirstIndex, int theSecondIndex, bool & theInsideOutFlag) const
             {
                 const VoxelT & firstValue = theVoxelCube[theFirstIndex];
                 const VoxelT & secondValue = theVoxelCube[theSecondIndex];
-                
+
                 const asl::Vector2<VoxelT> & firstThreshold  = _myThresholdCube[theFirstIndex];
                 const asl::Vector2<VoxelT> & secondThreshold = _myThresholdCube[theSecondIndex];
                 if ((firstValue <= firstThreshold[0] && secondValue >= secondThreshold[0]) ||
-                    (firstValue >= firstThreshold[0] && secondValue <= secondThreshold[0])) 
+                    (firstValue >= firstThreshold[0] && secondValue <= secondThreshold[0]))
                 {
-                    float li = (float)(firstValue-firstThreshold[0]) / 
+                    float li = (float)(firstValue-firstThreshold[0]) /
                             (float)((secondThreshold[0]- firstThreshold[0]) - (secondValue - firstValue));
                     theInsideOutFlag = false;
                     return li;
                 } else {
                     if ((firstValue <= firstThreshold[1] && secondValue >= secondThreshold[1]) ||
-                        (firstValue >= firstThreshold[1] && secondValue <= secondThreshold[1])) 
+                        (firstValue >= firstThreshold[1] && secondValue <= secondThreshold[1]))
                     {
-                        float li = (float)(firstValue-firstThreshold[1]) / 
+                        float li = (float)(firstValue-firstThreshold[1]) /
                             (float)((secondThreshold[1]- firstThreshold[1]) - (secondValue - firstValue));
                         theInsideOutFlag = true;
                         return li;
                     } else {
-                        throw MCPolicyException(std::string("Threshold is neither crossed from top or bottom with first: " ) + 
+                        throw MCPolicyException(std::string("Threshold is neither crossed from top or bottom with first: " ) +
                             asl::as_string(int(firstValue)) + " and second: " + asl::as_string(int(secondValue)), PLUS_FILE_LINE);
                     }
                 }
@@ -480,14 +480,14 @@ namespace y60 {
                 _myThresholdCube.clear();
                 _myThresholdCube.reserve(8);
 
-                _myThresholdCube.push_back( getThreshold(theI + 0, theJ + 0, theK + 0)); 
-                _myThresholdCube.push_back( getThreshold(theI + 0, theJ + 1, theK + 0)); 
-                _myThresholdCube.push_back( getThreshold(theI + 1, theJ + 1, theK + 0)); 
-                _myThresholdCube.push_back( getThreshold(theI + 1, theJ + 0, theK + 0)); 
-                _myThresholdCube.push_back( getThreshold(theI + 0, theJ + 0, theK + 1)); 
-                _myThresholdCube.push_back( getThreshold(theI + 0, theJ + 1, theK + 1)); 
-                _myThresholdCube.push_back( getThreshold(theI + 1, theJ + 1, theK + 1)); 
-                _myThresholdCube.push_back( getThreshold(theI + 1, theJ + 0, theK + 1)); 
+                _myThresholdCube.push_back( getThreshold(theI + 0, theJ + 0, theK + 0));
+                _myThresholdCube.push_back( getThreshold(theI + 0, theJ + 1, theK + 0));
+                _myThresholdCube.push_back( getThreshold(theI + 1, theJ + 1, theK + 0));
+                _myThresholdCube.push_back( getThreshold(theI + 1, theJ + 0, theK + 0));
+                _myThresholdCube.push_back( getThreshold(theI + 0, theJ + 0, theK + 1));
+                _myThresholdCube.push_back( getThreshold(theI + 0, theJ + 1, theK + 1));
+                _myThresholdCube.push_back( getThreshold(theI + 1, theJ + 1, theK + 1));
+                _myThresholdCube.push_back( getThreshold(theI + 1, theJ + 0, theK + 1));
             }
         private:
             inline
@@ -497,7 +497,7 @@ namespace y60 {
                 int x = theX * _myDownSampleRate;
                 int y = theY * _myDownSampleRate;
                 int z = theZ * _myDownSampleRate;
-                
+
                 if ( ( x >= _myBoundingBox[asl::Box3i::MIN][0] ) &&  ( x < _myBoundingBox[asl::Box3i::MAX][0]) &&
                      ( y >= _myBoundingBox[asl::Box3i::MIN][1] ) &&  ( y < _myBoundingBox[asl::Box3i::MAX][1]) &&
                      ( z >= _myBoundingBox[asl::Box3i::MIN][2] ) &&  ( z < _myBoundingBox[asl::Box3i::MAX][2]) )
@@ -506,10 +506,10 @@ namespace y60 {
                     y -= _myBoundingBox[asl::Box3i::MIN][1];
                     z -= _myBoundingBox[asl::Box3i::MIN][2];
                     // XXX Make this beautiful and fast
-                    asl::Vector4f myPixel =  _mySegmentationBitmaps[z]->getPixel(x,y); 
+                    asl::Vector4f myPixel =  _mySegmentationBitmaps[z]->getPixel(x,y);
                     myIndex = (unsigned char) myPixel[0];
                 }
-                return _myThresholdPalette[myIndex ? myIndex : _myGlobalThresholdIndex]; 
+                return _myThresholdPalette[myIndex ? myIndex : _myGlobalThresholdIndex];
             }
 
             std::vector<asl::Vector2<VoxelT> >    _myThresholdPalette;

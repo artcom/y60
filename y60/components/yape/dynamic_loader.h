@@ -39,7 +39,7 @@ class dynamic_loader : boost::noncopyable {
         }
         inline handle_type handle() { return lib_; }
     private:
-        void * do_load_function(const char * name); 
+        void * do_load_function(const char * name);
         handle_type lib_;
 };
 

@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -61,21 +61,21 @@
     use("SceneViewer.js");
 
     var myArgs = parseArguments(arguments, { "multisamples" : "%s",
-                                             "m"            : "%s" }); 
+                                             "m"            : "%s" });
     var myMultisampling = 8;
     if ("multisamples" in myArgs.options) {
-        myMultisampling = Number(myArgs.options.multisamples); 
+        myMultisampling = Number(myArgs.options.multisamples);
     }
-    
+
     if ("m" in myArgs.options) {
-        myMultisampling = Number(myArgs.options.m); 
+        myMultisampling = Number(myArgs.options.m);
     }
 
     if ("help" in myArgs.options) {
         print("ART+COM SceneViewer Usage: sv filename.[x60/b60/d60] [options]");
         print("available options:");
         print(" --help                         - print this help message");
-        print(" --m or --multisamples [number] - specify the Number of multisamples."); 
+        print(" --m or --multisamples [number] - specify the Number of multisamples.");
         print("                                  Must a be power of two.");
     }
 

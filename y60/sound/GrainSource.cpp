@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -67,10 +67,10 @@
 using namespace asl;
 using namespace y60;
 
-GrainSource::GrainSource(const std::string& theName, 
-                         SampleFormat theSampleFormat, 
-                         unsigned theSampleRate, 
-                         unsigned theNumChannels, 
+GrainSource::GrainSource(const std::string& theName,
+                         SampleFormat theSampleFormat,
+                         unsigned theSampleRate,
+                         unsigned theNumChannels,
                          unsigned theGrainSize,
                          unsigned theGrainRate) :
     SampleSource(theName, theSampleFormat, theSampleRate, theNumChannels),
@@ -90,7 +90,7 @@ GrainSource::GrainSource(const std::string& theName,
     _myAudioData = AudioBufferPtr(createAudioBuffer(_mySampleFormat, 0u, _numChannels, _mySampleRate));
     _myAudioData->clear();
     _myVolumeFader = VolumeFaderPtr(new VolumeFader(_mySampleFormat));
-    _myVolumeFader->setVolume(1, 0); 
+    _myVolumeFader->setVolume(1, 0);
     _myResampler = ResamplerPtr(new Resampler(_mySampleFormat));
     _myWindowFunction = WindowFunctionPtr(new WindowFunction(_mySampleFormat));
     _myWindowFunction->createHannWindow(1024);
@@ -118,12 +118,12 @@ void GrainSource::deliverData(AudioBufferBase& theBuffer) {
     float mySamplesPerMS = _mySampleRate * 0.001f;
     _myGrainOffset -= _myLastBuffersize;
     _myLastBuffersize = myNumFrames;
-    
+
     ////////////////////////////////////////////////////////////////////////////
     // copy samples overlapping from the last buffer to current frame buffer
     AC_TRACE << "GrainSource::deliverData(): copying overlap buffer frames";
 //    theBuffer.copyFrames(0u, *_myOverlapBuffer, 0u, myNumFrames);
-    theBuffer.copyFrames(0u, *_myOverlapBuffer, 0u, 
+    theBuffer.copyFrames(0u, *_myOverlapBuffer, 0u,
 		    	 std::min(_myOverlapBuffer->getNumFrames(),myNumFrames));
     // save remaining sample data to tmp buffer
     AudioBufferPtr myTmpBuffer = AudioBufferPtr();
@@ -155,13 +155,13 @@ void GrainSource::deliverData(AudioBufferBase& theBuffer) {
 
         unsigned myGrainFrames =(unsigned)( (float)(jitterValue(_myGrainSize, _myGrainSizeJitter)) * mySamplesPerMS);
         unsigned myRateFrames = (unsigned)( (float)(jitterValue(_myGrainRate, _myGrainRateJitter)) * mySamplesPerMS);
-        unsigned myPositionFrame = (unsigned)(jitterValue(_myGrainPosition,_myGrainPositionJitter) * 
+        unsigned myPositionFrame = (unsigned)(jitterValue(_myGrainPosition,_myGrainPositionJitter) *
                                               _myAudioDataFrames);
         ASSURE(myPositionFrame>=0);
         if (myPositionFrame>_myAudioDataFrames-myGrainFrames) {
             myPositionFrame = _myAudioDataFrames-myGrainFrames;
         }
- 
+
         // get grain from audio data
         AC_TRACE << "GrainSource::deliverData: creating grain audiobuffer";
         AudioBufferPtr myGrain = AudioBufferPtr(_myAudioData->partialClone(myPositionFrame, myPositionFrame + (unsigned)(ceilf(myGrainFrames * myJitteredRatio))));
@@ -201,7 +201,7 @@ bool GrainSource::queueSamples(AudioBufferPtr& theBuffer) {
         _myAudioData->resize(_myAudioDataFrames + mySrcFrames);
     }
     _myAudioData->copyFrames(_myAudioDataFrames, *theBuffer, 0u, mySrcFrames);
-    _myAudioDataFrames += mySrcFrames; 
+    _myAudioDataFrames += mySrcFrames;
     return true;
 }
 
@@ -361,7 +361,7 @@ inline unsigned GrainSource::jitterValue(unsigned theValue, unsigned theJitter) 
 
 inline float GrainSource::jitterValue(float theValue, float theJitter) const {
     //    AC_TRACE << "jitterValue(<" << theValue << ">,<" << theJitter << ">)";
-    float myRandomFloat = (float)(std::rand() % 1000) / 1000.f; 
+    float myRandomFloat = (float)(std::rand() % 1000) / 1000.f;
     float myResult = theValue + (2 * myRandomFloat * theJitter - theJitter);
     //    AC_TRACE << "randomFloat " << myRandomFloat;
     //    AC_TRACE << "result: " << myResult;

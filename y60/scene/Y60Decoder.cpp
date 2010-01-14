@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -84,7 +84,7 @@ namespace y60 {
             theStream->getStream().readString(myXML, 100, 0);
             if (myXML.find("<scene") != std::string::npos) { //TODO: smells cheesy
                 return MIME_TYPE_X60;
-            } 
+            }
             asl::Unsigned32 myMagic;
             theStream->getStream().readUnsigned32(myMagic, 0);
             if (myMagic == dom::Node::B60_MAGIC) {
@@ -107,23 +107,23 @@ namespace y60 {
         return "";
     }
 
-    bool 
+    bool
     Y60Decoder::setProgressNotifier(IProgressNotifierPtr theNotifier) {
         return false;
     }
-    bool 
+    bool
     Y60Decoder::setLazy(bool theFlag) {
         _myLazyMode = theFlag;
         return theFlag;
     }
 
-    bool 
+    bool
     Y60Decoder::addSource(asl::Ptr<asl::ReadableStreamHandle> theSource) {
         _mySources.push_back(theSource);
         return theSource != 0;
     }
- 
-    bool 
+
+    bool
     Y60Decoder::decodeScene(asl::Ptr<asl::ReadableStreamHandle> theSource, dom::DocumentPtr theDocument) {
         AC_DEBUG << "  Y60Decoder::decodeScene: theSource = '" << theSource->getName() << "'";
         asl::Time loadStart;
@@ -138,7 +138,7 @@ namespace y60 {
 
         unsigned long myFileSize = 0;
         unsigned long myNodeCount = 0;
-        
+
         if (myBinaryFlag) {
             AC_DEBUG << "  Y60Decoder::decodeScene: using binary xml loader, lazy="<<getLazy();
             myFileSize = theStream.size();
@@ -180,7 +180,7 @@ namespace y60 {
         double myProcessingTime = processingEnd - loadStart;
 
         AC_INFO<< "  Parse time: " << myParseTime << " sec, " << long(myFileSize/myParseTime/1024) << " kb/sec";
-        
+
         AC_INFO << "  Number of XML-Nodes: " << myNodeCount << ", "<< long(myNodeCount/myParseTime)
             << " nodes/sec, " << long(myFileSize/myNodeCount)<<" bytes/node";
         AC_INFO << "  Total XML processing time: " << myProcessingTime << " sec, "

@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -61,7 +61,7 @@
 //   $Revision: 1.58 $
 //   $Date: 2005/04/21 15:07:04 $
 //
-//  Description: 
+//  Description:
 //
 //=============================================================================
 
@@ -116,7 +116,7 @@ namespace y60 {
 
     DEFINE_EXCEPTION(MaterialFault, asl::Exception);
     DEFINE_EXCEPTION(UnknownDataSource, asl::Exception);
-     
+
     inline
     unsigned
     getVerticesPerPrimitive(PrimitiveType theType) {
@@ -137,7 +137,7 @@ namespace y60 {
                 return 0;
         }
     }
-    
+
 #ifdef _USE_GFX_MEM_
     typedef std::vector<asl::Vector3f, asl::GLAlloc<asl::Vector3f> > GfxVectorOfVector3f;
     typedef std::vector<asl::Vector4f, asl::GLAlloc<asl::Vector4f> > GfxVectorOfVector4f;
@@ -149,9 +149,9 @@ namespace y60 {
     typedef asl::Ptr<BoundingBoxTree> BoundingBoxTreePtr;
 
     //                  theTagName      theType       theAttributeName        theDefault
-    DEFINE_ATTRIBUTE_TAG(RenderStylesTag, RenderStyles, RENDER_STYLE_ATTRIB,    TYPE(), Y60_SCENE_DECL); 
-    DEFINE_ATTRIBUTE_TAG(MaterialIdTag,  std::string,   MATERIAL_REF_ATTRIB,    std::string(), Y60_SCENE_DECL); 
-    DEFINE_ATTRIBUTE_TAG(PrimitiveTypeTag, PrimitiveType,  PRIMITIVE_TYPE_ATTRIB,    TRIANGLES, Y60_SCENE_DECL); 
+    DEFINE_ATTRIBUTE_TAG(RenderStylesTag, RenderStyles, RENDER_STYLE_ATTRIB,    TYPE(), Y60_SCENE_DECL);
+    DEFINE_ATTRIBUTE_TAG(MaterialIdTag,  std::string,   MATERIAL_REF_ATTRIB,    std::string(), Y60_SCENE_DECL);
+    DEFINE_ATTRIBUTE_TAG(PrimitiveTypeTag, PrimitiveType,  PRIMITIVE_TYPE_ATTRIB,    TRIANGLES, Y60_SCENE_DECL);
 
     class Shape;
      /**
@@ -159,7 +159,7 @@ namespace y60 {
      * A list of elements described by their vertexdata. An element is
      * for example a triangle, quad or tringle strip, line, ...
      */
-    class Y60_SCENE_DECL Primitive : 
+    class Y60_SCENE_DECL Primitive :
         public dom::Facade,
         public MaterialIdTag::Plug,
         public PrimitiveTypeTag::Plug,
@@ -187,22 +187,22 @@ namespace y60 {
 
             typedef std::vector<Primitive::Intersection> IntersectionList;
             typedef std::vector<Primitive::SphereContacts> SphereContactsList;
-    
+
             Primitive(dom::Node & theNode);
 #if 0
-           Primitive(PrimitiveType theType, y60::MaterialBasePtr theMaterial, 
+           Primitive(PrimitiveType theType, y60::MaterialBasePtr theMaterial,
                       const std::string & theShapeId,
                       unsigned int theDomIndex = 0);
-#endif        
+#endif
             ~Primitive();
 
             void updateVertexData();
             void reverseUpdateVertexData();
 #if 0
-            unsigned int getDomIndex() const { 
-                return _myDomIndex; 
+            unsigned int getDomIndex() const {
+                return _myDomIndex;
             }
-#endif       
+#endif
             /**
              * Loads a Primitive from the indexnode @p theIndicesNode and the data node
              * @p theDataNode.
@@ -222,27 +222,27 @@ namespace y60 {
             const VertexDataBase & getVertexData(VertexDataRole theRole) const;
             VertexDataBasePtr getVertexDataPtr(VertexDataRole theRole);
             const VertexDataBasePtr getVertexDataPtr(VertexDataRole theRole) const;
-        
+
             MaterialBase & getMaterial() {
                 return *getNode().getElementById(get<MaterialIdTag>())->getFacade<MaterialBase>();
             }
-        
+
             const MaterialBase & getMaterial() const {
                 return *getNode().getElementById(get<MaterialIdTag>())->getFacade<MaterialBase>();
             }
-        
+
             Shape & getShape();
             const Shape & getShape() const;
-                      
+
             //TODO: make complete
             asl::Ptr<VertexDataAccessor<asl::Vector3f> > getLockingPositionsAccessor(bool forWriting = true, bool  forReading = false);
             asl::Ptr<VertexDataAccessor<asl::Vector3f> > getLockingNormalsAccessor(bool forWriting = true, bool  forReading = false);
             asl::Ptr<VertexDataAccessor<asl::Vector4f> > getLockingColorsAccessor(bool forWriting = true, bool  forReading = false);
 
-            asl::Ptr<ConstVertexDataAccessor<asl::Vector3f> > getConstLockingPositionsAccessor() const; 
+            asl::Ptr<ConstVertexDataAccessor<asl::Vector3f> > getConstLockingPositionsAccessor() const;
             asl::Ptr<ConstVertexDataAccessor<asl::Vector3f> > getConstLockingNormalsAccessor() const;
             asl::Ptr<ConstVertexDataAccessor<asl::Vector4f> > getConstLockingColorsAccessor() const;
-    
+
             asl::Ptr<VertexDataAccessor<float> >         getLockingTexCoord1fAccessor(unsigned theSlot, bool forWriting = true, bool  forReading = false);
             asl::Ptr<VertexDataAccessor<asl::Vector2f> > getLockingTexCoord2fAccessor(unsigned theSlot, bool forWriting = true, bool  forReading = false);
             asl::Ptr<VertexDataAccessor<asl::Vector3f> > getLockingTexCoord3fAccessor(unsigned theSlot, bool forWriting = true, bool  forReading = false);
@@ -250,30 +250,30 @@ namespace y60 {
             bool intersect(const asl::LineSegment<float> & theStick,  IntersectionList & theIntersectionInfo);
             bool intersect(const asl::Ray<float> & theStick,  IntersectionList & theIntersectionInfo);
             bool intersect(const asl::Line<float> & theStick,  IntersectionList & theIntersectionInfo);
-            // return all contacts with the primitive 
-            bool collide(const asl::Sphere<float> & theSphere, const asl::Vector3<float> & theMotion, 
+            // return all contacts with the primitive
+            bool collide(const asl::Sphere<float> & theSphere, const asl::Vector3<float> & theMotion,
                     const asl::Matrix4f & theSphereSpaceTransform, SphereContactsList & theCollisionInfo);
             // return the first contact before theCurrentContact
-            bool collide(const asl::Sphere<float> & theSphere, const asl::Vector3<float> & theMotion, 
+            bool collide(const asl::Sphere<float> & theSphere, const asl::Vector3<float> & theMotion,
                     const asl::Matrix4f & theSphereSpaceTransform, const asl::SweptSphereContact<float> & theCurrentContact,
                     SphereContacts & theNewContactInfo);
-   
+
             const std::vector<VertexDataBasePtr> & getVertexData() const {
                 return _myVertexData;
             }
 #if 0
-            const RenderStyles & getRenderStyles() const { 
-                return _myRenderStyles; 
+            const RenderStyles & getRenderStyles() const {
+                return _myRenderStyles;
             }
-            RenderStyles & getRenderStyles() { 
-                return _myRenderStyles; 
+            RenderStyles & getRenderStyles() {
+                return _myRenderStyles;
             }
 #endif
        private:
             // hide default, copy ctor and assignment
-            Primitive(); 
-            Primitive(const Primitive &); 
-            Primitive & operator= (const Primitive &); 
+            Primitive();
+            Primitive(const Primitive &);
+            Primitive & operator= (const Primitive &);
 
             template <class DETECTOR>
             bool scanElements(DETECTOR & theDetector,
@@ -289,20 +289,20 @@ namespace y60 {
             void fillFromDataSource(std::vector<T, Alloc> & theBin, const ParameterFunction & theParameterFunction);
 
             template <class T>
-            void assureTexCoords(const MaterialParameter & theParameter);    
-          
-            VertexDataBasePtr createVertexDataBin(ResourceManager* theResourceManager, TypeId theBinType, 
+            void assureTexCoords(const MaterialParameter & theParameter);
+
+            VertexDataBasePtr createVertexDataBin(ResourceManager* theResourceManager, TypeId theBinType,
                                                   VertexDataRole theRole, const VertexBufferUsage & theUsage);
-                                                  
+
             void generateMesh(dom::NodePtr theIndicesNode);
 
             // TODO: this should be a functor or something like that
             template <class T, class Alloc>
             void createTangents(std::vector<T, Alloc> & theBin);
-           
-#ifdef _WIN32            
+
+#ifdef _WIN32
             template <>
-            void 
+            void
             createTangents(GfxVectorOfVector3f & theBin);
 #endif
             void updateBoundingBoxTree();
@@ -318,8 +318,8 @@ namespace y60 {
             mutable BoundingBoxTreePtr     _myBoundingBoxTree;
     };
     typedef asl::Ptr<Primitive, dom::ThreadingModel> PrimitivePtr;
-    typedef std::vector<PrimitivePtr> PrimitiveVector;        
-       
+    typedef std::vector<PrimitivePtr> PrimitiveVector;
+
     template <class T, class Alloc>
     void
     Primitive::createTangents(std::vector<T, Alloc> & theBin) {
@@ -334,22 +334,22 @@ namespace y60 {
                 createTangents(theBin);
             break;
             default:
-                throw UnknownDataSource( std::string("Unknown datasource function : ") + 
+                throw UnknownDataSource( std::string("Unknown datasource function : ") +
                                       asl::getStringFromEnum(theParameterFunction, ParameterFunctionStrings),
                                       PLUS_FILE_LINE);
         }
     }
-    
+
 
     struct BoundingBoxTree {
-        BoundingBoxTree() : 
+        BoundingBoxTree() :
             myMinIndex(asl::NumericTraits<int>::max()),
             myMaxIndex(asl::NumericTraits<int>::min()),
             myTotalChildren(0)
         {
                 myBox.makeEmpty();
         }
-        BoundingBoxTree(const asl::Box3<float> & theBox, int theIndex) : 
+        BoundingBoxTree(const asl::Box3<float> & theBox, int theIndex) :
             myBox(theBox),
             myMinIndex(theIndex),
             myMaxIndex(theIndex),
@@ -368,8 +368,8 @@ namespace y60 {
 
         /** insert a new Bounding Box into the tree using the following rules:
             - when the tree bounds are empty, the tree's bounds are set to the new box
-            - when a child contains the box, recurse into the child 
-            - when a child contains the box, insert into the child 
+            - when a child contains the box, recurse into the child
+            - when a child contains the box, insert into the child
         */
         void insertBox(const asl::Box3<float> & theBox, int theIndex) {
             if (myBox.isEmpty()) {

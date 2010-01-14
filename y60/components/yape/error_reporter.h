@@ -66,7 +66,7 @@ struct default_error_reporter :
         if (report->linebuf) {
             size_t n = strlen(report->linebuf);
             std::cout << ":" << std::endl
-                << pfx.str() << report->linebuf 
+                << pfx.str() << report->linebuf
                 << ((n > 0 && report->linebuf[n-1] == '\n') ? "" : "\n")
                 << pfx.str();
             n = PTRDIFF(report->tokenptr, report->linebuf, char);

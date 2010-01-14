@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -80,30 +80,30 @@ using namespace std;
 
 namespace y60 {
 
-Win32mote::Win32mote(PSP_DEVICE_INTERFACE_DETAIL_DATA	& theDeviceData, HANDLE & theDeviceHandle) : 
+Win32mote::Win32mote(PSP_DEVICE_INTERFACE_DETAIL_DATA	& theDeviceData, HANDLE & theDeviceHandle) :
     WiiRemote(inputReportListener),
     _myEventObject(NULL)
 {
-		
+
     _myDevicePath = theDeviceData->DevicePath;
     _myDeviceHandle = theDeviceHandle;
-    
+
     setId( _myDevicePath);
     // Register to receive device notifications.
     // RegisterForDeviceNotifications();
-    
+
     GetDeviceCapabilities();
-    _myWriteHandle = CreateFile(_myDevicePath, GENERIC_WRITE, FILE_SHARE_READ|FILE_SHARE_WRITE, 
+    _myWriteHandle = CreateFile(_myDevicePath, GENERIC_WRITE, FILE_SHARE_READ|FILE_SHARE_WRITE,
                                 (LPSECURITY_ATTRIBUTES)NULL, OPEN_EXISTING, 0, NULL);
     if (_myWriteHandle == INVALID_HANDLE_VALUE) {
         //AC_PRINT << "win32 cstor invalid write handle";
-        throw WiiException("write handle invalid" ,  PLUS_FILE_LINE);    
+        throw WiiException("write handle invalid" ,  PLUS_FILE_LINE);
     }
-        
+
     PrepareForOverlappedTransfer();
-    
+
     _isConnected = true;
-    
+
     startThread();
 }
 
@@ -115,7 +115,7 @@ void
 Win32mote::inputReportListener(PosixThread & theThread)
 {
     try {
-        
+
         Win32mote & myDevice = dynamic_cast<Win32mote&>(theThread);
 
         AC_PRINT << myDevice._myControllerId;
@@ -127,12 +127,12 @@ Win32mote::inputReportListener(PosixThread & theThread)
 
             // Issue a read request
             if (myDevice._myReadHandle != INVALID_HANDLE_VALUE) {
-                result = ReadFile(myDevice._myReadHandle, 
-                                  myInputReport, 
-                                  myDevice._myCapabilities.InputReportByteLength, 
-                                  &bytes_read, 
-                                  (LPOVERLAPPED)&myDevice._myHIDOverlap);																						  
-            }  
+                result = ReadFile(myDevice._myReadHandle,
+                                  myInputReport,
+                                  myDevice._myCapabilities.InputReportByteLength,
+                                  &bytes_read,
+                                  (LPOVERLAPPED)&myDevice._myHIDOverlap);
+            }
 
             // Wait for read to finish
             result = WaitForSingleObject(myDevice._myEventObject, 300);
@@ -143,7 +143,7 @@ Win32mote::inputReportListener(PosixThread & theThread)
             if (result != WAIT_OBJECT_0) {
                 continue;
             }
-        
+
             myDevice.dispatchInputReport(myInputReport, 0);
         }
     } catch (const asl::Exception & ex) {
@@ -172,7 +172,7 @@ Win32mote::PrepareForOverlappedTransfer()
 	// Get a handle to the device for the overlapped ReadFiles.
     _myReadHandle = CreateFile (_myDevicePath, GENERIC_READ, FILE_SHARE_READ|FILE_SHARE_WRITE,
                                 (LPSECURITY_ATTRIBUTES)NULL, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL);
-    
+
     // Get an event object for the overlapped structure.
     if (_myEventObject == 0)
     {
@@ -194,7 +194,7 @@ Win32mote::GetDeviceCapabilities() {
 	HidD_FreePreparsedData(PreparsedData);
 }
 
-void 
+void
 Win32mote::send(unsigned char out_bytes[], unsigned theNumBytes) {
     char	output_report[256];
     DWORD	bytes_written = 0;
@@ -229,7 +229,7 @@ Win32mote::discover() {
     HIDD_ATTRIBUTES						Attributes;
     SP_DEVICE_INTERFACE_DATA			devInfoData;
     int									MemberIndex = 0;
-    LONG								Result;	
+    LONG								Result;
     GUID								HidGuid;
     PSP_DEVICE_INTERFACE_DETAIL_DATA	detailData;
 
@@ -238,7 +238,7 @@ Win32mote::discover() {
     detailData = NULL;
     DeviceHandle = NULL;
 
-    HidD_GetHidGuid(&HidGuid);	
+    HidD_GetHidGuid(&HidGuid);
 
     hDevInfo = SetupDiGetClassDevs(&HidGuid, NULL, NULL, DIGCF_PRESENT|DIGCF_INTERFACEDEVICE);
 
@@ -258,11 +258,11 @@ Win32mote::discover() {
         detailData->cbSize = sizeof(SP_DEVICE_INTERFACE_DETAIL_DATA);
 
         // After allocating, call again to get data
-        Result = SetupDiGetDeviceInterfaceDetail(hDevInfo, &devInfoData, detailData, Length, 
+        Result = SetupDiGetDeviceInterfaceDetail(hDevInfo, &devInfoData, detailData, Length,
                 &Required, NULL);
 
         cout << "device '" << detailData->DevicePath << "'" << endl;
-        DeviceHandle = CreateFile(detailData->DevicePath, 0, FILE_SHARE_READ|FILE_SHARE_WRITE, 
+        DeviceHandle = CreateFile(detailData->DevicePath, 0, FILE_SHARE_READ|FILE_SHARE_WRITE,
                 (LPSECURITY_ATTRIBUTES)NULL, OPEN_EXISTING,	0, NULL);
 
         Attributes.Size = sizeof(Attributes);
@@ -270,7 +270,7 @@ Win32mote::discover() {
         Result = HidD_GetAttributes(DeviceHandle, &Attributes);
 
         if (Attributes.VendorID == WIIMOTE_VENDOR_ID && Attributes.ProductID == WIIMOTE_PRODUCT_ID) {
-            // If the vendor and product IDs match, we've found a wiimote 
+            // If the vendor and product IDs match, we've found a wiimote
             Win32motePtr myDevice( new Win32mote( myDevices.size() ) );
 
             // TODO: move this stuff to Win32mote CTor
@@ -282,11 +282,11 @@ Win32mote::discover() {
 
             GetDeviceCapabilities(*myDevice);
 
-            myDevice->_myWriteHandle = CreateFile(detailData->DevicePath, GENERIC_WRITE, FILE_SHARE_READ|FILE_SHARE_WRITE, 
+            myDevice->_myWriteHandle = CreateFile(detailData->DevicePath, GENERIC_WRITE, FILE_SHARE_READ|FILE_SHARE_WRITE,
                     (LPSECURITY_ATTRIBUTES)NULL, OPEN_EXISTING, 0, NULL);
 
             PrepareForOverlappedTransfer(*myDevice, detailData);
-            
+
             myDevice->_isConnected = true;
 
             myDevices.push_back( myDevice );

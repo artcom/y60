@@ -100,7 +100,7 @@ dynamic_loader::open(const char * filename) {
 }
 void
 dynamic_loader::close() {
-    close_impl( lib_ ); 
+    close_impl( lib_ );
     lib_ = handle_type();
 }
 

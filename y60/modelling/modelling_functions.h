@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -132,13 +132,13 @@ Y60_MODELLING_DECL dom::NodePtr createColorMaterial(y60::ScenePtr theScene,
 
 Y60_MODELLING_DECL dom::NodePtr createTransform(dom::NodePtr theParentNode,
                              const std::string & theTransformName = "Transform");
-                             
+
 Y60_MODELLING_DECL dom::NodePtr createBody(dom::NodePtr theParentNode, const std::string & theShapeId);
 
 /// Set node alpha value. Node can be a body or a shape.
 Y60_MODELLING_DECL bool setAlpha(dom::Node * theNode, float theAlpha);
 Y60_MODELLING_DECL bool setAlphaByChangingMaterialColor(dom::NodePtr theMaterial, float theAlpha);
-    
+
 /**
  * Creates a canvas in the scene given in theScene
  * @param theScene Scene to create canvas in
@@ -205,11 +205,11 @@ createQuadStrip(y60::ScenePtr theScene, const std::string & theMaterialId,
                          const std::vector<asl::Vector4f> & theColors = std::vector<asl::Vector4f>()) ;
 
 Y60_MODELLING_DECL dom::NodePtr
-createStrip(const std::string & theType, y60::ScenePtr theScene, 
+createStrip(const std::string & theType, y60::ScenePtr theScene,
         const std::string & theMaterialId,
         const std::vector<asl::Vector3f> & thePositions,
         const std::vector<asl::Vector2f> & theTexCoords,
-        const std::vector<asl::Vector4f> & theColors); 
+        const std::vector<asl::Vector4f> & theColors);
 
 Y60_MODELLING_DECL dom::NodePtr createVoxelProxyGeometry(y60::ScenePtr theScene, const asl::Box3f & theVoxelBox,
                                       const asl::Matrix4f & theModelMatrix, const asl::Matrix4f & theCameraMatrix,
@@ -286,7 +286,7 @@ struct SphericalNormal {
                 -sin(myPolarCoord[1]),
                 sin(myPolarCoord[0]) * cos(myPolarCoord[1]));
 #endif
-        return asl::normalized(myNormal); 
+        return asl::normalized(myNormal);
      }
     const asl::Sphere<float>  _mySphere;
 private:
@@ -304,7 +304,7 @@ struct SphericalPosition : private SphericalNormal {
     {}
 
      asl::Vector3f operator()(unsigned x, unsigned y) const {
-       return SphericalNormal::_mySphere.center + SphericalNormal::operator()(x,y) * SphericalNormal::_mySphere.radius; 
+       return SphericalNormal::_mySphere.center + SphericalNormal::operator()(x,y) * SphericalNormal::_mySphere.radius;
      }
 };
 

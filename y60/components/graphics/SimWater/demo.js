@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -97,14 +97,14 @@ SimWaterTestApp.prototype.Constructor = function(self, theArguments) {
         print( "active floormap: " + _myWater.activeFloormap  + " of " + _myWater.floormapCount );
         _myWater.activeFloormap = 1;
 
-        _myWater.addCubemap( "data/forest_2_front.png", "data/forest_2_left.png", "data/forest_2_back.png", 
-                             "data/forest_2_right.png", "data/forest_2_top.png", "data/forest_2_bottom.png" ); 
+        _myWater.addCubemap( "data/forest_2_front.png", "data/forest_2_left.png", "data/forest_2_back.png",
+                             "data/forest_2_right.png", "data/forest_2_top.png", "data/forest_2_bottom.png" );
 
         print( "active cubemap: " + _myWater.activeCubemap  + " of " + _myWater.cubemapCount );
 
 
-        _myWater.addCubemap( "data/cube_top.png", "data/cube_left.png", "data/cube_bottom.png", 
-                             "data/cube_right.png", "data/cube_roof.png", "data/cube_ground.png" ); 
+        _myWater.addCubemap( "data/cube_top.png", "data/cube_left.png", "data/cube_bottom.png",
+                             "data/cube_right.png", "data/cube_roof.png", "data/cube_ground.png" );
 
         print( "active cubemap: " + _myWater.activeCubemap  + " of " + _myWater.cubemapCount );
         _myWater.activeCubemap = 0;

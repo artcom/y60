@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -59,16 +59,16 @@
 use( "SynergyEventHandler.js" );
 
 
-function ClickOnPointHandler( theSynergyServer, theSettings ) { 
+function ClickOnPointHandler( theSynergyServer, theSettings ) {
     this.Constructor( this, theSynergyServer, theSettings );
 }
 
-ClickOnPointHandler.prototype.Constructor 
-    = function( Public, theSynergyServer, theSettings ) 
+ClickOnPointHandler.prototype.Constructor
+    = function( Public, theSynergyServer, theSettings )
 {
 
     var Protected = [];
-    SynergyEventHandler.prototype.Constructor( Public, Protected, theSynergyServer, 
+    SynergyEventHandler.prototype.Constructor( Public, Protected, theSynergyServer,
                                                theSettings );
     var Base = [];
 
@@ -77,12 +77,12 @@ ClickOnPointHandler.prototype.Constructor
     var _myMouseButtonPressed = false;
     var _myLastRemoveEvent = null;
 
-    const MOVE_VELOCITY = 40; 
+    const MOVE_VELOCITY = 40;
 
     var _myVelocity = new Vector2f(0,0);
 
-    
-    // gets called when the last cursor has been removed 
+
+    // gets called when the last cursor has been removed
     Base.onRemoveFirst = Public.onRemoveFirst;
     Public.onRemoveFirst = function( theEvent ) {
         if (_myMouseButtonPressed) {
@@ -97,18 +97,18 @@ ClickOnPointHandler.prototype.Constructor
         Base.onASSEvent( theEvent );
 
         if ( theEvent.type == "add") {
-            if (Protected.firstEvents.length == 1) { 
+            if (Protected.firstEvents.length == 1) {
                 Protected.mousePosition = Protected.getMousePos( theEvent.raw_position );
-                _mySynergyServer.onMouseMotion( Protected.mousePosition.x, 
+                _mySynergyServer.onMouseMotion( Protected.mousePosition.x,
                                                 Protected.mousePosition.y );
                 _mySynergyServer.onMouseButton( 1, true );
                 print( "mouse button pressed" );
                 Protected.targetPosition = null;
                 _myMouseButtonPressed = true;
             }
-        } 
+        }
         else if ( theEvent.type == "move" ) {
-                
+
             if (Protected.singleCursor( theEvent )) {
 
                 Protected.targetPosition = Protected.getMousePos( theEvent.raw_position );
@@ -117,7 +117,7 @@ ClickOnPointHandler.prototype.Constructor
 
             Protected.tryMouseWheel( theEvent );
 
-        } 
+        }
     }
 
 }

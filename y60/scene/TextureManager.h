@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -104,9 +104,9 @@ namespace y60 {
             TexturePtr findTexture(const std::string & theTextureId) const;
 
             // Delegates to virtual methods of ResourceManager
-            virtual int getMaxTextureSize(int theDimensions) const; 
+            virtual int getMaxTextureSize(int theDimensions) const;
             //void updateTextureData(const TexturePtr & theTexture);
-            //void setTexturePriority(const TexturePtr & theTexture, float thePriority);           
+            //void setTexturePriority(const TexturePtr & theTexture, float thePriority);
 
             void unbindTexture(Texture * theTexture);
             void unbindTextures();
@@ -120,7 +120,7 @@ namespace y60 {
              * @param theResourceManager ResourceManager to register.
              * @return number of registered ResourceManagers
              */
-            int registerResourceManager(ResourceManager* theResourceManager); 
+            int registerResourceManager(ResourceManager* theResourceManager);
             ResourceManager * getResourceManager() { return _myResourceManager; }
             const ResourceManager * getResourceManager() const { return _myResourceManager; }
 

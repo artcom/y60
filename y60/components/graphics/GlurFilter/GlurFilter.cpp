@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -95,14 +95,14 @@ GlurFilter::GlurFilter(const y60::VectorOfFloat & theParameters) {
         theParameters[2],
         theParameters[3]
     );
-    
-    _myColorValue = 
-        ((int)(_myColor[0] * 255.0f) << 16) | 
+
+    _myColorValue =
+        ((int)(_myColor[0] * 255.0f) << 16) |
         ((int)(_myColor[1] * 255.0f) << 8) |
         (int)(_myColor[2] * 255.0f);
 
     _myAlpha = static_cast<unsigned char>(_myColor[3] * 255.0f);
-    
+
     _myRadius = (int)theParameters.size() - 4;
     _myLUT.resize(_myRadius*256);
     //cerr << "Glur radius: " << _myRadius << endl;
@@ -118,20 +118,20 @@ GlurFilter::GlurFilter(const y60::VectorOfFloat & theParameters) {
             _myLUT[r*256+i] = static_cast<unsigned char>(d);
         }
     }
-    
+
     if (_myAlpha > 0) {
         _myAlphaLUT.resize(256*256);
         for (unsigned int i=0; i<256; ++i) {
             for (unsigned int mySourceAlpha=0; mySourceAlpha<256; ++mySourceAlpha) {
                 _myAlphaLUT[(mySourceAlpha<<8)+i] = static_cast<unsigned char>((i * _myAlpha * mySourceAlpha) / 255 / 255);
             }
-        }    
+        }
     }
 }
 
 void
 GlurFilter::Apply(PLBmpBase * theSource, PLBmp * theDestination) const {
-    if ( theSource->GetPixelFormat() != PLPixelFormat::A8R8G8B8 && 
+    if ( theSource->GetPixelFormat() != PLPixelFormat::A8R8G8B8 &&
          theSource->GetPixelFormat() != PLPixelFormat::A8B8G8R8 ) {
         // TODO: use right exception class
         throw PLPixelFormat::UnsupportedPixelFormat("GlurFilter (must be A8R8G8B8 or A8B8G8R8)");
@@ -149,7 +149,7 @@ GlurFilter::Apply(PLBmpBase * theSource, PLBmp * theDestination) const {
 
     PLBYTE ** pSrcLineArray = theSource->GetLineArray();
     PLBYTE ** pDstLineArray = myTempBmp.GetLineArray();
-    
+
     int myOffset = _myRadius - 1;
     // pass 1: Glur in x direction
     for (int y=0; y < mySrcHeight; ++y) {
@@ -207,34 +207,34 @@ GlurFilter::Apply(PLBmpBase * theSource, PLBmp * theDestination) const {
     }
 /*
     // third pass, if alpha !=0, blend original image on top of glurred alpha channel
-    if (_myAlpha > 0) {  
+    if (_myAlpha > 0) {
         PLBYTE ** pSrcLineArray = theSource->GetLineArray();
         PLBYTE ** pDstLineArray = theDestination->GetLineArray();
-        
+
         int myGlurRed = (int)(_myColor[0] * 255.0f);
         int myGlurGreen = (int)(_myColor[1] * 255.0f);
         int myGlurBlue = (int)(_myColor[2] * 255.0f);
-        
+
         for (int y=0; y < mySrcHeight; ++y) {
-            unsigned * pSrc = (unsigned *)pSrcLineArray[y];        
+            unsigned * pSrc = (unsigned *)pSrcLineArray[y];
             unsigned * pDest = ((unsigned *)pDstLineArray[y+myOffset]) + myOffset;
             for(int x=0; x<mySrcWidth; ++x) {
                 unsigned int mySourceAlphaShifted = (*pSrc & 0xff000000) >> 16;
                 unsigned int myDestAlphaShifted = 0x0000ff00 - mySourceAlphaShifted;
-               
+
                 unsigned int rs = _myAlphaLUT[(*pSrc & 0xffff0000) >> 16]
                                 + _myAlphaLUT[myGlurRed | myDestAlphaShifted];
-                
+
                 unsigned int gs = _myAlphaLUT[((*pSrc & 0x0000ff00)>>8) | mySourceAlphaShifted]
                                 + _myAlphaLUT[myGlurGreen | myDestAlphaShifted];
-                
+
                 unsigned int bs = _myAlphaLUT[(*pSrc & 0x000000ff) | mySourceAlphaShifted]
                                 + _myAlphaLUT[myGlurBlue | myDestAlphaShifted];
-                                
+
                 *pDest++ = (*pDest & 0xff000000) | (rs << 16) | (gs << 8)| bs;
                 pSrc++;
             }
-        }   
+        }
     }
     */
 }

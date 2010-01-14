@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -69,7 +69,7 @@ namespace jslib {
     static JSBool Go( JSContext* cx, JSObject* obj, uintN argc, jsval* argv, jsval* rval) {
         DOC_BEGIN("");
         DOC_END;
-        
+
         asl::Ptr<JSEventLoop> myNativePtr = getNativeAs<JSEventLoop>( cx, obj );
 
         JSObject * myObject = obj;
@@ -85,7 +85,7 @@ namespace jslib {
     void JSEventLoop::go( JSContext *cx, JSObject *obj ) {
 
         AC_INFO << "JSEventLoop::go!";
-        
+
         _myJSContext = cx;
         _myEventListener = obj;
         asl::Time myStartTime;
@@ -93,13 +93,13 @@ namespace jslib {
         y60::EventDispatcher::get().addSink(this);
 
         for(;;) {
-            
+
             y60::EventDispatcher::get().dispatch();
-            
+
             if (JSA_hasFunction( _myJSContext, _myEventListener, "onFrame" ) ) {
                 jsval arg, rval;
                 asl::Time myCurrentTime;
-                arg = as_jsval( _myJSContext, 
+                arg = as_jsval( _myJSContext,
                                 (time_t)(myCurrentTime.millis() - myStartTime.millis())
                                 / 1000 );
                 if (!JSA_CallFunctionName( _myJSContext, _myEventListener, "onFrame", 1, &arg, &rval )) {
@@ -138,17 +138,17 @@ namespace jslib {
             y60::GenericEvent & myEvent = dynamic_cast<y60::GenericEvent&>( *theEvent );
             dom::NodePtr myEventNode = myEvent.asNode();
 
-            std::string myCallback( myEventNode->getAttribute("callback") ? 
-                                    myEventNode->getAttributeValue<std::string>("callback"): 
+            std::string myCallback( myEventNode->getAttribute("callback") ?
+                                    myEventNode->getAttributeValue<std::string>("callback"):
                                     "onEvent" );
             if (_myEventListener) {
                 if (JSA_hasFunction( _myJSContext, _myEventListener, myCallback.c_str()) ) {
                     jsval arg, rval;
                     arg = as_jsval( _myJSContext, myEvent.asNode() );
-                    JSA_CallFunctionName( _myJSContext, _myEventListener, 
+                    JSA_CallFunctionName( _myJSContext, _myEventListener,
                                           myCallback.c_str(), 1, &arg, &rval );
                 } else {
-                    AC_WARNING << "Generic event callback '" << myCallback 
+                    AC_WARNING << "Generic event callback '" << myCallback
                                << "' is missing.";
                 }
             }

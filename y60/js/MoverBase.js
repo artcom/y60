@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -74,7 +74,7 @@ function MoverBase(theViewport) {
 
 MoverBase.prototype.Constructor = function(obj, theViewport) {
     const DOUBLE_CLICK_INTERVAL = 500;
-    
+
     var _myViewport              = theViewport ? theViewport : window.canvas.childNode("viewport");
     var _myMoverObject           = null;
     var _myWorldSize             = null;
@@ -87,7 +87,7 @@ MoverBase.prototype.Constructor = function(obj, theViewport) {
     var _myRightButtonFlag       = false;
     var _myDoubleLeftButtonFlag  = false;
     var _myDoubleClickInterval   = DOUBLE_CLICK_INTERVAL;
-    
+
     //////////////////////////////////////////////////////////////////////
     //
     // public
@@ -100,7 +100,7 @@ MoverBase.prototype.Constructor = function(obj, theViewport) {
         if (theMoverObject == null) {
             return;
         }
-        
+
         // store initial position for reset
         _myInitialPosition    = theMoverObject.position.value;
         _myInitialOrientation = new Quaternionf(theMoverObject.orientation);
@@ -140,7 +140,7 @@ MoverBase.prototype.Constructor = function(obj, theViewport) {
     }
 
     obj.setDoubleClickActive = function(theFlag) {
-        _myDoubleClickInterval = (theFlag) ? DOUBLE_CLICK_INTERVAL : 0; 
+        _myDoubleClickInterval = (theFlag) ? DOUBLE_CLICK_INTERVAL : 0;
     }
     obj.setWorldSize = function(theSize) {
         if (theSize) {
@@ -203,11 +203,11 @@ MoverBase.prototype.Constructor = function(obj, theViewport) {
 
     //////////////////////////////////////////////////////////////////////
 
-    obj.reset = function() {        
+    obj.reset = function() {
         _myMoverObject.position    = _myInitialPosition;
         _myMoverObject.orientation = _myInitialOrientation;
-      
-        obj.setup();        
+
+        obj.setup();
     }
 
     obj.onKey = function(theKey, theKeyState, theX, theY, theShiftFlag, theCtrlFlag, theAltFlag) {
@@ -228,7 +228,7 @@ MoverBase.prototype.Constructor = function(obj, theViewport) {
 
     obj.onFrame = function(theTime) { // 'pure virtual'
     }
-    
+
     var _myLastButtonTime = 0;
     obj.onMouseButton = function(theButton, theState, theX, theY) {
         switch (theButton) {
@@ -258,7 +258,7 @@ MoverBase.prototype.Constructor = function(obj, theViewport) {
 
     obj.onAxis = function( theDevice, theAxis, theValue) {
     }
-    
+
     obj.getNormalizedScreen = function(theMousePosX, theMousePosY) {
         return new Vector3f((theMousePosX * 2 -_myViewport.width)/_myViewport.width,
             -(theMousePosY * 2 -_myViewport.height)/_myViewport.height, 0);

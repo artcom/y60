@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -94,14 +94,14 @@ namespace y60 {
 
     DEFINE_EXCEPTION(QuicktimeDecoderException, asl::Exception);
 
-    class QuicktimeDecoder : 
+    class QuicktimeDecoder :
         public MovieDecoderBase,
         public asl::PlugInBase
     {
         public:
             QuicktimeDecoder(asl::DLHandle theDLHandle);
             virtual ~QuicktimeDecoder();
-    
+
             bool hasVideo() const;
             bool hasAudio() const;
             void stopMovie();
@@ -111,7 +111,7 @@ namespace y60 {
              * @param theFilename file to load into the decoder
              */
             void load(const std::string & theFilename);
-    
+
             /**
              * loads a movie from the stream given by theSource
              * @param theFilename file to identify theSource
@@ -119,10 +119,10 @@ namespace y60 {
             void load(asl::Ptr<asl::ReadableStream> theSource, const std::string & theFilename) {
                 throw asl::NotYetImplemented(JUST_FILE_LINE);
             }
-        
+
             virtual asl::Ptr<MovieDecoderBase> instance() const;
             std::string canDecode(const std::string & theUrl, asl::Ptr<asl::ReadableStreamHandle> theStream = asl::Ptr<asl::ReadableStreamHandle>(0));
-    
+
             /**
              * Reads a frame.
              * @param theTime time of the frame to deliver
@@ -131,24 +131,24 @@ namespace y60 {
              * @return timestamp of the frame delivered in theTargetRaster
              */
             double readFrame(double theTime, unsigned theFrame, RasterVector theTargetRaster);
-    
+
             const char * getName() const { return "QuicktimeDecoder"; }
-            
+
             const bool hasAudio() const { AC_WARNING << "hasAudio always returns false for QuicktimeDecoder"; return false; }
-            
+
         private:
             void closeMovie();
             void decodeFrame(unsigned theFrameNumber, dom::ResizeableRasterPtr theTargetRaster);
             unsigned int getFramecount(::Movie theMovie);
 
-            ::Movie                  _myMovie;    
+            ::Movie                  _myMovie;
             unsigned                 _myLastDecodedFrame;
-            ::TimeValue              _myInternalMovieTime; 
-            ::TimeValue              _myFrameTimeStep;             
+            ::TimeValue              _myInternalMovieTime;
+            ::TimeValue              _myFrameTimeStep;
             GWorldPtr                _myOffScreenWorld;
 
         };
-    
+
         typedef asl::Ptr<QuicktimeDecoder> QuicktimeDecoderPtr;
 }
 

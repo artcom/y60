@@ -401,7 +401,7 @@ handle_arguments( int argc, char * argv[], handled_options & opts) {
             asl::build_information::get().find(program_name);
         if (it != asl::build_information::get().end()) {
             asl::build_target_info const& info = it->second;
-            cout << " (" << info.history_id() << ", " 
+            cout << " (" << info.history_id() << ", "
                  << info.build_date() << ", "
                  << info.build_time() << ")" << endl
                  << "[" << info.compiler() << " "

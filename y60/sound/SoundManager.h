@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -96,7 +96,7 @@ namespace y60 {
                 bool theUseCache);
         virtual void setVolume(float theVolume);
         virtual void fadeToVolume(float theVolume, float theTime);
-        virtual float getVolume() const; 
+        virtual float getVolume() const;
         virtual unsigned getNumSounds() const;
         virtual unsigned getNumOpenSounds() const {
             return _mySounds.size();
@@ -115,9 +115,9 @@ namespace y60 {
         virtual void deleteCacheItem(const std::string& theURI);
         virtual unsigned getCacheMemUsed() const;
         virtual unsigned getNumItemsInCache() const;
-        
+
         virtual void update();
-        
+
     private:
         SoundManager();
         void run();
@@ -126,12 +126,12 @@ namespace y60 {
         void addCacheItem(SoundCacheItemPtr theItem);
         SoundCacheItemPtr getCacheItem(const std::string & theURI) const;
         void checkCacheSize();
-        
+
         asl::ThreadLock _myLock;
         std::vector < SoundWeakPtr > _mySounds;
 
         // Sorted according to decoder priority.
-        std::vector < IAudioDecoderFactory* > _myDecoderFactories; 
+        std::vector < IAudioDecoderFactory* > _myDecoderFactories;
         IAudioDecoderFactory* _myFFMpegAudioDecoderFactory;
 
         // Cache stuff.

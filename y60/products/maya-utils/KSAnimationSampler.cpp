@@ -114,9 +114,9 @@ KSAnimationSampler::KSAnimationSampler() :
     _myIgnoreOutOfBounds( false )
 {}
 
-MStatus 
+MStatus
 KSAnimationSampler::doIt( const MArgList & theArgs ) {
-    MStatus myStatus = MS::kFailure; 
+    MStatus myStatus = MS::kFailure;
     bool isInterrupted = false;
     MComputation myComputation;
     myComputation.beginComputation();
@@ -248,13 +248,13 @@ KSAnimationSampler::doIt( const MArgList & theArgs ) {
         myStatus = MS::kSuccess;
     } catch (const std::exception & ex) {
         myStatus = MS::kFailure;
-        cerr << "std::exception" << endl;    
+        cerr << "std::exception" << endl;
     } catch (const asl::Exception & ex) {
         myStatus = MS::kFailure;
-        cerr << "asl::Exception" << endl;    
+        cerr << "asl::Exception" << endl;
     } catch (...) {
         myStatus = MS::kFailure;
-        cerr << "Unknown exception" << endl;    
+        cerr << "Unknown exception" << endl;
     }
     myComputation.endComputation();
     return myStatus;
@@ -276,7 +276,7 @@ KSAnimationSampler::deriveVelocities( const ValueList & currentPositions,
     return myVelocities;
 }
 
-void 
+void
 KSAnimationSampler::checkAccelerations( const ValueList & currentV,
                                         const ValueList & previousV,
                                         vector<bool> & theAExceededList)
@@ -321,7 +321,7 @@ KSAnimationSampler::collectPositions(const MSelectionList & theNodes,
     }
 }
 
-void 
+void
 KSAnimationSampler::saveKSAnimation( const vector<ValueListPtr> & thePositions,
                                      const vector<ValueListPtr> & theVelocities )
 {
@@ -375,7 +375,7 @@ KSAnimationSampler::saveKSAnimation( const vector<ValueListPtr> & thePositions,
 
     std::ofstream myOutFile( _myFilename.c_str(), std::ios::binary);
     if ( ! myOutFile ) {
-        AC_ERROR << "Failed to open file '" << _myFilename << "' for writing";     
+        AC_ERROR << "Failed to open file '" << _myFilename << "' for writing";
         return;
     }
     myOutFile << * myDoc;
@@ -386,7 +386,7 @@ KSAnimationSampler::creator() {
     return new KSAnimationSampler();
 }
 
-MSyntax 
+MSyntax
 KSAnimationSampler::newSyntax() {
     MSyntax mySyntax;
 
@@ -405,7 +405,7 @@ KSAnimationSampler::newSyntax() {
     return mySyntax;
 }
 
-void 
+void
 KSAnimationSampler::parseArgs(const MArgList & theArgs, MSelectionList & theSelectionList) {
     MArgDatabase myParser( newSyntax(), theArgs );
     myParser.getObjects( theSelectionList );

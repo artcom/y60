@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -117,7 +117,7 @@ CWRuler::on_realize() {
   _myWindow->clear();
 }
 
-bool 
+bool
 CWRuler::on_button_press_event(GdkEventButton * theEvent) {
     //cerr << "CWRuler::on_button_press_event()" << endl;
 
@@ -134,7 +134,7 @@ CWRuler::on_button_press_event(GdkEventButton * theEvent) {
             _myState = CHANGE_WIDTH_RIGHT;
         } else if (intersectWithMarker(theEvent, myCenterMarkerPos)) {
             _myState = CHANGE_CENTER;
-        } 
+        }
     } else if (_myMode == MODE_THRESHOLD) {
         int myCenterMarkerPos = convertValueToScreenPos(_myWindowCenter);
         if (intersectWithMarker(theEvent, myCenterMarkerPos)) {
@@ -152,14 +152,14 @@ CWRuler::on_button_press_event(GdkEventButton * theEvent) {
     return true;
 }
 
-bool 
+bool
 CWRuler::on_button_release_event(GdkEventButton * theEvent) {
     //cerr << "CWRuler::on_button_release_event()" << endl;
     _myState = IDLE;
     return true;
 }
 
-bool 
+bool
 CWRuler::on_motion_notify_event(GdkEventMotion * theEvent) {
     if ( _myState != IDLE) {
         float myValue = convertScreenPosToValue(int(theEvent->x));
@@ -230,7 +230,7 @@ CWRuler::on_expose_event(GdkEventExpose * theEvent) {
         int myXStart = convertValueToScreenPos(_myWindowCenter - myHWindowWidth);
         int myXEnd = convertValueToScreenPos(_myWindowCenter + myHWindowWidth);
 
-        _myWindow->draw_rectangle(get_style()->get_dark_gc(get_state()), true, myXStart, 0, 
+        _myWindow->draw_rectangle(get_style()->get_dark_gc(get_state()), true, myXStart, 0,
                 myXEnd - myXStart, get_allocation().get_height());
 
         drawMarker(_myWindowCenter + myHWindowWidth, get_style()->get_white_gc());
@@ -240,7 +240,7 @@ CWRuler::on_expose_event(GdkEventExpose * theEvent) {
         int myXStart = convertValueToScreenPos(_myLower);
         int myXEnd = convertValueToScreenPos(_myUpper);
 
-        _myWindow->draw_rectangle(get_style()->get_dark_gc(get_state()), true, myXStart, 0, 
+        _myWindow->draw_rectangle(get_style()->get_dark_gc(get_state()), true, myXStart, 0,
                 myXEnd - myXStart, get_allocation().get_height());
 
         drawMarker(_myLower, get_style()->get_white_gc());
@@ -253,7 +253,7 @@ CWRuler::on_expose_event(GdkEventExpose * theEvent) {
     return true;
 }
 
-void 
+void
 CWRuler::drawMarker(float thePosition, Glib::RefPtr<Gdk::GC> theGC) {
 
     int myHeight = get_allocation().get_height();
@@ -267,13 +267,13 @@ CWRuler::drawMarker(float thePosition, Glib::RefPtr<Gdk::GC> theGC) {
     _myWindow->draw_polygon(theGC, true, myPoints);
 }
 
-int 
+int
 CWRuler::convertValueToScreenPos(const float & theValue) {
     int myWidth = get_allocation().get_width();
     return int((theValue - _myValueRange[0])* float(myWidth) / (_myValueRange[1] - _myValueRange[0]));
 }
 
-float 
+float
 CWRuler::convertScreenPosToValue(const int & theScreenPos) {
     int myWidth = get_allocation().get_width();
     return (theScreenPos * (_myValueRange[1] - _myValueRange[0]) / myWidth) + _myValueRange[0];
@@ -290,7 +290,7 @@ CWRuler::intersectWithMarker(GdkEventButton * theEvent, int theMarkerPos) {
     return false;
 }
 
-void 
+void
 CWRuler::setValueRange(const asl::Vector2f & theValueRange) {
     _myValueRange = theValueRange;
     queue_draw();
@@ -301,7 +301,7 @@ CWRuler::getValueRange() const {
     return _myValueRange;
 }
 
-void 
+void
 CWRuler::setWindowCenter(float theCenter) {
     if (theCenter != _myWindowCenter) {
         _myWindowCenter = theCenter;
@@ -310,12 +310,12 @@ CWRuler::setWindowCenter(float theCenter) {
     queue_draw();
 }
 
-float 
+float
 CWRuler::getWindowCenter() const {
     return _myWindowCenter;
 }
 
-void 
+void
 CWRuler::setWindowWidth(float theWidth) {
     if (theWidth != _myWindowWidth) {
         _myWindowWidth = theWidth;
@@ -324,12 +324,12 @@ CWRuler::setWindowWidth(float theWidth) {
     queue_draw();
 }
 
-float 
+float
 CWRuler::getWindowWidth() const {
     return _myWindowWidth;
 }
 
-void 
+void
 CWRuler::setLower(float theLower) {
     if (theLower != _myLower) {
         _myLower = theLower;
@@ -338,12 +338,12 @@ CWRuler::setLower(float theLower) {
     queue_draw();
 }
 
-float 
+float
 CWRuler::getLower() const {
     return _myLower;
 }
 
-void 
+void
 CWRuler::setUpper(float theUpper) {
     if (theUpper != _myUpper) {
         _myUpper = theUpper;
@@ -352,18 +352,18 @@ CWRuler::setUpper(float theUpper) {
     queue_draw();
 }
 
-float 
+float
 CWRuler::getUpper() const {
     return _myUpper;
 }
 
-void 
+void
 CWRuler::setMode(CWRuler::Mode theMode) {
     _myMode = theMode;
     queue_draw();
 }
 
-CWRuler::Mode 
+CWRuler::Mode
 CWRuler::getMode() const {
     return _myMode;
 }
@@ -433,7 +433,7 @@ class TWindow : public Gtk::Window {
         // ListView stuff
         Gtk::ScrolledWindow        _myScrolledWindow;
         acgtk::TNTMeasurementList  _myListView;
-    
+
 };
 
 int main(int argc, char * argv[]) {

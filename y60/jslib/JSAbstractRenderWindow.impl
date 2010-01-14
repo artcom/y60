@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -79,29 +79,29 @@ JSBool JSAbstractRenderWindow<DERIVED>::setTimeout(JSContext *cx, JSObject *obj,
     DOC_PARAM_OPT("theJSObjectToCall", "", DOC_TYPE_OBJECT, "");
     DOC_RVAL("theTimeoutId", DOC_TYPE_INTEGER);
     DOC_END;
-    
+
     if (argc == 2 || argc == 3) {
         DERIVED * mySelf;
         convertFrom(cx, OBJECT_TO_JSVAL(obj), mySelf);
-        
+
         std::string myCallback;
         if (!convertFrom(cx, argv[0], myCallback)) {
             return JS_FALSE;
-        }        
+        }
         float myMillisec;
         if (!convertFrom(cx, argv[1], myMillisec)) {
             return JS_FALSE;
         }
-        
+
         if (argc == 3) {
             JSObject * myObjectToCall;
             if (JS_ValueToObject(cx, argv[2], &myObjectToCall)) {
-                long myRetVal = mySelf->setTimeout(myCallback, myMillisec, myObjectToCall);   
+                long myRetVal = mySelf->setTimeout(myCallback, myMillisec, myObjectToCall);
                 *rval = as_jsval(cx, myRetVal);
                  return JS_TRUE;
             }
         } else {
-            long myRetVal = mySelf->setTimeout(myCallback, myMillisec, 0);   
+            long myRetVal = mySelf->setTimeout(myCallback, myMillisec, 0);
             *rval = as_jsval(cx, myRetVal);
              return JS_TRUE;
         }
@@ -120,25 +120,25 @@ JSBool JSAbstractRenderWindow<DERIVED>::setInterval(JSContext *cx, JSObject *obj
     if (argc == 2 || argc == 3) {
         DERIVED * mySelf;
         convertFrom(cx, OBJECT_TO_JSVAL(obj), mySelf);
-        
+
         std::string myCallback;
         if (!convertFrom(cx, argv[0], myCallback)) {
             return JS_FALSE;
-        }        
+        }
         float myMillisec;
         if (!convertFrom(cx, argv[1], myMillisec)) {
             return JS_FALSE;
         }
-        
+
         if (argc == 3) {
             JSObject * myObjectToCall;
             if (JS_ValueToObject(cx, argv[2], &myObjectToCall)) {
-                long myRetVal = mySelf->setInterval(myCallback, myMillisec, myObjectToCall);   
+                long myRetVal = mySelf->setInterval(myCallback, myMillisec, myObjectToCall);
                 *rval = as_jsval(cx, myRetVal);
                  return JS_TRUE;
             }
         } else {
-            long myRetVal = mySelf->setInterval(myCallback, myMillisec, 0);   
+            long myRetVal = mySelf->setInterval(myCallback, myMillisec, 0);
             *rval = as_jsval(cx, myRetVal);
              return JS_TRUE;
         }
@@ -1085,9 +1085,9 @@ JSBool JSAbstractRenderWindow<DERIVED>::getPropertySwitch(DERIVED & theNative, u
     switch (theID) {
         case PROP_forceFullGC:
             *vp = as_jsval(cx, theNative.getForceFullGC()); //TODO: remove global
-            return JS_TRUE;            
+            return JS_TRUE;
         case PROP_visible:
-            *vp = as_jsval(cx, theNative.getVisibility()); 
+            *vp = as_jsval(cx, theNative.getVisibility());
             return JS_TRUE;
         case PROP_pause:
             *vp = as_jsval(cx, theNative.getPause()); //TODO: remove global
@@ -1192,7 +1192,7 @@ JSBool JSAbstractRenderWindow<DERIVED>::setPropertySwitch(NATIVE & theNative, un
             {
                 typedef void (DERIVED::*MyMethod)(bool);
                 return Method<DERIVED>::call((MyMethod)&DERIVED::setForceFullGC, cx, obj, 1, vp, &dummy);
-            }            
+            }
         case PROP_visible:
             {
                 typedef void (DERIVED::*MyMethod)(bool);

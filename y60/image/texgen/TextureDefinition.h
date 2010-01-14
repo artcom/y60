@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -60,7 +60,7 @@
 //
 //     $Author: uzadow $
 //
-// Description: 
+// Description:
 //
 //=============================================================================
 
@@ -91,34 +91,34 @@ namespace TexGen {
 
 class TextureDefinition {
 public:
-    TextureDefinition (const dom::Node& myNode, const std::string& myDirectory, 
-                       bool showProgress, 
+    TextureDefinition (const dom::Node& myNode, const std::string& myDirectory,
+                       bool showProgress,
                        bool myCreateMipMaps = false, float myIndexTextureSize = 1.0f);
     TextureDefinition (int myIndex);
 
     virtual ~TextureDefinition();
-   
-    int getLayerCount() const { return _myLayers.size(); } 
+
+    int getLayerCount() const { return _myLayers.size(); }
     void setTileSize (double myTileSize);
-    int getCurSize () const  
+    int getCurSize () const
         { return _myLayers[0]->getCurSize(); };
     const PLPixel32 getPixel(int x, int y) const;
     int getIndex () const;
-    PLPixel32 getAvgColor () const 
-    { 
-        PLPixel32 answer(0,0,0,0); 
+    PLPixel32 getAvgColor () const
+    {
+        PLPixel32 answer(0,0,0,0);
         for (std::vector<LayerDefinition*>::size_type i=0;i<_myLayers.size(); answer += _myLayers[i++]->getAvgColor() );
         return answer;
     }
     void addLayer (LayerDefinition* myLayer);
-    
+
     const PLPixel32* getPixelLine(int x, int y) const;
 
 private:
     TextureDefinition(const TextureDefinition &);
     const TextureDefinition & operator=(const TextureDefinition &);
-    void load (const dom::Node & curNode, const std::string& myDirectory, 
-               bool showProgress);   
+    void load (const dom::Node & curNode, const std::string& myDirectory,
+               bool showProgress);
     void createMipmaps (int myRapport);
     int _myIndex;
     std::vector<LayerDefinition*> _myLayers;
@@ -127,7 +127,7 @@ private:
 typedef std::map<int, TextureDefinition *> TextureDefinitionMap;
 
 inline const PLPixel32 TextureDefinition::getPixel(int x, int y) const {
-    PLPixel32 answer(0,0,0,0); 
+    PLPixel32 answer(0,0,0,0);
     for (std::vector<LayerDefinition*>::size_type i=0;i<_myLayers.size(); answer += _myLayers[i++]->getPixel(x,y) );
     return answer;
 }

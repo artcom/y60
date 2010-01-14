@@ -50,19 +50,19 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
     var _myASSManager = null;
     var _myDummyAppContainer = null;
     var _myWorldCross = null;
-    
+
     var _myPicking     = null;
 
     var _myDisplayImage = null;
     var _myDisplayMaterial = null;
     var _myDisplayBody = null;
-    
+
     //////////////////////////////////////////////////////////////////////
     //
     // public members
     //
     //////////////////////////////////////////////////////////////////////
-   
+
     // setup
     Base.setup = self.setup;
     self.setup = function(theWidth, theHeight, theTitle) {
@@ -88,10 +88,10 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
 
         //window.canvas.backgroundcolor = [1,1,1,1];
 
-        
+
 
         //_myASSManager.textColor = [0,0,0,1];
-        
+
 
         if (LATENCY_TEST) {
             ourLatencyTestPort = new SerialDevice(0);
@@ -168,7 +168,7 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
             //print("event " + theNode.type );
         } else if ( theNode.type == "touch") {
             var myBody = _myPicking.pickBody(theNode.position3D.x, theNode.position3D.y);
-            if(myBody) {                
+            if(myBody) {
                 for(var i=0; i<ourButtons.length; ++i ) {
                     if (myBody.id == ourButtons[i].body.id) {
                         ourButtons[i].press();
@@ -190,12 +190,12 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
         }
         _myLastEventTime = theNode.when;
     }
-    
+
 
     ///////////////////////////////////////////////////////
-    // private funtions 
+    // private funtions
     ///////////////////////////////////////////////////////
-   
+
 
 }
 

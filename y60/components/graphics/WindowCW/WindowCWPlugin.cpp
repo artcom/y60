@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -87,24 +87,24 @@ class WindowCWFilterFactory :
         DB(cerr << "WindowCWFilterFactory::createFilter" << endl);
         if (theParameters.size() != 2) {
             throw FilterArgumentCount("WindowCWFilter expects two paramters", PLUS_FILE_LINE);
-        }        
-        return asl::Ptr<PLFilter>(new PLFilterWindowCW(theParameters[0], theParameters[1]));    
-    }  
+        }
+        return asl::Ptr<PLFilter>(new PLFilterWindowCW(theParameters[0], theParameters[1]));
+    }
 };
 
 class WindowCWPlugin :
-    public PlugInBase      
+    public PlugInBase
 {
 public:
     WindowCWPlugin(asl::DLHandle theDLHandle) :
         PlugInBase(theDLHandle)
-    {}    
+    {}
 protected:
 	void _initializeSingletonManager(SingletonManager* theSingletonManager) {
 	    PlugInBase::_initializeSingletonManager(theSingletonManager);
 	    cerr << "adding windowCW filter" << endl;
 	    PaintLibFilterFactory::get().addFilterFactory(
-	        "windowCW", 
+	        "windowCW",
 	        asl::Ptr<IPaintLibFilterFactory>(new WindowCWFilterFactory)
         );
     }

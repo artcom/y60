@@ -2,23 +2,23 @@
  *  Created by Daniel Heckenberg.
  *  Copyright (c) 2004 Daniel Heckenberg. All rights reserved.
  *  (danielh.seeSaw<at>cse<dot>unsw<dot>edu<dot>au)
- *  
- * Permission is hereby granted, free of charge, to any person obtaining a 
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
  * to deal in the Software without restriction, including without limitation
- * the right to use, copy, modify, merge, publish, communicate, sublicence, 
- * and/or sell copies of the Software, and to permit persons to whom the 
+ * the right to use, copy, modify, merge, publish, communicate, sublicence,
+ * and/or sell copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included 
+ *
+ * The above copyright notice and this permission notice shall be included
  * in all copies or substantial portions of the Software.
- * 
- * TO THE EXTENT PERMITTED BY APPLICABLE LAW, THIS SOFTWARE IS PROVIDED 
- * "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT 
+ *
+ * TO THE EXTENT PERMITTED BY APPLICABLE LAW, THIS SOFTWARE IS PROVIDED
+ * "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
  * NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
- * PURPOSE AND NON-INFRINGEMENT.  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT 
+ * PURPOSE AND NON-INFRINGEMENT.  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
  * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
- * ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
+ * ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  */
@@ -33,13 +33,13 @@ struct tagVdigGrab
 	int					isRecording;
 
 	// QT Components
-	SeqGrabComponent	seqGrab; 
+	SeqGrabComponent	seqGrab;
 	SGChannel			sgchanVideo;
 	ComponentInstance   vdCompInst;
 
 	// Device settings
 	ImageDescriptionHandle	vdImageDesc;
-	Rect					vdDigitizerRect;		
+	Rect					vdDigitizerRect;
 
 	// Destination Settings
 	CGrafPtr				dstPort;
@@ -64,11 +64,11 @@ Boolean MySGModalFilterProc (
 SeqGrabComponent
 MakeSequenceGrabber(WindowRef pWindow);
 
-OSErr 
+OSErr
 MakeSequenceGrabChannel(SeqGrabComponent seqGrab, SGChannel *sgchanVideo);
 
 OSErr
-RequestSGSettings(  SeqGrabComponent		seqGrab, 
+RequestSGSettings(  SeqGrabComponent		seqGrab,
 					SGChannel				sgchanVideo);
 
 
@@ -91,25 +91,25 @@ vdgInit(VdigGrab* pVdg)
 
 	// zero initialize the structure
 	memset(pVdg, 0, sizeof(VdigGrab));
-	
+
 	if (err = EnterMovies())
 	{
-		printError("EnterMovies err=%d\n", err); 
+		printError("EnterMovies err=%d\n", err);
 		goto endFunc;
 	}
 
 	if (!(pVdg->seqGrab = MakeSequenceGrabber(NULL)))
 	{
-		printError("MakeSequenceGrabber error\n"); 
+		printError("MakeSequenceGrabber error\n");
 		goto endFunc;
 	}
-	
+
 	if (err = MakeSequenceGrabChannel(pVdg->seqGrab, &pVdg->sgchanVideo))
 	{
-		//printError("MakeSequenceGrabChannel err=%d\n", err); 
+		//printError("MakeSequenceGrabChannel err=%d\n", err);
 		goto endFunc;
 	}
-	
+
 endFunc:
 	return err;
 }
@@ -123,13 +123,13 @@ vdgRequestSettings(VdigGrab* pVdg)
 	if (err = RequestSGSettings(  pVdg->seqGrab,
 								  pVdg->sgchanVideo))
 	{
-		//printError("RequestSGSettings err=%d\n", err); 
+		//printError("RequestSGSettings err=%d\n", err);
 		goto endFunc;
 	}
-	
+
 	if (err = vdgGetSettings(pVdg))
 	{
-		printError("vdgGetSettings err=%d\n", err); 
+		printError("vdgGetSettings err=%d\n", err);
 		goto endFunc;
 	}
 
@@ -147,23 +147,23 @@ vdgGetDeviceNameAndFlags(VdigGrab* pVdg, char* szName, long* pBuffSize, UInt32* 
 	if (!pBuffSize)
 	{
 		printError("vdgGetDeviceName: NULL pointer error\n");
-		err = qtParamErr; 
+		err = qtParamErr;
 		goto endFunc;
 	}
-	
+
 	if (err = VDGetDeviceNameAndFlags(  pVdg->vdCompInst,
 										vdName,
 										&vdFlags))
 	{
 		printError("VDGetDeviceNameAndFlags err=%d\n", err);
-		*pBuffSize = 0; 
+		*pBuffSize = 0;
 		goto endFunc;
 	}
-	
+
 	if (szName)
 	{
 		int copyLen = min(*pBuffSize-1, vdName[0]);
-			
+
 		strncpy(szName, (const char *)(vdName+1), copyLen);
 		szName[copyLen] = '\0';
 
@@ -171,7 +171,7 @@ vdgGetDeviceNameAndFlags(VdigGrab* pVdg, char* szName, long* pBuffSize, UInt32* 
 	} else
 	{
 		*pBuffSize = vdName[0] + 1;
-	} 
+	}
 
 	if (pVdFlags)
 		*pVdFlags = vdFlags;
@@ -213,9 +213,9 @@ A much more optimal case, if you're doing it yourself is:
 */
 	OSErr err;
     Rect maxRect;
-	
+
 	DigitizerInfo info;
-	
+
 	// make sure this is a compressed source only
 	if (err = VDGetDigitizerInfo(pVdg->vdCompInst, &info))
 	{
@@ -224,13 +224,13 @@ A much more optimal case, if you're doing it yourself is:
 			printError("VDGetDigitizerInfo: not a compressed source device.\n");
 			goto endFunc;
 		}
-	} 
-	 
+	}
+
 //  VDGetCompressTypes() // tells you the supported types
 
-/* 
+/*
 	// Apple's SoftVDig doesn't seem to like these calls
-	if (err = VDCaptureStateChanging(   pVdg->vdCompInst, 
+	if (err = VDCaptureStateChanging(   pVdg->vdCompInst,
 										vdFlagCaptureLowLatency | vdFlagCaptureSetSettingsBegin))
 	{
 		printError("VDCaptureStateChanging err=%d\n", err);
@@ -243,28 +243,28 @@ A much more optimal case, if you're doing it yourself is:
 		printError("VDGetMaxSrcRect err=%d\n", err);
 //		goto endFunc;
 	}
-	
-	// Try to set maximum capture size ... is this necessary as we're setting the 
+
+	// Try to set maximum capture size ... is this necessary as we're setting the
 	// rectangle in the VDSetCompression call later?  I suppose that it is, as
 	// we're setting digitization size rather than compression size here...
-	// Apple vdigs don't like this call	
+	// Apple vdigs don't like this call
 	if (err = VDSetDigitizerRect( pVdg->vdCompInst, &maxRect))
 	{
 		printError("VDSetDigitizerRect err=%d\n", err);
-//		goto endFunc;		
+//		goto endFunc;
 	}
 
 	if (err = VDSetCompressionOnOff( pVdg->vdCompInst, 1))
 	{
 		printError("VDSetCompressionOnOff err=%d\n", err);
-//		goto endFunc;		
+//		goto endFunc;
 	}
 
 	// We could try to force the frame rate here... necessary for ASC softvdig
 	if (err = VDSetFrameRate( pVdg->vdCompInst, 0))
 	{
 		printError("VDSetFrameRate err=%d\n", err);
-//		goto endFunc;		
+//		goto endFunc;
 	}
 
 	// try to set a format that matches our target
@@ -276,14 +276,14 @@ A much more optimal case, if you're doing it yourself is:
 	// the wire rather than 4:2:2)
     if (err = VDSetCompression(	pVdg->vdCompInst,
                                 0, //'yuv2'
-                                0,	
-                                &maxRect, 
+                                0,
+                                &maxRect,
                                 0, //codecNormalQuality,
                                 0, //codecNormalQuality,
                                 0))
 	{
 		printError("VDSetCompression err=%d\n", err);
-//		goto endFunc;			
+//		goto endFunc;
 	}
 
 /*
@@ -291,20 +291,20 @@ A much more optimal case, if you're doing it yourself is:
    									vdFlagCaptureLowLatency | vdFlagCaptureSetSettingsEnd))
 	{
 		printError("VDCaptureStateChanging err=%d\n", err);
-//		goto endFunc;	   
+//		goto endFunc;
 	}
- */     
+ */
 	if (err =  VDResetCompressSequence( pVdg->vdCompInst ))
 	{
 //		printError("VDResetCompressSequence err=%d\n", err);
-//		goto endFunc;	   
+//		goto endFunc;
    }
- 
+
    pVdg->vdImageDesc = (ImageDescriptionHandle)NewHandle(0);
    if (err = VDGetImageDescription( pVdg->vdCompInst, pVdg->vdImageDesc))
    {
 		printError("VDGetImageDescription err=%d\n", err);
-//		goto endFunc;	   
+//		goto endFunc;
    }
 
 	// From Steve Sisak: find out if Digitizer is cropping for you.
@@ -315,7 +315,7 @@ A much more optimal case, if you're doing it yourself is:
 	}
 
 	pVdg->isPreflighted = 1;
-	
+
 endFunc:
 	return err;
 }
@@ -328,22 +328,22 @@ vdgStartGrabbing(VdigGrab*   pVdg)
 	if (!pVdg->isPreflighted)
 	{
 		printError("vdgStartGrabbing called without previous successful vdgPreflightGrabbing()\n");
-		err = badCallOrderErr; 
-		goto endFunc;	
+		err = badCallOrderErr;
+		goto endFunc;
 	}
 
     if (err = VDCompressOneFrameAsync( pVdg->vdCompInst ))
 	{
 		printError("VDCompressOneFrameAsync err=%d\n", err);
-		goto endFunc;	
+		goto endFunc;
 	}
-	
+
 	if (err = vdgDecompressionSequenceBegin( pVdg, pVdg->dstPort, NULL, NULL ))
 	{
 		printError("vdgDecompressionSequenceBegin err=%d\n", err);
-		goto endFunc;	
+		goto endFunc;
 	}
-	
+
 	pVdg->isGrabbing = 1;
 
 endFunc:
@@ -351,23 +351,23 @@ endFunc:
 }
 
 OSErr
-vdgGetDataRate( VdigGrab*   pVdg, 
+vdgGetDataRate( VdigGrab*   pVdg,
 				long*		pMilliSecPerFrame,
 				Fixed*      pFramesPerSecond,
 				long*       pBytesPerSecond)
 {
 	OSErr err;
 
-	if (err = VDGetDataRate( pVdg->vdCompInst, 
+	if (err = VDGetDataRate( pVdg->vdCompInst,
 							  pMilliSecPerFrame,
 							  pFramesPerSecond,
 							  pBytesPerSecond))
 	{
 		printError("VDGetDataRate err=%d\n", err);
-		goto endFunc;		
+		goto endFunc;
 	}
-	
-endFunc:	
+
+endFunc:
 	return err;
 }
 
@@ -376,27 +376,27 @@ vdgGetImageDescription( VdigGrab* pVdg,
 						ImageDescriptionHandle vdImageDesc )
 {
 	OSErr err;
-	
+
 	if (err = VDGetImageDescription( pVdg->vdCompInst, vdImageDesc))
 	{
 		printError("VDGetImageDescription err=%d\n", err);
-		goto endFunc;		
+		goto endFunc;
 	}
-	
-endFunc:	
+
+endFunc:
 	return err;
 }
 
 OSErr
 vdgDecompressionSequenceBegin(  VdigGrab* pVdg,
-								CGrafPtr dstPort, 
+								CGrafPtr dstPort,
 								Rect* pDstRect,
 								MatrixRecord* pDstScaleMatrix )
 {
 	OSErr err;
-	
+
 // 	Rect				   sourceRect = pMungData->bounds;
-//	MatrixRecord		   scaleMatrix;	
+//	MatrixRecord		   scaleMatrix;
 
   	// !HACK! Different conversions are used for these two equivalent types
 	// so we force the cType so that the more efficient path is used
@@ -407,7 +407,7 @@ vdgDecompressionSequenceBegin(  VdigGrab* pVdg,
 //	sourceRect.right = (*pVdg->vdImageDesc)->width;
 //	sourceRect.bottom = (*pVdg->vdImageDesc)->height;
 //	RectMatrix(&scaleMatrix, &sourceRect, &pMungData->bounds);
-			
+
     // begin the process of decompressing a sequence of frames
     // this is a set-up call and is only called once for the sequence - the ICM will interrogate different codecs
     // and construct a suitable decompression chain, as this is a time consuming process we don't want to do this
@@ -420,7 +420,7 @@ vdgDecompressionSequenceBegin(  VdigGrab* pVdg,
 										  0,
 										  dstPort,  //GetWindowPort(pMungData->pWindow),   // port for the DESTINATION image
 										  NULL,					// graphics device handle, if port is set, set to NULL
-										  NULL, //&sourceRect,					// source rectangle defining the portion of the image to decompress 
+										  NULL, //&sourceRect,					// source rectangle defining the portion of the image to decompress
                                           NULL, //&scaleMatrix,			// transformation matrix
                                           srcCopy,				// transfer mode specifier
                                           (RgnHandle)NULL,		// clipping region in dest. coordinate system to use as a mask
@@ -431,8 +431,8 @@ vdgDecompressionSequenceBegin(  VdigGrab* pVdg,
 		printError("DecompressSequenceBeginS err=%d\n", err);
 		goto endFunc;
 	}
-		  
-endFunc:	
+
+endFunc:
 	return err;
 }
 
@@ -443,7 +443,7 @@ vdgDecompressionSequenceWhen(   VdigGrab* pVdg,
 {
 	OSErr err;
 	CodecFlags	ignore = 0;
-  
+
 	if(err = DecompressSequenceFrameWhen(   pVdg->dstImageSeq,	// sequence ID returned by DecompressSequenceBegin
 											theData,			// pointer to compressed image data
 											dataSize,			// size of the buffer
@@ -455,7 +455,7 @@ vdgDecompressionSequenceWhen(   VdigGrab* pVdg,
 		printError("DecompressSequenceFrameWhen err=%d\n", err);
 		goto endFunc;
 	}
-	
+
 endFunc:
 	return err;
 }
@@ -468,7 +468,7 @@ vdgDecompressionSequenceEnd( VdigGrab* pVdg )
 	if (!pVdg->dstImageSeq)
 	{
 		printError("vdgDestroyDecompressionSequence NULL sequence\n");
-		err = qtParamErr; 
+		err = qtParamErr;
 		goto endFunc;
 	}
 
@@ -477,7 +477,7 @@ vdgDecompressionSequenceEnd( VdigGrab* pVdg )
 		printError("CDSequenceEnd err=%d\n", err);
 		goto endFunc;
 	}
-	
+
 	pVdg->dstImageSeq = 0;
 
 endFunc:
@@ -492,7 +492,7 @@ vdgStopGrabbing(VdigGrab* pVdg)
 	if (err = VDSetCompressionOnOff( pVdg->vdCompInst, 0))
 	{
 		printError("VDSetCompressionOnOff err=%d\n", err);
-//		goto endFunc;		
+//		goto endFunc;
 	}
 
 	if (err = vdgDecompressionSequenceEnd(pVdg))
@@ -536,16 +536,16 @@ vdgIdle(VdigGrab* pVdg, int*  pIsUpdated)
 			&& queuedFrameCount)
 	{
 		*pIsUpdated = 1;
-		
+
 		// Decompress the sequence
 		if (err = vdgDecompressionSequenceWhen( pVdg,
 												theData,
 												dataSize))
 		{
 			printError("vdgDecompressionSequenceWhen err=%d\n", err);
-//			goto endFunc;	
+//			goto endFunc;
 		}
-		
+
 		// return the buffer
 		if(err = vdgReleaseBuffer(pVdg, theData))
 		{
@@ -563,7 +563,7 @@ vdgIdle(VdigGrab* pVdg, int*  pIsUpdated)
 endFunc:
 	return err;
 }
-	
+
 
 OSErr
 vdgPoll(	VdigGrab*   pVdg,
@@ -576,12 +576,12 @@ vdgPoll(	VdigGrab*   pVdg,
 	OSErr err;
 
 	if (!pVdg->isGrabbing)
-	{ 
+	{
 		printError("vdgGetFrame error: not grabbing\n");
-		err = qtParamErr; 
+		err = qtParamErr;
 		goto endFunc;
 	}
-	
+
     if (err = VDCompressDone(	pVdg->vdCompInst,
 								pQueuedFrameCount,
 								pTheData,
@@ -592,14 +592,14 @@ vdgPoll(	VdigGrab*   pVdg,
 		printError("vdgGetFrame error: not grabbing\n");
 		goto endFunc;
 	}
-	
+
 	// Overlapped grabbing
     if (*pQueuedFrameCount)
     {
 		if (err = VDCompressOneFrameAsync(pVdg->vdCompInst))
 		{
 			printError("VDCompressOneFrameAsync err=%d\n", err);
-			goto endFunc;		
+			goto endFunc;
 		}
 	}
 
@@ -615,7 +615,7 @@ vdgReleaseBuffer(VdigGrab*   pVdg, Ptr theData)
 	if (err = VDReleaseCompressBuffer(pVdg->vdCompInst, theData))
 	{
 		printError("VDReleaseCompressBuffer err=%d\n", err);
-		goto endFunc;		
+		goto endFunc;
 	}
 
 endFunc:
@@ -625,7 +625,7 @@ endFunc:
 OSErr
 vdgUninit(VdigGrab* pVdg)
 {
-	OSErr err = noErr;		
+	OSErr err = noErr;
 
 	if (pVdg->vdImageDesc)
 	{
@@ -636,24 +636,24 @@ vdgUninit(VdigGrab* pVdg)
 	if (pVdg->vdCompInst)
 	{
 		if (err = CloseComponent(pVdg->vdCompInst))
-			//printError("CloseComponent err=%d\n", err);		
+			//printError("CloseComponent err=%d\n", err);
 		pVdg->vdCompInst = nil;
 	}
 
 	if (pVdg->sgchanVideo)
 	{
 		if (err = SGDisposeChannel(pVdg->seqGrab, pVdg->sgchanVideo))
-			printError("SGDisposeChannel err=%d\n", err);	
+			printError("SGDisposeChannel err=%d\n", err);
 		pVdg->sgchanVideo = nil;
 	}
-	
+
 	if (pVdg->seqGrab)
 	{
 		if (err = CloseComponent(pVdg->seqGrab))
-			printError("CloseComponent err=%d\n", err);		
+			printError("CloseComponent err=%d\n", err);
 		pVdg->seqGrab = nil;
 	}
-	
+
 	ExitMovies();
 	return err;
 }
@@ -666,40 +666,40 @@ vdgDelete(VdigGrab* pVdg)
 		printError("vdgDelete NULL pointer\n");
 		return;
 	}
-	
-	free(pVdg); 
+
+	free(pVdg);
 }
 
 OSErr
 vdgGetSettings(VdigGrab* pVdg)
-{	
+{
 	OSErr err;
 
 	// Extract information from the SG
-    if (err = SGGetVideoCompressor (	pVdg->sgchanVideo, 
+    if (err = SGGetVideoCompressor (	pVdg->sgchanVideo,
 										&pVdg->cpDepth,
 										&pVdg->cpCompressor,
-										&pVdg->cpSpatialQuality, 
-										&pVdg->cpTemporalQuality, 
+										&pVdg->cpSpatialQuality,
+										&pVdg->cpTemporalQuality,
 										&pVdg->cpKeyFrameRate ))
 	{
 		printError("SGGetVideoCompressor err=%d\n", err);
 		goto endFunc;
 	}
-    
-	if (err = SGGetFrameRate(pVdg->sgchanVideo, &pVdg->cpFrameRate))                                                                 
+
+	if (err = SGGetFrameRate(pVdg->sgchanVideo, &pVdg->cpFrameRate))
 	{
 		printError("SGGetFrameRate err=%d\n", err);
 		goto endFunc;
 	}
-	
+
 	// Get the selected vdig from the SG
     if (!(pVdg->vdCompInst = SGGetVideoDigitizerComponent(pVdg->sgchanVideo)))
     {
 		printError("SGGetVideoDigitizerComponent error\n");
 		goto endFunc;
 	}
-	
+
 endFunc:
 	return err;
 }
@@ -723,21 +723,21 @@ MakeSequenceGrabber(WindowRef pWindow)
 		printError("OpenDefaultComponent failed to open the default sequence grabber.\n");
 		goto endFunc;
 	}
-	
+
    	// initialize the default sequence grabber component
    	if(err = SGInitialize(seqGrab))
 	{
 		printError("SGInitialize err=%d\n", err);
 		goto endFunc;
 	}
-	
+
 	// This should be defaulted to the current port according to QT doco
 	if (err = SGSetGWorld(seqGrab, GetWindowPort(pWindow), NULL))
 	{
 		printError("SGSetGWorld err=%d\n", err);
 		goto endFunc;
 	}
-	
+
 	// specify the destination data reference for a record operation
 	// tell it we're not making a movie
 	// if the flag seqGrabDontMakeMovie is used, the sequence grabber still calls
@@ -752,13 +752,13 @@ MakeSequenceGrabber(WindowRef pWindow)
 		goto endFunc;
 	}
 
-endFunc:	
-    if (err && (seqGrab != NULL)) 
+endFunc:
+    if (err && (seqGrab != NULL))
 	{ // clean up on failure
     	CloseComponent(seqGrab);
         seqGrab = NULL;
     }
-    
+
 	return seqGrab;
 }
 
@@ -766,18 +766,18 @@ endFunc:
 // --------------------
 // MakeSequenceGrabChannel (adapted from Apple mung sample)
 //
-OSErr 
+OSErr
 MakeSequenceGrabChannel(SeqGrabComponent seqGrab, SGChannel* psgchanVideo)
 {
     long  flags = 0;
     OSErr err = noErr;
-    
+
     if (err = SGNewChannel(seqGrab, VideoMediaType, psgchanVideo))
 	{
 		//printError("SGNewChannel err=%d\n", err);
 		goto endFunc;
 	}
-	
+
 //	err = SGSetChannelBounds(*sgchanVideo, rect);
    	// set usage for new video channel to avoid playthrough
 	// note we don't set seqGrabPlayDuringRecord
@@ -793,16 +793,16 @@ endFunc:
         SGDisposeChannel(seqGrab, *psgchanVideo);
         *psgchanVideo = NULL;
     }
-	
+
 	return err;
 }
 
 OSErr
-RequestSGSettings(  SeqGrabComponent		seqGrab, 
+RequestSGSettings(  SeqGrabComponent		seqGrab,
 					SGChannel				sgchanVideo )
 {
 	OSErr err;
-    	            
+
     SGModalFilterUPP MySGModalFilterUPP;
 	if (!(MySGModalFilterUPP = NewSGModalFilterUPP (MySGModalFilterProc)))
 	{
@@ -810,10 +810,10 @@ RequestSGSettings(  SeqGrabComponent		seqGrab,
 		err = -1; // TODO appropriate error code
 		goto endFunc;
 	}
-    
+
 	// let the user configure and choose the device and settings
-	// "Due to a bug in all versions QuickTime 6.x for the function call "SGSettingsDialog()" 
-	// when used with the "seqGrabSettingsPreviewOnly" parameter, all third party panels will 
+	// "Due to a bug in all versions QuickTime 6.x for the function call "SGSettingsDialog()"
+	// when used with the "seqGrabSettingsPreviewOnly" parameter, all third party panels will
 	// be excluded."  	from http://www.outcastsoft.com/ASCDFG1394.html  15/03/04
 	//if (err = SGSettingsDialog(seqGrab, sgchanVideo, 0, NULL, seqGrabSettingsPreviewOnly, MySGModalFilterUPP, 0))
 	if (err = SGSettingsDialog(seqGrab, sgchanVideo, 0, NULL, 0, MySGModalFilterUPP, 0))
@@ -821,11 +821,11 @@ RequestSGSettings(  SeqGrabComponent		seqGrab,
 		//printError("SGSettingsDialog err=%d\n", err);
 		goto endFunc;
 	}
-    
+
 	// Dispose of the UPP
 	if (MySGModalFilterUPP)
 		DisposeSGModalFilterUPP(MySGModalFilterUPP);
-    
+
 endFunc:
 	return err;
 }
@@ -843,8 +843,8 @@ Boolean MySGModalFilterProc (
 	// updating them in here, but since we don't, we'll just clear out
 	// any update events meant for us
 	Boolean	handled = false;
-	
-	if ((theEvent->what == updateEvt) && 
+
+	if ((theEvent->what == updateEvt) &&
 		((WindowPtr) theEvent->message == (WindowPtr) refCon))
 	{
 		BeginUpdate ((WindowPtr) refCon);
@@ -858,12 +858,12 @@ OSErr
 createOffscreenGWorld(  GWorldPtr* pGWorldPtr,
 						OSType		pixelFormat,
 						Rect*		pBounds)
-{   
+{
 	OSErr err;
 	CGrafPtr theOldPort;
     GDHandle theOldDevice;
-	
-    // create an offscreen GWorld 
+
+    // create an offscreen GWorld
     if (err = QTNewGWorld(  pGWorldPtr,				// returned GWorld
     					pixelFormat,			// pixel format
     					pBounds,				// bounds
@@ -874,17 +874,17 @@ createOffscreenGWorld(  GWorldPtr* pGWorldPtr,
 		printError("QTNewGWorld: err=%d\n", err);
 		goto endFunc;
 	}
-    
+
     // lock the pixmap and make sure it's locked because
     // we can't decompress into an unlocked PixMap
     if(!LockPixels(GetGWorldPixMap(*pGWorldPtr)))
 		printError("createOffscreenGWorld: Can't lock pixels!\n");
-    
-    GetGWorld(&theOldPort, &theOldDevice);    
+
+    GetGWorld(&theOldPort, &theOldDevice);
     SetGWorld(*pGWorldPtr, NULL);
     BackColor(blackColor);
     ForeColor(whiteColor);
-    EraseRect(pBounds);    
+    EraseRect(pBounds);
     SetGWorld(theOldPort, theOldDevice);
 
 endFunc:

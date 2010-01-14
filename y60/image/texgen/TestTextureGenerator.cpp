@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -63,7 +63,7 @@
 //   $Revision: 1.2 $
 //
 //
-// Description: 
+// Description:
 //
 // (CVS log at the bottom of this file)
 //
@@ -99,30 +99,30 @@ const string myTestDir = "../";
 
 void TestTextureGenerator::run() {
 /*
-    light_withLightmap ("TestImages/lightmap_darkness.png",    
+    light_withLightmap ("TestImages/lightmap_darkness.png",
                         "TestImages/darkness_expectedresult.png",
                         false);
-    light_withLightmap ("TestImages/lightmap_bright.png", 
-                        "TestImages/brightness_expectedresult.png", 
+    light_withLightmap ("TestImages/lightmap_bright.png",
+                        "TestImages/brightness_expectedresult.png",
                         false);
-    light_withLightmap ("TestImages/lightmap_gradient.png", 
+    light_withLightmap ("TestImages/lightmap_gradient.png",
                         "TestImages/gradient_expectedresult.png",
                         false);
-    light_withLightmap ("TestImages/lightmap_gradient.png", 
+    light_withLightmap ("TestImages/lightmap_gradient.png",
                         "TestImages/gradientTiled_expectedresult.png",
                         true);
 */
 }
 
-void TestTextureGenerator::light_withLightmap (const string& myLightMapName, 
+void TestTextureGenerator::light_withLightmap (const string& myLightMapName,
                                                const string& myExpectedResultName,
-                                               bool createPartialTexture) 
+                                               bool createPartialTexture)
 {
 /*
     try {
         Node theTexDef;
         string theTexDefFileName (myTestDir+"noblend_test.xml");
-        ifstream theXMLFile (theTexDefFileName.c_str());    
+        ifstream theXMLFile (theTexDefFileName.c_str());
         if (!theXMLFile) {
             ENSURE_MSG (false, ("Can't open " +theTexDefFileName).c_str());
         }
@@ -137,32 +137,32 @@ void TestTextureGenerator::light_withLightmap (const string& myLightMapName,
         theDecoder.MakeBmpFromFile ((myTestDir+"TestImages/index_big.png").c_str(), &theIndexBmp );
 
         PLAnyBmp theLightMap;
-        theDecoder.MakeBmpFromFile ((myTestDir+myLightMapName).c_str(), &theLightMap ); 
+        theDecoder.MakeBmpFromFile ((myTestDir+myLightMapName).c_str(), &theLightMap );
 
-        TexGen::TextureGenerator theTextureGenerator (&theTexDef, myTestDir, false, 
+        TexGen::TextureGenerator theTextureGenerator (&theTexDef, myTestDir, false,
                                                       theIndexBmp, theLightMap);
 
         PLAnyBmp theResultBmp;
         theResultBmp.Create(128,128,32,false);
         if (createPartialTexture) {
             PLRect rect(32, 32, 96, 96);
-            theTextureGenerator.createTexture(rect,PLPoint (128,128),theResultBmp); 
+            theTextureGenerator.createTexture(rect,PLPoint (128,128),theResultBmp);
         } else {
             PLRect rect(0, 0, 128, 128);
-            theTextureGenerator.createTexture (rect, PLPoint (128, 128), 
-                                               theResultBmp); 
+            theTextureGenerator.createTexture (rect, PLPoint (128, 128),
+                                               theResultBmp);
         }
 
 #ifdef CREATE_TESTCASES
         // create testcases
         PLPNGEncoder theEncoder;
         theEncoder.MakeFileFromBmp ((myTestDir+myExpectedResultName).c_str(), &theResultBmp);
-#else        
+#else
         PLAnyBmp tempResultBmp;
         theDecoder.MakeBmpFromFile ((myTestDir+myExpectedResultName).c_str(), &tempResultBmp );
         PLAnyBmp theReference;
         theReference.CreateCopy (tempResultBmp, 24);
-        ENSURE_MSG (theReference == theResultBmp, 
+        ENSURE_MSG (theReference == theResultBmp,
                 (string("Result == ")+myExpectedResultName).c_str());
 
 #endif

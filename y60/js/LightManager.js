@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -66,13 +66,13 @@ function LightManager(theWorld, theLightSources) {
 LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
 
     var _myEnabledFlag  = true;
-    
+
     var _myScene        = theScene;
     var _myWorld        = theWorld;
     var _myLightSources = theScene.dom.find('/scene/lightsources');
 
     var _myLights = theWorld.findAll('.//light');
-    
+
     var _myLightCursor = 0;
 
     var _myViewportHeadlights    = [];
@@ -144,7 +144,7 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
         }
         var activeLightsFound = false;
         _myLights = _myWorld.findAll(".//light");
-        
+
         for (var i=0; i < _myLights.length; ++i) {
             if (_myLights[i].visible) {
                 activeLightsFound = true;
@@ -161,7 +161,7 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
     obj.setEnabled setter = function(theFlag) {
         _myEnabledFlag = theFlag;
     }
-    
+
     obj.registerHeadlightWithViewport = function(theViewportNode, theLightNode) {
         _myViewportHeadlights[theViewportNode.id] = theLightNode;
         _myViewportHeadlightsEnabled[theViewportNode.id] = true;
@@ -179,7 +179,7 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
         if (theViewport.id in _myViewportHeadlights) {
             myHeadlight = _myViewportHeadlights[theViewport.id];
         }
-        obj.registerHeadlightWithViewport(theViewport, 
+        obj.registerHeadlightWithViewport(theViewport,
                         attachHeadlightToCamera(myCamera, myHeadlight));
         _myViewportHeadlightsEnabled[theViewport.id] = true;
         if (myHeadlight == null) {
@@ -268,12 +268,12 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
     }
 
     obj.onPreViewport = function(theViewport) {
-        
+
         if (_myEnabledFlag && _myHeadLightFlag  && theViewport.id in _myViewportHeadlights) {
             if (_myViewportHeadlights[theViewport.id].visible != _myViewportHeadlightsEnabled[theViewport.id]) {
                 _myViewportHeadlights[theViewport.id].visible = _myViewportHeadlightsEnabled[theViewport.id];
-            } 
-        } 
+            }
+        }
     }
     obj.onPostViewport = function(theViewport) {
         //var numLights = 0;

@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -1071,7 +1071,7 @@ className(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             *rval = JSVAL_NULL;
             return JS_TRUE;
         }
-        
+
         std::string myClassName = myClass->name;
         *rval = as_jsval(cx, myClassName);
         return JS_TRUE;
@@ -1227,7 +1227,7 @@ jsval as_jsval(JSContext *cx, const ObjectDocumentation & theDocumentation) {
 
 template jsval as_jsval(JSContext *cx, const std::vector<ParameterDescription> & theVector);
 template jsval as_jsval(JSContext *cx, const std::vector<FunctionDescription> & theVector);
-    
+
 JS_STATIC_DLL_CALLBACK(JSBool)
 getDocumentedModules(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Collects all currently documented modules.");
@@ -1348,7 +1348,7 @@ checksumFromString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval 
             return JS_FALSE;
         }
         unsigned long myCRC32 = crc32(0L, Z_NULL, 0);
-        appendCRC32(myCRC32, myInputString);        
+        appendCRC32(myCRC32, myInputString);
         *rval = as_jsval(cx, myCRC32);
         return JS_TRUE;
     }
@@ -1440,7 +1440,7 @@ execute(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Executes a command on the system");
     DOC_PARAM("theCommand", "The command to execute", DOC_TYPE_STRING);
     DOC_PARAM_OPT("theArgs", "Arguments", DOC_TYPE_STRING, "");
-    DOC_PARAM_OPT("theBlockMode", "Blocking mode", DOC_TYPE_BOOLEAN, true);    
+    DOC_PARAM_OPT("theBlockMode", "Blocking mode", DOC_TYPE_BOOLEAN, true);
     DOC_RVAL("The return code of the command", DOC_TYPE_INTEGER);
     DOC_END;
     ensureParamCount(argc, 1, 3);
@@ -1469,7 +1469,7 @@ execute(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             if ( ! convertFrom(cx, argv[2], myCommandIsBlocking)) {
                 JS_ReportError(cx, "exec(): argument #3 must be a bool");
                 return JS_FALSE;
-            }            
+            }
         }
     }
     if ( myArgs == "") {
@@ -1491,13 +1491,13 @@ execute(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         NULL, NULL, NULL, 0, 0, 0, 0, 0, 0,
         0, STARTF_USESHOWWINDOW, SW_SHOWDEFAULT,
         0, NULL, NULL, NULL, NULL
-    };    
-    PROCESS_INFORMATION myProcessInfo;    
-    DWORD myProcessResult = 0;    
+    };
+    PROCESS_INFORMATION myProcessInfo;
+    DWORD myProcessResult = 0;
     /*bool myResult =*/ CreateProcess(
             NULL, &myExecutionCommand[0],
             NULL, NULL, true, 0,
-            NULL, myCWD.c_str(), 
+            NULL, myCWD.c_str(),
             &myStartupInfo,
             &myProcessInfo);
     if (myCommandIsBlocking) {
@@ -1550,7 +1550,7 @@ static JSFunctionSpec glob_functions[] = {
     {"reuse",             Reuse,          0},
     {"parseArguments",    ParseArguments, 2},
     {"plug",              Plug,           1},
-    {"preLoad",           PreLoad,  1},    
+    {"preLoad",           PreLoad,  1},
     {"saveImage",         SaveImage,	  2},
     {"saveImageFiltered", SaveImageFiltered, 4},
     {"applyImageFilter",  ApplyImageFilter,	3},

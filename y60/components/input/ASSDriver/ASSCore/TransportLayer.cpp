@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -137,7 +137,7 @@ TransportLayer::TransportLayer(const char * theTransportName, const dom::NodePtr
     _myReceivedFrames(0),
     _myChecksumErrorCounter(0)
 {
-    getConfigSetting( theSettings, "EventQueueSize", _myEventQueueSize, 
+    getConfigSetting( theSettings, "EventQueueSize", _myEventQueueSize,
                       static_cast<std::queue<ASSEvent>::size_type>(100u));
 
 #ifdef TL_LATENCY_TEST
@@ -157,7 +157,7 @@ TransportLayer::~TransportLayer() {
 }
 
 
-void 
+void
 TransportLayer::stopThread() {
     AC_INFO << "Shutting down proximatrix thread.";
     join();
@@ -165,7 +165,7 @@ TransportLayer::stopThread() {
 
 static const double NO_DATA_TIMEOUT = 3.0;
 
-void 
+void
 TransportLayer::poll() {
     // check for data timeout
     if(_myState != NOT_CONNECTED) {
@@ -192,7 +192,7 @@ TransportLayer::poll() {
             establishConnection();
             if (_myState == NOT_CONNECTED) {
                 // XXX: this keeps us from thrashing when we are not connected but is ugly.
-                msleep(1000); 
+                msleep(1000);
             }
             break;
         case SYNCHRONIZING:
@@ -337,7 +337,7 @@ TransportLayer::parseStatusLine() {
                             _myFrameQueue.push( ASSEvent( _myGridSize, _myFrameNo,
                                         _myFrameBuffer ));
                             AC_TRACE << "TransportLayer: event queue size = " << _myFrameQueue.size();
-                            // TODO use smart pointers 
+                            // TODO use smart pointers
                             _myFrameBuffer = 0;
                             _myFrameQueueLock.unlock();
                         } else {
@@ -371,15 +371,15 @@ TransportLayer::addLineToChecksum(std::deque<unsigned char>::const_iterator theL
 unsigned
 TransportLayer::valuesPerLine() const {
     if (_myMultiplexMax) {
-        return _myGridSize[0] / _myMultiplexMax;       
+        return _myGridSize[0] / _myMultiplexMax;
     } else {
-        return _myGridSize[0];       
+        return _myGridSize[0];
     }
 }
 
 void
 TransportLayer::readSensorValues() {
-    while ( _myTmpBuffer.size() >= ( _myExpectedLine == 0 ? 
+    while ( _myTmpBuffer.size() >= ( _myExpectedLine == 0 ?
                 getBytesPerStatusLine() : valuesPerLine() + 2 ))
     {
         //std::string hexDump;
@@ -411,9 +411,9 @@ TransportLayer::readSensorValues() {
 
             //size_t byteCount = (_myTmpBuffer.begin() + 2 + valuesPerLine() ) - (_myTmpBuffer.begin() + 2);
             if ( ! _myFrameBuffer ) {
-                // TODO use smart pointers 
+                // TODO use smart pointers
                 _myFrameBuffer = new unsigned char[ _myGridSize[0] * _myGridSize[1] ];
-                
+
             }
             unsigned char * myRowPtr = _myFrameBuffer + myRowIdx * _myGridSize[0];
             if (_myMultiplexMax == 0) {
@@ -425,7 +425,7 @@ TransportLayer::readSensorValues() {
                     * myRowPtr = * myInput;
                     myRowPtr += _myMultiplexMax;
                     ++myInput;
-                }    
+                }
             }
 
             addLineToChecksum(_myTmpBuffer.begin() + 2, _myTmpBuffer.begin() + 2 + valuesPerLine());
@@ -469,7 +469,7 @@ TransportLayer::synchronize() {
                 if ( i > 0) {
                     _myTmpBuffer.erase( _myTmpBuffer.begin(), _myTmpBuffer.begin() + i);
                     if ( ! _myTmpBuffer.empty() ) {
-                        ASSURE( _myTmpBuffer[0] == MAGIC_TOKEN); 
+                        ASSURE( _myTmpBuffer[0] == MAGIC_TOKEN);
                     }
                 }
                 break;
@@ -545,7 +545,7 @@ TransportLayer::handleConfigurationCommand() {
                 }
                 _myCommandQueueLock.unlock();
             } else if (myResponse == RESPONSE_ERROR || myResponse == RESPONSE_TIMEOUT) {
-                AC_ERROR << "Failed to enter config mode: " 
+                AC_ERROR << "Failed to enter config mode: "
                          << (myResponse == RESPONSE_TIMEOUT ? "timeout" : "error");
 
                 MAKE_SCOPE_TIMER(TransportLayer_handleConfigurationCommand2);
@@ -582,7 +582,7 @@ TransportLayer::handleConfigurationCommand() {
     }
 }
 
-CommandResponse 
+CommandResponse
 TransportLayer::getCommandResponse() {
     string myString( (char*)& ( * _myTmpBuffer.begin()), _myTmpBuffer.size());
     transform( myString.begin(), myString.end(), myString.begin(), ::toupper);
@@ -597,7 +597,7 @@ TransportLayer::getCommandResponse() {
 
     myPos = myString.find(ERROR_STRING);
     if (myPos != string::npos && myPos + ERROR_STRING.size() + 2 + 2 <= myString.size() &&
-        myString[ myPos + ERROR_STRING.size() + 2 ] == '\r' && 
+        myString[ myPos + ERROR_STRING.size() + 2 ] == '\r' &&
         myString[ myPos + ERROR_STRING.size() + 2 + 1 ] == '\n') {
         unsigned myErrorCode = as<unsigned>( myString.substr( myPos + ERROR_STRING.size(), 2 ));
         AC_ERROR << "Got 'ERR': errorcode: " << myErrorCode;
@@ -660,57 +660,57 @@ TransportLayer::getState() const {
     return _myState;
 }
 
-const asl::Vector2i & 
+const asl::Vector2i &
 TransportLayer::getGridSize() const {
     return _myGridSize;
 }
 
-int 
+int
 TransportLayer::getGridSpacing() const {
     return _myGridSpacing;
 }
 
-int 
+int
 TransportLayer::getFirmwareVersion() const {
     return _myFirmwareVersion;
 }
 
-int 
+int
 TransportLayer::getFirmwareStatus() const {
     return _myFirmwareStatus;
 }
 
-int 
+int
 TransportLayer::getControllerId() const {
     return _myControllerId;
 }
 
-int 
+int
 TransportLayer::getFirmwareMode() const {
     return _myFirmwareMode;
 }
 
-int 
+int
 TransportLayer::getFramerate() const {
     return _myFramerate;
 }
 
-int 
+int
 TransportLayer::getLastFrameNumber() const {
     return _myFrameNo;
 }
 
-int 
+int
 TransportLayer::getLastChecksum() const {
     return _myChecksum;
 }
 
-void 
+void
 TransportLayer::dumpConfiguration() const {
     AC_PRINT << "=== ASS Controller Status =============" << endl
              << "Firmware version : " << _myFirmwareVersion << endl
              << "Controller Id    : " << _myControllerId << endl
-             << "Firmware mode    : " << _myFirmwareMode 
+             << "Firmware mode    : " << _myFirmwareMode
                     << " (" << getFirmwareModeName(_myFirmwareMode) << ")" << endl
              << "Framerate        : " << _myFramerate << endl
              << "Grid size        : " << _myGridSize << endl
@@ -742,7 +742,7 @@ TransportLayer::getFirmwareModeName(unsigned theId) const {
     return "unknown";
 }
 
-void 
+void
 TransportLayer::threadMain(asl::PosixThread & theThread) {
     TransportLayer & mySelf = dynamic_cast<TransportLayer&>(theThread);
 

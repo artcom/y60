@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -275,7 +275,7 @@ AC_DEBUG << "createSphericalPlane:" << " theSphere = " << theSphere << ", thePol
                                                    , static_cast<float>(theSubdivision[1]) );
         asl::Vector2f myPolarUVector = asl::Vector2f(thePolarBounds.getSize()[0], 0)/mySubDivision;
         asl::Vector2f myPolarVVector = asl::Vector2f(0, thePolarBounds.getSize()[1])/mySubDivision;
-        
+
         Vector2f myUStep( 1.0f / mySubDivision[0], 0.0f);
         Vector2f myVStep( 0.0f, 1.0f / mySubDivision[1]);
 
@@ -283,8 +283,8 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
 
         return createPlane(theScene, theSubdivision[0]+1, theSubdivision[1]+1, "mySpherical", theMaterialId,
             QuadBuilder(),
-            SphericalPosition(theSphere,thePolarBounds.getMin(),myPolarUVector,myPolarVVector),  
-            SphericalNormal(theSphere,thePolarBounds.getMin(),myPolarUVector,myPolarVVector),  
+            SphericalPosition(theSphere,thePolarBounds.getMin(),myPolarUVector,myPolarVVector),
+            SphericalNormal(theSphere,thePolarBounds.getMin(),myPolarUVector,myPolarVVector),
             PlaneUVCoord(Point2f(0.0, 0.0), myUStep, myVStep ),
             WhiteColor());
     }
@@ -469,7 +469,7 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
         for (unsigned i = 0; i < myDiskVertices; i++) {
             myCircleElementBuilder.appendIndex(POSITIONS, 1 + i);
         }
-        
+
         myShapeBuilder.appendElements( myCircleElementBuilder );
 
         // return the result
@@ -503,7 +503,7 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
             const std::vector<asl::Vector2f> & theTexCoords,
             const std::vector<asl::Vector4f> & theColors)
     {
-        return createStrip(PrimitiveTypeStrings[LINE_STRIP], theScene, 
+        return createStrip(PrimitiveTypeStrings[LINE_STRIP], theScene,
                 theMaterialId, thePositions, theTexCoords, theColors);
     }
 
@@ -511,24 +511,24 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
     createQuadStrip(ScenePtr theScene, const std::string & theMaterialId,
             const std::vector<asl::Vector3f> & thePositions,
             const std::vector<asl::Vector2f> & theTexCoords,
-            const std::vector<asl::Vector4f> & theColors) 
+            const std::vector<asl::Vector4f> & theColors)
     {
-        return createStrip(PrimitiveTypeStrings[QUAD_STRIP], theScene, 
+        return createStrip(PrimitiveTypeStrings[QUAD_STRIP], theScene,
                 theMaterialId, thePositions, theTexCoords, theColors);
     }
 
     dom::NodePtr
-    createStrip(const std::string & theType, ScenePtr theScene, 
+    createStrip(const std::string & theType, ScenePtr theScene,
             const std::string & theMaterialId,
             const std::vector<asl::Vector3f> & thePositions,
             const std::vector<asl::Vector2f> & theTexCoords,
-            const std::vector<asl::Vector4f> & theColors) 
+            const std::vector<asl::Vector4f> & theColors)
     {
         bool needColors = theColors.size() !=0;
         bool needsNormals = false;
         if (theType == PrimitiveTypeStrings[QUAD_STRIP] || theType == PrimitiveTypeStrings[TRIANGLE_STRIP]) {
             needsNormals = true;
-        }            
+        }
 
         string myDefaultName = string("my") + theType;
         ShapeBuilder myShapeBuilder(myDefaultName);
@@ -551,7 +551,7 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
 
         if (needColors) {
             if (theColors.size() != thePositions.size()) {
-                throw asl::Exception(string("createStrip:: theColors count does not match thePosition count: ") + asl::as_string(theColors.size()) + " vs " + asl::as_string(thePositions.size()) );                
+                throw asl::Exception(string("createStrip:: theColors count does not match thePosition count: ") + asl::as_string(theColors.size()) + " vs " + asl::as_string(thePositions.size()) );
             }
             myShapeBuilder.ShapeBuilder::createVertexDataBin<asl::Vector4f>(COLOR_ROLE, theColors.size());
             myElementBuilder.createIndex(COLOR_ROLE, COLORS, theColors.size());
@@ -571,17 +571,17 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
                 if (i >= thePositions.size()-2) {
                     ii = (i%2 == 0) ? i-1 : i-2;
                 }
-                const asl::Vector3f & myV1 = (ii%2 == 0) ? 
+                const asl::Vector3f & myV1 = (ii%2 == 0) ?
                     thePositions[ii+1] : thePositions[ii+2];
-                const asl::Vector3f & myV2 = (ii%2 == 0) ? 
+                const asl::Vector3f & myV2 = (ii%2 == 0) ?
                     thePositions[ii+2] : thePositions[ii+1];
-                myNormal = cross(difference(myV1, thePositions[ii]), 
+                myNormal = cross(difference(myV1, thePositions[ii]),
                         difference(myV2, thePositions[ii]) );
                 myNormal = normalized(myNormal);
 
                 myShapeBuilder.appendVertexData(NORMAL_ROLE, myNormal);
                 myElementBuilder.appendIndex(NORMALS, i);
-            }                
+            }
             if ( ! theTexCoords.empty()) {
                 myShapeBuilder.appendVertexData("uvset", theTexCoords[i]);
                 myElementBuilder.appendIndex(getTextureRole(0), i);
@@ -826,7 +826,7 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
 
 
     dom::NodePtr
-    createUnlitTexturedMaterial(ScenePtr theScene, 
+    createUnlitTexturedMaterial(ScenePtr theScene,
                                 dom::NodePtr theImageOrTextureNode,
                                 const std::string & theName,
                                 bool theTransparencyFlag,
@@ -853,7 +853,7 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
 
         string myTextureId = theImageOrTextureNode->getAttributeString(ID_ATTRIB);
         if (theImageOrTextureNode->nodeName() == IMAGE_NODE_NAME ||
-            theImageOrTextureNode->nodeName() == MOVIE_NODE_NAME) 
+            theImageOrTextureNode->nodeName() == MOVIE_NODE_NAME)
         {
             theImageOrTextureNode->getFacade<Image>()->get<ImageWidthTag>();
             string myImageId = theImageOrTextureNode->getAttributeString(ID_ATTRIB);
@@ -1085,7 +1085,7 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
         float myDX = p2[0] - p1[0];
         float myDY = p2[1] - p1[1];
         if (myDX == 0.0 && myDY == 0.0) {
-            return -1.0; 
+            return -1.0;
         } else {
             float myT = myDY / (fabs( myDX) + fabs(myDY));
             if (myDX < 0.0) {
@@ -1174,7 +1174,7 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
         float myZ = myMinZ;
         while (myZ < myMaxZ || almostEqual(myZ, myMaxZ)) {
             asl::Planef myPlane(Vector3f(0.0, 0.0, 1.0), -myZ);
-            std::vector<Point3f> myIntersections;        
+            std::vector<Point3f> myIntersections;
             intersectBoxWithPlane(myCorners, myPlane, myIntersections, myEpsilon);
             if ( ! myIntersections.empty()) {
 

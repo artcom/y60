@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -100,8 +100,8 @@ void DInputFFBExtension::init() {
 
 
     //  Create the device pointer.  This makes the proper DX or Immersion TouchSense API
-    //  calls and returns a pointer to either a CImmDXDevice or a CImmMouse.  
-    //  Note:  CreateDevice() will look for a mouse first, then a joystick, returning a 
+    //  calls and returns a pointer to either a CImmDXDevice or a CImmMouse.
+    //  Note:  CreateDevice() will look for a mouse first, then a joystick, returning a
     //  pointer to the first device it finds.
     _myDevice = CImmDevice::CreateDevice(getDLHandle(), mainHWND);
     if (!_myDevice) {
@@ -119,26 +119,26 @@ void DInputFFBExtension::init() {
             AC_PRINT << "Found FFB device '" << didi.tszProductName << "'.";
 
             //######## Setup ranges [-100,100]
-            DIPROPRANGE diprg; 
- 
-            diprg.diph.dwSize       = sizeof(diprg); 
-            diprg.diph.dwHeaderSize = sizeof(diprg.diph); 
-            diprg.diph.dwObj        = DIJOFS_X; 
-            diprg.diph.dwHow        = DIPH_BYOFFSET; 
-            diprg.lMin              = -1000; 
-            diprg.lMax              = 1000; 
- 
+            DIPROPRANGE diprg;
+
+            diprg.diph.dwSize       = sizeof(diprg);
+            diprg.diph.dwHeaderSize = sizeof(diprg.diph);
+            diprg.diph.dwObj        = DIJOFS_X;
+            diprg.diph.dwHow        = DIPH_BYOFFSET;
+            diprg.lMin              = -1000;
+            diprg.lMax              = 1000;
+
             HRESULT hResult;
-            hResult = ((LPDIRECTINPUTDEVICE2)(_myDevice->GetDevice()))->SetProperty(DIPROP_RANGE, &diprg.diph); 
+            hResult = ((LPDIRECTINPUTDEVICE2)(_myDevice->GetDevice()))->SetProperty(DIPROP_RANGE, &diprg.diph);
             if (FAILED(hResult)) {
                 AC_ERROR << "Setting X range failed.";
                 _myDevice = 0;
                 return;
             }
 
-            diprg.diph.dwObj        = DIJOFS_Y; 
+            diprg.diph.dwObj        = DIJOFS_Y;
 
-            hResult = ((LPDIRECTINPUTDEVICE2)(_myDevice->GetDevice()))->SetProperty(DIPROP_RANGE, &diprg.diph); 
+            hResult = ((LPDIRECTINPUTDEVICE2)(_myDevice->GetDevice()))->SetProperty(DIPROP_RANGE, &diprg.diph);
             if (FAILED(hResult)) {
                 AC_ERROR << "Setting Y range failed.";
                 _myDevice = 0;
@@ -153,18 +153,18 @@ void DInputFFBExtension::init() {
             dipdw.diph.dwObj = 0;
             dipdw.diph.dwHow = DIPH_DEVICE;
             dipdw.dwData     = _myBufferSize;
-    
+
             hResult = ((LPDIRECTINPUTDEVICE8)(_myDevice->GetDevice()))->SetProperty(DIPROP_BUFFERSIZE, &dipdw.diph);
             if (FAILED(hResult)) {
                 printErrorState("SetProperty(DIPROP_BUFFERSIZE)", hResult);
                 return;
             }
-    
+
             hResult = ((LPDIRECTINPUTDEVICE8)(_myDevice->GetDevice()))->SetDataFormat(&c_dfDIJoystick2);
             if (FAILED(hResult)) {
                 AC_ERROR << "SetDataFormat() failed.";
                 return;
-            }            
+            }
 */
             //  Create a project and open the ifr file that contains the effects for this app
             _myProject = new CImmProject();
@@ -172,7 +172,7 @@ void DInputFFBExtension::init() {
             if (!_myProject->OpenFile("vroom.ifr", _myDevice)) {
                 AC_ERROR << "Could not load effect file '" << "vroom.ifr" << "'.";
                 return;
-            }   
+            }
 
             LoadEngineParams();
 
@@ -198,7 +198,7 @@ void DInputFFBExtension::init() {
             return;
         }
     }
-    
+
 }
 
 void
@@ -218,10 +218,10 @@ DInputFFBExtension::LoadEngineParams() {
     _myCompoundEffect->GetContainedEffect((long)0)->GetParameters(myEff);
 
     LPIMM_PERIODIC buffer = (LPIMM_PERIODIC)myEff.lpvTypeSpecificParams;
-    _myImmPeriodic.dwMagnitude = buffer->dwMagnitude; 
-    _myImmPeriodic.lOffset     = buffer->lOffset; 
-    _myImmPeriodic.dwPhase     = buffer->dwPhase; 
-    _myImmPeriodic.dwPeriod    = buffer->dwPeriod; 
+    _myImmPeriodic.dwMagnitude = buffer->dwMagnitude;
+    _myImmPeriodic.lOffset     = buffer->lOffset;
+    _myImmPeriodic.dwPhase     = buffer->dwPhase;
+    _myImmPeriodic.dwPeriod    = buffer->dwPeriod;
 
     //m_dwMagMultiplier        = _myImmPeriodic.dwMagnitude/20;
 
@@ -289,7 +289,7 @@ EventPtrList
 DInputFFBExtension::poll() {
     HRESULT hr;
     EventPtrList curEvents;
-    
+
     if (_myDevice) {
         hr = ((LPDIRECTINPUTDEVICE2)(_myDevice->GetDevice()))->Poll();
         if(FAILED(hr)) {
@@ -312,7 +312,7 @@ DInputFFBExtension::poll() {
             _myY = _myDIEvent.lY;
             curEvents.push_back(EventPtr(new AxisEvent(0, 1, _myY)));
         }
-#if 1        
+#if 1
 		_myImmPeriodic.dwMagnitude = 20;
 		if (_myCompoundEffect)
 			((CImmPeriodic*)(_myCompoundEffect->GetContainedEffect((long)0)))->ChangeParameters(_myImmPeriodic.dwMagnitude);
@@ -340,8 +340,8 @@ DInputFFBExtension::poll() {
     }
 
     return curEvents;
-}    
-    
+}
+
 HWND
 DInputFFBExtension::findSDLWindow() {
     SDL_SysWMinfo myInfo;

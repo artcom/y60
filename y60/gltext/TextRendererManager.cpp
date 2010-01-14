@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -88,7 +88,7 @@ namespace y60 {
     TextRendererManager::render(ViewportPtr theViewport) {
         if (_myTextSnippetsMap.find(theViewport->get<IdTag>()) == _myTextSnippetsMap.end()) {
             return;
-        }        
+        }
         std::vector<TextPtr> & myTextSnippets = _myTextSnippetsMap[theViewport->get<IdTag>()];
         if (myTextSnippets.empty()) {
             return;
@@ -175,7 +175,7 @@ namespace y60 {
             _myTTFRenderer->setColor(theTextColor);
         }
     }
-    const asl::Vector4f & 
+    const asl::Vector4f &
     TextRendererManager::getColor() {
         return _myBitmapRenderer.getColor();
     }
@@ -230,7 +230,7 @@ namespace y60 {
             _myTTFRenderer->setPadding(topPadding, bottomPadding, leftpadding, rightpadding);
         }
     }
-	
+
     void
 	TextRendererManager::setIndentation(int theIndentation) {
         _myBitmapRenderer.setIndentation(theIndentation);
@@ -268,7 +268,7 @@ namespace y60 {
 
 	void
 	TextRendererManager::loadTTF(const std::string & theName, const std::string & theFileName,
-	                  int theHeight, TTFFontInfo::FONTHINTING & theFonthint, 
+	                  int theHeight, TTFFontInfo::FONTHINTING & theFonthint,
 	                  TTFFontInfo::FONTTYPE & theFonttype)
     {
         _myTTFRenderer->loadFont(theName, expandEnvironment(theFileName), theHeight, theFonthint, theFonttype);
@@ -306,5 +306,5 @@ namespace y60 {
     TextRendererManager::setTracking(float theTracking) {
         _myTTFRenderer->setTracking(theTracking);
     }
-    
+
 }

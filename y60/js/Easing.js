@@ -3,14 +3,14 @@
 /*
   Easing Equations v1.5
   May 1, 2003
-  (c) 2003 Robert Penner, all rights reserved. 
-  This work is subject to the terms in http://www.robertpenner.com/easing_terms_of_use.html.  
-  
-  These tweening functions provide different flavors of 
-  math-based motion under a consistent API. 
-  
+  (c) 2003 Robert Penner, all rights reserved.
+  This work is subject to the terms in http://www.robertpenner.com/easing_terms_of_use.html.
+
+  These tweening functions provide different flavors of
+  math-based motion under a consistent API.
+
   Types of easing:
-  
+
 	  Linear
 	  Quadratic
 	  Cubic
@@ -28,11 +28,11 @@
   1.4 - added elastic and back easing
   1.3 - tweaked the exponential easing functions to make endpoints exact
   1.2 - inline optimizations (changing t and multiplying in one step)--thanks to Tatsuo Kato for the idea
-  
-  Discussed in Chapter 7 of 
+
+  Discussed in Chapter 7 of
   Robert Penner's Programming Macromedia Flash MX
   (including graphs of the easing equations)
-  
+
   http://www.robertpenner.com/profmx
   http://www.amazon.com/exec/obidos/ASIN/0072223561/robertpennerc-20
 */
@@ -242,7 +242,7 @@ Easing.easeOutBack = function (t, b, c, d, s) {
 // back easing in/out - backtracking slightly, then reversing direction and moving to target,
 // then overshooting target, reversing, and finally coming back to target
 Easing.easeInOutBack = function (t, b, c, d, s) {
-	if (s == undefined) s = 1.70158; 
+	if (s == undefined) s = 1.70158;
 	if ((t/=d/2) < 1) return c/2*(t*t*(((s*=(1.525))+1)*t - s)) + b;
 	return c/2*((t-=2)*t*(((s*=(1.525))+1)*t + s) + 2) + b;
 };

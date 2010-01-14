@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -415,7 +415,7 @@ WaterShader.prototype.Constructor = function(obj, theWaterMaterialNode, theWaves
             for (var i = 0; i < _myWaves.length; ++i) {
                 _myWaveParams[i] = _myMaterialNode.find(".//*[@name = 'Wave" + Number(i+1) + "Params']").childNodes[0];
                 var myWaveDirection = _myMaterialNode.find(".//*[@name = 'Wave" + Number(i+1) + "Direction']").childNodes[0];
-                        
+
                 var myDirection3f = _myWaves[i].direction;
                 myWaveDirection.nodeValue = new Vector4f(myDirection3f[0], myDirection3f[1], myDirection3f[2], 0);
 

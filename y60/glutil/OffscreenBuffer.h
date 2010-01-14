@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -73,7 +73,7 @@ namespace y60 {
     typedef asl::Ptr<Texture, dom::ThreadingModel> TexturePtr;
 
     class Y60_GLUTIL_DECL OffscreenBuffer {
-        public:        
+        public:
             /**
             * Allows Offscreen rendering into a texture.
             * Renders to an FBO by default but can fall-back to
@@ -83,18 +83,18 @@ namespace y60 {
             virtual ~OffscreenBuffer();
 
             /**
-            * activate the texture as render target and initializes FBO 
-            * if necessary  
+            * activate the texture as render target and initializes FBO
+            * if necessary
             */
             void activate(TexturePtr theTexture,
-                          unsigned theSamples = 1, unsigned theCubemapFace = 0); 
+                          unsigned theSamples = 1, unsigned theCubemapFace = 0);
 
             /**
-            * deactivates the texture as render target   
+            * deactivates the texture as render target
             * @param theCopyToImageFlag copy result to texture raster.
             */
-            void deactivate(TexturePtr theTexture, 
-                            bool theCopyToImageFlag = false); 
+            void deactivate(TexturePtr theTexture,
+                            bool theCopyToImageFlag = false);
 
         protected:
             /**
@@ -116,7 +116,7 @@ namespace y60 {
             void bindOffscreenFrameBuffer(TexturePtr theTexture,
                                           unsigned theSamples = 0, unsigned theCubemapFace = 0);
             void attachCubemapFace(unsigned theCubemapFace);
-            
+
             bool     _myUseFBO;
             bool     _myHasFBO;
             bool     _myHasFBOMultisample;
@@ -130,7 +130,7 @@ namespace y60 {
             // OpenGL id(s) of color buffer
             GLuint _myColorBuffer[2];
 
-            // OpenGL id(s) of depth buffer 
+            // OpenGL id(s) of depth buffer
             GLuint _myDepthBuffer[2];
     };
 }

@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -99,7 +99,7 @@ public:
     Uint32 read(void *buf, Uint32 buflen);
     Uint32 skip(Uint32 skiplen);
     void putback(Uint32 num);
-    
+
     Uint32 tell() const;
     PLDataSource * GetDataSource() const;
 private:
@@ -108,7 +108,7 @@ private:
     bool m_bGood;
 };
 
-class PLInputStreamFactory : 
+class PLInputStreamFactory :
     public DcmInputStreamFactory
 {
 public:
@@ -120,17 +120,17 @@ private:
     Uint32 m_initialPos;
 };
 
-class PLInputStream : 
+class PLInputStream :
     public DcmInputStream
 {
 public:
     PLInputStream(PLProducer *pProducer);
     DcmInputStreamFactory *newFactory() const;
 private:
-    PLProducer * m_pProducer; 
+    PLProducer * m_pProducer;
 };
 
-PLDICOMDecoder::PLDICOMDecoder() : 
+PLDICOMDecoder::PLDICOMDecoder() :
     PLPicDecoder(),
     m_di(0),
     m_bInvert(false)
@@ -146,18 +146,18 @@ PLDICOMDecoder::~PLDICOMDecoder()
 }
 
 void PLDICOMDecoder::Open (PLDataSource * pDataSrc)
-{	    
+{
     PLPixelFormat pf = PLPixelFormat::DONTCARE;
-    
+
     DcmFileFormat *dfile = new DcmFileFormat(); // NOTE: this is owned
     // by the Image it is going to construct (sic!)
-    
+
     m_pProducer = new PLProducer(pDataSrc);
     m_pInputStream = new PLInputStream(m_pProducer);
-    
+
     OFCondition cond = dfile->read(*m_pInputStream, EXS_Unknown,
          EGL_withoutGL, DCM_MaxReadLength);
-    
+
     if (cond.bad())
     {
       cerr<< cond.text() << endl;
@@ -165,7 +165,7 @@ void PLDICOMDecoder::Open (PLDataSource * pDataSrc)
     }
 
     E_TransferSyntax xfer = dfile->getDataset()->getOriginalXfer();
-    
+
     unsigned long opt_compatibilityMode =
       CIF_MayDetachPixelData | CIF_TakeOverExternalDataset;
 
@@ -211,14 +211,14 @@ void PLDICOMDecoder::Open (PLDataSource * pDataSrc)
 */
     int bpp = m_di->getDepth();
     cerr << "m_di->getDepth(): " << bpp << endl;
-    
+
     switch(m_di->getPhotometricInterpretation()) {
     case EPI_Monochrome1:  // 0==white
         m_bInvert = true;
     case EPI_Monochrome2:  // 0==black
         // for now we only want 8 or 16 bit bitmaps from dcmtk
         if (bpp > 8) {
-            bpp = 16;    
+            bpp = 16;
         }
         pf = PLPixelFormat::FromChannels("L", bpp);
         break;
@@ -246,7 +246,7 @@ void PLDICOMDecoder::Close () {
     delete m_di;
     delete m_pInputStream;
     delete m_pProducer;
-    
+
     PLPicDecoder::Close();
 }
 
@@ -259,11 +259,11 @@ void PLDICOMDecoder::GetImage (PLBmpBase & Bmp) {
     vector<char> myBuffer(myBufferSize);
     int myDataSize = m_di->getOutputData(
         &myBuffer[0],
-        myBufferSize, 
-        0, //myBpp, 
+        myBufferSize,
+        0, //myBpp,
         0
     );
-    
+
     int y;
     int myHeight = GetHeight();
     int myWidth = GetWidth();
@@ -290,7 +290,7 @@ DICOMTK :: DICOMTK() {
 
     // register RLE decompression codec
     DcmRLEDecoderRegistration::registerCodecs(OFFalse /*pCreateSOPInstanceUID*/, OFTrue /*debug mode*/);
-    
+
     // register JPEG decompression codecs
     DJDecoderRegistration::registerCodecs(EDC_always /*always convert YUV to RGB*/, EUC_default, EPC_default, OFTrue/*debug mode*/);
 
@@ -299,7 +299,7 @@ DICOMTK :: DICOMTK() {
 DICOMTK :: ~DICOMTK() {
     // deregister RLE decompression codec
     DcmRLEDecoderRegistration::cleanup();
-    
+
     // deregister JPEG decompression codecs
     DJDecoderRegistration::cleanup();
 }

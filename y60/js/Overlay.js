@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -289,7 +289,7 @@ MaterialOverlay.prototype.Constructor = function(Public, Protected, theScene, th
 	function setup() {
 		var myMaterialId = createUniqueId();
 		_myMaterial = Node.createElement('material');
-		
+
 		theScene.materials.appendChild(_myMaterial);
 		_myMaterial.id = myMaterialId;
 		_myMaterial.name = Public.name + "M";
@@ -359,7 +359,7 @@ TextureOverlay.prototype.Constructor = function(Public, Protected, theScene, the
 	/// Set image of first texture.
 	Public.image setter = function(theImage) {
 		Protected.myImages[0] = theImage;
-		if (_myTextureUnits) {		    
+		if (_myTextureUnits) {
 			var myTexture = Public.node.getElementById(_myTextureUnits.childNodes[0].texture);
 			myTexture.image = theImage.id;
 			//_myTextures[0].image = theImage.id;
@@ -498,7 +498,7 @@ TextureOverlay.prototype.Constructor = function(Public, Protected, theScene, the
 		if (isMovieFlag) {
 			myImage.frameblending = false;
 		}
-        var myFindString = "texture[@image='"+ theImageId+ "']";		
+        var myFindString = "texture[@image='"+ theImageId+ "']";
 		var myTexture = window.scene.textures.find(myFindString);
 		/*if (_myTextureUnits) {
 			_myTextureUnits = getDescendantByTagName(Public.material, "textureunits", false);
@@ -510,9 +510,9 @@ TextureOverlay.prototype.Constructor = function(Public, Protected, theScene, the
     			}
     		}
 		}*/
-		
 
-		
+
+
 		var my2ndTexture = null
 		if (!myTexture) {
 			myTexture = Modelling.createTexture(window.scene, myImage);
@@ -532,7 +532,7 @@ TextureOverlay.prototype.Constructor = function(Public, Protected, theScene, the
 
 		// create texture unit
 		if (!_myTextureUnits) {
-            var myFindString = "textureunits";				    
+            var myFindString = "textureunits";
 			_myTextureUnits = Public.material.find(myFindString);
 			if (!_myTextureUnits) {
 				_myTextureUnits = Public.material.appendChild(Node.createElement("textureunits"));
@@ -543,7 +543,7 @@ TextureOverlay.prototype.Constructor = function(Public, Protected, theScene, the
 		myTextureUnit.applymode = TextureApplyMode.modulate;
 		myTextureUnit.texture   = myTexture.id;
 
-		if (isMovieFlag && myImage.frameblending) {		
+		if (isMovieFlag && myImage.frameblending) {
 			var my2ndTextureUnit = _myTextureUnits.appendChild(Node.createElement("textureunit"));
 			my2ndTextureUnit.applymode = TextureApplyMode.modulate;
 			my2ndTextureUnit.texture   = my2ndTexture.id;
@@ -657,7 +657,7 @@ ImageOverlayBase.prototype.Constructor = function(Public, Protected, theScene, t
 				theScene.images.appendChild(myImage);
 				myImage.name = mySource;
 				//myImage.wrapmode  = TextureWrapMode.repeat;
-				//myImage.type = ImageType.single;                
+				//myImage.type = ImageType.single;
 				//ourImageCache[mySource] = myImage;
 			}
 		} else if (typeof(theSource) == "object" && "previousSibling" in theSource) {
@@ -824,7 +824,7 @@ MovieOverlay.prototype.Constructor = function(Public, Protected, theScene, theSo
 		Public.width  = mySize.x;
 		Public.height = mySize.y;
 		Protected.addTexture(myImage.id);
-		
+
 		// YUV targetrasterformat allows us to use a shader to convert YUV2RGB, therefore we need 3 rasters
 		if (myImage.childNodesLength() > 1) {
 		    Public.material.enabled = false;
@@ -834,11 +834,11 @@ MovieOverlay.prototype.Constructor = function(Public, Protected, theScene, theSo
     		myTextureUnit.applymode = TextureApplyMode.modulate;
 			var myTexture = Modelling.createTexture(window.scene, myImage);
 			myTexture.image = myImage.id;
-			myTexture.image_index = i;    		
+			myTexture.image_index = i;
     		myTextureUnit.texture   = myTexture.id;
 	    }
 	    if (myImage.childNodesLength() > 1) {
-    		Public.material.requires.textures = Public.createTextureFeatureString(myImage.childNodesLength());	
+    		Public.material.requires.textures = Public.createTextureFeatureString(myImage.childNodesLength());
         }
         if ( myImage.targetpixelformat == "YUV420") {
 	        Logger.info("using yuv2rgb shader to convert pixelformat");
@@ -877,7 +877,7 @@ function removeOverlay(theOverlayNode) {
 		if (myMaterialNode) {
 
 			// Remove texture,image
-			
+
 			var myTextureUnits = myMaterialNode.find("textureunits");
 			if (myTextureUnits) {
 				for (var i = 0; i < myTextureUnits.childNodesLength(); ++i) {

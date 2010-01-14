@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -146,7 +146,7 @@ namespace y60 {
         LINEAR,
         TextureSampleFilterEnum_MAX
     };
-    
+
     const char * const TextureSampleFilterStrings[] = {
         TEXTURE_SAMPLE_FILTER_NEAREST,
         TEXTURE_SAMPLE_FILTER_LINEAR,
@@ -408,7 +408,7 @@ namespace y60 {
     const char * const IMAGE_RESIZE_NONE  = "none";
     const char * const IMAGE_RESIZE_SCALE = "scale";
     const char * const IMAGE_RESIZE_PAD   = "pad";
- 
+
     //=== Image Types =========================================================
     const char * const IMAGE_TYPE_SINGLE  = "single";
     const char * const IMAGE_TYPE_VOXEL   = "voxel";
@@ -551,23 +551,23 @@ namespace y60 {
 
     //=== Renderstyle types =====================================================
     enum RenderStyleEnum {
-        FRONT, 
-        BACK, 
-        BOUNDING_VOLUME, 
-        IGNORE_DEPTH, 
-        NO_DEPTH_WRITES, 
+        FRONT,
+        BACK,
+        BOUNDING_VOLUME,
+        IGNORE_DEPTH,
+        NO_DEPTH_WRITES,
         POLYGON_OFFSET,
         RenderStyleEnum_MAX
     };
 
     const char * const RenderStyleStrings[] = {
-       "frontfacing",     
-       "backfacing",      
+       "frontfacing",
+       "backfacing",
        "bounding_volume",
-       "ignore_depth", 
+       "ignore_depth",
        "no_depth_writes",
-       "polygon_offset", 
-       "" 
+       "polygon_offset",
+       ""
     };
     DEFINE_BITSET(RenderStyles, RenderStyle, RenderStyleEnum, Y60_BASE_DECL);
 
@@ -650,7 +650,7 @@ namespace y60 {
         ""
     };
     DEFINE_ENUM(PrimitiveType, PrimitiveTypeEnum, Y60_BASE_DECL);
-    
+
     enum TargetBuffersEnum {
         RED_MASK,
         GREEN_MASK,
@@ -662,9 +662,9 @@ namespace y60 {
 
     const char * const TargetBuffersStrings[] = {
         "red",
-        "green", 
-        "blue", 
-        "alpha", 
+        "green",
+        "blue",
+        "alpha",
         "depth",
         ""
     };
@@ -733,7 +733,7 @@ namespace y60 {
         "stop",
         0
     };
-    
+
     // === VBO usage ====================================================
     enum VertexBufferUsageEnum {
         VERTEX_USAGE_UNDEFINED = 0,
@@ -762,11 +762,11 @@ namespace y60 {
             "static_copy",
             "dynamic_draw",
             "dynamic_read",
-            "dynamic_copy", 
+            "dynamic_copy",
             ""
     };
     DEFINE_ENUM(VertexBufferUsage, VertexBufferUsageEnum, Y60_BASE_DECL);
-   
+
     Y60_BASE_DECL VertexBufferUsage getDefaultVertexBufferUsage();
 
 }

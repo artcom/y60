@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 
@@ -75,12 +75,12 @@ OscSenderUnitTest.prototype.Constructor = function(obj, theName) {
         obj.myOscSender1.connect("127.0.0.1", 7001, 7000);
         //obj.myOscSender1.connect("10.1.2.55", 12000, 7000);
         obj.myNode = new Node("<OscEvent type='move'/>");
-        obj.myChildNode = new Node("<float>15</float>");        
+        obj.myChildNode = new Node("<float>15</float>");
         obj.myNode.firstChild.appendChild(obj.myChildNode.firstChild);
-        ENSURE('obj.myOscSender1.write(obj.myNode.firstChild) == 36');        
+        ENSURE('obj.myOscSender1.write(obj.myNode.firstChild) == 36');
 
         obj.myInvalidNode = new Node("<OscEvent typo='move'/>");
-        ENSURE('obj.myOscSender1.write(obj.myInvalidNode.firstChild) == 0');                
+        ENSURE('obj.myOscSender1.write(obj.myInvalidNode.firstChild) == 0');
     }
 };
 

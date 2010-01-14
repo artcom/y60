@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -89,10 +89,10 @@ namespace y60 {
     enum CgAutoParameterID {
         OBJECTWORLD,OBJECTWORLD_I,OBJECTWORLD_T,OBJECTWORLD_IT,
         CAMERA_POSITION, CAMERA_I, CAMERA_T, VIEWPROJECTION, TEXTURE_MATRICES,
-        POSITIONAL_LIGHTS, DIRECTIONAL_LIGHTS, SPOT_LIGHTS, 
+        POSITIONAL_LIGHTS, DIRECTIONAL_LIGHTS, SPOT_LIGHTS,
         POSITIONAL_LIGHTS_DIFFUSE_COLOR, DIRECTIONAL_LIGHTS_DIFFUSE_COLOR, SPOT_LIGHTS_DIFFUSE_COLOR,
         POSITIONAL_LIGHTS_SPECULAR_COLOR, DIRECTIONAL_LIGHTS_SPECULAR_COLOR, SPOT_LIGHTS_SPECULAR_COLOR,
-        AMBIENT_LIGHT_COLOR,  
+        AMBIENT_LIGHT_COLOR,
         SPOT_LIGHTS_CUTOFF,
         SPOT_LIGHTS_EXPONENT,
         SPOT_LIGHTS_DIRECTION,
@@ -288,7 +288,7 @@ namespace y60 {
 
             std::vector<const char *> _myCachedCompilerArgs;
             std::string _myCgProgramString;
-            bool                        _myUsesLights;    
+            bool                        _myUsesLights;
     };
 
     typedef asl::Ptr<CgProgramInfo> CgProgramInfoPtr;

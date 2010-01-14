@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -80,7 +80,7 @@ using namespace asl;
 namespace y60 {
 
     const int MAX_PORTS = 4;
-    
+
     DC1394::DC1394(asl::DLHandle theDLHandle) : PlugInBase(theDLHandle), // _myFirewire(0),
             _myDevices(0), _myDeviceCount(0), _hasRingBuffer(false), _isTransmitting(false)
     {
@@ -93,7 +93,7 @@ namespace y60 {
         resetBus();
     }
 
-    void 
+    void
     DC1394::scanBus() {
 
          dc1394camera_list_t * myCamList;
@@ -116,7 +116,7 @@ namespace y60 {
          for (int i = 0; i < myCamList->num; i++) {
              dc1394camera_t * myCamera = dc1394_camera_new( d, myCamList->ids[i].guid );
              if (!myCamera) {
-                 AC_ERROR << "Failed to initialize camera with guid " 
+                 AC_ERROR << "Failed to initialize camera with guid "
                           << myCamList->ids[i].guid ;
                  continue;
              } else {
@@ -142,29 +142,29 @@ namespace y60 {
         dc1394camera_t * myCamera = &getDeviceHandle();
         dc1394video_frame_t * myFrame = NULL;
 
-        dc1394error_t myStatus = dc1394_capture_dequeue( myCamera, 
-                                                         DC1394_CAPTURE_POLICY_POLL, 
+        dc1394error_t myStatus = dc1394_capture_dequeue( myCamera,
+                                                         DC1394_CAPTURE_POLICY_POLL,
                                                          &myFrame );
         ASSERT_DC1394(myStatus);
 
         if (myFrame) {
             unsigned int myWidth = 0;
             unsigned int myHeight = 0;
-            myStatus = dc1394_get_image_size_from_video_mode( myCamera, 
-                                                              _myVideoMode, 
+            myStatus = dc1394_get_image_size_from_video_mode( myCamera,
+                                                              _myVideoMode,
                                                               &myWidth, &myHeight);
             ASSERT_DC1394(myStatus);
-            
+
             dc1394color_coding_t myColorCoding;
-            myStatus = dc1394_get_color_coding_from_video_mode( myCamera, 
-                                                                _myVideoMode, 
+            myStatus = dc1394_get_color_coding_from_video_mode( myCamera,
+                                                                _myVideoMode,
                                                                 &myColorCoding);
             ASSERT_DC1394(myStatus);
 
             theTargetRaster->resize(myWidth, myHeight);
-            myStatus = dc1394_convert_to_RGB8( myFrame->image, 
-                                               theTargetRaster->pixels().begin(), 
-                                               myWidth, myHeight, DC1394_BYTE_ORDER_UYVY, 
+            myStatus = dc1394_convert_to_RGB8( myFrame->image,
+                                               theTargetRaster->pixels().begin(),
+                                               myWidth, myHeight, DC1394_BYTE_ORDER_UYVY,
                                                myColorCoding, 8 );
             ASSERT_DC1394(myStatus);
 
@@ -174,25 +174,25 @@ namespace y60 {
     }
 
     template<typename T>
-    void DC1394::getOption( const std::string & theOptionString, 
+    void DC1394::getOption( const std::string & theOptionString,
                             const std::string & theUrl,
-                            T & theOption ) 
+                            T & theOption )
     {
 
         std::string::size_type idx = theUrl.find( theOptionString + "=" );
         std::string::size_type optpos = idx + theOptionString.length() + 1;
 
-        if (idx != std::string::npos) 
+        if (idx != std::string::npos)
         {
-            std::string myValStr = theUrl.substr( optpos ); 
+            std::string myValStr = theUrl.substr( optpos );
             if (!myValStr.empty()) {
                 idx = myValStr.find(",");
                 if (idx != std::string::npos) {
                     myValStr = myValStr.substr( 0, idx );
                 }
-                theOption = asl::as<T>( myValStr ); 
+                theOption = asl::as<T>( myValStr );
             }
-        } 
+        }
 
     }
 
@@ -223,10 +223,10 @@ namespace y60 {
         getOption("gain", theFilename, myGain);
 
         if (myDeviceId >= _myDeviceCount) {
-            throw asl::Exception( "No such Device. Highest available DeviceId is: " 
+            throw asl::Exception( "No such Device. Highest available DeviceId is: "
                                   + _myDeviceCount-1, PLUS_FILE_LINE);
-        } 
-      
+        }
+
         if (myVideoModeString == "160x120_YUV444") {
             _myVideoMode = DC1394_VIDEO_MODE_160x120_YUV444;
         } else if (myVideoModeString == "320x240_YUV422") {
@@ -244,15 +244,15 @@ namespace y60 {
             myStatus = dc1394_video_get_supported_modes( myCamera, &myModes );
             std::string myModeList = "VideoModes: ";
             for (unsigned i = 0; i < myModes.num; i++) {
-                myModeList += myModes.modes[i] + " "; 
+                myModeList += myModes.modes[i] + " ";
             }
-            AC_PRINT << myModeList; 
+            AC_PRINT << myModeList;
             throw Exception("Unknown video mode", PLUS_FILE_LINE);
         }
 
         myStatus = dc1394_video_set_mode(myCamera, _myVideoMode);
         ASSERT_DC1394(myStatus);
-       
+
         unsigned int myWidth;
         unsigned int myHeight;
         myStatus = dc1394_get_image_size_from_video_mode(myCamera, _myVideoMode, &myWidth, &myHeight);
@@ -295,10 +295,10 @@ namespace y60 {
         _isTransmitting = false;
         CaptureDevice::stopCapture();
     }
-    
+
     void DC1394::startCapture() {
         if (!_hasRingBuffer) {
-            throw asl::Exception("can not start capture: not DMA buffer initailized", PLUS_FILE_LINE); 
+            throw asl::Exception("can not start capture: not DMA buffer initailized", PLUS_FILE_LINE);
         }
         dc1394_video_set_transmission(&getDeviceHandle(), DC1394_ON);
         _isTransmitting = true;
@@ -311,7 +311,7 @@ namespace y60 {
         CaptureDevice::pauseCapture();
     }
 
-    void 
+    void
     DC1394::initRingBuffer() {
         if (_hasRingBuffer) {
             freeRingBuffer();
@@ -319,13 +319,13 @@ namespace y60 {
         dc1394error_t myStatus = dc1394_video_set_iso_speed (&getDeviceHandle(), DC1394_ISO_SPEED_400);
         ASSERT_DC1394(myStatus);
 
-        myStatus = dc1394_capture_setup(&getDeviceHandle(), 10, 
+        myStatus = dc1394_capture_setup(&getDeviceHandle(), 10,
                                         DC1394_CAPTURE_FLAGS_DEFAULT);
         ASSERT_DC1394(myStatus);
         _hasRingBuffer = true;
     }
 
-    void 
+    void
     DC1394::freeRingBuffer() {
         if (_isTransmitting) {
             dc1394_video_set_transmission(&getDeviceHandle(), DC1394_OFF);

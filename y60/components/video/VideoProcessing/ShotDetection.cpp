@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -60,7 +60,7 @@
 
 namespace y60 {
 
-    ShotDetectionAlgorithm::ShotDetectionAlgorithm(const std::string & theName) : 
+    ShotDetectionAlgorithm::ShotDetectionAlgorithm(const std::string & theName) :
     Algorithm( theName ),
     _myResultNode("shots"),
     _mySourceRaster(),
@@ -72,7 +72,7 @@ namespace y60 {
         clearHistogram(1);
     }
 
-void 
+void
 ShotDetectionAlgorithm::onFrame(double theTime) {
     const BGRRaster * myFrame = dom::dynamic_cast_Value<BGRRaster>(_mySourceRaster.get());
     static int n = 0;
@@ -80,7 +80,7 @@ ShotDetectionAlgorithm::onFrame(double theTime) {
     //clear current histogram
     clearHistogram(n);
 
-    //compute histogram for current frame 
+    //compute histogram for current frame
     int myScaled;
     int myFactors[] = {1, BINS_PER_CHANNEL, BINS_PER_CHANNEL*BINS_PER_CHANNEL };
     BGRRaster::const_iterator it;
@@ -92,8 +92,8 @@ ShotDetectionAlgorithm::onFrame(double theTime) {
         }
 
         /*
-        AC_ERROR << myBin 
-        << " color " << int((*it)[0]) << "," 
+        AC_ERROR << myBin
+        << " color " << int((*it)[0]) << ","
         << int((*it)[1]) << "," << int((*it)[2]);
         */
         _myHistogram[n][myBin]++;
@@ -115,12 +115,12 @@ ShotDetectionAlgorithm::onFrame(double theTime) {
 
     if (_myResultNode.childNodesLength() > 0) {
         //update length of current shot node
-        dom::NodePtr myCurrentShot 
+        dom::NodePtr myCurrentShot
             = _myResultNode.childNode(_myResultNode.childNodesLength()-1);
         (*myCurrentShot)["length"] = asl::as_string(myLength);
     }
 
-    AC_DEBUG << "************** diff at " << theTime << " is " << myDifference; 
+    AC_DEBUG << "************** diff at " << theTime << " is " << myDifference;
     if (myDifference < _myThreshold) {
         //we have a potential shot
 
@@ -132,9 +132,9 @@ ShotDetectionAlgorithm::onFrame(double theTime) {
             myShotNode["length"] = asl::as_string(0);
 
             addHistogram(n, myShotNode);
-            _myResultNode.appendChild(myShotNode);                
+            _myResultNode.appendChild(myShotNode);
 
-            AC_INFO << "SHOT at " << theTime << " last shot length " << myLength 
+            AC_INFO << "SHOT at " << theTime << " last shot length " << myLength
                 << " (" << myDifference << ")";
         }
         _myLastShotTime = theTime;
@@ -144,25 +144,25 @@ ShotDetectionAlgorithm::onFrame(double theTime) {
     n = 1 - n;
 }
 
-void 
-ShotDetectionAlgorithm::configure(const dom::Node & theNode) { 
+void
+ShotDetectionAlgorithm::configure(const dom::Node & theNode) {
     try {
-        AC_INFO << "configure scene " << _myScene; 
+        AC_INFO << "configure scene " << _myScene;
         for( unsigned int i=0; i<theNode.childNodesLength(); i++) {
             const std::string myName = theNode.childNode("property",0)->getAttribute("name")->nodeValue();
             const std::string myValue = theNode.childNode("property",0)->getAttribute("value")->nodeValue();
             AC_INFO << "configure " << myName << " " << myValue;
-            if( myName == "sourceimage") {  
-                dom::NodePtr myImage = _myScene->getSceneDom()->getElementById(myValue);   
+            if( myName == "sourceimage") {
+                dom::NodePtr myImage = _myScene->getSceneDom()->getElementById(myValue);
                 if( myImage ) {
                     _mySourceRaster =  myImage->getFacade<y60::Image>()->getRasterValue();
                     //AC_INFO << "got source raster" << _mySourceRaster;
                 }
             } else if( myName == "threshold" ) {
-                asl::fromString(theNode["threshold"].nodeValue(), _myThreshold);    
+                asl::fromString(theNode["threshold"].nodeValue(), _myThreshold);
             } else if( myName == "minimal_length" ) {
-                asl::fromString(theNode["minimal_length"].nodeValue(), _myMinimalShotLength);   
-            }   
+                asl::fromString(theNode["minimal_length"].nodeValue(), _myMinimalShotLength);
+            }
 
         }
     } catch(asl::Exception ex) {
@@ -173,19 +173,19 @@ ShotDetectionAlgorithm::configure(const dom::Node & theNode) {
     AC_INFO << "ShotDetection::configure min. shot length " << _myMinimalShotLength;
 }
 
-const dom::Node & 
-ShotDetectionAlgorithm::result() const { 
+const dom::Node &
+ShotDetectionAlgorithm::result() const {
     return _myResultNode;
 }
 
-void 
+void
 ShotDetectionAlgorithm::clearHistogram(int theIndex) {
     for(int b = 0; b < NBINS; ++b) {
         _myHistogram[theIndex][b] = 0;
     }
 }
 
-unsigned long 
+unsigned long
 ShotDetectionAlgorithm::intersectHistograms() {
     unsigned long myTotal = 0;
     for(int b = 0; b < NBINS; ++b) {
@@ -195,7 +195,7 @@ ShotDetectionAlgorithm::intersectHistograms() {
 }
 
 //debug
-void 
+void
 ShotDetectionAlgorithm::printHistogram(int theIndex) {
     for(int b = 0; b < NBINS; ++b) {
         std::cout << _myHistogram[theIndex][b] << " ";
@@ -203,9 +203,9 @@ ShotDetectionAlgorithm::printHistogram(int theIndex) {
     std::cout << std::endl;
 }
 
-void 
+void
 ShotDetectionAlgorithm::addHistogram(int theIndex, dom::Node & theNode) {
-    y60::VectorOfUnsignedInt myHistogram(_myHistogram[theIndex], 
+    y60::VectorOfUnsignedInt myHistogram(_myHistogram[theIndex],
         _myHistogram[theIndex] + NBINS);
     theNode("histogram").appendChild( dom::Text(asl::as_string(myHistogram)) );
 }

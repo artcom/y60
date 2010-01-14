@@ -31,9 +31,9 @@ class RingBuffer
 public:
 	RingBuffer(int size);
 	~RingBuffer();
-	
+
 	int size();
-	
+
 	unsigned char* getNextBufferToWrite();
 	void writeFinished();
 	unsigned char* getNextBufferToRead();
@@ -42,7 +42,7 @@ public:
 private:
 	int nextIndex( int index );
 	int bufferSize;
-	
+
 	unsigned char* buffer[3];
 	volatile char readIndex;
 	volatile char writeIndex;

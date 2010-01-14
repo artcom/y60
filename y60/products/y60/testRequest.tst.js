@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -88,7 +88,7 @@ RequestUnitTest.prototype.Constructor = function(obj, theName) {
         if (myPort == 0) {
             myPort = 2345;
         }
-        
+
         obj.myTestServer = new TestServer("localhost",myPort);
         obj.myTestServer.start();
 
@@ -98,18 +98,18 @@ RequestUnitTest.prototype.Constructor = function(obj, theName) {
             print ("onDone called on "+this);
        };
 
-        
+
        /*
        obj.myPostRequest = new Request("http://himmel/~martin/upload.php");
-       
+
        obj.myPostRequest.postFile("/usr/lib/libc.a");
        obj.myPostRequest.addHttpHeader("X-Filename","SomeLogo.gif");
        obj.myPostRequest.onDone = function() {
            print (this.responseString);
        };
        obj.myManager.performRequest(obj.myPostRequest);
-       */ 
-        
+       */
+
         ENSURE("obj.myRequest != null");
         ENSURE("obj.myManager.activeCount==0");
         obj.myManager.performRequest(obj.myRequest);
@@ -125,9 +125,9 @@ RequestUnitTest.prototype.Constructor = function(obj, theName) {
             obj.myErrorCode = theErrorCode;
             //print ("onError called with code: " + theErrorCode);
         };
-        
+
         obj.myManager.performRequest(obj.myTimeoutRequest);
-        
+
 
         // loop until no more active requests
         // when using a Renderer, this will happen in the
@@ -141,7 +141,7 @@ RequestUnitTest.prototype.Constructor = function(obj, theName) {
         // check if tests needs at least the timeout and max 100 seconds
         ENSURE("obj.myDiffTime >= obj.myTimeout");
         ENSURE("obj.myDiffTime < 100");
-         
+
         ENSURE("obj.myManager.activeCount==0");
         ENSURE("obj.myRequest.responseCode==200");
         print("obj.myTimeoutRequest.responseCode: " + obj.myTimeoutRequest.responseCode);

@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -72,8 +72,8 @@ namespace jslib {
     }
 
     JSBool
-    JSNodeList::item(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, 
-            jsval *rval) 
+    JSNodeList::item(JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
+            jsval *rval)
     {
         DOC_BEGIN("Returns a node with a given index from the nodelist");
         DOC_PARAM("theIndex", "Index of the node to retrieve", DOC_TYPE_INTEGER);
@@ -170,7 +170,7 @@ namespace jslib {
     };
 
     JSBool
-    JSNodeList::Constructor(JSContext *cx, JSObject *obj, uintN argc, 
+    JSNodeList::Constructor(JSContext *cx, JSObject *obj, uintN argc,
             jsval *argv, jsval *rval) {
         DOC_BEGIN("Creates a new node list");
         DOC_END;
@@ -199,7 +199,7 @@ namespace jslib {
         return Base::Construct(cx, theNode, theList);
     }
 
-    JSNodeList::JSNodeList(dom::NodePtr theNode, 
+    JSNodeList::JSNodeList(dom::NodePtr theNode,
             NodeList * theNodeList)
         : Base(theNode, theNodeList)
     {}

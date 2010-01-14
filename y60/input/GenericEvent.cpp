@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -62,7 +62,7 @@
 
 namespace y60 {
 
-GenericEvent::GenericEvent(const std::string & theCallback, 
+GenericEvent::GenericEvent(const std::string & theCallback,
                            const dom::NodePtr & theSchemaDoc,
                            const dom::ValueFactoryPtr & theValueFactory) :
     Event( GENERIC, asl::Time() ),
@@ -101,12 +101,12 @@ GenericEvent::asNode() {
     return _myDocument->firstChild();
 }
 
-dom::NodePtr 
+dom::NodePtr
 GenericEvent::getNode() const {
     return _myDocument->firstChild();
 }
 
-dom::NodePtr 
+dom::NodePtr
 GenericEvent::getDocument() const {
     return _myDocument;
 }

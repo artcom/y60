@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -84,7 +84,7 @@ namespace y60 {
 
 #define SafeRelease(p) { if( (p) != 0 ) { (p)->Release(); (p)= NULL; } }
 
-static const GUID CLSID_ColorSpaceConverter = 
+static const GUID CLSID_ColorSpaceConverter =
 {0x1643E180,0x90F5,0x11CE, {0x97, 0xD5, 0x00, 0xAA, 0x00, 0x55, 0x59, 0x5A }};
 
 DShowGraph::DShowGraph()
@@ -99,9 +99,9 @@ DShowGraph::DShowGraph()
 	m_fIsScaling    = false;	// no scaling
 	m_dwGraphRegister = 1;		// init it to indicate if it is registered.
 
-	_myDesiredFrameRate = 25; 
+	_myDesiredFrameRate = 25;
 	_myDesiredHeight = 320;
-	_myDesiredWidth = 240; 
+	_myDesiredWidth = 240;
     _myDesiredBits = 24;
     _myDesiredVideoStandard = AnalogVideo_PAL_B;
 
@@ -116,23 +116,23 @@ DShowGraph::~DShowGraph()
     stopGraph();
     destroyFilterGraph();
 	if (m_pTrackingCB) {
-	    delete m_pTrackingCB; 
+	    delete m_pTrackingCB;
 	}
 }
 
 void DShowGraph::setAnalogVideoFormat(void)
 {
     HRESULT hr;
-    IAMAnalogVideoDecoder *pIAmAVD = NULL; 
+    IAMAnalogVideoDecoder *pIAmAVD = NULL;
     long lValue = 0;
 
-    hr = m_pCaptureGraphBuilder2->FindInterface(NULL, 
-        &MEDIATYPE_Video, m_pSrcFilter, 
+    hr = m_pCaptureGraphBuilder2->FindInterface(NULL,
+        &MEDIATYPE_Video, m_pSrcFilter,
         IID_IAMAnalogVideoDecoder, (void **)&pIAmAVD);
     if(FAILED(hr))
     {
-        // this interface is only supported by WDM drivers. 
-        // If this failed, we're probably looking at a VfW 
+        // this interface is only supported by WDM drivers.
+        // If this failed, we're probably looking at a VfW
         // driver. No harm, no foul.
         return;
     }
@@ -166,14 +166,14 @@ bool DShowGraph::buildCaptureGraph(IBaseFilter * pSrcFilter, int theIndex) {
 		IID_ICaptureGraphBuilder2, (void **) &m_pCaptureGraphBuilder2);
 	if (FAILED(hr))	{
 	    checkForDShowError(hr, "CoCreateInstance(m_pCaptureGraphBuilder2) failed", PLUS_FILE_LINE);
-	    return false; 
+	    return false;
 	}
 	// Attach the filter graph to the capture graph
 
 	hr = m_pCaptureGraphBuilder2->SetFiltergraph(m_pGraphBuilder);
 	if (FAILED(hr))	{
 	    checkForDShowError(hr, "SetFiltergraph(m_pGraphBuilder) failed", PLUS_FILE_LINE);
-	    return false; 
+	    return false;
 	}
 
 	if (pSrcFilter == 0) {
@@ -182,9 +182,9 @@ bool DShowGraph::buildCaptureGraph(IBaseFilter * pSrcFilter, int theIndex) {
 		hr = findCaptureDevice(&pSrcFilter, theIndex);
 	    if (FAILED(hr))	{
 	        checkForDShowError(hr, "findCaptureDevice failed", PLUS_FILE_LINE);
-	        return false; 
+	        return false;
 	    }
-		
+
 	}
 	m_pSrcFilter = pSrcFilter;
 
@@ -192,15 +192,15 @@ bool DShowGraph::buildCaptureGraph(IBaseFilter * pSrcFilter, int theIndex) {
 	hr = m_pGraphBuilder->AddFilter(pSrcFilter, L"Video Capture");
 	if (FAILED(hr))	{
 	    checkForDShowError(hr, "AddFilter(\"Video Capture\") failed", PLUS_FILE_LINE);
-	    return false; 
+	    return false;
 	}
-	
+
 	setAnalogVideoFormat();
-	
+
 	addExtraFilters();
 
     hr = selectVideoFormat();
-    
+
 	if (FAILED(hr)) {
 	    checkForDShowError(hr, "selectVideoFormat() failed", PLUS_FILE_LINE);
     	//return false;  // unable to build graph
@@ -222,7 +222,7 @@ bool DShowGraph::buildCaptureGraph(IBaseFilter * pSrcFilter, int theIndex) {
     SafeRelease(pIn);
     if (FAILED(hr))    {
         checkForDShowError(hr, "m_pGraphBuilder->Connect() failed", PLUS_FILE_LINE);
-        return false; 
+        return false;
     }
 
     pOut = get_pin(m_pGrabFilter, PINDIR_OUTPUT);
@@ -230,12 +230,12 @@ bool DShowGraph::buildCaptureGraph(IBaseFilter * pSrcFilter, int theIndex) {
     SafeRelease(pOut);
     if (FAILED(hr))    {
         checkForDShowError(hr, "m_pGraphBuilder->Render() failed", PLUS_FILE_LINE);
-        //return false; 
+        //return false;
     }
 
     // Now that the filter has been added to the graph and we have
     // rendered its stream, we can release this reference to the filter.
-    
+
 
     // Don't release the source filter, it will be released in the DTOR
     //SafeRelease( pSrcFilter );
@@ -246,11 +246,11 @@ bool DShowGraph::createFilterGraph(int theIndex, unsigned theInputPinNumber)
 {
     HRESULT hr;
 
-    hr = CoCreateInstance(CLSID_FilterGraph, NULL, CLSCTX_INPROC, 
+    hr = CoCreateInstance(CLSID_FilterGraph, NULL, CLSCTX_INPROC,
                       IID_IGraphBuilder, (void **)&m_pGraphBuilder);
     if (FAILED(hr))    {
         checkForDShowError(hr, "CoCreateInstance(m_pGraphBuilder) failed", PLUS_FILE_LINE);
-        return false; 
+        return false;
     }
     m_pGraphBuilder->QueryInterface(IID_IMediaControl,(void**)&m_pMediaControl);
     m_pGraphBuilder->QueryInterface(IID_IFilterGraph, (void**)&m_pFilterGraph);
@@ -281,7 +281,7 @@ void DShowGraph::destroyFilterGraph()
     releaseExtraFilters();
 }
 
-void DShowGraph::startGraph() 
+void DShowGraph::startGraph()
 {
     HRESULT hr;
     if( m_pMediaControl )
@@ -295,11 +295,11 @@ void DShowGraph::startGraph()
             }
         }
         //hr = m_pMediaControl->Run();
-        
+
     }
 }
 
-void DShowGraph::stopGraph() 
+void DShowGraph::stopGraph()
 {
     if( m_pMediaControl )
     {
@@ -316,7 +316,7 @@ HRESULT DShowGraph::findCaptureDevice(IBaseFilter ** ppSrcFilter, int theDeviceI
     IBaseFilter * pSrc = NULL;
     CComPtr <IMoniker> pMoniker =NULL;
     ULONG cFetched;
-   
+
     // Create the system device enumerator
     CComPtr <ICreateDevEnum> pDevEnum =NULL;
 
@@ -345,7 +345,7 @@ HRESULT DShowGraph::findCaptureDevice(IBaseFilter ** ppSrcFilter, int theDeviceI
             return hr;
         } else {
             IPropertyBag *pPropBag;
-            hr = pMoniker->BindToStorage(0, 0, IID_IPropertyBag, 
+            hr = pMoniker->BindToStorage(0, 0, IID_IPropertyBag,
                 (void**)(&pPropBag));
             // Find the description or friendly name.
             VARIANT varName;
@@ -360,14 +360,14 @@ HRESULT DShowGraph::findCaptureDevice(IBaseFilter ** ppSrcFilter, int theDeviceI
                 // Add it to the application's list box.
                 _myDevice = std::string(asl::convertBSTRToLPSTR(varName.bstrVal));
                 AC_DEBUG << "Capture Device is: " << _myDevice;
-                VariantClear(&varName); 
+                VariantClear(&varName);
             }
             pPropBag->Release();
         }
     }
     else
     {
-        AC_ERROR << "Unable to access video capture device!";   
+        AC_ERROR << "Unable to access video capture device!";
         return E_FAIL;
     }
     // Copy the found filter pointer to the output parameter.
@@ -383,7 +383,7 @@ void DShowGraph::setCameraParams(unsigned long theWhiteBalanceU, unsigned long t
     CComQIPtr<IAVTDolphinPropSet, &PROPSETID_VIDCAP_AVT> pAVTFilter(m_pSrcFilter);
 
     if(pAVTFilter) {
-        AC_DEBUG << "Found AVT camera interface." << endl;        
+        AC_DEBUG << "Found AVT camera interface." << endl;
         HRESULT hr;
         hr = pAVTFilter->SetWhitebalanceU(theWhiteBalanceU, 0, 0);
         checkForDShowError(hr, "SetWhiteBalanceU", PLUS_FILE_LINE);
@@ -395,8 +395,8 @@ void DShowGraph::setCameraParams(unsigned long theWhiteBalanceU, unsigned long t
         checkForDShowError(hr, "SetExposure", PLUS_FILE_LINE);
     } else {
         AC_DEBUG << "AVT camera interface not found." << endl;
-    }  
-    
+    }
+
 
 // [CH+CM]: This code works, but the parameter passing is not implemented, yet.
 //          So please leave this block, for further improvement.
@@ -428,14 +428,14 @@ void DShowGraph::setCameraParams(unsigned long theWhiteBalanceU, unsigned long t
 
         pProcAmp->Get(VideoProcAmp_Brightness, &Val, &Flags);
         AC_DEBUG << "get brightness returns: " << Val << " " << Flags;
- 
+
     } else {
         AC_DEBUG << "AMVideoProcAmp interface not found.";
     }
 
     IAMCameraControl * pCamContr = 0;
     m_pSrcFilter->QueryInterface(IID_IAMCameraControl , (void**)&pCamContr);
-    
+
     if (pCamContr) {
         long Min, Max, Step, Default, Flags, Val;
         AC_DEBUG << "AMCameraControl interface found.";
@@ -464,7 +464,7 @@ IPin* DShowGraph::get_pin( IBaseFilter* pFilter, PIN_DIRECTION dir )
             for(;;)
             {
                 ULONG  cFetched = 0;
-                PIN_DIRECTION pinDir = PIN_DIRECTION(-1); 
+                PIN_DIRECTION pinDir = PIN_DIRECTION(-1);
                 pPin = 0;
 
                 pEnumPins->Next( 1, &pPin, &cFetched );
@@ -482,7 +482,7 @@ IPin* DShowGraph::get_pin( IBaseFilter* pFilter, PIN_DIRECTION dir )
     return pPin;
 }
 
-HRESULT DShowGraph::addGraphToRot(IUnknown *pUnkGraph, DWORD *pdwRegister) 
+HRESULT DShowGraph::addGraphToRot(IUnknown *pUnkGraph, DWORD *pdwRegister)
 {
     IMoniker * pMoniker;
     IRunningObjectTable *pROT;
@@ -493,7 +493,7 @@ HRESULT DShowGraph::addGraphToRot(IUnknown *pUnkGraph, DWORD *pdwRegister)
         return E_FAIL;
     }
 
-    wsprintfW(wsz, L"FilterGraph %08x pid %08x", (DWORD_PTR)pUnkGraph, 
+    wsprintfW(wsz, L"FilterGraph %08x pid %08x", (DWORD_PTR)pUnkGraph,
               GetCurrentProcessId());
 
     hr = CreateItemMoniker(L"!", wsz, &pMoniker);
@@ -528,7 +528,7 @@ void DShowGraph::CaptureLive(int theIndex, unsigned theInputPinNumber)
     }
 }
 
-unsigned char* DShowGraph::lockImage() 
+unsigned char* DShowGraph::lockImage()
 {
     if (m_pTrackingCB) {
         return m_pTrackingCB->lockImage();
@@ -537,11 +537,11 @@ unsigned char* DShowGraph::lockImage()
     }
 }
 
-void DShowGraph::Play(){ 
+void DShowGraph::Play(){
     if (!this->m_fstartGraph)
         this->startGraph();
     this->m_fstartGraph = true;
-    m_pMediaControl->Run(); 
+    m_pMediaControl->Run();
 }
 
 
@@ -557,12 +557,12 @@ HRESULT DShowGraph::selectVideoFormat() {
 
     // get format being used NOW
     AM_MEDIA_TYPE *pmt;
-    
+
     hr = pSC->GetFormat(&pmt);
     if (FAILED(hr)) {
         checkForDShowError(hr, "GetFormat() failed", PLUS_FILE_LINE);
     }
-    
+
     //check the media subtype
     if ( !IsEqualGUID( pmt->subtype,  MEDIASUBTYPE_RGB24) ||
          !((VIDEOINFO *)pmt->pbFormat) )
@@ -570,8 +570,8 @@ HRESULT DShowGraph::selectVideoFormat() {
         AC_WARNING << "Video capture device does not use selected media subtype 'RGB24' by default.";
     }
 
-    //check the resolution 
-    VIDEOINFOHEADER *pVih = reinterpret_cast<VIDEOINFOHEADER*>(pmt->pbFormat);    
+    //check the resolution
+    VIDEOINFOHEADER *pVih = reinterpret_cast<VIDEOINFOHEADER*>(pmt->pbFormat);
     if ((pVih->bmiHeader.biWidth != _myDesiredWidth) ||
         (pVih->bmiHeader.biHeight != _myDesiredHeight))
     {
@@ -619,7 +619,7 @@ HRESULT DShowGraph::selectVideoFormat() {
     pmt->pUnk = 0;
 
     AC_DEBUG << "w=" << _myDesiredWidth << ", h=" << _myDesiredHeight << ", framerate=" << _myDesiredFrameRate << ", bits=" << _myDesiredBits;
-    
+
     hr = pSC->SetFormat(pmt);
     if (FAILED(hr)) {
         checkForDShowError(hr, "Set stream format 'SetFormat()' failed", PLUS_FILE_LINE);
@@ -641,7 +641,7 @@ void DShowGraph::setDesiredVideoFormat(int theWidth, int theHeight, int theFps, 
 void DShowGraph::addExtraFilters()
 {
     // Instanciate the ISampleGrabber filter
-    HRESULT hr = CoCreateInstance(CLSID_SampleGrabber, NULL, CLSCTX_INPROC_SERVER, 
+    HRESULT hr = CoCreateInstance(CLSID_SampleGrabber, NULL, CLSCTX_INPROC_SERVER,
                                        IID_IBaseFilter, (LPVOID *)&m_pGrabFilter);
     m_pGrabFilter->QueryInterface(IID_ISampleGrabber, (void **)&m_pSampleGrabber);
     if (FAILED(hr)) {
@@ -668,28 +668,28 @@ void DShowGraph::addExtraFilters()
 
     // Sometimes, we may need the color converter to add in the SampleGrabber
     // Filter. So just add one into the graph. If it is needed, it will be used
-    // Otherwise, it will be idle. 
-    hr = CoCreateInstance( CLSID_ColorSpaceConverter, NULL, CLSCTX_INPROC_SERVER, 
+    // Otherwise, it will be idle.
+    hr = CoCreateInstance( CLSID_ColorSpaceConverter, NULL, CLSCTX_INPROC_SERVER,
                  IID_IBaseFilter, (void **)&m_pColorConv );
     m_pFilterGraph->AddFilter(m_pColorConv, L"Color Space Converter");
     if (FAILED(hr)) {
         checkForDShowError(hr, "Add filter 'Color Space Converter' failed", PLUS_FILE_LINE);
     }
 
-    // Normally, we donot need to connect the PIN by ourselves. 
+    // Normally, we donot need to connect the PIN by ourselves.
     // it will be correctly connected when using Render().
     // So we do not connect these two filters together.
     // XXX !(show Video)?
     if (true) {
         IBaseFilter * pNull;
-        hr = CoCreateInstance(CLSID_NullRenderer, NULL, CLSCTX_INPROC_SERVER, 
+        hr = CoCreateInstance(CLSID_NullRenderer, NULL, CLSCTX_INPROC_SERVER,
                               IID_IBaseFilter, (LPVOID*) &pNull);
         m_pFilterGraph->AddFilter(pNull, L"NullRender");
-        
+
         // we can release the reference to the null render
         // after it has been added to the video graph.
         SafeRelease(pNull);
-        
+
     }
 }
 
@@ -721,8 +721,8 @@ void DShowGraph::initExtraFilters() {
 std::string DShowGraph::pinToString(long lType)
 {
     std::string myString;
-    switch (lType) 
-    {   
+    switch (lType)
+    {
         case PhysConn_Video_Tuner:           myString = std::string("Video Tuner\0");          break;
         case PhysConn_Video_Composite:       myString = std::string("Video Composite\0");      break;
         case PhysConn_Video_SVideo:          myString = std::string("Video SVideo\0");         break;
@@ -736,7 +736,7 @@ std::string DShowGraph::pinToString(long lType)
         case PhysConn_Video_USB:             myString = std::string("Video USB\0");            break;
         case PhysConn_Video_VideoDecoder:    myString = std::string("Video Decoder\0");        break;
         case PhysConn_Video_VideoEncoder:    myString = std::string("Video Encoder\0");        break;
-    
+
         case PhysConn_Audio_Tuner:           myString = std::string("Audio Tuner\0");          break;
         case PhysConn_Audio_Line:            myString = std::string("Audio Line\0");           break;
         case PhysConn_Audio_Mic:             myString = std::string("Audio Mic\0");            break;
@@ -747,7 +747,7 @@ std::string DShowGraph::pinToString(long lType)
         case PhysConn_Audio_1394:            myString = std::string("Audio 1394\0");           break;
         case PhysConn_Audio_USB:             myString = std::string("Audio USB\0");            break;
         case PhysConn_Audio_AudioDecoder:    myString = std::string("Audio Decoder\0");        break;
-    
+
         default:
             myString = std::string("Unknown\0");
             break;
@@ -781,16 +781,16 @@ void DShowGraph::configCrossbar(unsigned theInputPinNumber) {
     IAMCrossbar *pXBar1 = NULL;
     HRESULT hr = m_pCaptureGraphBuilder2->FindInterface(&LOOK_UPSTREAM_ONLY, NULL, m_pSrcFilter,
         IID_IAMCrossbar, (void**)&pXBar1);
-    if (SUCCEEDED(hr)) 
+    if (SUCCEEDED(hr))
     {
         AC_DEBUG << "Routing Crossbar1 input=" << theInputPinNumber;
         pXBar1->Route(0, theInputPinNumber);
         traceCrossbarInfo(pXBar1);
-        
+
         // Found one crossbar. Get its IBaseFilter interface.
         IBaseFilter *pFilter = NULL;
         hr = pXBar1->QueryInterface(IID_IBaseFilter, (void**)&pFilter);
-        if (SUCCEEDED(hr)) 
+        if (SUCCEEDED(hr))
         {
             // Search upstream for another crossbar.
             IAMCrossbar *pXBar2 = NULL;
@@ -819,7 +819,7 @@ std::vector<std::string> DShowGraph::enumDevices() {
 
     // Create the System Device Enumerator.
     HRESULT hr = CoCreateInstance(CLSID_SystemDeviceEnum, NULL,
-        CLSCTX_INPROC_SERVER, IID_ICreateDevEnum, 
+        CLSCTX_INPROC_SERVER, IID_ICreateDevEnum,
         reinterpret_cast<void**>(&pDevEnum));
     if (SUCCEEDED(hr))
     {
@@ -831,13 +831,13 @@ std::vector<std::string> DShowGraph::enumDevices() {
         while (pEnum->Next(1, &pMoniker, NULL) == S_OK)
         {
             IPropertyBag *pPropBag;
-            hr = pMoniker->BindToStorage(0, 0, IID_IPropertyBag, 
+            hr = pMoniker->BindToStorage(0, 0, IID_IPropertyBag,
                 (void**)(&pPropBag));
             if (FAILED(hr))
             {
                 pMoniker->Release();
                 continue;  // Skip this one, maybe the next one will work.
-            } 
+            }
             // Find the description or friendly name.
             VARIANT varName;
             VariantInit(&varName);
@@ -850,8 +850,8 @@ std::vector<std::string> DShowGraph::enumDevices() {
             {
                 // Add it to the application's list box.
                 myDeviceList.push_back(std::string(asl::convertBSTRToLPSTR(varName.bstrVal)));
-                AC_DEBUG << "Found Device " << myDeviceList.size()-1 << ": " << myDeviceList[myDeviceList.size()-1]; 
-                VariantClear(&varName); 
+                AC_DEBUG << "Found Device " << myDeviceList.size()-1 << ": " << myDeviceList[myDeviceList.size()-1];
+                VariantClear(&varName);
             }
             pPropBag->Release();
             pMoniker->Release();

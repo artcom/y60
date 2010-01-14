@@ -12,7 +12,7 @@
 #include <templog/logging.h>
 
 namespace y60 { namespace ape {
-    
+
 namespace log {
     using namespace templog;
     enum ape_severities {
@@ -42,20 +42,20 @@ namespace log {
 
     typedef logger<root,
             dbg,
-            audience_list<dev,usr> >  
+            audience_list<dev,usr> >
                                                             ape;
     typedef logger<ape,
             dbg,
-            audience_list<dev,usr> >  
+            audience_list<dev,usr> >
                                                                 module;
     typedef logger<module,
             msg,
-            audience_list<dev,usr> >  
+            audience_list<dev,usr> >
                                                                     import;
 
 }}} // end of namespace log, ape, y60
 
-    
+
 #define APE_LOG( logger, sev, aud ) TEMPLOG_LOG( logger, sev, aud )
 
 #else // Y60_APE_HAVE_TEMPLOG

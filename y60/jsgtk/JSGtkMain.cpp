@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -82,8 +82,8 @@ template class JSWrapper<int, asl::Ptr<int>, StaticAccessProtocol>;
 
 asl::Ptr<MessageAcceptor<LocalPolicy> > JSGtkMain::ourAppAcceptor;
 sigc::connection JSGtkMain::ourAcceptorTimeout;
-JSGtkMain::OtherInstanceSignal JSGtkMain::ourOtherInstanceSignal; 
-    
+JSGtkMain::OtherInstanceSignal JSGtkMain::ourOtherInstanceSignal;
+
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
@@ -225,7 +225,7 @@ connect_timeout(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
 
 }
 
-bool 
+bool
 JSGtkMain::on_timeout( JSContext * cx, JSObject * theJSObject, std::string theMethodName) {
     jsval myVal;
     /*JSBool bOK =*/ JS_GetProperty(cx, theJSObject, theMethodName.c_str(), &myVal);
@@ -289,7 +289,7 @@ connect_idle(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 
 }
 
-int 
+int
 JSGtkMain::on_idle( JSContext * cx, JSObject * theJSObject, std::string theMethodName) {
     jsval myVal;
     /*JSBool bOK =*/ JS_GetProperty(cx, theJSObject, theMethodName.c_str(), &myVal);
@@ -306,15 +306,15 @@ JSGtkMain::on_idle( JSContext * cx, JSObject * theJSObject, std::string theMetho
     return myResult;
 }
 
-    
-bool 
+
+bool
 JSGtkMain::onAcceptorTimeout() {
     asl::Ptr<MessageAcceptor<LocalPolicy>::Message> myMessage;
     while (myMessage = JSGtkMain::ourAppAcceptor->popIncomingMessage()) {
         AC_DEBUG << "received '" << myMessage->as_string() << "'";
         JSGtkMain::ourAppAcceptor->pushOutgoingMessage(myMessage->server, "ACK");
         AC_DEBUG << "sent ACK ";
-        ourOtherInstanceSignal.emit(myMessage->as_string()); 
+        ourOtherInstanceSignal.emit(myMessage->as_string());
     }
     return true;
 }
@@ -366,7 +366,7 @@ SetSingleInstance(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *
                     new MessageAcceptor<LocalPolicy>(theApplicationName));
         } catch (const ConduitInUseException &) {
             if (!JSGtkMain::sendToPrevInstance(theApplicationName, theProjectFilename)) {
-#ifdef LINUX            
+#ifdef LINUX
                 // delete dead socket and try again
                 deleteFile(UnixAddress::PIPE_PREFIX + theApplicationName);
                 JSGtkMain::ourAppAcceptor = asl::Ptr<MessageAcceptor<LocalPolicy> >(

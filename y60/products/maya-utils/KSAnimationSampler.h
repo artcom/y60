@@ -16,14 +16,14 @@
 
 #include <iostream>
 
-#include <maya/MString.h> 
-#include <maya/MSyntax.h> 
-#include <maya/MArgDatabase.h> 
-#include <maya/MSelectionList.h> 
-#include <maya/MFnDependencyNode.h> 
-#include <maya/MArgList.h> 
-#include <maya/MPxCommand.h> 
-#include <maya/MFnDagNode.h> 
+#include <maya/MString.h>
+#include <maya/MSyntax.h>
+#include <maya/MArgDatabase.h>
+#include <maya/MSelectionList.h>
+#include <maya/MFnDependencyNode.h>
+#include <maya/MArgList.h>
+#include <maya/MPxCommand.h>
+#include <maya/MFnDagNode.h>
 
 #include <vector>
 
@@ -44,7 +44,7 @@ class KSAnimationSampler : public MPxCommand {
         void collectPositions(const MSelectionList & theNodes,
                 std::vector<double> & theYPositions, std::vector<bool> & theOutOfBoundsList,
                 std::vector<bool> & theCompletelyOutOfBoundsList);
-        
+
         ValueListPtr deriveVelocities( const ValueList & currentPositions,
                                        const ValueList & previousPositions,
                                        std::vector<bool> & theVExceededList  );

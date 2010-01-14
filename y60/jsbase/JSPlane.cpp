@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -69,7 +69,7 @@ using namespace std;
 
 namespace jslib {
 
-template class JSWrapper<asl::Plane<PlaneNumber> >; 
+template class JSWrapper<asl::Plane<PlaneNumber> >;
 
 typedef PlaneNumber Number;
 typedef asl::Plane<Number> NATIVE;
@@ -117,19 +117,19 @@ distance(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         DOC_RVAL("The unsigend distance to the plane", DOC_TYPE_FLOAT);
         DOC_END;
         ensureParamCount(argc, 1);
-        NATIVE myPlane;        
+        NATIVE myPlane;
         convertFrom(cx, OBJECT_TO_JSVAL(obj), myPlane);
-        
-        asl::Point3f myPoint;                
+
+        asl::Point3f myPoint;
         if (JSVAL_IS_VOID(argv[0]) || !convertFrom(cx, argv[0], myPoint)) {
             JS_ReportError(cx, "JSPlane::distance(): Argument #1 must be a point");
             return JS_FALSE;
         }
-        
+
         float myDistance = asl::distance(myPoint, myPlane);
         *rval = as_jsval(cx, myDistance);
-        return JS_TRUE;    
-    } HANDLE_CPP_EXCEPTION;        
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
 }
 
 static JSBool
@@ -140,19 +140,19 @@ signedDistance(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
     DOC_END
     try {
         ensureParamCount(argc, 1);
-        NATIVE myPlane;        
+        NATIVE myPlane;
         convertFrom(cx, OBJECT_TO_JSVAL(obj), myPlane);
-        
-        asl::Point3f myPoint;                
+
+        asl::Point3f myPoint;
         if (JSVAL_IS_VOID(argv[0]) || !convertFrom(cx, argv[0], myPoint)) {
             JS_ReportError(cx, "JSPlane::signedDistance(): Argument #1 must be a point");
             return JS_FALSE;
         }
-        
+
         float myDistance = asl::signedDistance(myPoint, myPlane);
         *rval = as_jsval(cx, myDistance);
-        return JS_TRUE;    
-    } HANDLE_CPP_EXCEPTION;        
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
 }
 
 JSFunctionSpec *

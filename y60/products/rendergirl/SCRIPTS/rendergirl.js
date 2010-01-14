@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -176,7 +176,7 @@ ourHandler.on_include_activate = function() {
     var isPaused = window.pause;
     window.pause = true;
     var myFilename = getFilenameDialog("Include Scene", FileChooserDialog.ACTION_OPEN);
-    
+
     if (myFilename) {
         var myIncludeNode = new Node("<include/>").firstChild;
         myIncludeNode.src = myFilename;
@@ -184,7 +184,7 @@ ourHandler.on_include_activate = function() {
         window.scene.update(Scene.WORLD);
         ourViewer.lastSwitched = {};
     }
-    ourViewer.recollectSwitchNodes(); 
+    ourViewer.recollectSwitchNodes();
     ourViewer.setupSwitchNodeMenu();
     ourMaterialTable = ourViewer.applyMaterialTable();
 	ourSceneViewerDialog.setBaseNode(window.scene.world);
@@ -224,7 +224,7 @@ ourHandler.on_open_activate = function(theArguments) {
     ourSceneViewerDialog.setBaseNode(window.scene.world);
 
     window.pause = isPaused;
-     
+
 }
 
 
@@ -234,7 +234,7 @@ ourHandler.on_load_patch_activate = function() {
 
     var myFilename = getFilenameDialog("Load Patch", FileChooserDialog.ACTION_OPEN);
     loadPatch(myFilename);
-    
+
     window.pause = isPaused;
 }
 
@@ -471,18 +471,18 @@ ourHandler.on_material_dlg_save_clicked = function() {
     var isPaused = window.pause;
     window.pause = true;
     var myFilename = getFilenameDialog("Save Material", FileChooserDialog.ACTION_SAVE);
-    
+
     var myMaterial = getSelectedMaterial();
     if (myMaterial && myFilename) {
         if (myFilename.indexOf("xml") == -1) {
             myFilename = myFilename+".xml";
         }
-        
+
         var myNode = myMaterial.childNode("properties"); //.cloneNode(true);
         myNode.saveFile(myFilename, false);
     }
 
-	
+
     window.pause = isPaused;
 }
 
@@ -490,15 +490,15 @@ ourHandler.on_material_dlg_save_clicked = function() {
 ourHandler.on_material_dlg_save_table_clicked = function() {
 	var isPaused = window.pause;
     window.pause = true;
-    
+
     var myMaterial = getSelectedMaterial();
     var myMaterialName = myMaterial.name;
     if ("mswitch_"+myMaterial.name in ourViewer.lastSwitched) {
         myMaterialName = ourViewer.lastSwitched["mswitch_"+myMaterial.name];
     }
-    
+
     Logger.info("appending active properties for: "+myMaterial.name+" to materialtable as: "+myMaterialName);
-    
+
     var myNode = getDescendantByName(ourMaterialTable, myMaterialName, true);
     var myParentNode = myNode.parentNode;
 
@@ -508,10 +508,10 @@ ourHandler.on_material_dlg_save_table_clicked = function() {
 
     var myNewNode = new Node("<material name=\""+myMaterialName+"\"/>").firstChild;
     myNewNode.appendChild(myMaterial.childNode("properties").cloneNode(true));
-    
+
     ourMaterialTable.appendChild(myNewNode);
     ourMaterialTable.saveFile("materialtable.xml");
-    
+
     window.pause = isPaused;
 }
 
@@ -519,12 +519,12 @@ ourHandler.on_material_dlg_load_clicked = function() {
     var isPaused = window.pause;
     window.pause = true;
     var myFilename = getFilenameDialog("Open Material", FileChooserDialog.ACTION_OPEN);
-     
+
     if (!myFilename) {
         window.pause = isPaused;
         ourStatusBar.set("Invalid or incomplete Filename");
         return;
-    }    
+    }
 
     var myNode = Node.createDocument();
     myNode.parseFile(myFilename);
@@ -548,14 +548,14 @@ ourHandler.on_material_editor_activate = function() {
         ourStatusBar.set("No Materials in Scene.");
         return;
     }
-  
+
     ourStatusBar.set("Material Editor started.");
-  
+
     var myMaterialEditor = ourGlade.get_widget("dlgMaterialEditor");
 
     ourMaterialComboBox = new ComboBoxText();
     ourGlade.get_widget("material_box").pack_end(ourMaterialComboBox, false, false);
-   
+
     hideFloatSliders();
 
     ourMaterialComboBox.signal_changed.connect(ourMaterialComboBox, "on_changed");
@@ -567,7 +567,7 @@ ourHandler.on_material_editor_activate = function() {
             }
         }
     }
-    
+
     ourMaterialComboBox.show();
 
     // fill material choice rolldown with all available materials
@@ -588,7 +588,7 @@ ourHandler.on_material_editor_activate = function() {
         //print("Material:" + myMaterial);
         ourMaterialComboBox.active_text = myMaterial;
     }
-  	
+
     myMaterialEditor.show();
 }
 
@@ -733,7 +733,7 @@ Viewer.prototype.Constructor = function(self, theArguments) {
             loadPatch("Patch.js");
         }
 
-        myScene.setup();  
+        myScene.setup();
         var myCanvas = getDescendantByTagName(myScene.dom, 'canvas', true);
         ourViewer.setScene(myScene, myCanvas);
 
@@ -747,13 +747,13 @@ Viewer.prototype.Constructor = function(self, theArguments) {
             ourViewer.getLightManager().enableHeadlight(true);
             ourViewer.getLightManager().enableSunlight(true);
             ourStatusBar.set("Opened scene: " + theFilename + ". Default lighting is enabled.");
-        } 
+        }
 
         ourMaterialTable = ourViewer.applyMaterialTable();
         ourViewer.lastSwitched = {};
 
         setupGUI();
-        
+
         if (ourPatchObject && typeof(ourPatchObject.onSceneLoaded)=="function") {
             ourPatchObject.onSceneLoaded(myScene);
         }
@@ -766,7 +766,7 @@ Viewer.prototype.Constructor = function(self, theArguments) {
         if (RenderTest) {
             RenderTest.onFrame(theTime);
         }
-        
+
         if (ourPatchObject && typeof(ourPatchObject.onFrame)=="function") {
             ourPatchObject.onFrame(theTime);
         }
@@ -818,7 +818,7 @@ Viewer.prototype.Constructor = function(self, theArguments) {
         }
     }
 
-    self.onPreRender = function() {        
+    self.onPreRender = function() {
         if(ourPatchObject && typeof(ourPatchObject.onPreRender)=="function") {
             ourPatchObject.onPreRender();
         }
@@ -941,7 +941,7 @@ function main(argv) {
            var myCanvas = getDescendantByTagName(myScene.dom, 'canvas', true);
            ourViewer.setCanvas(myCanvas);
            setupGUI();
-           */      
+           */
 
         // enable lighting
         ourViewer.getLightManager().enableHeadlight(true);

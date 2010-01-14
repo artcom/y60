@@ -25,11 +25,11 @@ class property_descriptor : public ape_thing {
         void
         import(JSContext * cx, JSObject * ns, monkey_data & ape_ctx) {
             if ( boost::is_member_object_pointer<T>::value ) {
-                APE_LOG(log::import,log::dbg,log::dev) 
+                APE_LOG(log::import,log::dbg,log::dev)
                     << "importing property " << get_name();
                 ape_ctx.properties.add( ps_ );
             } else {
-                APE_LOG(log::import,log::dbg,log::dev) 
+                APE_LOG(log::import,log::dbg,log::dev)
                     << "importing static property " << get_name();
                 ape_ctx.static_properties.add( ps_ );
             }

@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -69,13 +69,13 @@ const unsigned BITMASK = 0x000000FF;
 
 
 TestSynergyServer::TestSynergyServer() : UnitTest( "TestSynergyServer" ),
-    _mySynergyServer( inet::getHostAddress( "localhost" ), 24800 ) 
+    _mySynergyServer( inet::getHostAddress( "localhost" ), 24800 )
 {
 }
 
 
 void TestSynergyServer::run() {
-    
+
     _myTestSocket.setRemoteAddr( inet::getHostAddress("localhost"), 24800 );
     _myTestSocket.connect();
     _myTestSocket.setBlockingMode( false );
@@ -87,13 +87,13 @@ void TestSynergyServer::run() {
     testSynergyPacket();
     testHandshake();
     testMouse();
-    
+
     _myTestSocket.close();
 
 }
 
 void TestSynergyServer::testHandshake() {
-    
+
     AC_TRACE << "TestSynergyServer::testHandshake";
 
     std::vector<unsigned char> myData;
@@ -103,7 +103,7 @@ void TestSynergyServer::testHandshake() {
 
     ENSURE( waitUntilTimeout() );
     myNumBytes = receive( myData );
-    printVectorAsHex( std::vector<unsigned char>( myData.begin(), 
+    printVectorAsHex( std::vector<unsigned char>( myData.begin(),
                                                   myData.begin() + myNumBytes) );
 
     ENSURE( myData[3] == 0x0b ); // ensure msg length == 11
@@ -126,16 +126,16 @@ void TestSynergyServer::testHandshake() {
     // check for query information message
 
     SynergyPacket myPacket;
-   
+
     testResponse( 4, "QINF", myPacket );
 
     char myDInfoMessage[22] = { 0x00, 0x00, 0x00, 0x12, // length
-                               'D','I','N','F',         // message type 
-                                0x00, 0x00, 0x00, 0x00, 
+                               'D','I','N','F',         // message type
+                                0x00, 0x00, 0x00, 0x00,
                                 0x07, '\x80', 0x04, '\xb0',
-                                0x00, 0x00, 
+                                0x00, 0x00,
                                 0x00, 0x00, 0x00, 0x00 };
-                                
+
     _myTestSocket.send( myDInfoMessage, sizeof(myDInfoMessage) );
 
     testResponse( 4, "CIAK", myPacket );
@@ -156,13 +156,13 @@ void TestSynergyServer::testHandshake() {
     // test handshake-complete state
     ENSURE( _mySynergyServer.isConnected() );
     ENSURE( _mySynergyServer.getScreenSize() == asl::Vector2i( 1920, 1200 ) );
-    
+
     char myDInfoMessage2[22] = { 0x00, 0x00, 0x00, 0x12, // length
-                                'D','I','N','F',         // message type 
-                                 0x00, 0x00, 0x00, 0x00, 
+                                'D','I','N','F',         // message type
+                                 0x00, 0x00, 0x00, 0x00,
                                  0x04, 0x00, 0x03, 0x00,
-                                 0x00, 0x00, 
-                                 0x00, 0x00, 0x00, 0x00 };     
+                                 0x00, 0x00,
+                                 0x00, 0x00, 0x00, 0x00 };
     _myTestSocket.send( myDInfoMessage2, sizeof( myDInfoMessage2 ) );
     testResponse( 4, "CIAK", myPacket );
     ENSURE( _mySynergyServer.getScreenSize() == asl::Vector2i( 1024, 768 ) );
@@ -170,7 +170,7 @@ void TestSynergyServer::testHandshake() {
 }
 
 void TestSynergyServer::testSynergyPacket() {
-    
+
     AC_TRACE << "TestSynergyServer::testSynergyPacket";
 
     char myTestPacket[26] = { 0x00, 0x00, 0x00, 0x01,
@@ -182,9 +182,9 @@ void TestSynergyServer::testSynergyPacket() {
                               0x00, 0x00, 0x00, 0x04,
                               'T', 'e', 's', 't' };
 
-    SynergyPacket myPacket( std::vector<unsigned char>( myTestPacket, myTestPacket + 
+    SynergyPacket myPacket( std::vector<unsigned char>( myTestPacket, myTestPacket +
                                                         sizeof(myTestPacket) ) );
-    
+
     std::vector<unsigned char> myMsg;
     myPacket.getNextMessage( myMsg );
     ENSURE( std::string(myMsg.begin(), myMsg.end()) == "T" );
@@ -202,7 +202,7 @@ void TestSynergyServer::testMouse() {
 
     AC_TRACE << "TestSynergyServer::testMouse";
 
-    SynergyPacket myPacket; 
+    SynergyPacket myPacket;
 
 
     // test mouse motion
@@ -222,11 +222,11 @@ void TestSynergyServer::testMouse() {
     testResponse( 8, "DMRM", myPacket, myMouseData );
 
 
-    // test mouse buttons 
+    // test mouse buttons
     myMouseData.clear();
     unsigned char myButton = 1;
 
-    myMouseData.push_back(myButton); 
+    myMouseData.push_back(myButton);
 
     _mySynergyServer.onMouseButton( myButton, true );
     testResponse( 5, "DMDN", myPacket, myMouseData );
@@ -243,22 +243,22 @@ void TestSynergyServer::testMouse() {
 
     _mySynergyServer.onMouseWheel( 0, -1 );
     testResponse( 8, "DMWM", myPacket, myMouseData );
-    
+
     myMouseData.clear();
     myMouseData.push_back(0x00);
     myMouseData.push_back(0x00);
     myMouseData.push_back(0xFF);
     myMouseData.push_back(0x88);
-    
+
     _mySynergyServer.onMouseWheel( 0, 1 );
     testResponse( 8, "DMWM", myPacket, myMouseData );
 
 }
 
 
-void TestSynergyServer::testResponse( unsigned theLength, const std::string & theMessage, 
-                                 SynergyPacket & thePacket, 
-                                 const std::vector<unsigned char> & theTestData ) 
+void TestSynergyServer::testResponse( unsigned theLength, const std::string & theMessage,
+                                 SynergyPacket & thePacket,
+                                 const std::vector<unsigned char> & theTestData )
 {
     AC_DEBUG << "TestSynergyServer::testResponse(" << theLength << "," << theMessage << ")";
 
@@ -268,7 +268,7 @@ void TestSynergyServer::testResponse( unsigned theLength, const std::string & th
 
         ENSURE( waitUntilTimeout() );
         myNumBytes = receive( myInputBuffer );
-        thePacket.assign( std::vector<unsigned char>( myInputBuffer.begin(), 
+        thePacket.assign( std::vector<unsigned char>( myInputBuffer.begin(),
                                                       myInputBuffer.begin()+myNumBytes ) );
     }
 
@@ -295,11 +295,11 @@ void TestSynergyServer::testResponse( unsigned theLength, const std::string & th
 bool TestSynergyServer::waitUntilTimeout() {
     asl::Time myCurrentTime;
     asl::Time myStartTime;
-    while (!_myTestSocket.peek(1) 
+    while (!_myTestSocket.peek(1)
            && (myCurrentTime.millis() - myStartTime.millis() <= RESPONSE_TIMEOUT)) {
         myCurrentTime = myCurrentTime.setNow();
     }
-    return (myCurrentTime.millis() - myStartTime.millis() < RESPONSE_TIMEOUT 
+    return (myCurrentTime.millis() - myStartTime.millis() < RESPONSE_TIMEOUT
             && _myTestSocket.peek(1));
 }
 

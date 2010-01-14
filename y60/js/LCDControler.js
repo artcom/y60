@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -135,13 +135,13 @@ LCDControlerBase.prototype.Constructor = function(self, theSerialPortNum) {
         }
     }
 
-    
+
     self.setText = function(theText) {
         self.clear();
         self.write(theText);
     }
 
-    // theStyle depends on the model, but the following are common 
+    // theStyle depends on the model, but the following are common
     //      "OFF"
     //      "BLINKING_BLOCK"
     //      "UNDERSCORE"
@@ -180,7 +180,7 @@ function createFont(thePixmaps) {
         var myLCDChar = [];
         for (var y=0; y < 8; ++y) {
             var myRowBits = 0;
-            var myLine = String(thePixmaps[i][y]); 
+            var myLine = String(thePixmaps[i][y]);
             for (var x=0; x < 5; ++x) {
                 if (myLine.charAt(4-x) != " ") {
                     myRowBits |= 1<<x;

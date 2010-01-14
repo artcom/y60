@@ -85,12 +85,12 @@ namespace tuttle {
     bool_t Shell::shutdown() {
         void *myResult;
         int   mySuccess;
-        
+
         mySuccess = pthread_join(_myClishThread, &myResult);
-        
+
         return mySuccess ? BOOL_FALSE : BOOL_TRUE;
     }
-    
+
     void Shell::execute(Command *theCommand) {
         _myDebugger.execute(theCommand);
     }
@@ -101,7 +101,7 @@ namespace tuttle {
     {
         uintN i, n;
         JSString *str;
-        
+
         for (i = n = 0; i < argc; i++) {
             str = JS_ValueToString(cx, argv[i]);
             if (!str)
@@ -123,7 +123,7 @@ namespace tuttle {
 
         const char *myCode       = lub_argv__get_arg(theArguments, 0);
         const int   myCodeLength = strlen(myCode);
-        
+
         JSContext  *myContext = _myContext;
         JSObject   *myGlobal  = _myGlobal;
         jsval       myReturn;
@@ -135,7 +135,7 @@ namespace tuttle {
             if(!Print(myContext, _myGlobal, 1, &myReturn, &myPrintReturn))
                 return BOOL_FALSE;
         }
-        
+
         return true;
     }
 
@@ -159,7 +159,7 @@ namespace tuttle {
         JS_ExecuteScript(myContext, myGlobal, myScript, &myReturn);
 
         JS_DestroyScript(myContext, myScript);
-        
+
         return true;
     }
 
@@ -169,14 +169,14 @@ namespace tuttle {
 
     CLISH_BUILTIN(Trace) {
         const char *arg = lub_argv__get_arg(theArguments, 0);
-        
+
         if(0 == strcmp(arg, "on")) {
             _myContext->tracefp = stderr;
         }
         if(0 == strcmp(arg, "off")) {
             _myContext->tracefp = NULL;
         }
-        
+
         return true;
     }
 

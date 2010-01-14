@@ -42,7 +42,7 @@
 class cameraTool
 {
 public:
-	
+
 	static cameraEngine* findCamera();
 };
 

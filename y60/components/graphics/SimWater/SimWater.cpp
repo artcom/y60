@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -105,11 +105,11 @@ SimWater::SimWater(DLHandle theDLHandle) :
 SimWater::~SimWater() {
 }
 
-void 
+void
 SimWater::onUpdateSettings(dom::NodePtr theConfiguration) {
 };
 
-void 
+void
 SimWater::onGetProperty(const std::string & thePropertyName,
         PropertyValue & theReturnValue) const
 {
@@ -169,7 +169,7 @@ SimWater::onGetProperty(const std::string & thePropertyName,
     AC_WARNING << "SimWater::onGetProperty(): Unknown property '" << thePropertyName << "'.";
 };
 
-void 
+void
 SimWater::onSetProperty(const std::string & thePropertyName,
         const PropertyValue & thePropertyValue)
 {
@@ -238,7 +238,7 @@ SimWater::onSetProperty(const std::string & thePropertyName,
     AC_WARNING << "SimWater::onSetProperty(): Unknown property '" << thePropertyName << "'.";
 };
 
-void 
+void
 SimWater::onStartup(jslib::AbstractRenderWindow * theWindow)  {
     AC_PRINT << "SimWater::onStartup()";
     initializeGLMemoryExtensions();
@@ -253,7 +253,7 @@ SimWater::onStartup(jslib::AbstractRenderWindow * theWindow)  {
     _myWaterRepresentation = WaterRepresentationPtr( new WaterRepresentation() );
     dom::NodePtr myCanvas = theWindow->getCanvas();
     _myWaterRepresentation->init( _myWaterSimulation, _myDisplaySize[0], _myDisplaySize[1],
-            _mySimulationOffset[0], _mySimulationOffset[1], 
+            _mySimulationOffset[0], _mySimulationOffset[1],
             _mySimulationSize[0], _mySimulationSize[1],
             theWindow->getWidth(), theWindow->getHeight(),
             _myDisplayOffset[0], _myDisplayOffset[1],
@@ -270,7 +270,7 @@ SimWater::loadTexturesFromConfig(const dom::Node & theConfig, WaterRepresentatio
         int numFloorTextures = theConfig(myClassName).childNodesLength("file");
         for (int i = 0; i < numFloorTextures; ++i) {
             AC_PRINT << "texture: " << i;
-            const dom::Node & myFileNode = theConfig(myClassName)("file",i); 
+            const dom::Node & myFileNode = theConfig(myClassName)("file",i);
             string fileName = DATA_DIR + "/" + myFileNode["name"].nodeValue();
             short objectID = asl::as<short>(myFileNode["objectid"].nodeValue());
             bool loadOK = _myWaterRepresentation->loadTexture(theClassID,objectID,fileName.c_str());
@@ -290,25 +290,25 @@ SimWater::loadTexturesFromConfig(const dom::Node & theConfig, WaterRepresentatio
 }
 
 
-bool 
+bool
 SimWater::onSceneLoaded(jslib::AbstractRenderWindow * theWindow) {
     AC_PRINT << "SimWater::onSceneLoaded()";
 
     return true;
 };
 
-void 
+void
 SimWater::handle(jslib::AbstractRenderWindow * theWindow, y60::EventPtr theEvent) {
     AC_DEBUG << "SimWater::handle()";
 };
 
-void 
+void
 SimWater::onFrame(jslib::AbstractRenderWindow * theWindow , double t) {
     AC_DEBUG << "SimWater::onFrame()";
 
     _myViewportSize[0] = theWindow->getWidth();
     _myViewportSize[1] = theWindow->getHeight();
-    
+
     asl::Time myCurrentTime;
     myCurrentTime.setNow();
     //double myRunTime = myCurrentTime - _myStartTime;
@@ -329,7 +329,7 @@ SimWater::onFrame(jslib::AbstractRenderWindow * theWindow , double t) {
 
 void
 SimWater::setWaterProjection() {
-    
+
 	glMatrixMode( GL_PROJECTION );
 	glLoadIdentity();
 
@@ -342,12 +342,12 @@ SimWater::setWaterProjection() {
 	glOrtho( left, right, top, bottom, -100, 10000);
 }
 
-void 
+void
 SimWater::onPreRender(jslib::AbstractRenderWindow * theRenderer) {
     AC_DEBUG << "SimWater::onPreRender()";
 };
 
-void 
+void
 SimWater::onPostRender(jslib::AbstractRenderWindow * theRenderer) {
     AC_DEBUG << "SimWater::onPostRender()";
 
@@ -384,24 +384,24 @@ SimWater::onPostRender(jslib::AbstractRenderWindow * theRenderer) {
     CHECK_OGL_ERROR;
 };
 
-Vector2i 
+Vector2i
 SimWater::convertMouseCoordsToSimulation( const Vector2i & theMousePos ) {
     Vector2i myResult;
-    myResult[0] = max( 0, min( _myDisplaySize[0] - 1, 
+    myResult[0] = max( 0, min( _myDisplaySize[0] - 1,
                 (theMousePos[0] * _myDisplaySize[0] / _myViewportSize[0])+ _myDisplayOffset[0]));
     myResult[1] = max (0, min( _myDisplaySize[1] - 1,
                 ((_myViewportSize[1] - theMousePos[1])  * _myDisplaySize[1] / _myViewportSize[1])+ _myDisplayOffset[1]));
     return myResult + _mySimulationOffset;
 }
 
-int 
+int
 SimWater::addFloormap(const std::string & theFilename) {
     /*bool loadOk =*/ _myWaterRepresentation->loadTexture(WaterRepresentation::floormaps, static_cast<short>(_myFloormapCounter), theFilename.c_str());
     _myWaterRepresentation->activateTexture(WaterRepresentation::floormaps,static_cast<short>( _myFloormapCounter) );
     return _myFloormapCounter++;
 }
 
-int 
+int
 SimWater::addCubemap(const std::string theFilenames[]) {
     /*bool loadOk =*/ _myWaterRepresentation->loadCubeMapTexture(WaterRepresentation::cubemaps, static_cast<short>(_myCubemapCounter),
             theFilenames);
@@ -409,12 +409,12 @@ SimWater::addCubemap(const std::string theFilenames[]) {
     return _myCubemapCounter++;
 }
 
-void 
+void
 SimWater::reset() {
     _myWaterSimulation->reset();
 }
 
-void 
+void
 SimWater::splash(const asl::Vector2i & thePosition, float theMagnitude, int theRadius) {
      Vector2i myCoord = convertMouseCoordsToSimulation( thePosition );
      _myWaterSimulation->sinoidSplash(myCoord[0], myCoord[1], theMagnitude, theRadius);

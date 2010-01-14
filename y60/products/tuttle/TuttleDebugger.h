@@ -23,7 +23,7 @@ namespace tuttle {
         JSObject  *getJavascriptGlobal();
 
         void executeCommands ();
-	
+
         void execute(Command *theCommand);
 
         void queuePush(Command *theCommand);
@@ -36,7 +36,7 @@ namespace tuttle {
         JSRuntime          *_myRuntime;
         JSContext          *_myContext;
         JSObject           *_myGlobal;
-	
+
 	std::queue<Command *> _myQueue;
         asl::ThreadLock       _myQueueLock;
 

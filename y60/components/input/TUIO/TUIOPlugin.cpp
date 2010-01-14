@@ -90,10 +90,10 @@ public:
 
     virtual void updateTuioObject(TuioObject *tobj) {
     }
-	
+
     virtual void removeTuioObject(TuioObject *tobj) {
     }
-	
+
     virtual void addTuioCursor(TuioCursor *myCursor) {
         handleCursor(myCursor, "add");
     }
@@ -105,7 +105,7 @@ public:
     virtual void removeTuioCursor(TuioCursor *myCursor) {
         handleCursor(myCursor, "remove");
     }
-	
+
     virtual void refresh(TuioTime ftime) {
     }
 
@@ -208,7 +208,7 @@ enum TUIOPropertyNumbers {
     PROP_eventSchema = -100
 };
 
-JSFunctionSpec * 
+JSFunctionSpec *
 TUIOPlugin::StaticFunctions() {
     static JSFunctionSpec myFunctions[] = {
         {"listenToUDP", ListenToUDP, 0},

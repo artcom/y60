@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -164,21 +164,21 @@ enum PropertyNumbers {
     // Gtk::WidgetFlags
     PROP_TOPLEVEL,
     PROP_NO_WINDOW,
-    PROP_REALIZED,   
-    PROP_MAPPED,   
+    PROP_REALIZED,
+    PROP_MAPPED,
     PROP_VISIBLE,
-    PROP_SENSITIVE,   
+    PROP_SENSITIVE,
     PROP_PARENT_SENSITIVE,
     PROP_CAN_FOCUS,
     PROP_HAS_FOCUS,
-    PROP_CAN_DEFAULT, 
+    PROP_CAN_DEFAULT,
     PROP_HAS_DEFAULT,
     PROP_HAS_GRAB,
     PROP_RC_STYLE,
-    PROP_COMPOSITE_CHILD,   
-    PROP_NO_REPARENT, 
-    PROP_APP_PAINTABLE, 
-    PROP_RECEIVES_DEFAULT,  
+    PROP_COMPOSITE_CHILD,
+    PROP_NO_REPARENT,
+    PROP_APP_PAINTABLE,
+    PROP_RECEIVES_DEFAULT,
     PROP_DOUBLE_BUFFERED,
     PROP_NO_SHOW_ALL,
     // Gtk::BuiltinIconSize
@@ -239,11 +239,11 @@ JSGtk::ConstIntProperties() {
         DEFINE_GTK_PROP(PACK_EXPAND_PADDING),
         DEFINE_GTK_PROP(PACK_EXPAND_WIDGET),
         DEFINE_GTK_PROP(PACK_SHRINK),
-        
+
         DEFINE_GTK_PROP(RELIEF_NORMAL),
         DEFINE_GTK_PROP(RELIEF_HALF),
         DEFINE_GTK_PROP(RELIEF_NONE),
-        
+
         DEFINE_GTK_PROP(JUSTIFY_LEFT),
         DEFINE_GTK_PROP(JUSTIFY_RIGHT),
         DEFINE_GTK_PROP(JUSTIFY_CENTER),
@@ -293,21 +293,21 @@ JSGtk::ConstIntProperties() {
 
         DEFINE_GTK_PROP(TOPLEVEL),
         DEFINE_GTK_PROP(NO_WINDOW),
-        DEFINE_GTK_PROP(REALIZED),   
-        DEFINE_GTK_PROP(MAPPED),   
+        DEFINE_GTK_PROP(REALIZED),
+        DEFINE_GTK_PROP(MAPPED),
         DEFINE_GTK_PROP(VISIBLE),
-        DEFINE_GTK_PROP(SENSITIVE),   
+        DEFINE_GTK_PROP(SENSITIVE),
         DEFINE_GTK_PROP(PARENT_SENSITIVE),
         DEFINE_GTK_PROP(CAN_FOCUS),
         DEFINE_GTK_PROP(HAS_FOCUS),
-        DEFINE_GTK_PROP(CAN_DEFAULT), 
+        DEFINE_GTK_PROP(CAN_DEFAULT),
         DEFINE_GTK_PROP(HAS_DEFAULT),
         DEFINE_GTK_PROP(HAS_GRAB),
         DEFINE_GTK_PROP(RC_STYLE),
-        DEFINE_GTK_PROP(COMPOSITE_CHILD),   
-        DEFINE_GTK_PROP(NO_REPARENT), 
-        DEFINE_GTK_PROP(APP_PAINTABLE), 
-        DEFINE_GTK_PROP(RECEIVES_DEFAULT),  
+        DEFINE_GTK_PROP(COMPOSITE_CHILD),
+        DEFINE_GTK_PROP(NO_REPARENT),
+        DEFINE_GTK_PROP(APP_PAINTABLE),
+        DEFINE_GTK_PROP(RECEIVES_DEFAULT),
         DEFINE_GTK_PROP(DOUBLE_BUFFERED),
         DEFINE_GTK_PROP(NO_SHOW_ALL),
 

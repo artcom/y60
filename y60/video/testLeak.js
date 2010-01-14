@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -93,7 +93,7 @@ MovieLeakUnitTest.prototype.Constructor = function(obj, theName, theFiles, theDe
     var _myMinFrame = 0;
 
     UnitTest.prototype.Constructor(obj, theName);
-    obj.run = function() {    
+    obj.run = function() {
         window.onFrame = function(theTime) {
             gc();
             var myMem = getProcessMemoryUsage();
@@ -103,8 +103,8 @@ MovieLeakUnitTest.prototype.Constructor = function(obj, theName, theFiles, theDe
             } else if (_myFrameCount < START_FRAMES + theVideoCount) {
                 //print("---- memory = "+getProcessMemoryUsage());
                 toggleMovie();
-                var myText = "Loop : " + (_myFrameCount - START_FRAMES) + "/" + theVideoCount; 
-                window.renderText([500,100], myText, "Screen15");        
+                var myText = "Loop : " + (_myFrameCount - START_FRAMES) + "/" + theVideoCount;
+                window.renderText([500,100], myText, "Screen15");
             } else if (_myFrameCount >= START_FRAMES + theVideoCount + END_FRAMES + 1) {
                 //window.scene.save("empty.xml", false);
                 var myUsedMemory = myMem;
@@ -125,7 +125,7 @@ MovieLeakUnitTest.prototype.Constructor = function(obj, theName, theFiles, theDe
                 print("No new maximum for last n frames, n =   : " + (obj.myFrameCount - obj.myMaxFrame));
                 print("Avrg. Difference per Movie              : " + asMemoryString(obj.myTrend));
                 print("allowed difference per Movie            : " + asMemoryString(obj.AllowedMemoryUsage));
-                ENSURE('obj.myTrend < obj.AllowedMemoryUsage || obj.myFrameCount - obj.myMaxFrame > 50');                
+                ENSURE('obj.myTrend < obj.AllowedMemoryUsage || obj.myFrameCount - obj.myMaxFrame > 50');
 
                 //window.scene.save("leaktest.x60");
                 window.stop();
@@ -145,14 +145,14 @@ MovieLeakUnitTest.prototype.Constructor = function(obj, theName, theFiles, theDe
                 _myMinMemory = myMem;
                 _myMinFrame = _myFrameCount;
             }
-                
+
             window.renderText([500,150], "Delta memory usage: " + asMemoryString(myMem-_myLastMemory), "Screen15");
             window.renderText([500,175], "Total memory usage: " + asMemoryString(myMem), "Screen15");
             window.renderText([500,200], "Trend:              " + _myTrend.toFixed(0), "Screen15");
             window.renderText([500,225], "Max. memory usage:  " + asMemoryString(_myMaxMemory), "Screen15");
             window.renderText([500,250], "Max. in Frame       " + _myMaxFrame, "Screen15");
-            _myFrameCount++; 
-            _myLastMemory = myMem;     
+            _myFrameCount++;
+            _myLastMemory = myMem;
         }
         window.go();
     }
@@ -167,11 +167,11 @@ MovieLeakUnitTest.prototype.Constructor = function(obj, theName, theFiles, theDe
     function toggleMovie() {
         remove();
         if (_myToggle) {
-            _myMovie    = new MovieOverlay(window.scene, theFiles[0], [0,0], null, false, null, theDecoderHint);            
+            _myMovie    = new MovieOverlay(window.scene, theFiles[0], [0,0], null, false, null, theDecoderHint);
         } else {
             _myMovie    = new MovieOverlay(window.scene, theFiles[1], [0,0], null, false, null, theDecoderHint);
         }
-        _myToggle = !_myToggle;                    
+        _myToggle = !_myToggle;
     }
 
 

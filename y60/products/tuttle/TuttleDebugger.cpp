@@ -45,7 +45,7 @@ namespace tuttle {
     JSObject  *Debugger::getJavascriptGlobal() {
         return _myGlobal;
     }
-    
+
     static JSTrapStatus
     tuttle_trap_break (JSContext *theContext, JSScript *theScript, jsbytecode *pc, jsval *rval, void *closure) {
         Debugger *myDebugger = reinterpret_cast<Debugger*>(closure);
@@ -73,7 +73,7 @@ namespace tuttle {
             cout << message;
             return;
         }
-        
+
         if(report->filename) {
             cout << report->filename << ":";
 
@@ -92,17 +92,17 @@ namespace tuttle {
             }
             cout << "warning: ";
         }
-        
+
         cout << message << endl;
-        
+
         if(report->linebuf) {
             int buflen = strlen(report->linebuf);
-            
+
             cout << report->linebuf;
-            
+
             if(report->linebuf[buflen-1] != '\n')
                 cout << endl;
-            
+
             const char *curchar;
             for(curchar = report->linebuf; curchar <= report->tokenptr; curchar++) {
                 if(*curchar == '\t') {
@@ -126,7 +126,7 @@ namespace tuttle {
 	    myWait = myCommand->execute(&myDummy);
             _myResultSemaphore.post();
 	}
-    }    
+    }
 
     bool Debugger::queueEmpty() {
         bool myEmpty;

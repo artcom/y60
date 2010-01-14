@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -106,7 +106,7 @@ setItem(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             JS_ReportError(cx, "setItem(thePos, theElement): needs two arguments");
             return JS_FALSE;
         }
-        
+
         NativeRef<dom::ResizeableVector> myNativeRef(cx,obj);
         dom::ResizeableVector & myNative = myNativeRef.getValue();
         asl::AC_SIZE_TYPE myArg0;
@@ -125,7 +125,7 @@ setItem(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
                                 +as_string(cx, argv[0])+" to type unsigned integer").c_str());
             return JS_FALSE;
         }
-        
+
     } HANDLE_CPP_EXCEPTION;
     return JS_TRUE;
 }
@@ -150,7 +150,7 @@ appendItem(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             JS_ReportError(cx, "append(theElement): needs an argument");
             return JS_FALSE;
         }
-        
+
         NativeRef<dom::ResizeableVector> myNativeRef(cx,obj);
         dom::ResizeableVector & myNative = myNativeRef.getValue();
         dom::ValuePtr myArg;
@@ -163,17 +163,17 @@ appendItem(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         }
 
     } HANDLE_CPP_EXCEPTION;
-    return JS_TRUE;    
+    return JS_TRUE;
 }
 
-static 
+static
 dom::ValuePtr makeListValue(JSContext *cx, NativeRef<dom::ResizeableVector> & theNativeRef, jsval theArg) {
     try {
         const dom::ValueBase & thisValue = dynamic_cast<const dom::ValueBase &>(theNativeRef.getValue());
         dom::ValuePtr newValue = thisValue.create(as_string(cx, theArg), 0);
         return newValue;
     } catch (dom::ConversionFailed &) {}
-    
+
     // try argument conversion by string
     std::string myArrayString;
     if (JSA_ArrayToString(cx, &theArg, myArrayString)) {
@@ -183,7 +183,7 @@ dom::ValuePtr makeListValue(JSContext *cx, NativeRef<dom::ResizeableVector> & th
         return dom::ValuePtr();
     }
 }
-    
+
 static JSBool
 appendList(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("appends a list of elements to the vector");
@@ -215,9 +215,9 @@ appendList(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         }
 
     } HANDLE_CPP_EXCEPTION;
-    return JS_TRUE;    
+    return JS_TRUE;
 }
-    
+
 static JSBool
 eraseItem(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Erases one element from the vector");
@@ -247,7 +247,7 @@ insertItemBefore(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
             JS_ReportError(cx, "insertItemBefore(thePos, theElement): needs two arguments");
             return JS_FALSE;
         }
-        
+
         NativeRef<dom::ResizeableVector> myNativeRef(cx,obj);
         dom::ResizeableVector & myNative = myNativeRef.getValue();
         unsigned int myArg0;
@@ -265,9 +265,9 @@ insertItemBefore(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
                                 +as_string(cx, argv[0])+" to type unsigned integer").c_str());
             return JS_FALSE;
         }
-        
+
     } HANDLE_CPP_EXCEPTION;
-    return JS_TRUE;    
+    return JS_TRUE;
 }
 static JSBool
 insertListBefore(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -280,7 +280,7 @@ insertListBefore(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
             JS_ReportError(cx, "insertListBefore(thePos, theList): needs two arguments");
             return JS_FALSE;
         }
-        
+
         asl::AC_SIZE_TYPE thePos;
         dom::ValuePtr myArg1;
         if (convertFrom(cx, argv[0], thePos)) {
@@ -309,9 +309,9 @@ insertListBefore(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
                                 +as_string(cx, argv[0])+" to type unsigned integer").c_str());
             return JS_FALSE;
         }
-        
+
     } HANDLE_CPP_EXCEPTION;
-    return JS_TRUE;    
+    return JS_TRUE;
 }
 static JSBool
 setList(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -324,7 +324,7 @@ setList(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             JS_ReportError(cx, "JSResizeableVector::setList(thePos, theList): needs two arguments");
             return JS_FALSE;
         }
-        
+
         asl::AC_SIZE_TYPE thePos;
         dom::ValuePtr myArg1;
         if (convertFrom(cx, argv[0], thePos)) {
@@ -333,7 +333,7 @@ setList(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
                 JS_ReportError(cx, "JSResizeableVector::setList(thePos, theList): argument #2 is not an object");
                 return JS_FALSE;
             }
-         
+
             try {
                 const dom::ResizeableVector & myVector = JSClassTraits<dom::ResizeableVector>::getNativeRef(cx, JSVAL_TO_OBJECT(argv[1]));
                 const dom::ValueBase & myVectorValue = dynamic_cast<const dom::ValueBase &>(myVector);
@@ -353,11 +353,11 @@ setList(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
                                 +as_string(cx, argv[0])+" to type unsigned integer").c_str());
             return JS_FALSE;
         }
-        
+
     } HANDLE_CPP_EXCEPTION;
-    return JS_TRUE;    
+    return JS_TRUE;
 }
-    
+
 static JSBool
 getList(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("gets elements from the vector");

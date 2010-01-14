@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -92,7 +92,7 @@ getItem(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     typedef dom::ValuePtr (NATIVE_VECTOR::*MyMethod)(asl::AC_SIZE_TYPE) const;
     return Method<NATIVE_VECTOR>::call((MyMethod)&NATIVE_VECTOR::getItem,cx,obj,argc,argv,rval);
 }
-    
+
 static JSBool
 setItem(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("sets an element in the vector. Throws an exception, if index is out of bounds.");
@@ -104,7 +104,7 @@ setItem(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             JS_ReportError(cx, "setItem(thePos, theElement): needs two arguments");
             return JS_FALSE;
         }
-        
+
         NativeRef<dom::AccessibleVector> myNativeRef(cx,obj);
         dom::AccessibleVector & myNative = myNativeRef.getValue();
         unsigned int myArg0;
@@ -122,11 +122,11 @@ setItem(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
                                 +as_string(cx, argv[0])+" to type unsigned integer").c_str());
             return JS_FALSE;
         }
-        
+
     } HANDLE_CPP_EXCEPTION;
     return JS_TRUE;
 }
-    
+
 JSFunctionSpec *
 JSAccessibleVector::Functions() {
     AC_DEBUG << "Registering class '"<<ClassName()<<"'"<<endl;

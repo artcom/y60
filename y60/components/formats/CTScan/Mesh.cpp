@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -102,7 +102,7 @@ Mesh::Mesh(dom::NodePtr theShapeNode) : _myShapeNode(theShapeNode), _myPositions
 
 }
 
-unsigned 
+unsigned
 Mesh::colorize(unsigned int theStartIndex, unsigned theColorIndex) {
     lockWrite();
     unsigned int myCount = 0;
@@ -113,7 +113,7 @@ Mesh::colorize(unsigned int theStartIndex, unsigned theColorIndex) {
         if (theStartIndex < 0 || theStartIndex > _myPositions->size()) {
             AC_ERROR << "Illegal Index " << theStartIndex << ". The Shape has only " << _myPositionIndexNode->nodeValueRef<VectorOfUnsignedInt>().size() << " indices.";
             return 0;
-        } 
+        }
         list<unsigned int> myToDoList;
         myToDoList.push_back(theStartIndex);
 
@@ -138,7 +138,7 @@ Mesh::colorize(unsigned int theStartIndex, unsigned theColorIndex) {
     return myCount;
 }
 
-int 
+int
 Mesh::deleteFace(unsigned theIndex) {
     MAKE_SCOPE_TIMER(deleteFace);
     int myReverseIndex = _myPositions->size()-_myFaceSize;
@@ -163,7 +163,7 @@ Mesh::deleteFace(unsigned theIndex) {
         }
         //AC_INFO << "Overwriting " << myIndex << " with " << myReverseIndex;
         myDelta = myReverseIndex - myIndex;
-    } 
+    }
     unsigned myNewSize = myReverseIndex;
     if (_myNormals) {
         _myNormals->resize(myNewSize);
@@ -187,7 +187,7 @@ Mesh::colorizeError(float theMaximumError, unsigned theColor) {
         if (_myErrorMap.at(i) < theMaximumError) {
             (*_myColors)[i] = theColor;
             ++myCount;
-        } 
+        }
     }
     unlockWrite();
     return myCount;
@@ -201,7 +201,7 @@ Mesh::colorizeDisconnected(unsigned theColor) {
         if (_myHalfEdges->at(i) == -1) {
             (*_myColors)[i] = theColor;
             ++myCount;
-        } 
+        }
     }
     unlockWrite();
     return myCount;
@@ -242,7 +242,7 @@ Mesh::calcEdgeError(unsigned theIndex) {
         }
         float myReturn = (1.0f - myCreaseAngle) * (myFaceArea + myTwinArea) +
             (myAngleSum * (myEdgeLength + 1));
-        //AC_INFO << "F-A: " << myCreaseAngle << ", Size: " << (myFaceArea + myTwinArea) << ", E-A: " << myAngleSum  
+        //AC_INFO << "F-A: " << myCreaseAngle << ", Size: " << (myFaceArea + myTwinArea) << ", E-A: " << myAngleSum
         //    << ", E-L: " << myEdgeLength << " -> [" << theIndex << "] = " << myReturn;
         return myReturn / 2.0f;
     } else {
@@ -282,14 +282,14 @@ Mesh::calcEdgeError(unsigned theIndex) {
             MESH_ASSURE(*i >= 0);
             EdgeList::iterator myStarEdge = _myEdgeList->getHalfEdge(*i);
             const Vector3f myStarFace[] = {myVertices[myPositions[*myStarEdge]], myVertices[myPositions[*myStarEdge.next()]], myVertices[myPositions[*myStarEdge.next().next()]]};
-            Vector3f myStarNormal = generateFaceNormal(myStarFace[0], myStarFace[1], myStarFace[2]); 
-            myAngleMax = max(myAngleMax, min((1.0f-dot(myStarNormal, myTwinNormal))/2.0f, 
+            Vector3f myStarNormal = generateFaceNormal(myStarFace[0], myStarFace[1], myStarFace[2]);
+            myAngleMax = max(myAngleMax, min((1.0f-dot(myStarNormal, myTwinNormal))/2.0f,
                                              (1.0f-dot(myStarNormal, myNormal))/2.0f));
         }
         float myAreaFactor = 1.0f - 1.0f / (1.0f + myFaceArea + myTwinArea);
         //float myReturn = (1.0f - myCreaseAngle) * (myFaceArea + myTwinArea) + (myAngleSum * (myEdgeLength + 1));
         float myReturn = (myAngleMax * myEdgeLength * myAreaFactor);
-        //AC_INFO << "F-A: " << myCreaseAngle << ", Size: " << (myFaceArea + myTwinArea) << ", E-A: " << myAngleSum  
+        //AC_INFO << "F-A: " << myCreaseAngle << ", Size: " << (myFaceArea + myTwinArea) << ", E-A: " << myAngleSum
         //    << ", E-L: " << myEdgeLength << " -> [" << theIndex << "] = " << myReturn;
         return myReturn;
     } else {
@@ -375,7 +375,7 @@ Mesh::check() const {
             // XXX TODO: Check if myPositions[i] is inside vertices.size()
         }
     }
-    AC_INFO << "# of faces: " << myPositions.size() / _myFaceSize; 
+    AC_INFO << "# of faces: " << myPositions.size() / _myFaceSize;
     return mySuccess;
 }
 
@@ -395,7 +395,7 @@ Mesh::lockWrite() {
         }
         _myHalfEdges = _myHalfEdgesNode->dom::Node::nodeValuePtrOpen<vector<signed int> >();
         _myPositionVertices = _myPositionVerticesNode->dom::Node::nodeValuePtrOpen<vector<Vector3f> >();
-        _myNormalVertices = _myNormalVerticesNode->dom::Node::nodeValuePtrOpen<vector<Vector3f> >();        
+        _myNormalVertices = _myNormalVerticesNode->dom::Node::nodeValuePtrOpen<vector<Vector3f> >();
         _myEdgeList = EdgeListPtr(new EdgeList(*_myHalfEdges, *_myPositions));
     }
 }
@@ -492,7 +492,7 @@ Mesh::edgeCollapse(unsigned thePosition) {
         unlockWrite();
         return false;
     }
-    
+
     // this is an EdgeList transaction
     EdgeList::iterator myEdge = _myEdgeList->getHalfEdge(thePosition);
     EdgeList::iterator myTwin = myEdge.twin();
@@ -532,7 +532,7 @@ Mesh::edgeCollapse(unsigned thePosition) {
     (*_myHalfEdges)[prev] = next;
     //AC_TRACE << "Connecting " << prev << " to " << next;
     int myTwinIndex = *myTwin;
-    // completely remove myEdge, myEdge.next(), myEdge.prev(), 
+    // completely remove myEdge, myEdge.next(), myEdge.prev(),
     // myTwin, myTwin.next(), myTwin.prev() from all indices
     //set all the twins of all edges of twin to -1
     EdgeList::iterator iter = myTwin;
@@ -612,7 +612,7 @@ Mesh::collapseByError(float theMaxError) {
             while (!_myErrorMap.empty() && _mySimplifyMode) {
                 int myEdge = _myErrorMap.front();
                 AC_TRACE << "Collapsing edge: " << myEdge;
-                AC_TRACE << "         error = " << _myErrorMap.at(myEdge); 
+                AC_TRACE << "         error = " << _myErrorMap.at(myEdge);
                 AC_TRACE << "         count = " << _myErrorMap.getErrorCount();
                 if (edgeCollapse(myEdge)) {
                     ++myNumModified;
@@ -629,9 +629,9 @@ Mesh::collapseByError(float theMaxError) {
             }
         }
     } catch (InconsistencyException e) {
-        AC_ERROR << "Mesh went Inconsistent. Check: " << check();        
+        AC_ERROR << "Mesh went Inconsistent. Check: " << check();
     //} catch (...) {
-    //    AC_ERROR << "Some Exception occured during simplification. Check: " << check();        
+    //    AC_ERROR << "Some Exception occured during simplification. Check: " << check();
     }
     _myErrorMap.clear();
     unlockWrite(true);
@@ -749,10 +749,10 @@ bool Mesh::test(dom::NodePtr theShapeNode) {
 }
 
 unsigned
-Mesh::colorSweptSphere(const asl::Sphere<float> & theSphere, 
-        const asl::Vector3f & theMotion, 
+Mesh::colorSweptSphere(const asl::Sphere<float> & theSphere,
+        const asl::Vector3f & theMotion,
         const dom::NodePtr & theTransformationRoot,
-        unsigned int theColor) 
+        unsigned int theColor)
 {
     CollisionInfoVector myCollisions;
     Scene::collideWithBodies(theTransformationRoot, theSphere, theMotion, myCollisions);
@@ -769,10 +769,10 @@ Mesh::colorSweptSphere(const asl::Sphere<float> & theSphere,
         for (int j = 0; j < myCollisions[i]._myPrimitiveSphereContacts->size(); ++j) {
             Primitive::SphereContacts & myContacts = myCollisions[i]._myPrimitiveSphereContacts->at(j);
             Primitive::Element myElement = myContacts._myElement;
-            for (unsigned int k = myElement._myStartVertex; 
-                    k < myElement._myStartVertex+myElement._myVertexCount; ++k) 
+            for (unsigned int k = myElement._myStartVertex;
+                    k < myElement._myStartVertex+myElement._myVertexCount; ++k)
             {
-                myColorIndex.at(myElement._myPrimitive->getDomIndex()+k) = theColor; 
+                myColorIndex.at(myElement._myPrimitive->getDomIndex()+k) = theColor;
             }
         }
 
@@ -780,7 +780,7 @@ Mesh::colorSweptSphere(const asl::Sphere<float> & theSphere,
     return myCollisions.size();
 }
 
-bool 
+bool
 pointInPolygon(const std::vector<asl::Vector2f> & thePolygon, const asl::Point3f & thePoint) {
 
   int  i;
@@ -788,22 +788,22 @@ pointInPolygon(const std::vector<asl::Vector2f> & thePolygon, const asl::Point3f
   bool myOddNodes=false;
 
   for (i=0; i < thePolygon.size()-1; i++) {
-      if (thePolygon[i][1]   < thePoint[1] && thePolygon[i+1][1] >= thePoint[1] || 
-              thePolygon[i+1][1] < thePoint[1] && thePolygon[i][1]   >= thePoint[1] ) 
+      if (thePolygon[i][1]   < thePoint[1] && thePolygon[i+1][1] >= thePoint[1] ||
+              thePolygon[i+1][1] < thePoint[1] && thePolygon[i][1]   >= thePoint[1] )
       {
           if (thePolygon[i][0]+(thePoint[1]-thePolygon[i][1])/(thePolygon[i+1][1]-thePolygon[i][1])*
-                  (thePolygon[i+1][0]-thePolygon[i][0])< thePoint[0]) 
+                  (thePolygon[i+1][0]-thePolygon[i][0])< thePoint[0])
           {
               myOddNodes = !myOddNodes;
           }
       }
   }
-  return myOddNodes; 
+  return myOddNodes;
 }
 
 unsigned
-recurseLasso(const std::vector<asl::Vector2f> & thePolygon, const dom::NodePtr & theTransformNode, 
-             const asl::Matrix4f & theViewProjection, unsigned theColor) 
+recurseLasso(const std::vector<asl::Vector2f> & thePolygon, const dom::NodePtr & theTransformNode,
+             const asl::Matrix4f & theViewProjection, unsigned theColor)
 {
     unsigned myColoredCount = 0;
     if (theTransformNode->nodeName() == BODY_NODE_NAME) {
@@ -848,9 +848,9 @@ recurseLasso(const std::vector<asl::Vector2f> & thePolygon, const dom::NodePtr &
     }
     return myColoredCount;
 }
-    
+
 unsigned
-Mesh::colorScreenSpaceLasso(const dom::NodePtr & theLassoBody, 
+Mesh::colorScreenSpaceLasso(const dom::NodePtr & theLassoBody,
                             const dom::NodePtr & theTransformationRoot,
                             const asl::Matrix4f & theViewProjection,
                             unsigned int theColor)
@@ -861,9 +861,9 @@ Mesh::colorScreenSpaceLasso(const dom::NodePtr & theLassoBody,
     dom::NodePtr myLassoShape = theLassoBody->getElementById(theLassoBody->getFacade<Body>()->get<ShapeTag>());
     dom::NodePtr myVertexData = myLassoShape->childNode(VERTEX_DATA_NAME);
     dom::NodePtr myPositionsNode = myVertexData->childNodeByAttribute(SOM_VECTOR_VECTOR3F_NAME, NAME_ATTRIB, POSITION_ROLE );
-    
+
     const VectorOfVector3f & myShapePositions = myPositionsNode->childNode(0)->nodeValueRef<VectorOfVector3f>();
-        
+
     std::vector<asl::Vector2f> myPolygon;
     for (int i = 0; i < myShapePositions.size(); ++i) {
         asl::Point3f myClipSpacePosition = asPoint(myShapePositions[i]) * myModelViewProjection;
@@ -873,7 +873,7 @@ Mesh::colorScreenSpaceLasso(const dom::NodePtr & theLassoBody,
     return recurseLasso(myPolygon, theTransformationRoot, theViewProjection, theColor);
 }
 
-void 
+void
 Mesh::removeMeshAndColor() {
     if (_myWriteLockCount <= 0) {
         if (!_myElementsNode->removeChild(_myElementsNode->childNode(HALFEDGES_NODE_NAME))) {
@@ -889,7 +889,7 @@ Mesh::removeMeshAndColor() {
     }
 }
 
-bool 
+bool
 Mesh::notifyProgress(double theProgress, const std::string & theMessage) {
     return _myProgressSignal.emit(theProgress, Glib::ustring(theMessage));
 }

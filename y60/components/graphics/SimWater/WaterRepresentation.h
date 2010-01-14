@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -83,7 +83,7 @@ class BufferAllocator {
 public:
     BufferAllocator() {}
     virtual ~BufferAllocator(){}
-    
+
     virtual void *  allocateSingleBuffer(unsigned int numBytes) = 0;
     virtual bool    freeSingleBuffer() = 0;
 };
@@ -102,9 +102,9 @@ const int VERTEX_DATA_STRIDE = 12;
 
 
 class WaterRepresentation {
-    
+
 public:
-    enum TextureClass { first = 1, floormaps = 1, surfacemaps = 2, cubemaps = 3, 
+    enum TextureClass { first = 1, floormaps = 1, surfacemaps = 2, cubemaps = 3,
                         puzzlemaps = 4 , last = 4
                       };
     // do not forget to add name when adding new values to TextureClass enum
@@ -118,19 +118,19 @@ public:
     }
 
     WaterRepresentation();
-    
+
     ~WaterRepresentation();
 
 //  make sure that (height % NUM_BUFFERS == 0) !!!
 
     // init internal data to fit water array size
-    void    init(WaterSimulationPtr waterSim, int width, int height, 
+    void    init(WaterSimulationPtr waterSim, int width, int height,
                  int dataOffsetX, int dataOffsetY,
                  int sceneDisplayWidth, int sceneDisplayHeight,
                  int displayWidth, int displayHeight,
                  int displayOffsetX, int displayOffsetY,
                  BufferAllocatorPtr bufferAllocator = BufferAllocatorPtr() );
-    
+
     void setDataOffset(const asl::Vector2i & theOffset);
     void setDisplayOffset(const asl::Vector2i & theOffset);
 
@@ -139,7 +139,7 @@ public:
 
     // update water data
     void    update();
-    
+
     // render in opengl
     void    preRender();    // setup data and vertex buffer
     void    render();
@@ -149,7 +149,7 @@ public:
 
     bool activateTexture(TextureClass theClassID, short newObjectID);
     bool activateTextureIndex(TextureClass theClassID, int newIndex);
-    bool getTextureIndex(TextureClass theClassID, short whichObjectID, int & theResultIndex); 
+    bool getTextureIndex(TextureClass theClassID, short whichObjectID, int & theResultIndex);
     bool activateOtherTexture(TextureClass theClassID, int theIndexOffset);
 
     bool hasTexture(TextureClass theClassID, short whichObjectID) {
@@ -175,42 +175,42 @@ public:
     void    setReflectionNormalScale(float value) {
         _reflectionNormalScale= value;
     }
-    
+
     bool    getDrawWireFrame() const {
         return _drawWireFrame;
     }
     void    setDrawWireFrame(bool value) {
         _drawWireFrame = value;
     }
-   
+
     bool    getDrawCaustics() const {
         return _drawCaustics;
     }
     void    setDrawCaustics(bool value) {
         _drawCaustics = value;
     }
-    
+
     bool    getDrawReflections() const {
         return _drawReflections;
     }
     void    setDrawReflections(bool value) {
         _drawReflections= value;
     }
-    
+
     bool    getDrawRefractions() const {
         return _drawRefractions;
     }
     void    setDrawRefractions(bool value) {
         _drawRefractions= value;
     }
-    
+
     float   getRefractionScale() const {
         return _refractionScale;
     }
     void    setRefractionScale(float value) {
         _refractionScale= value;
     }
-    
+
     float   getCausticBias() const {
         return _causticBias;
     }
@@ -262,7 +262,7 @@ public:
 
     // remove any "special" GL state settings
     virtual void    setDefaultGLState();
-    
+
 private:
     BufferAllocatorPtr  _bufferAllocator;
     GLfloat *           _vertexBuffer;
@@ -307,13 +307,13 @@ private:
     };
     VAR_Buffer          _varBuffer[NUM_VAR_BUFFERS];
     GLuint *            _stripIndices;
-    bool                _renderSurfaceEnabled; 
+    bool                _renderSurfaceEnabled;
     float               _crackWidth;
     float               _innerIceThickness;
     float               _outerIceThickness;
     bool                _renderCrackField;
     float               _surfaceOpacity;
-    
+
     bool            initRender();
     bool            initExtensions(const char* extension);
 
@@ -324,7 +324,7 @@ private:
     inline int      computeStripLength() const {
         return 2 + 2 * (_dataWidth - 1);
     }
-    
+
     void    copyWaterDataToVertexBuffer();
     void    copyWaterDataToVertexBuffer(int currentBuffer);
 

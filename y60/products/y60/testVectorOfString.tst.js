@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 
@@ -134,7 +134,7 @@ VectorOfStringTest.prototype.Constructor = function(obj, theName) {
         obj.myEmptyVectorOfString = obj.myDocument.firstChild.childNode(3).foo;
         obj.myVectorWithEmptyString = obj.myDocument.firstChild.childNode(4).foo;
 
-        
+
         ENSURE('obj.myVectorOfInt[0] == 1');
         ENSURE('obj.myVectorOfInt[1] == 2');
         ENSURE('obj.myVectorOfInt[2] == 3');
@@ -143,19 +143,19 @@ VectorOfStringTest.prototype.Constructor = function(obj, theName) {
         obj.myVectorOfInt[1] = 17.8;
         DPRINT('"### WARN we get an automatic float to int conversion here, type safety ? "');
         ENSURE('obj.myVectorOfInt[1] == 17');
-        
+
         ENSURE('almostEqual(obj.myVectorOfVector2f[0],new Vector2f(0.1,0.2) )');
         obj.myVectorOfVector2f[1] = new Vector2f(0.2,0.4);
         ENSURE('almostEqual(obj.myVectorOfVector2f[1],new Vector2f(0.2,0.4) )');
-       
+
         ENSURE('obj.myVectorOfString[0] == "one"');
         ENSURE('obj.myVectorOfString[1] == "two"');
         ENSURE('obj.myVectorOfString[2] == "three"');
         obj.myVectorOfString[1] = "zwei";
         ENSURE('obj.myVectorOfString[1] == "zwei"');
-        
+
         ENSURE('obj.myEmptyVectorOfString.length == 0');
-        
+
         ENSURE('obj.myVectorWithEmptyString.length == 6');
         ENSURE('obj.myVectorWithEmptyString[0] == ""');
         ENSURE('obj.myVectorWithEmptyString[4] == "bar"');

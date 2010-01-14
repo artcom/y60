@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO  
+// Description: TODO
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -86,11 +86,11 @@ using namespace asl;
 using namespace std;
 
 namespace y60 {
-    
-unsigned long RelativeReadableStream::read(void *theDest, unsigned long theSize) {        
+
+unsigned long RelativeReadableStream::read(void *theDest, unsigned long theSize) {
 
     unsigned long myPrevOffset = _myOffset;
-    AC_DEBUG << "reading... " << theSize; 
+    AC_DEBUG << "reading... " << theSize;
     try {
         _myOffset = _mySource->readBytes(theDest, theSize, _myOffset);
 
@@ -98,9 +98,9 @@ unsigned long RelativeReadableStream::read(void *theDest, unsigned long theSize)
         //read up to EOS
         _myOffset = _mySource->readBytes(theDest, _mySource->size()-myPrevOffset, myPrevOffset);
     }
-    AC_DEBUG << "read " << _myOffset - myPrevOffset << " bytes, fp " << _myOffset; 
+    AC_DEBUG << "read " << _myOffset - myPrevOffset << " bytes, fp " << _myOffset;
     return _myOffset - myPrevOffset;
-} 
+}
 
 unsigned long RelativeReadableStream::seek(int pos, int whence) {
     switch (whence) {
@@ -139,17 +139,17 @@ static int acstream_open(URLContext *h, const char *filename, int flags) {
         return -1;
     }
 }
-    
+
 static int acstream_read(URLContext *h, unsigned char *buf, int size) {
-    RelativeReadableStream * mySource 
+    RelativeReadableStream * mySource
         = reinterpret_cast<RelativeReadableStream*>(h->priv_data);
-    
+
     return mySource->read(buf, size);
-}    
+}
 
 static int64_t acstream_seek(URLContext *h, int64_t pos, int whence) {
     //int64_t myOffset = 0;
-    RelativeReadableStream * mySource 
+    RelativeReadableStream * mySource
         = reinterpret_cast<RelativeReadableStream*>(h->priv_data);
 
     return mySource->seek( static_cast<int>(pos), whence);
@@ -157,7 +157,7 @@ static int64_t acstream_seek(URLContext *h, int64_t pos, int whence) {
 }
 
 static int acstream_close(URLContext *h) {
-    RelativeReadableStream * mySource 
+    RelativeReadableStream * mySource
         = reinterpret_cast<RelativeReadableStream*>(h->priv_data);
 
     freeStream(mySource);
@@ -176,13 +176,13 @@ URLProtocol acstream_protocol = {
 
 
 void registerStream(string theUrl, asl::Ptr<ReadableStream> theSource) {
-    
+
     static bool avRegistered = false;
     if (!avRegistered) {
         register_protocol(&acstream_protocol);
         avRegistered = true;
     }
-        
+
     //TODO support opening the same stream multiple times
     ourOpenStreams[theUrl] = RelativeReadableStream(theSource);
 }
