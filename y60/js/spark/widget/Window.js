@@ -339,8 +339,8 @@ spark.Window.Constructor = function(Protected) {
         case "onASSEvent":
             return new Point2f(theEvent.position3D.x, theEvent.position3D.y);
         case "onTuioEvent":
-            return new Point2f(theEvent.position.x * 1920.0,  // XXX window size
-                               theEvent.position.y * 1200.0); // XXX window size
+            return new Point2f(theEvent.position.x * Public.width,
+                               theEvent.position.y * Public.height);
         default:
             Logger.fatal("Unknown multitouch event type");
             return null;
@@ -378,7 +378,12 @@ spark.Window.Constructor = function(Protected) {
             var myPosition = getMultitouchCursorPosition(theEvent);
             var myFocused = myCursor.focused;
 
-            var myPick = Public.pickWidget(myPosition.x, myPosition.y);
+            var myPick;
+            if(myCursor.grabbed) {
+                myPick = myCursor.grabHolder;
+            } else {
+                myPick = Public.pickWidget(myPosition.x, myPosition.y);
+            }
             if(!myPick) {
                 myPick = Public;
             }

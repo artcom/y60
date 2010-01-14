@@ -26,10 +26,28 @@ spark.Cursor.Constructor = function(Protected, theId) {
         return _myActive;
     };
 
-    var _myFocused = null;
+    var _myGrabHolder = null;
+
+    Public.grabHolder getter = function() {
+        return _myGrabHolder;
+    };
+
+    var _myHovered = null;
+
+    Public.hovered getter = function() {
+        return _myHovered;
+    };
 
     Public.focused getter = function() {
-        return _myFocused;
+        if(_myGrabHolder) {
+            return _myGrabHolder;
+        } else {
+            return _myHovered;
+        }
+    };
+
+    Public.grabbed getter = function() {
+        return (_myGrabHolder != null);
     };
 
     var _myStagePosition = new Point2f();
@@ -46,8 +64,8 @@ spark.Cursor.Constructor = function(Protected, theId) {
         return _myStagePosition.y;
     };
 
-    Public.update = function(theFocused, theStagePosition) {
-        _myFocused = theFocused;
+    Public.update = function(theHovered, theStagePosition) {
+        _myHovered = theHovered;
         _myStagePosition = theStagePosition.clone();
     };
 
@@ -57,6 +75,14 @@ spark.Cursor.Constructor = function(Protected, theId) {
 
     Public.deactivate = function() {
         _myActive = false;
+    };
+
+    Public.grab = function(theHolder) {
+        _myGrabHolder = theHolder;
+    };
+
+    Public.ungrab = function() {
+        _myGrabHolder = null;
     };
 
 };
