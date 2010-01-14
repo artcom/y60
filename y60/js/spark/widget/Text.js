@@ -16,7 +16,7 @@ spark.Text.Constructor = function(Protected) {
     var _myLineWidths = [];
     var _myImage;
     var _myTexture;
-    
+
     Public.text getter = function() { return _myText; };
     Public.text setter = function(theValue) {
         _myText = Protected.performLayout(theValue);
@@ -30,7 +30,7 @@ spark.Text.Constructor = function(Protected) {
     };
     Public.i18nItem getter = function() { return Public.textId; }
     Public.i18nItem setter = function(i) { Public.textId = i; }
-    
+
     Public.style getter = function() {
         return _myStyle;
     };
@@ -59,7 +59,7 @@ spark.Text.Constructor = function(Protected) {
             return myTextSize;
         }
     };
-    
+
     Base.realize = Public.realize;
     Public.realize = function() {
         // retrieve text
@@ -73,10 +73,10 @@ spark.Text.Constructor = function(Protected) {
                 _myText = myI18nText;
             }
         }
-        
+
         // extract font style
         _myStyle = spark.fontStyleFromNode(Public.node);
-        
+
         var myWidth  = Protected.getNumber("width");
         var myHeight = Protected.getNumber("height");
         _myImage = Modelling.createImage(window.scene, myWidth, myHeight, "BGRA");
@@ -86,7 +86,7 @@ spark.Text.Constructor = function(Protected) {
         var myMaterial = Modelling.createUnlitTexturedMaterial(window.scene,
                 _myTexture, Public.name + "-material", true);
 
-        Base.realize(myMaterial);        
+        Base.realize(myMaterial);
 
         _myText = Protected.performLayout(_myText);
 

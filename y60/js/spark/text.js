@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -64,9 +64,9 @@ spark.loadFont = function(theName, theSize, theStyle) {
         if(theStyle != "normal") {
             spark.loadFont(theName, theSize, "normal");
         }
-        
+
         Logger.info("Loading font " + theName + " with size " + theSize + " and style " + theStyle);
-        
+
         var myFontPath = null;
         if (fileExists("FONTS/" + theName + "-" + theStyle + ".otf")) {
             myFontPath = "FONTS/" + theName + "-" + theStyle + ".otf";
@@ -80,18 +80,18 @@ spark.loadFont = function(theName, theSize, theStyle) {
             throw new Error("FONTS/" + theName + "-" + theStyle + ".[ttf|otf] nor " +
                     theName + ".[ttf|otf] does not exist");
         }
-        
+
         // blurry aber gutes spacing -> No Hinting (Renderer.NOHINTING)
         // crispy aber rottenschlechtes spacing -> Natives Fonthinting (Renderer.NATIVEHINTING)
         // wenig crispy aber okes spacing -> Autohinting (Renderer.AUTOHINTING)
 
-        // XXX: inconsistent hinting!?        
+        // XXX: inconsistent hinting!?
         if (theStyle != "normal") {
            // enforce loadttf of a normal font, otherwise we get an exception
            window.loadTTF(myName, myFontPath, theSize, Renderer.AUTOHINTING , spark.styleFromString("normal"));
         }
         window.loadTTF(myName, myFontPath, theSize, Renderer.NOHINTING , spark.styleFromString(theStyle));
-        
+
         spark.ourLoadedFonts[myName] = true;
 
        // always load the bold variant to allow the bold tag <b>...</b> to be used
@@ -107,7 +107,7 @@ spark.loadFont = function(theName, theSize, theStyle) {
                window.loadTTF(myName, searchFile(myFontPath), theSize, Renderer.AUTOHINTING , Renderer.BOLD);
            }
        }
-        
+
     }
     return myName;
 };
@@ -120,13 +120,13 @@ spark.applyStyleDefaults = function(theStyle) {
     !theStyle.getAttribute("bottomPad") ? theStyle.bottomPad = 0 : null;
     !theStyle.getAttribute("rightPad")  ? theStyle.rightPad  = 0 : null;
     !theStyle.getAttribute("leftPad")   ? theStyle.leftPad   = 0 : null;
-    
+
     !theStyle.getAttribute("tracking")   ? theStyle.tracking   = 0 : null;
     !theStyle.getAttribute("lineHeight") ? theStyle.lineHeight = 0 : null;
-    
+
     !theStyle.getAttribute("hAlign")    ? theStyle.hAlign    = "left" : null;
     !theStyle.getAttribute("vAlign")    ? theStyle.vAlign    = "top"  : null;
-    
+
     !theStyle.getAttribute("textColor")       ? theStyle.textColor        = "000000" : null;
     !theStyle.getAttribute("backgroundColor") ? theStyle.backgroundColor  = "FFFFFF" : null;
 };
@@ -162,7 +162,7 @@ spark.fontStyleFromNode = function(theNode) {
     copyAttributeIfPresent("backgroundColor");
 
     spark.applyStyleDefaults(myStyle);
-    
+
     return myStyle;
 };
 
@@ -202,7 +202,7 @@ spark.styleFromString = function(theString) {
 spark.createTextImage = function(theSize) {
     var myImage = Modelling.createImage(window.scene, theSize.x, theSize.y, "RGBA");
     myImage.resize = "none";
-    
+
     return myImage;
 };
 
@@ -222,13 +222,13 @@ spark.renderText = function(theImage, theText, theStyle, theSize, theMaxTextWidt
     if(theSize != undefined) {
         mySize = theSize;
     }
-    
+
     var myTextSize =
         window.renderTextAsImage(theImage,
-                                 theText, 
+                                 theText,
                                  myFont,
                                  mySize.x, mySize.y);
-    
+
     if (theMaxTextWidth) {
         theMaxTextWidth.width = window.getTextMaxWidth();
     }
@@ -238,9 +238,9 @@ spark.renderText = function(theImage, theText, theStyle, theSize, theMaxTextWidt
             theLineWidths.push(myLineWidths[i]);
         }
     }
-    
+
     var myMatrix = new Matrix4f();
-    myMatrix.makeScaling(new Vector3f(myTextSize.x / theImage.width, 
+    myMatrix.makeScaling(new Vector3f(myTextSize.x / theImage.width,
                                       myTextSize.y / theImage.height, 1));
     theImage.matrix = myMatrix;
 

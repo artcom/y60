@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -64,5 +64,5 @@ spark.setupCameraOrtho = function(theCamera, theWidth, theHeight) {
     theCamera.position.x = theWidth/2;
     theCamera.position.y = theHeight/2;
     theCamera.position.z = 2500;
-    theCamera.orientation = Quaternionf.createFromEuler(new Vector3f(0,0,0));        
+    theCamera.orientation = Quaternionf.createFromEuler(new Vector3f(0,0,0));
 }

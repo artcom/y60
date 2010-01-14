@@ -15,11 +15,11 @@ spark.CoverFlow = spark.ComponentClass("CoverFlow");
 spark.CoverFlow.Constructor = function(Protected) {
     var Base = {};
     var Public = this;
-    
+
     var CACHED_IMAGES = 30;
     const MAX_RENDERED_IMAGES = 1;
     const MAX_DELETED_IMAGES = 2;
-    
+
     const FORWARD = 1;
     const BACK = -1;
     const MAX_ANIMATION_DURATION = 2;
@@ -36,7 +36,7 @@ spark.CoverFlow.Constructor = function(Protected) {
     const BODYCOUNT = 11;
     var CENTER_OFFSET = Math.floor(BODYCOUNT/2);
     const MAX_ANIM_ENTRIES = 20;
-    
+
     var _myAlphaAnimationFlag = true;
     var _myCoverRotation = COVER_ROTATION;
     var _myPerCoverDistance = PER_COVER_DISTANCE;
@@ -56,7 +56,7 @@ spark.CoverFlow.Constructor = function(Protected) {
     var _myOffscreenBody = null;
     var _myOffscreenCam = null;
     var _myVisibility = true;
-    
+
     var _myNumberOfEntries = 0;
     var _myBodyPool = [];
     var _myStartIndex = 0;
@@ -67,7 +67,7 @@ spark.CoverFlow.Constructor = function(Protected) {
     var _myFirstPointer = 0;
     var _myLastPagePosition = 0;
     var _myEntries = null;
-    
+
     var _myDirection = 1;
     var _myCurrentIndex = 0;
     var _mySkip = 0;
@@ -77,24 +77,24 @@ spark.CoverFlow.Constructor = function(Protected) {
     var _myStartSpeed = 0;
     var _myRestOfTheWorldNode = null;
     var _myEntrySrc = "";
-    
+
     this.Inherit(spark.Transform);
-    
+
     Public.currentindex getter = function() {
         return _myCurrentIndex;
     }
-    
+
     Public.numberofentries getter = function() {
         return _myNumberOfEntries;
     }
 
-    /* use it to define a groupnode for everything 
+    /* use it to define a groupnode for everything
        what should not be rendered offscreen from the Coverflow
      */
     Public.restoftheworld setter = function (theNode) {
         _myRestOfTheWorldNode = theNode;
     }
-    
+
     Base.realize = Public.realize;
     Public.realize = function() {
         Base.realize();
@@ -114,84 +114,84 @@ spark.CoverFlow.Constructor = function(Protected) {
             Logger.warning("max_animated_entries has to be an even number");
             _myMaxAnimatedEntries -= 1;
         }
-        
+
         CENTER_OFFSET = Math.floor(_myBodyCount/2);
-        
+
         _myOffscreenTransform = new spark.Transform();
-        Public.addChild(_myOffscreenTransform);  
+        Public.addChild(_myOffscreenTransform);
         _myOffscreenTransform.name = "OffscreenTransform";
-        _myOffscreenTransform.realize();  
+        _myOffscreenTransform.realize();
         _myOffscreenTransform.visible = false;
-        
+
         _myNormalTransform = new spark.Transform();
-        Public.addChild(_myNormalTransform);  
+        Public.addChild(_myNormalTransform);
         _myNormalTransform.name = "NormalTransform";
-        _myNormalTransform.realize();  
-        
+        _myNormalTransform.realize();
+
     }
-    
+
     Base.postRealize = Public.postRealize;
     Public.postRealize = function() {
         Base.postRealize();
         _myOffscreenCam = window.camera.cloneNode(true);
         adjustNodeId(_myOffscreenCam, true);
-        Public.sceneNode.appendChild(_myOffscreenCam); 
+        Public.sceneNode.appendChild(_myOffscreenCam);
         setupCamera3d(_myOffscreenCam, _myWidth, _myHeight);
         createOffScreenRenderer(_myOffscreenCam);
-        
+
         if (_myBodyCount > CACHED_IMAGES) {
             Logger.warning("_myBodyCount > CACHED_IMAGES resizing image cache");
             CACHED_IMAGES = ((_myBodyCount+1)%2 == 1) ? _myBodyCount : _myBodyCount +1;
         }
         Public.loadEntries();
         createBodyPool();
-        _myCurrentIndex = _myBodyPool[CENTER_OFFSET].imageidx;  
-        
+        _myCurrentIndex = _myBodyPool[CENTER_OFFSET].imageidx;
+
         // ON FRAME
         Public.stage.addEventListener(spark.StageEvent.FRAME, function(theEvent) {
-            
+
             if (_myNumberOfEntries == 0) {
                 return;
             }
             addImageToCache();
             removeOldImageFromCache();
-            
+
             positionEntries(theEvent.currenttime, theEvent.deltaT);
             if (Public.visible) {
                 renderSceneOffScreen();
             }
             _myVisibility = _myNormalTransform.visible;
         });
-        
+
         Public.stage.addEventListener(spark.StageEvent.PRE_RENDER, function(theEvent) {
             _myNormalTransform.visible = false;
             if (_myOffscreenBody) {
                 _myOffscreenTransform.visible = _myVisibility;
             }
         });
-        
+
         Public.stage.addEventListener(spark.StageEvent.POST_RENDER, function(theEvent) {
             _myNormalTransform.visible = _myVisibility;
             if (_myOffscreenBody) {
                 _myOffscreenTransform.visible = false;
             }
         });
-        
+
         Public.stage.addEventListener(spark.KeyboardEvent.KEY_DOWN, function(theEvent) {
             if (Public.visible) {
                 if (theEvent.keyString == "right") {
-                    Public.startAnimation((_myCurrentIndex+1)/(_myNumberOfEntries-1));        
+                    Public.startAnimation((_myCurrentIndex+1)/(_myNumberOfEntries-1));
                 }
                 if (theEvent.keyString == "left") {
-                    Public.startAnimation((_myCurrentIndex-1)/(_myNumberOfEntries-1));        
+                    Public.startAnimation((_myCurrentIndex-1)/(_myNumberOfEntries-1));
                 }
             }
         });
-        
-        Public.startAnimation(0.5);        
+
+        Public.startAnimation(0.5);
     }
-    
-    Public.loadEntries = function() {        
+
+    Public.loadEntries = function() {
         _myEntries = new Node();
         _myEntries.parseFile(_myEntrySrc);
         _myEntries = _myEntries.firstChild;
@@ -199,14 +199,14 @@ spark.CoverFlow.Constructor = function(Protected) {
             _myNumberOfEntries = _myEntries.childNodes.length;
         }
         print("found " + _myNumberOfEntries + " entries in coverflow");
-        
+
         var myCacheSize = Math.min(_myNumberOfEntries, CACHED_IMAGES);
         for (var i = 0; i < myCacheSize; ++i) {
             createEntryImageIndex(_myNumberOfEntries - myCacheSize + i);
         }
         _mySkip = 0;
     }
-    
+
     function addImageToCache () {
         var myCounter = 0;
         for (var i = 0; i < CACHED_IMAGES; ++i) {
@@ -220,7 +220,7 @@ spark.CoverFlow.Constructor = function(Protected) {
             }
         }
     }
-    
+
     function removeOldImageFromCache () {
         var myCounter = 0;
         for (imageidx in _myEntryImages) {
@@ -234,10 +234,10 @@ spark.CoverFlow.Constructor = function(Protected) {
                     return;
                 }
             }
-            
+
         }
     }
-    
+
     Public.fadeOutOffscreenBody = function() {
         var myClosureAnimation = new GUI.ClosureAnimation(FADE_TIME , unpenner(Easing.easeInQuad),
                                             function(theProgress) {
@@ -245,11 +245,11 @@ spark.CoverFlow.Constructor = function(Protected) {
                                             }
                                             );
         myClosureAnimation.onFinish = function() {
-            Public.visible = false;    
-        }                                        
-        playAnimation(myClosureAnimation);                                             
+            Public.visible = false;
+        }
+        playAnimation(myClosureAnimation);
     }
-    
+
     Public.fadeInOffscreenBody = function(theDelayFlag) {
         var mySequenceAnimation = new GUI.SequenceAnimation();
         if (theDelayFlag != undefined && theDelayFlag) {
@@ -264,21 +264,21 @@ spark.CoverFlow.Constructor = function(Protected) {
            Public.visible = true;
        }
        mySequenceAnimation.add(myClosureAnimation);
-       playAnimation(mySequenceAnimation);                                             
+       playAnimation(mySequenceAnimation);
     }
-    
+
     function createEntryImageIndex(theIndex) {
         var myEntry = _myEntries.childNode(theIndex);
         createEntryImage(theIndex, myEntry.src);
     }
-        
-    function createEntryImage(theIndex, theSrc) {        
+
+    function createEntryImage(theIndex, theSrc) {
         _myEntryImages[theIndex] = Modelling.createImage(window.scene, theSrc).id;
     }
-    
+
     function createBodyPool() {
         _myBodyPool = [];
-        
+
         for (var i = _myNumberOfEntries - _myBodyCount; i < _myNumberOfEntries; ++i) {
             var myVisible = (i >= 0 && i < _myNumberOfEntries);
             var myImage = null;
@@ -311,7 +311,7 @@ spark.CoverFlow.Constructor = function(Protected) {
                 myBody.name = "coverbody_" + i;
                 myBody.position.y = Math.round(_myCoverSize.y/2);
             }
-            
+
             _myBodyPool.push({body: myBody, tex: myTexture, imageidx: i, visible: myVisible});
         }
     }
@@ -328,7 +328,7 @@ spark.CoverFlow.Constructor = function(Protected) {
 
         var myEntry = _myEntries.childNode(_myNumberOfEntries);
         _myBodyPool[myIndex].entry = myEntry;
-        
+
         var myTargetRotation = Quaternionf.createFromEuler(new Vector3f(0,0,0));
         _myBodyPool[myIndex].body.orientation = myTargetRotation;
         var myScaleFactor = 0.96;
@@ -346,14 +346,14 @@ spark.CoverFlow.Constructor = function(Protected) {
             _myBodyPool[myIndex].body.scale.x = 1;
             _myBodyPool[myIndex].body.scale.y = 1;
             ourShow.newentryopenflag = false;
-        }        
+        }
         playAnimation(myClosureAnimation);
-        
+
         ourShow.entryWindow.visible = false;
         _myNumberOfEntries++;
-        
+
     }*/
-    
+
     function getCacheSize() {
         var myCount = 0;
         for(i in _myEntryImages) {
@@ -361,15 +361,15 @@ spark.CoverFlow.Constructor = function(Protected) {
         }
         return myCount;
     }
-    
+
     function printEntries() {
         for(i in _myEntryImages) {
             print(i)
         }
         print("---------------------")
     }
-    
-    
+
+
     function updateBodyPool(theEntryDifference) {
         for (var i = 0; i < Math.abs(theEntryDifference); ++i) {
             if (theEntryDifference > 0) { //increase page number
@@ -386,7 +386,7 @@ spark.CoverFlow.Constructor = function(Protected) {
                     _myBodyPool[_myFirstPointer].tex.image = _myEntryImages[myNewSkipIdx];
                     _myBodyPool[_myFirstPointer].visible = true;
                 }
-                
+
                 _myBodyPool[_myFirstPointer].imageidx = myNewIdx;
                 _myFirstPointer = (++_myFirstPointer + _myBodyCount)% _myBodyCount;
             } else { //decrease page number
@@ -403,13 +403,13 @@ spark.CoverFlow.Constructor = function(Protected) {
 
                     var myEntry = _myEntries.childNode(myNewSkipIdx);
                     _myBodyPool[_myFirstPointer].tex.image = _myEntryImages[myNewSkipIdx];
-                    _myBodyPool[_myFirstPointer].visible = true;                    
+                    _myBodyPool[_myFirstPointer].visible = true;
                 }
                 _myBodyPool[_myFirstPointer].imageidx = myNewIdx;
             }
         }
     }
-    
+
     //fix indices after animation with skipped textures
     function fixSkip() {
         _myCurrentIndex += _mySkip;
@@ -418,7 +418,7 @@ spark.CoverFlow.Constructor = function(Protected) {
         }
         _mySkip = 0;
     }
-    
+
     Public.startAnimation = function(theTarget,theNewEntryFlag) {
         if (_mySkip != 0) {
             fixSkip();
@@ -431,7 +431,7 @@ spark.CoverFlow.Constructor = function(Protected) {
         _myStartIndex = _myCurrentIndex;
         _myActionStartTime = -1;
         _myDirection = (_myRealTargetIndex - _myCurrentIndex < 0) ? -1 : 1;
-        
+
         if (Math.abs(_myRealTargetIndex - Math.floor(_myStartIndex)) >= _myMaxAnimatedEntries) {
             _myTargetIndex = Math.floor(_myStartIndex) + _myDirection * _myMaxAnimatedEntries;
         } else {
@@ -440,7 +440,7 @@ spark.CoverFlow.Constructor = function(Protected) {
         _myAnimationDuration = _myMinAnimationDuration + Math.abs(_myTargetIndex-_myCurrentIndex)/Math.max(_myMaxAnimatedEntries,_myBodyCount) * (_myMaxAnimationDuration-_myMinAnimationDuration);
         return _myAnimationDuration;
     }
-    
+
     function changeState(theState) {
         _myState = theState;
         if (_myState == INCREASE) {
@@ -453,7 +453,7 @@ spark.CoverFlow.Constructor = function(Protected) {
             _myCurrentSpeed = 0;
         }
     }
-    
+
     function positionEntries(theTime, theDeltaT) {
         if (_myActionStartTime < -1) {
             return;
@@ -463,11 +463,11 @@ spark.CoverFlow.Constructor = function(Protected) {
             changeState(INCREASE);
         }
         var myDelta = (theTime - _myActionStartTime)/_myAnimationDuration;
-        
+
         if ( (_myState != IDLE) && (_myState != DECREASE) && myDelta > 0.8) {
             changeState(DECREASE);
         }
-        
+
         if (_myState == INCREASE) {
             if (myDelta > 0.2) {
                 _myCurrentSpeed = _myMaxSpeed;
@@ -479,18 +479,18 @@ spark.CoverFlow.Constructor = function(Protected) {
             var myFraction = 0.5;
             _myCurrentSpeed = (_myTargetIndex - _myCurrentIndex) * myFraction/theDeltaT;
         } else if (_myState == SPEEDING) {
-            
+
         } else if (_myState == IDLE) {
             return;
         }
-                
-        
+
+
         if (myDelta > 1) {
             changeState(IDLE);
         } else {
             _myCurrentIndex += _myCurrentSpeed * theDeltaT;
         }
-        
+
         var mySpeed = _myCurrentSpeed * _myDirection/_myNumberOfEntries;
         var myPhase = 1.0-(_myCurrentIndex - Math.floor(_myCurrentIndex));
         var myCurrentPage = Math.floor(_myCurrentIndex);
@@ -498,7 +498,7 @@ spark.CoverFlow.Constructor = function(Protected) {
         var myEntryDifference = myCurrentPage-myLastPage;
         if (myEntryDifference) {
             _mySkip = 0;
-            if ((Math.abs(_myRealTargetIndex - Math.floor(_myStartIndex)) >= _myMaxAnimatedEntries) && 
+            if ((Math.abs(_myRealTargetIndex - Math.floor(_myStartIndex)) >= _myMaxAnimatedEntries) &&
                 Math.abs(myCurrentPage - Math.floor(_myStartIndex)) >= _myMaxAnimatedEntries/2) {
                 var mySDist = Math.abs(_myRealTargetIndex - Math.floor(_myStartIndex)) - _myMaxAnimatedEntries;
                 _mySkip += (myEntryDifference > 0 ? 1: -1) * mySDist;
@@ -506,28 +506,28 @@ spark.CoverFlow.Constructor = function(Protected) {
             updateBodyPool(myEntryDifference, _mySkip);
         }
         _myLastPagePosition = _myCurrentIndex;
-        
+
         //print("delta "+myDelta);
         //print("pagepos "+_myCurrentIndex);
         //print("speed "+mySpeed);
         //print(_myTargetIndex,_myStartIndex,myCurrentPage,_myDirection,myPhase);
-            
+
         for (var i = 0; i < _myBodyCount; ++i) {
-        
+
             if (_myBodyPool[i].visible) {
                 _myBodyPool[i].body.visible = true;
             } else {
                 _myBodyPool[i].body.visible = false;
                 continue;
             }
-            
+
             var reali = ((i-_myFirstPointer+_myBodyCount)%_myBodyCount);
-            
+
             //rotation
             var myTargetRotation = Quaternionf.createFromEuler(new Vector3f(0,0,0));
             if (reali == CENTER_OFFSET) {
                 myTargetRotation = Quaternionf.createFromEuler(new Vector3f(0,radFromDeg(_myCoverRotation+Math.abs(mySpeed)+myPhase*-_myCoverRotation),0));
-            } else if (reali == CENTER_OFFSET+1) {   
+            } else if (reali == CENTER_OFFSET+1) {
                 myTargetRotation = Quaternionf.createFromEuler(new Vector3f(0,radFromDeg(-_myCoverRotation-Math.abs(mySpeed)+(1.0-myPhase)*_myCoverRotation),0));
             } else if (reali < CENTER_OFFSET) {
                 myTargetRotation = Quaternionf.createFromEuler(new Vector3f(0,radFromDeg(_myCoverRotation+Math.abs(mySpeed)),0));
@@ -535,16 +535,16 @@ spark.CoverFlow.Constructor = function(Protected) {
                 myTargetRotation = Quaternionf.createFromEuler(new Vector3f(0,radFromDeg(-_myCoverRotation-Math.abs(mySpeed)),0));
             }
             _myBodyPool[i].body.orientation = myTargetRotation;
-            
+
             //position
             if (reali == CENTER_OFFSET) {
-                if (Math.abs(_myStartIndex-_myTargetIndex) <= 1 || 
+                if (Math.abs(_myStartIndex-_myTargetIndex) <= 1 ||
                     (Math.abs(myCurrentPage-_myTargetIndex) < 1 && _myDirection < 0) ||
                     (Math.abs(myCurrentPage-_myTargetIndex) == 0 && _myDirection > 0) ||
-                    
+
                     (Math.abs(myCurrentPage-Math.floor(_myStartIndex)) == 0 && _myDirection > 0) ||
                     (Math.abs(myCurrentPage-Math.floor(_myStartIndex)) == 0 && _myDirection < 0) )
-                    
+
                 {
                     _myBodyPool[i].body.position.z = (1.0-myPhase) * _myCoverPositionZ;
                 } else {
@@ -556,9 +556,9 @@ spark.CoverFlow.Constructor = function(Protected) {
                 }
                 _myBodyPool[i].body.position.x = _myWidth/2 - (1.0-Math.pow(myPhase,1.33333)) * myMovement;
             } else if (reali == CENTER_OFFSET+1) {
-                if (Math.abs(_myStartIndex-_myTargetIndex) <= 1 || 
+                if (Math.abs(_myStartIndex-_myTargetIndex) <= 1 ||
                    (Math.abs(myCurrentPage-_myTargetIndex) <= 1 && _myDirection > 0) ||
-                   
+
                    (Math.abs(myCurrentPage-Math.floor(_myStartIndex)) <= 1 && _myDirection < 0))
                 {
                     _myBodyPool[i].body.position.z = myPhase * _myCoverPositionZ;
@@ -580,7 +580,7 @@ spark.CoverFlow.Constructor = function(Protected) {
                 //z-offset
                 _myBodyPool[i].body.position.z = _myCoverPositionZ-Math.abs(reali-CENTER_OFFSET)*2;
             }
-            
+
             //alpha
             if (_myAlphaAnimationFlag) {
                 var myAlpha = 1.0;
@@ -592,23 +592,23 @@ spark.CoverFlow.Constructor = function(Protected) {
                 Modelling.setAlpha(_myBodyPool[i].body, myAlpha);
             }
         }
-        
+
         if (_myState == IDLE && _mySkip != 0) {
             fixSkip();
         }
     }
-    
-    
+
+
     function createOffScreenRenderer (theCamera) {
-        _myOffScreenImage = Modelling.createImage(window.scene, _myWidth, _myHeight, "RGBA");   
+        _myOffScreenImage = Modelling.createImage(window.scene, _myWidth, _myHeight, "RGBA");
         _myOffScreenImage.resize = "none";
-        
+
         // Flip vertically since framebuffer content is upside-down
         var myMirrorMatrix = new Matrix4f;
         myMirrorMatrix.makeScaling(new Vector3f(1,-1,1));
         _myOffScreenImage.matrix.postMultiply(myMirrorMatrix);
-        
-        _myOffScreenRenderer = new OffscreenRenderer([_myWidth, _myHeight], theCamera, "RGB", _myOffScreenImage, undefined, true, 0);    
+
+        _myOffScreenRenderer = new OffscreenRenderer([_myWidth, _myHeight], theCamera, "RGB", _myOffScreenImage, undefined, true, 0);
         _myOffScreenRenderer.texture.wrapmode = "clamp_to_edge";
         _myOffScreenRenderer.setBackgroundColor([1,1,1,0]);
         var myMaterial = buildUnlitTextureMaterialNode("offscreen_material", [_myOffScreenRenderer.texture.id]);
@@ -621,19 +621,19 @@ spark.CoverFlow.Constructor = function(Protected) {
         _myOffscreenBody.scale.y *=-1;
         _myOffscreenBody.insensible = true;
     }
-    
+
     function renderSceneOffScreen() {
         if (_myRestOfTheWorldNode) {
             _myRestOfTheWorldNode.visible = false;
         }
-        _myOffscreenTransform.visible = false;     
+        _myOffscreenTransform.visible = false;
         _myNormalTransform.visible = true;
-        _myOffScreenRenderer.renderarea.renderToCanvas(false);  
+        _myOffScreenRenderer.renderarea.renderToCanvas(false);
         if (_myRestOfTheWorldNode) {
             _myRestOfTheWorldNode.visible = true;
         }
     }
-    
+
     function setupCamera3d(theCamera, theWidth, theHeight) {
         theCamera.frustum = new Frustum();
         theCamera.frustum.width = theWidth;
@@ -645,8 +645,8 @@ spark.CoverFlow.Constructor = function(Protected) {
         theCamera.frustum.hfov = myHfov;
         theCamera.position.z = getCameraDistanceFromScreenLength(_myWidth, myHfov);
         theCamera.frustum.near = 0.1;
-        theCamera.frustum.far  = 5000; 
-        theCamera.orientation = Quaternionf.createFromEuler(new Vector3f(0,0,0));    
+        theCamera.frustum.far  = 5000;
+        theCamera.orientation = Quaternionf.createFromEuler(new Vector3f(0,0,0));
     }
 
     function getCameraDistanceFromScreenLength(theScreenLength, theHFov){

@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -107,7 +107,7 @@ spark.Event.Constructor = function(Protected, theType, theBubbles, theCancelable
     };
 
     var _myDispatching = false;
-    
+
     Public.dispatching getter = function() {
         return _myDispatching;
     };
@@ -118,7 +118,7 @@ spark.Event.Constructor = function(Protected, theType, theBubbles, theCancelable
         _myCurrentPhase  = spark.EventPhase.IDLE;
         _myCurrentTarget = null;
     };
-    
+
     Public.cancelDispatch = function() {
         if(_myCancelable) {
             Public.finishDispatch();
@@ -126,7 +126,7 @@ spark.Event.Constructor = function(Protected, theType, theBubbles, theCancelable
             Logger.fatal("event of type " + _myType + " is not cancelable");
         }
     };
-    
+
     Public.finishDispatch = function() {
         _myDispatching = false;
         _myCurrentPhase = spark.EventPhase.IDLE;
@@ -151,7 +151,7 @@ spark.EventDispatcher.Constructor = function(Protected) {
         if(theType == "mouse-click"){
             Logger.warning("MouseEvent.CLICK is deprecated; use MouseEvent.BUTTON_UP or MouseEvent.BUTTON_DOWN")
         }
-        
+
         if(theUseCapture == null) {
             theUseCapture = false;
         }
@@ -187,7 +187,7 @@ spark.EventDispatcher.Constructor = function(Protected) {
         var myCaptureList = [Public];
         while(myCurrent.parent != null) {
             var myCurrent = myCurrent.parent;
-            
+
             if("EventDispatcher" in myCurrent._classes_) {
                 myCaptureList.unshift(myCurrent);
             }
@@ -229,8 +229,8 @@ spark.EventDispatcher.Constructor = function(Protected) {
         if(theEvent.bubbles) {
             Logger.fatal("spark event bubbling has not been implemented yet");
         }
-        
-        theEvent.finishDispatch();        
+
+        theEvent.finishDispatch();
     };
 
     Public.hasEventListener = function(theType) {
@@ -253,7 +253,7 @@ spark.EventDispatcher.Constructor = function(Protected) {
         var myListeners = _myListenersByType[theType];
         for(var i = 0; i < myListeners.length; i++) {
             var myListener = myListeners[i];
-            if(myListener.type == theType 
+            if(myListener.type == theType
                && myListener.listener == theListener
                && myListener.useCapture == theUseCapture) {
                 myListeners.splice(i, 1);
@@ -313,45 +313,45 @@ spark.MouseEvent.SCROLL = "mouse-scroll";
 
 spark.MouseEvent.Constructor = function(Protected, theType, theX, theY, theAmountX, theAmountY, theButton, theButtonStates) {
     var Public = this;
-    
+
     this.Inherit(spark.Event, theType);
-    
+
     var _myStageX = theX;
-    
+
     Public.stageX getter = function() {
         return _myStageX;
     };
-    
+
     var _myStageY = theY;
 
     Public.stageY getter = function() {
         return _myStageY;
     };
-    
+
     var _myAmountX = theAmountX;
-    
+
     Public.amountX getter = function() {
         return _myAmountX;
     };
-    
+
     var _myAmountY = theAmountY;
-    
+
     Public.amountY getter = function() {
         return _myAmountY;
     };
-    
+
     var _myButton = theButton;
-    
+
     Public.button getter = function() {
         return _myButton;
     };
-    
+
     var _myButtonStates = theButtonStates;
-    
+
     Public.buttonStates getter = function () {
         return _myButtonStates;
     };
-    
+
 };
 
 spark.Keyboard = {};
@@ -371,21 +371,21 @@ spark.KeyboardEvent.KEY_UP   = "keybord-key-up";
 
 spark.KeyboardEvent.Constructor = function(Protected, theType, theKey, theModifiers) {
     var Public = this;
-    
+
     this.Inherit(spark.Event, theType);
-    
+
     var _myKey = theKey;
-    
+
     Public.key getter = function() {
         return _myKey;
     };
-    
+
     var _myModifiers = theModifiers;
-    
+
     Public.modifiers getter = function() {
         return _myModifiers;
     };
-    
+
     Public.keyString getter = function() {
         var myString =
               _myModifiers & spark.Keyboard.CTRL  ? "ctrl+"  : ""
@@ -394,7 +394,7 @@ spark.KeyboardEvent.Constructor = function(Protected, theType, theKey, theModifi
             + _myKey;
         return myString;
     };
-    
+
 };
 
 
@@ -406,24 +406,24 @@ spark.StageEvent.POST_RENDER = "stage-post-render";
 
 spark.StageEvent.Constructor = function(Protected, theType, theStage, theTime, theDeltaT) {
     var Public = this;
-    
+
     this.Inherit(spark.Event, theType);
-    
+
     var _myStage = theStage;
     var _myTime = theTime != null ? theTime : 0.0;
     var _myDeltaT = theDeltaT != null ? theDeltaT : 0.0;
-    
+
     Public.stage getter = function() {
         return _myStage;
-    };    
-    
+    };
+
     Public.currenttime getter = function() {
         return _myTime;
-    };  
-    
+    };
+
     Public.deltaT getter = function() {
         return _myDeltaT;
     };
-    
+
 };
 

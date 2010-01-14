@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -102,9 +102,9 @@ spark.ourMovieCounter = 0;
 
 spark.openMovie = function(thePath) {
     var myMovie = Node.createElement("movie");
-    
+
     window.scene.images.appendChild(myMovie);
-    
+
     myMovie.src = thePath;
     myMovie.name = "spark-movie-" + spark.ourMovieCounter++;
     myMovie.resize = "none";
@@ -112,8 +112,8 @@ spark.openMovie = function(thePath) {
     myMovie.playmode = "stop";
     myMovie.targetpixelformat = "RGB";
     myMovie.decoderhint = "FFMpegDecoder2";
-    
+
     window.scene.loadMovieFrame(myMovie);
-    
+
     return myMovie;
 };

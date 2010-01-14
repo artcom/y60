@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -51,14 +51,14 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
 /**
  * Widgets wrap Y60 scene objects.
- * 
+ *
  * This is where positioning, orientation, scaling,
  * visibility and sensibility go.
  */
@@ -72,12 +72,12 @@ spark.Widget.Constructor = function(Protected) {
     this.Inherit(spark.EventDispatcher);
 
     var _mySceneNode   = null;
-    
+
     // XXX: try to get rid of this.
     Public.sceneNode getter = function() {
         return _mySceneNode;
     };
-    
+
     // XXX: try to get rid of this.
     Public.innerSceneNode getter = function() {
         return _mySceneNode;
@@ -103,7 +103,7 @@ spark.Widget.Constructor = function(Protected) {
     Public.width getter = function(){
         return Public.size.x;
     };
-    
+
     Public.height getter = function(){
         return Public.size.y;
     };
@@ -122,7 +122,7 @@ spark.Widget.Constructor = function(Protected) {
         Logger.fatal("Widget " + Public.name + " is not the child of a valid stage.");
     };
 
-    
+
     // STAGE EVENTS
 
     Base.addEventListener = Public.addEventListener;
@@ -161,7 +161,7 @@ spark.Widget.Constructor = function(Protected) {
             break;
         }
     };
-    
+
     // ALPHA
 
     this.Property("alpha", Number, 1.0, applyAlpha);
@@ -196,8 +196,8 @@ spark.Widget.Constructor = function(Protected) {
             }
         }
     };
-    
-    
+
+
     // VISIBILITY AND SENSIBLITY
 
     Public.Property("visible", Boolean, true, applyVisibleAndSensible);
@@ -234,7 +234,7 @@ spark.Widget.Constructor = function(Protected) {
     };
 
     // SCALE
-    
+
     Public.Getter("scale", function() {
         return new Vector3f(Public.scaleX, Public.scaleY, Public.scaleZ);
     });
@@ -301,7 +301,7 @@ spark.Widget.Constructor = function(Protected) {
 
 
     // ROTATION
-    
+
     Public.Getter("rotation", function() {
         return new Vector3f(Public.rotationX, Public.rotationY, Public.rotationZ);
     });
@@ -321,9 +321,9 @@ spark.Widget.Constructor = function(Protected) {
             var myRotation = new Vector3f(radFromDeg(Public.rotationX),
                                           radFromDeg(Public.rotationY),
                                           radFromDeg(Public.rotationZ));
-            
+
             var myQuaternion = Quaternionf.createFromEuler(myRotation);
-            
+
             _mySceneNode.orientation = myQuaternion;
         }
     };
@@ -395,7 +395,7 @@ spark.Widget.Constructor = function(Protected) {
         }
         return Public.animateProperty(theDuration, theEasing, "alpha", Public.alpha, theEnd);
     };
-    
+
     Public.animateFadeIn = function(theDuration, theEasing) {
         if(!theDuration) {
             theDuration = 250.0;
@@ -434,7 +434,7 @@ spark.Widget.Constructor = function(Protected) {
         applyRotation();
         applyPivot();
         applyAlpha();
-        
+
         //Public.propagateAlpha();
     };
 
@@ -447,5 +447,5 @@ spark.Widget.Constructor = function(Protected) {
 
         Base.postRealize();
     };
-    
+
 }

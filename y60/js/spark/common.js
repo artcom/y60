@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -63,13 +63,13 @@ function Namespace(theName) {
 function AbstractClass(theName) {
     Logger.info("Defining abstract class " + theName);
     var myNamespace = this;
-    
+
     var myConstructor = function () {
         Logger.error("Trying to instantiate abstract class " + myNamespace.name + "." + theName);
     };
-    
+
     myConstructor._className_ = theName;
-    
+
     return myConstructor;
 };
 
@@ -80,12 +80,12 @@ function Class(theName) {
     function myConstructor () {
         var myPublic = this;
         var myProtected = {};
-        
+
         // initialize magic slots
         myPublic._protected_ = myProtected;
         myPublic._className_ = theName;
         myPublic._class_     = myNamespace[theName];
-        
+
         myPublic._classes_   = {};
         myPublic._classes_[theName] = myNamespace[theName];
 
@@ -105,12 +105,12 @@ function Class(theName) {
         if (theName in myNamespace){
             myNamespace[theName].Constructor.apply(myPublic, myArguments);
         } else {
-            Logger.error("'" + theName + 
+            Logger.error("'" + theName +
                          "' not found in namespace '" + myNamespace.name + "'");
         }
 
     };
-    
+
     myConstructor._className_ = theName;
 
     return myConstructor;
@@ -180,7 +180,7 @@ function ConvertToString(theType, theValue) {
     switch(theType) {
     case Boolean:
     case Number:
-    case String:    
+    case String:
         return String(theValue);
     default:
         throw new Exception("Do not know how to convert from the given type " + theType);

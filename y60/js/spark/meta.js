@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -64,13 +64,13 @@ spark.componentClasses = {};
 
 /**
  * Define a component class.
- * 
+ *
  * Conceptually, this is a metaclass providing
  * component-class registration.
- * 
+ *
  * Should be called on the spark namespace like:
  *   spark.Fnord = spark.ComponentClass("Fnord");
- * 
+ *
  */
 spark.ComponentClass = function(theName) {
     // generate the real constructor
@@ -86,7 +86,7 @@ spark.ComponentClass = function(theName) {
 
     // register this class as a component class
     spark.componentClasses[theName] = myInitializingConstructor;
-    
+
     // XXX: give the class a name, as the normal class definer does
     myInitializingConstructor._className_ = theName;
 
@@ -97,13 +97,13 @@ spark.ComponentClass = function(theName) {
 
 /**
  * Define a templated component class.
- * 
+ *
  * Conceptually, this is a metaclass providing
  * component template instantiation.
- * 
+ *
  * Should be called on the spark namespace like:
  *   spark.Fnord = spark.LoadedClass("Fnord", "Fnord.spark");
- * 
+ *
  */
 spark.LoadedClass = function(theClassName, theFile) {
     // load template from file
@@ -119,7 +119,7 @@ spark.LoadedClass = function(theClassName, theFile) {
     }
 
     var myBaseConstructor = spark.componentClasses[myBaseClass];
-    
+
     // build a constructor wrapper
     var myInitializingConstructor = function(theCallNode) {
         // clone template so we can change it

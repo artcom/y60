@@ -14,7 +14,7 @@ spark.ResizableRectangle.Constructor = function(Protected) {
         Public.width = s.x;
         Public.height = s.y;
     });
-    
+
     this.Property("width",  Number, 1, applySize);
     this.Property("height", Number, 1, applySize);
 
@@ -53,7 +53,7 @@ spark.ResizableRectangle.Constructor = function(Protected) {
             }
 
             var mySize = new Vector3f(Public.width, Public.height, 0);
-                               
+
             Public.origin = Protected.getVector3f("origin", Public.origin);
             var myLowerLeft = product( Public.origin, -1);
             var myUpperRight = difference( mySize, Public.origin);
@@ -64,7 +64,7 @@ spark.ResizableRectangle.Constructor = function(Protected) {
         }
 
         _myVertices = _myShape.find(".//*[@name='position']").firstChild.nodeValue;
-        
+
         var myBody  = Modelling.createBody(Public.parent.innerSceneNode, _myShape.id);
         if(Public.name) {
             myBody.name = Public.name;

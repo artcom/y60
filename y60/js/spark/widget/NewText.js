@@ -23,7 +23,7 @@ spark.NewText.Constructor = function(Protected) {
     var _myLayoutHook;
     var _myTextChangedHook;
     var _myLineWidths = [];
-    
+
     Public.text getter = function() { return _myText; };
     Public.text setter = function(theValue) {
         if(theValue && _myUpcase) {
@@ -39,7 +39,7 @@ spark.NewText.Constructor = function(Protected) {
             _myTextChangedHook();
         }
     };
-    
+
     Public.style getter = function() {
         return _myStyle;
     };
@@ -68,7 +68,7 @@ spark.NewText.Constructor = function(Protected) {
         Public.height = mySize.y;
         return mySize;
     }
-    
+
     Base.realize = Public.realize;
     Public.realize = function() {
         // retrieve text
@@ -76,12 +76,12 @@ spark.NewText.Constructor = function(Protected) {
 
         // handle internationalization
         _myTextId = Protected.getString("textId", "");
-        
+
         // extract font style
         _myStyle = spark.fontStyleFromNode(Public.node);
-      
+
         _myUpcase = Protected.getBoolean("upcase", false);
-  
+
         _myMaxWidth = Protected.getNumber("maxWidth", 0);
 
         _myImage = Modelling.createImage(window.scene, 16, 16, "BGRA");
@@ -91,7 +91,7 @@ spark.NewText.Constructor = function(Protected) {
         var myMaterial = Modelling.createUnlitTexturedMaterial(window.scene,
                 myTexture, Public.name + "-material", true);
 
-        Base.realize(myMaterial);        
+        Base.realize(myMaterial);
         Public.text = _myText;
 
         // finally, render the text
@@ -103,7 +103,7 @@ spark.NewText.Constructor = function(Protected) {
         if (_myTextId) {
             attachToI18nItem(_myTextId);
         }
-        Base.postRealize();                
+        Base.postRealize();
     }
 
     Public.maxWidth getter = function() { return _myMaxWidth; }

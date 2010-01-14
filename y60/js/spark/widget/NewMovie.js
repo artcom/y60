@@ -1,6 +1,6 @@
 /**
  * A simple movie player.
- * 
+ *
  * NOTE: does not adjust it's size when image is changed. However, the size
  *       can be changed by setting the width, height and size properties.
  */
@@ -18,7 +18,7 @@ spark.NewMovie.Constructor = function(Protected) {
 
     var _myMovie = null;
     var _myMovieOwned = false;
-    
+
     var _myTexture  = null;
     var _myVertices = null;
 
@@ -29,7 +29,7 @@ spark.NewMovie.Constructor = function(Protected) {
     		_myMovie.playmode = "play";
     	}
     };
-    
+
     Public.stop = function() {
     	if(_myMovie.nodeName == "movie") {
     		_myMovie.playmode = "stop";
@@ -48,7 +48,7 @@ spark.NewMovie.Constructor = function(Protected) {
     Public.loop getter = function() {
         return _myMovie.loopcount == 0;
     };
-    
+
     Public.loop setter = function(theFlag) {
         _myMovie.loopcount = theFlag ? 0 : 1;
     };
@@ -56,19 +56,19 @@ spark.NewMovie.Constructor = function(Protected) {
     // frames
 
     Public.frameCount getter = function() { return _myMovie.framecount; };
-    
+
     Public.currentFrame getter = function() { return _myMovie.currentframe; };
     Public.currentFrame setter = function(f) {
         _myMovie.currentframe = f;
     };
-    
+
     // audio
-    
+
     Public.audio getter = function() { return _myMovie.audio == 1; };
     Public.audio setter = function(theFlag) {
         _myMovie.audio = theFlag ? 1 : 0;
     };
-    
+
     Public.volume getter = function() { return _myMovie.volume; };
     Public.volume setter = function(theVolume) {
         _myMovie.volume = theVolume;
@@ -93,7 +93,7 @@ spark.NewMovie.Constructor = function(Protected) {
             _myMovie.parentNode.removeChild(_myMovie);
             _myMovie = null;
         }
-        
+
         _myMovie = theNode;
         _myTexture.image = theNode.id;
         Public.width  = _myMovie.width;
@@ -131,7 +131,7 @@ spark.NewMovie.Constructor = function(Protected) {
     Public.texture getter = function() {
         return _myTexture;
     };
-    
+
     // XXX: this should not exist.
     //    Public.textureId setter = function(theTextureId) {
     //        _myMaterial.childNode("textureunits").firstChild.texture = theTextureId;
@@ -162,7 +162,7 @@ spark.NewMovie.Constructor = function(Protected) {
                 _myTexture, Public.name + "-material", true);
 
         Base.realize(myMaterial);
-        
+
         if(_myMovie.nodeName != "image") {
             Public.loop = Protected.getBoolean("loop", false);
             Public.mode = Protected.getString("mode", "stop");
@@ -176,7 +176,7 @@ spark.NewMovie.Constructor = function(Protected) {
         if(_mySourceId) {
             attachToI18nItem(_mySourceId);
         }
-        Base.postRealize();                
+        Base.postRealize();
     };
 
     function handleI18nLanguage(e) {

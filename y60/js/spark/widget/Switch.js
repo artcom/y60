@@ -6,7 +6,7 @@ spark.Switch = spark.ComponentClass("Switch");
 spark.Switch.Constructor = function(Protected) {
     var Base = {};
     var Public = this;
-    
+
     this.Inherit(spark.Transform);
 
     var _myShown = null;

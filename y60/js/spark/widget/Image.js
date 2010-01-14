@@ -1,6 +1,6 @@
 /**
  * A simple Quad-image.
- * 
+ *
  * NOTE: does not adjust it's size when image is changed. However, the size
  *       can be changed by setting the width, height and size properties.
  */
@@ -18,10 +18,10 @@ spark.Image.Constructor = function(Protected) {
 
     var _myImage = null;
     var _myImageOwned = false;
-    
+
     var _myTexture  = null;
     var _myVertices = null;
-    
+
     // XXX crude hack starts here
     var _myOnImageChanged = null;
     // XXX crude hack ends here
@@ -73,7 +73,7 @@ spark.Image.Constructor = function(Protected) {
     Public.texture getter = function() {
         return _myTexture;
     };
-    
+
     // XXX: this should not exist.
     //    Public.textureId setter = function(theTextureId) {
     //        _myMaterial.childNode("textureunits").firstChild.texture = theTextureId;
@@ -119,7 +119,7 @@ spark.Image.Constructor = function(Protected) {
         if(_mySourceId) {
             attachToI18nItem(_mySourceId);
         }
-        Base.postRealize();        
+        Base.postRealize();
     };
 
     function handleI18nLanguage(e) {

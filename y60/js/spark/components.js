@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -51,14 +51,14 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
 /**
  * Component base class.
- * 
+ *
  * Components are XML-initializable objects organized
  * in a hierarchy. They can be graphical or not.
  */
@@ -76,7 +76,7 @@ function unpenner() {
    myArguments = myArguments.concat(theEasingArguments);
 
    return rcurry.apply(this, myArguments);
-} 
+}
 
 spark.Component.Constructor = function(Protected) {
     var Public = this;
@@ -91,7 +91,7 @@ spark.Component.Constructor = function(Protected) {
     Public.toString = function (){
         return "[" + Public._className_ + " " + Public.vocation + "]";
     };
-    
+
     var _myParent = null;
 
     Public.parent getter = function() {
@@ -110,9 +110,9 @@ spark.Component.Constructor = function(Protected) {
         return myCurrent;
     };
 
-    
+
     var _myNode = null;
-    
+
     Public.node getter = function() {
         return _myNode;
     };
@@ -139,12 +139,12 @@ spark.Component.Constructor = function(Protected) {
         spark.ourComponentsByNameMap[Public.name] = Public;
         Logger.debug("Realizing " + Public._className_ + " " + Public.vocation);
     };
-    
+
     Public.postRealize = function() {
         Logger.debug("Post-Realizing " + Public._className_ + " " + Public.vocation);
     };
 
-    
+
     Public.instantiateChildren = function() {
     };
 
@@ -153,10 +153,10 @@ spark.Component.Constructor = function(Protected) {
         var myConcreteItem = theItem;
         var myId = "";
         if (theAttribute == undefined) {
-            myId = Protected.getString("multilanguageId", "");         
+            myId = Protected.getString("multilanguageId", "");
         } else {
-            myId = Protected.getString(theAttribute, "");         
-        }        
+            myId = Protected.getString(theAttribute, "");
+        }
         if (myId != "") {
             // find multilanguage item
             var myI18N = Public.acquisition("I18N", myId);
@@ -169,8 +169,8 @@ spark.Component.Constructor = function(Protected) {
         }
         return myConcreteItem;
     }
-    
-    
+
+
     Protected.getString = function(theName, theDefault) {
         if(!_myNode) {
             if(arguments.length < 2) {
@@ -189,7 +189,7 @@ spark.Component.Constructor = function(Protected) {
             }
         }
     };
-    
+
     Protected.getBoolean = function(theName, theDefault) {
         if (!_myNode) {
             if(arguments.length < 2) {
@@ -208,7 +208,7 @@ spark.Component.Constructor = function(Protected) {
             }
         }
     };
-    
+
     Protected.getVector3f = function(theName, theDefault) {
         var myArray = Protected.getArray(theName, theDefault);
         if (myArray.length == 3) {
@@ -245,7 +245,7 @@ spark.Component.Constructor = function(Protected) {
             }
         }
     };
-    
+
     // XXX: this requires a member type. else it don't make no sense.
     Protected.getArray = function(theName, theDefault) {
         if(!_myNode) {
@@ -271,7 +271,7 @@ spark.Component.Constructor = function(Protected) {
 
 /**
  * Containers, obviously, contain other components.
- * 
+ *
  * This class is abstract because there can be different
  * kinds of containers, mostly distinguishing between
  * graphical and non-graphical ones.
@@ -344,7 +344,7 @@ spark.Container.Constructor = function(Protected) {
             return null;
         }
     };
-    
+
     Public.findChildrenByName = function(theName) {
         var myChildren = [];
         var myOwnChild = Public.getChildByName(theName);
@@ -368,7 +368,7 @@ spark.Container.Constructor = function(Protected) {
             _myChildren[i].realize();
         }
     };
-        
+
     Base.postRealize = Public.postRealize;
     Public.postRealize = function() {
         Base.postRealize();

@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -73,29 +73,29 @@ spark.DSAEvent.TOUCH = "dsa-touch";
 
 spark.DSAEvent.Constructor = function(Protected, theType, theEventName, theId, theBitMask, theGridSize, theCount) {
     var Public = this;
-    
+
     this.Inherit(spark.Event, theType);
-    
+
     var _myEventName = theEventName;
     var _myId        = theId;
     var _myBitMask   = theBitMask;
     var _myGridSize  = theGridSize;
     var _myCount     = theCount;
-    
+
     Public.id getter = function() {
         return _myId;
-    };    
-    
+    };
+
     Public.bitmask getter = function() {
         return _myBitMask;
-    };    
-    
+    };
+
     Public.gridsize getter = function() {
         return _myGridSize;
-    };  
-    
+    };
+
     Public.count getter = function() {
         return _myCount;
     };
-    
+
 };

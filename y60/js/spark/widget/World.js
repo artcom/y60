@@ -1,9 +1,9 @@
 /**
  * Wrapper to Y60 worlds.
- * 
+ *
  * This gets the world of the one and only SceneViewer
  * and wraps it as a spark component.
- * 
+ *
  * Bottom line: use this as the toplevel component of your app.
  */
 spark.World = spark.ComponentClass("World");

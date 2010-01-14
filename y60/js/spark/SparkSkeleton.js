@@ -44,7 +44,7 @@ try {
 
     // remove mover so input events won't cause display trouble
     ourApp.setMover(null);
-    
+
     // go and keep going
     ourApp.go();
 

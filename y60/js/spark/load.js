@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below. 
-//    
+// of GNU General Public License referenced below.
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations: 
+//    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -76,7 +76,7 @@ spark.loadFile = function(theFile, theParent) {
 
 /**
  * Load a dom tree into the spark world.
- * 
+ *
  * Note that this will keep references to the DOM tree
  * in the constructed components. If you wan't referential
  * independence, clone your dom first.
@@ -118,7 +118,7 @@ spark.instantiateRecursively = function(theNode, theParent) {
     }
 
     var myName = theNode.nodeName;
-    
+
     // ignore and warn about unknown component classes
     if (! (myName in spark.componentClasses)){
         Logger.warning("Unknown component class " +  myName + ". Ignoring definition.");
@@ -127,15 +127,15 @@ spark.instantiateRecursively = function(theNode, theParent) {
 
     // instantiate the component
     var myInstance = spark.instantiateComponent(theNode);
-    
+
     // add to parent if we have one
     if(theParent) {
         theParent.addChild(myInstance);
     }
-    
+
     // trigger child instantiation / recurse
     myInstance.instantiateChildren(theNode);
-    
+
     // break recursion
     return myInstance;
 };
@@ -145,7 +145,7 @@ spark.instantiateRecursively = function(theNode, theParent) {
  */
 spark.instantiateComponent = function(theNode) {
     Logger.info("Instantiating " + theNode.nodeName + ("name" in theNode ? " named " + theNode.name : ("id" in theNode ? " with id " + theNode.id : "")));
-    
+
     var myClassName = theNode.nodeName;
     var myNode = theNode;
 

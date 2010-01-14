@@ -17,23 +17,23 @@ spark.Window.Constructor = function(Protected) {
     Public.title getter = function()  {
         return window.title;
     };
-    
+
     Public.title setter = function(theTitle) {
         window.title = theTitle;
     };
-    
+
     Base.realize = Public.realize;
     Public.realize = function() {
         window = new RenderWindow();
-        
+
         window.position = [
             Protected.getNumber("positionX", 0),
             Protected.getNumber("positionY", 0)
         ];
-        
+
         window.decorations = Protected.getBoolean("decorations", true);
         window.multisamples = Protected.getNumber("multisamples", 0);
-        
+
         var mySceneFile = Protected.getString("sceneFile", "");
         if (mySceneFile.length > 0) {
             Public.setModelName( mySceneFile );
@@ -47,28 +47,28 @@ spark.Window.Constructor = function(Protected) {
         }
 
         Public.setMover(null);
-        
+
         window.showMouseCursor = Protected.getBoolean("mouseCursor", true);
         window.swapInterval = Protected.getNumber("swapInterval", 1);
         var myFixedDeltaT = Number(eval(Protected.getString("fixedDeltaT", "0"))); // so we can say something like "1/30"
         if (myFixedDeltaT) {
-            window.fixedFrameTime = myFixedDeltaT; 
+            window.fixedFrameTime = myFixedDeltaT;
         }
-        
+
         // mixed 2D/3D applications might want to keep the original frustum and manage
-        // the screenspace transformation themself. 
+        // the screenspace transformation themself.
         var mySetupFrustumFlag = Protected.getBoolean("setupFrustum", true);
         if (mySetupFrustumFlag) {
             spark.setupCameraOrtho(window.scene.dom.find(".//camera"), window.width, window.height);
         }
-        
+
         Protected.updateMouseButtonState(spark.Mouse.PRIMARY,   false);
         Protected.updateMouseButtonState(spark.Mouse.SECONDARY, false);
         Protected.updateMouseButtonState(spark.Mouse.TERTIARY,  false);
-        
+
         Base.realize(window.scene.world);
     };
-    
+
     // XXX: Override size, width and height properties inherited via Stage->Widget
     // They do return a boundingbox size which, from class Windows standpoint, is just
     // crap.
@@ -83,7 +83,7 @@ spark.Window.Constructor = function(Protected) {
     }
 
     const PICK_RADIUS = 1;
-    
+
     Public.pickWidget = function(theX, theY) {
         var myBody = Public.picking.pickBodyBySweepingSphereFromBodies(theX, theY, PICK_RADIUS, Public.sceneNode);
         if(myBody) {
@@ -95,48 +95,48 @@ spark.Window.Constructor = function(Protected) {
         }
         return null;
     };
-    
-    
+
+
     var _myMousePosition = new Vector2f();
-    
+
     Public.mousePosition getter = function() {
         return _myMousePosition;
     };
-    
+
     Protected.updateMousePosition = function(theX, theY) {
         _myMousePosition.x = theX;
         _myMousePosition.y = theY;
     };
-    
-    
+
+
     var _myMouseButtonStates = {};
-    
+
     Public.mouseButtonStates getter = function() {
         return _myMouseButtonStates;
     };
-    
+
     Protected.updateMouseButtonState = function(theButton, theState) {
         _myMouseButtonStates[theButton] = theState;
     };
-    
-    
+
+
     var _myMouseFocused = null;
-    
+
     Public.mouseFocused getter = function() {
         return _myMouseFocused;
     };
-    
-    
+
+
     var _myKeyboardFocused = null;
-    
+
     Public.keyboardFocused getter = function() {
         return _myKeyboardFocused;
     };
-    
+
     Public.focusKeyboard = function(theWidget) {
         _myKeyboardFocused = theWidget;
     };
-    
+
     // XXX: a somewhat hackish callback to get a hand on the scene
     //      after the model has been loaded but before any spark components
     //      are added.
@@ -149,7 +149,7 @@ spark.Window.Constructor = function(Protected) {
     Public.onSceneLoaded setter = function(f) {
         _mySceneLoadedCallback = f;
     }
-    
+
     //////////////////////////////////////////////////////////////////////
     // Callbacks
     //////////////////////////////////////////////////////////////////////
@@ -184,28 +184,28 @@ spark.Window.Constructor = function(Protected) {
     Base.onMouseMotion = Public.onMouseMotion;
     Public.onMouseMotion = function(theX, theY) {
         Base.onMouseMotion(theX, theY);
-        
+
         var myButtonStates = _myMouseButtonStates.clone();
-        
+
         Protected.updateMousePosition(theX, theY);
-        
+
         var myWidget = Public.pickWidget(theX, theY);
-        
+
         if(!myWidget) {
             myWidget = Public;
         }
-        
+
         if(myWidget != _myMouseFocused) {
             Logger.debug("Mouse focuses " + myWidget
                          + (_myMouseFocused ? ", leaving " + _myMouseFocused : ""));
-            
+
             if(_myMouseFocused) {
                 var myLeaveEvent = new spark.MouseEvent(spark.MouseEvent.LEAVE, theX, theY, 0, 0, null, myButtonStates);
                 _myMouseFocused.dispatchEvent(myLeaveEvent);
             }
-            
+
             _myMouseFocused = myWidget;
-                
+
             var myEnterEvent = new spark.MouseEvent(spark.MouseEvent.ENTER, theX, theY);
             myWidget.dispatchEvent(myEnterEvent);
         }
@@ -221,23 +221,23 @@ spark.Window.Constructor = function(Protected) {
     Base.onMouseButton = Public.onMouseButton;
     Public.onMouseButton = function(theButton, theState, theX, theY) {
         Base.onMouseButton(theButton, theState, theX, theY);
-        
+
         var myButton = spark.Mouse.buttonFromId(theButton);
         Protected.updateMouseButtonState(myButton, theState);
-        
+
         var myButtonStates = _myMouseButtonStates.clone();
-        
+
         Protected.updateMousePosition(theX, theY);
 
         var myWidget = Public.pickWidget(theX, theY);
-        
+
         if(myWidget) {
             if(theState) {
                 // XXX: click should be more well-defined and button-up-based.
                 Logger.debug("Mouse clicks " + myWidget + " with button " + myButton);
                 var myClickEvent = new spark.MouseEvent(spark.MouseEvent.CLICK, theX, theY, 0, 0, myButton, myButtonStates);
                 myWidget.dispatchEvent(myClickEvent);
-                
+
                 Logger.debug("Mouse " + myButton + " button down on " + myWidget);
                 var myDownEvent = new spark.MouseEvent(spark.MouseEvent.BUTTON_DOWN, theX, theY, 0, 0, myButton, myButtonStates);
                 myWidget.dispatchEvent(myDownEvent);
@@ -254,7 +254,7 @@ spark.Window.Constructor = function(Protected) {
     Public.onKey = function(theKey, theKeyState, theX, theY,
                          theShiftFlag, theControlFlag, theAltFlag) {
         Base.onKey(theKey, theKeyState, theX, theY, theShiftFlag, theControlFlag, theAltFlag);
-        
+
         if(_myKeyboardFocused) {
             var myModifiers =
                 (theShiftFlag ? spark.Keyboard.SHIFT : 0)
@@ -273,7 +273,7 @@ spark.Window.Constructor = function(Protected) {
         Base.onMouseWheel(theDeltaX, theDeltaY);
 
         var myButtonStates = _myMouseButtonStates.clone();
-        
+
         if(_myMouseFocused) {
             Logger.debug("Mouse scrolls " + _myMouseFocused + " by [" + theDeltaX + "," + theDeltaY + "]");
             var myEvent = new spark.MouseEvent(
@@ -308,10 +308,10 @@ spark.Window.Constructor = function(Protected) {
     Public.onExit = function() {
         Base.onExit();
     };
-    
-    
+
+
     // Handle DSA events
-    Public.onTouch = function(theEventName, theId, theBitMask, theGridSizeX, theGridSizeY, theCount) { 
+    Public.onTouch = function(theEventName, theId, theBitMask, theGridSizeX, theGridSizeY, theCount) {
         Logger.trace("onTouch " + theEventName +
                      ", " + theId + ", " + theBitMask + ", " + theGridSizeX +
                      ", " + theGridSizeY + ", " + theCount);
@@ -319,7 +319,7 @@ spark.Window.Constructor = function(Protected) {
                                          new Vector2f(theGridSizeX, theGridSizeY), theCount);
         Public.dispatchEvent(myEvent);
     };
- 	
+
     var _myMultitouchCursors = {};
 
     function getMultitouchCursorId(theEvent) {
@@ -351,14 +351,14 @@ spark.Window.Constructor = function(Protected) {
         if(theEvent.callback == "onASSEvent") {
             spark.proximatrix.onASSEvent(theEvent);
         }
-        
+
         var myId = getMultitouchCursorId(theEvent);
-        
+
         switch(theEvent.type) {
         case "configure":
             Logger.info("proximatrix got configured");
             break;
-            
+
         case "add":
         case "move": // proximatrix
         case "update": // tuio
@@ -374,15 +374,15 @@ spark.Window.Constructor = function(Protected) {
             if(theEvent.type == "add") {
                 myCursor.activate();
             }
-            
+
             var myPosition = getMultitouchCursorPosition(theEvent);
             var myFocused = myCursor.focused;
-            
+
             var myPick = Public.pickWidget(myPosition.x, myPosition.y);
             if(!myPick) {
                 myPick = Public;
             }
-            
+
             myCursor.update(myPick, myPosition);
 
             if(theEvent.type == "add") {
@@ -390,39 +390,39 @@ spark.Window.Constructor = function(Protected) {
                 var myAppear = new spark.CursorEvent(spark.CursorEvent.APPEAR, myCursor);
                 myPick.dispatchEvent(myAppear);
             }
-            
+
             if(myPick != myFocused) {
                 Logger.debug("Cursor " + myId + " focuses " + myPick
                              + (myFocused ? ", leaving " + myFocused : ""));
-                
+
                 if(myFocused) {
                     var myLeave = new spark.CursorEvent(spark.CursorEvent.LEAVE, myCursor);
                     myFocused.dispatchEvent(myLeave);
                 }
-                
+
                 var myEnter = new spark.CursorEvent(spark.CursorEvent.ENTER, myCursor);
                 myPick.dispatchEvent(myEnter);
             }
-            
+
             if(theEvent.type == "move" || theEvent.type == "update") {
                 Logger.debug("Cursor " + myId + " moves to " + myPosition + " over " + myPick);
                 var myMove = new spark.CursorEvent(spark.CursorEvent.MOVE, myCursor);
                 myPick.dispatchEvent(myMove);
             }
-            
+
             break;
-            
+
         case "remove":
             if(myId in _myMultitouchCursors) {
                 Logger.debug("Cursor " + myId + " removed");
-                
+
                 var myCursor = _myMultitouchCursors[myId];
-                
+
                 var myPosition = getMultitouchCursorPosition(theEvent);
                 var myFocused = myCursor.focused;
-                
+
                 myCursor.update(myFocused, myPosition);
-                
+
                 if(myFocused) {
                     Logger.debug("Cursor " + myId + " leaves " + myFocused);
                     var myLeave = new spark.CursorEvent(spark.CursorEvent.LEAVE, myCursor);
@@ -432,9 +432,9 @@ spark.Window.Constructor = function(Protected) {
                     var myVanish = new spark.CursorEvent(spark.CursorEvent.VANISH, myCursor);
                     myFocused.dispatchEvent(myVanish);
                 }
-                
+
                 myCursor.deactivate();
-                
+
                 delete _myMultitouchCursors[myId];
             }
             break;
