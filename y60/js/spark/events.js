@@ -148,6 +148,10 @@ spark.EventDispatcher.Constructor = function(Protected) {
     var _myListenersByType = {};
 
     Public.addEventListener = function(theType, theListener, theUseCapture) {
+        // XXX: this is not really acceptable.
+        //      need to figure out something better.
+        //      click events DO still make sense, after all.
+        //      maybe these should be implemented at widget level.
         if(theType == "mouse-click"){
             Logger.warning("MouseEvent.CLICK is deprecated; use MouseEvent.BUTTON_UP or MouseEvent.BUTTON_DOWN")
         }
