@@ -81,10 +81,10 @@ class DirectSoundPump : public Singleton<DirectSoundPump>, public Pump
 
         bool _myIsOutOpen;
 
-		LPDIRECTSOUND8 _myDS;
+		LPDIRECTSOUND _myDS;
 		DSCAPS _myDSCaps;
-        LPDIRECTSOUNDBUFFER _myPrimaryBuffer;       // Primary buffer can't be DX8
-        LPDIRECTSOUNDBUFFER8 _myDSBuffer;
+        LPDIRECTSOUNDBUFFER _myPrimaryBuffer;
+        LPDIRECTSOUNDBUFFER _myDSBuffer;
 
         HANDLE _myWakeup0Handle;
         HANDLE _myWakeup1Handle;

@@ -191,7 +191,7 @@ DirectSoundPump::openOutput() {
     }
     HRESULT theRetVal;
 
-    theRetVal = DirectSoundCreate8(_mySoundCardId, &_myDS, NULL);
+    theRetVal = DirectSoundCreate(_mySoundCardId, &_myDS, NULL);
     checkDSRetVal(theRetVal, PLUS_FILE_LINE);
 
     // Determine window. This stuff is mostly bullshit because SetCooperativeLevel
@@ -339,7 +339,7 @@ void DirectSoundPump::initSecondaryBuffer() {
     hr = _myDS->CreateSoundBuffer(&dsbdesc, &myDSBuffer, NULL);
     checkDSRetVal(hr, PLUS_FILE_LINE);
 
-    hr = myDSBuffer->QueryInterface(IID_IDirectSoundBuffer8, (void**)&_myDSBuffer);
+    hr = myDSBuffer->QueryInterface(IID_IDirectSoundBuffer, (void**)&_myDSBuffer);
     checkDSRetVal(hr, PLUS_FILE_LINE);
     myDSBuffer->Release();
     delete myWF;
@@ -351,8 +351,8 @@ void DirectSoundPump::initSecondaryBuffer() {
 void
 DirectSoundPump::initNotification()
 {
-    LPDIRECTSOUNDNOTIFY8 myDsNotify;
-    HRESULT hr = _myDSBuffer->QueryInterface(IID_IDirectSoundNotify8,
+    LPDIRECTSOUNDNOTIFY myDsNotify;
+    HRESULT hr = _myDSBuffer->QueryInterface(IID_IDirectSoundNotify,
             (LPVOID *)&myDsNotify);
     checkDSRetVal (hr, PLUS_FILE_LINE);
 
