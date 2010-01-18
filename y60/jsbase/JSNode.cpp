@@ -86,6 +86,9 @@
 #include <y60/image/Image.h>
 #include <asl/xpath/xpath_api.h>
 
+#include <y60/base/NodeNames.h>
+#include <y60/scene/TransformHierarchyFacade.h>
+
 
 #include <iostream>
 #include <fstream>
@@ -1624,6 +1627,39 @@ JSNode::setProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
         } else {
             JSString *myJSStr = JS_ValueToString(cx, id);
             std::string myProperty = JS_GetStringBytes(myJSStr);
+
+                            
+            // try experimental fastpath for body nodes (sorry, but this really speeds up things, needs to be done right, vs 1/2010).
+            if(myNode->nodeName() == y60::BODY_NODE_NAME || 
+               myNode->nodeName() == y60::TRANSFORM_NODE_NAME) {
+                y60::TransformHierarchyFacadePtr myTransformFacade = myNode->getFacade<y60::TransformHierarchyFacade>();
+                if(myProperty == y60::POSITION_ATTRIB) {
+                    asl::Vector3f position;                    
+                    if(convertFrom(cx, *vp, position)) { 
+                        myTransformFacade->set<y60::PositionTag>(position);
+                        return JS_TRUE;
+                    }
+                } else if(myProperty == y60::SCALE_ATTRIB) {
+                    asl::Vector3f scale;                    
+                    if(convertFrom(cx, *vp, scale)) { 
+                        myTransformFacade->set<y60::ScaleTag>(scale);
+                        return JS_TRUE;
+                    }
+                } else if(myProperty == y60::PIVOT_ATTRIB) {
+                    asl::Vector3f pivot;                    
+                    if(convertFrom(cx, *vp, pivot)) { 
+                        myTransformFacade->set<y60::PivotTag>(pivot);
+                        return JS_TRUE;
+                    }
+                } else if(myProperty == y60::ORIENTATION_ATTRIB) {
+                    asl::Quaternionf orientation;
+                    if(convertFrom(cx, *vp, orientation)) { 
+                        myTransformFacade->set<y60::OrientationTag>(orientation);
+                        return JS_TRUE;
+                    }
+                }
+            }
+
             //IF_NOISY(
                 AC_TRACE << "JSNode::setProperty:" << myProperty << endl;
                 AC_TRACE << "JSNode::setProperty: nodeName = " << myNode->nodeName() << endl;
