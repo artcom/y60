@@ -80,7 +80,7 @@ spark.Image.Constructor = function(Protected) {
     //    };
 
     Base.realize = Public.realize;
-    Public.realize = function() {
+    Public.realize = function(theCachedMaterial) {
         var myImageSource = Protected.getString("src", "");
         var myImageSourceId = Protected.getString("srcId", "");
 
@@ -104,9 +104,12 @@ spark.Image.Constructor = function(Protected) {
         _myTexture  = Modelling.createTexture(window.scene, _myImage);
         _myTexture.name = Public.name + "-texture";
         _myTexture.wrapmode = "clamp_to_edge";
-
-        var myMaterial = Modelling.createUnlitTexturedMaterial(window.scene,
-                _myTexture, Public.name + "-material", true);
+        
+        var myMaterial = theCachedMaterial;
+        if (myMaterial == undefined) {
+            myMaterial = Modelling.createUnlitTexturedMaterial(window.scene,
+                    _myTexture, Public.name + "-material", true);
+        }
 
         Base.realize(myMaterial);
 
