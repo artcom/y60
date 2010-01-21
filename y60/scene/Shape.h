@@ -127,7 +127,8 @@ namespace y60 {
                 return _myPrimitives;
             }
             void update();
-            void build();
+            void build(const std::map<dom::UniqueId, std::set<y60::VertexDataRole> >& theRolesPerElementToUpdate);
+            void updatePrimitives(const std::set<y60::VertexDataRole>& theRolesToUpdate);
             unsigned findMaxIndexSize(dom::NodePtr theElementsNode);
             void calculateBoundingBox();
             dom::NodePtr getVertexDataNode(const std::string & theDataName);
@@ -201,7 +202,10 @@ namespace y60 {
             Shape();
             Shape(const Shape &);
             Shape & operator=(const Shape &);
-
+            std::map<std::string, unsigned long long> _myVertexDataVersionMap;
+            std::map<dom::UniqueId, unsigned long long> _myElementToVersionMap;
+            std::multimap<std::string, dom::NodePtr> _myVertexDataNameToElementMap;
+            std::multimap<std::string, std::string> _myVertexDataToRolesMap;
             PrimitiveVector    _myPrimitives;
             unsigned long      _myVertexCount;
             unsigned long long _myLastRenderVersion;

@@ -61,8 +61,12 @@
 
 #include "Scene.h"
 
+#include <y60/base/VertexDataRoles.h>
+#include <asl/base/string_functions.h>
+
 using namespace dom;
 using namespace std;
+using namespace asl;
 
 namespace y60 {
 
@@ -79,8 +83,83 @@ namespace y60 {
     void
     Shape::update() {
         if (getNode().nodeVersion() > getLastRenderVersion()) {
-            build();
-        }
+            AC_TRACE << "Shape::update: updating shape with name = " << getNode().getAttributeString(NAME_ATTRIB);
+            NodePtr myVertexDataListNode = getNode().childNode(VERTEX_DATA_NAME);
+            std::map<dom::UniqueId, std::set<y60::VertexDataRole> > myRolesPerElementToUpdate;
+            bool myRebuildNeeded = false;
+            if(myVertexDataListNode) {
+                unsigned myVertexDataCount = myVertexDataListNode->childNodesLength();
+                std::map<std::string, unsigned long long>::const_iterator i;
+                for (unsigned j = 0; j < myVertexDataCount; ++j) {
+                    i = _myVertexDataVersionMap.find(myVertexDataListNode->childNode(j)->getAttributeString(NAME_ATTRIB));
+                    if(i != _myVertexDataVersionMap.end()) {
+                        if(i->second < myVertexDataListNode->childNode(j)->nodeVersion()) {
+                            AC_TRACE << "Shape::update: have to update all roles associated with vertex data: " << i->first;
+                            for(std::multimap<std::string, std::string>::const_iterator myRoles = _myVertexDataToRolesMap.find(i->first);
+                                myRoles != _myVertexDataToRolesMap.end() && myRoles != _myVertexDataToRolesMap.upper_bound(i->first); ++myRoles) {           
+                                AC_TRACE << "Shape::update: role: " << myRoles->second;
+                                for(std::multimap<std::string, dom::NodePtr>::const_iterator myCurElements = _myVertexDataNameToElementMap.find(i->first);
+                                    myCurElements != _myVertexDataNameToElementMap.end() && myCurElements != _myVertexDataNameToElementMap.upper_bound(i->first); ++myCurElements) {
+
+                                    NodePtr myElementsNode = myCurElements->second;
+                                    
+                                    if(myRolesPerElementToUpdate.find(myElementsNode->getUniqueId()) == myRolesPerElementToUpdate.end())
+                                        myRolesPerElementToUpdate.insert(std::make_pair(myElementsNode->getUniqueId(), std::set<y60::VertexDataRole>()));                                    
+                                    std::map<dom::UniqueId, std::set<y60::VertexDataRole> >::iterator myCurRoles = myRolesPerElementToUpdate.find(myElementsNode->getUniqueId());
+                                                                        
+                                    unsigned myIndicesCount = myElementsNode->childNodesLength(VERTEX_INDICES_NAME);
+                                    for (unsigned k = 0; k < myIndicesCount; ++k) {
+                                        NodePtr myIndicesNode = myElementsNode->childNode(VERTEX_INDICES_NAME, k);    
+                                        if(myRoles->second == myIndicesNode->getAttributeString(VERTEX_DATA_ROLE_ATTRIB)) {
+                                            myCurRoles->second.insert(VertexDataRole(getEnumFromString(myRoles->second, VertexDataRoleString)));
+                                            break;
+                                        }
+                                    }
+                                }                                
+                            }
+                        }
+                    } else {
+                        myRebuildNeeded = true;
+                        myRolesPerElementToUpdate.clear();
+                        AC_TRACE << "Shape::update: have to rebuild all; found new vertex data " << myVertexDataListNode->childNode(j)->getAttributeString(NAME_ATTRIB);
+                        break;
+                    }
+                }
+            }
+            
+            // if we already need a full rebuild here, we dont bother to check in a more finegrained fashion
+            if(!myRebuildNeeded) {
+                NodePtr myPrimitiveListNode = getNode().childNode(PRIMITIVE_LIST_NAME);
+                if(myPrimitiveListNode) {
+                    unsigned myPrimitiveCount = myPrimitiveListNode->childNodesLength(ELEMENTS_NODE_NAME);
+                    for(unsigned l = 0; l < myPrimitiveCount; ++l) {
+                        NodePtr myElementsNode = myPrimitiveListNode->childNode(ELEMENTS_NODE_NAME, l);
+                        std::map<UniqueId, unsigned long long>::const_iterator i = _myElementToVersionMap.find(myElementsNode->getUniqueId());
+                        if(i != _myElementToVersionMap.end()) {
+                            if(i->second < myElementsNode->nodeVersion()) { 
+                                 if(myRolesPerElementToUpdate.find(myElementsNode->getUniqueId()) == myRolesPerElementToUpdate.end())
+                                        myRolesPerElementToUpdate.insert(std::make_pair(myElementsNode->getUniqueId(), std::set<y60::VertexDataRole>()));                                    
+                                 std::map<dom::UniqueId, std::set<y60::VertexDataRole> >::iterator myCurRoles = myRolesPerElementToUpdate.find(myElementsNode->getUniqueId());
+                                
+                                // version of element is newer than the old one; thus something changed; we update all roles
+                                unsigned myIndicesCount = myElementsNode->childNodesLength(VERTEX_INDICES_NAME);
+                                for (unsigned k = 0; k < myIndicesCount; ++k) {
+                                    NodePtr myIndicesNode = myElementsNode->childNode(VERTEX_INDICES_NAME, k);
+                                    myCurRoles->second.insert(VertexDataRole(getEnumFromString(myIndicesNode->getAttributeString(VERTEX_DATA_ROLE_ATTRIB), VertexDataRoleString)));           
+                                    AC_TRACE << "Shape::update: role: " << myIndicesNode->getAttributeString(VERTEX_DATA_ROLE_ATTRIB);
+                                }
+                            }
+                        } else {
+                            myRolesPerElementToUpdate.clear();
+                            AC_TRACE << "Shape::update: have to rebuild all; found new element: " << *myElementsNode;
+                            break;
+                        }
+                    }
+                }                
+            }            
+            
+            build(myRolesPerElementToUpdate);
+        }        
         if (getNode().nodeVersion() < getLastRenderVersion()) {
             reverseUpdate();
         }
@@ -189,17 +268,70 @@ namespace y60 {
     }
 #else
     void
-    Shape::build() {
+    Shape::build(const std::map<dom::UniqueId, std::set<y60::VertexDataRole> >& theRolesPerElementToUpdate) {
         AC_TRACE << "Shape::build() id='"<<get<IdTag>()<<"'";
-       NodePtr myPrimitiveListNode = getNode().childNode(PRIMITIVE_LIST_NAME);
+        NodePtr myPrimitiveListNode = getNode().childNode(PRIMITIVE_LIST_NAME);
+        if(myPrimitiveListNode) {
+            unsigned myPrimitiveCount = myPrimitiveListNode->childNodesLength(ELEMENTS_NODE_NAME);
+            if(theRolesPerElementToUpdate.empty()) {
+                _myPrimitives.resize(0);
+            }
+            std::map<dom::UniqueId, std::set<y60::VertexDataRole> >::const_iterator i;
+            for (unsigned j = 0; j < myPrimitiveCount; ++j) {
+                NodePtr myElementsNode = myPrimitiveListNode->childNode(ELEMENTS_NODE_NAME, j);
+                PrimitivePtr myPrimitive = myElementsNode->getFacade<Primitive>();
+                i = theRolesPerElementToUpdate.find(myElementsNode->getUniqueId());
+                if(i != theRolesPerElementToUpdate.end()) { 
+                    myPrimitive->updateVertexData(i->second);
+                } else {
+                    myPrimitive->updateVertexData();
+                }
+                if(theRolesPerElementToUpdate.empty()) {
+                    _myPrimitives.push_back(myPrimitive);
+                }
+            }
+            
+            _myVertexDataVersionMap.clear();
+            _myElementToVersionMap.clear();
+            _myVertexDataToRolesMap.clear();      
+            _myVertexDataNameToElementMap.clear();
+            for(unsigned l = 0; l < myPrimitiveCount; ++l) {
+                NodePtr myElementsNode = myPrimitiveListNode->childNode(ELEMENTS_NODE_NAME, l);
+                unsigned myIndicesCount = myElementsNode->childNodesLength(VERTEX_INDICES_NAME);
+                //AC_PRINT << " inserting " << myElementsNode->getUniqueId() << " = " << myElementsNode->nodeVersion();
+                _myElementToVersionMap.insert(std::make_pair(myElementsNode->getUniqueId(), myElementsNode->nodeVersion()));
+                for (unsigned k = 0; k < myIndicesCount; ++k) {
+                    NodePtr myIndicesNode = myElementsNode->childNode(VERTEX_INDICES_NAME, k);
+                    NodePtr myVertexDataNode = getVertexDataNode(myIndicesNode->getAttributeString(VERTEX_DATA_ATTRIB));
+                    //AC_PRINT << " inserting " << myVertexDataNode->getAttributeString(NAME_ATTRIB) << " version = " << myVertexDataNode->nodeVersion();
+                    _myVertexDataVersionMap.insert(std::make_pair(myVertexDataNode->getAttributeString(NAME_ATTRIB), myVertexDataNode->nodeVersion()));
+                    _myVertexDataNameToElementMap.insert(std::make_pair(myVertexDataNode->getAttributeString(NAME_ATTRIB), myElementsNode));
+                    //AC_PRINT << " inserting " << myVertexDataNode->getAttributeString(NAME_ATTRIB) << " role = " << myIndicesNode->getAttributeString(VERTEX_DATA_ROLE_ATTRIB);
+                    _myVertexDataToRolesMap.insert(std::make_pair(myVertexDataNode->getAttributeString(NAME_ATTRIB), myIndicesNode->getAttributeString(VERTEX_DATA_ROLE_ATTRIB)));
+                }
+            }
+        }
+        _myLastRenderVersion = getNode().nodeVersion();
+    }
+     
+     void
+     Shape::updatePrimitives(const std::set<y60::VertexDataRole>& theRolesToUpdate) {
+         
+         NodePtr myVertexDataListNode = getNode().childNode(VERTEX_DATA_NAME);
+       if(myVertexDataListNode) {
+           unsigned myVertexDataCount = myVertexDataListNode->childNodesLength();
+            for (unsigned j = 0; j < myVertexDataCount; ++j) {
+                _myVertexDataVersionMap.insert(std::make_pair(std::string(myVertexDataListNode->childNode(j)->getAttributeString(NAME_ATTRIB)), myVertexDataListNode->childNode(j)->nodeVersion()));  
+            }
+       }      
+         
+        NodePtr myPrimitiveListNode = getNode().childNode(PRIMITIVE_LIST_NAME);
         if (myPrimitiveListNode) {
-            _myPrimitives.resize(0);
             unsigned myPrimitiveCount = myPrimitiveListNode->childNodesLength(ELEMENTS_NODE_NAME);
             for (unsigned j = 0; j < myPrimitiveCount; ++j) {
                 NodePtr myElementsNode = myPrimitiveListNode->childNode(ELEMENTS_NODE_NAME, j);
                 PrimitivePtr myPrimitive = myElementsNode->getFacade<Primitive>();
-                myPrimitive->updateVertexData();
-                _myPrimitives.push_back(myPrimitive);
+                myPrimitive->updateVertexData(theRolesToUpdate);
             }
         }
         _myLastRenderVersion = getNode().nodeVersion();

@@ -260,7 +260,7 @@ namespace y60 {
     }
 
     void
-    Primitive::updateVertexData() {
+    Primitive::updateVertexData(const std::set<y60::VertexDataRole>& theRolesToUpdate) {
         Shape & myShape = getShape();
         dom::Node & myElementsNode = getNode();
         ResourceManager * myResourceManager = myShape.getScene().getTextureManager()->getResourceManager();
@@ -268,8 +268,12 @@ namespace y60 {
         for (unsigned k = 0; k < myIndicesCount; ++k) {
             dom::NodePtr myIndicesNode = myElementsNode.childNode(VERTEX_INDICES_NAME, k);
             const string & myName = myIndicesNode->getAttributeString(VERTEX_DATA_ATTRIB);
-            dom::NodePtr myDataNode = myShape.getVertexDataNode(myName);
-            load(myResourceManager, myIndicesNode, myDataNode);
+            const string & myRoleString = myIndicesNode->getAttributeString(VERTEX_DATA_ROLE_ATTRIB);
+            VertexDataRole myRole = VertexDataRole(getEnumFromString(myRoleString, VertexDataRoleString));
+            if(theRolesToUpdate.empty() || theRolesToUpdate.find(myRole) != theRolesToUpdate.end()) {
+                dom::NodePtr myDataNode = myShape.getVertexDataNode(myName);
+                load(myResourceManager, myIndicesNode, myDataNode);
+            }
         }
     }
 

@@ -111,6 +111,7 @@
 #include <asl/math/numeric_functions.h>
 
 #include <vector>
+#include <set>
 
 namespace y60 {
 
@@ -196,7 +197,7 @@ namespace y60 {
 #endif
             ~Primitive();
 
-            void updateVertexData();
+            void updateVertexData(const std::set<y60::VertexDataRole>& theRolesToUpdate = std::set<y60::VertexDataRole>());
             void reverseUpdateVertexData();
 #if 0
             unsigned int getDomIndex() const {
