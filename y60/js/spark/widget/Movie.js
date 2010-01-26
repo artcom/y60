@@ -146,13 +146,13 @@ spark.Movie.Constructor = function(Protected) {
         myMovieNode.name  = _myMovie.name;
         myMovieNode.audio = _myMovie.audio;
         myMovieNode.maxcachesize = _myMovie.maxcachesize;
-        myMovieNode.volume      = (_myMovie &&  "volume" in _myMovie) ? _myMovie.volume : 1.0;
         myMovieNode.loopcount   = _myMovie.loopcount;
         myMovieNode.resize      = "none";
         myMovieNode.decoderhint = _myMovie.decoderhint;
         myMovieNode.targetpixelformat = _myMovie.targetpixelformat;
 
         window.scene.loadMovieFrame(myMovieNode);
+        myMovieNode.volume      = (_myMovie &&  "volume" in _myMovie) ? _myMovie.volume : 1.0;
         _myMovie.parentNode.removeChild(_myMovie);
         _myMovie = myMovieNode;
 		for (var i = 0; i < myTextures.length; i++) {
