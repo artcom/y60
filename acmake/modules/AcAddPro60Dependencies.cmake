@@ -19,17 +19,21 @@
 
 find_package(PRO60_DEPS NO_MODULE QUIET)
 
+mark_as_advanced(PRO60_DEPS_DIR PRO60_DEPS_ROOT_DIR)
+
 if(PRO60_DEPS_FOUND)
     pro60_deps_register_searchpath()
-    mark_as_advanced(PRO60_DEPS_DIR PRO60_DEPS_ROOT_DIR)
-    message("PRO60_DEPS found in ${PRO60_DEPS_ROOT_DIR}")
+    message("PRO60 Dependencies found by find_package in ${PRO60_DEPS_ROOT_DIR}")
 else(PRO60_DEPS_FOUND)
     if(WIN32)
         message(FATAL_ERROR "PRO60_DEPS could not be found")
     else(WIN32)
         set(PRO60_DEPS $ENV{PRO60_DEPS})
         if(PRO60_DEPS)
+            get_filename_component(PRO60_DEPS_DIR      ${PRO60_DEPS}        ABSOLUTE)
+            get_filename_component(PRO60_DEPS_ROOT_DIR ${PRO60_DEPS}/../../ ABSOLUTE)
             list(INSERT CMAKE_PREFIX_PATH 0 ${PRO60_DEPS})
+            message("PRO60 Dependencies found through environment in ${PRO60_DEPS_ROOT_DIR}")
         endif(PRO60_DEPS)
     endif(WIN32)
 endif(PRO60_DEPS_FOUND)
