@@ -124,7 +124,7 @@ SDLWindow::SDLWindow() :
     _myWidth(800),
     _myHeight(600),
     _myFullscreenFlag(false),
-    _myDecorationFlag(false),
+    _myDecorationFlag(true),
     _myResizableFlag(true), // XXX: backwards compatibility
 
     _myWindowTitle("Y60 Renderer"),

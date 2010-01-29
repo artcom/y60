@@ -568,8 +568,6 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         // Turn on sync to V-Blank
         window.swapInterval = 1;
 
-        window.decorations = true;
-
         // standard movers
         var myViewport = self.getRenderWindow().canvas.childNode("viewport");
         self.registerMover(CenteredTrackballMover);
