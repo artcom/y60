@@ -199,7 +199,7 @@ namespace y60 {
             break;
         case PLAY_MODE_PAUSE:
             if (_myPlayMode == PLAY_MODE_STOP) {
-                _myDecoder->startMovie(0);
+                _myDecoder->startMovie(getTimeFromFrame(get<CurrentFrameTag>()));
             }
             _myDecoder->pauseMovie();
             break;
