@@ -1,0 +1,36 @@
+
+#define SMOOTHNESS 0.002
+
+float4 getRoundCornerPixel(float2 TexCoord0,
+                    float4 Color,
+                    float4 backgroundColor,
+                    float radius,
+                    float cornerDistance,
+                    float aspectRatio,
+                    float4 cornerToggle)
+{
+    // we want to cut corners, so we need the distance and the section
+    /*                       (1,0)
+        c2 ---------------- c3
+        |                   |
+        |                   |
+        c0 ---------------- c1
+       (0,1)
+    */
+    TexCoord0.y /= aspectRatio;
+    float dist = distance(float2(cornerDistance, 1/aspectRatio-cornerDistance), TexCoord0);
+    if(cornerToggle.x == 1 && dist > radius && TexCoord0.x < cornerDistance && TexCoord0.y > 1/aspectRatio-cornerDistance) 
+        return float4(1.0, 1.0, 1.0, 1-smoothstep(0, SMOOTHNESS, dist-radius))*backgroundColor*Color;
+    dist = distance(float2(1-cornerDistance, 1/aspectRatio-cornerDistance), TexCoord0);
+    if(cornerToggle.y == 1 && dist > radius && TexCoord0.x > 1-cornerDistance && TexCoord0.y > 1/aspectRatio-cornerDistance) 
+        return float4(1.0, 1.0, 1.0, 1-smoothstep(0, SMOOTHNESS, dist-radius))*backgroundColor*Color;
+    dist = distance(float2(cornerDistance, cornerDistance),  TexCoord0);
+    if(cornerToggle.z == 1 && dist > radius && TexCoord0.x < cornerDistance && TexCoord0.y < cornerDistance) 
+        return float4(1.0, 1.0, 1.0, 1-smoothstep(0, SMOOTHNESS, dist-radius))*backgroundColor*Color;
+    dist = distance(float2(1-cornerDistance, cornerDistance),  TexCoord0);
+    if(cornerToggle.w == 1 && dist > radius && TexCoord0.x > 1-cornerDistance && TexCoord0.y < cornerDistance) 
+        return float4(1.0, 1.0, 1.0, 1-smoothstep(0, SMOOTHNESS, dist-radius))*backgroundColor*Color;
+        
+    backgroundColor.a = Color.a*backgroundColor.a;
+    return backgroundColor;
+}

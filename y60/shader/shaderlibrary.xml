@@ -2140,7 +2140,34 @@
                 <sampler2d name="tex1">1</sampler2d>
             </properties>
         </fragmentshader>        
-    </shader>            
+    </shader>   
+    <shader id="s14141RoundedCorner" name="RoundedCorner" cost="10">
+        <supports>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="texcoord" values="[`uv_map`]"/>
+            <feature class="option" values="[`RoundedCorner`]"/>
+            <feature class="vertexparams" values="[`color`]"/>
+            <feature class="textures" values="[`paint`]"/>            
+        </supports>
+        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`,`gp4vp`]" files="[`roundCorners.cg`]" entryfunctions="[`mainVertex`]">
+            <properties>
+            </properties>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector4f name="color"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`,`gp4fp`]" files="[`roundCorners.cg`]" entryfunctions="[`mainFragment`]">
+            <properties>
+                <sampler2d name="backgroundTex">0</sampler2d>
+                <float name="radius">0.2</float>
+                <float name="cornerDistance">0.2</float>
+                <float name="aspectRatio">1</float>
+                <vector4f name="cornerToggle">[1,1,1,1]</vector4f>
+            </properties>
+        </fragmentshader>        
+    </shader>          
 </shaders>
 <combiners>
     <!-- 'previous' + 'texture' -->
