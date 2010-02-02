@@ -208,6 +208,15 @@ spark.Component.Constructor = function(Protected) {
             }
         }
     };
+    
+    Protected.getVector4f = function(theName, theDefault) {
+        var myArray = Protected.getArray(theName, theDefault);
+        if (myArray && myArray.length == 4) {
+            return new Vector4f(myArray[0], myArray[1], myArray[2], myArray[3]);
+        } else {
+            return theDefault;
+        }
+    };
 
     Protected.getVector3f = function(theName, theDefault) {
         var myArray = Protected.getArray(theName, theDefault);
