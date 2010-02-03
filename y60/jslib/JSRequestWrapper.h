@@ -95,6 +95,10 @@ class JSRequestWrapper : public JSWrapper<JSRequest, JSRequestPtr, StaticAccessP
         static JSPropertySpec * StaticProperties();
         static JSFunctionSpec * StaticFunctions();
 
+        virtual ~JSRequestWrapper() {
+            AC_TRACE << "JSRequestWrapper::dtor called";
+        }
+
 
         virtual unsigned long length() const {
             return 1;

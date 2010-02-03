@@ -69,20 +69,28 @@ namespace jslib {
 
 JSRequest::JSRequest(const std::string & theURL) :
     Request(theURL), _myJSListener(0), _myJSContext(0)
-{
+{   
+    AC_TRACE << "constructing JSRequest with URL = " << theURL;
 }
 
 JSRequest::JSRequest(const std::string & theURL, const std::string & theUserAgent) :
     Request(theURL, theUserAgent), _myJSListener(0), _myJSContext(0)
 {
+    AC_TRACE << "constructing JSRequest with URL = " << theURL << " user agent = " << theUserAgent;
 }
 
 JSRequest::~JSRequest() {
 }
 
 void JSRequest::setJSListener(JSContext * theContext, JSObject * theListener) {
+    // remove old object if we update the listener.
+    removeFromRoot();
     _myJSListener = theListener;
     _myJSContext = theContext;
+    // add root to prevent garbage collection of listener object
+    if(!JS_AddRoot(theContext, &_myJSListener)) {
+        AC_WARNING << "failed to root request object!";
+    }
 }
 
 void
@@ -105,7 +113,7 @@ JSRequest::hasCallback(const char * theName) {
             << ", Listener=" << _myJSListener << endl);
     jsval myListenerValue = OBJECT_TO_JSVAL(_myJSListener);
     DB(AC_TRACE << "myListenerValue=" << myListenerValue << endl);
-    /*JSType myType =*/ JS_TypeOfValue(_myJSContext, myListenerValue);
+    /* JSType myType = */ JS_TypeOfValue(_myJSContext, myListenerValue);
     DB(AC_TRACE << "myListenerType=" << myType << endl);
     if (JS_GetProperty(_myJSContext, _myJSListener, theName, &myValue)) {
          DB(AC_TRACE << "property for '" << theName << "' found" << endl);
@@ -150,6 +158,14 @@ JSRequest::onDone() {
     if (hasCallback("onDone")) {
         jsval argv[1], rval;
         /*JSBool ok =*/ JSA_CallFunctionName(_myJSContext, _myJSListener, "onDone", 0, argv, &rval);
+    }
+}
+
+void 
+JSRequest::removeFromRoot() {
+    if(_myJSListener && _myJSContext) {    
+        JS_RemoveRoot(_myJSContext, &_myJSListener);
+        AC_TRACE << "removing root";
     }
 }
 

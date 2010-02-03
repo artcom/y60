@@ -17,6 +17,7 @@ JSProcess.cpp
 JSRenderer.cpp
 JSRequest.cpp
 JSRequestManager.cpp
+JSRequestManagerAdapter.cpp
 JSRequestWrapper.cpp
 JSHermiteSpline.cpp
 JSScene.cpp
@@ -54,6 +55,7 @@ JSProcess.h
 JSRenderer.h
 JSRequest.h
 JSRequestManager.h
+JSRequestManagerAdapter.h
 JSRequestWrapper.h
 JSHermiteSpline.h
 JSScene.h

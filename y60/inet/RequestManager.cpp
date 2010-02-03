@@ -113,7 +113,7 @@ namespace inet {
 
     }
 
-    void
+    bool 
     RequestManager::removeRequest(Request* theRequest) {
         vector<RequestPtr>::iterator it;
 
@@ -121,9 +121,10 @@ namespace inet {
             if (&(*(*it)) == theRequest) {
                 curl_multi_remove_handle(_myCurlMultiHandle, theRequest->getHandle());
                 _myRequests.erase(it);
-                return;
+                return true;
             }
-        }
+        }  
+        return false;
     }
 
     void

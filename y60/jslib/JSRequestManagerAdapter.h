@@ -1,6 +1,6 @@
 /* __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Copyright (C) 1993-2008, ART+COM AG Berlin, Germany <www.artcom.de>
+// Copyright (C) 1993-2010, ART+COM AG Berlin, Germany <www.artcom.de>
 //
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
@@ -56,45 +56,23 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-#ifndef _Y60_ACXPSHELL_JSREQUEST_H_INCLUDED_
-#define _Y60_ACXPSHELL_JSREQUEST_H_INCLUDED_
+
+#ifndef _Y60_JSREQUESTMANAGERADAPTER_H_INCLUDED
+#define _Y60_JSREQUESTMANAGERADAPTER_H_INCLUDED
+
 
 #include "y60_jslib_settings.h"
-
 #include <y60/jsbase/JScppUtils.h>
-
-#include <y60/inet/Request.h>
-
-#include <string>
-
-// TODO: change the name JSRequest to something less confusing, e.g. RequestAdapter
-// TODO: because it is not a wrapper for request as the name JSRequest suggests
+#include <y60/inet/RequestManager.h>
 
 namespace jslib {
 
-class JSRequest : public inet::Request {
-    public:
-        JSRequest(const std::string & theURL);
-        JSRequest(const std::string & theURL, const std::string & theUserAgent);
-        virtual ~JSRequest();
-
-
-        void setJSListener(JSContext * theContext, JSObject * theListener);
-
-        void onError(CURLcode theError, long theHttpStatus);
-        bool onProgress(double theDownloadTotal, double theCurrentDownload,
-                double theUploadTotal, double theCurrentUpload);
-        void onDone();
-
-        void removeFromRoot();
-    private:
-        JSRequest();
-        bool hasCallback(const char * theName);
-        JSObject * _myJSListener;
-        JSContext * _myJSContext;
-};
-
-typedef asl::Ptr<JSRequest> JSRequestPtr;
+    class JSRequestManagerAdapter : public inet::RequestManager {
+        public:
+            JSRequestManagerAdapter() : inet::RequestManager() {}
+        protected:
+            virtual bool removeRequest(inet::Request* theRequest);
+    };
 
 }
 

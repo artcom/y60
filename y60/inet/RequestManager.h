@@ -85,16 +85,17 @@ namespace inet {
     class Y60_INET_DECL RequestManager {
         public:
             RequestManager();
-            ~RequestManager();
+            virtual ~RequestManager();
             void performRequest(RequestPtr theRequest);
             /// must be called periodically
             int handleRequests(bool theBlockingFlag = false);
             int getActiveCount() const { return _myRequests.size(); };
+        protected:
+            virtual bool removeRequest(Request* theRequest);
         private:
             CURLM * getHandle() { return _myCurlMultiHandle; };
             void checkCurlStatus(CURLMcode theStatusCode,
                     const std::string & theWhere);
-            void removeRequest(Request* theRequest);
             void handleMessages();
             std::vector<RequestPtr> _myRequests;
             CURLM * _myCurlMultiHandle;

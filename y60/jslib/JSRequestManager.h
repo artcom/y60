@@ -62,16 +62,16 @@
 #include "y60_jslib_settings.h"
 
 #include <y60/jsbase/JSWrapper.h>
-#include <y60/inet/RequestManager.h>
+#include <y60/jslib/JSRequestManagerAdapter.h>
 #include <asl/base/Ptr.h>
 #include <asl/base/string_functions.h>
 
 namespace jslib {
 
-class JSRequestManager : public JSWrapper<inet::RequestManager, asl::Ptr<inet::RequestManager>, StaticAccessProtocol > {
+class JSRequestManager : public JSWrapper<jslib::JSRequestManagerAdapter, asl::Ptr<jslib::JSRequestManagerAdapter>, StaticAccessProtocol > {
         JSRequestManager() {}
     public:
-        typedef inet::RequestManager NATIVE;
+        typedef jslib::JSRequestManagerAdapter NATIVE;
         typedef asl::Ptr<NATIVE> OWNERPTR;
         typedef JSWrapper<NATIVE,OWNERPTR, StaticAccessProtocol> Base;
 
@@ -119,8 +119,13 @@ class JSRequestManager : public JSWrapper<inet::RequestManager, asl::Ptr<inet::R
 
 
 template <>
+struct JSClassTraits<jslib::JSRequestManagerAdapter> : public JSClassTraitsWrapper<jslib::JSRequestManagerAdapter, JSRequestManager> {};
+
+template <>
 struct JSClassTraits<inet::RequestManager> : public JSClassTraitsWrapper<inet::RequestManager, JSRequestManager> {};
 
+
+Y60_JSLIB_DECL bool convertFrom(JSContext *cx, jsval theValue, inet::RequestManager*& theRequest);
 Y60_JSLIB_DECL bool convertFrom(JSContext *cx, jsval theValue, JSRequestManager::OWNERPTR & theRequest);
 Y60_JSLIB_DECL bool convertFrom(JSContext *cx, jsval theValue, JSRequestManager::NATIVE & theRequest);
 Y60_JSLIB_DECL bool convertFrom(JSContext *cx, jsval theValue, JSRequestManager::NATIVE *& theRequest);

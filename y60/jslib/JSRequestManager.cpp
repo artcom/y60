@@ -69,7 +69,7 @@ using namespace asl;
 
 namespace jslib {
 
-template class JSWrapper<inet::RequestManager, asl::Ptr<inet::RequestManager>, StaticAccessProtocol >;
+template class JSWrapper<jslib::JSRequestManagerAdapter, asl::Ptr<jslib::JSRequestManagerAdapter>, StaticAccessProtocol >;
 
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -85,7 +85,7 @@ performRequest(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
     DOC_BEGIN("Add HTTP-Request to request queue.");
     DOC_PARAM("theRequest", "", DOC_TYPE_REQUEST);
     DOC_END;
-    return Method<JSRequestManager::NATIVE>::call(&JSRequestManager::NATIVE::performRequest,cx,obj,argc,argv,rval);
+    return Method<inet::RequestManager>::call(&inet::RequestManager::performRequest,cx,obj,argc,argv,rval);
 }
 
 static JSBool
@@ -189,7 +189,7 @@ JSRequestManager::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *a
     JSRequestManager * myNewObject = 0;
 
     if (argc == 0) {
-        OWNERPTR myNewManager = OWNERPTR(new inet::RequestManager());
+        OWNERPTR myNewManager = OWNERPTR(new jslib::JSRequestManagerAdapter());
         myNewObject = new JSRequestManager(myNewManager, myNewManager.get());
     } else {
         JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected 0, got %d",ClassName(), argc);

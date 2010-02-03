@@ -335,8 +335,8 @@ JSRequestWrapper::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *a
             return JS_FALSE;
         }
 
-        OWNERPTR myNewRequest = OWNERPTR(new JSRequest(myURL));
 
+        OWNERPTR myNewRequest;
         if (argc == 2) {
             if (JSVAL_IS_VOID(argv[1])) {
                 JS_ReportError(cx,"JSRequestWrapper::Constructor: bad argument #2 (undefined)");
@@ -351,6 +351,8 @@ JSRequestWrapper::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *a
 
             myNewRequest = OWNERPTR(new JSRequest(myURL, myUserAgent));
 
+        } else {
+            myNewRequest = OWNERPTR(new JSRequest(myURL));
         }
 
         myNewObject = new JSRequestWrapper(myNewRequest, myNewRequest.get());
