@@ -119,7 +119,7 @@ spark.Component.Constructor = function(Protected) {
 
 
     Public.initialize = function(theNode) {
-        this.Initialize(theNode);
+        Public.Initialize(theNode);
         _myNode   = theNode;
     };
 
