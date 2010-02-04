@@ -258,16 +258,16 @@ class VectorUnitTest : public LinearAlgebraTestBase {
 					Vector3d myResult3 = cross(Vector3d(1,0,-1), Vector3d(0,1,1));
 				    ENSURE_MSG(myResult3 == Vector3d(1,-1,1), "Crossproduct of (1,0,-1) and (0,1,1).");
 
-					Vector3d myResult4 = normal(Vector3d(0,0,10), Vector3d(0.3f,0,0));
+					Vector3d myResult4 = asl::normal(Vector3d(0,0,10), Vector3d(0.3f,0,0));
 					ENSURE_MSG(myResult4 == Vector3d(0,1,0), "normal of scaled x- and z- axis.");
 
-					Vector3d myResult5 = normal(Vector3d(0,0,-3), Vector3d(-1100,0,0));
+					Vector3d myResult5 = asl::normal(Vector3d(0,0,-3), Vector3d(-1100,0,0));
 				    ENSURE_MSG(myResult5 == Vector3d(0,1,0), "normal of  scaled -x- and -z- axis.");
 
-					Vector3d myResult6 = normal(Vector3d(0,0,10), Vector3d(100,0,1));
+					Vector3d myResult6 = asl::normal(Vector3d(0,0,10), Vector3d(100,0,1));
 				    ENSURE_MSG(myResult6 == Vector3d(0,1,0), "normal of (100,0,1) and scaled z- axis.");
 
-					Vector3d myResult7 = normal(Vector3d(1,0,-1), Vector3d(0,1,1));
+					Vector3d myResult7 = asl::normal(Vector3d(1,0,-1), Vector3d(0,1,1));
 				    ENSURE_MSG(almostEqual(myResult7, Vector3d(0.57735f,-0.57735f,0.57735f)), "normal of (1,0,-1) and (0,1,1).");
 
 				}
