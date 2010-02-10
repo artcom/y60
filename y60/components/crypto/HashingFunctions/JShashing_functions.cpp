@@ -71,9 +71,10 @@ namespace jslib {
     sha1FromBlock(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         DOC_BEGIN("Converts a Block into a sha1 checksum.");
         DOC_PARAM("theBlock", "A Block", DOC_TYPE_OBJECT);
+        DOC_PARAM_OPT("theAmountOfBytesToUse", "use this many bytes to calculate the sha sum", DOC_TYPE_INTEGER, 0);
         DOC_RVAL("A SHA-1 checksum as hex string", DOC_TYPE_STRING);
         DOC_END;
-        if (argc == 1) {
+        if (argc == 1 || argc == 2) {
             if (JSVAL_IS_VOID(argv[0])) {
                 JS_ReportError(cx, "sha1FromBlock(): Argument #%d is undefined", 1);
                 return JS_FALSE;
@@ -84,12 +85,21 @@ namespace jslib {
                 JS_ReportError(cx, "sha1FromBlock(): argument #1 must be a Block");
                 return JS_FALSE;
             }
+
             // copy block due to garbage collection
             asl::Ptr<asl::ReadableBlock> myReadableBlockPtr(new asl::Block(*myContentBlockPtr));
 
+            unsigned myAmountOfBytesToUse = myReadableBlockPtr->size();
+            if(argc == 2) {
+                if (!convertFrom(cx, argv[1], myAmountOfBytesToUse)) {
+                    JS_ReportError(cx, "sha1FromBlock(): argument #2 must be an integer");
+                    return JS_FALSE;
+                }
+                myAmountOfBytesToUse = asl::minimum(myAmountOfBytesToUse, myContentBlockPtr->size());
+            }
             unsigned char* myDigestBuffer = new unsigned char[CryptoPP::SHA1::DIGESTSIZE];
             CryptoPP::SHA1().CalculateDigest(myDigestBuffer, myReadableBlockPtr->begin(),
-                myReadableBlockPtr->size());
+                myAmountOfBytesToUse);
             std::string myFinalHexEncodedShaSum;
             asl::binToString(myDigestBuffer, CryptoPP::SHA1::DIGESTSIZE, myFinalHexEncodedShaSum);
             delete [] myDigestBuffer;
@@ -103,7 +113,7 @@ namespace jslib {
     JSFunctionSpec *
     JSHashingFunctions::Functions() {
         static JSFunctionSpec myFunctions[] = {
-            {"sha1FromBlock",   sha1FromBlock, 1},
+            {"sha1FromBlock",   sha1FromBlock, 2},
             {0},
         };
         return myFunctions;
