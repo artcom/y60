@@ -78,6 +78,12 @@ private:
   void decodeRGB
     ( PLBmpBase * pBmp);
 
+  void decodeCMYK
+    ( PLBmpBase * pBmp);
+    
+  void cmyk_to_bgr
+    (unsigned char *data, int pixels); 
+     
   jpeg_decompress_struct cinfo;  // IJPEG decoder state.
   jpeg_error_mgr         jerr;   // Custom error manager.
 

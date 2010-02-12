@@ -121,6 +121,8 @@ void PLJPEGDecoder::Open (PLDataSource * pDataSrc)
       /*DestBPP = 8;
       bIsGreyscale = true;*/
       pf = PLPixelFormat::L8;
+    } else if (cinfo.output_components == 4) { //CMYK will be converted to BGR
+        pf = PLPixelFormat::R8G8B8;
     }
 
 	  PLPoint DPI;
@@ -167,10 +169,13 @@ void PLJPEGDecoder::GetImage (PLBmpBase & Bmp)
 
     jpeg_start_decompress (&cinfo);
 
-    if (cinfo.out_color_space == JCS_GRAYSCALE)
-      decodeGray (&Bmp);
-    else
-      decodeRGB (&Bmp);
+    if (cinfo.out_color_space == JCS_GRAYSCALE){
+        decodeGray (&Bmp);
+    } else if (cinfo.output_components == 4) {
+        decodeCMYK (&Bmp);
+    } else {
+        decodeRGB (&Bmp);
+    }
     jpeg_finish_decompress (&cinfo);
   }
   catch (PLTextException)
@@ -272,6 +277,47 @@ void PLJPEGDecoder::decodeGray
   delete [] pBuf;
 }
 
+void PLJPEGDecoder::decodeCMYK
+    ( PLBmpBase * pBmp)
+    // Assumes IJPEG decoder is already set up.
+{
+  PLBYTE * pDst;
+  int CurLine = 0;
+  PLBYTE * pBuf = new PLBYTE [GetWidth()];
+  try
+  {
+    JSAMPARRAY ppBuf = &pBuf;
+
+    PLBYTE ** pLineArray = pBmp->GetLineArray();
+
+    while (CurLine < GetHeight())
+    {
+      ppBuf = &pDst;
+      *ppBuf = pLineArray[CurLine];
+      int lines = jpeg_read_scanlines (&cinfo, ppBuf, 1);
+      cmyk_to_bgr(ppBuf[0], lines*GetWidth());
+      CurLine++;
+    }
+  }
+  catch(...)
+  {
+    delete [] pBuf;
+    throw;
+  }
+  delete [] pBuf;
+}
+
+/* libjpeg doesn't support transformation from CMYK to BGR, so we do it ourselves. */
+void PLJPEGDecoder::cmyk_to_bgr(unsigned char *data, int pixels)
+{
+	for (;pixels;pixels--, data+=4)
+	{
+        unsigned char c = data[0], m = data[1], y = data[2], k = data[3];
+        data[2] = k - ((255 - c)*k>>8);
+        data[1] = k - ((255 - m)*k>>8);
+        data[0] = k - ((255 - y)*k>>8);
+	}
+}
 
 /*
  * progress notification callback
