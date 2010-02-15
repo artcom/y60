@@ -9,6 +9,7 @@ Hoccer.station = function() {
     var requestManager = new RequestManager();
 
     that.userAgent = "Hoccer/0.9dev Y60";
+    that.serverUri = "http://beta.hoccer.com";
 
     //default hoccer station at artcom
     that.longitude = 13.345116;
@@ -20,20 +21,24 @@ Hoccer.station = function() {
     that.distribute = function(theFile) {
         print("distribute");
         
-        var request = new Request("http://www.artcom.de/",  that.userAgent ); 
-        
+        var request = new Request(that.serverUri + "/peers",  that.userAgent); 
+        var body = "peer[gesture]=distribute" +
+                    "&peer[latitude]=" + that.latitude +
+                    "&peer[longitude]=" + that.longitude +
+                    "&peer[accuracy]=" + that.accuracy +
+                    "&peer[seeder]=1";
+    
+
         request.onDone  = function() {
             print("handle response: ", this.responseString, "  code: ", this.responseCode);
         }
 
-
         request.onError = function () {
             Logger.warning( "HTTP Code received: " 
-                            + this.responseCode + " for request '" 
-                            + thePath + "'." ); 
+                            + this.responseCode); 
         };
 
-        request.get(); 
+        request.post(body);
         requestManager.performRequest(request );
 
     };
