@@ -370,6 +370,17 @@ function ENSURE_ALMOST_EQUAL(theExpected, theResult, theMessage) {
     return myResult;
 }
 
+function ENSURE_WITHIN_TIMEOUT(theConditionFunction, theTimeout, theMessage){
+    var startTime = millisec();
+    while(! theConditionFunction()){
+        msleep(33);
+        if (millisec() - startTime > theTimeout){
+            break;
+        }
+    }
+
+    ENSURE(theConditionFunction(), theMessage);
+}
 
 function FAILURE(MSG) {
     ourCurrentTest.ensure(false, MSG, __LINE__(2));
