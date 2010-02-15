@@ -19,17 +19,31 @@ HoccerUnitTest.prototype.Constructor = function(obj, theName) {
     }
 
     function testThrowing() {
-        DTITLE("test throwing a text file");
+        DTITLE("test throwing");
 
         var testStation = Object.beget(Hoccer.station);
-        var done = false;
-        testStation.buildPeerGroup("test", function(){
-            done = true;
-        });
+        testStation.latitude += 1;
+        var isDone = false;
+        testStation.buildPeerGroup({
+            onDone : function(){
+                isDone = true;
+            }});
         ENSURE_WITHIN_TIMEOUT(function(){
-           testStation.update();
-           return done;
-        }, 2000, "creating peer group");
+                testStation.update();
+                return isDone;
+            }, 2000, "creating peer group");
+
+        var isError = false;
+        testStation.buildPeerGroup({
+            onError : function(){
+                isError = true;
+            }});
+        ENSURE_WITHIN_TIMEOUT(function(){
+                testStation.update();
+                return isError;
+            }, 2000, "creating peer group");
+
+
     }
 
     obj.run = function() {

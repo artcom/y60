@@ -25,7 +25,7 @@ Hoccer.station = function() {
         //"Content-Type: " + "text/plain" + "\r\n" +
         "Content-Transfer-Encoding: binary\r\n\r\n";
 
-        body += "Hallo Katja";
+        body += "Hallo Welt.";
 
         request.onDone  = function() {
             print("handle response: ", this.responseString, "  code: ", this.responseCode);
@@ -43,13 +43,10 @@ Hoccer.station = function() {
         requestManager.performRequest(request);
     }
 
-    that.buildPeerGroup = function(theFile, theOnDone) {
+    that.buildPeerGroup = function(theParams) {
         var request = new Request(that.serverUri + "/peers",  that.userAgent); 
-        request.onDone = theOnDone;
-        request.onError = function () {
-            Logger.warning( "HTTP Code received: " 
-                            + this.responseCode); 
-        };
+        request.onDone = (typeof (theParams.onDone)=='undefined'?function(){}:theParams.onDone);
+        request.onError = (typeof (theParams.onError)=='undefined'?function(){}:theParams.onError);
 
         var body = "peer[gesture]=distribute" +
                     "&peer[latitude]=" + that.latitude +
@@ -63,13 +60,19 @@ Hoccer.station = function() {
     that.distribute = function(theFile) {
         print("distribute");
         
-        that.buildPeerGroup(theFile, function() {
-            print("handle response: ", this.responseString, "  code: ", this.responseCode);
-            var response = eval("("+this.responseString+")");
-            var uploadUri = response.upload_uri;
-            print("uploadUri: ", uploadUri);
-            that.upload(theFile, uploadUri);
-        });
+        that.buildPeerGroup({
+           onDone : function() {
+               print("handle response: ", this.responseString, "  code: ", this.responseCode);
+               var response = eval("("+this.responseString+")");
+               var uploadUri = response.upload_uri;
+               print("uploadUri: ", uploadUri);
+               that.upload(theFile, uploadUri);
+           },
+           onError : function () {
+               Logger.warning( "HTTP Code received: " 
+                            + this.responseCode); 
+           }
+         });
     };
 
     that.update = function() {
