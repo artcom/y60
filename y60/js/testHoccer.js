@@ -42,8 +42,6 @@ HoccerUnitTest.prototype.Constructor = function(obj, theName) {
                 testStation.update();
                 return isError;
             }, 2000, "creating peer group");
-
-
     }
 
     obj.run = function() {

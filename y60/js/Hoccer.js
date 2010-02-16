@@ -21,36 +21,47 @@ Hoccer.station = function() {
     that.accuracy = 80;
     
     that.upload = function(theFile, theUploadUri) {
+        print("try to upload ", theFile, " to ", theUploadUri);
+        var border = "ycKtoN8VURwvDC4sUzYC9Mo7l0IVUyDDVf";
         var request = new Request(theUploadUri, that.userAgent);
-        
-        var body = "--" + "ycKtoN8VURwvDC4sUzYC9Mo7l0IVUyDDVf" + "\r\n" +
+        request.addHttpHeader("Content-Type", "multipart/form-data; boundary=" + border);
+        var body = "--" + border + "\r\n" +
         "Content-Disposition: form-data; name=\"" + "upload[attachment]" + "\" "+
-        //"filename=\"" + "funkyfilename.txt" + "\"\r\n" +
-        //"Content-Type: " + "text/plain" + "\r\n" +
+        "filename=\"" + theFile + "\"\r\n" +
+        "Content-Type: " + "text/plain" + "\r\n" +
         "Content-Transfer-Encoding: binary\r\n\r\n";
 
         body += "Hallo Welt.";
 
+        body += "\r\n--" + border + "--\r\n";
+
+        print("this will be send: ", body);
+
         request.onDone = function() {
-            print("handle response: ", this.responseString, "  code: ", this.responseCode);
+            print("upload done. handle response: ", this.responseString, "  code: ", this.responseCode);
         };
         request.onError = myOnErrorFunc;
 
-        //we wait for merge by sh
-        //request.put(body);
-        //myRequestManager.performRequest(request);
+        request.put(body);
+        myRequestManager.performRequest(request);
     };
 
     that.download = function(theDownloadUri) {
         print("download ", theDownloadUri);
-
+        var request = new Request(theDownloadUri, that.userAgent);
+        request.onDone = function() {
+            print("download done. handle response: ", this.responseString, "  code: ", this.responseCode);
+        };
+        request.onError = myOnErrorFunc;
+        request.get();
+        myRequestManager.performRequest(request);
     };
 
     that.prepareDownload = function(thePeerUri) {
         print("prepare Download from peer uri ", thePeerUri);
         var request = new Request(thePeerUri, that.userAgent);
         request.onDone = function() {
-            print("handle response: ", this.responseString, "  code: ", this.responseCode);
+            print("prepare download done. handle response: ", this.responseString, "  code: ", this.responseCode);
             var response = eval("("+this.responseString+")");
             var resources = response.resources;
             var downloadUri = "";
@@ -93,7 +104,7 @@ Hoccer.station = function() {
         that.buildPeerGroup({
            isSharing : true,
            onDone : function() {
-               print("handle response: ", this.responseString, "  code: ", this.responseCode);
+               print("build peergroup for distribute done. handle response: ", this.responseString, "  code: ", this.responseCode);
                var response = eval("("+this.responseString+")");
                var uploadUri = response.upload_uri;
                print("uploadUri: ", uploadUri);
@@ -109,7 +120,7 @@ Hoccer.station = function() {
         that.buildPeerGroup({
             isSharing : false,
             onDone : function() {
-               print("handle response: ", this.responseString, "  code: ", this.responseCode);
+               print("build peergroup for catch it done. handle response: ", this.responseString, "  code: ", this.responseCode);
                var response = eval("("+this.responseString+")");
                var peerUri = response.peer_uri;
                that.prepareDownload(peerUri);
