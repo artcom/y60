@@ -6,7 +6,11 @@ var Hoccer = {};
 
 Hoccer.station = function() {
     var that = {};
-    var requestManager = new RequestManager();
+    var myRequestManager = new RequestManager();
+    var myOnErrorFunc = function () {
+            Logger.warning( "HTTP Code received: " 
+                            + this.responseCode); 
+        };
 
     that.userAgent = "Hoccer/0.9dev Y60";
     that.serverUri = "http://beta.hoccer.com";
@@ -27,23 +31,46 @@ Hoccer.station = function() {
 
         body += "Hallo Welt.";
 
-        request.onDone  = function() {
+        request.onDone = function() {
             print("handle response: ", this.responseString, "  code: ", this.responseCode);
-            var response = eval(this.responseString);
-            var uploadUri = response.upload_uri;
-            that.upload(theFile, uploadUri);
-        }
-
-        request.onError = function () {
-            Logger.warning( "HTTP Code received: " 
-                            + this.responseCode); 
         };
+        request.onError = myOnErrorFunc;
 
-        request.put(body);
-        requestManager.performRequest(request);
-    }
+        //we wait for merge by sh
+        //request.put(body);
+        //myRequestManager.performRequest(request);
+    };
+
+    that.download = function(theDownloadUri) {
+        print("download ", theDownloadUri);
+
+    };
+
+    that.prepareDownload = function(thePeerUri) {
+        print("prepare Download from peer uri ", thePeerUri);
+        var request = new Request(thePeerUri, that.userAgent);
+        request.onDone = function() {
+            print("handle response: ", this.responseString, "  code: ", this.responseCode);
+            var response = eval("("+this.responseString+")");
+            var resources = response.resources;
+            var downloadUri = "";
+            if (resources.length > 0) {
+                downloadUri = resources[0];
+            }
+            if (downloadUri.length > 0) {
+                that.download(downloadUri);
+            }
+        };
+        request.onError = myOnErrorFunc;
+        request.get();
+        myRequestManager.performRequest(request);
+    };
 
     that.buildPeerGroup = function(theParams) {
+        print("buildPeerGroup");
+        if (typeof (theParams.isSharing) == 'undefined') {
+            theParams.isSharing = false;
+        }
         var request = new Request(that.serverUri + "/peers",  that.userAgent); 
         request.onDone = (typeof (theParams.onDone)=='undefined'?function(){}:theParams.onDone);
         request.onError = (typeof (theParams.onError)=='undefined'?function(){}:theParams.onError);
@@ -51,16 +78,20 @@ Hoccer.station = function() {
         var body = "peer[gesture]=distribute" +
                     "&peer[latitude]=" + that.latitude +
                     "&peer[longitude]=" + that.longitude +
-                    "&peer[accuracy]=" + that.accuracy +
-                    "&peer[seeder]=1";
+                    "&peer[accuracy]=" + that.accuracy + 
+                    (theParams.isSharing?"&peer[seeder]=1":"");
         request.post(body);
-        requestManager.performRequest(request );
-    }
+        myRequestManager.performRequest(request );
+        print("posted ",body);
+    };
+
+
 
     that.distribute = function(theFile) {
         print("distribute");
         
         that.buildPeerGroup({
+           isSharing : true,
            onDone : function() {
                print("handle response: ", this.responseString, "  code: ", this.responseCode);
                var response = eval("("+this.responseString+")");
@@ -68,15 +99,27 @@ Hoccer.station = function() {
                print("uploadUri: ", uploadUri);
                that.upload(theFile, uploadUri);
            },
-           onError : function () {
-               Logger.warning( "HTTP Code received: " 
-                            + this.responseCode); 
-           }
+           onError : myOnErrorFunc
          });
     };
 
+    that.catchIt = function() {
+        print("catch it");
+
+        that.buildPeerGroup({
+            isSharing : false,
+            onDone : function() {
+               print("handle response: ", this.responseString, "  code: ", this.responseCode);
+               var response = eval("("+this.responseString+")");
+               var peerUri = response.peer_uri;
+               that.prepareDownload(peerUri);
+            },
+            onError : myOnErrorFunc
+        });
+    };
+
     that.update = function() {
-        requestManager.handleRequests();
+        myRequestManager.handleRequests();
     };
 
 
