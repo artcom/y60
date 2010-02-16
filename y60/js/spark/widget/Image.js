@@ -38,8 +38,8 @@ spark.Image.Constructor = function(Protected) {
         }
         _myImage = theNode;
         _myTexture.image = theNode.id;
-        Public.width  = _myImage.width;
-        Public.height = _myImage.height;
+        Public.width  = Protected.getNumber("width", _myImage.raster.width);
+        Public.height = Protected.getNumber("height", _myImage.raster.height);
 
         // XXX crude hack starts here
         if(_myOnImageChanged) {
