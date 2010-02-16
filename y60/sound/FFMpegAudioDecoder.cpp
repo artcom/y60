@@ -199,8 +199,11 @@ void FFMpegAudioDecoder::open() {
         _myNumChannels = myCodecContext->channels;
         AC_DEBUG << "Number of channels: " << _myNumChannels << endl;
         AC_DEBUG << "Sample rate: " << _mySampleRate << endl;
+        AC_DEBUG << "Sample format: " << myCodecContext->sample_fmt << endl;
 
-        if (_mySampleRate != Pump::get().getNativeSampleRate()) {
+        if (_mySampleRate != Pump::get().getNativeSampleRate() || 
+            myCodecContext->sample_fmt != SAMPLE_FMT_S16) 
+        {
 #if  LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52,15,0)
             _myResampleContext = av_audio_resample_init(
                     _myNumChannels, _myNumChannels,
@@ -311,7 +314,7 @@ bool FFMpegAudioDecoder::decode() {
             if ( myBytesDecoded <= 0 ) {
                 continue;
             }
-            int numFrames = myBytesDecoded/(getBytesPerSample(SF_S16)*_myNumChannels);
+            int numFrames = myBytesDecoded/(av_get_bits_per_sample_format(myCodec->sample_fmt)/8*_myNumChannels);
             AC_TRACE << "FFMpegAudioDecoder::decode(): Frames per buffer= " << numFrames;
             AudioBufferPtr myBuffer;
             if (_myResampleContext) {

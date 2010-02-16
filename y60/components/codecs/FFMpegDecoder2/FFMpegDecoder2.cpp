@@ -467,7 +467,18 @@ namespace y60 {
                 continue;
             }
             int myNumChannels = _myAStream->codec->channels;
-            int numFrames = myBytesDecoded/(getBytesPerSample(SF_S16)*myNumChannels);
+            int myBytesPerSample = av_get_bits_per_sample_format(_myAStream->codec->sample_fmt)/8;
+            if (myNumChannels == 6) {
+                if (myBytesPerSample == 2) {
+                    myBytesDecoded = downmix5p1ToStereo(myAlignedBuf, myBytesDecoded);
+                } else if (myBytesPerSample == 4) {
+                    myBytesDecoded = downmix5p1ToStereo(reinterpret_cast<int32_t *>(myAlignedBuf), myBytesDecoded);
+                } else {
+                    throw FFMpegDecoder2Exception(std::string("unsupported sample format for 5.1 downmix: "), PLUS_FILE_LINE);
+                }
+                myNumChannels = 2;
+            }
+            int numFrames = myBytesDecoded/(myBytesPerSample*myNumChannels);
             AC_TRACE << "FFMpegDecoder2::decode(): Frames per buffer= " << numFrames;
             // queue audio sample
             AudioBufferPtr myBuffer;
@@ -968,17 +979,19 @@ namespace y60 {
 
         _myAudioSink = Pump::get().createSampleSink(theFilename);
 
-        if (myACodec->sample_rate != static_cast<int>(Pump::get().getNativeSampleRate()))
+        unsigned myChannels = (myACodec->channels > 2) ? 2 : myACodec->channels;
+        if (myACodec->sample_rate != static_cast<int>(Pump::get().getNativeSampleRate()) ||
+            myACodec->sample_fmt != SAMPLE_FMT_S16)
         {
 #if  LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52,15,0)
             _myResampleContext = av_audio_resample_init(
-                    myACodec->channels, myACodec->channels,
+                    myChannels, myChannels,
                     Pump::get().getNativeSampleRate(), myACodec->sample_rate,
                     SAMPLE_FMT_S16, myACodec->sample_fmt,
                     16, 10, 0, 0.8);
 #else
-            _myResampleContext = audio_resample_init(myACodec->channels,
-                    myACodec->channels, Pump::get().getNativeSampleRate(),
+            _myResampleContext = audio_resample_init(myChannels,
+                    myChannels, Pump::get().getNativeSampleRate(),
                     myACodec->sample_rate);
 #endif
         }
