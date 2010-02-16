@@ -23,7 +23,7 @@
 
 //! This is a base class for a destination of picture data.
 //! It defines methods to open, write to, close data sinks.
-class PLDataSink : public PLObject
+class NETSRC_PAINTLIB_EXPORT PLDataSink : public PLObject
 {
   // I'd like to get rid of this, but now it is needed so the encoders
   // can maintain the actually useful length of the buffer.

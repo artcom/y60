@@ -17,7 +17,7 @@
 //! This is a class which takes a memory region as a destination of
 //! picture data. The result is an encoded (for example, jpeg-compressed) 
 //! image in memory.
-class PLMemSink : public PLDataSink
+class NETSRC_PAINTLIB_EXPORT PLMemSink : public PLDataSink
 {
 
 public:
