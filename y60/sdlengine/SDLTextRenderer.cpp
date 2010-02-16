@@ -455,7 +455,7 @@ namespace y60 {
     }
 
     inline unsigned
-    SDLTextRenderer::parseNewline(const string & theText, unsigned thePos) {
+    SDLTextRenderer::parseNewline(const string & theText, unsigned thePos, Format & theFormat) {
         if (thePos < theText.size() && theText[thePos] == '\x0A')
         {
             return 1;
@@ -465,88 +465,95 @@ namespace y60 {
             return 2;
         }
 
-        if (theText.size() > thePos + 3 && theText[thePos] == '<' &&
-            theText[thePos + 2] == '/' && theText[thePos + 3] == '>')
+        std::string myTag = extractTag(theText, thePos);
+        if ( myTag == "p" || myTag == "P" || myTag == "P/" || myTag =="p/") {
+            return myTag.length()+2;
+        } else if ( myTag == "br" || myTag == "BR" || 
+                    myTag == "Br" || myTag == "bR" ||
+                    myTag == "br/" || myTag == "BR/" || 
+                    myTag == "Br/" || myTag == "bR/")
         {
-            switch (theText[thePos + 1]) {
-                case 'p':
-                case 'P':
-                    return 4;
-            }
+            return myTag.length()+2;
+        } else if ( myTag == "/li" || myTag == "/LI" || 
+                    myTag == "/Li" || myTag == "/lI")
+        {
+            theFormat.indent = false;
+            return myTag.length()+2;
         }
 
         return 0;
     }
 
-    inline unsigned
+    std::string
+    SDLTextRenderer::extractTag(const std::string & theText, unsigned thePos) {
+        const std::string & myRemainingText = theText.substr(thePos);
+        size_t myOpenIndex = myRemainingText.find_first_of("<");
+        size_t myCloseIndex = myRemainingText.find_first_of(">");
+        if (myOpenIndex == std::string::npos || myCloseIndex == std::string::npos || 
+            myCloseIndex < myOpenIndex || myOpenIndex != 0) {
+            return std::string("");
+        }
+        return myRemainingText.substr(1, myCloseIndex - 1);
+    }
+    
+    unsigned
     SDLTextRenderer::parseHtmlTag(const string & theText, unsigned thePos, Format & theFormat) {
-        bool myOpenFlag = false;
-        char myChar     = 0;
-        if (theText.size() > thePos + 6 &&
-            theText[thePos] == '<' &&
-            theText[thePos + 6] == '>')
-        {
-			std::string myFontColorTag = theText.substr(thePos,7);
-		    if (myFontColorTag == "</font>") {
-    			theFormat.color[0] = -1.0f;
-    			theFormat.color[1] = -1.0f;
-    			theFormat.color[2] = -1.0f;
-    			return 7;
-    		}
-		} else if (theText.size() > thePos + 21 &&
-            theText[thePos] == '<' &&
-            theText[thePos + 21] == '>')
-        {
-			std::string myFontColorTag = theText.substr(thePos,14);
-			if (myFontColorTag == "<font color='#") {
-				std::string myFontColor = theText.substr(thePos+14,6);
-				unsigned myRed = 0;
-				unsigned myGreen = 0;
-				unsigned myBlue = 0;
-				std::string myRedStr = myFontColor.substr(0,2);
-				asl::is_hex_number(myRedStr, myRed);
-				std::string myGreenStr = myFontColor.substr(2,2);
-				asl::is_hex_number(myGreenStr, myGreen);
-				std::string myBlueStr = myFontColor.substr(4,2);
-				asl::is_hex_number(myBlueStr, myBlue);
-				theFormat.color[0] = myRed/255.0f;
-				theFormat.color[1] = myGreen/255.0f;
-				theFormat.color[2] = myBlue/255.0f;
-				return 22;
+        std::string myTag = extractTag(theText, thePos);
+        if (myTag == "/font") {
+            theFormat.color[0] = -1.0f;
+            theFormat.color[1] = -1.0f;
+            theFormat.color[2] = -1.0f;
+        } else if (myTag.find_first_of("font") == 0) {
+		    size_t myColorIndex = 0;
+		    if ((myColorIndex = myTag.find("color=")) != std::string::npos) {
+		        std::string myFontColor = myTag.substr(myColorIndex+6);
+		        if ((myFontColor.find_first_of("'#") == 0) || (myFontColor.find_first_of("\"#") == 0)) {
+		            myFontColor = myFontColor.substr(2, 6);
+                    unsigned myRed = 0;
+                    unsigned myGreen = 0;
+                    unsigned myBlue = 0;
+                    std::string myRedStr = myFontColor.substr(0,2);
+                    asl::is_hex_number(myRedStr, myRed);
+                    std::string myGreenStr = myFontColor.substr(2,2);
+                    asl::is_hex_number(myGreenStr, myGreen);
+                    std::string myBlueStr = myFontColor.substr(4,2);
+                    asl::is_hex_number(myBlueStr, myBlue);
+                    theFormat.color[0] = myRed/255.0f;
+                    theFormat.color[1] = myGreen/255.0f;
+                    theFormat.color[2] = myBlue/255.0f;
+				}
 			}
-        } else if (theText.size() > thePos + 2 &&
-            theText[thePos] == '<' &&
-            theText[thePos + 2] == '>')
+        } else if (myTag == "b" || myTag == "B") {
+            theFormat.bold = true;
+        } else if (myTag == "i" || myTag == "I") {
+            theFormat.italics = true;
+        } else if (myTag == "u" || myTag == "U") {
+            theFormat.underline = true;
+        } else if (myTag == "/b" || myTag == "/B") {
+            theFormat.bold = false;
+        } else if (myTag == "/i" || myTag == "/I") {
+            theFormat.italics = false;
+        } else if (myTag == "/u" || myTag == "/U") {
+            theFormat.underline = false;
+        } else if (myTag == "/p" || myTag == "/P") {
+            // just remove closing tag
+        } else if (myTag == "/br" || myTag == "/BR" ||
+                   myTag == "/bR" || myTag == "/Br") 
         {
-            myChar = theText[thePos + 1];
-            myOpenFlag = true;
-        } else if (theText.size() > thePos + 3 &&
-            theText[thePos] == '<' &&
-            theText[thePos + 1] == '/' &&
-            theText[thePos + 3] == '>')
+            // just remove closing tag
+        } else if (myTag == "li" || myTag == "LI" ||
+                   myTag == "lI" || myTag == "Li") 
         {
-            myChar = theText[thePos + 2];
-            myOpenFlag = false;
+		    theFormat.indent = true;
+        } else {
+            return 0;
         }
 
-        if (myChar) {
-            switch (myChar) {
-                case 'b':
-                case 'B':
-                    theFormat.bold = myOpenFlag;
-                    return 4 - myOpenFlag;
-                case 'i':
-                case 'I':
-                    theFormat.italics = myOpenFlag;
-                    return 4 - myOpenFlag;
-                case 'u':
-                case 'U':
-                    theFormat.underline = myOpenFlag;
-                    return 4 - myOpenFlag;
-            }
-        }
-
-        return 0;
+        if (myTag.length() == 0) {
+		    return 0;
+		} else {
+		    return myTag.length()+2;
+		}
     }
 
     inline unsigned
@@ -573,7 +580,8 @@ namespace y60 {
         unsigned myWordStart = 0;
         unsigned myWordEnd   = 0;
         unsigned myNextWordOffset = 0;
-
+        unsigned myHtmlTagLength = 0;
+        
         Format myFormat;
         Format myNewFormat;
 
@@ -586,10 +594,12 @@ namespace y60 {
                 myNextWordOffset = 0;
             }
 
-            if ( 0 != (myOffset = parseNewline(theText, myTextPos)) ) {
+            if ( 0 != (myOffset = parseNewline(theText, myTextPos, myFormat)) ) {
                 theResult.push_back(Word(theText.substr(myWordStart, myWordEnd - myWordStart)));
                 theResult.back().newline = true;
                 theResult.back().format  = myFormat;
+                myNewFormat.indent = myFormat.indent;
+                myHtmlTagLength = 0;
                 myTextPos += myOffset;
                 myWordStart = myTextPos;
                 myWordEnd   = myTextPos;
@@ -600,9 +610,12 @@ namespace y60 {
                 if (myWordStart != myWordEnd) {
                     theResult.push_back(Word(theText.substr(myWordStart, myWordEnd - myWordStart)));
                     theResult.back().format = myFormat;
+                    theResult.back().taglength  = myHtmlTagLength;
+                    myHtmlTagLength = 0;
                     DB2(AC_TRACE << "Add word: '" << theResult.back().text << "' new start: " << myWordStart << endl;)
                 }
                 myFormat = myNewFormat;
+                myHtmlTagLength = myOffset;
                 myTextPos  += myOffset;
                 myWordStart = myTextPos;
                 myWordEnd   = myTextPos;
@@ -616,6 +629,9 @@ namespace y60 {
                 }
 
                 theResult.back().format = myFormat;
+                theResult.back().taglength  = myHtmlTagLength;
+                myHtmlTagLength = 0;
+
                 myWordStart = myTextPos;
                 myWordEnd   = myTextPos;
                 DB2(AC_TRACE << "Found word-end, word: '" << theResult.back().text << "' new start: " << myWordStart << endl;)
@@ -628,6 +644,9 @@ namespace y60 {
         if (myWordStart != myWordEnd) {
             theResult.push_back(Word(theText.substr(myWordStart, myWordEnd - myWordStart)));
             theResult.back().format = myFormat;
+            theResult.back().taglength  = myHtmlTagLength;
+            myHtmlTagLength = 0;
+
             DB2(AC_TRACE << "Add last word: '" << theResult.back().text << "'" << endl;)
         }
     }
@@ -643,14 +662,16 @@ namespace y60 {
         theLines.back().width = _myCursorPos[0];
         theLines.back().indent = _myCursorPos[0];
         _myCursorPos[0] = 0;
+        bool myIndentNextLine = false;
 
         for (unsigned i = 0; i < theWords.size(); ++i) {
             const Word & myWord = theWords[i];
+            myIndentNextLine = myWord.format.indent;
             if (theLines.back().width + myWord.surface->w > theLineWidth && ((i+1)*theLineHeight <= theSurfaceHeight)) {
                 // start new line
                 theLines.push_back(Line());
-                theLines.back().indent = _myIndentation;
-                theLines.back().width = _myIndentation;
+                theLines.back().indent = (myIndentNextLine) ? _myIndentation:0;
+                theLines.back().width = (myIndentNextLine) ? _myIndentation:0;
             }
 
             // Update line metrics
@@ -662,6 +683,8 @@ namespace y60 {
                     " and wordcount: "<< theLines.back().wordCount << endl;)
                 theLines.back().newline = true;
                 theLines.push_back(Line());
+                theLines.back().indent =  (myIndentNextLine) ? _myIndentation:0;
+                theLines.back().width =  (myIndentNextLine) ? _myIndentation:0;
                 myNewlineCount++;
             } else {
                 // Check if next word fits into the line
@@ -670,8 +693,8 @@ namespace y60 {
                         " wordcount: "<< theLines.back().wordCount << endl;)
                     // start new line
                     theLines.push_back(Line());
-                    theLines.back().indent = _myIndentation;
-                    theLines.back().width = _myIndentation;
+                    theLines.back().indent =  (myIndentNextLine) ? _myIndentation:0;
+                    theLines.back().width =  (myIndentNextLine) ? _myIndentation:0;
                 }
             }
         }

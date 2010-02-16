@@ -116,17 +116,19 @@ namespace y60 {
                 bool bold;
                 bool italics;
                 bool underline;
+                bool indent;
 				asl::Vector4f color;
             };
 
             struct Word {
                 Word(const std::string & theText) :
-                    text(theText), surface(0), newline(false), kerning(0), minx(0)
+                    text(theText), surface(0), newline(false), kerning(0), minx(0), taglength(0)
                 {}
 
                 std::string   text;
                 SDL_Surface * surface;
                 Format        format;
+                unsigned      taglength;
                 bool          newline;
                 double        kerning;
                 int           minx;
@@ -170,8 +172,10 @@ namespace y60 {
                     const std::string & theFontName,
                     const asl::Vector4f & theTextColor);
 
-            unsigned parseNewline(const std::string & theText, unsigned thePos);
+            unsigned parseNewline(const std::string & theText, unsigned thePos, Format & theFormat);
             unsigned parseHtmlTag(const std::string & theText, unsigned thePos, Format & theFormat);
+            std::string extractTag(const std::string & theText, unsigned thePos);
+
             unsigned parseWord(const std::string & theText, unsigned thePos);
             void parseWords(const std::string & theText, std::vector<Word> & theResult);
 
