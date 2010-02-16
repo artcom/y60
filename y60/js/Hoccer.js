@@ -1,8 +1,5 @@
-use("HttpClient.js");
 
 var Hoccer = {};
-
-
 
 Hoccer.station = function() {
     var that = {};
@@ -28,10 +25,11 @@ Hoccer.station = function() {
         var body = "--" + border + "\r\n" +
         "Content-Disposition: form-data; name=\"" + "upload[attachment]" + "\" "+
         "filename=\"" + theFile + "\"\r\n" +
-        "Content-Type: " + "text/plain" + "\r\n" +
+        "Content-Type: " + getMimeType(theFile) + "\r\n" +
         "Content-Transfer-Encoding: binary\r\n\r\n";
 
-        body += "Hallo Welt.";
+        //this does not seem to work for images!! (segmentation fault)
+        body += readFileAsBlock(theFile);
 
         body += "\r\n--" + border + "--\r\n";
 
@@ -57,19 +55,30 @@ Hoccer.station = function() {
         myRequestManager.performRequest(request);
     };
 
-    that.prepareDownload = function(thePeerUri) {
-        print("prepare Download from peer uri ", thePeerUri);
+    that.prepareDownload = function(thePeerUri, theRepeatCount) {
+        if (typeof (theRepeatCount) == 'undefined') {
+            theRepeatCount = 0;
+        }
+        print("prepare Download from peer uri ", thePeerUri, "repeatcount: ", theRepeatCount);
         var request = new Request(thePeerUri, that.userAgent);
         request.onDone = function() {
             print("prepare download done. handle response: ", this.responseString, "  code: ", this.responseCode);
             var response = eval("("+this.responseString+")");
             var resources = response.resources;
-            var downloadUri = "";
-            if (resources.length > 0) {
-                downloadUri = resources[0];
-            }
-            if (downloadUri.length > 0) {
-                that.download(downloadUri);
+            var expires = response.expires;
+            if (resources.length > 0 && resources[0].length > 0) {
+                that.download(resources[0]);
+            } else {
+                if (theRepeatCount < 7) {
+                    theRepeatCount+=1;
+                    var delayAni = new GUI.DelayAnimation(1000);
+                    delayAni.onFinish = function() {
+                        print("call again with repeatcount ", theRepeatCount);
+                        that.prepareDownload(thePeerUri,theRepeatCount);
+                    };
+                    playAnimation(delayAni);
+                    //window.setTimeout("that.prepareDownload(\""+thePeerUri+"\","+theRepeatCount+")",1000);
+                }
             }
         };
         request.onError = myOnErrorFunc;
@@ -132,6 +141,16 @@ Hoccer.station = function() {
     that.update = function() {
         myRequestManager.handleRequests();
     };
+
+    function getMimeType(theFile) {
+        if (theFile.substring(theFile.length-4,theFile.length) == ".vcf") {
+            return "text/x-vcard";
+        } else if (theFile.substring(theFile.length-4, theFile.length) == ".txt") {
+            return "text/plain";
+        } else {
+            return "raw/binary";
+        }
+    }
 
 
 
