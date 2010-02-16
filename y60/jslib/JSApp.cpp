@@ -80,6 +80,7 @@
 #include <asl/base/Revision.h>
 #include <asl/math/numeric_functions.h>
 #include <asl/base/checksum.h>
+#include <asl/base/buildinfo.h>
 
 #ifndef _WIN32
 #   include <asl/base/signal_functions.h>
@@ -144,7 +145,8 @@
 using namespace std;
 using namespace asl;
 using namespace y60;
-
+using asl::build_information;
+        
 namespace jslib {
 
 JSContext * ourJSContext(0);
@@ -705,6 +707,76 @@ SaveImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 }
 
 JS_STATIC_DLL_CALLBACK(JSBool)
+SaveImageToBlock(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Exports a specified image node into a block in png format");
+    DOC_PARAM("theImageNode", "A node in the scene that should be encoded into the block", DOC_TYPE_NODE);
+    DOC_END;
+    
+    try {
+        if (argc != 1) {
+            JS_ReportError(cx, "saveImageToBlock(): expects one argument: image node.");
+            return JS_FALSE;
+        }
+
+        dom::NodePtr myImageNode;
+        if (JSVAL_IS_VOID(argv[0]) || !convertFrom(cx, argv[0], myImageNode)) {
+            JS_ReportError(cx, "saveImageToBlock(): argument #1 must be an image node");
+            return JS_FALSE;
+        }
+
+        asl::Ptr<asl::Block> myBlock = asl::Ptr<asl::Block>(new asl::Block());
+
+        ImagePtr myImage = myImageNode->getFacade<y60::Image>();
+        myImage->saveToBlock(myBlock);
+
+        *rval = as_jsval(cx, myBlock);
+        return JS_TRUE;
+
+    } HANDLE_CPP_EXCEPTION;
+}
+
+JS_STATIC_DLL_CALLBACK(JSBool)
+SaveImageToBlockFiltered(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Exports a specified image node into a block in png format");
+    DOC_PARAM("theImageNode", "A node in the scene that should be encoded into the block", DOC_TYPE_NODE);
+    DOC_END;
+    
+    try {
+        if (argc != 3) {
+            JS_ReportError(cx, "saveImageToBlock(): expects three arguments: image node, filtername, filterparams");
+            return JS_FALSE;
+        }
+
+        dom::NodePtr myImageNode;
+        if (JSVAL_IS_VOID(argv[0]) || !convertFrom(cx, argv[0], myImageNode)) {
+            JS_ReportError(cx, "saveImageToBlock(): argument #1 must be an image node");
+            return JS_FALSE;
+        }
+
+        VectorOfString myFilterName;
+        if (JSVAL_IS_VOID(argv[1]) || !convertFrom(cx, argv[1], myFilterName)) {
+            JS_ReportError(cx, "saveImageFiltered(): argument #2 must be a vector of strings. (theFilterName)");
+            return JS_FALSE;
+        }
+
+        VectorOfVectorOfFloat myFilterParams;
+        if (JSVAL_IS_VOID(argv[2]) || !convertFrom(cx, argv[2], myFilterParams)) {
+            JS_ReportError(cx, "saveImageFiltered(): argument #3 must be a vector of VectorOfFloat. (theFilterParams)");
+            return JS_FALSE;
+        }
+
+        asl::Ptr<asl::Block> myBlock = asl::Ptr<asl::Block>(new asl::Block());
+
+        ImagePtr myImage = myImageNode->getFacade<y60::Image>();
+        myImage->saveToBlock(myBlock, myFilterName, myFilterParams);
+
+        *rval = as_jsval(cx, myBlock);
+        return JS_TRUE;
+
+    } HANDLE_CPP_EXCEPTION;
+}
+
+JS_STATIC_DLL_CALLBACK(JSBool)
 BlitImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Copy pixels from one image to another");
     DOC_PARAM("theSourceNode", "A X60 source imagenode", DOC_TYPE_NODE);
@@ -960,7 +1032,13 @@ Revision(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_RVAL("The SVN revision number", DOC_TYPE_STRING);
     DOC_END;
     try {
-        *rval = as_jsval(cx, asl::ourRevision);
+        std::stringstream myHistoryId;
+		build_information::const_iterator it = build_information::get().find("y60");
+        if (it != build_information::get().end()) {
+            myHistoryId << it->second.history_id();
+        }
+        
+        *rval = as_jsval(cx, myHistoryId.str());
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }
@@ -1021,6 +1099,22 @@ GC(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 #ifdef JS_GCMETER
         js_DumpGCStats(rt, stdout);
 #endif
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+JS_STATIC_DLL_CALLBACK(JSBool)
+IncrementalGC(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("One Incremental GC Step garbage collection.");
+    DOC_END;
+
+    try {
+        uint32 myMaxObjects = 0;
+        if (!convertFrom(cx, argv[0], myMaxObjects)) {
+            JS_ReportError(cx, "argument #0 must be an unsigned int");
+            return JS_FALSE;
+        }
+        JS_IncrementalGC(cx, myMaxObjects);
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }
@@ -1553,6 +1647,8 @@ static JSFunctionSpec glob_functions[] = {
     {"preLoad",           PreLoad,  1},
     {"saveImage",         SaveImage,	  2},
     {"saveImageFiltered", SaveImageFiltered, 4},
+    {"saveImageToBlock",  SaveImageToBlock, 1},
+    {"saveImageToBlockFiltered",  SaveImageToBlockFiltered, 3},
     {"applyImageFilter",  ApplyImageFilter,	3},
     {"blitImage",         BlitImage,	3},
     {"exit",              Exit,           0},
@@ -1560,6 +1656,7 @@ static JSFunctionSpec glob_functions[] = {
     {"build",             BuildDate,      0},
     {"revision",          Revision,       0},
     {"gc",                GC,             0},
+    {"incrementalGC",     IncrementalGC,  0},
     {"clear",             Clear,          1},
     {"__FILE__",          File,           0},
     {"__LINE__",          Line,           0},

@@ -152,6 +152,11 @@ namespace y60 {
             return 0;
         }
 
+        /** Saves the image to a block in memory (currently only as png) */
+        void saveToBlock(asl::Ptr<asl::Block> & theBlock,
+            const VectorOfString & theFilter = VectorOfString(),
+            const VectorOfVectorOfFloat & theFilterParams = VectorOfVectorOfFloat());
+
         /** Saves the image to disk (png, tiff, or jpeg).
         */
         void saveToFile(const std::string & theImagePath,

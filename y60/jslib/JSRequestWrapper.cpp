@@ -93,6 +93,20 @@ get(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 }
 
 static JSBool
+head(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Request a HTTP-HEAD.");
+    DOC_END;
+    return Method<inet::Request>::call(&inet::Request::head,cx,obj,argc,argv,rval);
+}
+
+static JSBool
+http_delete(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Request a HTTP-DELETE.");
+    DOC_END;
+    return Method<inet::Request>::call(&inet::Request::http_delete,cx,obj,argc,argv,rval);
+}
+    
+static JSBool
 post(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Post a string as one block of data.");
     DOC_PARAM("theData", "The data to post", DOC_TYPE_STRING);
@@ -101,6 +115,24 @@ post(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     return Method<inet::Request>::call(&inet::Request::post,cx,obj,argc,argv,rval);
 }
 
+static JSBool
+put(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Put a string as one block of data.");
+    DOC_PARAM("theData", "The data to post", DOC_TYPE_STRING);
+    DOC_RVAL("The size of the put buffer", DOC_TYPE_INTEGER);
+    DOC_END;
+    return Method<inet::Request>::call(&inet::Request::put,cx,obj,argc,argv,rval);
+}
+
+static JSBool
+putBlock(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Put a string as one block of data.");
+    DOC_PARAM("theData", "The data to post", DOC_TYPE_STRING);
+    DOC_RVAL("The size of the putBlock buffer", DOC_TYPE_INTEGER);
+    DOC_END;
+    return Method<inet::Request>::call(&inet::Request::putBlock,cx,obj,argc,argv,rval);
+}
+    
 static JSBool
 postFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Post a file as one block of data.");
@@ -200,8 +232,12 @@ JSRequestWrapper::Functions() {
         // name                  native                   nargs
         {"toString",          toString,            0},
         {"get",               get,                 0},
+        {"head",              head,                1},
+        {"put",               put,                 1},
+        {"putBlock",          putBlock,            1},
         {"post",              post,                1},
         {"postFile",          postFile,            1},
+        {"http_delete",       http_delete,         0},
         {"addHttpHeader",     addHttpHeader,       2},
         {"getResponseHeader", getResponseHeader,   1},
         {"getAllResponseHeaders", getAllResponseHeaders,   1},

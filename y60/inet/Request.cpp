@@ -335,6 +335,97 @@ namespace inet {
     Request::urlDecode(const std::string & theUrl) {
         return string(curl_unescape(theUrl.c_str(), 0));
     }
+    
+    struct WriteString {
+        std::string dataString;
+        unsigned int position;
+    };
+    
+    static size_t read_string_callback( char *theDestPtr, size_t theSrcSize, 
+                                        size_t theNumberOfElements, void *theInputPtr )
+    {
+        struct WriteString *myData = (struct WriteString *) theInputPtr;
+        
+        size_t myMaxSize = theSrcSize * theNumberOfElements;
+        if ( myMaxSize < 1 ) {
+             return 0;
+        }
+
+        if ( myData->position < myData->dataString.size() ) {
+            
+            *(char *) theDestPtr = myData->dataString[myData->position];
+            myData->position++;
+            
+            return 1;
+        } 
+        
+        return 0;        
+    }
+    
+    size_t
+    Request::put( const std::string & thePutData ) {
+        DB(AC_TRACE << "Putting Data: '" << thePutData << "' size: " << thePutData.size() << endl);
+        
+        // prepare data
+        struct WriteString * myPayloadString = new WriteString();
+        myPayloadString->dataString = thePutData;
+        myPayloadString->position   = 0;
+        
+        // send data
+        CURLcode myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_PUT, true);
+        checkCurlStatus(myStatus, PLUS_FILE_LINE);
+    
+        myStatus = curl_easy_setopt( _myCurlHandle, CURLOPT_READFUNCTION, read_string_callback );
+        checkCurlStatus(myStatus, PLUS_FILE_LINE);
+
+        myStatus = curl_easy_setopt( _myCurlHandle, CURLOPT_READDATA, myPayloadString );
+        checkCurlStatus(myStatus, PLUS_FILE_LINE);
+        
+        return thePutData.size();
+    }
+
+    struct WriteBlock {
+        asl::Ptr<Block> dataBlock;
+        unsigned int position;
+    };
+
+    static size_t read_block_callback( void *theDestPtr, size_t theSrcSize, size_t theNumberOfElements, void *theInputStream )
+    {
+
+        struct WriteBlock *myData = (struct WriteBlock*) theInputStream;
+
+        size_t myMaxSize = theSrcSize * theNumberOfElements;
+        if (myMaxSize < 1) {
+            return 0; // end of transmission
+        }
+
+        if (myData->position < myData->dataBlock->size()) {
+            *(unsigned char*)theDestPtr = *(myData->dataBlock->begin() + myData->position);
+            myData->position++;
+            return 1;
+        }
+
+        return 0;
+    }
+
+    size_t 
+    Request::putBlock( const asl::Ptr<Block> & theBlock ) {
+
+        struct WriteBlock * myPayloadBlock = new WriteBlock();
+        myPayloadBlock->dataBlock = theBlock;
+		myPayloadBlock->position  = 0;
+
+        CURLcode myStatus = curl_easy_setopt( _myCurlHandle, CURLOPT_UPLOAD, true );        
+        checkCurlStatus(myStatus, PLUS_FILE_LINE);
+
+        myStatus = curl_easy_setopt( _myCurlHandle, CURLOPT_READFUNCTION, read_block_callback );
+        checkCurlStatus(myStatus, PLUS_FILE_LINE);
+
+        myStatus = curl_easy_setopt( _myCurlHandle, CURLOPT_READDATA, myPayloadBlock );
+        checkCurlStatus(myStatus, PLUS_FILE_LINE);
+
+		return theBlock->size();
+    }
 
     // request-method type methods
     size_t
@@ -376,6 +467,12 @@ namespace inet {
         checkCurlStatus(myStatus, PLUS_FILE_LINE);
     }
 
+    void
+    Request::http_delete() {
+        CURLcode myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_CUSTOMREQUEST, "DELETE");
+        checkCurlStatus(myStatus, PLUS_FILE_LINE);
+    }
+    
    void
     Request::head() {
         CURLcode myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_NOBODY, true);

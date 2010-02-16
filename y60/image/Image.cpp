@@ -68,6 +68,7 @@
 #include <paintlib/plpngenc.h>
 #include <paintlib/pljpegenc.h>
 #include <paintlib/pltiffenc.h>
+#include <paintlib/plmemsink.h>
 #include <paintlib/Filter/plfilterflip.h>
 #if defined(_MSC_VER)
 #   pragma warning (pop)
@@ -401,6 +402,32 @@ namespace y60 {
 #endif
 
         convertFromPLBmp(myBmp);
+    }
+
+    // saves image to a block in png format
+    void 
+    Image::saveToBlock(asl::Ptr<Block> & theBlock,
+                       const VectorOfString & theFilter,
+                       const VectorOfVectorOfFloat & theFilterParams)
+    {
+        PLAnyBmp myBmp;
+        convertToPLBmp( myBmp );
+        if (theFilter.size()) {
+            applyCustomFilter(myBmp, theFilter, theFilterParams);
+        }
+
+        PLMemSink myMemSink;
+        int bufsize = myBmp.GetWidth()*myBmp.GetHeight()*(myBmp.GetBitsPerPixel()/8) + 65536;
+        myMemSink.Open("image", bufsize);
+
+        // default to png
+        PLPNGEncoder myPNGEncoder;
+        myPNGEncoder.SetCompressionLevel(9);
+        myPNGEncoder.SaveBmp(&myBmp, &myMemSink);
+
+        theBlock->resize(myMemSink.GetDataSize());
+		memcpy(theBlock->begin(), myMemSink.GetBytes(), myMemSink.GetDataSize());
+        myMemSink.Close();
     }
 
     void

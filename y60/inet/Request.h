@@ -136,9 +136,12 @@ namespace inet {
             void setFollowLocation(bool theFollowFlag);
 
             // request-method type methods
+            size_t put(const std::string & thePutData);
+            size_t putBlock(const asl::Ptr<asl::Block> & theBlock);
             size_t post(const std::string & thePostData);
             size_t postFile(const std::string & theFilename);
             size_t postBlock(const asl::Ptr<asl::ReadableBlock> & theBlock);
+            void http_delete();
             void get();
             void head();
 
