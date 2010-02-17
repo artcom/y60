@@ -19,7 +19,7 @@ Hoccer.station = function() {
     
     that.upload = function(theFile, theUploadUri) {
         print("try to upload ", theFile, " to ", theUploadUri);
-       
+      /* 
         var border = "ycKtoN8VURwvDC4sUzYC9Mo7l0IVUyDDVf";
         var request = new Request(theUploadUri, that.userAgent);
         request.addHttpHeader("Content-Type", "multipart/form-data; boundary=" + border);
@@ -44,6 +44,10 @@ Hoccer.station = function() {
 
         request.putBlock(block);
         myRequestManager.performRequest(request);
+
+*/
+
+        exec("curl -X PUT -F 'upload[attachment]=@"+theFile+";type="+getMimeType(theFile)+"' "+theUploadUri);
     };
 
     that.download = function(theDownloadUri) {
