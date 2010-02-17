@@ -19,28 +19,30 @@ Hoccer.station = function() {
     
     that.upload = function(theFile, theUploadUri) {
         print("try to upload ", theFile, " to ", theUploadUri);
+       
         var border = "ycKtoN8VURwvDC4sUzYC9Mo7l0IVUyDDVf";
         var request = new Request(theUploadUri, that.userAgent);
         request.addHttpHeader("Content-Type", "multipart/form-data; boundary=" + border);
-        var body = "--" + border + "\r\n" +
+        var prebodystring = "--" + border + "\r\n" +
         "Content-Disposition: form-data; name=\"" + "upload[attachment]" + "\" "+
         "filename=\"" + theFile + "\"\r\n" +
         "Content-Type: " + getMimeType(theFile) + "\r\n" +
         "Content-Transfer-Encoding: binary\r\n\r\n";
-
-        //this does not seem to work for images!! (segmentation fault)
-        body += readFileAsBlock(theFile);
-
-        body += "\r\n--" + border + "--\r\n";
-
-        print("this will be send: ", body);
+       
+        var bodyblock = readFileAsBlock(theFile);
+        var postbodystring = "\r\n--" + border + "--\r\n";
+        writeStringToFile("body1.help", prebodystring);
+        writeBlockToFile("body2.help", bodyblock);
+        writeStringToFile("body3.help", postbodystring);
+        exec("cat body1.help body2.help body3.help > body.help");
+        var block = readFileAsBlock("body.help");
 
         request.onDone = function() {
             print("upload done. handle response: ", this.responseString, "  code: ", this.responseCode);
         };
         request.onError = myOnErrorFunc;
 
-        request.put(body);
+        request.putBlock(block);
         myRequestManager.performRequest(request);
     };
 
@@ -147,6 +149,10 @@ Hoccer.station = function() {
             return "text/x-vcard";
         } else if (theFile.substring(theFile.length-4, theFile.length) == ".txt") {
             return "text/plain";
+        } else if (theFile.substring(theFile.length-4, theFile.length) == ".png") {
+            return "image/png";
+        } else if (theFile.substring(theFile.length-4, theFile.length) == ".jpg") {
+            return "image/jpeg";
         } else {
             return "raw/binary";
         }
