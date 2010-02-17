@@ -16,10 +16,21 @@ Hoccer.station = function() {
     that.longitude = 13.345116;
     that.latitude = 52.501077;
     that.accuracy = 80;
+    that.onImageCaught = function(){};
+    that.onTextCaught = function(){};
+    that.onSomethingElseCaught = function(){};
+
+    var MimeTypes = {
+        jpg : "image/jpeg",
+        png : "image/png",
+        txt : "text/plain",
+        vcf : "text/x-vcard",
+        bin : "raw/binary"
+    };
     
     that.upload = function(theFile, theUploadUri) {
         print("try to upload ", theFile, " to ", theUploadUri);
-      /* 
+        /*
         var border = "ycKtoN8VURwvDC4sUzYC9Mo7l0IVUyDDVf";
         var request = new Request(theUploadUri, that.userAgent);
         request.addHttpHeader("Content-Type", "multipart/form-data; boundary=" + border);
@@ -44,9 +55,13 @@ Hoccer.station = function() {
 
         request.putBlock(block);
         myRequestManager.performRequest(request);
-
-*/
-
+        
+        //helps to make ist fast but is never left...
+        while( myRequestManager.activeCount > 0 ) {
+            print(myRequestManager.activeCount);
+            myRequestManager.handleRequests();
+        }
+        */
         exec("curl -X PUT -F 'upload[attachment]=@"+theFile+";type="+getMimeType(theFile)+"' "+theUploadUri);
     };
 
@@ -54,7 +69,31 @@ Hoccer.station = function() {
         print("download ", theDownloadUri);
         var request = new Request(theDownloadUri, that.userAgent);
         request.onDone = function() {
-            print("download done. handle response: ", this.responseString, "  code: ", this.responseCode);
+           
+            var contentType = this.getResponseHeader("Content-Type");
+            var fileName = this.getResponseHeader("name");
+            if (fileName.length == 0) {
+                fileName = "tempfile";
+                if (contentType.indexOf(MimeTypes.png) > -1) {
+                    fileName += ".png";
+                } else if (contentType.indexOf(MimeTypes.jpg) > -1) {
+                    fileName += ".jpg";
+                }
+            }
+            print("filename: ",fileName);
+            print("content-type: ",contentType);
+            if (contentType.indexOf(MimeTypes.png) > -1 || contentType.indexOf(MimeTypes.jpg) > -1) {
+                writeBlockToFile(fileName, this.responseBlock);
+                var f = function(theFileName) {return that.onImageCaught;}();
+                f(fileName);
+            } else if (contentType.indexOf(MimeTypes.txt) > -1 || contentType.indexOf(MimeTypes.vcf) > -1) {
+                var f = function(theString) {return that.onTextCaught;}();
+                f(this.responseString);
+            } else {
+                var f = function(theString) {return that.onSomethingElseCaught;}();
+                f(this.responseString);
+            }
+            //print("download done. handle response: ", this.responseString, "  code: ", this.responseCode);
         };
         request.onError = myOnErrorFunc;
         request.get();
@@ -148,17 +187,30 @@ Hoccer.station = function() {
         myRequestManager.handleRequests();
     };
 
+    that.setCallbacks = function(theCallbacks) {
+        if (typeof (theCallbacks.onTextCaught) != 'undefined') {
+            that.onTextCaught = theCallbacks.onTextCaught;
+        }
+        if (typeof (theCallbacks.onImageCaught) != 'undefined') {
+            that.onImageCaught = theCallbacks.onImageCaught;
+        }
+        if (typeof (theCallbacks.onSomethingElseCaught) != 'undefined') {
+            that.onSomethingElseCaught = theCallbacks.onSomethingElseCaught;
+        }     
+    };
+
+
     function getMimeType(theFile) {
         if (theFile.substring(theFile.length-4,theFile.length) == ".vcf") {
-            return "text/x-vcard";
+            return MimeTypes.vcf;
         } else if (theFile.substring(theFile.length-4, theFile.length) == ".txt") {
-            return "text/plain";
+            return MimeTypes.txt;
         } else if (theFile.substring(theFile.length-4, theFile.length) == ".png") {
-            return "image/png";
+            return MimeTypes.png;
         } else if (theFile.substring(theFile.length-4, theFile.length) == ".jpg") {
-            return "image/jpeg";
+            return MimeTypes.jpg;
         } else {
-            return "raw/binary";
+            return MimeTypes.bin;
         }
     }
 
