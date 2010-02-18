@@ -10,7 +10,7 @@ Hoccer.station = function() {
         };
 
     that.userAgent = "Hoccer/0.9dev Y60";
-    that.serverUri = "http://beta.hoccer.com";
+    that.serverUri = "http://www.hoccer.com";
 
     //default hoccer station at artcom
     that.longitude = 13.345116;
