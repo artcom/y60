@@ -101,7 +101,7 @@ Hoccer.station = function() {
     };
 
     that.prepareDownload = function(thePeerUri, theRepeatCount) {
-        if (typeof (theRepeatCount) == 'undefined') {
+        if (typeof (theRepeatCount) === 'undefined') {
             theRepeatCount = 0;
         }
         print("prepare Download from peer uri ", thePeerUri, "repeatcount: ", theRepeatCount);
@@ -133,12 +133,12 @@ Hoccer.station = function() {
 
     that.buildPeerGroup = function(theParams) {
         print("buildPeerGroup");
-        if (typeof (theParams.isSharing) == 'undefined') {
+        if (typeof (theParams.isSharing) === 'undefined') {
             theParams.isSharing = false;
         }
         var request = new Request(that.serverUri + "/peers",  that.userAgent); 
-        request.onDone = (typeof (theParams.onDone)=='undefined'?function(){}:theParams.onDone);
-        request.onError = (typeof (theParams.onError)=='undefined'?function(){}:theParams.onError);
+        request.onDone = (typeof (theParams.onDone)==='undefined'?function(){}:theParams.onDone);
+        request.onError = (typeof (theParams.onError)==='undefined'?function(){}:theParams.onError);
 
         var body = "peer[gesture]=distribute" +
                     "&peer[latitude]=" + that.latitude +
@@ -146,7 +146,7 @@ Hoccer.station = function() {
                     "&peer[accuracy]=" + that.accuracy + 
                     (theParams.isSharing?"&peer[seeder]=1":"");
         request.post(body);
-        myRequestManager.performRequest(request );
+        myRequestManager.performRequest(request);
         print("posted ",body);
     };
 
@@ -188,13 +188,13 @@ Hoccer.station = function() {
     };
 
     that.setCallbacks = function(theCallbacks) {
-        if (typeof (theCallbacks.onTextCaught) != 'undefined') {
+        if (typeof (theCallbacks.onTextCaught) !== 'undefined') {
             that.onTextCaught = theCallbacks.onTextCaught;
         }
-        if (typeof (theCallbacks.onImageCaught) != 'undefined') {
+        if (typeof (theCallbacks.onImageCaught) !== 'undefined') {
             that.onImageCaught = theCallbacks.onImageCaught;
         }
-        if (typeof (theCallbacks.onSomethingElseCaught) != 'undefined') {
+        if (typeof (theCallbacks.onSomethingElseCaught) !== 'undefined') {
             that.onSomethingElseCaught = theCallbacks.onSomethingElseCaught;
         }     
     };

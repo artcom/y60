@@ -44,9 +44,28 @@ HoccerUnitTest.prototype.Constructor = function(obj, theName) {
             }, 2000, "creating peer group");
     }
 
+    function testThrowMultipleTimes() {
+        DTITLE("test throw multiple times");
+         var testStation = Object.beget(Hoccer.station);
+         
+         for (var i = 0; i < 100; ++i) {
+             testStation.latitude +=1;
+             var isDone = false;
+             testStation.buildPeerGroup({
+                onDone : function(){
+                    isDone = true;
+             }});
+             ENSURE_WITHIN_TIMEOUT(function(){
+                testStation.update();
+                return isDone;
+             }, 2000, "creating peer group");
+         }
+    }
+
     obj.run = function() {
         testDefaults();
         testThrowing();
+        testThrowMultipleTimes();
     }
 }
 
