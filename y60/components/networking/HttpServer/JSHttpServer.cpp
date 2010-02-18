@@ -111,7 +111,6 @@ registerCallback(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
     } 
     JS_ValueToObject(cx,argv[1],&myCallingObject);
 
-    jsval myFunctionValue = argv[2];
 	if (!JS_ValueToFunction(cx, argv[2])) {
 		JS_ReportError(cx, "Argument 3 is not a function!" );
 		return JS_FALSE;
@@ -137,10 +136,17 @@ registerCallback(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
 
 
 static JSBool
+requestsPending( JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("check if there are any requests waiting to be processed"); DOC_END;
+
+    return Method<JSHttpServer::NATIVE>::call(&JSHttpServer::NATIVE::requestsPending, cx, obj, argc, argv, rval);
+}
+
+static JSBool
 handleRequests(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("handle requests..."); DOC_END;
                
-    return Method<JSHttpServer::NATIVE>::call(&JSHttpServer::NATIVE::handleCallbacks,cx,obj,argc,argv,rval);
+    return Method<JSHttpServer::NATIVE>::call(&JSHttpServer::NATIVE::handleRequest,cx,obj,argc,argv,rval);
 
 }
 
@@ -192,6 +198,7 @@ JSHttpServer::Functions() {
         {"toString",             toString,                0},
         {"close",                close,                   0},
         {"start",                start,                   2},
+        {"requestsPending",      requestsPending,         0},
         {"handleRequests",       handleRequests,          0},
         {"registerCallback",     registerCallback,        2},
         {0}

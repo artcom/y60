@@ -59,7 +59,10 @@
 
 use("UnitTest.js");
 
+plug("Network");
 plug("HttpServer");
+
+const TIMEOUT = 1000;
 
 function HttpServerUnitTest() {
     this.Constructor(this, "HttpServerUnitTest");
@@ -71,33 +74,64 @@ HttpServerUnitTest.prototype.Constructor = function(obj, theName) {
 
     obj.run = function() {
 
+        obj.callback_answer = "callback";
+        obj.fallback_answer = "fallback";
+
         var myObj = {
-            asd : function(theMethod, theBody) {
-                return "asd!" + theMethod + " body: " + theBody;
-            },
             test : function(theMethod, theBody) {
-                return "test!" + theMethod + " body: " + theBody;
-            },
-            commands : function(theMethod, theBody) {
-                return "command:" + theBody;
+                return obj.callback_answer;
             },
             fallback : function(theMethod, theBody) {
-                return "fallback body: " + theBody;
+                return obj.fallback_answer;
             }
         }
 
         obj.myServer = new HttpServer();
+
+        obj.myServer.registerCallback("/test",myObj, myObj.test);
+        obj.myServer.registerCallback("*",myObj, myObj.fallback);
+
         obj.myServer.start( "0.0.0.0", "4042" );
 
-        obj.myServer.registerCallback("/asd",myObj, myObj.asd);
-        obj.myServer.registerCallback("/test",myObj, myObj.test);
-        obj.myServer.registerCallback("/commands",myObj, myObj.commands);
-        obj.myServer.registerCallback("*",myObj, myObj.fallback );
+        obj.socket = new Socket(Socket.TCPCLIENT, "4041", "INADDR_ANY");
+        obj.socket.connect("localhost","4042");
 
-        while( true ) {
-            obj.myServer.handleRequests();
-            msleep(1);
-        } 
+        var myRequest = "GET /test HTTP/1.1\r\nHost: localhost:4042\r\n\r\n";
+        obj.socket.write(myRequest);
+
+        var time = millisec();
+        while (!obj.myServer.requestsPending() && (millisec() - time < TIMEOUT))
+            ;;
+
+        obj.myServer.handleRequests();
+
+        time = millisec();
+        while (!(obj.socket.peek(1) > 0) && (millisec() - time < TIMEOUT)) 
+            ;;
+
+        obj.response = obj.socket.read();
+        obj.response = obj.response.substr(obj.response.search(/\r\n\r\n/)+4);
+        ENSURE("obj.response == obj.callback_answer");
+
+        myRequest = "GET /somethingelse HTTP/1.1\r\nHost: localhost:4042\r\n\r\n";
+        obj.socket.connect("localhost","4042");
+        obj.socket.write(myRequest);
+
+        time = millisec();
+        while (!obj.myServer.requestsPending() && (millisec() - time < TIMEOUT))
+            ;;
+
+        obj.myServer.handleRequests();
+
+        time = millisec();
+        while (!(obj.socket.peek(1) > 0) && (millisec() - time < TIMEOUT)) 
+            ;;
+
+        obj.response = obj.socket.read();
+        obj.response = obj.response.substr(obj.response.search(/\r\n\r\n/)+4);
+        ENSURE("obj.response == obj.fallback_answer");
+        obj.myServer.close();
+
     }
 
 };

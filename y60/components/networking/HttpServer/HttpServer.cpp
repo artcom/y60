@@ -108,9 +108,10 @@ namespace y60 {
                                             const std::string & theURI ) 
     {
 
+        std::string myResponseString;
+
         try {
 
-            std::string myResponseString;
             jsval argv[3], rval;
 
             argv[0] = jslib::as_jsval(theCallback.context, theRequest.method);
@@ -122,53 +123,55 @@ namespace y60 {
 
             if (!jslib::convertFrom(theCallback.context, rval, myResponseString)) {
                 JS_ReportError(theCallback.context, 
-                         "HttpServer::handleCallbacks: Callback does not return a string!");
+                         "HttpServer::handleRequest: Callback does not return a string!");
             }
 
-		    return myResponseString;
 
 		} catch (Exception e) {
 			AC_ERROR << e;
 		};
+		    
+        return myResponseString;
 
     }
 
-    void HttpServer::handleCallbacks() {
+    bool HttpServer::requestsPending() {
+        return !(_myRequestQueue->empty());
+    }
+
+    void HttpServer::handleRequest() {
 
         try {
 
-            while (!_myRequestQueue->empty()) {
+            y60::Y60Request myRequest;
+            _myRequestQueue->wait_and_pop(myRequest);
 
-                y60::Y60Request myRequest;
-                _myRequestQueue->wait_and_pop(myRequest);
-
-                std::string myResponseString;
-                std::string myPath = myRequest.uri.substr(0, myRequest.uri.find_first_of("?"));  
-                
-                y60::Y60Response myResponse;
+            std::string myResponseString;
+            std::string myPath = myRequest.uri.substr(0, myRequest.uri.find_first_of("?"));  
             
-                if (_myCallbacks.find(myPath) != _myCallbacks.end()) {
-                    
-                    JSCallback myCallback = _myCallbacks[myPath]; 
-                    myResponseString = invokeCallback( myCallback, myRequest, myRequest.uri );
-                    myResponse.payload      = myResponseString; 
-                    myResponse.return_code  = http::server::reply::ok; 
-                    myResponse.content_type = myCallback.contentType;
-                } else if (_myCallbacks.find("*") != _myCallbacks.end()) {
-                    
-                    JSCallback myCallback = _myCallbacks["*"]; 
-                    myResponseString = invokeCallback( myCallback, myRequest, myRequest.uri );
-                    myResponse.payload      = myResponseString; 
-                    myResponse.return_code  = http::server::reply::ok; 
-                    myResponse.content_type = "text/plain";
-                } else {
-                    
-                    myResponse.return_code  = http::server::reply::not_found; 
-                    AC_ERROR << "No callback registered for path: \"" << myPath << "\"!";
-                }
-
-                _myResponseQueue->push( myResponse );
+            y60::Y60Response myResponse;
+        
+            if (_myCallbacks.find(myPath) != _myCallbacks.end()) {
+                
+                JSCallback myCallback = _myCallbacks[myPath]; 
+                myResponseString = invokeCallback( myCallback, myRequest, myRequest.uri );
+                myResponse.payload      = myResponseString; 
+                myResponse.return_code  = http::server::reply::ok; 
+                myResponse.content_type = myCallback.contentType;
+            } else if (_myCallbacks.find("*") != _myCallbacks.end()) {
+                
+                JSCallback myCallback = _myCallbacks["*"]; 
+                myResponseString = invokeCallback( myCallback, myRequest, myRequest.uri );
+                myResponse.payload      = myResponseString; 
+                myResponse.return_code  = http::server::reply::ok; 
+                myResponse.content_type = "text/plain";
+            } else {
+                
+                myResponse.return_code  = http::server::reply::not_found; 
+                AC_ERROR << "No callback registered for path: \"" << myPath << "\"!";
             }
+
+            _myResponseQueue->push( myResponse );
 
 		} catch (Exception e) {
 			AC_ERROR << e;

@@ -120,7 +120,8 @@ namespace y60 {
 				}
             }
 
-            void handleCallbacks();
+            void handleRequest();
+            bool requestsPending();
 
 
         private:
