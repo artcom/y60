@@ -147,7 +147,9 @@ spark.instantiateRecursively = function(theNode, theParent) {
  * Internal: instantiate a single component
  */
 spark.instantiateComponent = function(theNode) {
-    Logger.info("Instantiating " + theNode.nodeName + ("name" in theNode ? " named " + theNode.name : ("id" in theNode ? " with id " + theNode.id : "")));
+    Logger.info("Instantiating " + theNode.nodeName
+                + ("name" in theNode ? " named " + theNode.name :
+                   ("id" in theNode ? " with id " + theNode.id : "")));
 
     var myClassName = theNode.nodeName;
     var myNode = theNode;
