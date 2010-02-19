@@ -111,8 +111,14 @@ spark.NewMovie.Constructor = function(Protected) {
     };
 
     Public.src setter = function(theSourceFile) {
-        Public.movie = spark.openMovie(theSourceFile);
-        _mySource = theSourceFile;
+        if(_mySource != theSourceFile) {
+            Public.movie = spark.openMovie(theSourceFile);
+            _mySource = theSourceFile;
+        } else {
+            if(_myMovie.playmode != "stop") {
+                Public.stop();
+            }
+        }
     };
 
     Public.srcId getter = function() {

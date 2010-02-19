@@ -254,11 +254,16 @@ spark.I18nMovie.Constructor = function(Protected) {
     var Base = {};
 
     this.Inherit(spark.I18nItem);
+    
+    var _myMovie = null;
 
     Base.createEvent = Protected.createEvent;
     Protected.createEvent = function(theLanguage) {
         var myEvent = Base.createEvent(theLanguage);
-        myEvent.movie = Public.movie;
+        if(!_myMovie || _myMovie.src != Protected.getLanguageData(Public.language)) {
+            _myMovie = Public.movie;
+        }
+        myEvent.movie = _myMovie;
         return myEvent;
     };
 
