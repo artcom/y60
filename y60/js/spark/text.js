@@ -1,6 +1,6 @@
 /* __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Copyright (C) 1993-2009, ART+COM AG Berlin, Germany <www.artcom.de>
+// Copyright (C) 1993-2010, ART+COM AG Berlin, Germany <www.artcom.de>
 //
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
@@ -56,8 +56,29 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+/**
+ * Text rendering utilities for SPARK
+ * 
+ * This bunch of code is used to coerce Y60 font rendering
+ * into something vaguely useful. Y60 centralizes font rendering
+ * state on the Window. This code manages this state.
+ * 
+ * The main purpose of this code is recollecting all style-related
+ * state into DOM nodes representing font styles.
+ * 
+ * Apart from that, this code provides the function renderText,
+ * which is a wart representing the overall interface that has been
+ * found to be required for text rendering in SPARK.
+ */
+
+/**
+ * Internal: table indicating loading state of fonts
+ */
 spark.ourLoadedFonts = {};
 
+/**
+ * Internal: ensure loading of font appropriate for the given style
+ */
 spark.loadFont = function(theName, theSize, theStyle) {
     var myName = theName + "-" + theStyle + "-" + theSize;
     if(!(myName in spark.ourLoadedFonts)) {
@@ -67,6 +88,8 @@ spark.loadFont = function(theName, theSize, theStyle) {
 
         Logger.info("Loading font " + theName + " with size " + theSize + " and style " + theStyle);
 
+        // XXX: this is a remnant from before the introduction
+        //      of include-path-based font loading.
         var myFontPath = null;
         if (fileExists("FONTS/" + theName + "-" + theStyle + ".otf")) {
             myFontPath = "FONTS/" + theName + "-" + theStyle + ".otf";
@@ -112,6 +135,9 @@ spark.loadFont = function(theName, theSize, theStyle) {
     return myName;
 };
 
+/**
+ * Internal: apply defaults to the given style node
+ */
 spark.applyStyleDefaults = function(theStyle) {
 
     !theStyle.getAttribute("fontStyle")   ? theStyle.fontStyle    = "normal" : null;
@@ -131,6 +157,14 @@ spark.applyStyleDefaults = function(theStyle) {
     !theStyle.getAttribute("backgroundColor") ? theStyle.backgroundColor  = "FFFFFF" : null;
 };
 
+/**
+ * Produce a font style node from the given DOM node.
+ * 
+ * This CAN be applied to any DOM node, but is usually
+ * used on a SPARK xml node to collect text style properties.
+ * 
+ * Returns a font style node that can be used with renderText.
+ */
 spark.fontStyleFromNode = function(theNode) {
     var myStyle = new Node("<style/>");
 
@@ -166,6 +200,9 @@ spark.fontStyleFromNode = function(theNode) {
     return myStyle;
 };
 
+/**
+ * Internal: determine font for the given style, ensuring that it is loaded.
+ */
 spark.fontForStyle = function(theStyle) {
     !theStyle.getAttribute("font")      ? theStyle.font    = "arial" : null;
     !theStyle.getAttribute("fontSize")  ? theStyle.fontSize = 12 : null;
@@ -173,6 +210,9 @@ spark.fontForStyle = function(theStyle) {
     return spark.loadFont(theStyle.font, theStyle.fontSize, theStyle.fontStyle);
 }
 
+/**
+ * Internal: Convert text alignment from string to Y60 enum.
+ */
 spark.alignmentFromString = function(theString) {
     if(theString == "top")
         return Renderer.TOP_ALIGNMENT;
@@ -187,6 +227,9 @@ spark.alignmentFromString = function(theString) {
     throw new Error("Unknown alignment: " + theString);
 };
 
+/**
+ * Internal: Convert text style from string to Y60 enum.
+ */
 spark.styleFromString = function(theString) {
     if(theString == "normal")
         return 0;
@@ -199,6 +242,9 @@ spark.styleFromString = function(theString) {
     throw new Error("Unknown font style: " + theString);
 };
 
+/**
+ * Create an image suitable for rendering text into.
+ */
 spark.createTextImage = function(theSize) {
     var myImage = Modelling.createImage(window.scene, theSize.x, theSize.y, "RGBA");
     myImage.resize = "none";
@@ -206,6 +252,14 @@ spark.createTextImage = function(theSize) {
     return myImage;
 };
 
+/**
+ * Render the given TEXT into the given IMAGE using the given STYLE with the given SIZE.
+ * 
+ * Returns the size of the text within the image as a Point2f.
+ * 
+ * MAXTEXTWIDTH and LINEWIDTHS are output parameters,
+ * allowing the client some layout trickery.
+ */
 spark.renderText = function(theImage, theText, theStyle, theSize, theMaxTextWidth, theLineWidths) {
     spark.applyStyleDefaults(theStyle);
 
