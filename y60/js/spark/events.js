@@ -1,6 +1,6 @@
 /* __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Copyright (C) 1993-2009, ART+COM AG Berlin, Germany <www.artcom.de>
+// Copyright (C) 1993-2010, ART+COM AG Berlin, Germany <www.artcom.de>
 //
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
@@ -56,6 +56,34 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+/**
+ * SPARK Event Handling
+ * 
+ * Events in SPARK are heavily inspired by DOM events.
+ * The API, however, is based on Adobe Flash.
+ * 
+ * Events are dispatched in a hierarchy of instances of EventDispatcher.
+ * All such instances must follow the component hierarchy protocol,
+ * meaning that they have to provide "parent" and "children" properties.
+ * There is, however, no obligation for all children and the parent to
+ * inherit EventDispatcher. Instances not doing so will be skipped during
+ * event dispatch.
+ * 
+ * As in DOM events, dispatch works in three phases: Capture, Target
+ * and Bubbling. Bubbling is currently unimplemented because there
+ * never was a need for it. It is believed likely that this will
+ * never change. For details on how dispatch works, see the DOM Level 3
+ * Events specification.
+ * 
+ * Dispatch may be cancelled by any participant in the event flow IF
+ * the event specifies that it may be cancelled. Doing so will stop
+ * propagation after the current handler.
+ * 
+ */
+
+/**
+ * Enumeration of event dispatch phases.
+ */
 spark.EventPhase = {
     IDLE:      "idle",
     CAPTURING: "capturing",
@@ -63,7 +91,16 @@ spark.EventPhase = {
     BUBBLING:  "bubbling"
 };
 
-
+/**
+ * Base class for events.
+ * 
+ * Constructor takes three arguments:
+ * 
+ *   TYPE (string)     - type of event, identifying handler to call
+ *   BUBBLES (bool)    - if true, the event will bubble after the target phase
+ *   CANCELABLE (bool) - if true, the event can be canceled with cancelDispatch
+ * 
+ */
 spark.Event = spark.Class("Event");
 
 spark.Event.Constructor = function(Protected, theType, theBubbles, theCancelable) {
@@ -71,54 +108,74 @@ spark.Event.Constructor = function(Protected, theType, theBubbles, theCancelable
 
 
     var _myBubbles = theBubbles != null ? theBubbles : false;
-
-    Public.bubbles getter = function() {
-        return _myBubbles;
-    };
-
     var _myCancelable = theCancelable != null ? theCancelable : false;
-
-    Public.cancelable getter = function() {
-        return _myCancelable;
-    };
-
     var _myCurrentTarget = null;
-
-    Public.currentTarget getter = function() {
-        return _myCurrentTarget;
-    };
-
     var _myCurrentPhase = spark.EventPhase.IDLE;
-
-    Public.currentPhase getter = function() {
-        return _myCurrentPhase;
-    };
-
     var _myTarget = null;
-
-    Public.target getter = function() {
-        return _myTarget;
-    };
-
     var _myType = theType;
+    var _myDispatching = false;
 
+
+    /**
+     * The type of this event.
+     */
     Public.type getter = function() {
         return _myType;
     };
 
-    var _myDispatching = false;
+    /**
+     * Whether this event participates in bubbling.
+     */
+    Public.bubbles getter = function() {
+        return _myBubbles;
+    };
 
+    /**
+     * Whether this event allows cancellation.
+     */
+    Public.cancelable getter = function() {
+        return _myCancelable;
+    };
+
+    /**
+     * Whether this event is currently being dispatched.
+     * 
+     * While true, the following properties are valid.
+     */
     Public.dispatching getter = function() {
         return _myDispatching;
     };
 
-    Public.startDispatch = function(theTarget) {
-        _myDispatching = true;
-        _myTarget = theTarget;
-        _myCurrentPhase  = spark.EventPhase.IDLE;
-        _myCurrentTarget = null;
+    /**
+     * The final target of this event in the current flow.
+     */
+    Public.target getter = function() {
+        return _myTarget;
     };
 
+    /**
+     * Always reflects the current target during event flow.
+     */
+    Public.currentTarget getter = function() {
+        return _myCurrentTarget;
+    };
+
+    /**
+     * Always reflects the current phase during event flow.
+     */
+    Public.currentPhase getter = function() {
+        return _myCurrentPhase;
+    };
+
+    /**
+     * Cancel dispatch of event.
+     * 
+     * This may be called by the client to abort the
+     * event flow for this event.
+     * 
+     * This is, however, only allowed on events that allow
+     * cancellation on creation.
+     */
     Public.cancelDispatch = function() {
         if(_myCancelable) {
             Public.finishDispatch();
@@ -127,12 +184,28 @@ spark.Event.Constructor = function(Protected, theType, theBubbles, theCancelable
         }
     };
 
+    /**
+     * Internal: update state of event to reflect start of dispatch
+     */
+    Public.startDispatch = function(theTarget) {
+        _myDispatching = true;
+        _myTarget = theTarget;
+        _myCurrentPhase  = spark.EventPhase.IDLE;
+        _myCurrentTarget = null;
+    };
+
+    /**
+     * Internal: update state of event to reflect end of dispatch
+     */
     Public.finishDispatch = function() {
         _myDispatching = false;
         _myCurrentPhase = spark.EventPhase.IDLE;
         _myCurrentTarget = null;
     };
 
+    /**
+     * Internal: update state of event to reflect dispatch to given target
+     */
     Public.dispatchTo = function(theCurrentTarget, theCurrentPhase) {
         _myCurrentTarget = theCurrentTarget;
         _myCurrentPhase  = theCurrentPhase;
@@ -140,6 +213,17 @@ spark.Event.Constructor = function(Protected, theType, theBubbles, theCancelable
 
 };
 
+/**
+ * Mixin class for event dispatchers.
+ * 
+ * This class may be mixed into anything that should offer
+ * an event dispatch protocol (dispatchEvent, addEventListener...).
+ * 
+ * Mixing in this class imposes a hierarchy protocol requirement,
+ * meaning that instances of this class must, by other means,
+ * provide a "parent" and a "children" property. These may be
+ * implemented as stubs, returning null and [] respectively.
+ */
 spark.EventDispatcher = spark.AbstractClass("EventDispatcher");
 
 spark.EventDispatcher.Constructor = function(Protected) {
@@ -147,6 +231,22 @@ spark.EventDispatcher.Constructor = function(Protected) {
 
     var _myListenersByType = {};
 
+    /**
+     * Register an event listener with this dispatcher.
+     * 
+     * This method should be called to register event handlers.
+     * 
+     * Event handlers are unary functions and will be called
+     * with the dispatched event as their sole argument.
+     * 
+     * The THIS of the handler will be the current target
+     * in the event flow.
+     * 
+     * Arguments:
+     *   TYPE (string)       - type of event to handle
+     *   LISTENER (function) - unary event handler function
+     *   USECAPTURE (bool)   - if the handler belongs to the Capture phase
+     */
     Public.addEventListener = function(theType, theListener, theUseCapture) {
         // XXX: this is not really acceptable.
         //      need to figure out something better.
@@ -173,6 +273,11 @@ spark.EventDispatcher.Constructor = function(Protected) {
         _myListenersByType[theType] = _myListenersByType[theType].concat(myListener);
     };
 
+    /**
+     * Get all event listeners for the given type.
+     * 
+     * This is internal, right? -IA 20100219
+     */
     Public.getEventListeners = function(theType) {
         if(theType in _myListenersByType) {
             var myListeners = _myListenersByType[theType];
@@ -183,6 +288,24 @@ spark.EventDispatcher.Constructor = function(Protected) {
         return [];
     };
 
+    /**
+     * Dispatch the given event to the hierarchy.
+     * 
+     * This method is the actual driver of event dispatch.
+     * 
+     * It adheres to the following protocol:
+     * 
+     *  - call startDispatch
+     *  - for each capturing listener, call it
+     *  - call listeners on target
+     *  - bubble the event upwards (not implemented)
+     *  - call finishDispatch
+     * 
+     * For each event target (in each phase), dispatchTo
+     * will be called on the event to update its currentTarget
+     * and currentPhase, making it reflect dispatch progress.
+     * 
+     */
     Public.dispatchEvent = function(theEvent) {
         theEvent.startDispatch(Public);
 
@@ -237,6 +360,11 @@ spark.EventDispatcher.Constructor = function(Protected) {
         theEvent.finishDispatch();
     };
 
+    /**
+     * Check if this dispatcher has listeners for the given event type.
+     * 
+     * This is non-recursive, checking only the given dispatcher.
+     */
     Public.hasEventListener = function(theType) {
         if(theType in _myListenersByType) {
             var myListeners = _myListenersByType[theType];
@@ -247,6 +375,16 @@ spark.EventDispatcher.Constructor = function(Protected) {
         return false;
     };
 
+    /**
+     * Remove the given event listener.
+     * 
+     * Care must be taken to call this method with the exact same
+     * arguments as in the corresponding addEventListener call.
+     * 
+     * The listener function will be compared by identity.
+     * Therefore, removing a listener that is a closure may fail.
+     * 
+     */
     Public.removeEventListener = function(theType, theListener, theUseCapture) {
         var myDidRemove = false;
 
@@ -271,6 +409,12 @@ spark.EventDispatcher.Constructor = function(Protected) {
         }
     };
 
+    /**
+     * Recursively check for listeners of a given event type.
+     * 
+     * This can be used to decide whether creating and dispatching
+     * an event is worth the effort.
+     */
     Public.willTrigger = function(theType) {
         if(Public.hasEventListener(theType)) {
             return true;
