@@ -1,6 +1,6 @@
 /* __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Copyright (C) 1993-2009, ART+COM AG Berlin, Germany <www.artcom.de>
+// Copyright (C) 1993-2010, ART+COM AG Berlin, Germany <www.artcom.de>
 //
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
@@ -56,7 +56,7 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-/*
+/**
  * Map of all component classes.
  */
 spark.componentClasses = {};
@@ -65,8 +65,8 @@ spark.componentClasses = {};
 /**
  * Define a component class.
  *
- * Conceptually, this is a metaclass providing
- * component-class registration.
+ * Conceptually, this function is a metaclass
+ * providing component-class registration.
  *
  * Should be called on the spark namespace like:
  *   spark.Fnord = spark.ComponentClass("Fnord");
@@ -98,8 +98,8 @@ spark.ComponentClass = function(theName) {
 /**
  * Define a templated component class.
  *
- * Conceptually, this is a metaclass providing
- * component template instantiation.
+ * Conceptually, this function is a metaclass
+ * providing component template instantiation.
  *
  * Should be called on the spark namespace like:
  *   spark.Fnord = spark.LoadedClass("Fnord", "Fnord.spark");
