@@ -301,7 +301,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
                 window.renderText([30, (40 + i * 20)], myText[i], "Screen15");
                 myWidth = Math.max(myWidth, myText[i].length * 10);
             }
-            _myTextOverlay.width  = myWidth;
+            //_myTextOverlay.width  = myWidth;
             _myTextOverlay.height = myText.length * 20 + 35;
         }
     }
@@ -548,7 +548,13 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
             if (_myMovieNode.src.search(/\.m60/) != -1) {
                 return getImageSize(_myMovieNode);
             } else {
-                return new Vector2i(_myMovieNode.width, _myMovieNode.height);
+                var height = _myMovieNode.height;
+                var width = Math.round(_myMovieNode.height * _myMovieNode.aspectratio);
+                if (width > _myMovieNode.width) {
+                    width = _myMovieNode.width;
+                    height = Math.round(width / _myMovieNode.aspectratio);
+                }
+                return new Vector2i(width, height);
             }
         } else if (_myCaptureNode) {
             return new Vector2i(_myCaptureNode.width, _myCaptureNode.height);

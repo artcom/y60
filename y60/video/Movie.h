@@ -96,6 +96,7 @@ namespace y60 {
     DEFINE_ATTRIBUTE_TAG(MaxCacheSizeTag, unsigned,    MOVIE_FRAME_MAX_CACHE_ATTRIB, 32, Y60_VIDEO_DECL);
     DEFINE_ATTRIBUTE_TAG(CurrentFrameTag, int,         MOVIE_FRAME_ATTRIB,       0, Y60_VIDEO_DECL);
     DEFINE_ATTRIBUTE_TAG(FrameCountTag,   int,         MOVIE_FRAMECOUNT_ATTRIB,  -1, Y60_VIDEO_DECL);
+    DEFINE_ATTRIBUTE_TAG(AspectRatioTag,  float,       MOVIE_ASPECT_RATIO_ATTRIB,   1, Y60_VIDEO_DECL);
     DEFINE_ATTRIBUTE_TAG(FrameRateTag,    double,      MOVIE_FRAMERATE_ATTRIB,   25, Y60_VIDEO_DECL);
     DEFINE_ATTRIBUTE_TAG(PlaySpeedTag,    float,       MOVIE_PLAYSPEED_ATTRIB,   1, Y60_VIDEO_DECL);
     DEFINE_ATTRIBUTE_TAG(PlayModeTag,     std::string, MOVIE_PLAYMODE_ATTRIB,    "play", Y60_VIDEO_DECL);
@@ -128,6 +129,7 @@ namespace y60 {
         public AVDelayTag::Plug,
         public AudioTag::Plug,
         public DecoderHintTag::Plug,
+        public AspectRatioTag::Plug,
         public dom::DynamicAttributePlug<MovieTimeTag, Movie>,
         public dom::DynamicAttributePlug<DecoderTag, Movie>,
         public dom::DynamicAttributePlug<HasAudioTag, Movie>

@@ -305,8 +305,7 @@ namespace y60 {
     const char * const MOVIE_AVDELAY_ATTRIB        = "avdelay";
     const char * const MOVIE_FRAMERATE_ATTRIB      = "fps";
     const char * const MOVIE_FRAMECOUNT_ATTRIB     = "framecount";
-    const char * const MOVIE_FRAMEBLENDFACTOR_ATTRIB = "frameblend_factor";
-    const char * const MOVIE_FRAMEBLENDING_ATTRIB  = "frameblending";
+    const char * const MOVIE_ASPECT_RATIO_ATTRIB   = "aspectratio";    
     const char * const MOVIE_HASAUDIO_ATTRIB       = "has_audio";
 
     const char * const MOVIE_PLAYSPEED_ATTRIB      = "playspeed";

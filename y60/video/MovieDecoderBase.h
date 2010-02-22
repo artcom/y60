@@ -118,6 +118,7 @@ namespace y60 {
              */
             virtual double getMovieTime(double theSystemTime);
 
+
             /**
              * Reads a frame from the decoder.
              * @param theTime time of the frame to fetch
@@ -188,6 +189,7 @@ namespace y60 {
             virtual const bool hasAudio() const = 0;
 
             virtual void setVolume(const float theVolume) {};
+
 
         protected:
             const Movie * getMovie() const;

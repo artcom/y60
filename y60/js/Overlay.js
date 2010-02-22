@@ -495,10 +495,7 @@ TextureOverlay.prototype.Constructor = function(Public, Protected, theScene, the
 			return;
 		}
 		var isMovieFlag = myImage.nodeName == "movie";
-		if (isMovieFlag) {
-			myImage.frameblending = false;
-		}
-        var myFindString = "texture[@image='"+ theImageId+ "']";
+		var myFindString = "texture[@image='"+ theImageId+ "']";		
 		var myTexture = window.scene.textures.find(myFindString);
 		/*if (_myTextureUnits) {
 			_myTextureUnits = getDescendantByTagName(Public.material, "textureunits", false);
@@ -513,17 +510,10 @@ TextureOverlay.prototype.Constructor = function(Public, Protected, theScene, the
 
 
 
-		var my2ndTexture = null
 		if (!myTexture) {
 			myTexture = Modelling.createTexture(window.scene, myImage);
 			_myTextures.push(myTexture);
 			myTexture.image = theImageId;
-			if (isMovieFlag && myImage.frameblending) {
-				var my2ndTexture = Modelling.createTexture(window.scene, myImage);
-				my2ndTexture.name = myTexture.name + "_2ndBuffer";
-				my2ndTexture.image = theImageId;
-				my2ndTexture.image_index = 1;
-			}
 		} else {
 			// re-use texture that references the given image -- maybe not such a good idea...
 			// in fact, it will probably break when cleaning up after ourselves since we might
@@ -543,11 +533,6 @@ TextureOverlay.prototype.Constructor = function(Public, Protected, theScene, the
 		myTextureUnit.applymode = TextureApplyMode.modulate;
 		myTextureUnit.texture   = myTexture.id;
 
-		if (isMovieFlag && myImage.frameblending) {
-			var my2ndTextureUnit = _myTextureUnits.appendChild(Node.createElement("textureunit"));
-			my2ndTextureUnit.applymode = TextureApplyMode.modulate;
-			my2ndTextureUnit.texture   = my2ndTexture.id;
-		}
 		addTextureRequirements(_myTextureUnits.childNodesLength());
 
 		return myTexture;

@@ -96,8 +96,14 @@ spark.NewMovie.Constructor = function(Protected) {
 
         _myMovie = theNode;
         _myTexture.image = theNode.id;
-        Public.width  = _myMovie.width;
-        Public.height = _myMovie.height;
+        var myHeight = _myMovie.height;
+        var myWidth = Math.round(_myMovie.height * _myMovie.aspectratio);
+        if (myWidth > _myMovie.width) {
+            myWidth = _myMovie.width;
+            myHeight = Math.round(myWidth / _myMovie.aspectratio);
+        }
+        Public.width  = myWidth;
+        Public.height = myHeight;
 
         // XXX crude hack starts here
         if(_myOnMovieChanged) {
@@ -168,7 +174,9 @@ spark.NewMovie.Constructor = function(Protected) {
                 _myTexture, Public.name + "-material", true);
 
         Base.realize(myMaterial);
-
+        if(myMovieSource) {
+            Public.src = myMovieSource;
+        }
         if(_myMovie.nodeName != "image") {
             Public.loop = Protected.getBoolean("loop", false);
             Public.mode = Protected.getString("mode", "stop");

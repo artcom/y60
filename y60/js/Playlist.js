@@ -213,6 +213,7 @@ Playlist.prototype.Constructor = function(self) {
         {
             return AUDIO_MEDIA;
         } else if (theUrl.search(/\.m60$/i)  != -1 ||
+                   theUrl.search(/\.vob$/i)  != -1 ||
                    theUrl.search(/\.mp4$/i)  != -1 ||
                    theUrl.search(/\.m4a$/i)  != -1 ||
                    theUrl.search(/\.mkv$/i)  != -1 ||
@@ -268,6 +269,7 @@ Playlist.prototype.Constructor = function(self) {
         if (theUrl.search(/\.mpg$/i)  != -1 ||
             theUrl.search(/\.mp4$/i)  != -1 ||
             theUrl.search(/\.m4a$/i)  != -1 ||
+            theUrl.search(/\.vob$/i)  != -1 ||
             theUrl.search(/\.mkv$/i)  != -1 ||
             theUrl.search(/\.flv$/i)  != -1 ||
             theUrl.search(/\.mpeg$/i) != -1 ||
@@ -294,7 +296,7 @@ Playlist.prototype.Constructor = function(self) {
             if (operatingSystem() == "LINUX") {
                 myDecoderHint = "FFMpegDecoder2";
             } else {
-                myDecoderHint = "WMVDecoder";
+                myDecoderHint = "FFMpegDecoder2"; //"WMVDecoder";
             }
         }
         return myDecoderHint;

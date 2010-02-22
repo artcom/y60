@@ -89,6 +89,7 @@ namespace y60 {
     Movie::Movie(dom::Node & theNode):
         Image(theNode),
         FrameCountTag::Plug(theNode),
+        AspectRatioTag::Plug(theNode),
         CurrentFrameTag::Plug(theNode),
         FrameRateTag::Plug(theNode),
         PlaySpeedTag::Plug(theNode),
@@ -376,8 +377,6 @@ namespace y60 {
             }
         }
     }
-
-
 
     bool Movie::getMovieTime(double & theTime) const {
         //DK my workaround for not knowing how to const_cast the asl::Ptr itself

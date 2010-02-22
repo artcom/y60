@@ -46,7 +46,13 @@ spark.Movie.Constructor = function(Protected) {
         _myMovie.src = theFileName;
         window.scene.loadMovieFrame(_myMovie);
         var mySize = getImageSize(_myMovie);
-        internalResize(mySize, Public.sceneNode);
+        var myHeight = mySize.y;
+        var myWidth = Math.round(mySize.y * _myMovie.aspectratio);
+        if (myWidth > mySize.x) {
+            myWidth = mySize.x;
+            myHeight = Math.round(myWidth / _myMovie.aspectratio);
+        }
+        internalResize(new Vector2f(myWidth, myHeight), Public.sceneNode);
     };
 
     Public.volume getter = function() { return _myMovie.volume; };

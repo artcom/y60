@@ -129,12 +129,10 @@ LabelBase.prototype.Constructor = function(Public, Protected, theScene,
         window.setLineHeight(lineHeight);
         var myFontName = loadFont(myStyle.font, myStyle.fontsize);
         var myImage = Protected.getImageNode();
-
         _myTextSize = window.renderTextAsImage(myImage, theText, myFontName,
                         theSize&&theSize[0]>0?Public.width:null,
                         theSize&&theSize[1]>0?Public.height:null,
                         Public.textCursorPos);
-
         _myCursorPos = window.getTextCursorPosition();
 
         Public.srcsize.x = _myTextSize[0] / myImage.width;
