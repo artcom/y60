@@ -14,14 +14,14 @@ HoccerUnitTest.prototype.Constructor = function(obj, theName) {
     function testDefaults() {
         DTITLE("testing default settings");
 
-        var testStation = Object.beget(Hoccer.station);
+        var testStation = Hoccer.station({});
         ENSURE_EQUAL(80, testStation.accuracy, "accuracy");
     }
 
     function testThrowing() {
         DTITLE("test throwing");
 
-        var testStation = Object.beget(Hoccer.station);
+        var testStation = Hoccer.station({});
         testStation.latitude += 1;
         var isDone = false;
         testStation.buildPeerGroup({
@@ -46,7 +46,7 @@ HoccerUnitTest.prototype.Constructor = function(obj, theName) {
 
     function testThrowMultipleTimes() {
         DTITLE("test throw multiple times");
-         var testStation = Object.beget(Hoccer.station);
+         var testStation = Hoccer.station({});
          
          for (var i = 0; i < 100; ++i) {
              testStation.latitude +=1;

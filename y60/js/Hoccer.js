@@ -1,7 +1,7 @@
 
 var Hoccer = {};
 
-Hoccer.station = function() {
+Hoccer.station = function(theParams) {
     var that = {};
     var myRequestManager = new RequestManager();
     var myOnErrorFunc = function () {
@@ -13,12 +13,13 @@ Hoccer.station = function() {
     that.serverUri = "http://www.hoccer.com";
 
     //default hoccer station at artcom
-    that.longitude = 13.345116;
-    that.latitude = 52.501077;
-    that.accuracy = 80;
-    that.onImageCaught = function(){};
-    that.onTextCaught = function(){};
-    that.onSomethingElseCaught = function(){};
+    that.longitude = (typeof(theParams.longitude) === 'undefined'?13.345116:theParams.longitude);
+    that.latitude = (typeof(theParams.latitude) === 'undefined'?52.501077:theParams.latitude);
+    that.bssids = (typeof(theParams.bssids) === 'undefined'?"":theParams.bssids);
+    that.accuracy = (typeof(theParams.accuracy) === 'undefined'?80:theParams.accuracy);
+    that.onImageCaught = (typeof(theParams.onImageCaught) === 'undefined'?function(){}:theParams.onImageCaught);
+    that.onTextCaught = (typeof(theParams.onTextCaught) === 'undefined'?function(){}:theParams.onTextCaught);
+    that.onSomethingElseCaught = (typeof(theParams.onSomethingElseCaught) === 'undefined'?function(){}:theParams.onSomethingElseCaught);
 
     var MimeTypes = {
         jpg : "image/jpeg",
@@ -144,7 +145,8 @@ Hoccer.station = function() {
                     "&peer[latitude]=" + that.latitude +
                     "&peer[longitude]=" + that.longitude +
                     "&peer[accuracy]=" + that.accuracy + 
-                    (theParams.isSharing?"&peer[seeder]=1":"");
+                    (theParams.isSharing?"&peer[seeder]=1":"") + 
+                    (that.bssids.length > 0?"&peers[bssids]="+that.bssids:"");
         request.post(body);
         myRequestManager.performRequest(request);
         print("posted ",body);
@@ -199,7 +201,6 @@ Hoccer.station = function() {
         }     
     };
 
-
     function getMimeType(theFile) {
         if (theFile.substring(theFile.length-4,theFile.length) == ".vcf") {
             return MimeTypes.vcf;
@@ -217,5 +218,5 @@ Hoccer.station = function() {
 
 
     return that;
-}();
+};
 
