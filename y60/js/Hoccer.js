@@ -146,7 +146,7 @@ Hoccer.station = function(theParams) {
                     "&peer[longitude]=" + that.longitude +
                     "&peer[accuracy]=" + that.accuracy + 
                     (theParams.isSharing?"&peer[seeder]=1":"") + 
-                    (that.bssids.length > 0?"&peers[bssids]="+that.bssids:"");
+                    (that.bssids.length > 0?"&peer[bssids]="+that.bssids:"");
         request.post(body);
         myRequestManager.performRequest(request);
         print("posted ",body);
