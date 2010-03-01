@@ -70,27 +70,42 @@ spark.Component = spark.AbstractClass("Component");
 spark.Component.Constructor = function(Protected) {
     var Public = this;
 
-    this.Property("name", String, null, applyName);
+    /**
+     * Components can have names.
+     */
+    this.Property("name", String, null);
 
-    function applyName() {
-    }
-
-    // XXX: really bad solution.
-    //      this should be higher up and more informative.
+    /**
+     * Printing method.
+     */
     Public.toString = function (){
         return "[" + Public._className_ + " " + Public.vocation + "]";
     };
 
+
     var _myParent = null;
 
+    /**
+     * Get the parent of this component.
+     */
     Public.parent getter = function() {
         return _myParent;
     };
 
+    /**
+     * Internal: change the parent of this component.
+     */
     Public.parent setter = function(theParent) {
         _myParent = theParent;
     };
 
+
+    /**
+     * Find the root of the component hierarchy.
+     * 
+     * NOTE: This is not identical to finding the
+     *       stage of a widget.
+     */
     Public.root getter = function() {
         var myCurrent = Public;
         while(myCurrent.parent != null) {
@@ -102,16 +117,29 @@ spark.Component.Constructor = function(Protected) {
 
     var _myNode = null;
 
+    /**
+     * Get the XML node used to instantiate this component.
+     */
     Public.node getter = function() {
         return _myNode;
     };
 
-
+    /**
+     * Initialize this component from an XML node.
+     * 
+     * This mostly kicks property initialization.
+     */
     Public.initialize = function(theNode) {
         Public.Initialize(theNode);
         _myNode   = theNode;
     };
 
+    /**
+     * Get the so-called vocation of this component.
+     * 
+     * The vocation of a component is a human-readable
+     * string describing the components identity.
+     */
     Public.vocation getter = function() {
         if(Public.name) {
             return "named " + Public.name;
@@ -120,7 +148,24 @@ spark.Component.Constructor = function(Protected) {
             return "with id " + Public.id;
         }
         return "without a name";
-    }
+    };
+
+    /**
+     * Given the node describing this component,
+     * instantiate all children and initialize them.
+     * 
+     * This method is used by the component instantiator
+     * to create the children of a component.
+     * 
+     * It can, however, also be used to coerce the
+     * "child" description of a component into something
+     * entirely different. One could, for example,
+     * override this and use it to put data items
+     * in the component description. I18n works like this.
+     */
+    Public.instantiateChildren = function(theNode) {
+    };
+
 
     // XXX: realize and post-realize should be one thing,
     //      with the remaining coupled properties uncoupled.
@@ -131,10 +176,6 @@ spark.Component.Constructor = function(Protected) {
 
     Public.postRealize = function() {
         Logger.debug("Post-Realizing " + Public._className_ + " " + Public.vocation);
-    };
-
-
-    Public.instantiateChildren = function() {
     };
 
     // XXX: I18N should be implemented with a property type
@@ -274,7 +315,6 @@ spark.Component.Constructor = function(Protected) {
  * kinds of containers, mostly distinguishing between
  * graphical and non-graphical ones.
  */
-
 spark.Container = spark.AbstractClass("Container");
 
 spark.Container.Constructor = function(Protected) {
@@ -286,10 +326,16 @@ spark.Container.Constructor = function(Protected) {
     var _myChildren = [];
     var _myNamedChildMap   = {};
 
+    /**
+     * Get an array containing all children of this container.
+     */
     Public.children getter = function() {
         return _myChildren.slice(0); // XXX: clone?
     };
 
+    /**
+     * Add the given child to this container.
+     */
     Public.addChild = function(theChild) {
         _myChildren.push(theChild);
 
@@ -302,7 +348,7 @@ spark.Container.Constructor = function(Protected) {
 
     // XXX: work around missing JS 1.6 functionality. However, this certainly
     // does not belong here. Maybe we should put all the nifty things from 1.6
-    // into free functions? [DS]
+    // into free functions? [DS] Yes. [IA 20100301]
     function indexOf(theArray, theItem) {
         for (var i = 0; i < theArray.length; ++i) {
             if (theArray[i] === theItem) {
@@ -312,6 +358,9 @@ spark.Container.Constructor = function(Protected) {
         return -1;
     }
 
+    /**
+     * Remove the given child.
+     */
     Public.removeChild = function(theChild) {
         var myChildIndex = indexOf(_myChildren, theChild);
 
@@ -328,13 +377,19 @@ spark.Container.Constructor = function(Protected) {
         theChild.parent = null;
     };
 
+    /**
+     * Remove all children.
+     */
     Public.removeAllChildren = function() {
         var myChildren = Public.children;
         for(var i = 0; i < myChildren.length; i++) {
             Public.removeChild(myChildren[i]);
         }
-    }
+    };
 
+    /**
+     * Retrieve a (direct) child by name.
+     */
     Public.getChildByName = function(theName) {
         if (theName in _myNamedChildMap) {
             return _myNamedChildMap[theName];
@@ -343,6 +398,9 @@ spark.Container.Constructor = function(Protected) {
         }
     };
 
+    /**
+     * Recursively retrieve children of the given name.
+     */
     Public.findChildrenByName = function(theName) {
         var myChildren = [];
         var myOwnChild = Public.getChildByName(theName);
@@ -358,6 +416,20 @@ spark.Container.Constructor = function(Protected) {
         return myChildren;
     };
 
+    /**
+     * Given the XML node describing this component,
+     * recursively instantiate and initialize all
+     * specified child components.
+     * 
+     * See implementation in Component for rationale.
+     */
+    Public.instantiateChildren = function(theNode) {
+        for(var i = 0; i < theNode.childNodesLength(); i++) {
+            var myChildNode = theNode.childNode(i);
+            spark.instantiateRecursively(myChildNode, Public);
+        }
+    };
+
     // XXX: rework realization
     Base.realize = Public.realize;
     Public.realize = function() {
@@ -367,6 +439,7 @@ spark.Container.Constructor = function(Protected) {
         }
     };
 
+    // XXX: rework realization
     Base.postRealize = Public.postRealize;
     Public.postRealize = function() {
         Base.postRealize();
@@ -375,11 +448,4 @@ spark.Container.Constructor = function(Protected) {
         }
     };
 
-    Public.instantiateChildren = function(theNode) {
-        for(var i = 0; i < theNode.childNodesLength(); i++) {
-            var myChildNode = theNode.childNode(i);
-            spark.instantiateRecursively(myChildNode, Public);
-        }
-    };
 };
-
