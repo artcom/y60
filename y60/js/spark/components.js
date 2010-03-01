@@ -56,6 +56,9 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+spark.sceneNodeMap = {};
+spark.ourComponentsByNameMap = {};
+
 /**
  * Component base class.
  *
@@ -63,20 +66,7 @@
  * in a hierarchy. They can be graphical or not.
  */
 
-spark.sceneNodeMap = {};
-spark.ourComponentsByNameMap = {};
-
 spark.Component = spark.AbstractClass("Component");
-
-function unpenner() {
-   var theEasingFunction = arguments[0];
-   var theEasingArguments = Array.prototype.slice.call(arguments, 1);
-
-   var myArguments = [theEasingFunction, 0.0, 1.0, 1.0];
-   myArguments = myArguments.concat(theEasingArguments);
-
-   return rcurry.apply(this, myArguments);
-}
 
 spark.Component.Constructor = function(Protected) {
     var Public = this;

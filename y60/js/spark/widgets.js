@@ -1,6 +1,6 @@
 /* __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Copyright (C) 1993-2009, ART+COM AG Berlin, Germany <www.artcom.de>
+// Copyright (C) 1993-2010, ART+COM AG Berlin, Germany <www.artcom.de>
 //
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: Standard widgets
+// Description: Widget base classes
 //
 // Last Review: NEVER, NOONE
 //
@@ -57,10 +57,27 @@
 */
 
 /**
- * Widgets wrap Y60 scene objects.
+ * Map from scene node id to widget.
+ * 
+ * This is used in various places to retrieve
+ * the widget responsible for a given scene node.
+ * 
+ * It is maintained by class Widget.
+ */
+spark.sceneNodeMap = {};
+
+
+/**
+ * Widgets: interactive graphical objects
  *
- * This is where positioning, orientation, scaling,
- * visibility and sensibility go.
+ * This is the mother of all GUI classes.
+ * 
+ * This is where positioning, orientation, scaling, visibility
+ * and sensibility are handled.
+ * 
+ * In general, each widget is associated with a Y60 scene node,
+ * which may be either a transform or a body, depending on the
+ * concrete subclass.
  */
 spark.Widget = spark.AbstractClass("Widget");
 
@@ -68,27 +85,48 @@ spark.Widget.Constructor = function(Protected) {
     var Base = {};
     var Public = this;
 
+    // all widgets are potential component containers.
+    // that does not necessitate that they can contain other widgets.
     this.Inherit(spark.Container);
+
+    // all widgets participate in event dispatch.
     this.Inherit(spark.EventDispatcher);
 
     var _mySceneNode   = null;
 
-    // XXX: try to get rid of this.
+    /**
+     * Access the scene node for this widget.
+     * 
+     * XXX: try to get rid of this accessor
+     */
     Public.sceneNode getter = function() {
         return _mySceneNode;
     };
 
-    // XXX: try to get rid of this.
+    /**
+     * Access the INNER scene node for this widget.
+     * 
+     * This is used exclusively by Canvas, returning
+     * the root of the world inside the Canvas.
+     * 
+     * On other widgets, the inner node equals
+     * the outer node.
+     * 
+     * XXX: try to get rid of this accessor
+     */
     Public.innerSceneNode getter = function() {
         return _mySceneNode;
     };
 
-    // XXX: function for getting screen-aligned bounds
+
+    // BOUNDS
+
+    // XXX: CRUFT: function for getting screen-aligned bounds
     Public.worldposition getter = function() {
         return _mySceneNode.globalmatrix.getTranslation();
     };
 
-    // XXX: function for getting bounds
+    // XXX: CRUFT: function for getting bounds
     Public.size getter = function() {
         var myBoundingBox = _mySceneNode.boundingbox;
         var myWidth = 0;
@@ -100,10 +138,12 @@ spark.Widget.Constructor = function(Protected) {
         }
     };
 
+    // XXX: CRUFT
     Public.width getter = function(){
         return Public.size.x;
     };
 
+    // XXX: CRUFT
     Public.height getter = function(){
         return Public.size.y;
     };
@@ -111,6 +151,11 @@ spark.Widget.Constructor = function(Protected) {
 
     // STAGE
 
+    /**
+     * Access the stage for this widget.
+     * 
+     * Works by traversing the hierarchy upwards until a stage is found.
+     */
     Public.stage getter = function() {
         var myCurrent = Public;
         while(myCurrent) {
@@ -120,11 +165,23 @@ spark.Widget.Constructor = function(Protected) {
             myCurrent = myCurrent.parent;
         }
         Logger.fatal("Widget " + Public.name + " is not the child of a valid stage.");
+        return null;
     };
 
 
     // STAGE EVENTS
 
+    /**
+     * Add an event listener.
+     * 
+     * This override is part of a hack to implement the somewhat unusual
+     * behaviour of stage events. Contrary to other events, stage events
+     * are never dispatched through the hierarchy. Instead, they execute
+     * a full target phase for every registrant, forbidding capture.
+     * 
+     * This is needed because there is no "focus" to base stage event
+     * dispatch on. Everyone just gets the events directly.
+     */
     Base.addEventListener = Public.addEventListener;
     Public.addEventListener = function(theType, theListener, theUseCapture) {
         if(!("Stage" in Public._classes_)) {
@@ -148,6 +205,11 @@ spark.Widget.Constructor = function(Protected) {
         Base.addEventListener(theType, theListener, theUseCapture);
     };
 
+    /**
+     * Remove an event listener.
+     * 
+     * This override is a hack, symmetric to addEventListener above.
+     */
     Base.removeEventListener = Public.removeEventListener;
     Public.removeEventListener = function(theType, theListener, theUseCapture) {
         switch(theType) {
@@ -281,6 +343,8 @@ spark.Widget.Constructor = function(Protected) {
 
     // ORIGIN
     // XXX: origins must be set up before realization
+    //      this is not thought out well and has been
+    //      introduced as a requirement-fullfilling hack.
 
     Public.Getter("origin", function() {
         return new Vector3f(Public.originX, Public.originY, Public.originZ);
@@ -417,6 +481,7 @@ spark.Widget.Constructor = function(Protected) {
     };
 
 
+    // REALIZATION
 
     Base.realize = Public.realize;
     Public.realize = function(theSceneNode) {

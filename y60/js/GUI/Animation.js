@@ -72,3 +72,15 @@ use("Animation/SequenceAnimation.js");
 use("Animation/DelayAnimation.js");
 use("Animation/QuaternionAnimation.js");
 use("Animation/VectorAnimation.js");
+
+// wrapper function for using penner easings
+// in conjunction with this library
+function unpenner() {
+   var theEasingFunction = arguments[0];
+   var theEasingArguments = Array.prototype.slice.call(arguments, 1);
+
+   var myArguments = [theEasingFunction, 0.0, 1.0, 1.0];
+   myArguments = myArguments.concat(theEasingArguments);
+
+   return rcurry.apply(this, myArguments);
+}
