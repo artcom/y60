@@ -56,7 +56,6 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-spark.sceneNodeMap = {};
 spark.ourComponentsByNameMap = {};
 
 /**
