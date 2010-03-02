@@ -119,9 +119,9 @@ function AbstractClass(theName) {
  * new instance as its first argument. Any arguments passed to the real,
  * outer, constructor will be passed as additional arguments.
  * 
- * Note that all constructor arguments given in the CTOR SIGNATURE must
- * be optional for component classes. In practice, they will be unreachable
- * as the component framework imposes its own constructor signature,
+ * Note that component classes should not have any additional constructor
+ * arguments in CTOR SIGNATURE, as the component framework imposes its
+ * own constructor signature involving the component-describing XML node,
  * effectively creating a default constructibility invariant.
  * 
  * The following metamethods will be attached to any new instance:
@@ -138,7 +138,7 @@ function Class(theName) {
         var myPublic = this;
         var myProtected = {};
 
-        // initialize magic slots
+        // initialize internal slots
         myPublic._protected_ = myProtected;
         myPublic._className_ = theName;
         myPublic._class_     = myNamespace[theName];
@@ -149,7 +149,7 @@ function Class(theName) {
         myPublic._properties_ = [];
         myPublic._signals_    = [];
 
-        // provide weaving functions
+        // provide metamethods
         myPublic.Inherit    = Inherit;
         myPublic.Getter     = Getter;
         myPublic.Setter     = Setter;
