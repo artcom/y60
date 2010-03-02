@@ -198,7 +198,7 @@ spark.Component.Constructor = function(Protected) {
             }
         }
         return myConcreteItem;
-    }
+    };
 
 
     Protected.getString = function(theName, theDefault) {
