@@ -56,10 +56,34 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+/**
+ * Global metamethod: Define a namespace on the target.
+ * 
+ * This metamethod allows the definition of a namespace.
+ * 
+ * It should only be used to define global namespaces as follows:
+ * 
+ *   var spark = Namespace("spark");
+ * 
+ */
 function Namespace(theName) {
     return {AbstractClass: AbstractClass, Class: Class, name: theName};
 };
 
+/**
+ * Namespace metamethod: Define an abstract class in the target namespace.
+ * 
+ * This metamethod is used to define an abstract (uninstantiable) class.
+ * 
+ * It should be used as follows:
+ * 
+ *   spark.BaseClass = spark.AbstractClass("BaseClass");
+ * 
+ * A constructor for the class will be defined. The constructor is not
+ * intended to be used but exists for debugging. It will always
+ * log an error.
+ * 
+ */
 function AbstractClass(theName) {
     Logger.info("Defining abstract class " + theName);
     var myNamespace = this;
@@ -73,6 +97,39 @@ function AbstractClass(theName) {
     return myConstructor;
 };
 
+/**
+ * Namespace metamethod: Define a concrete class in the target namespace.
+ * 
+ * This metamethod is used to define a concrete (instantiable) class.
+ * 
+ * It should be used as follows:
+ * 
+ *    spark.MyClass = spark.Class("MyClass");
+ * 
+ * This will define a constructor that will call the real, user-provided
+ * constructor of the class. This constructor must be defined as follows:
+ * 
+ *    spark.MyClass.Constructor = function(Protected, %{ ctor signature }% ) {
+ *        var Public = this;
+ *        var Base = {};
+ *        %{ class body }% 
+ *    };
+ * 
+ * The constructor will be called with the protected subobject of the
+ * new instance as its first argument. Any arguments passed to the real,
+ * outer, constructor will be passed as additional arguments.
+ * 
+ * Note that all constructor arguments given in the CTOR SIGNATURE must
+ * be optional for component classes. In practice, they will be unreachable
+ * as the component framework imposes its own constructor signature,
+ * effectively creating a default constructibility invariant.
+ * 
+ * The following metamethods will be attached to any new instance:
+ *   Inherit, Getter, Setter, Signal, Property, Initialize
+ *
+ * See the respective JSDoc for the specification of these metamethods.
+ * 
+ */
 function Class(theName) {
     Logger.info("Defining class " + theName);
     var myNamespace = this;
@@ -108,7 +165,6 @@ function Class(theName) {
             Logger.error("'" + theName +
                          "' not found in namespace '" + myNamespace.name + "'");
         }
-
     };
 
     myConstructor._className_ = theName;
@@ -116,6 +172,18 @@ function Class(theName) {
     return myConstructor;
 };
 
+/**
+ * Metamethod: Makes the target object be an instance of the given class.
+ * 
+ * This method calls the constructor of the given class on the target object,
+ * giving it an environment appropriate for extending the target object
+ * as to make it an instance the the CLASS.
+ * 
+ * Used like this (in the context of a class ctor):
+ * 
+ *   this.Inherit(spark.BaseClass);
+ * 
+ */
 function Inherit(theClass) {
     var myArguments = [this._protected_];
     myArguments = myArguments.concat(Array.prototype.slice.call(arguments, 1));
@@ -128,19 +196,74 @@ function Inherit(theClass) {
     theClass.Constructor.apply(this, myArguments);
 };
 
+/**
+ * Internal metamethod: Inherit an oldschool (Y60) class into the target object.
+ * 
+ * This, somewhat magic and special, metamethod is used to inherit
+ * a class Y60 javascript class into a SPARK class.
+ * 
+ * It should, in general, not be used. However, Window needs to inherit
+ * SceneViewer. So this is here as a generalized hack for achieving such things.
+ * 
+ */
 function InheritOldschool(theClass) {
     var myArguments = Array.prototype.slice.call(arguments);
     theClass.prototype.Constructor.apply(this, myArguments);
 };
 
+/**
+ * Metamethod: Define a getter.
+ * 
+ * This is a simple wrapper around __defineGetter__, present only for stylistic purposes.
+ * 
+ * It replaces the classic syntax:
+ * 
+ *    this.NAME getter = FUNCTION
+ * 
+ * With the almost as pretty:
+ * 
+ *    this.Getter(NAME, FUNCTION);
+ * 
+ */
 function Getter(theName, theFunction) {
     this.__defineGetter__(theName, theFunction);
 };
 
+/**
+ * Metamethod: Define a setter.
+ * 
+ * This is a simple wrapper around __defineSetter__, present only for stylistic purposes.
+ * 
+ * It replaces the classic syntax:
+ * 
+ *    this.NAME setter = FUNCTION
+ * 
+ * With the almost as pretty:
+ * 
+ *    this.Setter(NAME, FUNCTION);
+ * 
+ */
 function Setter(theName, theFunction) {
     this.__defineSetter__(theName, theFunction);
 };
 
+/**
+ * Metamethod: Define a signal on the target object.
+ * 
+ * Calling this metamethod will create a signal slot on the target object.
+ * 
+ * This signal slot can be given callbacks that will be called when the
+ * signal is signalled. The interface of the signal is in the form of
+ * a POJSO, reachable via a property named after the signal.
+ * 
+ * The interface of this POJSO is as follows:
+ *  - signal()
+ *     Signal the slot, calling all handlers on their respective context.
+ *  - call(theHandler, theContext)
+ *     Add a HANDLER to the signal slot, indicating the CONTEXT
+ *     that will be used as the 'this' of said handler on call.
+ * 
+ */
 function Signal(theName) {
     var mySignal = {};
 
@@ -162,7 +285,9 @@ function Signal(theName) {
     this[theName] = mySignal;
 };
 
-
+/**
+ * Internal: Generic serialization-grade conversion from value to string.
+ */
 function ConvertFromString(theType, theString) {
     switch(theType) {
     case Boolean:
@@ -176,6 +301,9 @@ function ConvertFromString(theType, theString) {
     }
 };
 
+/**
+ * Internal: Generic serialization-grade conversion from string to value.
+ */
 function ConvertToString(theType, theValue) {
     switch(theType) {
     case Boolean:
@@ -187,6 +315,31 @@ function ConvertToString(theType, theValue) {
     }
 };
 
+/**
+ * Metamethod: Define a dynamic property on an object
+ * 
+ * Calling this metamethod on an object has the following effects:
+ * 
+ *   - defining a getter named NAME on the object
+ *   - defining a setter named NAME on the object
+ *   - ensuring initialization of the property to its DEFAULT value
+ *   - the setter will call the HANDLER when the property is changed
+ *   - adding the property to the internal list of properties
+ *     on the object, allowing additional metamethods such as Initialize
+ * 
+ * Furthermore, the property will define an internal interface,
+ * used by serializers and deserializers that can be reached by
+ * iterating the _properties_ array of the object. For every defined
+ * property, a POJSO with the following interface will be present:
+ * 
+ *  - name
+ *     Read-only property indicating the name if the property.
+ *  - setFromString(theString)
+ *     Allows setting the property from string form. HANDLER will be called.
+ *  - getAsString()
+ *     Allows getting the property value in string form.
+ * 
+ */
 function Property(theName, theType, theDefault, theHandler) {
     var myProperty = {};
 
@@ -219,6 +372,14 @@ function Property(theName, theType, theDefault, theHandler) {
     this._properties_.push(myProperty);
 };
 
+/**
+ * Metamethod: Initialize properties of an object from XML attributes
+ * 
+ * This metamethods iterates over all properties defined on its
+ * target object, setting the property according to the corresponding
+ * XML attribute, if it is present.
+ * 
+ */
 function Initialize(theNode) {
     var myProps = this._properties_;
 

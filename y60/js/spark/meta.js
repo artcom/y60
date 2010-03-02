@@ -57,10 +57,9 @@
 */
 
 /**
- * Map of all component classes.
+ * Map of all component classes, indexed by name.
  */
 spark.componentClasses = {};
-
 
 /**
  * Define a component class.
@@ -69,8 +68,36 @@ spark.componentClasses = {};
  * providing component-class registration.
  *
  * Should be called on the spark namespace like:
+ * 
  *   spark.Fnord = spark.ComponentClass("Fnord");
  *
+ * The class will internally be defined by using the Class
+ * metamethod, producting an instantiable class.
+ * 
+ * The client must provide an inner constructor with the
+ * same syntax as for normal concrete classes:
+ * 
+ *    spark.Fnord.Constructor = function(Protected) {
+ *        var Public = this;
+ *        var Base = {};
+ *        %{ class body }% 
+ *    };
+ * 
+ * The real outer constructor for this class will be wrapped
+ * with a constructor of the following signature:
+ * 
+ *  - new MyClass(theNode)
+ *     Creates and initializes an instance of MyClass,
+ *     optionally deserializing NODE to provide property values.
+ * 
+ * The component class will be registered in the
+ * componentClasses registry under the given NAME,
+ * allowing it to be constructed with the factory
+ * machinery of the load module.
+ * 
+ * Note that component classes have a reduced internal
+ * interface comprised only of _className_.
+ * 
  */
 spark.ComponentClass = function(theName) {
     // generate the real constructor
@@ -96,14 +123,35 @@ spark.ComponentClass = function(theName) {
 
 
 /**
- * Define a templated component class.
+ * Internal: Define a templated component class.
  *
  * Conceptually, this function is a metaclass
  * providing component template instantiation.
  *
- * Should be called on the spark namespace like:
+ * Will be called on the spark namespace equivalently to:
+ * 
  *   spark.Fnord = spark.LoadedClass("Fnord", "Fnord.spark");
  *
+ * The class will be registered in the componentClasses
+ * registry under the given NAME.
+ * 
+ * Instantiating this class will clone the template from
+ * the given file and trigger the construction process
+ * for the component hierarchy described therein.
+ * 
+ * The real outer constructor for this class will be provided
+ * and has the following interface:
+ * 
+ *  - new MyClass(theNode)
+ *     Creates and initializes an instance of MyClass,
+ *     treating NODE as a call to the template from FILE.
+ * 
+ * This outer constructor will apply all attributes
+ * found in NODE to the root node of a clone of the
+ * loaded template, effectively allowing arbitrary
+ * properties on the root component of the template
+ * to be overridden by the template call.
+ * 
  */
 spark.LoadedClass = function(theClassName, theFile) {
     // load template from file

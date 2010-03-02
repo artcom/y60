@@ -1,0 +1,231 @@
+SPARK - Making fire
+
+1. Introduction and Conventions
+
+This document is an attempt at documenting the design of SPARK
+post-mortem. Since SPARK has been created as relief to pressing
+needs and not as a system, this has limits. Nonetheless, here you go.
+
+1.1. History / Blurb
+
+At the time when I (Ingo Albrecht) came to ART+COM, creating
+GUI applications with Y60 was extremely hard. Being a library
+kind of guy, I created an early ancestor of SPARK as part
+of the "Boersenspiel / Wie entsteht ein Aktienkurs" multitouch table,
+which was part of the "VW Investor Relations" project. This
+archaic bunch of UI code was partly derived from an early
+version of what was then called "TischMaschine".
+
+After this project, I worked with Adobe Flex for a long while,
+implementing the "VisionBuilds" flash application.
+
+These two experiences led to a strong feeling of discontent with
+the necessities of GUI programming in Y60 and a rather strong
+wish to replace the baroque, overweight and cumbersome scene
+interface of Y60 with something more suitable.
+
+I therefore set out to implement a GUI library. After some
+tinkering, an early prototype of SPARK was used to implement
+the "Aerodynamik" multitouch table as part of the project
+"Bombardier Messetische". This early prototype consisted
+of the object system and the component model. Input event
+dispatch was still manual work.
+
+At that time, SPARK competed with a library called XIP, which
+was derived from a then-failed attempt at creating a GUI library
+called "TischMaschine". Remnants of this fact can be found in a
+few places in SPARK, as XIP was refactored to use the SPARK object
+system at some point.
+
+Around this time, XIP lost its maintainers to project work.
+This lead to SPARK being used by other projects more and more,
+even replacing XIP in some cases. After a while, SPARK started
+gaining features.
+
+An event system was created, the widget library started to
+grow beyond a single file, multitouch support was written.
+
+1.2. Coding style
+
+Where not otherwise specified, SPARK follows ART+COM style.
+
+Indentation is 4 spaces.
+All comment styles are allowed.
+Omission of block braces is not allowed.
+Classic "getter/setter" syntax is mandatory.
+Statement-finishing semicolons are mandatory, including uses of "function".
+
+1.3. Naming
+
+Where not otherwise specified, SPARK follows ART+COM style.
+
+Globals should not follow ART+COM style ("our") when they are
+contained in a global namespace as this convention has been
+perceived as ugly and unnecessary for dynamic languages.
+
+Instance variables that are part of a metaobject closure
+should not use "_my", but resort to classic "my", as they
+are not considered to be "true" instance variables, but a
+degenerate form that is more suited to being written in
+a manner consistent with normal functions and algorithms.
+
+Names beginning with an uppercase character may be used
+only for class names and (as an exception) for metaconstructs.
+For this purpose, "instance-magic" names such as "Protected",
+"Public" and "Base" are considered to be metaconstructs.
+
+Names beginning and ending with a single underscore are
+used for internal purposes and should be considered as
+reserved.
+
+1.4. Warning policy
+
+If classic Y60 spidermonkey warns about something,
+that construct is by definition forbidden.
+
+1.5. Dependency policy
+
+SPARK shall depend only on plain Y60 plus some carefully
+selected javascript classes (such as "SceneViewer") that provide
+the neccessary pragmatics to make Y60 go. These dependencies
+are internal and should not be called by the client.
+
+All geometry classes are allowed, as is XML support. Y60 file
+manipulation is allowed only in situations where it can't be
+avoided.
+
+Everything else should only be integrated as a non-mandatory
+dependency. It is expected that explicit client action be
+required before any other code is loaded.
+
+
+2. Object system
+
+As every other JavaScript framework, SPARK has its own object system.
+
+Being derived from the one in Y60, it is heavily based on convention,
+does not use prototypes, uses an instance closure to provide isolation
+and uses a redirected constructor.
+
+This description is probably only readable to those with some lisp or scheme background,
+as it depends heavily on terminology from a family of object systems that is commonly used in them,
+the so-called "Meta Object Protocol". While this might be a bad, I have no idea how to express
+these facts without using advanced vocabulary.
+
+The glossary of any decent lisp book or the "Dylan Reference Manual"
+should allow you to wade through this rather esoteric part of SPARK.
+
+2.1. Namespaces
+
+SPARK originally intended to support namespaces. This has never been properly implemented.
+
+The component model and other parts of the system depend on all classes being in
+the "spark" namespace, which is statically initialized.
+
+Namespaces are plain old JS objects. The only special interface they provide is the class
+creation interface, represented by the two metamethods "AbstractClass" and "Class".
+
+2.2. Classes
+
+The class system in SPARK is a syntax-sugerred variant of the Y60 class system.
+
+The following is a mixture between statements of differences (to Y60) and defining clauses:
+
+- Instead of manually defining a redirect constructor, this task is delegated to namespace metamethods.
+
+- These metamethods ("Class" and "AbstractClass") are to be called metaclasses.
+
+- Metaclasses define construction behaviour. The instantiation behaviour of a specific class is defined
+  exclusively by its direct class, and therefore by the metaclass defining its direct class.
+
+- Metaclasses decorate the instances of their instances with metaclass-specific metamethods during construction.
+  In the case of the "class" metaclass, this includes the "Inherit" metamethod as well as the property and
+  signal definers to be described in a later chapter.
+
+- Since we do not use prototypes, the inner constructor is attached to the real constructor instead of being
+  stuffed into the prototype.
+
+- The "Public" argument to the inner constructor has been abolished in favor of the convention
+  of defining a local variable "Public" equalling "this".
+
+- A "Protected" argument remains, although it is used so seldomly that it should best be eliminated at some point.
+
+- A "Base" object is, again by convention, created in the constructor closure.
+  This object is used to hold references to baseclass methods that have been overridden.
+
+- Any arguments given to the real constructor are passed to the inner constructor after the "Protected" object.
+
+- An abstract class, defined by the "AbstractClass" metamethod, errs on instantiation.
+
+
+spark.Foobar = spark.AbstractClass("Foobar");
+
+spark.Foobar.Constructor = function(Protected) {
+    var Public = this;
+    var Base = {};
+};
+
+spark.Fnord = spark.Class("Fnord");
+
+spark.Fnord.Constructor = function(Protected) {
+    var Public = this;
+    var Base = {};
+};
+
+
+2.3. Properties
+
+The SPARK object system offers a property mechanism that has several purposes:
+
+- mapping properties to text form (for serialization)
+- allowing automatic deserialization from XML
+- offering a change listener interface for use in widget implementation
+- wrapping getter and setter definitions (as a replacement for the classic getter/setter syntax)
+
+The property system knows about the type (represented by the appropriate class object) of
+every property, allowing for clean extension of type-specific aspects of its functionality.
+
+Also, every property can have an optional setter hook function that is commonly used
+to propagate property changes to other components in the system. In the case of widgets,
+this hook is used to update the Y60 scene nodes implementing their graphical representation.
+
+The property system is comprised of the following three metamethods, available to
+the instances of any class that has been defined using the SPARK object system:
+
+- Property(theName, theType, theDefault, theHandler)
+   (defines a full-features SPARK property, see jsdoc)
+- Getter(theName, theFunction)
+   (defines a plain old getter, see jsdoc)
+- Setter(theName, theFunction)
+   (defines a plain old setter, see jsdoc)
+
+There also is a fourth (internal) metamethod, which is used during component realization:
+
+- Initialize(theNode)
+   (initialize property-bearing object from an xml node, see jsdoc)
+
+2.4. Signals
+
+The signals subsystem offers a way to define a hook-point for callbacks.
+
+It is meant to replace uses of handler properties, where used, allowing for
+multiple handlers as well as unified tracing and debugging.
+
+This mechanism is currently unused.
+
+It has the following metainterface:
+
+- Signal(theName)
+   (defines a signal slot, see jsdoc)
+
+The signal is represented as a property on the object defining it. The property
+bears a plain old JS object with the following methods:
+
+- signal()
+   (triggers the signal, immediately calling all its handlers, see jsdoc)
+- call(theHandler, theContext)
+   (adds a handler with a context (for use as the handlers 'this'), see jsdoc)
+
+
+
+2.5. Components
