@@ -45,6 +45,14 @@ gaining features.
 An event system was created, the widget library started to
 grow beyond a single file, multitouch support was written.
 
+Today, SPARK is still far from finished. Still, it is the
+predominant GUI library for Y60 and, compared to the vacuum
+it fills, quite featureful and definitely usable.
+
+Exposure to both unintroduced internal developers and
+external developers has shown that it is conceptually
+mature enough to be eligible for long-term maintenance.
+
 1.2. Coding style
 
 Where not otherwise specified, SPARK follows ART+COM style.
@@ -52,7 +60,8 @@ Where not otherwise specified, SPARK follows ART+COM style.
 Indentation is 4 spaces.
 All comment styles are allowed.
 Omission of block braces is not allowed.
-Classic "getter/setter" syntax is mandatory.
+Classic "getter/setter" syntax is currently mandatory,
+but meant to be replaced by the Getter and Setter metamethods.
 Statement-finishing semicolons are mandatory, including uses of "function".
 
 1.3. Naming
@@ -109,11 +118,11 @@ and uses a redirected constructor.
 
 This description is probably only readable to those with some lisp or scheme background,
 as it depends heavily on terminology from a family of object systems that is commonly used in them,
-the so-called "Meta Object Protocol". While this might be a bad, I have no idea how to express
-these facts without using advanced vocabulary.
+the so-called "Meta Object Protocol". While this might be cumbersome, I have no idea how to express
+these facts without using advanced vocabulary and consider the excursion into that realm worthwhile.
 
 The glossary of any decent lisp book or the "Dylan Reference Manual"
-should allow you to wade through this rather esoteric part of SPARK.
+should allow you to wade through this somewhat esoteric part of SPARK.
 
 2.1. Namespaces
 
@@ -158,21 +167,6 @@ The following is a mixture between statements of differences (to Y60) and defini
 - An abstract class, defined by the "AbstractClass" metamethod, errs on instantiation.
 
 
-spark.Foobar = spark.AbstractClass("Foobar");
-
-spark.Foobar.Constructor = function(Protected) {
-    var Public = this;
-    var Base = {};
-};
-
-spark.Fnord = spark.Class("Fnord");
-
-spark.Fnord.Constructor = function(Protected) {
-    var Public = this;
-    var Base = {};
-};
-
-
 2.3. Properties
 
 The SPARK object system offers a property mechanism that has several purposes:
@@ -204,6 +198,7 @@ There also is a fourth (internal) metamethod, which is used during component rea
 - Initialize(theNode)
    (initialize property-bearing object from an xml node, see jsdoc)
 
+
 2.4. Signals
 
 The signals subsystem offers a way to define a hook-point for callbacks.
@@ -211,7 +206,8 @@ The signals subsystem offers a way to define a hook-point for callbacks.
 It is meant to replace uses of handler properties, where used, allowing for
 multiple handlers as well as unified tracing and debugging.
 
-This mechanism is currently unused.
+This mechanism is currently unused, but is meant to replace pragmatic
+kludges like the onTextChanged hook in the current NewText class.
 
 It has the following metainterface:
 
@@ -227,5 +223,100 @@ bears a plain old JS object with the following methods:
    (adds a handler with a context (for use as the handlers 'this'), see jsdoc)
 
 
-
 2.5. Components
+
+SPARK provides a component framework that could be considered the core of it.
+
+A component, in this context, is an object, providing arbitrary (meaning non-GUI and GUI)
+functionality, that can be manipulated according to the component protocol described here.
+
+Components have the following functional facets:
+
+ - they can be instantiated ("deserialized") from an XML description
+ - they can participate in a hierarchy, the "component hierarchy",
+   which is a DOM- or GUI-toolkit-like tree of components.
+ - they bear an optional name, identifying them both to the program
+   and the developer working on the program
+
+
+2.6. Loading / Component Instantiation / Realization
+
+SPARK provides a mechanism for component instantiation, implemented by the "load" module.
+
+This subsystem can instantiate a hierarchy of arbitrary components from an XML description
+that can be provided as a file, a string or a DOM document. In the case of GUI widgets,
+this description is called a "layout", describing the precise appearance of the widgets.
+
+Each component is described by a single XML element bearing the name of the component
+class as its name. The attributes of this element are mapped to the object-system-level
+properties of the component, allowing initialization of arbitrary component state.
+
+Components are meant to be stateful objects. After creation, they are to be considered
+"unrealized" components, meaning that they do nothing but holding their state.
+
+To make use of a component, it must be realized. In the case of widgets, realization
+is the creation phase during which Y60 scene nodes representing the widget are created.
+However, this mechanism is more general than that. A sound component, for example,
+would load its buffer during realization. It should also not open its output channel
+until it is realized. An unrealized component should behave like a POJSO.
+
+There is a special case in the loader handling the class name "Template". This is
+used to register the templates described in the next section. A class can therefore
+never be named "Template".
+
+2.7. Templates
+
+Atop the component framework, there is a template mechanism that allows for component
+descriptions to be repeatedly instantiated. Templates are "compiled" into a pseudoclass
+that can be instantiated using the standard JS construction protocol. These classes
+are also registered as component classes, allowing them to be instantiated from
+XML component descriptions at any point after their definition.
+
+A template is defined by using the special component name "Template", subject
+to the following signature:
+
+<Template name="ClassName" src="class-name.spark"/>
+
+Such a clause defines a template class named "ClassName" that will instantiate a
+full, independent component hierarchy, as described in class-name.spark, whenever
+the template class is instantiated from a component description or from code.
+
+A reference to a template class is called a "template call". The call refers
+to the template class, making the correct terminology "calling a template class".
+
+Consider an imaginary template (in the file class-name.spark):
+
+<Transform>
+  <Button x="5"  width="10" height="10" color="red"/>
+  <Button x="20" width="10" height="10" color="green"/>
+</Transform>
+
+Following our example, a call for the "ClassName" template might look as follows:
+
+<ClassName/>
+
+This call will create a transform and two buttons, as described by the template.
+
+Template calls can be given arguments in the form of XML attributes. This is
+achieved by taking all attributes from the template call and applying them
+to the root element of the template itself.
+
+Therefore, if you call our example template as follows:
+
+<ClassName name="on-off-switches" x="100" y="100"/>
+
+The component desription that will actually be instantiated
+and realized looks as follows:
+
+<Transform name="on-off-switches" x="100" y="100">
+  <Button x="5"  width="10" height="10" color="red"/>
+  <Button x="20" width="10" height="10" color="green"/>
+</Transform>
+
+This mechanism is completely general and can be used for arbitrary properties.
+
+Arguments from the template call override attributes in the template silently.
+
+
+3. Widgets
+
