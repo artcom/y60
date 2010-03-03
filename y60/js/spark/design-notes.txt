@@ -124,6 +124,7 @@ these facts without using advanced vocabulary and consider the excursion into th
 The glossary of any decent lisp book or the "Dylan Reference Manual"
 should allow you to wade through this somewhat esoteric part of SPARK.
 
+
 2.1. Namespaces
 
 SPARK originally intended to support namespaces. This has never been properly implemented.
@@ -133,6 +134,7 @@ the "spark" namespace, which is statically initialized.
 
 Namespaces are plain old JS objects. The only special interface they provide is the class
 creation interface, represented by the two metamethods "AbstractClass" and "Class".
+
 
 2.2. Classes
 
@@ -245,7 +247,7 @@ SPARK provides a mechanism for component instantiation, implemented by the "load
 
 This subsystem can instantiate a hierarchy of arbitrary components from an XML description
 that can be provided as a file, a string or a DOM document. In the case of GUI widgets,
-this description is called a "layout", describing the precise appearance of the widgets.
+this description is called a "layout", describing the precise appearance of widgets.
 
 Each component is described by a single XML element bearing the name of the component
 class as its name. The attributes of this element are mapped to the object-system-level
@@ -263,6 +265,7 @@ until it is realized. An unrealized component should behave like a POJSO.
 There is a special case in the loader handling the class name "Template". This is
 used to register the templates described in the next section. A class can therefore
 never be named "Template".
+
 
 2.7. Templates
 
@@ -313,7 +316,8 @@ and realized looks as follows:
   <Button x="20" width="10" height="10" color="green"/>
 </Transform>
 
-This mechanism is completely general and can be used for arbitrary properties.
+This mechanism is completely general and can be used for arbitrary
+properties on arbitrary components.
 
 Arguments from the template call override attributes in the template silently.
 
@@ -346,6 +350,7 @@ leaves that are bodies. All widgets may have non-widget children. Stages
 can be children of non-widgets iff they are self-sufficient. Currently,
 Window is the only self-sufficient stage-class.
 
+
 3.1. Common functionality
 
 All widgets provide:
@@ -353,6 +358,7 @@ All widgets provide:
  - positioning and orienting
  - visibility flag
  - interaction sensibility flag
+
 
 3.2. Basic Widgets
 
@@ -366,15 +372,122 @@ all other widgets are derived:
 - Body
    Bodies form the leaves of the widget subtree of the 
 
+
 3.3. The Stage (Or Several Thereof)
 
-3.4. Offscreen Rendering
+Every widget hierarchy starts with a so-called stage.
 
-3.5. Text
+This special class of widgets represents the (2D) canvas on
+which the widget hierarchy will be rendered. It also cares
+about event dispatch, input device focus and other things
+that are normally application-level decisions.
 
-3.6. Movies
+There are currently two stage classes:
+
+- Window
+   A Y60 SceneViewer window, backed by SDL. This stage
+   supports the mayor Y60 input devices (keyboard, mouse)
+   as well as TUIO and Proximatrix multitouch devices.
+
+- Canvas
+   An offscreen-rendering stage. This can be used to render
+   a world into a texture for compositing purposes. Currently
+   does not support events of any kind. Can't be used as the
+   root of a widget hierarchy as it is itself a widget,
+   behaving similarly to an Image or ResizableRectangle.
+
+
+3.4. Text
+
+Text rendering in spark is done using the Text and NewText widgets.
+
+Currently, the Y60 TTF renderer is used for rendering text.
+This has loads of disadvantages, most notably that formatting
+is not properly abstracted. Replacing this renderer with a proper
+font rendering library (such as pango) is strongly advised.
+
+For design information about the current SPARK text renderer,
+see source code comments in the "text" module.
+
+
+3.5. Movies
+
+As for text rendering, SPARK provides two widgets for playing movies:
+Movie and NewMovie. They both represent various stages of evolution
+of video playback integration. Both are not satisfactory and a
+replacement should definitely be considered.
+
 
 4. Events
 
+SPARK implements an event system that is extremely similar to DOM Level 3 Events.
+
+The API is for this event system is derived from Adobe Flash (AS3).
+
+An EventDispatcher class is provided. This class should be inherited into
+any objects participating in event dispatch. Such objects must implement
+a certain hierarchy protocol.
+
+See the "event" module for detailed design notes.
+
+
 5. Animations
+
+There exists an animation system that can be used with SPARK. This subsystem
+is a port of some Flash AS3 animation code to Y60 javascript. It has not
+been designed for use with SPARK but seemed well-suited.
+
+SPARK should automatically load it.
+
+The animation system works by hooking a so-called AnimationManager to your
+applications onFrame hook. All running animations will be advanced on every
+frame.
+
+Animations are fire-and-forget, meaning that there is no obligation to destroy
+animations manually after they have been played. This is in contrast to Y60
+scene animations, which require extensive manual setup and, more importantly,
+manual animation destruction.
+
+There are two fundamental kinds of animation: Composite and Simple.
+Composite animations are containers for sub-animations, forming sequences
+and parallels. Simple animations are leaves in the animation hierarchy,
+
+
+Composite animations:
+
+Sequence animations have a duration totalling that of its children and play
+one child animation after another.
+
+Parallel animations have a duration that is the maximum of the durations
+of all child animations. All animations are played until they run out,
+stopping the parallel animation once all children have been played.
+
+
+Simple animations:
+
+Property animations (the most prevalent type) animate a single property
+on a POJSO. They have a start and end value, interpolating linearly between
+them.
+
+Rotation animations are used to rotate objects using degrees as
+the fundamental unit. This allows creating an animation that, for
+example, executes a 720° rotation over a given duration. These
+interpolate linearly, but are aware of angle wraparound.
+
+Quaternion animations perform linear quaternion interpolation.
+
+Vector animations (???)
+
+Delay animations are simple placeholders. They can be used in sequences
+to provide pauses or to pad a parallel animation to a certain length.
+
+Closure animations are based on callbacks provided by the user.
+Every time such an animation ticks, it will call a user-provided function
+with the animation progress (0..1) as its sole argument. This allows
+animation of several things in concert. The values given to the callback
+are guaranteed to be monotonic, allowing state-changes along the timeline
+of the animation.
+
+
+6. Internationalization (i18n)
 
