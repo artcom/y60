@@ -320,3 +320,61 @@ Arguments from the template call override attributes in the template silently.
 
 3. Widgets
 
+Widgets are components with a graphical representation.
+
+In SPARK, they realize to Y60 scene data structures.
+
+All widgets are SPARK component containers, allowing arbitrary non-widgets
+to be place in them, even if they do not allow for graphical children.
+
+The SPARK widget library is the least-engineered part of SPARK,
+providing a lose grabbag collection of common functionality that
+popped up in the process of developing the applications that, to date,
+have been realized with it.
+
+Widgets form part of the component hierarchy. Within the bounds of this
+section, the part of the component tree that is comprised of widgets
+shall be called "widget subtree". This term is derived from the notion
+of the component tree being a hypertree (as in hypergraph) of the widget
+tree.
+
+All widgets, except for stages, must exist as children of another widget.
+This invariant guarantees that any widget subtree of the component tree
+forms a closed subtree of the total tree. There may be several widget trees
+within a running system, each of them being rooted in a stage and having
+leaves that are bodies. All widgets may have non-widget children. Stages
+can be children of non-widgets iff they are self-sufficient. Currently,
+Window is the only self-sufficient stage-class.
+
+3.1. Common functionality
+
+All widgets provide:
+
+ - positioning and orienting
+ - visibility flag
+ - interaction sensibility flag
+
+3.2. Basic Widgets
+
+There are two base classes for widget implementation from which
+all other widgets are derived:
+
+- Transform
+   A transform is the fundamental container. At some point, it
+   would be subclassed to provide VBox, HBox, Window...
+   Currently, it is normally used in plain.
+- Body
+   Bodies form the leaves of the widget subtree of the 
+
+3.3. The Stage (Or Several Thereof)
+
+3.4. Offscreen Rendering
+
+3.5. Text
+
+3.6. Movies
+
+4. Events
+
+5. Animations
+
