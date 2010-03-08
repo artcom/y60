@@ -228,12 +228,12 @@ function InheritOldschool(theClass) {
  * 
  */
 function Getter(theName, theFunction) {
-	var myNextGetter = this.__lookupGetter__(theName);
+    var myNextGetter = this.__lookupGetter__(theName);
 
-	if(myNextGetter) {
-		Logger.warning("Defining setter for property " + theName + " in class "
-					  + this._className_ + ", which already has a setter for that property.");
-	}
+    if(myNextGetter) {
+        Logger.warning("Defining setter for property " + theName + " in class "
+                       + this._className_ + ", which already has a setter for that property.");
+    }
 
     this.__defineGetter__(theName, theFunction);
 };
@@ -249,18 +249,18 @@ function Getter(theName, theFunction) {
  * 
  */
 function GetterOverride(theName, theFunction) {
-	var myNextGetter = this.__lookupGetter__(theName);
+    var myNextGetter = this.__lookupGetter__(theName);
 
-	if(!myNextGetter) {
-		Logger.error("Trying to override getter for property " + theName + " in class "
-					 + this._className_ + ", which does not have a getter for that property.");
-	}
+    if(!myNextGetter) {
+        Logger.error("Trying to override getter for property " + theName + " in class "
+                     + this._className_ + ", which does not have a getter for that property.");
+    }
 
-	var myWrapper = function(theValue) {
-		return theFunction.call(this, myNextGetter);
-	};
+    var myWrapper = function(theValue) {
+        return theFunction.call(this, myNextGetter);
+    };
 
-	this.__defineGetter__(theName);
+    this.__defineGetter__(theName);
 };
 
 /**
@@ -278,12 +278,12 @@ function GetterOverride(theName, theFunction) {
  * 
  */
 function Setter(theName, theFunction) {
-	var myNextSetter = this.__lookupSetter__(theName);
+var myNextSetter = this.__lookupSetter__(theName);
 
-	if(myNextSetter) {
-		Logger.warning("Defining setter for property " + theName + " in class "
-					  + this._className_ + ", which already has a setter for that property.");
-	}
+    if(myNextSetter) {
+        Logger.warning("Defining setter for property " + theName + " in class "
+                       + this._className_ + ", which already has a setter for that property.");
+    }
 
     this.__defineSetter__(theName, theFunction);
 };
@@ -299,18 +299,18 @@ function Setter(theName, theFunction) {
  * 
  */
 function SetterOverride(theName, theFunction) {
-	var myNextSetter = this.__lookupSetter__(theName);
+    var myNextSetter = this.__lookupSetter__(theName);
 
-	if(!myNextSetter) {
-		Logger.error("Trying to override setter for property " + theName + " in class "
-					 + this._className_ + ", which does not have a setter for that property.");
-	}
+    if(!myNextSetter) {
+        Logger.error("Trying to override setter for property " + theName + " in class "
+                     + this._className_ + ", which does not have a setter for that property.");
+    }
 
-	var myWrapper = function(theValue) {
-		theFunction.call(this, theValue, theNextSetter);
-	};
+    var myWrapper = function(theValue) {
+        theFunction.call(this, theValue, theNextSetter);
+    };
 
-	this.__defineSetter__(theName, myWrapper);
+    this.__defineSetter__(theName, myWrapper);
 };
 
 /**
