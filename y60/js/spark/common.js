@@ -156,6 +156,8 @@ function Class(theName) {
         myPublic.Signal     = Signal;
         myPublic.Property   = Property;
         myPublic.Initialize = Initialize;
+        myPublic.GetterOverride = GetterOverride;
+        myPublic.SetterOverride = SetterOverride;
 
         // call the real constructor
         var myArguments = [myProtected].concat(Array.prototype.slice.call(arguments));
@@ -226,7 +228,39 @@ function InheritOldschool(theClass) {
  * 
  */
 function Getter(theName, theFunction) {
+	var myNextGetter = this.__lookupGetter__(theName);
+
+	if(myNextGetter) {
+		Logger.warning("Defining setter for property " + theName + " in class "
+					  + this._className_ + ", which already has a setter for that property.");
+	}
+
     this.__defineGetter__(theName, theFunction);
+};
+
+/**
+ * Metamethod: Override a getter.
+ * 
+ * This method uses __lookupGetter__ and __defineGetter__ to safely override
+ * a getter function, erring if the override is not an override at all.
+ * 
+ * It also passes the getter function an additional argument, NEXTGETTER,
+ * which refers to the getter being overridden.
+ * 
+ */
+function GetterOverride(theName, theFunction) {
+	var myNextGetter = this.__lookupGetter__(theName);
+
+	if(!myNextGetter) {
+		Logger.error("Trying to override getter for property " + theName + " in class "
+					 + this._className_ + ", which does not have a getter for that property.");
+	}
+
+	var myWrapper = function(theValue) {
+		return theFunction.call(this, myNextGetter);
+	};
+
+	this.__defineGetter__(theName);
 };
 
 /**
@@ -244,7 +278,39 @@ function Getter(theName, theFunction) {
  * 
  */
 function Setter(theName, theFunction) {
+	var myNextSetter = this.__lookupSetter__(theName);
+
+	if(myNextSetter) {
+		Logger.warning("Defining setter for property " + theName + " in class "
+					  + this._className_ + ", which already has a setter for that property.");
+	}
+
     this.__defineSetter__(theName, theFunction);
+};
+
+/**
+ * Metamethod: Override a getter.
+ * 
+ * This method uses __lookupGetter__ and __defineGetter__ to safely override
+ * a getter function, erring if the override is not an override at all.
+ * 
+ * It also passes the setter function an additional argument, NEXTSETTER,
+ * which refers to the setter being overridden.
+ * 
+ */
+function SetterOverride(theName, theFunction) {
+	var myNextSetter = this.__lookupSetter__(theName);
+
+	if(!myNextSetter) {
+		Logger.error("Trying to override setter for property " + theName + " in class "
+					 + this._className_ + ", which does not have a setter for that property.");
+	}
+
+	var myWrapper = function(theValue) {
+		theFunction.call(this, theValue, theNextSetter);
+	};
+
+	this.__defineSetter__(theName, myWrapper);
 };
 
 /**
