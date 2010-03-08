@@ -119,34 +119,62 @@ spark.Widget.Constructor = function(Protected) {
     };
 
 
-    // BOUNDS
+    // WORLD POSITION AND ORIENTATION GETTERS
 
-    // XXX: CRUFT: function for getting screen-aligned bounds
-    Public.worldposition getter = function() {
-        return _mySceneNode.globalmatrix.getTranslation();
-    };
-
-    // XXX: CRUFT: function for getting bounds
-    Public.size getter = function() {
-        var myBoundingBox = _mySceneNode.boundingbox;
-        var myWidth = 0;
-        if(myBoundingBox == "[]"){
-            Logger.warning("BoundingBox not initialized - size getter not yet implemented");
-            return new Vector2f(0,0);
-        } else {
-            return myBoundingBox.size;
+    Public.Getter("worldPosition", function() {
+        if(!_mySceneNode) {
+            Logger.error("World-related properties of widgets can only be retrieved after realization");
+            return null;
         }
-    };
+        return _mySceneNode.globalmatrix.getTranslation();
+    });
 
-    // XXX: CRUFT
-    Public.width getter = function(){
-        return Public.size.x;
-    };
+    Public.Getter("worldScale", function() {
+        if(!_mySceneNode) {
+            Logger.error("World-related properties of widgets can only be retrieved after realization");
+            return null;
+        }
+        return _mySceneNode.globalmatrix.getScale();
+    });
 
-    // XXX: CRUFT
-    Public.height getter = function(){
-        return Public.size.y;
-    };
+    Public.Getter("worldRotation", function() {
+        if(!_mySceneNode) {
+            Logger.error("World-related properties of widgets can only be retrieved after realization");
+            return null;
+        }
+        return _mySceneNode.globalmatrix.getRotation();
+    });
+
+
+    // WORLD BOUND GETTERS (XXX: ugly, only work after realization)
+
+    Public.Getter("worldBounds", function() {
+        if(!_mySceneNode) {
+            Logger.error("World-related properties of widgets can only be retrieved after realization");
+            return null;
+        }
+
+        var myBoundingBox = _mySceneNode.boundingbox;
+
+        if(myBoundingBox == "[]") {
+            Logger.error("Widget does not have a bounding box yet.");
+            return null;
+        }
+
+        return myBoundingBox.size;
+    });
+
+    Public.Getter("worldWidth", function(){
+        return Public.worldBounds.x;
+    });
+
+    Public.Getter("worldHeight", function(){
+        return Public.worldBounds.y;
+    });
+
+    Public.Getter("worldDepth", function(){
+        return Public.worldBounds.z;
+    });
 
 
     // STAGE
