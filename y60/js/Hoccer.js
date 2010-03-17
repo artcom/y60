@@ -4,9 +4,17 @@ var Hoccer = {};
 Hoccer.station = function(theParams) {
     var that = {};
     var myRequestManager = new RequestManager();
-    var myOnErrorFunc = function () {
+    var defaultOnErrorFunc = function() {
             Logger.warning( "HTTP Code received: " 
-                            + this.responseCode); 
+                            + this.responseCode);
+             return true; 
+        };
+    var defaultOnDoneFunc = function() {
+             return true;
+        };
+    var defaultOnProgressFunc = function() {
+            print("progressing");
+            return true; 
         };
 
     that.userAgent = "Hoccer/0.9dev Y60";
@@ -30,7 +38,7 @@ Hoccer.station = function(theParams) {
     };
     
     that.upload = function(theFile, theUploadUri) {
-        print("try to upload ", theFile, " to ", theUploadUri);
+        print("uploading ", theFile, " to ", theUploadUri);
         /*
         var border = "ycKtoN8VURwvDC4sUzYC9Mo7l0IVUyDDVf";
         var request = new Request(theUploadUri, that.userAgent);
@@ -52,7 +60,7 @@ Hoccer.station = function(theParams) {
         request.onDone = function() {
             print("upload done. handle response: ", this.responseString, "  code: ", this.responseCode);
         };
-        request.onError = myOnErrorFunc;
+        request.onError = defaultOnErrorFunc;
 
         request.putBlock(block);
         myRequestManager.performRequest(request);
@@ -96,7 +104,7 @@ Hoccer.station = function(theParams) {
             }
             //print("download done. handle response: ", this.responseString, "  code: ", this.responseCode);
         };
-        request.onError = myOnErrorFunc;
+        request.onError = defaultOnErrorFunc;
         request.get();
         myRequestManager.performRequest(request);
     };
@@ -127,7 +135,7 @@ Hoccer.station = function(theParams) {
                 }
             }
         };
-        request.onError = myOnErrorFunc;
+        request.onError = defaultOnErrorFunc;
         request.get();
         myRequestManager.performRequest(request);
     };
@@ -138,9 +146,10 @@ Hoccer.station = function(theParams) {
             theParams.isSharing = false;
         }
         var request = new Request(that.serverUri + "/peers",  that.userAgent); 
-        request.onDone = (typeof (theParams.onDone)==='undefined'?function(){}:theParams.onDone);
-        request.onError = (typeof (theParams.onError)==='undefined'?function(){}:theParams.onError);
-
+        request.onDone = (typeof (theParams.onDone) === 'undefined' ? defaultOnDoneFunc : theParams.onDone);
+        request.onError = (typeof (theParams.onError) === 'undefined' ? defaultOnErrorFunc : theParams.onError);
+        request.onProgress = defaultOnProgressFunc;//(typeof (theParams.onProgress) === 'undefined' ? defaultOnProgressFunc : theParams.onProgress);
+        
         var body = "peer[gesture]=distribute" +
                     "&peer[latitude]=" + that.latitude +
                     "&peer[longitude]=" + that.longitude +
@@ -149,7 +158,7 @@ Hoccer.station = function(theParams) {
                     (that.bssids.length > 0?"&peer[bssids]="+that.bssids:"");
         request.post(body);
         myRequestManager.performRequest(request);
-        print("posted ",body);
+        print("posted ", body);
     };
 
 
@@ -166,7 +175,7 @@ Hoccer.station = function(theParams) {
                print("uploadUri: ", uploadUri);
                that.upload(theFile, uploadUri);
            },
-           onError : myOnErrorFunc
+           onError : defaultOnErrorFunc
          });
     };
 
@@ -181,7 +190,7 @@ Hoccer.station = function(theParams) {
                var peerUri = response.peer_uri;
                that.prepareDownload(peerUri);
             },
-            onError : myOnErrorFunc
+            onError : defaultOnErrorFunc
         });
     };
 
