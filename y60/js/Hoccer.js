@@ -10,7 +10,7 @@ Hoccer.station = function(theParams) {
         };
 
     that.userAgent = "Hoccer/0.9dev Y60";
-    that.serverUri = "http://www.hoccer.com";
+    that.serverUri = (typeof(theParams.serverUri) === 'undefined' ? "http://www.hoccer.com" : theParams.serverUri);
 
     //default hoccer station at artcom
     that.longitude = (typeof(theParams.longitude) === 'undefined'?13.345116:theParams.longitude);
