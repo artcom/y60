@@ -151,8 +151,9 @@ Hoccer.station = function(theParams) {
         request.onDone = (typeof (theParams.onDone) === 'undefined' ? defaultOnDoneFunc : theParams.onDone);
         request.onError = (typeof (theParams.onError) === 'undefined' ? defaultOnErrorFunc : theParams.onError);
         request.onProgress = (typeof (theParams.onProgress) === 'undefined' ? defaultOnProgressFunc : theParams.onProgress);
+        var gesture = (typeof (theParams.gesture) === 'undefined' ? "distribute" : theParams.gesture);
         
-        var body = "peer[gesture]=distribute" +
+        var body = "peer[gesture]=" + gesture +
                     "&peer[latitude]=" + that.latitude +
                     "&peer[longitude]=" + that.longitude +
                     "&peer[accuracy]=" + that.accuracy + 
@@ -173,6 +174,22 @@ Hoccer.station = function(theParams) {
            isSharing : true,
            onDone : function() {
                print("build peergroup for distribute done. handle response: ", this.responseString, "  code: ", this.responseCode);
+               var response = eval("("+this.responseString+")");
+               var uploadUri = response.upload_uri;
+               print("uploadUri: ", uploadUri);
+               that.upload(theFile, uploadUri);
+           }
+         });
+    };
+    
+    that.sweepOut = function(theFile) {
+        print("sweeping Out");
+        
+        that.buildPeerGroup({
+           isSharing : true,
+           gesture : "pass",
+           onDone : function() {
+               print("build peergroup for sweepOut done. handle response: ", this.responseString, "  code: ", this.responseCode);
                var response = eval("("+this.responseString+")");
                var uploadUri = response.upload_uri;
                print("uploadUri: ", uploadUri);
