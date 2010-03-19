@@ -71,7 +71,7 @@ Hoccer.station = function(theParams) {
             myRequestManager.handleRequests();
         }
         */
-        exec("curl -X PUT -F 'upload[attachment]=@"+theFile+";type="+getMimeType(theFile)+"' "+theUploadUri);
+        exec("curl", "-X PUT -F 'upload[attachment]=@"+theFile+";type="+getMimeType(theFile)+"' "+theUploadUri, false);
     };
 
     that.download = function(theDownloadUri) {
