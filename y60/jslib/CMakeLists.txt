@@ -22,6 +22,7 @@ JSRequestWrapper.cpp
 JSHermiteSpline.cpp
 JSScene.cpp
 JSSerial.cpp
+JSStation.cpp
 JSStringMover.cpp
 JSSvgPath.cpp
 JSTestServer.cpp
@@ -60,6 +61,7 @@ JSRequestWrapper.h
 JSHermiteSpline.h
 JSScene.h
 JSSerial.h
+JSStation.h
 JSStringMover.h
 JSSvgPath.h
 JSTestServer.h
