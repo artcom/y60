@@ -55,6 +55,8 @@
 #define DB(x) //  x
 #define DB2(x) //  x
 
+using namespace asl;
+
 #ifndef _WIN32
     #include <netinet/in.h>
     #include <unistd.h>

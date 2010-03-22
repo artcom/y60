@@ -133,143 +133,147 @@ needs to be added; exposing the file descriptor should be enough to do that.
 #include <vector>
 #include <algorithm>
 
-class ASL_NET_DECL Station {
-public:
-    DEFINE_NAMED_EXCEPTION(Exception,Station::Exception,asl::Exception);
-    DEFINE_NAMED_EXCEPTION(SocketFailed,Station::SocketFailed,Exception);
-    DEFINE_NAMED_EXCEPTION(ConnectFailed,Station::ConnectFailed,Exception);
-    DEFINE_NAMED_EXCEPTION(SetSockOptFailed,Station::SetSockOptFailed,Exception);
-    DEFINE_NAMED_EXCEPTION(BindFailed,Station::BindFailed,Exception);
-    DEFINE_NAMED_EXCEPTION(SendFailed,Station::SendFailed,Exception);
-    DEFINE_NAMED_EXCEPTION(RecvFailed,Station::RecvFailed,Exception);
-    DEFINE_NAMED_EXCEPTION(InvalidPacket,Station::InvalidPacket,Exception);
-    DEFINE_NAMED_EXCEPTION(SizeMismatch,Station::SizeMismatch,Exception);
-    DEFINE_NAMED_EXCEPTION(EnableNonBlockingFailed,Station::EnableNonBlockingFailed,Exception);
+namespace asl {
 
-    enum constants { MTU_SIZE = 1400, STATION_MESSAGE_MAGIC = 0xfeedbee1};
+    class ASL_NET_DECL Station {
+    public:
+        DEFINE_NAMED_EXCEPTION(Exception,Station::Exception,asl::Exception);
+        DEFINE_NAMED_EXCEPTION(SocketFailed,Station::SocketFailed,Exception);
+        DEFINE_NAMED_EXCEPTION(ConnectFailed,Station::ConnectFailed,Exception);
+        DEFINE_NAMED_EXCEPTION(SetSockOptFailed,Station::SetSockOptFailed,Exception);
+        DEFINE_NAMED_EXCEPTION(BindFailed,Station::BindFailed,Exception);
+        DEFINE_NAMED_EXCEPTION(SendFailed,Station::SendFailed,Exception);
+        DEFINE_NAMED_EXCEPTION(RecvFailed,Station::RecvFailed,Exception);
+        DEFINE_NAMED_EXCEPTION(InvalidPacket,Station::InvalidPacket,Exception);
+        DEFINE_NAMED_EXCEPTION(SizeMismatch,Station::SizeMismatch,Exception);
+        DEFINE_NAMED_EXCEPTION(EnableNonBlockingFailed,Station::EnableNonBlockingFailed,Exception);
 
-    Station() : _good(false) {};
-    Station(unsigned long theBroadcastAddress, // IP-Broadcast Adress
-            unsigned short theBroadcastPort,   // IP-Port Adress
-            unsigned short theReceivePort,     // IP-Port Adress
-            unsigned long ownIPAddress,        // supply own Adresse to avoid receiving self-sent packets
-            unsigned long theStationID,        // arbitrary unique ID to distinguish different stations
-                                               // on a single  host (geht z.Z . unter Linux nicht wg. fehlendem SO_REUSEPORT
-            unsigned long theNetworkID)        // arbitrary group id, must be the same number for all participating nodes
-        : _good(false)
-    {
-        openStation(theBroadcastAddress, theBroadcastPort, theReceivePort, ownIPAddress, theStationID, theNetworkID);
-    };
-    void openStation(unsigned long theBroadcastAddress,
-                     unsigned short theBroadcastPort,
-                     unsigned short theReceivePort,
-                     unsigned long ownIPAddress,
-                     unsigned long theStationID,
-                     unsigned long theNetworkID);
-    void openStationDefault(unsigned long theBroadcastAddress = defaultBroadcastAddress(),
-                     unsigned short theBroadcastPort = defaultBroadcastPort(),
-                     unsigned short theReceivePort = defaultBroadcastPort(),
-                     unsigned long ownIPAddress = defaultIgnoreAddress(),
-                     unsigned long theStationID = defaultStationID(),
-                     unsigned long theNetworkID = defaultNetworkID())
-    {
-        openStation(theBroadcastAddress, theBroadcastPort, theReceivePort, ownIPAddress, theStationID, theNetworkID);
-    }
-    void closeStation();
-    void broadcast(const asl::ReadableBlock & theData);
-    bool receive(asl::ResizeableBlock & theData, unsigned long & theSenderAddress, unsigned long & theStationID);
-    operator const void*() const { return _good ? this : NULL;}
-    unsigned long getOutgoingMessageNumber() const {
-        return _myOutgoingMessageNumber;
-    }
+        enum constants { MTU_SIZE = 1400, STATION_MESSAGE_MAGIC = 0xfeedbee1};
 
-    static unsigned long defaultBroadcastAddress();
-    static unsigned short defaultBroadcastPort();
-    static unsigned long defaultIgnoreAddress();
-    static unsigned long defaultNetworkID();
-    static unsigned long defaultOwnIPAddress();
-    static unsigned long defaultStationID();
-    static bool disableReceivingFlag();
+        Station() : _good(false) {};
+        Station(unsigned long theBroadcastAddress, // IP-Broadcast Adress
+                unsigned short theBroadcastPort,   // IP-Port Adress
+                unsigned short theReceivePort,     // IP-Port Adress
+                unsigned long ownIPAddress,        // supply own Adresse to avoid receiving self-sent packets
+                unsigned long theStationID,        // arbitrary unique ID to distinguish different stations
+                                                   // on a single  host (geht z.Z . unter Linux nicht wg. fehlendem SO_REUSEPORT
+                unsigned long theNetworkID)        // arbitrary group id, must be the same number for all participating nodes
+            : _good(false)
+        {
+            openStation(theBroadcastAddress, theBroadcastPort, theReceivePort, ownIPAddress, theStationID, theNetworkID);
+        };
+        void openStation(unsigned long theBroadcastAddress,
+                         unsigned short theBroadcastPort,
+                         unsigned short theReceivePort,
+                         unsigned long ownIPAddress,
+                         unsigned long theStationID,
+                         unsigned long theNetworkID);
+        void openStationDefault(unsigned long theBroadcastAddress = defaultBroadcastAddress(),
+                         unsigned short theBroadcastPort = defaultBroadcastPort(),
+                         unsigned short theReceivePort = defaultBroadcastPort(),
+                         unsigned long ownIPAddress = defaultIgnoreAddress(),
+                         unsigned long theStationID = defaultStationID(),
+                         unsigned long theNetworkID = defaultNetworkID())
+        {
+            openStation(theBroadcastAddress, theBroadcastPort, theReceivePort, ownIPAddress, theStationID, theNetworkID);
+        }
+        void closeStation();
+        void broadcast(const asl::ReadableBlock & theData);
+        bool receive(asl::ResizeableBlock & theData, unsigned long & theSenderAddress, unsigned long & theStationID);
+        operator const void*() const { return _good ? this : NULL;}
+        unsigned long getOutgoingMessageNumber() const {
+            return _myOutgoingMessageNumber;
+        }
 
-    union Descriptor {
-        unsigned long long _together;
-        struct {
-            unsigned long _myIPAddress;
+        static unsigned long defaultBroadcastAddress();
+        static unsigned short defaultBroadcastPort();
+        static unsigned long defaultIgnoreAddress();
+        static unsigned long defaultNetworkID();
+        static unsigned long defaultOwnIPAddress();
+        static unsigned long defaultStationID();
+        static bool disableReceivingFlag();
+
+        union Descriptor {
+            unsigned long long _together;
+            struct {
+                unsigned long _myIPAddress;
+                unsigned long _myStationID;
+            } _separate;
+        };
+
+        struct Statistic {
+            Statistic() : _myMessageCount(0), _myPacketCount(0), _myByteCount(0) {}
+            Statistic(int theMessageCount, int thePacketCount, int theByteCount)
+                : _myMessageCount(theMessageCount), _myPacketCount(thePacketCount), _myByteCount(theByteCount) {}
+            int _myMessageCount;
+            int _myPacketCount;
+            int _myByteCount;
+            Statistic & operator+=(const Statistic & theOther);
+        };
+
+        const Statistic & getTransmitStatistic() const {
+            return _myTransmitStatistic;
+        }
+        const Statistic & getReceiveStatistic() const {
+            return _myReceiveStatistic;
+        }
+        const Statistic & getReceiveErrorStatistic() const {
+            return _myReceiveErrorStatistic;
+        }
+
+        typedef std::map<unsigned long long, Statistic> ReceiveStatisticByStation;
+
+        const ReceiveStatisticByStation & getReceiveStatisticByStation() const {
+            return _myReceiveStatisticByStation;
+        }
+        void resetStatistic();
+        static unsigned long getLocalHostAddress();
+    private:
+        struct Header {
+            unsigned long _myMagicNumber;
+            unsigned long _mySrcAddress;
+            unsigned long _myNetworkID;
             unsigned long _myStationID;
-        } _separate;
-    };
+            unsigned long _myMessageNumber;
+            unsigned long _myMessageSize;
+            unsigned long _myMessagePartCount;
+            unsigned long _myMessagePartNumber;
+            unsigned long _myMessagePartSize;
+            unsigned long _myUncompressedMessageSize;
+        };
+        struct Packet {
+            enum constants { PAYLOAD_SIZE = MTU_SIZE - sizeof(Header) };
+            Header _myHeader;
+            char   _myData[MTU_SIZE];
+        };
 
-    struct Statistic {
-        Statistic() : _myMessageCount(0), _myPacketCount(0), _myByteCount(0) {}
-        Statistic(int theMessageCount, int thePacketCount, int theByteCount)
-            : _myMessageCount(theMessageCount), _myPacketCount(thePacketCount), _myByteCount(theByteCount) {}
-        int _myMessageCount;
-        int _myPacketCount;
-        int _myByteCount;
-        Statistic & operator+=(const Statistic & theOther);
-    };
-
-    const Statistic & getTransmitStatistic() const {
-        return _myTransmitStatistic;
-    }
-    const Statistic & getReceiveStatistic() const {
-        return _myReceiveStatistic;
-    }
-    const Statistic & getReceiveErrorStatistic() const {
-        return _myReceiveErrorStatistic;
-    }
-
-    typedef std::map<unsigned long long, Statistic> ReceiveStatisticByStation;
-
-    const ReceiveStatisticByStation & getReceiveStatisticByStation() const {
-        return _myReceiveStatisticByStation;
-    }
-    void resetStatistic();
-    static unsigned long getLocalHostAddress();
-private:
-    struct Header {
-        unsigned long _myMagicNumber;
-        unsigned long _mySrcAddress;
+        unsigned short _myBroadcastPort;
+        unsigned short _myReceivePort;
+        unsigned long _myBroadcastAddress;
         unsigned long _myNetworkID;
         unsigned long _myStationID;
-        unsigned long _myMessageNumber;
-        unsigned long _myMessageSize;
-        unsigned long _myMessagePartCount;
-        unsigned long _myMessagePartNumber;
-        unsigned long _myMessagePartSize;
-        unsigned long _myUncompressedMessageSize;
+        unsigned long _ownIPAddress;
+        unsigned long _myFlags;
+        struct sockaddr_in _fromAddress;
+        struct sockaddr_in _toAddress;
+        int _myFileDescriptor;
+        int _myOutgoingMessageNumber;
+        bool _good;
+
+        std::map<unsigned long long,std::vector<asl::Ptr<Packet> > > _myIncomingPackets;
+
+        Statistic _myReceiveStatistic;
+        Statistic _myReceiveErrorStatistic;
+        Statistic _myTransmitStatistic;
+        ReceiveStatisticByStation _myReceiveStatisticByStation;
     };
-    struct Packet {
-        enum constants { PAYLOAD_SIZE = MTU_SIZE - sizeof(Header) };
-        Header _myHeader;
-        char   _myData[MTU_SIZE];
-    };
 
-    unsigned short _myBroadcastPort;
-    unsigned short _myReceivePort;
-    unsigned long _myBroadcastAddress;
-    unsigned long _myNetworkID;
-    unsigned long _myStationID;
-    unsigned long _ownIPAddress;
-    unsigned long _myFlags;
-    struct sockaddr_in _fromAddress;
-    struct sockaddr_in _toAddress;
-    int _myFileDescriptor;
-    int _myOutgoingMessageNumber;
-    bool _good;
+    std::ostream & operator<<(std::ostream&, const Station::Statistic &);
+    Station::Statistic operator-(const Station::Statistic & theOne, const Station::Statistic & theOther);
+    Station::Statistic operator/(const Station::Statistic & theOne, double theTime);
+    Station::Statistic maximum(const Station::Statistic & theOne, const Station::Statistic & theOther);
 
-    std::map<unsigned long long,std::vector<asl::Ptr<Packet> > > _myIncomingPackets;
-
-    Statistic _myReceiveStatistic;
-    Statistic _myReceiveErrorStatistic;
-    Statistic _myTransmitStatistic;
-    ReceiveStatisticByStation _myReceiveStatisticByStation;
-};
-
-std::ostream & operator<<(std::ostream&, const Station::Statistic &);
-Station::Statistic operator-(const Station::Statistic & theOne, const Station::Statistic & theOther);
-Station::Statistic operator/(const Station::Statistic & theOne, double theTime);
-Station::Statistic maximum(const Station::Statistic & theOne, const Station::Statistic & theOther);
+}
 #endif
 
 
