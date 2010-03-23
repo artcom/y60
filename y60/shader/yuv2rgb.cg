@@ -53,7 +53,8 @@ vert2frag mainVertexColor(app2vert IN,
 float4 mainFragment(vert2frag IN,
                     uniform sampler2D tex0,
                     uniform sampler2D tex1,
-                    uniform sampler2D tex2): COLOR
+                    uniform sampler2D tex2,
+                    uniform float4 surfacecolor): COLOR
 {
     float3 myYUVColor;
     myYUVColor.x = tex2D(tex0, IN.TexCoord0)-0.0625;
@@ -61,7 +62,7 @@ float4 mainFragment(vert2frag IN,
     myYUVColor.z = tex2D(tex2, IN.TexCoord0)-0.5;
     float3x3 myMatrix = float3x3(1.16,  0.0,   1.60, 1.16, -0.39, -0.81,1.16,  2.01,  0.0);
     float4 myRGBColor = float4(mul(myMatrix, myYUVColor), 1);
-    return myRGBColor;
+    return myRGBColor * surfacecolor;
 }
 
 float4 mainFragmentRedKeying(vert2frag IN,
