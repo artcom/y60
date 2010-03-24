@@ -10,7 +10,7 @@ spark.Movie.Constructor = function(Protected) {
     var Public = this;
 
     // XXX: refactor to ResizableRectangle
-    this.Inherit(spark.Body);
+    this.Inherit(spark.ResizableRectangle);
 
     var _myMovie    = null;
     var _myTexture  = null;
@@ -91,7 +91,8 @@ spark.Movie.Constructor = function(Protected) {
         _myTexture.name = Public.name + "-texture";
         _myTexture.wrapmode = "clamp_to_edge";
 
-        _myMaterial = Modelling.createUnlitTexturedMaterial(window.scene, _myTexture, Public.name + "-material", true);
+        _myMaterial = Modelling.createUnlitTexturedMaterial(window.scene, _myTexture, 
+                                                            Public.name + "-material", true);
 
         if(myTargetPixelFormat == "YUV420") {
             // YUV targetrasterformat allows us to use a shader to convert YUV2RGB,
@@ -99,7 +100,8 @@ spark.Movie.Constructor = function(Protected) {
 		    _myMaterial.enabled = false;
 
     		for (var i = 1; i < _myMovie.childNodesLength(); i++) {
-        		var myTextureUnit = _myMaterial.childNode("textureunits").appendChild(Node.createElement("textureunit"));
+        		var myTextureUnit = 
+                    _myMaterial.childNode("textureunits").appendChild(Node.createElement("textureunit"));
         		myTextureUnit.applymode = TextureApplyMode.modulate;
     			var myTexture = Modelling.createTexture(window.scene, _myMovie);
     			myTexture.image = _myMovie.id;
@@ -117,15 +119,20 @@ spark.Movie.Constructor = function(Protected) {
         var mySize = new Vector3f(_myMovie.width,_myMovie.height, 0);
         Protected.origin = Protected.getVector3f("origin", [0,0,0]);
         var myLowerLeft = new Vector3f(-Protected.origin.x,-Protected.origin.y,-Protected.origin.z);
-        var myUpperRight = new Vector3f(mySize.x - Protected.origin.x, mySize.y - Protected.origin.y, mySize.z - Protected.origin.z);
+        var myUpperRight = new Vector3f(mySize.x - Protected.origin.x, 
+                                        mySize.y - Protected.origin.y, 
+                                        mySize.z - Protected.origin.z);
 
         _myShape    = Modelling.createQuad(window.scene, _myMaterial.id, myLowerLeft, myUpperRight);
         _myShape.name = Public.name + "-shape";
 
         _myInitialSize = mySize;
 
-        var myBody  = Modelling.createBody(Public.parent.innerSceneNode, _myShape.id);
-        myBody.name = Public.name;
+        // XXX: we won't have 1x1 sized movies :(
+        if (Public.width == 1 && Public.height == 1) {
+            Public.width = _myInitialSize.x;
+            Public.height = _myInitialSize.y;
+        }
 
         var myInitialPlaymode = Protected.getString("playmode", "stop");
         _myMovie.playmode = myInitialPlaymode;
@@ -133,8 +140,10 @@ spark.Movie.Constructor = function(Protected) {
 
         var myInitialLoopcount = Protected.getString("loopcount", "1");
         _myMovie.loopcount = myInitialLoopcount;
+        
+        Base.realize(_myShape);
 
-        Base.realize(myBody);
+        
     };
 
     // for audio synced video we need a reload, cause y60 looses sync on looping
