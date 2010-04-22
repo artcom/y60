@@ -28,7 +28,7 @@ y60_httpserver_settings.h
 list ( APPEND EXTERNALS )
 
 if(NOT WIN32)
-	find_package(Boost COMPONENTS thread system)
+    find_package(Boost COMPONENTS thread system)
 endif(NOT WIN32)
 
 if(WIN32)
