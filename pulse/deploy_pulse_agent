@@ -1,0 +1,64 @@
+#!/bin/bash
+
+set -e
+set -u
+
+package=$1
+dir=$(dirname $package)
+file=$(basename $package)
+dir_abs=$(cd $dir; pwd)
+package_abs=$dir_abs/$file
+
+pushd $HOME
+
+echo "extracting $package to $HOME"
+tar xzf $package_abs
+versioned_dir=$(echo $file | sed 's/.tar.gz//')
+echo "creating symlink $versioned_dir -> pulse-agent"
+ln -fs $versioned_dir pulse-agent
+rm -r pulse-agent/logs
+ln -s ../../../var/log/pulse pulse-agent/logs
+
+autostart=$HOME/.config/autostart/pulse.desktop 
+echo "generating autostart entry '$autostart'"
+if [[ ! -e "$autostart" ]]; then
+    cat > $autostart <<-EOF
+        [Desktop Entry]
+        Type=Application
+        Name=Pulse Build Agent
+        Exec=$HOME/pulse-agent/bin/pulse start
+        Icon=system-run
+        Comment=
+        Name[en_US]=Pulse Build Agent
+        Comment[en_US]=Pulse Continuous Integration Client
+        X-GNOME-Autostart-enabled=true
+
+EOF
+fi
+
+logrot=/etc/logrotate.d/pulse-agent
+logrot_snippet=$0_logrotate
+cat >$logrot_snippet <<-EOF
+/var/log/pulse/*.log {
+    rotate 10
+    monthly
+}
+EOF
+
+script=$HOME/$0_sudo
+cat >$script <<-EOF
+#!/bin/bash
+echo "storing pulse logs in /var/log/pulse"
+mkdir -p /var/log/pulse
+chmod 775 /var/log/pulse
+chown root.buildlocal /var/log/pulse
+cp $logrot_snippet $logrot
+EOF
+
+chmod 755 $script
+
+echo "root permissions required to enable logrotation"
+sudo $script
+rm $script $logrot_snippet
+
+popd
