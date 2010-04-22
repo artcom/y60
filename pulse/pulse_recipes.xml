@@ -139,7 +139,7 @@
     <!-- single configuration CMake generators (make,nmake,etc) -->
     <scope>
         <property name="build.dir" value="${build.root}/${build.type}"/>
-        <property name="cmake.source.dir" value="../../src"/> 
+        <property name="cmake.source.dir" value="../.."/> 
         <property name="cmake.recipe.args" value="-D CMAKE_BUILD_TYPE=${build.type}"/>
 
         <recipe name="GMake Linux Continuous">
@@ -207,7 +207,7 @@
     <!-- multi configuration CMake generators (MSVC,Xcode) -->
     <scope>
         <property name="build.dir" value="${build.root}"/>
-        <property name="cmake.source.dir" value="../src"/>
+        <property name="cmake.source.dir" value=".."/>
         <property name="cmake.recipe.args" value=""/>
 
         <recipe name="MSVC">
