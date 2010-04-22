@@ -4,4 +4,3 @@ PRO60 is the integrated distribution of Y60 and all its dependencies.
 This installer will provide you with everything you need for
 running Y60 applications, developing applications and
 creating 3D models for Y60.
-
