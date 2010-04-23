@@ -75,6 +75,7 @@ if(ACMAKE_BUILDINFO)
                     WORKING_DIRECTORY ${GIT_REPOSITORY}
                     OUTPUT_VARIABLE GIT_COMMIT
                 )
+                string(STRIP ${GIT_COMMIT} GIT_COMMIT)
 
                 set(GIT_DEPEND_FILES
                     "${GIT_REPOSITORY}/.git/HEAD"
@@ -126,7 +127,7 @@ macro(_ac_add_repository_info TARGET_NAME BUILDINFO_FILENAME TARGET_TYPE)
                     ${CMAKE_COMMAND}
                           -D "SOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR}"
                           -D "TARGET_NAME=${TARGET_NAME}"
-                          -D "BUILD_CONFIG=${BUILD_TYPE}"
+                          -D "BUILD_CONFIG=${CMAKE_BUILD_TYPE}"
                           -D "TARGET_TYPE=${TARGET_TYPE}"
                           -D "BUILDINFO_FILE=${BUILDINFO_FILENAME}"
                           -D "BUILDINFO_TEMPLATE=${ACMAKE_BUILDINFO_TEMPLATE}"
