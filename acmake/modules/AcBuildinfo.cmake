@@ -77,9 +77,12 @@ if(ACMAKE_BUILDINFO)
                 )
 
                 set(GIT_DEPEND_FILES
-                    "${GIT_REPOSITORY}/.git/refs/heads/${GIT_BRANCH}"
                     "${GIT_REPOSITORY}/.git/HEAD"
                 )
+
+                if(EXISTS ${GIT_REPOSITORY}/.git/refs/heads/${GIT_BRANCH})
+                    list(APPEND GIT_DEPEND_FILES "${GIT_REPOSITORY}/.git/refs/heads/${GIT_BRANCH}")
+                endif(EXISTS ${GIT_REPOSITORY}/.git/refs/heads/${GIT_BRANCH})
 
                 set(GIT_ARGS
                     -D "GIT_REPOSITORY=${CMAKE_SOURCE_DIR}"
