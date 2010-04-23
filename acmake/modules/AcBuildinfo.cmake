@@ -67,16 +67,13 @@ if(ACMAKE_BUILDINFO)
                     WORKING_DIRECTORY ${GIT_REPOSITORY}
                     OUTPUT_VARIABLE GIT_BRANCHES
                 )
-                message(${GIT_BRANCHES})
-            
                 string(REGEX MATCH "\\* ([a-zA-Z0-9_-]*)" GIT_BRANCH_MATCH "${GIT_BRANCHES}")
                 set(GIT_BRANCH ${CMAKE_MATCH_1})
-                message(${GIT_BRANCH})
 
-                file(STRINGS "${GIT_REPOSITORY}/.git/refs/heads/${GIT_BRANCH}" GIT_COMMIT
-                    REGEX "[a-f0-9]*"
-                    LIMIT_COUNT 1
-                    NO_HEX_CONVERSION
+                execute_process(
+                    COMMAND git rev-parse HEAD
+                    WORKING_DIRECTORY ${GIT_REPOSITORY}
+                    OUTPUT_VARIABLE GIT_COMMIT
                 )
 
                 set(GIT_DEPEND_FILES
