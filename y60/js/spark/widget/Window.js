@@ -1,3 +1,6 @@
+/*jslint nomen: false, white: false*/
+/*global spark, use, SceneViewer, window*/
+
 /**
  * Simple wrapper for the Y60 scene viewer.
  */
@@ -36,7 +39,7 @@ spark.Window.Constructor = function(Protected) {
 
         var mySceneFile = Protected.getString("sceneFile", "");
         if (mySceneFile.length > 0) {
-            Public.setModelName( mySceneFile );
+            Public.setModelName(mySceneFile);
         }
         Public.setup(Protected.getNumber("width", 640),
                      Protected.getNumber("height", 480),
@@ -421,10 +424,9 @@ spark.Window.Constructor = function(Protected) {
             if(myId in _myMultitouchCursors) {
                 Logger.debug("Cursor " + myId + " removed");
 
-                var myCursor = _myMultitouchCursors[myId];
-
+                var myCursor   = _myMultitouchCursors[myId];
                 var myPosition = getMultitouchCursorPosition(theEvent);
-                var myFocused = myCursor.focused;
+                var myFocused  = myCursor.focused;
 
                 myCursor.update(myFocused, myPosition);
 

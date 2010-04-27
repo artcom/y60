@@ -56,6 +56,9 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+/*jslint nomen: false, plusplus: false*/
+/*global Logger, Exception*/
+
 /**
  * Global metamethod: Define a namespace on the target.
  * 
@@ -68,7 +71,7 @@
  */
 function Namespace(theName) {
     return {AbstractClass: AbstractClass, Class: Class, name: theName};
-};
+}
 
 /**
  * Namespace metamethod: Define an abstract class in the target namespace.
@@ -90,12 +93,13 @@ function AbstractClass(theName) {
 
     var myConstructor = function () {
         Logger.error("Trying to instantiate abstract class " + myNamespace.name + "." + theName);
+        // TODO check if this makes sense:: throw "Trying to instantiate abstract class " + myNamespace.name + "." + theName;
     };
 
     myConstructor._className_ = theName;
 
     return myConstructor;
-};
+}
 
 /**
  * Namespace metamethod: Define a concrete class in the target namespace.
@@ -134,7 +138,7 @@ function Class(theName) {
     Logger.info("Defining class " + theName);
     var myNamespace = this;
 
-    function myConstructor () {
+    function myConstructor() {
         var myPublic = this;
         var myProtected = {};
 
@@ -161,18 +165,18 @@ function Class(theName) {
 
         // call the real constructor
         var myArguments = [myProtected].concat(Array.prototype.slice.call(arguments));
-        if (theName in myNamespace){
+        if (theName in myNamespace) {
             myNamespace[theName].Constructor.apply(myPublic, myArguments);
         } else {
             Logger.error("'" + theName +
                          "' not found in namespace '" + myNamespace.name + "'");
         }
-    };
+    }
 
     myConstructor._className_ = theName;
 
     return myConstructor;
-};
+}
 
 /**
  * Metamethod: Makes the target object be an instance of the given class.
@@ -190,13 +194,13 @@ function Inherit(theClass) {
     var myArguments = [this._protected_];
     myArguments = myArguments.concat(Array.prototype.slice.call(arguments, 1));
 	// XXX this is compatibility goo for XIP
-	if("_className_" in theClass) {
+	if ("_className_" in theClass) {
         this._classes_[theClass._className_] = theClass;
 	} else {
 	    Logger.warning("Warning. Inheriting oldschool class without _className_. Precedence lists will be incomplete.");
 	}
     theClass.Constructor.apply(this, myArguments);
-};
+}
 
 /**
  * Internal metamethod: Inherit an oldschool (Y60) class into the target object.
@@ -211,7 +215,7 @@ function Inherit(theClass) {
 function InheritOldschool(theClass) {
     var myArguments = Array.prototype.slice.call(arguments);
     theClass.prototype.Constructor.apply(this, myArguments);
-};
+}
 
 /**
  * Metamethod: Define a getter.
@@ -230,13 +234,13 @@ function InheritOldschool(theClass) {
 function Getter(theName, theFunction) {
     var myNextGetter = this.__lookupGetter__(theName);
 
-    if(myNextGetter) {
-        Logger.warning("Defining setter for property " + theName + " in class "
-                       + this._className_ + ", which already has a setter for that property.");
+    if (myNextGetter) {
+        Logger.warning("Defining setter for property " + theName + " in class " +
+                       this._className_ + ", which already has a setter for that property.");
     }
 
     this.__defineGetter__(theName, theFunction);
-};
+}
 
 /**
  * Metamethod: Override a getter.
@@ -251,17 +255,17 @@ function Getter(theName, theFunction) {
 function GetterOverride(theName, theFunction) {
     var myNextGetter = this.__lookupGetter__(theName);
 
-    if(!myNextGetter) {
-        Logger.error("Trying to override getter for property " + theName + " in class "
-                     + this._className_ + ", which does not have a getter for that property.");
+    if (!myNextGetter) {
+        Logger.error("Trying to override getter for property " + theName + " in class " +
+                     this._className_ + ", which does not have a getter for that property.");
     }
 
-    var myWrapper = function(theValue) {
+    var myWrapper = function (theValue) {
         return theFunction.call(this, myNextGetter);
     };
 
-    this.__defineGetter__(theName);
-};
+    this.__defineGetter__(theName); // FIXME this is invalid. What probably was intended: this.__defineGetter__(theName, myWrapper);
+}
 
 /**
  * Metamethod: Define a setter.
@@ -278,15 +282,15 @@ function GetterOverride(theName, theFunction) {
  * 
  */
 function Setter(theName, theFunction) {
-var myNextSetter = this.__lookupSetter__(theName);
+    var myNextSetter = this.__lookupSetter__(theName);
 
-    if(myNextSetter) {
-        Logger.warning("Defining setter for property " + theName + " in class "
-                       + this._className_ + ", which already has a setter for that property.");
+    if (myNextSetter) {
+        Logger.warning("Defining setter for property " + theName + " in class " +
+                       this._className_ + ", which already has a setter for that property.");
     }
 
     this.__defineSetter__(theName, theFunction);
-};
+}
 
 /**
  * Metamethod: Override a getter.
@@ -301,17 +305,17 @@ var myNextSetter = this.__lookupSetter__(theName);
 function SetterOverride(theName, theFunction) {
     var myNextSetter = this.__lookupSetter__(theName);
 
-    if(!myNextSetter) {
-        Logger.error("Trying to override setter for property " + theName + " in class "
-                     + this._className_ + ", which does not have a setter for that property.");
+    if (!myNextSetter) {
+        Logger.error("Trying to override setter for property " + theName + " in class " +
+                     this._className_ + ", which does not have a setter for that property.");
     }
 
     var myWrapper = function(theValue) {
-        theFunction.call(this, theValue, theNextSetter);
+        theFunction.call(this, theValue, theNextSetter); // theNextSetter is not defined. Would need a closure or something like that.
     };
 
-    this.__defineSetter__(theName, myWrapper);
-};
+    this.__defineSetter__(theName, theFunction);
+}
 
 /**
  * Metamethod: Define a signal on the target object.
@@ -336,28 +340,30 @@ function Signal(theName) {
     var myHandlers = [];
     var myContexts = [];
 
-    mySignal.signal = function() {
+    mySignal.signal = function () {
         var myArguments = Array.prototype.slice.call(arguments);
-        for(var i = 0; i < myHandlers.length; i++) {
+        for (var i = 0; i < myHandlers.length; i++) {
             myHandlers[i].apply(myContexts[i], myArguments);
         }
     };
 
-    mySignal.call = function(theHandler, theContext) {
+    mySignal.call = function (theHandler, theContext) {
+        // TODO catch undefined since it will then be the global object.
+        // see https://developer.mozilla.org/En/Core_JavaScript_1.5_Reference/Objects/Function/Apply
         myHandlers.push(theHandler);
         myContexts.push(theContext);
     };
 
     this[theName] = mySignal;
-};
+}
 
 /**
  * Internal: Generic serialization-grade conversion from value to string.
  */
 function ConvertFromString(theType, theString) {
-    switch(theType) {
+    switch (theType) {
     case Boolean:
-        return !(theString == "false");
+        return !(theString === "false");
     case String:
         return theString;
     case Number:
@@ -365,13 +371,13 @@ function ConvertFromString(theType, theString) {
     default:
         throw new Exception("Do not know how to convert to the given type " + theType);
     }
-};
+}
 
 /**
  * Internal: Generic serialization-grade conversion from string to value.
  */
 function ConvertToString(theType, theValue) {
-    switch(theType) {
+    switch (theType) {
     case Boolean:
     case Number:
     case String:
@@ -379,7 +385,7 @@ function ConvertToString(theType, theValue) {
     default:
         throw new Exception("Do not know how to convert from the given type " + theType);
     }
-};
+}
 
 /**
  * Metamethod: Define a dynamic property on an object
@@ -411,32 +417,32 @@ function Property(theName, theType, theDefault, theHandler) {
 
     var myValue = theDefault;
 
-    this.Getter(theName, function() {
+    this.Getter(theName, function () {
         return myValue;
     });
 
-    this.Setter(theName, function(theValue) {
+    this.Setter(theName, function (theValue) {
         myValue = theValue;
-        if(theHandler) {
+        if (theHandler) {
             theHandler(myValue);
         }
     });
 
     myProperty.name = theName;
 
-    myProperty.setFromString = function(theString) {
+    myProperty.setFromString = function (theString) {
         myValue = ConvertFromString(theType, theString);
-        if(theHandler) {
+        if (theHandler) {
             theHandler(myValue);
         }
     };
 
-    myProperty.getAsString = function() {
+    myProperty.getAsString = function () {
         return ConvertToString(theType, myValue);
     };
 
     this._properties_.push(myProperty);
-};
+}
 
 /**
  * Metamethod: Initialize properties of an object from XML attributes
@@ -449,12 +455,12 @@ function Property(theName, theType, theDefault, theHandler) {
 function Initialize(theNode) {
     var myProps = this._properties_;
 
-    for(var i = 0; i < myProps.length; i++) {
+    for (var i = 0; i < myProps.length; i++) {
         var myProp = myProps[i];
         var myName = myProp.name;
-        if(myName in theNode) {
+        if (myName in theNode) {
             var myString = theNode[myName];
             myProp.setFromString(myString);
         }
     }
-};
+}

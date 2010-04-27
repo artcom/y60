@@ -56,6 +56,8 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+/*global use, Namespace, Node*/
+
 // object system
 use("common.js");
 
@@ -66,18 +68,18 @@ use("common.js");
  */
 var spark = Namespace("spark");
 
-spark.findRootElement = function(theDocument) {
+spark.findRootElement = function (theDocument) {
     var myRoot = theDocument.firstChild;
     // firstChild might be a xml processing instruction, a
     // comment, a doctype declaration or god knows what else.
-    while (myRoot.nodeType != Node.ELEMENT_NODE) {
-        if ( ! myRoot.nextSibling) {
+    while (myRoot.nodeType !== Node.ELEMENT_NODE) {
+        if (! myRoot.nextSibling) {
             throw new Error("spark document contains no xml element");
         }
         myRoot = myRoot.nextSibling;
     }
     return myRoot;
-}
+};
 
 // javascript extensions
 use("jsextensions.js");
