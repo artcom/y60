@@ -1,0 +1,6 @@
+<myComponentClass foo="hallo">
+  <myComponentClass name="tief" foo="grube">
+    <myComponentClass name="hoch" foo="haufen"></myComponentClass>
+  </myComponentClass>
+  <myComponentClass name="hoch" foo="berg"></myComponentClass>
+</myComponentClass>
