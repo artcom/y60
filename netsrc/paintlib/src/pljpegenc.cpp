@@ -103,7 +103,9 @@ void PLJPEGEncoder::DoEncode
   */
 
     // Initialize custom data destination
-    jpeg_mem_dest(m_pcinfo, pDataSink->GetBufferPtr(), pDataSink->GetMaxDataSize(), pDataSink);
+    // XXX nameclash with jpeg8
+    throw PLTextException(666, "JPEG encoding disabled because of a nameclash with jpeg8");
+    // jpeg_mem_dest(m_pcinfo, pDataSink->GetBufferPtr(), pDataSink->GetMaxDataSize(), pDataSink);
 
     // Set Header Fields
     m_pcinfo->image_width = pBmp->GetWidth();
