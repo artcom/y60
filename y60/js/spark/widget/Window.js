@@ -24,9 +24,40 @@ spark.Window.Constructor = function(Protected) {
     Public.title setter = function(theTitle) {
         window.title = theTitle;
     };
+    
+    function cleanupWorld() {
+        // This is the first world - it contains the loaded x60 model
+        var mySparkWorld = window.scene.dom.firstChild.firstChild;
+        // Create a new world for the 3d elements
+        _myWorld = Node.createElement("world");
+        _myWorld.name = "3d-world";
+        window.scene.dom.firstChild.appendChild(_myWorld);
+        
+        // move all over to the new world (at this moment the first world
+        // does not yet contains spark quads)
+        while (mySparkWorld.childNodesLength()) {
+            var myNode = mySparkWorld.removeChild(mySparkWorld.firstChild);
+            _myWorld.appendChild(myNode);
+        }
+        
+        // Get the camera from the 3d world and place a copy of it in the original first world
+        // The copy must have a unique id.
+        _myCamera = _myWorld.find(".//camera[@name='perspShape']"); 
+        var mySparkCam = _myCamera.cloneNode();
+        mySparkCam.id = createUniqueId();
+        mySparkWorld.appendChild(mySparkCam);
+        
+        // hook the new camera to the viewport (before it pointed to the 3d world's camera)
+        var myViewport = window.scene.dom.find("//viewport");
+        myViewport.camera = mySparkCam.id;
+        
+        Public.worlds['spark'] = window.scene.dom.firstChild.firstChild;
+        Public.worlds['3d']    = window.scene.dom.find(".//world[@name='3d-world']");
+    }
 
     Base.realize = Public.realize;
     Public.realize = function() {
+        Public.worlds = {}; // 'spark' and potentially '3d' is possible
         window = new RenderWindow();
 
         window.position = [
@@ -45,8 +76,13 @@ spark.Window.Constructor = function(Protected) {
                      Protected.getNumber("height", 480),
                      Protected.getBoolean("fullscreen", false),
                      Protected.getString("title", "SPARK Application"));
-        if (mySceneFile.length > 0 && _mySceneLoadedCallback) {
-            _mySceneLoadedCallback(window.scene.dom);
+        if (mySceneFile.length > 0) {
+            cleanupWorld();
+            if (_mySceneLoadedCallback) {
+                _mySceneLoadedCallback(window.scene.dom);
+            }
+        } else {
+            Public.worlds['spark'] = window.scene.dom.firstChild.firstChild;
         }
 
         Public.setMover(null);
