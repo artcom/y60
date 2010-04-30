@@ -8,7 +8,8 @@ Hoccer.station = function(theParams) {
     var defaultOnErrorFunc = function() {
             Logger.warning( "HTTP Code received: " 
                             + this.responseCode);
-             return true; 
+            that.isCatching = false;
+            return true; 
         };
     var defaultOnDoneFunc = function() {
              return true;
@@ -19,7 +20,8 @@ Hoccer.station = function(theParams) {
 
     that.userAgent = "Hoccer/0.92dev Y60";
     that.serverUri = (typeof(theParams.serverUri) === 'undefined' ? "http://www.hoccer.com" : theParams.serverUri);
-
+    that.isCatching = false;
+    
     //default hoccer station at artcom
     that.longitude = (typeof(theParams.longitude) === 'undefined'?13.345116:theParams.longitude);
     that.latitude = (typeof(theParams.latitude) === 'undefined'?52.501077:theParams.latitude);
@@ -82,7 +84,7 @@ Hoccer.station = function(theParams) {
             var contentType = this.getResponseHeader("Content-Type");
             var fileName = this.getResponseHeader("name");
             if (fileName.length == 0) {
-                fileName = "tempfile";
+                fileName = "DOWNLOADS/" + new Date().valueOf();//"tempfile";
                 if (contentType.indexOf(MimeTypes.png) > -1) {
                     fileName += ".png";
                 } else if (contentType.indexOf(MimeTypes.jpg) > -1) {
@@ -110,6 +112,8 @@ Hoccer.station = function(theParams) {
         myRequestManager.performRequest(request);
     };
 
+    that.resetIsCatching = function(){that.isCatching = false;}
+
     that.prepareDownload = function(thePeerUri, theRepeatCount) {
         if (typeof (theRepeatCount) === 'undefined') {
             theRepeatCount = 0;
@@ -123,6 +127,7 @@ Hoccer.station = function(theParams) {
             var expires = response.expires;
             if (resources.length > 0 && resources[0].length > 0) {
                 that.download(resources[0]);
+                window.setTimeout("resetIsCatching", 7000, that);
             } else {
                 if (theRepeatCount < 7) {
                     theRepeatCount+=1;
@@ -133,6 +138,8 @@ Hoccer.station = function(theParams) {
                     };
                     playAnimation(delayAni);
                     //window.setTimeout("that.prepareDownload(\""+thePeerUri+"\","+theRepeatCount+")",1000);
+                } else {
+                    that.isCatching = false;
                 }
             }
         };
@@ -200,7 +207,7 @@ Hoccer.station = function(theParams) {
 
     that.catchIt = function() {
         Logger.debug("catch it");
-
+        that.isCatching = true;
         that.buildPeerGroup({
             isSharing : false,
             onDone : function() {
