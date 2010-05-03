@@ -19,7 +19,6 @@ Hoccer.station = function(theParams) {
 
     that.userAgent = "Hoccer/0.95dev Y60";
     that.serverUri = (typeof(theParams.serverUri) === 'undefined' ? "http://www.hoccer.com" : theParams.serverUri);
-    that.isCatching = false;
     
     //default hoccer station at artcom
     that.longitude = (typeof(theParams.longitude) === 'undefined'?13.345116:theParams.longitude);
@@ -111,10 +110,6 @@ Hoccer.station = function(theParams) {
         myRequestManager.performRequest(request);
     };
 
-    that.resetIsCatching = function(){
-        that.isCatching = false;
-    }
-
     that.prepareDownload = function(thePeerUri) {
         print("looking for download uri on ", thePeerUri);
         var request = new Request(thePeerUri, that.userAgent);
@@ -123,9 +118,6 @@ Hoccer.station = function(theParams) {
             var response = eval("("+this.responseString+")");
             var resources = response.resources;
             var expires = parseInt(response.expires);
-            if (expires == 0){
-                window.setTimeout("resetIsCatching", 2000, that);
-            }
             if (resources.length > 0 && resources[0].length > 0) {
                 print("starting download from '", resources[0], "'");
                 that.download(resources[0]);
@@ -202,7 +194,6 @@ Hoccer.station = function(theParams) {
 
     that.catchIt = function() {
         Logger.debug("catch it");
-        that.isCatching = true;
         that.buildPeerGroup({
             isSharing : false,
             onDone : function() {
@@ -210,9 +201,6 @@ Hoccer.station = function(theParams) {
                var response = eval("("+this.responseString+")");
                var peerUri = response.peer_uri;
                that.prepareDownload(peerUri);
-            },
-            onError : function(){
-               window.setTimeout("resetIsCatching", 2000, that);
             }
         });
     };
