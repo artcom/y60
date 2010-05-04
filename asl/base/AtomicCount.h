@@ -54,7 +54,7 @@
 
 #if defined(LINUX) || defined(OSX_X86)
 #define UNIX_X86
-typedef struct { size_t counter; } atomic_t;
+typedef struct { ptrdiff_t counter; } atomic_t;
 #endif
 
 #if defined(UNIX_X86)
