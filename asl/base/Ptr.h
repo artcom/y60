@@ -73,17 +73,17 @@ namespace asl {
 
     template <class ThreadingModel>
     struct ReferenceCounter {
-        ReferenceCounter(long theSmartCount = 1, long theWeakCount = 1) :
+        ReferenceCounter(size_t theSmartCount = 1, size_t theWeakCount = 1) :
             smartCount(theSmartCount),
             weakCount(theWeakCount)
         {}
 
         ReferenceCounter<ThreadingModel>* getNextPtr() const {
-            return reinterpret_cast<ReferenceCounter<ThreadingModel>*>((long)smartCount);
+            return reinterpret_cast<ReferenceCounter<ThreadingModel>*>((size_t)smartCount);
         }
 
         void setNextPtr(ReferenceCounter<ThreadingModel> * theNext) {
-            smartCount.set(reinterpret_cast<long>(theNext));
+            smartCount.set(reinterpret_cast<size_t>(theNext));
         }
 
         void init() {
@@ -235,17 +235,21 @@ namespace asl {
                 pthread_mutex_lock(&_theMutex_);
                 if (_theFreeListHead_) {
                     ReferenceCounter<ThreadingModel> * result = _theFreeListHead_;
+                    DBP2(std::cout << "recycling old: " << (void*)result << std::endl);
                     _theFreeListHead_ = result->getNextPtr();
+                    DBP2(std::cout << "new head: " << (void*)_theFreeListHead_ << std::endl);
                     pthread_mutex_unlock(&_theMutex_);
                     result->init();
                     return result;
                 } else {
+                    DBP2(std::cout << "allocating new" << std::endl);
                     pthread_mutex_unlock(&_theMutex_);
                     return new ReferenceCounter<ThreadingModel>;
                 }
             }
             static void free(ReferenceCounter<ThreadingModel> * anOldPtr) {
                 pthread_mutex_lock(&_theMutex_);
+                DBP2(std::cout << "free: " << (void*)anOldPtr << std::endl);
                 anOldPtr->setNextPtr(_theFreeListHead_);
                 _theFreeListHead_ = anOldPtr;
                 pthread_mutex_unlock(&_theMutex_);

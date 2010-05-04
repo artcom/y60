@@ -52,12 +52,9 @@
 /*! \addtogroup aslbase */
 /* @{ */
 
-// ATTENTION: The Mac OS X atomic counter is not tested on multiprocessor
-//            machines because I don't have one. (HINT!) DS
-
 #if defined(LINUX) || defined(OSX_X86)
 #define UNIX_X86
-typedef struct { asl::Signed32 counter; } atomic_t;
+typedef struct { size_t counter; } atomic_t;
 #endif
 
 #if defined(UNIX_X86)
