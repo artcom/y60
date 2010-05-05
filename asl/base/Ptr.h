@@ -73,17 +73,17 @@ namespace asl {
 
     template <class ThreadingModel>
     struct ReferenceCounter {
-        ReferenceCounter(size_t theSmartCount = 1, size_t theWeakCount = 1) :
+        ReferenceCounter(ptrdiff_t theSmartCount = 1, ptrdiff_t theWeakCount = 1) :
             smartCount(theSmartCount),
             weakCount(theWeakCount)
         {}
 
         ReferenceCounter<ThreadingModel>* getNextPtr() const {
-            return reinterpret_cast<ReferenceCounter<ThreadingModel>*>((size_t)smartCount);
+            return reinterpret_cast<ReferenceCounter<ThreadingModel>*>((ptrdiff_t)smartCount);
         }
 
         void setNextPtr(ReferenceCounter<ThreadingModel> * theNext) {
-            smartCount.set(reinterpret_cast<size_t>(theNext));
+            smartCount.set(reinterpret_cast<ptrdiff_t>(theNext));
         }
 
         void init() {
@@ -595,7 +595,7 @@ namespace asl {
             bool operator<=(const WeakPtr<T,ThreadingModel,Allocator>& rhs) const;
             bool operator>=(const WeakPtr<T,ThreadingModel,Allocator>& rhs) const;
 
-            long use_count() const {
+            ptrdiff_t use_count() const {
                 return getRefCount();
             }
 
@@ -611,7 +611,7 @@ namespace asl {
             T *    _myNativePtr;
             ReferenceCounter<ThreadingModel> * _myRefCountPtr;
 
-            long getRefCount() const {
+            ptrdiff_t getRefCount() const {
                 if (_myRefCountPtr) {
                     return _myRefCountPtr->smartCount;
                 }
@@ -732,7 +732,7 @@ namespace asl {
                     return Ptr<T, ThreadingModel, Allocator>(0);
                 }
 
-                long use_count() const {
+                ptrdiff_t use_count() const {
                     return getRefCount();
                 }
 
@@ -755,14 +755,14 @@ namespace asl {
                 ReferenceCounter<ThreadingModel> * _myRefCountPtr;
 
                 // only use for debugging and tests
-                long getRefCount() const {
+                ptrdiff_t getRefCount() const {
                     if (_myRefCountPtr) {
                         return _myRefCountPtr->smartCount;
                     }
                     return 0;
                 }
 
-                long getWeakCount() const {
+                ptrdiff_t getWeakCount() const {
                     if (_myRefCountPtr) {
                         return _myRefCountPtr->weakCount;
                     }
