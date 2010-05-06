@@ -57,7 +57,7 @@ spark.Window.Constructor = function(Protected) {
 
     Base.realize = Public.realize;
     Public.realize = function() {
-        Public.worlds = {}; // 'spark' and potentially '3d' is possible
+ //       Public.worlds = {}; // 'spark' and potentially '3d' is possible
         window = new RenderWindow();
 
         window.position = [
@@ -76,7 +76,12 @@ spark.Window.Constructor = function(Protected) {
                      Protected.getNumber("height", 480),
                      Protected.getBoolean("fullscreen", false),
                      Protected.getString("title", "SPARK Application"));
-        if (mySceneFile.length > 0) {
+         if (mySceneFile.length > 0 && _mySceneLoadedCallback) {
+       	     _mySceneLoadedCallback(window.scene.dom);
+       	 }
+      //FIXME: this is colliding with our y60 application code somehow,
+      // with this change our apps wont run and just show black screen
+     /*   if (mySceneFile.length > 0) {
             cleanupWorld();
             if (_mySceneLoadedCallback) {
                 _mySceneLoadedCallback(window.scene.dom);
@@ -84,7 +89,7 @@ spark.Window.Constructor = function(Protected) {
         } else {
             Public.worlds['spark'] = window.scene.dom.firstChild.firstChild;
         }
-
+    */
         Public.setMover(null);
 
         window.showMouseCursor = Protected.getBoolean("mouseCursor", true);
