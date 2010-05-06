@@ -26,7 +26,7 @@
                    status-group="2"
                    details-group="3"
                    pass-status="Passed"
-                   failure-status="***"><![CDATA[^\\s*\\d+/\\d+ Testing (\\w+)\\s*(\\*\\*\\*|Passed)(.*)\$]]></regex-test.pp>
+                   failure-status="***"><![CDATA[^\\s*\\d+/\\d+ Testing (\\w+)\\s*(\\*\\*\\*|Passed)(.*)$|^\\s*\\d+/\\d+\\s+Test\\s+\\#\\d+:\\s+(\\w+)\\s+[.]*\\s*(\\*\\*\\*|Passed)(.*)$]]></regex-test.pp>
 
     <macro name="run_cmake">
         <executable name="create_build_dir" exe="${cmake.bin}"
