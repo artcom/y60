@@ -1,8 +1,6 @@
 <?xml version="1.0"?>
 <project default-recipe="GNU Make">
     <resource name="cmake"/>
-    <property name="build.type" value="release"/>
-    <property name="parallel.jobs" value="9"/>
     <property name="build.root" value="_builds"/>
     <property name="ctest.log.dir" value="Testing/Temporary/"/>
 
