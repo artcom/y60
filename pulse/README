@@ -1,1 +1,17 @@
-This directory contains the configuration and some support scripts for the pulse continous integration server
+This directory contains the configuration and some support scripts for the pulse
+server.
+
+README
+    This file
+
+launch_pulse_agent.bat
+    run the pulse agent on windows. add this to the autostart folder.
+
+local_resources.xml
+    some resource definitions for local pulse builds
+
+pulse_local
+    performs a local pulse build. run this in the toplevel of a working copy.
+
+pulse_recipes.xml
+    the pulse recipe file
