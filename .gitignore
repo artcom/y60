@@ -10,3 +10,5 @@ Makefile
 CTestTestfile.cmake
 cmake_install.cmake
 .DS_Store
+_builds
+_pulse.out
