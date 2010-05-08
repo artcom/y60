@@ -42,8 +42,11 @@ typedef __int64 int64;
 typedef unsigned __int64 uint64;
 
 #else
+}
 
 #include <stdint.h>
+
+namespace osc {
 
 //typedef long long int64;
 //typedef unsigned long long uint64;
