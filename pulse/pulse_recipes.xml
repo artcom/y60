@@ -57,7 +57,7 @@
 
     <macro name="run_gmake_build">
         <command name="build">
-            <make args="-j $(parallel.jobs?1) VERBOSE=1" working-dir="${build.dir}">
+            <make args="-j ${parallel.jobs} VERBOSE=1" working-dir="${build.dir}">
                 <process processor="${gcc.pp}"/>
             </make>
         </command>
@@ -138,9 +138,9 @@
 
     <!-- single configuration CMake generators (make,nmake,etc) -->
     <scope>
-        <property name="build.dir" value="${build.root}/$(build.type?Release)"/>
+        <property name="build.dir" value="${build.root}/${build.type}"/>
         <property name="cmake.source.dir" value="../.."/> 
-        <property name="cmake.recipe.args" value="-D CMAKE_BUILD_TYPE=$(build.type?Release)"/>
+        <property name="cmake.recipe.args" value="-D CMAKE_BUILD_TYPE=${build.type}"/>
 
         <recipe name="GMake Linux Continuous">
             <property name="cmake.generator" value="Unix Makefiles"/>
@@ -182,7 +182,7 @@
             <property name="cmake.generator" value="NMake Makefiles"/>
 
             <property name="cmake.recipe.args"
-                      value="${cmake.recipe.args} -D ACMAKE_PARALLEL_CL=$(parallel.jobs?1)"/>
+                      value="${cmake.recipe.args} -D ACMAKE_PARALLEL_CL=${parallel.jobs}"/>
 
             <macro-ref macro="${run_cmake}"/>
             <macro-ref macro="${run_nmake_build}"/>
@@ -194,7 +194,7 @@
             <property name="cmake.generator" value="NMake Makefiles"/>
 
             <property name="cmake.recipe.args"
-                      value="${cmake.recipe.args} -D ACMAKE_PARALLEL_CL=$(parallel.jobs?1)"/>
+                      value="${cmake.recipe.args} -D ACMAKE_PARALLEL_CL=${parallel.jobs}"/>
 
             <macro-ref macro="${run_cmake}"/>
             <macro-ref macro="${run_nmake_build}"/>
@@ -221,7 +221,7 @@
                 <executable exe="${vs.vcbuild.bin}" working-dir="${build.dir}">
                     <arg>/M$(parallel.jobs:1)</arg>
                     <arg>${vcbuild.solution.file}</arg>
-                    <arg>&quot;$(build.type?Release)|${win32.vcbuild.platform}&quot;</arg>
+                    <arg>&quot;${build.type}|${win32.vcbuild.platform}&quot;</arg>
 
                     <process processor="${msbuild.pp}"/>
                 </executable>
