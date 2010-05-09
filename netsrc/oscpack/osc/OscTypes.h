@@ -42,36 +42,32 @@ typedef __int64 int64;
 typedef unsigned __int64 uint64;
 
 #else
-}
 
-#include <stdint.h>
-
-namespace osc {
-
-//typedef long long int64;
-//typedef unsigned long long uint64;
-typedef int64_t int64;
-typedef uint64_t uint64;
+typedef long long int64;
+typedef unsigned long long uint64;
 
 #endif
 
-template <int LongSize>
-struct int32_type {};
+#ifdef __SIZEOF_LONG__
+    #if ( __SIZEOF_LONG__ == 8 )
+        #define x86_64
+    #endif
+#endif
 
-template <>
-struct int32_type<4> {
-    typedef signed long   signed_type;
-    typedef unsigned long unsigned_type;
-};
+#ifdef x86_64
 
-template <>
-struct int32_type<8> {
-    typedef signed int   signed_type;
-    typedef unsigned int unsigned_type;
-};
+//#warning "64 bit version"
+typedef signed int int32;
+typedef unsigned int uint32;
 
-typedef int32_type<sizeof(long)>::signed_type int32;
-typedef int32_type<sizeof(long)>::unsigned_type uint32;
+#else
+//#warning "32 bit version"
+
+typedef signed long int32;
+typedef unsigned long uint32;
+
+#endif
+
 
 
 enum TypeTagValues {
