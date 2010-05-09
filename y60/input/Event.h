@@ -67,6 +67,8 @@
 
 #include <asl/dom/typedefs.h>
 
+// XXX
+#warning testing cmake/pulse dependency issues
 
 namespace y60 {
 
