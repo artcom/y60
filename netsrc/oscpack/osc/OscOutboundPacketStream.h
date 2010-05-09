@@ -97,8 +97,7 @@ public:
     OutboundPacketStream& operator<<( const InfinitumType& rhs );
     OutboundPacketStream& operator<<( int32 rhs );
 
-//#ifndef x86_64
-#if 0
+#ifndef x86_64
     OutboundPacketStream& operator<<( int rhs )
             { *this << (int32)rhs; return *this; }
 #endif
