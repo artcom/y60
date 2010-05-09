@@ -692,35 +692,37 @@ JSScene::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
     JSScene * myNewObject = 0;
 
     try {
-        if (argc == 0) {
-            AC_INFO << "no filename, creating scene stubs";
-            PackageManagerPtr myPackageManager = JSApp::getPackageManager();
-            myNewPtr = y60::Scene::createStubs(myPackageManager);
-        }
-        asl::Ptr<ProgressCallback> myCallback;
-        if (argc >= 3) {
-            JSObject * myTarget = JSVAL_TO_OBJECT(argv[1]);
-            string myHandler;
-            convertFrom(cx, argv[2], myHandler);
-            myCallback = asl::Ptr<ProgressCallback>(new ProgressCallback(cx, myTarget,
-                    myHandler));
-        }
-
-        if (argc >= 1) {
-            std::string myFilename = as_string(cx, argv[0]);
-            bool lazyFlag = false;
-            if (argc == 2) {
-                convertFrom(cx, argv[0], lazyFlag);
+        if (!isCalledForConversion(cx, argc,argv)) {
+            if (argc == 0) {
+                AC_INFO << "no filename, creating scene stubs";
+                PackageManagerPtr myPackageManager = JSApp::getPackageManager();
+                myNewPtr = y60::Scene::createStubs(myPackageManager);
+            }
+            asl::Ptr<ProgressCallback> myCallback;
+            if (argc >= 3) {
+                JSObject * myTarget = JSVAL_TO_OBJECT(argv[1]);
+                string myHandler;
+                convertFrom(cx, argv[2], myHandler);
+                myCallback = asl::Ptr<ProgressCallback>(new ProgressCallback(cx, myTarget,
+                        myHandler));
             }
 
-            PackageManagerPtr myPackageManager = JSApp::getPackageManager();
-            AC_INFO << "Loading Scene " << getFilenamePart(myFilename) << " from "
-                    << getDirectoryPart(myFilename)<<", lazy="<<lazyFlag;
-            myPackageManager->add(asl::getDirectoryPart(myFilename));
-            myNewPtr = y60::Scene::load(getFilenamePart(myFilename), myPackageManager,
-                        myCallback, true, lazyFlag);
-        }
+            if (argc >= 1) {
+                std::string myFilename = as_string(cx, argv[0]);
+                bool lazyFlag = false;
+                if (argc == 2) {
+                    convertFrom(cx, argv[0], lazyFlag);
+                }
 
+                PackageManagerPtr myPackageManager = JSApp::getPackageManager();
+                AC_INFO << "Loading Scene " << getFilenamePart(myFilename) << " from "
+                        << getDirectoryPart(myFilename)<<", lazy="<<lazyFlag;
+                myPackageManager->add(asl::getDirectoryPart(myFilename));
+                myNewPtr = y60::Scene::load(getFilenamePart(myFilename), myPackageManager,
+                            myCallback, true, lazyFlag);
+            }
+
+        }
         myNewObject = new JSScene(myNewPtr, myNewPtr.get());
         if (myNewObject) {
             JS_SetPrivate(cx,obj,myNewObject);
