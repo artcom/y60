@@ -45,17 +45,31 @@ spark.Window.Constructor = function(Protected) {
         
         // Get the camera from the 3d world and place a copy of it in the original first world
         // The copy must have a unique id.
-        _myCamera = _myWorld.find(".//camera[@name='perspShape']"); 
+        _myCamera = _myWorld.find(".//camera[@name='perspShape']");
         var mySparkCam = _myCamera.cloneNode();
         mySparkCam.id = createUniqueId();
         mySparkWorld.appendChild(mySparkCam);
+        
+        // remove old Headlight with wrong id due to realloctaion of nodes
+        var myHeadlight = _myCamera.find(".//light");
+        _myCamera.removeChild(myHeadlight);
         
         // hook the new camera to the viewport (before it pointed to the 3d world's camera)
         var myViewport = window.scene.dom.find("//viewport");
         myViewport.camera = mySparkCam.id;
         
-        Public.worlds['spark'] = window.scene.dom.firstChild.firstChild;
-        Public.worlds['3d']    = window.scene.dom.find(".//world[@name='3d-world']");
+        // set new Lighting for 2d-viewport
+        var myLightManager = Public.getLightManager();
+        var myCanvas = window.scene.dom.find("//viewport/..");
+        myLightManager.setupDefaultLighting(myCanvas);
+        
+        Public.worlds['2d'] = window.scene.dom.firstChild.firstChild;
+        Public.worlds['3d'] = window.scene.dom.find(".//world[@name='3d-world']");
+        
+        // XXX TODO: 
+        //      - setup viewport for 3d, 
+        //      - rename function?!, 
+        //      - investigate activeViewport
     }
 
     Base.realize = Public.realize;
