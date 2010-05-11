@@ -28,7 +28,7 @@ spark.Window.Constructor = function(Protected) {
         window.title = theTitle;
     };
     
-    function cleanupWorld() {
+    function seperateWorld() {
         // This is the first world - it contains the loaded x60 model
         var mySparkWorld = window.scene.dom.firstChild.firstChild;
         // Create a new world for the 3d elements
@@ -94,18 +94,18 @@ spark.Window.Constructor = function(Protected) {
                      Protected.getBoolean("fullscreen", false),
                      Protected.getString("title", "SPARK Application"));
         
-        var performCleanup = Protected.getBoolean("performCleanup", false);
+        var worldSeperation = Protected.getBoolean("worldSeperation", false);
         if (mySceneFile.length > 0) {
-            if(performCleanup) {
-                cleanupWorld();
+            if(worldSeperation) {
+                seperateWorld();
             } else {
-                Public.worlds['spark'] = window.scene.dom.firstChild.firstChild;
+                Public.worlds['2d'] = window.scene.dom.firstChild.firstChild;
             }
             if (_mySceneLoadedCallback) {
                 _mySceneLoadedCallback(window.scene.dom);
             }
         } else {
-            Public.worlds['spark'] = window.scene.dom.firstChild.firstChild;
+            Public.worlds['2d'] = window.scene.dom.firstChild.firstChild;
         }
 
         Public.setMover(null);
@@ -129,6 +129,19 @@ spark.Window.Constructor = function(Protected) {
         Protected.updateMouseButtonState(spark.Mouse.TERTIARY,  false);
 
         Base.realize(window.scene.world);
+        
+        if(worldSeperation) {
+            // if 3d world existent, then render it to another canvas in the window
+            var my3dCanvas = new spark.OffscreenCanvas();
+            my3dCanvas.name   = "3D-canvas";
+            Public.addChild(my3dCanvas);
+            my3dCanvas.camera = _myCamera;
+            my3dCanvas.realize();
+            my3dCanvas.width  = Public.width;
+            my3dCanvas.height = Public.height;
+            my3dCanvas.position = new Vector3f(0,0,0);
+            my3dCanvas.postRealize();
+        }
     };
 
     // XXX: Override size, width and height properties inherited via Stage->Widget
