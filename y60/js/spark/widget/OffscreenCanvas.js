@@ -6,7 +6,6 @@ spark.OffscreenCanvas.Constructor = function (Protected) {
     var Base = {};
     this.Inherit(spark.Image);
 
-    var _myWorld = null;
     var _myCanvasTexture = null;
     var _myRenderArea = null;
     var _myCamera = null;
@@ -14,7 +13,6 @@ spark.OffscreenCanvas.Constructor = function (Protected) {
     Base.realize = Public.realize;
     Public.realize = function () {
         Base.realize();
-        setupOffscreenRenderer();
         setup3dView();
     };
     
@@ -57,7 +55,8 @@ spark.OffscreenCanvas.Constructor = function (Protected) {
         myViewport3d.camera = _myCamera.id;
 
         // create headlight for 3d-viewport
-        var myLightManager = Public.stage.getLightManager();
+        var myWorld = window.scene.dom.find(".//camera[@id='"+_myCamera.id+"']/..");
+        var myLightManager = new LightManager(window.scene, myWorld);
         myLightManager.setupDefaultLighting(myCanvas);
         
         //XXX: This is turning lighting off for the 3d scene, depends on model, 

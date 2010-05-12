@@ -65,11 +65,6 @@ spark.Window.Constructor = function(Protected) {
         
         Public.worlds['2d'] = window.scene.dom.firstChild.firstChild;
         Public.worlds['3d'] = window.scene.dom.find(".//world[@name='3d-world']");
-        
-        // XXX TODO: 
-        //      - setup viewport for 3d, 
-        //      - rename function?!, 
-        //      - investigate activeViewport
     }
 
     Base.realize = Public.realize;
