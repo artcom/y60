@@ -41,17 +41,19 @@ using namespace std;
 
 struct _PLExifTranslator
 {
-  int         Value;
-  char *      Desc;
+  int          Value;
+  const char * Desc;
 };
+
+typedef void (PLExifTag::*ConvertFunc)(std::string &);
 
 struct _PLExifTagValues
 {
-  PLUINT      Tag;            // The tag #
-  char *      ShortName;      // Short name for the tag
-  _PLExifTranslator *Trans;    // Translate values / units
-  void        (PLExifTag::*Convert)(std::string &);  // convert to common format
-  char *      Desc;           // Normal name for the tag
+  PLUINT              Tag;       // The tag #
+  const char *        ShortName; // Short name for the tag
+  _PLExifTranslator * Trans;     // Translate values / units
+  ConvertFunc         Convert;   // convert to common format  
+  const char *        Desc;      // Normal name for the tag
 };
 
 struct _PLExifFormatter
@@ -82,12 +84,14 @@ _PLExifTranslator OffOn[] = {
     {0,  NULL}
 };
 
+/* XXX unused
 _PLExifTranslator OnOff[] = {
     {0, "On"},
     {1, "Off"},
     {0,  NULL}
 
 };
+*/
 
 _PLExifTranslator DisableEnable[] = {
     {0, "Disable"},
@@ -554,6 +558,7 @@ _PLExifTranslator FujiFlashMode[] = {
 
 };
 
+/* XXX unused
 _PLExifTranslator FujiFlashStrg[] = {
     {0, "Auto"},
     {1, "On"},
@@ -562,7 +567,9 @@ _PLExifTranslator FujiFlashStrg[] = {
     {0,  NULL}
 
 };
+*/
 
+/* XXX unused
 _PLExifTranslator FujiMacro[] = {
     {0, "Off"},
     {1, "Macro"},
@@ -570,6 +577,7 @@ _PLExifTranslator FujiMacro[] = {
     {0,  NULL}
 
 };
+*/
 
 _PLExifTranslator FujiFocus[] = {
     {0, "Auto"},
@@ -826,12 +834,12 @@ _PLExifTranslator CasioExp[] = {
 
 
 // Units
-_PLExifTranslator UnitsSec[] = { VALUE_UNIT, "s" };
-_PLExifTranslator UnitsM[] =   { VALUE_UNIT, "m" };
-_PLExifTranslator UnitsMM[] =  { VALUE_UNIT, "mm" };
-_PLExifTranslator UnitsX[] =   { VALUE_UNIT, "x" };
+_PLExifTranslator UnitsSec[] = {{VALUE_UNIT, "s"}};
+_PLExifTranslator UnitsM[] =   {{VALUE_UNIT, "m"}};
+_PLExifTranslator UnitsMM[] =  {{VALUE_UNIT, "mm"}};
+_PLExifTranslator UnitsX[] =   {{VALUE_UNIT, "x"}};
 
-_PLExifTranslator LowerStr[] = { VALUE_LOWER_STR, NULL };
+_PLExifTranslator LowerStr[] = {{VALUE_LOWER_STR, NULL}};
 
 
 PLUINT rgMask[] = { 0, 0x000000FF, 0x0000FFFF, 0x00FFFFFF, 0xFFFFFF };
@@ -1691,7 +1699,7 @@ void PLExif::FormatRange(double Low, double High, string & Str)
     Str = LStr + '-' + HStr;
 }
 
-void PLExif::ReadIFD(const _PLExifTagValues *Tags, char * Prefix, PLExifTagList & sectionList)
+void PLExif::ReadIFD(const _PLExifTagValues *Tags, const char * Prefix, PLExifTagList & sectionList)
 {
   size_t      NoDir, DirPos, Index;
   size_t      TagNo, Format, NoComp, Offset;

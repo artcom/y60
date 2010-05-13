@@ -133,7 +133,7 @@ void PLPicEncoder::SetTraceConfig( int Level, char * pszFName )
   PLPicDecoder::SetTraceConfig( Level, pszFName );
 }
 
-void PLPicEncoder::raiseError( int Code, char * pszErr )
+void PLPicEncoder::raiseError( int Code, const char * pszErr )
 {
   PLPicDecoder::raiseError( Code, pszErr );
 }
