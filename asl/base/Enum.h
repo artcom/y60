@@ -294,7 +294,7 @@ class Bitset : public std::bitset<THE_ENUM::MAX> {
                 return is;
             }
 
-            THE_ENUM myEnum;
+            THE_ENUM myEnum(static_cast<typename THE_ENUM::Native>(THE_ENUM::MAX));
             while ( is.good() && ! is.eof() ) {
 
                 myEnum.parse(is);

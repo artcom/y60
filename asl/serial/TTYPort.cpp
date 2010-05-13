@@ -271,7 +271,7 @@ TTYPort::read(char * theBuffer, size_t & theSize) {
         }
     }
 
-    if (myReadBytes == theSize) {
+    if (myReadBytes == (int)theSize) {
         AC_TRACE << "TTYPort: read all " << myReadBytes << " bytes";
         return true;
     } else {
@@ -294,7 +294,7 @@ TTYPort::write(const char * theBuffer, size_t theSize) {
         return;
     }
 
-    if (theSize != myWrittenBytes) {
+    if ((int)theSize != myWrittenBytes) {
         throw SerialPortException(string("Can not write ") + as_string(theSize) +
                                " bytes to " + getDeviceName() + ". Only " +
                                as_string(myWrittenBytes) + " bytes got written.",

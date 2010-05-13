@@ -68,8 +68,8 @@ bool Pump::_myUseRealPump = true;
 Pump::Pump (SampleFormat mySF, unsigned myTimeStartDelay)
     : AudioTimeSource(myTimeStartDelay, getSampleRateConfig()),
       _myRunning(false),
-      _myNumUnderruns(0),
       _mySF(mySF),
+      _myNumUnderruns(0),
       _myVolumeFader(mySF),
       _doBritzelTest(false),
       _numClicks(0),

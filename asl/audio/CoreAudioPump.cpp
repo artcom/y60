@@ -186,7 +186,7 @@ CoreAudioPump::pump(AudioUnitRenderActionFlags    *inActionFlags,
 {
     OSStatus err= noErr;
     mix(_myOutputBuffer, inNumFrames);
-    int myCurFrame = 0;
+    UInt32 myCurFrame = 0;
     int curBuffer = 0;
     while (myCurFrame != inNumFrames) {
         ::AudioBuffer & myCoreAudioBuffer = ioData->mBuffers[curBuffer];
