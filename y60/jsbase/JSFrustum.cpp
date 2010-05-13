@@ -319,7 +319,7 @@ JSFrustum::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, 
             }
         case PROP_type:
             {
-                ProjectionType myProjection;
+                ProjectionType myProjection(ORTHONORMAL);
                 convertFrom(cx, * vp, myProjection);
                 myObj.getNative().setType(myProjection);
                 return JS_TRUE;

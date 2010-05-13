@@ -207,6 +207,7 @@ TransportLayer::poll() {
             readData();
             handleConfigurationCommand();
             break;
+        case DriverStateEnum_MAX: break; // avoid warning
     }
 }
 

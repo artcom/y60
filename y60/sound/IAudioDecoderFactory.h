@@ -76,6 +76,7 @@ class IAudioDecoderFactory
 {
     public:
         // Throws a decoder exception if not successful.
+        virtual ~IAudioDecoderFactory(){};
         virtual IAudioDecoder* tryCreateDecoder(const std::string& myURI) = 0;
         virtual int getPriority() const = 0; // Decoders with lower priority get checked first.
 

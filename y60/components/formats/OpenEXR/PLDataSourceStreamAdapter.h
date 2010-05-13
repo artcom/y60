@@ -77,7 +77,7 @@ class PLDataSourceStreamAdapter : public Imf::IStream {
         {}
 
         bool read (char theDataSink[], int theDataLength) {
-            if (_myReadPosition + theDataLength <= _myDataSize) {
+            if (_myReadPosition + theDataLength <= (unsigned)_myDataSize) {
                 memcpy((void*)theDataSink, (void*)(_myData + _myReadPosition), theDataLength);
                 _myReadPosition += theDataLength;
                 return true;

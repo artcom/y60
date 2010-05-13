@@ -76,8 +76,8 @@ struct StlHeader {
  */
 class StlCodec {
 public:
-    const static int HEADER_SIZE = 80;
-    const static int FACET_SIZE = 50; // NOTE: the record size is 50 bytes,
+    const static size_t HEADER_SIZE = 80;
+    const static size_t FACET_SIZE = 50; // NOTE: the record size is 50 bytes,
     //       but sizeof(StlFacet) = 52 (arch dependant)
     const static int NUM_FACET_SIZE = 4;
     const static unsigned short StlColorValid = 0x8000;
