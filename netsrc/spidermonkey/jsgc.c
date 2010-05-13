@@ -1278,9 +1278,9 @@ js_ForceGC(JSContext *cx, uintN gcflags)
 {
     uintN i;
     JSRuntime *rt;
-    JSArena *a;
-    uint8 flags, *flagp, *split;
-    JSGCThing *thing, *limit;
+    //JSArena *a;
+    //uint8 flags, *flagp, *split;
+    //JSGCThing *thing, *limit;
 
     for (i = 0; i < GCX_NTYPES; i++)
         cx->newborn[i] = NULL;
@@ -1555,8 +1555,6 @@ restart:
 #endif
        goto finalize;
     }
-
-mark:
 
     /*
      * Mark phase.

@@ -1671,7 +1671,10 @@ JS_PUBLIC_API(void)
 JS_MaybeGC(JSContext *cx)
 {
     JSRuntime *rt;
-    uint32 bytes, lastBytes;
+    // XXX this is something serious! 'bytes' is used uninitialized in the
+    // else-if branch below. Unfortunately i don't know what the code is trying
+    // to do... [DS]
+    uint32 bytes;
 
     rt = cx->runtime;
     if (rt->gcMallocBytes > rt->gcMaxBytes) {
