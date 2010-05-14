@@ -51,7 +51,7 @@ int execute(char * command) {
         return -1;
 
     if (pid == 0) {
-        char * const argv[4] = { "sh", "-c", command, 0};
+        char * const argv[4] = { (char*)"sh", (char*)"-c", command, 0};
         execve("/bin/sh", argv, 0);
         exit(127);
     }

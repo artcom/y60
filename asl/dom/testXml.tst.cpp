@@ -313,7 +313,7 @@ int main(int argc, char* argv[])
     else {
         asl::Time total_time = 0;
 
-        std::vector<char*> file_name;
+        std::vector<const char*> file_name;
 /*
 --> orig
 00:05.296

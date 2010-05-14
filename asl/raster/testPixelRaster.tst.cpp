@@ -160,6 +160,7 @@ public:
     void run() {
 
         MAT myMap(5,5,
+            (char*)
             "ABCDE"
             "FGHIJ"
             "KLMNO"
@@ -175,6 +176,7 @@ public:
         ENSURE(myMap == subMap);
 
         MAT nonSquareMap(7,4,
+            (char*)
             "ABCDEFG"
             "HIJKLMN"
             "OPQRSTU"
@@ -182,6 +184,7 @@ public:
         DDUMP(subMap);
 
         MAT expectedResultMap(3,2,
+            (char*)
             "RST"
             "YZa");
         DDUMP(expectedResultMap);
@@ -346,7 +349,7 @@ typedef asl::NanoTime ptime;
 template <class mat>
 struct iter_perf
 {
-    iter_perf(char* testname)
+    iter_perf(const char* testname)
     {
         cerr << "==== Testing type : " << testname << endl;
         typedef typename mat::iterator mat_iterator;
@@ -706,7 +709,7 @@ struct iter_perf
     }
 };
 
-void scale_perf(char* testname)
+void scale_perf(const char* testname)
 {
     cerr << "starting scale_perf" << endl;
     {
@@ -877,7 +880,7 @@ void scale_perf(char* testname)
     }
 }
 
-void algo_perf(char* testname)
+void algo_perf(const char* testname)
 {
     cerr << "**** algoperf: " << testname << endl;
 
@@ -1302,7 +1305,7 @@ template <class v>
 class ref_perf {
 public:
     typedef typename v::value_type v_value_type;
-    ref_perf(char* testname)
+    ref_perf(const char* testname)
     {
 
         {
