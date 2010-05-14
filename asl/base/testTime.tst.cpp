@@ -23,6 +23,7 @@
 #include "UnitTest.h"
 #include "Time.h"
 #include "TimeStreamFormater.h"
+#include "os_functions.h"
 #include <string>
 #include <iostream>
 
@@ -44,22 +45,22 @@ public:
         testParser("Wed, 02 Aug 2006 14:16:26 GMT", mySecs);
         testParser("Wed, 02 Aug 2006 15:16:26 CET", mySecs);
         testParser("Wed, 02 Aug 2006 16:16:26 CEST", mySecs);
-        setenv("TZ", "UTC", 1);
+        asl::set_environment_var("TZ", "UTC");
         tzset();
         testParser("Wed, 02 Aug 2006 14:16:26 GMT", mySecs);
         testParser("Wed, 02 Aug 2006 15:16:26 CET", mySecs);
         testParser("Wed, 02 Aug 2006 16:16:26 CEST", mySecs);
-        setenv("TZ", "MEZ", 1);
+        asl::set_environment_var("TZ", "MEZ");
         tzset();
         testParser("Wed, 02 Aug 2006 14:16:26 GMT", mySecs);
         testParser("Wed, 02 Aug 2006 15:16:26 CET", mySecs);
         testParser("Wed, 02 Aug 2006 16:16:26 CEST", mySecs);
-        setenv("TZ", "MESZ", 1);
+        asl::set_environment_var("TZ", "MESZ");
         tzset();
         testParser("Wed, 02 Aug 2006 14:16:26 GMT", mySecs);
         testParser("Wed, 02 Aug 2006 15:16:26 CET", mySecs);
         testParser("Wed, 02 Aug 2006 16:16:26 CEST", mySecs);
-        setenv("TZ", "UTC+2", 1);
+        asl::set_environment_var("TZ", "UTC+2");
         tzset();
         testParser("Wed, 02 Aug 2006 14:16:26 GMT", mySecs);
         testParser("Wed, 02 Aug 2006 15:16:26 CET", mySecs);
