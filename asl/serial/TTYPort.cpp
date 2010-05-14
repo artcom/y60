@@ -102,7 +102,7 @@ TTYPort::open(unsigned int theBaudRate, unsigned int theDataBits,
              << " stopbits: "  << theStopBits
              << " handshake: " << theHWHandShakeFlag << endl;
 
-    mode_t myOpenMode = O_RDWR | O_NOCTTY;
+    mode_t myOpenMode = mode_t(O_RDWR | O_NOCTTY);
     mode_t myOpenNonBlockMode = 0;
 
     if (theMinBytesPerRead == 0 && theTimeout == 0) {

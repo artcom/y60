@@ -774,7 +774,7 @@ public:
         std::vector<float> myVec(myNumber, myNumber + 3);
         addTest(new XmlVectorValueUnitTest<dom::VectorValue,std::vector<float>,SimpleValue<float> >("vector<float>",myVec));
 
-        char * myStrings[5] = { "onehunderedtwentyonethousendfivehunderes","",
+        const char * myStrings[5] = { "onehunderedtwentyonethousendfivehunderes","",
             "two", "threemillionfourhundredthousandandfourbillion",
         ""};
         std::vector<DOMString> myStringVec(myStrings, myStrings + 4);

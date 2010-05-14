@@ -66,16 +66,16 @@ void PrintStreamDesc (AudioStreamBasicDescription *inDesc)
         return;
     }
 
-    printf ("- - - - - - - - - - - - - - - - - - - -\n");
-    printf ("  Sample Rate:%f\n", inDesc->mSampleRate);
-    printf ("  Format ID:%s\n", (char*)&inDesc->mFormatID);
-    printf ("  Format Flags:%lX\n", inDesc->mFormatFlags);
-    printf ("  Bytes per Packet:%ld\n", inDesc->mBytesPerPacket);
-    printf ("  Frames per Packet:%ld\n", inDesc->mFramesPerPacket);
-    printf ("  Bytes per Frame:%ld\n", inDesc->mBytesPerFrame);
-    printf ("  Channels per Frame:%ld\n", inDesc->mChannelsPerFrame);
-    printf ("  Bits per Channel:%ld\n", inDesc->mBitsPerChannel);
-    printf ("- - - - - - - - - - - - - - - - - - - -\n");
+    std::cout << "- - - - - - - - - - - - - - - - - - - -" << std::endl
+        << "  Sample Rate:" << inDesc->mSampleRate << std::endl
+        << "  Format ID:" << (char*)&inDesc->mFormatID << std::endl
+        << "  Format Flags:" << inDesc->mFormatFlags << std::endl
+        << "  Bytes per Packet:" << inDesc->mBytesPerPacket << std::endl
+        << "  Frames per Packet:" << inDesc->mFramesPerPacket << std::endl
+        << "  Bytes per Frame:" << inDesc->mBytesPerFrame << std::endl
+        << "  Channels per Frame:" << inDesc->mChannelsPerFrame << std::endl
+        << "  Bits per Channel:" << inDesc->mBitsPerChannel << std::endl
+        << "- - - - - - - - - - - - - - - - - - - -" << std::endl;
 }
 
 
