@@ -61,11 +61,7 @@
 
 #include "y60_openexrdecoder_settings.h"
 
-#ifdef AC_BUILT_WITH_CMAKE
 #include <ImfIO.h>
-#else
-#include <OpenEXR/ImfIO.h>
-#endif
 
 class PLDataSourceStreamAdapter : public Imf::IStream {
     public:

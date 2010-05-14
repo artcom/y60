@@ -69,13 +69,8 @@
 
 #include "SDLApp.h"
 #include "SDLFontInfo.h"
-#ifdef AC_BUILT_WITH_CMAKE
 #include <SDL.h>
 #include <SDL_syswm.h>
-#else
-#include <SDL/SDL.h>
-#include <SDL/SDL_syswm.h>
-#endif
 
 #include <y60/glutil/GLAlloc.h>
 #include <y60/glrender/Renderer.h>

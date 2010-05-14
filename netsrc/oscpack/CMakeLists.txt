@@ -26,7 +26,6 @@ ac_add_project(
     REQUIRED_PACKAGES
         ${REQ_PACKAGES}
     DEFINITIONS
-        -DAC_BUILT_WITH_CMAKE
         ${OSCPACK_ENDIAN_DEFINITION}
 )
 

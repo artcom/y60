@@ -73,11 +73,8 @@
 #define EMULATE_INTTYPES
 #endif
 extern "C" {
-#ifndef AC_BUILT_WITH_CMAKE
-#       include <ffmpeg/avcodec.h>
-#else
-#       include <avcodec.h>
-#endif
+#include <ffmpeg/avcodec.h>
+
 #if LIBAVCODEC_VERSION_INT >= ((51<<16)+(38<<8)+0)
 #   include <libswscale/swscale.h>
 #endif

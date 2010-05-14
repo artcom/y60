@@ -27,11 +27,9 @@
 // XXX ### boost pointers currently cause crashs in JS
 #define AC_DONT_USE_BOOST_PTR
 
-#if defined(AC_BUILT_WITH_CMAKE)
-#   if !defined(AC_USE_BOOST_PTR)
-#       define AC_USE_BOOST_PTR
-#   endif //defined(AC_USE_BOOST_PTR)
-#endif //defined(AC_BUILT_WITH_CMAKE)
+#if !defined(AC_USE_BOOST_PTR)
+#   define AC_USE_BOOST_PTR
+#endif //defined(AC_USE_BOOST_PTR)
 
 #if defined(AC_DONT_USE_BOOST_PTR)
 #   if defined(AC_USE_BOOST_PTR)

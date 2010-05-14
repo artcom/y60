@@ -389,7 +389,7 @@ operator>>(std::istream & is, asl::Bitset<ENUM> & theBitset) {
 
 } // end of namespace
 
-#if defined(AC_BUILT_WITH_CMAKE) && defined(_WIN32)
+#if defined(_WIN32)
 #   define ASL_BASE_ENUM_EXPORT_STATICS(THE_ENUM, DLL_EXPORT_TOKEN) template class DLL_EXPORT_TOKEN asl::Enum<THE_ENUM, THE_ENUM ## _MAX>;
 #   define ASL_BASE_BITSET_EXPORT_STATICS(THE_ENUM_NAME, DLL_EXPORT_TOKEN) template class DLL_EXPORT_TOKEN asl::Bitset<THE_ENUM_NAME>;
 #else
