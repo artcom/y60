@@ -43,5 +43,6 @@ y60_add_component(
     EXTERNS ${EXTERNALS} Boost 
 )
 
-y60_add_jstest(HttpServer mod_HttpServer)
+# XXX Hangs (occasionally) on windows
+# y60_add_jstest(HttpServer mod_HttpServer)
 
