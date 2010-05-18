@@ -291,7 +291,7 @@ class FacadeUnitTest : public UnitTest {
         FacadeUnitTest() : UnitTest("FacadeUnitTest") {  }
         void run() {
             try {
-                char * myTestString =
+                const char * myTestString =
                     "<root id='r0' float='1.2'>\n"
                     "   <child id='c0' bool='1'/>\n"
                     "   <child id='c1'>\n"

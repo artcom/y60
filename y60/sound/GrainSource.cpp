@@ -83,9 +83,9 @@ GrainSource::GrainSource(const std::string& theName,
     _myRatio(1.),
     _myRatioJitter(0.),
     _myAbsoluteFrames(0),
+    _myAudioDataFrames(0),
     _myGrainOffset(0),
-    _myLastBuffersize(0),
-    _myAudioDataFrames(0)
+    _myLastBuffersize(0)
 {
     _myAudioData = AudioBufferPtr(createAudioBuffer(_mySampleFormat, 0u, _numChannels, _mySampleRate));
     _myAudioData->clear();

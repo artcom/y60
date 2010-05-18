@@ -64,7 +64,7 @@ public:
 
         {
             struct {
-                char * definition;
+                const char * definition;
                 unsigned numElements;
             } myPaths[] = {
                 { "M 0 0 l 0 50 l 10 50 l -10 50 l -50 0 z", 5 },

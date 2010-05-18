@@ -27,11 +27,9 @@
 // XXX ### boost pointers currently cause crashs in JS
 #define AC_DONT_USE_BOOST_PTR
 
-#if defined(AC_BUILT_WITH_CMAKE)
-#   if !defined(AC_USE_BOOST_PTR)
-#       define AC_USE_BOOST_PTR
-#   endif //defined(AC_USE_BOOST_PTR)
-#endif //defined(AC_BUILT_WITH_CMAKE)
+#if !defined(AC_USE_BOOST_PTR)
+#   define AC_USE_BOOST_PTR
+#endif //defined(AC_USE_BOOST_PTR)
 
 #if defined(AC_DONT_USE_BOOST_PTR)
 #   if defined(AC_USE_BOOST_PTR)
@@ -73,17 +71,17 @@ namespace asl {
 
     template <class ThreadingModel>
     struct ReferenceCounter {
-        ReferenceCounter(long theSmartCount = 1, long theWeakCount = 1) :
+        ReferenceCounter(ptrdiff_t theSmartCount = 1, ptrdiff_t theWeakCount = 1) :
             smartCount(theSmartCount),
             weakCount(theWeakCount)
         {}
 
         ReferenceCounter<ThreadingModel>* getNextPtr() const {
-            return reinterpret_cast<ReferenceCounter<ThreadingModel>*>((long)smartCount);
+            return reinterpret_cast<ReferenceCounter<ThreadingModel>*>((ptrdiff_t)smartCount);
         }
 
         void setNextPtr(ReferenceCounter<ThreadingModel> * theNext) {
-            smartCount.set(reinterpret_cast<long>(theNext));
+            smartCount.set(reinterpret_cast<ptrdiff_t>(theNext));
         }
 
         void init() {
@@ -235,17 +233,21 @@ namespace asl {
                 pthread_mutex_lock(&_theMutex_);
                 if (_theFreeListHead_) {
                     ReferenceCounter<ThreadingModel> * result = _theFreeListHead_;
+                    DBP2(std::cout << "recycling old: " << (void*)result << std::endl);
                     _theFreeListHead_ = result->getNextPtr();
+                    DBP2(std::cout << "new head: " << (void*)_theFreeListHead_ << std::endl);
                     pthread_mutex_unlock(&_theMutex_);
                     result->init();
                     return result;
                 } else {
+                    DBP2(std::cout << "allocating new" << std::endl);
                     pthread_mutex_unlock(&_theMutex_);
                     return new ReferenceCounter<ThreadingModel>;
                 }
             }
             static void free(ReferenceCounter<ThreadingModel> * anOldPtr) {
                 pthread_mutex_lock(&_theMutex_);
+                DBP2(std::cout << "free: " << (void*)anOldPtr << std::endl);
                 anOldPtr->setNextPtr(_theFreeListHead_);
                 _theFreeListHead_ = anOldPtr;
                 pthread_mutex_unlock(&_theMutex_);
@@ -591,7 +593,7 @@ namespace asl {
             bool operator<=(const WeakPtr<T,ThreadingModel,Allocator>& rhs) const;
             bool operator>=(const WeakPtr<T,ThreadingModel,Allocator>& rhs) const;
 
-            long use_count() const {
+            ptrdiff_t use_count() const {
                 return getRefCount();
             }
 
@@ -607,7 +609,7 @@ namespace asl {
             T *    _myNativePtr;
             ReferenceCounter<ThreadingModel> * _myRefCountPtr;
 
-            long getRefCount() const {
+            ptrdiff_t getRefCount() const {
                 if (_myRefCountPtr) {
                     return _myRefCountPtr->smartCount;
                 }
@@ -728,7 +730,7 @@ namespace asl {
                     return Ptr<T, ThreadingModel, Allocator>(0);
                 }
 
-                long use_count() const {
+                ptrdiff_t use_count() const {
                     return getRefCount();
                 }
 
@@ -751,14 +753,14 @@ namespace asl {
                 ReferenceCounter<ThreadingModel> * _myRefCountPtr;
 
                 // only use for debugging and tests
-                long getRefCount() const {
+                ptrdiff_t getRefCount() const {
                     if (_myRefCountPtr) {
                         return _myRefCountPtr->smartCount;
                     }
                     return 0;
                 }
 
-                long getWeakCount() const {
+                ptrdiff_t getWeakCount() const {
                     if (_myRefCountPtr) {
                         return _myRefCountPtr->weakCount;
                     }

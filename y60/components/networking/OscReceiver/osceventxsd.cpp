@@ -7,12 +7,12 @@
 // are copy protected by law. They may not be disclosed to third parties
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM GmbH Berlin.
-/* ==========================================================================
+// ==========================================================================
 //
-// !!!!!!! AUTOMATICALLY GENERATED FILE - ONLY PERFORM CHANGES IN THE !!!!!!!
-// !!!!!!!!!!!!!!!!!!!!!!!!! CORRESPONDING XSD FILE !!!!!!!!!!!!!!!!!!!!!!!!!
-*/
-/* ==========================================================================
+// XXX currently not regenerated automatically
+// TODO add asl_add_schema magic to CMakeLists.txt
+//
+// ==========================================================================
 */
 
 #include "y60/base/Y60xsd.h"

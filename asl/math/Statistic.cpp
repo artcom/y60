@@ -73,14 +73,14 @@ namespace asl {
         reset();
     }
 
-    Statistic::Statistic(char * theName, int theOutputIntervalSamples) :
+    Statistic::Statistic(std::string const& theName, int theOutputIntervalSamples) :
         _myName(theName), _myOutputIntervalSamples(theOutputIntervalSamples),
         _myOutputIntervalTime(0.0), _isEnabled(true)
     {
         reset();
     }
 
-    Statistic::Statistic(char * theName, double theOutputIntervalTime) :
+    Statistic::Statistic(std::string const& theName, double theOutputIntervalTime) :
         _myName(theName), _myOutputIntervalSamples(0),
         _myOutputIntervalTime(theOutputIntervalTime), _isEnabled(true)
     {
@@ -147,11 +147,11 @@ namespace asl {
     BoolStatistic::BoolStatistic() : Statistic() {
     }
 
-    BoolStatistic::BoolStatistic(char * theName, int theOutputIntervalSamples) :
+    BoolStatistic::BoolStatistic(std::string const& theName, int theOutputIntervalSamples) :
         Statistic(theName, theOutputIntervalSamples)
     {}
 
-    BoolStatistic::BoolStatistic(char * theName, double theOutputIntervalTime) :
+    BoolStatistic::BoolStatistic(std::string const& theName, double theOutputIntervalTime) :
         Statistic(theName, theOutputIntervalTime)
     {}
 
@@ -170,11 +170,11 @@ namespace asl {
     FrequencyStatistic::FrequencyStatistic() : Statistic(), _lastAddSampleTime(-1) {
     }
 
-    FrequencyStatistic::FrequencyStatistic(char * theName, int theOutputIntervalSamples) :
+    FrequencyStatistic::FrequencyStatistic(std::string const& theName, int theOutputIntervalSamples) :
         Statistic(theName, theOutputIntervalSamples), _lastAddSampleTime(-1)
     {}
 
-    FrequencyStatistic::FrequencyStatistic(char * theName, double theOutputIntervalTime) :
+    FrequencyStatistic::FrequencyStatistic(std::string const& theName, double theOutputIntervalTime) :
         Statistic(theName, theOutputIntervalTime), _lastAddSampleTime(-1)
     {}
 

@@ -48,10 +48,12 @@ typedef unsigned long long uint64;
 
 #endif
 
-#ifdef __SIZEOF_LONG__
-    #if ( __SIZEOF_LONG__ == 8 )
-        #define x86_64
-    #endif
+#if defined(__x86_64__)
+#   define x86_64
+#elif defined(__SIZEOF_LONG__)
+#   if ( __SIZEOF_LONG__ == 8 )
+#       define x86_64
+#   endif
 #endif
 
 #ifdef x86_64

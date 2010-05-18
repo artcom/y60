@@ -72,13 +72,8 @@
 #include "ShapeExporter.h"
 #include "CinemaHelpers.h"
 #include "res/c4d_symbols.h"
-#ifdef AC_BUILT_WITH_CMAKE
 #include "res/description/Facxmlexport.h"
 #include "res/description/Facbinaryexport.h"
-#else
-#include "res/Facxmlexport.h"
-#include "res/Facbinaryexport.h"
-#endif
 
 #include <asl/base/initialization.h>
 #include <asl/base/settings.h>

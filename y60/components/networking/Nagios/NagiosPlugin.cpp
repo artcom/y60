@@ -116,8 +116,8 @@ private:
 NagiosPlugin :: NagiosPlugin(DLHandle theDLHandle) :
 PlugInBase(theDLHandle),
 IRendererExtension("NagiosPlugin"),
-_myPort(2346),
-_myStatusServer()
+_myStatusServer(),
+_myPort(2346)
 {
 }
 

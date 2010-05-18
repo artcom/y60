@@ -291,7 +291,7 @@ class string_functions_UnitTest : public UnitTest {
                 for (unsigned int i = 0; i < 256; ++i) {
                     myInput[i] = static_cast<unsigned char>(i);
                 }
-                char * myOutput =
+                const char * myOutput =
                     "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIj"
                     "JCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0+P0BBQkNERUZH"
                     "SElKS0xNTk9QUVJTVFVWV1hZWltcXV5fYGFiY2RlZmdoaWpr"

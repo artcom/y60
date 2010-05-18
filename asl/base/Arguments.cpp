@@ -42,9 +42,7 @@
 #include "Path.h"
 #include "Logger.h"
 #include "Revision.h"
-#ifdef AC_BUILT_WITH_CMAKE
-#   include <asl/base/buildinfo.h>
-#endif
+#include <asl/base/buildinfo.h>
 
 
 using namespace std;
@@ -213,24 +211,16 @@ Arguments::printCopyright() const {
 
 void
 Arguments::printRevision() const {
-#ifdef AC_BUILT_WITH_CMAKE
     AC_PRINT << _programName << " revision "
              << asl::build_information::get().executable().history_id();
-#else
-    AC_PRINT << "Revision: " << ourRevision;
-#endif
 }
 
 void
 Arguments::printVersion() const {
-#ifdef AC_BUILT_WITH_CMAKE
     asl::build_target_info const& executable = asl::build_information::get().executable();
     AC_PRINT << "Build on " << executable.build_date() << " at "
              << executable.build_time()
              << " (Rev: " << executable.history_id() << ")";
-#else
-    AC_PRINT << "Build on " << __DATE__ << " at " << __TIME__ << " (Rev: " << asl::ourRevision << ")";
-#endif
 }
 
 void

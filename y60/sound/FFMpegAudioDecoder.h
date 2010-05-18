@@ -135,6 +135,7 @@ class FFMpegAudioDecoderFactory: public IAudioDecoderFactory
 {
     public:
         FFMpegAudioDecoderFactory();
+        virtual ~FFMpegAudioDecoderFactory() {};
         virtual IAudioDecoder* tryCreateDecoder(const std::string& myURI);
         virtual int getPriority() const;
 };

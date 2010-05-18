@@ -108,7 +108,7 @@ namespace y60 {
         * Constructor.
         * @param theDLHandle Handle for Plugin Management
         */
-        StlImport (asl::DLHandle theDLHandle) : _myGenerateNormal(false), PlugInBase(theDLHandle) {}
+        StlImport (asl::DLHandle theDLHandle) : PlugInBase(theDLHandle), _myGenerateNormal(false) {}
         ~StlImport() { }
 
         bool decodeScene(asl::Ptr<asl::ReadableStreamHandle> theSource, dom::DocumentPtr theScene);

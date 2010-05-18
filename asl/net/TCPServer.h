@@ -77,7 +77,7 @@ namespace inet {
         public:
             /// creates a new TCPServer listening on port theport on address fromhost.
             TCPServer(asl::Unsigned32 myHost, asl::Unsigned16 myPort, bool theReusePortFlag=false);
-            ~TCPServer();
+            virtual ~TCPServer();
 
             void close();
             /// waits for a client to connect.

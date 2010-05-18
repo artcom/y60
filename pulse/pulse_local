@@ -1,0 +1,10 @@
+#!/bin/bash
+
+RECIPE=$1
+
+pulse local                         \
+    -e pulse/local_resources.xml    \
+    -p pulse/pulse_recipes.xml      \
+    -o _pulse.out                   \
+    -r "$RECIPE"
+

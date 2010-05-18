@@ -61,11 +61,7 @@
 
 #include "y60_openexrdecoder_settings.h"
 
-#ifdef AC_BUILT_WITH_CMAKE
 #include <ImfIO.h>
-#else
-#include <OpenEXR/ImfIO.h>
-#endif
 
 class PLDataSourceStreamAdapter : public Imf::IStream {
     public:
@@ -77,7 +73,7 @@ class PLDataSourceStreamAdapter : public Imf::IStream {
         {}
 
         bool read (char theDataSink[], int theDataLength) {
-            if (_myReadPosition + theDataLength <= _myDataSize) {
+            if (_myReadPosition + theDataLength <= (unsigned)_myDataSize) {
                 memcpy((void*)theDataSink, (void*)(_myData + _myReadPosition), theDataLength);
                 _myReadPosition += theDataLength;
                 return true;

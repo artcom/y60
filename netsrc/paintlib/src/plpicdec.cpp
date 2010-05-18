@@ -406,7 +406,7 @@ void PLPicDecoder::Close
 
 void PLPicDecoder::raiseError
     ( int Code,
-      char * pszErr
+      const char * pszErr
     )
     // This function is needed by callbacks outside of any object,
     // so it's public and static. It should not be called from
@@ -433,7 +433,7 @@ void PLPicDecoder::Trace
       FILE * pFile = fopen (m_pszTraceFName, "a+t");
       if (pFile != (FILE *)0)
       {
-        fprintf (pFile, pszMessage);
+        fprintf (pFile, "%s", pszMessage);
         fclose (pFile);
       }
       else

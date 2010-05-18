@@ -86,7 +86,7 @@ checkArguments(const std::string & theMethodName, uintN argc, jsval *argv,
 
 bool
 isCalledForConversion(JSContext * cx, uintN argc, jsval * argv) {
-    if (JSVAL_IS_STRING(argv[0])) {
+    if (0 < argc && JSVAL_IS_STRING(argv[0])) {
         JSString * myJSString = JSVAL_TO_STRING(argv[0]);
         if (!strcmp(JS_GetStringBytes(myJSString), "CALLED_FROM_AS_JSVAL")) {
             JS_RemoveRoot(cx,&myJSString);

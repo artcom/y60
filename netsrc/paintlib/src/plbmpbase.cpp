@@ -140,17 +140,13 @@ void createTrueColorCopy (PLBmpBase & DestBmp, const PLBmpBase & SrcBmp,
       case 1:
         {
           PLPixel32 * pPal = SrcBmp.GetPalette();
-          DestPixelC blackDot, whiteDot;
+          DestPixelC blackDot(0,0,0);
+          DestPixelC whiteDot(255,255,255);
           // if bi-tonal "palette" exists, use it...
           if (pPal)
           {
             whiteDot = pPal[0];
             blackDot = pPal[1];
-          }
-          else
-          {
-            whiteDot.Set (255,255,255);
-            blackDot.Set (0,0,0);
           }
 
           // assume msb is leftmost

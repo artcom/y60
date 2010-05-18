@@ -20,9 +20,7 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-#ifdef AC_BUILT_WITH_CMAKE
 #include <acmake/aslbase_paths.h>
-#endif
 
 #include <string>
 #include <iostream>
@@ -51,7 +49,7 @@ int execute(char * command) {
         return -1;
 
     if (pid == 0) {
-        char * const argv[4] = { "sh", "-c", command, 0};
+        char * const argv[4] = { (char*)"sh", (char*)"-c", command, 0};
         execve("/bin/sh", argv, 0);
         exit(127);
     }
@@ -73,11 +71,7 @@ int main(int argc, char *argv[]) {
     cerr << myProgramName << " started in directory " << myDirectoryName << endl;
 
     string myScriptName =
-#ifdef AC_BUILT_WITH_CMAKE
         string(CMAKE_CURRENT_SOURCE_DIR) + theDirectorySeparator + "testShellScript.sh";
-#else
-        string("../../") + myProgramName + ".sh";
-#endif
 
     cerr << myProgramName << ": executing script '" << myScriptName << "'" << endl;
 

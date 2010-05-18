@@ -59,11 +59,7 @@
 #include <y60/jsbase/jssettings.h>
 #include <y60/sdlengine/SDLApp.h>
 
-#ifdef AC_BUILT_WITH_CMAKE
 #include <SDL.h>
-#else
-#include <SDL/SDL.h>
-#endif
 
 #include <asl/base/SingletonManager.h>
 
@@ -71,9 +67,7 @@
 #include <asl/base/StdOutputRedirector.h>
 #include <asl/base/string_functions.h>
 #include <asl/base/os_functions.h>
-#ifdef AC_BUILT_WITH_CMAKE
-#   include <asl/base/buildinfo.h>
-#endif
+#include <asl/base/buildinfo.h>
 
 #include <iostream>
 
@@ -95,9 +89,7 @@ const asl::Arguments::AllowedOptionWithDocumentation ourAllowedOptions[] = {
     {"--jit", "", "enable javascript just-in-time compiler"},
     {"--xml", "", ""}, // TODO: check was this does exactly
 #endif
-#ifdef AC_BUILT_WITH_CMAKE
     {"--buildinfo","component|'all'", "print details about this build and exit"},
-#endif
 //    {"--exec", "", "treat first argument expression and execute it"},
     {"--help", "", "print this text and exit."},
      //y60 will quit automatically after some frames taking a screen shot.
@@ -152,7 +144,6 @@ main(int argc, char **argv) {
             return EXIT_SUCCESS;
         }
 
-#ifdef AC_BUILT_WITH_CMAKE
         if (ourArguments.haveOption("--buildinfo")) {
             using asl::build_information;
             std::string component = ourArguments.getOptionArgument("--buildinfo");
@@ -171,7 +162,6 @@ main(int argc, char **argv) {
                 return EXIT_FAILURE;
             }
         }
-#endif // AC_BUILT_WITH_CMAKE
 
         string myIncludePath;
         if (ourArguments.haveOption("-I")) {

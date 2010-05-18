@@ -32,11 +32,9 @@
 #if defined(_MSC_VER)
 #pragma warning(push,1)
 #endif //defined(_MSC_VER)
-#ifdef AC_BUILT_WITH_CMAKE
+
 #include <half.h> // ILM OpenEXR 16Bit floating-point implementation
-#else
-#include <OpenEXR/half.h> // ILM OpenEXR 16Bit floating-point implementation
-#endif
+
 #if defined(_MSC_VER)
 #pragma warning(pop)
 #endif //defined(_MSC_VER)
