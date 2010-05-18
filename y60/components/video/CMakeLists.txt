@@ -15,6 +15,8 @@ endif(LINUX)
 
 if(WIN32)
     #add_subdirectory(WMPPlayer)
-    #add_subdirectory(DShowCapture)
+    if(WINDOWSSDK_FOUND)    
+        add_subdirectory(DShowCapture)
+    endif(WINDOWSSDK_FOUND)        
 endif(WIN32)
 
