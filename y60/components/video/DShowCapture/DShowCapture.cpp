@@ -73,7 +73,7 @@
 #define EMULATE_INTTYPES
 #endif
 extern "C" {
-#include <ffmpeg/avcodec.h>
+#include <libavcodec/avcodec.h>
 
 #if LIBAVCODEC_VERSION_INT >= ((51<<16)+(38<<8)+0)
 #   include <libswscale/swscale.h>
