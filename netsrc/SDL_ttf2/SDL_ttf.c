@@ -49,8 +49,13 @@
 #define FT_OPEN_STREAM ft_open_stream
 #endif
 
+#ifdef AC_BUILT_WITH_CMAKE
 #include <SDL.h>
 #include <SDL_endian.h>
+#else
+#include <SDL/SDL.h>
+#include <SDL/SDL_endian.h>
+#endif
 
 #include "SDL_ttf.h"
 
@@ -354,15 +359,8 @@ TTF_Font* TTF_OpenFontIndexRW( SDL_RWops *src, int freesrc, int ptsize, long ind
 	  // we keep a fallback if ascender or descender is '0'  (vs /2009)
       // removed fallback to bounding box because freetype already does
       // exactly what this code tried to do. (ia /20091218)
-      
-      // sorry reicofil crahes, if we use the approiate freetype way of
-      // getting fonts ascend and descen, so we switch back to bbox 
-      font->ascent  = FT_CEIL(FT_MulFix(face->bbox.yMax, scale)); 
-      font->descent = FT_CEIL(FT_MulFix(face->bbox.yMin, scale)); 
-
-      //font->ascent  = FT_CEIL(FT_MulFix(face->ascender, scale));
-      //font->descent = FT_CEIL(FT_MulFix(face->descender, scale));
-            
+      font->ascent  = FT_CEIL(FT_MulFix(face->ascender, scale));
+      font->descent = FT_CEIL(FT_MulFix(face->descender, scale));
 	  font->height  = font->ascent - font->descent + /* baseline */ 1;
 	  font->lineskip = FT_CEIL(FT_MulFix(face->height, scale));
 	  font->underline_offset = FT_FLOOR(FT_MulFix(face->underline_position, scale));
