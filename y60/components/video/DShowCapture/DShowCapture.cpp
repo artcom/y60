@@ -109,7 +109,12 @@ namespace y60 {
             unsigned myBufferLength = _myGraph->getHeight() * _myGraph->getWidth() * 3;
             if (myBufferLength == theTargetRaster->pixels().size()) {
                 if (_myDeinterlaceFlag) {
-                    int myPixelFormat = PIX_FMT_BGR24;
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52,20,0)
+        PixelFormat
+#else
+        int
+#endif
+                    myPixelFormat = PIX_FMT_BGR24;
                     unsigned myBytesPerPixel = 3;
                     unsigned int myLineSizeBytes = _myGraph->getWidth() * myBytesPerPixel;
 
@@ -133,7 +138,12 @@ namespace y60 {
                     mySrcPict.linesize[1] = myLineSizeBytes;
                     mySrcPict.linesize[2] = myLineSizeBytes;
 
-                    int myDestPixelFormat = PIX_FMT_YUV444P;
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52,20,0)
+        PixelFormat
+#else
+        int
+#endif
+                    myDestPixelFormat = PIX_FMT_YUV444P;
 #if LIBAVCODEC_VERSION_INT < ((51<<16)+(38<<8)+0)
                     img_convert(&myYUVPict, myDestPixelFormat, &mySrcPict, myPixelFormat,
                                 _myGraph->getWidth(), _myGraph->getHeight());
