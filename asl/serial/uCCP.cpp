@@ -57,15 +57,15 @@ namespace asl {
 
     uCCP::uCCP(SerialDevice * theTTY) :
         _myTransportLayer(theTTY),
+        _myStartToken(0xffU),
+        _myEndToken(0xfeU),
+        _myPayloadSize(std::numeric_limits<unsigned>::max()),
+        _myErrorChecking(CRC8_CHECKING),
         _myDroppedBytes(0),
         _myCRCErrors(0),
         _myCorruptPackets(0),
         _myPacketsSend(0),
-        _myPacketsReceived(0),
-        _myStartToken(0xffU),
-        _myEndToken(0xfeU),
-        _myPayloadSize(std::numeric_limits<unsigned>::max()),
-        _myErrorChecking(CRC8_CHECKING)
+        _myPacketsReceived(0)
     {}
 
     void

@@ -1,3 +1,6 @@
+/*jslint nomen: false, white: false*/
+/*global spark, use, SceneViewer, window*/
+
 /**
  * Simple wrapper for the Y60 scene viewer.
  */
@@ -11,6 +14,9 @@ spark.Window.Constructor = function(Protected) {
     var Base = {};
 
     this.Inherit(spark.Stage);
+    
+    var _myCamera = null;
+    var _myWorld = null;
 
     SceneViewer.prototype.Constructor(this, []);
 
@@ -21,9 +27,49 @@ spark.Window.Constructor = function(Protected) {
     Public.title setter = function(theTitle) {
         window.title = theTitle;
     };
+    
+    function seperateWorld() {
+        // This is the first world - it contains the loaded x60 model
+        var mySparkWorld = window.scene.dom.firstChild.firstChild;
+        // Create a new world for the 3d elements
+        _myWorld = Node.createElement("world");
+        _myWorld.name = "3d-world";
+        window.scene.dom.firstChild.appendChild(_myWorld);
+        
+        // move all over to the new world (at this moment the first world
+        // does not yet contain spark quads)
+        while (mySparkWorld.childNodesLength()) {
+            var myNode = mySparkWorld.removeChild(mySparkWorld.firstChild);
+            _myWorld.appendChild(myNode);
+        }
+        
+        // Get the camera from the 3d world and place a copy of it in the original first world
+        // The copy must have a unique id.
+        _myCamera = _myWorld.find(".//camera[@name='perspShape']");
+        var mySparkCam = _myCamera.cloneNode();
+        mySparkCam.id = createUniqueId();
+        mySparkWorld.appendChild(mySparkCam);
+        
+        // remove old Headlight with wrong id due to realloctaion of nodes
+        var myHeadlight = _myCamera.find(".//light");
+        _myCamera.removeChild(myHeadlight);
+        
+        // hook the new camera to the viewport (before it pointed to the 3d world's camera)
+        var myViewport = window.scene.dom.find("//viewport");
+        myViewport.camera = mySparkCam.id;
+        
+        // set new Lighting for 2d-viewport
+        var myLightManager = Public.getLightManager();
+        var myCanvas = window.scene.dom.find("//viewport/..");
+        myLightManager.setupDefaultLighting(myCanvas);
+        
+        Public.worlds['2d'] = window.scene.dom.firstChild.firstChild;
+        Public.worlds['3d'] = window.scene.dom.find(".//world[@name='3d-world']");
+    }
 
     Base.realize = Public.realize;
     Public.realize = function() {
+        Public.worlds = {}; // 'spark' and potentially '3d' is possible
         window = new RenderWindow();
 
         window.position = [
@@ -36,14 +82,25 @@ spark.Window.Constructor = function(Protected) {
 
         var mySceneFile = Protected.getString("sceneFile", "");
         if (mySceneFile.length > 0) {
-            Public.setModelName( mySceneFile );
+            Public.setModelName(mySceneFile);
         }
         Public.setup(Protected.getNumber("width", 640),
                      Protected.getNumber("height", 480),
                      Protected.getBoolean("fullscreen", false),
                      Protected.getString("title", "SPARK Application"));
-        if (mySceneFile.length > 0 && _mySceneLoadedCallback) {
-            _mySceneLoadedCallback(window.scene.dom);
+        
+        var worldSeperation = Protected.getBoolean("worldSeperation", false);
+        if (mySceneFile.length > 0) {
+            if(worldSeperation) {
+                seperateWorld();
+            } else {
+                Public.worlds['2d'] = window.scene.dom.firstChild.firstChild;
+            }
+            if (_mySceneLoadedCallback) {
+                _mySceneLoadedCallback(window.scene.dom);
+            }
+        } else {
+            Public.worlds['2d'] = window.scene.dom.firstChild.firstChild;
         }
 
         Public.setMover(null);
@@ -67,6 +124,19 @@ spark.Window.Constructor = function(Protected) {
         Protected.updateMouseButtonState(spark.Mouse.TERTIARY,  false);
 
         Base.realize(window.scene.world);
+        
+        if(worldSeperation) {
+            // if 3d world existent, then render it to another canvas in the window
+            var my3dCanvas = new spark.OffscreenCanvas();
+            my3dCanvas.name   = "3D-canvas";
+            Public.addChild(my3dCanvas);
+            my3dCanvas.camera = _myCamera;
+            my3dCanvas.realize();
+            my3dCanvas.width  = Public.width;
+            my3dCanvas.height = Public.height;
+            my3dCanvas.position = new Vector3f(0,0,0);
+            my3dCanvas.postRealize();
+        }
     };
 
     // XXX: Override size, width and height properties inherited via Stage->Widget
@@ -421,10 +491,9 @@ spark.Window.Constructor = function(Protected) {
             if(myId in _myMultitouchCursors) {
                 Logger.debug("Cursor " + myId + " removed");
 
-                var myCursor = _myMultitouchCursors[myId];
-
+                var myCursor   = _myMultitouchCursors[myId];
                 var myPosition = getMultitouchCursorPosition(theEvent);
-                var myFocused = myCursor.focused;
+                var myFocused  = myCursor.focused;
 
                 myCursor.update(myFocused, myPosition);
 

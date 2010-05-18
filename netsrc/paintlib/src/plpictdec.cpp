@@ -1149,7 +1149,7 @@ void PLPictDecoder::readRect
 
 
 void PLPictDecoder::dumpRect
-    ( char * psz,
+    ( const char * psz,
       MacRect * pr
     )
 {

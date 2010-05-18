@@ -5,14 +5,8 @@ project(Spidermonkey)
 
 include(AcMake)
 
-if(UNIX)
-    if(APPLE)
-        # Apple Mac OS X
-        set(SPIDERMONKEY_DEFINITIONS -DXP_UNIX)
-    else(APPLE)
-        # Linux
-        set(SPIDERMONKEY_DEFINITIONS -DXP_UNIX -DHAVE_VA_COPY -DVA_COPY=va_copy)
-    endif(APPLE)
+if(UNIX) # Apple and Linux, that is ...
+    set(SPIDERMONKEY_DEFINITIONS -DXP_UNIX -DHAVE_VA_COPY -DVA_COPY=va_copy)
 endif(UNIX)
 
 if(WIN32)

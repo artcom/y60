@@ -1398,7 +1398,6 @@ namespace y60 {
             asl::Ptr<Primitive::SphereContactsList> myContacts =
                 asl::Ptr<Primitive::SphereContactsList>(new Primitive::SphereContactsList);
 
-            const y60::PrimitiveVector & myPrimitives = theShape->getPrimitives();
             // try shape
             if (theShape->collide(_mySphere, _myMotion, theTransformation, *myContacts)) {
                 // store collision information

@@ -153,7 +153,7 @@ public:
 private:
   void                  decode();   // do the actual decoding of the EXIF data
 
-  void                  ReadIFD(const _PLExifTagValues * Tags, char * Prefix, PLExifTagList & sectionList);
+  void                  ReadIFD(const _PLExifTagValues * Tags, const char * Prefix, PLExifTagList & sectionList);
   void                  ExpandBinaryTag(const std::string & Src, const _PLExifTagValues *Tags, PLUINT Type, PLExifTagList & sectionList);
   void                  DecodeCanCustomFncs(const PLExifTag & rootTag, const _PLExifTagValues *Tags, PLExifTagList & sectionList);
 

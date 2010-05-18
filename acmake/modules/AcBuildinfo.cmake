@@ -67,20 +67,23 @@ if(ACMAKE_BUILDINFO)
                     WORKING_DIRECTORY ${GIT_REPOSITORY}
                     OUTPUT_VARIABLE GIT_BRANCHES
                 )
-            
                 string(REGEX MATCH "\\* ([a-zA-Z0-9_-]*)" GIT_BRANCH_MATCH "${GIT_BRANCHES}")
                 set(GIT_BRANCH ${CMAKE_MATCH_1})
 
-                file(STRINGS "${GIT_REPOSITORY}/.git/refs/heads/${GIT_BRANCH}" GIT_COMMIT
-                    REGEX "[a-f0-9]*"
-                    LIMIT_COUNT 1
-                    NO_HEX_CONVERSION
+                execute_process(
+                    COMMAND git rev-parse HEAD
+                    WORKING_DIRECTORY ${GIT_REPOSITORY}
+                    OUTPUT_VARIABLE GIT_COMMIT
                 )
+                string(STRIP ${GIT_COMMIT} GIT_COMMIT)
 
                 set(GIT_DEPEND_FILES
-                    "${GIT_REPOSITORY}/.git/refs/heads/${GIT_BRANCH}"
                     "${GIT_REPOSITORY}/.git/HEAD"
                 )
+
+                if(EXISTS ${GIT_REPOSITORY}/.git/refs/heads/${GIT_BRANCH})
+                    list(APPEND GIT_DEPEND_FILES "${GIT_REPOSITORY}/.git/refs/heads/${GIT_BRANCH}")
+                endif(EXISTS ${GIT_REPOSITORY}/.git/refs/heads/${GIT_BRANCH})
 
                 set(GIT_ARGS
                     -D "GIT_REPOSITORY=${CMAKE_SOURCE_DIR}"
@@ -124,7 +127,7 @@ macro(_ac_add_repository_info TARGET_NAME BUILDINFO_FILENAME TARGET_TYPE)
                     ${CMAKE_COMMAND}
                           -D "SOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR}"
                           -D "TARGET_NAME=${TARGET_NAME}"
-                          -D "BUILD_CONFIG=${BUILD_TYPE}"
+                          -D "BUILD_CONFIG=${CMAKE_BUILD_TYPE}"
                           -D "TARGET_TYPE=${TARGET_TYPE}"
                           -D "BUILDINFO_FILE=${BUILDINFO_FILENAME}"
                           -D "BUILDINFO_TEMPLATE=${ACMAKE_BUILDINFO_TEMPLATE}"

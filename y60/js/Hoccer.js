@@ -8,7 +8,7 @@ Hoccer.station = function(theParams) {
     var defaultOnErrorFunc = function() {
             Logger.warning( "HTTP Code received: " 
                             + this.responseCode);
-             return true; 
+            return true; 
         };
     var defaultOnDoneFunc = function() {
              return true;
@@ -17,9 +17,9 @@ Hoccer.station = function(theParams) {
             return true; 
         };
 
-    that.userAgent = "Hoccer/0.92dev Y60";
+    that.userAgent = "Hoccer/0.95dev Y60";
     that.serverUri = (typeof(theParams.serverUri) === 'undefined' ? "http://www.hoccer.com" : theParams.serverUri);
-
+    
     //default hoccer station at artcom
     that.longitude = (typeof(theParams.longitude) === 'undefined'?13.345116:theParams.longitude);
     that.latitude = (typeof(theParams.latitude) === 'undefined'?52.501077:theParams.latitude);
@@ -82,7 +82,7 @@ Hoccer.station = function(theParams) {
             var contentType = this.getResponseHeader("Content-Type");
             var fileName = this.getResponseHeader("name");
             if (fileName.length == 0) {
-                fileName = "tempfile";
+                fileName = "DOWNLOADS/" + new Date().valueOf();//"tempfile";
                 if (contentType.indexOf(MimeTypes.png) > -1) {
                     fileName += ".png";
                 } else if (contentType.indexOf(MimeTypes.jpg) > -1) {
@@ -110,30 +110,24 @@ Hoccer.station = function(theParams) {
         myRequestManager.performRequest(request);
     };
 
-    that.prepareDownload = function(thePeerUri, theRepeatCount) {
-        if (typeof (theRepeatCount) === 'undefined') {
-            theRepeatCount = 0;
-        }
-        print("prepare Download from peer uri ", thePeerUri, "repeatcount: ", theRepeatCount);
+    that.prepareDownload = function(thePeerUri) {
+        print("looking for download uri on ", thePeerUri);
         var request = new Request(thePeerUri, that.userAgent);
         request.onDone = function() {
-            print("prepare download done. handle response: ", this.responseString, "  code: ", this.responseCode);
+            print("handling polling response: ", this.responseString, "  code: ", this.responseCode);
             var response = eval("("+this.responseString+")");
             var resources = response.resources;
-            var expires = response.expires;
+            var expires = parseInt(response.expires);
             if (resources.length > 0 && resources[0].length > 0) {
+                print("starting download from '", resources[0], "'");
                 that.download(resources[0]);
             } else {
-                if (theRepeatCount < 7) {
-                    theRepeatCount+=1;
-                    var delayAni = new GUI.DelayAnimation(1000);
-                    delayAni.onFinish = function() {
-                        print("call again with repeatcount ", theRepeatCount);
-                        that.prepareDownload(thePeerUri,theRepeatCount);
-                    };
-                    playAnimation(delayAni);
-                    //window.setTimeout("that.prepareDownload(\""+thePeerUri+"\","+theRepeatCount+")",1000);
-                }
+                var delayedEvent = new GUI.DelayAnimation((expires + 1) * 1000);
+                delayedEvent.onFinish = function() {
+                     print("polling again on ", thePeerUri);
+                     that.prepareDownload(thePeerUri);
+                };
+                playAnimation(delayedEvent);
             }
         };
         request.onError = defaultOnErrorFunc;
@@ -200,7 +194,6 @@ Hoccer.station = function(theParams) {
 
     that.catchIt = function() {
         Logger.debug("catch it");
-
         that.buildPeerGroup({
             isSharing : false,
             onDone : function() {
@@ -208,8 +201,7 @@ Hoccer.station = function(theParams) {
                var response = eval("("+this.responseString+")");
                var peerUri = response.peer_uri;
                that.prepareDownload(peerUri);
-            },
-            onError : defaultOnErrorFunc
+            }
         });
     };
 

@@ -53,7 +53,7 @@ public:
         ENSURE(getPassedCount() == 10);
         int myVariable = 23;
         DPRINT(myVariable);
-        char * multiLineVariable = "1)bla\n2)blub\n3)yeah";
+        const char * multiLineVariable = "1)bla\n2)blub\n3)yeah";
         DDUMP(multiLineVariable);
         DPRINT2("TestUnitTest",myVariable);
         SUCCESS("just getting here is counted as success");

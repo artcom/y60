@@ -195,7 +195,7 @@ public:
   // outside of the library.
   static void raiseError
     ( int Code,
-      char * pszErr
+      const char * pszErr
     );
 
   //! Called to output status messages to the current debug console

@@ -76,9 +76,9 @@ extern std::string ourosceventxsd;
 namespace y60 {
 
     OscReceiver::OscReceiver(int thePort):
+        asl::PosixThread(),
         _myEventSchema( new dom::Document( ourosceventxsd )  ),
         _myValueFactory( new dom::ValueFactory() ),
-        asl::PosixThread(),
         _myCurrentBundleTimeTag(0)
     {
         registerStandardTypes( * _myValueFactory );

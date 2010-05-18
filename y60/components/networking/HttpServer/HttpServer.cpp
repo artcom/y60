@@ -144,7 +144,10 @@ namespace y60 {
         try {
 
             y60::Y60Request myRequest;
-            _myRequestQueue->wait_and_pop(myRequest);
+            bool hasRequest = _myRequestQueue->try_pop(myRequest);
+			if (!hasRequest) { 
+				return;
+			}
 
             std::string myResponseString;
             std::string myPath = myRequest.uri.substr(0, myRequest.uri.find_first_of("?"));  

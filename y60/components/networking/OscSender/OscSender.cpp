@@ -122,7 +122,7 @@ namespace y60 {
                     if (myChildNode->nodeName() == "float") {
                         myOSCStream << as<float>(string(myChildNode->childNode("#text")->nodeValue()).c_str());
                     } else if (myChildNode->nodeName() == "int") {
-                        myOSCStream << as<int>(string(myChildNode->childNode("#text")->nodeValue()).c_str());
+                        myOSCStream << as<osc::int32>(string(myChildNode->childNode("#text")->nodeValue()).c_str());
                     } else if (myChildNode->nodeName() == "double") {
                         myOSCStream << as<double>(string(myChildNode->childNode("#text")->nodeValue()).c_str());
                     } else if (myChildNode->nodeName() == "bool") {

@@ -89,7 +89,6 @@ namespace y60 {
     Movie::Movie(dom::Node & theNode):
         Image(theNode),
         FrameCountTag::Plug(theNode),
-        AspectRatioTag::Plug(theNode),
         CurrentFrameTag::Plug(theNode),
         FrameRateTag::Plug(theNode),
         PlaySpeedTag::Plug(theNode),
@@ -101,6 +100,7 @@ namespace y60 {
         AVDelayTag::Plug(theNode),
         AudioTag::Plug(theNode),
         DecoderHintTag::Plug(theNode),
+        AspectRatioTag::Plug(theNode),
         dom::DynamicAttributePlug<MovieTimeTag, Movie>(this, &Movie::getMovieTime),
         dom::DynamicAttributePlug<DecoderTag, Movie>(this, &Movie::getDecoderName),
         dom::DynamicAttributePlug<HasAudioTag, Movie>(this, &Movie::hasAudio),

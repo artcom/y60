@@ -804,7 +804,7 @@ array_sort(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
     CompareArgs ca;
     jsuint len, newlen, i;
     jsval *vec;
-    jsid id;
+    jsid id = 0; // avoid warning
     size_t nbytes;
 
     /*
@@ -853,9 +853,9 @@ array_sort(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 #endif
 
     for (i = 0; i < len; i++) {
-	ca.status = IndexToId(cx, i, &id);
-	if (!ca.status)
-	    goto out;
+        ca.status = IndexToId(cx, i, &id);
+        if (!ca.status)
+            goto out;
 #if JS_HAS_SPARSE_ARRAYS
         {
             JSObject *obj2;
@@ -871,9 +871,9 @@ array_sort(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
             newlen++;
         }
 #endif
-	ca.status = OBJ_GET_PROPERTY(cx, obj, id, &vec[i]);
-	if (!ca.status)
-	    goto out;
+        ca.status = OBJ_GET_PROPERTY(cx, obj, id, &vec[i]);
+        if (!ca.status)
+            goto out;
 
         /* We know JSVAL_IS_STRING yields 0 or 1, so avoid a branch via &=. */
         all_strings &= JSVAL_IS_STRING(vec[i]); 

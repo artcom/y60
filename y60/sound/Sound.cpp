@@ -76,11 +76,11 @@ int Sound::_myNumSoundsAllocated = 0;
 Sound::Sound (string myURI, IAudioDecoder * myDecoder, SoundCacheItemPtr myCacheItem,
         bool theLoop)
     : _myURI (myURI),
+      _myDecoder(myDecoder),
+      _myDecodingComplete(false),
       _myIsLooping(theLoop),
       _myTargetBufferedTime(1.0),
       _myMaxUpdateTime(0.2),
-      _myDecoder(myDecoder),
-      _myDecodingComplete(false),
       _myCacheItem(myCacheItem)
 {
     AC_DEBUG << "Sound::Sound(" << myURI << ", loop: " << theLoop << ")";

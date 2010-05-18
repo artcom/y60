@@ -56,6 +56,9 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+/*jslint nomen: false, plusplus: false*/
+/*global spark, Class, Node, Logger*/
+
 /**
  * Map of all component classes, indexed by name.
  */
@@ -99,14 +102,14 @@ spark.componentClasses = {};
  * interface comprised only of _className_.
  * 
  */
-spark.ComponentClass = function(theName) {
+spark.ComponentClass = function (theName) {
     // generate the real constructor
     var myConstructor = Class.call(this, theName);
 
     // wrap the constructor with an initialization call
-    var myInitializingConstructor = function(theNode) {
+    var myInitializingConstructor = function (theNode) {
         myConstructor.call(this);
-        if(theNode) {
+        if (theNode) {
             this.initialize(theNode);
         }
     };
@@ -153,7 +156,8 @@ spark.ComponentClass = function(theName) {
  * to be overridden by the template call.
  * 
  */
-spark.LoadedClass = function(theClassName, theFile) {
+ 
+spark.LoadedClass = function (theClassName, theFile) {
     // load template from file
     var myDocument = new Node();
     myDocument.parseFile(theFile);
@@ -162,14 +166,14 @@ spark.LoadedClass = function(theClassName, theFile) {
     var myTemplateNode = spark.findRootElement(myDocument);
     var myBaseClass = myTemplateNode.nodeName;
 
-    if(!(myBaseClass in spark.componentClasses)) {
+    if (!(myBaseClass in spark.componentClasses)) {
         Logger.error("Component class " + myBaseClass + " is unknown at this point");
     }
 
     var myBaseConstructor = spark.componentClasses[myBaseClass];
 
     // build a constructor wrapper
-    var myInitializingConstructor = function(theCallNode) {
+    var myInitializingConstructor = function (theCallNode) {
         // clone template so we can change it
         var myWovenNode = myTemplateNode.cloneNode(true);
 

@@ -168,7 +168,7 @@ Logger::Logger() :
     Ptr<LogMessageFormatter> myFileFormatter = createFormatter(LOG_FILE_FORMAT_ENV, FullLogMessageFormatter::name(), "console");
     Severity myFileSeverity = getSeverityFromEnv(LOG_FILE_FILTER_ENV, SEV_DISABLED);
     if (myFileSeverity != SEV_DISABLED) {
-        char * myLogFileName = getenv(LOG_FILE_NAME_ENV);
+        const char * myLogFileName = getenv(LOG_FILE_NAME_ENV);
         if (!myLogFileName) {
             myLogFileName = "asl_logfile.txt";
         }

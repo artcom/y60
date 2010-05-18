@@ -238,7 +238,7 @@ private:
     );
 
   void dumpRect
-    ( char * psz,
+    ( const char * psz,
       MacRect * pr
     );
 

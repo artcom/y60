@@ -34,7 +34,7 @@ namespace dom {
     /*! \addtogroup aslxml */
     /* @{ */
 
-#if defined(AC_BUILT_WITH_CMAKE) && defined(_WIN32)
+#if defined(_WIN32)
 #   define ASL_DOM_EXPORT_STATICS(thePlugName,theTagName,theExportToken) template class theExportToken thePlugName<theTagName>;
 #else
 #   define ASL_DOM_EXPORT_STATICS(thePlugName,theTagName,theExportToken)

@@ -1,0 +1,13 @@
+<resources>
+    <require name='cmake' version='2.8'/>
+    <resource name='cmake'>
+        <version value='2.8'>
+            <property name='cmake.bin' value='cmake'/>
+            <property name='cmake.agent.args' value=''/>
+            <property name='cmake.extra.args' value=''/>
+            <property name='ctest.bin' value='ctest'/>
+            <property name='ctest.agent.args' value=''/>
+            <property name='ctest.extra.args' value=''/>
+        </version>
+    </resource>
+</resources>

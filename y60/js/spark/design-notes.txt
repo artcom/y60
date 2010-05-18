@@ -239,6 +239,8 @@ Components have the following functional facets:
    which is a DOM- or GUI-toolkit-like tree of components.
  - they bear an optional name, identifying them both to the program
    and the developer working on the program
+ - they have a lifecycle (new/realized/derealized/dead), which is
+   currently not implemented throughout
 
 
 2.6. Loading / Component Instantiation / Realization
@@ -320,6 +322,8 @@ This mechanism is completely general and can be used for arbitrary
 properties on arbitrary components.
 
 Arguments from the template call override attributes in the template silently.
+
+Child nodes of the template call are currently thrown away.
 
 
 3. Widgets
@@ -425,8 +429,8 @@ SPARK implements an event system that is extremely similar to DOM Level 3 Events
 The API is for this event system is derived from Adobe Flash (AS3).
 
 An EventDispatcher class is provided. This class should be inherited into
-any objects participating in event dispatch. Such objects must implement
-a certain hierarchy protocol.
+any objects participating in event dispatch. Such objects must implement a
+certain hierarchy protocol.
 
 See the "event" module for detailed design notes.
 

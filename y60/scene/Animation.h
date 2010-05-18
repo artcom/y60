@@ -230,18 +230,18 @@ namespace y60 {
             Animation(dom::NodePtr theNode, dom::NodePtr theValueList, dom::NodePtr theAnimatedAttribute, unsigned theAnimatedIndex, bool theAngleAnimation)
                 : AnimationBase(theNode, theAngleAnimation),
                 _myValuesNode(theValueList->childNode(0)),
-                _myValueSetter(theAnimatedAttribute, theAnimatedIndex),
                 _myValues(0),
-                _myValuesBase(0)
+                _myValuesBase(0),
+                _myValueSetter(theAnimatedAttribute, theAnimatedIndex)
             {
             }
 
             Animation(dom::NodePtr theNode, dom::NodePtr theValueList, dom::NodePtr theAnimatedAttribute, bool theAngleAnimation)
                 : AnimationBase(theNode, theAngleAnimation),
                 _myValuesNode(theValueList->childNode(0)),
-                _myValueSetter(theAnimatedAttribute, 0),
                 _myValues(0),
-                _myValuesBase(0)
+                _myValuesBase(0),
+                _myValueSetter(theAnimatedAttribute, 0)
 
             {
             }

@@ -46,9 +46,9 @@ using namespace std;
 
     SampleSource::SampleSource(const std::string & theName, SampleFormat theSampleFormat,
                                unsigned theSampleRate, unsigned theNumChannels) :
-        _numChannels(theNumChannels),
         _mySampleRate(theSampleRate),
         _mySampleFormat(theSampleFormat),
+        _numChannels(theNumChannels),
         _myEnableState(false)
     {
         AC_DEBUG << "SampleSource::SampleSource (" << _myName << ")";

@@ -970,7 +970,7 @@ PLBYTE PLFilterQuantize::getNeighbor (PLPixel32 Color, PLPixel32 * pPal) const
   }
 
   PLBYTE PalIndex = static_cast<PLBYTE>(pNode->index);
-  if( PalIndex == -1)
+  if( pNode->index == -1)
   {
     pNode->index = 0;
 

@@ -56,6 +56,9 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+/*jslint nomen: false, plusplus: false*/
+/*global spark, Logger, Vector2f, Vector3f, Vector4f*/
+
 spark.ourComponentsByNameMap = {};
 
 /**
@@ -67,38 +70,37 @@ spark.ourComponentsByNameMap = {};
 
 spark.Component = spark.AbstractClass("Component");
 
-spark.Component.Constructor = function(Protected) {
+spark.Component.Constructor = function (Protected) {
     var Public = this;
-
+    
     /**
      * Components can have names.
      */
     this.Property("name", String, null);
 
+    var _myNode = null;
+    var _myParent = null;
+
     /**
      * Printing method.
      */
-    Public.toString = function (){
+    Public.toString = function () {
         return "[" + Public._className_ + " " + Public.vocation + "]";
     };
-
-
-    var _myParent = null;
 
     /**
      * Get the parent of this component.
      */
-    Public.parent getter = function() {
+    Public.parent getter = function () {
         return _myParent;
     };
 
     /**
      * Internal: change the parent of this component.
      */
-    Public.parent setter = function(theParent) {
+    Public.parent setter = function (theParent) {
         _myParent = theParent;
     };
-
 
     /**
      * Find the root of the component hierarchy.
@@ -106,21 +108,18 @@ spark.Component.Constructor = function(Protected) {
      * NOTE: This is not identical to finding the
      *       stage of a widget.
      */
-    Public.root getter = function() {
+    Public.root getter = function () {
         var myCurrent = Public;
-        while(myCurrent.parent != null) {
+        while (myCurrent.parent !== null) {
             myCurrent = myCurrent.parent;
         }
         return myCurrent;
     };
 
-
-    var _myNode = null;
-
     /**
      * Get the XML node used to instantiate this component.
      */
-    Public.node getter = function() {
+    Public.node getter = function () {
         return _myNode;
     };
 
@@ -129,7 +128,7 @@ spark.Component.Constructor = function(Protected) {
      * 
      * This mostly kicks property initialization.
      */
-    Public.initialize = function(theNode) {
+    Public.initialize = function (theNode) {
         Public.Initialize(theNode);
         _myNode   = theNode;
     };
@@ -140,11 +139,11 @@ spark.Component.Constructor = function(Protected) {
      * The vocation of a component is a human-readable
      * string describing the components identity.
      */
-    Public.vocation getter = function() {
-        if(Public.name) {
+    Public.vocation getter = function () {
+        if (Public.name) {
             return "named " + Public.name;
         }
-        if("id" in Public && Public.id) {
+        if ("id" in Public && Public.id) {
             return "with id " + Public.id;
         }
         return "without a name";
@@ -163,31 +162,31 @@ spark.Component.Constructor = function(Protected) {
      * override this and use it to put data items
      * in the component description. I18n works like this.
      */
-    Public.instantiateChildren = function(theNode) {
+    Public.instantiateChildren = function (theNode) {
     };
 
 
     // XXX: realize and post-realize should be one thing,
     //      with the remaining coupled properties uncoupled.
-    Public.realize = function() {
+    Public.realize = function () {
         spark.ourComponentsByNameMap[Public.name] = Public;
         Logger.debug("Realizing " + Public._className_ + " " + Public.vocation);
     };
 
-    Public.postRealize = function() {
+    Public.postRealize = function () {
         Logger.debug("Post-Realizing " + Public._className_ + " " + Public.vocation);
     };
 
     // XXX: I18N should be implemented with a property type
-    Protected.realizeI18N = function(theItem, theAttribute) {
+    Protected.realizeI18N = function (theItem, theAttribute) {
         var myConcreteItem = theItem;
         var myId = "";
-        if (theAttribute == undefined) {
+        if (theAttribute === undefined) {
             myId = Protected.getString("multilanguageId", "");
         } else {
             myId = Protected.getString(theAttribute, "");
         }
-        if (myId != "") {
+        if (myId !== "") {
             // find multilanguage item
             var myI18N = Public.acquisition("I18N", myId);
             if (myI18N) {
@@ -200,19 +199,18 @@ spark.Component.Constructor = function(Protected) {
         return myConcreteItem;
     };
 
-
-    Protected.getString = function(theName, theDefault) {
-        if(!_myNode) {
-            if(arguments.length < 2) {
+    Protected.getString = function (theName, theDefault) {
+        if (!_myNode) {
+            if (arguments.length < 2) {
                 Logger.error(Public._className_ + " cannot be instantiated from code because it needs attribute " + theName);
             } else {
                 return theDefault;
             }
         }
-        if(theName in _myNode) {
+        if (theName in _myNode) {
             return _myNode[theName];
         } else {
-            if(arguments.length < 2) {
+            if (arguments.length < 2) {
                 Logger.error(Public._className_ + " requires attribute " + theName);
             } else {
                 return theDefault;
@@ -220,18 +218,18 @@ spark.Component.Constructor = function(Protected) {
         }
     };
 
-    Protected.getBoolean = function(theName, theDefault) {
+    Protected.getBoolean = function (theName, theDefault) {
         if (!_myNode) {
-            if(arguments.length < 2) {
+            if (arguments.length < 2) {
                 Logger.error(Public._className_ + " cannot be instantiated from code because it needs attribute " + theName);
             } else {
                 return theDefault;
             }
         }
         if (theName in _myNode) {
-            return (_myNode[theName] == "true");
+            return (_myNode[theName] === "true");
         } else {
-            if(arguments.length < 2) {
+            if (arguments.length < 2) {
                 Logger.error(_myNode.nodeName + " requires attribute " + theName);
             } else {
                 return theDefault;
@@ -239,36 +237,36 @@ spark.Component.Constructor = function(Protected) {
         }
     };
     
-    Protected.getVector4f = function(theName, theDefault) {
+    Protected.getVector4f = function (theName, theDefault) {
         var myArray = Protected.getArray(theName, theDefault);
-        if (myArray && myArray.length == 4) {
+        if (myArray && myArray.length === 4) {
             return new Vector4f(myArray[0], myArray[1], myArray[2], myArray[3]);
         } else {
             return theDefault;
         }
     };
 
-    Protected.getVector3f = function(theName, theDefault) {
+    Protected.getVector3f = function (theName, theDefault) {
         var myArray = Protected.getArray(theName, theDefault);
-        if (myArray.length == 3) {
+        if (myArray.length === 3) {
             return new Vector3f(myArray[0], myArray[1], myArray[2]);
         } else {
             return theDefault;
         }
     };
 
-    Protected.getVector2f = function(theName, theDefault) {
+    Protected.getVector2f = function (theName, theDefault) {
         var myArray = Protected.getArray(theName, theDefault);
-        if (myArray.length == 2) {
+        if (myArray.length === 2) {
             return new Vector2f(myArray[0], myArray[1]);
         } else {
             return theDefault;
         }
     };
 
-    Protected.getNumber = function(theName, theDefault) {
+    Protected.getNumber = function (theName, theDefault) {
         if (!_myNode) {
-            if(arguments.length < 2) {
+            if (arguments.length < 2) {
                 Logger.error(Public._className_ + " cannot be instantiated from code because it needs attribute " + theName);
             } else {
                 return theDefault;
@@ -277,7 +275,7 @@ spark.Component.Constructor = function(Protected) {
         if (theName in _myNode) {
             return Number(_myNode[theName]);
         } else {
-            if(arguments.length < 2) {
+            if (arguments.length < 2) {
                 Logger.error(_myNode.nodeName + " requires attribute " + theName);
             } else {
                 return theDefault;
@@ -286,18 +284,18 @@ spark.Component.Constructor = function(Protected) {
     };
 
     // XXX: this requires a member type. else it don't make no sense.
-    Protected.getArray = function(theName, theDefault) {
-        if(!_myNode) {
-            if(arguments.length < 2) {
+    Protected.getArray = function (theName, theDefault) {
+        if (!_myNode) {
+            if (arguments.length < 2) {
                 Logger.error(Public._className_ + " cannot be instantiated from code because it needs attribute " + theName);
             } else {
                 return theDefault;
             }
         }
-        if(theName in _myNode) {
-            return _myNode[theName].substring(1, _myNode[theName].length -1).replace(/ /g,"").split(",");
+        if (theName in _myNode) {
+            return _myNode[theName].substring(1, _myNode[theName].length - 1).replace(/ /g, "").split(",");
         } else {
-            if(arguments.length < 2) {
+            if (arguments.length < 2) {
                 Logger.error(_myNode.nodeName + " requires attribute " + theName);
             } else {
                 return theDefault;
@@ -317,7 +315,7 @@ spark.Component.Constructor = function(Protected) {
  */
 spark.Container = spark.AbstractClass("Container");
 
-spark.Container.Constructor = function(Protected) {
+spark.Container.Constructor = function (Protected) {
     var Base = {};
     var Public = this;
 
@@ -329,17 +327,17 @@ spark.Container.Constructor = function(Protected) {
     /**
      * Get an array containing all children of this container.
      */
-    Public.children getter = function() {
+    Public.children getter = function () {
         return _myChildren.slice(0); // XXX: clone?
     };
 
     /**
      * Add the given child to this container.
      */
-    Public.addChild = function(theChild) {
+    Public.addChild = function (theChild) {
         _myChildren.push(theChild);
 
-        if(theChild.name) {
+        if (theChild.name) {
             _myNamedChildMap[theChild.name] = theChild;
         }
 
@@ -361,16 +359,16 @@ spark.Container.Constructor = function(Protected) {
     /**
      * Remove the given child.
      */
-    Public.removeChild = function(theChild) {
+    Public.removeChild = function (theChild) {
         var myChildIndex = indexOf(_myChildren, theChild);
 
-        if(myChildIndex == -1) {
+        if (myChildIndex === -1) {
             throw new Error("Could not remove " + theChild.name + " from " + Public.name + " because its not a child");
         }
 
         _myChildren.splice(myChildIndex, 1);
 
-        if(theChild.name) {
+        if (theChild.name) {
             delete _myNamedChildMap[theChild.name];
         }
 
@@ -380,9 +378,9 @@ spark.Container.Constructor = function(Protected) {
     /**
      * Remove all children.
      */
-    Public.removeAllChildren = function() {
+    Public.removeAllChildren = function () {
         var myChildren = Public.children;
-        for(var i = 0; i < myChildren.length; i++) {
+        for (var i = 0; i < myChildren.length; i++) {
             Public.removeChild(myChildren[i]);
         }
     };
@@ -390,7 +388,7 @@ spark.Container.Constructor = function(Protected) {
     /**
      * Retrieve a (direct) child by name.
      */
-    Public.getChildByName = function(theName) {
+    Public.getChildByName = function (theName) {
         if (theName in _myNamedChildMap) {
             return _myNamedChildMap[theName];
         } else {
@@ -401,15 +399,15 @@ spark.Container.Constructor = function(Protected) {
     /**
      * Recursively retrieve children of the given name.
      */
-    Public.findChildrenByName = function(theName) {
+    Public.findChildrenByName = function (theName) {
         var myChildren = [];
         var myOwnChild = Public.getChildByName(theName);
-        if(myOwnChild) {
+        if (myOwnChild) {
             myChildren.push(myOwnChild);
         }
-        for(var i = 0; i < _myChildren.length; i++) {
-            var myGrandchildren = myChild.findChildrenByName();
-            if(myGrandchildren.length > 0) {
+        for (var i = 0; i < _myChildren.length; i++) {
+            var myGrandchildren = myChild.findChildrenByName(); // what is myChild?
+            if (myGrandchildren.length > 0) {
                 myChildren = myChildren.concat(myGrandchildren);
             }
         }
@@ -423,8 +421,8 @@ spark.Container.Constructor = function(Protected) {
      * 
      * See implementation in Component for rationale.
      */
-    Public.instantiateChildren = function(theNode) {
-        for(var i = 0; i < theNode.childNodesLength(); i++) {
+    Public.instantiateChildren = function (theNode) {
+        for (var i = 0; i < theNode.childNodesLength(); i++) {
             var myChildNode = theNode.childNode(i);
             spark.instantiateRecursively(myChildNode, Public);
         }
@@ -432,18 +430,18 @@ spark.Container.Constructor = function(Protected) {
 
     // XXX: rework realization
     Base.realize = Public.realize;
-    Public.realize = function() {
+    Public.realize = function () {
         Base.realize();
-        for(var i = 0; i < _myChildren.length; i++) {
+        for (var i = 0; i < _myChildren.length; i++) {
             _myChildren[i].realize();
         }
     };
 
     // XXX: rework realization
     Base.postRealize = Public.postRealize;
-    Public.postRealize = function() {
+    Public.postRealize = function () {
         Base.postRealize();
-        for(var i = 0; i < _myChildren.length; i++) {
+        for (var i = 0; i < _myChildren.length; i++) {
             _myChildren[i].postRealize();
         }
     };

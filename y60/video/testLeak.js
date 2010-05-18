@@ -64,6 +64,13 @@
 //
 //=============================================================================
 
+// XXX
+// IMHO this thing is broken by design. It ignores page-size effects, 
+// difference in ptr size and all kind of other issues. It is the number
+// one cause of failed tests accross all platforms. I'm going to disable
+// at least the FFMpegDecoder2 leak test until someone rewrites this piece
+// of ... code
+// [DS]
 use("Overlay.js");
 use("Exception.js");
 use("UnitTest.js");

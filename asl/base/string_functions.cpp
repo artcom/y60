@@ -73,7 +73,7 @@ namespace asl {
 
     void
     binToString(unsigned char * theData, unsigned int theLength, string & theDest) {
-        static char * hexString = "0123456789ABCDEF";
+        static const char * hexString = "0123456789ABCDEF";
         theDest.resize(2*theLength);
         for (unsigned int i=0; i<theLength; i++) {
             int upperNibble = theData[i] >> 4;

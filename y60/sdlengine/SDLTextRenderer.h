@@ -122,7 +122,7 @@ namespace y60 {
 
             struct Word {
                 Word(const std::string & theText) :
-                    text(theText), surface(0), newline(false), kerning(0), minx(0), taglength(0)
+                    text(theText), surface(0), taglength(0), newline(false), kerning(0), minx(0)
                 {}
 
                 std::string   text;

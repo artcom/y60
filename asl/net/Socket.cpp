@@ -72,10 +72,10 @@ using namespace asl;
 namespace inet {
 
     Socket::Socket(asl::Unsigned32 thehost, Unsigned16 theport)
-        : fd(-1),
-          _myTimeOut(0),
-          _myLocalEndpoint(thehost, theport),
-          _myIsConnected(true)
+        : _myLocalEndpoint(thehost, theport),
+          fd(-1),
+          _myIsConnected(true),
+          _myTimeOut(0)
     {
         initSockets();
     }

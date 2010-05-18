@@ -227,7 +227,7 @@ class XmlDomUnitTest : public UnitTest {
 
                 // Test getElementById without schema
                 {
-                    char * myTestString =
+                    const char * myTestString =
                         "<root id='r0' attrib='value'>"
                         "   <child0 id='c0' attrib='value'/>"
                         "   <child1 id='c1' attrib='value'>"
@@ -264,7 +264,7 @@ class XmlDomUnitTest : public UnitTest {
 
                  // Test getElementById with schema
                 {
-                    char * myTestString =
+                    const char * myTestString =
                         "<root id='r0' attrib='value'>"
                         "   <child0 id='c0' attrib='value'/>"
                         "   <child1 id='c1' attrib='value'>"
@@ -961,7 +961,7 @@ class XmlDomEventsUnitTest : public UnitTest {
             try {
                 // Test getElementById
                 {
-                    char * myTestString =
+                    const char * myTestString =
                         "<root id='r0' attrib='value'>"
                         "   <child0 id='c0' attrib='value'/>"
                         "   <child1 id='c1' attrib='value'>"

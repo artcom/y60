@@ -68,7 +68,7 @@ public:
   // This function is needed by callbacks outside of any object,
   // so it's public and static. It should not be called from
   // outside of the library. 
-  static void raiseError( int Code, char * pszErr );
+  static void raiseError( int Code, const char * pszErr );
 
   //!
   void Trace( int TraceLevel, const char * pszMessage );

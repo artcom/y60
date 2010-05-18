@@ -10,9 +10,7 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-#ifdef AC_BUILT_WITH_CMAKE
 #include <acmake/aslbase_paths.h>
-#endif
 
 #include "file_functions.h"
 #include "Time.h"
@@ -102,16 +100,6 @@ class file_functions_UnitTest : public UnitTest {
             ENSURE(getParentDirectory("/")=="");
             ENSURE(getParentDirectory("")=="");
             ENSURE(getParentDirectory("X")=="");
-
-#ifndef AC_BUILT_WITH_CMAKE
-            // XXX: fix these up to work with the cmake build
-            ENSURE(searchFile(getFilenamePart(__FILE__), "/;.;../..") == std::string("../../") + getFilenamePart(__FILE__));
-            ENSURE(searchFile(getFilenamePart(__FILE__), "") == "");
-            ENSURE(searchFile(getFilenamePart(__FILE__), "../..") == std::string("../../") + getFilenamePart(__FILE__));
-#ifdef LINUX
-            ENSURE(searchFile(getFilenamePart(__FILE__), "/:.:../..") == std::string("../../") + getFilenamePart(__FILE__));
-#endif
-#endif
 
             ENSURE(getExtension("myfile.mp3") == "mp3");
             ENSURE(getExtension("myfile.something.mp3") == "mp3");
@@ -239,11 +227,7 @@ class DirectoryTest : public UnitTest {
             // use getdir utility function instead
 
             string myDir =
-#ifdef AC_BUILT_WITH_CMAKE
                 string(CMAKE_CURRENT_SOURCE_DIR) + theDirectorySeparator
-#else
-                string("..") + theDirectorySeparator + string("..") + theDirectorySeparator
-#endif
                 + string("testdir");
 
             vector<string> myDirEntries = getDirectoryEntries(myDir);
@@ -273,31 +257,19 @@ class DirectoryTest : public UnitTest {
             ENSURE_EXCEPTION(getDirectoryEntries("nonexistingdir"), OpenDirectoryFailed);
 
             ENSURE(isDirectory("."));
-#ifdef AC_BUILT_WITH_CMAKE
-	    ENSURE(isDirectory(string(CMAKE_CURRENT_SOURCE_DIR)));
-	    ENSURE(isDirectory(string(CMAKE_CURRENT_BINARY_DIR)));
-	    ENSURE(isDirectory(string(CMAKE_CURRENT_SOURCE_DIR) + theDirectorySeparator + string("testdir")));
-	    ENSURE(!isDirectory(string(CMAKE_CURRENT_SOURCE_DIR) + theDirectorySeparator + string("testdir") + theDirectorySeparator + string("a")));
-#else
-            ENSURE(isDirectory("../../testdir/"));
-            ENSURE(!isDirectory("../../testdir/a"));
-#endif
+            ENSURE(isDirectory(string(CMAKE_CURRENT_SOURCE_DIR)));
+            ENSURE(isDirectory(string(CMAKE_CURRENT_BINARY_DIR)));
+            ENSURE(isDirectory(string(CMAKE_CURRENT_SOURCE_DIR) + theDirectorySeparator + string("testdir")));
+            ENSURE(!isDirectory(string(CMAKE_CURRENT_SOURCE_DIR) + theDirectorySeparator + string("testdir") + theDirectorySeparator + string("a")));
 
             ENSURE(!isDirectory("nonexistingdir"));
-            //        ENSURE(isDirectory("../../testdir/.svn"));
 
             std::string myAppDir = getAppDirectory();
             DPRINT(myAppDir);
             ENSURE(isDirectory(myAppDir));
 
             // last modified stuff
-            std::string myFile =
-#ifdef AC_BUILT_WITH_CMAKE
-                string(CMAKE_CURRENT_BINARY_DIR)
-#else
-                string("../../")
-#endif
-	        + "dates.tst";
+            std::string myFile = string(CMAKE_CURRENT_BINARY_DIR) + "dates.tst";
 
             writeFile(myFile, "foo");
 
