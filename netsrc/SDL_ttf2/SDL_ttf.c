@@ -49,13 +49,8 @@
 #define FT_OPEN_STREAM ft_open_stream
 #endif
 
-#ifdef AC_BUILT_WITH_CMAKE
 #include <SDL.h>
 #include <SDL_endian.h>
-#else
-#include <SDL/SDL.h>
-#include <SDL/SDL_endian.h>
-#endif
 
 #include "SDL_ttf.h"
 
