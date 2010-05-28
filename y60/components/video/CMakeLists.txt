@@ -13,7 +13,8 @@ if(LINUX)
 
 endif(LINUX)
 
-if(WIN32)
+# XXX Proper checks missing... [DS]
+#if(WIN32)
     #add_subdirectory(WMPPlayer)
     if(DIRECTX_FOUND)    
         add_subdirectory(DShowCapture)
