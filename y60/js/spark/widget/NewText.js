@@ -110,13 +110,22 @@ spark.NewText.Constructor = function(Protected) {
     }
 
     Public.maxWidth getter = function() { return _myMaxWidth; }
-    Public.maxWidth setter = function(w) { _myMaxWidth = w; }
+    Public.maxWidth setter = function(w) { 
+        _myMaxWidth = w;
+        Protected.render();
+    };
+
+    Public.maxHeight getter = function() { return _myMaxHeight; }
+    Public.maxHeight setter = function(w) { 
+        _myMaxHeight = w; 
+        Protected.render();
+    };
 
     Public.textId getter = function() { return _myTextId; }
     Public.textId setter = function(id) {
         _myTextId = id;
         attachToI18nItem(id);
-    }
+    };
 
     Public.i18nItem getter = function() { return Public.textId; }
     Public.i18nItem setter = function(id) { Public.textId = id; }
