@@ -225,6 +225,7 @@ Playlist.prototype.Constructor = function(self) {
                    theUrl.search(/\.wmv$/i)  != -1 ||
                    theUrl.search(/\.mov$/i)  != -1 ||
                    theUrl.search(/\.m4v$/i)  != -1 ||
+                   theUrl.search(/\.mts$/i)  != -1 ||
                    theUrl.search(/\.m2v$/i)  != -1)
         {
             return VIDEO_MEDIA;
@@ -252,6 +253,7 @@ Playlist.prototype.Constructor = function(self) {
                         theUrl.search(/\.sgi$/i)  != -1 ||
                         theUrl.search(/\.tga$/i)  != -1 ||
                         theUrl.search(/\.tiff$/i) != -1 ||
+                        theUrl.search(/\.tif$/i) != -1 ||
                         theUrl.search(/\.wmf$/i)  != -1)
             {
                 return IMAGE_MEDIA;
@@ -278,6 +280,7 @@ Playlist.prototype.Constructor = function(self) {
             theUrl.search(/\.wmv$/i)  != -1 ||
             theUrl.search(/\.mov$/i)  != -1 ||
             theUrl.search(/\.m4v$/i)  != -1 ||
+            theUrl.search(/\.mts$/i)  != -1 ||
             theUrl.search(/\.m2v$/i)  != -1 ) {
             if (theSeekableFlag) {
                 myDecoderHint = "FFMpegDecoder2";

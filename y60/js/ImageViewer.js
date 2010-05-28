@@ -597,7 +597,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
             myString += "Internal Pixelformat: " + myTexture.internal_format +"\n";
             if (myNode.nodeName == "movie") {
                 myString += "Frame:         " + (myNode.currentframe + 1) + " / " + myNode.framecount +"\n";
-                myString += "Time:          " + ((myNode.currentframe + 1)/myNode.fps).toFixed(3) + " / " + (myNode.framecount/myNode.fps).toFixed(3) +"\n";
+                myString += "Time:          " + ((myNode.currentframe + 1)/myNode.fps).toFixed(3) + " / " + ((myNode.framecount == -1) ? -1 : (myNode.framecount/myNode.fps).toFixed(3)) +"\n";
                 myString += "Framerate:     " + myNode.fps.toPrecision(5) +"\n";
                 myString += "Playmode:      " + myNode.playmode +"\n";
                 myString += "Playspeed:     " + myNode.playspeed.toPrecision(5) +"\n";

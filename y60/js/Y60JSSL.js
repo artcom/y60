@@ -1047,6 +1047,20 @@ function stripIdentifier(theIdentifier) {
     return theIdentifier.replace(/[^\w\s.]/g, "");
 }
 
+function convertNewLine(theString){
+    for (var i = 0; i < theString.length; i++) {
+        if (theString[i] == "\\") {
+            if (i + 1 < theString.length) {
+                if (theString[i + 1] == "n") {
+                    theString = theString.substr(0, i) + "\n" + theString.substr(i + 2, theString.length - i - 2);
+                    i -= 1;
+                }
+            }
+        }
+    }
+    return theString;
+}
+
 function preloadImages() {
     for (var i = 0; i < window.scene.images.childNodes.length; i++) {
         preLoad(window.scene.images.childNode(i));

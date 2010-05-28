@@ -206,6 +206,7 @@ PerfMeter.prototype.Constructor = function(self, theSceneViewer) {
             if (!(myTimer.name in _myTopMaxTimers) || _myTopMaxTimers[myTimer.name].lastelapsed  > myTimer.lastelapsed) {
                 _myTopMaxTimers[myTimer.name] = myTimer;
                 _myTopMaxTimers[myTimer.name].frame = _myFrameCount;
+                _myTopMaxTimers[myTimer.name].lastelapsed = myTimer.lastelapsed;
             }
         }
     }

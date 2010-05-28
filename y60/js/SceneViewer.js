@@ -183,6 +183,13 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         return _myOnScreenDisplay;
     }
 
+    self.toggleVideoRecording = function() {
+        if (!_myVideoRecorder) {
+            _myVideoRecorder = new VideoRecorder(25);
+        }
+        _myVideoRecorder.enabled = !_myVideoRecorder.enabled;
+    }
+
     self.BaseViewer.onFrame = self.onFrame;
     self.onFrame = function(theTime) {
         self.BaseViewer.onFrame(theTime);
@@ -244,6 +251,9 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
     }
 
     self.onKey = function(theKey, theKeyState, theX, theY, theShiftFlag, theCtrlFlag, theAltFlag) {
+        if (!theCtrlFlag) {
+            return;
+        }
         var myMover = self.getMover(self.getActiveViewport());
     	if (myMover) {
             myMover.onKey(theKey, theKeyState, theX, theY, theShiftFlag, theCtrlFlag, theAltFlag);
@@ -689,6 +699,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
             myText.push("Lights:     " + myStatistics.activeLights + "/" + myStatistics.lights);
             myText.push("Overlays:   " + myStatistics.overlays);
             myText.push("Materials:  " + myStatistics.materials);
+            myText.push("gc:  " + myStatistics.gc);
         }
 
         var myViewport = self.getViewportAtWindowCoordinates(0, 0); // get viewport containing upper left pixel
