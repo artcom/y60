@@ -194,7 +194,7 @@ spark.NewMovie.Constructor = function(Protected) {
     };
 
     function handleI18nLanguage(e) {
-        Public.movie = _mySourceItem.movie;
+        Public.src = e.src;
     }
 
     function attachToI18nItem(theItemId) {
@@ -209,7 +209,7 @@ spark.NewMovie.Constructor = function(Protected) {
         }
         _mySourceItem.addEventListener(spark.I18nEvent.LANGUAGE,
                                        handleI18nLanguage);
-        Public.movie = _mySourceItem.movie;
+        Public.src = _mySourceItem.src;
     };
 
     // XXX crude hack starts here

@@ -126,7 +126,7 @@ spark.Image.Constructor = function(Protected) {
     };
 
     function handleI18nLanguage(e) {
-        Public.image = _mySourceItem.image;
+        Public.src = e.src;
     }
 
     function attachToI18nItem(theItemId) {
@@ -141,7 +141,7 @@ spark.Image.Constructor = function(Protected) {
         }
         _mySourceItem.addEventListener(spark.I18nEvent.LANGUAGE,
                                        handleI18nLanguage);
-        Public.image = _mySourceItem.image;
+        Public.src = _mySourceItem.src;
     };
 
     // XXX crude hack starts here
