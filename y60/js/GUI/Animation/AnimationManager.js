@@ -56,6 +56,8 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+var ourCurrentAnimationTime = -1;
+
 /**
  * The thing that runs animations.
  *
@@ -87,11 +89,12 @@ GUI.AnimationManager.prototype.Constructor = function(Public, Protected) {
 		return _animations.length > 0;
 	};
 
-    Public.doFrame = function() {
+    Public.doFrame = function(theTime) {
+        ourCurrentAnimationTime = theTime * 1000;
         for(var i = 0; i < _animations.length; i++) {
 	        var a = _animations[i];
 		    if(a.running) {
-		        a.doFrame();
+		        a.doFrame(theTime * 1000);
 		    }
 		}
 	    removeFinished();
