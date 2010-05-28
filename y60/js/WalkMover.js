@@ -68,12 +68,12 @@ use("MoverBase.js");
 use("picking_functions.js");
 use("intersection_functions.js");
 
-function WalkMover() {
-    this.Constructor(this);
-}
+function WalkMover(theViewport) {
+    this.Constructor(this, theViewport);
+};
 
-WalkMover.prototype.Constructor = function(self) {
-    MoverBase.prototype.Constructor(self);
+WalkMover.prototype.Constructor = function(self, theViewport) {
+    MoverBase.prototype.Constructor(self, theViewport);
     self.Mover = [];
 
     //////////////////////////////////////////////////////////////////////

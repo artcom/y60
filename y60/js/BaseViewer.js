@@ -201,20 +201,18 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         if (!theMoverFactory || theMoverFactory == undefined) {
             theMoverFactory = MoverBase;
         }
+        
         var myNewMover = new theMoverFactory(theViewport);
         var myViewportId = getViewportId(theViewport);
-        _myViewportMovers[myViewportId] = myNewMover;
+        _myLastMover = myNewMover;
+        
         myNewMover.setMoverObject(myNewMover.getViewportCamera());
+
         return myNewMover;
     }
 
     self.getMover = function(theViewport) {
-        var myIndex = getViewportId(theViewport);
-        if (myIndex in _myViewportMovers) {
-            return _myViewportMovers[myIndex];
-        } else {
-            return null;
-        }
+        return _myLastMover;
     }
 
     self.registerMover = function(theMoverFactory) {
@@ -225,14 +223,14 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     self.nextMover = function(theViewport) {
         var myViewportId = getViewportId(theViewport);
 
-    	if (_myMoverFactories.length == 0) {
-    	    return;
-    	}
-
+      	if (_myMoverFactories.length == 0) {
+      	    return;
+      	}
+        
         // find next mover
         var myNextMoverIndex = 0;
         for (var i = 0; i < _myMoverFactories.length; ++i) {
-            if (_myMoverFactories[i] == _myViewportMovers[myViewportId].constructor) {
+            if (_myMoverFactories[i] == _myLastMover.constructor) {
                 myNextMoverIndex = i+1;
                 break;
             }
@@ -699,7 +697,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     // Camera movers
     var _myMoverFactories        = [];  // Array of mover constructors
 
-    var _myViewportMovers        = [];
+    var _myLastMover             = null;
     var _myClickedViewport       = null;
     var _myAutoNearFarFlag       = true;
     var _activeViewport          = null;
