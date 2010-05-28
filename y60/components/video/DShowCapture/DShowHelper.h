@@ -67,6 +67,8 @@
 
 namespace y60 {
 
+#define SafeRelease(p) { if( (p) != 0 ) { (p)->Release(); (p)= NULL; } }
+
 void checkForDShowError(HRESULT hr, const std::string & theMessage,
         const std::string & theFileLine);
 

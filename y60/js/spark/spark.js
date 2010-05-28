@@ -126,4 +126,5 @@ if (!("disableSparkWidgets" in this)) {
     use("spark/widget/NewText.js");
     use("spark/widget/Canvas.js");
     use("spark/widget/OffscreenCanvas.js");
+    use("spark/widget/VideoCapture.js");
 }

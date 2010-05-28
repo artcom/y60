@@ -78,7 +78,7 @@ public:
     void setDesiredVideoFormat(int theWidth, int theHeight, int theFps, int theBits);
 
     // Automatically find a capturing device to capture video
-    void CaptureLive(int theIndex, unsigned theInputPinNumber = 0);
+    virtual void CaptureLive(int theIndex, unsigned theInputPinNumber = 0);
 
     // Destroy the whole Graph
     void Destroy() { destroyFilterGraph(); };
@@ -102,9 +102,11 @@ public:
     void traceCrossbarInfo(IAMCrossbar *pXBar);
     void configCrossbar(unsigned theInputPinNumber = 0);
     std::vector<std::string> enumDevices();
-private:
+protected:
     // Create the filter graph to render the video (capture or playback)
     virtual bool createFilterGraph(int theIndex = 0, unsigned theInputPinNumber = 0);
+    bool setActiveCamera(int theIndex);
+
     // Release the filter graph
     virtual void destroyFilterGraph();
     // Start the playing
