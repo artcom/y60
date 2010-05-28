@@ -70,6 +70,9 @@ var spark = Namespace("spark");
 
 spark.findRootElement = function (theDocument) {
     var myRoot = theDocument.firstChild;
+    if(!myRoot) {
+        myRoot = theDocument;
+    }
     // firstChild might be a xml processing instruction, a
     // comment, a doctype declaration or god knows what else.
     while (myRoot.nodeType !== Node.ELEMENT_NODE) {
@@ -81,8 +84,8 @@ spark.findRootElement = function (theDocument) {
     return myRoot;
 };
 
-// javascript extensions
-use("jsextensions.js");
+// javascript extensions (disabled)
+//use("jsextensions.js");
 // component instantiator
 use("meta.js");
 // spark file (and dom) loader
