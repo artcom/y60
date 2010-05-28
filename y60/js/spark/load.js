@@ -69,11 +69,12 @@ spark.loadString = function(theString, theParent) {
  */
 spark.loadFile = function(theFile, theParent) {
     Logger.info("Loading spark file " + theFile);
-    if (!fileExists(theFile)) {
+    var myFileWithPath = searchFile(theFile);
+    if (!myFileWithPath) {
         throw Error("spark file '" + theFile + "' does not exist.");
     }
     var myNode = new Node();
-    myNode.parseFile(theFile);
+    myNode.parseFile(myFileWithPath);
     return spark.loadDocument(myNode, theParent);
 };
 
