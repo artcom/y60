@@ -79,7 +79,8 @@ spark.ourLoadedFonts = {};
 /**
  * Internal: ensure loading of font appropriate for the given style
  */
-spark.loadFont = function(theName, theSize, theStyle) {
+
+spark.loadFont = function(theName, theSize, theStyle, theHinting) {
     var myName = theName + "-" + theStyle + "-" + theSize;
     if(!(myName in spark.ourLoadedFonts)) {
         if(theStyle != "normal") {
@@ -91,14 +92,14 @@ spark.loadFont = function(theName, theSize, theStyle) {
         // XXX: this is a remnant from before the introduction
         //      of include-path-based font loading.
         var myFontPath = null;
-        if (fileExists("FONTS/" + theName + "-" + theStyle + ".otf")) {
+        if (searchFile("FONTS/" + theName + "-" + theStyle + ".otf")) {
             myFontPath = "FONTS/" + theName + "-" + theStyle + ".otf";
-        } else if (fileExists("FONTS/" + theName + "-" + theStyle + ".ttf")) {
+        } else if (searchFile("FONTS/" + theName + "-" + theStyle + ".ttf")) {
             myFontPath = "FONTS/" + theName + "-" + theStyle + ".ttf";
-        } else if (fileExists("FONTS/" + theName + ".otf")) {
-            myFontPath = "FONTS/" + theName + ".otf";
-        } else if (fileExists("FONTS/" + theName + ".ttf")) {
+        } else if (searchFile("FONTS/" + theName + ".ttf")) {
             myFontPath = "FONTS/" + theName + ".ttf";
+        } else if (searchFile("FONTS/" + theName + ".otf")) {
+            myFontPath = "FONTS/" + theName + ".otf";
         } else {
             throw new Error("FONTS/" + theName + "-" + theStyle + ".[ttf|otf] nor " +
                     theName + ".[ttf|otf] does not exist");
@@ -108,13 +109,12 @@ spark.loadFont = function(theName, theSize, theStyle) {
         // crispy aber rottenschlechtes spacing -> Natives Fonthinting (Renderer.NATIVEHINTING)
         // wenig crispy aber okes spacing -> Autohinting (Renderer.AUTOHINTING)
 
-        // XXX: inconsistent hinting!?
-        if (theStyle != "normal") {
+        var myHinting = spark.hintingFromString(theHinting);    
            // enforce loadttf of a normal font, otherwise we get an exception
-           window.loadTTF(myName, myFontPath, theSize, Renderer.AUTOHINTING , spark.styleFromString("normal"));
+        window.loadTTF(myName, searchFile(myFontPath), theSize, myHinting , spark.styleFromString("normal"));
+        if(theStyle != "normal") {
+           window.loadTTF(myName, searchFile(myFontPath), theSize, myHinting , spark.styleFromString(theStyle));
         }
-        window.loadTTF(myName, myFontPath, theSize, Renderer.NOHINTING , spark.styleFromString(theStyle));
-
         spark.ourLoadedFonts[myName] = true;
 
        // always load the bold variant to allow the bold tag <b>...</b> to be used
@@ -125,12 +125,11 @@ spark.loadFont = function(theName, theSize, theStyle) {
            } else {
                myFontPath = searchFile("FONTS/" + myFont + "-bold" + ".ttf");
            }
-           if (myFontPath != undefined) {
-               Logger.info("loading bold font for " + myName + "," + myFontPath + "," + Renderer.AUTOHINTING + "," + "bold")
-               window.loadTTF(myName, searchFile(myFontPath), theSize, Renderer.AUTOHINTING , Renderer.BOLD);
+           if (myFontPath) {
+               Logger.info("loading bold font for " + myName + "," + myFontPath + "," + theSize + "," + "bold")
+               window.loadTTF(myName, searchFile(myFontPath), theSize, myHinting , Renderer.BOLD);
            }
        }
-
     }
     return myName;
 };
@@ -152,6 +151,7 @@ spark.applyStyleDefaults = function(theStyle) {
 
     !theStyle.getAttribute("hAlign")    ? theStyle.hAlign    = "left" : null;
     !theStyle.getAttribute("vAlign")    ? theStyle.vAlign    = "top"  : null;
+    !theStyle.getAttribute("hinting")    ? theStyle.hinting    = spark.NOHINTING  : null;
 
     !theStyle.getAttribute("textColor")       ? theStyle.textColor        = "000000" : null;
     !theStyle.getAttribute("backgroundColor") ? theStyle.backgroundColor  = "FFFFFF" : null;
@@ -191,6 +191,7 @@ spark.fontStyleFromNode = function(theNode) {
 
     copyAttributeIfPresent("hAlign");
     copyAttributeIfPresent("vAlign");
+    copyAttributeIfPresent("hinting");
 
     copyAttributeIfPresent("textColor");
     copyAttributeIfPresent("backgroundColor");
@@ -207,7 +208,8 @@ spark.fontForStyle = function(theStyle) {
     !theStyle.getAttribute("font")      ? theStyle.font    = "arial" : null;
     !theStyle.getAttribute("fontSize")  ? theStyle.fontSize = 12 : null;
     !theStyle.getAttribute("fontStyle") ? theStyle.fontStyle  = "normal" : null;
-    return spark.loadFont(theStyle.font, theStyle.fontSize, theStyle.fontStyle);
+    !theStyle.getAttribute("hinting") ? theStyle.hinting  = spark.NOHINTING : null;
+    return spark.loadFont(theStyle.font, theStyle.fontSize, theStyle.fontStyle, theStyle.hinting);
 }
 
 /**
@@ -242,11 +244,26 @@ spark.styleFromString = function(theString) {
     throw new Error("Unknown font style: " + theString);
 };
 
+spark.NATIVEHINTING = "nativehinting";
+spark.AUTOHINTING = "autohinting";
+spark.NOHINTING = "nohinting";
+
+spark.hintingFromString = function(theString) {
+    if(theString == spark.NOHINTING)
+        return Renderer.NOHINTING;
+    if(theString == spark.AUTOHINTING)
+        return Renderer.AUTOHINTING;
+    if(theString == spark.NATIVEHINTING)
+        return Renderer.NATIVEHINTING;
+    throw new Error("Unknown font style: " + theString);
+};
+
 /**
  * Create an image suitable for rendering text into.
  */
 spark.createTextImage = function(theSize) {
     var myImage = Modelling.createImage(window.scene, theSize.x, theSize.y, "RGBA");
+    myImage.name = "text_image";
     myImage.resize = "none";
 
     return myImage;
