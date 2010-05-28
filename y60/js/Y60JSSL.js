@@ -1113,3 +1113,17 @@ function setupCameraOrtho(theCamera, theWidth, theHeight, theCameraZ, theFarPlan
     theCamera.frustum.far  = myFarPlaneDistance;
     theCamera.orientation = Quaternionf.createFromEuler(new Vector3f(0,0,0));
 }
+
+function attachTo(theNode, theNewParent) {
+    var myGlobalMatrix = new Matrix4f( theNode.globalmatrix );
+    var myParentIMatrix = new Matrix4f( theNewParent.inverseglobalmatrix );
+    myGlobalMatrix.postMultiply( myParentIMatrix );
+    
+    var myDecomposition = myGlobalMatrix.decompose();
+    var myParent = theNode.parentNode;
+    myParent.removeChild( theNode );
+    theNewParent.appendChild( theNode );
+    theNode.position = myDecomposition.position;
+    theNode.orientation = myDecomposition.orientation;
+    theNode.scale = myDecomposition.scale;
+}

@@ -119,6 +119,7 @@ if (!("disableSparkWidgets" in this)) {
     use("spark/widget/Stage.js");
     use("spark/widget/World.js");
     use("spark/widget/Window.js");
+    use("spark/widget/Model.js");
     use("spark/widget/Body.js");
     use("spark/widget/ResizableRectangle.js");
     use("spark/widget/Rectangle.js");

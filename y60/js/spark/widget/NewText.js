@@ -116,8 +116,8 @@ spark.NewText.Constructor = function(Protected) {
     };
 
     Public.maxHeight getter = function() { return _myMaxHeight; }
-    Public.maxHeight setter = function(w) { 
-        _myMaxHeight = w; 
+    Public.maxHeight setter = function(h) { 
+        _myMaxHeight = h; 
         Protected.render();
     };
 
