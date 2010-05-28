@@ -6,10 +6,17 @@
  */
 spark.NewMovie = spark.ComponentClass("NewMovie");
 
-spark.NewMovie.Constructor = function(Protected) {
+spark.NewMovie.Constructor = function(Protected, theNode) {
     var Base = {};
     var Public = this;
-
+    if (theNode && (("useYuv2RgbShader" in theNode && theNode.useYuv2RgbShader === "true") ||
+        ("targetpixelformat" in theNode && theNode.targetpixelformat === "YUV420")))
+    {
+        use("YUV2RGBShader.js");
+        this.Inherit(spark.YUV2RGBShader);
+        Base.realizeYUV2RGBShader = Public.realize;
+        Base.postRealizeYUV2RGBShader = Public.postRealize;    
+    }
     this.Inherit(spark.ResizableRectangle);
 
     var _mySource = null;
@@ -17,10 +24,9 @@ spark.NewMovie.Constructor = function(Protected) {
     var _mySourceItem = null;
 
     var _myMovie = null;
-    var _myMovieOwned = false;
-
     var _myTexture  = null;
-    var _myVertices = null;
+    var _myDecoderHint  = "FFMpegDecoder2";
+    var _myTargetPixelFormat = "RGB";
 
     // playback control
 
@@ -87,7 +93,7 @@ spark.NewMovie.Constructor = function(Protected) {
 
     Public.movie setter = function(theNode) {
         if(_myMovie) {
-            if(_myMovie.playmode != "stop") {
+            if(_myMovie.nodeName == "Movie" && _myMovie.playmode != "stop") {
                 Public.stop();
             }
             _myMovie.parentNode.removeChild(_myMovie);
@@ -96,15 +102,10 @@ spark.NewMovie.Constructor = function(Protected) {
 
         _myMovie = theNode;
         _myTexture.image = theNode.id;
-        var myHeight = _myMovie.height;
-        var myWidth = Math.round(_myMovie.height * _myMovie.aspectratio);
-        if (myWidth > _myMovie.width) {
-            myWidth = _myMovie.width;
-            myHeight = Math.round(myWidth / _myMovie.aspectratio);
+        if(_myMovie.nodeName != "image") {
+            ensureAspectRatio();
+            initMovie();
         }
-        Public.width  = myWidth;
-        Public.height = myHeight;
-
         // XXX crude hack starts here
         if(_myOnMovieChanged) {
             _myOnMovieChanged();
@@ -118,8 +119,8 @@ spark.NewMovie.Constructor = function(Protected) {
 
     Public.src setter = function(theSourceFile) {
         if(_mySource != theSourceFile) {
-            Public.movie = spark.openMovie(theSourceFile);
             _mySource = theSourceFile;
+            Public.movie = spark.openMovie(theSourceFile, _myTargetPixelFormat, _myDecoderHint);
         } else {
             if(_myMovie.playmode != "stop") {
                 Public.stop();
@@ -144,25 +145,23 @@ spark.NewMovie.Constructor = function(Protected) {
         return _myTexture;
     };
 
-    // XXX: this should not exist.
-    //    Public.textureId setter = function(theTextureId) {
-    //        _myMaterial.childNode("textureunits").firstChild.texture = theTextureId;
-    //    };
-
     Base.realize = Public.realize;
     Public.realize = function() {
         var myMovieSource = Protected.getString("src", "");
         var myMovieSourceId = Protected.getString("srcId", "");
+        _myDecoderHint = Protected.getString("decoderhint", "FFMpegDecoder2");
+        _myTargetPixelFormat = Protected.getString("targetpixelformat", "RGB");
 
         if(myMovieSource == "") {
             var myWidth  = Protected.getNumber("width", 1);
             var myHeight = Protected.getNumber("height", 1);
             _myMovie      = Modelling.createImage(window.scene, myWidth, myHeight, "BGR");
+            _myMovie.name = Public.name + "_movieDummyImage";
             if(myMovieSourceId != "") {
                 _mySourceId = myMovieSourceId;
             }
         } else {
-            _myMovie = spark.openMovie(myMovieSource);
+            _myMovie = spark.openMovie(myMovieSource, _myTargetPixelFormat, _myDecoderHint);
             _mySource = myMovieSource;
         }
 
@@ -175,13 +174,8 @@ spark.NewMovie.Constructor = function(Protected) {
 
         Base.realize(myMaterial);
         if(myMovieSource) {
-            Public.src = myMovieSource;
-        }
-        if(_myMovie.nodeName != "image") {
-            Public.loop = Protected.getBoolean("loop", false);
-            Public.mode = Protected.getString("mode", "stop");
-            Public.audio = Protected.getBoolean("audio", true);
-            Public.volume = Protected.getNumber("volume", 1.0);
+            ensureAspectRatio();
+            initMovie();
         }
     };
 
@@ -190,8 +184,25 @@ spark.NewMovie.Constructor = function(Protected) {
         if(_mySourceId) {
             attachToI18nItem(_mySourceId);
         }
+        if ("realizeYUV2RGBShader" in Base && Base.realizeYUV2RGBShader) {
+            Base.realizeYUV2RGBShader();
+        }
         Base.postRealize();
+        if ("postRealizeYUV2RGBShader" in Base && Base.postRealizeYUV2RGBShader) {
+            Base.postRealizeYUV2RGBShader();
+        }   
     };
+
+    function ensureAspectRatio () {
+        var myHeight = _myMovie.height;
+        var myWidth = Math.round(_myMovie.height * _myMovie.aspectratio);
+        if (myWidth > _myMovie.width) {
+            myWidth = _myMovie.width;
+            myHeight = Math.round(myWidth / _myMovie.aspectratio);
+        }
+        Public.width  = myWidth;
+        Public.height = myHeight;
+    }
 
     function handleI18nLanguage(e) {
         Public.src = e.src;
@@ -211,6 +222,15 @@ spark.NewMovie.Constructor = function(Protected) {
                                        handleI18nLanguage);
         Public.src = _mySourceItem.src;
     };
+
+    function initMovie() {
+        Public.loop = Protected.getBoolean("loop", false);
+        Public.mode = Protected.getString("mode", "stop");
+        Public.audio = Protected.getBoolean("audio", true);
+        Public.volume = Protected.getNumber("volume", 1.0);
+        Public.width = Protected.getNumber("width", Public.width);
+        Public.height = Protected.getNumber("height", Public.height);
+    }
 
     // XXX crude hack starts here
 
