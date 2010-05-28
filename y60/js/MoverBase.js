@@ -70,9 +70,10 @@ var BUTTON_DOWN   = 1;
 
 function MoverBase(theViewport) {
     this.Constructor(this, theViewport);
-}
+};
 
 MoverBase.prototype.Constructor = function(obj, theViewport) {
+
     const DOUBLE_CLICK_INTERVAL = 500;
 
     var _myViewport              = theViewport ? theViewport : window.canvas.childNode("viewport");

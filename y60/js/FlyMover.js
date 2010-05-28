@@ -65,12 +65,12 @@
 
 use("MoverBase.js");
 
-function FlyMover() {
-    this.Constructor(this);
+function FlyMover(theViewport) {
+    this.Constructor(this, theViewport);
 }
 
-FlyMover.prototype.Constructor = function(self) {
-    MoverBase.prototype.Constructor(self);
+FlyMover.prototype.Constructor = function(self, theViewport) {
+    MoverBase.prototype.Constructor(self, theViewport);
     self.Mover = [];
 
     const TURN_SPEED        = 1;

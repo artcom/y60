@@ -277,7 +277,13 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
                     print("Normals: " + (self.getActiveViewport().drawnormals ? "on" : "off"));
                     break;
                 case 'm':
-                    self.nextMover();
+                    var my3dCamera = window.scene.dom.find(".//world[@name='3d-world']/camera");
+                    if (my3dCamera !== undefined) {
+                        var my3dViewport = window.scene.dom.find(".//viewport[@camera='" + my3dCamera.id + "']");
+                        self.nextMover(my3dViewport);
+                    } else {
+                        self.nextMover();
+                    }                  
                     break;
                 case 'F':
                     self.getActiveViewport().flatshading = !self.getActiveViewport().flatshading;
