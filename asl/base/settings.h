@@ -169,7 +169,7 @@ namespace asl {
 #define DESTRACE(x) //x
 
 
-#if defined(_WIN32) && defined(AC_BUILT_WITH_CMAKE)
+#if defined(_WIN32)
     //C4661 (no suitable definition provided for explicit template
     //instantiation request) -> ToDo: should be removed
 #   pragma warning( disable:  4251 4661)

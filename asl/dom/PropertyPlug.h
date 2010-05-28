@@ -83,6 +83,7 @@ namespace dom {
             Node& myNode = theFacade->getNode();
             ensureTextChild(myNode);
         }
+        virtual ~PropertyPlug() {}
 
         const ValuePtr getDefaultValue(const Node & theNode) const {
             if(!_myTextChild) {

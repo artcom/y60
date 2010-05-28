@@ -85,7 +85,7 @@ class ArgumentsUnitTest : public UnitTest {
             ENSURE( ! myArguments.parse( 0, 0 ));
 
             int dummyArgcBad = 7;
-            char * dummyArgvBad[] = {
+            const char * dummyArgvBad[] = {
                 "dummyProgramName", "firstFileName", "--bottles-in-fridge", "12" ,
                 "--check-beer-in-the-fridge", "someFileName", "anotherFileName"};
 
@@ -99,7 +99,7 @@ class ArgumentsUnitTest : public UnitTest {
             myArguments = asl::Arguments(myOptions);
 
             int dummyArgcGood = 7;
-            char * dummyArgvGood[] = { "dummyProgramName", "--blah-fasel",
+            const char * dummyArgvGood[] = { "dummyProgramName", "--blah-fasel",
                                        "firstFileName", "--bottles-in-fridge", "12" ,
                                        "someFileName", "anotherFileName"};
             ENSURE( myArguments.parse(dummyArgcGood, dummyArgvGood));
@@ -122,7 +122,7 @@ class ArgumentsUnitTest : public UnitTest {
                 myArguments = asl::Arguments(myOptions);
                 // test "--" stops parsing arguments
                 int dummyArgcGood = 7;
-                char * dummyArgvGood[] = { "myProgramName", "foo", "--bottles-in-fridge", "-1", "--", "--not-parsed", "--" };
+                const char * dummyArgvGood[] = { "myProgramName", "foo", "--bottles-in-fridge", "-1", "--", "--not-parsed", "--" };
                 ENSURE( myArguments.parse(dummyArgcGood, dummyArgvGood));
                 ENSURE( myArguments.haveOption("--bottles-in-fridge"));
                 DPRINT( myArguments.getCount() );

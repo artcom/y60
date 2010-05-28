@@ -56,8 +56,8 @@ HWSampleSink::HWSampleSink(const string & myName, SampleFormat mySampleFormat,
                            unsigned mySampleRate, unsigned numChannels)
     : SampleSource(myName, mySampleFormat, mySampleRate, numChannels),
       AudioTimeSource(0, mySampleRate),
-      _myStopWhenEmpty(false),
       _myState(STOPPED),
+      _myStopWhenEmpty(false),
       _isDelayingPlay(false)
 {
     AC_DEBUG << "HWSampleSink::HWSampleSink (" << _myName << ")";
@@ -391,6 +391,11 @@ void HWSampleSink::changeState(State newState) {
     case STOPPED:
     case PAUSED:
         disable();
+        break;
+    case STOPPING_FADE_OUT: // avoid warning
+    case PAUSING_FADE_OUT: // avoid warning
+    case PLAYBACK_DONE: // avoid warning
+    case DELAYING_PLAY: // avoid warning
         break;
     }
 }

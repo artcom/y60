@@ -59,9 +59,7 @@
 
 #include <iostream>
 
-#ifdef AC_BUILT_WITH_CMAKE
-#   include <acmake/y60image_paths.h>
-#endif
+#include <acmake/y60image_paths.h>
 
 #include <asl/base/string_functions.h>
 #include <asl/base/UnitTest.h>
@@ -90,11 +88,7 @@ class RasterTest : public UnitTest {
         void run() {
 
 
-#ifdef AC_BUILT_WITH_CMAKE
 #define IMAGE_DIR CMAKE_CURRENT_SOURCE_DIR"/testfiles"
-#else
-#define IMAGE_DIR "../../testfiles"
-#endif
 
             testImageFile(IMAGE_DIR "/white_square_4x4.PNG");
             testImageFile(IMAGE_DIR "/grey_square_4x4.PNG");

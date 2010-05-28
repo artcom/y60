@@ -3,16 +3,12 @@ set(SOURCES
 Demux.cpp
 FFMpegDecoder2.cpp
 FFMpegURLProtocol.cpp
-VideoMsg.cpp
-VideoMsgQueue.cpp
 )
 
 set(HEADERS
 Demux.h
 FFMpegDecoder2.h
 FFMpegURLProtocol.h
-VideoMsg.h
-VideoMsgQueue.h
 y60_ffmpegdecoder2_settings.h
 )
 
@@ -28,6 +24,7 @@ y60_add_component(
     EXTERNS ${EXTERNALS}
 )
 
-y60_add_jstest(Leak mod_ffmpeg2)
+# Disabled due to excessive flakyness ... see y60/video/testLeak.js
+#y60_add_jstest(Leak mod_ffmpeg2)
 y60_add_jstest(Movie mod_ffmpeg2)
 y60_add_jstest(Seek mod_ffmpeg2)

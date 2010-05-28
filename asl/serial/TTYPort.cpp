@@ -102,7 +102,7 @@ TTYPort::open(unsigned int theBaudRate, unsigned int theDataBits,
              << " stopbits: "  << theStopBits
              << " handshake: " << theHWHandShakeFlag << endl;
 
-    mode_t myOpenMode = O_RDWR | O_NOCTTY;
+    mode_t myOpenMode = mode_t(O_RDWR | O_NOCTTY);
     mode_t myOpenNonBlockMode = 0;
 
     if (theMinBytesPerRead == 0 && theTimeout == 0) {
@@ -271,7 +271,7 @@ TTYPort::read(char * theBuffer, size_t & theSize) {
         }
     }
 
-    if (myReadBytes == theSize) {
+    if (myReadBytes == (int)theSize) {
         AC_TRACE << "TTYPort: read all " << myReadBytes << " bytes";
         return true;
     } else {
@@ -294,7 +294,7 @@ TTYPort::write(const char * theBuffer, size_t theSize) {
         return;
     }
 
-    if (theSize != myWrittenBytes) {
+    if ((int)theSize != myWrittenBytes) {
         throw SerialPortException(string("Can not write ") + as_string(theSize) +
                                " bytes to " + getDeviceName() + ". Only " +
                                as_string(myWrittenBytes) + " bytes got written.",

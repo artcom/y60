@@ -82,13 +82,13 @@ RequestThread::RequestThread(const std::string & theLocalPath,
                       const std::vector<std::pair<std::string, std::string> > & theOutdatedAssets,
                       unsigned int theMaxRequestCount,
                       bool theVerboseFlag) :
-    _myLocalPath(theLocalPath),
-    _myUsername(theUsername),
-    _myPassword(thePassword),
-    _myUserAgent(theUserAgent),
-    _myProxy(theProxy),
     _myOutdatedAssets(theOutdatedAssets),
     _myMaxRequestCount(theMaxRequestCount),
+    _myUserAgent(theUserAgent),
+    _myLocalPath(theLocalPath),
+    _myProxy(theProxy),
+    _myUsername(theUsername),
+    _myPassword(thePassword),
     _myVerboseFlag(theVerboseFlag),
     _remainingCount(theOutdatedAssets.size())
 {

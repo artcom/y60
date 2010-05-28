@@ -1,6 +1,6 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <project default-recipe="GNU Make">
-    <resource name="cmake"/>
+    
     <property name="build.root" value="_builds"/>
     <property name="ctest.log.dir" value="Testing/Temporary/"/>
 
@@ -21,119 +21,67 @@
 
     <msbuild.pp name="msbuild.pp"/>
 
-    <regex-test.pp name="ctest.pp"
-                   name-group="3"
-                   status-group="4"
-                   details-group="5"
-                   pass-status="Passed"
-                   failure-status="***"><![CDATA[^\\s*\\d+/\\d+\\s+Test(ing)?\\s+(#\\d+:\\s+)?(\\w+)[ .]*(\\*\\*\\*|Passed)(.*)\$]]></regex-test.pp>
+    <regex-test.pp name="ctest.pp" name-group="3" status-group="4" details-group="5" pass-status="Passed" failure-status="***"><![CDATA[^\\s*\\d+/\\d+\\s+Test(ing)?\\s+(#\\d+:\\s+)?(\\w+)[ .]*(\\*\\*\\*|Passed)(.*)\$]]></regex-test.pp>
 
     <macro name="run_cmake">
-        <executable name="create_build_dir" exe="${cmake.bin}"
-                    args="-E make_directory ${build.dir}"/>
-        <executable name="flush_cmake_cache" exe="${cmake.bin}"
-                    working-dir="${build.dir}" args="-E remove CMakeCache.txt"/>
-        <command name="configure">
-            <executable exe="${cmake.bin}" working-dir="${build.dir}"
-                        args="${cmake.recipe.args} ${cmake.agent.args} ${cmake.extra.args}">
+        <executable name="create_build_dir" exe="${cmake.bin}" args="-E make_directory ${build.dir}"/>
+        <executable name="flush_cmake_cache" exe="${cmake.bin}" working-dir="${build.dir}" args="-E remove CMakeCache.txt"/>
+        <executable exe="${cmake.bin}" working-dir="${build.dir}" args="${cmake.recipe.args} ${cmake.agent.args} ${cmake.extra.args}" name="configure">
                 <arg>-G</arg><arg>${cmake.generator}</arg>
                 <arg>-D</arg><arg>CMAKE_VERBOSE_MAKEFILE=1</arg>
                 <arg>${cmake.source.dir}</arg>
 
                 <process processor="${cmake.pp}"/>
             </executable>
-        </command>
     </macro>
 
     <macro name="run_ctest">
-        <command name="test">
-            <executable exe="${ctest.bin}"
-                        args="${ctest.agent.args} ${ctest.extra.args}" working-dir="${build.dir}">
+        <executable exe="${ctest.bin}" args="${ctest.agent.args} ${ctest.extra.args}" working-dir="${build.dir}" name="test">
+            
                 <process processor="${ctest.pp}"/>
-            </executable>
+            
             <dir-artifact name="test output" base="${build.dir}/${ctest.log.dir}"/>
-        </command>
+        </executable>
     </macro>
 
     <macro name="run_gmake_build">
-        <command name="build">
-            <make args="-j ${parallel.jobs} VERBOSE=1" working-dir="${build.dir}">
+        <make args="-j ${parallel.jobs} VERBOSE=1" working-dir="${build.dir}" name="build">
                 <process processor="${gcc.pp}"/>
             </make>
-        </command>
     </macro>
 
     <macro name="run_gmake_docs">
-        <command name="documentation">
-            <make args="ASL-doxygen Y60-doxygen Y60-jsapi Y60-jsdoc" working-dir="${build.dir}"/>
-        </command>
+        <make args="ASL-doxygen Y60-doxygen Y60-jsapi Y60-jsdoc" working-dir="${build.dir}" name="documentation"/>
     </macro>
 
     <macro name="run_nmake_build">
-        <command name="build">
-            <executable exe="${vs.nmake.bin}" working-dir="${build.dir}">
+        <executable exe="${vs.nmake.bin}" working-dir="${build.dir}" name="build">
                 <process processor="${msbuild.pp}"/>
             </executable>
-        </command>
     </macro>
 
     <macro name="run_nmake_docs">
-        <command name="documentation">
-            <executable exe="${vs.nmake.bin}" working-dir="${build.dir}"
-                        args="ASL-doxygen Y60-doxygen Y60-jsapi Y60-jsdoc">
+        <executable exe="${vs.nmake.bin}" working-dir="${build.dir}" args="ASL-doxygen Y60-doxygen Y60-jsapi Y60-jsdoc" name="documentation">
                 <process processor="${msbuild.pp}"/>
             </executable>
-        </command>
     </macro>
 
     <macro name="run_cpack_windows">
-        <command name="package">
-            <executable
-               exe="${cpack.bin}"
-               args="${cpack.agent.args} ${cpack.extra.args}"
-               working-dir="${build.dir}"
-               />
-            <artifact 
-               ignore-stale="true"
-               name="installer"
-               file="${build.dir}/PRO60-*.*.*-win32.exe"
-               />
-            <artifact 
-               ignore-stale="true"
-               name="binary-zip"
-               file="${build.dir}/PRO60-*.*.*-win32.zip"
-               />
-        </command>
+        <executable exe="${cpack.bin}" args="${cpack.agent.args} ${cpack.extra.args}" working-dir="${build.dir}" name="package">
+            
+            <artifact ignore-stale="true" name="installer" file="${build.dir}/PRO60-*.*.*-win32.exe"/>
+            <artifact ignore-stale="true" name="binary-zip" file="${build.dir}/PRO60-*.*.*-win32.zip"/>
+        </executable>
     </macro>
 
     <macro name="run_cpack_linux">
-        <command name="package">
-            <executable
-               exe="${cpack.bin}"
-               args="${cpack.agent.args} ${cpack.extra.args}"
-               working-dir="${build.dir}"
-               />
-            <artifact
-               ignore-stale="true"
-               name="package-rpm"
-               file="${build.dir}/PRO60-*.*.*-Linux.rpm"
-               />
-            <artifact
-               ignore-stale="true"
-               name="package-deb"
-               file="${build.dir}/PRO60-*.*.*-Linux.deb"
-               />
-            <artifact
-               ignore-stale="true"
-               name="binary-tbz2"
-               file="${build.dir}/PRO60-*.*.*-Linux.tar.bz2"
-               />
-            <artifact
-               ignore-stale="true"
-               name="binary-tgz"
-               file="${build.dir}/PRO60-*.*.*-Linux.tar.gz"
-               />
-        </command>
+        <executable exe="${cpack.bin}" args="${cpack.agent.args} ${cpack.extra.args}" working-dir="${build.dir}" name="package">
+            
+            <artifact ignore-stale="true" name="package-rpm" file="${build.dir}/PRO60-*.*.*-Linux.rpm"/>
+            <artifact ignore-stale="true" name="package-deb" file="${build.dir}/PRO60-*.*.*-Linux.deb"/>
+            <artifact ignore-stale="true" name="binary-tbz2" file="${build.dir}/PRO60-*.*.*-Linux.tar.bz2"/>
+            <artifact ignore-stale="true" name="binary-tgz" file="${build.dir}/PRO60-*.*.*-Linux.tar.gz"/>
+        </executable>
     </macro>
 
     <!-- single configuration CMake generators (make,nmake,etc) -->
@@ -178,11 +126,10 @@
         </recipe>
 
         <recipe name="NMake Continuous">
-            <resource name="visual studio"/>
+            
             <property name="cmake.generator" value="NMake Makefiles"/>
 
-            <property name="cmake.recipe.args"
-                      value="${cmake.recipe.args} -D ACMAKE_PARALLEL_CL=${parallel.jobs}"/>
+            <property name="cmake.recipe.args" value="${cmake.recipe.args} -D ACMAKE_PARALLEL_CL=${parallel.jobs}"/>
 
             <macro-ref macro="${run_cmake}"/>
             <macro-ref macro="${run_nmake_build}"/>
@@ -190,11 +137,10 @@
         </recipe>
 
         <recipe name="NMake Nightly">
-            <resource name="visual studio"/>
+            
             <property name="cmake.generator" value="NMake Makefiles"/>
 
-            <property name="cmake.recipe.args"
-                      value="${cmake.recipe.args} -D ACMAKE_PARALLEL_CL=${parallel.jobs}"/>
+            <property name="cmake.recipe.args" value="${cmake.recipe.args} -D ACMAKE_PARALLEL_CL=${parallel.jobs}"/>
 
             <macro-ref macro="${run_cmake}"/>
             <macro-ref macro="${run_nmake_build}"/>
@@ -211,21 +157,19 @@
         <property name="cmake.recipe.args" value=""/>
 
         <recipe name="MSVC">
-            <resource name="visual studio"/>
-            <resource name="win32"/>
+            
+            
             <property name="cmake.generator" value="${vs.cmake.generator}"/>
 
             <macro-ref macro="${run_cmake}"/>
 
-            <command name="build">
-                <executable exe="${vs.vcbuild.bin}" working-dir="${build.dir}">
+            <executable exe="${vs.vcbuild.bin}" working-dir="${build.dir}" name="build">
                     <arg>/M$(parallel.jobs:1)</arg>
                     <arg>${vcbuild.solution.file}</arg>
-                    <arg>&quot;${build.type}|${win32.vcbuild.platform}&quot;</arg>
+                    <arg>"${build.type}|${win32.vcbuild.platform}"</arg>
 
                     <process processor="${msbuild.pp}"/>
                 </executable>
-            </command>
 
             <macro-ref macro="${run_ctest}"/>
         </recipe>

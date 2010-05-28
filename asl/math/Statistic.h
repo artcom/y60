@@ -81,14 +81,14 @@ namespace asl {
                 values after <theOutputIntervalSamples> samples have been collected.
                 The statistic is reset after each output.
             */
-            Statistic(char * theName, int theOutputIntervalSamples);
+            Statistic(std::string const& theName, int theOutputIntervalSamples);
 
             /**
                 This constructor causes the class to automatically output its
                 values after <theOutputIntervalTime> has passed.
                 The statistic is reset after each output.
             */
-            Statistic(char * theName, double theOutputIntervalTime);
+            Statistic(std::string const& theName, double theOutputIntervalTime);
 
             virtual ~Statistic() {
             }
@@ -138,23 +138,19 @@ namespace asl {
             }
 
         private:
-#ifdef LINUX
-            long long _myNumberOfSamples;
-#else
-            long      _myNumberOfSamples;
-#endif
-            double    _mySampleSum;
-            double    _mySquaredSampleSum;
-            double    _myMaximum;
-            double    _myMinimum;
-            double    _myVariance;
+            asl::Signed64   _myNumberOfSamples;
+            double          _mySampleSum;
+            double          _mySquaredSampleSum;
+            double          _myMaximum;
+            double          _myMinimum;
+            double          _myVariance;
 
-            char *    _myName;
-            int       _myOutputIntervalSamples;
-            double    _myOutputIntervalTime;
-            double    _myLastOutputTime;
+            std::string     _myName;
+            int             _myOutputIntervalSamples;
+            double          _myOutputIntervalTime;
+            double          _myLastOutputTime;
 
-            bool      _isEnabled;
+            bool            _isEnabled;
     };
 
     inline
@@ -181,8 +177,8 @@ namespace asl {
     class ASL_MATH_DECL BoolStatistic : public Statistic {
         public:
             BoolStatistic();
-            BoolStatistic(char * theName, int theOutputIntervalSamples);
-            BoolStatistic(char * theName, double theOutputIntervalTime);
+            BoolStatistic(std::string const& theName, int theOutputIntervalSamples);
+            BoolStatistic(std::string const& theName, double theOutputIntervalTime);
             virtual ~BoolStatistic() {};
 
             void addSample(bool theSample);
@@ -214,8 +210,8 @@ namespace asl {
     class ASL_MATH_DECL FrequencyStatistic : public Statistic {
         public:
             FrequencyStatistic();
-            FrequencyStatistic(char * theName, int theOutputIntervalSamples);
-            FrequencyStatistic(char * theName, double theOutputIntervalTime);
+            FrequencyStatistic(std::string const& theName, int theOutputIntervalSamples);
+            FrequencyStatistic(std::string const& theName, double theOutputIntervalTime);
 
             virtual ~FrequencyStatistic() {};
 

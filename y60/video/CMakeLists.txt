@@ -4,6 +4,9 @@ Capture.cpp
 M60Decoder.cpp
 Movie.cpp
 MovieDecoderBase.cpp
+VideoMsg.cpp
+VideoMsgQueue.cpp
+
 )
 
 set(HEADERS
@@ -15,6 +18,8 @@ M60Header.h
 Movie.h
 MovieDecoderBase.h
 MovieEncoding.h
+VideoMsg.h
+VideoMsgQueue.h
 y60_video_settings.h
 )
 

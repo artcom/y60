@@ -4,9 +4,7 @@
 #include "ShaderTypes.h"
 #include "ShaderLibrary.h"
 
-#ifdef AC_BUILT_WITH_CMAKE
-#   include <acmake/y60glrender_paths.h>
-#endif
+#include <acmake/y60glrender_paths.h>
 
 #include <asl/base/Exception.h>
 #include <Cg/cg.h>
@@ -49,11 +47,7 @@ testShaderLibrary(const std::string & theLibraryFileName, const std::string theV
 
 int main(int argc, char * argv[]) {
 
-#ifdef AC_BUILT_WITH_CMAKE
 #define SHADER_DIR CMAKE_CURRENT_SOURCE_DIR"/../shader/"
-#else
-#define SHADER_DIR "../../../shader/"
-#endif
 
 //    const std::string myLibraryDir = "../../../shader/";
 //const std::string myLibraryDir = "../../shader/";

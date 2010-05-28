@@ -3,9 +3,9 @@
 
 struct OpDef
 {
-  char * name;
-  int    len;
-  char * description;
+  const char * name;
+  int          len;
+  const char * description;
 };
 
 // for reserved opcodes

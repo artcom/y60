@@ -32,6 +32,7 @@ namespace dom {
 
     class PlugBase {
     public:
+        virtual ~PlugBase() {}
         virtual const ValuePtr getDefaultValue(const Node & theNode) const = 0;
         virtual const ValuePtr getValuePtr() const = 0;
     };

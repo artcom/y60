@@ -1,12 +1,11 @@
 <SkeletonImpl
     name="Skeleton"
     title="Skeleton"
-    decorations="false"
-    mouseCursor="false"
+    decorations="true"
+    mouseCursor="true"
     width="1280"
     height="1024"
     swapInterval="1"
-    fixedDeltaT="1/30"
     i18nContext="global-i18n">    
     <!--Template name="myTemplate" src="LAYOUT/myTemplate.spark"/-->
 
@@ -21,7 +20,7 @@
         </I18nText>
     </I18nContext>   
     
-    <NewText name="Language" x="100" y="100" z="5" fontSize="20" lineHeight="24" textColor="FFFFFF" textId="Text1"/>    
-    <NewText name="Language" x="100" y="300" z="10" fontSize="20" lineHeight="24" textColor="FFFFFF" textId="Text2"/>    
+    <!--NewText name="Language" x="100" y="100" z="5" fontSize="20" lineHeight="24" textColor="FFFFFF" textId="Text1"/>    
+    <NewText name="Language" x="100" y="300" z="10" fontSize="20" lineHeight="24" textColor="FFFFFF" textId="Text2"/-->    
                 
 </SkeletonImpl>

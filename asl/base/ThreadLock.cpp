@@ -61,7 +61,7 @@
 
 using namespace std;  // automatically added!
 namespace asl {
-void checkRetVal (int theRetVal, char * theFunc) {
+void checkRetVal (int theRetVal, const char * theFunc) {
     if (theRetVal != 0) {
         static bool myIsInCheckRetVal = false;
         if (myIsInCheckRetVal) {

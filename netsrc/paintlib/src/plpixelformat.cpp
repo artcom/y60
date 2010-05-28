@@ -54,7 +54,7 @@ DEFINEPIXELFORMAT(B32G32R32);    // RGB float
 DEFINEPIXELFORMAT(L8Cbr8);	// aka YUV 4:2:2
 DEFINEPIXELFORMAT(L8Cb8Cr8);	// aka YUV 4:4:4
 
-static char * ppChannelNames[] =
+static const char * ppChannelNames[] =
 	{
 		"R","G","B","A","I","L","Cbr","Cb","Cr","C","M","Y","K", "X"
 	};

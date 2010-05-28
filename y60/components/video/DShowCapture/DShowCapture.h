@@ -64,6 +64,7 @@
 #include <asl/base/ThreadLock.h>
 #include "DXSampleGrabber.h"
 #include "DShowGraph.h"
+#include "AVTDShowGraph.h"
 
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN

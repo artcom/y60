@@ -61,9 +61,9 @@
 
 #include "y60_ffmpegdecoder2_settings.h"
 
-#include "VideoMsgQueue.h"
 #include "Demux.h"
 
+#include <y60/video/VideoMsgQueue.h>
 #include <y60/video/AsyncDecoder.h>
 #include <y60/video/MovieEncoding.h>
 

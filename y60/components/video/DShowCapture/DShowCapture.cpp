@@ -73,11 +73,8 @@
 #define EMULATE_INTTYPES
 #endif
 extern "C" {
-#ifndef AC_BUILT_WITH_CMAKE
-#       include <ffmpeg/avcodec.h>
-#else
-#       include <avcodec.h>
-#endif
+#include <libavcodec/avcodec.h>
+
 #if LIBAVCODEC_VERSION_INT >= ((51<<16)+(38<<8)+0)
 #   include <libswscale/swscale.h>
 #endif
@@ -109,7 +106,12 @@ namespace y60 {
             unsigned myBufferLength = _myGraph->getHeight() * _myGraph->getWidth() * 3;
             if (myBufferLength == theTargetRaster->pixels().size()) {
                 if (_myDeinterlaceFlag) {
-                    int myPixelFormat = PIX_FMT_BGR24;
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52,20,0)
+        PixelFormat
+#else
+        int
+#endif
+                    myPixelFormat = PIX_FMT_BGR24;
                     unsigned myBytesPerPixel = 3;
                     unsigned int myLineSizeBytes = _myGraph->getWidth() * myBytesPerPixel;
 
@@ -133,7 +135,12 @@ namespace y60 {
                     mySrcPict.linesize[1] = myLineSizeBytes;
                     mySrcPict.linesize[2] = myLineSizeBytes;
 
-                    int myDestPixelFormat = PIX_FMT_YUV444P;
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52,20,0)
+        PixelFormat
+#else
+        int
+#endif
+                    myDestPixelFormat = PIX_FMT_YUV444P;
 #if LIBAVCODEC_VERSION_INT < ((51<<16)+(38<<8)+0)
                     img_convert(&myYUVPict, myDestPixelFormat, &mySrcPict, myPixelFormat,
                                 _myGraph->getWidth(), _myGraph->getHeight());
@@ -200,6 +207,7 @@ namespace y60 {
         unsigned myWhitebalanceV = 0;
         unsigned myShutter = 0;
         unsigned myGain = 0;
+        bool myAVT_Camera_Flag = false;
 
         if (myFrameWidth == 0) {
             myFrameWidth = 640;
@@ -214,9 +222,6 @@ namespace y60 {
             myRestartGraph = _myGraph->isRunning();
             delete _myGraph;
         }
-        _myGraph = new DShowGraph();
-
-        setPixelFormat(BGR);
 
         std::string::size_type idx = theFilename.find("width=");
         if (idx != std::string::npos) {
@@ -242,6 +247,10 @@ namespace y60 {
         if (idx != std::string::npos && theFilename.substr(idx+7).length() > 0) {
             myDeviceId = asl::as_int(theFilename.substr(idx+7));
         }
+        idx = theFilename.find("avtcamera=");
+        if (idx != std::string::npos && theFilename.substr(idx+10).length() > 0) {
+            myAVT_Camera_Flag = asl::as_int(theFilename.substr(idx+10)) == 1;
+        }
         idx = theFilename.find("whitebalanceb=");
         if (idx != std::string::npos && theFilename.substr(idx+14).length() > 0) {
             myWhitebalanceU = asl::as_int(theFilename.substr(idx+14));
@@ -264,12 +273,24 @@ namespace y60 {
             _myDeinterlaceFlag = asl::as_int(theFilename.substr(idx+12)) == 1 ? true:false;
         }
 
-        std::vector<std::string> myDevices = _myGraph->enumDevices();
-        if (myDeviceId >= myDevices.size()) {
-            throw DShowCapture::Exception("No such Device. Highest available DeviceId is: " + myDevices.size()-1, PLUS_FILE_LINE);
+        if (myAVT_Camera_Flag) {
+            _myGraph = new AVTDShowGraph();
+        } else {
+            _myGraph = new DShowGraph();
         }
 
-        setName(myDevices[myDeviceId]);
+        setPixelFormat(BGR);
+
+
+        std::vector<std::string> myDevices = _myGraph->enumDevices();
+        std::string myDeviceName = "unknown";
+        if (myDeviceId >= myDevices.size()) {
+            //throw DShowCapture::Exception("No such Device. Highest available DeviceId is: " + myDevices.size()-1, PLUS_FILE_LINE);
+        } else {
+            myDeviceName = myDevices[myDeviceId];
+        }
+
+        setName(myDeviceName);
         setFrameRate(myFrameRate);
         setFrameHeight(myFrameHeight);
         setFrameWidth(myFrameWidth);
@@ -278,6 +299,7 @@ namespace y60 {
         // Setup video size and image matrix
         float myXResize = float(myFrameWidth) / asl::nextPowerOfTwo(myFrameWidth);
         float myYResize = float(myFrameHeight) / asl::nextPowerOfTwo(myFrameHeight);
+
         _myGraph->setDesiredVideoFormat(myFrameWidth, myFrameHeight, myFrameRate, myBitsPerPixel);
 
         asl::Matrix4f myMatrix;

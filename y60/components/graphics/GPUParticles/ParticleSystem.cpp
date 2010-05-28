@@ -155,8 +155,8 @@ var myZ = myTrackballRadius * Math.cos(- _myTrackballOrientation.x) * Math.cos(_
 
 ParticleSystem::ParticleSystem(const y60::ScenePtr & theScene)
     : _myParticleCount(0)
-    , _myPointSize(5.0f, 0.0f, 64.0f)
     , _myScene(theScene)
+    , _myPointSize(5.0f, 0.0f, 64.0f)
 {}
 
 ParticleSystem::~ParticleSystem()

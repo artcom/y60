@@ -35,8 +35,6 @@ ac_add_project(
         ${REQ_PACKAGES}
     REQUIRED_PKGCONFIG
         ${REQ_PKGCONFIG}
-    DEFINITIONS
-        -DAC_BUILT_WITH_CMAKE
     CUSTOM_SCRIPTS
         ASLUtilities.cmake
 )

@@ -535,7 +535,7 @@ namespace dom {
                         if (asl::is_decimal_number(entity_name,value)) {
 							char myUTF8Buffer[6];
 							int myLen = OneUcs4ToUtf8Char(myUTF8Buffer, value);
-							for (unsigned i = 0; i < myLen; i++) {
+							for (int i = 0; i < myLen; i++) {
 								result += static_cast<char>(myUTF8Buffer[i]);
 							}
                             //result += static_cast<char>(value);
@@ -545,7 +545,7 @@ namespace dom {
                                 if (asl::is_hex_number(hex_string,value)) {
 									char myUTF8Buffer[6];
 									int myLen = OneUcs4ToUtf8Char(myUTF8Buffer, value);
-									for (unsigned i = 0; i < myLen; i++) {
+									for (int i = 0; i < myLen; i++) {
 										result += static_cast<char>(myUTF8Buffer[i]);
 									}
                                     //result += static_cast<char>(value);

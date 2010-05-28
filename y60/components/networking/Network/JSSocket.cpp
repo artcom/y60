@@ -456,8 +456,8 @@ JSConstIntPropertySpec *
 JSSocket::ConstIntProperties() {
 
     static JSConstIntPropertySpec myProperties[] = {
-            "UDP",               PROP_UDP,               SOCKET_TYPE_UDP,
-            "TCPCLIENT",         PROP_TCPCLIENT,         SOCKET_TYPE_TCPCLIENT,
+        {"UDP",               PROP_UDP,               SOCKET_TYPE_UDP},
+        {"TCPCLIENT",         PROP_TCPCLIENT,         SOCKET_TYPE_TCPCLIENT},
         {0}
     };
     return myProperties;

@@ -86,7 +86,7 @@ namespace inet {
                 return true;
             } catch (SocketException & se)
             {
-                se;  // Avoid unreferenced variable warning.
+                (void)se;  // Avoid unreferenced variable warning.
                 AC_DEBUG << retry << ". retry failed" << endl;
                 msleep(2000);
             }
