@@ -19,6 +19,7 @@ spark.NewText.Constructor = function(Protected) {
 
     var _myImage = null;
     var _myMaxWidth;
+    var _myMaxHeight;
     var _myMaxTextWidth = {};
     var _myLayoutHook;
     var _myTextChangedHook;
@@ -62,7 +63,7 @@ spark.NewText.Constructor = function(Protected) {
     Protected.render = function(theSize) {
         var myWidth = {width:0};
         _myLineWidths = [];
-        var mySize = spark.renderText(_myImage, _myText, _myStyle, new Vector2i(_myMaxWidth,0), myWidth, _myLineWidths);
+        var mySize = spark.renderText(_myImage, _myText, _myStyle, new Vector2i(_myMaxWidth,_myMaxHeight), myWidth, _myLineWidths);        
         _myMaxTextWidth =  myWidth.width;
         Public.width = mySize.x;
         Public.height = mySize.y;
@@ -83,6 +84,7 @@ spark.NewText.Constructor = function(Protected) {
         _myUpcase = Protected.getBoolean("upcase", false);
 
         _myMaxWidth = Protected.getNumber("maxWidth", 0);
+        _myMaxHeight = Protected.getNumber("maxHeight", 0);
 
         _myImage = Modelling.createImage(window.scene, 16, 16, "BGRA");
         var myTexture  = Modelling.createTexture(window.scene, _myImage);
@@ -95,7 +97,8 @@ spark.NewText.Constructor = function(Protected) {
         Public.text = _myText;
 
         // finally, render the text
-        Protected.render();
+        // redundant? text setter renders text; thus commented out.
+        //Protected.render();
     };
 
     Base.postRealize = Public.postRealize;
