@@ -70,7 +70,7 @@
 #define __IDxtAlphaSetter_INTERFACE_DEFINED__
 #define __IDxtJpeg_INTERFACE_DEFINED__
 #define __IDxtKey_INTERFACE_DEFINED__
-//  end-workaround (05/2010 VS)
+//  end-workaround (05/2010 VS) 
 #include <qedit.h>
 
 #include <asl/dom/Value.h>
