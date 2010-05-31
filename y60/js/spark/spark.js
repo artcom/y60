@@ -105,6 +105,8 @@ use("multitouch.js");
 use("internationalization.js");
 // dsa sensor support
 use("dsa.js");
+// MoverBase Wrapper to use spark Event-handling
+use("MoverBaseWrapper.js");
 
 // widgets
 if (!("disableSparkWidgets" in this)) {

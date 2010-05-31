@@ -333,7 +333,6 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
                     window.scene.dom.flushUnusedChildren();
                     break;
                 case 'h':
-                case 'H':
                     printHelp();
                     break;
                 case 's':

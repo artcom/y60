@@ -192,11 +192,13 @@ MoverBase.prototype.Constructor = function(obj, theViewport) {
         // Rotate about the world up vector
         myGlobalMatrix.rotateY(theWorldHeading);
         myGlobalMatrix.setRow(3, myWorldPosition);
-
+        
+        // Considering nested structure (camera within body node)
         var myParentMatrix = new Matrix4f(_myMoverObject.parentNode.globalmatrix);
         myParentMatrix.invert();
         myGlobalMatrix.postMultiply(myParentMatrix);
 
+        // update MoverObject
         var myDecomposition = myGlobalMatrix.decompose();
         _myMoverObject.orientation = myDecomposition.orientation;
         _myMoverObject.position    = myGlobalMatrix.getTranslation();
