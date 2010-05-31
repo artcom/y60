@@ -7,7 +7,7 @@ if( WIN32 )
     mark_as_advanced(DIRECTX_SDK_DIR)
 
     find_path(DIRECTX_INCLUDE_DIR dxsdkver.h)
-    mark_as_advanced(DIRECTX_INCLUDE_DIR)
+    mark_as_advanced(DIRECTX_INCLUDE_DIRS)
 
     set(DIRECTX_SUBLIBS dsound dinput8 dxguid )
     mark_as_advanced(DIRECTX_SUBLIBS)
