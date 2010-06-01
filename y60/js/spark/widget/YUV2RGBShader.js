@@ -8,6 +8,8 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
+use("BuildUtils.js");
+
 spark.YUV2RGBShader = spark.ComponentClass("YUV2RGBShader");
 spark.YUV2RGBShader.Constructor = function(Protected) {
     
@@ -15,13 +17,8 @@ spark.YUV2RGBShader.Constructor = function(Protected) {
     var Public = this;
     var _myTextures = [];
     var _mySource = null;
-    this.Inherit(spark.Container);
     
-    
-    
-    Base.realize = Public.realize;
     Public.realize = function() {
-        Base.realize();
         Public.movie = spark.openMovie(Public.src, "YUV420", Protected.getString("decoderhint", "FFMpegDecoder2"));
 	    Base.movieSetter = Public.__lookupSetter__("movie");
         Public.movie setter = function (theNode) {
@@ -62,12 +59,6 @@ spark.YUV2RGBShader.Constructor = function(Protected) {
         }
         myMaterial.enabled = true;
     }
-    
-    Base.postRealize = Public.postRealize;
-    Public.postRealize = function() {
-        Base.postRealize();
-    }
-    
     
     function feature_n_times(theWeight, theToken, n) {
         var f = "[" + theWeight + "[";

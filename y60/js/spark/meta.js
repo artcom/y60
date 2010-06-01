@@ -108,7 +108,7 @@ spark.ComponentClass = function (theName) {
 
     // wrap the constructor with an initialization call
     var myInitializingConstructor = function (theNode) {
-        myConstructor.call(this, theNode);
+        myConstructor.call(this);
         if (theNode) {
             this.initialize(theNode);
         }

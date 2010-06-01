@@ -278,8 +278,8 @@ spark.Widget.Constructor = function(Protected) {
 
     Public.propagateAlpha = function() {
         _myActualAlpha = Public.parentAlpha * Public.alpha;//_myAlpha;
-
-        for(var i = 0; i < Public.children.length; i++) {
+        var myChildCount = Public.children.length;
+        for(var i = 0; i < myChildCount; i++) {
             var myChild = Public.children[i];
             if("propagateAlpha" in myChild) {
                 myChild.propagateAlpha();

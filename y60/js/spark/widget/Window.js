@@ -154,8 +154,6 @@ spark.Window.Constructor = function(Protected) {
         return window.height;
     }
 
-    const PICK_RADIUS = 1;
-
     Public.pickWidget = function(theX, theY) {
         var myBody = Public.picking.pickBodyBySweepingSphereFromBodies(theX, theY, _myPickRadius, Public.sceneNode);
         if(myBody) {
