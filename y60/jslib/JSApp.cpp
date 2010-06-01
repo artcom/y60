@@ -1102,7 +1102,7 @@ GC(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }
-
+#ifndef USE_TRACEMONKEY
 JS_STATIC_DLL_CALLBACK(JSBool)
 IncrementalGC(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("One Incremental GC Step garbage collection.");
@@ -1118,7 +1118,7 @@ IncrementalGC(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }
-
+#endif
 JS_STATIC_DLL_CALLBACK(JSBool)
 Clear(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Clears a given object.");
@@ -1656,7 +1656,9 @@ static JSFunctionSpec glob_functions[] = {
     {"build",             BuildDate,      0},
     {"revision",          Revision,       0},
     {"gc",                GC,             0},
+#ifndef USE_TRACEMONKEY
     {"incrementalGC",     IncrementalGC,  0},
+#endif
     {"clear",             Clear,          1},
     {"__FILE__",          File,           0},
     {"__LINE__",          Line,           0},
