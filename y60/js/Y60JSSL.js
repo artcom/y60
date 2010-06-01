@@ -206,6 +206,16 @@ function stringToArray(s) {
     return s.substring(1, s.length - 1).split(",");
 }
 
+// Adds indexOf as free function for array index discovery
+function indexOf(theArray, theItem) {
+    for (var i = 0; i < theArray.length; ++i) {
+        if (theArray[i] === theItem) {
+            return i;
+        }
+    }
+    return -1;
+}
+
 function stringToByteArray(theString) {
     var myResult = [];
     for (var i = 0; i < theString.length; ++i) {
