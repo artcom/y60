@@ -16,7 +16,7 @@ macro(asl_add_schema XSD)
         add_custom_command(
             OUTPUT  ${THIS_XSD_CXX_FILE}
             DEPENDS ${THIS_XSD_FILE} text2src
-            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+            WORKING_DIRECTORY ${PRO60_DEPS_ROOT_DIR}/bin
             COMMAND 
                 ${TEXT2SRC}
                 --inputfile  "${CMAKE_CURRENT_SOURCE_DIR}/${THIS_XSD_FILE}"
