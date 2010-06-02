@@ -1383,7 +1383,6 @@ dom::Node::print(std::ostream & os, const String& indent, const bool greedy) con
                 os << indent << "<" << _myName;
                 for (TypedNamedNodeMap::size_type attr = 0; attr < _myAttributes.size();++attr) {
                     const NodePtr myAttribute = _myAttributes.item(attr);
-
                     if(greedy && !myAttribute->shouldPrint()) {
                     	continue;
                     }
@@ -1468,10 +1467,10 @@ dom::Node::print(std::ostream & os, const String& indent, const bool greedy) con
                     getChildren()[0]._myType != ELEMENT_NODE &&
                     nodeType() != DOCUMENT_TYPE_NODE) )
         {
-            getChildren().item(child)->print(os,"");
+            getChildren().item(child)->print(os,"", greedy);
         }
         else {
-            getChildren().item(child)->print(os,indent + "    ");
+            getChildren().item(child)->print(os,indent + "    ", greedy);
         }
     }
 
