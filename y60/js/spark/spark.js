@@ -130,4 +130,8 @@ if (!("disableSparkWidgets" in this)) {
     use("spark/widget/NewText.js");
     use("spark/widget/Canvas.js");
     use("spark/widget/OffscreenCanvas.js");
+    use("spark/widget/RoundedCornerQuad.js");
+    use("spark/widget/RoundedCornerMovie.js");
+    use("spark/widget/RoundedCornerImage.js");
+    use("spark/widget/StretchyImage.js");
 }

@@ -17,6 +17,8 @@ float4 getRoundCornerPixel(float2 TexCoord0,
         c0 ---------------- c1
        (0,1)
     */
+
+
     TexCoord0.y /= aspectRatio;
     float dist = distance(float2(cornerDistance, 1/aspectRatio-cornerDistance), TexCoord0);
     if(cornerToggle.x == 1 && dist > radius && TexCoord0.x < cornerDistance && TexCoord0.y > 1/aspectRatio-cornerDistance) 
@@ -34,3 +36,4 @@ float4 getRoundCornerPixel(float2 TexCoord0,
     backgroundColor.a = Color.a*backgroundColor.a;
     return backgroundColor;
 }
+

@@ -1,0 +1,110 @@
+//=============================================================================
+// Copyright (C) 2003 ART+COM AG Berlin
+//
+// These coded instructions, statements, and computer programs contain
+// unpublished proprietary information of ART+COM AG Berlin, and
+// are copy protected by law. They may not be disclosed to third parties
+// or copied or duplicated in any form, in whole or in part, without the
+// specific, prior written permission of ART+COM AG Berlin.
+//=============================================================================
+
+#define PI 3.14159265358
+#define TWOPI 2*PI
+#define DEGTORAD(x) x*(PI/180)
+#define RADTODEG(x) x*(180/PI)
+// monitor gap, calculated as x/((1366+x)*4) where x=6 pixel gap width
+#define MONITOR_GAP 0.0014556040756
+#define MONITOR_GAP_X 0.001098096632503
+
+struct app2vert { 
+    float4 Position : POSITION;
+    float4 TexCoord0 : TEXCOORD0;
+};
+
+struct vert2frag {
+    float4 Vertex    : POSITION;
+    float2 TexCoord0 : TEXCOORD0;
+};
+
+
+float getAltitude(float HA, float delta, float latitude, float longitude) {
+    return RADTODEG(asin(sin(latitude)*sin(delta) + cos(latitude)*cos(delta)*cos(HA)));
+}
+
+
+vert2frag mainVertex(app2vert IN,    
+                     uniform float4x4 GL_MODELVIEW_PROJECTION,
+                     uniform float4x4 GL_TEXTURE)
+{
+    vert2frag OUT;
+
+    OUT.Vertex = mul(GL_MODELVIEW_PROJECTION, IN.Position);
+    OUT.TexCoord0 = mul(GL_TEXTURE, IN.TexCoord0).xy;
+    return OUT;
+}
+
+float4 mainFragment(vert2frag IN,
+                    uniform sampler2D night,
+                    uniform float alpha,
+                    uniform float delta,
+                    uniform float gst,
+                    uniform float lineThickness,
+                    uniform float lineAlpha,
+                    uniform float cropRightPercent,
+                    uniform float cropBottomPercent) : COLOR
+{
+    float4 nightColor = tex2D(night, IN.TexCoord0);
+    float myNightAlpha = nightColor.a;
+    float4 dayColor = float4(1.0, 1.0, 1.0, 0.0);
+    // due to the map being cut on the bottom and being too long on the right
+    // we cut and crop and wrap etc pp
+    float myTexCoordX = IN.TexCoord0.x/cropRightPercent;
+    
+    // 0.0333333 accounts for aprox. 12 degrees shift
+    myTexCoordX += 0.0333333/cropRightPercent;
+                       
+    float myTexCoordY = IN.TexCoord0.y*cropBottomPercent;
+    
+    // account for monitor gaps; the gap parts are missing in the texture
+    // thus we have to blow up tcoords to final image ratio, and advance
+    // at each gap 
+
+    if(IN.TexCoord0.x > 0.25) myTexCoordX += MONITOR_GAP_X;
+    if(IN.TexCoord0.x > 0.5) myTexCoordX += MONITOR_GAP_X;
+    if(IN.TexCoord0.x > 0.75) myTexCoordX += MONITOR_GAP_X;
+
+    if(myTexCoordY > 0.33333333*cropBottomPercent) myTexCoordY += MONITOR_GAP;
+    if(myTexCoordY-MONITOR_GAP > 0.66666666*cropBottomPercent) myTexCoordY += MONITOR_GAP;
+    
+    // VISUALIZE
+    /*
+    if(IN.TexCoord0.x > 0.25-MONITOR_GAP_X/2 && IN.TexCoord0.x < 0.25+MONITOR_GAP_X/2) return float4(1.0, 0.0, 0.0, 1.0);
+    if(IN.TexCoord0.x > 0.50-MONITOR_GAP_X/2 && IN.TexCoord0.x < 0.50+MONITOR_GAP_X/2) return float4(1.0, 0.0, 0.0, 1.0);
+    if(IN.TexCoord0.x > 0.75-MONITOR_GAP_X/2 && IN.TexCoord0.x < 0.75+MONITOR_GAP_X/2) return float4(1.0, 0.0, 0.0, 1.0);
+    
+    if(myTexCoordY-MONITOR_GAP > 0.33333333*cropBottomPercent-MONITOR_GAP/2 && myTexCoordY-MONITOR_GAP < 0.33333333*cropBottomPercent+MONITOR_GAP/2 ) return float4(1.0, 0.0, 0.0, 1.0);
+    if(myTexCoordY-MONITOR_GAP > 0.66666666*cropBottomPercent-MONITOR_GAP/2 && myTexCoordY-MONITOR_GAP < 0.66666666*cropBottomPercent+MONITOR_GAP/2 ) return float4(1.0, 0.0, 0.0, 1.0);
+    */
+    float longitude = PI - myTexCoordX*TWOPI;
+    // solar hour angle
+    float HA = gst*TWOPI/24 - longitude - DEGTORAD(alpha);
+    float latitude = PI/2 - myTexCoordY*PI;
+	float alt = getAltitude(HA, DEGTORAD(delta), latitude, longitude);
+    // TODO: param
+    float intFactor, nightAltMax = 0, dayAltMin = 0;
+    if(alt > -lineThickness/2.0 && alt < lineThickness/2.0) {
+        float newAlpha = lineAlpha - ((abs(alt) * lineAlpha) / (lineThickness/2.0));
+        if(IN.TexCoord0.x > cropRightPercent) return float4(1.0, 1.0, 1.0, newAlpha - (IN.TexCoord0.x - cropRightPercent)*10);
+        return float4(1.0, 1.0, 1.0, newAlpha);
+    }
+    if(alt > dayAltMin) {
+        intFactor = 1;
+    } else if(alt < nightAltMax) {
+        intFactor = 0;
+    } else {
+        intFactor = (alt - nightAltMax)/(dayAltMin - nightAltMax);
+    }
+    if(IN.TexCoord0.x > cropRightPercent) return ((1-intFactor)*nightColor + intFactor*dayColor) + float4(0.0, 0.0, 0.0, -(IN.TexCoord0.x - cropRightPercent)*10);
+    return (1-intFactor)*nightColor + intFactor*dayColor;
+}
+

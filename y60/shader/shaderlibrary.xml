@@ -1867,51 +1867,6 @@
             </properties>
         </fragmentshader>        
     </shader>    
-    <shader id="s1414141" name="tropfen_2tex" cost="10">
-        <supports>
-            <feature class="lighting" values="[`unlit`]"/>
-            <feature class="texcoord" values="[`uv_map`, `uv_map`]"/>
-            <feature class="option" values="[`tropfen_2`]"/>
-            <feature class="textures" values="[`paint`, `paint`]"/>            
-        </supports>
-        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`,`gp4vp`]" files="[`tropfen.cg`]" entryfunctions="[`mainVertex`]">
-            <properties>
-            </properties>
-            <vertexparameters>
-                <vector4f name="position"/>
-                <vector2f name="texcoord0"/>
-            </vertexparameters>
-        </vertexshader>
-        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`,`gp4fp`]" files="[`tropfen.cg`]" entryfunctions="[`mainFragment2Tex`]">
-            <properties>
-                <sampler2d name="tex0">0</sampler2d>
-                <sampler2d name="tex1">1</sampler2d> 
-                 <float name="radius">1.0</float>
-            </properties>
-        </fragmentshader>        
-    </shader>    
-    <shader id="s1414142" name="tropfen" cost="10">
-        <supports>
-            <feature class="lighting" values="[`unlit`]"/>
-            <feature class="texcoord" values="[`uv_map`]"/>
-            <feature class="option" values="[`tropfen`]"/>
-            <feature class="textures" values="[`paint`]"/>            
-        </supports>
-        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`,`gp4vp`]" files="[`tropfen.cg`]" entryfunctions="[`mainVertex`]">
-            <properties>
-            </properties>
-            <vertexparameters>
-                <vector4f name="position"/>
-                <vector2f name="texcoord0"/>
-            </vertexparameters>
-        </vertexshader>
-        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`,`gp4fp`]" files="[`tropfen.cg`]" entryfunctions="[`mainFragment`]">
-            <properties>
-                <sampler2d name="tex0">0</sampler2d>
-                <float name="radius">1.0</float>
-            </properties>
-        </fragmentshader>        
-    </shader> 
     <shader id="s1414143" name="text_blur" cost="10">
         <supports>
             <feature class="textures" values="[`paint`]"/>
@@ -2017,36 +1972,6 @@
            </properties>
         </fragmentshader>
     </shader>
-    <shader id="s1414146" name="text_glow_blurred_masked" cost="10">
-        <supports>
-            <feature class="textures" values="[`paint`]"/>
-            <feature class="texcoord" values="[`*`]"/>
-            <feature class="lighting" values="[`unlit`]"/>
-            <feature class="effect"   values="[`glowBlur`]"/>
-            <feature class="option"   values="[`tropfen`]"/>
-        </supports>
-        <vertexshader profiles="[`vp40`]" files="[`tropfen.cg`]" entryfunctions="[`mainVertex`]">
-            <properties>
-            </properties>
-            <vertexparameters>
-                <vector4f name="position"/>
-                <vector2f name="texcoord0"/>
-            </vertexparameters>
-        </vertexshader>
-        <fragmentshader profiles="[`fp40`]" files="[`tropfen.cg`]" entryfunctions="[`mainFragmentGlowBlurTropfen`]">
-            <properties>
-                <vector4f name="surfacecolor">[1.0,1.0,1.0,1.0]</vector4f>
-                <sampler2d name="tex0">0</sampler2d>
-                <float name="radius">1.0</float>
-                <float name="width">512</float>  
-                <float name="height">512</float>  
-                <float name="glow_radius">0.0</float>  
-                <float name="blur">0.0</float>  
-                <vector4f name="glow_color">[1.0,1.0,1.0,1.0]</vector4f> 
-                <vector2f name="offset">[0.0,0.0]</vector2f> 
-           </properties>
-        </fragmentshader>
-    </shader>
     <shader id="s14141414" name="movie_yuv2rgb" cost="10">
         <supports>
             <feature class="lighting" values="[`unlit`]"/>
@@ -2070,31 +1995,7 @@
             </properties>
         </fragmentshader>        
     </shader>    
-    <shader id="s141414141" name="movie_yuva2rgb" cost="10">
-        <supports>
-            <feature class="lighting" values="[`unlit`]"/>
-            <feature class="texcoord" values="[`uv_map`]"/>
-            <feature class="option" values="[`yuva2rgb`]"/>
-            <feature class="textures" values="[`paint`, `paint`, `paint`, `paint`]"/>            
-        </supports>
-        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`,`gp4vp`]" files="[`yuv2rgb.cg`]" entryfunctions="[`mainVertex`]">
-            <properties>
-            </properties>
-            <vertexparameters>
-                <vector4f name="position"/>
-                <vector2f name="texcoord0"/>
-            </vertexparameters>
-        </vertexshader>
-        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`,`gp4fp`]" files="[`yuv2rgb.cg`]" entryfunctions="[`mainFragmentYUVA`]">
-            <properties>
-                <sampler2d name="tex0">0</sampler2d>
-                <sampler2d name="tex1">1</sampler2d>
-                <sampler2d name="tex2">2</sampler2d>
-                <sampler2d name="tex3">3</sampler2d>
-            </properties>
-        </fragmentshader>        
-    </shader>    
-    <shader id="s14141415" name="movie_yuv2rgb" cost="10">
+   <shader id="s14141415" name="movie_yuv2rgb" cost="10">
         <supports>
             <feature class="lighting" values="[`unlit`]"/>
             <feature class="texcoord" values="[`uv_map`]"/>
@@ -2119,28 +2020,6 @@
             </properties>
         </fragmentshader>        
     </shader>    
-    <shader id="s1414141413" name="rgba2movies_inverted" cost="10">
-        <supports>
-            <feature class="lighting" values="[`unlit`]"/>
-            <feature class="texcoord" values="[`uv_map`]"/>
-            <feature class="option" values="[`rgba2movies_inverted`]"/>
-            <feature class="textures" values="[`paint`, `paint`]"/>            
-        </supports>
-        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`]" files="[`yuv2rgb.cg`]" entryfunctions="[`mainVertex`]">
-            <properties>
-            </properties>
-            <vertexparameters>
-                <vector4f name="position"/>
-                <vector2f name="texcoord0"/>
-            </vertexparameters>
-        </vertexshader>
-        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`]" files="[`yuv2rgb.cg`]" entryfunctions="[`mainFragmentRGBA_inverted`]">
-            <properties>
-                <sampler2d name="tex0">0</sampler2d>
-                <sampler2d name="tex1">1</sampler2d>
-            </properties>
-        </fragmentshader>        
-    </shader>   
     <shader id="s14141RoundedCorner" name="RoundedCorner" cost="10">
         <supports>
             <feature class="lighting" values="[`unlit`]"/>
@@ -2167,7 +2046,61 @@
                 <vector4f name="cornerToggle">[1,1,1,1]</vector4f>
             </properties>
         </fragmentshader>        
-    </shader>          
+    </shader>        
+    <shader id="s1414RoundedCornerMovie" name="movie_yuv2rgb_rounded_corner" cost="10">
+        <supports>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="texcoord" values="[`uv_map`]"/>
+            <feature class="option" values="[`yuv2rgb_round`]"/>
+            <feature class="vertexparams" values="[`color`]"/>
+            <feature class="textures" values="[`paint`, `paint`, `paint`]"/>
+        </supports>
+        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`,`gp4vp`]" files="[`yuv2rgb-round.cg`]" entryfunctions="[`mainVertex`]">
+            <properties/>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector4f name="color"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`,`gp4fp`]" files="[`yuv2rgb-round.cg`]" entryfunctions="[`mainFragment`]">
+            <properties>
+                <sampler2d name="tex0">0</sampler2d>
+                <sampler2d name="tex1">1</sampler2d>
+                <sampler2d name="tex2">2</sampler2d>
+                <float name="radius">0.2</float>
+                <float name="cornerDistance">0.2</float>
+                <float name="aspectRatio">1</float>
+                <vector4f name="cornerToggle">[1,1,1,1]</vector4f>
+            </properties>
+        </fragmentshader>
+    </shader> 
+    <shader id="s14141SunWorld" name="SunWorldClock" cost="10">
+        <supports>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="texcoord" values="[`uv_map`]"/>
+            <feature class="option" values="[`SunWorldClock`]"/>
+            <feature class="textures" values="[`paint`]"/>
+        </supports>
+        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`,`gp4vp`]" files="[`sunWorldClock.cg`]" entryfunctions="[`mainVertex`]">
+            <properties/>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`,`gp4fp`]" files="[`sunWorldClock.cg`]" entryfunctions="[`mainFragment`]">
+            <properties>
+                <sampler2d name="night">0</sampler2d>
+                <float name="alpha">0.0</float>
+                <float name="gst">0.0</float>
+                <float name="lineThickness">0.28</float>
+                <float name="lineAlpha">0.2</float>
+                <float name="cropRightPercent">0.80291</float>
+                <float name="cropBottomPercent">0.86924</float>
+            </properties>
+        </fragmentshader>
+    </shader> 
 </shaders>
 <combiners>
     <!-- 'previous' + 'texture' -->
