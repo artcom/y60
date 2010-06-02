@@ -134,9 +134,9 @@ DemoRendererExtension :: setBodyId(const std::string & theBodyId) {
             throw CubeNotFound("Body '" + theBodyId + "' not found.", PLUS_FILE_LINE);
         }
         _myCubeBody = _myCube->getFacade<Body>();
-        AC_DEBUG << "Body found";
+        AC_DEBUG << "setBodyId: Body found";
     } else {
-        AC_WARNING << "Scene not found";
+        AC_WARNING << "setBodyId: Scene not found";
     }
 }
 
@@ -170,7 +170,7 @@ DemoRendererExtension :: onFrame(AbstractRenderWindow * theWindow , double t) {
         _myCubeBody->set<OrientationTag>(myOrientation);
         AC_DEBUG << "...onFrame";
     } else {
-        AC_DEBUG << "bodyId is not (yet) yet. doing nothing";
+        AC_DEBUG << "bodyId is not (yet) set. Doing nothing.";
     }
 }
 
