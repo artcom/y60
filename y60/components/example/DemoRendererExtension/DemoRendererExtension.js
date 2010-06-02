@@ -64,7 +64,13 @@
 //
 //=============================================================================
 
-if (__main__ == undefined) var __main__ = "DemoRendererExtension";
+/*jslint nomen:false*/
+/*global print, use, plug, window, exit, DemoRendererExtension, SceneViewer*/
+
+if (__main__ === undefined) {
+    // This sets __main__ on the GLOBAL scope!
+    var __main__ = "DemoRendererExtension";
+}
 
 use("SceneViewer.js");
 plug("DemoRendererExtension");
@@ -73,9 +79,7 @@ function DemoRendererExtensionApp(theArguments) {
     this.Constructor(this, theArguments);
 }
 
-DemoRendererExtensionApp.prototype.Constructor = function(self, theArguments) {
-    var _myTextOverlay = null;
-
+DemoRendererExtensionApp.prototype.Constructor = function (self, theArguments) {
     //////////////////////////////////////////////////////////////////////
     // Constructor
     //////////////////////////////////////////////////////////////////////
@@ -90,19 +94,19 @@ DemoRendererExtensionApp.prototype.Constructor = function(self, theArguments) {
 
     // setup
     Base.setup = self.setup;
-    self.setup = function(theWidth, theHeight, theTitle) {
+    self.setup = function (theWidth, theHeight, theTitle) {
         Base.setup(theWidth, theHeight, false, theTitle);
         window.addExtension(_myDemoRenderExtension);
         _myDemoRenderExtension.setBodyId("b0");
-    }
+    };
 
-}
+};
 
 //
 // main
 //
 
-if (__main__ == "DemoRendererExtension") {
+if (__main__ === "DemoRendererExtension") {
     print("DemoRendererExtension");
     try {
         var ourDemoRendererExtensionApp = new DemoRendererExtensionApp(arguments);
