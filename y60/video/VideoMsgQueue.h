@@ -67,9 +67,8 @@
 #ifndef _ac_video_VideoMsgQueue_h_
 #define _ac_video_VideoMsgQueue_h_
 
-#include "y60_ffmpegdecoder2_settings.h"
-
 #include "VideoMsg.h"
+#include "y60_video_settings.h"
 
 #include <asl/base/ThreadSemaphore.h>
 #include <asl/base/ThreadLock.h>
@@ -88,7 +87,7 @@ namespace y60 {
      * supported or expected.
      *
      */
-    class VideoMsgQueue {
+    class Y60_VIDEO_DECL VideoMsgQueue {
     public:
         /**
          * Creates a VideoMsgQueue.

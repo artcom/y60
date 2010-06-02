@@ -65,6 +65,9 @@ if(WIN32)
     # DirectShow GUIDs (comes with Windows SDK)
     list(APPEND REQ_PACKAGES Strmiids)
 
+    # alled gigabit camera api lib
+    list(APPEND OPT_PACKAGES AlliedGigabit)
+
 elseif(LINUX)
 
     # cairo backend

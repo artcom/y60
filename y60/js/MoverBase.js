@@ -70,9 +70,10 @@ var BUTTON_DOWN   = 1;
 
 function MoverBase(theViewport) {
     this.Constructor(this, theViewport);
-}
+};
 
 MoverBase.prototype.Constructor = function(obj, theViewport) {
+
     const DOUBLE_CLICK_INTERVAL = 500;
 
     var _myViewport              = theViewport ? theViewport : window.canvas.childNode("viewport");
@@ -191,11 +192,13 @@ MoverBase.prototype.Constructor = function(obj, theViewport) {
         // Rotate about the world up vector
         myGlobalMatrix.rotateY(theWorldHeading);
         myGlobalMatrix.setRow(3, myWorldPosition);
-
+        
+        // Considering nested structure (camera within body node)
         var myParentMatrix = new Matrix4f(_myMoverObject.parentNode.globalmatrix);
         myParentMatrix.invert();
         myGlobalMatrix.postMultiply(myParentMatrix);
 
+        // update MoverObject
         var myDecomposition = myGlobalMatrix.decompose();
         _myMoverObject.orientation = myDecomposition.orientation;
         _myMoverObject.position    = myGlobalMatrix.getTranslation();

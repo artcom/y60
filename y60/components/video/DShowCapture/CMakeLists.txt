@@ -2,6 +2,7 @@
 set(SOURCES
 DShowCapture.cpp
 DShowGraph.cpp
+AVTDShowGraph.cpp
 DShowHelper.cpp
 DXSampleGrabber.cpp
 )
@@ -12,6 +13,8 @@ DShowCapture.h
 DShowGraph.h
 DXSampleGrabber.h
 y60_dshowcapture_settings.h
+AVTActiveCam.h
+AVTDShowGraph.h
 )
 
 set(EXTERNALS FFMPEG STRMIIDS ATL WINDOWSSDK)

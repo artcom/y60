@@ -14,10 +14,13 @@ if(LINUX)
 endif(LINUX)
 
 # XXX Proper checks missing... [DS]
-#if(WIN32)
+if(WIN32)
     #add_subdirectory(WMPPlayer)
-#    if(WINDOWSSDK_FOUND)    
-#        add_subdirectory(DShowCapture)
-#    endif(WINDOWSSDK_FOUND)        
-#endif(WIN32)
+    if(DIRECTX_FOUND)    
+        add_subdirectory(DShowCapture)
+    endif(DIRECTX_FOUND)        
+    if (ALLIED_GIGABIT_FOUND)
+        add_subdirectory(AlliedEthernetCameraCapture)
+    endif(ALLIED_GIGABIT_FOUND)        
+endif(WIN32)
 

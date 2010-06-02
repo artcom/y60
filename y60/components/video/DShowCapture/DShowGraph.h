@@ -62,7 +62,19 @@
 #define NO_DSHOW_STRSAFE // avoid a bunch of useless warnings and an error that <dshow.h> drags in
 
 #include <dshow.h>
+
+// this is a workaround, because ms somehow decided not to ship
+// dxtrans.h, which is part of DirectX7 August/2007 SDK and included in qedit.h
+// the include qedit.h is still in newer sdk files, but dxtrans.h is not
+// ms is 'working' on this, use this workaround for compiler/linker-massage (05/2010 VS)
+#pragma include_alias( "dxtrans.h", "qedit.h" )
+#define __IDxtCompositor_INTERFACE_DEFINED__
+#define __IDxtAlphaSetter_INTERFACE_DEFINED__
+#define __IDxtJpeg_INTERFACE_DEFINED__
+#define __IDxtKey_INTERFACE_DEFINED__
+// end-workaround
 #include <qedit.h>
+
 #include <string>
 #include <vector>
 #include "DXSampleGrabber.h"
@@ -78,7 +90,7 @@ public:
     void setDesiredVideoFormat(int theWidth, int theHeight, int theFps, int theBits);
 
     // Automatically find a capturing device to capture video
-    void CaptureLive(int theIndex, unsigned theInputPinNumber = 0);
+    virtual void CaptureLive(int theIndex, unsigned theInputPinNumber = 0);
 
     // Destroy the whole Graph
     void Destroy() { destroyFilterGraph(); };
@@ -102,9 +114,11 @@ public:
     void traceCrossbarInfo(IAMCrossbar *pXBar);
     void configCrossbar(unsigned theInputPinNumber = 0);
     std::vector<std::string> enumDevices();
-private:
+protected:
     // Create the filter graph to render the video (capture or playback)
     virtual bool createFilterGraph(int theIndex = 0, unsigned theInputPinNumber = 0);
+    bool setActiveCamera(int theIndex);
+
     // Release the filter graph
     virtual void destroyFilterGraph();
     // Start the playing

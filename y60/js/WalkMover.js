@@ -68,12 +68,12 @@ use("MoverBase.js");
 use("picking_functions.js");
 use("intersection_functions.js");
 
-function WalkMover() {
-    this.Constructor(this);
-}
+function WalkMover(theViewport) {
+    this.Constructor(this, theViewport);
+};
 
-WalkMover.prototype.Constructor = function(self) {
-    MoverBase.prototype.Constructor(self);
+WalkMover.prototype.Constructor = function(self, theViewport) {
+    MoverBase.prototype.Constructor(self, theViewport);
     self.Mover = [];
 
     //////////////////////////////////////////////////////////////////////
@@ -82,11 +82,11 @@ WalkMover.prototype.Constructor = function(self) {
     const MODEL_UP_DIRECTION       = new Vector3f(0,1,0);
     const MODEL_RIGHT_DIRECTION    = cross(MODEL_FRONT_DIRECTION, MODEL_UP_DIRECTION);
     const INITIAL_WALK_SPEED       = 0.01; // percentage of world size per second
-    const INITIAL_EYEHEIGHT        = 200.0;
+    const INITIAL_EYEHEIGHT        = 200;
     const ROTATE_SPEED             = 1.0;
     const GRAVITY                  = 9.81;
     const PERSON_MASS              = 100;
-    const GRAVITY_DIRECTION        = new Vector3f(0, -1, 0);
+    const GRAVITY_DIRECTION        = product(MODEL_UP_DIRECTION,-1);
     const GRAVITY_ACCELERATION     = product(GRAVITY_DIRECTION, GRAVITY);
     const PERSON_WEIGHT_FORCE      = product(GRAVITY_ACCELERATION, PERSON_MASS);
 
@@ -127,6 +127,7 @@ WalkMover.prototype.Constructor = function(self) {
         self.Mover.reset();
 
         var myCamera          = self.getMoverObject();
+        myCamera.orientation = new Quaternionf(0,0,0,1);
 
         _myPosition          = myCamera.globalmatrix.getTranslation();
         _myVelocity          = new Vector3f(0,0,0);
@@ -162,10 +163,10 @@ WalkMover.prototype.Constructor = function(self) {
         if (theShiftFlag) {
             switch(theKey) {
                 case "up":
-                    _myEyeHeight += 0.1;
+                    _myEyeHeight *= 1.1;
                 break;
                 case "down":
-                    _myEyeHeight -= 0.1;
+                    _myEyeHeight /= 1.1;
                     _myEyeHeight = Math.max(_myEyeHeight,0);
                 break;
 
@@ -222,9 +223,9 @@ WalkMover.prototype.Constructor = function(self) {
         myOrientationMatrix.setRow(1, myCamera.globalmatrix.getRow(1).xyz0);
         myOrientationMatrix.setRow(0, myCamera.globalmatrix.getRow(0).xyz0);
 
-
         _myFrontVector = product(MODEL_FRONT_DIRECTION, myOrientationMatrix);
         _myRightVector = product(MODEL_RIGHT_DIRECTION, myOrientationMatrix);
+        
         if (_myGroundPlane) {
             _myProjectedFrontVector = normalized(projection(_myFrontVector, _myGroundPlane));
             _myProjectedRightVector = normalized(projection(_myRightVector, _myGroundPlane));
@@ -258,7 +259,6 @@ WalkMover.prototype.Constructor = function(self) {
 
     function findGround(theProbe) {
         var myGroundIntersection = nearestIntersection(self.getWorld(), theProbe);
-        //print("Find ground with ray: " + theProbe);
         if (myGroundIntersection) {
             _myGroundPlane  = new Planef(_myUpVector, myGroundIntersection.position);
             _myGroundNormal = normalized(myGroundIntersection.normal);
@@ -275,7 +275,7 @@ WalkMover.prototype.Constructor = function(self) {
     // Reorients the Mover with the ground, pushes the Mover above the ground
     function dropToGround(myTranslation) {
         var myFallingTranslation = myTranslation.clone();
-        myFallingTranslation.y = -1;
+        myFallingTranslation.y = GRAVITY_DIRECTION.y;
         var myNewPosition = findGround(new Ray(_myPosition, product(myFallingTranslation, 2)));
         if (myNewPosition != null) {
             _myPosition.value = myNewPosition;

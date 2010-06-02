@@ -56,22 +56,45 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-#ifndef _DShowHelper_H_
-#define _DShowHelper_H_
+#ifndef _ac_video_VideoMsg_h_
+#define _ac_video_VideoMsg_h_
 
-#define NO_DSHOW_STRSAFE // avoid a bunch of useless warnings and an error that <dshow.h> drags in
+#include "y60_video_settings.h"
 
-#include <dshow.h>
-
-#include <string>
+#include <asl/base/Ptr.h>
+#include <asl/dom/Value.h>
 
 namespace y60 {
 
-#define SafeRelease(p) { if( (p) != 0 ) { (p)->Release(); (p)= NULL; } }
+class Y60_VIDEO_DECL VideoMsg {
+public:
+    enum  VideoMsgType {
+        MSG_FRAME,
+        MSG_EOF
+    };
 
-void checkForDShowError(HRESULT hr, const std::string & theMessage,
-        const std::string & theFileLine);
+    // Time is in seconds.
+    VideoMsg(VideoMsgType theType, double theTime, std::vector<unsigned> theFrameSizes);
+    ~VideoMsg();
 
-} // namespace
+    VideoMsgType getType() const;
+    double getTime() const;
+    unsigned char * getBuffer(unsigned theBufferNum = 0) const;
+    unsigned getSize(unsigned theBufferNum = 0) const;
+
+private:
+    VideoMsgType _myType;
+    double _myTime;
+    std::vector<unsigned char *> _myFrames;
+    std::vector<unsigned> _myFramesSizes;
+};
+
+// Needed since the default pointer class uses an allocator with a thread-local
+// free list that breaks when all rasters are allocated in one thread and deallocated
+// in another.
+typedef asl::Ptr<VideoMsg, asl::MultiProcessor,
+        asl::PtrHeapAllocator<asl::MultiProcessor> > VideoMsgPtr;
+
+}
 
 #endif

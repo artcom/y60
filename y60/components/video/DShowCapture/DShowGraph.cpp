@@ -59,16 +59,11 @@
 #include "DShowGraph.h"
 #include "DShowHelper.h"
 
-// This interface id was copied verbatim from the AVT camera documentation
-// {DEC6F81A-8C51-4279-A45F-2623826BA892}
-// #undef DEFINE_GUID
-
 #include <initguid.h>
 
 DEFINE_GUID(PROPSETID_VIDCAP_AVT,
   0xdec6f81a, 0x8c51, 0x4279, 0xa4, 0x5f, 0x26, 0x23, 0x82, 0x6b, 0xa8, 0x92);
 
-//#include "AVTCameraPropset.h"
 #import "AVTPropSet.tlb" no_namespace
 
 #include <atlcomcli.h>
@@ -80,9 +75,9 @@ DEFINE_GUID(PROPSETID_VIDCAP_AVT,
 
 using namespace std;
 
+
 namespace y60 {
 
-#define SafeRelease(p) { if( (p) != 0 ) { (p)->Release(); (p)= NULL; } }
 
 static const GUID CLSID_ColorSpaceConverter =
 {0x1643E180,0x90F5,0x11CE, {0x97, 0xD5, 0x00, 0xAA, 0x00, 0x55, 0x59, 0x5A }};
@@ -187,7 +182,7 @@ bool DShowGraph::buildCaptureGraph(IBaseFilter * pSrcFilter, int theIndex) {
 
 	}
 	m_pSrcFilter = pSrcFilter;
-
+    
 	// Add Capture filter to our graph.
 	hr = m_pGraphBuilder->AddFilter(pSrcFilter, L"Video Capture");
 	if (FAILED(hr))	{
@@ -241,6 +236,7 @@ bool DShowGraph::buildCaptureGraph(IBaseFilter * pSrcFilter, int theIndex) {
     //SafeRelease( pSrcFilter );
     return true;
 }
+
 
 bool DShowGraph::createFilterGraph(int theIndex, unsigned theInputPinNumber)
 {
@@ -518,7 +514,6 @@ void DShowGraph::removeGraphFromRot(DWORD pdwRegister)
 void DShowGraph::CaptureLive(int theIndex, unsigned theInputPinNumber)
 {
     destroyFilterGraph();
-
     if (createFilterGraph(theIndex, theInputPinNumber)) {
         startGraph();
         this->m_fstartGraph = true;
@@ -575,17 +570,17 @@ HRESULT DShowGraph::selectVideoFormat() {
     if ((pVih->bmiHeader.biWidth != _myDesiredWidth) ||
         (pVih->bmiHeader.biHeight != _myDesiredHeight))
     {
-        AC_ERROR << "Video capture device resolution is '"
+        AC_INFO << "Video capture device resolution is '"
                  << pVih->bmiHeader.biWidth << "x" << pVih->bmiHeader.biHeight
                  << "'. Should be '" << _myDesiredWidth << "x" << _myDesiredHeight << "'!";
     }
-
     BITMAPINFOHEADER bih;
     bih.biBitCount = static_cast<WORD>(_myDesiredBits);
     bih.biClrImportant = 0;
     bih.biClrUsed = 0;
     bih.biCompression = 0;
     bih.biHeight = _myDesiredHeight;
+    bih.biWidth = _myDesiredWidth;
     bih.biPlanes = 1;
     bih.biSize = sizeof(BITMAPINFOHEADER);
     bih.biSizeImage =  _myDesiredHeight * _myDesiredWidth * _myDesiredBits / 8;
@@ -613,8 +608,8 @@ HRESULT DShowGraph::selectVideoFormat() {
     pmt->formattype = FORMAT_VideoInfo;
     pmt->lSampleSize = _myDesiredHeight * _myDesiredWidth * _myDesiredBits / 8; //UYVY format //640* 480* 24 / 8;
     pmt->majortype = MEDIATYPE_Video;
-    //pmt->subtype = MEDIASUBTYPE_RGB24;
-    pmt->subtype = MEDIASUBTYPE_UYVY;
+    pmt->subtype = MEDIASUBTYPE_RGB24;
+    //pmt->subtype = MEDIASUBTYPE_UYVY;
     pmt->pbFormat = (unsigned char *)&vih;
     pmt->pUnk = 0;
 
@@ -812,7 +807,7 @@ void DShowGraph::configCrossbar(unsigned theInputPinNumber) {
 }
 
 std::vector<std::string> DShowGraph::enumDevices() {
-    IMoniker *pMoniker = NULL;
+    //IMoniker *pMoniker = NULL;
     std::vector<std::string> myDeviceList;
     ICreateDevEnum *pDevEnum = NULL;
     IEnumMoniker *pEnum = NULL;
@@ -828,8 +823,14 @@ std::vector<std::string> DShowGraph::enumDevices() {
             CLSID_VideoInputDeviceCategory,
             &pEnum, 0);
         ASSURE(pEnum);
-        while (pEnum->Next(1, &pMoniker, NULL) == S_OK)
+        while (true)
         {
+            IMoniker *pMoniker = NULL;
+            ULONG ulFetched = 0;
+            hr = pEnum->Next(1, &pMoniker, &ulFetched);
+            if( hr != S_OK ) {
+                break;
+            }
             IPropertyBag *pPropBag;
             hr = pMoniker->BindToStorage(0, 0, IID_IPropertyBag,
                 (void**)(&pPropBag));

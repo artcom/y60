@@ -56,45 +56,26 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-#ifndef _ac_video_VideoMsg_h_
-#define _ac_video_VideoMsg_h_
+#ifndef _ac_DShowCapture_AVTDShowGraph_h_
+#define _ac_DShowCapture_AVTDShowGraph_h_
 
-#include "y60_ffmpegdecoder2_settings.h"
-
-#include <asl/base/Ptr.h>
-#include <asl/dom/Value.h>
+#include "DShowGraph.h"
 
 namespace y60 {
-
-class VideoMsg {
+/*! @addtogroup Y60componentsAVTDShowCapture */
+/* @{ */
+    class AVTDShowGraph : public DShowGraph{
 public:
-    enum VideoMsgType {
-        MSG_FRAME,
-        MSG_EOF
-    };
-
-    // Time is in seconds.
-    VideoMsg(VideoMsgType theType, double theTime, std::vector<unsigned> theFrameSizes);
-    ~VideoMsg();
-
-    VideoMsgType getType() const;
-    double getTime() const;
-    unsigned char * getBuffer(unsigned theBufferNum = 0) const;
-    unsigned getSize(unsigned theBufferNum = 0) const;
-
+    AVTDShowGraph();
+    virtual ~AVTDShowGraph();
+    // Automatically find a capturing device to capture video
+    void CaptureLive(int theIndex, unsigned theInputPinNumber = 0);
 private:
-    VideoMsgType _myType;
-    double _myTime;
-    std::vector<unsigned char *> _myFrames;
-    std::vector<unsigned> _myFramesSizes;
+    bool setCameraParams(int theIndex);
+    virtual bool buildCaptureGraph(IBaseFilter * filter = 0, int theIndex = 0);
+    unsigned _myAVTCameraIndex;
 };
-
-// Needed since the default pointer class uses an allocator with a thread-local
-// free list that breaks when all rasters are allocated in one thread and deallocated
-// in another.
-typedef asl::Ptr<VideoMsg, asl::MultiProcessor,
-        asl::PtrHeapAllocator<asl::MultiProcessor> > VideoMsgPtr;
-
+/* @} */
 }
 
-#endif
+#endif // _ac_DShowCapture_AVTDShowGraph_h_

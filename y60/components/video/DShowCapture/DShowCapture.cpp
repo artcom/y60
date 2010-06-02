@@ -207,6 +207,7 @@ namespace y60 {
         unsigned myWhitebalanceV = 0;
         unsigned myShutter = 0;
         unsigned myGain = 0;
+        bool myAVT_Camera_Flag = false;
 
         if (myFrameWidth == 0) {
             myFrameWidth = 640;
@@ -221,9 +222,6 @@ namespace y60 {
             myRestartGraph = _myGraph->isRunning();
             delete _myGraph;
         }
-        _myGraph = new DShowGraph();
-
-        setPixelFormat(BGR);
 
         std::string::size_type idx = theFilename.find("width=");
         if (idx != std::string::npos) {
@@ -249,6 +247,10 @@ namespace y60 {
         if (idx != std::string::npos && theFilename.substr(idx+7).length() > 0) {
             myDeviceId = asl::as_int(theFilename.substr(idx+7));
         }
+        idx = theFilename.find("avtcamera=");
+        if (idx != std::string::npos && theFilename.substr(idx+10).length() > 0) {
+            myAVT_Camera_Flag = asl::as_int(theFilename.substr(idx+10)) == 1;
+        }
         idx = theFilename.find("whitebalanceb=");
         if (idx != std::string::npos && theFilename.substr(idx+14).length() > 0) {
             myWhitebalanceU = asl::as_int(theFilename.substr(idx+14));
@@ -271,12 +273,24 @@ namespace y60 {
             _myDeinterlaceFlag = asl::as_int(theFilename.substr(idx+12)) == 1 ? true:false;
         }
 
-        std::vector<std::string> myDevices = _myGraph->enumDevices();
-        if (myDeviceId >= myDevices.size()) {
-            throw DShowCapture::Exception("No such Device. Highest available DeviceId is: " + myDevices.size()-1, PLUS_FILE_LINE);
+        if (myAVT_Camera_Flag) {
+            _myGraph = new AVTDShowGraph();
+        } else {
+            _myGraph = new DShowGraph();
         }
 
-        setName(myDevices[myDeviceId]);
+        setPixelFormat(BGR);
+
+
+        std::vector<std::string> myDevices = _myGraph->enumDevices();
+        std::string myDeviceName = "unknown";
+        if (myDeviceId >= myDevices.size()) {
+            //throw DShowCapture::Exception("No such Device. Highest available DeviceId is: " + myDevices.size()-1, PLUS_FILE_LINE);
+        } else {
+            myDeviceName = myDevices[myDeviceId];
+        }
+
+        setName(myDeviceName);
         setFrameRate(myFrameRate);
         setFrameHeight(myFrameHeight);
         setFrameWidth(myFrameWidth);
@@ -285,6 +299,7 @@ namespace y60 {
         // Setup video size and image matrix
         float myXResize = float(myFrameWidth) / asl::nextPowerOfTwo(myFrameWidth);
         float myYResize = float(myFrameHeight) / asl::nextPowerOfTwo(myFrameHeight);
+
         _myGraph->setDesiredVideoFormat(myFrameWidth, myFrameHeight, myFrameRate, myBitsPerPixel);
 
         asl::Matrix4f myMatrix;

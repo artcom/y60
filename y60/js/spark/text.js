@@ -77,6 +77,11 @@
 spark.ourLoadedFonts = {};
 
 /**
+ * sdl_ttf renders big fonts better than small ones, so this is for adjusting the rendering size
+ */
+spark.fontScale = 1;
+
+/**
  * Internal: ensure loading of font appropriate for the given style
  */
 
@@ -111,9 +116,9 @@ spark.loadFont = function(theName, theSize, theStyle, theHinting) {
 
         var myHinting = spark.hintingFromString(theHinting);    
            // enforce loadttf of a normal font, otherwise we get an exception
-        window.loadTTF(myName, searchFile(myFontPath), theSize, myHinting , spark.styleFromString("normal"));
+       window.loadTTF(myName, searchFile(myFontPath), theSize*spark.fontScale, myHinting , spark.styleFromString("normal"));
         if(theStyle != "normal") {
-           window.loadTTF(myName, searchFile(myFontPath), theSize, myHinting , spark.styleFromString(theStyle));
+           window.loadTTF(myName, searchFile(myFontPath), theSize*spark.fontScale, myHinting , spark.styleFromString(theStyle));
         }
         spark.ourLoadedFonts[myName] = true;
 
@@ -127,7 +132,7 @@ spark.loadFont = function(theName, theSize, theStyle, theHinting) {
            }
            if (myFontPath) {
                Logger.info("loading bold font for " + myName + "," + myFontPath + "," + theSize + "," + "bold")
-               window.loadTTF(myName, searchFile(myFontPath), theSize, myHinting , Renderer.BOLD);
+               window.loadTTF(myName, searchFile(myFontPath), theSize*spark.fontScale, myHinting , Renderer.BOLD);
            }
        }
     }
@@ -286,7 +291,7 @@ spark.renderText = function(theImage, theText, theStyle, theSize, theMaxTextWidt
 
     window.setTextColor(asColor(theStyle.textColor));
     window.setTracking(theStyle.tracking);
-    window.setLineHeight(theStyle.lineHeight);
+    window.setLineHeight(theStyle.lineHeight*spark.fontScale);
 
     var myFont = spark.fontForStyle(theStyle);
     var mySize = new Vector2f(theImage.width, theImage.height);
@@ -298,8 +303,18 @@ spark.renderText = function(theImage, theText, theStyle, theSize, theMaxTextWidt
         window.renderTextAsImage(theImage,
                                  theText,
                                  myFont,
-                                 mySize.x, mySize.y);
-
+                                 mySize.x*spark.fontScale, mySize.y*spark.fontScale);
+                                 
+    //XXX: if the image width is odd and fontscale is >1 the imagefilter can result in bad looking text
+    myTextSize = new Vector2f(Math.ceil(myTextSize[0]/spark.fontScale), Math.ceil(myTextSize[1]/spark.fontScale));
+    applyImageFilter(theImage, "resizehamming", [myTextSize.x, myTextSize.y, 1]);
+    if (theImage.width > 0 && theImage.height > 0) {
+        var myMatrix = new Matrix4f();
+        myMatrix.makeScaling(new Vector3f(myTextSize.x / theImage.width, 
+                                          myTextSize.y / theImage.height, 1));
+        theImage.matrix = myMatrix;
+    }
+    
     if (theMaxTextWidth) {
         theMaxTextWidth.width = window.getTextMaxWidth();
     }
@@ -309,11 +324,6 @@ spark.renderText = function(theImage, theText, theStyle, theSize, theMaxTextWidt
             theLineWidths.push(myLineWidths[i]);
         }
     }
-
-    var myMatrix = new Matrix4f();
-    myMatrix.makeScaling(new Vector3f(myTextSize.x / theImage.width,
-                                      myTextSize.y / theImage.height, 1));
-    theImage.matrix = myMatrix;
 
     window.setHTextAlignment(Renderer.LEFT_ALIGNMENT);
     window.setVTextAlignment(Renderer.TOP_ALIGNMENT);
