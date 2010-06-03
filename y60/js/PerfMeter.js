@@ -152,10 +152,10 @@ PerfMeter.prototype.Constructor = function(self, theSceneViewer) {
     var _myLineColor       = new Vector4f(0.5, 0.5, 0.5, 1);
     //var _myBGColor           = new Vector4f(1,0,0,0.3);
     var _myBGColor           = _myTranspColor;
-    var _myTimings = [ { "name" : "postRender",         "color" : new Vector4f(1,0,1,1), "time" : 0 },
-                       { "name" : "onFrame_JSCallback", "color" : new Vector4f(0,1,0,1), "time" : 0 },
-                       { "name" : "SDL_GL_SwapBuffers", "color" : new Vector4f(1,1,0,1), "time" : 0 },
-                       { "name" : "render",             "color" : new Vector4f(0,0,1,1), "time" : 0 }
+    var _myTimings = [ { "name" : "gc",           "color" : new Vector4f(0.2,0.9,0.8,1), "time" : 0, "lastelapsed" : 0 }, 
+                       { "name" : "onFrame_JSCallback", "color" : new Vector4f(0,1,0,1), "time" : 0, "lastelapsed" : 0 },
+                       { "name" : "SDL_GL_SwapBuffers", "color" : new Vector4f(1,1,0,1), "time" : 0, "lastelapsed" : 0 },
+                       { "name" : "render",             "color" : new Vector4f(0,0,1,1), "time" : 0, "lastelapsed" : 0 }
                  ];
 
     var _myTopMaxTimers = [];
@@ -206,6 +206,7 @@ PerfMeter.prototype.Constructor = function(self, theSceneViewer) {
             if (!(myTimer.name in _myTopMaxTimers) || _myTopMaxTimers[myTimer.name].lastelapsed  > myTimer.lastelapsed) {
                 _myTopMaxTimers[myTimer.name] = myTimer;
                 _myTopMaxTimers[myTimer.name].frame = _myFrameCount;
+                _myTopMaxTimers[myTimer.name].lastelapsed = myTimer.lastelapsed;
             }
         }
     }

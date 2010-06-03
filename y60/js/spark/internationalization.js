@@ -66,31 +66,37 @@ spark.I18nContext.Constructor = function(Protected) {
     this.Inherit(spark.EventDispatcher);
 
     var _myLanguage = "";
+    var _myDefaultLanguage = "";
 
     Public.language getter = function() {
         return _myLanguage;
     };
 
+    Public.defaultLanguage getter = function() {
+        return _myDefaultLanguage;
+    };
+    
     Public.switchLanguage = function(theLanguage) {
-        Logger.info("I18n context " + Public.name + " switching to language " + theLanguage);
+        Logger.info("I18n context " + Public.name + " switching to language " + theLanguage + " _myLanguage: " + _myLanguage);
+        if (theLanguage !== _myLanguage) {
+            _myLanguage = theLanguage;
+            var myChildren = Public.children;
+            var myChildCount = myChildren.length;
+            for(var i = 0; i < myChildCount; i++) {
+                var myChild = myChildren[i];
+                myChild.switchLanguage(theLanguage);
+            }
 
-        var myContextEvent = new spark.I18nEvent(theLanguage);
-        Public.dispatchEvent(myContextEvent);
-
-        var myChildren = Public.children;
-        for(var i = 0; i < myChildren.length; i++) {
-            var myChild = myChildren[i];
-            myChild.switchLanguage(theLanguage);
+            var myContextEvent = new spark.I18nEvent(theLanguage);
+            Public.dispatchEvent(myContextEvent);
         }
-
-        _myLanguage = theLanguage;
     };
 
     Base.postRealize = Public.postRealize;
     Public.postRealize = function() {
         Base.postRealize();
-        var myDefaultLanguage = Protected.getString("defaultLanguage", "en");
-        Public.switchLanguage(myDefaultLanguage);
+        _myDefaultLanguage = Protected.getString("defaultLanguage", "en");
+        Public.switchLanguage(_myDefaultLanguage);
     };
 
     Base.addChild = Public.addChild;
@@ -164,13 +170,20 @@ spark.I18nItem.Constructor = function(Protected) {
         return new spark.I18nEvent(theLanguage);
     };
 
-    Protected.getLanguageData = function(theLanguage) {
+    Public.getLanguageData = function(theLanguage) {
+        if(!theLanguage) {
+            theLanguage = _myLanguage;
+        }
         if(!(theLanguage in _myLanguageData)) {
-            Logger.warning("I18n item " + Public.name + " does not contain language " + theLanguage);
-            return null;
+            Logger.debug("I18n item " + Public.name + " does not contain language " + theLanguage);
+            return (Public.parent.defaultLanguage in _myLanguageData) ? _myLanguageData[Public.parent.defaultLanguage] : null;
         } else {
             return _myLanguageData[theLanguage];
         }
+    };
+
+    Public.hasLanguageData = function(theLanguage) {
+        return theLanguage in _myLanguageData;
     };
 
     Public.switchLanguage = function(theLanguage) {
@@ -214,7 +227,7 @@ spark.I18nText.Constructor = function(Protected) {
     };
 
     Public.text getter = function() {
-        var myData = Protected.getLanguageData(Public.language);
+        var myData = Public.getLanguageData(Public.language);
         if(myData == null) {
             return "";
         } else {
@@ -234,16 +247,17 @@ spark.I18nImage.Constructor = function(Protected) {
     Base.createEvent = Protected.createEvent;
     Protected.createEvent = function(theLanguage) {
         var myEvent = Base.createEvent(theLanguage);
-        myEvent.image = Public.image;
+        myEvent.src = Public.src;
         return myEvent;
     };
 
-    Public.image getter = function() {
-        var myData = Protected.getLanguageData(Public.language);
-        if( ! myData || myData.length == 0) {
-            return spark.getDummyImage();
+    Public.src getter = function() {
+        var myData = Public.getLanguageData(Public.language);
+        if(myData == null) {
+            return "";
+        } else {
+            return myData;
         }
-        return spark.getCachedImage(myData);
     };
 };
 
@@ -255,24 +269,19 @@ spark.I18nMovie.Constructor = function(Protected) {
 
     this.Inherit(spark.I18nItem);
     
-    var _myMovie = null;
-
     Base.createEvent = Protected.createEvent;
     Protected.createEvent = function(theLanguage) {
         var myEvent = Base.createEvent(theLanguage);
-        if(!_myMovie || _myMovie.src != Protected.getLanguageData(Public.language)) {
-            _myMovie = Public.movie;
-        }
-        myEvent.movie = _myMovie;
+        myEvent.src = Public.src;
         return myEvent;
     };
 
-    Public.movie getter = function() {
-        var myData = Protected.getLanguageData(Public.language);
-        if( ! myData || myData.length == 0) {
-            Logger.error("Can't make dummy movies");
-            return null;
+    Public.src getter = function() {
+        var myData = Public.getLanguageData(Public.language);
+        if(myData == null) {
+            return "";
+        } else {
+            return myData;
         }
-        return spark.openMovie(myData);
     };
 };

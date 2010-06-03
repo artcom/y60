@@ -1,5 +1,6 @@
-/**
- * A labelesque text component.
+/* This is a text rendering facility for spark
+ * It supports autosizing: the quad has the appropriate size after
+ * setting the 'text' property.
  */
 spark.Text = spark.ComponentClass("Text");
 
@@ -10,31 +11,43 @@ spark.Text.Constructor = function(Protected) {
     this.Inherit(spark.ResizableRectangle);
 
     var _myStyle = null;
+    var _myUpcase = false;
+
     var _myText  = "";
     var _myTextId = null;
-    var _myMaxTextWidth = 0;
+    var _myTextItem = null;
+
+    var _myImage = null;
+    var _myMaxWidth;
+    var _myMaxHeight;
+    var _myMaxTextWidth = {};
+    var _myLayoutHook;
+    var _myTextChangedHook;
     var _myLineWidths = [];
-    var _myImage;
-    var _myTexture;
 
     Public.text getter = function() { return _myText; };
     Public.text setter = function(theValue) {
-        _myText = Protected.performLayout(theValue);
+        if(theValue && _myUpcase) {
+            theValue = theValue.toUpperCase();
+        }
+        if(_myLayoutHook) {
+            _myText = _myLayoutHook(theValue);
+        } else {
+            _myText = theValue;
+        }
         Protected.render(Public.size);
+        if (_myTextChangedHook) {
+            _myTextChangedHook();
+        }
     };
-
-    Public.textId getter = function() { return _myTextId; };
-    Public.textId setter = function(theValue) {
-        // XXX: re-trigger i18n events? how?
-        _myTextId = theValue;
-    };
-    Public.i18nItem getter = function() { return Public.textId; }
-    Public.i18nItem setter = function(i) { Public.textId = i; }
 
     Public.style getter = function() {
         return _myStyle;
     };
 
+    Public.upcase getter = function() {
+        return _myUpcase;
+    };
     Public.maxTextWidth getter = function() {
         return _myMaxTextWidth;
     };
@@ -47,18 +60,15 @@ spark.Text.Constructor = function(Protected) {
         return _myLineWidths.length;
     };
 
-
-    Protected.performLayout = function(theText) {return theText;}
-
     Protected.render = function(theSize) {
-        if (_myText) {
-            var myWidth = {};
-            _myLineWidths = [];
-            var myTextSize = spark.renderText(_myImage, _myText, _myStyle, Public.size, myWidth, _myLineWidths);
-            _myMaxTextWidth = myWidth.width;
-            return myTextSize;
-        }
-    };
+        var myWidth = {width:0};
+        _myLineWidths = [];
+        var mySize = spark.renderText(_myImage, _myText, _myStyle, new Vector2i(_myMaxWidth,_myMaxHeight), myWidth, _myLineWidths);        
+        _myMaxTextWidth =  myWidth.width;
+        Public.width = mySize.x;
+        Public.height = mySize.y;
+        return mySize;
+    }
 
     Base.realize = Public.realize;
     Public.realize = function() {
@@ -67,31 +77,93 @@ spark.Text.Constructor = function(Protected) {
 
         // handle internationalization
         _myTextId = Protected.getString("textId", "");
-        if(_myTextId != "") {
-            var myI18nText = Protected.getI18nText(_myTextId);
-            if(myI18nText) {
-                _myText = myI18nText;
-            }
-        }
 
         // extract font style
         _myStyle = spark.fontStyleFromNode(Public.node);
 
-        var myWidth  = Protected.getNumber("width");
-        var myHeight = Protected.getNumber("height");
-        _myImage = Modelling.createImage(window.scene, myWidth, myHeight, "BGRA");
-        _myTexture  = Modelling.createTexture(window.scene, _myImage);
-        _myTexture.name = Public.name + "-texture";
-        _myTexture.wrapmode = "clamp_to_edge";
+        _myUpcase = Protected.getBoolean("upcase", false);
+
+        _myMaxWidth = Protected.getNumber("maxWidth", 0);
+        _myMaxHeight = Protected.getNumber("maxHeight", 0);
+
+        _myImage = Modelling.createImage(window.scene, 16, 16, "BGRA");
+        var myTexture  = Modelling.createTexture(window.scene, _myImage);
+        myTexture.name = Public.name + "-texture";
+        myTexture.wrapmode = "clamp_to_edge";
         var myMaterial = Modelling.createUnlitTexturedMaterial(window.scene,
-                _myTexture, Public.name + "-material", true);
+                myTexture, Public.name + "-material", true);
 
         Base.realize(myMaterial);
-
-        _myText = Protected.performLayout(_myText);
-
         // finally, render the text
+        Public.text = _myText;
+
+    };
+
+    Base.postRealize = Public.postRealize;
+    Public.postRealize = function() {
+        if (_myTextId) {
+            attachToI18nItem(_myTextId);
+        }
+        Base.postRealize();
+    }
+
+    Public.maxWidth getter = function() { return _myMaxWidth; }
+    Public.maxWidth setter = function(w) { 
+        _myMaxWidth = w;
         Protected.render();
     };
-    Protected.image getter = function() {return _myImage;}
+
+    Public.maxHeight getter = function() { return _myMaxHeight; }
+    Public.maxHeight setter = function(h) { 
+        _myMaxHeight = h; 
+        Protected.render();
+    };
+
+    Public.textId getter = function() { return _myTextId; }
+    Public.textId setter = function(id) {
+        _myTextId = id;
+        attachToI18nItem(id);
+    };
+
+    Public.i18nItem getter = function() { return Public.textId; }
+    Public.i18nItem setter = function(id) { Public.textId = id; }
+
+    Public.layoutHook getter = function() { return _myLayoutHook; }
+    Public.layoutHook setter = function(f) {
+        _myLayoutHook = f;
+        Public.text = _myText;
+    }
+
+    Public.onTextChanged getter = function() { return _myTextChangedHook; }
+    Public.onTextChanged setter = function(f) { _myTextChangedHook = f; }
+
+    function handleI18nLanguage(e) {
+        Public.text = _myTextItem.text;
+    }
+
+    function attachToI18nItem(theItemId) {
+        if(_myTextItem) {
+            _myTextItem.removeEventListener(spark.I18nEvent.LANGUAGE,
+                                            handleI18nLanguage);
+            _myTextItem = null;
+        }
+
+        if (theItemId) {
+            _myTextItem = Public.getI18nItemByName(theItemId);
+
+            if(!_myTextItem) {
+                Logger.fatal("no i18n item named " + theItemId);
+            }
+            _myTextItem.addEventListener(spark.I18nEvent.LANGUAGE,
+                    handleI18nLanguage);
+            Public.text = _myTextItem.text;
+        } else {
+            Public.text = "";
+        }
+
+    };
+    Public.textColor setter = function(theColorString) {
+        _myStyle.textColor = theColorString;
+        Protected.render();
+    }
 };

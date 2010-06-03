@@ -160,8 +160,8 @@ spark.ComponentClass = function (theName) {
 spark.LoadedClass = function (theClassName, theFile) {
     // load template from file
     var myDocument = new Node();
-    myDocument.parseFile(theFile);
-
+    var myFileWithPath = searchFile(theFile);
+    myDocument.parseFile(myFileWithPath);
     // get the template base class constructor
     var myTemplateNode = spark.findRootElement(myDocument);
     var myBaseClass = myTemplateNode.nodeName;

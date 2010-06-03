@@ -77,7 +77,7 @@ GUI.Animation.Constructor = function(Public, Protected) {
     var _duration = 100.0;
     var _loop = false;
     var _running = false;
-    var _startTime = 0.0;
+    var _startTime = -1;
     var _progressTime = 0.0;
     var _progress = 0.0;
     var _finished = false;
@@ -192,7 +192,7 @@ GUI.Animation.Constructor = function(Public, Protected) {
 
     Public.play = function() {
         Logger.debug("Playing " + this);
-		_startTime = millisec();
+		_startTime = ourCurrentAnimationTime;
 	    _progressTime = 0;
 		_progress = _easing(0.0);
 	    _running = true;
@@ -233,8 +233,11 @@ GUI.Animation.Constructor = function(Public, Protected) {
 
 	};
 
-    Public.doFrame = function() {
-        _progressTime = (millisec() - _startTime);
+    Public.doFrame = function(theTime) {
+        if (_startTime == -1) {
+            _startTime = ourCurrentAnimationTime;
+        }
+        _progressTime = (theTime - _startTime);
 		_progress = _easing(_progressTime / _duration);
 
 	    var finished = (_progressTime >= _duration);

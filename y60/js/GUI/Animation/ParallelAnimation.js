@@ -97,11 +97,11 @@ GUI.ParallelAnimation.prototype.Constructor = function(Public, Protected) {
 	};
 
     // step all children forward
-	Public.doFrame = function()	{
+	Public.doFrame = function(theTime)	{
 		var notFinished = false;
 		for(var i = 0; i < Public.children.length; i++) {
 			if(Public.children[i].running) {
-				Public.children[i].doFrame();
+				Public.children[i].doFrame(theTime);
                 notFinished |= Public.children[i].running;
 			}
 		}

@@ -29,7 +29,7 @@ spark.Canvas.Constructor = function(Protected) {
 
     	var myImage = Modelling.createImage(window.scene,
     										myWidth, myHeight, "BGRA");
-
+    	myImage.name = Public.name + "_canvasImage";
     	var myTexture = Modelling.createTexture(window.scene, myImage);
 
         myTexture.wrapmode = "clamp_to_edge";

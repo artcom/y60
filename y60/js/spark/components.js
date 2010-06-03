@@ -248,7 +248,7 @@ spark.Component.Constructor = function (Protected) {
 
     Protected.getVector3f = function (theName, theDefault) {
         var myArray = Protected.getArray(theName, theDefault);
-        if (myArray.length === 3) {
+        if (myArray && myArray.length === 3) {
             return new Vector3f(myArray[0], myArray[1], myArray[2]);
         } else {
             return theDefault;
@@ -257,7 +257,7 @@ spark.Component.Constructor = function (Protected) {
 
     Protected.getVector2f = function (theName, theDefault) {
         var myArray = Protected.getArray(theName, theDefault);
-        if (myArray.length === 2) {
+        if (myArray && myArray.length === 2) {
             return new Vector2f(myArray[0], myArray[1]);
         } else {
             return theDefault;
@@ -293,7 +293,12 @@ spark.Component.Constructor = function (Protected) {
             }
         }
         if (theName in _myNode) {
-            return _myNode[theName].substring(1, _myNode[theName].length - 1).replace(/ /g, "").split(",");
+            var myString = _myNode[theName].substring(1, _myNode[theName].length -1);
+            if (myString.length == 0) {
+                return [];
+            }
+            var myArray = findChildArray(trim(myString));
+            return myArray;
         } else {
             if (arguments.length < 2) {
                 Logger.error(_myNode.nodeName + " requires attribute " + theName);
@@ -302,6 +307,27 @@ spark.Component.Constructor = function (Protected) {
             }
         }
     };
+
+    function findChildArray(theArrayString) {
+        var myArray = [];
+        if(theArrayString[0] == "[") {
+            theArrayString = trim(theArrayString.substring(1, theArrayString.length -1));
+            theArrayString = theArrayString.replace(/, /g, ",");
+            var myStrings = theArrayString.split("],[");
+            for(var i = 0; i  < myStrings.length; ++i) {
+                if(myStrings[i].length > 0) {
+                    myArray.push(findChildArray(myStrings[i]));
+                }
+            }
+            return myArray;
+        } else {
+            var myStrings = theArrayString.split(",");
+            for (var i = 0; i < myStrings.length; ++i) {
+                myStrings[i] = trim(myStrings[i]);
+            }
+            return myStrings;
+        }
+    }
 
 };
 

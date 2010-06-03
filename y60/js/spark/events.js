@@ -273,6 +273,24 @@ spark.EventDispatcher.Constructor = function(Protected) {
         _myListenersByType[theType] = _myListenersByType[theType].concat(myListener);
     };
 
+    Public.addEventListenerInFront = function(theType, theListener, theUseCapture) {
+        if(theUseCapture == null) {
+            theUseCapture = false;
+        }
+
+        var myListener = {
+            type:       theType,
+            listener:   theListener,
+            useCapture: theUseCapture
+        };
+
+        if(! (theType in _myListenersByType)) {
+            _myListenersByType[theType] = [];
+        }
+
+        _myListenersByType[theType].unshift(myListener);
+    };
+
     /**
      * Get all event listeners for the given type.
      * 
@@ -406,6 +424,35 @@ spark.EventDispatcher.Constructor = function(Protected) {
 
         if(!myDidRemove) {
             Logger.error("Tried to remove nonexistent handler on " + Public.name + "." + theType);
+        }
+    };
+
+    Public.moveEventListenerToFront = function(theType, theListener, theUseCapture) {
+        var myDidMove = false;
+
+        if(theUseCapture == null) {
+            theUseCapture = false;
+        }
+
+        var myListeners = _myListenersByType[theType];
+        var myListenerToMove = null;
+        for(var i = 0; i < myListeners.length; i++) {
+            var myListener = myListeners[i];
+            if(myListener.type == theType 
+               && myListener.listener == theListener
+               && myListener.useCapture == theUseCapture)
+            {
+                myListenerToMove = myListeners[i];
+                myListeners.splice(i, 1);
+                break;
+            }
+        }
+        if (myListenerToMove) {
+            myListeners.unshift(myListenerToMove);
+            myDidMove = true;
+        }
+        if(!myDidMove) {
+            Logger.error("Tried to move nonexistent handler on " + Public.name + "." + theType);
         }
     };
 

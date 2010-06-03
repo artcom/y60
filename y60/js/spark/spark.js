@@ -70,6 +70,9 @@ var spark = Namespace("spark");
 
 spark.findRootElement = function (theDocument) {
     var myRoot = theDocument.firstChild;
+    if(!myRoot) {
+        myRoot = theDocument;
+    }
     // firstChild might be a xml processing instruction, a
     // comment, a doctype declaration or god knows what else.
     while (myRoot.nodeType !== Node.ELEMENT_NODE) {
@@ -81,8 +84,8 @@ spark.findRootElement = function (theDocument) {
     return myRoot;
 };
 
-// javascript extensions
-use("jsextensions.js");
+// javascript extensions (disabled)
+//use("jsextensions.js");
 // component instantiator
 use("meta.js");
 // spark file (and dom) loader
@@ -118,6 +121,7 @@ if (!("disableSparkWidgets" in this)) {
     use("spark/widget/Stage.js");
     use("spark/widget/World.js");
     use("spark/widget/Window.js");
+    use("spark/widget/Model.js");
     use("spark/widget/Body.js");
     use("spark/widget/ResizableRectangle.js");
     use("spark/widget/Rectangle.js");
@@ -128,5 +132,9 @@ if (!("disableSparkWidgets" in this)) {
     use("spark/widget/NewText.js");
     use("spark/widget/Canvas.js");
     use("spark/widget/OffscreenCanvas.js");
+    use("spark/widget/RoundedCornerQuad.js");
+    use("spark/widget/RoundedCornerMovie.js");
+    use("spark/widget/RoundedCornerImage.js");
+    use("spark/widget/StretchyImage.js");
     use("spark/widget/VideoCapture.js");
 }

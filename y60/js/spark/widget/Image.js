@@ -20,7 +20,7 @@ spark.Image.Constructor = function(Protected) {
     var _myImageOwned = false;
 
     var _myTexture  = null;
-    var _myVertices = null;
+    var _myUseCaching = true;
 
     // XXX crude hack starts here
     var _myOnImageChanged = null;
@@ -31,7 +31,7 @@ spark.Image.Constructor = function(Protected) {
     };
 
     Public.image setter = function(theNode) {
-        if(_myImageOwned) {
+        if (!_myUseCaching || _myImageOwned) {
             _myImage.parentNode.removeChild(_myImage);
             _myImageOwned = false;
             _myImage = null;
@@ -53,8 +53,12 @@ spark.Image.Constructor = function(Protected) {
     };
 
     Public.src setter = function(theSourceFile) {
-        Public.image = spark.getCachedImage(theSourceFile);
         _mySource = theSourceFile;
+        if (_myUseCaching) {
+            Public.image = spark.getCachedImage(theSourceFile);
+        } else {
+            Public.image = Modelling.createImage(window.scene, _mySource);
+        }
     };
 
     Public.srcId getter = function() {
@@ -74,15 +78,15 @@ spark.Image.Constructor = function(Protected) {
         return _myTexture;
     };
 
-    // XXX: this should not exist.
-    //    Public.textureId setter = function(theTextureId) {
-    //        _myMaterial.childNode("textureunits").firstChild.texture = theTextureId;
-    //    };
+    Public.useCaching getter = function() {
+        return _myUseCaching;
+    };
 
     Base.realize = Public.realize;
     Public.realize = function(theCachedMaterial) {
         var myImageSource = Protected.getString("src", "");
         var myImageSourceId = Protected.getString("srcId", "");
+        _myUseCaching = Protected.getBoolean("useCaching",true);
 
         var myWidth = 0;
         var myHeight = 0;
@@ -90,12 +94,17 @@ spark.Image.Constructor = function(Protected) {
             myWidth = Protected.getNumber("width", 1);
             myHeight = Protected.getNumber("height", 1);
             _myImage      = Modelling.createImage(window.scene, myWidth, myHeight, "BGRA");
+            _myImage.name = Public.name + "_ImagedummyImage";
             _myImageOwned = true;
             if(myImageSourceId != "") {
                 _mySourceId = myImageSourceId;
             }
         } else {
-            _myImage = spark.getCachedImage(myImageSource);
+            if (_myUseCaching) {
+                _myImage = spark.getCachedImage(myImageSource);
+            } else {
+                _myImage = Modelling.createImage(window.scene, myImageSource);
+            }
             _mySource = myImageSource;
             myWidth = Protected.getNumber("width", _myImage.raster.width);
             myHeight = Protected.getNumber("height", _myImage.raster.height);
@@ -126,7 +135,7 @@ spark.Image.Constructor = function(Protected) {
     };
 
     function handleI18nLanguage(e) {
-        Public.image = _mySourceItem.image;
+        Public.src = e.src;
     }
 
     function attachToI18nItem(theItemId) {
@@ -141,7 +150,7 @@ spark.Image.Constructor = function(Protected) {
         }
         _mySourceItem.addEventListener(spark.I18nEvent.LANGUAGE,
                                        handleI18nLanguage);
-        Public.image = _mySourceItem.image;
+        Public.src = _mySourceItem.src;
     };
 
     // XXX crude hack starts here

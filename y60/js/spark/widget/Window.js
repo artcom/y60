@@ -12,6 +12,8 @@ spark.Window = spark.ComponentClass("Window");
 spark.Window.Constructor = function(Protected) {
     var Public = this;
     var Base = {};
+    const PICK_RADIUS = 1;
+    var _myPickRadius = PICK_RADIUS;
 
     this.Inherit(spark.Stage);
     
@@ -152,10 +154,8 @@ spark.Window.Constructor = function(Protected) {
         return window.height;
     }
 
-    const PICK_RADIUS = 1;
-
     Public.pickWidget = function(theX, theY) {
-        var myBody = Public.picking.pickBodyBySweepingSphereFromBodies(theX, theY, PICK_RADIUS, Public.sceneNode);
+        var myBody = Public.picking.pickBodyBySweepingSphereFromBodies(theX, theY, _myPickRadius, Public.sceneNode);
         if(myBody) {
             var myBodyId = myBody.id;
             if(myBodyId in spark.sceneNodeMap) {
@@ -219,6 +219,14 @@ spark.Window.Constructor = function(Protected) {
     Public.onSceneLoaded setter = function(f) {
         _mySceneLoadedCallback = f;
     }
+    
+    Public.pickRadius getter = function() {
+        return _myPickRadius;
+    }
+
+    Public.pickRadius setter = function(theRadius) {
+        _myPickRadius = theRadius;
+    }
 
     //////////////////////////////////////////////////////////////////////
     // Callbacks
@@ -255,7 +263,7 @@ spark.Window.Constructor = function(Protected) {
     Public.onMouseMotion = function(theX, theY) {
         Base.onMouseMotion(theX, theY);
 
-        var myButtonStates = _myMouseButtonStates.clone();
+        var myButtonStates = clone(_myMouseButtonStates);
 
         Protected.updateMousePosition(theX, theY);
 
@@ -295,7 +303,7 @@ spark.Window.Constructor = function(Protected) {
         var myButton = spark.Mouse.buttonFromId(theButton);
         Protected.updateMouseButtonState(myButton, theState);
 
-        var myButtonStates = _myMouseButtonStates.clone();
+        var myButtonStates = clone(_myMouseButtonStates);
 
         Protected.updateMousePosition(theX, theY);
 
@@ -342,7 +350,7 @@ spark.Window.Constructor = function(Protected) {
     Public.onMouseWheel = function(theDeltaX, theDeltaY) {
         Base.onMouseWheel(theDeltaX, theDeltaY);
 
-        var myButtonStates = _myMouseButtonStates.clone();
+        var myButtonStates = clone(_myMouseButtonStates);
 
         if(_myMouseFocused) {
             Logger.debug("Mouse scrolls " + _myMouseFocused + " by [" + theDeltaX + "," + theDeltaY + "]");

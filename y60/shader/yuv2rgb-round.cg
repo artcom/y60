@@ -16,6 +16,8 @@
 //  Description: 
 //=============================================================================
 
+#include "roundCornerUtil.cg"
+
 struct app2vert { 
     float4 Position : POSITION;
     float3 Normal   : NORMAL;
@@ -36,6 +38,7 @@ vert2frag mainVertex(app2vert IN,
 
     OUT.Vertex = mul(GL_MODELVIEW_PROJECTION, IN.Position);
     OUT.TexCoord0 =  float2(IN.TexCoord).xy;
+    OUT.Color = IN.Color;
     return OUT;
 }
 
@@ -54,6 +57,10 @@ float4 mainFragment(vert2frag IN,
                     uniform sampler2D tex0,
                     uniform sampler2D tex1,
                     uniform sampler2D tex2,
+                    uniform float radius,
+                    uniform float cornerDistance,
+                    uniform float aspectRatio,
+                    uniform float4 cornerToggle,
                     uniform float4 surfacecolor): COLOR
 {
     float3 myYUVColor;
@@ -61,8 +68,8 @@ float4 mainFragment(vert2frag IN,
     myYUVColor.y = tex2D(tex1, IN.TexCoord0)-0.5;
     myYUVColor.z = tex2D(tex2, IN.TexCoord0)-0.5;
     float3x3 myMatrix = float3x3(1.16,  0.0,   1.60, 1.16, -0.39, -0.81,1.16,  2.01,  0.0);
-    float4 myRGBColor = float4(mul(myMatrix, myYUVColor), 1);
-    return myRGBColor * surfacecolor;
+    float4 myRGBColor = float4(mul(myMatrix, myYUVColor), 1) * surfacecolor;   
+    return getRoundCornerPixel(IN.TexCoord0, IN.Color, myRGBColor, radius, cornerDistance, aspectRatio, cornerToggle);
 }
 
 
