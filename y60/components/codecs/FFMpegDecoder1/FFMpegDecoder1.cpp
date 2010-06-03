@@ -353,6 +353,26 @@ namespace y60 {
 
         asl::Time myLoadEndTime;
         AC_INFO << "Load time " << (myLoadEndTime - myLoadStartTime) << "s";
+
+        float myAspectRatio = 1.0;
+        // calc aspect ratio
+#if LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(52,21,0)
+        if (_myVStream->sample_aspect_ratio.num) {
+           myAspectRatio = av_q2d(_myVStream->sample_aspect_ratio);
+        } else if (_myVStream->codec->sample_aspect_ratio.num) {
+#else            
+        if (_myVStream->codec->sample_aspect_ratio.num) {
+#endif            
+           myAspectRatio = av_q2d(_myVStream->codec->sample_aspect_ratio);
+        } else {
+           myAspectRatio = 0;
+        }
+        if (myAspectRatio <= 0.0) {
+            myAspectRatio = 1.0;
+        }
+        myAspectRatio *= (float)_myVStream->codec->width / _myVStream->codec->height; 
+        myMovie->set<AspectRatioTag>(myAspectRatio);
+
     }
 
     double
