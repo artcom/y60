@@ -56,6 +56,10 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+/*jslint white: false, plusplus: false*/
+/*globals spark, searchFile, Logger, window, Renderer, Node, Vector2f,
+          Matrix4f, applyImageFilter, Vector3f, asColor, Modelling */
+
 /**
  * Text rendering utilities for SPARK
  * 
@@ -115,8 +119,8 @@ spark.loadFont = function(theName, theSize, theStyle, theHinting) {
         // wenig crispy aber okes spacing -> Autohinting (Renderer.AUTOHINTING)
 
         var myHinting = spark.hintingFromString(theHinting);    
-           // enforce loadttf of a normal font, otherwise we get an exception
-       window.loadTTF(myName, searchFile(myFontPath), theSize*spark.fontScale, myHinting , spark.styleFromString("normal"));
+        // enforce loadttf of a normal font, otherwise we get an exception
+        window.loadTTF(myName, searchFile(myFontPath), theSize*spark.fontScale, myHinting , spark.styleFromString("normal"));
         if(theStyle != "normal") {
            window.loadTTF(myName, searchFile(myFontPath), theSize*spark.fontScale, myHinting , spark.styleFromString(theStyle));
         }
@@ -131,7 +135,7 @@ spark.loadFont = function(theName, theSize, theStyle, theHinting) {
                myFontPath = searchFile("FONTS/" + myFont + "-bold" + ".ttf");
            }
            if (myFontPath) {
-               Logger.info("loading bold font for " + myName + "," + myFontPath + "," + theSize + "," + "bold")
+               Logger.info("loading bold font for " + myName + "," + myFontPath + "," + theSize + "," + "bold");
                window.loadTTF(myName, searchFile(myFontPath), theSize*spark.fontScale, myHinting , Renderer.BOLD);
            }
        }
@@ -215,22 +219,27 @@ spark.fontForStyle = function(theStyle) {
     !theStyle.getAttribute("fontStyle") ? theStyle.fontStyle  = "normal" : null;
     !theStyle.getAttribute("hinting") ? theStyle.hinting  = spark.NOHINTING : null;
     return spark.loadFont(theStyle.font, theStyle.fontSize, theStyle.fontStyle, theStyle.hinting);
-}
+};
 
 /**
  * Internal: Convert text alignment from string to Y60 enum.
  */
 spark.alignmentFromString = function(theString) {
-    if(theString == "top")
+    if (theString === "top") {
         return Renderer.TOP_ALIGNMENT;
-    if(theString == "bottom")
+    }
+    if (theString === "bottom") {
         return Renderer.BOTTOM_ALIGNMENT;
-    if(theString == "left")
+    }
+    if (theString === "left") {
         return Renderer.LEFT_ALIGNMENT;
-    if(theString == "right")
+    }
+    if (theString === "right") {
         return Renderer.RIGHT_ALIGNMENT;
-    if(theString == "center")
+    }
+    if (theString === "center") {
         return Renderer.CENTER_ALIGNMENT;
+    }
     throw new Error("Unknown alignment: " + theString);
 };
 
@@ -238,14 +247,18 @@ spark.alignmentFromString = function(theString) {
  * Internal: Convert text style from string to Y60 enum.
  */
 spark.styleFromString = function(theString) {
-    if(theString == "normal")
+    if (theString === "normal") {
         return 0;
-    if(theString == "bold")
+    }
+    if (theString === "bold") {
         return Renderer.BOLD;
-    if(theString == "italic")
+    }
+    if (theString === "italic") {
         return Renderer.ITALIC;
-    if(theString == "bolditalic")
+    }
+    if (theString === "bolditalic") {
         return Renderer.BOLDITALIC;
+    }
     throw new Error("Unknown font style: " + theString);
 };
 
@@ -254,12 +267,15 @@ spark.AUTOHINTING = "autohinting";
 spark.NOHINTING = "nohinting";
 
 spark.hintingFromString = function(theString) {
-    if(theString == spark.NOHINTING)
+    if (theString === spark.NOHINTING) {
         return Renderer.NOHINTING;
-    if(theString == spark.AUTOHINTING)
+    }
+    if (theString === spark.AUTOHINTING) {
         return Renderer.AUTOHINTING;
-    if(theString == spark.NATIVEHINTING)
+    }
+    if (theString === spark.NATIVEHINTING) {
         return Renderer.NATIVEHINTING;
+    }
     throw new Error("Unknown font style: " + theString);
 };
 

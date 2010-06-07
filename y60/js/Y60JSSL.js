@@ -64,6 +64,11 @@
 /*globals print, Node, Vector4f, Vector3f, difference, normalized, cross,
           Logger, Planef, dumpstack*/
 
+
+var js = js || {};
+js.array  = ("array" in js)  ? js.array  : {};
+js.string = ("string" in js) ? js.string : {};
+
 var PI_2 = Math.PI / 2;
 var PI_4 = Math.PI / 4;
 var PI_180 = Math.PI / 180;
@@ -121,6 +126,8 @@ function clone(theObject, theMode) {
     }
     return myNewObject;
 }
+
+js.clone = clone;
 
 // WTF?
 function getFocalLength(theHfov) {
@@ -188,8 +195,6 @@ function degBetween(a,b) {
     return angleBetween(a,b, 180);
 }
 
-
-
 function clamp(theValue, theMin, theMax) {
     if (theValue < theMin) {
         return theMin;
@@ -219,6 +224,7 @@ function indexOf(theArray, theItem) {
     }
     return -1;
 }
+js.array.indexOf = indexOf;
 
 function stringToByteArray(theString) {
     var myResult = [];
@@ -293,7 +299,6 @@ function arrayToString(a) {
 
 // returns a precision formated string from a Vector3f list
 function formatVector3f(theVector, thePrecision) {
-
     var myString = "";
     for (var i = 0; i < theVector.length; ++i) {
 
@@ -311,7 +316,6 @@ function formatVector3f(theVector, thePrecision) {
 
 // returns a precision formated string from a Vector2f list
 function formatVector2f(theVector, thePrecision) {
-
     var myString = "";
     for (var i = 0; i < theVector.length; ++i) {
 
@@ -719,6 +723,8 @@ function trim(theString) {
     }
     return frontIndex > backIndex ? "" : theString.substring(frontIndex, (backIndex + 1));
 }
+js.string.trim = trim;
+
 function nextPowerOfTwo(n) {
     var myPowerOfTwo = 1;
     while (myPowerOfTwo < n) {
@@ -855,17 +861,17 @@ function easeIn(theValue) {
     return 2*easeInOut(theValue/2);
 }
 function gaussianBox_Mueller(theMean, theDeviation) {
-	var x1, x2, w, y1;
-	do {
-		x1 = 2.0 * Math.random() - 1.0;
-		x2 = 2.0 * Math.random() - 1.0;
-		w = x1 * x1 + x2 * x2;
-	} while ( w >= 1.0 );
+    var x1, x2, w, y1;
+    do {
+        x1 = 2.0 * Math.random() - 1.0;
+        x2 = 2.0 * Math.random() - 1.0;
+        w = x1 * x1 + x2 * x2;
+    } while ( w >= 1.0 );
 
-	w = Math.sqrt( (-2.0 * Math.log( w ) ) / w );
-	y1 = x1 * w;
+    w = Math.sqrt( (-2.0 * Math.log( w ) ) / w );
+    y1 = x1 * w;
 
-	return( theMean + y1 * theDeviation );
+    return( theMean + y1 * theDeviation );
 }
 function gaussianRandom() {
     var myGaussianRandom = gaussianBox_Mueller(0.5, 0.5)
@@ -984,12 +990,10 @@ function lerp(t, v, w) {
     return v + t *(w-v);
 }
 
-
 /*
  * RankedFeature conversion
  */
 function stringRankedFeature(theRankedFeature) {
-
     if (theRankedFeature == null) {
         return "";
     }
@@ -1007,7 +1011,6 @@ function stringRankedFeature(theRankedFeature) {
 }
 
 function parseRankedFeature(theString) {
-
     var myRegex = new RegExp("^\([0-9]*\)\\[\(.*\)\\]$");
     var myMatch = myRegex.exec(theString);
     if (!myMatch || myMatch.length != 3) {
@@ -1027,7 +1030,6 @@ function parseRankedFeature(theString) {
  * VectorOfRankedFeature conversion
  */
 function stringVectorOfRankedFeature(theVectorOfRankedFeature) {
-
     if (theVectorOfRankedFeature == null) {
         return "";
     }

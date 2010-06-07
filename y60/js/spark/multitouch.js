@@ -56,6 +56,9 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+/*jslint nomen: false*/
+/*globals spark, use, ASSManager, plug, TUIOClient*/
+
 /**
  * Load the proximatrix driver
  * 
@@ -66,7 +69,7 @@
  * This must be given a reference to the stage
  * due to the baroque API of ASSManager.
  */
-spark.enableProximatrix = function(theStage) {
+spark.enableProximatrix = function (theStage) {
     use("ASSManager.js");
     spark.proximatrix = new ASSManager(theStage);
 };
@@ -78,7 +81,7 @@ spark.enableProximatrix = function(theStage) {
  * TUIO events. A toplevel Window instance will
  * then dispatch these as cursor events.
  */
-spark.enableTuio = function() {
+spark.enableTuio = function () {
     plug("TUIOClient");
     TUIOClient.listenToUDP();
 };
@@ -91,7 +94,7 @@ spark.enableTuio = function() {
  */
 spark.Cursor = spark.Class("Cursor");
 
-spark.Cursor.Constructor = function(Protected, theId) {
+spark.Cursor.Constructor = function (Protected, theId) {
     var Public = this;
 
     var _myId = theId;
@@ -102,7 +105,7 @@ spark.Cursor.Constructor = function(Protected, theId) {
      * Any creator of cursors shall ensure uniqueness
      * (within application runtime) of these.
      */
-    Public.id getter = function() {
+    Public.id getter = function () {
         return _myId;
     };
 
@@ -116,7 +119,7 @@ spark.Cursor.Constructor = function(Protected, theId) {
      * identify "dead" cursors when dealing with
      * cursor collections.
      */
-    Public.active getter = function() {
+    Public.active getter = function () {
         return _myActive;
     };
 
@@ -126,17 +129,16 @@ spark.Cursor.Constructor = function(Protected, theId) {
     /**
      * Current grab holder of this cursor.
      */
-    Public.grabHolder getter = function() {
+    Public.grabHolder getter = function () {
         return _myGrabHolder;
     };
 
     /**
      * True when this cursor is under grab.
      */
-    Public.grabbed getter = function() {
-        return (_myGrabHolder != null);
+    Public.grabbed getter = function () {
+        return (_myGrabHolder !== null);
     };
-
 
     var _myHovered = null;
 
@@ -145,7 +147,7 @@ spark.Cursor.Constructor = function(Protected, theId) {
      * 
      * This is always updated, even when under grab.
      */
-    Public.hovered getter = function() {
+    Public.hovered getter = function () {
         return _myHovered;
     };
 
@@ -155,8 +157,8 @@ spark.Cursor.Constructor = function(Protected, theId) {
      * Depending on grab state, this is either
      * the grab holder or the currently hovered widget.
      */
-    Public.focused getter = function() {
-        if(_myGrabHolder) {
+    Public.focused getter = function () {
+        if (_myGrabHolder) {
             return _myGrabHolder;
         } else {
             return _myHovered;
@@ -168,28 +170,28 @@ spark.Cursor.Constructor = function(Protected, theId) {
     /**
      * Current position as cloned Point2f.
      */
-    Public.stagePosition getter = function() {
+    Public.stagePosition getter = function () {
         return _myStagePosition.clone();
     };
 
     /**
      * Current horizontal position.
      */
-    Public.stageX getter = function() {
+    Public.stageX getter = function () {
         return _myStagePosition.x;
     };
 
     /**
      * Current vertical position.
      */
-    Public.stageY getter = function() {
+    Public.stageY getter = function () {
         return _myStagePosition.y;
     };
 
     /**
      * Internal: update position and focus of cursor.
      */
-    Public.update = function(theHovered, theStagePosition) {
+    Public.update = function (theHovered, theStagePosition) {
         _myHovered = theHovered;
         _myStagePosition = theStagePosition.clone();
     };
@@ -197,28 +199,28 @@ spark.Cursor.Constructor = function(Protected, theId) {
     /**
      * Internal: called when cursor is created.
      */
-    Public.activate = function() {
+    Public.activate = function () {
         _myActive = true;
     };
 
     /**
      * Internal: called when cursor vanishes.
      */
-    Public.deactivate = function() {
+    Public.deactivate = function () {
         _myActive = false;
     };
 
     /**
      * Grab this cursor, sending all its future events to HOLDER.
      */
-    Public.grab = function(theHolder) {
+    Public.grab = function (theHolder) {
         _myGrabHolder = theHolder;
     };
 
     /**
      * Cancel a grab, returning the cursor to normal event flow.
      */
-    Public.ungrab = function() {
+    Public.ungrab = function () {
         _myGrabHolder = null;
     };
 
@@ -265,7 +267,7 @@ spark.CursorEvent.ENTER  = "cursor-enter";
  */
 spark.CursorEvent.LEAVE  = "cursor-leave";
 
-spark.CursorEvent.Constructor = function(Protected, theType, theCursor) {
+spark.CursorEvent.Constructor = function (Protected, theType, theCursor) {
     var Public = this;
 
     this.Inherit(spark.Event, theType);
@@ -275,28 +277,28 @@ spark.CursorEvent.Constructor = function(Protected, theType, theCursor) {
     /**
      * Reference to the cursor this event concerns
      */
-    Public.cursor getter = function() {
+    Public.cursor getter = function () {
         return _myCursor;
     };
 
     /**
      * Convenience: horizontal position of cursor
      */
-    Public.stageX getter = function() {
+    Public.stageX getter = function () {
         return _myCursor.stageX;
     };
 
     /**
      * Convenience: vertical position of cursor
      */
-    Public.stageY getter = function() {
+    Public.stageY getter = function () {
         return _myCursor.stageY;
     };
 
     /**
      * Convenience: intensity of cursor
      */
-    Public.intensity getter = function() {
+    Public.intensity getter = function () {
         return _myCursor.intensity;
     };
 };

@@ -56,24 +56,30 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-spark.setupCameraOrtho = function(theCamera, theWidth, theHeight, theCameraZ, theFarPlaneDistance) {
-    var myCameraZ = 500;
+/*jslint*/
+/*globals spark, Frustum, ProjectionType, Vector3f, Quaternionf*/
+
+spark.setupCameraOrtho = function (theCamera, theWidth, theHeight, theCameraZ, theFarPlaneDistance) {
+    /*var myCameraZ = 500;
     if(theCameraZ != undefined) {
        myCameraZ = theCameraZ;
-    }
-    var myFarPlaneDistance = myCameraZ*2;
-    if(theFarPlaneDistance != undefined) {
+    }*/
+    var myCameraZ = theCameraZ || 500;
+    
+    /*var myFarPlaneDistance = myCameraZ * 2;
+    if (theFarPlaneDistance != undefined) {
        myFarPlaneDistance = theFarPlaneDistance;
-    }
+    }*/
+    var myFarPlaneDistance = theFarPlaneDistance || myCameraZ * 2;
     
     theCamera.frustum = new Frustum();
-    theCamera.frustum.width = theWidth;
+    theCamera.frustum.width  = theWidth;
     theCamera.frustum.height = theHeight;
     theCamera.frustum.type = ProjectionType.orthonormal;
-    theCamera.position.x = theWidth/2;
-    theCamera.position.y = theHeight/2;
-    theCamera.position.z = myCameraZ;
+    theCamera.position.x   = theWidth / 2;
+    theCamera.position.y   = theHeight / 2;
+    theCamera.position.z   = myCameraZ;
     theCamera.frustum.near = 0.1;
     theCamera.frustum.far  = myFarPlaneDistance; 
-    theCamera.orientation = Quaternionf.createFromEuler(new Vector3f(0,0,0));
-}
+    theCamera.orientation  = Quaternionf.createFromEuler(new Vector3f(0, 0, 0));
+};

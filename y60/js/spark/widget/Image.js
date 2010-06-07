@@ -4,6 +4,10 @@
  * NOTE: does not adjust it's size when image is changed. However, the size
  *       can be changed by setting the width, height and size properties.
  */
+ 
+/*jslint nomen: false, white: false*/
+/*globals spark, window, Modelling, Logger*/
+
 spark.Image = spark.ComponentClass("Image");
 
 spark.Image.Constructor = function(Protected) {
@@ -90,7 +94,7 @@ spark.Image.Constructor = function(Protected) {
 
         var myWidth = 0;
         var myHeight = 0;
-        if(myImageSource == "") {
+        if (myImageSource === "") {
             myWidth = Protected.getNumber("width", 1);
             myHeight = Protected.getNumber("height", 1);
             _myImage      = Modelling.createImage(window.scene, myWidth, myHeight, "BGRA");
@@ -151,10 +155,9 @@ spark.Image.Constructor = function(Protected) {
         _mySourceItem.addEventListener(spark.I18nEvent.LANGUAGE,
                                        handleI18nLanguage);
         Public.src = _mySourceItem.src;
-    };
+    }
 
     // XXX crude hack starts here
-
     Public.onImageChanged getter = function() {
         return _myOnImageChanged;
     };

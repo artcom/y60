@@ -57,7 +57,7 @@
 */
 
 /*jslint nomen: false, plusplus: false*/
-/*global spark, Class, Node, Logger*/
+/*global spark, Class, Node, Logger, searchFile*/
 
 /**
  * Map of all component classes, indexed by name.

@@ -1,3 +1,6 @@
+/*jslint nomen:false, white: false*/
+/*globals spark, use*/
+
 /**
  * A simple movie player.
  *
@@ -32,25 +35,25 @@ spark.Movie.Constructor = function(Protected) {
             Public.realize = Base.realizeResizableRectangle;
         }
         Base.initialize(theNode);
-    }
+    };
     // playback control
 
     Public.play = function() {
-    	if(_myMovie.nodeName == "movie") {
-    		_myMovie.playmode = "play";
-    	}
+        if(_myMovie.nodeName == "movie") {
+            _myMovie.playmode = "play";
+        }
     };
 
     Public.stop = function() {
-    	if(_myMovie.nodeName == "movie") {
-    		_myMovie.playmode = "stop";
-    	}
+        if(_myMovie.nodeName == "movie") {
+            _myMovie.playmode = "stop";
+        }
     };
 
     Public.pause = function() {
-    	if(_myMovie.nodeName == "movie") {
-    		_myMovie.playmode = "pause";
-    	}
+        if(_myMovie.nodeName == "movie") {
+            _myMovie.playmode = "pause";
+        }
     };
 
     Public.mode getter = function() { return _myMovie.playmode; };
@@ -185,7 +188,7 @@ spark.Movie.Constructor = function(Protected) {
     };
 
     Base.postRealize = Public.postRealize;
-    Public.postRealize = function() {
+    Public.postRealize = function () {
         if(_mySourceId) {
             attachToI18nItem(_mySourceId);
         }
@@ -195,7 +198,7 @@ spark.Movie.Constructor = function(Protected) {
         Base.postRealize();
     };
 
-    function ensureAspectRatio () {
+    function ensureAspectRatio() {
         var myHeight = _myMovie.height;
         var myWidth = Math.round(_myMovie.height * _myMovie.aspectratio);
         if (myWidth > _myMovie.width) {

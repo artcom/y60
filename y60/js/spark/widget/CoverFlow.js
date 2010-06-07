@@ -8,11 +8,14 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
+/*jslint*/
+/*globals use, spark, Vector2f*/
+
 use("OffscreenRenderer.js");
 
 spark.CoverFlow = spark.ComponentClass("CoverFlow");
 
-spark.CoverFlow.Constructor = function(Protected) {
+spark.CoverFlow.Constructor = function (Protected) {
     var Base = {};
     var Public = this;
 

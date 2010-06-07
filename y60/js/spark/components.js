@@ -57,7 +57,7 @@
 */
 
 /*jslint nomen: false, plusplus: false*/
-/*global spark, Logger, Vector2f, Vector3f, Vector4f*/
+/*global spark, Logger, Vector2f, Vector3f, Vector4f, trim*/
 
 spark.ourComponentsByNameMap = {};
 
@@ -283,6 +283,28 @@ spark.Component.Constructor = function (Protected) {
         }
     };
 
+    function findChildArray(theArrayString) {
+        var myStrings, i;
+        var myArray = [];
+        if (theArrayString[0] === "[") {
+            theArrayString = trim(theArrayString.substring(1, theArrayString.length - 1));
+            theArrayString = theArrayString.replace(/, /g, ",");
+            myStrings = theArrayString.split("],[");
+            for (i = 0; i  < myStrings.length; ++i) {
+                if (myStrings[i].length > 0) {
+                    myArray.push(findChildArray(myStrings[i]));
+                }
+            }
+            return myArray;
+        } else {
+            myStrings = theArrayString.split(",");
+            for (i = 0; i < myStrings.length; ++i) {
+                myStrings[i] = trim(myStrings[i]);
+            }
+            return myStrings;
+        }
+    }
+
     // XXX: this requires a member type. else it don't make no sense.
     Protected.getArray = function (theName, theDefault) {
         if (!_myNode) {
@@ -293,8 +315,8 @@ spark.Component.Constructor = function (Protected) {
             }
         }
         if (theName in _myNode) {
-            var myString = _myNode[theName].substring(1, _myNode[theName].length -1);
-            if (myString.length == 0) {
+            var myString = _myNode[theName].substring(1, _myNode[theName].length - 1);
+            if (myString.length === 0) {
                 return [];
             }
             var myArray = findChildArray(trim(myString));
@@ -307,28 +329,6 @@ spark.Component.Constructor = function (Protected) {
             }
         }
     };
-
-    function findChildArray(theArrayString) {
-        var myArray = [];
-        if(theArrayString[0] == "[") {
-            theArrayString = trim(theArrayString.substring(1, theArrayString.length -1));
-            theArrayString = theArrayString.replace(/, /g, ",");
-            var myStrings = theArrayString.split("],[");
-            for(var i = 0; i  < myStrings.length; ++i) {
-                if(myStrings[i].length > 0) {
-                    myArray.push(findChildArray(myStrings[i]));
-                }
-            }
-            return myArray;
-        } else {
-            var myStrings = theArrayString.split(",");
-            for (var i = 0; i < myStrings.length; ++i) {
-                myStrings[i] = trim(myStrings[i]);
-            }
-            return myStrings;
-        }
-    }
-
 };
 
 
@@ -425,6 +425,7 @@ spark.Container.Constructor = function (Protected) {
     /**
      * Recursively retrieve children of the given name.
      */
+    // TODO: check if this is used at all - seems it cannot work - see myChild!
     Public.findChildrenByName = function (theName) {
         var myChildren = [];
         var myOwnChild = Public.getChildByName(theName);

@@ -11,6 +11,9 @@
 // y60 Skeleton.js rehearsal
 //=============================================================================
 
+/*jslint */
+/*globals use, GUI, spark, exit, reportException*/
+
 use("spark/spark.js");
 // load animation library
 use("GUI/Animation.js");
@@ -21,9 +24,9 @@ function playAnimation(theAnimation) {
 }
 
 spark.SkeletonImpl = spark.ComponentClass("SkeletonImpl");
-spark.SkeletonImpl.Constructor = function(Protected) {
+spark.SkeletonImpl.Constructor = function (Protected) {
     this.Inherit(spark.Window);
-}
+};
 
 // load layouts and run the event loop
 try {
@@ -32,19 +35,16 @@ try {
 
     // wrap onframe to integrate GUI.Animation
     var myRealOnFrame = ourApp.onFrame;
-    ourApp.onFrame = function(theTime, theDeltaT) {
+    ourApp.onFrame = function (theTime, theDeltaT) {
         ourAnimationManager.doFrame(theTime);
         myRealOnFrame.call(ourApp, theTime, theDeltaT);
-    }
+    };
 
     // remove mover so input events won't cause display trouble
     ourApp.setMover(null);
-
-    // go and keep going
+    
     ourApp.go();
-
 } catch (ex) {
     reportException(ex);
     exit(1);
 }
-

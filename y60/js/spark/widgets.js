@@ -56,6 +56,9 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+/*jslint white: false, nomen: false, plusplus: false*/
+/*globals spark, Vector3f, Logger, Quaternionf, radFromDeg, GUI*/
+
 /**
  * Map from scene node id to widget.
  * 
@@ -366,7 +369,7 @@ spark.Widget.Constructor = function(Protected) {
         if(_mySceneNode) {
             _mySceneNode.pivot = Public.pivot;
         }
-    };
+    }
 
 
     // ORIGIN
@@ -476,33 +479,33 @@ spark.Widget.Constructor = function(Protected) {
     };
 
     Public.animateFade = function(theDuration, theEnd, theEasing) {
-        if(!theDuration) {
+        if (!theDuration) {
             theDuration = 250.0;
         }
-        if(!theEnd) {
-        	theEnd = 1.0;
+        if (!theEnd) {
+            theEnd = 1.0;
         }
-        if(!theEasing) {
+        if (!theEasing) {
             theEasing = null;
         }
         return Public.animateProperty(theDuration, theEasing, "alpha", Public.alpha, theEnd);
     };
 
     Public.animateFadeIn = function(theDuration, theEasing) {
-        if(!theDuration) {
+        if (!theDuration) {
             theDuration = 250.0;
         }
-        if(!theEasing) {
+        if (!theEasing) {
             theEasing = null;
         }
         return Public.animateProperty(theDuration, theEasing, "alpha", 0.0, 1.0);
     };
 
     Public.animateFadeOut = function(theDuration, theEasing) {
-        if(!theDuration) {
+        if (!theDuration) {
             theDuration = 250.0;
         }
-        if(!theEasing) {
+        if (!theEasing) {
             theEasing = null;
         }
         return Public.animateProperty(theDuration, theEasing, "alpha", 1.0, 0.0);
@@ -541,4 +544,4 @@ spark.Widget.Constructor = function(Protected) {
         Base.postRealize();
     };
 
-}
+};

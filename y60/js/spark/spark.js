@@ -70,7 +70,7 @@ var spark = Namespace("spark");
 
 spark.findRootElement = function (theDocument) {
     var myRoot = theDocument.firstChild;
-    if(!myRoot) {
+    if (!myRoot) {
         myRoot = theDocument;
     }
     // firstChild might be a xml processing instruction, a

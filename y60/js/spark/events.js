@@ -56,6 +56,9 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+/*jslint nomen: false, plusplus: false*/
+/*globals spark, Logger, getter*/
+
 /**
  * SPARK Event Handling
  * 
@@ -85,10 +88,10 @@
  * Enumeration of event dispatch phases.
  */
 spark.EventPhase = {
-    IDLE:      "idle",
-    CAPTURING: "capturing",
-    TARGET:    "target",
-    BUBBLING:  "bubbling"
+    IDLE      : "idle",
+    CAPTURING : "capturing",
+    TARGET    : "target",
+    BUBBLING  : "bubbling"
 };
 
 /**
@@ -103,37 +106,36 @@ spark.EventPhase = {
  */
 spark.Event = spark.Class("Event");
 
-spark.Event.Constructor = function(Protected, theType, theBubbles, theCancelable) {
+spark.Event.Constructor = function (Protected, theType, theBubbles, theCancelable) {
     var Public = this;
 
-
-    var _myBubbles = theBubbles != null ? theBubbles : false;
-    var _myCancelable = theCancelable != null ? theCancelable : false;
+    var _myBubbles       = !!theBubbles;
+    var _myCancelable    = !!theCancelable;
     var _myCurrentTarget = null;
-    var _myCurrentPhase = spark.EventPhase.IDLE;
-    var _myTarget = null;
-    var _myType = theType;
-    var _myDispatching = false;
+    var _myCurrentPhase  = spark.EventPhase.IDLE;
+    var _myTarget        = null;
+    var _myType          = theType;
+    var _myDispatching   = false;
 
 
     /**
      * The type of this event.
      */
-    Public.type getter = function() {
+    Public.type getter = function () {
         return _myType;
     };
 
     /**
      * Whether this event participates in bubbling.
      */
-    Public.bubbles getter = function() {
+    Public.bubbles getter = function () {
         return _myBubbles;
     };
 
     /**
      * Whether this event allows cancellation.
      */
-    Public.cancelable getter = function() {
+    Public.cancelable getter = function () {
         return _myCancelable;
     };
 
@@ -142,28 +144,28 @@ spark.Event.Constructor = function(Protected, theType, theBubbles, theCancelable
      * 
      * While true, the following properties are valid.
      */
-    Public.dispatching getter = function() {
+    Public.dispatching getter = function () {
         return _myDispatching;
     };
 
     /**
      * The final target of this event in the current flow.
      */
-    Public.target getter = function() {
+    Public.target getter = function () {
         return _myTarget;
     };
 
     /**
      * Always reflects the current target during event flow.
      */
-    Public.currentTarget getter = function() {
+    Public.currentTarget getter = function () {
         return _myCurrentTarget;
     };
 
     /**
      * Always reflects the current phase during event flow.
      */
-    Public.currentPhase getter = function() {
+    Public.currentPhase getter = function () {
         return _myCurrentPhase;
     };
 
@@ -176,8 +178,8 @@ spark.Event.Constructor = function(Protected, theType, theBubbles, theCancelable
      * This is, however, only allowed on events that allow
      * cancellation on creation.
      */
-    Public.cancelDispatch = function() {
-        if(_myCancelable) {
+    Public.cancelDispatch = function () {
+        if (_myCancelable) {
             Public.finishDispatch();
         } else {
             Logger.fatal("event of type " + _myType + " is not cancelable");
@@ -187,7 +189,7 @@ spark.Event.Constructor = function(Protected, theType, theBubbles, theCancelable
     /**
      * Internal: update state of event to reflect start of dispatch
      */
-    Public.startDispatch = function(theTarget) {
+    Public.startDispatch = function (theTarget) {
         _myDispatching = true;
         _myTarget = theTarget;
         _myCurrentPhase  = spark.EventPhase.IDLE;
@@ -197,7 +199,7 @@ spark.Event.Constructor = function(Protected, theType, theBubbles, theCancelable
     /**
      * Internal: update state of event to reflect end of dispatch
      */
-    Public.finishDispatch = function() {
+    Public.finishDispatch = function () {
         _myDispatching = false;
         _myCurrentPhase = spark.EventPhase.IDLE;
         _myCurrentTarget = null;
@@ -206,7 +208,7 @@ spark.Event.Constructor = function(Protected, theType, theBubbles, theCancelable
     /**
      * Internal: update state of event to reflect dispatch to given target
      */
-    Public.dispatchTo = function(theCurrentTarget, theCurrentPhase) {
+    Public.dispatchTo = function (theCurrentTarget, theCurrentPhase) {
         _myCurrentTarget = theCurrentTarget;
         _myCurrentPhase  = theCurrentPhase;
     };
@@ -226,7 +228,7 @@ spark.Event.Constructor = function(Protected, theType, theBubbles, theCancelable
  */
 spark.EventDispatcher = spark.AbstractClass("EventDispatcher");
 
-spark.EventDispatcher.Constructor = function(Protected) {
+spark.EventDispatcher.Constructor = function (Protected) {
     var Public = this;
 
     var _myListenersByType = {};
@@ -252,11 +254,11 @@ spark.EventDispatcher.Constructor = function(Protected) {
         //      need to figure out something better.
         //      click events DO still make sense, after all.
         //      maybe these should be implemented at widget level.
-        if(theType == "mouse-click"){
+        if (theType == "mouse-click") {
             Logger.warning("MouseEvent.CLICK is deprecated; use MouseEvent.BUTTON_UP or MouseEvent.BUTTON_DOWN")
         }
 
-        if(theUseCapture == null) {
+        if (theUseCapture == null) {
             theUseCapture = false;
         }
 
@@ -266,7 +268,7 @@ spark.EventDispatcher.Constructor = function(Protected) {
             useCapture: theUseCapture
         };
 
-        if(! (theType in _myListenersByType)) {
+        if (!(theType in _myListenersByType)) {
             _myListenersByType[theType] = [];
         }
 
@@ -274,7 +276,7 @@ spark.EventDispatcher.Constructor = function(Protected) {
     };
 
     Public.addEventListenerInFront = function(theType, theListener, theUseCapture) {
-        if(theUseCapture == null) {
+        if (theUseCapture == null) {
             theUseCapture = false;
         }
 
@@ -284,7 +286,7 @@ spark.EventDispatcher.Constructor = function(Protected) {
             useCapture: theUseCapture
         };
 
-        if(! (theType in _myListenersByType)) {
+        if (!(theType in _myListenersByType)) {
             _myListenersByType[theType] = [];
         }
 
@@ -296,10 +298,10 @@ spark.EventDispatcher.Constructor = function(Protected) {
      * 
      * This is internal, right? -IA 20100219
      */
-    Public.getEventListeners = function(theType) {
-        if(theType in _myListenersByType) {
+    Public.getEventListeners = function (theType) {
+        if (theType in _myListenersByType) {
             var myListeners = _myListenersByType[theType];
-            if(myListeners.length > 0) {
+            if (myListeners.length > 0) {
                 return myListeners;
             }
         }
@@ -324,32 +326,32 @@ spark.EventDispatcher.Constructor = function(Protected) {
      * and currentPhase, making it reflect dispatch progress.
      * 
      */
-    Public.dispatchEvent = function(theEvent) {
+    Public.dispatchEvent = function (theEvent) {
         theEvent.startDispatch(Public);
 
         // collect dispatchers to capture on
         var myCurrent = Public;
         var myCaptureList = [Public];
-        while(myCurrent.parent != null) {
-            var myCurrent = myCurrent.parent;
+        while (myCurrent.parent != null) {
+            myCurrent = myCurrent.parent;
 
-            if("EventDispatcher" in myCurrent._classes_) {
+            if ("EventDispatcher" in myCurrent._classes_) {
                 myCaptureList.unshift(myCurrent);
             }
         }
         myCaptureList.pop();
 
         // capture phase
-        for(var i = 0; i < myCaptureList.length; i++) {
+        for (var i = 0; i < myCaptureList.length; i++) {
             var myCurrentTarget = myCaptureList[i];
-            if(myCurrentTarget.hasEventListener(theEvent.type)) {
+            if (myCurrentTarget.hasEventListener(theEvent.type)) {
                 theEvent.dispatchTo(myCurrentTarget, spark.EventPhase.CAPTURING);
                 var myListeners = myCurrentTarget.getEventListeners(theEvent.type);
-                for(var j = 0; j < myListeners.length; j++) {
+                for (var j = 0; j < myListeners.length; j++) {
                     var myListener = myListeners[j];
-                    if(myListener.useCapture) {
+                    if (myListener.useCapture) {
                         myListener.listener.call(myCurrentTarget, theEvent);
-                        if(!theEvent.dispatching) {
+                        if (!theEvent.dispatching) {
                             return;
                         }
                     }
@@ -359,19 +361,19 @@ spark.EventDispatcher.Constructor = function(Protected) {
 
         // target phase
         theEvent.dispatchTo(Public, spark.EventPhase.TARGET);
-        if(Public.hasEventListener(theEvent.type)) {
+        if (Public.hasEventListener(theEvent.type)) {
             var myListeners = Public.getEventListeners(theEvent.type);
-            for(var j = 0; j < myListeners.length; j++) {
+            for (var j = 0; j < myListeners.length; j++) {
                 var myListener = myListeners[j];
                 myListener.listener.call(Public, theEvent);
-                if(!theEvent.dispatching) {
+                if (!theEvent.dispatching) {
                     return;
                 }
             }
         }
 
         // bubbling phase
-        if(theEvent.bubbles) {
+        if (theEvent.bubbles) {
             Logger.fatal("spark event bubbling has not been implemented yet");
         }
 
@@ -384,9 +386,9 @@ spark.EventDispatcher.Constructor = function(Protected) {
      * This is non-recursive, checking only the given dispatcher.
      */
     Public.hasEventListener = function(theType) {
-        if(theType in _myListenersByType) {
+        if (theType in _myListenersByType) {
             var myListeners = _myListenersByType[theType];
-            if(myListeners.length > 0) {
+            if (myListeners.length > 0) {
                 return true;
             }
         }
@@ -406,23 +408,23 @@ spark.EventDispatcher.Constructor = function(Protected) {
     Public.removeEventListener = function(theType, theListener, theUseCapture) {
         var myDidRemove = false;
 
-        if(theUseCapture == null) {
+        if (theUseCapture == null) {
             theUseCapture = false;
         }
 
         var myListeners = _myListenersByType[theType];
-        for(var i = 0; i < myListeners.length; i++) {
+        for (var i = 0; i < myListeners.length; i++) {
             var myListener = myListeners[i];
-            if(myListener.type == theType
-               && myListener.listener == theListener
-               && myListener.useCapture == theUseCapture) {
+            if (myListener.type == theType &&
+                myListener.listener == theListener &&
+                myListener.useCapture == theUseCapture) {
                 myListeners.splice(i, 1);
                 myDidRemove = true;
                 break;
             }
         }
 
-        if(!myDidRemove) {
+        if (!myDidRemove) {
             Logger.error("Tried to remove nonexistent handler on " + Public.name + "." + theType);
         }
     };
@@ -430,15 +432,15 @@ spark.EventDispatcher.Constructor = function(Protected) {
     Public.moveEventListenerToFront = function(theType, theListener, theUseCapture) {
         var myDidMove = false;
 
-        if(theUseCapture == null) {
+        if (theUseCapture == null) {
             theUseCapture = false;
         }
 
         var myListeners = _myListenersByType[theType];
         var myListenerToMove = null;
-        for(var i = 0; i < myListeners.length; i++) {
+        for (var i = 0; i < myListeners.length; i++) {
             var myListener = myListeners[i];
-            if(myListener.type == theType 
+            if (myListener.type == theType 
                && myListener.listener == theListener
                && myListener.useCapture == theUseCapture)
             {
@@ -451,7 +453,7 @@ spark.EventDispatcher.Constructor = function(Protected) {
             myListeners.unshift(myListenerToMove);
             myDidMove = true;
         }
-        if(!myDidMove) {
+        if (!myDidMove) {
             Logger.error("Tried to move nonexistent handler on " + Public.name + "." + theType);
         }
     };
@@ -463,12 +465,12 @@ spark.EventDispatcher.Constructor = function(Protected) {
      * an event is worth the effort.
      */
     Public.willTrigger = function(theType) {
-        if(Public.hasEventListener(theType)) {
+        if (Public.hasEventListener(theType)) {
             return true;
         }
-        for(var i = 0; i < Public.children.length; i++) {
+        for (var i = 0; i < Public.children.length; i++) {
             var myChild = Public.children[i];
-            if(myChild.willTrigger(theType)) {
+            if (myChild.willTrigger(theType)) {
                 return true;
             }
         }
@@ -513,31 +515,31 @@ spark.MouseEvent.Constructor = function(Protected, theType, theX, theY, theAmoun
 
     var _myStageX = theX;
 
-    Public.stageX getter = function() {
+    Public.stageX getter = function () {
         return _myStageX;
     };
 
     var _myStageY = theY;
 
-    Public.stageY getter = function() {
+    Public.stageY getter = function () {
         return _myStageY;
     };
 
     var _myAmountX = theAmountX;
 
-    Public.amountX getter = function() {
+    Public.amountX getter = function () {
         return _myAmountX;
     };
 
     var _myAmountY = theAmountY;
 
-    Public.amountY getter = function() {
+    Public.amountY getter = function () {
         return _myAmountY;
     };
 
     var _myButton = theButton;
 
-    Public.button getter = function() {
+    Public.button getter = function () {
         return _myButton;
     };
 
@@ -546,7 +548,6 @@ spark.MouseEvent.Constructor = function(Protected, theType, theX, theY, theAmoun
     Public.buttonStates getter = function () {
         return _myButtonStates;
     };
-
 };
 
 spark.Keyboard = {};
@@ -557,7 +558,6 @@ spark.Keyboard.ALT_SHIFT  = spark.Keyboard.ALT | spark.Keyboard.SHIFT;
 spark.Keyboard.CTRL       = 4;
 spark.Keyboard.CTRL_SHIFT = spark.Keyboard.CTRL | spark.Keyboard.SHIFT;
 spark.Keyboard.CTRL_ALT   = spark.Keyboard.CTRL | spark.Keyboard.ALT;
-
 
 spark.KeyboardEvent = spark.Class("KeyboardEvent");
 
@@ -589,9 +589,7 @@ spark.KeyboardEvent.Constructor = function(Protected, theType, theKey, theModifi
             + _myKey;
         return myString;
     };
-
 };
-
 
 spark.StageEvent = spark.Class("StageEvent");
 
@@ -619,6 +617,4 @@ spark.StageEvent.Constructor = function(Protected, theType, theStage, theTime, t
     Public.deltaT getter = function() {
         return _myDeltaT;
     };
-
 };
-
