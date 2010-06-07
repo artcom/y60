@@ -1628,7 +1628,7 @@ JSNode::setProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
             JSString *myJSStr = JS_ValueToString(cx, id);
             std::string myProperty = JS_GetStringBytes(myJSStr);
 
-                            
+#if 0
             // try experimental fastpath for body nodes (sorry, but this really speeds up things, needs to be done right, vs 1/2010).
             if(myNode->nodeName() == y60::BODY_NODE_NAME || 
                myNode->nodeName() == y60::TRANSFORM_NODE_NAME) {
@@ -1659,7 +1659,7 @@ JSNode::setProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
                     }
                 }
             }
-
+#endif
             //IF_NOISY(
                 AC_TRACE << "JSNode::setProperty:" << myProperty << endl;
                 AC_TRACE << "JSNode::setProperty: nodeName = " << myNode->nodeName() << endl;
