@@ -60,6 +60,10 @@
 //     - JavaScript helper functions
 //==============================================================================
 
+/*jslint plusplus:false, white:false*/
+/*globals print, Node, Vector4f, Vector3f, difference, normalized, cross,
+          Logger, Planef, dumpstack*/
+
 var PI_2 = Math.PI / 2;
 var PI_4 = Math.PI / 4;
 var PI_180 = Math.PI / 180;
@@ -91,11 +95,11 @@ function clone(theObject, theMode) {
     var myNewObject = [];
 
     if (theObject instanceof Node) {
-	var attrs = theObject.attributes;
-        for (var i = 0; i <attrs.length; i++) {
-	    myNewObject[attrs[i].nodeName] = attrs[i].nodeValue;
+        var attrs = theObject.attributes;
+        for (var i = 0; i < attrs.length; i++) {
+            myNewObject[attrs[i].nodeName] = attrs[i].nodeValue;
         }
-	return myNewObject;
+        return myNewObject;
     }
 
     if (!theMode) {
@@ -234,37 +238,37 @@ var COLOR_HEX_STRING_PATTERN = /^[0-9A-Fa-f]{6}/;
 
 // use like this: asColor("00BFA3", 1);
 function asColor(theHexString, theAlpha) {
-
     if (!theHexString) {
         throw new Exception("asColor: theHexString is not defined!");
     }
 
     if (theHexString instanceof Vector4f) {
-	Logger.trace("asColor: is Vector4f:" + theHexString);
-	return theHexString;
+        Logger.trace("asColor: is Vector4f:" + theHexString);
+        return theHexString;
     }
 
     Logger.trace(typeof theHexString);
 
-    if (theAlpha == undefined) {
+    if (theAlpha === undefined) {
         theAlpha = 1;
     }
 
     if (theHexString instanceof Vector3f) {
-	Logger.trace("asColor: is Vector3f:" + theHexString);
+        Logger.trace("asColor: is Vector3f:" + theHexString);
         return new Vector4f(theHexString[0], theHexString[1], theHexString[2], theAlpha);
     }
 
     if (COLOR_HEX_STRING_PATTERN.test(theHexString)) {
-	Logger.trace("asColor: evaluating " + theHexString);
-        var myRed   = eval("0x" + theHexString[0] + theHexString[1]);
-        var myGreen = eval("0x" + theHexString[2] + theHexString[3]);
-        var myBlue  = eval("0x" + theHexString[4] + theHexString[5]);
-        return new Vector4f(myRed / 255, myGreen / 255, myBlue / 255, theAlpha);
+        Logger.trace("asColor: converting " + theHexString);
+        var myRed   = parseInt(theHexString.substr(0, 2), 16) / 255;
+        var myGreen = parseInt(theHexString.substr(2, 2), 16) / 255;
+        var myBlue  = parseInt(theHexString.substr(4, 2), 16) / 255;
+        return new Vector4f(myRed, myGreen, myBlue, theAlpha);
     } else {
-	var retval = eval(theHexString);
-	Logger.trace("asColor: eval " + theHexString + " ergibt " + retval);
-	return new Vector4f(retval);
+        // Wtf is that good for?
+        var retval = eval(theHexString);
+        Logger.trace("asColor: eval " + theHexString + " ergibt " + retval);
+        return new Vector4f(retval);
     }
 }
 
