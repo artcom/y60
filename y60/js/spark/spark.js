@@ -132,9 +132,9 @@ if (!("disableSparkWidgets" in this)) {
     use("spark/widget/NewText.js");
     use("spark/widget/Canvas.js");
     use("spark/widget/OffscreenCanvas.js");
-    use("spark/widget/RoundedCornerQuad.js");
-    use("spark/widget/RoundedCornerMovie.js");
-    use("spark/widget/RoundedCornerImage.js");
-    use("spark/widget/StretchyImage.js");
-    use("spark/widget/VideoCapture.js");
+    use("spark/add-ons/RoundedCornerQuad.js");
+    use("spark/add-ons/RoundedCornerMovie.js");
+    use("spark/add-ons/RoundedCornerImage.js");
+    use("spark/add-ons/StretchyImage.js");
+    use("spark/add-ons/VideoCapture.js");
 }
