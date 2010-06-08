@@ -387,7 +387,7 @@ spark.Container.Constructor = function (Protected) {
      */
     Public.getChildAt = function(theIndex) {
        return _myChildren[theIndex];
-   };
+    };
     
     /**
      * Remove the given child.
