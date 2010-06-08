@@ -335,9 +335,7 @@ spark.Window.Constructor = function(Protected) {
 
         if(_myKeyboardFocused) {
             var myModifiers =
-                (theShiftFlag ? spark.Keyboard.SHIFT : 0)
-                | (theControlFlag ? spark.Keyboard.CTRL : 0)
-                | (theAltFlag ? spark.Keyboard.ALT : 0);
+                (theShiftFlag ? spark.Keyboard.SHIFT : 0) | (theControlFlag ? spark.Keyboard.CTRL : 0) | (theAltFlag ? spark.Keyboard.ALT : 0);
             var myType = theKeyState ? spark.KeyboardEvent.KEY_DOWN : spark.KeyboardEvent.KEY_UP;
             var myEvent = new spark.KeyboardEvent(myType, theKey, myModifiers);
             Logger.debug("Key " + myEvent.keyString + " " + (theKeyState ? "down" : "up") + " on " + _myKeyboardFocused);
