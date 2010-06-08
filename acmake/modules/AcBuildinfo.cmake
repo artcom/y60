@@ -56,7 +56,7 @@ if(ACMAKE_BUILDINFO)
         if(EXISTS ${CMAKE_SOURCE_DIR}/.git)
             set(GIT_REPOSITORY ${CMAKE_SOURCE_DIR})
             set(GIT_OK YES)
-            find_program(GIT git git.exe)
+            find_program(GIT NAMES git git.exe git.cmd)
             if(NOT GIT)
                 message("git not found. Disabling repository information.")
                 set(GIT_OK NO)
@@ -71,11 +71,11 @@ if(ACMAKE_BUILDINFO)
                 set(GIT_BRANCH ${CMAKE_MATCH_1})
 
                 execute_process(
-                    COMMAND git rev-parse HEAD
+                    COMMAND ${GIT} rev-parse HEAD
                     WORKING_DIRECTORY ${GIT_REPOSITORY}
                     OUTPUT_VARIABLE GIT_COMMIT
                 )
-                string(STRIP ${GIT_COMMIT} GIT_COMMIT)
+                string(STRIP "${GIT_COMMIT}" GIT_COMMIT)
 
                 set(GIT_DEPEND_FILES
                     "${GIT_REPOSITORY}/.git/HEAD"
