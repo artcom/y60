@@ -12,9 +12,14 @@ spark.Canvas.Constructor = function(Protected) {
     var Base = {};
     
     this.Inherit(spark.ResizableRectangle);
+    BaseViewer.prototype.Constructor(this, []);
+    this.Inherit(spark.CallbackWrapper);
     
     var _myRenderArea = null;
     var _myWorld = null;
+    var _myViewport = null;
+    
+    const PICK_RADIUS = 1;
     
     Public.innerSceneNode getter = function() {
         return _myWorld;
@@ -52,14 +57,11 @@ spark.Canvas.Constructor = function(Protected) {
             mergeScenes(window.scene, myDom);
             
             var myCanvas = window.scene.dom.find(".//canvases/canvas[@id='" + myCanvasId + "']");
-            myViewport = myCanvas.find(".//viewport");
+            _myViewport = myCanvas.find(".//viewport");
             myCamera   = window.scene.dom.getElementById(myWorldId).find(".//camera");
             
             _myWorld = window.scene.dom.getElementById(myWorldId);
             
-            var myLightManager = new LightManager(window.scene, _myWorld);
-            myLightManager.setupDefaultLighting(myCanvas);
-          
         } else {
             _myWorld = Node.createElement("world");
             window.scene.worlds.appendChild(_myWorld);
@@ -75,21 +77,78 @@ spark.Canvas.Constructor = function(Protected) {
             myCanvas.name = Public.name + "-canvas";
             myCanvas.backgroundcolor[3] = 0.0;
             
-            var myViewport = Node.createElement("viewport");
-            myViewport.camera = myCamera.id;
-            myCanvas.appendChild(myViewport);
-            myViewport.name = Public.name + "-viewport";
+            _myViewport = Node.createElement("viewport");
+            _myViewport.camera = myCamera.id;
+            myCanvas.appendChild(_myViewport);
+            _myViewport.name = Public.name + "-viewport";
         }
         
-        myCanvas.target = myTexture.id;
+        var myLightManager = new LightManager(window.scene, _myWorld);
+        Public.setLightManager(myLightManager);
+        Public.setupWindow(_myRenderArea);
         
+        myCanvas.target = myTexture.id;
         _myRenderArea.setSceneAndCanvas(window.scene, myCanvas);
+        
+        Public.setCanvas(myCanvas);
         
         Public.parent.stage.addEventListener(spark.StageEvent.FRAME, function(theEvent) {
             _myRenderArea.renderToCanvas();
+            Public.getMover(_myViewport).onFrame(theEvent.currenttime)
         });
         
+        Public.stage.addEventListener(spark.KeyboardEvent.KEY_DOWN, onKey);
+        Public.stage.addEventListener(spark.KeyboardEvent.KEY_UP, onKey);
+        Public.addEventListener(spark.MouseEvent.MOVE, Public.onMouseMotion);
+        Public.addEventListener(spark.MouseEvent.BUTTON_DOWN, Public.onMouseButtonDown);
+        Public.addEventListener(spark.MouseEvent.BUTTON_UP, Public.onMouseButtonUp);
+        
         Base.realize(myMaterial);
+        
+        Public.registerMover(WalkMover);
+        Public.setMover(WalkMover, _myViewport);
+    };
+    
+    Base.onMouseButtonDown = Public.onMouseButtonDown;
+    Public.onMouseButtonDown = function(theEvent) {
+        Base.onMouseButtonDown(theEvent);
+        
+        // XXX TO BE FIXED: picking
+        //var myWidget = pickWidget(theEvent.stageX, theEvent.stageY);
+        //print("canvas widget:", myWidget)
+    };
+    
+    // XXX WORKAROUND because of broken picking - BaseViewer should handle this
+    Base.onMouseButton = Public.onMouseButton;
+    Public.onMouseButton = function(theButton, theState, theX, theY) {
+        Base.onMouseButton(theButton, theState, theX, theY);
+        Public.getMover(_myViewport).onMouseButton(theButton, theState, theX, theY);
+    };
+    
+    
+    function pickWidget(theX, theY) {
+        var myBody = Public.picking.pickBodyBySweepingSphereFromBodies(theX, theY, PICK_RADIUS, _myWorld, _myViewport);
+        if(myBody) {
+            var myBodyId = myBody.id;
+            if(myBodyId in spark.sceneNodeMap) {
+                var myWidget = spark.sceneNodeMap[myBodyId];
+                return myWidget;
+            }
+        }
+        return null;
+    };
+    
+    function onKey(theEvent) {
+        // this works because keyboard modifiers are manipulated bitwise
+        if(theEvent.modifiers < spark.Keyboard.CTRL) {
+            return;
+        }
+        var myState = (theEvent.type == "keybord-key-down");
+        var myShiftFlag = (theEvent.modifiers == spark.Keyboard.CTRL_SHIFT);
+        Public.getLightManager().onKey(theEvent.key, myState, myShiftFlag);
+        
+        // XXX WORKAROUND because of broken picking - BaseViewer should handle this
+        Public.getMover(_myViewport).onKey(theEvent.key, myState, 0, 0, myShiftFlag, true, false);
     };
     
     function prepareMerge (theSceneFilePath) {

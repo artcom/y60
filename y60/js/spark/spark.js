@@ -109,7 +109,10 @@ use("internationalization.js");
 // dsa sensor support
 use("dsa.js");
 // MoverBase Wrapper to use spark Event-handling
+// XXX deprecated to be removed soon [kw]
 use("MoverBaseWrapper.js");
+// EventWrapper to convert SPARK into JS callbacks
+use("CallbackWrapper.js");
 
 // widgets
 if (!("disableSparkWidgets" in this)) {
