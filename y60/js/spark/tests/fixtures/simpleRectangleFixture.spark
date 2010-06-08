@@ -1,0 +1,3 @@
+<Window>
+  <Rectangle color="[1,0.5,0]" x="50" y="40" width="300" height="200" name="testRectangle"/>
+</Window>
