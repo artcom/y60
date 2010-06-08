@@ -63,7 +63,7 @@ if(ACMAKE_BUILDINFO)
             endif(NOT GIT)
             if(GIT_OK)
                 execute_process(
-                    COMMAND git branch --no-color
+                    COMMAND ${GIT} branch --no-color
                     WORKING_DIRECTORY ${GIT_REPOSITORY}
                     OUTPUT_VARIABLE GIT_BRANCHES
                 )
