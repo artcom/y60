@@ -554,7 +554,7 @@ spark.Keyboard = {};
 
 spark.Keyboard.SHIFT      = 1;
 spark.Keyboard.ALT        = 2;
-spark.Keyboard.ALT_SHIFT  = spark.Keyboard.ALT | spark.Keyboard.SHIFT;
+spark.Keyboard.ALT_SHIFT  = 1 | 2;//spark.Keyboard.ALT | spark.Keyboard.SHIFT;
 spark.Keyboard.CTRL       = 4;
 spark.Keyboard.CTRL_SHIFT = spark.Keyboard.CTRL | spark.Keyboard.SHIFT;
 spark.Keyboard.CTRL_ALT   = spark.Keyboard.CTRL | spark.Keyboard.ALT;
@@ -582,11 +582,10 @@ spark.KeyboardEvent.Constructor = function(Protected, theType, theKey, theModifi
     };
 
     Public.keyString getter = function() {
-        var myString =
-              _myModifiers & spark.Keyboard.CTRL  ? "ctrl+"  : ""
-            + _myModifiers & spark.Keyboard.ALT   ? "alt+"   : ""
-            + _myModifiers & spark.Keyboard.SHIFT ? "shift+" : ""
-            + _myKey;
+        var myString = (_myModifiers & spark.Keyboard.CTRL  ? "ctrl+"  : "") + 
+                       (_myModifiers & spark.Keyboard.ALT   ? "alt+"   : "") + 
+                       (_myModifiers & spark.Keyboard.SHIFT ? "shift+" : "") + 
+                       _myKey;
         return myString;
     };
 };
