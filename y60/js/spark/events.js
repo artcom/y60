@@ -582,11 +582,10 @@ spark.KeyboardEvent.Constructor = function(Protected, theType, theKey, theModifi
     };
 
     Public.keyString getter = function() {
-        var myString =
-              _myModifiers & spark.Keyboard.CTRL  ? "ctrl+"  : ""
-            + _myModifiers & spark.Keyboard.ALT   ? "alt+"   : ""
-            + _myModifiers & spark.Keyboard.SHIFT ? "shift+" : ""
-            + _myKey;
+        var myString = (_myModifiers & spark.Keyboard.CTRL  ? "ctrl+"  : "") + 
+                       (_myModifiers & spark.Keyboard.ALT   ? "alt+"   : "") + 
+                       (_myModifiers & spark.Keyboard.SHIFT ? "shift+" : "") + 
+                       _myKey;
         return myString;
     };
 
