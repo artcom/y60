@@ -216,10 +216,20 @@ function stringToArray(s) {
 }
 
 // Adds indexOf as free function for array index discovery
-function indexOf(theArray, theItem) {
-    for (var i = 0; i < theArray.length; ++i) {
-        if (theArray[i] === theItem) {
-            return i;
+function indexOf(theArray, theItem, theFrom) {
+    var len = theArray.length >>> 0;
+    var from = Number(arguments[2]) || 0;
+    from = (from < 0)
+         ? Math.ceil(from)
+         : Math.floor(from);
+    if (from < 0) {
+        from += len;
+    }
+
+    for (; from < len; from++) {
+        if (from in theArray &&
+            theArray[from] === theItem) {
+                return from;
         }
     }
     return -1;

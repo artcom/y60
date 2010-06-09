@@ -78,6 +78,8 @@ LoaderUnitTest.prototype.Constructor = function (obj, theName) {
         ENSURE_EQUAL(2, obj.myComponentInstance.children.length, "has one child");
         
         ENSURE_EQUAL('grube', obj.myComponentInstance.children[0].foo, "child has xml attr realized properly");
+        ENSURE_EQUAL(null, obj.myComponentInstance.getChildByName("unknown"), "unknown child-name gets null")
+        
         var myTmpChild = obj.myComponentInstance.getChildByName("tief");
         ENSURE_EQUAL(1, myTmpChild.children.length, "Child of root has one child");
         var myTmpChildChild = myTmpChild.getChildByName("hoch");

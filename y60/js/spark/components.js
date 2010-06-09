@@ -348,13 +348,12 @@ spark.Container.Constructor = function (Protected) {
     this.Inherit(spark.Component);
 
     var _myChildren = [];
-    var _myNamedChildMap   = {};
 
     /**
      * Get an array containing all children of this container.
      */
     Public.children getter = function () {
-        return _myChildren.slice(0); // XXX: clone?
+        return _myChildren;
     };
 
     /**
@@ -362,25 +361,8 @@ spark.Container.Constructor = function (Protected) {
      */
     Public.addChild = function (theChild) {
         _myChildren.push(theChild);
-
-        if (theChild.name) {
-            _myNamedChildMap[theChild.name] = theChild;
-        }
-
         theChild.parent = Public;
     };
-
-    // XXX: work around missing JS 1.6 functionality. However, this certainly
-    // does not belong here. Maybe we should put all the nifty things from 1.6
-    // into free functions? [DS] Yes. [IA 20100301]
-    function indexOf(theArray, theItem) {
-        for (var i = 0; i < theArray.length; ++i) {
-            if (theArray[i] === theItem) {
-                return i;
-            }
-        }
-        return -1;
-    }
 
     /**
      * Remove the given child.
@@ -391,13 +373,7 @@ spark.Container.Constructor = function (Protected) {
         if (myChildIndex === -1) {
             throw new Error("Could not remove " + theChild.name + " from " + Public.name + " because its not a child");
         }
-
         _myChildren.splice(myChildIndex, 1);
-
-        if (theChild.name) {
-            delete _myNamedChildMap[theChild.name];
-        }
-
         theChild.parent = null;
     };
 
@@ -405,21 +381,25 @@ spark.Container.Constructor = function (Protected) {
      * Remove all children.
      */
     Public.removeAllChildren = function () {
-        var myChildren = Public.children;
-        for (var i = 0; i < myChildren.length; i++) {
-            Public.removeChild(myChildren[i]);
+        var i = _myChildren.length;
+        while (i--) {
+            _myChildren[i].name = null;
         }
+        _myChildren = [];
     };
 
     /**
      * Retrieve a (direct) child by name.
      */
     Public.getChildByName = function (theName) {
-        if (theName in _myNamedChildMap) {
-            return _myNamedChildMap[theName];
-        } else {
-            return null;
+        var i = _myChildren.length, myChild;
+        while (i--) {
+            myChild = _myChildren[i];
+            if (myChild.name === theName) {
+                return myChild;
+            }
         }
+        return null;
     };
 
     /**
@@ -472,5 +452,4 @@ spark.Container.Constructor = function (Protected) {
             _myChildren[i].postRealize();
         }
     };
-
 };
