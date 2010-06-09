@@ -1,6 +1,6 @@
 /*jslint nomen: false*/
 /*global print, use, UnitTest, UnitTestSuite, __FILE__, exit, Namespace,
-         ENSURE, ENSURE_EQUAL, spark, Vector2f, Vector3f*/
+         ENSURE, ENSURE_EQUAL, spark, Vector2f, Vector3f, Node*/
 
 use("UnitTest.js");
 this.useSparkWidgets = true;
@@ -81,10 +81,63 @@ RectangleUnitTest.prototype.Constructor = function (obj, theName) {
         ENSURE_EQUAL(true, myRectangle.visible, "correct visibility");
         ENSURE_EQUAL(true, myRectangle.sensible, "correct sensibility");
         ENSURE_EQUAL("named testRectangle", myRectangle.vocation, "correct vocation");
+        
+        //stage
+        
+        // worldScale, worldPosition, worldRotation, worldBounds, worldWidth
+        // worldHeight, worldDepth
     }
     
     function testRectangleTransformations() {
+        obj.App = spark.loadFile("tests/fixtures/simpleRectangleFixture.spark");
+        var myRectangle = obj.App.getChildByName("testRectangle");
         
+        // rotation
+        myRectangle.rotationX = 1.5;
+        myRectangle.rotationY = 0.75;
+        myRectangle.rotationZ = -0.5;
+        ENSURE_EQUAL(1.5, myRectangle.rotationX, "rotationX is correct");
+        ENSURE_EQUAL(0.75, myRectangle.rotationY, "rotationY is correct");
+        ENSURE_EQUAL(-0.5, myRectangle.rotationZ, "rotationZ is correct");
+        ENSURE_EQUAL("[1.5,0.75,-0.5]", myRectangle.rotation.toString(), "rotation Vector is correctly transformed");
+        
+        // scale
+        myRectangle.scaleX = 2.5;
+        myRectangle.scaleY = 1.75;
+        myRectangle.scaleZ = -1.5;
+        ENSURE_EQUAL(2.5,  myRectangle.scaleX, "scaleX is correct");
+        ENSURE_EQUAL(1.75, myRectangle.scaleY, "scaleY is correct");
+        ENSURE_EQUAL(-1.5, myRectangle.scaleZ, "scaleZ is correct");
+        ENSURE_EQUAL("[2.5,1.75,-1.5]", myRectangle.scale.toString(), "scale Vector is correctly transformed");
+        
+        // position
+        myRectangle.position = new Vector3f(0.25, 0.4, 0.33);
+        ENSURE_EQUAL("[0.25,0.4,0.33]", myRectangle.position.toString(), "position Vector is correctly transformed");
+        myRectangle.x = -0.33;
+        myRectangle.y = 0.44;
+        myRectangle.z = 3.1415;
+        ENSURE_EQUAL(-0.33,  myRectangle.x, "x is correct");
+        ENSURE_EQUAL(0.44, myRectangle.y, "y is correct");
+        ENSURE_EQUAL(3.1415, myRectangle.z, "z is correct");
+        ENSURE_EQUAL("[-0.33,0.44,3.1415]", myRectangle.position.toString(), "position Vector is correctly transformed");
+        
+        // pivot
+        myRectangle.pivotX = 1.5;
+        myRectangle.pivotY = 2.75;
+        myRectangle.pivotZ = -4.5;
+        ENSURE_EQUAL(1.5,  myRectangle.pivotX, "pivotX is correct");
+        ENSURE_EQUAL(2.75, myRectangle.pivotY, "pivotY is correct");
+        ENSURE_EQUAL(-4.5, myRectangle.pivotZ, "pivotZ is correct");
+        ENSURE_EQUAL("[1.5,2.75,-4.5]", myRectangle.pivot.toString(), "pivot Vector is correctly transformed");
+        
+        // origin
+        myRectangle.originX = 0.5;
+        myRectangle.originY = 0.75;
+        myRectangle.originZ = -0.5;
+        ENSURE_EQUAL(0.5,  myRectangle.originX, "originX is correct");
+        ENSURE_EQUAL(0.75, myRectangle.originY, "originY is correct");
+        ENSURE_EQUAL(-0.5, myRectangle.originZ, "originZ is correct");
+        ENSURE_EQUAL("[0.5,0.75,-0.5]", myRectangle.origin.toString(), "origin Vector is correctly transformed");
     }
     
     obj.run = function () { 
