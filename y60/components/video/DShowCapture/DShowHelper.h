@@ -7,6 +7,7 @@
 // by law. They may be used, modified and redistributed under the terms
 // of GNU General Public License referenced below.
 //
+//
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
