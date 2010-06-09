@@ -106,6 +106,7 @@ Picking.prototype.Constructor = function (obj, theRenderWindow) {
         if (!myViewport) {
             return null;
         }
+        // XXX TODO: exchange window with _myRenderWindow
         var myCamera = window.scene.world.getElementById(myViewport.camera);
         var myClosestPosition = null;
         var myInfo = obj.pickIntersection(theScreenPixelX, theScreenPixelY);

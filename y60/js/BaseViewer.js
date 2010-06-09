@@ -120,6 +120,10 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     self.getLightManager = function() {
         return _myLightManager;
     }
+    
+    self.setLightManager = function(theLightManager) {
+        _myLightManager = theLightManager;
+    }
 
     self.getRenderWindow = function() {
         return _myRenderWindow;

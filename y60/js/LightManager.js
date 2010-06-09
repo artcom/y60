@@ -235,8 +235,12 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
         }
         switch (theKey) {
             case 'l':
-                window.lighting = !window.lighting;
-                print("Lighting: " + (window.lighting ? "on" : "off"));
+                var viewportId;
+                for (viewportId in _myViewportHeadlights) {
+                    var viewport = _myScene.dom.getElementById(viewportId);
+                    viewport.lighting = !viewport.lighting;
+                    print("Lighting: " + (viewport.lighting ? "on" : "off"));
+                }
                 break;
             case 'k':
                 if (theShiftFlag) {
