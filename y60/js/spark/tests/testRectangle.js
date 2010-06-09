@@ -1,6 +1,6 @@
 /*jslint nomen: false*/
 /*global print, use, UnitTest, UnitTestSuite, __FILE__, exit, Namespace,
-         ENSURE, ENSURE_EQUAL, spark, Vector2f, Vector3f*/
+         ENSURE, ENSURE_EQUAL, spark, Vector2f, Vector3f, Node*/
 
 use("UnitTest.js");
 this.useSparkWidgets = true;
@@ -73,7 +73,7 @@ RectangleUnitTest.prototype.Constructor = function (obj, theName) {
         ENSURE_EQUAL(1.0, myRectangle.scaleY, "scaleY is correct");
         ENSURE_EQUAL(1.0, myRectangle.scaleZ, "scaleZ is correct");
 
-        //node
+        //node (spark)
         ENSURE_EQUAL(true, myRectangle.node instanceof Node, "node is a Node");
         // could make more assertions here but that would basically just test Node
 
@@ -81,10 +81,92 @@ RectangleUnitTest.prototype.Constructor = function (obj, theName) {
         ENSURE_EQUAL(true, myRectangle.visible, "correct visibility");
         ENSURE_EQUAL(true, myRectangle.sensible, "correct sensibility");
         ENSURE_EQUAL("named testRectangle", myRectangle.vocation, "correct vocation");
+        
+        //stage
+        ENSURE_EQUAL(spark.Window, obj.App._class_, "App is a spark.Window");
+        ENSURE_EQUAL(true, ("Stage" in obj.App._classes_), "spark.Stage is a superclass for our App");
+        ENSURE_EQUAL(obj.App, myRectangle.stage, "The stage of the Rectangle is identical with the App");
+        
+        //sceneNode, innerSceneNode
+        ENSURE_EQUAL(true, myRectangle.sceneNode instanceof Node, "Rectangle is associated with a Node in sceneSpace");
+        // innerSceneNode is the sceneNode except for canvas nodes
+        ENSURE_EQUAL(true, myRectangle.innerSceneNode instanceof Node, "Rectangle is associated with a Node in sceneSpace via innerSceneNode");
+        
+        // worldScale, worldPosition, worldRotation, worldBounds
+        // worldWidth, worldHeight, worldDepth
+        ENSURE_EQUAL("[1,1,1]", myRectangle.worldScale.toString());
+        ENSURE_EQUAL("[50,40,0]", myRectangle.worldPosition.toString());
+        ENSURE_EQUAL("[0,-0,0]", myRectangle.worldRotation.toString());
+        ENSURE_EQUAL("[300,200,0]", myRectangle.worldBounds.toString());
+        ENSURE_EQUAL(300, myRectangle.worldWidth);
+        ENSURE_EQUAL(200, myRectangle.worldHeight);
+        ENSURE_EQUAL(0,   myRectangle.worldDepth);
+        
     }
     
     function testRectangleTransformations() {
+        obj.App = spark.loadFile("tests/fixtures/simpleRectangleFixture.spark");
+        var myRectangle = obj.App.getChildByName("testRectangle");
         
+        // rotation
+        var myOrientation = myRectangle.sceneNode.orientation.toString();
+        myRectangle.rotationX = 1.5;
+        myRectangle.rotationY = 0.75;
+        myRectangle.rotationZ = -0.5;
+        ENSURE_EQUAL(1.5, myRectangle.rotationX, "rotationX is correct");
+        ENSURE_EQUAL(0.75, myRectangle.rotationY, "rotationY is correct");
+        ENSURE_EQUAL(-0.5, myRectangle.rotationZ, "rotationZ is correct");
+        ENSURE_EQUAL("[1.5,0.75,-0.5]", myRectangle.rotation.toString(), "rotation Vector is correctly transformed");
+        ENSURE_EQUAL(false, (myRectangle.sceneNode.orientation.toString() === myOrientation), "orientation in the sceneNode changed");
+        ENSURE_EQUAL("[-0.0131177,-0.0064872,0.00444851,0.999883]", myRectangle.sceneNode.orientation.toString(), "new orientation in the sceneNode is correct");
+
+        // scale
+        var myScale = myRectangle.sceneNode.scale.toString();
+        myRectangle.scaleX = 2.5;
+        myRectangle.scaleY = 1.75;
+        myRectangle.scaleZ = -1.5;
+        ENSURE_EQUAL(2.5,  myRectangle.scaleX, "scaleX is correct");
+        ENSURE_EQUAL(1.75, myRectangle.scaleY, "scaleY is correct");
+        ENSURE_EQUAL(-1.5, myRectangle.scaleZ, "scaleZ is correct");
+        ENSURE_EQUAL("[2.5,1.75,-1.5]", myRectangle.scale.toString(), "scale Vector is correctly transformed");
+        ENSURE_EQUAL(false, (myRectangle.sceneNode.scale.toString() === myScale), "scale in the sceneNode changed");
+        ENSURE_EQUAL("[2.5,1.75,-1.5]", myRectangle.sceneNode.scale.toString(), "new scale in the sceneNode is correct");
+        
+        // position
+        var myPosition = myRectangle.sceneNode.position.toString();
+        myRectangle.position = new Vector3f(0.25, 0.4, 0.33);
+        ENSURE_EQUAL("[0.25,0.4,0.33]", myRectangle.position.toString(), "position Vector is correctly transformed");
+        myRectangle.x = -0.33;
+        myRectangle.y = 0.44;
+        myRectangle.z = 3.1415;
+        ENSURE_EQUAL(-0.33,  myRectangle.x, "x is correct");
+        ENSURE_EQUAL(0.44, myRectangle.y, "y is correct");
+        ENSURE_EQUAL(3.1415, myRectangle.z, "z is correct");
+        ENSURE_EQUAL("[-0.33,0.44,3.1415]", myRectangle.position.toString(), "position Vector is correctly transformed");
+        ENSURE_EQUAL(false, (myRectangle.sceneNode.position.toString() === myScale), "position in the sceneNode changed");
+        ENSURE_EQUAL("[-0.33,0.44,3.1415]", myRectangle.sceneNode.position.toString(), "new position in the sceneNode is correct");
+        
+        // pivot
+        var myPivot = myRectangle.sceneNode.pivot.toString();
+        myRectangle.pivotX = 1.5;
+        myRectangle.pivotY = 2.75;
+        myRectangle.pivotZ = -4.5;
+        ENSURE_EQUAL(1.5,  myRectangle.pivotX, "pivotX is correct");
+        ENSURE_EQUAL(2.75, myRectangle.pivotY, "pivotY is correct");
+        ENSURE_EQUAL(-4.5, myRectangle.pivotZ, "pivotZ is correct");
+        ENSURE_EQUAL("[1.5,2.75,-4.5]", myRectangle.pivot.toString(), "pivot Vector is correctly transformed");
+        ENSURE_EQUAL(false, (myRectangle.sceneNode.pivot.toString() === myScale), "pivot in the sceneNode changed");
+        ENSURE_EQUAL("[1.5,2.75,-4.5]", myRectangle.sceneNode.pivot.toString(), "new pivot in the sceneNode is correct");
+        
+        // origin
+        myRectangle.originX = 0.5;
+        myRectangle.originY = 0.75;
+        myRectangle.originZ = -0.5;
+        ENSURE_EQUAL(0.5,  myRectangle.originX, "originX is correct");
+        ENSURE_EQUAL(0.75, myRectangle.originY, "originY is correct");
+        ENSURE_EQUAL(-0.5, myRectangle.originZ, "originZ is correct");
+        ENSURE_EQUAL("[0.5,0.75,-0.5]", myRectangle.origin.toString(), "origin Vector is correctly transformed");
+        // origin is a spark concept (i think) and is not represented in the sceneNode
     }
     
     obj.run = function () { 
