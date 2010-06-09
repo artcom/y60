@@ -384,6 +384,9 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
         /// plug audio and capture plugs, video is handled inside y60 engine via decoderhint
         var myPlaylist = new Playlist();
         switch (myPlaylist.getMediaHintFromURL(myFilename)) {
+            case IMAGE_MEDIA:
+                print("Media: Image");
+                break;                
             case AUDIO_MEDIA:
                 print("Media: audio");
                 if (OS == "WIN32" && !_myWMAPlugged) {
