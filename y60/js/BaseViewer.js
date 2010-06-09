@@ -597,6 +597,16 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         if (_myAutoClicker != null) {
             _myAutoClicker.onFrame();
         }
+        
+        var myCanvas = self.getActiveViewport().parentNode; //self.getRenderWindow().canvas;
+        if (myCanvas) {
+            for (var i=0; i < myCanvas.childNodesLength('viewport'); ++i) {
+                var myMover = self.getMover(myCanvas.childNode('viewport'));
+                if (myMover) {
+                    myMover.onFrame(theTime);
+                }
+            }
+        }
 
         _myLightManager.onFrame(theTime);
     }

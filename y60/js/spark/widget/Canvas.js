@@ -19,11 +19,12 @@ spark.Canvas.Constructor = function(Protected) {
     var _myWorld = null;
     var _myViewport = null;
     
-    const PICK_RADIUS = 1;
+    const PICK_RADIUS = 0.01;
     
-    Public.innerSceneNode getter = function() {
-        return _myWorld;
-    };
+   //XXX is this really needed that way? Cannot access spark innernode that way
+   // Public.innerSceneNode getter = function() {
+   //     return _myWorld;
+   // };
     
     Base.realize = this.realize;
     this.realize = function() {
@@ -92,11 +93,7 @@ spark.Canvas.Constructor = function(Protected) {
         
         Public.setCanvas(myCanvas);
         
-        Public.parent.stage.addEventListener(spark.StageEvent.FRAME, function(theEvent) {
-            _myRenderArea.renderToCanvas();
-            Public.getMover(_myViewport).onFrame(theEvent.currenttime)
-        });
-        
+        Public.parent.stage.addEventListener(spark.StageEvent.FRAME, Public.onFrame);
         Public.stage.addEventListener(spark.KeyboardEvent.KEY_DOWN, onKey);
         Public.stage.addEventListener(spark.KeyboardEvent.KEY_UP, onKey);
         Public.addEventListener(spark.MouseEvent.MOVE, Public.onMouseMotion);
@@ -109,31 +106,47 @@ spark.Canvas.Constructor = function(Protected) {
         Public.setMover(WalkMover, _myViewport);
     };
     
+    Base.onFrame = Public.onFrame;
+    Public.onFrame = function (theEvent) {
+        Base.onFrame(theEvent.currenttime);
+        _myRenderArea.renderToCanvas();
+    }
+    
     Base.onMouseButtonDown = Public.onMouseButtonDown;
     Public.onMouseButtonDown = function(theEvent) {
         Base.onMouseButtonDown(theEvent);
         
-        // XXX TO BE FIXED: picking
-        //var myWidget = pickWidget(theEvent.stageX, theEvent.stageY);
-        //print("canvas widget:", myWidget)
+        var canvasPosition = convertToCanvasCoordinates (theEvent.stageX, theEvent.stageY);
+        var myBody = pickBody(canvasPosition.x,  canvasPosition.y);
+        print("canvas picket body:", myBody);
     };
     
-    // XXX WORKAROUND because of broken picking - BaseViewer should handle this
     Base.onMouseButton = Public.onMouseButton;
     Public.onMouseButton = function(theButton, theState, theX, theY) {
-        Base.onMouseButton(theButton, theState, theX, theY);
-        Public.getMover(_myViewport).onMouseButton(theButton, theState, theX, theY);
+        var canvasPosition = convertToCanvasCoordinates (theX, theY);
+        Base.onMouseButton(theButton, theState, canvasPosition.x, canvasPosition.y);
     };
     
+    function convertMousePositionToCanvasCoordinates(theX, theY) {
+        return new Vector2f(theX/2, theY/2);
+    }
     
-    function pickWidget(theX, theY) {
+    function convertToCanvasCoordinates(theX, theY) {
+        var myIntersection = Public.stage.picking.pickIntersection(theX, theY);
+        // assumptions:
+        //  - as the rectangle has no depth, there should always only appear ONE intersection
+        //  - the Canvas is topmost intersection, if not, this handler would not have been called by spark
+        var PointOnCanvas = new Point3f(myIntersection.info.intersections[0].position);
+        var transformMatrix = new Matrix4f(Public.innerSceneNode.globalmatrix);
+        transformMatrix.invert();
+       
+        return product(PointOnCanvas, transformMatrix);
+    }
+    
+    function pickBody(theX, theY) {
         var myBody = Public.picking.pickBodyBySweepingSphereFromBodies(theX, theY, PICK_RADIUS, _myWorld, _myViewport);
         if(myBody) {
-            var myBodyId = myBody.id;
-            if(myBodyId in spark.sceneNodeMap) {
-                var myWidget = spark.sceneNodeMap[myBodyId];
-                return myWidget;
-            }
+            return myBody;
         }
         return null;
     };
@@ -146,8 +159,6 @@ spark.Canvas.Constructor = function(Protected) {
         var myState = (theEvent.type == "keybord-key-down");
         var myShiftFlag = (theEvent.modifiers == spark.Keyboard.CTRL_SHIFT);
         Public.getLightManager().onKey(theEvent.key, myState, myShiftFlag);
-        
-        // XXX WORKAROUND because of broken picking - BaseViewer should handle this
         Public.getMover(_myViewport).onKey(theEvent.key, myState, 0, 0, myShiftFlag, true, false);
     };
     

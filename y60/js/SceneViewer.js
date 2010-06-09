@@ -200,15 +200,6 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         if (_myVideoRecorder) {
             _myVideoRecorder.onFrame();
         }
-        var myCanvas = self.getActiveViewport().parentNode; //self.getRenderWindow().canvas;
-        if (myCanvas) {
-            for (var i=0; i < myCanvas.childNodesLength('viewport'); ++i) {
-                var myMover = self.getMover(myCanvas.childNode('viewport'));
-                if (myMover) {
-                    myMover.onFrame(theTime);
-                }
-            }
-        }
         if (_myAnimationManager) {
             _myAnimationManager.onFrame(theTime);
         }
