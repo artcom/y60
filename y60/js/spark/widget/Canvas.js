@@ -118,7 +118,7 @@ spark.Canvas.Constructor = function(Protected) {
         
         var canvasPosition = convertToCanvasCoordinates (theEvent.stageX, theEvent.stageY);
         var myBody = pickBody(canvasPosition.x,  canvasPosition.y);
-        print("canvas picket body:", myBody);
+        print("picked body:", myBody)
     };
     
     Base.onMouseButton = Public.onMouseButton;
@@ -127,20 +127,18 @@ spark.Canvas.Constructor = function(Protected) {
         Base.onMouseButton(theButton, theState, canvasPosition.x, canvasPosition.y);
     };
     
-    function convertMousePositionToCanvasCoordinates(theX, theY) {
-        return new Vector2f(theX/2, theY/2);
-    }
-    
     function convertToCanvasCoordinates(theX, theY) {
         var myIntersection = Public.stage.picking.pickIntersection(theX, theY);
         // assumptions:
         //  - as the rectangle has no depth, there should always only appear ONE intersection
         //  - the Canvas is topmost intersection, if not, this handler would not have been called by spark
-        var PointOnCanvas = new Point3f(myIntersection.info.intersections[0].position);
+        var pointOnCanvas = new Point3f(myIntersection.info.intersections[0].position);
         var transformMatrix = new Matrix4f(Public.innerSceneNode.globalmatrix);
         transformMatrix.invert();
-       
-        return product(PointOnCanvas, transformMatrix);
+        var intersecPointOnCanvas = product(pointOnCanvas, transformMatrix);
+        intersecPointOnCanvas.y = Public.height - intersecPointOnCanvas.y;
+        
+        return intersecPointOnCanvas;
     }
     
     function pickBody(theX, theY) {
