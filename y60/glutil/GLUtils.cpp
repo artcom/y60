@@ -76,6 +76,9 @@ GdkGLProc gdk_gl_get_proc_address            (const char *proc_name);
 #ifndef _AC_NO_CG_
 	#include <Cg/cgGL.h>
 #endif
+#ifdef AC_USE_OSX_CGL
+    #include <OpenGL/CGLCurrent.h>
+#endif
 
 using namespace std;
 
@@ -619,7 +622,14 @@ void * aglGetProcAddress (char * pszProc)
 
     bool hasCap(const string & theCapStr) {
         bool myReturn = 0 != glewIsSupported(theCapStr.c_str());
+
         if (!myReturn) {
+#ifdef AC_USE_OSX_CGL
+            CGLContextObj myContext = CGLGetCurrentContext();
+            if (myContext == NULL) {
+                return false;
+            }
+#endif
             // try again extension string,
             // maybe extension is not supported by glew-version
             const char * myExtensionsString = reinterpret_cast<const char *>(glGetString(GL_EXTENSIONS));
