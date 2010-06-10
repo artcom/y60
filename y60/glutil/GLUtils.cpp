@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below.
-//
+// of GNU General Public License referenced below. 
+//    
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO
+// Description: TODO  
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations:
+//    recommendations: 
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -175,7 +175,7 @@ namespace y60 {
         }
         return myTexSampleFilter;
     }
-
+    
     GLenum
     asGLTextureTarget(TextureType theTextureType) {
         switch (theTextureType) {
@@ -236,7 +236,7 @@ namespace y60 {
     GLenum
     asGLCubemapFace(unsigned theFace) {
         switch (theFace) {
-            case CUBEMAP_BEHIND:
+            case CUBEMAP_BEHIND: 
                 return GL_TEXTURE_CUBE_MAP_POSITIVE_Z_ARB;
             case CUBEMAP_RIGHT:
                 return GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB;
@@ -620,6 +620,12 @@ void * aglGetProcAddress (char * pszProc)
     bool hasCap(const string & theCapStr) {
         bool myReturn = 0 != glewIsSupported(theCapStr.c_str());
         if (!myReturn) {
+            // try again extension string,
+            // maybe extension is not supported by glew-version
+            std::string myExtensions(reinterpret_cast<const char *>(glGetString(GL_EXTENSIONS)));
+            if (myExtensions.find(theCapStr) != string::npos ) {
+                return true;
+            }
             AC_DEBUG << "OpenGL Extension not supported: " << theCapStr;
         }
         return myReturn;

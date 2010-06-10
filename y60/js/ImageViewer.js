@@ -69,6 +69,7 @@ const MINZOOMFACTOR = 0.001;
 const FRAME_RATE    = 100;
 const OS = operatingSystem();
 
+
 function ImageViewerApp(theArguments) {
     this.Constructor(this, theArguments);
 }
@@ -248,6 +249,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
 
     Base.onFrame = self.onFrame;
     self.onFrame = function(theTime) {
+
         Base.onFrame(theTime);
         /* if (window.fps < 60) {
             print("miss: " + window.fps + " / " + millisec());
