@@ -95,11 +95,6 @@
 	#define AC_USE_X11
 #endif
 
-#if defined(OSX)
-	#define AC_USE_OSX_CGL
-	#define AC_USE_NSGL
-#endif
-
 // window system extensions
 #ifdef _WIN32
 #endif
