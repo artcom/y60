@@ -622,8 +622,8 @@ void * aglGetProcAddress (char * pszProc)
         if (!myReturn) {
             // try again extension string,
             // maybe extension is not supported by glew-version
-            std::string myExtensions(reinterpret_cast<const char *>(glGetString(GL_EXTENSIONS)));
-            if (myExtensions.find(theCapStr) != string::npos ) {
+            const char * myExtensionsString = reinterpret_cast<const char *>(glGetString(GL_EXTENSIONS));
+            if (myExtensionsString && std::string(myExtensionsString).find(theCapStr) != string::npos) {
                 return true;
             }
             AC_DEBUG << "OpenGL Extension not supported: " << theCapStr;
