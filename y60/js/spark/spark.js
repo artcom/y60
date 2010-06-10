@@ -108,9 +108,6 @@ use("multitouch.js");
 use("internationalization.js");
 // dsa sensor support
 use("dsa.js");
-// MoverBase Wrapper to use spark Event-handling
-// XXX deprecated to be removed soon [kw]
-use("MoverBaseWrapper.js");
 // EventWrapper to convert SPARK into JS callbacks
 use("CallbackWrapper.js");
 
@@ -134,7 +131,6 @@ if (!("disableSparkWidgets" in this)) {
     use("spark/widget/NewMovie.js");
     use("spark/widget/NewText.js");
     use("spark/widget/Canvas.js");
-    use("spark/widget/OffscreenCanvas.js");
     use("spark/widget/RoundedCornerQuad.js");
     use("spark/widget/RoundedCornerMovie.js");
     use("spark/widget/RoundedCornerImage.js");
