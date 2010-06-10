@@ -102,15 +102,23 @@ spark.Canvas.Constructor = function(Protected) {
         
         Base.realize(myMaterial);
         
-        Public.registerMover(WalkMover);
-        Public.setMover(WalkMover, _myViewport);
+        //Public.registerMover(WalkMover);
+        //Public.setMover(WalkMover, _myViewport);
     };
     
     Base.onFrame = Public.onFrame;
     Public.onFrame = function (theEvent) {
         Base.onFrame(theEvent.currenttime);
         _myRenderArea.renderToCanvas();
-    }
+    };
+    
+    Base.onMouseMotion = Public.onMouseMotion;
+    Public.onMouseMotion = function(theEvent) {
+        var canvasPosition = convertToCanvasCoordinates (theEvent.stageX, theEvent.stageY);
+        if(canvasPosition) {
+            Base.onMouseMotion(canvasPosition.x, canvasPosition.y);
+        }
+    };
     
     Base.onMouseButtonDown = Public.onMouseButtonDown;
     Public.onMouseButtonDown = function(theEvent) {
@@ -119,7 +127,7 @@ spark.Canvas.Constructor = function(Protected) {
         var canvasPosition = convertToCanvasCoordinates (theEvent.stageX, theEvent.stageY);
         if(canvasPosition) {
             var myBody = pickBody(canvasPosition.x,  canvasPosition.y);
-            print("picked body:", myBody)
+            print("picked body:", myBody);
         }
     };
     
@@ -163,7 +171,11 @@ spark.Canvas.Constructor = function(Protected) {
         var myState = (theEvent.type == "keybord-key-down");
         var myShiftFlag = (theEvent.modifiers == spark.Keyboard.CTRL_SHIFT);
         Public.getLightManager().onKey(theEvent.key, myState, myShiftFlag);
-        Public.getMover(_myViewport).onKey(theEvent.key, myState, 0, 0, myShiftFlag, true, false);
+        
+        var myMover = Public.getMover(_myViewport);
+        if(myMover) {
+            myMover.onKey(theEvent.key, myState, 0, 0, myShiftFlag, true, false);
+        }
     };
     
     function prepareMerge (theSceneFilePath) {

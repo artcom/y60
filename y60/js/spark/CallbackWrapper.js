@@ -22,8 +22,4 @@ spark.CallbackWrapper.Constructor = function (Protected, theViewport) {
         Public.onMouseButton(mapper[theEvent.button], BUTTON_DOWN, theEvent.stageX, theEvent.stageY);
     };
     
-    Base.onMouseMotion = Public.onMouseMotion;
-    Public.onMouseMotion = function(theEvent) {
-        Base.onMouseMotion(theEvent.stageX, theEvent.stageY);
-    };
 };
