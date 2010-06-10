@@ -117,28 +117,34 @@ spark.Canvas.Constructor = function(Protected) {
         Base.onMouseButtonDown(theEvent);
         
         var canvasPosition = convertToCanvasCoordinates (theEvent.stageX, theEvent.stageY);
-        var myBody = pickBody(canvasPosition.x,  canvasPosition.y);
-        print("picked body:", myBody)
+        if(canvasPosition) {
+            var myBody = pickBody(canvasPosition.x,  canvasPosition.y);
+            print("picked body:", myBody)
+        }
     };
     
     Base.onMouseButton = Public.onMouseButton;
     Public.onMouseButton = function(theButton, theState, theX, theY) {
         var canvasPosition = convertToCanvasCoordinates (theX, theY);
-        Base.onMouseButton(theButton, theState, canvasPosition.x, canvasPosition.y);
+        if(canvasPosition) {
+            Base.onMouseButton(theButton, theState, canvasPosition.x, canvasPosition.y);
+        }
     };
     
     function convertToCanvasCoordinates(theX, theY) {
-        var myIntersection = Public.stage.picking.pickIntersection(theX, theY);
         // assumptions:
         //  - as the rectangle has no depth, there should always only appear ONE intersection
         //  - the Canvas is topmost intersection, if not, this handler would not have been called by spark
-        var pointOnCanvas = new Point3f(myIntersection.info.intersections[0].position);
-        var transformMatrix = new Matrix4f(Public.innerSceneNode.globalmatrix);
-        transformMatrix.invert();
-        var intersecPointOnCanvas = product(pointOnCanvas, transformMatrix);
-        intersecPointOnCanvas.y = Public.height - intersecPointOnCanvas.y;
-        
-        return intersecPointOnCanvas;
+        var myIntersection = Public.stage.picking.pickIntersection(theX, theY);
+        if(myIntersection) {
+            var pointOnCanvas = new Point3f(myIntersection.info.intersections[0].position);
+            var transformMatrix = new Matrix4f(Public.innerSceneNode.globalmatrix);
+            transformMatrix.invert();
+            var intersecPointOnCanvas = product(pointOnCanvas, transformMatrix);
+            intersecPointOnCanvas.y = Public.height - intersecPointOnCanvas.y;
+            return intersecPointOnCanvas;
+        }
+        return null;
     }
     
     function pickBody(theX, theY) {
