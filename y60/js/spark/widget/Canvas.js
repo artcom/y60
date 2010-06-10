@@ -21,10 +21,10 @@ spark.Canvas.Constructor = function(Protected) {
     
     const PICK_RADIUS = 0.01;
     
-   //XXX is this really needed that way? Cannot access spark innernode that way
-   // Public.innerSceneNode getter = function() {
-   //     return _myWorld;
-   // };
+   
+    Public.world getter = function() {
+        return _myWorld;
+    }
     
     Base.realize = this.realize;
     this.realize = function() {
@@ -101,9 +101,6 @@ spark.Canvas.Constructor = function(Protected) {
         Public.addEventListener(spark.MouseEvent.BUTTON_UP, Public.onMouseButtonUp);
         
         Base.realize(myMaterial);
-        
-        //Public.registerMover(WalkMover);
-        //Public.setMover(WalkMover, _myViewport);
     };
     
     Base.onFrame = Public.onFrame;
@@ -117,17 +114,6 @@ spark.Canvas.Constructor = function(Protected) {
         var canvasPosition = convertToCanvasCoordinates (theEvent.stageX, theEvent.stageY);
         if(canvasPosition) {
             Base.onMouseMotion(canvasPosition.x, canvasPosition.y);
-        }
-    };
-    
-    Base.onMouseButtonDown = Public.onMouseButtonDown;
-    Public.onMouseButtonDown = function(theEvent) {
-        Base.onMouseButtonDown(theEvent);
-        
-        var canvasPosition = convertToCanvasCoordinates (theEvent.stageX, theEvent.stageY);
-        if(canvasPosition) {
-            var myBody = pickBody(canvasPosition.x,  canvasPosition.y);
-            print("picked body:", myBody);
         }
     };
     
@@ -155,10 +141,14 @@ spark.Canvas.Constructor = function(Protected) {
         return null;
     }
     
-    function pickBody(theX, theY) {
-        var myBody = Public.picking.pickBodyBySweepingSphereFromBodies(theX, theY, PICK_RADIUS, _myWorld, _myViewport);
-        if(myBody) {
-            return myBody;
+    Public.pickBody = function(theX, theY) {
+        var canvasPosition = convertToCanvasCoordinates (theX, theY);
+        if(canvasPosition) {
+            var myBody = Public.picking.pickBodyBySweepingSphereFromBodies(
+                                canvasPosition.x, canvasPosition.y, PICK_RADIUS, _myWorld, _myViewport);
+            if(myBody) {
+                return myBody;
+            }
         }
         return null;
     };
