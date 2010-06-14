@@ -147,6 +147,8 @@ function Class(theName) {
         myPublic._className_ = theName;
         myPublic._class_     = myNamespace[theName];
 
+        myPublic._sparkFile_ = "";
+
         myPublic._classes_   = {};
         myPublic._classes_[theName] = myNamespace[theName];
 
