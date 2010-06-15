@@ -89,6 +89,7 @@ MoverBase.prototype.Constructor = function(obj, theViewport) {
     var _myDoubleLeftButtonFlag  = false;
     var _myDoubleClickInterval   = DOUBLE_CLICK_INTERVAL;
 
+
     //////////////////////////////////////////////////////////////////////
     //
     // public
@@ -170,6 +171,8 @@ MoverBase.prototype.Constructor = function(obj, theViewport) {
     obj.getDoubleLeftButtonFlag = function() {
         return _myDoubleLeftButtonFlag;
     }
+    
+    obj.movements = {};
 
     obj.rotateWithObject = function(theVector) {
         var myWorldTranslation = new Vector4f(0,0,0,0);
