@@ -163,6 +163,7 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
 
     self.rotation setter = function (theRotation) {
         _myEulerOrientation = theRotation;
+        self.getMoverObject().orientation = Quaternionf.createFromEuler(_myEulerOrientation);
     };
     
     self.movements.rotateXY = function(theDelta) {
