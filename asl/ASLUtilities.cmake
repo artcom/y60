@@ -10,10 +10,12 @@ macro(asl_add_schema XSD)
     set(THIS_XSD_FILE ${XSD})
 
     if(THIS_XSD_CXX_FILE)
-        #get_target_property(
-        #    TEXT2SRC text2src LOCATION
-        #)
         find_program(TEXT2SRC NAMES text2src text2src.exe)
+        if (NOT TEXT2SRC)
+            get_target_property(
+                TEXT2SRC text2src LOCATION
+            )
+        endif(NOT TEXT2SRC)
         if(WIN32)
             add_custom_command(
                 OUTPUT  ${THIS_XSD_CXX_FILE}
