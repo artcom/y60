@@ -60,7 +60,7 @@
 use("UnitTest.js");
 
 const XMLDOC_1 = "testDom_tmp_output.xml";
-const XMLDOC_2 = searchFile("testfiles/unicode.xml");
+const XMLDOC_2 = searchFile("fixtures/unicode.xml");
 
 function NodeUnitTest() {
     this.Constructor(this, "NodeUnitTest");

@@ -72,7 +72,7 @@ JSAppUnitTest.prototype.Constructor = function(obj, theName) {
 
 
         if (operatingSystem() == "WIN32") {
-            var myShellScript = searchFile("testfiles/exec.bat");
+            var myShellScript = searchFile("fixtures/exec.bat");
 
             obj.myReturnCode = exec("\"" + myShellScript + "\"", "2");
             ENSURE('obj.myReturnCode === 2');
@@ -83,12 +83,12 @@ JSAppUnitTest.prototype.Constructor = function(obj, theName) {
             obj.myReturnCode = exec(myShellScript, "2", false);
             ENSURE('obj.myReturnCode === 0');
         } else {
-            myShellScript = searchFile("testfiles/exec.sh");
+            myShellScript = searchFile("fixtures/exec.sh");
             obj.myReturnCode = exec(myShellScript, "2");
             ENSURE('obj.myReturnCode === 2');
             obj.myReturnCode = exec(myShellScript + " 3");
             ENSURE('obj.myReturnCode === 3');
-            obj.myReturnCode = exec("testfiles/exec.butt");
+            obj.myReturnCode = exec("fixtures/exec.butt");
             ENSURE('obj.myReturnCode === 127');
             /*
             command is blocking flag isn't recognized in linux/osx

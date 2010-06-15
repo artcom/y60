@@ -74,7 +74,7 @@ ModellingUnitTest.prototype.Constructor = function(obj, theName) {
         var myRedColor = new Vector4f([1,0,0,1]);
         var myGreenColor = new Vector4f([0,1,0,1]);
         var myBlueColor = new Vector4f([0,0,1,1]);
-        var myTestFile = "testfiles/DiffuseRamp.png";
+        var myTestFile = "fixtures/DiffuseRamp.png";
 
 
         var myTransform = Modelling.createTransform(myScene.world);

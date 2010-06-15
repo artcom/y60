@@ -220,12 +220,12 @@ OverlayUnitTest.prototype.Constructor = function(obj, theName) {
 
         obj.myScene = window.scene;
         var myViewport = obj.myScene.dom.find(".//viewport");
-        obj.myDummyOverlay = new ImageOverlay(obj.myScene, "testfiles/black.rgb");
+        obj.myDummyOverlay = new ImageOverlay(obj.myScene, "fixtures/black.rgb");
         obj.myDummyImageId = obj.myScene.images.lastChild.id;
         obj.myOverlay = new Overlay(obj.myScene, new Vector4f(1,2,3,1), [10, 20], [100,200]);
         //testCommonProperties([10,20], [100,200], [1,2,3,1]);
 
-        obj.myOverlay = new ImageOverlay(obj.myScene, "testfiles/DiffuseRamp.png", [30, 40]);
+        obj.myOverlay = new ImageOverlay(obj.myScene, "fixtures/DiffuseRamp.png", [30, 40]);
         obj.myImageId = obj.myScene.images.lastChild.id;
         //testCommonProperties([30,40], [32,1], [1,1,1,1]);
 
@@ -235,7 +235,7 @@ OverlayUnitTest.prototype.Constructor = function(obj, theName) {
         //
         ///////////////////////////////////////////////////////////////////////////////////////
 
-        var mySources = ["testfiles/black.rgb", "testfiles/DiffuseRamp.png"];
+        var mySources = ["fixtures/black.rgb", "fixtures/DiffuseRamp.png"];
         obj.myMultiOverlay = new ImageOverlay(obj.myScene, mySources);
         ENSURE('obj.myMultiOverlay.images.length == 2');
 

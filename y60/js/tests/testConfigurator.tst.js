@@ -64,10 +64,10 @@ function ConfiguratorUnitTest() {
     this.Constructor(this, "ConfiguratorUnitTest");
 };
 
-const COMMON_SETTINGS = searchFile("testfiles/common_settings.xml");
-const MERGED_SETTINGS = searchFile("testfiles/merged_settings.xml");
-const LIST_A_SETTINGS = searchFile("testfiles/settings_list_a.xml");
-const LIST_B_SETTINGS = searchFile("testfiles/settings_list_b.xml");
+const COMMON_SETTINGS = searchFile("fixtures/common_settings.xml");
+const MERGED_SETTINGS = searchFile("fixtures/merged_settings.xml");
+const LIST_A_SETTINGS = searchFile("fixtures/settings_list_a.xml");
+const LIST_B_SETTINGS = searchFile("fixtures/settings_list_b.xml");
 
 ConfiguratorUnitTest.prototype.Constructor = function(obj, theName) {
 
