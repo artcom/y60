@@ -139,6 +139,57 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
         _myGroundPlane       = null;
         _myEyeHeight         = INITIAL_EYEHEIGHT;
     }
+    
+    self.eyeHeight setter = function(theHeight) {
+        _myEyeHeight = theHeight;
+        _myEyeHeight = Math.max(_myEyeHeight,0);
+    }
+    
+    self.eyeHeight getter = function () {
+        return _myEyeHeight;
+    }
+    
+    self.walkSpeed setter = function(theWalkSpeed) {
+        _myWalkSpeed = theWalkSpeed;
+    }
+    
+    self.walkSpeed getter = function () {
+        return _myWalkSpeed;
+    }
+    
+    self.movements.rotateXY = function(theDelta) {
+        _myEulerOrientation.x += theDelta.y;
+        _myEulerOrientation.y += -theDelta.x;
+        self.getMoverObject().orientation = Quaternionf.createFromEuler(_myEulerOrientation);
+    }
+    
+    self.movements.translateAlongFrontVector = function (theDelta) {
+        var myDirVector;
+        if (_myGroundContactFlag) {
+            myDirVector = _myProjectedFrontVector;
+        } else {
+            myDirVector = _myFrontVector;
+        }
+        translate(myDirVector, theDelta);
+    }
+    
+    self.movements.translateAlongRightVector = function (theDelta) {
+        var myDirVector;
+        if (_myGroundContactFlag) {
+            myDirVector = _myProjectedRightVector;
+        } else {
+            myDirVector = _myRightVector;
+        }
+        translate(myDirVector, theDelta);
+    }
+    
+    function translate(theDirection, theDelta) {
+        var myNewPosition = sum (_myPosition, product(theDirection, theDelta));
+        if (!positionAllowed(myNewPosition)) {
+            myNewPosition = sum (_myPosition, product(theDirection, -5.0 * theDelta));
+        }
+        _myPosition = myNewPosition
+    }
 
     self.onFrame = function(theTime) {
         if (_myLastTime == null) {
@@ -191,9 +242,7 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
         var curNormalizedMousePos = self.getNormalizedScreen(theX, theY);
         if (self.getLeftButtonFlag()) {
             var myDelta = difference(curNormalizedMousePos, _prevNormalizedMousePosition);
-            _myEulerOrientation.x += myDelta.y;
-            _myEulerOrientation.y += -myDelta.x;
-            self.getMoverObject().orientation = Quaternionf.createFromEuler(_myEulerOrientation);
+            self.movements.rotateXY(myDelta);
         }
         _prevNormalizedMousePosition = curNormalizedMousePos;
     }
@@ -291,52 +340,18 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
         var myStep = _myWalkSpeed * self.getWorldSize() * theDeltaT;
         switch (theKey) {
             case "up":
-                if (_myGroundContactFlag) {
-                    myDirVector = _myProjectedFrontVector;
-                } else {
-                    myDirVector = _myFrontVector;
-                }
-
-                myNewPosition = sum(_myPosition, product(myDirVector, -myStep));
-                if (!positionAllowed(myNewPosition)) {
-                    myNewPosition = sum (_myPosition, product(myDirVector, 5.0 * myStep));
-                }
+                self.movements.translateAlongFrontVector(-myStep);
                 break;
             case "down":
-                if (_myGroundContactFlag) {
-                    myDirVector = _myProjectedFrontVector;
-                } else {
-                    myDirVector = _myFrontVector;
-                }
-                myNewPosition = sum (_myPosition, product(myDirVector, myStep));
-                if (!positionAllowed(myNewPosition)) {
-                    myNewPosition = sum (_myPosition, product(myDirVector, -5.0 * myStep));
-                }
+                self.movements.translateAlongFrontVector(myStep);
                 break;
             case "left":
-                if (_myGroundContactFlag) {
-                    myDirVector = _myProjectedRightVector;
-                } else {
-                    myDirVector = _myRightVector;
-                }
-                myNewPosition = sum (_myPosition, product(myDirVector, myStep))
-                if (!positionAllowed(myNewPosition)) {
-                    myNewPosition = sum (_myPosition, product(myDirVector, -5.0 * myStep));
-                }
+                self.movements.translateAlongRightVector(myStep);
                 break;
             case "right":
-                if (_myGroundContactFlag) {
-                    myDirVector = _myProjectedRightVector;
-                } else {
-                    myDirVector = _myRightVector;
-                }
-                myNewPosition = sum (_myPosition, product(myDirVector, -myStep))
-                if (!positionAllowed(myNewPosition)) {
-                    myNewPosition = sum (_myPosition, product(myDirVector, 5.0 * myStep));
-                }
+                self.movements.translateAlongRightVector(-myStep);
                 break;
         }
-        _myPosition = myNewPosition
     }
 
     function printHelp() {
