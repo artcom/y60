@@ -3,7 +3,7 @@
          ENSURE, ENSURE_EQUAL, spark*/
 
 use("UnitTest.js");
-use("spark.js");
+use("spark/spark.js");
 
 // ComponentClass
 

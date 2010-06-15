@@ -3,7 +3,7 @@
          ENSURE, ENSURE_EQUAL*/
 
 use("UnitTest.js");
-use("common.js");
+use("spark/common.js");
 
 var global = this;
 

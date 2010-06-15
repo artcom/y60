@@ -122,6 +122,9 @@ install(
 add_subdirectory(products)
 add_subdirectory(components)
 
+# native js (for tests mainly)
+add_subdirectory(js)
+
 # Generate standard documentation
 ac_add_doxygen(Y60 ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}/doc/doxygen Doxyfile.in)
 ac_add_xsddoc(Y60 ${CMAKE_CURRENT_SOURCE_DIR}/base/Y60.xsd ${CMAKE_CURRENT_BINARY_DIR}/doc/schema)

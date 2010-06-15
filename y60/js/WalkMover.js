@@ -82,7 +82,7 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
     const MODEL_UP_DIRECTION       = new Vector3f(0,1,0);
     const MODEL_RIGHT_DIRECTION    = cross(MODEL_FRONT_DIRECTION, MODEL_UP_DIRECTION);
     const INITIAL_WALK_SPEED       = 0.01; // percentage of world size per second
-    const INITIAL_EYEHEIGHT        = 200;
+    const INITIAL_EYEHEIGHT        = 0.5;
     const ROTATE_SPEED             = 1.0;
     const GRAVITY                  = 9.81;
     const PERSON_MASS              = 100;
@@ -256,6 +256,9 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
             _myWalkSpeed /= 1.5;
         }
 
+    }
+    self.setPosition = function (thePosition) {
+        _myPosition = thePosition;
     }
 
     //////////////////////////////////////////////////////////////////////
