@@ -211,7 +211,7 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
         if (theKeyState && theKey == 'h') {
             printHelp();
         }
-        if (theShiftFlag) {
+        if (theShiftFlag && theControlFlag && theAltFlag) {
             switch(theKey) {
                 case "up":
                     _myEyeHeight *= 1.1;
@@ -223,7 +223,9 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
 
             }
         } else {
-            _myPressedKeys[theKey] = theKeyState;
+            if((theKeyState && theControlFlag && theAltFlag) || !theKeyState) {
+                _myPressedKeys[theKey] = theKeyState;
+            }
         }
         self.Mover.onKey(theKey, theKeyState, theX, theY, theShiftFlag, theControlFlag, theAltFlag);
     }

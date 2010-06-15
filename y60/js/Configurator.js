@@ -83,7 +83,7 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
         } else {
             throw new Exception("No settings found", fileline());
         }
-    }
+    };
 
     obj.getSettingsFile = function() {
         if (_myCommonSettingsFile) {
@@ -91,24 +91,24 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
         } else {
             throw new Exception("No settingsfile found", fileline());
         }
-    }
+    };
 
     obj.setSettingsFile = function(theSettingsFile) {
         setup(obj, theSceneViewer, theSettingsFile);
-    }
+    };
 
     obj.setSettingsFileList = function( theFileList ) {
         _mySettingsFileList = theFileList;
         setup( obj, theSceneViewer, _myCommonSettingsFile );
-    }
+    };
 
     obj.getSettingsFileList = function() {
         return _mySettingsFileList;
-    }
+    };
 
     obj.hasSection = function(theSection) {
         return _myMergedSettings.childNode(theSection) != null;
-    }
+    };
 
     obj.setSetting = function(theSection, theSetting, theValue) {
         var mySection = _myMergedSettings.childNode(theSection);
@@ -125,7 +125,7 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
         }
 
         notifyListeners();
-    }
+    };
 
     obj.restoreSettings = function() {
         for (var i = 0; i < _myMergedSettings.childNodes.length; ++i) {
@@ -136,12 +136,12 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
             }
         }
         notifyListeners();
-    }
+    };
 
     obj.reloadSettings = function() {
         setup( obj, theSceneViewer, _myCommonSettingsFile );
         notifyListeners();
-    }
+    };
 
     function saveSection( theSourceSection, theTargetSection ) {
         // save common setting values
@@ -154,7 +154,7 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
                 theSourceSection.removeChild( mySourceNode );
             }
         }
-    }
+    };
 
     function saveSetting( theSetting, theSettingsFile, theCurrentMergedSettings ) {
 
@@ -170,7 +170,7 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
             }
         }
         theSetting.saveFile( theSettingsFile );
-    }
+    };
 
     obj.saveSettings = function() {
         var myCommonSettingsFileSavedFlag = false;
@@ -187,8 +187,7 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
             saveSetting( _myOriginalCommonSettings, _myCommonSettingsFile,
                          myCurrentMergedSettings );
         }
-    }
-
+    };
 
     obj.removeListener = function(theListener) {
         for (var i=_myListeners.length-1; i >= 0; --i) {
@@ -196,7 +195,7 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
                 _myListeners.splice(i, 1);
             }
         }
-    }
+    };
 
     obj.addListener = function(theListener, theSection) {
         if (!_myMergedSettings) {
@@ -214,15 +213,15 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
             theListener.onUpdateSettings(_myMergedSettings);
         }
         _myListeners.push({obj:theListener, section:theSection});
-    }
+    };
 
     obj.onFrame = function(theTime) {
         if (_myKeyDown && (theTime - _myKeyDown.time) > 0.2) {
-            obj.onKey(_myKeyDown.key, true, _myKeyDown.shift);
+            obj.onKey(_myKeyDown.key, true, _myKeyDown.shift, _myKeyDown.ctrl, _myKeyDown.alt);
         }
-    }
+    };
 
-    obj.onKey = function(theKey, theKeyState, theShiftFlag) {
+    obj.onKey = function(theKey, theKeyState, theShiftFlag, theCtrlFlag, theAltFlag) {
         if (!_myMergedSettings) {
             return;
         }
@@ -230,9 +229,17 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
             _myKeyDown = null;
             return;
         }
-
-        _myKeyDown = { key: theKey, shift: theShiftFlag, time: _mySceneViewer.getCurrentTime()};
-
+        
+        _myKeyDown = {  key: theKey, 
+                        shift: theShiftFlag, 
+                        ctrl: theCtrlFlag, 
+                        alt: theAltFlag, 
+                        time: _mySceneViewer.getCurrentTime()};
+        
+        if (!theCtrlFlag) {
+            return;
+        }
+        
         switch (theKey) {
             case "up":
                 _myCurrentSetting.increment(theShiftFlag);
@@ -279,7 +286,7 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
                 printHelp();
                 break;
         }
-    }
+    };
 
     function Setting(theNode) {
         var _myNode       = theNode;
@@ -309,16 +316,15 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
                     _myStringFlag = (Number(_myValue).toString() == "NaN");
                 }
             }
-
-        }
+        };
 
         this.name = function() {
-            var myName = _myNode.nodeName
+            var myName = _myNode.nodeName;
             if (_myArrayFlag) {
                 myName += "[" + _myArrayPos + "]";
             }
             return myName;
-        }
+        };
 
         this.value = function() {
             if (_myArrayFlag) {
@@ -330,7 +336,7 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
                     return Number(_myValue);
                 }
             }
-        }
+        };
 
         this.help = function() {
             if ("help" in _myNode) {
@@ -338,7 +344,7 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
             } else {
                 return "";
             }
-        }
+        };
 
         this.next = function() {
             if (_myArrayFlag && _myArrayPos < _myArray.length - 1) {
@@ -347,7 +353,7 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
                 _myNode = nextNode(_myNode);
                 this.setup();
             }
-        }
+        };
 
         this.previous = function() {
             if (_myArrayFlag && _myArrayPos > 0) {
@@ -359,7 +365,7 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
                     _myArrayPos = _myArray.length - 1;
                 }
             }
-        }
+        };
 
         this.increment = function(theFastFlag) {
             if (theFastFlag == undefined) {
@@ -398,7 +404,7 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
                 _myValue = myValue;
             }
             _myNode.firstChild.nodeValue = myValue;
-        }
+        };
 
         this.decrement = function(theFastFlag) {
             if (theFastFlag == undefined) {
@@ -435,7 +441,7 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
                 _myValue = myValue;
             }
             _myNode.firstChild.nodeValue = myValue;
-        }
+        };
 
         if (!isValidNode(_myNode)) {
             _myNode = nextNode(_myNode);
@@ -623,7 +629,7 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
     var _myKeyDown                = null;
 
     setup( obj, theSceneViewer, theSettingsFile, theSettingsFileList );
-}
+};
 
 //
 // A generic XML-to-JavaScript converter.
@@ -641,7 +647,7 @@ function Settings() {
             var myChild = theNode.childNodes[i];
             this[myChild.nodeName] = myChild.firstChild.nodeValue;
         }
-    }
+    };
 }
 
 var ourSettings = (ourSettings == undefined) ? new Settings() : ourSettings;

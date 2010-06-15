@@ -105,90 +105,95 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
 
     self.setCursor = function(theImageString, theSize) {
         setCursor(theImageString, theSize);
-    }
+    };
 
     self.resetCursor = function() {
         resetCursor();
-    }
+    };
 
     self.getSettings = function() {
         if(_myConfigurator) {
             return _myConfigurator.getSettings();
         } else {
-            Logger.warning("no settings.xml used -> no Configurator")
+            Logger.warning("no settings.xml used -> no Configurator");
             return null;
         }
-    }
+    };
 
     self.getConfigurator = function() {
         if(_myConfigurator) {
             return _myConfigurator;
         } else {
-            Logger.warning("no settings.xml used -> no Configurator")
+            Logger.warning("no settings.xml used -> no Configurator");
             return null;
         }
-    }
+    };
 
     self.registerSettingsListener = function(theListener, theSection) {
         if(_myConfigurator) {
             _myConfigurator.addListener(theListener, theSection);
         } else {
-            Logger.warning("no settings.xml used -> no Configurator")
+            Logger.warning("no settings.xml used -> no Configurator");
         }
-    }
+    };
+    
     self.deregisterSettingsListener = function(theListener) {
         if(_myConfigurator) {
             _myConfigurator.removeListener(theListener);
         } else {
-            Logger.warning("no settings.xml used -> no Configurator")
+            Logger.warning("no settings.xml used -> no Configurator");
         }
-    }
+    };
 
     self.getCurrentTime = function(){
         return _myCurrentTime;
-    }
+    };
+    
     self.statisticColor setter = function(theColor) {
         _myStatisticColor = theColor;
-    }
+    };
+    
     self.current_time getter = function() {
         return _myCurrentTime;
-    }
+    };
 
     self.getAnimationManager = function() {
         return _myAnimationManager;
-    }
+    };
 
     self.getImageManager = function() {
         Logger.warning("ImageManager is deprecated.");
         return _myImageManager;
-    }
+    };
+    
     self.getPerfMeter = function() {
         if (!_myPerfMeter) {
             _myPerfMeter = new PerfMeter(self);
         }
         return _myPerfMeter;
-    }
+    };
 
     self.setSplashScreen = function(theFlag) {
         _mySplashScreenFlag = theFlag;
-    }
+    };
 
     self.setMessage = function(theMessage, theLine) {
         if (!_myOnScreenDisplay) {
             _myOnScreenDisplay = new OnScreenDisplay(self);
         }
         _myOnScreenDisplay.setMessage(theMessage, theLine);
-    }
+    };
+    
     self.getOSD = function() {
         return _myOnScreenDisplay;
-    }
+    };
 
     self.toggleVideoRecording = function() {
         if (!_myVideoRecorder) {
             _myVideoRecorder = new VideoRecorder(25);
         }
         _myVideoRecorder.enabled = !_myVideoRecorder.enabled;
-    }
+    };
 
     self.BaseViewer.onFrame = self.onFrame;
     self.onFrame = function(theTime) {
@@ -215,11 +220,10 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         if (_myPerfMeter) {
             _myPerfMeter.onFrame(theTime);
         }
-
-    }
+    };
 
     self.onPreRender = function() {
-    }
+    };
 
     self.BaseViewer.onPostRender = self.onPostRender;
     self.onPostRender = function() {
@@ -239,22 +243,22 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         if (_myOnScreenStatistics > 0) {
             showStatistics();
         }
-    }
+    };
 
     self.onKey = function(theKey, theKeyState, theX, theY, theShiftFlag, theCtrlFlag, theAltFlag) {
-        if (!theCtrlFlag) {
-            return;
-        }
         var myMover = self.getMover(self.getActiveViewport());
-    	if (myMover) {
+        
+        if (myMover) {
             myMover.onKey(theKey, theKeyState, theX, theY, theShiftFlag, theCtrlFlag, theAltFlag);
         }
         if (!theAltFlag) {
-            _myDebugVisual.onKey(theKey, theKeyState, theShiftFlag);
-            self.getLightManager().onKey(theKey, theKeyState, theShiftFlag);
-            _myAnimationManager.onKey(theKey, theKeyState, theShiftFlag);
+            self.getLightManager().onKey(theKey, theKeyState, theShiftFlag, theCtrlFlag, theAltFlag);
             if(_myConfigurator) {
-                _myConfigurator.onKey(theKey, theKeyState, theShiftFlag);
+                _myConfigurator.onKey(theKey, theKeyState, theShiftFlag, theCtrlFlag, theAltFlag);
+            }
+            if(theCtrlFlag) {
+                _myDebugVisual.onKey(theKey, theKeyState, theShiftFlag);
+                _myAnimationManager.onKey(theKey, theKeyState, theShiftFlag);
             }
         }
         if (_myShutter) {
@@ -262,12 +266,12 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
                 return;
             }
         }
-
+        
         // theKeyState is true, if the key is pressed
-        if (!theKeyState) {
+        if (!theKeyState || !theCtrlFlag) {
             return;
         }
-
+        
         if (theShiftFlag) {
             theKey = theKey.toUpperCase();
         }
@@ -474,7 +478,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
                     break;
             }
         }
-    }
+    };
 
     self.BaseViewer.onMouseMotion = self.onMouseMotion;
     self.onMouseMotion = function(theX, theY) {
@@ -484,7 +488,8 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
                 return;
             }
         }
-    }
+    };
+    
     self.BaseViewer.onMouseButton = self.onMouseButton;
     self.onMouseButton = function(theButton, theState, theX, theY) {
         self.BaseViewer.onMouseButton(theButton, theState, theX, theY);
@@ -493,28 +498,28 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
                 return;
             }
         }
-    }
+    };
 
     self.BaseViewer.onAxis = self.onAxis;
     self.onAxis = function(theDevice, theAxis, theValue) {
         self.BaseViewer.onAxis( theDevice, theAxis, theValue);
-    }
+    };
 
     self.BaseViewer.onButton = self.onButton;
     self.onButton = function(theDevice, theButton, theState) {
         self.BaseViewer.onButton( theDevice, theButton, theState);
-    }
+    };
 
     self.onResize = function(theNewWidth, theNewHeight) {
         if (_myShutter) {
             _myShutter.onResize();
         }
-    }
+    };
 
     self.BaseViewer.onExit = self.onExit;
     self.onExit = function() {
         self.BaseViewer.onExit();
-    }
+    };
 
     // Must be called before setup
     // Use the following constants:
@@ -527,11 +532,12 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
     self.addRenderingCapability = function(theCapability) {
         _mySetDefaultRenderingCap = false;
         window.renderingCaps = window.renderingCaps | theCapability;
-    }
+    };
+    
     self.removeRenderingCapability = function(theCapability) {
         _mySetDefaultRenderingCap = false;
         window.renderingCaps = window.renderingCaps & (~theCapability);
-    }
+    };
 
     self.setup = function(theWindowWidth, theWindowHeight, theFullscreen, theWindowTitle, theScene, theSwitchNodeFlag) {
         //print(theWindowWidth + " x " + theWindowHeight + " fullscreen: " + theFullscreen);
@@ -641,9 +647,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
                                                     (window.height - _mySplashScreen.height) / 2);
         }
         _mySinceLastVersion="1";
-
-
-    }
+    };
 
     self.createShutter = function() {
         if (!_myShutter) {
@@ -651,11 +655,11 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
             _myShutter = new Shutter(self, new Vector4f(0,0,0,0));
             self.registerSettingsListener(_myShutter, "Shutter");
         }
-    }
+    };
 
     self.go = function() {
         window.go();
-    }
+    };
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     //
@@ -799,4 +803,4 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
     var _myVideoRecorder         = null;
     var _myStatisticColor        = [1,1,1,1];
     var _mySinceLastVersion        = "1";
-}
+};

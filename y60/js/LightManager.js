@@ -156,21 +156,21 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
             _mySunLight.visible = true;
             _myHeadLightFlag = true;
         }
-    }
+    };
 
     obj.setEnabled setter = function(theFlag) {
         _myEnabledFlag = theFlag;
-    }
+    };
 
     obj.registerHeadlightWithViewport = function(theViewportNode, theLightNode) {
         _myViewportHeadlights[theViewportNode.id] = theLightNode;
         _myViewportHeadlightsEnabled[theViewportNode.id] = true;
-    }
+    };
 
     obj.deregisterHeadlightFromViewport = function(theViewportNode) {
         delete _myViewportHeadlights[theViewportNode.id];
         delete _myViewportHeadlightsEnabled[theViewportNode.id];
-    }
+    };
 
     obj.setupHeadlight = function(theViewport) {
         var myCamera = theViewport.getElementById(theViewport.camera);
@@ -188,14 +188,15 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
             _myViewportHeadlights[theViewport.id].name = "Headlight_"+theViewport.id;
             _myViewportHeadlights[theViewport.id].visible = false;
         }
-    }
+    };
+    
     obj.enableHeadlight = function(theFlag) {
         _myHeadLightFlag = theFlag;
-    }
+    };
 
     obj.enableSunlight = function(theFlag) {
         _mySunLight.visible = theFlag;
-    }
+    };
 
     obj.onFrame = function(theTime) {
         if (_myLastSunUpdate) {
@@ -210,9 +211,9 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
             }
         }
         _myLastSunUpdate = theTime;
-    }
+    };
 
-    obj.onKey = function(theKey, theKeyState, theShiftFlag) {
+    obj.onKey = function(theKey, theKeyState, theShiftFlag, theCtrlFlag, theAltFlag) {
         // theKeyState is true, if the key is pressed
         switch (theKey) {
             case 'd':
@@ -221,16 +222,18 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
                     _mySunSpeed = 0;
                     return;
                 }
-                if (theShiftFlag) {
-                    _mySunSpeed = 30;
-                } else {
-                    _mySunSpeed = -30;
+                if(theCtrlFlag) {
+                    if (theShiftFlag) {
+                        _mySunSpeed = 30;
+                    } else {
+                        _mySunSpeed = -30;
+                    }
                 }
                 return;
         }
 
         // Key handlers following this are only activated on key down
-        if (!theKeyState) {
+        if (!theKeyState || !theCtrlFlag) {
             return;
         }
         switch (theKey) {
@@ -269,7 +272,7 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
                 printHelp();
                 break;
         }
-    }
+    };
 
     obj.onPreViewport = function(theViewport) {
 
@@ -278,7 +281,8 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
                 _myViewportHeadlights[theViewport.id].visible = _myViewportHeadlightsEnabled[theViewport.id];
             }
         }
-    }
+    };
+    
     obj.onPostViewport = function(theViewport) {
         //var numLights = 0;
         //for (i in _myViewportHeadlights) {
@@ -287,22 +291,23 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
         if (_myEnabledFlag /*&& numLights > 1*/ && _myHeadLightFlag && theViewport.id in _myViewportHeadlights && _myViewportHeadlights[theViewport.id].visible) {
             _myViewportHeadlights[theViewport.id].visible = false;
         }
-    }
+    };
 
     obj.getHeadlight = function(theViewport) {
         if (theViewport.id in _myViewportHeadlights) {
             return _myViewportHeadlights[theViewport.id];
         }
         return null;
-    }
+    };
+    
     obj.getSunlight = function() {
         return _mySunLight;
-    }
+    };
 
     obj.setSunPosition = function(thePercentage) {
         _mySunPosition.setRelative(thePercentage);
         updateSunPosition();
-    }
+    };
 
     obj.createLightSource = function(theLightSourceName, theType) {
         var myLightSourceNode = Node.createElement('lightsource');
@@ -313,7 +318,7 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
         Logger.trace("Creating new Lightsource node: " + theLightSourceName+" = "+myLightSourceNode.id);
         myLightSourceNode.name = theLightSourceName;
         return myLightSourceNode;
-    }
+    };
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     //
@@ -382,4 +387,4 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
          print("    d    move sun (decrease daytime)");
          print("    D    move sun (increase daytime)");
     }
-}
+};
