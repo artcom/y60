@@ -57,63 +57,44 @@
 
 */
 
+/*jslint*/
+/*globals use, print, UnitTest, UnitTestSuite, ENSURE, exit, reuse,
+          writeStringToFile*/
+
 use("UnitTest.js");
 
-function MySceneUnitTest() {
-    this.Constructor(this, "MySceneUnitTest");
+function HotCodingUnitTest() {
+    this.Constructor(this, "HotCodingUnitTest");
 }
 
-
-MySceneUnitTest.prototype.Constructor = function(obj, theName) {
+HotCodingUnitTest.prototype.Constructor = function (obj, theName) {
 
     UnitTest.prototype.Constructor(obj, theName);
 
-    obj.run = function() {
-        obj.myScene = new Scene(); // create scene with stubs
-        obj.myScene.setup();
+    obj.run = function () {
+        obj.myModuleName = "TemporaryTestModule.js";
+        obj.myModule = "function calculateSum(a,b) { return a+b; };";
+        ENSURE("writeStringToFile(obj.myModuleName, obj.myModule) == true");
+        ENSURE("fileExists(obj.myModuleName)");
+        ENSURE("readFileAsString(obj.myModuleName) == obj.myModule");
+        use(obj.myModuleName);
+        ENSURE("calculateSum(1,2) == 3");
 
-        obj.testScene();
-    }
+        obj.myModule = "function calculateSum(a,b) { return a+b + 1; };";
+        writeStringToFile(obj.myModuleName, obj.myModule);
+        ENSURE("readFileAsString(obj.myModuleName) == obj.myModule");
+        reuse();
+        ENSURE("calculateSum(1,2) == 4");
+        ENSURE("deleteFile(obj.myModuleName) == true");
+        ENSURE("!fileExists(obj.myModuleName)");
+    };
+};
 
-    obj.testScene = function() {
-        // Test convinience scene access properties
-        ENSURE('obj.myScene.dom.nodeName == "scene"');
-        ENSURE('obj.myScene.world.nodeName == "world"');
-        ENSURE('obj.myScene.canvases.nodeName == "canvases"');
-        ENSURE('obj.myScene.canvas.nodeName == "canvas"');
-        ENSURE('obj.myScene.materials.nodeName == "materials"');
-        ENSURE('obj.myScene.lightsources.nodeName == "lightsources"');
-        ENSURE('obj.myScene.animations.nodeName == "animations"');
-        ENSURE('obj.myScene.characters.nodeName == "characters"');
-        ENSURE('obj.myScene.shapes.nodeName == "shapes"');
-        ENSURE('obj.myScene.images.nodeName == "images"');
-        ENSURE('obj.myScene.cameras[0].nodeName == "camera"');
-
-        // Test array assignment to vector nodes
-        obj.myScene.world.position = new Vector3f(1,1,1);
-        ENSURE('almostEqual(obj.myScene.world.position, new Vector3f(1,1,1))');
-        obj.myScene.world.position = [2,3,4];
-        ENSURE('almostEqual(obj.myScene.world.position, new Vector3f(2,3,4))');
-        obj.myScene.world.position = [1.1,2.2,3.3];
-        ENSURE('almostEqual(obj.myScene.world.position, new Vector3f(1.1,2.2,3.3))');
-        obj.myScene.world.position = ["1","2","3"];
-        ENSURE('almostEqual(obj.myScene.world.position, new Vector3f(1,2,3))');
-
-        /*var myTimeStart = millisec();
-        var myIterations = 10000;
-        for (var i = 0; i < myIterations; i++) {
-            var myImages = obj.myScene.images;
-        }
-        print("Duration for " + myIterations + " : " + ((millisec() - myTimeStart) / 1000));
-        */
-    }
-}
-
-var myTestName = "testScene.tst.js";
+var myTestName = "testHotCoding.tst.js";
 var mySuite = new UnitTestSuite(myTestName);
 
-mySuite.addTest(new MySceneUnitTest());
+mySuite.addTest(new HotCodingUnitTest());
 mySuite.run();
 
-print(">> Finished test suite '"+myTestName+"', return status = " + mySuite.returnStatus() + "");
+print(">> Finished test suite '" + myTestName + "', return status = " + mySuite.returnStatus() + "");
 exit(mySuite.returnStatus());

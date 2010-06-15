@@ -57,121 +57,124 @@
 
 */
 
+/*jslint */
+/*globals use, print, Vector3f, UnitTest, ENSURE, SUCCESS, FAILURE, Matrix4f,
+          Node, DomEvent, crash, crash1, exit, UnitTestSuite, RenderWindow*/
+
 use("UnitTest.js");
 
 function MyClassUnitTest() {
     this.Constructor(this, "MyClassUnitTest");
-};
+}
 
-
-MyClassUnitTest.prototype.Constructor = function(obj, theName) {
+MyClassUnitTest.prototype.Constructor = function (obj, theName) {
 
     UnitTest.prototype.Constructor(obj, theName);
 
-    obj.run = function() {
+    obj.run = function () {
         obj.myVar = 1;
         ENSURE('obj.myVar == 1');
         ENSURE('1 + 1 == 2');
 
+        var myVector;
         try {
-            var myVector = new Vector3f("hallo");
+            myVector = new Vector3f("hallo");
             FAILURE("No exception thrown");
         } catch (ex) {
-            SUCCESS("Exception thrown and caught:"+ex);
+            SUCCESS("Exception thrown and caught:" + ex);
         }
 
         try {
-            var myVector = new Matrix4f("hallo");
+            myVector = new Matrix4f("hallo");
             FAILURE("No exception thrown");
         } catch (ex) {
-            SUCCESS("Exception thrown and caught:"+ex);
+            SUCCESS("Exception thrown and caught:" + ex);
         }
 
-        var myMatrix = new Matrix4f;
+        var myMatrix = new Matrix4f();
         try {
             myMatrix.badMethod();
             FAILURE("No exception thrown");
         } catch (ex) {
-            SUCCESS("Exception thrown and caught:"+ex);
+            SUCCESS("Exception thrown and caught:" + ex);
         }
         try {
             myMatrix.postMultiply("bad_argument");
             FAILURE("No exception thrown");
         } catch (ex) {
-            SUCCESS("Exception thrown and caught:"+ex);
+            SUCCESS("Exception thrown and caught:" + ex);
         }
-    }
+    };
 };
 
 function FailedDomEventTest() {
     this.Constructor(this, "DomEventTest");
 }
 
-FailedDomEventTest.prototype.Constructor = function(obj, theName) {
+FailedDomEventTest.prototype.Constructor = function (obj, theName) {
     UnitTest.prototype.Constructor(obj, theName);
 
-    obj.run = function() {
+    obj.run = function () {
         obj.myDocument = Node.createDocument();
-        obj.myDocument.parse('<test name="root">\
-                              <child1 name="child1">\
-                              <child2 name="child2">\
-                              <child3 name="child3"></child3></child2></child1>\
-                              </test>');
+        obj.myDocument.parse('<test name="root">\n' +
+                             '<child1 name="child1">\n' +
+                             '<child2 name="child2">\n' +
+                             '<child3 name="child3"></child3></child2></child1>\n' +
+                             '</test>');
         var myChildNode1 = obj.myDocument.childNode(0).childNode(0);
         var myChildNode2 = myChildNode1.childNode(0);
         var myChildNode3 = myChildNode2.childNode(0);
-        var myVector = new Vector3f(0,1,2);
+        var myVector = new Vector3f(0, 1, 2);
         var myDomEvent = new DomEvent("testEvent", myVector, true, false, 0.0);
         //ENSURE = print;
         ENSURE(myDomEvent.stopPropagation());
         ENSURE(myDomEvent.preventDefault());
-        ENSURE(myDomEvent.type == "testEvent");
-        ENSURE(myDomEvent.eventPhase == 1);
-        ENSURE(myDomEvent.bubbles == true);
-        ENSURE(myDomEvent.cancelable == false);
-        ENSURE(myDomEvent.isDefaultPrevented == true);
+        ENSURE(myDomEvent.type === "testEvent");
+        ENSURE(myDomEvent.eventPhase === 1);
+        ENSURE(myDomEvent.bubbles === true);
+        ENSURE(myDomEvent.cancelable === false);
+        ENSURE(myDomEvent.isDefaultPrevented === true);
 
         myChildNode2.addEventListener("testEvent", obj, true, "handleEvent");
         try {
             myChildNode3.dispatchEvent(myDomEvent);
             FAILURE("No exception thrown");
         } catch (ex) {
-            SUCCESS("Exception thrown and caught:"+ex);
+            SUCCESS("Exception thrown and caught:" + ex);
         }
-    }
+    };
 
-    obj.handleEvent = function(theEvent) {
+    obj.handleEvent = function (theEvent) {
         print("eventListener: " + theEvent);
         crash();
-    }
-}
+    };
+};
 
 function OnFrameUnitTest() {
     this.Constructor(this, "OnFrameUnitTest");
-};
+}
 
-
-OnFrameUnitTest.prototype.Constructor = function(obj, theName) {
+OnFrameUnitTest.prototype.Constructor = function (obj, theName) {
 
     UnitTest.prototype.Constructor(obj, theName);
 
-    obj.onFrame = function(theTime) {
-       var myArray = [];
-       myArray[1].foo = "bar";
-       FAILURE("No exception thrown");
-    }
+    obj.onFrame = function (theTime) {
+        var myArray = [];
+        myArray[1].foo = "bar";
+        FAILURE("No exception thrown");
+    };
 
-    obj.run = function() {
+    obj.run = function () {
         obj.myVar = 1;
         ENSURE('obj.myVar == 1');
         ENSURE('1 + 1 == 2');
 
         try {
             var myArray = [];
-            print( myArray[1].foo = "bar" );
+            print(myArray[1].foo = "bar");
             FAILURE("No exception thrown");
         } catch (ex) {
-            SUCCESS("Exception thrown and caught:"+ex);
+            SUCCESS("Exception thrown and caught:" + ex);
         }
 
         var window = new RenderWindow();
@@ -180,16 +183,16 @@ OnFrameUnitTest.prototype.Constructor = function(obj, theName) {
             window.go();
             FAILURE("No exception thrown");
         } catch (ex) {
-            SUCCESS("Exception thrown and caught:"+ex);
+            SUCCESS("Exception thrown and caught:" + ex);
         }
-    }
+    };
 };
 
 print("the next error is intentional");
 try {
     crash1();
 } catch (ex) {
-    print("Exception:"+ex+", name=" + ex.name + ",fileName="+ex.fileName+", lineNumber="+ex.lineNumber );
+    print("Exception:" + ex + ", name=" + ex.name + ",fileName=" + ex.fileName + ", lineNumber=" + ex.lineNumber);
 }
 
 
@@ -201,5 +204,5 @@ mySuite.addTest(new FailedDomEventTest());
 mySuite.addTest(new OnFrameUnitTest());
 mySuite.run();
 
-print(">> Finished test suite '"+myTestName+"', return status = " + mySuite.returnStatus() + "");
+print(">> Finished test suite '" + myTestName + "', return status = " + mySuite.returnStatus() + "");
 exit(mySuite.returnStatus());

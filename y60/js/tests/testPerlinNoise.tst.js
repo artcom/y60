@@ -57,18 +57,22 @@
 
 */
 
+/*jslint plusplus:false*/
+/*globals print, use, UnitTest, PerlinNoise, ENSURE, DPRINT, millisec, exit,
+          UnitTestSuite*/
+
 use("UnitTest.js");
 use("Overlay.js");
 
 function PerlinNoiseUnitTest() {
     this.Constructor(this, "PerlinNoiseUnitTest");
-};
+}
 
-PerlinNoiseUnitTest.prototype.Constructor = function(obj, theName) {
-
+PerlinNoiseUnitTest.prototype.Constructor = function (obj, theName) {
+    
     UnitTest.prototype.Constructor(obj, theName);
 
-    obj.run = function() {
+    obj.run = function () {
         obj.myPerlinNoise = new PerlinNoise(3);
         ENSURE('obj.myPerlinNoise.octavecount == 3');
         ENSURE('obj.myPerlinNoise.amplitudefalloff == 0.5');
@@ -83,7 +87,7 @@ PerlinNoiseUnitTest.prototype.Constructor = function(obj, theName) {
         var myNoise = new PerlinNoise(3);
         var myTime = millisec();
         for (var i = 0; i < 1000; ++i) {
-            myNoise.noise([1,2,3]);
+            myNoise.noise([1, 2, 3]);
         }
         print("timing: " + (millisec() - myTime) / 1000);
 /*
@@ -96,7 +100,7 @@ PerlinNoiseUnitTest.prototype.Constructor = function(obj, theName) {
         }
         myWindow.go();
 */
-    }
+    };
 };
 
 var myTestName = "testPerlinNoise.tst.js";
@@ -105,5 +109,5 @@ var mySuite = new UnitTestSuite(myTestName);
 mySuite.addTest(new PerlinNoiseUnitTest());
 mySuite.run();
 
-print(">> Finished test suite '"+myTestName+"', return status = " + mySuite.returnStatus() + "");
+print(">> Finished test suite '" + myTestName + "', return status = " + mySuite.returnStatus() + "");
 exit(mySuite.returnStatus());

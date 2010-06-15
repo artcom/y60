@@ -57,30 +57,65 @@
 
 */
 
+/*jslint*/
+/*globals print, Scene, use, UnitTest, ENSURE, Vector3f, UnitTestSuite, exit*/
+
 use("UnitTest.js");
 
-function MyClassUnitTest() {
-    this.Constructor(this, "MyClassUnitTest");
-};
+function MySceneUnitTest() {
+    this.Constructor(this, "MySceneUnitTest");
+}
 
-
-MyClassUnitTest.prototype.Constructor = function(obj, theName) {
-
+MySceneUnitTest.prototype.Constructor = function (obj, theName) {
+    
     UnitTest.prototype.Constructor(obj, theName);
 
-    obj.run = function() {
-        obj.myVar = 1;
-        ENSURE('obj.myVar == 1');
-        ENSURE('1 + 1 == 2');
-    }
+    obj.run = function () {
+        obj.myScene = new Scene(); // create scene with stubs
+        obj.myScene.setup();
+
+        obj.testScene();
+    };
+
+    obj.testScene = function () {
+        // Test convinience scene access properties
+        ENSURE('obj.myScene.dom.nodeName == "scene"');
+        ENSURE('obj.myScene.world.nodeName == "world"');
+        ENSURE('obj.myScene.canvases.nodeName == "canvases"');
+        ENSURE('obj.myScene.canvas.nodeName == "canvas"');
+        ENSURE('obj.myScene.materials.nodeName == "materials"');
+        ENSURE('obj.myScene.lightsources.nodeName == "lightsources"');
+        ENSURE('obj.myScene.animations.nodeName == "animations"');
+        ENSURE('obj.myScene.characters.nodeName == "characters"');
+        ENSURE('obj.myScene.shapes.nodeName == "shapes"');
+        ENSURE('obj.myScene.images.nodeName == "images"');
+        ENSURE('obj.myScene.cameras[0].nodeName == "camera"');
+
+        // Test array assignment to vector nodes
+        obj.myScene.world.position = new Vector3f(1, 1, 1);
+        ENSURE('almostEqual(obj.myScene.world.position, new Vector3f(1,1,1))');
+        obj.myScene.world.position = [2, 3, 4];
+        ENSURE('almostEqual(obj.myScene.world.position, new Vector3f(2,3,4))');
+        obj.myScene.world.position = [1.1, 2.2, 3.3];
+        ENSURE('almostEqual(obj.myScene.world.position, new Vector3f(1.1,2.2,3.3))');
+        obj.myScene.world.position = ["1", "2", "3"];
+        ENSURE('almostEqual(obj.myScene.world.position, new Vector3f(1,2,3))');
+
+        /*var myTimeStart = millisec();
+        var myIterations = 10000;
+        for (var i = 0; i < myIterations; i++) {
+            var myImages = obj.myScene.images;
+        }
+        print("Duration for " + myIterations + " : " + ((millisec() - myTimeStart) / 1000));
+        */
+    };
 };
 
-var myTestName = "testMyClass.tst.js";
+var myTestName = "testScene.tst.js";
 var mySuite = new UnitTestSuite(myTestName);
 
-mySuite.addTest(new MyClassUnitTest());
-mySuite.addTest(new MyClassUnitTest());
+mySuite.addTest(new MySceneUnitTest());
 mySuite.run();
 
-print(">> Finished test suite '"+myTestName+"', return status = " + mySuite.returnStatus() + "");
+print(">> Finished test suite '" + myTestName + "', return status = " + mySuite.returnStatus() + "");
 exit(mySuite.returnStatus());
