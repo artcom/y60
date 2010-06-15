@@ -57,12 +57,13 @@
 
 */
 
+/*jslint*/
+/*globals*/
 use("UnitTest.js");
 
 function MyClassUnitTest() {
     this.Constructor(this, "MyClassUnitTest");
 };
-
 
 MyClassUnitTest.prototype.Constructor = function(obj, theName) {
 

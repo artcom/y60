@@ -57,22 +57,25 @@
 
 */
 
+/*jslint*/
+/*globals print, use, UnitTest, UnitTestSuite, exec, searchFile,
+          operatingSystem, ENSURE, exit*/
 use("UnitTest.js");
 
 function JSAppUnitTest() {
     this.Constructor(this, "JSAppUnitTest");
-};
+}
 
-JSAppUnitTest.prototype.Constructor = function(obj, theName) {
+JSAppUnitTest.prototype.Constructor = function (obj, theName) {
 
     UnitTest.prototype.Constructor(obj, theName);
 
-    obj.run = function() {
+    obj.run = function () {
         ENSURE('"pickytests" === "pickytests"');
+        var myShellScript;
 
-
-        if (operatingSystem() == "WIN32") {
-            var myShellScript = searchFile("fixtures/exec.bat");
+        if (operatingSystem() === "WIN32") {
+            myShellScript = searchFile("fixtures/exec.bat");
 
             obj.myReturnCode = exec("\"" + myShellScript + "\"", "2");
             ENSURE('obj.myReturnCode === 2');
@@ -96,9 +99,7 @@ JSAppUnitTest.prototype.Constructor = function(obj, theName) {
             ENSURE('obj.myReturnCode === 0');
             */
         }
-
-
-    }
+    };
 };
 
 try {
@@ -106,10 +107,9 @@ try {
     var mySuite = new UnitTestSuite(myTestName);
 
     mySuite.addTest(new JSAppUnitTest());
-
     mySuite.run();
 
-    print(">> Finished test suite '"+myTestName+"', return status = " + mySuite.returnStatus() + "");
+    print(">> Finished test suite '" + myTestName + "', return status = " + mySuite.returnStatus() + "");
     exit(mySuite.returnStatus());
 } catch (ex) {
     print("-----------------------------------------------------------------------------------------");

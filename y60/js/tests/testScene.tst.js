@@ -57,25 +57,27 @@
 
 */
 
+/*jslint*/
+/*globals print, Scene, use, UnitTest, ENSURE, Vector3f, UnitTestSuite, exit*/
+
 use("UnitTest.js");
 
 function MySceneUnitTest() {
     this.Constructor(this, "MySceneUnitTest");
 }
 
-
-MySceneUnitTest.prototype.Constructor = function(obj, theName) {
-
+MySceneUnitTest.prototype.Constructor = function (obj, theName) {
+    
     UnitTest.prototype.Constructor(obj, theName);
 
-    obj.run = function() {
+    obj.run = function () {
         obj.myScene = new Scene(); // create scene with stubs
         obj.myScene.setup();
 
         obj.testScene();
-    }
+    };
 
-    obj.testScene = function() {
+    obj.testScene = function () {
         // Test convinience scene access properties
         ENSURE('obj.myScene.dom.nodeName == "scene"');
         ENSURE('obj.myScene.world.nodeName == "world"');
@@ -90,13 +92,13 @@ MySceneUnitTest.prototype.Constructor = function(obj, theName) {
         ENSURE('obj.myScene.cameras[0].nodeName == "camera"');
 
         // Test array assignment to vector nodes
-        obj.myScene.world.position = new Vector3f(1,1,1);
+        obj.myScene.world.position = new Vector3f(1, 1, 1);
         ENSURE('almostEqual(obj.myScene.world.position, new Vector3f(1,1,1))');
-        obj.myScene.world.position = [2,3,4];
+        obj.myScene.world.position = [2, 3, 4];
         ENSURE('almostEqual(obj.myScene.world.position, new Vector3f(2,3,4))');
-        obj.myScene.world.position = [1.1,2.2,3.3];
+        obj.myScene.world.position = [1.1, 2.2, 3.3];
         ENSURE('almostEqual(obj.myScene.world.position, new Vector3f(1.1,2.2,3.3))');
-        obj.myScene.world.position = ["1","2","3"];
+        obj.myScene.world.position = ["1", "2", "3"];
         ENSURE('almostEqual(obj.myScene.world.position, new Vector3f(1,2,3))');
 
         /*var myTimeStart = millisec();
@@ -106,8 +108,8 @@ MySceneUnitTest.prototype.Constructor = function(obj, theName) {
         }
         print("Duration for " + myIterations + " : " + ((millisec() - myTimeStart) / 1000));
         */
-    }
-}
+    };
+};
 
 var myTestName = "testScene.tst.js";
 var mySuite = new UnitTestSuite(myTestName);
@@ -115,5 +117,5 @@ var mySuite = new UnitTestSuite(myTestName);
 mySuite.addTest(new MySceneUnitTest());
 mySuite.run();
 
-print(">> Finished test suite '"+myTestName+"', return status = " + mySuite.returnStatus() + "");
+print(">> Finished test suite '" + myTestName + "', return status = " + mySuite.returnStatus() + "");
 exit(mySuite.returnStatus());

@@ -57,20 +57,24 @@
 
 */
 
+/*jslint*/
+/*globals use, print, UnitTest, UnitTestSuite, ENSURE, exit, reuse,
+          writeStringToFile*/
+
 use("UnitTest.js");
 
 function HotCodingUnitTest() {
     this.Constructor(this, "HotCodingUnitTest");
-};
+}
 
-HotCodingUnitTest.prototype.Constructor = function(obj, theName) {
+HotCodingUnitTest.prototype.Constructor = function (obj, theName) {
 
     UnitTest.prototype.Constructor(obj, theName);
 
-    obj.run = function() {
+    obj.run = function () {
         obj.myModuleName = "TemporaryTestModule.js";
         obj.myModule = "function calculateSum(a,b) { return a+b; };";
-        ENSURE("writeStringToFile(obj.myModuleName, obj.myModule) == true");;
+        ENSURE("writeStringToFile(obj.myModuleName, obj.myModule) == true");
         ENSURE("fileExists(obj.myModuleName)");
         ENSURE("readFileAsString(obj.myModuleName) == obj.myModule");
         use(obj.myModuleName);
@@ -83,7 +87,7 @@ HotCodingUnitTest.prototype.Constructor = function(obj, theName) {
         ENSURE("calculateSum(1,2) == 4");
         ENSURE("deleteFile(obj.myModuleName) == true");
         ENSURE("!fileExists(obj.myModuleName)");
-    }
+    };
 };
 
 var myTestName = "testHotCoding.tst.js";
@@ -92,5 +96,5 @@ var mySuite = new UnitTestSuite(myTestName);
 mySuite.addTest(new HotCodingUnitTest());
 mySuite.run();
 
-print(">> Finished test suite '"+myTestName+"', return status = " + mySuite.returnStatus() + "");
+print(">> Finished test suite '" + myTestName + "', return status = " + mySuite.returnStatus() + "");
 exit(mySuite.returnStatus());

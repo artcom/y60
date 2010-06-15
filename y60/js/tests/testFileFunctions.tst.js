@@ -57,17 +57,20 @@
 
 */
 
+/*jslint */
+/*globals use, print, ENSURE, getDirectoryEntries, UnitTestSuite, UnitTest*/
+
 use("UnitTest.js");
 
 function TestFileFunctions() {
     this.Constructor(this, "TestFileFunctions");
-};
+}
 
-TestFileFunctions.prototype.Constructor = function(obj, theName) {
+TestFileFunctions.prototype.Constructor = function (obj, theName) {
 
     UnitTest.prototype.Constructor(obj, theName);
 
-    obj.run = function() {
+    obj.run = function () {
         print("Directory Listing for .: " + getDirectoryEntries("."));
         ENSURE('fileExists("bla") == false');
         ENSURE('fileExists(__FILE__()) == true');
@@ -75,13 +78,13 @@ TestFileFunctions.prototype.Constructor = function(obj, theName) {
         print("Director Listing for bla: " + getDirectoryEntries("bla"));
 
        //ENSURE_EXCEPTION("getDirectoryEntries('bla')");
-    }
+    };
 };
 
 var mySuite = new UnitTestSuite("UnitTest");
 
 try {
-    mySuite.addTest(new TestFileFunctions);
+    mySuite.addTest(new TestFileFunctions());
     mySuite.run();
 } catch (e) {
     print("## An unknown exception occured during execution." + e + "");
