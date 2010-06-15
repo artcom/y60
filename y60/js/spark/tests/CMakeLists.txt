@@ -1,5 +1,8 @@
 set(JSTESTS
 Common
+Meta
+Loader
+Rectangle
 )
 
 foreach(TEST ${JSTESTS})

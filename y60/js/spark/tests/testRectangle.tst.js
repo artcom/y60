@@ -4,7 +4,7 @@
 
 use("UnitTest.js");
 this.useSparkWidgets = true;
-use("spark.js");
+use("spark/spark.js");
 
 // Widget
 
@@ -16,7 +16,7 @@ RectangleUnitTest.prototype.Constructor = function (obj, theName) {
     UnitTest.prototype.Constructor(obj, theName);
     
     function testRectangleBasics() {
-        obj.App = spark.loadFile("tests/fixtures/simpleRectangleFixture.spark");
+        obj.App = spark.loadFile("fixtures/simpleRectangleFixture.spark");
         ENSURE_EQUAL(1, obj.App.children.length, "has one child");
         var myRectangle = obj.App.getChildByName("testRectangle");
         ENSURE_EQUAL("testRectangle", myRectangle.name, "Rectangle has correct name");
@@ -105,7 +105,7 @@ RectangleUnitTest.prototype.Constructor = function (obj, theName) {
     }
     
     function testRectangleTransformations() {
-        obj.App = spark.loadFile("tests/fixtures/simpleRectangleFixture.spark");
+        obj.App = spark.loadFile("fixtures/simpleRectangleFixture.spark");
         var myRectangle = obj.App.getChildByName("testRectangle");
         
         // rotation
