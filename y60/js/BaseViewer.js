@@ -202,17 +202,19 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
    }
 
     self.setMover = function(theMoverFactory, theViewport) {
-        if (!theMoverFactory || theMoverFactory == undefined) {
-            theMoverFactory = MoverBase;
+        if (theMoverFactory) {
+            var myNewMover = new theMoverFactory(theViewport);
+            var myViewportId = getViewportId(theViewport);
+            _myLastMover = myNewMover;
+            
+            myNewMover.setMoverObject(myNewMover.getViewportCamera());
+            
+            return myNewMover;
+        } else { 
+            _myLastMover = null;
+            return null;
+            
         }
-        
-        var myNewMover = new theMoverFactory(theViewport);
-        var myViewportId = getViewportId(theViewport);
-        _myLastMover = myNewMover;
-        
-        myNewMover.setMoverObject(myNewMover.getViewportCamera());
-
-        return myNewMover;
     }
 
     self.getMover = function(theViewport) {
@@ -227,20 +229,22 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     self.nextMover = function(theViewport) {
         var myViewportId = getViewportId(theViewport);
 
-      	if (_myMoverFactories.length == 0) {
-      	    return;
-      	}
+        if (_myMoverFactories.length == 0) {
+            return;
+        }
         
         // find next mover
         var myNextMoverIndex = 0;
-        for (var i = 0; i < _myMoverFactories.length; ++i) {
-            if (_myMoverFactories[i] == _myLastMover.constructor) {
-                myNextMoverIndex = i+1;
-                break;
+        if (_myLastMover) {
+            for (var i = 0; i < _myMoverFactories.length; ++i) {
+                if (_myMoverFactories[i] == _myLastMover.constructor) {
+                    myNextMoverIndex = i+1;
+                    break;
+                }
             }
-        }
-        if (myNextMoverIndex >= _myMoverFactories.length) {
-            myNextMoverIndex = 0;
+            if (myNextMoverIndex >= _myMoverFactories.length) {
+                myNextMoverIndex = 0;
+            }
         }
 
         // switch mover

@@ -82,7 +82,7 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
     const MODEL_UP_DIRECTION       = new Vector3f(0,1,0);
     const MODEL_RIGHT_DIRECTION    = cross(MODEL_FRONT_DIRECTION, MODEL_UP_DIRECTION);
     const INITIAL_WALK_SPEED       = 0.01; // percentage of world size per second
-    const INITIAL_EYEHEIGHT        = 0.5;
+    const INITIAL_EYEHEIGHT        = 200;
     const ROTATE_SPEED             = 1.0;
     const GRAVITY                  = 9.81;
     const PERSON_MASS              = 100;
@@ -126,7 +126,7 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
     self.reset = function() {
         self.Mover.reset();
 
-        var myCamera          = self.getMoverObject();
+        var myCamera         = self.getMoverObject();
         myCamera.orientation = new Quaternionf(0,0,0,1);
 
         _myPosition          = myCamera.globalmatrix.getTranslation();
@@ -138,30 +138,38 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
         _myGroundNormal      = null;
         _myGroundPlane       = null;
         _myEyeHeight         = INITIAL_EYEHEIGHT;
-    }
+    };
     
     self.eyeHeight setter = function(theHeight) {
         _myEyeHeight = theHeight;
         _myEyeHeight = Math.max(_myEyeHeight,0);
-    }
+    };
     
     self.eyeHeight getter = function () {
         return _myEyeHeight;
-    }
+    };
     
     self.walkSpeed setter = function(theWalkSpeed) {
         _myWalkSpeed = theWalkSpeed;
-    }
+    };
     
     self.walkSpeed getter = function () {
         return _myWalkSpeed;
-    }
+    };
+    
+    self.position setter = function (thePosition) {
+        _myPosition = thePosition;
+    };
+
+    self.rotation setter = function (theRotation) {
+        _myEulerOrientation = theRotation;
+    };
     
     self.movements.rotateXY = function(theDelta) {
         _myEulerOrientation.x += theDelta.y;
         _myEulerOrientation.y += -theDelta.x;
         self.getMoverObject().orientation = Quaternionf.createFromEuler(_myEulerOrientation);
-    }
+    };
     
     self.movements.translateAlongFrontVector = function (theDelta) {
         var myDirVector;
@@ -171,7 +179,7 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
             myDirVector = _myFrontVector;
         }
         translate(myDirVector, theDelta);
-    }
+    };
     
     self.movements.translateAlongRightVector = function (theDelta) {
         var myDirVector;
@@ -181,7 +189,7 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
             myDirVector = _myRightVector;
         }
         translate(myDirVector, theDelta);
-    }
+    };
     
     function translate(theDirection, theDelta) {
         var myNewPosition = sum (_myPosition, product(theDirection, theDelta));
@@ -189,7 +197,7 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
             myNewPosition = sum (_myPosition, product(theDirection, -5.0 * theDelta));
         }
         _myPosition = myNewPosition
-    }
+    };
 
     self.onFrame = function(theTime) {
         if (_myLastTime == null) {
@@ -204,14 +212,14 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
         }
         simulate(myDeltaTime);
         _myLastTime = theTime;
-    }
+    };
 
     self.Mover.onKey = self.onKey;
     self.onKey = function(theKey, theKeyState, theX, theY, theShiftFlag, theControlFlag, theAltFlag) {
         if (theKeyState && theKey == 'h') {
             printHelp();
         }
-        if (theShiftFlag) {
+        if (theShiftFlag && theControlFlag && theAltFlag) {
             switch(theKey) {
                 case "up":
                     _myEyeHeight *= 1.1;
@@ -223,10 +231,12 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
 
             }
         } else {
-            _myPressedKeys[theKey] = theKeyState;
+            if((theKeyState && theControlFlag && theAltFlag) || !theKeyState) {
+                _myPressedKeys[theKey] = theKeyState;
+            }
         }
         self.Mover.onKey(theKey, theKeyState, theX, theY, theShiftFlag, theControlFlag, theAltFlag);
-    }
+    };
 
     self.Mover.onMouseButton = self.onMouseButton;
     self.onMouseButton = function(theButton, theState, theX, theY) {
@@ -236,7 +246,7 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
         } else { // Button Up
             _prevNormalizedMousePosition = new Vector3f(0,0,0);
         }
-    }
+    };
 
     self.onMouseMotion = function(theX, theY) {
         var curNormalizedMousePos = self.getNormalizedScreen(theX, theY);
@@ -245,7 +255,7 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
             self.movements.rotateXY(myDelta);
         }
         _prevNormalizedMousePosition = curNormalizedMousePos;
-    }
+    };
 
     self.onMouseWheel = function(theDeltaX, theDeltaY) {
         if (theDeltaY < 0) {
@@ -253,11 +263,7 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
         } else {
             _myWalkSpeed /= 1.5;
         }
-
-    }
-    self.setPosition = function (thePosition) {
-        _myPosition = thePosition;
-    }
+    };
 
     //////////////////////////////////////////////////////////////////////
     //

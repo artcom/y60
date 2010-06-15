@@ -259,7 +259,7 @@ Shutter.prototype.Constructor = function(self, theSceneViewer, theSize, theCusto
 
     self.onKey = function(theKey, theKeyState, theShiftFlag, theCtrlFlag, theAltFlag) {
 
-        if (theAltFlag == false) {
+        if (!theAltFlag || !theCtrlFlag) {
             return false;
         }
 

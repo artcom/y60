@@ -103,7 +103,7 @@ TrackballMover.prototype.Constructor = function(obj, theViewport) {
     obj.setup = function() {
         var myTrackballBody = obj.getMoverObject().parentNode;
         obj.selectBody(myTrackballBody);
-    }
+    };
 
     obj.Mover.onMouseButton = obj.onMouseButton;
     obj.onMouseButton = function(theButton, theState, theX, theY) {
@@ -129,17 +129,17 @@ TrackballMover.prototype.Constructor = function(obj, theViewport) {
                 _prevNormalizedMousePosition = new Vector3f(0,0,0);
             }
         }
-    }
+    };
 
     obj.rotate = function(thePrevMousePos, theCurMousePos) {
         _myTrackball.rotate(thePrevMousePos, theCurMousePos);
         applyRotation();
-    }
+    };
 
     obj.rotateByQuaternion = function( theQuaternion ) {
         _myTrackball.setQuaternion( product( theQuaternion, _myTrackball.getQuaternion()));
         applyRotation();
-    }
+    };
 
     obj.zoom = function(theDelta) {
         var myWorldSize = obj.getWorldSize();
@@ -149,7 +149,7 @@ TrackballMover.prototype.Constructor = function(obj, theViewport) {
         var myScreenTranslation = new Vector3f(0, 0, -theDelta * myWorldSize * myZoomFactor / ZOOM_SPEED);
 
         obj.update(myScreenTranslation, 0);
-    }
+    };
 
     obj.pan = function(theDeltaX, theDeltaY) {
         var myScreenTranslation;
@@ -171,7 +171,7 @@ TrackballMover.prototype.Constructor = function(obj, theViewport) {
         }
         obj.update(myScreenTranslation, 0);
         //Logger.warning("Pan:"+obj.getScreenPanVector());
-    }
+    };
 
     obj.onMouseMotion = function(theX, theY) {
         var curNormalizedMousePos = obj.getNormalizedScreen(theX, theY);
@@ -184,26 +184,26 @@ TrackballMover.prototype.Constructor = function(obj, theViewport) {
             obj.rotate(_prevNormalizedMousePosition, curNormalizedMousePos);
         }
         _prevNormalizedMousePosition = curNormalizedMousePos;
-    }
+    };
 
     obj.selectBody = function(theBody) {
         _myTrackballCenter = getTrackballCenterFromBody(theBody);
         setupTrackball();
-    }
+    };
 
     obj.setTrackballCenter = function(theCenter) {
         _myTrackballCenter = theCenter;
         setupTrackball();
-    }
+    };
 
     obj.getOrientation = function() {
         return _myTrackball.getQuaternion();
-    }
+    };
 
     obj.setOrientation = function(theOrientation) {
         _myTrackball.setQuaternion(theOrientation);
         applyRotation();
-    }
+    };
     //////////////////////////////////////////////////////////////////////
     //
     // private
@@ -251,11 +251,11 @@ TrackballMover.prototype.Constructor = function(obj, theViewport) {
         var myObjectToCenter = difference(myMoverObjectWorldPos, _myTrackballCenter);
         var myPanVector = new Vector3f(dot(myObjectToCenter, myRightVector), dot(myObjectToCenter, myUpVector), 0);
         return myPanVector;
-    }
+    };
 
     obj.setTrackballRadius = function( theRadius ) {
         _myTrackball.setSphereRadius( theRadius );
-    }
+    };
 
     obj.set = function(theOrientation, theRadius, thePanVector) {
         var myNewMatrix = new Matrix4f();
@@ -276,7 +276,7 @@ TrackballMover.prototype.Constructor = function(obj, theViewport) {
         obj.getMoverObject().shear = myDecomposition.shear;
         obj.getMoverObject().scale = myDecomposition.scale;
         obj.update(thePanVector, 0);
-    }
+    };
 
     function applyRotation() {
         var myPanVector = obj.getScreenPanVector();
@@ -309,17 +309,17 @@ TrackballMover.prototype.Constructor = function(obj, theViewport) {
         myProjectionMatrix.invert();
         myProjectionMatrix.postMultiply(myCamera.globalmatrix);
 
-    	var myWorldNearPos = product(myClipNearPos, myProjectionMatrix);
-    	var myWorldFarPos = product(myClipFarPos, myProjectionMatrix);
+        var myWorldNearPos = product(myClipNearPos, myProjectionMatrix);
+        var myWorldFarPos = product(myClipFarPos, myProjectionMatrix);
         var myMouseRay = new Ray(myWorldNearPos, myWorldFarPos);
-
+        
         var myWorld = obj.getWorld();
-    	var myIntersection = nearestIntersection(myWorld, myMouseRay);
-    	if (myIntersection) {
-    	    print("  -> You picked trackball object: " + myIntersection.info.body.name);
-    	    return myIntersection.info.body;
-    	} else {
-    	    return obj.getMoverObject().parentNode;
-    	}
+        var myIntersection = nearestIntersection(myWorld, myMouseRay);
+        if (myIntersection) {
+            print("  -> You picked trackball object: " + myIntersection.info.body.name);
+            return myIntersection.info.body;
+        } else {
+            return obj.getMoverObject().parentNode;
+        }
     }
-}
+};

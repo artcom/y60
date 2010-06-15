@@ -558,6 +558,7 @@ spark.Keyboard.ALT_SHIFT  = spark.Keyboard.ALT | spark.Keyboard.SHIFT;
 spark.Keyboard.CTRL       = 4;
 spark.Keyboard.CTRL_SHIFT = spark.Keyboard.CTRL | spark.Keyboard.SHIFT;
 spark.Keyboard.CTRL_ALT   = spark.Keyboard.CTRL | spark.Keyboard.ALT;
+spark.Keyboard.CTRL_ALT_SHIFT = spark.Keyboard.ALT | spark.Keyboard.SHIFT | spark.Keyboard.CTRL;
 
 spark.KeyboardEvent = spark.Class("KeyboardEvent");
 

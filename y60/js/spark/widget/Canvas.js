@@ -154,17 +154,22 @@ spark.Canvas.Constructor = function(Protected) {
     };
     
     function onKey(theEvent) {
-        // this works because keyboard modifiers are manipulated bitwise
-        if(theEvent.modifiers < spark.Keyboard.CTRL) {
-            return;
-        }
         var myState = (theEvent.type == "keybord-key-down");
-        var myShiftFlag = (theEvent.modifiers == spark.Keyboard.CTRL_SHIFT);
-        Public.getLightManager().onKey(theEvent.key, myState, myShiftFlag);
+        var myShiftFlag = (theEvent.modifiers == spark.Keyboard.SHIFT) ||
+                          (theEvent.modifiers == spark.Keyboard.ALT_SHIFT) ||
+                          (theEvent.modifiers == spark.Keyboard.CTRL_SHIFT) ||
+                          (theEvent.modifiers == spark.Keyboard.CTRL_ALT_SHIFT);
+        var myAltFlag = (theEvent.modifiers == spark.Keyboard.ALT) ||
+                        (theEvent.modifiers == spark.Keyboard.ALT_SHIFT) ||
+                        (theEvent.modifiers == spark.Keyboard.CTRL_ALT) ||
+                        (theEvent.modifiers == spark.Keyboard.CTRL_ALT_SHIFT);
+        // this works because keyboard modifiers are manipulated bitwise
+        var myCtrlFlag = (theEvent.modifiers >= spark.Keyboard.CTRL);
         
+        Public.getLightManager().onKey(theEvent.key, myState, myShiftFlag);
         var myMover = Public.getMover(_myViewport);
         if(myMover) {
-            myMover.onKey(theEvent.key, myState, 0, 0, myShiftFlag, true, false);
+            myMover.onKey(theEvent.key, myState, 0, 0, myShiftFlag, myCtrlFlag, myAltFlag);
         }
     };
     
