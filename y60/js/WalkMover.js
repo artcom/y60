@@ -160,6 +160,10 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
     self.position setter = function (thePosition) {
         _myPosition = thePosition;
     };
+
+    self.rotation setter = function (theRotation) {
+        _myEulerOrientation = theRotation;
+    };
     
     self.movements.rotateXY = function(theDelta) {
         _myEulerOrientation.x += theDelta.y;
