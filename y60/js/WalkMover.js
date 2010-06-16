@@ -210,6 +210,7 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
         _myLastTime = theTime;
     };
 
+    // XXX TODO: the Eventhandling should not be inside the Mover
     self.Mover.onKey = self.onKey;
     self.onKey = function(theKey, theKeyState, theX, theY, theShiftFlag, theControlFlag, theAltFlag) {
         if (theKeyState && theKey == 'h') {
@@ -224,7 +225,6 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
                     _myEyeHeight /= 1.1;
                     _myEyeHeight = Math.max(_myEyeHeight,0);
                 break;
-
             }
         } else {
             if((theKeyState && theControlFlag && theAltFlag) || !theKeyState) {
@@ -234,6 +234,7 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
         self.Mover.onKey(theKey, theKeyState, theX, theY, theShiftFlag, theControlFlag, theAltFlag);
     };
 
+    // XXX TODO: the Eventhandling should not be inside the Mover
     self.Mover.onMouseButton = self.onMouseButton;
     self.onMouseButton = function(theButton, theState, theX, theY) {
         self.Mover.onMouseButton(theButton, theState, theX, theY);
@@ -244,6 +245,7 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
         }
     };
 
+    // XXX TODO: the Eventhandling should not be inside the Mover
     self.onMouseMotion = function(theX, theY) {
         var curNormalizedMousePos = self.getNormalizedScreen(theX, theY);
         if (self.getLeftButtonFlag()) {
@@ -253,6 +255,7 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
         _prevNormalizedMousePosition = curNormalizedMousePos;
     };
 
+    // XXX TODO: the Eventhandling should not be inside the Mover
     self.onMouseWheel = function(theDeltaX, theDeltaY) {
         if (theDeltaY < 0) {
             _myWalkSpeed *= 1.5;
@@ -284,7 +287,7 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
             _myProjectedFrontVector = normalized(projection(_myFrontVector, _myGroundPlane));
             _myProjectedRightVector = normalized(projection(_myRightVector, _myGroundPlane));
         }
-        _myUpVector    = product(MODEL_UP_DIRECTION,    myOrientationMatrix);
+        _myUpVector    = product(MODEL_UP_DIRECTION, myOrientationMatrix);
 
         var myVelocity = new Vector3f(_myVelocity);
 

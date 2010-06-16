@@ -99,12 +99,13 @@ TrackballMover.prototype.Constructor = function(obj, theViewport) {
     //////////////////////////////////////////////////////////////////////
 
     obj.name = "TrackballMover";
-
+    
     obj.setup = function() {
         var myTrackballBody = obj.getMoverObject().parentNode;
         obj.selectBody(myTrackballBody);
     };
 
+    // XXX TODO: the Eventhandling should not be inside the Mover
     obj.Mover.onMouseButton = obj.onMouseButton;
     obj.onMouseButton = function(theButton, theState, theX, theY) {
         obj.Mover.onMouseButton(theButton, theState, theX, theY);
@@ -131,17 +132,31 @@ TrackballMover.prototype.Constructor = function(obj, theViewport) {
         }
     };
 
-    obj.rotate = function(thePrevMousePos, theCurMousePos) {
+    // XXX TODO: the Eventhandling should not be inside the Mover
+    obj.onMouseMotion = function(theX, theY) {
+        var curNormalizedMousePos = obj.getNormalizedScreen(theX, theY);
+        var myDelta = difference(curNormalizedMousePos, _prevNormalizedMousePosition);
+        if (obj.getRightButtonFlag()) {
+            obj.movements.zoom(myDelta[1]);
+        } else if (obj.getMiddleButtonFlag()) {
+            obj.movements.pan(myDelta[0], myDelta[1]);
+        } else if (obj.getLeftButtonFlag()) {
+            obj.movements.rotateByScreenCoordinates(_prevNormalizedMousePosition, curNormalizedMousePos);
+        }
+        _prevNormalizedMousePosition = curNormalizedMousePos;
+    };
+
+    obj.movements.rotateByScreenCoordinates = function(thePrevMousePos, theCurMousePos) {
         _myTrackball.rotate(thePrevMousePos, theCurMousePos);
         applyRotation();
     };
 
-    obj.rotateByQuaternion = function( theQuaternion ) {
+    obj.movements.rotateByQuaternion = function( theQuaternion ) {
         _myTrackball.setQuaternion( product( theQuaternion, _myTrackball.getQuaternion()));
         applyRotation();
     };
 
-    obj.zoom = function(theDelta) {
+    obj.movements.zoom = function(theDelta) {
         var myWorldSize = obj.getWorldSize();
 
         // scale the zoom by distance from camera to picked object
@@ -151,15 +166,15 @@ TrackballMover.prototype.Constructor = function(obj, theViewport) {
         obj.update(myScreenTranslation, 0);
     };
 
-    obj.pan = function(theDeltaX, theDeltaY) {
+    obj.movements.pan = function(theDeltaX, theDeltaY) {
         var myScreenTranslation;
         var myCamera = obj.getViewportCamera();
         if(myCamera.frustum.hfov == 0) {
             // ortho camera
             var myOrthoHeight = (obj.getViewport().height / obj.getViewport().width  ) * myCamera.width;
-            myScreenTranslation = new Vector3f(myCamera.width * theDeltaX,
-                    myOrthoHeight * theDeltaY,
-                    0);
+            myScreenTranslation = new Vector3f( myCamera.width * theDeltaX,
+                                                myOrthoHeight * theDeltaY,
+                                                0);
         } else {
             // divide by two to compensate for range [-1,1] => [0,1]
             var myPanFactor =  getDistanceDependentFactor() /2 ;
@@ -171,19 +186,6 @@ TrackballMover.prototype.Constructor = function(obj, theViewport) {
         }
         obj.update(myScreenTranslation, 0);
         //Logger.warning("Pan:"+obj.getScreenPanVector());
-    };
-
-    obj.onMouseMotion = function(theX, theY) {
-        var curNormalizedMousePos = obj.getNormalizedScreen(theX, theY);
-        var myDelta = difference(curNormalizedMousePos, _prevNormalizedMousePosition);
-        if (obj.getRightButtonFlag()) {
-            obj.zoom(myDelta[1]);
-        } else if (obj.getMiddleButtonFlag()) {
-            obj.pan(myDelta[0], myDelta[1]);
-        } else if (obj.getLeftButtonFlag()) {
-            obj.rotate(_prevNormalizedMousePosition, curNormalizedMousePos);
-        }
-        _prevNormalizedMousePosition = curNormalizedMousePos;
     };
 
     obj.selectBody = function(theBody) {
@@ -204,44 +206,6 @@ TrackballMover.prototype.Constructor = function(obj, theViewport) {
         _myTrackball.setQuaternion(theOrientation);
         applyRotation();
     };
-    //////////////////////////////////////////////////////////////////////
-    //
-    // private
-    //
-    //////////////////////////////////////////////////////////////////////
-
-    function getDistanceDependentFactor(){
-        var toObject = difference(obj.getMoverObject().position, _myTrackballCenter);
-        var myDistanceFactor =  clamp(magnitude(toObject) / obj.getWorldSize(),
-                                MIN_DISTANCE_FACTOR, MAX_DISTANCE_FACTOR);
-        return myDistanceFactor;
-    }
-
-    function setupTrackball() {
-        var myDecomposition = obj.getMoverObject().globalmatrix.decompose();
-        _myTrackball.setQuaternion(myDecomposition.orientation);
-    }
-
-    function getTrackballCenterFromBody(theBody) {
-        if (theBody) {
-            if (theBody.boundingbox.isEmpty) {
-                return theBody.globalmatrix.getRow(3).xyz;
-            } else {
-                return theBody.boundingbox.center;
-            }
-        } else {
-            var myViewVector = product(obj.getMoverObject().globalmatrix.getRow(2).xyz, -1);
-            var myPosition   = obj.getMoverObject().globalmatrix.getTranslation();
-            var myCenterRay  = new Ray(myPosition, myViewVector);
-
-            var myTrackballRadius = 1.0; //_myTrackball.getSphereRadius();
-            var myIntersection = nearestIntersection(obj.getWorld(), myCenterRay);
-            if (myIntersection) {
-            	myTrackballRadius = myIntersection.distance;
-            }
-            return product(myViewVector, myTrackballRadius);
-        }
-    }
 
     obj.getScreenPanVector = function() {
         var myRightVector = obj.getMoverObject().globalmatrix.getRow(0).xyz;
@@ -277,16 +241,54 @@ TrackballMover.prototype.Constructor = function(obj, theViewport) {
         obj.getMoverObject().scale = myDecomposition.scale;
         obj.update(thePanVector, 0);
     };
+    
+    
+    //////////////////////////////////////////////////////////////////////
+    //
+    // private
+    //
+    //////////////////////////////////////////////////////////////////////
+
+    function getDistanceDependentFactor(){
+        var toObject = difference(obj.getMoverObject().position, _myTrackballCenter);
+        var myDistanceFactor =  clamp(magnitude(toObject) / obj.getWorldSize(),
+                                MIN_DISTANCE_FACTOR, MAX_DISTANCE_FACTOR);
+        return myDistanceFactor;
+    }
+
+    function setupTrackball() {
+        var myDecomposition = obj.getMoverObject().globalmatrix.decompose();
+        _myTrackball.setQuaternion(myDecomposition.orientation);
+    }
+
+    function getTrackballCenterFromBody(theBody) {
+        if (theBody) {
+            if (theBody.boundingbox.isEmpty) {
+                return theBody.globalmatrix.getRow(3).xyz;
+            } else {
+                return theBody.boundingbox.center;
+            }
+        } else {
+            var myViewVector = product(obj.getMoverObject().globalmatrix.getRow(2).xyz, -1);
+            var myPosition   = obj.getMoverObject().globalmatrix.getTranslation();
+            var myCenterRay  = new Ray(myPosition, myViewVector);
+
+            var myTrackballRadius = 1.0; //_myTrackball.getSphereRadius();
+            var myIntersection = nearestIntersection(obj.getWorld(), myCenterRay);
+            if (myIntersection) {
+                myTrackballRadius = myIntersection.distance;
+            }
+            return product(myViewVector, myTrackballRadius);
+        }
+    }
 
     function applyRotation() {
         var myPanVector = obj.getScreenPanVector();
         var myWorldTranslation = obj.rotateWithObject(myPanVector).xyz;
         var myMoverObjectWorldPos = obj.getMoverObject().globalmatrix.getRow(3).xyz;
         var myDistance = distance(difference(myMoverObjectWorldPos, myWorldTranslation), _myTrackballCenter);
-        // var deltaRotationMatrix = new Matrix4f(_myTrackball.getQuaternion());
-
+        
         obj.set(_myTrackball.getQuaternion(), myDistance, myPanVector);
-        //Logger.warning("myDistance="+myDistance);
     }
 
     function pickBody(theX, theY) {
