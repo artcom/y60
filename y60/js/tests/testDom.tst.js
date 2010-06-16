@@ -57,20 +57,25 @@
 
 */
 
+/*jslint plusplus:false*/
+/*globals use, print, UnitTestSuite, Node, DPRINT, ENSURE, UnitTest, DTITLE,
+          SUCCESS, Vector3f, gc, DomEvent, ENSURE_EXCEPTION, Vector4f, exit,
+          searchFile*/
+
 use("UnitTest.js");
 
 const XMLDOC_1 = "testDom_tmp_output.xml";
-const XMLDOC_2 = searchFile("testfiles/unicode.xml");
+const XMLDOC_2 = searchFile("fixtures/unicode.xml");
 
 function NodeUnitTest() {
     this.Constructor(this, "NodeUnitTest");
-};
+}
 
-NodeUnitTest.prototype.Constructor = function(obj, theName) {
+NodeUnitTest.prototype.Constructor = function (obj, theName) {
 
     UnitTest.prototype.Constructor(obj, theName);
 
-    obj.run = function() {
+    obj.run = function () {
         DPRINT('Node');
         DPRINT('Node.ELEMENT_NODE');
         ENSURE('Node.ELEMENT_NODE == 1');
@@ -105,7 +110,6 @@ NodeUnitTest.prototype.Constructor = function(obj, theName) {
         DPRINT('obj.myNode.childNode("hello",1)');
         ENSURE('obj.myNode.childNode("hello",1) == undefined');
         ENSURE('obj.myNode.firstChild.lastChild.isSameNode(obj.myNode.childNode("hello").childNode("world2"))');
-
 
         obj.myNodeList = obj.myNode.childNodes;
         DPRINT('obj.myNodeList');
@@ -143,8 +147,8 @@ NodeUnitTest.prototype.Constructor = function(obj, theName) {
         ENSURE('myDocument.firstChild.attrname == "attrvalue"');
         ENSURE('myDocument.firstChild.noattrname == undefined');
 
-        obj.myTestObj = new Object();
-        obj.myTestObj.attrname = new Object();
+        obj.myTestObj = {};
+        obj.myTestObj.attrname = {};
         ENSURE('"attrname" in myTestObj');
         ENSURE('!("noattrname" in myTestObj)');
 
@@ -179,18 +183,18 @@ NodeUnitTest.prototype.Constructor = function(obj, theName) {
         ENSURE('obj.myNode.childNodes.length == 2');
         ENSURE('obj.myNode.firstChild.nodeName == "new"');
         ENSURE('obj.myNode.lastChild.nodeName == "order"');
-    }
-}
+    };
+};
 
 function SchemaUnitTest() {
     this.Constructor(this, "SchemaUnitTest");
 }
 
-SchemaUnitTest.prototype.Constructor = function(obj, theName) {
+SchemaUnitTest.prototype.Constructor = function (obj, theName) {
 
     UnitTest.prototype.Constructor(obj, theName);
 
-    obj.run = function() {
+    obj.run = function () {
     //TODO: repair cast to bool
 
         obj.myDocument = new Node();
@@ -199,71 +203,71 @@ SchemaUnitTest.prototype.Constructor = function(obj, theName) {
         ENSURE('!myDocument.ok');
 
         DTITLE("Starting 2nd Schema tests");
+        // TODO load string from fixture
         obj.mySchema = new Node(
-            "<xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'>"
-            +"   <xs:simpleType name='Vector3f'>\n"
-            +"       <xs:restriction base='xs:string' />\n"
-            +"   </xs:simpleType>\n"
-            +"    <xs:element name='scene'>\n"
-            +"        <xs:complexType>\n"
-            +"            <xs:sequence>\n"
-            +"                <xs:element name='shapes' type='xs:int'/>\n"
-            +"                <xs:element name='materials' type='xs:int'/>\n"
-            +"                <xs:element ref='worlds'/>\n"
-            +"                <xs:element ref='uvset'/>\n"
-            +"                <xs:element name='newchild' type='xs:int'/>\n"
-            +"            </xs:sequence>\n"
-            +"            <xs:attribute name='version' type='xs:unsignedLong'/>\n"
-            +"            <xs:attribute name='newattr' type='xs:unsignedLong'/>\n"
-            +"            <xs:attribute name='size' type='Vector3f'/>\n"
-            +"        </xs:complexType>\n"
-            +"    </xs:element>\n"
-            +"    <xs:element name='worlds'>\n"
-            +"        <xs:complexType>\n"
-            +"            <xs:sequence minOccurs='0' maxOccurs='unbounded'>\n"
-            +"                <xs:element ref='world' />\n"
-            +"            </xs:sequence>\n"
-            +"        </xs:complexType>\n"
-            +"    </xs:element>\n"
-            +"    <xs:element name='world'>\n"
-            +"        <xs:complexType>\n"
-            +"            <xs:sequence minOccurs='0' maxOccurs='unbounded'>\n"
-//                        +"                <xs:element name='node' type='xs:hexBinary'/>\n"
-            +"                <xs:element name='node' type='xs:string'/>\n"
-            +"            </xs:sequence>\n"
-            +"            <xs:attribute name='id' type='xs:ID' />\n"
-            +"            <xs:attribute name='next' type='xs:IDREF' />\n"
-            +"            <xs:attribute name='name' type='xs:string' />\n"
-            +"        </xs:complexType>\n"
-            +"    </xs:element>\n"
-            +"    <xs:element name='uvset'>\n"
-            +"        <xs:complexType>\n"
-            +"            <xs:simpleContent>\n"
-            +"                <xs:extension base='xs:int'>\n"
-            +"                    <xs:attribute name='name' type='xs:ID' />\n"
-            +"                </xs:extension>\n"
-            +"            </xs:simpleContent>\n"
-            +"        </xs:complexType>\n"
-            +"    </xs:element>\n"
-            +"</xs:schema>\n"
-        );
+            "<xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'>" +
+            "   <xs:simpleType name='Vector3f'>\n" +
+            "       <xs:restriction base='xs:string' />\n" +
+            "   </xs:simpleType>\n" +
+            "    <xs:element name='scene'>\n" +
+            "        <xs:complexType>\n" +
+            "            <xs:sequence>\n" +
+            "                <xs:element name='shapes' type='xs:int'/>\n" +
+            "                <xs:element name='materials' type='xs:int'/>\n" +
+            "                <xs:element ref='worlds'/>\n" +
+            "                <xs:element ref='uvset'/>\n" +
+            "                <xs:element name='newchild' type='xs:int'/>\n" +
+            "            </xs:sequence>\n" +
+            "            <xs:attribute name='version' type='xs:unsignedLong'/>\n" +
+            "            <xs:attribute name='newattr' type='xs:unsignedLong'/>\n" +
+            "            <xs:attribute name='size' type='Vector3f'/>\n" +
+            "        </xs:complexType>\n" +
+            "    </xs:element>\n" +
+            "    <xs:element name='worlds'>\n" +
+            "        <xs:complexType>\n" +
+            "            <xs:sequence minOccurs='0' maxOccurs='unbounded'>\n" +
+            "                <xs:element ref='world' />\n" +
+            "            </xs:sequence>\n" +
+            "        </xs:complexType>\n" +
+            "    </xs:element>\n" +
+            "    <xs:element name='world'>\n" +
+            "        <xs:complexType>\n" +
+            "            <xs:sequence minOccurs='0' maxOccurs='unbounded'>\n" +
+//                       +"                <xs:element name='node' type='xs:hexBinary'/>\n"
+            "                <xs:element name='node' type='xs:string'/>\n" +
+            "            </xs:sequence>\n" +
+            "            <xs:attribute name='id' type='xs:ID' />\n" +
+            "            <xs:attribute name='next' type='xs:IDREF' />\n" +
+            "            <xs:attribute name='name' type='xs:string' />\n" +
+            "        </xs:complexType>\n" +
+            "    </xs:element>\n" +
+            "    <xs:element name='uvset'>\n" +
+            "        <xs:complexType>\n" +
+            "            <xs:simpleContent>\n" +
+            "                <xs:extension base='xs:int'>\n" +
+            "                    <xs:attribute name='name' type='xs:ID' />\n" +
+            "                </xs:extension>\n" +
+            "            </xs:simpleContent>\n" +
+            "        </xs:complexType>\n" +
+            "    </xs:element>\n" +
+            "</xs:schema>\n");
         ENSURE('mySchema.ok');
         obj.myDocument = Node.createDocument();
         obj.myDocument.useFactories("w3c-schema,som");
-        obj.myDocument.addSchema(obj.mySchema,"");
+        obj.myDocument.addSchema(obj.mySchema, "");
         SUCCESS("added Schema");
         DPRINT('obj.myDocument.schema');
+        // TODO load string from fixture
         obj.myDocument.parse(
-            "<scene version='214' size='[1,2,3]'>"
-            +"    <shapes>12345</shapes>\n"
-            +"    <materials/>\n"
-            +"    <worlds>\n"
-            +"       <world id='world1' name='myFirstWorld' next='world2'/>\n"
-            +"       <world id='world2' name='mySecondWorld'/>\n"
-            +"  </worlds>\n"
-            +"  <uvset name='bla'>23</uvset>\n"
-            +"</scene>\n"
-            );
+            "<scene version='214' size='[1,2,3]'>" +
+            "    <shapes>12345</shapes>\n" +
+            "    <materials/>\n" +
+            "    <worlds>\n" +
+            "       <world id='world1' name='myFirstWorld' next='world2'/>\n" +
+            "       <world id='world2' name='mySecondWorld'/>\n" +
+            "  </worlds>\n" +
+            "  <uvset name='bla'>23</uvset>\n" +
+            "</scene>\n");
         ENSURE('myDocument.ok');
         //myDocument.getSchema()->dump();
         ENSURE('myDocument.firstChild.nodeName == "scene"');
@@ -283,7 +287,7 @@ SchemaUnitTest.prototype.Constructor = function(obj, theName) {
         ENSURE('myScene.nodeName == "scene"');
         ENSURE('almostEqual(myScene.size,new Vector3f(1,2,3))');
         obj.mySceneSize = obj.myScene.size;
-        obj.mySceneSize.value = new Vector3f(2,3,4);
+        obj.mySceneSize.value = new Vector3f(2, 3, 4);
         ENSURE('almostEqual(mySceneSize,new Vector3f(2,3,4))');
         ENSURE('almostEqual(myScene.size,new Vector3f(2,3,4))');
 
@@ -291,46 +295,47 @@ SchemaUnitTest.prototype.Constructor = function(obj, theName) {
         ENSURE('myScene.find("//world").name == "myFirstWorld"');
         ENSURE('myScene.find("//world").$next.name == "mySecondWorld"');
 
-
         obj.myScene = obj.myDocument.firstChild;
         print(obj.myScene.childNodes);
         print(obj.myScene.attributes);
         obj.myVersionAttrNode = obj.myScene.attributes.getNamedItem("version");
         obj.myUVSet = obj.myScene.find("//uvset").firstChild;
 
-        ENSURE("myVersionAttrNode.isSameNode(myScene.getAttributeNode('version'))");;
+        ENSURE("myVersionAttrNode.isSameNode(myScene.getAttributeNode('version'))");
         //obj.myVersionAttrNode.nodeValueDependsOn(obj.myDocument.firstChild.firstChild.firstChild);
 
-        print("onReconnect="+obj.myVersionAttrNode.onReconnect);
-        obj.myVersionAttrNode.onReconnect = function() {
+        print("onReconnect=" + obj.myVersionAttrNode.onReconnect);
+        obj.myVersionAttrNode.onReconnect = function () {
             print("onReconnect:");
-            print("nodeValueDependsOn: root = "+this.rootNode.nodeName);
-            print("nodeValueDependsOn:"+this.rootNode.find("//uvset").firstChild);
+            print("nodeValueDependsOn: root = " + this.rootNode.nodeName);
+            print("nodeValueDependsOn:" + this.rootNode.find("//uvset").firstChild);
             this.nodeValueDependsOn(this.rootNode.find("//uvset").firstChild);
         };
-        print("onReconnect="+obj.myVersionAttrNode.onReconnect);
+        print("onReconnect=" + obj.myVersionAttrNode.onReconnect);
 
-        print("onOutdatedValue="+obj.myVersionAttrNode.onOutdatedValue);
-        obj.myVersionAttrNode.onOutdatedValue = function() {
-            print("recalculating myVersionAttrNode, this="+this);
+        print("onOutdatedValue=" + obj.myVersionAttrNode.onOutdatedValue);
+        obj.myVersionAttrNode.onOutdatedValue = function () {
+            print("recalculating myVersionAttrNode, this=" + this);
             this.nodeValue = this.rootNode.find("//uvset").firstChild.nodeValue * 10;
         };
-        print("onOutdatedValue="+obj.myVersionAttrNode.onOutdatedValue);
+        print("onOutdatedValue=" + obj.myVersionAttrNode.onOutdatedValue);
 
-        print("onSetValue="+obj.myVersionAttrNode.onSetValue);
-        obj.myVersionAttrNode.onSetValue = function() {print("onSet, this="+this)};
-        print("onSetValue="+obj.myVersionAttrNode.onSetValue);
+        print("onSetValue=" + obj.myVersionAttrNode.onSetValue);
+        obj.myVersionAttrNode.onSetValue = function () {
+            print("onSet, this=" + this);
+        };
+        print("onSetValue=" + obj.myVersionAttrNode.onSetValue);
 
         gc();
-        print("onReconnect="+obj.myVersionAttrNode.onReconnect);
-        print("onOutdatedValue="+obj.myVersionAttrNode.onOutdatedValue);
-        print("onSetValue="+obj.myVersionAttrNode.onSetValue);
+        print("onReconnect=" + obj.myVersionAttrNode.onReconnect);
+        print("onOutdatedValue=" + obj.myVersionAttrNode.onOutdatedValue);
+        print("onSetValue=" + obj.myVersionAttrNode.onSetValue);
 
-        obj.myDocument.firstChild.firstChild.firstChild.onSetValue = function() {
-            print("scene version onSetValue("+this.nodeValue+")");
-        }
-        obj.myUVSet.onSetValue = function() {
-            print("UVSet onSetValue("+this.nodeValue+")");
+        obj.myDocument.firstChild.firstChild.firstChild.onSetValue = function () {
+            print("scene version onSetValue(" + this.nodeValue + ")");
+        };
+        obj.myUVSet.onSetValue = function () {
+            print("UVSet onSetValue(" + this.nodeValue + ")");
         };
         print("reading myVersionAttrNode.nodeValue");
         print(obj.myVersionAttrNode.nodeValue);
@@ -360,24 +365,23 @@ SchemaUnitTest.prototype.Constructor = function(obj, theName) {
             print(obj.myScene.attributes[i]);
         }
         //exit(1);
-    }
-}
+    };
+};
 
 function DomParseUnitTest() {
     this.Constructor(this, "DomParseUnitTest");
 }
 
-DomParseUnitTest.prototype.Constructor = function(obj, theName) {
+DomParseUnitTest.prototype.Constructor = function (obj, theName) {
 
     UnitTest.prototype.Constructor(obj, theName);
 
-
-    obj.run = function() {
+    obj.run = function () {
         obj.myDocument = Node.createDocument();
 
         // Test parsing of quoted characters
         obj.myDocument.parse('<hello myattr="&lt;p&gt;">world&lt;p&gt;&amp;</hello>');
-        print("myDoc="+obj.myDocument);
+        print("myDoc=" + obj.myDocument);
         ENSURE('obj.myDocument.firstChild.nodeName == "hello"');
         ENSURE('obj.myDocument.firstChild.myattr == "<p>"');
         ENSURE('obj.myDocument.firstChild.firstChild.nodeValue == "world<p>&"');
@@ -395,118 +399,115 @@ DomParseUnitTest.prototype.Constructor = function(obj, theName) {
 
         var myXMLDoc = new Node();
         myXMLDoc.parseFile(XMLDOC_2);
-        var myXMLNode = myXMLDoc.firstChild;
-
-        var myUnicode = myXMLNode.firstChild.firstChild.firstChild.nodeValue;
-    }
-}
+        //var myXMLNode = myXMLDoc.firstChild;
+        //var myUnicode = myXMLNode.firstChild.firstChild.firstChild.nodeValue;
+    };
+};
 
 function DomEventTest() {
     this.Constructor(this, "DomEventTest");
 }
 
-DomEventTest.prototype.Constructor = function(obj, theName) {
+DomEventTest.prototype.Constructor = function (obj, theName) {
     UnitTest.prototype.Constructor(obj, theName);
 
-    obj.run = function() {
+    obj.run = function () {
         obj.myDocument = Node.createDocument();
-        obj.myDocument.parse('<test name="root">\
-                              <child1 name="child1">\
-                              <child2 name="child2">\
-                              <child3 name="child3"></child3></child2></child1>\
-                              </test>');
+        // TODO load string from fixture
+        obj.myDocument.parse('<test name="root">\n' + 
+                              '<child1 name="child1">\n' +
+                              '<child2 name="child2">\n' +
+                              '<child3 name="child3"></child3></child2></child1>\n' +
+                              '</test>');
         var myChildNode1 = obj.myDocument.childNode(0).childNode(0);
         var myChildNode2 = myChildNode1.childNode(0);
         var myChildNode3 = myChildNode2.childNode(0);
-        var myVector = new Vector3f(0,1,2);
-        var myDomEvent = new DomEvent("testEvent", myVector, true, false, 0.0);
+        var myVector     = new Vector3f(0, 1, 2);
+        var myDomEvent   = new DomEvent("testEvent", myVector, true, false, 0.0);
         //ENSURE = print;
         ENSURE(myDomEvent.stopPropagation());
         ENSURE(myDomEvent.preventDefault());
-        ENSURE(myDomEvent.type == "testEvent");
-        ENSURE(myDomEvent.eventPhase == 1);
-        ENSURE(myDomEvent.bubbles == true);
-        ENSURE(myDomEvent.cancelable == false);
-        ENSURE(myDomEvent.isDefaultPrevented == true);
+        ENSURE(myDomEvent.type === "testEvent");
+        ENSURE(myDomEvent.eventPhase === 1);
+        ENSURE(myDomEvent.bubbles === true);
+        ENSURE(myDomEvent.cancelable === false);
+        ENSURE(myDomEvent.isDefaultPrevented === true);
 
         myChildNode2.addEventListener("testEvent", obj, true, "handleEvent");
         myChildNode3.dispatchEvent(myDomEvent);
-    }
+    };
 
-    obj.handleEvent = function(theEvent) {
+    obj.handleEvent = function (theEvent) {
         print("eventListener: " + theEvent);
-    }
-}
+    };
+};
+
 function ValueUnitTest() {
     this.Constructor(this, "SchemaUnitTest");
 }
 
-ValueUnitTest.prototype.Constructor = function(obj, theName) {
+ValueUnitTest.prototype.Constructor = function (obj, theName) {
 
     UnitTest.prototype.Constructor(obj, theName);
 
-    obj.run = function() {
+    obj.run = function () {
         DTITLE("Starting Vector Value Tests");
-        obj.mySchema = new Node(
-                                "<xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'>"
-                                +"   <xs:simpleType name='Vector3f'>\n"
-                                +"       <xs:restriction base='xs:string' />\n"
-                                +"   </xs:simpleType>\n"
-                                +"   <xs:simpleType name='VectorOfVector3f'>\n"
-                                +"       <xs:restriction base='xs:string' />\n"
-                                +"   </xs:simpleType>\n"
-                                +"   <xs:simpleType name='VectorOfFloat'>\n"
-                                +"       <xs:restriction base='xs:string' />\n"
-                                +"   </xs:simpleType>\n"
-                                +"    <xs:element name='scene'>\n"
-                                +"        <xs:complexType>\n"
-                                +"            <xs:sequence>\n"
-                                +"                <xs:element ref='vectoroffloat'/>\n"
-                                +"                <xs:element ref='vectorofvector3f'/>\n"
-                                +"            </xs:sequence>\n"
-                                +"            <xs:attribute name='version' type='xs:unsignedLong'/>\n"
-                                +"           <xs:attribute name=\"id\" type=\"xs:ID\"/>\n"
-                                +"        </xs:complexType>\n"
-                                +"    </xs:element>\n"
-
-                                +"    <xs:element name=\"vectorofvector3f\">\n"
-                                +"        <xs:complexType>\n"
-                                +"            <xs:simpleContent>\n"
-                                +"                <xs:extension base=\"VectorOfVector3f\">\n"
-                                +"                    <xs:attribute name=\"id\" type=\"xs:ID\"/>\n"
-                                +"                    <xs:attribute name=\"name\" type=\"xs:string\"/>\n"
-                                +"                </xs:extension>\n"
-                                +"            </xs:simpleContent>\n"
-                                +"        </xs:complexType>\n"
-                                +"    </xs:element>\n"
-                                +"    <xs:element name=\"vectoroffloat\">\n"
-                                +"        <xs:complexType>\n"
-                                +"            <xs:simpleContent>\n"
-                                +"                <xs:extension base=\"VectorOfFloat\">\n"
-                                +"                    <xs:attribute name=\"id\" type=\"xs:ID\"/>\n"
-                                +"                    <xs:attribute name=\"name\" type=\"xs:string\"/>\n"
-                                +"                </xs:extension>\n"
-                                +"            </xs:simpleContent>\n"
-                                +"        </xs:complexType>\n"
-                                +"    </xs:element>\n"
-                                +"</xs:schema>\n"
-                                );
+        // TODO load from fixture
+        obj.mySchema = new Node("<xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'>" +
+                                "   <xs:simpleType name='Vector3f'>\n" +
+                                "       <xs:restriction base='xs:string' />\n" +
+                                "   </xs:simpleType>\n" +
+                                "   <xs:simpleType name='VectorOfVector3f'>\n" +
+                                "       <xs:restriction base='xs:string' />\n" +
+                                "   </xs:simpleType>\n" +
+                                "   <xs:simpleType name='VectorOfFloat'>\n" +
+                                "       <xs:restriction base='xs:string' />\n" +
+                                "   </xs:simpleType>\n" +
+                                "    <xs:element name='scene'>\n" +
+                                "        <xs:complexType>\n" +
+                                "            <xs:sequence>\n" +
+                                "                <xs:element ref='vectoroffloat'/>\n" +
+                                "                <xs:element ref='vectorofvector3f'/>\n" +
+                                "            </xs:sequence>\n" +
+                                "            <xs:attribute name='version' type='xs:unsignedLong'/>\n" +
+                                "           <xs:attribute name=\"id\" type=\"xs:ID\"/>\n" +
+                                "        </xs:complexType>\n" +
+                                "    </xs:element>\n" +
+                                "    <xs:element name=\"vectorofvector3f\">\n" +
+                                "        <xs:complexType>\n" +
+                                "            <xs:simpleContent>\n" +
+                                "                <xs:extension base=\"VectorOfVector3f\">\n" +
+                                "                    <xs:attribute name=\"id\" type=\"xs:ID\"/>\n" +
+                                "                    <xs:attribute name=\"name\" type=\"xs:string\"/>\n" +
+                                "                </xs:extension>\n" +
+                                "            </xs:simpleContent>\n" +
+                                "        </xs:complexType>\n" +
+                                "    </xs:element>\n" +
+                                "    <xs:element name=\"vectoroffloat\">\n" +
+                                "        <xs:complexType>\n" +
+                                "            <xs:simpleContent>\n" +
+                                "                <xs:extension base=\"VectorOfFloat\">\n" +
+                                "                    <xs:attribute name=\"id\" type=\"xs:ID\"/>\n" +
+                                "                    <xs:attribute name=\"name\" type=\"xs:string\"/>\n" +
+                                "                </xs:extension>\n" +
+                                "            </xs:simpleContent>\n" +
+                                "        </xs:complexType>\n" +
+                                "    </xs:element>\n" +
+                                "</xs:schema>\n");
         ENSURE('mySchema.ok');
         obj.myDocument = Node.createDocument();
         obj.myDocument.useFactories("w3c-schema,som");
-        obj.myDocument.addSchema(obj.mySchema,"");
+        obj.myDocument.addSchema(obj.mySchema, "");
         SUCCESS("added Schema");
         DPRINT('obj.myDocument.schema');
-        obj.myDocument.parse(
-                              "<scene version='214'>"
-                             +"       <vectorofvector3f id='iv' name='vectors'>\n"
-                             +"       [[0,0,0],[1,1,1]]"
-                             +"    </vectorofvector3f>"
-                             +"       <vectoroffloat id='fv' name='floats'>\n"
-                             +"       [0,1,2,3]"
-                             +"    </vectoroffloat>"
-                             +"</scene>\n"
-                             );
+        obj.myDocument.parse("<scene version='214'>" +
+                             "       <vectorofvector3f id='iv' name='vectors'>\n" +
+                             "       [[0,0,0],[1,1,1]]" +
+                             "    </vectorofvector3f>" +
+                             "       <vectoroffloat id='fv' name='floats'>\n" +
+                             "       [0,1,2,3]" +
+                             "    </vectoroffloat>" +
+                             "</scene>\n");
         ENSURE('myDocument.ok');
         //myDocument.getSchema()->dump();
         ENSURE('myDocument.firstChild.nodeName == "scene"');
@@ -519,13 +520,13 @@ ValueUnitTest.prototype.Constructor = function(obj, theName) {
         ENSURE('myFloatVectorNode.nodeValueTypeName == "VectorOfFloat"');
 
         obj.myFloatVector = obj.myFloatVectorNode.nodeValue;
-        obj.myFullList = obj.myFloatVector.getList(0,obj.myFloatVector.length);
+        obj.myFullList = obj.myFloatVector.getList(0, obj.myFloatVector.length);
         ENSURE("myFullList.length == myFloatVector.length");
         ENSURE("myFloatVector[0] == 0");
         ENSURE("myFloatVector.getItem(0) == 0");
-        obj.myFloatVector.setItem(0,5);
+        obj.myFloatVector.setItem(0, 5);
         ENSURE("myFloatVector.getItem(0) == 5");
-        obj.myFloatVector.setItem(0,0);
+        obj.myFloatVector.setItem(0, 0);
         obj.myFloatVector.appendList(obj.myFullList);
         ENSURE("myFullList.length*2 == myFloatVector.length");
         ENSURE("myFullList.length*2 == obj.myFloatVectorNode.nodeValue.length");
@@ -533,28 +534,27 @@ ValueUnitTest.prototype.Constructor = function(obj, theName) {
         obj.myFloatVector.eraseList(0, obj.myFullList.length);
         ENSURE("myFullList.length == myFloatVector.length");
         obj.myFloatVector.eraseItem(0);
-        obj.myFloatVector.eraseItem(obj.myFloatVector.length-1);
+        obj.myFloatVector.eraseItem(obj.myFloatVector.length - 1);
         ENSURE("myFullList.length - 2 == myFloatVector.length");
         ENSURE_EXCEPTION("myFloatVector.eraseItem(myFloatVector.length)");
         obj.myFloatVector.eraseList(0, obj.myFloatVector.length);
         ENSURE("0 == myFloatVector.length");
         obj.myFloatVector.appendItem(23);
         ENSURE("myFloatVector.getItem(0) == 23");
-        obj.myFloatVector.insertItemBefore(0,42);
+        obj.myFloatVector.insertItemBefore(0, 42);
         ENSURE("myFloatVector.getItem(0) == 42");
-        obj.myFloatVector.insertListBefore(0,obj.myFullList);
+        obj.myFloatVector.insertListBefore(0, obj.myFullList);
         ENSURE("myFullList.length + 2 == myFloatVector.length");
 
         obj.myFloatVector.eraseList(0, obj.myFloatVector.length);
-        obj.myFloatVector.appendList(new Vector4f(0,1,2,3));
+        obj.myFloatVector.appendList(new Vector4f(0, 1, 2, 3));
         SUCCESS("appendList(new Vector4f(0,1,2,3))");
         ENSURE("4 == myFloatVector.length");
-        obj.myFloatVector.appendList([0,1,2,3]);
+        obj.myFloatVector.appendList([0, 1, 2, 3]);
         SUCCESS("appendList([0,1,2,3])");
         ENSURE("8 == myFloatVector.length");
-
-    }
-}
+    };
+};
 
 var myTestName = "testDOM.tst.js";
 var mySuite = new UnitTestSuite(myTestName);
@@ -566,5 +566,5 @@ mySuite.addTest(new NodeUnitTest());
 mySuite.addTest(new ValueUnitTest());
 mySuite.run();
 
-print(">> Finished test suite '"+myTestName+"', return status = " + mySuite.returnStatus() + "");
+print(">> Finished test suite '" + myTestName + "', return status = " + mySuite.returnStatus() + "");
 exit(mySuite.returnStatus());

@@ -56,6 +56,11 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+/*jslint */
+/*globals use, UnitTest, Node, ENSURE, Vector4f, DPRINT, Vector2f,
+          ImageOverlay, RenderWindow, Overlay, print, UnitTestSuite,
+          exit, arrayToString*/
+
 // TODO:
 // - Test parent handling
 
@@ -69,25 +74,25 @@ function OverlayUnitTest() {
     this.Constructor(this, "OverlayUnitTest");
 }
 
-OverlayUnitTest.prototype.Constructor = function(obj, theName) {
+OverlayUnitTest.prototype.Constructor = function (obj, theName) {
 
     UnitTest.prototype.Constructor(obj, theName);
 
     obj.myDummyOverlay = null;
     obj.myScene     = null;
 
-    obj.getAttribute = function(theNode, theAttributeName) {
+    obj.getAttribute = function (theNode, theAttributeName) {
         var myNode = new Node(theNode).firstChild;
         return myNode[theAttributeName];
         /*
         var myRegExp = new RegExp(theAttributeName + '=\\"(.\\w)\\"');
         myRegExp.exec(String(theNode));
         return RegExp.$1;*/
-    }
+    };
 
-    obj.getLastOverlay = function() {
+    obj.getLastOverlay = function () {
         return obj.myScene.dom.find(".//overlays").lastChild;
-    }
+    };
 
     function testCommonProperties(thePosition, theSize, theColor) {
         // Test toString operator
@@ -106,7 +111,7 @@ OverlayUnitTest.prototype.Constructor = function(obj, theName) {
         obj.myOverlay.material = obj.myMaterialNode;
 
         // Test color convenience property
-        obj.myOverlay.color = new Vector4f(4,3,2,1);
+        obj.myOverlay.color = new Vector4f(4, 3, 2, 1);
         obj.myColor = obj.myOverlay.material.find(".//*[@name='surfacecolor']").firstChild.nodeValue;
         ENSURE('almostEqual(obj.myOverlay.color, obj.myColor)');
 
@@ -156,15 +161,15 @@ OverlayUnitTest.prototype.Constructor = function(obj, theName) {
         ENSURE('!obj.myOverlay.visible');
 
         ENSURE('almostEqual(obj.myOverlay.position, ' + arrayToString(thePosition) + ')');
-        obj.myOverlay.position = new Vector2f(2,1);
+        obj.myOverlay.position = new Vector2f(2, 1);
         ENSURE('almostEqual(obj.myOverlay.position, [2,1])');
 
         ENSURE('almostEqual(obj.myOverlay.srcorigin, [0,0])');
-        obj.myOverlay.srcorigin = new Vector2f(1,2);
+        obj.myOverlay.srcorigin = new Vector2f(1, 2);
         ENSURE('almostEqual(obj.myOverlay.srcorigin, [1,2])');
 
         ENSURE('almostEqual(obj.myOverlay.srcsize, [1,1])');
-        obj.myOverlay.srcsize = new Vector2f(3,4);
+        obj.myOverlay.srcsize = new Vector2f(3, 4);
         ENSURE('almostEqual(obj.myOverlay.srcsize, [3,4])');
 
         ENSURE('obj.myOverlay.alpha == 1');
@@ -180,7 +185,7 @@ OverlayUnitTest.prototype.Constructor = function(obj, theName) {
         ENSURE('obj.myOverlay.height == 10');
 
         ENSURE('almostEqual(obj.myOverlay.bordercolor, [0,0,0,1])');
-        obj.myOverlay.bordercolor = new Vector4f(1,2,3,4);
+        obj.myOverlay.bordercolor = new Vector4f(1, 2, 3, 4);
         ENSURE('almostEqual(obj.myOverlay.bordercolor, [1,2,3,4])');
 
         ENSURE('obj.myOverlay.borderwidth == 1');
@@ -214,18 +219,17 @@ OverlayUnitTest.prototype.Constructor = function(obj, theName) {
         ENSURE('String(obj.myOverlay) != String(obj.getLastOverlay())');
     }
 
-    obj.run = function() {
+    obj.run = function () {
         // Create empty scene
         window = new RenderWindow();
 
-        obj.myScene = window.scene;
-        var myViewport = obj.myScene.dom.find(".//viewport");
-        obj.myDummyOverlay = new ImageOverlay(obj.myScene, "testfiles/black.rgb");
+        obj.myScene        = window.scene;
+        obj.myDummyOverlay = new ImageOverlay(obj.myScene, "fixtures/black.rgb");
         obj.myDummyImageId = obj.myScene.images.lastChild.id;
-        obj.myOverlay = new Overlay(obj.myScene, new Vector4f(1,2,3,1), [10, 20], [100,200]);
+        obj.myOverlay      = new Overlay(obj.myScene, new Vector4f(1, 2, 3, 1), [10, 20], [100, 200]);
         //testCommonProperties([10,20], [100,200], [1,2,3,1]);
 
-        obj.myOverlay = new ImageOverlay(obj.myScene, "testfiles/DiffuseRamp.png", [30, 40]);
+        obj.myOverlay = new ImageOverlay(obj.myScene, "fixtures/DiffuseRamp.png", [30, 40]);
         obj.myImageId = obj.myScene.images.lastChild.id;
         //testCommonProperties([30,40], [32,1], [1,1,1,1]);
 
@@ -235,14 +239,14 @@ OverlayUnitTest.prototype.Constructor = function(obj, theName) {
         //
         ///////////////////////////////////////////////////////////////////////////////////////
 
-        var mySources = ["testfiles/black.rgb", "testfiles/DiffuseRamp.png"];
+        var mySources = ["fixtures/black.rgb", "fixtures/DiffuseRamp.png"];
         obj.myMultiOverlay = new ImageOverlay(obj.myScene, mySources);
         ENSURE('obj.myMultiOverlay.images.length == 2');
 
-        obj.myMultiOverlay.position = new Vector2f(300,300);
+        obj.myMultiOverlay.position = new Vector2f(300, 300);
 
         var myImages = obj.myMultiOverlay.images;
-        myImages.push( obj.myMultiOverlay.images[0].cloneNode(true) );
+        myImages.push(obj.myMultiOverlay.images[0].cloneNode(true));
         // the following wont work, we modified images in place
         // ENSURE('obj.myMultiOverlay.images.length == 2');
         obj.myMultiOverlay.images = myImages;
@@ -265,10 +269,8 @@ OverlayUnitTest.prototype.Constructor = function(obj, theName) {
 
         ENSURE('obj.myTextureNode.image == obj.myOverlay.texture.image');
         ENSURE('obj.myTextureNode.image == obj.myOverlay.image.id');
-
-
-    }
-}
+    };
+};
 
 function main() {
     var myTestName = "testOverlay.tst.js";
@@ -277,11 +279,10 @@ function main() {
     mySuite.addTest(new OverlayUnitTest());
     mySuite.run();
 
-    print(">> Finished test suite '"+myTestName+"', return status = " + mySuite.returnStatus() + "");
+    print(">> Finished test suite '" + myTestName + "', return status = " + mySuite.returnStatus() + "");
     return mySuite.returnStatus();
 }
 
-if (main() != 0) {
+if (main() !== 0) {
     exit(1);
 }
-
