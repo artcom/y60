@@ -75,7 +75,9 @@ spark.loadFile = function(theFile, theParent) {
     }
     var myNode = new Node();
     myNode.parseFile(myFileWithPath);
-    return spark.loadDocument(myNode, theParent);
+    var myComponent = spark.loadDocument(myNode, theParent);
+    myComponent._sparkFile_ = theFile;
+    return myComponent;
 };
 
 /**
