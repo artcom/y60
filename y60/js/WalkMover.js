@@ -83,7 +83,6 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
     const MODEL_RIGHT_DIRECTION    = cross(MODEL_FRONT_DIRECTION, MODEL_UP_DIRECTION);
     const INITIAL_WALK_SPEED       = 0.01; // percentage of world size per second
     const INITIAL_EYEHEIGHT        = 200;
-    const ROTATE_SPEED             = 1.0;
     const GRAVITY                  = 9.81;
     const PERSON_MASS              = 100;
     const GRAVITY_DIRECTION        = product(MODEL_UP_DIRECTION,-1);
