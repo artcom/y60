@@ -141,9 +141,9 @@ TrackballMover.prototype.Constructor = function(obj, theViewport) {
         _prevMousePosition = new Vector3f(theX, theY, 0);
     };
 
-    obj.movements.rotateByScreenCoordinates = function(thePrevMousePos, theCurMousePos) {
-        var prevNormalizedMousePos = obj.getNormalizedScreen(thePrevMousePos[0], thePrevMousePos[1]);
-        var curNormalizedMousePos = obj.getNormalizedScreen(theCurMousePos[0], theCurMousePos[1]);
+    obj.movements.rotateByScreenCoordinates = function(thePrevMousePos, theCurrentPos) {
+        var prevNormalizedMousePos = obj.getNormalizedScreen(thePreviousPos[0], thePreviousPos[1]);
+        var curNormalizedMousePos = obj.getNormalizedScreen(theCurrentPos[0], theCurrentPos[1]);
         _myTrackball.rotate(prevNormalizedMousePos, curNormalizedMousePos);
         applyRotation();
     };
@@ -153,10 +153,8 @@ TrackballMover.prototype.Constructor = function(obj, theViewport) {
         applyRotation();
     };
     
-    obj.movements.zoomByScreenCoordinates = function(thePrevMousePos, theCurMousePos) {
-        var prevNormalizedMousePos = obj.getNormalizedScreen(thePrevMousePos[0], thePrevMousePos[1]);
-        var curNormalizedMousePos = obj.getNormalizedScreen(theCurMousePos[0], theCurMousePos[1]);
-        var myDelta = difference(curNormalizedMousePos, prevNormalizedMousePos);
+    obj.movements.zoomByScreenCoordinates = function(thePreviousPos, theCurrentPos) {
+        var myDelta = obj.getNormalizedDifference(thePreviousPos, theCurrentPos);
         obj.movements.zoom(myDelta[1]);
     };
 
@@ -170,10 +168,8 @@ TrackballMover.prototype.Constructor = function(obj, theViewport) {
         obj.update(myScreenTranslation, 0);
     };
 
-    obj.movements.panByScreenCoordinates = function(thePrevMousePos, theCurMousePos) {
-        var prevNormalizedMousePos = obj.getNormalizedScreen(thePrevMousePos[0], thePrevMousePos[1]);
-        var curNormalizedMousePos = obj.getNormalizedScreen(theCurMousePos[0], theCurMousePos[1]);
-        var myDelta = difference(curNormalizedMousePos, prevNormalizedMousePos);
+    obj.movements.panByScreenCoordinates = function(thePreviousPos, theCurrentPos) {
+        var myDelta = obj.getNormalizedDifference(thePreviousPos, theCurrentPos);
         obj.movements.pan(myDelta[0], myDelta[1]);
     };
 
