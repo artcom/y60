@@ -186,7 +186,7 @@ FlyMover.prototype.Constructor = function(self, theViewport) {
         _myPitchAngle = setZeroZone(_myPitchAngle, 0.02);
     };
     
-    
+    // XXX TODO: the Eventhandling should not be inside the Mover
     self.onFrame = function(theTime) {
         if (!_myLastIdleTime) {
             _myLastIdleTime = theTime;
@@ -197,6 +197,7 @@ FlyMover.prototype.Constructor = function(self, theViewport) {
         _myLastIdleTime = theTime;
     };
     
+    // XXX TODO: the Eventhandling should not be inside the Mover
     self.onMouseButton = function(theButton, theState, theX, theY) {
         if (theState != BUTTON_UP) {
             return;
@@ -216,6 +217,7 @@ FlyMover.prototype.Constructor = function(self, theViewport) {
         }
     };
     
+    // XXX TODO: the Eventhandling should not be inside the Mover
     self.onMouseMotion = function(theX, theY) {
         self.setCameraAnglesByScreenCoordinates(theX, theY);
     };

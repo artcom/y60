@@ -80,17 +80,14 @@ TrackballMover.prototype.Constructor = function(obj, theViewport) {
     MoverBase.prototype.Constructor(obj, theViewport);
     obj.Mover = [];
 
-
-    const PAN_SPEED           = 1;
-    const ZOOM_SPEED          = 1;
     const MAX_DISTANCE_FACTOR = 10.0;
     const MIN_DISTANCE_FACTOR = 0.1;
 
     //////////////////////////////////////////////////////////////////////
 
-    var _myTrackball            = new Trackball();
-    var _myTrackballCenter      = new Point3f(0,0,0);
-    var _prevNormalizedMousePosition = new Vector3f(0,0,0); // [-1..1]
+    var _myTrackball        = new Trackball();
+    var _myTrackballCenter  = new Point3f(0,0,0);
+    var _prevMousePosition  = new Vector3f(0,0,0);
 
     //////////////////////////////////////////////////////////////////////
     //
@@ -125,29 +122,29 @@ TrackballMover.prototype.Constructor = function(obj, theViewport) {
                     obj.selectBody(myTrackedBody);
                     applyRotation();
                 }
-                _prevNormalizedMousePosition = obj.getNormalizedScreen(theX, theY);
+                _prevMousePosition = new Vector3f(theX, theY, 0);
             } else { // Button Up
-                _prevNormalizedMousePosition = new Vector3f(0,0,0);
+                _prevMousePosition = new Vector3f(0,0,0);
             }
         }
     };
 
     // XXX TODO: the Eventhandling should not be inside the Mover
     obj.onMouseMotion = function(theX, theY) {
-        var curNormalizedMousePos = obj.getNormalizedScreen(theX, theY);
-        var myDelta = difference(curNormalizedMousePos, _prevNormalizedMousePosition);
         if (obj.getRightButtonFlag()) {
-            obj.movements.zoom(myDelta[1]);
+            obj.movements.zoomByScreenCoordinates(_prevMousePosition, new Vector3f(theX, theY, 0));
         } else if (obj.getMiddleButtonFlag()) {
-            obj.movements.pan(myDelta[0], myDelta[1]);
+            obj.movements.panByScreenCoordinates(_prevMousePosition, new Vector3f(theX, theY, 0));
         } else if (obj.getLeftButtonFlag()) {
-            obj.movements.rotateByScreenCoordinates(_prevNormalizedMousePosition, curNormalizedMousePos);
+            obj.movements.rotateByScreenCoordinates(_prevMousePosition, new Vector3f(theX, theY, 0));
         }
-        _prevNormalizedMousePosition = curNormalizedMousePos;
+        _prevMousePosition = new Vector3f(theX, theY, 0);
     };
 
     obj.movements.rotateByScreenCoordinates = function(thePrevMousePos, theCurMousePos) {
-        _myTrackball.rotate(thePrevMousePos, theCurMousePos);
+        var prevNormalizedMousePos = obj.getNormalizedScreen(thePrevMousePos[0], thePrevMousePos[1]);
+        var curNormalizedMousePos = obj.getNormalizedScreen(theCurMousePos[0], theCurMousePos[1]);
+        _myTrackball.rotate(prevNormalizedMousePos, curNormalizedMousePos);
         applyRotation();
     };
 
@@ -155,15 +152,29 @@ TrackballMover.prototype.Constructor = function(obj, theViewport) {
         _myTrackball.setQuaternion( product( theQuaternion, _myTrackball.getQuaternion()));
         applyRotation();
     };
+    
+    obj.movements.zoomByScreenCoordinates = function(thePrevMousePos, theCurMousePos) {
+        var prevNormalizedMousePos = obj.getNormalizedScreen(thePrevMousePos[0], thePrevMousePos[1]);
+        var curNormalizedMousePos = obj.getNormalizedScreen(theCurMousePos[0], theCurMousePos[1]);
+        var myDelta = difference(curNormalizedMousePos, prevNormalizedMousePos);
+        obj.movements.zoom(myDelta[1]);
+    };
 
     obj.movements.zoom = function(theDelta) {
         var myWorldSize = obj.getWorldSize();
 
         // scale the zoom by distance from camera to picked object
         var myZoomFactor =  getDistanceDependentFactor();
-        var myScreenTranslation = new Vector3f(0, 0, -theDelta * myWorldSize * myZoomFactor / ZOOM_SPEED);
+        var myScreenTranslation = new Vector3f(0, 0, -theDelta * myWorldSize * myZoomFactor);
 
         obj.update(myScreenTranslation, 0);
+    };
+
+    obj.movements.panByScreenCoordinates = function(thePrevMousePos, theCurMousePos) {
+        var prevNormalizedMousePos = obj.getNormalizedScreen(thePrevMousePos[0], thePrevMousePos[1]);
+        var curNormalizedMousePos = obj.getNormalizedScreen(theCurMousePos[0], theCurMousePos[1]);
+        var myDelta = difference(curNormalizedMousePos, prevNormalizedMousePos);
+        obj.movements.pan(myDelta[0], myDelta[1]);
     };
 
     obj.movements.pan = function(theDeltaX, theDeltaY) {
@@ -177,12 +188,12 @@ TrackballMover.prototype.Constructor = function(obj, theViewport) {
                                                 0);
         } else {
             // divide by two to compensate for range [-1,1] => [0,1]
-            var myPanFactor =  getDistanceDependentFactor() /2 ;
+            var myPanFactor =  getDistanceDependentFactor() / 2;
             var myWorldSize = obj.getWorldSize();
             var myScreenTranslation = new Vector3f(0, 0, 0);
             // negate to move camera (not object)
-            myScreenTranslation.x = -theDeltaX * myWorldSize * myPanFactor / PAN_SPEED;
-            myScreenTranslation.y = -theDeltaY * myWorldSize * myPanFactor / PAN_SPEED;
+            myScreenTranslation.x = -theDeltaX * myWorldSize * myPanFactor;
+            myScreenTranslation.y = -theDeltaY * myWorldSize * myPanFactor;
         }
         obj.update(myScreenTranslation, 0);
         //Logger.warning("Pan:"+obj.getScreenPanVector());
@@ -249,7 +260,7 @@ TrackballMover.prototype.Constructor = function(obj, theViewport) {
     //
     //////////////////////////////////////////////////////////////////////
 
-    function getDistanceDependentFactor(){
+    function getDistanceDependentFactor() {
         var toObject = difference(obj.getMoverObject().position, _myTrackballCenter);
         var myDistanceFactor =  clamp(magnitude(toObject) / obj.getWorldSize(),
                                 MIN_DISTANCE_FACTOR, MAX_DISTANCE_FACTOR);
