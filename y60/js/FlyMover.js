@@ -73,14 +73,13 @@ FlyMover.prototype.Constructor = function(self, theViewport) {
     MoverBase.prototype.Constructor(self, theViewport);
     self.Mover = [];
 
-    const TURN_SPEED        = 1;
     const INITIAL_FLY_SPEED = 0.001;
     const MINIMUM_AUTO_ADJUST_WORLD_SIZE_PERCENTAGE = 0.0001;
 
     //////////////////////////////////////////////////////////////////////
 
-    var _myMousePosX         = 0;
-    var _myMousePosY         = 0;
+    var _myHeadingAngle     = 0;
+    var _myPitchAngle       = 0;
     var _myLastIdleTime      = null;
 
     var _myFlySpeed          = 0;
@@ -93,102 +92,133 @@ FlyMover.prototype.Constructor = function(self, theViewport) {
     //////////////////////////////////////////////////////////////////////
 
     self.name = "FlyMover";
+    
+    self.flySpeed getter = function() {
+        return _myFlySpeed;
+    };
+    self.flySpeed setter = function(theSpeed) {
+        _myFlySpeed = theSpeed;
+    };
+    
+    self.headingAngle setter = function(theAngleInRadiant) {
+        _myHeadingAngle = theAngleInRadiant;
+    };
+    self.headingAngle getter = function() {
+        return _myHeadingAngle;
+    };
+    
+    self.pitchAngle setter = function(theAngleInRadiant) {
+        _myPitchAngle = theAngleInRadiant;
+    };
+    self.pitchAngle getter = function() {
+        return _myPitchAngle;
+    };
 
     self.Mover.reset = self.reset;
     self.reset = function() {
         self.Mover.reset();
         _myFlySpeed = 0;
         _myCurrentStartSpeed = 1;
-    }
+    };
 
-    self.stop = function() {_myFlySpeed = 0;}
-
-    self.onFrame = function(theTime) {
-        if (!_myLastIdleTime) {
-            _myLastIdleTime = theTime;
-            return;
-        }
-
-        var myDeltaTime = theTime - _myLastIdleTime;
-
+    self.stop = function() {_myFlySpeed = 0;};
+    
+    self.simulate = function(theDeltaTime) {
         if (_myFlySpeed) {
-            //print(magnitude(self.getMoverObject().position));
-            //print("ws: " + myWorldSize + " pos: " + magnitude(self.getMoverObject().position));
             var myWorldSize = self.getWorldSize();
             var myDistance = magnitude(self.getMoverObject().position);
+            // adjust flight speed corresponding to world center
             if (myDistance < myWorldSize * MINIMUM_AUTO_ADJUST_WORLD_SIZE_PERCENTAGE) {
                 myDistance = myWorldSize * MINIMUM_AUTO_ADJUST_WORLD_SIZE_PERCENTAGE;
             }
             var myAdjustmentFactor = myDistance / myWorldSize;
-            var myAdjustedFlySpeed = _myFlySpeed * myAdjustmentFactor; // / magnitude(self.getMoverObject().position);
-
-            var myMouseX = 2 * (0.5 - (_myMousePosX / window.width));
-            var myMouseY = 2 * (0.5 - (_myMousePosY / window.height));
-
-            myMouseX = setZeroZone(myMouseX, 0.02);
-            myMouseY = setZeroZone(myMouseY, 0.02);
-
-            var deltaHeading = new Quaternionf(new Vector3f(0,1,0), TURN_SPEED * myDeltaTime * myMouseX * Math.abs(myMouseX));
-            var deltaPitch = new Quaternionf(new Vector3f(1,0,0), TURN_SPEED * myDeltaTime * myMouseY * Math.abs(myMouseY));
+            var myAdjustedFlySpeed = _myFlySpeed * myAdjustmentFactor;
+            
+            var deltaHeading = new Quaternionf(new Vector3f(0,1,0), theDeltaTime * _myHeadingAngle);
+            var deltaPitch = new Quaternionf(new Vector3f(1,0,0), theDeltaTime * _myPitchAngle);
+            
             var prevOrientaion = new Quaternionf(self.getMoverObject().orientation);
             var newOrientation = new Quaternionf(deltaPitch);
             newOrientation.multiply(prevOrientaion);
             newOrientation.multiply(deltaHeading);
             self.getMoverObject().orientation = newOrientation;
-            var myWorldHeading = TURN_SPEED * myMouseX * Math.abs(myMouseX);
-
+            var myWorldHeading = _myHeadingAngle * Math.abs(_myHeadingAngle);
+            
             // fly in negative z (forward)
-            var myWorldTranslation = new Vector3f(0, 0, -myAdjustedFlySpeed * myDeltaTime);
+            var myWorldTranslation = new Vector3f(0, 0, -myAdjustedFlySpeed * theDeltaTime);
             self.update(myWorldTranslation, 0);
         }
-
+    };
+    
+    self.increaseFlySpeed = function(theSpeedFactor) {
+        if (_myFlySpeed >= _myCurrentStartSpeed) {
+            _myFlySpeed = _myFlySpeed * theSpeedFactor;
+        } else if (_myFlySpeed <= -_myCurrentStartSpeed) {
+            _myFlySpeed = _myFlySpeed / theSpeedFactor;
+        } else {
+            _myFlySpeed          = self.getWorldSize() * INITIAL_FLY_SPEED;
+            _myCurrentStartSpeed = self.getWorldSize() * INITIAL_FLY_SPEED;
+        }
+        if (_myFlySpeed < _myCurrentStartSpeed && _myFlySpeed > - _myCurrentStartSpeed) {
+            _myFlySpeed = 0;
+        }
+    };
+    
+    self.decreaseFlySpeed = function(theSpeedFactor) {
+        if (_myFlySpeed <= - _myCurrentStartSpeed) {
+            _myFlySpeed = _myFlySpeed * theSpeedFactor;
+        } else if (_myFlySpeed >= _myCurrentStartSpeed) {
+            _myFlySpeed = _myFlySpeed / theSpeedFactor;
+        } else {
+            _myFlySpeed          = - self.getWorldSize() * INITIAL_FLY_SPEED;
+            _myCurrentStartSpeed =   self.getWorldSize() * INITIAL_FLY_SPEED;
+        }
+        if (_myFlySpeed < _myCurrentStartSpeed && _myFlySpeed > - _myCurrentStartSpeed) {
+            _myFlySpeed = 0;
+        }
+    };
+    
+    self.setCameraAnglesByScreenCoordinates = function(theX, theY) {
+        _myHeadingAngle = 2 * (0.5 - (theX / self.getViewport().width));
+        _myPitchAngle = 2 * (0.5 - (theY / self.getViewport().height));
+        
+        _myHeadingAngle = setZeroZone(_myHeadingAngle, 0.02);
+        _myPitchAngle = setZeroZone(_myPitchAngle, 0.02);
+    };
+    
+    
+    self.onFrame = function(theTime) {
+        if (!_myLastIdleTime) {
+            _myLastIdleTime = theTime;
+            return;
+        }
+        var myDeltaTime = theTime - _myLastIdleTime;
+        self.simulate(myDeltaTime);
         _myLastIdleTime = theTime;
-    }
-
+    };
+    
     self.onMouseButton = function(theButton, theState, theX, theY) {
         if (theState != BUTTON_UP) {
             return;
         }
-
         switch (theButton) {
             case LEFT_BUTTON :
-                if (_myFlySpeed >= _myCurrentStartSpeed) {
-                    _myFlySpeed = _myFlySpeed * 1.5;
-                } else if (_myFlySpeed <= -_myCurrentStartSpeed) {
-                    _myFlySpeed = _myFlySpeed / 1.5;
-                } else {
-                    _myFlySpeed          = self.getWorldSize() * INITIAL_FLY_SPEED;
-                    _myCurrentStartSpeed = self.getWorldSize() * INITIAL_FLY_SPEED;
-                }
+                self.increaseFlySpeed(1.5);
                 break;
             case MIDDLE_BUTTON :
                 _myFlySpeed = 0;
                 break;
             case RIGHT_BUTTON :
-                if (_myFlySpeed <= - _myCurrentStartSpeed) {
-                    _myFlySpeed = _myFlySpeed  * 1.5;
-                } else if (_myFlySpeed >= _myCurrentStartSpeed) {
-                    _myFlySpeed = _myFlySpeed / 1.5;
-                } else {
-                    _myFlySpeed          = - self.getWorldSize() * INITIAL_FLY_SPEED;
-                    _myCurrentStartSpeed =   self.getWorldSize() * INITIAL_FLY_SPEED;
-                }
+                self.decreaseFlySpeed(1.5);
                 break;
             default:
                 return;
         }
-
-        if (_myFlySpeed < _myCurrentStartSpeed && _myFlySpeed > - _myCurrentStartSpeed) {
-            _myFlySpeed = 0;
-        }
-
-        //print("Fly speed: " + _myFlySpeed.toFixed(2) + " m/s");
-    }
-
+    };
+    
     self.onMouseMotion = function(theX, theY) {
-        _myMousePosX = theX;
-        _myMousePosY = theY;
-    }
+        self.setCameraAnglesByScreenCoordinates(theX, theY);
+    };
 
     //////////////////////////////////////////////////////////////////////
     //
@@ -205,4 +235,4 @@ FlyMover.prototype.Constructor = function(self, theViewport) {
         }
         return 0;
     }
-}
+};
