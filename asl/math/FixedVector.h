@@ -45,6 +45,7 @@
 
 #include "VectorManipulator.h"
 #include "numeric_functions.h"
+#include <asl/base/string_functions.h>
 
 #include <iostream>
 
@@ -444,6 +445,41 @@ std::ostream & printVector(std::ostream &os, const T & v,
     return os << theEndToken;
 }
 
+// specialized element parsing to handle numeric underflow
+// gracefully
+
+inline std::istream & parseElement(std::istream & is, float & e, const char stopChar) {
+    std::string buffer;
+    getline(is, buffer, stopChar);
+    if (!asl::fromString(buffer, e)) { // this handles underflow gracefully
+        is.setstate(std::ios::failbit);
+    }
+    return is;
+}
+
+inline std::istream & parseElement(std::istream & is, double & e, const char stopChar) {
+    std::string buffer;
+    getline(is, buffer, stopChar);
+    if (!asl::fromString(buffer, e)) { // this handles underflow gracefully
+        is.setstate(std::ios::failbit);
+    }
+    return is;
+}
+
+// generic element parsing.
+// uses streams to parse - this allows nested structes (e.g. VectorofVector3f)
+template <class T>
+std::istream & parseElement(std::istream & is, T & e, const char stopChar)
+{
+    is >> e; // parse element
+    char myChar; // check whether next char is the expected stop char
+    is >> myChar;
+    if (myChar != stopChar) {
+        is.setstate(std::ios::failbit);
+    }
+    return is;
+}
+
 template <class T>
 std::istream & parseVector(std::istream & is, T & v,
                            const char theStartToken = '[',
@@ -460,17 +496,8 @@ std::istream & parseVector(std::istream & is, T & v,
 
     typename T::size_type mySize = v.size();
     for (typename T::size_type i = 0; i < mySize; ++i) {
-        is >> v[i];
-
+        parseElement(is, v[i], (i < mySize-1) ? theDelimiter : theEndToken);
         if (!is) {
-            is.setstate(std::ios::failbit);
-            return is;
-        }
-
-        is >> myChar;
-        if (((i < mySize - 1) &&  myChar != theDelimiter) ||
-                ((i == mySize - 1) &&  myChar != theEndToken))
-        {
             is.setstate(std::ios::failbit);
             return is;
         }

@@ -60,6 +60,9 @@ namespace asl {
 
     DEFINE_EXCEPTION(BufferTooSmall, asl::Exception);
 
+    ASL_BASE_DECL bool fromString(const std::string & theString, float & outValue);
+    ASL_BASE_DECL bool fromString(const std::string & theString, double & outValue);
+    
     /// return every type that has a operator>>(ostream) as string
 #ifdef _SETTING_USE_STRSTREAM_INSTEAD_OF_STRINGSTREAM_
     template <class T>

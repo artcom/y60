@@ -23,6 +23,9 @@
 #include "string_functions.h"
 
 #include <cstring>
+#include <errno.h>
+#include <stdlib.h>
+#include <math.h>
 
 using namespace std;
 
@@ -54,6 +57,43 @@ namespace asl {
             return true;
         }
         return false;
+    }
+
+    bool fromString(const std::string & theString, float & outValue) {
+        errno = 0;
+        char * end = 0;
+        outValue = strtof(theString.c_str(), &end);
+
+		// if errno = ERANGE, then we have an over- or underflow.
+		// if its an overflow, outValue will be very big (positive or negative infinity)
+		// if its an underflow, outValue will be almost zero
+        if (errno == ERANGE && fabsf(outValue) < 1.0f) { 
+          return true; // underflow
+        }
+        if (errno != 0) {
+            return false; // some other error while parsing
+        }
+        if (end && *end !='\0') { // trailing chars
+            return false;
+        }
+        return true; // all ok
+    }
+
+    bool fromString(const std::string & theString, double & outValue) {
+        errno = 0;
+        char * end = 0;
+        outValue = strtod(theString.c_str(), &end);
+
+        if (errno == ERANGE && fabs(outValue) < 1.0) { 
+          return true; // underflow
+        }
+        if (errno != 0) {
+            return false; // some other error while parsing
+        }
+        if (end && *end !='\0') { // trailing chars
+            return false;
+        }
+        return true; // all ok
     }
 
     bool
