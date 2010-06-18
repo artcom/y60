@@ -97,14 +97,6 @@ spark.StretchyImage.Constructor = function(Protected) {
         //Public.texture.mag_filter = "nearest";
         
 
-        Base.originSetter = Public.__lookupSetter__("origin");
-        Public.origin setter = function (theOrigin) {
-           Base.originSetter(theOrigin);
-           if (theOrigin.x !== 0 || theOrigin.y !== 0 || theOrigin.z !== 0) {
-                Logger.warning("non zero origin is not implemented for " + Public._className_ + " yet");
-           }
-        };
-        
         Base.imageSetter = Public.__lookupSetter__("image");
         Public.image setter = function (theImage) {
            Base.imageSetter(theImage);
@@ -123,11 +115,6 @@ spark.StretchyImage.Constructor = function(Protected) {
            Base.heightSetter(theHeight);
            updateGeometry(new Vector2f(Public.width, theHeight));
         };
-
-        var myOrigin = Protected.getVector3f("origin", new Vector3f(0,0,0))
-        if (myOrigin.x !== 0 || myOrigin.y !== 0 || myOrigin.z !== 0) {
-            Logger.warning("non zero origin is not implemented for " + Public._className_ + " yet");
-        }
 
         initMembers();
         setupGeometry();
@@ -183,33 +170,34 @@ spark.StretchyImage.Constructor = function(Protected) {
     function updateGeometry(theSize, theUVCoordFlag) {
         var myWidth = theSize.x;
         var myHeight = theSize.y; 
+        var o = Public.origin;
         var v = 0;
         for (var i = 0; i < _myVerticesPerSide.y; ++i) {
             for (var j = 0; j < _myVerticesPerSide.x; ++j) {
                 v = i * _myVerticesPerSide.x + j;
-                var myX = 0;
-                var myY = 0;
+                var myX = -o.x;
+                var myY = -o.y;
                 if (j === 0) {
-                    myX = 0;
+                    myX = -o.x;
                 } else if (j === _myVerticesPerSide.x -3) {
-                    myX = _myEdgeLeft;
+                    myX = -o.x + _myEdgeLeft;
                 } else if (j === _myVerticesPerSide.x -2) {
-                    myX = myWidth - _myEdgeRight;
+                    myX = myWidth - o.x - _myEdgeRight;
                 } else if (j === _myVerticesPerSide.x -1) {
-                    myX = myWidth;
+                    myX = myWidth - o.x;
                 }
                 if (i === 0) {
-                    myY = 0;
+                    myY = -o.y;
                 } else if (i === _myVerticesPerSide.y -3) {
-                    myY = _myEdgeBottom;
+                    myY = -o.y + _myEdgeBottom;
                 } else if (i === _myVerticesPerSide.y -2) {
-                    myY = myHeight - _myEdgeTop;
+                    myY = myHeight - o.y - _myEdgeTop;
                 } else if (i === _myVerticesPerSide.y -1) {
-                    myY = myHeight;
+                    myY = myHeight - o.y;
                 }
                 Protected.vertices[v] = [myX, myY, 0];
                 if (theUVCoordFlag) {
-                    _myUVCoords[v] = [myX/myWidth, 1 - myY/myHeight];
+                    _myUVCoords[v] = [(myX + o.x)/myWidth, 1 - (myY + o.y)/myHeight];
                 }
             }
         }

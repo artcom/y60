@@ -266,7 +266,7 @@ function GetterOverride(theName, theFunction) {
         return theFunction.call(this, myNextGetter);
     };
 
-    this.__defineGetter__(theName); // FIXME this is invalid. What probably was intended: this.__defineGetter__(theName, myWrapper);
+    this.__defineGetter__(theName, myWrapper); 
 }
 
 /**
@@ -313,10 +313,10 @@ function SetterOverride(theName, theFunction) {
     }
 
     var myWrapper = function(theValue) {
-        theFunction.call(this, theValue, theNextSetter); // theNextSetter is not defined. Would need a closure or something like that.
+        theFunction.call(this, theValue, myNextSetter);
     };
 
-    this.__defineSetter__(theName, theFunction);
+    this.__defineSetter__(theName, myWrapper);
 }
 
 /**
