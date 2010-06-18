@@ -60,6 +60,11 @@ public:
             ENSURE(*(myVec.begin()+1) == 3);
             ENSURE(myVec.end() - myVec.begin() == 2);
         }
+        {
+            // string conversion tests
+            ENSURE(asl::almostEqual(as<Vec2T>("[0,0]"), Vec2(0,0))); 
+            ENSURE(asl::almostEqual(as<Vec2T>("[-1e-1000,0]"), Vec2(0,0))); // underflow test 
+        }
        {
             const Vec2T myVec(Vec2(2,3));
             ENSURE(myVec[0]==2);
