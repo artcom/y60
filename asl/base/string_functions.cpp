@@ -59,6 +59,7 @@ namespace asl {
         return false;
     }
 
+#ifdef _SETTING_FLOAT_ISTREAM_UNDERFLOW_WORKAROUND_
     bool fromString(const std::string & theString, float & outValue) {
         errno = 0;
         char * end = 0;
@@ -95,6 +96,7 @@ namespace asl {
         }
         return true; // all ok
     }
+#endif
 
     bool
     hex_to_num(char digit, unsigned int & num) {
