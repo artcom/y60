@@ -445,6 +445,7 @@ std::ostream & printVector(std::ostream &os, const T & v,
     return os << theEndToken;
 }
 
+#ifdef _SETTING_FLOAT_ISTREAM_UNDERFLOW_WORKAROUND_
 // specialized element parsing to handle numeric underflow
 // gracefully
 
@@ -465,7 +466,7 @@ inline std::istream & parseElement(std::istream & is, double & e, const char sto
     }
     return is;
 }
-
+#endif
 // generic element parsing.
 // uses streams to parse - this allows nested structes (e.g. VectorofVector3f)
 template <class T>
