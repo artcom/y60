@@ -138,6 +138,8 @@ namespace asl {
 
     // Debug symbols too long for std::map etc. in MSVC 6.0
     #define _SETTING_DISABLE_LONG_DEBUG_SYMBOL_WARNING_
+    #define _SETTING_FLOAT_ISTREAM_UNDERFLOW_WORKAROUND_
+    #define _SETTING_NO_STRTOF_
     const char theDirectorySeparator = '\\';
 #else
     const char theDirectorySeparator = '/';
