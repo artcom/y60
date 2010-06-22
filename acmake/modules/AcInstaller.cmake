@@ -93,9 +93,9 @@ macro(_ac_init_installer_shortcuts)
     endif(WIN32)
 endmacro(_ac_init_installer_shortcuts)
 
-macro(ac_add_installer_shortcut NAME ICON DESCRIPTION WORKINGDIR COMMAND ARGUMENTS)
+macro(ac_add_installer_shortcut NAME ICON DESCRIPTION WORKINGDIR COMMAND ARGUMENTS COMMAND_DIR)
     if(WIN32)
-        file(APPEND ${ACMAKE_SHORTCUT_FILE} "defineShortcut(\"${NAME}\", \"${ICON}\", \"${DESCRIPTION}\", \"${WORKINGDIR}\", \"${COMMAND}\", \"${ARGUMENTS}\")\n")
+        file(APPEND ${ACMAKE_SHORTCUT_FILE} "defineShortcut(\"${NAME}\", \"${ICON}\", \"${DESCRIPTION}\", \"${WORKINGDIR}\", \"${COMMAND}\", \"${ARGUMENTS}\", \"${COMMAND_DIR}\")\n")
     endif(WIN32)
 endmacro(ac_add_installer_shortcut)
 

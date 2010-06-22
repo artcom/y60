@@ -177,6 +177,9 @@ macro(y60_add_launcher NAME)
              FILES ${THIS_LAUNCHER_DESKTOP_FILE}
              COMPONENT ${APPLICATION}
              DESTINATION share/applications
+             PERMISSIONS OWNER_EXECUTE GROUP_EXECUTE WORLD_EXECUTE
+                         OWNER_READ    GROUP_READ    WORLD_READ
+                         OWNER_WRITE
          )
     endif(LINUX)
 
@@ -196,15 +199,95 @@ macro(y60_add_launcher NAME)
                          OWNER_WRITE
          )
 
-         ac_add_installer_shortcut(${NAME} "" "" "" "bin\\\\\\\\${NAME}.bat" "")
+         ac_add_installer_shortcut(${NAME} "" "" "" "bin\\\\\\\\${NAME}.bat" "" "")
     endif(WIN32)
 endmacro(y60_add_launcher)
+
+macro(y60_add_watchdog_launcher NAME)
+    parse_arguments(
+        THIS_LAUNCHER
+        "BINARY_NAME;DESCRIPTION;CONFIG_FILE;INSTALL_DIR;MIME_TYPES"
+        ""
+        ${ARGN}
+    )
+
+    set(APPLICATION ${Y60_CURRENT_APPLICATION})
+
+    # if we are in an independent app, this will have been defined
+    # if it wasn't, then get it from project globals
+    if(NOT Y60_CMAKE_DIR)
+        get_global(Y60_CMAKE_DIR Y60_CMAKE_DIR)
+    endif(NOT Y60_CMAKE_DIR)
+
+    get_global(${APPLICATION}_BUILD_PATH   THIS_APPLICATION_BUILD_PATH)
+    get_global(${APPLICATION}_INSTALL_PATH THIS_APPLICATION_INSTALL_PATH)
+    get_global(${APPLICATION}_BINARY_DIR   THIS_APPLICATION_BINARY_DIR)
+    get_global(${APPLICATION}_SOURCE_DIR   THIS_APPLICATION_SOURCE_DIR)
+
+    set(THIS_LAUNCHER_NAME "${NAME}")
+
+    if(NOT THIS_LAUNCHER_BINARY_NAME)
+        set(THIS_LAUNCHER_BINARY_NAME watchdog)
+    endif(NOT THIS_LAUNCHER_BINARY_NAME)
+
+    if(NOT THIS_LAUNCHER_CONFIG_FILE)
+        set(THIS_LAUNCHER_CONFIG_FILE watchdog.xml)
+    endif(NOT THIS_LAUNCHER_CONFIG_FILE)
+    y60_add_asset(${THIS_LAUNCHER_CONFIG_FILE})
+
+    if(NOT THIS_LAUNCHER_INSTALL_DIR)
+        set(THIS_LAUNCHER_INSTALL_DIR /opt/ART+COM)
+    endif(NOT THIS_LAUNCHER_INSTALL_DIR)
+
+    if(UNIX)
+        set(THIS_LAUNCHER_LAUNCH_FILE ${CMAKE_CURRENT_BINARY_DIR}/${ACMAKE_BINARY_SUBDIR}/${THIS_LAUNCHER_NAME})
+        file(WRITE  ${THIS_LAUNCHER_LAUNCH_FILE} "#!/bin/sh\n")
+        file(APPEND ${THIS_LAUNCHER_LAUNCH_FILE} "cd ../lib/${APPLICATION}\n")
+        file(APPEND ${THIS_LAUNCHER_LAUNCH_FILE} "${THIS_LAUNCHER_BINARY_NAME} --configfile ${THIS_LAUNCHER_CONFIG_FILE}\n")
+        install(
+             FILES ${THIS_LAUNCHER_LAUNCH_FILE}
+             COMPONENT ${APPLICATION}
+             DESTINATION bin/
+             PERMISSIONS OWNER_EXECUTE GROUP_EXECUTE WORLD_EXECUTE
+                         OWNER_READ    GROUP_READ    WORLD_READ
+                         OWNER_WRITE
+        )
+    endif(UNIX)
+
+    if(LINUX)
+         # generate xdg desktop entry
+         set(THIS_LAUNCHER_DESKTOP_FILE ${CMAKE_CURRENT_BINARY_DIR}/${THIS_LAUNCHER_NAME}.desktop)
+
+         file(WRITE  ${THIS_LAUNCHER_DESKTOP_FILE} "[Desktop Entry]\n")
+         file(APPEND ${THIS_LAUNCHER_DESKTOP_FILE} "Type=Application\n")
+         file(APPEND ${THIS_LAUNCHER_DESKTOP_FILE} "Name=${THIS_LAUNCHER_NAME}\n")
+         file(APPEND ${THIS_LAUNCHER_DESKTOP_FILE} "Path=${THIS_LAUNCHER_INSTALL_DIR}/${APPLICATION}\n")
+         file(APPEND ${THIS_LAUNCHER_DESKTOP_FILE} "TryExec=${THIS_LAUNCHER_BINARY_NAME}\n")
+         file(APPEND ${THIS_LAUNCHER_DESKTOP_FILE} "Exec=${THIS_LAUNCHER_BINARY_NAME} --configfile ${THIS_LAUNCHER_CONFIG_FILE} %U\n")
+         if(THIS_LAUNCHER_MIME_TYPES)
+             file(APPEND ${THIS_LAUNCHER_DESKTOP_FILE} "MimeType=${THIS_LAUNCHER_MIME_TYPES}\n")
+         endif(THIS_LAUNCHER_MIME_TYPES)
+
+         install(
+             FILES ${THIS_LAUNCHER_DESKTOP_FILE}
+             COMPONENT ${APPLICATION}
+             DESTINATION share/applications
+             PERMISSIONS OWNER_EXECUTE GROUP_EXECUTE WORLD_EXECUTE
+                         OWNER_READ    GROUP_READ    WORLD_READ
+                         OWNER_WRITE
+         )
+    endif(LINUX)
+
+    if(WIN32)
+        # XXX: last argument COMMAND_DIR is a relative path to the watchdog
+        ac_add_installer_shortcut("${NAME}" "" "" "lib\\\\\\\\${APPLICATION}"  "${THIS_LAUNCHER_BINARY_NAME}" "--configfile ${THIS_LAUNCHER_CONFIG_FILE}" "\\\\\\\\..\\\\\\\\PRO60\\\\\\\\bin\\\\\\\\")
+    endif(WIN32)
+endmacro(y60_add_watchdog_launcher)
 
 function(y60_end_application NAME)
     if(NOT Y60_CURRENT_APPLICATION)
         message(FATAL_ERROR "Trying to end Y60 application ${NAME} before it started")
     endif(NOT Y60_CURRENT_APPLICATION)
-
     get_global(${NAME}_BUILD_PATH BUILD_PATH)
     get_global(${NAME}_INSTALL_PATH INSTALL_PATH)
 
