@@ -107,7 +107,7 @@ SemaphoreUnitTest::run() {
 
     string msg = string("waiting 2 secs takes roughly twice as long as waiting 1 sec. waited ")
                + as_string(2*diff1) + " vs. " + as_string(diff2) + " milliseconds.";
-    ENSURE_MSG(abs(2*diff1 - diff2) < 100, msg.c_str());
+    ENSURE_MSG(abs(long(2*diff1 - diff2)) < 100, msg.c_str());
 
     ENSURE_MSG(true, "Waiting for 3 seconds");
     ENSURE_MSG(!_mySecondSemaphore.wait(3000), "Timeout works.");
