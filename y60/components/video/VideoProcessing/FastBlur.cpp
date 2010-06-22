@@ -119,7 +119,7 @@ namespace y60 {
         GRAYRaster::const_iterator itSrc = mySourceFrame->begin();
         unsigned int i=0;
 
-        for (itSrc; itSrc != mySourceFrame->end(); ++itSrc, ++i) {
+        for (; itSrc != mySourceFrame->end(); ++itSrc, ++i) {
             _myFloatImage[i] = static_cast<float>((*itSrc).get());
         }
 
@@ -160,7 +160,7 @@ namespace y60 {
         GRAYRaster::iterator itTrgt = myTargetFrame.begin();
 
         i=0;
-        for (itTrgt; itTrgt != myTargetFrame.end(); ++itTrgt, ++i) {
+        for (; itTrgt != myTargetFrame.end(); ++itTrgt, ++i) {
             (*itTrgt) = static_cast<unsigned char>(_myFloatImage[i]);
         }
 	}
