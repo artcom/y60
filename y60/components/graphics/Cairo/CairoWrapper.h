@@ -87,7 +87,7 @@ public:
         reference();
     }
 
-    ~CairoWrapper() {
+    virtual ~CairoWrapper() {
         _myWrappers.erase(_myWrapped);
         unreference();
     }
