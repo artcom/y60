@@ -279,7 +279,8 @@ macro(y60_add_watchdog_launcher NAME)
     endif(LINUX)
 
     if(WIN32)
-        # XXX: last argument COMMAND_DIR is a relative path to the watchdog
+        # TODO: last argument COMMAND_DIR is a relative path to the watchdog,
+        # ...this is a hack, and should be replaced by something proper (GM)
         ac_add_installer_shortcut("${NAME}" "" "" "lib\\\\\\\\${APPLICATION}"  "${THIS_LAUNCHER_BINARY_NAME}" "--configfile ${THIS_LAUNCHER_CONFIG_FILE}" "\\\\\\\\..\\\\\\\\PRO60\\\\\\\\bin\\\\\\\\")
     endif(WIN32)
 endmacro(y60_add_watchdog_launcher)
