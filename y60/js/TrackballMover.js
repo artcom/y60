@@ -141,9 +141,9 @@ TrackballMover.prototype.Constructor = function(obj, theViewport) {
         _prevMousePosition = new Vector3f(theX, theY, 0);
     };
 
-    obj.movements.rotateByScreenCoordinates = function(thePrevMousePos, theCurrentPos) {
-        var prevNormalizedMousePos = obj.getNormalizedScreen(thePreviousPos[0], thePreviousPos[1]);
-        var curNormalizedMousePos = obj.getNormalizedScreen(theCurrentPos[0], theCurrentPos[1]);
+    obj.movements.rotateByScreenCoordinates = function(thePrevMousePos, theCurrentMousePos) {
+        var prevNormalizedMousePos = obj.getNormalizedScreen(thePrevMousePos[0], thePrevMousePos[1]);
+        var curNormalizedMousePos = obj.getNormalizedScreen(theCurrentMousePos[0], theCurrentMousePos[1]);
         _myTrackball.rotate(prevNormalizedMousePos, curNormalizedMousePos);
         applyRotation();
     };
