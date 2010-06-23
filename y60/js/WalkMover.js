@@ -83,7 +83,6 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
     const MODEL_RIGHT_DIRECTION    = cross(MODEL_FRONT_DIRECTION, MODEL_UP_DIRECTION);
     const INITIAL_WALK_SPEED       = 0.01; // percentage of world size per second
     const INITIAL_EYEHEIGHT        = 200;
-    const ROTATE_SPEED             = 1.0;
     const GRAVITY                  = 9.81;
     const PERSON_MASS              = 100;
     const GRAVITY_DIRECTION        = product(MODEL_UP_DIRECTION,-1);
@@ -112,7 +111,7 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
     var _myGroundNormal       = null;
     var _myGroundPlane        = null;
 
-    var _prevNormalizedMousePosition = new Vector3f(0,0,0); // [-1..1]
+    var _prevMousePosition    = new Vector3f(0,0,0);
 
     //////////////////////////////////////////////////////////////////////
     //
@@ -166,9 +165,14 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
         self.getMoverObject().orientation = Quaternionf.createFromEuler(_myEulerOrientation);
     };
     
-    self.movements.rotateXY = function(theDelta) {
-        _myEulerOrientation.x += theDelta.y;
-        _myEulerOrientation.y += -theDelta.x;
+    self.movements.rotateXYByScreenCoordinates = function(thePreviousPos, theCurrentPos) {
+        var myDelta = self.getNormalizedDifference(thePreviousPos, theCurrentPos);
+        self.movements.rotateXY(myDelta);
+    };
+    
+    self.movements.rotateXY = function(theAnglesInRadiant) {
+        _myEulerOrientation.x += theAnglesInRadiant.y;
+        _myEulerOrientation.y += -theAnglesInRadiant.x;
         self.getMoverObject().orientation = Quaternionf.createFromEuler(_myEulerOrientation);
     };
     
@@ -197,9 +201,10 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
         if (!positionAllowed(myNewPosition)) {
             myNewPosition = sum (_myPosition, product(theDirection, -5.0 * theDelta));
         }
-        _myPosition = myNewPosition
+        _myPosition = myNewPosition;
     };
-
+    
+    // XXX TODO: the Eventhandling should not be inside the Mover
     self.onFrame = function(theTime) {
         if (_myLastTime == null) {
             _myLastTime = theTime;
@@ -215,6 +220,7 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
         _myLastTime = theTime;
     };
 
+    // XXX TODO: the Eventhandling should not be inside the Mover
     self.Mover.onKey = self.onKey;
     self.onKey = function(theKey, theKeyState, theX, theY, theShiftFlag, theControlFlag, theAltFlag) {
         if (theKeyState && theKey == 'h') {
@@ -229,7 +235,6 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
                     _myEyeHeight /= 1.1;
                     _myEyeHeight = Math.max(_myEyeHeight,0);
                 break;
-
             }
         } else {
             if((theKeyState && theControlFlag && theAltFlag) || !theKeyState) {
@@ -239,25 +244,26 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
         self.Mover.onKey(theKey, theKeyState, theX, theY, theShiftFlag, theControlFlag, theAltFlag);
     };
 
+    // XXX TODO: the Eventhandling should not be inside the Mover
     self.Mover.onMouseButton = self.onMouseButton;
     self.onMouseButton = function(theButton, theState, theX, theY) {
         self.Mover.onMouseButton(theButton, theState, theX, theY);
         if (theButton == LEFT_BUTTON) {
-            _prevNormalizedMousePosition = self.getNormalizedScreen(theX, theY);
+            _prevMousePosition = new Vector3f(theX, theY, 0);
         } else { // Button Up
-            _prevNormalizedMousePosition = new Vector3f(0,0,0);
+            _prevMousePosition = new Vector3f(0,0,0);
         }
     };
 
+    // XXX TODO: the Eventhandling should not be inside the Mover
     self.onMouseMotion = function(theX, theY) {
-        var curNormalizedMousePos = self.getNormalizedScreen(theX, theY);
         if (self.getLeftButtonFlag()) {
-            var myDelta = difference(curNormalizedMousePos, _prevNormalizedMousePosition);
-            self.movements.rotateXY(myDelta);
+            self.movements.rotateXYByScreenCoordinates(_prevMousePosition, new Vector3f(theX, theY, 0));
         }
-        _prevNormalizedMousePosition = curNormalizedMousePos;
+        _prevMousePosition = new Vector3f(theX, theY, 0);
     };
 
+    // XXX TODO: the Eventhandling should not be inside the Mover
     self.onMouseWheel = function(theDeltaX, theDeltaY) {
         if (theDeltaY < 0) {
             _myWalkSpeed *= 1.5;
@@ -289,7 +295,7 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
             _myProjectedFrontVector = normalized(projection(_myFrontVector, _myGroundPlane));
             _myProjectedRightVector = normalized(projection(_myRightVector, _myGroundPlane));
         }
-        _myUpVector    = product(MODEL_UP_DIRECTION,    myOrientationMatrix);
+        _myUpVector    = product(MODEL_UP_DIRECTION, myOrientationMatrix);
 
         var myVelocity = new Vector3f(_myVelocity);
 
@@ -313,7 +319,7 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
     function positionAllowed(theNewPostion) {
         var myForwardStep = new LineSegment(_myPosition, theNewPostion);
         var myForwardIntersection = nearestIntersection(self.getWorld(), myForwardStep);
-        return (myForwardIntersection == null)
+        return (myForwardIntersection == null);
     }
 
     function findGround(theProbe) {
@@ -363,11 +369,13 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
 
     function printHelp() {
         print("Walk Mover keys:");
-        print("   <up>  walk forward");
-        print("  <down> walk backward");
-        print("  <left> walk to the left");
-        print(" <right> walk to the right");
-        print(" mouse-wheel-up    increase walk speed");
-        print(" mouse-wheel-down  decrease walk speed");
+        print("  CTRL+ALT+<up>     walk forward");
+        print("  CTRL+ALT+<down>   walk backward");
+        print("  CTRL+ALT+<left>   walk to the left");
+        print("  CTRL+ALT+<right>  walk to the right");
+        print("  mouse-wheel-up    increase walk speed");
+        print("  mouse-wheel-down  decrease walk speed");
+        print("  CTRL+ALT+SHIFT+<up>    increase eye-height");
+        print("  CTRL+ALT+SHIFT+<down>  decrease eye-height");
     }
-}
+};

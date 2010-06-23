@@ -210,8 +210,6 @@ MoverBase.prototype.Constructor = function(obj, theViewport) {
         _myMoverObject.position    = myGlobalMatrix.getTranslation();
     };
 
-    //////////////////////////////////////////////////////////////////////
-
     obj.reset = function() {
         _myMoverObject.position    = _myInitialPosition;
         _myMoverObject.orientation = _myInitialOrientation;
@@ -271,6 +269,12 @@ MoverBase.prototype.Constructor = function(obj, theViewport) {
     obj.getNormalizedScreen = function(theMousePosX, theMousePosY) {
         return new Vector3f((theMousePosX * 2 -_myViewport.width)/_myViewport.width,
             -(theMousePosY * 2 -_myViewport.height)/_myViewport.height, 0);
+    };
+    
+    obj.getNormalizedDifference = function(thePreviousPosition, theCurrentPosition) {
+        var prevNormalizedPos = obj.getNormalizedScreen(thePreviousPosition[0], thePreviousPosition[1]);
+        var curNormalizedPos = obj.getNormalizedScreen(theCurrentPosition[0], theCurrentPosition[1]);
+        return difference(curNormalizedPos, prevNormalizedPos);
     };
 
     function printHelp() {
