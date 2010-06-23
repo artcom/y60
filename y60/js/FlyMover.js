@@ -71,7 +71,7 @@ function FlyMover(theViewport) {
 
 FlyMover.prototype.Constructor = function(self, theViewport) {
     MoverBase.prototype.Constructor(self, theViewport);
-    self.Mover = [];
+    self.Mover = {};
 
     const TURN_SPEED        = 1;
     const INITIAL_FLY_SPEED = 0.001;
@@ -101,7 +101,9 @@ FlyMover.prototype.Constructor = function(self, theViewport) {
         _myCurrentStartSpeed = 1;
     }
 
-    self.stop = function() {_myFlySpeed = 0;}
+    self.stop = function() {
+        _myFlySpeed = 0;
+    };
 
     self.onFrame = function(theTime) {
         if (!_myLastIdleTime) {
