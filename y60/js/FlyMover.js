@@ -124,17 +124,6 @@ FlyMover.prototype.Constructor = function(self, theViewport) {
     self.stop = function() {
         _myFlySpeed = 0;
     };
-
-    self.onFrame = function(theTime) {
-        if (!_myLastIdleTime) {
-            _myLastIdleTime = theTime;
-            return;
-        }
-
-        var myDeltaTime = theTime - _myLastIdleTime;
-    };
-
-    self.stop = function() {_myFlySpeed = 0;};
     
     self.simulate = function(theDeltaTime) {
         if (_myFlySpeed) {
