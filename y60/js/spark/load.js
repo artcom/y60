@@ -75,8 +75,7 @@ spark.loadFile = function(theFile, theParent) {
     }
     var myNode = new Node();
     myNode.parseFile(myFileWithPath);
-    var myComponent = spark.loadDocument(myNode, theParent);
-    myComponent._sparkFile_ = theFile;
+    var myComponent = spark.loadDocument(myNode, theParent, theFile);
     return myComponent;
 };
 
@@ -87,9 +86,12 @@ spark.loadFile = function(theFile, theParent) {
  * in the constructed components. If you wan't referential
  * independence, clone your dom first.
  */
-spark.loadDocument = function(theNode, theParent) {
+spark.loadDocument = function(theNode, theParent, theFile) {
     var myRoot = spark.findRootElement(theNode);
     var myComponent = spark.instantiateRecursively(myRoot, theParent);
+    if (theFile) {
+        myComponent._sparkFile_ = theFile;
+    }
     myComponent.realize();
     myComponent.postRealize();
     return myComponent;

@@ -92,22 +92,22 @@ SemaphoreUnitTest::run() {
     myRetVal = pthread_join (_myThread, &myThreadRetVal);
     ENSURE_MSG (myRetVal == 0, "pthread_join succeeded");
 
-    int diff1, diff2;
+    asl::Signed64 diff1, diff2;
     Time start, end;
 
     start = Time();
     _mySecondSemaphore.wait(1000);
     end = Time();
-    diff1 = int((end.micros() - start.micros()) / 1000);
+    diff1 = asl::Signed64((end.micros() - start.micros()) / 1000);
 
     start = Time();
     _mySecondSemaphore.wait(2000);
     end = Time();
-    diff2 = int((end.micros() - start.micros()) / 1000);
+    diff2 = asl::Signed64((end.micros() - start.micros()) / 1000);
 
     string msg = string("waiting 2 secs takes roughly twice as long as waiting 1 sec. waited ")
                + as_string(2*diff1) + " vs. " + as_string(diff2) + " milliseconds.";
-    ENSURE_MSG(abs(2*diff1 - diff2) < 100, msg.c_str());
+    ENSURE_MSG(abs(long(2*diff1 - diff2)) < 100, msg.c_str());
 
     ENSURE_MSG(true, "Waiting for 3 seconds");
     ENSURE_MSG(!_mySecondSemaphore.wait(3000), "Timeout works.");

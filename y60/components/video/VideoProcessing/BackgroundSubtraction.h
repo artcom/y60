@@ -88,12 +88,13 @@ namespace y60 {
         y60::ImagePtr _mySourceImage;
         y60::ImagePtr _myTargetImage;
         y60::ImagePtr _myBackgroundImage;
+        
+        unsigned int _myCounter;
 
         asl::Unsigned64 _myImageNodeVersion;
 
         float _myThreshold;
         float _myWeight;
-        unsigned int _myCounter;
     };
 }
 

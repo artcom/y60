@@ -170,7 +170,8 @@ function playSound(theFilename, theVolume, theLoopFlag, theSeekOffset) {
     }
 
     try {
-        var mySound = new Sound(theFilename, theLoopFlag);
+        var myFileName = searchFile(theFilename);
+        var mySound = new Sound(myFilename, theLoopFlag);
         mySound.volume = theVolume;
         mySound.seek(theSeekOffset * mySound.duration);
         mySound.play();
@@ -187,5 +188,6 @@ function preloadSound(theFilename) {
         initSoundController();
     }
 
-    ourSoundController.preloadSound(theFilename);
+    var myFileName = searchFile(theFilename);
+    ourSoundController.preloadSound(myFilename);
 }

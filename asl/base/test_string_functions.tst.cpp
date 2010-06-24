@@ -52,12 +52,14 @@ class string_functions_UnitTest : public UnitTest {
 
                 // double/float <-> string conversion
             ENSURE(as<float>("1.0") == 1.0f);
-            ENSURE(as<double>("1.0") == 1.0);
             ENSURE(as<int>("1") == 1);
             ENSURE(as<int>("-1") == -1);
             ENSURE(as<long>("1") == 1);
             ENSURE(as<bool>("1") == 1);
             ENSURE(as<bool>("0") == 0);
+			// test underflow
+			ENSURE(as<float>("-1e-50") == 0.0f);
+            ENSURE(as<double>("-1e-1000") == 0.0);
 
             // lowercase uppercase
             {
