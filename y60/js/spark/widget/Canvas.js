@@ -202,7 +202,10 @@ spark.Canvas.Constructor = function (Protected) {
         
         var myLightManager = new LightManager(window.scene, _myWorld);
         Public.setLightManager(myLightManager);
-        Public.setupWindow(_myRenderArea);
+        
+        _myRenderArea.renderingCaps = Renderer.FRAMEBUFFER_SUPPORT;
+        _myRenderArea.multisamples = 4;
+        Public.setupWindow(_myRenderArea, false);
         
         myCanvas.target = myTexture.id;
         _myRenderArea.setSceneAndCanvas(window.scene, myCanvas);
