@@ -1,4 +1,4 @@
-/*jslint nomen: false, plusplus: false, white: false*/
+/*jslint nomen: false, plusplus: false, bitwise: false*/
 /*globals use, spark, OffscreenRenderArea, Modelling, window, Node, Vector3f,
           BaseViewer, LightManager, product, Matrix4f, Point3f, Logger,
           fileExists, getDirectoryPart, print, adjustNodeId, Renderer*/
@@ -42,12 +42,12 @@ spark.Canvas.Constructor = function (Protected) {
         return null;
     }
     
-    Public.pickBody = function(theX, theY) {
-        var canvasPosition = convertToCanvasCoordinates (theX, theY);
+    Public.pickBody = function (theX, theY) {
+        var canvasPosition = convertToCanvasCoordinates(theX, theY);
         if (canvasPosition) {
             var myBody = Public.picking.pickBodyBySweepingSphereFromBodies(
                                 canvasPosition.x, canvasPosition.y, PICK_RADIUS, _myWorld, _myViewport);
-            if(myBody) {
+            if (myBody) {
                 return myBody;
             }
         }
@@ -103,7 +103,7 @@ spark.Canvas.Constructor = function (Protected) {
         
         // REWRITE TEXTURE SRC PATH
         var imageNode = myDom.find(".//images");
-        for(var i = 0; i < imageNode.childNodesLength(); ++i) {
+        for (var i = 0; i < imageNode.childNodesLength(); ++i) {
             var myTargetDir = getDirectoryPart(theSceneFilePath);
             var myTexSrcPath = imageNode.childNodes[i].src;
             if (myTexSrcPath.charAt(0) !== "/") {
@@ -139,9 +139,10 @@ spark.Canvas.Constructor = function (Protected) {
     
     // Public methods
     
-    Public.world getter = function () {
+    Public.__defineGetter__("world", function () {
         return _myWorld;
-    };
+    });
+    
     
     Base.realize = this.realize;
     this.realize = function () {
@@ -230,17 +231,17 @@ spark.Canvas.Constructor = function (Protected) {
     };
     
     Base.onMouseMotion = Public.onMouseMotion;
-    Public.onMouseMotion = function(theEvent) {
-        var canvasPosition = convertToCanvasCoordinates (theEvent.stageX, theEvent.stageY);
-        if(canvasPosition) {
+    Public.onMouseMotion = function (theEvent) {
+        var canvasPosition = convertToCanvasCoordinates(theEvent.stageX, theEvent.stageY);
+        if (canvasPosition) {
             Base.onMouseMotion(canvasPosition.x, canvasPosition.y);
         }
     };
     
     Base.onMouseButton = Public.onMouseButton;
-    Public.onMouseButton = function(theButton, theState, theX, theY) {
-        var canvasPosition = convertToCanvasCoordinates (theX, theY);
-        if(canvasPosition) {
+    Public.onMouseButton = function (theButton, theState, theX, theY) {
+        var canvasPosition = convertToCanvasCoordinates(theX, theY);
+        if (canvasPosition) {
             Base.onMouseButton(theButton, theState, canvasPosition.x, canvasPosition.y);
         }
     };
