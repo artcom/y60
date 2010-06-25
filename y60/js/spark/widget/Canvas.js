@@ -29,20 +29,20 @@ spark.Canvas.Constructor = function (Protected) {
     /////////////////////
     
     function convertToCanvasCoordinates(theX, theY) {
-        var pointOnCanvas, transformMatrix, intersecPointOnCanvas;
+        var transformMatrix;
+        var intersecPointOnCanvas = null;
         // assumptions:
         //  - as the rectangle has no depth, there should always only appear ONE intersection
         //  - the Canvas is topmost intersection, if not, this handler would not have been called by spark
         var myIntersection = Public.stage.picking.pickIntersection(theX, theY);
         if (myIntersection) {
-            pointOnCanvas = new Point3f(myIntersection.info.intersections[0].position);
             transformMatrix = new Matrix4f(Public.innerSceneNode.globalmatrix);
             transformMatrix.invert();
-            intersecPointOnCanvas = product(pointOnCanvas, transformMatrix);
+            intersecPointOnCanvas = product(myIntersection.info.intersections[0].position,
+                                            transformMatrix);
             intersecPointOnCanvas.y = Public.height - intersecPointOnCanvas.y;
-            return intersecPointOnCanvas;
         }
-        return null;
+        return intersecPointOnCanvas;
     }
     
     function onKey(theEvent) {
@@ -172,14 +172,14 @@ spark.Canvas.Constructor = function (Protected) {
             var myDom = prepareMerge(mySceneFile);
             
             // XXX assumption: only one world exist/ is handled
-            myWorldId = myDom.find(".//worlds/world").id;
+            myWorldId  = myDom.find(".//worlds/world").id;
             myCanvasId = myDom.find(".//canvases/canvas").id;
             
             mergeScenes(window.scene, myDom);
             
-            myCanvas = window.scene.dom.find(".//canvases/canvas[@id='" + myCanvasId + "']");
+            myCanvas    = window.scene.dom.find(".//canvases/canvas[@id='" + myCanvasId + "']");
             _myViewport = myCanvas.find(".//viewport");
-            myCamera   = window.scene.dom.getElementById(myWorldId).find(".//camera");
+            myCamera    = window.scene.dom.getElementById(myWorldId).find(".//camera");
             
             _myWorld = window.scene.dom.getElementById(myWorldId);
         } else {
@@ -223,15 +223,14 @@ spark.Canvas.Constructor = function (Protected) {
     };
     
     Public.pickBody = function (theX, theY) {
-        var canvasPosition = convertToCanvasCoordinates(theX, theY);
+        var pickedBody     = null,
+            canvasPosition = convertToCanvasCoordinates(theX, theY);
         if (canvasPosition) {
-            var myBody = Public.picking.pickBodyBySweepingSphereFromBodies(
-                                canvasPosition.x, canvasPosition.y, PICK_RADIUS, _myWorld, _myViewport);
-            if (myBody) {
-                return myBody;
-            }
+            pickedBody = Public.picking.pickBodyBySweepingSphereFromBodies(
+                                canvasPosition.x, canvasPosition.y,
+                                PICK_RADIUS, _myWorld, _myViewport);
         }
-        return null;
+        return pickedBody;
     };
     
     Base.onFrame = Public.onFrame;
