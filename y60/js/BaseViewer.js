@@ -58,7 +58,7 @@
 
 // use this idiom in each level of inheritance and
 // you'll know if you are the outermost .js file.
-if (__main__ == undefined) var __main__ = "SceneViewer";
+var __main__ = __main__ || "BaseViewer";
 
 use("Y60JSSL.js");
 use("Exception.js");
