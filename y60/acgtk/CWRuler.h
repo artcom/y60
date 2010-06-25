@@ -65,7 +65,7 @@
 
 #if defined(_MSC_VER)
     #pragma warning(push,1)
-    #pragma warning(disable:4413 4244 4250)
+    //#pragma warning(disable:4413 4244 4250)
 #endif //defined(_MSC_VER)
 #include <gtkmm/drawingarea.h>
 #include <sigc++/sigc++.h>

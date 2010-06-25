@@ -648,7 +648,7 @@ public:
 };
 #if defined(_MSC_VER)
     #pragma warning(push)
-    #pragma warning(disable:4505) // suppress warning C4505: unreferenced local function has been removed 
+    #pragma warning(disable:4505) // suppress warning C4505: unreferenced local function has been removed
 #endif //defined(_MSC_VER)
 
 template <class NATIVE,

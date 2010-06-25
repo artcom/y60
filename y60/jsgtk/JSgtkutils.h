@@ -72,7 +72,7 @@
 
 #if defined(_MSC_VER)
     #pragma warning(push,1)
-    #pragma warning(disable:4244 4512 4413 4251 4127 4520 4250)
+    //#pragma warning(disable:4244 4512 4413 4251 4127 4520 4250)
 #endif //defined(_MSC_VER)
 #include <gtkmm.h>
 #if defined(_MSC_VER)
