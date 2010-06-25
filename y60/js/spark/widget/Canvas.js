@@ -13,9 +13,9 @@ spark.Canvas.Constructor = function (Protected) {
     var Public = this;
     var Base = {};
     
-    this.Inherit(spark.ResizableRectangle);
-    BaseViewer.prototype.Constructor(this, []);
-    this.Inherit(spark.CallbackWrapper);
+    Public.Inherit(spark.ResizableRectangle);
+    BaseViewer.prototype.Constructor(Public, []);
+    Public.Inherit(spark.CallbackWrapper);
     
     var _myRenderArea = null;
     var _myWorld = null;
@@ -24,35 +24,26 @@ spark.Canvas.Constructor = function (Protected) {
     var PICK_RADIUS = 0.01;
     var _sampling = 1;
     
-    // Private methods
+    /////////////////////
+    // Private Methods //
+    /////////////////////
     
     function convertToCanvasCoordinates(theX, theY) {
+        var pointOnCanvas, transformMatrix, intersecPointOnCanvas;
         // assumptions:
         //  - as the rectangle has no depth, there should always only appear ONE intersection
         //  - the Canvas is topmost intersection, if not, this handler would not have been called by spark
         var myIntersection = Public.stage.picking.pickIntersection(theX, theY);
         if (myIntersection) {
-            var pointOnCanvas = new Point3f(myIntersection.info.intersections[0].position);
-            var transformMatrix = new Matrix4f(Public.innerSceneNode.globalmatrix);
+            pointOnCanvas = new Point3f(myIntersection.info.intersections[0].position);
+            transformMatrix = new Matrix4f(Public.innerSceneNode.globalmatrix);
             transformMatrix.invert();
-            var intersecPointOnCanvas = product(pointOnCanvas, transformMatrix);
+            intersecPointOnCanvas = product(pointOnCanvas, transformMatrix);
             intersecPointOnCanvas.y = Public.height - intersecPointOnCanvas.y;
             return intersecPointOnCanvas;
         }
         return null;
     }
-    
-    Public.pickBody = function (theX, theY) {
-        var canvasPosition = convertToCanvasCoordinates(theX, theY);
-        if (canvasPosition) {
-            var myBody = Public.picking.pickBodyBySweepingSphereFromBodies(
-                                canvasPosition.x, canvasPosition.y, PICK_RADIUS, _myWorld, _myViewport);
-            if (myBody) {
-                return myBody;
-            }
-        }
-        return null;
-    };
     
     function onKey(theEvent) {
         var myState = (theEvent.type === "keybord-key-down");
@@ -75,6 +66,7 @@ spark.Canvas.Constructor = function (Protected) {
     }
     
     function prepareMerge(theSceneFilePath) {
+        var myTargetDir, myTexSrcPath, myNewPath;
         /* adjust ids:
          *  - world, canvas, viewport ids need to be unique as we need duplicates
          *  - camera id needs to be unique, is linked in viewport, so viewport.camera needs update too
@@ -104,11 +96,11 @@ spark.Canvas.Constructor = function (Protected) {
         // REWRITE TEXTURE SRC PATH
         var imageNode = myDom.find(".//images");
         for (var i = 0; i < imageNode.childNodesLength(); ++i) {
-            var myTargetDir = getDirectoryPart(theSceneFilePath);
-            var myTexSrcPath = imageNode.childNodes[i].src;
+            myTargetDir = getDirectoryPart(theSceneFilePath);
+            myTexSrcPath = imageNode.childNodes[i].src;
             if (myTexSrcPath.charAt(0) !== "/") {
                 myTexSrcPath = myTexSrcPath.replace(/^\.\//, "");
-                var myNewPath = myTargetDir + myTexSrcPath;
+                myNewPath = myTargetDir + myTexSrcPath;
                 if (!fileExists(myNewPath)) {
                     Logger.warning("Could not find texture within path '" + myNewPath + "'");
                 } else {
@@ -120,13 +112,14 @@ spark.Canvas.Constructor = function (Protected) {
     }
     
     function mergeScenes(theTargetScene, theModelDom) {
+        var childNode, receivingNode, childChildNode;
         var mySceneNode = theModelDom.firstChild;
         
         while (mySceneNode.childNodesLength()) {
-            var childNode = mySceneNode.firstChild;
-            var receivingNode = theTargetScene.dom.getNodesByTagName(childNode.nodeName)[0];
+            childNode = mySceneNode.firstChild;
+            receivingNode = theTargetScene.dom.getNodesByTagName(childNode.nodeName)[0];
             while (childNode.childNodesLength()) {
-                var childChildNode = childNode.removeChild(childNode.firstChild);
+                childChildNode = childNode.removeChild(childNode.firstChild);
                 try {
                     receivingNode.appendChild(childChildNode);
                 } catch (err) {
@@ -137,15 +130,21 @@ spark.Canvas.Constructor = function (Protected) {
         }
     }
     
-    // Public methods
+    ///////////////////////
+    // Getters / Setters //
+    ///////////////////////
     
     Public.__defineGetter__("world", function () {
         return _myWorld;
     });
     
+    ////////////////////
+    // Public Methods //
+    ////////////////////
     
-    Base.realize = this.realize;
-    this.realize = function () {
+    Base.realize = Public.realize;
+    Public.realize = function () {
+        var myCamera, myCanvas, myWorldId, myCanvasId;
         _sampling    = Protected.getNumber("sampling", 1);
         var myWidth  = Protected.getNumber("width", 100);
         var myHeight = Protected.getNumber("height", 100);
@@ -168,8 +167,8 @@ spark.Canvas.Constructor = function (Protected) {
         myMaterial.transparent = true;
         
         var mySceneFile = Protected.getString("sceneFile", "");
-        var myCamera, myCanvas, myWorldId, myCanvasId;
         if (mySceneFile) {
+            // Create (merge) world from scene file
             var myDom = prepareMerge(mySceneFile);
             
             // XXX assumption: only one world exist/ is handled
@@ -183,26 +182,25 @@ spark.Canvas.Constructor = function (Protected) {
             myCamera   = window.scene.dom.getElementById(myWorldId).find(".//camera");
             
             _myWorld = window.scene.dom.getElementById(myWorldId);
-            
         } else {
+            // Setup default world
             _myWorld = Node.createElement("world");
-            window.scene.worlds.appendChild(_myWorld);
             _myWorld.name = Public.name + "-world";
+            window.scene.worlds.appendChild(_myWorld);
             
             myCamera = Node.createElement("camera");
             _myWorld.appendChild(myCamera);
-            
             spark.setupCameraOrtho(myCamera, myWidth, myHeight);
             
             myCanvas = Node.createElement("canvas");
-            window.scene.canvases.appendChild(myCanvas);
             myCanvas.name = Public.name + "-canvas";
             myCanvas.backgroundcolor[3] = 0.0;
+            window.scene.canvases.appendChild(myCanvas);
             
             _myViewport = Node.createElement("viewport");
             _myViewport.camera = myCamera.id;
-            myCanvas.appendChild(_myViewport);
             _myViewport.name = Public.name + "-viewport";
+            myCanvas.appendChild(_myViewport);
         }
         
         var myLightManager = new LightManager(window.scene, _myWorld);
@@ -222,6 +220,18 @@ spark.Canvas.Constructor = function (Protected) {
         Public.addEventListener(spark.MouseEvent.BUTTON_UP, Public.onMouseButtonUp);
         
         Base.realize(myMaterial);
+    };
+    
+    Public.pickBody = function (theX, theY) {
+        var canvasPosition = convertToCanvasCoordinates(theX, theY);
+        if (canvasPosition) {
+            var myBody = Public.picking.pickBodyBySweepingSphereFromBodies(
+                                canvasPosition.x, canvasPosition.y, PICK_RADIUS, _myWorld, _myViewport);
+            if (myBody) {
+                return myBody;
+            }
+        }
+        return null;
     };
     
     Base.onFrame = Public.onFrame;
