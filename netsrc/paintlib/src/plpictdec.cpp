@@ -702,7 +702,7 @@ void PLPictDecoder::unpack8bits
   rowBytes &= 0x7fff;
 
   if (rowBytes == 0)
-    rowBytes = Width;
+    rowBytes = static_cast<PLWORD>(Width);
 
   PLBYTE * pLineBuf = new PLBYTE [rowBytes];
 
@@ -761,7 +761,7 @@ void PLPictDecoder::unpackbits
   if (pixelSize <= 8)
     rowBytes &= 0x7fff;
 
-  pixwidth = Width;
+  pixwidth = static_cast<PLWORD>(Width);
   pkpixsize = 1;          // RLE unit: one byte for everything...
   if (pixelSize == 16)    // ...except 16 bpp.
   {
@@ -922,7 +922,7 @@ void PLPictDecoder::skipBits
   if (pixelSize <= 8)
     rowBytes &= 0x7fff;
 
-  pixwidth = Width;
+  pixwidth = static_cast<PLWORD>(Width);
 
   if (pixelSize == 16)
     pixwidth *= 2;
@@ -1052,8 +1052,8 @@ void PLPictDecoder::expandBuf8
         pSrc++;
         pDest += 8;
       }
-      if (Width & 7)  // Check for leftover pixels
-        for (i=7; i>(8-Width & 7); i--)
+      if (Width & 0x07)  // Check for leftover pixels
+        for (i=7; i>(8-(Width & 0x07)); i--)
         {
           *pDest = (*pSrc >> i) & 1;
           pDest++;
@@ -1115,7 +1115,7 @@ void PLPictDecoder::readColourTable
   Trace (2, sz);
   Trace (3, "Reading Palette.\n");
 
-  for (int i = 0; i < *pNumColors; i++)
+  for (PLWORD i = 0; i < *pNumColors; i++)
   {
     val = ReadMWord(pDataSrc);
     if (ctFlags & 0x8000)

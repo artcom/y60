@@ -65,8 +65,15 @@
 #include <y60/jsbase/JSWrapper.impl>
 
 #include <iostream>
+#if defined(_MSC_VER)
+    // supress warnings caused by gtk in vc++
+    #pragma warning(push,1)
+#endif //defined(_MSC_VER)
 #include <gdk/gdkkeysyms.h>
 #include <gtkmm/window.h>
+#if defined(_MSC_VER)
+    #pragma warning(pop)
+#endif //defined(_MSC_VER)
 
 using namespace std;
 using namespace asl;

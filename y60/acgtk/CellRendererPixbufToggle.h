@@ -55,13 +55,6 @@
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
-//
-//   $RCSfile: SliceViewer.js,v $
-//   $Author: danielk $
-//   $Revision: 1.97 $
-//   $Date: 2005/04/29 13:49:59 $
-//
-//=============================================================================
 
 #ifndef ACGTK_CELL_RENDERER_PIXBUF_TOGGLE_INCLUDED
 #define ACGTK_CELL_RENDERER_PIXBUF_TOGGLE_INCLUDED
@@ -69,8 +62,8 @@
 #include "y60_acgtk_settings.h"
 
 #if defined(_MSC_VER)
-    #pragma warning(push)
-    #pragma warning(disable:4413 4244 4127 4512)
+    #pragma warning(push,1)
+    #pragma warning(disable:4413 4244 4127 4512 4250)
 #endif //defined(_MSC_VER)
 #include <gtkmm/cellrenderer.h>
 #if defined(_MSC_VER)

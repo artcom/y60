@@ -70,8 +70,17 @@
 #include <y60/jsbase/JScppUtils.h>
 #include <y60/jsbase/JSWrapper.impl>
 #include <iostream>
+
+#if defined(_MSC_VER)
+    // supress warnings caused by gtk in vc++
+    #pragma warning(push,1)
+    #pragma warning(disable:4413 4244 4512 4250)
+#endif //defined(_MSC_VER)
 #include <gtkmm/main.h>
 #include <sigc++/slot.h>
+#if defined(_MSC_VER)
+    #pragma warning(pop)
+#endif //defined(_MSC_VER)
 
 using namespace std;
 using namespace asl;

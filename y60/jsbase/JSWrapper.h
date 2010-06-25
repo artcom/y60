@@ -646,7 +646,10 @@ public:
     virtual const void * getNativeAdress() const = 0;
     virtual ~JSWrapperBase() {};
 };
-
+#if defined(_MSC_VER)
+    #pragma warning(push)
+    #pragma warning(disable:4505) // suppress warning C4505: unreferenced local function has been removed 
+#endif //defined(_MSC_VER)
 
 template <class NATIVE,
           class OWNERPTR=asl::Ptr<typename dom::ValueWrapper<NATIVE>::Type, dom::ThreadingModel>,
@@ -898,6 +901,9 @@ private:
     OWNERPTR _myOwner;
     NATIVE * _myNative; // only used when instantiated with NATIVE_ACCESS_PROTOCOL = StaticAccessProtocol
 };
+#if defined(_MSC_VER)
+    #pragma warning(pop)
+#endif //defined(_MSC_VER)
 
 
 template <class NATIVE, class JSWRAPPER>

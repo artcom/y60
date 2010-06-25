@@ -71,7 +71,9 @@
 // C4355 : 'this' : used in base member initializer list
 // C4239 : nonstandard extension used : 'type cast' : conversion from '<temporary>' to '<non-const reference>'
 // C4396: 'func' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
-#pragma warning( disable: 4355 /*4239*/ 4396 )
+// C4100: unreferenced formal parameter: NOTE: we could achieve the same thing by using unnamed paramters
+// C4201: nonstandard extension used : nameless struct/union (Windows SDK produces these warnings)
+#pragma warning( disable: 4355 /*4239*/ 4396 4100 4201)
 #endif // _MSC_VER
 
 // this is not exactly accurate

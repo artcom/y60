@@ -71,9 +71,9 @@
 #include <asl/math/Vector234.h>
 
 #if defined(_MSC_VER)
-    #pragma warning(push)
+    #pragma warning(push,1)
     #pragma warning(disable:4413)
-    #pragma warning(disable:4244)
+    #pragma warning(disable:4244 4250)
 #endif //defined(_MSC_VER)
 
 #include <gtkmm/drawingarea.h>

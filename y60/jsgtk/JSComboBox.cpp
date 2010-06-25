@@ -70,7 +70,13 @@
 #include <y60/jsbase/JSWrapper.impl>
 #include <iostream>
 
+#if defined(_MSC_VER)
+    #pragma warning(push,1)
+#endif //defined(_MSC_VER)
 #include <gtkmm/liststore.h>
+#if defined(_MSC_VER)
+    #pragma warning(pop)
+#endif //defined(_MSC_VER)
 
 using namespace std;
 using namespace asl;

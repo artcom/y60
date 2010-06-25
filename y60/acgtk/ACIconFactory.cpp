@@ -60,12 +60,13 @@
 #include "ACIconFactory.h"
 
 #if defined(_MSC_VER)
-    #pragma warning(push)
-    #pragma warning(disable:4413 4244 4512)
+    // supress warnings caused by gtk in vc++
+    #pragma warning(push,1)
+    #pragma warning(disable:4413 4244 4512 4250)
 #endif //defined(_MSC_VER)
 #include <gtkmm/stock.h>
 #if defined(_MSC_VER)
-#pragma warning(pop)
+    #pragma warning(pop)
 #endif //defined(_MSC_VER)
 
 namespace acgtk {
