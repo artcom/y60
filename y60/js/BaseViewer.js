@@ -76,6 +76,16 @@ function BaseViewer(theArguments) {
 }
 
 BaseViewer.prototype.Constructor = function(self, theArguments) {
+
+    var _defaultRenderingCapabilities = Renderer.TEXTURE_3D_SUPPORT |
+                                        Renderer.MULTITEXTURE_SUPPORT |
+                                        Renderer.TEXTURECOMPRESSION_SUPPORT |
+                                        Renderer.CUBEMAP_SUPPORT;
+                                        
+    self.getDefaultRenderingCapabilites = function() {
+        return _defaultRenderingCapabilities;
+    };
+
     self.getReleaseMode = function() {
         return _myReleaseMode;
     }
@@ -170,14 +180,10 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         _myPicking = new Picking(_myRenderWindow);
     }
 
-    self.setupWindow = function(theRenderWindow, theSetDefaultRenderingCap) {
+    self.setupWindow = function(theRenderWindow, theSetDefaultRenderingCapabilitiesFlag) {
         self.attachWindow(theRenderWindow);
-        if (theSetDefaultRenderingCap == undefined || theSetDefaultRenderingCap) {
-            _myRenderWindow.renderingCaps =
-                Renderer.TEXTURE_3D_SUPPORT |
-                Renderer.MULTITEXTURE_SUPPORT |
-                Renderer.TEXTURECOMPRESSION_SUPPORT |
-                Renderer.CUBEMAP_SUPPORT;
+        if (!!theSetDefaultRenderingCapabilitiesFlag) {
+            _myRenderWindow.renderingCaps = _defaultRenderingCapabilities;
         }
    }
 

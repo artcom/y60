@@ -1,7 +1,7 @@
 /*jslint nomen: false, plusplus: false, white: false*/
 /*globals use, spark, OffscreenRenderArea, Modelling, window, Node, Vector3f,
           BaseViewer, LightManager, product, Matrix4f, Point3f, Logger,
-          fileExists, getDirectoryPart, print, adjustNodeId*/
+          fileExists, getDirectoryPart, print, adjustNodeId, Renderer*/
 
 /**
  * Wrapper for the Y60 offscreen renderer.
@@ -22,6 +22,7 @@ spark.Canvas.Constructor = function (Protected) {
     var _myViewport = null;
     
     var PICK_RADIUS = 0.01;
+    var _sampling = 1;
     
     // Private methods
     
@@ -144,10 +145,13 @@ spark.Canvas.Constructor = function (Protected) {
     
     Base.realize = this.realize;
     this.realize = function () {
-        _myRenderArea = new OffscreenRenderArea();
-        
-        var myWidth = Protected.getNumber("width", 100);
+        _sampling    = Protected.getNumber("sampling", 1);
+        var myWidth  = Protected.getNumber("width", 100);
         var myHeight = Protected.getNumber("height", 100);
+        
+        _myRenderArea = new OffscreenRenderArea();
+        _myRenderArea.renderingCaps = Public.getDefaultRenderingCapabilites() | Renderer.FRAMEBUFFER_SUPPORT;
+        _myRenderArea.multisamples = _sampling;
         
         var myImage = Modelling.createImage(window.scene,
                                             myWidth, myHeight, "BGRA");
@@ -202,7 +206,7 @@ spark.Canvas.Constructor = function (Protected) {
         
         var myLightManager = new LightManager(window.scene, _myWorld);
         Public.setLightManager(myLightManager);
-        Public.setupWindow(_myRenderArea);
+        Public.setupWindow(_myRenderArea, false);
         
         myCanvas.target = myTexture.id;
         _myRenderArea.setSceneAndCanvas(window.scene, myCanvas);
