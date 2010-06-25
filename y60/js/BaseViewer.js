@@ -181,8 +181,12 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     }
 
     self.setupWindow = function(theRenderWindow, theSetDefaultRenderingCapabilitiesFlag) {
+        var setDefaultRenderingCapabilities = true;
+        if (theSetDefaultRenderingCapabilitiesFlag !== undefined) {
+            setDefaultRenderingCapabilities = !!theSetDefaultRenderingCapabilitiesFlag;
+        }
         self.attachWindow(theRenderWindow);
-        if (!!theSetDefaultRenderingCapabilitiesFlag) {
+        if (setDefaultRenderingCapabilities) {
             _myRenderWindow.renderingCaps = _defaultRenderingCapabilities;
         }
    }
