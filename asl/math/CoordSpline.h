@@ -129,13 +129,14 @@ namespace asl {
             }
     		QuaternionKeyframe( const QuaternionKeyframe& theKeyframe) {
                 _myQuaternion = theKeyframe._myQuaternion;
-                _myOrientationMatrix = asl::Matrix4f(_myQuaternion);
+                _myOrientationMatrix = theKeyframe._myOrientationMatrix;
                 xyz = theKeyframe.xyz;
                 t = theKeyframe.t;
                 speed = theKeyframe.speed;
 		    }
             QuaternionKeyframe & operator=(const QuaternionKeyframe & theKeyframe) {
                 _myQuaternion = theKeyframe._myQuaternion;
+                _myOrientationMatrix = theKeyframe._myOrientationMatrix;
                 xyz = theKeyframe.xyz;
                 t = theKeyframe.t;
                 speed = theKeyframe.speed;
