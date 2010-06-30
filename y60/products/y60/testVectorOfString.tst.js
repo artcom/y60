@@ -160,6 +160,12 @@ VectorOfStringTest.prototype.Constructor = function(obj, theName) {
         ENSURE('obj.myVectorWithEmptyString[0] == ""');
         ENSURE('obj.myVectorWithEmptyString[4] == "bar"');
         ENSURE('obj.myVectorWithEmptyString[5] == ""');
+
+        // test JS setProperty
+        obj.myVectorOfString = ["foo","bar"];
+        ENSURE('obj.myVectorOfString[0] == "foo"');
+        ENSURE('obj.myVectorOfString[1] == "bar"');
+        ENSURE('obj.myVectorOfString.length == 2');
     }
 }
 

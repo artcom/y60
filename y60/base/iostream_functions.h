@@ -70,6 +70,8 @@
 
 namespace asl {
 
+    static const char VECTOR_OF_STRING_DELIMITER = '`';
+
     template <class T>
     std::istream & parseVector(std::istream & is, std::vector<T> & v) {
         char myChar;
