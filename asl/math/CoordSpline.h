@@ -176,7 +176,8 @@ namespace asl {
         void    print		    ( void );
         bool    init		    ( const std::vector<asl::QuaternionKeyframe>& keyframes, float& total_path, bool planet_mode );
         asl::Vector3f xyz			    ( float t );
-        asl::Vector3f  getHPR   ( float t );
+        asl::Quaternionf getQuaternion ( float s );
+        asl::Vector3f getHPR   ( float t );
         float  s			    ( float t );
         float  sPlanet		    ( float t );
         float  v			    ( float t );
