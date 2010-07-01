@@ -201,13 +201,17 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
        }
    }
 
-    self.setMover = function(theMoverFactory, theViewport) {
+    self.setMover = function(theMoverFactory, theViewport, theMoverObject) {
         if (theMoverFactory) {
             var myNewMover = new theMoverFactory(theViewport);
             var myViewportId = getViewportId(theViewport);
             _myLastMover = myNewMover;
             
-            myNewMover.setMoverObject(myNewMover.getViewportCamera());
+            if(theMoverObject !== undefined) {
+                myNewMover.setMoverObject(theMoverObject);
+            } else {
+                myNewMover.setMoverObject(myNewMover.getViewportCamera());
+            }
             
             return myNewMover;
         } else { 
