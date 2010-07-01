@@ -40,8 +40,8 @@ namespace asl {
     class Keyframe
     {
       public:
-    		Keyframe( asl::Vector3f & coord, float theTimeStamp, float theSpeed )
-    		            : xyz(coord), t(theTimeStamp), speed(theSpeed)  {}
+    		Keyframe( asl::Vector3f & coord, float theTimeDelta, float theSpeed )
+    		            : xyz(coord), t(theTimeDelta), speed(theSpeed)  {}
     		Keyframe( const Keyframe& theKeyframe) { xyz = theKeyframe.xyz; t = theKeyframe.t; speed = theKeyframe.speed;}
     		Keyframe() {}
             Keyframe & operator=(const Keyframe & theKeyframe) {
@@ -56,7 +56,7 @@ namespace asl {
     		virtual void setPosition(const asl::Vector3f & thePosition) { xyz = thePosition; }
 
             const float getTime() const { return t; }
-            void setTime(float theTimeStamp) { t = theTimeStamp; }
+            void setTime(float theTimeDelta) { t = theTimeDelta; }
             const float getSpeed() const { return speed; }
             void setSpeed(float theSpeed) { speed = theSpeed; }
         protected:
@@ -70,8 +70,8 @@ namespace asl {
     {
       public:
             // XXX don't know if here's actually ZYXRotating needed (gm)
-    		EulerKeyframe( asl::Vector3f & coord, asl::Vector3f & orientation, float theTimeStamp, float theSpeed )
-    		        : rotation(orientation), xyz(coord), t(theTimeStamp), speed(theSpeed)
+    		EulerKeyframe( asl::Vector3f & coord, asl::Vector3f & orientation, float theTimeDelta, float theSpeed )
+    		        : rotation(orientation), xyz(coord), t(theTimeDelta), speed(theSpeed)
     		 {
                 _myOrientationMatrix.makeZYXRotating(rotation);
     		 }
@@ -98,7 +98,7 @@ namespace asl {
     		virtual void setPosition(const asl::Vector3f & thePosition) { xyz = thePosition; }
 
             const float getTime() const { return t; }
-            void setTime(float theTimeStamp) { t = theTimeStamp; }
+            void setTime(float theTimeDelta) { t = theTimeDelta; }
             const float getSpeed() const { return speed; }
             void setSpeed(float theSpeed) { speed = theSpeed; }
 
@@ -122,8 +122,8 @@ namespace asl {
     class QuaternionKeyframe
     {
       public:
-    		QuaternionKeyframe( asl::Vector3f & coord, asl::Quaternionf & orientation, float theTimeStamp, float theSpeed )
-    		        : _myQuaternion(orientation), xyz(coord), t(theTimeStamp), speed(theSpeed)
+    		QuaternionKeyframe( asl::Vector3f & coord, asl::Quaternionf & orientation, float theTimeDelta, float theSpeed )
+    		        : _myQuaternion(orientation), xyz(coord), t(theTimeDelta), speed(theSpeed)
             {
                 _myOrientationMatrix = asl::Matrix4f(_myQuaternion);
             }
@@ -149,7 +149,7 @@ namespace asl {
     		virtual void setPosition(const asl::Vector3f & thePosition) { xyz = thePosition; }
 
             const float getTime() const { return t; }
-            void setTime(float theTimeStamp) { t = theTimeStamp; }
+            void setTime(float theTimeDelta) { t = theTimeDelta; }
             const float getSpeed() const { return speed; }
             void setSpeed(float theSpeed) { speed = theSpeed; }
 

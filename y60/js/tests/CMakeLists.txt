@@ -21,6 +21,7 @@ UnitTest
 VectorOfString
 Y60JSSL
 ImageClone
+JSCoordSpline
 )
 
 foreach(TEST ${JSTESTS})

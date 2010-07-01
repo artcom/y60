@@ -32,6 +32,16 @@ using namespace std;  // automatically added!
 
 namespace asl {
 
+    static const int POSITION_X = 0; 
+    static const int POSITION_Y = 1; 
+    static const int POSITION_Z = 2;
+    static const int RIGHT_X = 3; 
+    static const int RIGHT_Y = 4; 
+    static const int RIGHT_Z = 5; 
+    static const int FRONT_X = 6; 
+    static const int FRONT_Y = 7; 
+    static const int FRONT_Z = 8; 
+
     CoordSpline::CoordSpline ( void )
     {
         for ( int i=0; i<11; i++ ) {
@@ -210,9 +220,9 @@ namespace asl {
     {
         float x, y, z;
 
-        x = (*_spline[0])(s);
-        y = (*_spline[1])(s);
-        z = (*_spline[2])(s);
+        x = (*_spline[POSITION_X])(s);
+        y = (*_spline[POSITION_Y])(s);
+        z = (*_spline[POSITION_Z])(s);
 
         return asl::Vector3f( x, y, z );
     }
@@ -231,8 +241,8 @@ namespace asl {
         asl::Vector3f right, front, up;
         asl::Vector3f hpr;
 
-        right = Vector3f((*_spline[3])(s), (*_spline[4])(s), (*_spline[5])(s) );
-        front = Vector3f((*_spline[6])(s), (*_spline[7])(s), (*_spline[8])(s) );
+        right = Vector3f((*_spline[RIGHT_X])(s), (*_spline[RIGHT_Y])(s), (*_spline[RIGHT_Z])(s) );
+        front = Vector3f((*_spline[FRONT_X])(s), (*_spline[FRONT_Y])(s), (*_spline[FRONT_Z])(s) );
         up = cross( front, right );
 
         asl::Matrix4f myMatrix;
@@ -265,28 +275,29 @@ namespace asl {
         asl::Vector3f right, front, up;
         asl::Vector3f hpr;
 
-        right = Vector3f((*_spline[3])(s), (*_spline[4])(s), (*_spline[5])(s) );
-        front = Vector3f((*_spline[6])(s), (*_spline[7])(s), (*_spline[8])(s) );
+        right = Vector3f((*_spline[RIGHT_X])(s), (*_spline[RIGHT_Y])(s), (*_spline[RIGHT_Z])(s) );
+        front = Vector3f((*_spline[FRONT_X])(s), (*_spline[FRONT_Y])(s), (*_spline[FRONT_Z])(s) );
         up = cross( front, right );
 
         asl::Matrix4f myMatrix;
         myMatrix.makeIdentity();
         asl::Vector4f myUp(up[0], up[1], up[2], 0.0);
+        
+        myUp.normalize();
         myMatrix.assignRow(1,myUp);
 
         asl::Vector4f myFront(front[0], front[1], front[2], 0.0);
+        myFront.normalize();
         myMatrix.assignRow(2,myFront);
 
         asl::Vector4f myRight(right[0], right[1], right[2], 0.0);
+        myRight.normalize();
         myMatrix.assignRow(0,myRight);
 
-        asl::Vector3f myScale,myShear,myPosition;
         asl::Quaternionf myOrientation;
-        myMatrix.decompose(myScale, myShear, myOrientation, myPosition);
+        myMatrix.getRotation(myOrientation);
         return myOrientation;
     }
-
-
 
     ////////////////////////////////////////////////////////////////////////////////
     //
@@ -380,9 +391,9 @@ namespace asl {
 
         float result =
             sqrt (
-            (*_spline[0])(s, 1) * (*_spline[0])(s, 1) +
-            (*_spline[1])(s, 1) * (*_spline[1])(s, 1) +
-            (*_spline[2])(s, 1) * (*_spline[2])(s, 1)
+            (*_spline[POSITION_X])(s, 1) * (*_spline[POSITION_X])(s, 1) +
+            (*_spline[POSITION_Y])(s, 1) * (*_spline[POSITION_Y])(s, 1) +
+            (*_spline[POSITION_Z])(s, 1) * (*_spline[POSITION_Z])(s, 1)
             );
 
         return result;
@@ -400,12 +411,12 @@ namespace asl {
 
         float result =
             sqrt (
-            (*_spline[3])(s, 1) * (*_spline[3])(s, 1) +
-            (*_spline[4])(s, 1) * (*_spline[4])(s, 1) +
-            (*_spline[5])(s, 1) * (*_spline[5])(s, 1) +
-            (*_spline[6])(s, 1) * (*_spline[6])(s, 1) +
-            (*_spline[7])(s, 1) * (*_spline[7])(s, 1) +
-            (*_spline[8])(s, 1) * (*_spline[8])(s, 1)
+            (*_spline[RIGHT_X])(s, 1) * (*_spline[RIGHT_X])(s, 1) +
+            (*_spline[RIGHT_Y])(s, 1) * (*_spline[RIGHT_Y])(s, 1) +
+            (*_spline[RIGHT_Z])(s, 1) * (*_spline[RIGHT_Z])(s, 1) +
+            (*_spline[FRONT_X])(s, 1) * (*_spline[FRONT_X])(s, 1) +
+            (*_spline[FRONT_Y])(s, 1) * (*_spline[FRONT_Y])(s, 1) +
+            (*_spline[FRONT_Z])(s, 1) * (*_spline[FRONT_Z])(s, 1)
             );
 
         return result;
@@ -459,9 +470,9 @@ namespace asl {
         CoordSpline::vFront( float s )
     {
 
-        float x = (*_spline[6]) ( s, 1 );
-        float y = (*_spline[7]) ( s, 1 );
-        float z = (*_spline[8]) ( s, 1 );
+        float x = (*_spline[FRONT_X]) ( s, 1 );
+        float y = (*_spline[FRONT_Y]) ( s, 1 );
+        float z = (*_spline[FRONT_Z]) ( s, 1 );
 
         return asl::Vector3f( x, y, z );
     }
@@ -478,9 +489,9 @@ namespace asl {
         CoordSpline::vRight( float s )
     {
 
-        float x = (*_spline[3]) ( s, 1 );
-        float y = (*_spline[4]) ( s, 1 );
-        float z = (*_spline[5]) ( s, 1 );
+        float x = (*_spline[RIGHT_X]) ( s, 1 );
+        float y = (*_spline[RIGHT_Y]) ( s, 1 );
+        float z = (*_spline[RIGHT_Z]) ( s, 1 );
 
         return asl::Vector3f( x, y, z );
     }
@@ -497,9 +508,9 @@ namespace asl {
         CoordSpline::vCamera( float s )
     {
 
-        float x = (*_spline[0]) ( s, 1 );
-        float y = (*_spline[1]) ( s, 1 );
-        float z = (*_spline[2]) ( s, 1 );
+        float x = (*_spline[POSITION_X]) ( s, 1 );
+        float y = (*_spline[POSITION_Y]) ( s, 1 );
+        float z = (*_spline[POSITION_Z]) ( s, 1 );
 
         return asl::Vector3f( x, y, z );
     }
@@ -522,8 +533,8 @@ namespace asl {
 
         // GET 10 SAMPLEPOINTS
         float x1, x2, x3, y1, y2, y3, step, x, y;
-        x1	    = _spline[0]->x(segment);
-        x3	    = _spline[0]->x(segment+1);
+        x1	    = _spline[POSITION_X]->x(segment);
+        x3	    = _spline[POSITION_X]->x(segment+1);
         step    = (x3-x1) / 10.0f;
 
         x = x2 = x1;
@@ -579,12 +590,12 @@ namespace asl {
         while( minRad2( x1, x2, x3, tol, &xmin ) < minHeight ) {
             const float h_factor = 0.9f;
             const float l_factor = 0.9f;
-            _spline[0]->changeTension( higherKeyframe, h_factor );
-            _spline[1]->changeTension( higherKeyframe, h_factor );
-            _spline[2]->changeTension( higherKeyframe, h_factor );
-            _spline[0]->changeTension( lowerKeyframe,  l_factor );
-            _spline[1]->changeTension( lowerKeyframe,  l_factor );
-            _spline[2]->changeTension( lowerKeyframe,  l_factor );
+            _spline[POSITION_X]->changeTension( higherKeyframe, h_factor );
+            _spline[POSITION_Y]->changeTension( higherKeyframe, h_factor );
+            _spline[POSITION_Z]->changeTension( higherKeyframe, h_factor );
+            _spline[POSITION_X]->changeTension( lowerKeyframe,  l_factor );
+            _spline[POSITION_Y]->changeTension( lowerKeyframe,  l_factor );
+            _spline[POSITION_Z]->changeTension( lowerKeyframe,  l_factor );
             AC_TRACE << "repairing spline segment "<<segment<<", step "<< count;
             if( count == maxcount ) {
                 AC_ERROR << "CoordSpline::avoidEarthCollision: cannot repair splineset";
