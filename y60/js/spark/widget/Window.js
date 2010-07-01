@@ -270,12 +270,15 @@ spark.Window.Constructor = function(Protected) {
             myPositionScale = new Vector2f(window.width, window.height);
         }
         var myPos = new Vector2f(theGesture.position3D.x * myPositionScale.x, theGesture.position3D.y * myPositionScale.y);
+        
+        // old picking without cursor grabbing
 //        var myWidget = Public.pickWidget(myPos.x, myPos.y);        
 //        if(!myWidget) {
 //            myWidget = Public;
 //        }
         var mySparkConformedCursorId = getSparkConformedCursorId(theGesture.baseeventtype, theGesture.cursorid);
         
+        // picking with considering cursor grabbing
         var myWidget;
         var myCursor = null;
         if (mySparkConformedCursorId in _myMultitouchCursors) {
@@ -289,36 +292,37 @@ spark.Window.Constructor = function(Protected) {
         if(!myWidget) {
             myWidget = Public;
         }
-//        print("picked " + myWidget.name + " " + theGesture.cursorid);
         if (myCursor) {
             myCursor.update(myWidget, myPos);
         }
         
         switch(theGesture.type) {
+            
             case "wipe":
                 var myDir = new Vector3f(theGesture.direction.x * myPositionScale.x * -1, theGesture.direction.y * myPositionScale.y * (1),0);
                 var myWipeEvent = new spark.WipeGestureEvent(spark.GestureEvent.WIPE, mySparkConformedCursorId , myPos.x, myPos.y, theGesture.baseeventtype, myDir);
                 myWidget.dispatchEvent(myWipeEvent);
                 break;
+                
             case "zoom_start":
-                print("----window zoom START " + theGesture.cursorid);
+//                print("----window zoom START " + theGesture.cursorid);
                 var myCursorList = [];
                 if (!myCursor) {
+                    Logger.error("zoom start gesture has no cursor object for cursorid: " + theGesture.cursorid);
                     return;
-                    Logger.error("no cursor for zoom start");
                 }
                 myCursorList.push(myCursor);
                 if (!_myMultitouchCursors[getSparkConformedCursorId(theGesture.baseeventtype, theGesture.zoomcursorid)]) {
+                    Logger.error("zoom start gesture has no cursor object for zoompartnerid: " + theGesture.zoomcursorid);
                     return;
-                    Logger.error("no zoompartner cursor for zoom start");
                 }
                 myCursorList.push(_myMultitouchCursors[getSparkConformedCursorId(theGesture.baseeventtype, theGesture.zoomcursorid)]);
-//                print("added cursors to list : " + myCursorList);
                 
                 var myZoomCenter = new Vector3f(theGesture.zoomcenter.x * myPositionScale.x, (1-theGesture.zoomcenter.y) * myPositionScale.y * (1),0);
                 var myZoomEvent = new spark.ZoomGestureEvent(spark.GestureEvent.ZOOM_START, mySparkConformedCursorId , myPos.x, myPos.y, theGesture.baseeventtype, null, null, myZoomCenter, myCursorList);
                 myWidget.dispatchEvent(myZoomEvent);
                 break;
+                
             case "zoom":
                 var myFirstDistance = theGesture.initialdistance;
                 var myDistance = theGesture.distance;
@@ -327,16 +331,14 @@ spark.Window.Constructor = function(Protected) {
                 myWidget.dispatchEvent(myZoomEvent);
                 var mySparkConformedZoomPartnerId = getSparkConformedCursorId(theGesture.baseeventtype, theGesture.zoomcursorid);
                 break;
+                
             case "zoom_finish":
-                print("----window zoom FINISH " + theGesture.cursorid);
-//                
+//                print("----window zoom FINISH " + theGesture.cursorid);
                 var myZoomEvent = new spark.ZoomGestureEvent(spark.GestureEvent.ZOOM_FINISH, mySparkConformedCursorId , myPos.x, myPos.y, theGesture.baseeventtype);
                 myWidget.dispatchEvent(myZoomEvent);
 
-//                print("delete " + theGesture.cursorid,theGesture.zoomcursorid);
-//                print("----------------------" + "\n");
-
                 break;
+                
             case "rotate":
                 break;
             default:
