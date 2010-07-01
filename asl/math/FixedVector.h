@@ -497,7 +497,17 @@ std::istream & parseVector(std::istream & is, T & v,
 
     typename T::size_type mySize = v.size();
     for (typename T::size_type i = 0; i < mySize; ++i) {
-        parseElement(is, v[i], (i < mySize-1) ? theDelimiter : theEndToken);
+        if (is.peek() == VECTOR_OF_STRING_DELIMITER) { // we have a backticked string. Try to interprete the contents
+            is >> myChar; // discard opening backtick
+            parseElement(is, v[i], VECTOR_OF_STRING_DELIMITER);  // parse up to closing backtick
+            is >> myChar; // ensure delimter follows
+            if ( myChar != ((i+1 < mySize) ? theDelimiter : theEndToken)) {
+                is.setstate(std::ios::failbit);
+                return is;
+            }
+        } else {
+            parseElement(is, v[i], (i+1 < mySize) ? theDelimiter : theEndToken);
+        }
         if (!is) {
             is.setstate(std::ios::failbit);
             return is;
