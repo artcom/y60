@@ -71,7 +71,7 @@ function FlyMover(theViewport) {
 
 FlyMover.prototype.Constructor = function(self, theViewport) {
     MoverBase.prototype.Constructor(self, theViewport);
-    self.Mover = [];
+    self.Mover = {};
 
     const INITIAL_FLY_SPEED = 0.001;
     const MINIMUM_AUTO_ADJUST_WORLD_SIZE_PERCENTAGE = 0.0001;
@@ -121,7 +121,9 @@ FlyMover.prototype.Constructor = function(self, theViewport) {
         _myCurrentStartSpeed = 1;
     };
 
-    self.stop = function() {_myFlySpeed = 0;};
+    self.stop = function() {
+        _myFlySpeed = 0;
+    };
     
     self.simulate = function(theDeltaTime) {
         if (_myFlySpeed) {
@@ -186,7 +188,7 @@ FlyMover.prototype.Constructor = function(self, theViewport) {
         _myPitchAngle = setZeroZone(_myPitchAngle, 0.02);
     };
     
-    
+    // XXX TODO: the Eventhandling should not be inside the Mover
     self.onFrame = function(theTime) {
         if (!_myLastIdleTime) {
             _myLastIdleTime = theTime;
@@ -197,6 +199,7 @@ FlyMover.prototype.Constructor = function(self, theViewport) {
         _myLastIdleTime = theTime;
     };
     
+    // XXX TODO: the Eventhandling should not be inside the Mover
     self.onMouseButton = function(theButton, theState, theX, theY) {
         if (theState != BUTTON_UP) {
             return;
@@ -216,6 +219,7 @@ FlyMover.prototype.Constructor = function(self, theViewport) {
         }
     };
     
+    // XXX TODO: the Eventhandling should not be inside the Mover
     self.onMouseMotion = function(theX, theY) {
         self.setCameraAnglesByScreenCoordinates(theX, theY);
     };

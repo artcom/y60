@@ -166,7 +166,7 @@ JSKeyframe::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, j
     DOC_BEGIN("Construct a Keyframe");
     DOC_PARAM("thePosition", "", DOC_TYPE_VECTOR3F);
     DOC_PARAM("theOrientation", "", DOC_TYPE_QUATERNIONF);
-    DOC_PARAM("theTimestamp", "", DOC_TYPE_FLOAT);
+    DOC_PARAM("theTimeDelta", "", DOC_TYPE_FLOAT);
     DOC_PARAM("theSpeed", "", DOC_TYPE_FLOAT);
     DOC_END;
     if (JSA_GetClass(cx,obj) != Class()) {
@@ -191,8 +191,8 @@ JSKeyframe::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, j
             return JS_FALSE;
         }
 
-        float myTimeStamp;
-        if (JSVAL_IS_VOID(argv[2]) || !convertFrom(cx, argv[2], myTimeStamp)) {
+        float deltaTime;
+        if (JSVAL_IS_VOID(argv[2]) || !convertFrom(cx, argv[2], deltaTime)) {
             JS_ReportError(cx, "JSKeyFrame::Constructor: argument #3 must be a float");
             return JS_FALSE;
         }
@@ -204,7 +204,7 @@ JSKeyframe::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, j
         }
 
 
-        OWNERPTR myNewKeyframe = OWNERPTR(new QuaternionKeyframe(myPosition, myOrienation, myTimeStamp, mySpeed));
+        OWNERPTR myNewKeyframe = OWNERPTR(new QuaternionKeyframe(myPosition, myOrienation, deltaTime, mySpeed));
         myNewObject = new JSKeyframe(myNewKeyframe, myNewKeyframe.get());
     } else {
         JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected 4 (position, orienation, timestamp, speed) %d",ClassName(), argc);

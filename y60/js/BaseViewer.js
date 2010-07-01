@@ -58,7 +58,7 @@
 
 // use this idiom in each level of inheritance and
 // you'll know if you are the outermost .js file.
-if (__main__ == undefined) var __main__ = "SceneViewer";
+var __main__ = __main__ || "BaseViewer";
 
 use("Y60JSSL.js");
 use("Exception.js");
@@ -76,6 +76,16 @@ function BaseViewer(theArguments) {
 }
 
 BaseViewer.prototype.Constructor = function(self, theArguments) {
+
+    var _defaultRenderingCapabilities = Renderer.TEXTURE_3D_SUPPORT |
+                                        Renderer.MULTITEXTURE_SUPPORT |
+                                        Renderer.TEXTURECOMPRESSION_SUPPORT |
+                                        Renderer.CUBEMAP_SUPPORT;
+                                        
+    self.getDefaultRenderingCapabilites = function() {
+        return _defaultRenderingCapabilities;
+    };
+
     self.getReleaseMode = function() {
         return _myReleaseMode;
     }
@@ -170,14 +180,14 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         _myPicking = new Picking(_myRenderWindow);
     }
 
-    self.setupWindow = function(theRenderWindow, theSetDefaultRenderingCap) {
+    self.setupWindow = function(theRenderWindow, theSetDefaultRenderingCapabilitiesFlag) {
+        var setDefaultRenderingCapabilities = true;
+        if (theSetDefaultRenderingCapabilitiesFlag !== undefined) {
+            setDefaultRenderingCapabilities = !!theSetDefaultRenderingCapabilitiesFlag;
+        }
         self.attachWindow(theRenderWindow);
-        if (theSetDefaultRenderingCap == undefined || theSetDefaultRenderingCap) {
-            _myRenderWindow.renderingCaps =
-                Renderer.TEXTURE_3D_SUPPORT |
-                Renderer.MULTITEXTURE_SUPPORT |
-                Renderer.TEXTURECOMPRESSION_SUPPORT |
-                Renderer.CUBEMAP_SUPPORT;
+        if (setDefaultRenderingCapabilities) {
+            _myRenderWindow.renderingCaps = _defaultRenderingCapabilities;
         }
    }
 
