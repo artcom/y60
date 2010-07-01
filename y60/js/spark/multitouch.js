@@ -300,3 +300,146 @@ spark.CursorEvent.Constructor = function(Protected, theType, theCursor) {
         return _myCursor.intensity;
     };
 };
+
+
+/**
+ * Multitouch cursors
+ * 
+ * This class represents 
+ * multitouch gesture events
+ */
+const ASS_BASE_EVENT = 0;
+const TUIO_BASE_EVENT = 1;
+
+
+spark.GestureEvent = spark.Class("GestureEvent");
+
+/**
+ * rotate event: "XXX"
+ */
+spark.GestureEvent.ROTATE  = "gesture-rotate";
+
+spark.GestureEvent.Constructor = function(Protected, theType, theCursorId, theX, theY, theBaseEvent) {
+    var Public = this;
+
+    this.Inherit(spark.Event, theType);
+    
+    /**
+     * Reference to the cursor this event concerns
+     */
+    var _myCursorId = theCursorId;
+    
+    Public.cursorid getter = function() {
+        return _myCursorId;
+    };
+    
+    /**
+     * Convenience: horizontal position of cursor
+     */
+    var _myStageX = theX;
+    
+    Public.stageX getter = function() {
+        return _myStageX;
+    };
+
+    /**
+     * Convenience: vertical position of cursor
+     */
+    var _myStageY = theY;
+
+    Public.stageY getter = function() {
+        return _myStageY;
+    };
+
+    /**
+     * Reference to the base event ass or tuio
+     */
+    var _myBaseEvent = theBaseEvent;
+
+    Public.baseEvent getter = function() {
+        return _myBaseEvent;
+    };
+};
+
+
+/**
+ * wipe event: "the distance between the last two move cursors
+ * is bigger than the given threshold"
+ */
+spark.GestureEvent.WIPE  = "gesture-wipe";
+spark.WipeGestureEvent = spark.Class("WipeGestureEvent");
+spark.WipeGestureEvent.Constructor = function(Protected, theType, theCursorId, theX, theY, theBaseEvent, theDir) {
+    var Public = this;
+
+    this.Inherit(spark.GestureEvent, theType, theCursorId, theX, theY, theBaseEvent);
+    
+    /**
+     * Direction vector  of the wipe event
+     */
+    var _myDir = normalized(theDir);
+
+    Public.direction getter = function() {
+        return _myDir;
+    };
+    
+    /**
+     * Magnitude of the direction vector
+     */
+    var _myMagnitude = magnitude(theDir);
+
+    Public.magnitude getter = function () {
+        return _myMagnitude;
+    };
+
+};
+
+/**
+ * zoom event: "two cursors who enlarge their distance"
+ */
+spark.GestureEvent.ZOOM_START  = "gesture-zoom-start";
+spark.GestureEvent.ZOOM  = "gesture-zoom";
+spark.GestureEvent.ZOOM_FINISH = "gesture-zoom-finish";
+
+spark.ZoomGestureEvent = spark.Class("ZoomGestureEvent");
+spark.ZoomGestureEvent.Constructor = function(Protected, theType, theCursorId, theX, theY, theBaseEvent, theFirstDistance, theDistance, theZoomCenter, theCursorArray) {
+    var Public = this;
+
+    this.Inherit(spark.GestureEvent, theType, theCursorId, theX, theY, theBaseEvent);
+    
+    /**
+     * start distance between the zoom partners
+     */
+    var _myFirstDistance = theFirstDistance;
+
+    Public.firstdistance getter = function () {
+        return _myFirstDistance;
+    };
+    
+    /**
+     * current distance between zoom partners
+     */
+    var _myDistance = theDistance;
+
+    Public.distance getter = function() {
+        return _myDistance;
+    };
+    
+    /**
+     * midpoint between the zoom partner pos
+     */
+    var _myZoomCenter = theZoomCenter;
+
+    Public.zoomcenter getter = function () {
+        return _myZoomCenter;
+    };
+    
+    /**
+     * list of zoom cursors
+     */
+    var _myCursorArray = theCursorArray;
+
+    Public.cursorarray getter = function () {
+        return _myCursorArray;
+    };
+
+};

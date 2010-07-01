@@ -258,6 +258,93 @@ spark.Window.Constructor = function(Protected) {
         Public.dispatchEvent(myEvent);
     };
 
+    // Will be called on a gesture event
+    Public.onGesture = function(theGesture) {
+        
+        var myPositionScale = new Vector2f(1,1);
+        // ass event come in screen coordinates
+        // tuio events are normalized from 0 to 1, so scale'em here
+        // actually they must be scaled to screen-resolution
+        // and not window-resolution, it now only works for fullscreen apps        
+        if (theGesture.baseeventtype == TUIO_BASE_EVENT) {
+            myPositionScale = new Vector2f(window.width, window.height);
+        }
+        var myPos = new Vector2f(theGesture.position3D.x * myPositionScale.x, theGesture.position3D.y * myPositionScale.y);
+//        var myWidget = Public.pickWidget(myPos.x, myPos.y);        
+//        if(!myWidget) {
+//            myWidget = Public;
+//        }
+        var mySparkConformedCursorId = getSparkConformedCursorId(theGesture.baseeventtype, theGesture.cursorid);
+        
+        var myWidget;
+        var myCursor = null;
+        if (mySparkConformedCursorId in _myMultitouchCursors) {
+            myCursor = _myMultitouchCursors[mySparkConformedCursorId];
+        }
+        if(myCursor && myCursor.grabbed) {
+            myWidget = myCursor.grabHolder;
+        } else {
+            myWidget = Public.pickWidget(myPos.x, myPos.y);
+        }
+        if(!myWidget) {
+            myWidget = Public;
+        }
+//        print("picked " + myWidget.name + " " + theGesture.cursorid);
+        if (myCursor) {
+            myCursor.update(myWidget, myPos);
+        }
+        
+        switch(theGesture.type) {
+            case "wipe":
+                var myDir = new Vector3f(theGesture.direction.x * myPositionScale.x * -1, theGesture.direction.y * myPositionScale.y * (1),0);
+                var myWipeEvent = new spark.WipeGestureEvent(spark.GestureEvent.WIPE, mySparkConformedCursorId , myPos.x, myPos.y, theGesture.baseeventtype, myDir);
+                myWidget.dispatchEvent(myWipeEvent);
+                break;
+            case "zoom_start":
+                print("----window zoom START " + theGesture.cursorid);
+                var myCursorList = [];
+                if (!myCursor) {
+                    return;
+                    Logger.error("no cursor for zoom start");
+                }
+                myCursorList.push(myCursor);
+                if (!_myMultitouchCursors[getSparkConformedCursorId(theGesture.baseeventtype, theGesture.zoomcursorid)]) {
+                    return;
+                    Logger.error("no zoompartner cursor for zoom start");
+                }
+                myCursorList.push(_myMultitouchCursors[getSparkConformedCursorId(theGesture.baseeventtype, theGesture.zoomcursorid)]);
+//                print("added cursors to list : " + myCursorList);
+                
+                var myZoomCenter = new Vector3f(theGesture.zoomcenter.x * myPositionScale.x, (1-theGesture.zoomcenter.y) * myPositionScale.y * (1),0);
+                var myZoomEvent = new spark.ZoomGestureEvent(spark.GestureEvent.ZOOM_START, mySparkConformedCursorId , myPos.x, myPos.y, theGesture.baseeventtype, null, null, myZoomCenter, myCursorList);
+                myWidget.dispatchEvent(myZoomEvent);
+                break;
+            case "zoom":
+                var myFirstDistance = theGesture.initialdistance;
+                var myDistance = theGesture.distance;
+                var myZoomEvent = new spark.ZoomGestureEvent(spark.GestureEvent.ZOOM, mySparkConformedCursorId , myPos.x, myPos.y, theGesture.baseeventtype, 
+                                                                myFirstDistance, myDistance);
+                myWidget.dispatchEvent(myZoomEvent);
+                var mySparkConformedZoomPartnerId = getSparkConformedCursorId(theGesture.baseeventtype, theGesture.zoomcursorid);
+                break;
+            case "zoom_finish":
+                print("----window zoom FINISH " + theGesture.cursorid);
+//                
+                var myZoomEvent = new spark.ZoomGestureEvent(spark.GestureEvent.ZOOM_FINISH, mySparkConformedCursorId , myPos.x, myPos.y, theGesture.baseeventtype);
+                myWidget.dispatchEvent(myZoomEvent);
+
+//                print("delete " + theGesture.cursorid,theGesture.zoomcursorid);
+//                print("----------------------" + "\n");
+
+                break;
+            case "rotate":
+                break;
+            default:
+//                print(theGesture.type);
+            
+        }
+    }
+
     // Will be called on a mouse move
     Base.onMouseMotion = Public.onMouseMotion;
     Public.onMouseMotion = function(theX, theY) {
@@ -395,6 +482,16 @@ spark.Window.Constructor = function(Protected) {
                                          new Vector2f(theGridSizeX, theGridSizeY), theCount);
         Public.dispatchEvent(myEvent);
     };
+    
+    function getSparkConformedCursorId(theBaseEventType, theId) {
+        var mySparkConformedCursorId = "";
+        if (theBaseEventType == ASS_BASE_EVENT) {
+            mySparkConformedCursorId  = "pmtx" + theId;
+        } else {
+            mySparkConformedCursorId  = "tuio" + theId;
+        }
+        return mySparkConformedCursorId;
+    }
 
     var _myMultitouchCursors = {};
 
@@ -496,7 +593,6 @@ spark.Window.Constructor = function(Protected) {
         case "remove":
             if(myId in _myMultitouchCursors) {
                 Logger.debug("Cursor " + myId + " removed");
-
                 var myCursor   = _myMultitouchCursors[myId];
                 var myPosition = getMultitouchCursorPosition(theEvent);
                 var myFocused  = myCursor.focused;
@@ -514,7 +610,6 @@ spark.Window.Constructor = function(Protected) {
                 }
 
                 myCursor.deactivate();
-
                 delete _myMultitouchCursors[myId];
             }
             break;
