@@ -57,24 +57,28 @@
 
 */
 
+/*jslint plusplus: false*/
+/*globals print, use, UnitTest, ENSURE, Node, DTITLE, exit, UnitTestSuite,
+          removeAttributeByName, removeElement*/
+
+use("Y60JSSL.js");
 use("UnitTest.js");
 
 function Y60JSSLUnitTest() {
     this.Constructor(this, "Y60JSSLUnitTest");
-};
+}
 
-
-Y60JSSLUnitTest.prototype.Constructor = function(obj, theName) {
+Y60JSSLUnitTest.prototype.Constructor = function (obj, theName) {
 
     UnitTest.prototype.Constructor(obj, theName);
 
     function testRemoveElement(theArray, theResult) {
-        DTITLE("removing elemnts");
+        DTITLE("removing elements");
 
         obj.myArray = theArray;
         obj.myResult = theResult;
         for (var i = 0; i < obj.myArray.length; ++i) {
-            if (obj.myArray[i] == 0) {
+            if (obj.myArray[i] === 0) {
                 obj.myArray = removeElement(obj.myArray, i);
                 i--;
             }
@@ -94,54 +98,105 @@ Y60JSSLUnitTest.prototype.Constructor = function(obj, theName) {
         myNode.test2 = "testval2";
         var myAttributeCount = myNode.attributes.length;
         myNode = removeAttributeByName(myNode, "test");
-        ENSURE(myAttributeCount == 2 && myNode.attributes.length == 1,
+        ENSURE(myAttributeCount === 2 && myNode.attributes.length === 1,
             "added two attributes and removed the first");
 
         myNode = removeAttributeByName(myNode, "nonexistingAttrib");
-        ENSURE(myNode.attributes.length == 1,
+        ENSURE(myNode.attributes.length === 1,
                "trying to remove a non-existing attribute");
 
         myNode = removeAttributeByName(myNode, "test2");
-        ENSURE(myNode.attributes.length == 0,
+        ENSURE(myNode.attributes.length === 0,
             "removed the last remaining attribute");
     }
 
     function testAngleFunctions() {
         DTITLE("angle functions");
 
-        ENSURE( 'degBetween(0,0) == 0');
-        ENSURE( 'degBetween(0, 90) == -90 ' );
-        ENSURE( 'degBetween(90, 0) == 90 ' );
+        ENSURE('degBetween(0,0) == 0');
+        ENSURE('degBetween(0, 90) == -90 ');
+        ENSURE('degBetween(90, 0) == 90 ');
 
-        ENSURE( 'degBetween(370, 350) == 20 ' );
-        ENSURE( 'degBetween(10, 350) == 20 ' );
+        ENSURE('degBetween(370, 350) == 20 ');
+        ENSURE('degBetween(10, 350) == 20 ');
 
-        ENSURE( 'degBetween(350, 370) == -20 ' );
-        ENSURE( 'degBetween(350, 10) == -20 ' );
+        ENSURE('degBetween(350, 370) == -20 ');
+        ENSURE('degBetween(350, 10) == -20 ');
 
-        ENSURE( 'degBetween(190, 170) == 20 ' );
-        ENSURE( 'degBetween(170, 190) == -20 ' );
+        ENSURE('degBetween(190, 170) == 20 ');
+        ENSURE('degBetween(170, 190) == -20 ');
+    }
+    
+    function testArrayToString() {
+        DTITLE("arrayToString");
+        
+        ENSURE_EQUAL("[]",
+                     arrayToString([]),
+                     "empty array");
+        ENSURE_EQUAL("[[]]",
+                     arrayToString([[]]),
+                     "empty array in an array");
+        ENSURE_EQUAL("[[1,1,1],identity[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]]",
+                     arrayToString([new Vector3f(1,1,1), new Matrix4f()]),
+                     "array with non-primitive members");
+    }
+    
+    function testParseRankedFeature() {
+        DTITLE("parseRankedFeature");
+        
+        var myRankedFeature = parseRankedFeature("123[]");
+        ENSURE_EQUAL(true, myRankedFeature.features.constructor === Array, "features is an Array");
+        ENSURE_EQUAL(1, myRankedFeature.features.length, "no features given - length is 1 (??)"); // This does not really make sense...
+        ENSURE_EQUAL("", myRankedFeature.features[0], "and this feature is '' (??)");
+        ENSURE_EQUAL("number", typeof myRankedFeature.rank, "rank is a Number");
+        ENSURE_EQUAL(123, myRankedFeature.rank, "proper rank");
+        
+        myRankedFeature = parseRankedFeature("123[water,ice,fire]");
+        ENSURE_EQUAL(3, myRankedFeature.features.length, "proper length of features");
+        ENSURE_EQUAL("water", myRankedFeature.features[0], "first feature proper");
+        ENSURE_EQUAL("ice", myRankedFeature.features[1], "second feature proper");
+        ENSURE_EQUAL("fire", myRankedFeature.features[2], "third feature proper");
     }
 
-    obj.run = function() {
-        testAngleFunctions();
+    function teststripIdentifier() {
+        DTITLE("stripIdentifier");
+        
+        ENSURE_EQUAL("theTestFile.js", stripIdentifier("theTest-File.js"));
+        ENSURE_EQUAL("PathtonowheretheTestFile.js", stripIdentifier("Path/to\\nowhere/theTest-File.js"));
+    }
+
+    obj.run = function () {
+        /*testAngleFunctions();
         testRemoveElement([], []);
         testRemoveElement([0], []);
-        testRemoveElement([0,0], []);
-        testRemoveElement([0,1,2], [1,2]);
-        testRemoveElement([1,2,0], [1,2]);
-        testRemoveElement([1,0,2], [1,2]);
-        testRemoveElement([1,2,3], [1,2,3]);
-        testRemoveElement([0,0,1,0,0,2,0,0,3,0,0], [1,2,3]);
+        testRemoveElement([0, 0], []);
+        testRemoveElement([0, 1, 2], [1, 2]);
+        testRemoveElement([1, 2, 0], [1, 2]);
+        testRemoveElement([1, 0, 2], [1, 2]);
+        testRemoveElement([1, 2, 3], [1, 2, 3]);
+        testRemoveElement([0, 0, 1, 0, 0, 2, 0, 0, 3, 0, 0], [1, 2, 3]);
         testRemoveAttribute();
-    }
+        testArrayToString();
+        testParseRankedFeature();*/
+        
+        teststripIdentifier();
+    };
 };
 
-var myTestName = "testY60JSSL.tst.js";
-var mySuite = new UnitTestSuite(myTestName);
+try {
+    var myScriptPathSegments = __FILE__().split("/");
+    var mySuiteName = myScriptPathSegments[myScriptPathSegments.length - 1];
+    var mySuite = new UnitTestSuite(mySuiteName);
 
-mySuite.addTest(new Y60JSSLUnitTest());
-mySuite.run();
+    // may be more than one test here
+    mySuite.addTest(new Y60JSSLUnitTest()); 
+    mySuite.run();
 
-print(">> Finished test suite '"+myTestName+"', return status = " + mySuite.returnStatus() + "");
-exit(mySuite.returnStatus());
+    print(">> Finished test suite '" + mySuiteName + "', return status = " + mySuite.returnStatus() + "");
+    exit(mySuite.returnStatus());
+} catch (ex) {
+    print("-----------------------------------------------------------------------------------------");
+    print("### Error: " + ex);
+    print("-----------------------------------------------------------------------------------------");
+    exit(1);
+}
