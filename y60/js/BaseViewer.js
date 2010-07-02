@@ -342,7 +342,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
             theWorld = _myRenderWindow.scene.world;
         }
         // material
-        var myMaterialNode = _myRenderWindow.scene.world.getElementById(_mySkyboxMaterialId);
+        var myMaterialNode = theWorld.getElementById(_mySkyboxMaterialId);
         if (!myMaterialNode) {
             myMaterialNode = Node.createElement("material");
             myMaterialNode.id = createUniqueId();
@@ -388,10 +388,9 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
             theTile = new Vector2i(1,6);
         }
         if (_mySkyboxMaterialId) {
-            var mySkyboxMaterial =
-                _myRenderWindow.scene.world.getElementById(_mySkyboxMaterialId);
+            var mySkyboxMaterial = theWorld.getElementById(_mySkyboxMaterialId);
             var myTextureId = mySkyboxMaterial.childNode("textureunits").firstChild.texture;
-            var myTexture = window.scene.textures.getElementById(myTextureId);
+            var myTexture = _myRenderWindow.scene.textures.getElementById(myTextureId);
             var mySkyboxImage = mySkyboxMaterial.getElementById(myTexture.image);
             mySkyboxImage.src = theFileName;
             mySkyboxImage.tile = theTile;
@@ -407,11 +406,11 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
 
             _myRenderWindow.scene.images.appendChild(mySkyboxImage);
 
-            var mySkyboxTexture = Modelling.createTexture(window.scene, mySkyboxImage);
+            var mySkyboxTexture = Modelling.createTexture(_myRenderWindow.scene, mySkyboxImage);
             mySkyboxTexture.mipmap   = 0;
             mySkyboxTexture.wrapmode = "repeat";
 
-            self.addSkyBoxFromImage(mySkyboxImage);
+            self.addSkyBoxFromImage(mySkyboxImage, theWorld);
         }
     }
 
