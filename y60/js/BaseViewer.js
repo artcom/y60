@@ -343,6 +343,9 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         }
         // material
         var myMaterialNode = theWorld.getElementById(_mySkyboxMaterialId);
+        var myTextureUnitNode  = null;
+        var myTextureNode      = null;
+        
         if (!myMaterialNode) {
             myMaterialNode = Node.createElement("material");
             myMaterialNode.id = createUniqueId();
@@ -353,19 +356,22 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
             theWorld.skyboxmaterial = _mySkyboxMaterialId;
 
             // add texture units
-            var myTextureUnitsNode = new Node("<textureunits><textureunit applymode='decal'/></textureunits>").firstChild;
+            var myTextureUnitsNode = Node.createElement("textureunits");
+            myTextureUnitNode  = Node.createElement("textureunit");
+            myTextureUnitNode.applymode = "decal";
+            myTextureUnitsNode.appendChild(myTextureUnitNode);
             myMaterialNode.appendChild(myTextureUnitsNode);
 
             // add texture requirement
             var myTextureFeatures = new Node("<feature name='textures'>[100[skybox]]</feature>").firstChild;
             myMaterialNode.requires.appendChild(myTextureFeatures);
+        } else {
+            // texture unit
+            myTextureUnitNode = myMaterialNode.childNode("textureunits").firstChild;
+            // texture
+            myTextureNode = myMaterialNode.getElementById(myTextureUnitNode.texture);
         }
 
-        // texture unit
-        var myTextureUnitNode = myMaterialNode.childNode("textureunits").firstChild;
-
-        // texture
-        var myTextureNode = myMaterialNode.getElementById(myTextureUnitNode.texture);
         if (!myTextureNode) {
             myTextureNode = Node.createElement("texture");
             myTextureNode.id = createUniqueId();
@@ -375,9 +381,8 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
 
             _myRenderWindow.scene.textures.appendChild(myTextureNode);
             myTextureUnitNode.texture = myTextureNode.id;
-        }
-
-        myTextureNode.image = theImageNode.id;
+        }       
+        myTextureNode.image = theImageNode.id;        
     }
 
     self.addSkyBoxFromFile = function(theFileName, theTile, theWorld) {
