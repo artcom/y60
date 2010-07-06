@@ -59,7 +59,10 @@
 /*jslint white:false, nomen:false, bitwise:false, plusplus:false*/
 /*globals use, Renderer, glow, window, Logger, Glow, AutoClicker, Vector2f,
           Exception, fileline, Picking, fileExists, revision, Node,
-          createUniqueId, almostEqual, Vector2i, Modelling, print*/
+          createUniqueId, almostEqual, Vector2i, Modelling, print,
+          LightManager, GLResourceManager, SwitchNodeHandler,
+          MSwitchNodeHandler, TSwitchNodeHandler, readFileAsString,
+          writeStringToFile, NagiosPlugin, Playlist, plug*/
 
 // use this idiom in each level of inheritance and
 // you'll know if you are the outermost .js file.
@@ -270,9 +273,10 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         return self.getActiveViewport().id; //getSingleViewport().id;
     }
 
-    self.setMover = function(theMoverFactory, theViewport, theMoverObject) {
-        if (theMoverFactory) {
-            var myNewMover = new theMoverFactory(theViewport);
+    self.setMover = function(MoverConstructor, theViewport, theMoverObject) {
+        var myNewMover = null;
+        if (MoverConstructor) {
+            myNewMover = new MoverConstructor(theViewport);
             var myViewportId = getViewportId(theViewport);
             _myLastMover = myNewMover;
             
@@ -285,7 +289,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
             return myNewMover;
         } else { 
             _myLastMover = null;
-            return null;
+            return myNewMover;
             
         }
     };
@@ -446,6 +450,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     };
 
     self.addSkyBoxFromFile = function(theFileName, theTile, theWorld) {
+        var mySkyboxImage;
         if ( ! theWorld ) {
             theWorld = _myRenderWindow.scene.world;
         }
@@ -456,14 +461,14 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
             var mySkyboxMaterial = theWorld.getElementById(_mySkyboxMaterialId);
             var myTextureId = mySkyboxMaterial.childNode("textureunits").firstChild.texture;
             var myTexture = _myRenderWindow.scene.textures.getElementById(myTextureId);
-            var mySkyboxImage = mySkyboxMaterial.getElementById(myTexture.image);
+            mySkyboxImage = mySkyboxMaterial.getElementById(myTexture.image);
             mySkyboxImage.src = theFileName;
             mySkyboxImage.tile = theTile;
             myTexture.wrapmode = "clamp_to_edge";
             theWorld.skyboxmaterial = _mySkyboxMaterialId;
         } else {
             var myImageId = createUniqueId();
-            var mySkyboxImage      = Node.createElement("image");
+            mySkyboxImage      = Node.createElement("image");
             mySkyboxImage.name     = theFileName;
             mySkyboxImage.id       = myImageId;
             mySkyboxImage.src      = theFileName;
@@ -491,6 +496,27 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     //  RenderWindow callback handlers
     //
     ///////////////////////////////////////////////////////////////////////////////////////////
+
+    function mergeMaterialProperties(theTargetMaterial, theTableNode) {
+
+        //theTargetMaterial.removeChild(theTargetMaterial.childNode("properties"));
+        //theTargetMaterial.appendChild(theTableNode.cloneNode(true));
+
+        var myTargetProperties = theTargetMaterial.childNode("properties");
+        for (var i = 0; i < theTableNode.childNodes.length; ++i) {
+            var myNode = theTableNode.childNode(i);
+            if (myNode.nodeName.search(/sampler/) != -1) {
+                // skip samplers
+                continue;
+            }
+            var myTargetProperty = myTargetProperties.find(".//*[@name = '" + myNode.name + "']");
+            if (myTargetProperty) {
+                // remove property before replacing it
+                myTargetProperties.removeChild(myTargetProperty);
+            }
+            myTargetProperties.appendChild(myNode.cloneNode(true));
+        }
+    }
 
     self.applyMaterialTable = function(theFilename) {
 
@@ -540,27 +566,6 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
 
         return _myMaterialTable;
     };
-
-    function mergeMaterialProperties(theTargetMaterial, theTableNode) {
-
-        //theTargetMaterial.removeChild(theTargetMaterial.childNode("properties"));
-        //theTargetMaterial.appendChild(theTableNode.cloneNode(true));
-
-        var myTargetProperties = theTargetMaterial.childNode("properties");
-        for (var i = 0; i < theTableNode.childNodes.length; ++i) {
-            var myNode = theTableNode.childNode(i);
-            if (myNode.nodeName.search(/sampler/) != -1) {
-                // skip samplers
-                continue;
-            }
-            var myTargetProperty = myTargetProperties.find(".//*[@name = '" + myNode.name + "']");
-            if (myTargetProperty) {
-                // remove property before replacing it
-                myTargetProperties.removeChild(myTargetProperty);
-            }
-            myTargetProperties.appendChild(myNode.cloneNode(true));
-        }
-    }
 
     self.recollectSwitchNodes = function(theNode) {
         collectAllSwitchNodes(theNode);
@@ -854,24 +859,24 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
             if ( !("name" in myChild) ) {
                 continue;
             }
-            var myName = new String( myChild.name );
-            if ( myName.match(/^switch_.*/)) {
+            var myName = myChild.name;
+            if (myName.match(/^switch_.*/)) {
                 _mySwitchNodes.push( new SwitchNodeHandler( myChild ) );
             }
-            if ( myName.match(/^mswitch_.*/)) {
+            if (myName.match(/^mswitch_.*/)) {
                 _myMSwitchNodes.push( new MSwitchNodeHandler( myChild ) );
             }
-            if ( myName.match(/^tswitch_.*/) && myChild.nodeName == "material") {
+            if (myName.match(/^tswitch_.*/) && myChild.nodeName == "material") {
                 _myTSwitchNodes.push( new TSwitchNodeHandler( theNode.childNode(i)) );
             }
-            collectSwitchNodes( myChild );
+            collectSwitchNodes(myChild);
         }
     }
 
     function collectAllSwitchNodes(theNode) {
-        _mySwitchNodes  = new Array();
-        _myMSwitchNodes = new Array();
-        _myTSwitchNodes = new Array();
+        _mySwitchNodes  = [];
+        _myMSwitchNodes = [];
+        _myTSwitchNodes = [];
 
         if (theNode == null) {
             collectSwitchNodes(window.scene.world);
@@ -883,15 +888,15 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
 
     self.getSwitchNodes = function() {
         return _mySwitchNodes;
-    }
+    };
 
     self.getMaterialSwitchNodes = function() {
         return _myMSwitchNodes;
-    }
+    };
 
     self.getTextureSwitchNodes = function() {
         return _myTSwitchNodes;
-    }
+    };
 
     self.prepareScene = function (theScene, theCanvas, theSwitchNodeFlag) {
         if (theScene) {
@@ -933,13 +938,13 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
             _myShapes = null;
             _myImages = null;
         }
-    }
+    };
 
-    /////////////////
-    // Constructor //
-    /////////////////
+    ////////////////////
+    // Initialization //
+    ////////////////////
 
-    self.arguments = _parseArguments(theArguments);
+    self['arguments'] = _parseArguments(theArguments);
 
     var myShaderLibrary = self.getShaderLibrary();
     if (myShaderLibrary) {
@@ -947,4 +952,4 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     } else {
         Logger.warning("No Shaderlibrary name given found, default library will be loaded");
     }
-}
+};
