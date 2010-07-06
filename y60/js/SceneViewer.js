@@ -56,10 +56,13 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+/*jslint nomen:false, white:false*/
+/*globals use, Logger, BaseViewer*/
+
 // use this idiom in each level of inheritance and
 // you'll know if you are the outermost .js file.
 // (See ImageViewer and SliceViewer for an example of how to use this)
-if (__main__ == undefined) var __main__ = "SceneViewer";
+var __main__ = __main__ || "SceneViewer";
 
 use("Y60JSSL.js");
 use("Exception.js");
@@ -84,8 +87,8 @@ use("VideoRecorder.js");
 use("PerfMeter.js");
 
 // Global window object (similar to html window)
-if (window == undefined) var window   = null;
-if (renderer == undefined) var renderer = null;
+var window = window || null;
+var renderer = renderer || null;
 
 var SETTINGS_FILE_NAMES = ["settings.xml", "CONFIG/settings.xml" ];
 

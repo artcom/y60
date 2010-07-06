@@ -56,6 +56,11 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+/*jslint white:false, nomen:false, bitwise:false, plusplus:false*/
+/*globals use, Renderer, glow, window, Logger, Glow, AutoClicker, Vector2f,
+          Exception, fileline, Picking, fileExists, revision, Node,
+          createUniqueId, almostEqual, Vector2i, Modelling, print*/
+
 // use this idiom in each level of inheritance and
 // you'll know if you are the outermost .js file.
 var __main__ = __main__ || "BaseViewer";
@@ -69,13 +74,57 @@ use("Playlist.js");
 use("Glow.js");
 use("SwitchNodeHandler.js");
 use("AutoClicker.js");
-//use("OcclusionUtils.js"); // XXX disabled, no longer needed
 
 function BaseViewer(theArguments) {
     this.Constructor(this, theArguments);
 }
 
 BaseViewer.prototype.Constructor = function(self, theArguments) {
+
+    /////////////////////
+    // Private Members //
+    /////////////////////
+
+    var _myRenderWindow          = null;
+    var _myActiveCameraIndex     = 0;
+    var _myModelName             = null;
+    var _myShaderLibrary         = null;
+    var _myReleaseMode           = true;
+    var _myLightManager          = null;
+    var _myGlow                  = null;
+
+    var PROFILE_FILENAME = "profile.xml";
+    var _myProfileFilename = null;
+    var _myProfileNode     = null;
+
+    // Camera movers
+    var _myMoverFactories        = [];  // Array of mover constructors
+
+    var _myLastMover             = null;
+    var _myClickedViewport       = null;
+    var _myAutoNearFarFlag       = true;
+    var _activeViewport          = null;
+
+    // For fast scene access
+    var _myWorld                 = null;
+    var _myMaterials             = null;
+    var _myLightSources          = null;
+    var _myShapes                = null;
+    var _myCharacters            = null;
+    var _myAnimations            = null;
+    var _myImages                = null;
+
+    var _mySkyboxMaterialId      = null;
+    var _myHeartbeatThrober      = null;
+    var _myNagiosPlugin          = null;
+    var _myPicking               = null;
+    var _myAutoClicker           = null;
+
+    var _mySwitchNodes  = [];
+    var _myMSwitchNodes = [];
+    var _myTSwitchNodes = [];
+    var _myMaterialTable = null;
+    var _myDrawCameraFrustumFlag = false;
 
     var _defaultRenderingCapabilities = Renderer.TEXTURE_3D_SUPPORT |
                                         Renderer.MULTITEXTURE_SUPPORT |
@@ -88,12 +137,13 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
 
     self.getReleaseMode = function() {
         return _myReleaseMode;
-    }
+    };
 
-    self.glow getter = function() {
+    self.__defineGetter__("glow", function () {
         return _myGlow ? _myGlow.getEnabled() : false;
-    }
-    self.glow setter = function(theMode) {
+    });
+    
+    self.__defineSetter__("glow", function (theMode) {
         if (theMode) {
             if (_myGlow === null) {
                 _myGlow = new Glow(self, 5, 2.5);
@@ -104,48 +154,50 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         }
         _activeViewport.glow = theMode;
         _myGlow.setEnabled(theMode);
-    }
+    });
+    
     self.getProfileMode = function() {
         return (_myProfileNode != null);
-    }
+    };
 
     self.getShaderLibrary = function() {
         return _myShaderLibrary;
-    }
-    self.autoClicker getter = function() {
+    };
+    
+    self.__defineGetter__("autoClicker", function () {
         if (!_myAutoClicker) {
             _myAutoClicker = new AutoClicker(self);
         }
         return _myAutoClicker;
-    }
+    });
 
     self.setModelName = function(theModelName) {
         _myModelName = theModelName;
-    }
+    };
 
     self.getModelName = function() {
         return _myModelName;
-    }
+    };
 
     self.getLightManager = function() {
         return _myLightManager;
-    }
+    };
     
     self.setLightManager = function(theLightManager) {
         _myLightManager = theLightManager;
-    }
+    };
 
     self.getRenderWindow = function() {
         return _myRenderWindow;
-    }
+    };
 
     self.setActiveViewport = function(theViewport) {
         Logger.info("Active viewport is name=" + theViewport.name + " id=" + theViewport.id);
         _activeViewport = theViewport;
-    }
+    };
     self.getActiveViewport = function() {
         return _activeViewport;
-    }
+    };
 
     self.getViewportAtWindowCoordinates = function(theX, theY) {
         var myLowestPos = new Vector2f(10000,10000);
@@ -166,19 +218,19 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
             }
         }
         return myBestChoice;
-    }
+    };
 
     self.getActiveCamera = function() {
         var myViewport = self.getActiveViewport();
         return myViewport.getElementById(myViewport.camera);
-    }
+    };
 
     self.attachWindow = function(theRenderWindow) {
         _myRenderWindow = theRenderWindow;
         // register our event listener
         _myRenderWindow.eventListener = self;
         _myPicking = new Picking(_myRenderWindow);
-    }
+    };
 
     self.setupWindow = function(theRenderWindow, theSetDefaultRenderingCapabilitiesFlag) {
         var setDefaultRenderingCapabilities = true;
@@ -189,27 +241,34 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         if (setDefaultRenderingCapabilities) {
             _myRenderWindow.renderingCaps = _defaultRenderingCapabilities;
         }
-   }
+    };
 
-   self.getScene = function() {
-       return _myRenderWindow.scene;
-   }
+    self.getScene = function() {
+        return _myRenderWindow.scene;
+    };
 
-   self.setScene = function(theScene, theCanvas, theSwitchNodeFlag) {
-       var myStatus = _myRenderWindow.setSceneAndCanvas(theScene, theCanvas);
-       if (!myStatus) {
-           throw new Exception("Could not load model", fileline());
-       }
-       if (!theScene) {
-           self.prepareScene(null, null, theSwitchNodeFlag);
-       } else {
-           var myCanvas = theCanvas ? theCanvas : theScene.dom.find('/scene/canvases/canvas');
-            if (!myCanvas) {
-                Logger.fatal("No canvas found");
-            }
-           self.prepareScene(theScene, myCanvas, theSwitchNodeFlag);
-       }
-   }
+    self.setScene = function(theScene, theCanvas, theSwitchNodeFlag) {
+        var myStatus = _myRenderWindow.setSceneAndCanvas(theScene, theCanvas);
+        if (!myStatus) {
+            throw new Exception("Could not load model", fileline());
+        }
+        if (!theScene) {
+            self.prepareScene(null, null, theSwitchNodeFlag);
+        } else {
+            var myCanvas = theCanvas ? theCanvas : theScene.dom.find('/scene/canvases/canvas');
+             if (!myCanvas) {
+                 Logger.fatal("No canvas found");
+             }
+            self.prepareScene(theScene, myCanvas, theSwitchNodeFlag);
+        }
+    };
+    
+    function getViewportId(theViewport) {
+        if (theViewport) {
+            return theViewport.id;
+        }
+        return self.getActiveViewport().id; //getSingleViewport().id;
+    }
 
     self.setMover = function(theMoverFactory, theViewport, theMoverObject) {
         if (theMoverFactory) {
@@ -229,16 +288,16 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
             return null;
             
         }
-    }
+    };
 
     self.getMover = function(theViewport) {
         return _myLastMover;
-    }
+    };
 
     self.registerMover = function(theMoverFactory) {
         // should check if object type is already in list
         _myMoverFactories.push(theMoverFactory);
-    }
+    };
 
     self.nextMover = function(theViewport) {
         var myViewportId = getViewportId(theViewport);
@@ -264,11 +323,11 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         // switch mover
         var myNewMover = self.setMover(_myMoverFactories[myNextMoverIndex], theViewport);
         print("Activated Mover: " + myNewMover.name);
-    }
+    };
 
     self.setAutoNearFarPlane = function(theFlag) {
         _myAutoNearFarFlag = theFlag;
-    }
+    };
 
     self.setCanvas = function(theCanvasNode) {
         if (theCanvasNode != _myRenderWindow.canvas) {
@@ -280,7 +339,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
             _myLightManager.setupHeadlight(myViewport);
         }
         _activeViewport = _myRenderWindow.canvas.find('viewport');
-    }
+    };
 
     self.setCanvasByIndex = function(theIndex) {
         var myCanvasRoot = _myRenderWindow.scene.dom.find('/scene/canvases');
@@ -299,14 +358,15 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
             myViewport.camera = myDefaultCamera.id;
             self.setCanvas(myCanvas);
         }
-    }
+    };
 
     self.nextCamera = function(theViewport) {
         return self.setActiveCamera(_myActiveCameraIndex+1, theViewport);
-    }
+    };
+    
     self.prevCamera = function(theViewport) {
         return self.setActiveCamera(_myActiveCameraIndex-1, theViewport);
-    }
+    };
 
     self.setActiveCamera = function(theCamera, theViewport) {
         if (!isNaN(theCamera)) {
@@ -335,7 +395,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         }
         _myLightManager.setupHeadlight(theViewport);
         return theCamera;
-    }
+    };
 
     self.addSkyBoxFromImage = function(theImageNode, theWorld) {
         if ( ! theWorld ) {
@@ -383,7 +443,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
             myTextureUnitNode.texture = myTextureNode.id;
         }       
         myTextureNode.image = theImageNode.id;        
-    }
+    };
 
     self.addSkyBoxFromFile = function(theFileName, theTile, theWorld) {
         if ( ! theWorld ) {
@@ -417,14 +477,14 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
 
             self.addSkyBoxFromImage(mySkyboxImage, theWorld);
         }
-    }
+    };
 
     self.removeSkyBox = function(theWorld) {
         if ( ! theWorld) {
             theWorld = _myRenderWindow.scene.world;
         }
         theWorld.skyboxmaterial = "";
-    }
+    };
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     //
@@ -448,7 +508,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
             if (myDoc.firstChild && myDoc.firstChild.nodeName == "materialtable") {
                 _myMaterialTable = myDoc.firstChild;
             } else {
-                Logger.info("Could not apply MaterialTable: "+theFilename+" does not seem to contain a valid xml-structure.")
+                Logger.info("Could not apply MaterialTable: "+theFilename+" does not seem to contain a valid xml-structure.");
                 return new Node("<materialtable/>").firstChild;
             }
         }
@@ -479,7 +539,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         }
 
         return _myMaterialTable;
-    }
+    };
 
     function mergeMaterialProperties(theTargetMaterial, theTableNode) {
 
@@ -504,7 +564,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
 
     self.recollectSwitchNodes = function(theNode) {
         collectAllSwitchNodes(theNode);
-    }
+    };
 
     self.onExit = function() {
         if (_myProfileNode) {
@@ -547,7 +607,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
             // save
             writeStringToFile(_myProfileFilename, myProfilesNode);
         }
-    }
+    };
 
     self.onPreViewport = function(theViewport) {
         if (theViewport.camera != "") {
@@ -573,14 +633,14 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
             }
         }
         _myLightManager.onPreViewport(theViewport);
-    }
+    };
 
     self.onPostViewport = function(theViewport) {
         _myLightManager.onPostViewport(theViewport);
-    }
+    };
 
     self.onResize = function() {
-    }
+    };
 
     self.drawCameraFrustums = function() {
         var myCameras = _myRenderWindow.scene.cameras;
@@ -591,13 +651,13 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
                 window.getRenderer().drawFrustum( myCameras[i], myAspect);
             }
         }
-    }
+    };
 
     self.onPostRender = function() {
         if (_myDrawCameraFrustumFlag) {
             self.drawCameraFrustums();
         }
-    }
+    };
 
     self.onFrame = function(theTime) {
         if (_myProfileNode) {
@@ -631,7 +691,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         }
 
         _myLightManager.onFrame(theTime);
-    }
+    };
 
     self.onMouseMotion = function(theX, theY) {
         var myViewportUnderMouse = _myPicking.getViewportAt(theX, theY);
@@ -641,7 +701,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         if (_myClickedViewport && self.getMover(_myClickedViewport)) {
             self.getMover(_myClickedViewport).onMouseMotion(theX, theY);
         }
-    }
+    };
 
     self.onMouseButton = function(theButton, theState, theX, theY) {
         var myMover = null;
@@ -672,13 +732,14 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         if (myMover) {
             myMover.onMouseButton(theButton, theState, theX, theY);
         }
-    }
+    };
+    
     self.onMouseWheel = function(theDeltaX, theDeltaY) {
         var myMover = self.getMover(self.getActiveViewport());
         if (myMover) {
             myMover.onMouseWheel(theDeltaX, theDeltaY);
         }
-    }
+    };
 
     self.enableHeartbeat = function(theFrequency, theHeartbeatfile) {
         if (_myHeartbeatThrober == null) {
@@ -689,7 +750,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         } else {
             _myHeartbeatThrober.enable(true);
         }
-    }
+    };
 
     self.enableNagios = function(thePort) {
         plug("Nagios");
@@ -697,73 +758,33 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         _myNagiosPlugin.port = thePort;
         _myRenderWindow.addExtension(_myNagiosPlugin);
         return _myNagiosPlugin;
-    }
+    };
 
     self.onAxis = function( theDevice, theAxis, theValue) {
         var myMover = self.getMover(self.getActiveViewport());
         if (myMover) {
             myMover.onAxis(theDevice, theAxis, theValue);
         }
-    }
+    };
 
     self.onButton = function( theDevice, theButton, theState) {
         var myMover = self.getMover(self.getActiveViewport());
         if (myMover) {
             myMover.onButton(theDevice, theButton, theState);
         }
-    }
-    ///////////////////////////////////////////////////////////////////////////////////////////
-    //
-    // private members
-    //
-    ///////////////////////////////////////////////////////////////////////////////////////////
+    };
 
-    var _myRenderWindow          = null;
-    var _myActiveCameraIndex     = 0;
-    var _myModelName             = null;
-    var _myShaderLibrary         = null;
-    var _myReleaseMode           = true;
-    var _myLightManager          = null;
-    var _myGlow                  = null;
-
-    const PROFILE_FILENAME = "profile.xml";
-    var _myProfileFilename = null;
-    var _myProfileNode     = null;
-
-    // Camera movers
-    var _myMoverFactories        = [];  // Array of mover constructors
-
-    var _myLastMover             = null;
-    var _myClickedViewport       = null;
-    var _myAutoNearFarFlag       = true;
-    var _activeViewport          = null;
-
-    // For fast scene access
-    var _myWorld                 = null;
-    var _myMaterials             = null;
-    var _myLightSources          = null;
-    var _myShapes                = null;
-    var _myCharacters            = null;
-    var _myAnimations            = null;
-    var _myImages                = null;
-
-    var _mySkyboxMaterialId      = null;
-    var _myHeartbeatThrober      = null;
-    var _myNagiosPlugin          = null;
-    var _myPicking               = null;
-    var _myAutoClicker           = null;
-
-    var _mySwitchNodes  = new Array();
-    var _myMSwitchNodes = new Array();
-    var _myTSwitchNodes = new Array();
-    var _myMaterialTable = null;
-    var _myDrawCameraFrustumFlag = false;
-
-    self.__defineGetter__('picking', function() { return _myPicking; });
-
-    self.__defineGetter__('drawFrustums', function() { return _myDrawCameraFrustumFlag; });
-    self.__defineSetter__('drawFrustums', function(theFlag) { _myDrawCameraFrustumFlag = theFlag; });
-
+    self.__defineGetter__('picking', function() {
+        return _myPicking;
+    });
+    
+    self.__defineGetter__('drawFrustums', function() {
+        return _myDrawCameraFrustumFlag;
+    });
+    
+    self.__defineSetter__('drawFrustums', function(theFlag) {
+        _myDrawCameraFrustumFlag = theFlag;
+    });
 
     function getSingleViewport() {
         if (_myRenderWindow.canvas.childNodesLength("viewport") == 1) {
@@ -773,14 +794,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         return null;
     }
 
-    function getViewportId(theViewport) {
-        if (theViewport) {
-            return theViewport.id;
-        }
-        return self.getActiveViewport().id; //getSingleViewport().id;
-    }
-
-    function parseArguments(theArguments) {
+    function _parseArguments(theArguments) {
         var myArgumentMap = [];
         if (theArguments) {
             for (var i = 0; i < theArguments.length; ++i) {
@@ -806,7 +820,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
                 _myReleaseMode = false;
             }
             if ("profile" in myArgumentMap) {
-                _myProfileFilename = myArgumentMap["profile"];
+                _myProfileFilename = myArgumentMap.profile;
                 if (_myProfileFilename == null) {
                     _myProfileFilename = PROFILE_FILENAME;
                 }
@@ -832,7 +846,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
             }
         }
 
-    }
+    };
 
     function collectSwitchNodes( theNode ) {
         for (var i = 0; i < theNode.childNodesLength(); ++i) {
@@ -921,13 +935,11 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         }
     }
 
-    ///////////////////////////////////////////////////////////////////////////////////////////
-    //
-    // Constructor
-    //
-    ///////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////
+    // Constructor //
+    /////////////////
 
-    self.arguments = parseArguments(theArguments);
+    self.arguments = _parseArguments(theArguments);
 
     var myShaderLibrary = self.getShaderLibrary();
     if (myShaderLibrary) {
