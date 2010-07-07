@@ -213,7 +213,8 @@ PIXEL expand(VALUE v) {
 template <class SRC, class DEST>
 struct invert : public std::unary_function<SRC, DEST> {
     DEST operator()(const SRC & src) {
-        return static_cast<DEST>(src ^ SRC(-1));
+        return static_cast<DEST>( ~ src);
+        // return static_cast<DEST>(src ^ SRC(-1));
     }
 };
 

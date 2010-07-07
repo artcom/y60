@@ -80,6 +80,10 @@ extern "C" {
 #endif
 }
 
+#ifdef WIN32
+#pragma warning(pop)
+#endif
+
 extern "C"
 EXPORT asl::PlugInBase * DShowCapture_instantiatePlugIn(asl::DLHandle myDLHandle) {
     return new y60::DShowCapture(myDLHandle);

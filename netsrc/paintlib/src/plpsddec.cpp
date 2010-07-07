@@ -198,7 +198,7 @@ PLBmpInfo* PLPSDDecoder::createBmpInfo
     case Greyscale:
       {        
         for (int i=0; i<256; i++)
-          m_pPal[i].Set(i, i, i, static_cast<PLBYTE>(0xFF));
+          m_pPal[i].Set(static_cast<PLBYTE>(i), static_cast<PLBYTE>(i), static_cast<PLBYTE>(i), static_cast<PLBYTE>(0xFF));
         pf = PLPixelFormat::L8;
       }
       break;

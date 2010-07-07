@@ -114,18 +114,22 @@ namespace y60 {
             int myPixelFormat;
             switch (AnyBmp.GetBitsPerPixel()) {
                 case 32:
-                    if (PL_RGBA_RED == 0) {
-                        myPixelFormat = GL_RGBA;
-                    } else {
-                        myPixelFormat = GL_BGRA;
-                    }
+#if defined(PL_PIXEL_RGBA_ORDER)                    
+                    myPixelFormat = GL_RGBA;
+#elif defined(PL_PIXEL_BGRA_ORDER)                   
+                    myPixelFormat = GL_BGRA;
+#else
+  #error Pixel RGB bytes order not selected
+#endif                   
                     break;
                 case 24:
-                    if (PL_RGBA_RED == 0) {
-                        myPixelFormat = GL_RGB;
-                    } else {
-                        myPixelFormat = GL_BGR;
-                    }
+#if defined(PL_PIXEL_RGBA_ORDER)                    
+                    myPixelFormat = GL_RGB;
+#elif defined(PL_PIXEL_BGRA_ORDER)                   
+                    myPixelFormat = GL_BGR;
+#else
+  #error Pixel RGB bytes order not selected
+#endif                   
                     break;
                 default:
                     throw GLTextureCompressionException(string("Cannot compress texture with ") +

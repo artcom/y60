@@ -75,12 +75,25 @@ MemoryMeter.prototype.Constructor = function(self, theSceneViewer) {
     var _myMaxMemoryUsage       = 0;
     var _myMaxMemoryTime        = 0;
     var _myProcFunctionsPlugged = false;
+    var _myGLPlugged            = false;
+    var _myGLMemExtensionAvail  = false;
 
     self.toggleEnableFlag = function() {
         if (!_myProcFunctionsPlugged) {
             plug("ProcessFunctions");
             _myProcFunctionsPlugged = true;
         }
+        if (!_myGLPlugged) {
+            plug("GLBinding");
+            _myGLPlugged = true;
+            try {
+                var myGLMemFree = gl.GetFreeMem();
+                _myGLMemExtensionAvail = true;
+            } catch(theEx) {
+                _myGLMemExtensionAvail = false;
+            }
+        }
+
         self.enabled = !self.enabled;
     }
 
@@ -124,6 +137,11 @@ MemoryMeter.prototype.Constructor = function(self, theSceneViewer) {
             var myMem = asMemoryString(getFreeMemory()) + "/" + asMemoryString(getTotalMemory());
             window.setTextColor(myTextColor);
             window.renderText(new Vector2f(10, 30), myMem, "Screen8", myViewport);
+            if (_myGLMemExtensionAvail) {
+                var myTotalGLMem = gl.GetTotalMem();
+                var myGLMem = "GL: " + asMemoryString(myTotalGLMem - gl.GetFreeMem()) + "/" + asMemoryString(myTotalGLMem);
+                window.renderText(new Vector2f(10, 40), myGLMem, "Screen8", myViewport);
+            }
         }
     }
 }

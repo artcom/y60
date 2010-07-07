@@ -120,6 +120,44 @@ namespace jslib {
         } HANDLE_CPP_EXCEPTION;
     }
 
+    JS_STATIC_DLL_CALLBACK(JSBool)
+    GetTotalMem(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) {
+        try {
+            DOC_BEGIN("");
+            DOC_END;
+            GLint total_mem_kb = 0;
+            if (y60::hasCap("GL_NVX_gpu_memory_info")) {
+                #define GL_GPU_MEM_INFO_TOTAL_AVAILABLE_MEM_NVX 0x9048
+                glGetIntegerv(GL_GPU_MEM_INFO_TOTAL_AVAILABLE_MEM_NVX, &total_mem_kb);
+            } else {
+                throw asl::Exception(std::string("GL::GetTotalMem, sorry GL_NVX_gpu_memory_info extension not available."), PLUS_FILE_LINE);
+            }
+            *rval = as_jsval(cx, total_mem_kb);
+            return JS_TRUE;
+
+        } HANDLE_CPP_EXCEPTION;
+    }
+
+    JS_STATIC_DLL_CALLBACK(JSBool)
+    GetFreeMem(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) {
+        try {
+            DOC_BEGIN("");
+            DOC_END;
+            GLint cur_avail_mem_kb = 0;
+            if (y60::hasCap("GL_NVX_gpu_memory_info")) {
+                #define GL_GPU_MEM_INFO_CURRENT_AVAILABLE_MEM_NVX 0x9049
+                glGetIntegerv(GL_GPU_MEM_INFO_CURRENT_AVAILABLE_MEM_NVX, &cur_avail_mem_kb);
+            } else {
+                throw asl::Exception(std::string("GL::GetFreeMem, sorry GL_NVX_gpu_memory_info extension not available."), PLUS_FILE_LINE);
+            }
+            *rval = as_jsval(cx, cur_avail_mem_kb);
+            return JS_TRUE;
+
+        } HANDLE_CPP_EXCEPTION;
+    }
+
+
+
 
     enum PropertyNumbers {
         PROP_BLENDING = GL_BLEND,
@@ -144,7 +182,9 @@ namespace jslib {
         static JSFunctionSpec myFunctions[] = {
             // name                         native                       nargs
             {"Enable",             Enable,             1},
-            {"Disable",            Disable,             1},
+            {"Disable",            Disable,            1},
+            {"GetTotalMem",    GetTotalMem,    1},
+            {"GetFreeMem",         GetFreeMem,         1},
             {0}
         };
         return myFunctions;

@@ -296,6 +296,8 @@ void PLFileSource::Seek
 void PLFileSource::isBufferOk (int NumBytes)
 {
 #ifdef _WIN32
+#pragma warning(push)
+#pragma warning(disable:4702)
   try 
   {
     PLBYTE byte = m_pCurPos[NumBytes-1];
@@ -305,6 +307,7 @@ void PLFileSource::isBufferOk (int NumBytes)
   {
     throw PLTextException(PL_ERREND_OF_FILE, "End of file reached while decoding.");
   }
+#pragma warning(pop)
 #endif
 }
 
@@ -335,6 +338,8 @@ bool PLFileSource::bytesAvailable
 #endif
 
 #ifdef _WIN32
+#pragma warning(push)
+#pragma warning(disable:4702)
 int PLFileSource::mapFileHandle()
 {
   PLBYTE * pBuffer = NULL;
@@ -390,6 +395,7 @@ int PLFileSource::getLastPLError()
       return PL_ERRFILE_NOT_FOUND;
   }
 }
+#pragma warning(pop)
 #endif
 
 /*

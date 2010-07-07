@@ -17,5 +17,6 @@
         <copyFrameBufferFlag min="0" max="1" step="1" help="activate/deactivate copying to frame buffer">0</copyFrameBufferFlag>
         <frameBufferArea help="defines area that is copied to frame buffer">[0,1046,1400,280]</frameBufferArea>
         <blacklevelposoffset help="black level offset">[0.0,0.0]</blacklevelposoffset>
+        <roughCalibrationMode min="0" max="1" step="1" help="show/hide calibration blocks for rough pre-calibration">1.00000</roughCalibrationMode>
     </EdgeBlender>
 </settings>

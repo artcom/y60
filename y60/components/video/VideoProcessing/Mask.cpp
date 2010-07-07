@@ -104,7 +104,7 @@ namespace y60 {
         BGRRaster::iterator itBlob  = const_cast<BGRRaster::iterator>(myMaskFrame->begin());
         BGRRaster::iterator itTarg  = const_cast<BGRRaster::iterator>(myTargetFrame->begin());
 
-        for (itSrc; itSrc != mySourceFrame->end(); ++itSrc, ++itBlob, ++itTarg) {
+        for (; itSrc != mySourceFrame->end(); ++itSrc, ++itBlob, ++itTarg) {
             bool myLetPass = (((*itBlob)[0]) > 128);
             if (!myLetPass) {
                 for (unsigned int i=0; i<3; ++i) {

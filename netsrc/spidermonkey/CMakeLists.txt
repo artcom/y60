@@ -18,6 +18,7 @@ if(WIN32)
     set(CMAKE_EXE_LINKER_FLAGS    "${CMAKE_EXE_LINKER_FLAGS} /OPT:REF /OPT:NOICF")
     set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} /OPT:REF /OPT:NOICF")
     set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /OPT:REF /OPT:NOICF")
+    
 endif(WIN32)
 
 ac_add_project(
@@ -95,12 +96,18 @@ ac_add_library(
 
 _ac_add_include_path(spidermonkey ${CMAKE_CURRENT_BINARY_DIR}/include YES)
 
+
 set_target_properties(
     spidermonkey
     PROPERTIES
         COMPILE_DEFINITIONS "EXPORT_JS_API"
         COMPILE_DEFINITIONS_DEBUG "DEBUG"
 )
+if (WIN32)
+    # disable a bunch of warnings inside of spidermonkey - we assume they know what they're doing
+    ac_add_target_properties(spidermonkey COMPILE_FLAGS "/wd4055 /wd4214 /wd4127 /wd4706 /wd4202 /wd4100 /wd4244 /wd4702 /wd4131 /wd4100 /wd4232 /wd4214")
+endif (WIN32)
+
 
 ac_add_executable(
     smonkey

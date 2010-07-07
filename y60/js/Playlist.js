@@ -253,6 +253,7 @@ Playlist.prototype.Constructor = function(self) {
                         theUrl.search(/\.sgi$/i)  != -1 ||
                         theUrl.search(/\.tga$/i)  != -1 ||
                         theUrl.search(/\.tiff$/i) != -1 ||
+                        theUrl.search(/\.i60$/i) != -1 ||
                         theUrl.search(/\.tif$/i) != -1 ||
                         theUrl.search(/\.wmf$/i)  != -1)
             {

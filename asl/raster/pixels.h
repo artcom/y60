@@ -129,6 +129,9 @@ struct Pixel {
     DERIVED operator^(const DERIVED & y) const {
         return (DERIVED)(get() ^ y.get());
     }
+    DERIVED operator~() const {
+        return (DERIVED)(~get());
+    }
     DERIVED operator>>(const DERIVED & y) const {
         return (DERIVED)(get() >> y.get());
     }

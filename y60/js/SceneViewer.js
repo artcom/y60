@@ -598,8 +598,8 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         var mySettingsFile = "";
         var i;
         for (i = 0; i < SETTINGS_FILE_NAMES.length; ++i) {
-            if ( fileExists( SETTINGS_FILE_NAMES[i] )) {
-                mySettingsFile = SETTINGS_FILE_NAMES[i];
+            if ( searchFile( SETTINGS_FILE_NAMES[i] )) {
+                mySettingsFile = searchFile(SETTINGS_FILE_NAMES[i]);
                 break;
             } else {
                 //Logger.error( "Couldn't find settings file " + SETTINGS_FILE_NAMES[i] );
@@ -611,8 +611,8 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         var myHostFiles = ["settings-" + hostname() + ".xml",
                            "CONFIG/settings-" + hostname() + ".xml"];
         for (i = 0; i < myHostFiles.length; ++i) {
-            if (fileExists( myHostFiles[i] )) {
-                myHostSettingsFile = myHostFiles[i];
+            if (searchFile( myHostFiles[i] )) {
+                myHostSettingsFile = searchFile(myHostFiles[i]);
                 break;
             }
         }

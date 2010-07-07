@@ -306,7 +306,7 @@ PLBYTE PLBmpBase::FindNearestColor (PLPixel32 col)
     if (d1 < dMin)
     {
       dMin = d1;
-      index = i;
+      index = static_cast<PLBYTE>(i);
     }
   }
   return index;

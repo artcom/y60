@@ -190,6 +190,7 @@ spark.LoadedClass = function (theClassName, theFile) {
         // override the objects class
         this._className_ = theClassName;
         this._class_     = myInitializingConstructor;
+        this._sparkFile_ = theFile;
 
         // instantiate children
         this.instantiateChildren(myWovenNode);

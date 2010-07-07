@@ -30,7 +30,7 @@ namespace dom {
     /*! \addtogroup aslxml */
     /* @{ */
 
-    class PlugBase {
+    class ASL_DOM_DECL PlugBase {
     public:
         virtual ~PlugBase() {}
         virtual const ValuePtr getDefaultValue(const Node & theNode) const = 0;

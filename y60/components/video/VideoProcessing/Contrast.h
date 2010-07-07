@@ -82,8 +82,8 @@ namespace y60 {
         y60::ImagePtr _mySourceImage;
         y60::ImagePtr _myTargetImage;
 
-        float _myUpper;
         float _myLower;
+        float _myUpper;
 
         asl::Unsigned64 _myImageNodeVersion;
 

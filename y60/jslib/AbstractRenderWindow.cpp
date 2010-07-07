@@ -510,18 +510,13 @@ AbstractRenderWindow::onFrame() {
     // update movies and capture
     if (_myScene) {
         MAKE_SCOPE_TIMER(onFrame_updateMovieAndCapture);
-        dom::NodePtr myImages = _myScene->getImagesRoot();
-        for (unsigned i = 0; i < myImages->childNodesLength(); ++i) {
-            dom::NodePtr myImage = myImages->childNode(i);
-            if (myImage->nodeType() != dom::Node::ELEMENT_NODE) {
-                continue;
-            }
-            if (myImage->nodeName() == MOVIE_NODE_NAME) {
-                _myScene->getTextureManager()->loadMovieFrame(myImage->getFacade<Movie>(), _myElapsedTime);
-            }
-            else if (myImage->nodeName() == CAPTURE_NODE_NAME) {
-                _myScene->getTextureManager()->loadCaptureFrame(myImage->getFacade<Capture>());
-            }
+        std::vector<MoviePtr> myMovies = _myScene->getImagesRoot()->getAllFacades<Movie>(MOVIE_NODE_NAME);        
+        for (unsigned i = 0; i < myMovies.size(); ++i) {
+            _myScene->getTextureManager()->loadMovieFrame(myMovies[i], _myElapsedTime);
+        }
+        std::vector<CapturePtr> myCaptures = _myScene->getImagesRoot()->getAllFacades<Capture>(CAPTURE_NODE_NAME);        
+        for (unsigned i = 0; i < myCaptures.size(); ++i) {
+            _myScene->getTextureManager()->loadCaptureFrame(myCaptures[i]);
         }
     }
 

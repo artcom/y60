@@ -55,13 +55,6 @@
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
-//
-//   $RCSfile: SliceViewer.js,v $
-//   $Author: danielk $
-//   $Revision: 1.97 $
-//   $Date: 2005/04/29 13:49:59 $
-//
-//=============================================================================
 
 #ifndef ACGTK_CW_RULER_INCLUDED
 #define ACGTK_CW_RULER_INCLUDED
@@ -71,8 +64,8 @@
 #include <asl/math/Vector234.h>
 
 #if defined(_MSC_VER)
-    #pragma warning(push)
-    #pragma warning(disable:4413 4244)
+    #pragma warning(push,1)
+    //#pragma warning(disable:4413 4244 4250)
 #endif //defined(_MSC_VER)
 #include <gtkmm/drawingarea.h>
 #include <sigc++/sigc++.h>

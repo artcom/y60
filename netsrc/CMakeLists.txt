@@ -16,5 +16,5 @@ add_subdirectory(spidermonkey)
 add_subdirectory(oscpack)
 
 if(WIN32)
-    add_subdirectory(FakeATL)
+    add_subdirectory(fakeatl)
 endif(WIN32)

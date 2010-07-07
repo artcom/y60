@@ -69,6 +69,7 @@ const MINZOOMFACTOR = 0.001;
 const FRAME_RATE    = 100;
 const OS = operatingSystem();
 
+
 function ImageViewerApp(theArguments) {
     this.Constructor(this, theArguments);
 }
@@ -248,6 +249,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
 
     Base.onFrame = self.onFrame;
     self.onFrame = function(theTime) {
+
         Base.onFrame(theTime);
         /* if (window.fps < 60) {
             print("miss: " + window.fps + " / " + millisec());
@@ -384,6 +386,9 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
         /// plug audio and capture plugs, video is handled inside y60 engine via decoderhint
         var myPlaylist = new Playlist();
         switch (myPlaylist.getMediaHintFromURL(myFilename)) {
+            case IMAGE_MEDIA:
+                print("Media: Image");
+                break;                
             case AUDIO_MEDIA:
                 print("Media: audio");
                 if (OS == "WIN32" && !_myWMAPlugged) {

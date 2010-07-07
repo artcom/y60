@@ -62,7 +62,14 @@
 #include "jsgtk.h"
 
 #include <y60/jsbase/JScppUtils.h>
+#if defined(_MSC_VER)
+    // supress warnings caused by gtk in vc++
+    #pragma warning(push,1)
+#endif //defined(_MSC_VER)
 #include <gtkmm.h>
+#if defined(_MSC_VER)
+    #pragma warning(pop)
+#endif //defined(_MSC_VER)
 
 using namespace std;
 using namespace jslib;

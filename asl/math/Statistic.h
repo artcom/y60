@@ -97,7 +97,7 @@ namespace asl {
 
             virtual void reset();
 
-            virtual int getNumberOfSamples() const {
+            virtual asl::Signed64 getNumberOfSamples() const {
                 return _myNumberOfSamples;
             }
 
