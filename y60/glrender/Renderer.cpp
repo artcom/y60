@@ -101,7 +101,7 @@
 #include <algorithm>
 
 #define DB(x)   // x
-#define DB2(x) // x
+#define DB2(x)  //x
 
 // profiling
 //#define PROFILING_LEVEL_FULL
@@ -247,13 +247,14 @@ namespace y60 {
             }
             CHECK_OGL_ERROR;
         }
-
+        DBP2(START_TIMER(renderBodyPart_switchMaterial_vertexRegistry));
         VertexRegisterFlags myVertexRegisterFlags;
         if (isOverlay) {
             myVertexRegisterFlags.reset();
         } else {
             myVertexRegisterFlags = myShader->getVertexRegisterFlags();
         }
+        DBP2(STOP_TIMER(renderBodyPart_switchMaterial_vertexRegistry));
         for (unsigned myRegister = 0; myRegister < MAX_REGISTER; ++myRegister) {
             bool myEnable = false;
 #if 1
@@ -267,7 +268,7 @@ namespace y60 {
 #else
             myEnable = myVertexRegisterFlags[myRegister];
 #endif
-
+            DBP2(START_TIMER(renderBodyPart_switchMaterial_register));
             switch (myRegister) {
                 case POSITION_REGISTER:
                     break;
@@ -305,12 +306,13 @@ namespace y60 {
                     break;
             }
         }
+        DBP2(STOP_TIMER(renderBodyPart_switchMaterial_register));
         CHECK_OGL_ERROR;
-
+        DBP2(START_TIMER(renderBodyPart_switchMaterial_enableTextures));
         if (_myState->getTexturing()) {
-            myShader->enableTextures(theMaterial);
+           myShader->enableTextures(theMaterial);
         }
-
+        DBP2(STOP_TIMER(renderBodyPart_switchMaterial_enableTextures));
         CHECK_OGL_ERROR;
 
         _myPreviousMaterial        = &theMaterial;
@@ -375,17 +377,21 @@ namespace y60 {
         DBP2(STOP_TIMER(renderBodyPart_switchMaterial));
 
         DBP2(START_TIMER(renderBodyPart_materialChanged));
+        DBP2(START_TIMER(renderBodyPart_materialChanged_registerTexture));
         glMatrixMode( GL_TEXTURE );
         for (unsigned myTexUnit = 0; myTexUnit < myMaterial.getTextureUnitCount(); ++myTexUnit) {
             glActiveTexture(asGLTextureRegister(myTexUnit));
             glPushMatrix();
         }
         glMatrixMode( GL_MODELVIEW );
+        DBP2(STOP_TIMER(renderBodyPart_materialChanged_registerTexture));
 
         IShaderPtr myShader = myMaterial.getShader();
         if (myShader) {
             if (myMaterial.hasTexGen()) {
+            	DBP2(START_TIMER(renderBodyPart_materialChanged_enableTextureProjection));
                 myShader->enableTextureProjection( myMaterial, theViewport, theCamera );
+                DBP2(STOP_TIMER(renderBodyPart_materialChanged_enableTextureProjection));
             }
             if (myBodyHasChanged || myMaterialHasChanged) {
                 DBP2(MAKE_GL_SCOPE_TIMER(renderBodyPart_bindBodyParams));
@@ -404,7 +410,9 @@ namespace y60 {
         DBP2(STOP_TIMER(renderBodyPart_getRenderStyles));
 
         DBP2(START_TIMER(renderBodyPart_render));
+        DBP2(START_TIMER(renderBodyPart_enableREnderStyles));
         enableRenderStyles(myRenderStyles, &myMaterial);
+        DBP2(STOP_TIMER(renderBodyPart_enableREnderStyles));
 
         bool myRendererCullingEnabled = _myState->getBackfaceCulling();
         if (myRendererCullingEnabled) {
@@ -447,11 +455,13 @@ namespace y60 {
         }
         DBP2(STOP_TIMER(renderBodyPart_setupBoundingVolume));
 
+        DBP2(START_TIMER(renderBodyPart_registerTextures));
         glMatrixMode( GL_TEXTURE );
         for (unsigned myTexUnit = 0; myTexUnit < myMaterial.getTextureUnitCount(); ++myTexUnit) {
             glActiveTexture(asGLTextureRegister(myTexUnit));
             glPopMatrix();
         }
+        DBP2(STOP_TIMER(renderBodyPart_registerTextures));
         glMatrixMode( GL_MODELVIEW );
         CHECK_OGL_ERROR;
     }
@@ -485,13 +495,16 @@ namespace y60 {
     void
     Renderer::renderPrimitives(const BodyPart & theBodyPart, const MaterialBase & theMaterial) {
         DBP(MAKE_GL_SCOPE_TIMER(renderPrimitives));
+        DBP2(START_TIMER(renderBodyPart_renderPrimitives));
         DBP(START_TIMER(getPrimitive));
         const y60::Primitive & myPrimitive = theBodyPart.getPrimitive();
         DBP(STOP_TIMER(getPrimitive));
         COUNT_N(Vertices, myPrimitive.size());
 
+
         const MaterialParameterVector & myMaterialParameters = theMaterial.getVertexParameters();
         unsigned myVertexParamSize = myMaterialParameters.size();
+        DBP2(START_TIMER(renderBodyPart_renderPrimitives_loop));
         for (unsigned i = 0; i < myVertexParamSize; ++i) {
             const MaterialParameter & myParameter = myMaterialParameters[i];
             if (myPrimitive.hasVertexData(myParameter.getRole())) {
@@ -509,10 +522,12 @@ namespace y60 {
                         myData.useAsColor();
                         break;
                     default:
+                    	DBP2(START_TIMER(renderBodyPart_renderPrimitives_loopdefault));
                         GLenum myGlRegister = asGLTextureRegister(myRegister);
                         glActiveTexture(myGlRegister);
                         glClientActiveTexture(myGlRegister);
                         myData.useAsTexCoord();
+                        DBP2(STOP_TIMER(renderBodyPart_renderPrimitives_loopdefault));
                         break;
                 }
                 CHECK_OGL_ERROR;
@@ -522,9 +537,10 @@ namespace y60 {
 					getStringFromEnum(myParameter.getRole(), GLRegisterString), PLUS_FILE_LINE);
 			}
         }
+        DBP2(STOP_TIMER(renderBodyPart_renderPrimitives_loop));
 
         DBP2(
-            unsigned long myPrimitiveCount = myPrimitive.size();
+            /*unsigned long myPrimitiveCount = myPrimitive.size();
             AC_TRACE << "glDrawArrays size=" << myPrimitive.size() << " primCount="
                      << myPrimitiveCount << " primType=" << myPrimitive.getType()
                      << " GLtype=" << getPrimitiveGLType(myPrimitive.getType());
@@ -533,6 +549,7 @@ namespace y60 {
                 myMaxPrimitiveCount = myPrimitiveCount;
             }
             AC_TRACE << "Primitive maxsize: " << myMaxPrimitiveCount;
+            */
         )
 
         DBP2(static asl::NanoTime lastTime;
@@ -548,6 +565,7 @@ namespace y60 {
             glDrawArrays(getPrimitiveGLType(myPrimitive.get<PrimitiveTypeTag>()), 0, myPrimitive.size());
             CHECK_OGL_ERROR;
         }
+        DBP2(STOP_TIMER(renderBodyPart_renderPrimitives));
     }
 
     void
@@ -1021,7 +1039,7 @@ namespace y60 {
 
         if (theNode->nodeName() == BODY_NODE_NAME) {
             Body & myBody = *(dynamic_cast_Ptr<Body>(myFacade));
-
+            DBP(MAKE_GL_SCOPE_TIMER(realREnderlisting));
             // do the billboarding here
             if (myBody.get<BillboardTag>() == AXIS_BILLBOARD) {
                 DBP(MAKE_GL_SCOPE_TIMER(update_billboards));
@@ -1081,6 +1099,7 @@ namespace y60 {
 
                 myBody.set<GlobalMatrixTag>(myScreenAlignedMatrix);
             }
+
         }
 
         // Check culling
@@ -1122,7 +1141,7 @@ namespace y60 {
         if (theNode->nodeName() == BODY_NODE_NAME) {
             DB(AC_TRACE << "createRenderList: body processing";)
             DBP(MAKE_GL_SCOPE_TIMER(createRenderList_insertBody));
-
+            DBP2(START_TIMER(createRenderList_remainingBodies));
             const Body & myBody = *(dynamic_cast_Ptr<Body>(myFacade));
 
             // Split the body in bodyparts to make material sorted rendering possible
@@ -1156,17 +1175,20 @@ namespace y60 {
 
                 theBodyParts.insert(std::make_pair(myKey, BodyPart(*(theWorld),myBody, myShape, myPrimitive, theClippingPlanes, theScissorBox)));
             }
+            DBP2(STOP_TIMER(createRenderList_remainingBodies));
 
             COUNT(RenderedBodies);
         }
 
         {
+            DBP2(START_TIMER(createRenderList_nowCREATING));
             DBP(MAKE_GL_SCOPE_TIMER(createRenderList_recurse));
             for (unsigned i = 0; i < theNode->childNodesLength(); ++i) {
                 createRenderList(theWorld, theNode->childNode(i), theBodyParts, theCamera,
                         theEyeSpaceTransform, theViewport, myOverlapFrustumFlag,
                         theClippingPlanes, theScissorBox);
             }
+            DBP2(STOP_TIMER(createRenderList_nowCREATING));
         }
         DB(AC_TRACE << "createRenderList: end of function return";)
     }
@@ -1343,6 +1365,8 @@ namespace y60 {
 
                 // (7) render bodies
                 if (! myBodyParts.empty()) {
+
+                	DBP2(START_TIMER(render_renderBodyParts));
                     MAKE_GL_SCOPE_TIMER(renderBodyParts);
                     _myPreviousBody = 0;
 
@@ -1352,21 +1376,30 @@ namespace y60 {
 
                     //int i = 0;
                     bool currentMaterialHasAlpha = false;
+                    DBP2(START_TIMER(render_renderBodyParts_Iterator));
+
                     for (BodyPartMap::const_iterator it = myBodyParts.begin(); it != myBodyParts.end(); ++it) {
                         if (theViewport->get<ViewportAlphaTestTag>()
                             && !currentMaterialHasAlpha && it->first.getTransparencyFlag())
                         {
+                        	DBP2(START_TIMER(render_renderBodyParts_enableAlpha));
                             glEnable(GL_ALPHA_TEST);
                             currentMaterialHasAlpha = true;
+                            DBP2(STOP_TIMER(render_renderBodyParts_enableAlpha));
                         }
+                        DBP2(START_TIMER(render_renderBodyParts_renderBodyPart));
                         renderBodyPart(it->second, *theViewport, *myCamera);
+                        DBP2(STOP_TIMER(render_renderBodyParts_renderBodyPart));
+
                     }
+                    DBP2(STOP_TIMER(render_renderBodyParts_Iterator));
                     glPopMatrix();
                     CHECK_OGL_ERROR;
 
                     _myState->setScissorTest(false);
                     _myState->setClippingPlanes(std::vector<asl::Planef>());
                     _myState->setFrontFaceCCW(true);
+                    DBP2(STOP_TIMER(render_renderBodyParts));
                 }
 
                 // turn fog off again
