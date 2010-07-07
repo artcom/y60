@@ -56,16 +56,17 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-/*jslint nomen:false, white:false*/
-/*globals use, Logger, BaseViewer*/
+/*jslint nomen:false, white:false, plusplus:false, bitwise:false*/
+/*globals use, Logger, BaseViewer, AutoTimer, resetCursor, setCursor,
+          PerfMeter, OnScreenDisplay, clamp, Renderer, print, hostname,
+          fileExists, Scene, reuse, padStringFront, VideoRecorder,
+          getFocalLength*/
 
 // use this idiom in each level of inheritance and
 // you'll know if you are the outermost .js file.
 // (See ImageViewer and SliceViewer for an example of how to use this)
 var __main__ = __main__ || "SceneViewer";
 
-use("Y60JSSL.js");
-use("Exception.js");
 use("BaseViewer.js");
 
 use("ClassicTrackballMover.js");
@@ -100,11 +101,152 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
     BaseViewer.prototype.Constructor(self, theArguments);
     self.BaseViewer = [];
 
-    ///////////////////////////////////////////////////////////////////////////////////////////
-    //
-    // public members
-    //
-    ///////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////
+    // Private Members //
+    /////////////////////
+
+    var _myFullscreen             = false;
+    var _myConfigurator           = null;
+    var _myDebugVisual            = null;
+    var _myAnimationManager       = null;
+    var _myImageManager           = null;
+    var _myScreenshotCount        = 0;
+    var _myCurrentTime            = 0;
+    var _myTimer                  = new AutoTimer("SceneViewer Timer");
+    var _mySplashScreen           = null;
+    var _mySplashScreenFlag       = false;
+    var _myShutter                = null;
+    var _myOnScreenDisplay        = null;
+    var _mySetDefaultRenderingCap = true;
+    var _myMemoryMeter            = null;
+    var _myPerfMeter              = null;
+    var _myOnScreenStatistics     = 0;
+    var _myVideoRecorder          = null;
+    var _myStatisticColor         = [1, 1, 1, 1];
+    var _mySinceLastVersion       = "1";
+
+
+    /////////////////////
+    // Private Methods //
+    /////////////////////
+
+    function fadeSplashScreen(theTime) {
+        var START_FADE = 1;
+        var STOP_FADE  = 3;
+        _mySplashScreen.moveToTop();
+        if (theTime > START_FADE && theTime < STOP_FADE) {
+            _mySplashScreen.alpha = clamp((STOP_FADE - theTime) / (STOP_FADE - START_FADE), 0, 1);
+        }
+        if (theTime > STOP_FADE + 1) {
+            _mySplashScreen.removeFromScene();
+            _mySplashScreen = null;
+        }
+    }
+
+    function showStatistics() {
+        var myText = [];
+        myText.push(window.fps.toFixed(1) + " swap=" + window.swapInterval);
+
+        if (_myOnScreenStatistics > 1) {
+            var myStatistics = window.scene.statistics;
+            myText.push("Vertices:   " + myStatistics.renderedVertices + "/" + myStatistics.vertices);
+            myText.push("Primitives: " + myStatistics.renderedPrimitives + "/" + myStatistics.primitives);
+            myText.push("Worldnodes: " + myStatistics.worldNodes);
+            myText.push("Bodies:     " + myStatistics.bodies);
+            myText.push("Lights:     " + myStatistics.activeLights + "/" + myStatistics.lights);
+            myText.push("Overlays:   " + myStatistics.overlays);
+            myText.push("Materials:  " + myStatistics.materials);
+            myText.push("gc:  " + myStatistics.gc);
+        }
+
+        var myViewport = self.getViewportAtWindowCoordinates(0, 0); // get viewport containing upper left pixel
+        for (var i = 0; i < myText.length; ++i) {
+            window.setTextColor([0,0,0,1]);
+            window.renderText([(myViewport.size[0] * window.width) - 201, 19 + (i * 15)], myText[i], "Screen13", myViewport);
+            window.setTextColor(_myStatisticColor);
+            window.renderText([(myViewport.size[0] * window.width) - 200.8, 19.2 + (i * 15)], myText[i], "Screen13", myViewport);
+        }
+    }
+
+    function cycleBoundingVolumeMode() {
+        if (renderer.boundingVolumeMode == Renderer.BV_NONE) {
+            renderer.boundingVolumeMode = Renderer.BV_BODY;
+            print("Bounding volume mode: per body");
+        } else if (renderer.boundingVolumeMode == Renderer.BV_BODY) {
+            renderer.boundingVolumeMode = Renderer.BV_SHAPE;
+            print("Bounding volume mode: per shape");
+        } else if (renderer.boundingVolumeMode == Renderer.BV_SHAPE) {
+            renderer.boundingVolumeMode = Renderer.BV_HIERARCHY;
+            print("Bounding volume mode: hierarchy");
+        } else if (renderer.boundingVolumeMode == Renderer.BV_HIERARCHY) {
+            renderer.boundingVolumeMode = Renderer.BV_NONE;
+            print("Bounding volume mode: off");
+        }
+    }
+
+    function printHelp() {
+         print("Scene Viewer Keys:");
+         print("  print or W   write screenshot as png image to the current directory");
+         print("  shift-print  enables/disables video recorder");
+         print("    w          toggle wireframe");
+         print("    F          toggle flatshading");
+         print("    t          toggle texturing");
+         print("    b          toggle backface culling");
+         print("    m          switch to next mover");
+         print("    M          toggles mouse cursor visibility");
+         print("    f          toggles fullscreen");
+         print("    V          toggles autoClicker");
+         print("    v          toggles bounding box visualization");
+         print("    c          toggles culling");
+         print("    C          toggles culling debug mode");
+         print("    p          pause continous rendering");
+         print("    s          print statistic");
+         print("    S          save scene to file");
+         print("    B          save scene to binary file");
+         print("    q          quits the application");
+         print("    X          dumps scene on console");
+         print("    P          prints a list of all nodes that have changed since last print");
+         print("    U          flush currently unused nodes in lazy loading mode");
+         print("    u          toggle used memory display");
+         print("    T          toggle timing display");
+         print("    e          re-evaluate all include-files");
+         print("    i          Cycles window swap interval");
+         print("    +          increase zoom factor");
+         print("    -          decrease zoom factor");
+         print("    ,          switch to previous camera");
+         print("    .          switch to next camera");
+         print(" NumPad-/      draw camera frustums");
+         print("   0-9         switch to camera number 0-9");
+         print("    N          start Nagios plugin");
+         print("    A          free dom value caches");
+         print("    h          print this help");
+    }
+
+    function screenShot(theBasename) {
+        if (theBasename == undefined) {
+            theBasename = "screenshot";
+        }
+
+        var myDate = new Date();
+        myDate = String(myDate.getFullYear()) + padStringFront(myDate.getMonth()+1, "0", 2) + padStringFront(myDate.getDate(), "0", 2);
+
+        var myFilename = "";
+        while (1) {
+            myFilename = theBasename + "-";
+            myFilename += myDate;
+            myFilename += "-" + _myScreenshotCount + ".png";
+            if (!fileExists(myFilename)) {
+                break;
+            }
+            ++_myScreenshotCount;
+        }
+        print("Saving screenshot as '" + myFilename + "'");
+        window.saveBuffer(myFilename);
+    }
+
+    ////////////////////
+    // Public Methods //
+    ////////////////////
 
     self.setCursor = function(theImageString, theSize) {
         setCursor(theImageString, theSize);
@@ -152,13 +294,13 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         return _myCurrentTime;
     };
     
-    self.statisticColor setter = function(theColor) {
+    self.__defineSetter__("statisticColor", function (theColor) {
         _myStatisticColor = theColor;
-    };
+    });
     
-    self.current_time getter = function() {
+    self.__defineGetter__("current_time", function () {
         return _myCurrentTime;
-    };
+    });
 
     self.getAnimationManager = function() {
         return _myAnimationManager;
@@ -249,6 +391,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
     };
 
     self.onKey = function(theKey, theKeyState, theX, theY, theShiftFlag, theCtrlFlag, theAltFlag) {
+        var myCamera;
         var myMover = self.getMover(self.getActiveViewport());
         
         if (myMover) {
@@ -343,8 +486,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
                         _myOnScreenStatistics = 0;
                     }
                     window.printStatistics();
-                    var myCamera    = self.getActiveCamera(); //window.scene.dom.getElementById(window.canvas.childNode(0).camera);
-                    print("  Scene size     " + window.scene.getWorldSize(myCamera).toFixed(1) + "m");
+                    print("  Scene size     " + window.scene.getWorldSize(self.getActiveCamera()).toFixed(1) + "m");
                     break;
                 case 'S':
                     self.getScene().save("saved_scene.x60", false);
@@ -393,7 +535,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
                     print("Texturing: " + (self.getActiveViewport().texturing ? "on" : "off"));
                     break;
                 case '[-]':
-                    var myCamera = self.getActiveCamera();
+                    myCamera = self.getActiveCamera();
                     if (myCamera.frustum.hfov) { // persp camera
                         var myHfov = myCamera.frustum.hfov;
                         if (myHfov < 5) {
@@ -409,7 +551,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
                     }
                     break;
                 case '[+]':
-                    var myCamera = self.getActiveCamera();
+                    myCamera = self.getActiveCamera();
                     if (myCamera.frustum.hfov) { // persp camera
                         myHfov = myCamera.frustum.hfov;
                         if (myHfov > 5) {
@@ -663,147 +805,4 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
     self.go = function() {
         window.go();
     };
-
-    ///////////////////////////////////////////////////////////////////////////////////////////
-    //
-    // private members
-    //
-    ///////////////////////////////////////////////////////////////////////////////////////////
-
-    function fadeSplashScreen(theTime) {
-        const START_FADE = 1;
-        const STOP_FADE  = 3;
-        _mySplashScreen.moveToTop();
-        if (theTime > START_FADE && theTime < STOP_FADE) {
-            _mySplashScreen.alpha = clamp((STOP_FADE - theTime) / (STOP_FADE - START_FADE), 0, 1);
-        }
-        if (theTime > STOP_FADE + 1) {
-            _mySplashScreen.removeFromScene();
-            _mySplashScreen = null;
-        }
-    }
-
-    function showStatistics() {
-        var myText = [];
-        myText.push(window.fps.toFixed(1) + " swap=" + window.swapInterval);
-
-        if (_myOnScreenStatistics > 1) {
-            var myStatistics = window.scene.statistics;
-            myText.push("Vertices:   " + myStatistics.renderedVertices + "/" + myStatistics.vertices);
-            myText.push("Primitives: " + myStatistics.renderedPrimitives + "/" + myStatistics.primitives);
-            myText.push("Worldnodes: " + myStatistics.worldNodes);
-            myText.push("Bodies:     " + myStatistics.bodies);
-            myText.push("Lights:     " + myStatistics.activeLights + "/" + myStatistics.lights);
-            myText.push("Overlays:   " + myStatistics.overlays);
-            myText.push("Materials:  " + myStatistics.materials);
-            myText.push("gc:  " + myStatistics.gc);
-        }
-
-        var myViewport = self.getViewportAtWindowCoordinates(0, 0); // get viewport containing upper left pixel
-        for (var i = 0; i < myText.length; ++i) {
-            window.setTextColor([0,0,0,1]);
-            window.renderText([(myViewport.size[0] * window.width) - 201, 19 + (i * 15)], myText[i], "Screen13", myViewport);
-            window.setTextColor(_myStatisticColor);
-            window.renderText([(myViewport.size[0] * window.width) - 200.8, 19.2 + (i * 15)], myText[i], "Screen13", myViewport);
-        }
-    }
-
-    function cycleBoundingVolumeMode() {
-        if (renderer.boundingVolumeMode == Renderer.BV_NONE) {
-            renderer.boundingVolumeMode = Renderer.BV_BODY;
-            print("Bounding volume mode: per body");
-        } else if (renderer.boundingVolumeMode == Renderer.BV_BODY) {
-            renderer.boundingVolumeMode = Renderer.BV_SHAPE;
-            print("Bounding volume mode: per shape");
-        } else if (renderer.boundingVolumeMode == Renderer.BV_SHAPE) {
-            renderer.boundingVolumeMode = Renderer.BV_HIERARCHY;
-            print("Bounding volume mode: hierarchy");
-        } else if (renderer.boundingVolumeMode == Renderer.BV_HIERARCHY) {
-            renderer.boundingVolumeMode = Renderer.BV_NONE;
-            print("Bounding volume mode: off");
-        }
-    }
-
-    function printHelp() {
-         print("Scene Viewer Keys:");
-         print("  print or W   write screenshot as png image to the current directory");
-         print("  shift-print  enables/disables video recorder");
-         print("    w          toggle wireframe");
-         print("    F          toggle flatshading");
-         print("    t          toggle texturing");
-         print("    b          toggle backface culling");
-         print("    m          switch to next mover");
-         print("    M          toggles mouse cursor visibility");
-         print("    f          toggles fullscreen");
-         print("    V          toggles autoClicker");
-         print("    v          toggles bounding box visualization");
-         print("    c          toggles culling");
-         print("    C          toggles culling debug mode");
-         print("    p          pause continous rendering");
-         print("    s          print statistic");
-         print("    S          save scene to file");
-         print("    B          save scene to binary file");
-         print("    q          quits the application");
-         print("    X          dumps scene on console");
-         print("    P          prints a list of all nodes that have changed since last print");
-         print("    U          flush currently unused nodes in lazy loading mode");
-         print("    u          toggle used memory display");
-         print("    T          toggle timing display");
-         print("    e          re-evaluate all include-files");
-         print("    i          Cycles window swap interval");
-         print("    +          increase zoom factor");
-         print("    -          decrease zoom factor");
-         print("    ,          switch to previous camera");
-         print("    .          switch to next camera");
-         print(" NumPad-/      draw camera frustums");
-         print("   0-9         switch to camera number 0-9");
-         print("    N          start Nagios plugin");
-         print("    A          free dom value caches");
-         print("    h          print this help");
-    }
-
-    function screenShot(theBasename) {
-        if (theBasename == undefined) {
-            theBasename = "screenshot";
-        }
-
-        var myDate = new Date();
-        myDate = String(myDate.getFullYear()) + padStringFront(myDate.getMonth()+1, "0", 2) + padStringFront(myDate.getDate(), "0", 2);
-
-        var myFilename = "";
-        while (1) {
-            myFilename = theBasename + "-";
-            myFilename += myDate;
-            myFilename += "-" + _myScreenshotCount + ".png";
-            if (!fileExists(myFilename)) {
-                break;
-            }
-            ++_myScreenshotCount;
-        }
-        print("Saving screenshot as '" + myFilename + "'");
-        window.saveBuffer(myFilename);
-    }
-
-    var _myFullscreen            = false;
-
-    var _myConfigurator          = null;
-    var _myDebugVisual           = null;
-    var _myAnimationManager      = null;
-    var _myImageManager          = null;
-
-    var _myScreenshotCount = 0;
-
-    var _myCurrentTime           = 0;
-    var _myTimer                 = new AutoTimer("SceneViewer Timer");
-    var _mySplashScreen          = null;
-    var _mySplashScreenFlag      = false;
-    var _myShutter               = null;
-    var _myOnScreenDisplay       = null;
-    var _mySetDefaultRenderingCap= true;
-    var _myMemoryMeter           = null;
-    var _myPerfMeter             = null;
-    var _myOnScreenStatistics    = 0;
-    var _myVideoRecorder         = null;
-    var _myStatisticColor        = [1,1,1,1];
-    var _mySinceLastVersion        = "1";
 };
