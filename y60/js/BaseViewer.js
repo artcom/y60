@@ -173,7 +173,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         var myTargetProperties = theTargetMaterial.childNode("properties");
         for (var i = 0; i < theTableNode.childNodes.length; ++i) {
             var myNode = theTableNode.childNode(i);
-            if (myNode.nodeName.search(/sampler/) != -1) {
+            if (myNode.nodeName.search(/sampler/) !== -1) {
                 // skip samplers
                 continue;
             }
@@ -211,12 +211,12 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         if (theArguments) {
             for (var i = 0; i < theArguments.length; ++i) {
                 var myArgument = theArguments[i];
-                if (!_myShaderLibrary && myArgument.search(/shaderlib.*\.xml$/) != -1) {
+                if (!_myShaderLibrary && myArgument.search(/shaderlib.*\.xml$/) !== -1) {
                     // Take the first xml-file as shader library
                     _myShaderLibrary = myArgument;
-                } else if (myArgument.search(/\.[xbd]60$/) != -1 ||
-                           myArgument.search(/\.st.$/) != -1 ||
-                           myArgument.search(/\.x3d$/) != -1) {
+                } else if (myArgument.search(/\.[xbd]60$/) !== -1 ||
+                           myArgument.search(/\.st.$/) !== -1 ||
+                           myArgument.search(/\.x3d$/) !== -1) {
                     _myModelName = myArgument;
                 }
 
@@ -233,7 +233,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
             }
             if ("profile" in myArgumentMap) {
                 _myProfileFilename = myArgumentMap.profile;
-                if (_myProfileFilename == null) {
+                if (_myProfileFilename === null) {
                     _myProfileFilename = PROFILE_FILENAME;
                 }
                 _myProfileNode = new Node("<profile revision='0' name='' description='Frames-per-Second' current='0' previous='0' gain='0' time='0' maxfps='0' minfps='0'/>").firstChild;
@@ -246,7 +246,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     function collectSwitchNodes( theNode ) {
         for (var i = 0; i < theNode.childNodesLength(); ++i) {
             var myChild = theNode.childNode(i);
-            if ( !("name" in myChild) ) {
+            if (!("name" in myChild)) {
                 continue;
             }
             var myName = myChild.name;
@@ -256,7 +256,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
             if (myName.match(/^mswitch_.*/)) {
                 _myMSwitchNodes.push( new MSwitchNodeHandler( myChild ) );
             }
-            if (myName.match(/^tswitch_.*/) && myChild.nodeName == "material") {
+            if (myName.match(/^tswitch_.*/) && myChild.nodeName === "material") {
                 _myTSwitchNodes.push( new TSwitchNodeHandler( theNode.childNode(i)) );
             }
             collectSwitchNodes(myChild);
@@ -268,7 +268,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         _myMSwitchNodes = [];
         _myTSwitchNodes = [];
 
-        if (theNode == null) {
+        if (theNode === undefined) {
             collectSwitchNodes(window.scene.world);
         } else {
             collectSwitchNodes(theNode);
@@ -289,7 +289,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     };
     
     self.getProfileMode = function() {
-        return (_myProfileNode != null);
+        return (_myProfileNode !== null);
     };
 
     self.getShaderLibrary = function() {
@@ -420,16 +420,16 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
 
     self.nextMover = function(theViewport) {
         //var myViewportId = getViewportId(theViewport);
-
-        if (_myMoverConstructors.length == 0) {
+        if (_myMoverConstructors.length === 0) {
             return;
         }
         
         // find next mover
         var myNextMoverIndex = 0;
         if (_myLastMover) {
+            // TODO use modulo and indexOf
             for (var i = 0; i < _myMoverConstructors.length; ++i) {
-                if (_myMoverConstructors[i] == _myLastMover.constructor) {
+                if (_myMoverConstructors[i] === _myLastMover.constructor) {
                     myNextMoverIndex = i+1;
                     break;
                 }
@@ -449,7 +449,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     };
 
     self.setCanvas = function(theCanvasNode) {
-        if (theCanvasNode != _myRenderWindow.canvas) {
+        if (theCanvasNode !== _myRenderWindow.canvas) {
             _myRenderWindow.canvas = theCanvasNode;
         }
         _myLightManager.setupDefaultLighting(theCanvasNode);
@@ -614,10 +614,10 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
                 return new Node("<materialtable/>").firstChild;
             }
             myDoc.parseFile(theFilename);
-            if (myDoc.firstChild && myDoc.firstChild.nodeName == "materialtable") {
+            if (myDoc.firstChild && myDoc.firstChild.nodeName === "materialtable") {
                 _myMaterialTable = myDoc.firstChild;
             } else {
-                Logger.info("Could not apply MaterialTable: "+theFilename+" does not seem to contain a valid xml-structure.");
+                Logger.info("Could not apply MaterialTable: " + theFilename + " does not seem to contain a valid xml-structure.");
                 return new Node("<materialtable/>").firstChild;
             }
         }
@@ -635,7 +635,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
                 if (!mySwitchNode) {
                     continue;
                 }
-                if (mySwitchNode.nodeName == "body") {
+                if (mySwitchNode.nodeName === "body") {
                     Logger.info("Switchnode found in materialtable: "+mySwitchNode.name);
                     var myShape = mySwitchNode.getElementById(mySwitchNode.shape);
                     var myMaterialId = myShape.find("primitives").firstChild.material;
@@ -698,7 +698,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     };
 
     self.onPreViewport = function(theViewport) {
-        if (theViewport.camera != "") {
+        if (theViewport.camera !== "") {
             var myCamera = theViewport.getElementById(theViewport.camera);
             // calculate near/far planes from world size and distance camera-world
             var myWorldSize = _myRenderWindow.scene.getWorldSize(myCamera);
@@ -734,7 +734,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         var myViewport = self.getActiveViewport();
         var myAspect = myViewport.width / myViewport.height;
         for (var i = 0; i < myCameras.length; ++i) {
-            if (myCameras[i].id != myViewport.camera) {
+            if (myCameras[i].id !== myViewport.camera) {
                 window.getRenderer().drawFrustum(myCameras[i], myAspect);
             }
         }
@@ -760,10 +760,10 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
                 _myProfileNode.time = theTime;
             }
         }
-        if (_myHeartbeatThrober != null) {
+        if (_myHeartbeatThrober !== null) {
             _myHeartbeatThrober.throb(theTime);
         }
-        if (_myAutoClicker != null) {
+        if (_myAutoClicker !== null) {
             _myAutoClicker.onFrame();
         }
         
@@ -782,7 +782,8 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
 
     self.onMouseMotion = function(theX, theY) {
         var myViewportUnderMouse = _myPicking.getViewportAt(theX, theY);
-        if (myViewportUnderMouse && myViewportUnderMouse != _myClickedViewport && self.getMover(myViewportUnderMouse)) {
+        // ??? this seems weird
+        if (myViewportUnderMouse && myViewportUnderMouse !== _myClickedViewport && self.getMover(myViewportUnderMouse)) {
             self.getMover(myViewportUnderMouse).onMouseMotion(theX, theY);
         }
         if (_myClickedViewport && self.getMover(_myClickedViewport)) {
