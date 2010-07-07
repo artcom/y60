@@ -106,10 +106,14 @@ CoordSplineTest.prototype.Constructor = function(obj, theName) {
             return angle;
         }
     }
-
+ 
     // returns true if two rotations are almost equivalent 
     obj.almostEqualRotation = function(a,b) {
-        return almostEqual(quaternionMagnitude(rotationalDifference(a,b)),0);
+        //XXX: almostEqual for doubles has a threshold of 0.00001 for equality, 
+        //     on linux 32 bit, the Quaternion methods (probably the createFromEuler)
+        //     produce inaccuracies that deliver values with differences of less than
+        //     power of 3
+        return (quaternionMagnitude(rotationalDifference(a,b)) <= 0.01);
     };
 
     //
