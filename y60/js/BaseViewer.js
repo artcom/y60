@@ -62,7 +62,8 @@
           createUniqueId, almostEqual, Vector2i, Modelling, print,
           LightManager, GLResourceManager, SwitchNodeHandler,
           MSwitchNodeHandler, TSwitchNodeHandler, readFileAsString,
-          writeStringToFile, NagiosPlugin, Playlist, plug, HeartbeatThrober*/
+          writeStringToFile, NagiosPlugin, Playlist, plug, HeartbeatThrober,
+          indexOf*/
 
 // use this idiom in each level of inheritance and
 // you'll know if you are the outermost .js file.
@@ -102,8 +103,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
 
     // Camera movers
     var _myMoverConstructors  = [];  // Array of mover constructors
-                           
-    var _myLastMover       = null;
+    var _myCurrentMover    = null;
     var _myClickedViewport = null;
     var _myAutoNearFarFlag = true;
     var _activeViewport    = null;
@@ -392,25 +392,21 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         var myNewMover = null;
         if (MoverConstructor) {
             myNewMover = new MoverConstructor(theViewport);
-            //var myViewportId = getViewportId(theViewport);
-            _myLastMover = myNewMover;
+            _myCurrentMover = myNewMover;
             
-            if(theMoverObject !== undefined) {
+            if (theMoverObject !== undefined) {
                 myNewMover.setMoverObject(theMoverObject);
             } else {
                 myNewMover.setMoverObject(myNewMover.getViewportCamera());
             }
-            
-            return myNewMover;
         } else { 
-            _myLastMover = null;
-            return myNewMover;
-            
+            _myCurrentMover = null;
         }
+        return myNewMover;
     };
 
     self.getMover = function(theViewport) {
-        return _myLastMover;
+        return _myCurrentMover;
     };
 
     self.registerMover = function(theMoverFactory) {
@@ -419,26 +415,15 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     };
 
     self.nextMover = function(theViewport) {
-        //var myViewportId = getViewportId(theViewport);
         if (_myMoverConstructors.length === 0) {
             return;
         }
         
-        // find next mover
+        // find next mover's constructor
         var myNextMoverIndex = 0;
-        if (_myLastMover) {
-            // TODO use modulo and indexOf
-            for (var i = 0; i < _myMoverConstructors.length; ++i) {
-                if (_myMoverConstructors[i] === _myLastMover.constructor) {
-                    myNextMoverIndex = i+1;
-                    break;
-                }
-            }
-            if (myNextMoverIndex >= _myMoverConstructors.length) {
-                myNextMoverIndex = 0;
-            }
+        if (_myCurrentMover) {
+            myNextMoverIndex = (indexOf(_myMoverConstructors, _myCurrentMover.constructor) + 1) % _myMoverConstructors.length;
         }
-
         // switch mover
         var myNewMover = self.setMover(_myMoverConstructors[myNextMoverIndex], theViewport);
         print("Activated Mover: " + myNewMover.name);
