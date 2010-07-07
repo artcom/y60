@@ -56,25 +56,26 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-//use("ShapeBuilder.js"); // UH: self-referential reference? ;-)
+/*jslint white:false, nomen: false, plusplus:false*/
+/*globals arrayToString, Node, Logger*/
 
-const ELEMENT_TYPE_POINTS          = "points";
-const ELEMENT_TYPE_LINES           = "lines";
-const ELEMENT_TYPE_LINE_STRIP      = "linestrip";
-const ELEMENT_TYPE_LINE_LOOP       = "lineloop";
-const ELEMENT_TYPE_TRIANGLES       = "triangles";
-const ELEMENT_TYPE_TRIANGLE_STRIP  = "trianglestrip";
-const ELEMENT_TYPE_TRIANGLE_FAN    = "trianglefan";
-const ELEMENT_TYPE_QUADS           = "quads";
-const ELEMENT_TYPE_QUAD_STRIP      = "quadstrip";
-const ELEMENT_TYPE_POLYGON         = "polygon";
-
+// XXX Are these used anywhere?
+/*const ELEMENT_TYPE_POINTS         = "points";
+const ELEMENT_TYPE_LINES          = "lines";
+const ELEMENT_TYPE_LINE_STRIP     = "linestrip";
+const ELEMENT_TYPE_LINE_LOOP      = "lineloop";
+const ELEMENT_TYPE_TRIANGLES      = "triangles";
+const ELEMENT_TYPE_TRIANGLE_STRIP = "trianglestrip";
+const ELEMENT_TYPE_TRIANGLE_FAN   = "trianglefan";
+const ELEMENT_TYPE_QUADS          = "quads";
+const ELEMENT_TYPE_QUAD_STRIP     = "quadstrip";
+const ELEMENT_TYPE_POLYGON        = "polygon";
+*/
 function Element(theType, theMaterialId) {
     this.Constructor(this, theType, theMaterialId);
 }
 
 Element.prototype.Constructor = function(self, theType, theMaterialId) {
-
     self.type = theType;
     self.material = theMaterialId;
 
@@ -83,30 +84,65 @@ Element.prototype.Constructor = function(self, theType, theMaterialId) {
     self.normals   = [];
     self.colors    = [];
     self.texcoords = [[]];
-}
+};
 
-/**
- */
 function ShapeBuilder() {
     this.Constructor(this);
 }
 
 ShapeBuilder.prototype.Constructor = function(obj) {
 
-    var _myElements  = [];
+    /////////////////////
+    // Private Members //
+    /////////////////////
 
-    // position,normal,etc. data
+    var _myElements  = [];
     var _myPositions = [];
     var _myNormals   = [];
     var _myColors    = [];
     var _myUVCoords  = [[]];
 
+    /////////////////////
+    // Private Methods //
+    /////////////////////
+
+    // this is a utility function for appendQuadWithCustomTexCoordsAndPositions && appendQuadWithCustomTexCoords
+    function appendRemainingVertexData(theElement, theUVOrigin, theUVSize, theGenSingleVertexColorFlag) {
+        // a single normal pointing z for all vertices
+        var myNormalIndex = _myNormals.length;
+        _myNormals.push([0, 0, 1]);
+        theElement.normals.push(myNormalIndex,myNormalIndex,myNormalIndex,myNormalIndex);
+
+        // uv coordintaes for the 4 vertices
+        var myTexIndex = _myUVCoords[0].length;
+
+        _myUVCoords[0].push([theUVOrigin[0], theUVOrigin[1] + theUVSize[1]]);
+        _myUVCoords[0].push([theUVOrigin[0] + theUVSize[0], theUVOrigin[1] + theUVSize[1]]);
+        _myUVCoords[0].push([theUVOrigin[0] + theUVSize[0], theUVOrigin[1]]);
+        _myUVCoords[0].push([theUVOrigin[0], theUVOrigin[1]]);
+
+        theElement.texcoords[0].push(myTexIndex,myTexIndex+1,myTexIndex+2,myTexIndex+3);
+
+        var myColorIndex = _myColors.length;
+        if (theGenSingleVertexColorFlag || theGenSingleVertexColorFlag === undefined) {
+            _myColors.push([1,1,1,1]);
+            theElement.colors.push(myColorIndex, myColorIndex, myColorIndex, myColorIndex);
+        } else {
+            _myColors.push([1,1,1,1]);
+            _myColors.push([1,1,1,1]);
+            _myColors.push([1,1,1,1]);
+            _myColors.push([1,1,1,1]);
+            theElement.colors.push(myColorIndex, myColorIndex+1, myColorIndex+2, myColorIndex+3);
+        }
+    }
+
+    ////////////////////
+    // Public Methods //
+    ////////////////////
+
     /// Create <shape> node from the data previously passed in.
     obj.buildNode = function(theName) {
-
-        if (theName == null) {
-            theName = "ShapeBuilder";
-        }
+        theName = theName || "ShapeBuilder";
 
         // vertex data
         var myShapeString =
@@ -150,38 +186,38 @@ ShapeBuilder.prototype.Constructor = function(obj) {
 
         var myShapeDoc = new Node(myShapeString);
         return myShapeDoc.firstChild;
-    }
+    };
 
     /// Append a new shape element of the type using the material.
     obj.appendElement = function(theType, theMaterialId) {
         var e = new Element(theType, theMaterialId);
         _myElements.push(e);
         return e;
-    }
+    };
 
     obj.appendVertex = function(theElement, theVertex) {
         var myIndex = _myPositions.length;
         _myPositions.push(theVertex);
         theElement.positions.push(myIndex);
         return myIndex;
-    }
+    };
 
     obj.appendNormal = function(theElement, theNormal) {
         var myIndex = _myNormals.length;
         _myNormals.push(theNormal);
         theElement.normals.push(myIndex);
         return myIndex;
-    }
+    };
 
     obj.appendColor = function(theElement, theColor) {
         var myIndex = _myColors.length;
         _myColors.push(theColor);
         theElement.colors.push(myIndex);
         return myIndex;
-    }
+    };
 
     obj.appendTexCoord = function(theElement, theTexCoord, theTextureSlot) {
-        if (theTextureSlot == undefined) {
+        if (theTextureSlot === undefined) {
             theTextureSlot = 0;
         } else {
             if (_myUVCoords.length < theTextureSlot+1) {
@@ -196,7 +232,7 @@ ShapeBuilder.prototype.Constructor = function(obj) {
         _myUVCoords[theTextureSlot].push(theTexCoord);
         theElement.texcoords[theTextureSlot].push(myIndex);
         return myIndex;
-    }
+    };
 
     /// Append a line to the given element.
     obj.appendLineElement = function (theElement, theLineBegin, theLineEnd){
@@ -208,7 +244,7 @@ ShapeBuilder.prototype.Constructor = function(obj) {
         theElement.normals.push(0);
         theElement.colors.push(_myColors.length-1);
         theElement.colors.push(_myColors.length-1);
-    }
+    };
 
     /// Append a point to a linestrip element.
     obj.appendLineStripElement = function (theElement, thePosition) {
@@ -216,13 +252,10 @@ ShapeBuilder.prototype.Constructor = function(obj) {
         theElement.positions.push(obj.appendVertex(thePosition));
         theElement.normals.push(0);
         theElement.colors.push(0);
-    }
+    };
 
     obj.appendQuad = function (theElement, thePosition, theSize, theDepth) {
-
-        if (theDepth == null) {
-            theDepth = 0;
-        }
+        theDepth = theDepth || 0;
 
         // add positions to shape's vertex data
         var myHalfWidth  = theSize[0] / 2;
@@ -236,7 +269,7 @@ ShapeBuilder.prototype.Constructor = function(obj) {
         theElement.positions.push(myPosIndex,myPosIndex+1,myPosIndex+2,myPosIndex+3);
 
         // a single normal pointing z for all vertices
-        var myNormalIndex = _myNormals.length
+        var myNormalIndex = _myNormals.length;
         _myNormals.push([0, 0, 1]);
         theElement.normals.push(myNormalIndex,myNormalIndex,myNormalIndex,myNormalIndex);
 
@@ -247,11 +280,11 @@ ShapeBuilder.prototype.Constructor = function(obj) {
         _myUVCoords[0].push([1,0]);
         _myUVCoords[0].push([0,0]);
         theElement.texcoords[0].push(myTexIndex,myTexIndex+1,myTexIndex+2,myTexIndex+3);
-    }
+    };
 
     obj.appendQuad2 = function (theElement, p1, p2, p3, p4, theUVcoords) {
         // add positions to shape's vertex data
-        var myPosIndex = _myPositions.length
+        var myPosIndex = _myPositions.length;
 
         _myPositions.push(p1);
         _myPositions.push(p2);
@@ -262,13 +295,13 @@ ShapeBuilder.prototype.Constructor = function(obj) {
         theElement.positions.push(myPosIndex,myPosIndex+1,myPosIndex+2,myPosIndex+3);
 
         // a single normal pointing z for all vertices
-        var myNormalIndex = _myNormals.length
+        var myNormalIndex = _myNormals.length;
         _myNormals.push([0, 0, 1]);
         theElement.normals.push(myNormalIndex,myNormalIndex,myNormalIndex,myNormalIndex);
 
         // uv coordintaes for the 4 vertices
         var myTexIndex = _myUVCoords[0].length;
-        if (theUVcoords == undefined) {
+        if (theUVcoords === undefined) {
             _myUVCoords[0].push([0,1]);
             _myUVCoords[0].push([1,1]);
             _myUVCoords[0].push([1,0]);
@@ -280,7 +313,7 @@ ShapeBuilder.prototype.Constructor = function(obj) {
             _myUVCoords[0].push(theUVcoords[3]);
         }
         theElement.texcoords[0].push(myTexIndex,myTexIndex+1,myTexIndex+2,myTexIndex+3);
-    }
+    };
 
     obj.appendQuadWithCustomTexCoords = function (theElement, thePosition, theSize, theUVOrigin, theUVSize, theGenSingleVertexColorFlag) {
         // add positions to shape's vertex data
@@ -295,7 +328,8 @@ ShapeBuilder.prototype.Constructor = function(obj) {
         theElement.positions.push(myPosIndex,myPosIndex+1,myPosIndex+2,myPosIndex+3);
         // append remaining stuff
         appendRemainingVertexData(theElement, theUVOrigin, theUVSize, theGenSingleVertexColorFlag);
-    }
+    };
+    
     obj.appendQuadWithCustomTexCoordsAndPositions = function (theElement, thePositions, theUVOrigin, theUVSize, theGenSingleVertexColorFlag) {
         // add positions to shape's vertex data
         var myPosIndex = _myPositions.length;
@@ -307,35 +341,5 @@ ShapeBuilder.prototype.Constructor = function(obj) {
         theElement.positions.push(myPosIndex,myPosIndex+1,myPosIndex+2,myPosIndex+3);
         // append remaining stuff
         appendRemainingVertexData(theElement, theUVOrigin, theUVSize, theGenSingleVertexColorFlag);
-    }
-    // this is a utility function for appendQuadWithCustomTexCoordsAndPositions && appendQuadWithCustomTexCoords
-    function appendRemainingVertexData(theElement, theUVOrigin, theUVSize, theGenSingleVertexColorFlag) {
-        // a single normal pointing z for all vertices
-        var myNormalIndex = _myNormals.length
-        _myNormals.push([0, 0, 1]);
-        theElement.normals.push(myNormalIndex,myNormalIndex,myNormalIndex,myNormalIndex);
-
-        // uv coordintaes for the 4 vertices
-        var myTexIndex = _myUVCoords[0].length;
-
-        _myUVCoords[0].push([theUVOrigin[0], theUVOrigin[1] + theUVSize[1]]);
-        _myUVCoords[0].push([theUVOrigin[0] + theUVSize[0], theUVOrigin[1] + theUVSize[1]]);
-        _myUVCoords[0].push([theUVOrigin[0] + theUVSize[0], theUVOrigin[1]]);
-        _myUVCoords[0].push([theUVOrigin[0], theUVOrigin[1]]);
-
-        theElement.texcoords[0].push(myTexIndex,myTexIndex+1,myTexIndex+2,myTexIndex+3);
-
-        var myColorIndex = _myColors.length;
-        if (theGenSingleVertexColorFlag || theGenSingleVertexColorFlag == undefined) {
-            _myColors.push([1,1,1,1]);
-            theElement.colors.push(myColorIndex, myColorIndex, myColorIndex, myColorIndex);
-        } else {
-            _myColors.push([1,1,1,1]);
-            _myColors.push([1,1,1,1]);
-            _myColors.push([1,1,1,1]);
-            _myColors.push([1,1,1,1]);
-            theElement.colors.push(myColorIndex, myColorIndex+1, myColorIndex+2, myColorIndex+3);
-        }
-    }
-
-}
+    };
+};

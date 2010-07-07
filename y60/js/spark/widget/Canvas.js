@@ -28,23 +28,6 @@ spark.Canvas.Constructor = function (Protected) {
     // Private Methods //
     /////////////////////
     
-    function convertToCanvasCoordinates(theX, theY) {
-        var transformMatrix;
-        var intersecPointOnCanvas = null;
-        // assumptions:
-        //  - as the rectangle has no depth, there should always only appear ONE intersection
-        //  - the Canvas is topmost intersection, if not, this handler would not have been called by spark
-        var myIntersection = Public.stage.picking.pickIntersection(theX, theY);
-        if (myIntersection) {
-            transformMatrix = new Matrix4f(Public.innerSceneNode.globalmatrix);
-            transformMatrix.invert();
-            intersecPointOnCanvas = product(myIntersection.info.intersections[0].position,
-                                            transformMatrix);
-            intersecPointOnCanvas.y = Public.height - intersecPointOnCanvas.y;
-        }
-        return intersecPointOnCanvas;
-    }
-    
     function onKey(theEvent) {
         var myState = (theEvent.type === "keybord-key-down");
         var myShiftFlag = (theEvent.modifiers === spark.Keyboard.SHIFT) ||
@@ -138,9 +121,30 @@ spark.Canvas.Constructor = function (Protected) {
         return _myWorld;
     });
     
+    Public.__defineGetter__("viewport", function () {
+        return _myViewport;
+    });
+    
     ////////////////////
     // Public Methods //
     ////////////////////
+    
+    Public.convertToCanvasCoordinates = function (theX, theY) {
+        var transformMatrix;
+        var intersecPointOnCanvas = null;
+        // assumptions:
+        //  - as the rectangle has no depth, there should always only appear ONE intersection
+        //  - the Canvas is topmost intersection, if not, this handler would not have been called by spark
+        var myIntersection = Public.stage.picking.pickIntersection(theX, theY);
+        if (myIntersection) {
+            transformMatrix = new Matrix4f(Public.innerSceneNode.globalmatrix);
+            transformMatrix.invert();
+            intersecPointOnCanvas = product(myIntersection.info.intersections[0].position,
+                                            transformMatrix);
+            intersecPointOnCanvas.y = Public.height - intersecPointOnCanvas.y;
+        }
+        return intersecPointOnCanvas;
+    };
     
     Base.realize = Public.realize;
     Public.realize = function () {
@@ -224,7 +228,7 @@ spark.Canvas.Constructor = function (Protected) {
     
     Public.pickBody = function (theX, theY) {
         var pickedBody     = null,
-            canvasPosition = convertToCanvasCoordinates(theX, theY);
+            canvasPosition = Public.convertToCanvasCoordinates(theX, theY);
         if (canvasPosition) {
             pickedBody = Public.picking.pickBodyBySweepingSphereFromBodies(
                                 canvasPosition.x, canvasPosition.y,
@@ -241,7 +245,7 @@ spark.Canvas.Constructor = function (Protected) {
     
     Base.onMouseMotion = Public.onMouseMotion;
     Public.onMouseMotion = function (theEvent) {
-        var canvasPosition = convertToCanvasCoordinates(theEvent.stageX, theEvent.stageY);
+        var canvasPosition = Public.convertToCanvasCoordinates(theEvent.stageX, theEvent.stageY);
         if (canvasPosition) {
             Base.onMouseMotion(canvasPosition.x, canvasPosition.y);
         }
@@ -249,7 +253,7 @@ spark.Canvas.Constructor = function (Protected) {
     
     Base.onMouseButton = Public.onMouseButton;
     Public.onMouseButton = function (theButton, theState, theX, theY) {
-        var canvasPosition = convertToCanvasCoordinates(theX, theY);
+        var canvasPosition = Public.convertToCanvasCoordinates(theX, theY);
         if (canvasPosition) {
             Base.onMouseButton(theButton, theState, canvasPosition.x, canvasPosition.y);
         }

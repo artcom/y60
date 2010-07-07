@@ -126,7 +126,6 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
         self.Mover.reset();
 
         var myCamera         = self.getMoverObject();
-        myCamera.orientation = new Quaternionf(0,0,0,1);
 
         _myPosition          = myCamera.globalmatrix.getTranslation();
         _myVelocity          = new Vector3f(0,0,0);
