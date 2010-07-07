@@ -158,12 +158,12 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         return _myAutoClicker;
     });
     
-    function getViewportId(theViewport) {
+    /*function getViewportId(theViewport) {
         if (theViewport) {
             return theViewport.id;
         }
         return self.getActiveViewport().id; //getSingleViewport().id;
-    }
+    }*/
 
     function mergeMaterialProperties(theTargetMaterial, theTableNode) {
 
@@ -198,13 +198,13 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         _myDrawCameraFrustumFlag = theFlag;
     });
 
-    function getSingleViewport() {
+    /*function getSingleViewport() {
         if (_myRenderWindow.canvas.childNodesLength("viewport") == 1) {
             return _myRenderWindow.canvas.childNode("viewport");
         }
         Logger.warning("getSingleViewport called without a viewport in non-single viewport mode.");
         return null;
-    }
+    }*/
 
     function _parseArguments(theArguments) {
         var myArgumentMap = [];
@@ -392,7 +392,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         var myNewMover = null;
         if (MoverConstructor) {
             myNewMover = new MoverConstructor(theViewport);
-            var myViewportId = getViewportId(theViewport);
+            //var myViewportId = getViewportId(theViewport);
             _myLastMover = myNewMover;
             
             if(theMoverObject !== undefined) {
@@ -419,7 +419,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     };
 
     self.nextMover = function(theViewport) {
-        var myViewportId = getViewportId(theViewport);
+        //var myViewportId = getViewportId(theViewport);
 
         if (_myMoverConstructors.length == 0) {
             return;
@@ -892,7 +892,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     self.prepareScene = function (theScene, theCanvas, theSwitchNodeFlag) {
         if (theScene) {
             // Cache main scene nodes for fast access
-            var myWorlds    = theScene.dom.find("/scene/worlds");
+            //var myWorlds    = theScene.dom.find("/scene/worlds");
 
             _myWorld        = theScene.world;
             _myMaterials    = theScene.materials;

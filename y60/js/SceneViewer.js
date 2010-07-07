@@ -56,7 +56,7 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-/*jslint nomen:false, white:false, plusplus:false, bitwise:false*/
+/*jslint nomen:false, plusplus:false, bitwise:false*/
 /*globals use, Logger, BaseViewer, AutoTimer, resetCursor, setCursor,
           PerfMeter, OnScreenDisplay, clamp, Renderer, print, hostname,
           fileExists, Scene, reuse, padStringFront, VideoRecorder,
@@ -100,7 +100,7 @@ function SceneViewer(theArguments) {
     this.Constructor(this, theArguments);
 }
 
-SceneViewer.prototype.Constructor = function(self, theArguments) {
+SceneViewer.prototype.Constructor = function (self, theArguments) {
     BaseViewer.prototype.Constructor(self, theArguments);
     self.BaseViewer = [];
 
@@ -164,7 +164,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
 
         var myViewport = self.getViewportAtWindowCoordinates(0, 0); // get viewport containing upper left pixel
         for (var i = 0; i < myText.length; ++i) {
-            window.setTextColor([0,0,0,1]);
+            window.setTextColor([0, 0, 0, 1]);
             window.renderText([(myViewport.size[0] * window.width) - 201, 19 + (i * 15)], myText[i], "Screen13", myViewport);
             window.setTextColor(_myStatisticColor);
             window.renderText([(myViewport.size[0] * window.width) - 200.8, 19.2 + (i * 15)], myText[i], "Screen13", myViewport);
@@ -188,48 +188,48 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
     }
 
     function printHelp() {
-         print("Scene Viewer Keys:");
-         print("  print or W   write screenshot as png image to the current directory");
-         print("  shift-print  enables/disables video recorder");
-         print("    w          toggle wireframe");
-         print("    F          toggle flatshading");
-         print("    t          toggle texturing");
-         print("    b          toggle backface culling");
-         print("    m          switch to next mover");
-         print("    M          toggles mouse cursor visibility");
-         print("    f          toggles fullscreen");
-         print("    V          toggles autoClicker");
-         print("    v          toggles bounding box visualization");
-         print("    c          toggles culling");
-         print("    C          toggles culling debug mode");
-         print("    p          pause continous rendering");
-         print("    s          print statistic");
-         print("    S          save scene to file");
-         print("    B          save scene to binary file");
-         print("    q          quits the application");
-         print("    X          dumps scene on console");
-         print("    P          prints a list of all nodes that have changed since last print");
-         print("    U          flush currently unused nodes in lazy loading mode");
-         print("    u          toggle used memory display");
-         print("    T          toggle timing display");
-         print("    e          re-evaluate all include-files");
-         print("    i          Cycles window swap interval");
-         print("    +          increase zoom factor");
-         print("    -          decrease zoom factor");
-         print("    ,          switch to previous camera");
-         print("    .          switch to next camera");
-         print(" NumPad-/      draw camera frustums");
-         print("   0-9         switch to camera number 0-9");
-         print("    N          start Nagios plugin");
-         print("    A          free dom value caches");
-         print("    h          print this help");
+        print("Scene Viewer Keys:");
+        print("  print or W   write screenshot as png image to the current directory");
+        print("  shift-print  enables/disables video recorder");
+        print("    w          toggle wireframe");
+        print("    F          toggle flatshading");
+        print("    t          toggle texturing");
+        print("    b          toggle backface culling");
+        print("    m          switch to next mover");
+        print("    M          toggles mouse cursor visibility");
+        print("    f          toggles fullscreen");
+        print("    V          toggles autoClicker");
+        print("    v          toggles bounding box visualization");
+        print("    c          toggles culling");
+        print("    C          toggles culling debug mode");
+        print("    p          pause continous rendering");
+        print("    s          print statistic");
+        print("    S          save scene to file");
+        print("    B          save scene to binary file");
+        print("    q          quits the application");
+        print("    X          dumps scene on console");
+        print("    P          prints a list of all nodes that have changed since last print");
+        print("    U          flush currently unused nodes in lazy loading mode");
+        print("    u          toggle used memory display");
+        print("    T          toggle timing display");
+        print("    e          re-evaluate all include-files");
+        print("    i          Cycles window swap interval");
+        print("    +          increase zoom factor");
+        print("    -          decrease zoom factor");
+        print("    ,          switch to previous camera");
+        print("    .          switch to next camera");
+        print(" NumPad-/      draw camera frustums");
+        print("   0-9         switch to camera number 0-9");
+        print("    N          start Nagios plugin");
+        print("    A          free dom value caches");
+        print("    h          print this help");
     }
 
     function screenShot(theBasename) {
         theBasename = theBasename || "screenshot";
 
         var myDate = new Date();
-        myDate = String(myDate.getFullYear()) + padStringFront(myDate.getMonth()+1, "0", 2) + padStringFront(myDate.getDate(), "0", 2);
+        myDate = String(myDate.getFullYear()) + padStringFront(myDate.getMonth() + 1, "0", 2) + padStringFront(myDate.getDate(), "0", 2);
 
         var myFilename = "";
         while (1) {
@@ -249,16 +249,16 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
     // Public Methods //
     ////////////////////
 
-    self.setCursor = function(theImageString, theSize) {
+    self.setCursor = function (theImageString, theSize) {
         setCursor(theImageString, theSize);
     };
 
-    self.resetCursor = function() {
+    self.resetCursor = function () {
         resetCursor();
     };
 
-    self.getSettings = function() {
-        if(_myConfigurator) {
+    self.getSettings = function () {
+        if (_myConfigurator) {
             return _myConfigurator.getSettings();
         } else {
             Logger.warning("no settings.xml used -> no Configurator");
@@ -266,8 +266,8 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         }
     };
 
-    self.getConfigurator = function() {
-        if(_myConfigurator) {
+    self.getConfigurator = function () {
+        if (_myConfigurator) {
             return _myConfigurator;
         } else {
             Logger.warning("no settings.xml used -> no Configurator");
@@ -275,23 +275,23 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         }
     };
 
-    self.registerSettingsListener = function(theListener, theSection) {
-        if(_myConfigurator) {
+    self.registerSettingsListener = function (theListener, theSection) {
+        if (_myConfigurator) {
             _myConfigurator.addListener(theListener, theSection);
         } else {
             Logger.warning("no settings.xml used -> no Configurator");
         }
     };
     
-    self.deregisterSettingsListener = function(theListener) {
-        if(_myConfigurator) {
+    self.deregisterSettingsListener = function (theListener) {
+        if (_myConfigurator) {
             _myConfigurator.removeListener(theListener);
         } else {
             Logger.warning("no settings.xml used -> no Configurator");
         }
     };
 
-    self.getCurrentTime = function(){
+    self.getCurrentTime = function () {
         return _myCurrentTime;
     };
     
@@ -303,38 +303,38 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         return _myCurrentTime;
     });
 
-    self.getAnimationManager = function() {
+    self.getAnimationManager = function () {
         return _myAnimationManager;
     };
 
-    self.getImageManager = function() {
+    self.getImageManager = function () {
         Logger.warning("ImageManager is deprecated.");
         return _myImageManager;
     };
     
-    self.getPerfMeter = function() {
+    self.getPerfMeter = function () {
         if (!_myPerfMeter) {
             _myPerfMeter = new PerfMeter(self);
         }
         return _myPerfMeter;
     };
 
-    self.setSplashScreen = function(theFlag) {
+    self.setSplashScreen = function (theFlag) {
         _mySplashScreenFlag = theFlag;
     };
 
-    self.setMessage = function(theMessage, theLine) {
+    self.setMessage = function (theMessage, theLine) {
         if (!_myOnScreenDisplay) {
             _myOnScreenDisplay = new OnScreenDisplay(self);
         }
         _myOnScreenDisplay.setMessage(theMessage, theLine);
     };
     
-    self.getOSD = function() {
+    self.getOSD = function () {
         return _myOnScreenDisplay;
     };
 
-    self.toggleVideoRecording = function() {
+    self.toggleVideoRecording = function () {
         if (!_myVideoRecorder) {
             _myVideoRecorder = new VideoRecorder(25);
         }
@@ -342,7 +342,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
     };
 
     self.BaseViewer.onFrame = self.onFrame;
-    self.onFrame = function(theTime) {
+    self.onFrame = function (theTime) {
         self.BaseViewer.onFrame(theTime);
         _myCurrentTime = theTime;
         if (_myShutter) {
@@ -360,7 +360,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         if (_mySplashScreen) {
             fadeSplashScreen(theTime);
         }
-        if(_myConfigurator) {
+        if (_myConfigurator) {
             _myConfigurator.onFrame(theTime);
         }
         if (_myPerfMeter) {
@@ -368,11 +368,11 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         }
     };
 
-    self.onPreRender = function() {
+    self.onPreRender = function () {
     };
 
     self.BaseViewer.onPostRender = self.onPostRender;
-    self.onPostRender = function() {
+    self.onPostRender = function () {
         self.BaseViewer.onPostRender();
         if (_myAnimationManager) {
             _myAnimationManager.onPostRender();
@@ -391,7 +391,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         }
     };
 
-    self.onKey = function(theKey, theKeyState, theX, theY, theShiftFlag, theCtrlFlag, theAltFlag) {
+    self.onKey = function (theKey, theKeyState, theX, theY, theShiftFlag, theCtrlFlag, theAltFlag) {
         var myCamera, myHfov;
         var myMover = self.getMover(self.getActiveViewport());
         
@@ -400,10 +400,10 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         }
         if (!theAltFlag) {
             self.getLightManager().onKey(theKey, theKeyState, theShiftFlag, theCtrlFlag, theAltFlag);
-            if(_myConfigurator) {
+            if (_myConfigurator) {
                 _myConfigurator.onKey(theKey, theKeyState, theShiftFlag, theCtrlFlag, theAltFlag);
             }
-            if(theCtrlFlag) {
+            if (theCtrlFlag) {
                 _myDebugVisual.onKey(theKey, theKeyState, theShiftFlag);
                 _myAnimationManager.onKey(theKey, theKeyState, theShiftFlag);
             }
@@ -424,210 +424,210 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         }
         if (!theAltFlag) {
             switch (theKey) {
-                case 'n':
-                    self.getActiveViewport().drawnormals = !self.getActiveViewport().drawnormals;
-                    print("Normals: " + (self.getActiveViewport().drawnormals ? "on" : "off"));
-                    break;
-                case 'm':
-                    self.nextMover();
-                    break;
-                case 'F':
-                    self.getActiveViewport().flatshading = !self.getActiveViewport().flatshading;
-                    print("Flatshading: " + (self.getActiveViewport().flatshading ? "on" : "off"));
-                    break;
-                case 'w':
-                    self.getActiveViewport().wireframe = !self.getActiveViewport().wireframe;
-                    print("Wireframe: " + (self.getActiveViewport().wireframe ? "on" : "off"));
-                    break;
-                case 'b':
-                    self.getActiveViewport().backfaceculling = !self.getActiveViewport().backfaceculling;
-                    print("Backface culling: " + (self.getActiveViewport().backfaceculling ? "on" : "off"));
-                    break;
-                case 'c':
-                    self.getActiveViewport().culling = !self.getActiveViewport().culling;
-                    print("Culling: " + (self.getActiveViewport().culling ? "on" : "off"));
-                    break;
-                case 'C':
-                    self.getActiveViewport().debugculling = !self.getActiveViewport().debugculling;
-                    print("Debug culling: " + (self.getActiveViewport().debugculling ? "on" : "off"));
-                    break;
-                case 'V':
-                    self.autoClicker.enabled = !self.autoClicker.enabled;
-                    self.autoClicker.interval = 4;
-                    break;
-                case 'v':
-                    cycleBoundingVolumeMode();
-                    break;
-                case 'B':
-                    self.getScene().save("saved_scene.b60", true);
-                    print("Saved scene to: saved_scene.b60");
-                    break;
-                case 'D':
-                    self.getScene().saveWithCatalog("saved_scene.d60", "saved_scene.d60", true);
-                    print("Saved scene and catalog to: saved_scene.d60");
-                    break;
-                case 'p':
-                    window.pause = !window.pause;
-                    print("Pause: " + (window.pause ? "on" : "off"));
-                    break;
-                case 'P':
-                    print("Node changed since version "+_mySinceLastVersion+":");
-                    window.scene.dom.printChangedNodes(_mySinceLastVersion);
-                    _mySinceLastVersion = window.scene.dom.nodeVersion;
-                    break;
-                case 'U':
-                    window.scene.dom.flushUnusedChildren();
-                    break;
-                case 'h':
-                    printHelp();
-                    break;
-                case 's':
-                    _myOnScreenStatistics++;
-                    if (_myOnScreenStatistics > 2) {
-                        _myOnScreenStatistics = 0;
+            case 'n':
+                self.getActiveViewport().drawnormals = !self.getActiveViewport().drawnormals;
+                print("Normals: " + (self.getActiveViewport().drawnormals ? "on" : "off"));
+                break;
+            case 'm':
+                self.nextMover();
+                break;
+            case 'F':
+                self.getActiveViewport().flatshading = !self.getActiveViewport().flatshading;
+                print("Flatshading: " + (self.getActiveViewport().flatshading ? "on" : "off"));
+                break;
+            case 'w':
+                self.getActiveViewport().wireframe = !self.getActiveViewport().wireframe;
+                print("Wireframe: " + (self.getActiveViewport().wireframe ? "on" : "off"));
+                break;
+            case 'b':
+                self.getActiveViewport().backfaceculling = !self.getActiveViewport().backfaceculling;
+                print("Backface culling: " + (self.getActiveViewport().backfaceculling ? "on" : "off"));
+                break;
+            case 'c':
+                self.getActiveViewport().culling = !self.getActiveViewport().culling;
+                print("Culling: " + (self.getActiveViewport().culling ? "on" : "off"));
+                break;
+            case 'C':
+                self.getActiveViewport().debugculling = !self.getActiveViewport().debugculling;
+                print("Debug culling: " + (self.getActiveViewport().debugculling ? "on" : "off"));
+                break;
+            case 'V':
+                self.autoClicker.enabled = !self.autoClicker.enabled;
+                self.autoClicker.interval = 4;
+                break;
+            case 'v':
+                cycleBoundingVolumeMode();
+                break;
+            case 'B':
+                self.getScene().save("saved_scene.b60", true);
+                print("Saved scene to: saved_scene.b60");
+                break;
+            case 'D':
+                self.getScene().saveWithCatalog("saved_scene.d60", "saved_scene.d60", true);
+                print("Saved scene and catalog to: saved_scene.d60");
+                break;
+            case 'p':
+                window.pause = !window.pause;
+                print("Pause: " + (window.pause ? "on" : "off"));
+                break;
+            case 'P':
+                print("Node changed since version " + _mySinceLastVersion + ":");
+                window.scene.dom.printChangedNodes(_mySinceLastVersion);
+                _mySinceLastVersion = window.scene.dom.nodeVersion;
+                break;
+            case 'U':
+                window.scene.dom.flushUnusedChildren();
+                break;
+            case 'h':
+                printHelp();
+                break;
+            case 's':
+                _myOnScreenStatistics++;
+                if (_myOnScreenStatistics > 2) {
+                    _myOnScreenStatistics = 0;
+                }
+                window.printStatistics();
+                print("  Scene size     " + window.scene.getWorldSize(self.getActiveCamera()).toFixed(1) + "m");
+                break;
+            case 'S':
+                self.getScene().save("saved_scene.x60", false);
+                print("Saved scene to: saved_scene.x60");
+                break;
+            case 'f':
+                _myFullscreen = !_myFullscreen;
+                window.resize(0, 0, _myFullscreen);
+                print("Fullscreen: " + (_myFullscreen ? "on" : "off"));
+                break;
+            case 'A':
+                print("Freeing dom caches...");
+                window.scene.dom.freeCaches();
+                print("Freeing dom caches done.");
+                break;
+            case 'X':
+                print(window.scene.world);
+                break;
+            case 'N':
+                var myPlugin = self.enableNagios(2349);
+                myPlugin.timeout = 5000;
+                print("Nagios plugin listening on port " + myPlugin.port + ", frame timeout is " + myPlugin.timeout + " ms");
+                break;
+            case "W":
+            case "sys req":
+            case "print screen":
+                screenShot();
+                break;
+            case "PRINT SCREEN":
+            case "SYS REQ":
+                if (!_myVideoRecorder) {
+                    _myVideoRecorder = new VideoRecorder(25);
+                }
+                _myVideoRecorder.enabled = !_myVideoRecorder.enabled;
+                break;
+            case 'M':
+                window.showMouseCursor = !window.showMouseCursor;
+                print("Mouse cursor: " + (window.showMouseCursor ? "on" : "off"));
+                break;
+            case "g":
+                self.glow = !self.glow;
+                print("glow: " + (self.glow ? "on" : "off"));
+                break;
+            case "t":
+                self.getActiveViewport().texturing = !self.getActiveViewport().texturing;
+                print("Texturing: " + (self.getActiveViewport().texturing ? "on" : "off"));
+                break;
+            case '[-]':
+                myCamera = self.getActiveCamera();
+                if (myCamera.frustum.hfov) { // persp camera
+                    myHfov = myCamera.frustum.hfov;
+                    if (myHfov < 5) {
+                        myHfov += 0.1;
+                    } else if (myHfov < 175) {
+                        myHfov += 5;
                     }
-                    window.printStatistics();
-                    print("  Scene size     " + window.scene.getWorldSize(self.getActiveCamera()).toFixed(1) + "m");
-                    break;
-                case 'S':
-                    self.getScene().save("saved_scene.x60", false);
-                    print("Saved scene to: saved_scene.x60");
-                    break;
-                case 'f':
-                    _myFullscreen = !_myFullscreen;
-                    window.resize(0, 0, _myFullscreen);
-                    print("Fullscreen: " + (_myFullscreen ? "on" : "off"));
-                    break;
-                case 'A':
-                    print("Freeing dom caches...");
-                    window.scene.dom.freeCaches();
-                    print("Freeing dom caches done.");
-                    break;
-                 case 'X':
-                    print(window.scene.world);
-                    break;
-                case 'N':
-                    var myPlugin = self.enableNagios(2349);
-                    myPlugin.timeout = 5000;
-                    print("Nagios plugin listening on port "+myPlugin.port+", frame timeout is "+myPlugin.timeout+" ms");
-                    break;
-                case "W":
-                case "sys req":
-                case "print screen":
-                    screenShot();
-                    break;
-                case "PRINT SCREEN":
-                case "SYS REQ":
-                    if (!_myVideoRecorder) {
-                        _myVideoRecorder = new VideoRecorder(25);
+                    myCamera.frustum.hfov = myHfov;
+                    print("Zoom to " + getFocalLength(myHfov).toFixed(1) + "mm (hfov: " + myHfov.toFixed(1) + ")");
+                } else {  // ortho camera
+                    myCamera.width *= 1.1;
+                    print("Zoom to width " + myCamera.width);
+                }
+                break;
+            case '[+]':
+                myCamera = self.getActiveCamera();
+                if (myCamera.frustum.hfov) { // persp camera
+                    myHfov = myCamera.frustum.hfov;
+                    if (myHfov > 5) {
+                        myHfov -= 5;
+                    } else if (myHfov > 0.1) {
+                        myHfov -= 0.1;
                     }
-                    _myVideoRecorder.enabled = !_myVideoRecorder.enabled;
-                    break;
-                case 'M':
-                    window.showMouseCursor = !window.showMouseCursor;
-                    print("Mouse cursor: " + (window.showMouseCursor ? "on" : "off"));
-                    break;
-                case "g":
-                    self.glow = !self.glow;
-                    print("glow: " + (self.glow ? "on" : "off"));
-                    break;
-                case "t":
-                    self.getActiveViewport().texturing = !self.getActiveViewport().texturing;
-                    print("Texturing: " + (self.getActiveViewport().texturing ? "on" : "off"));
-                    break;
-                case '[-]':
-                    myCamera = self.getActiveCamera();
-                    if (myCamera.frustum.hfov) { // persp camera
-                        myHfov = myCamera.frustum.hfov;
-                        if (myHfov < 5) {
-                            myHfov += 0.1;
-                        } else if (myHfov < 175) {
-                            myHfov += 5;
-                        }
-                        myCamera.frustum.hfov = myHfov;
-                        print("Zoom to " + getFocalLength(myHfov).toFixed(1) + "mm (hfov: " + myHfov.toFixed(1) + ")");
-                    } else {  // ortho camera
-                        myCamera.width *= 1.1;
-                        print("Zoom to width " + myCamera.width);
-                    }
-                    break;
-                case '[+]':
-                    myCamera = self.getActiveCamera();
-                    if (myCamera.frustum.hfov) { // persp camera
-                        myHfov = myCamera.frustum.hfov;
-                        if (myHfov > 5) {
-                            myHfov -= 5;
-                        } else if (myHfov > 0.1) {
-                            myHfov -= 0.1;
-                        }
-                        myCamera.frustum.hfov = myHfov;
-                        print("Zoom to " + getFocalLength(myHfov).toFixed(1) + "mm (hfov: " + myHfov.toFixed(1) + ")");
-                    } else {  // ortho camera
-                        myCamera.width /= 1.1;
-                        print("Zoom to width " + myCamera.width);
-                    }
-                    break;
-                case 'u':
-                    if (!_myMemoryMeter) {
-                        _myMemoryMeter = new MemoryMeter(self);
-                    }
-                    _myMemoryMeter.toggleEnableFlag();
-                    break;
-                case 'T':
-                    self.getPerfMeter().toggleEnableFlag();
-                    break;
-                case '0':
-                case '1':
-                case '2':
-                case '3':
-                case '4':
-                case '5':
-                case '6':
-                case '7':
-                case '8':
-                case '9':
-                    //window.camera = self.setActiveCamera(Number(theKey));
-                    self.setActiveCamera(Number(theKey));
-                    print("Active camera: " + self.getActiveCamera().name);
-                    break;
-                case ".":
-                    self.nextCamera();
-                    print("Active camera: " + self.getActiveCamera().name);
-                    break;
-                case ",":
-                    self.prevCamera();
-                    print("Active camera: " + self.getActiveCamera().name);
-                    break;
-                case "e":
-                    reuse();
-                    print("All includes re-evaluated.");
-                    break;
-                case "i":
-                    // Cycle swap interval
-                    var mySwapInterval = window.swapInterval;
-                    mySwapInterval++;
-                    if (mySwapInterval > 4) {
-                        mySwapInterval = 0;
-                    }
-                    window.swapInterval = mySwapInterval;
-                    print("Swap interval=" + window.swapInterval);
-                    break;
-                case 'o':
-                    print("Optimizing scene...");
-                    window.scene.optimize();
-                    break;
-                case '[/]':
-                    self.drawFrustums = ! self.drawFrustums;
-                    print("Draw frustums: " + (self.drawFrustums ? "On" : "Off"));
-                    break;
-                default:
-                    break;
+                    myCamera.frustum.hfov = myHfov;
+                    print("Zoom to " + getFocalLength(myHfov).toFixed(1) + "mm (hfov: " + myHfov.toFixed(1) + ")");
+                } else {  // ortho camera
+                    myCamera.width /= 1.1;
+                    print("Zoom to width " + myCamera.width);
+                }
+                break;
+            case 'u':
+                if (!_myMemoryMeter) {
+                    _myMemoryMeter = new MemoryMeter(self);
+                }
+                _myMemoryMeter.toggleEnableFlag();
+                break;
+            case 'T':
+                self.getPerfMeter().toggleEnableFlag();
+                break;
+            case '0':
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+            case '8':
+            case '9':
+                //window.camera = self.setActiveCamera(Number(theKey));
+                self.setActiveCamera(Number(theKey));
+                print("Active camera: " + self.getActiveCamera().name);
+                break;
+            case ".":
+                self.nextCamera();
+                print("Active camera: " + self.getActiveCamera().name);
+                break;
+            case ",":
+                self.prevCamera();
+                print("Active camera: " + self.getActiveCamera().name);
+                break;
+            case "e":
+                reuse();
+                print("All includes re-evaluated.");
+                break;
+            case "i":
+                // Cycle swap interval
+                var mySwapInterval = window.swapInterval;
+                mySwapInterval++;
+                if (mySwapInterval > 4) {
+                    mySwapInterval = 0;
+                }
+                window.swapInterval = mySwapInterval;
+                print("Swap interval=" + window.swapInterval);
+                break;
+            case 'o':
+                print("Optimizing scene...");
+                window.scene.optimize();
+                break;
+            case '[/]':
+                self.drawFrustums = ! self.drawFrustums;
+                print("Draw frustums: " + (self.drawFrustums ? "On" : "Off"));
+                break;
+            default:
+                break;
             }
         }
     };
 
     self.BaseViewer.onMouseMotion = self.onMouseMotion;
-    self.onMouseMotion = function(theX, theY) {
+    self.onMouseMotion = function (theX, theY) {
         self.BaseViewer.onMouseMotion(theX, theY);
         if (_myShutter && _myShutter.enabled()) {
             if (_myShutter.onMouseMotion(theX, theY)) {
@@ -637,7 +637,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
     };
     
     self.BaseViewer.onMouseButton = self.onMouseButton;
-    self.onMouseButton = function(theButton, theState, theX, theY) {
+    self.onMouseButton = function (theButton, theState, theX, theY) {
         self.BaseViewer.onMouseButton(theButton, theState, theX, theY);
         if (_myShutter && _myShutter.enabled()) {
             if (_myShutter.onMouseButton(theButton, theState, theX, theY)) {
@@ -647,23 +647,23 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
     };
 
     self.BaseViewer.onAxis = self.onAxis;
-    self.onAxis = function(theDevice, theAxis, theValue) {
-        self.BaseViewer.onAxis( theDevice, theAxis, theValue);
+    self.onAxis = function (theDevice, theAxis, theValue) {
+        self.BaseViewer.onAxis(theDevice, theAxis, theValue);
     };
 
     self.BaseViewer.onButton = self.onButton;
-    self.onButton = function(theDevice, theButton, theState) {
-        self.BaseViewer.onButton( theDevice, theButton, theState);
+    self.onButton = function (theDevice, theButton, theState) {
+        self.BaseViewer.onButton(theDevice, theButton, theState);
     };
 
-    self.onResize = function(theNewWidth, theNewHeight) {
+    self.onResize = function (theNewWidth, theNewHeight) {
         if (_myShutter) {
             _myShutter.onResize();
         }
     };
 
     self.BaseViewer.onExit = self.onExit;
-    self.onExit = function() {
+    self.onExit = function () {
         self.BaseViewer.onExit();
     };
 
@@ -675,17 +675,17 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
     //     Renderer.CUBEMAP_SUPPORT            [default]
     //     Renderer.POINT_PARAMETER_SUPPORT
     //     Renderer.TEXTURE_3D_SUPPORT
-    self.addRenderingCapability = function(theCapability) {
+    self.addRenderingCapability = function (theCapability) {
         _mySetDefaultRenderingCap = false;
         window.renderingCaps = window.renderingCaps | theCapability;
     };
     
-    self.removeRenderingCapability = function(theCapability) {
+    self.removeRenderingCapability = function (theCapability) {
         _mySetDefaultRenderingCap = false;
         window.renderingCaps = window.renderingCaps & (~theCapability);
     };
 
-    self.setup = function(theWindowWidth, theWindowHeight, theFullscreen, theWindowTitle, theScene, theSwitchNodeFlag) {
+    self.setup = function (theWindowWidth, theWindowHeight, theFullscreen, theWindowTitle, theScene, theSwitchNodeFlag) {
         //print(theWindowWidth + " x " + theWindowHeight + " fullscreen: " + theFullscreen);
         window = window || new RenderWindow();
         if (theWindowWidth && theWindowHeight) {
@@ -752,7 +752,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         var myHostFiles = ["settings-" + hostname() + ".xml",
                            "CONFIG/settings-" + hostname() + ".xml"];
         for (i = 0; i < myHostFiles.length; ++i) {
-            if (fileExists( myHostFiles[i] )) {
+            if (fileExists(myHostFiles[i])) {
                 myHostSettingsFile = myHostFiles[i];
                 break;
             }
@@ -790,18 +790,18 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
             _mySplashScreen.position = new Vector2f((window.width - _mySplashScreen.width) / 2,
                                                     (window.height - _mySplashScreen.height) / 2);
         }
-        _mySinceLastVersion="1";
+        _mySinceLastVersion = "1";
     };
 
-    self.createShutter = function() {
+    self.createShutter = function () {
         if (!_myShutter) {
             print("Creating shutter");
-            _myShutter = new Shutter(self, new Vector4f(0,0,0,0));
+            _myShutter = new Shutter(self, new Vector4f(0, 0, 0, 0));
             self.registerSettingsListener(_myShutter, "Shutter");
         }
     };
 
-    self.go = function() {
+    self.go = function () {
         window.go();
     };
 };
