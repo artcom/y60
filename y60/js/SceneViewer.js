@@ -60,7 +60,10 @@
 /*globals use, Logger, BaseViewer, AutoTimer, resetCursor, setCursor,
           PerfMeter, OnScreenDisplay, clamp, Renderer, print, hostname,
           fileExists, Scene, reuse, padStringFront, VideoRecorder,
-          getFocalLength*/
+          getFocalLength, WalkMover, FlyMover, TrackballMover,
+          ClassicTrackballMover, CenteredTrackballMover, RenderWindow,
+          ImageOverlay, Vector2f, Vector4f, Configurator, Shutter,
+          ImageManager, AnimationManager, DebugVisual, MemoryMeter*/
 
 // use this idiom in each level of inheritance and
 // you'll know if you are the outermost .js file.
@@ -112,7 +115,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
     var _myImageManager           = null;
     var _myScreenshotCount        = 0;
     var _myCurrentTime            = 0;
-    var _myTimer                  = new AutoTimer("SceneViewer Timer");
+    //var _myTimer                  = new AutoTimer("SceneViewer Timer");
     var _mySplashScreen           = null;
     var _mySplashScreenFlag       = false;
     var _myShutter                = null;
@@ -169,16 +172,16 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
     }
 
     function cycleBoundingVolumeMode() {
-        if (renderer.boundingVolumeMode == Renderer.BV_NONE) {
+        if (renderer.boundingVolumeMode === Renderer.BV_NONE) {
             renderer.boundingVolumeMode = Renderer.BV_BODY;
             print("Bounding volume mode: per body");
-        } else if (renderer.boundingVolumeMode == Renderer.BV_BODY) {
+        } else if (renderer.boundingVolumeMode === Renderer.BV_BODY) {
             renderer.boundingVolumeMode = Renderer.BV_SHAPE;
             print("Bounding volume mode: per shape");
-        } else if (renderer.boundingVolumeMode == Renderer.BV_SHAPE) {
+        } else if (renderer.boundingVolumeMode === Renderer.BV_SHAPE) {
             renderer.boundingVolumeMode = Renderer.BV_HIERARCHY;
             print("Bounding volume mode: hierarchy");
-        } else if (renderer.boundingVolumeMode == Renderer.BV_HIERARCHY) {
+        } else if (renderer.boundingVolumeMode === Renderer.BV_HIERARCHY) {
             renderer.boundingVolumeMode = Renderer.BV_NONE;
             print("Bounding volume mode: off");
         }
@@ -223,9 +226,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
     }
 
     function screenShot(theBasename) {
-        if (theBasename == undefined) {
-            theBasename = "screenshot";
-        }
+        theBasename = theBasename || "screenshot";
 
         var myDate = new Date();
         myDate = String(myDate.getFullYear()) + padStringFront(myDate.getMonth()+1, "0", 2) + padStringFront(myDate.getDate(), "0", 2);
@@ -391,7 +392,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
     };
 
     self.onKey = function(theKey, theKeyState, theX, theY, theShiftFlag, theCtrlFlag, theAltFlag) {
-        var myCamera;
+        var myCamera, myHfov;
         var myMover = self.getMover(self.getActiveViewport());
         
         if (myMover) {
@@ -537,7 +538,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
                 case '[-]':
                     myCamera = self.getActiveCamera();
                     if (myCamera.frustum.hfov) { // persp camera
-                        var myHfov = myCamera.frustum.hfov;
+                        myHfov = myCamera.frustum.hfov;
                         if (myHfov < 5) {
                             myHfov += 0.1;
                         } else if (myHfov < 175) {
@@ -686,10 +687,8 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
 
     self.setup = function(theWindowWidth, theWindowHeight, theFullscreen, theWindowTitle, theScene, theSwitchNodeFlag) {
         //print(theWindowWidth + " x " + theWindowHeight + " fullscreen: " + theFullscreen);
-        if (window == null) {
-            window = new RenderWindow();
-        }
-        if (theWindowWidth != null && theWindowHeight != null) {
+        window = window || new RenderWindow();
+        if (theWindowWidth && theWindowHeight) {
             window.resize(theWindowWidth, theWindowHeight, theFullscreen);
         }
 
@@ -740,7 +739,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         var mySettingsFile = "";
         var i;
         for (i = 0; i < SETTINGS_FILE_NAMES.length; ++i) {
-            if ( fileExists( SETTINGS_FILE_NAMES[i] )) {
+            if (fileExists(SETTINGS_FILE_NAMES[i])) {
                 mySettingsFile = SETTINGS_FILE_NAMES[i];
                 break;
             } else {
@@ -761,28 +760,28 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
 
         // look for command line argument of settings file(s)
         // e.g. "settings mysettings.xml:moresettings.xml"
-        var mySettingsList = undefined;
-        if ("settings" in self.arguments) {
-            var mySettingsListString = self.arguments["settings"];
+        var mySettingsList;
+        if ("settings" in self['arguments']) {
+            var mySettingsListString = self['arguments'].settings;
             if (mySettingsListString) {
                 mySettingsList = mySettingsListString.split(":");
             }
         }
 
         // add host name dependent settings file to the beginning of the file list
-        if (myHostSettingsFile != "") {
-            if (mySettingsList == undefined) {
+        if (myHostSettingsFile !== "") {
+            if (mySettingsList === undefined) {
                 mySettingsList = [myHostSettingsFile];
             } else {
                 mySettingsList.unshift(myHostSettingsFile);
             }
         }
 
-        if(mySettingsFile != "" || mySettingsList != undefined) {
+        if (mySettingsFile !== "" || mySettingsList !== undefined) {
             _myConfigurator = new Configurator(self, mySettingsFile, mySettingsList);
         }
 
-        if (theWindowTitle != null) {
+        if (theWindowTitle !== undefined) {
             window.title = theWindowTitle;
         }
         if (_mySplashScreenFlag) {
