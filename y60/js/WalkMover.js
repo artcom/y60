@@ -170,9 +170,24 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
     };
     
     self.movements.rotateXY = function(theAnglesInRadiant) {
-        _myEulerOrientation.x += theAnglesInRadiant.y;
-        _myEulerOrientation.y += -theAnglesInRadiant.x;
-        self.getMoverObject().orientation = Quaternionf.createFromEuler(_myEulerOrientation);
+//        _myEulerOrientation.x += theAnglesInRadiant.y;
+//        _myEulerOrientation.y += -theAnglesInRadiant.x;
+//        self.getMoverObject().orientation = Quaternionf.createFromEuler(_myEulerOrientation);
+        
+        // Get the Camera Matrix without its Translation part
+        var myCameraRotationMatrix = self.getMoverObject().globalmatrix;
+        var myCameraNegTranslate = myCameraRotationMatrix.getTranslation();
+        myCameraNegTranslate.mult(-1);
+        myCameraRotationMatrix.translate(myCameraNegTranslate);
+
+        // compute the rotated Side Vector and rotate about it -> TILT rotation
+        var myMatrix = new Matrix4f();
+        myMatrix.makeTranslating(new Vector3f(1,0,0));
+        myMatrix.postMultiply(myCameraRotationMatrix);
+        self.getMoverObject().orientation.multiply(new Quaternionf(myMatrix.getTranslation(),theAnglesInRadiant.y));
+
+        // add rotation about the up vector -> PAN rotation
+        self.getMoverObject().orientation.multiply(new Quaternionf(new Vector3f(0,1,0),-theAnglesInRadiant.x));
     };
     
     self.movements.translateAlongFrontVector = function (theDelta) {
