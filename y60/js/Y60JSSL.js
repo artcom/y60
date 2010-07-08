@@ -657,7 +657,6 @@ function getTimestamp() {
 
 function padStringFront(theString, thePaddingChar, theLength) {
     if (typeof(theString) !== "string") {
-        //print("converting from " + typeof(theString));
         theString = String(theString);
     }
     while (theString.length < theLength) {
