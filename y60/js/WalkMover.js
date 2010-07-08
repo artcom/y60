@@ -96,7 +96,6 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
 
     var _myPosition           = new Vector3f(0,0,0);
     var _myVelocity           = new Vector3f(0,0,0); // meter/sec
-    var _myEulerOrientation   = new Vector3f(0,0,0);
 
     var _myWalkSpeed          = INITIAL_WALK_SPEED;
     var _myGroundContactFlag  = false;
@@ -129,7 +128,6 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
 
         _myPosition          = myCamera.globalmatrix.getTranslation();
         _myVelocity          = new Vector3f(0,0,0);
-        _myEulerOrientation  = myCamera.globalmatrix.getRotation();
         _myWalkSpeed         = INITIAL_WALK_SPEED;
 
         _myGroundContactFlag = false;
@@ -160,8 +158,7 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
     };
 
     self.rotation setter = function (theRotation) {
-        _myEulerOrientation = theRotation;
-        self.getMoverObject().orientation = Quaternionf.createFromEuler(_myEulerOrientation);
+        self.getMoverObject().orientation = Quaternionf.createFromEuler(theRotation);
     };
     
     self.movements.rotateXYByScreenCoordinates = function(thePreviousPos, theCurrentPos) {
@@ -170,15 +167,10 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
     };
     
     self.movements.rotateXY = function(theAnglesInRadiant) {
-//        _myEulerOrientation.x += theAnglesInRadiant.y;
-//        _myEulerOrientation.y += -theAnglesInRadiant.x;
-//        self.getMoverObject().orientation = Quaternionf.createFromEuler(_myEulerOrientation);
-        
-        // Get the Camera Matrix without its Translation part
         var myCameraRotationMatrix = self.getMoverObject().globalmatrix;
-        var myCameraNegTranslate = myCameraRotationMatrix.getTranslation();
-        myCameraNegTranslate.mult(-1);
-        myCameraRotationMatrix.translate(myCameraNegTranslate);
+        var myCameraNegTranslation = myCameraRotationMatrix.getTranslation();
+        myCameraNegTranslation.mult(-1);
+        myCameraRotationMatrix.translate(myCameraNegTranslation);
 
         // compute the rotated Side Vector and rotate about it -> TILT rotation
         var myMatrix = new Matrix4f();
