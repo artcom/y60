@@ -75,11 +75,11 @@ namespace asl
 #ifdef AC_USE_X11
         return y60::hasCap("GL_NV_vertex_array_range");
 #else
-#ifdef AC_USE_OSX_CGL
+#ifdef AC_IGNORE_NV_MEMORY_MANAGEMENT 
 		return false;
-#endif
-#endif
-#endif
+#endif // AC_IGNORE_NV_MEMORY_MANAGEMENT
+#endif // AC_USE_X11
+#endif // _WIN32
     }
 
     bool initializeGLMemoryExtensions() {
@@ -109,11 +109,11 @@ namespace asl
         return (void*)(glXAllocateMemoryNV(
             theSize, theReadFrequency, theWriteFrequency, thePriority));
 #else
-#ifdef AC_USE_OSX_CGL
+#ifdef AC_IGNORE_NV_MEMORY_MANAGEMENT
         return 0;
-#endif
-#endif
-#endif
+#endif // AC_IGNORE_NV_MEMORY_MANAGEMENT
+#endif // AC_USE_X11
+#endif // _WIN32
     }
 
     void gfxFreeMemoryNV(void * theMemory) {
@@ -126,10 +126,10 @@ namespace asl
 #ifdef AC_USE_X11
         glXFreeMemoryNV(theMemory);
 #else
-#ifdef AC_USE_OSX_CGL
-#endif
-#endif
-#endif
+#ifdef AC_IGNORE_NV_MEMORY_MANAGEMENT
+#endif // AC_IGNORE_NV_MEMORY_MANAGEMENT
+#endif // AC_USE_X11
+#endif // _WIN32
     }
 
     void AGPMemoryFlushSingleton::resetGLAGPMemoryFlush() {

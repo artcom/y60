@@ -243,6 +243,7 @@ namespace asl {
 
         right = Vector3f((*_spline[RIGHT_X])(s), (*_spline[RIGHT_Y])(s), (*_spline[RIGHT_Z])(s) );
         front = Vector3f((*_spline[FRONT_X])(s), (*_spline[FRONT_Y])(s), (*_spline[FRONT_Z])(s) );
+
         up = cross( front, right );
 
         asl::Matrix4f myMatrix;
@@ -277,6 +278,7 @@ namespace asl {
 
         right = Vector3f((*_spline[RIGHT_X])(s), (*_spline[RIGHT_Y])(s), (*_spline[RIGHT_Z])(s) );
         front = Vector3f((*_spline[FRONT_X])(s), (*_spline[FRONT_Y])(s), (*_spline[FRONT_Z])(s) );
+
         up = cross( front, right );
 
         asl::Matrix4f myMatrix;

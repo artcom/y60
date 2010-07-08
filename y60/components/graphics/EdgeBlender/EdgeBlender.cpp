@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below.
-//
+// of GNU General Public License referenced below. 
+//    
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO
+// Description: TODO  
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations:
+//    recommendations: 
 //          - use pixelspace instead of texturespace [DS]
 //          - avoid rotations; use symmetric bars and corner tiles [DS]
 //          - store vertexdata on the GPU; it's constant [DS]
@@ -133,7 +133,7 @@ class EdgeBlender :
                 float theStartX, float theStartY, float theEndX, float theEndY);
         void rotateTo(unsigned theEdge);
         void drawBlendedEdge(float theStart, float theEnd, float theBlendWidth, float theMargin = 0.0f);
-        void drawBlendedCorner(float theMarginX, float theMarginY,
+        void drawBlendedCorner(float theMarginX, float theMarginY, 
                 float theXSize, float theYSize);
         void drawBlackLevel(float theLeft, float theTop, float theRight, float theBottom);
         float getBlendValue(float theValue);
@@ -203,6 +203,7 @@ class EdgeBlender :
         bool _myPostGridFlag;
         bool _myBlendingFlag;
         bool _myBlackLevelFlag;
+        bool _myRoughCalibrationMode;
 
         bool _myCopyFrameBufferFlag;
         asl::Vector4f _myFrameBufferArea;
@@ -230,6 +231,7 @@ EdgeBlender::EdgeBlender(asl::DLHandle theDLHandle) :
     _myPostGridFlag(false),
     _myBlendingFlag(true),
     _myBlackLevelFlag(true),
+    _myRoughCalibrationMode(false),
 
     _myCopyFrameBufferFlag(false),
     _myFrameBuffer(0)
@@ -368,7 +370,8 @@ EdgeBlender::onUpdateSettings(dom::NodePtr theSettings) {
     _myBlackLevelFlag = 0 != getSetting(theSettings, "blacklevelFlag", int(_myBlackLevelFlag));
     _myCopyFrameBufferFlag = 0 != getSetting(theSettings, "copyFrameBufferFlag", int(_myCopyFrameBufferFlag));
     _myFrameBufferArea = getSetting(theSettings, "frameBufferArea", _myFrameBufferArea);
-
+    
+    _myRoughCalibrationMode = 0 != getSetting(theSettings, "roughCalibrationMode", int(_myRoughCalibrationMode));
 }
 
 void
@@ -469,7 +472,7 @@ EdgeBlender::renderMultiScreen()
                 myY0 += i > 0 ? _myBlPosOffset[1] : 0.0f;
                 myY1 -= i < _myRowCount-1 ? _myBlPosOffset[1] : 0.0f;
             }
-
+            
             for(unsigned j = 0; j < _myColumnCount; ++j) {
                 float myX  = float(j) / _myColumnCount;
                 float myX0 = (j > 0 ? myX + myXBlendWidth : myX);
@@ -591,7 +594,7 @@ EdgeBlender::preRender() {
     glPushMatrix();
     glLoadIdentity();
     gluOrtho2D(0.0f, 1.0f, 1.0f, 0.0f);
-
+    
     // store that section
     glGetIntegerv(GL_VIEWPORT, _mySavedViewport);
 
@@ -608,14 +611,16 @@ EdgeBlender::preRender() {
     glPushMatrix();
     glLoadIdentity();
 
-
+    
     // load attribs
     glPushAttrib(GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT | GL_TEXTURE_BIT | GL_POLYGON_BIT); // GL_ALL_ATTRIB_BITS);
 
     glDisable(GL_LIGHTING);
     glDisable(GL_DEPTH_TEST);
     glPolygonMode(GL_FRONT, GL_FILL);
-    CHECK_OGL_ERROR;
+//    glDisable(GL_CULL_FACE);
+    glFrontFace(GL_CCW);
+    glCullFace(GL_BACK);
 }
 
 void
@@ -627,7 +632,7 @@ EdgeBlender::postRender() {
     glMatrixMode(GL_PROJECTION);
     // restore viewport
     glViewport(_mySavedViewport[0], _mySavedViewport[1], _mySavedViewport[2], _mySavedViewport[3]);
-
+    
     glPopMatrix();
 
     glMatrixMode(GL_TEXTURE);
@@ -706,24 +711,48 @@ EdgeBlender::rotateTo(unsigned theEdge) {
  */
 void
 EdgeBlender::drawBlendedEdge(float theStart, float theEnd, float theBlendWidth, float theMargin) {
+    
+    if (_myRoughCalibrationMode) {
+        AC_DEBUG << "rough calibration mode: start " << theStart << " end " << theEnd;
+        unsigned int myRoughCalibrationBlocks = 16; // XXX put to settings 
 
-    AC_DEBUG << "drawBlendedEdge start " << theStart << " end " << theEnd;
-    float myDelta = 1.0f / _myNumSubdivisions;
+        glBegin(GL_QUADS);
+        for (unsigned i = 0; i < myRoughCalibrationBlocks; ++i) {
+            float myAlpha = i%2;
+           
+            float myRange = theEnd-theStart;
+            float myY1 = theStart + ((float)i/(float)myRoughCalibrationBlocks) * myRange;
+            float myY2 = theStart + (((float)i+1)/(float)myRoughCalibrationBlocks) * myRange;
 
-    glBegin(GL_TRIANGLE_STRIP);
-    for (unsigned i = 0; i <= _myNumSubdivisions; ++i) {
-        float myX = i * myDelta;
+            //glColor4f(0.0f, myBlendValue, 0.0f, max(0.2f, 1.0f - myBlendValue));
+            glColor4f(0.0f, 0.0f, 0.0f, myAlpha);
 
-        float myBlendValue = getBlendValue(myX);
-        //glColor4f(0.0f, myBlendValue, 0.0f, max(0.2f, 1.0f - myBlendValue));
-        glColor4f(0.0f, 0.0f, 0.0f, 1.0f - myBlendValue);
+            glVertex2f(theMargin+theBlendWidth, myY1);
+            glVertex2f(theMargin, myY1);
+            
+            glVertex2f(theMargin, myY2);
+            glVertex2f(theMargin+theBlendWidth, myY2);
+        }
+        glEnd();
+    
+    } else {
+        AC_DEBUG << "drawBlendedEdge start " << theStart << " end " << theEnd;
+        float myDelta = 1.0f / _myNumSubdivisions;
 
-        float myXPos = theMargin + myX * theBlendWidth;
-        glVertex2f(myXPos, theStart);
-        glVertex2f(myXPos, theEnd);
+        glBegin(GL_TRIANGLE_STRIP);
+        for (unsigned i = 0; i <= _myNumSubdivisions; ++i) {
+            float myX = i * myDelta;
+
+            float myBlendValue = getBlendValue(myX);
+            //glColor4f(0.0f, myBlendValue, 0.0f, max(0.2f, 1.0f - myBlendValue));
+            glColor4f(0.0f, 0.0f, 0.0f, 1.0f - myBlendValue);
+
+            float myXPos = theMargin + myX * theBlendWidth;
+            glVertex2f(myXPos, theStart);
+            glVertex2f(myXPos, theEnd);
+        }
+        glEnd();
     }
-    glEnd();
-
 }
 
 /*

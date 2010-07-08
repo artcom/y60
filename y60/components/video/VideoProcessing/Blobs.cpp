@@ -124,7 +124,7 @@ namespace y60 {
         GRAYRaster::iterator itSrc = const_cast<GRAYRaster::iterator>(mySourceFrame->begin());
         GRAYRaster::iterator itTarget = const_cast<GRAYRaster::iterator>(myTargetFrame->begin());
 
-        for (itSrc; itSrc != mySourceFrame->end(); ++itSrc, ++itTarget) {
+        for (; itSrc != mySourceFrame->end(); ++itSrc, ++itTarget) {
             (*itTarget) = (*itSrc);
         }
 

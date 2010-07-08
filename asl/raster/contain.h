@@ -317,6 +317,10 @@ struct Triple {
     DERIVED operator^(const DERIVED & y) const {
         return DERIVED(first() ^ y.first(), second()^ y.second(), third() ^ y.third());
     }
+    DERIVED operator~() const {
+        T1 ifirst = ~(first());
+        return DERIVED(~(first()), ~(second()), ~(third()));
+    }
 
     template <class NUMBER>
     DERIVED operator*(NUMBER y) const {

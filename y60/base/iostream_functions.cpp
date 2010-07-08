@@ -119,15 +119,15 @@ namespace asl {
         theStream << "[";
         for (unsigned i = 0; i < theStringVector.size(); ++i) {
             const std::string & myString = theStringVector[i];
-            theStream << "`";
+            theStream << VECTOR_OF_STRING_DELIMITER;
             for (std::string::size_type j = 0; j < myString.size();++j) {
                 const char & c = myString[j];
-                if (c == '`' || c == '[' || c == ']' || c == ',' || c == '\\') {
+                if (c == VECTOR_OF_STRING_DELIMITER || c == '[' || c == ']' || c == ',' || c == '\\') {
                     theStream << '\\';
                 }
                 theStream << c;
             }
-            theStream << "`";
+            theStream << VECTOR_OF_STRING_DELIMITER;
             if (i < theStringVector.size() - 1) {
                 theStream << ",";
             }
@@ -159,12 +159,12 @@ namespace asl {
                 if (myChar == ']') {
                     break;
                 }
-            } else if (myChar != '`' && myStartFlag) {
+            } else if (myChar != VECTOR_OF_STRING_DELIMITER && myStartFlag) {
                 if (myChar == '\\') {
                     theStream >> myChar;
                 }
                 myElement += myChar;
-            } else if (myChar == '`') {
+            } else if (myChar == VECTOR_OF_STRING_DELIMITER) {
                 myStartFlag = !myStartFlag;
                 if (myStartFlag) {
                     myElementFlag = true;

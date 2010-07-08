@@ -360,7 +360,7 @@ void PLTIFFDecoder::doLoColor (TIFF * tif, PLBmpBase * pBmp)
         // warning: the following ignores possible halftone hints
         for (int i = 0; i < numColors; ++i, pb += offset)
         {
-          pb[PL_RGBA_RED] = pb[PL_RGBA_GREEN] = pb[PL_RGBA_BLUE] = i * step;
+          pb[PL_RGBA_RED] = pb[PL_RGBA_GREEN] = pb[PL_RGBA_BLUE] = static_cast<PLBYTE>(i * step);
           pb[PL_RGBA_ALPHA] = 255;
         }
 

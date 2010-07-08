@@ -1057,8 +1057,8 @@ namespace y60 {
                 Matrix4f myBillboardMatrix = myBody.get<GlobalMatrixTag>();
                 myBillboardMatrix.scale(myFinalInverseScale);
 
-                float myRotation = getBillboardRotationY(myBillboardMatrix,
-                        theCamera->get<GlobalMatrixTag>());
+                float myRotation = static_cast<float>(getBillboardRotationY(myBillboardMatrix,
+                        theCamera->get<GlobalMatrixTag>()));
                 Matrix4f myLocalRotation;
                 myLocalRotation.makeRotating(Vector3f(0,1,0),myRotation);
                 myLocalRotation.postMultiply(myBillboardTransform);

@@ -147,6 +147,8 @@ function Class(theName) {
         myPublic._className_ = theName;
         myPublic._class_     = myNamespace[theName];
 
+        myPublic._sparkFile_ = "";
+
         myPublic._classes_   = {};
         myPublic._classes_[theName] = myNamespace[theName];
 
@@ -264,7 +266,7 @@ function GetterOverride(theName, theFunction) {
         return theFunction.call(this, myNextGetter);
     };
 
-    this.__defineGetter__(theName); // FIXME this is invalid. What probably was intended: this.__defineGetter__(theName, myWrapper);
+    this.__defineGetter__(theName, myWrapper); 
 }
 
 /**
@@ -311,10 +313,10 @@ function SetterOverride(theName, theFunction) {
     }
 
     var myWrapper = function(theValue) {
-        theFunction.call(this, theValue, theNextSetter); // theNextSetter is not defined. Would need a closure or something like that.
+        theFunction.call(this, theValue, myNextSetter);
     };
 
-    this.__defineSetter__(theName, theFunction);
+    this.__defineSetter__(theName, myWrapper);
 }
 
 /**

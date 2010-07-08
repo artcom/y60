@@ -42,7 +42,7 @@ public:
     void run() {
         PIX blackPixel;
         //DPRINT(&blackPixel);
-        fill(begin(blackPixel),end(blackPixel),0.0);
+        fill(begin(blackPixel),end(blackPixel),(unsigned char)(0));
         //DPRINT(blackPixel);
         PIX firstPixel = blackPixel;
         //DPRINT(firstPixel);

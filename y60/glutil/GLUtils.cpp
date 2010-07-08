@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below.
-//
+// of GNU General Public License referenced below. 
+//    
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO
+// Description: TODO  
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations:
+//    recommendations: 
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -75,6 +75,9 @@ GdkGLProc gdk_gl_get_proc_address            (const char *proc_name);
 
 #ifndef _AC_NO_CG_
 	#include <Cg/cgGL.h>
+#endif
+#ifdef OSX
+    #include <OpenGL/CGLCurrent.h>
 #endif
 
 using namespace std;
@@ -175,7 +178,7 @@ namespace y60 {
         }
         return myTexSampleFilter;
     }
-
+    
     GLenum
     asGLTextureTarget(TextureType theTextureType) {
         switch (theTextureType) {
@@ -236,7 +239,7 @@ namespace y60 {
     GLenum
     asGLCubemapFace(unsigned theFace) {
         switch (theFace) {
-            case CUBEMAP_BEHIND:
+            case CUBEMAP_BEHIND: 
                 return GL_TEXTURE_CUBE_MAP_POSITIVE_Z_ARB;
             case CUBEMAP_RIGHT:
                 return GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB;
@@ -510,116 +513,22 @@ namespace y60 {
         throw asl::Exception(std::string("Unkown TexCoordMode ") + asl::as_string(theMode), PLUS_FILE_LINE);
     }
 
-#ifdef AC_USE_OSX_CGL
-
-// see http://developer.apple.com/qa/qa2001/qa1188.html for details
-
-#ifdef AC_USE_NSGL
-
-#include <mach-o/dyld.h>
-#include <stdlib.h>
-#include <string.h>
-
-void * NSGLGetProcAddress (const char * name)
-{
-    NSSymbol symbol;
-    char * symbolName;
-    /* prepend a '_' for the Unix C symbol mangling convention */
-    symbolName = (char*) malloc(strlen((const char*)name) + 2);
-    strcpy(symbolName+1, (const char*)name);
-    symbolName[0] = '_';
-    symbol = NULL;
-    if (NSIsSymbolNameDefined(symbolName))
-        symbol = NSLookupAndBindSymbol(symbolName);
-    free(symbolName);
-    return symbol ? NSAddressOfSymbol(symbol) : NULL;
-}
-#else
-
-// Apple AGL Version
-#include <Carbon/Carbon.h>
-
-CFBundleRef gBundleRefOpenGL = NULL;
-
-// -------------------------
-
-OSStatus aglInitEntryPoints (void)
-{
-    OSStatus err = noErr;
-    const Str255 frameworkName = "OpenGL.framework";
-    FSRefParam fileRefParam;
-    FSRef fileRef;
-    CFURLRef bundleURLOpenGL;
-
-    memset(&fileRefParam, 0, sizeof(fileRefParam));
-    memset(&fileRef, 0, sizeof(fileRef));
-
-    fileRefParam.ioNamePtr  = frameworkName;
-    fileRefParam.newRef = &fileRef;
-
-    // Frameworks directory/folder
-    err = FindFolder (kSystemDomain, kFrameworksFolderType, false,
-                      &fileRefParam.ioVRefNum, &fileRefParam.ioDirID);
-    if (noErr != err) {
-        AC_ERROR << "Could not find frameworks folder";
-        return err;
-    }
-    err = PBMakeFSRefSync (&fileRefParam); // make FSRef for folder
-    if (noErr != err) {
-        AC_ERROR << "Could make FSref to frameworks folder";
-        return err;
-    }
-    // create URL to folder
-    bundleURLOpenGL = CFURLCreateFromFSRef (kCFAllocatorDefault,
-                                            &fileRef);
-    if (!bundleURLOpenGL) {
-        AC_ERROR << "Could create OpenGL Framework bundle URL";
-        return paramErr;
-    }
-    // create ref to GL's bundle
-    gBundleRefOpenGL = CFBundleCreate (kCFAllocatorDefault,
-                                       bundleURLOpenGL);
-    if (!gBundleRefOpenGL) {
-        AC_ERROR << "Could not create OpenGL Framework bundle";
-        return paramErr;
-    }
-    CFRelease (bundleURLOpenGL); // release created bundle
-    // if the code was successfully loaded, look for our function.
-    if (!CFBundleLoadExecutable (gBundleRefOpenGL)) {
-        AC_ERROR << "Could not load MachO executable";
-        return paramErr;
-    }
-    return err;
-}
-
-// -------------------------
-
-void aglDellocEntryPoints (void)
-{
-    if (gBundleRefOpenGL != NULL) {
-        // unload the bundle's code.
-        CFBundleUnloadExecutable (gBundleRefOpenGL);
-        CFRelease (gBundleRefOpenGL);
-        gBundleRefOpenGL = NULL;
-    }
-}
-
-// -------------------------
-
-void * aglGetProcAddress (char * pszProc)
-{
-    return CFBundleGetFunctionPointerForName (gBundleRefOpenGL,
-                CFStringCreateWithCStringNoCopy (NULL,
-                     pszProc, CFStringGetSystemEncoding (), NULL));
-}
-
-#endif
-
-#endif
-
     bool hasCap(const string & theCapStr) {
         bool myReturn = 0 != glewIsSupported(theCapStr.c_str());
+
         if (!myReturn) {
+#ifdef OSX 
+            CGLContextObj myContext = CGLGetCurrentContext();
+            if (myContext == NULL) {
+                return false;
+            }
+#endif
+            // try again extension string,
+            // maybe extension is not supported by glew-version
+            const char * myExtensionsString = reinterpret_cast<const char *>(glGetString(GL_EXTENSIONS));
+            if (myExtensionsString && std::string(myExtensionsString).find(theCapStr) != string::npos) {
+                return true;
+            }
             AC_DEBUG << "OpenGL Extension not supported: " << theCapStr;
         }
         return myReturn;

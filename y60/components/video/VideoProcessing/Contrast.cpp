@@ -115,7 +115,7 @@ namespace y60 {
             unsigned char myValue = value * 255 / myRange;
             _myLookupTable.push_back(myValue);
         }
-        for (unsigned char i=myUpper; i<256; i++) {
+        for (unsigned int i=myUpper; i<=255; i++) {
             _myLookupTable.push_back(255);
         }
     }
@@ -140,7 +140,7 @@ namespace y60 {
         GRAYRaster & myTargetFrame = myTargetFrameLock.get();
         GRAYRaster::iterator itTrgt = myTargetFrame.begin();
 
-        for (itSrc; itSrc != mySourceFrame->end(); ++itSrc, ++itTrgt) {
+        for (; itSrc != mySourceFrame->end(); ++itSrc, ++itTrgt) {
             (*itTrgt) = _myLookupTable[(*itSrc).get()];
         }
 	}

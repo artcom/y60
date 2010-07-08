@@ -68,6 +68,7 @@ namespace y60 {
         Algorithm(theName),
         _myResultNode("result"),
         _mySourceRaster(),
+        _myTargetRaster(),
         _myImageNodeVersion(0)
     {
     }

@@ -84,10 +84,11 @@ namespace y60 {
         static const int BINS_PER_CHANNEL = 5;
         static const int NBINS = BINS_PER_CHANNEL*BINS_PER_CHANNEL*BINS_PER_CHANNEL;
         unsigned long _myHistogram[2][NBINS];
-        double _myThreshold;
-        double _myLastShotTime, _myMinimalShotLength;
         dom::Element _myResultNode;
         dom::ValuePtr _mySourceRaster;
+        double _myThreshold;
+        double _myMinimalShotLength;
+        double _myLastShotTime;
 
         void clearHistogram(int theIndex);
         unsigned long intersectHistograms();

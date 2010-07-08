@@ -739,6 +739,7 @@ SceneViewer.prototype.Constructor = function (self, theArguments) {
         var mySettingsFile = "";
         var i;
         for (i = 0; i < SETTINGS_FILE_NAMES.length; ++i) {
+
             if (fileExists(SETTINGS_FILE_NAMES[i])) {
                 mySettingsFile = SETTINGS_FILE_NAMES[i];
                 break;

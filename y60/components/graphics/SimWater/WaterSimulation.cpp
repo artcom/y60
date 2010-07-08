@@ -64,6 +64,7 @@
 #   define NOMINMAX
 #   include <windows.h>
 #   undef max
+#   pragma warning(pop)
 #endif
 
 

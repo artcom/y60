@@ -836,7 +836,12 @@ JSA_ArrayToString(JSContext * cx, jsval * vp, string & theResult) {
             return JS_FALSE;
         }
 
-        theResult += myString;
+        if (JSVAL_IS_STRING(myArrayElement)) {
+            // TODO: escape the string
+            theResult += VECTOR_OF_STRING_DELIMITER + myString + VECTOR_OF_STRING_DELIMITER;
+        } else {
+            theResult += myString;
+        }
         if (i < myArrayLength - 1) {
             theResult += ",";
         }

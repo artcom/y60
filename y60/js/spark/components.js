@@ -368,7 +368,7 @@ spark.Container.Constructor = function (Protected) {
      * Remove the given child.
      */
     Public.removeChild = function (theChild) {
-        var myChildIndex = indexOf(_myChildren, theChild);
+        var myChildIndex = js.array.indexOf(_myChildren, theChild);
 
         if (myChildIndex === -1) {
             throw new Error("Could not remove " + theChild.name + " from " + Public.name + " because its not a child");

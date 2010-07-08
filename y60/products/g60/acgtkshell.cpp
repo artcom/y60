@@ -55,21 +55,12 @@
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
-//
-//   $RCSfile: acgtkshell.cpp,v $
-//   $Author: christian $
-//   $Revision: 1.8 $
-//   $Date: 2005/04/20 16:54:30 $
-//
-//   Description: Application-wrapper for xpshell
-//
-//=============================================================================
 
 #include <y60/jsgtk/GTKApp.h>
 #include <y60/jsbase/jssettings.h>
 #if defined(_MSC_VER)
-    #pragma warning(push)
-    #pragma warning(disable:4512 4413 4244 4251)
+    #pragma warning(push,1)
+    //#pragma warning(disable:4512 4413 4244 4250)
 #endif //defined(_MSC_VER)
 #include <gtkmm.h>
 #if defined(_MSC_VER)

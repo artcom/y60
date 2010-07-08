@@ -113,7 +113,7 @@ namespace y60 {
         BGRRaster::iterator itBlob  = const_cast<BGRRaster::iterator>(myBlobFrame->begin());
         BGRRaster::iterator itTarg  = const_cast<BGRRaster::iterator>(myTargetFrame->begin());
 
-        for (itSrc; itSrc != mySourceFrame->end(); ++itSrc, ++itBlob, ++itTarg) {
+        for (; itSrc != mySourceFrame->end(); ++itSrc, ++itBlob, ++itTarg) {
             float myWeight = (static_cast<float>((*itBlob)[0]) / 256.0f);
 
             for (unsigned int i=0; i<3; ++i) {

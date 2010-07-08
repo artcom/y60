@@ -124,7 +124,7 @@ static JSBool
 flush(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
-    cairo_surface_t *mySurface;
+    cairo_surface_t *mySurface = NULL;
     convertFrom(cx, OBJECT_TO_JSVAL(obj), mySurface);
 
     ensureParamCount(argc, 0);
@@ -161,7 +161,7 @@ static JSBool
 writeToPNG(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
-    cairo_surface_t *mySurface;
+    cairo_surface_t *mySurface = NULL;
     convertFrom(cx, OBJECT_TO_JSVAL(obj), mySurface);
 
     ensureParamCount(argc, 1);
@@ -178,7 +178,7 @@ static JSBool
 getWidth(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
-    cairo_surface_t *mySurface;
+    cairo_surface_t *mySurface = NULL;
     convertFrom(cx, OBJECT_TO_JSVAL(obj), mySurface);
 
     ensureParamCount(argc, 0);
@@ -194,7 +194,7 @@ static JSBool
 getHeight(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
-    cairo_surface_t *mySurface;
+    cairo_surface_t *mySurface = NULL;
     convertFrom(cx, OBJECT_TO_JSVAL(obj), mySurface);
 
     ensureParamCount(argc, 0);

@@ -70,8 +70,8 @@
 #endif
 
 #if defined(_MSC_VER)
-    #pragma warning(push)
-    #pragma warning(disable:4413 4244)
+    #pragma warning(push,1)
+    //#pragma warning(disable:4413 4244 4250)
 #endif //defined(_MSC_VER)
 #include <gtkmm/drawingarea.h>
 #if defined(_MSC_VER)
