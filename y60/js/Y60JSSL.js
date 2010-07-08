@@ -130,7 +130,6 @@ function clone(theObject, theMode) {
     }
     return myNewObject;
 }
-
 js.clone = clone;
 
 // WTF?
@@ -1082,6 +1081,7 @@ function stripIdentifier(theIdentifier) {
 }
 
 function convertNewLine(theString) {
+    // XXX can this not be done simpler?
     for (var i = 0; i < theString.length; i++) {
         if (theString[i] === "\\") {
             if (i + 1 < theString.length) {

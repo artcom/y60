@@ -176,6 +176,15 @@ Y60JSSLUnitTest.prototype.Constructor = function (obj, theName) {
         ENSURE_EQUAL(2, js.array.indexOf(["2","1","2"], "2", 1), "from argument starts search at that given index");
         ENSURE_EQUAL(0, js.array.indexOf(["2","1","2"], "2", 0), "from argument starts search at that given index");
     }
+    
+    function testConvertNewLine() {
+        DTITLE("convertNewLine");
+        
+        ENSURE_EQUAL("hello\nworld", convertNewLine("hello\\nworld"), "convert newline 1");
+        ENSURE_EQUAL("hello\\\nworld", convertNewLine("hello\\\nworld"), "convert newline 2");
+        ENSURE_EQUAL("hello world\n", convertNewLine("hello world\\n"), "convert newline 3");
+        ENSURE_EQUAL("hello world\n", convertNewLine("hello world\n"), "convert newline 4");
+    }
 
     obj.run = function () {
         testAngleFunctions();
@@ -192,6 +201,7 @@ Y60JSSLUnitTest.prototype.Constructor = function (obj, theName) {
         testParseRankedFeature();
         teststripIdentifier();
         testArrayIndexOf();
+        testConvertNewLine();
     };
 };
 
