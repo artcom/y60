@@ -15,6 +15,8 @@ spark.ResizableRectangle.Constructor = function(Protected) {
         Public.height = s.y;
     });
 
+    Public.SetterOverride("origin", applyOrigin);
+
     this.Property("width",  Number, 1, applySize);
     this.Property("height", Number, 1, applySize);
 
@@ -26,7 +28,12 @@ spark.ResizableRectangle.Constructor = function(Protected) {
             _myVertices[2] = [-o.x, Public.height - o.y, -o.z];
             _myVertices[3] = [Public.width - o.x, Public.height - o.y, -o.z];
         }
-    };
+    }
+
+    function applyOrigin(o, theBaseSetter) {
+        theBaseSetter(o);
+        applySize();
+    }
 
     var _myMaterial;
     var _myShape;

@@ -46,6 +46,8 @@ namespace asl {
     /*! \addtogroup aslbase */
     /* @{ */
 
+    const char VECTOR_OF_STRING_DELIMITER = '`';
+
     typedef unsigned char Char;
     const int MAX_CHAR_VALUE = 255 * 16;
 

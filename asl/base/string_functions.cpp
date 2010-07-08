@@ -63,8 +63,12 @@ namespace asl {
     bool fromString(const std::string & theString, float & outValue) {
         errno = 0;
         char * end = 0;
-        outValue = strtof(theString.c_str(), &end);
 
+#ifdef _SETTING_NO_STRTOF_     
+        outValue = static_cast<float>(strtod(theString.c_str(), &end));
+#else
+        outValue = strtof(theString.c_str(), &end);
+#endif
 		// if errno = ERANGE, then we have an over- or underflow.
 		// if its an overflow, outValue will be very big (positive or negative infinity)
 		// if its an underflow, outValue will be almost zero

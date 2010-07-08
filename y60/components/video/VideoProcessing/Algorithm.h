@@ -83,6 +83,7 @@ namespace y60 {
         Algorithm(const std::string & theName) {
             _myName = theName;
         }
+        virtual ~Algorithm() {};
         virtual void configure(const dom::Node & theNode) = 0;
 
         virtual const dom::Node & result() const {

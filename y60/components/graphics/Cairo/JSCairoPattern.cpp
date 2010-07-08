@@ -95,15 +95,15 @@ void CairoWrapper<cairo_pattern_t>::unreference() {
 
 template class CairoWrapper<cairo_pattern_t>;
 
-static JSBool
-checkForErrors(JSContext *theJavascriptPattern, cairo_pattern_t *thePattern) {
-    cairo_status_t myStatus = cairo_pattern_status(thePattern);
-    if(myStatus != CAIRO_STATUS_SUCCESS) {
-        JS_ReportError(theJavascriptPattern, "cairo error: %s", cairo_status_to_string(myStatus));
-        return JS_FALSE;
-    }
-    return JS_TRUE;
-}
+// static JSBool
+// checkForErrors(JSContext *theJavascriptPattern, cairo_pattern_t *thePattern) {
+//     cairo_status_t myStatus = cairo_pattern_status(thePattern);
+//     if(myStatus != CAIRO_STATUS_SUCCESS) {
+//         JS_ReportError(theJavascriptPattern, "cairo error: %s", cairo_status_to_string(myStatus));
+//         return JS_FALSE;
+//     }
+//     return JS_TRUE;
+// }
 
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -188,7 +188,7 @@ static JSBool
 setExtend(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
-    cairo_pattern_t *myPattern;
+    cairo_pattern_t *myPattern = NULL;
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myPattern);
 
     ensureParamCount(argc, 1);
@@ -205,7 +205,7 @@ static JSBool
 getExtend(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
-    cairo_pattern_t *myPattern;
+    cairo_pattern_t *myPattern = NULL;
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myPattern);
 
     ensureParamCount(argc, 0);
@@ -226,7 +226,7 @@ static JSBool
 setMatrix(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
-    cairo_pattern_t *myPattern;
+    cairo_pattern_t *myPattern = NULL;
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myPattern);
 
     ensureParamCount(argc, 1);
@@ -247,7 +247,7 @@ static JSBool
 getMatrix(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
-    cairo_pattern_t *myPattern;
+    cairo_pattern_t *myPattern = NULL;
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myPattern);
 
     ensureParamCount(argc, 0);

@@ -64,8 +64,9 @@
 #include <y60/jsbase/JSWrapper.h>
 
 #if defined(_MSC_VER)
-    #pragma warning(push)
-    #pragma warning(disable:4512 4413 4244)
+    #pragma warning(push,1)
+    // supress warnings caused by gtk in vc++
+    //#pragma warning(disable:4413 4244 4512 4250)
 #endif //defined(_MSC_VER)
 #include <gtkmm/cellrenderer.h>
 #if defined(_MSC_VER)

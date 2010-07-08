@@ -276,7 +276,7 @@ spark.hintingFromString = function(theString) {
     if (theString === spark.NATIVEHINTING) {
         return Renderer.NATIVEHINTING;
     }
-    throw new Error("Unknown font style: " + theString);
+    throw new Error("Unknown font hinting: " + theString);
 };
 
 /**

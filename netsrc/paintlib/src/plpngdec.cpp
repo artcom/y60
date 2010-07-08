@@ -142,7 +142,7 @@ void PLPNGDecoder::GetImage (PLBmpBase & Bmp)
                             (*(ppng_color_tab+i)).red,
                             (*(ppng_color_tab+i)).green,
                             (*(ppng_color_tab+i)).blue,
-                            0xFF);
+                            static_cast<PLBYTE>(0xFF));
     }
   }
 

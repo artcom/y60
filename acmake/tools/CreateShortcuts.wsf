@@ -8,9 +8,9 @@
             var installDirectory = arguments[0];
             var startMenuFolder  = arguments[1];
             
-            function defineShortcut(theName, theIcon, theDescription, theWorkingDirectory, theCommand, theArguments) {
+            function defineShortcut(theName, theIcon, theDescription, theWorkingDirectory, theCommand, theArguments, theCommandDirectory) {
                 var shortcut = shell.CreateShortcut(startMenuFolder + "\\" + theName + ".lnk");
-                shortcut.TargetPath = installDirectory + "\\" + theCommand;
+                shortcut.TargetPath = installDirectory + ((theCommandDirectory) ? theCommandDirectory : "") + "\\" + theCommand;
                 if(theDescription) {
                     shortcut.Description = theDescription;
                 }

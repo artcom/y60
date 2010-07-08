@@ -82,29 +82,6 @@
 #include <y60/base/NodeValueNames.h>
 #include <y60/scene/MaterialParameter.h>
 
-#ifdef _WIN32
-#    define NOMINMAX
-#    ifndef WIN32_LEAN_AND_MEAN
-#       define WIN32_LEAN_AND_MEAN 1
-#    endif
-#    include <windows.h>
-#    undef WIN32_LEAN_AND_MEAN
-#endif
-
-#if defined(LINUX)
-	#define AC_USE_X11
-#endif
-
-#if defined(OSX)
-	#define AC_USE_OSX_CGL
-	#define AC_USE_NSGL
-#endif
-
-// window system extensions
-#ifdef _WIN32
-#endif
-
-
 namespace y60 {
     DEFINE_EXCEPTION(OpenGLException, asl::Exception);
     DEFINE_EXCEPTION(CantParseOpenGLVersion, asl::Exception);
