@@ -219,8 +219,7 @@ function stringToArray(s) {
     return s.substring(1, s.length - 1).split(",");
 }
 
-// Adds indexOf as free function for array index discovery
-function indexOf(theArray, theItem, theFrom) {
+js.array.indexOf = function (theArray, theItem, theFrom) {
     var len = theArray.length >>> 0;
     var from = Number(arguments[2]) || 0;
     from = (from < 0) ? Math.ceil(from) : Math.floor(from);
@@ -235,8 +234,11 @@ function indexOf(theArray, theItem, theFrom) {
         }
     }
     return -1;
+};
+function indexOf(theArray, theItem, theFrom) {
+    Logger.warning("Y60JSSL :: free function 'indexOf' is deprecated. Use js.array.indexOf");
+    return js.array.indexOf(theArray, theItem, theFrom);
 }
-js.array.indexOf = indexOf;
 
 function stringToByteArray(theString) {
     var myResult = [];

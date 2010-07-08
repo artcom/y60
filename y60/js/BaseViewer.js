@@ -63,7 +63,7 @@
           LightManager, GLResourceManager, SwitchNodeHandler,
           MSwitchNodeHandler, TSwitchNodeHandler, readFileAsString,
           writeStringToFile, NagiosPlugin, Playlist, plug, HeartbeatThrober,
-          indexOf*/
+          js*/
 
 // use this idiom in each level of inheritance and
 // you'll know if you are the outermost .js file.
@@ -406,12 +406,14 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     };
 
     self.getMover = function(theViewport) {
+        // Why is theViewport an argument here?
         return _myCurrentMover;
     };
 
     self.registerMover = function(theMoverFactory) {
-        // should check if object type is already in list
-        _myMoverConstructors.push(theMoverFactory);
+        if (js.array.indexOf(_myMoverConstructors, theMoverFactory) === -1) {
+            _myMoverConstructors.push(theMoverFactory);
+        }
     };
 
     self.nextMover = function(theViewport) {
@@ -422,7 +424,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         // find next mover's constructor
         var myNextMoverIndex = 0;
         if (_myCurrentMover) {
-            myNextMoverIndex = (indexOf(_myMoverConstructors, _myCurrentMover.constructor) + 1) % _myMoverConstructors.length;
+            myNextMoverIndex = (js.array.indexOf(_myMoverConstructors, _myCurrentMover.constructor) + 1) % _myMoverConstructors.length;
         }
         // switch mover
         var myNewMover = self.setMover(_myMoverConstructors[myNextMoverIndex], theViewport);
@@ -853,9 +855,9 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         var myMovies = theScene.images.findAll("movie");
 
         if (myMovies) {
-            for (var myMovieIndex = 0; myMovieIndex < myMovies.length; myMovieIndex++) {
-                var myMovie = myMovies[myMovieIndex];
-                if (myMovie.decoderhint == "") {
+            for (var i = 0; i < myMovies.length; i++) {
+                var myMovie = myMovies[i];
+                if (myMovie.decoderhint === "") {
                     myMovie.decoderhint = new Playlist().getVideoDecoderHintFromURL(myMovie.src, false);
                     //print("Set decoderhint for movie with source : " + myMovie.src + " to: " + myMovie.decoderhint);
                 }

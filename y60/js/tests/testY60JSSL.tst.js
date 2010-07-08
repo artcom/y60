@@ -57,9 +57,11 @@
 
 */
 
-/*jslint plusplus: false*/
+/*jslint plusplus: false, nomen:false*/
 /*globals print, use, UnitTest, ENSURE, Node, DTITLE, exit, UnitTestSuite,
-          removeAttributeByName, removeElement*/
+          removeAttributeByName, removeElement, stripIdentifier,
+          parseRankedFeature, js, __FILE__,
+          ENSURE_EQUAL, arrayToString, Vector3f, Matrix4f*/
 
 use("Y60JSSL.js");
 use("UnitTest.js");
@@ -137,7 +139,7 @@ Y60JSSLUnitTest.prototype.Constructor = function (obj, theName) {
                      arrayToString([[]]),
                      "empty array in an array");
         ENSURE_EQUAL("[[1,1,1],identity[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]]",
-                     arrayToString([new Vector3f(1,1,1), new Matrix4f()]),
+                     arrayToString([new Vector3f(1, 1, 1), new Matrix4f()]),
                      "array with non-primitive members");
     }
     
@@ -165,8 +167,18 @@ Y60JSSLUnitTest.prototype.Constructor = function (obj, theName) {
         ENSURE_EQUAL("PathtonowheretheTestFile.js", stripIdentifier("Path/to\\nowhere/theTest-File.js"));
     }
 
+    function testArrayIndexOf() {
+        DTITLE("js.array.indexOf");
+        
+        ENSURE_EQUAL(-1, js.array.indexOf([], 1), "elements not in array return -1");
+        ENSURE_EQUAL(0, js.array.indexOf([1, 1], 1), "first Element's index found is returned");
+        ENSURE_EQUAL(-1, js.array.indexOf(["0","1","2"], 2), "elements are found by identity comparison");
+        ENSURE_EQUAL(2, js.array.indexOf(["2","1","2"], "2", 1), "from argument starts search at that given index");
+        ENSURE_EQUAL(0, js.array.indexOf(["2","1","2"], "2", 0), "from argument starts search at that given index");
+    }
+
     obj.run = function () {
-        /*testAngleFunctions();
+        testAngleFunctions();
         testRemoveElement([], []);
         testRemoveElement([0], []);
         testRemoveElement([0, 0], []);
@@ -177,9 +189,9 @@ Y60JSSLUnitTest.prototype.Constructor = function (obj, theName) {
         testRemoveElement([0, 0, 1, 0, 0, 2, 0, 0, 3, 0, 0], [1, 2, 3]);
         testRemoveAttribute();
         testArrayToString();
-        testParseRankedFeature();*/
-        
+        testParseRankedFeature();
         teststripIdentifier();
+        testArrayIndexOf();
     };
 };
 
