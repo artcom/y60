@@ -236,7 +236,7 @@ js.array.indexOf = function (theArray, theItem, theFrom) {
     return -1;
 };
 function indexOf(theArray, theItem, theFrom) {
-    Logger.warning("Y60JSSL :: free function 'indexOf' is deprecated. Use js.array.indexOf");
+    Logger.warning("Y60JSSL :: free function 'indexOf' is deprecated. Use 'js.array.indexOf' instead.");
     return js.array.indexOf(theArray, theItem, theFrom);
 }
 
