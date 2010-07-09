@@ -186,6 +186,7 @@ spark.Canvas.Constructor = function (Protected) {
             myCamera    = window.scene.dom.getElementById(myWorldId).find(".//camera");
             
             _myWorld = window.scene.dom.getElementById(myWorldId);
+            _myWorld.name = Public.name + "-world";
         } else {
             // Setup default world
             _myWorld = Node.createElement("world");
@@ -198,13 +199,14 @@ spark.Canvas.Constructor = function (Protected) {
             
             myCanvas = Node.createElement("canvas");
             myCanvas.name = Public.name + "-canvas";
-            myCanvas.backgroundcolor[3] = 0.0;
             window.scene.canvases.appendChild(myCanvas);
             
             _myViewport = Node.createElement("viewport");
             _myViewport.camera = myCamera.id;
             _myViewport.name = Public.name + "-viewport";
             myCanvas.appendChild(_myViewport);
+            
+            myCanvas.backgroundcolor[3] = 0.0;
         }
         
         var myLightManager = new LightManager(window.scene, _myWorld);
