@@ -439,10 +439,12 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         if (theCanvasNode !== _myRenderWindow.canvas) {
             _myRenderWindow.canvas = theCanvasNode;
         }
-        _myLightManager.setupDefaultLighting(theCanvasNode);
-        for (var i=0; i < theCanvasNode.childNodesLength('viewport'); ++i) {
-            var myViewport = theCanvasNode.childNode('viewport');
-            _myLightManager.setupHeadlight(myViewport);
+        if(_myLightManager) {
+            _myLightManager.setupDefaultLighting(theCanvasNode);
+            for (var i=0; i < theCanvasNode.childNodesLength('viewport'); ++i) {
+                var myViewport = theCanvasNode.childNode('viewport');
+                _myLightManager.setupHeadlight(myViewport);
+            }
         }
         _activeViewport = _myRenderWindow.canvas.find('viewport');
     };
@@ -706,11 +708,15 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
                 }
             }
         }
-        _myLightManager.onPreViewport(theViewport);
+        if(_myLightManager) {
+            _myLightManager.onPreViewport(theViewport);
+        }
     };
 
     self.onPostViewport = function(theViewport) {
-        _myLightManager.onPostViewport(theViewport);
+        if(_myLightManager) {
+            _myLightManager.onPostViewport(theViewport);
+        }
     };
 
     self.onResize = function() {
@@ -763,8 +769,10 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
                 }
             }
         }
-
-        _myLightManager.onFrame(theTime);
+        
+        if(_myLightManager) {
+            _myLightManager.onFrame(theTime);
+        }
     };
 
     self.onMouseMotion = function(theX, theY) {

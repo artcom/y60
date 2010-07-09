@@ -20,6 +20,7 @@ spark.Canvas.Constructor = function (Protected) {
     var _myRenderArea = null;
     var _myWorld = null;
     var _myViewport = null;
+    var _myCanvasNode = null;
     
     var PICK_RADIUS = 0.01;
     var _sampling = 1;
@@ -41,7 +42,9 @@ spark.Canvas.Constructor = function (Protected) {
         // this works because keyboard modifiers are manipulated bitwise
         var myCtrlFlag = (theEvent.modifiers >= spark.Keyboard.CTRL);
         
-        Public.getLightManager().onKey(theEvent.key, myState, myShiftFlag);
+        if(Public.getLightManager()) {
+            Public.getLightManager().onKey(theEvent.key, myState, myShiftFlag);
+        }
         var myMover = Public.getMover(_myViewport);
         if (myMover) {
             myMover.onKey(theEvent.key, myState, 0, 0, myShiftFlag, myCtrlFlag, myAltFlag);
@@ -148,7 +151,7 @@ spark.Canvas.Constructor = function (Protected) {
     
     Base.realize = Public.realize;
     Public.realize = function () {
-        var myCamera, myCanvas, myWorldId, myCanvasId;
+        var myCamera, myWorldId, myCanvasId;
         _sampling    = Protected.getNumber("sampling", 1);
         var myWidth  = Protected.getNumber("width", 100);
         var myHeight = Protected.getNumber("height", 100);
@@ -170,7 +173,9 @@ spark.Canvas.Constructor = function (Protected) {
         var myMaterial = Modelling.createUnlitTexturedMaterial(window.scene, myTexture);
         myMaterial.transparent = true;
         
+        var myAutoCreateTag = Protected.getBoolean("autoCreate", true);
         var mySceneFile = Protected.getString("sceneFile", "");
+        
         if (mySceneFile) {
             // Create (merge) world from scene file
             var myDom = prepareMerge(mySceneFile);
@@ -181,42 +186,51 @@ spark.Canvas.Constructor = function (Protected) {
             
             mergeScenes(window.scene, myDom);
             
-            myCanvas    = window.scene.dom.find(".//canvases/canvas[@id='" + myCanvasId + "']");
-            _myViewport = myCanvas.find(".//viewport");
+            _myCanvasNode = window.scene.dom.find(".//canvases/canvas[@id='" + myCanvasId + "']");
+            _myViewport = _myCanvasNode.find(".//viewport");
             myCamera    = window.scene.dom.getElementById(myWorldId).find(".//camera");
             
             _myWorld = window.scene.dom.getElementById(myWorldId);
             _myWorld.name = Public.name + "-world";
-        } else {
-            // Setup default world
-            _myWorld = Node.createElement("world");
-            _myWorld.name = Public.name + "-world";
-            window.scene.worlds.appendChild(_myWorld);
-            
-            myCamera = Node.createElement("camera");
-            _myWorld.appendChild(myCamera);
-            spark.setupCameraOrtho(myCamera, myWidth, myHeight);
-            
-            myCanvas = Node.createElement("canvas");
-            myCanvas.name = Public.name + "-canvas";
-            window.scene.canvases.appendChild(myCanvas);
+        } 
+        else {
+            _myCanvasNode = Node.createElement("canvas");
+            _myCanvasNode.name = Public.name + "-canvas";
+            window.scene.canvases.appendChild(_myCanvasNode);
             
             _myViewport = Node.createElement("viewport");
-            _myViewport.camera = myCamera.id;
             _myViewport.name = Public.name + "-viewport";
-            myCanvas.appendChild(_myViewport);
+            _myCanvasNode.appendChild(_myViewport);
             
-            myCanvas.backgroundcolor[3] = 0.0;
+            if(myAutoCreateTag) {
+                // Setup default world
+                _myWorld = Node.createElement("world");
+                _myWorld.name = Public.name + "-world";
+                window.scene.worlds.appendChild(_myWorld);
+
+                myCamera = Node.createElement("camera");
+                _myWorld.appendChild(myCamera);
+                spark.setupCameraOrtho(myCamera, myWidth, myHeight);
+                
+                _myViewport.camera = myCamera.id;
+                _myCanvasNode.backgroundcolor[3] = 0.0;
+            }
+            else {
+                _myCanvasNode.backgroundcolor = new Vector4f(1,1,1,1);
+            }
         }
         
-        var myLightManager = new LightManager(window.scene, _myWorld);
-        Public.setLightManager(myLightManager);
+        if(_myWorld) {
+            var myLightManager = new LightManager(window.scene, _myWorld);
+            Public.setLightManager(myLightManager);
+        }
+        
         Public.setupWindow(_myRenderArea, false);
         
-        myCanvas.target = myTexture.id;
-        _myRenderArea.setSceneAndCanvas(window.scene, myCanvas);
-        
-        Public.setCanvas(myCanvas);
+        _myCanvasNode.target = myTexture.id;
+        _myRenderArea.setSceneAndCanvas(window.scene, _myCanvasNode);
+
+        Public.setCanvas(_myCanvasNode);
         
         Public.parent.stage.addEventListener(spark.StageEvent.FRAME, Public.onFrame);
         Public.stage.addEventListener(spark.KeyboardEvent.KEY_DOWN, onKey);
@@ -226,6 +240,21 @@ spark.Canvas.Constructor = function (Protected) {
         Public.addEventListener(spark.MouseEvent.BUTTON_UP, Public.onMouseButtonUp);
         
         Base.realize(myMaterial);
+    };
+    
+    Base.setActiveCamera = Public.setActiveCamera;
+    Public.setActiveCamera = function(theCamera, theViewport) {
+        if(!Public.getLightManager()) {
+            var myWorld = theCamera.parentNode;
+            while(myWorld && myWorld.nodeName != "world") {
+                myWorld = myWorld.parentNode;
+            }
+            var myLightManager = new LightManager(window.scene, myWorld);
+            Public.setLightManager(myLightManager);
+            myLightManager.setupDefaultLighting(_myCanvasNode);
+        }
+        
+        Base.setActiveCamera(theCamera, theViewport);
     };
     
     Public.pickBody = function (theX, theY) {
