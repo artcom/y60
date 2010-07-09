@@ -21,6 +21,8 @@ spark.Canvas.Constructor = function (Protected) {
     var _myWorld = null;
     var _myViewport = null;
     var _myCanvasNode = null;
+    var _onPreViewportFunc = null;
+    var _onPostViewportFunc = null;
     
     var PICK_RADIUS = 0.01;
     var _sampling = 1;
@@ -126,6 +128,14 @@ spark.Canvas.Constructor = function (Protected) {
     
     Public.__defineGetter__("viewport", function () {
         return _myViewport;
+    });
+    
+    Public.__defineSetter__("onPreViewportFunc", function(theCallback) {
+        _onPreViewportFunc = theCallback;
+    });
+    
+    Public.__defineSetter__("onPostViewportFunc", function(theCallback) {
+        _onPostViewportFunc = theCallback;
     });
     
     ////////////////////
@@ -255,6 +265,22 @@ spark.Canvas.Constructor = function (Protected) {
         }
         
         Base.setActiveCamera(theCamera, theViewport);
+    };
+    
+    Base.onPreViewport = Public.onPreViewport;
+    Public.onPreViewport = function(theViewport) {
+        Base.onPreViewport(theViewport);
+        if (_onPreViewportFunc) {
+            _onPreViewportFunc();
+        }
+    };
+    
+    Base.onPostViewport = Public.onPostViewport;
+    Public.onPostViewport = function(theViewport) {
+        if (_onPostViewportFunc) {
+            _onPostViewportFunc();
+        }
+        Base.onPostViewport(theViewport);
     };
     
     Public.pickBody = function (theX, theY) {
