@@ -91,7 +91,7 @@ function setMasterVolume(theVolume) {
         return;
     }
     try {
-        print("Audio Volume set to:"+theVolume);
+        Logger.info("Audio Volume set to:"+theVolume);
         ourSoundController.volume = theVolume;
         return ourSoundController.volume;
     } catch (ex) {
