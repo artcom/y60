@@ -179,10 +179,13 @@ spark.fontStyleFromNode = function(theNode) {
 
     myStyle = myStyle.childNode(0);
 
+
     function copyAttributeIfPresent(theAttribute) {
-        var myValue = theNode.getAttribute(theAttribute);
-        if(myValue) {
-            myStyle[theAttribute] = myValue;
+        if (theNode) {
+            var myValue = theNode.getAttribute(theAttribute);
+            if(myValue) {
+                myStyle[theAttribute] = myValue;
+            }
         }
     }
 
@@ -206,7 +209,6 @@ spark.fontStyleFromNode = function(theNode) {
     copyAttributeIfPresent("backgroundColor");
 
     spark.applyStyleDefaults(myStyle);
-
     return myStyle;
 };
 
