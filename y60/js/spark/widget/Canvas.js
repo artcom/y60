@@ -23,6 +23,7 @@ spark.Canvas.Constructor = function (Protected) {
     var _myCanvasNode = null;
     var _onPreViewportFunc = null;
     var _onPostViewportFunc = null;
+    var _myRenderFlag = true;
     
     var PICK_RADIUS = 0.01;
     var _sampling = 1;
@@ -136,6 +137,10 @@ spark.Canvas.Constructor = function (Protected) {
     
     Public.__defineSetter__("onPostViewportFunc", function(theCallback) {
         _onPostViewportFunc = theCallback;
+    });
+    
+    Public.__defineSetter__("render", function(theBoolean) {
+        _myRenderFlag = theBoolean;
     });
     
     ////////////////////
@@ -297,7 +302,9 @@ spark.Canvas.Constructor = function (Protected) {
     Base.onFrame = Public.onFrame;
     Public.onFrame = function (theEvent) {
         Base.onFrame(theEvent.currenttime);
-        _myRenderArea.renderToCanvas();
+        if(_myRenderFlag) {
+            _myRenderArea.renderToCanvas();
+        }
     };
     
     Base.onMouseMotion = Public.onMouseMotion;
