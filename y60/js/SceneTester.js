@@ -303,10 +303,12 @@ SceneTester.prototype.Constructor = function(obj, theArguments) {
         var myArgument = theArguments[i];
         
         if (myArgument.search(/^outputimage/) !== -1) {
-            _myOutputImageName = myArgument.split("=", 1)[1];
+            lastEqualPosition = myArgument.lastIndexOf('=');
+            _myOutputImageName = myArgument.substr(lastEqualPosition + 1);
         }
         if (myArgument.search(/^outputsuffix/) !== -1) {
-            _myOutputSuffix = myArgument.split("=", 1)[1];
+            lastEqualPosition = myArgument.lastIndexOf('=');
+            _myOutputSuffix = myArgument.substr(lastEqualPosition + 1);
         }
     }
 };
