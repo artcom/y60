@@ -298,17 +298,21 @@ SceneTester.prototype.Constructor = function(obj, theArguments) {
         }
     };
     
-    for (var i = 0; i < theArguments.length; ++i) {
-        var lastEqualPosition;
-        var myArgument = theArguments[i];
-        
-        if (myArgument.search(/^outputimage/) !== -1) {
-            lastEqualPosition = myArgument.lastIndexOf('=');
-            _myOutputImageName = myArgument.substr(lastEqualPosition + 1);
-        }
-        if (myArgument.search(/^outputsuffix/) !== -1) {
-            lastEqualPosition = myArgument.lastIndexOf('=');
-            _myOutputSuffix = myArgument.substr(lastEqualPosition + 1);
+    obj.parseArguments = function(theArguments) {
+        for (var i = 0; i < theArguments.length; ++i) {
+            var lastEqualPosition;
+            var myArgument = theArguments[i];
+            
+            if (myArgument.search(/^outputimage/) !== -1) {
+                lastEqualPosition = myArgument.lastIndexOf('=');
+                _myOutputImageName = myArgument.substr(lastEqualPosition + 1);
+            }
+            if (myArgument.search(/^outputsuffix/) !== -1) {
+                lastEqualPosition = myArgument.lastIndexOf('=');
+                _myOutputSuffix = myArgument.substr(lastEqualPosition + 1);
+            }
         }
     }
+    
+    obj.parseArguments(theArguments);
 };

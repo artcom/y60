@@ -105,7 +105,6 @@ spark.Window.Constructor = function(Protected) {
 
 
     var _myMousePosition = new Vector2f();
-
     Public.mousePosition getter = function() {
         return _myMousePosition;
     };
@@ -117,7 +116,6 @@ spark.Window.Constructor = function(Protected) {
 
 
     var _myMouseButtonStates = {};
-
     Public.mouseButtonStates getter = function() {
         return _myMouseButtonStates;
     };
@@ -128,14 +126,12 @@ spark.Window.Constructor = function(Protected) {
 
 
     var _myMouseFocused = null;
-
     Public.mouseFocused getter = function() {
         return _myMouseFocused;
     };
 
 
     var _myKeyboardFocused = null;
-
     Public.keyboardFocused getter = function() {
         return _myKeyboardFocused;
     };

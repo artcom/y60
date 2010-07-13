@@ -121,6 +121,7 @@ if (!("disableSparkWidgets" in this)) {
     use("spark/widget/Stage.js");
     use("spark/widget/World.js");
     use("spark/widget/Window.js");
+    use("spark/widget/SparkSceneTesterWindow.js");
     use("spark/widget/Model.js");
     use("spark/widget/Body.js");
     use("spark/widget/ResizableRectangle.js");
@@ -136,4 +137,5 @@ if (!("disableSparkWidgets" in this)) {
     use("spark/add-ons/RoundedCornerImage.js");
     use("spark/add-ons/StretchyImage.js");
     use("spark/add-ons/VideoCapture.js");
+
 }

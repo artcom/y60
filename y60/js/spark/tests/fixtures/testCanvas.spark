@@ -1,0 +1,3 @@
+<SparkSceneTesterWindow>
+  <Canvas name="offscreen-canvas-scene" x="10" y="10" width="300" height="300" sceneFile="fixtures/models/cube.x60"/>
+</SparkSceneTesterWindow>
