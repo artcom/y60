@@ -3,7 +3,6 @@
          ENSURE, ENSURE_EQUAL, spark, Vector2f, Vector3f, Node*/
 
 use("UnitTest.js");
-this.useSparkWidgets = true;
 use("spark/spark.js");
 
 // Widget
