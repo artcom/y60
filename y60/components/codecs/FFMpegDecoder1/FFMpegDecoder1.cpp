@@ -354,7 +354,7 @@ namespace y60 {
         asl::Time myLoadEndTime;
         AC_INFO << "Load time " << (myLoadEndTime - myLoadStartTime) << "s";
 
-        float myAspectRatio = 1.0;
+        double myAspectRatio = 1.0;
         // calc aspect ratio
 #if LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(52,21,0)
         if (_myVStream->sample_aspect_ratio.num) {
@@ -371,7 +371,7 @@ namespace y60 {
             myAspectRatio = 1.0;
         }
         myAspectRatio *= (float)_myVStream->codec->width / _myVStream->codec->height; 
-        myMovie->set<AspectRatioTag>(myAspectRatio);
+        myMovie->set<AspectRatioTag>((float)myAspectRatio);
 
     }
 
