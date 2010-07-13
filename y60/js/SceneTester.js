@@ -56,50 +56,88 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+/*jslint white:false, nomen:false, plusplus:false*/
+/*globals use, print, window, ourShow, exit, Logger, Exception,
+          OffscreenRenderer, SceneViewer, expandEnvironment, Scene,
+          writeStringToFile, adjustNodeIds, Modelling, saveImageFiltered*/
+
 use("SceneViewer.js");
-// use("UnitTest.js");
 use("OffscreenRenderer.js");
 use("Exception.js");
-
-const WINDOW_WIDTH = 640;
-const WINDOW_HEIGHT = 480;
 
 function SceneTester(theArguments) {
     this.Constructor(this, theArguments);
 }
 
+SceneTester.WINDOW_WIDTH = 640;
+SceneTester.WINDOW_HEIGHT = 480;
+
 SceneTester.prototype.Constructor = function(obj, theArguments) {
-
     SceneViewer.prototype.Constructor(obj, theArguments);
-
     var Base = {};
 
-    ///////////////////////////////////////////////////////////////////////////////////////////
-    //
-    // public members
-    //
-    ///////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////
+    // private members //
+    /////////////////////
+
+    var _myTestDurationInFrames = 3;
+    var _myOutputImageName      = null;
+    var _myOutputSuffix         = null;
+    // Default is rendering offscreen!
+    var _myOffscreenFlag        = (expandEnvironment("${AC_NO_OFFSCREEN_TEST}") !== '1');
+    var _mySaveLoadFlag         = false;
+    var _myOffscreenRenderer    = null;
+
+    /////////////////////
+    // Private Methods //
+    /////////////////////
+    
+    function registerHeadlights(theClonedCanvas) {
+        var myViewport, myCamera, myHeadlight, i, j;
+        var myLightmanager = ourShow.getLightManager();
+        for (i = 0; i < theClonedCanvas.childNodesLength(); ++i) {
+            myViewport = theClonedCanvas.childNode(i);
+            myCamera = myViewport.getElementById(myViewport.camera);
+            for(j = 0; j < myCamera.childNodesLength(); ++j) {
+                myHeadlight = myCamera.childNode(j);
+                myLightmanager.registerHeadlightWithViewport(myViewport, myHeadlight);
+            }
+        }
+    }
+
+    function deregisterHeadlights(theClonedCanvas) {
+        var i, myViewport;
+        var myLightmanager = ourShow.getLightManager();
+        for (i = 0; i < theClonedCanvas.childNodesLength(); ++i) {
+            myViewport = theClonedCanvas.childNode(i);
+            myLightmanager.deregisterHeadlightFromViewport(myViewport);
+        }
+    }
+
+    ////////////////////
+    // Public Members //
+    ////////////////////
 
     obj.MAX_FRAME_COUNT = 1000; // Terminate test after this many frames.
     obj.myFrameCount = 0;
     obj.myImageCount = 0;
 
-    obj.saveLoadFlag setter = function(theFlag) {
+    obj.__defineSetter__("saveLoadFlag", function(theFlag) {
         _mySaveLoadFlag = theFlag;
-    }
+    });
 
-    obj.offscreenFlag setter = function(theFlag) {
+    obj.__defineSetter__("offscreenFlag", function(theFlag) {
         _myOffscreenFlag = theFlag;
-    }
+    });
 
-    Base.onFrame = obj.onFrame;
+    /*Base.onFrame = obj.onFrame;
     obj.onFrame = function (theTime) {
         Base.onFrame(theTime);
-    }
+    }*/
 
     obj.setTestDurationInFrames = function(theFrameCount) {
         _myTestDurationInFrames = theFrameCount;
-    }
+    };
 
     obj.getTestImageName = function() {
         var myImageFilename = "";
@@ -110,7 +148,7 @@ SceneTester.prototype.Constructor = function(obj, theArguments) {
         }
         obj.myImageCount++;
         return myImageFilename;
-    }
+    };
 
     Base.getActiveViewport = obj.getActiveViewport;
     obj.getActiveViewport = function() {
@@ -119,7 +157,7 @@ SceneTester.prototype.Constructor = function(obj, theArguments) {
         } else {
             return Base.getActiveViewport();
         }
-    }
+    };
 
     obj.getRenderer = function() {
         if (_myOffscreenRenderer) {
@@ -127,7 +165,7 @@ SceneTester.prototype.Constructor = function(obj, theArguments) {
         } else {
             return window.getRenderer();
         }
-    }
+    };
 
     Base.getRenderWindow = obj.getRenderWindow;
     obj.getRenderWindow = function() {
@@ -136,7 +174,7 @@ SceneTester.prototype.Constructor = function(obj, theArguments) {
         } else {
             return window;
         }
-    }
+    };
 
     obj.saveTestImage = function(theCount) {
         var myImageFilename = obj.getTestImageName();
@@ -163,17 +201,14 @@ SceneTester.prototype.Constructor = function(obj, theArguments) {
             _myOffscreenRenderer.setBody(window.scene.world);
             ourShow.activeWindow = _myOffscreenRenderer.renderarea;
 
-            _myOffscreenRenderer.onPreViewport = ourShow.onPreViewport;
+            _myOffscreenRenderer.onPreViewport  = ourShow.onPreViewport;
             _myOffscreenRenderer.onPostViewport = ourShow.onPostViewport;
-            _myOffscreenRenderer.onPreRender = ourShow.onPreRender;
-            _myOffscreenRenderer.onPostRender = ourShow.onPostRender;
+            _myOffscreenRenderer.onPreRender    = ourShow.onPreRender;
+            _myOffscreenRenderer.onPostRender   = ourShow.onPostRender;
 
             registerHeadlights(myClonedCanvas);
             _myOffscreenRenderer.render(true);
             deregisterHeadlights(myClonedCanvas);
-
-            var myCameras = window.scene.cameras;
-            var myAspect = myViewport.width / myViewport.height;
 
             saveImageFiltered(_myOffscreenRenderer.image, myImageFilename, ["flip"], [[]]);
 
@@ -184,28 +219,7 @@ SceneTester.prototype.Constructor = function(obj, theArguments) {
         } else {
             window.saveBuffer(myImageFilename);
         }
-    }
-
-    function registerHeadlights(theClonedCanvas) {
-        var myLightmanager = ourShow.getLightManager();
-        for (var i=0; i<theClonedCanvas.childNodesLength(); ++i) {
-            var myViewport = theClonedCanvas.childNode(i);
-            var myCamera = myViewport.getElementById(myViewport.camera);
-
-            for(var j=0; j<myCamera.childNodesLength(); ++j) {
-                var myHeadlight = myCamera.childNode(j);
-                myLightmanager.registerHeadlightWithViewport(myViewport, myHeadlight);
-            }
-        }
-    }
-
-    function deregisterHeadlights(theClonedCanvas) {
-        var myLightmanager = ourShow.getLightManager();
-        for (var i=0; i<theClonedCanvas.childNodesLength(); ++i) {
-            var myViewport = theClonedCanvas.childNode(i);
-            myLightmanager.deregisterHeadlightFromViewport(myViewport);
-        }
-    }
+    };
 
     obj.testSaveLoad = function() {
         var myXmlFilename = 'saved_testscene.x60';
@@ -228,15 +242,14 @@ SceneTester.prototype.Constructor = function(obj, theArguments) {
         print("Setting up binary scene");
         myNewBinScene.setup();
 
-        if (myNewXmlScene.dom.toString() != myNewBinScene.dom.toString()) {
+        if (myNewXmlScene.dom.toString() !== myNewBinScene.dom.toString()) {
             print("comparing " + myXmlFilename + " and " + myBinXmlFilename + " failed.");
             writeStringToFile("saved_binary_testscene.x60", myNewBinScene.dom.toString());
             writeStringToFile("saved_xml_testscene.x60", myNewXmlScene.dom.toString());
             print("inspect 'saved_binary_testscene.x60' and 'saved_xml_testscene.x60' for differences");
             exit(1);
         }
-    }
-
+    };
 
     Base.onPostRender = obj.onPostRender;
     obj.onPostRender = function() {
@@ -247,7 +260,7 @@ SceneTester.prototype.Constructor = function(obj, theArguments) {
                 ++obj.myFrameCount;
                 if (obj.myFrameCount > obj.MAX_FRAME_COUNT) {
                     if (!_myOutputImageName) {
-                        print ("Maximum frame count "+obj.myFrameCount+" reached - something went wrong. Terminating test");
+                        print ("Maximum frame count " + obj.myFrameCount + " reached - something went wrong. Terminating test");
                         exit(1);
                     }
                 }
@@ -258,61 +271,42 @@ SceneTester.prototype.Constructor = function(obj, theArguments) {
             print("### ERROR: Exception caught: " + ex);
             exit(1);
         }
-    }
+    };
 
     obj.onFrameDone = function(theFrameCount) {
-        if (_myOutputImageName) {
-            if (theFrameCount == _myTestDurationInFrames) {
-                obj.saveTestImage();
-
-                if (_mySaveLoadFlag) {
-                    obj.testSaveLoad();
-                }
-                exit(0);
+        if (_myOutputImageName &&
+            theFrameCount === _myTestDurationInFrames) {
+            obj.saveTestImage();
+            if (_mySaveLoadFlag) {
+                obj.testSaveLoad();
             }
+            exit(0);
         }
-    }
-
+    };
+    
     Base.setup = obj.setup;
     obj.setup = function(theWidth, theHeight) {
-        if (!theWidth) {
-            theWidth = WINDOW_WIDTH;
-        }
-        if (!theHeight) {
-            theHeight = WINDOW_HEIGHT;
-        }
+        theWidth = theWidth || SceneTester.WINDOW_WIDTH;
+        theHeight = theHeight || SceneTester.WINDOW_HEIGHT;
+        
         Base.setup(theWidth, theHeight, false, "Scene Tester");
-        window.position = [0,0];
+        window.position = [0,0]; // why?
         if (_myOffscreenFlag) {
             Logger.info("tester running in offscreen mode");
         } else {
             Logger.info("tester not running in offscreen mode");
         }
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////////////////
-    //
-    // private members
-    //
-    ///////////////////////////////////////////////////////////////////////////////////////////
-
-    var _myTestDurationInFrames = 3;
-    var _myOutputImageName      = null;
-    var _myOutputSuffix         = null;
-    var _myOffscreenFlag        = (expandEnvironment("${AC_NO_OFFSCREEN_TEST}") != 1);
-    var _mySaveLoadFlag         = false;
-    var _myOffscreenRenderer    = null;
-
+    };
+    
     for (var i = 0; i < theArguments.length; ++i) {
+        var lastEqualPosition;
         var myArgument = theArguments[i];
-        if (myArgument.search(/outputimage/) != -1) {
-            var lastEqualPosition = myArgument.lastIndexOf('=');
-            _myOutputImageName = myArgument.substr(lastEqualPosition + 1);
+        
+        if (myArgument.search(/^outputimage/) !== -1) {
+            _myOutputImageName = myArgument.split("=", 1)[1];
         }
-        if (myArgument.search(/outputsuffix/) != -1) {
-            var lastEqualPosition = myArgument.lastIndexOf('=');
-            _myOutputSuffix = myArgument.substr(lastEqualPosition + 1);
+        if (myArgument.search(/^outputsuffix/) !== -1) {
+            _myOutputSuffix = myArgument.split("=", 1)[1];
         }
     }
-}
-
+};
