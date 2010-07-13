@@ -55,6 +55,7 @@ spark.Canvas.Constructor = function (Protected) {
     }
     
     function prepareMerge(theSceneFilePath) {
+        theSceneFilePath = searchFile(theSceneFilePath);
         var myTargetDir, myTexSrcPath, myNewPath;
         /* adjust ids:
          *  - world, canvas, viewport ids need to be unique as we need duplicates
@@ -73,6 +74,7 @@ spark.Canvas.Constructor = function (Protected) {
         }
         
         var myDom = new Node();
+        
         myDom.parseFile(theSceneFilePath);
         
         adjustNodeId(myDom.find(".//world"), true);
