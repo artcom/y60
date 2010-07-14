@@ -1,0 +1,40 @@
+<scene revision="21291">
+    <worlds>
+        <world id="A7BJ8wmnpak=" sticky="1">
+            <camera name="myCamera" position="[450,300,500]" frustum="orthonormal[-450,450,-300,300,0.1,1000]" id="BLBJ8wmnpak=">
+                <light name="Headlight_ArBJ8wmnpak=" lightsource="B7BJ8wmnpak=" id="CLBJ8wmnpak=" visible="0" sticky="1"/>
+            </camera>
+            <light name="Sun" lightsource="BbBJ8wmnpak=" orientation="[0.120467,-0.849256,-0.464473,0.220265]" id="BrBJ8wmnpak=" sticky="1"/>
+        </world>
+    </worlds>
+    <records/>
+    <canvases>
+        <canvas id="AbBJ8wmnpak=">
+            <viewport id="ArBJ8wmnpak=" camera="BLBJ8wmnpak=">
+                <overlays/>
+            </viewport>
+        </canvas>
+    </canvases>
+    <materials/>
+    <lightsources>
+        <lightsource id="BbBJ8wmnpak=" name="SunLightSource" type="directional">
+            <properties>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[0.5,0.5,0.5,1]</vector4f>
+                <vector4f name="specular">[0.5,0.5,0.5,1]</vector4f>
+            </properties>
+        </lightsource>
+        <lightsource id="B7BJ8wmnpak=" name="HeadLightSource" type="positional">
+            <properties>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[1,1,1,1]</vector4f>
+                <vector4f name="specular">[1,1,1,1]</vector4f>
+            </properties>
+        </lightsource>
+    </lightsources>
+    <animations/>
+    <characters/>
+    <shapes/>
+    <textures/>
+    <images/>
+</scene>

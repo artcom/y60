@@ -1,0 +1,12 @@
+<Window name="OffscreenCanvasTutorial"
+        title="offscreenCanvasTutorial"
+        decorations="true"
+        mouseCursor="true"
+        width="900"
+        height="600"
+        swapInterval="1"
+        i18nContext="global-i18n">
+    
+    
+</Window>
+
