@@ -111,7 +111,7 @@ namespace y60 {
             typedef std::map<std::string, SDLFontInfo> FontLibrary;
 
             struct Format {
-                Format() : bold(false), italics(false), underline(false), color(asl::Vector4f(-1,-1,-1,1)) {}
+                Format() : bold(false), italics(false), underline(false), indent(false), color(asl::Vector4f(-1,-1,-1,1)) {}
 
                 bool bold;
                 bool italics;

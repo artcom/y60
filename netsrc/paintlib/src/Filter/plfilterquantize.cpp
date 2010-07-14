@@ -307,20 +307,20 @@ void PLFilterQuantize::squeeze(QUBOX * pBox) const
     {
       for (int b=Corner0.GetB (); b<=Corner1.GetB (); b++)
       {
-        int index = getColorTableIndex ( PLPixel32 (r,g,b,0));
+        int index = getColorTableIndex ( PLPixel32 (static_cast<PLBYTE>(r),static_cast<PLBYTE>(g),static_cast<PLBYTE>(b),static_cast<PLBYTE>(0)));
         HISTONODE * pNode = m_ppHisto[index];
         if (pNode)
         {
           if (pNode->count>0L)
           {
-            pBox->Corner0 = PLPixel32 (min (r, (int)pBox->Corner0.GetR ()),
-                                      min (g, (int)pBox->Corner0.GetG ()),
-                                      min (b, (int)pBox->Corner0.GetB ()),
-                                      0);
-            pBox->Corner1 = PLPixel32 (max (r, (int)pBox->Corner1.GetR ()),
-                                      max (g, (int)pBox->Corner1.GetG ()),
-                                      max (b, (int)pBox->Corner1.GetB ()),
-                                      0);
+            pBox->Corner0 = PLPixel32 (static_cast<PLBYTE>(min (r, (int)pBox->Corner0.GetR ())),
+                                       static_cast<PLBYTE>(min (g, (int)pBox->Corner0.GetG ())),
+                                       static_cast<PLBYTE>(min (b, (int)pBox->Corner0.GetB ())),
+                                       static_cast<PLBYTE>(0));
+            pBox->Corner1 = PLPixel32 (static_cast<PLBYTE>(max (r, (int)pBox->Corner1.GetR ())),
+                                       static_cast<PLBYTE>(max (g, (int)pBox->Corner1.GetG ())),
+                                       static_cast<PLBYTE>(max (b, (int)pBox->Corner1.GetB ())),
+                                       static_cast<PLBYTE>(0));
             rsum += r*pNode->count;
             gsum += g*pNode->count;
             bsum += b*pNode->count;
@@ -384,13 +384,13 @@ void PLFilterQuantize::genPopularityPalette
   int IndexCache = -1;
   HISTONODE * pNode;
   HISTONODE * pNodeCache = 0;
-  for (int r=0; r<31; r++)
+  for (PLBYTE r=0; r<31; r++)
   {
-    for (int g=0; g<31; g++)
+    for (PLBYTE g=0; g<31; g++)
     {
-      for (int b=0; b<31; b++)
+      for (PLBYTE b=0; b<31; b++)
       {
-        int index = getColorTableIndex (PLPixel32 (r,g,b,PLBYTE(0)));
+        int index = getColorTableIndex (PLPixel32 (r,g,b,PLBYTE()));
         if (index == IndexCache)
           pNode = pNodeCache;
         else
@@ -405,7 +405,7 @@ void PLFilterQuantize::genPopularityPalette
           if(pNode->count > PalCount[255])
           {
             PalCount[255] = pNode->count;
-            pPal[255].Set (r,g,b,0);
+            pPal[255].Set (r,g,b, PLBYTE() );
 
             int i = 255;        /* bubble up */
             while(PalCount[i] > PalCount[i-1] && i>8)

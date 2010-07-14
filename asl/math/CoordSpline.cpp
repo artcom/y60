@@ -233,7 +233,7 @@ namespace asl {
 
         right = Vector3f((*_spline[3])(s), (*_spline[4])(s), (*_spline[5])(s) );
         front = Vector3f((*_spline[6])(s), (*_spline[7])(s), (*_spline[8])(s) );
-        up = cross( right, front );
+        up = cross( front, right );
 
         asl::Matrix4f myMatrix;
         myMatrix.makeIdentity();
@@ -250,6 +250,38 @@ namespace asl {
         asl::Vector3f myShear;
         asl::Vector3f myOrientation;
         asl::Vector3f myPosition;
+        myMatrix.decompose(myScale, myShear, myOrientation, myPosition);
+        return myOrientation;
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////
+    //
+    //	quaternion
+    //
+    ////////////////////////////////////////////////////////////////////////////////
+    asl::Quaternionf
+        CoordSpline::getQuaternion ( float s )
+    {
+        asl::Vector3f right, front, up;
+        asl::Vector3f hpr;
+
+        right = Vector3f((*_spline[3])(s), (*_spline[4])(s), (*_spline[5])(s) );
+        front = Vector3f((*_spline[6])(s), (*_spline[7])(s), (*_spline[8])(s) );
+        up = cross( front, right );
+
+        asl::Matrix4f myMatrix;
+        myMatrix.makeIdentity();
+        asl::Vector4f myUp(up[0], up[1], up[2], 0.0);
+        myMatrix.assignRow(1,myUp);
+
+        asl::Vector4f myFront(front[0], front[1], front[2], 0.0);
+        myMatrix.assignRow(2,myFront);
+
+        asl::Vector4f myRight(right[0], right[1], right[2], 0.0);
+        myMatrix.assignRow(0,myRight);
+
+        asl::Vector3f myScale,myShear,myPosition;
+        asl::Quaternionf myOrientation;
         myMatrix.decompose(myScale, myShear, myOrientation, myPosition);
         return myOrientation;
     }

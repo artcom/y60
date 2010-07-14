@@ -92,10 +92,10 @@ SimWater::SimWater(DLHandle theDLHandle) :
     _myDisplaySize(SIMULATION_WIDTH , SIMULATION_WIDTH),
     _myDisplayOffset(0 , 0), // TODO: doesn't change anything ... find out why?
     //_myWaterDamping(0.9993),
+    _myViewportSize(0, 0),
     _myRunSimulationFlag( true ),
     _myIntegrationsPerFrame( 3 ),
     _myTimeStep( 0.1f ),
-    _myViewportSize(0, 0),
     _myFloormapCounter(0),
     _myCubemapCounter(0),
     _isRunning( false )

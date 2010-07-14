@@ -193,9 +193,12 @@ private:
     class ComputeThread: public asl::PosixThread {
     public:
             ComputeThread (WaterSimulation & simulation) : PosixThread(),
-                          _simulation(simulation),
+                          _threadLock(0),
+                          _timeStep(0.0),
+                          _numSteps(0),
+                          _stripSize(0),
                           _doQuit(false),
-                          _threadLock(0)
+                          _simulation(simulation)
             { }
 
             virtual ~ComputeThread() {}

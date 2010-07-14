@@ -114,8 +114,9 @@ namespace y60 {
 
             double getMovieTime(double theSystemTime) {
                 if (!hasAudio() || !getDecodeAudioFlag()) {
-                    AC_DEBUG << "No Audio returning " << MovieDecoderBase::getMovieTime(theSystemTime);
-                    return MovieDecoderBase::getMovieTime(theSystemTime);
+                    double myTime = MovieDecoderBase::getMovieTime(theSystemTime);
+                    AC_DEBUG << "No Audio returning " <<myTime;
+                    return myTime;
                 } else {
                     AC_DEBUG << " returning audio time " << _myAudioSink->getPumpTime()<<" audioOffset: "<<_myAudioTimeOffset
                             <<" video time: "<<MovieDecoderBase::getMovieTime(theSystemTime);
@@ -145,7 +146,6 @@ namespace y60 {
                 MovieDecoderBase::startMovie(theStartTime);
                 if (theStartAudioFlag && _myAudioSink && getDecodeAudioFlag()) {
                     _myAudioSink->play();
-                    _myAudioTimeOffset = theStartTime;
                 }
             }
             /**

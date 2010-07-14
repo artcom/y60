@@ -129,13 +129,14 @@ namespace asl {
             }
     		QuaternionKeyframe( const QuaternionKeyframe& theKeyframe) {
                 _myQuaternion = theKeyframe._myQuaternion;
-                _myOrientationMatrix = asl::Matrix4f(_myQuaternion);
+                _myOrientationMatrix = theKeyframe._myOrientationMatrix;
                 xyz = theKeyframe.xyz;
                 t = theKeyframe.t;
                 speed = theKeyframe.speed;
 		    }
             QuaternionKeyframe & operator=(const QuaternionKeyframe & theKeyframe) {
                 _myQuaternion = theKeyframe._myQuaternion;
+                _myOrientationMatrix = theKeyframe._myOrientationMatrix;
                 xyz = theKeyframe.xyz;
                 t = theKeyframe.t;
                 speed = theKeyframe.speed;
@@ -175,7 +176,8 @@ namespace asl {
         void    print		    ( void );
         bool    init		    ( const std::vector<asl::QuaternionKeyframe>& keyframes, float& total_path, bool planet_mode );
         asl::Vector3f xyz			    ( float t );
-        asl::Vector3f  getHPR   ( float t );
+        asl::Quaternionf getQuaternion ( float s );
+        asl::Vector3f getHPR   ( float t );
         float  s			    ( float t );
         float  sPlanet		    ( float t );
         float  v			    ( float t );

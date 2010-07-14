@@ -72,8 +72,8 @@
 #endif
 
 #if defined(_MSC_VER)
-    #pragma warning(push)
-    #pragma warning(disable:4512 4413)
+    #pragma warning(push,1)
+    //#pragma warning(disable:4512 4413 4250)
 #endif //defined(_MSC_VER)
 #include <gtkmm.h>
 #if defined(_MSC_VER)

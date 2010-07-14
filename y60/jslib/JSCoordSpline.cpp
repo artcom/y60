@@ -88,7 +88,7 @@ orientation(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
     DOC_PARAM("theTimestamp", "", DOC_TYPE_FLOAT);
     DOC_RVAL("Orientation", DOC_TYPE_VECTOR3F);
     DOC_END;
-    return Method<JSCoordSpline::NATIVE>::call(&JSCoordSpline::NATIVE::getHPR,cx,obj,argc,argv,rval);
+    return Method<JSCoordSpline::NATIVE>::call(&JSCoordSpline::NATIVE::getQuaternion,cx,obj,argc,argv,rval);
 }
 static JSBool
 print(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {

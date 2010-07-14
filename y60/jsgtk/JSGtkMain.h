@@ -64,8 +64,8 @@
 #include <y60/jsbase/JSWrapper.h>
 
 #if defined(_MSC_VER)
-    #pragma warning(push)
-    #pragma warning(disable:4512 4413 4244 4251)
+    #pragma warning(push,1)
+    //#pragma warning(disable:4512 4413 4244 4251 4250)
 #endif //defined(_MSC_VER)
 #include <gtkmm/main.h>
 #if defined(_MSC_VER)

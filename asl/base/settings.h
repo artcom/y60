@@ -71,7 +71,25 @@
 // C4355 : 'this' : used in base member initializer list
 // C4239 : nonstandard extension used : 'type cast' : conversion from '<temporary>' to '<non-const reference>'
 // C4396: 'func' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
-#pragma warning( disable: 4355 /*4239*/ 4396 )
+#pragma warning( disable: 4355 /*4239*/ 4396 4100)
+
+// C4100: unreferenced formal parameter
+// Rationale: many interfaces have lots of parameters, some of which are not used in all implementations. 
+// NOTE: we could achieve the same thing selectively by using unnamed parameters
+#pragma warning( disable: 4100)
+
+// C4201: nonstandard extension used : nameless struct/union
+// Rationale: Windows SDK produces these warnings
+#pragma warning( disable: 4201)
+
+// C4505 : <method>: unreferenced local function has been removed
+// Rationale: this warning is triggered on lots of template classes (e.g. JSWrapper.h).
+// It can not be disabled locally - from http://support.microsoft.com/kb/947783/
+//       This is by design.  The C4505 warning applies to a region of code not to a specific function.  
+//       The warning is actually tested for at the end of the compilation unit so selectively disabling 
+//       this warning will not work.
+#pragma warning(disable: 4505)
+
 #endif // _MSC_VER
 
 // this is not exactly accurate
