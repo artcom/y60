@@ -74,12 +74,49 @@ CanvasUnitTest.prototype.Constructor = function (obj, theName) {
             ENSURE_EQUAL(true, isIdinDom(receivingNode,myNodeList[i].myId), myNodeList[i].nodeName +
                     " were copied correctly");
         }
+    }
 
+    function testEmptyCanvas () {
+        var myScene = spark.loadFile("fixtures/emptyCanvasFixture.spark");
+        var myCanvasWidget = myScene.getChildByName("empty-canvas");
+
+        var myWorldInDom = myScene.getScene().dom.find(".//worlds/world[@name='"+myCanvasWidget.name+"-world']");
+        ENSURE_EQUAL(false, !!myWorldInDom, "as assumed no world was found");
+
+        var myCanvasInDom = myScene.getScene().dom.find(".//canvases/canvas[@name='"+myCanvasWidget.name+"-canvas']");
+        ENSURE_EQUAL(true, !!myCanvasInDom, "canvas found");
+
+        var myViewportInDom = myCanvasInDom.find(".//viewport[@name='"+myCanvasWidget.name+"-viewport']");
+        ENSURE_EQUAL(true, !!myViewportInDom, "viewport found");
+        
+        ENSURE_EQUAL(false, !!myViewportInDom.camera, "as assumed no camera for viewport found");
+
+        ENSURE_EQUAL(false, !!myCanvasWidget.getLightManager(), "as assumed no lightmanager specified for canvas widget");
+    }
+
+    function testSceneCanvas () {
+        var myScene = spark.loadFile("fixtures/sceneCanvasFixture.spark");
+        var myCanvasWidget = myScene.getChildByName("3D-canvas");
+
+        var myWorldInDom = myScene.getScene().dom.find(".//worlds/world[@name='"+myCanvasWidget.name+"-world']");
+        ENSURE_EQUAL(true, !!myWorldInDom, "as assumed world was found");
+
+        var myCanvasInDom = myScene.getScene().dom.find(".//canvases/canvas[@name='JohnDoe']");
+        ENSURE_EQUAL(true, !!myCanvasInDom, "canvas found");
+
+        var myViewportInDom = myCanvasInDom.find(".//viewport");
+        ENSURE_EQUAL(true, !!myViewportInDom, "viewport for canvas found");
+        
+        ENSURE_EQUAL(true, !!myViewportInDom.camera, "as assumed camera for viewport found");
+
+        ENSURE_EQUAL(true, !!myCanvasWidget.getLightManager(), "as assumed lightmanager specified for canvas widget");
     }
 
     obj.run = function () { 
         testPrepareMerge();
         testMergeScene();
+        testEmptyCanvas();
+        testSceneCanvas();
     };
 };
 
