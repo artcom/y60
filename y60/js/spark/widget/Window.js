@@ -20,10 +20,16 @@ spark.Window.Constructor = function(Protected) {
     var _myCamera = null;
     var _myWorld = null;
 
+    var _myMultitouchCursors = {};
+
     SceneViewer.prototype.Constructor(this, []);
 
     Public.title getter = function()  {
         return window.title;
+    };
+
+    Public.multitouchCursors getter = function()  {
+        return _myMultitouchCursors;
     };
 
     Public.title setter = function(theTitle) {
@@ -178,7 +184,6 @@ spark.Window.Constructor = function(Protected) {
         _myMousePosition.y = theY;
     };
 
-
     var _myMouseButtonStates = {};
 
     Public.mouseButtonStates getter = function() {
@@ -271,11 +276,6 @@ spark.Window.Constructor = function(Protected) {
         }
         var myPos = new Vector2f(theGesture.position3D.x * myPositionScale.x, theGesture.position3D.y * myPositionScale.y);
         
-        // old picking without cursor grabbing
-//        var myWidget = Public.pickWidget(myPos.x, myPos.y);        
-//        if(!myWidget) {
-//            myWidget = Public;
-//        }
         var mySparkConformedCursorId = getSparkConformedCursorId(theGesture.baseeventtype, theGesture.cursorid);
         
         // picking with considering cursor grabbing
@@ -295,55 +295,45 @@ spark.Window.Constructor = function(Protected) {
         if (myCursor) {
             myCursor.update(myWidget, myPos);
         }
+        var myPartnerCursor = null;
+        // Do some zomm gesture specific things
+        if (theGesture.type == "zoom_start" || theGesture.type == "zoom" || theGesture.type == "zoom_finish" ) {
+            var mySparkconformedpartnerCursorId = getSparkConformedCursorId(theGesture.baseeventtype, theGesture.zoompartnerid);
+            // Get gesture partner cursor partner in case this a zooming event (zoom_start, zoom, zoom_finish)
+            if (mySparkconformedpartnerCursorId in _myMultitouchCursors) {
+                myPartnerCursor = _myMultitouchCursors[mySparkconformedpartnerCursorId];
+            }            
+            // zoom and zoom start need both cursors
+            if ((theGesture.type=="zoom_start" || theGesture.type=="zoom")&& (!myCursor || !myPartnerCursor)) {
+                return;
+            }
+        }
         
-        switch(theGesture.type) {
-            
-            case "wipe":
+        switch(theGesture.type) {            
+            case "wipe":            
                 var myDir = new Vector3f(theGesture.direction.x * myPositionScale.x * -1, theGesture.direction.y * myPositionScale.y * (1),0);
-                var myWipeEvent = new spark.WipeGestureEvent(spark.GestureEvent.WIPE, mySparkConformedCursorId , myPos.x, myPos.y, theGesture.baseeventtype, myDir);
+                var myWipeEvent = new spark.WipeGestureEvent(spark.GestureEvent.WIPE, theGesture.baseeventtype, myDir, myCursor);
                 myWidget.dispatchEvent(myWipeEvent);
-                break;
-                
+                break;                
             case "zoom_start":
-//                print("----window zoom START " + theGesture.cursorid);
-                var myCursorList = [];
-                if (!myCursor) {
-                    Logger.error("zoom start gesture has no cursor object for cursorid: " + theGesture.cursorid);
-                    return;
-                }
-                myCursorList.push(myCursor);
-                if (!_myMultitouchCursors[getSparkConformedCursorId(theGesture.baseeventtype, theGesture.zoomcursorid)]) {
-                    Logger.error("zoom start gesture has no cursor object for zoompartnerid: " + theGesture.zoomcursorid);
-                    return;
-                }
-                myCursorList.push(_myMultitouchCursors[getSparkConformedCursorId(theGesture.baseeventtype, theGesture.zoomcursorid)]);
-                
                 var myZoomCenter = new Vector3f(theGesture.zoomcenter.x * myPositionScale.x, (1-theGesture.zoomcenter.y) * myPositionScale.y * (1),0);
-                var myZoomEvent = new spark.ZoomGestureEvent(spark.GestureEvent.ZOOM_START, mySparkConformedCursorId , myPos.x, myPos.y, theGesture.baseeventtype, null, null, myZoomCenter, myCursorList);
+                var myZoomEvent = new spark.ZoomGestureEvent(spark.GestureEvent.ZOOM_START, theGesture.baseeventtype, myCursor, myPartnerCursor, null, null, myZoomCenter);
                 myWidget.dispatchEvent(myZoomEvent);
-                break;
-                
+                break;                
             case "zoom":
                 var myFirstDistance = theGesture.initialdistance;
                 var myDistance = theGesture.distance;
-                var myZoomEvent = new spark.ZoomGestureEvent(spark.GestureEvent.ZOOM, mySparkConformedCursorId , myPos.x, myPos.y, theGesture.baseeventtype, 
-                                                                myFirstDistance, myDistance);
+                var myZoomEvent = new spark.ZoomGestureEvent(spark.GestureEvent.ZOOM, theGesture.baseeventtype, myCursor, myPartnerCursor, myFirstDistance, myDistance);
                 myWidget.dispatchEvent(myZoomEvent);
-                var mySparkConformedZoomPartnerId = getSparkConformedCursorId(theGesture.baseeventtype, theGesture.zoomcursorid);
-                break;
-                
-            case "zoom_finish":
-//                print("----window zoom FINISH " + theGesture.cursorid);
-                var myZoomEvent = new spark.ZoomGestureEvent(spark.GestureEvent.ZOOM_FINISH, mySparkConformedCursorId , myPos.x, myPos.y, theGesture.baseeventtype);
+                break;                
+            case "zoom_finish":                
+                var myZoomEvent = new spark.ZoomGestureEvent(spark.GestureEvent.ZOOM_FINISH, theGesture.baseeventtype, myCursor, myPartnerCursor);
                 myWidget.dispatchEvent(myZoomEvent);
-
-                break;
-                
+                break;                
             case "rotate":
                 break;
             default:
-//                print(theGesture.type);
-            
+                Logger.info("Unknown gesture : " + theGesture);            
         }
     }
 
@@ -495,7 +485,6 @@ spark.Window.Constructor = function(Protected) {
         return mySparkConformedCursorId;
     }
 
-    var _myMultitouchCursors = {};
 
     function getMultitouchCursorId(theEvent) {
         switch(theEvent.callback) {
@@ -508,7 +497,8 @@ spark.Window.Constructor = function(Protected) {
             return null;
         }
     };
-
+    
+    
     function getMultitouchCursorPosition(theEvent) {
         switch(theEvent.callback) {
         case "onASSEvent":
@@ -528,7 +518,6 @@ spark.Window.Constructor = function(Protected) {
         }
 
         var myId = getMultitouchCursorId(theEvent);
-
         switch(theEvent.type) {
         case "configure":
             Logger.info("proximatrix got configured");
@@ -536,7 +525,7 @@ spark.Window.Constructor = function(Protected) {
 
         case "add":
         case "move": // proximatrix
-        case "update": // tuio
+        case "update": // tuio        
             var myCursor;
             if(myId in _myMultitouchCursors) {
                 myCursor = _myMultitouchCursors[myId];

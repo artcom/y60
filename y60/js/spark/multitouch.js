@@ -162,6 +162,14 @@ spark.Cursor.Constructor = function(Protected, theId) {
             return _myHovered;
         }
     };
+    
+    var _myLastStagePosition = new Point2f();
+    /**
+     * Last stage position as cloned Point2f.
+     */
+    Public.lastStagePosition getter = function() {
+        return _myLastStagePosition.clone();
+    };
 
     var _myStagePosition = new Point2f();
 
@@ -191,6 +199,7 @@ spark.Cursor.Constructor = function(Protected, theId) {
      */
     Public.update = function(theHovered, theStagePosition) {
         _myHovered = theHovered;
+        _myLastStagePosition = Public.stagePosition;
         _myStagePosition = theStagePosition.clone();
     };
 
@@ -308,59 +317,14 @@ spark.CursorEvent.Constructor = function(Protected, theType, theCursor) {
  * This class represents 
  * multitouch gesture events
  */
-const ASS_BASE_EVENT = 0;
+
+const ASS_BASE_EVENT  = 0;
 const TUIO_BASE_EVENT = 1;
 
-
 spark.GestureEvent = spark.Class("GestureEvent");
-
-/**
- * rotate event: "XXX"
- */
-spark.GestureEvent.ROTATE  = "gesture-rotate";
-
-spark.GestureEvent.Constructor = function(Protected, theType, theCursorId, theX, theY, theBaseEvent) {
-    var Public = this;
-
-    this.Inherit(spark.Event, theType);
-    
-    /**
-     * Reference to the cursor this event concerns
-     */
-    var _myCursorId = theCursorId;
-    
-    Public.cursorid getter = function() {
-        return _myCursorId;
-    };
-    
-    /**
-     * Convenience: horizontal position of cursor
-     */
-    var _myStageX = theX;
-    
-    Public.stageX getter = function() {
-        return _myStageX;
-    };
-
-    /**
-     * Convenience: vertical position of cursor
-     */
-    var _myStageY = theY;
-
-    Public.stageY getter = function() {
-        return _myStageY;
-    };
-
-    /**
-     * Reference to the base event ass or tuio
-     */
-    var _myBaseEvent = theBaseEvent;
-
-    Public.baseEvent getter = function() {
-        return _myBaseEvent;
-    };
+spark.GestureEvent.Constructor = function(Protected, theType, theBaseEvent, theCursor) {
+    this.Inherit(spark.CursorEvent, theType, theCursor);
 };
-
 
 /**
  * wipe event: "the distance between the last two move cursors
@@ -368,10 +332,10 @@ spark.GestureEvent.Constructor = function(Protected, theType, theCursorId, theX,
  */
 spark.GestureEvent.WIPE  = "gesture-wipe";
 spark.WipeGestureEvent = spark.Class("WipeGestureEvent");
-spark.WipeGestureEvent.Constructor = function(Protected, theType, theCursorId, theX, theY, theBaseEvent, theDir) {
+spark.WipeGestureEvent.Constructor = function(Protected, theType, theBaseEvent, theDir, theCursor) {
     var Public = this;
 
-    this.Inherit(spark.GestureEvent, theType, theCursorId, theX, theY, theBaseEvent);
+    this.Inherit(spark.GestureEvent, theType, theBaseEvent, theCursor);
     
     /**
      * Direction vector  of the wipe event
@@ -401,10 +365,10 @@ spark.GestureEvent.ZOOM  = "gesture-zoom";
 spark.GestureEvent.ZOOM_FINISH = "gesture-zoom-finish";
 
 spark.ZoomGestureEvent = spark.Class("ZoomGestureEvent");
-spark.ZoomGestureEvent.Constructor = function(Protected, theType, theCursorId, theX, theY, theBaseEvent, theFirstDistance, theDistance, theZoomCenter, theCursorArray) {
+spark.ZoomGestureEvent.Constructor = function(Protected, theType, theBaseEvent, theMainCursor, thePartnerCursor, theFirstDistance, theDistance, theZoomCenter) {
     var Public = this;
 
-    this.Inherit(spark.GestureEvent, theType, theCursorId, theX, theY, theBaseEvent);
+    this.Inherit(spark.GestureEvent, theType, theBaseEvent, theMainCursor);
     
     /**
      * start distance between the zoom partners
@@ -434,12 +398,17 @@ spark.ZoomGestureEvent.Constructor = function(Protected, theType, theCursorId, t
     };
     
     /**
-     * list of zoom cursors
+     * get partner cursor
      */
-    var _myCursorArray = theCursorArray;
+    var _myPartnerCursor = thePartnerCursor;
 
-    Public.cursorarray getter = function () {
-        return _myCursorArray;
+    Public.partnerCursor getter = function () {
+        return _myPartnerCursor;
     };
 
 };
+
+/**
+ * rotate event: "XXX"
+ */
+spark.GestureEvent.ROTATE  = "gesture-rotate";
