@@ -14,7 +14,8 @@ spark.Window.Constructor = function(Protected) {
     var Base = {};
     const PICK_RADIUS = 1;
     var _myPickRadius = PICK_RADIUS;
-
+    var _myPickCounter = 0;
+    
     this.Inherit(spark.Stage);
     
     var _myCamera = null;
@@ -161,6 +162,7 @@ spark.Window.Constructor = function(Protected) {
     }
 
     Public.pickWidget = function(theX, theY) {
+        _myPickCounter++;
         var myBody = Public.picking.pickBodyBySweepingSphereFromBodies(theX, theY, _myPickRadius, Public.sceneNode);
         if(myBody) {
             var myBodyId = myBody.id;
@@ -245,6 +247,9 @@ spark.Window.Constructor = function(Protected) {
             var myEvent = new spark.StageEvent(spark.StageEvent.FRAME, Public, theTime, theDeltaT);
             Public.dispatchEvent(myEvent);
         }
+        Logger.info("picking per Frame # " + _myPickCounter);
+        _myPickCounter = 0;
+        print("----");
     };
 
     // Will be called before rendering the frame
