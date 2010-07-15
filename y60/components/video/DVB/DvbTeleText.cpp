@@ -97,9 +97,9 @@ Unsigned16 reverse[] = {
 DvbTeleText::DvbTeleText(const string & theDemuxDeviceName)
     : PosixThread()
     , _myDemuxFd(0)
-    , _myDemuxDeviceName(theDemuxDeviceName)
     , _myPid(0)
     , _myChannelHasLock(false)
+    , _myDemuxDeviceName(theDemuxDeviceName)
 {
 
 }
@@ -265,8 +265,8 @@ DvbTeleText::processStream(){
         // }
 
         // buf[4] buf[5] magazine number and row address
-        int myMagazineNumber = 0;
-        int myRowNumber = 0;
+        unsigned int myMagazineNumber = 0;
+        unsigned int myRowNumber = 0;
 
         for (int bc = 0; bc < 3; bc++) {
             bool isSet = buf[4] & (1 << (bc*2+2));
