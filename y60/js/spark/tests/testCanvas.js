@@ -11,25 +11,30 @@ try {
     var myFrameCounter = 0;
 
     var myCanvas = ourShow.getChildByName("offscreen-canvas-scene");
+    var myWorld = myCanvas.world;
     
-    // --- empty canvas setup --------------------------------------------------
-    var myEmptyCanvas = ourShow.getChildByName("empty-offscreen-canvas");
+    // EMPTY CANVASES SETUP ----------------------------------------------------
+    var myEmptyCanvas = ourShow.getChildByName("offscreen-canvas-empty");
+    var myEmptyMovertestCanvas = ourShow.getChildByName("offscreen-canvas-empty-movertest");
+    var myEmptyCanvases = [myEmptyCanvas, myEmptyMovertestCanvas];
     
     // SETUP PERSPECTIVE CAMERA
-    var myCamera = Node.createElement("camera");
-    myCamera.frustum = new Frustum();
-    myCamera.frustum.width = myEmptyCanvas.width;
-    myCamera.frustum.height = myEmptyCanvas.height;
-    myCamera.frustum.type = ProjectionType.perspective;
-    myCamera.position = new Vector3f(0,1,2);
-    myCamera.orientation = Quaternionf.createFromEuler(new Vector3f(radFromDeg(-30),0,0));
+    for(var i = 0; i < myEmptyCanvases.length; ++i) {
+        var myCamera = Node.createElement("camera");
+        myCamera.frustum = new Frustum();
+        myCamera.frustum.width = myEmptyCanvases[i].width;
+        myCamera.frustum.height = myEmptyCanvases[i].height;
+        myCamera.frustum.type = ProjectionType.perspective;
+        myCamera.position = new Vector3f(0,1,2);
+        myCamera.orientation = Quaternionf.createFromEuler(new Vector3f(radFromDeg(-30),0,0));
+        
+        myWorld.appendChild(myCamera);
+        myEmptyCanvases[i].getActiveViewport().camera = myCamera.id;
+        myEmptyCanvases[i].setActiveCamera(myCamera);
+    }
     
-    var myWorld = myCanvas.world;
-    myWorld.appendChild(myCamera);
-    myEmptyCanvas.getActiveViewport().camera = myCamera.id;
-    myEmptyCanvas.setActiveCamera(myCamera);
     
-    // --- clipping planes -----------------------------------------------------
+    // CLIPPING PLANE FOR EMPTY-CANVAS
     var myPlaneNode = Node.createElement("plane");
     myWorld.appendChild(myPlaneNode);
     
@@ -42,6 +47,13 @@ try {
     myEmptyCanvas.onPostViewportFunc = function() {
         myWorld.clippingplanes = "[]";
     }
+    
+    
+    // MOVER SETTINGS/MODIFICATION FOR EMPTY-MOVERTEST-CANVAS
+    myEmptyMovertestCanvas.setMover(TrackballMover, myEmptyMovertestCanvas.getActiveViewport());
+    var myRotation = Quaternionf.createFromEuler(new Vector3f(radFromDeg(-20),0,0));
+    myEmptyMovertestCanvas.getMover().movements.rotateByQuaternion(myRotation);
+    
     
     Base.onFrame = ourShow.onFrame;
     ourShow.onFrame = function(theTime) {

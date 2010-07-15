@@ -3,6 +3,7 @@ Common
 Meta
 Loader
 Rectangle
+Canvas
 )
 
 set(NOCG_TESTS
