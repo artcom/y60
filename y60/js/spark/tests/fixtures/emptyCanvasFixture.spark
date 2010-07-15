@@ -1,0 +1,11 @@
+<Window name="TestEmptyCanvas"
+        title="TestEmptyCanvas"
+        decorations="true"
+        mouseCursor="true"
+        width="900"
+        height="600"
+        swapInterval="1"
+        i18nContext="global-i18n">
+    <Canvas name="empty-canvas" x="475" y="25" width="400" height="250" autoCreate="false"/>
+</Window>
+
