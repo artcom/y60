@@ -267,7 +267,7 @@ OverlayBase.prototype.Constructor = function(Public, Protected, theScene, thePos
     /// Create an overlay without material
     function setup() {
         var myParent = null;
-        if (theParent !== null) {
+        if (theParent !== null && theParent !== undefined) { // why do we get passed both?
             if ("node" in theParent) {
                 myParent = theParent.node;
             } else {
