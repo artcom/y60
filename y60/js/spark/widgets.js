@@ -56,7 +56,7 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-/*jslint white: false, nomen: false, plusplus: false*/
+/*jslint , nomen:false, plusplus:false*/
 /*globals spark, Vector3f, Logger, Quaternionf, radFromDeg, GUI*/
 
 /**
@@ -84,7 +84,7 @@ spark.sceneNodeMap = {};
  */
 spark.Widget = spark.AbstractClass("Widget");
 
-spark.Widget.Constructor = function(Protected) {
+spark.Widget.Constructor = function (Protected) {
     var Base = {};
     var Public = this;
 
@@ -95,6 +95,10 @@ spark.Widget.Constructor = function(Protected) {
     // all widgets participate in event dispatch.
     this.Inherit(spark.EventDispatcher);
 
+    /////////////////////
+    // Private Members //
+    /////////////////////
+
     var _mySceneNode   = null;
 
     /**
@@ -102,9 +106,9 @@ spark.Widget.Constructor = function(Protected) {
      * 
      * XXX: try to get rid of this accessor
      */
-    Public.sceneNode getter = function() {
+    Public.__defineGetter__("sceneNode", function () {
         return _mySceneNode;
-    };
+    });
 
     /**
      * Access the INNER scene node for this widget.
@@ -117,91 +121,81 @@ spark.Widget.Constructor = function(Protected) {
      * 
      * XXX: try to get rid of this accessor
      */
-    Public.innerSceneNode getter = function() {
+    Public.__defineGetter__("innerSceneNode", function () {
         return _mySceneNode;
-    };
-
+    });
 
     // WORLD POSITION AND ORIENTATION GETTERS
 
-    Public.Getter("worldPosition", function() {
-        if(!_mySceneNode) {
+    Public.Getter("worldPosition", function () {
+        if (!_mySceneNode) {
             Logger.error("World-related properties of widgets can only be retrieved after realization");
             return null;
         }
         return _mySceneNode.globalmatrix.getTranslation();
     });
 
-    Public.Getter("worldScale", function() {
-        if(!_mySceneNode) {
+    Public.Getter("worldScale", function () {
+        if (!_mySceneNode) {
             Logger.error("World-related properties of widgets can only be retrieved after realization");
             return null;
         }
         return _mySceneNode.globalmatrix.getScale();
     });
 
-    Public.Getter("worldRotation", function() {
-        if(!_mySceneNode) {
+    Public.Getter("worldRotation", function () {
+        if (!_mySceneNode) {
             Logger.error("World-related properties of widgets can only be retrieved after realization");
             return null;
         }
         return _mySceneNode.globalmatrix.getRotation();
     });
 
-
     // WORLD BOUND GETTERS (XXX: ugly, only work after realization)
-
-    Public.Getter("worldBounds", function() {
-        if(!_mySceneNode) {
+    Public.Getter("worldBounds", function () {
+        if (!_mySceneNode) {
             Logger.error("World-related properties of widgets can only be retrieved after realization");
             return null;
         }
-
         var myBoundingBox = _mySceneNode.boundingbox;
-
-        if(myBoundingBox == "[]") {
+        if (myBoundingBox + "" === "[]") {
             Logger.error("Widget does not have a bounding box yet.");
             return null;
         }
-
         return myBoundingBox.size;
     });
 
-    Public.Getter("worldWidth", function(){
+    Public.Getter("worldWidth", function () {
         return Public.worldBounds.x;
     });
 
-    Public.Getter("worldHeight", function(){
+    Public.Getter("worldHeight", function () {
         return Public.worldBounds.y;
     });
 
-    Public.Getter("worldDepth", function(){
+    Public.Getter("worldDepth", function () {
         return Public.worldBounds.z;
     });
 
-
     // STAGE
-
     /**
      * Access the stage for this widget.
      * 
      * Works by traversing the hierarchy upwards until a stage is found.
      */
-    Public.stage getter = function() {
+    Public.__defineGetter__("stage", function () {
         var myCurrent = Public;
-        while(myCurrent) {
-            if("Stage" in myCurrent._classes_) {
+        while (myCurrent) {
+            if ("Stage" in myCurrent._classes_) {
                 return myCurrent;
             }
             myCurrent = myCurrent.parent;
         }
         Logger.fatal("Widget " + Public.name + " is not the child of a valid stage.");
         return null;
-    };
-
+    });
 
     // STAGE EVENTS
-
     /**
      * Add an event listener.
      * 
@@ -214,18 +208,18 @@ spark.Widget.Constructor = function(Protected) {
      * dispatch on. Everyone just gets the events directly.
      */
     Base.addEventListener = Public.addEventListener;
-    Public.addEventListener = function(theType, theListener, theUseCapture) {
-        if(!("Stage" in Public._classes_)) {
-            switch(theType) {
+    Public.addEventListener = function (theType, theListener, theUseCapture) {
+        if (!("Stage" in Public._classes_)) {
+            switch (theType) {
             case spark.StageEvent.FRAME:
             case spark.StageEvent.PRE_RENDER:
             case spark.StageEvent.POST_RENDER:
-                if(theUseCapture) {
+                if (theUseCapture) {
                     Logger.fatal("Capture of stage events is forbidden.");
                 }
                 Public.stage.addEventListener(
                     theType,
-                    function(theEvent) {
+                    function (theEvent) {
                         Public.dispatchEvent(theEvent);
                     },
                     false
@@ -242,8 +236,8 @@ spark.Widget.Constructor = function(Protected) {
      * This override is a hack, symmetric to addEventListener above.
      */
     Base.removeEventListener = Public.removeEventListener;
-    Public.removeEventListener = function(theType, theListener, theUseCapture) {
-        switch(theType) {
+    Public.removeEventListener = function (theType, theListener, theUseCapture) {
+        switch (theType) {
         case spark.StageEvent.FRAME:
         case spark.StageEvent.PRE_RENDER:
         case spark.StageEvent.POST_RENDER:
@@ -256,61 +250,59 @@ spark.Widget.Constructor = function(Protected) {
     };
 
     // ALPHA
-
-    this.Property("alpha", Number, 1.0, applyAlpha);
-
     function applyAlpha() {
         Public.propagateAlpha();
-    };
-
+    }
+    
+    this.Property("alpha", Number, 1.0, applyAlpha);
     var _myActualAlpha = 1.0;
-
-    Public.Getter("actualAlpha", function() {
+    
+    Public.Getter("actualAlpha", function () {
         return _myActualAlpha;
     });
 
-
-    Public.Getter("parentAlpha", function() {
+    Public.Getter("parentAlpha", function () {
         var myParentAlpha = 1.0;
-        if((Public.parent) && ("actualAlpha" in Public.parent)) {
+        if ((Public.parent) && ("actualAlpha" in Public.parent)) {
             myParentAlpha = Public.parent.actualAlpha;
         }
         return myParentAlpha;
     });
 
-
-    Public.propagateAlpha = function() {
+    Public.propagateAlpha = function () {
         _myActualAlpha = Public.parentAlpha * Public.alpha;//_myAlpha;
         var myChildCount = Public.children.length;
-        for(var i = 0; i < myChildCount; i++) {
+        for (var i = 0; i < myChildCount; i++) {
             var myChild = Public.children[i];
-            if("propagateAlpha" in myChild) {
+            if ("propagateAlpha" in myChild) {
                 myChild.propagateAlpha();
             }
         }
     };
 
-
     // VISIBILITY AND SENSIBLITY
-
-    Public.Property("visible", Boolean, true, applyVisibleAndSensible);
-
-    Public.Property("sensible", Boolean, true, applyVisibleAndSensible);
-
     function applyVisibleAndSensible() {
-        if(_mySceneNode) {
+        if (_mySceneNode) {
             _mySceneNode.insensible = !(Public.visible && Public.sensible);
             _mySceneNode.visible    = Public.visible;
         }
     }
+    
+    Public.Property("visible", Boolean, true, applyVisibleAndSensible);
+    Public.Property("sensible", Boolean, true, applyVisibleAndSensible);
 
     // POSITION
-
-    Public.Getter("position", function() {
+    function applyPosition() {
+        if (_mySceneNode) {
+            _mySceneNode.position = Public.position;
+        }
+    }
+    
+    Public.Getter("position", function () {
         return new Vector3f(Public.x, Public.y, Public.z);
     });
 
-    Public.Setter("position", function(theValue) {
+    Public.Setter("position", function (theValue) {
         Public.x = theValue.x;
         Public.y = theValue.y;
         Public.z = theValue.z;
@@ -320,19 +312,18 @@ spark.Widget.Constructor = function(Protected) {
     this.Property("y", Number, 0.0, applyPosition);
     this.Property("z", Number, 0.0, applyPosition);
 
-    function applyPosition() {
-        if(_mySceneNode) {
-            _mySceneNode.position = Public.position;
-        }
-    };
-
     // SCALE
-
-    Public.Getter("scale", function() {
+    function applyScale() {
+        if (_mySceneNode) {
+            _mySceneNode.scale = Public.scale;
+        }
+    }
+    
+    Public.Getter("scale", function () {
         return new Vector3f(Public.scaleX, Public.scaleY, Public.scaleZ);
     });
 
-    Public.Setter("scale", function(theValue) {
+    Public.Setter("scale", function (theValue) {
         Public.scaleX = theValue.x;
         Public.scaleY = theValue.y;
         Public.scaleZ = theValue.z;
@@ -342,20 +333,18 @@ spark.Widget.Constructor = function(Protected) {
     this.Property("scaleY", Number, 1.0, applyScale);
     this.Property("scaleZ", Number, 1.0, applyScale);
 
-    function applyScale() {
-        if(_mySceneNode) {
-            _mySceneNode.scale = Public.scale;
-        }
-    };
-
-
     // PIVOT
-
-    Public.Getter("pivot", function() {
+    function applyPivot() {
+        if (_mySceneNode) {
+            _mySceneNode.pivot = Public.pivot;
+        }
+    }
+    
+    Public.Getter("pivot", function () {
         return new Vector3f(Public.pivotX, Public.pivotY, Public.pivotZ);
     });
 
-    Public.Setter("pivot", function(theValue) {
+    Public.Setter("pivot", function (theValue) {
         Public.pivotX = theValue.x;
         Public.pivotY = theValue.y;
         Public.pivotZ = theValue.z;
@@ -365,23 +354,18 @@ spark.Widget.Constructor = function(Protected) {
     this.Property("pivotY", Number, 0.0, applyPivot);
     this.Property("pivotZ", Number, 0.0, applyPivot);
 
-    function applyPivot() {
-        if(_mySceneNode) {
-            _mySceneNode.pivot = Public.pivot;
-        }
-    }
-
-
     // ORIGIN
     // XXX: origins must be set up before realization
     //      this is not thought out well and has been
     //      introduced as a requirement-fullfilling hack.
-
-    Public.Getter("origin", function() {
+    function applyOrigin() {
+    }
+    
+    Public.Getter("origin", function () {
         return new Vector3f(Public.originX, Public.originY, Public.originZ);
     });
 
-    Public.Setter("origin", function(theValue) {
+    Public.Setter("origin", function (theValue) {
         Public.originX = theValue.x;
         Public.originY = theValue.y;
         Public.originZ = theValue.z;
@@ -391,17 +375,23 @@ spark.Widget.Constructor = function(Protected) {
     this.Property("originY", Number, 0.0, applyOrigin);
     this.Property("originZ", Number, 0.0, applyOrigin);
 
-    function applyOrigin() {
-    };
-
-
     // ROTATION
+    function applyRotation() {
+        if (_mySceneNode) {
+            var myRotation = new Vector3f(radFromDeg(Public.rotationX),
+                                          radFromDeg(Public.rotationY),
+                                          radFromDeg(Public.rotationZ));
 
-    Public.Getter("rotation", function() {
+            var myQuaternion = Quaternionf.createFromEuler(myRotation);
+            _mySceneNode.orientation = myQuaternion;
+        }
+    }
+    
+    Public.Getter("rotation", function () {
         return new Vector3f(Public.rotationX, Public.rotationY, Public.rotationZ);
     });
 
-    Public.Setter("rotation", function(theValue) {
+    Public.Setter("rotation", function (theValue) {
         Public.rotationX = theValue.x;
         Public.rotationY = theValue.y;
         Public.rotationZ = theValue.z;
@@ -411,45 +401,32 @@ spark.Widget.Constructor = function(Protected) {
     this.Property("rotationY", Number, 0.0, applyRotation);
     this.Property("rotationZ", Number, 0.0, applyRotation);
 
-    function applyRotation() {
-        if(_mySceneNode) {
-            var myRotation = new Vector3f(radFromDeg(Public.rotationX),
-                                          radFromDeg(Public.rotationY),
-                                          radFromDeg(Public.rotationZ));
-
-            var myQuaternion = Quaternionf.createFromEuler(myRotation);
-
-            _mySceneNode.orientation = myQuaternion;
-        }
-    };
-
     // INTERNATIONALISATION HOOKS
-
     var _myI18nContext = null;
 
-    Public.i18nContext getter = function() {
-        if(_myI18nContext) {
+    Public.__defineGetter__("i18nContext", function () {
+        if (_myI18nContext) {
             return _myI18nContext;
         } else {
-            if(Public.parent) {
+            if (Public.parent) {
                 return Public.parent.i18nContext;
             } else {
                 return null;
             }
         }
-    };
+    });
 
-    Public.i18nContext setter = function(theValue) {
+    Public.__defineGetter__("i18nContext", function (theValue) {
         _myI18nContext = theValue; // XXX: re-trigger i18n events? how?
-    };
+    });
 
-    Public.i18nContexts getter = function() {
+    Public.__defineGetter__("i18nContexts", function () {
         var myContexts = [];
         var myCurrent = Public;
-        while(myCurrent) {
-            if(myContexts.length > 0) {
+        while (myCurrent) {
+            if (myContexts.length > 0) {
                 var myContext = myCurrent.i18nContext;
-                if(myContexts[myContexts.length - 1] != myContext) {
+                if (myContexts[myContexts.length - 1] !== myContext) {
                     myContexts.push(myCurrent.i18nContext);
                 }
             } else {
@@ -458,14 +435,14 @@ spark.Widget.Constructor = function(Protected) {
             myCurrent = myCurrent.parent;
         }
         return myContexts;
-    };
+    });
 
-    Public.getI18nItemByName = function(theName) {
+    Public.getI18nItemByName = function (theName) {
         var myContexts = Public.i18nContexts;
-        for(var i = 0; i < myContexts.length; i++) {
+        for (var i = 0; i < myContexts.length; i++) {
             var myContext = myContexts[i];
             var myItem = myContext.getChildByName(theName);
-            if(myItem) {
+            if (myItem) {
                 return myItem;
             }
         }
@@ -473,12 +450,11 @@ spark.Widget.Constructor = function(Protected) {
     };
 
     // ANIMATION HELPERS
-
-    Public.animateProperty = function(theDuration, theEasing, theProperty, theStart, theEnd) {
+    Public.animateProperty = function (theDuration, theEasing, theProperty, theStart, theEnd) {
         return new GUI.PropertyAnimation(theDuration, theEasing, Public, theProperty, theStart, theEnd);
     };
 
-    Public.animateFade = function(theDuration, theEnd, theEasing) {
+    Public.animateFade = function (theDuration, theEnd, theEasing) {
         if (!theDuration) {
             theDuration = 250.0;
         }
@@ -491,7 +467,7 @@ spark.Widget.Constructor = function(Protected) {
         return Public.animateProperty(theDuration, theEasing, "alpha", Public.alpha, theEnd);
     };
 
-    Public.animateFadeIn = function(theDuration, theEasing) {
+    Public.animateFadeIn = function (theDuration, theEasing) {
         if (!theDuration) {
             theDuration = 250.0;
         }
@@ -501,7 +477,7 @@ spark.Widget.Constructor = function(Protected) {
         return Public.animateProperty(theDuration, theEasing, "alpha", 0.0, 1.0);
     };
 
-    Public.animateFadeOut = function(theDuration, theEasing) {
+    Public.animateFadeOut = function (theDuration, theEasing) {
         if (!theDuration) {
             theDuration = 250.0;
         }
@@ -513,35 +489,30 @@ spark.Widget.Constructor = function(Protected) {
 
 
     // REALIZATION
-
     Base.realize = Public.realize;
-    Public.realize = function(theSceneNode) {
+    Public.realize = function (theSceneNode) {
         _mySceneNode = theSceneNode;
-
         _mySceneNode.sticky = true;
-
+        
         spark.sceneNodeMap[_mySceneNode.id] = Public;
-
+        
         Base.realize();
-
+        
         applyVisibleAndSensible();
         applyPosition();
         applyScale();
         applyRotation();
         applyPivot();
         applyAlpha();
-
         //Public.propagateAlpha();
     };
 
     Base.postRealize = Public.postRealize;
-    Public.postRealize = function() {
+    Public.postRealize = function () {
         var myContextName = Protected.getString("i18nContext", "");
-        if(myContextName != "") {
+        if (myContextName !== "") {
             _myI18nContext = Public.getChildByName(myContextName);
         }
-
         Base.postRealize();
     };
-
 };

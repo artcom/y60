@@ -286,7 +286,7 @@ spark.Canvas.prepareMerge = function prepareMerge(theSceneFilePath) {
     adjustNodeId(myDom.find(".//canvases/canvas"), false);
     var myViewport = myDom.find(".//viewport");
     adjustNodeId(myViewport, false);
-    adjustNodeId(myDom.find(".//camera"), false);
+    // adjustNodeId(myDom.find(".//camera"), false); // XXX not necessary since already done in world 
     myViewport.camera = myDom.find(".//camera").id;
     
     // REWRITE TEXTURE SRC PATH
