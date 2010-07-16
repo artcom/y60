@@ -242,21 +242,22 @@ spark.Window.Constructor = function(Protected) {
 
         var myWidget = Public.pickWidget(theX, theY);
 
-        if(myWidget) {
-            if(theState) {
-                // XXX: click should be more well-defined and button-up-based.
-                Logger.debug("Mouse clicks " + myWidget + " with button " + myButton);
-                var myClickEvent = new spark.MouseEvent(spark.MouseEvent.CLICK, theX, theY, 0, 0, myButton, myButtonStates);
-                myWidget.dispatchEvent(myClickEvent);
+        if(!myWidget) {
+            myWidget = Public;
+        }
+        if(theState) {
+            // XXX: click should be more well-defined and button-up-based.
+            Logger.debug("Mouse clicks " + myWidget + " with button " + myButton);
+            var myClickEvent = new spark.MouseEvent(spark.MouseEvent.CLICK, theX, theY, 0, 0, myButton, myButtonStates);
+            myWidget.dispatchEvent(myClickEvent);
 
-                Logger.debug("Mouse " + myButton + " button down on " + myWidget);
-                var myDownEvent = new spark.MouseEvent(spark.MouseEvent.BUTTON_DOWN, theX, theY, 0, 0, myButton, myButtonStates);
-                myWidget.dispatchEvent(myDownEvent);
-            } else {
-                Logger.debug("Mouse " + myButton + " button up on " + myWidget);
-                var myUpEvent = new spark.MouseEvent(spark.MouseEvent.BUTTON_UP, theX, theY, 0, 0, myButton, myButtonStates);
-                myWidget.dispatchEvent(myUpEvent);
-            }
+            Logger.debug("Mouse " + myButton + " button down on " + myWidget);
+            var myDownEvent = new spark.MouseEvent(spark.MouseEvent.BUTTON_DOWN, theX, theY, 0, 0, myButton, myButtonStates);
+            myWidget.dispatchEvent(myDownEvent);
+        } else {
+            Logger.debug("Mouse " + myButton + " button up on " + myWidget);
+            var myUpEvent = new spark.MouseEvent(spark.MouseEvent.BUTTON_UP, theX, theY, 0, 0, myButton, myButtonStates);
+            myWidget.dispatchEvent(myUpEvent);
         }
     };
 
