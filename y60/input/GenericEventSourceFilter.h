@@ -56,47 +56,35 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-#ifndef ASS_EVENT_SOURCE_INCLUDED
-#define ASS_EVENT_SOURCE_INCLUDED
+#ifndef _Y60_INPUT_GENEREICEVENTSOURCEFILTER_INCLUDED_
+#define _Y60_INPUT_GENEREICEVENTSOURCEFILTER_INCLUDED_
 
-#include "y60_eventsource_settings.h"
-#include <y60/components/input/ASSDriver/ASSCore/ASSDriver.h>
-#include <y60/input/GenericEventSourceFilter.h>
+#include "y60_input_settings.h"
+
+#include "GenericEvent.h"
+#include "IEventSource.h"
+#include <asl/base/Ptr.h>
+#include <vector>
 
 namespace y60 {
+    struct CursorFilter {
+        CursorFilter(std::string theEventType, std::string theIdAttributeName) : _myEventType(theEventType), _myCursorAttributeName(theIdAttributeName) {}
+        std::string _myEventType;
+        std::string _myCursorAttributeName;
+    };
+    class Y60_INPUT_DECL GenericEventSourceFilter {
+        public:
+            GenericEventSourceFilter();
+            virtual ~GenericEventSourceFilter();
+            void addCursorFilter(std::string theEventType, std::string theIdAttributeName);
+            void applyFilter(EventPtrList & theEventList);
+            void analyzeEvents(EventPtrList theEventList, std::string theIdAttributeName);
+        private:          
+            void applyCursorFilter(std::string theEventType, std::string theIdAttributeName, EventPtrList & theEventList);
+            std::vector<CursorFilter> _myCursorFilter;
+    };
 
-class ASSEventSource : public asl::PlugInBase,
-                       public ASSDriver,
-                       public y60::IEventSource,
-                       public GenericEventSourceFilter
-{
-    public:
-        ASSEventSource(asl::DLHandle theHandle);
-        virtual y60::EventPtrList poll();
+    typedef asl::Ptr<IEventSource> IEventSourcePtr;
+}
 
-
-        const char * ClassName() {
-            static const char * myClassName = "ASSEventSource";
-            return myClassName;
-        }
-
-        virtual void onGetProperty(const std::string & thePropertyName,
-                           PropertyValue & theReturnValue) const;
-        virtual void onSetProperty(const std::string & thePropertyName,
-                           const PropertyValue & thePropertyValue);
-        // TODO virtual void onUpdateSettings(dom::NodePtr theSettings);
-
-        void createTransportLayerEvent(const std::string & theType );
-    protected:
-        void createEvent( int theID, const std::string & theType,
-                const asl::Vector2f & theRawPosition, const asl::Vector3f & thePosition3D,
-                const asl::Box2f & theROI, float intensity, const ASSEvent & theEvent);
-    private:
-        dom::NodePtr                 _myEventSchema;
-        asl::Ptr<dom::ValueFactory>  _myValueFactory;
-        y60::EventPtrList            _myEvents;
-};
-
-} // end of namespace y60
-
-#endif // ASS_EVENT_SOURCE_INCLUDED
+#endif _Y60_INPUT_GENEREICEVENTSOURCEFILTER_INCLUDED_

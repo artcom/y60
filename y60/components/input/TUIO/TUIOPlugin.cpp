@@ -10,6 +10,7 @@
 #include <y60/base/DataTypes.h>
 #include <y60/input/IEventSource.h>
 #include <y60/input/GenericEvent.h>
+#include <y60/input/GenericEventSourceFilter.h>
 #include <y60/jsbase/IScriptablePlugin.h>
 #include <y60/jsbase/JSWrapper.h>
 #include <y60/jsbase/JSNode.h>
@@ -25,7 +26,8 @@ using namespace TUIO;
 class TUIOPlugin : public PlugInBase,
                    public y60::IEventSource,
                    public jslib::IScriptablePlugin,
-                   public TuioListener
+                   public TuioListener,
+                   public GenericEventSourceFilter
 {
 
 private:
@@ -44,6 +46,11 @@ public:
     {
         registerStandardTypes(*_myEventValueFactory);
         registerSomTypes(*_myEventValueFactory);
+
+        // add filter for deleting multiple update
+	    if (_myFilterMultipleUpdatePerCursorFlag) {
+            addCursorFilter("update", "id");
+        }
     }
 
     ~TUIOPlugin()
@@ -79,80 +86,44 @@ public:
             }
 
             _myUndeliveredCursors.clear();
-			//analyzeEvents(myEvents);
 		    //AC_INFO << "unfiltered toui events # " << myEvents.size();
-			EventPtrList myEventsFiltered;
-			if (_myFilterMultipleUpdatePerCursorFlag) {
-				filterEventsPerCursor("update", myEvents, myEventsFiltered);
-			} else {
-				myEventsFiltered = myEvents;
-			}
 
-
-			//analyzeEvents(myEventsFiltered);
-		    AC_INFO << "deliver toui events # " << myEventsFiltered.size();
-            return myEventsFiltered;
+            // logs event statistics for multiple events per cursor and type
+        	//analyzeEvents(_myEvents, "id");
+            // do the event filter in base class GenericEventSourceFilter
+            applyFilter(myEvents);
+		    //AC_INFO << "deliver toui events # " << myEvents.size();
+            return myEvents;
         } else {
             return EventPtrList();
         }
     }
-	void analyzeEvents(EventPtrList theEventList) {
-		std::map<int, std::map<std::string, int> > myCursorEventCounter;
-		{
-			EventPtrList::iterator myEndIt   = theEventList.end();
-			EventPtrList::iterator myIt = theEventList.begin();
-			for(; myIt !=  myEndIt; ++myIt){
-				GenericEventPtr myGenericEvent(dynamic_cast_Ptr<GenericEvent>(*myIt));
-				dom::NodePtr myNode = myGenericEvent->getNode();
-				int myCursorId = asl::as<int>(myNode->getAttributeString("id"));
-				std::string myCursorType = myNode->getAttributeString("type");
-				if (myCursorEventCounter.find(myCursorId) == myCursorEventCounter.end()) {
-					myCursorEventCounter[myCursorId][myCursorType] = 0;
-				} else {
-					if (myCursorEventCounter[myCursorId].find(myCursorType) == myCursorEventCounter[myCursorId].end()) {
-						myCursorEventCounter[myCursorId][myCursorType] = 0;
-					}
-				}
-				myCursorEventCounter[myCursorId][myCursorType]++;
-			}
-		}
-		{
-			std::map<int, std::map<std::string, int> >::iterator myEndIt   = myCursorEventCounter.end();
-			std::map<int, std::map<std::string, int> >::iterator myIt = myCursorEventCounter.begin();
-			for(; myIt !=  myEndIt; ++myIt){
-				std::map<std::string, int>::iterator myEndItType   = myIt->second.end();
-				std::map<std::string, int>::iterator myItType      = myIt->second.begin();
-				for(; myItType !=  myEndItType; ++myItType){
-					AC_INFO << "TUIOCLIENT::Cursor id: " << myIt->first << " with type: " << myItType->first << " has # " << myItType->second << " events";
-				}
-			}
-			AC_INFO << "-------";
-		}
-	}
+    void filterEventsPerCursor(std::string theEventType, std::string theIdAttributeName, EventPtrList & theEventList) {
+	    std::map<int, std::vector<GenericEventPtr > > myEvents2Shrink;
+	    EventPtrList::iterator myIt = theEventList.begin();
+	    unsigned int counter= 0;
+        for (; myIt !=theEventList.end(); ) {
+		    counter++;
+		    GenericEventPtr myGenericEvent(dynamic_cast_Ptr<GenericEvent>(*myIt));
+		    dom::NodePtr myNode = myGenericEvent->getNode();
+		    int myCursorId = asl::as<int>(myNode->getAttributeString(theIdAttributeName));
+		    std::string myEventType = myNode->getAttributeString("type");
+		    if (myEventType == theEventType) {
+			    if (myEvents2Shrink.find(myCursorId) == myEvents2Shrink.end()) {
+				    myEvents2Shrink[myCursorId] = std::vector<GenericEventPtr>();
+			    }
+			    myEvents2Shrink[myCursorId].push_back(myGenericEvent);
+                myIt = theEventList.erase(myIt);
+            } else {
+                ++myIt;
+            }
+        }
 
-	void filterEventsPerCursor(std::string theEventType, EventPtrList theEventList, EventPtrList & theTargetEventList) {
-		std::map<int, std::vector<GenericEventPtr > > myEvents;
-		EventPtrList::iterator myEndIt   = theEventList.end();
-		EventPtrList::iterator myIt = theEventList.begin();
-		for(; myIt !=  myEndIt; ++myIt){
-			GenericEventPtr myGenericEvent(dynamic_cast_Ptr<GenericEvent>(*myIt));
-			dom::NodePtr myNode = myGenericEvent->getNode();
-			int myCursorId = asl::as<int>(myNode->getAttributeString("id"));
-			std::string myEventType = myNode->getAttributeString("type");
-			if (myEventType == theEventType) {
-				if (myEvents.find(myCursorId) == myEvents.end()) {
-					myEvents[myCursorId] = std::vector<GenericEventPtr>();
-				}
-				myEvents[myCursorId].push_back(myGenericEvent);
-			} else {
-				theTargetEventList.push_back(myGenericEvent);
-			}
-		}
-		std::map<int, std::vector<GenericEventPtr > >::iterator myEndIt2   = myEvents.end();
-		std::map<int, std::vector<GenericEventPtr > >::iterator myIt2 = myEvents.begin();
-		for(; myIt2 !=  myEndIt2; ++myIt2){
-			theTargetEventList.push_back((myIt2->second)[(myIt2->second).size()-1]);
-		}
+        std::map<int, std::vector<GenericEventPtr > >::iterator myEndIt2   = myEvents2Shrink.end();
+	    std::map<int, std::vector<GenericEventPtr > >::iterator myIt2 = myEvents2Shrink.begin();
+	    for(; myIt2 !=  myEndIt2; ++myIt2){
+		    theEventList.push_back((myIt2->second)[(myIt2->second).size()-1]);
+	    }
 	}
 
 
