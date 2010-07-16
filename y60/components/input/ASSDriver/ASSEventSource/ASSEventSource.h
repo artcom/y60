@@ -61,12 +61,14 @@
 
 #include "y60_eventsource_settings.h"
 #include <y60/components/input/ASSDriver/ASSCore/ASSDriver.h>
+#include <y60/input/GenericEventSourceFilter.h>
 
 namespace y60 {
 
 class ASSEventSource : public asl::PlugInBase,
                        public ASSDriver,
-                       public y60::IEventSource
+                       public y60::IEventSource,
+                       public GenericEventSourceFilter
 {
     public:
         ASSEventSource(asl::DLHandle theHandle);
