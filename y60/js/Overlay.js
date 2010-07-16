@@ -57,7 +57,7 @@
 */
 
 /*jslint white:false, plusplus:false, nomen:false*/
-/*globals use, print, exit, window, Logger, OverlayBase, Matrix4f, Vector3f,
+/*globals use, exit, window, Logger, OverlayBase, Matrix4f, Vector3f,
           Box3f, Exception, fileline, Node, product, expandEnvironment,
           asColor, createUniqueId, Modelling, Vector2i, TextureApplyMode,
           Playlist, addMaterialRequirement, getImageSize*/
@@ -267,7 +267,7 @@ OverlayBase.prototype.Constructor = function(Public, Protected, theScene, thePos
     /// Create an overlay without material
     function setup() {
         var myParent = null;
-        if (theParent !== undefined) {
+        if (theParent !== null) {
             if ("node" in theParent) {
                 myParent = theParent.node;
             } else {
@@ -855,7 +855,7 @@ MovieOverlay.prototype.Constructor = function(Public, Protected, theScene, theSo
                 myImage.decoderhint = new Playlist().getVideoDecoderHintFromURL(myImage.src, false);
             }
             myImage.audio = theAudioFlag;
-            if (thePixelFormat === undefined) {
+            if (thePixelFormat === null) {
                 thePixelFormat = "RGB";
             }
             myImage.targetpixelformat = thePixelFormat;
