@@ -56,8 +56,8 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-#ifndef _Y60_INPUT_GENEREICEVENTSOURCEFILTER_INCLUDED_
-#define _Y60_INPUT_GENEREICEVENTSOURCEFILTER_INCLUDED_
+#ifndef _Y60_INPUT_GENERICEVENTSOURCEFILTER_INCLUDED_
+#define _Y60_INPUT_GENERICEVENTSOURCEFILTER_INCLUDED_
 
 #include "y60_input_settings.h"
 
@@ -87,4 +87,4 @@ namespace y60 {
     typedef asl::Ptr<IEventSource> IEventSourcePtr;
 }
 
-#endif _Y60_INPUT_GENEREICEVENTSOURCEFILTER_INCLUDED_
+#endif //_Y60_INPUT_GENERICEVENTSOURCEFILTER_INCLUDED_
