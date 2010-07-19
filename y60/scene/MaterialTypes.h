@@ -67,7 +67,7 @@
 namespace y60 {
 
     enum ParameterFunction { PASS_THROUGH, TANGENT };
-    static const char * ParameterFunctionStrings[] =
+    const char * const ParameterFunctionStrings[] =
     {
         VERTEXPARAM_PASS_THROUGH,
         VERTEXPARAM_TANGENT,
