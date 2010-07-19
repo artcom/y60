@@ -77,6 +77,9 @@ spark.Canvas.Constructor = function (Protected) {
     Public.__defineSetter__("render", function(theBoolean) {
         _myRenderFlag = theBoolean;
     });
+    Public.__defineGetter__("render", function () {
+        return _myRenderFlag;
+    });
     
     ////////////////////
     // Public Methods //
@@ -211,14 +214,14 @@ spark.Canvas.Constructor = function (Protected) {
     Public.onPreViewport = function(theViewport) {
         Base.onPreViewport(theViewport);
         if (_onPreViewportFunc) {
-            _onPreViewportFunc();
+            _onPreViewportFunc(theViewport);
         }
     };
     
     Base.onPostViewport = Public.onPostViewport;
     Public.onPostViewport = function(theViewport) {
         if (_onPostViewportFunc) {
-            _onPostViewportFunc();
+            _onPostViewportFunc(theViewport);
         }
         Base.onPostViewport(theViewport);
     };
