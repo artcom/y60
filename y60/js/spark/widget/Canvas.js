@@ -77,6 +77,9 @@ spark.Canvas.Constructor = function (Protected) {
     Public.__defineSetter__("render", function(theBoolean) {
         _myRenderFlag = theBoolean;
     });
+    Public.__defineGetter__("render", function () {
+        return _myRenderFlag;
+    });
     
     ////////////////////
     // Public Methods //
