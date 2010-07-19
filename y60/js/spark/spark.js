@@ -137,5 +137,6 @@ if (!("disableSparkWidgets" in this)) {
     use("spark/add-ons/RoundedCornerImage.js");
     use("spark/add-ons/StretchyImage.js");
     use("spark/add-ons/VideoCapture.js");
+    use("spark/add-ons/Slider.js");
 
 }
