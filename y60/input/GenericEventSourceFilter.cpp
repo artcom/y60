@@ -71,7 +71,7 @@ namespace y60 {
     // apply filter in place
     void GenericEventSourceFilter::applyFilter(EventPtrList & theEventList) {
         for (unsigned i = 0; i < _myCursorFilter.size(); i++) {
-            AC_INFO << "filter cursor events with type: " << _myCursorFilter[i]._myEventType << " and cursor id attribute: " << _myCursorFilter[i]._myCursorAttributeName;
+            //AC_INFO << "filter cursor events with type: " << _myCursorFilter[i]._myEventType << " and cursor id attribute: " << _myCursorFilter[i]._myCursorAttributeName;
             applyCursorFilter(_myCursorFilter[i]._myEventType, _myCursorFilter[i]._myCursorAttributeName, theEventList);
         }
     }

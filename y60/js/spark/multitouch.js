@@ -365,7 +365,7 @@ spark.GestureEvent.ZOOM  = "gesture-zoom";
 spark.GestureEvent.ZOOM_FINISH = "gesture-zoom-finish";
 
 spark.ZoomGestureEvent = spark.Class("ZoomGestureEvent");
-spark.ZoomGestureEvent.Constructor = function(Protected, theType, theBaseEvent, theMainCursor, thePartnerCursor, theFirstDistance, theDistance, theZoomCenter) {
+spark.ZoomGestureEvent.Constructor = function(Protected, theType, theBaseEvent, theMainCursor, thePartnerCursor, theFirstDistance, theDistance, theZoomCenter, theLastDistance) {
     var Public = this;
 
     this.Inherit(spark.GestureEvent, theType, theBaseEvent, theMainCursor);
@@ -377,6 +377,15 @@ spark.ZoomGestureEvent.Constructor = function(Protected, theType, theBaseEvent, 
 
     Public.firstdistance getter = function () {
         return _myFirstDistance;
+    };
+    
+    /**
+     * current distance between zoom partners
+     */
+    var _myLastDistance = theLastDistance;
+
+    Public.lastdistance getter = function() {
+        return _myLastDistance;
     };
     
     /**
@@ -412,3 +421,37 @@ spark.ZoomGestureEvent.Constructor = function(Protected, theType, theBaseEvent, 
  * rotate event: "XXX"
  */
 spark.GestureEvent.ROTATE  = "gesture-rotate";
+spark.RotateGestureEvent = spark.Class("RotateGestureEvent");
+spark.RotateGestureEvent.Constructor = function(Protected, theType, theBaseEvent, theMainCursor, thePartnerCursor, theAngle, theZoomCenter) {
+    var Public = this;
+
+    this.Inherit(spark.GestureEvent, theType, theBaseEvent, theMainCursor);
+    
+    /**
+     * angle 
+     */
+    var _myAngle = theAngle;
+
+    Public.angle getter = function () {
+        return _myAngle;
+    };
+    
+    /**
+     * get partner cursor
+     */
+    var _myPartnerCursor = thePartnerCursor;
+
+    Public.partnerCursor getter = function () {
+        return _myPartnerCursor;
+    };
+    
+    /**
+     * midpoint between the zoom partner pos
+     */
+    var _myZoomCenter = theZoomCenter;
+
+    Public.zoomcenter getter = function () {
+        return _myZoomCenter;
+    };
+
+};
