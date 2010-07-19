@@ -26,6 +26,46 @@ spark.Slider.Constructor = function(Protected) {
     Public.__defineSetter__("eventTarget", function(theTarget) {
         _myEventTarget = theTarget;
     });
+    
+    Public.__defineSetter__("centered", function(theFlag) {
+        _centered = theFlag;
+    });
+    
+    Public.__defineGetter__("centered", function() {
+        return _centered;
+    });
+    
+    Public.__defineSetter__("sticky", function(theFlag) {
+        _sticky = theFlag;
+    });
+    
+    Public.__defineGetter__("sticky", function() {
+        return _sticky;
+    });
+    
+    Public.__defineGetter__("activeCursor", function() {
+        return _myActiveCursor;
+    });
+    
+    Public.__defineGetter__("idleCursor", function() {
+        return _myIdleCursor;
+    });
+    
+    Public.__defineGetter__("horizontalLock", function() {
+        return _horizontalLock;
+    });
+    
+    Public.__defineSetter__("horizontalLock", function(theHorizontalLock) {
+        _horizontalLock = theHorizontalLock;
+    });
+    
+    Public.__defineGetter__("verticalLock", function() {
+        return _verticalLock;
+    });
+    
+    Public.__defineSetter__("verticalLock", function(theVerticalLock) {
+        _verticalLock = theVerticalLock;
+    });
 
     Base.realize = Public.realize;
     Public.realize = function () {
@@ -95,6 +135,7 @@ spark.Slider.Constructor = function(Protected) {
     };
 
     Public.onSlideStop = function (theEvent) {
+        Public.onSlide(theEvent);
         delete _myPosHistory[theEvent.cursor.id];
         _myIdleCursor.position = _myActiveCursor.position;
         _myIdleCursor.visible   = true;
@@ -204,6 +245,7 @@ spark.Slider.Constructor = function(Protected) {
                                                   _mySliderBackground.height/2 -_myIdleCursor.height/2,
                                                   0);
             _myActiveCursor.position = _myIdleCursor.position;
+            
     }
 }
 

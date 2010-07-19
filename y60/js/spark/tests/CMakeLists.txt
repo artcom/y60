@@ -4,6 +4,7 @@ Meta
 Loader
 Rectangle
 Canvas
+Slider
 )
 
 set(NOCG_TESTS
