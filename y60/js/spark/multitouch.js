@@ -162,6 +162,14 @@ spark.Cursor.Constructor = function(Protected, theId) {
             return _myHovered;
         }
     };
+    
+    var _myLastStagePosition = new Point2f();
+    /**
+     * Last stage position as cloned Point2f.
+     */
+    Public.lastStagePosition getter = function() {
+        return _myLastStagePosition.clone();
+    };
 
     var _myStagePosition = new Point2f();
 
@@ -191,6 +199,7 @@ spark.Cursor.Constructor = function(Protected, theId) {
      */
     Public.update = function(theHovered, theStagePosition) {
         _myHovered = theHovered;
+        _myLastStagePosition = Public.stagePosition;
         _myStagePosition = theStagePosition.clone();
     };
 
@@ -300,3 +309,106 @@ spark.CursorEvent.Constructor = function(Protected, theType, theCursor) {
         return _myCursor.intensity;
     };
 };
+
+
+/**
+ * Multitouch cursors
+ * 
+ * This class represents 
+ * multitouch gesture events
+ */
+
+const ASS_BASE_EVENT  = 0;
+const TUIO_BASE_EVENT = 1;
+
+spark.GestureEvent = spark.Class("GestureEvent");
+spark.GestureEvent.Constructor = function(Protected, theType, theBaseEvent, theCursor) {
+    this.Inherit(spark.CursorEvent, theType, theCursor);
+};
+
+/**
+ * wipe event: "the distance between the last two move cursors
+ * is bigger than the given threshold"
+ */
+spark.GestureEvent.WIPE  = "gesture-wipe";
+spark.WipeGestureEvent = spark.Class("WipeGestureEvent");
+spark.WipeGestureEvent.Constructor = function(Protected, theType, theBaseEvent, theDir, theCursor) {
+    var Public = this;
+
+    this.Inherit(spark.GestureEvent, theType, theBaseEvent, theCursor);
+    
+    /**
+     * Direction vector  of the wipe event
+     */
+    var _myDir = normalized(theDir);
+
+    Public.direction getter = function() {
+        return _myDir;
+    };
+    
+    /**
+     * Magnitude of the direction vector
+     */
+    var _myMagnitude = magnitude(theDir);
+
+    Public.magnitude getter = function () {
+        return _myMagnitude;
+    };
+
+};
+
+/**
+ * zoom event: "two cursors who enlarge their distance"
+ */
+spark.GestureEvent.ZOOM_START  = "gesture-zoom-start";
+spark.GestureEvent.ZOOM  = "gesture-zoom";
+spark.GestureEvent.ZOOM_FINISH = "gesture-zoom-finish";
+
+spark.ZoomGestureEvent = spark.Class("ZoomGestureEvent");
+spark.ZoomGestureEvent.Constructor = function(Protected, theType, theBaseEvent, theMainCursor, thePartnerCursor, theFirstDistance, theDistance, theZoomCenter) {
+    var Public = this;
+
+    this.Inherit(spark.GestureEvent, theType, theBaseEvent, theMainCursor);
+    
+    /**
+     * start distance between the zoom partners
+     */
+    var _myFirstDistance = theFirstDistance;
+
+    Public.firstdistance getter = function () {
+        return _myFirstDistance;
+    };
+    
+    /**
+     * current distance between zoom partners
+     */
+    var _myDistance = theDistance;
+
+    Public.distance getter = function() {
+        return _myDistance;
+    };
+    
+    /**
+     * midpoint between the zoom partner pos
+     */
+    var _myZoomCenter = theZoomCenter;
+
+    Public.zoomcenter getter = function () {
+        return _myZoomCenter;
+    };
+    
+    /**
+     * get partner cursor
+     */
+    var _myPartnerCursor = thePartnerCursor;
+
+    Public.partnerCursor getter = function () {
+        return _myPartnerCursor;
+    };
+
+};
+
+/**
+ * rotate event: "XXX"
+ */
+spark.GestureEvent.ROTATE  = "gesture-rotate";

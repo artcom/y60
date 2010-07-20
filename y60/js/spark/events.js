@@ -477,6 +477,7 @@ spark.EventDispatcher.Constructor = function(Protected) {
 
 };
 
+
 spark.Mouse = {};
 
 spark.Mouse.PRIMARY   = "primary";
@@ -495,6 +496,7 @@ spark.Mouse.buttonFromId = function(theId) {
         Logger.fatal("Unknown mouse button " + theId);
     }
 };
+
 
 spark.MouseEvent = spark.Class("MouseEvent");
 

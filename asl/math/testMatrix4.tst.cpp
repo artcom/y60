@@ -511,8 +511,13 @@ class Matrix4UnitTest : public UnitTest {
                 // reading this and it is no longer 2008, please
                 // try running the test without this hack and
                 // remove it if things are fine afterwards. -IA
+                //
+                // 2010 : gcc (Ubuntu 4.4.3-4ubuntu5) 4.4.3
+                // the test works now, but compiled with -O3 
+                // produces false warning: 'array subscript is above array bounds'
+                // changed to AC_PRINT to suppress the buggy warning
 #ifdef __GNUC__
-                cout << "Comparing " << i << " and " << myData[i] << " for almost-equality..." << endl;
+                AC_PRINT << "Comparing " << i << " and " << myData[i] << " for almost-equality...";
 #endif
                 ENSURE_MSG(almostEqual(myData[i], i), "Testing getData");
             }

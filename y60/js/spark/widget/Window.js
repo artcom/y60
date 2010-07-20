@@ -14,16 +14,23 @@ spark.Window.Constructor = function(Protected) {
     var Base = {};
     const PICK_RADIUS = 1;
     var _myPickRadius = PICK_RADIUS;
-
+    var _myPickCounter = 0;
+    
     this.Inherit(spark.Stage);
     
     var _myCamera = null;
     var _myWorld = null;
 
+    var _myMultitouchCursors = {};
+
     SceneViewer.prototype.Constructor(this, []);
 
     Public.title getter = function()  {
         return window.title;
+    };
+
+    Public.multitouchCursors getter = function()  {
+        return _myMultitouchCursors;
     };
 
     Public.title setter = function(theTitle) {
@@ -155,6 +162,7 @@ spark.Window.Constructor = function(Protected) {
     }
 
     Public.pickWidget = function(theX, theY) {
+        _myPickCounter++;
         var myBody = Public.picking.pickBodyBySweepingSphereFromBodies(theX, theY, _myPickRadius, Public.sceneNode);
         if(myBody) {
             var myBodyId = myBody.id;
@@ -177,7 +185,6 @@ spark.Window.Constructor = function(Protected) {
         _myMousePosition.x = theX;
         _myMousePosition.y = theY;
     };
-
 
     var _myMouseButtonStates = {};
 
@@ -246,6 +253,9 @@ spark.Window.Constructor = function(Protected) {
             var myEvent = new spark.StageEvent(spark.StageEvent.FRAME, Public, theTime, theDeltaT);
             Public.dispatchEvent(myEvent);
         }
+        Logger.info("picking per Frame # " + _myPickCounter);
+        _myPickCounter = 0;
+        print("----");
     };
 
     // Will be called before rendering the frame
@@ -263,6 +273,80 @@ spark.Window.Constructor = function(Protected) {
         var myEvent = new spark.StageEvent(spark.StageEvent.POST_RENDER, Public);
         Public.dispatchEvent(myEvent);
     };
+
+    // Will be called on a gesture event
+    Public.onGesture = function(theGesture) {
+        
+        var myPositionScale = new Vector2f(1,1);
+        // ass event come in screen coordinates
+        // tuio events are normalized from 0 to 1, so scale'em here
+        // actually they must be scaled to screen-resolution
+        // and not window-resolution, it now only works for fullscreen apps        
+        if (theGesture.baseeventtype == TUIO_BASE_EVENT) {
+            myPositionScale = new Vector2f(window.width, window.height);
+        }
+        var myPos = new Vector2f(theGesture.position3D.x * myPositionScale.x, theGesture.position3D.y * myPositionScale.y);
+        
+        var mySparkConformedCursorId = getSparkConformedCursorId(theGesture.baseeventtype, theGesture.cursorid);
+        
+        // picking with considering cursor grabbing
+        var myWidget;
+        var myCursor = null;
+        if (mySparkConformedCursorId in _myMultitouchCursors) {
+            myCursor = _myMultitouchCursors[mySparkConformedCursorId];
+        }
+        if(myCursor && myCursor.grabbed) {
+            myWidget = myCursor.grabHolder;
+        } else {
+            myWidget = Public.pickWidget(myPos.x, myPos.y);
+        }
+        if(!myWidget) {
+            myWidget = Public;
+        }
+        if (myCursor) {
+            myCursor.update(myWidget, myPos);
+        }
+        var myPartnerCursor = null;
+        // Do some zomm gesture specific things
+        if (theGesture.type == "zoom_start" || theGesture.type == "zoom" || theGesture.type == "zoom_finish" ) {
+            var mySparkconformedpartnerCursorId = getSparkConformedCursorId(theGesture.baseeventtype, theGesture.zoompartnerid);
+            // Get gesture partner cursor partner in case this a zooming event (zoom_start, zoom, zoom_finish)
+            if (mySparkconformedpartnerCursorId in _myMultitouchCursors) {
+                myPartnerCursor = _myMultitouchCursors[mySparkconformedpartnerCursorId];
+            }            
+            // zoom and zoom start need both cursors
+            if ((theGesture.type=="zoom_start" || theGesture.type=="zoom")&& (!myCursor || !myPartnerCursor)) {
+                return;
+            }
+        }
+        
+        switch(theGesture.type) {            
+            case "wipe":            
+                var myDir = new Vector3f(theGesture.direction.x * myPositionScale.x * -1, theGesture.direction.y * myPositionScale.y * (1),0);
+                var myWipeEvent = new spark.WipeGestureEvent(spark.GestureEvent.WIPE, theGesture.baseeventtype, myDir, myCursor);
+                myWidget.dispatchEvent(myWipeEvent);
+                break;                
+            case "zoom_start":
+                var myZoomCenter = new Vector3f(theGesture.zoomcenter.x * myPositionScale.x, (1-theGesture.zoomcenter.y) * myPositionScale.y * (1),0);
+                var myZoomEvent = new spark.ZoomGestureEvent(spark.GestureEvent.ZOOM_START, theGesture.baseeventtype, myCursor, myPartnerCursor, null, null, myZoomCenter);
+                myWidget.dispatchEvent(myZoomEvent);
+                break;                
+            case "zoom":
+                var myFirstDistance = theGesture.initialdistance;
+                var myDistance = theGesture.distance;
+                var myZoomEvent = new spark.ZoomGestureEvent(spark.GestureEvent.ZOOM, theGesture.baseeventtype, myCursor, myPartnerCursor, myFirstDistance, myDistance);
+                myWidget.dispatchEvent(myZoomEvent);
+                break;                
+            case "zoom_finish":                
+                var myZoomEvent = new spark.ZoomGestureEvent(spark.GestureEvent.ZOOM_FINISH, theGesture.baseeventtype, myCursor, myPartnerCursor);
+                myWidget.dispatchEvent(myZoomEvent);
+                break;                
+            case "rotate":
+                break;
+            default:
+                Logger.info("Unknown gesture : " + theGesture);            
+        }
+    }
 
     // Will be called on a mouse move
     Base.onMouseMotion = Public.onMouseMotion;
@@ -401,8 +485,17 @@ spark.Window.Constructor = function(Protected) {
                                          new Vector2f(theGridSizeX, theGridSizeY), theCount);
         Public.dispatchEvent(myEvent);
     };
+    
+    function getSparkConformedCursorId(theBaseEventType, theId) {
+        var mySparkConformedCursorId = "";
+        if (theBaseEventType == ASS_BASE_EVENT) {
+            mySparkConformedCursorId  = "pmtx" + theId;
+        } else {
+            mySparkConformedCursorId  = "tuio" + theId;
+        }
+        return mySparkConformedCursorId;
+    }
 
-    var _myMultitouchCursors = {};
 
     function getMultitouchCursorId(theEvent) {
         switch(theEvent.callback) {
@@ -415,7 +508,8 @@ spark.Window.Constructor = function(Protected) {
             return null;
         }
     };
-
+    
+    
     function getMultitouchCursorPosition(theEvent) {
         switch(theEvent.callback) {
         case "onASSEvent":
@@ -435,7 +529,6 @@ spark.Window.Constructor = function(Protected) {
         }
 
         var myId = getMultitouchCursorId(theEvent);
-
         switch(theEvent.type) {
         case "configure":
             Logger.info("proximatrix got configured");
@@ -443,7 +536,7 @@ spark.Window.Constructor = function(Protected) {
 
         case "add":
         case "move": // proximatrix
-        case "update": // tuio
+        case "update": // tuio        
             var myCursor;
             if(myId in _myMultitouchCursors) {
                 myCursor = _myMultitouchCursors[myId];
@@ -502,7 +595,6 @@ spark.Window.Constructor = function(Protected) {
         case "remove":
             if(myId in _myMultitouchCursors) {
                 Logger.debug("Cursor " + myId + " removed");
-
                 var myCursor   = _myMultitouchCursors[myId];
                 var myPosition = getMultitouchCursorPosition(theEvent);
                 var myFocused  = myCursor.focused;
@@ -520,7 +612,6 @@ spark.Window.Constructor = function(Protected) {
                 }
 
                 myCursor.deactivate();
-
                 delete _myMultitouchCursors[myId];
             }
             break;

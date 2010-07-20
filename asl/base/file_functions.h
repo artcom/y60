@@ -76,6 +76,9 @@ ASL_BASE_DECL void removeDirectory(const std::string & theDirectory, const bool 
 /** list names contained in a directory in theContent, returns false on error */
 ASL_BASE_DECL bool listDirectory(const std::string & theDirectory, std::vector<std::string> & theContent);
 
+/** changes to a new directory  */
+ASL_BASE_DECL void changeDirectory(const std::string & theDirectory);
+
 /** creates a new directory and all necessary parent directories */
 ASL_BASE_DECL void createPath(const std::string & theDirectory);
 

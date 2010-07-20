@@ -758,8 +758,8 @@ namespace y60 {
 
         int myROIChanged = 0;
         if ( theCursorIt->second.previousRoi.hasPosition() &&
-             theCursorIt->second.roi[Box2f::MIN] != theCursorIt->second.previousRoi[Box2f::MIN] ||
-             theCursorIt->second.roi[Box2f::MAX] !=  theCursorIt->second.previousRoi[Box2f::MAX])
+            (theCursorIt->second.roi[Box2f::MIN] != theCursorIt->second.previousRoi[Box2f::MIN] ||
+             theCursorIt->second.roi[Box2f::MAX] != theCursorIt->second.previousRoi[Box2f::MAX]))
         {
             myROIChanged = int(myIntensity);
             myIntensity = (theCursorIt->second.previousIntensity + myIntensity) / 2;

@@ -67,12 +67,16 @@
 #include <asl/dom/Value.h>
 #include <y60/glutil/OffscreenBuffer.h>
 
+
+namespace y60 {
+    class Texture;
+}
+
 /**
  * @ingroup Y60jslib
  */
 namespace jslib {
 
-    class y60::Texture;
     typedef asl::Ptr<y60::Texture, dom::ThreadingModel> TexturePtr;
 
     class OffscreenRenderArea : public y60::OffscreenBuffer, public AbstractRenderWindow {

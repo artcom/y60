@@ -73,6 +73,12 @@ class FixedVectorStreamUnitTest : public UnitTest {
 		        // Test data access
 		        const double * myData = myMatrix.getData();
 		        for (unsigned i = 0; i < 16; i++) {
+                    // 2010 : gcc (Ubuntu 4.4.3-4ubuntu5) 4.4.3
+                    // compiled with -O3 gcc produces false warning: 'array subscript is above array bounds'
+                    // added stream output to circumvents the optimizer bug
+#ifdef __GNUC__
+                    AC_PRINT << "Comparing " << i << " and " << myData[i];
+#endif
 			        ENSURE(myData[i] == double(i));
 		        }
 

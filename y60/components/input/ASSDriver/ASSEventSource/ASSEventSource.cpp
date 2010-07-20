@@ -77,6 +77,8 @@ ASSEventSource::ASSEventSource(DLHandle theHandle) :
 {
     registerStandardTypes( * _myValueFactory );
     registerSomTypes( * _myValueFactory );
+
+    //addCursorFilter("move", "id");
 }
 
 
@@ -86,6 +88,9 @@ ASSEventSource::poll() {
 
     processInput();
 
+    // do the event filter in base class GenericEventSourceFilter
+	//analyzeEvents(_myEvents, "id");
+    applyFilter(_myEvents);
     return _myEvents;
 }
 

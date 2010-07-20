@@ -56,64 +56,35 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+#ifndef _Y60_INPUT_GENERICEVENTSOURCEFILTER_INCLUDED_
+#define _Y60_INPUT_GENERICEVENTSOURCEFILTER_INCLUDED_
+
+#include "y60_input_settings.h"
+
+#include "GenericEvent.h"
+#include "IEventSource.h"
 #include <asl/base/Ptr.h>
-#include <asl/base/Stream.h>
-
-#include "y60_ffmpegdecoder2_settings.h"
-
-#ifdef OSX
-    extern "C" {
-#       include <libavformat/avformat.h>
-    }
-#   undef AV_NOPTS_VALUE
-#   define AV_NOPTS_VALUE 0x8000000000000000LL
-#else
-#   if defined(_MSC_VER)
-#       pragma warning(push,1)
-#   endif
-    extern "C" {
-#   include <avformat.h>
-    }
-#   if defined(_MSC_VER)
-#       pragma warning(pop)
-#   endif
-#endif
-
-#ifndef AV_VERSION_INT
-#define AV_VERSION_INT(a,b,c) (a<<16 | b<<8 | c)
-#endif
+#include <vector>
 
 namespace y60 {
-
-    /**
-     * registers an open stream so that ffmpeg can use it.
-     * the stream will be de-registered automatically by ffmpeg on close.
-     * @param theUrl identifies the stream
-     * @param theSource
-     */
-    void registerStream(std::string theUrl, asl::Ptr<asl::ReadableStream> theSource);
-
-
-    /**
-     * @ingroup Y60video
-     * A generic ReadableStream adapter for streams
-     * that need to remember the current stream position
-     * it behaves like the file protocol in C. supports read & seek
-     *
-     */
-    class RelativeReadableStream {
+    struct CursorFilter {
+        CursorFilter(std::string theEventType, std::string theIdAttributeName) : _myEventType(theEventType), _myCursorAttributeName(theIdAttributeName) {}
+        std::string _myEventType;
+        std::string _myCursorAttributeName;
+    };
+    class Y60_INPUT_DECL GenericEventSourceFilter {
         public:
-            RelativeReadableStream() : _mySource() {}
-            RelativeReadableStream( asl::Ptr<asl::ReadableStream> theSource)
-                : _mySource(theSource), _myOffset(0) {}
-
-            unsigned long read(void *theDest, unsigned long theSize);
-            unsigned long seek(int pos, int whence);
-
-        private:
-            asl::Ptr<asl::ReadableStream> _mySource;
-            unsigned long _myOffset;
+            GenericEventSourceFilter();
+            virtual ~GenericEventSourceFilter();
+            void addCursorFilter(std::string theEventType, std::string theIdAttributeName);
+            void applyFilter(EventPtrList & theEventList);
+            void analyzeEvents(EventPtrList theEventList, std::string theIdAttributeName);
+        private:          
+            void applyCursorFilter(std::string theEventType, std::string theIdAttributeName, EventPtrList & theEventList);
+            std::vector<CursorFilter> _myCursorFilter;
     };
 
+    typedef asl::Ptr<IEventSource> IEventSourcePtr;
 }
 
+#endif //_Y60_INPUT_GENERICEVENTSOURCEFILTER_INCLUDED_
