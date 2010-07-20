@@ -232,6 +232,12 @@ spark.Window.Constructor = function(Protected) {
     // Callbacks
     //////////////////////////////////////////////////////////////////////
 
+    //  Will be called before onFrame, has the time since application start
+    Public.onProtoFrame = function(theTime) {
+        var myEvent = new spark.StageEvent(spark.StageEvent.PROTO_FRAME, Public, theTime);
+        Public.dispatchEvent(myEvent);
+    };
+
     //  Will be called first in renderloop, has the time since application start
     Base.onFrame = Public.onFrame;
     Public.onFrame = function(theTime, theDeltaT) {
