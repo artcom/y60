@@ -305,7 +305,7 @@ namespace y60 {
         DB(AC_DEBUG << "Movie::readFrame time=" << theCurrentTime
             << " src=" << get<ImageSourceTag>());
         DB(AC_DEBUG << "                 theIgnoreCurrentTime=" << theIgnoreCurrentTime);
-        _myLastCurrentTime = (theIgnoreCurrentTime) ? 0 : theCurrentTime;
+        _myLastCurrentTime = (theIgnoreCurrentTime) ? -1.0 : theCurrentTime;
 
         if (!_myDecoder) {
             AC_ERROR << "Movie::readFrame not allowed before open";
