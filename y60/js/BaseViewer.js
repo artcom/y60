@@ -506,13 +506,11 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     };
 
     self.addSkyBoxFromImage = function(theImageNode, theWorld) {
-        if ( ! theWorld ) {
-            theWorld = _myRenderWindow.scene.world;
-        }
+        theWorld = theWorld || _myRenderWindow.scene.world;
         // material
         var myMaterialNode = theWorld.getElementById(_mySkyboxMaterialId);
-        var myTextureUnitNode  = null;
-        var myTextureNode      = null;
+        var myTextureUnitNode = null;
+        var myTextureNode     = null;
         
         if (!myMaterialNode) {
             myMaterialNode = Node.createElement("material");
@@ -550,7 +548,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
             _myRenderWindow.scene.textures.appendChild(myTextureNode);
             myTextureUnitNode.texture = myTextureNode.id;
         }       
-        myTextureNode.image = theImageNode.id;        
+        myTextureNode.image = theImageNode.id;
     };
 
     self.addSkyBoxFromFile = function(theFileName, theTile, theWorld) {
@@ -582,6 +580,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
 
             self.addSkyBoxFromImage(mySkyboxImage, theWorld);
         }
+        return _mySkyboxMaterialId;
     };
 
     self.removeSkyBox = function(theWorld) {
