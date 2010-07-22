@@ -255,7 +255,6 @@ spark.Window.Constructor = function(Protected) {
         }
         Logger.info("picking per Frame # " + _myPickCounter);
         _myPickCounter = 0;
-        print("----");
     };
 
     // Will be called before rendering the frame
