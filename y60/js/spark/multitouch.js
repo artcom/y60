@@ -312,7 +312,7 @@ spark.CursorEvent.Constructor = function(Protected, theType, theCursor) {
 
 
 /**
- * Multitouch cursors
+ * Multitouch gestures
  * 
  * This class represents 
  * multitouch gesture events
@@ -358,17 +358,49 @@ spark.WipeGestureEvent.Constructor = function(Protected, theType, theBaseEvent, 
 };
 
 /**
- * zoom event: "two cursors who enlarge their distance"
+ * events with two cursors (abstract)
  */
-spark.GestureEvent.ZOOM_START  = "gesture-zoom-start";
-spark.GestureEvent.ZOOM  = "gesture-zoom";
-spark.GestureEvent.ZOOM_FINISH = "gesture-zoom-finish";
-
-spark.ZoomGestureEvent = spark.Class("ZoomGestureEvent");
-spark.ZoomGestureEvent.Constructor = function(Protected, theType, theBaseEvent, theMainCursor, thePartnerCursor, theFirstDistance, theDistance, theZoomCenter, theLastDistance) {
+spark.MultiCursorGestureEvent = spark.Class("MultiCursorGestureEvent");
+spark.MultiCursorGestureEvent.Constructor = function(Protected, theType, theBaseEvent, theMainCursor, thePartnerCursor, theCenterpoint) {
     var Public = this;
 
     this.Inherit(spark.GestureEvent, theType, theBaseEvent, theMainCursor);
+    
+    
+    /**
+     * get partner cursor
+     */
+    var _myPartnerCursor = thePartnerCursor;
+
+    Public.partnerCursor getter = function () {
+        return _myPartnerCursor;
+    };
+    
+    /**
+     * centerpoint between the two cursors
+     */
+    var _myCenterPoint = theCenterpoint;
+
+    Public.centerpoint getter = function () {
+        return _myCenterPoint;
+    };
+
+};
+
+
+
+/**
+ * zoom event: "two cursors which change their distance"
+ */
+spark.GestureEvent.CURSOR_PAIR_START  = "gesture-cursor-pair-start";
+spark.GestureEvent.ZOOM  = "gesture-zoom";
+spark.GestureEvent.CURSOR_PAIR_FINISH = "gesture-cursor-pair-finish";
+
+spark.ZoomGestureEvent = spark.Class("ZoomGestureEvent");
+spark.ZoomGestureEvent.Constructor = function(Protected, theType, theBaseEvent, theMainCursor, thePartnerCursor, theFirstDistance, theDistance, theCenterpoint, theLastDistance) {
+    var Public = this;
+
+    this.Inherit(spark.MultiCursorGestureEvent, theType, theBaseEvent, theMainCursor, thePartnerCursor, theCenterpoint);
     
     /**
      * start distance between the zoom partners
@@ -397,35 +429,17 @@ spark.ZoomGestureEvent.Constructor = function(Protected, theType, theBaseEvent, 
         return _myDistance;
     };
     
-    /**
-     * midpoint between the zoom partner pos
-     */
-    var _myZoomCenter = theZoomCenter;
-
-    Public.zoomcenter getter = function () {
-        return _myZoomCenter;
-    };
-    
-    /**
-     * get partner cursor
-     */
-    var _myPartnerCursor = thePartnerCursor;
-
-    Public.partnerCursor getter = function () {
-        return _myPartnerCursor;
-    };
-
 };
 
 /**
- * rotate event: "XXX"
+ * rotate event: "two cursor with changing angle"
  */
 spark.GestureEvent.ROTATE  = "gesture-rotate";
 spark.RotateGestureEvent = spark.Class("RotateGestureEvent");
-spark.RotateGestureEvent.Constructor = function(Protected, theType, theBaseEvent, theMainCursor, thePartnerCursor, theAngle, theZoomCenter) {
+spark.RotateGestureEvent.Constructor = function(Protected, theType, theBaseEvent, theMainCursor, thePartnerCursor, theAngle, theCenterpoint) {
     var Public = this;
 
-    this.Inherit(spark.GestureEvent, theType, theBaseEvent, theMainCursor);
+    this.Inherit(spark.MultiCursorGestureEvent, theType, theBaseEvent, theMainCursor, thePartnerCursor, theCenterpoint);
     
     /**
      * angle 
@@ -436,22 +450,4 @@ spark.RotateGestureEvent.Constructor = function(Protected, theType, theBaseEvent
         return _myAngle;
     };
     
-    /**
-     * get partner cursor
-     */
-    var _myPartnerCursor = thePartnerCursor;
-
-    Public.partnerCursor getter = function () {
-        return _myPartnerCursor;
-    };
-    
-    /**
-     * midpoint between the zoom partner pos
-     */
-    var _myZoomCenter = theZoomCenter;
-
-    Public.zoomcenter getter = function () {
-        return _myZoomCenter;
-    };
-
 };

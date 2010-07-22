@@ -71,7 +71,7 @@ namespace y60 {
     // apply filter in place
     void GenericEventSourceFilter::applyFilter(EventPtrList & theEventList) {
         for (unsigned i = 0; i < _myCursorFilter.size(); i++) {
-            //AC_INFO << "filter cursor events with type: " << _myCursorFilter[i]._myEventType << " and cursor id attribute: " << _myCursorFilter[i]._myCursorAttributeName;
+            AC_DEBUG << "filter cursor events with type: " << _myCursorFilter[i]._myEventType << " and cursor id attribute: " << _myCursorFilter[i]._myCursorAttributeName;
             applyCursorFilter(_myCursorFilter[i]._myEventType, _myCursorFilter[i]._myCursorAttributeName, theEventList);
         }
     }
@@ -104,7 +104,7 @@ namespace y60 {
     }
 
     void GenericEventSourceFilter::analyzeEvents(EventPtrList theEventList, std::string theIdAttributeName) {
-        AC_INFO << "############## analyzeEvents cursor events:";
+        AC_DEBUG << "############## analyzeEvents cursor events:";
 	    std::map<int, std::map<std::string, int> > myCursorEventCounter;
 	    {
 		    EventPtrList::iterator myEndIt   = theEventList.end();
@@ -131,10 +131,10 @@ namespace y60 {
 			    std::map<std::string, int>::iterator myEndItType   = myIt->second.end();
 			    std::map<std::string, int>::iterator myItType      = myIt->second.begin();
 			    for(; myItType !=  myEndItType; ++myItType){
-				    AC_INFO << "Cursor id: " << myIt->first << " with type: " << myItType->first << " has # " << myItType->second << " events";
+				    AC_DEBUG << "Cursor id: " << myIt->first << " with type: " << myItType->first << " has # " << myItType->second << " events";
 			    }
 		    }
-		    AC_INFO << "-------";
+		    AC_DEBUG << "-------";
 	    }
     }
 
