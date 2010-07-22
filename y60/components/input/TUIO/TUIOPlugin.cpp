@@ -89,10 +89,11 @@ public:
 		    //AC_INFO << "unfiltered toui events # " << myEvents.size();
 
             // logs event statistics for multiple events per cursor and type
-        	//analyzeEvents(_myEvents, "id");
+        	//analyzeEvents(myEvents, "id");
             // do the event filter in base class GenericEventSourceFilter
             applyFilter(myEvents);
 		    //AC_INFO << "deliver toui events # " << myEvents.size();
+			//analyzeEvents(myEvents, "id");
             return myEvents;
         } else {
             return EventPtrList();
