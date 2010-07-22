@@ -109,11 +109,13 @@ spark.openMovie = function(thePath, theTargetPixelFormat, theDecoderHint) {
     myMovie.name = "spark-movie-" + spark.ourMovieCounter++;
     myMovie.resize = "none";
     myMovie.loopcount = "1";
-    myMovie.playmode = "stop";
     myMovie.targetpixelformat = (theTargetPixelFormat) ? theTargetPixelFormat :"RGB";
     myMovie.decoderhint = (theDecoderHint) ? theDecoderHint : "FFMpegDecoder2";
 
+    //always load first frame
+    myMovie.playmode = "pause";
     window.scene.loadMovieFrame(myMovie);
+    myMovie.playmode = "stop";
 
     return myMovie;
 };

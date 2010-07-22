@@ -58,6 +58,7 @@ namespace dom {
             }
         private:
             asl::WeakPtr<IMPL, ThreadingModel> _myCallBack;
+            asl::Unsigned64 _myPadding;
             void (IMPL::*_myCallBackFunction)();
     };
 
