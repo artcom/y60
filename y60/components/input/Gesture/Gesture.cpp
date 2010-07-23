@@ -25,18 +25,18 @@ using namespace dom;
 
 namespace y60 {
 
-const float DISTANCE_THRESHOLD = 120.0;
+const float IGNORE_CURSOR_DISTANCE = 120.0;
 const float WIPE_DISTANCE_THRESHOLD = 100.0;
-const float MAX_ZOOM_DISTANCE = 1000.0;
+const float MAX_CURSOR_PAIR_DISTANCE = 1000.0;
 
 Gesture::Gesture(DLHandle theHandle) :
     asl::PlugInBase( theHandle ),
      _myGestureSettings(0),
      _myGestureSchema( new dom::Document( y60::ourgestureeventxsd ) ),
     _myValueFactory( new dom::ValueFactory() ),
-    _myDistanceThreshold(DISTANCE_THRESHOLD),
+    _myIgnoreCursorsInHistoryDistance(IGNORE_CURSOR_DISTANCE),
     _myWipeDistanceThreshold(WIPE_DISTANCE_THRESHOLD),
-    _myMaxZoomDistance(MAX_ZOOM_DISTANCE),
+    _myMaxCursorPairDistance(MAX_CURSOR_PAIR_DISTANCE),
     _myEventCounter(0)
 {
     registerStandardTypes( * _myValueFactory );
@@ -188,7 +188,7 @@ Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent,  int theID, const std
             if(_myCursorList.size() > 1) {
 
                 //new pair finding
-                float myCursorDistance = _myMaxZoomDistance;
+                float myCursorDistance = _myMaxCursorPairDistance;
                 
                 
                 CursorList::iterator myEndIt   = _myCursorList.end();
@@ -331,7 +331,7 @@ Gesture::getCurrentPos(GESTURE_BASE_EVENT_TYPE theBaseEvent, int theCursorId) {
         float myDistance = 0;
         Vector3f myLastPosition(0,0,0);
         unsigned myCounter = 0;
-        for (unsigned int i = myPositions.size(); i > 0 && myDistance < _myDistanceThreshold; --i)
+        for (unsigned int i = myPositions.size(); i > 0 && myDistance < _myIgnoreCursorsInHistoryDistance; --i)
         {
             myCounter+=i;
             myPos[0] += myPositions[i-1][0] * i;
@@ -349,9 +349,9 @@ Gesture::getCurrentPos(GESTURE_BASE_EVENT_TYPE theBaseEvent, int theCursorId) {
 
 void
 Gesture::onUpdateSettings(dom::NodePtr theSettings) {
-     _myDistanceThreshold = getSetting( theSettings, "DistanceThreshold", _myDistanceThreshold);
+     _myIgnoreCursorsInHistoryDistance = getSetting( theSettings, "IgnoreCursorsInHistoryDistance", _myIgnoreCursorsInHistoryDistance);
      _myWipeDistanceThreshold = getSetting( theSettings, "WipeDistanceThreshold", _myWipeDistanceThreshold);
-     _myMaxZoomDistance = getSetting( theSettings, "MaxZoomDistance", _myMaxZoomDistance);
+     _myMaxCursorPairDistance = getSetting( theSettings, "MaxCursorPairDistance", _myMaxCursorPairDistance);
 }
 
 void

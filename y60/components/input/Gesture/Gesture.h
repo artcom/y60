@@ -83,9 +83,9 @@ class Gesture : public asl::PlugInBase,
         std::map<int, asl::Vector3f>    _myLastCursorPositions;
         std::map<int, float>            _myInitialZoomDistance;
         CursorPartnerList               _myCursorPartner;
-        float                           _myDistanceThreshold;
+        float                           _myIgnoreCursorsInHistoryDistance;
         float                           _myWipeDistanceThreshold;
-        float                           _myMaxZoomDistance;
+        float                           _myMaxCursorPairDistance;
 
         unsigned int                    _myEventCounter;
         asl::ThreadLock                 _myDeliveryMutex;
