@@ -11,30 +11,28 @@
 #ifndef ASS_GESTURE_INCLUDED
 #define ASS_GESTURE_INCLUDED
 
-#include <y60/input/y60_input_settings.h>
-#include <y60/input/GenericEventSourceFilter.h>
-
-#include <asl/math/Vector234.h>
-#include <asl/base/PlugInBase.h>
-#include <y60/jsbase/IScriptablePlugin.h>
-#include <y60/input/IEventSink.h>
-#include <y60/input/IEventSource.h>
-
-#include <asl/base/Auto.h>
-#include <asl/base/ThreadLock.h>
-#include <y60/jslib/AbstractRenderWindow.h>
-#include <y60/input/GenericEvent.h>
-
 #include <vector>
 #include <map>
 
+#include <asl/math/Vector234.h>
+#include <asl/base/PlugInBase.h>
+#include <asl/base/Auto.h>
+#include <asl/base/ThreadLock.h>
+
+#include <y60/input/y60_input_settings.h>
+#include <y60/input/GenericEventSourceFilter.h>
+#include <y60/input/IEventSink.h>
+#include <y60/input/IEventSource.h>
+#include <y60/input/GenericEvent.h>
+#include <y60/jsbase/IScriptablePlugin.h>
+#include <y60/jslib/AbstractRenderWindow.h>
 
 
 namespace y60 {
 
 enum GESTURE_BASE_EVENT_TYPE{
-	ASSEVENT,
-	TUIOEVENT
+    ASSEVENT,
+    TUIOEVENT
 };
 
 
@@ -68,11 +66,11 @@ class Gesture : public asl::PlugInBase,
                           const asl::Vector3f & thePosition3D);
     private:
         dom::NodePtr addGestureEvent2Queue(GESTURE_BASE_EVENT_TYPE theBaseEvent, int theID, 
-			                               const std::string & theType, 
-										   const asl::Vector3f & thePosition3D);
+                                           const std::string & theType, 
+                                           const asl::Vector3f & thePosition3D);
         asl::Vector3f getCurrentPos(GESTURE_BASE_EVENT_TYPE theBaseEvent, int theCursorId);
-		CursorPartnerList::iterator getCursorPartner(int theId);
-		void saveAllCursorPositions();
+        CursorPartnerList::iterator getCursorPartner(int theId);
+        void saveAllCursorPositions();
 
         dom::NodePtr                    _myGestureSettings;
         dom::NodePtr                    _myGestureSchema;
