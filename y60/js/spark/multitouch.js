@@ -302,3 +302,37 @@ spark.CursorEvent.Constructor = function (Protected, theType, theCursor) {
         return _myCursor.intensity;
     };
 };
+
+
+/**
+ * Generic input events
+ * 
+ * Each of these are mapped onto specific mouse and cursor events.
+ * 
+ */
+spark.GenericInputEvent = spark.Class("GenericInputEvent");
+
+// XXX to be extended on demand
+spark.GenericInputEvent.BUTTON_DOWN_ENTER   = "generic-button-down-enter";
+spark.GenericInputEvent.BUTTON_UP_ENTER     = "generic-button-up-enter";
+spark.GenericInputEvent.ENTER               = "generic-enter";
+spark.GenericInputEvent.BUTTON_UP_LEAVE     = "generic-button-up-leave";
+spark.GenericInputEvent.LEAVE               = "generic-leave";
+spark.GenericInputEvent.MOVE                = "generic-move";
+
+spark.GenericInputEvent.eventMapping = {};
+spark.GenericInputEvent.eventMapping[spark.GenericInputEvent.BUTTON_DOWN_ENTER] = [spark.MouseEvent.BUTTON_DOWN, spark.CursorEvent.ENTER];
+spark.GenericInputEvent.eventMapping[spark.GenericInputEvent.BUTTON_UP_ENTER]   = [spark.MouseEvent.BUTTON_UP, spark.CursorEvent.ENTER];
+spark.GenericInputEvent.eventMapping[spark.GenericInputEvent.ENTER]             = [spark.MouseEvent.ENTER, spark.CursorEvent.ENTER];
+spark.GenericInputEvent.eventMapping[spark.GenericInputEvent.BUTTON_UP_LEAVE]   = [spark.MouseEvent.BUTTON_UP, spark.CursorEvent.LEAVE];
+spark.GenericInputEvent.eventMapping[spark.GenericInputEvent.LEAVE]             = [spark.MouseEvent.LEAVE, spark.CursorEvent.LEAVE];
+spark.GenericInputEvent.eventMapping[spark.GenericInputEvent.MOVE]              = [spark.MouseEvent.MOVE, spark.CursorEvent.MOVE];
+
+spark.GenericInputEvent.getMappedEvents = function(theEventType) {
+    
+    if (theEventType in spark.GenericInputEvent.eventMapping) {
+        return spark.GenericInputEvent.eventMapping[theEventType];
+    } else {
+        return null;
+    }
+};

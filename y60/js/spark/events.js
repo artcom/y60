@@ -250,26 +250,34 @@ spark.EventDispatcher.Constructor = function (Protected) {
      *   USECAPTURE (bool)   - if the handler belongs to the Capture phase
      */
     Public.addEventListener = function (theType, theListener, theUseCapture) {
-        // XXX: this is not really acceptable.
-        //      need to figure out something better.
-        //      click events DO still make sense, after all.
-        //      maybe these should be implemented at widget level.
-        if (theType === "mouse-click") {
-            Logger.warning("MouseEvent.CLICK is deprecated; use MouseEvent.BUTTON_UP or MouseEvent.BUTTON_DOWN");
+        var mappedEvents = spark.GenericInputEvent.getMappedEvents(theType);
+        
+        if(mappedEvents) {
+            for(var i=0; i<mappedEvents.length; ++i) {
+                Public.addEventListener(mappedEvents[i], theListener, theUseCapture);
+            }
+        } else {
+            // XXX: this is not really acceptable.
+            //      need to figure out something better.
+            //      click events DO still make sense, after all.
+            //      maybe these should be implemented at widget level.
+            if (theType === spark.MouseEvent.CLICK) {
+                Logger.warning("MouseEvent.CLICK is deprecated; use MouseEvent.BUTTON_UP or MouseEvent.BUTTON_DOWN");
+            }
+            theUseCapture = theUseCapture || false;
+            
+            var myListener = {
+                type:       theType,
+                listener:   theListener,
+                useCapture: theUseCapture
+            };
+
+            if (!(theType in _myListenersByType)) {
+                _myListenersByType[theType] = [];
+            }
+
+            _myListenersByType[theType] = _myListenersByType[theType].concat(myListener);
         }
-        theUseCapture = theUseCapture || false;
-
-        var myListener = {
-            type:       theType,
-            listener:   theListener,
-            useCapture: theUseCapture
-        };
-
-        if (!(theType in _myListenersByType)) {
-            _myListenersByType[theType] = [];
-        }
-
-        _myListenersByType[theType] = _myListenersByType[theType].concat(myListener);
     };
 
     Public.addEventListenerInFront = function(theType, theListener, theUseCapture) {
@@ -607,3 +615,4 @@ spark.StageEvent.Constructor = function(Protected, theType, theStage, theTime, t
         return _myDeltaT;
     });
 };
+
