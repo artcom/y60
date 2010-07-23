@@ -33,7 +33,7 @@ class TUIOPlugin : public PlugInBase,
 private:
     typedef std::pair<const char*, TuioCursor*> CursorEvent;
     typedef std::vector<CursorEvent> CursorEventList;
-	bool _myFilterMultipleUpdatePerCursorFlag;
+    bool _myFilterMultipleUpdatePerCursorFlag;
 
 
 public:
@@ -42,13 +42,13 @@ public:
         : PlugInBase(myDLHandle),
           _myEventSchemaDocument(new Document(y60::ourtuioeventxsd)),
           _myEventValueFactory(new ValueFactory()),
-		  _myFilterMultipleUpdatePerCursorFlag(true)
+          _myFilterMultipleUpdatePerCursorFlag(true)
     {
         registerStandardTypes(*_myEventValueFactory);
         registerSomTypes(*_myEventValueFactory);
 
         // add filter for deleting multiple update
-	    if (_myFilterMultipleUpdatePerCursorFlag) {
+        if (_myFilterMultipleUpdatePerCursorFlag) {
             addCursorFilter("update", "id");
         }
     }
@@ -86,34 +86,34 @@ public:
             }
 
             _myUndeliveredCursors.clear();
-		    //AC_INFO << "unfiltered toui events # " << myEvents.size();
+            //AC_INFO << "unfiltered toui events # " << myEvents.size();
 
             // logs event statistics for multiple events per cursor and type
-        	//analyzeEvents(myEvents, "id");
+            //analyzeEvents(myEvents, "id");
             // do the event filter in base class GenericEventSourceFilter
             applyFilter(myEvents);
-		    //AC_INFO << "deliver toui events # " << myEvents.size();
-			//analyzeEvents(myEvents, "id");
+            //AC_INFO << "deliver toui events # " << myEvents.size();
+            //analyzeEvents(myEvents, "id");
             return myEvents;
         } else {
             return EventPtrList();
         }
     }
     void filterEventsPerCursor(std::string theEventType, std::string theIdAttributeName, EventPtrList & theEventList) {
-	    std::map<int, std::vector<GenericEventPtr > > myEvents2Shrink;
-	    EventPtrList::iterator myIt = theEventList.begin();
-	    unsigned int counter= 0;
+        std::map<int, std::vector<GenericEventPtr > > myEvents2Shrink;
+        EventPtrList::iterator myIt = theEventList.begin();
+        unsigned int counter= 0;
         for (; myIt !=theEventList.end(); ) {
-		    counter++;
-		    GenericEventPtr myGenericEvent(dynamic_cast_Ptr<GenericEvent>(*myIt));
-		    dom::NodePtr myNode = myGenericEvent->getNode();
-		    int myCursorId = asl::as<int>(myNode->getAttributeString(theIdAttributeName));
-		    std::string myEventType = myNode->getAttributeString("type");
-		    if (myEventType == theEventType) {
-			    if (myEvents2Shrink.find(myCursorId) == myEvents2Shrink.end()) {
-				    myEvents2Shrink[myCursorId] = std::vector<GenericEventPtr>();
-			    }
-			    myEvents2Shrink[myCursorId].push_back(myGenericEvent);
+            counter++;
+            GenericEventPtr myGenericEvent(dynamic_cast_Ptr<GenericEvent>(*myIt));
+            dom::NodePtr myNode = myGenericEvent->getNode();
+            int myCursorId = asl::as<int>(myNode->getAttributeString(theIdAttributeName));
+            std::string myEventType = myNode->getAttributeString("type");
+            if (myEventType == theEventType) {
+                if (myEvents2Shrink.find(myCursorId) == myEvents2Shrink.end()) {
+                    myEvents2Shrink[myCursorId] = std::vector<GenericEventPtr>();
+                }
+                myEvents2Shrink[myCursorId].push_back(myGenericEvent);
                 myIt = theEventList.erase(myIt);
             } else {
                 ++myIt;
@@ -121,11 +121,11 @@ public:
         }
 
         std::map<int, std::vector<GenericEventPtr > >::iterator myEndIt2   = myEvents2Shrink.end();
-	    std::map<int, std::vector<GenericEventPtr > >::iterator myIt2 = myEvents2Shrink.begin();
-	    for(; myIt2 !=  myEndIt2; ++myIt2){
-		    theEventList.push_back((myIt2->second)[(myIt2->second).size()-1]);
-	    }
-	}
+        std::map<int, std::vector<GenericEventPtr > >::iterator myIt2 = myEvents2Shrink.begin();
+        for(; myIt2 !=  myEndIt2; ++myIt2){
+            theEventList.push_back((myIt2->second)[(myIt2->second).size()-1]);
+        }
+    }
 
 
 // TuioListener

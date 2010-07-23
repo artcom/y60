@@ -76,20 +76,20 @@ namespace y60 {
         }
     }
     void GenericEventSourceFilter::applyCursorFilter(std::string theEventType, std::string theIdAttributeName, EventPtrList & theEventList) {
-	    std::map<int, std::vector<GenericEventPtr > > myEvents2Shrink;
-	    EventPtrList::iterator myIt = theEventList.begin();
-	    unsigned int counter= 0;
+        std::map<int, std::vector<GenericEventPtr > > myEvents2Shrink;
+        EventPtrList::iterator myIt = theEventList.begin();
+        unsigned int counter= 0;
         for (; myIt !=theEventList.end(); ) {
-		    counter++;
-		    GenericEventPtr myGenericEvent(dynamic_cast_Ptr<GenericEvent>(*myIt));
-		    dom::NodePtr myNode = myGenericEvent->getNode();
-		    int myCursorId = asl::as<int>(myNode->getAttributeString(theIdAttributeName));
-		    std::string myEventType = myNode->getAttributeString("type");
-		    if (myEventType == theEventType) {
-			    if (myEvents2Shrink.find(myCursorId) == myEvents2Shrink.end()) {
-				    myEvents2Shrink[myCursorId] = std::vector<GenericEventPtr>();
-			    }
-			    myEvents2Shrink[myCursorId].push_back(myGenericEvent);
+            counter++;
+            GenericEventPtr myGenericEvent(dynamic_cast_Ptr<GenericEvent>(*myIt));
+            dom::NodePtr myNode = myGenericEvent->getNode();
+            int myCursorId = asl::as<int>(myNode->getAttributeString(theIdAttributeName));
+            std::string myEventType = myNode->getAttributeString("type");
+            if (myEventType == theEventType) {
+                if (myEvents2Shrink.find(myCursorId) == myEvents2Shrink.end()) {
+                    myEvents2Shrink[myCursorId] = std::vector<GenericEventPtr>();
+                }
+                myEvents2Shrink[myCursorId].push_back(myGenericEvent);
                 myIt = theEventList.erase(myIt);
             } else {
                 ++myIt;
@@ -97,45 +97,45 @@ namespace y60 {
         }
 
         std::map<int, std::vector<GenericEventPtr > >::iterator myEndIt2   = myEvents2Shrink.end();
-	    std::map<int, std::vector<GenericEventPtr > >::iterator myIt2 = myEvents2Shrink.begin();
-	    for(; myIt2 !=  myEndIt2; ++myIt2){
-		    theEventList.push_back((myIt2->second)[(myIt2->second).size()-1]);
-	    }
+        std::map<int, std::vector<GenericEventPtr > >::iterator myIt2 = myEvents2Shrink.begin();
+        for(; myIt2 !=  myEndIt2; ++myIt2){
+            theEventList.push_back((myIt2->second)[(myIt2->second).size()-1]);
+        }
     }
 
     void GenericEventSourceFilter::analyzeEvents(EventPtrList theEventList, std::string theIdAttributeName) {
         AC_DEBUG << "############## analyzeEvents cursor events:";
-	    std::map<int, std::map<std::string, int> > myCursorEventCounter;
-	    {
-		    EventPtrList::iterator myEndIt   = theEventList.end();
-		    EventPtrList::iterator myIt = theEventList.begin();
-		    for(; myIt !=  myEndIt; ++myIt){
-			    GenericEventPtr myGenericEvent(dynamic_cast_Ptr<GenericEvent>(*myIt));
-			    dom::NodePtr myNode = myGenericEvent->getNode();
-			    int myCursorId = asl::as<int>(myNode->getAttributeString(theIdAttributeName));
-			    std::string myCursorType = myNode->getAttributeString("type");
-			    if (myCursorEventCounter.find(myCursorId) == myCursorEventCounter.end()) {
-				    myCursorEventCounter[myCursorId][myCursorType] = 0;
-			    } else {
-				    if (myCursorEventCounter[myCursorId].find(myCursorType) == myCursorEventCounter[myCursorId].end()) {
-					    myCursorEventCounter[myCursorId][myCursorType] = 0;
-				    }
-			    }
-			    myCursorEventCounter[myCursorId][myCursorType]++;
-		    }
-	    }
-	    {
-		    std::map<int, std::map<std::string, int> >::iterator myEndIt   = myCursorEventCounter.end();
-		    std::map<int, std::map<std::string, int> >::iterator myIt = myCursorEventCounter.begin();
-		    for(; myIt !=  myEndIt; ++myIt){
-			    std::map<std::string, int>::iterator myEndItType   = myIt->second.end();
-			    std::map<std::string, int>::iterator myItType      = myIt->second.begin();
-			    for(; myItType !=  myEndItType; ++myItType){
-				    AC_DEBUG << "Cursor id: " << myIt->first << " with type: " << myItType->first << " has # " << myItType->second << " events";
-			    }
-		    }
-		    AC_DEBUG << "-------";
-	    }
+        std::map<int, std::map<std::string, int> > myCursorEventCounter;
+        {
+            EventPtrList::iterator myEndIt   = theEventList.end();
+            EventPtrList::iterator myIt = theEventList.begin();
+            for(; myIt !=  myEndIt; ++myIt){
+                GenericEventPtr myGenericEvent(dynamic_cast_Ptr<GenericEvent>(*myIt));
+                dom::NodePtr myNode = myGenericEvent->getNode();
+                int myCursorId = asl::as<int>(myNode->getAttributeString(theIdAttributeName));
+                std::string myCursorType = myNode->getAttributeString("type");
+                if (myCursorEventCounter.find(myCursorId) == myCursorEventCounter.end()) {
+                    myCursorEventCounter[myCursorId][myCursorType] = 0;
+                } else {
+                    if (myCursorEventCounter[myCursorId].find(myCursorType) == myCursorEventCounter[myCursorId].end()) {
+                        myCursorEventCounter[myCursorId][myCursorType] = 0;
+                    }
+                }
+                myCursorEventCounter[myCursorId][myCursorType]++;
+            }
+        }
+        {
+            std::map<int, std::map<std::string, int> >::iterator myEndIt   = myCursorEventCounter.end();
+            std::map<int, std::map<std::string, int> >::iterator myIt = myCursorEventCounter.begin();
+            for(; myIt !=  myEndIt; ++myIt){
+                std::map<std::string, int>::iterator myEndItType   = myIt->second.end();
+                std::map<std::string, int>::iterator myItType      = myIt->second.begin();
+                for(; myItType !=  myEndItType; ++myItType){
+                    AC_DEBUG << "Cursor id: " << myIt->first << " with type: " << myItType->first << " has # " << myItType->second << " events";
+                }
+            }
+            AC_DEBUG << "-------";
+        }
     }
 
 }

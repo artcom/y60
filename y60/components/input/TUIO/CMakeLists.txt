@@ -13,7 +13,7 @@ TUIO
 )
 
 if(WIN32)
-	list(APPEND EXTERNS WINMM)
+    list(APPEND EXTERNS WINMM)
 endif(WIN32)
 
 y60_add_component(
