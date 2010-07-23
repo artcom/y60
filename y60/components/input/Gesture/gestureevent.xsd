@@ -1,0 +1,77 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<xs:schema id="gestureevent" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <!-- example nodes
+         <generic when="1.17026e+09"
+                  callback="onASSEvent"
+                  id="24"
+                  type="tap"
+                  position="[9.22574,7.24158]" />
+         <generic when="1.17026e+09"
+                  callback="onASSEvent"
+                  id="24"
+                  type="lift"
+                  position="[9.22574,7.24158]" />
+                  
+         <generic when="1.17026e+09"
+                  callback="onASSEvent"
+                  id="23"
+                  type="move"
+                  lastPoint="[9.22574,7.24158]"
+                  newPoint="[44.8317,-15.4852,0]"/>
+         <generic when="1.17026e+09"
+                  callback="onASSEvent"
+                  id="23"
+                  type="wipe"
+                  direction="[0,-1,0]"/>
+         <generic when="1.17026e+09"
+                  callback="onASSEvent"
+                  id="23"
+                  type="zoom"
+                  distance="10.0"
+                  firstdistance="5"
+                  lastdistance="15"
+                  centerpoint="[9.22574,7.24158]/>
+    -->
+    <xs:simpleType name="Vector3f">
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    <xs:simpleType name="Vector2f">
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    <xs:simpleType name="Vector2i">
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    <xs:simpleType name="Box2f">
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    <xs:element name="generic">
+        <xs:complexType>
+            <xs:attribute name="when" type="xs:double"/>
+            <xs:attribute name="simulation_time" type="xs:double"/>
+            <xs:attribute name="callback" type="xs:string"/>
+            <xs:attribute name="id" type="xs:ID"/>
+            <xs:attribute name="cursorid" type="xs:int"/>
+            <xs:attribute name="cursorpartnerid" type="xs:int"/>
+            <xs:attribute name="ignore" type="xs:int"/>
+            <xs:attribute name="type" type="xs:string"/>
+            <xs:attribute name="position3D" type="Vector3f"/>
+            <xs:attribute name="position" type="Vector3f"/>
+            <xs:attribute name="direction" type="Vector3f"/>
+            <xs:attribute name="distance" type="xs:double"/>
+            <xs:attribute name="lastdistance" type="xs:double"/>
+            <xs:attribute name="initialdistance" type="xs:double"/>
+            <xs:attribute name="centerpoint" type="Vector3f"/>
+            <xs:attribute name="angle" type="xs:double"/>
+            <xs:attribute name="baseeventtype" type="xs:int"/>                    
+        </xs:complexType>
+    </xs:element>
+
+    <!-- This node can be used by clients to store multiple cursors -->
+    <xs:element name="cursors">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="generic" />
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

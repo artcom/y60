@@ -1,4 +1,4 @@
-
+add_subdirectory(Gesture)
 add_subdirectory(ASSDriver)
 add_subdirectory(DSADriver)
 
