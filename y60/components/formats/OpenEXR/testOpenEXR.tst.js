@@ -57,7 +57,6 @@
 
 */
 
-includePath("../..");  //TODO: remove this after deprecating  ant-build
 use("UnitTest.js");
 
 function OpenEXRUnitTest() {
@@ -72,7 +71,6 @@ OpenEXRUnitTest.prototype.Constructor = function(obj, theName) {
 
     obj.run = function() {
         plug("OpenEXR");
-        GLResourceManager.prepareShaderLibrary("../../shader/shaderlibrary.xml");
         var window = new RenderWindow();
 
         //var myScene = new Scene();
