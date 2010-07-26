@@ -90,7 +90,7 @@ inline const TObj& plassert_valid_impl(const TObj& obj)
     PLASSERT(nBuf < 4096);
 
 #ifndef _WIN32
-    fprintf (stderr, szBuffer);
+    fprintf (stderr, "%s", szBuffer);
 #else
     ::OutputDebugString (szBuffer);
 #endif //_WIN32
