@@ -246,7 +246,7 @@ namespace asl {
         Vector3<Number> contactSphereCenter;
         Vector3<Number> contactSphereNormal;
         ContactType contactType;
-        SweptSphereContact() : contactType(NO_CONTACT) {}
+        SweptSphereContact() : t(0), contactPoint(), contactNormal(), contactSphereCenter(), contactSphereNormal(), contactType(NO_CONTACT) {}
     };
 
     // find the first and last contact with a triangle
