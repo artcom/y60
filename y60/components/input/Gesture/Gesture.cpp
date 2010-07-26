@@ -42,6 +42,9 @@ Gesture::Gesture(DLHandle theHandle) :
     registerStandardTypes( * _myValueFactory );
     registerSomTypes( * _myValueFactory );
     EventDispatcher::get().addSink(this);
+    addCursorFilter("rotate", "cursorid");
+    addCursorFilter("zoom", "cursorid");
+    addCursorFilter("wipe", "cursorid");
 }
 
 
@@ -137,7 +140,7 @@ Gesture::addGestureEvent2Queue(GESTURE_BASE_EVENT_TYPE theBaseEvent, int theID, 
             GenericEventPtr myGenericEvent(dynamic_cast_Ptr<GenericEvent>(*myIt));
             dom::NodePtr myNode = myGenericEvent->getNode();
             std::string myEventType = myNode->getAttributeString("type");
-            if (myEventType == "zoom" || myEventType == "cursor_pair_start" || myEventType == "cursor_pair_finish" || myEventType == "rotate") {
+            if (myEventType == theType && (myEventType == "zoom" || myEventType == "cursor_pair_start" || myEventType == "cursor_pair_finish" || myEventType == "rotate")) {
                 int myCursorPartnerId = asl::as<int>(myNode->getAttributeString("cursorpartnerid"));
                 if (myCursorPartnerId == theID) {
                     _myEvents.erase(myIt);
