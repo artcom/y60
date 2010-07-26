@@ -72,6 +72,9 @@ var js = js || {};
 js.array  = ("array" in js)  ? js.array  : {};
 js.string = ("string" in js) ? js.string : {};
 
+var utils = utils || {};
+utils.dom  = ("dom" in utils)  ? utils.dom  : {};
+
 var PI_2 = Math.PI / 2;
 var PI_4 = Math.PI / 4;
 var PI_180 = Math.PI / 180;
@@ -1162,3 +1165,35 @@ function attachTo(theNode, theNewParent) {
     theNode.orientation = myDecomposition.orientation;
     theNode.scale = myDecomposition.scale;
 }
+
+utils.dom.mergeNodes = function (theTargetNode, theSourceNode) {
+    var myTexture            = Node.createElement("texture");
+    var myImage            = Node.createElement("image");
+    var myShape            = Node.createElement("shape");
+    var myMaterial            = Node.createElement("material");
+    var myBody            = Node.createElement("body");
+//    myBody.createElement("name");
+//    print(myBody.getAttribute("name"));
+//    print(myBody.attributes);
+//    for( var i in myBody.attributes) { print(i); }
+//    if( "name" in myBody ) { print("yyyy"); }
+//    print(myBody);
+
+    var myTransform            = Node.createElement("transform");
+//    print("create material");
+//    theTargetNode.rootNode.materials.appendChild(myMaterial);
+//    print(theTargetNode.rootNode.find(".//materials"));
+    theTargetNode.rootNode.find(".//materials").appendChild(myMaterial);
+    theTargetNode.rootNode.find(".//shapes").appendChild(myShape);
+    theTargetNode.rootNode.find(".//images").appendChild(myImage);
+    theTargetNode.rootNode.find(".//textures").appendChild(myTexture);
+
+    myBody.name = "Cube";
+    myTransform.name = "BOX";
+
+    myTransform.appendChild(myBody);
+//    print(myTransform);
+    theTargetNode.appendChild(myTransform);
+
+};
+
