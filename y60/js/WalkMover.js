@@ -112,6 +112,9 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
 
     var _prevMousePosition    = new Vector3f(0,0,0);
 
+    var _myMinimumTiltRotation= radFromDeg(-30);
+    var _myMaximumTiltRotation= radFromDeg(50);
+
     //////////////////////////////////////////////////////////////////////
     //
     // public
@@ -136,6 +139,19 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
         _myEyeHeight         = INITIAL_EYEHEIGHT;
     };
     
+    self.__defineGetter__("minTiltRotation", function () {
+        return _myMinimumTiltRotation;
+    });
+    self.__defineSetter__("minTiltRotation", function (theValue) {
+        _myMinimumTiltRotation = theValue;
+    });
+    self.__defineGetter__("maxTiltRotation", function () {
+        return _myMaximumTiltRotation;
+    });
+    self.__defineSetter__("maxTiltRotation", function (theValue) {
+        _myMaximumTiltRotation = theValue;
+    });
+
     self.eyeHeight setter = function(theHeight) {
         _myEyeHeight = theHeight;
         _myEyeHeight = Math.max(_myEyeHeight,0);
@@ -167,17 +183,23 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
     };
     
     self.movements.rotateXY = function(theAnglesInRadiant) {
-        var myCameraRotationMatrix = self.getMoverObject().globalmatrix;
-        var myCameraNegTranslation = myCameraRotationMatrix.getTranslation();
-        myCameraNegTranslation.mult(-1);
-        myCameraRotationMatrix.translate(myCameraNegTranslation);
+        var myCameraRotationMatrix = new Matrix4f(self.getMoverObject().globalmatrix);
+        myCameraRotationMatrix.setRow(3,new Vector4f(0,0,0,myCameraRotationMatrix[3][3]));
 
-        // compute the rotated Side Vector and rotate about it -> TILT rotation
-        var myMatrix = new Matrix4f();
-        myMatrix.makeTranslating(new Vector3f(1,0,0));
-        myMatrix.postMultiply(myCameraRotationMatrix);
-        self.getMoverObject().orientation.multiply(new Quaternionf(myMatrix.getTranslation(),theAnglesInRadiant.y));
-
+        var myUnitVectorMatrix = new Matrix4f();
+        myUnitVectorMatrix.makeTranslating(new Vector3f(0,0,-1));
+        myUnitVectorMatrix.postMultiply(myCameraRotationMatrix);
+        var myRotatedUnitVector = myUnitVectorMatrix.getTranslation();
+        var myMinimumValue = Math.sin(_myMinimumTiltRotation);
+        var myMaximumValue = Math.sin(_myMaximumTiltRotation);
+        if( ((theAnglesInRadiant.y < 0)&&(myRotatedUnitVector.y >= myMinimumValue)) ||  
+            ((theAnglesInRadiant.y >=0)&&(myRotatedUnitVector.y <= myMaximumValue)) ) {
+            // compute the rotated Side Vector and rotate about it -> TILT rotation
+            var myMatrix = new Matrix4f();
+            myMatrix.makeTranslating(new Vector3f(1,0,0));
+            myMatrix.postMultiply(myCameraRotationMatrix);
+            self.getMoverObject().orientation.multiply(new Quaternionf(myMatrix.getTranslation(),theAnglesInRadiant.y));
+        }
         // add rotation about the up vector -> PAN rotation
         self.getMoverObject().orientation.multiply(new Quaternionf(new Vector3f(0,1,0),-theAnglesInRadiant.x));
     };
