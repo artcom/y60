@@ -1189,7 +1189,7 @@ utils.dom.mergeNodes = function (theTargetNode, theSourceNode) {
                 var myElements = theSourceNode.childNode("primitives").childNode("elements");
                 var myMaterial = theSourceNode.rootNode.getElementById(myElements.material);
                 utils.dom.mergeNodes(theTargetNode,myMaterial);
-                myClonedSourceNode = theSourceNode.cloneNode(false);
+                myClonedSourceNode = theSourceNode.cloneNode(true);
                 theTargetNode.rootNode.find(".//shapes").appendChild(myClonedSourceNode);
             }
             break;
@@ -1201,7 +1201,7 @@ utils.dom.mergeNodes = function (theTargetNode, theSourceNode) {
                     myTexture = theSourceNode.rootNode.getElementById(myTextureUnits.childNode(i).texture);
                     utils.dom.mergeNodes(theTargetNode,myTexture);
                 }
-                myClonedSourceNode = theSourceNode.cloneNode(false);
+                myClonedSourceNode = theSourceNode.cloneNode(true);
                 theTargetNode.rootNode.find(".//materials").appendChild(myClonedSourceNode);
             }
             break;
@@ -1209,13 +1209,13 @@ utils.dom.mergeNodes = function (theTargetNode, theSourceNode) {
             if(!theTargetNode.rootNode.find(".//texture[@id='"+theSourceNode.id+"']")){
                 var myImage = theSourceNode.rootNode.getElementById(theSourceNode.image);
                 utils.dom.mergeNodes(theTargetNode,myImage);
-                myClonedSourceNode = theSourceNode.cloneNode(false);
+                myClonedSourceNode = theSourceNode.cloneNode(true);
                 theTargetNode.rootNode.find(".//textures").appendChild(myClonedSourceNode);
             } 
             break;
         case "image":
             if(!theTargetNode.rootNode.find(".//image[@id='"+theSourceNode.id+"']")){
-                myClonedSourceNode = theSourceNode.cloneNode(false);
+                myClonedSourceNode = theSourceNode.cloneNode(true);
                 theTargetNode.rootNode.find(".//images").appendChild(myClonedSourceNode);
             }
             break;
