@@ -1167,116 +1167,122 @@ function attachTo(theNode, theNewParent) {
 }
 
 utils.dom.mergeNodes = function (theTargetNode, theSourceNode) {
-    var myClonedSourceNode;
-    var i;
-    switch(theSourceNode.nodeName) {
-        case "transform":
-            myClonedSourceNode = theSourceNode.cloneNode(false);
-            theTargetNode.appendChild(myClonedSourceNode);
-            for(i=0;i<theSourceNode.childNodesLength();++i){
-                utils.dom.mergeNodes(myClonedSourceNode,theSourceNode.childNode(i));
-            }
-            break;
-        case "body":
-            var myShape = theSourceNode.rootNode.getElementById(theSourceNode.shape);
-            utils.dom.mergeNodes(theTargetNode,myShape);
 
-            myClonedSourceNode = theSourceNode.cloneNode(false);
-            theTargetNode.appendChild(myClonedSourceNode);
-            break;
-        case "shape":
-            if(!theTargetNode.rootNode.find(".//shape[@id='"+theSourceNode.id+"']")){
+    function _adjustIds (theSourceNode) {
+        var myOldId = theSourceNode.id;
+        adjustNodeId(theSourceNode,false);
+        var myNewId = theSourceNode.id;
+        var i;
+        switch(theSourceNode.nodeName) {
+            case "transform":
+                for(i=0;i<theSourceNode.childNodesLength();++i){
+                    _adjustIds(theSourceNode.childNode(i));
+                }
+                break;
+            case "body":
+                var myShape = theSourceNode.rootNode.getElementById(theSourceNode.shape);
+                _adjustIds(myShape);
+                break;
+            case "shape":
+                var myReferencingBodys = theSourceNode.rootNode.findAll(".//body[@shape='"+myOldId+"']");
+                for(i=0;i<myReferencingBodys.length;++i){
+                    myReferencingBodys[i].shape = myNewId;
+                }
                 var myElements = theSourceNode.childNode("primitives").childNode("elements");
                 var myMaterial = theSourceNode.rootNode.getElementById(myElements.material);
-                utils.dom.mergeNodes(theTargetNode,myMaterial);
-                myClonedSourceNode = theSourceNode.cloneNode(true);
-                theTargetNode.rootNode.find(".//shapes").appendChild(myClonedSourceNode);
-            }
-            break;
-        case "material":
-            if(!theTargetNode.rootNode.find(".//material[@id='"+theSourceNode.id+"']")){
+                _adjustIds(myMaterial);
+                break;
+            case "material":
+                var myReferencingShapes = theSourceNode.rootNode.findAll(".//elements[@material='"+myOldId+"']");
+                for(i=0;i<myReferencingShapes.length;++i){
+                    myReferencingShapes[i].material = myNewId;
+                }
+                
                 var myTextureUnits = theSourceNode.childNode("textureunits");
                 var myTexture;
                 for(i=0;i<myTextureUnits.childNodesLength();++i) {
                     myTexture = theSourceNode.rootNode.getElementById(myTextureUnits.childNode(i).texture);
-                    utils.dom.mergeNodes(theTargetNode,myTexture);
+                    _adjustIds(myTexture);
                 }
-                myClonedSourceNode = theSourceNode.cloneNode(true);
-                theTargetNode.rootNode.find(".//materials").appendChild(myClonedSourceNode);
-            }
-            break;
-        case "texture":
-            if(!theTargetNode.rootNode.find(".//texture[@id='"+theSourceNode.id+"']")){
+                break;
+            case "texture":
+                var myReferencingTextureUnits = theSourceNode.rootNode.findAll(".//textureunit[@texture='"+myOldId+"']");
+                for(i=0;i<myReferencingTextureUnits.length;++i){
+                    myReferencingTextureUnits[i].texture = myNewId;
+                }
                 var myImage = theSourceNode.rootNode.getElementById(theSourceNode.image);
-                utils.dom.mergeNodes(theTargetNode,myImage);
-                myClonedSourceNode = theSourceNode.cloneNode(true);
-                theTargetNode.rootNode.find(".//textures").appendChild(myClonedSourceNode);
-            } 
-            break;
-        case "image":
-            if(!theTargetNode.rootNode.find(".//image[@id='"+theSourceNode.id+"']")){
-                myClonedSourceNode = theSourceNode.cloneNode(true);
-                theTargetNode.rootNode.find(".//images").appendChild(myClonedSourceNode);
-            }
-            break;
-        default:
-            break;
+                _adjustIds(myImage);
+                break;
+            case "image":
+                var myReferencingTextures = theSourceNode.rootNode.findAll(".//texture[@image='"+myOldId+"']");
+                for(i=0;i<myReferencingTextures.length;++i){
+                    myReferencingTextures[i].image = myNewId;
+                }
+                break;
+            default:
+                break;
+        }
     }
+
+    function _cloneToTarget (theTargetNode, theSourceNode) {
+        var myClonedSourceNode;
+        var i;
+        switch(theSourceNode.nodeName) {
+            case "transform":
+                myClonedSourceNode = theSourceNode.cloneNode(false);
+                theTargetNode.appendChild(myClonedSourceNode);
+                for(i=0;i<theSourceNode.childNodesLength();++i){
+                    _cloneToTarget(myClonedSourceNode,theSourceNode.childNode(i));
+                }
+                break;
+            case "body":
+                var myShape = theSourceNode.rootNode.getElementById(theSourceNode.shape);
+                _cloneToTarget(theTargetNode,myShape);
+
+                myClonedSourceNode = theSourceNode.cloneNode(false);
+                theTargetNode.appendChild(myClonedSourceNode);
+                break;
+            case "shape":
+                if(!theTargetNode.rootNode.find(".//shape[@id='"+theSourceNode.id+"']")){
+                    var myElements = theSourceNode.childNode("primitives").childNode("elements");
+                    var myMaterial = theSourceNode.rootNode.getElementById(myElements.material);
+                    _cloneToTarget(theTargetNode,myMaterial);
+                    myClonedSourceNode = theSourceNode.cloneNode(true);
+                    theTargetNode.rootNode.find(".//shapes").appendChild(myClonedSourceNode);
+                }
+                break;
+            case "material":
+                if(!theTargetNode.rootNode.find(".//material[@id='"+theSourceNode.id+"']")){
+                    var myTextureUnits = theSourceNode.childNode("textureunits");
+                    var myTexture;
+                    for(i=0;i<myTextureUnits.childNodesLength();++i) {
+                        myTexture = theSourceNode.rootNode.getElementById(myTextureUnits.childNode(i).texture);
+                        _cloneToTarget(theTargetNode,myTexture);
+                    }
+                    myClonedSourceNode = theSourceNode.cloneNode(true);
+                    theTargetNode.rootNode.find(".//materials").appendChild(myClonedSourceNode);
+                }
+                break;
+            case "texture":
+                if(!theTargetNode.rootNode.find(".//texture[@id='"+theSourceNode.id+"']")){
+                    var myImage = theSourceNode.rootNode.getElementById(theSourceNode.image);
+                    _cloneToTarget(theTargetNode,myImage);
+                    myClonedSourceNode = theSourceNode.cloneNode(true);
+                    theTargetNode.rootNode.find(".//textures").appendChild(myClonedSourceNode);
+                } 
+                break;
+            case "image":
+                if(!theTargetNode.rootNode.find(".//image[@id='"+theSourceNode.id+"']")){
+                    myClonedSourceNode = theSourceNode.cloneNode(true);
+                    theTargetNode.rootNode.find(".//images").appendChild(myClonedSourceNode);
+                }
+                break;
+            default:
+                break;
+        }
+    }
+    _adjustIds(theSourceNode);
+    _cloneToTarget(theTargetNode, theSourceNode);
 };
 
-utils.dom.prepareMergeNodes = function (theSourceNode) {
-    var myOldId = theSourceNode.id;
-    adjustNodeId(theSourceNode,false);
-    var myNewId = theSourceNode.id;
-    var i;
-    switch(theSourceNode.nodeName) {
-        case "transform":
-            for(i=0;i<theSourceNode.childNodesLength();++i){
-                utils.dom.prepareMergeNodes(theSourceNode.childNode(i));
-            }
-            break;
-        case "body":
-            var myShape = theSourceNode.rootNode.getElementById(theSourceNode.shape);
-            utils.dom.prepareMergeNodes(myShape);
-            break;
-        case "shape":
-            var myReferencingBodys = theSourceNode.rootNode.findAll(".//body[@shape='"+myOldId+"']");
-            for(i=0;i<myReferencingBodys.length;++i){
-                myReferencingBodys[i].shape = myNewId;
-            }
-            var myElements = theSourceNode.childNode("primitives").childNode("elements");
-            var myMaterial = theSourceNode.rootNode.getElementById(myElements.material);
-            utils.dom.prepareMergeNodes(myMaterial);
-            break;
-        case "material":
-            var myReferencingShapes = theSourceNode.rootNode.findAll(".//elements[@material='"+myOldId+"']");
-            for(i=0;i<myReferencingShapes.length;++i){
-                myReferencingShapes[i].material = myNewId;
-            }
-            
-            var myTextureUnits = theSourceNode.childNode("textureunits");
-            var myTexture;
-            for(i=0;i<myTextureUnits.childNodesLength();++i) {
-                myTexture = theSourceNode.rootNode.getElementById(myTextureUnits.childNode(i).texture);
-                utils.dom.prepareMergeNodes(myTexture);
-            }
-            break;
-        case "texture":
-            var myReferencingTextureUnits = theSourceNode.rootNode.findAll(".//textureunit[@texture='"+myOldId+"']");
-            for(i=0;i<myReferencingTextureUnits.length;++i){
-                myReferencingTextureUnits[i].texture = myNewId;
-            }
-            var myImage = theSourceNode.rootNode.getElementById(theSourceNode.image);
-            utils.dom.prepareMergeNodes(myImage);
-            break;
-        case "image":
-            var myReferencingTextures = theSourceNode.rootNode.findAll(".//texture[@image='"+myOldId+"']");
-            for(i=0;i<myReferencingTextures.length;++i){
-                myReferencingTextures[i].image = myNewId;
-            }
-            break;
-        default:
-            break;
-    }
-};
 

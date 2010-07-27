@@ -195,7 +195,6 @@ Y60JSSLUnitTest.prototype.Constructor = function (obj, theName) {
         var myTargetNode = myTargetScene.dom.find(".//*[@name='BOX']");
         var mySourceNode = mySourceScene.dom.find(".//*[@name='BOX']");
 
-        utils.dom.prepareMergeNodes(mySourceNode);
         utils.dom.mergeNodes(myTargetNode,mySourceNode);
 
         ENSURE_NOT_EQUAL(undefined,myTargetNode.find(".//transform[@name='BOX']"),
