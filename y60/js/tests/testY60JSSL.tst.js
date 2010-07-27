@@ -188,41 +188,43 @@ Y60JSSLUnitTest.prototype.Constructor = function (obj, theName) {
 
     function testDomMergeNodes() {
         DTITLE("DomMergeNodes");
-        var myTargetScene = new Scene(searchFile("fixtures/models/scene.x60"));
-        var mySourceScene = new Scene(searchFile("fixtures/models/scene.x60"));
+        var i;
+        var myTargetScene = new Scene(searchFile("fixtures/models/targetScene.x60"));
+        var mySourceScene = new Scene(searchFile("fixtures/models/sourceScene.x60"));
 
         var myTargetNode = myTargetScene.dom.find(".//*[@name='BOX']");
         var mySourceNode = mySourceScene.dom.find(".//*[@name='BOX']");
 
+        utils.dom.prepareMergeNodes(mySourceNode);
         utils.dom.mergeNodes(myTargetNode,mySourceNode);
 
         ENSURE_NOT_EQUAL(undefined,myTargetNode.find(".//transform[@name='BOX']"),
-                         "Target Node must have a child TransformNode");
+                         "Target Node must have a child TransformNode named BOX");
 
         var myCubeNodes = myTargetScene.dom.findAll(".//*[@name='Cube']");
-        ENSURE_EQUAL(2,myCubeNodes.length,"Target Scene must have two Cubes");
-        ENSURE_NOT_EQUAL(myCubeNodes[0].getAttribute("id"),myCubeNodes[1].getAttribute("id"),
-                         "Cubes must have unique id's");
+        ENSURE_EQUAL(4,myCubeNodes.length,"Target Scene must have two Cubes");
+        for(i=0;i<myCubeNodes.length;++i){
+//            print(myCubeNodes[i].shape);
+            ENSURE_NOT_EQUAL(null,myTargetScene.shapes.getElementById(myCubeNodes[i].shape),"each referenced shape must exist");
+//            print("shape id: " + myCubeNodes[i].shape);
+//            if(myTargetScene.shapes.getElementById(myCubeNodes[i].shape)){ 
+//                print("shape exists");
+//            } else {
+//                print("shape does NOT exists");
+//            }
+        }
 
         var myImages = myTargetScene.dom.findAll(".//image");
         ENSURE_EQUAL(2,myImages.length,"Target Scene must have two images");
-        ENSURE_NOT_EQUAL(myImages[0].getAttribute("id"),myImages[1].getAttribute("id"),
-                         "Images must have unique id's");
 
         var myTextures = myTargetScene.dom.findAll(".//texture");
         ENSURE_EQUAL(2,myTextures.length,"Target Scene must have two textures");
-        ENSURE_NOT_EQUAL(myTextures[0].getAttribute("id"),myTextures[1].getAttribute("id"),
-                         "Textures must have unique id's");
 
         var myMaterials = myTargetScene.dom.findAll(".//material");
         ENSURE_EQUAL(2,myMaterials.length,"Target Scene must have two materials");
-        ENSURE_NOT_EQUAL(myMaterials[0].getAttribute("id"),myMaterials[1].getAttribute("id"),
-                         "Materials must have unique id's");
 
         var myShapes = myTargetScene.dom.findAll(".//shape");
         ENSURE_EQUAL(2,myShapes.length,"Target Scene must have two shapes");
-        ENSURE_NOT_EQUAL(myShapes[0].getAttribute("id"),myShapes[1].getAttribute("id"),
-                         "Shapes must have unique id's");
 
         ENSURE_EQUAL(1,myTargetScene.dom.findAll(".//canvas").length,
                      "Target Scene must have one canvas");

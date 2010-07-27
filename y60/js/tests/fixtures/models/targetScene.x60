@@ -9,6 +9,7 @@
             <transform visible="1" name="MODEL" position="[0,0,0]" scale="[1,1,1]" orientation="[0,0,0,1]" pivot="[0,0,0]" billboard="" id="YOgG8wm3W_8=">
                 <transform visible="1" name="BOX" position="[0,0,0]" scale="[1,1,1]" orientation="[0,0,0,1]" pivot="[0,0,0]" billboard="" id="YOgG8wm3W_9=">
                     <body shape="AxI58waogW8=" id="DxI58waogW8=" name="Cube" visible="1" insensible="0" position="[0,0,0]" orientation="[0,0,0,-1]" scale="[1,1,1]" pivot="[0,0,0]" billboard="" cullable="1" clippingplanes="[]" scissor="" sticky="0" events="[]" skeleton="[]"/>
+                    <body shape="AxI58waogW8=" id="DxI58waogW9=" name="Cube" visible="1" insensible="0" position="[0,0,0]" orientation="[0,0,0,-1]" scale="[1,1,1]" pivot="[0,0,0]" billboard="" cullable="1" clippingplanes="[]" scissor="" sticky="0" events="[]" skeleton="[]"/>
                 </transform>
             </transform>
         </world>
