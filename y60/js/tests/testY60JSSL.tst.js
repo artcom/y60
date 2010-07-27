@@ -204,14 +204,7 @@ Y60JSSLUnitTest.prototype.Constructor = function (obj, theName) {
         var myCubeNodes = myTargetScene.dom.findAll(".//*[@name='Cube']");
         ENSURE_EQUAL(4,myCubeNodes.length,"Target Scene must have two Cubes");
         for(i=0;i<myCubeNodes.length;++i){
-//            print(myCubeNodes[i].shape);
             ENSURE_NOT_EQUAL(null,myTargetScene.shapes.getElementById(myCubeNodes[i].shape),"each referenced shape must exist");
-//            print("shape id: " + myCubeNodes[i].shape);
-//            if(myTargetScene.shapes.getElementById(myCubeNodes[i].shape)){ 
-//                print("shape exists");
-//            } else {
-//                print("shape does NOT exists");
-//            }
         }
 
         var myImages = myTargetScene.dom.findAll(".//image");
