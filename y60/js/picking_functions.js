@@ -175,8 +175,8 @@ Picking.prototype.Constructor = function (obj, theRenderWindow) {
         return myClosestPosition;
     };
 
-    obj.pickBody = function (theScreenPixelX, theScreenPixelY) {
-        var myIntersection = obj.pickIntersection(theScreenPixelX, theScreenPixelY);
+    obj.pickBody = function (theScreenPixelX, theScreenPixelY, theWorld) {
+        var myIntersection = obj.pickIntersection(theScreenPixelX, theScreenPixelY, theWorld);
         if (myIntersection) {
             return myIntersection.info.body;
         } else {
@@ -284,10 +284,10 @@ Picking.prototype.Constructor = function (obj, theRenderWindow) {
         return myViewLineSegment;
     };
 
-    obj.pickIntersection = function (theScreenPixelX, theScreenPixelY) {
+    obj.pickIntersection = function (theScreenPixelX, theScreenPixelY, theWorld) {
         var myLineSegment = obj.getLineSegmentThroughScreen(theScreenPixelX, theScreenPixelY);
         //XXX.. this should not look just for first world in scene.. what about multiple worlds????
-        var myWorld = _myRenderWindow.scene.dom.find("worlds/world");
+        var myWorld = theWorld || _myRenderWindow.scene.dom.find("worlds/world");
         return nearestIntersection(myWorld, myLineSegment);
     };
 
