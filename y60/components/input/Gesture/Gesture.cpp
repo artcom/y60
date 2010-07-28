@@ -65,7 +65,7 @@ Gesture::poll() {
     //analyzeEvents(myFinalEvents, "cursorid");
     _myEvents.clear();
 
-    AC_DEBUG << "-------";
+    AC_PRINT << "-------";
     return myFinalEvents;
 }
 
@@ -259,6 +259,7 @@ Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent,  int theID, const std
                     if (isNaN(myAngle)) {
                         myAngle = 0;
                     }
+                    AC_PRINT << "angle: " << myAngle;
                     if (abs(myAngle) > 1) {
                         dom::NodePtr myNode2 = addGestureEvent2Queue(theBaseEvent, theID, "rotate", thePosition3D);
                         myNode2->appendAttribute<float>("angle", myAngle);
@@ -334,6 +335,7 @@ Gesture::getCurrentPos(GESTURE_BASE_EVENT_TYPE theBaseEvent, int theCursorId) {
         float myDistance = 0;
         Vector3f myLastPosition(0,0,0);
         unsigned myCounter = 0;
+        //for (unsigned int i = myPositions.size(); i > 0 && myDistance < _myIgnoreCursorsInHistoryDistance; --i)
         for (unsigned int i = myPositions.size(); i > 0 && myDistance < _myIgnoreCursorsInHistoryDistance; --i)
         {
             myCounter+=i;
@@ -343,6 +345,10 @@ Gesture::getCurrentPos(GESTURE_BASE_EVENT_TYPE theBaseEvent, int theCursorId) {
                 myDistance += distance( myPositions[i-1], myLastPosition );
             }
             myLastPosition = myPositions[i-1];
+
+            if (myPositions.size() > 10 && i == myPositions.size()-10) {
+                break;
+            }
          }
          myPos.mult(float(1.0f)/(myCounter)) ;
          return myPos;
