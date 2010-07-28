@@ -86,10 +86,16 @@ spark.Slider.Constructor = function(Protected) {
         _sticky         = Protected.getBoolean("sticky", true);
         Public.addEventListener(spark.CursorEvent.ENTER, Public.onSlideStart,true);
         Public.addEventListener(spark.MouseEvent.BUTTON_DOWN, Public.dispatchCursorEnter, true);
+//        Public.addEventListener(spark.GenericInputEvent.BUTTON_DOWN_ENTER, Public.dispatchCursorEnter, true);
+
         Public.addEventListener(spark.CursorEvent.MOVE, Public.onSlide,true);
         Public.stage.addEventListener(spark.MouseEvent.MOVE, Public.dispatchCursorMove, true);
+//        Public.addEventListener(spark.GenericInputEvent.MOVE, Public.onSlide,true);
+
         Public.addEventListener(spark.CursorEvent.LEAVE, Public.onSlideStop, true);
         Public.stage.addEventListener(spark.MouseEvent.BUTTON_UP, Public.dispatchCursorLeave, true);
+//        Public.addEventListener(spark.GenericInputEvent.BUTTON_UP_LEAVE, Public.onSlideStop, true);
+
         if(_centered) {
             centerCursor();
         }
