@@ -100,6 +100,8 @@ use("registry.js");
 use("cache.js");
 // basic component classes
 use("components.js");
+// cursor object
+use("cursor.js");
 // event handling
 use("events.js");
 // multitouch support

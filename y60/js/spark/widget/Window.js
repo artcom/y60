@@ -129,6 +129,7 @@ spark.Window.Constructor = function(Protected) {
     Public.mouseFocused getter = function() {
         return _myMouseFocused;
     };
+    var _myMouseCursor = null;
 
 
     var _myKeyboardFocused = null;
@@ -200,7 +201,12 @@ spark.Window.Constructor = function(Protected) {
 
         Protected.updateMousePosition(theX, theY);
 
-        var myWidget = Public.pickWidget(theX, theY);
+        var myWidget;
+        if(_myMouseCursor && _myMouseCursor.grabbed) {
+            myWidget = _myMouseCursor.grabHolder;
+        } else {
+            myWidget = Public.pickWidget(theX, theY);
+        }
 
         if(!myWidget) {
             myWidget = Public;
@@ -212,17 +218,29 @@ spark.Window.Constructor = function(Protected) {
 
             if(_myMouseFocused) {
                 var myLeaveEvent = new spark.MouseEvent(spark.MouseEvent.LEAVE, theX, theY, 0, 0, null, myButtonStates);
+                if (_myMouseCursor) {
+                    _myMouseCursor.update(true, new Point2f(theX,theY));
+                    myLeaveEvent.cursor = _myMouseCursor;
+                }
                 _myMouseFocused.dispatchEvent(myLeaveEvent);
             }
 
             _myMouseFocused = myWidget;
 
             var myEnterEvent = new spark.MouseEvent(spark.MouseEvent.ENTER, theX, theY);
+            _myMouseCursor = new spark.Cursor("mouse-cursor")
+            _myMouseCursor.update(true, new Point2f(theX,theY));
+            myEnterEvent.cursor = _myMouseCursor;
             myWidget.dispatchEvent(myEnterEvent);
         }
 
         Logger.debug("Mouse moves to [" + theX + "," + theY + "] over " + myWidget);
         var myMoveEvent = new spark.MouseEvent(spark.MouseEvent.MOVE, theX, theY);
+        if (!_myMouseCursor) {
+            _myMouseCursor = new spark.Cursor("mouse-cursor")
+        }
+        _myMouseCursor.update(true, new Point2f(theX,theY));
+        myMoveEvent.cursor = _myMouseCursor;
         myWidget.dispatchEvent(myMoveEvent);
 
         _myMouseFocused = myWidget;
@@ -240,7 +258,12 @@ spark.Window.Constructor = function(Protected) {
 
         Protected.updateMousePosition(theX, theY);
 
-        var myWidget = Public.pickWidget(theX, theY);
+        var myWidget;
+        if(_myMouseCursor && _myMouseCursor.grabbed) {
+            myWidget = _myMouseCursor.grabHolder;
+        } else {
+            myWidget = Public.pickWidget(theX, theY);
+        }
 
         if(!myWidget) {
             myWidget = Public;
@@ -249,14 +272,24 @@ spark.Window.Constructor = function(Protected) {
             // XXX: click should be more well-defined and button-up-based.
             Logger.debug("Mouse clicks " + myWidget + " with button " + myButton);
             var myClickEvent = new spark.MouseEvent(spark.MouseEvent.CLICK, theX, theY, 0, 0, myButton, myButtonStates);
+            _myMouseCursor = new spark.Cursor("mouse-cursor")
+            _myMouseCursor.update(true, new Point2f(theX,theY));
+            myClickEvent.cursor = _myMouseCursor;
             myWidget.dispatchEvent(myClickEvent);
 
             Logger.debug("Mouse " + myButton + " button down on " + myWidget);
             var myDownEvent = new spark.MouseEvent(spark.MouseEvent.BUTTON_DOWN, theX, theY, 0, 0, myButton, myButtonStates);
+            _myMouseCursor = new spark.Cursor("mouse-cursor")
+            _myMouseCursor.update(true, new Point2f(theX,theY));
+            myDownEvent.cursor = _myMouseCursor;
             myWidget.dispatchEvent(myDownEvent);
         } else {
             Logger.debug("Mouse " + myButton + " button up on " + myWidget);
             var myUpEvent = new spark.MouseEvent(spark.MouseEvent.BUTTON_UP, theX, theY, 0, 0, myButton, myButtonStates);
+            if (_myMouseCursor) {
+                _myMouseCursor.update(true, new Point2f(theX,theY));
+                myUpEvent.cursor = _myMouseCursor;
+            }
             myWidget.dispatchEvent(myUpEvent);
         }
     };

@@ -512,6 +512,15 @@ spark.MouseEvent.Constructor = function(Protected, theType, theX, theY, theAmoun
 
     var _myStageX = theX;
 
+    var _myCursor = null;
+
+    Public.__defineGetter__("cursor", function () {
+        return _myCursor;
+    });
+    Public.__defineSetter__("cursor", function (theCursor) {
+        _myCursor = theCursor;
+    });
+
     Public.__defineGetter__("stageX", function () {
         return _myStageX;
     });
