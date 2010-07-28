@@ -84,44 +84,12 @@ spark.Slider.Constructor = function(Protected) {
         _horizontalLock = Protected.getBoolean("horizontal-lock",false);
         _centered       = Protected.getBoolean("centered", true);
         _sticky         = Protected.getBoolean("sticky", true);
-        Public.addEventListener(spark.CursorEvent.ENTER, Public.onSlideStart,true);
-        Public.addEventListener(spark.MouseEvent.BUTTON_DOWN, Public.dispatchCursorEnter, true);
-//        Public.addEventListener(spark.GenericInputEvent.BUTTON_DOWN_ENTER, Public.dispatchCursorEnter, true);
-
-        Public.addEventListener(spark.CursorEvent.MOVE, Public.onSlide,true);
-        Public.stage.addEventListener(spark.MouseEvent.MOVE, Public.dispatchCursorMove, true);
-//        Public.addEventListener(spark.GenericInputEvent.MOVE, Public.onSlide,true);
-
-        Public.addEventListener(spark.CursorEvent.LEAVE, Public.onSlideStop, true);
-        Public.stage.addEventListener(spark.MouseEvent.BUTTON_UP, Public.dispatchCursorLeave, true);
-//        Public.addEventListener(spark.GenericInputEvent.BUTTON_UP_LEAVE, Public.onSlideStop, true);
+        Public.addEventListener(spark.GenericInputEvent.BUTTON_DOWN_ENTER, Public.onSlideStart, true);
+        Public.addEventListener(spark.GenericInputEvent.MOVE, Public.onSlide,true);
+        Public.addEventListener(spark.GenericInputEvent.BUTTON_UP_LEAVE, Public.onSlideStop, true);
 
         if(_centered) {
             centerCursor();
-        }
-    };
-
-    Public.dispatchCursorEnter = function(theEvent) {
-        _myMouseCursor = new spark.Cursor("mouse-cursor")
-        _myMouseCursor.update(true, new Point2f(theEvent.stageX, theEvent.stageY));
-        var myEnter = new spark.CursorEvent(spark.CursorEvent.ENTER, _myMouseCursor);
-        _mySliderBackground.dispatchEvent(myEnter);
-    };
-
-    Public.dispatchCursorMove = function(theEvent) {
-        if(_myMouseCursor) {
-            _myMouseCursor.update(true, new Point2f(theEvent.stageX, theEvent.stageY));
-            var myMove = new spark.CursorEvent(spark.CursorEvent.MOVE, _myMouseCursor);
-            _mySliderBackground.dispatchEvent(myMove);
-        }
-    };
-
-    Public.dispatchCursorLeave = function(theEvent) {
-        if(_myMouseCursor) {
-            _myMouseCursor.update(true, new Point2f(theEvent.stageX, theEvent.stageY));
-            var myLeave = new spark.CursorEvent(spark.CursorEvent.LEAVE, _myMouseCursor);
-            _mySliderBackground.dispatchEvent(myLeave);
-            _myMouseCursor = null;
         }
     };
 
@@ -141,31 +109,33 @@ spark.Slider.Constructor = function(Protected) {
     };
 
     Public.onSlideStop = function (theEvent) {
-        Public.onSlide(theEvent);
-        delete _myPosHistory[theEvent.cursor.id];
-        _myIdleCursor.position = _myActiveCursor.position;
-        _myIdleCursor.visible   = true;
-        _myActiveCursor.visible = false;
-        theEvent.cursor.ungrab(theEvent.target);
-        if(!_sticky) {
-            if(_centered) {
-                centerCursor();
-            } else {
-                _myIdleCursor.position   = _myCursorOrigin;
-                _myActiveCursor.position = _myCursorOrigin;
+        if(theEvent.cursor && (theEvent.cursor.id in _myPosHistory)){
+            Public.onSlide(theEvent);
+            delete _myPosHistory[theEvent.cursor.id];
+            _myIdleCursor.position = _myActiveCursor.position;
+            _myIdleCursor.visible   = true;
+            _myActiveCursor.visible = false;
+            theEvent.cursor.ungrab(theEvent.target);
+            if(!_sticky) {
+                if(_centered) {
+                    centerCursor();
+                } else {
+                    _myIdleCursor.position   = _myCursorOrigin;
+                    _myActiveCursor.position = _myCursorOrigin;
+                }
             }
-        }
-        if(_myEventTarget) {
-            var mySliderStop = new spark.SliderEvent(spark.SliderEvent.STOP,
-                                                     Public.name,
-                                                     getRelativeX(),
-                                                     getRelativeY());
-            _myEventTarget.dispatchEvent(mySliderStop);
+            if(_myEventTarget) {
+                var mySliderStop = new spark.SliderEvent(spark.SliderEvent.STOP,
+                                                         Public.name,
+                                                         getRelativeX(),
+                                                         getRelativeY());
+                _myEventTarget.dispatchEvent(mySliderStop);
+            }
         }
     };
 
     Public.onSlide = function (theEvent) {
-        if(theEvent.cursor){
+        if(theEvent.cursor && (theEvent.cursor.id in _myPosHistory)){
             dampPosition(theEvent);
             if(!_horizontalLock) {
                 var myNewX = theEvent.dampenedPos.x -

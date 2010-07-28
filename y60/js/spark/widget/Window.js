@@ -218,20 +218,12 @@ spark.Window.Constructor = function(Protected) {
 
             if(_myMouseFocused) {
                 var myLeaveEvent = new spark.MouseEvent(spark.MouseEvent.LEAVE, theX, theY, 0, 0, null, myButtonStates);
-                if (_myMouseCursor) {
-                    _myMouseCursor.update(true, new Point2f(theX,theY));
-                    myLeaveEvent.cursor = _myMouseCursor;
-                    _myMouseCursor = null;
-                }
                 _myMouseFocused.dispatchEvent(myLeaveEvent);
             }
 
             _myMouseFocused = myWidget;
 
             var myEnterEvent = new spark.MouseEvent(spark.MouseEvent.ENTER, theX, theY);
-            _myMouseCursor = new spark.Cursor("mouse-cursor")
-            _myMouseCursor.update(true, new Point2f(theX,theY));
-            myEnterEvent.cursor = _myMouseCursor;
             myWidget.dispatchEvent(myEnterEvent);
         }
 
