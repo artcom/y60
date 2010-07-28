@@ -230,9 +230,11 @@ spark.Canvas.Constructor = function (Protected) {
         var pickedBody     = null,
             canvasPosition = Public.convertToCanvasCoordinates(theX, theY);
         if (canvasPosition) {
-            pickedBody = Public.picking.pickBodyBySweepingSphereFromBodies(
-                                canvasPosition.x, canvasPosition.y,
-                                PICK_RADIUS, _myWorld, _myViewport);
+            // picking by intersection not by sweeping sphere, more accurate for strangely grouped bodies
+            pickedBody = Public.picking.pickBody(canvasPosition.x, canvasPosition.y, _myWorld);
+            //pickBodyBySweepingSphereFromBodies(
+            //                    canvasPosition.x, canvasPosition.y,
+            //                    PICK_RADIUS, _myWorld, _myViewport);
         }
         return pickedBody;
     };
