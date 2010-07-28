@@ -165,51 +165,53 @@ spark.Slider.Constructor = function(Protected) {
     };
 
     Public.onSlide = function (theEvent) {
-        dampPosition(theEvent);
-        if(!_horizontalLock) {
-            var myNewX = theEvent.dampenedPos.x -
-                         Public.x -
-                         _mySliderBackground.x -
-                         _myActiveCursor.width/2;
-            var myMinX = _mySliderBackground.x;
-            if(myNewX < myMinX) {
-                _myActiveCursor.x       = myMinX;
-            } else {
-                var myMaxX = _mySliderBackground.x +
-                             _mySliderBackground.width -
-                             _myActiveCursor.width;
-                if(myNewX > myMaxX) {
-                    _myActiveCursor.x       = myMaxX;
+        if(theEvent.cursor){
+            dampPosition(theEvent);
+            if(!_horizontalLock) {
+                var myNewX = theEvent.dampenedPos.x -
+                             Public.x -
+                             _mySliderBackground.x -
+                             _myActiveCursor.width/2;
+                var myMinX = _mySliderBackground.x;
+                if(myNewX < myMinX) {
+                    _myActiveCursor.x       = myMinX;
                 } else {
-                    _myActiveCursor.x       = myNewX;
+                    var myMaxX = _mySliderBackground.x +
+                                 _mySliderBackground.width -
+                                 _myActiveCursor.width;
+                    if(myNewX > myMaxX) {
+                        _myActiveCursor.x       = myMaxX;
+                    } else {
+                        _myActiveCursor.x       = myNewX;
+                    }
                 }
             }
-        }
-        if(!_verticalLock) {
-            var myNewY              = -theEvent.dampenedPos.y +
-                                      Public.stage.height -
-                                      Public.y -
-                                      _mySliderBackground.y -
-                                      _myActiveCursor.height/2;
-            var myMinY =     _mySliderBackground.y;
-            if(myNewY < myMinY) {
-                _myActiveCursor.y       = myMinY;
-            } else {
-                var myMaxY = _mySliderBackground.height - _myActiveCursor.height;
-                if(myNewY > myMaxY) {
-                    _myActiveCursor.y       = myMaxY;
+            if(!_verticalLock) {
+                var myNewY              = -theEvent.dampenedPos.y +
+                                          Public.stage.height -
+                                          Public.y -
+                                          _mySliderBackground.y -
+                                          _myActiveCursor.height/2;
+                var myMinY =     _mySliderBackground.y;
+                if(myNewY < myMinY) {
+                    _myActiveCursor.y       = myMinY;
                 } else {
-                    _myActiveCursor.y       = myNewY;
+                    var myMaxY = _mySliderBackground.height - _myActiveCursor.height;
+                    if(myNewY > myMaxY) {
+                        _myActiveCursor.y       = myMaxY;
+                    } else {
+                        _myActiveCursor.y       = myNewY;
+                    }
                 }
-            }
 
-        }
-        if(_myEventTarget) {
-            var mySliderMove = new spark.SliderEvent( spark.SliderEvent.MOVE,
-                                                      Public.name,
-                                                      getRelativeX(),
-                                                      getRelativeY());
-            _myEventTarget.dispatchEvent(mySliderMove);
+            }
+            if(_myEventTarget) {
+                var mySliderMove = new spark.SliderEvent( spark.SliderEvent.MOVE,
+                                                          Public.name,
+                                                          getRelativeX(),
+                                                          getRelativeY());
+                _myEventTarget.dispatchEvent(mySliderMove);
+            }
         }
     };
 
