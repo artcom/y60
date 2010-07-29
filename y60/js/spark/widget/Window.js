@@ -568,9 +568,9 @@ spark.Window.Constructor = function(Protected) {
         var myCounter = 0;
         
         for (var i = 0; i < _myCursorPositionHistory[theCursorId].length; i++) {
-            myCounter+=i;
-            myAveragedPos[0] += _myCursorPositionHistory[theCursorId][i][0] * i;
-            myAveragedPos[1] += _myCursorPositionHistory[theCursorId][i][1] * i;
+            myCounter+=(i+1);
+            myAveragedPos[0] += _myCursorPositionHistory[theCursorId][i][0] * (i+1);
+            myAveragedPos[1] += _myCursorPositionHistory[theCursorId][i][1] * (i+1);
         }
         myAveragedPos[0] /= myCounter;
         myAveragedPos[1] /= myCounter;
