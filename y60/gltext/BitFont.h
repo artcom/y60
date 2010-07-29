@@ -22,13 +22,13 @@ struct BitChar {
  */
 
 struct BitFont {
-  char *name;
+  const char *name;
   int num_chars;
   int first;
   const BitChar **ch;
   int ascent;
   int descent;
-  char *short_name;
+  const char *short_name;
 };
 
 Y60_GLTEXT_DECL void

@@ -64,6 +64,9 @@ spark.Movie.Constructor = function(Protected) {
         _myMovie.loopcount = theFlag ? 0 : 1;
     };
 
+    Public.playSpeed getter = function() { return _myMovie.playspeed;};
+    Public.playSpeed setter = function(theSpeed) { _myMovie.playspeed = theSpeed;};
+
     // frames
 
     Public.frameCount getter = function() { return _myMovie.framecount; };
@@ -228,6 +231,7 @@ spark.Movie.Constructor = function(Protected) {
     function initMovie() {
         Public.loop = Protected.getBoolean("loop", false);
         Public.mode = Protected.getString("mode", "stop");
+        Public.playSpeed = Protected.getNumber("playspeed", 1);
         Public.audio = Protected.getBoolean("audio", true);
         Public.volume = Protected.getNumber("volume", 1.0);
         Public.width = Protected.getNumber("width", Public.width);
