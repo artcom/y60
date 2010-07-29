@@ -68,7 +68,7 @@ class Gesture : public asl::PlugInBase,
         dom::NodePtr addGestureEvent2Queue(GESTURE_BASE_EVENT_TYPE theBaseEvent, int theID, 
                                            const std::string & theType, 
                                            const asl::Vector3f & thePosition3D);
-        asl::Vector3f getCurrentPos(GESTURE_BASE_EVENT_TYPE theBaseEvent, int theCursorId);
+        asl::Vector3f getCurrentPosition(GESTURE_BASE_EVENT_TYPE theBaseEvent, int theCursorId);
         CursorPartnerList::iterator getCursorPartner(int theId);
         void saveAllCursorPositions();
 
@@ -77,7 +77,7 @@ class Gesture : public asl::PlugInBase,
         asl::Ptr<dom::ValueFactory>     _myValueFactory;
         y60::EventPtrList               _myEvents;
 
-        std::map<int, Position3fVector> _myCursorPosHistory;
+        std::map<int, Position3fVector> _myCursorPositionHistory;
 
         CursorList                      _myCursorList;
         std::map<int, asl::Vector3f>    _myLastCursorPositions;
@@ -86,6 +86,7 @@ class Gesture : public asl::PlugInBase,
         float                           _myIgnoreCursorsInHistoryDistance;
         float                           _myWipeDistanceThreshold;
         float                           _myMaxCursorPairDistance;
+        unsigned int                    _myMaxPositionsFromHistory;
 
         unsigned int                    _myEventCounter;
         asl::ThreadLock                 _myDeliveryMutex;

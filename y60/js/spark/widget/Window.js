@@ -23,7 +23,7 @@ spark.Window.Constructor = function(Protected) {
     var _myPickRadius = PICK_RADIUS;
     var _myPickCounter = 0;
     var _myPickList = {};
-    var _myCursorPosHistory = {};
+    var _myCursorPositionHistory = {};
     var _myMultitouchCursors = {};
     
 
@@ -542,35 +542,38 @@ spark.Window.Constructor = function(Protected) {
     
     
     function initCursorPosHistory(theCursorId) {
-        if (!(theCursorId in _myCursorPosHistory)) {
-            _myCursorPosHistory[theCursorId] = [];
+        if (!(theCursorId in _myCursorPositionHistory)) {
+            _myCursorPositionHistory[theCursorId] = [];
         }
     }
     
     function removeCursorPosHistory(theCursorId) {
-        if (theCursorId in _myCursorPosHistory) {
-            delete _myCursorPosHistory[theCursorId];
+        if (theCursorId in _myCursorPositionHistory) {
+            delete _myCursorPositionHistory[theCursorId];
         }
     }
     
     function getAveragedAssPosition(theCursorId, thePosition) {
         
-        if (!(theCursorId in _myCursorPosHistory)) {
+        if (!(theCursorId in _myCursorPositionHistory)) {
             return thePosition;
         }
         
-        if (_myCursorPosHistory[theCursorId].length >= MAX_CURSOR_POSITIONS_IN_HISTORY) {
-            _myCursorPosHistory[theCursorId].shift();
+        if (_myCursorPositionHistory[theCursorId].length >= MAX_CURSOR_POSITIONS_IN_HISTORY) {
+            _myCursorPositionHistory[theCursorId].shift();
         }
-        _myCursorPosHistory[theCursorId].push(thePosition);
+        _myCursorPositionHistory[theCursorId].push(thePosition);
         
         var myAveragedPos = new Vector2f(0,0);
-        for (var i = 0; i < _myCursorPosHistory[theCursorId].length; i++) {
-            myAveragedPos[0] += _myCursorPosHistory[theCursorId][i][0];
-            myAveragedPos[1] += _myCursorPosHistory[theCursorId][i][1];
+        var myCounter = 0;
+        
+        for (var i = 0; i < _myCursorPositionHistory[theCursorId].length; i++) {
+            myCounter+=i;
+            myAveragedPos[0] += _myCursorPositionHistory[theCursorId][i][0] * i;
+            myAveragedPos[1] += _myCursorPositionHistory[theCursorId][i][1] * i;
         }
-        myAveragedPos[0] /= _myCursorPosHistory[theCursorId].length;
-        myAveragedPos[1] /= _myCursorPosHistory[theCursorId].length;
+        myAveragedPos[0] /= myCounter;
+        myAveragedPos[1] /= myCounter;
         return myAveragedPos;
     }
 

@@ -25,9 +25,11 @@ using namespace dom;
 
 namespace y60 {
 
-const float IGNORE_CURSOR_DISTANCE = 120.0;
-const float WIPE_DISTANCE_THRESHOLD = 100.0;
-const float MAX_CURSOR_PAIR_DISTANCE = 1000.0;
+const float IGNORE_CURSOR_DISTANCE            = 120.0;
+const float WIPE_DISTANCE_THRESHOLD           = 100.0;
+const float MAX_CURSOR_PAIR_DISTANCE          = 1000.0;
+const unsigned int MAX_POSITIONS_FROM_HISTORY = 10;
+
 
 Gesture::Gesture(DLHandle theHandle) :
     asl::PlugInBase( theHandle ),
@@ -35,6 +37,7 @@ Gesture::Gesture(DLHandle theHandle) :
      _myGestureSchema( new dom::Document( y60::ourgestureeventxsd ) ),
     _myValueFactory( new dom::ValueFactory() ),
     _myIgnoreCursorsInHistoryDistance(IGNORE_CURSOR_DISTANCE),
+    _myMaxPositionsFromHistory(MAX_POSITIONS_FROM_HISTORY),
     _myWipeDistanceThreshold(WIPE_DISTANCE_THRESHOLD),
     _myMaxCursorPairDistance(MAX_CURSOR_PAIR_DISTANCE),
     _myEventCounter(0)
@@ -113,7 +116,7 @@ Gesture::saveAllCursorPositions() {
     _myLastCursorPositions.clear();
     CursorList::iterator myIt = _myCursorList.begin();
     for(; myIt !=  _myCursorList.end();myIt++){
-        _myLastCursorPositions[myIt->first] = _myCursorPosHistory[myIt->first][_myCursorPosHistory[myIt->first].size()-1];
+        _myLastCursorPositions[myIt->first] = _myCursorPositionHistory[myIt->first][_myCursorPositionHistory[myIt->first].size()-1];
     }
 }
 
@@ -165,8 +168,8 @@ Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent,  int theID, const std
             _myCursorList[ theID ] = true;
 
             // track first cursor position
-            _myCursorPosHistory[ theID ] = Position3fVector();
-            _myCursorPosHistory[ theID ].push_back(thePosition3D);
+            _myCursorPositionHistory[ theID ] = Position3fVector();
+            _myCursorPositionHistory[ theID ].push_back(thePosition3D);
 
             // reset values
             _myInitialZoomDistance[ theID ] = 0.0f;
@@ -180,9 +183,9 @@ Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent,  int theID, const std
         if(theType == "move" || theType == "update"){
             AC_DEBUG << "Gesture::createEvent -> move";
 
-            Vector3f myLastPoint = getCurrentPos(theBaseEvent, theID);
-            _myCursorPosHistory[ theID ].push_back(thePosition3D);
-            Vector3f myPos = getCurrentPos(theBaseEvent, theID);
+            Vector3f myLastPoint = getCurrentPosition(theBaseEvent, theID); 
+            _myCursorPositionHistory[ theID ].push_back(thePosition3D);
+            Vector3f myPos = getCurrentPosition(theBaseEvent, theID);
 
             //save vector betwenn last and current point
             bool myPartnerFoundFlag = false;
@@ -202,14 +205,14 @@ Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent,  int theID, const std
                     AC_DEBUG << theID << " has no cursor partner";
                     CursorList::iterator myIt = _myCursorList.begin();
                     for(; myIt !=  myEndIt; ++myIt){
-                        float myDistance = distance(myPos, getCurrentPos(theBaseEvent, myIt->first));
+                        float myDistance = distance(myPos, getCurrentPosition(theBaseEvent, myIt->first));
                         if(_myCursorPartner.find(myIt->first) == _myCursorPartner.end() && myIt->first != theID &&  myDistance < myCursorDistance) {
                             _myCursorPartner[theID] = myIt->first;
                             _myCursorPartner[myIt->first] = theID;
                             myCursorDistance = myDistance;
                             AC_DEBUG << "register cursor_pair_start " << theID << " partner: " <<  myIt->first;
                             dom::NodePtr myNode = addGestureEvent2Queue(theBaseEvent, theID, "cursor_pair_start", thePosition3D);
-                            Vector3f myCursorPartnerPos = getCurrentPos(theBaseEvent, _myCursorPartner[theID]);
+                            Vector3f myCursorPartnerPos = getCurrentPosition(theBaseEvent, _myCursorPartner[theID]);
                             Vector3f myCenterPoint(myPos);
                             myCenterPoint.add(myCursorPartnerPos);
                             myCenterPoint = product(myCenterPoint,0.5f);
@@ -225,7 +228,7 @@ Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent,  int theID, const std
                 else if(_myCursorPartner.find(theID) != _myCursorPartner.end()) {
 
                     AC_DEBUG << theID << " has cursor partner with id " << _myCursorPartner[theID];
-                    Vector3f myCursorPartnerPos = getCurrentPos(theBaseEvent, _myCursorPartner[theID]);
+                    Vector3f myCursorPartnerPos = getCurrentPosition(theBaseEvent, _myCursorPartner[theID]);
 
                     // distance between the two partner cursors
                     float myDistance = distance(myPos,myCursorPartnerPos);
@@ -302,7 +305,7 @@ Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent,  int theID, const std
 
             //Remove Cursor and Cursor History on remove-event
             _myCursorList.erase(_myCursorList.find(theID ));
-            _myCursorPosHistory.erase(_myCursorPosHistory.find(theID));
+            _myCursorPositionHistory.erase(_myCursorPositionHistory.find(theID));
             
         }
 }
@@ -321,34 +324,40 @@ Gesture::getCursorPartner(int theId) {
 
 //Returns Weighted Average from Cursor History
 Vector3f
-Gesture::getCurrentPos(GESTURE_BASE_EVENT_TYPE theBaseEvent, int theCursorId) {
-    MAKE_SCOPE_TIMER(Gesture_getCurrentPos);
+Gesture::getCurrentPosition(GESTURE_BASE_EVENT_TYPE theBaseEvent, int theCursorId) {
+    MAKE_SCOPE_TIMER(Gesture_getCurrentPosition);
     // tuio event
     if (theBaseEvent == TUIOEVENT) {
-        return _myCursorPosHistory[theCursorId][_myCursorPosHistory[theCursorId].size()-1];
+        return _myCursorPositionHistory[theCursorId][_myCursorPositionHistory[theCursorId].size()-1];
 
     // ass event
-    } else {
-        Position3fVector myPositions = _myCursorPosHistory[theCursorId];
+    } else {       
+        Position3fVector myPositions = Position3fVector();
+        // check that there are not more than _myMaxPositionsFromHistory in myPositions;
+        if ( _myCursorPositionHistory[theCursorId].size() <= _myMaxPositionsFromHistory) {
+            myPositions = _myCursorPositionHistory[theCursorId];
+        } else {
+            unsigned int myNumOfPositions = _myCursorPositionHistory[theCursorId].size();
+            for (unsigned int i = myNumOfPositions-1; i >= myNumOfPositions - _myMaxPositionsFromHistory; --i) {
+                myPositions.push_back(_myCursorPositionHistory[theCursorId][i]);
+            }
+        }
+        
         Vector3f myPos(0,0,0 );
-
-        float myDistance = 0;
+        AC_PRINT<<"ass "<<myPositions.size();
+        //float myDistance = 0;
         Vector3f myLastPosition(0,0,0);
         unsigned myCounter = 0;
         //for (unsigned int i = myPositions.size(); i > 0 && myDistance < _myIgnoreCursorsInHistoryDistance; --i)
-        for (unsigned int i = myPositions.size(); i > 0 && myDistance < _myIgnoreCursorsInHistoryDistance; --i)
+        for (unsigned int i = myPositions.size(); i > 0; --i)
         {
             myCounter+=i;
-            myPos[0] += myPositions[i-1][0] * i;
-            myPos[1] += myPositions[i-1][1] * i;
-            if( i < myPositions.size()) {
+            myPos[0] += myPositions[i-1][0] *i;
+            myPos[1] += myPositions[i-1][1] *i;
+            /*if( i < myPositions.size()) {
                 myDistance += distance( myPositions[i-1], myLastPosition );
             }
-            myLastPosition = myPositions[i-1];
-
-            if (myPositions.size() > 10 && i == myPositions.size()-10) {
-                break;
-            }
+            myLastPosition = myPositions[i-1];*/
          }
          myPos.mult(float(1.0f)/(myCounter)) ;
          return myPos;
@@ -361,6 +370,7 @@ Gesture::onUpdateSettings(dom::NodePtr theSettings) {
      _myIgnoreCursorsInHistoryDistance = getSetting( theSettings, "IgnoreCursorsInHistoryDistance", _myIgnoreCursorsInHistoryDistance);
      _myWipeDistanceThreshold = getSetting( theSettings, "WipeDistanceThreshold", _myWipeDistanceThreshold);
      _myMaxCursorPairDistance = getSetting( theSettings, "MaxCursorPairDistance", _myMaxCursorPairDistance);
+     _myMaxPositionsFromHistory = getSetting( theSettings, "MaxPositionsFromHistory", _myMaxPositionsFromHistory);
 }
 
 void
