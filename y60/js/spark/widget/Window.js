@@ -201,17 +201,22 @@ spark.Window.Constructor = function(Protected) {
 
         Protected.updateMousePosition(theX, theY);
 
-        var myWidget;
-        if(_myMouseCursor && _myMouseCursor.grabbed) {
-            myWidget = _myMouseCursor.grabHolder;
-        } else {
-            myWidget = Public.pickWidget(theX, theY);
-        }
+        var myWidget = Public.pickWidget(theX, theY);
 
         if(!myWidget) {
             myWidget = Public;
         }
 
+        if(_myMouseCursor) {
+            _myMouseCursor.update(myWidget, new Point2f(theX,theY));
+            var myMouseCursorMoveEvent = new spark.MouseCursorEvent(spark.MouseCursorEvent.MOVE, _myMouseCursor);
+            if(_myMouseCursor.grabbed) {
+                _myMouseCursor.grabHolder.dispatchEvent(myMouseCursorMoveEvent);
+            } else {
+                myWidget.dispatchEvent(myMouseCursorMoveEvent);
+            }
+        }
+        
         if(myWidget != _myMouseFocused) {
             Logger.debug("Mouse focuses " + myWidget
                          + (_myMouseFocused ? ", leaving " + _myMouseFocused : ""));
@@ -221,6 +226,16 @@ spark.Window.Constructor = function(Protected) {
                 _myMouseFocused.dispatchEvent(myLeaveEvent);
             }
 
+            if(_myMouseCursor && !_myMouseCursor.grabbed) {
+                if(_myMouseFocused) {
+                    var myCursorLeave = new spark.MouseCursorEvent(spark.MouseCursorEvent.LEAVE, _myMouseCursor);
+                    _myMouseFocused.dispatchEvent(myCursorLeave);
+                }
+
+                var myCursorEnter = new spark.MouseCursorEvent(spark.MouseCursorEvent.ENTER, _myMouseCursor);
+                myWidget.dispatchEvent(myCursorEnter);
+            }
+        
             _myMouseFocused = myWidget;
 
             var myEnterEvent = new spark.MouseEvent(spark.MouseEvent.ENTER, theX, theY);
@@ -229,12 +244,9 @@ spark.Window.Constructor = function(Protected) {
 
         Logger.debug("Mouse moves to [" + theX + "," + theY + "] over " + myWidget);
         var myMoveEvent = new spark.MouseEvent(spark.MouseEvent.MOVE, theX, theY);
-        if (_myMouseCursor) {
-            _myMouseCursor.update(true, new Point2f(theX,theY));
-            myMoveEvent.cursor = _myMouseCursor;
-        }
         myWidget.dispatchEvent(myMoveEvent);
-
+        
+        
         _myMouseFocused = myWidget;
     };
 
@@ -250,38 +262,40 @@ spark.Window.Constructor = function(Protected) {
 
         Protected.updateMousePosition(theX, theY);
 
-        var myWidget;
-        if(_myMouseCursor && _myMouseCursor.grabbed) {
-            myWidget = _myMouseCursor.grabHolder;
-        } else {
-            myWidget = Public.pickWidget(theX, theY);
-        }
-
+        var myWidget = Public.pickWidget(theX, theY);
         if(!myWidget) {
             myWidget = Public;
         }
-        if(theState) {
-            _myMouseCursor = new spark.Cursor("mouse-cursor")
-            _myMouseCursor.update(true, new Point2f(theX,theY));
+        
+        if(theButton === LEFT_BUTTON){
+            if(theState) {
+                _myMouseCursor = new spark.Cursor("mouse-cursor")
+                _myMouseCursor.update(myWidget, new Point2f(theX,theY));
+                var myMouseCursorEvent = new spark.MouseCursorEvent(spark.MouseCursorEvent.APPEAR, _myMouseCursor);
+                myWidget.dispatchEvent(myMouseCursorEvent);
+            } else {
+                _myMouseCursor.update(myWidget, new Point2f(theX,theY));
+                var myMouseCursorEvent = new spark.MouseCursorEvent(spark.MouseCursorEvent.VANISH, _myMouseCursor);
+                if(_myMouseCursor.grabbed) {
+                    _myMouseCursor.grabHolder.dispatchEvent(myMouseCursorEvent);
+                } else {
+                    myWidget.dispatchEvent(myMouseCursorEvent);
+                }
+            }
+        }
 
+        if(theState) {
             // XXX: click should be more well-defined and button-up-based.
             Logger.debug("Mouse clicks " + myWidget + " with button " + myButton);
             var myClickEvent = new spark.MouseEvent(spark.MouseEvent.CLICK, theX, theY, 0, 0, myButton, myButtonStates);
-            myClickEvent.cursor = _myMouseCursor;
             myWidget.dispatchEvent(myClickEvent);
 
             Logger.debug("Mouse " + myButton + " button down on " + myWidget);
             var myDownEvent = new spark.MouseEvent(spark.MouseEvent.BUTTON_DOWN, theX, theY, 0, 0, myButton, myButtonStates);
-            myDownEvent.cursor = _myMouseCursor;
             myWidget.dispatchEvent(myDownEvent);
         } else {
             Logger.debug("Mouse " + myButton + " button up on " + myWidget);
             var myUpEvent = new spark.MouseEvent(spark.MouseEvent.BUTTON_UP, theX, theY, 0, 0, myButton, myButtonStates);
-            if (_myMouseCursor) {
-                _myMouseCursor.update(true, new Point2f(theX,theY));
-                myUpEvent.cursor = _myMouseCursor;
-                _myMouseCursor = null;
-            }
             myWidget.dispatchEvent(myUpEvent);
         }
     };

@@ -84,9 +84,9 @@ spark.Slider.Constructor = function(Protected) {
         _horizontalLock = Protected.getBoolean("horizontal-lock",false);
         _centered       = Protected.getBoolean("centered", true);
         _sticky         = Protected.getBoolean("sticky", true);
-        Public.addEventListener(spark.GenericInputEvent.BUTTON_DOWN_ENTER, Public.onSlideStart, true);
-        Public.addEventListener(spark.GenericInputEvent.MOVE, Public.onSlide,true);
-        Public.addEventListener(spark.GenericInputEvent.BUTTON_UP_LEAVE, Public.onSlideStop, true);
+        Public.addEventListener(spark.GenericCursorEvent.APPEAR_TOUCHENTER, Public.onSlideStart, true);
+        Public.addEventListener(spark.GenericCursorEvent.MOVE, Public.onSlide,true);
+        Public.addEventListener(spark.GenericCursorEvent.VANISH_TOUCHLEAVE, Public.onSlideStop, true);
 
         if(_centered) {
             centerCursor();
@@ -109,7 +109,7 @@ spark.Slider.Constructor = function(Protected) {
     };
 
     Public.onSlideStop = function (theEvent) {
-        if(theEvent.cursor && (theEvent.cursor.id in _myPosHistory)){
+        if(theEvent.cursor.id in _myPosHistory){
             Public.onSlide(theEvent);
             delete _myPosHistory[theEvent.cursor.id];
             _myIdleCursor.position = _myActiveCursor.position;
@@ -135,7 +135,7 @@ spark.Slider.Constructor = function(Protected) {
     };
 
     Public.onSlide = function (theEvent) {
-        if(theEvent.cursor && (theEvent.cursor.id in _myPosHistory)){
+        if(theEvent.cursor.id in _myPosHistory){
             dampPosition(theEvent);
             if(!_horizontalLock) {
                 var myNewX = theEvent.dampenedPos.x -

@@ -250,7 +250,7 @@ spark.EventDispatcher.Constructor = function (Protected) {
      *   USECAPTURE (bool)   - if the handler belongs to the Capture phase
      */
     Public.addEventListener = function (theType, theListener, theUseCapture) {
-        var mappedEvents = spark.GenericInputEvent.getMappedEvents(theType);
+        var mappedEvents = spark.GenericCursorEvent.getMappedEvents(theType);
         
         if(mappedEvents) {
             for(var i=0; i<mappedEvents.length; ++i) {
@@ -512,15 +512,6 @@ spark.MouseEvent.Constructor = function(Protected, theType, theX, theY, theAmoun
 
     var _myStageX = theX;
 
-    var _myCursor = null;
-
-    Public.__defineGetter__("cursor", function () {
-        return _myCursor;
-    });
-    Public.__defineSetter__("cursor", function (theCursor) {
-        _myCursor = theCursor;
-    });
-
     Public.__defineGetter__("stageX", function () {
         return _myStageX;
     });
@@ -554,6 +545,84 @@ spark.MouseEvent.Constructor = function(Protected, theType, theX, theY, theAmoun
     Public.__defineGetter__("buttonStates", function () {
         return _myButtonStates;
     });
+};
+
+
+/**
+ * Cursor events
+ * 
+ * Each of these represents a change in state
+ * on the given cursor.
+ */
+spark.MouseCursorEvent = spark.Class("MouseCursorEvent");
+
+/**
+ * Appear event: "new cursor created here"
+ * 
+ * Symmetric to VANISH.
+ */
+spark.MouseCursorEvent.APPEAR = "mouse-cursor-appear";
+
+/**
+ * Vanish event: "cursor ceases to exist"
+ * 
+ * Symmetric to APPEAR.
+ */
+spark.MouseCursorEvent.VANISH = "mouse-cursor-vanish";
+
+/**
+ * Move event: "cursor changed position"
+ */
+spark.MouseCursorEvent.MOVE   = "mouse-cursor-move";
+
+/**
+ * Enter event: "cursor entered widget"
+ * 
+ * Symmetric to LEAVE.
+ */
+spark.MouseCursorEvent.ENTER  = "mouse-cursor-enter";
+
+/**
+ * Leave event: "cursor left widget"
+ * 
+ * Symmetric to ENTER.
+ */
+spark.MouseCursorEvent.LEAVE  = "mouse-cursor-leave";
+
+spark.MouseCursorEvent.Constructor = function (Protected, theType, theCursor) {
+    var Public = this;
+
+    this.Inherit(spark.Event, theType);
+
+    var _myCursor = theCursor;
+
+    /**
+     * Reference to the cursor this event concerns
+     */
+    Public.cursor getter = function () {
+        return _myCursor;
+    };
+
+    /**
+     * Convenience: horizontal position of cursor
+     */
+    Public.stageX getter = function () {
+        return _myCursor.stageX;
+    };
+
+    /**
+     * Convenience: vertical position of cursor
+     */
+    Public.stageY getter = function () {
+        return _myCursor.stageY;
+    };
+
+    /**
+     * Convenience: intensity of cursor
+     */
+    Public.intensity getter = function () {
+        return _myCursor.intensity;
+    };
 };
 
 spark.Keyboard = {};
