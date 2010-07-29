@@ -289,7 +289,7 @@ spark.Window.Constructor = function(Protected) {
         } 
         var myPos = new Vector2f(theGesture.position3D.x * myPositionScale.x, theGesture.position3D.y * myPositionScale.y);
         if (theGesture.baseeventtype == ASS_BASE_EVENT) {
-            myPos = getAveragedAssPosition(theGesture.cursorid, myPos);
+            myPos = getAveragedAssPosition(theGesture.cursorid);
         }
         
         var mySparkConformedCursorId = getSparkConformedCursorId(theGesture.baseeventtype, theGesture.cursorid);
@@ -314,9 +314,9 @@ spark.Window.Constructor = function(Protected) {
         if(!myWidget) {
             myWidget = Public;
         }
-        if (myCursor) {
-            myCursor.update(myWidget, myPos);
-        }
+//        if (myCursor) {
+//            myCursor.update(myWidget, myPos);
+//        }
         var myPartnerCursor = null;
         var myCenterPoint = null;
         // Do some multicursor gesture specific things (zoom/rotate)
@@ -530,7 +530,7 @@ spark.Window.Constructor = function(Protected) {
         switch(theEvent.callback) {
         case "onASSEvent":
             var myPosition = new Point2f(theEvent.position3D.x, theEvent.position3D.y);
-            return getAveragedAssPosition(theEvent.id, myPosition);
+            return calculateAverageAssPosition(theEvent.id, myPosition);
         case "onTuioEvent":
             return new Point2f(theEvent.position.x * Public.width,
                                theEvent.position.y * Public.height);
@@ -553,7 +553,7 @@ spark.Window.Constructor = function(Protected) {
         }
     }
     
-    function getAveragedAssPosition(theCursorId, thePosition) {
+    function calculateAverageAssPosition(theCursorId, thePosition) {
         
         if (!(theCursorId in _myCursorPositionHistory)) {
             return thePosition;
@@ -564,6 +564,10 @@ spark.Window.Constructor = function(Protected) {
         }
         _myCursorPositionHistory[theCursorId].push(thePosition);
         
+        return getAveragedAssPosition(theCursorId);
+    }
+    
+    function getAveragedAssPosition(theCursorId) {
         var myAveragedPos = new Vector2f(0,0);
         var myCounter = 0;
         
