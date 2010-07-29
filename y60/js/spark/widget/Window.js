@@ -289,7 +289,9 @@ spark.Window.Constructor = function(Protected) {
         } 
         var myPos = new Vector2f(theGesture.position3D.x * myPositionScale.x, theGesture.position3D.y * myPositionScale.y);
         if (theGesture.baseeventtype == ASS_BASE_EVENT) {
-            myPos = getAveragedAssPosition(theGesture.cursorid);
+            if ((theGesture.cursorid in _myCursorPositionHistory)) {
+                myPos = getAveragedAssPosition(theGesture.cursorid);  
+            }
         }
         
         var mySparkConformedCursorId = getSparkConformedCursorId(theGesture.baseeventtype, theGesture.cursorid);

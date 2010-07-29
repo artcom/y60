@@ -183,13 +183,13 @@ Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent,  int theID, const std
         if(theType == "move" || theType == "update"){
             AC_DEBUG << "Gesture::createEvent -> move";
 
-            Vector3f myLastPoint = getCurrentPosition(theBaseEvent, theID); 
+            Vector3f myLastPoint = getCurrentPosition(theID); 
 
             if (_myCursorPositionHistory.size() >= _myMaxPositionsFromHistory) {
                 _myCursorPositionHistory[ theID ].erase(_myCursorPositionHistory[ theID ].begin());
             }
             _myCursorPositionHistory[ theID ].push_back(thePosition3D);
-            Vector3f myPos = getCurrentPosition(theBaseEvent, theID);
+            Vector3f myPos = getCurrentPosition(theID);
 
             //save vector betwenn last and current point
             bool myPartnerFoundFlag = false;
@@ -209,14 +209,14 @@ Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent,  int theID, const std
                     AC_DEBUG << theID << " has no cursor partner";
                     CursorList::iterator myIt = _myCursorList.begin();
                     for(; myIt !=  myEndIt; ++myIt){
-                        float myDistance = distance(myPos, getCurrentPosition(theBaseEvent, myIt->first));
+                        float myDistance = distance(myPos, getCurrentPosition(myIt->first));
                         if(_myCursorPartner.find(myIt->first) == _myCursorPartner.end() && myIt->first != theID &&  myDistance < myCursorDistance) {
                             _myCursorPartner[theID] = myIt->first;
                             _myCursorPartner[myIt->first] = theID;
                             myCursorDistance = myDistance;
                             AC_DEBUG << "register cursor_pair_start " << theID << " partner: " <<  myIt->first;
                             dom::NodePtr myNode = addGestureEvent2Queue(theBaseEvent, theID, "cursor_pair_start", thePosition3D);
-                            Vector3f myCursorPartnerPos = getCurrentPosition(theBaseEvent, _myCursorPartner[theID]);
+                            Vector3f myCursorPartnerPos = getCurrentPosition(_myCursorPartner[theID]);
                             Vector3f myCenterPoint(myPos);
                             myCenterPoint.add(myCursorPartnerPos);
                             myCenterPoint = product(myCenterPoint,0.5f);
@@ -232,7 +232,7 @@ Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent,  int theID, const std
                 else if(_myCursorPartner.find(theID) != _myCursorPartner.end()) {
 
                     AC_DEBUG << theID << " has cursor partner with id " << _myCursorPartner[theID];
-                    Vector3f myCursorPartnerPos = getCurrentPosition(theBaseEvent, _myCursorPartner[theID]);
+                    Vector3f myCursorPartnerPos = getCurrentPosition(_myCursorPartner[theID]);
 
                     // distance between the two partner cursors
                     float myDistance = distance(myPos,myCursorPartnerPos);
@@ -325,38 +325,6 @@ Gesture::getCursorPartner(int theId) {
     }
     return myEndIt;
 }
-
-//Returns Weighted Average from Cursor History
-Vector3f
-Gesture::getCurrentPosition(GESTURE_BASE_EVENT_TYPE theBaseEvent, int theCursorId) {
-    MAKE_SCOPE_TIMER(Gesture_getCurrentPosition);
-    // tuio event
-    if (theBaseEvent == TUIOEVENT) {
-        return _myCursorPositionHistory[theCursorId][_myCursorPositionHistory[theCursorId].size()-1];
-
-    // ass event
-    } else {       
-        
-        Vector3f myPos(0,0,0 );
-        //float myDistance = 0;
-        //Vector3f myLastPosition(0,0,0);
-        unsigned myCounter = 0;
-        //for (unsigned int i = myPositions.size(); i > 0 && myDistance < _myIgnoreCursorsInHistoryDistance; --i)
-        for (unsigned int i = 0; i < _myCursorPositionHistory[theCursorId].size(); ++i)
-        {
-            myCounter+=i+1;
-            myPos[0] += _myCursorPositionHistory[theCursorId][i][0] *(i+1);
-            myPos[1] += _myCursorPositionHistory[theCursorId][i][1] *(i+1);
-            /*if( i < myPositions.size()) {
-                myDistance += distance( myPositions[i-1], myLastPosition );
-            }
-            myLastPosition = myPositions[i-1];*/
-         }
-         myPos.mult(float(1.0f)/(myCounter)) ;
-         return myPos;
-    }
-}
-
 
 void
 Gesture::onUpdateSettings(dom::NodePtr theSettings) {

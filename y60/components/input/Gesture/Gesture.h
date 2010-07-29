@@ -68,7 +68,11 @@ class Gesture : public asl::PlugInBase,
         dom::NodePtr addGestureEvent2Queue(GESTURE_BASE_EVENT_TYPE theBaseEvent, int theID, 
                                            const std::string & theType, 
                                            const asl::Vector3f & thePosition3D);
-        asl::Vector3f getCurrentPosition(GESTURE_BASE_EVENT_TYPE theBaseEvent, int theCursorId);
+
+        inline asl::Vector3f getCurrentPosition(int theCursorId) {
+            return _myCursorPositionHistory[theCursorId][_myCursorPositionHistory[theCursorId].size()-1];
+        }
+
         CursorPartnerList::iterator getCursorPartner(int theId);
         void saveAllCursorPositions();
 
