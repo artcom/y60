@@ -65,7 +65,7 @@ Gesture::poll() {
     //analyzeEvents(myFinalEvents, "cursorid");
     _myEvents.clear();
 
-    AC_PRINT << "-------";
+    //AC_PRINT << "-------";
     return myFinalEvents;
 }
 
@@ -268,7 +268,7 @@ Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent,  int theID, const std
                 } 
             }     
             if (!myPartnerFoundFlag) {
-                Vector3f myDiff = difference(myLastPoint, myPos);
+                Vector3f myDiff = difference(myPos, myLastPoint);
                 if( magnitude(myDiff) > _myWipeDistanceThreshold ) {
                     // register wipe event
                     NodePtr myNode = addGestureEvent2Queue(theBaseEvent, theID, "wipe", thePosition3D);
