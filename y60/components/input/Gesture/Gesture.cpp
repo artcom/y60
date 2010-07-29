@@ -184,6 +184,10 @@ Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent,  int theID, const std
             AC_DEBUG << "Gesture::createEvent -> move";
 
             Vector3f myLastPoint = getCurrentPosition(theBaseEvent, theID); 
+
+            if (_myCursorPositionHistory.size() >= _myMaxPositionsFromHistory) {
+                _myCursorPositionHistory[ theID ].erase(_myCursorPositionHistory[ theID ].begin());
+            }
             _myCursorPositionHistory[ theID ].push_back(thePosition3D);
             Vector3f myPos = getCurrentPosition(theBaseEvent, theID);
 
@@ -332,28 +336,17 @@ Gesture::getCurrentPosition(GESTURE_BASE_EVENT_TYPE theBaseEvent, int theCursorI
 
     // ass event
     } else {       
-        Position3fVector myPositions = Position3fVector();
-        // check that there are not more than _myMaxPositionsFromHistory in myPositions;
-        if ( _myCursorPositionHistory[theCursorId].size() <= _myMaxPositionsFromHistory) {
-            myPositions = _myCursorPositionHistory[theCursorId];
-        } else {
-            unsigned int myNumOfPositions = _myCursorPositionHistory[theCursorId].size();
-            for (unsigned int i = myNumOfPositions-1; i >= myNumOfPositions - _myMaxPositionsFromHistory; --i) {
-                myPositions.push_back(_myCursorPositionHistory[theCursorId][i]);
-            }
-        }
         
         Vector3f myPos(0,0,0 );
-        AC_PRINT<<"ass "<<myPositions.size();
         //float myDistance = 0;
-        Vector3f myLastPosition(0,0,0);
+        //Vector3f myLastPosition(0,0,0);
         unsigned myCounter = 0;
         //for (unsigned int i = myPositions.size(); i > 0 && myDistance < _myIgnoreCursorsInHistoryDistance; --i)
-        for (unsigned int i = myPositions.size(); i > 0; --i)
+        for (unsigned int i = 0; i < _myCursorPositionHistory[theCursorId].size(); ++i)
         {
-            myCounter+=i;
-            myPos[0] += myPositions[i-1][0] *i;
-            myPos[1] += myPositions[i-1][1] *i;
+            myCounter+=i+1;
+            myPos[0] += _myCursorPositionHistory[theCursorId][i][0] *(i+1);
+            myPos[1] += _myCursorPositionHistory[theCursorId][i][1] *(i+1);
             /*if( i < myPositions.size()) {
                 myDistance += distance( myPositions[i-1], myLastPosition );
             }
