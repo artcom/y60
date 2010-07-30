@@ -112,8 +112,8 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
 
     var _prevMousePosition    = new Vector3f(0,0,0);
 
-    var _myMinimumTiltRotation= radFromDeg(-30);
-    var _myMaximumTiltRotation= radFromDeg(50);
+    var _myMinimumTiltRotation= null;
+    var _myMaximumTiltRotation= null;
 
     //////////////////////////////////////////////////////////////////////
     //
@@ -186,14 +186,21 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
         var myCameraRotationMatrix = new Matrix4f(self.getMoverObject().globalmatrix);
         myCameraRotationMatrix.setRow(3,new Vector4f(0,0,0,myCameraRotationMatrix[3][3]));
 
-        var myUnitVectorMatrix = new Matrix4f();
-        myUnitVectorMatrix.makeTranslating(new Vector3f(0,0,-1));
-        myUnitVectorMatrix.postMultiply(myCameraRotationMatrix);
-        var myRotatedUnitVector = myUnitVectorMatrix.getTranslation();
-        var myMinimumValue = Math.sin(_myMinimumTiltRotation);
-        var myMaximumValue = Math.sin(_myMaximumTiltRotation);
-        if( ((theAnglesInRadiant.y < 0)&&(myRotatedUnitVector.y >= myMinimumValue)) ||  
-            ((theAnglesInRadiant.y >=0)&&(myRotatedUnitVector.y <= myMaximumValue)) ) {
+        var applyTiltRotationFlag = true;
+        if ((_myMinimumTiltRotation !== null) &&
+            (_myMaximumTiltRotation !== null) ) {
+            var myUnitVectorMatrix = new Matrix4f();
+            myUnitVectorMatrix.makeTranslating(new Vector3f(0,0,-1));
+            myUnitVectorMatrix.postMultiply(myCameraRotationMatrix);
+            var myRotatedUnitVector = myUnitVectorMatrix.getTranslation();
+            var myMinimumValue = Math.sin(_myMinimumTiltRotation);
+            var myMaximumValue = Math.sin(_myMaximumTiltRotation);
+            if( ((theAnglesInRadiant.y < 0)&&(myRotatedUnitVector.y < myMinimumValue)) ||  
+                ((theAnglesInRadiant.y >=0)&&(myRotatedUnitVector.y > myMaximumValue)) ) {
+                applyTiltRotationFlag = false;
+            }
+        }
+        if(applyTiltRotationFlag){
             // compute the rotated Side Vector and rotate about it -> TILT rotation
             var myMatrix = new Matrix4f();
             myMatrix.makeTranslating(new Vector3f(1,0,0));
