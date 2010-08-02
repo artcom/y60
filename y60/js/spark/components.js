@@ -413,7 +413,7 @@ spark.Container.Constructor = function (Protected) {
             myChildren.push(myOwnChild);
         }
         for (var i = 0; i < _myChildren.length; i++) {
-            var myGrandchildren = myChild.findChildrenByName(); // what is myChild?
+            var myGrandchildren = _myChildren[i].findChildrenByName(theName);
             if (myGrandchildren.length > 0) {
                 myChildren = myChildren.concat(myGrandchildren);
             }
