@@ -37,9 +37,9 @@ Gesture::Gesture(DLHandle theHandle) :
      _myGestureSchema( new dom::Document( y60::ourgestureeventxsd ) ),
     _myValueFactory( new dom::ValueFactory() ),
     _myIgnoreCursorsInHistoryDistance(IGNORE_CURSOR_DISTANCE),
-    _myMaxPositionsFromHistory(MAX_POSITIONS_FROM_HISTORY),
     _myWipeDistanceThreshold(WIPE_DISTANCE_THRESHOLD),
     _myMaxCursorPairDistance(MAX_CURSOR_PAIR_DISTANCE),
+    _myMaxPositionsFromHistory(MAX_POSITIONS_FROM_HISTORY),
     _myEventCounter(0)
 {
     registerStandardTypes( * _myValueFactory );
@@ -115,7 +115,7 @@ void
 Gesture::saveAllCursorPositions() {
     _myLastCursorPositions.clear();
     CursorList::iterator myIt = _myCursorList.begin();
-    for(; myIt !=  _myCursorList.end();myIt++){
+    for(; myIt !=  _myCursorList.end();++myIt){
         _myLastCursorPositions[myIt->first] = _myCursorPositionHistory[myIt->first][_myCursorPositionHistory[myIt->first].size()-1];
     }
 }
@@ -139,7 +139,7 @@ Gesture::addGestureEvent2Queue(GESTURE_BASE_EVENT_TYPE theBaseEvent, int theID, 
     }
     if (theType == "zoom" || theType == "rotate") {
         EventPtrList::iterator myIt = _myEvents.begin();
-        for(; myIt !=  _myEvents.end();myIt++){
+        for(; myIt !=  _myEvents.end();++myIt){
             GenericEventPtr myGenericEvent(dynamic_cast_Ptr<GenericEvent>(*myIt));
             dom::NodePtr myNode = myGenericEvent->getNode();
             std::string myEventType = myNode->getAttributeString("type");
