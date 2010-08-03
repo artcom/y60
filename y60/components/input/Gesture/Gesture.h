@@ -48,6 +48,9 @@ class Gesture : public asl::PlugInBase,
                        public GenericEventSourceFilter
 {
     public:
+        static const float WIPE_DISTANCE_THRESHOLD;
+        static const float MAX_CURSOR_PAIR_DISTANCE;
+
         Gesture(asl::DLHandle theHandle);
         virtual y60::EventPtrList poll();
         virtual void handle(EventPtr theEvent);
@@ -87,10 +90,8 @@ class Gesture : public asl::PlugInBase,
         std::map<int, asl::Vector3f>    _myLastCursorPositions;
         std::map<int, float>            _myInitialZoomDistance;
         CursorPartnerList               _myCursorPartner;
-        float                           _myIgnoreCursorsInHistoryDistance;
         float                           _myWipeDistanceThreshold;
         float                           _myMaxCursorPairDistance;
-        unsigned int                    _myMaxPositionsFromHistory;
 
         unsigned int                    _myEventCounter;
         asl::ThreadLock                 _myDeliveryMutex;

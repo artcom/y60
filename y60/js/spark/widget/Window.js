@@ -517,13 +517,7 @@ spark.Window.Constructor = function(Protected) {
                 myCenterPoint.mult(myScale);
             }
             var mySparkConformedCursorPartnerId = getSparkConformedCursorId(theGesture, theGesture.cursorpartnerid);
-            if (mySparkConformedCursorPartnerId in _myMultitouchCursors) {
-                myCursorPartner = _myMultitouchCursors[mySparkConformedCursorPartnerId];
-            }            
-            // zoom, rotate and cursor_pair_start need both cursors
-            if ((theGesture.type=="cursor_pair_start" || theGesture.type=="zoom" || theGesture.type=="rotate")&& (!myCursor || !myCursorPartner)) {
-                return;
-            }
+            var myCursorPartner = getMultitouchCursor(mySparkConformedCursorPartnerId);
         }
         
         switch(theGesture.type) {    

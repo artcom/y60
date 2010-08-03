@@ -25,21 +25,16 @@ using namespace dom;
 
 namespace y60 {
 
-const float IGNORE_CURSOR_DISTANCE            = 120.0;
-const float WIPE_DISTANCE_THRESHOLD           = 100.0;
-const float MAX_CURSOR_PAIR_DISTANCE          = 1000.0;
-const unsigned int MAX_POSITIONS_FROM_HISTORY = 10;
-
+    const float Gesture::WIPE_DISTANCE_THRESHOLD = 100.0;
+    const float Gesture::MAX_CURSOR_PAIR_DISTANCE = 1000.0;
 
 Gesture::Gesture(DLHandle theHandle) :
     asl::PlugInBase( theHandle ),
      _myGestureSettings(0),
      _myGestureSchema( new dom::Document( y60::ourgestureeventxsd ) ),
     _myValueFactory( new dom::ValueFactory() ),
-    _myIgnoreCursorsInHistoryDistance(IGNORE_CURSOR_DISTANCE),
     _myWipeDistanceThreshold(WIPE_DISTANCE_THRESHOLD),
     _myMaxCursorPairDistance(MAX_CURSOR_PAIR_DISTANCE),
-    _myMaxPositionsFromHistory(MAX_POSITIONS_FROM_HISTORY),
     _myEventCounter(0)
 {
     registerStandardTypes( * _myValueFactory );
@@ -57,18 +52,18 @@ Gesture::poll() {
     // save all cursor positions
     saveAllCursorPositions();
 
-    AC_DEBUG << "unfiltered gesture events # " << _myEvents.size();
+    AC_TRACE << "unfiltered gesture events # " << _myEvents.size();
     //analyzeEvents(_myEvents, "cursorid");
 
     // do the event filter in base class GenericEventSourceFilter
     EventPtrList myFinalEvents(_myEvents);
     applyFilter(myFinalEvents);
 
-    AC_DEBUG << "deliver gesture events # " << myFinalEvents.size();
+    AC_TRACE << "deliver gesture events # " << myFinalEvents.size();
     //analyzeEvents(myFinalEvents, "cursorid");
     _myEvents.clear();
 
-    //AC_PRINT << "-------";
+    AC_TRACE << "-------";
     return myFinalEvents;
 }
 
@@ -185,9 +180,6 @@ Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent,  int theID, const std
 
             Vector3f myLastPoint = getCurrentPosition(theID); 
 
-            if (_myCursorPositionHistory.size() >= _myMaxPositionsFromHistory) {
-                _myCursorPositionHistory[ theID ].erase(_myCursorPositionHistory[ theID ].begin());
-            }
             _myCursorPositionHistory[ theID ].push_back(thePosition3D);
             Vector3f myPos = getCurrentPosition(theID);
 
@@ -266,7 +258,6 @@ Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent,  int theID, const std
                     if (isNaN(myAngle)) {
                         myAngle = 0;
                     }
-                    AC_PRINT << "angle: " << myAngle;
                     if (abs(myAngle) > 1) {
                         dom::NodePtr myNode2 = addGestureEvent2Queue(theBaseEvent, theID, "rotate", thePosition3D);
                         myNode2->appendAttribute<float>("angle", myAngle);
@@ -328,10 +319,8 @@ Gesture::getCursorPartner(int theId) {
 
 void
 Gesture::onUpdateSettings(dom::NodePtr theSettings) {
-     _myIgnoreCursorsInHistoryDistance = getSetting( theSettings, "IgnoreCursorsInHistoryDistance", _myIgnoreCursorsInHistoryDistance);
      _myWipeDistanceThreshold = getSetting( theSettings, "WipeDistanceThreshold", _myWipeDistanceThreshold);
      _myMaxCursorPairDistance = getSetting( theSettings, "MaxCursorPairDistance", _myMaxCursorPairDistance);
-     _myMaxPositionsFromHistory = getSetting( theSettings, "MaxPositionsFromHistory", _myMaxPositionsFromHistory);
 }
 
 void
