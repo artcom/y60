@@ -16,7 +16,7 @@ spark.Window.Constructor = function(Protected) {
     this.Inherit(spark.Stage);
     
     const PICK_RADIUS = 1;
-    const MAX_CURSOR_POSITIONS_IN_HISTORY = 10;
+    const MAX_CURSOR_POSITIONS_FOR_AVERAGE = 10;
     
     var _myCamera = null;
     var _myWorld = null;
@@ -24,6 +24,7 @@ spark.Window.Constructor = function(Protected) {
     var _myPickList = {};
     var _myCursorPositionHistory = {};
     var _myMultitouchCursors = {};
+    var _myMaxCursorPositionsForAverage = MAX_CURSOR_POSITIONS_FOR_AVERAGE;
     
 
     SceneViewer.prototype.Constructor(this, []);
@@ -39,6 +40,10 @@ spark.Window.Constructor = function(Protected) {
     Public.title setter = function(theTitle) {
         window.title = theTitle;
     };
+    
+    Public.maxCursorPositionsForAverage setter = function(theValue) {
+        _myMaxCursorPositionsForAverage = theValue;
+    }
     
     function seperateWorld() {
         // This is the first world - it contains the loaded x60 model
@@ -644,7 +649,7 @@ spark.Window.Constructor = function(Protected) {
             return thePosition;
         }
         
-        if (_myCursorPositionHistory[theCursorId].length >= MAX_CURSOR_POSITIONS_IN_HISTORY) {
+        if (_myCursorPositionHistory[theCursorId].length >= _myMaxCursorPositionsForAverage) {
             _myCursorPositionHistory[theCursorId].shift();
         }
         _myCursorPositionHistory[theCursorId].push(thePosition);
