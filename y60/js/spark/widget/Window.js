@@ -426,35 +426,15 @@ spark.Window.Constructor = function(Protected) {
             initCursorPositionHistory (theEvent.id);
         case "move": // proximatrix
         case "update": // tuio        
-            var myCursor;
-            if(myId in _myMultitouchCursors) {
-                myCursor = _myMultitouchCursors[myId];
-            } else {
-                Logger.debug("Cursor " + myId + " added");
-                myCursor = new spark.Cursor(myId);
-                _myMultitouchCursors[myId] = myCursor;
-            }
+            var myCursor = getMultitouchCursor(myId);
             if(theEvent.type == "add") {
                 myCursor.activate();
             }
-            var myPosition = getMultitouchCursorPosition(theEvent);
-            
             var myFocused = myCursor.focused;
 
-            var myPick = null;
-            if(myCursor.grabbed) {
-                myPick = myCursor.grabHolder;
-            } else {
-                if (theEvent.id in _myPickList) {
-                    myPick = _myPickList[theEvent.id];
-                } else {
-                    myPick = Public.pickWidget(myPosition.x, myPosition.y);
-                    _myPickList[theEvent.id] = myPick;
-                }
-            }
-            if(!myPick) {
-                myPick = Public;
-            }
+            var myPosition = getMultitouchCursorPosition(theEvent);
+            
+            var myPick = getWidgetForMultitouchCursor(myCursor, myPosition);
             myCursor.update(myPick, myPosition);
 
             if(theEvent.type == "add") {
@@ -513,6 +493,7 @@ spark.Window.Constructor = function(Protected) {
     Public.onASSEvent = handleMultitouchEvent;
     Public.onTuioEvent = handleMultitouchEvent;
     
+    
     // Will be called on a gesture event
     Public.onGesture = function(theGesture) {
         
@@ -520,30 +501,9 @@ spark.Window.Constructor = function(Protected) {
         var mySparkConformedCursorId = getSparkConformedCursorId(theGesture, theGesture.cursorid);
         
         // picking with considering cursor grabbing
-        var myWidget;
-        var myCursor = null;
-        if (mySparkConformedCursorId in _myMultitouchCursors) {
-            myCursor = _myMultitouchCursors[mySparkConformedCursorId];
-        } else {
-            Logger.debug("Cursor " + mySparkConformedCursorId + " added");
-            myCursor = new spark.Cursor(mySparkConformedCursorId);
-            _myMultitouchCursors[mySparkConformedCursorId] = myCursor;
-        }
+        var myCursor = getMultitouchCursor(mySparkConformedCursorId);
+        var myWidget = getWidgetForMultitouchCursor(myCursor, myPosition);
         
-        if (myCursor && myCursor.grabbed) {
-            myWidget = myCursor.grabHolder;
-        } else {
-            if (theGesture.cursorid in _myPickList) {
-                myWidget = _myPickList[theGesture.cursorid];
-            } else {
-                myWidget = Public.pickWidget(myPosition.x, myPosition.y);
-                _myPickList[theGesture.cursorid] = myWidget;
-            }
-        }
-        if (!myWidget) {
-            myWidget = Public;
-        }
-
         var myScale = new Vector3f(1, 1, 1);
         if (theGesture.baseeventtype == TUIO_BASE_EVENT) {
             myScale = new Vector3f(Public.width, Public.height, 1);
@@ -595,6 +555,36 @@ spark.Window.Constructor = function(Protected) {
             default:
                 Logger.info("Unknown gesture : " + theGesture);            
         }
+    }
+    
+    function getWidgetForMultitouchCursor(theCursor, thePosition) {
+        var myWidget;
+        if (theCursor.grabbed) {
+            myWidget = theCursor.grabHolder;
+        } else {
+            if (theCursor.id in _myPickList) {
+                myWidget = _myPickList[theCursor.id];
+            } else {
+                myWidget = Public.pickWidget(thePosition.x, thePosition.y);
+                _myPickList[theCursor.id] = myWidget;
+            }
+        }
+        if (!myWidget) {
+            myWidget = Public;
+        }
+        return myWidget;
+    }
+    
+    function getMultitouchCursor(theId) {
+        var myCursor;
+        if (theId in _myMultitouchCursors) {
+            myCursor = _myMultitouchCursors[theId];
+        } else {
+            Logger.debug("Cursor " + theId + " added");
+            myCursor = new spark.Cursor(theId);
+            _myMultitouchCursors[theId] = myCursor;
+        }
+        return myCursor;
     }
     
     function getSparkConformedCursorId(theEvent, theId) {
