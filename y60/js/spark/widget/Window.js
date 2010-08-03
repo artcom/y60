@@ -21,7 +21,6 @@ spark.Window.Constructor = function(Protected) {
     var _myCamera = null;
     var _myWorld = null;
     var _myPickRadius = PICK_RADIUS;
-    var _myPickCounter = 0;
     var _myPickList = {};
     var _myCursorPositionHistory = {};
     var _myMultitouchCursors = {};
@@ -166,7 +165,6 @@ spark.Window.Constructor = function(Protected) {
     }
 
     Public.pickWidget = function(theX, theY) {
-        _myPickCounter++;
         var myBody = Public.picking.pickBodyBySweepingSphereFromBodies(theX, theY, _myPickRadius, Public.sceneNode);
         if(myBody) {
             var myBodyId = myBody.id;
@@ -257,7 +255,6 @@ spark.Window.Constructor = function(Protected) {
             var myEvent = new spark.StageEvent(spark.StageEvent.FRAME, Public, theTime, theDeltaT);
             Public.dispatchEvent(myEvent);
         }
-        _myPickCounter = 0;
         _myPickList = {};
     };
 
@@ -527,6 +524,10 @@ spark.Window.Constructor = function(Protected) {
         var myCursor = null;
         if (mySparkConformedCursorId in _myMultitouchCursors) {
             myCursor = _myMultitouchCursors[mySparkConformedCursorId];
+        } else {
+            Logger.debug("Cursor " + mySparkConformedCursorId + " added");
+            myCursor = new spark.Cursor(mySparkConformedCursorId);
+            _myMultitouchCursors[mySparkConformedCursorId] = myCursor;
         }
         
         if (myCursor && myCursor.grabbed) {
