@@ -114,7 +114,7 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
 
     var _myMinimumTiltRotation= null;
     var _myMaximumTiltRotation= null;
-
+    
     //////////////////////////////////////////////////////////////////////
     //
     // public
@@ -122,6 +122,11 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
     //////////////////////////////////////////////////////////////////////
 
     self.name = "WalkMover";
+
+    // Position and orientation are only set when really necessary
+    // This is mainly needed for onOutdatedValue and onNodeValueChanged to
+    // work properly - this maybe the default in the future...
+    self.defensivelyUpdate = false;
 
     self.Mover.reset = self.reset;
     self.reset = function() {
@@ -341,7 +346,14 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
         _myVelocity = myPostAccelVelocity;
 
         dropToGround(myTranslation);
-        self.getMoverObject().position = _myPosition;
+        
+        if (self.defensivelyUpdate) {
+            if (!almostEqual(distance(_myPosition, self.getMoverObject().position), 0)) {
+                self.getMoverObject().position = _myPosition;
+            }
+        } else {
+            self.getMoverObject().position = _myPosition;
+        }
     }
 
     // returns position change resulting from all forces
