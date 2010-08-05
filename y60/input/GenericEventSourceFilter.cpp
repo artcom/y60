@@ -64,7 +64,7 @@ namespace y60 {
     GenericEventSourceFilter::~GenericEventSourceFilter() {
     }
 
-    void GenericEventSourceFilter::addCursorFilter(string theEventType, string theIdAttributeName) {
+    void GenericEventSourceFilter::addCursorFilter(const std::string & theEventType, const std::string & theIdAttributeName) {
         _myCursorFilter.push_back( CursorFilter(theEventType, theIdAttributeName));
 
     }
@@ -75,7 +75,7 @@ namespace y60 {
             applyCursorFilter(_myCursorFilter[i]._myEventType, _myCursorFilter[i]._myCursorAttributeName, theEventList);
         }
     }
-    void GenericEventSourceFilter::applyCursorFilter(std::string theEventType, std::string theIdAttributeName, EventPtrList & theEventList) {
+    void GenericEventSourceFilter::applyCursorFilter(const std::string & theEventType, const std::string & theIdAttributeName, EventPtrList & theEventList) {
         std::map<int, std::vector<GenericEventPtr > > myEvents2Shrink;
         EventPtrList::iterator myIt = theEventList.begin();
         unsigned int counter= 0;
@@ -103,7 +103,7 @@ namespace y60 {
         }
     }
 
-    void GenericEventSourceFilter::analyzeEvents(EventPtrList theEventList, std::string theIdAttributeName) {
+    void GenericEventSourceFilter::analyzeEvents(EventPtrList & theEventList, const std::string & theIdAttributeName) const {
         AC_DEBUG << "############## analyzeEvents cursor events:";
         std::map<int, std::map<std::string, int> > myCursorEventCounter;
         {

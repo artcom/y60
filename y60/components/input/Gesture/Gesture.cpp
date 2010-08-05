@@ -35,8 +35,8 @@ Gesture::Gesture(DLHandle theHandle) :
      _myGestureSchema( new dom::Document( y60::ourgestureeventxsd ) ),
     _myValueFactory( new dom::ValueFactory() ),
     _myWipeDistanceThreshold(WIPE_DISTANCE_THRESHOLD),
-    _myRotateAngleThreshold(ROTATE_ANGLE_THRESHOLD),
     _myMaxCursorPairDistance(MAX_CURSOR_PAIR_DISTANCE),
+    _myRotateAngleThreshold(ROTATE_ANGLE_THRESHOLD),
     _myEventCounter(0)
 {
     registerStandardTypes( * _myValueFactory );
@@ -158,7 +158,7 @@ void
 Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent,  int theID, const std::string & theType, const Vector3f & thePosition3D)
 {
     MAKE_SCOPE_TIMER(Gesture_createEvent);
-        if(theType == "add"){
+        if(theType == "add") {
             AC_DEBUG << "Gesture::createEvent -> add";
 
             // track cursor
@@ -173,11 +173,11 @@ Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent,  int theID, const std
         }
 
         // check if theNode is valid - maybe its Cursor is not in the List
-        if(_myCursorList.find(theID) == _myCursorList.end()){
-                return;
+        if(_myCursorList.find(theID) == _myCursorList.end()) {
+            return;
         }
 
-        if(theType == "move" || theType == "update"){
+        if(theType == "move" || theType == "update") {
             AC_DEBUG << "Gesture::createEvent -> move";
 
             Vector3f myLastPoint = getCurrentPosition(theID); 

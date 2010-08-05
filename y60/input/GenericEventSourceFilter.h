@@ -68,7 +68,7 @@
 
 namespace y60 {
     struct CursorFilter {
-        CursorFilter(std::string theEventType, std::string theIdAttributeName) : _myEventType(theEventType), _myCursorAttributeName(theIdAttributeName) {}
+        CursorFilter(const std::string & theEventType, const std::string & theIdAttributeName) : _myEventType(theEventType), _myCursorAttributeName(theIdAttributeName) {}
         std::string _myEventType;
         std::string _myCursorAttributeName;
     };
@@ -76,11 +76,11 @@ namespace y60 {
         public:
             GenericEventSourceFilter();
             virtual ~GenericEventSourceFilter();
-            void addCursorFilter(std::string theEventType, std::string theIdAttributeName);
+            void addCursorFilter(const std::string & theEventType, const std::string & theIdAttributeName);
             void applyFilter(EventPtrList & theEventList);
-            void analyzeEvents(EventPtrList theEventList, std::string theIdAttributeName);
+            void analyzeEvents(EventPtrList & theEventList, const std::string & theIdAttributeName) const;
         private:          
-            void applyCursorFilter(std::string theEventType, std::string theIdAttributeName, EventPtrList & theEventList);
+            void applyCursorFilter(const std::string & theEventType, const std::string & theIdAttributeName, EventPtrList & theEventList);
             std::vector<CursorFilter> _myCursorFilter;
     };
 
