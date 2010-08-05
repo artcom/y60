@@ -17,7 +17,7 @@ spark.Window.Constructor = function(Protected) {
     
     const PICK_RADIUS = 1;
     const MAX_CURSOR_POSITIONS_FOR_AVERAGE = 10;
-    const MOVE_DISTANCE_THRESHOLD = 0;
+    const MOVE_DISTANCE_THRESHOLD = 0.1;
     
     var _myCamera = null;
     var _myWorld = null;
