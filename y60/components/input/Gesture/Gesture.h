@@ -50,6 +50,7 @@ class Gesture : public asl::PlugInBase,
     public:
         static const float WIPE_DISTANCE_THRESHOLD;
         static const float MAX_CURSOR_PAIR_DISTANCE;
+        static const unsigned int ROTATE_ANGLE_THRESHOLD;
 
         Gesture(asl::DLHandle theHandle);
         virtual y60::EventPtrList poll();
@@ -92,6 +93,7 @@ class Gesture : public asl::PlugInBase,
         CursorPartnerList               _myCursorPartner;
         float                           _myWipeDistanceThreshold;
         float                           _myMaxCursorPairDistance;
+        unsigned int                    _myRotateAngleThreshold;
 
         unsigned int                    _myEventCounter;
         asl::ThreadLock                 _myDeliveryMutex;

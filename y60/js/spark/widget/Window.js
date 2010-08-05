@@ -17,6 +17,7 @@ spark.Window.Constructor = function(Protected) {
     
     const PICK_RADIUS = 1;
     const MAX_CURSOR_POSITIONS_FOR_AVERAGE = 10;
+    const MOVE_DISTANCE_THRESHOLD = 0;
     
     var _myCamera = null;
     var _myWorld = null;
@@ -428,7 +429,7 @@ spark.Window.Constructor = function(Protected) {
             break;
 
         case "add":
-            initCursorPositionHistory (theEvent.id);
+            initCursorPositionHistory(myId);
         case "move": // proximatrix
         case "update": // tuio        
             var myCursor = getMultitouchCursor(myId);
@@ -436,8 +437,10 @@ spark.Window.Constructor = function(Protected) {
                 myCursor.activate();
             }
             var myFocused = myCursor.focused;
-
+            
+            var myLastPosition = getAveragedPosition(myId);
             var myPosition = getMultitouchCursorPosition(theEvent);
+            myPosition = calculateAveragePosition(myId, myPosition);
             
             var myPick = getWidgetForMultitouchCursor(myCursor, myPosition);
             myCursor.update(myPick, myPosition);
@@ -461,9 +464,13 @@ spark.Window.Constructor = function(Protected) {
             }
 
             if(theEvent.type == "move" || theEvent.type == "update") {
-                Logger.debug("Cursor " + myId + " moves to " + myPosition + " over " + myPick);
-                var myMove = new spark.CursorEvent(spark.CursorEvent.MOVE, myCursor);
-                myPick.dispatchEvent(myMove);
+                
+                var myMoveDistance = distance(myPosition, myLastPosition);
+                if (myMoveDistance >= MOVE_DISTANCE_THRESHOLD) {
+                    Logger.debug("Cursor " + myId + " moves to " + myPosition + " over " + myPick);
+                    var myMove = new spark.CursorEvent(spark.CursorEvent.MOVE, myCursor);
+                    myPick.dispatchEvent(myMove);
+                }
             }
 
             break;
@@ -473,6 +480,7 @@ spark.Window.Constructor = function(Protected) {
                 Logger.debug("Cursor " + myId + " removed");
                 var myCursor   = _myMultitouchCursors[myId];
                 var myPosition = getMultitouchCursorPosition(theEvent);
+                myPosition = calculateAveragePosition(myId, myPosition);
                 var myFocused  = myCursor.focused;
 
                 myCursor.update(myFocused, myPosition);
@@ -490,7 +498,7 @@ spark.Window.Constructor = function(Protected) {
                 myCursor.deactivate();
                 delete _myMultitouchCursors[myId];
             }
-            removeCursorPositionHistory(theEvent.id);
+            removeCursorPositionHistory(myId);
             break;
         }
     };
@@ -502,8 +510,12 @@ spark.Window.Constructor = function(Protected) {
     // Will be called on a gesture event
     Public.onGesture = function(theGesture) {
         
-        var myPosition = getMultitouchCursorPosition(theGesture);
         var mySparkConformedCursorId = getSparkConformedCursorId(theGesture, theGesture.cursorid);
+        var myPosition = getAveragedPosition(mySparkConformedCursorId);
+        if (!myPosition) {
+            myPosition = getMultitouchCursorPosition(theGesture);
+        }
+                         
         
         // picking with considering cursor grabbing
         var myCursor = getMultitouchCursor(mySparkConformedCursorId);
@@ -606,35 +618,33 @@ spark.Window.Constructor = function(Protected) {
     
     
     function getMultitouchCursorPosition(theEvent) {
+        var myPosition;
         switch(theEvent.callback) {
         case "onASSEvent":
-            var myPosition = new Point2f(theEvent.position3D.x, theEvent.position3D.y);
-            return calculateAverageAssPosition(theEvent.id, myPosition);
+            myPosition = new Point2f(theEvent.position3D.x, theEvent.position3D.y);
+            break;
         case "onTuioEvent":
-            return new Point2f(theEvent.position.x * Public.width,
-                               theEvent.position.y * Public.height);
+            myPosition = new Point2f(theEvent.position.x * Public.width,
+                                     theEvent.position.y * Public.height);
+            break;
         case "onGesture":
             if (theEvent.baseeventtype == ASS_BASE_EVENT) {
-                if (theEvent.cursorid in _myCursorPositionHistory) {
-                    return getAveragedAssPosition(theEvent.cursorid);  
-                } else {
-                    return new Point2f(theEvent.position3D.x, theEvent.position3D.y);
-                }
+                myPosition = new Point2f(theEvent.position3D.x, theEvent.position3D.y);
             } else {
-                return new Point2f(theEvent.position3D.x * Public.width,
-                                   theEvent.position3D.y * Public.height);
+                myPosition = new Point2f(theEvent.position3D.x * Public.width,
+                                         theEvent.position3D.y * Public.height);
             }
+            break;
         default:
             Logger.fatal("Unknown multitouch event type");
             return null;
         }
+        return myPosition;
     };
     
     
     function initCursorPositionHistory(theCursorId) {
-        if (!(theCursorId in _myCursorPositionHistory)) {
-            _myCursorPositionHistory[theCursorId] = [];
-        }
+        _myCursorPositionHistory[theCursorId] = [];
     }
     
     function removeCursorPositionHistory(theCursorId) {
@@ -643,7 +653,7 @@ spark.Window.Constructor = function(Protected) {
         }
     }
     
-    function calculateAverageAssPosition(theCursorId, thePosition) {
+    function calculateAveragePosition(theCursorId, thePosition) {
         
         if (!(theCursorId in _myCursorPositionHistory)) {
             return thePosition;
@@ -654,20 +664,24 @@ spark.Window.Constructor = function(Protected) {
         }
         _myCursorPositionHistory[theCursorId].push(thePosition);
         
-        return getAveragedAssPosition(theCursorId);
+        return getAveragedPosition(theCursorId);
     }
     
-    function getAveragedAssPosition(theCursorId) {
+    function getAveragedPosition(theCursorId) {
         var myAveragedPos = new Vector2f(0,0);
         var myCounter = 0;
         
+        if (!(theCursorId in _myCursorPositionHistory)) {
+            return null;
+        }
         for (var i = 0; i < _myCursorPositionHistory[theCursorId].length; i++) {
             myCounter+=(i+1);
             myAveragedPos[0] += _myCursorPositionHistory[theCursorId][i][0] * (i+1);
             myAveragedPos[1] += _myCursorPositionHistory[theCursorId][i][1] * (i+1);
         }
-        myAveragedPos[0] /= myCounter;
-        myAveragedPos[1] /= myCounter;
+        if (myCounter > 0) {
+            myAveragedPos.div(myCounter);
+        }
         return myAveragedPos;
     }
 

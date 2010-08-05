@@ -27,6 +27,7 @@ namespace y60 {
 
     const float Gesture::WIPE_DISTANCE_THRESHOLD = 100.0;
     const float Gesture::MAX_CURSOR_PAIR_DISTANCE = 1000.0;
+    const unsigned int Gesture::ROTATE_ANGLE_THRESHOLD = 1;
 
 Gesture::Gesture(DLHandle theHandle) :
     asl::PlugInBase( theHandle ),
@@ -34,6 +35,7 @@ Gesture::Gesture(DLHandle theHandle) :
      _myGestureSchema( new dom::Document( y60::ourgestureeventxsd ) ),
     _myValueFactory( new dom::ValueFactory() ),
     _myWipeDistanceThreshold(WIPE_DISTANCE_THRESHOLD),
+    _myRotateAngleThreshold(ROTATE_ANGLE_THRESHOLD),
     _myMaxCursorPairDistance(MAX_CURSOR_PAIR_DISTANCE),
     _myEventCounter(0)
 {
@@ -258,7 +260,7 @@ Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent,  int theID, const std
                     if (isNaN(myAngle)) {
                         myAngle = 0;
                     }
-                    if (abs(myAngle) > 1) {
+                    if (abs(myAngle) > _myRotateAngleThreshold) {
                         dom::NodePtr myNode2 = addGestureEvent2Queue(theBaseEvent, theID, "rotate", thePosition3D);
                         myNode2->appendAttribute<float>("angle", myAngle);
                         myNode2->appendAttribute<Vector3f>("centerpoint", myCenterPoint);
@@ -321,6 +323,7 @@ void
 Gesture::onUpdateSettings(dom::NodePtr theSettings) {
      _myWipeDistanceThreshold = getSetting( theSettings, "WipeDistanceThreshold", _myWipeDistanceThreshold);
      _myMaxCursorPairDistance = getSetting( theSettings, "MaxCursorPairDistance", _myMaxCursorPairDistance);
+     _myRotateAngleThreshold = getSetting( theSettings, "RotateAngleThreshold", _myRotateAngleThreshold);
 }
 
 void
