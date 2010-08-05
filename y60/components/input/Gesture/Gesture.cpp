@@ -27,7 +27,8 @@ namespace y60 {
 
     const float Gesture::WIPE_DISTANCE_THRESHOLD = 100.0;
     const float Gesture::MAX_CURSOR_PAIR_DISTANCE = 1000.0;
-    const unsigned int Gesture::ROTATE_ANGLE_THRESHOLD = 1;
+    const float Gesture::ROTATE_ANGLE_THRESHOLD = 1;
+    const float Gesture::ZOOM_DISTANCE_THRESHOLD = 0;
 
 Gesture::Gesture(DLHandle theHandle) :
     asl::PlugInBase( theHandle ),
@@ -35,6 +36,7 @@ Gesture::Gesture(DLHandle theHandle) :
      _myGestureSchema( new dom::Document( y60::ourgestureeventxsd ) ),
     _myValueFactory( new dom::ValueFactory() ),
     _myWipeDistanceThreshold(WIPE_DISTANCE_THRESHOLD),
+    _myZoomDistanceThreshold(ZOOM_DISTANCE_THRESHOLD),
     _myRotateAngleThreshold(ROTATE_ANGLE_THRESHOLD),
     _myMaxCursorPairDistance(MAX_CURSOR_PAIR_DISTANCE),
     _myEventCounter(0)
@@ -243,11 +245,14 @@ Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent,  int theID, const std
                     
                     // register zoom event
                     float myLastDistance = distance(_myLastCursorPositions[myCursorPartnerIt->first], myLastPoint);
-                    dom::NodePtr myNode = addGestureEvent2Queue(theBaseEvent, theID, "zoom", thePosition3D);
-                    myNode->appendAttribute<float>("distance", myDistance);
-                    myNode->appendAttribute<float>("lastdistance", myLastDistance);
-                    myNode->appendAttribute<float>("initialdistance", _myInitialZoomDistance[theID]);
-                    myNode->appendAttribute<Vector3f>("centerpoint", myCenterPoint);
+
+                    if (myLastDistance >= _myZoomDistanceThreshold) {
+                        dom::NodePtr myNode = addGestureEvent2Queue(theBaseEvent, theID, "zoom", thePosition3D);
+                        myNode->appendAttribute<float>("distance", myDistance);
+                        myNode->appendAttribute<float>("lastdistance", myLastDistance);
+                        myNode->appendAttribute<float>("initialdistance", _myInitialZoomDistance[theID]);
+                        myNode->appendAttribute<Vector3f>("centerpoint", myCenterPoint);
+                    }
                 
                     if (myCursorPartnerIt != _myCursorPartner.end()) {
                         _myInitialZoomDistance[myCursorPartnerIt->first] = _myInitialZoomDistance[theID];
@@ -324,6 +329,7 @@ Gesture::onUpdateSettings(dom::NodePtr theSettings) {
      _myWipeDistanceThreshold = getSetting( theSettings, "WipeDistanceThreshold", _myWipeDistanceThreshold);
      _myMaxCursorPairDistance = getSetting( theSettings, "MaxCursorPairDistance", _myMaxCursorPairDistance);
      _myRotateAngleThreshold = getSetting( theSettings, "RotateAngleThreshold", _myRotateAngleThreshold);
+     _myZoomDistanceThreshold = getSetting( theSettings, "ZoomDistanceThreshold", _myZoomDistanceThreshold);
 }
 
 void
