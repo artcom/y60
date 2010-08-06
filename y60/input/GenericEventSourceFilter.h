@@ -86,9 +86,9 @@ namespace y60 {
             void analyzeEvents(EventPtrList & theEventList, const std::string & theIdAttributeName) const;
             
         protected:    
-            asl::Vector3f GenericEventSourceFilter::getAveragePosition(const unsigned int theCursorId, const asl::Vector3f & thePosition);
-            asl::Vector2f GenericEventSourceFilter::getAveragePosition(const unsigned int theCursorId, const asl::Vector2f & thePosition);
-            void GenericEventSourceFilter::clearCursorHistory(const EventPtrList & theEventList);
+            asl::Vector3f getAveragePosition(const unsigned int theCursorId, const asl::Vector3f & thePosition);
+            asl::Vector2f getAveragePosition(const unsigned int theCursorId, const asl::Vector2f & thePosition);
+            void clearCursorHistory(const EventPtrList & theEventList);
 
             std::map<int, std::vector<asl::Vector3f> >   _myCursorPositionHistory;
             unsigned int _myMaxCursorPositionsForAverage;
