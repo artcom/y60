@@ -16,16 +16,13 @@ spark.Window.Constructor = function(Protected) {
     this.Inherit(spark.Stage);
     
     const PICK_RADIUS = 1;
-    const MAX_CURSOR_POSITIONS_FOR_AVERAGE = 10;
-    const MOVE_DISTANCE_THRESHOLD = 0.1;
+    const MOVE_DISTANCE_THRESHOLD = 0;//0.1;
     
     var _myCamera = null;
     var _myWorld = null;
     var _myPickRadius = PICK_RADIUS;
     var _myPickList = {};
-    var _myCursorPositionHistory = {};
     var _myMultitouchCursors = {};
-    var _myMaxCursorPositionsForAverage = MAX_CURSOR_POSITIONS_FOR_AVERAGE;
     
 
     SceneViewer.prototype.Constructor(this, []);
@@ -41,10 +38,6 @@ spark.Window.Constructor = function(Protected) {
     Public.title setter = function(theTitle) {
         window.title = theTitle;
     };
-    
-    Public.maxCursorPositionsForAverage setter = function(theValue) {
-        _myMaxCursorPositionsForAverage = theValue;
-    }
     
     function seperateWorld() {
         // This is the first world - it contains the loaded x60 model
@@ -429,7 +422,6 @@ spark.Window.Constructor = function(Protected) {
             break;
 
         case "add":
-            initCursorPositionHistory(myId);
         case "move": // proximatrix
         case "update": // tuio        
             var myCursor = getMultitouchCursor(myId);
@@ -438,9 +430,7 @@ spark.Window.Constructor = function(Protected) {
             }
             var myFocused = myCursor.focused;
             
-            var myLastPosition = getAveragedPosition(myId);
             var myPosition = getMultitouchCursorPosition(theEvent);
-            myPosition = calculateAveragePosition(myId, myPosition);
             
             var myPick = getWidgetForMultitouchCursor(myCursor, myPosition);
             myCursor.update(myPick, myPosition);
@@ -465,7 +455,7 @@ spark.Window.Constructor = function(Protected) {
 
             if(theEvent.type == "move" || theEvent.type == "update") {
                 
-                var myMoveDistance = distance(myPosition, myLastPosition);
+                var myMoveDistance = distance(myPosition, myCursor.lastStagePosition);
                 if (myMoveDistance >= MOVE_DISTANCE_THRESHOLD) {
                     Logger.debug("Cursor " + myId + " moves to " + myPosition + " over " + myPick);
                     var myMove = new spark.CursorEvent(spark.CursorEvent.MOVE, myCursor);
@@ -480,7 +470,6 @@ spark.Window.Constructor = function(Protected) {
                 Logger.debug("Cursor " + myId + " removed");
                 var myCursor   = _myMultitouchCursors[myId];
                 var myPosition = getMultitouchCursorPosition(theEvent);
-                myPosition = calculateAveragePosition(myId, myPosition);
                 var myFocused  = myCursor.focused;
 
                 myCursor.update(myFocused, myPosition);
@@ -498,7 +487,6 @@ spark.Window.Constructor = function(Protected) {
                 myCursor.deactivate();
                 delete _myMultitouchCursors[myId];
             }
-            removeCursorPositionHistory(myId);
             break;
         }
     };
@@ -511,11 +499,7 @@ spark.Window.Constructor = function(Protected) {
     Public.onGesture = function(theGesture) {
         
         var mySparkConformedCursorId = getSparkConformedCursorId(theGesture, theGesture.cursorid);
-        var myPosition = getAveragedPosition(mySparkConformedCursorId);
-        if (!myPosition) {
-            myPosition = getMultitouchCursorPosition(theGesture);
-        }
-                         
+        var myPosition = getMultitouchCursorPosition(theGesture);
         
         // picking with considering cursor grabbing
         var myCursor = getMultitouchCursor(mySparkConformedCursorId);
@@ -643,46 +627,5 @@ spark.Window.Constructor = function(Protected) {
     };
     
     
-    function initCursorPositionHistory(theCursorId) {
-        _myCursorPositionHistory[theCursorId] = [];
-    }
     
-    function removeCursorPositionHistory(theCursorId) {
-        if (theCursorId in _myCursorPositionHistory) {
-            delete _myCursorPositionHistory[theCursorId];
-        }
-    }
-    
-    function calculateAveragePosition(theCursorId, thePosition) {
-        
-        if (!(theCursorId in _myCursorPositionHistory)) {
-            return thePosition;
-        }
-        
-        if (_myCursorPositionHistory[theCursorId].length >= _myMaxCursorPositionsForAverage) {
-            _myCursorPositionHistory[theCursorId].shift();
-        }
-        _myCursorPositionHistory[theCursorId].push(thePosition);
-        
-        return getAveragedPosition(theCursorId);
-    }
-    
-    function getAveragedPosition(theCursorId) {
-        var myAveragedPos = new Vector2f(0,0);
-        var myCounter = 0;
-        
-        if (!(theCursorId in _myCursorPositionHistory)) {
-            return null;
-        }
-        for (var i = 0; i < _myCursorPositionHistory[theCursorId].length; i++) {
-            myCounter+=(i+1);
-            myAveragedPos[0] += _myCursorPositionHistory[theCursorId][i][0] * (i+1);
-            myAveragedPos[1] += _myCursorPositionHistory[theCursorId][i][1] * (i+1);
-        }
-        if (myCounter > 0) {
-            myAveragedPos.div(myCounter);
-        }
-        return myAveragedPos;
-    }
-
 };

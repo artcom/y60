@@ -84,7 +84,7 @@ class ASSEventSource : public asl::PlugInBase,
                            PropertyValue & theReturnValue) const;
         virtual void onSetProperty(const std::string & thePropertyName,
                            const PropertyValue & thePropertyValue);
-        // TODO virtual void onUpdateSettings(dom::NodePtr theSettings);
+        virtual void onUpdateSettings(dom::NodePtr theSettings);
 
         void createTransportLayerEvent(const std::string & theType );
     protected:

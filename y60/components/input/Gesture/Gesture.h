@@ -36,8 +36,6 @@ enum GESTURE_BASE_EVENT_TYPE{
 };
 
 
-typedef std::vector< asl::Vector3f > Position3fVector;
-typedef std::vector< asl::Vector2f > Position2fVector;
 typedef std::map<int, bool> CursorList;
 typedef std::map<int, int> CursorPartnerList;
 
@@ -74,10 +72,6 @@ class Gesture : public asl::PlugInBase,
                                            const std::string & theType, 
                                            const asl::Vector3f & thePosition3D);
 
-        inline asl::Vector3f getCurrentPosition(int theCursorId) {
-            return _myCursorPositionHistory[theCursorId][_myCursorPositionHistory[theCursorId].size()-1];
-        }
-
         CursorPartnerList::iterator getCursorPartner(int theId);
         void saveAllCursorPositions();
 
@@ -86,9 +80,8 @@ class Gesture : public asl::PlugInBase,
         asl::Ptr<dom::ValueFactory>     _myValueFactory;
         y60::EventPtrList               _myEvents;
 
-        std::map<int, Position3fVector> _myCursorPositionHistory;
-
         CursorList                      _myCursorList;
+        std::map<int, asl::Vector3f>    _myCurrentCursorPositions;
         std::map<int, asl::Vector3f>    _myLastCursorPositions;
         std::map<int, float>            _myInitialZoomDistance;
         CursorPartnerList               _myCursorPartner;

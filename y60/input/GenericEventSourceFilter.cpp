@@ -59,23 +59,31 @@
 #include "GenericEventSourceFilter.h"
 
 using namespace std;
+using namespace asl;
 namespace y60 {
-    GenericEventSourceFilter::GenericEventSourceFilter() {}
-    GenericEventSourceFilter::~GenericEventSourceFilter() {
-    }
+    const unsigned int GenericEventSourceFilter::MAX_CURSOR_POSITIONS_FOR_AVERAGE = 10;
 
-    void GenericEventSourceFilter::addCursorFilter(const std::string & theEventType, const std::string & theIdAttributeName) {
+    GenericEventSourceFilter::GenericEventSourceFilter():
+        _myMaxCursorPositionsForAverage(MAX_CURSOR_POSITIONS_FOR_AVERAGE)
+    {}
+
+    GenericEventSourceFilter::~GenericEventSourceFilter() {}
+
+    void 
+    GenericEventSourceFilter::addCursorFilter(const std::string & theEventType, const std::string & theIdAttributeName) {
         _myCursorFilter.push_back( CursorFilter(theEventType, theIdAttributeName));
 
     }
     // apply filter in place
-    void GenericEventSourceFilter::applyFilter(EventPtrList & theEventList) {
+    void 
+    GenericEventSourceFilter::applyFilter(EventPtrList & theEventList) {
         for (unsigned i = 0; i < _myCursorFilter.size(); i++) {
             AC_DEBUG << "filter cursor events with type: " << _myCursorFilter[i]._myEventType << " and cursor id attribute: " << _myCursorFilter[i]._myCursorAttributeName;
             applyCursorFilter(_myCursorFilter[i]._myEventType, _myCursorFilter[i]._myCursorAttributeName, theEventList);
         }
     }
-    void GenericEventSourceFilter::applyCursorFilter(const std::string & theEventType, const std::string & theIdAttributeName, EventPtrList & theEventList) {
+    void 
+    GenericEventSourceFilter::applyCursorFilter(const std::string & theEventType, const std::string & theIdAttributeName, EventPtrList & theEventList) {
         std::map<int, std::vector<GenericEventPtr > > myEvents2Shrink;
         EventPtrList::iterator myIt = theEventList.begin();
         unsigned int counter= 0;
@@ -103,8 +111,9 @@ namespace y60 {
         }
     }
 
-    void GenericEventSourceFilter::analyzeEvents(EventPtrList & theEventList, const std::string & theIdAttributeName) const {
-        AC_DEBUG << "############## analyzeEvents cursor events:";
+    void 
+    GenericEventSourceFilter::analyzeEvents(EventPtrList & theEventList, const std::string & theIdAttributeName) const {
+        AC_DEBUG << "GenericEventSourceFilter::analyzeEvents cursor events:";
         std::map<int, std::map<std::string, int> > myCursorEventCounter;
         {
             EventPtrList::iterator myEndIt   = theEventList.end();
@@ -138,4 +147,55 @@ namespace y60 {
         }
     }
 
+    asl::Vector3f 
+    GenericEventSourceFilter::getAveragePosition(const unsigned int theCursorId, const asl::Vector3f & thePosition) {
+        
+        if (_myCursorPositionHistory.find(theCursorId) == _myCursorPositionHistory.end()) {
+            _myCursorPositionHistory[theCursorId].reserve(_myMaxCursorPositionsForAverage);
+        }
+        
+        CursorPositions::iterator myIt = _myCursorPositionHistory[theCursorId].begin();
+
+        if (_myCursorPositionHistory[theCursorId].size() >= _myMaxCursorPositionsForAverage) {
+            _myCursorPositionHistory[theCursorId].erase(myIt);
+        }
+        _myCursorPositionHistory[theCursorId].push_back(thePosition);
+
+        asl::Vector3f myAveragePosition = asl::Vector3f(0.0,0.0,0.0);
+        unsigned int myWeight = 0;
+        unsigned int myWeightCounter = 0;
+
+        myIt = _myCursorPositionHistory[theCursorId].begin();
+        CursorPositions::iterator myEndIt = _myCursorPositionHistory[theCursorId].end();
+        for(; myIt !=  myEndIt; ++myIt){
+            myWeight++;
+            myWeightCounter += myWeight;
+            myAveragePosition += asl::product((*myIt), float(myWeight));
+        }
+        if (myWeight > 0) {
+            myAveragePosition.div(float(myWeightCounter));
+        }
+        return myAveragePosition;
+    }
+
+    asl::Vector2f 
+    GenericEventSourceFilter::getAveragePosition(const unsigned int theCursorId, const asl::Vector2f & thePosition) {
+        asl::Vector3f myPosition(thePosition[0], thePosition[1], 0);
+        myPosition = getAveragePosition(theCursorId, myPosition);
+        return asl::Vector2f(myPosition[0], myPosition[1]);
+    }
+ 
+    void 
+    GenericEventSourceFilter::clearCursorHistory(const EventPtrList & theEventList) {
+        EventPtrList::const_iterator myIt = theEventList.begin();
+        for (; myIt !=theEventList.end(); ++myIt) {
+            GenericEventPtr myGenericEvent(dynamic_cast_Ptr<GenericEvent>(*myIt));
+            dom::NodePtr myNode = myGenericEvent->getNode();
+            int myCursorId = asl::as<int>(myNode->getAttributeString("id"));
+            std::string myEventType = myNode->getAttributeString("type");
+            if (myEventType == "remove" && _myCursorPositionHistory.find(myCursorId) != _myCursorPositionHistory.end()) {
+                _myCursorPositionHistory[myCursorId].clear();
+            }
+        }
+    }
 }

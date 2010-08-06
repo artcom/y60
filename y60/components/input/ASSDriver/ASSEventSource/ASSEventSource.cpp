@@ -64,6 +64,7 @@ using namespace y60;
 
 #include <y60/jsbase/IScriptablePlugin.h>
 #include <y60/jsbase/JSWrapper.h>
+#include <y60/base/SettingsParser.h>
 
 
 namespace y60 {
@@ -71,6 +72,7 @@ namespace y60 {
 ASSEventSource::ASSEventSource(DLHandle theHandle) :
     asl::PlugInBase( theHandle ),
     ASSDriver( /*theHandle */),
+    GenericEventSourceFilter(),
     _myEventSchema( new dom::Document( y60::ourasseventxsd ) ),
     _myValueFactory( new dom::ValueFactory() )
 
@@ -91,6 +93,7 @@ ASSEventSource::poll() {
     // do the event filter in base class GenericEventSourceFilter
 	//analyzeEvents(_myEvents, "id");
     applyFilter(_myEvents);
+    clearCursorHistory(_myEvents);
     return _myEvents;
 }
 
@@ -104,10 +107,11 @@ ASSEventSource::createEvent( int theID, const std::string & theType,
             _myValueFactory));
     dom::NodePtr myNode = myEvent->getNode();
 
+    asl::Vector3f myPosition = getAveragePosition(theID, thePosition3D);
     myNode->appendAttribute<int>("id", theID);
     myNode->appendAttribute<std::string>("type", theType);
     myNode->appendAttribute<Vector2f>("raw_position", theRawPosition);
-    myNode->appendAttribute<Vector3f>("position3D", thePosition3D);
+    myNode->appendAttribute<Vector3f>("position3D", myPosition);
     myNode->appendAttribute<Box2f>("roi", theROI);
     myNode->appendAttribute<float>("intensity", theIntensity);
     myNode->appendAttribute<float>("frameno", static_cast<float>(theEvent.frameno));
@@ -127,6 +131,15 @@ ASSEventSource::createTransportLayerEvent( const std::string & theType)
         myNode->appendAttribute<Vector2i>("grid_size", _myGridSize);
     }
     _myEvents.push_back( myEvent );
+}
+
+void
+ASSEventSource::onUpdateSettings(dom::NodePtr theSettings) {
+
+
+    AC_DEBUG << "updating ASSEventSource settings";
+    dom::NodePtr mySettings = getASSSettings( theSettings );
+    getConfigSetting( mySettings, "maxCursorPositionsForAverage", _myMaxCursorPositionsForAverage, unsigned int (10) );
 }
 
 void

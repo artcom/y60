@@ -40,6 +40,7 @@ public:
 
     TUIOPlugin(DLHandle myDLHandle)
         : PlugInBase(myDLHandle),
+          GenericEventSourceFilter(),
           _myEventSchemaDocument(new Document(y60::ourtuioeventxsd)),
           _myEventValueFactory(new ValueFactory()),
           _myFilterMultipleUpdatePerCursorFlag(true)
@@ -51,6 +52,8 @@ public:
         if (_myFilterMultipleUpdatePerCursorFlag) {
             addCursorFilter("update", "id");
         }
+        // no default cursor smoothing 
+        _myMaxCursorPositionsForAverage = 1;
     }
 
     ~TUIOPlugin()
@@ -86,47 +89,21 @@ public:
             }
 
             _myUndeliveredCursors.clear();
-            //AC_INFO << "unfiltered toui events # " << myEvents.size();
+            //AC_INFO << "unfiltered tuio events # " << myEvents.size();
 
             // logs event statistics for multiple events per cursor and type
             //analyzeEvents(myEvents, "id");
             // do the event filter in base class GenericEventSourceFilter
             applyFilter(myEvents);
-            //AC_INFO << "deliver toui events # " << myEvents.size();
+            clearCursorHistory(myEvents);
+            //AC_INFO << "deliver tuio events # " << myEvents.size();
             //analyzeEvents(myEvents, "id");
             return myEvents;
         } else {
             return EventPtrList();
         }
     }
-    void filterEventsPerCursor(std::string theEventType, std::string theIdAttributeName, EventPtrList & theEventList) {
-        std::map<int, std::vector<GenericEventPtr > > myEvents2Shrink;
-        EventPtrList::iterator myIt = theEventList.begin();
-        unsigned int counter= 0;
-        for (; myIt !=theEventList.end(); ) {
-            counter++;
-            GenericEventPtr myGenericEvent(dynamic_cast_Ptr<GenericEvent>(*myIt));
-            dom::NodePtr myNode = myGenericEvent->getNode();
-            int myCursorId = asl::as<int>(myNode->getAttributeString(theIdAttributeName));
-            std::string myEventType = myNode->getAttributeString("type");
-            if (myEventType == theEventType) {
-                if (myEvents2Shrink.find(myCursorId) == myEvents2Shrink.end()) {
-                    myEvents2Shrink[myCursorId] = std::vector<GenericEventPtr>();
-                }
-                myEvents2Shrink[myCursorId].push_back(myGenericEvent);
-                myIt = theEventList.erase(myIt);
-            } else {
-                ++myIt;
-            }
-        }
-
-        std::map<int, std::vector<GenericEventPtr > >::iterator myEndIt2   = myEvents2Shrink.end();
-        std::map<int, std::vector<GenericEventPtr > >::iterator myIt2 = myEvents2Shrink.begin();
-        for(; myIt2 !=  myEndIt2; ++myIt2){
-            theEventList.push_back((myIt2->second)[(myIt2->second).size()-1]);
-        }
-    }
-
+    
 
 // TuioListener
 
@@ -197,7 +174,9 @@ protected:
         TuioTime myValueTime = myCursor->getTuioTime();
         myNode->appendAttribute<double>("value_time", myValueTime.getSeconds() + (myValueTime.getMicroseconds() / 1000000.0));
 
-        myNode->appendAttribute<Vector2f>("position", Vector2f(myCursor->getX(), myCursor->getY()));
+        Vector2f myPosition = Vector2f(myCursor->getX(), myCursor->getY());
+        myPosition = getAveragePosition(myCursor->getSessionID(), myPosition);
+        myNode->appendAttribute<Vector2f>("position", myPosition);
         myNode->appendAttribute<Vector2f>("velocity", Vector2f(myCursor->getXSpeed(), myCursor->getYSpeed()));
 
         myNode->appendAttribute<double>("speed", myCursor->getMotionSpeed());

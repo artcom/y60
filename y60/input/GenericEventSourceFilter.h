@@ -67,24 +67,38 @@
 #include <vector>
 
 namespace y60 {
+    typedef std::map<int, std::vector<asl::Vector3f> > CursorPositionHistory;
+    typedef std::vector<asl::Vector3f> CursorPositions;
+
     struct CursorFilter {
         CursorFilter(const std::string & theEventType, const std::string & theIdAttributeName) : _myEventType(theEventType), _myCursorAttributeName(theIdAttributeName) {}
         std::string _myEventType;
         std::string _myCursorAttributeName;
     };
+
     class Y60_INPUT_DECL GenericEventSourceFilter {
         public:
+            static const unsigned int MAX_CURSOR_POSITIONS_FOR_AVERAGE;
             GenericEventSourceFilter();
             virtual ~GenericEventSourceFilter();
             void addCursorFilter(const std::string & theEventType, const std::string & theIdAttributeName);
             void applyFilter(EventPtrList & theEventList);
             void analyzeEvents(EventPtrList & theEventList, const std::string & theIdAttributeName) const;
+            
+        protected:    
+            asl::Vector3f GenericEventSourceFilter::getAveragePosition(const unsigned int theCursorId, const asl::Vector3f & thePosition);
+            asl::Vector2f GenericEventSourceFilter::getAveragePosition(const unsigned int theCursorId, const asl::Vector2f & thePosition);
+            void GenericEventSourceFilter::clearCursorHistory(const EventPtrList & theEventList);
+
+            std::map<int, std::vector<asl::Vector3f> >   _myCursorPositionHistory;
+            unsigned int _myMaxCursorPositionsForAverage;
         private:          
             void applyCursorFilter(const std::string & theEventType, const std::string & theIdAttributeName, EventPtrList & theEventList);
-            std::vector<CursorFilter> _myCursorFilter;
+            std::vector<CursorFilter>                    _myCursorFilter;
+            
     };
 
-    typedef asl::Ptr<IEventSource> IEventSourcePtr;
+    
 }
 
 #endif //_Y60_INPUT_GENERICEVENTSOURCEFILTER_INCLUDED_
