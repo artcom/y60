@@ -81,11 +81,11 @@ namespace y60 {
             static const unsigned int MAX_CURSOR_POSITIONS_FOR_AVERAGE;
             GenericEventSourceFilter();
             virtual ~GenericEventSourceFilter();
+        protected:    
             void addCursorFilter(const std::string & theEventType, const std::string & theIdAttributeName);
             void applyFilter(EventPtrList & theEventList);
             void analyzeEvents(EventPtrList & theEventList, const std::string & theIdAttributeName) const;
             
-        protected:    
             asl::Vector3f getAveragePosition(const unsigned int theCursorId, const asl::Vector3f & thePosition);
             asl::Vector2f getAveragePosition(const unsigned int theCursorId, const asl::Vector2f & thePosition);
             void clearCursorHistory(const EventPtrList & theEventList);

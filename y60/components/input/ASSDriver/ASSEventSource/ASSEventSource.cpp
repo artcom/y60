@@ -135,9 +135,9 @@ ASSEventSource::createTransportLayerEvent( const std::string & theType)
 
 void
 ASSEventSource::onUpdateSettings(dom::NodePtr theSettings) {
-
-
+    ASSDriver::onUpdateSettings(theSettings);
     AC_DEBUG << "updating ASSEventSource settings";
+
     dom::NodePtr mySettings = getASSSettings( theSettings );
     getConfigSetting( mySettings, "maxCursorPositionsForAverage", _myMaxCursorPositionsForAverage, static_cast<unsigned int> (10) );
 }

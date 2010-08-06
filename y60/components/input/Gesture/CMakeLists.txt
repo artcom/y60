@@ -15,7 +15,7 @@ y60_add_component(
     Gesture
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
-    DEPENDS y60jslib 
+    DEPENDS y60jslib y60input 
     
 )
 asl_add_schema(

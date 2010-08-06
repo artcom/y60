@@ -9,17 +9,18 @@
 //============================================================================
 
 #include "Gesture.h"
-#include <y60/base/SettingsParser.h>
 
 
 using namespace asl;
 using namespace y60;
 using namespace dom;
 
+#include <y60/base/SettingsParser.h>
 #include <y60/jsbase/IScriptablePlugin.h>
 #include <y60/jsbase/JSWrapper.h>
 #include <y60/base/DataTypes.h>
 #include <y60/input/EventDispatcher.h>
+#include <y60/input/GenericEventSourceFilter.h>
 
 #include "gestureeventxsd.h"
 
@@ -32,6 +33,7 @@ namespace y60 {
 
 Gesture::Gesture(DLHandle theHandle) :
     asl::PlugInBase( theHandle ),
+    GenericEventSourceFilter(),
      _myGestureSettings(0),
      _myGestureSchema( new dom::Document( y60::ourgestureeventxsd ) ),
     _myValueFactory( new dom::ValueFactory() ),
