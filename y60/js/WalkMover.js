@@ -189,31 +189,34 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
     
     self.movements.rotateXY = function(theAnglesInRadiant) {
         var myCameraRotationMatrix = new Matrix4f(self.getMoverObject().globalmatrix);
-        myCameraRotationMatrix.setRow(3,new Vector4f(0,0,0,myCameraRotationMatrix[3][3]));
+        myCameraRotationMatrix.setRow(3, new Vector4f(0, 0, 0, myCameraRotationMatrix[3][3]));
 
         var applyTiltRotationFlag = true;
-        if ((_myMinimumTiltRotation !== null) &&
-            (_myMaximumTiltRotation !== null) ) {
+        if (_myMinimumTiltRotation && _myMaximumTiltRotation) {
             var myUnitVectorMatrix = new Matrix4f();
-            myUnitVectorMatrix.makeTranslating(new Vector3f(0,0,-1));
+            myUnitVectorMatrix.makeTranslating(new Vector3f(0, 0, -1));
             myUnitVectorMatrix.postMultiply(myCameraRotationMatrix);
             var myRotatedUnitVector = myUnitVectorMatrix.getTranslation();
-            var myMinimumValue = Math.sin(_myMinimumTiltRotation);
-            var myMaximumValue = Math.sin(_myMaximumTiltRotation);
-            if( ((theAnglesInRadiant.y < 0)&&(myRotatedUnitVector.y < myMinimumValue)) ||  
-                ((theAnglesInRadiant.y >=0)&&(myRotatedUnitVector.y > myMaximumValue)) ) {
+            if (((theAnglesInRadiant.y <  0) && (myRotatedUnitVector.y < Math.sin(_myMinimumTiltRotation))) ||
+                ((theAnglesInRadiant.y >= 0) && (myRotatedUnitVector.y > Math.sin(_myMaximumTiltRotation)))) {
                 applyTiltRotationFlag = false;
             }
         }
-        if(applyTiltRotationFlag){
+        var myTiltOrientation = null;
+        if (applyTiltRotationFlag) {
             // compute the rotated Side Vector and rotate about it -> TILT rotation
             var myMatrix = new Matrix4f();
-            myMatrix.makeTranslating(new Vector3f(1,0,0));
+            myMatrix.makeTranslating(new Vector3f(1, 0, 0));
             myMatrix.postMultiply(myCameraRotationMatrix);
-            self.getMoverObject().orientation.multiply(new Quaternionf(myMatrix.getTranslation(),theAnglesInRadiant.y));
+            //self.getMoverObject().orientation.multiply(new Quaternionf(myMatrix.getTranslation(),theAnglesInRadiant.y));
+            myTiltOrientation = new Quaternionf(myMatrix.getTranslation(),theAnglesInRadiant.y);
         }
         // add rotation about the up vector -> PAN rotation
-        self.getMoverObject().orientation.multiply(new Quaternionf(new Vector3f(0,1,0),-theAnglesInRadiant.x));
+        var myPanOrientation = new Quaternionf(new Vector3f(0,1,0),-theAnglesInRadiant.x)
+        if (myTiltOrientation) {
+            myPanOrientation.multiply(myTiltOrientation);
+        }
+        self.getMoverObject().orientation.multiply(myPanOrientation);
     };
     
     self.movements.translateAlongFrontVector = function (theDelta) {

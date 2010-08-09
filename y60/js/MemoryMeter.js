@@ -63,13 +63,21 @@
 //
 //=============================================================================
 
+/*jslint nomen:false*/
+/*globals plug, window, Vector2f, gl, getProcessMemoryUsage, asMemoryString,
+          getFreeMemory, getTotalMemory*/
+
 function MemoryMeter(theSceneViewer) {
     this.Constructor(this, theSceneViewer);
 }
 
-MemoryMeter.prototype.Constructor = function(self, theSceneViewer) {
+MemoryMeter.prototype.Constructor = function (self, theSceneViewer) {
 
     self.enabled                = false;
+
+    /////////////////////
+    // Private Members //
+    /////////////////////
 
     var _mySceneViewer          = theSceneViewer;
     var _myMaxMemoryUsage       = 0;
@@ -78,7 +86,11 @@ MemoryMeter.prototype.Constructor = function(self, theSceneViewer) {
     var _myGLPlugged            = false;
     var _myGLMemExtensionAvail  = false;
 
-    self.toggleEnableFlag = function() {
+    ////////////////////
+    // Public Methods //
+    ////////////////////
+
+    self.toggleEnableFlag = function () {
         if (!_myProcFunctionsPlugged) {
             plug("ProcessFunctions");
             _myProcFunctionsPlugged = true;
@@ -87,18 +99,16 @@ MemoryMeter.prototype.Constructor = function(self, theSceneViewer) {
             plug("GLBinding");
             _myGLPlugged = true;
             try {
-                var myGLMemFree = gl.GetFreeMem();
+                //var myGLMemFree = gl.GetFreeMem();
                 _myGLMemExtensionAvail = true;
-            } catch(theEx) {
+            } catch (theEx) {
                 _myGLMemExtensionAvail = false;
             }
         }
-
         self.enabled = !self.enabled;
-    }
+    };
 
-
-    self.onPostRender = function() {
+    self.onPostRender = function () {
         if (!_myProcFunctionsPlugged) {
             return;
         }
@@ -111,9 +121,9 @@ MemoryMeter.prototype.Constructor = function(self, theSceneViewer) {
         if (self.enabled) {
             var myBackgroundColor = window.canvas.backgroundcolor;
             var myBrightness = (myBackgroundColor[0] + myBackgroundColor[1] + myBackgroundColor[2]) / 3;
-            var myTextColor = [1,1,1,1];
+            var myTextColor = [1, 1, 1, 1];
             if (myBrightness > 0.5) {
-                myTextColor = [0,0,0,1];
+                myTextColor = [0, 0, 0, 1];
             }
             var myViewport = theSceneViewer.getViewportAtWindowCoordinates(0, 0); // get viewport containing upper left pixel
 
@@ -123,7 +133,7 @@ MemoryMeter.prototype.Constructor = function(self, theSceneViewer) {
             var myAge = _mySceneViewer.getCurrentTime() - _myMaxMemoryTime;
             var myRed   = 1;
             var myGreen = 1;
-            const MAX_MEMORY_GREEN_TIME = 300;
+            var MAX_MEMORY_GREEN_TIME = 300;
             if (myAge < MAX_MEMORY_GREEN_TIME) {
                 myGreen = myAge / MAX_MEMORY_GREEN_TIME;
             }
@@ -131,7 +141,7 @@ MemoryMeter.prototype.Constructor = function(self, theSceneViewer) {
                 myRed = 1 - (myAge - MAX_MEMORY_GREEN_TIME) / MAX_MEMORY_GREEN_TIME;
             }
 
-            window.setTextColor([myRed,myGreen,0,1]);
+            window.setTextColor([myRed, myGreen, 0, 1]);
             window.renderText(new Vector2f(10, 20), asMemoryString(_myMaxMemoryUsage), "Screen8", myViewport);
 
             var myMem = asMemoryString(getFreeMemory()) + "/" + asMemoryString(getTotalMemory());
@@ -143,5 +153,5 @@ MemoryMeter.prototype.Constructor = function(self, theSceneViewer) {
                 window.renderText(new Vector2f(10, 40), myGLMem, "Screen8", myViewport);
             }
         }
-    }
-}
+    };
+};
