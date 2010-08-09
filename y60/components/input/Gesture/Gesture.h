@@ -72,6 +72,13 @@ class Gesture : public asl::PlugInBase,
                                            const std::string & theType, 
                                            const asl::Vector3f & thePosition3D);
 
+        inline asl::Vector3f getCenter(const asl::Vector3f & thePosition, const asl::Vector3f & thePartnerPosition) const {
+            asl::Vector3f myCenterPoint(thePosition);
+            myCenterPoint.add(thePartnerPosition);
+            return product(myCenterPoint,0.5f);
+        }
+        
+                        
         CursorPartnerList::iterator getCursorPartner(int theId);
         void saveAllCursorPositions();
 

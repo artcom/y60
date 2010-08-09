@@ -203,10 +203,8 @@ Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent,  int theID, const std
                         _myCursorPartner[theID] = myCursorPartnerId;
                         _myCursorPartner[myCursorPartnerId] = theID;
                         dom::NodePtr myNode = addGestureEvent2Queue(theBaseEvent, theID, "cursor_pair_start", thePosition3D);
-                        Vector3f myCursorPartnerPosition = _myCurrentCursorPositions[myCursorPartnerId];
-                        Vector3f myCenterPoint(thePosition3D);
-                        myCenterPoint.add(myCursorPartnerPosition);
-                        myCenterPoint = product(myCenterPoint,0.5f);
+                        asl::Vector3f myCursorPartnerPosition = _myCurrentCursorPositions[myCursorPartnerId];
+                        asl::Vector3f myCenterPoint = getCenter(thePosition3D, myCursorPartnerPosition);
                         myNode->appendAttribute<Vector3f>("centerpoint", myCenterPoint);
                         // distance between the two partner cursors
                         float myDistance = distance(thePosition3D,myCursorPartnerPosition);
@@ -221,10 +219,7 @@ Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent,  int theID, const std
                     Vector3f myCursorPartnerPosition = _myCurrentCursorPositions[_myCursorPartner[theID]];
                     CursorPartnerList::iterator myCursorPartnerIt = getCursorPartner(theID);
                 
-                    // calculate center                
-                    Vector3f myCenterPoint(thePosition3D);
-                    myCenterPoint.add(myCursorPartnerPosition);
-                    myCenterPoint = product(myCenterPoint,0.5f);
+                    asl::Vector3f myCenterPoint = getCenter(thePosition3D, myCursorPartnerPosition);
 
                     // register zoom event
                     float myDistance = distance(thePosition3D,myCursorPartnerPosition);
