@@ -64,11 +64,12 @@
 #include "GenericEvent.h"
 #include "IEventSource.h"
 #include <asl/base/Ptr.h>
+#include <deque>
 #include <vector>
 
 namespace y60 {
-    typedef std::map<int, std::vector<asl::Vector3f> > CursorPositionHistory;
-    typedef std::vector<asl::Vector3f> CursorPositions;
+    typedef std::map<int, std::deque<asl::Vector3f> > CursorPositionHistory;
+    typedef std::deque<asl::Vector3f> CursorPositions;
 
     struct CursorFilter {
         CursorFilter(const std::string & theEventType, const std::string & theIdAttributeName) : _myEventType(theEventType), _myCursorAttributeName(theIdAttributeName) {}
@@ -84,13 +85,14 @@ namespace y60 {
         protected:    
             void addCursorFilter(const std::string & theEventType, const std::string & theIdAttributeName);
             void applyFilter(EventPtrList & theEventList);
-            void analyzeEvents(EventPtrList & theEventList, const std::string & theIdAttributeName) const;
+            void analyzeEvents(const EventPtrList & theEventList, const std::string & theIdAttributeName) const;
             
+            //XXX getter function should be const -> separate calculate average from getter
             asl::Vector3f getAveragePosition(const unsigned int theCursorId, const asl::Vector3f & thePosition);
             asl::Vector2f getAveragePosition(const unsigned int theCursorId, const asl::Vector2f & thePosition);
-            void clearCursorHistory(const EventPtrList & theEventList);
+            void clearCursorHistoryOnRemove(const EventPtrList & theEventList);
 
-            std::map<int, std::vector<asl::Vector3f> >   _myCursorPositionHistory;
+            std::map<int, std::deque<asl::Vector3f> >   _myCursorPositionHistory;
             unsigned int _myMaxCursorPositionsForAverage;
         private:          
             void applyCursorFilter(const std::string & theEventType, const std::string & theIdAttributeName, EventPtrList & theEventList);

@@ -17,6 +17,8 @@
 
 #include "tuioeventxsd.h"
 
+#define DB(x) //x
+
 namespace y60 {
 
 using namespace asl;
@@ -33,7 +35,6 @@ class TUIOPlugin : public PlugInBase,
 private:
     typedef std::pair<const char*, TuioCursor*> CursorEvent;
     typedef std::vector<CursorEvent> CursorEventList;
-    bool _myFilterMultipleUpdatePerCursorFlag;
 
 
 public:
@@ -89,15 +90,16 @@ public:
             }
 
             _myUndeliveredCursors.clear();
-            //AC_INFO << "unfiltered tuio events # " << myEvents.size();
-
+            
+            DB(AC_INFO << "unfiltered tuio events # " << myEvents.size());
             // logs event statistics for multiple events per cursor and type
-            //analyzeEvents(myEvents, "id");
+            DB(analyzeEvents(myEvents, "id"));
             // do the event filter in base class GenericEventSourceFilter
             applyFilter(myEvents);
-            clearCursorHistory(myEvents);
-            //AC_INFO << "deliver tuio events # " << myEvents.size();
-            //analyzeEvents(myEvents, "id");
+            DB(AC_INFO << "deliver tuio events # " << myEvents.size());
+            DB(analyzeEvents(myEvents, "id"));
+            
+            clearCursorHistoryOnRemove(myEvents);
             return myEvents;
         } else {
             return EventPtrList();
@@ -194,6 +196,7 @@ private:
     CursorEventList _myUndeliveredCursors;
 
     std::vector<TuioClient*> _myClients;
+    bool _myFilterMultipleUpdatePerCursorFlag;
 
 };
 

@@ -34,8 +34,8 @@ namespace y60 {
 Gesture::Gesture(DLHandle theHandle) :
     asl::PlugInBase( theHandle ),
     GenericEventSourceFilter(),
-     _myGestureSettings(0),
-     _myGestureSchema( new dom::Document( y60::ourgestureeventxsd ) ),
+    _myGestureSettings(0),
+    _myGestureSchema( new dom::Document( y60::ourgestureeventxsd ) ),
     _myValueFactory( new dom::ValueFactory() ),
     _myWipeDistanceThreshold(WIPE_DISTANCE_THRESHOLD),
     _myMaxCursorPairDistance(MAX_CURSOR_PAIR_DISTANCE),
@@ -167,45 +167,34 @@ Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent,  int theID, const std
 
             // track cursor
             _myCursorList[ theID ] = true;
-
-            // track first cursor position
             _myCurrentCursorPositions[ theID ] = thePosition3D;
-            
+
+            //XXX is it needed?, maybe move to cursor_pair_started
             // reset values
             _myInitialZoomDistance[ theID ] = 0.0f;
-        }
-
-        // check if theNode is valid - maybe its Cursor is not in the List
-        if(_myCursorList.find(theID) == _myCursorList.end()) {
-            return;
-        }
-
-        if(theType == "move" || theType == "update") {
+        } else if(theType == "move" || theType == "update") {
+            if(_myCursorList.find(theID) == _myCursorList.end()) {
+                return;
+            }
             AC_DEBUG << "Gesture::createEvent -> move";
 
             Vector3f myLastPosition = _myLastCursorPositions[theID]; 
-
             _myCurrentCursorPositions[ theID ] = thePosition3D;
-            
-            //save vector betwenn last and current point
             bool myPartnerFoundFlag = false;
 
             // more than one cursor, check multicursor gesture (zoom / rotate)
             if(_myCursorList.size() > 1) {
-
-                //new pair finding
-                float myCursorDistance = _myMaxCursorPairDistance;
-                
-                
-                CursorList::iterator myEndIt   = _myCursorList.end();
-
                 // if there is no cursor partner
                 if(_myCursorPartner.find(theID) == _myCursorPartner.end()) {
-
                     AC_DEBUG << theID << " has no cursor partner";
+            
+                    //XXX whats myCursorDistance needed for
+                    float myCursorDistance = _myMaxCursorPairDistance;
                     CursorList::iterator myIt = _myCursorList.begin();
-                    for(; myIt !=  myEndIt; ++myIt){
+                    CursorList::iterator myEndIt   = _myCursorList.end();
+                    for(; myIt !=  myEndIt; ++myIt) {
                         float myDistance = distance(thePosition3D, _myCurrentCursorPositions[myIt->first]);
+                        // if the cursor found a partner
                         if(_myCursorPartner.find(myIt->first) == _myCursorPartner.end() && myIt->first != theID &&  myDistance < myCursorDistance) {
                             _myCursorPartner[theID] = myIt->first;
                             _myCursorPartner[myIt->first] = theID;
@@ -217,48 +206,44 @@ Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent,  int theID, const std
                             myCenterPoint.add(myCursorPartnerPosition);
                             myCenterPoint = product(myCenterPoint,0.5f);
                             myNode->appendAttribute<Vector3f>("centerpoint", myCenterPoint);
-                            // if the cursor found a partner
                             myPartnerFoundFlag = true;
                             break;
                         }
                     }
-                }
-
-                // if there is already a cursor partner
-                else if(_myCursorPartner.find(theID) != _myCursorPartner.end()) {
-
+                } else {  // if there is already a cursor partner
                     AC_DEBUG << theID << " has cursor partner with id " << _myCursorPartner[theID];
+                    
+                    myPartnerFoundFlag = true;
                     Vector3f myCursorPartnerPosition = _myCurrentCursorPositions[_myCursorPartner[theID]];
-
+                    CursorPartnerList::iterator myCursorPartnerIt = getCursorPartner(theID);
+                
                     // distance between the two partner cursors
                     float myDistance = distance(thePosition3D,myCursorPartnerPosition);
-
                     if(_myInitialZoomDistance[theID] == 0)  {
                         _myInitialZoomDistance[theID] = myDistance;
                     }
+                    if (myCursorPartnerIt != _myCursorPartner.end()) {
+                        _myInitialZoomDistance[myCursorPartnerIt->first] = _myInitialZoomDistance[theID];
+                    }
 
+                    // calculate center                
                     Vector3f myCenterPoint(thePosition3D);
                     myCenterPoint.add(myCursorPartnerPosition);
                     myCenterPoint = product(myCenterPoint,0.5f);
 
-                    CursorPartnerList::iterator myCursorPartnerIt = getCursorPartner(theID);
-                    
                     // register zoom event
                     float myLastDistance = distance(_myLastCursorPositions[myCursorPartnerIt->first], myLastPosition);
 
-                    if (myLastDistance >= _myZoomDistanceThreshold) {
+                    if (myDistance >= _myZoomDistanceThreshold) {
                         dom::NodePtr myNode = addGestureEvent2Queue(theBaseEvent, theID, "zoom", thePosition3D);
                         myNode->appendAttribute<float>("distance", myDistance);
                         myNode->appendAttribute<float>("lastdistance", myLastDistance);
                         myNode->appendAttribute<float>("initialdistance", _myInitialZoomDistance[theID]);
                         myNode->appendAttribute<Vector3f>("centerpoint", myCenterPoint);
+                        //XXX add zoom amount to the event
                     }
                 
-                    if (myCursorPartnerIt != _myCursorPartner.end()) {
-                        _myInitialZoomDistance[myCursorPartnerIt->first] = _myInitialZoomDistance[theID];
-                    }
-                    myPartnerFoundFlag = true;
-
+                    // register rotate event
                     Vector3f myVectorOld = normalized(difference(_myLastCursorPositions[theID],_myLastCursorPositions[myCursorPartnerIt->first]));
                     Vector3f myVectorNew = normalized(difference(thePosition3D, myCursorPartnerPosition));
                     float myAngle = float(degFromRad(atan2( myVectorNew[1], myVectorNew[0] ) - atan2( myVectorOld[1], myVectorOld[0] ) ));
@@ -278,10 +263,10 @@ Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent,  int theID, const std
                     // register wipe event
                     NodePtr myNode = addGestureEvent2Queue(theBaseEvent, theID, "wipe", thePosition3D);
                     myNode->appendAttribute<Vector3f>("direction", myDiff);
+                    //XXX add magnitude to the event
                 }
             }
-        }
-        if(theType == "remove"){
+        } else if(theType == "remove") {
             AC_DEBUG << "Gesture::createEvent -> remove";
 
             if(_myCursorList.find(theID) == _myCursorList.end()){
@@ -300,8 +285,6 @@ Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent,  int theID, const std
                 _myCursorPartner.erase(_myCursorPartner.find(theID));
             } 
             
-            // cleanup
-
             //Reset first Zooming
             _myInitialZoomDistance.erase(_myInitialZoomDistance.find(theID));
 

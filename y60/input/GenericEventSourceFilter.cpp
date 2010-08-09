@@ -112,12 +112,12 @@ namespace y60 {
     }
 
     void 
-    GenericEventSourceFilter::analyzeEvents(EventPtrList & theEventList, const std::string & theIdAttributeName) const {
+    GenericEventSourceFilter::analyzeEvents(const EventPtrList & theEventList, const std::string & theIdAttributeName) const {
         AC_DEBUG << "GenericEventSourceFilter::analyzeEvents cursor events:";
         std::map<int, std::map<std::string, int> > myCursorEventCounter;
         {
-            EventPtrList::iterator myEndIt   = theEventList.end();
-            EventPtrList::iterator myIt = theEventList.begin();
+            EventPtrList::const_iterator myEndIt   = theEventList.end();
+            EventPtrList::const_iterator myIt = theEventList.begin();
             for(; myIt !=  myEndIt; ++myIt){
                 GenericEventPtr myGenericEvent(dynamic_cast_Ptr<GenericEvent>(*myIt));
                 dom::NodePtr myNode = myGenericEvent->getNode();
@@ -151,13 +151,11 @@ namespace y60 {
     GenericEventSourceFilter::getAveragePosition(const unsigned int theCursorId, const asl::Vector3f & thePosition) {
         
         if (_myCursorPositionHistory.find(theCursorId) == _myCursorPositionHistory.end()) {
-            _myCursorPositionHistory[theCursorId].reserve(_myMaxCursorPositionsForAverage);
+            _myCursorPositionHistory[theCursorId] = CursorPositions();
         }
         
-        CursorPositions::iterator myIt = _myCursorPositionHistory[theCursorId].begin();
-
         if (_myCursorPositionHistory[theCursorId].size() >= _myMaxCursorPositionsForAverage) {
-            _myCursorPositionHistory[theCursorId].erase(myIt);
+            _myCursorPositionHistory[theCursorId].pop_front();
         }
         _myCursorPositionHistory[theCursorId].push_back(thePosition);
 
@@ -165,7 +163,7 @@ namespace y60 {
         unsigned int myWeight = 0;
         unsigned int myWeightCounter = 0;
 
-        myIt = _myCursorPositionHistory[theCursorId].begin();
+        CursorPositions::iterator myIt = _myCursorPositionHistory[theCursorId].begin();
         CursorPositions::iterator myEndIt = _myCursorPositionHistory[theCursorId].end();
         for(; myIt !=  myEndIt; ++myIt){
             myWeight++;
@@ -186,7 +184,7 @@ namespace y60 {
     }
  
     void 
-    GenericEventSourceFilter::clearCursorHistory(const EventPtrList & theEventList) {
+    GenericEventSourceFilter::clearCursorHistoryOnRemove(const EventPtrList & theEventList) {
         EventPtrList::const_iterator myIt = theEventList.begin();
         for (; myIt !=theEventList.end(); ++myIt) {
             GenericEventPtr myGenericEvent(dynamic_cast_Ptr<GenericEvent>(*myIt));
@@ -194,6 +192,7 @@ namespace y60 {
             int myCursorId = asl::as<int>(myNode->getAttributeString("id"));
             std::string myEventType = myNode->getAttributeString("type");
             if (myEventType == "remove" && _myCursorPositionHistory.find(myCursorId) != _myCursorPositionHistory.end()) {
+                //TODO remove cursor too
                 _myCursorPositionHistory[myCursorId].clear();
             }
         }
