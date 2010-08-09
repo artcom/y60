@@ -89,7 +89,7 @@ spark.Slider.Constructor = function(Protected) {
         Public.addEventListener(spark.GenericCursorEvent.VANISH_TOUCHLEAVE, Public.onSlideStop, true);
 
         if(_centered) {
-            centerCursor();
+            Public.centerCursor();
         }
     };
 
@@ -118,7 +118,7 @@ spark.Slider.Constructor = function(Protected) {
             theEvent.cursor.ungrab(theEvent.target);
             if(!_sticky) {
                 if(_centered) {
-                    centerCursor();
+                    Public.centerCursor();
                 } else {
                     _myIdleCursor.position   = _myCursorOrigin;
                     _myActiveCursor.position = _myCursorOrigin;
@@ -144,27 +144,27 @@ spark.Slider.Constructor = function(Protected) {
                              _myActiveCursor.width/2;
                 var myMinX = _mySliderBackground.x;
                 if(myNewX < myMinX) {
-                    _myActiveCursor.x       = myMinX;
+                    _myActiveCursor.x = myMinX;
                 } else {
                     var myMaxX = _mySliderBackground.x +
                                  _mySliderBackground.width -
                                  _myActiveCursor.width;
                     if(myNewX > myMaxX) {
-                        _myActiveCursor.x       = myMaxX;
+                        _myActiveCursor.x = myMaxX;
                     } else {
-                        _myActiveCursor.x       = myNewX;
+                        _myActiveCursor.x = myNewX;
                     }
                 }
             }
             if(!_verticalLock) {
-                var myNewY              = -theEvent.dampenedPos.y +
-                                          Public.stage.height -
-                                          Public.y -
-                                          _mySliderBackground.y -
-                                          _myActiveCursor.height/2;
-                var myMinY =     _mySliderBackground.y;
+                var myNewY = -theEvent.dampenedPos.y +
+                             Public.stage.height -
+                             Public.y -
+                             _mySliderBackground.y -
+                             _myActiveCursor.height/2;
+                var myMinY = _mySliderBackground.y;
                 if(myNewY < myMinY) {
-                    _myActiveCursor.y       = myMinY;
+                    _myActiveCursor.y = myMinY;
                 } else {
                     var myMaxY = _mySliderBackground.height - _myActiveCursor.height;
                     if(myNewY > myMaxY) {
@@ -183,6 +183,13 @@ spark.Slider.Constructor = function(Protected) {
                 _myEventTarget.dispatchEvent(mySliderMove);
             }
         }
+    };
+    
+    Public.centerCursor = function() {
+            _myIdleCursor.position = new Vector3f(_mySliderBackground.width/2 -_myIdleCursor.width/2,
+                                                  _mySliderBackground.height/2 -_myIdleCursor.height/2,
+                                                  0);
+            _myActiveCursor.position = _myIdleCursor.position;
     };
 
     function dampPosition (theEvent) {
@@ -218,13 +225,6 @@ spark.Slider.Constructor = function(Protected) {
         }
     }
     
-    function centerCursor() {
-            _myIdleCursor.position = new Vector3f(_mySliderBackground.width/2 -_myIdleCursor.width/2,
-                                                  _mySliderBackground.height/2 -_myIdleCursor.height/2,
-                                                  0);
-            _myActiveCursor.position = _myIdleCursor.position;
-            
-    }
 }
 
 spark.SliderEvent = spark.Class("SliderEvent");
