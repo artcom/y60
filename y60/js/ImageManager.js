@@ -56,6 +56,9 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+/*jslint nomen:false white:false*/
+/*globals window, Node, Modelling*/
+
 function ImageManager(theBaseViewer) {
     this.Constructor(this, theBaseViewer);
 }
@@ -63,18 +66,18 @@ function ImageManager(theBaseViewer) {
 ImageManager.prototype.Constructor = function(obj, theBaseViewer) {
 
     // private members
-    var _myBaseViewer = theBaseViewer;
+    //var _myBaseViewer = theBaseViewer; // unused
 
     // public methods
     obj.getImageNode = function(theImageName, theEncoding) {
         var myImageNode = window.scene.images.find("image[@name = '" + theImageName + "']");
         if (!myImageNode) {
-            var myEncoding = (theEncoding != undefined) ? theEncoding.toUpperCase() : "RGB";
-            myImageNode = Modelling.createImage(window.scene, 1,1,myEncoding);
+            var myEncoding = (theEncoding !== undefined) ? theEncoding.toUpperCase() : "RGB";
+            myImageNode = Modelling.createImage(window.scene, 1, 1, myEncoding);
             myImageNode.name = theImageName;
         }
         return myImageNode;
-    }
+    };
 
     obj.createImage = function(theSource, theEncoding) {
         var myImageNode = Node.createElement("image");
@@ -83,7 +86,7 @@ ImageManager.prototype.Constructor = function(obj, theBaseViewer) {
         myImageNode.src = theSource;
         myImageNode.resize = "pad";
         return myImageNode;
-    }
+    };
 
     obj.createMovie = function(theSource, theDecoderHint) {
         var myMovie = Node.createElement("movie");
@@ -95,6 +98,5 @@ ImageManager.prototype.Constructor = function(obj, theBaseViewer) {
         }
         window.scene.loadMovieFrame(myMovie);
         return myMovie;
-    }
-}
-
+    };
+};
