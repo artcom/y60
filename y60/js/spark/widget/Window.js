@@ -522,30 +522,30 @@ spark.Window.Constructor = function(Protected) {
         }
         
         switch(theGesture.type) {    
-            case "wipe":            
-                var myDir = new Vector3f(theGesture.direction.x, theGesture.direction.y, 0);
-                myDir.mult(myScale);
-                var myWipeEvent = new spark.WipeGestureEvent(spark.GestureEvent.WIPE, theGesture.baseeventtype, myDir, myCursor);
+            case "wipe":           
+                var myMagnitude = magnitude(myScale) * theGesture.magnitude;
+                var myWipeEvent = new spark.WipeGestureEvent(spark.GestureEvent.WIPE, theGesture.baseeventtype, myCursor, theGesture.direction, myMagnitude);
                 myWidget.dispatchEvent(myWipeEvent);
                 break;                
             case "cursor_pair_start":
-                var myZoomEvent = new spark.ZoomGestureEvent(spark.GestureEvent.CURSOR_PAIR_START, theGesture.baseeventtype, myCursor, myCursorPartner, null, null, myCenterPoint);
-                myWidget.dispatchEvent(myZoomEvent);
+                var myCursorPairStartEvent = new spark.MultiCursorGestureEvent(spark.GestureEvent.CURSOR_PAIR_START, theGesture.baseeventtype, myCursor, myCursorPartner, myCenterPoint, theGesture.distance);
+                myWidget.dispatchEvent(myCursorPairStartEvent);
                 break;                
             case "zoom":
-                var myFirstDistance = theGesture.initialdistance;
                 var myDistance = theGesture.distance;
                 var myLastDistance = theGesture.lastdistance;
-                var myZoomEvent = new spark.ZoomGestureEvent(spark.GestureEvent.ZOOM, theGesture.baseeventtype, myCursor, myCursorPartner, myFirstDistance, myDistance, myCenterPoint, myLastDistance);
+                var myInitialDistance = theGesture.initialdistance;
+                var myZoomFactor = theGesture.zoomfactor;
+                var myZoomEvent = new spark.ZoomGestureEvent(spark.GestureEvent.ZOOM, theGesture.baseeventtype, myCursor, myCursorPartner, myCenterPoint, myDistance, myLastDistance, myInitialDistance, myZoomFactor);
                 myWidget.dispatchEvent(myZoomEvent);
                 break;   
             case "rotate":
-                var myRotateEvent = new spark.RotateGestureEvent(spark.GestureEvent.ROTATE, theGesture.baseeventtype, myCursor, myCursorPartner, theGesture.angle, myCenterPoint);
+                var myRotateEvent = new spark.RotateGestureEvent(spark.GestureEvent.ROTATE, theGesture.baseeventtype, myCursor, myCursorPartner, myCenterPoint, theGesture.distance, theGesture.angle);
                 myWidget.dispatchEvent(myRotateEvent);
                 break;             
             case "cursor_pair_finish":                
-                var myZoomEvent = new spark.ZoomGestureEvent(spark.GestureEvent.CURSOR_PAIR_FINISH, theGesture.baseeventtype, myCursor, myCursorPartner);
-                myWidget.dispatchEvent(myZoomEvent);
+                var myCursorPairFinishEvent = new spark.MultiCursorGestureEvent(spark.GestureEvent.CURSOR_PAIR_FINISH, theGesture.baseeventtype, myCursor, myCursorPartner);
+                myWidget.dispatchEvent(myCursorPairFinishEvent);
                 break;                
             default:
                 Logger.info("Unknown gesture : " + theGesture);            
