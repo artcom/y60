@@ -192,8 +192,7 @@ namespace y60 {
             int myCursorId = asl::as<int>(myNode->getAttributeString("id"));
             std::string myEventType = myNode->getAttributeString("type");
             if (myEventType == "remove" && _myCursorPositionHistory.find(myCursorId) != _myCursorPositionHistory.end()) {
-                //TODO remove cursor too
-                _myCursorPositionHistory[myCursorId].clear();
+                _myCursorPositionHistory.erase(myCursorId);
             }
         }
     }
