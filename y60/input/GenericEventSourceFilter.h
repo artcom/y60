@@ -87,9 +87,18 @@ namespace y60 {
             void applyFilter(EventPtrList & theEventList);
             void analyzeEvents(const EventPtrList & theEventList, const std::string & theIdAttributeName) const;
             
-            //XXX getter function should be const -> separate calculate average from getter
-            asl::Vector3f getAveragePosition(const unsigned int theCursorId, const asl::Vector3f & thePosition);
-            asl::Vector2f getAveragePosition(const unsigned int theCursorId, const asl::Vector2f & thePosition);
+            asl::Vector3f getAveragePosition(const unsigned int theCursorId) const;
+            inline asl::Vector3f getCurrentPosition(const unsigned int theCursorId) const {
+                CursorPositionHistory::const_iterator myPositionsIt = _myCursorPositionHistory.find(theCursorId);
+                if (myPositionsIt != _myCursorPositionHistory.end()) {
+                    return myPositionsIt->second.back();
+                } else {
+                    return asl::Vector3f(0.0,0.0,0.0);
+                }
+            };
+
+            asl::Vector3f calculateAveragePosition(const unsigned int theCursorId, const asl::Vector3f & thePosition);
+            asl::Vector2f calculateAveragePosition(const unsigned int theCursorId, const asl::Vector2f & thePosition);
             void clearCursorHistoryOnRemove(const EventPtrList & theEventList);
 
             std::map<int, std::deque<asl::Vector3f> >   _myCursorPositionHistory;

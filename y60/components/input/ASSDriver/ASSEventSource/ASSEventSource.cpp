@@ -107,7 +107,7 @@ ASSEventSource::createEvent( int theID, const std::string & theType,
             _myValueFactory));
     dom::NodePtr myNode = myEvent->getNode();
 
-    asl::Vector3f myPosition = getAveragePosition(theID, thePosition3D);
+    asl::Vector3f myPosition = calculateAveragePosition(theID, thePosition3D);
     myNode->appendAttribute<int>("id", theID);
     myNode->appendAttribute<std::string>("type", theType);
     myNode->appendAttribute<Vector2f>("raw_position", theRawPosition);

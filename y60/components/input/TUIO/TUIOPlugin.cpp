@@ -177,7 +177,7 @@ protected:
         myNode->appendAttribute<double>("value_time", myValueTime.getSeconds() + (myValueTime.getMicroseconds() / 1000000.0));
 
         Vector2f myPosition = Vector2f(myCursor->getX(), myCursor->getY());
-        myPosition = getAveragePosition(myCursor->getSessionID(), myPosition);
+        myPosition = calculateAveragePosition(myCursor->getSessionID(), myPosition);
         myNode->appendAttribute<Vector2f>("position", myPosition);
         myNode->appendAttribute<Vector2f>("velocity", Vector2f(myCursor->getXSpeed(), myCursor->getYSpeed()));
 

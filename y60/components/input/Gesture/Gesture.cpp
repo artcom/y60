@@ -237,7 +237,6 @@ Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent,  int theID, const std
                         myNode->appendAttribute<float>("initialdistance", _myInitialZoomDistance[theID]);
                         myNode->appendAttribute<float>("zoomfactor", myDistance/myLastDistance);
                         myNode->appendAttribute<Vector3f>("centerpoint", myCenterPoint);
-                        //XXX add zoom amount to the event
                     }
                 
                     // register rotate event

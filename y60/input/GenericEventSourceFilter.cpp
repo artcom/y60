@@ -148,7 +148,7 @@ namespace y60 {
     }
 
     asl::Vector3f 
-    GenericEventSourceFilter::getAveragePosition(const unsigned int theCursorId, const asl::Vector3f & thePosition) {
+    GenericEventSourceFilter::calculateAveragePosition(const unsigned int theCursorId, const asl::Vector3f & thePosition) {
         
         if (_myCursorPositionHistory.find(theCursorId) == _myCursorPositionHistory.end()) {
             _myCursorPositionHistory[theCursorId] = CursorPositions();
@@ -158,31 +158,39 @@ namespace y60 {
             _myCursorPositionHistory[theCursorId].pop_front();
         }
         _myCursorPositionHistory[theCursorId].push_back(thePosition);
-
-        asl::Vector3f myAveragePosition = asl::Vector3f(0.0,0.0,0.0);
-        unsigned int myWeight = 0;
-        unsigned int myWeightCounter = 0;
-
-        CursorPositions::iterator myIt = _myCursorPositionHistory[theCursorId].begin();
-        CursorPositions::iterator myEndIt = _myCursorPositionHistory[theCursorId].end();
-        for(; myIt !=  myEndIt; ++myIt){
-            myWeight++;
-            myWeightCounter += myWeight;
-            myAveragePosition += asl::product((*myIt), float(myWeight));
-        }
-        if (myWeight > 0) {
-            myAveragePosition.div(float(myWeightCounter));
-        }
-        return myAveragePosition;
+        return getAveragePosition(theCursorId);
     }
 
     asl::Vector2f 
-    GenericEventSourceFilter::getAveragePosition(const unsigned int theCursorId, const asl::Vector2f & thePosition) {
+    GenericEventSourceFilter::calculateAveragePosition(const unsigned int theCursorId, const asl::Vector2f & thePosition) {
         asl::Vector3f myPosition(thePosition[0], thePosition[1], 0);
-        myPosition = getAveragePosition(theCursorId, myPosition);
+        myPosition = calculateAveragePosition(theCursorId, myPosition);
         return asl::Vector2f(myPosition[0], myPosition[1]);
     }
  
+    asl::Vector3f 
+    GenericEventSourceFilter::getAveragePosition(const unsigned int theCursorId) const {
+        asl::Vector3f myAveragePosition = asl::Vector3f(0.0,0.0,0.0);
+        unsigned int myWeight = 0;
+        unsigned int myWeightCounter = 0;
+        CursorPositionHistory::const_iterator myPositionsIt = _myCursorPositionHistory.find(theCursorId);
+        if (myPositionsIt != _myCursorPositionHistory.end()) {
+            CursorPositions::const_iterator myIt = myPositionsIt->second.begin();
+            CursorPositions::const_iterator myEndIt = myPositionsIt->second.end();
+            for(; myIt !=  myEndIt; ++myIt){
+                myWeight++;
+                myWeightCounter += myWeight;
+                myAveragePosition += asl::product((*myIt), float(myWeight));
+            }
+            if (myWeight > 0) {
+                myAveragePosition.div(float(myWeightCounter));
+            }
+        }
+        return myAveragePosition;
+    }
+ 
+        
+
     void 
     GenericEventSourceFilter::clearCursorHistoryOnRemove(const EventPtrList & theEventList) {
         EventPtrList::const_iterator myIt = theEventList.begin();
