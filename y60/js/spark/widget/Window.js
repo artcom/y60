@@ -12,7 +12,7 @@ spark.Window = spark.ComponentClass("Window");
 spark.Window.Constructor = function(Protected) {
     var Public = this;
     var Base = {};
-    const PICK_RADIUS = 1;
+    var PICK_RADIUS = 1;
     var _myPickRadius = PICK_RADIUS;
 
     this.Inherit(spark.Stage);

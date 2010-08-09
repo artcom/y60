@@ -1,0 +1,15 @@
+<Window name="simpleSliderFixture"
+           title="simpleSliderFixture"
+           width="900"
+           height="600"
+           swapInterval="1"
+           i18nContext="global-i18n">
+
+    <Slider name="simple-slider">
+        <Rectangle name="background" color="[0.7, 0.7, 0.7, 0.7]" z="2" width="50" height="300">
+            <Rectangle name="idle-cursor"    z="4" width="50" height="30" color="[0.2,0.2,0.2]"/>
+            <Rectangle name="active-cursor"  z="3" width="50" height="30" color="[0.7,0.2,0.2]"/>
+        </Rectangle>
+    </Slider>
+
+</Window>

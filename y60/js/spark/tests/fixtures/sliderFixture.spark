@@ -1,0 +1,31 @@
+<Window name="sliderFixture"
+           title="sliderFixture"
+           width="900"
+           height="600"
+           positionX="0"
+           positionY="140"
+           swapInterval="1"
+           i18nContext="global-i18n">
+
+    <Slider name="simple-slider">
+        <Rectangle name="background" color="[0.7, 0.7, 0.7, 1]" z="2" width="450" height="300">
+            <Rectangle name="idle-cursor"    z="4" width="50" height="50" color="[0.2,0.2,0.2]"/>
+            <Rectangle name="active-cursor"  z="3" width="50" height="50" color="[0.7,0.2,0.2]"/>
+        </Rectangle>
+    </Slider>
+    
+    <Slider name="horizontal-locked-slider" horizontal-lock="true">
+        <Rectangle name="background" color="[0.7, 0.7, 0.7, 1]" z="2" width="450" height="300">
+            <Rectangle name="idle-cursor"    z="4" width="50" height="50" color="[0.2,0.2,0.2]"/>
+            <Rectangle name="active-cursor"  z="3" width="50" height="50" color="[0.7,0.2,0.2]"/>
+        </Rectangle>
+    </Slider>
+    
+    <Slider name="vertical-locked-slider" vertical-lock="true">
+        <Rectangle name="background" color="[0.7, 0.7, 0.7, 1]" z="2" width="450" height="300">
+            <Rectangle name="idle-cursor"    z="4" width="50" height="50" color="[0.2,0.2,0.2]"/>
+            <Rectangle name="active-cursor"  z="3" width="50" height="50" color="[0.7,0.2,0.2]"/>
+        </Rectangle>
+    </Slider>
+
+</Window>
