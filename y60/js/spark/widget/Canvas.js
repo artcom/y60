@@ -1,13 +1,19 @@
 /*jslint nomen: false, plusplus: false, bitwise: false*/
 /*globals use, spark, OffscreenRenderArea, Modelling, window, Node, Vector3f,
           BaseViewer, LightManager, product, Matrix4f, Point3f, Logger,
-          fileExists, getDirectoryPart, print, adjustNodeId, Renderer*/
+          fileExists, getDirectoryPart, print, adjustNodeId, Renderer,
+          Vector4f, searchFile, createUniqueId*/
 
 /**
  * Wrapper for the Y60 offscreen renderer.
  */
 
 spark.Canvas = spark.ComponentClass("Canvas");
+
+spark.Canvas.BINDING_SLOT = {
+    PRE  : "PRE_VIEWPORT",
+    POST : "POST_VIEWPORT"
+};
 
 spark.Canvas.Constructor = function (Protected) {
     var Public = this;
@@ -17,15 +23,22 @@ spark.Canvas.Constructor = function (Protected) {
     BaseViewer.prototype.Constructor(Public, []);
     Public.Inherit(spark.CallbackWrapper);
     
-    var _myRenderArea = null;
-    var _myWorld = null;
-    var _myViewport = null;
-    var _myCanvasNode = null;
-    var _onPreViewportFunc = null;
+    var _myRenderArea       = null;
+    var _myWorld            = null;
+    var _myViewport         = null;
+    var _myCanvasNode       = null;
+    var _onPreViewportFunc  = null;
     var _onPostViewportFunc = null;
-    var _myRenderFlag = true;
+    var _myRenderFlag       = true;
     
-    var PICK_RADIUS = 0.01;
+    var _bindings = {};
+    (function () {
+        for (var slot in spark.Canvas.BINDING_SLOT) {
+            _bindings[spark.Canvas.BINDING_SLOT[slot]] = {};
+        }
+    }());
+    
+    //var PICK_RADIUS = 0.01;
     var _sampling = 1;
     
     /////////////////////
@@ -45,7 +58,7 @@ spark.Canvas.Constructor = function (Protected) {
         // this works because keyboard modifiers are manipulated bitwise
         var myCtrlFlag = (theEvent.modifiers >= spark.Keyboard.CTRL);
         
-        if(Public.getLightManager()) {
+        if (Public.getLightManager()) {
             Public.getLightManager().onKey(theEvent.key, myState, myShiftFlag);
         }
         var myMover = Public.getMover(_myViewport);
@@ -54,9 +67,31 @@ spark.Canvas.Constructor = function (Protected) {
         }
     }
     
+    function _unbind(theHandle) {
+        delete _bindings[theHandle.bind_info.slot][theHandle.bind_info.id];
+        return true;
+    }
+    
+    function Handle(theBindInfo, theCb) {
+        this.bind_info = theBindInfo; //back-pointer
+        this.cb = theCb;
+    }
+    
+    Handle.prototype.unbind = function () {
+        _unbind(this);
+    };
+    
     ///////////////////////
     // Getters / Setters //
     ///////////////////////
+    
+    Public.bind = function (theBindingSlot, cb) {
+        var bind_info = {id: createUniqueId(),
+                         slot: theBindingSlot};
+        var my_handle = new Handle(bind_info, cb);
+        _bindings[theBindingSlot][bind_info.id] = my_handle;
+        return my_handle;
+    };
     
     Public.__defineGetter__("world", function () {
         return _myWorld;
@@ -66,15 +101,15 @@ spark.Canvas.Constructor = function (Protected) {
         return _myViewport;
     });
     
-    Public.__defineSetter__("onPreViewportFunc", function(theCallback) {
+    Public.__defineSetter__("onPreViewportFunc", function (theCallback) {
         _onPreViewportFunc = theCallback;
     });
     
-    Public.__defineSetter__("onPostViewportFunc", function(theCallback) {
+    Public.__defineSetter__("onPostViewportFunc", function (theCallback) {
         _onPostViewportFunc = theCallback;
     });
     
-    Public.__defineSetter__("render", function(theBoolean) {
+    Public.__defineSetter__("render", function (theBoolean) {
         _myRenderFlag = theBoolean;
     });
     Public.__defineGetter__("render", function () {
@@ -155,7 +190,7 @@ spark.Canvas.Constructor = function (Protected) {
             _myViewport.name = Public.name + "-viewport";
             _myCanvasNode.appendChild(_myViewport);
             
-            if(myAutoCreateTag) {
+            if (myAutoCreateTag) {
                 // Setup default world
                 _myWorld = Node.createElement("world");
                 _myWorld.name = Public.name + "-world";
@@ -169,11 +204,11 @@ spark.Canvas.Constructor = function (Protected) {
                 _myCanvasNode.backgroundcolor[3] = 0.0;
             }
             else {
-                _myCanvasNode.backgroundcolor = new Vector4f(1,1,1,1);
+                _myCanvasNode.backgroundcolor = new Vector4f(1, 1, 1, 1);
             }
         }
         
-        if(_myWorld) {
+        if (_myWorld) {
             var myLightManager = new LightManager(window.scene, _myWorld);
             Public.setLightManager(myLightManager);
         }
@@ -196,10 +231,10 @@ spark.Canvas.Constructor = function (Protected) {
     };
     
     Base.setActiveCamera = Public.setActiveCamera;
-    Public.setActiveCamera = function(theCamera, theViewport) {
-        if(!Public.getLightManager()) {
+    Public.setActiveCamera = function (theCamera, theViewport) {
+        if (!Public.getLightManager()) {
             var myWorld = theCamera.parentNode;
-            while(myWorld && myWorld.nodeName != "world") {
+            while (myWorld && myWorld.nodeName !== "world") {
                 myWorld = myWorld.parentNode;
             }
             var myLightManager = new LightManager(window.scene, myWorld);
@@ -211,17 +246,27 @@ spark.Canvas.Constructor = function (Protected) {
     };
     
     Base.onPreViewport = Public.onPreViewport;
-    Public.onPreViewport = function(theViewport) {
+    Public.onPreViewport = function (theViewport) {
         Base.onPreViewport(theViewport);
         if (_onPreViewportFunc) {
+            Logger.warning("spark.Canvas.onPreViewportFunc is deprecated - use Bindings now!");
             _onPreViewportFunc(theViewport);
+        }
+        for (var handleId in _bindings[spark.Canvas.BINDING_SLOT.PRE]) {
+            var myHandle = _bindings[spark.Canvas.BINDING_SLOT.PRE][handleId];
+            myHandle.cb(theViewport);
         }
     };
     
     Base.onPostViewport = Public.onPostViewport;
-    Public.onPostViewport = function(theViewport) {
+    Public.onPostViewport = function (theViewport) {
         if (_onPostViewportFunc) {
+            Logger.warning("spark.Canvas.onPostViewportFunc is deprecated - use Bindings now!");
             _onPostViewportFunc(theViewport);
+        }
+        for (var handleId in _bindings[spark.Canvas.BINDING_SLOT.POST]) {
+            var myHandle = _bindings[spark.Canvas.BINDING_SLOT.POST][handleId];
+            myHandle.cb(theViewport);
         }
         Base.onPostViewport(theViewport);
     };
@@ -242,7 +287,7 @@ spark.Canvas.Constructor = function (Protected) {
     Base.onFrame = Public.onFrame;
     Public.onFrame = function (theEvent) {
         Base.onFrame(theEvent.currenttime);
-        if(_myRenderFlag) {
+        if (_myRenderFlag) {
             _myRenderArea.renderToCanvas();
         }
     };
