@@ -78,8 +78,9 @@ spark.enableProximatrix = function(theStage) {
  * TUIO events. A toplevel Window instance will
  * then dispatch these as cursor events.
  */
-spark.enableTuio = function() {
-    plug("TUIOClient");
+spark.enableTuio = function(theStage) {
+    var myPlugIn = plug("TUIOClient");
+    theStage.registerSettingsListener( myPlugIn, "TUIO" );
     TUIOClient.listenToUDP();
 };
 

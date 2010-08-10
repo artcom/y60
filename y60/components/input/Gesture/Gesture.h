@@ -82,7 +82,6 @@ class Gesture : public asl::PlugInBase,
         CursorPartnerList::iterator getCursorPartner(int theId);
         void saveAllCursorPositions();
 
-        dom::NodePtr                    _myGestureSettings;
         dom::NodePtr                    _myGestureSchema;
         asl::Ptr<dom::ValueFactory>     _myValueFactory;
         y60::EventPtrList               _myEvents;

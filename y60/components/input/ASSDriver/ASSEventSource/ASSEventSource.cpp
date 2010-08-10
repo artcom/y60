@@ -80,7 +80,10 @@ ASSEventSource::ASSEventSource(DLHandle theHandle) :
     registerStandardTypes( * _myValueFactory );
     registerSomTypes( * _myValueFactory );
 
-    //addCursorFilter("move", "id");
+    // add filter for deleting multiple update
+    if (_myFilterMultipleMovePerCursorFlag) {
+        addCursorFilter("move", "id");
+    }
 }
 
 
@@ -139,7 +142,8 @@ ASSEventSource::onUpdateSettings(dom::NodePtr theSettings) {
     AC_DEBUG << "updating ASSEventSource settings";
 
     dom::NodePtr mySettings = getASSSettings( theSettings );
-    getConfigSetting( mySettings, "maxCursorPositionsForAverage", _myMaxCursorPositionsForAverage, static_cast<unsigned int> (10) );
+    getConfigSetting( mySettings, "MaxCursorPositionsForAverage", _myMaxCursorPositionsForAverage, static_cast<unsigned int> (10) );
+    getConfigSetting( mySettings, "FilterMultipleMovePerCursor", _myFilterMultipleMovePerCursorFlag, true );
 }
 
 void

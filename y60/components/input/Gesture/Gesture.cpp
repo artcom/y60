@@ -34,7 +34,6 @@ namespace y60 {
 Gesture::Gesture(DLHandle theHandle) :
     asl::PlugInBase( theHandle ),
     GenericEventSourceFilter(),
-    _myGestureSettings(0),
     _myGestureSchema( new dom::Document( y60::ourgestureeventxsd ) ),
     _myValueFactory( new dom::ValueFactory() ),
     _myWipeDistanceThreshold(WIPE_DISTANCE_THRESHOLD),
@@ -185,7 +184,7 @@ Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent,  int theID, const std
                 if(_myCursorPartner.find(theID) == _myCursorPartner.end()) {
                     AC_DEBUG << theID << " has no cursor partner";
             
-                    int myCursorPartnerId;
+                    int myCursorPartnerId = -1;
                     float myCursorDistance = _myMaxCursorPairDistance;
                     CursorList::iterator myIt = _myCursorList.begin();
                     CursorList::iterator myEndIt   = _myCursorList.end();

@@ -43,14 +43,13 @@ public:
         : PlugInBase(myDLHandle),
           GenericEventSourceFilter(),
           _myEventSchemaDocument(new Document(y60::ourtuioeventxsd)),
-          _myEventValueFactory(new ValueFactory()),
-          _myFilterMultipleUpdatePerCursorFlag(true)
+          _myEventValueFactory(new ValueFactory())
     {
         registerStandardTypes(*_myEventValueFactory);
         registerSomTypes(*_myEventValueFactory);
 
         // add filter for deleting multiple update
-        if (_myFilterMultipleUpdatePerCursorFlag) {
+        if (_myFilterMultipleMovePerCursorFlag) {
             addCursorFilter("update", "id");
         }
         // no default cursor smoothing 
@@ -68,8 +67,33 @@ public:
 
     JSFunctionSpec *StaticFunctions();
     JSPropertySpec *StaticProperties();
+    
+    virtual void onUpdateSettings(dom::NodePtr theSettings) {
+        dom::NodePtr mySettings = getTUIOSettings(theSettings);
+        _myFilterMultipleMovePerCursorFlag = getSetting( mySettings, "FilterMultipleMovePerCursor", _myFilterMultipleMovePerCursorFlag);
+        _myMaxCursorPositionsForAverage = getSetting( mySettings, "MaxCursorPositionsForAverage", _myMaxCursorPositionsForAverage);
+    }
 
+    dom::NodePtr
+    getTUIOSettings(dom::NodePtr theSettings) {
+        dom::NodePtr mySettings;
+        if ( theSettings->nodeType() == dom::Node::DOCUMENT_NODE) {
+            if (theSettings->childNode(0)->nodeName() == "settings") {
+                mySettings = theSettings->childNode(0)->childNode("TUIO", 0);
+            }
+        } else if ( theSettings->nodeName() == "settings") {
+            mySettings = theSettings->childNode("TUIO", 0);
+        } else if ( theSettings->nodeName() == "TUIO" ) {
+            mySettings = theSettings;
+        }
 
+        if ( ! mySettings ) {
+            throw Exception(
+                std::string("Could not find TUIO node in settings: ") +
+                as_string( * theSettings), PLUS_FILE_LINE );
+        }
+        return mySettings;
+    }
 
 // IEventSource
 
@@ -196,8 +220,6 @@ private:
     CursorEventList _myUndeliveredCursors;
 
     std::vector<TuioClient*> _myClients;
-    bool _myFilterMultipleUpdatePerCursorFlag;
-
 };
 
 

@@ -103,6 +103,7 @@ namespace y60 {
 
             std::map<int, std::deque<asl::Vector3f> >   _myCursorPositionHistory;
             unsigned int _myMaxCursorPositionsForAverage;
+            bool _myFilterMultipleMovePerCursorFlag;
         private:          
             void applyCursorFilter(const std::string & theEventType, const std::string & theIdAttributeName, EventPtrList & theEventList);
             std::vector<CursorFilter>                    _myCursorFilter;

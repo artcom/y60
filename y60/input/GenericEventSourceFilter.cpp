@@ -64,7 +64,8 @@ namespace y60 {
     const unsigned int GenericEventSourceFilter::MAX_CURSOR_POSITIONS_FOR_AVERAGE = 10;
 
     GenericEventSourceFilter::GenericEventSourceFilter():
-        _myMaxCursorPositionsForAverage(MAX_CURSOR_POSITIONS_FOR_AVERAGE)
+        _myMaxCursorPositionsForAverage(MAX_CURSOR_POSITIONS_FOR_AVERAGE),
+        _myFilterMultipleMovePerCursorFlag(true)
     {}
 
     GenericEventSourceFilter::~GenericEventSourceFilter() {}
