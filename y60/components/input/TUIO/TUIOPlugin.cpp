@@ -70,7 +70,9 @@ public:
     
     virtual void onUpdateSettings(dom::NodePtr theSettings) {
         dom::NodePtr mySettings = getTUIOSettings(theSettings);
-        _myFilterMultipleMovePerCursorFlag = getSetting( mySettings, "FilterMultipleMovePerCursor", _myFilterMultipleMovePerCursorFlag);
+        int myFilterFlag = 0;
+        myFilterFlag = getSetting( mySettings, "FilterMultipleMovePerCursor", myFilterFlag);
+        _myFilterMultipleMovePerCursorFlag = (myFilterFlag == 1 ? true : false);
         _myMaxCursorPositionsForAverage = getSetting( mySettings, "MaxCursorPositionsForAverage", _myMaxCursorPositionsForAverage);
     }
 
