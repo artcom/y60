@@ -503,11 +503,11 @@ namespace y60 {
             theFormat.color[0] = -1.0f;
             theFormat.color[1] = -1.0f;
             theFormat.color[2] = -1.0f;
-        } else if (myTag.find_first_of("font") == 0) {
+        } else if (myTag.find("font") == 0) {
 		    size_t myColorIndex = 0;
 		    if ((myColorIndex = myTag.find("color=")) != std::string::npos) {
 		        std::string myFontColor = myTag.substr(myColorIndex+6);
-		        if ((myFontColor.find_first_of("'#") == 0) || (myFontColor.find_first_of("\"#") == 0)) {
+		        if ((myFontColor.find("'#") == 0) || (myFontColor.find("\"#") == 0)) {
 		            myFontColor = myFontColor.substr(2, 6);
                     unsigned myRed = 0;
                     unsigned myGreen = 0;
