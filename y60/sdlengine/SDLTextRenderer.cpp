@@ -504,11 +504,11 @@ namespace y60 {
             theFormat.color[1] = -1.0f;
             theFormat.color[2] = -1.0f;
         } else if (myTag.find("font") == 0) {
-		    size_t myColorIndex = 0;
-		    if ((myColorIndex = myTag.find("color=")) != std::string::npos) {
-		        std::string myFontColor = myTag.substr(myColorIndex+6);
-		        if ((myFontColor.find("'#") == 0) || (myFontColor.find("\"#") == 0)) {
-		            myFontColor = myFontColor.substr(2, 6);
+            size_t myColorIndex = 0;
+            if ((myColorIndex = myTag.find("color=")) != std::string::npos) {
+                std::string myFontColor = myTag.substr(myColorIndex+6);
+                if ((myFontColor.find("'#") == 0) || (myFontColor.find("\"#") == 0)) {
+                    myFontColor = myFontColor.substr(2, 6);
                     unsigned myRed = 0;
                     unsigned myGreen = 0;
                     unsigned myBlue = 0;
@@ -521,8 +521,8 @@ namespace y60 {
                     theFormat.color[0] = myRed/255.0f;
                     theFormat.color[1] = myGreen/255.0f;
                     theFormat.color[2] = myBlue/255.0f;
-				}
-			}
+                }
+            }
         } else if (myTag == "b" || myTag == "B") {
             theFormat.bold = true;
         } else if (myTag == "i" || myTag == "I") {
@@ -544,16 +544,16 @@ namespace y60 {
         } else if (myTag == "li" || myTag == "LI" ||
                    myTag == "lI" || myTag == "Li") 
         {
-		    theFormat.indent = true;
+            theFormat.indent = true;
         } else {
             return 0;
         }
 
         if (myTag.length() == 0) {
-		    return 0;
-		} else {
-		    return myTag.length()+2;
-		}
+            return 0;
+        } else {
+            return myTag.length()+2;
+        }
     }
 
     inline unsigned
@@ -734,7 +734,7 @@ namespace y60 {
                                   Uint8(theTextColor[3] * 255) };
 
         for (unsigned i = 0; i < theWords.size(); ++i) {
-			SDL_Color myWordColor = myTextColor;
+            SDL_Color myWordColor = myTextColor;
             Word & myWord = theWords[i];
             const TTF_Font * myFont = myNormalFont;
 
@@ -743,13 +743,13 @@ namespace y60 {
                 mySDLFormat |= TTF_STYLE_UNDERLINE;
             }
 
-			if(myWord.format.color[0] != -1) {
-				SDL_Color myNewTextColor = { Uint8(myWord.format.color[0] * 255),
+            if(myWord.format.color[0] != -1) {
+                SDL_Color myNewTextColor = { Uint8(myWord.format.color[0] * 255),
                                 Uint8(myWord.format.color[1] * 255),
                                 Uint8(myWord.format.color[2] * 255),
                                 Uint8(myWord.format.color[3] * 255) };
-				myWordColor = myNewTextColor;
-			}
+                myWordColor = myNewTextColor;
+            }
 
             if (myWord.format.bold && myWord.format.italics && myBoldItalicFont) {
                 myFont = myBoldItalicFont;
