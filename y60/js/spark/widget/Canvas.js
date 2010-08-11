@@ -38,7 +38,7 @@ spark.Canvas.Constructor = function (Protected) {
         }
     }());
     
-    //var PICK_RADIUS = 0.01;
+    var PICK_RADIUS = 1;
     var _sampling = 1;
     
     /////////////////////
@@ -196,6 +196,8 @@ spark.Canvas.Constructor = function (Protected) {
                 _myWorld.name = Public.name + "-world";
                 window.scene.worlds.appendChild(_myWorld);
 
+                
+                
                 myCamera = Node.createElement("camera");
                 _myWorld.appendChild(myCamera);
                 spark.setupCameraOrtho(myCamera, myWidth, myHeight);
@@ -228,6 +230,11 @@ spark.Canvas.Constructor = function (Protected) {
         Public.addEventListener(spark.MouseEvent.BUTTON_UP, Public.onMouseButtonUp);
         
         Base.realize(myMaterial);
+        if(_myWorld) {
+            while (Public.innerSceneNode.firstChild) {
+                _myWorld.appendChild(Public.innerSceneNode.firstChild);
+            }
+        }
     };
     
     Base.setActiveCamera = Public.setActiveCamera;
@@ -272,8 +279,8 @@ spark.Canvas.Constructor = function (Protected) {
     };
     
     Public.pickBody = function (theX, theY) {
-        var pickedBody     = null,
-            canvasPosition = Public.convertToCanvasCoordinates(theX, theY);
+        var pickedBody     = null;
+        var canvasPosition = Public.convertToCanvasCoordinates(theX, theY);
         if (canvasPosition) {
             // picking by intersection not by sweeping sphere, more accurate for strangely grouped bodies
             pickedBody = Public.picking.pickBody(canvasPosition.x, canvasPosition.y, _myWorld);
@@ -282,6 +289,18 @@ spark.Canvas.Constructor = function (Protected) {
             //                    PICK_RADIUS, _myWorld, _myViewport);
         }
         return pickedBody;
+    };
+    
+    Public.pickWidget = function(theX, theY) {
+        var myBody = Public.pickBody(theX, theY);
+        if(myBody) {
+            var myBodyId = myBody.id;
+            if(myBodyId in spark.sceneNodeMap) {
+                var myWidget = spark.sceneNodeMap[myBodyId];
+                return myWidget;
+            }
+        }
+        return null;
     };
     
     Base.onFrame = Public.onFrame;
@@ -305,7 +324,10 @@ spark.Canvas.Constructor = function (Protected) {
         var canvasPosition = Public.convertToCanvasCoordinates(theX, theY);
         if (canvasPosition) {
             Base.onMouseButton(theButton, theState, canvasPosition.x, canvasPosition.y);
+           // var myWidget = Public.pickWidget(canvasPosition.x, canvasPosition.y);
+           // print("___myPickedWidget: ", myWidget);
         }
+        
     };
 };
 

@@ -97,6 +97,12 @@ spark.Window.Constructor = function(Protected) {
             var myBodyId = myBody.id;
             if(myBodyId in spark.sceneNodeMap) {
                 var myWidget = spark.sceneNodeMap[myBodyId];
+                if("pickWidget" in myWidget) {
+                   var myCanvasWidget = myWidget.pickWidget(theX, theY);
+                    if (myCanvasWidget) {
+                        myWidget = myCanvasWidget;
+                    }
+                }
                 return myWidget;
             }
         }
