@@ -68,5 +68,9 @@
         <MinTouchInterval step="0.01">0.2</MinTouchInterval>
         <MinTouchThreshold step="0.1">9.0</MinTouchThreshold>
         
+        <!-- filter 'move' events -->
+        <FilterMultipleMovePerCursor min="0" step="1" max="1">1</FilterMultipleMovePerCursor>
+        <!-- smooth cursor position with an average calculation 1==no smoothing -->
+        <MaxCursorPositionsForAverage min="1" step="1">10</MaxCursorPositionsForAverage>
     </ASSDriver>
 </settings>
