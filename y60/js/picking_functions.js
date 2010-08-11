@@ -286,6 +286,9 @@ Picking.prototype.Constructor = function (obj, theRenderWindow) {
 
     obj.pickIntersection = function (theScreenPixelX, theScreenPixelY, theWorld) {
         var myLineSegment = obj.getLineSegmentThroughScreen(theScreenPixelX, theScreenPixelY);
+        if (myLineSegment == null) {
+            return null;
+        }
         //XXX.. this should not look just for first world in scene.. what about multiple worlds????
         var myWorld = theWorld || _myRenderWindow.scene.dom.find("worlds/world");
         return nearestIntersection(myWorld, myLineSegment);

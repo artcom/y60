@@ -30,6 +30,7 @@ spark.Canvas.Constructor = function (Protected) {
     var _onPreViewportFunc  = null;
     var _onPostViewportFunc = null;
     var _myRenderFlag       = true;
+    var _myPickRadius       = 0;
     
     var _bindings = {};
     (function () {
@@ -38,7 +39,6 @@ spark.Canvas.Constructor = function (Protected) {
         }
     }());
     
-    var PICK_RADIUS = 1;
     var _sampling = 1;
     
     /////////////////////
@@ -114,6 +114,16 @@ spark.Canvas.Constructor = function (Protected) {
     });
     Public.__defineGetter__("render", function () {
         return _myRenderFlag;
+    });
+    
+    //pickRadius = 0 will result in fast ray intersection picking, 
+    // when pickRadius > 0 slower sweepsphere picking will be activated
+    Public.__defineSetter__("pickRadius", function (theNewRadius) {
+        _myPickRadius = theNewRadius;
+    });
+    
+    Public.__defineGetter__("pickRadius", function () {
+        return _myPickRadius;
     });
     
     ////////////////////
@@ -282,11 +292,13 @@ spark.Canvas.Constructor = function (Protected) {
         var pickedBody     = null;
         var canvasPosition = Public.convertToCanvasCoordinates(theX, theY);
         if (canvasPosition) {
-            // picking by intersection not by sweeping sphere, more accurate for strangely grouped bodies
-            pickedBody = Public.picking.pickBody(canvasPosition.x, canvasPosition.y, _myWorld);
-            //pickBodyBySweepingSphereFromBodies(
-            //                    canvasPosition.x, canvasPosition.y,
-            //                    PICK_RADIUS, _myWorld, _myViewport);
+            if(_myPickRadius === 0) {
+                pickedBody = Public.picking.pickBody(canvasPosition.x, canvasPosition.y, _myWorld);
+            }  else {
+                pickedBody = Public.picking.pickBodyBySweepingSphereFromBodies(
+                                canvasPosition.x, canvasPosition.y,
+                                _myPickRadius, _myWorld, _myViewport);
+            }
         }
         return pickedBody;
     };
