@@ -64,32 +64,37 @@
 //=============================================================================
 
 
+/*jslint nomen:false white:false*/
+/*globals use, MoverBase, Vector3f, cross, product, almostEqual, Matrix4f,
+          Quaternionf, Vector4f, print, sum, LEFT_BUTTON, Ray, normalized,
+          Planef, projection, LineSegment, distance, nearestIntersection*/
+
 use("MoverBase.js");
 use("picking_functions.js");
 use("intersection_functions.js");
 
 function WalkMover(theViewport) {
     this.Constructor(this, theViewport);
-};
+}
 
 WalkMover.prototype.Constructor = function(self, theViewport) {
     MoverBase.prototype.Constructor(self, theViewport);
     self.Mover = [];
 
-    //////////////////////////////////////////////////////////////////////
+    /////////////////////
+    // Private Members //
+    /////////////////////
 
-    const MODEL_FRONT_DIRECTION    = new Vector3f(0,0,1);
-    const MODEL_UP_DIRECTION       = new Vector3f(0,1,0);
-    const MODEL_RIGHT_DIRECTION    = cross(MODEL_FRONT_DIRECTION, MODEL_UP_DIRECTION);
-    const INITIAL_WALK_SPEED       = 0.01; // percentage of world size per second
-    const INITIAL_EYEHEIGHT        = 200;
-    const GRAVITY                  = 9.81;
-    const PERSON_MASS              = 100;
-    const GRAVITY_DIRECTION        = product(MODEL_UP_DIRECTION,-1);
-    const GRAVITY_ACCELERATION     = product(GRAVITY_DIRECTION, GRAVITY);
-    const PERSON_WEIGHT_FORCE      = product(GRAVITY_ACCELERATION, PERSON_MASS);
-
-    //////////////////////////////////////////////////////////////////////
+    var MODEL_FRONT_DIRECTION = new Vector3f(0,0,1);
+    var MODEL_UP_DIRECTION    = new Vector3f(0,1,0);
+    var MODEL_RIGHT_DIRECTION = cross(MODEL_FRONT_DIRECTION, MODEL_UP_DIRECTION);
+    var INITIAL_WALK_SPEED    = 0.01; // percentage of world size per second
+    var INITIAL_EYEHEIGHT     = 200;
+    var GRAVITY               = 9.81;
+    var PERSON_MASS           = 100;
+    var GRAVITY_DIRECTION     = product(MODEL_UP_DIRECTION,-1);
+    var GRAVITY_ACCELERATION  = product(GRAVITY_DIRECTION, GRAVITY);
+    var PERSON_WEIGHT_FORCE   = product(GRAVITY_ACCELERATION, PERSON_MASS);
 
     var _myPressedKeys        = [];
     var _myLastTime           = null;
@@ -115,12 +120,129 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
     var _myMinimumTiltRotation= null;
     var _myMaximumTiltRotation= null;
     
-    //////////////////////////////////////////////////////////////////////
-    //
-    // public
-    //
-    //////////////////////////////////////////////////////////////////////
+    /////////////////////
+    // Private Methods //
+    /////////////////////
 
+    // returns position change resulting from all forces
+    function simulateForces(myDeltaTime, myInOutVelocity) {
+        var myAcceleration   = product(PERSON_WEIGHT_FORCE, 1 / PERSON_MASS);
+        var myVelocityChange = product(myAcceleration, myDeltaTime);
+        myInOutVelocity.add(myVelocityChange);
+    }
+
+    function positionAllowed(theNewPostion) {
+        var myForwardStep = new LineSegment(_myPosition, theNewPostion);
+        return !!nearestIntersection(self.getWorld(), myForwardStep);
+    }
+
+    function findGround(theProbe) {
+        var myGroundIntersection = nearestIntersection(self.getWorld(), theProbe);
+        if (myGroundIntersection) {
+            _myGroundPlane  = new Planef(_myUpVector, myGroundIntersection.position);
+            _myGroundNormal = normalized(myGroundIntersection.normal);
+            _myGroundContactFlag = true;
+            var myNewPosition = new Vector3f(myGroundIntersection.position);
+            myNewPosition.y += _myEyeHeight;
+            return myNewPosition;
+        } else {
+            _myGroundContactFlag = false;
+            return null;
+        }
+    }
+
+    // Reorients the Mover with the ground, pushes the Mover above the ground
+    function dropToGround(myTranslation) {
+        var myFallingTranslation = myTranslation.clone();
+        myFallingTranslation.y = GRAVITY_DIRECTION.y;
+        var myNewPosition = findGround(new Ray(_myPosition, product(myFallingTranslation, 2)));
+        if (myNewPosition) {
+            _myPosition.value = myNewPosition;
+        }
+    }
+
+    function simulate(theDeltaTime) {
+        var myCamera = self.getMoverObject();
+
+        // Get current orientation
+        var myOrientationMatrix = new Matrix4f();
+        myOrientationMatrix.makeIdentity();
+        myOrientationMatrix.setRow(2, myCamera.globalmatrix.getRow(2).xyz0);
+        myOrientationMatrix.setRow(1, myCamera.globalmatrix.getRow(1).xyz0);
+        myOrientationMatrix.setRow(0, myCamera.globalmatrix.getRow(0).xyz0);
+
+        _myFrontVector = product(MODEL_FRONT_DIRECTION, myOrientationMatrix);
+        _myRightVector = product(MODEL_RIGHT_DIRECTION, myOrientationMatrix);
+        
+        if (_myGroundPlane) {
+            _myProjectedFrontVector = normalized(projection(_myFrontVector, _myGroundPlane));
+            _myProjectedRightVector = normalized(projection(_myRightVector, _myGroundPlane));
+        }
+        _myUpVector    = product(MODEL_UP_DIRECTION, myOrientationMatrix);
+
+        //var myVelocity = new Vector3f(_myVelocity);
+
+        var myPostAccelVelocity = new Vector3f(_myVelocity);
+        simulateForces(theDeltaTime, myPostAccelVelocity);
+
+        var myTranslation = product(myPostAccelVelocity, theDeltaTime);
+        _myVelocity = myPostAccelVelocity;
+
+        dropToGround(myTranslation);
+        
+        if (self.defensivelyUpdate) {
+            if (!almostEqual(distance(_myPosition, self.getMoverObject().position), 0)) {
+                self.getMoverObject().position = _myPosition;
+            }
+        } else {
+            self.getMoverObject().position = _myPosition;
+        }
+    }
+
+    function onKeyDown(theKey, theDeltaT) {
+        //var myNewPosition = new Vector3f(_myPosition);
+        //var myDirVector = null;
+        var myStep = _myWalkSpeed * self.getWorldSize() * theDeltaT;
+        switch (theKey) {
+            case "up":
+                self.movements.translateAlongFrontVector(-myStep);
+                break;
+            case "down":
+                self.movements.translateAlongFrontVector(myStep);
+                break;
+            case "left":
+                self.movements.translateAlongRightVector(myStep);
+                break;
+            case "right":
+                self.movements.translateAlongRightVector(-myStep);
+                break;
+        }
+    }
+
+    function translate(theDirection, theDelta) {
+        var myNewPosition = sum (_myPosition, product(theDirection, theDelta));
+        if (positionAllowed(myNewPosition)) {
+            myNewPosition = sum (_myPosition, product(theDirection, -5.0 * theDelta));
+        }
+        _myPosition = myNewPosition;
+    }
+
+    function printHelp() {
+        print("Walk Mover keys:");
+        print("  CTRL+ALT+<up>     walk forward");
+        print("  CTRL+ALT+<down>   walk backward");
+        print("  CTRL+ALT+<left>   walk to the left");
+        print("  CTRL+ALT+<right>  walk to the right");
+        print("  mouse-wheel-up    increase walk speed");
+        print("  mouse-wheel-down  decrease walk speed");
+        print("  CTRL+ALT+SHIFT+<up>    increase eye-height");
+        print("  CTRL+ALT+SHIFT+<down>  decrease eye-height");
+    }
+    
+    ////////////////////
+    // Public Methods //
+    ////////////////////
+    
     self.name = "WalkMover";
 
     // Position and orientation are only set when really necessary
@@ -157,30 +279,30 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
         _myMaximumTiltRotation = theValue;
     });
 
-    self.eyeHeight setter = function(theHeight) {
+    self.__defineSetter__("eyeHeight", function(theHeight) {
         _myEyeHeight = theHeight;
         _myEyeHeight = Math.max(_myEyeHeight,0);
-    };
+    });
     
-    self.eyeHeight getter = function () {
+    self.__defineGetter__("eyeHeight", function () {
         return _myEyeHeight;
-    };
+    });
     
-    self.walkSpeed setter = function(theWalkSpeed) {
+    self.__defineSetter__("walkSpeed", function(theWalkSpeed) {
         _myWalkSpeed = theWalkSpeed;
-    };
+    });
     
-    self.walkSpeed getter = function () {
+    self.__defineGetter__("walkSpeed", function () {
         return _myWalkSpeed;
-    };
+    });
     
-    self.position setter = function (thePosition) {
+    self.__defineSetter__("position", function (thePosition) {
         _myPosition = thePosition;
-    };
+    });
 
-    self.rotation setter = function (theRotation) {
+    self.__defineSetter__("rotation", function (theRotation) {
         self.getMoverObject().orientation = Quaternionf.createFromEuler(theRotation);
-    };
+    });
     
     self.movements.rotateXYByScreenCoordinates = function(thePreviousPos, theCurrentPos) {
         var myDelta = self.getNormalizedDifference(thePreviousPos, theCurrentPos);
@@ -212,7 +334,7 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
             myTiltOrientation = new Quaternionf(myMatrix.getTranslation(),theAnglesInRadiant.y);
         }
         // add rotation about the up vector -> PAN rotation
-        var myPanOrientation = new Quaternionf(new Vector3f(0,1,0),-theAnglesInRadiant.x)
+        var myPanOrientation = new Quaternionf(new Vector3f(0,1,0),-theAnglesInRadiant.x);
         if (myTiltOrientation) {
             myPanOrientation.multiply(myTiltOrientation);
         }
@@ -239,17 +361,9 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
         translate(myDirVector, theDelta);
     };
     
-    function translate(theDirection, theDelta) {
-        var myNewPosition = sum (_myPosition, product(theDirection, theDelta));
-        if (!positionAllowed(myNewPosition)) {
-            myNewPosition = sum (_myPosition, product(theDirection, -5.0 * theDelta));
-        }
-        _myPosition = myNewPosition;
-    };
-    
     // XXX TODO: the Eventhandling should not be inside the Mover
     self.onFrame = function(theTime) {
-        if (_myLastTime == null) {
+        if (_myLastTime === null) {
             _myLastTime = theTime;
             return;
         }
@@ -266,7 +380,7 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
     // XXX TODO: the Eventhandling should not be inside the Mover
     self.Mover.onKey = self.onKey;
     self.onKey = function(theKey, theKeyState, theX, theY, theShiftFlag, theControlFlag, theAltFlag) {
-        if (theKeyState && theKey == 'h') {
+        if (theKeyState && theKey === 'h') {
             printHelp();
         }
         if (theShiftFlag && theControlFlag && theAltFlag) {
@@ -291,7 +405,7 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
     self.Mover.onMouseButton = self.onMouseButton;
     self.onMouseButton = function(theButton, theState, theX, theY) {
         self.Mover.onMouseButton(theButton, theState, theX, theY);
-        if (theButton == LEFT_BUTTON) {
+        if (theButton === LEFT_BUTTON) {
             _prevMousePosition = new Vector3f(theX, theY, 0);
         } else { // Button Up
             _prevMousePosition = new Vector3f(0,0,0);
@@ -314,118 +428,4 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
             _myWalkSpeed /= 1.5;
         }
     };
-
-    //////////////////////////////////////////////////////////////////////
-    //
-    // private
-    //
-    //////////////////////////////////////////////////////////////////////
-
-    function simulate(theDeltaTime) {
-        var myCamera = self.getMoverObject();
-
-        // Get current orientation
-        var myOrientationMatrix = new Matrix4f;
-        myOrientationMatrix.makeIdentity();
-        myOrientationMatrix.setRow(2, myCamera.globalmatrix.getRow(2).xyz0);
-        myOrientationMatrix.setRow(1, myCamera.globalmatrix.getRow(1).xyz0);
-        myOrientationMatrix.setRow(0, myCamera.globalmatrix.getRow(0).xyz0);
-
-        _myFrontVector = product(MODEL_FRONT_DIRECTION, myOrientationMatrix);
-        _myRightVector = product(MODEL_RIGHT_DIRECTION, myOrientationMatrix);
-        
-        if (_myGroundPlane) {
-            _myProjectedFrontVector = normalized(projection(_myFrontVector, _myGroundPlane));
-            _myProjectedRightVector = normalized(projection(_myRightVector, _myGroundPlane));
-        }
-        _myUpVector    = product(MODEL_UP_DIRECTION, myOrientationMatrix);
-
-        var myVelocity = new Vector3f(_myVelocity);
-
-        var myPostAccelVelocity = new Vector3f(_myVelocity);
-        simulateForces(theDeltaTime, myPostAccelVelocity);
-
-        var myTranslation = product(myPostAccelVelocity, theDeltaTime);
-        _myVelocity = myPostAccelVelocity;
-
-        dropToGround(myTranslation);
-        
-        if (self.defensivelyUpdate) {
-            if (!almostEqual(distance(_myPosition, self.getMoverObject().position), 0)) {
-                self.getMoverObject().position = _myPosition;
-            }
-        } else {
-            self.getMoverObject().position = _myPosition;
-        }
-    }
-
-    // returns position change resulting from all forces
-    function simulateForces(myDeltaTime, myInOutVelocity) {
-        var myAcceleration   = product(PERSON_WEIGHT_FORCE, 1 / PERSON_MASS);
-        var myVelocityChange = product(myAcceleration, myDeltaTime);
-        myInOutVelocity.add(myVelocityChange);
-    }
-
-    function positionAllowed(theNewPostion) {
-        var myForwardStep = new LineSegment(_myPosition, theNewPostion);
-        var myForwardIntersection = nearestIntersection(self.getWorld(), myForwardStep);
-        return (myForwardIntersection == null);
-    }
-
-    function findGround(theProbe) {
-        var myGroundIntersection = nearestIntersection(self.getWorld(), theProbe);
-        if (myGroundIntersection) {
-            _myGroundPlane  = new Planef(_myUpVector, myGroundIntersection.position);
-            _myGroundNormal = normalized(myGroundIntersection.normal);
-            _myGroundContactFlag = true;
-            var myNewPosition = new Vector3f(myGroundIntersection.position);
-            myNewPosition.y += _myEyeHeight;
-            return myNewPosition;
-        } else {
-            _myGroundContactFlag = false;
-            return null;
-        }
-    }
-
-    // Reorients the Mover with the ground, pushes the Mover above the ground
-    function dropToGround(myTranslation) {
-        var myFallingTranslation = myTranslation.clone();
-        myFallingTranslation.y = GRAVITY_DIRECTION.y;
-        var myNewPosition = findGround(new Ray(_myPosition, product(myFallingTranslation, 2)));
-        if (myNewPosition != null) {
-            _myPosition.value = myNewPosition;
-        }
-    }
-
-    function onKeyDown(theKey, theDeltaT) {
-        var myNewPosition = new Vector3f(_myPosition);
-        var myDirVector = null;
-        var myStep = _myWalkSpeed * self.getWorldSize() * theDeltaT;
-        switch (theKey) {
-            case "up":
-                self.movements.translateAlongFrontVector(-myStep);
-                break;
-            case "down":
-                self.movements.translateAlongFrontVector(myStep);
-                break;
-            case "left":
-                self.movements.translateAlongRightVector(myStep);
-                break;
-            case "right":
-                self.movements.translateAlongRightVector(-myStep);
-                break;
-        }
-    }
-
-    function printHelp() {
-        print("Walk Mover keys:");
-        print("  CTRL+ALT+<up>     walk forward");
-        print("  CTRL+ALT+<down>   walk backward");
-        print("  CTRL+ALT+<left>   walk to the left");
-        print("  CTRL+ALT+<right>  walk to the right");
-        print("  mouse-wheel-up    increase walk speed");
-        print("  mouse-wheel-down  decrease walk speed");
-        print("  CTRL+ALT+SHIFT+<up>    increase eye-height");
-        print("  CTRL+ALT+SHIFT+<down>  decrease eye-height");
-    }
 };
