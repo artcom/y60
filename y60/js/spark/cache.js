@@ -102,12 +102,12 @@ spark.ourMovieCounter = 0;
 
 spark.openMovie = function(thePath, theTargetPixelFormat, theDecoderHint) {
     var myMovie = Node.createElement("movie");
-
     window.scene.images.appendChild(myMovie);
 
     myMovie.src = thePath;
     myMovie.name = "spark-movie-" + spark.ourMovieCounter++;
     myMovie.resize = "none";
+    myMovie.maxcachesize = "8";
     myMovie.loopcount = "1";
     myMovie.targetpixelformat = (theTargetPixelFormat) ? theTargetPixelFormat :"RGB";
     myMovie.decoderhint = (theDecoderHint) ? theDecoderHint : "FFMpegDecoder2";

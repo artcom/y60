@@ -121,7 +121,7 @@ namespace y60 {
         _myNumIFramesDecoded(0),
         _myVideoStreamTimeBase(-1),
         _myFrameRate(25),
-        _myMaxCacheSize(8),
+        //_myMaxCacheSize(8),
         _myFrameWidth(0),
         _myFrameHeight(0),
         _myBytesPerPixel(1),
@@ -306,7 +306,7 @@ namespace y60 {
             }
         }
         Movie * myMovie = getMovie();
-        _myMaxCacheSize = myMovie->get<MaxCacheSizeTag>();
+        //_myMaxCacheSize = myMovie->get<MaxCacheSizeTag>();
         _myLastVideoFrame = VideoMsgPtr();
 
         if (!isActive()) {
@@ -817,7 +817,7 @@ namespace y60 {
         bool isDone = false;
         while (!shouldTerminate() && !isDone) {
 			AC_TRACE << "---- FFMpegDecoder2::loop";
-            if (_myMsgQueue.size() >= _myMaxCacheSize) {
+            if (_myMsgQueue.size() >= getMovie()->get<MaxCacheSizeTag>()) {
                 // decode the audio...but let the video thread sleep
                 if (hasAudio() && getDecodeAudioFlag()) {
                     AC_DEBUG<<"---sleeping ---still decode audio";
@@ -973,6 +973,7 @@ namespace y60 {
                    myVCodec->codec_id == CODEC_ID_WMV3)
         {
             myMovie->set<FrameCountTag>(int(_myVStream->duration * _myFrameRate / 1000));
+            myMovie->set<MaxCacheSizeTag>(std::min(int(myMovie->get<MaxCacheSizeTag>()), int(myMovie->get<FrameCountTag>())));
             _myVideoStreamTimeBase = 1/ av_q2d(_myVStream->time_base);
         } else {
 	        double myDuration = 0.0;
@@ -982,6 +983,7 @@ namespace y60 {
                 myDuration = (_myFormatContext->duration - _myFormatContext->start_time )*_myFrameRate/(double)AV_TIME_BASE;
             }
             myMovie->set<FrameCountTag>(int(myDuration));
+            myMovie->set<MaxCacheSizeTag>(std::min(int(myMovie->get<MaxCacheSizeTag>()), int(myMovie->get<FrameCountTag>())));
 	        _myVideoStreamTimeBase = 1/ av_q2d(_myVStream->time_base);
 	    }
         AC_INFO << "FFMpegDecoder2::setupVideo() " << theFilename << " fps="
@@ -1061,7 +1063,7 @@ namespace y60 {
     bool FFMpegDecoder2::shouldSeek(double theCurrentTime, double theDestTime) {
         double myDistance = (theDestTime-theCurrentTime)*_myFrameRate;
         AC_DEBUG<<"FFMpegDecoder2::shouldSeek: "<<"Dest=" << theDestTime << ", Curr=" << theCurrentTime<<" --> distance: "<<myDistance;
-        return (myDistance > _myMaxCacheSize || myDistance < 0);
+        return (myDistance > getMovie()->get<MaxCacheSizeTag>() || myDistance < 0);
     }
 
     void FFMpegDecoder2::seek(double theDestTime) {
