@@ -200,22 +200,20 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
     }
 
     function onKeyDown(theKey, theDeltaT) {
-        //var myNewPosition = new Vector3f(_myPosition);
-        //var myDirVector = null;
         var myStep = _myWalkSpeed * self.getWorldSize() * theDeltaT;
         switch (theKey) {
-            case "up":
-                self.movements.translateAlongFrontVector(-myStep);
-                break;
-            case "down":
-                self.movements.translateAlongFrontVector(myStep);
-                break;
-            case "left":
-                self.movements.translateAlongRightVector(myStep);
-                break;
-            case "right":
-                self.movements.translateAlongRightVector(-myStep);
-                break;
+        case "up":
+            self.movements.translateAlongFrontVector(-myStep);
+            break;
+        case "down":
+            self.movements.translateAlongFrontVector(myStep);
+            break;
+        case "left":
+            self.movements.translateAlongRightVector(myStep);
+            break;
+        case "right":
+            self.movements.translateAlongRightVector(-myStep);
+            break;
         }
     }
 
@@ -255,7 +253,6 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
         self.Mover.reset();
 
         var myCamera         = self.getMoverObject();
-
         _myPosition          = myCamera.globalmatrix.getTranslation();
         _myVelocity          = new Vector3f(0,0,0);
         _myWalkSpeed         = INITIAL_WALK_SPEED;
@@ -280,8 +277,7 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
     });
 
     self.__defineSetter__("eyeHeight", function(theHeight) {
-        _myEyeHeight = theHeight;
-        _myEyeHeight = Math.max(_myEyeHeight,0);
+        _myEyeHeight = Math.max(theHeight,0);
     });
     
     self.__defineGetter__("eyeHeight", function () {
@@ -304,7 +300,7 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
         self.getMoverObject().orientation = Quaternionf.createFromEuler(theRotation);
     });
     
-    self.movements.rotateXYByScreenCoordinates = function(thePreviousPos, theCurrentPos) {
+    self.movements.rotateXYByScreenCoordinates = function (thePreviousPos, theCurrentPos) {
         var myDelta = self.getNormalizedDifference(thePreviousPos, theCurrentPos);
         self.movements.rotateXY(myDelta);
     };
@@ -342,23 +338,19 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
     };
     
     self.movements.translateAlongFrontVector = function (theDelta) {
-        var myDirVector;
         if (_myGroundContactFlag) {
-            myDirVector = _myProjectedFrontVector;
+            translate(_myProjectedFrontVector, theDelta);
         } else {
-            myDirVector = _myFrontVector;
+            translate(_myFrontVector, theDelta);
         }
-        translate(myDirVector, theDelta);
     };
     
     self.movements.translateAlongRightVector = function (theDelta) {
-        var myDirVector;
         if (_myGroundContactFlag) {
-            myDirVector = _myProjectedRightVector;
+            translate(_myProjectedRightVector, theDelta);
         } else {
-            myDirVector = _myRightVector;
+            translate(_myRightVector, theDelta);
         }
-        translate(myDirVector, theDelta);
     };
     
     // XXX TODO: the Eventhandling should not be inside the Mover
@@ -394,11 +386,12 @@ WalkMover.prototype.Constructor = function(self, theViewport) {
                 break;
             }
         } else {
-            if((theKeyState && theControlFlag && theAltFlag) || !theKeyState) {
+            if ((theKeyState && theControlFlag && theAltFlag) || !theKeyState) {
                 _myPressedKeys[theKey] = theKeyState;
             }
         }
-        self.Mover.onKey(theKey, theKeyState, theX, theY, theShiftFlag, theControlFlag, theAltFlag);
+        self.Mover.onKey(theKey, theKeyState, theX, theY,
+                         theShiftFlag, theControlFlag, theAltFlag);
     };
 
     // XXX TODO: the Eventhandling should not be inside the Mover
