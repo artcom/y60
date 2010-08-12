@@ -50,7 +50,7 @@ spark.ResizableRectangle.Constructor = function(Protected) {
         } else if (theMaterialOrImageOrShape.nodeName == "material") {
             _myMaterial = theMaterialOrImageOrShape;
         }
-        _myMaterial.properties.blendfunction = "[src_alpha,one_minus_src_alpha,one,one]";
+        _myMaterial.properties.blendfunction = "[src_alpha,one_minus_src_alpha,one,one_minus_src_alpha]";
         if ( ! _myShape) {
             var tu = _myMaterial.find("./textureunits/textureunit");
             if (tu) {

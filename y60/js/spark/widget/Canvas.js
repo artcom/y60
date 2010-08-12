@@ -240,7 +240,7 @@ spark.Canvas.Constructor = function (Protected) {
         Public.addEventListener(spark.MouseEvent.BUTTON_UP, Public.onMouseButtonUp);
         
         Base.realize(myMaterial);
-        myMaterial.properties.blendfunction = "[one,one_minus_src_alpha,one,one]";
+        myMaterial.properties.blendfunction = "[one,one_minus_src_alpha,one,one_minus_src_alpha]";
         if(_myWorld) {
             while (Public.innerSceneNode.firstChild) {
                 _myWorld.appendChild(Public.innerSceneNode.firstChild);
