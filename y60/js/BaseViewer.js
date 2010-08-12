@@ -129,6 +129,8 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     var _myMaterialTable = null;
     var _myDrawCameraFrustumFlag = false;
 
+    var _myLastTime = 0;
+
     var _defaultRenderingCapabilities = Renderer.TEXTURE_3D_SUPPORT |
                                         Renderer.MULTITEXTURE_SUPPORT |
                                         Renderer.TEXTURECOMPRESSION_SUPPORT |
@@ -739,6 +741,9 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     };
 
     self.onFrame = function(theTime) {
+        var myDeltaTime = theTime - _myLastTime;
+        _myLastTime = theTime;
+        
         if (_myProfileNode) {
             var myFPS = _myRenderWindow.fps;
             if (myFPS > _myProfileNode.maxfps) {
@@ -764,12 +769,12 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
             for (var i=0; i < myCanvas.childNodesLength('viewport'); ++i) {
                 var myMover = self.getMover(myCanvas.childNode('viewport'));
                 if (myMover) {
-                    myMover.onFrame(theTime);
+                    myMover.onFrame(theTime, myDeltaTime);
                 }
             }
         }
         
-        if(_myLightManager) {
+        if (_myLightManager) {
             _myLightManager.onFrame(theTime);
         }
     };

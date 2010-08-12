@@ -352,19 +352,13 @@ WalkMover.prototype.Constructor = function (self, theViewport) {
     };
     
     // XXX TODO: the Eventhandling should not be inside the Mover
-    self.onFrame = function (theTime) {
-        if (_myLastTime === null) {
-            _myLastTime = theTime;
-            return;
-        }
-        var myDeltaTime = theTime - _myLastTime;
+    self.onFrame = function (theTime, theTimeDelta) {
         for (var myKey in _myPressedKeys) {
             if (_myPressedKeys[myKey]) {
-                onKeyDown(myKey, myDeltaTime);
+                onKeyDown(myKey, theTimeDelta);
             }
         }
-        simulate(myDeltaTime);
-        _myLastTime = theTime;
+        simulate(theTimeDelta);
     };
 
     // XXX TODO: the Eventhandling should not be inside the Mover
