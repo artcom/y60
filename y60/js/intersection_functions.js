@@ -170,7 +170,6 @@ function nearestIntersection(theRootNode, myLineSegment, theIntersectInVisibleSh
     if (myIntersectionInfo) {
         return findNearestIntersection(myIntersectionInfo, myLineSegment.origin);
     }
-    return undefined;
 }
 function farthestIntersection(theRootNode, myLineSegment, theIntersectInVisibleShapes) {
     if (theIntersectInVisibleShapes == null || theIntersectInVisibleShapes == undefined) {
@@ -180,7 +179,6 @@ function farthestIntersection(theRootNode, myLineSegment, theIntersectInVisibleS
     if (myIntersectionInfo) {
         return findFarthestIntersection(myIntersectionInfo, myLineSegment.origin);
     }
-    return undefined;
 }
 
 function drawIntersection(theIntersectionInfo, theIntersection) {
