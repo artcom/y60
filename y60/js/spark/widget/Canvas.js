@@ -240,6 +240,8 @@ spark.Canvas.Constructor = function (Protected) {
         Public.addEventListener(spark.MouseEvent.BUTTON_UP, Public.onMouseButtonUp);
         
         Base.realize(myMaterial);
+        // set the canvas material to allow proper layering of transparencies
+        // see http://home.comcast.net/~tom_forsyth/blog.wiki.html#[[Premultiplied%20alpha]]
         myMaterial.properties.blendfunction = "[one,one_minus_src_alpha,one,one_minus_src_alpha]";
         if(_myWorld) {
             while (Public.innerSceneNode.firstChild) {
