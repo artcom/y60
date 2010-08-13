@@ -295,7 +295,7 @@ namespace y60 {
 
     void
     Movie::readFrame() {
-        readFrame(0, true);
+        readFrame(_myLastCurrentTime, true);
     }
 
 
@@ -305,7 +305,7 @@ namespace y60 {
         DB(AC_DEBUG << "Movie::readFrame time=" << theCurrentTime
             << " src=" << get<ImageSourceTag>());
         DB(AC_DEBUG << "                 theIgnoreCurrentTime=" << theIgnoreCurrentTime);
-        _myLastCurrentTime = theCurrentTime;
+        _myLastCurrentTime = (theIgnoreCurrentTime) ? -1.0 : theCurrentTime;
 
         if (!_myDecoder) {
             AC_ERROR << "Movie::readFrame not allowed before open";
@@ -343,7 +343,7 @@ namespace y60 {
             myMovieTime = getTimeFromFrame(myNextFrame);
             break;
         case PLAY_MODE_PLAY:
-            if (theIgnoreCurrentTime) {
+            if (theIgnoreCurrentTime && get<CurrentFrameTag>() != 0) {
                 myMovieTime = getTimeFromFrame(get<CurrentFrameTag>());
             } else {
                 myMovieTime = _myDecoder->getMovieTime(theCurrentTime);
@@ -407,7 +407,11 @@ namespace y60 {
         if (!almostEqual(myVolume, get<VolumeTag>())) {
             set<VolumeTag>(myVolume);
         }
-        myDecoder->setVolume(myVolume);
+        if (myDecoder) {
+            myDecoder->setVolume(myVolume);
+        } else {
+            AC_ERROR << "Movie::setVolume with no valid decoder, please use loadMovieFrame somehow to initialize movie";
+        }
     }
 
 

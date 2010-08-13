@@ -11,6 +11,7 @@ KeyEvent.cpp
 MouseEvent.cpp
 TouchEvent.cpp
 WindowEvent.cpp
+GenericEventSourceFilter.cpp
 asseventxsd.cpp
 )
 
@@ -30,6 +31,7 @@ MouseEvent.h
 TouchEvent.h
 WindowEvent.h
 asseventxsd.h
+GenericEventSourceFilter.h
 y60_input_settings.h
 )
 

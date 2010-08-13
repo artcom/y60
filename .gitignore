@@ -13,3 +13,6 @@ cmake_install.cmake
 build.log
 _builds
 _pulse.out
+*~
+.*swp
+.*swo

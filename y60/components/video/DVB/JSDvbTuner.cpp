@@ -228,7 +228,6 @@ JSDvbTuner::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj,
 // setproperty handling
 JSBool
 JSDvbTuner::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
-    jsval dummy;
     switch (theID) {
     default:
         JS_ReportError(cx,"JSDvbTuner::setPropertySwitch: index %d out of range", theID);

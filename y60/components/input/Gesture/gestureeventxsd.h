@@ -1,3 +1,4 @@
+
 /* __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 // Copyright (C) 1993-2008, ART+COM AG Berlin, Germany <www.artcom.de>
@@ -54,49 +55,21 @@
 //    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
+
 */
 
-#ifndef ASS_EVENT_SOURCE_INCLUDED
-#define ASS_EVENT_SOURCE_INCLUDED
 
-#include "y60_eventsource_settings.h"
-#include <y60/components/input/ASSDriver/ASSCore/ASSDriver.h>
-#include <y60/input/GenericEventSourceFilter.h>
+#ifndef AC_GESTUREEVENT_XSD_INCLUDED
+#define AC_GESTUREEVENT_XSD_INCLUDED
+
+//#include "y60_gesture_settings.h"
+
+#include <string>
 
 namespace y60 {
 
-class ASSEventSource : public asl::PlugInBase,
-                       public ASSDriver,
-                       public y60::IEventSource,
-                       public GenericEventSourceFilter
-{
-    public:
-        ASSEventSource(asl::DLHandle theHandle);
-        virtual y60::EventPtrList poll();
+extern const std::string ourgestureeventxsd;
 
+}
 
-        const char * ClassName() {
-            static const char * myClassName = "ASSEventSource";
-            return myClassName;
-        }
-
-        virtual void onGetProperty(const std::string & thePropertyName,
-                           PropertyValue & theReturnValue) const;
-        virtual void onSetProperty(const std::string & thePropertyName,
-                           const PropertyValue & thePropertyValue);
-        virtual void onUpdateSettings(dom::NodePtr theSettings);
-
-        void createTransportLayerEvent(const std::string & theType );
-    protected:
-        void createEvent( int theID, const std::string & theType,
-                const asl::Vector2f & theRawPosition, const asl::Vector3f & thePosition3D,
-                const asl::Box2f & theROI, float intensity, const ASSEvent & theEvent);
-    private:
-        dom::NodePtr                 _myEventSchema;
-        asl::Ptr<dom::ValueFactory>  _myValueFactory;
-        y60::EventPtrList            _myEvents;
-};
-
-} // end of namespace y60
-
-#endif // ASS_EVENT_SOURCE_INCLUDED
+#endif

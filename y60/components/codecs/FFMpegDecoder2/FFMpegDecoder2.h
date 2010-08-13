@@ -237,7 +237,7 @@ namespace y60 {
 
         DemuxPtr _myDemux;
 
-        int64_t _myStartTimestamp;
+        int64_t _myVideoStartTimestamp;
 #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52,20,0)
         PixelFormat
 #else
@@ -251,13 +251,11 @@ namespace y60 {
         int _myNumFramesDecoded;
         int _myNumIFramesDecoded;
 
-        //XXX: Since time_base is specified per stream by ffmpeg, we should really be
-        //     calculating this per stream and not per file.
-        double _myTimeUnitsPerSecond;
+        double _myVideoStreamTimeBase;
 
         // worker thread values to prevent dom access and thus race conditions.
         double _myFrameRate;
-        unsigned _myMaxCacheSize;
+        //unsigned _myMaxCacheSize;
         int _myFrameWidth;
         int _myFrameHeight;
         unsigned  _myBytesPerPixel;

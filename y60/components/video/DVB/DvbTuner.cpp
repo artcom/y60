@@ -76,16 +76,16 @@ DvbTuner::deviceAvailable(const string & theDeviceName) {
     return true;
 }
 
-DvbTuner::DvbTuner(const dom::NodePtr & theChannelConfig, const string & theDeviceName)
-: _myAdapter(0)
-, _myFrontend(0)
-, _myVideoFd(0)
-, _myAudioFd(0)
-, _myDvr(1)
-, _myDeviceName(theDeviceName)
-, _myChannelConfig(theChannelConfig)
-, _myChannelName("")
-, _myDvbTeleText(theDeviceName+"/demux0")
+DvbTuner::DvbTuner(const dom::NodePtr & theChannelConfig, const string & theDeviceName):
+    _myDeviceName(theDeviceName),
+    _myChannelConfig(theChannelConfig),
+    _myAdapter(0),
+    _myFrontend(0),
+    _myDvr(1),
+    _myChannelName(""),
+    _myAudioFd(0),
+    _myVideoFd(0), 
+    _myDvbTeleText(theDeviceName+"/demux0")
 {
     setupConstants();
     openDevice();
@@ -136,7 +136,7 @@ DvbTuner::setParameters(const std::string & theChannelName) {
     NodePtr myChannels = _myChannelConfig->childNode("dvb_channel_list");
 
     if (myChannels) {
-        for (int i=0; i<myChannels->childNodesLength(); ++i){
+        for (unsigned int i = 0; i < myChannels->childNodesLength(); ++i){
             if (myChannels->childNode(i)->getAttributeString("name") == theChannelName) {
                 Node myNode = *(myChannels->childNode(i));
 

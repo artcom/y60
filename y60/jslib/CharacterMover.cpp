@@ -269,7 +269,7 @@ namespace jslib {
     {
         if (_myCellSize == Vector3f(0.f, 0.f,0.f)) {
             _myCellSize = thePositions[2] - thePositions[0];
-            _myCellSize[3] = 0.001f;    // ensures that the bounding box is non-empty
+            _myCellSize[2] = 0.001f;    // ensures that the bounding box is non-empty
         }
 
         if (_myPositionIsDirty) {

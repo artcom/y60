@@ -114,14 +114,14 @@ namespace y60 {
         _myMsgQueue(),
         _myFrame(0),
         _myDemux(),
-        _myStartTimestamp(-1),
+        _myVideoStartTimestamp(0),
         _myDestinationPixelFormat(PIX_FMT_BGR24),
         _myResampleContext(0),
         _myNumFramesDecoded(0),
         _myNumIFramesDecoded(0),
-        _myTimeUnitsPerSecond(-1),
+        _myVideoStreamTimeBase(-1),
         _myFrameRate(25),
-        _myMaxCacheSize(8),
+        //_myMaxCacheSize(8),
         _myFrameWidth(0),
         _myFrameHeight(0),
         _myBytesPerPixel(1),
@@ -237,7 +237,8 @@ namespace y60 {
             _myDemux->enableStream(_myAStreamIndex);
         }
 
-        float myAspectRatio = 1.0;
+        decodeFrame();
+        double myAspectRatio = 1.0;
         // calc aspect ratio
 #if LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(52,21,0)
         if (_myVStream->sample_aspect_ratio.num) {
@@ -255,7 +256,10 @@ namespace y60 {
         }
         myAspectRatio *= (float)_myVStream->codec->width / _myVStream->codec->height; 
         Movie * myMovie = getMovie();
-        myMovie->set<AspectRatioTag>(myAspectRatio);
+        myMovie->set<AspectRatioTag>((float)myAspectRatio);
+
+        _myVideoStartTimestamp = _myVStream->start_time;//myPacket->dts;
+        AC_DEBUG << "Set StartTimestamp to packet timestamp= " << _myVideoStartTimestamp;
 
 
     }
@@ -302,7 +306,7 @@ namespace y60 {
             }
         }
         Movie * myMovie = getMovie();
-        _myMaxCacheSize = myMovie->get<MaxCacheSizeTag>();
+        //_myMaxCacheSize = myMovie->get<MaxCacheSizeTag>();
         _myLastVideoFrame = VideoMsgPtr();
 
         if (!isActive()) {
@@ -318,8 +322,9 @@ namespace y60 {
                 _myAdjustAudioOffsetFlag = true;
                 _myDemux->clearPacketCache(_myAStreamIndex);
                 av_seek_frame(_myFormatContext, _myAStreamIndex,
-                              (int64_t)floor(theStartTime), AVSEEK_FLAG_BACKWARD);
+                               (int64_t)(theStartTime*(1/ av_q2d(_myAStream->time_base))) + _myAStream->start_time, AVSEEK_FLAG_BACKWARD);
                 avcodec_flush_buffers(_myAStream->codec);
+                _myVideoStartTimestamp = 0;
             }
             if (theStartAudioFlag && hasAudio() && getDecodeAudioFlag()) {
                 readAudio();
@@ -600,13 +605,9 @@ namespace y60 {
                 // start_time indicates the begin of the video
                 if (myFrameCompleteFlag  && (myPacket->dts >= _myVStream->start_time)) {
                     STOP_TIMER(decodeFrame_ffmpegdecode);
-                    if (_myStartTimestamp == -1) {
-                        _myStartTimestamp = myPacket->dts;//_myVStream->start_time;
-                        AC_DEBUG << "Set StartTimestamp to packet timestamp= " << _myStartTimestamp;
-                    }
                     int64_t myNextPacketTimestamp = myPacket->dts;
-                    double myFrameTime = (double)myNextPacketTimestamp/_myTimeUnitsPerSecond;
-                    AC_DEBUG << "---- add frame"<< " time_base:"<<_myTimeUnitsPerSecond
+                    double myFrameTime = (double)myNextPacketTimestamp/_myVideoStreamTimeBase;
+                    AC_DEBUG << "---- add frame"<< " time_base:"<<_myVideoStreamTimeBase
 		                        <<" FrameTime: "<<myFrameTime;
                     addCacheFrame(_myFrame, myFrameTime);
                     _myLastFrameTime = myFrameTime;
@@ -712,11 +713,9 @@ namespace y60 {
 
         VideoMsgPtr myVideoMsg;
         double myStreamTime = theTime;
-        if (_myStartTimestamp != -1) {
-            myStreamTime += _myStartTimestamp/_myTimeUnitsPerSecond;
-        }
-        AC_DEBUG << "_myTimeUnitsPerSecond: "<< _myTimeUnitsPerSecond <<" _myStartTimestamp: "
-                <<_myStartTimestamp<<" Time=" << theTime;
+        myStreamTime += _myVideoStartTimestamp/_myVideoStreamTimeBase;
+        AC_DEBUG << "_myVideoStreamTimeBase: "<< _myVideoStreamTimeBase <<" _myVideoStartTimestamp: "
+                <<_myVideoStartTimestamp<<" Time=" << theTime;
         AC_DEBUG <<" - Reading frame timestamp: " << myStreamTime<< " from queue.";
 
         try {
@@ -751,8 +750,8 @@ namespace y60 {
                     }
                     double myTimestamp = myVideoMsg->getTime();
                     AC_DEBUG << "readFrame: FrameTime="
-                        << myVideoMsg->getTime()
-                        << ", Calculated frame #=" << (myTimestamp - (_myStartTimestamp/_myTimeUnitsPerSecond))*_myFrameRate
+                        << myTimestamp
+                        << ", Calculated frame #=" << (myTimestamp - (_myVideoStartTimestamp/_myVideoStreamTimeBase))*_myFrameRate
                         << ", Cache size=" << _myMsgQueue.size();
                     double myFrameDiff = (myStreamTime - myTimestamp)*_myFrameRate;
                     AC_DEBUG << "           myFrameDiff=" << myFrameDiff;
@@ -763,28 +762,38 @@ namespace y60 {
                         AC_DEBUG<<"can not find frame: "<<myStreamTime<< " -> decoder must have dropped it!!";
                         myFrameDroppedFlag = true;
                         _myMsgQueue.push_front(myVideoMsg); // don't loose the current video frame
+                        theTime = -1;
                         break;
                     }
                 }
             }
-            if(!myFrameDroppedFlag){
-                _myLastVideoFrame = myVideoMsg;
-                // Current frame is in myVideoMsg now. Convert to a format that Y60 can use.
-                // we think this is for version bumping
-                for (unsigned i = 0 ; i < theTargetRaster.size(); i++) {
-                    theTargetRaster[i]->resize( theTargetRaster[i]->width(), theTargetRaster[i]->height());
-                }
-                if (myVideoMsg) {
+            // Current frame is in myVideoMsg now. Convert to a format that Y60 can use.
+            // we think this is for version bumping
+            for (unsigned i = 0 ; i < theTargetRaster.size(); i++) {
+                theTargetRaster[i]->resize( theTargetRaster[i]->width(), theTargetRaster[i]->height());
+            }
+            if (myVideoMsg) {
+                if(!myFrameDroppedFlag){
                     AC_DEBUG << "readFrame: Frame delivered. wanted=" << theTime
-                            << ", got=" << (myVideoMsg->getTime()- _myStartTimestamp/_myTimeUnitsPerSecond);
-                    theTime = myVideoMsg->getTime() - _myStartTimestamp/_myTimeUnitsPerSecond;
-                    for (unsigned i = 0 ; i < theTargetRaster.size(); i++) {
-                        memcpy(theTargetRaster[i]->pixels().begin(), myVideoMsg->getBuffer(i),
-                                theTargetRaster[i]->pixels().size());
-                    }
+                        << ", got=" << (myVideoMsg->getTime()- _myVideoStartTimestamp/_myVideoStreamTimeBase);
+                    theTime = myVideoMsg->getTime() - _myVideoStartTimestamp/_myVideoStreamTimeBase;
+                    _myLastVideoFrame = myVideoMsg;
+                }
+                if (getPlayMode() == y60::PLAY_MODE_PAUSE && !_myLastVideoFrame) {
+                    _myLastVideoFrame = myVideoMsg;
+                }
+                for (unsigned i = 0 ; i < theTargetRaster.size(); i++) {
+                    memcpy(theTargetRaster[i]->pixels().begin(), myVideoMsg->getBuffer(i),
+                            theTargetRaster[i]->pixels().size());
+                }
+            } else {
+                // TODO: Figure out if/why this happens. Delete?
+                AC_WARNING << "readFrame, empty frame.";
+                if (_myDestinationPixelFormat == PIX_FMT_YUV420P ) {
+                    memset(theTargetRaster[0]->pixels().begin(), 16, theTargetRaster[0]->pixels().size());
+                    memset(theTargetRaster[1]->pixels().begin(), 127, theTargetRaster[1]->pixels().size());
+                    memset(theTargetRaster[2]->pixels().begin(), 127, theTargetRaster[2]->pixels().size());
                 } else {
-                    // TODO: Figure out if/why this happens. Delete?
-                    AC_WARNING << "readFrame, empty frame.";
                     for (unsigned i = 0 ; i < theTargetRaster.size(); i++) {
                         memset(theTargetRaster[i]->pixels().begin(), 0, theTargetRaster[i]->pixels().size());
                     }
@@ -808,7 +817,7 @@ namespace y60 {
         bool isDone = false;
         while (!shouldTerminate() && !isDone) {
 			AC_TRACE << "---- FFMpegDecoder2::loop";
-            if (_myMsgQueue.size() >= _myMaxCacheSize) {
+            if (_myMsgQueue.size() >= getMovie()->get<MaxCacheSizeTag>()) {
                 // decode the audio...but let the video thread sleep
                 if (hasAudio() && getDecodeAudioFlag()) {
                     AC_DEBUG<<"---sleeping ---still decode audio";
@@ -924,6 +933,9 @@ namespace y60 {
             case YUV420:
 				{AC_TRACE << "Using YUV420 pixels";}
 				_myDestinationPixelFormat = PIX_FMT_YUV420P;
+				if (myVCodec->pix_fmt != PIX_FMT_YUV420P) {
+				    AC_WARNING<<"you're trying to use YUV2RGB shader but the source video pixel format is not YUV420p, src: " + theFilename;
+				}
                 myMovie->createRaster(_myFrameWidth, _myFrameHeight, 1, y60::GRAY);
                 myMovie->addRasterValue(createRasterValue( y60::GRAY, _myFrameWidth/2, _myFrameHeight/2), y60::GRAY, 1);
                 myMovie->addRasterValue(createRasterValue( y60::GRAY, _myFrameWidth/2, _myFrameHeight/2), y60::GRAY, 1);
@@ -937,8 +949,14 @@ namespace y60 {
                 break;
         }
         unsigned myRasterCount = myMovie->getNode().childNodesLength();
-        for (unsigned i = 0; i < myRasterCount; i++) {
-            myMovie->getRasterPtr(i)->clear();
+        if (_myDestinationPixelFormat == PIX_FMT_YUV420P ) {
+            memset(myMovie->getRasterPtr(0)->pixels().begin(), 16, myMovie->getRasterPtr(0)->pixels().size());
+            memset(myMovie->getRasterPtr(1)->pixels().begin(), 127, myMovie->getRasterPtr(1)->pixels().size());
+            memset(myMovie->getRasterPtr(2)->pixels().begin(), 127, myMovie->getRasterPtr(2)->pixels().size());
+        } else {
+            for (unsigned i = 0; i < myRasterCount; i++) {
+                myMovie->getRasterPtr(i)->clear();
+            }
         }
 
         _myFrameRate = av_q2d(_myVStream->r_frame_rate);
@@ -948,14 +966,15 @@ namespace y60 {
         {
             // For some codecs, the duration value is not set. For MPEG1 and MPEG2,
             // ffmpeg gives often a wrong value.
-            _myTimeUnitsPerSecond = 1/ av_q2d(_myVStream->time_base);
-            //unsigned myFrameCount = unsigned(_myVStream->duration*_myFrameRate/_myTimeUnitsPerSecond);
+            _myVideoStreamTimeBase = 1/ av_q2d(_myVStream->time_base);
+            //unsigned myFrameCount = unsigned(_myVStream->duration*_myFrameRate/_myVideoStreamTimeBase);
 
         } else if (myVCodec->codec_id == CODEC_ID_WMV1 || myVCodec->codec_id == CODEC_ID_WMV2 ||
                    myVCodec->codec_id == CODEC_ID_WMV3)
         {
             myMovie->set<FrameCountTag>(int(_myVStream->duration * _myFrameRate / 1000));
-            _myTimeUnitsPerSecond = 1/ av_q2d(_myVStream->time_base);
+            myMovie->set<MaxCacheSizeTag>(std::min(int(myMovie->get<MaxCacheSizeTag>()), int(myMovie->get<FrameCountTag>())));
+            _myVideoStreamTimeBase = 1/ av_q2d(_myVStream->time_base);
         } else {
 	        double myDuration = 0.0;
             if(_myFormatContext->start_time == (int)AV_NOPTS_VALUE) {
@@ -964,11 +983,12 @@ namespace y60 {
                 myDuration = (_myFormatContext->duration - _myFormatContext->start_time )*_myFrameRate/(double)AV_TIME_BASE;
             }
             myMovie->set<FrameCountTag>(int(myDuration));
-	        _myTimeUnitsPerSecond = 1/ av_q2d(_myVStream->time_base);
+            myMovie->set<MaxCacheSizeTag>(std::min(int(myMovie->get<MaxCacheSizeTag>()), int(myMovie->get<FrameCountTag>())));
+	        _myVideoStreamTimeBase = 1/ av_q2d(_myVStream->time_base);
 	    }
         AC_INFO << "FFMpegDecoder2::setupVideo() " << theFilename << " fps="
                 << _myFrameRate << " framecount=" << getFrameCount()<< " time_base: "
-                <<_myTimeUnitsPerSecond;
+                <<_myVideoStreamTimeBase;
         AC_INFO << "r_framerate den: " <<_myVStream->r_frame_rate.den<< " r_framerate num: "<< _myVStream->r_frame_rate.num;
         AC_INFO << "stream time_base: " << _myVStream->time_base.den << ","<<_myVStream->time_base.num;
         AC_INFO << "codec time_base: " << _myVStream->codec->time_base.den << ","<<_myVStream->codec->time_base.num;
@@ -976,8 +996,6 @@ namespace y60 {
 
         // allocate frame for YUV data
         _myFrame = avcodec_alloc_frame();
-        _myStartTimestamp = -1;
-
     }
     void
     FFMpegDecoder2::setupAudio(const std::string & theFilename) {
@@ -1038,14 +1056,14 @@ namespace y60 {
         _myMsgQueue.push_back(myVideoFrame);
 
         AC_DEBUG << "---- Added Frame to cache, Frame # : "
-            << double(theTime - _myStartTimestamp/_myTimeUnitsPerSecond)*_myFrameRate
+            << double(theTime - _myVideoStartTimestamp/_myVideoStreamTimeBase)*_myFrameRate
             << " cache size=" << _myMsgQueue.size();
     }
 
     bool FFMpegDecoder2::shouldSeek(double theCurrentTime, double theDestTime) {
         double myDistance = (theDestTime-theCurrentTime)*_myFrameRate;
         AC_DEBUG<<"FFMpegDecoder2::shouldSeek: "<<"Dest=" << theDestTime << ", Curr=" << theCurrentTime<<" --> distance: "<<myDistance;
-        return (myDistance > _myMaxCacheSize || myDistance < 0);
+        return (myDistance > getMovie()->get<MaxCacheSizeTag>() || myDistance < 0);
     }
 
     void FFMpegDecoder2::seek(double theDestTime) {
@@ -1103,7 +1121,7 @@ namespace y60 {
         // AVSEEK_FLAG_BACKWARD: seek backwards -> ffmpeg seek better when this flag is enabled, even when seeking forward
 
         unsigned char mySeekFlags = AVSEEK_FLAG_BACKWARD;// | AVSEEK_FLAG_ANY;
-        int64_t mySeekTimeInTimeBaseUnits = int64_t(theDestTime*_myTimeUnitsPerSecond);
+        int64_t mySeekTimeInTimeBaseUnits = int64_t(theDestTime*_myVideoStreamTimeBase);
         /*int myResult =*/ av_seek_frame(_myFormatContext, _myVStreamIndex,
                                 mySeekTimeInTimeBaseUnits, mySeekFlags);
         if (theSeekAudioFlag && hasAudio() && getDecodeAudioFlag()) {

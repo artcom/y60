@@ -2,6 +2,7 @@
 //
 // Copyright (C) 1993-2008, ART+COM AG Berlin, Germany <www.artcom.de>
 //
+//
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms

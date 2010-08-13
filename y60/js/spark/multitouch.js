@@ -81,9 +81,161 @@ spark.enableProximatrix = function (theStage) {
  * TUIO events. A toplevel Window instance will
  * then dispatch these as cursor events.
  */
-spark.enableTuio = function () {
-    plug("TUIOClient");
+
+spark.enableTuio = function(theStage) {
+    var myPlugIn = plug("TUIOClient");
+    theStage.registerSettingsListener( myPlugIn, "TUIO" );
     TUIOClient.listenToUDP();
+};
+
+/**
+ * Multitouch cursors
+ * 
+ * This class represents the retained state of
+ * a single multitouch cursor.
+ */
+spark.Cursor = spark.Class("Cursor");
+
+spark.Cursor.Constructor = function(Protected, theId) {
+    var Public = this;
+
+    var _myId = theId;
+
+    /**
+     * ID of this cursor.
+     * 
+     * Any creator of cursors shall ensure uniqueness
+     * (within application runtime) of these.
+     */
+    Public.id getter = function() {
+        return _myId;
+    };
+
+    var _myActive = false;
+
+    /**
+     * Whether this cursor still exists.
+     * 
+     * This will be true for as long as the sensoric
+     * keeps track of this cursor. Can be used to
+     * identify "dead" cursors when dealing with
+     * cursor collections.
+     */
+    Public.active getter = function() {
+        return _myActive;
+    };
+
+
+    var _myGrabHolder = null;
+
+    /**
+     * Current grab holder of this cursor.
+     */
+    Public.grabHolder getter = function() {
+        return _myGrabHolder;
+    };
+
+    /**
+     * True when this cursor is under grab.
+     */
+    Public.grabbed getter = function() {
+        return (_myGrabHolder != null);
+    };
+
+
+    var _myHovered = null;
+
+    /**
+     * Returns widget currently being hovered.
+     * 
+     * This is always updated, even when under grab.
+     */
+    Public.hovered getter = function() {
+        return _myHovered;
+    };
+
+    /**
+     * Returns widget currently being focused.
+     * 
+     * Depending on grab state, this is either
+     * the grab holder or the currently hovered widget.
+     */
+    Public.focused getter = function() {
+        if(_myGrabHolder) {
+            return _myGrabHolder;
+        } else {
+            return _myHovered;
+        }
+    };
+    
+    var _myLastStagePosition = new Point2f();
+    /**
+     * Last stage position as cloned Point2f.
+     */
+    Public.lastStagePosition getter = function() {
+        return _myLastStagePosition.clone();
+    };
+
+    var _myStagePosition = new Point2f();
+
+    /**
+     * Current position as cloned Point2f.
+     */
+    Public.stagePosition getter = function() {
+        return _myStagePosition.clone();
+    };
+
+    /**
+     * Current horizontal position.
+     */
+    Public.stageX getter = function() {
+        return _myStagePosition.x;
+    };
+
+    /**
+     * Current vertical position.
+     */
+    Public.stageY getter = function() {
+        return _myStagePosition.y;
+    };
+
+    /**
+     * Internal: update position and focus of cursor.
+     */
+    Public.update = function(theHovered, theStagePosition) {
+        _myHovered = theHovered;
+        _myLastStagePosition = Public.stagePosition;
+        _myStagePosition = theStagePosition.clone();
+    };
+
+    /**
+     * Internal: called when cursor is created.
+     */
+    Public.activate = function() {
+        _myActive = true;
+    };
+
+    /**
+     * Internal: called when cursor vanishes.
+     */
+    Public.deactivate = function() {
+        _myActive = false;
+    };
+
+    /**
+     * Grab this cursor, sending all its future events to HOLDER.
+     */
+    Public.grab = function(theHolder) {
+        _myGrabHolder = theHolder;
+    };
+
+    /**
+     * Cancel a grab, returning the cursor to normal event flow.
+     */
+    Public.ungrab = function() {
+        _myGrabHolder = null;
+    };
+
 };
 
 /**
@@ -199,4 +351,153 @@ spark.GenericCursorEvent.getMappedEvents = function(theEventType) {
     } else {
         return null;
     }
+};
+
+
+/**
+ * Multitouch gestures
+ * 
+ * This class represents 
+ * multitouch gesture events
+ */
+
+const ASS_BASE_EVENT  = 0;
+const TUIO_BASE_EVENT = 1;
+
+spark.GestureEvent = spark.Class("GestureEvent");
+spark.GestureEvent.Constructor = function(Protected, theType, theBaseEvent, theCursor) {
+    this.Inherit(spark.CursorEvent, theType, theCursor);
+};
+
+/**
+ * wipe event: "the distance between the last two move cursors
+ * is bigger than the given threshold"
+ */
+spark.GestureEvent.WIPE  = "gesture-wipe";
+spark.WipeGestureEvent = spark.Class("WipeGestureEvent");
+spark.WipeGestureEvent.Constructor = function(Protected, theType, theBaseEvent, theCursor, theDirection, theMagnitude) {
+    var Public = this;
+
+    this.Inherit(spark.GestureEvent, theType, theBaseEvent, theCursor);
+    
+    /**
+     * Direction vector of the wipe event
+     */
+    var _myDirection = theDirection;
+
+    Public.direction getter = function() {
+        return _myDirection;
+    };
+    
+    /**
+     * Magnitude of the direction vector
+     */
+    var _myMagnitude = theMagnitude;
+
+    Public.magnitude getter = function () {
+        return _myMagnitude;
+    };
+
+};
+
+/**
+ * events with two cursors
+ */
+spark.GestureEvent.CURSOR_PAIR_START  = "gesture-cursor-pair-start";
+spark.GestureEvent.CURSOR_PAIR_FINISH = "gesture-cursor-pair-finish";
+
+spark.MultiCursorGestureEvent = spark.Class("MultiCursorGestureEvent");
+spark.MultiCursorGestureEvent.Constructor = function(Protected, theType, theBaseEvent, theMainCursor, thePartnerCursor, theCenterpoint, theDistance) {
+    var Public = this;
+
+    this.Inherit(spark.GestureEvent, theType, theBaseEvent, theMainCursor);
+    
+    
+    /**
+     * get partner cursor
+     */
+    var _myPartnerCursor = thePartnerCursor;
+
+    Public.partnerCursor getter = function () {
+        return _myPartnerCursor;
+    };
+    
+    /**
+     * centerpoint between the two cursors
+     */
+    var _myCenterPoint = theCenterpoint;
+
+    Public.centerPoint getter = function () {
+        return _myCenterPoint;
+    };
+
+    /**
+     * current distance between zoom partners
+     */
+    var _myDistance = theDistance;
+
+    Public.distance getter = function() {
+        return _myDistance;
+    };
+};
+
+
+
+/**
+ * zoom event: "two cursors which change their distance"
+ */
+spark.GestureEvent.ZOOM  = "gesture-zoom";
+
+spark.ZoomGestureEvent = spark.Class("ZoomGestureEvent");
+spark.ZoomGestureEvent.Constructor = function(Protected, theType, theBaseEvent, theMainCursor, thePartnerCursor, theCenterpoint, theDistance, theLastDistance, theInitialDistance, theZoomFactor) {
+    var Public = this;
+
+    this.Inherit(spark.MultiCursorGestureEvent, theType, theBaseEvent, theMainCursor, thePartnerCursor, theCenterpoint, theDistance);
+    
+    /**
+     * current distance between zoom partners
+     */
+    var _myLastDistance = theLastDistance;
+
+    Public.lastDistance getter = function() {
+        return _myLastDistance;
+    };
+    
+    /**
+     * initial distance between zoom partners
+     */
+    var _myInitialDistance = theInitialDistance;
+
+    Public.initialDistance getter = function() {
+        return _myInitialDistance;
+    };
+    
+    /**
+     * current zoom factor
+     */
+    var _myZoomFactor = theZoomFactor;
+
+    Public.zoomFactor getter = function() {
+        return _myZoomFactor;
+    };
+};
+
+/**
+ * rotate event: "two cursor with changing angle"
+ */
+spark.GestureEvent.ROTATE  = "gesture-rotate";
+spark.RotateGestureEvent = spark.Class("RotateGestureEvent");
+spark.RotateGestureEvent.Constructor = function(Protected, theType, theBaseEvent, theMainCursor, thePartnerCursor, theCenterpoint, theDistance, theAngle) {
+    var Public = this;
+
+    this.Inherit(spark.MultiCursorGestureEvent, theType, theBaseEvent, theMainCursor, thePartnerCursor, theCenterpoint, theDistance);
+    
+    /**
+     * angle 
+     */
+    var _myAngle = theAngle;
+
+    Public.angle getter = function () {
+        return _myAngle;
+    };
 };

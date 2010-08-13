@@ -1,0 +1,8 @@
+<settings>
+    <TUIO>
+        <!-- filter move (update) events -->
+        <FilterMultipleMovePerCursor min="0" step="1" max="1">1</FilterMultipleMovePerCursor>
+        <!-- smooth cursor position with an average calculation 1==no smoothing -->
+        <MaxCursorPositionsForAverage min="1" step="1">1</MaxCursorPositionsForAverage>
+    </TUIO>
+</settings>

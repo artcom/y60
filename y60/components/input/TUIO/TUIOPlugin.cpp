@@ -10,11 +10,14 @@
 #include <y60/base/DataTypes.h>
 #include <y60/input/IEventSource.h>
 #include <y60/input/GenericEvent.h>
+#include <y60/input/GenericEventSourceFilter.h>
 #include <y60/jsbase/IScriptablePlugin.h>
 #include <y60/jsbase/JSWrapper.h>
 #include <y60/jsbase/JSNode.h>
 
 #include "tuioeventxsd.h"
+
+#define DB(x) //x
 
 namespace y60 {
 
@@ -25,22 +28,32 @@ using namespace TUIO;
 class TUIOPlugin : public PlugInBase,
                    public y60::IEventSource,
                    public jslib::IScriptablePlugin,
-                   public TuioListener
+                   public TuioListener,
+                   public GenericEventSourceFilter
 {
 
 private:
     typedef std::pair<const char*, TuioCursor*> CursorEvent;
     typedef std::vector<CursorEvent> CursorEventList;
 
+
 public:
 
     TUIOPlugin(DLHandle myDLHandle)
         : PlugInBase(myDLHandle),
+          GenericEventSourceFilter(),
           _myEventSchemaDocument(new Document(y60::ourtuioeventxsd)),
           _myEventValueFactory(new ValueFactory())
     {
         registerStandardTypes(*_myEventValueFactory);
         registerSomTypes(*_myEventValueFactory);
+
+        // add filter for deleting multiple update
+        if (_myFilterMultipleMovePerCursorFlag) {
+            addCursorFilter("update", "id");
+        }
+        // no default cursor smoothing 
+        _myMaxCursorPositionsForAverage = 1;
     }
 
     ~TUIOPlugin()
@@ -54,8 +67,35 @@ public:
 
     JSFunctionSpec *StaticFunctions();
     JSPropertySpec *StaticProperties();
+    
+    virtual void onUpdateSettings(dom::NodePtr theSettings) {
+        dom::NodePtr mySettings = getTUIOSettings(theSettings);
+        int myFilterFlag = 0;
+        myFilterFlag = getSetting( mySettings, "FilterMultipleMovePerCursor", myFilterFlag);
+        _myFilterMultipleMovePerCursorFlag = (myFilterFlag == 1 ? true : false);
+        _myMaxCursorPositionsForAverage = getSetting( mySettings, "MaxCursorPositionsForAverage", _myMaxCursorPositionsForAverage);
+    }
 
+    dom::NodePtr
+    getTUIOSettings(dom::NodePtr theSettings) {
+        dom::NodePtr mySettings;
+        if ( theSettings->nodeType() == dom::Node::DOCUMENT_NODE) {
+            if (theSettings->childNode(0)->nodeName() == "settings") {
+                mySettings = theSettings->childNode(0)->childNode("TUIO", 0);
+            }
+        } else if ( theSettings->nodeName() == "settings") {
+            mySettings = theSettings->childNode("TUIO", 0);
+        } else if ( theSettings->nodeName() == "TUIO" ) {
+            mySettings = theSettings;
+        }
 
+        if ( ! mySettings ) {
+            throw Exception(
+                std::string("Could not find TUIO node in settings: ") +
+                as_string( * theSettings), PLUS_FILE_LINE );
+        }
+        return mySettings;
+    }
 
 // IEventSource
 
@@ -76,12 +116,22 @@ public:
             }
 
             _myUndeliveredCursors.clear();
-
+            
+            DB(AC_INFO << "unfiltered tuio events # " << myEvents.size());
+            // logs event statistics for multiple events per cursor and type
+            DB(analyzeEvents(myEvents, "id"));
+            // do the event filter in base class GenericEventSourceFilter
+            applyFilter(myEvents);
+            DB(AC_INFO << "deliver tuio events # " << myEvents.size());
+            DB(analyzeEvents(myEvents, "id"));
+            
+            clearCursorHistoryOnRemove(myEvents);
             return myEvents;
         } else {
             return EventPtrList();
         }
     }
+    
 
 // TuioListener
 
@@ -152,7 +202,9 @@ protected:
         TuioTime myValueTime = myCursor->getTuioTime();
         myNode->appendAttribute<double>("value_time", myValueTime.getSeconds() + (myValueTime.getMicroseconds() / 1000000.0));
 
-        myNode->appendAttribute<Vector2f>("position", Vector2f(myCursor->getX(), myCursor->getY()));
+        Vector2f myPosition = Vector2f(myCursor->getX(), myCursor->getY());
+        myPosition = calculateAveragePosition(myCursor->getSessionID(), myPosition);
+        myNode->appendAttribute<Vector2f>("position", myPosition);
         myNode->appendAttribute<Vector2f>("velocity", Vector2f(myCursor->getXSpeed(), myCursor->getYSpeed()));
 
         myNode->appendAttribute<double>("speed", myCursor->getMotionSpeed());
@@ -170,7 +222,6 @@ private:
     CursorEventList _myUndeliveredCursors;
 
     std::vector<TuioClient*> _myClients;
-
 };
 
 

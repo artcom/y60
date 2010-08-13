@@ -1671,12 +1671,10 @@ JS_PUBLIC_API(void)
 JS_MaybeGC(JSContext *cx)
 {
     JSRuntime *rt;
-    // XXX this is something serious! 'bytes' is used uninitialized in the
-    // else-if branch below. Unfortunately i don't know what the code is trying
-    // to do... [DS]
     uint32 bytes;
 
     rt = cx->runtime;
+    bytes = rt->gcBytes;
     if (rt->gcMallocBytes > rt->gcMaxBytes) {
         JS_GC(cx);
     } else if (bytes > 8192) {
@@ -1685,7 +1683,7 @@ JS_MaybeGC(JSContext *cx)
          * the last time we GC'd, or if we have malloc'd more bytes through
          * JS_malloc than we were told to allocate by JS_NewRuntime.
          */
-        if (rt->gcBytes > rt->gcLastBytes + rt->gcLastBytes / 2) {
+        if (bytes > rt->gcLastBytes + rt->gcLastBytes / 2) {
             JS_GC(cx);
         } else {
             JS_AdaptiveGC(cx);

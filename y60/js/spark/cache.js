@@ -105,18 +105,20 @@ spark.ourMovieCounter = 0;
 
 spark.openMovie = function (thePath, theTargetPixelFormat, theDecoderHint) {
     var myMovie = Node.createElement("movie");
-
     window.scene.images.appendChild(myMovie);
 
     myMovie.src = thePath;
     myMovie.name = "spark-movie-" + spark.ourMovieCounter++;
     myMovie.resize = "none";
+    myMovie.maxcachesize = "8";
     myMovie.loopcount = "1";
-    myMovie.playmode = "stop";
     myMovie.targetpixelformat = theTargetPixelFormat || "RGB";
     myMovie.decoderhint = theDecoderHint || "FFMpegDecoder2";
 
+    //always load first frame
+    myMovie.playmode = "pause";
     window.scene.loadMovieFrame(myMovie);
+    myMovie.playmode = "stop";
 
     return myMovie;
 };

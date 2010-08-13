@@ -64,24 +64,6 @@
 #include <asl/base/Block.h>
 #include <asl/base/MappedBlock.h>
 
-#ifdef OSX
-    extern "C" {
-#       include <libavformat/avformat.h>
-    }
-#   undef AV_NOPTS_VALUE
-#   define AV_NOPTS_VALUE 0x8000000000000000LL
-#else
-#   if defined(_MSC_VER)
-#       pragma warning(push,1)
-#   endif
-    extern "C" {
-#   include <avformat.h>
-    }
-#   if defined(_MSC_VER)
-#       pragma warning(pop)
-#   endif
-#endif
-
 using namespace asl;
 using namespace std;
 
@@ -179,7 +161,11 @@ void registerStream(string theUrl, asl::Ptr<ReadableStream> theSource) {
 
     static bool avRegistered = false;
     if (!avRegistered) {
+#if LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(52,29,0)
+        av_register_protocol(&acstream_protocol);
+#else
         register_protocol(&acstream_protocol);
+#endif
         avRegistered = true;
     }
 

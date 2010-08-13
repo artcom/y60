@@ -126,7 +126,7 @@ namespace inet {
 
         sscanf(dotaddr,"%d.%d.%d.%d",&i1,&i2,&i3,&i4);
         // byte order of host addresses is __BIG_ENDIAN
-        hostaddr=(i1&0xff)<<24 | (i2&0xff)<<16 | (i3&0xff)<<8 | i4&0xff;
+        hostaddr=((i1&0xff)<<24) | ((i2&0xff)<<16) | ((i3&0xff)<<8) | (i4&0xff);
 
         AC_DEBUG << "addrFromStr(): address "
             << (i1 & 0xff) << '.' << (i2 & 0xff) << '.'
