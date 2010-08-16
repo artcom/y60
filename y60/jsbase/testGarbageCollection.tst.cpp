@@ -153,7 +153,7 @@ static JSFunctionSpec global_functions[] = {
     {0}
 };
 
-char * filenames[] = {
+const char * filenames[] = {
     TEST_DATA_DIR "/emptyScript.js",
     TEST_DATA_DIR "/testJSObjects.js",
     TEST_DATA_DIR "/testManyObjects.js",
@@ -172,7 +172,7 @@ public:
 
     void generateBaseline() {
         FILE *outfile = fopen( TEST_DATA_DIR "/BASELINE", "w+");
-        for (char **fileName = filenames; *fileName; fileName++) {
+        for (const char **fileName = filenames; *fileName; fileName++) {
             init();
             runTestScript(*fileName);
             cleanup(false);

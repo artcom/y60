@@ -252,7 +252,7 @@ JSApp::ShellErrorReporter(JSContext *cx, const char * message, JSErrorReport * r
 
     /* Conditionally ignore reported warnings. */
     asl::Severity mySeverity = SEV_ERROR;
-    char * myStrictMsg = "";
+    std::string myStrictMsg("");
     if (JSREPORT_IS_WARNING(report->flags)) {
         mySeverity = SEV_WARNING;
         if (JSREPORT_IS_STRICT(report->flags)) {

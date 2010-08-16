@@ -91,7 +91,6 @@ PowermateInputExtension::~PowermateInputExtension() {
 
 void PowermateInputExtension::init() {
 
-    int powermate = -1;
     _myFileDescriptorList.clear();
 
     findPowermates();
@@ -118,7 +117,7 @@ PowermateInputExtension::poll() {
         r = read(_myFileDescriptorList[i], ibuffer, sizeof(struct input_event) * BUFFER_SIZE);
         if( r > 0 ){
             events = r / sizeof(struct input_event);
-            for(unsigned myEventIndex=0; myEventIndex<events; myEventIndex++) {
+            for(int myEventIndex = 0; myEventIndex < events; ++myEventIndex) {
                 processEvent(&ibuffer[myEventIndex], i, curEvents);
             }
         }

@@ -634,8 +634,23 @@ namespace asl {
         return std::string(_getcwd( NULL, 0 ));
 #else
         char myBuffer[1024];
-        getcwd( myBuffer, 1024);
-        return std::string(myBuffer);
+        if (getcwd( myBuffer, 1024) == myBuffer) {
+            return std::string(myBuffer);
+        } else {
+            throw asl::Exception(std::string("getcwd() failed with error: ") + strerror(errno), PLUS_FILE_LINE);
+            return "";
+        }
+#endif
+    }
+
+    void
+    changeDirectory(const std::string & theDirectory) {
+#ifdef _WIN32
+        _chdir( theDirectory.c_str());
+#else
+        if (chdir( theDirectory.c_str() ) < 0) {
+            throw asl::Exception(std::string("chdir() failed with error: ") + strerror(errno), PLUS_FILE_LINE);
+        }
 #endif
     }
 

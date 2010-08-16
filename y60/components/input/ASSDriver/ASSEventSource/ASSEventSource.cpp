@@ -64,6 +64,7 @@ using namespace y60;
 
 #include <y60/jsbase/IScriptablePlugin.h>
 #include <y60/jsbase/JSWrapper.h>
+#include <y60/base/SettingsParser.h>
 
 
 namespace y60 {
@@ -71,12 +72,18 @@ namespace y60 {
 ASSEventSource::ASSEventSource(DLHandle theHandle) :
     asl::PlugInBase( theHandle ),
     ASSDriver( /*theHandle */),
+    GenericEventSourceFilter(),
     _myEventSchema( new dom::Document( y60::ourasseventxsd ) ),
     _myValueFactory( new dom::ValueFactory() )
 
 {
     registerStandardTypes( * _myValueFactory );
     registerSomTypes( * _myValueFactory );
+
+    // add filter for deleting multiple update
+    if (_myFilterMultipleMovePerCursorFlag) {
+        addCursorFilter("move", "id");
+    }
 }
 
 
@@ -86,6 +93,10 @@ ASSEventSource::poll() {
 
     processInput();
 
+    // do the event filter in base class GenericEventSourceFilter
+	//analyzeEvents(_myEvents, "id");
+    applyFilter(_myEvents);
+    clearCursorHistoryOnRemove(_myEvents);
     return _myEvents;
 }
 
@@ -99,10 +110,11 @@ ASSEventSource::createEvent( int theID, const std::string & theType,
             _myValueFactory));
     dom::NodePtr myNode = myEvent->getNode();
 
+    asl::Vector3f myPosition = calculateAveragePosition(theID, thePosition3D);
     myNode->appendAttribute<int>("id", theID);
     myNode->appendAttribute<std::string>("type", theType);
     myNode->appendAttribute<Vector2f>("raw_position", theRawPosition);
-    myNode->appendAttribute<Vector3f>("position3D", thePosition3D);
+    myNode->appendAttribute<Vector3f>("position3D", myPosition);
     myNode->appendAttribute<Box2f>("roi", theROI);
     myNode->appendAttribute<float>("intensity", theIntensity);
     myNode->appendAttribute<float>("frameno", static_cast<float>(theEvent.frameno));
@@ -122,6 +134,20 @@ ASSEventSource::createTransportLayerEvent( const std::string & theType)
         myNode->appendAttribute<Vector2i>("grid_size", _myGridSize);
     }
     _myEvents.push_back( myEvent );
+}
+
+void
+ASSEventSource::onUpdateSettings(dom::NodePtr theSettings) {
+    ASSDriver::onUpdateSettings(theSettings);
+    AC_DEBUG << "updating ASSEventSource settings";
+
+    dom::NodePtr mySettings = getASSSettings( theSettings );
+    getConfigSetting( mySettings, "MaxCursorPositionsForAverage", _myMaxCursorPositionsForAverage, static_cast<unsigned int> (10) );
+    
+    int myFilterFlag = 0;
+    getConfigSetting( mySettings, "FilterMultipleMovePerCursor", myFilterFlag, 1);
+    _myFilterMultipleMovePerCursorFlag = (myFilterFlag == 1 ? true : false);
+        
 }
 
 void

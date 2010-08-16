@@ -248,11 +248,8 @@ namespace y60 {
 
             cgDestroyProgram(_myCgProgramID);
             std::string myCWD = getCWD();
-#ifdef _WIN32
-             _chdir( _myCWD.c_str());
-#else
-             chdir( _myCWD.c_str());
-#endif
+            asl::changeDirectory(_myCWD.c_str());
+
             std::vector<string> myArgStrings;
             std::vector<const char *> myArgs = _myCachedCompilerArgs;
             appendUnsizedArrayBugWorkaroundCompilerArgs(myArgStrings, myArgs);
@@ -264,11 +261,8 @@ namespace y60 {
                                              getCgProfile(), _myShader._myEntryFunction.c_str(),
                                              asl::begin_ptr(myArgs));
             AC_TRACE << "cgCreateProgram created program id = "<<_myCgProgramID;
-#ifdef _WIN32
-            _chdir( myCWD.c_str());
-#else
-            chdir( myCWD.c_str());
-#endif
+
+            asl::changeDirectory(myCWD.c_str());
             assertCg(PLUS_FILE_LINE, _myContext);
         }
 

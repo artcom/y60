@@ -87,6 +87,7 @@ class Y60_INPUT_DECL GenericEvent : public Event {
 };
 
 typedef asl::Ptr<GenericEvent> GenericEventPtr;
+typedef std::vector<GenericEventPtr> GenericEventPtrList;
 
 }
 #endif // _Y60_INPUT_GENERIC_EVENT_INCLUDED_

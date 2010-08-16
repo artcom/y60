@@ -195,7 +195,6 @@ spark.I18nItem.Constructor = function (Protected) {
         }
 
         _myLanguage = theLanguage;
-
         var myEvent = Protected.createEvent(theLanguage);
         Public.dispatchEvent(myEvent);
 
