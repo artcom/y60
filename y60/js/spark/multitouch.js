@@ -67,6 +67,7 @@
  * due to the baroque API of ASSManager.
  */
 spark.enableProximatrix = function(theStage) {
+    dumpstack();
     use("ASSManager.js");
     spark.proximatrix = new ASSManager(theStage);
 };
@@ -80,8 +81,13 @@ spark.enableProximatrix = function(theStage) {
  */
 spark.enableTuio = function(theStage) {
     var myPlugIn = plug("TUIOClient");
-    theStage.registerSettingsListener( myPlugIn, "TUIO" );
     TUIOClient.listenToUDP();
+    if (!theStage) {
+        Logger.warning("for the settings listener the Stage as argument is mandatory");
+    } else {
+        theStage.registerSettingsListener( myPlugIn, "TUIO" );
+    }
+    
 };
 
 /**
