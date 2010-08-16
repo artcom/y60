@@ -84,8 +84,6 @@ spark.findRootElement = function (theDocument) {
     return myRoot;
 };
 
-// javascript extensions (disabled)
-//use("jsextensions.js");
 // component instantiator
 use("meta.js");
 // spark file (and dom) loader
@@ -140,5 +138,4 @@ if (!("disableSparkWidgets" in this)) {
     use("spark/add-ons/StretchyImage.js");
     use("spark/add-ons/VideoCapture.js");
     use("spark/add-ons/Slider.js");
-
 }
