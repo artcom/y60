@@ -178,7 +178,7 @@ WalkMover.prototype.Constructor = function (self, theViewport) {
             _myProjectedFrontVector = normalized(projection(_myFrontVector, _myGroundPlane));
             _myProjectedRightVector = normalized(projection(_myRightVector, _myGroundPlane));
         }
-        _myUpVector    = product(MODEL_UP_DIRECTION, myOrientationMatrix);
+        _myUpVector = product(MODEL_UP_DIRECTION, myOrientationMatrix);
         
         var myPostAccelVelocity = new Vector3f(_myVelocity);
         simulateForces(theDeltaTime, myPostAccelVelocity);

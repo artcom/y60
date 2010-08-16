@@ -81,7 +81,6 @@ spark.getCachedImage = function (thePath) {
 
         spark.registerNode(myName, myImage);
     }
-
     return myImage;
 };
 
@@ -97,7 +96,6 @@ spark.getCachedTexture = function (thePath) {
 
         spark.registerNode(myName, myTexture);
     }
-
     return myTexture;
 };
 
@@ -119,6 +117,5 @@ spark.openMovie = function (thePath, theTargetPixelFormat, theDecoderHint) {
     myMovie.playmode = "pause";
     window.scene.loadMovieFrame(myMovie);
     myMovie.playmode = "stop";
-
     return myMovie;
 };

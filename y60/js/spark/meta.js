@@ -202,4 +202,3 @@ spark.LoadedClass = function (theClassName, theFile) {
     // return the thing so it can be put in the namespace
     return myInitializingConstructor;
 };
-
