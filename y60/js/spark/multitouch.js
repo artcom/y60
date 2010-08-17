@@ -315,44 +315,6 @@ spark.CursorEvent.Constructor = function (Protected, theType, theCursor) {
     };
 };
 
-/**
- * Generic cursor events
- * 
- * Each of these are mapped onto specific mousecursor and touchcursor events.
- * 
- */
-spark.GenericCursorEvent = spark.Class("GenericCursorEvent");
-
-spark.GenericCursorEvent.APPEAR = "generic-cursor-appear";
-spark.GenericCursorEvent.ENTER  = "generic-cursor-enter";
-spark.GenericCursorEvent.LEAVE  = "generic-cursor-leave";
-spark.GenericCursorEvent.VANISH = "generic-cursor-vanish";
-spark.GenericCursorEvent.MOVE   = "generic-cursor-move";
-spark.GenericCursorEvent.APPEAR_TOUCHENTER = "generic-cursor-appear-touchenter";
-spark.GenericCursorEvent.VANISH_TOUCHLEAVE = "generic-cursor-vanish-touchleave";
-
-spark.GenericCursorEvent.eventMapping = {};
-spark.GenericCursorEvent.eventMapping[spark.GenericCursorEvent.APPEAR]  = [spark.MouseCursorEvent.APPEAR, spark.CursorEvent.APPEAR];
-spark.GenericCursorEvent.eventMapping[spark.GenericCursorEvent.ENTER]   = [spark.MouseCursorEvent.ENTER,  spark.CursorEvent.ENTER];
-spark.GenericCursorEvent.eventMapping[spark.GenericCursorEvent.LEAVE]   = [spark.MouseCursorEvent.LEAVE,  spark.CursorEvent.LEAVE];
-spark.GenericCursorEvent.eventMapping[spark.GenericCursorEvent.VANISH]  = [spark.MouseCursorEvent.VANISH, spark.CursorEvent.VANISH];
-spark.GenericCursorEvent.eventMapping[spark.GenericCursorEvent.MOVE]    = [spark.MouseCursorEvent.MOVE,   spark.CursorEvent.MOVE];
-spark.GenericCursorEvent.eventMapping[spark.GenericCursorEvent.APPEAR_TOUCHENTER] = [spark.MouseCursorEvent.APPEAR,
-                                                                                     spark.CursorEvent.APPEAR,
-                                                                                     spark.CursorEvent.ENTER];
-spark.GenericCursorEvent.eventMapping[spark.GenericCursorEvent.VANISH_TOUCHLEAVE] = [spark.MouseCursorEvent.VANISH,
-                                                                                     spark.CursorEvent.VANISH,
-                                                                                     spark.CursorEvent.LEAVE];
-
-
-spark.GenericCursorEvent.getMappedEvents = function(theEventType) {
-    if (theEventType in spark.GenericCursorEvent.eventMapping) {
-        return spark.GenericCursorEvent.eventMapping[theEventType];
-    } else {
-        return null;
-    }
-};
-
 
 /**
  * Multitouch gestures
@@ -501,3 +463,47 @@ spark.RotateGestureEvent.Constructor = function(Protected, theType, theBaseEvent
         return _myAngle;
     };
 };
+
+
+
+
+/**
+ * Generic cursor events
+ * 
+ * Each of these are mapped onto specific mousecursor and touchcursor events.
+ * 
+ */
+spark.GenericCursorEvent = spark.Class("GenericCursorEvent");
+
+spark.GenericCursorEvent.APPEAR = "generic-cursor-appear";
+spark.GenericCursorEvent.ENTER  = "generic-cursor-enter";
+spark.GenericCursorEvent.LEAVE  = "generic-cursor-leave";
+spark.GenericCursorEvent.VANISH = "generic-cursor-vanish";
+spark.GenericCursorEvent.MOVE   = "generic-cursor-move";
+spark.GenericCursorEvent.APPEAR_TOUCHENTER = "generic-cursor-appear-touchenter";
+spark.GenericCursorEvent.VANISH_TOUCHLEAVE = "generic-cursor-vanish-touchleave";
+spark.GenericCursorEvent.APPEAR_WIPE       = "generic-cursor-appear-wipe";
+
+spark.GenericCursorEvent.eventMapping = {};
+spark.GenericCursorEvent.eventMapping[spark.GenericCursorEvent.APPEAR]  = [spark.MouseCursorEvent.APPEAR, spark.CursorEvent.APPEAR];
+spark.GenericCursorEvent.eventMapping[spark.GenericCursorEvent.ENTER]   = [spark.MouseCursorEvent.ENTER,  spark.CursorEvent.ENTER];
+spark.GenericCursorEvent.eventMapping[spark.GenericCursorEvent.LEAVE]   = [spark.MouseCursorEvent.LEAVE,  spark.CursorEvent.LEAVE];
+spark.GenericCursorEvent.eventMapping[spark.GenericCursorEvent.VANISH]  = [spark.MouseCursorEvent.VANISH, spark.CursorEvent.VANISH];
+spark.GenericCursorEvent.eventMapping[spark.GenericCursorEvent.MOVE]    = [spark.MouseCursorEvent.MOVE,   spark.CursorEvent.MOVE];
+spark.GenericCursorEvent.eventMapping[spark.GenericCursorEvent.APPEAR_TOUCHENTER] = [spark.MouseCursorEvent.APPEAR,
+                                                                                     spark.CursorEvent.APPEAR,
+                                                                                     spark.CursorEvent.ENTER];
+spark.GenericCursorEvent.eventMapping[spark.GenericCursorEvent.VANISH_TOUCHLEAVE] = [spark.MouseCursorEvent.VANISH,
+                                                                                     spark.CursorEvent.VANISH,
+                                                                                     spark.CursorEvent.LEAVE];
+spark.GenericCursorEvent.eventMapping[spark.GenericCursorEvent.APPEAR_WIPE]       = [spark.MouseCursorEvent.APPEAR,
+                                                                                     spark.GestureEvent.WIPE];
+
+
+spark.GenericCursorEvent.getMappedEvents = function(theEventType) {
+    if (theEventType in spark.GenericCursorEvent.eventMapping) {
+        return spark.GenericCursorEvent.eventMapping[theEventType];
+    }
+};
+
+
