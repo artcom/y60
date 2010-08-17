@@ -255,7 +255,7 @@ namespace y60 {
 
         // worker thread values to prevent dom access and thus race conditions.
         double _myFrameRate;
-        //unsigned _myMaxCacheSize;
+        unsigned _myMaxCacheSize;
         int _myFrameWidth;
         int _myFrameHeight;
         unsigned  _myBytesPerPixel;
