@@ -354,8 +354,14 @@ TTF_Font* TTF_OpenFontIndexRW( SDL_RWops *src, int freesrc, int ptsize, long ind
 	  // we keep a fallback if ascender or descender is '0'  (vs /2009)
       // removed fallback to bounding box because freetype already does
       // exactly what this code tried to do. (ia /20091218)
+      // old code start:
+      //font->ascent  = FT_CEIL(FT_MulFix(face->bbox.yMax, scale));
+	  //font->descent = FT_CEIL(FT_MulFix(face->bbox.yMin, scale));
+      // old code end
+
       font->ascent  = FT_CEIL(FT_MulFix(face->ascender, scale));
       font->descent = FT_CEIL(FT_MulFix(face->descender, scale));
+
 	  font->height  = font->ascent - font->descent + /* baseline */ 1;
 	  font->lineskip = FT_CEIL(FT_MulFix(face->height, scale));
 	  font->underline_offset = FT_FLOOR(FT_MulFix(face->underline_position, scale));
@@ -501,12 +507,14 @@ static FT_Error Load_Glyph( TTF_Font* font, Uint16 ch, c_glyph* cached, int want
 	if ( (want & CACHED_METRICS) && !(cached->stored & CACHED_METRICS) ) {
 		if ( FT_IS_SCALABLE( face ) ) {
 			/* Get the bounding box */
-			cached->minx = (int)floor(metrics->horiBearingX / 64.0);
-			cached->maxx = cached->minx + FT_CEIL(metrics->width);
-			cached->maxy = FT_FLOOR(metrics->horiBearingY);
-			cached->miny = cached->maxy - FT_CEIL(metrics->height);
-			/* cached->yoffset = font->ascent - cached->maxy; */
-			cached->yoffset = (int)floor(font->ascent - (metrics->horiBearingY / 64.0));
+            cached->minx = (int)floor(metrics->horiBearingX / 64.0);
+            cached->maxx = cached->minx + FT_CEIL(metrics->width);
+            cached->maxy = FT_FLOOR(metrics->horiBearingY);
+            cached->miny = cached->maxy - FT_CEIL(metrics->height);
+            // this seg faults application with certain fonts (i.e. Helvetica) 
+            // changed back to original code coming with SDL_ttf.c (vs), 20100816
+            //cached->yoffset = (int)floor(font->ascent - (metrics->horiBearingY / 64.0));
+			cached->yoffset = font->ascent - cached->maxy;
 		} else {
 			/* Get the bounding box for non-scalable format.
 			 * Again, freetype2 fills in many of the font metrics
