@@ -66,8 +66,16 @@ class Gesture : public asl::PlugInBase,
 
     protected:
         void createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent, int theID, const std::string & theType,
-                          const asl::Vector3f & thePosition3D);
+                          const asl::Vector3f & thePosition3D, unsigned long long & theTimestamp);
     private:
+        struct PositionInfo {
+            PositionInfo() {};
+            PositionInfo(const asl::Vector3f & thePosition, unsigned long long & theTimestamp):
+                _myPosition(thePosition), 
+                _myTimestamp(theTimestamp) {}
+            asl::Vector3f _myPosition;
+            unsigned long long _myTimestamp;
+        };
         dom::NodePtr addGestureEvent2Queue(GESTURE_BASE_EVENT_TYPE theBaseEvent, int theID, 
                                            const std::string & theType, 
                                            const asl::Vector3f & thePosition3D);
@@ -87,8 +95,8 @@ class Gesture : public asl::PlugInBase,
         y60::EventPtrList               _myEvents;
 
         CursorList                      _myCursorList;
-        std::map<int, asl::Vector3f>    _myCurrentCursorPositions;
-        std::map<int, asl::Vector3f>    _myLastCursorPositions;
+        std::map<int, PositionInfo>     _myCurrentCursorPositions;
+        std::map<int, PositionInfo>     _myLastCursorPositions;
         std::map<int, float>            _myInitialZoomDistance;
         CursorPartnerList               _myCursorPartner;
         float                           _myWipeDistanceThreshold;

@@ -78,6 +78,7 @@ void Gesture::handle(EventPtr theEvent) {
     GenericEventPtr myGenericEventPtr;
     dom::NodePtr myNode;
     std::string myType;
+    unsigned long long myTimestamp;
     switch(theEvent->type) {
         case Event::MOUSE_MOTION:
             //createEvent(1312, "add", Vector3f(1,2,3));
@@ -86,6 +87,7 @@ void Gesture::handle(EventPtr theEvent) {
             myGenericEventPtr = dynamic_cast_Ptr<GenericEvent>(theEvent);
             myNode = myGenericEventPtr->getNode();
             myType = myNode->getAttributeString("type");
+            myTimestamp = (asl::as<unsigned long long>(myNode->getAttribute("when")->nodeValue()));
             // cursor events from tuio or ass driver
             if (myType == "add" || myType == "remove" || myType == "move" || myType == "update") {
                 GESTURE_BASE_EVENT_TYPE myBaseEventType = ASSEVENT;
@@ -102,7 +104,7 @@ void Gesture::handle(EventPtr theEvent) {
                     myPosition[2] = 0.0;
                     myBaseEventType = TUIOEVENT;
                 }
-                createEvent(myBaseEventType, asl::as<int>(myNode->getAttribute("id")->nodeValue()),  myType, myPosition);
+                createEvent(myBaseEventType, asl::as<int>(myNode->getAttribute("id")->nodeValue()),  myType, myPosition, myTimestamp);
             }
             break;
         default:
@@ -158,7 +160,7 @@ Gesture::addGestureEvent2Queue(GESTURE_BASE_EVENT_TYPE theBaseEvent, int theID, 
 
 
 void
-Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent,  int theID, const std::string & theType, const Vector3f & thePosition3D)
+Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent,  int theID, const std::string & theType, const Vector3f & thePosition3D, unsigned long long & theTimestamp)
 {
     MAKE_SCOPE_TIMER(Gesture_createEvent);
         if(theType == "add") {
@@ -166,7 +168,7 @@ Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent,  int theID, const std
 
             // track cursor
             _myCursorList[ theID ] = true;
-            _myCurrentCursorPositions[ theID ] = thePosition3D;
+            _myCurrentCursorPositions[ theID ] = PositionInfo(thePosition3D, theTimestamp);
 
         } else if(theType == "move" || theType == "update") {
             if(_myCursorList.find(theID) == _myCursorList.end()) {
@@ -175,10 +177,17 @@ Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent,  int theID, const std
             AC_DEBUG << "Gesture::createEvent -> move";
 
             if(_myLastCursorPositions.find(theID) == _myLastCursorPositions.end()) {
-                _myLastCursorPositions[theID] = thePosition3D;
+                if(_myCurrentCursorPositions.find(theID) != _myCurrentCursorPositions.end()) {
+                    // take the positioninfo from the add event
+                    _myLastCursorPositions[theID] = _myCurrentCursorPositions[ theID ];
+                } else {
+                    // no event at all found
+                    _myLastCursorPositions[theID] = PositionInfo(thePosition3D, theTimestamp);
+                }
             }
-            Vector3f myLastPosition = _myLastCursorPositions[theID]; 
-            _myCurrentCursorPositions[ theID ] = thePosition3D;
+
+            Vector3f myLastPosition = _myLastCursorPositions[theID]._myPosition; 
+            _myCurrentCursorPositions[ theID ] = PositionInfo(thePosition3D, theTimestamp);
             bool myPartnerFoundFlag = false;
 
             // more than one cursor, check multicursor gesture (zoom / rotate)
@@ -192,7 +201,7 @@ Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent,  int theID, const std
                     CursorList::iterator myIt = _myCursorList.begin();
                     CursorList::iterator myEndIt   = _myCursorList.end();
                     for(; myIt !=  myEndIt; ++myIt) {
-                        float myDistance = distance(thePosition3D, _myCurrentCursorPositions[myIt->first]);
+                        float myDistance = distance(thePosition3D, _myCurrentCursorPositions[myIt->first]._myPosition);
                         // if the cursor found a partner
                         if(_myCursorPartner.find(myIt->first) == _myCursorPartner.end() && myIt->first != theID &&  myDistance < myCursorDistance) {
                             myCursorDistance = myDistance;
@@ -205,7 +214,7 @@ Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent,  int theID, const std
                         _myCursorPartner[theID] = myCursorPartnerId;
                         _myCursorPartner[myCursorPartnerId] = theID;
                         dom::NodePtr myNode = addGestureEvent2Queue(theBaseEvent, theID, "cursor_pair_start", thePosition3D);
-                        asl::Vector3f myCursorPartnerPosition = _myCurrentCursorPositions[myCursorPartnerId];
+                        asl::Vector3f myCursorPartnerPosition = _myCurrentCursorPositions[myCursorPartnerId]._myPosition;
                         asl::Vector3f myCenterPoint = getCenter(thePosition3D, myCursorPartnerPosition);
                         myNode->appendAttribute<Vector3f>("centerpoint", myCenterPoint);
                         // distance between the two partner cursors
@@ -218,14 +227,14 @@ Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent,  int theID, const std
                     AC_DEBUG << theID << " has cursor partner with id " << _myCursorPartner[theID];
                     
                     myPartnerFoundFlag = true;
-                    Vector3f myCursorPartnerPosition = _myCurrentCursorPositions[_myCursorPartner[theID]];
+                    Vector3f myCursorPartnerPosition = _myCurrentCursorPositions[_myCursorPartner[theID]]._myPosition;
                     CursorPartnerList::iterator myCursorPartnerIt = getCursorPartner(theID);
                 
                     asl::Vector3f myCenterPoint = getCenter(thePosition3D, myCursorPartnerPosition);
 
                     // register zoom event
                     float myDistance = distance(thePosition3D,myCursorPartnerPosition);
-                    float myLastDistance = distance(_myLastCursorPositions[myCursorPartnerIt->first], myLastPosition);
+                    float myLastDistance = distance(_myLastCursorPositions[myCursorPartnerIt->first]._myPosition, myLastPosition);
 
                     if (myDistance >= _myZoomDistanceThreshold) {
                         dom::NodePtr myNode = addGestureEvent2Queue(theBaseEvent, theID, "zoom", thePosition3D);
@@ -237,7 +246,7 @@ Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent,  int theID, const std
                     }
                 
                     // register rotate event
-                    Vector3f myVectorOld = normalized(difference(_myLastCursorPositions[theID],_myLastCursorPositions[myCursorPartnerIt->first]));
+                    Vector3f myVectorOld = normalized(difference(_myLastCursorPositions[theID]._myPosition,_myLastCursorPositions[myCursorPartnerIt->first]._myPosition));
                     Vector3f myVectorNew = normalized(difference(thePosition3D, myCursorPartnerPosition));
                     float myAngle = float(degFromRad(atan2( myVectorNew[1], myVectorNew[0] ) - atan2( myVectorOld[1], myVectorOld[0] ) ));
                     if (isNaN(myAngle)) {
@@ -255,6 +264,15 @@ Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent,  int theID, const std
                 Vector3f myDifference = difference(thePosition3D, myLastPosition);
                 float myMagnitude = magnitude(myDifference);
                 if( myMagnitude > _myWipeDistanceThreshold ) {
+                    
+                    unsigned long long myLastTimestamp = _myLastCursorPositions[theID]._myTimestamp; 
+                    unsigned long long myTimeDifference = theTimestamp - myLastTimestamp;
+
+                    if (myTimeDifference == 0) {
+                        myTimeDifference  = 1000;
+                    }
+                    myMagnitude /= myTimeDifference/1000.0f;
+
                     // register wipe event
                     NodePtr myNode = addGestureEvent2Queue(theBaseEvent, theID, "wipe", thePosition3D);
                     myNode->appendAttribute<Vector3f>("direction", normalized(myDifference));
