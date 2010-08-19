@@ -23,6 +23,8 @@ spark.StretchyImage.Constructor = function(Protected) {
     var _myEdgeBottom = 0;
     var _myEdgeLeft = 0;
     var _myEdgeRight = 0;
+    var _myLeftCapFlag = true;
+    var _myRightCapFlag = true;
     
     var _myQuadsPerSide = new Vector2f(3, 3);
     var _myVerticesPerSide = new Vector2f(_myQuadsPerSide.x + 1, _myQuadsPerSide.y + 1);
@@ -77,6 +79,8 @@ spark.StretchyImage.Constructor = function(Protected) {
     Public.realize = function() {
         Base.realize();
         _myImageSize = getImageSize(Public.image);
+        _myLeftCapFlag = Protected.getBoolean("leftcap", true);
+        _myRightCapFlag = Protected.getBoolean("rightcap", true);
         _myEdgeTop = Protected.getNumber("edgeTop",0);
         _myEdgeBottom = Protected.getNumber("edgeBottom",0);
         _myEdgeLeft = Protected.getNumber("edgeLeft",0);
@@ -93,8 +97,9 @@ spark.StretchyImage.Constructor = function(Protected) {
         _myEdgeBottom = (_myEdgeBottom > 0) ? _myEdgeBottom+1 : 0;
         _myEdgeLeft = (_myEdgeLeft > 0) ? _myEdgeLeft+1 : 0;
         _myEdgeRight = (_myEdgeRight > 0) ? _myEdgeRight+1 : 0;
-        //Public.texture.min_filter = "nearest";
-        //Public.texture.mag_filter = "nearest";
+ 
+        Public.texture.min_filter = "nearest";
+        Public.texture.mag_filter = "nearest";
         
 
         Base.imageSetter = Public.__lookupSetter__("image");
@@ -157,6 +162,9 @@ spark.StretchyImage.Constructor = function(Protected) {
         var v = 0;
         for (var i = 0; i < _myQuadsPerSide.y; ++i) {
             for (var j = 0; j < _myQuadsPerSide.x; ++j) {
+                if ((!_myRightCapFlag && j == _myQuadsPerSide.x-1) || (!_myLeftCapFlag && j == 0)) {
+                    continue;
+                }
                 v = i * _myVerticesPerSide.x + j;
                 var q = 4 * (i * _myQuadsPerSide.x + j);
                 myUVIdx[q  ] = myPIdx[q  ] = v;
