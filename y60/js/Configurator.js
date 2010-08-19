@@ -206,7 +206,7 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
             var mySection = _myMergedSettings.childNode(theSection);
             if (!mySection) {
                 Logger.warning("Section " + theSection + " does not exist.");
-		        return;
+                return;
             }
             theListener.onUpdateSettings(mySection);
         } else {

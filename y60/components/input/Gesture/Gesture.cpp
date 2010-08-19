@@ -174,6 +174,9 @@ Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent,  int theID, const std
             }
             AC_DEBUG << "Gesture::createEvent -> move";
 
+            if(_myLastCursorPositions.find(theID) == _myLastCursorPositions.end()) {
+                _myLastCursorPositions[theID] = thePosition3D;
+            }
             Vector3f myLastPosition = _myLastCursorPositions[theID]; 
             _myCurrentCursorPositions[ theID ] = thePosition3D;
             bool myPartnerFoundFlag = false;
