@@ -255,17 +255,17 @@ MoverBase.prototype.Constructor = function (obj, theViewport) {
     obj.onMouseButton = function (theButton, theState, theX, theY) {
         switch (theButton) {
         case LEFT_BUTTON:
-            _myLeftButtonFlag = (theState === BUTTON_DOWN);
+            _myLeftButtonFlag = (theState === !!BUTTON_DOWN);
             if (_myLeftButtonFlag) {
                 _myDoubleLeftButtonFlag = !_myDoubleLeftButtonFlag && ((millisec() - _myLastButtonTime) < _myDoubleClickInterval);
                 _myLastButtonTime = millisec();
             }
             break;
         case MIDDLE_BUTTON:
-            _myMiddleButtonFlag = (theState === BUTTON_DOWN);
+            _myMiddleButtonFlag = (theState === !!BUTTON_DOWN);
             break;
         case RIGHT_BUTTON:
-            _myRightButtonFlag = (theState === BUTTON_DOWN);
+            _myRightButtonFlag = (theState === !!BUTTON_DOWN);
             break;
         default:
             break;

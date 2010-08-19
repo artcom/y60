@@ -249,7 +249,7 @@ ClassicTrackballMover.prototype.Constructor = function (obj, theViewport, theCen
     obj.Mover.onMouseButton = obj.onMouseButton;
     obj.onMouseButton = function (theButton, theState, theX, theY) {
         obj.Mover.onMouseButton(theButton, theState, theX, theY);
-        if (theButton === LEFT_BUTTON && theState === BUTTON_DOWN) {
+        if (theButton === LEFT_BUTTON && theState === !!BUTTON_DOWN) {
             if (obj.getDoubleLeftButtonFlag()) {
                 print("####################################");
                 var myPickedBody = pickBody(theX, theY);
