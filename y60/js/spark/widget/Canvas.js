@@ -31,6 +31,8 @@ spark.Canvas.Constructor = function (Protected) {
     var _onPostViewportFunc = null;
     var _myRenderFlag       = true;
     var _myPickRadius       = 0;
+    var _myImage = null;
+    
     
     var _bindings = {};
     (function () {
@@ -116,6 +118,15 @@ spark.Canvas.Constructor = function (Protected) {
         return _myRenderFlag;
     });
     
+    Public.__defineGetter__("image", function() {
+        return _myImage;
+    });
+    Public.__defineGetter__("renderArea", function() {
+        return _myRenderArea;
+    });
+    
+    
+    
     //pickRadius = 0 will result in fast ray intersection picking, 
     // when pickRadius > 0 slower sweepsphere picking will be activated
     Public.__defineSetter__("pickRadius", function (theNewRadius) {
@@ -158,10 +169,10 @@ spark.Canvas.Constructor = function (Protected) {
         _myRenderArea.renderingCaps = Public.getDefaultRenderingCapabilites() | Renderer.FRAMEBUFFER_SUPPORT;
         _myRenderArea.multisamples = _sampling;
         
-        var myImage = Modelling.createImage(window.scene,
-                                            myWidth, myHeight, "BGRA");
-        myImage.name = Public.name + "_canvasImage";
-        var myTexture = Modelling.createTexture(window.scene, myImage);
+        _myImage = Modelling.createImage(window.scene,
+                                         myWidth, myHeight, "BGRA");
+        _myImage.name = Public.name + "_canvasImage";
+        var myTexture = Modelling.createTexture(window.scene, _myImage);
         myTexture.wrapmode = "clamp_to_edge";
         
         var myFlipMatrix = myTexture.matrix;
@@ -190,8 +201,7 @@ spark.Canvas.Constructor = function (Protected) {
             
             _myWorld = window.scene.dom.getElementById(myWorldId);
             _myWorld.name = Public.name + "-world";
-        } 
-        else {
+        } else {
             _myCanvasNode = Node.createElement("canvas");
             _myCanvasNode.name = Public.name + "-canvas";
             window.scene.canvases.appendChild(_myCanvasNode);
@@ -214,8 +224,7 @@ spark.Canvas.Constructor = function (Protected) {
                 
                 _myViewport.camera = myCamera.id;
                 _myCanvasNode.backgroundcolor[3] = 0.0;
-            }
-            else {
+            } else {
                 _myCanvasNode.backgroundcolor = new Vector4f(1, 1, 1, 1);
             }
         }
@@ -243,7 +252,7 @@ spark.Canvas.Constructor = function (Protected) {
         // set the canvas material to allow proper layering of transparencies
         // see http://home.comcast.net/~tom_forsyth/blog.wiki.html#[[Premultiplied%20alpha]]
         myMaterial.properties.blendfunction = "[one,one_minus_src_alpha,one,one_minus_src_alpha]";
-        if(_myWorld) {
+        if (_myWorld) {
             while (Public.innerSceneNode.firstChild) {
                 _myWorld.appendChild(Public.innerSceneNode.firstChild);
             }
@@ -295,7 +304,7 @@ spark.Canvas.Constructor = function (Protected) {
         var pickedBody     = null;
         var canvasPosition = Public.convertToCanvasCoordinates(theX, theY);
         if (canvasPosition) {
-            if(_myPickRadius === 0) {
+            if (_myPickRadius === 0) {
                 pickedBody = Public.picking.pickBody(canvasPosition.x, canvasPosition.y, _myWorld);
             }  else {
                 pickedBody = Public.picking.pickBodyBySweepingSphereFromBodies(
@@ -306,11 +315,11 @@ spark.Canvas.Constructor = function (Protected) {
         return pickedBody;
     };
     
-    Public.pickWidget = function(theX, theY) {
+    Public.pickWidget = function (theX, theY) {
         var myBody = Public.pickBody(theX, theY);
-        if(myBody) {
+        if (myBody) {
             var myBodyId = myBody.id;
-            if(myBodyId in spark.sceneNodeMap) {
+            if (myBodyId in spark.sceneNodeMap) {
                 var myWidget = spark.sceneNodeMap[myBodyId];
                 return myWidget;
             }

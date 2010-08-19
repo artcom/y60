@@ -13,7 +13,6 @@
 
 spark.StretchyImage = spark.ComponentClass("StretchyImage");
 spark.StretchyImage.Constructor = function (Protected) {
-    
     var Base = {};
     var Public = this;
     
@@ -107,7 +106,7 @@ spark.StretchyImage.Constructor = function (Protected) {
             for (var j = 0; j < _myQuadsPerSide.x; ++j) {
                 v = i * _myVerticesPerSide.x + j;
                 var q = 4 * (i * _myQuadsPerSide.x + j);
-                myUVIdx[q]     = myPIdx[q]   = v;
+                myUVIdx[q]     = myPIdx[q]     = v;
                 myUVIdx[q + 1] = myPIdx[q + 1] = v + 1;
                 myUVIdx[q + 2] = myPIdx[q + 2] = v + 1 + _myVerticesPerSide.x;
                 myUVIdx[q + 3] = myPIdx[q + 3] = v + _myVerticesPerSide.x;
@@ -178,10 +177,10 @@ spark.StretchyImage.Constructor = function (Protected) {
         _myQuadsPerSide = new Vector2f(myQuadsPerSideX, myQuadsPerSideY);
 
         //XXX: to avoid texture filtering artefacts 
-        _myEdgeTop    = (_myEdgeTop > 0) ? _myEdgeTop + 1 : 0;
+        _myEdgeTop    = (_myEdgeTop > 0)    ? _myEdgeTop + 1 : 0;
         _myEdgeBottom = (_myEdgeBottom > 0) ? _myEdgeBottom + 1 : 0;
-        _myEdgeLeft   = (_myEdgeLeft > 0) ? _myEdgeLeft + 1 : 0;
-        _myEdgeRight  = (_myEdgeRight > 0) ? _myEdgeRight + 1 : 0;
+        _myEdgeLeft   = (_myEdgeLeft > 0)   ? _myEdgeLeft + 1 : 0;
+        _myEdgeRight  = (_myEdgeRight > 0)  ? _myEdgeRight + 1 : 0;
         //Public.texture.min_filter = "nearest";
         //Public.texture.mag_filter = "nearest";
 
