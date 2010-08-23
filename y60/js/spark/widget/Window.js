@@ -425,10 +425,12 @@ spark.Window.Constructor = function(Protected) {
         case "move": // proximatrix
         case "update": // tuio        
             var myCursor = getMultitouchCursor(myId);
+            var myFocused;
             if(theEvent.type == "add") {
                 myCursor.activate();
+            } else {
+                myFocused = myCursor.focused;
             }
-            var myFocused = myCursor.focused;
             
             var myPosition = getMultitouchCursorPosition(theEvent);
             
@@ -436,11 +438,11 @@ spark.Window.Constructor = function(Protected) {
             myCursor.update(myPick, myPosition);
 
             if(theEvent.type == "add") {
-                Logger.debug("Cursor " + myId + " appears in " + myFocused);
+                Logger.debug("Cursor " + myId + " appears in " + myPick);
                 var myAppear = new spark.CursorEvent(spark.CursorEvent.APPEAR, myCursor);
                 myPick.dispatchEvent(myAppear);
             }
-            if(myPick != myFocused) {
+            if(myCursor.active && (myPick != myFocused)) {
                 Logger.debug("Cursor " + myId + " focuses " + myPick
                              + (myFocused ? ", leaving " + myFocused : ""));
 
@@ -453,7 +455,7 @@ spark.Window.Constructor = function(Protected) {
                 myPick.dispatchEvent(myEnter);
             }
 
-            if(theEvent.type == "move" || theEvent.type == "update") {
+            if(myCursor.active && (theEvent.type == "move" || theEvent.type == "update")) {
                 
                 var myMoveDistance = distance(myPosition, myCursor.lastStagePosition);
                 if (myMoveDistance >= MOVE_DISTANCE_THRESHOLD) {
@@ -497,7 +499,6 @@ spark.Window.Constructor = function(Protected) {
     
     // Will be called on a gesture event
     Public.onGesture = function(theGesture) {
-        
         var mySparkConformedCursorId = getSparkConformedCursorId(theGesture, theGesture.cursorid);
         var myPosition = getMultitouchCursorPosition(theGesture);
         
