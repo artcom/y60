@@ -85,6 +85,10 @@ spark.Image.Constructor = function(Protected) {
     Public.useCaching getter = function() {
         return _myUseCaching;
     };
+    
+    Public.__defineSetter__("useCaching", function(theFlag) {
+        _myUseCaching = theFlag;
+    });
 
     Base.realize = Public.realize;
     Public.realize = function(theCachedMaterial) {
