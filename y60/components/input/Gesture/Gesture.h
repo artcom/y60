@@ -11,35 +11,31 @@
 #ifndef ASS_GESTURE_INCLUDED
 #define ASS_GESTURE_INCLUDED
 
-#include <y60/input/y60_input_settings.h>
-#include <y60/input/GenericEventSourceFilter.h>
-
-#include <asl/math/Vector234.h>
-#include <asl/base/PlugInBase.h>
-#include <y60/jsbase/IScriptablePlugin.h>
-#include <y60/input/IEventSink.h>
-#include <y60/input/IEventSource.h>
-
-#include <asl/base/Auto.h>
-#include <asl/base/ThreadLock.h>
-#include <y60/jslib/AbstractRenderWindow.h>
-#include <y60/input/GenericEvent.h>
-
 #include <vector>
 #include <map>
 
+#include <asl/math/Vector234.h>
+#include <asl/base/PlugInBase.h>
+#include <asl/base/Auto.h>
+#include <asl/base/ThreadLock.h>
+
+#include <y60/input/y60_input_settings.h>
+#include <y60/input/GenericEventSourceFilter.h>
+#include <y60/input/IEventSink.h>
+#include <y60/input/IEventSource.h>
+#include <y60/input/GenericEvent.h>
+#include <y60/jsbase/IScriptablePlugin.h>
+#include <y60/jslib/AbstractRenderWindow.h>
 
 
 namespace y60 {
 
 enum GESTURE_BASE_EVENT_TYPE{
-	ASSEVENT,
-	TUIOEVENT
+    ASSEVENT,
+    TUIOEVENT
 };
 
 
-typedef std::vector< asl::Vector3f > Position3fVector;
-typedef std::vector< asl::Vector2f > Position2fVector;
 typedef std::map<int, bool> CursorList;
 typedef std::map<int, int> CursorPartnerList;
 
@@ -50,6 +46,11 @@ class Gesture : public asl::PlugInBase,
                        public GenericEventSourceFilter
 {
     public:
+        static const float WIPE_DISTANCE_THRESHOLD;
+        static const float MAX_CURSOR_PAIR_DISTANCE;
+        static const float ROTATE_ANGLE_THRESHOLD;
+        static const float ZOOM_DISTANCE_THRESHOLD;
+
         Gesture(asl::DLHandle theHandle);
         virtual y60::EventPtrList poll();
         virtual void handle(EventPtr theEvent);
@@ -65,29 +66,43 @@ class Gesture : public asl::PlugInBase,
 
     protected:
         void createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent, int theID, const std::string & theType,
-                          const asl::Vector3f & thePosition3D);
+                          const asl::Vector3f & thePosition3D, unsigned long long & theTimestamp);
     private:
+        struct PositionInfo {
+            PositionInfo() {};
+            PositionInfo(const asl::Vector3f & thePosition, unsigned long long & theTimestamp):
+                _myPosition(thePosition), 
+                _myTimestamp(theTimestamp) {}
+            asl::Vector3f _myPosition;
+            unsigned long long _myTimestamp;
+        };
         dom::NodePtr addGestureEvent2Queue(GESTURE_BASE_EVENT_TYPE theBaseEvent, int theID, 
-			                               const std::string & theType, 
-										   const asl::Vector3f & thePosition3D);
-        asl::Vector3f getCurrentPos(GESTURE_BASE_EVENT_TYPE theBaseEvent, int theCursorId);
-		CursorPartnerList::iterator getCursorPartner(int theId);
-		void saveAllCursorPositions();
+                                           const std::string & theType, 
+                                           const asl::Vector3f & thePosition3D);
 
-        dom::NodePtr                    _myGestureSettings;
+        inline asl::Vector3f getCenter(const asl::Vector3f & thePosition, const asl::Vector3f & thePartnerPosition) const {
+            asl::Vector3f myCenterPoint(thePosition);
+            myCenterPoint.add(thePartnerPosition);
+            return product(myCenterPoint,0.5f);
+        }
+        
+                        
+        CursorPartnerList::iterator getCursorPartner(int theId);
+        void saveAllCursorPositions();
+
         dom::NodePtr                    _myGestureSchema;
         asl::Ptr<dom::ValueFactory>     _myValueFactory;
         y60::EventPtrList               _myEvents;
 
-        std::map<int, Position3fVector> _myCursorPosHistory;
-
         CursorList                      _myCursorList;
-        std::map<int, asl::Vector3f>    _myLastCursorPositions;
+        std::map<int, PositionInfo>     _myCurrentCursorPositions;
+        std::map<int, PositionInfo>     _myLastCursorPositions;
         std::map<int, float>            _myInitialZoomDistance;
         CursorPartnerList               _myCursorPartner;
-        float                           _myDistanceThreshold;
         float                           _myWipeDistanceThreshold;
-        float                           _myMaxZoomDistance;
+        float                           _myMaxCursorPairDistance;
+        float                           _myRotateAngleThreshold;
+        float                           _myZoomDistanceThreshold;
 
         unsigned int                    _myEventCounter;
         asl::ThreadLock                 _myDeliveryMutex;

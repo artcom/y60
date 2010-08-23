@@ -271,6 +271,9 @@ namespace y60 {
             DB(AC_DEBUG << "Joining FFMpegDecoder Thread");
             join();
         }
+        Movie * myMovie = getMovie();
+        myMovie->set<MaxCacheSizeTag>(std::min(int(myMovie->get<MaxCacheSizeTag>()), int(myMovie->get<FrameCountTag>())));
+        _myMaxCacheSize = myMovie->get<MaxCacheSizeTag>();
         doSeek(0, false);
 
         if (!isActive()) {
@@ -973,6 +976,7 @@ namespace y60 {
                    myVCodec->codec_id == CODEC_ID_WMV3)
         {
             myMovie->set<FrameCountTag>(int(_myVStream->duration * _myFrameRate / 1000));
+            myMovie->set<MaxCacheSizeTag>(std::min(int(myMovie->get<MaxCacheSizeTag>()), int(myMovie->get<FrameCountTag>())));
             _myVideoStreamTimeBase = 1/ av_q2d(_myVStream->time_base);
         } else {
 	        double myDuration = 0.0;
@@ -982,8 +986,10 @@ namespace y60 {
                 myDuration = (_myFormatContext->duration - _myFormatContext->start_time )*_myFrameRate/(double)AV_TIME_BASE;
             }
             myMovie->set<FrameCountTag>(int(myDuration));
+            myMovie->set<MaxCacheSizeTag>(std::min(int(myMovie->get<MaxCacheSizeTag>()), int(myMovie->get<FrameCountTag>())));
 	        _myVideoStreamTimeBase = 1/ av_q2d(_myVStream->time_base);
 	    }
+        _myMaxCacheSize = myMovie->get<MaxCacheSizeTag>();
         AC_INFO << "FFMpegDecoder2::setupVideo() " << theFilename << " fps="
                 << _myFrameRate << " framecount=" << getFrameCount()<< " time_base: "
                 <<_myVideoStreamTimeBase;

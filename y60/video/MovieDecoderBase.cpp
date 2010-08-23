@@ -181,6 +181,7 @@ namespace y60 {
             }
             AC_DEBUG << "!!!!!!MovieDecoderBase::setEOF setting FrameCountTag: " <<_myMovie->get<CurrentFrameTag>();
             _myMovie->set<FrameCountTag>(_myMovie->get<CurrentFrameTag>());
+            //_myMovie->set<MaxCacheSizeTag>(std::min(int(_myMovie->get<MaxCacheSizeTag>()), int(_myMovie->get<FrameCountTag>())));
         }
     }
 

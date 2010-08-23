@@ -65,6 +65,9 @@
 #ifdef OSX
     #define _SETTING_GCC_TEMPLATE_MATCHING_BUG_WORKAROUND_
     #define _SETTING_FLOAT_ISTREAM_UNDERFLOW_WORKAROUND_
+    // don't define decrepated check() macros (collides with boost identifiers)
+    // see /Developer/SDKs/MacOSX10.6.sdk/usr/include/AssertMacros.h
+    #define __ASSERT_MACROS_DEFINE_VERSIONS_WITHOUT_UNDERSCORES 0
 #endif
 
 #ifdef _MSC_VER

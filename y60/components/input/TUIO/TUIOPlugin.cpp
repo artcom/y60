@@ -17,6 +17,8 @@
 
 #include "tuioeventxsd.h"
 
+#define DB(x) //x
+
 namespace y60 {
 
 using namespace asl;
@@ -33,24 +35,25 @@ class TUIOPlugin : public PlugInBase,
 private:
     typedef std::pair<const char*, TuioCursor*> CursorEvent;
     typedef std::vector<CursorEvent> CursorEventList;
-	bool _myFilterMultipleUpdatePerCursorFlag;
 
 
 public:
 
     TUIOPlugin(DLHandle myDLHandle)
         : PlugInBase(myDLHandle),
+          GenericEventSourceFilter(),
           _myEventSchemaDocument(new Document(y60::ourtuioeventxsd)),
-          _myEventValueFactory(new ValueFactory()),
-		  _myFilterMultipleUpdatePerCursorFlag(true)
+          _myEventValueFactory(new ValueFactory())
     {
         registerStandardTypes(*_myEventValueFactory);
         registerSomTypes(*_myEventValueFactory);
 
         // add filter for deleting multiple update
-	    if (_myFilterMultipleUpdatePerCursorFlag) {
+        if (_myFilterMultipleMovePerCursorFlag) {
             addCursorFilter("update", "id");
         }
+        // no default cursor smoothing 
+        _myMaxCursorPositionsForAverage = 1;
     }
 
     ~TUIOPlugin()
@@ -64,8 +67,35 @@ public:
 
     JSFunctionSpec *StaticFunctions();
     JSPropertySpec *StaticProperties();
+    
+    virtual void onUpdateSettings(dom::NodePtr theSettings) {
+        dom::NodePtr mySettings = getTUIOSettings(theSettings);
+        int myFilterFlag = 0;
+        myFilterFlag = getSetting( mySettings, "FilterMultipleMovePerCursor", myFilterFlag);
+        _myFilterMultipleMovePerCursorFlag = (myFilterFlag == 1 ? true : false);
+        _myMaxCursorPositionsForAverage = getSetting( mySettings, "MaxCursorPositionsForAverage", _myMaxCursorPositionsForAverage);
+    }
 
+    dom::NodePtr
+    getTUIOSettings(dom::NodePtr theSettings) {
+        dom::NodePtr mySettings;
+        if ( theSettings->nodeType() == dom::Node::DOCUMENT_NODE) {
+            if (theSettings->childNode(0)->nodeName() == "settings") {
+                mySettings = theSettings->childNode(0)->childNode("TUIO", 0);
+            }
+        } else if ( theSettings->nodeName() == "settings") {
+            mySettings = theSettings->childNode("TUIO", 0);
+        } else if ( theSettings->nodeName() == "TUIO" ) {
+            mySettings = theSettings;
+        }
 
+        if ( ! mySettings ) {
+            throw Exception(
+                std::string("Could not find TUIO node in settings: ") +
+                as_string( * theSettings), PLUS_FILE_LINE );
+        }
+        return mySettings;
+    }
 
 // IEventSource
 
@@ -86,47 +116,22 @@ public:
             }
 
             _myUndeliveredCursors.clear();
-		    //AC_INFO << "unfiltered toui events # " << myEvents.size();
-
+            
+            DB(AC_INFO << "unfiltered tuio events # " << myEvents.size());
             // logs event statistics for multiple events per cursor and type
-        	//analyzeEvents(myEvents, "id");
+            DB(analyzeEvents(myEvents, "id"));
             // do the event filter in base class GenericEventSourceFilter
             applyFilter(myEvents);
-		    //AC_INFO << "deliver toui events # " << myEvents.size();
-			//analyzeEvents(myEvents, "id");
+            DB(AC_INFO << "deliver tuio events # " << myEvents.size());
+            DB(analyzeEvents(myEvents, "id"));
+            
+            clearCursorHistoryOnRemove(myEvents);
             return myEvents;
         } else {
             return EventPtrList();
         }
     }
-    void filterEventsPerCursor(std::string theEventType, std::string theIdAttributeName, EventPtrList & theEventList) {
-	    std::map<int, std::vector<GenericEventPtr > > myEvents2Shrink;
-	    EventPtrList::iterator myIt = theEventList.begin();
-	    unsigned int counter= 0;
-        for (; myIt !=theEventList.end(); ) {
-		    counter++;
-		    GenericEventPtr myGenericEvent(dynamic_cast_Ptr<GenericEvent>(*myIt));
-		    dom::NodePtr myNode = myGenericEvent->getNode();
-		    int myCursorId = asl::as<int>(myNode->getAttributeString(theIdAttributeName));
-		    std::string myEventType = myNode->getAttributeString("type");
-		    if (myEventType == theEventType) {
-			    if (myEvents2Shrink.find(myCursorId) == myEvents2Shrink.end()) {
-				    myEvents2Shrink[myCursorId] = std::vector<GenericEventPtr>();
-			    }
-			    myEvents2Shrink[myCursorId].push_back(myGenericEvent);
-                myIt = theEventList.erase(myIt);
-            } else {
-                ++myIt;
-            }
-        }
-
-        std::map<int, std::vector<GenericEventPtr > >::iterator myEndIt2   = myEvents2Shrink.end();
-	    std::map<int, std::vector<GenericEventPtr > >::iterator myIt2 = myEvents2Shrink.begin();
-	    for(; myIt2 !=  myEndIt2; ++myIt2){
-		    theEventList.push_back((myIt2->second)[(myIt2->second).size()-1]);
-	    }
-	}
-
+    
 
 // TuioListener
 
@@ -197,7 +202,9 @@ protected:
         TuioTime myValueTime = myCursor->getTuioTime();
         myNode->appendAttribute<double>("value_time", myValueTime.getSeconds() + (myValueTime.getMicroseconds() / 1000000.0));
 
-        myNode->appendAttribute<Vector2f>("position", Vector2f(myCursor->getX(), myCursor->getY()));
+        Vector2f myPosition = Vector2f(myCursor->getX(), myCursor->getY());
+        myPosition = calculateAveragePosition(myCursor->getSessionID(), myPosition);
+        myNode->appendAttribute<Vector2f>("position", myPosition);
         myNode->appendAttribute<Vector2f>("velocity", Vector2f(myCursor->getXSpeed(), myCursor->getYSpeed()));
 
         myNode->appendAttribute<double>("speed", myCursor->getMotionSpeed());
@@ -215,7 +222,6 @@ private:
     CursorEventList _myUndeliveredCursors;
 
     std::vector<TuioClient*> _myClients;
-
 };
 
 

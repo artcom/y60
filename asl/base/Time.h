@@ -222,11 +222,11 @@ namespace asl {
                     return myTimeSpec;
                 }
 
-                long long micros() const {
+                unsigned long long micros() const {
                         return when.tv_sec * 1000000L + when.tv_usec;
                 }
 
-                long long millis() const {
+                unsigned long long millis() const {
                         return when.tv_sec * 1000L + when.tv_usec/1000L;
                 }
                 inline std::ostream& print(std::ostream& s) const;

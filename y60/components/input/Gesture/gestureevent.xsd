@@ -46,7 +46,7 @@
     </xs:simpleType>
     <xs:element name="generic">
         <xs:complexType>
-            <xs:attribute name="when" type="xs:double"/>
+            <xs:attribute name="when" type="xs:unsignedLong"/>
             <xs:attribute name="simulation_time" type="xs:double"/>
             <xs:attribute name="callback" type="xs:string"/>
             <xs:attribute name="id" type="xs:ID"/>
@@ -55,13 +55,14 @@
             <xs:attribute name="ignore" type="xs:int"/>
             <xs:attribute name="type" type="xs:string"/>
             <xs:attribute name="position3D" type="Vector3f"/>
-            <xs:attribute name="position" type="Vector3f"/>
             <xs:attribute name="direction" type="Vector3f"/>
-            <xs:attribute name="distance" type="xs:double"/>
-            <xs:attribute name="lastdistance" type="xs:double"/>
-            <xs:attribute name="initialdistance" type="xs:double"/>
+            <xs:attribute name="distance" type="xs:float"/>
+            <xs:attribute name="lastdistance" type="xs:float"/>
+            <xs:attribute name="initialdistance" type="xs:float"/>
             <xs:attribute name="centerpoint" type="Vector3f"/>
             <xs:attribute name="angle" type="xs:double"/>
+            <xs:attribute name="magnitude" type="xs:float"/>
+            <xs:attribute name="zoomfactor" type="xs:float"/>
             <xs:attribute name="baseeventtype" type="xs:int"/>                    
         </xs:complexType>
     </xs:element>

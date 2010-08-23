@@ -67,6 +67,7 @@
  * due to the baroque API of ASSManager.
  */
 spark.enableProximatrix = function(theStage) {
+    dumpstack();
     use("ASSManager.js");
     spark.proximatrix = new ASSManager(theStage);
 };
@@ -78,9 +79,15 @@ spark.enableProximatrix = function(theStage) {
  * TUIO events. A toplevel Window instance will
  * then dispatch these as cursor events.
  */
-spark.enableTuio = function() {
-    plug("TUIOClient");
+spark.enableTuio = function(theStage) {
+    var myPlugIn = plug("TUIOClient");
     TUIOClient.listenToUDP();
+    if (!theStage) {
+        Logger.warning("for the settings listener the Stage as argument is mandatory");
+    } else {
+        theStage.registerSettingsListener( myPlugIn, "TUIO" );
+    }
+    
 };
 
 /**
@@ -332,24 +339,24 @@ spark.GestureEvent.Constructor = function(Protected, theType, theBaseEvent, theC
  */
 spark.GestureEvent.WIPE  = "gesture-wipe";
 spark.WipeGestureEvent = spark.Class("WipeGestureEvent");
-spark.WipeGestureEvent.Constructor = function(Protected, theType, theBaseEvent, theDir, theCursor) {
+spark.WipeGestureEvent.Constructor = function(Protected, theType, theBaseEvent, theCursor, theDirection, theMagnitude) {
     var Public = this;
 
     this.Inherit(spark.GestureEvent, theType, theBaseEvent, theCursor);
     
     /**
-     * Direction vector  of the wipe event
+     * Direction vector of the wipe event
      */
-    var _myDir = normalized(theDir);
+    var _myDirection = theDirection;
 
     Public.direction getter = function() {
-        return _myDir;
+        return _myDirection;
     };
     
     /**
      * Magnitude of the direction vector
      */
-    var _myMagnitude = magnitude(theDir);
+    var _myMagnitude = theMagnitude;
 
     Public.magnitude getter = function () {
         return _myMagnitude;
@@ -358,10 +365,13 @@ spark.WipeGestureEvent.Constructor = function(Protected, theType, theBaseEvent, 
 };
 
 /**
- * events with two cursors (abstract)
+ * events with two cursors
  */
+spark.GestureEvent.CURSOR_PAIR_START  = "gesture-cursor-pair-start";
+spark.GestureEvent.CURSOR_PAIR_FINISH = "gesture-cursor-pair-finish";
+
 spark.MultiCursorGestureEvent = spark.Class("MultiCursorGestureEvent");
-spark.MultiCursorGestureEvent.Constructor = function(Protected, theType, theBaseEvent, theMainCursor, thePartnerCursor, theCenterpoint) {
+spark.MultiCursorGestureEvent.Constructor = function(Protected, theType, theBaseEvent, theMainCursor, thePartnerCursor, theCenterpoint, theDistance) {
     var Public = this;
 
     this.Inherit(spark.GestureEvent, theType, theBaseEvent, theMainCursor);
@@ -381,45 +391,10 @@ spark.MultiCursorGestureEvent.Constructor = function(Protected, theType, theBase
      */
     var _myCenterPoint = theCenterpoint;
 
-    Public.centerpoint getter = function () {
+    Public.centerPoint getter = function () {
         return _myCenterPoint;
     };
 
-};
-
-
-
-/**
- * zoom event: "two cursors which change their distance"
- */
-spark.GestureEvent.CURSOR_PAIR_START  = "gesture-cursor-pair-start";
-spark.GestureEvent.ZOOM  = "gesture-zoom";
-spark.GestureEvent.CURSOR_PAIR_FINISH = "gesture-cursor-pair-finish";
-
-spark.ZoomGestureEvent = spark.Class("ZoomGestureEvent");
-spark.ZoomGestureEvent.Constructor = function(Protected, theType, theBaseEvent, theMainCursor, thePartnerCursor, theFirstDistance, theDistance, theCenterpoint, theLastDistance) {
-    var Public = this;
-
-    this.Inherit(spark.MultiCursorGestureEvent, theType, theBaseEvent, theMainCursor, thePartnerCursor, theCenterpoint);
-    
-    /**
-     * start distance between the zoom partners
-     */
-    var _myFirstDistance = theFirstDistance;
-
-    Public.firstdistance getter = function () {
-        return _myFirstDistance;
-    };
-    
-    /**
-     * current distance between zoom partners
-     */
-    var _myLastDistance = theLastDistance;
-
-    Public.lastdistance getter = function() {
-        return _myLastDistance;
-    };
-    
     /**
      * current distance between zoom partners
      */
@@ -431,15 +406,58 @@ spark.ZoomGestureEvent.Constructor = function(Protected, theType, theBaseEvent, 
     
 };
 
+
+
+/**
+ * zoom event: "two cursors which change their distance"
+ */
+spark.GestureEvent.ZOOM  = "gesture-zoom";
+
+spark.ZoomGestureEvent = spark.Class("ZoomGestureEvent");
+spark.ZoomGestureEvent.Constructor = function(Protected, theType, theBaseEvent, theMainCursor, thePartnerCursor, theCenterpoint, theDistance, theLastDistance, theInitialDistance, theZoomFactor) {
+    var Public = this;
+
+    this.Inherit(spark.MultiCursorGestureEvent, theType, theBaseEvent, theMainCursor, thePartnerCursor, theCenterpoint, theDistance);
+    
+    /**
+     * current distance between zoom partners
+     */
+    var _myLastDistance = theLastDistance;
+
+    Public.lastDistance getter = function() {
+        return _myLastDistance;
+    };
+    
+    /**
+     * initial distance between zoom partners
+     */
+    var _myInitialDistance = theInitialDistance;
+
+    Public.initialDistance getter = function() {
+        return _myInitialDistance;
+    };
+    
+    /**
+     * current zoom factor
+     */
+    var _myZoomFactor = theZoomFactor;
+
+    Public.zoomFactor getter = function() {
+        return _myZoomFactor;
+    };
+    
+    
+};
+
 /**
  * rotate event: "two cursor with changing angle"
  */
 spark.GestureEvent.ROTATE  = "gesture-rotate";
 spark.RotateGestureEvent = spark.Class("RotateGestureEvent");
-spark.RotateGestureEvent.Constructor = function(Protected, theType, theBaseEvent, theMainCursor, thePartnerCursor, theAngle, theCenterpoint) {
+spark.RotateGestureEvent.Constructor = function(Protected, theType, theBaseEvent, theMainCursor, thePartnerCursor, theCenterpoint, theDistance, theAngle) {
     var Public = this;
 
-    this.Inherit(spark.MultiCursorGestureEvent, theType, theBaseEvent, theMainCursor, thePartnerCursor, theCenterpoint);
+    this.Inherit(spark.MultiCursorGestureEvent, theType, theBaseEvent, theMainCursor, thePartnerCursor, theCenterpoint, theDistance);
     
     /**
      * angle 

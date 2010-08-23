@@ -5,7 +5,7 @@
     </xs:simpleType>
     <xs:element name="generic">
         <xs:complexType>
-            <xs:attribute name="when" type="xs:double"/>
+            <xs:attribute name="when" type="xs:unsignedLong"/>
             <xs:attribute name="simulation_time" type="xs:double"/>
             <xs:attribute name="callback" type="xs:string"/>
 

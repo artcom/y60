@@ -1,0 +1,8 @@
+<settings>
+    <Gesture>
+        <WipeDistanceThreshold min="0" step="0.01">0.01000</WipeDistanceThreshold>
+        <MaxCursorPairDistance min="0">500</MaxCursorPairDistance>
+        <RotateAngleThreshold min="0" step="0.1">1</RotateAngleThreshold>
+        <ZoomDistanceThreshold min="0" step="0.25">0.25</ZoomDistanceThreshold>
+    </Gesture>
+</settings>

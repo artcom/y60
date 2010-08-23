@@ -78,7 +78,7 @@ GenericEvent::GenericEvent(const std::string & theCallback,
     }
 
     _myDocument->appendChild( dom::NodePtr( new dom::Element("generic")) );
-    _myDocument->firstChild()->appendAttribute("when", double( when ));
+    _myDocument->firstChild()->appendAttribute("when", when.millis());
     if ( ! theCallback.empty()) {
         _myDocument->firstChild()->appendAttribute("callback", theCallback);
     }
