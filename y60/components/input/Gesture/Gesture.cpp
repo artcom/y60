@@ -265,13 +265,13 @@ Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent,  int theID, const std
                 float myMagnitude = magnitude(myDifference);
                 if( myMagnitude > _myWipeDistanceThreshold ) {
                     
-                    unsigned long long myLastTimestamp = _myLastCursorPositions[theID]._myTimestamp; 
+                    /*unsigned long long myLastTimestamp = _myLastCursorPositions[theID]._myTimestamp; 
                     unsigned long long myTimeDifference = theTimestamp - myLastTimestamp;
 
                     if (myTimeDifference == 0) {
                         myTimeDifference  = 1000;
                     }
-                    myMagnitude /= myTimeDifference/1000.0f;
+                    myMagnitude /= myTimeDifference/1000.0f;*/
 
                     // register wipe event
                     NodePtr myNode = addGestureEvent2Queue(theBaseEvent, theID, "wipe", thePosition3D);
