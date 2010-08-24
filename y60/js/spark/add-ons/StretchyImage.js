@@ -23,8 +23,10 @@ spark.StretchyImage.Constructor = function(Protected) {
     var _myEdgeBottom = 0;
     var _myEdgeLeft = 0;
     var _myEdgeRight = 0;
-    var _myLeftCapFlag = true;
-    var _myRightCapFlag = true;
+    var _myCropTop = 0;
+    var _myCropBottom = 0;
+    var _myCropLeft = 0;
+    var _myCropRight = 0;
     
     var _myQuadsPerSide = new Vector2f(3, 3);
     var _myVerticesPerSide = new Vector2f(_myQuadsPerSide.x + 1, _myQuadsPerSide.y + 1);
@@ -79,12 +81,14 @@ spark.StretchyImage.Constructor = function(Protected) {
     Public.realize = function() {
         Base.realize();
         _myImageSize = getImageSize(Public.image);
-        _myLeftCapFlag = Protected.getBoolean("leftcap", true);
-        _myRightCapFlag = Protected.getBoolean("rightcap", true);
         _myEdgeTop = Protected.getNumber("edgeTop",0);
         _myEdgeBottom = Protected.getNumber("edgeBottom",0);
         _myEdgeLeft = Protected.getNumber("edgeLeft",0);
         _myEdgeRight = Protected.getNumber("edgeRight",0);
+        _myCropTop = Protected.getNumber("cropTop",0);
+        _myCropBottom = Protected.getNumber("cropBottom",0);
+        _myCropLeft = Protected.getNumber("cropLeft",0);
+        _myCropRight = Protected.getNumber("cropRight",0);
         var myQuadsPerSideX = Protected.getNumber("quadsPerSideX", 3);
         var myQuadsPerSideY = Protected.getNumber("quadsPerSideY", 3);
         if (myQuadsPerSideX > 3 || myQuadsPerSideY > 3) {
@@ -98,8 +102,8 @@ spark.StretchyImage.Constructor = function(Protected) {
         _myEdgeLeft = (_myEdgeLeft > 0) ? _myEdgeLeft+1 : 0;
         _myEdgeRight = (_myEdgeRight > 0) ? _myEdgeRight+1 : 0;
  
-        Public.texture.min_filter = "nearest";
-        Public.texture.mag_filter = "nearest";
+        //Public.texture.min_filter = "nearest";
+        //Public.texture.mag_filter = "nearest";
         
 
         Base.imageSetter = Public.__lookupSetter__("image");
@@ -162,9 +166,6 @@ spark.StretchyImage.Constructor = function(Protected) {
         var v = 0;
         for (var i = 0; i < _myQuadsPerSide.y; ++i) {
             for (var j = 0; j < _myQuadsPerSide.x; ++j) {
-                if ((!_myRightCapFlag && j == _myQuadsPerSide.x-1) || (!_myLeftCapFlag && j == 0)) {
-                    continue;
-                }
                 v = i * _myVerticesPerSide.x + j;
                 var q = 4 * (i * _myQuadsPerSide.x + j);
                 myUVIdx[q  ] = myPIdx[q  ] = v;
@@ -185,27 +186,37 @@ spark.StretchyImage.Constructor = function(Protected) {
                 v = i * _myVerticesPerSide.x + j;
                 var myX = -o.x;
                 var myY = -o.y;
+                var myCropX = 0;
+                var myCropY = 0;
                 if (j === 0) {
                     myX = -o.x;
+                    myCropX = _myCropLeft;
                 } else if (j === _myVerticesPerSide.x -3) {
                     myX = -o.x + _myEdgeLeft;
+                    myCropX = _myCropLeft;
                 } else if (j === _myVerticesPerSide.x -2) {
                     myX = myWidth - o.x - _myEdgeRight;
+                    myCropX = -_myCropRight;
                 } else if (j === _myVerticesPerSide.x -1) {
                     myX = myWidth - o.x;
+                    myCropX = -_myCropRight;
                 }
                 if (i === 0) {
                     myY = -o.y;
+                    myCropY = _myCropBottom;
                 } else if (i === _myVerticesPerSide.y -3) {
                     myY = -o.y + _myEdgeBottom;
+                    myCropY = _myCropBottom;
                 } else if (i === _myVerticesPerSide.y -2) {
                     myY = myHeight - o.y - _myEdgeTop;
+                    myCropY = -_myCropTop;
                 } else if (i === _myVerticesPerSide.y -1) {
                     myY = myHeight - o.y;
+                    myCropY = -_myCropTop;
                 }
                 Protected.vertices[v] = [myX, myY, 0];
                 if (theUVCoordFlag) {
-                    _myUVCoords[v] = [(myX + o.x)/myWidth, 1 - (myY + o.y)/myHeight];
+                    _myUVCoords[v] = [(myX + myCropX + o.x)/myWidth, 1 - (myY + myCropY + o.y)/myHeight];
                 }
             }
         }
