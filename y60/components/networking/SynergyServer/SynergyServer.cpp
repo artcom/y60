@@ -66,8 +66,8 @@
 const unsigned int READ_BUFFER_SIZE = 2000;
 const unsigned char SYNERGY_VERSION[4] = {0,1,0,3};
 const unsigned int BITMASK = 0x000000FF;
-const long long KEEP_ALIVE_TIMEOUT = 3000;
-const long long HEART_BEAT_TIMEOUT = 500;
+const unsigned long long KEEP_ALIVE_TIMEOUT = 3000;
+const unsigned long long HEART_BEAT_TIMEOUT = 500;
 
 unsigned char MOUSE_WHEEL_DOWN[4] = {0x00, 0x00, 0xFF, 0x88};
 unsigned char MOUSE_WHEEL_UP[4] = {0x00, 0x00, 0x00, 0x78};
