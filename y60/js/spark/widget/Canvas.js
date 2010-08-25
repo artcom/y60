@@ -88,8 +88,8 @@ spark.Canvas.Constructor = function (Protected) {
     ///////////////////////
     
     Public.bind = function (theBindingSlot, cb) {
-        var bind_info = {id: createUniqueId(),
-                         slot: theBindingSlot};
+        var bind_info = {id   : createUniqueId(),
+                         slot : theBindingSlot};
         var my_handle = new Handle(bind_info, cb);
         _bindings[theBindingSlot][bind_info.id] = my_handle;
         return my_handle;
