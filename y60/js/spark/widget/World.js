@@ -1,3 +1,6 @@
+/*jslint */
+/*globals spark, window*/
+
 /**
  * Wrapper to Y60 worlds.
  *
@@ -8,14 +11,14 @@
  */
 spark.World = spark.ComponentClass("World");
 
-spark.World.Constructor = function(Protected) {
+spark.World.Constructor = function (Protected) {
     var Base = {};
     var Public = this;
 
     this.Inherit(spark.Stage);
 
     Base.realize = Public.realize;
-    Public.realize = function() {
+    Public.realize = function () {
         Base.realize(window.scene.world);
     };
 };

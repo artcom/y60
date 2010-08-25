@@ -12,12 +12,12 @@ use("SceneViewer.js"); // XXX: bad place for this
 spark.Window = spark.ComponentClass("Window");
 
 spark.Window.Constructor = function (Protected) {
-    var Public = this;
     var Base = {};
-    
-    this.Inherit(spark.Stage);
+    var Public = this;
+    Public.Inherit(spark.Stage);
     // Also inherit from SceneViewer
     SceneViewer.prototype.Constructor(this, []);
+    
     /////////////////////
     // Private Members //
     /////////////////////

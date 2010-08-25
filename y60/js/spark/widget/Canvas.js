@@ -118,10 +118,10 @@ spark.Canvas.Constructor = function (Protected) {
         return _myRenderFlag;
     });
     
-    Public.__defineGetter__("image", function() {
+    Public.__defineGetter__("image", function () {
         return _myImage;
     });
-    Public.__defineGetter__("renderArea", function() {
+    Public.__defineGetter__("renderArea", function () {
         return _myRenderArea;
     });
     

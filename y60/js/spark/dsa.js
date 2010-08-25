@@ -75,8 +75,11 @@ spark.DSAEvent.TOUCH = "dsa-touch";
 
 spark.DSAEvent.Constructor = function (Protected, theType, theEventName, theId, theBitMask, theGridSize, theCount) {
     var Public = this;
-
-    this.Inherit(spark.Event, theType);
+    Public.Inherit(spark.Event, theType);
+    
+    /////////////////////
+    // Private Members //
+    /////////////////////
 
     var _myEventName = theEventName;
     var _myId        = theId;
@@ -84,20 +87,23 @@ spark.DSAEvent.Constructor = function (Protected, theType, theEventName, theId, 
     var _myGridSize  = theGridSize;
     var _myCount     = theCount;
 
-    Public.id getter = function () {
+    ////////////////////
+    // Public Methods //
+    ////////////////////
+
+    Public.__defineGetter__("id", function () {
         return _myId;
-    };
+    });
 
-    Public.bitmask getter = function () {
+    Public.__defineGetter__("bitmask", function () {
         return _myBitMask;
-    };
+    });
 
-    Public.gridsize getter = function () {
+    Public.__defineGetter__("gridsize", function () {
         return _myGridSize;
-    };
+    });
 
-    Public.count getter = function () {
+    Public.__defineGetter__("count", function () {
         return _myCount;
-    };
-
+    });
 };

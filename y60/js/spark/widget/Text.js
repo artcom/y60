@@ -1,14 +1,20 @@
+/*jslint nomen:false*/
+/*globals spark, Logger, Vector2i, Modelling, window*/
+
 /* This is a text rendering facility for spark
  * It supports autosizing: the quad has the appropriate size after
  * setting the 'text' property.
  */
 spark.Text = spark.ComponentClass("Text");
 
-spark.Text.Constructor = function(Protected) {
+spark.Text.Constructor = function (Protected) {
     var Base = {};
     var Public = this;
+    Public.Inherit(spark.ResizableRectangle);
 
-    this.Inherit(spark.ResizableRectangle);
+    /////////////////////
+    // Private Members //
+    /////////////////////
 
     var _myStyle = null;
     var _myUpcase = false;
@@ -25,12 +31,61 @@ spark.Text.Constructor = function(Protected) {
     var _myTextChangedHook;
     var _myLineWidths = [];
 
-    Public.text getter = function() { return _myText; };
-    Public.text setter = function(theValue) {
-        if(theValue && _myUpcase) {
+    /////////////////////
+    // Private Methods //
+    /////////////////////
+    
+    function handleI18nLanguage(e) {
+        Public.text = _myTextItem.text;
+    }
+
+    function attachToI18nItem(theItemId) {
+        if (_myTextItem) {
+            _myTextItem.removeEventListener(spark.I18nEvent.LANGUAGE,
+                                            handleI18nLanguage);
+            _myTextItem = null;
+        }
+
+        if (theItemId) {
+            _myTextItem = Public.getI18nItemByName(theItemId);
+
+            if (!_myTextItem) {
+                Logger.fatal("no i18n item named " + theItemId);
+            }
+            _myTextItem.addEventListener(spark.I18nEvent.LANGUAGE,
+                    handleI18nLanguage);
+            Public.text = _myTextItem.text;
+        } else {
+            Public.text = "";
+        }
+    }
+    
+    ///////////////////////
+    // Protected Methods //
+    ///////////////////////
+    
+    Protected.render = function (theSize) {
+        var myWidth = {width : 0};
+        _myLineWidths = [];
+        var mySize = spark.renderText(_myImage, _myText, _myStyle, new Vector2i(_myMaxWidth, _myMaxHeight), myWidth, _myLineWidths);        
+        _myMaxTextWidth =  myWidth.width;
+        Public.width = mySize.x;
+        Public.height = mySize.y;
+        return mySize;
+    };
+    
+    ////////////////////
+    // Public Methods //
+    ////////////////////
+
+    Public.__defineGetter__("text", function () {
+        return _myText;
+    });
+    Public.__defineSetter__("text", function (theValue) {
+        if (theValue && _myUpcase) {
             theValue = theValue.toUpperCase();
         }
-        if(_myLayoutHook) {
+        if (_myLayoutHook) {
             _myText = _myLayoutHook(theValue);
         } else {
             _myText = theValue;
@@ -39,39 +94,30 @@ spark.Text.Constructor = function(Protected) {
         if (_myTextChangedHook) {
             _myTextChangedHook();
         }
-    };
+    });
 
-    Public.style getter = function() {
+    Public.__defineGetter__("style", function () {
         return _myStyle;
-    };
+    });
 
-    Public.upcase getter = function() {
+    Public.__defineGetter__("upcase", function () {
         return _myUpcase;
-    };
-    Public.maxTextWidth getter = function() {
+    });
+    
+    Public.__defineGetter__("maxTextWidth", function () {
         return _myMaxTextWidth;
-    };
+    });
 
-    Public.lineWidths getter = function() {
+    Public.__defineGetter__("lineWidths", function () {
         return _myLineWidths;
-    };
+    });
 
-    Public.lineCount getter = function() {
+    Public.__defineGetter__("lineCount", function () {
         return _myLineWidths.length;
-    };
-
-    Protected.render = function(theSize) {
-        var myWidth = {width:0};
-        _myLineWidths = [];
-        var mySize = spark.renderText(_myImage, _myText, _myStyle, new Vector2i(_myMaxWidth,_myMaxHeight), myWidth, _myLineWidths);        
-        _myMaxTextWidth =  myWidth.width;
-        Public.width = mySize.x;
-        Public.height = mySize.y;
-        return mySize;
-    }
+    });
 
     Base.realize = Public.realize;
-    Public.realize = function() {
+    Public.realize = function () {
         // retrieve text
         _myText = Protected.getString("text", "");
 
@@ -100,70 +146,61 @@ spark.Text.Constructor = function(Protected) {
     };
 
     Base.postRealize = Public.postRealize;
-    Public.postRealize = function() {
+    Public.postRealize = function () {
         if (_myTextId) {
             attachToI18nItem(_myTextId);
         }
         Base.postRealize();
-    }
+    };
 
-    Public.maxWidth getter = function() { return _myMaxWidth; }
-    Public.maxWidth setter = function(w) { 
+    Public.__defineGetter__("maxWidth", function () {
+        return _myMaxWidth;
+    });
+    Public.__defineSetter__("maxWidth", function (w) {
         _myMaxWidth = w;
         Protected.render();
-    };
+    });
 
-    Public.maxHeight getter = function() { return _myMaxHeight; }
-    Public.maxHeight setter = function(h) { 
+    Public.__defineGetter__("maxHeight", function () {
+        return _myMaxHeight;
+    });
+    Public.__defineSetter__("maxHeight", function (h) { 
         _myMaxHeight = h; 
         Protected.render();
-    };
+    });
 
-    Public.textId getter = function() { return _myTextId; }
-    Public.textId setter = function(id) {
+    Public.__defineGetter__("textId", function () {
+        return _myTextId;
+    });
+    Public.__defineSetter__("textId", function (id) {
         _myTextId = id;
         attachToI18nItem(id);
-    };
+    });
 
-    Public.i18nItem getter = function() { return Public.textId; }
-    Public.i18nItem setter = function(id) { Public.textId = id; }
+    Public.__defineGetter__("i18nItem", function () {
+        return Public.textId;
+    });
+    Public.__defineSetter__("i18nItem", function (id) {
+        Public.textId = id;
+    });
 
-    Public.layoutHook getter = function() { return _myLayoutHook; }
-    Public.layoutHook setter = function(f) {
+    Public.__defineGetter__("layoutHook", function () {
+        return _myLayoutHook;
+    });
+    Public.__defineSetter__("layoutHook", function (f) {
         _myLayoutHook = f;
         Public.text = _myText;
-    }
+    });
 
-    Public.onTextChanged getter = function() { return _myTextChangedHook; }
-    Public.onTextChanged setter = function(f) { _myTextChangedHook = f; }
+    Public.__defineGetter__("onTextChanged", function () {
+        return _myTextChangedHook;
+    });
+    Public.__defineSetter__("onTextChanged", function (f) {
+        _myTextChangedHook = f;
+    });
 
-    function handleI18nLanguage(e) {
-        Public.text = _myTextItem.text;
-    }
-
-    function attachToI18nItem(theItemId) {
-        if(_myTextItem) {
-            _myTextItem.removeEventListener(spark.I18nEvent.LANGUAGE,
-                                            handleI18nLanguage);
-            _myTextItem = null;
-        }
-
-        if (theItemId) {
-            _myTextItem = Public.getI18nItemByName(theItemId);
-
-            if(!_myTextItem) {
-                Logger.fatal("no i18n item named " + theItemId);
-            }
-            _myTextItem.addEventListener(spark.I18nEvent.LANGUAGE,
-                    handleI18nLanguage);
-            Public.text = _myTextItem.text;
-        } else {
-            Public.text = "";
-        }
-
-    };
-    Public.textColor setter = function(theColorString) {
+    Public.__defineSetter__("textColor", function (theColorString) {
         _myStyle.textColor = theColorString;
         Protected.render();
-    }
+    });
 };
