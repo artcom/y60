@@ -83,7 +83,7 @@ namespace y60 {
 
             virtual vector<EventPtr> poll() {
                 vector<EventPtr> curEvents;
-                if (!_myTestEvents.empty()) {
+                while (!_myTestEvents.empty()) {
                     EventPtr myNextEvent = _myTestEvents.front();
                     _myTestEvents.pop_front();
                     curEvents.push_back(myNextEvent);
@@ -111,7 +111,8 @@ class EventDispatcherTest : public UnitTest, IEventSink {
         virtual void handle(EventPtr theEvent) {
             DB (cerr << "Handling " << theEvent->when
                     << ", should be " << _myExpectedEvents.front()->when << endl);
-            ENSURE( theEvent == _myExpectedEvents.front());
+            ENSURE( theEvent->when == _myExpectedEvents.front()->when);
+            ENSURE( theEvent->type == _myExpectedEvents.front()->type);
             _myExpectedEvents.pop_front();
         }
 
@@ -119,38 +120,55 @@ class EventDispatcherTest : public UnitTest, IEventSink {
             deque<EventPtr> myEventQueue(theTestEvents.begin(),theTestEvents.end());
             _myTestSource.setEvents(myEventQueue);
 
-            _myExpectedEvents.assign(theTestEvents.begin(),theTestEvents.end());
-
-            for (vector<EventPtr>::size_type i=0; i<theTestEvents.size(); i++) {
-                _testDispatcher.dispatch();
-            }
+            _testDispatcher.dispatch();
+            
             ENSURE(_myExpectedEvents.empty());
             ENSURE(_myTestSource._myTestEvents.empty());
         }
 
         void run() {
             vector<EventPtr> myTestEvents;
-
+            
             _testDispatcher.addSource(&_myTestSource);
             _testDispatcher.addSink(this);
             // very simple test
             myTestEvents.push_back(EventPtr(new Event(Event::KEY_UP)));
+            _myExpectedEvents.assign(myTestEvents.begin(), myTestEvents.end());
             startDispatchTest(myTestEvents);
-
             // simple presorted test
             myTestEvents.clear();
             myTestEvents.push_back(EventPtr(new Event(Event::KEY_UP,1)));
             myTestEvents.push_back(EventPtr(new Event(Event::KEY_UP,2)));
             myTestEvents.push_back(EventPtr(new Event(Event::KEY_UP,3)));
             myTestEvents.push_back(EventPtr(new Event(Event::KEY_UP,4)));
+            _myExpectedEvents.assign(myTestEvents.begin(), myTestEvents.end());
             startDispatchTest(myTestEvents);
-
             // simple unsorted test
             myTestEvents.clear();
             myTestEvents.push_back(EventPtr(new Event(Event::KEY_UP,3)));
             myTestEvents.push_back(EventPtr(new Event(Event::KEY_UP,1)));
             myTestEvents.push_back(EventPtr(new Event(Event::KEY_UP,4)));
             myTestEvents.push_back(EventPtr(new Event(Event::KEY_UP,2)));
+            _myExpectedEvents.push_back(EventPtr(new Event(Event::KEY_UP,1)));
+            _myExpectedEvents.push_back(EventPtr(new Event(Event::KEY_UP,2)));
+            _myExpectedEvents.push_back(EventPtr(new Event(Event::KEY_UP,3)));
+            _myExpectedEvents.push_back(EventPtr(new Event(Event::KEY_UP,4)));
+            startDispatchTest(myTestEvents);
+            //test sorting of events with same timestamp
+            myTestEvents.clear();
+            myTestEvents.push_back(EventPtr(new Event(Event::KEY_UP, 2)));
+            myTestEvents.push_back(EventPtr(new Event(Event::KEY_UP, 2)));
+            myTestEvents.push_back(EventPtr(new Event(Event::KEY_UP, 2)));
+            myTestEvents.push_back(EventPtr(new Event(Event::KEY_UP, 2)));
+            myTestEvents.push_back(EventPtr(new Event(Event::MOUSE_MOTION, 2)));
+            myTestEvents.push_back(EventPtr(new Event(Event::KEY_UP, 1)));
+                
+            _myExpectedEvents.push_back(EventPtr(new Event(Event::KEY_UP, 1)));
+            _myExpectedEvents.push_back(EventPtr(new Event(Event::KEY_UP, 2)));
+            _myExpectedEvents.push_back(EventPtr(new Event(Event::KEY_UP, 2)));
+            _myExpectedEvents.push_back(EventPtr(new Event(Event::KEY_UP, 2)));
+            _myExpectedEvents.push_back(EventPtr(new Event(Event::KEY_UP, 2)));
+            _myExpectedEvents.push_back(EventPtr(new Event(Event::MOUSE_MOTION, 2)));
             startDispatchTest(myTestEvents);
         }
 };

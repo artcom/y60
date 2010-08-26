@@ -66,6 +66,7 @@
 
 // own header
 #include "EventDispatcher.h"
+#include <asl/base/Logger.h>
 
 #include "Event.h"
 
@@ -75,7 +76,8 @@
 using namespace std;
 
 namespace y60 {
-
+    isEventAfter EventDispatcher::_myEventSort = isEventAfter();
+        
     EventDispatcher::EventDispatcher() {
     }
 
@@ -84,19 +86,19 @@ namespace y60 {
 
     void
     EventDispatcher::dispatch() {
-        std::priority_queue<EventPtr,EventPtrList,isEventAfter> sortedEvents;
+        std::vector<EventPtr> sortedEvents;
 
         for (unsigned i = 0; i < _myEventSources.size(); ++i) {
             EventPtrList curEvents = _myEventSources[i]->poll();
             for (unsigned j = 0; j < curEvents.size(); ++j) {
                 curEvents[j]->source = _myEventSources[i];
-                sortedEvents.push(curEvents[j]);
+                sortedEvents.push_back(curEvents[j]);
             }
         }
-
+        std::sort(sortedEvents.begin(), sortedEvents.end(),_myEventSort);
         while (!sortedEvents.empty()) {
-            EventPtr curEvent = sortedEvents.top();
-            sortedEvents.pop();
+            EventPtr curEvent = sortedEvents.back();
+            sortedEvents.pop_back();
             for (unsigned i = 0; i < _myEventSinks.size(); ++i) {
                 _myEventSinks[i]->handle(curEvent);
             }
