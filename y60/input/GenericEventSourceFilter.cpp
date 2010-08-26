@@ -94,25 +94,25 @@ namespace y60 {
             std::string myEventType = myNode->getAttributeString("type");
             if (myEventType == theEventType) {
                 if (myNewestEvent.find(myCursorId) != myNewestEvent.end()) {
-					myIt = theEventList.erase(myIt);    
-				} else {
-					++myIt;
-				}
+                    myIt = theEventList.erase(myIt);    
+                } else {
+                    ++myIt;
+                }
                 myNewestEvent[myCursorId] = myGenericEvent;
             } else {
                 ++myIt;
             }
         }
 
-		for (myIt = theEventList.begin(); myIt !=theEventList.end(); ++myIt) {
+        for (myIt = theEventList.begin(); myIt !=theEventList.end(); ++myIt) {
             GenericEventPtr myGenericEvent(dynamic_cast_Ptr<GenericEvent>(*myIt));
             dom::NodePtr myNode = myGenericEvent->getNode();
             int myCursorId = asl::as<int>(myNode->getAttributeString(theIdAttributeName));
             std::string myEventType = myNode->getAttributeString("type");
             if (myEventType == theEventType && myNewestEvent.find(myCursorId) != myNewestEvent.end()) {
-				*(myIt) = myNewestEvent[myCursorId];
-			}
-		}
+                *(myIt) = myNewestEvent[myCursorId];
+            }
+        }
         
     }
 
