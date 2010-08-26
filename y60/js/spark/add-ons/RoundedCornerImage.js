@@ -33,5 +33,10 @@ spark.RoundedCornerImage.Constructor = function(Protected) {
         Base.postRealizeRoundedCornerQuad();
     }
     
+    Base.imageSetter = Public.__lookupSetter__("image");
+    Public.image setter = function (theImage) {
+       Base.imageSetter(theImage);
+       Public.update();
+    };
     
 }

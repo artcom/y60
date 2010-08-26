@@ -75,13 +75,17 @@ spark.RoundedCornerQuad.Constructor = function(Protected) {
             addMaterialRequirement(Protected.material, "option", "[10[yuv2rgb_round]]");
         }
         Protected.material.enabled = true;
-        Public.updateAspectRatio();
-        Public.radius = Protected.getNumber("radius", 17); 
-        Public.cornerDistance = Protected.getNumber("cornerDistance", 17); 
-        Public.cornerToggle = Protected.getVector4f("cornerToggle", [1,1,1,1]);
+        Public.update();
     }
     
     Public.updateAspectRatio = function() {
         Protected.material.properties.aspectRatio = Public.width/Public.height;
+    }
+    
+    Public.update = function() {
+        Public.updateAspectRatio();
+        Public.radius = Protected.getNumber("radius", 17); 
+        Public.cornerDistance = Protected.getNumber("cornerDistance", 17); 
+        Public.cornerToggle = Protected.getVector4f("cornerToggle", [1,1,1,1]);
     }
 }
