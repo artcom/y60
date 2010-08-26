@@ -94,6 +94,7 @@ namespace y60 {
     private:
         std::vector<IEventSource*> _myEventSources;
         std::vector<IEventSink*> _myEventSinks;
+        static y60::isEventAfter _myEventSort;
     };
 }
 
