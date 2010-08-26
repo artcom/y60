@@ -57,11 +57,20 @@ CoordSplineTest.prototype.Constructor = function(obj, theName) {
     // set up our spline. We have three keyframes, with 1 time unit between them.
 
     obj.keyFrames = [];
-    obj.keyFrames.push(new Keyframe([-1,0,0],  Quaternionf.createFromEuler([0,0,0]), 1, 0.5));
-    obj.keyFrames.push(new Keyframe([ 0,1,0],  Quaternionf.createFromEuler([0,Math.PI/4,Math.PI/4]), 1, 0.5));
-    obj.keyFrames.push(new Keyframe([ 1,0,0],  Quaternionf.createFromEuler([0,Math.PI/2,Math.PI/2]), 1, 0.5));
-    obj.myPath = new CoordSpline(obj.keyFrames);
+    //obj.keyFrames.push(new Keyframe([-1,0,0],  Quaternionf.createFromEuler([0,0,0]), 1, 0.5));
+    //obj.keyFrames.push(new Keyframe([ 0,1,0],  Quaternionf.createFromEuler([0,Math.PI/4,Math.PI/4]), 1, 0.5));
+    //obj.keyFrames.push(new Keyframe([ 1,0,0],  Quaternionf.createFromEuler([0,Math.PI/2,Math.PI/2]), 1, 0.5));
+    
 
+
+    obj.keyFrames.push(new Keyframe(  [0,1,0]   ,new Quaternionf(-0,0,0,1)               , 1, 0.5));
+    obj.keyFrames.push(new Keyframe(  [0,1,0]   ,new Quaternionf(0,1,-0,0)               , 1, 0.5));
+    obj.keyFrames.push(new Keyframe(  [0,1,1]   ,new Quaternionf(0,0.957092,0,0.289784)  , 1, 0.5));
+    obj.keyFrames.push(new Keyframe(  [1,1,2.5] ,new Quaternionf(0,0.981956,-0.189108,0) , 1, 0.5));
+    obj.keyFrames.push(new Keyframe(  [1,2,5]   ,new Quaternionf(-0,0.707107,0,0.707107) , 1, 0.5));
+    obj.keyFrames.push(new Keyframe(  [4,2,5]   ,new Quaternionf(-0,0.707107,0,0.707107) , 1, 0.5));
+    
+    obj.myPath = new CoordSpline(obj.keyFrames);
 
     //
     // a few utility functions
@@ -94,6 +103,7 @@ CoordSplineTest.prototype.Constructor = function(obj, theName) {
     function rotationalDifference(a,b) {
         var invertB = new Quaternionf(b);
         invertB.invert();
+        print(a, invertB);
         return product(a, invertB); 
     }
 

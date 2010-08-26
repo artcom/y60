@@ -53,7 +53,7 @@ class CoordSplineTest : public UnitTest {
             cout << "Coord Spline length: " << myLength << endl;
             for (int i = 0; i <= theNumSteps; i ++) {
                 float myT = (1.0f / theNumSteps) * i;
-                cout << "CoordSpline Value for (" << myT << " ," << myCoordSpline.xyz(myT) << " / " << myCoordSpline.getHPR(myT) << ")" << endl;
+                cout << "CoordSpline Value for (" << myT << " ," << myCoordSpline.xyz(myT) << ")" << endl;
             }
 
 

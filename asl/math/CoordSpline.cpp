@@ -35,16 +35,11 @@ namespace asl {
     static const int POSITION_X = 0; 
     static const int POSITION_Y = 1; 
     static const int POSITION_Z = 2;
-    static const int RIGHT_X = 3; 
-    static const int RIGHT_Y = 4; 
-    static const int RIGHT_Z = 5; 
-    static const int FRONT_X = 6; 
-    static const int FRONT_Y = 7; 
-    static const int FRONT_Z = 8; 
+    static const int TIME       = 3;
 
     CoordSpline::CoordSpline ( void )
     {
-        for ( int i=0; i<11; i++ ) {
+        for ( int i=0; i<5; i++ ) {
             _spline.push_back ( new Hermite() );
         }
     }
@@ -52,7 +47,7 @@ namespace asl {
     CoordSpline::~CoordSpline ( void )
     {
 
-        for ( int i=0;i<11; i++ ) {
+        for ( int i=0;i<5; i++ ) {
             delete _spline[i];
         }
     }
@@ -61,22 +56,23 @@ namespace asl {
         CoordSpline::print ( void )
     {
         // PRINT s(t) SPLINE PARAMETERS
-        _spline[9]->print();
+        _spline[TIME]->print();
     }
 
 
     bool
         CoordSpline::init ( const vector<asl::QuaternionKeyframe>& keyframes, float& total_path, bool planet_mode )
     {
-
-        dvector		time;		//
-        dvector		s;		//	dvector is defined in "Spline.h":
-        dvector		sPlanet;	//
-        dvector		speed;		//	typedef vector<float> dvector
-        dvector		weight;		//
-        dvector		weight_reverse;	//
-        vector< dvector >	value;		//
-        vector<QuaternionKeyframe>::const_iterator	it;
+        dvector    time;    //
+        dvector    s;    //  dvector is defined in "Spline.h":
+        dvector    sPlanet;  //
+        dvector    speed;    //  typedef vector<float> dvector
+        dvector    weight;    //
+        dvector    weight_reverse;  //
+        vector< dvector >  value;    //
+        vector<QuaternionKeyframe>::const_iterator  it;
+        typedef std::vector<asl::Quaternionf> VectorOfQuaternionf;
+        VectorOfQuaternionf keyFrameOrientations;
 
         _planet_mode    = planet_mode;
         _error_count    = 0;
@@ -99,7 +95,7 @@ namespace asl {
 
 
         // FILL VALUE WITH ARBITRARY NUMBERS
-        for ( dvector::size_type i=0; i<9; i++ ) {
+        for ( dvector::size_type i=0; i<3; i++ ) {
             value.push_back ( time );
         }
 
@@ -112,29 +108,12 @@ namespace asl {
             value[1] [i] = (*it).getPosition()[1];
             value[2] [i] = (*it).getPosition()[2];
 
-            //asl::Vector3f myRotation   = (*it).getOrientation();
-            //AC_TRACE << "+++++ Spline define : " << i << " orientation: " << myRotation << endl;
-
-            //asl::Matrix4f myMatrix;
-            asl::Vector4f myUpVector    = (*it).getOrientationMatrix().getRow(1);
-            asl::Vector3f myUpVector3(myUpVector[0], myUpVector[1], myUpVector[2]);
-            asl::Vector4f myViewVector  = (*it).getOrientationMatrix().getRow(2);
-            asl::Vector3f myViewVector3(myViewVector[0], myViewVector[1], myViewVector[2]);
-            asl::Vector3f myRightVec       = cross(myUpVector3, myViewVector3);
-
-            //AC_TRACE <<"right: " <<  myRightVec << endl;
-            //AC_TRACE <<"myViewVector3: " <<  myViewVector3 << endl;
-            //hpr2rfu ( hpr, right, front, up );
-
-            value[3] [i] = myRightVec[0];
-            value[4] [i] = myRightVec[1];
-            value[5] [i] = myRightVec[2];
-
-            value[6] [i] = myViewVector3[0];
-            value[7] [i] = myViewVector3[1];
-            value[8] [i] = myViewVector3[2];
-
+            const asl::Quaternionf & myOrientation = (*it).getOrientation() ;
+            keyFrameOrientations.push_back(myOrientation);
         }
+
+
+        quaternionSpline = new QuaternionSpline(keyFrameOrientations, time);
 
         // CALCULATE VALUES FOR weight
         weight = weight_reverse = time;
@@ -148,7 +127,7 @@ namespace asl {
             if (asl::almostEqual(dist_left + dist_right,0 )) {
                 weight[i] = 0.0;
             } else {
-                weight[i]	    = dist_left / (dist_left+dist_right);
+                weight[i]      = dist_left / (dist_left+dist_right);
             }
             weight_reverse[i]   = 1.0f -weight[i];
         }
@@ -169,38 +148,27 @@ namespace asl {
             avoidEarthCollision( segment );
         }
 
-
-        // INIT SPLINES hpr(s)
-        for ( i=3; i<9; i++ ) {
-            AC_TRACE << "initializing spline " << i << endl;
-            if ( ! _spline[i]->init ( s, value[i], weight_reverse ) ) {
-                AC_ERROR << "CoordSpline::init: could not initialise value "<< i <<endl;
-                return false;
-            }
-            if( debug ) _spline[i]->print();
-        }
-
-
         // INIT SPLINE s(t)
         AC_TRACE << "initializing spline s(t)" << endl;
-        if ( ! _spline[9]->init ( time, s, catmull_rom, true ) ) {
+        if ( ! _spline[TIME]->init ( time, s, catmull_rom, true ) ) {
             AC_ERROR << "CoordSpline::init: could not initialise spline" << endl;
             return false;
         }
-        if( debug ) _spline[9]->print();
+        if( debug ) _spline[TIME]->print();
 
         for ( it=keyframes.begin(); it!=keyframes.end(); it++ ) {
             float mySpeed = (*it).getSpeed();
             speed.push_back ( mySpeed );
         }
-        _spline[9]->slowdown ( speed );
+        _spline[TIME]->slowdown ( speed );
 
         AC_TRACE << "s(t) after slowdown:" << endl;
-        if( debug ) _spline[9]->print();
+        if( debug ) _spline[TIME]->print();
 
         // ESTIMATE TOTAL_PATH
         if ( _planet_mode ) {
-            integrate ( v_planet(*this), 0.0, time[iLast], total_path );
+          //   integrate ( v_planet(*this), 0.0, time[iLast], total_path );
+          throw(new asl::Exception("not yet implemented"));
         }
 
         return true;
@@ -211,7 +179,7 @@ namespace asl {
 
     ////////////////////////////////////////////////////////////////////////////////
     //
-    //	xyz
+    //  xyz
     //
     ////////////////////////////////////////////////////////////////////////////////
 
@@ -231,13 +199,15 @@ namespace asl {
 
     ////////////////////////////////////////////////////////////////////////////////
     //
-    //	hpr
+    //  hpr
     //
     ////////////////////////////////////////////////////////////////////////////////
 
+#if 0
     asl::Vector3f
         CoordSpline::getHPR ( float s )
     {
+    	//TODO: this is broken due to quaternion interpolation
         asl::Vector3f right, front, up;
         asl::Vector3f hpr;
 
@@ -265,90 +235,69 @@ namespace asl {
         return myOrientation;
     }
 
+#endif
     ////////////////////////////////////////////////////////////////////////////////
     //
-    //	quaternion
+    //  quaternion
     //
     ////////////////////////////////////////////////////////////////////////////////
     asl::Quaternionf
         CoordSpline::getQuaternion ( float s )
     {
-        asl::Vector3f right, front, up;
-        asl::Vector3f hpr;
-
-        right = Vector3f((*_spline[RIGHT_X])(s), (*_spline[RIGHT_Y])(s), (*_spline[RIGHT_Z])(s) );
-        front = Vector3f((*_spline[FRONT_X])(s), (*_spline[FRONT_Y])(s), (*_spline[FRONT_Z])(s) );
-
-        up = cross( front, right );
-
-        asl::Matrix4f myMatrix;
-        myMatrix.makeIdentity();
-        asl::Vector4f myUp(up[0], up[1], up[2], 0.0);
-        
-        myUp.normalize();
-        myMatrix.assignRow(1,myUp);
-
-        asl::Vector4f myFront(front[0], front[1], front[2], 0.0);
-        myFront.normalize();
-        myMatrix.assignRow(2,myFront);
-
-        asl::Vector4f myRight(right[0], right[1], right[2], 0.0);
-        myRight.normalize();
-        myMatrix.assignRow(0,myRight);
-
-        asl::Quaternionf myOrientation;
-        myMatrix.getRotation(myOrientation);
-        return myOrientation;
+    	asl::Quaternionf myOrientation;
+        myOrientation  = quaternionSpline->getOrientation(s);
+        AC_TRACE << "returning quatertion: " << myOrientation;
+        return quaternionSpline->getOrientation(s);
     }
 
     ////////////////////////////////////////////////////////////////////////////////
     //
-    //	s
+    //  s
     //
     ////////////////////////////////////////////////////////////////////////////////
 
     float
         CoordSpline::s ( float t )
     {
-        return (*_spline[9])(t);
+        return (*_spline[TIME])(t);
     }
 
 
 
     ////////////////////////////////////////////////////////////////////////////////
     //
-    //	sPlanet
+    //  sPlanet
     //
     ////////////////////////////////////////////////////////////////////////////////
 
     float
         CoordSpline::sPlanet ( float t )
     {
-        return (*_spline[10])(t);
+        return (*_spline[4])(t);
     }
 
 
 
     ////////////////////////////////////////////////////////////////////////////////
     //
-    //	v
+    //  v
     //
     ////////////////////////////////////////////////////////////////////////////////
 
     float
         CoordSpline::v ( float t )
     {
-        return (*_spline[9]) ( t, 1 );
+        return (*_spline[TIME]) ( t, 1 );
     }
 
 
 
     ////////////////////////////////////////////////////////////////////////////////
     //
-    //	vPlanet
+    //  vPlanet
     //
     ////////////////////////////////////////////////////////////////////////////////
-
+#if 0
 
     float
         CoordSpline::vPlanet ( float s )
@@ -379,11 +328,12 @@ namespace asl {
         return 1.0f / subjectiveArcElement;
     }
 
+#endif
     ////////////////////////////////////////////////////////////////////////////////
     //
-    //	arcElementTrans
+    //  arcElementTrans
     //
-    //	sqrt ( x'^2 + y'^2 + z'^2 )
+    //  sqrt ( x'^2 + y'^2 + z'^2 )
     //
     ////////////////////////////////////////////////////////////////////////////////
 
@@ -403,14 +353,14 @@ namespace asl {
 
     ////////////////////////////////////////////////////////////////////////////////
     //
-    //	arcElementRot
+    //  arcElementRot
     //
     ////////////////////////////////////////////////////////////////////////////////
-
+#if 0
     float
         CoordSpline::arcElementRot ( float s )
     {
-
+        //TODO: broken due to quaternion orientaion
         float result =
             sqrt (
             (*_spline[RIGHT_X])(s, 1) * (*_spline[RIGHT_X])(s, 1) +
@@ -423,55 +373,55 @@ namespace asl {
 
         return result;
     }
-
+#endif
 
 
     ////////////////////////////////////////////////////////////////////////////////
     //
-    //	getPath
+    //  getPath
     //
     ////////////////////////////////////////////////////////////////////////////////
 
     float
         CoordSpline::getPath ( int i )
     {
-        if ( i<0 || i>=_spline[9]->dim() ) {
+        if ( i<0 || i>=_spline[TIME]->dim() ) {
             AC_ERROR << "CoordSpline::getPath: bad value of arg i = "<< i;
             return 0.0;
         }
-        return _spline[9]->y(i);
+        return _spline[TIME]->y(i);
     }
 
 
 
     ////////////////////////////////////////////////////////////////////////////////
     //
-    //	getTime
+    //  getTime
     //
     ////////////////////////////////////////////////////////////////////////////////
 
     float
         CoordSpline::getTime ( int i )
     {
-        if ( i<0 || i>=_spline[9]->dim() ) {
+        if ( i<0 || i>=_spline[TIME]->dim() ) {
             AC_ERROR << "CoordSpline::getTime: bad value of arg i = "<< i;
             return 0.0;
         }
-        return _spline[9]->x(i);
+        return _spline[TIME]->x(i);
     }
 
 
-
+#if 0
     ////////////////////////////////////////////////////////////////////////////////
     //
-    //	vFront
+    //  vFront
     //
     ////////////////////////////////////////////////////////////////////////////////
 
     asl::Vector3f
         CoordSpline::vFront( float s )
     {
-
+        //
         float x = (*_spline[FRONT_X]) ( s, 1 );
         float y = (*_spline[FRONT_Y]) ( s, 1 );
         float z = (*_spline[FRONT_Z]) ( s, 1 );
@@ -483,7 +433,7 @@ namespace asl {
 
     ////////////////////////////////////////////////////////////////////////////////
     //
-    //	vRight
+    //  vRight
     //
     ////////////////////////////////////////////////////////////////////////////////
 
@@ -502,7 +452,7 @@ namespace asl {
 
     ////////////////////////////////////////////////////////////////////////////////
     //
-    //	vCamera
+    //  vCamera
     //
     ////////////////////////////////////////////////////////////////////////////////
 
@@ -517,11 +467,11 @@ namespace asl {
         return asl::Vector3f( x, y, z );
     }
 
-
+#endif
 
     ////////////////////////////////////////////////////////////////////////////////
     //
-    //	avoidEarthCollision
+    //  avoidEarthCollision
     //
     ////////////////////////////////////////////////////////////////////////////////
 
@@ -529,14 +479,14 @@ namespace asl {
         CoordSpline::avoidEarthCollision ( int segment )
     {
 
-        float minHeight	= 0.0;
-        //    float fLimit	= (minHeight+EarthRadiusF)*(minHeight+EarthRadiusF);
-        //bool debug		= false;
+        float minHeight  = 0.0;
+        //    float fLimit  = (minHeight+EarthRadiusF)*(minHeight+EarthRadiusF);
+        //bool debug    = false;
 
         // GET 10 SAMPLEPOINTS
         float x1, x2, x3, y1, y2, y3, step, x, y;
-        x1	    = _spline[POSITION_X]->x(segment);
-        x3	    = _spline[POSITION_X]->x(segment+1);
+        x1      = _spline[POSITION_X]->x(segment);
+        x3      = _spline[POSITION_X]->x(segment+1);
         step    = (x3-x1) / 10.0f;
 
         x = x2 = x1;
@@ -613,7 +563,7 @@ namespace asl {
 
     ////////////////////////////////////////////////////////////////////////////////
     //
-    //	rad23
+    //  rad23
     //
     ////////////////////////////////////////////////////////////////////////////////
 
@@ -626,11 +576,11 @@ namespace asl {
 
     ////////////////////////////////////////////////////////////////////////////////
     //
-    //	minRad2
+    //  minRad2
     //
-    //	find minimum by parabolic interpolation.
-    //	the algorithm is described in Numerical recipes, parabolic interpolation
-    //	and Brent's method. See p 402, eq 10.2.1, see also "brent.c"
+    //  find minimum by parabolic interpolation.
+    //  the algorithm is described in Numerical recipes, parabolic interpolation
+    //  and Brent's method. See p 402, eq 10.2.1, see also "brent.c"
     //
     ////////////////////////////////////////////////////////////////////////////////
 
@@ -709,4 +659,3 @@ namespace asl {
 
 
 }
-
