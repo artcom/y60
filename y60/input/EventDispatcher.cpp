@@ -95,7 +95,7 @@ namespace y60 {
                 sortedEvents.push_back(curEvents[j]);
             }
         }
-        std::sort(sortedEvents.begin(), sortedEvents.end(),_myEventSort);
+        std::stable_sort(sortedEvents.begin(), sortedEvents.end(),_myEventSort);
         while (!sortedEvents.empty()) {
             EventPtr curEvent = sortedEvents.back();
             sortedEvents.pop_back();

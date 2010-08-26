@@ -85,31 +85,35 @@ namespace y60 {
     }
     void 
     GenericEventSourceFilter::applyCursorFilter(const std::string & theEventType, const std::string & theIdAttributeName, EventPtrList & theEventList) {
-        std::map<int, std::vector<GenericEventPtr > > myEvents2Shrink;
+        std::map<int, GenericEventPtr > myNewestEvent;
         EventPtrList::iterator myIt = theEventList.begin();
-        unsigned int counter= 0;
         for (; myIt !=theEventList.end(); ) {
-            counter++;
             GenericEventPtr myGenericEvent(dynamic_cast_Ptr<GenericEvent>(*myIt));
             dom::NodePtr myNode = myGenericEvent->getNode();
             int myCursorId = asl::as<int>(myNode->getAttributeString(theIdAttributeName));
             std::string myEventType = myNode->getAttributeString("type");
             if (myEventType == theEventType) {
-                if (myEvents2Shrink.find(myCursorId) == myEvents2Shrink.end()) {
-                    myEvents2Shrink[myCursorId] = std::vector<GenericEventPtr>();
-                }
-                myEvents2Shrink[myCursorId].push_back(myGenericEvent);
-                myIt = theEventList.erase(myIt);
+                if (myNewestEvent.find(myCursorId) != myNewestEvent.end()) {
+					myIt = theEventList.erase(myIt);    
+				} else {
+					++myIt;
+				}
+                myNewestEvent[myCursorId] = myGenericEvent;
             } else {
                 ++myIt;
             }
         }
 
-        std::map<int, std::vector<GenericEventPtr > >::iterator myEndIt2   = myEvents2Shrink.end();
-        std::map<int, std::vector<GenericEventPtr > >::iterator myIt2 = myEvents2Shrink.begin();
-        for(; myIt2 !=  myEndIt2; ++myIt2){
-            theEventList.push_back((myIt2->second)[(myIt2->second).size()-1]);
-        }
+		for (myIt = theEventList.begin(); myIt !=theEventList.end(); ++myIt) {
+            GenericEventPtr myGenericEvent(dynamic_cast_Ptr<GenericEvent>(*myIt));
+            dom::NodePtr myNode = myGenericEvent->getNode();
+            int myCursorId = asl::as<int>(myNode->getAttributeString(theIdAttributeName));
+            std::string myEventType = myNode->getAttributeString("type");
+            if (myEventType == theEventType && myNewestEvent.find(myCursorId) != myNewestEvent.end()) {
+				*(myIt) = myNewestEvent[myCursorId];
+			}
+		}
+        
     }
 
     void 
