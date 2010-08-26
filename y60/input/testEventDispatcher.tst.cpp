@@ -54,7 +54,6 @@
 //    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
-
 */
 
 #include "EventDispatcher.h"
