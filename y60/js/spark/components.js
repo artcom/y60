@@ -57,7 +57,7 @@
 */
 
 /*jslint nomen: false, plusplus: false*/
-/*global spark, Logger, Vector2f, Vector3f, Vector4f, trim*/
+/*global spark, Logger, Vector2f, Vector3f, Vector4f, trim, js*/
 
 spark.ourComponentsByNameMap = {};
 
@@ -91,16 +91,16 @@ spark.Component.Constructor = function (Protected) {
     /**
      * Get the parent of this component.
      */
-    Public.parent getter = function () {
+    Public.__defineGetter__("parent", function () {
         return _myParent;
-    };
+    });
 
     /**
      * Internal: change the parent of this component.
      */
-    Public.parent setter = function (theParent) {
+    Public.__defineSetter__("parent", function (theParent) {
         _myParent = theParent;
-    };
+    });
 
     /**
      * Find the root of the component hierarchy.
@@ -108,20 +108,20 @@ spark.Component.Constructor = function (Protected) {
      * NOTE: This is not identical to finding the
      *       stage of a widget.
      */
-    Public.root getter = function () {
+    Public.__defineGetter__("root", function () {
         var myCurrent = Public;
         while (myCurrent.parent !== null) {
             myCurrent = myCurrent.parent;
         }
         return myCurrent;
-    };
+    });
 
     /**
      * Get the XML node used to instantiate this component.
      */
-    Public.node getter = function () {
+    Public.__defineGetter__("node", function () {
         return _myNode;
-    };
+    });
 
     /**
      * Initialize this component from an XML node.
@@ -139,7 +139,7 @@ spark.Component.Constructor = function (Protected) {
      * The vocation of a component is a human-readable
      * string describing the components identity.
      */
-    Public.vocation getter = function () {
+    Public.__defineGetter__("vocation", function () {
         if (Public.name) {
             return "named " + Public.name;
         }
@@ -147,7 +147,7 @@ spark.Component.Constructor = function (Protected) {
             return "with id " + Public.id;
         }
         return "without a name";
-    };
+    });
 
     /**
      * Given the node describing this component,
@@ -352,9 +352,9 @@ spark.Container.Constructor = function (Protected) {
     /**
      * Get an array containing all children of this container.
      */
-    Public.children getter = function () {
+    Public.__defineGetter__("children", function () {
         return _myChildren;
-    };
+    });
 
     /**
      * Add the given child to this container.

@@ -12,12 +12,12 @@ use("SceneViewer.js"); // XXX: bad place for this
 spark.Window = spark.ComponentClass("Window");
 
 spark.Window.Constructor = function (Protected) {
-    var Public = this;
     var Base = {};
-    
-    this.Inherit(spark.Stage);
+    var Public = this;
+    Public.Inherit(spark.Stage);
     // Also inherit from SceneViewer
     SceneViewer.prototype.Constructor(this, []);
+    
     /////////////////////
     // Private Members //
     /////////////////////
@@ -274,7 +274,12 @@ spark.Window.Constructor = function (Protected) {
     });
 
     Public.pickWidget = function (theX, theY) {
-        var myBody = Public.picking.pickBodyBySweepingSphereFromBodies(theX, theY, _myPickRadius, Public.sceneNode);
+        var myBody     = null;
+        if (_myPickRadius === 0) {
+            myBody = Public.picking.pickBody(theX, theY, Public.sceneNode);
+        } else {
+            myBody = Public.picking.pickBodyBySweepingSphereFromBodies(theX, theY, _myPickRadius, Public.sceneNode);
+        }
         if (myBody) {
             var myBodyId = myBody.id;
             if (myBodyId in spark.sceneNodeMap) {

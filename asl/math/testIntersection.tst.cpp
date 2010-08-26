@@ -43,6 +43,7 @@ class IntersectionTest : public UnitTest {
             Point3f C(1.0f, 1.0f, 0.0f);
             Point3f D(2.0f, 0.0f, 0.0f);
             Point3f E(3.0f, 1.0f, 0.0f);
+            Triangle<float> triangle(E,D,C);
             {
                 asl::Line<float> myLine(A,B);
                 ENSURE(almostEqual(distance(myLine,C), 1.0f));
@@ -181,6 +182,23 @@ class IntersectionTest : public UnitTest {
                 ENSURE(intersection(mySphere, myLineSegment4, myResult));
                 ENSURE(myResult.size() == 1);
                 ENSURE(myResult[0] == Point3f(-1,0,0));
+            }
+            // Triangle Line/LineSegment/Ray Tests
+            {
+                Point3f myResult;
+                Vector3f myResultNormal;
+                LineSegment<float> myLineSegment(Point3f(2,0.5,-1), Point3f(2,0.5,1));
+                Line<float> myLine(Point3f(2,0.5,-1), Point3f(2,0.5,1));
+                Ray<float> myRay(Point3f(2,0.5,-1), Point3f(2,0.5,1));
+                
+                ENSURE(intersection(triangle, myLineSegment, myResult)); 
+                ENSURE(intersection(triangle, myLineSegment, myResult, myResultNormal)); 
+                
+                ENSURE(intersection(triangle, myLine, myResult)); 
+                ENSURE(intersection(triangle, myLine, myResult, myResultNormal)); 
+                
+                ENSURE(intersection(triangle, myRay, myResult)); 
+                ENSURE(intersection(triangle, myRay, myResult, myResultNormal)); 
             }
         }
 };

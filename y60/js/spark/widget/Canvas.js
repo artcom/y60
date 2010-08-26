@@ -88,8 +88,8 @@ spark.Canvas.Constructor = function (Protected) {
     ///////////////////////
     
     Public.bind = function (theBindingSlot, cb) {
-        var bind_info = {id: createUniqueId(),
-                         slot: theBindingSlot};
+        var bind_info = {id   : createUniqueId(),
+                         slot : theBindingSlot};
         var my_handle = new Handle(bind_info, cb);
         _bindings[theBindingSlot][bind_info.id] = my_handle;
         return my_handle;
@@ -118,10 +118,10 @@ spark.Canvas.Constructor = function (Protected) {
         return _myRenderFlag;
     });
     
-    Public.__defineGetter__("image", function() {
+    Public.__defineGetter__("image", function () {
         return _myImage;
     });
-    Public.__defineGetter__("renderArea", function() {
+    Public.__defineGetter__("renderArea", function () {
         return _myRenderArea;
     });
     
