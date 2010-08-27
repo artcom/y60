@@ -179,6 +179,7 @@ namespace y60 {
 
         void setupVideo(const std::string & theFilename);
         void setupAudio(const std::string & theFilename);
+        void getVideoProperties(const std::string & theFilename);
         void dumpCache();
         bool shouldSeek(double theCurrentTime, double theDestTime);
         void seek(double theDestTime);
