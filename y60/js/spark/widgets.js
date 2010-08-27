@@ -476,10 +476,10 @@ spark.Widget.Constructor = function(Protected) {
     };
 
     Public.animateFade = function(theDuration, theEnd, theEasing) {
-        if(!theDuration) {
+        if(theDuration == undefined) {
             theDuration = 250.0;
         }
-        if(!theEnd) {
+        if(theEnd == undefined) {
         	theEnd = 1.0;
         }
         if(!theEasing) {
