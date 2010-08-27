@@ -289,7 +289,7 @@ namespace y60 {
             }
             return (unsigned)(myFrame % get<FrameCountTag>());
         }
-    }
+}
 
 
 
@@ -303,7 +303,7 @@ namespace y60 {
     void
     Movie::readFrame(double theCurrentTime, bool theIgnoreCurrentTime) {
         DB(AC_DEBUG << "Movie::readFrame time=" << theCurrentTime
-            << " src=" << get<ImageSourceTag>());
+            << " src=" << get<ImageSourceTag>() << " current playmode=" << getStringFromEnum(_myPlayMode, MoviePlayModeStrings) << " currentFrame=" << get<CurrentFrameTag>());
         DB(AC_DEBUG << "                 theIgnoreCurrentTime=" << theIgnoreCurrentTime);
         _myLastCurrentTime = (theIgnoreCurrentTime) ? -1.0 : theCurrentTime;
 

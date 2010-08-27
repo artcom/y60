@@ -237,31 +237,10 @@ namespace y60 {
             _myDemux->enableStream(_myAStreamIndex);
         }
 
+        getVideoProperties(theFilename);
         decodeFrame();
-        double myAspectRatio = 1.0;
-        // calc aspect ratio
-#if LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(52,21,0)
-        if (_myVStream->sample_aspect_ratio.num) {
-           myAspectRatio = av_q2d(_myVStream->sample_aspect_ratio);
-        } else if (_myVStream->codec->sample_aspect_ratio.num) {
-#else            
-        if (_myVStream->codec->sample_aspect_ratio.num) {
-#endif            
-           myAspectRatio = av_q2d(_myVStream->codec->sample_aspect_ratio);
-        } else {
-           myAspectRatio = 0;
-        }
-        if (myAspectRatio <= 0.0) {
-            myAspectRatio = 1.0;
-        }
-        myAspectRatio *= (float)_myVStream->codec->width / _myVStream->codec->height; 
-        Movie * myMovie = getMovie();
-        myMovie->set<AspectRatioTag>((float)myAspectRatio);
-
-        _myVideoStartTimestamp = _myVStream->start_time;//myPacket->dts;
-        AC_DEBUG << "Set StartTimestamp to packet timestamp= " << _myVideoStartTimestamp;
-
-
+        // reload video properties after first decode
+        getVideoProperties(theFilename);
     }
 
     void FFMpegDecoder2::startOverAgain() {
@@ -962,6 +941,15 @@ namespace y60 {
             }
         }
 
+        // allocate frame for YUV data
+        _myFrame = avcodec_alloc_frame();
+    }
+
+    void
+    FFMpegDecoder2::getVideoProperties(const std::string & theFilename) {
+        AVCodecContext * myVCodec = _myVStream->codec;
+        Movie * myMovie = getMovie();
+
         _myFrameRate = av_q2d(_myVStream->r_frame_rate);
 
         myMovie->set<FrameRateTag>(_myFrameRate);
@@ -979,28 +967,49 @@ namespace y60 {
             myMovie->set<MaxCacheSizeTag>(std::min(int(myMovie->get<MaxCacheSizeTag>()), int(myMovie->get<FrameCountTag>())));
             _myVideoStreamTimeBase = 1/ av_q2d(_myVStream->time_base);
         } else {
-	        double myDuration = 0.0;
+            double myDuration = 0.0;
             if(_myFormatContext->start_time == (int)AV_NOPTS_VALUE) {
                 myDuration = (_myFormatContext->duration )*_myFrameRate/(double)AV_TIME_BASE;
             } else {
                 myDuration = (_myFormatContext->duration - _myFormatContext->start_time )*_myFrameRate/(double)AV_TIME_BASE;
             }
-            myMovie->set<FrameCountTag>(int(myDuration));
+            myMovie->set<FrameCountTag>(int(asl::round(myDuration)));
             myMovie->set<MaxCacheSizeTag>(std::min(int(myMovie->get<MaxCacheSizeTag>()), int(myMovie->get<FrameCountTag>())));
 	        _myVideoStreamTimeBase = 1/ av_q2d(_myVStream->time_base);
 	    }
         _myMaxCacheSize = myMovie->get<MaxCacheSizeTag>();
-        AC_INFO << "FFMpegDecoder2::setupVideo() " << theFilename << " fps="
+
+        double myAspectRatio = 1.0;
+        // calc aspect ratio
+#if LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(52,21,0)
+        if (_myVStream->sample_aspect_ratio.num) {
+           myAspectRatio = av_q2d(_myVStream->sample_aspect_ratio);
+        } else if (_myVStream->codec->sample_aspect_ratio.num) {
+#else            
+        if (_myVStream->codec->sample_aspect_ratio.num) {
+#endif            
+           myAspectRatio = av_q2d(_myVStream->codec->sample_aspect_ratio);
+        } else {
+           myAspectRatio = 0;
+        }
+        if (myAspectRatio <= 0.0) {
+            myAspectRatio = 1.0;
+        }
+        myAspectRatio *= (float)_myVStream->codec->width / _myVStream->codec->height; 
+        myMovie->set<AspectRatioTag>((float)myAspectRatio);
+
+        _myVideoStartTimestamp = _myVStream->start_time;//myPacket->dts;
+        AC_INFO << "FFMpegDecoder2::getVideoProperties() " << theFilename << " fps="
                 << _myFrameRate << " framecount=" << getFrameCount()<< " time_base: "
                 <<_myVideoStreamTimeBase;
         AC_INFO << "r_framerate den: " <<_myVStream->r_frame_rate.den<< " r_framerate num: "<< _myVStream->r_frame_rate.num;
         AC_INFO << "stream time_base: " << _myVStream->time_base.den << ","<<_myVStream->time_base.num;
         AC_INFO << "codec time_base: " << _myVStream->codec->time_base.den << ","<<_myVStream->codec->time_base.num;
         AC_INFO << "formatcontex start_time: " << _myFormatContext->start_time<<" stream start_time: "<<_myVStream->start_time;
+        AC_INFO << "aspect ratio= " << myAspectRatio;
 
-        // allocate frame for YUV data
-        _myFrame = avcodec_alloc_frame();
     }
+
     void
     FFMpegDecoder2::setupAudio(const std::string & theFilename) {
         AVCodecContext * myACodec = _myAStream->codec;
