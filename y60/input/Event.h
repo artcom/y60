@@ -112,9 +112,9 @@ namespace y60 {
     };
 
     // Functor to compare two EventPtrs chronologically
-    struct isEventAfter : public std::binary_function<EventPtr,EventPtr,bool> {
+    struct isEventBefore : public std::binary_function<EventPtr,EventPtr,bool> {
         bool operator()(const EventPtr & x, const EventPtr & y) const {
-            return x->when >= y->when;
+            return x->when < y->when;
         }
     };
 }

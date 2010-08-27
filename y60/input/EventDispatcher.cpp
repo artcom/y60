@@ -76,7 +76,7 @@
 using namespace std;
 
 namespace y60 {
-    isEventAfter EventDispatcher::_myEventSort = isEventAfter();
+    isEventBefore EventDispatcher::_myEventSort = isEventBefore();
         
     EventDispatcher::EventDispatcher() {
     }
@@ -86,7 +86,7 @@ namespace y60 {
 
     void
     EventDispatcher::dispatch() {
-        std::vector<EventPtr> sortedEvents;
+        std::deque<EventPtr> sortedEvents;
 
         for (unsigned i = 0; i < _myEventSources.size(); ++i) {
             EventPtrList curEvents = _myEventSources[i]->poll();
@@ -97,8 +97,8 @@ namespace y60 {
         }
         std::stable_sort(sortedEvents.begin(), sortedEvents.end(),_myEventSort);
         while (!sortedEvents.empty()) {
-            EventPtr curEvent = sortedEvents.back();
-            sortedEvents.pop_back();
+            EventPtr curEvent = sortedEvents.front();
+            sortedEvents.pop_front();
             for (unsigned i = 0; i < _myEventSinks.size(); ++i) {
                 _myEventSinks[i]->handle(curEvent);
             }
