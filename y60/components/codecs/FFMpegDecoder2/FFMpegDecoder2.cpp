@@ -250,9 +250,6 @@ namespace y60 {
             DB(AC_DEBUG << "Joining FFMpegDecoder Thread");
             join();
         }
-        Movie * myMovie = getMovie();
-        myMovie->set<MaxCacheSizeTag>(std::min(int(myMovie->get<MaxCacheSizeTag>()), int(myMovie->get<FrameCountTag>())));
-        _myMaxCacheSize = myMovie->get<MaxCacheSizeTag>();
         doSeek(0, false);
 
         if (!isActive()) {
