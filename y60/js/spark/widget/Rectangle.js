@@ -10,16 +10,29 @@ spark.Rectangle.Constructor = function(Protected) {
     var _myColor;
     Base.realize = Public.realize;
     Public.realize = function(theMaterialOrShape) {
-        _myColor = Protected.getVector3f("color", null);
-        _myColor = _myColor || Protected.getVector4f("color", [1,1,1,1]);
-        
-        if(_myColor.length < 4) {
-            _myColor = new Vector4f(_myColor.x, _myColor.y, _myColor.z, Public.alpha);
-        } 
-        
-        var myMaterial = Modelling.createColorMaterial(window.scene, _myColor);
-        
-        myMaterial.transparent = true;
+        var myMaterial = null;
+        if(theMaterialOrShape) {
+            if (theMaterialOrShape.nodeName == "shape") {
+                var myShape = theMaterialOrShape;
+                var myMateriaId = _myShape
+                    . childNode("primitives")
+                    . childNode("elements").material;
+                myMaterial = _myShape.getElementById(myMateriaId);
+            } else if (theMaterialOrShape.nodeName == "material") {
+                myMaterial = theMaterialOrShape;
+            }
+        } else {
+            _myColor = Protected.getVector3f("color", null);
+            _myColor = _myColor || Protected.getVector4f("color", [1,1,1,1]);
+            
+            if(_myColor.length < 4) {
+                _myColor = new Vector4f(_myColor.x, _myColor.y, _myColor.z, Public.alpha);
+            } 
+            
+            myMaterial = Modelling.createColorMaterial(window.scene, _myColor);
+            
+            myMaterial.transparent = true;
+        }
         Base.realize(myMaterial);
     };
     
@@ -27,7 +40,9 @@ spark.Rectangle.Constructor = function(Protected) {
     Base.postRealize = Public.postRealize;
     Public.postRealize = function(){
         Base.postRealize();
-        Public.color = _myColor;
+        if(_myColor) {
+            Public.color = _myColor;
+        }
     };
 
     Public.color getter = function() {
