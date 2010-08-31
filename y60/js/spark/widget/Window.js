@@ -163,9 +163,14 @@ spark.Window.Constructor = function(Protected) {
         return window.height;
     }
 
-    Public.pickWidget = function(theX, theY) {
-        var myBody = Public.picking.pickBodyBySweepingSphereFromBodies(theX, theY, _myPickRadius, Public.sceneNode);
-        if(myBody) {
+    Public.pickWidget = function (theX, theY) {
+        var myBody     = null;
+        if (_myPickRadius === 0) {
+            myBody = Public.picking.pickBody(theX, theY, Public.sceneNode);
+        } else {
+            myBody = Public.picking.pickBodyBySweepingSphereFromBodies(theX, theY, _myPickRadius, Public.sceneNode);
+        }
+        if (myBody) {
             var myBodyId = myBody.id;
             if(myBodyId in spark.sceneNodeMap) {
                 var myWidget = spark.sceneNodeMap[myBodyId];
@@ -626,7 +631,10 @@ spark.Window.Constructor = function(Protected) {
         }
         return myPosition;
     };
+<<<<<<< HEAD
     
     
     
+=======
+>>>>>>> c82ab7c... (spark) window can now also use fast ray picking instead of tolerant swept sphere
 };
