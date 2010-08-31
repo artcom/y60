@@ -631,10 +631,4 @@ spark.Window.Constructor = function(Protected) {
         }
         return myPosition;
     };
-<<<<<<< HEAD
-    
-    
-    
-=======
->>>>>>> c82ab7c... (spark) window can now also use fast ray picking instead of tolerant swept sphere
 };
