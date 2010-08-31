@@ -186,10 +186,10 @@ spark.Slider.Constructor = function(Protected) {
     };
     
     Public.centerCursor = function() {
-            _myIdleCursor.position = new Vector3f(_mySliderBackground.width/2 -_myIdleCursor.width/2,
-                                                  _mySliderBackground.height/2 -_myIdleCursor.height/2,
-                                                  0);
-            _myActiveCursor.position = _myIdleCursor.position;
+            _myIdleCursor.x = _mySliderBackground.width/2 -_myIdleCursor.width/2;
+            _myIdleCursor.y = _mySliderBackground.height/2 -_myIdleCursor.height/2;
+            _myActiveCursor.x = _myIdleCursor.x;
+            _myActiveCursor.y = _myIdleCursor.y;
     };
 
     function dampPosition (theEvent) {
