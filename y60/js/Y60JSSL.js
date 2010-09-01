@@ -1279,9 +1279,10 @@ utils.dom.mergeNodes = function (theTargetNode, theSourceNode) {
         default:
             break;
         }
+        return myClonedSourceNode;
     }
     _adjustIds(theSourceNode);
-    _cloneToTarget(theTargetNode, theSourceNode);
+    return _cloneToTarget(theTargetNode, theSourceNode);
 };
 
 
