@@ -111,7 +111,7 @@ spark.loadFont = function(theName, theSize, theStyle, theHinting) {
         }
 
         // blurry aber gutes spacing -> No Hinting (Renderer.NOHINTING)
-        // crispy aber rottenschlechtes spacing -> Natives Fonthinting (Renderer.NATIVEHINTING)
+        // crispy aber rottenschlechtes spacing -> Natives Fonthinting (Renderer.NATIVEHINTING) // if compiled into freetype!! 
         // wenig crispy aber okes spacing -> Autohinting (Renderer.AUTOHINTING)
 
         var myHinting = spark.hintingFromString(theHinting);    
@@ -213,7 +213,7 @@ spark.fontForStyle = function(theStyle) {
     !theStyle.getAttribute("font")      ? theStyle.font    = "arial" : null;
     !theStyle.getAttribute("fontSize")  ? theStyle.fontSize = 12 : null;
     !theStyle.getAttribute("fontStyle") ? theStyle.fontStyle  = "normal" : null;
-    !theStyle.getAttribute("hinting") ? theStyle.hinting  = spark.NOHINTING : null;
+    !theStyle.getAttribute("hinting") ? theStyle.hinting  = spark.AUTOHINTING : null;
     return spark.loadFont(theStyle.font, theStyle.fontSize, theStyle.fontStyle, theStyle.hinting);
 }
 
@@ -249,15 +249,21 @@ spark.styleFromString = function(theString) {
     throw new Error("Unknown font style: " + theString);
 };
 
-spark.NATIVEHINTING = "nativehinting";
+spark.AUTOHINTINGLIGHT = "autohinting_light";
+spark.AUTOHINTINGMONO = "autohinting_mono";
 spark.AUTOHINTING = "autohinting";
 spark.NOHINTING = "nohinting";
+spark.NATIVEHINTING = "nativehinting";
 
 spark.hintingFromString = function(theString) {
     if(theString == spark.NOHINTING)
         return Renderer.NOHINTING;
     if(theString == spark.AUTOHINTING)
         return Renderer.AUTOHINTING;
+    if(theString == spark.AUTOHINTINGMONO)
+        return Renderer.AUTOHINTINGMONO;
+    if(theString == spark.AUTOHINTINGLIGHT)
+        return Renderer.AUTOHINTINGLIGHT;
     if(theString == spark.NATIVEHINTING)
         return Renderer.NATIVEHINTING;
     throw new Error("Unknown font hinting: " + theString);

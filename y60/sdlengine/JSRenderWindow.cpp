@@ -182,14 +182,14 @@ loadTTF(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     // Binding is implemented by hand to allow overloading
     try {
         SDLFontInfo::FONTTYPE myFontType = SDLFontInfo::NORMAL;
-        SDLFontInfo::FONTHINTING myFontHint = SDLFontInfo::NOHINTING;
+        SDLFontInfo::FONTHINTING myFontHint = SDLFontInfo::AUTOHINTING;
 
         std::string myName   = "";
         std::string myPath   = "";
         unsigned    myHeight = 0;
 
-        if (argc != 4 && argc != 5) {
-            JS_ReportError(cx, "Renderer::loadTTF(): Wrong number of arguments. Must be four or five");
+        if (argc != 3 && argc != 4 && argc != 5) {
+            JS_ReportError(cx, "Renderer::loadTTF(): Wrong number of arguments. Must be three, four or five");
             return JS_FALSE;
         }
 
@@ -208,12 +208,14 @@ loadTTF(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             return JS_FALSE;
         }
 
+        if (argc > 3) {
         unsigned short myFontHintEnum = 0;
         if (!convertFrom(cx, argv[3], myFontHintEnum)) {
             JS_ReportError(cx, "Renderer::loadTTF(): Argument #4 must be a font hint type");
             return JS_FALSE;
         }
         myFontHint = SDLFontInfo::FONTHINTING(myFontHintEnum);
+        }
 
         if (argc > 4) {
             unsigned short myFontTypeEnum = 0;

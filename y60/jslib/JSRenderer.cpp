@@ -313,6 +313,9 @@ JSRenderer::ConstIntProperties() {
     const unsigned short PROP_NOHINTING     = 0;
     const unsigned short PROP_NATIVEHINTING = 1;
     const unsigned short PROP_AUTOHINTING   = 2;
+    const unsigned short PROP_AUTOHINTING_LIGHT = 3;
+    const unsigned short PROP_AUTOHINTING_MONO   = 4;
+    
 
     static JSConstIntPropertySpec myProperties[] = {
             DEFINE_PROPERTY(BV_NONE),
@@ -328,6 +331,8 @@ JSRenderer::ConstIntProperties() {
             DEFINE_FONT_FLAG(NOHINTING),
             DEFINE_FONT_FLAG(NATIVEHINTING),
             DEFINE_FONT_FLAG(AUTOHINTING),
+            DEFINE_FONT_FLAG(AUTOHINTING_LIGHT),
+            DEFINE_FONT_FLAG(AUTOHINTING_MONO),
             DEFINE_FONT_FLAG(NORMAL),
             DEFINE_FONT_FLAG(BOLD),
             DEFINE_FONT_FLAG(ITALIC),

@@ -1,6 +1,6 @@
 /*
     SDL_ttf:  A companion library to SDL for working with TrueType (tm) fonts
-    Copyright (C) 1997-2004 Sam Lantinga
+    Copyright (C) 1997-2009 Sam Lantinga
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -20,7 +20,7 @@
     slouken@libsdl.org
 */
 
-/* $Id: SDL_ttf.h,v 1.5 2004/09/13 08:36:02 christian Exp $ */
+/* $Id: SDL_ttf.h 5122 2009-10-17 18:16:33Z slouken $ */
 
 /* This library is a wrapper around the excellent FreeType 2.0 library,
    available at:
@@ -30,8 +30,8 @@
 #ifndef _SDL_TTF_H
 #define _SDL_TTF_H
 
-#include <SDL.h>
-#include <begin_code.h>
+#include "SDL.h"
+#include "begin_code.h"
 
 /* Set up for C function definitions, even when using C++ */
 #ifdef __cplusplus
@@ -42,7 +42,7 @@ extern "C" {
 */
 #define SDL_TTF_MAJOR_VERSION	2
 #define SDL_TTF_MINOR_VERSION	0
-#define SDL_TTF_PATCHLEVEL	7
+#define SDL_TTF_PATCHLEVEL	10
 
 /* This macro can be used to fill a version structure with the compile-time
  * version of the SDL_ttf library.
@@ -82,16 +82,9 @@ typedef struct _TTF_Font TTF_Font;
 /* Initialize the TTF engine - returns 0 if successful, -1 on error */
 extern DECLSPEC int SDLCALL TTF_Init(void);
 
-/* Turn font fitting on / off (default is on), should be called before TTF_OpenFont [ART+COM Patch] */
-extern DECLSPEC void TTF_SetFitting(int theFittingFlag);
-
 /* Get the kerning between two characters  [ART+COM Patch] */
 extern DECLSPEC double TTF_Kerning(TTF_Font * theFont, const Uint16 theFirstCharacter, const Uint16 theSecondCharacter);
-
-/* Is a character part of font  [ART+COM Patch]  (-1 -> failed, 0 ->o.k.) */
-extern DECLSPEC int TTF_HasGlyph(TTF_Font * theFont, const Uint16 theCharacter);
-
-/* Get the kerning between two characters  [ART+COM Patch] */
+/* font tracking  [ART+COM Patch] */
 extern DECLSPEC void TTF_SetTracking(float theTracking);
 
 /* Open a font file and create a font of the specified point size.
@@ -103,43 +96,58 @@ extern DECLSPEC TTF_Font * SDLCALL TTF_OpenFontIndex(const char *file, int ptsiz
 extern DECLSPEC TTF_Font * SDLCALL TTF_OpenFontRW(SDL_RWops *src, int freesrc, int ptsize);
 extern DECLSPEC TTF_Font * SDLCALL TTF_OpenFontIndexRW(SDL_RWops *src, int freesrc, int ptsize, long index);
 
-/* Set and retrieve the font style
-   This font style is implemented by modifying the font glyphs, and
-   doesn't reflect any inherent properties of the truetype font file.
-*/
+/* Set and retrieve the font style */
 #define TTF_STYLE_NORMAL	0x00
 #define TTF_STYLE_BOLD		0x01
 #define TTF_STYLE_ITALIC	0x02
 #define TTF_STYLE_UNDERLINE	0x04
-extern DECLSPEC int SDLCALL TTF_GetFontStyle(TTF_Font *font);
+#define TTF_STYLE_STRIKETHROUGH	0x08
+extern DECLSPEC int SDLCALL TTF_GetFontStyle(const TTF_Font *font);
 extern DECLSPEC void SDLCALL TTF_SetFontStyle(TTF_Font *font, int style);
+extern DECLSPEC int SDLCALL TTF_GetFontOutline(const TTF_Font *font);
+extern DECLSPEC void SDLCALL TTF_SetFontOutline(TTF_Font *font, int outline);
+
+/* Set and retrieve FreeType hinter settings */
+#define TTF_HINTING_NONE      0
+#define TTF_HINTING_NORMAL    1
+#define TTF_HINTING_AUTO      2
+#define TTF_HINTING_LIGHT     3
+#define TTF_HINTING_MONO      4
+extern DECLSPEC int SDLCALL TTF_GetFontHinting(const TTF_Font *font);
+extern DECLSPEC void SDLCALL TTF_SetFontHinting(TTF_Font *font, int hinting);
 
 /* Get the total height of the font - usually equal to point size */
-extern DECLSPEC int SDLCALL TTF_FontHeight(TTF_Font *font);
+extern DECLSPEC int SDLCALL TTF_FontHeight(const TTF_Font *font);
 
 /* Get the offset from the baseline to the top of the font
    This is a positive value, relative to the baseline.
  */
-extern DECLSPEC int SDLCALL TTF_FontAscent(TTF_Font *font);
+extern DECLSPEC int SDLCALL TTF_FontAscent(const TTF_Font *font);
 
 /* Get the offset from the baseline to the bottom of the font
    This is a negative value, relative to the baseline.
  */
-extern DECLSPEC int SDLCALL TTF_FontDescent(TTF_Font *font);
+extern DECLSPEC int SDLCALL TTF_FontDescent(const TTF_Font *font);
 
 /* Get the recommended spacing between lines of text for this font */
-extern DECLSPEC int SDLCALL TTF_FontLineSkip(TTF_Font *font);
+extern DECLSPEC int SDLCALL TTF_FontLineSkip(const TTF_Font *font);
+
+/* Get/Set whether or not kerning is allowed for this font */
+extern DECLSPEC int SDLCALL TTF_GetFontKerning(const TTF_Font *font);
+extern DECLSPEC void SDLCALL TTF_SetFontKerning(TTF_Font *font, int allowed);
 
 /* Get the number of faces of the font */
-extern DECLSPEC long SDLCALL TTF_FontFaces(TTF_Font *font);
-
+extern DECLSPEC long SDLCALL TTF_FontFaces(const TTF_Font *font);
 /* Get the minx of the first glyph of the most recently rendered word */
 extern DECLSPEC int SDLCALL TTF_CurrentLineMinX();
 
 /* Get the font face attributes, if any */
-extern DECLSPEC int SDLCALL TTF_FontFaceIsFixedWidth(TTF_Font *font);
-extern DECLSPEC char * SDLCALL TTF_FontFaceFamilyName(TTF_Font *font);
-extern DECLSPEC char * SDLCALL TTF_FontFaceStyleName(TTF_Font *font);
+extern DECLSPEC int SDLCALL TTF_FontFaceIsFixedWidth(const TTF_Font *font);
+extern DECLSPEC char * SDLCALL TTF_FontFaceFamilyName(const TTF_Font *font);
+extern DECLSPEC char * SDLCALL TTF_FontFaceStyleName(const TTF_Font *font);
+
+/* Check wether a glyph is provided by the font or not */
+extern DECLSPEC int SDLCALL TTF_GlyphIsProvided(const TTF_Font *font, Uint16 ch);
 
 /* Get the metrics (dimensions) of a glyph
    To understand what these metrics mean, here is a useful link:
@@ -147,7 +155,7 @@ extern DECLSPEC char * SDLCALL TTF_FontFaceStyleName(TTF_Font *font);
  */
 extern DECLSPEC int SDLCALL TTF_GlyphMetrics(TTF_Font *font, Uint16 ch,
 				     int *minx, int *maxx,
-                     int *miny, int *maxy, int *advance);
+                                     int *miny, int *maxy, int *advance);
 
 /* Get the dimensions of a rendered string of text */
 extern DECLSPEC int SDLCALL TTF_SizeText(TTF_Font *font, const char *text, int *w, int *h);
@@ -248,7 +256,6 @@ extern DECLSPEC Uint16 *UTF8_to_UNICODE(Uint16 *unicode, const char *utf8, int l
 #ifdef __cplusplus
 }
 #endif
-
-#include <close_code.h>
+#include "close_code.h"
 
 #endif /* _SDL_TTF_H */

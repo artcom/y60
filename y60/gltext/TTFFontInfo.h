@@ -75,6 +75,8 @@ namespace y60 {
         "NoHinting",
         "NativeHinting",
         "AutoHinting",
+        "AutoHintingLight",
+        "AutoHintingMono",
         0
     };
 
@@ -90,7 +92,9 @@ namespace y60 {
             enum FONTHINTING {
                 NOHINTING,
                 NATIVEHINTING,
-                AUTOHINTING
+                AUTOHINTING,
+                AUTOHINTING_LIGHT,
+                AUTOHINTING_MONO
             };
 
             TTFFontInfo(FONTTYPE theFontType, int theHeight, FONTHINTING theHinting)
@@ -102,7 +106,7 @@ namespace y60 {
             TTFFontInfo()
                 : _myFontType(NORMAL),
                 _myHeight(0),
-                _myFontHinting(NOHINTING)
+                _myFontHinting(AUTOHINTING)
             {};
 
             const FONTTYPE getFontType() {

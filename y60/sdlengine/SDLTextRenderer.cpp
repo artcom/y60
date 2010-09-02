@@ -126,15 +126,12 @@ namespace y60 {
     {
         const string myFileName = AppPackageManager::get().getPtr()->searchFile(theFileName);
 
-        TTF_SetFitting((int)theFonthint);
-
         string myFontName = makeFontName(theName, theFontType);
         if (_myFonts.find(myFontName) != _myFonts.end()) {
             // Font already loaded
             return;
         }
         _myFontHintingMap[theName] = theFonthint;
-        TTF_SetFitting((int)_myFontHintingMap[theName]);
 
         if (theFontType != SDLFontInfo::NORMAL) {
             if (_myFonts.find(makeFontName(theName, SDLFontInfo::NORMAL)) == _myFonts.end()) {
@@ -150,6 +147,7 @@ namespace y60 {
         if (!myFont) {
             throw GLTextRendererException(string("Could not load font: ") + theName+ ", " + myFileName, PLUS_FILE_LINE);
         }
+        TTF_SetFontHinting(myFont, (int)_myFontHintingMap[theName]);
         _myFonts[myFontName] = SDLFontInfo(myFont, theFontType, theHeight, theFonthint);
 
         AC_DEBUG << "TTFTextRenderer - loaded font: " << theName << ", " << myFileName << " with size: "
@@ -228,12 +226,6 @@ namespace y60 {
 
         unsigned int myImageDataSize = _myTextureSurface->w * _myTextureSurface->h * sizeof(asl::RGBA);
 
-        // XXX image-texture-separation
-        // if ((_myTextureSurface->w != myImage->get<ImageWidthTag>()) ||
-        //     (_myTextureSurface->h != myImage->get<ImageHeightTag>()))
-        // {
-        //     myImage->triggerUpload();
-        // }
 
 #ifdef DUMP_TEXT_AS_PNG
         MAKE_GL_SCOPE_TIMER(SDLTextRenderer_renderTextAsImage_dumpAsPng);
@@ -260,11 +252,10 @@ namespace y60 {
     {
         SDLFontInfo::FONTTYPE myFontType = SDLFontInfo::NORMAL;
         std::string myFontName = makeFontName(theFontName, myFontType);
-        TTF_Font* myFont = const_cast<TTF_Font*>(getFont(myFontName));
+        const TTF_Font* myFont = getFont(myFontName);
         if (!myFont) {
             throw GLTextRendererException(string("Font: ") + myFontName + " not in fontlibrary", PLUS_FILE_LINE);
         }
-        TTF_SetFitting((int)getFontHint(theFontName));
 
         theFontHeight = TTF_FontHeight(myFont);
         theFontAscent = TTF_FontAscent(myFont);
@@ -284,8 +275,6 @@ namespace y60 {
         if (!myFont) {
             throw GLTextRendererException(string("Font: ") + myFontName + " not in fontlibrary", PLUS_FILE_LINE);
         }
-
-        TTF_SetFitting((int)getFontHint(theFontName));
 
         Uint16 myUnicodeChar[2];
         UTF8_to_UNICODE(myUnicodeChar, theCharacter.c_str(), 1);
@@ -310,9 +299,6 @@ namespace y60 {
             throw GLTextRendererException(string("Font: ") + myFontName + " not in fontlibrary", PLUS_FILE_LINE);
         }
 
-        TTF_SetFitting((int)getFontHint(theFontName));
-
-
         Uint16 myFirstUnicodeChar[2];
         Uint16 mySecondUnicodeChar[2];
 
@@ -334,11 +320,9 @@ namespace y60 {
             throw GLTextRendererException(string("Font: ") + myFontName + " not in fontlibrary", PLUS_FILE_LINE);
         }
 
-        TTF_SetFitting((int)getFontHint(theFontName));
-
         Uint16 myUnicodeChar[2];
         UTF8_to_UNICODE(myUnicodeChar,  theCharacter.c_str(),  1);
-        double myResult = TTF_HasGlyph((TTF_Font*) myFont, myUnicodeChar[0]);
+        double myResult = TTF_GlyphIsProvided((TTF_Font*) myFont, myUnicodeChar[0]);
         DB(AC_TRACE << "### myFont=" << myFontName << " Ch=" << theCharacter << " available=" << myResult << endl;)
         return myResult==0;
 
@@ -722,7 +706,9 @@ namespace y60 {
             throw GLTextRendererException("Internal error: Normal font not defined.", PLUS_FILE_LINE);
         }
 
-        TTF_SetFitting((int)getFontHint(theFontName));
+        if (TTF_GetFontHinting (myNormalFont) != (int)getFontHint(theFontName)) {
+            TTF_SetFontHinting(myNormalFont, (int)getFontHint(theFontName));
+        }
 
         const TTF_Font * myBoldFont       = getFont(makeFontName(theFontName, SDLFontInfo::BOLD));
         const TTF_Font * myItalicFont     = getFont(makeFontName(theFontName, SDLFontInfo::ITALIC));
@@ -778,17 +764,6 @@ namespace y60 {
             myWord.minx = TTF_CurrentLineMinX();
 
             TTF_SetFontStyle((TTF_Font*) myFont, TTF_STYLE_NORMAL);
-
-            // Calculate kerning
-            /*
-            if ((i < myWords.size() - 1) && myWords[i].text.size() && myWords[i+1].text.size()) {
-                char myLastChar = myWords[i].text[myWords[i].text.size() - 1];
-                char myNextChar = myWords[i + 1].text[0];
-                DB2(AC_TRACE << "Kerning between '" << myLastChar << "' and '" << myNextChar << "' is: ";)
-                myWords[i].kerning = TTF_Kerning(mySDLFontInfo.getFont(), myLastChar, myNextChar);
-                DB2(AC_TRACE << myWords[i].kerning << endl;)
-            }
-            */
         }
     }
 
@@ -840,8 +815,6 @@ namespace y60 {
             mySurfaceWidth  = theTargetWidth;
             mySurfaceHeight = theTargetHeight;
         }
-
-        TTF_SetFitting((int)getFontHint(theFontName));
 
         vector<Line> myLines;
         unsigned myLineHeight = _myLineHeight;

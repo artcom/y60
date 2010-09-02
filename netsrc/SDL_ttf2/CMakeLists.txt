@@ -17,6 +17,8 @@ configure_file(
 ac_add_project(
     ACSDLTTF
     REQUIRED_PACKAGES SDL Freetype
+    DEFINITIONS
+        -DAC_BUILT_WITH_CMAKE
 )
 
 ac_add_library(
