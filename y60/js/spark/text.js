@@ -156,7 +156,7 @@ spark.applyStyleDefaults = function(theStyle) {
 
     !theStyle.getAttribute("hAlign")    ? theStyle.hAlign    = "left" : null;
     !theStyle.getAttribute("vAlign")    ? theStyle.vAlign    = "top"  : null;
-    !theStyle.getAttribute("hinting")    ? theStyle.hinting    = spark.NOHINTING  : null;
+    !theStyle.getAttribute("hinting")    ? theStyle.hinting    = spark.AUTOHINTING  : null;
 
     !theStyle.getAttribute("textColor")       ? theStyle.textColor        = "000000" : null;
     !theStyle.getAttribute("backgroundColor") ? theStyle.backgroundColor  = "FFFFFF" : null;
