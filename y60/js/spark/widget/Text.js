@@ -203,4 +203,7 @@ spark.Text.Constructor = function (Protected) {
         _myStyle.textColor = theColorString;
         Protected.render();
     });
+    Public.__defineGetter__("textColor", function () {
+        return _myStyle.textColor;
+    });
 };
