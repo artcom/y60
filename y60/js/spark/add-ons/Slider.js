@@ -18,6 +18,8 @@ spark.Slider.Constructor = function(Protected) {
     var _myMouseCursor            = null;
     var _myCursorOrigin           = null;
     var _myPosHistory             = {};
+    
+    var _stopTime                 = 0;
 
     const DAMPENING_HISTORY = 5;
 
@@ -94,6 +96,10 @@ spark.Slider.Constructor = function(Protected) {
     };
 
     Public.onSlideStart = function (theEvent) {
+        var currentTime = millisec();
+        if(Math.abs(currentTime - _stopTime) < 3) {
+            return;
+        }
         _myPosHistory[theEvent.cursor.id] = [];
         _myIdleCursor.visible   = false;
         _myActiveCursor.visible = true;
@@ -109,6 +115,7 @@ spark.Slider.Constructor = function(Protected) {
     };
 
     Public.onSlideStop = function (theEvent) {
+        _stopTime = millisec();
         if(theEvent.cursor.id in _myPosHistory){
             Public.onSlide(theEvent);
             delete _myPosHistory[theEvent.cursor.id];
@@ -186,10 +193,10 @@ spark.Slider.Constructor = function(Protected) {
     };
     
     Public.centerCursor = function() {
-            _myIdleCursor.x = _mySliderBackground.width/2 -_myIdleCursor.width/2;
-            _myIdleCursor.y = _mySliderBackground.height/2 -_myIdleCursor.height/2;
-            _myActiveCursor.x = _myIdleCursor.x;
-            _myActiveCursor.y = _myIdleCursor.y;
+        _myIdleCursor.x = _mySliderBackground.width/2 -_myIdleCursor.width/2;
+        _myIdleCursor.y = _mySliderBackground.height/2 -_myIdleCursor.height/2;
+        _myActiveCursor.x = _myIdleCursor.x;
+        _myActiveCursor.y = _myIdleCursor.y;
     };
 
     function dampPosition (theEvent) {
