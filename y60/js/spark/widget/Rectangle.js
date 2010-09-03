@@ -6,7 +6,7 @@ spark.Rectangle = spark.ComponentClass("Rectangle");
 spark.Rectangle.Constructor = function (Protected) {
     var Base = {};
     var Public = this;
-    this.Inherit(spark.ResizableRectangle);
+    Public.Inherit(spark.ResizableRectangle);
 
     /////////////////////
     // Private Members //

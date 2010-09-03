@@ -58,9 +58,7 @@ spark.ResizableRectangle.Constructor = function (Protected) {
     Public.realize = function (theMaterialOrImageOrShape) {
         if (theMaterialOrImageOrShape.nodeName === "shape") {
             _myShape = theMaterialOrImageOrShape;
-            var myMateriaId = _myShape
-                . childNode("primitives")
-                . childNode("elements").material;
+            var myMateriaId = _myShape.childNode("primitives").childNode("elements").material;
             _myMaterial = _myShape.getElementById(myMateriaId);
         } else if (theMaterialOrImageOrShape.nodeName === "material") {
             _myMaterial = theMaterialOrImageOrShape;
@@ -99,6 +97,10 @@ spark.ResizableRectangle.Constructor = function (Protected) {
 
     Protected.__defineGetter__("material", function () {
         return _myMaterial;
+    });
+    Protected.__defineSetter__("material", function (theMaterial) {
+        _myMaterial = theMaterial;
+        _myShape.childNode("primitives").childNode("elements").material = _myMaterial.id;
     });
     Protected.__defineGetter__("shape", function () {
         return _myShape;
