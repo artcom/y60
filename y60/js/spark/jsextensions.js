@@ -4,6 +4,9 @@
     clone should be a function if this is required at all.
 */
 
+/*jslint*/
+/*globals Logger*/
+
 Logger.warning("jsextentions should not be used anymore!!");
 
 Object.prototype.clone = function () {

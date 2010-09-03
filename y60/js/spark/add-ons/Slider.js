@@ -4,7 +4,7 @@
 spark.Slider = spark.ComponentClass("Slider");
 
 spark.Slider.Constructor = function (Protected) {
-    var Base = {};
+    var Base   = {};
     var Public = this;
     Public.Inherit(spark.Transform);
 
@@ -12,19 +12,19 @@ spark.Slider.Constructor = function (Protected) {
     // Private Members //
     /////////////////////
 
-    var _mySliderBackground       = null;
-    var _myActiveCursor           = null;
-    var _myIdleCursor             = null;
-
-    var _horizontalLock           = null;
-    var _verticalLock             = null;
-    var _centered                 = null;
-    var _sticky                   = null;
-
-    var _myEventTarget            = null;
-
-    var _myCursorOrigin           = null;
-    var _myPosHistory             = {};
+    var _mySliderBackground = null;
+    var _myActiveCursor     = null;
+    var _myIdleCursor       = null;
+                            
+    var _horizontalLock     = null;
+    var _verticalLock       = null;
+    var _centered           = null;
+    var _sticky             = null;
+                            
+    var _myEventTarget      = null;
+                            
+    var _myCursorOrigin     = null;
+    var _myPosHistory       = {};
 
     var DAMPENING_HISTORY = 5;
 

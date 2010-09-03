@@ -142,7 +142,6 @@ spark.Text.Constructor = function (Protected) {
         Base.realize(myMaterial);
         // finally, render the text
         Public.text = _myText;
-
     };
 
     Base.postRealize = Public.postRealize;
