@@ -42,7 +42,6 @@ try {
 
     // remove mover so input events won't cause display trouble
     ourApp.setMover(null);
-    
     ourApp.go();
 } catch (ex) {
     reportException(ex);

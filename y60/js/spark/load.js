@@ -56,7 +56,7 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-/*jslint*/
+/*jslint nomen:false*/
 /*globals spark, use, Node, Logger, searchFile*/
 
 /**
@@ -88,7 +88,7 @@ spark.loadFile = function (theFile, theParent) {
  * in the constructed components. If you wan't referential
  * independence, clone your dom first.
  */
-spark.loadDocument = function(theNode, theParent, theFile) {
+spark.loadDocument = function (theNode, theParent, theFile) {
     var myRoot = spark.findRootElement(theNode);
     var myComponent = spark.instantiateRecursively(myRoot, theParent);
     if (theFile) {

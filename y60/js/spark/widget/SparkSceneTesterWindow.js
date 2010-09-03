@@ -1,3 +1,6 @@
+/*jslint*/
+/*globals use, spark, SceneTester*/
+
 use("SceneTester.js");
 
 spark.SparkSceneTesterWindow = spark.ComponentClass("SparkSceneTesterWindow");
@@ -21,7 +24,7 @@ spark.SparkSceneTesterWindow.Constructor = function (Protected) {
     Public.Inherit(spark.Window);
     
     Base.onPostRender = Public.onPostRender;
-    Public.onPostRender = function() {
+    Public.onPostRender = function () {
         Base.onPostRender();
         SceneTesterBase.onPostRender();
     };

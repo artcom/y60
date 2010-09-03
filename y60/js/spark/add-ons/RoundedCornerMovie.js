@@ -8,30 +8,31 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
+/*jslint*/
+/*globals spark*/
+
 spark.RoundedCornerMovie = spark.ComponentClass("RoundedCornerMovie");
-spark.RoundedCornerMovie.Constructor = function(Protected) {
-    
-    var Base = {};
+spark.RoundedCornerMovie.Constructor = function (Protected) {
+    var Base   = {};
     var Public = this;
-    
-    this.Inherit(spark.RoundedCornerQuad);
+    Public.Inherit(spark.RoundedCornerQuad);
     Base.realizeRoundedCornerQuad = Public.realize;
     Base.postRealizeRoundedCornerQuad = Public.postRealize;
+    Public.Inherit(spark.Movie);
     
-    this.Inherit(spark.Movie);
-    
+    ////////////////////
+    // Public Methods //
+    ////////////////////
     
     Base.realize = Public.realize;
-    Public.realize = function() {
+    Public.realize = function () {
         Base.realize();
         Base.realizeRoundedCornerQuad();
-    }
+    };
     
     Base.postRealize = Public.postRealize;
-    Public.postRealize = function() {
+    Public.postRealize = function () {
         Base.postRealize();
         Base.postRealizeRoundedCornerQuad();
-    }
-    
-    
-}
+    };
+};

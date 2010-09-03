@@ -11,8 +11,11 @@ spark.Body = spark.AbstractClass("Body");
 spark.Body.Constructor = function (Protected) {
     var Base = {};
     var Public = this;
+    Public.Inherit(spark.Widget);
 
-    this.Inherit(spark.Widget);
+    ////////////////////
+    // Public Methods //
+    ////////////////////
 
     Base.propagateAlpha = Public.propagateAlpha;
     Public.propagateAlpha = function () {

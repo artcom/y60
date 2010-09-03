@@ -142,7 +142,6 @@ spark.Text.Constructor = function (Protected) {
         Base.realize(myMaterial);
         // finally, render the text
         Public.text = _myText;
-
     };
 
     Base.postRealize = Public.postRealize;
@@ -202,5 +201,8 @@ spark.Text.Constructor = function (Protected) {
     Public.__defineSetter__("textColor", function (theColorString) {
         _myStyle.textColor = theColorString;
         Protected.render();
+    });
+    Public.__defineGetter__("textColor", function () {
+        return _myStyle.textColor;
     });
 };

@@ -16,5 +16,4 @@ spark.Transform.Constructor = function (Protected) {
         var myTransform = Modelling.createTransform(Public.parent.innerSceneNode, Public.name);
         Base.realize(myTransform);
     };
-
 };

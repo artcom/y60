@@ -7,15 +7,18 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
+
+/*jslint nomen:false plusplus:false*/
+/*globals spark, use, addMaterialRequirement*/
+
 use("BuildUtils.js");
 
 spark.RoundedCornerQuad = spark.ComponentClass("RoundedCornerQuad");
-spark.RoundedCornerQuad.Constructor = function(Protected) {
-    
+spark.RoundedCornerQuad.Constructor = function (Protected) {
     var Base = {};
     var Public = this;
     
-        /*                       (1,0)
+    /*                       (1,0)
         c2 ---------------- c3
         |                   |
         |                   |
@@ -23,53 +26,54 @@ spark.RoundedCornerQuad.Constructor = function(Protected) {
        (0,1)
     */
     
-    Public.cornerDistance setter = function(theDistance) {
-       Protected.material.properties.cornerDistance = theDistance/Public.width;
-    }
+    ////////////////////
+    // Public Methods //
+    ////////////////////
     
-    Public.radius setter = function(theRadius) {
-        Protected.material.properties.radius = theRadius/Public.width;
-    }
+    Public.__defineSetter__("cornerDistance", function (theDistance) {
+        Protected.material.properties.cornerDistance = theDistance / Public.width;
+    });
     
-    Public.radius getter = function() {
-        return Protected.material.properties.radius*Public.width;
-    }
+    Public.__defineGetter__("radius", function () {
+        return Protected.material.properties.radius * Public.width;
+    });
+    Public.__defineSetter__("radius", function (theRadius) {
+        Protected.material.properties.radius = theRadius / Public.width;
+    });
     
-    Public.cornerToggle getter = function() {
+    Public.__defineGetter__("cornerToggle", function () {
         return Protected.material.properties.cornerToggle;
-    }
-    
-    Public.cornerToggle setter = function(theVector) {
+    });
+    Public.__defineSetter__("cornerToggle", function (theVector) {
         Protected.material.properties.cornerToggle = theVector;
-    }
+    });
     
-    Public.cropRightCorners setter = function(theFlag) {
+    Public.__defineSetter__("cropRightCorners", function (theFlag) {
         if (theFlag) {
-            Protected.material.properties.cornerToggle = [1,1,1,1];
+            Protected.material.properties.cornerToggle = [1, 1, 1, 1];
         } else {
-            Protected.material.properties.cornerToggle = [1,0,1,0];
+            Protected.material.properties.cornerToggle = [1, 0, 1, 0];
         }
-    }
+    });
     
-    Public.realize = function() {
+    Public.realize = function () {
         Protected.material.transparent = true;
         addMaterialRequirement(Protected.material, "vertexparams", "[10[color]]");
-    }
+    };
 
-    Public.postRealize = function() {
+    Public.postRealize = function () {
         Protected.material.enabled = false;
         var myOptionNode = Protected.material.requires.getNodesByTagName("feature");
         var myIsYUVMovie = false;
-        for(var i = 0; i < myOptionNode.length; ++i) {
-            if(myOptionNode[i].name == "option") {
-                if(myOptionNode[i].childNode("#text").nodeValue == "[10[yuv2rgb]]")
-                {
+        for (var i = 0; i < myOptionNode.length; ++i) {
+            if (myOptionNode[i].name === "option") {
+                if (myOptionNode[i].childNode("#text").nodeValue === "[10[yuv2rgb]]") {
                     Protected.material.requires.removeChild(myOptionNode[i]);
                     myIsYUVMovie = true;
                 }
             }
         }
-        if(!myIsYUVMovie) {
+        if (!myIsYUVMovie) {
             addMaterialRequirement(Protected.material, "option", "[10[RoundedCorner]]");
         } else {
             addMaterialRequirement(Protected.material, "option", "[10[yuv2rgb_round]]");
@@ -78,10 +82,10 @@ spark.RoundedCornerQuad.Constructor = function(Protected) {
         Public.updateAspectRatio();
         Public.radius = Protected.getNumber("radius", 17); 
         Public.cornerDistance = Protected.getNumber("cornerDistance", 17); 
-        Public.cornerToggle = Protected.getVector4f("cornerToggle", [1,1,1,1]);
-    }
+        Public.cornerToggle = Protected.getVector4f("cornerToggle", [1, 1, 1, 1]);
+    };
     
-    Public.updateAspectRatio = function() {
-        Protected.material.properties.aspectRatio = Public.width/Public.height;
-    }
-}
+    Public.updateAspectRatio = function () {
+        Protected.material.properties.aspectRatio = Public.width / Public.height;
+    };
+};

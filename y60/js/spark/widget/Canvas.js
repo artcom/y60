@@ -31,9 +31,8 @@ spark.Canvas.Constructor = function (Protected) {
     var _onPostViewportFunc = null;
     var _myRenderFlag       = true;
     var _myPickRadius       = 0;
-    var _myImage = null;
-    
-    
+    var _myImage            = null;
+    var _sampling           = 1;
     var _bindings = {};
     (function () {
         for (var slot in spark.Canvas.BINDING_SLOT) {
@@ -41,7 +40,7 @@ spark.Canvas.Constructor = function (Protected) {
         }
     }());
     
-    var _sampling = 1;
+
     
     /////////////////////
     // Private Methods //

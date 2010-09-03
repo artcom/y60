@@ -137,7 +137,7 @@ spark.Image.Constructor = function (Protected) {
             _myImage      = Modelling.createImage(window.scene, myWidth, myHeight, "BGRA");
             _myImage.name = Public.name + "_ImagedummyImage";
             _myImageOwned = true;
-            if (myImageSourceId != "") {
+            if (myImageSourceId !== "") {
                 _mySourceId = myImageSourceId;
             }
         } else {

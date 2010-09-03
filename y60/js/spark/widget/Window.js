@@ -451,15 +451,16 @@ spark.Window.Constructor = function (Protected) {
             myWidget = Public;
         }
         
+        var myMouseCursorEvent;
         if (theButton === LEFT_BUTTON) {
             if (theState) {
                 _myMouseCursor = new spark.Cursor("mouse-cursor");
                 _myMouseCursor.update(myWidget, new Point2f(theX, theY));
-                var myMouseCursorEvent = new spark.MouseCursorEvent(spark.MouseCursorEvent.APPEAR, _myMouseCursor);
+                myMouseCursorEvent = new spark.MouseCursorEvent(spark.MouseCursorEvent.APPEAR, _myMouseCursor);
                 myWidget.dispatchEvent(myMouseCursorEvent);
             } else {
                 _myMouseCursor.update(myWidget, new Point2f(theX, theY));
-                var myMouseCursorEvent = new spark.MouseCursorEvent(spark.MouseCursorEvent.VANISH, _myMouseCursor);
+                myMouseCursorEvent = new spark.MouseCursorEvent(spark.MouseCursorEvent.VANISH, _myMouseCursor);
                 if (_myMouseCursor.grabbed) {
                     _myMouseCursor.grabHolder.dispatchEvent(myMouseCursorEvent);
                 } else {
@@ -577,7 +578,7 @@ spark.Window.Constructor = function (Protected) {
                 myCenterPoint.mult(myScale);
             }
             var mySparkConformedCursorPartnerId = getSparkConformedCursorId(theGesture, theGesture.cursorpartnerid);
-            var myCursorPartner = getMultitouchCursor(mySparkConformedCursorPartnerId);
+            myCursorPartner = getMultitouchCursor(mySparkConformedCursorPartnerId);
         }
         
         switch (theGesture.type) {

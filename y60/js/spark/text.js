@@ -56,7 +56,7 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-/*jslint white: false, plusplus: false*/
+/*jslint white: true, plusplus: false*/
 /*globals spark, searchFile, Logger, window, Renderer, Node, Vector2f,
           Matrix4f, applyImageFilter, Vector3f, asColor, Modelling */
 
@@ -89,10 +89,10 @@ spark.fontScale = 1;
  * Internal: ensure loading of font appropriate for the given style
  */
 
-spark.loadFont = function(theName, theSize, theStyle, theHinting) {
+spark.loadFont = function (theName, theSize, theStyle, theHinting) {
     var myName = theName + "-" + theStyle + "-" + theSize;
-    if(!(myName in spark.ourLoadedFonts)) {
-        if(theStyle != "normal") {
+    if (!(myName in spark.ourLoadedFonts)) {
+        if (theStyle != "normal") {
             spark.loadFont(theName, theSize, "normal");
         }
 
@@ -120,25 +120,25 @@ spark.loadFont = function(theName, theSize, theStyle, theHinting) {
 
         var myHinting = spark.hintingFromString(theHinting);    
         // enforce loadttf of a normal font, otherwise we get an exception
-        window.loadTTF(myName, searchFile(myFontPath), theSize*spark.fontScale, myHinting , spark.styleFromString("normal"));
-        if(theStyle != "normal") {
-           window.loadTTF(myName, searchFile(myFontPath), theSize*spark.fontScale, myHinting , spark.styleFromString(theStyle));
+        window.loadTTF(myName, searchFile(myFontPath), theSize * spark.fontScale, myHinting, spark.styleFromString("normal"));
+        if (theStyle != "normal") {
+            window.loadTTF(myName, searchFile(myFontPath), theSize * spark.fontScale, myHinting, spark.styleFromString(theStyle));
         }
         spark.ourLoadedFonts[myName] = true;
 
-       // always load the bold variant to allow the bold tag <b>...</b> to be used
-       if(spark.styleFromString(theStyle) != Renderer.BOLD) {
-           var myFont = theName.split("-")[0];
-           if (searchFile("FONTS/" + myFont + "-bold" + ".otf")) {
-               myFontPath = searchFile("FONTS/" + myFont + "-bold" + ".otf");
-           } else {
-               myFontPath = searchFile("FONTS/" + myFont + "-bold" + ".ttf");
-           }
-           if (myFontPath) {
-               Logger.info("loading bold font for " + myName + "," + myFontPath + "," + theSize + "," + "bold");
-               window.loadTTF(myName, searchFile(myFontPath), theSize*spark.fontScale, myHinting , Renderer.BOLD);
-           }
-       }
+        // always load the bold variant to allow the bold tag <b>...</b> to be used
+        if (spark.styleFromString(theStyle) != Renderer.BOLD) {
+            var myFont = theName.split("-")[0];
+            if (searchFile("FONTS/" + myFont + "-bold" + ".otf")) {
+                myFontPath = searchFile("FONTS/" + myFont + "-bold" + ".otf");
+            } else {
+                myFontPath = searchFile("FONTS/" + myFont + "-bold" + ".ttf");
+            }
+            if (myFontPath) {
+                Logger.info("loading bold font for " + myName + "," + myFontPath + "," + theSize + "," + "bold");
+                window.loadTTF(myName, searchFile(myFontPath), theSize * spark.fontScale, myHinting, Renderer.BOLD);
+            }
+        }
     }
     return myName;
 };
@@ -147,19 +147,18 @@ spark.loadFont = function(theName, theSize, theStyle, theHinting) {
  * Internal: apply defaults to the given style node
  */
 spark.applyStyleDefaults = function(theStyle) {
+    !theStyle.getAttribute("fontStyle")  ? theStyle.fontStyle = "normal" : null;
 
-    !theStyle.getAttribute("fontStyle")   ? theStyle.fontStyle    = "normal" : null;
-
-    !theStyle.getAttribute("topPad")    ? theStyle.topPad    = 0 : null;
-    !theStyle.getAttribute("bottomPad") ? theStyle.bottomPad = 0 : null;
-    !theStyle.getAttribute("rightPad")  ? theStyle.rightPad  = 0 : null;
-    !theStyle.getAttribute("leftPad")   ? theStyle.leftPad   = 0 : null;
+    !theStyle.getAttribute("topPad")     ? theStyle.topPad    = 0 : null;
+    !theStyle.getAttribute("bottomPad")  ? theStyle.bottomPad = 0 : null;
+    !theStyle.getAttribute("rightPad")   ? theStyle.rightPad  = 0 : null;
+    !theStyle.getAttribute("leftPad")    ? theStyle.leftPad   = 0 : null;
 
     !theStyle.getAttribute("tracking")   ? theStyle.tracking   = 0 : null;
     !theStyle.getAttribute("lineHeight") ? theStyle.lineHeight = 0 : null;
 
-    !theStyle.getAttribute("hAlign")    ? theStyle.hAlign    = "left" : null;
-    !theStyle.getAttribute("vAlign")    ? theStyle.vAlign    = "top"  : null;
+    !theStyle.getAttribute("hAlign")     ? theStyle.hAlign     = "left" : null;
+    !theStyle.getAttribute("vAlign")     ? theStyle.vAlign     = "top"  : null;
     !theStyle.getAttribute("hinting")    ? theStyle.hinting    = spark.NOHINTING  : null;
 
     !theStyle.getAttribute("textColor")       ? theStyle.textColor        = "000000" : null;
@@ -176,9 +175,7 @@ spark.applyStyleDefaults = function(theStyle) {
  */
 spark.fontStyleFromNode = function(theNode) {
     var myStyle = new Node("<style/>");
-
     myStyle = myStyle.childNode(0);
-
 
     function copyAttributeIfPresent(theAttribute) {
         if (theNode) {
@@ -216,10 +213,10 @@ spark.fontStyleFromNode = function(theNode) {
  * Internal: determine font for the given style, ensuring that it is loaded.
  */
 spark.fontForStyle = function(theStyle) {
-    !theStyle.getAttribute("font")      ? theStyle.font    = "arial" : null;
-    !theStyle.getAttribute("fontSize")  ? theStyle.fontSize = 12 : null;
-    !theStyle.getAttribute("fontStyle") ? theStyle.fontStyle  = "normal" : null;
-    !theStyle.getAttribute("hinting") ? theStyle.hinting  = spark.NOHINTING : null;
+    !theStyle.getAttribute("font")      ? theStyle.font      = "arial" : null;
+    !theStyle.getAttribute("fontSize")  ? theStyle.fontSize  = 12 : null;
+    !theStyle.getAttribute("fontStyle") ? theStyle.fontStyle = "normal" : null;
+    !theStyle.getAttribute("hinting")   ? theStyle.hinting   = spark.NOHINTING : null;
     return spark.loadFont(theStyle.font, theStyle.fontSize, theStyle.fontStyle, theStyle.hinting);
 };
 
