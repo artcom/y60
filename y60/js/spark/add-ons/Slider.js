@@ -25,9 +25,12 @@ spark.Slider.Constructor = function (Protected) {
                             
     var _myCursorOrigin     = null;
     var _myPosHistory       = {};
+    
+    var _stopTime           = 0;
 
     var DAMPENING_HISTORY = 5;
-
+    
+    
     /////////////////////
     // Private Methods //
     /////////////////////
@@ -141,6 +144,10 @@ spark.Slider.Constructor = function (Protected) {
     };
 
     Public.onSlideStart = function (theEvent) {
+        var currentTime = millisec();
+        if(Math.abs(currentTime - _stopTime) < 3) {
+            return;
+        }
         _myPosHistory[theEvent.cursor.id] = [];
         _myIdleCursor.visible   = false;
         _myActiveCursor.visible = true;
@@ -156,7 +163,8 @@ spark.Slider.Constructor = function (Protected) {
     };
 
     Public.onSlideStop = function (theEvent) {
-        if (theEvent.cursor.id in _myPosHistory) {
+        _stopTime = millisec();
+        if(theEvent.cursor.id in _myPosHistory) {
             Public.onSlide(theEvent);
             delete _myPosHistory[theEvent.cursor.id];
             _myIdleCursor.position = _myActiveCursor.position;
