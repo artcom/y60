@@ -1,14 +1,17 @@
+/*jslint plusplus: false*/
+/*globals spark, window, Vector3f, Quaternionf, Modelling*/
+
 // XXX: revisit. good idea though.
 spark.Model = spark.ComponentClass("Model");
 
-spark.Model.Constructor = function(Protected) {
+spark.Model.Constructor = function (Protected) {
     var Base = {};
     var Public = this;
 
     this.Inherit(spark.Body);
 
     Base.realize = Public.realize;
-    Public.realize = function() {
+    Public.realize = function () {
         var myY60Name = Protected.getString("rootName");
         var myY60DomObject = window.scene.dom.find("//*[@name='" + myY60Name + "']");
         var myPosition = new Vector3f(myY60DomObject.position);
@@ -18,25 +21,25 @@ spark.Model.Constructor = function(Protected) {
         Public.position = myPosition;
         Public.orientation = myOrientation;
         Public.scale = myScale;
-    }
+    };
 
     Base.postRealize = Public.postRealize;
-    Public.postRealize = function() {
+    Public.postRealize = function () {
         Base.postRealize();
-    }
-
-    Base.propagateAlpha = Public.propagateAlpha;
-    Public.propagateAlpha = function() {
-        Base.propagateAlpha();
-        propagateAlpha(Public.sceneNode, Public.actualAlpha);
     };
 
     function propagateAlpha(theNode, theAlpha) {
-        if (theNode.nodeName == "body") {
+        if (theNode.nodeName === "body") {
             Modelling.setAlpha(theNode, theAlpha);
         }
-        for (var i = 0; i <theNode.childNodesLength(); i++) {
+        for (var i = 0; i < theNode.childNodesLength(); i++) {
             propagateAlpha(theNode.childNode(i), theAlpha);
         }
     }
-}
+
+    Base.propagateAlpha = Public.propagateAlpha;
+    Public.propagateAlpha = function () {
+        Base.propagateAlpha();
+        propagateAlpha(Public.sceneNode, Public.actualAlpha);
+    };
+};

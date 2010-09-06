@@ -63,14 +63,22 @@
 //
 //=============================================================================
 
+/*jslint nomen:false*/
+/*globals Node*/
+
+// XXX A **throbber** is a graphic found in a graphical user interface of a
+// computer program (especially a web browser) that animates to show the
+// user that the program is performing an action (such as downloading a web page).
+// spelling: throber -> throbber
+
 function HeartbeatThrober(theEnableFlag, theFrequency, theFilename) {
     var _myFrequency      = theFrequency; // in seconds
     var _myLastThrobTime  = -1;
     var _IsEnabled        = theEnableFlag;
     var _myFilename       = theFilename;
     var _myFirstThrob     = true;
-    this.throb = function(theTime) {
-        if (_myLastThrobTime == -1) {
+    this.throb = function (theTime) {
+        if (_myLastThrobTime === -1) {
             _myLastThrobTime = theTime;
             _myFirstThrob = true;
         }
@@ -79,26 +87,27 @@ function HeartbeatThrober(theEnableFlag, theFrequency, theFilename) {
             if (myDeltaTime > _myFrequency || _myFirstThrob) {
                 _myFirstThrob = false;
                 // we want seconds but Date returns milliseconds
-                var mySecondsSince1970 = Date.parse(Date())/1000;
+                var mySecondsSince1970 = Date.parse(Date()) / 1000;
                 var myHeartbeatString =
-                    '<heartbeat secondsSince1970="' + mySecondsSince1970 +'" >\n' +
+                    '<heartbeat secondsSince1970="' + mySecondsSince1970 + '" >\n' +
                     '</heartbeat>';
                 var myHeartbeatDoc = new Node(myHeartbeatString);
                 myHeartbeatDoc.saveFile(_myFilename);
                 _myLastThrobTime = theTime;
             }
         }
-    }
-    this.use = function(theFlag, theFrequency, theHeartbeatfile) {
+    };
+    
+    this.use = function (theFlag, theFrequency, theHeartbeatfile) {
         _IsEnabled       = theFlag;
         _myFrequency     = theFrequency;
         _myFilename      = theHeartbeatfile;
         _myLastThrobTime = -1;
-    }
+    };
 
-    this.enable = function(theFlag) {
+    this.enable = function (theFlag) {
         _IsEnabled = theFlag;
         _myFirstThrob = true;
-    }
+    };
 
 }

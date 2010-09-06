@@ -56,10 +56,13 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+/*jslint nomen:false*/
+/*globals spark, use, Node, Logger, searchFile*/
+
 /**
  * Load an xml string into the spark world.
  */
-spark.loadString = function(theString, theParent) {
+spark.loadString = function (theString, theParent) {
     var myNode = new Node(theString);
     return spark.loadDocument(myNode, theParent);
 };
@@ -67,16 +70,15 @@ spark.loadString = function(theString, theParent) {
 /**
  * Load an xml file into the spark world.
  */
-spark.loadFile = function(theFile, theParent) {
+spark.loadFile = function (theFile, theParent) {
     Logger.info("Loading spark file " + theFile);
     var myFileWithPath = searchFile(theFile);
     if (!myFileWithPath) {
-        throw Error("spark file '" + theFile + "' does not exist.");
+        throw new Error("spark file '" + theFile + "' does not exist.");
     }
     var myNode = new Node();
     myNode.parseFile(myFileWithPath);
-    var myComponent = spark.loadDocument(myNode, theParent, theFile);
-    return myComponent;
+    return spark.loadDocument(myNode, theParent, theFile);
 };
 
 /**
@@ -86,7 +88,7 @@ spark.loadFile = function(theFile, theParent) {
  * in the constructed components. If you wan't referential
  * independence, clone your dom first.
  */
-spark.loadDocument = function(theNode, theParent, theFile) {
+spark.loadDocument = function (theNode, theParent, theFile) {
     var myRoot = spark.findRootElement(theNode);
     var myComponent = spark.instantiateRecursively(myRoot, theParent);
     if (theFile) {
@@ -101,9 +103,8 @@ spark.loadDocument = function(theNode, theParent, theFile) {
 /**
  * Internal: instantiation engine.
  */
-spark.instantiateRecursively = function(theNode, theParent) {
-
-    if (!theNode){
+spark.instantiateRecursively = function (theNode, theParent) {
+    if (!theNode) {
         Logger.fatal("Internal fault: instantiateRecursively called without a node.");
     }
 
@@ -112,23 +113,23 @@ spark.instantiateRecursively = function(theNode, theParent) {
     //      and generally useful. Think "node handlers vs component instantiation",
     //      where the former could, for example, be components that can be given
     //      child nodes that are purely descriptive.
-    if(theNode.nodeName == "Template") {
+    if (theNode.nodeName === "Template") {
         var myFile = theNode.src;
-        var myName = theNode.name;
-        Logger.info("Loading template " + myName + " from file " + myFile);
-        spark[myName] = spark.LoadedClass(myName, myFile);
+        //var myName = theNode.name;
+        Logger.info("Loading template " + theNode.name + " from file " + myFile);
+        spark[theNode.name] = spark.LoadedClass(theNode.name, myFile);
         return null;
     }
 
     // ignore comments
-    if(theNode.nodeName == "#comment") {
+    if (theNode.nodeName === "#comment") {
         return null;
     }
 
     var myName = theNode.nodeName;
 
     // ignore and warn about unknown component classes
-    if (! (myName in spark.componentClasses)){
+    if (!(myName in spark.componentClasses)) {
         Logger.warning("Unknown component class " +  myName + ". Ignoring definition.");
         return null;
     }
@@ -137,7 +138,7 @@ spark.instantiateRecursively = function(theNode, theParent) {
     var myInstance = spark.instantiateComponent(theNode);
 
     // add to parent if we have one
-    if(theParent) {
+    if (theParent) {
         theParent.addChild(myInstance);
     }
 
@@ -151,15 +152,15 @@ spark.instantiateRecursively = function(theNode, theParent) {
 /**
  * Internal: instantiate a single component
  */
-spark.instantiateComponent = function(theNode) {
-    Logger.info("Instantiating " + theNode.nodeName
-                + ("name" in theNode ? " named " + theNode.name :
-                   ("id" in theNode ? " with id " + theNode.id : "")));
+spark.instantiateComponent = function (theNode) {
+    Logger.info("Instantiating " + theNode.nodeName +
+                ("name" in theNode ? " named " + theNode.name :
+                ("id" in theNode ? " with id " + theNode.id : "")));
 
     var myClassName = theNode.nodeName;
     var myNode = theNode;
 
-    var myConstructor = spark.componentClasses[myClassName];
-    return new myConstructor(myNode);
+    var MyConstructor = spark.componentClasses[myClassName];
+    return new MyConstructor(myNode);
 };
 

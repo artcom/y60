@@ -57,63 +57,31 @@
 
 */
 
+/*jslint*/
+/*globals*/
 use("UnitTest.js");
 
-function JSAppUnitTest() {
-    this.Constructor(this, "JSAppUnitTest");
+function MyClassUnitTest() {
+    this.Constructor(this, "MyClassUnitTest");
 };
 
-JSAppUnitTest.prototype.Constructor = function(obj, theName) {
+MyClassUnitTest.prototype.Constructor = function(obj, theName) {
 
     UnitTest.prototype.Constructor(obj, theName);
 
     obj.run = function() {
-        ENSURE('"pickytests" === "pickytests"');
-
-
-        if (operatingSystem() == "WIN32") {
-            var myShellScript = searchFile("testfiles/exec.bat");
-
-            obj.myReturnCode = exec("\"" + myShellScript + "\"", "2");
-            ENSURE('obj.myReturnCode === 2');
-            obj.myReturnCode = exec("\"" + myShellScript + "\" 3");
-            ENSURE('obj.myReturnCode === 3');
-            obj.myReturnCode = exec("testfiles\\exec.butt");
-            ENSURE('obj.myReturnCode === -1');
-            obj.myReturnCode = exec(myShellScript, "2", false);
-            ENSURE('obj.myReturnCode === 0');
-        } else {
-            myShellScript = searchFile("testfiles/exec.sh");
-            obj.myReturnCode = exec(myShellScript, "2");
-            ENSURE('obj.myReturnCode === 2');
-            obj.myReturnCode = exec(myShellScript + " 3");
-            ENSURE('obj.myReturnCode === 3');
-            obj.myReturnCode = exec("testfiles/exec.butt");
-            ENSURE('obj.myReturnCode === 127');
-            /*
-            command is blocking flag isn't recognized in linux/osx
-            obj.myReturnCode = exec("testfiles/exec.sh", "2", false);
-            ENSURE('obj.myReturnCode === 0');
-            */
-        }
-
-
+        obj.myVar = 1;
+        ENSURE('obj.myVar == 1');
+        ENSURE('1 + 1 == 2');
     }
 };
 
-try {
-    var myTestName = "testJSapp.tst.js";
-    var mySuite = new UnitTestSuite(myTestName);
+var myTestName = "testMyClass.tst.js";
+var mySuite = new UnitTestSuite(myTestName);
 
-    mySuite.addTest(new JSAppUnitTest());
+mySuite.addTest(new MyClassUnitTest());
+mySuite.addTest(new MyClassUnitTest());
+mySuite.run();
 
-    mySuite.run();
-
-    print(">> Finished test suite '"+myTestName+"', return status = " + mySuite.returnStatus() + "");
-    exit(mySuite.returnStatus());
-} catch (ex) {
-    print("-----------------------------------------------------------------------------------------");
-    print("### Error: " + ex);
-    print("-----------------------------------------------------------------------------------------");
-    exit(1);
-}
+print(">> Finished test suite '"+myTestName+"', return status = " + mySuite.returnStatus() + "");
+exit(mySuite.returnStatus());

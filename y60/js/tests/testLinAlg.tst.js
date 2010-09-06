@@ -57,6 +57,9 @@
 
 */
 
+/*jslint*/
+/*globals use, print UnitTest, UnitTestSuite, Renderer, ENSURE, Vector2f,
+          Matrix4f, DPRINT, cross, Vector3f, Vector4f*/
 
 use("UnitTest.js");
 use("Timer.js");
@@ -65,7 +68,7 @@ var myRenderer = new Renderer();
 
 function FixedVectorUnitTest() {
     this.Constructor(this, "FixedVectorUnitTest");
-};
+}
 
 FixedVectorUnitTest.prototype.Constructor = function(obj, theName) {
 
@@ -95,34 +98,34 @@ FixedVectorUnitTest.prototype.Constructor = function(obj, theName) {
 
         obj.myVec.sub(obj.myVec);
         ENSURE('almostEqual(obj.myVec, new Vector2f(0,0))');
-        obj.myVec.add(new Vector2f(1,2));
+        obj.myVec.add(new Vector2f(1, 2));
         ENSURE('almostEqual(obj.myVec, new Vector2f(1,2))');
-        obj.myVec.add(new Vector2f(3,4));
+        obj.myVec.add(new Vector2f(3, 4));
         ENSURE('almostEqual(obj.myVec, new Vector2f(4,6))');
-        obj.myVec.div(new Vector2f(2,2));
+        obj.myVec.div(new Vector2f(2, 2));
         ENSURE('almostEqual(obj.myVec, new Vector2f(2,3))');
-        obj.myVec.mult(new Vector2f(3,3));
+        obj.myVec.mult(new Vector2f(3, 3));
         ENSURE('almostEqual(obj.myVec, new Vector2f(6,9))');
-        obj.myVec.mult(new Vector2f(3,4));
+        obj.myVec.mult(new Vector2f(3, 4));
         ENSURE('almostEqual(obj.myVec, new Vector2f(18,36))');
-        obj.myVec.div(new Vector2f(3,4));
+        obj.myVec.div(new Vector2f(3, 4));
         ENSURE('almostEqual(obj.myVec, new Vector2f(6,9))');
-        obj.myVec.mult([-1,-1]);
+        obj.myVec.mult([-1, -1]);
         ENSURE('almostEqual(obj.myVec, new Vector2f(-6,-9))');
-        obj.myVec.add(new Vector2f(12,12));
+        obj.myVec.add(new Vector2f(12, 12));
         ENSURE('almostEqual(obj.myVec, new Vector2f(6,3))');
-        obj.myVec.sub(new Vector2f(2,2));
+        obj.myVec.sub(new Vector2f(2, 2));
         ENSURE('almostEqual(obj.myVec, new Vector2f(4,1))');
 
-        obj.myVector = new Vector2f(1,2);
+        obj.myVector = new Vector2f(1, 2);
         ENSURE('almostEqual(obj.myVector, new Vector2f(1,2))');
         ENSURE('obj.myVector.toString() == "[1,2]"');
 
-        obj.myVector = new Vector3f(1,2,3);
+        obj.myVector = new Vector3f(1, 2, 3);
         ENSURE('almostEqual(obj.myVector, new Vector3f(1,2,3))');
         ENSURE('obj.myVector.toString() == "[1,2,3]"');
 
-        obj.myVector = new Vector4f(1,2,3,4);
+        obj.myVector = new Vector4f(1, 2, 3, 4);
         obj.myVector.x = 4;
         obj.myVector.y = 3;
         obj.myVector.z = 2;
@@ -150,7 +153,7 @@ FixedVectorUnitTest.prototype.Constructor = function(obj, theName) {
         ENSURE('almostEqual(dot(new Vector4f(1,2,3,4),new Vector4f(5,6,7,8)), 1*5+2*6+3*7+4*8)');
         ENSURE('almostEqual(magnitude(new Vector4f(1,2,3,4)), Math.sqrt(1*1+2*2+3*3+4*4))');
         ENSURE('almostEqual(normalized(new Vector4f(0,0,0,9)),new Vector4f(0,0,0,1))');
-        obj.myLen = Math.sqrt(1*1+2*2+3*3+4*4);
+        obj.myLen = Math.sqrt(1 *1 + 2 * 2 + 3 * 3 + 4 * 4);
         ENSURE('almostEqual(normalized(new Vector4f(1,2,3,4)),new Vector4f(1/obj.myLen,2/obj.myLen,3/obj.myLen,4/obj.myLen))');
 
         // common new Vector3f Tests
@@ -164,22 +167,22 @@ FixedVectorUnitTest.prototype.Constructor = function(obj, theName) {
         ENSURE('almostEqual(dot(new Vector3f(1,2,3),new Vector3f(5,6,7)), 1*5+2*6+3*7)');
         ENSURE('almostEqual(magnitude(new Vector3f(1,2,3)), Math.sqrt(1*1+2*2+3*3))');
         ENSURE('almostEqual(normalized(new Vector3f(0,0,9)),new Vector3f(0,0,1))');
-        obj.myLen = Math.sqrt(1*1+2*2+3*3);
+        obj.myLen = Math.sqrt(1 * 1 + 2 * 2 + 3 * 3);
         ENSURE('almostEqual(normalized(new Vector3f(1,2,3)),new Vector3f(1/obj.myLen,2/obj.myLen,3/obj.myLen))');
 
         // special Vector3f Tests
         // cross and normals test
 
-        obj.myResult = cross(new Vector3f(0,0,1), new Vector3f(1,0,0));
+        obj.myResult = cross(new Vector3f(0, 0, 1), new Vector3f(1, 0, 0));
         ENSURE('almostEqual(myResult , new Vector3f(0,1,0))', "Crossproduct of x- and z- axis.");
 
-        obj.myResult1 = cross(new Vector3f(0,0,-1), new Vector3f(-1,0,0));
+        obj.myResult1 = cross(new Vector3f(0, 0, -1), new Vector3f(-1, 0, 0));
         ENSURE('almostEqual(myResult1 , new Vector3f(0,1,0))', "Crossproduct of  -x- and -z- axis.");
 
-        obj.myResult2 = cross(new Vector3f(0,0,1), new Vector3f(1,0,1));
+        obj.myResult2 = cross(new Vector3f(0, 0, 1), new Vector3f(1, 0, 1));
         ENSURE('almostEqual(myResult2 , new Vector3f(0,1,0))', "Crossproduct of (1,0,1) and z- axis.");
 
-        obj.myResult3 = cross(new Vector3f(1,0,-1), new Vector3f(0,1,1));
+        obj.myResult3 = cross(new Vector3f(1, 0, -1), new Vector3f(0, 1, 1));
         ENSURE('almostEqual(myResult3 , new Vector3f(1,-1,1))', "Crossproduct of (1,0,-1) and (0,1,1).");
 
         // common Vector2f Tests
@@ -193,7 +196,7 @@ FixedVectorUnitTest.prototype.Constructor = function(obj, theName) {
         ENSURE('almostEqual(dot(new Vector2f(1,2),new Vector2f(5,6)), 1*5+2*6)');
         ENSURE('almostEqual(magnitude(new Vector2f(1,2)), Math.sqrt(1*1+2*2))');
         ENSURE('almostEqual(normalized(new Vector2f(0,9)),new Vector2f(0,1))');
-        obj.myLen = Math.sqrt(1*1+2*2);
+        obj.myLen = Math.sqrt(1 * 1 + 2 * 2);
         ENSURE('almostEqual(normalized(new Vector2f(1,2)),new Vector2f(1/obj.myLen,2/obj.myLen))');
 
         // String constructor
@@ -216,7 +219,7 @@ Matrix4fUnitTest.prototype.Constructor = function(obj, theName) {
 
     obj.run = function() {
 
-        obj.myMatrix = new Matrix4f(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15);
+        obj.myMatrix = new Matrix4f(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ,11, 12, 13, 14, 15);
 
         ENSURE('almostEqual(new Vector4f(0,1,2,3),obj.myMatrix.getRow(0))');
         ENSURE('almostEqual(new Vector4f(4,5,6,7),obj.myMatrix.getRow(1))');
@@ -257,25 +260,25 @@ Matrix4fUnitTest.prototype.Constructor = function(obj, theName) {
         DPRINT('Matrix4f.IDENTITY');
 
         ENSURE('obj.myMatrix.type == Matrix4f.IDENTITY', "Test makeIdentity()");
-        obj.myIdentity = new Matrix4f(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1);
+        obj.myIdentity = new Matrix4f(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
         ENSURE('almostEqual(obj.myMatrix, myIdentity)', "Test makeIdentity()");
 
         DTITLE("Testing makeScaling");
-        obj.myMatrix = new Matrix4f(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15);
+        obj.myMatrix = new Matrix4f(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
         obj.myMatrix.makeScaling(new Vector3f(-1, 2, 3));
         DPRINT('obj.myMatrix.type');
         ENSURE('obj.myMatrix.type != Matrix4f.IDENTITY', "Test makeScaling()");
         ENSURE('obj.myMatrix.type == Matrix4f.SCALING', "Test makeScaling()");
-        obj.myScaling = new Matrix4f(-1,0,0,0,0,2,0,0,0,0,3,0,0,0,0,1);
+        obj.myScaling = new Matrix4f(-1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 3, 0, 0, 0, 0, 1);
         ENSURE('almostEqual(obj.myMatrix, myScaling)', "Test makeScaling()");
 
         DTITLE("Testing makeTranslating");
-        obj.myMatrix= new Matrix4f(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15);
+        obj.myMatrix= new Matrix4f(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ,11, 12, 13, 14, 15);
         obj.myMatrix.makeTranslating(new Vector3f(3, 2, -1));
         DPRINT('obj.myMatrix.type');
         ENSURE('obj.myMatrix.type != Matrix4f.IDENTITY', "Test makeScaling()");
         ENSURE('obj.myMatrix.type == Matrix4f.TRANSLATING', "Test makeTranslating()");
-        obj.myTranslating = new Matrix4f(1,0,0,0,0,1,0,0,0,0,1,0,3,2,-1,1);
+        obj.myTranslating = new Matrix4f(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 3, 2, -1, 1);
         ENSURE('almostEqual(obj.myMatrix, obj.myTranslating)', "Test makeTranslating()");
 
         DTITLE("Testing rotate");
@@ -428,7 +431,6 @@ FixedPointUnitTest.prototype.Constructor = function(obj, theName) {
     }
 
     obj.run = function() {
-
         obj.myPt = new Point2f(2,3);
         ENSURE('almostEqual(new Point2f(1,-2), new Point2f(1,-2))');
         ENSURE('myPt[0]==2');

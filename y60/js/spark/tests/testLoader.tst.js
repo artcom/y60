@@ -3,7 +3,7 @@
          ENSURE, ENSURE_EQUAL, spark*/
 
 use("UnitTest.js");
-use("spark.js");
+use("spark/spark.js");
 
 // Loader
 
@@ -56,7 +56,7 @@ LoaderUnitTest.prototype.Constructor = function (obj, theName) {
                 this.foo = Protected.getString("foo", null);
             };
         };
-        obj.myComponentInstance = spark.loadFile("tests/fixtures/myLoaderFixture_1.xml");
+        obj.myComponentInstance = spark.loadFile("fixtures/myLoaderFixture_1.xml");
         ENSURE_EQUAL('hallo', obj.myComponentInstance.foo, "specified xml attr was realized");
     }
     
@@ -73,11 +73,13 @@ LoaderUnitTest.prototype.Constructor = function (obj, theName) {
                 this.foo = Protected.getString("foo", null);
             };
         };
-        obj.myComponentInstance = spark.loadFile("tests/fixtures/myLoaderFixture_2.xml");
+        obj.myComponentInstance = spark.loadFile("fixtures/myLoaderFixture_2.xml");
         ENSURE_EQUAL('hallo', obj.myComponentInstance.foo, "specified xml attr was realized");
         ENSURE_EQUAL(2, obj.myComponentInstance.children.length, "has one child");
         
         ENSURE_EQUAL('grube', obj.myComponentInstance.children[0].foo, "child has xml attr realized properly");
+        ENSURE_EQUAL(null, obj.myComponentInstance.getChildByName("unknown"), "unknown child-name gets null");
+        
         var myTmpChild = obj.myComponentInstance.getChildByName("tief");
         ENSURE_EQUAL(1, myTmpChild.children.length, "Child of root has one child");
         var myTmpChildChild = myTmpChild.getChildByName("hoch");

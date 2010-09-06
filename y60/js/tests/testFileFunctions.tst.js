@@ -57,40 +57,36 @@
 
 */
 
+/*jslint */
+/*globals use, print, ENSURE, getDirectoryEntries, UnitTestSuite, UnitTest*/
+
 use("UnitTest.js");
 
-function HotCodingUnitTest() {
-    this.Constructor(this, "HotCodingUnitTest");
-};
+function TestFileFunctions() {
+    this.Constructor(this, "TestFileFunctions");
+}
 
-HotCodingUnitTest.prototype.Constructor = function(obj, theName) {
+TestFileFunctions.prototype.Constructor = function (obj, theName) {
 
     UnitTest.prototype.Constructor(obj, theName);
 
-    obj.run = function() {
-        obj.myModuleName = "TemporaryTestModule.js";
-        obj.myModule = "function calculateSum(a,b) { return a+b; };";
-        ENSURE("writeStringToFile(obj.myModuleName, obj.myModule) == true");;
-        ENSURE("fileExists(obj.myModuleName)");
-        ENSURE("readFileAsString(obj.myModuleName) == obj.myModule");
-        use(obj.myModuleName);
-        ENSURE("calculateSum(1,2) == 3");
+    obj.run = function () {
+        print("Directory Listing for .: " + getDirectoryEntries("."));
+        ENSURE('fileExists("bla") == false');
+        ENSURE('fileExists(__FILE__()) == true');
+        ENSURE('getDirectoryEntries("bla") == null');
+        print("Director Listing for bla: " + getDirectoryEntries("bla"));
 
-        obj.myModule = "function calculateSum(a,b) { return a+b + 1; };";
-        writeStringToFile(obj.myModuleName, obj.myModule);
-        ENSURE("readFileAsString(obj.myModuleName) == obj.myModule");
-        reuse();
-        ENSURE("calculateSum(1,2) == 4");
-        ENSURE("deleteFile(obj.myModuleName) == true");
-        ENSURE("!fileExists(obj.myModuleName)");
-    }
+       //ENSURE_EXCEPTION("getDirectoryEntries('bla')");
+    };
 };
 
-var myTestName = "testHotCoding.tst.js";
-var mySuite = new UnitTestSuite(myTestName);
+var mySuite = new UnitTestSuite("UnitTest");
 
-mySuite.addTest(new HotCodingUnitTest());
-mySuite.run();
-
-print(">> Finished test suite '"+myTestName+"', return status = " + mySuite.returnStatus() + "");
-exit(mySuite.returnStatus());
+try {
+    mySuite.addTest(new TestFileFunctions());
+    mySuite.run();
+} catch (e) {
+    print("## An unknown exception occured during execution." + e + "");
+    mySuite.incrementFailedCount();
+}

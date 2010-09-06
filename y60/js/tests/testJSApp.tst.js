@@ -57,33 +57,63 @@
 
 */
 
+/*jslint*/
+/*globals print, use, UnitTest, UnitTestSuite, exec, searchFile,
+          operatingSystem, ENSURE, exit*/
 use("UnitTest.js");
 
-function TestFileFunctions() {
-    this.Constructor(this, "TestFileFunctions");
-};
+function JSAppUnitTest() {
+    this.Constructor(this, "JSAppUnitTest");
+}
 
-TestFileFunctions.prototype.Constructor = function(obj, theName) {
+JSAppUnitTest.prototype.Constructor = function (obj, theName) {
 
     UnitTest.prototype.Constructor(obj, theName);
 
-    obj.run = function() {
-        print("Directory Listing for .: " + getDirectoryEntries("."));
-        ENSURE('fileExists("bla") == false');
-        ENSURE('fileExists(__FILE__()) == true');
-        ENSURE('getDirectoryEntries("bla") == null');
-        print("Director Listing for bla: " + getDirectoryEntries("bla"));
+    obj.run = function () {
+        ENSURE('"pickytests" === "pickytests"');
+        var myShellScript;
 
-       //ENSURE_EXCEPTION("getDirectoryEntries('bla')");
-    }
+        if (operatingSystem() === "WIN32") {
+            myShellScript = searchFile("fixtures/exec.bat");
+
+            obj.myReturnCode = exec("\"" + myShellScript + "\"", "2");
+            ENSURE('obj.myReturnCode === 2');
+            obj.myReturnCode = exec("\"" + myShellScript + "\" 3");
+            ENSURE('obj.myReturnCode === 3');
+            obj.myReturnCode = exec("testfiles\\exec.butt");
+            ENSURE('obj.myReturnCode === -1');
+            obj.myReturnCode = exec(myShellScript, "2", false);
+            ENSURE('obj.myReturnCode === 0');
+        } else {
+            myShellScript = searchFile("fixtures/exec.sh");
+            obj.myReturnCode = exec(myShellScript, "2");
+            ENSURE('obj.myReturnCode === 2');
+            obj.myReturnCode = exec(myShellScript + " 3");
+            ENSURE('obj.myReturnCode === 3');
+            obj.myReturnCode = exec("fixtures/exec.butt");
+            ENSURE('obj.myReturnCode === 127');
+            /*
+            command is blocking flag isn't recognized in linux/osx
+            obj.myReturnCode = exec("testfiles/exec.sh", "2", false);
+            ENSURE('obj.myReturnCode === 0');
+            */
+        }
+    };
 };
 
-var mySuite = new UnitTestSuite("UnitTest");
-
 try {
-    mySuite.addTest(new TestFileFunctions);
+    var myTestName = "testJSapp.tst.js";
+    var mySuite = new UnitTestSuite(myTestName);
+
+    mySuite.addTest(new JSAppUnitTest());
     mySuite.run();
-} catch (e) {
-    print("## An unknown exception occured during execution." + e + "");
-    mySuite.incrementFailedCount();
+
+    print(">> Finished test suite '" + myTestName + "', return status = " + mySuite.returnStatus() + "");
+    exit(mySuite.returnStatus());
+} catch (ex) {
+    print("-----------------------------------------------------------------------------------------");
+    print("### Error: " + ex);
+    print("-----------------------------------------------------------------------------------------");
+    exit(1);
 }

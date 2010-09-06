@@ -60,20 +60,6 @@
 /*global Logger, Exception*/
 
 /**
- * Global metamethod: Define a namespace on the target.
- * 
- * This metamethod allows the definition of a namespace.
- * 
- * It should only be used to define global namespaces as follows:
- * 
- *   var spark = Namespace("spark");
- * 
- */
-function Namespace(theName) {
-    return {AbstractClass: AbstractClass, Class: Class, name: theName};
-}
-
-/**
  * Namespace metamethod: Define an abstract class in the target namespace.
  * 
  * This metamethod is used to define an abstract (uninstantiable) class.
@@ -99,130 +85,6 @@ function AbstractClass(theName) {
     myConstructor._className_ = theName;
 
     return myConstructor;
-}
-
-/**
- * Namespace metamethod: Define a concrete class in the target namespace.
- * 
- * This metamethod is used to define a concrete (instantiable) class.
- * 
- * It should be used as follows:
- * 
- *    spark.MyClass = spark.Class("MyClass");
- * 
- * This will define a constructor that will call the real, user-provided
- * constructor of the class. This constructor must be defined as follows:
- * 
- *    spark.MyClass.Constructor = function(Protected, %{ ctor signature }% ) {
- *        var Public = this;
- *        var Base = {};
- *        %{ class body }% 
- *    };
- * 
- * The constructor will be called with the protected subobject of the
- * new instance as its first argument. Any arguments passed to the real,
- * outer, constructor will be passed as additional arguments.
- * 
- * Note that component classes should not have any additional constructor
- * arguments in CTOR SIGNATURE, as the component framework imposes its
- * own constructor signature involving the component-describing XML node,
- * effectively creating a default constructibility invariant.
- * 
- * The following metamethods will be attached to any new instance:
- *   Inherit, Getter, Setter, Signal, Property, Initialize
- *
- * See the respective JSDoc for the specification of these metamethods.
- * 
- */
-function Class(theName) {
-    Logger.info("Defining class " + theName);
-    var myNamespace = this;
-
-    function myConstructor() {
-        var myPublic = this;
-        var myProtected = {};
-
-        // initialize internal slots
-        myPublic._protected_ = myProtected;
-        myPublic._className_ = theName;
-        myPublic._class_     = myNamespace[theName];
-
-        myPublic._sparkFile_ = "";
-
-        myPublic._classes_   = {};
-        myPublic._classes_[theName] = myNamespace[theName];
-
-        myPublic._properties_ = [];
-        myPublic._signals_    = [];
-
-        // provide metamethods
-        myPublic.Inherit    = Inherit;
-        myPublic.Getter     = Getter;
-        myPublic.Setter     = Setter;
-        myPublic.Signal     = Signal;
-        myPublic.Property   = Property;
-        myPublic.Initialize = Initialize;
-        myPublic.GetterOverride = GetterOverride;
-        myPublic.SetterOverride = SetterOverride;
-
-        myProtected.Getter     = Getter;
-        myProtected.Setter     = Setter;
-        myProtected.Property   = Property;
-        myProtected.GetterOverride = GetterOverride;
-        myProtected.SetterOverride = SetterOverride;
-
-        // call the real constructor
-        var myArguments = [myProtected].concat(Array.prototype.slice.call(arguments));
-        if (theName in myNamespace) {
-            myNamespace[theName].Constructor.apply(myPublic, myArguments);
-        } else {
-            Logger.error("'" + theName +
-                         "' not found in namespace '" + myNamespace.name + "'");
-        }
-    }
-
-    myConstructor._className_ = theName;
-
-    return myConstructor;
-}
-
-/**
- * Metamethod: Makes the target object be an instance of the given class.
- * 
- * This method calls the constructor of the given class on the target object,
- * giving it an environment appropriate for extending the target object
- * as to make it an instance the the CLASS.
- * 
- * Used like this (in the context of a class ctor):
- * 
- *   this.Inherit(spark.BaseClass);
- * 
- */
-function Inherit(theClass) {
-    var myArguments = [this._protected_];
-    myArguments = myArguments.concat(Array.prototype.slice.call(arguments, 1));
-	// XXX this is compatibility goo for XIP
-	if ("_className_" in theClass) {
-        this._classes_[theClass._className_] = theClass;
-	} else {
-	    Logger.warning("Warning. Inheriting oldschool class without _className_. Precedence lists will be incomplete.");
-	}
-    theClass.Constructor.apply(this, myArguments);
-}
-
-/**
- * Internal metamethod: Inherit an oldschool (Y60) class into the target object.
- * 
- * This, somewhat magic and special, metamethod is used to inherit
- * a class Y60 javascript class into a SPARK class.
- * 
- * It should, in general, not be used. However, Window needs to inherit
- * SceneViewer. So this is here as a generalized hack for achieving such things.
- * 
- */
-function InheritOldschool(theClass) {
-    var myArguments = Array.prototype.slice.call(arguments);
-    theClass.prototype.Constructor.apply(this, myArguments);
 }
 
 /**
@@ -318,11 +180,56 @@ function SetterOverride(theName, theFunction) {
                      this._className_ + ", which does not have a setter for that property.");
     }
 
-    var myWrapper = function(theValue) {
+    var myWrapper = function (theValue) {
         theFunction.call(this, theValue, myNextSetter);
     };
 
     this.__defineSetter__(theName, myWrapper);
+}
+
+/**
+ * Metamethod: Makes the target object be an instance of the given class.
+ * 
+ * This method calls the constructor of the given class on the target object,
+ * giving it an environment appropriate for extending the target object
+ * as to make it an instance the the CLASS.
+ * 
+ * Used like this (in the context of a class ctor):
+ * 
+ *   this.Inherit(spark.BaseClass);
+ * 
+ */
+function Inherit(theClass) {
+    var myArguments = [this._protected_];
+    myArguments = myArguments.concat(Array.prototype.slice.call(arguments, 1));
+    // XXX this is compatibility goo for XIP
+    if ("_className_" in theClass) {
+        this._classes_[theClass._className_] = theClass;
+    } else {
+        Logger.warning("Warning. Inheriting oldschool class without _className_. Precedence lists will be incomplete.");
+    }
+    theClass.Constructor.apply(this, myArguments);
+}
+
+/**
+ * Metamethod: Initialize properties of an object from XML attributes
+ * 
+ * This metamethods iterates over all properties defined on its
+ * target object, setting the property according to the corresponding
+ * XML attribute, if it is present.
+ * 
+ */
+function Initialize(theNode) {
+    var myProps = this._properties_;
+
+    for (var i = 0; i < myProps.length; i++) {
+        var myProp = myProps[i];
+        var myName = myProp.name;
+        if (myName in theNode) {
+            var myString = theNode[myName];
+            myProp.setFromString(myString);
+        }
+    }
 }
 
 /**
@@ -368,7 +275,7 @@ function Signal(theName) {
 /**
  * Internal: Generic serialization-grade conversion from value to string.
  */
-function ConvertFromString(theType, theString) {
+function convertFromString(theType, theString) {
     switch (theType) {
     case Boolean:
         return !(theString === "false");
@@ -384,7 +291,7 @@ function ConvertFromString(theType, theString) {
 /**
  * Internal: Generic serialization-grade conversion from string to value.
  */
-function ConvertToString(theType, theValue) {
+function convertToString(theType, theValue) {
     switch (theType) {
     case Boolean:
     case Number:
@@ -439,36 +346,129 @@ function Property(theName, theType, theDefault, theHandler) {
     myProperty.name = theName;
 
     myProperty.setFromString = function (theString) {
-        myValue = ConvertFromString(theType, theString);
+        myValue = convertFromString(theType, theString);
         if (theHandler) {
             theHandler(myValue);
         }
     };
 
     myProperty.getAsString = function () {
-        return ConvertToString(theType, myValue);
+        return convertToString(theType, myValue);
     };
 
     this._properties_.push(myProperty);
 }
 
 /**
- * Metamethod: Initialize properties of an object from XML attributes
+ * Namespace metamethod: Define a concrete class in the target namespace.
  * 
- * This metamethods iterates over all properties defined on its
- * target object, setting the property according to the corresponding
- * XML attribute, if it is present.
+ * This metamethod is used to define a concrete (instantiable) class.
+ * 
+ * It should be used as follows:
+ * 
+ *    spark.MyClass = spark.Class("MyClass");
+ * 
+ * This will define a constructor that will call the real, user-provided
+ * constructor of the class. This constructor must be defined as follows:
+ * 
+ *    spark.MyClass.Constructor = function(Protected, %{ ctor signature }% ) {
+ *        var Public = this;
+ *        var Base = {};
+ *        %{ class body }% 
+ *    };
+ * 
+ * The constructor will be called with the protected subobject of the
+ * new instance as its first argument. Any arguments passed to the real,
+ * outer, constructor will be passed as additional arguments.
+ * 
+ * Note that component classes should not have any additional constructor
+ * arguments in CTOR SIGNATURE, as the component framework imposes its
+ * own constructor signature involving the component-describing XML node,
+ * effectively creating a default constructibility invariant.
+ * 
+ * The following metamethods will be attached to any new instance:
+ *   Inherit, Getter, Setter, Signal, Property, Initialize
+ *
+ * See the respective JSDoc for the specification of these metamethods.
  * 
  */
-function Initialize(theNode) {
-    var myProps = this._properties_;
+function Class(theName) {
+    Logger.info("Defining class " + theName);
+    var myNamespace = this;
 
-    for (var i = 0; i < myProps.length; i++) {
-        var myProp = myProps[i];
-        var myName = myProp.name;
-        if (myName in theNode) {
-            var myString = theNode[myName];
-            myProp.setFromString(myString);
+    function myConstructor() {
+        var myPublic = this;
+        var myProtected = {};
+
+        // initialize internal slots
+        myPublic._protected_ = myProtected;
+        myPublic._className_ = theName;
+        myPublic._class_     = myNamespace[theName];
+
+        myPublic._sparkFile_ = "";
+
+        myPublic._classes_   = {};
+        myPublic._classes_[theName] = myNamespace[theName];
+
+        myPublic._properties_ = [];
+        myPublic._signals_    = [];
+
+        // provide metamethods
+        myPublic.Inherit    = Inherit;
+        myPublic.Getter     = Getter;
+        myPublic.Setter     = Setter;
+        myPublic.Signal     = Signal;
+        myPublic.Property   = Property;
+        myPublic.Initialize = Initialize;
+        myPublic.GetterOverride = GetterOverride;
+        myPublic.SetterOverride = SetterOverride;
+
+        myProtected.Getter     = Getter;
+        myProtected.Setter     = Setter;
+        myProtected.Property   = Property;
+        myProtected.GetterOverride = GetterOverride;
+        myProtected.SetterOverride = SetterOverride;
+
+        // call the real constructor
+        var myArguments = [myProtected].concat(Array.prototype.slice.call(arguments));
+        if (theName in myNamespace) {
+            myNamespace[theName].Constructor.apply(myPublic, myArguments);
+        } else {
+            Logger.error("'" + theName +
+                         "' not found in namespace '" + myNamespace.name + "'");
         }
     }
+
+    myConstructor._className_ = theName;
+
+    return myConstructor;
+}
+
+/**
+ * Global metamethod: Define a namespace on the target.
+ * 
+ * This metamethod allows the definition of a namespace.
+ * 
+ * It should only be used to define global namespaces as follows:
+ * 
+ *   var spark = Namespace("spark");
+ * 
+ */
+function Namespace(theName) {
+    return {AbstractClass: AbstractClass, Class: Class, name: theName};
+}
+
+/**
+ * Internal metamethod: Inherit an oldschool (Y60) class into the target object.
+ * 
+ * This, somewhat magic and special, metamethod is used to inherit
+ * a class Y60 javascript class into a SPARK class.
+ * 
+ * It should, in general, not be used. However, Window needs to inherit
+ * SceneViewer. So this is here as a generalized hack for achieving such things.
+ * 
+ */
+function InheritOldschool(theClass) {
+    var myArguments = Array.prototype.slice.call(arguments);
+    theClass.prototype.Constructor.apply(this, myArguments);
 }

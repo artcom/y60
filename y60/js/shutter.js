@@ -63,6 +63,11 @@
 //
 //=============================================================================
 
+/*jslint white:false nomen:false*/
+/*globals use, Vector4i, Vector4f, Node, window, print, ImageOverlay,
+          drawPixel, product, Vector2i, fileExists, hostname, createUniqueId,
+          stringToArray*/
+
 use("AnimationManager.js");
 
 function Shutter(theSceneViewer, theSize, theCustomShutterFile) {
@@ -70,16 +75,16 @@ function Shutter(theSceneViewer, theSize, theCustomShutterFile) {
 }
 
 Shutter.prototype.Constructor = function(self, theSceneViewer, theSize, theCustomShutterFile) {
-    const SHUTTER_OVERLAY = "shadertex/black.rgb";
-    const CUSTOM_SHUTTER_OVERLAY = "shadertex/custom_shutter.png";
+    var SHUTTER_OVERLAY = "shadertex/black.rgb";
+    var CUSTOM_SHUTTER_OVERLAY = "shadertex/custom_shutter.png";
 
-    const LEFT_SHUTTER    = 0;
-    const RIGHT_SHUTTER   = 1;
-    const TOP_SHUTTER     = 2;
-    const BOTTOM_SHUTTER  = 3;
-    const DEFAULT_SHUTTER_SIZE   = 0;
+    var LEFT_SHUTTER    = 0;
+    var RIGHT_SHUTTER   = 1;
+    var TOP_SHUTTER     = 2;
+    var BOTTOM_SHUTTER  = 3;
+    var DEFAULT_SHUTTER_SIZE = 0;
 
-    var _myShutterXmlFileName = "";
+    var _myShutterXmlFileName    = "";
     var _mySceneViewer           = theSceneViewer;
     var _myLeftOverlay           = null;
     var _myRightOverlay          = null;
@@ -93,8 +98,8 @@ Shutter.prototype.Constructor = function(self, theSceneViewer, theSize, theCusto
     var _myEnabledFlag           = true;
 
     // cursor
-    const CURSOR_IMAGE  = "shadertex/crosshair.png";
-    const CURSOR_SIZE   = 10;
+    var CURSOR_IMAGE  = "shadertex/crosshair.png";
+    var CURSOR_SIZE   = 10;
     var _myCursor       = null;
 
     var _myPosX         = 0;
@@ -106,13 +111,93 @@ Shutter.prototype.Constructor = function(self, theSceneViewer, theSize, theCusto
     var _myDrawingAlpha = 255;
     var _myDrawingColor = new Vector4i(0,0,0,_myDrawingAlpha);
 
-    if (theSize == undefined) {
-        theSize = new Vector4f(DEFAULT_SHUTTER_SIZE, DEFAULT_SHUTTER_SIZE, DEFAULT_SHUTTER_SIZE,DEFAULT_SHUTTER_SIZE);
-    }
+    theSize = theSize || new Vector4f(DEFAULT_SHUTTER_SIZE, DEFAULT_SHUTTER_SIZE, DEFAULT_SHUTTER_SIZE,DEFAULT_SHUTTER_SIZE);
     var _myShutterSize        = theSize;
     var _myDefaultShutterSize = theSize;
 
-    // public functions
+    /////////////////////
+    // Private Methods //
+    /////////////////////
+    
+    function printHelp() {
+         print("Shutter Keys:");
+         print("  ALT-s       toggle shutter");
+         print("  ALT-d       toggle interactive shutter");
+         print("  ALT-SHIFT-d toggles interactive shutter drawing");
+         print("  ALT-w       save interactive shutter");
+    }
+
+    function drawPixel(theX, theY) {
+
+        // XXX this should be two separate functions (position cursor, draw)
+        var myHalfBrushSize = _myBrushSize / 2;
+        _myCursor.position = new Vector2i(theX-myHalfBrushSize, theY-myHalfBrushSize);
+        _myCursor.visible = _myInteractiveFlag;
+
+        if (!_myEnabledFlag || !_myDrawFlag) {
+            return;
+        }
+        print("drawPixel " + theX + "," + theY);
+
+        var myRasterData = _myInteractivePixelImage.childNode(0).childNode(0).nodeValue;
+        var myImageX = (theX / window.width)  * myRasterData.width;
+        var myImageY = (theY / window.height) * myRasterData.height;
+
+        var myMinX = Math.max(0, myImageX - myHalfBrushSize);
+        var myMinY = Math.max(0, myImageY - myHalfBrushSize);
+        var myMaxX = Math.min(myRasterData.width-1, myImageX + myHalfBrushSize);
+        var myMaxY = Math.min(myRasterData.height-1, myImageY + myHalfBrushSize);
+
+        myRasterData.fillRect(myMinX, myMinY,
+                              myMaxX, myMaxY,
+                              _myDrawingColor[0], _myDrawingColor[1], _myDrawingColor[2], _myDrawingColor[3]);
+
+        /*
+        print("x: " + myImageX)
+        print("y: " + myImageY)
+        for (var x = 0; x<_myBrushSize;x++) {
+            for (var y = 0; y<_myBrushSize;y++) {
+                myRasterData.setPixel((myImageX-_myBrushSize/2)+x,
+                                      (myImageY-_myBrushSize/2)+y, 255 ,255,255,255);
+                print(myRasterData.getPixel((theX-_myBrushSize/2)+x,
+                                            (theY-_myBrushSize/2)+y));
+            }
+        }
+        */
+    }
+
+    function refresh() {
+        // XXX UH: what's all this -10 business? it effectively moves the shutter up-and-left... ?!?
+        _myLeftOverlay.width  = window.width * _myShutterSize[LEFT_SHUTTER];
+        _myLeftOverlay.height = window.height;
+        //_myLeftOverlay.position = new Vector2i(-10,-10);
+        _myLeftOverlay.position = new Vector2i(0,0);
+
+        _myRightOverlay.width  = window.width * _myShutterSize[RIGHT_SHUTTER];
+        _myRightOverlay.height = window.height;
+        //_myRightOverlay.position = new Vector2i(window.width - _myRightOverlay.width, -10);
+        _myRightOverlay.position = new Vector2i(window.width - _myRightOverlay.width, 0);
+
+        _myTopOverlay.width  = window.width;
+        _myTopOverlay.height = window.height * _myShutterSize[TOP_SHUTTER];
+        //_myTopOverlay.position = new Vector2i(-10,-10);
+        _myTopOverlay.position = new Vector2i(0,0);
+
+        _myBottomOverlay.width  = window.width;
+        _myBottomOverlay.height = window.height * _myShutterSize[BOTTOM_SHUTTER];
+        //_myBottomOverlay.position = new Vector2i(-10, window.height - _myBottomOverlay.height);
+        _myBottomOverlay.position = new Vector2i(0, window.height - _myBottomOverlay.height);
+
+        _myInteractiveOverlay.width  = window.width;
+        _myInteractiveOverlay.height  = window.height;
+        //_myInteractiveOverlay.position = new Vector2i(-10,-10);
+        _myInteractiveOverlay.position = new Vector2i(0,0);
+    }
+
+    ////////////////////
+    // Public Methods //
+    ////////////////////
+    
     self.setup = function(theShutterOverlayFile, theCustomShutterFile) {
         _myShutterXmlFileName = "shutter."+hostname()+".xml";
         if (fileExists(_myShutterXmlFileName)) {
@@ -158,19 +243,19 @@ Shutter.prototype.Constructor = function(self, theSceneViewer, theSize, theCusto
 
         self.enable(true);
         refresh();
-    }
+    };
 
     self.onUpdateSettings = function(theNode) {
         if (theNode && theNode.childNode("shutter_size")) {
             var myShutterSize = stringToArray(theNode.childNode("shutter_size").firstChild.nodeValue);
             self.setScale(myShutterSize);
         }
-    }
+    };
 
     self.setScale = function(theValue) {
         _myShutterSize = product(theValue, 0.01);
         refresh();
-    }
+    };
 
     self.setBrush = function(theSize) {
         _myBrushSize = theSize;
@@ -182,7 +267,7 @@ Shutter.prototype.Constructor = function(self, theSceneViewer, theSize, theCusto
                                               _myPosY - theSize / 2);
         }
         drawPixel(_myPosX, _myPosY);
-    }
+    };
 
     self.enable = function(theFlag) {
         _myEnabledFlag = theFlag;
@@ -200,44 +285,40 @@ Shutter.prototype.Constructor = function(self, theSceneViewer, theSize, theCusto
             _myBottomOverlay.visible = false;
             _myInteractiveOverlay.visible = false;
         }
-    }
+    };
 
     self.enabled = function() {
         return _myEnabledFlag;
-    }
+    };
 
     self.reset = function() {
         _myShutterSize = _myDefaultShutterSize;
         refresh();
-    }
+    };
 
     self.onResize = function() {
         refresh();
-    }
+    };
 
     self.onFrame = function(theTime) {
-
         if (_myEnabledFlag && _myInteractiveFlag) {
 
             _myPosX += _myDeltaX;
             _myPosY += _myDeltaY;
             drawPixel(_myPosX, _myPosY);
         }
-    }
+    };
 
     self.onMouseMotion = function(theX, theY) {
-
         /*if (_myEnabledFlag && _myInteractiveFlag) {
             _myPosX = theX;
             _myPosY = theY;
             drawPixel(theX, theY);
         }*/
-
         return _myInteractiveFlag;
-    }
+    };
 
     self.onMouseButton = function(theButton, theState, theX, theY) {
-
         if (_myEnabledFlag == false || _myInteractiveFlag == false) {
             return false;
         }
@@ -255,11 +336,10 @@ Shutter.prototype.Constructor = function(self, theSceneViewer, theSize, theCusto
         }
 
         return true;
-    }
+    };
 
     self.onKey = function(theKey, theKeyState, theShiftFlag, theCtrlFlag, theAltFlag) {
-
-        if (theAltFlag == false) {
+        if (!theAltFlag || !theCtrlFlag) {
             return false;
         }
 
@@ -344,85 +424,8 @@ Shutter.prototype.Constructor = function(self, theSceneViewer, theSize, theCusto
                 printHelp();
                 break;
         }
-
         return true;
-    }
-
-    // private functions
-    function printHelp() {
-         print("Shutter Keys:");
-         print("  ALT-s       toggle shutter");
-         print("  ALT-d       toggle interactive shutter");
-         print("  ALT-SHIFT-d toggles interactive shutter drawing");
-         print("  ALT-w       save interactive shutter");
-    }
-
-    function drawPixel(theX, theY) {
-
-        // XXX this should be two separate functions (position cursor, draw)
-        var myHalfBrushSize = _myBrushSize / 2;
-        _myCursor.position = new Vector2i(theX-myHalfBrushSize, theY-myHalfBrushSize);
-        _myCursor.visible = _myInteractiveFlag;
-
-        if (_myEnabledFlag == false || _myDrawFlag == false) {
-            return;
-        }
-        print("drawPixel " + theX + "," + theY);
-
-        var myRasterData = _myInteractivePixelImage.childNode(0).childNode(0).nodeValue;
-        var myImageX = (theX / window.width)  * myRasterData.width;
-        var myImageY = (theY / window.height) * myRasterData.height;
-
-        var myMinX = Math.max(0, myImageX - myHalfBrushSize);
-        var myMinY = Math.max(0, myImageY - myHalfBrushSize);
-        var myMaxX = Math.min(myRasterData.width-1, myImageX + myHalfBrushSize);
-        var myMaxY = Math.min(myRasterData.height-1, myImageY + myHalfBrushSize);
-
-        myRasterData.fillRect(myMinX, myMinY,
-                              myMaxX, myMaxY,
-                              _myDrawingColor[0], _myDrawingColor[1], _myDrawingColor[2], _myDrawingColor[3]);
-
-        /*
-        print("x: " + myImageX)
-        print("y: " + myImageY)
-        for (var x = 0; x<_myBrushSize;x++) {
-            for (var y = 0; y<_myBrushSize;y++) {
-                myRasterData.setPixel((myImageX-_myBrushSize/2)+x,
-                                      (myImageY-_myBrushSize/2)+y, 255 ,255,255,255);
-                print(myRasterData.getPixel((theX-_myBrushSize/2)+x,
-                                            (theY-_myBrushSize/2)+y));
-            }
-        }
-        */
-    }
-
-    function refresh() {
-        // XXX UH: what's all this -10 business? it effectively moves the shutter up-and-left... ?!?
-        _myLeftOverlay.width  = window.width * _myShutterSize[LEFT_SHUTTER];
-        _myLeftOverlay.height = window.height;
-        //_myLeftOverlay.position = new Vector2i(-10,-10);
-        _myLeftOverlay.position = new Vector2i(0,0);
-
-        _myRightOverlay.width  = window.width * _myShutterSize[RIGHT_SHUTTER];
-        _myRightOverlay.height = window.height;
-        //_myRightOverlay.position = new Vector2i(window.width - _myRightOverlay.width, -10);
-        _myRightOverlay.position = new Vector2i(window.width - _myRightOverlay.width, 0);
-
-        _myTopOverlay.width  = window.width;
-        _myTopOverlay.height = window.height * _myShutterSize[TOP_SHUTTER];
-        //_myTopOverlay.position = new Vector2i(-10,-10);
-        _myTopOverlay.position = new Vector2i(0,0);
-
-        _myBottomOverlay.width  = window.width;
-        _myBottomOverlay.height = window.height * _myShutterSize[BOTTOM_SHUTTER];
-        //_myBottomOverlay.position = new Vector2i(-10, window.height - _myBottomOverlay.height);
-        _myBottomOverlay.position = new Vector2i(0, window.height - _myBottomOverlay.height);
-
-        _myInteractiveOverlay.width  = window.width;
-        _myInteractiveOverlay.height  = window.height;
-        //_myInteractiveOverlay.position = new Vector2i(-10,-10);
-        _myInteractiveOverlay.position = new Vector2i(0,0);
-    }
+    };
 
     self.setup(SHUTTER_OVERLAY, theCustomShutterFile);
-}
+};

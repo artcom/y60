@@ -56,7 +56,11 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-if ((operatingSystem() == "LINUX" || operatingSystem() == "OSX") && expandEnvironment("${Y60_POWERMATE_SUPPORT}") == 1) {
+/*jslint nomen:false*/
+/*globals operatingSystem, expandEnvironment, plug, window, Quaternionf,
+          print, millisec, Vector4f, Matrix4f, product, Vector3f, difference*/
+
+if ((operatingSystem() === "LINUX" || operatingSystem() === "OSX") && expandEnvironment("${Y60_POWERMATE_SUPPORT}") === 1) {
     plug("PowermateInputExtension");
 }
 
@@ -67,14 +71,17 @@ var RIGHT_BUTTON  = 2;
 var BUTTON_UP     = 0;
 var BUTTON_DOWN   = 1;
 
-
 function MoverBase(theViewport) {
     this.Constructor(this, theViewport);
-};
+}
 
-MoverBase.prototype.Constructor = function(obj, theViewport) {
+MoverBase.prototype.Constructor = function (obj, theViewport) {
 
-    const DOUBLE_CLICK_INTERVAL = 500;
+    /////////////////////
+    // Private Members //
+    /////////////////////
+    
+    var DOUBLE_CLICK_INTERVAL = 500;
 
     var _myViewport              = theViewport ? theViewport : window.canvas.childNode("viewport");
     var _myMoverObject           = null;
@@ -88,17 +95,26 @@ MoverBase.prototype.Constructor = function(obj, theViewport) {
     var _myRightButtonFlag       = false;
     var _myDoubleLeftButtonFlag  = false;
     var _myDoubleClickInterval   = DOUBLE_CLICK_INTERVAL;
+    
+    var _myLastButtonTime = 0;
+    
+    /////////////////////
+    // Private Methods //
+    /////////////////////
 
-    //////////////////////////////////////////////////////////////////////
-    //
-    // public
-    //
-    //////////////////////////////////////////////////////////////////////
+    function printHelp() {
+        print("Mover keys:");
+        print("    r    reset mover");
+    }
+
+    ////////////////////
+    // Public Methods //
+    ////////////////////
 
     obj.name = "Mover";
 
-    obj.setMoverObject = function(theMoverObject) {
-        if (theMoverObject == null) {
+    obj.setMoverObject = function (theMoverObject) {
+        if (!theMoverObject) {
             return;
         }
 
@@ -108,80 +124,86 @@ MoverBase.prototype.Constructor = function(obj, theViewport) {
         _myMoverObject = theMoverObject;
 
         obj.reset();
-    }
+    };
 
-    obj.setup = function() {
-    }
-    obj.stop = function() {}
-    obj.setInitialPose = function() {
+    obj.setup = function () {
+    };
+    
+    obj.stop = function () {
+    };
+    
+    obj.setInitialPose = function () {
         if (_myMoverObject) {
             _myInitialPosition    = _myMoverObject.position.value;
             _myInitialOrientation = new Quaternionf(_myMoverObject.orientation);
         }
-    }
+    };
 
-    obj.getViewport = function() {
+    obj.getViewport = function () {
         return _myViewport;
-    }
+    };
 
-    obj.getViewportCamera = function() {
+    obj.getViewportCamera = function () {
         return _myViewport.getElementById(_myViewport.camera);
-    }
+    };
 
-    obj.getWorld = function() {
+    obj.getWorld = function () {
         var myNodeInWorld = obj.getViewportCamera();
-        while (myNodeInWorld.nodeName != "world") {
+        while (myNodeInWorld.nodeName !== "world") {
             myNodeInWorld = myNodeInWorld.parentNode;
         }
         return myNodeInWorld;
-    }
+    };
 
-    obj.getMoverObject = function() {
+    obj.getMoverObject = function () {
         return _myMoverObject;
-    }
+    };
 
-    obj.setDoubleClickActive = function(theFlag) {
+    obj.setDoubleClickActive = function (theFlag) {
         _myDoubleClickInterval = (theFlag) ? DOUBLE_CLICK_INTERVAL : 0;
-    }
-    obj.setWorldSize = function(theSize) {
+    };
+    
+    obj.setWorldSize = function (theSize) {
         if (theSize) {
             _myWorldSize  = theSize;
         } else {
             _myWorldSize = 1.0;
         }
-    }
+    };
 
-    obj.getWorldSize = function() {
+    obj.getWorldSize = function () {
         return _myWorldSize;
-    }
+    };
 
-    obj.getLeftButtonFlag = function() {
+    obj.getLeftButtonFlag = function () {
         return _myLeftButtonFlag;
-    }
+    };
 
-    obj.getMiddleButtonFlag = function() {
+    obj.getMiddleButtonFlag = function () {
         return _myMiddleButtonFlag;
-    }
+    };
 
-    obj.getRightButtonFlag = function() {
+    obj.getRightButtonFlag = function () {
         return _myRightButtonFlag;
-    }
+    };
 
-    obj.getDoubleLeftButtonFlag = function() {
+    obj.getDoubleLeftButtonFlag = function () {
         return _myDoubleLeftButtonFlag;
-    }
+    };
+    
+    obj.movements = {};
 
-    obj.rotateWithObject = function(theVector) {
-        var myWorldTranslation = new Vector4f(0,0,0,0);
+    obj.rotateWithObject = function (theVector) {
+        var myWorldTranslation = new Vector4f(0, 0, 0, 0);
 
         var myGlobalMatrix = _myMoverObject.globalmatrix;
         myWorldTranslation.add(product(myGlobalMatrix.getRow(0), theVector.x));
         myWorldTranslation.add(product(myGlobalMatrix.getRow(1), theVector.y));
         myWorldTranslation.add(product(myGlobalMatrix.getRow(2), theVector.z));
         return myWorldTranslation;
-    }
+    };
 
-    obj.update = function(theScreenTranslation, theWorldHeading) {
+    obj.update = function (theScreenTranslation, theWorldHeading) {
         var myGlobalMatrix = new Matrix4f(_myMoverObject.globalmatrix);
         var myWorldPosition  = myGlobalMatrix.getRow(3);
 
@@ -202,73 +224,71 @@ MoverBase.prototype.Constructor = function(obj, theViewport) {
         var myDecomposition = myGlobalMatrix.decompose();
         _myMoverObject.orientation = myDecomposition.orientation;
         _myMoverObject.position    = myGlobalMatrix.getTranslation();
-    }
+    };
 
-    //////////////////////////////////////////////////////////////////////
-
-    obj.reset = function() {
+    obj.reset = function () {
         _myMoverObject.position    = _myInitialPosition;
         _myMoverObject.orientation = _myInitialOrientation;
 
         obj.setup();
-    }
+    };
 
-    obj.onKey = function(theKey, theKeyState, theX, theY, theShiftFlag, theCtrlFlag, theAltFlag) {
-        if (theKeyState) {
+    obj.onKey = function (theKey, theKeyState, theX, theY, theShiftFlag, theCtrlFlag, theAltFlag) {
+        if (theKeyState && theCtrlFlag && theAltFlag) {
             if (theShiftFlag) {
                 theKey = theKey.toUpperCase();
             }
             switch (theKey) {
-                case 'r':
-                    obj.reset();
-                    break;
-                case "h":
-                    printHelp();
-                    break;
+            case 'r':
+                obj.reset();
+                break;
+            case "h":
+                printHelp();
+                break;
             }
         }
-    }
+    };
 
-    obj.onFrame = function(theTime) { // 'pure virtual'
-    }
+    obj.onFrame = function (theTime) { // 'pure virtual'
+    };
 
-    var _myLastButtonTime = 0;
-    obj.onMouseButton = function(theButton, theState, theX, theY) {
+    obj.onMouseButton = function (theButton, theState, theX, theY) {
         switch (theButton) {
-            case LEFT_BUTTON:
-                _myLeftButtonFlag = (theState == BUTTON_DOWN);
-                if (_myLeftButtonFlag) {
-                    _myDoubleLeftButtonFlag = !_myDoubleLeftButtonFlag && ((millisec() - _myLastButtonTime) < _myDoubleClickInterval);
-                    _myLastButtonTime = millisec();
-                }
-                break;
-            case MIDDLE_BUTTON:
-                _myMiddleButtonFlag = (theState == BUTTON_DOWN);
-                break;
-            case RIGHT_BUTTON:
-                _myRightButtonFlag = (theState == BUTTON_DOWN);
-                break;
-            default:
-                break;
+        case LEFT_BUTTON:
+            _myLeftButtonFlag = (theState === !!BUTTON_DOWN);
+            if (_myLeftButtonFlag) {
+                _myDoubleLeftButtonFlag = !_myDoubleLeftButtonFlag && ((millisec() - _myLastButtonTime) < _myDoubleClickInterval);
+                _myLastButtonTime = millisec();
+            }
+            break;
+        case MIDDLE_BUTTON:
+            _myMiddleButtonFlag = (theState === !!BUTTON_DOWN);
+            break;
+        case RIGHT_BUTTON:
+            _myRightButtonFlag = (theState === !!BUTTON_DOWN);
+            break;
+        default:
+            break;
         }
-    }
+    };
 
-    obj.onMouseMotion = function(theX, theY) { // 'pure virtual'
-    }
+    obj.onMouseMotion = function (theX, theY) { // 'pure virtual'
+    };
 
-    obj.onMouseWheel = function(theDeltaX, theDeltaY) {
-    }
+    obj.onMouseWheel = function (theDeltaX, theDeltaY) {
+    };
 
-    obj.onAxis = function( theDevice, theAxis, theValue) {
-    }
+    obj.onAxis = function (theDevice, theAxis, theValue) {
+    };
 
-    obj.getNormalizedScreen = function(theMousePosX, theMousePosY) {
-        return new Vector3f((theMousePosX * 2 -_myViewport.width)/_myViewport.width,
-            -(theMousePosY * 2 -_myViewport.height)/_myViewport.height, 0);
-    }
-
-    function printHelp() {
-        print("Mover keys:");
-        print("    r    reset mover");
-    }
-}
+    obj.getNormalizedScreen = function (theMousePosX, theMousePosY) {
+        return new Vector3f((theMousePosX * 2 - _myViewport.width) / _myViewport.width,
+                            -(theMousePosY * 2 - _myViewport.height) / _myViewport.height, 0);
+    };
+    
+    obj.getNormalizedDifference = function (thePreviousPosition, theCurrentPosition) {
+        var prevNormalizedPos = obj.getNormalizedScreen(thePreviousPosition[0], thePreviousPosition[1]);
+        var curNormalizedPos  = obj.getNormalizedScreen(theCurrentPosition[0],  theCurrentPosition[1]);
+        return difference(curNormalizedPos, prevNormalizedPos);
+    };
+};

@@ -63,6 +63,7 @@ namespace asl {
     bool fromString(const std::string & theString, float & outValue) {
         errno = 0;
         char * end = 0;
+
 #ifdef _SETTING_NO_STRTOF_     
         outValue = static_cast<float>(strtod(theString.c_str(), &end));
 #else

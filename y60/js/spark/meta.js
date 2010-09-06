@@ -57,7 +57,7 @@
 */
 
 /*jslint nomen: false, plusplus: false*/
-/*global spark, Class, Node, Logger*/
+/*global spark, Class, Node, Logger, searchFile*/
 
 /**
  * Map of all component classes, indexed by name.
@@ -202,4 +202,3 @@ spark.LoadedClass = function (theClassName, theFile) {
     // return the thing so it can be put in the namespace
     return myInitializingConstructor;
 };
-

@@ -56,10 +56,13 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+/*jslint plusplus: false*/
+/*globals spark, Modelling, window, Node*/
+
 spark.dummyImage = null;
 
-spark.getDummyImage = function() {
-    if(spark.dummyImage == null) {
+spark.getDummyImage = function () {
+    if (spark.dummyImage === null) {
         spark.dummyImage = Modelling.createImage(window.scene, 16, 16, "BGRA");
         spark.dummyImage.name = "spark-dummy-image";
     }
@@ -68,25 +71,24 @@ spark.getDummyImage = function() {
 
 spark.cachedImages = {};
 
-spark.getCachedImage = function(thePath) {
+spark.getCachedImage = function (thePath) {
     var myName = "spark-cached-image-" + thePath;
     var myImage = spark.getNode(myName);
 
-    if(!myImage) {
+    if (!myImage) {
         myImage = Modelling.createImage(window.scene, thePath);
         myImage.name = myName;
 
         spark.registerNode(myName, myImage);
     }
-
     return myImage;
 };
 
-spark.getCachedTexture = function(thePath) {
+spark.getCachedTexture = function (thePath) {
     var myName = "spark-cached-texture-" + thePath;
     var myTexture = spark.getNode(myName);
 
-    if(!myTexture) {
+    if (!myTexture) {
         var myImage = spark.getCachedImage(thePath);
 
         myTexture = Modelling.createTexture(window.scene, myImage);
@@ -94,13 +96,12 @@ spark.getCachedTexture = function(thePath) {
 
         spark.registerNode(myName, myTexture);
     }
-
     return myTexture;
 };
 
 spark.ourMovieCounter = 0;
 
-spark.openMovie = function(thePath, theTargetPixelFormat, theDecoderHint) {
+spark.openMovie = function (thePath, theTargetPixelFormat, theDecoderHint) {
     var myMovie = Node.createElement("movie");
     window.scene.images.appendChild(myMovie);
 
@@ -109,13 +110,12 @@ spark.openMovie = function(thePath, theTargetPixelFormat, theDecoderHint) {
     myMovie.resize = "none";
     myMovie.maxcachesize = "8";
     myMovie.loopcount = "1";
-    myMovie.targetpixelformat = (theTargetPixelFormat) ? theTargetPixelFormat :"RGB";
-    myMovie.decoderhint = (theDecoderHint) ? theDecoderHint : "FFMpegDecoder2";
+    myMovie.targetpixelformat = theTargetPixelFormat || "RGB";
+    myMovie.decoderhint = theDecoderHint || "FFMpegDecoder2";
 
     //always load first frame
     myMovie.playmode = "pause";
     window.scene.loadMovieFrame(myMovie);
     myMovie.playmode = "stop";
-
     return myMovie;
 };

@@ -15,33 +15,3 @@ ac_add_executable(
   EXTERNS ${EXTERNALS}
   ${Y60_APP_STYLE}
 )
-
-
-set(JSTESTS
-Configurator
-Dom
-Enum
-ErrorHandling
-FileFunctions
-HotCoding
-JSApp
-LinAlg
-Locale
-Modelling
-MyClass
-Overlay
-PerlinNoise
-Request
-Scene
-Serial
-Shell
-SimpleBench
-UnitTest
-VectorOfString
-Y60JSSL
-ImageClone
-)
-
-foreach(TEST ${JSTESTS})
-  y60_add_jstest(${TEST} y60)
-endforeach(TEST)

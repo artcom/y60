@@ -57,11 +57,15 @@
 
 */
 
+/*jslint white: false*/
+/*globals use, print, UnitTestSuite, UnitTest, BlendEquation, SUCCESS, ENSURE,
+          FAILURE, Scene, RenderStyles, exit, Modelling*/
+
 use("UnitTest.js");
 
 function TestEnum() {
     this.Constructor(this, "TestEnum");
-};
+}
 
 TestEnum.prototype.Constructor = function(obj, theName) {
 
@@ -77,6 +81,7 @@ TestEnum.prototype.Constructor = function(obj, theName) {
                 break;
             default:
                 FAILURE("switch");
+                break;
         }
 
         ENSURE('obj.myEnum == "max"');
@@ -93,6 +98,7 @@ TestEnum.prototype.Constructor = function(obj, theName) {
                 break;
             default:
                 FAILURE("switch");
+                break;
         }
         print(obj.myMaterial);
         ENSURE( obj.myMaterial.properties.targetbuffers.depth);
@@ -100,12 +106,12 @@ TestEnum.prototype.Constructor = function(obj, theName) {
         ENSURE( ! obj.myMaterial.properties.targetbuffers.depth);
 
 
-    }
+    };
 };
 
 function TestBitset() {
     this.Constructor(this, "TestBitset");
-};
+}
 TestBitset.prototype.Constructor = function(obj, theName) {
 
     UnitTest.prototype.Constructor(obj, theName);
@@ -128,13 +134,13 @@ TestBitset.prototype.Constructor = function(obj, theName) {
         var myMask = RenderStyles.asMask( RenderStyle.frontfacing, RenderStyle.backfacing, RenderStyle.ignore_depth);
         obj.myBitset.setValue( myMask );
 */
-    }
+    };
 };
 var mySuite = new UnitTestSuite("UnitTest");
 
 try {
-    mySuite.addTest(new TestBitset);
-    mySuite.addTest(new TestEnum);
+    mySuite.addTest(new TestBitset());
+    mySuite.addTest(new TestEnum());
     mySuite.run();
 } catch (e) {
     print("## An unknown exception occured during execution." + e + "");

@@ -70,7 +70,7 @@ var spark = Namespace("spark");
 
 spark.findRootElement = function (theDocument) {
     var myRoot = theDocument.firstChild;
-    if(!myRoot) {
+    if (!myRoot) {
         myRoot = theDocument;
     }
     // firstChild might be a xml processing instruction, a
@@ -84,8 +84,6 @@ spark.findRootElement = function (theDocument) {
     return myRoot;
 };
 
-// javascript extensions (disabled)
-//use("jsextensions.js");
 // component instantiator
 use("meta.js");
 // spark file (and dom) loader
@@ -100,6 +98,8 @@ use("registry.js");
 use("cache.js");
 // basic component classes
 use("components.js");
+// cursor object
+use("cursor.js");
 // event handling
 use("events.js");
 // multitouch support
@@ -108,8 +108,8 @@ use("multitouch.js");
 use("internationalization.js");
 // dsa sensor support
 use("dsa.js");
-// MoverBase Wrapper to use spark Event-handling
-use("MoverBaseWrapper.js");
+// EventWrapper to convert SPARK into JS callbacks
+use("CallbackWrapper.js");
 
 // widgets
 if (!("disableSparkWidgets" in this)) {
@@ -121,6 +121,7 @@ if (!("disableSparkWidgets" in this)) {
     use("spark/widget/Stage.js");
     use("spark/widget/World.js");
     use("spark/widget/Window.js");
+    use("spark/widget/SparkSceneTesterWindow.js");
     use("spark/widget/Model.js");
     use("spark/widget/Body.js");
     use("spark/widget/ResizableRectangle.js");
@@ -131,10 +132,10 @@ if (!("disableSparkWidgets" in this)) {
     use("spark/widget/NewMovie.js");
     use("spark/widget/NewText.js");
     use("spark/widget/Canvas.js");
-    use("spark/widget/OffscreenCanvas.js");
     use("spark/add-ons/RoundedCornerQuad.js");
     use("spark/add-ons/RoundedCornerMovie.js");
     use("spark/add-ons/RoundedCornerImage.js");
     use("spark/add-ons/StretchyImage.js");
     use("spark/add-ons/VideoCapture.js");
+    use("spark/add-ons/Slider.js");
 }

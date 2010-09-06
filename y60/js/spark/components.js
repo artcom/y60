@@ -57,7 +57,7 @@
 */
 
 /*jslint nomen: false, plusplus: false*/
-/*global spark, Logger, Vector2f, Vector3f, Vector4f*/
+/*global spark, Logger, Vector2f, Vector3f, Vector4f, trim, js*/
 
 spark.ourComponentsByNameMap = {};
 
@@ -91,16 +91,16 @@ spark.Component.Constructor = function (Protected) {
     /**
      * Get the parent of this component.
      */
-    Public.parent getter = function () {
+    Public.__defineGetter__("parent", function () {
         return _myParent;
-    };
+    });
 
     /**
      * Internal: change the parent of this component.
      */
-    Public.parent setter = function (theParent) {
+    Public.__defineSetter__("parent", function (theParent) {
         _myParent = theParent;
-    };
+    });
 
     /**
      * Find the root of the component hierarchy.
@@ -108,20 +108,20 @@ spark.Component.Constructor = function (Protected) {
      * NOTE: This is not identical to finding the
      *       stage of a widget.
      */
-    Public.root getter = function () {
+    Public.__defineGetter__("root", function () {
         var myCurrent = Public;
         while (myCurrent.parent !== null) {
             myCurrent = myCurrent.parent;
         }
         return myCurrent;
-    };
+    });
 
     /**
      * Get the XML node used to instantiate this component.
      */
-    Public.node getter = function () {
+    Public.__defineGetter__("node", function () {
         return _myNode;
-    };
+    });
 
     /**
      * Initialize this component from an XML node.
@@ -139,7 +139,7 @@ spark.Component.Constructor = function (Protected) {
      * The vocation of a component is a human-readable
      * string describing the components identity.
      */
-    Public.vocation getter = function () {
+    Public.__defineGetter__("vocation", function () {
         if (Public.name) {
             return "named " + Public.name;
         }
@@ -147,7 +147,7 @@ spark.Component.Constructor = function (Protected) {
             return "with id " + Public.id;
         }
         return "without a name";
-    };
+    });
 
     /**
      * Given the node describing this component,
@@ -283,6 +283,28 @@ spark.Component.Constructor = function (Protected) {
         }
     };
 
+    function findChildArray(theArrayString) {
+        var myStrings, i;
+        var myArray = [];
+        if (theArrayString[0] === "[") {
+            theArrayString = trim(theArrayString.substring(1, theArrayString.length - 1));
+            theArrayString = theArrayString.replace(/, /g, ",");
+            myStrings = theArrayString.split("],[");
+            for (i = 0; i  < myStrings.length; ++i) {
+                if (myStrings[i].length > 0) {
+                    myArray.push(findChildArray(myStrings[i]));
+                }
+            }
+            return myArray;
+        } else {
+            myStrings = theArrayString.split(",");
+            for (i = 0; i < myStrings.length; ++i) {
+                myStrings[i] = trim(myStrings[i]);
+            }
+            return myStrings;
+        }
+    }
+
     // XXX: this requires a member type. else it don't make no sense.
     Protected.getArray = function (theName, theDefault) {
         if (!_myNode) {
@@ -293,8 +315,8 @@ spark.Component.Constructor = function (Protected) {
             }
         }
         if (theName in _myNode) {
-            var myString = _myNode[theName].substring(1, _myNode[theName].length -1);
-            if (myString.length == 0) {
+            var myString = _myNode[theName].substring(1, _myNode[theName].length - 1);
+            if (myString.length === 0) {
                 return [];
             }
             var myArray = findChildArray(trim(myString));
@@ -307,28 +329,6 @@ spark.Component.Constructor = function (Protected) {
             }
         }
     };
-
-    function findChildArray(theArrayString) {
-        var myArray = [];
-        if(theArrayString[0] == "[") {
-            theArrayString = trim(theArrayString.substring(1, theArrayString.length -1));
-            theArrayString = theArrayString.replace(/, /g, ",");
-            var myStrings = theArrayString.split("],[");
-            for(var i = 0; i  < myStrings.length; ++i) {
-                if(myStrings[i].length > 0) {
-                    myArray.push(findChildArray(myStrings[i]));
-                }
-            }
-            return myArray;
-        } else {
-            var myStrings = theArrayString.split(",");
-            for (var i = 0; i < myStrings.length; ++i) {
-                myStrings[i] = trim(myStrings[i]);
-            }
-            return myStrings;
-        }
-    }
-
 };
 
 
@@ -348,63 +348,32 @@ spark.Container.Constructor = function (Protected) {
     this.Inherit(spark.Component);
 
     var _myChildren = [];
-    var _myNamedChildMap   = {};
 
     /**
      * Get an array containing all children of this container.
      */
-    Public.children getter = function () {
-        return _myChildren.slice(0); // XXX: clone?
-    };
+    Public.__defineGetter__("children", function () {
+        return _myChildren;
+    });
 
     /**
      * Add the given child to this container.
      */
     Public.addChild = function (theChild) {
         _myChildren.push(theChild);
-
-        if (theChild.name) {
-            _myNamedChildMap[theChild.name] = theChild;
-        }
-
         theChild.parent = Public;
     };
 
-    // XXX: work around missing JS 1.6 functionality. However, this certainly
-    // does not belong here. Maybe we should put all the nifty things from 1.6
-    // into free functions? [DS] Yes. [IA 20100301]
-    function indexOf(theArray, theItem) {
-        for (var i = 0; i < theArray.length; ++i) {
-            if (theArray[i] === theItem) {
-                return i;
-            }
-        }
-        return -1;
-    }
-    
-    /**
-     * Get child by index.
-     */
-    Public.getChildAt = function(theIndex) {
-       return _myChildren[theIndex];
-    };
-    
     /**
      * Remove the given child.
      */
     Public.removeChild = function (theChild) {
-        var myChildIndex = indexOf(_myChildren, theChild);
+        var myChildIndex = js.array.indexOf(_myChildren, theChild);
 
         if (myChildIndex === -1) {
             throw new Error("Could not remove " + theChild.name + " from " + Public.name + " because its not a child");
         }
-
         _myChildren.splice(myChildIndex, 1);
-
-        if (theChild.name) {
-            delete _myNamedChildMap[theChild.name];
-        }
-
         theChild.parent = null;
     };
 
@@ -412,26 +381,31 @@ spark.Container.Constructor = function (Protected) {
      * Remove all children.
      */
     Public.removeAllChildren = function () {
-        var myChildren = Public.children;
-        for (var i = 0; i < myChildren.length; i++) {
-            Public.removeChild(myChildren[i]);
+        var i = _myChildren.length;
+        while (i--) {
+            _myChildren[i].name = null;
         }
+        _myChildren = [];
     };
 
     /**
      * Retrieve a (direct) child by name.
      */
     Public.getChildByName = function (theName) {
-        if (theName in _myNamedChildMap) {
-            return _myNamedChildMap[theName];
-        } else {
-            return null;
+        var i = _myChildren.length, myChild;
+        while (i--) {
+            myChild = _myChildren[i];
+            if (myChild.name === theName) {
+                return myChild;
+            }
         }
+        return null;
     };
 
     /**
      * Recursively retrieve children of the given name.
      */
+    // TODO: check if this is used at all - seems it cannot work - see myChild!
     Public.findChildrenByName = function (theName) {
         var myChildren = [];
         var myOwnChild = Public.getChildByName(theName);
@@ -439,7 +413,7 @@ spark.Container.Constructor = function (Protected) {
             myChildren.push(myOwnChild);
         }
         for (var i = 0; i < _myChildren.length; i++) {
-            var myGrandchildren = myChild.findChildrenByName(); // what is myChild?
+            var myGrandchildren = _myChildren[i].findChildrenByName(theName);
             if (myGrandchildren.length > 0) {
                 myChildren = myChildren.concat(myGrandchildren);
             }
@@ -478,5 +452,4 @@ spark.Container.Constructor = function (Protected) {
             _myChildren[i].postRealize();
         }
     };
-
 };

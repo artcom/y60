@@ -56,9 +56,12 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+/*jslint nomen: false, plusplus: false*/
+/*globals spark, Logger*/
+
 spark.I18nContext = spark.ComponentClass("I18nContext");
 
-spark.I18nContext.Constructor = function(Protected) {
+spark.I18nContext.Constructor = function (Protected) {
     var Public = this;
     var Base = {};
 
@@ -68,21 +71,21 @@ spark.I18nContext.Constructor = function(Protected) {
     var _myLanguage = "";
     var _myDefaultLanguage = "";
 
-    Public.language getter = function() {
+    Public.language getter = function () {
         return _myLanguage;
     };
 
-    Public.defaultLanguage getter = function() {
+    Public.defaultLanguage getter = function () {
         return _myDefaultLanguage;
     };
     
-    Public.switchLanguage = function(theLanguage) {
+    Public.switchLanguage = function (theLanguage) {
         Logger.info("I18n context " + Public.name + " switching to language " + theLanguage + " _myLanguage: " + _myLanguage);
         if (theLanguage !== _myLanguage) {
             _myLanguage = theLanguage;
             var myChildren = Public.children;
             var myChildCount = myChildren.length;
-            for(var i = 0; i < myChildCount; i++) {
+            for (var i = 0; i < myChildCount; i++) {
                 var myChild = myChildren[i];
                 myChild.switchLanguage(theLanguage);
             }
@@ -93,28 +96,26 @@ spark.I18nContext.Constructor = function(Protected) {
     };
 
     Base.postRealize = Public.postRealize;
-    Public.postRealize = function() {
+    Public.postRealize = function () {
         Base.postRealize();
         _myDefaultLanguage = Protected.getString("defaultLanguage", "en");
         Public.switchLanguage(_myDefaultLanguage);
     };
 
     Base.addChild = Public.addChild;
-    Public.addChild = function(theChild) {
+    Public.addChild = function (theChild) {
         Base.addChild(theChild);
-        if(_myLanguage != "") {
+        if (_myLanguage !== "") {
             theChild.switchLanguage(_myLanguage);
         }
     };
-
 };
-
 
 spark.I18nEvent = spark.Class("I18nEvent");
 
 spark.I18nEvent.LANGUAGE = "language";
 
-spark.I18nEvent.Constructor = function(Protected, theLanguage) {
+spark.I18nEvent.Constructor = function (Protected, theLanguage) {
     var Public = this;
     var Base = {};
 
@@ -122,16 +123,14 @@ spark.I18nEvent.Constructor = function(Protected, theLanguage) {
 
     var _myLanguage = theLanguage;
 
-    Public.language getter = function() {
+    Public.language getter = function () {
         return _myLanguage;
     };
-
 };
-
 
 spark.I18nItem = spark.AbstractClass("I18nItem");
 
-spark.I18nItem.Constructor = function(Protected) {
+spark.I18nItem.Constructor = function (Protected) {
     var Public = this;
     var Base = {};
 
@@ -140,41 +139,41 @@ spark.I18nItem.Constructor = function(Protected) {
 
     var _myLanguage = "";
 
-    Public.language getter = function() {
+    Public.language getter = function () {
         return _myLanguage;
     };
 
     var _myLanguageData = {};
 
-    Protected.languageData = function() {
+    Protected.languageData = function () {
         return _myLanguageData;
     };
 
     Base.realize = Public.realize;
-    Public.realize = function() {
+    Public.realize = function () {
         Base.realize();
         var myNode = Public.node;
-        for(var i = 0; i < myNode.childNodesLength(); i++) {
+        for (var i = 0; i < myNode.childNodesLength(); i++) {
             var myChild = myNode.childNode(i);
             var myLang = myChild.nodeName;
             var myData = "";
             var myNumChildren = myChild.childNodesLength();
-            for(var j = 0; j < myNumChildren; j++) {
+            for (var j = 0; j < myNumChildren; j++) {
                 myData += myChild.childNode(j).nodeValue;
             }
             Public.addLanguageData(myLang, myData);
         }
     };
 
-    Protected.createEvent = function(theLanguage) {
+    Protected.createEvent = function (theLanguage) {
         return new spark.I18nEvent(theLanguage);
     };
 
-    Public.getLanguageData = function(theLanguage) {
-        if(!theLanguage) {
+    Public.getLanguageData = function (theLanguage) {
+        if (!theLanguage) {
             theLanguage = _myLanguage;
         }
-        if(!(theLanguage in _myLanguageData)) {
+        if (!(theLanguage in _myLanguageData)) {
             Logger.debug("I18n item " + Public.name + " does not contain language " + theLanguage);
             return (Public.parent.defaultLanguage in _myLanguageData) ? _myLanguageData[Public.parent.defaultLanguage] : null;
         } else {
@@ -182,16 +181,16 @@ spark.I18nItem.Constructor = function(Protected) {
         }
     };
 
-    Public.hasLanguageData = function(theLanguage) {
+    Public.hasLanguageData = function (theLanguage) {
         return theLanguage in _myLanguageData;
     };
 
-    Public.switchLanguage = function(theLanguage) {
-        if(theLanguage == _myLanguage) {
+    Public.switchLanguage = function (theLanguage) {
+        if (theLanguage == _myLanguage) {
             return;
         }
 
-        if(!(theLanguage in _myLanguageData)) {
+        if (!(theLanguage in _myLanguageData)) {
             Logger.warning("I18n item " + Public.name + " does not contain language " + theLanguage);
         }
 
@@ -201,8 +200,8 @@ spark.I18nItem.Constructor = function(Protected) {
 
     };
 
-    Public.addLanguageData = function(theLanguage, theData) {
-        if(theLanguage in _myLanguageData) {
+    Public.addLanguageData = function (theLanguage, theData) {
+        if (theLanguage in _myLanguageData) {
             Logger.warning("duplicate i18n data for item " + Public.name + " in language " + theLanguage);
         }
         _myLanguageData[theLanguage] = theData;
@@ -212,22 +211,22 @@ spark.I18nItem.Constructor = function(Protected) {
 
 spark.I18nText = spark.ComponentClass("I18nText");
 
-spark.I18nText.Constructor = function(Protected) {
+spark.I18nText.Constructor = function (Protected) {
     var Public = this;
     var Base = {};
 
     this.Inherit(spark.I18nItem);
 
     Base.createEvent = Protected.createEvent;
-    Protected.createEvent = function(theLanguage) {
+    Protected.createEvent = function (theLanguage) {
         var myEvent = Base.createEvent(theLanguage);
         myEvent.text = Public.text;
         return myEvent;
     };
 
-    Public.text getter = function() {
+    Public.text getter = function () {
         var myData = Public.getLanguageData(Public.language);
-        if(myData == null) {
+        if (myData == null) {
             return "";
         } else {
             return myData;
@@ -237,22 +236,22 @@ spark.I18nText.Constructor = function(Protected) {
 
 spark.I18nImage = spark.ComponentClass("I18nImage");
 
-spark.I18nImage.Constructor = function(Protected) {
+spark.I18nImage.Constructor = function (Protected) {
     var Public = this;
     var Base = {};
 
     this.Inherit(spark.I18nItem);
 
     Base.createEvent = Protected.createEvent;
-    Protected.createEvent = function(theLanguage) {
+    Protected.createEvent = function (theLanguage) {
         var myEvent = Base.createEvent(theLanguage);
         myEvent.src = Public.src;
         return myEvent;
     };
 
-    Public.src getter = function() {
+    Public.src getter = function () {
         var myData = Public.getLanguageData(Public.language);
-        if(myData == null) {
+        if (myData == null) {
             return "";
         } else {
             return myData;
@@ -262,22 +261,22 @@ spark.I18nImage.Constructor = function(Protected) {
 
 spark.I18nMovie = spark.ComponentClass("I18nMovie");
 
-spark.I18nMovie.Constructor = function(Protected) {
+spark.I18nMovie.Constructor = function (Protected) {
     var Public = this;
     var Base = {};
 
     this.Inherit(spark.I18nItem);
     
     Base.createEvent = Protected.createEvent;
-    Protected.createEvent = function(theLanguage) {
+    Protected.createEvent = function (theLanguage) {
         var myEvent = Base.createEvent(theLanguage);
         myEvent.src = Public.src;
         return myEvent;
     };
 
-    Public.src getter = function() {
+    Public.src getter = function () {
         var myData = Public.getLanguageData(Public.language);
-        if(myData == null) {
+        if (myData == null) {
             return "";
         } else {
             return myData;

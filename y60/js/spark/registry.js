@@ -56,17 +56,20 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+/*jslint*/
+/*globals spark, Exception, window*/
+
 spark.nameToIdMap = {};
 
-spark.registerNode = function(theName, theNode) {
-    if(theName in spark.nameToIdMap) {
+spark.registerNode = function (theName, theNode) {
+    if (theName in spark.nameToIdMap) {
         throw new Exception("Spark-registered node name used twice.");
     }
     spark.nameToIdMap[theName] = theNode.id;
 };
 
-spark.getNode = function(theName) {
-    if(theName in spark.nameToIdMap) {
+spark.getNode = function (theName) {
+    if (theName in spark.nameToIdMap) {
         return window.scene.dom.getElementById(spark.nameToIdMap[theName]);
     } else {
         return null;
