@@ -106,7 +106,15 @@ namespace y60 {
         float myPlaySpeed = _myMovie->get<PlaySpeedTag>();
         if (_myLastSystemTime >= 0) {
             _myMovieTime += (theSystemTime - _myLastSystemTime) * myPlaySpeed;
-
+            // if difference between last system time and current system time is bigger than movie duration
+            while (_myMovieTime * getFrameRate() > getFrameCount()) {
+                if (_myMovie->get<LoopCountTag>() == 0) {
+                    _myMovieTime -= getFrameCount() / getFrameRate();
+                } else {
+                    _myMovieTime = getFrameCount() / getFrameRate();
+                    break;
+                }
+            }
             // Calculate the wraparaound for reverse playback
             if (_myMovieTime < 0) {
                 unsigned myFrameCount = getFrameCount();

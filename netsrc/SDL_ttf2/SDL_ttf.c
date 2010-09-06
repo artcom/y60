@@ -2134,18 +2134,18 @@ void TTF_SetFontHinting( TTF_Font* font, int hinting )
 int TTF_GetFontHinting( const TTF_Font* font )
 {
     int hinting = font->hinting;
-    if (hinting == FT_LOAD_FORCE_AUTOHINT)
-        return TTF_HINTING_AUTO;
-    if (hinting == 0)
-		return TTF_HINTING_NORMAL;
-		    
+    if (hinting == FT_LOAD_DEFAULT)
+        return TTF_HINTING_NORMAL;
+    if (hinting & FT_LOAD_NO_HINTING)
+        return TTF_HINTING_NONE;
+    
     hinting &= ~FT_LOAD_FORCE_AUTOHINT;
-    if (hinting == FT_LOAD_TARGET_LIGHT)
-		return TTF_HINTING_LIGHT;
-	else if (hinting == FT_LOAD_TARGET_MONO)
-	    return TTF_HINTING_MONO;
-	else if (hinting == FT_LOAD_NO_HINTING)
-		return TTF_HINTING_NONE;
+    if (hinting & FT_LOAD_TARGET_LIGHT)
+        return TTF_HINTING_LIGHT;
+    else if (hinting & FT_LOAD_TARGET_MONO)
+        return TTF_HINTING_MONO;
+    else
+        return TTF_HINTING_AUTO;
 }
 
 void TTF_Quit( void )
