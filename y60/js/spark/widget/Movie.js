@@ -16,9 +16,11 @@ spark.Movie.Constructor = function(Protected) {
     var _myTexture  = null;
     var _myDecoderHint  = "FFMpegDecoder2";
     var _myTargetPixelFormat = "RGB";
+    var _mySetSourceWithoutChangingBody = false;
 
     this.Inherit(spark.ResizableRectangle);
 
+    
     Base.initialize = Public.initialize;
     Public.initialize = function(theNode) {
         if (theNode && (("useYuv2RgbShader" in theNode && theNode.useYuv2RgbShader === "true") ||
@@ -128,7 +130,18 @@ spark.Movie.Constructor = function(Protected) {
     Public.src setter = function(theSourceFile) {
         if(_mySource != theSourceFile) {
             _mySource = theSourceFile;
-            Public.movie = spark.openMovie(theSourceFile, _myTargetPixelFormat, _myDecoderHint);
+            if (_mySetSourceWithoutChangingBody) {
+                if (_myMovie.nodeName == "image") {
+                    _myMovie.parentNode.removeChild(_myMovie);
+                    _myMovie = null;
+                    Public.movie = spark.openMovie(theSourceFile, _myTargetPixelFormat, _myDecoderHint)
+                } else {
+                    _myMovie.src = theSourceFile;
+                    window.scene.loadMovieFrame(_myMovie);
+                }
+            } else {
+                Public.movie = spark.openMovie(theSourceFile, _myTargetPixelFormat, _myDecoderHint);
+            }
         } else {
             if(_myMovie.playmode != "stop") {
                 Public.stop();
@@ -159,6 +172,7 @@ spark.Movie.Constructor = function(Protected) {
         var myMovieSourceId = Protected.getString("srcId", "");
         _myDecoderHint = Protected.getString("decoderhint", "FFMpegDecoder2");
         _myTargetPixelFormat = Protected.getString("targetpixelformat", "RGB");
+        _mySetSourceWithoutChangingBody = Protected.getBoolean("setSourceWithoutChangingBody",false);
 
         if(myMovieSource == "") {
             var myWidth  = Protected.getNumber("width", 1);
