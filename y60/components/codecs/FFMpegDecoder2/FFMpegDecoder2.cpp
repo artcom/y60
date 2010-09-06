@@ -1125,7 +1125,7 @@ namespace y60 {
 
     // Calls ffmpeg seek, flushes buffers etc.
     void FFMpegDecoder2::doSeek(double theDestTime, bool theSeekAudioFlag) {
-        AC_DEBUG<<"FFMpegDecoder2::doSeek destTime: "<<theDestTime<<" destFrame: "<<int64_t(theDestTime*_myFrameRate);
+        AC_DEBUG<<"FFMpegDecoder2::doSeek destTime: "<<theDestTime<<" destFrame: "<<theDestTime*_myFrameRate;
 
         // AVSEEK_FLAG_ANY: seek to any frame, even non keyframes -> results in artifacts until the next iframe is decoded
         // AVSEEK_FLAG_BACKWARD: seek backwards -> ffmpeg seek better when this flag is enabled, even when seeking forward
