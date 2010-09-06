@@ -30,7 +30,6 @@ JSZipWriter.cpp
 JSfile_functions.cpp
 JSintersection_functions.cpp
 OffscreenRenderArea.cpp
-Picking.cpp
 Timeout.cpp
 jscpp.cpp
 )
@@ -70,7 +69,6 @@ JSZipWriter.h
 JSfile_functions.h
 JSintersection_functions.h
 OffscreenRenderArea.h
-Picking.h
 Timeout.h
 jscpp.h
 y60_jslib_settings.h

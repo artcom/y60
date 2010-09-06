@@ -69,7 +69,7 @@
 #include <asl/dom/AttributePlug.h>
 #include <asl/math/Frustum.h>
 
-#include <y60/jslib/Picking.h>
+#include "Picking.h"
 
 namespace y60 {
 
@@ -94,7 +94,6 @@ namespace y60 {
     DEFINE_ATTRIBUTE_TAG(ViewportDrawGlowTag,        bool,          VIEWPORT_GLOW_ATTRIB,            false, Y60_SCENE_DECL);
     DEFINE_ATTRIBUTE_TAG(ViewportDrawNormalsTag,     bool,          VIEWPORT_DRAWNORMALS_ATTRIB,     false, Y60_SCENE_DECL);
 
-    typedef asl::Ptr<Viewport, dom::ThreadingModel> ViewportPtr;
 
     class Y60_SCENE_DECL Viewport :
         public dom::Facade,
@@ -144,7 +143,7 @@ namespace y60 {
                   dom::DynamicAttributePlug<ViewportHeightTag, Viewport>(this, &Viewport::getHeight),
                   dom::DynamicAttributePlug<ViewportWidthTag, Viewport>(this, &Viewport::getWidth),
                   ResizePolicyTag::Plug( theNode ),
-                  _myPicking()
+                  _myPicking(PickingPtr(new Picking()))
             {}
 
             IMPLEMENT_DYNAMIC_FACADE(Viewport);
@@ -152,21 +151,22 @@ namespace y60 {
             //  canvas. Suitable for glViewport.
             int getLower() const;
             inline dom::NodePtr pickBody(const unsigned int theX, const unsigned int theY) const {
-                return _myPicking.pickBody(this->getNode(), theX, theY);
+                return _myPicking->pickBody(this->getNode(), theX, theY);
             };
             inline dom::NodePtr pickBodyBySweepingSphereFromBodies(const unsigned int theX, const unsigned int theY, const float theSphereRadius) const {
-                return _myPicking.pickBodyBySweepingSphereFromBodies(this->getNode(), theX, theY, theSphereRadius);
+                return _myPicking->pickBodyBySweepingSphereFromBodies(getNode(), theX, theY, theSphereRadius);
             };
             void applyAspectToCamera();
-        private:
             bool getTop(int & theTop) const;
             bool getLeft(int & theLeft) const;
             bool getHeight(unsigned & theHeight) const;
             bool getWidth(unsigned & theWidth) const;
+        private:
 
-            jslib::Picking _myPicking;
+            PickingPtr _myPicking;
     };
 
+    typedef asl::Ptr<Viewport, dom::ThreadingModel> ViewportPtr;
 }
 
 #endif

@@ -388,7 +388,19 @@ namespace y60 {
                                     const asl::Vector3<float> & theMotion,
                                     CollisionInfo & theCollision,
                                     bool theIntersectInvisibleBodysFlag = true);
+            dom::NodePtr pickBody(const unsigned int theX,
+                             const unsigned int theY,
+                             const dom::NodePtr theCanvas) const;
 
+            dom::NodePtr pickBody(const unsigned int theX,
+                             const unsigned int theY) const;
+            dom::NodePtr pickBodyBySweepingSphereFromBodies(const unsigned int theX,
+                             const unsigned int theY,
+                             const float theSphereRadius,
+                             const dom::NodePtr theCanvas) const;
+            dom::NodePtr pickBodyBySweepingSphereFromBodies(const unsigned int theX,
+                             const unsigned int theY,
+                             const float theSphereRadius) const;
 	        //void reverseUpdateShape(ShapePtr theShape);
             //void reverseUpdateShapes();
 

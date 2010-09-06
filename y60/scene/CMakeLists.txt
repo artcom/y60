@@ -26,6 +26,7 @@ LightSourceBuilder.cpp
 MaterialBase.cpp
 MaterialBuilder.cpp
 MovieBuilder.cpp
+Picking.cpp
 Primitive.cpp
 Scene.cpp
 SceneBuilder.cpp
@@ -86,6 +87,7 @@ MaterialTypes.h
 MemoryResourceManager.h
 MovieBuilder.h
 Overlay.h
+Picking.h
 Primitive.h
 PropertyListFacade.h
 Record.h
