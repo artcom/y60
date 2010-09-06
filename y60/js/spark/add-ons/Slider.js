@@ -134,9 +134,9 @@ spark.Slider.Constructor = function (Protected) {
         _horizontalLock = Protected.getBoolean("horizontal-lock", false);
         _centered       = Protected.getBoolean("centered", true);
         _sticky         = Protected.getBoolean("sticky", true);
-        Public.addEventListener(spark.GenericCursorEvent.APPEAR_TOUCHENTER, Public.onSlideStart, true);
-        Public.addEventListener(spark.GenericCursorEvent.MOVE, Public.onSlide, true);
-        Public.addEventListener(spark.GenericCursorEvent.VANISH_TOUCHLEAVE, Public.onSlideStop, true);
+        Public.addEventListener(spark.CursorEvent.APPEAR_ENTER, Public.onSlideStart, true);
+        Public.addEventListener(spark.CursorEvent.MOVE, Public.onSlide, true);
+        Public.addEventListener(spark.CursorEvent.VANISH_LEAVE, Public.onSlideStop, true);
 
         if (_centered) {
             Public.centerCursor();
