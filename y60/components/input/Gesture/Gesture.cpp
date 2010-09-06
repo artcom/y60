@@ -108,7 +108,6 @@ void Gesture::handle(EventPtr theEvent) {
             }
             break;
         default:
-            AC_INFO << "event type " << theEvent->type << " not handled";
             break;
     }
 }
