@@ -87,7 +87,6 @@ namespace y60 {
         dom::NodePtr myCameraNode = theViewportNode.getElementById( theViewportNode.getAttributeString(CAMERA_ATTRIB) );
         CameraPtr myCamera = myCameraNode->getFacade<Camera>();
         getNearAndFarPlanePos(myCamera, theViewportNode, theScreenPixelX, theScreenPixelY, myNearPlanePos, myFarPlanePos); 
-        AC_PRINT<<myNearPlanePos<<", "<<myFarPlanePos;
 
         asl::LineSegment<float> myLineSegment = asl::LineSegment<float>(myNearPlanePos, myFarPlanePos);
         dom::NodePtr myWorldNode = findWorldForCamera(myCamera);
@@ -150,17 +149,14 @@ namespace y60 {
     Picking::findNearestIntersection(const y60::IntersectionInfoVector & theIntersectionInfo, const asl::Point3f & theReferencePoint) const {
         float myMinDistance = std::numeric_limits<float>::max();
         dom::NodePtr myPickedBody;
-        AC_PRINT<<"infosize: "<<theIntersectionInfo.size()<<" origin "<<theReferencePoint;
         for (y60::IntersectionInfoVector::const_iterator it = theIntersectionInfo.begin(); it != theIntersectionInfo.end(); ++it) {
             const Primitive::IntersectionList & myIntersectionList = *(it->_myPrimitiveIntersections);
-            AC_PRINT<<"list size: "<<myIntersectionList.size();
             for (Primitive::IntersectionList::const_iterator it2 = myIntersectionList.begin(); it2 != myIntersectionList.end(); ++it2) {
-                float myDistance = asl::distance(theReferencePoint, it2->_myPosition);
-                AC_PRINT<<"distance: "<<myDistance<<", _myPos: "<<it2->_myPosition<<", "<<*(it->_myBody);
+                asl::Point3f myPosition = product( it2->_myPosition, it->_myTransformation);
+                float myDistance = asl::distance(theReferencePoint, myPosition);
                 if (myDistance < myMinDistance) {
                     myMinDistance = myDistance;
                     myPickedBody = it->_myBody;
-                    AC_PRINT<<"picked: "<<*myPickedBody;
                 }
             }
         }
@@ -171,7 +167,6 @@ namespace y60 {
     Picking::nearestIntersection(const ScenePtr theScene, const dom::NodePtr theRootNode, const asl::LineSegment<float> & theLineSegment) const {
         y60::IntersectionInfoVector myIntersections;
         bool myIntersectedFlag = theScene->intersectBodies(theRootNode, theLineSegment, myIntersections, true);
-        AC_PRINT<<"intersected: "<<myIntersectedFlag;
         if (myIntersectedFlag) {
             return findNearestIntersection(myIntersections, theLineSegment.origin);
         }
