@@ -147,6 +147,68 @@ toString(JSContext *cx, JSObject *obj, uintn argc, jsval *argv, jsval *rval) {
 
 
 static JSBool
+pickBody(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Returns a body");
+    DOC_PARAM("theX", "", DOC_TYPE_INTEGER);
+    DOC_PARAM("theY", "", DOC_TYPE_INTEGER);
+    DOC_PARAM("theCanvas", "", DOC_TYPE_NODE);
+    DOC_RVAL("body", DOC_TYPE_NODE)
+    DOC_END;
+    try {
+        MAKE_SCOPE_TIMER(pickBody);
+        ensureParamCount(argc, 2, 3);
+
+        unsigned int theX = 0;
+        unsigned int theY = 0;
+        dom::NodePtr theCanvas;
+        dom::NodePtr myPickedBody;
+        convertFrom(cx, argv[0], theX);
+        convertFrom(cx, argv[1], theY);
+        if (argc > 2) {
+            convertFrom(cx, argv[2], theCanvas);
+            myPickedBody = JSScene::getJSWrapper(cx,obj).getNative().pickBody(theX, theY, theCanvas);
+        } else {
+            myPickedBody = JSScene::getJSWrapper(cx,obj).getNative().pickBody(theX, theY);
+        }
+        *rval = as_jsval(cx, myPickedBody);
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+
+static JSBool
+pickBodyBySweepingSphereFromBodies(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Returns a body");
+    DOC_PARAM("theX", "", DOC_TYPE_INTEGER);
+    DOC_PARAM("theY", "", DOC_TYPE_INTEGER);
+    DOC_PARAM("theSphereRadius", "", DOC_TYPE_FLOAT);
+    DOC_PARAM("theCanvas", "", DOC_TYPE_NODE);
+    DOC_RVAL("body", DOC_TYPE_NODE)
+    DOC_END;
+    try {
+        MAKE_SCOPE_TIMER(pickBodyBySweepingSphereFromBodies);
+        ensureParamCount(argc, 3, 4);
+
+        unsigned int theX = 0;
+        unsigned int theY = 0;
+        float theSphereRadius = 0;
+        dom::NodePtr theCanvas;
+        dom::NodePtr myPickedBody;
+        convertFrom(cx, argv[0], theX);
+        convertFrom(cx, argv[1], theY);
+        convertFrom(cx, argv[2], theSphereRadius);
+        if (argc > 3) {
+            convertFrom(cx, argv[3], theCanvas);
+            myPickedBody = JSScene::getJSWrapper(cx,obj).getNative().pickBodyBySweepingSphereFromBodies(theX, theY, theSphereRadius, theCanvas);
+        } else {
+            myPickedBody = JSScene::getJSWrapper(cx,obj).getNative().pickBodyBySweepingSphereFromBodies(theX, theY, theSphereRadius);
+        }
+        *rval = as_jsval(cx, myPickedBody);
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+static JSBool
 intersectBodies(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Returns the intersections of a body with a given line, line segment, ray or box.");
     DOC_PARAM("theBody", "", DOC_TYPE_NODE);    DOC_PARAM("theLine", "", DOC_TYPE_LINE);
@@ -507,6 +569,8 @@ JSScene::Functions() {
         {"loadMovieFrame",        loadMovieFrame,      1},
         {"ensureMovieFramecount", ensureMovieFramecount,1},
         {"loadCaptureFrame",      loadCaptureFrame,    2},
+        {"pickBody",            pickBody,              2},
+        {"pickBodyBySweepingSphereFromBodies",     pickBodyBySweepingSphereFromBodies,   3},
         {0}
     };
     return myFunctions;

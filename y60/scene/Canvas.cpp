@@ -59,8 +59,9 @@
 // own header
 #include "Canvas.h"
 
-#include "Scene.h"
 #include <asl/dom/Nodes.h>
+#include <y60/scene/Scene.h>
+#include <y60/scene/Viewport.h>
 
 using namespace std;
 
@@ -78,6 +79,29 @@ Canvas::getHeight() const {
     asl::Ptr<IFrameBuffer> myFrameBuffer = _myFrameBuffer.lock();
     AC_TRACE << "Canvas::getHeight '" << get<NameTag>() << "' framebuffer=" << myFrameBuffer.get();
     return myFrameBuffer ? myFrameBuffer->getHeight() : 0;
+}
+
+ViewportPtr
+Canvas::getViewportAt(const unsigned int theX, const unsigned int theY) const {
+    int myViewportCount = getNode().childNodesLength(VIEWPORT_NODE_NAME);
+    for (int i = myViewportCount-1; i >= 0; --i) {
+        dom::NodePtr myViewportNode = getNode().childNode(VIEWPORT_NODE_NAME,i);
+        ViewportPtr myViewport = myViewportNode->getFacade<Viewport>();
+        int myTop = 0;
+        int myLeft = 0;
+        unsigned int myWidth = 0;
+        unsigned int myHeight = 0;
+        if (myViewport->getTop(myTop) && myViewport->getHeight(myHeight) && 
+            myViewport->getWidth(myWidth) && myViewport->getLeft(myLeft) && 
+            myTop <= static_cast<int>(theY) &&
+            myHeight + myTop >= theY &&
+            myLeft <= static_cast<int>(theX) &&
+            myLeft + myWidth >= theX)
+        {
+            return myViewport;
+        }
+    }
+    throw Exception("no suitable viewport found in canvas " + get<NameTag>(), PLUS_FILE_LINE);
 }
 
 bool

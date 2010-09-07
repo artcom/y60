@@ -276,9 +276,9 @@ spark.Window.Constructor = function (Protected) {
     Public.pickWidget = function (theX, theY) {
         var myBody     = null;
         if (_myPickRadius === 0) {
-            myBody = Public.picking.pickBody(theX, theY, Public.sceneNode);
+            myBody = window.scene.pickBody(theX, theY, window.scene.canvas);
         } else {
-            myBody = Public.picking.pickBodyBySweepingSphereFromBodies(theX, theY, _myPickRadius, Public.sceneNode);
+            myBody = window.scene.pickBodyBySweepingSphereFromBodies(theX, theY, _myPickRadius, window.scene.canvas);
         }
         if (myBody) {
             var myBodyId = myBody.id;

@@ -74,14 +74,10 @@ bool
 Viewport::getLeft(int & theLeft) const {
     const Node * myCanvasNode = this->getNode().parentNode();
     if (myCanvasNode) {
-         int newLeft = int(get<Position2DTag>()[0] * myCanvasNode->getFacade<Canvas>()->getWidth());
-         if (theLeft != newLeft) {
-             theLeft = newLeft;
-             return true;
-         }
-    } else {
-        AC_ERROR << "Canvas is null!";
-    }
+         theLeft = int(get<Position2DTag>()[0] * myCanvasNode->getFacade<Canvas>()->getWidth());
+         return true;
+    } 
+    AC_ERROR << "Canvas is null!";
     return false;
 }
 
@@ -98,14 +94,10 @@ bool
 Viewport::getTop(int & theTop) const {
     const Node * myCanvasNode = this->getNode().parentNode();
     if (myCanvasNode) {
-        int newTop = int(get<Position2DTag>()[1] * myCanvasNode->getFacade<Canvas>()->getHeight());
-        if (theTop != newTop) {
-            theTop = newTop;
-            return true;
-        }
-    } else {
-        AC_ERROR << "Canvas is null!";
+        theTop = int(get<Position2DTag>()[1] * myCanvasNode->getFacade<Canvas>()->getHeight());
+        return true;
     }
+    AC_ERROR << "Canvas is null!";
     return false;
 }
 
@@ -114,11 +106,8 @@ Viewport::getWidth(unsigned & theWidth) const {
     const Node * myCanvasNode = this->getNode().parentNode();
     if (myCanvasNode) {
         const CanvasPtr & myCanvas = myCanvasNode->getFacade<Canvas>();
-        unsigned newWidth = unsigned(get<Size2DTag>()[0] * myCanvas->getWidth());
-        if (theWidth != newWidth) {
-            theWidth = newWidth;
-            return true;
-        }
+        theWidth = unsigned(get<Size2DTag>()[0] * myCanvas->getWidth());
+        return true;
     }
     return false;
 }
@@ -127,11 +116,8 @@ bool
 Viewport::getHeight(unsigned & theHeight) const {
     const Node * myCanvasNode = this->getNode().parentNode();
     if (myCanvasNode) {
-        unsigned newHeight = unsigned(get<Size2DTag>()[1] * myCanvasNode->getFacade<Canvas>()->getHeight());
-        if (newHeight != theHeight) {
-            theHeight = newHeight;
-            return true;
-        }
+        theHeight = unsigned(get<Size2DTag>()[1] * myCanvasNode->getFacade<Canvas>()->getHeight());
+        return true;
     }
     return false;
 }
