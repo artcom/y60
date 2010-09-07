@@ -394,7 +394,7 @@ spark.Window.Constructor = function (Protected) {
 
         if (_myMouseCursor) {
             _myMouseCursor.update(myWidget, new Point2f(theX, theY));
-            var myMouseCursorMoveEvent = new spark.MouseCursorEvent(spark.MouseCursorEvent.MOVE, _myMouseCursor);
+            var myMouseCursorMoveEvent = new spark.CursorEvent(spark.CursorEvent.MOVE, _myMouseCursor);
             if (_myMouseCursor.grabbed) {
                 _myMouseCursor.grabHolder.dispatchEvent(myMouseCursorMoveEvent);
             } else {
@@ -413,11 +413,11 @@ spark.Window.Constructor = function (Protected) {
 
             if (_myMouseCursor && !_myMouseCursor.grabbed) {
                 if (_myMouseFocused) {
-                    var myCursorLeave = new spark.MouseCursorEvent(spark.MouseCursorEvent.LEAVE, _myMouseCursor);
+                    var myCursorLeave = new spark.CursorEvent(spark.CursorEvent.LEAVE, _myMouseCursor);
                     _myMouseFocused.dispatchEvent(myCursorLeave);
                 }
 
-                var myCursorEnter = new spark.MouseCursorEvent(spark.MouseCursorEvent.ENTER, _myMouseCursor);
+                var myCursorEnter = new spark.CursorEvent(spark.CursorEvent.ENTER, _myMouseCursor);
                 myWidget.dispatchEvent(myCursorEnter);
             }
             _myMouseFocused = myWidget;
@@ -456,16 +456,17 @@ spark.Window.Constructor = function (Protected) {
             if (theState) {
                 _myMouseCursor = new spark.Cursor("mouse-cursor");
                 _myMouseCursor.update(myWidget, new Point2f(theX, theY));
-                myMouseCursorEvent = new spark.MouseCursorEvent(spark.MouseCursorEvent.APPEAR, _myMouseCursor);
+                myMouseCursorEvent = new spark.CursorEvent(spark.CursorEvent.APPEAR, _myMouseCursor);
                 myWidget.dispatchEvent(myMouseCursorEvent);
             } else {
                 _myMouseCursor.update(myWidget, new Point2f(theX, theY));
-                myMouseCursorEvent = new spark.MouseCursorEvent(spark.MouseCursorEvent.VANISH, _myMouseCursor);
+                myMouseCursorEvent = new spark.CursorEvent(spark.CursorEvent.VANISH, _myMouseCursor);
                 if (_myMouseCursor.grabbed) {
                     _myMouseCursor.grabHolder.dispatchEvent(myMouseCursorEvent);
                 } else {
                     myWidget.dispatchEvent(myMouseCursorEvent);
                 }
+                _myMouseCursor = null;
             }
         }
 
