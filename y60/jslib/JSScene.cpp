@@ -191,7 +191,7 @@ pickBodyBySweepingSphereFromBodies(JSContext *cx, JSObject *obj, uintN argc, jsv
 
         unsigned int theX = 0;
         unsigned int theY = 0;
-        unsigned int theSphereRadius = 0;
+        float theSphereRadius = 0;
         dom::NodePtr theCanvas;
         dom::NodePtr myPickedBody;
         convertFrom(cx, argv[0], theX);

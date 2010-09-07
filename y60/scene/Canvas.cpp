@@ -93,16 +93,15 @@ Canvas::getViewportAt(const unsigned int theX, const unsigned int theY) const {
         unsigned int myHeight = 0;
         if (myViewport->getTop(myTop) && myViewport->getHeight(myHeight) && 
             myViewport->getWidth(myWidth) && myViewport->getLeft(myLeft) && 
-            myTop <= theY &&
+            myTop <= static_cast<int>(theY) &&
             myHeight + myTop >= theY &&
-            myLeft <= theX &&
+            myLeft <= static_cast<int>(theX) &&
             myLeft + myWidth >= theX)
         {
             return myViewport;
         }
     }
-    return ViewportPtr();
-
+    throw Exception("no suitable viewport found in canvas " + get<NameTag>(), PLUS_FILE_LINE);
 }
 
 bool
