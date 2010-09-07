@@ -24,6 +24,7 @@ spark.Movie.Constructor = function(Protected) {
     var _myTexture           = null;
     var _myDecoderHint       = "FFMpegDecoder2";
     var _myTargetPixelFormat = "RGB";
+    var _mySetSourceWithoutChangingBody = false;
 
     // XXX crude hack starts here
     var _myOnMovieChanged = null;
@@ -77,6 +78,7 @@ spark.Movie.Constructor = function(Protected) {
     // Public Methods //
     ////////////////////
 
+    
     Base.initialize = Public.initialize;
     Public.initialize = function(theNode) {
         if (theNode && (("useYuv2RgbShader" in theNode && theNode.useYuv2RgbShader === "true") ||
@@ -90,51 +92,6 @@ spark.Movie.Constructor = function(Protected) {
             Public.realize = Base.realizeResizableRectangle;
         }
         Base.initialize(theNode);
-    };
-    
-    Base.realize = Public.realize;
-    Public.realize = function () {
-        var myMovieSource = Protected.getString("src", "");
-        var myMovieSourceId = Protected.getString("srcId", "");
-        _myDecoderHint = Protected.getString("decoderhint", "FFMpegDecoder2");
-        _myTargetPixelFormat = Protected.getString("targetpixelformat", "RGB");
-
-        if (myMovieSource === "") {
-            var myWidth  = Protected.getNumber("width", 1);
-            var myHeight = Protected.getNumber("height", 1);
-            _myMovie      = Modelling.createImage(window.scene, myWidth, myHeight, "BGR");
-            _myMovie.name = Public.name + "_movieDummyImage";
-            if (myMovieSourceId !== "") {
-                _mySourceId = myMovieSourceId;
-            }
-        } else {
-            _myMovie = spark.openMovie(myMovieSource, _myTargetPixelFormat, _myDecoderHint);
-            _mySource = myMovieSource;
-        }
-
-        _myTexture  = Modelling.createTexture(window.scene, _myMovie);
-        _myTexture.name = Public.name + "-texture";
-        _myTexture.wrapmode = "clamp_to_edge";
-
-        var myMaterial = Modelling.createUnlitTexturedMaterial(window.scene,
-                _myTexture, Public.name + "-material", true);
-
-        Base.realize(myMaterial);
-        if (myMovieSource) {
-            ensureAspectRatio();
-            initMovie();
-        }
-    };
-
-    Base.postRealize = Public.postRealize;
-    Public.postRealize = function () {
-        if (_mySourceId) {
-            attachToI18nItem(_mySourceId);
-        }
-        if ("realizeYUV2RGBShader" in Base && Base.realizeYUV2RGBShader) {
-            Base.realizeYUV2RGBShader();
-        }
-        Base.postRealize();
     };
     
     // playback control
@@ -241,7 +198,18 @@ spark.Movie.Constructor = function(Protected) {
     Public.__defineSetter__("src", function (theSourceFile) {
         if(_mySource !== theSourceFile) {
             _mySource = theSourceFile;
-            Public.movie = spark.openMovie(theSourceFile, _myTargetPixelFormat, _myDecoderHint);
+            if (_mySetSourceWithoutChangingBody) {
+                if (_myMovie.nodeName == "image") {
+                    _myMovie.parentNode.removeChild(_myMovie);
+                    _myMovie = null;
+                    Public.movie = spark.openMovie(theSourceFile, _myTargetPixelFormat, _myDecoderHint);
+                } else {
+                    _myMovie.src = theSourceFile;
+                    window.scene.loadMovieFrame(_myMovie);
+                }
+            } else {
+                Public.movie = spark.openMovie(theSourceFile, _myTargetPixelFormat, _myDecoderHint);
+            }
         } else {
             if(_myMovie.playmode !== "stop") {
                 Public.stop();
@@ -267,6 +235,52 @@ spark.Movie.Constructor = function(Protected) {
     Public.__defineGetter__("texture", function() {
         return _myTexture;
     });
+
+    Base.realize = Public.realize;
+    Public.realize = function() {
+        var myMovieSource = Protected.getString("src", "");
+        var myMovieSourceId = Protected.getString("srcId", "");
+        _myDecoderHint = Protected.getString("decoderhint", "FFMpegDecoder2");
+        _myTargetPixelFormat = Protected.getString("targetpixelformat", "RGB");
+        _mySetSourceWithoutChangingBody = Protected.getBoolean("setSourceWithoutChangingBody",false);
+
+        if(myMovieSource === "") {
+            var myWidth  = Protected.getNumber("width", 1);
+            var myHeight = Protected.getNumber("height", 1);
+            _myMovie      = Modelling.createImage(window.scene, myWidth, myHeight, "BGR");
+            _myMovie.name = Public.name + "_movieDummyImage";
+            if(myMovieSourceId !== "") {
+                _mySourceId = myMovieSourceId;
+            }
+        } else {
+            _myMovie = spark.openMovie(myMovieSource, _myTargetPixelFormat, _myDecoderHint);
+            _mySource = myMovieSource;
+        }
+
+        _myTexture  = Modelling.createTexture(window.scene, _myMovie);
+        _myTexture.name = Public.name + "-texture";
+        _myTexture.wrapmode = "clamp_to_edge";
+
+        var myMaterial = Modelling.createUnlitTexturedMaterial(window.scene,
+                _myTexture, Public.name + "-material", true);
+
+        Base.realize(myMaterial);
+        if(myMovieSource) {
+            ensureAspectRatio();
+            initMovie();
+        }
+    };
+
+    Base.postRealize = Public.postRealize;
+    Public.postRealize = function() {
+        if(_mySourceId) {
+            attachToI18nItem(_mySourceId);
+        }
+        if ("realizeYUV2RGBShader" in Base && Base.realizeYUV2RGBShader) {
+            Base.realizeYUV2RGBShader();
+        }
+        Base.postRealize();
+    };
 
     // XXX crude hack starts here
     Public.__defineGetter__("onMovieChanged", function() {
