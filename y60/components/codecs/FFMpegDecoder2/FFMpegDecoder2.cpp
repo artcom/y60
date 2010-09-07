@@ -286,10 +286,14 @@ namespace y60 {
         }
         Movie * myMovie = getMovie();
         _myMaxCacheSize = myMovie->get<MaxCacheSizeTag>();
+        double myCurrentTime = 0.0;
+        if (_myLastVideoFrame) {
+            myCurrentTime = _myLastVideoFrame->getTime();    
+        }
         _myLastVideoFrame = VideoMsgPtr();
 
         if (!isActive()) {
-            if (shouldSeek(0, theStartTime)) {
+            if (shouldSeek(myCurrentTime, theStartTime) || _myMsgQueue.hasEOF()) {
                 _myDemux->clearPacketCache();
                 _myMsgQueue.clear();
                 _myMsgQueue.reset();
@@ -305,10 +309,19 @@ namespace y60 {
                 avcodec_flush_buffers(_myAStream->codec);
                 _myVideoStartTimestamp = 0;
             }
+            bool myAudioEOFFlag = false;
             if (theStartAudioFlag && hasAudio() && getDecodeAudioFlag()) {
-                readAudio();
+                myAudioEOFFlag = !readAudio();
             }
-            decodeFrame();
+            if (!decodeFrame() || myAudioEOFFlag) {
+                _myDemux->clearPacketCache();
+                _myMsgQueue.clear();
+                _myMsgQueue.reset();
+                doSeek(theStartTime);
+                if (theStartAudioFlag && hasAudio() && getDecodeAudioFlag()) {
+                    _myAdjustAudioOffsetFlag = true;
+                }
+            }
         }
         setState(RUN);
 
@@ -343,7 +356,6 @@ namespace y60 {
         }
         if (getState() != STOP) {
             AC_DEBUG << "Stopping Movie";
-
             _myLastVideoFrame = VideoMsgPtr();
 
             doSeek(0);
@@ -1098,7 +1110,6 @@ namespace y60 {
         _myMsgQueue.reset();
 
         doSeek(theDestTime);
-
         _myLastVideoFrame = VideoMsgPtr();
         if (hasAudio() && getDecodeAudioFlag()) {
             if (getState() == RUN) {
