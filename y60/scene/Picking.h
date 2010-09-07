@@ -67,15 +67,13 @@ namespace asl {
 };
 
 namespace y60 {
-    class Scene;
     class Camera;
     class Viewport;
-    class IntersectionInfo;
-    class CollisionInfo;
+    struct IntersectionInfo;
+    struct CollisionInfo;
     typedef asl::Ptr<y60::Viewport, dom::ThreadingModel> ViewportPtr;
     typedef std::vector<y60::IntersectionInfo> IntersectionInfoVector;
     typedef std::vector<y60::CollisionInfo> CollisionInfoVector;
-    typedef asl::Ptr<Scene,dom::ThreadingModel> ScenePtr;
     typedef asl::Ptr<Camera, dom::ThreadingModel> CameraPtr;
 
     class Picking {
@@ -85,8 +83,8 @@ namespace y60 {
 
     private:
         dom::NodePtr findNearestIntersection(const y60::IntersectionInfoVector & theIntersectionInfo, const asl::Point3f & theReferencePoint) const;
-        dom::NodePtr nearestIntersection(const ScenePtr theScene, const dom::NodePtr theRootNode, const asl::LineSegment<float> & theLineSegment) const;
-        y60::CollisionInfoVector pickCollisionsBySweepingSphereFromBodies(const ScenePtr theScene, const CameraPtr theCamera, const dom::Node & theViewportNode, const unsigned int theScreenPixelX, const unsigned int theScreenPixelY, const float theSphereRadius, const dom::NodePtr theRootNode) const; 
+        dom::NodePtr nearestIntersection(const dom::NodePtr theRootNode, const asl::LineSegment<float> & theLineSegment) const;
+        y60::CollisionInfoVector pickCollisionsBySweepingSphereFromBodies(const CameraPtr theCamera, const dom::Node & theViewportNode, const unsigned int theScreenPixelX, const unsigned int theScreenPixelY, const float theSphereRadius, const dom::NodePtr theRootNode) const; 
         void getNearAndFarPlanePos(const CameraPtr theCamera, const dom::Node & theViewportNode, const unsigned int theScreenPixelX, const unsigned int theScreenPixelY, asl::Point3f& theNearClipPos, asl::Point3f& theFarClipPos ) const;
         dom::NodePtr findWorldForCamera(const CameraPtr theCamera) const; 
         void transformClipToWorld(asl::Point3f & theNearClipPos, asl::Point3f & theFarClipPos, const CameraPtr theCamera) const;

@@ -90,8 +90,7 @@ namespace y60 {
 
         asl::LineSegment<float> myLineSegment = asl::LineSegment<float>(myNearPlanePos, myFarPlanePos);
         dom::NodePtr myWorldNode = findWorldForCamera(myCamera);
-        ScenePtr myScene = myCameraNode->getRootElement()->getFacade<Scene>();
-        return nearestIntersection(myScene, myWorldNode, myLineSegment);
+        return nearestIntersection(myWorldNode, myLineSegment);
     }
 
     dom::NodePtr
@@ -116,8 +115,7 @@ namespace y60 {
         dom::NodePtr myCameraNode = theViewportNode.getElementById( theViewportNode.getAttributeString(CAMERA_ATTRIB) );
         CameraPtr myCamera = myCameraNode->getFacade<Camera>();
         dom::NodePtr myWorldNode = findWorldForCamera(myCamera);
-        ScenePtr myScene = myCameraNode->getRootElement()->getFacade<Scene>();
-        y60::CollisionInfoVector myCollisions = pickCollisionsBySweepingSphereFromBodies(myScene, myCamera, 
+        y60::CollisionInfoVector myCollisions = pickCollisionsBySweepingSphereFromBodies(myCamera, 
                                                                     theViewportNode,
                                                                     theScreenPixelX,
                                                                     theScreenPixelY,
@@ -164,9 +162,9 @@ namespace y60 {
     }
 
     dom::NodePtr
-    Picking::nearestIntersection(const ScenePtr theScene, const dom::NodePtr theRootNode, const asl::LineSegment<float> & theLineSegment) const {
+    Picking::nearestIntersection(const dom::NodePtr theRootNode, const asl::LineSegment<float> & theLineSegment) const {
         y60::IntersectionInfoVector myIntersections;
-        bool myIntersectedFlag = theScene->intersectBodies(theRootNode, theLineSegment, myIntersections, true);
+        bool myIntersectedFlag = y60::Scene::intersectBodies(theRootNode, theLineSegment, myIntersections, true);
         if (myIntersectedFlag) {
             return findNearestIntersection(myIntersections, theLineSegment.origin);
         }
@@ -174,7 +172,7 @@ namespace y60 {
     }
 
     y60::CollisionInfoVector
-    Picking::pickCollisionsBySweepingSphereFromBodies(const ScenePtr theScene, const CameraPtr theCamera, 
+    Picking::pickCollisionsBySweepingSphereFromBodies(const CameraPtr theCamera, 
                     const dom::Node & theViewportNode, const unsigned int theScreenPixelX, 
                     const unsigned int theScreenPixelY, const float theSphereRadius, 
                     const dom::NodePtr theRootNode) const 
@@ -186,7 +184,7 @@ namespace y60 {
         asl::Sphere<float> mySphere = asl::Sphere<float>(myNearPlanePos, theSphereRadius);
         asl::Vector3f myMotion = asl::difference(myFarPlanePos, myNearPlanePos);
         y60::CollisionInfoVector myCollisionInfoVector;
-        theScene->collideWithBodies(theRootNode, mySphere, myMotion, myCollisionInfoVector, true);
+        y60::Scene::collideWithBodies(theRootNode, mySphere, myMotion, myCollisionInfoVector, true);
         return myCollisionInfoVector;
     }
 
