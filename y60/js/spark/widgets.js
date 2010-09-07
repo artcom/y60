@@ -416,7 +416,7 @@ spark.Widget.Constructor = function (Protected) {
         }
     });
 
-    Public.__defineGetter__("i18nContext", function (theValue) {
+    Public.__defineSetter__("i18nContext", function (theValue) {
         _myI18nContext = theValue; // XXX: re-trigger i18n events? how?
     });
 
