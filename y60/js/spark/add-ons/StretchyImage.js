@@ -41,12 +41,7 @@ spark.StretchyImage.Constructor = function (Protected) {
     /////////////////////
     // Private Methods //
     /////////////////////
-    
-    function getVertexData(theShape, theVertexAttribute) {
-        var myXPath = ".//*[@name='" + theVertexAttribute + "']";
-        return theShape.find(myXPath).firstChild.nodeValue;
-    }
-    
+
     function initMembers() {
         _myUVCoords = getVertexData(Protected.shape, 'uvset');
         _myVerticesPerSide = new Vector2f(_myQuadsPerSide.x + 1, _myQuadsPerSide.y + 1);
@@ -55,11 +50,38 @@ spark.StretchyImage.Constructor = function (Protected) {
         Logger.debug(Public.name + " quadsPerSide " + _myQuadsPerSide + ", verticesPerSide " + _myVerticesPerSide + ", numVertices " + _myNumVertices + ", numQuads " + _myNumQuads);
     }
 
+    function getVertexData(theShape, theVertexAttribute) {
+        var myXPath = ".//*[@name='" + theVertexAttribute + "']";
+        return theShape.find(myXPath).firstChild.nodeValue;
+    }
+
     function getIndexData(theShape, theVertexAttribute) {
         var myXPath = ".//*[@vertexdata='" + theVertexAttribute + "']";
         return theShape.find(myXPath).firstChild.nodeValue;
     }
-    
+
+    function setupGeometry() {
+        _myUVCoords.resize(_myNumVertices);
+        Protected.vertices.resize(_myNumVertices);
+        updateGeometry(_myImageSize, true);
+
+        var myPIdx = getIndexData(Protected.shape, 'position');
+        myPIdx.resize( _myNumQuads * 4 );
+        var myUVIdx = getIndexData(Protected.shape, 'uvset');
+        myUVIdx.resize( _myNumQuads * 4 );
+        var v = 0;
+        for (var i = 0; i < _myQuadsPerSide.y; ++i) {
+            for (var j = 0; j < _myQuadsPerSide.x; ++j) {
+                v = i * _myVerticesPerSide.x + j;
+                var q = 4 * (i * _myQuadsPerSide.x + j);
+                myUVIdx[q  ] = myPIdx[q  ] = v;
+                myUVIdx[q+1] = myPIdx[q+1] = v + 1;
+                myUVIdx[q+2] = myPIdx[q+2] = v + 1 + _myVerticesPerSide.x;
+                myUVIdx[q+3] = myPIdx[q+3] = v + _myVerticesPerSide.x;
+            }
+        }
+    }
+
     function updateGeometry(theSize, theUVCoordFlag) {
         var myWidth = theSize.x;
         var myHeight = theSize.y; 
@@ -70,54 +92,42 @@ spark.StretchyImage.Constructor = function (Protected) {
                 v = i * _myVerticesPerSide.x + j;
                 var myX = -o.x;
                 var myY = -o.y;
+                var myCropX = 0;
+                var myCropY = 0;
                 if (j === 0) {
                     myX = -o.x;
-                } else if (j === _myVerticesPerSide.x - 3) {
+                    myCropX = _myCropLeft;
+                } else if (j === _myVerticesPerSide.x -3) {
                     myX = -o.x + _myEdgeLeft;
-                } else if (j === _myVerticesPerSide.x - 2) {
+                    myCropX = _myCropLeft;
+                } else if (j === _myVerticesPerSide.x -2) {
                     myX = myWidth - o.x - _myEdgeRight;
-                } else if (j === _myVerticesPerSide.x - 1) {
+                    myCropX = -_myCropRight;
+                } else if (j === _myVerticesPerSide.x -1) {
                     myX = myWidth - o.x;
+                    myCropX = -_myCropRight;
                 }
                 if (i === 0) {
                     myY = -o.y;
-                } else if (i === _myVerticesPerSide.y - 3) {
+                    myCropY = _myCropBottom;
+                } else if (i === _myVerticesPerSide.y -3) {
                     myY = -o.y + _myEdgeBottom;
-                } else if (i === _myVerticesPerSide.y - 2) {
+                    myCropY = _myCropBottom;
+                } else if (i === _myVerticesPerSide.y -2) {
                     myY = myHeight - o.y - _myEdgeTop;
-                } else if (i === _myVerticesPerSide.y - 1) {
+                    myCropY = -_myCropTop;
+                } else if (i === _myVerticesPerSide.y -1) {
                     myY = myHeight - o.y;
+                    myCropY = -_myCropTop;
                 }
                 Protected.vertices[v] = [myX, myY, 0];
                 if (theUVCoordFlag) {
-                    _myUVCoords[v] = [(myX + o.x) / myWidth, 1 - (myY + o.y) / myHeight];
+                    _myUVCoords[v] = [(myX + myCropX + o.x)/myWidth, 1 - (myY + myCropY + o.y)/myHeight];
                 }
             }
         }
     }
 
-    function setupGeometry() {
-        _myUVCoords.resize(_myNumVertices);
-        Protected.vertices.resize(_myNumVertices);
-        updateGeometry(_myImageSize, true);
-
-        var myPIdx = getIndexData(Protected.shape, 'position');
-        myPIdx.resize(_myNumQuads * 4);
-        var myUVIdx = getIndexData(Protected.shape, 'uvset');
-        myUVIdx.resize(_myNumQuads * 4);
-        var v = 0;
-        for (var i = 0; i < _myQuadsPerSide.y; ++i) {
-            for (var j = 0; j < _myQuadsPerSide.x; ++j) {
-                v = i * _myVerticesPerSide.x + j;
-                var q = 4 * (i * _myQuadsPerSide.x + j);
-                myUVIdx[q]     = myPIdx[q]     = v;
-                myUVIdx[q + 1] = myPIdx[q + 1] = v + 1;
-                myUVIdx[q + 2] = myPIdx[q + 2] = v + 1 + _myVerticesPerSide.x;
-                myUVIdx[q + 3] = myPIdx[q + 3] = v + _myVerticesPerSide.x;
-            }
-        }
-    }
-    
     ////////////////////
     // Public Methods //
     ////////////////////
@@ -223,89 +233,5 @@ spark.StretchyImage.Constructor = function (Protected) {
     };
     
     
-    function initMembers() {
-        _myUVCoords = getVertexData(Protected.shape, 'uvset');
-        _myVerticesPerSide = new Vector2f(_myQuadsPerSide.x + 1, _myQuadsPerSide.y + 1);
-        _myNumVertices = _myVerticesPerSide.x * _myVerticesPerSide.y;
-        _myNumQuads = _myQuadsPerSide.x * _myQuadsPerSide.y;
-        Logger.debug(Public.name + " quadsPerSide " + _myQuadsPerSide + ", verticesPerSide " + _myVerticesPerSide + ", numVertices " + _myNumVertices + ", numQuads " + _myNumQuads);
-    };
-
-    function getVertexData(theShape, theVertexAttribute) {
-        var myXPath = ".//*[@name='" + theVertexAttribute + "']";
-        return theShape.find(myXPath).firstChild.nodeValue;
-    };
-
-    function getIndexData(theShape, theVertexAttribute) {
-        var myXPath = ".//*[@vertexdata='" + theVertexAttribute + "']";
-        return theShape.find(myXPath).firstChild.nodeValue;
-    };
-
-    function setupGeometry() {
-        _myUVCoords.resize(_myNumVertices);
-        Protected.vertices.resize(_myNumVertices);
-        updateGeometry(_myImageSize, true);
-
-        var myPIdx = getIndexData(Protected.shape, 'position');
-        myPIdx.resize( _myNumQuads * 4 );
-        var myUVIdx = getIndexData(Protected.shape, 'uvset');
-        myUVIdx.resize( _myNumQuads * 4 );
-        var v = 0;
-        for (var i = 0; i < _myQuadsPerSide.y; ++i) {
-            for (var j = 0; j < _myQuadsPerSide.x; ++j) {
-                v = i * _myVerticesPerSide.x + j;
-                var q = 4 * (i * _myQuadsPerSide.x + j);
-                myUVIdx[q  ] = myPIdx[q  ] = v;
-                myUVIdx[q+1] = myPIdx[q+1] = v + 1;
-                myUVIdx[q+2] = myPIdx[q+2] = v + 1 + _myVerticesPerSide.x;
-                myUVIdx[q+3] = myPIdx[q+3] = v + _myVerticesPerSide.x;
-            }
-        }
-    };
-
-    function updateGeometry(theSize, theUVCoordFlag) {
-        var myWidth = theSize.x;
-        var myHeight = theSize.y; 
-        var o = Public.origin;
-        var v = 0;
-        for (var i = 0; i < _myVerticesPerSide.y; ++i) {
-            for (var j = 0; j < _myVerticesPerSide.x; ++j) {
-                v = i * _myVerticesPerSide.x + j;
-                var myX = -o.x;
-                var myY = -o.y;
-                var myCropX = 0;
-                var myCropY = 0;
-                if (j === 0) {
-                    myX = -o.x;
-                    myCropX = _myCropLeft;
-                } else if (j === _myVerticesPerSide.x -3) {
-                    myX = -o.x + _myEdgeLeft;
-                    myCropX = _myCropLeft;
-                } else if (j === _myVerticesPerSide.x -2) {
-                    myX = myWidth - o.x - _myEdgeRight;
-                    myCropX = -_myCropRight;
-                } else if (j === _myVerticesPerSide.x -1) {
-                    myX = myWidth - o.x;
-                    myCropX = -_myCropRight;
-                }
-                if (i === 0) {
-                    myY = -o.y;
-                    myCropY = _myCropBottom;
-                } else if (i === _myVerticesPerSide.y -3) {
-                    myY = -o.y + _myEdgeBottom;
-                    myCropY = _myCropBottom;
-                } else if (i === _myVerticesPerSide.y -2) {
-                    myY = myHeight - o.y - _myEdgeTop;
-                    myCropY = -_myCropTop;
-                } else if (i === _myVerticesPerSide.y -1) {
-                    myY = myHeight - o.y;
-                    myCropY = -_myCropTop;
-                }
-                Protected.vertices[v] = [myX, myY, 0];
-                if (theUVCoordFlag) {
-                    _myUVCoords[v] = [(myX + myCropX + o.x)/myWidth, 1 - (myY + myCropY + o.y)/myHeight];
-                }
-            }
-        }
-    };
+    
 };
