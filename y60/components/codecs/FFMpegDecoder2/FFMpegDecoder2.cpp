@@ -1061,11 +1061,14 @@ namespace y60 {
     }
 
     void FFMpegDecoder2::addCacheFrame(AVFrame* theFrame, double theTime) {
+        MAKE_SCOPE_TIMER(FFMpegDecoder2_addCacheFrame);
 		AC_DEBUG << "---- try to add frame at " << theTime;
         VideoMsgPtr myVideoFrame = createFrame(theTime);
         AVCodecContext * myVCodec = _myVStream->codec;
-        if (myVCodec->pix_fmt==PIX_FMT_PAL8) {
+        if (myVCodec->pix_fmt == PIX_FMT_PAL8 && _myDestinationPixelFormat == PIX_FMT_GRAY8) {
             copyPlaneToRaster(myVideoFrame->getBuffer(0), theFrame->data[0], theFrame->linesize[0], _myFrameWidth, _myFrameHeight);
+        } else if (myVCodec->pix_fmt == PIX_FMT_BGRA && _myDestinationPixelFormat == PIX_FMT_BGRA) {
+            copyPlaneToRaster(myVideoFrame->getBuffer(0), theFrame->data[0], theFrame->linesize[0], _myFrameWidth*4, _myFrameHeight);
         } else {
             if (_myDestinationPixelFormat == PIX_FMT_YUV420P ) {
                 copyPlaneToRaster(myVideoFrame->getBuffer(0), theFrame->data[0], theFrame->linesize[0], _myFrameWidth, _myFrameHeight);
@@ -1077,7 +1080,7 @@ namespace y60 {
         }
         _myMsgQueue.push_back(myVideoFrame);
 
-        AC_DEBUG << "---- Added Frame to cache, Frame # : "
+		AC_DEBUG << "---- Added Frame to cache, Frame # : "
             << double(theTime - _myVideoStartTimestamp/_myVideoStreamTimeBase)*_myFrameRate
             << " cache size=" << _myMsgQueue.size();
     }
