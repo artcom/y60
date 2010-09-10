@@ -1166,6 +1166,44 @@ namespace y60 {
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
+    // Picking 
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    
+    dom::NodePtr
+    Scene::pickBody(const unsigned int theX, const unsigned int theY, const dom::NodePtr theCanvas) const {
+        CanvasPtr myCanvas = theCanvas->getFacade<Canvas>();
+        ViewportPtr myViewport = myCanvas->getViewportAt(theX, theY);
+        return myViewport->pickBody(theX, theY);
+    }
+
+    dom::NodePtr 
+    Scene::pickBody(const unsigned int theX, const unsigned int theY) const {
+        const dom::NodePtr myCanvas = getCanvasRoot()->childNode(CANVAS_NODE_NAME); 
+        return pickBody(theX, theY, myCanvas);
+    }
+
+    dom::NodePtr 
+    Scene::pickBodyBySweepingSphereFromBodies(const unsigned int theX,
+                    const unsigned int theY,
+                    const float theSphereRadius,
+                    const dom::NodePtr theCanvas) const
+    {
+        CanvasPtr myCanvas = theCanvas->getFacade<Canvas>();
+        ViewportPtr myViewport = myCanvas->getViewportAt(theX, theY);
+        return myViewport->pickBodyBySweepingSphereFromBodies(theX, theY, theSphereRadius);
+    }
+
+    dom::NodePtr 
+    Scene::pickBodyBySweepingSphereFromBodies(const unsigned int theX,
+                            const unsigned int theY,
+                            const float theSphereRadius) const
+    {
+        const dom::NodePtr myCanvas = getCanvasRoot()->childNode(CANVAS_NODE_NAME); 
+        return pickBodyBySweepingSphereFromBodies(theX, theY, theSphereRadius, myCanvas);
+    }
+
+
+    ///////////////////////////////////////////////////////////////////////////////////////////
     // Intersection / Collision detection
     ///////////////////////////////////////////////////////////////////////////////////////////
 

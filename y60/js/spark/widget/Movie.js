@@ -206,6 +206,8 @@ spark.Movie.Constructor = function(Protected) {
                 } else {
                     _myMovie.src = theSourceFile;
                     window.scene.loadMovieFrame(_myMovie);
+                    ensureAspectRatio();
+                    initMovie();
                 }
             } else {
                 Public.movie = spark.openMovie(theSourceFile, _myTargetPixelFormat, _myDecoderHint);

@@ -538,9 +538,9 @@ namespace y60 {
 			}
         }
         DBP2(STOP_TIMER(renderBodyPart_renderPrimitives_loop));
-
+        /*
         DBP2(
-            /*unsigned long myPrimitiveCount = myPrimitive.size();
+            unsigned long myPrimitiveCount = myPrimitive.size();
             AC_TRACE << "glDrawArrays size=" << myPrimitive.size() << " primCount="
                      << myPrimitiveCount << " primType=" << myPrimitive.getType()
                      << " GLtype=" << getPrimitiveGLType(myPrimitive.getType());
@@ -549,8 +549,8 @@ namespace y60 {
                 myMaxPrimitiveCount = myPrimitiveCount;
             }
             AC_TRACE << "Primitive maxsize: " << myMaxPrimitiveCount;
-            */
         )
+        */
 
         DBP2(static asl::NanoTime lastTime;
                 asl::NanoTime switchTime = asl::NanoTime() - lastTime;

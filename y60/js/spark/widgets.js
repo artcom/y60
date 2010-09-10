@@ -416,7 +416,7 @@ spark.Widget.Constructor = function (Protected) {
         }
     });
 
-    Public.__defineGetter__("i18nContext", function (theValue) {
+    Public.__defineSetter__("i18nContext", function (theValue) {
         _myI18nContext = theValue; // XXX: re-trigger i18n events? how?
     });
 
@@ -458,7 +458,7 @@ spark.Widget.Constructor = function (Protected) {
         if(!theDuration) {
             theDuration = 250.0;
         }
-        if(!theEnd) {
+        if(theEnd == undefined) {
         	theEnd = 1.0;
         }
         if (!theEasing) {

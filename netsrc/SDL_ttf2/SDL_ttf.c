@@ -1127,7 +1127,7 @@ int TTF_SizeUNICODE(TTF_Font *font, const Uint16 *text, int *w, int *h)
 	int status;
 	const Uint16 *ch;
 	int swapped;
-	int x, z;
+	float x, z;
 	int minx, maxx;
 	int miny, maxy;
 	c_glyph *glyph;
@@ -1210,8 +1210,8 @@ int TTF_SizeUNICODE(TTF_Font *font, const Uint16 *text, int *w, int *h)
 #endif
 		
 		z = x + glyph->minx;
-		if ( minx > z ) {
-			minx = z;
+		if ( minx > (int)floor(z) ) {
+			minx = (int)floor(z);
 		}
 		if ( TTF_HANDLE_STYLE_BOLD(font) ) {
 			x += font->glyph_overhang;
@@ -1221,11 +1221,12 @@ int TTF_SizeUNICODE(TTF_Font *font, const Uint16 *text, int *w, int *h)
 		} else {
 			z = x + glyph->maxx;
 		}
-		if ( maxx < z ) {
-			maxx = z;
+		if ( maxx < (int)ceil(z) ) {
+			maxx = (int)ceil(z);
 		}
 		x += glyph->advance;
         x += TTF_tracking;
+
 		if ( glyph->miny < miny ) {
 			miny = glyph->miny;
 		}
@@ -1260,7 +1261,6 @@ int TTF_SizeUNICODE(TTF_Font *font, const Uint16 *text, int *w, int *h)
 
 /* Get kerning between two glyphs by characters [ART+COM Patch] */
 double TTF_Kerning(TTF_Font * theFont, const Uint16 theFirstCharacter, const Uint16 theSecondCharacter) {
-    //double myKerning = 0.0;
     FT_Error error;
     FT_UInt  myFirstIndex;
     FT_UInt  mySecondIndex;
@@ -1469,7 +1469,6 @@ SDL_Surface *TTF_RenderUNICODE_Solid(TTF_Font *font,
 		if ( TTF_HANDLE_STYLE_BOLD(font) ) {
 			xstart += font->glyph_overhang;
 		}
-        xstart += TTF_tracking;
 		prev_index = glyph->index;
 	}
 
@@ -1739,7 +1738,6 @@ SDL_Surface* TTF_RenderUNICODE_Shaded( TTF_Font* font,
 		if( TTF_HANDLE_STYLE_BOLD(font) ) {
 			xstart += font->glyph_overhang;
 		}
-        xstart += TTF_tracking;
 		prev_index = glyph->index;
 	}
 
@@ -1890,7 +1888,8 @@ SDL_Surface *TTF_RenderUTF8_Blended(TTF_Font *font,
 SDL_Surface *TTF_RenderUNICODE_Blended(TTF_Font *font,
 				const Uint16 *text, SDL_Color fg)
 {
-	int xstart;
+	float xstart;
+    Uint32 dstOffset;
 	int width, height;
 	SDL_Surface *textbuf;
 	Uint32 alpha;
@@ -1927,7 +1926,7 @@ SDL_Surface *TTF_RenderUNICODE_Blended(TTF_Font *font,
 	use_kerning = FT_HAS_KERNING( font->face ) && font->kerning;
 	
 	/* Load and render each character */
-	xstart = 0;
+	xstart = 0.0;
 	swapped = TTF_byteswapped;
 	pixel = (fg.b<<16)|(fg.g<<8)|fg.r;
 	SDL_FillRect(textbuf, NULL, pixel);	/* Initialize with fg and 0 alpha */
@@ -1988,14 +1987,21 @@ SDL_Surface *TTF_RenderUNICODE_Blended(TTF_Font *font,
 			if ( row+glyph->yoffset >= textbuf->h ) {
 				continue;
 			}
+			dstOffset = (xstart - floor(xstart) >= 0.5) ? (Uint32)ceil(xstart) + glyph->minx : (Uint32)floor(xstart) + glyph->minx;
 			dst = (Uint32*) textbuf->pixels +
 				(row+glyph->yoffset) * textbuf->pitch/4 +
-				xstart + glyph->minx;
+				dstOffset;
 
 			/* Added code to adjust src pointer for pixmaps to
 			 * account for pitch.
 			 * */
 			src = (Uint8*) (glyph->pixmap.buffer + glyph->pixmap.pitch * row);
+			
+			/* Make sure we don't go over the limit [ART+COM Patch] tracking*/
+			if ((int)dstOffset + width > textbuf->w) {
+			    width = textbuf->w - dstOffset;
+			}
+			
 			for ( col = width; col>0 && dst < dst_check; --col) {
 				alpha = *src++;
 				*dst++ |= pixel | (alpha << 24);

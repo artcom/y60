@@ -54,60 +54,43 @@
 //    recommendations:
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
+
 */
 
-#ifndef _scene_Canvas_h_
-#define _scene_Canvas_h_
+#ifndef _scene_Picking_h_
+#define _scene_Picking_h_
 
-#include "y60_scene_settings.h"
+#include <asl/dom/Nodes.h>
 
-#include "IFrameBuffer.h"
+namespace asl {
+  template <class T> class LineSegment;
+};
 
-#include <y60/base/CommonTags.h>
-#include <y60/base/NodeNames.h>
-#include <y60/base/DataTypes.h>
-#include <asl/dom/Facade.h>
-#include <asl/dom/AttributePlug.h>
 namespace y60 {
-
-    class Texture;
-    class Scene;
+    class Camera;
     class Viewport;
-    typedef asl::Ptr<Viewport, dom::ThreadingModel> ViewportPtr;
+    struct IntersectionInfo;
+    struct CollisionInfo;
+    typedef asl::Ptr<y60::Viewport, dom::ThreadingModel> ViewportPtr;
+    typedef std::vector<y60::IntersectionInfo> IntersectionInfoVector;
+    typedef std::vector<y60::CollisionInfo> CollisionInfoVector;
+    typedef asl::Ptr<Camera, dom::ThreadingModel> CameraPtr;
 
-    //                  theTagName                theType        theAttributeName                    theDefault
-    DEFINE_ATTRIBUTE_TAG(CanvasBackgroundColorTag, asl::Vector4f, CANVAS_BACKGROUNDCOLOR_ATTRIB, asl::Vector4f(0,0,0,1), Y60_SCENE_DECL);
-    DEFINE_ATTRIBUTE_TAG(CanvasTargetTag,          std::string,   CANVAS_TARGET_ATTRIB, "", Y60_SCENE_DECL);
+    class Picking {
+    public:
+        dom::NodePtr pickBody(const dom::Node & theViewportNode, const unsigned int theScreenPixelX, const unsigned int theScreenPixelY) const;
+        dom::NodePtr pickBodyBySweepingSphereFromBodies(const dom::Node & theViewportNode, const unsigned int theScreenPixelX, const unsigned int theScreenPixelY, const float theSphereRadius) const;
 
-    class Y60_SCENE_DECL Canvas :
-        public dom::Facade,
-		public IdTag::Plug,
-		public NameTag::Plug,
-		public CanvasBackgroundColorTag::Plug,
-		public CanvasTargetTag::Plug
-    {
-        public:
-            Canvas(dom::Node & theNode) :
-              dom::Facade(theNode),
-                  IdTag::Plug(theNode),
-                  NameTag::Plug(theNode),
-                  CanvasBackgroundColorTag::Plug(theNode),
-                  CanvasTargetTag::Plug(theNode)
-              {}
-            IMPLEMENT_FACADE(Canvas);
+    private:
+        dom::NodePtr findNearestIntersection(const y60::IntersectionInfoVector & theIntersectionInfo, const asl::Point3f & theReferencePoint) const;
+        dom::NodePtr nearestIntersection(const dom::NodePtr theRootNode, const asl::LineSegment<float> & theLineSegment) const;
+        y60::CollisionInfoVector pickCollisionsBySweepingSphereFromBodies(const CameraPtr theCamera, const dom::Node & theViewportNode, const unsigned int theScreenPixelX, const unsigned int theScreenPixelY, const float theSphereRadius, const dom::NodePtr theRootNode) const; 
+        void getNearAndFarPlanePos(const CameraPtr theCamera, const dom::Node & theViewportNode, const unsigned int theScreenPixelX, const unsigned int theScreenPixelY, asl::Point3f& theNearClipPos, asl::Point3f& theFarClipPos ) const;
+        dom::NodePtr findWorldForCamera(const CameraPtr theCamera) const; 
+        void transformClipToWorld(asl::Point3f & theNearClipPos, asl::Point3f & theFarClipPos, const CameraPtr theCamera) const;
 
-            unsigned getWidth() const;
-            unsigned getHeight() const;
-            bool setFrameBuffer(asl::Ptr<IFrameBuffer> theFrameBuffer);
-
-            bool hasRenderTarget() const;
-            asl::Ptr<Texture, dom::ThreadingModel> getTarget(asl::Ptr<Scene, dom::ThreadingModel> theScene);
-            ViewportPtr getViewportAt(const unsigned int theX, const unsigned int theY) const;
-        private:
-            asl::WeakPtr<IFrameBuffer> _myFrameBuffer;
     };
-
-    typedef asl::Ptr<Canvas, dom::ThreadingModel> CanvasPtr;
+    typedef asl::Ptr<Picking, dom::ThreadingModel> PickingPtr;
 }
 
 #endif
