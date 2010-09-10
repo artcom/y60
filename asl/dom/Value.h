@@ -1376,26 +1376,26 @@ namespace dom {
             }
             //const ResizeableRaster & mySourceRaster = raster_cast( theSource );
             const T * myNativeSource = dynamic_cast_Value<T>( & theSource );
-
-            if (sourceWidth == 0) {
-                sourceWidth = myNativeSource->hsize() - sourceX;
-            }
-
-           if (sourceHeight == 0) {
-                sourceHeight = myNativeSource->vsize() - sourceY;
-            }
-
-           if(sourceHeight == 0 || sourceWidth == 0) return;
-
-            asl::Box2<asl::AC_OFFSET_TYPE> mySourceRect(sourceX, sourceY, sourceX+sourceWidth, sourceY+sourceHeight);
-            asl::Box2<asl::AC_OFFSET_TYPE> mySourceRasterRect(0, 0, myNativeSource->hsize(), myNativeSource->vsize());
-            if (!mySourceRasterRect.contains(mySourceRect)) {
-                AC_ERROR << "pasteRaster: source rectangle is outside source raster, source raster="<< mySourceRasterRect << ", source rect="<<mySourceRect;
-                return;
-            }
-            asl::subraster<PIXEL> myTargetRegion( myNativeTarget, targetX, targetY, targetWidth, targetHeight);
-
             if ( myNativeSource ) {
+                if (sourceWidth == 0) {
+                    sourceWidth = myNativeSource->hsize() - sourceX;
+                }
+
+                if (sourceHeight == 0) {
+                    sourceHeight = myNativeSource->vsize() - sourceY;
+                }
+
+                if(sourceHeight == 0 || sourceWidth == 0) return;
+
+                asl::Box2<asl::AC_OFFSET_TYPE> mySourceRect(sourceX, sourceY, sourceX+sourceWidth, sourceY+sourceHeight);
+                asl::Box2<asl::AC_OFFSET_TYPE> mySourceRasterRect(0, 0, myNativeSource->hsize(), myNativeSource->vsize());
+                if (!mySourceRasterRect.contains(mySourceRect)) {
+                    AC_ERROR << "pasteRaster: source rectangle is outside source raster, source raster="<< mySourceRasterRect << ", source rect="<<mySourceRect;
+                    return;
+                }
+                asl::subraster<PIXEL> myTargetRegion( myNativeTarget, targetX, targetY, targetWidth, targetHeight);
+
+
                 const asl::const_subraster<PIXEL> mySourceRegion(*myNativeSource, sourceX, sourceY, sourceWidth, sourceHeight);
                 if (myTargetRect.getSize() !=mySourceRect.getSize()) {
 #ifndef _WIN32
