@@ -77,7 +77,7 @@ namespace y60 {
                     bool thePixelBorderFlag = true,bool theForcePowerOfTwoFlag = false);
             const dom::ResizeableRasterPtr getRaster() const { return _masterRaster; };
         private:
-            TextureAtlas(asl::AC_SIZE_TYPE width, asl::AC_SIZE_TYPE width); 
+            TextureAtlas(asl::AC_SIZE_TYPE width, asl::AC_SIZE_TYPE height); 
             dom::ResizeableRasterPtr _masterRaster;
     };
     typedef asl::Ptr<TextureAtlas> TextureAtlasPtr; 

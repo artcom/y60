@@ -26,6 +26,7 @@
 #include <asl/base/settings.h>
 
 #include <cmath>
+#include <cstdlib>
 #include <limits>
 #include <string>
 
