@@ -14,6 +14,7 @@ add_subdirectory(paintlib)
 add_subdirectory(SDL_ttf2)
 add_subdirectory(spidermonkey)
 add_subdirectory(oscpack)
+add_subdirectory(texture-atlas)
 
 if(WIN32)
     add_subdirectory(fakeatl)

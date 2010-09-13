@@ -26,6 +26,7 @@
 #include <asl/base/settings.h>
 
 #include <cmath>
+#include <cstdlib>
 #include <limits>
 #include <string>
 
@@ -424,6 +425,12 @@ NUMBER ipow(NUMBER a, int x) {
     while (--x) myResult *= a;
     return myResult;
 }
+
+template <class NUMBER>
+NUMBER random(NUMBER min, NUMBER max) {
+    return static_cast<NUMBER>(min + rand()/double(RAND_MAX) * (max - min));
+}
+
 
 
 /* @} */

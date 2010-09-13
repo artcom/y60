@@ -8,6 +8,7 @@ PLFilterFactory.cpp
 PLFilterGaussianBlur.cpp
 PLFilterResizePadded.cpp
 PixelEncoding.cpp
+TextureAtlas.cpp
 )
 
 set(HEADERS
@@ -23,6 +24,7 @@ PLFilterFactory.h
 PLFilterGaussianBlur.h
 PLFilterResizePadded.h
 PixelEncoding.h
+TextureAtlas.h
 y60_image_settings.h
 )
 
@@ -30,6 +32,7 @@ set(TESTS
 HeightToNormalMap
 ImageLoader
 Raster
+TextureAtlas
 )
 
 ac_add_library(
@@ -37,6 +40,6 @@ ac_add_library(
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     DEPENDS aslbase asldom aslmath aslzip
-            y60base paintlib
+            y60base paintlib textureatlas
     TESTS   ${TESTS}
 )
