@@ -93,7 +93,7 @@ public:
             myRasters.push_back(redRaster);
             */
             for (int i = 0; i < 100; ++i) {
-                dom::ResizeableRasterPtr blueRaster = dynamic_cast_Ptr<dom::ResizeableRaster>(createRasterValue(y60::RGBA, random(2,50), random(2,50)));
+                dom::ResizeableRasterPtr blueRaster = dynamic_cast_Ptr<dom::ResizeableRaster>(createRasterValue(y60::RGBA, random(2,2), random(2,2)));
                 AC_WARNING << "[" << i << "]" << blueRaster->width() << " x " << blueRaster->height();
                 blueRaster->fillRect(0,0,blueRaster->width(), blueRaster->height(),asl::Vector4f(random(0.0f,1.0f),random(0.0f, 1.0f),random(0.0f, 1.0f),1));
                 myNames.push_back("blue");

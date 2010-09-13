@@ -2,6 +2,8 @@
 
 #define TEXTURE_PACKER_H
 
+#include "textureatlas_settings.h"
+
 /*!
 **
 ** Copyright (c) 2009 by John W. Ratcliff mailto:jratcliffscarab@gmail.com
@@ -80,7 +82,7 @@
 namespace TEXTURE_PACKER
 {
 
-class TexturePacker
+class NETSRC_TEXTUREATLAS_EXPORT TexturePacker
 {
 public:
   virtual void  setTextureCount(int tcount) = 0; // number of textures to consider..
