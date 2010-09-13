@@ -94,10 +94,11 @@ public:
 
 };
 
+extern "C" {
+    TexturePacker * createTexturePacker(void);
+    void            releaseTexturePacker(TexturePacker *tp);
 
-TexturePacker * createTexturePacker(void);
-void            releaseTexturePacker(TexturePacker *tp);
-
+};
 }; // end the texture packer namespace
 
 #endif
