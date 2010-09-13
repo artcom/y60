@@ -10,7 +10,7 @@
 #endif
 
 
-#ifdef paintlib_EXPORTS
+#ifdef textureatlas_EXPORTS
 #   define NETSRC_TEXTUREATLAS_EXPORT AC_DLL_EXPORT
 #else
 #   define NETSRC_TEXTUREATLAS_EXPORT AC_DLL_IMPORT
