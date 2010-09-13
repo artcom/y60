@@ -666,6 +666,10 @@ spark.Window.Constructor = function (Protected) {
         }
         
         switch (theGesture.type) {
+        case "tap": 
+            var myTapEvent = new spark.TapGestureEvent(spark.GestureEvent.TAP, theGesture.baseeventtype, myCursor, myPosition);
+            myWidget.dispatchEvent(myTapEvent);
+            break;
         case "wipe":
             var myMagnitude = magnitude(myScale) * theGesture.magnitude;
             var myWipeEvent = new spark.WipeGestureEvent(spark.GestureEvent.WIPE, theGesture.baseeventtype, myCursor, theGesture.direction, myMagnitude);

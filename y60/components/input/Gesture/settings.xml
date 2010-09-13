@@ -4,5 +4,7 @@
         <MaxCursorPairDistance min="0">500</MaxCursorPairDistance>
         <RotateAngleThreshold min="0" step="0.1">1</RotateAngleThreshold>
         <ZoomDistanceThreshold min="0" step="0.25">0.25</ZoomDistanceThreshold>
+        <TapMaxDistanceThreshold min="0" step="0.01">0.001</TapMaxDistanceThreshold>
+        <TapMaxDurationThreshold min="0" step="50">0</TapMaxDurationThreshold>
     </Gesture>
 </settings>

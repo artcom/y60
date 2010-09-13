@@ -50,6 +50,8 @@ class Gesture : public asl::PlugInBase,
         static const float MAX_CURSOR_PAIR_DISTANCE;
         static const float ROTATE_ANGLE_THRESHOLD;
         static const float ZOOM_DISTANCE_THRESHOLD;
+        static const float TAP_MAX_DISTANCE_THRESHOLD;			 
+        static const unsigned int TAP_MAX_DURATION_THRESHOLD;		
 
         Gesture(asl::DLHandle theHandle);
         virtual y60::EventPtrList poll();
@@ -97,12 +99,16 @@ class Gesture : public asl::PlugInBase,
         CursorList                      _myCursorList;
         std::map<int, PositionInfo>     _myCurrentCursorPositions;
         std::map<int, PositionInfo>     _myLastCursorPositions;
+        std::map<int, PositionInfo>     _myInitialCursorPositions;
         std::map<int, float>            _myInitialZoomDistance;
         CursorPartnerList               _myCursorPartner;
+
         float                           _myWipeDistanceThreshold;
         float                           _myMaxCursorPairDistance;
         float                           _myRotateAngleThreshold;
         float                           _myZoomDistanceThreshold;
+        float                           _myTapMaxDistanceThreshold;
+        unsigned int                    _myTapMaxDurationThreshold;
 
         unsigned int                    _myEventCounter;
         asl::ThreadLock                 _myDeliveryMutex;
