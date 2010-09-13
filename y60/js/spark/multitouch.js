@@ -402,6 +402,34 @@ spark.WipeGestureEvent.Constructor = function (Protected, theType, theBaseEvent,
 };
 
 /**
+ * tap event: "the distance between the last two move cursors
+ * is smaller than the given threshold"
+ */
+spark.GestureEvent.TAP  = "gesture-tap";
+spark.TapGestureEvent = spark.Class("TapGestureEvent");
+spark.TapGestureEvent.Constructor = function (Protected, theType, theBaseEvent, theCursor, thePosition) {
+    var Public = this;
+    this.Inherit(spark.GestureEvent, theType, theBaseEvent, theCursor);
+    
+    /////////////////////
+    // Private Members //
+    /////////////////////
+    
+    var _myPosition = thePosition;
+    
+    ////////////////////
+    // Public Methods //
+    ////////////////////
+    
+    /**
+     * Position of the tap event
+     */
+    Public.__defineGetter__("position", function () {
+        return _myPosition;
+    });
+};
+
+/**
  * events with two cursors
  */
 spark.GestureEvent.CURSOR_PAIR_START  = "gesture-cursor-pair-start";
