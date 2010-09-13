@@ -94,11 +94,9 @@ public:
 
 };
 
-extern "C" {
-    TexturePacker * createTexturePacker(void);
-    void            releaseTexturePacker(TexturePacker *tp);
+NETSRC_TEXTUREATLAS_EXPORT TexturePacker * createTexturePacker(void);
+NETSRC_TEXTUREATLAS_EXPORT void            releaseTexturePacker(TexturePacker *tp);
 
-};
 }; // end the texture packer namespace
 
 #endif
