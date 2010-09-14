@@ -205,6 +205,14 @@ public:
     } \
 }
 
+#define ENSURE_ALMOSTEQUAL(EXP1,EXP2) { \
+    ENSURE_FULL(almostEqual(EXP1,EXP2), # EXP1 " ~= " # EXP2, true); \
+    if (!almostEqual(EXP1, EXP2)) { \
+        std::cerr << getTracePrefix() << #EXP1 << " = " << EXP1 << std::endl; \
+        std::cerr << getTracePrefix() << #EXP2 << " = " << EXP2 << std::endl; \
+    } \
+}
+
 #define ENSURE_UNEQUAL(EXP1,EXP2) { \
     ENSURE_FULL(EXP1 != EXP2, # EXP1 "==" # EXP2, true); \
     if ((EXP1) == (EXP2)) { \
