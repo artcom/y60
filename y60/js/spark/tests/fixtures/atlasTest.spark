@@ -1,0 +1,13 @@
+<Window>
+<!--
+  <Image src="fixtures/textures/testAtlas[rgbtest_130.png]" x="50" y="40"/>
+  <Image src="fixtures/textures/testAtlas[checkers.png]" x="50" y="200"/>
+  <Image src="fixtures/textures/testAtlas[colors.rgb]" x="200" y="40"/>
+  <Image src="fixtures/textures/testAtlas[testbild00.rgb]" x="200" y="300"/>
+  -->
+  <Image src="fixtures/textures/rgbtest_130.png" x="50" y="40"/>
+  <Image src="fixtures/textures/checkers.png" x="50" y="200"/>
+  <Image src="fixtures/textures/colors.rgb" x="200" y="40"/>
+  <Image src="fixtures/textures/testbild00.rgb" x="200" y="300"/>
+</Window>
+
