@@ -26,10 +26,12 @@ using namespace dom;
 
 namespace y60 {
 
-    const float Gesture::WIPE_DISTANCE_THRESHOLD = 100.0;
-    const float Gesture::MAX_CURSOR_PAIR_DISTANCE = 1000.0;
-    const float Gesture::ROTATE_ANGLE_THRESHOLD = 1.0;
-    const float Gesture::ZOOM_DISTANCE_THRESHOLD = 0.0;
+    const float Gesture::WIPE_DISTANCE_THRESHOLD = 100.0;     //min movement of cursor that is needed for wipe
+    const float Gesture::MAX_CURSOR_PAIR_DISTANCE = 1000.0;   //cursors with larger distance than this can not be pairs
+    const float Gesture::ROTATE_ANGLE_THRESHOLD = 1.0;        //fill me
+    const float Gesture::ZOOM_DISTANCE_THRESHOLD = 0.0;		  //fill me
+	const float Gesture::TAP_MAX_DISTANCE_THRESHOLD = 40.0;	  //max movement of cursor, larger distances can not be tap gestures
+	const unsigned int Gesture::TAP_MAX_DURATION_THRESHOLD = 1;	  //cursors with longer durations will not lead to taps
 
 Gesture::Gesture(DLHandle theHandle) :
     asl::PlugInBase( theHandle ),
@@ -40,6 +42,8 @@ Gesture::Gesture(DLHandle theHandle) :
     _myMaxCursorPairDistance(MAX_CURSOR_PAIR_DISTANCE),
     _myRotateAngleThreshold(ROTATE_ANGLE_THRESHOLD),
     _myZoomDistanceThreshold(ZOOM_DISTANCE_THRESHOLD),
+    _myTapMaxDistanceThreshold(TAP_MAX_DISTANCE_THRESHOLD),
+    _myTapMaxDurationThreshold(TAP_MAX_DURATION_THRESHOLD),
     _myEventCounter(0)
 {
     registerStandardTypes( * _myValueFactory );
@@ -48,13 +52,14 @@ Gesture::Gesture(DLHandle theHandle) :
     addCursorFilter("rotate", "cursorid");
     addCursorFilter("zoom", "cursorid");
     addCursorFilter("wipe", "cursorid");
+    addCursorFilter("tap", "cursorid");
 }
 
 
 y60::EventPtrList
 Gesture::poll() {
     AutoLocker<ThreadLock> l(_myDeliveryMutex);
-    // save all cursor positions
+    // save all cursor positions (_myLastCursorPositions)
     saveAllCursorPositions();
 
     AC_TRACE << "unfiltered gesture events # " << _myEvents.size();
@@ -116,7 +121,7 @@ void
 Gesture::saveAllCursorPositions() {
     _myLastCursorPositions.clear();
     CursorList::iterator myIt = _myCursorList.begin();
-    for(; myIt !=  _myCursorList.end();++myIt){
+    for (; myIt !=  _myCursorList.end();++myIt){
         _myLastCursorPositions[myIt->first] = _myCurrentCursorPositions[myIt->first];
     }
 }
@@ -159,24 +164,25 @@ Gesture::addGestureEvent2Queue(GESTURE_BASE_EVENT_TYPE theBaseEvent, int theID, 
 
 
 void
-Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent,  int theID, const std::string & theType, const Vector3f & thePosition3D, unsigned long long & theTimestamp)
+Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent, int theID, const std::string & theType, const Vector3f & thePosition3D, unsigned long long & theTimestamp)
 {
     MAKE_SCOPE_TIMER(Gesture_createEvent);
-        if(theType == "add") {
+        if (theType == "add") {
             AC_DEBUG << "Gesture::createEvent -> add";
 
             // track cursor
             _myCursorList[ theID ] = true;
             _myCurrentCursorPositions[ theID ] = PositionInfo(thePosition3D, theTimestamp);
+            _myInitialCursorPositions[ theID ] = PositionInfo(thePosition3D, theTimestamp);
 
         } else if(theType == "move" || theType == "update") {
-            if(_myCursorList.find(theID) == _myCursorList.end()) {
+            if (_myCursorList.find(theID) == _myCursorList.end()) {
                 return;
             }
             AC_DEBUG << "Gesture::createEvent -> move";
 
-            if(_myLastCursorPositions.find(theID) == _myLastCursorPositions.end()) {
-                if(_myCurrentCursorPositions.find(theID) != _myCurrentCursorPositions.end()) {
+            if (_myLastCursorPositions.find(theID) == _myLastCursorPositions.end()) {
+                if (_myCurrentCursorPositions.find(theID) != _myCurrentCursorPositions.end()) {
                     // take the positioninfo from the add event
                     _myLastCursorPositions[theID] = _myCurrentCursorPositions[ theID ];
                 } else {
@@ -190,9 +196,9 @@ Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent,  int theID, const std
             bool myPartnerFoundFlag = false;
 
             // more than one cursor, check multicursor gesture (zoom / rotate)
-            if(_myCursorList.size() > 1) {
+            if (_myCursorList.size() > 1) {
                 // if there is no cursor partner
-                if(_myCursorPartner.find(theID) == _myCursorPartner.end()) {
+                if (_myCursorPartner.find(theID) == _myCursorPartner.end()) {
                     AC_DEBUG << theID << " has no cursor partner";
             
                     int myCursorPartnerId = -1;
@@ -262,7 +268,8 @@ Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent,  int theID, const std
             if (!myPartnerFoundFlag) {
                 Vector3f myDifference = difference(thePosition3D, myLastPosition);
                 float myMagnitude = magnitude(myDifference);
-                if( myMagnitude > _myWipeDistanceThreshold ) {
+				AC_INFO << "check for wipe with magnitude " << myMagnitude << " threshold " << _myWipeDistanceThreshold;
+                if ( myMagnitude > _myWipeDistanceThreshold ) {
                     
                     /*unsigned long long myLastTimestamp = _myLastCursorPositions[theID]._myTimestamp; 
                     unsigned long long myTimeDifference = theTimestamp - myLastTimestamp;
@@ -272,20 +279,26 @@ Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent,  int theID, const std
                     }
                     myMagnitude /= myTimeDifference/1000.0f;*/
 
+
+                    //magnitude is velocity from beginning of wipe until current position
+                    //myMagnitude = magnitude(difference(thePosition3D, _myInitialCursorPositions._myPosition))/
+                    //              magnitude(difference(theTimestamp, _myInitialCursorPositions._myTimestamp));
+
                     // register wipe event
                     NodePtr myNode = addGestureEvent2Queue(theBaseEvent, theID, "wipe", thePosition3D);
-                    myNode->appendAttribute<Vector3f>("direction", normalized(myDifference));
+					myNode->appendAttribute<Vector3f>("direction", normalized(myDifference));
                     myNode->appendAttribute<float>("magnitude", myMagnitude);
-                }
+					AC_INFO << "register wipe gesture, id " << theID << " direction " << normalized(myDifference) << " magnitude " << myMagnitude;
+                } 
             }
-        } else if(theType == "remove") {
+        } else if (theType == "remove") {
             AC_DEBUG << "Gesture::createEvent -> remove";
 
-            if(_myCursorList.find(theID) == _myCursorList.end()){
+            if (_myCursorList.find(theID) == _myCursorList.end()){
                 return;
             }
             // is the removing cursor part of a existing multicursor gesture
-            if(_myCursorPartner.find(theID) != _myCursorPartner.end()) {
+            if (_myCursorPartner.find(theID) != _myCursorPartner.end()) {
                 AC_DEBUG << "register cursor_pair_finish: " << theID << " partner: " <<  _myCursorPartner[theID];
                 dom::NodePtr myNode = addGestureEvent2Queue(theBaseEvent, theID, "cursor_pair_finish", thePosition3D);
 
@@ -295,9 +308,21 @@ Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent,  int theID, const std
                 }
                 _myCursorPartner.erase(_myCursorPartner.find(theID));
                 
-            } 
-            if(_myInitialZoomDistance.find(theID) != _myInitialZoomDistance.end()) {
+            } else {
+                Vector3f myDifference = difference(thePosition3D, _myInitialCursorPositions[theID]._myPosition);
+                float myMagnitude = magnitude(myDifference);
+                unsigned int myDuration = _myCurrentCursorPositions[theID]._myTimestamp - _myInitialCursorPositions[theID]._myTimestamp;
+				AC_INFO << "check for tap with magnitude " << myMagnitude << " threshold " << _myWipeDistanceThreshold << " - duration " << myDuration << " threshold " << _myTapMaxDurationThreshold;
+                if (myMagnitude < _myTapMaxDistanceThreshold &&  myDuration < _myTapMaxDurationThreshold) {
+                    NodePtr myNode = addGestureEvent2Queue(theBaseEvent, theID, "tap", thePosition3D);
+					AC_INFO << "register tap gesture, id " << theID << " pos " << thePosition3D;
+                }
+            }
+            if (_myInitialZoomDistance.find(theID) != _myInitialZoomDistance.end()) {
                 _myInitialZoomDistance.erase(theID);
+            }
+            if (_myInitialCursorPositions.find(theID) != _myInitialCursorPositions.end()) {
+                _myInitialCursorPositions.erase(theID);
             }
             _myCursorList.erase(_myCursorList.find(theID ));
         }
@@ -321,6 +346,8 @@ Gesture::onUpdateSettings(dom::NodePtr theSettings) {
      _myMaxCursorPairDistance = getSetting( theSettings, "MaxCursorPairDistance", _myMaxCursorPairDistance);
      _myRotateAngleThreshold = getSetting( theSettings, "RotateAngleThreshold", _myRotateAngleThreshold);
      _myZoomDistanceThreshold = getSetting( theSettings, "ZoomDistanceThreshold", _myZoomDistanceThreshold);
+     _myTapMaxDistanceThreshold = getSetting( theSettings, "TapMaxDistanceThreshold", _myTapMaxDistanceThreshold);
+     _myTapMaxDurationThreshold = getSetting( theSettings, "TapMaxDurationThreshold", _myTapMaxDurationThreshold);
 }
 
 void

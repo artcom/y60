@@ -283,8 +283,9 @@ public:
       for (int i=0; i<mTextureCount; i++)
       {
         Texture &t = mTextures[i];
-        t.set(t.mWidth+2, t.mHeight+2);
-        mTotalArea += t.mArea;
+        t.mWidth+=2;
+        t.mHeight+=2;
+        mTotalArea += (t.mWidth*t.mHeight);
       }
       mLongestEdge+=2;
     }
@@ -295,7 +296,8 @@ public:
     }
 
     width  = mLongestEdge;              // The width is no more than the longest edge of any rectangle passed in
-    height = mTextureCount * mLongestEdge;  // We guess that the height is worse-case: on exit, this will get shrunk down to the actual tallest height.
+    int count = mTotalArea / (mLongestEdge*mLongestEdge);
+    height = (count+2)*mLongestEdge;            // We guess that the height is no more than twice the longest edge.  On exit, this will get shrunk down to the actual tallest height.
 
     mDebugCount = 0;
     newFree(0,0,width,height);
