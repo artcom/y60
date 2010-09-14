@@ -72,16 +72,16 @@ namespace y60 {
     */
     class Y60_IMAGE_DECL TextureAtlas {
         public:
-            typedef std::vector<dom::ResizeableRasterPtr> Subtextures;
+            typedef std::map<std::string, dom::ResizeableRasterPtr> Subtextures;
             typedef std::map<std::string, asl::Matrix4f> UVTranslations;
 
-            TextureAtlas(const std::vector<std::string> & theNames, 
-                         const Subtextures & theBitmaps,
+            TextureAtlas(const Subtextures & theBitmaps,
                          bool thePixelBorderFlag = true, bool theForcePowerOfTwoFlag = false);
 
             const dom::ResizeableRasterPtr getRaster() const { return _masterRaster; };
 
             bool findTextureTranslation(const std::string & theTextureName, asl::Matrix4f & theTranslation) const;
+            asl::AC_SIZE_TYPE getTextureCount() const { return _translations.size(); };
 
         private:
             TextureAtlas();

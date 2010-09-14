@@ -68,23 +68,19 @@ using namespace asl;
 using namespace std;
 
 namespace y60 {
-    TextureAtlas::TextureAtlas(const std::vector<std::string> & theNames, 
-                 const Subtextures & theBitmaps,
+    TextureAtlas::TextureAtlas(const Subtextures & theBitmaps,
                  bool thePixelBorderFlag, bool theForcePowerOfTwoFlag)
     {
-        if (theNames.size() != theBitmaps.size()) {
-            throw Exception("mismatched array sizes");
-        }
         TEXTURE_PACKER::TexturePacker *tp = TEXTURE_PACKER::createTexturePacker();
         //
         // Next inform the system how many textures you want to pack.
         //
-        tp->setTextureCount(theNames.size());
+        tp->setTextureCount(theBitmaps.size());
         //
         // Now, add each texture's width and height in sequence 1-10
         //
         for (Subtextures::const_iterator it = theBitmaps.begin(); it != theBitmaps.end(); ++it) { 
-            tp->addTexture((*it)->width(),(*it)->height());
+            tp->addTexture((it->second)->width(),(it->second)->height());
         }
         //
         // Next you pack them .
@@ -99,27 +95,30 @@ namespace y60 {
         }
         
         // blit subtextures
-        for (asl::AC_SIZE_TYPE i = 0; i < theBitmaps.size(); ++i) {
+        int index = 0;
+        for (Subtextures::const_iterator it=theBitmaps.begin(); it != theBitmaps.end(); ++it) {
             int targetX;
             int targetY;
             int targetWidth;
             int targetHeight;
+            
+            const dom::ResizeableRasterPtr & curBitmap = it->second;
 
-            bool rotated = tp->getTextureLocation(i, targetX, targetY, targetWidth, targetHeight);
+            bool rotated = tp->getTextureLocation(index++, targetX, targetY, targetWidth, targetHeight);
             //TODO: supported rotated bitmaps
-            AC_TRACE << "blitting bitmap '" << theNames[i] << "' (" << theBitmaps[i]->width() << " x " << theBitmaps[i]->height() << ")";
+            AC_TRACE << "blitting bitmap '" << it->first << "' (" << curBitmap->width() << " x " << curBitmap->height() << ")";
             AC_TRACE << "   into (" << targetX << ", " << targetY << " )";
             AC_TRACE << "   new size: " << targetWidth << " x " << targetHeight << "(rotated: " << rotated << ")";
 
             //dom::ValuePtr myRasterValue = dynamic_cast_Ptr<dom::ValueBase>(theBitmaps[i]);
             int firstRowCol = thePixelBorderFlag ? -1 : 0;
-            int lastRow = thePixelBorderFlag ? theBitmaps[i]->height()+1 : theBitmaps[i]->height();
-            int lastCol = thePixelBorderFlag ? theBitmaps[i]->width()+1 : theBitmaps[i]->width();
+            int lastRow = thePixelBorderFlag ? curBitmap->height()+1 : curBitmap->height();
+            int lastCol = thePixelBorderFlag ? curBitmap->width()+1 : curBitmap->width();
 
             for (asl::AC_OFFSET_TYPE y = firstRowCol; y < lastRow; ++y) {
                 for (asl::AC_OFFSET_TYPE x = firstRowCol; x < lastCol; ++x) {
-                    asl::Vector4f myPixel = theBitmaps[i]->getPixel(clamp(x, static_cast<AC_OFFSET_TYPE>(0), static_cast<AC_OFFSET_TYPE>(theBitmaps[i]->width()-1)),
-                                                                    clamp(y, static_cast<AC_OFFSET_TYPE>(0), static_cast<AC_OFFSET_TYPE>(theBitmaps[i]->height()-1)));
+                    asl::Vector4f myPixel = curBitmap->getPixel(clamp(x, static_cast<AC_OFFSET_TYPE>(0), static_cast<AC_OFFSET_TYPE>(curBitmap->width()-1)),
+                                                                clamp(y, static_cast<AC_OFFSET_TYPE>(0), static_cast<AC_OFFSET_TYPE>(curBitmap->height()-1)));
                     if (rotated) {
                         _masterRaster->setPixel(y+targetX,x+targetY,myPixel);
                     } else {
@@ -127,10 +126,10 @@ namespace y60 {
                     }
                 }
             }
-            AC_TRACE << "creating UV Translation for " << theNames[i] << " rotated:" << rotated;
-            AC_TRACE << "        size: " << theBitmaps[i]->getSize();
+            AC_TRACE << "creating UV Translation for " << it->first << " rotated:" << rotated;
+            AC_TRACE << "        size: " << curBitmap->getSize();
             AC_TRACE << "    position: " << Vector2<AC_SIZE_TYPE>(targetX, targetY);
-            _translations.insert(make_pair(theNames[i], createUVTranslation(_masterRaster->getSize(), theBitmaps[i]->getSize(), 
+            _translations.insert(make_pair(it->first, createUVTranslation(_masterRaster->getSize(), curBitmap->getSize(), 
                            Vector2<AC_SIZE_TYPE>(targetX, targetY), rotated )));
         }
         TEXTURE_PACKER::releaseTexturePacker(tp);

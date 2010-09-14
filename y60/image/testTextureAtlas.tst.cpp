@@ -223,14 +223,13 @@ public:
         : UnitTest("TextureAtlasUnitTest") {}
 
 
-    void makeRaster(const std::string & theName, int theWidth, int theHeight, const Vector4f & theColor) {
+    void makeSubtexture(const std::string & theName, int theWidth, int theHeight, const Vector4f & theColor) {
         dom::ResizeableRasterPtr raster = dynamic_cast_Ptr<dom::ResizeableRaster>(createRasterValue(y60::RGBA, theWidth, theHeight));
         raster->fillRect(0,0,theWidth, theHeight, theColor);
-        _myNames.push_back(theName);
-        _myRasters.push_back(raster);
+        _mySubtextures.insert(make_pair(theName, raster));
     }
 
-    void testRaster(const TextureAtlas & myAtlas, const string & theName, const Vector4f & theExpectedColor) {
+    void textPixels(const TextureAtlas & myAtlas, const string & theName, const Vector4f & theExpectedColor) {
         Matrix4f textureTranslation;
         ENSURE(myAtlas.findTextureTranslation(theName, textureTranslation) );
 
@@ -249,11 +248,12 @@ public:
         setSilentSuccess(false);
     }
 
-    void run() {
-        makeRaster("red", 5, 1, Vector4f(1,0,0,1));
-        makeRaster("blue", 2, 2, Vector4f(0,0,1,1));
-        makeRaster("yellow", 2, 1, Vector4f(1,1,0,1));
-        makeRaster("green", 3, 2, Vector4f(0,1,0,1));
+    void testBitmap() {
+        _mySubtextures.clear();
+        makeSubtexture("red", 5, 1, Vector4f(1,0,0,1));
+        makeSubtexture("blue", 2, 2, Vector4f(0,0,1,1));
+        makeSubtexture("yellow", 2, 1, Vector4f(1,1,0,1));
+        makeSubtexture("green", 3, 2, Vector4f(0,1,0,1));
 
         /*
         for (int i = 0; i < 100; ++i) {
@@ -265,7 +265,7 @@ public:
         }
         */
 
-        TextureAtlas myAtlas(_myNames, _myRasters, true, false);
+        TextureAtlas myAtlas(_mySubtextures, true, false);
         {
             Path myPath("test.png", UTF8);
             PLAnyBmp myBmp;
@@ -281,15 +281,29 @@ public:
         Matrix4f textureTranslation;
         ENSURE( ! myAtlas.findTextureTranslation("doesn't exist", textureTranslation) );
        
-        testRaster(myAtlas, "red", Vector4f(1,0,0,1));
-        testRaster(myAtlas, "blue", Vector4f(0,0,1,1));
-        testRaster(myAtlas, "yellow", Vector4f(1,1,0,1));
-        testRaster(myAtlas, "green", Vector4f(0,1,0,1));
+        textPixels(myAtlas, "red", Vector4f(1,0,0,1));
+        textPixels(myAtlas, "blue", Vector4f(0,0,1,1));
+        textPixels(myAtlas, "yellow", Vector4f(1,1,0,1));
+        textPixels(myAtlas, "green", Vector4f(0,1,0,1));
     }
 
-    std::vector<std::string> _myNames;
-    std::vector<dom::ResizeableRasterPtr> _myRasters;
+    void testDuplicates() {
+        _mySubtextures.clear();
+        makeSubtexture("red", 5, 1, Vector4f(1,0,0,1));
+        makeSubtexture("red", 5, 1, Vector4f(1,0,0,1)); // 2nd texture with same name should be discarded
+        TextureAtlas myAtlas(_mySubtextures, true, false);
+        ENSURE_EQUAL(1, myAtlas.getTextureCount());
+        ENSURE_EQUAL(Vector2<AC_SIZE_TYPE>(7,3), myAtlas.getRaster()->getSize());
+    }
+
+    void run() {
+        testDuplicates();
+        testBitmap();
+    }
+
+    TextureAtlas::Subtextures _mySubtextures;
 };
+
 
 }
 
