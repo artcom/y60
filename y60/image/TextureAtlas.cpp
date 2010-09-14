@@ -61,16 +61,16 @@
 #include "PixelEncoding.h"
 
 #include <asl/base/Exception.h>
+#include <asl/math/numeric_functions.h>
 #include <netsrc/texture-atlas/TexturePacker.h>
 
 using namespace asl;
 using namespace std;
 
 namespace y60 {
-    asl::Ptr<TextureAtlas> 
-    TextureAtlas::generate(const std::vector<std::string> & theNames, 
-                           const Subtextures & theBitmaps,
-                           bool thePixelBorderFlag, bool theForcePowerOfTwoFlag)
+    TextureAtlas::TextureAtlas(const std::vector<std::string> & theNames, 
+                 const Subtextures & theBitmaps,
+                 bool thePixelBorderFlag, bool theForcePowerOfTwoFlag)
     {
         if (theNames.size() != theBitmaps.size()) {
             throw Exception("mismatched array sizes");
@@ -89,14 +89,15 @@ namespace y60 {
         //
         // Next you pack them .
         //
-        int atlasWidth;
-        int atlasHeight;
-        tp->packTextures(atlasWidth,atlasHeight,theForcePowerOfTwoFlag,thePixelBorderFlag);
+        {
+            int atlasWidth;
+            int atlasHeight;
+            tp->packTextures(atlasWidth,atlasHeight,theForcePowerOfTwoFlag, thePixelBorderFlag);
+            AC_TRACE << "creating texture atlas (" << atlasWidth << " x " << atlasHeight << ")";
+            _masterRaster = dynamic_cast_Ptr<dom::ResizeableRaster>(createRasterValue(y60::RGBA, atlasWidth, atlasHeight));
+            _masterRaster->fillRect(0,0,atlasWidth,atlasHeight,asl::Vector4f(1,1,1,1));
+        }
         
-        // create master texture
-        TextureAtlasPtr myAtlas(new TextureAtlas(atlasWidth, atlasHeight));
-
-        AC_TRACE << "creating texture atlas (" << atlasWidth << " x " << atlasHeight << ")";
         // blit subtextures
         for (asl::AC_SIZE_TYPE i = 0; i < theBitmaps.size(); ++i) {
             int targetX;
@@ -111,25 +112,60 @@ namespace y60 {
             AC_TRACE << "   new size: " << targetWidth << " x " << targetHeight << "(rotated: " << rotated << ")";
 
             //dom::ValuePtr myRasterValue = dynamic_cast_Ptr<dom::ValueBase>(theBitmaps[i]);
-            for (AC_SIZE_TYPE y = 0; y < theBitmaps[i]->height(); ++y) {
-                for (AC_SIZE_TYPE x = 0; x < theBitmaps[i]->width(); ++x) {
-                    asl::Vector4f myPixel = theBitmaps[i]->getPixel(x,y);
+            int firstRowCol = thePixelBorderFlag ? -1 : 0;
+            int lastRow = thePixelBorderFlag ? theBitmaps[i]->height()+1 : theBitmaps[i]->height();
+            int lastCol = thePixelBorderFlag ? theBitmaps[i]->width()+1 : theBitmaps[i]->width();
+
+            for (asl::AC_OFFSET_TYPE y = firstRowCol; y < lastRow; ++y) {
+                for (asl::AC_OFFSET_TYPE x = firstRowCol; x < lastCol; ++x) {
+                    asl::Vector4f myPixel = theBitmaps[i]->getPixel(clamp(x, static_cast<AC_OFFSET_TYPE>(0), static_cast<AC_OFFSET_TYPE>(theBitmaps[i]->width()-1)),
+                                                                    clamp(y, static_cast<AC_OFFSET_TYPE>(0), static_cast<AC_OFFSET_TYPE>(theBitmaps[i]->height()-1)));
                     if (rotated) {
-                        myAtlas->_masterRaster->setPixel(y+targetX,x+targetY,myPixel);
+                        _masterRaster->setPixel(y+targetX,x+targetY,myPixel);
                     } else {
-                        myAtlas->_masterRaster->setPixel(x+targetX,y+targetY,myPixel);
+                        _masterRaster->setPixel(x+targetX,y+targetY,myPixel);
                     }
                 }
             }
+            AC_TRACE << "creating UV Translation for " << theNames[i] << " rotated:" << rotated;
+            AC_TRACE << "        size: " << theBitmaps[i]->getSize();
+            AC_TRACE << "    position: " << Vector2<AC_SIZE_TYPE>(targetX, targetY);
+            _translations.insert(make_pair(theNames[i], createUVTranslation(_masterRaster->getSize(), theBitmaps[i]->getSize(), 
+                           Vector2<AC_SIZE_TYPE>(targetX, targetY), rotated )));
         }
         TEXTURE_PACKER::releaseTexturePacker(tp);
-        return myAtlas;
     };
 
-    TextureAtlas::TextureAtlas(asl::AC_SIZE_TYPE width, asl::AC_SIZE_TYPE height) 
+    asl::Matrix4f 
+    TextureAtlas::createUVTranslation(const asl::Vector2<asl::AC_SIZE_TYPE> & theAtlasSize,
+            const asl::Vector2<asl::AC_SIZE_TYPE> & theBitmapSize, 
+            const asl::Vector2<asl::AC_SIZE_TYPE> & theBitmapPosition,
+            bool theRotatedFlag) 
     {
-        _masterRaster = dynamic_cast_Ptr<dom::ResizeableRaster>(createRasterValue(y60::RGBA, width, height));
-        _masterRaster->fillRect(0,0,width,height,asl::Vector4f(1,1,1,1));
-    };
+        asl::Matrix4f myTranslation;
+        asl::Vector2f atlasSize(theAtlasSize[0], theAtlasSize[1]);
+
+        if (theRotatedFlag) {
+            myTranslation.makeIdentity();
+            myTranslation.rotateZ(0,-1); // rotate 90° counterclockwise
+            myTranslation.scale(Vector3f(theBitmapSize[1]/atlasSize[0], theBitmapSize[0]/atlasSize[1], 1));
+            myTranslation.translate(Vector3f(0,theBitmapSize[0]/atlasSize[1],0)); // correct pivot
+        } else {
+            myTranslation.makeScaling(Vector3f(theBitmapSize[0]/atlasSize[0], theBitmapSize[1]/atlasSize[1], 1));
+        }
+        myTranslation.translate(Vector3f(theBitmapPosition[0]/atlasSize[0], theBitmapPosition[1]/atlasSize[1], 0));
+        return myTranslation;
+    }
+
+    bool 
+    TextureAtlas::findTextureTranslation(const std::string & theTextureName, asl::Matrix4f & theTranslation) const {
+       UVTranslations::const_iterator it = _translations.find(theTextureName);
+       if (it == _translations.end()) {
+           return false;
+       }
+       theTranslation = it->second;
+       return true;
+    }
+
 }
 

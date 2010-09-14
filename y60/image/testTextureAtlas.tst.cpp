@@ -74,58 +74,232 @@
 
 using namespace std; 
 using namespace asl;
-using namespace y60;
+
+namespace y60 {
+
+class TextureAtlasUVTest : public UnitTest {
+public:
+    TextureAtlasUVTest()
+        : UnitTest("TextureAtlasUVTest") {}
+
+    void run() {
+        {  // test UV Coord translation - only scale
+           /* 
+            *  subtexture:     atlas:
+            *   (1x2)          (4x8)
+            *                  X...    
+            *      X           Y...
+            *      Y           ....
+            *                  ....
+            *                  ....
+            *                  ....
+            */
+            Vector2<AC_SIZE_TYPE> atlasSize(4,8);
+            Vector2<AC_SIZE_TYPE> bitmapSize(1,2);
+            Vector2<AC_SIZE_TYPE> bitmapPosition(0u,0u);
+            bool rotated = false;
+
+            Matrix4f translation = TextureAtlas::createUVTranslation(atlasSize, bitmapSize, bitmapPosition, rotated);
+
+            ENSURE_ALMOSTEQUAL(Vector4f(0,0,0,1) * translation, Vector4f(0.0 ,0.0 ,0,1));
+            ENSURE_ALMOSTEQUAL(Vector4f(1,0,0,1) * translation, Vector4f(0.25,0.0 ,0,1));
+            ENSURE_ALMOSTEQUAL(Vector4f(0,1,0,1) * translation, Vector4f(0.00,0.25,0,1));
+            ENSURE_ALMOSTEQUAL(Vector4f(1,1,0,1) * translation, Vector4f(0.25,0.25,0,1));
+
+        }
+        {  // test UV Coord translation - scale & reposition
+           /* 
+            *  subtexture:     atlas:
+            *   (1x2)          (4x8)
+            *                  ....    
+            *      X           ..X.
+            *      Y           ..Y.
+            *                  ....
+            *                  ....
+            *                  ....
+            */
+            Vector2<AC_SIZE_TYPE> atlasSize(4,8);
+            Vector2<AC_SIZE_TYPE> bitmapSize(1,2);
+            Vector2<AC_SIZE_TYPE> bitmapPosition(2,1);
+            bool rotated = false;
+
+            Matrix4f translation = TextureAtlas::createUVTranslation(atlasSize, bitmapSize, bitmapPosition, rotated);
+
+            ENSURE_ALMOSTEQUAL(Vector4f(0,0,0,1) * translation, Vector4f(0.50,0.125,0,1));
+            ENSURE_ALMOSTEQUAL(Vector4f(1,0,0,1) * translation, Vector4f(0.75,0.125,0,1));
+            ENSURE_ALMOSTEQUAL(Vector4f(0,1,0,1) * translation, Vector4f(0.50,0.375,0,1));
+            ENSURE_ALMOSTEQUAL(Vector4f(1,1,0,1) * translation, Vector4f(0.75,0.375,0,1));
+
+        }
+        {  // test UV Coord translation - scale & rotate
+           /* 
+            *  subtexture:     atlas:
+            *   (1x2)          (4x8)
+            *                  XY..    
+            *      X           ....
+            *      Y           ....
+            *                  ....
+            *                  ....
+            *                  ....
+            */
+            Vector2<AC_SIZE_TYPE> atlasSize(4,8);
+            Vector2<AC_SIZE_TYPE> bitmapSize(1,2);
+            Vector2<AC_SIZE_TYPE> bitmapPosition(0u,0u);
+            bool rotated = true;
+
+            Matrix4f translation = TextureAtlas::createUVTranslation(atlasSize, bitmapSize, bitmapPosition, rotated);
+
+            ENSURE_ALMOSTEQUAL(Vector4f(0,0,0,1) * translation, Vector4f(0.00,0.125,0,1));
+            ENSURE_ALMOSTEQUAL(Vector4f(1,0,0,1) * translation, Vector4f(0.00,0.000,0,1));
+            ENSURE_ALMOSTEQUAL(Vector4f(0,1,0,1) * translation, Vector4f(0.50,0.125,0,1));
+            ENSURE_ALMOSTEQUAL(Vector4f(1,1,0,1) * translation, Vector4f(0.50,0.000,0,1));
+
+        }
+        {  // test UV Coord translation - scale, rotate & reposition
+           /* 
+            *  subtexture:     atlas:
+            *   (1x2)          (4x8)
+            *                  ....    
+            *      X           .XY.
+            *      Y           ....
+            *                  ....
+            *                  ....
+            *                  ....
+            */
+            Vector2<AC_SIZE_TYPE> atlasSize(4,8);
+            Vector2<AC_SIZE_TYPE> bitmapSize(1,2);
+            Vector2<AC_SIZE_TYPE> bitmapPosition(1,1);
+            bool rotated = true;
+
+            Matrix4f translation = TextureAtlas::createUVTranslation(atlasSize, bitmapSize, bitmapPosition, rotated);
+
+            ENSURE_ALMOSTEQUAL(Vector4f(0,0,0,1) * translation, Vector4f(0.25,0.25 ,0,1));
+            ENSURE_ALMOSTEQUAL(Vector4f(1,0,0,1) * translation, Vector4f(0.25,0.125,0,1));
+            ENSURE_ALMOSTEQUAL(Vector4f(0,1,0,1) * translation, Vector4f(0.75,0.25 ,0,1));
+            ENSURE_ALMOSTEQUAL(Vector4f(1,1,0,1) * translation, Vector4f(0.75,0.125,0,1));
+
+        }
+        {  // test UV Coord translation - scale, rotate & reposition
+           /* 
+            *  subtexture:            atlas:
+            *   (1x2)rotated          (8x10)
+            */
+            Vector2<AC_SIZE_TYPE> atlasSize(8,10);
+            Vector2<AC_SIZE_TYPE> bitmapSize(1,2);
+            Vector2<AC_SIZE_TYPE> bitmapPosition(5,8);
+            bool rotated = true;
+
+            Matrix4f translation = TextureAtlas::createUVTranslation(atlasSize, bitmapSize, bitmapPosition, rotated);
+            ENSURE_ALMOSTEQUAL(Vector4f(0,0,0,1) * translation, Vector4f(5.0f/8.0f,9.0f/10.0f ,0,1));
+            ENSURE_ALMOSTEQUAL(Vector4f(1,0,0,1) * translation, Vector4f(5.0f/8.0f,8.0f/10.0f,0,1));
+            ENSURE_ALMOSTEQUAL(Vector4f(0,1,0,1) * translation, Vector4f(7.0f/8.0f,9.0f/10.0f ,0,1));
+            ENSURE_ALMOSTEQUAL(Vector4f(1,1,0,1) * translation, Vector4f(7.0f/8.0f,8.0f/10.0f,0,1));
+
+        }
+        {  // test UV Coord translation - scale, rotate & reposition
+           /* 
+            *  subtexture:            atlas:
+            *   (2x1)rotated          (8x10)
+            */
+            Vector2<AC_SIZE_TYPE> atlasSize(8,10);
+            Vector2<AC_SIZE_TYPE> bitmapSize(2,1);
+            Vector2<AC_SIZE_TYPE> bitmapPosition(5,8);
+            bool rotated = true;
+
+            Matrix4f translation = TextureAtlas::createUVTranslation(atlasSize, bitmapSize, bitmapPosition, rotated);
+            ENSURE_ALMOSTEQUAL(Vector4f(0,0,0,1) * translation, Vector4f(5.0f/8.0f,10.0f/10.0f ,0,1));
+            ENSURE_ALMOSTEQUAL(Vector4f(1,0,0,1) * translation, Vector4f(5.0f/8.0f,8.0f/10.0f,0,1));
+            ENSURE_ALMOSTEQUAL(Vector4f(0,1,0,1) * translation, Vector4f(6.0f/8.0f,10.0f/10.0f ,0,1));
+            ENSURE_ALMOSTEQUAL(Vector4f(1,1,0,1) * translation, Vector4f(6.0f/8.0f,8.0f/10.0f,0,1));
+
+        }
+    }
+
+};
 
 class TextureAtlasUnitTest : public UnitTest {
 public:
     TextureAtlasUnitTest()
         : UnitTest("TextureAtlasUnitTest") {}
 
-    void run() {
-        {
-            std::vector<std::string> myNames;
-            std::vector<dom::ResizeableRasterPtr> myRasters;
 
-            /*
-            dom::ResizeableRasterPtr redRaster = dynamic_cast_Ptr<dom::ResizeableRaster>(createRasterValue(y60::RGBA, 3, 17));
-            redRaster->fillRect(0,0,3,17,asl::Vector4f(1,0,0,1));
-            myNames.push_back("red");
-            myRasters.push_back(redRaster);
-            */
-            for (int i = 0; i < 100; ++i) {
-                dom::ResizeableRasterPtr blueRaster = dynamic_cast_Ptr<dom::ResizeableRaster>(createRasterValue(y60::RGBA, random(2,2), random(2,2)));
-                AC_WARNING << "[" << i << "]" << blueRaster->width() << " x " << blueRaster->height();
-                blueRaster->fillRect(0,0,blueRaster->width(), blueRaster->height(),asl::Vector4f(random(0.0f,1.0f),random(0.0f, 1.0f),random(0.0f, 1.0f),1));
-                myNames.push_back("blue");
-                myRasters.push_back(blueRaster);
-            }
-
-            TextureAtlasPtr myAtlas = TextureAtlas::generate(myNames, myRasters, false, false);
-            ENSURE(myAtlas);
-
-            {
-                Path myPath("test.png", UTF8);
-                PLAnyBmp myBmp;
-                PLPixelFormat pf;
-                mapPixelEncodingToFormat(y60::RGBA, pf);
-
-                myBmp.Create( myAtlas->getRaster()->width(), myAtlas->getRaster()->height(), pf,
-                        const_cast<unsigned char*>(myAtlas->getRaster()->pixels().begin()), myAtlas->getRaster()->width() * 4);
-                PLPNGEncoder myEncoder;
-                myEncoder.MakeFileFromBmp(myPath.toLocale().c_str(), &myBmp);
-            }
-        }
+    void makeRaster(const std::string & theName, int theWidth, int theHeight, const Vector4f & theColor) {
+        dom::ResizeableRasterPtr raster = dynamic_cast_Ptr<dom::ResizeableRaster>(createRasterValue(y60::RGBA, theWidth, theHeight));
+        raster->fillRect(0,0,theWidth, theHeight, theColor);
+        _myNames.push_back(theName);
+        _myRasters.push_back(raster);
     }
 
+    void testRaster(const TextureAtlas & myAtlas, const string & theName, const Vector4f & theExpectedColor) {
+        Matrix4f textureTranslation;
+        ENSURE(myAtlas.findTextureTranslation(theName, textureTranslation) );
+
+        Vector4f oneCorner = Vector4f(0,0,0,1) * textureTranslation;
+        Vector4f otherCorner = Vector4f(1,1,0,1) * textureTranslation;
+        int minX = floor(min(oneCorner[0],otherCorner[0])*myAtlas.getRaster()->width()+0.5);
+        int maxX = floor(max(oneCorner[0],otherCorner[0])*myAtlas.getRaster()->width()+0.5);
+        int minY = floor(min(oneCorner[1],otherCorner[1])*myAtlas.getRaster()->height()+0.5);
+        int maxY = floor(max(oneCorner[1],otherCorner[1])*myAtlas.getRaster()->height()+0.5);
+        setSilentSuccess(true);
+        for (int y = minY-1; y <= maxY; ++y) {
+           for (int x = minX-1; x <= maxX; ++x) {
+               ENSURE_EQUAL(theExpectedColor, myAtlas.getRaster()->getPixel(x,y));
+           }
+        }
+        setSilentSuccess(false);
+    }
+
+    void run() {
+        makeRaster("red", 5, 1, Vector4f(1,0,0,1));
+        makeRaster("blue", 2, 2, Vector4f(0,0,1,1));
+        makeRaster("yellow", 2, 1, Vector4f(1,1,0,1));
+        makeRaster("green", 3, 2, Vector4f(0,1,0,1));
+
+        /*
+        for (int i = 0; i < 100; ++i) {
+            dom::ResizeableRasterPtr blueRaster = dynamic_cast_Ptr<dom::ResizeableRaster>(createRasterValue(y60::RGBA, random(2,20), random(2,20)));
+            AC_TRACE << "[" << i << "]" << blueRaster->width() << " x " << blueRaster->height();
+            blueRaster->fillRect(0,0,blueRaster->width(), blueRaster->height(),asl::Vector4f(random(0.0f,1.0f),random(0.0f, 1.0f),random(0.0f, 1.0f),1));
+            myNames.push_back("blue");
+            myRasters.push_back(blueRaster);
+        }
+        */
+
+        TextureAtlas myAtlas(_myNames, _myRasters, true, false);
+        {
+            Path myPath("test.png", UTF8);
+            PLAnyBmp myBmp;
+            PLPixelFormat pf;
+            mapPixelEncodingToFormat(y60::RGBA, pf);
+
+            myBmp.Create( myAtlas.getRaster()->width(), myAtlas.getRaster()->height(), pf,
+                    const_cast<unsigned char*>(myAtlas.getRaster()->pixels().begin()), myAtlas.getRaster()->width() * 4);
+            PLPNGEncoder myEncoder;
+            myEncoder.MakeFileFromBmp(myPath.toLocale().c_str(), &myBmp);
+        }
+
+        Matrix4f textureTranslation;
+        ENSURE( ! myAtlas.findTextureTranslation("doesn't exist", textureTranslation) );
+       
+        testRaster(myAtlas, "red", Vector4f(1,0,0,1));
+        testRaster(myAtlas, "blue", Vector4f(0,0,1,1));
+        testRaster(myAtlas, "yellow", Vector4f(1,1,0,1));
+        testRaster(myAtlas, "green", Vector4f(0,1,0,1));
+    }
+
+    std::vector<std::string> _myNames;
+    std::vector<dom::ResizeableRasterPtr> _myRasters;
 };
 
+}
 
 class MyTestSuite : public UnitTestSuite {
 public:
     MyTestSuite(const char * myName, int argc, char *argv[]) : UnitTestSuite(myName, argc, argv) {}
     void setup() {
         UnitTestSuite::setup(); // called to print a launch message
-        addTest(new TextureAtlasUnitTest());
+        addTest(new y60::TextureAtlasUVTest());
+        addTest(new y60::TextureAtlasUnitTest());
     }
 };
 

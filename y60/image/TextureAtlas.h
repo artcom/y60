@@ -63,22 +63,37 @@
 #include <vector>
 
 #include <asl/dom/Value.h>
+#include <asl/math/Matrix4.h>
 
 namespace y60 {
     /**
     * @ingroup y60image
-    * Facade for an image node in the dom.
+    * Texture atlas creation and use.
     */
     class Y60_IMAGE_DECL TextureAtlas {
         public:
             typedef std::vector<dom::ResizeableRasterPtr> Subtextures;
-            static asl::Ptr<TextureAtlas> generate(const std::vector<std::string> & theNames, 
-                    const Subtextures & theBitmaps,
-                    bool thePixelBorderFlag = true,bool theForcePowerOfTwoFlag = false);
+            typedef std::map<std::string, asl::Matrix4f> UVTranslations;
+
+            TextureAtlas(const std::vector<std::string> & theNames, 
+                         const Subtextures & theBitmaps,
+                         bool thePixelBorderFlag = true, bool theForcePowerOfTwoFlag = false);
+
             const dom::ResizeableRasterPtr getRaster() const { return _masterRaster; };
+
+            bool findTextureTranslation(const std::string & theTextureName, asl::Matrix4f & theTranslation) const;
+
         private:
-            TextureAtlas(asl::AC_SIZE_TYPE width, asl::AC_SIZE_TYPE height); 
+            TextureAtlas();
+            TextureAtlas(const TextureAtlas &);
+            TextureAtlas operator=(const TextureAtlas &);
+
+            friend class TextureAtlasUVTest; // for tests 
+            static asl::Matrix4f createUVTranslation(const asl::Vector2<asl::AC_SIZE_TYPE> & theAtlasSize,
+                    const asl::Vector2<asl::AC_SIZE_TYPE> & theBitmapSize, const asl::Vector2<asl::AC_SIZE_TYPE> & theBitmapPosition,
+                    bool theRotatedFlag);
             dom::ResizeableRasterPtr _masterRaster;
+            UVTranslations _translations;
     };
     typedef asl::Ptr<TextureAtlas> TextureAtlasPtr; 
 }
