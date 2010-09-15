@@ -140,6 +140,11 @@ namespace y60 {
 
         myAttributeName = splitNameAndComponent( myAttributeName, theAttributeComponent );
 
+        //XXX: somehow theNode does not get the full facade if not called once or something like that..
+        // Serialization Problem???
+                 Boolean hack = theNode->hasFacade();
+        ///////////////////
+        
         dom::NodePtr myAnimatedAttribute = theNode->getAttribute(myAttributeName);
 
         if (!myAnimatedAttribute) {
