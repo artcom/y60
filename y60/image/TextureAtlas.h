@@ -63,22 +63,45 @@
 #include <vector>
 
 #include <asl/dom/Value.h>
+#include <asl/math/Matrix4.h>
+#include <asl/base/Path.h>
+#include <asl/zip/PackageManager.h>
 
 namespace y60 {
     /**
     * @ingroup y60image
-    * Facade for an image node in the dom.
+    * Texture atlas creation and use.
     */
     class Y60_IMAGE_DECL TextureAtlas {
         public:
-            typedef std::vector<dom::ResizeableRasterPtr> Subtextures;
-            static asl::Ptr<TextureAtlas> generate(const std::vector<std::string> & theNames, 
-                    const Subtextures & theBitmaps,
-                    bool thePixelBorderFlag = true,bool theForcePowerOfTwoFlag = false);
-            const dom::ResizeableRasterPtr getRaster() const { return _masterRaster; };
+            typedef std::map<std::string, dom::ResizeableRasterPtr> Subtextures;
+            typedef std::map<std::string, asl::Matrix4f> UVTranslations;
+
+            TextureAtlas(const Subtextures & theBitmaps,
+                         bool thePixelBorderFlag = true, bool theForcePowerOfTwoFlag = false);
+
+            TextureAtlas(const asl::Path & theFilename, asl::Ptr<asl::PackageManager> thePackageManager = asl::Ptr<asl::PackageManager>());
+
+            const dom::ResizeableRasterPtr getRaster() const;
+
+            bool findTextureTranslation(const std::string & theTextureName, asl::Matrix4f & theTranslation) const;
+            asl::AC_SIZE_TYPE getTextureCount() const { return _translations.size(); };
+            void saveToFile(const asl::Path & theFilename) const;
+            const asl::Path & getRasterPath() const { return _masterRasterPath; }; 
+
         private:
-            TextureAtlas(asl::AC_SIZE_TYPE width, asl::AC_SIZE_TYPE height); 
-            dom::ResizeableRasterPtr _masterRaster;
+            TextureAtlas();
+            TextureAtlas(const TextureAtlas &);
+            TextureAtlas operator=(const TextureAtlas &);
+
+            friend class TextureAtlasUVTest; // for tests 
+            static asl::Matrix4f createUVTranslation(const asl::Vector2<asl::AC_SIZE_TYPE> & theAtlasSize,
+                    const asl::Vector2<asl::AC_SIZE_TYPE> & theBitmapSize, const asl::Vector2<asl::AC_SIZE_TYPE> & theBitmapPosition,
+                    bool theRotatedFlag);
+
+            asl::Path _masterRasterPath;
+            mutable dom::ResizeableRasterPtr _masterRaster; // lazy loading
+            UVTranslations _translations;
     };
     typedef asl::Ptr<TextureAtlas> TextureAtlasPtr; 
 }

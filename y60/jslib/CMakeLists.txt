@@ -26,6 +26,7 @@ JSStation.cpp
 JSStringMover.cpp
 JSSvgPath.cpp
 JSTestServer.cpp
+JSTextureAtlas.cpp
 JSZipWriter.cpp
 JSfile_functions.cpp
 JSintersection_functions.cpp
