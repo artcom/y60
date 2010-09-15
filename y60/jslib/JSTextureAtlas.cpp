@@ -101,11 +101,31 @@ FindTextureTranslation(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, js
     } HANDLE_CPP_EXCEPTION;
 }
 
+static JSBool
+SaveToFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Saves the Atlas to the given file");
+    DOC_PARAM("theFilename", "", DOC_TYPE_STRING);
+    DOC_END;
+    try {
+        ensureParamCount(argc, 1, PLUS_FILE_LINE);
+
+        JSTextureAtlas::OWNERPTR myNative;
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
+
+        string theSaveToFilename;
+        convertFrom(cx, argv[0], theSaveToFilename);
+
+        myNative->saveToFile(Path(theSaveToFilename, UTF8));
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
 JSFunctionSpec *
 JSTextureAtlas::Functions() {
     static JSFunctionSpec myFunctions[] = {
         // name                  native                   nargs
         {"findTextureTranslation",   FindTextureTranslation,          1},
+        {"saveToFile",               SaveToFile            ,          1},
         {0}
     };
     return myFunctions;
