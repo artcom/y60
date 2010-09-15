@@ -53,7 +53,7 @@ public:
             addCursorFilter("update", "id");
         }
         // no default cursor smoothing 
-        _myMaxCursorPositionsForAverage = 1;
+        _myMaxCursorPositionsInHistory = 1;
     }
 
     ~TUIOPlugin()
@@ -73,7 +73,7 @@ public:
         int myFilterFlag = 0;
         myFilterFlag = getSetting( mySettings, "FilterMultipleMovePerCursor", myFilterFlag);
         _myFilterMultipleMovePerCursorFlag = (myFilterFlag == 1 ? true : false);
-        _myMaxCursorPositionsForAverage = getSetting( mySettings, "MaxCursorPositionsForAverage", _myMaxCursorPositionsForAverage);
+        _myMaxCursorPositionsInHistory = getSetting( mySettings, "MaxCursorPositionsForAverage", _myMaxCursorPositionsInHistory);
     }
 
     dom::NodePtr
