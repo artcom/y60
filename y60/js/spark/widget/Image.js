@@ -123,22 +123,6 @@ spark.Image.Constructor = function (Protected) {
         _myUseCaching = theFlag;
     });
 
-    /* TODO clean this up:
-     *
-     * 1) if theCachedMaterial is given, use this material.
-     *    - what happens to height & width?
-     *    - we should set image & image-src, flagging it as "not owned"
-     *    - we should set _myTexture to null
-     * 
-     * 2) if "useCaching" is true:
-     *    - _myTexture is set to owned texture
-     *    - _myMaterial is set to owned material
-     *    - image & image-src is set to shared image, flagging it as "now owned"
-     *
-     * 3) if texture atlas is used:
-     *    - the result is similar to cachedMaterial
-     *    - new UV Coords must be handed over to base class (or we modify them afterwards)
-     */
     Base.realize = Public.realize;
     Public.realize = function (theCachedMaterial) {
         var myImageSource = Protected.getString("src", "");
@@ -157,7 +141,12 @@ spark.Image.Constructor = function (Protected) {
                 _mySourceId = myImageSourceId;
             }
         } else {
-            this.src = myImageSource;
+            if (_myUseCaching) {
+                _myImage = spark.getCachedImage(myImageSource);
+            } else {
+                _myImage = Modelling.createImage(window.scene, myImageSource);
+            }
+            _mySource = myImageSource;
             myWidth = Protected.getNumber("width", _myImage.raster.width);
             myHeight = Protected.getNumber("height", _myImage.raster.height);
         }
