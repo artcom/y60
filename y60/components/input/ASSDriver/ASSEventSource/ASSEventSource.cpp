@@ -142,7 +142,7 @@ ASSEventSource::onUpdateSettings(dom::NodePtr theSettings) {
     AC_DEBUG << "updating ASSEventSource settings";
 
     dom::NodePtr mySettings = getASSSettings( theSettings );
-    getConfigSetting( mySettings, "MaxCursorPositionsForAverage", _myMaxCursorPositionsForAverage, static_cast<unsigned int> (10) );
+    getConfigSetting( mySettings, "MaxCursorPositionsForAverage", _myMaxCursorPositionsInHistory, static_cast<unsigned int> (10) );
     
     int myFilterFlag = 0;
     getConfigSetting( mySettings, "FilterMultipleMovePerCursor", myFilterFlag, 1);

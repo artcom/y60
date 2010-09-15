@@ -61,10 +61,10 @@
 using namespace std;
 using namespace asl;
 namespace y60 {
-    const unsigned int GenericEventSourceFilter::MAX_CURSOR_POSITIONS_FOR_AVERAGE = 10;
+    const unsigned int GenericEventSourceFilter::MAX_CURSOR_POSITIONS_IN_HISTORY = 10;
 
     GenericEventSourceFilter::GenericEventSourceFilter():
-        _myMaxCursorPositionsForAverage(MAX_CURSOR_POSITIONS_FOR_AVERAGE),
+        _myMaxCursorPositionsInHistory(MAX_CURSOR_POSITIONS_IN_HISTORY),
         _myFilterMultipleMovePerCursorFlag(true)
     {}
 
@@ -152,17 +152,27 @@ namespace y60 {
         }
     }
 
-    asl::Vector3f 
-    GenericEventSourceFilter::calculateAveragePosition(const unsigned int theCursorId, const asl::Vector3f & thePosition) {
-        
+    void
+    GenericEventSourceFilter::addPositionToHistory(const unsigned int theCursorId, const asl::Vector3f & thePosition) {
         if (_myCursorPositionHistory.find(theCursorId) == _myCursorPositionHistory.end()) {
             _myCursorPositionHistory[theCursorId] = CursorPositions();
         }
         
-        if (_myCursorPositionHistory[theCursorId].size() >= _myMaxCursorPositionsForAverage) {
+        if (_myCursorPositionHistory[theCursorId].size() >= _myMaxCursorPositionsInHistory) {
             _myCursorPositionHistory[theCursorId].pop_front();
         }
         _myCursorPositionHistory[theCursorId].push_back(thePosition);
+    }
+
+    void
+    GenericEventSourceFilter::addPositionToHistory(const unsigned int theCursorId, const asl::Vector2f & thePosition) {
+        asl::Vector3f myPosition(thePosition[0], thePosition[1], 0);
+        addPositionToHistory(theCursorId, myPosition);
+    }
+
+    asl::Vector3f 
+    GenericEventSourceFilter::calculateAveragePosition(const unsigned int theCursorId, const asl::Vector3f & thePosition) {
+        addPositionToHistory(theCursorId, thePosition);
         return getAveragePosition(theCursorId);
     }
 

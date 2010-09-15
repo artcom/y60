@@ -79,7 +79,7 @@ namespace y60 {
 
     class Y60_INPUT_DECL GenericEventSourceFilter {
         public:
-            static const unsigned int MAX_CURSOR_POSITIONS_FOR_AVERAGE;
+            static const unsigned int MAX_CURSOR_POSITIONS_IN_HISTORY;
             GenericEventSourceFilter();
             virtual ~GenericEventSourceFilter();
         protected:    
@@ -97,12 +97,14 @@ namespace y60 {
                 }
             };
 
+            void addPositionToHistory(const unsigned int theCursorId, const asl::Vector3f & thePosition);
+            void addPositionToHistory(const unsigned int theCursorId, const asl::Vector2f & thePosition);
             asl::Vector3f calculateAveragePosition(const unsigned int theCursorId, const asl::Vector3f & thePosition);
             asl::Vector2f calculateAveragePosition(const unsigned int theCursorId, const asl::Vector2f & thePosition);
             void clearCursorHistoryOnRemove(const EventPtrList & theEventList);
 
             std::map<int, std::deque<asl::Vector3f> >   _myCursorPositionHistory;
-            unsigned int _myMaxCursorPositionsForAverage;
+            unsigned int _myMaxCursorPositionsInHistory;
             bool _myFilterMultipleMovePerCursorFlag;
         private:          
             void applyCursorFilter(const std::string & theEventType, const std::string & theIdAttributeName, EventPtrList & theEventList);

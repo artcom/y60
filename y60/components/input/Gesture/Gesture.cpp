@@ -167,6 +167,7 @@ void
 Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent, int theID, const std::string & theType, const Vector3f & thePosition3D, unsigned long long & theTimestamp)
 {
     MAKE_SCOPE_TIMER(Gesture_createEvent);
+        addPositionToHistory(theID, thePosition3D);
         if (theType == "add") {
             AC_DEBUG << "Gesture::createEvent -> add";
 
@@ -266,25 +267,10 @@ Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent, int theID, const std:
                 } 
             }     
             if (!myPartnerFoundFlag) {
-                Vector3f myDifference = difference(thePosition3D, myLastPosition);
+                Vector3f myDifference = difference(thePosition3D, _myCursorPositionHistory[theID].front());
                 float myMagnitude = magnitude(myDifference);
 				AC_INFO << "check for wipe with magnitude " << myMagnitude << " threshold " << _myWipeDistanceThreshold;
                 if ( myMagnitude > _myWipeDistanceThreshold ) {
-                    
-                    /*unsigned long long myLastTimestamp = _myLastCursorPositions[theID]._myTimestamp; 
-                    unsigned long long myTimeDifference = theTimestamp - myLastTimestamp;
-
-                    if (myTimeDifference == 0) {
-                        myTimeDifference  = 1000;
-                    }
-                    myMagnitude /= myTimeDifference/1000.0f;*/
-
-
-                    //magnitude is velocity from beginning of wipe until current position
-                    //myMagnitude = magnitude(difference(thePosition3D, _myInitialCursorPositions._myPosition))/
-                    //              magnitude(difference(theTimestamp, _myInitialCursorPositions._myTimestamp));
-
-                    // register wipe event
                     NodePtr myNode = addGestureEvent2Queue(theBaseEvent, theID, "wipe", thePosition3D);
 					myNode->appendAttribute<Vector3f>("direction", normalized(myDifference));
                     myNode->appendAttribute<float>("magnitude", myMagnitude);
@@ -312,11 +298,14 @@ Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent, int theID, const std:
                 Vector3f myDifference = difference(thePosition3D, _myInitialCursorPositions[theID]._myPosition);
                 float myMagnitude = magnitude(myDifference);
                 unsigned int myDuration = _myCurrentCursorPositions[theID]._myTimestamp - _myInitialCursorPositions[theID]._myTimestamp;
-				AC_INFO << "check for tap with magnitude " << myMagnitude << " threshold " << _myWipeDistanceThreshold << " - duration " << myDuration << " threshold " << _myTapMaxDurationThreshold;
+				AC_INFO << "check for tap with magnitude " << myMagnitude << " threshold " << _myTapMaxDistanceThreshold << " - duration " << myDuration << " threshold " << _myTapMaxDurationThreshold;
                 if (myMagnitude < _myTapMaxDistanceThreshold &&  myDuration < _myTapMaxDurationThreshold) {
                     NodePtr myNode = addGestureEvent2Queue(theBaseEvent, theID, "tap", thePosition3D);
 					AC_INFO << "register tap gesture, id " << theID << " pos " << thePosition3D;
                 }
+            }
+            if (_myCursorPositionHistory.find(theID) != _myCursorPositionHistory.end()) {
+                _myCursorPositionHistory.erase(theID);
             }
             if (_myInitialZoomDistance.find(theID) != _myInitialZoomDistance.end()) {
                 _myInitialZoomDistance.erase(theID);
@@ -348,6 +337,7 @@ Gesture::onUpdateSettings(dom::NodePtr theSettings) {
      _myZoomDistanceThreshold = getSetting( theSettings, "ZoomDistanceThreshold", _myZoomDistanceThreshold);
      _myTapMaxDistanceThreshold = getSetting( theSettings, "TapMaxDistanceThreshold", _myTapMaxDistanceThreshold);
      _myTapMaxDurationThreshold = getSetting( theSettings, "TapMaxDurationThreshold", _myTapMaxDurationThreshold);
+     _myMaxCursorPositionsInHistory = getSetting( theSettings, "MaxCursorPositionsInHistory", _myMaxCursorPositionsInHistory);
 }
 
 void
