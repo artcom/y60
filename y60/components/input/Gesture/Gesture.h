@@ -51,6 +51,7 @@ class Gesture : public asl::PlugInBase,
         static const float ROTATE_ANGLE_THRESHOLD;
         static const float ZOOM_DISTANCE_THRESHOLD;
         static const float TAP_MAX_DISTANCE_THRESHOLD;			 
+        static const unsigned int TAP_MIN_DURATION_THRESHOLD;		
         static const unsigned int TAP_MAX_DURATION_THRESHOLD;		
 
         Gesture(asl::DLHandle theHandle);
@@ -108,6 +109,7 @@ class Gesture : public asl::PlugInBase,
         float                           _myRotateAngleThreshold;
         float                           _myZoomDistanceThreshold;
         float                           _myTapMaxDistanceThreshold;
+        unsigned int                    _myTapMinDurationThreshold;
         unsigned int                    _myTapMaxDurationThreshold;
 
         unsigned int                    _myEventCounter;

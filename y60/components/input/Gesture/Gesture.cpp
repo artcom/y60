@@ -31,7 +31,8 @@ namespace y60 {
     const float Gesture::ROTATE_ANGLE_THRESHOLD = 1.0;        //fill me
     const float Gesture::ZOOM_DISTANCE_THRESHOLD = 0.0;		  //fill me
 	const float Gesture::TAP_MAX_DISTANCE_THRESHOLD = 40.0;	  //max movement of cursor, larger distances can not be tap gestures
-	const unsigned int Gesture::TAP_MAX_DURATION_THRESHOLD = 1;	  //cursors with longer durations will not lead to taps
+	const unsigned int Gesture::TAP_MIN_DURATION_THRESHOLD = 50;	  //cursors with longer durations will not lead to taps
+	const unsigned int Gesture::TAP_MAX_DURATION_THRESHOLD = 500;	  //cursors with longer durations will not lead to taps
 
 Gesture::Gesture(DLHandle theHandle) :
     asl::PlugInBase( theHandle ),
@@ -43,6 +44,7 @@ Gesture::Gesture(DLHandle theHandle) :
     _myRotateAngleThreshold(ROTATE_ANGLE_THRESHOLD),
     _myZoomDistanceThreshold(ZOOM_DISTANCE_THRESHOLD),
     _myTapMaxDistanceThreshold(TAP_MAX_DISTANCE_THRESHOLD),
+    _myTapMinDurationThreshold(TAP_MIN_DURATION_THRESHOLD),
     _myTapMaxDurationThreshold(TAP_MAX_DURATION_THRESHOLD),
     _myEventCounter(0)
 {
@@ -275,6 +277,8 @@ Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent, int theID, const std:
 					myNode->appendAttribute<Vector3f>("direction", normalized(myDifference));
                     myNode->appendAttribute<float>("magnitude", myMagnitude);
 					AC_INFO << "register wipe gesture, id " << theID << " direction " << normalized(myDifference) << " magnitude " << myMagnitude;
+                    //delete history to avoid additional wipes in next cursor moves
+                    _myCursorPositionHistory.clear();
                 } 
             }
         } else if (theType == "remove") {
@@ -298,8 +302,10 @@ Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent, int theID, const std:
                 Vector3f myDifference = difference(thePosition3D, _myInitialCursorPositions[theID]._myPosition);
                 float myMagnitude = magnitude(myDifference);
                 unsigned int myDuration = _myCurrentCursorPositions[theID]._myTimestamp - _myInitialCursorPositions[theID]._myTimestamp;
-				AC_INFO << "check for tap with magnitude " << myMagnitude << " threshold " << _myTapMaxDistanceThreshold << " - duration " << myDuration << " threshold " << _myTapMaxDurationThreshold;
-                if (myMagnitude < _myTapMaxDistanceThreshold &&  myDuration < _myTapMaxDurationThreshold) {
+				AC_INFO << "check for tap with magnitude " << myMagnitude << " threshold " << _myTapMaxDistanceThreshold << " - duration: " << myDuration << ", >= threshold: " << _myTapMinDurationThreshold << " < threshold: " << _myTapMaxDurationThreshold;
+                if (myMagnitude < _myTapMaxDistanceThreshold &&  
+                    myDuration < _myTapMaxDurationThreshold &&
+                    myDuration >= _myTapMinDurationThreshold) {
                     NodePtr myNode = addGestureEvent2Queue(theBaseEvent, theID, "tap", thePosition3D);
 					AC_INFO << "register tap gesture, id " << theID << " pos " << thePosition3D;
                 }
@@ -336,6 +342,7 @@ Gesture::onUpdateSettings(dom::NodePtr theSettings) {
      _myRotateAngleThreshold = getSetting( theSettings, "RotateAngleThreshold", _myRotateAngleThreshold);
      _myZoomDistanceThreshold = getSetting( theSettings, "ZoomDistanceThreshold", _myZoomDistanceThreshold);
      _myTapMaxDistanceThreshold = getSetting( theSettings, "TapMaxDistanceThreshold", _myTapMaxDistanceThreshold);
+     _myTapMinDurationThreshold = getSetting( theSettings, "TapMinDurationThreshold", _myTapMinDurationThreshold);
      _myTapMaxDurationThreshold = getSetting( theSettings, "TapMaxDurationThreshold", _myTapMaxDurationThreshold);
      _myMaxCursorPositionsInHistory = getSetting( theSettings, "MaxCursorPositionsInHistory", _myMaxCursorPositionsInHistory);
 }
