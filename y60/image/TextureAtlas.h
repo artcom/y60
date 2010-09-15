@@ -64,6 +64,8 @@
 
 #include <asl/dom/Value.h>
 #include <asl/math/Matrix4.h>
+#include <asl/base/Path.h>
+#include <asl/zip/PackageManager.h>
 
 namespace y60 {
     /**
@@ -78,10 +80,14 @@ namespace y60 {
             TextureAtlas(const Subtextures & theBitmaps,
                          bool thePixelBorderFlag = true, bool theForcePowerOfTwoFlag = false);
 
-            const dom::ResizeableRasterPtr getRaster() const { return _masterRaster; };
+            TextureAtlas(const asl::Path & theFilename, asl::Ptr<asl::PackageManager> thePackageManager = asl::Ptr<asl::PackageManager>());
+
+            const dom::ResizeableRasterPtr getRaster() const;
 
             bool findTextureTranslation(const std::string & theTextureName, asl::Matrix4f & theTranslation) const;
             asl::AC_SIZE_TYPE getTextureCount() const { return _translations.size(); };
+            void saveToFile(const asl::Path & theFilename) const;
+            const asl::Path & getRasterPath() const { return _masterRasterPath; }; 
 
         private:
             TextureAtlas();
@@ -92,7 +98,9 @@ namespace y60 {
             static asl::Matrix4f createUVTranslation(const asl::Vector2<asl::AC_SIZE_TYPE> & theAtlasSize,
                     const asl::Vector2<asl::AC_SIZE_TYPE> & theBitmapSize, const asl::Vector2<asl::AC_SIZE_TYPE> & theBitmapPosition,
                     bool theRotatedFlag);
-            dom::ResizeableRasterPtr _masterRaster;
+
+            asl::Path _masterRasterPath;
+            mutable dom::ResizeableRasterPtr _masterRaster; // lazy loading
             UVTranslations _translations;
     };
     typedef asl::Ptr<TextureAtlas> TextureAtlasPtr; 

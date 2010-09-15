@@ -83,6 +83,7 @@
 #include "JSSerial.h"
 #include "JSStation.h"
 #include "JSProcess.h"
+#include "JSTextureAtlas.h"
 
 #include <y60/jsbase/JSSphere.h>
 #include <y60/jsbase/JSBox.h>
@@ -300,6 +301,9 @@ bool initCppClasses(JSContext *cx, JSObject *theGlobalObject) {
         return false;
     }
     if (!JSPerlinNoise::initClass(cx, theGlobalObject)) {
+        return false;
+    }
+    if (!JSTextureAtlas::initClass(cx, theGlobalObject)) {
         return false;
     }
     /*

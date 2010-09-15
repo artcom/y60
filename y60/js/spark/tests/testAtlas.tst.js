@@ -3,7 +3,6 @@
          ENSURE, ENSURE_EQUAL, spark, Vector2f, Vector3f, Node*/
 
 use("UnitTest.js");
-
 // Other imports needed for the tests
 use("spark/spark.js");
 
@@ -16,12 +15,31 @@ function SparkAtlasTest() {
 SparkAtlasTest.prototype.Constructor = function (obj, theName) {
     UnitTest.prototype.Constructor(obj, theName);
 
+    function testConstructor() {
+        // test load constructor
+        obj.newAtlas = new TextureAtlas("fixtures/textureAtlas.xml");
+        ENSURE('obj.newAtlas instanceof TextureAtlas');
+        ENSURE('obj.newAtlas.imagePath === "fixtures/textureAtlas.png"');
+        ENSURE_EXCEPTION("new TextureAtlas( 'fixtures/file-not-found')");
+
+        // test generating constructor
+        obj.newAtlas = new TextureAtlas( { 'red': 'fixtures/textures/testbild00.rgb' } );
+        ENSURE('obj.newAtlas instanceof TextureAtlas');
+        ENSURE_EXCEPTION("new TextureAtlas( { 'red': 'fixtures/textures/file-not-found' } )");
+
+        ENSURE_EXCEPTION("new TextureAtlas()");
+    }
+
     function testAtlas() {
+        var newAtlas = new TextureAtlas( { 'red': 'fixtures/textures/testbild00.rgb' } );
+        print("foo:", newAtlas.findTextureTranslation("foo"));
+        print("red:", newAtlas.findTextureTranslation("red"));
         obj.App = spark.loadFile("fixtures/atlasTest.spark");
-        obj.App.go();
+        // obj.App.go();
     }
 
     obj.run = function () {
+        testConstructor();
         testAtlas();
     };
 };

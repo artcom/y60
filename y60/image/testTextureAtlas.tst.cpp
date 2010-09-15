@@ -64,11 +64,6 @@
 #include <asl/math/numeric_functions.h>
 
 #include <asl/base/UnitTest.h>
-
-#include <paintlib/plpngenc.h>
-#include <paintlib/planybmp.h>
-
-#include "PixelEncoding.h"
 #include "TextureAtlas.h"
 #include "Image.h"
 
@@ -232,6 +227,7 @@ public:
     void textPixels(const TextureAtlas & myAtlas, const string & theName, const Vector4f & theExpectedColor) {
         Matrix4f textureTranslation;
         ENSURE(myAtlas.findTextureTranslation(theName, textureTranslation) );
+        ENSURE(myAtlas.getRaster());
 
         Vector4f oneCorner = Vector4f(0,0,0,1) * textureTranslation;
         Vector4f otherCorner = Vector4f(1,1,0,1) * textureTranslation;
@@ -266,17 +262,6 @@ public:
         */
 
         TextureAtlas myAtlas(_mySubtextures, true, false);
-        {
-            Path myPath("test.png", UTF8);
-            PLAnyBmp myBmp;
-            PLPixelFormat pf;
-            mapPixelEncodingToFormat(y60::RGBA, pf);
-
-            myBmp.Create( myAtlas.getRaster()->width(), myAtlas.getRaster()->height(), pf,
-                    const_cast<unsigned char*>(myAtlas.getRaster()->pixels().begin()), myAtlas.getRaster()->width() * 4);
-            PLPNGEncoder myEncoder;
-            myEncoder.MakeFileFromBmp(myPath.toLocale().c_str(), &myBmp);
-        }
 
         Matrix4f textureTranslation;
         ENSURE( ! myAtlas.findTextureTranslation("doesn't exist", textureTranslation) );
@@ -285,6 +270,22 @@ public:
         textPixels(myAtlas, "blue", Vector4f(0,0,1,1));
         textPixels(myAtlas, "yellow", Vector4f(1,1,0,1));
         textPixels(myAtlas, "green", Vector4f(0,1,0,1));
+    }
+    
+    void testLoadSave() {
+        _mySubtextures.clear();
+        makeSubtexture("red", 5, 1, Vector4f(1,0,0,1));
+        makeSubtexture("blue", 2, 2, Vector4f(0,0,1,1));
+
+        TextureAtlas firstAtlas(_mySubtextures, true, false);
+        firstAtlas.saveToFile(asl::Path("test.xml", UTF8));
+
+        TextureAtlas secondAtlas(asl::Path("test.xml", UTF8));
+
+        Matrix4f textureTranslation;
+        ENSURE( ! secondAtlas.findTextureTranslation("doesn't exist", textureTranslation) );
+        textPixels(secondAtlas, "red", Vector4f(1,0,0,1));
+        textPixels(secondAtlas, "blue", Vector4f(0,0,1,1));
     }
 
     void testDuplicates() {
@@ -299,6 +300,7 @@ public:
     void run() {
         testDuplicates();
         testBitmap();
+        testLoadSave();
     }
 
     TextureAtlas::Subtextures _mySubtextures;

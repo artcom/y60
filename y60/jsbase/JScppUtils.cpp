@@ -268,13 +268,16 @@ template Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, const std::vector<float> 
 template Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, const std::vector<double> & theVector);
 template Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, const std::vector<std::string> & theVector);
 
-void ensureParamCount(uintN argc, int theMinCount, int theMaxCount) {
+void ensureParamCount(uintN argc, int theMinCount, int theMaxCount, const std::string & where) {
     if ( static_cast<int>(argc) < theMinCount) {
-        throw Exception(string("Not enough arguments, ")+as_string(theMinCount)+" expected.");
+        throw Exception(string("Not enough arguments, ")+as_string(theMinCount)+" expected.", where);
     }
     if (theMaxCount && static_cast<int>(argc) > theMaxCount) {
-        throw Exception(string("Too many arguments, ")+as_string(theMaxCount)+" accepted.");
+        throw Exception(string("Too many arguments, ")+as_string(theMaxCount)+" accepted.", where);
     }
+};
+void ensureParamCount(uintN argc, int theMinCount, const std::string & where) {
+    ensureParamCount(argc, theMinCount, 0, where);
 };
 
 void

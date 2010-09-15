@@ -61,8 +61,16 @@
 #include "PixelEncoding.h"
 
 #include <asl/base/Exception.h>
+#include <asl/base/file_functions.h>
+#include <asl/dom/Nodes.h>
 #include <asl/math/numeric_functions.h>
 #include <netsrc/texture-atlas/TexturePacker.h>
+
+#include <paintlib/plpngenc.h>
+#include <paintlib/planybmp.h>
+
+#include "PixelEncoding.h"
+#include "ImageLoader.h"
 
 using namespace asl;
 using namespace std;
@@ -135,6 +143,16 @@ namespace y60 {
         TEXTURE_PACKER::releaseTexturePacker(tp);
     };
 
+    const dom::ResizeableRasterPtr 
+    TextureAtlas::getRaster() const {
+        if (!_masterRaster) {
+            // load the raster
+            ImageLoader imageLoader(_masterRasterPath.toLocale());
+            _masterRaster = imageLoader.getRaster();
+        }
+        return _masterRaster;
+    }
+
     asl::Matrix4f 
     TextureAtlas::createUVTranslation(const asl::Vector2<asl::AC_SIZE_TYPE> & theAtlasSize,
             const asl::Vector2<asl::AC_SIZE_TYPE> & theBitmapSize, 
@@ -164,6 +182,73 @@ namespace y60 {
        }
        theTranslation = it->second;
        return true;
+    }
+
+    TextureAtlas::TextureAtlas(const asl::Path & theFilename, PackageManagerPtr thePackageManager) {
+        dom::Node doc;
+        std::ifstream inFile;
+
+        if (thePackageManager) {
+            std::string packagedFile = thePackageManager->searchFile(theFilename.toLocale());
+            if (!packagedFile.empty()) {
+                inFile.open(packagedFile.c_str(), std::ios::binary);
+            }
+        }
+
+        if (!inFile.is_open() && fileExists(theFilename.toLocale())) {
+            inFile.open(theFilename.toLocale().c_str(), std::ios::binary);
+        }
+        if (!inFile || !inFile.is_open()) {
+            if (thePackageManager) {
+                throw Exception(std::string("atlas definition '") + theFilename.toLocale()+ "' not found in " +
+                        thePackageManager->getSearchPath(), PLUS_FILE_LINE);
+            } else {
+                throw Exception(std::string("atlas definition '") + theFilename.toLocale() + "' not found in " +
+                        "current directory.", PLUS_FILE_LINE);
+            }
+        }
+        inFile >> doc;
+        std::string atlasDirectory = getDirectoryPart(theFilename.toUTF8());
+
+        _masterRasterPath = Path(atlasDirectory+ doc.childNode("TextureAtlas")->getAttributeString("src"), UTF8);
+        // load the translation table
+        for (AC_SIZE_TYPE i = 0; i < doc.childNode("TextureAtlas")->childNodesLength("Subtexture"); ++i) {
+            const dom::NodePtr subTextureNode =  doc.childNode("TextureAtlas")->childNode("Subtexture",i);
+            _translations.insert(make_pair(subTextureNode->getAttributeString("name"),
+                                           subTextureNode->getAttributeValue<asl::Matrix4f>("matrix")));
+        }
+    }
+
+    void
+    TextureAtlas::saveToFile(const asl::Path & theFilename) const {
+        // save the bitmap
+        Path bitmapPath(removeExtension(theFilename.toUTF8())+".png", UTF8);
+        PLAnyBmp myBmp;
+        PLPixelFormat pf;
+        mapPixelEncodingToFormat(y60::RGBA, pf);
+
+        myBmp.Create( getRaster()->width(), getRaster()->height(), pf,
+                const_cast<unsigned char*>(getRaster()->pixels().begin()), getRaster()->width() * 4);
+        PLPNGEncoder myEncoder;
+        myEncoder.MakeFileFromBmp(bitmapPath.toLocale().c_str(), &myBmp);
+        // save the translation table
+        dom::Document doc;
+        dom::NodePtr root = doc.appendChild(dom::Element("TextureAtlas"));
+        root->appendAttribute("src", bitmapPath);
+        UVTranslations::const_iterator it = _translations.begin();
+        for (; it != _translations.end(); ++it) {
+            dom::NodePtr subtexture = root->appendChild(dom::Element("Subtexture"));
+            subtexture->appendAttribute("name", it->first);
+            subtexture->appendAttribute("matrix", it->second);
+        };
+        std::ofstream myFile(theFilename.toLocale().c_str(), std::ios_base::trunc | std::ios_base::out);
+        if (!myFile) {
+            throw Exception(std::string("Can not open file '") + theFilename.toLocale() + "' for writing", PLUS_FILE_LINE);
+        }
+        doc.print(myFile, "", true);
+        if (!myFile) {
+            throw Exception(std::string("Could not write text file '") + theFilename.toLocale() + "'", PLUS_FILE_LINE);
+        }
     }
 
 }

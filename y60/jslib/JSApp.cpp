@@ -512,6 +512,11 @@ being handed input arguments and comparing them with a list of allowed arguments
                 DB(AC_TRACE << "PropName[" << i << "] = '" << myPropName << "' -> '" << myValueString << "'" << endl);
             }
         }
+        if (myPropIds) {
+            JS_DestroyIdArray(cx, myPropIds);
+            myPropIds = 0;
+        }
+
         myArguments.parse(myArgs);
 
         // create a JS "arguments" object

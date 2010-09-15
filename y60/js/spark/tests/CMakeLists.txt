@@ -5,6 +5,7 @@ Loader
 Rectangle
 Canvas
 Slider
+Atlas
 )
 
 set(NOCG_TESTS
