@@ -200,6 +200,12 @@ JSTextureAtlas::createSubtexturesFromJSObject(JSContext *cx, JSObject * theSubte
                 throw ArgumentConversionFailed("JSTextureAtlas: value for '"+textureName+"' must be a file path (string)", PLUS_FILE_LINE);
             };
             ImageLoader imageLoader(Path(texturePath, UTF8).toLocale(), JSApp::getPackageManager());
+
+            if (!imageLoader.HasAlpha()) { // or is (imageLoader.GetBitsPerPixel() != 32) correct here?
+                AC_TRACE << "   imagefile '" << texturePath << "' has no alpha channel (" << imageLoader.GetBitsPerPixel() << " bits/pixel): correcting to  32 bits/pixel with alpha channel";
+                imageLoader.setFixedAlpha(1.0);
+            }
+            
             dom::ResizeableRasterPtr myRaster = imageLoader.getRaster();
             mySubtextures.insert(make_pair(textureName, myRaster));
         }
