@@ -203,6 +203,12 @@ protected:
         myNode->appendAttribute<double>("value_time", myValueTime.getSeconds() + (myValueTime.getMicroseconds() / 1000000.0));
 
         Vector2f myPosition = Vector2f(myCursor->getX(), myCursor->getY());
+        if (myCursor->getX() < 0 || myCursor->getX() > 1 || myCursor->getY() < 0 || myCursor->getY() > 1) {
+            AC_WARNING << "illegal coordinates " << myCursor->getX() << " " << myCursor->getY();
+            myPosition[0] = asl::clamp(myCursor->getX(),0.0f,1.0f);
+            myPosition[1] = asl::clamp(myCursor->getY(),0.0f,1.0f);
+            AC_WARNING << "fixed coordinates " << myPosition;
+        }
         myPosition = calculateAveragePosition(myCursor->getSessionID(), myPosition);
         myNode->appendAttribute<Vector2f>("position", myPosition);
         myNode->appendAttribute<Vector2f>("velocity", Vector2f(myCursor->getXSpeed(), myCursor->getYSpeed()));
