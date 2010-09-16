@@ -477,6 +477,7 @@ ParseArguments(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
 being handed input arguments and comparing them with a list of allowed arguments.");
     DOC_PARAM("theArguments", "Array of argument-strings to parse", DOC_TYPE_ARRAY);
     DOC_PARAM("theAllowedOptions", "(array-of-(array-of-string))", DOC_TYPE_ARRAY);
+    DOC_PARAM("theAdditionalUsage", "string-of-additional-usage", DOC_TYPE_STRING);
     DOC_RVAL("(array-of-string) arguments object", DOC_TYPE_ARRAY);
     DOC_END;
     try {

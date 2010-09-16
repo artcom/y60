@@ -69,6 +69,8 @@ spark.AtlasImage.Constructor = function (Protected) {
         _myAtlasPath = theAtlasPath;
         _mySubTextureName = theTextureName;
         _applyAtlasTextureInformation();
+        Protected.material = _getMaterial(theTextureName, theAtlasPath);
+        Protected.material.properties.blendfunction = "[src_alpha,one_minus_src_alpha,one,one_minus_src_alpha]";
         Public.size = Public.root.textureAtlasManager.getSize(_mySubTextureName, _myAtlasPath);
     };
 };
