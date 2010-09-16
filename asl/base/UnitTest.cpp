@@ -279,16 +279,12 @@ UnitTest::setMyName(const char * theName) {
 
 std::string
 UnitTest::getTempDirectory() const {
-#ifdef CMAKE_CURRENT_BINARY_DIR
-    std::string tempDirectory("#CMAKE_CURRENT_BINARY_DIR/");
-#else
-    std::string tempDirectory;
-#endif    
-    tempDirectory += string("Testing/")+_myName+"/";
+    std::string tempDirectory("Testing/");
+    tempDirectory += _myName;
     if (!isDirectory(tempDirectory)) {
         createDirectory(tempDirectory);
     }
-    return tempDirectory;
+    return tempDirectory+"/";
 }
 
 void
