@@ -343,6 +343,7 @@ struct gray : public Pixel<ColorGray,VALUE, gray<VALUE> > {
     gray(const VALUE & initValue) : Pixel<ColorGray, VALUE, gray<VALUE> >::base_type(initValue) {}
     gray(const typename Pixel<ColorGray, VALUE, gray<VALUE> >::base_type & initValue) :
                 Pixel<ColorGray, VALUE, gray<VALUE> >::base_type(initValue) {}
+    static bool hasAlpha() { return true; };
 };
 
 // TODO: calculate pixelsum for gray values, fix free getter functions for red, green, blue, alpha etc.
@@ -380,6 +381,7 @@ struct RGB_t : public Triple<red<T>, green<T>, blue<T>, RGB_t<T> > {
     typedef T sequence_type[3];
     typedef T * iterator;
     typedef const T * const_iterator;
+    static bool hasAlpha() { return false; };
 
     T& operator[](int i) {return reinterpret_cast<T*>(this)[i];}
     const T& operator[](int i) const {return reinterpret_cast<const T*>(this)[i];};
@@ -422,6 +424,7 @@ struct BGR_t : public Triple<blue<T>, green<T>, red<T>, BGR_t<T> > {
     typedef T sequence_type[3];
     typedef T * iterator;
     typedef const T * const_iterator;
+    static bool hasAlpha() { return false; };
 
     T& operator[](int i) {return reinterpret_cast<T*>(this)[i];}
     const T& operator[](int i) const {return reinterpret_cast<const T*>(this)[i];};
@@ -462,6 +465,7 @@ struct HSV_t : public Triple<hue<T>, saturation<T>, gray<T>, HSV_t<T> >{
     typedef T sequence_type[3];
     typedef T * iterator;
     typedef const T * const_iterator;
+    static bool hasAlpha() { return false; };
 
     T& operator[](int i) {return reinterpret_cast<T*>(this)[i];}
     const T& operator[](int i) const {return reinterpret_cast<const T*>(this)[i];};
@@ -498,6 +502,7 @@ struct RGBA_t : public Quad<red<T>, green<T>, blue<T>, alpha<T>, RGBA_t<T> > {
     typedef T sequence_type[4];
     typedef T * iterator;
     typedef const T * const_iterator;
+    static bool hasAlpha() { return true; };
 
     T& operator[](int i) {return reinterpret_cast<T*>(this)[i];}
     const T& operator[](int i) const {return reinterpret_cast<const T*>(this)[i];};
@@ -534,6 +539,7 @@ struct ABGR_t : public Quad<alpha<T>, blue<T>, green<T>, red<T>, ABGR_t<T> > {
     typedef T sequence_type[4];
     typedef T * iterator;
     typedef const T * const_iterator;
+    static bool hasAlpha() { return true; };
 
     T& operator[](int i) {return reinterpret_cast<T*>(this)[i];}
     const T& operator[](int i) const {return reinterpret_cast<const T*>(this)[i];};
@@ -570,6 +576,7 @@ struct BGRA_t : public Quad<blue<T>, green<T>, red<T>, alpha<T>, BGRA_t<T> > {
     typedef T sequence_type[4];
     typedef T * iterator;
     typedef const T * const_iterator;
+    static bool hasAlpha() { return true; };
 
     T& operator[](int i) {return reinterpret_cast<T*>(this)[i];}
     const T& operator[](int i) const {return reinterpret_cast<const T*>(this)[i];};
@@ -599,6 +606,7 @@ struct BGRA_t : public Quad<blue<T>, green<T>, red<T>, alpha<T>, BGRA_t<T> > {
 
 struct DXT1 {
     unsigned long long value; // 8 bytes
+    static bool hasAlpha() { return false; }
 
     int bytesRequired(int x, int y, int z = 1) const {
         return x * y * z / 2;
@@ -635,6 +643,7 @@ struct DXT1 {
 
 struct DXT1a {
     unsigned long long value; // 8 bytes
+    static bool hasAlpha() { return false; }
 
     int bytesRequired(int x, int y, int z = 1) const {
         return x * y * z / 2;
@@ -671,6 +680,7 @@ struct DXT1a {
 struct DXT3 {
     unsigned long long value1; // 8 bytes
     unsigned long long value2; // 8 bytes
+    static bool hasAlpha() { return false; }
 
     int bytesRequired(int x, int y, int z = 1) const {
         return x * y * z ;
@@ -712,6 +722,7 @@ struct DXT3 {
 struct DXT5 {
     unsigned long long value1; // 8 bytes
     unsigned long long value2; // 8 bytes
+    static bool hasAlpha() { return false; }
 
     int bytesRequired(int x, int y, int z = 1) const {
         return x * y * z ;

@@ -82,12 +82,21 @@ DirectoryPackage::findFile(const std::string & theRelativePath) const {
 
 Ptr<ReadableStreamHandle>
 DirectoryPackage::getStream(const std::string & theRelativePath) {
-    return Ptr<ReadableStreamHandle>(new AlwaysOpenReadableFileHandle(getAbsolutePath(theRelativePath)));
+    std::string absolutePath = getAbsolutePath(theRelativePath);
+    if (fileExists(absolutePath) && !isDirectory(absolutePath)) {
+        return Ptr<ReadableStreamHandle>(new AlwaysOpenReadableFileHandle(getAbsolutePath(theRelativePath)));
+    } else {
+        return Ptr<ReadableStreamHandle>(0);
+    }
 }
 Ptr<ReadableBlockHandle>
 DirectoryPackage::getFile(const std::string & theRelativePath) {
-    std::string myPath = getAbsolutePath(theRelativePath);
-    return Ptr<ReadableBlockHandle>(new AnyReadableBlockHandle(asl::Ptr<ReadableBlock>(new ConstMappedBlock(myPath)), myPath));
+    std::string absolutePath = getAbsolutePath(theRelativePath);
+    if (fileExists(absolutePath) && !isDirectory(absolutePath)) {
+        return Ptr<ReadableBlockHandle>(new AnyReadableBlockHandle(asl::Ptr<ReadableBlock>(new ConstMappedBlock(absolutePath)), absolutePath));
+    } else {
+        return Ptr<ReadableBlockHandle>(0);
+    }
 }
 
 }

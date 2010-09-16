@@ -20,6 +20,8 @@ SparkAtlasTest.prototype.Constructor = function (obj, theName) {
         obj.newAtlas = new TextureAtlas("fixtures/textureAtlas.xml");
         ENSURE('obj.newAtlas instanceof TextureAtlas');
         ENSURE('obj.newAtlas.imagePath === "fixtures/textureAtlas.png"');
+        ENSURE('obj.newAtlas.findTextureSize("red").x == 5'); 
+        ENSURE('obj.newAtlas.findTextureSize("red").y == 1'); 
         ENSURE_EXCEPTION("new TextureAtlas( 'fixtures/file-not-found')");
 
         // test generating constructor
@@ -32,8 +34,6 @@ SparkAtlasTest.prototype.Constructor = function (obj, theName) {
 
     function testAtlas() {
         var newAtlas = new TextureAtlas( { 'red': 'fixtures/textures/testbild00.rgb' } );
-        print("foo:", newAtlas.findTextureTranslation("foo"));
-        print("red:", newAtlas.findTextureTranslation("red"));
         obj.App = spark.loadFile("fixtures/atlasTest.spark");
         // obj.App.go();
     }

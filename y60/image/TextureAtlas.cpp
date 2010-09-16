@@ -122,11 +122,15 @@ namespace y60 {
             int firstRowCol = thePixelBorderFlag ? -1 : 0;
             int lastRow = thePixelBorderFlag ? curBitmap->height()+1 : curBitmap->height();
             int lastCol = thePixelBorderFlag ? curBitmap->width()+1 : curBitmap->width();
+            bool fillAlpha = ! curBitmap->hasAlpha();
 
             for (asl::AC_OFFSET_TYPE y = firstRowCol; y < lastRow; ++y) {
                 for (asl::AC_OFFSET_TYPE x = firstRowCol; x < lastCol; ++x) {
                     asl::Vector4f myPixel = curBitmap->getPixel(clamp(x, static_cast<AC_OFFSET_TYPE>(0), static_cast<AC_OFFSET_TYPE>(curBitmap->width()-1)),
                                                                 clamp(y, static_cast<AC_OFFSET_TYPE>(0), static_cast<AC_OFFSET_TYPE>(curBitmap->height()-1)));
+                    if (fillAlpha) {
+                        myPixel[3] = 1.0f;
+                    }
                     if (rotated) {
                         _masterRaster->setPixel(y+targetX,x+targetY,myPixel);
                     } else {
@@ -137,8 +141,9 @@ namespace y60 {
             AC_TRACE << "creating UV Translation for " << it->first << " rotated:" << rotated;
             AC_TRACE << "        size: " << curBitmap->getSize();
             AC_TRACE << "    position: " << Vector2<AC_SIZE_TYPE>(targetX, targetY);
-            _translations.insert(make_pair(it->first, createUVTranslation(_masterRaster->getSize(), curBitmap->getSize(), 
-                           Vector2<AC_SIZE_TYPE>(targetX, targetY), rotated )));
+            asl::Matrix4f transMatrix = createUVTranslation(_masterRaster->getSize(), curBitmap->getSize(), 
+                           Vector2<AC_SIZE_TYPE>(targetX, targetY), rotated);
+            _translations.insert(make_pair(it->first, Subtexture(transMatrix, curBitmap->getSize())));
         }
         TEXTURE_PACKER::releaseTexturePacker(tp);
     };
@@ -175,30 +180,37 @@ namespace y60 {
     }
 
     bool 
+    TextureAtlas::findTextureSize(const std::string & theTextureName, asl::Vector2<AC_SIZE_TYPE> & theSize) const {
+       UVTranslations::const_iterator it = _translations.find(theTextureName);
+       if (it == _translations.end()) {
+           return false;
+       }
+       theSize = it->second.size;
+       return true;
+    }
+
+    bool 
     TextureAtlas::findTextureTranslation(const std::string & theTextureName, asl::Matrix4f & theTranslation) const {
        UVTranslations::const_iterator it = _translations.find(theTextureName);
        if (it == _translations.end()) {
            return false;
        }
-       theTranslation = it->second;
+       theTranslation = it->second.matrix;
        return true;
     }
 
     TextureAtlas::TextureAtlas(const asl::Path & theFilename, PackageManagerPtr thePackageManager) {
-        dom::Node doc;
-        std::ifstream inFile;
+        dom::Document doc;
+        asl::Ptr<ReadableStreamHandle> mySource;
+        asl::Ptr<ReadableFile> fileSource;
 
         if (thePackageManager) {
-            std::string packagedFile = thePackageManager->searchFile(theFilename.toLocale());
-            if (!packagedFile.empty()) {
-                inFile.open(packagedFile.c_str(), std::ios::binary);
-            }
+            mySource = thePackageManager->readStream(theFilename.toLocale());
         }
-
-        if (!inFile.is_open() && fileExists(theFilename.toLocale())) {
-            inFile.open(theFilename.toLocale().c_str(), std::ios::binary);
+        if (!mySource && fileExists(theFilename.toLocale())) {
+            mySource = asl::Ptr<AlwaysOpenReadableFileHandle>(new AlwaysOpenReadableFileHandle(theFilename.toLocale()));
         }
-        if (!inFile || !inFile.is_open()) {
+        if (!mySource) {
             if (thePackageManager) {
                 throw Exception(std::string("atlas definition '") + theFilename.toLocale()+ "' not found in " +
                         thePackageManager->getSearchPath(), PLUS_FILE_LINE);
@@ -207,15 +219,18 @@ namespace y60 {
                         "current directory.", PLUS_FILE_LINE);
             }
         }
-        inFile >> doc;
+        std::string myXMLFile;
+        mySource->getStream().readString(myXMLFile, mySource->getStream().size(), 0);
+        doc.parse(myXMLFile);
+        
         std::string atlasDirectory = getDirectoryPart(theFilename.toUTF8());
-
         _masterRasterPath = Path(atlasDirectory+ doc.childNode("TextureAtlas")->getAttributeString("src"), UTF8);
         // load the translation table
         for (AC_SIZE_TYPE i = 0; i < doc.childNode("TextureAtlas")->childNodesLength("Subtexture"); ++i) {
             const dom::NodePtr subTextureNode =  doc.childNode("TextureAtlas")->childNode("Subtexture",i);
             _translations.insert(make_pair(subTextureNode->getAttributeString("name"),
-                                           subTextureNode->getAttributeValue<asl::Matrix4f>("matrix")));
+                        Subtexture(subTextureNode->getAttributeValue<asl::Matrix4f>("matrix"), 
+                                   subTextureNode->getAttributeValue<asl::Vector2<AC_SIZE_TYPE> >("size"))));
         }
     }
 
@@ -239,7 +254,8 @@ namespace y60 {
         for (; it != _translations.end(); ++it) {
             dom::NodePtr subtexture = root->appendChild(dom::Element("Subtexture"));
             subtexture->appendAttribute("name", it->first);
-            subtexture->appendAttribute("matrix", it->second);
+            subtexture->appendAttribute("matrix", it->second.matrix);
+            subtexture->appendAttribute("size", it->second.size);
         };
         std::ofstream myFile(theFilename.toLocale().c_str(), std::ios_base::trunc | std::ios_base::out);
         if (!myFile) {

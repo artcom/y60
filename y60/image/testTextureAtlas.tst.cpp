@@ -274,6 +274,11 @@ public:
     
     void testLoadSave() {
         _mySubtextures.clear();
+        // first some error cases
+        ENSURE_EXCEPTION(TextureAtlas t(Path("does-not-exist", UTF8)), asl::Exception);
+        ENSURE_EXCEPTION(TextureAtlas t(Path("", UTF8)), asl::Exception);
+
+        // now load & save an atlas
         makeSubtexture("red", 5, 1, Vector4f(1,0,0,1));
         makeSubtexture("blue", 2, 2, Vector4f(0,0,1,1));
 
@@ -286,6 +291,10 @@ public:
         ENSURE( ! secondAtlas.findTextureTranslation("doesn't exist", textureTranslation) );
         textPixels(secondAtlas, "red", Vector4f(1,0,0,1));
         textPixels(secondAtlas, "blue", Vector4f(0,0,1,1));
+
+        asl::Vector2<AC_SIZE_TYPE> textureSize;
+        ENSURE(secondAtlas.findTextureSize("red", textureSize));
+        ENSURE_EQUAL(textureSize, Vector2<AC_SIZE_TYPE>(5,1));
     }
 
     void testDuplicates() {
