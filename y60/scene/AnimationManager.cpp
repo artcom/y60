@@ -142,7 +142,7 @@ namespace y60 {
 
         //XXX: somehow theNode does not get the full facade if not called once or something like that..
         // Serialization Problem???
-                 Boolean hack = theNode->hasFacade();
+        theNode->hasFacade();
         ///////////////////
         
         dom::NodePtr myAnimatedAttribute = theNode->getAttribute(myAttributeName);
