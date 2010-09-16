@@ -1,6 +1,6 @@
 <TextureAtlas src="testbild00.rgb">
-    <subtexture name="rgbtest_130.png" matrix="identity[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]" />
-    <subtexture name="checkers.png" matrix="identity[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]" />
-    <subtexture name="colors.rgb" matrix="identity[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]" />
-    <subtexture name="testbild00.rgb" matrix="identity[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]" />
+    <subtexture name="rgbtest_130.png" size="[150,150]" matrix="identity[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]" />
+    <subtexture name="checkers.png" size="[128,128]" matrix="identity[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]" />
+    <subtexture name="colors.rgb" size="[256,256]" matrix="identity[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]" />
+    <subtexture name="testbild00.rgb" size="[256,256]" matrix="identity[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]" />
 </TextureAtlas>
