@@ -23,6 +23,7 @@
 #include "UnitTest.h"
 
 #include "console_functions.h"
+#include "file_functions.h"
 
 #ifdef _WIN32
 #   include <windows.h>
@@ -274,6 +275,20 @@ UnitTest::getProfileRepeatCount() const {
 void
 UnitTest::setMyName(const char * theName) {
     _myName = theName;
+}
+
+std::string
+UnitTest::getTempDirectory() const {
+#ifdef CMAKE_CURRENT_BINARY_DIR
+    std::string tempDirectory("#CMAKE_CURRENT_BINARY_DIR/");
+#else
+    std::string tempDirectory;
+#endif    
+    tempDirectory += string("Testing/")+_myName+"/";
+    if (!isDirectory(tempDirectory)) {
+        createDirectory(tempDirectory);
+    }
+    return tempDirectory;
 }
 
 void
