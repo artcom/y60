@@ -51,8 +51,8 @@ spark.ResizableRectangle.Constructor = function (Protected) {
 
     Public.SetterOverride("origin", applyOrigin);
 
-    this.Property("width",  Number, 1, applySize);
-    this.Property("height", Number, 1, applySize);
+    Public.Property("width",  Number, 1, applySize);
+    Public.Property("height", Number, 1, applySize);
 
     Base.realize = Public.realize;
     Public.realize = function (theMaterialOrImageOrShape) {

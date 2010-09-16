@@ -480,14 +480,17 @@ being handed input arguments and comparing them with a list of allowed arguments
     DOC_RVAL("(array-of-string) arguments object", DOC_TYPE_ARRAY);
     DOC_END;
     try {
-        if (argc != 2 ) {
-            JS_ReportError(cx, "ParseArguments(): expects two arguments, (array-of-string, array-of-(array-of-string))");
+        if ((argc < 2) || (argc > 3)) {
+            JS_ReportError(cx, "ParseArguments(): expects two or three arguments, (array-of-string, array-of-(array-of-string), string-of-additional-usage)");
             return JS_FALSE;
         }
         asl::Arguments myArguments;
 
         vector<string> myArgs;
         convertFrom(cx, argv[0], myArgs);
+
+        string additionalUsage;
+        convertFrom(cx, argv[2], additionalUsage);
 
         myArgs.insert(myArgs.begin(), ourTopScriptFilename);
 
@@ -517,8 +520,13 @@ being handed input arguments and comparing them with a list of allowed arguments
             myPropIds = 0;
         }
 
-        myArguments.parse(myArgs);
+        if (!additionalUsage.empty()) {
+            AC_TRACE << "setting additionalUsage:" << additionalUsage << endl;
+            myArguments.setShortDescription(additionalUsage);
+        }
 
+        myArguments.parse(myArgs);
+        
         // create a JS "arguments" object
         vector<string> justArguments;
         for (int i = 0; i < myArguments.getCount(); ++i) {
