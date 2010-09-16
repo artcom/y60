@@ -285,7 +285,7 @@ JSTextureAtlas::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *arg
                         newTextureAtlas = OWNERPTR(new TextureAtlas(subtextures, myBorderFlag));
                     } else {
                         bool myPowerOfTwoFlag;
-                        if (!convertFrom(cx, argv[1], myPowerOfTwoFlag)) {
+                        if (!convertFrom(cx, argv[2], myPowerOfTwoFlag)) {
                             JS_ReportError(cx, "JSTextureAtlas::Constructor: argument #3 must be boolean (power-of-two-flag)");
                             return JS_FALSE;
                         }
