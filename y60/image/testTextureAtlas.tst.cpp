@@ -291,6 +291,10 @@ public:
         ENSURE( ! secondAtlas.findTextureTranslation("doesn't exist", textureTranslation) );
         textPixels(secondAtlas, "red", Vector4f(1,0,0,1));
         textPixels(secondAtlas, "blue", Vector4f(0,0,1,1));
+
+        asl::Vector2<AC_SIZE_TYPE> textureSize;
+        ENSURE(secondAtlas.findTextureSize("red", textureSize));
+        ENSURE_EQUAL(textureSize, Vector2<AC_SIZE_TYPE>(5,1));
     }
 
     void testDuplicates() {

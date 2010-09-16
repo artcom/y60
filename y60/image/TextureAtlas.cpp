@@ -141,8 +141,9 @@ namespace y60 {
             AC_TRACE << "creating UV Translation for " << it->first << " rotated:" << rotated;
             AC_TRACE << "        size: " << curBitmap->getSize();
             AC_TRACE << "    position: " << Vector2<AC_SIZE_TYPE>(targetX, targetY);
-            _translations.insert(make_pair(it->first, createUVTranslation(_masterRaster->getSize(), curBitmap->getSize(), 
-                           Vector2<AC_SIZE_TYPE>(targetX, targetY), rotated )));
+            asl::Matrix4f transMatrix = createUVTranslation(_masterRaster->getSize(), curBitmap->getSize(), 
+                           Vector2<AC_SIZE_TYPE>(targetX, targetY), rotated);
+            _translations.insert(make_pair(it->first, Subtexture(transMatrix, curBitmap->getSize())));
         }
         TEXTURE_PACKER::releaseTexturePacker(tp);
     };
@@ -179,12 +180,22 @@ namespace y60 {
     }
 
     bool 
+    TextureAtlas::findTextureSize(const std::string & theTextureName, asl::Vector2<AC_SIZE_TYPE> & theSize) const {
+       UVTranslations::const_iterator it = _translations.find(theTextureName);
+       if (it == _translations.end()) {
+           return false;
+       }
+       theSize = it->second.size;
+       return true;
+    }
+
+    bool 
     TextureAtlas::findTextureTranslation(const std::string & theTextureName, asl::Matrix4f & theTranslation) const {
        UVTranslations::const_iterator it = _translations.find(theTextureName);
        if (it == _translations.end()) {
            return false;
        }
-       theTranslation = it->second;
+       theTranslation = it->second.matrix;
        return true;
     }
 
@@ -218,7 +229,8 @@ namespace y60 {
         for (AC_SIZE_TYPE i = 0; i < doc.childNode("TextureAtlas")->childNodesLength("Subtexture"); ++i) {
             const dom::NodePtr subTextureNode =  doc.childNode("TextureAtlas")->childNode("Subtexture",i);
             _translations.insert(make_pair(subTextureNode->getAttributeString("name"),
-                                           subTextureNode->getAttributeValue<asl::Matrix4f>("matrix")));
+                        Subtexture(subTextureNode->getAttributeValue<asl::Matrix4f>("matrix"), 
+                                   subTextureNode->getAttributeValue<asl::Vector2<AC_SIZE_TYPE> >("size"))));
         }
     }
 
@@ -242,7 +254,8 @@ namespace y60 {
         for (; it != _translations.end(); ++it) {
             dom::NodePtr subtexture = root->appendChild(dom::Element("Subtexture"));
             subtexture->appendAttribute("name", it->first);
-            subtexture->appendAttribute("matrix", it->second);
+            subtexture->appendAttribute("matrix", it->second.matrix);
+            subtexture->appendAttribute("size", it->second.size);
         };
         std::ofstream myFile(theFilename.toLocale().c_str(), std::ios_base::trunc | std::ios_base::out);
         if (!myFile) {

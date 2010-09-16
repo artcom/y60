@@ -75,7 +75,6 @@ namespace y60 {
     class Y60_IMAGE_DECL TextureAtlas {
         public:
             typedef std::map<std::string, dom::ResizeableRasterPtr> Subtextures;
-            typedef std::map<std::string, asl::Matrix4f> UVTranslations;
 
             TextureAtlas(const Subtextures & theBitmaps,
                          bool thePixelBorderFlag = true, bool theForcePowerOfTwoFlag = false);
@@ -85,11 +84,20 @@ namespace y60 {
             const dom::ResizeableRasterPtr getRaster() const;
 
             bool findTextureTranslation(const std::string & theTextureName, asl::Matrix4f & theTranslation) const;
+            bool findTextureSize(const std::string & theTextureName, asl::Vector2<asl::AC_SIZE_TYPE> & theSize) const;
             asl::AC_SIZE_TYPE getTextureCount() const { return _translations.size(); };
             void saveToFile(const asl::Path & theFilename) const;
             const asl::Path & getRasterPath() const { return _masterRasterPath; }; 
 
         private:
+            struct Subtexture {
+                Subtexture(const asl::Matrix4f & theMatrix, const asl::Vector2<asl::AC_SIZE_TYPE> & theSize) :
+                    matrix(theMatrix), size(theSize) {}
+                asl::Matrix4f matrix;
+                asl::Vector2<asl::AC_SIZE_TYPE> size;
+            };
+
+            typedef std::map<std::string, Subtexture> UVTranslations;
             TextureAtlas();
             TextureAtlas(const TextureAtlas &);
             TextureAtlas operator=(const TextureAtlas &);
