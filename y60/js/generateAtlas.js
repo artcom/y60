@@ -11,7 +11,7 @@ var HELP_ARGUMENT = "help";
 function usage() {
     print("Texture Atlas Generator Help:");
     print("arguments:\n\thelp: this help");
-    print("\tatlasName=\"<theAtlasDefinitionFile>\"");
+    print("\tatlasName=\"<theAtlasDefinitionFile>\" (mandatory)");
     print("\ttextures=[<textureName1>,<texturePath1>],[<textureName2>,<texturePath2>]...");
     print("\tborder=true|false default: true (optional)");
     print("\tpowerof=true|false default: false (optional)");
@@ -92,10 +92,44 @@ function main() {
         var myNewTextureAtlas = new TextureAtlas(myAtlasTextures, myBorderFlag, myPowerOfTwoFlag);
         myNewTextureAtlas.saveToFile(myAtlasName);
     } else {
-        Logger.error("could not build Atlas '" + myAtlasName + "'");
+        Logger.error("argument atlasName is mandatory!");
         usage();
     }
 }
 
 evaluateArguments(parseArguments(arguments));
 main();
+
+/*jslint white:true*/
+/*globals use, parseArguments, reportException, Exception*/
+
+/*
+use("Exception.js");
+
+try {
+    var myArgs = parseArguments(arguments, {
+        'forcePowerOfTwo' : '',
+        'noborder'        : '',
+        'outputFile'      : "%s"
+    }," additional arguments are parsed as texture sources. The basename will be the TextureName in the resulting Atlas");
+    
+    if ("forcePowerOfTwo" in myArgs.options) {
+        print("forcePowerOfTwo");
+    }
+    if ("noborder" in myArgs.options) {
+        print("noborder");
+    }
+    if ('outputFile' in myArgs.options) {
+        print(myArgs.options.outputFile);
+    } else {
+        throw new Exception("--outputFile is mandatory! See --help");
+    }
+    
+    for (var i = 0; i < myArgs.length; i++) {
+        print(myArgs[i]);
+    }
+    
+} catch (ex) {
+    reportException(ex);
+}
+*/

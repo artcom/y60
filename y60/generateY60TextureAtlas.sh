@@ -1,2 +1,2 @@
 #!/bin/bash
-y60 generateAtlas.js $@
+y60 generateAtlas.js -- $@
