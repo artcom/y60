@@ -41,8 +41,7 @@ TextureAtlasManager.prototype.Constructor = function (Public) {
     
     Public.getSize = function (theTextureName, theAtlasDefinitionFile) {
         var myAtlasInfo = Public.loadAtlas(theAtlasDefinitionFile);
-        //return myAtlasInfo.atlas.getPixelSize(theTextureName);
-        return new Vector2i(288, 50);
+        return myAtlasInfo.atlas.findTextureSize(theTextureName);
     };
     
     Public.getMaterial = function (theAtlasDefinitionFile) {
