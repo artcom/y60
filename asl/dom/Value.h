@@ -1184,6 +1184,7 @@ namespace dom {
                               const float theAlpha) = 0;
 
         virtual void randomize(const asl::Vector4f & theMinColor, const asl::Vector4f & theMaxColor) = 0;
+        virtual bool hasAlpha() const = 0;
 
         /*
         virtual ValuePtr getPixel(asl::AC_SIZE_TYPE x, asl::AC_SIZE_TYPE y) const = 0;
@@ -1240,6 +1241,11 @@ namespace dom {
         asl::AC_SIZE_TYPE height() const {
             return _myRasterValue.getValue().vsize();
         }
+
+        bool hasAlpha() const {
+            return PIXEL::hasAlpha(); 
+        }
+
         const asl::ReadableBlock & pixels() const {
             _myPixels.reference(asl::ReadableBlockAdapter((const unsigned char*)asl::begin_ptr(_myRasterValue.getValue()),
                                                           (const unsigned char*)asl::end_ptr  (_myRasterValue.getValue())));

@@ -274,6 +274,11 @@ public:
     
     void testLoadSave() {
         _mySubtextures.clear();
+        // first some error cases
+        ENSURE_EXCEPTION(TextureAtlas t(Path("does-not-exist", UTF8)), asl::Exception);
+        ENSURE_EXCEPTION(TextureAtlas t(Path("", UTF8)), asl::Exception);
+
+        // now load & save an atlas
         makeSubtexture("red", 5, 1, Vector4f(1,0,0,1));
         makeSubtexture("blue", 2, 2, Vector4f(0,0,1,1));
 

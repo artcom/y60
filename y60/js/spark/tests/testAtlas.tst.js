@@ -32,8 +32,6 @@ SparkAtlasTest.prototype.Constructor = function (obj, theName) {
 
     function testAtlas() {
         var newAtlas = new TextureAtlas( { 'red': 'fixtures/textures/testbild00.rgb' } );
-        print("foo:", newAtlas.findTextureTranslation("foo"));
-        print("red:", newAtlas.findTextureTranslation("red"));
         obj.App = spark.loadFile("fixtures/atlasTest.spark");
         // obj.App.go();
     }

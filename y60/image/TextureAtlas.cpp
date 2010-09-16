@@ -122,11 +122,15 @@ namespace y60 {
             int firstRowCol = thePixelBorderFlag ? -1 : 0;
             int lastRow = thePixelBorderFlag ? curBitmap->height()+1 : curBitmap->height();
             int lastCol = thePixelBorderFlag ? curBitmap->width()+1 : curBitmap->width();
+            bool fillAlpha = ! curBitmap->hasAlpha();
 
             for (asl::AC_OFFSET_TYPE y = firstRowCol; y < lastRow; ++y) {
                 for (asl::AC_OFFSET_TYPE x = firstRowCol; x < lastCol; ++x) {
                     asl::Vector4f myPixel = curBitmap->getPixel(clamp(x, static_cast<AC_OFFSET_TYPE>(0), static_cast<AC_OFFSET_TYPE>(curBitmap->width()-1)),
                                                                 clamp(y, static_cast<AC_OFFSET_TYPE>(0), static_cast<AC_OFFSET_TYPE>(curBitmap->height()-1)));
+                    if (fillAlpha) {
+                        myPixel[3] = 1.0f;
+                    }
                     if (rotated) {
                         _masterRaster->setPixel(y+targetX,x+targetY,myPixel);
                     } else {
@@ -185,20 +189,17 @@ namespace y60 {
     }
 
     TextureAtlas::TextureAtlas(const asl::Path & theFilename, PackageManagerPtr thePackageManager) {
-        dom::Node doc;
-        std::ifstream inFile;
+        dom::Document doc;
+        asl::Ptr<ReadableStreamHandle> mySource;
+        asl::Ptr<ReadableFile> fileSource;
 
         if (thePackageManager) {
-            std::string packagedFile = thePackageManager->searchFile(theFilename.toLocale());
-            if (!packagedFile.empty()) {
-                inFile.open(packagedFile.c_str(), std::ios::binary);
-            }
+            mySource = thePackageManager->readStream(theFilename.toLocale());
         }
-
-        if (!inFile.is_open() && fileExists(theFilename.toLocale())) {
-            inFile.open(theFilename.toLocale().c_str(), std::ios::binary);
+        if (!mySource && fileExists(theFilename.toLocale())) {
+            mySource = asl::Ptr<AlwaysOpenReadableFileHandle>(new AlwaysOpenReadableFileHandle(theFilename.toLocale()));
         }
-        if (!inFile || !inFile.is_open()) {
+        if (!mySource) {
             if (thePackageManager) {
                 throw Exception(std::string("atlas definition '") + theFilename.toLocale()+ "' not found in " +
                         thePackageManager->getSearchPath(), PLUS_FILE_LINE);
@@ -207,9 +208,11 @@ namespace y60 {
                         "current directory.", PLUS_FILE_LINE);
             }
         }
-        inFile >> doc;
+        std::string myXMLFile;
+        mySource->getStream().readString(myXMLFile, mySource->getStream().size(), 0);
+        doc.parse(myXMLFile);
+        
         std::string atlasDirectory = getDirectoryPart(theFilename.toUTF8());
-
         _masterRasterPath = Path(atlasDirectory+ doc.childNode("TextureAtlas")->getAttributeString("src"), UTF8);
         // load the translation table
         for (AC_SIZE_TYPE i = 0; i < doc.childNode("TextureAtlas")->childNodesLength("Subtexture"); ++i) {
