@@ -249,7 +249,7 @@ namespace y60 {
         // save the translation table
         dom::Document doc;
         dom::NodePtr root = doc.appendChild(dom::Element("TextureAtlas"));
-        root->appendAttribute("src", bitmapPath);
+        root->appendAttribute("src", getFilenamePart(bitmapPath.toUTF8()));
         UVTranslations::const_iterator it = _translations.begin();
         for (; it != _translations.end(); ++it) {
             dom::NodePtr subtexture = root->appendChild(dom::Element("Subtexture"));

@@ -283,9 +283,9 @@ public:
         makeSubtexture("blue", 2, 2, Vector4f(0,0,1,1));
 
         TextureAtlas firstAtlas(_mySubtextures, true, false);
-        firstAtlas.saveToFile(asl::Path("test.xml", UTF8));
+        firstAtlas.saveToFile(asl::Path(getTempDirectory()+"test.xml", UTF8));
 
-        TextureAtlas secondAtlas(asl::Path("test.xml", UTF8));
+        TextureAtlas secondAtlas(asl::Path(getTempDirectory()+"test.xml", UTF8));
 
         Matrix4f textureTranslation;
         ENSURE( ! secondAtlas.findTextureTranslation("doesn't exist", textureTranslation) );
