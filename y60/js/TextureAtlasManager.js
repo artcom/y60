@@ -1,34 +1,29 @@
 /*jslint nomen:false*/
-/*globals*/
+/*globals Modelling, window, TextureAtlas*/
 
 function TextureAtlasManager() {
     this.Constructor(this);
 }
 
-TextureAtlasManager.prototype.Constructor = function(Public) {
+TextureAtlasManager.prototype.Constructor = function (Public) {
     
     /////////////////////
     // Private Members //
     /////////////////////
     
-    var _atlasses = {}; // key: atlasDefinitionFile
+    var _atlasses = {};
     
     ////////////////////
     // Public Methods //
     ////////////////////
     
     /* explicitely load a TextureAtlas*/
-    Public.loadAtlas = function(theAtlasDefinitionFile) {
+    Public.loadAtlas = function (theAtlasDefinitionFile) {
         var myNewTextureAtlas, myAtlasInfo;
         if (!(theAtlasDefinitionFile in _atlasses)) {
             myNewTextureAtlas = new TextureAtlas(theAtlasDefinitionFile);
             _atlasses[theAtlasDefinitionFile] = {};
             myAtlasInfo = _atlasses[theAtlasDefinitionFile];
-            
-            
-            print(myAtlasInfo.atlas.imagePath);
-            
-            
             myAtlasInfo.atlas = myNewTextureAtlas;
             myAtlasInfo.material = Modelling.
                                    createUnlitTexturedMaterial(window.scene,
@@ -39,13 +34,18 @@ TextureAtlasManager.prototype.Constructor = function(Public) {
         return _atlasses[theAtlasDefinitionFile];
     };
     
-    Public.getUVTranslation = function(theTextureName, theAtlasDefinitionFile) {
-        // Lazy loading and preparing of material/texture/image in scenegraph
+    Public.getUVMatrix = function (theTextureName, theAtlasDefinitionFile) {
         var myAtlasInfo = Public.loadAtlas(theAtlasDefinitionFile);
         return myAtlasInfo.atlas.findTextureTranslation(theTextureName);
     };
     
-    Public.getMaterial = function(theAtlasDefinitionFile) {
+    Public.getSize = function (theTextureName, theAtlasDefinitionFile) {
+        var myAtlasInfo = Public.loadAtlas(theAtlasDefinitionFile);
+        //return myAtlasInfo.atlas.getPixelSize(theTextureName);
+        return new Vector2i(288, 50);
+    };
+    
+    Public.getMaterial = function (theAtlasDefinitionFile) {
         var myAtlasInfo = Public.loadAtlas(theAtlasDefinitionFile);
         return myAtlasInfo.material;
     };
