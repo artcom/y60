@@ -111,6 +111,8 @@ use("dsa.js");
 // EventWrapper to convert SPARK into JS callbacks
 use("CallbackWrapper.js");
 
+// TODO Use an autoloading mechanism for this!
+
 // widgets
 if (!("disableSparkWidgets" in this)) {
     // base class
@@ -132,6 +134,7 @@ if (!("disableSparkWidgets" in this)) {
     use("spark/widget/NewMovie.js");
     use("spark/widget/NewText.js");
     use("spark/widget/Canvas.js");
+    use("spark/widget/AtlasImage.js");
     use("spark/add-ons/RoundedCornerQuad.js");
     use("spark/add-ons/RoundedCornerMovie.js");
     use("spark/add-ons/RoundedCornerImage.js");

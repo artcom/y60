@@ -63,7 +63,8 @@
           getFocalLength, WalkMover, FlyMover, TrackballMover,
           ClassicTrackballMover, CenteredTrackballMover, RenderWindow,
           ImageOverlay, Vector2f, Vector4f, Configurator, Shutter,
-          ImageManager, AnimationManager, DebugVisual, MemoryMeter*/
+          ImageManager, AnimationManager, DebugVisual, MemoryMeter,
+          TextureAtlasManager*/
 
 // use this idiom in each level of inheritance and
 // you'll know if you are the outermost .js file.
@@ -82,6 +83,7 @@ use("LightManager.js");
 use("DebugVisual.js");
 use("AnimationManager.js");
 use("ImageManager.js");
+use("TextureAtlasManager.js");
 use("Timer.js");
 use("Configurator.js");
 use("shutter.js");
@@ -127,7 +129,6 @@ SceneViewer.prototype.Constructor = function (self, theArguments) {
     var _myVideoRecorder          = null;
     var _myStatisticColor         = [1, 1, 1, 1];
     var _mySinceLastVersion       = "1";
-
 
     /////////////////////
     // Private Methods //
@@ -248,6 +249,8 @@ SceneViewer.prototype.Constructor = function (self, theArguments) {
     ////////////////////
     // Public Methods //
     ////////////////////
+
+    self.textureAtlasManager = new TextureAtlasManager();
 
     self.setCursor = function (theImageString, theSize) {
         setCursor(theImageString, theSize);
@@ -743,9 +746,9 @@ SceneViewer.prototype.Constructor = function (self, theArguments) {
             if (fileExists(SETTINGS_FILE_NAMES[i])) {
                 mySettingsFile = SETTINGS_FILE_NAMES[i];
                 break;
-            } else {
-                //Logger.error( "Couldn't find settings file " + SETTINGS_FILE_NAMES[i] );
-            }
+            } /*else {
+                Logger.error( "Couldn't find settings file " + SETTINGS_FILE_NAMES[i] );
+            }*/
         }
 
         // look for host dependent settings file

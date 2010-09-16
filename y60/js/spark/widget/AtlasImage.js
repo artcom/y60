@@ -22,7 +22,12 @@ spark.AtlasImage.Constructor = function (Protected) {
     Base.realize = Public.realize;
     Public.realize = function (theMaterial) {
         _myAtlasPath = Protected.getString("atlas");
-        _myTextureName = Protected.getString("src");
+        _myTextureName = Protected.getString("name");
+        
+        /*
+        print(Public.root.textureAtlasManager.getUVTranslation(_myTextureName, _myAtlasPath));
+        print(Public.root.textureAtlasManager.getMaterial(_myAtlasPath));
+        */
     };
 
     Base.postRealize = Public.postRealize;
