@@ -1,0 +1,17 @@
+<SparkSceneTesterWindow title="Buttons" width="600" height="600">
+  
+  <Image name="background" src="fixtures/textures/background.png" x="0" y="0" width="1200" height="1200" z="-10"/>
+
+  <AtlasImage name="button1" subtexture="button_default.png" atlas="fixtures/atlasses/buttonAtlas.xml"
+              x="10" y="10" z="1" />
+  <AtlasImage name="button2" subtexture="button_default.png" atlas="fixtures/atlasses/buttonAtlas.xml"
+              x="10" y="100" z="2" width="288" height="50"/>
+  <AtlasImage name="button3" subtexture="button_default.png" atlas="fixtures/atlasses/buttonAtlas.xml"
+              x="10" y="200" z="3" width="388" height="77"/>
+              
+              
+  <AtlasImage name="rotated" subtexture="rotated.png" atlas="fixtures/atlasses/rotatedAtlas.xml"
+              x="10" y="500" z="4"/>
+  <AtlasImage name="normal" subtexture="normal.png" atlas="fixtures/atlasses/rotatedAtlas.xml"
+              x="120" y="400" z="5" width="128" height="128"/>
+</SparkSceneTesterWindow>

@@ -1,0 +1,10 @@
+<TextureAtlas src="variousAtlas.png">
+    <Subtexture name="2Dslider_thumb.png" matrix="affine[[0.156489,0,0,0],[0,0.0345118,0,0],[0,0,1,0],[0.583969,0.763468,0,1]]" size="[41,41]"/>
+    <Subtexture name="2Dslider_thumb_pressed.png" matrix="affine[[0.156489,0,0,0],[0,0.0345118,0,0],[0,0,1,0],[0.748092,0.763468,0,1]]" size="[41,41]"/>
+    <Subtexture name="checkers.png" matrix="affine[[0.48855,0,0,0],[0,0.107744,0,0],[0,0,1,0],[0.00381679,0.891414,0,1]]" size="[128,128]"/>
+    <Subtexture name="colors.rgb" matrix="affine[[0.977099,0,0,0],[0,0.215488,0,0],[0,0,1,0],[0.00381679,0.111953,0,1]]" size="[256,256]"/>
+    <Subtexture name="rgbtest_130.png" matrix="affine[[0.572519,0,0,0],[0,0.126263,0,0],[0,0,1,0],[0.00381679,0.763468,0,1]]" size="[150,150]"/>
+    <Subtexture name="rgbtest_256.png" matrix="affine[[0.977099,0,0,0],[0,0.215488,0,0],[0,0,1,0],[0.00381679,0.329125,0,1]]" size="[256,256]"/>
+    <Subtexture name="testbild00.rgb" matrix="affine[[0.977099,0,0,0],[0,0.215488,0,0],[0,0,1,0],[0.00381679,0.546296,0,1]]" size="[256,256]"/>
+    <Subtexture name="testbild01.rgb" matrix="affine[[0.992366,0,0,0],[0,0.109428,0,0],[0,0,1,0],[0.00381679,0.000841751,0,1]]" size="[260,130]"/>
+</TextureAtlas>

@@ -1,3 +1,7 @@
+/*jslint plusplus:false*/
+/*globals use, spark, Node, Frustum, ProjectionType, Vector3f, Quaternionf,
+          radFromDeg, print, Planef, TrackballMover, exit*/
+
 use("spark/spark.js");
 
 //AC_NO_OFFSCREEN_TEST=1
@@ -19,14 +23,14 @@ try {
     var myEmptyCanvases = [myEmptyCanvas, myEmptyMovertestCanvas];
     
     // SETUP PERSPECTIVE CAMERA
-    for(var i = 0; i < myEmptyCanvases.length; ++i) {
+    for (var i = 0; i < myEmptyCanvases.length; ++i) {
         var myCamera = Node.createElement("camera");
         myCamera.frustum = new Frustum();
         myCamera.frustum.width = myEmptyCanvases[i].width;
         myCamera.frustum.height = myEmptyCanvases[i].height;
         myCamera.frustum.type = ProjectionType.perspective;
-        myCamera.position = new Vector3f(0,1,2);
-        myCamera.orientation = Quaternionf.createFromEuler(new Vector3f(radFromDeg(-30),0,0));
+        myCamera.position = new Vector3f(0, 1, 2);
+        myCamera.orientation = Quaternionf.createFromEuler(new Vector3f(radFromDeg(-30), 0, 0));
         
         myWorld.appendChild(myCamera);
         myEmptyCanvases[i].getActiveViewport().camera = myCamera.id;
@@ -41,24 +45,24 @@ try {
     var myClippingPlane = new Planef(new Vector3f(0, -1, 0), 0);
     myPlaneNode.value = myClippingPlane;
     
-    myEmptyCanvas.onPreViewportFunc = function() {
+    myEmptyCanvas.onPreViewportFunc = function () {
         myWorld.clippingplanes = "[`" + myPlaneNode.id + "`]";
-    }
-    myEmptyCanvas.onPostViewportFunc = function() {
+    };
+    myEmptyCanvas.onPostViewportFunc = function () {
         myWorld.clippingplanes = "[]";
-    }
+    };
     
     
     // MOVER SETTINGS/MODIFICATION FOR EMPTY-MOVERTEST-CANVAS
     myEmptyMovertestCanvas.setMover(TrackballMover, myEmptyMovertestCanvas.getActiveViewport());
-    var myRotation = Quaternionf.createFromEuler(new Vector3f(radFromDeg(-20),0,0));
+    var myRotation = Quaternionf.createFromEuler(new Vector3f(radFromDeg(-20), 0, 0));
     myEmptyMovertestCanvas.getMover().movements.rotateByQuaternion(myRotation);
     
     
     Base.onFrame = ourShow.onFrame;
-    ourShow.onFrame = function(theTime) {
+    ourShow.onFrame = function (theTime) {
         Base.onFrame(theTime);
-    }
+    };
 
     ourShow.setTestDurationInFrames(30);
     ourShow.go();

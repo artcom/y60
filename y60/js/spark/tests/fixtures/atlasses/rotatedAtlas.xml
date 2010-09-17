@@ -1,0 +1,5 @@
+<TextureAtlas src="rotatedAtlas.png">
+    <Subtexture name="normal.png" matrix="affine[[0.996109,0,0,0],[0,0.61244,0,0],[0,0,1,0],[0.00194553,0.00119617,0,1]]" size="[512,512]"/>
+    <Subtexture name="normal2.png" matrix="affine[[0.622568,0,0,0],[0,0.382775,0,0],[0,0,1,0],[0.00194553,0.616029,0,1]]" size="[320,320]"/>
+    <Subtexture name="rotated.png" matrix="affine[[0,-0.239234,0,0],[0.0972763,0,0,0],[0,0,1,0],[0.628405,0.855263,0,1]]" size="[200,50]"/>
+</TextureAtlas>
