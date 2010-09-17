@@ -16,6 +16,12 @@ spark.AtlasImage.Constructor = function (Protected) {
     var _mySubTextureName   = null;
     var _myOriginalUVCoords = [];
     
+    var _myDirtyFlags = {
+        atlas      : false,
+        subtexture : false
+    };
+    var _realized = false;
+    
     /////////////////////
     // Private Methods //
     /////////////////////
@@ -47,17 +53,22 @@ spark.AtlasImage.Constructor = function (Protected) {
     
     Base.realize = Public.realize;
     Public.realize = function (theMaterial) {
-        _myAtlasPath = Protected.getString("atlas");
-        _mySubTextureName = Protected.getString("subtexture");
+        _myAtlasPath      = Protected.getString("atlas", _myAtlasPath);
+        _mySubTextureName = Protected.getString("subtexture", _mySubTextureName);
         
-        Base.realize(_getMaterial(_mySubTextureName, _myAtlasPath));
-        
+        if (_mySubTextureName && _myAtlasPath) {
+            Base.realize(_getMaterial(_mySubTextureName, _myAtlasPath));
+        } else {
+            throw new Exception("AtlasImage cannot be realized without having set a texture and atlas first via 'setTexture()'");
+        }
         _storeOriginalUVCoords();
         _applyAtlasTextureInformation();
         
         var myTexturePixelSize = Public.root.textureAtlasManager.getSize(_mySubTextureName, _myAtlasPath);
         Public.width  = Protected.getNumber("width",  myTexturePixelSize[0]);
         Public.height = Protected.getNumber("height", myTexturePixelSize[1]);
+        
+        _realized = true;
     };
 
     Base.postRealize = Public.postRealize;
@@ -68,9 +79,11 @@ spark.AtlasImage.Constructor = function (Protected) {
     Public.setTexture = function (theTextureName, theAtlasPath) {
         _myAtlasPath = theAtlasPath;
         _mySubTextureName = theTextureName;
-        _applyAtlasTextureInformation();
-        Protected.material = _getMaterial(theTextureName, theAtlasPath);
-        Protected.material.properties.blendfunction = "[src_alpha,one_minus_src_alpha,one,one_minus_src_alpha]";
-        Public.size = Public.root.textureAtlasManager.getSize(_mySubTextureName, _myAtlasPath);
+        if (_realized) {
+            _applyAtlasTextureInformation();
+            Protected.material = _getMaterial(theTextureName, theAtlasPath);
+            Protected.material.properties.blendfunction = "[src_alpha,one_minus_src_alpha,one,one_minus_src_alpha]";
+            Public.size = Public.root.textureAtlasManager.getSize(_mySubTextureName, _myAtlasPath);
+        }
     };
 };
