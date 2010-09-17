@@ -25,6 +25,8 @@
 #include "console_functions.h"
 #include "file_functions.h"
 
+#include <acmake/aslbase_paths.h>
+
 #ifdef _WIN32
 #   include <windows.h>
 #   include <io.h>
@@ -279,16 +281,13 @@ UnitTest::setMyName(const char * theName) {
 
 std::string
 UnitTest::getTempDirectory() const {
-#ifdef CMAKE_CURRENT_BINARY_DIR
-    std::string tempDirectory("#CMAKE_CURRENT_BINARY_DIR/");
-#else
-    std::string tempDirectory;
-#endif    
-    tempDirectory += string("Testing/")+_myName+"/";
+    std::string tempDirectory(CMAKE_BINARY_DIR);
+    tempDirectory += "/Testing/";
+    tempDirectory += _myName;
     if (!isDirectory(tempDirectory)) {
         createDirectory(tempDirectory);
     }
-    return tempDirectory;
+    return tempDirectory+"/";
 }
 
 void

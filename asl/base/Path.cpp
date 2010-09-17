@@ -68,14 +68,18 @@ namespace asl {
 DEFINE_EXCEPTION(UnicodeException, Exception);
 
 Path::Path() {
-#ifndef OSX
+#ifdef OSX
+    _myString = 0;
+#else
 	_myLocaleChars = 0;
 #endif
 }
 
 Path::Path(const char * theString, StringEncoding theEncoding)
 {
-#ifndef OSX
+#ifdef OSX
+    _myString = 0;
+#else
 	_myLocaleChars = 0;
 #endif
     assign(theString, theEncoding);
@@ -83,7 +87,9 @@ Path::Path(const char * theString, StringEncoding theEncoding)
 
 Path::Path(const std::string & theString, StringEncoding theEncoding)
 {
-#ifndef OSX
+#ifdef OSX
+    _myString = 0;
+#else
 	_myLocaleChars = 0;
 #endif
     assign(theString.c_str(), theEncoding);
@@ -109,6 +115,11 @@ Path::free() {
         ::free(_myLocaleChars);
     }
     _myLocaleChars = 0;
+#elif OSX
+    if (_myString) {
+        CFRelease(_myString);
+    }
+    _myString = 0;
 #elif LINUX
     if (_myLocaleChars) {
         g_free(_myLocaleChars);
