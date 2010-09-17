@@ -132,7 +132,7 @@ namespace y60 {
                         myPixel[3] = 1.0f;
                     }
                     if (rotated) {
-                        _masterRaster->setPixel(y+targetX,x+targetY,myPixel);
+                        _masterRaster->setPixel(y+targetX,targetY+lastCol+firstRowCol-1-x, myPixel);
                     } else {
                         _masterRaster->setPixel(x+targetX,y+targetY,myPixel);
                     }

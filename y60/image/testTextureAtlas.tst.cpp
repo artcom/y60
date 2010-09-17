@@ -270,6 +270,8 @@ public:
         textPixels(myAtlas, "blue", Vector4f(0,0,1,1));
         textPixels(myAtlas, "yellow", Vector4f(1,1,0,1));
         textPixels(myAtlas, "green", Vector4f(0,1,0,1));
+        
+        myAtlas.saveToFile(asl::Path(getTempDirectory()+"testRotated.xml", UTF8));
     }
     
     void testLoadSave() {
