@@ -34,12 +34,12 @@ spark.RoundedCornerMovie.Constructor = function (Protected) {
     Public.postRealize = function () {
         Base.postRealize();
         Base.postRealizeRoundedCornerQuad();
+
+        Base.movieSetter = Public.__lookupSetter__("movie");
+        Public.__defineSetter__("movie", function (theNode) {
+            Base.movieSetter(theNode);
+            Public.update();
+        });
     }
-    
-    Base.movieSetter = Public.__lookupSetter__("movie");
-    Public.movie setter = function (theMovie) {
-       Base.movieSetter(theMovie);
-       Public.update();
-    };
     
 };
