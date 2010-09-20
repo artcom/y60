@@ -9,7 +9,9 @@
 //=============================================================================
 
 /*jslint nomen:false plusplus:false*/
-/*globals spark, Logger, Vector2f, getImageSize*/
+/*globals use, spark, Logger, Vector2f, getImageSize, ShapeStretcher, Vector2i*/
+
+use("spark/add-ons/ShapeStretcher.js");
 
 spark.StretchyImage = spark.ComponentClass("StretchyImage");
 spark.StretchyImage.Constructor = function (Protected) {
@@ -21,211 +23,106 @@ spark.StretchyImage.Constructor = function (Protected) {
     // Private Members //
     /////////////////////
 
-    var _myUVCoords   = null;
-    var _myImageSize  = null;
-    var _myEdgeTop    = 0;
-    var _myEdgeBottom = 0;
-    var _myEdgeLeft   = 0;
-    var _myEdgeRight  = 0;
-    var _myCropTop    = 0;
-    var _myCropBottom = 0;
-    var _myCropLeft   = 0;
-    var _myCropRight  = 0;
+    var _myImageSize      = null;
+    var _myShapeStretcher = null;
     
-    var _myQuadsPerSide    = new Vector2f(3, 3);
-    var _myVerticesPerSide = new Vector2f(_myQuadsPerSide.x + 1, _myQuadsPerSide.y + 1);
-    var _myNumVertices     = _myVerticesPerSide.x * _myVerticesPerSide.y;
-    var _myNumQuads        = _myQuadsPerSide.x * _myQuadsPerSide.y;
-    
-    var _applyEdgeFilteringOffsetFlag = true;
-    
-    /////////////////////
-    // Private Methods //
-    /////////////////////
-
-    function getVertexData(theShape, theVertexAttribute) {
-        var myXPath = ".//*[@name='" + theVertexAttribute + "']";
-        return theShape.find(myXPath).firstChild.nodeValue;
-    }
-
-    function getIndexData(theShape, theVertexAttribute) {
-        var myXPath = ".//*[@vertexdata='" + theVertexAttribute + "']";
-        return theShape.find(myXPath).firstChild.nodeValue;
-    }
-
-    function initMembers() { // TODO proper naming init members is equivalent to "does internal stuff"
-        _myUVCoords = getVertexData(Protected.shape, 'uvset');
-        _myVerticesPerSide = new Vector2f(_myQuadsPerSide.x + 1, _myQuadsPerSide.y + 1);
-        _myNumVertices = _myVerticesPerSide.x * _myVerticesPerSide.y;
-        _myNumQuads = _myQuadsPerSide.x * _myQuadsPerSide.y;
-        Logger.debug(Public.name + " quadsPerSide " + _myQuadsPerSide + ", verticesPerSide " + _myVerticesPerSide + ", numVertices " + _myNumVertices + ", numQuads " + _myNumQuads);
-    }
-
-    function _applyEdgeFilteringOffset(theEdgeAmount) {
-        return (!_applyEdgeFilteringOffsetFlag || theEdgeAmount < 0) ? 0 : 1;
-    }
-
-    function updateGeometry(theSize, theUVCoordFlag) {
-        var myWidth = theSize.x;
-        var myHeight = theSize.y;
-        var o = Public.origin;
-        var v = 0;
-        for (var i = 0; i < _myVerticesPerSide.y; ++i) {
-            for (var j = 0; j < _myVerticesPerSide.x; ++j) {
-                v = i * _myVerticesPerSide.x + j;
-                var myX = -o.x;
-                var myY = -o.y;
-                var myCropX = 0;
-                var myCropY = 0;
-                if (j === 0) {
-                    myX = -o.x;
-                    myCropX = _myCropLeft;
-                } else if (j === _myVerticesPerSide.x - 3) {
-                    myX = -o.x + _myEdgeLeft + _applyEdgeFilteringOffset(_myEdgeLeft);
-                    myCropX = _myCropLeft;
-                } else if (j === _myVerticesPerSide.x - 2) {
-                    myX = myWidth - o.x - _myEdgeRight - _applyEdgeFilteringOffset(_myEdgeRight);
-                    myCropX = -_myCropRight;
-                } else if (j === _myVerticesPerSide.x - 1) {
-                    myX = myWidth - o.x;
-                    myCropX = -_myCropRight;
-                }
-                if (i === 0) {
-                    myY = -o.y;
-                    myCropY = _myCropBottom;
-                } else if (i === _myVerticesPerSide.y - 3) {
-                    myY = -o.y + _myEdgeBottom + _applyEdgeFilteringOffset(_myEdgeBottom);
-                    myCropY = _myCropBottom;
-                } else if (i === _myVerticesPerSide.y - 2) {
-                    myY = myHeight - o.y - _myEdgeTop - _applyEdgeFilteringOffset(_myEdgeTop);
-                    myCropY = -_myCropTop;
-                } else if (i === _myVerticesPerSide.y - 1) {
-                    myY = myHeight - o.y;
-                    myCropY = -_myCropTop;
-                }
-                Protected.vertices[v] = [myX, myY, 0];
-                if (theUVCoordFlag) {
-                    _myUVCoords[v] = [(myX + myCropX + o.x) / myWidth, 1 - (myY + myCropY + o.y) / myHeight];
-                }
-            }
-        }
-    }
-
-    function setupGeometry() {
-        _myUVCoords.resize(_myNumVertices);
-        Protected.vertices.resize(_myNumVertices);
-        updateGeometry(_myImageSize, true);
-
-        var myPIdx = getIndexData(Protected.shape, 'position');
-        myPIdx.resize(_myNumQuads * 4);
-        var myUVIdx = getIndexData(Protected.shape, 'uvset');
-        myUVIdx.resize(_myNumQuads * 4);
-        var v = 0;
-        for (var i = 0; i < _myQuadsPerSide.y; ++i) {
-            for (var j = 0; j < _myQuadsPerSide.x; ++j) {
-                v = i * _myVerticesPerSide.x + j;
-                var q = 4 * (i * _myQuadsPerSide.x + j);
-                myUVIdx[q]     = myPIdx[q]     = v;
-                myUVIdx[q + 1] = myPIdx[q + 1] = v + 1;
-                myUVIdx[q + 2] = myPIdx[q + 2] = v + 1 + _myVerticesPerSide.x;
-                myUVIdx[q + 3] = myPIdx[q + 3] = v + _myVerticesPerSide.x;
-            }
-        }
-    }
-
     ////////////////////
     // Public Methods //
     ////////////////////
     
     Public.__defineGetter__("edgeTop", function () {
-        return _myEdgeTop;
+        return _myShapeStretcher.edges.top;
     });
 
     Public.__defineSetter__("edgeTop", function (theValue) {
-        _myEdgeTop = theValue;
+        _myShapeStretcher.edges.top = theValue;
+        _myShapeStretcher.updateGeometry(new Vector2f(Public.width, Public.height), false, Public.origin);
     });
     
     Public.__defineGetter__("edgeBottom", function () {
-        return _myEdgeBottom;
+        return _myShapeStretcher.edges.bottom;
     });
 
     Public.__defineSetter__("edgeBottom", function (theValue) {
-        _myEdgeBottom = theValue;
+        _myShapeStretcher.edges.bottom = theValue;
+        _myShapeStretcher.updateGeometry(new Vector2f(Public.width, Public.height), false, Public.origin);
     });
     
     Public.__defineGetter__("edgeLeft", function () {
-        return _myEdgeLeft;
+        return _myShapeStretcher.edges.left;
     });
 
     Public.__defineSetter__("edgeLeft", function (theValue) {
-        _myEdgeLeft = theValue;
+        _myShapeStretcher.edges.left = theValue;
+        _myShapeStretcher.updateGeometry(new Vector2f(Public.width, Public.height), false, Public.origin);
     });
     
     Public.__defineGetter__("edgeRight", function () {
-        return _myEdgeRight;
+        return _myShapeStretcher.edges.right;
     });
 
     Public.__defineSetter__("edgeRight", function (theValue) {
-        _myEdgeRight = theValue;
+        _myShapeStretcher.edges.right = theValue;
+        _myShapeStretcher.updateGeometry(new Vector2f(Public.width, Public.height), false, Public.origin);
     });
 
     // TODO add getter setter for crop settings
 
     Public.__defineGetter__("edges", function () {
-        return [_myEdgeLeft, _myEdgeBottom, _myEdgeRight, _myEdgeTop];
+        return [_myShapeStretcher.edges.left,
+                _myShapeStretcher.edges.bottom,
+                _myShapeStretcher.edges.right,
+                _myShapeStretcher.edges.top];
     });
     
     Public.__defineSetter__("edges", function (theEdges) {
-        _myEdgeLeft   = theEdges[0];
-        _myEdgeBottom = theEdges[1];
-        _myEdgeRight  = theEdges[2];
-        _myEdgeTop    = theEdges[3];
+        _myShapeStretcher.edges.left   = theEdges[0];
+        _myShapeStretcher.edges.bottom = theEdges[1];
+        _myShapeStretcher.edges.right  = theEdges[2];
+        _myShapeStretcher.edges.top    = theEdges[3];
+        _myShapeStretcher.updateGeometry(new Vector2f(Public.width, Public.height), false, Public.origin);
     });
 
     Base.realize = Public.realize;
     Public.realize = function () {
         Base.realize();
-        _myImageSize  = getImageSize(Public.image);
-        _myEdgeTop    = Protected.getNumber("edgeTop",    0);
-        _myEdgeBottom = Protected.getNumber("edgeBottom", 0);
-        _myEdgeLeft   = Protected.getNumber("edgeLeft",   0);
-        _myEdgeRight  = Protected.getNumber("edgeRight",  0);
-        _myCropTop    = Protected.getNumber("cropTop",    0);
-        _myCropBottom = Protected.getNumber("cropBottom", 0);
-        _myCropLeft   = Protected.getNumber("cropLeft",   0);
-        _myCropRight  = Protected.getNumber("cropRight",  0);
-        var myQuadsPerSideX = Protected.getNumber("quadsPerSideX", 3); // XXX must be odd
-        var myQuadsPerSideY = Protected.getNumber("quadsPerSideY", 3); // XXX must be odd
-        if (myQuadsPerSideX > 3 || myQuadsPerSideY > 3) {
-            Logger.warning("StretchyImage doesn't support more than 3 quads per side yet");
-        }
-        _myQuadsPerSide = new Vector2f(myQuadsPerSideX, myQuadsPerSideY);
         
-        //Public.texture.min_filter = "nearest";
-        //Public.texture.mag_filter = "nearest";
-
+        _myShapeStretcher = new ShapeStretcher(Protected.shape, {
+            edges : {'top'    : Protected.getNumber("edgeTop",    0),
+                     'left'   : Protected.getNumber("edgeLeft",   0),
+                     'bottom' : Protected.getNumber("edgeBottom", 0),
+                     'right'  : Protected.getNumber("edgeRight",  0)},
+            crop  : {'top'    : Protected.getNumber("cropTop",    0),
+                     'left'   : Protected.getNumber("cropLeft",   0),
+                     'bottom' : Protected.getNumber("cropBottom", 0),
+                     'right'  : Protected.getNumber("cropRight",  0)},
+            quadsPerSide : new Vector2i(Protected.getNumber("quadsPerSideX", 3),
+                                        Protected.getNumber("quadsPerSideY", 3))
+        });
+        
+        _myImageSize  = getImageSize(Public.image);
         Base.imageSetter = Public.__lookupSetter__("image");
         Public.__defineSetter__("image", function (theImage) {
             Base.imageSetter(theImage);
             _myImageSize = getImageSize(theImage);
-            setupGeometry();
+            _myShapeStretcher.setupGeometry(_myImageSize, Public.origin);
         });
 
         Base.widthSetter = Public.__lookupSetter__("width");
         Public.__defineSetter__("width", function (theWidth) {
             Base.widthSetter(theWidth);
-            updateGeometry(new Vector2f(theWidth, Public.height));
+            _myShapeStretcher.updateGeometry(new Vector2f(theWidth, Public.height), false, Public.origin);
         });
 
         Base.heightSetter = Public.__lookupSetter__("height");
         Public.__defineSetter__("height", function (theHeight) {
             Base.heightSetter(theHeight);
-            updateGeometry(new Vector2f(Public.width, theHeight));
+            _myShapeStretcher.updateGeometry(new Vector2f(Public.width, theHeight), false, Public.origin);
         });
 
-        initMembers();
-        setupGeometry();
-        updateGeometry(Public.size);
+        _myShapeStretcher.initialize();
+        _myShapeStretcher.setupGeometry(_myImageSize, Public.origin);
+        _myShapeStretcher.updateGeometry(Public.size, false, Public.origin);
     };
     
     Base.postRealize = Public.postRealize;
