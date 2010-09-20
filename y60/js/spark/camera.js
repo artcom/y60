@@ -60,10 +60,6 @@
 /*globals spark, Frustum, ProjectionType, Vector3f, Quaternionf*/
 
 spark.setupCameraOrtho = function (theCamera, theWidth, theHeight, theCameraZ, theFarPlaneDistance) {
-    /*var myCameraZ = 500;
-    if(theCameraZ != undefined) {
-       myCameraZ = theCameraZ;
-    }*/
     var myCameraZ = theCameraZ || 500;
     
     /*var myFarPlaneDistance = myCameraZ * 2;

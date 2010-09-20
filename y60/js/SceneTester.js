@@ -312,7 +312,7 @@ SceneTester.prototype.Constructor = function(obj, theArguments) {
                 _myOutputSuffix = myArgument.substr(lastEqualPosition + 1);
             }
         }
-    }
+    };
     
     obj.parseArguments(theArguments);
 };

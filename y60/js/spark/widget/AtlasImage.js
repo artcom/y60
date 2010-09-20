@@ -1,5 +1,5 @@
 /*jslint nomen: false plusplus:false*/
-/*globals spark, window, print, product, Vector3f*/
+/*globals spark, window, print, product, Vector3f, Exception*/
 
 spark.AtlasImage = spark.ComponentClass("AtlasImage");
 
@@ -15,11 +15,6 @@ spark.AtlasImage.Constructor = function (Protected) {
     var _myAtlasPath        = null;
     var _mySubTextureName   = null;
     var _myOriginalUVCoords = [];
-    
-    var _myDirtyFlags = {
-        atlas      : false,
-        subtexture : false
-    };
     var _realized = false;
     
     /////////////////////

@@ -163,4 +163,3 @@ spark.instantiateComponent = function (theNode) {
     var MyConstructor = spark.componentClasses[myClassName];
     return new MyConstructor(myNode);
 };
-
