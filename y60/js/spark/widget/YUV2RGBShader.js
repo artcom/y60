@@ -44,7 +44,8 @@ spark.YUV2RGBShader.Constructor = function (Protected) {
     ////////////////////
     
     Public.realize = function () {
-        Public.movie = spark.openMovie(Public.src, "YUV420", Protected.getString("decoderhint", "FFMpegDecoder2"));
+        Public.movie = spark.openMovie(Public.src, "YUV420", 
+                Protected.getString("decoderhint", "FFMpegDecoder2"), Protected.getBoolean("audio", true));
         Base.movieSetter = Public.__lookupSetter__("movie");
         Public.__defineSetter__("movie", function (theNode) {
             Base.movieSetter(theNode);
@@ -61,7 +62,8 @@ spark.YUV2RGBShader.Constructor = function (Protected) {
         Base.srcSetter = Public.__lookupSetter__("src");
         Public.__defineSetter__("src", function (theSrc) {
             _mySource = theSrc;
-            Public.movie = spark.openMovie(theSrc, "YUV420", Protected.getString("decoderhint", "FFMpegDecoder2"));
+            Public.movie = spark.openMovie(theSrc, "YUV420",
+                Protected.getString("decoderhint", "FFMpegDecoder2"), Protected.getBoolean("audio", true));
         });
         // YUV targetrasterformat allows us to use a shader to convert YUV2RGB, 
         // loadMovieFrame created 3 rasters for us, therefore we need 3 textures
@@ -85,3 +87,4 @@ spark.YUV2RGBShader.Constructor = function (Protected) {
         myMaterial.enabled = true;
     };
 };
+

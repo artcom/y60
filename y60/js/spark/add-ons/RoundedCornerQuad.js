@@ -67,9 +67,10 @@ spark.RoundedCornerQuad.Constructor = function (Protected) {
         var myIsYUVMovie = false;
         for (var i = 0; i < myOptionNode.length; ++i) {
             if (myOptionNode[i].name === "option") {
-                if (myOptionNode[i].childNode("#text").nodeValue === "[10[yuv2rgb]]") {
+                if (myOptionNode[i].childNode("#text").nodeValue == "[10[yuv2rgb]]") {
                     Protected.material.requires.removeChild(myOptionNode[i]);
                     myIsYUVMovie = true;
+                    break;
                 }
             }
         }

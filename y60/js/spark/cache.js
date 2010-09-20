@@ -101,7 +101,7 @@ spark.getCachedTexture = function (thePath) {
 
 spark.ourMovieCounter = 0;
 
-spark.openMovie = function (thePath, theTargetPixelFormat, theDecoderHint) {
+spark.openMovie = function (thePath, theTargetPixelFormat, theDecoderHint, theAudioFlag) {
     var myMovie = Node.createElement("movie");
     window.scene.images.appendChild(myMovie);
 
@@ -110,6 +110,7 @@ spark.openMovie = function (thePath, theTargetPixelFormat, theDecoderHint) {
     myMovie.resize = "none";
     myMovie.maxcachesize = "8";
     myMovie.loopcount = "1";
+    myMovie.audio = ((theAudioFlag) ? "1" : "0") || "1";
     myMovie.targetpixelformat = theTargetPixelFormat || "RGB";
     myMovie.decoderhint = theDecoderHint || "FFMpegDecoder2";
 

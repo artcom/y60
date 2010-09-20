@@ -68,7 +68,6 @@ spark.Movie.Constructor = function(Protected) {
         Public.loop = Protected.getBoolean("loop", false);
         Public.mode = Protected.getString("mode", "stop");
         Public.playSpeed = Protected.getNumber("playspeed", 1);
-        Public.audio = Protected.getBoolean("audio", true);
         Public.volume = Protected.getNumber("volume", 1.0);
         Public.width = Protected.getNumber("width", Public.width);
         Public.height = Protected.getNumber("height", Public.height);
@@ -151,9 +150,10 @@ spark.Movie.Constructor = function(Protected) {
     Public.__defineGetter__("audio", function() {
         return _myMovie.audio === 1;
     });
+    /* disabled for now, audio can only configured when opening theMovie
     Public.__defineSetter__("audio", function(theFlag) {
         _myMovie.audio = theFlag ? 1 : 0;
-    });
+    });*/
 
     Public.__defineGetter__("volume", function() {
         return _myMovie.volume;
@@ -202,7 +202,7 @@ spark.Movie.Constructor = function(Protected) {
                 if (_myMovie.nodeName == "image") {
                     _myMovie.parentNode.removeChild(_myMovie);
                     _myMovie = null;
-                    Public.movie = spark.openMovie(theSourceFile, _myTargetPixelFormat, _myDecoderHint);
+                    Public.movie = spark.openMovie(theSourceFile, _myTargetPixelFormat, _myDecoderHint, Protected.getBoolean("audio", true));
                 } else {
                     _myMovie.src = theSourceFile;
                     window.scene.loadMovieFrame(_myMovie);
@@ -210,7 +210,7 @@ spark.Movie.Constructor = function(Protected) {
                     initMovie();
                 }
             } else {
-                Public.movie = spark.openMovie(theSourceFile, _myTargetPixelFormat, _myDecoderHint);
+                Public.movie = spark.openMovie(theSourceFile, _myTargetPixelFormat, _myDecoderHint, Protected.getBoolean("audio", true));
             }
         } else {
             if(_myMovie.playmode !== "stop") {
