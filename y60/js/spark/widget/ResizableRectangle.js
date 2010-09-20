@@ -5,9 +5,9 @@
 spark.ResizableRectangle = spark.AbstractClass("ResizableRectangle");
 
 spark.ResizableRectangle.Constructor = function (Protected) {
-    var Base = {};
     var Public = this;
-    this.Inherit(spark.Body);
+    var Base   = {};
+    Public.Inherit(spark.Body);
 
     /////////////////////
     // Private Members //
@@ -78,7 +78,13 @@ spark.ResizableRectangle.Constructor = function (Protected) {
             var myLowerLeft = product(Public.origin, -1);
             var myUpperRight = difference(mySize, Public.origin);
             _myShape = Modelling.createQuad(window.scene, _myMaterial.id,
-                    myLowerLeft, myUpperRight);
+                                            myLowerLeft, myUpperRight);
+            // or more generic for later enhancements
+            /*
+            _myShape = Modelling.createPlane(window.scene, _myMaterial.id,
+                       myLowerLeft, myUpperRight,
+                       1,1);
+            */
             _myShape.name = Public.name + "-shape";
         }
 

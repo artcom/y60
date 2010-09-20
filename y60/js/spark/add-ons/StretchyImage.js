@@ -13,10 +13,9 @@
 
 spark.StretchyImage = spark.ComponentClass("StretchyImage");
 spark.StretchyImage.Constructor = function (Protected) {
-    var Base = {};
     var Public = this;
-    
-    this.Inherit(spark.Image);
+    var Base   = {};
+    Public.Inherit(spark.Image);
 
     /////////////////////
     // Private Members //
@@ -28,27 +27,21 @@ spark.StretchyImage.Constructor = function (Protected) {
     var _myEdgeBottom = 0;
     var _myEdgeLeft   = 0;
     var _myEdgeRight  = 0;
-    var _myCropTop = 0;
+    var _myCropTop    = 0;
     var _myCropBottom = 0;
-    var _myCropLeft = 0;
-    var _myCropRight = 0;
+    var _myCropLeft   = 0;
+    var _myCropRight  = 0;
     
     var _myQuadsPerSide    = new Vector2f(3, 3);
     var _myVerticesPerSide = new Vector2f(_myQuadsPerSide.x + 1, _myQuadsPerSide.y + 1);
     var _myNumVertices     = _myVerticesPerSide.x * _myVerticesPerSide.y;
     var _myNumQuads        = _myQuadsPerSide.x * _myQuadsPerSide.y;
     
+    var _applyEdgeFilteringOffsetFlag = true;
+    
     /////////////////////
     // Private Methods //
     /////////////////////
-
-    function initMembers() {
-        _myUVCoords = getVertexData(Protected.shape, 'uvset');
-        _myVerticesPerSide = new Vector2f(_myQuadsPerSide.x + 1, _myQuadsPerSide.y + 1);
-        _myNumVertices = _myVerticesPerSide.x * _myVerticesPerSide.y;
-        _myNumQuads = _myQuadsPerSide.x * _myQuadsPerSide.y;
-        Logger.debug(Public.name + " quadsPerSide " + _myQuadsPerSide + ", verticesPerSide " + _myVerticesPerSide + ", numVertices " + _myNumVertices + ", numQuads " + _myNumQuads);
-    }
 
     function getVertexData(theShape, theVertexAttribute) {
         var myXPath = ".//*[@name='" + theVertexAttribute + "']";
@@ -60,31 +53,21 @@ spark.StretchyImage.Constructor = function (Protected) {
         return theShape.find(myXPath).firstChild.nodeValue;
     }
 
-    function setupGeometry() {
-        _myUVCoords.resize(_myNumVertices);
-        Protected.vertices.resize(_myNumVertices);
-        updateGeometry(_myImageSize, true);
+    function initMembers() { // TODO proper naming init members is equivalent to "does internal stuff"
+        _myUVCoords = getVertexData(Protected.shape, 'uvset');
+        _myVerticesPerSide = new Vector2f(_myQuadsPerSide.x + 1, _myQuadsPerSide.y + 1);
+        _myNumVertices = _myVerticesPerSide.x * _myVerticesPerSide.y;
+        _myNumQuads = _myQuadsPerSide.x * _myQuadsPerSide.y;
+        Logger.debug(Public.name + " quadsPerSide " + _myQuadsPerSide + ", verticesPerSide " + _myVerticesPerSide + ", numVertices " + _myNumVertices + ", numQuads " + _myNumQuads);
+    }
 
-        var myPIdx = getIndexData(Protected.shape, 'position');
-        myPIdx.resize( _myNumQuads * 4 );
-        var myUVIdx = getIndexData(Protected.shape, 'uvset');
-        myUVIdx.resize( _myNumQuads * 4 );
-        var v = 0;
-        for (var i = 0; i < _myQuadsPerSide.y; ++i) {
-            for (var j = 0; j < _myQuadsPerSide.x; ++j) {
-                v = i * _myVerticesPerSide.x + j;
-                var q = 4 * (i * _myQuadsPerSide.x + j);
-                myUVIdx[q  ] = myPIdx[q  ] = v;
-                myUVIdx[q+1] = myPIdx[q+1] = v + 1;
-                myUVIdx[q+2] = myPIdx[q+2] = v + 1 + _myVerticesPerSide.x;
-                myUVIdx[q+3] = myPIdx[q+3] = v + _myVerticesPerSide.x;
-            }
-        }
+    function _applyEdgeFilteringOffset(theEdgeAmount) {
+        return (!_applyEdgeFilteringOffsetFlag || theEdgeAmount < 0) ? 0 : 1;
     }
 
     function updateGeometry(theSize, theUVCoordFlag) {
         var myWidth = theSize.x;
-        var myHeight = theSize.y; 
+        var myHeight = theSize.y;
         var o = Public.origin;
         var v = 0;
         for (var i = 0; i < _myVerticesPerSide.y; ++i) {
@@ -97,33 +80,55 @@ spark.StretchyImage.Constructor = function (Protected) {
                 if (j === 0) {
                     myX = -o.x;
                     myCropX = _myCropLeft;
-                } else if (j === _myVerticesPerSide.x -3) {
-                    myX = -o.x + _myEdgeLeft;
+                } else if (j === _myVerticesPerSide.x - 3) {
+                    myX = -o.x + _myEdgeLeft + _applyEdgeFilteringOffset(_myEdgeLeft);
                     myCropX = _myCropLeft;
-                } else if (j === _myVerticesPerSide.x -2) {
-                    myX = myWidth - o.x - _myEdgeRight;
+                } else if (j === _myVerticesPerSide.x - 2) {
+                    myX = myWidth - o.x - _myEdgeRight - _applyEdgeFilteringOffset(_myEdgeRight);
                     myCropX = -_myCropRight;
-                } else if (j === _myVerticesPerSide.x -1) {
+                } else if (j === _myVerticesPerSide.x - 1) {
                     myX = myWidth - o.x;
                     myCropX = -_myCropRight;
                 }
                 if (i === 0) {
                     myY = -o.y;
                     myCropY = _myCropBottom;
-                } else if (i === _myVerticesPerSide.y -3) {
-                    myY = -o.y + _myEdgeBottom;
+                } else if (i === _myVerticesPerSide.y - 3) {
+                    myY = -o.y + _myEdgeBottom + _applyEdgeFilteringOffset(_myEdgeBottom);
                     myCropY = _myCropBottom;
-                } else if (i === _myVerticesPerSide.y -2) {
-                    myY = myHeight - o.y - _myEdgeTop;
+                } else if (i === _myVerticesPerSide.y - 2) {
+                    myY = myHeight - o.y - _myEdgeTop - _applyEdgeFilteringOffset(_myEdgeTop);
                     myCropY = -_myCropTop;
-                } else if (i === _myVerticesPerSide.y -1) {
+                } else if (i === _myVerticesPerSide.y - 1) {
                     myY = myHeight - o.y;
                     myCropY = -_myCropTop;
                 }
                 Protected.vertices[v] = [myX, myY, 0];
                 if (theUVCoordFlag) {
-                    _myUVCoords[v] = [(myX + myCropX + o.x)/myWidth, 1 - (myY + myCropY + o.y)/myHeight];
+                    _myUVCoords[v] = [(myX + myCropX + o.x) / myWidth, 1 - (myY + myCropY + o.y) / myHeight];
                 }
+            }
+        }
+    }
+
+    function setupGeometry() {
+        _myUVCoords.resize(_myNumVertices);
+        Protected.vertices.resize(_myNumVertices);
+        updateGeometry(_myImageSize, true);
+
+        var myPIdx = getIndexData(Protected.shape, 'position');
+        myPIdx.resize(_myNumQuads * 4);
+        var myUVIdx = getIndexData(Protected.shape, 'uvset');
+        myUVIdx.resize(_myNumQuads * 4);
+        var v = 0;
+        for (var i = 0; i < _myQuadsPerSide.y; ++i) {
+            for (var j = 0; j < _myQuadsPerSide.x; ++j) {
+                v = i * _myVerticesPerSide.x + j;
+                var q = 4 * (i * _myQuadsPerSide.x + j);
+                myUVIdx[q]     = myPIdx[q]     = v;
+                myUVIdx[q + 1] = myPIdx[q + 1] = v + 1;
+                myUVIdx[q + 2] = myPIdx[q + 2] = v + 1 + _myVerticesPerSide.x;
+                myUVIdx[q + 3] = myPIdx[q + 3] = v + _myVerticesPerSide.x;
             }
         }
     }
@@ -164,6 +169,8 @@ spark.StretchyImage.Constructor = function (Protected) {
         _myEdgeRight = theValue;
     });
 
+    // TODO add getter setter for crop settings
+
     Public.__defineGetter__("edges", function () {
         return [_myEdgeLeft, _myEdgeBottom, _myEdgeRight, _myEdgeTop];
     });
@@ -178,27 +185,21 @@ spark.StretchyImage.Constructor = function (Protected) {
     Base.realize = Public.realize;
     Public.realize = function () {
         Base.realize();
-        _myImageSize = getImageSize(Public.image);
-        _myEdgeTop = Protected.getNumber("edgeTop",0);
-        _myEdgeBottom = Protected.getNumber("edgeBottom",0);
-        _myEdgeLeft = Protected.getNumber("edgeLeft",0);
-        _myEdgeRight = Protected.getNumber("edgeRight",0);
-        _myCropTop = Protected.getNumber("cropTop",0);
-        _myCropBottom = Protected.getNumber("cropBottom",0);
-        _myCropLeft = Protected.getNumber("cropLeft",0);
-        _myCropRight = Protected.getNumber("cropRight",0);
-        var myQuadsPerSideX = Protected.getNumber("quadsPerSideX", 3);
-        var myQuadsPerSideY = Protected.getNumber("quadsPerSideY", 3);
+        _myImageSize  = getImageSize(Public.image);
+        _myEdgeTop    = Protected.getNumber("edgeTop",    0);
+        _myEdgeBottom = Protected.getNumber("edgeBottom", 0);
+        _myEdgeLeft   = Protected.getNumber("edgeLeft",   0);
+        _myEdgeRight  = Protected.getNumber("edgeRight",  0);
+        _myCropTop    = Protected.getNumber("cropTop",    0);
+        _myCropBottom = Protected.getNumber("cropBottom", 0);
+        _myCropLeft   = Protected.getNumber("cropLeft",   0);
+        _myCropRight  = Protected.getNumber("cropRight",  0);
+        var myQuadsPerSideX = Protected.getNumber("quadsPerSideX", 3); // XXX must be odd
+        var myQuadsPerSideY = Protected.getNumber("quadsPerSideY", 3); // XXX must be odd
         if (myQuadsPerSideX > 3 || myQuadsPerSideY > 3) {
             Logger.warning("StretchyImage doesn't support more than 3 quads per side yet");
         }
         _myQuadsPerSide = new Vector2f(myQuadsPerSideX, myQuadsPerSideY);
-
-        //XXX: to avoid texture filtering artefacts 
-        _myEdgeTop    = (_myEdgeTop > 0)    ? _myEdgeTop + 1 : 0;
-        _myEdgeBottom = (_myEdgeBottom > 0) ? _myEdgeBottom + 1 : 0;
-        _myEdgeLeft   = (_myEdgeLeft > 0)   ? _myEdgeLeft + 1 : 0;
-        _myEdgeRight  = (_myEdgeRight > 0)  ? _myEdgeRight + 1 : 0;
         
         //Public.texture.min_filter = "nearest";
         //Public.texture.mag_filter = "nearest";
@@ -215,7 +216,7 @@ spark.StretchyImage.Constructor = function (Protected) {
             Base.widthSetter(theWidth);
             updateGeometry(new Vector2f(theWidth, Public.height));
         });
-        
+
         Base.heightSetter = Public.__lookupSetter__("height");
         Public.__defineSetter__("height", function (theHeight) {
             Base.heightSetter(theHeight);
@@ -231,7 +232,4 @@ spark.StretchyImage.Constructor = function (Protected) {
     Public.postRealize = function () {
         Base.postRealize();
     };
-    
-    
-    
 };
