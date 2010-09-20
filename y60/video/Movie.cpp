@@ -433,7 +433,7 @@ namespace y60 {
 #if 0
         loadStream( thePackageManager.openFile(get<ImageSourceTag>()), get<ImageSourceTag>());
 #else
-        loadFile( thePackageManager.searchFile(get<ImageSourceTag>()) );
+        loadFile( thePackageManager.searchFile(get<ImageSourceTag>()));
 #endif
     }
 
@@ -479,8 +479,8 @@ namespace y60 {
 
 
     void
-    Movie::load(const std::string & theTexturePath) {
-        loadFile( asl::searchFile(get<ImageSourceTag>(), theTexturePath) );
+    Movie::load(const std::string & theTexturePath, const unsigned int theFrame) {
+        loadFile( asl::searchFile(get<ImageSourceTag>(), theTexturePath), theFrame );
     }
 
 
@@ -504,13 +504,15 @@ namespace y60 {
 
 
     void
-    Movie::loadFile(const std::string & theUrl) {
+    Movie::loadFile(const std::string & theUrl, const unsigned int theFrame) {
 
         const std::string & mySourceFile = get<ImageSourceTag>();
         if (_myDecoder) {
             _myDecoder->stopMovie();
         }
-        //set<CurrentFrameTag>(0);
+        if (theFrame > 0) {
+            set<CurrentFrameTag>(theFrame);
+        }
         _myLastDecodedFrame = std::numeric_limits<unsigned>::max();
         _myCurrentLoopCount = 0;
 

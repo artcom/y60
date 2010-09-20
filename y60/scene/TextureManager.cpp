@@ -173,6 +173,27 @@ namespace y60 {
         }
     }
 
+    void 
+    TextureManager::loadMovieAtFrame(asl::Ptr<Movie, dom::ThreadingModel> theMovie,
+        const unsigned int theMovieFrame) {
+        MAKE_SCOPE_TIMER(TextureManager_loadMovieFrame);
+        AC_DEBUG << "loadMovieFrame: theFrame = " << theMovieFrame;
+
+        // First time load, or source has changed
+        if (theMovie->reloadRequired()) {
+            MAKE_SCOPE_TIMER(TextureManager_loadMovieFrame_movieLoad);
+            try {
+                theMovie->load(AppPackageManager::get().getPtr()->getSearchPath(), theMovieFrame);
+            } catch (asl::Exception & ex) {
+                ex.appendWhat(string("while loading movie src='") +
+                        theMovie->get<ImageSourceTag>() + "', "+
+                        "searching in '"+AppPackageManager::get().getPtr()->getSearchPath()+"'");
+                throw ex;
+            }
+        }
+        theMovie->readFrame();
+    }
+
     void
     TextureManager::loadCaptureFrame(CapturePtr theCapture) {
         MAKE_SCOPE_TIMER(TextureManager_loadCaptureFrame);
