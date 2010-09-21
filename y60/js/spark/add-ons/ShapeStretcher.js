@@ -9,14 +9,6 @@ function ShapeStretcher(theShape, theOptions) {
 // Statics //
 /////////////
 
-ShapeStretcher.DEFAULT_EDGES = {'top'    : 0,
-                                'left'   : 0,
-                                'bottom' : 0,
-                                'right'  : 0};
-ShapeStretcher.DEFAULT_CROP  = {'top'    : 0,
-                                'left'   : 0,
-                                'bottom' : 0,
-                                'right'  : 0};
 ShapeStretcher.DEFAULT_QUADS_PER_SIDE = new Vector2i(3, 3);
 ShapeStretcher.APPLY_EDGE_FILTERING_OFFSET_FLAG = true;
 
@@ -46,14 +38,20 @@ ShapeStretcher.prototype.Constructor = function (Public, theShape, theOptions) {
     if (theOptions && "edges" in theOptions) {
         _myEdges = theOptions.edges;
     } else {
-        _myEdges = ShapeStretcher.DEFAULT_EDGES.clone();
+        _myEdges = {'top'    : 0,
+                    'left'   : 0,
+                    'bottom' : 0,
+                    'right'  : 0};
     }
     
     var _myCrop  = null;
     if (theOptions && "crop" in theOptions) {
         _myCrop = theOptions.crop;
     } else {
-        _myCrop = ShapeStretcher.DEFAULT_CROP.clone();
+        _myCrop = {'top'    : 0,
+                   'left'   : 0,
+                   'bottom' : 0,
+                   'right'  : 0}
     }
     
     var _myQuadsPerSide = null;
@@ -178,5 +176,9 @@ ShapeStretcher.prototype.Constructor = function (Public, theShape, theOptions) {
     // TODO potentially make edges simply public
     Public.__defineGetter__("edges", function () {
         return _myEdges;
+    });
+    
+    Public.__defineGetter__("crop", function () {
+        return _myCrop;
     });
 };
