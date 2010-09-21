@@ -58,6 +58,11 @@ ShapeStretcher.prototype.Constructor = function (Public, theShape, theOptions) {
     } else {
         _myQuadsPerSide = ShapeStretcher.DEFAULT_QUADS_PER_SIDE.clone();
     }
+    
+    var _myUVTransformationMatrix  = null;
+    if (theOptions && "uvTransformationMatrix" in theOptions) {
+        _myUVTransformationMatrix = theOptions.uvTransformationMatrix;
+    }
     var _myVerticesPerSide = new Vector2i(_myQuadsPerSide.x + 1,
                                           _myQuadsPerSide.y + 1);
     
@@ -83,7 +88,7 @@ ShapeStretcher.prototype.Constructor = function (Public, theShape, theOptions) {
     ////////////////////
     
     Public.updateGeometry = function (theSize, theUVCoordFlag, theOrigin) {
-        var myWidth = theSize.x;
+        var myWidth  = theSize.x;
         var myHeight = theSize.y;
         var myOrigin = theOrigin;
         var v = 0;
@@ -124,6 +129,10 @@ ShapeStretcher.prototype.Constructor = function (Public, theShape, theOptions) {
                 _myVertices[v] = [myX, myY, 0];
                 if (theUVCoordFlag) {
                     _myUVCoords[v] = [(myX + myCropX + myOrigin.x) / myWidth, 1 - (myY + myCropY + myOrigin.y) / myHeight];
+                    if(_myUVTransformationMatrix) {
+                        _myUVCoords[v] = product(_myUVCoords[v].xy0, _myUVTransformationMatrix).xy;
+                    }
+                    
                 }
             }
         }
@@ -133,7 +142,7 @@ ShapeStretcher.prototype.Constructor = function (Public, theShape, theOptions) {
         _myUVCoords.resize(_myNumVertices);
         _myVertices.resize(_myNumVertices);
         Public.updateGeometry(theSize, true, theOrigin);
-
+        
         var myPIdx = _getIndexData(_myShape, 'position');
         myPIdx.resize(_myNumQuads * 4);
         var myUVIdx = _getIndexData(_myShape, 'uvset');

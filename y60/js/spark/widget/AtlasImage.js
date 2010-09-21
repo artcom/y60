@@ -16,6 +16,8 @@ spark.AtlasImage.Constructor = function (Protected) {
     var _mySubTextureName   = null;
     var _myOriginalUVCoords = [];
     var _realized = false;
+    var _myUVTransformationMatrix = null;
+    var _myOriginalImageSize = null;
     
     /////////////////////
     // Private Methods //
@@ -26,7 +28,7 @@ spark.AtlasImage.Constructor = function (Protected) {
             var myUVCoords = Protected.shape.find(".//*[@name='uvset']").firstChild.nodeValue;
             for (var i = 0; i < myUVCoords.length; i++) {
                 myUVCoords[i] = product(_myOriginalUVCoords[i].xy0,
-                                        Public.root.textureAtlasManager.getUVMatrix(_mySubTextureName, _myAtlasPath)).xy;
+                                        _myUVTransformationMatrix).xy;
             }
         }
     }
@@ -50,6 +52,7 @@ spark.AtlasImage.Constructor = function (Protected) {
     Public.realize = function (theMaterial) {
         _myAtlasPath      = Protected.getString("atlas", _myAtlasPath);
         _mySubTextureName = Protected.getString("subtexture", _mySubTextureName);
+        _myUVTransformationMatrix = Public.root.textureAtlasManager.getUVMatrix(_mySubTextureName, _myAtlasPath);
         
         if (_mySubTextureName && _myAtlasPath) {
             Base.realize(_getMaterial(_mySubTextureName, _myAtlasPath));
@@ -59,9 +62,9 @@ spark.AtlasImage.Constructor = function (Protected) {
         _storeOriginalUVCoords();
         _applyAtlasTextureInformation();
         
-        var myTexturePixelSize = Public.root.textureAtlasManager.getSize(_mySubTextureName, _myAtlasPath);
-        Public.width  = Protected.getNumber("width",  myTexturePixelSize[0]);
-        Public.height = Protected.getNumber("height", myTexturePixelSize[1]);
+        _myOriginalImageSize = Public.root.textureAtlasManager.getSize(_mySubTextureName, _myAtlasPath);
+        Public.width  = Protected.getNumber("width",  _myOriginalImageSize[0]);
+        Public.height = Protected.getNumber("height", _myOriginalImageSize[1]);
         
         _realized = true;
     };
@@ -81,4 +84,12 @@ spark.AtlasImage.Constructor = function (Protected) {
             Public.size = Public.root.textureAtlasManager.getSize(_mySubTextureName, _myAtlasPath);
         }
     };
+    
+    Protected.__defineGetter__("uvTransformationMatrix", function() {
+        return _myUVTransformationMatrix;
+    });
+    
+    Protected.__defineGetter__("originalImageSize", function() {
+        return _myOriginalImageSize;
+    });
 };
