@@ -22,9 +22,10 @@ spark.Movie.Constructor = function(Protected) {
 
     var _myMovie             = null;
     var _myTexture           = null;
+    var _myStartFrame        = 0; //movie should start at this frame after setting src
     var _myDecoderHint       = "FFMpegDecoder2";
     var _myTargetPixelFormat = "RGB";
-    var _mySetSourceWithoutChangingBody = false;
+    var _mySetSourceWithoutChangingImageNode = false;
 
     // XXX crude hack starts here
     var _myOnMovieChanged = null;
@@ -116,6 +117,12 @@ spark.Movie.Constructor = function(Protected) {
     Public.__defineGetter__("mode", function () {
         return _myMovie.playmode;
     });
+    Public.__defineGetter__("startFrame", function () {
+        return _myStartFrame;
+    });
+    Public.__defineSetter__("startFrame", function (theValue) {
+        _myStartFrame = theValue;
+    });
     Public.__defineSetter__("mode", function (thePlaymode) {
         _myMovie.playmode = thePlaymode;
     });
@@ -198,19 +205,20 @@ spark.Movie.Constructor = function(Protected) {
     Public.__defineSetter__("src", function (theSourceFile) {
         if(_mySource !== theSourceFile) {
             _mySource = theSourceFile;
-            if (_mySetSourceWithoutChangingBody) {
+            if (_mySetSourceWithoutChangingImageNode) {
                 if (_myMovie.nodeName == "image") {
                     _myMovie.parentNode.removeChild(_myMovie);
                     _myMovie = null;
-                    Public.movie = spark.openMovie(theSourceFile, _myTargetPixelFormat, _myDecoderHint, Protected.getBoolean("audio", true));
+                    Public.movie = spark.openMovie(theSourceFile, _myTargetPixelFormat, _myDecoderHint, Protected.getBoolean("audio", true), _myStartFrame);
                 } else {
                     _myMovie.src = theSourceFile;
-                    window.scene.loadMovieFrame(_myMovie);
+                    window.scene.loadMovieFrame(_myMovie, _myStartFrame);
+                    _myMovie.playmode = "pause";
                     ensureAspectRatio();
                     initMovie();
                 }
             } else {
-                Public.movie = spark.openMovie(theSourceFile, _myTargetPixelFormat, _myDecoderHint, Protected.getBoolean("audio", true));
+                Public.movie = spark.openMovie(theSourceFile, _myTargetPixelFormat, _myDecoderHint, Protected.getBoolean("audio", true), _myStartFrame);
             }
         } else {
             if(_myMovie.playmode !== "stop") {
@@ -244,7 +252,7 @@ spark.Movie.Constructor = function(Protected) {
         var myMovieSourceId = Protected.getString("srcId", "");
         _myDecoderHint = Protected.getString("decoderhint", "FFMpegDecoder2");
         _myTargetPixelFormat = Protected.getString("targetpixelformat", "RGB");
-        _mySetSourceWithoutChangingBody = Protected.getBoolean("setSourceWithoutChangingBody",false);
+        _mySetSourceWithoutChangingImageNode = Protected.getBoolean("setSourceWithoutChangingImageNode",false);
 
         if(myMovieSource === "") {
             var myWidth  = Protected.getNumber("width", 1);
@@ -255,7 +263,7 @@ spark.Movie.Constructor = function(Protected) {
                 _mySourceId = myMovieSourceId;
             }
         } else {
-            _myMovie = spark.openMovie(myMovieSource, _myTargetPixelFormat, _myDecoderHint);
+            _myMovie = spark.openMovie(myMovieSource, _myTargetPixelFormat, _myDecoderHint, _myStartFrame);
             _mySource = myMovieSource;
         }
 

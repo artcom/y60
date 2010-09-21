@@ -161,7 +161,7 @@ namespace y60 {
         * loads a movie from the file given in theTexturePath
         * @param theTexturePath movie file to load
         */
-        virtual void load(const std::string & theTexturePath);
+        virtual void load(const std::string & theTexturePath, const unsigned int theFrame=0);
         //            virtual void load(const std::string & theTexturePath = ".");
         /**
         * @retval true, if a reload of the movie is required
@@ -208,7 +208,7 @@ namespace y60 {
 
         double getTimeFromFrame(unsigned theFrame) const;
         unsigned getFrameFromTime(double theTime);
-        void loadFile(const std::string & theSourceFile);
+        void loadFile(const std::string & theSourceFile, const unsigned int theFrame=0);
         void loadStream(asl::Ptr<asl::ReadableStream> theSource,
             const std::string theName);
 

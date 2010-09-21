@@ -101,7 +101,7 @@ spark.getCachedTexture = function (thePath) {
 
 spark.ourMovieCounter = 0;
 
-spark.openMovie = function (thePath, theTargetPixelFormat, theDecoderHint, theAudioFlag) {
+spark.openMovie = function (thePath, theTargetPixelFormat, theDecoderHint, theAudioFlag, theStartFrame) {
     var myMovie = Node.createElement("movie");
     window.scene.images.appendChild(myMovie);
 
@@ -114,9 +114,9 @@ spark.openMovie = function (thePath, theTargetPixelFormat, theDecoderHint, theAu
     myMovie.targetpixelformat = theTargetPixelFormat || "RGB";
     myMovie.decoderhint = theDecoderHint || "FFMpegDecoder2";
 
-    //always load first frame
+    //always load theStartFrame
     myMovie.playmode = "pause";
-    window.scene.loadMovieFrame(myMovie);
+    window.scene.loadMovieFrame(myMovie, theStartFrame);
     myMovie.playmode = "stop";
     return myMovie;
 };
