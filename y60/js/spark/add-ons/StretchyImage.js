@@ -27,45 +27,25 @@ spark.StretchyImage.Constructor = function (Protected) {
     var _myImageSize      = null;
     var _myShapeStretcher = null;
     
+    function _addEdgeProperty(theAcessorName, theEdgeName) {
+        Public.__defineGetter__(theAcessorName, function () {
+            return _myShapeStretcher.edges[theEdgeName];
+        });
+
+        Public.__defineSetter__(theAcessorName, function (theValue) {
+            _myShapeStretcher.edges[theEdgeName] = theValue;
+            _myShapeStretcher.updateGeometry(new Vector2f(Public.width, Public.height), false, Public.origin);
+        });
+    }
+    
     ////////////////////
     // Public Methods //
     ////////////////////
     
-    Public.__defineGetter__("edgeTop", function () {
-        return _myShapeStretcher.edges.top;
-    });
-
-    Public.__defineSetter__("edgeTop", function (theValue) {
-        _myShapeStretcher.edges.top = theValue;
-        _myShapeStretcher.updateGeometry(new Vector2f(Public.width, Public.height), false, Public.origin);
-    });
-    
-    Public.__defineGetter__("edgeBottom", function () {
-        return _myShapeStretcher.edges.bottom;
-    });
-
-    Public.__defineSetter__("edgeBottom", function (theValue) {
-        _myShapeStretcher.edges.bottom = theValue;
-        _myShapeStretcher.updateGeometry(new Vector2f(Public.width, Public.height), false, Public.origin);
-    });
-    
-    Public.__defineGetter__("edgeLeft", function () {
-        return _myShapeStretcher.edges.left;
-    });
-
-    Public.__defineSetter__("edgeLeft", function (theValue) {
-        _myShapeStretcher.edges.left = theValue;
-        _myShapeStretcher.updateGeometry(new Vector2f(Public.width, Public.height), false, Public.origin);
-    });
-    
-    Public.__defineGetter__("edgeRight", function () {
-        return _myShapeStretcher.edges.right;
-    });
-
-    Public.__defineSetter__("edgeRight", function (theValue) {
-        _myShapeStretcher.edges.right = theValue;
-        _myShapeStretcher.updateGeometry(new Vector2f(Public.width, Public.height), false, Public.origin);
-    });
+    _addEdgeProperty('edgeTop',    'top');
+    _addEdgeProperty('edgeBottom', 'bottom');
+    _addEdgeProperty('edgeLeft',   'left');
+    _addEdgeProperty('edgeRight',  'right');
 
     // TODO add getter setter for crop settings
 

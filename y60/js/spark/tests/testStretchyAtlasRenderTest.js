@@ -15,7 +15,10 @@ try {
     myStretchyAtlas.size = new Vector2f(300,300);
 
     var myStretchyAtlas  = ourShow.getChildByName("stretchyatlas2");
-    myStretchyAtlas.edgeTop = 1;
+    myStretchyAtlas.edgeTop    = 1;
+    myStretchyAtlas.edgeBottom = 18;
+    myStretchyAtlas.edgeLeft   = 22;
+    myStretchyAtlas.edgeRight  = 0;
     
     var myStretchyAtlas  = ourShow.getChildByName("stretchyatlas3");
     myStretchyAtlas.edges = [10, 10, 10,10];
