@@ -38,6 +38,22 @@ spark.StretchyImage.Constructor = function (Protected) {
         });
     }
     
+    function _addCropProperty(theAcessorName, theEdgeName) {
+        Public.__defineGetter__(theAcessorName, function () {
+            return _myShapeStretcher.crop[theEdgeName];
+        });
+
+        Public.__defineSetter__(theAcessorName, function (theValue) {
+            _myShapeStretcher.crop[theEdgeName] = theValue;
+            _reset();
+        });
+    }
+    
+    function _reset() {
+        _myShapeStretcher.setupGeometry(_myImageSize, Public.origin);
+        _myShapeStretcher.updateGeometry(Public.size, false, Public.origin);
+    }
+    
     ////////////////////
     // Public Methods //
     ////////////////////
@@ -47,7 +63,10 @@ spark.StretchyImage.Constructor = function (Protected) {
     _addEdgeProperty('edgeLeft',   'left');
     _addEdgeProperty('edgeRight',  'right');
 
-    // TODO add getter setter for crop settings
+    _addCropProperty('cropTop',    'top');
+    _addCropProperty('cropBottom', 'bottom');
+    _addCropProperty('cropLeft',   'left');
+    _addCropProperty('cropRight',  'right');
 
     Public.__defineGetter__("edges", function () {
         return [_myShapeStretcher.edges.left,
@@ -62,6 +81,21 @@ spark.StretchyImage.Constructor = function (Protected) {
         _myShapeStretcher.edges.right  = theEdges[2];
         _myShapeStretcher.edges.top    = theEdges[3];
         _myShapeStretcher.updateGeometry(Public.size, false, Public.origin);
+    });
+
+    Public.__defineGetter__("crop", function () {
+        return [_myShapeStretcher.crop.left,
+                _myShapeStretcher.crop.bottom,
+                _myShapeStretcher.crop.right,
+                _myShapeStretcher.crop.top];
+    });
+    
+    Public.__defineSetter__("crop", function (theEdges) {
+        _myShapeStretcher.crop.left   = theEdges[0];
+        _myShapeStretcher.crop.bottom = theEdges[1];
+        _myShapeStretcher.crop.right  = theEdges[2];
+        _myShapeStretcher.crop.top    = theEdges[3];
+        _reset();
     });
 
     Base.realize = Public.realize;
@@ -102,8 +136,7 @@ spark.StretchyImage.Constructor = function (Protected) {
         });
 
         _myShapeStretcher.initialize();
-        _myShapeStretcher.setupGeometry(_myImageSize, Public.origin);
-        _myShapeStretcher.updateGeometry(Public.size, false, Public.origin);
+        _reset();
     };
     
     Base.postRealize = Public.postRealize;
