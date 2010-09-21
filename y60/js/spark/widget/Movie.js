@@ -113,12 +113,6 @@ spark.Movie.Constructor = function(Protected) {
     Public.__defineGetter__("mode", function () {
         return _myMovie.playmode;
     });
-    Public.__defineGetter__("startFrame", function () {
-        return _myStartFrame;
-    });
-    Public.__defineSetter__("startFrame", function (theValue) {
-        _myStartFrame = theValue;
-    });
     Public.__defineSetter__("mode", function (thePlaymode) {
         _myMovie.playmode = thePlaymode;
     });
@@ -147,6 +141,13 @@ spark.Movie.Constructor = function(Protected) {
     });
     Public.__defineSetter__("currentFrame", function(f) {
         _myMovie.currentframe = f;
+    });
+
+    Public.__defineGetter__("startFrame", function () {
+        return _myStartFrame;
+    });
+    Public.__defineSetter__("startFrame", function (theValue) {
+        _myStartFrame = theValue;
     });
 
     // audio
@@ -184,10 +185,7 @@ spark.Movie.Constructor = function(Protected) {
 
         _myMovie = theNode;
         _myTexture.image = theNode.id;
-        if (_myMovie.nodeName !== "image") {
-            ensureAspectRatio();
-            initMovie();
-        }
+        Public.onMovieChanged();
     });
 
     Public.__defineGetter__("src", function() {
@@ -198,14 +196,11 @@ spark.Movie.Constructor = function(Protected) {
             _mySource = theSourceFile;
             if (_mySetSourceWithoutChangingImageNode) {
                 if (_myMovie.nodeName === "image") {
-                    _myMovie.parentNode.removeChild(_myMovie);
-                    _myMovie = null;
                     Public.movie = spark.openMovie(theSourceFile, _myTargetPixelFormat, _myDecoderHint, Protected.getBoolean("audio", true), _myStartFrame);
                 } else {
                     _myMovie.src = theSourceFile;
                     window.scene.loadMovieFrame(_myMovie, _myStartFrame);
-                    ensureAspectRatio();
-                    initMovie();
+                    Public.onMovieChanged();
                 }
             } else {
                 Public.movie = spark.openMovie(theSourceFile, _myTargetPixelFormat, _myDecoderHint, Protected.getBoolean("audio", true), _myStartFrame);
@@ -265,10 +260,7 @@ spark.Movie.Constructor = function(Protected) {
                 _myTexture, Public.name + "-material", true);
 
         Base.realize(myMaterial);
-        if(myMovieSource) {
-            ensureAspectRatio();
-            initMovie();
-        }
+        Public.onMovieChanged();
     };
 
     Base.postRealize = Public.postRealize;
@@ -280,5 +272,12 @@ spark.Movie.Constructor = function(Protected) {
             Base.realizeYUV2RGBShader();
         }
         Base.postRealize();
+    };
+
+    Public.onMovieChanged = function() {
+        if (_myMovie.nodeName !== "image") {
+            ensureAspectRatio();
+            initMovie();
+        }
     };
 };
