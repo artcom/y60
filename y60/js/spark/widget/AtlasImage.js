@@ -16,12 +16,22 @@ spark.AtlasImage.Constructor = function (Protected) {
     var _mySubTextureName   = null;
     var _myOriginalUVCoords = [];
     var _realized = false;
+    // XXX would even be nice to have this in the components.
+    // e.g. "bool getter 'realized'"
     
     /////////////////////
     // Private Methods //
     /////////////////////
     
-    Protected.applyAtlasTextureInformation = function() {
+    function _getMaterial(theTextureName, theAtlasPath) {
+        return Public.root.textureAtlasManager.getMaterial(_myAtlasPath);
+    }
+    
+    ///////////////////////
+    // Protected Methods //
+    ///////////////////////
+    
+    Protected.applyAtlasTextureInformation = function () {
         if (_myAtlasPath && _mySubTextureName) {
             var myUVCoords = Protected.shape.find(".//*[@name='uvset']").firstChild.nodeValue;
             for (var i = 0; i < myUVCoords.length; i++) {
@@ -29,19 +39,23 @@ spark.AtlasImage.Constructor = function (Protected) {
                                         Public.root.textureAtlasManager.getUVMatrix(_mySubTextureName, _myAtlasPath)).xy;
             }
         }
-    }
+    };
     
-    function _getMaterial(theTextureName, theAtlasPath) {
-        return Public.root.textureAtlasManager.getMaterial(_myAtlasPath);
-    }
-    
-    Protected.storeOriginalUVCoords = function() {
+    Protected.storeOriginalUVCoords = function () {
         var myOriginalUVCoords = Protected.shape.find(".//*[@name='uvset']").firstChild.nodeValue;
         _myOriginalUVCoords = [];
         for (var i = 0; i < myOriginalUVCoords.length; i++) {
             _myOriginalUVCoords.push(myOriginalUVCoords[i].clone());
         }
-    }
+    };
+    
+    Protected.__defineGetter__("uvTransformationMatrix", function () {
+        return Public.root.textureAtlasManager.getUVMatrix(_mySubTextureName, _myAtlasPath);
+    });
+    
+    Protected.__defineGetter__("originalImageSize", function () {
+        return Public.root.textureAtlasManager.getSize(_mySubTextureName, _myAtlasPath);
+    });
     
     ////////////////////
     // Public Methods //
@@ -72,7 +86,7 @@ spark.AtlasImage.Constructor = function (Protected) {
     };
     
     Public.setTexture = function (theTextureName, theAtlasPath) {
-        _myAtlasPath = theAtlasPath;
+        _myAtlasPath      = theAtlasPath;
         _mySubTextureName = theTextureName;
         if (_realized) {
             Protected.applyAtlasTextureInformation();
@@ -81,12 +95,4 @@ spark.AtlasImage.Constructor = function (Protected) {
             Public.originalImageSize = Public.root.textureAtlasManager.getSize(_mySubTextureName, _myAtlasPath);
         }
     };
-    
-    Protected.__defineGetter__("uvTransformationMatrix", function() {
-        return Public.root.textureAtlasManager.getUVMatrix(_mySubTextureName, _myAtlasPath);
-    });
-    
-    Protected.__defineGetter__("originalImageSize", function() {
-        return Public.root.textureAtlasManager.getSize(_mySubTextureName, _myAtlasPath);
-    });
 };

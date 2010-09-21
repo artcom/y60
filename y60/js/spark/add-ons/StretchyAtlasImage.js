@@ -1,5 +1,5 @@
 /*jslint nomen:false*/
-/*globals spark, use, Vector4f, ShapeStretcher*/
+/*globals spark, use, Vector4f, Vector2f, Vector2i ShapeStretcher*/
 
 use("spark/add-ons/ShapeStretcher.js");
 
@@ -10,12 +10,14 @@ spark.StretchyAtlasImage.Constructor = function (Protected) {
     var Base   = {};
     Public.Inherit(spark.AtlasImage);
     
+    /////////////////////
     // Private Members //
+    /////////////////////
     
     var _myShapeStretcher = null;
     var _myImageSize      = null;
     
-       ////////////////////
+   ////////////////////
     // Public Methods //
     ////////////////////
     
@@ -74,8 +76,8 @@ spark.StretchyAtlasImage.Constructor = function (Protected) {
     
     Base.realize = Public.realize;
     Public.realize = function () {
-        
         Base.realize();
+        
         // ...now we have the shape
         _myShapeStretcher = new ShapeStretcher(Protected.shape, {
             edges : {'top'    : Protected.getNumber("edgeTop",    0),
@@ -90,11 +92,9 @@ spark.StretchyAtlasImage.Constructor = function (Protected) {
                                         Protected.getNumber("quadsPerSideY", 3))
         });
         
-        //_myImageSize  = getImageSize(Public.image);
         Base.imageSetter = Public.__lookupSetter__("image");
         Public.__defineSetter__("image", function (theImage) {
             Base.imageSetter(theImage);
-            //_myImageSize = getImageSize(theImage);
             _myShapeStretcher.setupGeometry(Public.size, Public.origin);
         });
 
@@ -111,7 +111,7 @@ spark.StretchyAtlasImage.Constructor = function (Protected) {
         });
 
         _myShapeStretcher.initialize();
-        _myShapeStretcher.setupGeometry (Protected.originalImageSize, Public.origin);
+        _myShapeStretcher.setupGeometry(Protected.originalImageSize, Public.origin);
         Protected.storeOriginalUVCoords();
         Protected.applyAtlasTextureInformation();
         _myShapeStretcher.updateGeometry(Public.size, false, Public.origin);
@@ -120,10 +120,8 @@ spark.StretchyAtlasImage.Constructor = function (Protected) {
     Base.setTexture = Public.setTexture;
     Public.setTexture = function (theTextureName, theAtlasPath) {
         Base.setTexture(theTextureName, theAtlasPath);
-        _myShapeStretcher.setupGeometry (Protected.originalImageSize, Public.origin);
+        _myShapeStretcher.setupGeometry(Protected.originalImageSize, Public.origin);
         Protected.storeOriginalUVCoords();
         Protected.applyAtlasTextureInformation();
     };
-    
-    
 };

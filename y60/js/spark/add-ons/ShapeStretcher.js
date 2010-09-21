@@ -5,6 +5,10 @@ function ShapeStretcher(theShape, theOptions) {
     this.Constructor(this, theShape, theOptions);
 }
 
+/////////////
+// Statics //
+/////////////
+
 ShapeStretcher.DEFAULT_EDGES = {'top'    : 0,
                                 'left'   : 0,
                                 'bottom' : 0,
@@ -54,6 +58,8 @@ ShapeStretcher.prototype.Constructor = function (Public, theShape, theOptions) {
     
     var _myQuadsPerSide = null;
     if (theOptions && "quadsPerSide" in theOptions) {
+        // TODO check that quadsPerSide are odd. Even quadsPerSide is possible but
+        // it is not entirely clear from which "direction" the stretching is applied
         _myQuadsPerSide = theOptions.quadsPerSide;
     } else {
         _myQuadsPerSide = ShapeStretcher.DEFAULT_QUADS_PER_SIDE.clone();
@@ -100,10 +106,12 @@ ShapeStretcher.prototype.Constructor = function (Public, theShape, theOptions) {
                     myX = -myOrigin.x;
                     myCropX = _myCrop.left;
                 } else if (j === _myVerticesPerSide.x - 3) {
-                    myX = -myOrigin.x + _myEdges.left + ShapeStretcher.applyEdgeFilteringOffset(_myEdges.left);
+                    myX = -myOrigin.x + _myEdges.left +
+                          ShapeStretcher.applyEdgeFilteringOffset(_myEdges.left);
                     myCropX = _myCrop.left;
                 } else if (j === _myVerticesPerSide.x - 2) {
-                    myX = myWidth - myOrigin.x - _myEdges.right - ShapeStretcher.applyEdgeFilteringOffset(_myEdges.right);
+                    myX = myWidth - myOrigin.x - _myEdges.right -
+                          ShapeStretcher.applyEdgeFilteringOffset(_myEdges.right);
                     myCropX = -_myCrop.right;
                 } else if (j === _myVerticesPerSide.x - 1) {
                     myX = myWidth - myOrigin.x;
@@ -113,10 +121,12 @@ ShapeStretcher.prototype.Constructor = function (Public, theShape, theOptions) {
                     myY = -myOrigin.y;
                     myCropY = _myCrop.bottom;
                 } else if (i === _myVerticesPerSide.y - 3) {
-                    myY = -myOrigin.y + _myEdges.bottom + ShapeStretcher.applyEdgeFilteringOffset(_myEdges.bottom);
+                    myY = -myOrigin.y + _myEdges.bottom +
+                          ShapeStretcher.applyEdgeFilteringOffset(_myEdges.bottom);
                     myCropY = _myCrop.bottom;
                 } else if (i === _myVerticesPerSide.y - 2) {
-                    myY = myHeight - myOrigin.y - _myEdges.top - ShapeStretcher.applyEdgeFilteringOffset(_myEdges.top);
+                    myY = myHeight - myOrigin.y - _myEdges.top -
+                          ShapeStretcher.applyEdgeFilteringOffset(_myEdges.top);
                     myCropY = -_myCrop.top;
                 } else if (i === _myVerticesPerSide.y - 1) {
                     myY = myHeight - myOrigin.y;
@@ -124,7 +134,8 @@ ShapeStretcher.prototype.Constructor = function (Public, theShape, theOptions) {
                 }
                 _myVertices[v] = [myX, myY, 0];
                 if (theUVCoordFlag) {
-                    _myUVCoords[v] = [(myX + myCropX + myOrigin.x) / myWidth, 1 - (myY + myCropY + myOrigin.y) / myHeight];
+                    _myUVCoords[v] = [(myX + myCropX + myOrigin.x) / myWidth,
+                                      1 - (myY + myCropY + myOrigin.y) / myHeight];
                 }
             }
         }
@@ -153,11 +164,15 @@ ShapeStretcher.prototype.Constructor = function (Public, theShape, theOptions) {
     };
     
     Public.initialize = function () {
-        _myUVCoords = _getVertexData(_myShape, 'uvset');
-        _myVerticesPerSide = new Vector2f(_myQuadsPerSide.x + 1, _myQuadsPerSide.y + 1);
-        _myNumVertices = _myVerticesPerSide.x * _myVerticesPerSide.y;
-        _myNumQuads = _myQuadsPerSide.x * _myQuadsPerSide.y;
-        Logger.debug("ShapeStretcher::  quadsPerSide " + _myQuadsPerSide + ", verticesPerSide " + _myVerticesPerSide + ", numVertices " + _myNumVertices + ", numQuads " + _myNumQuads);
+        _myUVCoords        = _getVertexData(_myShape, 'uvset');
+        _myVerticesPerSide = new Vector2f(_myQuadsPerSide.x + 1,
+                                          _myQuadsPerSide.y + 1);
+        _myNumVertices     = _myVerticesPerSide.x * _myVerticesPerSide.y;
+        _myNumQuads        = _myQuadsPerSide.x    * _myQuadsPerSide.y;
+        Logger.debug("ShapeStretcher::  quadsPerSide " + _myQuadsPerSide +
+                     ", verticesPerSide " + _myVerticesPerSide +
+                     ", numVertices " + _myNumVertices +
+                     ", numQuads " + _myNumQuads);
     };
     
     // TODO potentially make edges simply public

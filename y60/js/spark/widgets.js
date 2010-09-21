@@ -56,7 +56,7 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-/*jslint , nomen:false, plusplus:false*/
+/*jslint nomen:false, plusplus:false*/
 /*globals spark, Vector3f, Logger, Quaternionf, radFromDeg, GUI*/
 
 /**
@@ -222,9 +222,11 @@ spark.Widget.Constructor = function (Protected) {
                     function (theEvent) {
                         Public.dispatchEvent(theEvent);
                     },
-                    false
-                );
+                    false);
                 break;
+            // XXX use this default?
+            //default:
+            //    break;
             }
         }
         Base.addEventListener(theType, theListener, theUseCapture);
@@ -454,13 +456,11 @@ spark.Widget.Constructor = function (Protected) {
         return new GUI.PropertyAnimation(theDuration, theEasing, Public, theProperty, theStart, theEnd);
     };
 
-    Public.animateFade = function(theDuration, theEnd, theEasing) {
-        if(!theDuration) {
+    Public.animateFade = function (theDuration, theEnd, theEasing) {
+        if (!theDuration) {
             theDuration = 250.0;
         }
-        if(theEnd == undefined) {
-        	theEnd = 1.0;
-        }
+        theEnd = theEnd || 1.0;
         if (!theEasing) {
             theEasing = null;
         }
