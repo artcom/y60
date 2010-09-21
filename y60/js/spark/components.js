@@ -76,7 +76,7 @@ spark.Component.Constructor = function (Protected) {
     /**
      * Components can have names.
      */
-    this.Property("name", String, null);
+    Public.Property("name", String, null);
 
     var _myNode = null;
     var _myParent = null;
@@ -130,7 +130,7 @@ spark.Component.Constructor = function (Protected) {
      */
     Public.initialize = function (theNode) {
         Public.Initialize(theNode);
-        _myNode   = theNode;
+        _myNode = theNode;
     };
 
     /**
@@ -344,10 +344,13 @@ spark.Container = spark.AbstractClass("Container");
 spark.Container.Constructor = function (Protected) {
     var Base = {};
     var Public = this;
+    Public.Inherit(spark.Component);
 
-    this.Inherit(spark.Component);
+    // Private Members //
 
     var _myChildren = [];
+
+    // Public Methods //
 
     /**
      * Get an array containing all children of this container.

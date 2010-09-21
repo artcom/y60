@@ -14,6 +14,7 @@
 use("spark/add-ons/ShapeStretcher.js");
 
 spark.StretchyImage = spark.ComponentClass("StretchyImage");
+
 spark.StretchyImage.Constructor = function (Protected) {
     var Public = this;
     var Base   = {};
