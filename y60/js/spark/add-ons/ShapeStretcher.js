@@ -51,7 +51,7 @@ ShapeStretcher.prototype.Constructor = function (Public, theShape, theOptions) {
         _myCrop = {'top'    : 0,
                    'left'   : 0,
                    'bottom' : 0,
-                   'right'  : 0}
+                   'right'  : 0};
     }
     
     var _myQuadsPerSide = null;
@@ -149,10 +149,10 @@ ShapeStretcher.prototype.Constructor = function (Public, theShape, theOptions) {
         var myUVIdx = _getIndexData(_myShape, 'uvset');
         myUVIdx.resize(_myNumQuads * 4);
         var v = 0;
-        for (var i = 0; i < _myQuadsPerSide.y; ++i) {
-            for (var j = 0; j < _myQuadsPerSide.x; ++j) {
-                v = i * _myVerticesPerSide.x + j;
-                var q = 4 * (i * _myQuadsPerSide.x + j);
+        for (var currentY = 0; currentY < _myQuadsPerSide.y; ++currentY) {
+            for (var currentX = 0; currentX < _myQuadsPerSide.x; ++currentX) {
+                v = currentY * _myVerticesPerSide.x + currentX;
+                var q = 4 * (currentY * _myQuadsPerSide.x + currentX);
                 myUVIdx[q]     = myPIdx[q]     = v;
                 myUVIdx[q + 1] = myPIdx[q + 1] = v + 1;
                 myUVIdx[q + 2] = myPIdx[q + 2] = v + 1 + _myVerticesPerSide.x;
