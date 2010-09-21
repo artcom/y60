@@ -175,7 +175,7 @@ spark.Movie.Constructor = function(Protected) {
 
     Public.__defineSetter__("movie", function(theNode) {
         if (_myMovie) {
-            if (_myMovie.nodeName === "Movie" && _myMovie.playmode !== "stop") {
+            if (_myMovie.nodeName === "movie" && _myMovie.playmode !== "stop") {
                 Public.stop();
             }
             _myMovie.parentNode.removeChild(_myMovie);
