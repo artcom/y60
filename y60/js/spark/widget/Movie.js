@@ -27,10 +27,6 @@ spark.Movie.Constructor = function(Protected) {
     var _myTargetPixelFormat = "RGB";
     var _mySetSourceWithoutChangingImageNode = false;
 
-    // XXX crude hack starts here
-    var _myOnMovieChanged = null;
-    // XXX crude hack ends here
-
     /////////////////////
     // Private Methods //
     /////////////////////
@@ -179,7 +175,7 @@ spark.Movie.Constructor = function(Protected) {
 
     Public.__defineSetter__("movie", function(theNode) {
         if (_myMovie) {
-            if (_myMovie.nodeName === "Movie" && _myMovie.playmode !== "stop") {
+            if (_myMovie.nodeName === "movie" && _myMovie.playmode !== "stop") {
                 Public.stop();
             }
             _myMovie.parentNode.removeChild(_myMovie);
@@ -192,11 +188,6 @@ spark.Movie.Constructor = function(Protected) {
             ensureAspectRatio();
             initMovie();
         }
-        // XXX crude hack starts here
-        if(_myOnMovieChanged) {
-            _myOnMovieChanged();
-        }
-        // XXX crude hack ends here
     });
 
     Public.__defineGetter__("src", function() {
@@ -206,14 +197,13 @@ spark.Movie.Constructor = function(Protected) {
         if(_mySource !== theSourceFile) {
             _mySource = theSourceFile;
             if (_mySetSourceWithoutChangingImageNode) {
-                if (_myMovie.nodeName == "image") {
+                if (_myMovie.nodeName === "image") {
                     _myMovie.parentNode.removeChild(_myMovie);
                     _myMovie = null;
                     Public.movie = spark.openMovie(theSourceFile, _myTargetPixelFormat, _myDecoderHint, Protected.getBoolean("audio", true), _myStartFrame);
                 } else {
                     _myMovie.src = theSourceFile;
                     window.scene.loadMovieFrame(_myMovie, _myStartFrame);
-                    _myMovie.playmode = "pause";
                     ensureAspectRatio();
                     initMovie();
                 }
@@ -291,13 +281,4 @@ spark.Movie.Constructor = function(Protected) {
         }
         Base.postRealize();
     };
-
-    // XXX crude hack starts here
-    Public.__defineGetter__("onMovieChanged", function() {
-        return _myOnMovieChanged;
-    });
-    Public.__defineSetter__("onMovieChanged", function(f) {
-        _myOnMovieChanged = f;
-    });
-    // XXX crude hack ends here
 };
