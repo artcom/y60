@@ -197,7 +197,7 @@ spark.Movie.Constructor = function(Protected) {
         if(_mySource !== theSourceFile) {
             _mySource = theSourceFile;
             if (_mySetSourceWithoutChangingImageNode) {
-                if (_myMovie.nodeName == "image") {
+                if (_myMovie.nodeName === "image") {
                     _myMovie.parentNode.removeChild(_myMovie);
                     _myMovie = null;
                     Public.movie = spark.openMovie(theSourceFile, _myTargetPixelFormat, _myDecoderHint, Protected.getBoolean("audio", true), _myStartFrame);
