@@ -27,10 +27,6 @@ spark.Movie.Constructor = function(Protected) {
     var _myTargetPixelFormat = "RGB";
     var _mySetSourceWithoutChangingImageNode = false;
 
-    // XXX crude hack starts here
-    var _myOnMovieChanged = null;
-    // XXX crude hack ends here
-
     /////////////////////
     // Private Methods //
     /////////////////////
@@ -192,11 +188,6 @@ spark.Movie.Constructor = function(Protected) {
             ensureAspectRatio();
             initMovie();
         }
-        // XXX crude hack starts here
-        if(_myOnMovieChanged) {
-            _myOnMovieChanged();
-        }
-        // XXX crude hack ends here
     });
 
     Public.__defineGetter__("src", function() {
@@ -213,7 +204,6 @@ spark.Movie.Constructor = function(Protected) {
                 } else {
                     _myMovie.src = theSourceFile;
                     window.scene.loadMovieFrame(_myMovie, _myStartFrame);
-                    _myMovie.playmode = "pause";
                     ensureAspectRatio();
                     initMovie();
                 }
@@ -291,13 +281,4 @@ spark.Movie.Constructor = function(Protected) {
         }
         Base.postRealize();
     };
-
-    // XXX crude hack starts here
-    Public.__defineGetter__("onMovieChanged", function() {
-        return _myOnMovieChanged;
-    });
-    Public.__defineSetter__("onMovieChanged", function(f) {
-        _myOnMovieChanged = f;
-    });
-    // XXX crude hack ends here
 };
