@@ -139,6 +139,7 @@ if (!("disableSparkWidgets" in this)) {
     use("spark/add-ons/RoundedCornerMovie.js");
     use("spark/add-ons/RoundedCornerImage.js");
     use("spark/add-ons/StretchyImage.js");
+    use("spark/add-ons/StretchyAtlasImage.js");
     use("spark/add-ons/VideoCapture.js");
     use("spark/add-ons/Slider.js");
 }
