@@ -36,7 +36,8 @@ spark.AtlasImage.Constructor = function (Protected) {
             var myUVCoords = Protected.shape.find(".//*[@name='uvset']").firstChild.nodeValue;
             for (var i = 0; i < myUVCoords.length; i++) {
                 myUVCoords[i] = product(_myOriginalUVCoords[i].xy0,
-                                        Public.root.textureAtlasManager.getUVMatrix(_mySubTextureName, _myAtlasPath)).xy;
+                                        Public.root.textureAtlasManager.getUVMatrix(_mySubTextureName,
+                                                                                    _myAtlasPath)).xy;
             }
         }
     };
@@ -50,11 +51,13 @@ spark.AtlasImage.Constructor = function (Protected) {
     };
     
     Protected.__defineGetter__("uvTransformationMatrix", function () {
-        return Public.root.textureAtlasManager.getUVMatrix(_mySubTextureName, _myAtlasPath);
+        return Public.root.textureAtlasManager.getUVMatrix(_mySubTextureName,
+                                                           _myAtlasPath);
     });
     
     Protected.__defineGetter__("originalImageSize", function () {
-        return Public.root.textureAtlasManager.getSize(_mySubTextureName, _myAtlasPath);
+        return Public.root.textureAtlasManager.getSize(_mySubTextureName,
+                                                       _myAtlasPath);
     });
     
     ////////////////////
@@ -74,9 +77,12 @@ spark.AtlasImage.Constructor = function (Protected) {
         Protected.storeOriginalUVCoords();
         Protected.applyAtlasTextureInformation();
         
-        Public.width  = Protected.getNumber("width",  Public.root.textureAtlasManager.getSize(_mySubTextureName, _myAtlasPath)[0]);
-        Public.height = Protected.getNumber("height", Public.root.textureAtlasManager.getSize(_mySubTextureName, _myAtlasPath)[1]);
-        
+        Public.width  = Protected.getNumber("width",
+                                            Public.root.textureAtlasManager.getSize(_mySubTextureName,
+                                                                                    _myAtlasPath)[0]);
+        Public.height = Protected.getNumber("height",
+                                            Public.root.textureAtlasManager.getSize(_mySubTextureName,
+                                                                                    _myAtlasPath)[1]);
         _realized = true;
     };
 

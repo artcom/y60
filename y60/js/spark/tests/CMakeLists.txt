@@ -11,6 +11,7 @@ Atlas
 set(NOCG_TESTS
 testCanvas
 testAtlasRenderTest
+testStretchyAtlasRenderTest
 )
 
 foreach(TEST ${JSTESTS})
