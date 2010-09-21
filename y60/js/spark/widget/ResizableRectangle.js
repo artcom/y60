@@ -45,6 +45,19 @@ spark.ResizableRectangle.Constructor = function (Protected) {
     });
 
     Public.Setter("size", function (theSize) {
+        // XXX this triggers applySize twice, modifying the SceneGraph twice
+        // The spark.Property's internal value cannot be changed not triggering
+        // the handle - which is architecturally fine but is a problem here.
+        // Another way could be to use dirtyFlags but this has its own problems.
+        // Main problem there would be that the dirtyFlag only gets cleared by
+        // applying the change to the SceneGraph immediately before rendering
+        // takes place making direct access to the scenegraph dangerous.
+        // example: setter for size is called, width is modified and dirty flag is set
+        // Then another part [1] accesses the shape directly and relies on the
+        // vertex values of the vertices.
+        // then the onPreRender gets called and the real changes from the size
+        // setter gets applied and the dirty flag gets reset.
+        // As can be seen this would lead to inconsistent values for [1]
         Public.width = theSize.x;
         Public.height = theSize.y;
     });

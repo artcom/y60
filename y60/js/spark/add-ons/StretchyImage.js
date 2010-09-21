@@ -34,7 +34,7 @@ spark.StretchyImage.Constructor = function (Protected) {
 
         Public.__defineSetter__(theAcessorName, function (theValue) {
             _myShapeStretcher.edges[theEdgeName] = theValue;
-            _myShapeStretcher.updateGeometry(new Vector2f(Public.width, Public.height), false, Public.origin);
+            _myShapeStretcher.updateGeometry(Public.size, false, Public.origin);
         });
     }
     
@@ -61,7 +61,7 @@ spark.StretchyImage.Constructor = function (Protected) {
         _myShapeStretcher.edges.bottom = theEdges[1];
         _myShapeStretcher.edges.right  = theEdges[2];
         _myShapeStretcher.edges.top    = theEdges[3];
-        _myShapeStretcher.updateGeometry(new Vector2f(Public.width, Public.height), false, Public.origin);
+        _myShapeStretcher.updateGeometry(Public.size, false, Public.origin);
     });
 
     Base.realize = Public.realize;
