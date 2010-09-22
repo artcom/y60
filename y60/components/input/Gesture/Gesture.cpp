@@ -26,11 +26,12 @@ using namespace dom;
 
 namespace y60 {
 
-    const float Gesture::WIPE_DISTANCE_THRESHOLD = 100.0;     //min movement of cursor that is needed for wipe
-    const float Gesture::MAX_CURSOR_PAIR_DISTANCE = 1000.0;   //cursors with larger distance than this can not be pairs
-    const float Gesture::ROTATE_ANGLE_THRESHOLD = 1.0;        //fill me
-    const float Gesture::ZOOM_DISTANCE_THRESHOLD = 0.0;          //fill me
-    const float Gesture::TAP_MAX_DISTANCE_THRESHOLD = 40.0;      //max movement of cursor, larger distances can not be tap gestures
+    const float Gesture::WIPE_VELOCITY_THRESHOLD = 0.1f;     //min velocity of cursor that is needed for wipe
+    const unsigned int Gesture::WIPE_MIN_HISTORY_LENGTH = 4;    //min length of history needed for wipe
+    const float Gesture::MAX_CURSOR_PAIR_DISTANCE = 1000.0f;   //cursors with larger distance than this can not be pairs
+    const float Gesture::ROTATE_ANGLE_THRESHOLD = 1.0f;        //fill me
+    const float Gesture::ZOOM_DISTANCE_THRESHOLD = 0.0f;          //fill me
+    const float Gesture::TAP_MAX_DISTANCE_THRESHOLD = 40.0f;      //max movement of cursor, larger distances can not be tap gestures
     const unsigned int Gesture::TAP_MIN_DURATION_THRESHOLD = 50;      //cursors with longer durations will not lead to taps
     const unsigned int Gesture::TAP_MAX_DURATION_THRESHOLD = 500;      //cursors with longer durations will not lead to taps
 
@@ -39,7 +40,8 @@ Gesture::Gesture(DLHandle theHandle) :
     GenericEventSourceFilter(),
     _myGestureSchema( new dom::Document( y60::ourgestureeventxsd ) ),
     _myValueFactory( new dom::ValueFactory() ),
-    _myWipeDistanceThreshold(WIPE_DISTANCE_THRESHOLD),
+    _myWipeVelocityThreshold(WIPE_VELOCITY_THRESHOLD),
+    _myWipeMinHistoryLength(WIPE_MIN_HISTORY_LENGTH),
     _myMaxCursorPairDistance(MAX_CURSOR_PAIR_DISTANCE),
     _myRotateAngleThreshold(ROTATE_ANGLE_THRESHOLD),
     _myZoomDistanceThreshold(ZOOM_DISTANCE_THRESHOLD),
@@ -269,20 +271,23 @@ Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent, int theID, const std:
                 } 
             }     
             if (!myPartnerFoundFlag) {
-                Vector3f myDifference = difference(thePosition3D, _myCursorPositionHistory[theID].front()._myPosition);
-                float myMagnitude = magnitude(myDifference);
-                AC_INFO << "check for wipe with magnitude " << myMagnitude << " threshold " << _myWipeDistanceThreshold << " history size " << _myCursorPositionHistory[theID].size();
-                if ( myMagnitude > _myWipeDistanceThreshold ) {
-                    NodePtr myNode = addGestureEvent2Queue(theBaseEvent, theID, "wipe", thePosition3D);
-                    myNode->appendAttribute<Vector3f>("direction", normalized(myDifference));
+                if ( _myWipeMinHistoryLength <= _myCursorPositionHistory[theID].size()) {
+                    Vector3f myDifference = difference(thePosition3D, _myCursorPositionHistory[theID].front()._myPosition);
+                    float myMagnitude = magnitude(myDifference);
                     float myDuration = _myCursorPositionHistory[theID].back()._myTimestamp - _myCursorPositionHistory[theID].front()._myTimestamp;
                     myDuration /= 1000.0f; //seconds
                     float myVelocity = myMagnitude/myDuration;
-                    myNode->appendAttribute<float>("velocity", myVelocity);
-                    AC_INFO << "register wipe gesture, id " << theID << " direction " << normalized(myDifference) << " velocity " << myVelocity << " (duration: " << myDuration <<")";
-                    //delete history to avoid additional wipes in next cursor moves
-                    _myCursorPositionHistory.clear();
-                } 
+                    AC_INFO << "check for wipe with velocity " << myVelocity << " threshold " << _myWipeVelocityThreshold << " history size " << _myCursorPositionHistory[theID].size();
+                    if (myVelocity > _myWipeVelocityThreshold) {
+                        NodePtr myNode = addGestureEvent2Queue(theBaseEvent, theID, "wipe", thePosition3D);
+                        myNode->appendAttribute<Vector3f>("direction", normalized(myDifference));
+                        
+                        myNode->appendAttribute<float>("velocity", myVelocity);
+                        AC_INFO << "register wipe gesture, id " << theID << " direction " << normalized(myDifference) << " velocity " << myVelocity << " (duration: " << myDuration <<")";
+                        //delete history to avoid additional wipes in next cursor moves
+                        _myCursorPositionHistory.clear();
+                    } 
+                }
             }
         } else if (theType == "remove") {
             AC_DEBUG << "Gesture::createEvent -> remove";
@@ -304,7 +309,7 @@ Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent, int theID, const std:
             } else {
                 Vector3f myDifference = difference(thePosition3D, _myInitialCursorPositions[theID]._myPosition);
                 float myMagnitude = magnitude(myDifference);
-                unsigned int myDuration = _myCurrentCursorPositions[theID]._myTimestamp - _myInitialCursorPositions[theID]._myTimestamp;
+                unsigned long myDuration = _myCurrentCursorPositions[theID]._myTimestamp - _myInitialCursorPositions[theID]._myTimestamp;
                 AC_INFO << "check for tap with magnitude " << myMagnitude << " threshold " << _myTapMaxDistanceThreshold << " - duration: " << myDuration << ", >= threshold: " << _myTapMinDurationThreshold << " < threshold: " << _myTapMaxDurationThreshold;
                 if (myMagnitude < _myTapMaxDistanceThreshold &&  
                     myDuration < _myTapMaxDurationThreshold &&
@@ -340,7 +345,8 @@ Gesture::getCursorPartner(int theId) {
 
 void
 Gesture::onUpdateSettings(dom::NodePtr theSettings) {
-     _myWipeDistanceThreshold = getSetting( theSettings, "WipeDistanceThreshold", _myWipeDistanceThreshold);
+     _myWipeVelocityThreshold = getSetting( theSettings, "WipeVelocityThreshold", _myWipeVelocityThreshold);
+     _myWipeMinHistoryLength = getSetting( theSettings, "WipeMinHistoryLength", _myWipeMinHistoryLength);
      _myMaxCursorPairDistance = getSetting( theSettings, "MaxCursorPairDistance", _myMaxCursorPairDistance);
      _myRotateAngleThreshold = getSetting( theSettings, "RotateAngleThreshold", _myRotateAngleThreshold);
      _myZoomDistanceThreshold = getSetting( theSettings, "ZoomDistanceThreshold", _myZoomDistanceThreshold);

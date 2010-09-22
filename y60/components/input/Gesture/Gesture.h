@@ -46,7 +46,8 @@ class Gesture : public asl::PlugInBase,
                        public GenericEventSourceFilter
 {
     public:
-        static const float WIPE_DISTANCE_THRESHOLD;
+        static const float WIPE_VELOCITY_THRESHOLD;
+        static const unsigned int WIPE_MIN_HISTORY_LENGTH;
         static const float MAX_CURSOR_PAIR_DISTANCE;
         static const float ROTATE_ANGLE_THRESHOLD;
         static const float ZOOM_DISTANCE_THRESHOLD;
@@ -96,7 +97,8 @@ class Gesture : public asl::PlugInBase,
         std::map<int, float>            _myInitialZoomDistance;
         CursorPartnerList               _myCursorPartner;
 
-        float                           _myWipeDistanceThreshold;
+        float                           _myWipeVelocityThreshold;
+        unsigned int                    _myWipeMinHistoryLength;
         float                           _myMaxCursorPairDistance;
         float                           _myRotateAngleThreshold;
         float                           _myZoomDistanceThreshold;
