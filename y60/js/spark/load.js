@@ -70,7 +70,7 @@ spark.loadString = function (theString, theParent) {
 /**
  * Load an xml file into the spark world.
  */
-spark.loadFile = function (theFile, theParent) {
+spark.loadFile = function (theFile, theParent, theArguments) {
     Logger.info("Loading spark file " + theFile);
     var myFileWithPath = searchFile(theFile);
     if (!myFileWithPath) {
@@ -78,7 +78,7 @@ spark.loadFile = function (theFile, theParent) {
     }
     var myNode = new Node();
     myNode.parseFile(myFileWithPath);
-    return spark.loadDocument(myNode, theParent, theFile);
+    return spark.loadDocument(myNode, theParent, theFile, theArguments);
 };
 
 /**
@@ -88,9 +88,9 @@ spark.loadFile = function (theFile, theParent) {
  * in the constructed components. If you wan't referential
  * independence, clone your dom first.
  */
-spark.loadDocument = function (theNode, theParent, theFile) {
+spark.loadDocument = function (theNode, theParent, theFile, theArguments) {
     var myRoot = spark.findRootElement(theNode);
-    var myComponent = spark.instantiateRecursively(myRoot, theParent);
+    var myComponent = spark.instantiateRecursively(myRoot, theParent, theArguments);
     if (theFile) {
         myComponent._sparkFile_ = theFile;
     }
@@ -103,7 +103,7 @@ spark.loadDocument = function (theNode, theParent, theFile) {
 /**
  * Internal: instantiation engine.
  */
-spark.instantiateRecursively = function (theNode, theParent) {
+spark.instantiateRecursively = function (theNode, theParent, theArguments) {
     if (!theNode) {
         Logger.fatal("Internal fault: instantiateRecursively called without a node.");
     }
@@ -135,7 +135,7 @@ spark.instantiateRecursively = function (theNode, theParent) {
     }
 
     // instantiate the component
-    var myInstance = spark.instantiateComponent(theNode);
+    var myInstance = spark.instantiateComponent(theNode, theArguments);
 
     // add to parent if we have one
     if (theParent) {
@@ -152,7 +152,7 @@ spark.instantiateRecursively = function (theNode, theParent) {
 /**
  * Internal: instantiate a single component
  */
-spark.instantiateComponent = function (theNode) {
+spark.instantiateComponent = function (theNode, theArguments) {
     Logger.info("Instantiating " + theNode.nodeName +
                 ("name" in theNode ? " named " + theNode.name :
                 ("id" in theNode ? " with id " + theNode.id : "")));
@@ -161,5 +161,5 @@ spark.instantiateComponent = function (theNode) {
     var myNode = theNode;
 
     var MyConstructor = spark.componentClasses[myClassName];
-    return new MyConstructor(myNode);
+    return new MyConstructor(myNode, theArguments);
 };
