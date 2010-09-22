@@ -248,7 +248,7 @@ spark.Movie.Constructor = function(Protected) {
                 _mySourceId = myMovieSourceId;
             }
         } else {
-            _myMovie = spark.openMovie(myMovieSource, _myTargetPixelFormat, _myDecoderHint, _myStartFrame);
+            _myMovie = spark.openMovie(myMovieSource, _myTargetPixelFormat, _myDecoderHint, Protected.getBoolean("audio", true), _myStartFrame);
             _mySource = myMovieSource;
         }
 
