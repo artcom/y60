@@ -11,12 +11,12 @@ use("SceneViewer.js"); // XXX: bad place for this
 
 spark.Window = spark.ComponentClass("Window");
 
-spark.Window.Constructor = function (Protected) {
+spark.Window.Constructor = function (Protected, theArguments) {
     var Base = {};
     var Public = this;
     Public.Inherit(spark.Stage);
     // Also inherit from SceneViewer
-    SceneViewer.prototype.Constructor(this, []);
+    SceneViewer.prototype.Constructor(this, theArguments);
     
     /////////////////////
     // Private Members //
@@ -671,8 +671,8 @@ spark.Window.Constructor = function (Protected) {
             myWidget.dispatchEvent(myTapEvent);
             break;
         case "wipe":
-            var myMagnitude = magnitude(myScale) * theGesture.magnitude;
-            var myWipeEvent = new spark.WipeGestureEvent(spark.GestureEvent.WIPE, theGesture.baseeventtype, myCursor, theGesture.direction, myMagnitude);
+            var myVelocity = magnitude(myScale) * theGesture.velocity;
+            var myWipeEvent = new spark.WipeGestureEvent(spark.GestureEvent.WIPE, theGesture.baseeventtype, myCursor, theGesture.direction, myVelocity);
             myWidget.dispatchEvent(myWipeEvent);
             break;
         case "cursor_pair_start":
