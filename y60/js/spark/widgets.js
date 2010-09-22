@@ -460,7 +460,9 @@ spark.Widget.Constructor = function (Protected) {
         if (!theDuration) {
             theDuration = 250.0;
         }
-        theEnd = theEnd || 1.0;
+        if (theEnd == undefined) {
+            theEnd = 0.0;
+        }
         if (!theEasing) {
             theEasing = null;
         }

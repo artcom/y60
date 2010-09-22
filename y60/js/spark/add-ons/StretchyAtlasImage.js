@@ -17,47 +17,52 @@ spark.StretchyAtlasImage.Constructor = function (Protected) {
     var _myShapeStretcher = null;
     var _myImageSize      = null;
     
-   ////////////////////
+    /////////////////////
+    // Private Methods //
+    /////////////////////
+    
+    function _addEdgeProperty(theAcessorName, theEdgeName) {
+        Public.__defineGetter__(theAcessorName, function () {
+            return _myShapeStretcher.edges[theEdgeName];
+        });
+
+        Public.__defineSetter__(theAcessorName, function (theValue) {
+            _myShapeStretcher.edges[theEdgeName] = theValue;
+            _myShapeStretcher.updateGeometry(Public.size, false, Public.origin);
+        });
+    }
+    
+    function _addCropProperty(theAcessorName, theEdgeName) {
+        Public.__defineGetter__(theAcessorName, function () {
+            return _myShapeStretcher.crop[theEdgeName];
+        });
+
+        Public.__defineSetter__(theAcessorName, function (theValue) {
+            _myShapeStretcher.crop[theEdgeName] = theValue;
+            _reset();
+        });
+    }
+    
+    function _reset() {
+        _myShapeStretcher.setupGeometry(Protected.originalImageSize, Public.origin);
+        Protected.storeOriginalUVCoords();
+        Protected.applyAtlasTextureInformation();
+        _myShapeStretcher.updateGeometry(Public.size, false, Public.origin);
+    }
+    
+    ////////////////////
     // Public Methods //
     ////////////////////
     
-    Public.__defineGetter__("edgeTop", function () {
-        return _myShapeStretcher.edges.top;
-    });
+    _addEdgeProperty('edgeTop',    'top');
+    _addEdgeProperty('edgeBottom', 'bottom');
+    _addEdgeProperty('edgeLeft',   'left');
+    _addEdgeProperty('edgeRight',  'right');
 
-    Public.__defineSetter__("edgeTop", function (theValue) {
-        _myShapeStretcher.edges.top = theValue;
-        _myShapeStretcher.updateGeometry(new Vector2f(Public.width, Public.height), false, Public.origin);
-    });
-    
-    Public.__defineGetter__("edgeBottom", function () {
-        return _myShapeStretcher.edges.bottom;
-    });
-
-    Public.__defineSetter__("edgeBottom", function (theValue) {
-        _myShapeStretcher.edges.bottom = theValue;
-        _myShapeStretcher.updateGeometry(new Vector2f(Public.width, Public.height), false, Public.origin);
-    });
-    
-    Public.__defineGetter__("edgeLeft", function () {
-        return _myShapeStretcher.edges.left;
-    });
-
-    Public.__defineSetter__("edgeLeft", function (theValue) {
-        _myShapeStretcher.edges.left = theValue;
-        _myShapeStretcher.updateGeometry(new Vector2f(Public.width, Public.height), false, Public.origin);
-    });
-    
-    Public.__defineGetter__("edgeRight", function () {
-        return _myShapeStretcher.edges.right;
-    });
-
-    Public.__defineSetter__("edgeRight", function (theValue) {
-        _myShapeStretcher.edges.right = theValue;
-        _myShapeStretcher.updateGeometry(new Vector2f(Public.width, Public.height), false, Public.origin);
-    });
-
-    // TODO add getter setter for crop settings
+    _addCropProperty('cropTop',    'top');
+    _addCropProperty('cropBottom', 'bottom');
+    _addCropProperty('cropLeft',   'left');
+    _addCropProperty('cropRight',  'right');
 
     Public.__defineGetter__("edges", function () {
         return [_myShapeStretcher.edges.left,
@@ -71,14 +76,28 @@ spark.StretchyAtlasImage.Constructor = function (Protected) {
         _myShapeStretcher.edges.bottom = theEdges[1];
         _myShapeStretcher.edges.right  = theEdges[2];
         _myShapeStretcher.edges.top    = theEdges[3];
-        _myShapeStretcher.updateGeometry(new Vector2f(Public.width, Public.height), false, Public.origin);
+        _myShapeStretcher.updateGeometry(Public.size, false, Public.origin);
+    });
+    
+    Public.__defineGetter__("crop", function () {
+        return [_myShapeStretcher.crop.left,
+                _myShapeStretcher.crop.bottom,
+                _myShapeStretcher.crop.right,
+                _myShapeStretcher.crop.top];
+    });
+    
+    Public.__defineSetter__("crop", function (theEdges) {
+        _myShapeStretcher.crop.left   = theEdges[0];
+        _myShapeStretcher.crop.bottom = theEdges[1];
+        _myShapeStretcher.crop.right  = theEdges[2];
+        _myShapeStretcher.crop.top    = theEdges[3];
+        _reset();
     });
     
     Base.realize = Public.realize;
     Public.realize = function () {
         Base.realize();
         
-        // ...now we have the shape
         _myShapeStretcher = new ShapeStretcher(Protected.shape, {
             edges : {'top'    : Protected.getNumber("edgeTop",    0),
                      'left'   : Protected.getNumber("edgeLeft",   0),
@@ -111,17 +130,15 @@ spark.StretchyAtlasImage.Constructor = function (Protected) {
         });
 
         _myShapeStretcher.initialize();
-        _myShapeStretcher.setupGeometry(Protected.originalImageSize, Public.origin);
-        Protected.storeOriginalUVCoords();
-        Protected.applyAtlasTextureInformation();
-        _myShapeStretcher.updateGeometry(Public.size, false, Public.origin);
+        _reset();
     };
     
     Base.setTexture = Public.setTexture;
     Public.setTexture = function (theTextureName, theAtlasPath) {
         Base.setTexture(theTextureName, theAtlasPath);
-        _myShapeStretcher.setupGeometry(Protected.originalImageSize, Public.origin);
+        /*_myShapeStretcher.setupGeometry(Protected.originalImageSize, Public.origin);
         Protected.storeOriginalUVCoords();
-        Protected.applyAtlasTextureInformation();
+        Protected.applyAtlasTextureInformation();*/
+        _reset();
     };
 };

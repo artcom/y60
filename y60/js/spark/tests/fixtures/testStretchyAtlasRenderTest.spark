@@ -4,9 +4,10 @@
                x="10" y="10" z="12"  width="300" height="300"
               edgeTop="15" edgeLeft="15" edgeRight="15" edgeBottom="15"/>
               
-  <StretchyAtlasImage name="stretchyatlas2" subtexture="2Dslider_thumb.png" atlas="fixtures/atlasses/variousAtlas.xml"
+  <StretchyAtlasImage name="stretchyatlas2" subtexture="rgbtest_130.png" atlas="fixtures/atlasses/variousAtlas.xml"
                x="10" y="320" z="12"  width="300" height="300"
-              edgeTop="15" edgeLeft="15" edgeRight="15" edgeBottom="15"/>
+              edgeTop="15" edgeLeft="15" edgeRight="15" edgeBottom="15"
+              cropTop="10" cropLeft="33" cropBottom="50" cropRight="22"/>
               
   <StretchyAtlasImage name="stretchyatlas3" subtexture="2Dslider_thumb.png" atlas="fixtures/atlasses/variousAtlas.xml"
                x="320" y="10" z="12"  width="300" height="300"
