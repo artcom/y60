@@ -50,9 +50,9 @@ class Gesture : public asl::PlugInBase,
         static const float MAX_CURSOR_PAIR_DISTANCE;
         static const float ROTATE_ANGLE_THRESHOLD;
         static const float ZOOM_DISTANCE_THRESHOLD;
-        static const float TAP_MAX_DISTANCE_THRESHOLD;			 
-        static const unsigned int TAP_MIN_DURATION_THRESHOLD;		
-        static const unsigned int TAP_MAX_DURATION_THRESHOLD;		
+        static const float TAP_MAX_DISTANCE_THRESHOLD;             
+        static const unsigned int TAP_MIN_DURATION_THRESHOLD;        
+        static const unsigned int TAP_MAX_DURATION_THRESHOLD;        
 
         Gesture(asl::DLHandle theHandle);
         virtual y60::EventPtrList poll();
@@ -71,14 +71,6 @@ class Gesture : public asl::PlugInBase,
         void createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent, int theID, const std::string & theType,
                           const asl::Vector3f & thePosition3D, unsigned long long & theTimestamp);
     private:
-        struct PositionInfo {
-            PositionInfo() {};
-            PositionInfo(const asl::Vector3f & thePosition, unsigned long long & theTimestamp):
-                _myPosition(thePosition), 
-                _myTimestamp(theTimestamp) {}
-            asl::Vector3f _myPosition;
-            unsigned long long _myTimestamp;
-        };
         dom::NodePtr addGestureEvent2Queue(GESTURE_BASE_EVENT_TYPE theBaseEvent, int theID, 
                                            const std::string & theType, 
                                            const asl::Vector3f & thePosition3D);

@@ -94,7 +94,7 @@ ASSEventSource::poll() {
     processInput();
 
     // do the event filter in base class GenericEventSourceFilter
-	//analyzeEvents(_myEvents, "id");
+    //analyzeEvents(_myEvents, "id");
     applyFilter(_myEvents);
     clearCursorHistoryOnRemove(_myEvents);
     return _myEvents;

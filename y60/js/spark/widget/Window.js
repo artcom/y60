@@ -671,8 +671,8 @@ spark.Window.Constructor = function (Protected, theArguments) {
             myWidget.dispatchEvent(myTapEvent);
             break;
         case "wipe":
-            var myMagnitude = magnitude(myScale) * theGesture.magnitude;
-            var myWipeEvent = new spark.WipeGestureEvent(spark.GestureEvent.WIPE, theGesture.baseeventtype, myCursor, theGesture.direction, myMagnitude);
+            var myVelocity = magnitude(myScale) * theGesture.velocity;
+            var myWipeEvent = new spark.WipeGestureEvent(spark.GestureEvent.WIPE, theGesture.baseeventtype, myCursor, theGesture.direction, myVelocity);
             myWidget.dispatchEvent(myWipeEvent);
             break;
         case "cursor_pair_start":

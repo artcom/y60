@@ -153,7 +153,7 @@ namespace y60 {
     }
 
     void
-    GenericEventSourceFilter::addPositionToHistory(const unsigned int theCursorId, const asl::Vector3f & thePosition) {
+    GenericEventSourceFilter::addPositionToHistory(const unsigned int theCursorId, const asl::Vector3f & thePosition, const unsigned long long & theTimestamp) {
         if (_myCursorPositionHistory.find(theCursorId) == _myCursorPositionHistory.end()) {
             _myCursorPositionHistory[theCursorId] = CursorPositions();
         }
@@ -161,25 +161,25 @@ namespace y60 {
         if (_myCursorPositionHistory[theCursorId].size() >= _myMaxCursorPositionsInHistory) {
             _myCursorPositionHistory[theCursorId].pop_front();
         }
-        _myCursorPositionHistory[theCursorId].push_back(thePosition);
+        _myCursorPositionHistory[theCursorId].push_back(PositionInfo(thePosition,theTimestamp));
     }
 
     void
-    GenericEventSourceFilter::addPositionToHistory(const unsigned int theCursorId, const asl::Vector2f & thePosition) {
+    GenericEventSourceFilter::addPositionToHistory(const unsigned int theCursorId, const asl::Vector2f & thePosition, const unsigned long long & theTimestamp) {
         asl::Vector3f myPosition(thePosition[0], thePosition[1], 0);
-        addPositionToHistory(theCursorId, myPosition);
+        addPositionToHistory(theCursorId, myPosition, theTimestamp);
     }
 
     asl::Vector3f 
-    GenericEventSourceFilter::calculateAveragePosition(const unsigned int theCursorId, const asl::Vector3f & thePosition) {
-        addPositionToHistory(theCursorId, thePosition);
+    GenericEventSourceFilter::calculateAveragePosition(const unsigned int theCursorId, const asl::Vector3f & thePosition, const unsigned long long & theTimestamp) {
+        addPositionToHistory(theCursorId, thePosition, theTimestamp);
         return getAveragePosition(theCursorId);
     }
 
     asl::Vector2f 
-    GenericEventSourceFilter::calculateAveragePosition(const unsigned int theCursorId, const asl::Vector2f & thePosition) {
+    GenericEventSourceFilter::calculateAveragePosition(const unsigned int theCursorId, const asl::Vector2f & thePosition, const unsigned long long & theTimestamp) {
         asl::Vector3f myPosition(thePosition[0], thePosition[1], 0);
-        myPosition = calculateAveragePosition(theCursorId, myPosition);
+        myPosition = calculateAveragePosition(theCursorId, myPosition, theTimestamp);
         return asl::Vector2f(myPosition[0], myPosition[1]);
     }
  
@@ -195,7 +195,7 @@ namespace y60 {
             for(; myIt !=  myEndIt; ++myIt){
                 myWeight++;
                 myWeightCounter += myWeight;
-                myAveragePosition += asl::product((*myIt), float(myWeight));
+                myAveragePosition += asl::product((myIt->_myPosition), float(myWeight));
             }
             if (myWeight > 0) {
                 myAveragePosition.div(float(myWeightCounter));
