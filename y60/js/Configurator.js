@@ -214,6 +214,10 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
         }
         _myListeners.push({obj:theListener, section:theSection});
     };
+    
+    obj.findSections  = function(theXpath) {
+        return _myMergedSettings.findAll(theXpath);
+    };
 
     obj.onFrame = function(theTime) {
         if (_myKeyDown && (theTime - _myKeyDown.time) > 0.2) {
