@@ -78,7 +78,7 @@ public:
 	~SocketError() {}
 
 	SocketErrorCode
-	getErrorCode() {
+	getErrorCode() const {
 	    return _myErrorCode;
 	}
 

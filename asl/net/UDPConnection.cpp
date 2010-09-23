@@ -44,6 +44,8 @@
 #include "SocketException.h"
 #include "net.h"
 
+#include <asl/base/Logger.h>
+
 #include <errno.h>
 #ifndef _WIN32
 #include <unistd.h>
@@ -64,6 +66,23 @@ namespace inet {
             throw SocketError(err, "UDPConnection::Connect()");
         }
         return true;
+    }
+    
+    unsigned UDPConnection::send(const void *data, unsigned len)
+    {
+        unsigned bytesSent = 0;
+        try {
+            bytesSent = UDPSocket::send(data, len);
+        } catch (const inet::SocketError & err) {
+            if(err.getErrorCode() == OS_SOCKET_ERROR(ECONNREFUSED)) {
+                //http://www.unixguide.net/network/socketfaq/5.4.shtml
+                AC_WARNING << "Received ICMP Error from Receiver " << getRemoteAddress() << " at port "
+                           << getRemotePort() << ": " << err;
+            } else {
+                throw err;
+            }
+        }
+        return bytesSent;
     }
 
 }

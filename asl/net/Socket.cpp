@@ -161,7 +161,7 @@ namespace inet {
         if ((byteswritten=::send(fd, (char*)data, len, getSendFlags())) != static_cast<int>(len))
         {
             int err = getLastSocketError();
-            throw SocketError(err, "Socket::write() failed.");
+            throw SocketError(err, "Socket::send() failed.");
         }
         return byteswritten;
     }

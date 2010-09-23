@@ -77,6 +77,7 @@ namespace inet {
         public:
             UDPConnection(asl::Unsigned32 thehost, asl::Unsigned16 theport);
             virtual bool connect(asl::Unsigned32 thehost, asl::Unsigned16 theport);
+            virtual unsigned send(const void *data, unsigned len);
     };
 
     typedef asl::Ptr<UDPConnection> UDPConnectionPtr;

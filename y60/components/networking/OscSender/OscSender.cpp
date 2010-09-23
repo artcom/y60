@@ -142,14 +142,7 @@ namespace y60 {
                 myOSCStream << osc::EndBundle;
                 ASSURE( myOSCStream.IsReady() );
                 if ( myOSCStream.Size() > 16 ) { // empty bundles have size 16
-                    try {
-                        // determined experimentally ... ain't nice
-                        _myReceiverUDPConnection->send( myOSCStream.Data(), myOSCStream.Size() );
-                    } catch (const inet::SocketException & ex) {
-                        AC_WARNING << "Failed to send to " << _myReceiverAddress << " at port "
-                                   << _myReceiverPort << ": " << ex;
-                        _myReceiverUDPConnection = UDPConnectionPtr();
-                    }
+                    _myReceiverUDPConnection->send( myOSCStream.Data(), myOSCStream.Size() );
                     myBytesWitten = myOSCStream.Size();
                     AC_DEBUG << "Send event: " << *theOscEvent;
                 }
