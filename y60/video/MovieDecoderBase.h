@@ -195,11 +195,11 @@ namespace y60 {
             const Movie * getMovie() const;
             Movie * getMovie();
             bool getDecodeAudioFlag() const;
+            double         _myMovieTime;
 
         private:
             Movie *        _myMovie;
             bool           _myEndOfFileFlag;
-            double         _myMovieTime;
             double         _myLastSystemTime;
             bool           _myDecodeAudioFlag;
     };

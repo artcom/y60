@@ -80,7 +80,7 @@ namespace y60 {
     }
 
     MovieDecoderBase::MovieDecoderBase() :
-        _myEndOfFileFlag(false), _myMovieTime(0.0), _myLastSystemTime(-1.0), _myDecodeAudioFlag(true)
+        _myMovieTime(0.0), _myEndOfFileFlag(false), _myLastSystemTime(-1.0), _myDecodeAudioFlag(true)
     {}
 
     MovieDecoderBase::~MovieDecoderBase() {}
