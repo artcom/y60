@@ -962,7 +962,7 @@ namespace y60 {
         Movie * myMovie = getMovie();
 
         _myFrameRate = av_q2d(_myVStream->r_frame_rate);
-        _myFrameRate/=2;
+        
         myMovie->set<FrameRateTag>(_myFrameRate);
         if (myVCodec->codec_id == CODEC_ID_MPEG1VIDEO || myVCodec->codec_id == CODEC_ID_MPEG2VIDEO )
         {
