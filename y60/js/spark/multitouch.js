@@ -370,7 +370,7 @@ spark.GestureEvent.Constructor = function (Protected, theType, theBaseEvent, the
  */
 spark.GestureEvent.WIPE  = "gesture-wipe";
 spark.WipeGestureEvent = spark.Class("WipeGestureEvent");
-spark.WipeGestureEvent.Constructor = function (Protected, theType, theBaseEvent, theCursor, theDirection, theMagnitude) {
+spark.WipeGestureEvent.Constructor = function (Protected, theType, theBaseEvent, theCursor, theDirection, theVelocity) {
     var Public = this;
     this.Inherit(spark.GestureEvent, theType, theBaseEvent, theCursor);
     
@@ -379,7 +379,7 @@ spark.WipeGestureEvent.Constructor = function (Protected, theType, theBaseEvent,
     /////////////////////
     
     var _myDirection = theDirection;
-    var _myMagnitude = theMagnitude;
+    var _myVelocity = theVelocity;
     
     ////////////////////
     // Public Methods //
@@ -393,10 +393,10 @@ spark.WipeGestureEvent.Constructor = function (Protected, theType, theBaseEvent,
     });
     
     /**
-     * Magnitude of the direction vector
+     * Velocity of the movement
      */
-    Public.__defineGetter__("magnitude", function () {
-        return _myMagnitude;
+    Public.__defineGetter__("velocity", function () {
+        return _myVelocity;
     });
 
 };

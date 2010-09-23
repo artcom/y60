@@ -715,6 +715,7 @@ namespace y60 {
             if (_myLastVideoFrame) {
                 if(shouldSeek(_myLastVideoFrame->getTime(), myStreamTime)) {
                     seek(theTime);
+                    _myMovieTime = theTime;
                     return -1;
                 }
                 double myFrameTime = _myLastVideoFrame->getTime();
@@ -961,7 +962,7 @@ namespace y60 {
         Movie * myMovie = getMovie();
 
         _myFrameRate = av_q2d(_myVStream->r_frame_rate);
-
+        
         myMovie->set<FrameRateTag>(_myFrameRate);
         if (myVCodec->codec_id == CODEC_ID_MPEG1VIDEO || myVCodec->codec_id == CODEC_ID_MPEG2VIDEO )
         {

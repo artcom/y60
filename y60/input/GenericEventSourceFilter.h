@@ -68,14 +68,24 @@
 #include <vector>
 
 namespace y60 {
-    typedef std::map<int, std::deque<asl::Vector3f> > CursorPositionHistory;
-    typedef std::deque<asl::Vector3f> CursorPositions;
-
+  
     struct CursorFilter {
         CursorFilter(const std::string & theEventType, const std::string & theIdAttributeName) : _myEventType(theEventType), _myCursorAttributeName(theIdAttributeName) {}
         std::string _myEventType;
         std::string _myCursorAttributeName;
     };
+    struct PositionInfo {
+        PositionInfo() {};
+        PositionInfo(const asl::Vector3f & thePosition, const unsigned long long & theTimestamp):
+            _myPosition(thePosition), 
+            _myTimestamp(theTimestamp) {}
+        asl::Vector3f _myPosition;
+        unsigned long long _myTimestamp;
+    };
+
+    typedef std::map<int, std::deque<PositionInfo> > CursorPositionHistory;
+    typedef std::deque<PositionInfo> CursorPositions;
+
 
     class Y60_INPUT_DECL GenericEventSourceFilter {
         public:
@@ -91,19 +101,19 @@ namespace y60 {
             inline asl::Vector3f getCurrentPosition(const unsigned int theCursorId) const {
                 CursorPositionHistory::const_iterator myPositionsIt = _myCursorPositionHistory.find(theCursorId);
                 if (myPositionsIt != _myCursorPositionHistory.end()) {
-                    return myPositionsIt->second.back();
+                    return myPositionsIt->second.back()._myPosition;
                 } else {
                     return asl::Vector3f(0.0,0.0,0.0);
                 }
             };
 
-            void addPositionToHistory(const unsigned int theCursorId, const asl::Vector3f & thePosition);
-            void addPositionToHistory(const unsigned int theCursorId, const asl::Vector2f & thePosition);
-            asl::Vector3f calculateAveragePosition(const unsigned int theCursorId, const asl::Vector3f & thePosition);
-            asl::Vector2f calculateAveragePosition(const unsigned int theCursorId, const asl::Vector2f & thePosition);
+            void addPositionToHistory(const unsigned int theCursorId, const asl::Vector3f & thePosition, const unsigned long long & theTimestamp=asl::Time().millis());
+            void addPositionToHistory(const unsigned int theCursorId, const asl::Vector2f & thePosition, const unsigned long long & theTimestamp=asl::Time().millis());
+            asl::Vector3f calculateAveragePosition(const unsigned int theCursorId, const asl::Vector3f & thePosition, const unsigned long long & theTimestamp=asl::Time().millis());
+            asl::Vector2f calculateAveragePosition(const unsigned int theCursorId, const asl::Vector2f & thePosition, const unsigned long long & theTimestamp=asl::Time().millis());
             void clearCursorHistoryOnRemove(const EventPtrList & theEventList);
 
-            std::map<int, std::deque<asl::Vector3f> >   _myCursorPositionHistory;
+            std::map<int, std::deque<PositionInfo> >   _myCursorPositionHistory;
             unsigned int _myMaxCursorPositionsInHistory;
             bool _myFilterMultipleMovePerCursorFlag;
         private:          

@@ -447,16 +447,21 @@ loadMovieFrame(JSContext *cx, JSObject *obj, uintn argc, jsval *argv, jsval *rva
         convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
         dom::NodePtr myNode;
-        convertFrom(cx, argv[0], myNode);
+        if (!convertFrom(cx, argv[0], myNode)) {
+            JS_ReportError(cx, "JSScene::loadMovieFrame(): argument #1 must be a node (movienode)");
+            return JS_FALSE;
+        }
 
-        ensureParamCount(argc, 1);
-
+        ensureParamCount(argc, 1, 2);
         if (argc == 1) {
             myNative->getTextureManager()->loadMovieFrame(myNode->getFacade<Movie>());
-        } else {
+        } else if (argc == 2 ) {
             unsigned int myFrame;
-            convertFrom(cx, argv[1], myFrame);
-            myNative->getTextureManager()->loadMovieAtFrame(myNode->getFacade<Movie>(), myFrame);
+            if (convertFrom(cx, argv[1], myFrame)) {
+                myNative->getTextureManager()->loadMovieAtFrame(myNode->getFacade<Movie>(), myFrame);
+            } else {
+                myNative->getTextureManager()->loadMovieFrame(myNode->getFacade<Movie>());
+            }
         }
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
