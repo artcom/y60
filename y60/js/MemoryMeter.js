@@ -99,7 +99,7 @@ MemoryMeter.prototype.Constructor = function (self, theSceneViewer) {
             plug("GLBinding");
             _myGLPlugged = true;
             try {
-                //var myGLMemFree = gl.GetFreeMem();
+                gl.GetFreeMem();
                 _myGLMemExtensionAvail = true;
             } catch (theEx) {
                 _myGLMemExtensionAvail = false;
