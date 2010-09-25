@@ -121,6 +121,7 @@ namespace y60 {
         Image::registerDependenciesRegistrators();
         AC_DEBUG << "Movie::registerDependenciesRegistrators '" << get<NameTag>();
         VolumeTag::Plug::getValuePtr()->setImmediateCallBack(dynamic_cast_Ptr<Movie>(getSelf()), &Movie::setVolume);
+        PlayModeTag::Plug::getValuePtr()->setImmediateCallBack(dynamic_cast_Ptr<Movie>(getSelf()), &Movie::setPlayMode);
     }
 
     void Movie::setup() {
@@ -153,7 +154,6 @@ namespace y60 {
         if (_myDecoder) {
             _myDecoder->stopMovie();
         }
-        set<PlayModeTag>(asl::getStringFromEnum(PLAY_MODE_STOP, MoviePlayModeStrings));
         set<CurrentFrameTag>(0);
         _myLastDecodedFrame = std::numeric_limits<unsigned>::max();
         _myCurrentLoopCount = 0;
@@ -175,7 +175,19 @@ namespace y60 {
     }
 
 
-
+    void
+    Movie::setPlayMode() {
+        if (!_myDecoder) {
+            return;
+        }
+        AC_DEBUG<<"playmode attribute in dom changed to "<<get<PlayModeTag>();
+        MoviePlayMode myPlayMode =
+            MoviePlayMode(asl::getEnumFromString(get<PlayModeTag>(), MoviePlayModeStrings));
+        if (myPlayMode != _myPlayMode) {
+            setPlayMode(myPlayMode);
+        }
+    }
+    
     void
     Movie::setPlayMode(MoviePlayMode thePlayMode) {
         AC_DEBUG << "Movie::setPlayMode "
@@ -211,7 +223,11 @@ namespace y60 {
         }
         // Synchronize internal and external representation
         _myPlayMode = thePlayMode;
-        set<PlayModeTag>(asl::getStringFromEnum(thePlayMode, MoviePlayModeStrings));
+        MoviePlayMode myPlayMode =
+            MoviePlayMode(asl::getEnumFromString(get<PlayModeTag>(), MoviePlayModeStrings));
+        if (myPlayMode != _myPlayMode) {
+            set<PlayModeTag>(asl::getStringFromEnum(thePlayMode, MoviePlayModeStrings));
+        }
     }
 
     double Movie::decodeFrame(double theTime, unsigned theFrame) {
@@ -311,13 +327,7 @@ namespace y60 {
             AC_ERROR << "Movie::readFrame not allowed before open";
             return;
         }
-        // Check for playmode changes from javascript
-        MoviePlayMode myPlayMode =
-            MoviePlayMode(asl::getEnumFromString(get<PlayModeTag>(), MoviePlayModeStrings));
-        if (myPlayMode != _myPlayMode) {
-            setPlayMode(myPlayMode);
-        }
-
+        
         // Calculate next frame
         int myNextFrame = 0;
         double myMovieTime = 0.0;
@@ -506,21 +516,17 @@ namespace y60 {
     void
     Movie::loadFile(const std::string & theUrl, const unsigned int theFrame) {
 
-        const std::string & mySourceFile = get<ImageSourceTag>();
-        if (_myDecoder) {
-            _myDecoder->stopMovie();
+        if (_myPlayMode != PLAY_MODE_STOP) {
+            setPlayMode(PLAY_MODE_STOP);
         }
         if (theFrame > 0) {
             set<CurrentFrameTag>(theFrame);
         }
-        _myLastDecodedFrame = std::numeric_limits<unsigned>::max();
-        _myCurrentLoopCount = 0;
-
-        _myPlayMode = PLAY_MODE_STOP;
-
+        
         // if imagesource is an url do not take the packetmanager or searchfile new url
 
-        string myFilename;
+        const std::string & mySourceFile = get<ImageSourceTag>();
+        std::string myFilename;
         if (mySourceFile.find("://") != string::npos) {
             myFilename = mySourceFile;
         } else {
@@ -574,6 +580,8 @@ namespace y60 {
             myMatrix.makeScaling(asl::Vector3f(myXResize, myYResize, 1.0f));
             set<ImageMatrixTag>(myMatrix);
         }
+        // set desired playmode from dom
+        setPlayMode();
     }
 
 

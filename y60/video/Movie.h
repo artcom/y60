@@ -187,6 +187,7 @@ namespace y60 {
         bool hasAudio(bool & theHasAudio) const;
 
         void setVolume();
+        void setPlayMode();
         virtual void registerDependenciesRegistrators();
 
         /**
