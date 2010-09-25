@@ -621,6 +621,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
     function stopMovie() {
         if (_myMovieNode) {
             print("Removing MovieNode");
+            _myMovieNode.playmode = "stop";
             window.scene.images.removeChild(_myMovieNode);
             _myMovieNode = null;
         }
