@@ -119,7 +119,7 @@ class JSTextureAtlas : public JSWrapper<y60::TextureAtlas, asl::Ptr<y60::Texture
 template <>
 struct JSClassTraits<y60::TextureAtlas> : public JSClassTraitsWrapper<y60::TextureAtlas, JSTextureAtlas> {};
 
-bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<y60::TextureAtlas> & theTextureAtlas);
+bool convertFrom(JSContext *cx, jsval theValue, JSTextureAtlas::OWNERPTR & theTextureAtlas);
 }
 
 #endif
