@@ -94,9 +94,12 @@ namespace y60 {
         virtual SoundPtr createSound(const std::string & theURI, bool theLoop);
         virtual SoundPtr createSound(const std::string & theURI, bool theLoop,
                 bool theUseCache);
-        virtual void setVolume(float theVolume);
         virtual void fadeToVolume(float theVolume, float theTime);
         virtual float getVolume() const;
+        virtual void getVolumes(std::vector<float> & theVolumes) const;
+        virtual void setVolume(float theVolume);
+        virtual void setVolumes(std::vector<float> theVolumes);
+        virtual unsigned int getChannelCount() const;
         virtual unsigned getNumSounds() const;
         virtual unsigned getNumOpenSounds() const {
             return _mySounds.size();
