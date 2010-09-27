@@ -122,10 +122,14 @@ namespace y60 {
         AC_DEBUG << "Movie::registerDependenciesRegistrators '" << get<NameTag>();
         VolumeTag::Plug::getValuePtr()->setImmediateCallBack(dynamic_cast_Ptr<Movie>(getSelf()), &Movie::setVolume);
         PlayModeTag::Plug::getValuePtr()->setImmediateCallBack(dynamic_cast_Ptr<Movie>(getSelf()), &Movie::setPlayMode);
+        ImageSourceTag::Plug::getValuePtr()->setImmediateCallBack(dynamic_cast_Ptr<Movie>(getSelf()), &Movie::setSource);
+        // take attributes on construction time in account
+        setSource();
+        setPlayMode();
+        setVolume();
     }
 
     void Movie::setup() {
-
         //check if we have an inline movie, if so open it using FFMpeg
         dom::NodePtr myBinaryElement = getNode().firstChild();
         if (myBinaryElement && !getRasterPtr()) {
@@ -174,7 +178,7 @@ namespace y60 {
         decodeFrame(myMovieTime, 0);
     }
 
-
+    // callback for playmode attribute
     void
     Movie::setPlayMode() {
         if (!_myDecoder) {
@@ -185,6 +189,7 @@ namespace y60 {
             MoviePlayMode(asl::getEnumFromString(get<PlayModeTag>(), MoviePlayModeStrings));
         if (myPlayMode != _myPlayMode) {
             setPlayMode(myPlayMode);
+            readFrame();
         }
     }
     
@@ -353,15 +358,13 @@ namespace y60 {
             myMovieTime = getTimeFromFrame(myNextFrame);
             break;
         case PLAY_MODE_PLAY:
+            myMovieTime = _myDecoder->getMovieTime(theCurrentTime);
             if (theIgnoreCurrentTime && get<CurrentFrameTag>() != 0) {
                 myMovieTime = getTimeFromFrame(get<CurrentFrameTag>());
-            } else {
-                myMovieTime = _myDecoder->getMovieTime(theCurrentTime);
             }
             myNextFrame = (int)getFrameFromTime(myMovieTime);
             break;
         case PLAY_MODE_STOP:
-            myNextFrame = _myLastDecodedFrame;
             return;
         case PLAY_MODE_NODISK:
             //XXX check if we need to do something more here
@@ -411,21 +414,23 @@ namespace y60 {
     }
 
     void Movie::setVolume() {
+        if (!_myDecoder) {
+            return;
+        }
         MovieDecoderBase* myDecoder = const_cast<MovieDecoderBase*>(_myDecoder.get());
         float myVolume = get<VolumeTag>();
         myVolume = asl::clamp(myVolume, 0.0f, 1.0f);
         if (!almostEqual(myVolume, get<VolumeTag>())) {
             set<VolumeTag>(myVolume);
         }
-        if (myDecoder) {
-            myDecoder->setVolume(myVolume);
-        } else {
-            AC_ERROR << "Movie::setVolume with no valid decoder, please use loadMovieFrame somehow to initialize movie";
-        }
+        myDecoder->setVolume(myVolume);
     }
 
-
-    void Movie::load() {}
+    void Movie::setSource() {
+        if (reloadRequired()) {
+            load(AppPackageManager::get().getPtr()->getSearchPath());
+        }
+    }
 
 
 
@@ -489,8 +494,8 @@ namespace y60 {
 
 
     void
-    Movie::load(const std::string & theTexturePath, const unsigned int theFrame) {
-        loadFile( asl::searchFile(get<ImageSourceTag>(), theTexturePath), theFrame );
+    Movie::load(const std::string & theTexturePath) {
+        loadFile( asl::searchFile(get<ImageSourceTag>(), theTexturePath) );
     }
 
 
@@ -514,17 +519,13 @@ namespace y60 {
 
 
     void
-    Movie::loadFile(const std::string & theUrl, const unsigned int theFrame) {
+    Movie::loadFile(const std::string & theUrl) {
 
         if (_myPlayMode != PLAY_MODE_STOP) {
             setPlayMode(PLAY_MODE_STOP);
         }
-        if (theFrame > 0) {
-            set<CurrentFrameTag>(theFrame);
-        }
         
         // if imagesource is an url do not take the packetmanager or searchfile new url
-
         const std::string & mySourceFile = get<ImageSourceTag>();
         std::string myFilename;
         if (mySourceFile.find("://") != string::npos) {
@@ -580,19 +581,21 @@ namespace y60 {
             myMatrix.makeScaling(asl::Vector3f(myXResize, myYResize, 1.0f));
             set<ImageMatrixTag>(myMatrix);
         }
-        // set desired playmode from dom
-        setPlayMode();
     }
 
 
 
     bool
-    Movie::reloadRequired(){
-        bool rc = !_myDecoder || _myLoadedFilename != get<ImageSourceTag>();
+    Movie::reloadRequired() {
+        std::string mySource = get<ImageSourceTag>();
+        if (mySource == "") {
+            return false;
+        }
+        bool rc = !_myDecoder || _myLoadedFilename != mySource;
         AC_TRACE << "Movie::reloadRequired " << rc
             << " with _myLoadedFilename=" << _myLoadedFilename
-            << " ImageSourceTag=" << get<ImageSourceTag>();
-        if (_myLoadedFilename != get<ImageSourceTag>()) {
+            << " ImageSourceTag=" << mySource;
+        if (_myLoadedFilename != mySource) {
             set<FrameCountTag>(-1);
         }
         return rc;

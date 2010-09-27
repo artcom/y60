@@ -436,7 +436,6 @@ static JSBool
 loadMovieFrame(JSContext *cx, JSObject *obj, uintn argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Updates a movie node.");
     DOC_PARAM("theMovieNode", "The movie node to update.", DOC_TYPE_NODE);
-    DOC_PARAM_OPT("theFrame", "The frame which should be loaded.", DOC_TYPE_INTEGER, 0);
     DOC_END;
     try {
         if (argc < 1) {
@@ -452,17 +451,8 @@ loadMovieFrame(JSContext *cx, JSObject *obj, uintn argc, jsval *argv, jsval *rva
             return JS_FALSE;
         }
 
-        ensureParamCount(argc, 1, 2);
-        if (argc == 1) {
-            myNative->getTextureManager()->loadMovieFrame(myNode->getFacade<Movie>());
-        } else if (argc == 2 ) {
-            unsigned int myFrame;
-            if (convertFrom(cx, argv[1], myFrame)) {
-                myNative->getTextureManager()->loadMovieAtFrame(myNode->getFacade<Movie>(), myFrame);
-            } else {
-                myNative->getTextureManager()->loadMovieFrame(myNode->getFacade<Movie>());
-            }
-        }
+        ensureParamCount(argc, 1);
+        myNative->getTextureManager()->loadMovieFrame(myNode->getFacade<Movie>());
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }

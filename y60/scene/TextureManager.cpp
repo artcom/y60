@@ -150,48 +150,11 @@ namespace y60 {
         MAKE_SCOPE_TIMER(TextureManager_loadMovieFrame);
         AC_DEBUG << "loadMovieFrame: theCurrentTime = " << theCurrentTime;
 
-        // First time load, or source has changed
-        if (theMovie->reloadRequired()) {
-            MAKE_SCOPE_TIMER(TextureManager_loadMovieFrame_movieLoad);
-            try {
-                theMovie->load(AppPackageManager::get().getPtr()->getSearchPath());
-            } catch (asl::Exception & ex) {
-                ex.appendWhat(string("while loading movie src='") +
-                        theMovie->get<ImageSourceTag>() + "', "+
-                        "searching in '"+AppPackageManager::get().getPtr()->getSearchPath()+"'");
-                throw ex;
-            }
+        if (theCurrentTime == -1) {
+            theMovie->readFrame();
+        } else {
+            theMovie->readFrame(theCurrentTime);
         }
-
-        {
-            MAKE_SCOPE_TIMER(TextureManager_loadMovieFrame_movieReadFrame);
-            if (theCurrentTime == -1) {
-                theMovie->readFrame();
-            } else {
-                theMovie->readFrame(theCurrentTime);
-            }
-        }
-    }
-
-    void 
-    TextureManager::loadMovieAtFrame(asl::Ptr<Movie, dom::ThreadingModel> theMovie,
-        const unsigned int theMovieFrame) {
-        MAKE_SCOPE_TIMER(TextureManager_loadMovieFrame);
-        AC_DEBUG << "loadMovieFrame: theFrame = " << theMovieFrame;
-
-        // First time load, or source has changed
-        if (theMovie->reloadRequired()) {
-            MAKE_SCOPE_TIMER(TextureManager_loadMovieFrame_movieLoad);
-            try {
-                theMovie->load(AppPackageManager::get().getPtr()->getSearchPath(), theMovieFrame);
-            } catch (asl::Exception & ex) {
-                ex.appendWhat(string("while loading movie src='") +
-                        theMovie->get<ImageSourceTag>() + "', "+
-                        "searching in '"+AppPackageManager::get().getPtr()->getSearchPath()+"'");
-                throw ex;
-            }
-        }
-        theMovie->readFrame();
     }
 
     void

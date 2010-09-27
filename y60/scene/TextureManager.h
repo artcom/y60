@@ -99,8 +99,6 @@ namespace y60 {
             void reloadTextures();
             void loadMovieFrame(asl::Ptr<Movie, dom::ThreadingModel> theMovie,
                                 double theCurrentTime = -1);
-            void loadMovieAtFrame(asl::Ptr<Movie, dom::ThreadingModel> theMovie,
-                                const unsigned int theMovieFrame);
             void loadCaptureFrame(asl::Ptr<Capture, dom::ThreadingModel> theCapture);
             TexturePtr getTexture(const std::string & theTextureId) const;
             TexturePtr findTexture(const std::string & theTextureId) const;

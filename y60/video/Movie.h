@@ -99,11 +99,11 @@ namespace y60 {
     DEFINE_ATTRIBUTE_TAG(AspectRatioTag,  float,       MOVIE_ASPECT_RATIO_ATTRIB,   1, Y60_VIDEO_DECL);
     DEFINE_ATTRIBUTE_TAG(FrameRateTag,    double,      MOVIE_FRAMERATE_ATTRIB,   25, Y60_VIDEO_DECL);
     DEFINE_ATTRIBUTE_TAG(PlaySpeedTag,    float,       MOVIE_PLAYSPEED_ATTRIB,   1, Y60_VIDEO_DECL);
-    DEFINE_ATTRIBUTE_TAG(PlayModeTag,     std::string, MOVIE_PLAYMODE_ATTRIB,    "play", Y60_VIDEO_DECL);
+    DEFINE_ATTRIBUTE_TAG(PlayModeTag,     std::string, MOVIE_PLAYMODE_ATTRIB,    "stop", Y60_VIDEO_DECL);
     DEFINE_ATTRIBUTE_TAG(VolumeTag,       float,       MOVIE_VOLUME_ATTRIB,      1, Y60_VIDEO_DECL);
     DEFINE_ATTRIBUTE_TAG(LoopCountTag,    unsigned,    MOVIE_LOOPCOUNT_ATTRIB,   1, Y60_VIDEO_DECL);
     DEFINE_ATTRIBUTE_TAG(AudioTag,        bool,        MOVIE_AUDIO_ATTRIB,       true, Y60_VIDEO_DECL);
-    DEFINE_ATTRIBUTE_TAG(DecoderHintTag,  std::string, MOVIE_DECODERHINT_ATTRIB, "", Y60_VIDEO_DECL);
+    DEFINE_ATTRIBUTE_TAG(DecoderHintTag,  std::string, MOVIE_DECODERHINT_ATTRIB, "FFMpegDecoder2", Y60_VIDEO_DECL);
     DEFINE_ATTRIBUTE_TAG(MovieTimeTag,    double,      MOVIE_MOVIETIME_ATTRIB,   0, Y60_VIDEO_DECL);
     DEFINE_ATTRIBUTE_TAG(DecoderTag,      std::string, MOVIE_DECODER_ATTRIB,     "UNKNOWN", Y60_VIDEO_DECL);
     DEFINE_ATTRIBUTE_TAG(HasAudioTag,     bool,        MOVIE_HASAUDIO_ATTRIB,    false, Y60_VIDEO_DECL);
@@ -161,14 +161,8 @@ namespace y60 {
         * loads a movie from the file given in theTexturePath
         * @param theTexturePath movie file to load
         */
-        virtual void load(const std::string & theTexturePath, const unsigned int theFrame=0);
-        //            virtual void load(const std::string & theTexturePath = ".");
-        /**
-        * @retval true, if a reload of the movie is required
-        * (due to a change in the src attribute for example)
-        */
-        virtual bool reloadRequired();
-
+        virtual void load(const std::string & theTexturePath);
+        
         /**
         * @ ensures that the movie has correct framecount
         */
@@ -188,6 +182,7 @@ namespace y60 {
 
         void setVolume();
         void setPlayMode();
+        void setSource();
         virtual void registerDependenciesRegistrators();
 
         /**
@@ -198,7 +193,13 @@ namespace y60 {
         Movie();
 
         // Overwrite the Image::load() method to avoid auto-loading mechanism
-        void load();
+        void load(){};
+        
+        /**
+        * @retval true, if a reload of the movie is required
+        * (due to a change in the src attribute for example)
+        */
+        bool reloadRequired();
 
         void setup();
         void stop();
@@ -209,7 +210,7 @@ namespace y60 {
 
         double getTimeFromFrame(unsigned theFrame) const;
         unsigned getFrameFromTime(double theTime);
-        void loadFile(const std::string & theSourceFile, const unsigned int theFrame=0);
+        void loadFile(const std::string & theSourceFile);
         void loadStream(asl::Ptr<asl::ReadableStream> theSource,
             const std::string theName);
 
