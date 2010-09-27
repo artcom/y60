@@ -199,7 +199,7 @@ spark.Movie.Constructor = function(Protected) {
                     Public.movie = spark.openMovie(theSourceFile, _myTargetPixelFormat, _myDecoderHint, Protected.getBoolean("audio", true), _myStartFrame);
                 } else {
                     _myMovie.src = theSourceFile;
-                    window.scene.loadMovieFrame(_myMovie, _myStartFrame);
+                    _myMovie.currentframe = _myStartFrame;
                     Public.onMovieChanged();
                 }
             } else {

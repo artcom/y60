@@ -105,7 +105,6 @@ spark.openMovie = function (thePath, theTargetPixelFormat, theDecoderHint, theAu
     var myMovie = Node.createElement("movie");
     window.scene.images.appendChild(myMovie);
 
-    myMovie.src = thePath;
     myMovie.name = "spark-movie-" + spark.ourMovieCounter++;
     myMovie.resize = "none";
     myMovie.maxcachesize = "8";
@@ -113,10 +112,8 @@ spark.openMovie = function (thePath, theTargetPixelFormat, theDecoderHint, theAu
     myMovie.audio = (theAudioFlag) ? "1" : (theAudioFlag === undefined) ? "1" : "0";
     myMovie.targetpixelformat = theTargetPixelFormat || "RGB";
     myMovie.decoderhint = theDecoderHint || "FFMpegDecoder2";
-
-    //always load theStartFrame
-    myMovie.playmode = "pause";
-    window.scene.loadMovieFrame(myMovie, theStartFrame);
-    myMovie.playmode = "stop";
+    myMovie.src = thePath;
+    
+    myMovie.currentframe = theStartFrame;
     return myMovie;
 };

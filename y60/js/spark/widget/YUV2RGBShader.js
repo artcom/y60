@@ -64,7 +64,7 @@ spark.YUV2RGBShader.Constructor = function (Protected) {
             _mySource = theSrc;
             if (Protected.getBoolean("setSourceWithoutChangingImageNode", false)) {
                 Public.movie.src = theSrc;
-                window.scene.loadMovieFrame(Public.movie, Public.startFrame);
+                Public.currentFrame = Public.startFrame;
                 Public.onMovieChanged();
             } else {
                 Public.movie = spark.openMovie(theSrc, "YUV420",
