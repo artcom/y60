@@ -392,7 +392,7 @@ namespace y60 {
     dom::NodePtr
     MaterialBuilder::createMovieNode(SceneBuilder & theSceneBuilder, const std::string & theName,
             const std::string & theFileName,
-            unsigned theLoopCount)
+            unsigned int theLoopCount)
     {
         std::string myFileName(theFileName);
         asl::findAndReplace(myFileName, "\\","/");

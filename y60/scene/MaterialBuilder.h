@@ -111,7 +111,7 @@ namespace y60 {
 
         dom::NodePtr createMovieNode(SceneBuilder & theSceneBuilder,
                 const std::string & theName, const std::string & theFileName,
-                unsigned theLoopCount);
+                unsigned int theLoopCount = 1);
 
         dom::NodePtr createImageNode(SceneBuilder & theSceneBuilder,
                 const std::string & theName, const std::string & theFileName,

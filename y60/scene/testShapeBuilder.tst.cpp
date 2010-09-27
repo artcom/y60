@@ -169,7 +169,7 @@ class ShapeBuilderUnitTest : public UnitTest {
                         CLAMP, false, Matrix4f::Identity(), "", Vector4f(1.0f,1.0f,1.0f,0.5f), Vector4f(0.0f,0.0f,0.0f,0.0f));
                 myMaterialBuilder.createTextureUnitNode(myTexture->getAttributeString(ID_ATTRIB), DECAL, PAINT, TEXCOORD_UV_MAP, Matrix4f::Identity(), false, 60, false, 50);
 
-                myImage = myMaterialBuilder.createMovieNode(mySceneBuilder, "testTexture3", "mymovie.mpg", PAINT);
+                myImage = myMaterialBuilder.createMovieNode(mySceneBuilder, "testTexture3", "mymovie.mpg");
                 myTexture = myMaterialBuilder.createTextureNode(mySceneBuilder, "testTexture3", myImage->getAttributeString(ID_ATTRIB),
                         CLAMP, false, Matrix4f::Identity(), "", Vector4f(1,1,1,1), Vector4f(0,0,0,0));
                 myMaterialBuilder.createTextureUnitNode(myTexture->getAttributeString(ID_ATTRIB), DECAL, PAINT, TEXCOORD_UV_MAP, Matrix4f::Identity(), false, 60, false, 50);
@@ -344,7 +344,8 @@ class ShapeBuilderUnitTest : public UnitTest {
             myImageNode = mySceneNode->childNode("images")->getElementById(myImageId);
             ENSURE(myImageNode->getAttribute("src")->nodeValue() == "mymovie.mpg");
             ENSURE(myImageNode->getAttribute("currentframe")->nodeValue() == "0");
-            ENSURE(myImageNode->getAttribute("framecount")->nodeValue() == "0");
+            ENSURE(myImageNode->getAttribute("playmode")->nodeValue() == "stop");
+            ENSURE(myImageNode->getAttribute("loopcount")->nodeValue() == "1");
 
             //==============================================================================
             // Transform/Body tests
