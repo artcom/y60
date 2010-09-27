@@ -789,6 +789,14 @@ MovieOverlay.prototype.Constructor = function(Public, Protected, theScene, theSo
     // Public
     ///////////////////////////////////////////////////////////////////////////////////////////
 
+    var BaseRemoveFromScene = Public.removeFromScene;
+    Public.removeFromScene = function() {
+        if(Public.image) {
+            Public.playmode = "stop";
+        }
+        BaseRemoveFromScene();
+    };
+
     Public.__defineGetter__("movie", function() {
         return Public.image;
     });
@@ -842,10 +850,9 @@ MovieOverlay.prototype.Constructor = function(Public, Protected, theScene, theSo
             myImage = theSource;
         } else {
             myImage = Node.createElement("movie");
+            theScene.images.appendChild(myImage);
             myImage.name = theSource;
             myImage.resize = "none";
-            myImage.src  = expandEnvironment(theSource);
-            theScene.images.appendChild(myImage);
             if (theAudioFlag === undefined) {
                 theAudioFlag = true;
             }
@@ -859,13 +866,14 @@ MovieOverlay.prototype.Constructor = function(Public, Protected, theScene, theSo
                 thePixelFormat = "RGB";
             }
             myImage.targetpixelformat = thePixelFormat;
+            myImage.src  = expandEnvironment(theSource);
             if (thePlayMode !== undefined) {
                 myImage.playmode = thePlayMode;
             }
         }
         var myNodeName = myImage.nodeName;
         if (myNodeName === "movie") {
-            window.scene.loadMovieFrame(myImage);
+            //window.scene.loadMovieFrame(myImage); // no need anymore, playmode handles that
         } else if (myNodeName === "capture") {
             window.scene.loadCaptureFrame(myImage);
         } else {

@@ -663,16 +663,11 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
             _myMovieNode.name = "IVMovieNode";
             _myMovieNode.resize="none";
             _myMovieNode.id = createUniqueId();
-            _myMovieNode.playmode = "play";
             _myMovieNode.loopcount = 0;
             _myMovieNode.audio = 1;
             _myMovieNode.decoderhint = theDecoderHint;
-            _myMovieNode.src = theFilename;
-            //_myMovieNode.maxcachesize = 128;
-            _myMovieNode.targetpixelformat = "RGBA8";//"YUV420";//"ALPHA";//"LUMINANCE8";//"RGB" // "ALPHA"
-            if (theEnsureFrameCount) {
-                window.scene.ensureMovieFramecount(_myMovieNode);
-            }
+            //_myMovieNode.maxcachesize = 32;
+            _myMovieNode.targetpixelformat = "RGB";//"YUV420";//"ALPHA";//"LUMINANCE8";//"RGB" // "ALPHA";//"RGBA8";
         }
 
         if (_myFullSizeMode) {
@@ -680,22 +675,18 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
         }
 
         _myMovieNode.src = theFilename;
-        try {
-            window.scene.loadMovieFrame(_myMovieNode);
-        } catch (ex) {
-            window.scene.images.removeChild(_myMovieNode);
-            print(ex);
-            print("### ERROR: loadMovieFrame failed for file: " + theFilename);
-            return;
+        _myMovieNode.playmode = "play";
+        _myMovieNode.volume = 1.0;
+        if (theEnsureFrameCount) {
+            window.scene.ensureMovieFramecount(_myMovieNode);
         }
-
+        
         if (!_myMovieOverlay) {
             _myMovieOverlay = new MovieOverlay(window.scene, _myMovieNode);
         } else {
             _myMovieOverlay.movie = _myMovieNode;
         }
 
-        _myMovieNode.playmode = "play";
         _myMovieOverlay.width  = _myMovieNode.width;
         _myMovieOverlay.height = _myMovieNode.height;
 
