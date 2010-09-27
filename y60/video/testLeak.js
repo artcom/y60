@@ -174,9 +174,9 @@ MovieLeakUnitTest.prototype.Constructor = function(obj, theName, theFiles, theDe
     function toggleMovie() {
         remove();
         if (_myToggle) {
-            _myMovie    = new MovieOverlay(window.scene, theFiles[0], [0,0], null, false, null, theDecoderHint);
+            _myMovie    = new MovieOverlay(window.scene, theFiles[0], [0,0], null, false, null, theDecoderHint, "play");
         } else {
-            _myMovie    = new MovieOverlay(window.scene, theFiles[1], [0,0], null, false, null, theDecoderHint);
+            _myMovie    = new MovieOverlay(window.scene, theFiles[1], [0,0], null, false, null, theDecoderHint, "play");
         }
         _myToggle = !_myToggle;
     }

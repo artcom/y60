@@ -140,7 +140,7 @@ function FFMpegTest(theArguments) {
                 theMovie.playmode = "play";
                 break;
             case 9:
-                This.assure_msg(theMovie.currentframe == 3, "Movie has played 3 frames.");
+                This.assure_msg(theMovie.currentframe == 4, "Movie has played 4 frames.");
                 theMovie.playmode = "stop";
                 This.nextTest();
                 break;
@@ -162,7 +162,7 @@ function FFMpegTest(theArguments) {
                 theMovie.playmode = "play";
                 break;
             case 8:
-                This.assure_msg(theMovie.currentframe == 4, "Movie has played 4 frames.");
+                This.assure_msg(theMovie.currentframe == 5, "Movie has played 5 frames.");
                 theMovie.playmode = "stop";
                 This.nextTest();
                 break;
@@ -214,10 +214,10 @@ function FFMpegTest(theArguments) {
                 break;
             case 11:
                 This.assure_msg(theMovie.playmode == "play", "Movie is playing again.");
-                This.assure_msg(theMovie.currentframe == 1, "Current frame is 1");
+                This.assure_msg(theMovie.currentframe == 2, "Current frame is 2");
                 break;
             case 12:
-                This.assure_msg(theMovie.currentframe == 2, "Movie has played 3 frames.");
+                This.assure_msg(theMovie.currentframe == 3, "Movie has played 3 frames.");
                 theMovie.playmode = "stop";
                 This.nextTest();
                 break;
@@ -247,10 +247,10 @@ function FFMpegTest(theArguments) {
                 break;
             case 9:
                 This.assure_msg(theMovie.playmode == "play", "Movie is playing again.");
-                This.assure_msg(theMovie.currentframe == 1, "Current frame is 1");
+                This.assure_msg(theMovie.currentframe == 2, "Current frame is 2");
                 break;
             case 10:
-                This.assure_msg(theMovie.currentframe == 2, "Movie has played 3 frames.");
+                This.assure_msg(theMovie.currentframe == 3, "Movie has played 3 frames.");
                 theMovie.playmode = "stop";
                 This.nextTest();
                 break;
