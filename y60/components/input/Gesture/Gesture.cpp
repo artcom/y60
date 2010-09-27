@@ -96,7 +96,7 @@ void Gesture::handle(EventPtr theEvent) {
             myGenericEventPtr = dynamic_cast_Ptr<GenericEvent>(theEvent);
             myNode = myGenericEventPtr->getNode();
             myType = myNode->getAttributeString("type");
-            myTimestamp = (asl::as<unsigned long long>(myNode->getAttribute("when")->nodeValue()));
+            myTimestamp = asl::as<unsigned long long>(myNode->getAttribute("when")->nodeValue());
             // cursor events from tuio or ass driver
             if (myType == "add" || myType == "remove" || myType == "move" || myType == "update") {
                 GESTURE_BASE_EVENT_TYPE myBaseEventType = ASSEVENT;
@@ -108,7 +108,8 @@ void Gesture::handle(EventPtr theEvent) {
                 } else if (myNode->getAttribute("position")) {
                     // tuio event
                     Vector2f myTuIOPosition(asl::as<Vector2f>(myNode->getAttribute("position")->nodeValue()));
-                    myTimestamp = unsigned long long(asl::as<double>(myNode->getAttribute("value_time")->nodeValue()) * 1000.0);
+                    
+                    myTimestamp = (unsigned long long)(asl::as<double>(myNode->getAttribute("value_time")->nodeValue())*1000);
                     myPosition[0] = myTuIOPosition[0];
                     myPosition[1] = myTuIOPosition[1];
                     myPosition[2] = 0.0;
