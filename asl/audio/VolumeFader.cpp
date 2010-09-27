@@ -40,48 +40,80 @@
 
 #include "VolumeFader.h"
 
+#include <numeric>
+
 namespace asl {
 
-VolumeFader::VolumeFader(SampleFormat theSampleFormat)
+VolumeFader::VolumeFader(SampleFormat theSampleFormat, unsigned int theChannelCount)
     : Effect(createEffectFunctor<VolumeFaderFunctor>(theSampleFormat))
 {
-    _myCurrentVolume = _myBeginVolume = _myEndVolume = 0.0;
+    setChannelCount(theChannelCount);
+    // _myCurrentVolume = _myBeginVolume = _myEndVolume = 0.0;
     _myCurrentFrame = _myFadeBeginFrame = _myFadeEndFrame = 0;
 }
 
-void VolumeFader::setVolume(float theTargetVolume, unsigned theFadeDurationFrames) {
-    _myBeginVolume = _myCurrentVolume;
-    _myEndVolume = theTargetVolume;
+void
+VolumeFader::setChannelCount(unsigned int theCount) {
+    _myCurrentVolumes.resize(theCount);
+    _myBeginVolumes.resize(theCount);
+    _myEndVolumes.resize(theCount);
+}
 
+void VolumeFader::setVolumes(std::vector<float> theTargetVolumes, unsigned theFadeDurationFrames) {
+    _myBeginVolumes = _myCurrentVolumes;
+    if (theTargetVolumes.size() != _myCurrentVolumes.size()) {
+        throw Exception("VolumeFader::setVolumes() - number of volumes doesn't match number of channels", PLUS_FILE_LINE);
+    }
+    _myEndVolumes = theTargetVolumes; 
     _myFadeBeginFrame = _myCurrentFrame;
     _myFadeEndFrame = _myCurrentFrame + theFadeDurationFrames;
 }
+void VolumeFader::setVolume(float theTargetVolume, unsigned theFadeDurationFrames) {
+    std::vector<float> targetVolumes(_myCurrentVolumes.size(), theTargetVolume);
+    setVolumes(targetVolumes, theFadeDurationFrames);
+}
 
 float VolumeFader::getVolume() const {
+    std::vector<float> myVolumes;
+    getVolumes(myVolumes);
+    return accumulate(myVolumes.begin(), myVolumes.end(), 0.0f) / myVolumes.size();
+}
+void VolumeFader::getVolumes(std::vector<float> & theVolumes) const {
     // Hack: In a real fade, we want to return the actual volume. In a fade that's
     // just there to prevent clicks, this returns the destination volume.
     if (_myCurrentFrame + DEFAULT_FADE_FRAMES < _myFadeEndFrame) {
-        return getVolume(_myCurrentFrame);
+        getVolumes(_myCurrentFrame, theVolumes);
     } else {
-        return _myEndVolume;
+        theVolumes = _myEndVolumes;
+    }
+}
+
+void VolumeFader::getVolumes(Unsigned64 theFrame, std::vector<float> & theVolumes) const {
+    if(_myCurrentFrame >= _myFadeBeginFrame) {
+        if (theFrame < _myFadeEndFrame) {
+            theVolumes.resize(_myBeginVolumes.size());
+            float myFadePercent = float(theFrame - _myFadeBeginFrame)/
+                    (_myFadeEndFrame - _myFadeBeginFrame);
+            for (int i = 0; i < theVolumes.size(); ++i) {
+                float myVolumeDiff = _myEndVolumes[i]-_myBeginVolumes[i];
+                theVolumes[i] = _myBeginVolumes[i]+myFadePercent*myVolumeDiff;
+            }
+            return;
+        } else {
+            theVolumes = _myEndVolumes;
+            return;
+        }
+    } else {
+        AC_WARNING << "VolumeFader::getVolume: _myCurrentFrame < _myFadeBeginFrame";
+        theVolumes = _myBeginVolumes;
+        return;
     }
 }
 
 float VolumeFader::getVolume(Unsigned64 theFrame) const {
-    if(_myCurrentFrame >= _myFadeBeginFrame) {
-        if (theFrame < _myFadeEndFrame) {
-            float myVolumeDiff = _myEndVolume-_myBeginVolume;
-            float myFadePercent = float(theFrame - _myFadeBeginFrame)/
-                    (_myFadeEndFrame - _myFadeBeginFrame);
-            float myVolume = _myBeginVolume+myFadePercent*myVolumeDiff;
-            return myVolume;
-        } else {
-            return _myEndVolume;
-        }
-    } else {
-        AC_WARNING << "VolumeFader::getVolume: _myCurrentFrame < _myFadeBeginFrame";
-        return _myBeginVolume;
-    }
+    std::vector<float> myVolumes;
+    getVolumes(theFrame, myVolumes);
+    return accumulate(myVolumes.begin(), myVolumes.end(),0.0f) / myVolumes.size();
 }
 
 } // namespace

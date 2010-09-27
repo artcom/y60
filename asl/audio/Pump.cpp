@@ -92,6 +92,7 @@ Pump::Pump (SampleFormat mySF, unsigned myTimeStartDelay)
 
     _myTempBuffer = AudioBufferPtr(createAudioBuffer(getNativeSampleFormat(),
             0, getNumOutputChannels(), getNativeSampleRate()));
+    _myVolumeFader.setChannelCount(getNumOutputChannels());
     _myVolumeFader.setVolume(1.0);
 }
 
@@ -171,12 +172,20 @@ void Pump::setVolume (float theVolume) {
     _myVolumeFader.setVolume(theVolume);
 }
 
+void Pump::setVolumes (std::vector<float> theVolumes) {
+    _myVolumeFader.setVolumes(theVolumes);
+}
+
 void Pump::fadeToVolume(float theVolume, float theTime) {
     _myVolumeFader.setVolume(theVolume, unsigned(theTime*getNativeSampleRate()));
 }
 
 float Pump::getVolume() const {
     return _myVolumeFader.getVolume();
+}
+
+void Pump::getVolumes(std::vector<float> & theVolumes) const {
+    _myVolumeFader.getVolumes(theVolumes);
 }
 
 void Pump::setBritzelTest(bool doBritzelTest) {

@@ -316,7 +316,7 @@ JSTextureAtlas::initClass(JSContext *cx, JSObject *theGlobalObject) {
     return myClass;
 }
 
-bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<y60::TextureAtlas> & theTextureAtlas) {
+bool convertFrom(JSContext *cx, jsval theValue, JSTextureAtlas::OWNERPTR & theTextureAtlas) {
     if (JSVAL_IS_OBJECT(theValue)) {
         JSObject * myArgument;
         if (JS_ValueToObject(cx, theValue, &myArgument)) {

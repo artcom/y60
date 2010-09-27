@@ -222,10 +222,6 @@ SoundPtr SoundManager::createSound(const string & theURI, bool theLoop,
     return mySound;
 }
 
-void SoundManager::setVolume(float theVolume) {
-    Pump::get().setVolume(theVolume);
-}
-
 void SoundManager::fadeToVolume(float theVolume, float theTime) {
     Pump::get().fadeToVolume(theVolume, theTime);
 }
@@ -235,8 +231,23 @@ float SoundManager::getVolume() const {
     return Pump::get().getVolume();
 }
 
+void SoundManager::getVolumes(std::vector<float> & theVolumes) const {
+    Pump::get().getVolumes(theVolumes);
+}
+void SoundManager::setVolume(float theVolume) {
+    Pump::get().setVolume(theVolume);
+}
+
+void SoundManager::setVolumes(std::vector<float> theVolumes) {
+    Pump::get().setVolumes(theVolumes);
+}
+
 unsigned SoundManager::getNumSounds() const {
     return Pump::get().getNumSinks();
+}
+
+unsigned int SoundManager::getChannelCount() const {
+    return Pump::get().getNumOutputChannels();
 }
 
 bool SoundManager::isRunning() const {

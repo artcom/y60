@@ -96,6 +96,34 @@ namespace jslib {
                 cx,obj,argc,argv,rval);
     }
 
+    static JSBool
+    getVolumes(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+        DOC_BEGIN("Returns an array of volumes, one element per channel.");
+        DOC_END;
+        try {
+            ensureParamCount(argc, 0, 0, PLUS_FILE_LINE);
+
+            JSSoundManager::OWNERPTR myNative;
+            convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
+
+            std::vector<float> myVolumes;
+            
+            myNative->getVolumes(myVolumes);
+            *rval = as_jsval(cx, myVolumes);
+            
+            return JS_TRUE;
+        } HANDLE_CPP_EXCEPTION;
+    }
+    
+    static JSBool
+    setVolumes(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+        DOC_BEGIN("Set volumes of all channels");
+        DOC_PARAM("theVolume", "one float for each channel", DOC_TYPE_VECTOROFFLOAT);
+        DOC_END;
+        return Method<JSSoundManager::NATIVE>::call(&JSSoundManager::NATIVE::setVolumes,
+                cx,obj,argc,argv,rval);
+    }
+
     JSFunctionSpec *
     JSSoundManager::Functions() {
         static JSFunctionSpec myFunctions[] = {
@@ -103,6 +131,8 @@ namespace jslib {
             {"stopAll",              stopAll,           0},
             {"fadeToVolume",         fadeToVolume,      2},
             {"preloadSound",         preloadSound,      1},
+            {"getVolumes",           getVolumes,        0},
+            {"setVolumes",           setVolumes,        1},
             {0}
         };
         return myFunctions;
@@ -114,6 +144,7 @@ namespace jslib {
             {"volume",       PROP_volume, JSPROP_ENUMERATE|JSPROP_PERMANENT},
             {"running",      PROP_running,      JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT},
             {"soundcount",   PROP_soundcount,   JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT},
+            {"channelcount", PROP_channelcount, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT},
             {0}
         };
         return myProperties;
@@ -131,6 +162,9 @@ namespace jslib {
                 return JS_TRUE;
             case PROP_soundcount:
                 *vp = as_jsval(cx, getNative().getNumSounds());
+                return JS_TRUE;
+            case PROP_channelcount:
+                *vp = as_jsval(cx, getNative().getChannelCount());
                 return JS_TRUE;
             default:
                 JS_ReportError(cx,"JSSoundManager::getProperty: index %d out of range", theID);
@@ -212,6 +246,18 @@ namespace jslib {
     jsval as_jsval(JSContext *cx, JSSoundManager::OWNERPTR theOwner, JSSoundManager::NATIVE * theNative) {
         JSObject * myObject = JSSoundManager::Construct(cx, theOwner, theNative);
         return OBJECT_TO_JSVAL(myObject);
+    }
+    bool convertFrom(JSContext *cx, jsval theValue, JSSoundManager::OWNERPTR & theSoundManager) {
+        if (JSVAL_IS_OBJECT(theValue)) {
+            JSObject * myArgument;
+            if (JS_ValueToObject(cx, theValue, &myArgument)) {
+                if (JSA_GetClass(cx,myArgument) == JSClassTraits<y60::SoundManager>::Class()) {
+                    theSoundManager = JSClassTraits<y60::SoundManager>::getNativeOwner(cx,myArgument);
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
 
