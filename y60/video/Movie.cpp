@@ -80,7 +80,7 @@ using namespace dom;
 using namespace std;
 using namespace asl;
 
-#define DB(x) x
+#define DB(x) // x
 #define DB2(x) // x
 
 
@@ -323,9 +323,9 @@ namespace y60 {
 
     void
     Movie::readFrame(double theCurrentTime, bool theIgnoreCurrentTime) {
-        DB(AC_DEBUG << "Movie::readFrame time=" << theCurrentTime
+        DB(AC_TRACE << "Movie::readFrame time=" << theCurrentTime
             << " src=" << get<ImageSourceTag>() << " current playmode=" << getStringFromEnum(_myPlayMode, MoviePlayModeStrings) << " currentFrame=" << get<CurrentFrameTag>());
-        DB(AC_DEBUG << "                 theIgnoreCurrentTime=" << theIgnoreCurrentTime);
+        DB(AC_TRACE << "                 theIgnoreCurrentTime=" << theIgnoreCurrentTime);
         _myLastCurrentTime = (theIgnoreCurrentTime) ? -1.0 : theCurrentTime;
 
         if (!_myDecoder) {

@@ -90,7 +90,8 @@ namespace jslib {
             enum PropertyNumbers {
                 PROP_volume = -100,
                 PROP_running,
-                PROP_soundcount
+                PROP_soundcount,
+                PROP_channelcount
             };
 
             static JSPropertySpec * Properties();
@@ -124,6 +125,7 @@ namespace jslib {
     jsval as_jsval(JSContext *cx, JSSoundManager::OWNERPTR theOwner);
     jsval as_jsval(JSContext *cx, JSSoundManager::OWNERPTR theOwner,
             JSSoundManager::NATIVE * theNative);
+    bool convertFrom(JSContext *cx, jsval theValue, JSSoundManager::OWNERPTR & theSoundManager);
 
     template <>
     struct JSClassTraits<JSSoundManager::NATIVE>

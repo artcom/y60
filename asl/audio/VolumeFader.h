@@ -53,12 +53,15 @@ namespace asl {
 class ASL_AUDIO_DECL VolumeFader: public Effect {
 public:
     static const unsigned DEFAULT_FADE_FRAMES = 200;
-    VolumeFader(SampleFormat theSampleFormat);
+    // Note: this isn't really tested with anything other than channel count = 2
+    VolumeFader(SampleFormat theSampleFormat, unsigned int theChannelCount = 2);
 
     void setVolume(float theTargetVolume, unsigned theFadeDurationFrames = DEFAULT_FADE_FRAMES);
+    void setVolumes(std::vector<float> theTargetVolumes, unsigned theFadeDurationFrames = DEFAULT_FADE_FRAMES);
     float getVolume() const;
+    void getVolumes(std::vector<float> & theVolumes) const;
     float getVolume(Unsigned64 theFrame) const;
-
+    void setChannelCount(unsigned int theCount);
 private:
     template <class SAMPLE>
     class VolumeFaderFunctor : public EffectFunctor<SAMPLE> {
@@ -68,7 +71,10 @@ private:
                 VolumeFader * myFader = dynamic_cast<VolumeFader *>(theEffect);
                 ASSURE(myFader);
 
-                float myVolumeDiff = myFader->_myEndVolume-myFader->_myBeginVolume;
+                std::vector<float> myVolumeDiffs(theBuffer.getNumChannels());
+                for (unsigned i = 0; i < theBuffer.getNumChannels(); ++i) {
+                    myVolumeDiffs[i] = myFader->_myEndVolumes[i] - myFader->_myBeginVolumes[i];
+                }
                 float myFadeDuration = float(myFader->_myFadeEndFrame - myFader->_myFadeBeginFrame);
 
                 SAMPLE * curSample = theBuffer.begin();
@@ -84,28 +90,32 @@ private:
                         myFadePercent = (myFader->_myCurrentFrame -
                                          myFader->_myFadeBeginFrame)/myFadeDuration;
                     }
-                    myFader->_myCurrentVolume = myFader->_myBeginVolume+
-                            myFadePercent*myVolumeDiff;
-                    for (unsigned myChannel = 0; myChannel<theBuffer.getNumChannels();
-                            ++myChannel)
+                    for (unsigned i = 0; i < theBuffer.getNumChannels(); ++i)
                     {
-                        *curSample = (SAMPLE)((*curSample) * myFader->_myCurrentVolume);
+                        myFader->_myCurrentVolumes[i] = myFader->_myBeginVolumes[i]+
+                            myFadePercent*myVolumeDiffs[i];
+                        *curSample = (SAMPLE)((*curSample) * myFader->_myCurrentVolumes[i]);
                         curSample++;
                     }
                 }
-                myFader->_myCurrentVolume = myFader->_myEndVolume;
-                lastFrame = theAbsoluteFrame+theBuffer.getNumFrames();
-                for (; curSample < theBuffer.end(); ++curSample) {
-                    *curSample = (SAMPLE)((*curSample) * myFader->_myCurrentVolume);
+                for (unsigned i = 0; i < theBuffer.getNumChannels(); ++i) {
+                    myFader->_myCurrentVolumes[i] = myFader->_myEndVolumes[i];
                 }
+                while (curSample != theBuffer.end()) {
+                    for (unsigned i = 0; i < theBuffer.getNumChannels(); ++i) {
+                        *curSample = (SAMPLE)((*curSample) * myFader->_myCurrentVolumes[i]);
+                        ++curSample;
+                    }
+                }
+                lastFrame = theAbsoluteFrame+theBuffer.getNumFrames();
                 myFader->_myCurrentFrame=lastFrame;
             }
     };
-
-    float _myCurrentVolume;
+    void getVolumes(Unsigned64 theFrame, std::vector<float> & theVolumes) const;
+    std::vector<float> _myCurrentVolumes;
     Unsigned64 _myCurrentFrame;
 
-    float _myBeginVolume, _myEndVolume;
+    std::vector<float> _myBeginVolumes, _myEndVolumes;
     Unsigned64 _myFadeBeginFrame, _myFadeEndFrame;
 };
 

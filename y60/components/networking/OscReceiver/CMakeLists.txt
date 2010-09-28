@@ -25,3 +25,11 @@ y60_add_component(
     DEPENDS asldom y60jsbase y60input oscpackip oscpackosc
     EXTERNS ${EXTERNALS}
 )
+
+asl_add_schema(
+    oscevent.xsd
+    CXX_FILE      osceventxsd.cpp
+    CXX_NAMESPACE y60
+    CXX_VARNAME   ourosceventxsd
+    CXX_INCLUDE   osceventxsd.h
+)

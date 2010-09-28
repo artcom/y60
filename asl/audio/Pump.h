@@ -69,8 +69,10 @@ class ASL_AUDIO_DECL Pump : public AudioTimeSource, private PosixThread
         HWSampleSinkPtr createSampleSink(const std::string & theName);
         AudioBufferPtr createBuffer(unsigned theNumFrames);
         void setVolume(float theVolume);
-        void fadeToVolume(float theVolume, float theTime);
+        void setVolumes(std::vector<float> theVolumes);
+        void fadeToVolume(float theVolume, float theTime); // TODO: multi-channel fades
         float getVolume() const;
+        void getVolumes(std::vector<float> & theVolumes) const;
         void setBritzelTest(bool doBritzelTest);
         Time getLatency() const;
         unsigned getNumUnderruns() const;

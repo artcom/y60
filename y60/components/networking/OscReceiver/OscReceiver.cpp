@@ -59,6 +59,9 @@
 #include <iostream>
 
 #include "OscReceiver.h"
+#include "osceventxsd.h"
+#include <asl/base/Auto.h>
+#include <asl/base/ThreadLock.h>
 #include "y60/jsbase/Documentation.h"
 #include <y60/input/GenericEvent.h>
 #include <y60/base/DataTypes.h>
@@ -69,9 +72,6 @@
 
 using namespace std;
 using namespace asl;
-
-extern std::string ourosceventxsd;
-
 
 namespace y60 {
 
@@ -97,7 +97,7 @@ namespace y60 {
 
 
     y60::EventPtrList OscReceiver::poll() {
-        _myThreadLock.lock();
+        AutoLocker<ThreadLock> scopeLock(_myThreadLock);
 
         _myCurrentY60Events.clear();
 
@@ -105,8 +105,6 @@ namespace y60 {
             _myCurrentY60Events.push_back(createY60Event(_myNewMessages.front()));
             _myNewMessages.pop_front();
         }
-
-        _myThreadLock.unlock();
 
         return _myCurrentY60Events;
     }
@@ -220,11 +218,11 @@ namespace y60 {
     }
 
     void OscReceiver::ProcessMessage( const osc::ReceivedMessage& theMessage,
-                                      const IpEndpointName& theRemoteEndpoint ){
+                                      const IpEndpointName& theRemoteEndpoint )
+    {
 
+        AutoLocker<ThreadLock> scopeLock(_myThreadLock);
         try{
-            _myThreadLock.lock();
-
 
             string myMessageString =
                 createMessageString(theMessage, theRemoteEndpoint);
@@ -232,14 +230,12 @@ namespace y60 {
 
 
             //AC_TRACE << "c++: adding osc event " << *myNode;
-            _myThreadLock.unlock();
 
         }catch( OscException& e ){
             // any parsing errors such as unexpected argument types, or
             // missing arguments get thrown as exceptions.
             std::cout << "error while parsing message: "
                       << theMessage.AddressPattern() << ": " << e.what() << "\n";
-            _myThreadLock.unlock();
         }
     }
 }
