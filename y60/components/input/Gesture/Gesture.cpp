@@ -96,7 +96,7 @@ void Gesture::handle(EventPtr theEvent) {
             myGenericEventPtr = dynamic_cast_Ptr<GenericEvent>(theEvent);
             myNode = myGenericEventPtr->getNode();
             myType = myNode->getAttributeString("type");
-            myTimestamp = (asl::as<unsigned long long>(myNode->getAttribute("when")->nodeValue()));
+            myTimestamp = asl::as<unsigned long long>(myNode->getAttribute("when")->nodeValue());
             // cursor events from tuio or ass driver
             if (myType == "add" || myType == "remove" || myType == "move" || myType == "update") {
                 GESTURE_BASE_EVENT_TYPE myBaseEventType = ASSEVENT;
@@ -108,6 +108,8 @@ void Gesture::handle(EventPtr theEvent) {
                 } else if (myNode->getAttribute("position")) {
                     // tuio event
                     Vector2f myTuIOPosition(asl::as<Vector2f>(myNode->getAttribute("position")->nodeValue()));
+                    
+                    myTimestamp = (unsigned long long)(asl::as<double>(myNode->getAttribute("value_time")->nodeValue())*1000);
                     myPosition[0] = myTuIOPosition[0];
                     myPosition[1] = myTuIOPosition[1];
                     myPosition[2] = 0.0;
@@ -285,7 +287,9 @@ Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent, int theID, const std:
                         myNode->appendAttribute<float>("velocity", myVelocity);
                         AC_INFO << "register wipe gesture, id " << theID << " direction " << normalized(myDifference) << " velocity " << myVelocity << " (duration: " << myDuration <<")";
                         //delete history to avoid additional wipes in next cursor moves
-                        _myCursorPositionHistory.clear();
+                        if (_myCursorPositionHistory.find(theID) != _myCursorPositionHistory.end()) {
+                            _myCursorPositionHistory.erase(theID);
+                        }
                     } 
                 }
             }
@@ -295,6 +299,7 @@ Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent, int theID, const std:
             if (_myCursorList.find(theID) == _myCursorList.end()){
                 return;
             }
+            _myCurrentCursorPositions[ theID ] = PositionInfo(thePosition3D, theTimestamp);
             // is the removing cursor part of a existing multicursor gesture
             if (_myCursorPartner.find(theID) != _myCursorPartner.end()) {
                 AC_DEBUG << "register cursor_pair_finish: " << theID << " partner: " <<  _myCursorPartner[theID];
