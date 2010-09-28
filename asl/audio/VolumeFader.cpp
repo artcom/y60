@@ -94,7 +94,7 @@ void VolumeFader::getVolumes(Unsigned64 theFrame, std::vector<float> & theVolume
             theVolumes.resize(_myBeginVolumes.size());
             float myFadePercent = float(theFrame - _myFadeBeginFrame)/
                     (_myFadeEndFrame - _myFadeBeginFrame);
-            for (int i = 0; i < theVolumes.size(); ++i) {
+            for (AC_SIZE_TYPE i = 0; i < theVolumes.size(); ++i) {
                 float myVolumeDiff = _myEndVolumes[i]-_myBeginVolumes[i];
                 theVolumes[i] = _myBeginVolumes[i]+myFadePercent*myVolumeDiff;
             }
