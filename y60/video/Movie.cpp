@@ -123,7 +123,7 @@ namespace y60 {
         VolumeTag::Plug::getValuePtr()->setImmediateCallBack(dynamic_cast_Ptr<Movie>(getSelf()), &Movie::setVolume);
         PlayModeTag::Plug::getValuePtr()->setImmediateCallBack(dynamic_cast_Ptr<Movie>(getSelf()), &Movie::setPlayMode);
         ImageSourceTag::Plug::getValuePtr()->setImmediateCallBack(dynamic_cast_Ptr<Movie>(getSelf()), &Movie::setSource);
-        // take attributes on construction time in account
+        // take node attributes on construction time in account
         setSource();
         setPlayMode();
         setVolume();
@@ -178,21 +178,6 @@ namespace y60 {
         decodeFrame(myMovieTime, 0);
     }
 
-    // callback for playmode attribute
-    void
-    Movie::setPlayMode() {
-        if (!_myDecoder) {
-            return;
-        }
-        AC_DEBUG<<"playmode attribute in dom changed to "<<get<PlayModeTag>();
-        MoviePlayMode myPlayMode =
-            MoviePlayMode(asl::getEnumFromString(get<PlayModeTag>(), MoviePlayModeStrings));
-        if (myPlayMode != _myPlayMode) {
-            setPlayMode(myPlayMode);
-            readFrame();
-        }
-    }
-    
     void
     Movie::setPlayMode(MoviePlayMode thePlayMode) {
         AC_DEBUG << "Movie::setPlayMode "
@@ -223,7 +208,7 @@ namespace y60 {
             break;
         case PLAY_MODE_NODISK:
             //XXX check if we need to do something more here
-            AC_INFO << "Movie set to PLAY_MODE_NODISK";
+            AC_DEBUG << "Movie set to PLAY_MODE_NODISK";
             break;
         }
         // Synchronize internal and external representation
@@ -368,7 +353,7 @@ namespace y60 {
             return;
         case PLAY_MODE_NODISK:
             //XXX check if we need to do something more here
-            AC_INFO << "Movie has PLAY_MODE_NODISK";
+            AC_DEBUG << "Movie has PLAY_MODE_NODISK";
             break;
         }
 
@@ -413,6 +398,7 @@ namespace y60 {
         return true;
     }
 
+    //callback for 'volume' attribute
     void Movie::setVolume() {
         if (!_myDecoder) {
             return;
@@ -426,13 +412,28 @@ namespace y60 {
         myDecoder->setVolume(myVolume);
     }
 
+    // callback for 'src' attribute
     void Movie::setSource() {
         if (reloadRequired()) {
             load(AppPackageManager::get().getPtr()->getSearchPath());
         }
     }
 
-
+    // callback for 'playmode' attribute
+    void
+    Movie::setPlayMode() {
+        if (!_myDecoder) {
+            return;
+        }
+        AC_DEBUG<<"playmode attribute in dom changed to "<<get<PlayModeTag>();
+        MoviePlayMode myPlayMode =
+            MoviePlayMode(asl::getEnumFromString(get<PlayModeTag>(), MoviePlayModeStrings));
+        if (myPlayMode != _myPlayMode) {
+            setPlayMode(myPlayMode);
+            readFrame();
+        }
+    }
+    
 
     void Movie::load(asl::PackageManager & thePackageManager) {
         /*

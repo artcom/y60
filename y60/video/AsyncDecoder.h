@@ -115,10 +115,10 @@ namespace y60 {
             double getMovieTime(double theSystemTime) {
                 if (!hasAudio() || !getDecodeAudioFlag()) {
                     double myTime = MovieDecoderBase::getMovieTime(theSystemTime);
-                    AC_DEBUG << "No Audio returning " <<myTime;
+                    AC_TRACE << "No Audio returning " <<myTime;
                     return myTime;
                 } else {
-                    AC_DEBUG << " returning audio time " << _myAudioSink->getPumpTime()<<" audioOffset: "<<_myAudioTimeOffset
+                    AC_TRACE << " returning audio time " << _myAudioSink->getPumpTime()<<" audioOffset: "<<_myAudioTimeOffset
                             <<" video time: "<<MovieDecoderBase::getMovieTime(theSystemTime);
                     // audio is not running yet, maybe cause we are buffering, so do not show any video frames
                     if (_myAudioSink->getState() == asl::HWSampleSink::STOPPED || _myCachingFlag) {
@@ -142,7 +142,7 @@ namespace y60 {
             }
 
             void startMovie(double theStartTime, bool theStartAudioFlag = true) {
-                AC_DEBUG << "AsyncDecoder::startMovie";
+                AC_INFO << "AsyncDecoder::startMovie";
                 MovieDecoderBase::startMovie(theStartTime);
                 if (theStartAudioFlag && _myAudioSink && getDecodeAudioFlag()) {
                     _myAudioSink->play();
@@ -152,7 +152,7 @@ namespace y60 {
              * Resumes from pause
              */
             void resumeMovie(double theStartTime, bool theResumeAudioFlag = true) {
-                AC_DEBUG << "AsyncDecoder::resumeMovie";
+                AC_INFO << "AsyncDecoder::resumeMovie";
                 MovieDecoderBase::resumeMovie(theStartTime);
                 if (theResumeAudioFlag && _myAudioSink && getDecodeAudioFlag()) {
                     _myAudioSink->play();
@@ -173,7 +173,7 @@ namespace y60 {
                 //AC_DEBUG << "AsyncDecoder::stopMovie";
                 MovieDecoderBase::stopMovie();
                 if (theStopAudioFlag && _myAudioSink && getDecodeAudioFlag()) {
-                    AC_TRACE << "====== STOPPING AUDIO " << std::endl;
+                    AC_DEBUG << "====== STOPPING AUDIO ";
                     _myAudioSink->stop();
                 }
                 setState(STOP);

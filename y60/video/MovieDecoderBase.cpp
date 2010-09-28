@@ -97,7 +97,7 @@ namespace y60 {
     }
 #endif
     double MovieDecoderBase::getMovieTime(double theSystemTime) {
-        AC_DEBUG << "getMovieTime start: _myMovieTime: " << _myMovieTime
+        AC_TRACE << "getMovieTime start: _myMovieTime: " << _myMovieTime
                 << ", theSystemTime: " << theSystemTime << ", _myLastSystemTime: "
                 << _myLastSystemTime;
         if (theSystemTime <= _myLastSystemTime) {
@@ -126,7 +126,7 @@ namespace y60 {
             }
         }
         _myLastSystemTime = theSystemTime;
-        AC_DEBUG << "getMovieTime end: _myMovieTime: " << _myMovieTime
+        AC_TRACE << "getMovieTime end: _myMovieTime: " << _myMovieTime
                 << ", theSystemTime: " << theSystemTime << ", _myLastSystemTime: "
                 << _myLastSystemTime;
         return _myMovieTime;
@@ -182,7 +182,7 @@ namespace y60 {
             if (_myMovie->get<CurrentFrameTag>() == 0) {
                 throw asl::Exception("no decodable video stream found. (are width and height both multiples of two?) ", PLUS_FILE_LINE);
             }
-            AC_DEBUG << "!!!!!!MovieDecoderBase::setEOF setting FrameCountTag: " <<_myMovie->get<CurrentFrameTag>();
+            AC_DEBUG << "MovieDecoderBase::setEOF setting FrameCountTag: " <<_myMovie->get<CurrentFrameTag>();
             _myMovie->set<FrameCountTag>(_myMovie->get<CurrentFrameTag>());
         }
     }
