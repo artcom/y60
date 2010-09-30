@@ -49,7 +49,8 @@ namespace asl {
     const char VECTOR_OF_STRING_DELIMITER = '`';
 
     typedef unsigned char Char;
-    const int MAX_CHAR_VALUE = 255 * 16;
+    // Full support for ISO10646 16-bit characters
+    const unsigned int MAX_CHAR_VALUE = 0xFFFFu;
 
     ASL_BASE_DECL extern const Char cb64[];
     ASL_BASE_DECL extern const Char cb66[];
