@@ -89,7 +89,7 @@ namespace y60 {
                 IpEndpointName       _mySender;
             };
 
-            OscReceiver(int thePort);
+            OscReceiver(int thePort, const char * theEndpointName = 0);
             virtual ~OscReceiver();
 
             const char * ClassName() {

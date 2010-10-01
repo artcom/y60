@@ -71,6 +71,7 @@ class OscSender {
         /// creates a new OscSender
         OscSender();
         bool connect(std::string theReceiverAddress, unsigned theReceiverPort, unsigned theSenderPort);
+        bool connect(std::string theReceiverAddress, unsigned theReceiverPort, std::string theSenderAddress, unsigned theSenderPort);
         virtual ~OscSender();
 
         void close();

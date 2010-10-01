@@ -80,14 +80,23 @@ namespace y60 {
         if(_myReceiverUDPConnection) close();
     }
 
-    bool OscSender::connect(string theReceiverAddress, unsigned theReceiverPort, unsigned theSenderPort) {
+    bool OscSender::connect(string theReceiverAddress, unsigned theReceiverPort, string theSenderAddress, unsigned theSenderPort) {
         _myReceiverAddress = theReceiverAddress;
         _myReceiverPort    = theReceiverPort;
+        if (theSenderAddress == "") {
+            _myReceiverUDPConnection = UDPConnectionPtr( new UDPConnection( INADDR_ANY, static_cast<asl::Unsigned16>(theSenderPort) ));
+        } else {
+            _myReceiverUDPConnection = UDPConnectionPtr( new UDPConnection( getHostAddress(theSenderAddress.c_str()), 
+                        static_cast<asl::Unsigned16>(theSenderPort) ));
+        }
 
-        _myReceiverUDPConnection = UDPConnectionPtr( new UDPConnection( INADDR_ANY, static_cast<asl::Unsigned16>(theSenderPort) ));
         _myReceiverUDPConnection->connect( getHostAddress( theReceiverAddress.c_str() ), static_cast<asl::Unsigned16>(theReceiverPort));
         AC_DEBUG << "Connected to : " << theReceiverAddress << " with port : " << theReceiverPort << " and sender port: " << theSenderPort;
         return true;
+    }
+
+    bool OscSender::connect(string theReceiverAddress, unsigned theReceiverPort, unsigned theSenderPort) {
+        return connect(theReceiverAddress, theReceiverPort, "", theSenderPort);
     }
 
 

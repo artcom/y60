@@ -142,6 +142,7 @@ namespace jslib {
     JSOscReceiver::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         DOC_BEGIN("Creates a OscReceiver with given port.");
         DOC_PARAM("thePort", "", DOC_TYPE_INTEGER);
+        DOC_PARAM("theAddressName", "dotted quad or hostname", DOC_TYPE_STRING);
         DOC_END;
         try {
             if (JSA_GetClass(cx,obj) != Class()) {
@@ -157,6 +158,18 @@ namespace jslib {
                     return JS_FALSE;
                 }
                 myNewNative = OscReceiverPtr(new OscReceiver(myPort));
+            } else if (argc == 2) {
+                int myPort;
+                if (!convertFrom(cx, argv[0], myPort)) {
+                    JS_ReportError(cx, "JSOscReceiver::Constructor(): argument #1 must be the port as integer");
+                    return JS_FALSE;
+                }
+                std::string myAddressName;
+                if (!convertFrom(cx, argv[1], myAddressName)) {
+                    JS_ReportError(cx, "JSOscReceiver::Constructor(): argument #2 must be the address as string");
+                    return JS_FALSE;
+                }
+                myNewNative = OscReceiverPtr(new OscReceiver(myPort, myAddressName.c_str()));
             } else {
                 // Construct empty OscReceiver that will be filled by copy Construct()
                 AC_PRINT << "JSOscReceiver::Constructor: empty";

@@ -131,28 +131,12 @@ connect(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Connect to socket.");
     DOC_PARAM("theReceiverIPAddress", "IP-address or hostname to connect to", DOC_TYPE_STRING);
     DOC_PARAM("theReceiverPort", "Port number to connect to", DOC_TYPE_INTEGER);
+    DOC_PARAM("theSenderAddress", "(optional) Local address to use", DOC_TYPE_STRING);
     DOC_PARAM("theSenderPort", "Local port number", DOC_TYPE_INTEGER);
     DOC_RVAL("True if succesful", DOC_TYPE_BOOLEAN);
     DOC_END;
     try {
-        if (argc != 3) {
-            JS_ReportError(cx, "OscSender::connect: bad number of arguments: expected 3 "
-                "(remote ip adress, remote port, local port), got %d", argc);
-            return JS_FALSE;
-        }
-
-        if (JSVAL_IS_VOID(argv[0])) {
-            JS_ReportError(cx,"Socket::connect: bad argument #1 (undefined)");
-            return JS_FALSE;
-        }
-        if (JSVAL_IS_VOID(argv[1])) {
-            JS_ReportError(cx,"Socket::connect: bad argument #2 (undefined)");
-            return JS_FALSE;
-        }
-        if (JSVAL_IS_VOID(argv[2])) {
-            JS_ReportError(cx,"Socket::connect: bad argument #3 (undefined)");
-            return JS_FALSE;
-        }
+        ensureParamCount(argc, 3, 4, PLUS_FILE_LINE);
 
         string myRemoteHostAddressString;
         if (!convertFrom(cx, argv[0], myRemoteHostAddressString)) {
@@ -165,13 +149,26 @@ connect(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             JS_ReportError(cx, "OscSender::connect: argument #2 must be an unsigned short (remote port)");
             return JS_FALSE;
         }
+
+        string myLocalAddress = "";
         unsigned short myLocalPort;
-        if (!convertFrom(cx, argv[2], myLocalPort)) {
-            JS_ReportError(cx, "OscSender::connect: argument #3 must be an unsigned short (local port)");
-            return JS_FALSE;
+        if (argc == 3) {
+            if (!convertFrom(cx, argv[2], myLocalPort)) {
+             JS_ReportError(cx, "OscSender::connect: argument #3 must be an unsigned short (local port)");
+             return JS_FALSE;
+            }
+        } else {
+            if (!convertFrom(cx, argv[2], myLocalAddress)) {
+             JS_ReportError(cx, "OscSender::connect: argument #3 must be a a string (local address)");
+             return JS_FALSE;
+            }
+            if (!convertFrom(cx, argv[3], myLocalPort)) {
+             JS_ReportError(cx, "OscSender::connect: argument #4 must be an unsigned short (local port)");
+             return JS_FALSE;
+            }
         }
 
-        if (JSOscSender::getJSWrapper(cx,obj).openNative().connect(myRemoteHostAddressString, myRemotePort, myLocalPort) ) {
+        if (JSOscSender::getJSWrapper(cx,obj).openNative().connect(myRemoteHostAddressString, myRemotePort, myLocalAddress, myLocalPort) ) {
             return JS_TRUE;
         } else {
             return JS_FALSE;

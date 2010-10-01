@@ -75,7 +75,7 @@ using namespace asl;
 
 namespace y60 {
 
-    OscReceiver::OscReceiver(int thePort):
+    OscReceiver::OscReceiver(int thePort, const char * theEndpointName):
         asl::PosixThread(),
         _myEventSchema( new dom::Document( ourosceventxsd )  ),
         _myValueFactory( new dom::ValueFactory() ),
@@ -84,9 +84,15 @@ namespace y60 {
         registerStandardTypes( * _myValueFactory );
 
         AC_DEBUG << "Initiated osc receiver on port: " << thePort;
-        _myOscReceiverSocket = asl::Ptr<UdpListeningReceiveSocket>(
-            new UdpListeningReceiveSocket(IpEndpointName(IpEndpointName::ANY_ADDRESS,
-                                                         thePort), this));
+        if (theEndpointName) {
+            _myOscReceiverSocket = asl::Ptr<UdpListeningReceiveSocket>(
+                new UdpListeningReceiveSocket(IpEndpointName(theEndpointName,
+                                                             thePort), this));
+        } else {
+            _myOscReceiverSocket = asl::Ptr<UdpListeningReceiveSocket>(
+                new UdpListeningReceiveSocket(IpEndpointName(IpEndpointName::ANY_ADDRESS,
+                                                             thePort), this));
+        }
 
         y60::EventDispatcher::get().addSource(this);
     }
