@@ -36,7 +36,7 @@ spark.Text.Constructor = function (Protected) {
     /////////////////////
     
     function handleI18nLanguage(e) {
-        Public.text = _myTextItem.text;
+        applyTextItemData();
     }
 
     function attachToI18nItem(theItemId) {
@@ -54,12 +54,22 @@ spark.Text.Constructor = function (Protected) {
             }
             _myTextItem.addEventListener(spark.I18nEvent.LANGUAGE,
                     handleI18nLanguage);
-            Public.text = _myTextItem.text;
+            applyTextItemData();
         } else {
             Public.text = "";
         }
     }
-    
+ 
+    function applyTextItemData() {
+        var myNewFontStyle = _myTextItem.fontStyle;
+        if(myNewFontStyle) {
+            if(spark.isFontStyleNode(myNewFontStyle)) {
+                _myStyle = spark.mergeFontStyles(_myStyle, myNewFontStyle);
+            }
+        }
+        Public.text = _myTextItem.text;
+    }
+   
     ///////////////////////
     // Protected Methods //
     ///////////////////////
@@ -100,6 +110,11 @@ spark.Text.Constructor = function (Protected) {
         return _myStyle;
     });
 
+    Public.__defineSetter__("style", function (theValue) {
+        _myStyle = theValue;
+        Public.text = Public.text;
+    });
+    
     Public.__defineGetter__("upcase", function () {
         return _myUpcase;
     });

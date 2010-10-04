@@ -24,14 +24,14 @@ function playAnimation(theAnimation) {
 }
 
 spark.SkeletonImpl = spark.ComponentClass("SkeletonImpl");
-spark.SkeletonImpl.Constructor = function (Protected) {
-    this.Inherit(spark.Window);
+spark.SkeletonImpl.Constructor = function (Protected, theArguments) {
+    this.Inherit(spark.Window, theArguments);
 };
 
 // load layouts and run the event loop
 try {
     spark.SkeletonImpl.commandlineArguments = arguments;
-    var ourApp = spark.loadFile("LAYOUT/Skeleton.spark");
+    var ourApp = spark.loadFile("LAYOUT/Skeleton.spark", undefined, arguments);
 
     // wrap onframe to integrate GUI.Animation
     var myRealOnFrame = ourApp.onFrame;
