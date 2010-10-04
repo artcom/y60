@@ -164,6 +164,69 @@ spark.applyStyleDefaults = function(theStyle) {
     !theStyle.getAttribute("textColor")       ? theStyle.textColor        = "000000" : null;
     !theStyle.getAttribute("backgroundColor") ? theStyle.backgroundColor  = "FFFFFF" : null;
 };
+			 
+spark.isFontStyleNode = function(theNode) {
+    return (theNode.getAttribute("font") ||
+            theNode.getAttribute("fontSize") || 
+            theNode.getAttribute("fontStyle") || 
+            theNode.getAttribute("topPad") || 
+            theNode.getAttribute("bottomPad") || 
+            theNode.getAttribute("leftPad") || 
+            theNode.getAttribute("rightPad") || 
+            theNode.getAttribute("tracking") || 
+            theNode.getAttribute("lineHeight") || 
+            theNode.getAttribute("hAlign") || 
+            theNode.getAttribute("vAlign") || 
+            theNode.getAttribute("hinting") || 
+            theNode.getAttribute("textColor") || 
+            theNode.getAttribute("backgroundColor")); 
+}
+
+spark.mergeFontStyles = function(theOldStyle, theNewStyle) {
+    if(!spark.isFontStyleNode(theOldStyle) || !spark.isFontStyleNode(theNewStyle)) {
+        throw new Error("either old fontstyle or new fontstyle is no font style not!"); 
+    }
+    var myMergedStyle = new Node("<style/>");
+    myMergedStyle = myMergedStyle.childNode(0);
+
+    // init style
+    spark.applyStyleDefaults(myMergedStyle);
+
+    function mergeAttributeIfPresent(theAttribute) {
+        var myNewValue = theNewStyle.getAttribute(theAttribute);
+        if(myNewValue) {
+            myMergedStyle[theAttribute] = myNewValue;
+        } else {
+            var myOldValue = theOldStyle.getAttribute(theAttribute);
+            if(myOldValue) {
+                myMergedStyle[theAttribute] = myOldValue;
+            }
+        }
+    }
+
+    mergeAttributeIfPresent("font");
+    mergeAttributeIfPresent("fontSize");
+    mergeAttributeIfPresent("fontStyle");
+
+    mergeAttributeIfPresent("topPad");
+    mergeAttributeIfPresent("bottomPad");
+    mergeAttributeIfPresent("leftPad");
+    mergeAttributeIfPresent("rightPad");
+
+    mergeAttributeIfPresent("tracking");
+    mergeAttributeIfPresent("lineHeight");
+
+    mergeAttributeIfPresent("hAlign");
+    mergeAttributeIfPresent("vAlign");
+    mergeAttributeIfPresent("hinting");
+    
+    mergeAttributeIfPresent("textColor");
+    mergeAttributeIfPresent("backgroundColor");
+    
+   return myMergedStyle; 
+    
+}
+
 
 /**
  * Produce a font style node from the given DOM node.

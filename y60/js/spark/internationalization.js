@@ -144,6 +144,7 @@ spark.I18nItem.Constructor = function (Protected) {
     });
 
     var _myLanguageData = {};
+    var _myLanguageNodes = {}; 
 
     Protected.languageData = function () {
         return _myLanguageData;
@@ -162,6 +163,7 @@ spark.I18nItem.Constructor = function (Protected) {
                 myData += myChild.childNode(j).nodeValue;
             }
             Public.addLanguageData(myLang, myData);
+            Public.addLanguageNode(myLang, myChild);
         }
     };
 
@@ -183,17 +185,37 @@ spark.I18nItem.Constructor = function (Protected) {
 
     Public.hasLanguageData = function (theLanguage) {
         return theLanguage in _myLanguageData;
+    }
+    
+    Public.getLanguageNode = function(theLanguage) {
+        if(!theLanguage) {
+            theLanguage = _myLanguage;
+        }
+        if(!(theLanguage in _myLanguageNodes)) {
+            Logger.debug("I18n item " + Public.name + " does not contain language " + theLanguage);
+            return (Public.parent.defaultLanguage in _myLanguageNodes) ? _myLanguageNodes[Public.parent.defaultLanguage] : null;
+        } else {
+            return _myLanguageNodes[theLanguage];
+        }
     };
+    
+    Public.hasLanguageNode = function(theLanguage) {
+        return theLanguage in _myLanguageNodes;
+    }
+
 
     Public.switchLanguage = function (theLanguage) {
         if (theLanguage == _myLanguage) {
             return;
         }
 
+        // XXX; one of these tests is redundant now
         if (!(theLanguage in _myLanguageData)) {
-            Logger.warning("I18n item " + Public.name + " does not contain language " + theLanguage);
+            Logger.debug("I18n item " + Public.name + " does not contain language " + theLanguage);
         }
-
+        if(!(theLanguage in _myLanguageNodes)) {
+            Logger.debug("I18n item " + Public.name + " does not contain language node " + theLanguage);
+        }
         _myLanguage = theLanguage;
         var myEvent = Protected.createEvent(theLanguage);
         Public.dispatchEvent(myEvent);
@@ -205,7 +227,14 @@ spark.I18nItem.Constructor = function (Protected) {
         }
         _myLanguageData[theLanguage] = theData;
     };
-    
+    	   
+    Public.addLanguageNode = function(theLanguage, theNode) {
+        if(theLanguage in _myLanguageNodes) {
+            Logger.warning("duplicate i18n node for item " + Public.name + " in language " + theLanguage);
+        }
+        _myLanguageNodes[theLanguage] = theNode;
+    };
+
     Public.changeLanguageData = function (theLanguage, theData) {
         if (theLanguage in _myLanguageData) {
             Logger.info("overwrite i18n data for item " + Public.name + " in language " + theLanguage);
@@ -229,6 +258,7 @@ spark.I18nText.Constructor = function (Protected) {
     Protected.createEvent = function (theLanguage) {
         var myEvent = Base.createEvent(theLanguage);
         myEvent.text = Public.text;
+        myEvent.fontStyle = Public.fontStyle;
         return myEvent;
     };
 
@@ -242,6 +272,11 @@ spark.I18nText.Constructor = function (Protected) {
         // see if this can be replaced by
         // return Public.getLanguageData(Public.language) || "";
     });
+		
+    Public.fontStyle getter = function() {
+        var myFontStyleNode = Public.getLanguageNode(Public.language);
+        return myFontStyleNode;
+    }
 };
 
 spark.I18nImage = spark.ComponentClass("I18nImage");
