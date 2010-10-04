@@ -260,6 +260,17 @@ spark.Window.Constructor = function (Protected, theArguments) {
         Base.realize(window.scene.world);
     };
 
+    Base.postRealize = Public.postRealize;
+    Public.postRealize = function () {
+        Base.postRealize();
+        if ("layouting" in Public.arguments) {
+            print("initializing Layouter");
+            use("spark/add-ons/Layouter.js");
+            var myLayouter = new Node("<Layouter name='Layouter_" + Public.name + "'/>");
+            spark.loadDocument(myLayouter);
+        }
+    };
+
     // XXX: Override size, width and height properties inherited via Stage->Widget
     // They do return a boundingbox size which, from class Windows standpoint, is just
     // crap.
