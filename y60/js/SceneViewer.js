@@ -91,6 +91,7 @@ use("OnScreenDisplay.js");
 use("MemoryMeter.js");
 use("VideoRecorder.js");
 use("PerfMeter.js");
+use("Ruler.js");
 
 // Global window object (similar to html window)
 var window = window || null;
@@ -129,6 +130,7 @@ SceneViewer.prototype.Constructor = function (self, theArguments) {
     var _myVideoRecorder          = null;
     var _myStatisticColor         = [1, 1, 1, 1];
     var _mySinceLastVersion       = "1";
+    var _myRuler                  = null;
 
     /////////////////////
     // Private Methods //
@@ -392,6 +394,9 @@ SceneViewer.prototype.Constructor = function (self, theArguments) {
         if (_myOnScreenStatistics > 0) {
             showStatistics();
         }
+        if (_myRuler && _myRuler.enabled) {
+            _myRuler.onPostRender();
+        }
     };
 
     self.onKey = function (theKey, theKeyState, theX, theY, theShiftFlag, theCtrlFlag, theAltFlag) {
@@ -400,6 +405,9 @@ SceneViewer.prototype.Constructor = function (self, theArguments) {
         
         if (myMover) {
             myMover.onKey(theKey, theKeyState, theX, theY, theShiftFlag, theCtrlFlag, theAltFlag);
+        }
+        if (_myRuler && _myRuler.enabled) {
+            _myRuler.onKey(theKey, theKeyState, theX, theY, theShiftFlag, theCtrlFlag, theAltFlag);
         }
         if (!theAltFlag) {
             self.getLightManager().onKey(theKey, theKeyState, theShiftFlag, theCtrlFlag, theAltFlag);
@@ -623,6 +631,15 @@ SceneViewer.prototype.Constructor = function (self, theArguments) {
                 self.drawFrustums = ! self.drawFrustums;
                 print("Draw frustums: " + (self.drawFrustums ? "On" : "Off"));
                 break;
+            case 'r':
+                if (_myRuler.enabled) {
+                    _myRuler.enabled = false;
+                    print("ruler deactivated");
+                } else {
+                    _myRuler.enabled = true;
+                    print("ruler activated");
+                }                
+                break;
             default:
                 break;
             }
@@ -637,6 +654,9 @@ SceneViewer.prototype.Constructor = function (self, theArguments) {
                 return;
             }
         }
+        if (_myRuler && _myRuler.enabled) {
+            _myRuler.onMouseMotion(theX, theY);
+        }
     };
     
     self.BaseViewer.onMouseButton = self.onMouseButton;
@@ -646,6 +666,9 @@ SceneViewer.prototype.Constructor = function (self, theArguments) {
             if (_myShutter.onMouseButton(theButton, theState, theX, theY)) {
                 return;
             }
+        }
+        if (_myRuler && _myRuler.enabled) {
+            _myRuler.onMouseButton(theButton, theState, theX, theY); 
         }
     };
 
@@ -734,6 +757,7 @@ SceneViewer.prototype.Constructor = function (self, theArguments) {
         _myDebugVisual = new DebugVisual(myScene.world, self);
 
         _myAnimationManager = new AnimationManager(self);
+        _myRuler            = new Ruler(self);
 
         // [CH]: Deprecated, should be removed someday
         _myImageManager = new ImageManager(self);
