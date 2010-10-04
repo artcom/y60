@@ -198,6 +198,20 @@ spark.Text.Constructor = function (Protected) {
         _myTextChangedHook = f;
     });
 
+    Public.__defineSetter__("font", function (theFont) {
+        _myStyle.font= theFont;
+        Protected.render();
+    });
+    Public.__defineGetter__("font", function () {
+        return _myStyle.font;
+    });
+    Public.__defineSetter__("fontSize", function (theFontSize) {
+        _myStyle.fontSize = theFontSize;
+        Protected.render();
+    });
+    Public.__defineGetter__("fontSize", function () {
+        return _myStyle.fontSize;
+    });
     Public.__defineSetter__("textColor", function (theColorString) {
         _myStyle.textColor = theColorString;
         Protected.render();
