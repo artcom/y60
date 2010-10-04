@@ -89,20 +89,24 @@ spark.Image.Constructor = function (Protected) {
     Public.__defineSetter__("src", function (theSourceFile) {
         _mySource = theSourceFile;
         if (_myUseCaching) {
-            Public.image = spark.getCachedImage(theSourceFile);
+            Public.image = spark.getCachedImage(_mySource);
         } else {
-            Public.image = Modelling.createImage(window.scene, _mySource);
+            if (_mySource === "") {
+                Public.image = Modelling.createImage(window.scene, Public.width, Public.height, "BGRA");
+            } else {
+                Public.image = Modelling.createImage(window.scene, _mySource);
+            }
         }
     });
 
     Public.__defineGetter__("srcId", function () {
         return _mySourceId;
     });
-
     Public.__defineSetter__("srcId", function (theValue) {
         _mySourceId = theValue;
         attachToI18nItem(theValue);
     });
+    
     Public.__defineGetter__("i18nItem", function () {
         return Public.srcId;
     });
@@ -120,7 +124,7 @@ spark.Image.Constructor = function (Protected) {
     });
     
     Public.__defineSetter__("useCaching", function (theFlag) {
-        _myUseCaching = theFlag;
+        _myUseCaching = !!theFlag;
     });
 
     Base.realize = Public.realize;

@@ -138,7 +138,9 @@ spark.Event.Constructor = function (Protected, theType, theBubbles, theCancelabl
     Public.__defineGetter__("cancelable", function () {
         return _myCancelable;
     });
-
+    Public.__defineSetter__("cancelable", function (theCancelableFlag) {
+        _myCancelable = !!theCancelableFlag;
+    });
     /**
      * Whether this event is currently being dispatched.
      * 
@@ -200,9 +202,11 @@ spark.Event.Constructor = function (Protected, theType, theBubbles, theCancelabl
      * Internal: update state of event to reflect end of dispatch
      */
     Public.finishDispatch = function () {
-        _myDispatching = false;
-        _myCurrentPhase = spark.EventPhase.IDLE;
-        _myCurrentTarget = null;
+        if (_myCancelable) {
+            _myDispatching = false;
+            _myCurrentPhase = spark.EventPhase.IDLE;
+            _myCurrentTarget = null;
+        }
     };
 
     /**
@@ -599,8 +603,8 @@ spark.StageEvent.POST_RENDER = "stage-post-render";
 
 spark.StageEvent.Constructor = function(Protected, theType, theStage, theTime, theDeltaT) {
     var Public = this;
-
-    this.Inherit(spark.Event, theType);
+    Public.Inherit(spark.Event, theType);
+    Public.cancelable = false;
 
     var _myStage = theStage;
     var _myTime = theTime != null ? theTime : 0.0;
