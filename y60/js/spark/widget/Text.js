@@ -112,7 +112,7 @@ spark.Text.Constructor = function (Protected) {
 
     Public.__defineSetter__("style", function (theValue) {
         _myStyle = theValue;
-        Public.text = Public.text;
+        Protected.render();
     });
     
     Public.__defineGetter__("upcase", function () {
