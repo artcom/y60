@@ -93,7 +93,7 @@ spark.loadFont = function (theName, theSize, theStyle, theHinting) {
     var myName = theName + "-" + theStyle + "-" + theSize;
     if (!(myName in spark.ourLoadedFonts)) {
         if (theStyle != "normal") {
-            spark.loadFont(theName, theSize, "normal");
+            spark.loadFont(theName, theSize, "normal", theHinting);
         }
 
         Logger.info("Loading font " + theName + " with size " + theSize + " and style " + theStyle);

@@ -197,7 +197,6 @@ spark.I18nItem.Constructor = function (Protected) {
         _myLanguage = theLanguage;
         var myEvent = Protected.createEvent(theLanguage);
         Public.dispatchEvent(myEvent);
-
     };
 
     Public.addLanguageData = function (theLanguage, theData) {
@@ -205,6 +204,15 @@ spark.I18nItem.Constructor = function (Protected) {
             Logger.warning("duplicate i18n data for item " + Public.name + " in language " + theLanguage);
         }
         _myLanguageData[theLanguage] = theData;
+    };
+    
+    Public.changeLanguageData = function (theLanguage, theData) {
+        if (theLanguage in _myLanguageData) {
+            Logger.info("overwrite i18n data for item " + Public.name + " in language " + theLanguage);
+        }
+        _myLanguageData[theLanguage] = theData;
+        var myEvent = Protected.createEvent(theLanguage);
+        Public.dispatchEvent(myEvent);
     };
 
 };
