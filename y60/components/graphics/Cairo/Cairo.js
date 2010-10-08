@@ -55,7 +55,6 @@
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
-
 use("SceneViewer.js");
 use("Overlay.js");
 
@@ -85,13 +84,13 @@ ourShow.setup = function() {
     var angle1 = radFromDeg(45.0);
     var angle2 = radFromDeg(180.0);
 
-    var myCairoSurface = new CairoSurface(myImage);
-    var myCairo = new Cairo(myCairoSurface);
-    myCairo.setAntialias(Cairo.ANTIALIAS_NONE);
-    myCairo.setSourceRGB(255,0,0);
-    myCairo.setLineWidth(10.0);
-    myCairo.arc(xc, yc, radius, angle1, angle2);
-    myCairo.stroke();
+    var mySurface = new Cairo.Surface(myImage);
+    var cairoContext = new Cairo.Context(mySurface);
+    cairoContext.setAntialias(Cairo.ANTIALIAS_NONE);
+    cairoContext.setSourceRGB(255,0,0);
+    cairoContext.setLineWidth(10.0);
+    cairoContext.arc(xc, yc, radius, angle1, angle2);
+    cairoContext.stroke();
 }
 
 try {

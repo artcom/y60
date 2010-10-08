@@ -59,22 +59,170 @@
 #include <asl/base/PlugInBase.h>
 #include <y60/jsbase/IScriptablePlugin.h>
 
-#include "JSCairo.h"
-#include "JSCairoSurface.h"
-#include "JSCairoPattern.h"
+#include "JSContext.h"
+#include "JSSurface.h"
+#include "JSPattern.h"
 
 namespace y60 {
     using namespace jslib;
 
+    static JSClass Package = {
+        "Package",
+        JSCLASS_HAS_PRIVATE,
+        JS_PropertyStub, JS_PropertyStub,
+        JS_PropertyStub, JS_PropertyStub,
+        JS_EnumerateStub, JS_ResolveStub,
+        JS_ConvertStub, JS_FinalizeStub
+    };
+
     class JSCairoPlugin : public asl::PlugInBase, public jslib::IScriptablePlugin {
         public:
+            enum PropertyNumbers {
+                PROP_ANTIALIAS_DEFAULT,
+                PROP_ANTIALIAS_NONE,
+                PROP_ANTIALIAS_GRAY,
+                PROP_ANTIALIAS_SUBPIXEL,
+
+                PROP_FILL_RULE_WINDING,
+                PROP_FILL_RULE_EVEN_ODD,
+
+                PROP_LINE_CAP_BUTT,
+                PROP_LINE_CAP_ROUND,
+                PROP_LINE_CAP_SQUARE,
+
+                PROP_LINE_JOIN_MITER,
+                PROP_LINE_JOIN_ROUND,
+                PROP_LINE_JOIN_BEVEL,
+
+                PROP_OPERATOR_CLEAR,
+                PROP_OPERATOR_SOURCE,
+                PROP_OPERATOR_OVER,
+                PROP_OPERATOR_IN,
+                PROP_OPERATOR_OUT,
+                PROP_OPERATOR_ATOP,
+                PROP_OPERATOR_DEST,
+                PROP_OPERATOR_DEST_OVER,
+                PROP_OPERATOR_DEST_IN,
+                PROP_OPERATOR_DEST_OUT,
+                PROP_OPERATOR_DEST_ATOP,
+                PROP_OPERATOR_XOR,
+                PROP_OPERATOR_ADD,
+                PROP_OPERATOR_SATURATE,
+
+                PROP_FONT_TYPE_TOY,
+                PROP_FONT_TYPE_FT,
+                PROP_FONT_TYPE_WIN32,
+                PROP_FONT_TYPE_ATSUI,
+
+                PROP_FONT_SLANT_NORMAL,
+                PROP_FONT_SLANT_ITALIC,
+                PROP_FONT_SLANT_OBLIQUE,
+
+                PROP_FONT_WEIGHT_NORMAL,
+                PROP_FONT_WEIGHT_BOLD,
+
+                PROP_SUBPIXEL_ORDER_DEFAULT,
+                PROP_SUBPIXEL_ORDER_RGB,
+                PROP_SUBPIXEL_ORDER_BGR,
+                PROP_SUBPIXEL_ORDER_VRGB,
+                PROP_SUBPIXEL_ORDER_VBGR,
+
+                PROP_HINT_STYLE_DEFAULT,
+                PROP_HINT_STYLE_NONE,
+                PROP_HINT_STYLE_SLIGHT,
+                PROP_HINT_STYLE_MEDIUM,
+                PROP_HINT_STYLE_FULL,
+
+                PROP_HINT_METRICS_DEFAULT,
+                PROP_HINT_METRICS_OFF,
+                PROP_HINT_METRICS_ON,
+
+                PROP_EXTEND_NONE,
+                PROP_EXTEND_REPEAT,
+                // PROP_EXTEND_REFLECT,
+                // PROP_EXTEND_PAD,
+
+                PROP_END
+            };
             JSCairoPlugin(asl::DLHandle theDLHandle) : asl::PlugInBase(theDLHandle) {}
+            JSConstIntPropertySpec * ConstIntProperties() {
+
+                static JSConstIntPropertySpec myProperties[] = {
+                    // name                id                       value
+                    {"ANTIALIAS_DEFAULT",  PROP_ANTIALIAS_DEFAULT,  CAIRO_ANTIALIAS_DEFAULT},
+                    {"ANTIALIAS_NONE",     PROP_ANTIALIAS_NONE,     CAIRO_ANTIALIAS_NONE},
+                    {"ANTIALIAS_GRAY",     PROP_ANTIALIAS_GRAY,     CAIRO_ANTIALIAS_GRAY},
+                    {"ANTIALIAS_SUBPIXEL", PROP_ANTIALIAS_SUBPIXEL, CAIRO_ANTIALIAS_SUBPIXEL},
+
+                    {"FILL_RULE_WINDING",  PROP_FILL_RULE_WINDING,  CAIRO_FILL_RULE_WINDING},
+                    {"FILL_RULE_EVEN_ODD", PROP_FILL_RULE_EVEN_ODD, CAIRO_FILL_RULE_EVEN_ODD},
+
+                    {"LINE_CAP_BUTT",      PROP_LINE_CAP_BUTT,      CAIRO_LINE_CAP_BUTT},
+                    {"LINE_CAP_ROUND",     PROP_LINE_CAP_ROUND,     CAIRO_LINE_CAP_ROUND},
+                    {"LINE_CAP_SQUARE",    PROP_LINE_CAP_SQUARE,    CAIRO_LINE_CAP_SQUARE},
+
+                    {"LINE_JOIN_MITER",    PROP_LINE_JOIN_MITER,    CAIRO_LINE_JOIN_MITER},
+                    {"LINE_JOIN_ROUND",    PROP_LINE_JOIN_ROUND,    CAIRO_LINE_JOIN_ROUND},
+                    {"LINE_JOIN_BEVEL",    PROP_LINE_JOIN_BEVEL,    CAIRO_LINE_JOIN_BEVEL},
+
+                    {"OPERATOR_CLEAR",     PROP_OPERATOR_CLEAR,     CAIRO_OPERATOR_CLEAR},
+                    {"OPERATOR_SOURCE",    PROP_OPERATOR_SOURCE,    CAIRO_OPERATOR_SOURCE},
+                    {"OPERATOR_OVER",      PROP_OPERATOR_OVER,      CAIRO_OPERATOR_OVER},
+                    {"OPERATOR_IN",        PROP_OPERATOR_IN,        CAIRO_OPERATOR_IN},
+                    {"OPERATOR_OUT",       PROP_OPERATOR_OUT,       CAIRO_OPERATOR_OUT},
+                    {"OPERATOR_ATOP",      PROP_OPERATOR_ATOP,      CAIRO_OPERATOR_ATOP},
+                    {"OPERATOR_DEST",      PROP_OPERATOR_DEST,      CAIRO_OPERATOR_DEST},
+                    {"OPERATOR_DEST_OVER", PROP_OPERATOR_DEST_OVER, CAIRO_OPERATOR_DEST_OVER},
+                    {"OPERATOR_DEST_IN",   PROP_OPERATOR_DEST_IN,   CAIRO_OPERATOR_DEST_IN},
+                    {"OPERATOR_DEST_OUT",  PROP_OPERATOR_DEST_OUT,  CAIRO_OPERATOR_DEST_OUT},
+                    {"OPERATOR_DEST_ATOP", PROP_OPERATOR_DEST_ATOP, CAIRO_OPERATOR_DEST_ATOP},
+                    {"OPERATOR_XOR",       PROP_OPERATOR_XOR,       CAIRO_OPERATOR_XOR},
+                    {"OPERATOR_ADD",       PROP_OPERATOR_ADD,       CAIRO_OPERATOR_ADD},
+                    {"OPERATOR_SATURATE",  PROP_OPERATOR_SATURATE,  CAIRO_OPERATOR_SATURATE},
+
+                    {"FONT_TYPE_TOY",      PROP_FONT_TYPE_TOY,      CAIRO_FONT_TYPE_TOY},
+                    {"FONT_TYPE_FT",       PROP_FONT_TYPE_FT,       CAIRO_FONT_TYPE_FT},
+                    {"FONT_TYPE_WIN32",    PROP_FONT_TYPE_WIN32,    CAIRO_FONT_TYPE_WIN32},
+                    {"FONT_TYPE_ATSUI",    PROP_FONT_TYPE_ATSUI,    CAIRO_FONT_TYPE_ATSUI},
+
+                    {"FONT_SLANT_NORMAL",  PROP_FONT_SLANT_NORMAL,          CAIRO_FONT_SLANT_NORMAL},
+                    {"FONT_SLANT_ITALIC",  PROP_FONT_SLANT_ITALIC,          CAIRO_FONT_SLANT_ITALIC},
+                    {"FONT_SLAND_OBLIQUE", PROP_FONT_SLANT_OBLIQUE,         CAIRO_FONT_SLANT_OBLIQUE},
+
+                    {"FONT_WEIGHT_NORMAL", PROP_FONT_WEIGHT_NORMAL,         CAIRO_FONT_WEIGHT_NORMAL},
+                    {"FONT_WEIGHT_BOLD",   PROP_FONT_WEIGHT_BOLD,           CAIRO_FONT_WEIGHT_BOLD},
+
+                    {"SUBPIXEL_ORDER_DEFAULT", PROP_SUBPIXEL_ORDER_DEFAULT, CAIRO_SUBPIXEL_ORDER_DEFAULT},
+                    {"SUBPIXEL_ORDER_RGB",     PROP_SUBPIXEL_ORDER_RGB,     CAIRO_SUBPIXEL_ORDER_RGB},
+                    {"SUBPIXEL_ORDER_BGR",     PROP_SUBPIXEL_ORDER_BGR,     CAIRO_SUBPIXEL_ORDER_BGR},
+                    {"SUBPIXEL_ORDER_VRGB",    PROP_SUBPIXEL_ORDER_VRGB,    CAIRO_SUBPIXEL_ORDER_VRGB},
+                    {"SUBPIXEL_ORDER_VBGR",    PROP_SUBPIXEL_ORDER_VBGR,    CAIRO_SUBPIXEL_ORDER_VBGR},
+
+                    {"HINT_STYLE_DEFAULT",     PROP_HINT_STYLE_DEFAULT,     CAIRO_HINT_STYLE_DEFAULT},
+                    {"HINT_STYLE_NONE",        PROP_HINT_STYLE_NONE,        CAIRO_HINT_STYLE_NONE},
+                    {"HINT_STYLE_SLIGHT",      PROP_HINT_STYLE_SLIGHT,      CAIRO_HINT_STYLE_SLIGHT},
+                    {"HINT_STYLE_MEDIUM",      PROP_HINT_STYLE_MEDIUM,      CAIRO_HINT_STYLE_MEDIUM},
+                    {"HINT_STYLE_FULL",        PROP_HINT_STYLE_FULL,        CAIRO_HINT_STYLE_FULL},
+
+                    {"HINT_METRICS_DEFAULT",   PROP_HINT_METRICS_DEFAULT,   CAIRO_HINT_METRICS_DEFAULT},
+                    {"HINT_METRICS_OFF",       PROP_HINT_METRICS_OFF,       CAIRO_HINT_METRICS_OFF},
+                    {"HINT_METRICS_ON",        PROP_HINT_METRICS_DEFAULT,   CAIRO_HINT_METRICS_ON},
+
+                    {"EXTEND_NONE",   PROP_EXTEND_NONE,   CAIRO_EXTEND_NONE},
+                    {"EXTEND_REPEAT", PROP_EXTEND_REPEAT, CAIRO_EXTEND_REPEAT},
+
+                    {0}
+                };
+                return myProperties;
+            };
 
             virtual void initClasses(JSContext * theContext, JSObject * theGlobalObject) {
-                JSCairo::initClass(theContext, theGlobalObject);
-
-                JSCairoSurface::initClass(theContext, theGlobalObject);
-                JSCairoPattern::initClass(theContext, theGlobalObject);
+                // A simple package class
+                JSObject *myNamespace = JS_DefineObject(theContext, theGlobalObject, "Cairo", &Package, NULL, JSPROP_PERMANENT | JSPROP_READONLY);
+                JSA_DefineConstInts(theContext, myNamespace, ConstIntProperties()); 
+                cairo::JSContext::initClass(theContext, myNamespace);
+                cairo::JSSurface::initClass(theContext,  myNamespace);
+                cairo::JSPattern::initClass(theContext, myNamespace);
             }
 
             const char * ClassName() {

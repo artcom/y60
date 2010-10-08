@@ -66,7 +66,7 @@
 
 #include <y60/jsbase/JSWrapper.impl>
 
-#include "JSCairoSurface.h"
+#include "JSSurface.h"
 
 #include "CairoWrapper.impl"
 
@@ -213,7 +213,7 @@ triggerUpload(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
     DOC_END;
     ensureParamCount(argc, 0);
 
-    JSCairoSurface *mySurface = reinterpret_cast<JSCairoSurface*>(JS_GetPrivate(cx, obj));
+    cairo::JSSurface *mySurface = reinterpret_cast<cairo::JSSurface*>(JS_GetPrivate(cx, obj));
 
     mySurface->doTriggerUpload();
 
@@ -221,12 +221,12 @@ triggerUpload(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
 }
 
 void
-JSCairoSurface::doTriggerUpload() {
+cairo::JSSurface::doTriggerUpload() {
     //_myImageNode->getFacade<y60::Image>()->triggerUpload();
 }
 
 JSFunctionSpec *
-JSCairoSurface::Functions() {
+cairo::JSSurface::Functions() {
     IF_REG(cerr << "Registering class '"<<ClassName()<<"'"<<endl);
     static JSFunctionSpec myFunctions[] = {
         // name                  native                   nargs
@@ -247,7 +247,7 @@ JSCairoSurface::Functions() {
 }
 
 JSPropertySpec *
-JSCairoSurface::Properties() {
+cairo::JSSurface::Properties() {
     static JSPropertySpec myProperties[] = {
         {0}
     };
@@ -255,33 +255,33 @@ JSCairoSurface::Properties() {
 }
 
 JSBool
-JSCairoSurface::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
+cairo::JSSurface::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
     JSClassTraits<NATIVE>::ScopedNativeRef myObj(cx, obj);
     return getPropertySwitch(myObj.getNative(), theID, cx, obj, id, vp);
 }
 
 JSBool
-JSCairoSurface::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
+cairo::JSSurface::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
     JSClassTraits<NATIVE>::ScopedNativeRef myObj(cx, obj);
     return setPropertySwitch(myObj.getNative(), theID, cx, obj, id, vp);
 }
 
 JSBool
-JSCairoSurface::getPropertySwitch(NATIVE & theNative, unsigned long theID,
+cairo::JSSurface::getPropertySwitch(NATIVE & theNative, unsigned long theID,
         JSContext *cx, JSObject *obj, jsval id, jsval *vp)
 {
     return JS_FALSE;
 }
 
 JSBool
-JSCairoSurface::setPropertySwitch(NATIVE & theNative, unsigned long theID,
+cairo::JSSurface::setPropertySwitch(NATIVE & theNative, unsigned long theID,
         JSContext *cx, JSObject *obj, jsval id, jsval *vp)
 {
     return JS_FALSE;
 }
 
 void
-JSCairoSurface::convertRGBAtoBGRA(ResizeableRasterPtr theOld, ResizeableRasterPtr theNew) {
+cairo::JSSurface::convertRGBAtoBGRA(ResizeableRasterPtr theOld, ResizeableRasterPtr theNew) {
     ReadableBlock  &myOld = theOld->pixels();
     WriteableBlock &myNew = theNew->pixels();
 
@@ -302,7 +302,7 @@ JSCairoSurface::convertRGBAtoBGRA(ResizeableRasterPtr theOld, ResizeableRasterPt
 }
 
 JSBool
-JSCairoSurface::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+cairo::JSSurface::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
 
@@ -313,7 +313,7 @@ JSCairoSurface::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *arg
 
     NATIVE * newNative;
 
-    JSCairoSurface * myNewObject = 0;
+    cairo::JSSurface * myNewObject = 0;
 
     dom::NodePtr myImageNode;
     std::string  myPath;
@@ -375,7 +375,7 @@ JSCairoSurface::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *arg
     }
 
     JSCairoSurfaceWrapper::STRONGPTR _myOwnerPtr(newNative);
-    myNewObject = new JSCairoSurface(dynamic_cast_Ptr<NATIVE>(_myOwnerPtr), newNative);
+    myNewObject = new cairo::JSSurface(dynamic_cast_Ptr<NATIVE>(_myOwnerPtr), newNative);
 
     JSCairoSurfaceWrapper::WEAKPTR   _mySelfPtr(_myOwnerPtr);
     newNative->setSelfPtr(_mySelfPtr);
@@ -387,12 +387,12 @@ JSCairoSurface::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *arg
 
         return JS_TRUE;
     }
-    JS_ReportError(cx,"JSCairoSurface::Constructor: bad parameters");
+    JS_ReportError(cx,"cairo::JSSurface::Constructor: bad parameters");
     return JS_FALSE;
 }
 
 JSConstIntPropertySpec *
-JSCairoSurface::ConstIntProperties() {
+cairo::JSSurface::ConstIntProperties() {
 
     static JSConstIntPropertySpec myProperties[] = {
         // name                id                       value
@@ -403,14 +403,14 @@ JSCairoSurface::ConstIntProperties() {
 };
 
 void
-JSCairoSurface::addClassProperties(JSContext * cx, JSObject * theClassProto) {
+cairo::JSSurface::addClassProperties(JSContext * cx, JSObject * theClassProto) {
     JSA_AddFunctions(cx, theClassProto, Functions());
     JSA_AddProperties(cx, theClassProto, Properties());
     createClassModuleDocumentation("Cairo", ClassName(), Properties(), Functions(), 0, 0, 0);
 }
 
 JSObject *
-JSCairoSurface::initClass(JSContext *cx, JSObject *theGlobalObject) {
+cairo::JSSurface::initClass(JSContext *cx, JSObject *theGlobalObject) {
     JSObject * myClassObject = Base::initClass(cx, theGlobalObject, ClassName(), Constructor, 0 ,0);
     if (myClassObject) {
         addClassProperties(cx, myClassObject);
@@ -420,27 +420,27 @@ JSCairoSurface::initClass(JSContext *cx, JSObject *theGlobalObject) {
         JSObject * myConstructorFuncObj = JSVAL_TO_OBJECT(myConstructorFuncObjVal);
         JSA_DefineConstInts(cx, myConstructorFuncObj, ConstIntProperties());
     } else {
-        cerr << "JSCairoSurface::initClass: constructor function object not found, could not initialize static members"<<endl;
+        cerr << "cairo::JSSurface::initClass: constructor function object not found, could not initialize static members"<<endl;
     }
     return myClassObject;
 }
 
-jsval as_jsval(JSContext *cx, JSCairoSurface::OWNERPTR theOwner, JSCairoSurface::NATIVE * theNative) {
-    JSObject * myReturnObject = JSCairoSurface::Construct(cx, theOwner, theNative);
+jsval as_jsval(JSContext *cx, cairo::JSSurface::OWNERPTR theOwner, cairo::JSSurface::NATIVE * theNative) {
+    JSObject * myReturnObject = cairo::JSSurface::Construct(cx, theOwner, theNative);
     return OBJECT_TO_JSVAL(myReturnObject);
 }
 
-jsval as_jsval(JSContext *cx, JSCairoSurface::OWNERPTR theOwner, cairo_surface_t * theNative) {
+jsval as_jsval(JSContext *cx, cairo::JSSurface::OWNERPTR theOwner, cairo_surface_t * theNative) {
     JSCairoSurfaceWrapper *myWrapper = dynamic_cast<JSCairoSurfaceWrapper*>(JSCairoSurfaceWrapper::get(theNative));
     return as_jsval(cx, theOwner, myWrapper);
 }
 
-bool convertFrom(JSContext *cx, jsval theValue, JSCairoSurface::NATIVE *& theTarget) {
+bool convertFrom(JSContext *cx, jsval theValue, cairo::JSSurface::NATIVE *& theTarget) {
     if (JSVAL_IS_OBJECT(theValue)) {
         JSObject * myArgument;
         if (JS_ValueToObject(cx, theValue, &myArgument)) {
-            if (JSA_GetClass(cx,myArgument) == JSClassTraits<JSCairoSurface::NATIVE>::Class()) {
-                JSClassTraits<JSCairoSurface::NATIVE>::ScopedNativeRef myObj(cx, myArgument);
+            if (JSA_GetClass(cx,myArgument) == JSClassTraits<cairo::JSSurface::NATIVE>::Class()) {
+                JSClassTraits<cairo::JSSurface::NATIVE>::ScopedNativeRef myObj(cx, myArgument);
                 theTarget = &myObj.getNative();
                 return true;
             }
@@ -450,7 +450,7 @@ bool convertFrom(JSContext *cx, jsval theValue, JSCairoSurface::NATIVE *& theTar
 }
 
 bool convertFrom(JSContext *cx, jsval theValue, cairo_surface_t *& theTarget) {
-    JSCairoSurface::NATIVE *myWrapper;
+    cairo::JSSurface::NATIVE *myWrapper;
 
     if(convertFrom(cx, theValue, myWrapper)) {
         theTarget = myWrapper->getWrapped();

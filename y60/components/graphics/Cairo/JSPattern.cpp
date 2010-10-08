@@ -69,8 +69,8 @@
 
 #include "CairoUtilities.h"
 
-#include "JSCairoSurface.h"
-#include "JSCairoPattern.h"
+#include "JSSurface.h"
+#include "JSPattern.h"
 
 #include "CairoWrapper.impl"
 
@@ -265,7 +265,7 @@ getMatrix(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 }
 
 JSFunctionSpec *
-JSCairoPattern::Functions() {
+cairo::JSPattern::Functions() {
     IF_REG(cerr << "Registering class '"<<ClassName()<<"'"<<endl);
     static JSFunctionSpec myFunctions[] = {
         // name                  native                   nargs
@@ -283,7 +283,7 @@ JSCairoPattern::Functions() {
 }
 
 JSPropertySpec *
-JSCairoPattern::Properties() {
+cairo::JSPattern::Properties() {
     static JSPropertySpec myProperties[] = {
         {0}
     };
@@ -291,33 +291,33 @@ JSCairoPattern::Properties() {
 }
 
 JSBool
-JSCairoPattern::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
+cairo::JSPattern::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
     JSClassTraits<NATIVE>::ScopedNativeRef myObj(cx, obj);
     return getPropertySwitch(myObj.getNative(), theID, cx, obj, id, vp);
 }
 
 JSBool
-JSCairoPattern::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
+cairo::JSPattern::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
     JSClassTraits<NATIVE>::ScopedNativeRef myObj(cx, obj);
     return setPropertySwitch(myObj.getNative(), theID, cx, obj, id, vp);
 }
 
 JSBool
-JSCairoPattern::getPropertySwitch(NATIVE & theNative, unsigned long theID,
+cairo::JSPattern::getPropertySwitch(NATIVE & theNative, unsigned long theID,
         JSContext *cx, JSObject *obj, jsval id, jsval *vp)
 {
     return JS_FALSE;
 }
 
 JSBool
-JSCairoPattern::setPropertySwitch(NATIVE & theNative, unsigned long theID,
+cairo::JSPattern::setPropertySwitch(NATIVE & theNative, unsigned long theID,
         JSContext *cx, JSObject *obj, jsval id, jsval *vp)
 {
     return JS_FALSE;
 }
 
 JSBool
-JSCairoPattern::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+cairo::JSPattern::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
 
@@ -328,7 +328,7 @@ JSCairoPattern::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *arg
 
     NATIVE * newNative;
 
-    JSCairoPattern * myNewObject = 0;
+    cairo::JSPattern * myNewObject = 0;
 
     if (argc == 1) {
 
@@ -347,7 +347,7 @@ JSCairoPattern::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *arg
     }
 
     JSCairoPatternWrapper::STRONGPTR _myOwnerPtr(newNative);
-    myNewObject = new JSCairoPattern(dynamic_cast_Ptr<NATIVE>(_myOwnerPtr), newNative);
+    myNewObject = new cairo::JSPattern(dynamic_cast_Ptr<NATIVE>(_myOwnerPtr), newNative);
 
     JSCairoPatternWrapper::WEAKPTR   _mySelfPtr(_myOwnerPtr);
     newNative->setSelfPtr(_mySelfPtr);
@@ -357,12 +357,12 @@ JSCairoPattern::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *arg
 
         return JS_TRUE;
     }
-    JS_ReportError(cx,"JSCairoPattern::Constructor: bad parameters");
+    JS_ReportError(cx,"cairo::JSPattern::Constructor: bad parameters");
     return JS_FALSE;
 }
 
 JSConstIntPropertySpec *
-JSCairoPattern::ConstIntProperties() {
+cairo::JSPattern::ConstIntProperties() {
 
     static JSConstIntPropertySpec myProperties[] = {
         // name                id                       value
@@ -372,14 +372,14 @@ JSCairoPattern::ConstIntProperties() {
 };
 
 void
-JSCairoPattern::addClassProperties(JSContext * cx, JSObject * theClassProto) {
+cairo::JSPattern::addClassProperties(JSContext * cx, JSObject * theClassProto) {
     JSA_AddFunctions(cx, theClassProto, Functions());
     JSA_AddProperties(cx, theClassProto, Properties());
     createClassModuleDocumentation("Cairo", ClassName(), Properties(), Functions(), 0, 0, 0);
 }
 
 JSObject *
-JSCairoPattern::initClass(JSContext *cx, JSObject *theGlobalObject) {
+cairo::JSPattern::initClass(JSContext *cx, JSObject *theGlobalObject) {
     JSObject * myClassObject = Base::initClass(cx, theGlobalObject, ClassName(), Constructor, 0 ,0);
     if (myClassObject) {
         addClassProperties(cx, myClassObject);
@@ -389,27 +389,27 @@ JSCairoPattern::initClass(JSContext *cx, JSObject *theGlobalObject) {
         JSObject * myConstructorFuncObj = JSVAL_TO_OBJECT(myConstructorFuncObjVal);
         JSA_DefineConstInts(cx, myConstructorFuncObj, ConstIntProperties());
     } else {
-        cerr << "JSCairoPattern::initClass: constructor function object not found, could not initialize static members"<<endl;
+        cerr << "cairo::JSPattern::initClass: constructor function object not found, could not initialize static members"<<endl;
     }
     return myClassObject;
 }
 
-jsval as_jsval(JSContext *cx, JSCairoPattern::OWNERPTR theOwner, JSCairoPattern::NATIVE * theNative) {
-    JSObject * myReturnObject = JSCairoPattern::Construct(cx, theOwner, theNative);
+jsval as_jsval(JSContext *cx, cairo::JSPattern::OWNERPTR theOwner, cairo::JSPattern::NATIVE * theNative) {
+    JSObject * myReturnObject = cairo::JSPattern::Construct(cx, theOwner, theNative);
     return OBJECT_TO_JSVAL(myReturnObject);
 }
 
-jsval as_jsval(JSContext *cx, JSCairoPattern::OWNERPTR theOwner, cairo_pattern_t * theNative) {
+jsval as_jsval(JSContext *cx, cairo::JSPattern::OWNERPTR theOwner, cairo_pattern_t * theNative) {
     JSCairoPatternWrapper *myWrapper = dynamic_cast<JSCairoPatternWrapper*>(JSCairoPatternWrapper::get(theNative));
     return as_jsval(cx, theOwner, myWrapper);
 }
 
-bool convertFrom(JSContext *cx, jsval theValue, JSCairoPattern::NATIVE *& theTarget) {
+bool convertFrom(JSContext *cx, jsval theValue, cairo::JSPattern::NATIVE *& theTarget) {
     if (JSVAL_IS_OBJECT(theValue)) {
         JSObject * myArgument;
         if (JS_ValueToObject(cx, theValue, &myArgument)) {
-            if (JSA_GetClass(cx,myArgument) == JSClassTraits<JSCairoPattern::NATIVE>::Class()) {
-                JSClassTraits<JSCairoPattern::NATIVE>::ScopedNativeRef myObj(cx, myArgument);
+            if (JSA_GetClass(cx,myArgument) == JSClassTraits<cairo::JSPattern::NATIVE>::Class()) {
+                JSClassTraits<cairo::JSPattern::NATIVE>::ScopedNativeRef myObj(cx, myArgument);
                 theTarget = &myObj.getNative();
                 return true;
             }
@@ -419,7 +419,7 @@ bool convertFrom(JSContext *cx, jsval theValue, JSCairoPattern::NATIVE *& theTar
 }
 
 bool convertFrom(JSContext *cx, jsval theValue, cairo_pattern_t *& theTarget) {
-    JSCairoPattern::NATIVE *myWrapper;
+    cairo::JSPattern::NATIVE *myWrapper;
 
     if(convertFrom(cx, theValue, myWrapper)) {
         theTarget = myWrapper->getWrapped();

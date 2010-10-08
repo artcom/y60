@@ -1,19 +1,19 @@
 
 set(SOURCES
 CairoUtilities.cpp
-JSCairo.cpp
-JSCairoPattern.cpp
+JSContext.cpp
+JSPattern.cpp
 JSCairoPlugin.cpp
-JSCairoSurface.cpp
+JSSurface.cpp
 )
 
 set(HEADERS
 CairoUtilities.h
 CairoWrapper.h
 CairoWrapper.impl
-JSCairo.h
-JSCairoPattern.h
-JSCairoSurface.h
+JSContext.h
+JSPattern.h
+JSSurface.h
 )
 
 y60_add_component(
