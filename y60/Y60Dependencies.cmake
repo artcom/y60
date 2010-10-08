@@ -29,6 +29,7 @@ endif(APPLE AND SDL_LIBRARY MATCHES ".*\\.framework.*")
 # gtk and consorts
 list(APPEND OPT_PACKAGES GTKMM)
 list(APPEND OPT_PACKAGES GTKGLEXT)
+list(APPEND OPT_PKGCONFIG CAIROMM cairomm-1.0)
 
 # media codecs
 list(APPEND REQ_PACKAGES FFMPEG)
