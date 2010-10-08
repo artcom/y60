@@ -90,13 +90,13 @@ spark.fontScale = 1;
  */
 
 spark.loadFont = function (theName, theSize, theStyle, theHinting) {
-    var myName = theName + "-" + theStyle + "-" + theSize;
+    var myName = theName + "-" + theStyle + "-" + theSize + "-" + theHinting;
     if (!(myName in spark.ourLoadedFonts)) {
         if (theStyle != "normal") {
             spark.loadFont(theName, theSize, "normal", theHinting);
         }
 
-        Logger.info("Loading font " + theName + " with size " + theSize + " and style " + theStyle);
+        Logger.info("Loading font " + theName + " with size " + theSize + " and style " + theStyle+" and hinting:"+theHinting);
 
         // XXX: this is a remnant from before the introduction
         //      of include-path-based font loading.

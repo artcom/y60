@@ -213,6 +213,13 @@ spark.Text.Constructor = function (Protected) {
         _myTextChangedHook = f;
     });
 
+    Public.__defineSetter__("hinting", function (theHinting) {
+        _myStyle.hinting= theHinting;
+        Protected.render();
+    });
+    Public.__defineGetter__("hinting", function () {
+        return _myStyle.hinting;
+    });
     Public.__defineSetter__("font", function (theFont) {
         _myStyle.font= theFont;
         Protected.render();
