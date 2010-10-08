@@ -110,7 +110,10 @@ public:
             CursorEventList::iterator it;
             for(it = _myUndeliveredCursors.begin(); it != _myUndeliveredCursors.end(); ++it) {
                 CursorEvent & myEvent = *it;
-                myEvents.push_back(convertCursorEvent(myEvent.first, myEvent.second));
+                int myCursorId = myEvent.second->getSessionID();
+                if (allow2SendCursor(myCursorId)) {
+                    myEvents.push_back(convertCursorEvent(myEvent.first, myEvent.second));
+                }
                 delete myEvent.second;
                 myEvent.second = 0;
             }

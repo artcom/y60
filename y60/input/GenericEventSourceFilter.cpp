@@ -65,7 +65,8 @@ namespace y60 {
 
     GenericEventSourceFilter::GenericEventSourceFilter():
         _myMaxCursorPositionsInHistory(MAX_CURSOR_POSITIONS_IN_HISTORY),
-        _myFilterMultipleMovePerCursorFlag(true)
+        _myFilterMultipleMovePerCursorFlag(true),
+        _myMaxCursorCount(5)
     {}
 
     GenericEventSourceFilter::~GenericEventSourceFilter() {}
@@ -83,6 +84,24 @@ namespace y60 {
             applyCursorFilter(_myCursorFilter[i]._myEventType, _myCursorFilter[i]._myCursorAttributeName, theEventList);
         }
     }
+
+    bool GenericEventSourceFilter::allow2SendCursor(int theCursorId) {
+        bool myAllowFlag = true;
+        if (_myMaxCursorCount >-1) {
+            std::vector<int>::iterator myCursorInUse = find(_myCursorsInUse.begin(), _myCursorsInUse.end(), theCursorId);    
+            if (myCursorInUse == _myCursorsInUse.end()) {
+                if (_myCursorsInUse.size() < _myMaxCursorCount) {
+                    // we have room for cursor
+                    myAllowFlag = true;
+                    _myCursorsInUse.push_back(theCursorId);
+                } else {
+                    myAllowFlag = false;
+                }
+            }
+        }
+        return myAllowFlag;
+    }
+
     void 
     GenericEventSourceFilter::applyCursorFilter(const std::string & theEventType, const std::string & theIdAttributeName, EventPtrList & theEventList) {
         std::map<int, GenericEventPtr > myNewestEvent;
