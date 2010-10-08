@@ -74,6 +74,9 @@ public:
         myFilterFlag = getSetting( mySettings, "FilterMultipleMovePerCursor", myFilterFlag);
         _myFilterMultipleMovePerCursorFlag = (myFilterFlag == 1 ? true : false);
         _myMaxCursorPositionsInHistory = getSetting( mySettings, "MaxCursorPositionsForAverage", _myMaxCursorPositionsInHistory);
+        int myMaxCursorCount = -1;
+        myMaxCursorCount = getSetting( mySettings, "MaxCursorCount", myMaxCursorCount);
+        setMaxCursorCount(myMaxCursorCount);
     }
 
     dom::NodePtr

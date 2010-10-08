@@ -98,6 +98,7 @@ namespace y60 {
             void analyzeEvents(const EventPtrList & theEventList, const std::string & theIdAttributeName) const;
             bool allow2SendCursor(int theCursorId);
             void removeFromCursorList(int theCursorId);
+            void setMaxCursorCount(int theMaxCursorCount) { _myMaxCursorCount = theMaxCursorCount; }
 
             asl::Vector3f getAveragePosition(const unsigned int theCursorId) const;
             inline asl::Vector3f getCurrentPosition(const unsigned int theCursorId) const {
