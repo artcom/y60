@@ -96,7 +96,10 @@ namespace y60 {
             void addCursorFilter(const std::string & theEventType, const std::string & theIdAttributeName);
             void applyFilter(EventPtrList & theEventList);
             void analyzeEvents(const EventPtrList & theEventList, const std::string & theIdAttributeName) const;
-            
+            bool allow2SendCursor(int theCursorId);
+            void removeFromCursorList(int theCursorId);
+            void setMaxCursorCount(int theMaxCursorCount) { _myMaxCursorCount = theMaxCursorCount; }
+
             asl::Vector3f getAveragePosition(const unsigned int theCursorId) const;
             inline asl::Vector3f getCurrentPosition(const unsigned int theCursorId) const {
                 CursorPositionHistory::const_iterator myPositionsIt = _myCursorPositionHistory.find(theCursorId);
@@ -118,7 +121,10 @@ namespace y60 {
             bool _myFilterMultipleMovePerCursorFlag;
         private:          
             void applyCursorFilter(const std::string & theEventType, const std::string & theIdAttributeName, EventPtrList & theEventList);
+
             std::vector<CursorFilter>                    _myCursorFilter;
+            int                                          _myMaxCursorCount;
+            std::vector<int>                             _myCursorsInUse;
             
     };
 

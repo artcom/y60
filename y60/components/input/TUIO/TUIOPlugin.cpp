@@ -74,6 +74,9 @@ public:
         myFilterFlag = getSetting( mySettings, "FilterMultipleMovePerCursor", myFilterFlag);
         _myFilterMultipleMovePerCursorFlag = (myFilterFlag == 1 ? true : false);
         _myMaxCursorPositionsInHistory = getSetting( mySettings, "MaxCursorPositionsForAverage", _myMaxCursorPositionsInHistory);
+        int myMaxCursorCount = -1;
+        myMaxCursorCount = getSetting( mySettings, "MaxCursorCount", myMaxCursorCount);
+        setMaxCursorCount(myMaxCursorCount);
     }
 
     dom::NodePtr
@@ -110,7 +113,13 @@ public:
             CursorEventList::iterator it;
             for(it = _myUndeliveredCursors.begin(); it != _myUndeliveredCursors.end(); ++it) {
                 CursorEvent & myEvent = *it;
-                myEvents.push_back(convertCursorEvent(myEvent.first, myEvent.second));
+                int myCursorId = myEvent.second->getSessionID();
+                if (allow2SendCursor(myCursorId)) {
+                    myEvents.push_back(convertCursorEvent(myEvent.first, myEvent.second));
+                    if (strcmp (myEvent.first, "remove") == 0) {
+                        removeFromCursorList(myCursorId);
+                    }
+                }
                 delete myEvent.second;
                 myEvent.second = 0;
             }
