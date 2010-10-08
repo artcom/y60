@@ -97,6 +97,7 @@ namespace y60 {
             void applyFilter(EventPtrList & theEventList);
             void analyzeEvents(const EventPtrList & theEventList, const std::string & theIdAttributeName) const;
             bool allow2SendCursor(int theCursorId);
+            void removeFromCursorList(int theCursorId);
 
             asl::Vector3f getAveragePosition(const unsigned int theCursorId) const;
             inline asl::Vector3f getCurrentPosition(const unsigned int theCursorId) const {

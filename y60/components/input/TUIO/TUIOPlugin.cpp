@@ -113,6 +113,9 @@ public:
                 int myCursorId = myEvent.second->getSessionID();
                 if (allow2SendCursor(myCursorId)) {
                     myEvents.push_back(convertCursorEvent(myEvent.first, myEvent.second));
+                    if (strcmp (myEvent.first, "remove") == 0) {
+                        removeFromCursorList(myCursorId);
+                    }
                 }
                 delete myEvent.second;
                 myEvent.second = 0;

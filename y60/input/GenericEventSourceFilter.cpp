@@ -102,6 +102,14 @@ namespace y60 {
         return myAllowFlag;
     }
 
+    void GenericEventSourceFilter::removeFromCursorList(int theCursorId) {
+        std::vector<int>::iterator myCursorInUse = find(_myCursorsInUse.begin(), _myCursorsInUse.end(), theCursorId);    
+        if (myCursorInUse != _myCursorsInUse.end()) {
+            _myCursorsInUse.erase(myCursorInUse);
+        }
+
+    }
+
     void 
     GenericEventSourceFilter::applyCursorFilter(const std::string & theEventType, const std::string & theIdAttributeName, EventPtrList & theEventList) {
         std::map<int, GenericEventPtr > myNewestEvent;
