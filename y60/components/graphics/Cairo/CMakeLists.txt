@@ -4,6 +4,8 @@ CairoUtilities.cpp
 JSContext.cpp
 JSPattern.cpp
 JSCairoPlugin.cpp
+JSFontDescription.cpp
+JSLayout.cpp
 JSSurface.cpp
 )
 
@@ -13,6 +15,8 @@ CairoWrapper.h
 CairoWrapper.impl
 JSContext.h
 JSPattern.h
+JSFontDescription.h
+JSLayout.h
 JSSurface.h
 )
 
@@ -21,5 +25,5 @@ y60_add_component(
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     DEPENDS y60jslib y60input
-    EXTERNS CAIRO
+    EXTERNS CAIRO PANGO PANGOCAIRO
 )

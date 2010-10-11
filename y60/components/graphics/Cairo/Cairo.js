@@ -91,7 +91,16 @@ ourShow.setup = function() {
     cairoContext.setLineWidth(10.0);
     cairoContext.arc(xc, yc, radius, angle1, angle2);
     cairoContext.stroke();
+
+    // now some txt rendering
+    var myLayout = new Pango.Layout(cairoContext);
+    var myFontDesc = new Pango.FontDescription("Arial 12");
+    myLayout.font_description = myFontDesc;
+    myLayout.text = "\u1E78berl\u00E4nge";
+    myLayout.update_from_cairo_context(cairoContext);
+    myLayout.show_in_cairo_context(cairoContext);
 }
+
 
 try {
     ourShow.setup();

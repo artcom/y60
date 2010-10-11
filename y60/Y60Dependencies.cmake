@@ -56,6 +56,8 @@ if(WIN32)
 
     # cairo backend
     list(APPEND OPT_PKGCONFIG CAIRO cairo-win32)
+    list(APPEND OPT_PKGCONFIG PANGO pango)
+    list(APPEND OPT_PKGCONFIG PANGOCAIRO pangocairo)
 
     # windows media sdk
     list(APPEND REQ_PACKAGES Wmsdk)
@@ -73,6 +75,8 @@ elseif(LINUX)
 
     # cairo backend
     list(APPEND OPT_PKGCONFIG CAIRO cairo-xlib)
+    list(APPEND OPT_PKGCONFIG PANGO pango)
+    list(APPEND OPT_PKGCONFIG PANGOCAIRO pangocairo)
 
     # gstreamer
     # XXX: might work on OSX
@@ -82,6 +86,8 @@ elseif(OSX)
 
     # cairo backend
     list(APPEND OPT_PKGCONFIG CAIRO cairo-quartz)
+    list(APPEND OPT_PKGCONFIG PANGO pango)
+    list(APPEND OPT_PKGCONFIG PANGOCAIRO pangocairo)
 
     # cocoa ui framework
     find_library( COCOA_LIBRARIES NAMES Cocoa)

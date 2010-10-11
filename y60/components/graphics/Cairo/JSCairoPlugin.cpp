@@ -60,8 +60,11 @@
 #include <y60/jsbase/IScriptablePlugin.h>
 
 #include "JSContext.h"
+#include "JSLayout.h"
 #include "JSSurface.h"
 #include "JSPattern.h"
+
+#include "JSFontDescription.h"
 
 namespace y60 {
     using namespace jslib;
@@ -217,12 +220,17 @@ namespace y60 {
             };
 
             virtual void initClasses(JSContext * theContext, JSObject * theGlobalObject) {
-                // A simple package class
-                JSObject *myNamespace = JS_DefineObject(theContext, theGlobalObject, "Cairo", &Package, NULL, JSPROP_PERMANENT | JSPROP_READONLY);
-                JSA_DefineConstInts(theContext, myNamespace, ConstIntProperties()); 
-                cairo::JSContext::initClass(theContext, myNamespace);
-                cairo::JSSurface::initClass(theContext,  myNamespace);
-                cairo::JSPattern::initClass(theContext, myNamespace);
+                // start cairo namespace
+                JSObject *cairoNamespace = JS_DefineObject(theContext, theGlobalObject, "Cairo", &Package, NULL, JSPROP_PERMANENT | JSPROP_READONLY);
+                JSA_DefineConstInts(theContext, cairoNamespace, ConstIntProperties()); 
+                cairo::JSContext::initClass(theContext, cairoNamespace);
+                cairo::JSSurface::initClass(theContext,  cairoNamespace);
+                cairo::JSPattern::initClass(theContext, cairoNamespace);
+
+                // start pango namespace
+                JSObject *pangoNamespace = JS_DefineObject(theContext, theGlobalObject, "Pango", &Package, NULL, JSPROP_PERMANENT | JSPROP_READONLY);
+                pango::JSFontDescription::initClass(theContext, pangoNamespace);
+                pango::JSLayout::initClass(theContext, pangoNamespace);
             }
 
             const char * ClassName() {
