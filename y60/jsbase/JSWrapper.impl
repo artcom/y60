@@ -289,7 +289,7 @@ const char * JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL>::ClassName(const char 
 template <class NATIVE, class OWNERPTR,
           template <class, class> class ACCESS_PROTOCOL>
 JSObject * JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL>::Construct(JSContext *cx, OWNERPTR theOwner, NATIVE * theNative) {
-     JSObject * myNewObj = JS_ConstructObject(cx, Class(), 0, 0);
+     JSObject * myNewObj = JS_ConstructObject(cx, Class(), 0, JSClassSingleton::get().getCtorParent());
      JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL> & myJSWrapper = getJSWrapper(cx,myNewObj);
      myJSWrapper._myOwner = theOwner;
      myJSWrapper._myNative = theNative;
@@ -344,7 +344,7 @@ JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL>::~JSWrapper()
 template <class NATIVE, class OWNERPTR,
           template <class, class> class ACCESS_PROTOCOL>
 JSObject * JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL>::initClass(JSContext *cx,
-    JSObject *theGlobalObject,
+    JSObject *theNamespace,
     const char * theClassName,
     JSNative theConstructor,
     JSPropertySpec * theProperties,
@@ -355,7 +355,7 @@ JSObject * JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL>::initClass(JSContext *cx
 {
     //createClassDocumentation(theClassName, theProperties, theFunctions, theConstIntProperties, theStaticProperties, theStaticFunctions);
 
-    JSObject * myProtoObj = JS_InitClass(cx, theGlobalObject, NULL, Class(theClassName),
+    JSObject * myProtoObj = JS_InitClass(cx, theNamespace, NULL, Class(theClassName),
             /* native constructor function and min arg count */
             theConstructor, 0,
             /* prototype object properties and methods -- these
@@ -370,7 +370,7 @@ JSObject * JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL>::initClass(JSContext *cx
 
     if (theConstIntProperties) {
         jsval myConstructorFuncObjVal;
-        if (JS_GetProperty(cx, theGlobalObject, theClassName, &myConstructorFuncObjVal)) {
+        if (JS_GetProperty(cx, theNamespace, theClassName, &myConstructorFuncObjVal)) {
             JSObject * myConstructorFuncObj = JSVAL_TO_OBJECT(myConstructorFuncObjVal);
             JSA_DefineConstInts(cx, myConstructorFuncObj, theConstIntProperties);
         } else {
@@ -380,7 +380,10 @@ JSObject * JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL>::initClass(JSContext *cx
 
     // Initialize the private pointer to class pointer to mark this class as prototype
     JS_SetPrivate(cx, myProtoObj, Class(theClassName));
-
+    JSClassSingleton::get().setCtorParent(theNamespace);
+    // we must set the namespace's parent to NULL, otherwise
+    // JS_NewObject & co won't work.
+    JS_SetParent(cx, theNamespace, 0);
     return myProtoObj;
 }
 

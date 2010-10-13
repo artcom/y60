@@ -769,8 +769,14 @@ public:
         std::vector<JSPropertySpec> & getStaticPropertiesRef() {
             return myStaticProperties;
         }
+        JSObject * getCtorParent() {
+            return _myCtorParent;
+        }
+        void setCtorParent(JSObject * theParent) {
+            _myCtorParent = theParent;
+        }
      private:
-        JSClassSingleton() {
+        JSClassSingleton() : _myCtorParent(0) {
             JSClass myTempClass = {
                 "<notsetyet>",                        // const char          *name;
                 JSCLASS_HAS_PRIVATE |                 // uint32              flags;
@@ -807,9 +813,11 @@ public:
                                     // jsword              spare;
             };
             _myJSClass = myTempClass;
+
         }
     private:
         JSClass _myJSClass;
+        JSObject * _myCtorParent;
         std::vector<JSFunctionSpec> myMethods;
         std::vector<JSPropertySpec> myProperties;
         std::vector<JSFunctionSpec> myStaticFunctions;
