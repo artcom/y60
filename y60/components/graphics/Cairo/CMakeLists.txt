@@ -4,9 +4,11 @@ CairoUtilities.cpp
 JSCairoContext.cpp
 JSCairoPattern.cpp
 JSCairoPlugin.cpp
+JSCairoSurface.cpp
+
+JSPangoContext.cpp
 JSPangoFontDescription.cpp
 JSPangoLayout.cpp
-JSCairoSurface.cpp
 )
 
 set(HEADERS
@@ -15,9 +17,11 @@ CairoWrapper.h
 CairoWrapper.impl
 JSCairoContext.h
 JSCairoPattern.h
+JSCairoSurface.h
+
+JSPangoContext.h
 JSPangoFontDescription.h
 JSPangoLayout.h
-JSCairoSurface.h
 )
 
 y60_add_component(

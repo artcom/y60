@@ -69,7 +69,7 @@
 
 #include <glib-object.h>
 
-#include "JSPangoFontDescription.h"
+#include "JSPangoContext.h"
 
 #include "CairoUtilities.h"
 
@@ -85,99 +85,13 @@ static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
-    pango::JSFontDescription::OWNERPTR myOwner;
-    convertFrom(cx, OBJECT_TO_JSVAL(obj), myOwner);
-    char * theDescription = pango_font_description_to_string(myOwner->get());
-    std::string myStringRep = string(theDescription);
+    std::string myStringRep = string("PangoContext@") + as_string(obj);
     *rval = as_jsval(cx, myStringRep);
-    g_free(theDescription);
     return JS_TRUE;
 }
-
-#if 0
-static JSBool
-setExtend(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
-    DOC_END;
-    cairo_pattern_t *myPattern = NULL;
-    convertFrom(cx, OBJECT_TO_JSVAL(obj), myPattern);
-
-    ensureParamCount(argc, 1);
-
-    int myExtend;
-    convertFrom(cx, argv[0], myExtend);
-
-    cairo_pattern_set_extend(myPattern, (cairo_extend_t)myExtend);
-
-    return JS_TRUE;
-}
-
-static JSBool
-getExtend(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
-    DOC_END;
-    cairo_pattern_t *myPattern = NULL;
-    convertFrom(cx, OBJECT_TO_JSVAL(obj), myPattern);
-
-    ensureParamCount(argc, 0);
-
-    cairo_extend_t myExtend = cairo_pattern_get_extend(myPattern);
-
-    *rval = as_jsval(cx, (int)myExtend);
-
-    return JS_TRUE;
-}
-
-// enum        cairo_filter_t;
-// void        cairo_pattern_set_filter        (cairo_pattern_t *pattern,
-//                                              cairo_filter_t filter);
-// cairo_filter_t cairo_pattern_get_filter     (cairo_pattern_t *pattern);
-
-static JSBool
-setMatrix(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
-    DOC_END;
-    cairo_pattern_t *myPattern = NULL;
-    convertFrom(cx, OBJECT_TO_JSVAL(obj), myPattern);
-
-    ensureParamCount(argc, 1);
-
-    Matrix4f myMatrix;
-    convertFrom(cx, argv[0], myMatrix);
-
-    cairo_matrix_t myCairoMatrix;
-
-    convertMatrixToCairo(myMatrix, &myCairoMatrix);
-
-    cairo_pattern_set_matrix(myPattern, &myCairoMatrix);
-
-    return JS_TRUE;
-}
-
-static JSBool
-getMatrix(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
-    DOC_END;
-    cairo_pattern_t *myPattern = NULL;
-    convertFrom(cx, OBJECT_TO_JSVAL(obj), myPattern);
-
-    ensureParamCount(argc, 0);
-
-    cairo_matrix_t myCairoMatrix;
-
-    cairo_pattern_get_matrix(myPattern, &myCairoMatrix);
-
-    Matrix4f myMatrix;
-    convertMatrixFromCairo(myMatrix, &myCairoMatrix);
-
-    *rval = as_jsval(cx, myMatrix);
-
-    return JS_TRUE;
-}
-#endif
 
 JSFunctionSpec *
-pango::JSFontDescription::Functions() {
+pango::JSContext::Functions() {
     IF_REG(cerr << "Registering class '"<<ClassName()<<"'"<<endl);
     static JSFunctionSpec myFunctions[] = {
         // name                  native                   nargs
@@ -189,7 +103,7 @@ pango::JSFontDescription::Functions() {
 }
 
 JSPropertySpec *
-pango::JSFontDescription::Properties() {
+pango::JSContext::Properties() {
     static JSPropertySpec myProperties[] = {
         {0}
     };
@@ -197,33 +111,33 @@ pango::JSFontDescription::Properties() {
 }
 
 JSBool
-pango::JSFontDescription::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
+pango::JSContext::getPropertySwitch(unsigned long theID, ::JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
     JSClassTraits<NATIVE>::ScopedNativeRef myObj(cx, obj);
     return getPropertySwitch(myObj.getNative(), theID, cx, obj, id, vp);
 }
 
 JSBool
-pango::JSFontDescription::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
+pango::JSContext::setPropertySwitch(unsigned long theID, ::JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
     JSClassTraits<NATIVE>::ScopedNativeRef myObj(cx, obj);
     return setPropertySwitch(myObj.getNative(), theID, cx, obj, id, vp);
 }
 
 JSBool
-pango::JSFontDescription::getPropertySwitch(NATIVE & theNative, unsigned long theID,
-        JSContext *cx, JSObject *obj, jsval id, jsval *vp)
+pango::JSContext::getPropertySwitch(NATIVE & theNative, unsigned long theID,
+        ::JSContext *cx, JSObject *obj, jsval id, jsval *vp)
 {
     return JS_FALSE;
 }
 
 JSBool
-pango::JSFontDescription::setPropertySwitch(NATIVE & theNative, unsigned long theID,
-        JSContext *cx, JSObject *obj, jsval id, jsval *vp)
+pango::JSContext::setPropertySwitch(NATIVE & theNative, unsigned long theID,
+        ::JSContext *cx, JSObject *obj, jsval id, jsval *vp)
 {
     return JS_FALSE;
 }
 
 JSBool
-pango::JSFontDescription::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+pango::JSContext::Constructor(::JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
 
@@ -232,36 +146,33 @@ pango::JSFontDescription::Constructor(JSContext *cx, JSObject *obj, uintN argc, 
         return JS_FALSE;
     }
 
-    pango::JSFontDescription * myNewObject = 0;
+    pango::JSContext * myNewObject = 0;
     NATIVE * newNative = 0;
 
     if (argc == 0) {
-        PangoFontDescription * myDescr = pango_font_description_new();
-        newNative = new NATIVE(myDescr);
-	} else if (argc == 1) {
-        string fontDescription;
-        convertFrom(cx, argv[0], fontDescription);
 
-        PangoFontDescription * myDescr = pango_font_description_from_string(fontDescription.c_str());
-        newNative = new NATIVE(myDescr);
+        PangoContext * myContext = pango_context_new();
+
+        newNative = new NATIVE(myContext, false);
+
     } else {
-        JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected 0 or 1: got %d",ClassName(), argc);
+        JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected none () %d",ClassName(), argc);
         return JS_FALSE;
     }
 
-    myNewObject = new pango::JSFontDescription(OWNERPTR(newNative), newNative);
+    myNewObject = new pango::JSContext(OWNERPTR(newNative), newNative);
 
     if (myNewObject) {
         JS_SetPrivate(cx,obj,myNewObject);
 
         return JS_TRUE;
     }
-    JS_ReportError(cx,"pango::JSFontDescription::Constructor: bad parameters");
+    JS_ReportError(cx,"pango::JSContext::Constructor: bad parameters");
     return JS_FALSE;
 }
 
 JSConstIntPropertySpec *
-pango::JSFontDescription::ConstIntProperties() {
+pango::JSContext::ConstIntProperties() {
 
     static JSConstIntPropertySpec myProperties[] = {
         // name                id                       value
@@ -271,14 +182,14 @@ pango::JSFontDescription::ConstIntProperties() {
 };
 
 void
-pango::JSFontDescription::addClassProperties(JSContext * cx, JSObject * theClassProto) {
+pango::JSContext::addClassProperties(::JSContext * cx, JSObject * theClassProto) {
     JSA_AddFunctions(cx, theClassProto, Functions());
     JSA_AddProperties(cx, theClassProto, Properties());
     createClassModuleDocumentation("Cairo", ClassName(), Properties(), Functions(), 0, 0, 0);
 }
 
 JSObject *
-pango::JSFontDescription::initClass(JSContext *cx, JSObject *theGlobalObject) {
+pango::JSContext::initClass(::JSContext *cx, JSObject *theGlobalObject) {
     JSObject * myClassObject = Base::initClass(cx, theGlobalObject, ClassName(), Constructor, 0 ,0);
     if (myClassObject) {
         addClassProperties(cx, myClassObject);
@@ -288,22 +199,22 @@ pango::JSFontDescription::initClass(JSContext *cx, JSObject *theGlobalObject) {
         JSObject * myConstructorFuncObj = JSVAL_TO_OBJECT(myConstructorFuncObjVal);
         JSA_DefineConstInts(cx, myConstructorFuncObj, ConstIntProperties());
     } else {
-        cerr << "pango::JSFontDescription::initClass: constructor function object not found, could not initialize static members"<<endl;
+        cerr << "pango::JSContext::initClass: constructor function object not found, could not initialize static members"<<endl;
     }
     return myClassObject;
 }
 
-jsval as_jsval(JSContext *cx, pango::JSFontDescription::OWNERPTR theOwner, pango::JSFontDescription::NATIVE * theNative) {
-    JSObject * myReturnObject = pango::JSFontDescription::Construct(cx, theOwner, theNative);
+jsval as_jsval(JSContext *cx, pango::JSContext::OWNERPTR theOwner, pango::JSContext::NATIVE * theNative) {
+    JSObject * myReturnObject = pango::JSContext::Construct(cx, theOwner, theNative);
     return OBJECT_TO_JSVAL(myReturnObject);
 }
 
-bool convertFrom(JSContext *cx, jsval theValue, pango::JSFontDescription::OWNERPTR & theOwner) {
+bool convertFrom(JSContext *cx, jsval theValue, pango::JSContext::OWNERPTR & theOwner) {
     if (JSVAL_IS_OBJECT(theValue)) {
         JSObject * myArgument;
         if (JS_ValueToObject(cx, theValue, &myArgument)) {
-            if (JSA_GetClass(cx,myArgument) == JSClassTraits<pango::JSFontDescription::NATIVE>::Class()) {
-                theOwner = pango::JSFontDescription::getJSWrapper(cx, myArgument).getOwner();
+            if (JSA_GetClass(cx,myArgument) == JSClassTraits<pango::JSContext::NATIVE>::Class()) {
+                theOwner = pango::JSContext::getJSWrapper(cx, myArgument).getOwner();
                 return true;
             }
         }

@@ -56,50 +56,56 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-#ifndef _Y60_PANGO_JSFONTDESCRITION_INCLUDED_
-#define _Y60_PANGO_JSFONTDESCRITION_INCLUDED_
-
-#include <asl/dom/Nodes.h>
+#ifndef _Y60_PANGO_JSCONTEXT_INCLUDED_
+#define _Y60_PANGO_JSCONTEXT_INCLUDED_
 
 #include <y60/jsbase/JSWrapper.h>
 
-#include <pango/pango-font.h>
+#include <pango/pango-context.h>
 
 namespace jslib {
 
     namespace pango {
         // a quick wrapper to ensure the correct *_free is called on destruction
-        class FontDescriptionWrapper {
+        class ContextWrapper {
             public:
-                FontDescriptionWrapper(PangoFontDescription * theNative) :
-                    _myNative(theNative) {};
-                ~FontDescriptionWrapper() {
+                // note: some pango calls increase the refcount for you (e.g. pango_context_new),
+                // some don't (pango_layout_get_context). In the first case, we must set theIncRefcountFlag to false,
+                // in the latter case to true.
+                ContextWrapper(PangoContext * theNative, bool theIncRefcountFlag) :
+                    _myNative(theNative) 
+                {
+                    if (theIncRefcountFlag) {
+                        g_object_ref(_myNative);
+                    }
+                };
+                ~ContextWrapper() {
                     if (_myNative) {
-                        pango_font_description_free(_myNative);
+                        g_object_unref(_myNative);
                     }
                 }
-                PangoFontDescription * get() const { return _myNative; };
+                PangoContext * get() const { return _myNative; };
             private:
                 // not copy-safe: hide copy ctor & assignment op
-                FontDescriptionWrapper(const FontDescriptionWrapper &);
-                FontDescriptionWrapper & operator=(const FontDescriptionWrapper &);
-                PangoFontDescription * _myNative;
+                ContextWrapper(const ContextWrapper &);
+                ContextWrapper & operator=(const ContextWrapper &);
+                PangoContext * _myNative;
                 
         };
-        class JSFontDescription : public JSWrapper<FontDescriptionWrapper, asl::Ptr< FontDescriptionWrapper >, StaticAccessProtocol> {
-            JSFontDescription();  // hide default constructor
+        class JSContext : public JSWrapper<ContextWrapper, asl::Ptr< ContextWrapper >, StaticAccessProtocol> {
+            JSContext();  // hide default constructor
             public:
 
-            virtual ~JSFontDescription() {
+            virtual ~JSContext() {
             }
 
-            typedef FontDescriptionWrapper NATIVE;
-            typedef asl::Ptr< FontDescriptionWrapper > OWNERPTR;
+            typedef ContextWrapper NATIVE;
+            typedef asl::Ptr< ContextWrapper > OWNERPTR;
 
             typedef JSWrapper<NATIVE, OWNERPTR, StaticAccessProtocol> Base;
 
             static const char * ClassName() {
-                return "FontDescription";
+                return "Context";
             }
 
             static JSFunctionSpec * Functions();
@@ -128,7 +134,7 @@ namespace jslib {
                     return Base::Construct(cx, theOwner, theNative);
                 }
 
-            JSFontDescription(OWNERPTR theOwner, NATIVE * theNative)
+            JSContext(OWNERPTR theOwner, NATIVE * theNative)
                 : Base(theOwner, theNative)
             { }
 
@@ -136,20 +142,20 @@ namespace jslib {
             static JSObject * initClass(::JSContext *cx, JSObject *theGlobalObject);
             static void addClassProperties(::JSContext * cx, JSObject * theClassProto);
 
-            static JSFontDescription & getObject(::JSContext *cx, JSObject * obj) {
-                return dynamic_cast<JSFontDescription &>(JSFontDescription::getJSWrapper(cx,obj));
+            static JSContext & getObject(::JSContext *cx, JSObject * obj) {
+                return dynamic_cast<JSContext &>(JSContext::getJSWrapper(cx,obj));
             }
 
         };
     };
 
     template <>
-    struct JSClassTraits<pango::JSFontDescription::NATIVE>
-        : public JSClassTraitsWrapper<pango::JSFontDescription::NATIVE, pango::JSFontDescription> {};
+    struct JSClassTraits<pango::JSContext::NATIVE>
+        : public JSClassTraitsWrapper<pango::JSContext::NATIVE, pango::JSContext> {};
 
-    jsval as_jsval(JSContext *cx, pango::JSFontDescription::OWNERPTR theOwner, pango::JSFontDescription::NATIVE * theNative);
+    jsval as_jsval(JSContext *cx, pango::JSContext::OWNERPTR theOwner, pango::JSContext::NATIVE * theNative);
 
-    bool convertFrom(JSContext *cx, jsval theValue, pango::JSFontDescription::OWNERPTR & theOwner);
+    bool convertFrom(JSContext *cx, jsval theValue, pango::JSContext::OWNERPTR & theOwner);
 }
 
 #endif

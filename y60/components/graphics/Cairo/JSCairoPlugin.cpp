@@ -60,11 +60,12 @@
 #include <y60/jsbase/IScriptablePlugin.h>
 
 #include "JSCairoContext.h"
-#include "JSPangoLayout.h"
 #include "JSCairoSurface.h"
 #include "JSCairoPattern.h"
 
+#include "JSPangoContext.h"
 #include "JSPangoFontDescription.h"
+#include "JSPangoLayout.h"
 
 namespace y60 {
     using namespace jslib;
@@ -230,6 +231,7 @@ namespace y60 {
                 // start pango namespace
                 JSObject *pangoNamespace = JS_DefineObject(theContext, theGlobalObject, "Pango", &Package, NULL, JSPROP_PERMANENT | JSPROP_READONLY);
                 pango::JSFontDescription::initClass(theContext, pangoNamespace);
+                pango::JSContext::initClass(theContext, pangoNamespace);
                 pango::JSLayout::initClass(theContext, pangoNamespace);
             }
 

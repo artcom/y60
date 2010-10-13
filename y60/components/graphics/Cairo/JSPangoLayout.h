@@ -107,6 +107,7 @@ namespace jslib {
             enum PropertyNumbers {
                 PROP_font_description = -100,
                 PROP_text,
+                PROP_context,
                 PROP_END
             };
             static JSPropertySpec * Properties();

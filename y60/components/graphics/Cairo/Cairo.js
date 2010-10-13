@@ -99,6 +99,8 @@ ourShow.setup = function() {
     myLayout.text = "\u1E78berl\u00E4nge";
     myLayout.update_from_cairo_context(cairoContext);
     myLayout.show_in_cairo_context(cairoContext);
+    Logger.warning(myLayout.context);
+    Logger.warning(myLayout.font_description);
 }
 
 

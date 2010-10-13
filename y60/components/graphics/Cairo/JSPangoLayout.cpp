@@ -69,8 +69,9 @@
 
 #include <glib-object.h>
 
-#include "JSPangoLayout.h"
 #include "JSCairoContext.h"
+#include "JSPangoContext.h"
+#include "JSPangoLayout.h"
 #include "JSPangoFontDescription.h"
 
 #include <pango/pangocairo.h>
@@ -150,47 +151,56 @@ pango::JSLayout::Properties() {
     static JSPropertySpec myProperties[] = {
         {"font_description", PROP_font_description, JSPROP_ENUMERATE|JSPROP_PERMANENT},
         {"text", PROP_text, JSPROP_ENUMERATE|JSPROP_PERMANENT},
+        {"context", PROP_context, JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_READONLY},
         {0}
     };
     return myProperties;
 }
 
 JSBool
-pango::JSLayout::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
+pango::JSLayout::getPropertySwitch(unsigned long theID, ::JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
     JSClassTraits<NATIVE>::ScopedNativeRef myObj(cx, obj);
     return getPropertySwitch(myObj.getNative(), theID, cx, obj, id, vp);
 }
 
 JSBool
-pango::JSLayout::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
+pango::JSLayout::setPropertySwitch(unsigned long theID, ::JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
     JSClassTraits<NATIVE>::ScopedNativeRef myObj(cx, obj);
     return setPropertySwitch(myObj.getNative(), theID, cx, obj, id, vp);
 }
 
 JSBool
 pango::JSLayout::getPropertySwitch(NATIVE & theNative, unsigned long theID,
-        JSContext *cx, JSObject *obj, jsval id, jsval *vp)
+        ::JSContext *cx, JSObject *obj, jsval id, jsval *vp)
 {
     switch (theID) {
         case PROP_text:
             *vp = as_jsval(cx, pango_layout_get_text(theNative.get()));
             return JS_TRUE;
         case PROP_font_description:
-            {
+            try {
                 // this getter returns a read-only, non-owned reference to the PangoFontDescription
                 // since we can't wrap that, we'll return a copy
                 PangoFontDescription * myCopy = pango_font_description_copy(pango_layout_get_font_description(theNative.get()));
                 JSFontDescription::NATIVE * wrappedCopy = new JSFontDescription::NATIVE(myCopy);
-                *vp = as_jsval(cx, JSFontDescription::OWNERPTR(wrappedCopy));
+                *vp = as_jsval(cx, JSFontDescription::OWNERPTR(wrappedCopy), wrappedCopy);
                 return JS_TRUE;
-            }
+            } HANDLE_CPP_EXCEPTION;
+        case PROP_context:
+            try {
+                PangoContext * myContext = pango_layout_get_context(theNative.get());
+                // pango_layout_get_context doesn't inc the refcount, so we have to (pass true) 
+                pango::JSContext::NATIVE * wrappedContext = new pango::JSContext::NATIVE(myContext, true);
+                *vp = as_jsval(cx, pango::JSContext::OWNERPTR(wrappedContext), wrappedContext);
+                return JS_TRUE;
+            } HANDLE_CPP_EXCEPTION;
     }
     return JS_FALSE;
 }
 
 JSBool
 pango::JSLayout::setPropertySwitch(NATIVE & theNative, unsigned long theID,
-        JSContext *cx, JSObject *obj, jsval id, jsval *vp)
+        ::JSContext *cx, JSObject *obj, jsval id, jsval *vp)
 {
     switch (theID) {
         case PROP_text:
@@ -213,7 +223,7 @@ pango::JSLayout::setPropertySwitch(NATIVE & theNative, unsigned long theID,
 }
 
 JSBool
-pango::JSLayout::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+pango::JSLayout::Constructor(::JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
 
@@ -262,14 +272,14 @@ pango::JSLayout::ConstIntProperties() {
 };
 
 void
-pango::JSLayout::addClassProperties(JSContext * cx, JSObject * theClassProto) {
+pango::JSLayout::addClassProperties(::JSContext * cx, JSObject * theClassProto) {
     JSA_AddFunctions(cx, theClassProto, Functions());
     JSA_AddProperties(cx, theClassProto, Properties());
     createClassModuleDocumentation("Cairo", ClassName(), Properties(), Functions(), 0, 0, 0);
 }
 
 JSObject *
-pango::JSLayout::initClass(JSContext *cx, JSObject *theGlobalObject) {
+pango::JSLayout::initClass(::JSContext *cx, JSObject *theGlobalObject) {
     JSObject * myClassObject = Base::initClass(cx, theGlobalObject, ClassName(), Constructor, 0 ,0);
     if (myClassObject) {
         addClassProperties(cx, myClassObject);
@@ -284,12 +294,12 @@ pango::JSLayout::initClass(JSContext *cx, JSObject *theGlobalObject) {
     return myClassObject;
 }
 
-jsval as_jsval(JSContext *cx, pango::JSLayout::OWNERPTR theOwner) {
+jsval as_jsval(::JSContext *cx, pango::JSLayout::OWNERPTR theOwner) {
     JSObject * myReturnObject = pango::JSLayout::Construct(cx, theOwner, &*theOwner);
     return OBJECT_TO_JSVAL(myReturnObject);
 }
 
-bool convertFrom(JSContext *cx, jsval theValue, pango::JSLayout::OWNERPTR & theOwner) {
+bool convertFrom(::JSContext *cx, jsval theValue, pango::JSLayout::OWNERPTR & theOwner) {
     if (JSVAL_IS_OBJECT(theValue)) {
         JSObject * myArgument;
         if (JS_ValueToObject(cx, theValue, &myArgument)) {
