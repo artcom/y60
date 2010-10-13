@@ -66,7 +66,7 @@
 
 #include <y60/jsbase/JSWrapper.impl>
 
-#include "JSSurface.h"
+#include "JSCairoSurface.h"
 
 #include "CairoWrapper.impl"
 

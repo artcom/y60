@@ -1,23 +1,23 @@
 
 set(SOURCES
 CairoUtilities.cpp
-JSContext.cpp
-JSPattern.cpp
+JSCairoContext.cpp
+JSCairoPattern.cpp
 JSCairoPlugin.cpp
-JSFontDescription.cpp
-JSLayout.cpp
-JSSurface.cpp
+JSPangoFontDescription.cpp
+JSPangoLayout.cpp
+JSCairoSurface.cpp
 )
 
 set(HEADERS
 CairoUtilities.h
 CairoWrapper.h
 CairoWrapper.impl
-JSContext.h
-JSPattern.h
-JSFontDescription.h
-JSLayout.h
-JSSurface.h
+JSCairoContext.h
+JSCairoPattern.h
+JSPangoFontDescription.h
+JSPangoLayout.h
+JSCairoSurface.h
 )
 
 y60_add_component(

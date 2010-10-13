@@ -69,7 +69,7 @@
 
 #include <glib-object.h>
 
-#include "JSFontDescription.h"
+#include "JSPangoFontDescription.h"
 
 #include "CairoUtilities.h"
 

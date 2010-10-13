@@ -59,12 +59,12 @@
 #include <asl/base/PlugInBase.h>
 #include <y60/jsbase/IScriptablePlugin.h>
 
-#include "JSContext.h"
-#include "JSLayout.h"
-#include "JSSurface.h"
-#include "JSPattern.h"
+#include "JSCairoContext.h"
+#include "JSPangoLayout.h"
+#include "JSCairoSurface.h"
+#include "JSCairoPattern.h"
 
-#include "JSFontDescription.h"
+#include "JSPangoFontDescription.h"
 
 namespace y60 {
     using namespace jslib;

@@ -69,10 +69,10 @@
 
 #include "CairoUtilities.h"
 
-#include "JSContext.h"
+#include "JSCairoContext.h"
 
-#include "JSSurface.h"
-#include "JSPattern.h"
+#include "JSCairoSurface.h"
+#include "JSCairoPattern.h"
 
 #include "CairoWrapper.impl"
 

@@ -69,9 +69,9 @@
 
 #include <glib-object.h>
 
-#include "JSLayout.h"
-#include "JSContext.h"
-#include "JSFontDescription.h"
+#include "JSPangoLayout.h"
+#include "JSCairoContext.h"
+#include "JSPangoFontDescription.h"
 
 #include <pango/pangocairo.h>
 

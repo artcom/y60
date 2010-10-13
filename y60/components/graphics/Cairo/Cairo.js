@@ -94,7 +94,7 @@ ourShow.setup = function() {
 
     // now some txt rendering
     var myLayout = new Pango.Layout(cairoContext);
-    var myFontDesc = new Pango.FontDescription("Arial 12");
+    var myFontDesc = new Pango.FontDescription("Tele-Antiqua Regular 100");
     myLayout.font_description = myFontDesc;
     myLayout.text = "\u1E78berl\u00E4nge";
     myLayout.update_from_cairo_context(cairoContext);
