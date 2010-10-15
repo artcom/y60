@@ -1,0 +1,15 @@
+A PEG.js[1] CSV parser modeled after an article[2] by Julian M Bucknall 
+
+To (re-)generate the parser you're going to need the PEG.js package. Make
+sure the pegjs executable is in your path and then call 'make'.
+
+Alternativley, you can just paste the pegjs file into the online version of the
+parser generator[3] and just download the result.
+
+
+[1] http://pegjs.majda.cz/
+[2] http://www.boyet.com/articles/csvparser.html
+[3] http://pegjs.majda.cz/online
+
+
+
