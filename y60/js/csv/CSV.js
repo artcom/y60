@@ -62,7 +62,7 @@ var CSV = (function(){
       
       function parse_csv_file(context) {
         var cacheKey = "csv_file" + '@' + pos;
-        var cachedResult = cache[cacheKey];
+        var cachedResult = cacheKey in cache ? cache[cacheKey] : undefined;
         if (cachedResult) {
           pos = cachedResult.nextPos;
           return cachedResult.result;
@@ -87,7 +87,7 @@ var CSV = (function(){
       
       function parse_csv_record(context) {
         var cacheKey = "csv_record" + '@' + pos;
-        var cachedResult = cache[cacheKey];
+        var cachedResult = cacheKey in cache ? cache[cacheKey] : undefined;
         if (cachedResult) {
           pos = cachedResult.nextPos;
           return cachedResult.result;
@@ -123,7 +123,7 @@ var CSV = (function(){
       
       function parse_csv_string_list(context) {
         var cacheKey = "csv_string_list" + '@' + pos;
-        var cachedResult = cache[cacheKey];
+        var cachedResult = cacheKey in cache ? cache[cacheKey] : undefined;
         if (cachedResult) {
           pos = cachedResult.nextPos;
           return cachedResult.result;
@@ -212,7 +212,7 @@ var CSV = (function(){
       
       function parse_raw_string(context) {
         var cacheKey = "raw_string" + '@' + pos;
-        var cachedResult = cache[cacheKey];
+        var cachedResult = cacheKey in cache ? cache[cacheKey] : undefined;
         if (cachedResult) {
           pos = cachedResult.nextPos;
           return cachedResult.result;
@@ -290,7 +290,7 @@ var CSV = (function(){
           pos = savedPos0;
         }
         var result0 = result1 !== null
-          ? (function(field) { return field[0]; })(result1[1])
+          ? (function(field) { return field ? field[0] : undefined; })(result1[1])
           : null;
         
         
@@ -304,7 +304,7 @@ var CSV = (function(){
       
       function parse_raw_field(context) {
         var cacheKey = "raw_field" + '@' + pos;
-        var cachedResult = cache[cacheKey];
+        var cachedResult = cacheKey in cache ? cache[cacheKey] : undefined;
         if (cachedResult) {
           pos = cachedResult.nextPos;
           return cachedResult.result;
@@ -334,7 +334,7 @@ var CSV = (function(){
       
       function parse_simple_field(context) {
         var cacheKey = "simple_field" + '@' + pos;
-        var cachedResult = cache[cacheKey];
+        var cachedResult = cacheKey in cache ? cache[cacheKey] : undefined;
         if (cachedResult) {
           pos = cachedResult.nextPos;
           return cachedResult.result;
@@ -382,7 +382,7 @@ var CSV = (function(){
       
       function parse_quoted_field(context) {
         var cacheKey = "quoted_field" + '@' + pos;
-        var cachedResult = cache[cacheKey];
+        var cachedResult = cacheKey in cache ? cache[cacheKey] : undefined;
         if (cachedResult) {
           pos = cachedResult.nextPos;
           return cachedResult.result;
@@ -440,7 +440,7 @@ var CSV = (function(){
       
       function parse_escaped_field(context) {
         var cacheKey = "escaped_field" + '@' + pos;
-        var cachedResult = cache[cacheKey];
+        var cachedResult = cacheKey in cache ? cache[cacheKey] : undefined;
         if (cachedResult) {
           pos = cachedResult.nextPos;
           return cachedResult.result;
@@ -529,7 +529,7 @@ var CSV = (function(){
       
       function parse_sub_field(context) {
         var cacheKey = "sub_field" + '@' + pos;
-        var cachedResult = cache[cacheKey];
+        var cachedResult = cacheKey in cache ? cache[cacheKey] : undefined;
         if (cachedResult) {
           pos = cachedResult.nextPos;
           return cachedResult.result;
@@ -573,7 +573,7 @@ var CSV = (function(){
       
       function parse_new_line(context) {
         var cacheKey = "new_line" + '@' + pos;
-        var cachedResult = cache[cacheKey];
+        var cachedResult = cacheKey in cache ? cache[cacheKey] : undefined;
         if (cachedResult) {
           pos = cachedResult.nextPos;
           return cachedResult.result;

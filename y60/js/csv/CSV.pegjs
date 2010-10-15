@@ -20,7 +20,7 @@ csv_string_list
     }
 
 raw_string
-    = [ \t]* field:(raw_field [ \t]*) ? { return field[0]; }
+    = [ \t]* field:(raw_field [ \t]*) ? { return field ? field[0] : undefined; }
 
 raw_field
     = simple_field
