@@ -242,6 +242,20 @@ function indexOf(theArray, theItem, theFrom) {
     return js.array.indexOf(theArray, theItem, theFrom);
 }
 
+// Does not allow filter functions that mutate the input array!
+js.array.filter = function (theArray, thefilterFunction) {
+    if (typeof thefilterFunction !== "function") {
+        throw new TypeError();
+    }
+    var myResult = [];
+    for (var i = 0; i < theArray.length; i++) {
+        if (thefilterFunction.call(theArray, theArray[i], i, theArray)) {
+            myResult.push(theArray[i]);
+        }
+    }
+    return myResult;
+};
+
 function stringToByteArray(theString) {
     var myResult = [];
     for (var i = 0; i < theString.length; ++i) {
