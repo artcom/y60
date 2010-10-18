@@ -33,6 +33,8 @@ RealSound
 
 list(APPEND EXTERNALS FFMPEG)
 
+add_definitions(-D__STDC_CONSTANT_MACROS) # ffmpeg is c99 only and needs some c macros
+
 ac_add_library(
     y60sound y60/sound
     SOURCES ${SOURCES}

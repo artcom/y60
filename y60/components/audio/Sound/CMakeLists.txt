@@ -12,6 +12,8 @@ JSSoundManager.h
 y60_jssound_settings.h
 )
 
+add_definitions(-D__STDC_CONSTANT_MACROS) # ffmpeg is c99 only and needs some c macros
+
 y60_add_component(
     Sound
     SOURCES ${SOURCES}
