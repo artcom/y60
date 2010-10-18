@@ -332,7 +332,7 @@ namespace y60 {
             myMovie->set<FrameCountTag>(int(_myVStream->duration * myFPS / 1000));
         } else {
 	        double myDuration = 0.0;
-            if(_myFormatContext->start_time == (int)AV_NOPTS_VALUE) {
+            if(_myFormatContext->start_time == AV_NOPTS_VALUE) {
                 myDuration = (_myFormatContext->duration )*myFPS/(double)AV_TIME_BASE;
             } else {
                 myDuration = (_myFormatContext->duration - _myFormatContext->start_time )*myFPS/(double)AV_TIME_BASE;
@@ -344,7 +344,7 @@ namespace y60 {
         _myLastVideoTimestamp = 0;
 
         // Get Starttime
-        if (_myVStream->start_time != (int)AV_NOPTS_VALUE) {
+        if (_myVStream->start_time != AV_NOPTS_VALUE) {
             _myStartTimestamp = _myVStream->start_time;
         } else {
             _myStartTimestamp = 0;

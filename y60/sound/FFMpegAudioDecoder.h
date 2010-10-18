@@ -79,7 +79,6 @@ extern "C" {
 #       pragma warning (push, 1)
 #   endif //defined(_MSC_VER)
 #   include <avformat.h>
-#   include <avcodec.h>
 #   if defined(_MSC_VER)
 #       pragma warning (pop)
 #   endif //defined(_MSC_VER)

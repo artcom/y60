@@ -73,10 +73,10 @@
 #define EMULATE_INTTYPES
 #endif
 extern "C" {
-#include <libavcodec/avcodec.h>
+#include <avformat.h>
 
 #if LIBAVCODEC_VERSION_INT >= ((51<<16)+(38<<8)+0)
-#   include <libswscale/swscale.h>
+#   include <swscale.h>
 #endif
 }
 
@@ -299,10 +299,6 @@ namespace y60 {
         setFrameHeight(myFrameHeight);
         setFrameWidth(myFrameWidth);
         setDevice(myDeviceId);
-
-        // Setup video size and image matrix
-        float myXResize = float(myFrameWidth) / asl::nextPowerOfTwo(myFrameWidth);
-        float myYResize = float(myFrameHeight) / asl::nextPowerOfTwo(myFrameHeight);
 
         _myGraph->setDesiredVideoFormat(myFrameWidth, myFrameHeight, myFrameRate, myBitsPerPixel);
 
