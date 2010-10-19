@@ -96,7 +96,6 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
     var _myCurrentMediaType = -1;
     var _mySoundId	        = -1;
     var _myMasterVolume     = 1.0;
-    var _myWMAPlugged       = false;
     var _myVideoCapturePlugged= false;
     var _myMissedFrameCounter = 0;
     var _myMaxMissedFrame     = 0;
@@ -391,10 +390,6 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
                 break;                
             case AUDIO_MEDIA:
                 print("Media: audio");
-                if (OS == "WIN32" && !_myWMAPlugged) {
-                    plug("WMADecoder");
-                    _myWMAPlugged = true;
-                }
                 break;
             case CAPTURE_MEDIA:
                 print("Media: Capture Video");
