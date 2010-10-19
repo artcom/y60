@@ -132,6 +132,7 @@ namespace y60 {
         _myVideoOutputId(-1),
         _myAudioOutputId(-1),
         _myReferenceCount(0),
+        _myReader(NULL),
         _myEventResult(S_OK),
         _myCurrentPlaySpeed(1.0),
         _myFrameRate(0.0),

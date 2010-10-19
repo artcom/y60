@@ -10,7 +10,7 @@ y60_ffmpegdecoder1_settings.h
 
 list(APPEND EXTERNALS FFMPEG)
 
-add_definitions(-D__STDC_CONSTANT_MACROS) # XXX: why? what? aeh!?
+add_definitions(-D__STDC_CONSTANT_MACROS) # ffmpeg is c99 only and needs some c macros
 
 y60_add_component(
     FFMpegDecoder1

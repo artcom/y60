@@ -82,6 +82,9 @@ namespace y60 {
     public:
         virtual ~SoundManager();
 
+        // will be called automatically from singletonmanager, stops audio when singleton is about to be destroyed
+        virtual void stop();
+
         virtual void setCacheSize(unsigned myTotalSize, unsigned myItemSize);
         virtual unsigned getMaxCacheSize() const;
         virtual unsigned getMaxCacheItemSize() const;

@@ -76,12 +76,13 @@
 #include <string>
 #include <list>
 
-extern "C"
+extern "C" {
 #ifdef OSX
 #   include <libavformat/avformat.h>
 #else
 #   include <avformat.h>
 #endif
+}
 
 #ifndef AV_VERSION_INT
 #define AV_VERSION_INT(a,b,c) (a<<16 | b<<8 | c)

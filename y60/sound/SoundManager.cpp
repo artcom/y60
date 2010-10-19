@@ -84,8 +84,8 @@ SoundManager::SoundManager()
     AC_DEBUG << "SoundManager::SoundManager";
 
     // Initialize ffmpeg
-    AC_DEBUG << "Soundmanager: using " << LIBAVCODEC_IDENT << endl;
-    //av_log_set_level(AV_LOG_ERROR);
+    AC_INFO << "Soundmanager: using " << LIBAVCODEC_IDENT << endl;
+    av_log_set_level(AV_LOG_ERROR);
     av_register_all();
 
     _myFFMpegAudioDecoderFactory = new FFMpegAudioDecoderFactory;
@@ -101,13 +101,15 @@ SoundManager::SoundManager()
 
 SoundManager::~SoundManager() {
     AC_DEBUG << "SoundManager::~SoundManager";
-    msleep(50);
+    //msleep(50); //XXX: why?!
     if (_mySounds.size() != 0) {
         AC_DEBUG << "Deleting SoundManager, but " << _mySounds.size() <<
                 " sounds are still active.";
         stopAll();
     }
-    join();
+    if (isUnjoined()) {
+        join();
+    }
     unregisterDecoderFactory(_myFFMpegAudioDecoderFactory);
     delete _myFFMpegAudioDecoderFactory;
     _myCache.clear();
@@ -123,6 +125,18 @@ SoundManager::~SoundManager() {
         AC_WARNING << "SoundManager being deleted, but " <<
                 Sound::getNumSoundsAllocated() <<
                 " Sounds are still allocated.";
+    }
+}
+
+void 
+SoundManager::stop() {
+    if (_mySounds.size() != 0) {
+        AC_DEBUG << "stopping SoundManager, but " << _mySounds.size() <<
+                " sounds are still active.";
+        stopAll();
+    }
+    if (isUnjoined()) {
+        join();
     }
 }
 
