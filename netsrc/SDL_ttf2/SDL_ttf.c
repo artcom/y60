@@ -387,7 +387,7 @@ static unsigned long RWread(
 	return SDL_RWread( src, buffer, 1, (int)count );
 }
 
-TTF_Font* TTF_OpenFontIndexRW( SDL_RWops *src, int freesrc, int ptsize, long index )
+TTF_Font* TTF_OpenFontIndexRW( SDL_RWops *src, int freesrc, int ptsize, long index, int theAscendOffset )
 {
 	TTF_Font* font;
 	FT_Error error;
@@ -475,7 +475,7 @@ TTF_Font* TTF_OpenFontIndexRW( SDL_RWops *src, int freesrc, int ptsize, long ind
 
 	  /* Get the scalable font metrics for this font */
 	  scale = face->size->metrics.y_scale;
-	  font->ascent  = FT_CEIL(FT_MulFix(face->ascender, scale));
+	  font->ascent  = FT_CEIL(FT_MulFix(face->ascender, scale)) + theAscendOffset;
 	  font->descent = FT_CEIL(FT_MulFix(face->descender, scale));
 	  font->height  = font->ascent - font->descent + /* baseline */ 1;
 	  font->lineskip = FT_CEIL(FT_MulFix(face->height, scale));
@@ -498,7 +498,7 @@ TTF_Font* TTF_OpenFontIndexRW( SDL_RWops *src, int freesrc, int ptsize, long ind
 		 * non-scalable fonts must be determined differently
 		 * or sometimes cannot be determined.
 		 * */
-	  	font->ascent = face->available_sizes[ptsize].height;
+	  	font->ascent = face->available_sizes[ptsize].height + theAscendOffset;
 	  	font->descent = 0;
 	  	font->height = face->available_sizes[ptsize].height;
 	  	font->lineskip = FT_CEIL(font->ascent);
@@ -542,24 +542,24 @@ TTF_Font* TTF_OpenFontIndexRW( SDL_RWops *src, int freesrc, int ptsize, long ind
 	return font;
 }
 
-TTF_Font* TTF_OpenFontRW( SDL_RWops *src, int freesrc, int ptsize )
+TTF_Font* TTF_OpenFontRW( SDL_RWops *src, int freesrc, int ptsize, int theAscendOffset )
 {
-	return TTF_OpenFontIndexRW(src, freesrc, ptsize, 0);
+	return TTF_OpenFontIndexRW(src, freesrc, ptsize, 0, theAscendOffset);
 }
 
-TTF_Font* TTF_OpenFontIndex( const char *file, int ptsize, long index )
+TTF_Font* TTF_OpenFontIndex( const char *file, int ptsize, long index, int theAscendOffset )
 {
 	SDL_RWops *rw = SDL_RWFromFile(file, "rb");
 	if ( rw == NULL ) {
 		TTF_SetError(SDL_GetError());
 		return NULL;
 	}
-	return TTF_OpenFontIndexRW(rw, 1, ptsize, index);
+	return TTF_OpenFontIndexRW(rw, 1, ptsize, index, theAscendOffset);
 }
 
-TTF_Font* TTF_OpenFont( const char *file, int ptsize )
+TTF_Font* TTF_OpenFont( const char *file, int ptsize, int theAscendOffset)
 {
-	return TTF_OpenFontIndex(file, ptsize, 0);
+	return TTF_OpenFontIndex(file, ptsize, 0, theAscendOffset);
 }
 
 static void Flush_Glyph( c_glyph* glyph )

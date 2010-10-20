@@ -89,28 +89,32 @@ spark.fontScale = 1;
  * Internal: ensure loading of font appropriate for the given style
  */
 
-spark.loadFont = function (theName, theSize, theStyle, theHinting) {
-    var myName = theName + "-" + theStyle + "-" + theSize + "-" + theHinting;
+spark.loadFont = function (theName, theSize, theFontStyle, theHinting, theAscendOffset) {
+    if (theAscendOffset == undefined) {
+        theAscendOffset = 0;
+    }
+    var myName = theName + "-" + theFontStyle + "-" + theSize + "-" + theHinting + "-" + theAscendOffset;
     if (!(myName in spark.ourLoadedFonts)) {
-        if (theStyle != "normal") {
-            spark.loadFont(theName, theSize, "normal", theHinting);
+        if (theFontStyle != "normal") {
+            spark.loadFont(theName, theSize, "normal", theHinting, theAscendOffset);
         }
 
-        Logger.info("Loading font " + theName + " with size " + theSize + " and style " + theStyle+" and hinting:"+theHinting);
+        Logger.info("Loading font " + theName + " with size " + theSize + " and fonststyle " + theFontStyle+
+                    " and hinting:"+theHinting + " and ascend offset:" + theAscendOffset);
 
         // XXX: this is a remnant from before the introduction
         //      of include-path-based font loading.
         var myFontPath = null;
-        if (searchFile("FONTS/" + theName + "-" + theStyle + ".otf")) {
-            myFontPath = "FONTS/" + theName + "-" + theStyle + ".otf";
-        } else if (searchFile("FONTS/" + theName + "-" + theStyle + ".ttf")) {
-            myFontPath = "FONTS/" + theName + "-" + theStyle + ".ttf";
+        if (searchFile("FONTS/" + theName + "-" + theFontStyle + ".otf")) {
+            myFontPath = "FONTS/" + theName + "-" + theFontStyle + ".otf";
+        } else if (searchFile("FONTS/" + theName + "-" + theFontStyle + ".ttf")) {
+            myFontPath = "FONTS/" + theName + "-" + theFontStyle + ".ttf";
         } else if (searchFile("FONTS/" + theName + ".ttf")) {
             myFontPath = "FONTS/" + theName + ".ttf";
         } else if (searchFile("FONTS/" + theName + ".otf")) {
             myFontPath = "FONTS/" + theName + ".otf";
         } else {
-            throw new Error("FONTS/" + theName + "-" + theStyle + ".[ttf|otf] nor " +
+            throw new Error("FONTS/" + theName + "-" + theFontStyle + ".[ttf|otf] nor " +
                     theName + ".[ttf|otf] does not exist");
         }
 
@@ -120,14 +124,14 @@ spark.loadFont = function (theName, theSize, theStyle, theHinting) {
 
         var myHinting = spark.hintingFromString(theHinting);    
         // enforce loadttf of a normal font, otherwise we get an exception
-        window.loadTTF(myName, searchFile(myFontPath), theSize * spark.fontScale, myHinting, spark.styleFromString("normal"));
-        if (theStyle != "normal") {
-            window.loadTTF(myName, searchFile(myFontPath), theSize * spark.fontScale, myHinting, spark.styleFromString(theStyle));
+        window.loadTTF(myName, searchFile(myFontPath), theSize * spark.fontScale, myHinting, spark.styleFromString("normal"), theAscendOffset);
+        if (theFontStyle != "normal") {
+            window.loadTTF(myName, searchFile(myFontPath), theSize * spark.fontScale, myHinting, spark.styleFromString(theFontStyle));
         }
         spark.ourLoadedFonts[myName] = true;
 
         // always load the bold variant to allow the bold tag <b>...</b> to be used
-        if (spark.styleFromString(theStyle) != Renderer.BOLD) {
+        if (spark.styleFromString(theFontStyle) != Renderer.BOLD) {
             var myFont = theName.split("-")[0];
             if (searchFile("FONTS/" + myFont + "-bold" + ".otf")) {
                 myFontPath = searchFile("FONTS/" + myFont + "-bold" + ".otf");
@@ -251,6 +255,7 @@ spark.fontStyleFromNode = function(theNode) {
 
     copyAttributeIfPresent("font");
     copyAttributeIfPresent("fontSize");
+    copyAttributeIfPresent("ascendOffset");
     copyAttributeIfPresent("fontStyle");
 
     copyAttributeIfPresent("topPad");
@@ -280,7 +285,8 @@ spark.fontForStyle = function(theStyle) {
     !theStyle.getAttribute("fontSize")  ? theStyle.fontSize = 12 : null;
     !theStyle.getAttribute("fontStyle") ? theStyle.fontStyle  = "normal" : null;
     !theStyle.getAttribute("hinting") ? theStyle.hinting  = spark.AUTOHINTING : null;
-    return spark.loadFont(theStyle.font, theStyle.fontSize, theStyle.fontStyle, theStyle.hinting);
+    !theStyle.getAttribute("ascendOffset") ? theStyle.ascendOffset  = 0 : null;
+    return spark.loadFont(theStyle.font, theStyle.fontSize, theStyle.fontStyle, theStyle.hinting, theStyle.ascendOffset);
 };
 
 /**

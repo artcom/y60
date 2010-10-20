@@ -91,10 +91,10 @@ extern DECLSPEC void TTF_SetTracking(float theTracking);
  * Some .fon fonts will have several sizes embedded in the file, so the
  * point size becomes the index of choosing which size.  If the value
  * is too high, the last indexed size will be the default. */
-extern DECLSPEC TTF_Font * SDLCALL TTF_OpenFont(const char *file, int ptsize);
-extern DECLSPEC TTF_Font * SDLCALL TTF_OpenFontIndex(const char *file, int ptsize, long index);
-extern DECLSPEC TTF_Font * SDLCALL TTF_OpenFontRW(SDL_RWops *src, int freesrc, int ptsize);
-extern DECLSPEC TTF_Font * SDLCALL TTF_OpenFontIndexRW(SDL_RWops *src, int freesrc, int ptsize, long index);
+extern DECLSPEC TTF_Font * SDLCALL TTF_OpenFont(const char *file, int ptsize, int theAscendOffset);
+extern DECLSPEC TTF_Font * SDLCALL TTF_OpenFontIndex(const char *file, int ptsize, long index, int theAscendOffset);
+extern DECLSPEC TTF_Font * SDLCALL TTF_OpenFontRW(SDL_RWops *src, int freesrc, int ptsize, int theAscendOffset);
+extern DECLSPEC TTF_Font * SDLCALL TTF_OpenFontIndexRW(SDL_RWops *src, int freesrc, int ptsize, long index, int theAscendOffset);
 
 /* Set and retrieve the font style */
 #define TTF_STYLE_NORMAL	0x00

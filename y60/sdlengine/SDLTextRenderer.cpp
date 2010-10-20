@@ -122,7 +122,8 @@ namespace y60 {
     void
     SDLTextRenderer::loadFont(const string & theName, const string & theFileName,
                               int theHeight, TTFFontInfo::FONTHINTING & theFonthint,
-                              TTFFontInfo::FONTTYPE theFontType)
+                              TTFFontInfo::FONTTYPE theFontType,
+                              int theAscendOffset)
     {
         const string myFileName = AppPackageManager::get().getPtr()->searchFile(theFileName);
 
@@ -142,7 +143,7 @@ namespace y60 {
         if (!fileExists(myFileName)) {
             throw GLTextRendererException(string("Font file '") + myFileName + "' does not exist.", PLUS_FILE_LINE);
         }
-        TTF_Font * myFont = TTF_OpenFont(myFileName.c_str(), theHeight);
+        TTF_Font * myFont = TTF_OpenFont(myFileName.c_str(), theHeight, theAscendOffset);
 
         if (!myFont) {
             throw GLTextRendererException(string("Could not load font: ") + theName+ ", " + myFileName, PLUS_FILE_LINE);
