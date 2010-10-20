@@ -55,7 +55,7 @@ struct CSVParser : grammar<Iterator, std::vector<std::vector<std::string> >()> {
         subField %= *(char_ - '"');
         optionalSpaces = *(lit(' ')|lit('\t'));
 
-        simpleField %= +(char_ - ';' - '\n' - '\t' - ' ' - '"');
+        simpleField %= +(char_ - ';' - eol - '\t' - ' ' - '"');
         quotedField %= '"' > escapedField > '"';
 
         rawField %= simpleField | quotedField;

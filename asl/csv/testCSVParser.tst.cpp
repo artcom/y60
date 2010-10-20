@@ -73,7 +73,21 @@ public:
 
     void testRecordCount() {
         std::vector<std::vector<std::string> > result;
-        parseCSV("foo;bar;baz\nsnarf;barf;narf\n", result);
+        // Linux-Style line breaks
+        parseCSV("foo;bar;baz\nsnarf;\"ba\nrf\";narf\n", result);
+        ENSURE_EQUAL(2, result.size());
+        ENSURE_EQUAL(3, result[0].size());
+        ENSURE_EQUAL("foo", result[0][0]);
+        ENSURE_EQUAL(3, result[1].size());
+        ENSURE_EQUAL("snarf", result[1][0]);
+        // Windows-Style line breaks
+        result.clear();
+        parseCSV("foo;bar;baz\r\nsnarf;\"ba\r\nrf\";narf\r\n", result);
+        for (int r = 0; r < result.size(); ++r) {
+            for (int f = 0; f < result[r].size(); ++f) {
+                cerr << "[" << r << "," << f << "]='" << result[r][f] << "'" << endl;
+            }
+        }
         ENSURE_EQUAL(2, result.size());
         ENSURE_EQUAL(3, result[0].size());
         ENSURE_EQUAL("foo", result[0][0]);
