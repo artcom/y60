@@ -25,6 +25,9 @@
 
 #include <boost/config/warning_disable.hpp>
 #include <boost/spirit/version.hpp>
+#if SPIRIT_VERSION < 0x2000           
+    #error boost::spirit 2.0 or later required (boost 1.37+)
+#endif
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>
 #include <boost/spirit/include/phoenix_operator.hpp>
