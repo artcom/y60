@@ -19,20 +19,31 @@
 #include <string>
 #include <vector>
 
+#if defined(_MSC_VER)
+#   pragma warning (push,2)
+#endif //defined(_MSC_VER)
+
 #include <boost/config/warning_disable.hpp>
+#include <boost/spirit/version.hpp>
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>
 #include <boost/spirit/include/phoenix_operator.hpp>
 #include <boost/spirit/include/phoenix_fusion.hpp>
 #include <boost/spirit/include/phoenix_stl.hpp>
 #include <boost/spirit/include/phoenix_object.hpp>
+#if defined(_MSC_VER)
+#   pragma warning (pop)
+#   pragma warning (disable:4503) // decorated name length exceeded
+#   pragma warning (disable:4706) // assignment within conditional expression
+#endif //defined(_MSC_VER)
 
 using namespace boost::phoenix;
 using namespace boost::spirit;
 using namespace boost::spirit::qi;
 
-
-namespace {
+#if SPIRIT_VERSION == 0x2000                // namespaces for spirit 2.0 (boost 1.39)
+    using namespace boost::spirit::arg_names;
+#endif
 
 template <typename Iterator>
 struct CSVParser : grammar<Iterator, std::vector<std::vector<std::string> >()> {
@@ -45,7 +56,7 @@ struct CSVParser : grammar<Iterator, std::vector<std::vector<std::string> >()> {
         quotedField %= '"' > escapedField > '"';
 
         rawField %= simpleField | quotedField;
-        rawString = optionalSpaces >> -(rawField[_val=_1] >> optionalSpaces);
+		rawString = optionalSpaces >> -(rawField[_val=_1] >> optionalSpaces);
 
         escapedField = subField[_val+=_1] > *(lit("\"\"")[_val+='"'] > subField[_val+=_1]);
 
@@ -87,10 +98,6 @@ struct CSVParser : grammar<Iterator, std::vector<std::vector<std::string> >()> {
     rule<Iterator, std::vector<std::string>()> csvRecord;
     rule<Iterator, std::vector<std::vector<std::string> >()> csvFile;
 };
-
-} // end of anonymous namespace
-
-
 
 namespace asl {
 

@@ -29,7 +29,7 @@
 
 namespace asl {
 
-void
+ASL_CSV_DECL void
 parseCSV(std::string const& input, std::vector<std::vector<std::string> > & result);
 
 }
