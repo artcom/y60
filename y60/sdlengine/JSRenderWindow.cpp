@@ -178,6 +178,7 @@ loadTTF(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_PARAM("theHeight", "Font height", DOC_TYPE_INTEGER);
     DOC_PARAM("theHinting", "Font hinting", DOC_TYPE_ENUMERATION);
     DOC_PARAM_OPT("theFontFace", "Font face, see static properties of Renderer", DOC_TYPE_ENUMERATION, SDLFontInfo::NORMAL);
+    DOC_PARAM_OPT("theAscendOffset", "Some fonts need a ascend offset to be rendered correctly by SDL-ttf", DOC_TYPE_INTEGER, 0);
     DOC_END;
     // Binding is implemented by hand to allow overloading
     try {
@@ -187,9 +188,10 @@ loadTTF(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         std::string myName   = "";
         std::string myPath   = "";
         unsigned    myHeight = 0;
+        int         myAscendOffset = 0;
 
-        if (argc != 3 && argc != 4 && argc != 5) {
-            JS_ReportError(cx, "Renderer::loadTTF(): Wrong number of arguments. Must be three, four or five");
+        if (argc <3 || argc > 6) {
+            JS_ReportError(cx, "Renderer::loadTTF(): Wrong number of arguments. Must be three, four, five or six");
             return JS_FALSE;
         }
 
@@ -226,7 +228,14 @@ loadTTF(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             myFontType = SDLFontInfo::FONTTYPE(myFontTypeEnum);
         }
 
-        myObj.getNative().getRenderer()->getTextManager().loadTTF(myName, myPath, myHeight, myFontHint, myFontType);
+        if (argc > 5) {
+            if (!convertFrom(cx, argv[5], myAscendOffset)) {
+                JS_ReportError(cx, "Renderer::loadTTF(): Argument #6 must be a ascend offset");
+                return JS_FALSE;
+            }
+        }
+
+        myObj.getNative().getRenderer()->getTextManager().loadTTF(myName, myPath, myHeight, myFontHint, myFontType, myAscendOffset);
         return JS_TRUE;
    } HANDLE_CPP_EXCEPTION;
 }
@@ -301,7 +310,7 @@ JSRenderWindow::Functions() {
         {"createCursor",         createCursor,             1},
         {"go",                   go,                       0},
         {"stop",                 stop,                     0},
-        {"loadTTF",              loadTTF,                  4},
+        {"loadTTF",              loadTTF,                  5},
         {"setMousePosition",     setMousePosition,         2},
         {"setEventRecorderMode", setEventRecorderMode,     1},
         {"getEventRecorderMode", getEventRecorderMode,     0},

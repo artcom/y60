@@ -85,7 +85,7 @@ namespace y60 {
 
             void loadFont(const std::string & theName, const std::string & theFileName,
                     int theHeight, TTFFontInfo::FONTHINTING & theFonthint,
-                    TTFFontInfo::FONTTYPE theFontType);
+                    TTFFontInfo::FONTTYPE theFontType, int theAscendOffset = 0);
             TextPtr createText(const asl::Vector2f & thePos,
                     const std::string & theString,
                     const std::string & theFontName);
