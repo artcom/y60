@@ -948,6 +948,13 @@ SDLWindow::setSwapInterval(unsigned theInterval)
 
 #ifdef _WIN32
     if (_myHasVideoSync) {
+        bool myCardIsATI =  getGLVendorString().find("ATI") != string::npos; 
+        if (myCardIsATI && theInterval > 1 ) {
+            // take a look at http://www.opengl.org/registry/specs/EXT/swap_control.txt
+            AC_WARNING << "Sorry, ATI-Graphiccards most likely have a MAX_SWAP_INTERVAL of 1 (at least by now Oct. 2010), \n" <<
+                          "so setting a value greater than 1, in this case '#" << theInterval <<
+                          "', may result in no swap at all.";
+        }
         wglSwapIntervalEXT(theInterval);
         _mySwapInterval = wglGetSwapIntervalEXT();
         if (theInterval != _mySwapInterval) {
