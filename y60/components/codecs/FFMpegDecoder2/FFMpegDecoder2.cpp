@@ -428,7 +428,7 @@ namespace y60 {
     void FFMpegDecoder2::addAudioPacket(const AVPacket & thePacket) {
         DBA(AC_TRACE << "FFMpegDecoder2::addAudioPacket()");
         int64_t pts = thePacket.dts;
-        if (thePacket.pts != AV_NOPTS_VALUE) {
+        if (thePacket.pts != static_cast<int64_t>(AV_NOPTS_VALUE)) {
             pts = thePacket.pts;
         }
         double myTime = pts / (1/av_q2d(_myAStream->time_base));
@@ -981,7 +981,7 @@ namespace y60 {
             _myVideoStreamTimeBase = 1/ av_q2d(_myVStream->time_base);
         } else {
             double myDuration = 0.0;
-            if(_myFormatContext->start_time == AV_NOPTS_VALUE) {
+            if(_myFormatContext->start_time == static_cast<int64_t>(AV_NOPTS_VALUE)) {
                 myDuration = (_myFormatContext->duration )*_myFrameRate/(double)AV_TIME_BASE;
             } else {
                 myDuration = (_myFormatContext->duration - _myFormatContext->start_time )*_myFrameRate/(double)AV_TIME_BASE;
