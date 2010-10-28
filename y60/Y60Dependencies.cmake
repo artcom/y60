@@ -40,6 +40,8 @@ list(APPEND OPT_PACKAGES TUIO)
 # crypto++
 list(APPEND OPT_PACKAGES Crypto++)
 
+# opencv lib
+list(APPEND OPT_PACKAGES OpenCV)
 
 if(WIN32)
 
