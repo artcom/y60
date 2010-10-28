@@ -404,6 +404,9 @@ operator>>(std::istream & is, asl::Bitset<ENUM> & theBitset) {
     ASL_BASE_ENUM_EXPORT_STATICS(THE_ENUM,DLL_EXPORT_TOKEN) \
     typedef asl::Enum<THE_ENUM, THE_ENUM ## _MAX> THE_NAME;
 
+#define DEFINE_ENUM_LOCAL( THE_NAME, THE_ENUM) \
+    typedef asl::Enum<THE_ENUM, THE_ENUM ## _MAX> THE_NAME;
+
 
 /** Helper macro. Creates a typedef.
  * @relates asl::Bitset
