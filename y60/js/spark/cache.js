@@ -69,8 +69,6 @@ spark.getDummyImage = function () {
     return spark.dummyImage;
 };
 
-spark.cachedImages = {};
-
 spark.getCachedImage = function (thePath) {
     var myName = "spark-cached-image-" + thePath;
     var myImage = spark.getNode(myName);
