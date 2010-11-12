@@ -8,6 +8,8 @@ endif(Y60_WITH_GTK)
 add_subdirectory(CompareImage)
 
 add_subdirectory(GenCompressedTex)
+add_subdirectory(ViewACM)
+add_subdirectory(GenACM)
 add_subdirectory(GenCubemap)
 add_subdirectory(GenMovie)
 
