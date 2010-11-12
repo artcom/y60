@@ -663,7 +663,7 @@ namespace asl {
             _myFileName(theFileName, UTF8)
         {
             if (appendToFile) {
-                _myOutFile.open(_myFileName.toLocale().c_str(),std::ios::binary|std::ios::ate);
+                _myOutFile.open(_myFileName.toLocale().c_str(),std::ios::binary|std::ios::app);
             } else {
                 _myOutFile.open(_myFileName.toLocale().c_str(),std::ios::binary|std::ios::trunc);
             }
