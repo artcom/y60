@@ -71,15 +71,19 @@ spark.Image.Constructor = function (Protected) {
             _myImage = null;
         }
         _myImage = theNode;
-        _myTexture.image = theNode.id;
-        Public.width  = Protected.getNumber("width", _myImage.raster.width);
-        Public.height = Protected.getNumber("height", _myImage.raster.height);
+        if (_myImage) {
+            _myTexture.image = theNode.id;
+            Public.width  = Protected.getNumber("width", _myImage.raster.width);
+            Public.height = Protected.getNumber("height", _myImage.raster.height);
 
-        // XXX crude hack starts here
-        if (_myOnImageChanged) {
-            _myOnImageChanged();
+            // XXX crude hack starts here
+            if (_myOnImageChanged) {
+                _myOnImageChanged();
+            }
+            // XXX crude hack ends here
+        } else {
+            _myTexture = null;  //trigger deletion by gc
         }
-        // XXX crude hack ends here
     });
 
     Public.__defineGetter__("src", function () {

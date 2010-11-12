@@ -68,6 +68,12 @@ spark.registerNode = function (theName, theNode) {
     spark.nameToIdMap[theName] = theNode.id;
 };
 
+spark.unregisterNode = function (theName) {
+    if (theName in spark.nameToIdMap) {
+        delete spark.nameToIdMap[theName];
+    }
+};
+
 spark.getNode = function (theName) {
     if (theName in spark.nameToIdMap) {
         return window.scene.dom.getElementById(spark.nameToIdMap[theName]);
