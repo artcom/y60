@@ -267,6 +267,7 @@ template Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, const std::vector<unsigne
 template Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, const std::vector<float> & theVector);
 template Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, const std::vector<double> & theVector);
 template Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, const std::vector<std::string> & theVector);
+template Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, const std::vector<std::vector<std::string> > & theVector);
 
 void ensureParamCount(uintN argc, int theMinCount, int theMaxCount, const std::string & where) {
     if ( static_cast<int>(argc) < theMinCount) {
