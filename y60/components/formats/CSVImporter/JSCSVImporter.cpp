@@ -52,20 +52,15 @@ namespace jslib {
     Csv2array(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         DOC_BEGIN("");
         DOC_END;
-        asl::Ptr<JSCSVImporter> myNative = getNativeAs<JSCSVImporter>(cx, obj);
         std::string myFileName;
         convertFrom(cx, argv[0], myFileName );
-        if (myNative) {
-            *rval = as_jsval(cx, myNative->csv2array(myFileName));
-        } else {
-            ASSERT(myNative);
-        }
+        *rval = as_jsval(cx, JSCSVImporter::csv2array(myFileName));
         return JS_TRUE;
     }
 
 
     JSFunctionSpec *
-    JSCSVImporter::Functions() {
+    JSCSVImporter::StaticFunctions() {
         AC_DEBUG << "Registering class '"<<ClassName()<<"'"<<endl;
         static JSFunctionSpec myFunctions[] = {
             // name                  native                   nargs

@@ -53,9 +53,9 @@ namespace jslib {
             return myClassName;
         }
         
-        JSFunctionSpec* Functions();
+        JSFunctionSpec* StaticFunctions();
 
-        vector<vector<string> > csv2array(string theFileName);
+        static vector<vector<string> > csv2array(string theFileName);
     private:
     };
 };// jslib

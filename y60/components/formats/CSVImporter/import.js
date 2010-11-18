@@ -1,7 +1,6 @@
 plug("CSVImporter");
 
-var _myCSVImporter = new CSVImporter();
-var _myArray = _myCSVImporter.csv2array("simple.csv");
+var _myArray = CSVImporter.csv2array("simple.csv");
 
 for (var i = 0, l = _myArray.length; i < l; ++i) {
     var myRow = "";
