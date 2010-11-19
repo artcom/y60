@@ -61,9 +61,9 @@ namespace y60 {
 
             virtual void initClasses(JSContext * theContext, JSObject * theGlobalObject) {
                 // start csv namespace
-                //JSObject *csvNamespace = JS_DefineObject(theContext, theGlobalObject, "CSV", &Package, NULL, JSPROP_PERMANENT | JSPROP_READONLY);
-                //JSA_DefineConstInts(theContext, csvNamespace, ConstIntProperties()); 
-                csv::JSCSVImporter::initClass(theContext, theGlobalObject);
+                JSObject *csvNamespace = JS_DefineObject(theContext, theGlobalObject, "CSV", &Package, NULL, JSPROP_PERMANENT | JSPROP_READONLY);
+                JSA_DefineConstInts(theContext, csvNamespace, ConstIntProperties()); 
+                csv::JSCSVImporter::initClass(theContext, csvNamespace);
             }
 
             const char * ClassName() {

@@ -76,7 +76,7 @@ namespace jslib {
                 JS_SetPrivate(cx, obj, myNewObject);
                 return JS_TRUE;
             } else  {
-                JS_ReportError(cx,"JSTiledImage::Constructor: bad parameters");
+                JS_ReportError(cx,"JSCSVImporter::Constructor: bad parameters");
                 return JS_FALSE;
             }
         } HANDLE_CPP_EXCEPTION;
@@ -97,7 +97,6 @@ namespace jslib {
     JSPropertySpec *
     csv::JSCSVImporter::Properties() {
         static JSPropertySpec myProperties[] = {
-    /*        {"volume",    PROP_volume,   JSPROP_ENUMERATE|JSPROP_PERMANENT},*/
             {0}
         };
         return myProperties;

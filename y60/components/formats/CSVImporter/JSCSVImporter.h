@@ -37,16 +37,10 @@
 #include <vector>
 
 #include <y60/jsbase/JSWrapper.h>
+#include <y60/jsbase/JSWrapper.impl>
+
 #include "CSVImporter.h"
 
-#include <string>
-#include <asl/base/Ptr.h>
-#include <y60/jsbase/JSVector.h>
-#include <y60/jslib/JSScene.h>
-#include <y60/jsbase/JSNode.h>
-#include <y60/jsbase/JSWrapper.impl>
-#include <y60/jsbase/JSWrapper.h>
-#include <y60/jsbase/JSScriptablePlugin.h>
 
 using namespace std;
 using namespace asl;
@@ -72,7 +66,6 @@ namespace jslib {
             static JSFunctionSpec* StaticFunctions();
 
             enum PropertyNumbers {
-                /*    PROP_volume = -100,*/
             };
 
             static jslib::JSConstIntPropertySpec * ConstIntProperties();
@@ -84,7 +77,6 @@ namespace jslib {
             }
             virtual JSBool getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp);
             virtual JSBool setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp);
-            
 
             static JSObject * initClass(JSContext *cx, JSObject *theGlobalObject);
             static JSBool Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
