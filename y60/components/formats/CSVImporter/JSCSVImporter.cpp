@@ -52,14 +52,14 @@ namespace jslib {
     }
 
     JSObject *
-    csv::JSCSVImporter::initClass(JSContext *cx, JSObject *theGlobalObject) {
+    csv::JSImporter::initClass(JSContext *cx, JSObject *theGlobalObject) {
         JSObject *myClass = Base::initClass(cx, theGlobalObject, ClassName(), Constructor, Properties(), Functions(),  ConstIntProperties(), StaticProperties(), StaticFunctions());
-        DOC_MODULE_CREATE("CSVImporter", JSCSVImporter);
+        DOC_MODULE_CREATE("CSVImporter", JSImporter);
         return myClass;
     }
 
     JSBool
-    csv::JSCSVImporter::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    csv::JSImporter::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         DOC_BEGIN("");
         DOC_END;
         try {
@@ -71,31 +71,31 @@ namespace jslib {
             OWNERPTR myNewNative;
             myNewNative = OWNERPTR(new csv::CSVImporter());
 
-            csv::JSCSVImporter * myNewObject = new csv::JSCSVImporter(myNewNative, myNewNative.get());
+            csv::JSImporter * myNewObject = new csv::JSImporter(myNewNative, myNewNative.get());
             if (myNewObject) {
                 JS_SetPrivate(cx, obj, myNewObject);
                 return JS_TRUE;
             } else  {
-                JS_ReportError(cx,"JSCSVImporter::Constructor: bad parameters");
+                JS_ReportError(cx,"JSImporter::Constructor: bad parameters");
                 return JS_FALSE;
             }
         } HANDLE_CPP_EXCEPTION;
     }
 
     JSConstIntPropertySpec *
-    csv::JSCSVImporter::ConstIntProperties() {
+    csv::JSImporter::ConstIntProperties() {
         static JSConstIntPropertySpec myProperties[] = {{0}};
         return myProperties;
     }
 
     JSPropertySpec *
-    csv::JSCSVImporter::StaticProperties() {
+    csv::JSImporter::StaticProperties() {
         static JSPropertySpec myProperties[] = {{0}};
         return myProperties;
     }
 
     JSPropertySpec *
-    csv::JSCSVImporter::Properties() {
+    csv::JSImporter::Properties() {
         static JSPropertySpec myProperties[] = {
             {0}
         };
@@ -103,31 +103,31 @@ namespace jslib {
     }
     
     JSBool
-    csv::JSCSVImporter::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
+    csv::JSImporter::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
         switch (theID) {
             default:
-                JS_ReportError(cx,"JSCSVImporter::getProperty: index %d out of range", theID);
+                JS_ReportError(cx,"JSImporter::getProperty: index %d out of range", theID);
                 return JS_FALSE;
         }
     }
 
     JSBool
-    csv::JSCSVImporter::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
+    csv::JSImporter::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
         switch (theID) {
             default:
-                JS_ReportError(cx,"JSCSVImporter::setPropertySwitch: index %d out of range", theID);
+                JS_ReportError(cx,"JSImporter::setPropertySwitch: index %d out of range", theID);
         }
         return JS_FALSE;
     }
 
     JSFunctionSpec *
-    csv::JSCSVImporter::Functions() {
+    csv::JSImporter::Functions() {
         static JSFunctionSpec myFunctions[] = {{0}};
         return myFunctions;
     }
 
     JSFunctionSpec *
-    csv::JSCSVImporter::StaticFunctions() {
+    csv::JSImporter::StaticFunctions() {
         AC_DEBUG << "Registering class '"<<ClassName()<<"'"<<endl;
         static JSFunctionSpec myFunctions[] = {
             // name                  native                   nargs
@@ -138,12 +138,12 @@ namespace jslib {
     }
 
 
-    bool convertFrom(JSContext *cx, jsval theValue, csv::JSCSVImporter::OWNERPTR & theCSVImporter) {
+    bool convertFrom(JSContext *cx, jsval theValue, csv::JSImporter::OWNERPTR & theCSVImporter) {
         if (JSVAL_IS_OBJECT(theValue)) {
             JSObject * myArgument;
             if (JS_ValueToObject(cx, theValue, &myArgument)) {
-                if (JSA_GetClass(cx,myArgument) == JSClassTraits<csv::JSCSVImporter::NATIVE>::Class()) {
-                    theCSVImporter = JSClassTraits<csv::JSCSVImporter::NATIVE>::getNativeOwner(cx,myArgument);
+                if (JSA_GetClass(cx,myArgument) == JSClassTraits<csv::JSImporter::NATIVE>::Class()) {
+                    theCSVImporter = JSClassTraits<csv::JSImporter::NATIVE>::getNativeOwner(cx,myArgument);
                     return true;
                 }
             }
@@ -151,13 +151,13 @@ namespace jslib {
         return false;
     }
 
-    jsval as_jsval(JSContext *cx, csv::JSCSVImporter::OWNERPTR theOwner) {
-        JSObject * myReturnObject = csv::JSCSVImporter::Construct(cx, theOwner, theOwner.get());
+    jsval as_jsval(JSContext *cx, csv::JSImporter::OWNERPTR theOwner) {
+        JSObject * myReturnObject = csv::JSImporter::Construct(cx, theOwner, theOwner.get());
         return OBJECT_TO_JSVAL(myReturnObject);
     }
 
-    jsval as_jsval(JSContext *cx, csv::JSCSVImporter::OWNERPTR theOwner, csv::JSCSVImporter::NATIVE * theNative) {
-        JSObject * myObject = csv::JSCSVImporter::Construct(cx, theOwner, theNative);
+    jsval as_jsval(JSContext *cx, csv::JSImporter::OWNERPTR theOwner, csv::JSImporter::NATIVE * theNative) {
+        JSObject * myObject = csv::JSImporter::Construct(cx, theOwner, theNative);
         return OBJECT_TO_JSVAL(myObject);
     }
 

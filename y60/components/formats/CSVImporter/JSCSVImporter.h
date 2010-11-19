@@ -28,8 +28,8 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _ac_CSVImporter_JSCSVImporter_h_
-#define _ac_CSVImporter_JSCSVImporter_h_
+#ifndef _ac_CSVImporter_JSImporter_h_
+#define _ac_CSVImporter_JSImporter_h_
 
 #include "y60_csvimporter_settings.h"
 
@@ -47,19 +47,19 @@ using namespace asl;
 
 namespace jslib {
     namespace csv {
-        class JSCSVImporter : public jslib::JSWrapper<CSVImporter,
+        class JSImporter : public jslib::JSWrapper<CSVImporter,
                                 CSVImporterPtr, jslib::StaticAccessProtocol> {
-            JSCSVImporter();
+            JSImporter();
         public:
             typedef CSVImporter NATIVE;
             typedef CSVImporterPtr OWNERPTR;
             typedef jslib::JSWrapper<NATIVE,OWNERPTR, jslib::StaticAccessProtocol> Base;
 
-            JSCSVImporter(OWNERPTR theOwner, NATIVE * theNative): Base(theOwner, theNative) {}
-            virtual ~JSCSVImporter() {};
+            JSImporter(OWNERPTR theOwner, NATIVE * theNative): Base(theOwner, theNative) {}
+            virtual ~JSImporter() {};
 
             static const char * ClassName() {
-                return "CSVImporter";
+                return "Importer";
             }
 
             static JSFunctionSpec* Functions();
@@ -85,14 +85,14 @@ namespace jslib {
     };//csv
 
     template <>
-    struct JSClassTraits<csv::JSCSVImporter::NATIVE>
-        : public JSClassTraitsWrapper<csv::JSCSVImporter::NATIVE, csv::JSCSVImporter> {};
+    struct JSClassTraits<csv::JSImporter::NATIVE>
+        : public JSClassTraitsWrapper<csv::JSImporter::NATIVE, csv::JSImporter> {};
 
     bool convertFrom(JSContext *cx, jsval theValue, jslib::csv::CSVImporterPtr& theCSVImporter);
 
-    jsval as_jsval(JSContext *cx, jslib::csv::JSCSVImporter::OWNERPTR theOwner);
-    jsval as_jsval(JSContext *cx, jslib::csv::JSCSVImporter::OWNERPTR theOwner, jslib::csv::JSCSVImporter::NATIVE * theNative);
+    jsval as_jsval(JSContext *cx, jslib::csv::JSImporter::OWNERPTR theOwner);
+    jsval as_jsval(JSContext *cx, jslib::csv::JSImporter::OWNERPTR theOwner, jslib::csv::JSImporter::NATIVE * theNative);
 };// jslib
 
 
-#endif // _ac_CSVImporter_JSCSVImporter_h_
+#endif // _ac_CSVImporter_JSImporter_h_
