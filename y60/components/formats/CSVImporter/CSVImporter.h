@@ -42,7 +42,7 @@ namespace jslib {
     namespace csv {
         class CSVImporter { 
         public:
-            CSVImporter();
+            CSVImporter() {};
             virtual ~CSVImporter() {};
             static std::vector<std::vector<std::string> > csv2array(std::string theFileName);
         };
