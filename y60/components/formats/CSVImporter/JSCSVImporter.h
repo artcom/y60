@@ -35,29 +35,72 @@
 
 #include <string>
 #include <vector>
-#include <asl/base/PlugInBase.h>
+
+#include <y60/jsbase/JSWrapper.h>
+#include "CSVImporter.h"
+
+#include <string>
+#include <asl/base/Ptr.h>
+#include <y60/jsbase/JSVector.h>
+#include <y60/jslib/JSScene.h>
+#include <y60/jsbase/JSNode.h>
+#include <y60/jsbase/JSWrapper.impl>
+#include <y60/jsbase/JSWrapper.h>
 #include <y60/jsbase/JSScriptablePlugin.h>
 
 using namespace std;
 using namespace asl;
 
 namespace jslib {
-    class JSCSVImporter : public PlugInBase, public IScriptablePlugin {
-    public:
-        JSCSVImporter(asl::DLHandle theDLHandle) : asl::PlugInBase(theDLHandle) {}
+    namespace csv {
+        class JSCSVImporter : public jslib::JSWrapper<CSVImporter,
+                                CSVImporterPtr, jslib::StaticAccessProtocol> {
+            JSCSVImporter();
+        public:
+            typedef CSVImporter NATIVE;
+            typedef CSVImporterPtr OWNERPTR;
+            typedef jslib::JSWrapper<NATIVE,OWNERPTR, jslib::StaticAccessProtocol> Base;
 
-        virtual ~JSCSVImporter() {};
+            JSCSVImporter(OWNERPTR theOwner, NATIVE * theNative): Base(theOwner, theNative) {}
+            virtual ~JSCSVImporter() {};
 
-        const char * ClassName() {
-            static const char * myClassName = "CSVImporter";
-            return myClassName;
-        }
-        
-        JSFunctionSpec* StaticFunctions();
+            static const char * ClassName() {
+                return "CSVImporter";
+            }
 
-        static vector<vector<string> > csv2array(string theFileName);
-    private:
-    };
+            static JSFunctionSpec* Functions();
+            static JSFunctionSpec* StaticFunctions();
+
+            enum PropertyNumbers {
+                /*    PROP_volume = -100,*/
+            };
+
+            static jslib::JSConstIntPropertySpec * ConstIntProperties();
+            static JSPropertySpec * Properties();
+            static JSPropertySpec * StaticProperties();
+
+            virtual unsigned long length() const {
+                return 1;
+            }
+            virtual JSBool getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp);
+            virtual JSBool setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp);
+            
+
+            static JSObject * initClass(JSContext *cx, JSObject *theGlobalObject);
+            static JSBool Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
+        private:
+        };
+    };//csv
+
+    template <>
+    struct JSClassTraits<csv::JSCSVImporter::NATIVE>
+        : public JSClassTraitsWrapper<csv::JSCSVImporter::NATIVE, csv::JSCSVImporter> {};
+
+    bool convertFrom(JSContext *cx, jsval theValue, jslib::csv::CSVImporterPtr& theCSVImporter);
+
+    jsval as_jsval(JSContext *cx, jslib::csv::JSCSVImporter::OWNERPTR theOwner);
+    jsval as_jsval(JSContext *cx, jslib::csv::JSCSVImporter::OWNERPTR theOwner, jslib::csv::JSCSVImporter::NATIVE * theNative);
 };// jslib
+
 
 #endif // _ac_CSVImporter_JSCSVImporter_h_

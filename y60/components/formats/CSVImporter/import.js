@@ -1,4 +1,4 @@
-plug("CSVImporter");
+plug("CSV");
 
 var _myArray = CSVImporter.csv2array("simple.csv");
 
