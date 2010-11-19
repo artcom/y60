@@ -38,19 +38,16 @@
 #include <asl/base/Ptr.h>
 
 
-using namespace std;
-using namespace asl;
-
 namespace jslib {
     namespace csv {
         class CSVImporter { 
         public:
             CSVImporter();
             virtual ~CSVImporter() {};
-            static vector<vector<string> > csv2array(string theFileName);
+            static std::vector<std::vector<std::string> > csv2array(std::string theFileName);
         };
 
-        typedef Ptr<CSVImporter> CSVImporterPtr;
+        typedef asl::Ptr<CSVImporter> CSVImporterPtr;
     };//csv
 };// jslib
 

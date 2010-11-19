@@ -33,9 +33,10 @@
 #include <asl/csv/CSVParser.h>
 #include <y60/jsbase/JSNode.h>
 
-using namespace y60;
 using namespace std;
+using namespace asl;
 using namespace dom;
+using namespace y60;
 
 namespace jslib {
     vector<vector<string> > 

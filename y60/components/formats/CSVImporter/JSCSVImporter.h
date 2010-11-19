@@ -42,9 +42,6 @@
 #include "CSVImporter.h"
 
 
-using namespace std;
-using namespace asl;
-
 namespace jslib {
     namespace csv {
         class JSImporter : public jslib::JSWrapper<CSVImporter,
