@@ -182,6 +182,7 @@ spark.Canvas.Constructor = function (Protected) {
         myMaterial.transparent = true;
         
         var myAutoCreateTag = Protected.getBoolean("autoCreate", true);
+        var mySceneFile = Protected.getString("sceneFile", "");
         if (mySceneFile) {
             // Create (merge) world from scene file
             var myDom = spark.Canvas.prepareMerge(mySceneFile);
