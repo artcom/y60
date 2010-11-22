@@ -182,12 +182,9 @@ spark.Canvas.Constructor = function (Protected) {
         myMaterial.transparent = true;
         
         var myAutoCreateTag = Protected.getBoolean("autoCreate", true);
-        var mySceneFile = Protected.getString("sceneFile", "");
-        Logger.warning("--------------------------Cavas sceneFile: " + mySceneFile);
         if (mySceneFile) {
             // Create (merge) world from scene file
             var myDom = spark.Canvas.prepareMerge(mySceneFile);
-            Logger.warning("--------------------------Cavas has sceneFile: " + mySceneFile);
             // XXX assumption: only one world exist/ is handled
             myWorldId  = myDom.find(".//worlds/world").id;
             myCanvasId = myDom.find(".//canvases/canvas").id;
