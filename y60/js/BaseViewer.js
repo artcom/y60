@@ -430,7 +430,6 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         }
         // switch mover
         var myNewMover = self.setMover(_myMoverConstructors[myNextMoverIndex], theViewport);
-        print("Activated Mover: " + myNewMover.name);
     };
 
     self.setAutoNearFarPlane = function(theFlag) {
@@ -841,7 +840,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
 
     self.enableNagios = function(thePort) {
         plug("Nagios");
-        _myNagiosPlugin = new NagiosPlugin();
+        _myNagiosPlugin = new Nagios();
         _myNagiosPlugin.port = thePort;
         _myRenderWindow.addExtension(_myNagiosPlugin);
         return _myNagiosPlugin;
@@ -871,7 +870,6 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
                 var myMovie = myMovies[i];
                 if (myMovie.decoderhint === "") {
                     myMovie.decoderhint = new Playlist().getVideoDecoderHintFromURL(myMovie.src, false);
-                    //print("Set decoderhint for movie with source : " + myMovie.src + " to: " + myMovie.decoderhint);
                 }
             }
         }
@@ -935,7 +933,6 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     ////////////////////
 
     self['arguments'] = _parseArguments(theArguments);
-
     var myShaderLibrary = self.getShaderLibrary();
     if (myShaderLibrary) {
         GLResourceManager.prepareShaderLibrary(myShaderLibrary);

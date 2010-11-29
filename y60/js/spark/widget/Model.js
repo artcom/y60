@@ -8,7 +8,10 @@ spark.Model.Constructor = function (Protected) {
     var Base = {};
     var Public = this;
 
-    this.Inherit(spark.Body);
+    //XXX this formerly inherited from Body Widget, but then was limited to <body/> nodes
+    //    to make it work generically with more scenegraphelements as p.e. <transform/> nodes,
+    // it now inherits from widget
+    this.Inherit(spark.Widget);
 
     Base.realize = Public.realize;
     Public.realize = function () {

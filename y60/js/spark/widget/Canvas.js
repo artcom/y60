@@ -183,15 +183,14 @@ spark.Canvas.Constructor = function (Protected) {
         
         var myAutoCreateTag = Protected.getBoolean("autoCreate", true);
         var mySceneFile = Protected.getString("sceneFile", "");
-        
         if (mySceneFile) {
             // Create (merge) world from scene file
             var myDom = spark.Canvas.prepareMerge(mySceneFile);
-            
             // XXX assumption: only one world exist/ is handled
             myWorldId  = myDom.find(".//worlds/world").id;
             myCanvasId = myDom.find(".//canvases/canvas").id;
             
+
             spark.Canvas.mergeScenes(window.scene, myDom);
             
             _myCanvasNode = window.scene.dom.find(".//canvases/canvas[@id='" + myCanvasId + "']");
@@ -390,13 +389,14 @@ spark.Canvas.prepareMerge = function prepareMerge(theSceneFilePath) {
         myTargetDir = getDirectoryPart(theSceneFilePath);
         myTexSrcPath = imageNode.childNodes[i].src;
         if (myTexSrcPath.charAt(0) !== "/") {
-            myTexSrcPath = myTexSrcPath.replace(/^\.\//, "");
-            myNewPath = myTargetDir + myTexSrcPath;
-            if (!fileExists(myNewPath)) {
-                Logger.warning("Could not find texture within path '" + myNewPath + "'");
-            } else {
-                imageNode.childNodes[i].src = myNewPath;
+            var myTexSrcPaths = myTexSrcPath.split("|");
+            for(var j = 0; j < myTexSrcPaths.length; j++) {
+                myTexSrcPaths[j] = myTexSrcPaths[j].replace(/^\.\//, myTargetDir + "");
+                if (!fileExists(myTexSrcPaths[j])) {
+                    Logger.error("Could not find texture within path '" + myTexSrcPaths[j] + "'");
+                }
             }
+            imageNode.childNodes[i].src =  myTexSrcPaths.join("|");
         }
     }
     return myDom;
@@ -405,7 +405,6 @@ spark.Canvas.prepareMerge = function prepareMerge(theSceneFilePath) {
 spark.Canvas.mergeScenes = function (theTargetScene, theModelDom) {
     var childNode, receivingNode, childChildNode;
     var mySceneNode = theModelDom.firstChild;
-    
     while (mySceneNode.childNodesLength()) {
         childNode = mySceneNode.firstChild;
         receivingNode = theTargetScene.dom.getNodesByTagName(childNode.nodeName)[0];
