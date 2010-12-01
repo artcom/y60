@@ -242,6 +242,7 @@ namespace asl {
 /**
 Use AC_PRINT << "myMessage" in situations when a message should be printed and logged anyway, possibly without formatting */
 #define AC_PRINT AC_LOG_CHECK(asl::SEV_PRINT, __FILE__, __LINE__)
+#define AC_MODULE_PRINT(MODULE) AC_LOG_CHECK(asl::SEV_PRINT, MODULE, __LINE__)
 /**
 Use AC_FATAL << "myErrorMessage" in situations when a severe condition (e.g. memory corruption) was
 detected and you are going to abort program execution. */
@@ -263,12 +264,15 @@ Use AC_INFO << "myInfoMessage" in situations to inform about resource usage,
 performance, or completion of important tasks or important events */
 #define AC_INFO AC_LOG(asl::SEV_INFO, __FILE__, __LINE__)
 #define AC_INFO_CHECK AC_LOG_CHECK(asl::SEV_INFO, __FILE__, __LINE__)
+#define AC_MODULE_INFO(MODULE) AC_LOG_CHECK(asl::SEV_INFO, MODULE, __LINE__)
+
 /**
 Use AC_DEBUG << "myDebugMessage" to inform about creation or destruction of important objects,
 overall flow of control and general input/output events; keep in mind that debug message should
 still permit the application to perform its work; use them sparsely*/
 #define AC_DEBUG AC_LOG(asl::SEV_DEBUG, __FILE__, __LINE__)
 #define AC_DEBUG_CHECK AC_LOG_CHECK(asl::SEV_DEBUG, __FILE__, __LINE__)
+#define AC_MODULE_DEBUG(MODULE) AC_LOG_CHECK(asl::SEV_DEBUG, MODULE, __LINE__)
 /**
 Use AC_TRACE << "myDebugMessage" to trace flow of control and produce an amount of information
 so detailed that the program might be too slow to perform anything reasonable; in general

@@ -37,11 +37,17 @@ class LoggerUnitTest : public UnitTest {
 public:
     LoggerUnitTest() : UnitTest("LoggerUnitTest") {}
     void run() {
+        // Control via env i.e. 'AC_LOG_MODULE_VERBOSITY=INFO/ExclusiveOutput' 
+        AC_MODULE_PRINT("ExclusiveOutput") << "Only logs into module : 'ExclusiveOutput'";
+        AC_MODULE_INFO("ExclusiveOutput")  << "Only logs into module : 'ExclusiveOutput'";
+        AC_MODULE_DEBUG("ExclusiveOutput") << "Only logs into module : 'ExclusiveOutput'";
+
         AC_FATAL << "This is a Test Fatal Log Entry" << "- and this is some more text" << std::endl;
         AC_ERROR << "This is a Test Error Log Entry" << "- and this is some more text" << std::endl;
         AC_WARNING << "This is a Test Warning Log Entry" << "- and this is some more text" << std::endl;
         AC_INFO << "This is a Test Info Log Entry" << "- and this is some more text" << std::endl;
         AC_DEBUG << "This is a Test Debug Log Entry" << "- and this is some more text" << std::endl;
+
         AC_TRACE << "This is a Test Trace Log Entry" << "- and this is some more text" << std::endl;
         if (AC_TRACE_ON) {
             cerr << "This is a conditional Test Trace Log Entry" << "- and this is some more text" << std::endl;
