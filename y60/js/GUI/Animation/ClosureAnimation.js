@@ -72,7 +72,7 @@ GUI.ClosureAnimation.prototype.Constructor = function(Public, Protected, theDura
     // Member
     ////////////////////////////////////////
 
-    var _function = null;
+    Public.func = null;
 
     ////////////////////////////////////////
     // Public
@@ -86,19 +86,19 @@ GUI.ClosureAnimation.prototype.Constructor = function(Public, Protected, theDura
 			Public.easing = theEasing;
 		}
 
-		_function = theFunction;
+		Public.func = theFunction;
     };
 
     // call the closure with the current progress value
     Base.render = Public.render;
     Public.render = function() {
-        if(_function != null) {
-            _function(Public.progress);
+        if(Public.func != null) {
+            Public.func(Public.progress);
         }
 	};
 
 	Public.toString = function() {
-		return "ClosureAnimation" + _function;
+		return "ClosureAnimation" + Public.func;
 	};
 
     Public.setup();
