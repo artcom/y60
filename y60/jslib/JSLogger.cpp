@@ -81,10 +81,14 @@ static JSBool log(asl::Severity theSeverity, JSContext *cx, JSObject *obj, uintN
 			myLineNo = 0;
 			myFilename = "unknown";
 		}
+		std::string myModuleName(myFilename);
 		std::string myMessage;
 		ensureParamCount(argc, 1);
 		convertFrom(cx, argv[0], myMessage);
-		AC_LOG_CHECK(theSeverity, myFilename, myLineNo) << myMessage;
+		if (argc > 1 ) {
+    		convertFrom(cx, argv[1], myModuleName);		    
+		}
+		AC_LOG_CHECK(theSeverity, myModuleName.c_str(), myLineNo) << myMessage;
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }
@@ -92,36 +96,42 @@ static JSBool log(asl::Severity theSeverity, JSContext *cx, JSObject *obj, uintN
 static JSBool fatal(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Log at fatal level");
     DOC_PARAM("theMessage", "", DOC_TYPE_STRING);
+    DOC_PARAM_OPT("theChannel", "", DOC_TYPE_STRING, "");
     DOC_END;
     return log(asl::SEV_FATAL, cx, obj, argc, argv, rval);
 }
 static JSBool error(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Log at error level");
     DOC_PARAM("theMessage", "", DOC_TYPE_STRING);
+    DOC_PARAM_OPT("theChannel", "", DOC_TYPE_STRING, "");
     DOC_END;
     return log(asl::SEV_ERROR, cx, obj, argc, argv, rval);
 }
 static JSBool warning(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Log at warning level");
     DOC_PARAM("theMessage", "", DOC_TYPE_STRING);
+    DOC_PARAM_OPT("theChannel", "", DOC_TYPE_STRING, "");
     DOC_END;
     return log(asl::SEV_WARNING, cx, obj, argc, argv, rval);
 }
 static JSBool trace(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Log at info level");
     DOC_PARAM("theMessage", "", DOC_TYPE_STRING);
+    DOC_PARAM_OPT("theChannel", "", DOC_TYPE_STRING, "");
     DOC_END;
     return log(asl::SEV_TRACE, cx, obj, argc, argv, rval);
 }
 static JSBool info(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Log at info level");
     DOC_PARAM("theMessage", "", DOC_TYPE_STRING);
+    DOC_PARAM_OPT("theChannel", "", DOC_TYPE_STRING, "");
     DOC_END;
     return log(asl::SEV_INFO, cx, obj, argc, argv, rval);
 }
 static JSBool debug(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Log at debug level");
     DOC_PARAM("theMessage", "", DOC_TYPE_STRING);
+    DOC_PARAM_OPT("theChannel", "", DOC_TYPE_STRING, "");
     DOC_END;
     return log(asl::SEV_DEBUG, cx, obj, argc, argv, rval);
 }
@@ -284,8 +294,8 @@ JSLogger::StaticFunctions() {
         // name                    native          nargs
         {"fatal",     fatal,     1},
         {"error",     error,     1},
-        {"warning",     warning,     1},
-        {"info",     info,     1},
+        {"warning",   warning,     1},
+        {"info",      info,     1},
         {"debug",     debug,     1},
         {"trace",     trace,     1},
         {"setVerbosity", setVerbosity, 4},
