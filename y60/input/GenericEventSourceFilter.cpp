@@ -90,7 +90,7 @@ namespace y60 {
         if (_myMaxCursorCount >-1) {
             std::vector<int>::iterator myCursorInUse = find(_myCursorsInUse.begin(), _myCursorsInUse.end(), theCursorId);    
             if (myCursorInUse == _myCursorsInUse.end()) {
-                if (_myCursorsInUse.size() < _myMaxCursorCount) {
+                if (static_cast<int>(_myCursorsInUse.size()) < _myMaxCursorCount) {
                     // we have room for cursor
                     myAllowFlag = true;
                     _myCursorsInUse.push_back(theCursorId);
