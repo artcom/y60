@@ -177,7 +177,12 @@ spark.I18nItem.Constructor = function (Protected) {
         }
         if (!(theLanguage in _myLanguageData)) {
             Logger.debug("I18n item " + Public.name + " does not contain language " + theLanguage);
-            return (Public.parent.defaultLanguage in _myLanguageData) ? _myLanguageData[Public.parent.defaultLanguage] : null;
+            if (Public.parent.defaultLanguage in _myLanguageData) {
+                return _myLanguageData[Public.parent.defaultLanguage];
+            } else {
+                Logger.warning("I18n item " + Public.name + " does not contain defaultlanguage " + Public.parent.defaultLanguage);
+                return null;
+            }
         } else {
             return _myLanguageData[theLanguage];
         }
@@ -193,7 +198,12 @@ spark.I18nItem.Constructor = function (Protected) {
         }
         if(!(theLanguage in _myLanguageNodes)) {
             Logger.debug("I18n item " + Public.name + " does not contain language " + theLanguage);
-            return (Public.parent.defaultLanguage in _myLanguageNodes) ? _myLanguageNodes[Public.parent.defaultLanguage] : null;
+            if (Public.parent.defaultLanguage in _myLanguageNodes) {
+                return _myLanguageNodes[Public.parent.defaultLanguage];
+            } else {
+                Logger.warning("I18n item " + Public.name + " does not contain defaultlanguage " + Public.parent.defaultLanguage);
+                return null;
+            }
         } else {
             return _myLanguageNodes[theLanguage];
         }
@@ -273,10 +283,10 @@ spark.I18nText.Constructor = function (Protected) {
         // return Public.getLanguageData(Public.language) || "";
     });
 		
-    Public.fontStyle getter = function() {
+    Public.__defineGetter__("fontStyle", function() {
         var myFontStyleNode = Public.getLanguageNode(Public.language);
         return myFontStyleNode;
-    }
+    });
 };
 
 spark.I18nImage = spark.ComponentClass("I18nImage");
