@@ -224,9 +224,9 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
 
                 myArgument = myArgument.split("=");
                 if (myArgument.length > 1) {
-                    myArgumentMap[myArgument[0]] = myArgument[1];
+                    myArgumentMap[trim(myArgument[0])] = trim(myArgument[1]);
                 } else {
-                    myArgumentMap[myArgument[0]] = null;
+                    myArgumentMap[trim(myArgument[0])] = null;
                 }
             }
 
