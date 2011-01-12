@@ -44,6 +44,7 @@ spark.Layouter.Constructor = function(Protected) {
     var _mySparkFiles = [];
     var _myVisualMode = 2; // box with mesurement
     var _myLayoutImage = null;
+    var _myBackup = {originalZ:null, originalWidth:null, originalHeight:null};
     const DEBUG_COLOR = new Vector4f(1,0,0,1);
     
     const IDLE = 0;
@@ -150,6 +151,9 @@ spark.Layouter.Constructor = function(Protected) {
     Public.target setter = function (theWidget) {
         print("target widget", theWidget)
         _myWidget = theWidget;
+        _myBackup.originalZ = _myWidget.z;
+        _myBackup.originalWidth = _myWidget.width;
+        _myBackup.originalHeight = _myWidget.height;
         _myState = ACTIVE;
         _myOldPos = null;
         if (!(_myWidget.name in _mySparkFiles)) {
@@ -315,11 +319,13 @@ spark.Layouter.Constructor = function(Protected) {
                 if (myNode) {
                     myNode.x = Math.round(_myWidget.x);
                     myNode.y = Math.round(_myWidget.y);
-                    myNode.z = Math.round(_myWidget.z);
-                    if (_myWidget.width) {
+                    if (_myWidget.z !== _myBackup.originalZ) {
+                        myNode.z = Math.round(_myWidget.z);
+                    }
+                    if (_myWidget.width && _myWidget.width !== _myBackup.originalWidth) {
                         myNode.width = Math.round(_myWidget.width);
                     }
-                    if (_myWidget.height) {
+                    if (_myWidget.height && _myWidget.height !== _myBackup.originalHeight) {
                         myNode.height = Math.round(_myWidget.height);
                     }
                     _myCurrentSparkNode.saveFile(_myCurrentSparkFile);
