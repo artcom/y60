@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below.
-//
+// of GNU General Public License referenced below. 
+//    
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO
+// Description: TODO  
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations:
+//    recommendations: 
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -73,8 +73,8 @@ using namespace inet;
 
 namespace y60 {
 
-RequestThread::RequestThread(const std::string & theLocalPath,
-                      const std::string & theUsername,
+RequestThread::RequestThread(const std::string & theLocalPath, 
+                      const std::string & theUsername, 
                       const std::string & thePassword,
                       const std::string & theSessionCookie,
                       const std::string & theUserAgent,
@@ -82,13 +82,13 @@ RequestThread::RequestThread(const std::string & theLocalPath,
                       const std::vector<std::pair<std::string, std::string> > & theOutdatedAssets,
                       unsigned int theMaxRequestCount,
                       bool theVerboseFlag) :
+    _myLocalPath(theLocalPath), 
+    _myUsername(theUsername), 
+    _myPassword(thePassword), 
+    _myUserAgent(theUserAgent),
+    _myProxy(theProxy),
     _myOutdatedAssets(theOutdatedAssets),
     _myMaxRequestCount(theMaxRequestCount),
-    _myUserAgent(theUserAgent),
-    _myLocalPath(theLocalPath),
-    _myProxy(theProxy),
-    _myUsername(theUsername),
-    _myPassword(thePassword),
     _myVerboseFlag(theVerboseFlag),
     _remainingCount(theOutdatedAssets.size())
 {
@@ -99,19 +99,19 @@ RequestThread::RequestThread(const std::string & theLocalPath,
 };
 
 
-int
+int 
 RequestThread::getRemainingCount() const {
     asl::ScopeLocker(_remainingCountLock, false);
     return _remainingCount;
 }
 
-void
+void 
 RequestThread::setRemainingCount(unsigned int theNewCount) {
     asl::ScopeLocker(_remainingCountLock, true);
     _remainingCount = theNewCount;
 }
 
-void
+void 
 RequestThread::addToCookieJar(const std::string & theCookieString) {
     // JSESSIONID=c04c810430da7ff877e211624fbcb7e591c88151b82e.e34LaNmQaNeMci0Mb38LbhmPbxj0n6jAmljGr5XDqQLvpAe; path=/content
     string::size_type myEquals = theCookieString.find("=");
@@ -130,7 +130,7 @@ RequestThread::addToCookieJar(const std::string & theCookieString) {
     _myCookieJar[myCookieName] = myCookieValue;
 }
 
-bool
+bool 
 RequestThread::handleRequests() {
     int myRunningCount = _myRequestManager.handleRequests(true);
 
@@ -148,7 +148,7 @@ RequestThread::handleRequests() {
                 AC_DEBUG << "setLastModified for " << myFilename << " to " << myTime;
                 setLastModified(myFilename, myTime);
                 AC_DEBUG << "lastModified is now " << getLastModified(myFilename);
-            }  else if ( myResponseCode == 304) {
+            }  else if ( myResponseCode == 304) { 
                 // not modified, everything ok
             } else {
                 string myReason = myIter->second->getResponseHeader("X-ORA-CONTENT-Info");
@@ -206,7 +206,7 @@ RequestThread::addAssetRequest(const std::string & thePath, const std::string & 
 
 
 
-void
+void 
 RequestThread::run () {
     while (!shouldTerminate()) {
         if (handleRequests()) {

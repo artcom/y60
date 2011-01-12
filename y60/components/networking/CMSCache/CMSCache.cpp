@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below.
-//
+// of GNU General Public License referenced below. 
+//    
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO
+// Description: TODO  
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations:
+//    recommendations: 
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -63,7 +63,7 @@
 #include <y60/inet/Request.h>
 
 #ifdef verify
-	#ifndef _SETTING_NO_UNDEF_WARNING_
+	#ifndef _SETTING_NO_UNDEF_WARNING_ 
 		#warning Symbol 'verify' defined as macro, undefining. (Outrageous namespace pollution by Apples AssertMacros.h, revealing arrogance and incompetence)
 	#endif
 #undef verify
@@ -151,9 +151,9 @@ CMSCache::collectAssets(dom::NodePtr theParent) {
     for (unsigned i = 0; i < theParent->childNodesLength(); ++i) {
         dom::NodePtr myChild = theParent->childNode( i );
         if (myChild->nodeName() == "externalcontent") {
-            const std::string & myPath = myChild->getAttributeString("path");
+            const std::string & myPath = myChild->childNode("path")->childNode("#cdata-section")->nodeValue();
             if (_myAssets.find( myPath ) == _myAssets.end()) {
-                if ( !myChild->getAttribute("uri") || myChild->getAttributeString("uri").empty() ) {
+                if ( !myChild->childNode("uri") || myChild->childNode("path")->childNode("#cdata-section")->nodeValue().empty() ) {
                     // Assets without URIs are allowed (used for references)
                 } else {
                     dom::NodePtr myClone = myChild->cloneNode( dom::Node::DEEP );
@@ -189,10 +189,10 @@ CMSCache::synchronize() {
         */
         AC_INFO << "creating request thread";
 
-
+    
         std::vector<std::pair<std::string, std::string> > myOutdatedAssets;
         collectOutdatedAssets(myOutdatedAssets);
-        _myRequestThread = RequestThreadPtr(new RequestThread(_myLocalPath, _myUsername, _myPassword,
+        _myRequestThread = RequestThreadPtr(new RequestThread(_myLocalPath, _myUsername, _myPassword, 
                     _mySessionCookie, _myUserAgent, _myProxy, myOutdatedAssets, _myMaxRequestCount,
                     _myVerboseFlag));
         // fillRequestQueue();
@@ -206,12 +206,12 @@ CMSCache::collectOutdatedAssets(std::vector<std::pair<std::string, std::string> 
     std::map<std::string, dom::NodePtr>::iterator myIter = _myAssets.begin();
     for (; myIter != _myAssets.end(); myIter++) {
         if ( isOutdated( myIter->second )) {
-            VERBOSE_PRINT << "Asset " << myIter->second->getAttributeString("path")
+            VERBOSE_PRINT << "Asset " << myIter->second->childNode("path")->childNode("#cdata-section")->nodeValue()
                      << " may be outdated.";
             myIter->second->getAttribute("status")->nodeValue("outdated");
-            theOutdatedAssets.push_back( make_pair(myIter->second->getAttributeString("path"), myIter->second->getAttributeString("uri")));
+            theOutdatedAssets.push_back( make_pair(myIter->second->childNode("path")->childNode("#cdata-section")->nodeValue(), myIter->second->childNode("uri")->childNode("#cdata-section")->nodeValue()));
         } else {
-            VERBOSE_PRINT << "Asset " << myIter->second->getAttributeString("path")
+            VERBOSE_PRINT << "Asset " << myIter->second->childNode("path")->childNode("#cdata-section")->nodeValue()
                      << " is uptodate.";
         }
     }
@@ -220,8 +220,7 @@ CMSCache::collectOutdatedAssets(std::vector<std::pair<std::string, std::string> 
 
 bool
 CMSCache::isOutdated( dom::NodePtr theAsset ) {
-    // always check by issuing a request
-    return true;
+    return !asl::fileExists(theAsset->childNode("path")->childNode("#cdata-section")->nodeValue());
 }
 
 void
@@ -229,7 +228,7 @@ CMSCache::updateDirectoryHierarchy() {
     std::map<std::string, dom::NodePtr>::iterator myIter = _myAssets.begin();
     while (myIter != _myAssets.end()) {
         std::string myPath = _myLocalPath + "/" +
-                getDirectoryPart(myIter->second->getAttributeString("path"));
+                getDirectoryPart(myIter->second->childNode("path")->childNode("#cdata-section")->nodeValue());
         if ( ! fileExists( myPath )) {
             createPath( myPath );
         }
