@@ -18,7 +18,8 @@
 //i toggles visibility of layoutImage, which can be an commandLineArgument (layoutimage=<src>)
 
 //classes using Layouter can implement hooks
-// * layouterUpdatePosition
+// * layouterUpdatePosition - for additional updates in the widget
+// * layouterSetPosition - force specific position update in widget
 // * writebackPosition
 // * layouterToggleWidget - can be used to change widget style e.g.
 
@@ -190,22 +191,26 @@ spark.Layouter.Constructor = function(Protected) {
             return;
         }
         if ("layouterUpdatePosition" in _myWidget) {
-            _myWidget.layouterUpdatePosition();
+            _myWidget.layouterUpdatePosition(_myOldPos, new Vector3f(theX, theY, theZ));
         }
-        var myRotation = _myWidget.sceneNode.globalmatrix.getRotation();
-        var myWidgetRotation = new Vector3f(radFromDeg(_myWidget.rotation.x), radFromDeg(_myWidget.rotation.y), radFromDeg(_myWidget.rotation.z));
-        myRotation = difference(myRotation, myWidgetRotation);
-        var myXOffset = theX - _myOldPos.x;
-        var myYOffset = (window.height - theY) - _myOldPos.y;
-        var myZOffset = theZ - _myOldPos.z;
-        var myMatrix = new Matrix4f();
-        myMatrix.makeTranslating(new Vector3f(myXOffset, myYOffset, myZOffset));
-        myMatrix.rotateZ(myRotation.z);
-        var myTranslation = myMatrix.getTranslation();
-        _myWidget.x += myTranslation.x;
-        _myWidget.y += myTranslation.y;
-        _myWidget.z += myTranslation.z;
-        print(_myWidget.name + " moved to x: " + _myWidget.x + " y: " + _myWidget.y + " z: " +_myWidget.z);
+        if (!("layouterSetPosition" in _myWidget)) {
+            var myRotation = _myWidget.sceneNode.globalmatrix.getRotation();
+            var myWidgetRotation = new Vector3f(radFromDeg(_myWidget.rotation.x), radFromDeg(_myWidget.rotation.y), radFromDeg(_myWidget.rotation.z));
+            myRotation = difference(myRotation, myWidgetRotation);
+            var myXOffset = theX - _myOldPos.x;
+            var myYOffset = (window.height - theY) - _myOldPos.y;
+            var myZOffset = theZ - _myOldPos.z;
+            var myMatrix = new Matrix4f();
+            myMatrix.makeTranslating(new Vector3f(myXOffset, myYOffset, myZOffset));
+            myMatrix.rotateZ(myRotation.z);
+            var myTranslation = myMatrix.getTranslation();
+            _myWidget.x += myTranslation.x;
+            _myWidget.y += myTranslation.y;
+            _myWidget.z += myTranslation.z;
+            print(_myWidget.name + " moved to x: " + _myWidget.x + " y: " + _myWidget.y + " z: " +_myWidget.z);
+        } else {
+            _myWidget.layouterSetPosition(_myOldPos, new Vector3f(theX, theY, theZ));
+        }
         _myOldPos = new Vector3f(theX, window.height - theY, theZ);
     }
     
