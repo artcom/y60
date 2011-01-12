@@ -15,6 +15,7 @@
 //s change size of widget
 //1 moves down in z direction
 //2 moves up in z direction
+//i toggles visibility of layoutImage, which can be an commandLineArgument (layoutimage=<src>)
 
 //classes using Layouter can implement hooks
 // * layouterUpdatePosition
@@ -42,6 +43,7 @@ spark.Layouter.Constructor = function(Protected) {
     var _mySparkNodes = [];
     var _mySparkFiles = [];
     var _myVisualMode = 2; // box with mesurement
+    var _myLayoutImage = null;
     const DEBUG_COLOR = new Vector4f(1,0,0,1);
     
     const IDLE = 0;
@@ -53,6 +55,16 @@ spark.Layouter.Constructor = function(Protected) {
         _myStage = findStage();
         _myStage.focusKeyboard(_myStage);
         
+        for (i in _myStage.arguments) {
+            if (i.search(/layoutimage/i) !== -1) {
+                _myLayoutImage = _myStage.arguments[i];
+                Logger.warning("found layoutimage: " + _myLayoutImage);
+                //XXX: TODO change to overlay
+                var myNode = new Node("<Image name='layoutimage' z='50' src='" + _myLayoutImage + "' visible='false' alpha='0.4' sensible='false'/>");
+                _myLayoutImage = spark.loadDocument(myNode, _myStage);
+                _myLayoutImage.sensible = false;
+            }
+        }
         Base.onKey = _myStage.onKey;
         _myStage.onKey = function(theKey, theKeyState, theX, theY,
                              theShiftFlag, theControlFlag, theAltFlag) {
@@ -82,6 +94,9 @@ spark.Layouter.Constructor = function(Protected) {
                     _myWidget.layouterToggleWidget();
                 } else if (theKey == "x") {
                     _myVisualMode = (_myVisualMode + 1)%3;
+                } else if (theKey == "i" && _myLayoutImage) {
+                    _myLayoutImage.visible = !_myLayoutImage.visible;
+                    print("layoutimage ", _myLayoutImage.visible)
                 }
             } else {
                 if(theKey.search(/ctrl/) != -1) {
@@ -209,7 +224,6 @@ spark.Layouter.Constructor = function(Protected) {
 
     function onMouseDown(theEvent) {
         if (!_myWidget) {
-            print("onMouseDown", theEvent.target)
             Public.target = theEvent.target;
             _myListeners = clone(theEvent.target.getEventListeners(spark.CursorEvent.APPEAR));
         }
