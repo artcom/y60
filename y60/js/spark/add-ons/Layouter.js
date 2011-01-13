@@ -216,8 +216,8 @@ spark.Layouter.Constructor = function(Protected) {
     
     function activate () {
         print("activate")
-        _myStage.addEventListener(spark.CursorEvent.APPEAR, onMouseDown , true);
-        _myStage.addEventListener(spark.CursorEvent.MOVE, onMouseMove, true);
+        _myStage.addEventListenerInFront(spark.CursorEvent.APPEAR, onMouseDown , true);
+        _myStage.addEventListenerInFront(spark.CursorEvent.MOVE, onMouseMove, true);
     }
     
     function deactivate() {
@@ -239,6 +239,10 @@ spark.Layouter.Constructor = function(Protected) {
         for (var i = 0; i < _myListeners.length; ++i) {
             theEvent.target.removeEventListener(spark.CursorEvent.APPEAR, _myListeners[i].listener, _myListeners[i].useCapture);
         }
+        if (!theEvent.cancelable) {
+            theEvent.cancelable = true;
+        }
+        theEvent.cancelDispatch();
         updatePosition(theEvent.stageX, theEvent.stageY, 0);
     }
 
