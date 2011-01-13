@@ -99,6 +99,8 @@ spark.Layouter.Constructor = function(Protected) {
                 } else if (theKey == "i" && _myLayoutImage) {
                     _myLayoutImage.visible = !_myLayoutImage.visible;
                     print("layoutimage ", _myLayoutImage.visible)
+                } else if (theKey == "r") { // call SceneViewer for using the ruler
+                    Base.onKey(theKey, theKeyState, theX, theY, theShiftFlag, theControlFlag, theAltFlag);
                 }
             } else {
                 if(theKey.search(/ctrl/) != -1) {
