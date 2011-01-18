@@ -75,44 +75,44 @@ GUI.ParallelAnimation.prototype.Constructor = function(Public, Protected) {
     // duration = max(map(children, duration))
     Base.childDurationChanged = Public.childDurationChanged;
     Public.childDurationChanged = function(theChild) {
-    	var d = 0;
-	    for(var i = 0; i < Public.children.length; i++) {
-	        var c = Public.children[i].duration;
-		    if(c > d) {
-				d = c;
-			}
-		}
-	    Protected.duration = d;
-	};
+        var d = 0;
+        for(var i = 0; i < Public.children.length; i++) {
+            var c = Public.children[i].duration;
+            if(c > d) {
+                d = c;
+            }
+        }
+        Protected.duration = d;
+    };
 
     // start playing all children
     Base.play = Public.play;
-	Public.play = function(theComeToAnEndFlag) {
-		Base.play();
+    Public.play = function(theComeToAnEndFlag) {
+        Base.play();
         if (!theComeToAnEndFlag) {
             for(var i = 0; i < Public.children.length; i++) {
                 Public.children[i].play();
             }
         }
-	};
+    };
 
     // step all children forward
-	Public.doFrame = function(theTime)	{
-		var notFinished = false;
-		for(var i = 0; i < Public.children.length; i++) {
-			if(Public.children[i].running) {
-				Public.children[i].doFrame(theTime);
+    Public.doFrame = function(theTime)  {
+        var notFinished = false;
+        for(var i = 0; i < Public.children.length; i++) {
+            if(Public.children[i].running) {
+                Public.children[i].doFrame(theTime);
                 notFinished |= Public.children[i].running;
-			}
-		}
+            }
+        }
 
-		if(!notFinished) {
-			Public.finish();
-		}
-	};
+        if(!notFinished) {
+            Public.finish();
+        }
+    };
 
-	Public.toString = function() {
-		return "ParallelAnimation";
-	};
+    Public.toString = function() {
+        return "ParallelAnimation";
+    };
 
 };

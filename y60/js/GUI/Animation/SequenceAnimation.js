@@ -81,19 +81,19 @@ GUI.SequenceAnimation.prototype.Constructor = function(Public, Protected) {
     // duration = sum(map(children, duration))
     Base.childDurationChanged = Public.childDurationChanged;
     Public.childDurationChanged = function() {
-		var d = 0.0;
-	    for(var i = 0; i < Public.children.length; i++) {
-				d += Public.children[i].duration;
-			}
-		Protected.duration = d;
-	};
+        var d = 0.0;
+        for(var i = 0; i < Public.children.length; i++) {
+                d += Public.children[i].duration;
+            }
+        Protected.duration = d;
+    };
 
     // start to play this animation
     // plays the first animation
     Base.play = Public.play;
-	Public.play = function(theComeToAnEndFlag)
-	{
-	    Base.play();
+    Public.play = function(theComeToAnEndFlag)
+    {
+        Base.play();
         if(!theComeToAnEndFlag) {
             _current = 0;
             if(Public.children.length >= 1) {
@@ -107,19 +107,19 @@ GUI.SequenceAnimation.prototype.Constructor = function(Public, Protected) {
         if (_current >= Public.children.length) {
             return;
         }
-	    Public.children[_current].doFrame(theTime);
-	    if(!Public.children[_current].running) {
-			_current++;
-			if(_current < Public.children.length) {
-				Public.children[_current].play();
-			} else {
-				Public.finish();
-			}
-		}
-	};
+        Public.children[_current].doFrame(theTime);
+        if(!Public.children[_current].running) {
+            _current++;
+            if(_current < Public.children.length) {
+                Public.children[_current].play();
+            } else {
+                Public.finish();
+            }
+        }
+    };
 
-	Public.toString = function() {
-		return Protected.standardToString("SequenceAnimation");
-	};
+    Public.toString = function() {
+        return Protected.standardToString("SequenceAnimation");
+    };
 
 };

@@ -80,13 +80,13 @@ GUI.ClosureAnimation.prototype.Constructor = function(Public, Protected, theDura
 
     // initialize from arguments
     Public.setup = function() {
-		Protected.duration = theDuration;
+        Protected.duration = theDuration;
 
-		if(theEasing != null) {
-			Public.easing = theEasing;
-		}
+        if(theEasing != null) {
+            Public.easing = theEasing;
+        }
 
-		Public.func = theFunction;
+        Public.func = theFunction;
     };
 
     // call the closure with the current progress value
@@ -95,11 +95,11 @@ GUI.ClosureAnimation.prototype.Constructor = function(Public, Protected, theDura
         if(Public.func != null) {
             Public.func(Public.progress);
         }
-	};
+    };
 
-	Public.toString = function() {
-		return "ClosureAnimation" + Public.func;
-	};
+    Public.toString = function() {
+        return "ClosureAnimation" + Public.func;
+    };
 
     Public.setup();
 };

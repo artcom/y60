@@ -81,23 +81,23 @@ GUI.AnimationManager.prototype.Constructor = function(Public, Protected) {
     ////////////////////////////////////////
 
     Public.play = function(a) {
-		_animations.push(a);
-	    a.play();
-	};
+        _animations.push(a);
+        a.play();
+    };
 
     Public.isPlaying = function() {
-		return _animations.length > 0;
-	};
+        return _animations.length > 0;
+    };
 
     Public.doFrame = function(theTime) {
         ourCurrentAnimationTime = theTime * 1000;
         for(var i = 0; i < _animations.length; i++) {
-	        var a = _animations[i];
-		    if(a.running) {
-		        a.doFrame(theTime * 1000);
-		    }
-		}
-	    removeFinished();
+            var a = _animations[i];
+            if(a.running) {
+                a.doFrame(theTime * 1000);
+            }
+        }
+        removeFinished();
     };
 
     ////////////////////////////////////////
@@ -106,11 +106,11 @@ GUI.AnimationManager.prototype.Constructor = function(Public, Protected) {
 
     function removeFinished() {
         for(var i = 0; i < _animations.length; i++) {
-			var a = _animations[i];
-		    if(!a.running) {
-				_animations.splice(i, 1);
-			}
-		}
-	};
+            var a = _animations[i];
+            if(!a.running) {
+                _animations.splice(i, 1);
+            }
+        }
+    };
 
 };

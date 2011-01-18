@@ -78,14 +78,14 @@ GUI.CompositeAnimation.Constructor = function(Public, Protected) {
 
     Public.children getter = function() {
         return [].concat(_children);
-	};
+    };
 
     // add a child, also updating duration
     Public.add = function(theAnimation) {
-		_children.push(theAnimation);
+        _children.push(theAnimation);
         theAnimation.parent = Public;
-		Public.childDurationChanged();
-	};
+        Public.childDurationChanged();
+    };
 
     // duration computation, should be overridden
     Public.childDurationChanged = function(theChild) {
@@ -94,12 +94,12 @@ GUI.CompositeAnimation.Constructor = function(Public, Protected) {
     // generic cancel
     Base.cancel = Public.cancel;
     Public.cancel = function() {
-		for(var i = 0; i < _children.length; i++) {
-			if(_children[i].running) {
-				_children[i].cancel();
-			}
-		}
-	    Base.cancel();
+        for(var i = 0; i < _children.length; i++) {
+            if(_children[i].running) {
+                _children[i].cancel();
+            }
+        }
+        Base.cancel();
     };
 
     // generic finish
@@ -112,15 +112,15 @@ GUI.CompositeAnimation.Constructor = function(Public, Protected) {
                 }
             }
         }
-	    Base.finish();
-	};
+        Base.finish();
+    };
 
     // generic comeToAnEnd
     Base.comeToAnEnd = Public.comeToAnEnd;
     Public.comeToAnEnd = function(){
-		for(var i = 0; i < _children.length; i++) {
-			_children[i].comeToAnEnd();
-		}
-	    Base.comeToAnEnd();
-	};
+        for(var i = 0; i < _children.length; i++) {
+            _children[i].comeToAnEnd();
+        }
+        Base.comeToAnEnd();
+    };
 };
