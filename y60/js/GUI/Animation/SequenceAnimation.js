@@ -93,13 +93,13 @@ GUI.SequenceAnimation.prototype.Constructor = function(Public, Protected) {
     Base.play = Public.play;
 	Public.play = function(theComeToAnEndFlag)
 	{
+	    Base.play();
         if(!theComeToAnEndFlag) {
             _current = 0;
             if(Public.children.length >= 1) {
                 Public.children[_current].play();
             }
         }
-	    Base.play();
     };
 
     // iterate through child animations
