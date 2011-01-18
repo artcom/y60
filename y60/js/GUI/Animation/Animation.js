@@ -229,6 +229,9 @@ GUI.Animation.Constructor = function(Public, Protected) {
             Public.play(true);
     	    Public.render();
         }
+        _progressTime = _duration;
+        _progress = 1.0;
+        Public.render();
 		Public.finish(true);
 
 	};
