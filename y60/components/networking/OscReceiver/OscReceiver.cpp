@@ -111,13 +111,12 @@ namespace y60 {
             _myCurrentY60Events.push_back(createY60Event(_myNewMessages.front()));
             _myNewMessages.pop_front();
         }
-
         return _myCurrentY60Events;
     }
 
     void OscReceiver::start(){
         if (!_myOscReceiverSocket) {
-            AC_WARNING << "Sorry, no osc receiver port settet, use the 'port'-propperty to do so.";
+            AC_WARNING << "Sorry, no osc receiver port set, use the 'port'-property to do so.";
         }
         AC_DEBUG << "start listening for osc events";
         fork();
