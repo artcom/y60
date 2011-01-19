@@ -91,8 +91,7 @@ GUI.SequenceAnimation.prototype.Constructor = function(Public, Protected) {
     // start to play this animation
     // plays the first animation
     Base.play = Public.play;
-    Public.play = function(theComeToAnEndFlag)
-    {
+    Public.play = function(theComeToAnEndFlag) {
         Base.play();
         if(!theComeToAnEndFlag) {
             _current = 0;

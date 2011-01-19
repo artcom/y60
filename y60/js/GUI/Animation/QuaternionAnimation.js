@@ -121,7 +121,7 @@ GUI.QuaternionAnimation.prototype.Constructor = function(Public, Protected, theD
     };
 
     Public.toString = function() {
-        return "QuaternionAnimation" + " on "  + _object.name + "." + _property;
+        return Protected.standardToString("QuaternionAnimation" + " on "  + _object.name + "." + _property);
     };
 
     Public.setup();

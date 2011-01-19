@@ -112,7 +112,7 @@ GUI.ParallelAnimation.prototype.Constructor = function(Public, Protected) {
     };
 
     Public.toString = function() {
-        return "ParallelAnimation";
+        return Protected.standardToString("ParallelAnimation");
     };
 
 };

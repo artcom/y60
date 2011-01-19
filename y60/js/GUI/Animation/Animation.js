@@ -70,7 +70,7 @@ GUI.Animation.Constructor = function(Public, Protected) {
     // Member
     ////////////////////////////////////////
 
-    var _id = Animation.idCounter++;
+    var _id = GUI.Animation.idCounter++;
     var _name = null;
 
     var _parent = null;

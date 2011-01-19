@@ -84,7 +84,7 @@ GUI.DelayAnimation.prototype.Constructor = function(Public, Protected, theDurati
     };
 
     Public.toString = function() {
-        return "DelayAnimation";
+        return Protected.standardToString("DelayAnimation");
     };
 
     Public.setup();

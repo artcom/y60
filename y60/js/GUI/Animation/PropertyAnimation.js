@@ -124,7 +124,7 @@ GUI.PropertyAnimation.prototype.Constructor = function(Public, Protected, theDur
     };
 
     Public.toString = function() {
-        return "PropertyAnimation" + " on "  + _object.name + "." + _property;
+        return Protected.standardToString("PropertyAnimation" + " on "  + _object.name + "." + _property);
     };
 
     Public.setup();

@@ -127,7 +127,7 @@ GUI.RotationAnimation.prototype.Constructor = function(Public, Protected, theDur
     };
 
     Public.toString = function() {
-        return "RotationAnimation" + " on "  + _object.name + "." + _property;
+        return Protected.standardToString("RotationAnimation" + " on "  + _object.name + "." + _property);
     };
 
     Public.setup();

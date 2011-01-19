@@ -121,7 +121,7 @@ GUI.VectorAnimation.prototype.Constructor = function(Public, Protected, theDurat
     };
 
     Public.toString = function() {
-        return "VectorAnimation" + " on "  + _object.name + "." + _property;
+        return Protected.standardToString("VectorAnimation" + " on "  + _object.name + "." + _property);
     };
 
     Public.setup();
