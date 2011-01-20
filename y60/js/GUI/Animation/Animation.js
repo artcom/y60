@@ -191,7 +191,7 @@ GUI.Animation.Constructor = function(Public, Protected) {
     ////////////////////////////////////////
 
     Public.play = function() {
-        Logger.debug("Playing " + this);
+        Logger.debug("Playing " + Public);
         _startTime = ourCurrentAnimationTime;
         _progressTime = 0;
         _progress = _easing(0.0);
@@ -204,13 +204,13 @@ GUI.Animation.Constructor = function(Public, Protected) {
     };
 
     Public.cancel = function() {
-        Logger.debug("Cancelled " + this);
+        Logger.debug("Cancelled " + Public);
         _running = false;
         callOnCancel();
     };
 
     Public.finish = function() {
-        Logger.debug("Finished " + this);
+        Logger.debug("Finished " + Public);
         callOnFinish();
         if(_loop) {
             Public.play();
@@ -221,7 +221,7 @@ GUI.Animation.Constructor = function(Public, Protected) {
     };
 
     Public.comeToAnEnd = function() {
-        Logger.debug("comeToAnEnd " + Public.name);
+        Logger.debug("comeToAnEnd " + Public);
         if (_finished) {
             return;
         }
@@ -275,7 +275,7 @@ GUI.Animation.Constructor = function(Public, Protected) {
     };
 
     Protected.standardToString = function(cls) {
-        return cls + " " + Public.path + ((Public.name != null) ? (" (" + Public.name + ") ") : "");
+        return cls + " " + Public.path + ((Public.name != null) ? (" (" + Public.name + ") ") : "") + " running: " + _running;
     };
 
     ////////////////////////////////////////
