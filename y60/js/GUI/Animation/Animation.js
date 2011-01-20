@@ -206,34 +206,19 @@ GUI.Animation.Constructor = function(Public, Protected) {
     Public.cancel = function() {
         Logger.debug("Cancelled " + Public);
         _running = false;
+        _finished = false;
         callOnCancel();
     };
 
     Public.finish = function() {
-        Logger.debug("Finished " + Public);
-        callOnFinish();
-        if(_loop) {
-            Public.play();
-        } else {
-            _running = false;
-            _finished = true;
-        }
-    };
-
-    Public.comeToAnEnd = function() {
-        Logger.debug("comeToAnEnd " + Public);
+        Logger.debug("force finish of " + Public);
         if (_finished) {
             return;
         }
         if (!_running) {
             Public.play(true);
-            Public.render();
         }
-        _progressTime = _duration;
-        _progress = 1.0;
-        Public.render();
-        Public.finish(true);
-
+        Protected.finish();
     };
 
     Public.doFrame = function(theTime) {
@@ -245,15 +230,10 @@ GUI.Animation.Constructor = function(Public, Protected) {
 
         var finished = (_progressTime >= _duration);
 
-        if(finished) {
-            _progressTime = _duration;
-            _progress = 1.0;
-        }
-
-        Public.render();
-
-        if(finished) {
-            Public.finish();
+        if (finished) {
+            Protected.finish();
+        } else {
+            Public.render();
         }
     };
 
@@ -267,6 +247,20 @@ GUI.Animation.Constructor = function(Public, Protected) {
     ////////////////////////////////////////
     // Protected
     ////////////////////////////////////////
+
+    Protected.finish = function() {
+        Logger.debug("Finished " + Public);
+        _progressTime = _duration;
+        _progress = 1.0;
+        Public.render();
+        callOnFinish();
+        if(_loop) {
+            Public.play();
+        } else {
+            _running = false;
+            _finished = true;
+        }
+    };
 
     Protected.durationChanged = function() {
         if(_parent) {

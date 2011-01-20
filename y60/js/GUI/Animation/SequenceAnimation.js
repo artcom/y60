@@ -112,7 +112,7 @@ GUI.SequenceAnimation.prototype.Constructor = function(Public, Protected) {
             if(_current < Public.children.length) {
                 Public.children[_current].play();
             } else {
-                Public.finish();
+                Protected.finish();
             }
         }
     };
