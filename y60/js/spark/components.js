@@ -398,7 +398,7 @@ spark.Container.Constructor = function (Protected) {
         var i = _myChildren.length, myChild;
         while (i--) {
             myChild = _myChildren[i];
-            if (myChild.name === theName) {
+            if (myChild.name === theName.toString()) {
                 return myChild;
             }
         }
