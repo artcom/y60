@@ -107,7 +107,7 @@ GUI.ParallelAnimation.prototype.Constructor = function(Public, Protected) {
         }
 
         if(!notFinished) {
-            Public.finish();
+            Protected.finish();
         }
     };
 

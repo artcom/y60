@@ -155,8 +155,8 @@ spark.Layouter.Constructor = function(Protected) {
         print("target widget", theWidget)
         _myWidget = theWidget;
         _myBackup.originalZ = _myWidget.z;
-        _myBackup.originalWidth = _myWidget.width;
-        _myBackup.originalHeight = _myWidget.height;
+        _myBackup.originalWidth = ("width" in _myWidget) ? _myWidget.width : null;
+        _myBackup.originalHeight = ("height" in _myWidget) ? _myWidget.height : null;
         _myState = ACTIVE;
         _myOldPos = null;
         if (!(_myWidget.name in _mySparkFiles)) {
@@ -333,10 +333,10 @@ spark.Layouter.Constructor = function(Protected) {
                     if (_myWidget.z !== _myBackup.originalZ) {
                         myNode.z = Math.round(_myWidget.z);
                     }
-                    if (_myWidget.width && _myWidget.width !== _myBackup.originalWidth) {
+                    if ("width" in _myWidget && _myWidget.width && _myWidget.width !== _myBackup.originalWidth) {
                         myNode.width = Math.round(_myWidget.width);
                     }
-                    if (_myWidget.height && _myWidget.height !== _myBackup.originalHeight) {
+                    if ("height" in _myWidget && _myWidget.height && _myWidget.height !== _myBackup.originalHeight) {
                         myNode.height = Math.round(_myWidget.height);
                     }
                     _myCurrentSparkNode.saveFile(_myCurrentSparkFile);
