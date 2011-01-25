@@ -190,7 +190,7 @@ spark.I18nItem.Constructor = function (Protected) {
 
     Public.hasLanguageData = function (theLanguage) {
         return theLanguage in _myLanguageData;
-    }
+    };
     
     Public.getLanguageNode = function(theLanguage) {
         if(!theLanguage) {
@@ -211,8 +211,7 @@ spark.I18nItem.Constructor = function (Protected) {
     
     Public.hasLanguageNode = function(theLanguage) {
         return theLanguage in _myLanguageNodes;
-    }
-
+    };
 
     Public.switchLanguage = function (theLanguage) {
         if (theLanguage == _myLanguage) {
@@ -274,7 +273,7 @@ spark.I18nText.Constructor = function (Protected) {
 
     Public.__defineGetter__("text", function () {
         var myData = Public.getLanguageData(Public.language);
-        if (myData == null) {
+        if (myData === null) {
             return "";
         } else {
             return myData;
@@ -306,7 +305,7 @@ spark.I18nImage.Constructor = function (Protected) {
 
     Public.__defineGetter__("src", function () {
         var myData = Public.getLanguageData(Public.language);
-        if (myData == null) {
+        if (myData === null) {
             return "";
         } else {
             return myData;
@@ -333,7 +332,7 @@ spark.I18nMovie.Constructor = function (Protected) {
 
     Public.__defineGetter__("src", function () {
         var myData = Public.getLanguageData(Public.language);
-        if (myData == null) {
+        if (myData === null) {
             return "";
         } else {
             return myData;

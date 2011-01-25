@@ -95,7 +95,8 @@ spark.StretchyImage.Constructor = function (Protected) {
         _myShapeStretcher.crop.bottom = theEdges[1];
         _myShapeStretcher.crop.right  = theEdges[2];
         _myShapeStretcher.crop.top    = theEdges[3];
-        _reset();
+        _myShapeStretcher.updateGeometry(_myImageSize, true, Public.origin);
+        _myShapeStretcher.updateGeometry(Public.size, false, Public.origin);
     });
 
     Base.realize = Public.realize;
