@@ -578,6 +578,33 @@ CreateTriangleStrip(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsv
     return CreateStrip(PrimitiveTypeStrings[TRIANGLE_STRIP], cx, obj, argc, argv, rval);
 }
 
+JS_STATIC_DLL_CALLBACK(JSBool)
+CreateTriangles(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval)
+{
+    DOC_BEGIN("Create a shape from a list of triangle points");
+    DOC_PARAM("theScene", "The scene to create the strip in", DOC_TYPE_SCENE);
+    DOC_PARAM("theMaterialId", "Shape material id.", DOC_TYPE_STRING);
+    DOC_PARAM("thePositions", "Array of positions", DOC_TYPE_VECTOROFVECTOR3F);
+    DOC_PARAM_OPT("theTexCoords", "Texture Coordinates", DOC_TYPE_VECTOROFVECTOR2F, "");
+    DOC_PARAM_OPT("theColors", "Vertexcolors", DOC_TYPE_VECTOROFVECTOR4F, "");
+    DOC_RVAL("The new created triangles shape", DOC_TYPE_NODE);
+    DOC_END;
+    return CreateStrip(PrimitiveTypeStrings[TRIANGLES], cx, obj, argc, argv, rval);
+}
+
+JS_STATIC_DLL_CALLBACK(JSBool)
+CreateQuads(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval)
+{
+    DOC_BEGIN("Create a shape from a list of quad points");
+    DOC_PARAM("theScene", "The scene to create the strip in", DOC_TYPE_SCENE);
+    DOC_PARAM("theMaterialId", "Shape material id.", DOC_TYPE_STRING);
+    DOC_PARAM("thePositions", "Array of positions", DOC_TYPE_VECTOROFVECTOR3F);
+    DOC_PARAM_OPT("theTexCoords", "Texture Coordinates", DOC_TYPE_VECTOROFVECTOR2F, "");
+    DOC_PARAM_OPT("theColors", "Vertexcolors", DOC_TYPE_VECTOROFVECTOR4F, "");
+    DOC_RVAL("The new created quads strip shape", DOC_TYPE_NODE);
+    DOC_END;
+    return CreateStrip(PrimitiveTypeStrings[QUADS], cx, obj, argc, argv, rval);
+}
 
 JS_STATIC_DLL_CALLBACK(JSBool)
 CreateTriangleMeshMarkup(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) {
@@ -1308,6 +1335,8 @@ JSModellingFunctions::StaticFunctions() {
         {"createLineStrip",             CreateLineStrip,             4},
         {"createQuadStrip",             CreateQuadStrip,             4},
         {"createTriangleStrip",         CreateTriangleStrip,         4},
+        {"createTriangles",             CreateTriangles,             4},
+        {"createQuads",                 CreateQuads,                 4},
         {"createQuadStack",             CreateQuadStack,             5},
         {"createTexture",               CreateTexture,               2},
         {"createImage",                 CreateImage,                 4},
