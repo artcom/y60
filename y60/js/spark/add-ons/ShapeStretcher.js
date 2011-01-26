@@ -104,30 +104,30 @@ ShapeStretcher.prototype.Constructor = function (Public, theShape, theOptions) {
                     myX = -myOrigin.x;
                     myCropX = _myCrop.left;
                 } else if (j === _myVerticesPerSide.x - 3) {
-                    myX = clamp(-myOrigin.x + _myEdges.left +
+                    myX = -myOrigin.x + clamp(_myEdges.left +
                           ShapeStretcher.applyEdgeFilteringOffset(_myEdges.left),0,myWidth);
                     myCropX = _myCrop.left;
                 } else if (j === _myVerticesPerSide.x - 2) {
-                    myX = clamp(myWidth - myOrigin.x - _myEdges.right -
+                    myX = -myOrigin.x + clamp(myWidth - _myEdges.right -
                           ShapeStretcher.applyEdgeFilteringOffset(_myEdges.right),Math.min(_myEdges.left,myWidth),myWidth);
                     myCropX = -_myCrop.right;
                 } else if (j === _myVerticesPerSide.x - 1) {
-                    myX = clamp(myWidth - myOrigin.x,Math.min(_myEdges.left,myWidth),myWidth);
+                    myX = -myOrigin.x + clamp(myWidth,Math.min(_myEdges.left,myWidth),myWidth);
                     myCropX = -_myCrop.right;
                 }
                 if (i === 0) {
                     myY = -myOrigin.y;
                     myCropY = _myCrop.bottom;
                 } else if (i === _myVerticesPerSide.y - 3) {
-                    myY = clamp(-myOrigin.y + _myEdges.bottom +
+                    myY = -myOrigin.y + clamp(_myEdges.bottom +
                           ShapeStretcher.applyEdgeFilteringOffset(_myEdges.bottom),0,myHeight);
                     myCropY = _myCrop.bottom;
                 } else if (i === _myVerticesPerSide.y - 2) {
-                    myY = clamp(myHeight - myOrigin.y - _myEdges.top -
+                    myY = -myOrigin.y + clamp(myHeight - _myEdges.top -
                           ShapeStretcher.applyEdgeFilteringOffset(_myEdges.top),Math.min(_myEdges.bottom,myHeight),myHeight);
                     myCropY = -_myCrop.top;
                 } else if (i === _myVerticesPerSide.y - 1) {
-                    myY = clamp(myHeight - myOrigin.y,Math.min(_myEdges.bottom,myHeight),myHeight);
+                    myY = -myOrigin.y + clamp(myHeight,Math.min(_myEdges.bottom,myHeight),myHeight);
                     myCropY = -_myCrop.top;
                 }
                 _myVertices[v] = [myX, myY, 0];
