@@ -14,6 +14,7 @@
             <xs:attribute name="start_time" type="xs:double"/>
             <xs:attribute name="value_time" type="xs:double"/>
             <xs:attribute name="position" type="Vector2f"/>
+            <xs:attribute name="toucharea" type="Vector2f"/>
             <xs:attribute name="velocity" type="Vector2f"/>
             <xs:attribute name="speed" type="xs:double"/>
             <xs:attribute name="acceleration" type="xs:double"/>
