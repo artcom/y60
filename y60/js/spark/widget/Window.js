@@ -101,15 +101,15 @@ spark.Window.Constructor = function (Protected, theArguments) {
             myPosition = new Point2f(theEvent.position3D.x, theEvent.position3D.y);
             break;
         case "onTuioEvent":
-            myPosition = new Point2f(theEvent.position.x * (theEvent.toucharea.x > 0) ? theEvent.toucharea.x : Public.width,
-                                     theEvent.position.y * (theEvent.toucharea.y > 0) ? theEvent.toucharea.y : Public.height);
+            myPosition = new Point2f(theEvent.position.x * ((theEvent.toucharea.x > 0) ? theEvent.toucharea.x : Public.width),
+                                     theEvent.position.y * ((theEvent.toucharea.y > 0) ? theEvent.toucharea.y : Public.height));
             break;
         case "onGesture":
             if (theEvent.baseeventtype == ASS_BASE_EVENT) {
                 myPosition = new Point2f(theEvent.position3D.x, theEvent.position3D.y);
             } else {
-                myPosition = new Point2f(theEvent.position3D.x * (theEvent.toucharea.x > 0) ? theEvent.toucharea.x : Public.width,
-                                         theEvent.position3D.y * (theEvent.toucharea.y > 0) ? theEvent.toucharea.y : Public.height);
+                myPosition = new Point2f(theEvent.position3D.x * ((theEvent.toucharea.x > 0) ? theEvent.toucharea.x : Public.width),
+                                         theEvent.position3D.y * ((theEvent.toucharea.y > 0) ? theEvent.toucharea.y : Public.height));
             }
             break;
         default:
