@@ -134,15 +134,11 @@ spark.Canvas.Constructor = function (Protected) {
     
     function applyWidth(theWidth, theBaseSetter) {
         theBaseSetter(theWidth);
-        _myCamera.frustum.width = theWidth;
-        _myCamera.position.x = theWidth/2;
         _myImage.raster.resize(theWidth, getImageSize(_myImage).y);
     }
 
     function applyHeight(theHeight, theBaseSetter) {
         theBaseSetter(theHeight);
-        _myCamera.frustum.height = theHeight;
-        _myCamera.position.y = theHeight/2;
         _myImage.raster.resize(getImageSize(_myImage).x, theHeight);
     }
 
