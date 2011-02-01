@@ -209,6 +209,7 @@ SceneViewer.prototype.Constructor = function (self, theArguments) {
         print("    s          print statistic");
         print("    S          save scene to file");
         print("    B          save scene to binary file");
+        print("    O          save scene to d60 file");
         print("    q          quits the application");
         print("    X          dumps scene on console");
         print("    P          prints a list of all nodes that have changed since last print");
@@ -473,7 +474,7 @@ SceneViewer.prototype.Constructor = function (self, theArguments) {
                 self.getScene().save("saved_scene.b60", true);
                 print("Saved scene to: saved_scene.b60");
                 break;
-            case 'D':
+            case 'O':
                 self.getScene().saveWithCatalog("saved_scene.d60", "saved_scene.d60", true);
                 print("Saved scene and catalog to: saved_scene.d60");
                 break;
