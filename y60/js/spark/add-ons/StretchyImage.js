@@ -102,16 +102,19 @@ spark.StretchyImage.Constructor = function (Protected) {
     Base.realize = Public.realize;
     Public.realize = function () {
         Base.realize();
-        
+        var myEdges = Protected.getArray("edges", [0,0,0,0]); 
+        var myCrops = Protected.getArray("crops", [0,0,0,0]); 
         _myShapeStretcher = new ShapeStretcher(Protected.shape, {
-            edges : {'top'    : Protected.getNumber("edgeTop",    0),
-                     'left'   : Protected.getNumber("edgeLeft",   0),
-                     'bottom' : Protected.getNumber("edgeBottom", 0),
-                     'right'  : Protected.getNumber("edgeRight",  0)},
-            crop  : {'top'    : Protected.getNumber("cropTop",    0),
-                     'left'   : Protected.getNumber("cropLeft",   0),
-                     'bottom' : Protected.getNumber("cropBottom", 0),
-                     'right'  : Protected.getNumber("cropRight",  0)},
+            edges : {'left'   : Protected.getNumber("edgeLeft",   parseInt(myEdges[0], 10)),
+                     'bottom' : Protected.getNumber("edgeBottom", parseInt(myEdges[1], 10)),
+                     'right'  : Protected.getNumber("edgeRight",  parseInt(myEdges[2], 10)),
+                     'top'    : Protected.getNumber("edgeTop",    parseInt(myEdges[3], 10))},
+
+            crop  : {'left'   : Protected.getNumber("cropLeft",   parseInt(myCrops[0], 10)),
+                     'bottom' : Protected.getNumber("cropBottom", parseInt(myCrops[1], 10)),
+                     'right'  : Protected.getNumber("cropRight",  parseInt(myCrops[2], 10)),
+                     'top'    : Protected.getNumber("cropTop",    parseInt(myCrops[3], 10))},
+
             quadsPerSide : new Vector2i(Protected.getNumber("quadsPerSideX", 3),
                                         Protected.getNumber("quadsPerSideY", 3))
         });
