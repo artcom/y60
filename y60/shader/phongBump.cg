@@ -111,8 +111,7 @@ float4 mainFragment(vert2frag IN,
      * positional light
      */
     for (int i = 0; i < AC_POSITIONAL_LIGHTS.length; ++i) {
-
-        L = mul(TBN, AC_POSITIONAL_LIGHTS[i] - P);
+        L = normalize(mul(TBN, AC_POSITIONAL_LIGHTS[i] - P));
         diffuseTerm = saturate(dot(L, N));
         myColor.rgb += diffuse.rgb * AC_POSITIONAL_LIGHTS_DIFFUSE_COLOR[i] * diffuseTerm;
 
