@@ -97,22 +97,9 @@ spark.StretchyAtlasImage.Constructor = function (Protected) {
     Base.realize = Public.realize;
     Public.realize = function () {
         Base.realize();
-        var myEdges = Protected.getArray("edges", [0,0,0,0]);
-        var myCrops = Protected.getArray("crops", [0,0,0,0]);
-        _myShapeStretcher = new ShapeStretcher(Protected.shape, {
-            edges : {'left'   : Protected.getNumber("edgeLeft",   parseInt(myEdges[0], 10)),
-                     'bottom' : Protected.getNumber("edgeBottom", parseInt(myEdges[1], 10)),
-                     'right'  : Protected.getNumber("edgeRight",  parseInt(myEdges[2], 10)),
-                     'top'    : Protected.getNumber("edgeTop",    parseInt(myEdges[3], 10))},
-
-            crop  : {'left'   : Protected.getNumber("cropLeft",   parseInt(myCrops[0], 10)),
-                     'bottom' : Protected.getNumber("cropBottom", parseInt(myCrops[1], 10)),
-                     'right'  : Protected.getNumber("cropRight",  parseInt(myCrops[2], 10)),
-                     'top'    : Protected.getNumber("cropTop",    parseInt(myCrops[3], 10))},
-
-            quadsPerSide : new Vector2i(Protected.getNumber("quadsPerSideX", 3),
-                                        Protected.getNumber("quadsPerSideY", 3))
-        });
+        var myShapeStretcherCtor = spark.ShapeStretcher.Factory.getShapeStretcherFromAttribute(
+                Protected.getString("shapeStretcher", "default"));
+        _myShapeStretcher = new myShapeStretcherCtor(Protected.shape);
         
         Base.imageSetter = Public.__lookupSetter__("image");
         Public.__defineSetter__("image", function (theImage) {
@@ -132,7 +119,7 @@ spark.StretchyAtlasImage.Constructor = function (Protected) {
             _myShapeStretcher.updateGeometry(new Vector2f(Public.width, theHeight), false, Public.origin);
         });
 
-        _myShapeStretcher.initialize();
+        _myShapeStretcher.initialize(Public.node);
         _reset();
     };
     

@@ -1,23 +1,55 @@
-/*jslint nomen:false plusplus:false*/
-/*globals Vector4f, Vector2i, Exception, Vector2f, Logger*/
+//=============================================================================
+// Copyright (C) 2011, ART+COM AG Berlin
+//
+// These coded instructions, statements, and computer programs contain
+// unpublished proprietary information of ART+COM AG Berlin, and
+// are copy protected by law. They may not be disclosed to third parties
+// or copied or duplicated in any form, in whole or in part, without the
+// specific, prior written permission of ART+COM AG Berlin.
+//=============================================================================
 
-function ShapeStretcher(theShape, theOptions) {
-    this.Constructor(this, theShape, theOptions);
-}
+/*jslint nomen:false plusplus:false*/
+/*globals Vector4f, Vector2i, Exception, Vector2f, Logger, clamp*/
+
+spark.ShapeStretcher = spark.AbstractClass("ShapeStretcher");
 
 /////////////
 // Statics //
 /////////////
 
-ShapeStretcher.DEFAULT_QUADS_PER_SIDE = new Vector2i(3, 3);
-ShapeStretcher.APPLY_EDGE_FILTERING_OFFSET_FLAG = true;
+spark.ShapeStretcher.Factory = (function () {
+        var _myFactory = {};
+        this.registerShapeStretcher = function (theStretcherName, theCtor) {
+            if (theStretcherName in _myFactory) {
+                Logger.warning("overwriting previously registered shapestretcher " + theStretcherName);
+            }
+            Logger.info("registering shapestretcher with name '" + theStretcherName + "'");
+            _myFactory[theStretcherName] = theCtor;
+        };
 
-ShapeStretcher.applyEdgeFilteringOffset = function (theEdgeAmount) {
-    return (!ShapeStretcher.APPLY_EDGE_FILTERING_OFFSET_FLAG || theEdgeAmount < 0) ? 0 : 1;
+        this.getShapeStretcherFromAttribute = function (theStretcherName) {
+            Logger.info("lookup shapestretcher with name '" + theStretcherName + "'");
+            if (theStretcherName in _myFactory) {
+                return _myFactory[theStretcherName];
+            } else {
+                return _myFactory['default'];
+            }
+        };
+        return this;
+}());
+
+spark.ShapeStretcher.DEFAULT_QUADS_PER_SIDE = new Vector2i(1, 1);
+spark.ShapeStretcher.APPLY_EDGE_FILTERING_OFFSET_FLAG = true;
+
+spark.ShapeStretcher.applyEdgeFilteringOffset = function (theEdgeAmount) {
+    return (!spark.ShapeStretcher.APPLY_EDGE_FILTERING_OFFSET_FLAG || theEdgeAmount < 0) ? 0 : 1;
 };
 
-ShapeStretcher.prototype.Constructor = function (Public, theShape, theOptions) {
+spark.ShapeStretcher.Constructor = function (Protected, theShape) {
     
+    var Public = this;
+    var Base   = {};
+    Public.Inherit(spark.Component);
     ////////////////
     // Validation //
     ////////////////
@@ -34,54 +66,53 @@ ShapeStretcher.prototype.Constructor = function (Public, theShape, theOptions) {
     var _myVertices   = _myShape.find(".//*[@name='position']").firstChild.nodeValue;
     var _myUVCoords   = null;
     
-    var _myEdges = null;
-    if (theOptions && "edges" in theOptions) {
-        _myEdges = theOptions.edges;
-    } else {
-        _myEdges = {'top'    : 0,
-                    'left'   : 0,
-                    'bottom' : 0,
-                    'right'  : 0};
-    }
-    
     var _myCrop  = null;
-    if (theOptions && "crop" in theOptions) {
-        _myCrop = theOptions.crop;
-    } else {
-        _myCrop = {'top'    : 0,
-                   'left'   : 0,
-                   'bottom' : 0,
-                   'right'  : 0};
-    }
-    
+    var _myEdges = null;
     var _myQuadsPerSide = null;
-    if (theOptions && "quadsPerSide" in theOptions) {
-        // TODO check that quadsPerSide are odd. Even quadsPerSide is possible but
-        // it is not entirely clear from which "direction" the stretching is applied
-        _myQuadsPerSide = theOptions.quadsPerSide;
-    } else {
-        _myQuadsPerSide = ShapeStretcher.DEFAULT_QUADS_PER_SIDE.clone();
+    var _myVerticesPerSide = null;
+    var _myNumVertices     = null;
+    var _myNumQuads        = null;
+    
+    function parseOptions(theOptions) {
+        if (theOptions && "edges" in theOptions) {
+            _myEdges = theOptions.edges;
+        } else {
+            _myEdges = {'top'    : 0,
+                        'left'   : 0,
+                        'bottom' : 0,
+                        'right'  : 0};
+        }
+        
+        if (theOptions && "crop" in theOptions) {
+            _myCrop = theOptions.crop;
+        } else {
+            _myCrop = {'top'    : 0,
+                       'left'   : 0,
+                       'bottom' : 0,
+                       'right'  : 0};
+        }
+        
+        if (theOptions && "quadsPerSide" in theOptions) {
+            // TODO check that quadsPerSide are odd. Even quadsPerSide is possible but
+            // it is not entirely clear from which "direction" the stretching is applied
+            _myQuadsPerSide = theOptions.quadsPerSide;
+        } else {
+            _myQuadsPerSide = spark.ShapeStretcher.DEFAULT_QUADS_PER_SIDE.clone();
+        }
     }
-
-    var _myVerticesPerSide = new Vector2i(_myQuadsPerSide.x + 1,
-                                          _myQuadsPerSide.y + 1);
+    ///////////////////////
+    // Protected Methods //
+    ///////////////////////
     
-    var _myNumVertices     = _myVerticesPerSide.x * _myVerticesPerSide.y;
-    var _myNumQuads        = _myQuadsPerSide.x * _myQuadsPerSide.y;
-    
-    /////////////////////
-    // Private Methods //
-    /////////////////////
-    
-    function _getVertexData(theShape, theVertexAttribute) {
+    Protected.getVertexData = function (theShape, theVertexAttribute) {
         var myXPath = ".//*[@name='" + theVertexAttribute + "']";
         return theShape.find(myXPath).firstChild.nodeValue;
-    }
+    };
 
-    function _getIndexData(theShape, theVertexAttribute) {
+    Protected.getIndexData = function (theShape, theVertexAttribute) {
         var myXPath = ".//*[@vertexdata='" + theVertexAttribute + "']";
         return theShape.find(myXPath).firstChild.nodeValue;
-    }
+    };
     
     ////////////////////
     // Public Methods //
@@ -91,52 +122,10 @@ ShapeStretcher.prototype.Constructor = function (Public, theShape, theOptions) {
         var myWidth  = theSize.x;
         var myHeight = theSize.y;
         var myOrigin = theOrigin;
-        var v = 0;
-        
-        for (var i = 0; i < _myVerticesPerSide.y; ++i) {
-            for (var j = 0; j < _myVerticesPerSide.x; ++j) {
-                v = i * _myVerticesPerSide.x + j;
-                var myX = -myOrigin.x;
-                var myY = -myOrigin.y;
-                var myCropX = 0;
-                var myCropY = 0;
-                if (j === 0) {
-                    myX = -myOrigin.x;
-                    myCropX = _myCrop.left;
-                } else if (j === _myVerticesPerSide.x - 3) {
-                    myX = -myOrigin.x + clamp(_myEdges.left +
-                          ShapeStretcher.applyEdgeFilteringOffset(_myEdges.left),0,myWidth);
-                    myCropX = _myCrop.left;
-                } else if (j === _myVerticesPerSide.x - 2) {
-                    myX = -myOrigin.x + clamp(myWidth - _myEdges.right -
-                          ShapeStretcher.applyEdgeFilteringOffset(_myEdges.right),Math.min(_myEdges.left,myWidth),myWidth);
-                    myCropX = -_myCrop.right;
-                } else if (j === _myVerticesPerSide.x - 1) {
-                    myX = -myOrigin.x + clamp(myWidth,Math.min(_myEdges.left,myWidth),myWidth);
-                    myCropX = -_myCrop.right;
-                }
-                if (i === 0) {
-                    myY = -myOrigin.y;
-                    myCropY = _myCrop.bottom;
-                } else if (i === _myVerticesPerSide.y - 3) {
-                    myY = -myOrigin.y + clamp(_myEdges.bottom +
-                          ShapeStretcher.applyEdgeFilteringOffset(_myEdges.bottom),0,myHeight);
-                    myCropY = _myCrop.bottom;
-                } else if (i === _myVerticesPerSide.y - 2) {
-                    myY = -myOrigin.y + clamp(myHeight - _myEdges.top -
-                          ShapeStretcher.applyEdgeFilteringOffset(_myEdges.top),Math.min(_myEdges.bottom,myHeight),myHeight);
-                    myCropY = -_myCrop.top;
-                } else if (i === _myVerticesPerSide.y - 1) {
-                    myY = -myOrigin.y + clamp(myHeight,Math.min(_myEdges.bottom,myHeight),myHeight);
-                    myCropY = -_myCrop.top;
-                }
-                _myVertices[v] = [myX, myY, 0];
-                if (theUVCoordFlag) {
-                    _myUVCoords[v] = [(myWidth > 0 ? (myX + myCropX + myOrigin.x) / myWidth : 0),
-                                      (myHeight > 0 ? 1 - (myY + myCropY + myOrigin.y) / myHeight : 0)];
-                }
-            }
-        }
+        _myVertices[0] = [-myOrigin.x, -myOrigin.y, -myOrigin.z];
+        _myVertices[1] = [myWidth - myOrigin.x, -myOrigin.y, -myOrigin.z];
+        _myVertices[2] = [-myOrigin.x, myHeight - myOrigin.y, -myOrigin.z];
+        _myVertices[3] = [myWidth - myOrigin.x, myHeight - myOrigin.y, -myOrigin.z];
     };
     
     Public.setupGeometry = function (theSize, theOrigin) {
@@ -144,9 +133,9 @@ ShapeStretcher.prototype.Constructor = function (Public, theShape, theOptions) {
         _myVertices.resize(_myNumVertices);
         Public.updateGeometry(theSize, true, theOrigin);
         
-        var myPIdx = _getIndexData(_myShape, 'position');
+        var myPIdx = Protected.getIndexData(_myShape, 'position');
         myPIdx.resize(_myNumQuads * 4);
-        var myUVIdx = _getIndexData(_myShape, 'uvset');
+        var myUVIdx = Protected.getIndexData(_myShape, 'uvset');
         myUVIdx.resize(_myNumQuads * 4);
         var v = 0;
         for (var currentY = 0; currentY < _myQuadsPerSide.y; ++currentY) {
@@ -161,12 +150,35 @@ ShapeStretcher.prototype.Constructor = function (Public, theShape, theOptions) {
         }
     };
     
-    Public.initialize = function () {
-        _myUVCoords        = _getVertexData(_myShape, 'uvset');
+    Base.initialize = Public.initialize;
+    Public.initialize = function (theNode) {
+        Base.initialize(theNode);
+        var myEdges = Protected.getArray("edges", [0,0,0,0]); 
+        var myCrops = Protected.getArray("crops", [0,0,0,0]); 
+        var myOptions = {
+            edges : {'left'   : Protected.getNumber("edgeLeft",   parseInt(myEdges[0], 10)),
+                     'bottom' : Protected.getNumber("edgeBottom", parseInt(myEdges[1], 10)),
+                     'right'  : Protected.getNumber("edgeRight",  parseInt(myEdges[2], 10)),
+                     'top'    : Protected.getNumber("edgeTop",    parseInt(myEdges[3], 10))},
+
+            crop  : {'left'   : Protected.getNumber("cropLeft",   parseInt(myCrops[0], 10)),
+                     'bottom' : Protected.getNumber("cropBottom", parseInt(myCrops[1], 10)),
+                     'right'  : Protected.getNumber("cropRight",  parseInt(myCrops[2], 10)),
+                     'top'    : Protected.getNumber("cropTop",    parseInt(myCrops[3], 10))},
+
+            quadsPerSide : new Vector2i(Protected.getNumber("quadsPerSideX", 3),
+                                        Protected.getNumber("quadsPerSideY", 3))
+        };
+
+        parseOptions(myOptions);
+        _myVerticesPerSide = new Vector2i(_myQuadsPerSide.x + 1,
+                                          _myQuadsPerSide.y + 1);
+        
+        _myNumVertices     = _myVerticesPerSide.x * _myVerticesPerSide.y;
+        _myNumQuads        = _myQuadsPerSide.x * _myQuadsPerSide.y;
+        _myUVCoords        = Protected.getVertexData(_myShape, 'uvset');
         _myVerticesPerSide = new Vector2f(_myQuadsPerSide.x + 1,
                                           _myQuadsPerSide.y + 1);
-        _myNumVertices     = _myVerticesPerSide.x * _myVerticesPerSide.y;
-        _myNumQuads        = _myQuadsPerSide.x    * _myQuadsPerSide.y;
         Logger.debug("ShapeStretcher::  quadsPerSide " + _myQuadsPerSide +
                      ", verticesPerSide " + _myVerticesPerSide +
                      ", numVertices " + _myNumVertices +
@@ -181,4 +193,81 @@ ShapeStretcher.prototype.Constructor = function (Public, theShape, theOptions) {
     Public.__defineGetter__("crop", function () {
         return _myCrop;
     });
+    Protected.__defineGetter__("vertices", function () {
+        return _myVertices;
+    });
+    
+    Protected.__defineGetter__("verticesPerSide", function () {
+        return _myVerticesPerSide;
+    });
+    Protected.__defineGetter__("uvcoords", function () {
+        return _myUVCoords;
+    });
 };
+
+spark.DefaultShapeStretcher = spark.Class("DefaultShapeStretcher");
+spark.ShapeStretcher.Factory.registerShapeStretcher('default', spark.DefaultShapeStretcher);
+
+spark.DefaultShapeStretcher.Constructor = function (Protected, theShape) {
+    spark.ShapeStretcher.DEFAULT_QUADS_PER_SIDE = new Vector2i(3, 3);
+    var Public = this;
+    var Base = {};
+
+    Public.Inherit(spark.ShapeStretcher, theShape);
+    ////////////////////
+    // Public Methods //
+    ////////////////////
+    
+    Public.updateGeometry = function (theSize, theUVCoordFlag, theOrigin) {
+        var myWidth  = theSize.x;
+        var myHeight = theSize.y;
+        var myOrigin = theOrigin;
+        var v = 0;
+        
+        for (var i = 0; i < Protected.verticesPerSide.y; ++i) {
+            for (var j = 0; j < Protected.verticesPerSide.x; ++j) {
+                v = i * Protected.verticesPerSide.x + j;
+                var myX = -myOrigin.x;
+                var myY = -myOrigin.y;
+                var myCropX = 0;
+                var myCropY = 0;
+                if (j === 0) {
+                    myX = -myOrigin.x;
+                    myCropX = Public.crop.left;
+                } else if (j === Protected.verticesPerSide.x - 3) {
+                    myX = -myOrigin.x + clamp(Public.edges.left +
+                          spark.ShapeStretcher.applyEdgeFilteringOffset(Public.edges.left),0,myWidth);
+                    myCropX = Public.crop.left;
+                } else if (j === Protected.verticesPerSide.x - 2) {
+                    myX = -myOrigin.x + clamp(myWidth - Public.edges.right -
+                          spark.ShapeStretcher.applyEdgeFilteringOffset(Public.edges.right),Math.min(Public.edges.left,myWidth),myWidth);
+                    myCropX = -Public.crop.right;
+                } else if (j === Protected.verticesPerSide.x - 1) {
+                    myX = -myOrigin.x + clamp(myWidth,Math.min(Public.edges.left,myWidth),myWidth);
+                    myCropX = -Public.crop.right;
+                }
+                if (i === 0) {
+                    myY = -myOrigin.y;
+                    myCropY = Public.crop.bottom;
+                } else if (i === Protected.verticesPerSide.y - 3) {
+                    myY = -myOrigin.y + clamp(Public.edges.bottom +
+                          spark.ShapeStretcher.applyEdgeFilteringOffset(Public.edges.bottom),0,myHeight);
+                    myCropY = Public.crop.bottom;
+                } else if (i === Protected.verticesPerSide.y - 2) {
+                    myY = -myOrigin.y + clamp(myHeight - Public.edges.top -
+                          spark.ShapeStretcher.applyEdgeFilteringOffset(Public.edges.top),Math.min(Public.edges.bottom,myHeight),myHeight);
+                    myCropY = -Public.crop.top;
+                } else if (i === Protected.verticesPerSide.y - 1) {
+                    myY = -myOrigin.y + clamp(myHeight,Math.min(Public.edges.bottom,myHeight),myHeight);
+                    myCropY = -Public.crop.top;
+                }
+                Protected.vertices[v] = [myX, myY, 0];
+                if (theUVCoordFlag) {
+                    Protected.uvcoords[v] = [(myWidth > 0 ? (myX + myCropX + myOrigin.x) / myWidth : 0),
+                                      (myHeight > 0 ? 1 - (myY + myCropY + myOrigin.y) / myHeight : 0)];
+                }
+            }
+        }
+    };
+};
+
