@@ -9,7 +9,7 @@
 //=============================================================================
 
 /*jslint nomen:false plusplus:false*/
-/*globals Vector4f, Vector2i, Exception, Vector2f, Logger, clamp*/
+/*globals Vector2i, Exception, Vector2f, Logger, clamp*/
 
 spark.ShapeStretcher = spark.AbstractClass("ShapeStretcher");
 
@@ -19,7 +19,7 @@ spark.ShapeStretcher = spark.AbstractClass("ShapeStretcher");
 
 spark.ShapeStretcher.Factory = (function () {
         var _myFactory = {};
-        this.registerShapeStretcher = function (theStretcherName, theCtor) {
+        var registerShapeStretcher = function (theStretcherName, theCtor) {
             if (theStretcherName in _myFactory) {
                 Logger.warning("overwriting previously registered shapestretcher " + theStretcherName);
             }
@@ -27,7 +27,7 @@ spark.ShapeStretcher.Factory = (function () {
             _myFactory[theStretcherName] = theCtor;
         };
 
-        this.getShapeStretcherFromAttribute = function (theStretcherName) {
+        var getShapeStretcherFromAttribute = function (theStretcherName) {
             Logger.info("lookup shapestretcher with name '" + theStretcherName + "'");
             if (theStretcherName in _myFactory) {
                 return _myFactory[theStretcherName];
@@ -35,7 +35,8 @@ spark.ShapeStretcher.Factory = (function () {
                 return _myFactory['default'];
             }
         };
-        return this;
+        return {"registerShapeStretcher"         : registerShapeStretcher,
+                "getShapeStretcherFromAttribute" : getShapeStretcherFromAttribute};
 }());
 
 spark.ShapeStretcher.DEFAULT_QUADS_PER_SIDE = new Vector2i(1, 1);
@@ -55,7 +56,7 @@ spark.ShapeStretcher.Constructor = function (Protected, theShape) {
     ////////////////
     
     if (!theShape) {
-        throw new Exception("Shape must be provided");
+        throw new Exception("Shape must be provided", fileline());
     }
     
     /////////////////////
@@ -73,33 +74,6 @@ spark.ShapeStretcher.Constructor = function (Protected, theShape) {
     var _myNumVertices     = null;
     var _myNumQuads        = null;
     
-    function parseOptions(theOptions) {
-        if (theOptions && "edges" in theOptions) {
-            _myEdges = theOptions.edges;
-        } else {
-            _myEdges = {'top'    : 0,
-                        'left'   : 0,
-                        'bottom' : 0,
-                        'right'  : 0};
-        }
-        
-        if (theOptions && "crop" in theOptions) {
-            _myCrop = theOptions.crop;
-        } else {
-            _myCrop = {'top'    : 0,
-                       'left'   : 0,
-                       'bottom' : 0,
-                       'right'  : 0};
-        }
-        
-        if (theOptions && "quadsPerSide" in theOptions) {
-            // TODO check that quadsPerSide are odd. Even quadsPerSide is possible but
-            // it is not entirely clear from which "direction" the stretching is applied
-            _myQuadsPerSide = theOptions.quadsPerSide;
-        } else {
-            _myQuadsPerSide = spark.ShapeStretcher.DEFAULT_QUADS_PER_SIDE.clone();
-        }
-    }
     ///////////////////////
     // Protected Methods //
     ///////////////////////
@@ -155,22 +129,21 @@ spark.ShapeStretcher.Constructor = function (Protected, theShape) {
         Base.initialize(theNode);
         var myEdges = Protected.getArray("edges", [0,0,0,0]); 
         var myCrops = Protected.getArray("crops", [0,0,0,0]); 
-        var myOptions = {
-            edges : {'left'   : Protected.getNumber("edgeLeft",   parseInt(myEdges[0], 10)),
-                     'bottom' : Protected.getNumber("edgeBottom", parseInt(myEdges[1], 10)),
-                     'right'  : Protected.getNumber("edgeRight",  parseInt(myEdges[2], 10)),
-                     'top'    : Protected.getNumber("edgeTop",    parseInt(myEdges[3], 10))},
+        _myEdges    = {'left'   : Protected.getNumber("edgeLeft",   parseInt(myEdges[0], 10)),
+                       'bottom' : Protected.getNumber("edgeBottom", parseInt(myEdges[1], 10)),
+                       'right'  : Protected.getNumber("edgeRight",  parseInt(myEdges[2], 10)),
+                       'top'    : Protected.getNumber("edgeTop",    parseInt(myEdges[3], 10))};
 
-            crop  : {'left'   : Protected.getNumber("cropLeft",   parseInt(myCrops[0], 10)),
-                     'bottom' : Protected.getNumber("cropBottom", parseInt(myCrops[1], 10)),
-                     'right'  : Protected.getNumber("cropRight",  parseInt(myCrops[2], 10)),
-                     'top'    : Protected.getNumber("cropTop",    parseInt(myCrops[3], 10))},
+        _myCrop     = {'left'   : Protected.getNumber("cropLeft",   parseInt(myCrops[0], 10)),
+                       'bottom' : Protected.getNumber("cropBottom", parseInt(myCrops[1], 10)),
+                       'right'  : Protected.getNumber("cropRight",  parseInt(myCrops[2], 10)),
+                       'top'    : Protected.getNumber("cropTop",    parseInt(myCrops[3], 10))};
 
-            quadsPerSide : new Vector2i(Protected.getNumber("quadsPerSideX", 3),
-                                        Protected.getNumber("quadsPerSideY", 3))
-        };
-
-        parseOptions(myOptions);
+        // TODO check that quadsPerSide are odd. Even quadsPerSide is possible but
+        // it is not entirely clear from which "direction" the stretching is applied
+        _myQuadsPerSide    = new Vector2i(Protected.getNumber("quadsPerSideX", spark.ShapeStretcher.DEFAULT_QUADS_PER_SIDE.x),
+                                          Protected.getNumber("quadsPerSideY", spark.ShapeStretcher.DEFAULT_QUADS_PER_SIDE.y));
+        
         _myVerticesPerSide = new Vector2i(_myQuadsPerSide.x + 1,
                                           _myQuadsPerSide.y + 1);
         
