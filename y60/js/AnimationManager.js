@@ -255,7 +255,7 @@ AnimationManager.prototype.Constructor = function(obj, theSceneViewer) {
     };
 
     obj.enable = function(theEnable) {
-        _myEnabled = theEnable || true;
+        _myEnabled = theEnable;
         _myUpdated = true;
     };
 
