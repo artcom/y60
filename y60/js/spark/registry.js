@@ -63,7 +63,7 @@ spark.nameToIdMap = {};
 
 spark.registerNode = function (theName, theNode) {
     if (theName in spark.nameToIdMap) {
-        throw new Exception("Spark-registered node name used twice.");
+        throw new Exception("Spark-registered node name used twice.", fileline());
     }
     spark.nameToIdMap[theName] = theNode.id;
 };

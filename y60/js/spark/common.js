@@ -284,7 +284,7 @@ function convertFromString(theType, theString) {
     case Number:
         return Number(theString);
     default:
-        throw new Exception("Do not know how to convert to the given type " + theType);
+        throw new Exception("Do not know how to convert to the given type " + theType, fileline());
     }
 }
 
@@ -298,7 +298,7 @@ function convertToString(theType, theValue) {
     case String:
         return String(theValue);
     default:
-        throw new Exception("Do not know how to convert from the given type " + theType);
+        throw new Exception("Do not know how to convert from the given type " + theType, fileline());
     }
 }
 
