@@ -813,12 +813,6 @@ MovieOverlay.prototype.Constructor = function(Public, Protected, theScene, theSo
     Public.__defineGetter__("playmode", function() { return Public.image.playmode; });
     Public.__defineSetter__("playmode", function(theArgument) { Public.image.playmode = theArgument; });
 
-    Public.__defineGetter__("color_scale", function() { return Public.image.color_scale; });
-    Public.__defineSetter__("color_scale", function(theArgument) { Public.image.color_scale = theArgument; });
-
-    Public.__defineGetter__("startime", function() { return Public.image.startime; });
-    Public.__defineSetter__("startime", function(theArgument) { Public.image.startime = theArgument; });
-
     Public.__defineGetter__("audio", function() { return Public.image.audio; });
     Public.__defineSetter__("audio", function(theArgument) { Logger.error("Cannot set audio flag after construction"); });
 
