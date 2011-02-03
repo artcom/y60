@@ -99,6 +99,10 @@ spark.StretchyImage.Constructor = function (Protected) {
         _myShapeStretcher.updateGeometry(Public.size, false, Public.origin);
     });
 
+    Protected.__defineGetter__("shapeStretcher", function () {
+            return _myShapeStretcher;
+    });
+
     Base.realize = Public.realize;
     Public.realize = function () {
         Base.realize();

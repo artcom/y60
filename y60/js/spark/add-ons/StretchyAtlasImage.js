@@ -94,6 +94,10 @@ spark.StretchyAtlasImage.Constructor = function (Protected) {
         _reset();
     });
     
+    Protected.__defineGetter__("shapeStretcher", function () {
+            return _myShapeStretcher;
+    });
+
     Base.realize = Public.realize;
     Public.realize = function () {
         Base.realize();
