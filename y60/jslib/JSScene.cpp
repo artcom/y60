@@ -537,7 +537,7 @@ JSScene::StaticFunctions() {
     AC_DEBUG << "Accessing Static Functions to Class '"<<ClassName()<<"'"<<endl;
     static JSFunctionSpec myFunctions[] = {
         // name                    native          nargs
-        {"intersectBodies",        intersectBodies,        2},
+        {"intersectBodies",        intersectBodies,        3},
         {"intersectBodyCenters",   intersectBodyCenters,   2},
         {"collideWithBodies",      collideWithBodies,      3},
         {"collideWithBodiesOnce",  collideWithBodiesOnce,  3},
@@ -557,15 +557,15 @@ JSScene::Functions() {
         {"optimize",              optimize,            1},
         {"collectGarbage",        collectGarbage,      0},
         {"bodyVolume",            bodyVolume,          1},
-        {"save",                  save,                2},
-        {"saveWithCatalog",       saveWithCatalog,     2},
+        {"save",                  save,                3},
+        {"saveWithCatalog",       saveWithCatalog,     3},
         {"setup",                 setup,               0},
         {"getWorldSize",          getWorldSize,        1},
         {"loadMovieFrame",        loadMovieFrame,      1},
         {"ensureMovieFramecount", ensureMovieFramecount,1},
         {"loadCaptureFrame",      loadCaptureFrame,    2},
-        {"pickBody",            pickBody,              2},
-        {"pickBodyBySweepingSphereFromBodies",     pickBodyBySweepingSphereFromBodies,   3},
+        {"pickBody",            pickBody,              3},
+        {"pickBodyBySweepingSphereFromBodies",     pickBodyBySweepingSphereFromBodies,   4},
         {0}
     };
     return myFunctions;
