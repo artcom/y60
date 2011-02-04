@@ -151,7 +151,6 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage,
         _myViewport.camera = self.camera.id;
         //_myViewport.wireframe = true;
 
-        dumpstack();
         // Setup offscreen render area
         _myOffscreenRenderArea = new OffscreenRenderArea();
         if (theUseFBOFlag) {
