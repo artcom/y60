@@ -23,7 +23,7 @@ spark.Movie.Constructor = function(Protected) {
     var _myMovie             = null;
     var _myTexture           = null;
     var _myStartFrame        = 0; //movie should start at this frame after setting src
-    var _myDecoderHint       = "FFMpegDecoder2";
+    var _myDecoderHint       = undefined;
     var _myTargetPixelFormat = "RGB";
     var _mySetSourceWithoutChangingImageNode = false;
 
@@ -235,7 +235,7 @@ spark.Movie.Constructor = function(Protected) {
     Public.realize = function() {
         var myMovieSource = Protected.getString("src", "");
         var myMovieSourceId = Protected.getString("srcId", "");
-        _myDecoderHint = Protected.getString("decoderhint", "FFMpegDecoder2");
+        _myDecoderHint = Protected.getString("decoderhint", undefined);
         _myTargetPixelFormat = Protected.getString("targetpixelformat", "RGB");
         _mySetSourceWithoutChangingImageNode = Protected.getBoolean("setSourceWithoutChangingImageNode",false);
 
