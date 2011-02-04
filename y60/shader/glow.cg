@@ -43,9 +43,10 @@ float4 mainFragment(vert2frag IN,
             int myOffset = i - halfKernelSize;
             float2 sampleCoord = float2( i/ blurKernelTexSize, 0.5); 
             myTexCoord.y = IN.texCoord.y + (myOffset*texelSize.y);
-            float myValue = tex2D(blurKernel, sampleCoord).r;
             //myTexCoord.y = clamp(myTexCoord.y, -1, 0);
-            myGlowColor.rgb += tex2D(tex, myTexCoord).rgb * myValue;
+            float3 myColor = tex2D(tex, myTexCoord).rgb;
+            float myValue = tex2D(blurKernel, sampleCoord).r;
+            myGlowColor.rgb += myColor * myValue;
         }
     } else { 
         // blur X
