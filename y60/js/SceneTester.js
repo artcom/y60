@@ -199,7 +199,6 @@ SceneTester.prototype.Constructor = function(obj, theArguments) {
 
             _myOffscreenRenderer = new OffscreenRenderer([window.width, window.height], myCamera, "rgba", myImage, myClonedCanvas, true, 0);
             _myOffscreenRenderer.setBody(window.scene.world);
-            ourShow.activeWindow = _myOffscreenRenderer.renderarea;
 
             _myOffscreenRenderer.onPreViewport  = ourShow.onPreViewport;
             _myOffscreenRenderer.onPostViewport = ourShow.onPostViewport;

@@ -853,13 +853,10 @@ MovieOverlay.prototype.Constructor = function(Public, Protected, theScene, theSo
             if (theDecoderHint) {
                 myImage.decoderhint = theDecoderHint;
             } else {
-                myImage.decoderhint = new Playlist().getVideoDecoderHintFromURL(myImage.src, false);
+                myImage.decoderhint = new Playlist().getVideoDecoderHintFromURL(theSource, false);
             }
             myImage.audio = theAudioFlag;
-            if (thePixelFormat === null) {
-                thePixelFormat = "RGB";
-            }
-            myImage.targetpixelformat = thePixelFormat;
+            myImage.targetpixelformat = thePixelFormat || "RGB";
             myImage.src  = expandEnvironment(theSource);
             if (thePlayMode !== undefined) {
                 myImage.playmode = thePlayMode;
