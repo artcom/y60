@@ -153,19 +153,16 @@ namespace y60 {
 
     std::string
     FFMpegDecoder2::canDecode(const std::string & theUrl, asl::Ptr<asl::ReadableStreamHandle> theStream) {
-        if (asl::toLowerCase(asl::getExtension(theUrl)) == "mpg" ||
-            asl::toLowerCase(asl::getExtension(theUrl)) == "m2v" ||
-            asl::toLowerCase(asl::getExtension(theUrl)) == "avi" ||
-            asl::toLowerCase(asl::getExtension(theUrl)) == "mp4" ||
-            asl::toLowerCase(asl::getExtension(theUrl)) == "mkv" ||
-            asl::toLowerCase(asl::getExtension(theUrl)) == "mov" ||
-            asl::toLowerCase(asl::getExtension(theUrl)) == "flv" ||
-            asl::toLowerCase(asl::getExtension(theUrl)) == "mpeg") {
-            AC_TRACE << "FFMpegDecoder2 can decode :" << theUrl << endl;
+        // assume that ffmpeg can decode everything, except y60 formats
+        if (asl::toLowerCase(asl::getExtension(theUrl)) != "m60" &&
+            asl::toLowerCase(asl::getExtension(theUrl)) != "x60" &&
+            asl::toLowerCase(asl::getExtension(theUrl)) != "d60" &&
+            asl::toLowerCase(asl::getExtension(theUrl)) != "i60" )
+        {
+            AC_INFO << "FFMpegDecoder2 can decode :" << theUrl << endl;
             return MIME_TYPE_MPG;
         } else {
-            AC_TRACE << "FFMpegDecoder2 can not decode :" << theUrl <<
-                    "responsible for extensions mpg and m2v" << endl;
+            AC_INFO << "FFMpegDecoder2 can not decode :" << theUrl << endl;
             return "";
         }
     }
