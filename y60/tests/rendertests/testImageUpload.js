@@ -70,9 +70,8 @@ function ENSURE(theExpression) {
 
 ourShow.SceneTester.setup = ourShow.setup;
 ourShow.setup = function () {
-    ourShow.SceneTester.setup();
+    ourShow.SceneTester.setup(256, 256);
     window.fixedFrameTime = 1;
-    window.resize(256, 256);
             
     // Image setup
     ourImage = new Node("<image src='tex/colors.rgb'/>").firstChild;
