@@ -130,7 +130,7 @@ namespace jslib {
         static JSFunctionSpec myFunctions[] = {
             // name                  native                   nargs
             {"toString",             toString,                0},
-            {"onUpdateSettings",     onUpdateSettings,         0},
+            {"onUpdateSettings",     onUpdateSettings,        1},
             {0}
         };
         return myFunctions;

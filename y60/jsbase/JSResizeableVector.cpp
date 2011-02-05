@@ -98,7 +98,7 @@ static JSBool
 setItem(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("sets an element in the vector. Throws an exception, if index is out of bounds.");
     DOC_PARAM("theIndex", "Index of the element to set.", DOC_TYPE_INTEGER);
-    DOC_RVAL("theElement", DOC_TYPE_OBJECT);
+    DOC_PARAM("theElement","", DOC_TYPE_OBJECT);
     DOC_RVAL("success", DOC_TYPE_BOOLEAN);
     DOC_END;
     try {

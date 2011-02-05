@@ -301,7 +301,7 @@ JSFunctionSpec *
 JSOffscreenRenderArea::Functions() {
     static JSFunctionSpec myFunctions[] = {
         // name                  native               nargs
-        {"renderToCanvas",       renderToCanvas,       1},
+        {"renderToCanvas",       renderToCanvas,       4},
         {"setWidth",             setWidth,             1},
         {"setHeight",            setHeight,            1},
         {"setScene",             setScene,             1},

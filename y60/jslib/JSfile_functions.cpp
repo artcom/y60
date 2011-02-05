@@ -659,8 +659,8 @@ searchFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 JSFunctionSpec *
 JSFileFunctions::Functions() {
     static JSFunctionSpec myFunctions[] = {
-        {"readFileAsString",  ReadFileAsString,  1},
-        {"readFileAsBlock",   ReadFileAsBlock,   1},
+        {"readFileAsString",  ReadFileAsString,  2},
+        {"readFileAsBlock",   ReadFileAsBlock,   2},
         {"writeStringToFile", WriteStringToFile, 2},
         {"writeBlockToFile",  WriteBlockToFile, 2},
         {"getLastModified",        GetLastModified,  1},
@@ -674,7 +674,7 @@ JSFileFunctions::Functions() {
         {"includePath",            IncludePath, 1},
         {"removePath",             RemovePath,  1},
         {"getPath",                GetPath,     0},
-        {"findFiles",              findFiles,   2},
+        {"findFiles",              findFiles,   3},
         {"getDirectoryEntries", getDirectoryEntries, 1},
         {"isDirectory",         IsDirectory,         1},
         {"getAppDirectory",     getAppDirectory,     0},

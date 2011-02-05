@@ -173,8 +173,8 @@ namespace jslib {
         static JSFunctionSpec myFunctions[] = {
             // name                native                   nargs
             {"closeStation",       closeStation,                0},
-            {"broadcastBlock",     broadcastBlock,              0},
-            {"broadcastString",    broadcastString,             0},
+            {"broadcastBlock",     broadcastBlock,              1},
+            {"broadcastString",    broadcastString,             1},
             {"receive",            receive,                     0},
             {0}
         };

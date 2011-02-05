@@ -292,18 +292,18 @@ JSLogger::StaticFunctions() {
     AC_DEBUG << "Registering class '"<<ClassName()<<"'"<<endl;
     static JSFunctionSpec myFunctions[] = {
         // name                    native          nargs
-        {"fatal",     fatal,     1},
-        {"error",     error,     1},
-        {"warning",   warning,     1},
-        {"info",      info,     1},
-        {"debug",     debug,     1},
-        {"trace",     trace,     1},
+        {"fatal",     fatal,     2},
+        {"error",     error,     2},
+        {"warning",   warning,   2},
+        {"info",      info,      2},
+        {"debug",     debug,     2},
+        {"trace",     trace,     2},
         {"setVerbosity", setVerbosity, 4},
         {"addFileSink", addFileSink, 1},
         {"addFarewellSink", addFarewellSink, 0},
         {"getLastElapsed", getLastElapsed, 1},
         {"getTimer", getTimer, 1},
-        {"getNewMaxTimers", getNewMaxTimers, 2},
+        {"getNewMaxTimers", getNewMaxTimers, 3},
         {0}
     };
     return myFunctions;

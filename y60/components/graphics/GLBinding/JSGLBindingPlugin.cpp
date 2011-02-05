@@ -183,8 +183,8 @@ namespace jslib {
             // name                         native                       nargs
             {"Enable",             Enable,             1},
             {"Disable",            Disable,            1},
-            {"GetTotalMem",    GetTotalMem,    1},
-            {"GetFreeMem",         GetFreeMem,         1},
+            {"GetTotalMem",        GetTotalMem,        0},
+            {"GetFreeMem",         GetFreeMem,         0},
             {0}
         };
         return myFunctions;
