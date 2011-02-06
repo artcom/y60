@@ -119,14 +119,13 @@ class RequestThread : public asl::PosixThread {
         typedef std::map<std::string, AssetRequestPtr> AssetRequestMap;
         AssetRequestMap _myAssetRequests;
 
-        std::vector< std::pair<std::string, std::string> > _myOutdatedAssets;
-
-        unsigned int _myMaxRequestCount;
-        std::string _myUserAgent;
         std::string _myLocalPath;
-        std::string _myProxy;
         std::string _myUsername;
         std::string _myPassword;
+        std::string _myUserAgent;
+        std::string _myProxy;
+        std::vector< std::pair<std::string, std::string> > _myOutdatedAssets;
+        unsigned int _myMaxRequestCount;
         bool _myVerboseFlag;
         std::map<std::string,std::string> _myCookieJar;
 
