@@ -2101,6 +2101,26 @@
             </properties>
         </fragmentshader>
     </shader> 
+   <shader id="s199ottobock_waves" name="ottobock_waves" cost="10">
+        <supports>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="option" values="[`ottobock_waves`]"/>
+            <feature class="textures" values="[`paint`]"/>
+        </supports>
+        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`]" files="[`ottobock_waves.cg`]" entryfunctions="[`mainVertex`]">
+            <properties>
+                <float name="theta">0</float>
+                <float name="period">0.5</float>
+                <float name="amplitude">25</float>
+                <float name="alpha">1</float>
+                <vector2f name="touchPosition">[-1,-1]</vector2f>
+        	</properties>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector3f name="color"/>
+            </vertexparameters>
+        </vertexshader>
+    </shader>
 </shaders>
 <combiners>
     <!-- 'previous' + 'texture' -->

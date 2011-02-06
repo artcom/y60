@@ -1,0 +1,62 @@
+//=============================================================================
+// Copyright (C) 2008 ART+COM AG Berlin
+//
+// These coded instructions, statements, and computer programs contain
+// unpublished proprietary information of ART+COM AG Berlin, and
+// are copy protected by law. They may not be disclosed to third parties
+// or copied or duplicated in any form, in whole or in part, without the
+// specific, prior written permission of ART+COM AG Berlin.
+//=============================================================================
+
+struct vert2frag {
+    float4 position  : POSITION;
+    float4 color     : COLOR;
+    float2 texcoord  : TEXCOORD0;
+    float pointsize  : PSIZE;
+};
+
+struct app2vert {
+    float4 position  : POSITION;
+    float4 color     : COLOR;
+    float2 texcoord  : TEXCOORD0;
+};
+
+#define MAX_POINT_SIZE 40
+#define WAVE_LENGTH 4000
+
+float computeY(float theta, float period, float amplitude, float theX){
+
+    return sin(theta + theX * period) * amplitude;
+}
+
+vert2frag mainVertex(app2vert IN,                
+                     uniform float theta,
+                     uniform float period,
+                     uniform float amplitude,
+                     uniform float alpha,
+                     uniform float2 touchPosition,
+                     uniform float4x4 GL_MODELVIEW_PROJECTION){
+
+    vert2frag OUT;
+
+    float offset = touchPosition.y;
+    float4 myPosition = IN.position;
+    myPosition.y = computeY(theta, period, amplitude, myPosition.x) +
+                   offset;
+
+    OUT.position = mul(GL_MODELVIEW_PROJECTION, myPosition);
+    OUT.texcoord = IN.texcoord;
+    OUT.color = IN.color;
+
+    OUT.color.a = alpha;
+    
+    float myRelativeNearnessToTouchCenter =
+       abs(IN.position.x - touchPosition.x) / (WAVE_LENGTH / 2);
+
+
+    OUT.pointsize = (MAX_POINT_SIZE * pow(1 - myRelativeNearnessToTouchCenter,4));
+    
+
+    return OUT;
+}
+

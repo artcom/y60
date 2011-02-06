@@ -18,6 +18,7 @@ testNightvision
 testParticles
 testSpotlight
 testSprites
+testVertexShaderOnly
 )
 
 set(NOCG_TESTS
