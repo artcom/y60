@@ -1106,16 +1106,6 @@ namespace y60 {
         case ARBFP1 :
             myResult = CG_PROFILE_ARBFP1;
             break;
-#if (CG_VERSION_NUM >= 2000)
-        case GP4VP:
-            myResult = CG_PROFILE_GPU_VP;
-            break;
-        case GP4FP:
-            myResult = CG_PROFILE_GPU_FP;
-            break;
-#else
-#   error "CG below 2.0 won't work!"
-#endif
         case  VP40:
             myResult = CG_PROFILE_VP40;
             break;
@@ -1141,11 +1131,32 @@ namespace y60 {
         case GLSLF:
             myResult = CG_PROFILE_GLSLF;
             break;
+#   if (CG_VERSION_NUM >= 3000)
+        case GP5VP:
+            myResult = CG_PROFILE_GP5VP;
+            break;
+        case GP5FP:
+            myResult = CG_PROFILE_GP5FP;
+            break;
+        case GP4VP:
+            myResult = CG_PROFILE_GP4VP;
+            break;
+        case GP4FP:
+            myResult = CG_PROFILE_GP4FP;
+            break;
+#   else
+        case GP4VP:
+            myResult = CG_PROFILE_GPU_VP;
+            break;
+        case GP4FP:
+            myResult = CG_PROFILE_GPU_FP;
+            break;
+#   endif
 #else
 #   error "CG below 2.0 won't work!"
 #endif
         default:
-            throw RendererException(string("Unknown shaderprofile : ") +
+            throw RendererException(string("Unsupported shaderprofile : ") +
                                     getStringFromEnum(_myShader._myProfile, ShaderProfileStrings),
                                     PLUS_FILE_LINE);
         };

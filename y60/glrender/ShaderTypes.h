@@ -12,7 +12,9 @@
 // Warning: There are several enum/string pairs in this file which need to
 // stay consistent.
 
-#if (CG_VERSION_NUM >= 2000)
+#if (CG_VERSION_NUM >= 3000)
+#   define AC_NV_CG_30
+#elif (CG_VERSION_NUM >= 2000)
 #   define AC_NV_CG_20
 #else
 #   error "CG below 2.0 won't work!"
@@ -36,7 +38,12 @@ namespace y60 {
     ,
     GLSLC, GP4FP, GP4VP, GP4GP
 #   endif
+#   ifdef AC_NV_CG_30
+    ,
+    GLSLC, GP4FP, GP4VP, GP4GP, GLSLG, GP5FP, GP5VP, GP5GP, GP5TCP, GP5TEP
+#   endif
     };
+
 
     const char * const ShaderProfileStrings[] = {
         "no-profile",
@@ -55,6 +62,18 @@ namespace y60 {
         "gp4fp",
         "gp4vp",
         "gp4gp",
+#       endif
+#       ifdef AC_NV_CG_30
+        "glslc",
+        "gp4fp",
+        "gp4vp",
+        "gp4gp",
+        "glslg",
+        "gp5fp",
+        "gp5vp",
+        "gp5gp",
+        "gp5tcp",
+        "gp5tep",
 #       endif
         0
     };
