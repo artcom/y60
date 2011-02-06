@@ -89,7 +89,10 @@ namespace y60 {
 
     CgShader::CgShader(const dom::NodePtr theNode,
                        const std::string & theVertexProfileName,
-                       const std::string & theFragmentProfileName) : GLShader(theNode), _myFragmentShader()
+                       const std::string & theFragmentProfileName) :
+        GLShader(theNode),
+        _myVertexShader(),
+        _myFragmentShader()
     {
         _myType = CG_MATERIAL;
         dom::NodePtr myShaderNode = theNode->childNode(VERTEX_SHADER_NODE_NAME);
