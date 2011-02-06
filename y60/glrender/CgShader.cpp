@@ -101,7 +101,7 @@ namespace y60 {
             loadParameters(myShaderNode, _myVertexShader);
             _myVertexShader._myType = VERTEX_SHADER;
         } else {
-            AC_WARNING << "no vertex prog found for " << theNode->nodeName();
+            AC_INFO << "no vertex programm found in shader: " << theNode->getAttributeString(NAME_ATTRIB);
          }
 
         myShaderNode = theNode->childNode(FRAGMENT_SHADER_NODE_NAME);
@@ -109,7 +109,7 @@ namespace y60 {
             loadShaderProperties(myShaderNode, _myFragmentShader, theFragmentProfileName);
             _myFragmentShader._myType = FRAGMENT_SHADER;
         } else {
-            AC_WARNING << "no fragment prog found for " << theNode->nodeName();
+            AC_INFO << "no fragment programm found in shader: " << theNode->getAttributeString(NAME_ATTRIB);
         }
     }
 
