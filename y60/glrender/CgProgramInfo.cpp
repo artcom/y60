@@ -1063,6 +1063,8 @@ namespace y60 {
     void
     CgProgramInfo::enableTextures(const y60::MaterialBase & theMaterial) {
         AC_TRACE << "CgProgramInfo::enableTextures - " << ShaderProfileStrings[_myShader._myProfile];
+
+        asl::Unsigned64 myFrameNumber = theMaterial.get<LastActiveFrameTag>();
         glMatrixMode(GL_TEXTURE);
         bool alreadyHasSpriteTexture = false;
         for (unsigned int i = 0; i < _myTextureParams.size(); ++i) {
@@ -1076,6 +1078,7 @@ namespace y60 {
                 }
                 const TextureUnit & myTextureUnit = theMaterial.getTextureUnit(i);
                 TexturePtr myTexture = myTextureUnit.getTexture();
+                myTexture->set<LastActiveFrameTag>(myFrameNumber);
                 // texture env apply mode
                 GLenum myTexEnvMode = asGLTextureApplyMode(myTextureUnit.get<TextureUnitApplyModeTag>());
                 glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, myTexEnvMode);
@@ -1087,6 +1090,7 @@ namespace y60 {
                 asl::Matrix4f myMatrix;
                 const y60::ImagePtr & myImage = myTexture->getImage();
                 if (myImage) {
+                    const_cast<y60::Image&>(*myImage).set<LastActiveFrameTag>(myFrameNumber);
                     myMatrix = myImage->get<ImageMatrixTag>();
                     myMatrix.postMultiply(myTexture->get<TextureNPOTMatrixTag>());
                 } else {
