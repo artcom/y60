@@ -145,7 +145,7 @@ namespace y60 {
 
             void enableProfile();
             void disableProfile();
-            void enableTextures();
+            void enableTextures(const MaterialBase & theMaterial);
             void disableTextures();
             CGprofile getCgProfile() const;
 
