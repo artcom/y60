@@ -574,12 +574,13 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
         for(unsigned i = 0; i < thePositions.size(); ++i) {
             myShapeBuilder.appendVertexData(POSITION_ROLE, thePositions[i]);
             myElementBuilder.appendIndex(POSITIONS, i);
-
             if (needsNormals) {
                 asl::Vector3f myNormal;
                 int ii = i;
-                if (i >= thePositions.size()-2) {
-                    ii = (i%2 == 0) ? i-1 : i-2;
+                if (i == thePositions.size()-1) {
+                    ii = i - 2;
+                } else if (i == thePositions.size() - 2) {
+                    ii = i - 1;
                 }
                 const asl::Vector3f & myV1 = (ii%2 == 0) ?
                     thePositions[ii+1] : thePositions[ii+2];
@@ -588,7 +589,7 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
                 myNormal = cross(difference(myV1, thePositions[ii]),
                         difference(myV2, thePositions[ii]) );
                 myNormal = normalized(myNormal);
-
+                
                 myShapeBuilder.appendVertexData(NORMAL_ROLE, myNormal);
                 myElementBuilder.appendIndex(NORMALS, i);
             }

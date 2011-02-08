@@ -2099,18 +2099,18 @@ It contains references to image-nodes for texturing and other material definitio
         </xs:annotation>
         <xs:complexType>
             <xs:sequence>
-                <xs:element ref="requires">
+                <xs:element ref="requires" maxOccurs="1">
                     <xs:annotation>
                         <xs:documentation>Contains requirements, which are matched against shaders in the shaderlibrary
 to find the best matching shader for this material.</xs:documentation>
                     </xs:annotation>
                 </xs:element>
-                <xs:element ref="properties">
+                <xs:element ref="properties" maxOccurs="1">
                     <xs:annotation>
                         <xs:documentation>Contains material properties, such as colors.</xs:documentation>
                     </xs:annotation>
                 </xs:element>
-                <xs:element ref="textureunits">
+                <xs:element ref="textureunits" maxOccurs="1">
                     <xs:annotation>
                         <xs:documentation>Contains texture unit definitions.</xs:documentation>
                     </xs:annotation>

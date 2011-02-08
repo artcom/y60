@@ -35,7 +35,6 @@ ourShow.setup = function() {
     myNode.firstChild.nodeValue = "[100[paint, paint]]";
     myNode = myMaterial.requires.find("*[@name = 'texcoord']");
     myNode.firstChild.nodeValue = "[100[uv_map,reflective]]";
-    myMaterial.enabled = true;
 
     var myTexture = Modelling.createTexture(window.scene, _myImage);
 
@@ -44,6 +43,7 @@ ourShow.setup = function() {
     myTextureUnit.texture = myTexture.id;
     myMaterial.childNode("textureunits").appendChild(myTextureUnit); 
 
+    myMaterial.enabled = true;
     myTestOverlay.srcsize = [1, -1];
 }
 

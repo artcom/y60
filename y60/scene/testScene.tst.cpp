@@ -153,6 +153,17 @@ public:
                 ENSURE(!myWorld->isDirty<GlobalMatrixTag>());
             }
 
+            // test material schema
+            NodePtr myMaterialNode = myScene->getMaterialsRoot()->appendChild(NodePtr(new dom::Element("material")));
+            MaterialBasePtr myMaterialFacade = myMaterialNode->getFacade<MaterialBase>();
+            myMaterialFacade->set<EnabledTag>(false);
+            myMaterialNode->appendChild(NodePtr(new dom::Element("requires")));
+            MaterialRequirementFacadePtr myReqFacade = myMaterialFacade->getChild<MaterialRequirementTag>();
+            myReqFacade->getNode().appendChild(NodePtr(new dom::Node("<feature name='option'>[10[foo]]</feature>"))->firstChild());
+            myMaterialFacade->set<EnabledTag>(true);
+            
+
+
             // Test bounding box handling
             {
 
