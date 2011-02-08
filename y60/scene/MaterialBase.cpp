@@ -192,7 +192,7 @@ namespace y60 {
             load();
         }
     }
-#if 1
+#if 0
     //TODO: we should not load every time a property has changed, only when the requirements change
    void MaterialBase::ensureProperties() const {
        if (!_ensuring && getNode().nodeVersion() != _myMaterialVersion) {
@@ -205,6 +205,9 @@ namespace y60 {
 #else
     // this is an improved version, but it does not work properly
    void MaterialBase::ensureProperties() const {
+       if(!get<EnabledTag>()) {
+           return;
+       }
        if (_ensuring || getNode().nodeVersion() == _myMaterialVersion) {
            return;
        }
