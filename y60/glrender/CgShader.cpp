@@ -156,7 +156,7 @@ namespace y60 {
             _myFragmentProgram->load();
         }
 
-        // load fragment shader
+        // load vertex shader
         if (_myVertexProgram) {
             _myVertexProgram->load();
         }
@@ -394,25 +394,21 @@ namespace y60 {
     void
     CgShader::enableTextures(const MaterialBase & theMaterial) {
         MAKE_GL_SCOPE_TIMER(CgShader_enableTextures);
-        if (_myVertexProgram) {
-            _myVertexProgram->enableTextures();
-        }
         if (_myFragmentProgram) {
-            _myFragmentProgram->enableTextures();
+            _myFragmentProgram->enableTextures(theMaterial);
+        } else {
+            GLShader::enableTextures(theMaterial);
         }
-        GLShader::enableTextures(theMaterial);
     }
 
     void
     CgShader::disableTextures(const MaterialBase & theMaterial) {
         MAKE_GL_SCOPE_TIMER(CgShader_disableTextures);
-        if (_myVertexProgram) {
-            _myVertexProgram->disableTextures();
-        }
         if (_myFragmentProgram) {
             _myFragmentProgram->disableTextures();
+        } else {
+            GLShader::disableTextures(theMaterial);
         }
-        GLShader::disableTextures(theMaterial);
     }
 
     void

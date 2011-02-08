@@ -550,7 +550,7 @@ namespace y60 {
             DBP2(STOP_TIMER(CgProgramInfo_reloadIfRequired_bindMaterialParams));
 
             DBP2(START_TIMER(CgProgramInfo_reloadIfRequired_enableTextures));
-            enableTextures();
+            enableTextures(theMaterial);
             DBP2(STOP_TIMER(CgProgramInfo_reloadIfRequired_enableTextures));
 
             assertCg(PLUS_FILE_LINE, _myContext);
@@ -885,9 +885,8 @@ namespace y60 {
             unsigned myTextureIndex = theNode.nodeValueAs<unsigned>();
             if (myTextureIndex < theMaterial.getTextureUnitCount()) {
                 const TextureUnit & myTextureUnit = theMaterial.getTextureUnit(myTextureIndex);
-                const TexturePtr & myTexture = myTextureUnit.getTexture();
-
-                unsigned myTextureId = myTexture->getTextureId();
+                TexturePtr myTexture = myTextureUnit.getTexture();
+                unsigned myTextureId = myTexture->applyTexture();
                 AC_TRACE << "cgGLSetTextureParameter param=" << theCgParameter << " texid=" << myTextureId;
                 cgGLSetTextureParameter( theCgParameter, myTextureId);
                     AC_TRACE << "cgGLSetTextureParameter: Texture index " << as_string(myTextureIndex)
@@ -1062,16 +1061,70 @@ namespace y60 {
     }
 
     void
-    CgProgramInfo::enableTextures() {
+    CgProgramInfo::enableTextures(const y60::MaterialBase & theMaterial) {
         AC_TRACE << "CgProgramInfo::enableTextures - " << ShaderProfileStrings[_myShader._myProfile];
-        for (unsigned i=0; i < _myTextureParams.size(); ++i) {
+
+        asl::Unsigned64 myFrameNumber = theMaterial.get<LastActiveFrameTag>();
+        glMatrixMode(GL_TEXTURE);
+        bool alreadyHasSpriteTexture = false;
+        for (unsigned int i = 0; i < _myTextureParams.size(); ++i) {
             if (_myTextureParams[i].isUsedByShader()) {
-                GLenum myTexUnit = cgGLGetTextureEnum(_myTextureParams[i]._myParameter);
-                glActiveTexture(myTexUnit);
                 cgGLEnableTextureParameter(_myTextureParams[i]._myParameter);
-                CHECK_OGL_ERROR;
+                if (i >= theMaterial.getTextureUnitCount()) {
+                    throw ShaderException(std::string("Texture index ") + as_string(i) +
+                                          " not found. Material id=" + theMaterial.get<IdTag>() + 
+                                          " name=" + theMaterial.get<NameTag>() + " has " + as_string(theMaterial.getTextureUnitCount()) + " texture(s)",
+                                          PLUS_FILE_LINE);
+                }
+                const TextureUnit & myTextureUnit = theMaterial.getTextureUnit(i);
+                TexturePtr myTexture = myTextureUnit.getTexture();
+                myTexture->set<LastActiveFrameTag>(myFrameNumber);
+                // texture env apply mode
+                GLenum myTexEnvMode = asGLTextureApplyMode(myTextureUnit.get<TextureUnitApplyModeTag>());
+                glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, myTexEnvMode);
+
+                // texture env const blend color (changed from black OpenGL default)
+                glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, myTextureUnit.get<TextureUnitEnvColorTag>().begin());
+
+                // load texture matrix
+                asl::Matrix4f myMatrix;
+                const y60::ImagePtr & myImage = myTexture->getImage();
+                if (myImage) {
+                    const_cast<y60::Image&>(*myImage).set<LastActiveFrameTag>(myFrameNumber);
+                    myMatrix = myImage->get<ImageMatrixTag>();
+                    myMatrix.postMultiply(myTexture->get<TextureNPOTMatrixTag>());
+                } else {
+                    myMatrix  = myTexture->get<TextureNPOTMatrixTag>();
+                }
+                myMatrix.postMultiply(myTexture->get<TextureMatrixTag>());
+                myMatrix.postMultiply(myTextureUnit.get<TextureUnitMatrixTag>());
+                glLoadMatrixf(static_cast<const GLfloat *>(myMatrix.getData()));
+
+                // setup texture sprite
+                if (myTextureUnit.get<TextureUnitSpriteTag>()) {
+                    if (!alreadyHasSpriteTexture) {
+                        glEnable(GL_POINT_SPRITE_ARB);
+                        CHECK_OGL_ERROR;
+                        if (hasCap("GL_ARB_point_parameters")) {
+                            glPointParameterfARB(GL_POINT_SPRITE_R_MODE_NV, GL_S);
+                            CHECK_OGL_ERROR;
+                        }
+                        alreadyHasSpriteTexture = true;
+                    }
+                    glTexEnvf( GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_TRUE );
+                    CHECK_OGL_ERROR;
+                } else {
+                    if (alreadyHasSpriteTexture) {
+                        glDisable(GL_POINT_SPRITE_ARB);
+                        alreadyHasSpriteTexture = false;
+                    }
+                    glTexEnvf( GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_FALSE );
+                    CHECK_OGL_ERROR;
+                }
             }
         }
+        glMatrixMode(GL_MODELVIEW);
+        assertCg(string("CgProgramInfo::enableTextures() ") + _myPathName, _myContext);
     }
 
     void
@@ -1079,12 +1132,11 @@ namespace y60 {
         AC_TRACE << "CgProgramInfo::disableTextures - " << ShaderProfileStrings[_myShader._myProfile];
         for (unsigned i=0; i < _myTextureParams.size(); ++i) {
             if (_myTextureParams[i].isUsedByShader()) {
-                GLenum myTexUnit = _myTextureParams[i].getTextureUnit();
-                glActiveTexture(myTexUnit);
                 cgGLDisableTextureParameter(_myTextureParams[i]._myParameter);
-                CHECK_OGL_ERROR;
             }
         }
+        glDisable(GL_POINT_SPRITE_ARB);
+        assertCg(string("CgProgramInfo::disableTextures() ") + _myPathName, _myContext);
     }
 
     void
