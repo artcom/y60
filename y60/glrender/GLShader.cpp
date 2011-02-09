@@ -413,7 +413,6 @@ namespace y60 {
             y60::TexturePtr myTexture = myTextureUnit.getTexture();
             GLenum myTexUnit = asGLTextureRegister(i);
             glActiveTexture(myTexUnit);
-            glClientActiveTexture(myTexUnit);
 
             // triggers texture setup/update
             unsigned myTextureId = myTexture->applyTexture(); //ensureTextureId();
@@ -441,7 +440,6 @@ namespace y60 {
 
             GLenum myTexUnit = asGLTextureRegister(i);
             glActiveTexture(myTexUnit);
-            glClientActiveTexture(myTexUnit);
 
             // unbind/disable texture
             GLenum myTextureTarget = asGLTextureTarget(myTexture->getType());
