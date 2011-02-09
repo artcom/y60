@@ -1069,6 +1069,7 @@ namespace y60 {
         bool alreadyHasSpriteTexture = false;
         for (unsigned int i = 0; i < _myTextureParams.size(); ++i) {
             if (_myTextureParams[i].isUsedByShader()) {
+                setGLTextureState(true, _myTextureParams[i]._myParameter);
                 cgGLEnableTextureParameter(_myTextureParams[i]._myParameter);
                 if (i >= theMaterial.getTextureUnitCount()) {
                     throw ShaderException(std::string("Texture index ") + as_string(i) +
@@ -1128,16 +1129,44 @@ namespace y60 {
     }
 
     void
+    CgProgramInfo::setGLTextureState(bool theEnableFlag, const CGparameter & theParameter) {
+        GLenum myTextureTarget = GL_TEXTURE_1D;
+        switch (cgGetParameterType(theParameter)) {
+            case CG_SAMPLER1D:
+                myTextureTarget = GL_TEXTURE_1D;
+                break;
+            case CG_SAMPLER2D:
+                myTextureTarget = GL_TEXTURE_2D;
+                break;
+            case CG_SAMPLER3D:
+                myTextureTarget = GL_TEXTURE_3D;
+                break;
+            case CG_SAMPLERCUBE:
+                myTextureTarget = GL_TEXTURE_CUBE_MAP_ARB;
+                break;
+            case CG_SAMPLERRECT:
+                myTextureTarget = GL_TEXTURE_RECTANGLE_ARB;
+                break;
+        };
+        if (theEnableFlag) {
+            glEnable(myTextureTarget);
+        } else {
+            glDisable(myTextureTarget);
+        }
+    }
+
+    void
     CgProgramInfo::disableTextures() {
         AC_TRACE << "CgProgramInfo::disableTextures - " << ShaderProfileStrings[_myShader._myProfile];
         for (unsigned i=0; i < _myTextureParams.size(); ++i) {
             if (_myTextureParams[i].isUsedByShader()) {
                 cgGLDisableTextureParameter(_myTextureParams[i]._myParameter);
+                setGLTextureState(false, _myTextureParams[i]._myParameter);
             }
         }
         glDisable(GL_POINT_SPRITE_ARB);
-        assertCg(string("CgProgramInfo::disableTextures() ") + _myPathName, _myContext);
     }
+
 
     void
     CgProgramInfo::updateTextureUnits() {
@@ -1145,8 +1174,6 @@ namespace y60 {
             _myTextureParams[i].updateTextureUnit(_myShader._myFilename);
         }
     }
-
-
 
     CGprofile
     CgProgramInfo::getCgProfile() const {

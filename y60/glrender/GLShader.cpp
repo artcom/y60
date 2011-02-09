@@ -316,7 +316,7 @@ namespace y60 {
         AC_TRACE << "GLShader::activate " << theMaterial.get<NameTag>();
         AC_TRACE << "GLShader::activate " << theMaterial.getNode();
 
-        theMaterial.updateParams(); // This call is still necessary, but should not be! (removal breaks e.g. glowcube.js test)
+        //theMaterial.updateParams(); // This call is still necessary, but should not be! (removal breaks e.g. glowcube.js test)
 
         MaterialPropertiesFacadePtr myMaterialPropFacade = theMaterial.getChild<MaterialPropertiesTag>();
 
