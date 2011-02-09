@@ -1434,6 +1434,7 @@ namespace y60 {
         }
 
         _myTextRendererManager.render(theViewport);
+        AC_PRINT << "-------";
     }
 
     void

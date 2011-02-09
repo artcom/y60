@@ -60,6 +60,7 @@
 
 //own header
 #include "CgProgramInfo.h"
+#include "GLShader.h"
 
 #ifdef _WIN32
 #    include <direct.h>
@@ -1069,7 +1070,8 @@ namespace y60 {
         bool alreadyHasSpriteTexture = false;
         for (unsigned int i = 0; i < _myTextureParams.size(); ++i) {
             if (_myTextureParams[i].isUsedByShader()) {
-                setGLTextureState(true, _myTextureParams[i]._myParameter);
+                setGLTextureState(true, _myTextureParams[i]);
+
                 cgGLEnableTextureParameter(_myTextureParams[i]._myParameter);
                 if (i >= theMaterial.getTextureUnitCount()) {
                     throw ShaderException(std::string("Texture index ") + as_string(i) +
@@ -1078,50 +1080,7 @@ namespace y60 {
                                           PLUS_FILE_LINE);
                 }
                 const TextureUnit & myTextureUnit = theMaterial.getTextureUnit(i);
-                TexturePtr myTexture = myTextureUnit.getTexture();
-                myTexture->set<LastActiveFrameTag>(myFrameNumber);
-                // texture env apply mode
-                GLenum myTexEnvMode = asGLTextureApplyMode(myTextureUnit.get<TextureUnitApplyModeTag>());
-                glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, myTexEnvMode);
-
-                // texture env const blend color (changed from black OpenGL default)
-                glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, myTextureUnit.get<TextureUnitEnvColorTag>().begin());
-
-                // load texture matrix
-                asl::Matrix4f myMatrix;
-                const y60::ImagePtr & myImage = myTexture->getImage();
-                if (myImage) {
-                    const_cast<y60::Image&>(*myImage).set<LastActiveFrameTag>(myFrameNumber);
-                    myMatrix = myImage->get<ImageMatrixTag>();
-                    myMatrix.postMultiply(myTexture->get<TextureNPOTMatrixTag>());
-                } else {
-                    myMatrix  = myTexture->get<TextureNPOTMatrixTag>();
-                }
-                myMatrix.postMultiply(myTexture->get<TextureMatrixTag>());
-                myMatrix.postMultiply(myTextureUnit.get<TextureUnitMatrixTag>());
-                glLoadMatrixf(static_cast<const GLfloat *>(myMatrix.getData()));
-
-                // setup texture sprite
-                if (myTextureUnit.get<TextureUnitSpriteTag>()) {
-                    if (!alreadyHasSpriteTexture) {
-                        glEnable(GL_POINT_SPRITE_ARB);
-                        CHECK_OGL_ERROR;
-                        if (hasCap("GL_ARB_point_parameters")) {
-                            glPointParameterfARB(GL_POINT_SPRITE_R_MODE_NV, GL_S);
-                            CHECK_OGL_ERROR;
-                        }
-                        alreadyHasSpriteTexture = true;
-                    }
-                    glTexEnvf( GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_TRUE );
-                    CHECK_OGL_ERROR;
-                } else {
-                    if (alreadyHasSpriteTexture) {
-                        glDisable(GL_POINT_SPRITE_ARB);
-                        alreadyHasSpriteTexture = false;
-                    }
-                    glTexEnvf( GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_FALSE );
-                    CHECK_OGL_ERROR;
-                }
+                setTextureParameters(myTextureUnit, alreadyHasSpriteTexture, myFrameNumber);
             }
         }
         glMatrixMode(GL_MODELVIEW);
@@ -1129,9 +1088,10 @@ namespace y60 {
     }
 
     void
-    CgProgramInfo::setGLTextureState(bool theEnableFlag, const CGparameter & theParameter) {
+    CgProgramInfo::setGLTextureState(bool theEnableFlag, const CgTextureParam & theParameter) {
+
         GLenum myTextureTarget = GL_TEXTURE_1D;
-        switch (cgGetParameterType(theParameter)) {
+        switch (cgGetParameterType(theParameter._myParameter)) {
             case CG_SAMPLER1D:
                 myTextureTarget = GL_TEXTURE_1D;
                 break;
@@ -1148,6 +1108,7 @@ namespace y60 {
                 myTextureTarget = GL_TEXTURE_RECTANGLE_ARB;
                 break;
         };
+        glActiveTexture(theParameter.getTextureUnit());
         if (theEnableFlag) {
             glEnable(myTextureTarget);
         } else {
@@ -1161,7 +1122,7 @@ namespace y60 {
         for (unsigned i=0; i < _myTextureParams.size(); ++i) {
             if (_myTextureParams[i].isUsedByShader()) {
                 cgGLDisableTextureParameter(_myTextureParams[i]._myParameter);
-                setGLTextureState(false, _myTextureParams[i]._myParameter);
+                setGLTextureState(false, _myTextureParams[i]);
             }
         }
         glDisable(GL_POINT_SPRITE_ARB);
