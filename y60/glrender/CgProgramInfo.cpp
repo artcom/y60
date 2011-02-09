@@ -1071,7 +1071,6 @@ namespace y60 {
         for (unsigned int i = 0; i < _myTextureParams.size(); ++i) {
             if (_myTextureParams[i].isUsedByShader()) {
                 setGLTextureState(true, _myTextureParams[i]);
-
                 cgGLEnableTextureParameter(_myTextureParams[i]._myParameter);
                 if (i >= theMaterial.getTextureUnitCount()) {
                     throw ShaderException(std::string("Texture index ") + as_string(i) +
@@ -1106,6 +1105,9 @@ namespace y60 {
                 break;
             case CG_SAMPLERRECT:
                 myTextureTarget = GL_TEXTURE_RECTANGLE_ARB;
+                break;
+            default:
+                throw ShaderException(std::string("unknown texture type in Material id=") + theParameter._myParamName, PLUS_FILE_LINE);
                 break;
         };
         glActiveTexture(theParameter.getTextureUnit());
