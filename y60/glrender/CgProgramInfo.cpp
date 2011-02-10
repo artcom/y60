@@ -226,13 +226,6 @@ namespace y60 {
             std::vector<string> myArgStrings;
             std::vector<const char *> myArgs = _myCachedCompilerArgs;
             appendUnsizedArrayBugWorkaroundCompilerArgs(myArgStrings, myArgs);
-            char const ** ppOptions = cgGLGetOptimalOptions(getCgProfile());
-            if (ppOptions && *ppOptions) {
-                while (*ppOptions) {
-                    myArgs.push_back(*ppOptions);
-                    ppOptions++;
-                }
-            }
             myArgs.push_back(0);
             AC_TRACE << "cgCreateProgramFromFile  args = " << myArgs;
             //AC_TRACE << "cgCreateProgram  unsized array fix args = " << myArgStrings;
@@ -261,13 +254,6 @@ namespace y60 {
             std::vector<string> myArgStrings;
             std::vector<const char *> myArgs = _myCachedCompilerArgs;
             appendUnsizedArrayBugWorkaroundCompilerArgs(myArgStrings, myArgs);
-            char const ** ppOptions = cgGLGetOptimalOptions(getCgProfile());
-            if (ppOptions && *ppOptions) {
-                while (*ppOptions) {
-                    myArgs.push_back(*ppOptions);
-                    ppOptions++;
-                }
-            }
             myArgs.push_back(0);
             //AC_TRACE << "cgCreateProgram  unsized array fix args = " << myArgStrings;
             AC_TRACE << "cgCreateProgram  args = " << myArgs;

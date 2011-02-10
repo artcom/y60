@@ -235,7 +235,7 @@ namespace y60 {
             const string myShadersBestProfileName = theShader._myPossibleProfileNames[myProfileIndex];
             ShaderProfile myShadersBestProfile = ShaderProfile(asl::getEnumFromString(myShadersBestProfileName, ShaderProfileStrings));
             if (myShadersBestProfile < myRequestedProfile) {
-                AC_INFO << "Shader description for shader: " << theShaderNode->parentNode()->getAttributeString(NAME_ATTRIB) << " does not contain requested profile '"<<theProfileName<<"', using shader's best profile '"<<myShadersBestProfileName<<"'";
+                AC_INFO << "Shader description does not contain requested profile '"<<theProfileName<<"', using shader's best profile '"<<myShadersBestProfileName<<"'";
                 theShader._myProfile = myShadersBestProfile;
             } else {
                 AC_DEBUG << "Engine profile does not match any given profile in shader description, library node =" << *theShaderNode;
