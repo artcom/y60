@@ -226,6 +226,7 @@ namespace y60 {
             std::vector<string> myArgStrings;
             std::vector<const char *> myArgs = _myCachedCompilerArgs;
             appendUnsizedArrayBugWorkaroundCompilerArgs(myArgStrings, myArgs);
+#if (CG_VERSION_NUM >= 2200)
             char const ** ppOptions = cgGLGetOptimalOptions(getCgProfile());
             if (ppOptions && *ppOptions) {
                 while (*ppOptions) {
@@ -233,6 +234,7 @@ namespace y60 {
                     ppOptions++;
                 }
             }
+#endif
             myArgs.push_back(0);
             AC_TRACE << "cgCreateProgramFromFile  args = " << myArgs;
             //AC_TRACE << "cgCreateProgram  unsized array fix args = " << myArgStrings;
@@ -261,6 +263,7 @@ namespace y60 {
             std::vector<string> myArgStrings;
             std::vector<const char *> myArgs = _myCachedCompilerArgs;
             appendUnsizedArrayBugWorkaroundCompilerArgs(myArgStrings, myArgs);
+#if (CG_VERSION_NUM >= 2200)
             char const ** ppOptions = cgGLGetOptimalOptions(getCgProfile());
             if (ppOptions && *ppOptions) {
                 while (*ppOptions) {
@@ -268,6 +271,7 @@ namespace y60 {
                     ppOptions++;
                 }
             }
+#endif
             myArgs.push_back(0);
             //AC_TRACE << "cgCreateProgram  unsized array fix args = " << myArgStrings;
             AC_TRACE << "cgCreateProgram  args = " << myArgs;
@@ -1079,6 +1083,9 @@ namespace y60 {
     CgProgramInfo::enableTextures(const y60::MaterialBase & theMaterial) {
         AC_TRACE << "CgProgramInfo::enableTextures - " << ShaderProfileStrings[_myShader._myProfile];
 
+        if (_myTextureParams.size() == 0) {
+            return;
+        }
         asl::Unsigned64 myFrameNumber = theMaterial.get<LastActiveFrameTag>();
         glMatrixMode(GL_TEXTURE);
         bool alreadyHasSpriteTexture = false;
