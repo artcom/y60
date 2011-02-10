@@ -662,7 +662,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
             _myMovieNode.audio = 1;
             _myMovieNode.decoderhint = theDecoderHint;
             //_myMovieNode.maxcachesize = 32;
-            _myMovieNode.targetpixelformat = "RGB";//"YUV420";//"ALPHA";//"LUMINANCE8";//"RGB" // "ALPHA";//"RGBA8";
+            _myMovieNode.targetpixelformat = "YUV420";//"YUV420";//"ALPHA";//"LUMINANCE8";//"RGB" // "ALPHA";//"RGBA8";
         }
 
         if (_myFullSizeMode) {
