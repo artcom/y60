@@ -131,8 +131,6 @@ if (!("disableSparkWidgets" in this)) {
     use("spark/widget/Image.js");
     use("spark/widget/Text.js");
     use("spark/widget/Movie.js");
-    use("spark/widget/NewMovie.js");
-    use("spark/widget/NewText.js");
     use("spark/widget/Canvas.js");
     use("spark/widget/AtlasImage.js");
     use("spark/add-ons/RoundedCornerQuad.js");
