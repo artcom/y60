@@ -34,6 +34,7 @@ spark.StretchyImage.Constructor = function (Protected) {
 
         Public.__defineSetter__(theAcessorName, function (theValue) {
             _myShapeStretcher.edges[theEdgeName] = theValue;
+            _myShapeStretcher.updateGeometry(_myImageSize, true, Public.origin);
             _myShapeStretcher.updateGeometry(Public.size, false, Public.origin);
         });
     }
@@ -45,7 +46,8 @@ spark.StretchyImage.Constructor = function (Protected) {
 
         Public.__defineSetter__(theAcessorName, function (theValue) {
             _myShapeStretcher.crop[theEdgeName] = theValue;
-            _reset();
+            _myShapeStretcher.updateGeometry(_myImageSize, true, Public.origin);
+            _myShapeStretcher.updateGeometry(Public.size, false, Public.origin);
         });
     }
     
@@ -80,6 +82,7 @@ spark.StretchyImage.Constructor = function (Protected) {
         _myShapeStretcher.edges.bottom = theEdges[1];
         _myShapeStretcher.edges.right  = theEdges[2];
         _myShapeStretcher.edges.top    = theEdges[3];
+        _myShapeStretcher.updateGeometry(_myImageSize, true, Public.origin);
         _myShapeStretcher.updateGeometry(Public.size, false, Public.origin);
     });
 
@@ -116,6 +119,7 @@ spark.StretchyImage.Constructor = function (Protected) {
             Base.imageSetter(theImage);
             _myImageSize = getImageSize(theImage);
             _myShapeStretcher.setupGeometry(_myImageSize, Public.origin);
+            _myShapeStretcher.updateGeometry(Public.size, false, Public.origin);
         });
 
         Base.widthSetter = Public.__lookupSetter__("width");
