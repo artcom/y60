@@ -280,7 +280,7 @@ dom::Schema::checkSchemaRestriction(const NodePtr theParentElementType,
                                     const NodePtr theSchemaDeclaration, 
                                     const Node* theElement)
 {
-    if (theElement->parentNode() && theSchemaDeclaration) {
+    if (theElement && theElement->parentNode() && theSchemaDeclaration) {
         if (theParentElementType) {
             // check if we are part of a sequence
             NodePtr mySequence;
