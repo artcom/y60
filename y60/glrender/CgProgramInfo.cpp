@@ -735,7 +735,7 @@ namespace y60 {
             {
                 Matrix4f myTransposedMatrix = theCamera.get<GlobalMatrixTag>();
                 myTransposedMatrix.transpose();
-                    {AC_TRACE << "setting CAMERA_T to " << myTransposedMatrix;}
+                {AC_TRACE << "setting CAMERA_T to " << myTransposedMatrix;}
                 setCgMatrixParameter(curParam, myTransposedMatrix);
                 break;
             }
@@ -746,7 +746,7 @@ namespace y60 {
                 Matrix4f myProjectionMatrix;
                 theCamera.get<FrustumTag>().getProjectionMatrix( myProjectionMatrix );
                 myMatrix.postMultiply(myProjectionMatrix);
-                    {AC_TRACE << "setting VIEWPROJECTION to " << myMatrix;}
+                {AC_TRACE << "setting VIEWPROJECTION to " << myMatrix;}
                 setCgMatrixParameter(curParam, myMatrix);
                 break;
             }
@@ -762,7 +762,7 @@ namespace y60 {
             {
                 Matrix4f myTransposedMatrix = theBody.get<GlobalMatrixTag>();
                 myTransposedMatrix.transpose();
-                    {AC_TRACE << "setting OBJECTWORLD_T to " << myTransposedMatrix;}
+                {AC_TRACE << "setting OBJECTWORLD_T to " << myTransposedMatrix;}
                 setCgMatrixParameter(curParam, myTransposedMatrix);
                 break;
             }
@@ -770,19 +770,30 @@ namespace y60 {
             {
                 Matrix4f myTransposedMatrix = theBody.get<InverseGlobalMatrixTag>();
                 myTransposedMatrix.transpose();
-                    {AC_TRACE << "setting OBJECTWORLD_T to " << myTransposedMatrix;}
+                {AC_TRACE << "setting OBJECTWORLD_T to " << myTransposedMatrix;}
                 setCgMatrixParameter(curParam, myTransposedMatrix);
                 break;
             }
             case TEXTURE_MATRICES:
             {
-                    {AC_TRACE << "setting TEXTURE_MATRICES";}
+                {AC_TRACE << "setting TEXTURE_MATRICES";}
                 unsigned mySize = cgGetArraySize(curParam._myParameter, 0);
                 for (unsigned i = 0; i < mySize; ++i) {
                     CGparameter myParam = cgGetArrayParameter(curParam._myParameter, i);
-                    Matrix4f myTextureMatrix = theMaterial.getTextureUnit(i).get<TextureUnitMatrixTag>();
-                        {AC_TRACE << "setting texture matrix << " << i << " param=" << myParam << " to " << myTextureMatrix;}
-                    cgGLSetMatrixParameterfc(myParam, myTextureMatrix.getData());
+                    const TextureUnit & myTextureUnit = theMaterial.getTextureUnit(i);
+                    const y60::TexturePtr & myTexture = myTextureUnit.getTexture();
+                    const y60::ImagePtr & myImage = myTexture->getImage();
+                    asl::Matrix4f myMatrix;
+                    if (myImage) {
+                        myMatrix = myImage->get<ImageMatrixTag>();
+                        myMatrix.postMultiply(myTexture->get<TextureNPOTMatrixTag>());
+                    } else {
+                        myMatrix  = myTexture->get<TextureNPOTMatrixTag>();
+                    }
+                    myMatrix.postMultiply(myTexture->get<TextureMatrixTag>());
+                    myMatrix.postMultiply(myTextureUnit.get<TextureUnitMatrixTag>());
+                    {AC_TRACE << "setting texture matrix << " << i << " param=" << myParam << " to " << myMatrix;}
+                    cgGLSetMatrixParameterfc(myParam, myMatrix.getData());
                 }
                 break;
             }
