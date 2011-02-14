@@ -1531,9 +1531,16 @@ dom::Node::parseAll(const String& is) {
                     doctype = new_child.get();
                 }
             }
+            // check root node against schema restrictions
+            if (new_child->_mySchemaInfo && new_child->self().lock()) {
+                new_child->_mySchemaInfo->getSchema()->checkSchemaRestriction(new_child->_mySchemaInfo->_myType, new_child->_mySchemaInfo->_mySchemaDeclaration, new_child.getNativePtr());
+            }
         } while (completed_pos > pos);
         // read potentially trailing whitespace
         _myParseCompletionPos = asl::read_whitespace(is,pos);
+
+
+
     }
 
     catch (ParseException & pex) {
@@ -1982,6 +1989,7 @@ dom::Node::parseNextNode(const String & is, std::string::size_type pos, const No
             } while (completed_pos > tag_end_pos);
             _myDocSize = _myParseCompletionPos = completed_pos;
             // start tag element node & all children ready
+
             return _myParseCompletionPos;
         }
 
@@ -2135,6 +2143,7 @@ dom::Node::appendChild(NodePtr theNewChild) {
        return NodePtr();
     }
 
+
     checkName(theNewChild->nodeName(), theNewChild->nodeType());
     if (theNewChild->nodeType() == DOCUMENT_FRAGMENT_NODE) {
         // appending a DocumentFragment-Node is a kind of poor man's "atomic" operation in the sense that
@@ -2172,6 +2181,12 @@ dom::Node::appendChild(NodePtr theNewChild) {
     }
     checkAndUpdateChildrenSchemaInfo(*theNewChild, this);
     getChildren().appendWithoutReparenting(theNewChild); // reparenting should have been already done in checkAndUpdateChildrenSchemaInfo
+
+    // check schema restrictions
+    if (_mySchemaInfo) {
+        _mySchemaInfo->getSchema()->checkSchemaRestriction(_mySchemaInfo->_myType, theNewChild->_mySchemaInfo->_mySchemaDeclaration, theNewChild.getNativePtr());
+    }
+
     return theNewChild;
 }
 
@@ -3266,6 +3281,7 @@ Node::registerName() {
 
 void
 Node::reparent(Node * theNewParent, Node * theTopNewParent, bool theBumpVersionFlag) {
+
     //Node * myOldParent = _myParent;
     _myParent = theNewParent;
     unregisterName();
@@ -3302,6 +3318,11 @@ Node::reparent(Node * theNewParent, Node * theTopNewParent, bool theBumpVersionF
     // Variant b: In case a parent value depends on the values of all children
     if (_myParent) {
         _myParent->markPrecursorDependenciesOutdated();
+
+        // check schema restrictions
+        if (_mySchemaInfo && theNewParent && theTopNewParent) {
+            _mySchemaInfo->getSchema()->checkSchemaRestriction(theNewParent->_mySchemaInfo->_myType, _mySchemaInfo->_mySchemaDeclaration, this);
+        }
     }
 #endif
     if (_myParent && theBumpVersionFlag) {

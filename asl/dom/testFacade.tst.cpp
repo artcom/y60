@@ -141,7 +141,6 @@ class ChildFacade :
             FacadeAttributePlug<DoubleParentFloatTag>(this),
             FacadeAttributePlug<ChildFloatSumTag>(this)
         {
-            AC_PRINT << "ChildFacade Ctor ";
         }
 
         void registerDependenciesForHalfFloat() {
@@ -398,22 +397,17 @@ class FacadeUnitTest : public UnitTest {
                 ENSURE(myRoot->getAttribute("float"));
                 ENSURE(almostEqual(myRoot->getAttribute("float")->nodeValueRef<float>(), 1.2));
 
-               AC_PRINT << "start req facade testing...";
                 RootFacadePtr myFacade = myRoot->getFacade<RootFacade>();
 
                 RequirementsFacadePtr myReqFacade = myFacade->getChild<RequirementsTag>();
 
-                AC_PRINT << "1";
                 ENSURE(myFacade);
                 ENSURE(myFacade->get<IdTag>() == "r0");
                 ENSURE(myReqFacade->get<ReqTexturesTag>() == "b0rken");
                 ENSURE(myReqFacade->get<ReqTexcoordTag>() == ReqTexcoordTag::getDefault());
                 ENSURE(almostEqual(myFacade->get<FloatTag>(), 1.2));
-                AC_PRINT << "2";
 
-                AC_PRINT << "CHILDFACADE ?";
                 ChildFacadePtr myChildFacade = myRoot->firstChild()->getFacade<ChildFacade>();
-                AC_PRINT << "CHILDFACADE OK";
                 ENSURE(myChildFacade);
                 ENSURE(myChildFacade->get<IdTag>() == "c0");
                 ENSURE(myChildFacade->get<BoolTag>() == true);
@@ -636,9 +630,7 @@ class FacadeUnitTest : public UnitTest {
                         ENSURE(myChild5Facade);
                         ENSURE(myChild5Facade->get<DoubleParentFloatTag>() == 8);
                         ENSURE(myChild2Facade->set<FloatTag>(4) == 4);
-                        AC_PRINT << "For setDirty: " << *myChild5;
                         ENSURE(myChild5Facade->isDirty<DoubleParentFloatTag>());
-                        AC_PRINT << "-Nach setDirty: " << *myChild5;
                         ENSURE(myChild5Facade->get<DoubleParentFloatTag>() == 16);
                         myChild4->removeChild(myChild5);
                     }

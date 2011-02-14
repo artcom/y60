@@ -425,8 +425,8 @@ class XmlSchemaUnitTest : public UnitTest {
                         "<xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'>"
                         "   <xs:element name='scene'>\n"
                         "       <xs:complexType>\n"
-                        "           <xs:sequence>\n"
-                        "               <xs:element name='shapes' type='xs:int'/>\n"
+                        "           <xs:sequence maxOccurs='6'>\n"
+                        "               <xs:element name='shapes' type='xs:int' maxOccurs='unbounded'/>\n"
                         "               <xs:element name='materials' type='xs:int'/>\n"
                         "               <xs:element ref='worlds'/>\n"
                         "               <xs:element ref='uvset'/>\n"
@@ -436,10 +436,10 @@ class XmlSchemaUnitTest : public UnitTest {
                         "           <xs:attribute name='newattr' type='xs:unsignedLong'/>\n"
                         "       </xs:complexType>\n"
                         "   </xs:element>\n"
-                        "   <xs:element name='worlds'>\n"
+                        "   <xs:element name='worlds' maxOccurs='2'>\n"
                         "       <xs:complexType>\n"
-                        "           <xs:sequence minOccurs='0' maxOccurs='unbounded'>\n"
-                        "               <xs:element ref='world' />\n"
+                        "           <xs:sequence minOccurs='0' maxOccurs='2'>\n"
+                        "               <xs:element ref='world'/>\n"
                         "           </xs:sequence>\n"
                         "       </xs:complexType>\n"
                         "   </xs:element>\n"
@@ -453,7 +453,7 @@ class XmlSchemaUnitTest : public UnitTest {
                         "           <xs:attribute name='name' type='xs:string' />\n"
                         "       </xs:complexType>\n"
                         "   </xs:element>\n"
-                        "   <xs:element name='uvset'>\n"
+                        "   <xs:element name='uvset' maxOccurs='1'>\n"
                         "       <xs:complexType>\n"
                         "           <xs:simpleContent>\n"
                         "               <xs:extension base='xs:int'>\n"
@@ -465,6 +465,64 @@ class XmlSchemaUnitTest : public UnitTest {
                         "</xs:schema>\n"
                     );
                     ENSURE(mySchema);
+
+                    // test scheme maxoccurs restrictions
+                    dom::Document myBrokenDocument;
+                    myBrokenDocument.setValueFactory(asl::Ptr<dom::ValueFactory>(new dom::ValueFactory()));
+                    dom::registerStandardTypes(*myBrokenDocument.getValueFactory());
+                    myBrokenDocument.addSchema(mySchema,"");
+                    const char * my2MuchWorldsInSceneDocumentString =
+                        "<scene version='214'>"
+                        "   <shapes>12345</shapes>\n"
+                        "   <materials/>\n"
+                        "   <worlds></worlds>\n"
+                        "   <worlds></worlds>\n"
+                        "   <worlds></worlds>\n"
+                        "   <uvset name='bla'>23</uvset>\n"
+                        "</scene>\n";
+
+                    ENSURE(!myBrokenDocument.parse(my2MuchWorldsInSceneDocumentString));
+
+                    const char * my2MuchWorldInWorldsDocumentString =
+                        "<scene version='214'>"
+                        "   <shapes>12345</shapes>\n"
+                        "   <materials/>\n"
+                        "   <worlds>\n"
+                        "       <world></world>\n"
+                        "       <world></world>\n"
+                        "       <world></world>\n"
+                        "   </worlds>\n";
+                        "   <worlds></worlds>\n"
+                        "   <uvset name='bla'>23</uvset>\n"
+                        "</scene>\n";
+
+                    ENSURE(!myBrokenDocument.parse(my2MuchWorldInWorldsDocumentString));
+
+                    const char * my2MuchUVSetsInSceneDocumentString =
+                        "<scene version='214'>"
+                        "   <shapes>12345</shapes>\n"
+                        "   <materials/>\n"
+                        "   <worlds></worlds>\n"
+                        "   <worlds></worlds>\n"
+                        "   <uvset name='bla'>23</uvset>\n"
+                        "   <uvset name='blaFasel'>23</uvset>\n"
+                        "</scene>\n";
+
+                    ENSURE(!myBrokenDocument.parse(my2MuchUVSetsInSceneDocumentString));
+
+                    const char * my2MuchNodesInSceneDocumentString =
+                        "<scene version='214'>"
+                        "   <shapes>12345</shapes>\n"
+                        "   <shapes>12345</shapes>\n"
+                        "   <shapes>12345</shapes>\n"
+                        "   <materials/>\n"
+                        "   <worlds></worlds>\n"
+                        "   <worlds></worlds>\n"
+                        "   <uvset name='bla'>23</uvset>\n"
+                        "</scene>\n";
+
+                    ENSURE(!myBrokenDocument.parse(my2MuchNodesInSceneDocumentString));
+
                     dom::Document myDocument;
                     myDocument.setValueFactory(asl::Ptr<dom::ValueFactory>(new dom::ValueFactory()));
                     dom::registerStandardTypes(*myDocument.getValueFactory());
@@ -516,7 +574,7 @@ myDocument.getValueFactory()->dump();
                     dom::NodePtr myOtherWorld = myDocument("scene")("worlds")("world").cloneNode();
                     cerr << *myOtherWorld;
                     myDocument("scene")("worlds").appendChild(myOtherWorld->cloneNode());
-                    myDocument("scene")("worlds").appendChild(myOtherWorld->cloneNode());
+                    ENSURE_EXCEPTION(myDocument("scene")("worlds").appendChild(myOtherWorld->cloneNode()),dom::Schema::ElementNotAllowed);
                     cerr << myDocument;
                     DTITLE("Binarization tests");
                     asl::Block myBinaryRep;

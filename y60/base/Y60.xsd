@@ -940,52 +940,52 @@ lightsources, animations, shapes and images</xs:documentation>
         </xs:annotation>
         <xs:complexType>
             <xs:sequence>
-                <xs:element ref="worlds">
+                <xs:element ref="worlds" maxOccurs="1">
                     <xs:annotation>
                         <xs:documentation>Contains the scenegraph hierachy</xs:documentation>
                     </xs:annotation>
                 </xs:element>
-                <xs:element ref="records">
+                <xs:element ref="records" maxOccurs="1">
                     <xs:annotation>
                         <xs:documentation>Contains the user defined data hierarchy</xs:documentation>
                     </xs:annotation>
                 </xs:element>
-                 <xs:element ref="canvases">
+                 <xs:element ref="canvases" maxOccurs="1">
                     <xs:annotation>
                         <xs:documentation>Contains render areas and viewports</xs:documentation>
                     </xs:annotation>
                 </xs:element>
-                <xs:element ref="materials">
+                <xs:element ref="materials" maxOccurs="1">
                     <xs:annotation>
                         <xs:documentation>Contains material definitions</xs:documentation>
                     </xs:annotation>
                 </xs:element>
-                <xs:element ref="lightsources">
+                <xs:element ref="lightsources" maxOccurs="1">
                     <xs:annotation>
                         <xs:documentation>Contains light definitions</xs:documentation>
                     </xs:annotation>
                 </xs:element>
-                <xs:element ref="animations">
+                <xs:element ref="animations" maxOccurs="1">
                     <xs:annotation>
                         <xs:documentation>Contains all global timeline animations</xs:documentation>
                     </xs:annotation>
                 </xs:element>
-                <xs:element ref="characters">
+                <xs:element ref="characters" maxOccurs="1">
                     <xs:annotation>
                         <xs:documentation>Contains character animations</xs:documentation>
                     </xs:annotation>
                 </xs:element>
-                <xs:element ref="shapes">
+                <xs:element ref="shapes" maxOccurs="1">
                     <xs:annotation>
                         <xs:documentation>Contains the geometric of all objects in the scene</xs:documentation>
                     </xs:annotation>
                 </xs:element>
-                <xs:element ref="textures">
+                <xs:element ref="textures" maxOccurs="1">
                     <xs:annotation>
                         <xs:documentation>Contains texture objects that are referenced by textureunits</xs:documentation>
                     </xs:annotation>
                 </xs:element>
-                <xs:element ref="images">
+                <xs:element ref="images" maxOccurs="1">
                     <xs:annotation>
                         <xs:documentation>Contains images that are referenced by textures</xs:documentation>
                     </xs:annotation>
@@ -1172,12 +1172,12 @@ A possible application is edge blending, where you render the same scene into tw
         </xs:annotation>
         <xs:complexType>
             <xs:sequence minOccurs="0" maxOccurs="unbounded">
-                <xs:element ref="underlays">
+                <xs:element ref="underlays" maxOccurs="1">
                     <xs:annotation>
                         <xs:documentation>Contains overlay elements, that are rendered below the reset of the scene</xs:documentation>
                     </xs:annotation>
                 </xs:element>
-                <xs:element ref="overlays">
+                <xs:element ref="overlays" maxOccurs="1">
                     <xs:annotation>
                         <xs:documentation>Contains overlay elements, that are rendered on top of the scene</xs:documentation>
                     </xs:annotation>
@@ -1512,13 +1512,13 @@ See also the indices-node (shape-&gt;primitives-&gt;elemements-&gt;indices) for 
         </xs:annotation>
         <xs:complexType>
             <xs:sequence>
-                <xs:element ref="vertexdata">
+                <xs:element ref="vertexdata" maxOccurs="1">
                     <xs:annotation>
                         <xs:documentation>Contains positions, colors, normals, uv-coordinates,
 and other vertex data</xs:documentation>
                     </xs:annotation>
                 </xs:element>
-                <xs:element ref="primitives">
+                <xs:element ref="primitives" maxOccurs="1">
                     <xs:annotation>
                         <xs:documentation>Contains primitives, such as triangles and quads, that
 reference the vertexdata</xs:documentation>
@@ -1766,7 +1766,7 @@ The following roles are currently defined:
         </xs:annotation>
         <xs:complexType>
             <xs:sequence>
-                <xs:element ref="properties">
+                <xs:element ref="properties" maxOccurs="1">
                     <xs:annotation>
                         <xs:documentation>Contains properties for the lightsource.
 
@@ -2115,12 +2115,12 @@ to find the best matching shader for this material.</xs:documentation>
                         <xs:documentation>Contains texture unit definitions.</xs:documentation>
                     </xs:annotation>
                 </xs:element>
-                <xs:element ref="texture">
+                <xs:element ref="texture" maxOccurs="1">
                     <xs:annotation>
                         <xs:documentation>Contains texture definitions.</xs:documentation>
                     </xs:annotation>
                 </xs:element>
-                 <xs:element ref="ImageBase">
+                 <xs:element ref="ImageBase" maxOccurs="1">
                     <xs:annotation>
                         <xs:documentation>Contains image and movie definitions.</xs:documentation>
                     </xs:annotation>
@@ -2149,7 +2149,7 @@ Transparent materials are rendered in z-order in a second pass.</xs:documentatio
             </xs:attribute>
          </xs:complexType>
     </xs:element>
-    <xs:element name="requires">
+    <xs:element name="requires" maxOccurs="1">
         <xs:annotation>
             <xs:documentation>A list of features, that are required by a shader to render a given material.
 The material requirements are used to find the best matching shader in the shaderlibrary.</xs:documentation>
@@ -2199,7 +2199,7 @@ matching shader.</xs:documentation>
             </xs:simpleContent>
         </xs:complexType>
     </xs:element>
-    <xs:element name="properties">
+    <xs:element name="properties" maxOccurs="1">
         <xs:annotation>
             <xs:documentation>List of material properties. Typical properties include:
 
@@ -2689,7 +2689,7 @@ Example:
         </xs:complexType>
     </xs:element>
 
-    <xs:element name="textureunits">
+    <xs:element name="textureunits" maxOccurs="1">
         <xs:annotation>
             <xs:documentation>List of textureunits that belong to the material.
 The number of textureunit child nodes must be the same as the number of textures defined in the material requirements node.</xs:documentation>

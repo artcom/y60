@@ -275,6 +275,71 @@ Schema::findType(NodePtr theSchemaDeclaration, unsigned long theParsePos) {
         throw Schema::ElementWithoutType(asl::as_string(*theSchemaDeclaration),"Node::findSchemaType (type by child)", theParsePos);
     }
 }
+bool
+dom::Schema::checkSchemaRestriction(const NodePtr theParentElementType,
+                                    const NodePtr theSchemaDeclaration, 
+                                    const Node* theElement)
+{
+    if (theElement->parentNode() && theSchemaDeclaration) {
+        if (theParentElementType) {
+            // check if we are part of a sequence
+            NodePtr mySequence;
+            if (theParentElementType->nodeName() == XS_COMPLEXTYPE ||
+                theParentElementType->nodeName() == XS_SEQUENCE)
+            {
+                NodePtr myComplexContent = theParentElementType->childNode(XS_COMPLEXCONTENT);
+                NodePtr myExtension;
+                NodePtr myRestriction;
+                if (myComplexContent) {
+                    myExtension = myComplexContent->childNode(XS_EXTENSION);
+                    myRestriction = myComplexContent->childNode(XS_RESTRICTION);
+                    if (myExtension) {
+                        mySequence = myExtension->childNode(XS_SEQUENCE);
+                    } else if (myRestriction) {
+                        mySequence = myRestriction->childNode(XS_SEQUENCE);
+                    } else {
+                        throw ExtensionOrRestrictionRequired(
+                            string("'Either xs:extension or xs:restriction required as child of xs:complexContent'")
+                            +", element declaration:"+asl::as_string(*theParentElementType),
+                            "Node::checkSchemaRestriction (complexType)");
+                    }
+                } else {
+                    mySequence = theParentElementType->childNode(XS_SEQUENCE);
+                }
+            }
+            // check maxoccurs of any childnodes in a sequence
+            NodePtr myMaxSequenceChildCountAttr;
+            if (mySequence) {
+                myMaxSequenceChildCountAttr = mySequence->getAttribute(MAXOCCURS_NAME);
+                if (myMaxSequenceChildCountAttr && myMaxSequenceChildCountAttr->nodeValue() != UNBOUNDED_MAXOCCURS) {
+                    unsigned myMaxSequenceChildCount = asl::as<int>(myMaxSequenceChildCountAttr->nodeValue());
+                    unsigned myChildNodeCount = theElement->parentNode()->childNodesLength();
+                    if (myChildNodeCount > myMaxSequenceChildCount) {
+                        throw Schema::ElementNotAllowed(
+                            string("'")+ theElement->nodeName()+"' is not allowed as child #"+ asl::as_string(myChildNodeCount) +" of '"+theElement->parentNode()->nodeName()+"'"
+                            +" because of maxOccurs restrictions, declaration:\n"+asl::as_string(*mySequence),
+                            "Node::checkElementRestriction");
+                    }
+                }
+            }
+        }
+
+
+        // check maxoccurs of specific xs:elements-declaration as part of a sequence
+        NodePtr myMaxOccursAttr = theSchemaDeclaration->getAttribute(MAXOCCURS_NAME);
+        if (myMaxOccursAttr && myMaxOccursAttr->nodeValue() != UNBOUNDED_MAXOCCURS) {
+            unsigned myMaxOccurs = asl::as<int>(myMaxOccursAttr->nodeValue());
+            unsigned myElementCount = theElement->parentNode()->childNodesLength(theElement->nodeName());
+            if (myElementCount > myMaxOccurs) {
+                throw Schema::ElementNotAllowed(
+                    string("'")+ theElement->nodeName()+"' is not allowed as child #"+ asl::as_string(myElementCount) +" of '"+theElement->parentNode()->nodeName()+"'"
+                    +" because of maxOccurs restrictions, declaration:\n"+asl::as_string(*theSchemaDeclaration),
+                    "Node::checkElementRestriction");
+            }
+        }
+    }
+    return true;
+}
 
 const NodePtr
 dom::Schema::findElementDeclaration(const DOMString & theParentElementName,
