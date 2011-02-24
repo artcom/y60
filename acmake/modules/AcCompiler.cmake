@@ -16,8 +16,11 @@
 #
 
 if(MSVC)
-    # Full warnings
-    add_definitions( /W4 )
+    # Almost full warnings
+    # Avoid duplicate warning option warning.
+    # See http://msdn.microsoft.com/en-us/library/thxezb7y.aspx
+    # [DS]
+    #add_definitions( /W4 )
 
     set(ACMAKE_PARALLEL_CL "" CACHE STRING "Number of processes to use when compiling with cl")
 
