@@ -72,7 +72,7 @@ ourShow.SceneTester.setup = ourShow.setup;
 ourShow.setup = function () {
     ourShow.SceneTester.setup(256, 256);
     window.fixedFrameTime = 1;
-            
+    ourShow.offscreenFlag = false;
     // Image setup
     ourImage = new Node("<image src='tex/colors.rgb'/>").firstChild;
     ourImage = window.scene.images.appendChild(ourImage);
