@@ -133,7 +133,6 @@ FixedVectorUnitTest.prototype.Constructor = function(obj, theName) {
         obj.myVec.add(3.5);
         ENSURE('almostEqual(obj.myVec, new Vector2f(8,4))');
         obj.myVec.div(2.1);
-        print(obj.myVec)
         ENSURE('almostEqual(obj.myVec, new Vector2f(3.80952,1.90476))');
         obj.myVec.mult(2.1);
         ENSURE('almostEqual(obj.myVec, new Vector2f(8,4))');
