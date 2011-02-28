@@ -937,6 +937,6 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     if (myShaderLibrary) {
         GLResourceManager.prepareShaderLibrary(myShaderLibrary);
     } else {
-        Logger.warning("No Shaderlibrary name given found, default library will be loaded");
+        Logger.info("No Shaderlibrary name given found, default library will be loaded");
     }
 };
