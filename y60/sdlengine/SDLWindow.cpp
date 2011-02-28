@@ -343,8 +343,11 @@ SDLWindow::setVideoMode(unsigned theTargetWidth, unsigned theTargetHeight,
 	_myWidth = theTargetWidth;
 	_myHeight = theTargetHeight;
 	_myFullscreenFlag = theFullscreenFlag;
+    //XXX: getScreenSize() results in segfault on linux and is not implemented on macos, so disabled size correction for them
+#ifdef WIN32
     asl::Vector2i myScreenSize = getScreenSize();
     _myWindowHeightBiggerThenDesktopFlag = _myHeight > (myScreenSize[1] - ourMagicDecorationHeight);
+#endif
 	updateVideoMode();
 }
 
