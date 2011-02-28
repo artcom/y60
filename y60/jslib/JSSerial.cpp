@@ -164,7 +164,7 @@ open(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         }
         if (argc > 6) {
             if (!convertFrom(cx, argv[6], myTimeOut)) {
-                JS_ReportError(cx, "JSSerial::open(): argument #6 must be a integer (Timeout)");
+                JS_ReportError(cx, "JSSerial::open(): argument #7 must be a integer (Timeout)");
                 return JS_FALSE;
             }
         }
@@ -508,7 +508,7 @@ JSSerial::Functions() {
     static JSFunctionSpec myFunctions[] = {
         // name                  native                   nargs
         {"toString",             toString,                0},
-        {"open",                 open,                    5},
+        {"open",                 open,                    7},
         {"close",                close,                   0},
         {"read",                 read,                    1},
         {"readBlock",            readBlock,               1},

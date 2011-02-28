@@ -80,6 +80,9 @@ float4 mainFragment(vert2frag IN,
 
     float3x3 TBN = float3x3(IN.tangent, IN.binormal, IN.normal);
 
+#ifdef PAINT
+    float4 myTexColor = tex2D(colorMap, IN.texCoord0);
+#endif
     float4 Ntex = tex2D(normalMap, IN.texCoord0);
     float3 N = normalize(expand(Ntex.rgb));
     float3 P = IN.worldPosition;
@@ -108,8 +111,7 @@ float4 mainFragment(vert2frag IN,
      * positional light
      */
     for (int i = 0; i < AC_POSITIONAL_LIGHTS.length; ++i) {
-
-        L = mul(TBN, AC_POSITIONAL_LIGHTS[i] - P);
+        L = normalize(mul(TBN, AC_POSITIONAL_LIGHTS[i] - P));
         diffuseTerm = saturate(dot(L, N));
         myColor.rgb += diffuse.rgb * AC_POSITIONAL_LIGHTS_DIFFUSE_COLOR[i] * diffuseTerm;
 
@@ -122,7 +124,6 @@ float4 mainFragment(vert2frag IN,
 
 #ifdef PAINT
     // blend with base texture
-    float4 myTexColor = tex2D(colorMap, IN.texCoord0);
     myColor *= myTexColor; // MODULATE
 #endif
 

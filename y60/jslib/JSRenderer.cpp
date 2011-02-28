@@ -252,7 +252,7 @@ JSRenderer::Functions() {
         // name                  native                   nargs
         {"toString",             toString,                0},
         {"draw",                 draw,                    5},
-        {"drawFrustum",          drawFrustum,             2},
+        {"drawFrustum",          drawFrustum,             1},
         {0}
     };
     return myFunctions;

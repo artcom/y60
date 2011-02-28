@@ -229,11 +229,11 @@ Example:
     </xs:element>
     <xs:element name="shader">
         <xs:complexType>
-            <xs:sequence>
-                <xs:element ref="supports"/>
-                <xs:element ref="fragmentshader"/>
-                <xs:element ref="vertexshader"/>
-                <xs:element ref="fixedfunctionshader"/>
+            <xs:sequence maxOccurs="4">
+                <xs:element ref="supports" maxOccurs="1"/>
+                <xs:element ref="fragmentshader" maxOccurs="1"/>
+                <xs:element ref="vertexshader" maxOccurs="1"/>
+                <xs:element ref="fixedfunctionshader" maxOccurs="1"/>
             </xs:sequence>
             <xs:attribute name="name" type="xs:string"/>
             <xs:attribute name="id" type="xs:ID"/>
@@ -262,7 +262,7 @@ Example:
     <xs:element name="fragmentshader">
         <xs:complexType>
             <xs:sequence minOccurs="0" maxOccurs="1">
-                <xs:element ref="properties"/>
+                <xs:element ref="properties"  maxOccurs="1"/>
             </xs:sequence>
             <xs:simpleContent>
                 <xs:extension base="CgShader"/>
@@ -271,9 +271,9 @@ Example:
     </xs:element>
     <xs:element name="vertexshader">
         <xs:complexType>
-            <xs:sequence minOccurs="0" maxOccurs="1">
-                <xs:element ref="properties"/>
-                <xs:element ref="vertexparameters"/>
+            <xs:sequence minOccurs="0"  maxOccurs="2">
+                <xs:element ref="properties" maxOccurs="1"/>
+                <xs:element ref="vertexparameters" maxOccurs="1"/>
             </xs:sequence>
             <xs:simpleContent>
                 <xs:extension base="CgShader"/>
@@ -282,9 +282,9 @@ Example:
     </xs:element>
     <xs:element name="fixedfunctionshader">
         <xs:complexType>
-            <xs:sequence minOccurs="0" maxOccurs="1">
-                <xs:element ref="properties"/>
-                <xs:element ref="vertexparameters"/>
+            <xs:sequence minOccurs="0"  maxOccurs="2">
+                <xs:element ref="properties" maxOccurs="1"/>
+                <xs:element ref="vertexparameters" maxOccurs="1"/>
             </xs:sequence>
             <xs:simpleContent>
                 <xs:extension base="CgShader"/>

@@ -8,6 +8,7 @@
 #include <asl/dom/Nodes.h>
 
 #include <y60/base/DataTypes.h>
+#include <y60/base/SettingsParser.h>
 #include <y60/input/IEventSource.h>
 #include <y60/input/GenericEvent.h>
 #include <y60/input/GenericEventSourceFilter.h>
@@ -43,7 +44,8 @@ public:
         : PlugInBase(myDLHandle),
           GenericEventSourceFilter(),
           _myEventSchemaDocument(new Document(y60::ourtuioeventxsd)),
-          _myEventValueFactory(new ValueFactory())
+          _myEventValueFactory(new ValueFactory()),
+          _myTouchArea(-1.0,-1.0)
     {
         registerStandardTypes(*_myEventValueFactory);
         registerSomTypes(*_myEventValueFactory);
@@ -52,7 +54,7 @@ public:
         if (_myFilterMultipleMovePerCursorFlag) {
             addCursorFilter("update", "id");
         }
-        // no default cursor smoothing 
+        // no default cursor smoothing
         _myMaxCursorPositionsInHistory = 1;
     }
 
@@ -71,12 +73,13 @@ public:
     virtual void onUpdateSettings(dom::NodePtr theSettings) {
         dom::NodePtr mySettings = getTUIOSettings(theSettings);
         int myFilterFlag = 0;
-        myFilterFlag = getSetting( mySettings, "FilterMultipleMovePerCursor", myFilterFlag);
+        getConfigSetting( mySettings, "FilterMultipleMovePerCursor", myFilterFlag, 0);
         _myFilterMultipleMovePerCursorFlag = (myFilterFlag == 1 ? true : false);
-        _myMaxCursorPositionsInHistory = getSetting( mySettings, "MaxCursorPositionsForAverage", _myMaxCursorPositionsInHistory);
+        getConfigSetting( mySettings, "MaxCursorPositionsForAverage", _myMaxCursorPositionsInHistory, static_cast<unsigned int>(1));
         int myMaxCursorCount = -1;
-        myMaxCursorCount = getSetting( mySettings, "MaxCursorCount", myMaxCursorCount);
+        getConfigSetting( mySettings, "MaxCursorCount", myMaxCursorCount, -1);
         setMaxCursorCount(myMaxCursorCount);
+        getConfigSetting( mySettings, "TouchArea", _myTouchArea, asl::Vector2f(-1.0,-1.0));
     }
 
     dom::NodePtr
@@ -220,6 +223,7 @@ protected:
         }
         myPosition = calculateAveragePosition(myCursor->getSessionID(), myPosition);
         myNode->appendAttribute<Vector2f>("position", myPosition);
+        myNode->appendAttribute<Vector2f>("toucharea", _myTouchArea);
         myNode->appendAttribute<Vector2f>("velocity", Vector2f(myCursor->getXSpeed(), myCursor->getYSpeed()));
 
         myNode->appendAttribute<double>("speed", myCursor->getMotionSpeed());
@@ -237,6 +241,7 @@ private:
     CursorEventList _myUndeliveredCursors;
 
     std::vector<TuioClient*> _myClients;
+    asl::Vector2f _myTouchArea;
 };
 
 

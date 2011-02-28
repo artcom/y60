@@ -145,7 +145,7 @@ namespace y60 {
 
             void enableProfile();
             void disableProfile();
-            void enableTextures();
+            void enableTextures(const MaterialBase & theMaterial);
             void disableTextures();
             CGprofile getCgProfile() const;
 
@@ -274,6 +274,7 @@ namespace y60 {
             void setCgUnsizedArrayParameter(const CgProgramAutoParam & theParam, const std::vector<asl::Vector4f> & theValue);
             void setCgUnsizedArrayParameter(const CgProgramAutoParam & theParam, const std::vector<float> & theValue);
             void updateTextureUnits();
+            void setGLTextureState(bool theEnableFlag, const CgTextureParam & theParameter);
 
             ShaderDescription           _myShader;
             CGprogram                   _myCgProgramID;

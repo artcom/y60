@@ -74,18 +74,18 @@ GUI.DelayAnimation.prototype.Constructor = function(Public, Protected, theDurati
 
     // initialize from arguments
     Public.setup = function() {
-		Protected.duration = theDuration;
+        Protected.duration = theDuration;
     };
 
     // does noting
     Base.render = Public.render;
     Public.render = function() {
 
-	};
+    };
 
-	Public.toString = function() {
-		return "DelayAnimation";
-	};
+    Public.toString = function() {
+        return Protected.standardToString("DelayAnimation");
+    };
 
     Public.setup();
 };

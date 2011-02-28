@@ -1,5 +1,5 @@
 //=============================================================================
-// Copyright (C) 2009, ART+COM AG Berlin
+// Copyright (C) 2011, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -34,6 +34,7 @@ spark.StretchyImage.Constructor = function (Protected) {
 
         Public.__defineSetter__(theAcessorName, function (theValue) {
             _myShapeStretcher.edges[theEdgeName] = theValue;
+            _myShapeStretcher.updateGeometry(_myImageSize, true, Public.origin);
             _myShapeStretcher.updateGeometry(Public.size, false, Public.origin);
         });
     }
@@ -45,7 +46,8 @@ spark.StretchyImage.Constructor = function (Protected) {
 
         Public.__defineSetter__(theAcessorName, function (theValue) {
             _myShapeStretcher.crop[theEdgeName] = theValue;
-            _reset();
+            _myShapeStretcher.updateGeometry(_myImageSize, true, Public.origin);
+            _myShapeStretcher.updateGeometry(Public.size, false, Public.origin);
         });
     }
     
@@ -80,6 +82,7 @@ spark.StretchyImage.Constructor = function (Protected) {
         _myShapeStretcher.edges.bottom = theEdges[1];
         _myShapeStretcher.edges.right  = theEdges[2];
         _myShapeStretcher.edges.top    = theEdges[3];
+        _myShapeStretcher.updateGeometry(_myImageSize, true, Public.origin);
         _myShapeStretcher.updateGeometry(Public.size, false, Public.origin);
     });
 
@@ -95,25 +98,20 @@ spark.StretchyImage.Constructor = function (Protected) {
         _myShapeStretcher.crop.bottom = theEdges[1];
         _myShapeStretcher.crop.right  = theEdges[2];
         _myShapeStretcher.crop.top    = theEdges[3];
-        _reset();
+        _myShapeStretcher.updateGeometry(_myImageSize, true, Public.origin);
+        _myShapeStretcher.updateGeometry(Public.size, false, Public.origin);
+    });
+
+    Protected.__defineGetter__("shapeStretcher", function () {
+            return _myShapeStretcher;
     });
 
     Base.realize = Public.realize;
     Public.realize = function () {
         Base.realize();
-        
-        _myShapeStretcher = new ShapeStretcher(Protected.shape, {
-            edges : {'top'    : Protected.getNumber("edgeTop",    0),
-                     'left'   : Protected.getNumber("edgeLeft",   0),
-                     'bottom' : Protected.getNumber("edgeBottom", 0),
-                     'right'  : Protected.getNumber("edgeRight",  0)},
-            crop  : {'top'    : Protected.getNumber("cropTop",    0),
-                     'left'   : Protected.getNumber("cropLeft",   0),
-                     'bottom' : Protected.getNumber("cropBottom", 0),
-                     'right'  : Protected.getNumber("cropRight",  0)},
-            quadsPerSide : new Vector2i(Protected.getNumber("quadsPerSideX", 3),
-                                        Protected.getNumber("quadsPerSideY", 3))
-        });
+        var myShapeStretcherCtor = spark.ShapeStretcher.Factory.getShapeStretcherFromAttribute(
+                Protected.getString("shapeStretcher", "default"));
+        _myShapeStretcher = new myShapeStretcherCtor(Protected.shape);
         
         _myImageSize  = getImageSize(Public.image);
         Base.imageSetter = Public.__lookupSetter__("image");
@@ -121,6 +119,7 @@ spark.StretchyImage.Constructor = function (Protected) {
             Base.imageSetter(theImage);
             _myImageSize = getImageSize(theImage);
             _myShapeStretcher.setupGeometry(_myImageSize, Public.origin);
+            _myShapeStretcher.updateGeometry(Public.size, false, Public.origin);
         });
 
         Base.widthSetter = Public.__lookupSetter__("width");
@@ -135,7 +134,7 @@ spark.StretchyImage.Constructor = function (Protected) {
             _myShapeStretcher.updateGeometry(new Vector2f(Public.width, theHeight), false, Public.origin);
         });
 
-        _myShapeStretcher.initialize();
+        _myShapeStretcher.initialize(Public.node);
         _reset();
     };
     

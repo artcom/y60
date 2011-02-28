@@ -5,8 +5,8 @@
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
 // by law. They may be used, modified and redistributed under the terms
-// of GNU General Public License referenced below.
-//
+// of GNU General Public License referenced below. 
+//    
 // Alternative licensing without the obligations of the GPL is
 // available upon request.
 //
@@ -28,7 +28,7 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Description: TODO
+// Description: TODO  
 //
 // Last Review: NEVER, NOONE
 //
@@ -51,7 +51,7 @@
 //
 //    overall review status  : unknown
 //
-//    recommendations:
+//    recommendations: 
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -90,7 +90,7 @@ AssetRequest::AssetRequest(RequestThread * theParent,
     if (fileExists(_myLocalFile)) {
         time_t myLastModified = getLastModified(_myLocalFile);
         if (_myLocalPath == "C_produktion/1_inhalte/IMG/emptypath.png") {
-            AC_DEBUG << "If-modified-Since " << myLastModified << " for " << _myLocalPath;
+            AC_DEBUG << "If-modified-Since " << myLastModified << " for " << _myLocalPath; 
         }
         addHttpHeaderAsDate("If-Modified-Since", myLastModified);
     }
@@ -147,13 +147,13 @@ AssetRequest::onError(CURLcode theCode, long theHttpStatus) {
             break;
         default:
             {
-                AC_ERROR << "CURLerror for URL '" << getURL() << "': " << getErrorString();
+                AC_ERROR << "CURLerror for URL '" << getURL() << "': " << getErrorString();        
             }
     }
-}
+}    
 
 
-void
+void 
 AssetRequest::onDone() {
     _myIsDoneFlag = true;
     if (getResponseCode() >= 399 ) {
@@ -162,7 +162,9 @@ AssetRequest::onDone() {
     }
     if (_myOutputFile) {
         _myOutputFile = asl::Ptr<ofstream>();
-        deleteFile(_myLocalFile);
+        if (asl::fileExists(_myLocalFile)) {
+            deleteFile(_myLocalFile);
+        }
         moveFile(_myPartialFile, _myLocalFile);
     }
     _myParent->sendStatusMsg(StatusMsg(_myLocalPath, "status", "done"));

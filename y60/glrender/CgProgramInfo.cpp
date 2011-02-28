@@ -60,6 +60,7 @@
 
 //own header
 #include "CgProgramInfo.h"
+#include "GLShader.h"
 
 #ifdef _WIN32
 #    include <direct.h>
@@ -225,6 +226,15 @@ namespace y60 {
             std::vector<string> myArgStrings;
             std::vector<const char *> myArgs = _myCachedCompilerArgs;
             appendUnsizedArrayBugWorkaroundCompilerArgs(myArgStrings, myArgs);
+#if (CG_VERSION_NUM >= 2200)
+            char const ** ppOptions = cgGLGetOptimalOptions(getCgProfile());
+            if (ppOptions && *ppOptions) {
+                while (*ppOptions) {
+                    myArgs.push_back(*ppOptions);
+                    ppOptions++;
+                }
+            }
+#endif
             myArgs.push_back(0);
             AC_TRACE << "cgCreateProgramFromFile  args = " << myArgs;
             //AC_TRACE << "cgCreateProgram  unsized array fix args = " << myArgStrings;
@@ -253,6 +263,15 @@ namespace y60 {
             std::vector<string> myArgStrings;
             std::vector<const char *> myArgs = _myCachedCompilerArgs;
             appendUnsizedArrayBugWorkaroundCompilerArgs(myArgStrings, myArgs);
+#if (CG_VERSION_NUM >= 2200)
+            char const ** ppOptions = cgGLGetOptimalOptions(getCgProfile());
+            if (ppOptions && *ppOptions) {
+                while (*ppOptions) {
+                    myArgs.push_back(*ppOptions);
+                    ppOptions++;
+                }
+            }
+#endif
             myArgs.push_back(0);
             //AC_TRACE << "cgCreateProgram  unsized array fix args = " << myArgStrings;
             AC_TRACE << "cgCreateProgram  args = " << myArgs;
@@ -550,7 +569,7 @@ namespace y60 {
             DBP2(STOP_TIMER(CgProgramInfo_reloadIfRequired_bindMaterialParams));
 
             DBP2(START_TIMER(CgProgramInfo_reloadIfRequired_enableTextures));
-            enableTextures();
+            enableTextures(theMaterial);
             DBP2(STOP_TIMER(CgProgramInfo_reloadIfRequired_enableTextures));
 
             assertCg(PLUS_FILE_LINE, _myContext);
@@ -716,7 +735,7 @@ namespace y60 {
             {
                 Matrix4f myTransposedMatrix = theCamera.get<GlobalMatrixTag>();
                 myTransposedMatrix.transpose();
-                    {AC_TRACE << "setting CAMERA_T to " << myTransposedMatrix;}
+                {AC_TRACE << "setting CAMERA_T to " << myTransposedMatrix;}
                 setCgMatrixParameter(curParam, myTransposedMatrix);
                 break;
             }
@@ -727,7 +746,7 @@ namespace y60 {
                 Matrix4f myProjectionMatrix;
                 theCamera.get<FrustumTag>().getProjectionMatrix( myProjectionMatrix );
                 myMatrix.postMultiply(myProjectionMatrix);
-                    {AC_TRACE << "setting VIEWPROJECTION to " << myMatrix;}
+                {AC_TRACE << "setting VIEWPROJECTION to " << myMatrix;}
                 setCgMatrixParameter(curParam, myMatrix);
                 break;
             }
@@ -743,7 +762,7 @@ namespace y60 {
             {
                 Matrix4f myTransposedMatrix = theBody.get<GlobalMatrixTag>();
                 myTransposedMatrix.transpose();
-                    {AC_TRACE << "setting OBJECTWORLD_T to " << myTransposedMatrix;}
+                {AC_TRACE << "setting OBJECTWORLD_T to " << myTransposedMatrix;}
                 setCgMatrixParameter(curParam, myTransposedMatrix);
                 break;
             }
@@ -751,19 +770,30 @@ namespace y60 {
             {
                 Matrix4f myTransposedMatrix = theBody.get<InverseGlobalMatrixTag>();
                 myTransposedMatrix.transpose();
-                    {AC_TRACE << "setting OBJECTWORLD_T to " << myTransposedMatrix;}
+                {AC_TRACE << "setting OBJECTWORLD_T to " << myTransposedMatrix;}
                 setCgMatrixParameter(curParam, myTransposedMatrix);
                 break;
             }
             case TEXTURE_MATRICES:
             {
-                    {AC_TRACE << "setting TEXTURE_MATRICES";}
+                {AC_TRACE << "setting TEXTURE_MATRICES";}
                 unsigned mySize = cgGetArraySize(curParam._myParameter, 0);
                 for (unsigned i = 0; i < mySize; ++i) {
                     CGparameter myParam = cgGetArrayParameter(curParam._myParameter, i);
-                    Matrix4f myTextureMatrix = theMaterial.getTextureUnit(i).get<TextureUnitMatrixTag>();
-                        {AC_TRACE << "setting texture matrix << " << i << " param=" << myParam << " to " << myTextureMatrix;}
-                    cgGLSetMatrixParameterfc(myParam, myTextureMatrix.getData());
+                    const TextureUnit & myTextureUnit = theMaterial.getTextureUnit(i);
+                    const y60::TexturePtr & myTexture = myTextureUnit.getTexture();
+                    const y60::ImagePtr & myImage = myTexture->getImage();
+                    asl::Matrix4f myMatrix;
+                    if (myImage) {
+                        myMatrix = myImage->get<ImageMatrixTag>();
+                        myMatrix.postMultiply(myTexture->get<TextureNPOTMatrixTag>());
+                    } else {
+                        myMatrix  = myTexture->get<TextureNPOTMatrixTag>();
+                    }
+                    myMatrix.postMultiply(myTexture->get<TextureMatrixTag>());
+                    myMatrix.postMultiply(myTextureUnit.get<TextureUnitMatrixTag>());
+                    {AC_TRACE << "setting texture matrix << " << i << " param=" << myParam << " to " << myMatrix;}
+                    cgGLSetMatrixParameterfc(myParam, myMatrix.getData());
                 }
                 break;
             }
@@ -885,9 +915,8 @@ namespace y60 {
             unsigned myTextureIndex = theNode.nodeValueAs<unsigned>();
             if (myTextureIndex < theMaterial.getTextureUnitCount()) {
                 const TextureUnit & myTextureUnit = theMaterial.getTextureUnit(myTextureIndex);
-                const TexturePtr & myTexture = myTextureUnit.getTexture();
-
-                unsigned myTextureId = myTexture->getTextureId();
+                TexturePtr myTexture = myTextureUnit.getTexture();
+                unsigned myTextureId = myTexture->applyTexture();
                 AC_TRACE << "cgGLSetTextureParameter param=" << theCgParameter << " texid=" << myTextureId;
                 cgGLSetTextureParameter( theCgParameter, myTextureId);
                     AC_TRACE << "cgGLSetTextureParameter: Texture index " << as_string(myTextureIndex)
@@ -1062,15 +1091,62 @@ namespace y60 {
     }
 
     void
-    CgProgramInfo::enableTextures() {
+    CgProgramInfo::enableTextures(const y60::MaterialBase & theMaterial) {
         AC_TRACE << "CgProgramInfo::enableTextures - " << ShaderProfileStrings[_myShader._myProfile];
-        for (unsigned i=0; i < _myTextureParams.size(); ++i) {
+
+        if (_myTextureParams.size() == 0) {
+            return;
+        }
+        asl::Unsigned64 myFrameNumber = theMaterial.get<LastActiveFrameTag>();
+        glMatrixMode(GL_TEXTURE);
+        bool alreadyHasSpriteTexture = false;
+        for (unsigned int i = 0; i < _myTextureParams.size(); ++i) {
             if (_myTextureParams[i].isUsedByShader()) {
-                GLenum myTexUnit = cgGLGetTextureEnum(_myTextureParams[i]._myParameter);
-                glActiveTexture(myTexUnit);
+                setGLTextureState(true, _myTextureParams[i]);
                 cgGLEnableTextureParameter(_myTextureParams[i]._myParameter);
-                CHECK_OGL_ERROR;
+                if (i >= theMaterial.getTextureUnitCount()) {
+                    throw ShaderException(std::string("Texture index ") + as_string(i) +
+                                          " not found. Material id=" + theMaterial.get<IdTag>() + 
+                                          " name=" + theMaterial.get<NameTag>() + " has " + as_string(theMaterial.getTextureUnitCount()) + " texture(s)",
+                                          PLUS_FILE_LINE);
+                }
+                const TextureUnit & myTextureUnit = theMaterial.getTextureUnit(i);
+                setTextureParameters(myTextureUnit, alreadyHasSpriteTexture, myFrameNumber);
             }
+        }
+        glMatrixMode(GL_MODELVIEW);
+        assertCg(string("CgProgramInfo::enableTextures() ") + _myPathName, _myContext);
+    }
+
+    void
+    CgProgramInfo::setGLTextureState(bool theEnableFlag, const CgTextureParam & theParameter) {
+
+        GLenum myTextureTarget = GL_TEXTURE_1D;
+        switch (cgGetParameterType(theParameter._myParameter)) {
+            case CG_SAMPLER1D:
+                myTextureTarget = GL_TEXTURE_1D;
+                break;
+            case CG_SAMPLER2D:
+                myTextureTarget = GL_TEXTURE_2D;
+                break;
+            case CG_SAMPLER3D:
+                myTextureTarget = GL_TEXTURE_3D;
+                break;
+            case CG_SAMPLERCUBE:
+                myTextureTarget = GL_TEXTURE_CUBE_MAP_ARB;
+                break;
+            case CG_SAMPLERRECT:
+                myTextureTarget = GL_TEXTURE_RECTANGLE_ARB;
+                break;
+            default:
+                throw ShaderException(std::string("unknown texture type in Material id=") + theParameter._myParamName, PLUS_FILE_LINE);
+                break;
+        };
+        glActiveTexture(theParameter.getTextureUnit());
+        if (theEnableFlag) {
+            glEnable(myTextureTarget);
+        } else {
+            glDisable(myTextureTarget);
         }
     }
 
@@ -1079,13 +1155,13 @@ namespace y60 {
         AC_TRACE << "CgProgramInfo::disableTextures - " << ShaderProfileStrings[_myShader._myProfile];
         for (unsigned i=0; i < _myTextureParams.size(); ++i) {
             if (_myTextureParams[i].isUsedByShader()) {
-                GLenum myTexUnit = _myTextureParams[i].getTextureUnit();
-                glActiveTexture(myTexUnit);
                 cgGLDisableTextureParameter(_myTextureParams[i]._myParameter);
-                CHECK_OGL_ERROR;
+                setGLTextureState(false, _myTextureParams[i]);
             }
         }
+        glDisable(GL_POINT_SPRITE_ARB);
     }
+
 
     void
     CgProgramInfo::updateTextureUnits() {
@@ -1093,8 +1169,6 @@ namespace y60 {
             _myTextureParams[i].updateTextureUnit(_myShader._myFilename);
         }
     }
-
-
 
     CGprofile
     CgProgramInfo::getCgProfile() const {
@@ -1106,16 +1180,6 @@ namespace y60 {
         case ARBFP1 :
             myResult = CG_PROFILE_ARBFP1;
             break;
-#if (CG_VERSION_NUM >= 2000)
-        case GP4VP:
-            myResult = CG_PROFILE_GPU_VP;
-            break;
-        case GP4FP:
-            myResult = CG_PROFILE_GPU_FP;
-            break;
-#else
-#   error "CG below 2.0 won't work!"
-#endif
         case  VP40:
             myResult = CG_PROFILE_VP40;
             break;
@@ -1141,11 +1205,32 @@ namespace y60 {
         case GLSLF:
             myResult = CG_PROFILE_GLSLF;
             break;
+#   if (CG_VERSION_NUM >= 3000)
+        case GP5VP:
+            myResult = CG_PROFILE_GP5VP;
+            break;
+        case GP5FP:
+            myResult = CG_PROFILE_GP5FP;
+            break;
+        case GP4VP:
+            myResult = CG_PROFILE_GP4VP;
+            break;
+        case GP4FP:
+            myResult = CG_PROFILE_GP4FP;
+            break;
+#   else
+        case GP4VP:
+            myResult = CG_PROFILE_GPU_VP;
+            break;
+        case GP4FP:
+            myResult = CG_PROFILE_GPU_FP;
+            break;
+#   endif
 #else
 #   error "CG below 2.0 won't work!"
 #endif
         default:
-            throw RendererException(string("Unknown shaderprofile : ") +
+            throw RendererException(string("Unsupported shaderprofile : ") +
                                     getStringFromEnum(_myShader._myProfile, ShaderProfileStrings),
                                     PLUS_FILE_LINE);
         };

@@ -190,30 +190,39 @@ namespace y60 {
         VectorOfRankedFeature myVertexParam = myVertexParamColorNode->firstChild()->nodeValueRef<VectorOfRankedFeature>();
         if( myVertexParam[0]._myFeature[0] == "unlit") {
             dom::NodePtr mySurfaceColorsNode = theMaterial->childNode("properties",0)->childNodeByAttribute("vector4f", "name", "surfacecolor");
-            Vector4f & mySurfaceColor = mySurfaceColorsNode->firstChild()->nodeValueRefOpen<Vector4f>();
-            mySurfaceColor[3] = theAlpha;
-            mySurfaceColorsNode->firstChild()->nodeValueRefClose<Vector4f>();
+            if(mySurfaceColorsNode) {
+                Vector4f & mySurfaceColor = mySurfaceColorsNode->firstChild()->nodeValueRefOpen<Vector4f>();
+                mySurfaceColor[3] = theAlpha;
+                mySurfaceColorsNode->firstChild()->nodeValueRefClose<Vector4f>();
+            }
         } else {
             dom::NodePtr myDiffuseColorsNode = theMaterial->childNode("properties",0)->childNodeByAttribute("vector4f", "name", "diffuse");
-            Vector4f & myDiffuseColor = myDiffuseColorsNode->firstChild()->nodeValueRefOpen<Vector4f>();
-            myDiffuseColor[3] = theAlpha;
-            myDiffuseColorsNode->firstChild()->nodeValueRefClose<Vector4f>();
+            if(myDiffuseColorsNode) {
+                Vector4f & myDiffuseColor = myDiffuseColorsNode->firstChild()->nodeValueRefOpen<Vector4f>();
+                myDiffuseColor[3] = theAlpha;
+                myDiffuseColorsNode->firstChild()->nodeValueRefClose<Vector4f>();
+            }
 
             dom::NodePtr myAmbientColorsNode = theMaterial->childNode("properties",0)->childNodeByAttribute("vector4f", "name", "ambient");
-            Vector4f & myAmbientColor = myAmbientColorsNode->firstChild()->nodeValueRefOpen<Vector4f>();
-            myAmbientColor[3] = theAlpha;
-            myAmbientColorsNode->firstChild()->nodeValueRefClose<Vector4f>();
+            if(myAmbientColorsNode) {
+                Vector4f & myAmbientColor = myAmbientColorsNode->firstChild()->nodeValueRefOpen<Vector4f>();
+                myAmbientColor[3] = theAlpha;
+                myAmbientColorsNode->firstChild()->nodeValueRefClose<Vector4f>();
+            }
 
             dom::NodePtr mySpecularColorsNode = theMaterial->childNode("properties",0)->childNodeByAttribute("vector4f", "name", "specular");
-            Vector4f & mySpecularColor = mySpecularColorsNode->firstChild()->nodeValueRefOpen<Vector4f>();
-            mySpecularColor[3] = theAlpha;
-            mySpecularColorsNode->firstChild()->nodeValueRefClose<Vector4f>();
+            if(mySpecularColorsNode) {
+                Vector4f & mySpecularColor = mySpecularColorsNode->firstChild()->nodeValueRefOpen<Vector4f>();
+                mySpecularColor[3] = theAlpha;
+                mySpecularColorsNode->firstChild()->nodeValueRefClose<Vector4f>();
+            }
 
             dom::NodePtr myEmissiveColorsNode = theMaterial->childNode("properties",0)->childNodeByAttribute("vector4f", "name", "emissive");
-            Vector4f & myEmissiveColor = myEmissiveColorsNode->firstChild()->nodeValueRefOpen<Vector4f>();
-            myEmissiveColor[3] = theAlpha;
-            myEmissiveColorsNode->firstChild()->nodeValueRefClose<Vector4f>();
-
+            if(myEmissiveColorsNode) {
+                Vector4f & myEmissiveColor = myEmissiveColorsNode->firstChild()->nodeValueRefOpen<Vector4f>();
+                myEmissiveColor[3] = theAlpha;
+                myEmissiveColorsNode->firstChild()->nodeValueRefClose<Vector4f>();
+            }
         }
         return true;
     }
@@ -565,12 +574,13 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
         for(unsigned i = 0; i < thePositions.size(); ++i) {
             myShapeBuilder.appendVertexData(POSITION_ROLE, thePositions[i]);
             myElementBuilder.appendIndex(POSITIONS, i);
-
             if (needsNormals) {
                 asl::Vector3f myNormal;
                 int ii = i;
-                if (i >= thePositions.size()-2) {
-                    ii = (i%2 == 0) ? i-1 : i-2;
+                if (i == thePositions.size()-1) {
+                    ii = i - 2;
+                } else if (i == thePositions.size() - 2) {
+                    ii = i - 1;
                 }
                 const asl::Vector3f & myV1 = (ii%2 == 0) ?
                     thePositions[ii+1] : thePositions[ii+2];
@@ -579,7 +589,7 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
                 myNormal = cross(difference(myV1, thePositions[ii]),
                         difference(myV2, thePositions[ii]) );
                 myNormal = normalized(myNormal);
-
+                
                 myShapeBuilder.appendVertexData(NORMAL_ROLE, myNormal);
                 myElementBuilder.appendIndex(NORMALS, i);
             }

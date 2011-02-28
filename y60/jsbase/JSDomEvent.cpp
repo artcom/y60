@@ -164,7 +164,7 @@ JSDomEvent::Functions() {
     static JSFunctionSpec myFunctions[] = {
         // name                  native                   nargs
         {"toString",             toString,                0},
-        {"initEvent",            initEvent,               3},
+        {"initEvent",            initEvent,               4},
         {"stopPropagation",      stopPropagation,         0},
         {"preventDefault",       preventDefault,          0},
         {0}

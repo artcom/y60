@@ -101,15 +101,15 @@ spark.Window.Constructor = function (Protected, theArguments) {
             myPosition = new Point2f(theEvent.position3D.x, theEvent.position3D.y);
             break;
         case "onTuioEvent":
-            myPosition = new Point2f(theEvent.position.x * Public.width,
-                                     theEvent.position.y * Public.height);
+            myPosition = new Point2f(theEvent.position.x * ((theEvent.toucharea.x > 0) ? theEvent.toucharea.x : Public.width),
+                                     theEvent.position.y * ((theEvent.toucharea.y > 0) ? theEvent.toucharea.y : Public.height));
             break;
         case "onGesture":
             if (theEvent.baseeventtype == ASS_BASE_EVENT) {
                 myPosition = new Point2f(theEvent.position3D.x, theEvent.position3D.y);
             } else {
-                myPosition = new Point2f(theEvent.position3D.x * Public.width,
-                                         theEvent.position3D.y * Public.height);
+                myPosition = new Point2f(theEvent.position3D.x * ((theEvent.toucharea.x > 0) ? theEvent.toucharea.x : Public.width),
+                                         theEvent.position3D.y * ((theEvent.toucharea.y > 0) ? theEvent.toucharea.y : Public.height));
             }
             break;
         default:
@@ -581,7 +581,8 @@ spark.Window.Constructor = function (Protected, theArguments) {
         
         var myScale = new Vector3f(1, 1, 1);
         if (theGesture.baseeventtype == TUIO_BASE_EVENT) {
-            myScale = new Vector3f(Public.width, Public.height, 1);
+            myScale = new Vector3f((theEvent.toucharea.x > 0) ? theEvent.toucharea.x : Public.width,
+                                   (theEvent.toucharea.y > 0) ? theEvent.toucharea.y : Public.height, 1);
         }
         var myCursorPartner = null;
         var myCenterPoint = null;

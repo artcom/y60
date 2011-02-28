@@ -89,7 +89,10 @@ namespace y60 {
 
     CgShader::CgShader(const dom::NodePtr theNode,
                        const std::string & theVertexProfileName,
-                       const std::string & theFragmentProfileName) : GLShader(theNode), _myFragmentShader()
+                       const std::string & theFragmentProfileName) :
+        GLShader(theNode),
+        _myVertexShader(),
+        _myFragmentShader()
     {
         _myType = CG_MATERIAL;
         dom::NodePtr myShaderNode = theNode->childNode(VERTEX_SHADER_NODE_NAME);
@@ -98,7 +101,7 @@ namespace y60 {
             loadParameters(myShaderNode, _myVertexShader);
             _myVertexShader._myType = VERTEX_SHADER;
         } else {
-            AC_WARNING << "no vertex prog found for " << theNode->nodeName();
+            AC_INFO << "no vertex programm found in shader: " << theNode->getAttributeString(NAME_ATTRIB);
          }
 
         myShaderNode = theNode->childNode(FRAGMENT_SHADER_NODE_NAME);
@@ -106,7 +109,7 @@ namespace y60 {
             loadShaderProperties(myShaderNode, _myFragmentShader, theFragmentProfileName);
             _myFragmentShader._myType = FRAGMENT_SHADER;
         } else {
-            AC_WARNING << "no fragment prog found for " << theNode->nodeName();
+            AC_INFO << "no fragment programm found in shader: " << theNode->getAttributeString(NAME_ATTRIB);
         }
     }
 
@@ -153,7 +156,7 @@ namespace y60 {
             _myFragmentProgram->load();
         }
 
-        // load fragment shader
+        // load vertex shader
         if (_myVertexProgram) {
             _myVertexProgram->load();
         }
@@ -232,7 +235,7 @@ namespace y60 {
             const string myShadersBestProfileName = theShader._myPossibleProfileNames[myProfileIndex];
             ShaderProfile myShadersBestProfile = ShaderProfile(asl::getEnumFromString(myShadersBestProfileName, ShaderProfileStrings));
             if (myShadersBestProfile < myRequestedProfile) {
-                AC_INFO << "Shader description does not contain requested profile '"<<theProfileName<<"', using shader's best profile '"<<myShadersBestProfileName<<"'";
+                AC_INFO << "Shader description for shader: " << theShaderNode->parentNode()->getAttributeString(NAME_ATTRIB) << " does not contain requested profile '"<<theProfileName<<"', using shader's best profile '"<<myShadersBestProfileName<<"'";
                 theShader._myProfile = myShadersBestProfile;
             } else {
                 AC_DEBUG << "Engine profile does not match any given profile in shader description, library node =" << *theShaderNode;
@@ -392,12 +395,13 @@ namespace y60 {
     CgShader::enableTextures(const MaterialBase & theMaterial) {
         MAKE_GL_SCOPE_TIMER(CgShader_enableTextures);
         if (_myVertexProgram) {
-            _myVertexProgram->enableTextures();
+            _myVertexProgram->enableTextures(theMaterial);
         }
         if (_myFragmentProgram) {
-            _myFragmentProgram->enableTextures();
+            _myFragmentProgram->enableTextures(theMaterial);
+        } else {
+            GLShader::enableTextures(theMaterial);
         }
-        GLShader::enableTextures(theMaterial);
     }
 
     void
@@ -408,8 +412,9 @@ namespace y60 {
         }
         if (_myFragmentProgram) {
             _myFragmentProgram->disableTextures();
+        } else {
+            GLShader::disableTextures(theMaterial);
         }
-        GLShader::disableTextures(theMaterial);
     }
 
     void

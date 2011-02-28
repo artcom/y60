@@ -1,9 +1,7 @@
 /*jslint nomen:false*/
 /*globals plug, spark, Node, createUniqueId, window, Logger, operatingSystem*/
 
-var ourDebugInputFlag = false; // XXX this is global!
 spark.VideoCapture = spark.ComponentClass("VideoCapture");
-
 spark.VideoCapture.Constructor = function (Protected) {
     var Base = {};
     var Public = this;
@@ -37,8 +35,8 @@ spark.VideoCapture.Constructor = function (Protected) {
             window.scene.loadCaptureFrame(_myCaptureNode);
         }
         Public.image = _myCaptureNode;
-        Public.width = theWidth;
-        Public.height = theHeight;        
+        Public.width = Protected.getNumber("width", theWidth);
+        Public.height = Protected.getNumber("height", theHeight);
     }
     
     ////////////////////
@@ -47,12 +45,7 @@ spark.VideoCapture.Constructor = function (Protected) {
     
     Base.realize = Public.realize;
     Public.realize = function (theMaterialOrShape) {
-        Base.realize();
-    };
-
-    Base.postRealize = Public.postRealize;
-    Public.postRealize = function () {
-        Base.postRealize();
+        Base.realize(theMaterialOrShape);
         _myCaptureType  = Protected.getString("type");
         _myFramerate    = Protected.getNumber("fps", 30);
         _myBitsPerPixel = Protected.getNumber("bpp", 24);
@@ -70,5 +63,10 @@ spark.VideoCapture.Constructor = function (Protected) {
         
         createNewCaptureNode(Protected.getNumber("capturewidth",  800),
                              Protected.getNumber("captureheight", 600));        
+    };
+
+    Base.postRealize = Public.postRealize;
+    Public.postRealize = function () {
+        Base.postRealize();
     };
 };

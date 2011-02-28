@@ -406,6 +406,7 @@ JSAbstractRenderWindow<DERIVED>::renderText(JSContext *cx, JSObject *obj, uintN 
     DOC_PARAM("thePosition in Pixel", "", DOC_TYPE_VECTOR2F);
     DOC_PARAM("theTextString", "", DOC_TYPE_STRING);
     DOC_PARAM_OPT("theFontName", "An OpenGL compiled font name", DOC_TYPE_STRING, "Screen15");
+    DOC_PARAM_OPT("theViewport", "", DOC_TYPE_OBJECT, "");
     DOC_END;
     try {
         ensureParamCount(argc, 2, 4);
@@ -953,30 +954,30 @@ template<class DERIVED>
 JSFunctionSpec * JSAbstractRenderWindow<DERIVED>::BaseFunctions() {
     static JSFunctionSpec myFunctions[] = {
         // name                  native                   nargs
-        {"setTimeout",         setTimeout,               2},
-        {"setInterval",        setInterval,              2},
+        {"setTimeout",         setTimeout,               3},
+        {"setInterval",        setInterval,              3},
         {"clearTimeout",       clearTimeout,             1},
         {"clearInterval",      clearInterval,            1},
         {"saveBuffer",         saveBuffer,               1},
-        {"copyBufferToTexture", copyBufferToTexture,     2},
+        {"copyBufferToTexture", copyBufferToTexture,     3},
         {"getRenderer",        getRenderer,              0},
         {"addExtension",       addExtension,             1},
         {"setSceneAndCanvas",  setSceneAndCanvas,        2},
         {"hasCap",             hasCap,                   1},
         {"hasCapAsString",     hasCapAsString,           1},
-        {"printStatistics",    printStatistics,          2}, // base class
+        {"printStatistics",    printStatistics,          0}, // base class
         {"getImagePixel",      getImagePixel,            3},
         {"setImagePixel",      setImagePixel,            4},
         {"getPixel",           getPixel,                 4},
         {"performRequest",     performRequest,           1},
         // text rendering
-        {"renderText",         renderText,               3},
+        {"renderText",         renderText,               4},
         {"setTextColor",       setTextColor,             1},
         {"getTextColor",       getTextColor,             0},
-        {"renderTextAsImage",  renderTextAsImage,        5},
+        {"renderTextAsImage",  renderTextAsImage,        6},
         {"getTextCursorPosition", getTextCursorPosition, 0},
-        {"getTextLineWidths", getTextLineWidths, 0},
-        {"getTextMaxWidth", getTextMaxWidth, 0},
+        {"getTextLineWidths",  getTextLineWidths,        0},
+        {"getTextMaxWidth",    getTextMaxWidth,          0},
         {"setTextPadding",     setTextPadding,           4},
         {"setTextIndentation", setTextIndentation,       1},
         {"setHTextAlignment",  setHTextAlignment,        1},
@@ -984,9 +985,9 @@ JSFunctionSpec * JSAbstractRenderWindow<DERIVED>::BaseFunctions() {
         {"setLineHeight",      setLineHeight,            1},
         {"setParagraph",       setParagraph,             2},
         {"getFontMetrics",     getFontMetrics,           1},
-        {"getGlyphMetrics",    getGlyphMetrics,          7},
+        {"getGlyphMetrics",    getGlyphMetrics,          2},
         {"getKerning",         getKerning,               3},
-        {"hasGlyph",           hasGlyph,               3},
+        {"hasGlyph",           hasGlyph,                 2},
         {"setTracking",        setTracking,              1},
         // animations
         {"runAnimations",      runAnimations,            1},

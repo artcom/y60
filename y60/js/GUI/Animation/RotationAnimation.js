@@ -74,25 +74,25 @@ GUI.RotationAnimation.prototype.Constructor = function(Public, Protected, theDur
     ////////////////////////////////////////
 
     var _object = null;
-	var _property = "";
-	var _start = 0;
-	var _rotation = 0;
+    var _property = "";
+    var _start = 0;
+    var _rotation = 0;
 
-	Public.object getter = function() {
-	    return _object;
-	}
+    Public.object getter = function() {
+        return _object;
+    }
 
-	Public.property getter = function() {
-	    return _property;
-	}
+    Public.property getter = function() {
+        return _property;
+    }
 
-	Public.start getter = function() {
-	    return _start;
-	}
+    Public.start getter = function() {
+        return _start;
+    }
 
-	Public.rotation getter = function() {
-	    return _rotation;
-	}
+    Public.rotation getter = function() {
+        return _rotation;
+    }
 
     ////////////////////////////////////////
     // Public
@@ -100,16 +100,16 @@ GUI.RotationAnimation.prototype.Constructor = function(Public, Protected, theDur
 
     // initialize from arguments
     Public.setup = function() {
-		Protected.duration = theDuration;
+        Protected.duration = theDuration;
 
-		if(theEasing != null) {
-			Public.easing = theEasing;
-		}
+        if(theEasing != null) {
+            Public.easing = theEasing;
+        }
 
-		_object = theObject;
-		_property = theProperty;
-		_start = theStart;
-		_rotation = theRotation;
+        _object = theObject;
+        _property = theProperty;
+        _start = theStart;
+        _rotation = theRotation;
     };
 
     // set the current value
@@ -119,16 +119,16 @@ GUI.RotationAnimation.prototype.Constructor = function(Public, Protected, theDur
         myValue %= 360.0;
         if(_object instanceof Array) {
             for (var object in _object) {
-		        object[_property] = myValue;
+                object[_property] = myValue;
             }
         } else {
-	        _object[_property] = myValue;
+            _object[_property] = myValue;
         }
-	};
+    };
 
-	Public.toString = function() {
-		return "RotationAnimation" + " on "  + _object.name + "." + _property;
-	};
+    Public.toString = function() {
+        return Protected.standardToString("RotationAnimation" + " on "  + _object.name + "." + _property);
+    };
 
     Public.setup();
 };

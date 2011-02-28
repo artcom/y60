@@ -272,7 +272,7 @@ JSBox3f::Functions() {
         {"makeFull",           makeFull,       0         },
         {"makeCorrect",        makeCorrect,    0         },
         {"extendBy",           extendBy,       1         }, // point, box
-        {"contains",           contains,       0         }, // point, box
+        {"contains",           contains,       1         }, // point, box
         {"intersects",         intersects,     1         }, // box
         {"intersect",          intersects,     1         }, // box
         {"envelopes",          envelopes,      1         },

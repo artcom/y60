@@ -15,9 +15,11 @@
 //s change size of widget
 //1 moves down in z direction
 //2 moves up in z direction
+//i toggles visibility of layoutImage, which can be an commandLineArgument (layoutimage=<src>)
 
 //classes using Layouter can implement hooks
-// * layouterUpdatePosition
+// * layouterUpdatePosition - for additional updates in the widget
+// * layouterSetPosition - force specific position update in widget
 // * writebackPosition
 // * layouterToggleWidget - can be used to change widget style e.g.
 
@@ -42,6 +44,8 @@ spark.Layouter.Constructor = function(Protected) {
     var _mySparkNodes = [];
     var _mySparkFiles = [];
     var _myVisualMode = 2; // box with mesurement
+    var _myLayoutImage = null;
+    var _myBackup = {originalZ:null, originalWidth:null, originalHeight:null};
     const DEBUG_COLOR = new Vector4f(1,0,0,1);
     
     const IDLE = 0;
@@ -53,6 +57,16 @@ spark.Layouter.Constructor = function(Protected) {
         _myStage = findStage();
         _myStage.focusKeyboard(_myStage);
         
+        for (i in _myStage.arguments) {
+            if (i.search(/layoutimage/i) !== -1) {
+                _myLayoutImage = _myStage.arguments[i];
+                Logger.warning("found layoutimage: " + _myLayoutImage);
+                //XXX: TODO change to overlay
+                var myNode = new Node("<Image name='layoutimage' z='50' src='" + _myLayoutImage + "' visible='false' alpha='0.4' sensible='false'/>");
+                _myLayoutImage = spark.loadDocument(myNode, _myStage);
+                _myLayoutImage.sensible = false;
+            }
+        }
         Base.onKey = _myStage.onKey;
         _myStage.onKey = function(theKey, theKeyState, theX, theY,
                              theShiftFlag, theControlFlag, theAltFlag) {
@@ -82,6 +96,11 @@ spark.Layouter.Constructor = function(Protected) {
                     _myWidget.layouterToggleWidget();
                 } else if (theKey == "x") {
                     _myVisualMode = (_myVisualMode + 1)%3;
+                } else if (theKey == "i" && _myLayoutImage) {
+                    _myLayoutImage.visible = !_myLayoutImage.visible;
+                    print("layoutimage ", _myLayoutImage.visible)
+                } else if (theKey == "r") { // call SceneViewer for using the ruler
+                    Base.onKey(theKey, theKeyState, theX, theY, theShiftFlag, theControlFlag, theAltFlag);
                 }
             } else {
                 if(theKey.search(/ctrl/) != -1) {
@@ -135,6 +154,9 @@ spark.Layouter.Constructor = function(Protected) {
     Public.target setter = function (theWidget) {
         print("target widget", theWidget)
         _myWidget = theWidget;
+        _myBackup.originalZ = _myWidget.z;
+        _myBackup.originalWidth = ("width" in _myWidget) ? _myWidget.width : null;
+        _myBackup.originalHeight = ("height" in _myWidget) ? _myWidget.height : null;
         _myState = ACTIVE;
         _myOldPos = null;
         if (!(_myWidget.name in _mySparkFiles)) {
@@ -171,29 +193,33 @@ spark.Layouter.Constructor = function(Protected) {
             return;
         }
         if ("layouterUpdatePosition" in _myWidget) {
-            _myWidget.layouterUpdatePosition();
+            _myWidget.layouterUpdatePosition(_myOldPos, new Vector3f(theX, theY, theZ));
         }
-        var myRotation = _myWidget.sceneNode.globalmatrix.getRotation();
-        var myWidgetRotation = new Vector3f(radFromDeg(_myWidget.rotation.x), radFromDeg(_myWidget.rotation.y), radFromDeg(_myWidget.rotation.z));
-        myRotation = difference(myRotation, myWidgetRotation);
-        var myXOffset = theX - _myOldPos.x;
-        var myYOffset = (window.height - theY) - _myOldPos.y;
-        var myZOffset = theZ - _myOldPos.z;
-        var myMatrix = new Matrix4f();
-        myMatrix.makeTranslating(new Vector3f(myXOffset, myYOffset, myZOffset));
-        myMatrix.rotateZ(myRotation.z);
-        var myTranslation = myMatrix.getTranslation();
-        _myWidget.x += myTranslation.x;
-        _myWidget.y += myTranslation.y;
-        _myWidget.z += myTranslation.z;
-        print(_myWidget.name + " moved to x: " + _myWidget.x + " y: " + _myWidget.y + " z: " +_myWidget.z);
+        if (!("layouterSetPosition" in _myWidget)) {
+            var myRotation = _myWidget.sceneNode.globalmatrix.getRotation();
+            var myWidgetRotation = new Vector3f(radFromDeg(_myWidget.rotation.x), radFromDeg(_myWidget.rotation.y), radFromDeg(_myWidget.rotation.z));
+            myRotation = difference(myRotation, myWidgetRotation);
+            var myXOffset = theX - _myOldPos.x;
+            var myYOffset = (window.height - theY) - _myOldPos.y;
+            var myZOffset = theZ - _myOldPos.z;
+            var myMatrix = new Matrix4f();
+            myMatrix.makeTranslating(new Vector3f(myXOffset, myYOffset, myZOffset));
+            myMatrix.rotateZ(myRotation.z);
+            var myTranslation = myMatrix.getTranslation();
+            _myWidget.x += myTranslation.x;
+            _myWidget.y += myTranslation.y;
+            _myWidget.z += myTranslation.z;
+            print(_myWidget.name + " moved to x: " + _myWidget.x + " y: " + _myWidget.y + " z: " +_myWidget.z);
+        } else {
+            _myWidget.layouterSetPosition(_myOldPos, new Vector3f(theX, theY, theZ));
+        }
         _myOldPos = new Vector3f(theX, window.height - theY, theZ);
     }
     
     function activate () {
         print("activate")
-        _myStage.addEventListener(spark.CursorEvent.APPEAR, onMouseDown , true);
-        _myStage.addEventListener(spark.CursorEvent.MOVE, onMouseMove, true);
+        _myStage.addEventListenerInFront(spark.CursorEvent.APPEAR, onMouseDown , true);
+        _myStage.addEventListenerInFront(spark.CursorEvent.MOVE, onMouseMove, true);
     }
     
     function deactivate() {
@@ -209,13 +235,16 @@ spark.Layouter.Constructor = function(Protected) {
 
     function onMouseDown(theEvent) {
         if (!_myWidget) {
-            print("onMouseDown", theEvent.target)
             Public.target = theEvent.target;
             _myListeners = clone(theEvent.target.getEventListeners(spark.CursorEvent.APPEAR));
         }
         for (var i = 0; i < _myListeners.length; ++i) {
             theEvent.target.removeEventListener(spark.CursorEvent.APPEAR, _myListeners[i].listener, _myListeners[i].useCapture);
         }
+        if (!theEvent.cancelable) {
+            theEvent.cancelable = true;
+        }
+        theEvent.cancelDispatch();
         updatePosition(theEvent.stageX, theEvent.stageY, 0);
     }
 
@@ -301,11 +330,13 @@ spark.Layouter.Constructor = function(Protected) {
                 if (myNode) {
                     myNode.x = Math.round(_myWidget.x);
                     myNode.y = Math.round(_myWidget.y);
-                    myNode.z = Math.round(_myWidget.z);
-                    if (_myWidget.width) {
+                    if (_myWidget.z !== _myBackup.originalZ) {
+                        myNode.z = Math.round(_myWidget.z);
+                    }
+                    if ("width" in _myWidget && _myWidget.width && _myWidget.width !== _myBackup.originalWidth) {
                         myNode.width = Math.round(_myWidget.width);
                     }
-                    if (_myWidget.height) {
+                    if ("height" in _myWidget && _myWidget.height && _myWidget.height !== _myBackup.originalHeight) {
                         myNode.height = Math.round(_myWidget.height);
                     }
                     _myCurrentSparkNode.saveFile(_myCurrentSparkFile);

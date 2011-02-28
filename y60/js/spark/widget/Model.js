@@ -14,9 +14,15 @@ spark.Model.Constructor = function (Protected) {
     this.Inherit(spark.Widget);
 
     Base.realize = Public.realize;
-    Public.realize = function () {
-        var myY60Name = Protected.getString("rootName");
-        var myY60DomObject = window.scene.dom.find("//*[@name='" + myY60Name + "']");
+    Public.realize = function (theY60DomObject) {
+        var myY60DomObject = null;
+        if (theY60DomObject) {
+            myY60DomObject = theY60DomObject;
+        } else {
+            var myY60Name = Protected.getString("rootName");
+            myY60DomObject = window.scene.dom.find("//*[@name='" + myY60Name + "']");
+        }
+        
         var myPosition = new Vector3f(myY60DomObject.position);
         var myOrientation = new Quaternionf(myY60DomObject.orientation);
         var myScale = new Vector3f(myY60DomObject.scale);

@@ -108,6 +108,53 @@ namespace y60 {
         GL_TEXTURE_GEN_S, GL_TEXTURE_GEN_T, GL_TEXTURE_GEN_R, GL_TEXTURE_GEN_Q
     };
 
+    void setTextureParameters(const TextureUnit & theTextureUnit, bool & alreadyHasSpriteTexture, asl::Unsigned64 & theFrameNumber) {
+        TexturePtr myTexture = theTextureUnit.getTexture();
+        myTexture->set<LastActiveFrameTag>(theFrameNumber);
+        // texture env apply mode
+        GLenum myTexEnvMode = asGLTextureApplyMode(theTextureUnit.get<TextureUnitApplyModeTag>());
+        glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, myTexEnvMode);
+
+        // texture env const blend color (changed from black OpenGL default)
+        glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, theTextureUnit.get<TextureUnitEnvColorTag>().begin());
+
+        // load texture matrix
+        asl::Matrix4f myMatrix;
+        const y60::ImagePtr & myImage = myTexture->getImage();
+        if (myImage) {
+            const_cast<y60::Image&>(*myImage).set<LastActiveFrameTag>(theFrameNumber);
+            myMatrix = myImage->get<ImageMatrixTag>();
+            myMatrix.postMultiply(myTexture->get<TextureNPOTMatrixTag>());
+        } else {
+            myMatrix  = myTexture->get<TextureNPOTMatrixTag>();
+        }
+        myMatrix.postMultiply(myTexture->get<TextureMatrixTag>());
+        myMatrix.postMultiply(theTextureUnit.get<TextureUnitMatrixTag>());
+        glLoadMatrixf(static_cast<const GLfloat *>(myMatrix.getData()));
+
+        // setup texture sprite
+        if (theTextureUnit.get<TextureUnitSpriteTag>()) {
+            if (!alreadyHasSpriteTexture) {
+                glEnable(GL_POINT_SPRITE_ARB);
+                CHECK_OGL_ERROR;
+                if (hasCap("GL_ARB_point_parameters")) {
+                    glPointParameterfARB(GL_POINT_SPRITE_R_MODE_NV, GL_S);
+                    CHECK_OGL_ERROR;
+                }
+                alreadyHasSpriteTexture = true;
+            }
+            glTexEnvf( GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_TRUE );
+            CHECK_OGL_ERROR;
+        } else {
+            if (alreadyHasSpriteTexture) {
+                glDisable(GL_POINT_SPRITE_ARB);
+                alreadyHasSpriteTexture = false;
+            }
+            glTexEnvf( GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_FALSE );
+            CHECK_OGL_ERROR;
+        }
+    }
+
     GLShader::GLShader(const dom::NodePtr theNode)
     :   _myType(FIXED_FUNCTION_MATERIAL),
         _myHasImagingEXT(hasCap("GL_ARB_imaging")),
@@ -316,7 +363,7 @@ namespace y60 {
         AC_TRACE << "GLShader::activate " << theMaterial.get<NameTag>();
         AC_TRACE << "GLShader::activate " << theMaterial.getNode();
 
-        theMaterial.updateParams(); // This call is still necessary, but should not be! (removal breaks e.g. glowcube.js test)
+        //theMaterial.updateParams(); // This call is still necessary, but should not be! (removal breaks e.g. glowcube.js test) (works fine without this call, so we deactivate it [GM,VS])
 
         MaterialPropertiesFacadePtr myMaterialPropFacade = theMaterial.getChild<MaterialPropertiesTag>();
 
@@ -361,23 +408,11 @@ namespace y60 {
         glMatrixMode(GL_TEXTURE);
         bool alreadyHasSpriteTexture = false;
         for (unsigned i = 0; i < myTextureCount; ++i) {
-
-            // [VS;DS;UH;SH] someone please explain this
-            // from disableTextures: Fixed Function Shaders only support paint & skybox usage
-            TextureUsage myTextureUsage = theMaterial.getTextureUsage(i);
-            /*
-            if (myTextureUsage != PAINT && myTextureUsage != SKYBOX) {
-                continue;
-            }
-            */
-
             const y60::TextureUnit & myTextureUnit = theMaterial.getTextureUnit(i);
+            
             y60::TexturePtr myTexture = myTextureUnit.getTexture();
-            myTexture->set<LastActiveFrameTag>(myFrameNumber);
-
             GLenum myTexUnit = asGLTextureRegister(i);
             glActiveTexture(myTexUnit);
-            glClientActiveTexture(myTexUnit);
 
             // triggers texture setup/update
             unsigned myTextureId = myTexture->applyTexture(); //ensureTextureId();
@@ -387,49 +422,8 @@ namespace y60 {
             glBindTexture(myTextureTarget, myTextureId);
             glEnable(myTextureTarget);
             AC_TRACE << "GLShader::enableTextures unit=" << i << " texId=" << myTextureId << " target=0x" << hex << myTextureTarget << dec;
+            setTextureParameters(myTextureUnit, alreadyHasSpriteTexture, myFrameNumber);
 
-            // texture env apply mode
-            GLenum myTexEnvMode = asGLTextureApplyMode(myTextureUnit.get<TextureUnitApplyModeTag>());
-            glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, myTexEnvMode);
-
-            // texture env const blend color (changed from black OpenGL default)
-            glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, myTextureUnit.get<TextureUnitEnvColorTag>().begin());
-
-            // load texture matrix
-            asl::Matrix4f myMatrix;
-            const y60::ImagePtr & myImage = myTexture->getImage();
-            if (myImage) {
-                const_cast<y60::Image&>(*myImage).set<LastActiveFrameTag>(myFrameNumber);
-                myMatrix = myImage->get<ImageMatrixTag>();
-                myMatrix.postMultiply(myTexture->get<TextureNPOTMatrixTag>());
-            } else {
-                myMatrix  = myTexture->get<TextureNPOTMatrixTag>();
-            }
-            myMatrix.postMultiply(myTexture->get<TextureMatrixTag>());
-            myMatrix.postMultiply(myTextureUnit.get<TextureUnitMatrixTag>());
-            glLoadMatrixf(static_cast<const GLfloat *>(myMatrix.getData()));
-
-            // setup texture sprite
-            if (myTextureUnit.get<TextureUnitSpriteTag>()) {
-                if (!alreadyHasSpriteTexture) {
-                    glEnable(GL_POINT_SPRITE_ARB);
-                    CHECK_OGL_ERROR;
-                    if (_myHasPointParmatersEXT) {
-                        glPointParameterfARB(GL_POINT_SPRITE_R_MODE_NV, GL_S);
-                        CHECK_OGL_ERROR;
-                    }
-                    alreadyHasSpriteTexture = true;
-                }
-                glTexEnvf( GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_TRUE );
-                CHECK_OGL_ERROR;
-            } else {
-                if (alreadyHasSpriteTexture) {
-                    glDisable(GL_POINT_SPRITE_ARB);
-                    alreadyHasSpriteTexture = false;
-                }
-                glTexEnvf( GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_FALSE );
-                CHECK_OGL_ERROR;
-            }
         }
         glMatrixMode(GL_MODELVIEW);
     }
@@ -441,21 +435,11 @@ namespace y60 {
         unsigned myTextureCount = theMaterial.getTextureUnitCount();
         // AC_TRACE << "current texcount:" << myTextureCount << ", prev:" << myPreviousTextureCount << endl;
         for (unsigned i = 0; i < myTextureCount; ++i) {
-
-            // Fixed Function Shaders only support paint & skybox usage
-            TextureUsage myTextureUsage = theMaterial.getTextureUsage(i);
-            /*
-            if (myTextureUsage != PAINT && myTextureUsage != SKYBOX) {
-                continue;
-            }
-            */
-
             const y60::TextureUnit & myTextureUnit = theMaterial.getTextureUnit(i);
             y60::TexturePtr myTexture = myTextureUnit.getTexture();
 
             GLenum myTexUnit = asGLTextureRegister(i);
             glActiveTexture(myTexUnit);
-            glClientActiveTexture(myTexUnit);
 
             // unbind/disable texture
             GLenum myTextureTarget = asGLTextureTarget(myTexture->getType());

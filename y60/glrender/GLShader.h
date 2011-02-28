@@ -20,6 +20,8 @@
 
 namespace y60 {
 
+    void setTextureParameters(const TextureUnit & theTextureUnit, bool & alreadyHasSpriteTexture, asl::Unsigned64 & theFrameNumber);
+
     class ShaderLibrary;
 
     class Y60_GLRENDER_DECL GLShader : public y60::IShader {

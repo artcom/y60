@@ -456,40 +456,48 @@ namespace y60 {
 
 
     MovieDecoderBasePtr Movie::getDecoder(const std::string theFilename) {
-        MovieDecoderBasePtr myDecoder =
-            DecoderManager::get().findDecoder<MovieDecoderBase>(theFilename);
+        MovieDecoderBasePtr myDecoder;
+        std::vector<MovieDecoderBasePtr> myDecoders;
+        myDecoders = DecoderManager::get().findAllDecoders<MovieDecoderBase>(theFilename);
+        std::string myDecoderHint = get<DecoderHintTag>();
+        std::string myFileExtension = asl::toLowerCase(asl::getExtension(theFilename));
 
-        const std::string & myDecoderHint = get<DecoderHintTag>();
-        if (myDecoderHint != "") {
-            std::vector<MovieDecoderBasePtr> myDecoders;
-            myDecoders = DecoderManager::get().findAllDecoders<MovieDecoderBase>(theFilename);
-            std::vector<MovieDecoderBasePtr>::iterator it;
-            bool foundDecoderFlag = false;
-            for(it = myDecoders.begin(); it != myDecoders.end(); ++it) {
-                AC_DEBUG << "possible decoder " << (*it)->getName();
-                if ((*it)->getName() == myDecoderHint) {
-                    myDecoder = (*it);
-                    foundDecoderFlag = true;
-                    break;
+        // no decoder initialized or no decoder for filetype found
+        if (myDecoders.size() == 0) {
+            if (myFileExtension == "m60") {
+                return MovieDecoderBasePtr(new M60Decoder());
+            } else {
+                if (myDecoderHint == "" ) { 
+                    myDecoderHint = "FFMpegDecoder2";
                 }
-            }
-            if (!foundDecoderFlag) {
-                // we did not find a decoder for the decoderhint, plug it and try to use it
                 asl::PlugInBasePtr myPlugIn =
                     asl::PlugInManager::get().getPlugIn(myDecoderHint);
                 if (IDecoderPtr myDecoderPlug = dynamic_cast_Ptr<IDecoder>(myPlugIn)) {
                     AC_INFO << "Plug: " << myDecoderHint << ": as Decoder" << endl;
                     DecoderManager::get().addDecoder(myDecoderPlug);
-                    myDecoder = dynamic_cast_Ptr<MovieDecoderBase>(myDecoderPlug);
+                    myDecoder = DecoderManager::get().findDecoder<MovieDecoderBase>(theFilename);
+                    if (!myDecoder) {
+                        throw MovieException(std::string("Sorry, could not find decoder for: ")
+                            + theFilename, PLUS_FILE_LINE);
+                    }
                 } else {
                     throw MovieException(std::string("Unable to plug decoder: ")
                         + myDecoderHint, PLUS_FILE_LINE);
                 }
             }
+        } else if (myDecoderHint != "") {
+            std::vector<MovieDecoderBasePtr>::iterator it;
+            for(it = myDecoders.begin(); it != myDecoders.end(); ++it) {
+                AC_DEBUG << "possible decoder " << (*it)->getName();
+                if ((*it)->getName() == myDecoderHint) {
+                    myDecoder = (*it);
+                    break;
+                }
+            }
+        } else {
+            myDecoder = *(myDecoders.begin());
         }
-        //        AC_INFO << "using decoder " << myDecoder->getName() << " for decoding "
-        //                << theFilename << " hint " << myDecoderHint;
-        return myDecoder;
+        return myDecoder->instance();
     }
 
 
@@ -542,20 +550,12 @@ namespace y60 {
         AC_INFO << "Movie::loadFile " << (void*)this << " filename=" << myFilename;
 
         // First: Look for registered decoders that could handle the source
-        MovieDecoderBasePtr myDecoder = getDecoder(myFilename);
-
-        if (!myDecoder) {
-            // Second: Try m60, by extension
-            string myFileExtension = asl::toLowerCase(asl::getExtension(myFilename));
-            if (myFileExtension == "m60") {
-                _myDecoder = MovieDecoderBasePtr(new M60Decoder());
-            } else {
-                throw MovieException(std::string("Sorry, could not find decoder for: ")
-                    + myFilename, PLUS_FILE_LINE);
-            }
-        } else {
-            _myDecoder = myDecoder->instance();
+        _myDecoder = getDecoder(myFilename);
+        if (!_myDecoder) {
+            throw MovieException(std::string("Sorry, could not find decoder for: ")
+                + myFilename, PLUS_FILE_LINE);
         }
+
         _myDecoder->initialize(this);
         _myDecoder->load(myFilename);
         postLoad();

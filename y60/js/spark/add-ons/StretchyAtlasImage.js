@@ -94,22 +94,16 @@ spark.StretchyAtlasImage.Constructor = function (Protected) {
         _reset();
     });
     
+    Protected.__defineGetter__("shapeStretcher", function () {
+            return _myShapeStretcher;
+    });
+
     Base.realize = Public.realize;
     Public.realize = function () {
         Base.realize();
-        
-        _myShapeStretcher = new ShapeStretcher(Protected.shape, {
-            edges : {'top'    : Protected.getNumber("edgeTop",    0),
-                     'left'   : Protected.getNumber("edgeLeft",   0),
-                     'bottom' : Protected.getNumber("edgeBottom", 0),
-                     'right'  : Protected.getNumber("edgeRight",  0)},
-            crop  : {'top'    : Protected.getNumber("cropTop",    0),
-                     'left'   : Protected.getNumber("cropLeft",   0),
-                     'bottom' : Protected.getNumber("cropBottom", 0),
-                     'right'  : Protected.getNumber("cropRight",  0)},
-            quadsPerSide : new Vector2i(Protected.getNumber("quadsPerSideX", 3),
-                                        Protected.getNumber("quadsPerSideY", 3))
-        });
+        var myShapeStretcherCtor = spark.ShapeStretcher.Factory.getShapeStretcherFromAttribute(
+                Protected.getString("shapeStretcher", "default"));
+        _myShapeStretcher = new myShapeStretcherCtor(Protected.shape);
         
         Base.imageSetter = Public.__lookupSetter__("image");
         Public.__defineSetter__("image", function (theImage) {
@@ -129,7 +123,7 @@ spark.StretchyAtlasImage.Constructor = function (Protected) {
             _myShapeStretcher.updateGeometry(new Vector2f(Public.width, theHeight), false, Public.origin);
         });
 
-        _myShapeStretcher.initialize();
+        _myShapeStretcher.initialize(Public.node);
         _reset();
     };
     

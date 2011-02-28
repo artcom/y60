@@ -70,7 +70,7 @@ GUI.Animation.Constructor = function(Public, Protected) {
     // Member
     ////////////////////////////////////////
 
-    var _id = Animation.idCounter++;
+    var _id = GUI.Animation.idCounter++;
     var _name = null;
 
     var _parent = null;
@@ -97,45 +97,45 @@ GUI.Animation.Constructor = function(Public, Protected) {
     // getter / setter
     Public.id getter = function() {
         return _id;
-	};
+    };
 
     Public.path getter = function() {
         var r = "" + _id;
-	    var p = _parent;
-		while(p) {
-			r = p.id + "." + r;
-		    p = p.parent;
-	    }
-	    return r;
-	};
+        var p = _parent;
+        while(p) {
+            r = p.id + "." + r;
+            p = p.parent;
+        }
+        return r;
+    };
 
     Public.name getter = function() {
-		return _name;
-	};
+        return _name;
+    };
 
     Public.name setter = function(v) {
-		_name = v;
-	};
+        _name = v;
+    };
 
     Public.progress getter = function() {
-		return _progress;
-	};
+        return _progress;
+    };
 
     Public.progress setter = function(p) {
-		_progress = p;
-	};
+        _progress = p;
+    };
 
     Public.easing getter = function() {
         return _easing;
-	};
+    };
 
-	Public.easing setter = function(theEasing) {
+    Public.easing setter = function(theEasing) {
         _easing = theEasing;
-	};
+    };
 
     Public.duration getter = function() {
         return _duration;
-	};
+    };
 
     Protected.duration setter = function(d) {
         _duration = d;
@@ -150,130 +150,127 @@ GUI.Animation.Constructor = function(Public, Protected) {
         _loop = l;
     };
 
-    Public.running getter = function()	{
-		return _running;
-	};
+    Public.running getter = function()  {
+        return _running;
+    };
 
     Public.parent getter = function() {
-		return _parent;
-	};
+        return _parent;
+    };
 
     Public.parent setter = function(a) {
-		_parent = a;
-	};
+        _parent = a;
+    };
 
     Public.onPlay getter = function() {
-		return _onPlay;
-	};
+        return _onPlay;
+    };
 
     Public.onPlay setter = function(f) {
-		_onPlay = f;
-	};
+        _onPlay = f;
+    };
 
-    Public.onCancel getter = function()	{
-		return _onCancel;
-	};
+    Public.onCancel getter = function() {
+        return _onCancel;
+    };
 
     Public.onCancel setter = function(f) {
-		_onCancel = f;
-	};
+        _onCancel = f;
+    };
 
-    Public.onFinish getter = function()	{
-		return _onFinish;
-	};
+    Public.onFinish getter = function() {
+        return _onFinish;
+    };
 
     Public.onFinish setter = function(f) {
-		_onFinish = f;
-	};
+        _onFinish = f;
+    };
 
     ////////////////////////////////////////
     // Public
     ////////////////////////////////////////
 
     Public.play = function() {
-        Logger.debug("Playing " + this);
-		_startTime = ourCurrentAnimationTime;
-	    _progressTime = 0;
-		_progress = _easing(0.0);
-	    _running = true;
-	    _finished = false;
+        Logger.debug("Playing " + Public);
+        _startTime = ourCurrentAnimationTime;
+        _progressTime = 0;
+        _progress = _easing(0.0);
+        _running = true;
+        _finished = false;
 
-	    callOnPlay();
+        callOnPlay();
 
-	    Public.render();
-	};
+        Public.render();
+    };
 
     Public.cancel = function() {
-        Logger.debug("Cancelled " + this);
-		_running = false;
-	    callOnCancel();
-	};
+        Logger.debug("Cancelled " + Public);
+        _running = false;
+        _finished = false;
+        callOnCancel();
+    };
 
     Public.finish = function() {
-        Logger.debug("Finished " + this);
-		callOnFinish();
-        if(_loop) {
-            Public.play();
-        } else {
-            _running = false;
-            _finished = true;
-        }
-	};
-
-	Public.comeToAnEnd = function() {
-        Logger.debug("comeToAnEnd " + Public.name);
+        Logger.debug("force finish of " + Public);
         if (_finished) {
             return;
         }
         if (!_running) {
             Public.play(true);
-    	    Public.render();
         }
-		Public.finish(true);
-
-	};
+        Protected.finish();
+    };
 
     Public.doFrame = function(theTime) {
         if (_startTime == -1) {
             _startTime = ourCurrentAnimationTime;
         }
         _progressTime = (theTime - _startTime);
-		_progress = _easing(_progressTime / _duration);
+        _progress = _easing(_progressTime / _duration);
 
-	    var finished = (_progressTime >= _duration);
+        var finished = (_progressTime >= _duration);
 
-	    if(finished) {
-			_progressTime = _duration;
-		    _progress = 1.0;
-		}
-
-	    Public.render();
-
-	    if(finished) {
-			Public.finish();
-		}
-	};
+        if (finished) {
+            Protected.finish();
+        } else {
+            Public.render();
+        }
+    };
 
     Public.render = function() {
     };
 
     Public.toString = function() {
-		return Protected.standardToString("Animation");
-	};
+        return Protected.standardToString("Animation");
+    };
 
     ////////////////////////////////////////
     // Protected
     ////////////////////////////////////////
 
+    Protected.finish = function() {
+        Logger.debug("Finished " + Public);
+        _progressTime = _duration;
+        _progress = 1.0;
+        Public.render();
+        callOnFinish();
+        if(_loop) {
+            Public.play();
+        } else {
+            _running = false;
+            _finished = true;
+        }
+    };
+
     Protected.durationChanged = function() {
-		if(_parent) {
-			_parent.childDurationChanged(Public);
-		}
+        if(_parent) {
+            _parent.childDurationChanged(Public);
+        }
     };
 
     Protected.standardToString = function(cls) {
-		return cls + " " + Public.path + ((Public.name != null) ? (" (" + Public.name + ") ") : "");
-	};
+        return cls + " " + Public.path + ((Public.name != null) ? (" (" + Public.name + ") ") : "") + " running: " + _running;
+    };
 
     ////////////////////////////////////////
     // Private

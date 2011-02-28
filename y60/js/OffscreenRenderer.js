@@ -87,7 +87,7 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage,
         // Get target image for offscreen rendering
         theSize = theSize || [window.width, window.height];
         thePixelFormat = thePixelFormat || "rgba";
-        if (theImage === undefined) {
+        if (!theImage) {
             theImage = Modelling.createImage(window.scene, theSize[0], theSize[1], thePixelFormat);
             theImage.resize = "none"; // use non-power of two textures
         }
@@ -103,7 +103,7 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage,
         self.image.matrix.postMultiply(myMirrorMatrix);
 
         // Setup canvas and viewport
-        if (theCanvas === undefined) {
+        if (!theCanvas) {
             Logger.info("Canvas undefined, copying 1st canvas/1st viewport");
 
             // clone first viewport of first canvas
@@ -125,7 +125,7 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage,
         }
 
         // Setup camera
-        if (theCamera === undefined) {
+        if (!theCamera) {
             Logger.info("Camera undefined, copying camera of viewport");
 
             var myCameraId;
@@ -234,7 +234,8 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage,
     self.resize = function (theNewSize) {
         if (self.texture.width  === 0 ||
             self.texture.width  !== theNewSize.x ||
-            self.texture.height !== theNewSize.y) {
+            self.texture.height !== theNewSize.y) 
+        {
             window.scene.textures.removeChild(self.texture);
             self.texture = Modelling.createTexture(window.scene, self.image);
             self.texture.name = "newTexture";
@@ -270,7 +271,8 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage,
         theCubemapFace = theCubemapFace || 0;
 
         if (_myOffscreenNodes.length === 1 &&
-            _myOffscreenNodes[0].nodeName === "world") {
+            _myOffscreenNodes[0].nodeName === "world")
+        {
             var myWasVisible = _myOffscreenNodes[0].visible;
             _myOffscreenNodes[0].visible = true;
             _myOffscreenRenderArea.renderToCanvas(theReadbackFlag);
@@ -334,5 +336,5 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage,
     self.image                 = null;
     self.texture               = null;
 
-    setup(theSize, theCanvas);
+    setup();
 }

@@ -578,6 +578,33 @@ CreateTriangleStrip(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsv
     return CreateStrip(PrimitiveTypeStrings[TRIANGLE_STRIP], cx, obj, argc, argv, rval);
 }
 
+JS_STATIC_DLL_CALLBACK(JSBool)
+CreateTriangles(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval)
+{
+    DOC_BEGIN("Create a shape from a list of triangle points");
+    DOC_PARAM("theScene", "The scene to create the strip in", DOC_TYPE_SCENE);
+    DOC_PARAM("theMaterialId", "Shape material id.", DOC_TYPE_STRING);
+    DOC_PARAM("thePositions", "Array of positions", DOC_TYPE_VECTOROFVECTOR3F);
+    DOC_PARAM_OPT("theTexCoords", "Texture Coordinates", DOC_TYPE_VECTOROFVECTOR2F, "");
+    DOC_PARAM_OPT("theColors", "Vertexcolors", DOC_TYPE_VECTOROFVECTOR4F, "");
+    DOC_RVAL("The new created triangles shape", DOC_TYPE_NODE);
+    DOC_END;
+    return CreateStrip(PrimitiveTypeStrings[TRIANGLES], cx, obj, argc, argv, rval);
+}
+
+JS_STATIC_DLL_CALLBACK(JSBool)
+CreateQuads(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval)
+{
+    DOC_BEGIN("Create a shape from a list of quad points");
+    DOC_PARAM("theScene", "The scene to create the strip in", DOC_TYPE_SCENE);
+    DOC_PARAM("theMaterialId", "Shape material id.", DOC_TYPE_STRING);
+    DOC_PARAM("thePositions", "Array of positions", DOC_TYPE_VECTOROFVECTOR3F);
+    DOC_PARAM_OPT("theTexCoords", "Texture Coordinates", DOC_TYPE_VECTOROFVECTOR2F, "");
+    DOC_PARAM_OPT("theColors", "Vertexcolors", DOC_TYPE_VECTOROFVECTOR4F, "");
+    DOC_RVAL("The new created quads strip shape", DOC_TYPE_NODE);
+    DOC_END;
+    return CreateStrip(PrimitiveTypeStrings[QUADS], cx, obj, argc, argv, rval);
+}
 
 JS_STATIC_DLL_CALLBACK(JSBool)
 CreateTriangleMeshMarkup(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) {
@@ -1293,27 +1320,29 @@ JSFunctionSpec *
 JSModellingFunctions::StaticFunctions() {
     static JSFunctionSpec myFunctions[] = {
         // name                         native                       nargs
-        {"createTransform",             CreateTransform,             1},
-        {"createSurface2DFromContour",  CreateSurface2DFromContour,  4},
+        {"createTransform",             CreateTransform,             2},
+        {"createSurface2DFromContour",  CreateSurface2DFromContour,  5},
         {"createBody",                  CreateBody,                  2},
         {"createCanvas",                CreateCanvas,                2},
         {"createQuad",                  CreateQuad,                  4},
         {"createSphericalPlane",        CreateSphericalPlane,        6},
         {"createPlane",                 CreatePlane,                 6},
         {"createCrosshair",             CreateCrosshair,             5},
-        {"createDistanceMarkup",        CreateDistanceMarkup,        5},
-        {"createAngleMarkup",           CreateAngleMarkup,           6},
-        {"createPartialDisk",           CreatePartialDisk,           5},
+        {"createDistanceMarkup",        CreateDistanceMarkup,        4},
+        {"createAngleMarkup",           CreateAngleMarkup,           7},
+        {"createPartialDisk",           CreatePartialDisk,           7},
         {"createTriangleMeshMarkup",    CreateTriangleMeshMarkup,    5},
-        {"createLineStrip",             CreateLineStrip,             4},
-        {"createQuadStrip",             CreateQuadStrip,             4},
-        {"createTriangleStrip",         CreateTriangleStrip,         4},
+        {"createLineStrip",             CreateLineStrip,             5},
+        {"createQuadStrip",             CreateQuadStrip,             5},
+        {"createTriangleStrip",         CreateTriangleStrip,         5},
+        {"createTriangles",             CreateTriangles,             5},
+        {"createQuads",                 CreateQuads,                 5},
         {"createQuadStack",             CreateQuadStack,             5},
         {"createTexture",               CreateTexture,               2},
         {"createImage",                 CreateImage,                 4},
-        {"createImageFromBlock",        CreateImageFromBlock,        4},
+        {"createImageFromBlock",        CreateImageFromBlock,        2},
         {"createLambertMaterial",       CreateLambertMaterial,       3},
-        {"createColorMaterial",         CreateColorMaterial,         3},
+        {"createColorMaterial",         CreateColorMaterial,         2},
         {"createUnlitTexturedMaterial", CreateUnlitTexturedMaterial, 7},
         {"createPhongTexturedMaterial", CreatePhongTexturedMaterial, 7},
         {"createPhongMaterial",         CreatePhongMaterial,         5},

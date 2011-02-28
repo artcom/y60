@@ -109,7 +109,9 @@ spark.openMovie = function (thePath, theTargetPixelFormat, theDecoderHint, theAu
     myMovie.loopcount = "1";
     myMovie.audio = (theAudioFlag) ? "1" : (theAudioFlag === undefined) ? "1" : "0";
     myMovie.targetpixelformat = theTargetPixelFormat || "RGB";
-    myMovie.decoderhint = theDecoderHint || "FFMpegDecoder2";
+    if (theDecoderHint !== undefined && theDecoderHint !== null) {
+        myMovie.decoderhint = theDecoderHint;
+    }
     myMovie.src = thePath;
     
     myMovie.currentframe = theStartFrame;

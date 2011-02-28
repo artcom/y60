@@ -24,6 +24,8 @@ using namespace dom;
 
 #include "gestureeventxsd.h"
 
+#define DB(x) //x
+
 namespace y60 {
 
     const float Gesture::WIPE_VELOCITY_THRESHOLD = 0.1f;     //min velocity of cursor that is needed for wipe
@@ -32,7 +34,7 @@ namespace y60 {
     const float Gesture::ROTATE_ANGLE_THRESHOLD = 1.0f;        //fill me
     const float Gesture::ZOOM_DISTANCE_THRESHOLD = 0.0f;          //fill me
     const float Gesture::TAP_MAX_DISTANCE_THRESHOLD = 40.0f;      //max movement of cursor, larger distances can not be tap gestures
-    const unsigned int Gesture::TAP_MIN_DURATION_THRESHOLD = 50;      //cursors with longer durations will not lead to taps
+    const unsigned int Gesture::TAP_MIN_DURATION_THRESHOLD = 50;      //cursors with shorter durations will not lead to taps
     const unsigned int Gesture::TAP_MAX_DURATION_THRESHOLD = 500;      //cursors with longer durations will not lead to taps
 
 Gesture::Gesture(DLHandle theHandle) :
@@ -66,18 +68,18 @@ Gesture::poll() {
     // save all cursor positions (_myLastCursorPositions)
     saveAllCursorPositions();
 
-    AC_TRACE << "unfiltered gesture events # " << _myEvents.size();
-    //analyzeEvents(_myEvents, "cursorid");
+    DB(AC_TRACE << "unfiltered gesture events # " << _myEvents.size());
+    DB(analyzeEvents(_myEvents, "cursorid"));
 
     // do the event filter in base class GenericEventSourceFilter
     EventPtrList myFinalEvents(_myEvents);
     applyFilter(myFinalEvents);
 
-    AC_TRACE << "deliver gesture events # " << myFinalEvents.size();
-    //analyzeEvents(myFinalEvents, "cursorid");
+    DB(AC_TRACE << "deliver gesture events # " << myFinalEvents.size());
+    DB(analyzeEvents(myFinalEvents, "cursorid"));
     _myEvents.clear();
 
-    AC_TRACE << "-------";
+    DB(AC_TRACE << "-------");
     return myFinalEvents;
 }
 
@@ -276,7 +278,7 @@ Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent, int theID, const std:
                 if ( _myWipeMinHistoryLength <= _myCursorPositionHistory[theID].size()) {
                     Vector3f myDifference = difference(thePosition3D, _myCursorPositionHistory[theID].front()._myPosition);
                     float myMagnitude = magnitude(myDifference);
-                    float myDuration = _myCursorPositionHistory[theID].back()._myTimestamp - _myCursorPositionHistory[theID].front()._myTimestamp;
+                    float myDuration = static_cast<float>(_myCursorPositionHistory[theID].back()._myTimestamp - _myCursorPositionHistory[theID].front()._myTimestamp);
                     myDuration /= 1000.0f; //seconds
                     float myVelocity = myMagnitude/myDuration;
                     AC_INFO << "check for wipe with velocity " << myVelocity << " threshold " << _myWipeVelocityThreshold << " history size " << _myCursorPositionHistory[theID].size();
@@ -314,7 +316,7 @@ Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent, int theID, const std:
             } else {
                 Vector3f myDifference = difference(thePosition3D, _myInitialCursorPositions[theID]._myPosition);
                 float myMagnitude = magnitude(myDifference);
-                unsigned long myDuration = _myCurrentCursorPositions[theID]._myTimestamp - _myInitialCursorPositions[theID]._myTimestamp;
+                unsigned int myDuration = static_cast<unsigned int>(_myCurrentCursorPositions[theID]._myTimestamp - _myInitialCursorPositions[theID]._myTimestamp);
                 AC_INFO << "check for tap with magnitude " << myMagnitude << " threshold " << _myTapMaxDistanceThreshold << " - duration: " << myDuration << ", >= threshold: " << _myTapMinDurationThreshold << " < threshold: " << _myTapMaxDurationThreshold;
                 if (myMagnitude < _myTapMaxDistanceThreshold &&  
                     myDuration < _myTapMaxDurationThreshold &&

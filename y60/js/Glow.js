@@ -362,6 +362,7 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
         _myBlurXOverlay.height = myHeight;
 
         var myBlurXMaterial = _myBlurXOverlay.material;
+        myBlurXMaterial.enabled = false;
         myBlurXMaterial.name = "BlurX";
         myBlurXMaterial.requires.textures = "[10[glow,glow]]";
 
@@ -369,8 +370,7 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
         myTextureUnit.texture = myBlurKernelTexture.id;
         var myBlurXTextureUnits  = myBlurXMaterial.find("textureunits");
         myBlurXTextureUnits.appendChild(myTextureUnit);
-        //window.scene.save("dump.x60");
-        window.scene.update(Scene.MATERIALS);
+        myBlurXMaterial.enabled = true;
         myBlurXMaterial.properties.texelSize = new Vector3f( 1/myBlurXImage.width, 1/myBlurXImage.height, 0.0);
         myBlurXMaterial.properties.glowScale = theGlowScale;
         myBlurXMaterial.properties.kernelSize = theKernelSize;
@@ -403,6 +403,7 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
         _myBlurYOverlay.name = "BlurY";
 
         var myBlurYMaterial = _myBlurYOverlay.material;
+        myBlurYMaterial.enabled = false;
         myBlurYMaterial.name = "BlurY";
         myBlurYMaterial.requires.textures = "[10[glow,glow]]";
 
@@ -411,7 +412,7 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
         var myBlurYTextureUnits  = myBlurYMaterial.find("textureunits");
         myBlurYTextureUnits.appendChild(myTextureUnit);
 
-        //window.scene.update(Scene.MATERIALS);
+        myBlurYMaterial.enabled = true;
         myBlurYMaterial.properties.texelSize = new Vector3f( 1/myBlurYImage.width, 1/myBlurYImage.height,1.0);
         myBlurYMaterial.properties.glowScale = theGlowScale;
         myBlurYMaterial.properties.kernelSize = theKernelSize;

@@ -32,6 +32,7 @@ spark.Canvas.Constructor = function (Protected) {
     var _myRenderFlag       = true;
     var _myPickRadius       = 0;
     var _myImage            = null;
+    var _myCamera           = null;
     var _sampling           = 1;
     var _bindings = {};
     (function () {
@@ -123,9 +124,24 @@ spark.Canvas.Constructor = function (Protected) {
     Public.__defineGetter__("renderArea", function () {
         return _myRenderArea;
     });
+    Public.__defineGetter__("camera", function () {
+        return _myCamera;
+    });
     
     
+    Public.SetterOverride("width", applyWidth);
+    Public.SetterOverride("height", applyHeight);
     
+    function applyWidth(theWidth, theBaseSetter) {
+        theBaseSetter(theWidth);
+        _myImage.raster.resize(theWidth, getImageSize(_myImage).y);
+    }
+
+    function applyHeight(theHeight, theBaseSetter) {
+        theBaseSetter(theHeight);
+        _myImage.raster.resize(getImageSize(_myImage).x, theHeight);
+    }
+
     //pickRadius = 0 will result in fast ray intersection picking, 
     // when pickRadius > 0 slower sweepsphere picking will be activated
     Public.__defineSetter__("pickRadius", function (theNewRadius) {
@@ -159,7 +175,7 @@ spark.Canvas.Constructor = function (Protected) {
     
     Base.realize = Public.realize;
     Public.realize = function () {
-        var myCamera, myWorldId, myCanvasId;
+        var myWorldId, myCanvasId;
         _sampling    = Protected.getNumber("sampling", 1);
         var myWidth  = Protected.getNumber("width", 100);
         var myHeight = Protected.getNumber("height", 100);
@@ -195,7 +211,7 @@ spark.Canvas.Constructor = function (Protected) {
             
             _myCanvasNode = window.scene.dom.find(".//canvases/canvas[@id='" + myCanvasId + "']");
             _myViewport = _myCanvasNode.find(".//viewport");
-            myCamera    = window.scene.dom.getElementById(myWorldId).find(".//camera");
+            _myCamera    = window.scene.dom.getElementById(myWorldId).find(".//camera");
             
             _myWorld = window.scene.dom.getElementById(myWorldId);
             _myWorld.name = Public.name + "-world";
@@ -216,11 +232,11 @@ spark.Canvas.Constructor = function (Protected) {
 
                 
                 
-                myCamera = Node.createElement("camera");
-                _myWorld.appendChild(myCamera);
-                spark.setupCameraOrtho(myCamera, myWidth, myHeight);
+                _myCamera = Node.createElement("camera");
+                _myWorld.appendChild(_myCamera);
+                spark.setupCameraOrtho(_myCamera, myWidth, myHeight);
                 
-                _myViewport.camera = myCamera.id;
+                _myViewport.camera = _myCamera.id;
                 _myCanvasNode.backgroundcolor[3] = 0.0;
             } else {
                 _myCanvasNode.backgroundcolor = new Vector4f(1, 1, 1, 1);

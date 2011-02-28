@@ -1,0 +1,112 @@
+<scene revision="20287">
+    <worlds>
+        <world visible="1" id="Bz468waoggs=">
+            <transform visible="1" name="groundPlane_transform" position="[0,0,0]" scale="[12,12,1]" orientation="[0.707107,0,0,-0.707107]" pivot="[0,0,0]" billboard="" id="CD468waoggs="/>
+            <camera visible="1" name="perspShape" position="[2.45298,1.83974,2.45298]" scale="[1,1,1]" orientation="[-0.223024,0.371366,0.0923797,-0.896556]" pivot="[0,0,0]" billboard="" frustum="perspective[-0.0514286,0.0514286,-0.0509525,0.0509525,0.1,10000]" id="Cj468waoggs="/>
+            <transform visible="0" name="top" position="[0,100,0]" scale="[1,1,1]" orientation="[-0.707107,0,0,-0.707107]" pivot="[0,0,0]" billboard="" id="Cz468waoggs="/>
+            <transform visible="0" name="front" position="[0,0,100]" scale="[1,1,1]" orientation="[0,0,0,-1]" pivot="[0,0,0]" billboard="" id="DD468waoggs="/>
+            <transform visible="0" name="side" position="[100,0,0]" scale="[1,1,1]" orientation="[0,0.707107,0,-0.707107]" pivot="[0,0,0]" billboard="" id="DT468waoggs="/>
+            <body shape="Az468waoggs=" id="Dz468waoggs=" name="pCube1" visible="1" insensible="0" position="[0,0,0]" orientation="[0,0,0,-1]" scale="[1,1,1]" pivot="[0,0,0]" billboard="" cullable="1" clippingplanes="[]" scissor="" sticky="0" events="[]" skeleton="[]"/>
+        </world>
+    </worlds>
+    <records/>
+    <canvases>
+        <canvas id="AT468waoggs=" name="JohnDoe" backgroundcolor="[0,0,0,1]" target="">
+            <viewport id="Aj468waoggs=" name="JohnDoe" camera="Cj468waoggs=" position="[0,0]" size="[1,1]" orientation="landscape" backfaceculling="1" wireframe="0" lighting="1" texturing="1" flatshading="0" culling="1" debugculling="0" alphatest="1" drawnormals="0" glow="0" resizepolicy="adapt_vertical">
+                <overlays/>
+            </viewport>
+        </canvas>
+    </canvases>
+    <materials>
+        <material name="lambert2" id="BD468waoggs=" transparent="0">
+            <properties>
+                <vector4f name="ambient">[0,0,0,1]</vector4f>
+                <vector4f name="diffuse">[0.8,0.8,0.8,1]</vector4f>
+                <vector4f name="emissive">[0,0,0,1]</vector4f>
+            </properties>
+            <textureunits>
+                <textureunit texture="Bj468waoggs=" projector="" applymode="modulate" combiner="" envcolor="[1,1,1,1]" sprite="0" matrix="identity[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]" resizepolicy="adapt_vertical"/>
+            </textureunits>
+            <requires>
+                <feature name="textures">[100[paint]]</feature>
+                <feature name="texcoord">[100[uv_map]]</feature>
+                <feature name="lighting">[30[lambert],20[flat],10[unlit]]</feature>
+            </requires>
+        </material>
+    </materials>
+    <lightsources/>
+    <animations/>
+    <characters/>
+    <shapes>
+        <shape name="pCubeShape1" renderstyle="[frontfacing,backfacing]" id="Az468waoggs=">
+            <vertexdata>
+                <vectorofvector3f name="position" vertexbufferusage="static_draw">[
+[-0.5,-0.5,0.5],
+[0.5,-0.5,0.5],
+[-0.5,0.5,0.5],
+[0.5,0.5,0.5],
+[-0.5,0.5,-0.5],
+[0.5,0.5,-0.5],
+[-0.5,-0.5,-0.5],
+[0.5,-0.5,-0.5]]</vectorofvector3f>
+                <vectorofvector3f name="normal" vertexbufferusage="static_draw">[
+[0,0,1],
+[0,0,1],
+[0,0,1],
+[0,0,1],
+[0,1,0],
+[0,1,0],
+[0,1,0],
+[0,1,0],
+[0,0,-1],
+[0,0,-1],
+[0,0,-1],
+[0,0,-1],
+[0,-1,0],
+[0,-1,0],
+[0,-1,0],
+[0,-1,0],
+[1,0,0],
+[1,0,0],
+[1,0,0],
+[1,0,0],
+[-1,0,0],
+[-1,0,0],
+[-1,0,0],
+[-1,0,0]]</vectorofvector3f>
+                <vectorofvector4f name="color" vertexbufferusage="static_draw">[[1,1,1,1]]</vectorofvector4f>
+                <vectorofvector2f name="map1" vertexbufferusage="static_draw">[
+[0,1],
+[1,1],
+[0,0],
+[1,0],
+[0,-1],
+[1,-1],
+[0,-2],
+[1,-2],
+[0,-3],
+[1,-3],
+[2,1],
+[2,0],
+[-1,1],
+[-1,0]]</vectorofvector2f>
+            </vertexdata>
+            <primitives>
+                <elements type="triangles" material="BD468waoggs=">
+                    <indices vertexdata="position" role="position">[0,1,2,1,3,2,2,3,4,3,5,4,4,5,6,5,7,6,6,7,0,7,1,0,1,
+7,3,7,5,3,6,0,4,0,2,4]</indices>
+                    <indices vertexdata="normal" role="normal">[0,1,2,1,3,2,4,5,6,5,7,6,8,9,10,9,11,10,12,13,14,13,15,14,16,
+17,18,17,19,18,20,21,22,21,23,22]</indices>
+                    <indices vertexdata="map1" role="texcoord0">[0,1,2,1,3,2,2,3,4,3,5,4,4,5,6,5,7,6,6,7,8,7,9,8,1,
+10,3,10,11,3,12,0,13,0,2,13]</indices>
+                </elements>
+            </primitives>
+        </shape>
+    </shapes>
+    <textures>
+        <texture name="file1" image="BT468waoggs=" id="Bj468waoggs=" texturepixelformat="" mipmap="1" anisotropy="1" matrix="identity[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]" color_bias="[0,0,0,0]" color_scale="[1,1,1,1]" wrapmode="repeat" min_filter="linear" mag_filter="linear" image_index="0"/>
+    </textures>
+    <images>
+        <image name="file1" type="single" depth="1" tile="[1,1]" id="BT468waoggs=" src="./tex/testbild00.rgb" resize="none" filter="" filter_params="[]" matrix="identity[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]" targetpixelformat=""/>
+    </images>
+</scene>

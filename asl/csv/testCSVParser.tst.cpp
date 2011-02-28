@@ -83,8 +83,8 @@ public:
         // Windows-Style line breaks
         result.clear();
         parseCSV("foo;bar;baz\r\nsnarf;\"ba\r\nrf\";narf\r\n", result);
-        for (int r = 0; r < result.size(); ++r) {
-            for (int f = 0; f < result[r].size(); ++f) {
+        for (AC_SIZE_TYPE r = 0; r < result.size(); ++r) {
+            for (AC_SIZE_TYPE f = 0; f < result[r].size(); ++f) {
                 cerr << "[" << r << "," << f << "]='" << result[r][f] << "'" << endl;
             }
         }

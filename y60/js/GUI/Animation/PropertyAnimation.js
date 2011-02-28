@@ -74,23 +74,23 @@ GUI.PropertyAnimation.prototype.Constructor = function(Public, Protected, theDur
     ////////////////////////////////////////
 
     var _object = null;
-	var _property = "";
-	var _min = 0;
-	var _max = 0;
+    var _property = "";
+    var _min = 0;
+    var _max = 0;
 
-	Public.object getter = function() {
-	    return _object;
-	}
+    Public.object getter = function() {
+        return _object;
+    }
 
-	Public.property getter = function() {
-	    return _property;
-	}
+    Public.property getter = function() {
+        return _property;
+    }
 
-	Public.min getter = function() { return _min; }
-	Public.min setter = function(v) { _min = v; }
+    Public.min getter = function() { return _min; }
+    Public.min setter = function(v) { _min = v; }
 
-	Public.max getter = function() { return _max; }
-	Public.max setter = function(v) { _max = v; }
+    Public.max getter = function() { return _max; }
+    Public.max setter = function(v) { _max = v; }
 
     ////////////////////////////////////////
     // Public
@@ -98,16 +98,16 @@ GUI.PropertyAnimation.prototype.Constructor = function(Public, Protected, theDur
 
     // initialize from arguments
     Public.setup = function() {
-		Protected.duration = theDuration;
+        Protected.duration = theDuration;
 
-		if(theEasing != null) {
-			Public.easing = theEasing;
-		}
+        if(theEasing != null) {
+            Public.easing = theEasing;
+        }
 
-		_object = theObject;
-		_property = theProperty;
-		_min = theMin;
-		_max = theMax;
+        _object = theObject;
+        _property = theProperty;
+        _min = theMin;
+        _max = theMax;
     };
 
     // set the current value
@@ -116,16 +116,16 @@ GUI.PropertyAnimation.prototype.Constructor = function(Public, Protected, theDur
         var myValue = _min + ((_max - _min) * Public.progress);
         if(_object instanceof Array) {
             for (var object in _object) {
-		        object[_property] = myValue;
+                object[_property] = myValue;
             }
         } else {
-	        _object[_property] = myValue;
+            _object[_property] = myValue;
         }
-	};
+    };
 
-	Public.toString = function() {
-		return "PropertyAnimation" + " on "  + _object.name + "." + _property;
-	};
+    Public.toString = function() {
+        return Protected.standardToString("PropertyAnimation" + " on "  + _object.name + "." + _property);
+    };
 
     Public.setup();
 };

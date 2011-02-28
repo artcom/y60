@@ -173,7 +173,7 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
             _mySunLight.name = "Sun";
             _mySunLight.lightsource = mySunLightSource.id;
             // calculate the local sunlight direction
-            _mySunLight.orientation = Quaternionf.createFromEuler(_mySunPosition.getRotation());
+            _mySunLight.orientation = Quaternionf.createFromEuler(_mySunPosition.getDirection());
             _myWorld.appendChild(_mySunLight);
             theScene.update(Scene.ALL);
         }
@@ -291,13 +291,16 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
             if (!theKeyState) {
                 // stop sun
                 _mySunSpeed = 0;
+                print("Sun Speed " + _mySunSpeed);
                 return;
             }
             if(theCtrlFlag) {
                 if (theShiftFlag) {
                     _mySunSpeed = 30;
+                    print("Sun Speed " + _mySunSpeed);
                 } else {
                     _mySunSpeed = -30;
+                    print("Sun Speed " + _mySunSpeed);
                 }
             }
             return;
@@ -311,9 +314,11 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
             case 'l':
                 var viewportId;
                 for (viewportId in _myViewportHeadlights) {
-                    var viewport = _myScene.dom.getElementById(viewportId);
-                    viewport.lighting = !viewport.lighting;
-                    print("Lighting: " + (viewport.lighting ? "on" : "off"));
+                    if (viewportId) {
+                        var viewport = _myScene.dom.getElementById(viewportId);
+                        viewport.lighting = !viewport.lighting;
+                        print("Lighting: " + (viewport.lighting ? "on" : "off"));
+                    }
                 }
                 break;
             case 'k':

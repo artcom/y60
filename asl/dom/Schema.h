@@ -91,6 +91,9 @@ class ASL_DOM_DECL Schema : public DocumentFragment {
 		// return a type name for a given xs:attribute node
 		const NodePtr getAttributeType(const NodePtr myAttributeDeclaration) const;
 
+        bool checkSchemaRestriction(const NodePtr theParentElementType,
+                                    const NodePtr theSchemaDeclaration, 
+                                    const Node* theElement);
 		const NodePtr findElementDeclaration(const DOMString & theParentElementName,
 									const NodePtr theParentElementType,
 									const DOMString & theElementName,

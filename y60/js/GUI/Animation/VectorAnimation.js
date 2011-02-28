@@ -74,25 +74,25 @@ GUI.VectorAnimation.prototype.Constructor = function(Public, Protected, theDurat
     ////////////////////////////////////////
 
     var _object = theObject;
-	var _property = "";
-	var _start = 0;
-	var _end;
+    var _property = "";
+    var _start = 0;
+    var _end;
 
-	Public.object getter = function() {
-	    return _object;
-	}
+    Public.object getter = function() {
+        return _object;
+    }
 
-	Public.property getter = function() {
-	    return _property;
-	}
+    Public.property getter = function() {
+        return _property;
+    }
 
-	Public.start getter = function() {
-	    return _start;
-	}
+    Public.start getter = function() {
+        return _start;
+    }
 
-	Public.end getter = function() {
-	    return _end;
-	}
+    Public.end getter = function() {
+        return _end;
+    }
 
     ////////////////////////////////////////
     // Public
@@ -100,17 +100,17 @@ GUI.VectorAnimation.prototype.Constructor = function(Public, Protected, theDurat
 
     // initialize from arguments
     Public.setup = function() {
-		Protected.duration = theDuration;
+        Protected.duration = theDuration;
 
-		if(theEasing != null) {
-			Public.easing = theEasing;
-		}
+        if(theEasing != null) {
+            Public.easing = theEasing;
+        }
 
-		_object = theObject;
-		_property = theProperty;
-		_start = theStart; // take a copy, just in case the user
+        _object = theObject;
+        _property = theProperty;
+        _start = theStart; // take a copy, just in case the user
                            // supplied a refernce? [DS]
-		_end = theEnd;
+        _end = theEnd;
     };
 
     // set the current value
@@ -118,11 +118,11 @@ GUI.VectorAnimation.prototype.Constructor = function(Public, Protected, theDurat
     Public.render = function() {
         var myValue = sum(product(_start, 1-Public.progress), product(_end, Public.progress));
         _object[_property] = myValue;
-	};
+    };
 
-	Public.toString = function() {
-		return "VectorAnimation" + " on "  + _object.name + "." + _property;
-	};
+    Public.toString = function() {
+        return Protected.standardToString("VectorAnimation" + " on "  + _object.name + "." + _property);
+    };
 
     Public.setup();
 };

@@ -1,0 +1,193 @@
+<scene revision="20287">
+    <worlds>
+        <world visible="1" id="B4c58waogaU=">
+            <transform visible="1" name="groundPlane_transform" position="[0,0,0]" scale="[12,12,1]" orientation="[0.707107,0,0,-0.707107]" pivot="[0,0,0]" billboard="" id="CIc58waogaU="/>
+            <camera visible="1" name="perspShape" position="[0.179865,0.0917023,0.179516]" scale="[1,1,1]" orientation="[-0.164282,0.395426,0.0721149,-0.900805]" pivot="[0,0,0]" billboard="" frustum="perspective[-0.0514286,0.0514286,-0.0509525,0.0509525,0.1,10000]" id="Coc58waogaU="/>
+            <transform visible="0" name="top" position="[0.000954915,1.00701,0.015]" scale="[1,1,1]" orientation="[-0.707107,0,0,-0.707107]" pivot="[0,0,0]" billboard="" id="C4c58waogaU="/>
+            <transform visible="0" name="front" position="[0.000954915,0,1.00076]" scale="[1,1,1]" orientation="[0,0,0,-1]" pivot="[0,0,0]" billboard="" id="DIc58waogaU="/>
+            <transform visible="0" name="side" position="[1.00011,0,0.015]" scale="[1,1,1]" orientation="[0,0.707107,0,-0.707107]" pivot="[0,0,0]" billboard="" id="DYc58waogaU="/>
+            <joint visible="1" name="joint1" position="[0,0.1,0]" scale="[1,1,1]" orientation="[0,0,0,-1]" pivot="[0,0,0]" billboard="" jointorientation="[0,0,0.707107,0.707107]" id="Doc58waogaU=">
+                <joint visible="1" name="joint2" position="[0.1,-1.77636e-17,0.03]" scale="[1,1,1]" orientation="[0,0,0,-1]" pivot="[0,0,0]" billboard="" jointorientation="[0,0,0,1]" id="D4c58waogaU=">
+                    <joint visible="1" name="joint3" position="[0.1,-1.77636e-17,-0.03]" scale="[1,1,1]" orientation="[0,0,0,-1]" pivot="[0,0,0]" billboard="" jointorientation="[0,0,-0.707107,0.707107]" id="EIc58waogaU="/>
+                </joint>
+            </joint>
+            <body shape="A4c58waogaU=" id="Eoc58waogaU=" name="pCylinder1" visible="1" insensible="0" position="[0,0,0]" orientation="[0,0,0,-1]" scale="[1,1,1]" pivot="[0,0,0]" billboard="" cullable="1" clippingplanes="[]" scissor="" sticky="0" events="[]" skeleton="[`Doc58waogaU=`,`D4c58waogaU=`,`EIc58waogaU=`]"/>
+            <transform visible="1" name="transform2" position="[0,0,0]" scale="[1,1,1]" orientation="[0,0,0,-1]" pivot="[0,0,0]" billboard="" id="E4c58waogaU="/>
+        </world>
+    </worlds>
+    <records/>
+    <canvases>
+        <canvas id="AYc58waogaU=" name="JohnDoe" backgroundcolor="[0,0,0,1]" target="">
+            <viewport id="Aoc58waogaU=" name="JohnDoe" camera="Coc58waogaU=" position="[0,0]" size="[1,1]" orientation="landscape" backfaceculling="1" wireframe="0" lighting="1" texturing="1" flatshading="0" culling="1" debugculling="0" alphatest="1" drawnormals="0" glow="0" resizepolicy="adapt_vertical">
+                <overlays/>
+            </viewport>
+        </canvas>
+    </canvases>
+    <materials>
+        <material name="lambert1" id="BIc58waogaU=" transparent="0">
+            <properties>
+                <vector4f name="ambient">[0,0,0,1]</vector4f>
+                <vector4f name="diffuse">[0.8,0.8,0.8,1]</vector4f>
+                <vector4f name="emissive">[0,0,0,1]</vector4f>
+            </properties>
+            <textureunits>
+                <textureunit texture="Boc58waogaU=" projector="" applymode="modulate" combiner="" envcolor="[1,1,1,1]" sprite="0" matrix="identity[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]" resizepolicy="adapt_vertical"/>
+            </textureunits>
+            <requires>
+                <feature name="physics">[100[skin]]</feature>
+                <feature name="textures">[100[paint]]</feature>
+                <feature name="texcoord">[100[uv_map]]</feature>
+                <feature name="lighting">[30[lambert],20[flat],10[unlit]]</feature>
+            </requires>
+        </material>
+    </materials>
+    <lightsources/>
+    <animations/>
+    <characters/>
+    <shapes>
+        <shape name="pCylinderShape1" renderstyle="[frontfacing,backfacing]" id="A4c58waogaU=">
+            <vertexdata>
+                <vectorofvector3f name="position" vertexbufferusage="static_draw">[
+[0.00309017,-0.1,-0.00951057],
+[-0.00809017,-0.1,-0.00587785],
+[-0.00809017,-0.1,0.00587785],
+[0.00309017,-0.1,0.00951056],
+[0.01,-0.1,0],
+[0.00309017,-1.77629e-17,0.0204894],
+[-0.00809017,-1.77628e-17,0.0241221],
+[-0.00809017,-1.77629e-17,0.0358779],
+[0.00309017,-1.77629e-17,0.0395106],
+[0.01,-1.77628e-17,0.03],
+[0.00309017,0.1,-0.00951056],
+[-0.00809017,0.1,-0.00587785],
+[-0.00809017,0.1,0.00587785],
+[0.00309017,0.1,0.00951057],
+[0.01,0.1,0]]</vectorofvector3f>
+                <vectorofvector3f name="normal" vertexbufferusage="static_draw">[
+[0.305126,0.273645,-0.912149],
+[-0.805344,0.170342,-0.567807],
+[-0.817289,0,-0.576228],
+[0.317235,-1.41938e-08,-0.948347],
+[-0.805344,-0.170342,0.567807],
+[-0.817289,0,0.576228],
+[0.305126,-0.273645,0.912149],
+[0.317235,-1.89251e-08,0.948347],
+[1,0,3.7406e-08],
+[1,-2.33788e-08,-3.7406e-08],
+[-0.805344,-0.170342,-0.567807],
+[0.305126,-0.273645,-0.912149],
+[-0.805344,0.170342,0.567807],
+[0.305126,0.273645,0.912149],
+[1,-4.67575e-08,-1.12218e-07]]</vectorofvector3f>
+                <vectorofvector4f name="color" vertexbufferusage="static_draw">[[1,1,1,1]]</vectorofvector4f>
+                <vectorofvector2f name="map1" vertexbufferusage="static_draw">[
+[0,0.954545],
+[0.0571199,0.954545],
+[0.11424,0.954545],
+[0.17136,0.954545],
+[0.228479,0.954545],
+[0.285599,0.954545],
+[0,0.5],
+[0.0571199,0.5],
+[0.11424,0.5],
+[0.17136,0.5],
+[0.228479,0.5],
+[0.285599,0.5],
+[0,0.0454545],
+[0.0571199,0.0454545],
+[0.11424,0.0454545],
+[0.17136,0.0454545],
+[0.228479,0.0454545],
+[0.285599,0.0454545]]</vectorofvector2f>
+                <vectorofvector4f name="joint_weights_0" vertexbufferusage="static_draw">[
+[0.499981,0.499981,3.73456e-05,0],
+[0.499981,0.499981,3.87933e-05,0],
+[0.514445,0.485512,4.28271e-05,0],
+[0.538709,0.461248,4.24052e-05,0],
+[0.499979,0.499979,4.13206e-05,0],
+[0.49998,0.49998,3.93566e-05,0],
+[0.499979,0.499979,4.16229e-05,0],
+[0.499981,0.499981,3.87933e-05,0],
+[0.499981,0.499981,3.73456e-05,0],
+[0.499979,0.499979,4.13206e-05,0],
+[0.999919,7.4688e-05,6.21836e-06,0],
+[0.999916,7.75832e-05,6.21835e-06,0],
+[0.999911,8.32418e-05,5.8686e-06,0],
+[0.999916,7.87096e-05,5.32421e-06,0],
+[0.999911,8.26373e-05,6.21831e-06,0]]</vectorofvector4f>
+                <vectorofvector4f name="joint_indices_0" vertexbufferusage="static_draw">[
+[1,2,0,0],
+[1,2,0,0],
+[1,2,0,0],
+[1,2,0,0],
+[1,2,0,0],
+[0,1,2,0],
+[0,1,2,0],
+[0,1,2,0],
+[0,1,2,0],
+[0,1,2,0],
+[0,1,2,0],
+[0,1,2,0],
+[0,1,2,0],
+[0,1,2,0],
+[0,1,2,0]]</vectorofvector4f>
+                <vectorofvector4f name="joint_weights_1" vertexbufferusage="static_draw">[
+[0,0,0,0],
+[0,0,0,0],
+[0,0,0,0],
+[0,0,0,0],
+[0,0,0,0],
+[0,0,0,0],
+[0,0,0,0],
+[0,0,0,0],
+[0,0,0,0],
+[0,0,0,0],
+[0,0,0,0],
+[0,0,0,0],
+[0,0,0,0],
+[0,0,0,0],
+[0,0,0,0]]</vectorofvector4f>
+                <vectorofvector4f name="joint_indices_1" vertexbufferusage="static_draw">[
+[0,0,0,0],
+[0,0,0,0],
+[0,0,0,0],
+[0,0,0,0],
+[0,0,0,0],
+[0,0,0,0],
+[0,0,0,0],
+[0,0,0,0],
+[0,0,0,0],
+[0,0,0,0],
+[0,0,0,0],
+[0,0,0,0],
+[0,0,0,0],
+[0,0,0,0],
+[0,0,0,0]]</vectorofvector4f>
+            </vertexdata>
+            <primitives>
+                <elements type="quads" material="BIc58waogaU=">
+                    <indices vertexdata="position" role="position">[0,1,6,5,1,2,7,6,2,3,8,7,3,4,9,8,4,0,5,9,5,6,11,10,6,
+7,12,11,7,8,13,12,8,9,14,13,9,5,10,14]</indices>
+                    <indices vertexdata="normal" role="normal">[0,1,2,3,1,4,5,2,4,6,7,5,6,8,9,7,8,0,3,9,3,2,10,11,2,
+5,12,10,5,7,13,12,7,9,14,13,9,3,11,14]</indices>
+                    <indices vertexdata="map1" role="texcoord0">[0,1,7,6,1,2,8,7,2,3,9,8,3,4,10,9,4,5,11,10,6,7,13,12,7,
+8,14,13,8,9,15,14,9,10,16,15,10,11,17,16]</indices>
+                    <indices vertexdata="joint_weights_0" role="joint_weights_0">[0,1,6,5,1,2,7,6,2,3,8,7,3,4,9,8,4,0,5,9,5,6,11,10,6,
+7,12,11,7,8,13,12,8,9,14,13,9,5,10,14]</indices>
+                    <indices vertexdata="joint_indices_0" role="joint_indices_0">[0,1,6,5,1,2,7,6,2,3,8,7,3,4,9,8,4,0,5,9,5,6,11,10,6,
+7,12,11,7,8,13,12,8,9,14,13,9,5,10,14]</indices>
+                    <indices vertexdata="joint_weights_1" role="joint_weights_1">[0,1,6,5,1,2,7,6,2,3,8,7,3,4,9,8,4,0,5,9,5,6,11,10,6,
+7,12,11,7,8,13,12,8,9,14,13,9,5,10,14]</indices>
+                    <indices vertexdata="joint_indices_1" role="joint_indices_1">[0,1,6,5,1,2,7,6,2,3,8,7,3,4,9,8,4,0,5,9,5,6,11,10,6,
+7,12,11,7,8,13,12,8,9,14,13,9,5,10,14]</indices>
+                </elements>
+            </primitives>
+        </shape>
+    </shapes>
+    <textures>
+        <texture name="file1" image="BYc58waogaU=" id="Boc58waogaU=" texturepixelformat="" mipmap="1" anisotropy="1" matrix="identity[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]" color_bias="[0,0,0,0]" color_scale="[1,1,1,1]" wrapmode="repeat" min_filter="linear" mag_filter="linear" image_index="0"/>
+    </textures>
+    <images>
+        <image name="file1" type="single" depth="1" tile="[1,1]" id="BYc58waogaU=" src="./tex/testbild00.rgb" resize="none" filter="" filter_params="[]" matrix="identity[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]" targetpixelformat=""/>
+    </images>
+</scene>

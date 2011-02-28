@@ -98,7 +98,10 @@ namespace y60 {
                     const Camera & theCamera);
             void bindOverlayParams(const MaterialBase & theMaterial);
             bool isSupported() const {
-                return _myVertexShader._myProfile && ((_myFragmentShader._myType != NO_SHADER_TYPE) ? _myFragmentShader._myProfile :true);
+                return (((_myVertexShader._myType != NO_SHADER_TYPE)   ? (_myVertexShader._myProfile != NO_PROFILE)
+                                                                       : true) &&
+                        ((_myFragmentShader._myType != NO_SHADER_TYPE) ? (_myFragmentShader._myProfile != NO_PROFILE)
+                                                                       : true));
             }
 
         protected:

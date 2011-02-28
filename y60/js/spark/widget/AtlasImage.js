@@ -72,7 +72,7 @@ spark.AtlasImage.Constructor = function (Protected) {
         if (_mySubTextureName && _myAtlasPath) {
             Base.realize(_getMaterial(_mySubTextureName, _myAtlasPath));
         } else {
-            throw new Exception("AtlasImage cannot be realized without having set a texture and atlas first via 'setTexture()'");
+            throw new Exception("AtlasImage cannot be realized without having set a texture and atlas first via 'setTexture()'", fileline());
         }
         Protected.storeOriginalUVCoords();
         Protected.applyAtlasTextureInformation();

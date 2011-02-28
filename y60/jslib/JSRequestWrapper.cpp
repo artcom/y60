@@ -242,7 +242,7 @@ JSRequestWrapper::Functions() {
         {"getResponseHeader", getResponseHeader,   1},
         {"getAllResponseHeaders", getAllResponseHeaders,   1},
         {"setTimeoutParams",  setTimeoutParams,    2},
-        {"setCredentials",    setCredentials,      2},
+        {"setCredentials",    setCredentials,      3},
         {"setCookie",         setCookie,      1},
         {"setProxy",          setProxy,       2},
         {0}
