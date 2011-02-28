@@ -491,7 +491,7 @@ class XmlSchemaUnitTest : public UnitTest {
                         "       <world></world>\n"
                         "       <world></world>\n"
                         "       <world></world>\n"
-                        "   </worlds>\n";
+                        "   </worlds>\n"
                         "   <worlds></worlds>\n"
                         "   <uvset name='bla'>23</uvset>\n"
                         "</scene>\n";
