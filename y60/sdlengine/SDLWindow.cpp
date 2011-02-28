@@ -72,11 +72,15 @@
 #include <SDL/SDL.h>
 
 #ifdef WIN32_LEAN_AND_MEAN
-static const int ourMagicDecorationHeight = 15;
 #undef WIN32_LEAN_AND_MEAN
-#elif
-static const int ourMagicDecorationHeight = 0;
 #endif
+
+#ifdef WIN32
+static const unsigned int ourMagicDecorationHeight = 15;
+#else
+static const unsigned int ourMagicDecorationHeight = 0;
+#endif
+
 #include <SDL/SDL_syswm.h>
 
 #include <iostream>
