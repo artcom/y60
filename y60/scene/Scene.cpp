@@ -1173,7 +1173,11 @@ namespace y60 {
     Scene::pickBody(const unsigned int theX, const unsigned int theY, const dom::NodePtr theCanvas) const {
         CanvasPtr myCanvas = theCanvas->getFacade<Canvas>();
         ViewportPtr myViewport = myCanvas->getViewportAt(theX, theY);
-        return myViewport->pickBody(theX, theY);
+        if (myViewport) {
+            return myViewport->pickBody(theX, theY);
+        } else {
+            return dom::NodePtr(0);
+        }
     }
 
     dom::NodePtr 
@@ -1190,7 +1194,11 @@ namespace y60 {
     {
         CanvasPtr myCanvas = theCanvas->getFacade<Canvas>();
         ViewportPtr myViewport = myCanvas->getViewportAt(theX, theY);
-        return myViewport->pickBodyBySweepingSphereFromBodies(theX, theY, theSphereRadius);
+        if (myViewport) {
+            return myViewport->pickBodyBySweepingSphereFromBodies(theX, theY, theSphereRadius);
+        } else {
+            return NodePtr(0);
+        }
     }
 
     dom::NodePtr 

@@ -235,8 +235,12 @@ namespace jslib {
     DOC_RESET;
     DOC_PARAM("Vector", "", DOC_TYPE_VECTOR3F);
     DOC_END;
-        jsdouble myNumber;
-        if (JS_ValueToNumber(cx,argv[0],&myNumber)) {
+        if (JSVAL_IS_INT(argv[0]) || JSVAL_IS_DOUBLE(argv[0])) {
+            jsdouble myNumber;
+            if (!JS_ValueToNumber(cx,argv[0],&myNumber)) {
+                JS_ReportError(cx, "JSVector::add: argument 1 has to be int/float/double");
+                return JS_FALSE;
+            }
             (openNativeRef(cx,obj).NATIVE_VECTOR::add)(ELEM(myNumber));
             closeNativeRef(cx, obj);
             return JS_TRUE;
@@ -255,8 +259,12 @@ namespace jslib {
     DOC_RESET;
     DOC_PARAM("Vector", "", DOC_TYPE_VECTOR3F);
     DOC_END;
-        jsdouble myNumber;
-        if (JS_ValueToNumber(cx,argv[0],&myNumber)) {
+        if (JSVAL_IS_INT(argv[0]) || JSVAL_IS_DOUBLE(argv[0])) {
+            jsdouble myNumber;
+            if (!JS_ValueToNumber(cx,argv[0],&myNumber)) {
+                JS_ReportError(cx, "JSVector::sub: argument 1 has to be int/float/double");
+                return JS_FALSE;
+            }
             (openNativeRef(cx,obj).NATIVE_VECTOR::sub)(ELEM(myNumber));
             closeNativeRef(cx, obj);
             return JS_TRUE;
@@ -275,8 +283,12 @@ namespace jslib {
     DOC_RESET;
     DOC_PARAM("Vector", "", DOC_TYPE_VECTOR3F);
     DOC_END;
-        jsdouble myNumber;
-        if (JS_ValueToNumber(cx,argv[0],&myNumber)) {
+        if (JSVAL_IS_INT(argv[0]) || JSVAL_IS_DOUBLE(argv[0])) {
+            jsdouble myNumber;
+            if (!JS_ValueToNumber(cx,argv[0],&myNumber)) {
+                JS_ReportError(cx, "JSVector::add: argument 1 has to be int/float/double");
+                return JS_FALSE;
+            }
             (openNativeRef(cx,obj).NATIVE_VECTOR::mult)(ELEM(myNumber));
             closeNativeRef(cx, obj);
             return JS_TRUE;
@@ -295,8 +307,12 @@ namespace jslib {
     DOC_RESET;
     DOC_PARAM("Vector", "", DOC_TYPE_VECTOR3F);
     DOC_END;
-        jsdouble myNumber;
-        if (JS_ValueToNumber(cx,argv[0],&myNumber)) {
+        if (JSVAL_IS_INT(argv[0]) || JSVAL_IS_DOUBLE(argv[0])) {
+            jsdouble myNumber;
+            if (!JS_ValueToNumber(cx,argv[0],&myNumber)) {
+                JS_ReportError(cx, "JSVector::div: argument 1 has to be int/float/double");
+                return JS_FALSE;
+            }
             (openNativeRef(cx,obj).NATIVE_VECTOR::div)(ELEM(myNumber));
             closeNativeRef(cx, obj);
             return JS_TRUE;

@@ -117,6 +117,28 @@ FixedVectorUnitTest.prototype.Constructor = function(obj, theName) {
         obj.myVec.sub(new Vector2f(2, 2));
         ENSURE('almostEqual(obj.myVec, new Vector2f(4,1))');
 
+        obj.myVec.sub(1);
+        ENSURE('almostEqual(obj.myVec, new Vector2f(3,0))');
+        obj.myVec.add(3);
+        ENSURE('almostEqual(obj.myVec, new Vector2f(6,3))');
+        obj.myVec.div(3);
+        ENSURE('almostEqual(obj.myVec, new Vector2f(2,1))');
+        obj.myVec.mult(4);
+        ENSURE('almostEqual(obj.myVec, new Vector2f(8,4))');
+        obj.myVec.add(-3);
+        ENSURE('almostEqual(obj.myVec, new Vector2f(5,1))');
+        
+        obj.myVec.sub(0.5);
+        ENSURE('almostEqual(obj.myVec, new Vector2f(4.5,0.5))');
+        obj.myVec.add(3.5);
+        ENSURE('almostEqual(obj.myVec, new Vector2f(8,4))');
+        obj.myVec.div(2.1);
+        ENSURE('almostEqual(obj.myVec, new Vector2f(3.80952,1.90476))');
+        obj.myVec.mult(2.1);
+        ENSURE('almostEqual(obj.myVec, new Vector2f(8,4))');
+        obj.myVec.add(-3.125);
+        ENSURE('almostEqual(obj.myVec, new Vector2f(4.875,0.875))');
+        
         obj.myVector = new Vector2f(1, 2);
         ENSURE('almostEqual(obj.myVector, new Vector2f(1,2))');
         ENSURE('obj.myVector.toString() == "[1,2]"');
