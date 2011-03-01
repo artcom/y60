@@ -91,6 +91,9 @@ spark.enableTuio = function (theStage) {
     }
 };
 
+var TUIO_OBJECT_CLASS = "object";
+var TUIO_CURSOR_CLASS = "cursor";
+
 /**
  * Multitouch cursors
  * 
@@ -345,6 +348,85 @@ spark.CursorEvent.Constructor = function (Protected, theType, theCursor) {
      */
     Public.__defineGetter__("intensity", function () {
         return _myCursor.intensity;
+    });
+
+};
+
+spark.ObjectEvent = spark.Class("ObjectEvent");
+
+/**
+ * Appear event: "new object created here"
+ * 
+ * Symmetric to VANISH.
+ */
+spark.ObjectEvent.APPEAR = "object-appear";
+
+/**
+ * Vanish event: "object ceases to exist"
+ * 
+ * Symmetric to APPEAR.
+ */
+spark.ObjectEvent.VANISH = "object-vanish";
+
+/**
+ * Move event: "object changed position"
+ */
+spark.ObjectEvent.MOVE   = "object-move";
+
+/**
+ * Enter event: "object entered widget"
+ * 
+ * Symmetric to LEAVE.
+ */
+spark.ObjectEvent.ENTER  = "object-enter";
+
+/**
+ * Leave event: "object left widget"
+ * 
+ * Symmetric to ENTER.
+ */
+spark.ObjectEvent.LEAVE  = "object-leave";
+
+spark.ObjectEvent.Constructor = function (Protected, theType, theObject, theEvent) {
+    var Public = this;
+    this.Inherit(spark.CursorEvent, theType, theObject);
+    
+    /////////////////////
+    // Private Members //
+    /////////////////////
+    
+    var _myEvent = theEvent;
+    
+    ////////////////////
+    // Public Methods //
+    ////////////////////
+    
+    /**
+     * Rotation of the object
+     */
+    Public.__defineGetter__("rotation", function () {
+        return _myEvent.rotation;
+    });
+    
+    /**
+     * Rotation speed of the object
+     */
+    Public.__defineGetter__("rotationspeed", function () {
+        return _myEvent.rotationspeed;
+    });
+    
+    /**
+     * Rotation acceleration of the object
+     */
+    Public.__defineGetter__("rotationaccel", function () {
+        return _myEvent.rotationaccel;
+    });
+    
+    /**
+     * Symbolid of the object
+     */
+    Public.__defineGetter__("symbolid", function () {
+        return _myEvent.symbolid;
     });
 
 };

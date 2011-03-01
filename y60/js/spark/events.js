@@ -286,7 +286,6 @@ spark.EventDispatcher.Constructor = function (Protected) {
 
     Public.addEventListenerInFront = function(theType, theListener, theUseCapture) {
         theUseCapture = theUseCapture || false;
-
         var myListener = {
             type:       theType,
             listener:   theListener,

@@ -61,6 +61,7 @@
             <xs:attribute name="initialdistance" type="xs:float"/>
             <xs:attribute name="centerpoint" type="Vector3f"/>
             <xs:attribute name="angle" type="xs:double"/>
+            <xs:attribute name="toucharea" type="Vector2f"/>
             <xs:attribute name="velocity" type="xs:float"/>
             <xs:attribute name="zoomfactor" type="xs:float"/>
             <xs:attribute name="baseeventtype" type="xs:int"/>                    
