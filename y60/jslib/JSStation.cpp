@@ -192,21 +192,15 @@ namespace jslib {
     // getproperty handling
     JSBool
     JSStation::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
-        switch (theID) {
-            default:
-                JS_ReportError(cx,"JSStation::getProperty: index %d out of range", theID);
-                return JS_FALSE;
-        }
+        JS_ReportError(cx,"JSStation::getProperty: index %d out of range", theID);
+        return JS_FALSE;
     }
 
     // setproperty handling
     JSBool
     JSStation::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
-        switch (theID) {
-            default:
-                JS_ReportError(cx,"JSStation::setPropertySwitch: index %d out of range", theID);
-                return JS_FALSE;
-        }
+        JS_ReportError(cx,"JSStation::setPropertySwitch: index %d out of range", theID);
+        return JS_FALSE;
     }
 
     JSBool

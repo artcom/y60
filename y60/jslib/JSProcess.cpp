@@ -169,21 +169,15 @@ JSProcess::Properties() {
 // getproperty handling
 JSBool
 JSProcess::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
-    switch (theID) {
-        default:
-            JS_ReportError(cx,"JSProcess::getProperty: index %d out of range", theID);
-            return JS_FALSE;
-    }
+    JS_ReportError(cx,"JSProcess::getProperty: index %d out of range", theID);
+    return JS_FALSE;
 }
 
 // setproperty handling
 JSBool
 JSProcess::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
-    switch (theID) {
-        default:
-            JS_ReportError(cx,"JSProcess::setPropertySwitch: index %d out of range", theID);
-            return JS_FALSE;
-    }
+    JS_ReportError(cx,"JSProcess::setPropertySwitch: index %d out of range", theID);
+    return JS_FALSE;
 }
 
 JSBool
