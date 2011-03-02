@@ -194,7 +194,7 @@ spark.Slider.Constructor = function (Protected) {
             dampPosition(theEvent);
             if (!_horizontalLock) {
                 var myNewX = theEvent.dampenedPos.x -
-                             Public.x -
+                             Public.worldPosition.x -
                              _mySliderBackground.x -
                              _myActiveCursor.width / 2;
                 var myMinX = _mySliderBackground.x;
@@ -214,7 +214,7 @@ spark.Slider.Constructor = function (Protected) {
             if (!_verticalLock) {
                 var myNewY = -theEvent.dampenedPos.y +
                              Public.stage.height -
-                             Public.y -
+                             Public.worldPosition.y -
                              _mySliderBackground.y -
                              _myActiveCursor.height / 2;
                 var myMinY = _mySliderBackground.y;
