@@ -147,7 +147,12 @@ spark.Window.Constructor = function (Protected, theArguments) {
 
             if (theEvent.type == "add") {
                 Logger.debug("Cursor " + myId + " appears in " + myPick);
-                var myAppear = new spark.CursorEvent(spark.CursorEvent.APPEAR, myCursor);
+                var myAppear = null;
+                if (theEvent.tuiotype == TUIO_OBJECT_CLASS) {
+                    myAppear = new spark.ObjectEvent(spark.ObjectEvent.APPEAR, myCursor, theEvent);
+                } else {
+                    myAppear = new spark.CursorEvent(spark.CursorEvent.APPEAR, myCursor);
+                }
                 myPick.dispatchEvent(myAppear);
             }
             if (myCursor.active && (myPick != myFocused)) {
@@ -155,11 +160,20 @@ spark.Window.Constructor = function (Protected, theArguments) {
                              + (myFocused ? ", leaving " + myFocused : ""));
 
                 if (myFocused) {
-                    var myLeave = new spark.CursorEvent(spark.CursorEvent.LEAVE, myCursor);
+                    var myLeave = null;
+                    if (theEvent.tuiotype == TUIO_OBJECT_CLASS) {
+                        myLeave = new spark.ObjectEvent(spark.ObjectEvent.LEAVE, myCursor, theEvent);
+                    } else {
+                        myLeave = new spark.CursorEvent(spark.CursorEvent.LEAVE, myCursor);
+                    }
                     myFocused.dispatchEvent(myLeave);
                 }
-
-                var myEnter = new spark.CursorEvent(spark.CursorEvent.ENTER, myCursor);
+                var myEnter = null;
+                if (theEvent.tuiotype == TUIO_OBJECT_CLASS) {
+                    myEnter = new spark.ObjectEvent(spark.ObjectEvent.ENTER, myCursor, theEvent);
+                } else {
+                    myEnter = new spark.CursorEvent(spark.CursorEvent.ENTER, myCursor);
+                }
                 myPick.dispatchEvent(myEnter);
             }
 
@@ -168,7 +182,13 @@ spark.Window.Constructor = function (Protected, theArguments) {
                 var myMoveDistance = distance(myPosition, myCursor.lastStagePosition);
                 if (myMoveDistance >= MOVE_DISTANCE_THRESHOLD) {
                     Logger.debug("Cursor " + myId + " moves to " + myPosition + " over " + myPick);
-                    var myMove = new spark.CursorEvent(spark.CursorEvent.MOVE, myCursor);
+                    var myMove = null;
+                    if (theEvent.tuiotype == TUIO_OBJECT_CLASS) {
+                        myMove = new spark.ObjectEvent(spark.ObjectEvent.MOVE, myCursor, theEvent);
+                    } else {
+                        myMove = new spark.CursorEvent(spark.CursorEvent.MOVE, myCursor);
+                    }
+                    
                     myPick.dispatchEvent(myMove);
                 }
             }
@@ -183,12 +203,24 @@ spark.Window.Constructor = function (Protected, theArguments) {
                 myCursor.update(myFocused, myPosition);
 
                 if (myFocused) {
-                    Logger.debug("Cursor " + myId + " leaves " + myFocused);
-                    var myLeave = new spark.CursorEvent(spark.CursorEvent.LEAVE, myCursor);
+                    var myLeave = null;
+                    if (theEvent.tuiotype == TUIO_OBJECT_CLASS) {
+                        Logger.debug("Object " + myId + " leaves " + myFocused);                    
+                        myLeave = new spark.ObjectEvent(spark.ObjectEvent.LEAVE, myCursor, theEvent);
+                    } else {
+                        Logger.debug("Cursor " + myId + " leaves " + myFocused);                    
+                        myLeave = new spark.CursorEvent(spark.CursorEvent.LEAVE, myCursor);
+                    }
                     myFocused.dispatchEvent(myLeave);
-
-                    Logger.debug("Cursor " + myId + " vanishes in " + myFocused);
-                    var myVanish = new spark.CursorEvent(spark.CursorEvent.VANISH, myCursor);
+                    
+                    var myVanish = null;
+                    if (theEvent.tuiotype == TUIO_OBJECT_CLASS) {
+                        Logger.debug("Object " + myId + " vanishes in " + myFocused);
+                        myVanish = new spark.ObjectEvent(spark.ObjectEvent.VANISH, myCursor, theEvent);
+                    } else {
+                        Logger.debug("Cursor " + myId + " vanishes in " + myFocused);
+                        myVanish = new spark.CursorEvent(spark.CursorEvent.VANISH, myCursor);
+                    }
                     myFocused.dispatchEvent(myVanish);
                 }
                 myCursor.deactivate();
@@ -581,8 +613,8 @@ spark.Window.Constructor = function (Protected, theArguments) {
         
         var myScale = new Vector3f(1, 1, 1);
         if (theGesture.baseeventtype == TUIO_BASE_EVENT) {
-            myScale = new Vector3f((theEvent.toucharea.x > 0) ? theEvent.toucharea.x : Public.width,
-                                   (theEvent.toucharea.y > 0) ? theEvent.toucharea.y : Public.height, 1);
+            myScale = new Vector3f((theGesture.toucharea.x > 0) ? theGesture.toucharea.x : Public.width,
+                                   (theGesture.toucharea.y > 0) ? theGesture.toucharea.y : Public.height, 1);
         }
         var myCursorPartner = null;
         var myCenterPoint = null;

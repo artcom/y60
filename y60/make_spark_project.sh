@@ -62,7 +62,7 @@ echo "      - $PROJECT_NAME.sh"
 ####################################################################
 
 START_SCRIPT=${PROJECT_NAME}.sh
-echo -e "#!/bin/bash\ny60 -I \"SCRIPTS;.\" $PROJECT_NAME.js rehearsal" > $START_SCRIPT
+echo -e "#!/bin/bash\ny60 -I \"SCRIPTS;.\" $PROJECT_NAME.js rehearsal \$*" > $START_SCRIPT
 chmod a+rx $START_SCRIPT
 
 ####################################################################
