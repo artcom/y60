@@ -68,6 +68,12 @@ spark.Slider.Constructor = function (Protected) {
                    (_mySliderBackground.width - _myActiveCursor.width);
         }
     }
+
+    var centerCursor = function () {
+        _myCursorOrigin.x = _mySliderBackground.width / 2  - _myIdleCursor.width / 2;
+        _myCursorOrigin.y = _mySliderBackground.height / 2  - _myIdleCursor.height / 2;
+        Public.resetCursor();
+    };
     
     ////////////////////
     // Public Methods //
@@ -139,7 +145,7 @@ spark.Slider.Constructor = function (Protected) {
         Public.addEventListener(spark.CursorEvent.VANISH_LEAVE, Public.onSlideStop, true);
 
         if (_centered) {
-            Public.centerCursor();
+            centerCursor();
         }
     };
 
@@ -172,12 +178,7 @@ spark.Slider.Constructor = function (Protected) {
             _myActiveCursor.visible = false;
             theEvent.cursor.ungrab(theEvent.target);
             if (!_sticky) {
-                if (_centered) {
-                    Public.centerCursor();
-                } else {
-                    _myIdleCursor.position   = _myCursorOrigin;
-                    _myActiveCursor.position = _myCursorOrigin;
-                }
+                Public.resetCursor();
             }
             if (_myEventTarget) {
                 var mySliderStop = new spark.SliderEvent(spark.SliderEvent.STOP,
@@ -240,12 +241,13 @@ spark.Slider.Constructor = function (Protected) {
         }
     };
     
-    Public.centerCursor = function () {
-        _myIdleCursor.x   = _mySliderBackground.width / 2  - _myIdleCursor.width / 2;
-        _myIdleCursor.y   = _mySliderBackground.height / 2 - _myIdleCursor.height / 2;
+    Public.resetCursor = function() {
+        _myIdleCursor.x   = _myCursorOrigin.x;
+        _myIdleCursor.y   = _myCursorOrigin.y;
         _myActiveCursor.x = _myIdleCursor.x;
         _myActiveCursor.y = _myIdleCursor.y;
     };
+
 };
 
 spark.SliderEvent = spark.Class("SliderEvent");
