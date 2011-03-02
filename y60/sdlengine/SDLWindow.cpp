@@ -147,8 +147,7 @@ SDLWindow::SDLWindow() :
     _myHasVideoSync(false),
     _myScreen(0),
     _mySwapInterval(0),
-    _myLastSwapCounter(0),
-    _myWindowHeightBiggerThenDesktopFlag(false)
+    _myLastSwapCounter(0)
 {
     setGLContext(GLContextPtr(new GLContext()));
 }
@@ -236,8 +235,13 @@ SDLWindow::onResize(Event & theEvent) {
         }
     } else {
         unsigned myHeightOffset = 0;
-        // in case of decorated window, that has a bigger height as the desktop, we need to correct SDL-correction
-        if (_myWindowHeightBiggerThenDesktopFlag || myWindowEvent.height/2.0  != myWindowEvent.height/2) {
+        asl::Vector2i myScreenSize(0,0);
+#ifdef WIN32
+        myScreenSize = getScreenSize();
+#endif
+        // in case of a decorated window, that has a bigger height as the desktop,
+        // or uneven height, we need to correct SDL-correction
+        if (myWindowEvent.height > (myScreenSize[1] - ourMagicDecorationHeight) || myWindowEvent.height/2.0  != myWindowEvent.height/2) {
             myHeightOffset = 1;
         }
         setVideoMode(myWindowEvent.width, myWindowEvent.height - myHeightOffset, false);
@@ -343,11 +347,6 @@ SDLWindow::setVideoMode(unsigned theTargetWidth, unsigned theTargetHeight,
 	_myWidth = theTargetWidth;
 	_myHeight = theTargetHeight;
 	_myFullscreenFlag = theFullscreenFlag;
-    //XXX: getScreenSize() results in segfault on linux and is not implemented on macos, so disabled size correction for them
-#ifdef WIN32
-    asl::Vector2i myScreenSize = getScreenSize();
-    _myWindowHeightBiggerThenDesktopFlag = _myHeight > (myScreenSize[1] - ourMagicDecorationHeight);
-#endif
 	updateVideoMode();
 }
 

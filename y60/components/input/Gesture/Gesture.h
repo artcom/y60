@@ -70,11 +70,13 @@ class Gesture : public asl::PlugInBase,
 
     protected:
         void createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent, int theID, const std::string & theType,
-                          const asl::Vector3f & thePosition3D, unsigned long long & theTimestamp);
+                          const asl::Vector3f & thePosition3D, unsigned long long & theTimestamp,
+                          const asl::Vector2f & theToucharea);
     private:
         dom::NodePtr addGestureEvent2Queue(GESTURE_BASE_EVENT_TYPE theBaseEvent, int theID, 
                                            const std::string & theType, 
-                                           const asl::Vector3f & thePosition3D);
+                                           const asl::Vector3f & thePosition3D,
+                                           const asl::Vector2f & theToucharea);
 
         inline asl::Vector3f getCenter(const asl::Vector3f & thePosition, const asl::Vector3f & thePartnerPosition) const {
             asl::Vector3f myCenterPoint(thePosition);
