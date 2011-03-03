@@ -76,9 +76,9 @@
 #endif
 
 #ifdef WIN32
-static const unsigned int ourMagicDecorationHeight = 15;
+static const int ourMagicDecorationHeight = 15;
 #else
-static const unsigned int ourMagicDecorationHeight = 0;
+static const int ourMagicDecorationHeight = 0;
 #endif
 
 #include <SDL/SDL_syswm.h>
@@ -236,9 +236,7 @@ SDLWindow::onResize(Event & theEvent) {
     } else {
         unsigned myHeightOffset = 0;
         asl::Vector2i myScreenSize(0,0);
-#ifdef WIN32
         myScreenSize = getScreenSize();
-#endif
         // in case of a decorated window, that has a bigger height as the desktop,
         // or uneven height, we need to correct SDL-correction
         if (myWindowEvent.height > (myScreenSize[1] - ourMagicDecorationHeight) || myWindowEvent.height/2.0  != myWindowEvent.height/2) {
