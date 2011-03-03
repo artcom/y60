@@ -60,6 +60,7 @@
 #include "Event.h"
 
 #include <asl/base/UnitTest.h>
+#include <asl/dom/Nodes.h>
 #include <iostream>
 #include <deque>
 #include <algorithm>
@@ -169,6 +170,22 @@ class EventDispatcherTest : public UnitTest, IEventSink {
             _myExpectedEvents.push_back(EventPtr(new Event(Event::KEY_UP, 2)));
             _myExpectedEvents.push_back(EventPtr(new Event(Event::MOUSE_MOTION, 2)));
             startDispatchTest(myTestEvents);
+
+            // test event node ctor
+            {
+                dom::Node myTestDocument("<event type='test' when='2'/>");
+                dom::NodePtr myNode = myTestDocument.firstChild();
+                EventPtr myEvent = EventPtr(new Event(Event::KEY_UP, myNode));
+                EventPtr myExpectedEvent = EventPtr(new Event(Event::KEY_UP, 0.002));
+                ENSURE( myEvent->when.millis() == myExpectedEvent->when.millis());
+            }
+            {
+                dom::Node myTestDocument("<event type='test'/>");
+                dom::NodePtr myNode = myTestDocument.firstChild();
+                EventPtr myEvent = EventPtr(new Event(Event::KEY_UP, myNode));
+                EventPtr myExpectedEvent = EventPtr(new Event(Event::KEY_UP, 0));
+                ENSURE( myEvent->when.millis() == myExpectedEvent->when.millis());
+            }
         }
 };
 

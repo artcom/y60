@@ -79,7 +79,7 @@ namespace y60 {
 
     Event::Event(Type theType, const dom::NodePtr & theNode) :
         type(theType),
-        when(theNode->getAttributeValue<unsigned long long>("when", when.millis()))
+        when(theNode->getAttributeValue<unsigned long long>("when", 0)/1.0e3)
     {
     }
 
@@ -118,7 +118,7 @@ namespace y60 {
         dom::NodePtr myNode(myNodeP);
         if (myNode) {
             myNode = myNode->firstChild();
-            myNode->appendAttribute("when", (unsigned long long)when.millis() );
+            myNode->appendAttribute("when", when.millis());
         }
 
         return myNode;
