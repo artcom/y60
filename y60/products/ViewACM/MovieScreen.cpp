@@ -190,7 +190,7 @@ namespace video {
     }
 
     bool
-    MovieScreen::updateToFrame(unsigned long nextFrame) {
+    MovieScreen::updateToFrame(unsigned int nextFrame) {
             return update();
     }
     
