@@ -50,8 +50,8 @@ struct Image {
             return int(pow(2.0, newBase));
         }
 
-        double getHeightStretch() const { return _myHeightStretch; }
-        double getWidthStretch() const  { return _myWidthStretch; }
+        float getHeightStretch() const { return _myHeightStretch; }
+        float getWidthStretch() const  { return _myWidthStretch; }
         double getRotation()     const  { return _myRotation;}  
         
         virtual void    getTextureInfo(unsigned int & theTextureWidth, 
@@ -64,8 +64,8 @@ struct Image {
         }
         
     protected:
-        double          _myHeightStretch;
-        double          _myWidthStretch;
+        float          _myHeightStretch;
+        float          _myWidthStretch;
         double          _myRotation;
 
 

@@ -18,7 +18,7 @@
 namespace video {
 
     class MovieBase;
-    class Image;
+    struct Image;
    
     class MovieScreen {
         public:
