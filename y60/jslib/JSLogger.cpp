@@ -272,10 +272,10 @@ static JSBool getNewMaxTimers(JSContext *cx, JSObject *obj, uintN argc, jsval *a
         ensureParamCount(argc, 3);
         double myThreshold = 0;
         convertFrom(cx, argv[0], myThreshold);
-        unsigned long long myThresholdTicks = myThreshold * asl::NanoTime::perSecond();
+        unsigned long long myThresholdTicks = static_cast<unsigned long long>(floor(myThreshold * asl::NanoTime::perSecond()));
         double myAgeThreshold = 0;
         convertFrom(cx, argv[1], myAgeThreshold);
-        unsigned long long myAgeThresholdTicks = myAgeThreshold * asl::NanoTime::perSecond();
+        unsigned long long myAgeThresholdTicks = static_cast<unsigned long long>(floor(myAgeThreshold * asl::NanoTime::perSecond()));
         size_t myCount = 0;
         convertFrom(cx, argv[2], myCount);
         AC_TRACE << "myThresholdTicks=" << myThresholdTicks << ", myAgeThresholdTicks="<<myAgeThresholdTicks<<",myCount="<<myCount;

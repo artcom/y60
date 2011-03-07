@@ -165,7 +165,7 @@ namespace y60 {
             bool theRotatedFlag) 
     {
         asl::Matrix4f myTranslation;
-        asl::Vector2f atlasSize(theAtlasSize[0], theAtlasSize[1]);
+        asl::Vector2f atlasSize(static_cast<float>(theAtlasSize[0]), static_cast<float>(theAtlasSize[1]));
 
         if (theRotatedFlag) {
             myTranslation.makeIdentity();
