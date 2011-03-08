@@ -406,8 +406,12 @@ spark.Canvas.prepareMerge = function prepareMerge(theSceneFilePath) {
         myTexSrcPath = imageNode.childNodes[i].src;
         if (myTexSrcPath.charAt(0) !== "/") {
             var myTexSrcPaths = myTexSrcPath.split("|");
-            for(var j = 0; j < myTexSrcPaths.length; j++) {
-                myTexSrcPaths[j] = myTexSrcPaths[j].replace(/^\.\//, myTargetDir + "");
+            for (var j = 0; j < myTexSrcPaths.length; j++) {
+                if (myTexSrcPaths[j].indexOf(".") === 0) {
+                    myTexSrcPaths[j] = myTexSrcPaths[j].replace(/^\.\//, myTargetDir + "");
+                } else {
+                    myTexSrcPaths[j] = myTargetDir + myTexSrcPaths[j]; 
+                }
                 if (!fileExists(myTexSrcPaths[j])) {
                     Logger.error("Could not find texture within path '" + myTexSrcPaths[j] + "'");
                 }
