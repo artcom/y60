@@ -190,7 +190,7 @@ namespace video {
     }
 
     bool
-    MovieScreen::updateToFrame(unsigned long nextFrame) {
+    MovieScreen::updateToFrame(unsigned int nextFrame) {
             return update();
     }
     
@@ -270,11 +270,11 @@ namespace video {
                     _myCurrentFrameImage->_myCurrentFrameData);
             
             if ( !_myFrameIsPowerOf2 ) {
-                _myTextureCoordinates.set(ScreenRegion::TOP_RIGHT, _myCurrentFrameImage->_myFrameWidth, 0);
-                _myTextureCoordinates.set(ScreenRegion::TOP_LEFT, 0, 0);
-                _myTextureCoordinates.set(ScreenRegion::BOTTOM_RIGHT, _myCurrentFrameImage->_myFrameWidth, 
-                                          _myCurrentFrameImage->_myFrameHeight);
-                _myTextureCoordinates.set(ScreenRegion::BOTTOM_LEFT, 0,  _myCurrentFrameImage->_myFrameHeight);
+                _myTextureCoordinates.set(ScreenRegion::TOP_RIGHT, float(_myCurrentFrameImage->_myFrameWidth), 0.0f);
+                _myTextureCoordinates.set(ScreenRegion::TOP_LEFT, 0.0f, 0.0f);
+                _myTextureCoordinates.set(ScreenRegion::BOTTOM_RIGHT, float(_myCurrentFrameImage->_myFrameWidth), 
+                                          float(_myCurrentFrameImage->_myFrameHeight));
+                _myTextureCoordinates.set(ScreenRegion::BOTTOM_LEFT, 0.0f,  float(_myCurrentFrameImage->_myFrameHeight));
             }
         }
         return true;
@@ -315,23 +315,23 @@ namespace video {
             case QUAD:
                 glBegin(GL_QUADS);
                 glTexCoord2f(_myTextureCoordinates.get(ScreenRegion::BOTTOM_LEFT)[0], _myTextureCoordinates.get(ScreenRegion::BOTTOM_LEFT)[1] );
-                glVertex3f (_myPosition[0]-(_myWidth/2.0), 
-                            _myPosition[1]-(_myHeight/2.0),
-                            0.0);
+                glVertex3f (_myPosition[0]-(_myWidth/2.0f), 
+                            _myPosition[1]-(_myHeight/2.0f),
+                            0.0f);
                 glTexCoord2f(_myTextureCoordinates.get(ScreenRegion::BOTTOM_RIGHT)[0], _myTextureCoordinates.get(ScreenRegion::BOTTOM_RIGHT)[1]);
-                glVertex3f (_myPosition[0]+(_myWidth/2.0), 
-                            _myPosition[1]-(_myHeight/2.0),
-                            0.0);
+                glVertex3f (_myPosition[0]+(_myWidth/2.0f), 
+                            _myPosition[1]-(_myHeight/2.0f),
+                            0.0f);
 
                 glTexCoord2f(_myTextureCoordinates.get(ScreenRegion::TOP_RIGHT)[0], _myTextureCoordinates.get(ScreenRegion::TOP_RIGHT)[1]);
-                glVertex3f (_myPosition[0]+(_myWidth/2.0), 
-                            _myPosition[1]+(_myHeight/2.0),
-                            0.0);
+                glVertex3f (_myPosition[0]+(_myWidth/2.0f), 
+                            _myPosition[1]+(_myHeight/2.0f),
+                            0.0f);
 
                 glTexCoord2f(_myTextureCoordinates.get(ScreenRegion::TOP_LEFT)[0], _myTextureCoordinates.get(ScreenRegion::TOP_LEFT)[1]);
-                glVertex3f (_myPosition[0]-(_myWidth/2.0), 
-                            _myPosition[1]+(_myHeight/2.0),
-                            0.0);
+                glVertex3f (_myPosition[0]-(_myWidth/2.0f), 
+                            _myPosition[1]+(_myHeight/2.0f),
+                            0.0f);
                 glEnd();
                 break;
             case SPHERE:

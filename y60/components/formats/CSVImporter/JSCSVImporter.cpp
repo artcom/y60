@@ -104,19 +104,13 @@ namespace jslib {
     
     JSBool
     csv::JSImporter::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
-        switch (theID) {
-            default:
-                JS_ReportError(cx,"JSImporter::getProperty: index %d out of range", theID);
-                return JS_FALSE;
-        }
+        JS_ReportError(cx,"JSImporter::getProperty: index %d out of range", theID);
+        return JS_FALSE;
     }
 
     JSBool
     csv::JSImporter::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
-        switch (theID) {
-            default:
-                JS_ReportError(cx,"JSImporter::setPropertySwitch: index %d out of range", theID);
-        }
+        JS_ReportError(cx,"JSImporter::setPropertySwitch: index %d out of range", theID);
         return JS_FALSE;
     }
 

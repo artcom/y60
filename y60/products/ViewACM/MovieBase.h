@@ -40,9 +40,9 @@ class MovieBase : public Image {
         virtual ~MovieBase() {}
         virtual bool init() = 0;
         virtual bool updateToTime(double runningTime)   { return false; }
-        virtual bool updateToFrame(unsigned long frame) { return false; }
-        virtual void updateToFrameAsync(unsigned long frame) { }
-        virtual bool waitForFrameAsync(unsigned long frame)  { return false; }
+        virtual bool updateToFrame(unsigned int frame) { return false; }
+        virtual void updateToFrameAsync(unsigned int frame) { }
+        virtual bool waitForFrameAsync(unsigned int frame)  { return false; }
                            
         virtual bool updateToStream()                   { return false; }
         virtual void reset() { _myAbsoluteFrameLast = ULONG_MAX; _myCurrentFrame = ULONG_MAX; _myCurrentLoop = 0; }

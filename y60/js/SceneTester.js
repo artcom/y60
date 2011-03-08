@@ -180,9 +180,11 @@ SceneTester.prototype.Constructor = function(obj, theArguments) {
         var myImageFilename = obj.getTestImageName();
         print("Writing test image to file: " + myImageFilename);
         if (_myOffscreenFlag) {
+            print("saveTestImage, offscreen");
             var myImage = Modelling.createImage(window.scene, window.width, window.height, "rgba");
             myImage.resize = "none";
 
+            print("1");
             var myCanvas = window.scene.canvases.firstChild;
             if (!myCanvas) {
                 throw new Exception("No canvas found in scene");
@@ -196,26 +198,35 @@ SceneTester.prototype.Constructor = function(obj, theArguments) {
                 throw new Exception("No viewport found");
             }
             var myCamera = window.scene.dom.getElementById(myViewport.camera);
-
+            print("2");
+            
             _myOffscreenRenderer = new OffscreenRenderer([window.width, window.height], myCamera, "rgba", myImage, myClonedCanvas, true, 0);
+            print("3");
             _myOffscreenRenderer.setBody(window.scene.world);
 
             _myOffscreenRenderer.onPreViewport  = ourShow.onPreViewport;
             _myOffscreenRenderer.onPostViewport = ourShow.onPostViewport;
             _myOffscreenRenderer.onPreRender    = ourShow.onPreRender;
             _myOffscreenRenderer.onPostRender   = ourShow.onPostRender;
-
+            print("4");
+            
             registerHeadlights(myClonedCanvas);
+            print("5");
             _myOffscreenRenderer.render(true);
+            print("6");
             deregisterHeadlights(myClonedCanvas);
-
+            print("7");
+            
             saveImageFiltered(_myOffscreenRenderer.image, myImageFilename, ["flip"], [[]]);
-
+            print("8");
+            
             window.scene.canvases.removeChild(myClonedCanvas);
             window.scene.images.removeChild(myImage);
-
+            print("9");
+            
             _myOffscreenRenderer = null;
         } else {
+            print("saveTestImage, window.saveBuffer");
             window.saveBuffer(myImageFilename);
         }
     };
@@ -279,6 +290,7 @@ SceneTester.prototype.Constructor = function(obj, theArguments) {
             if (_mySaveLoadFlag) {
                 obj.testSaveLoad();
             }
+            print("test done -> exit");
             exit(0);
         }
     };

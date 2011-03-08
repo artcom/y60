@@ -148,7 +148,7 @@ using namespace TextureCompression;
                           (_myFrameWidth *  _myFrameHeight ) ) * 4 /
                           getCompressionRatio(getFormatFromGLFormat(_myGLCompressionFormat));
 
-                    _myHeightStretch = double(_myFrameHeight) / double(newHeight);
+                    _myHeightStretch = float(_myFrameHeight) / float(newHeight);
                     _myFrameHeight = newHeight; 
                     
                 }
@@ -181,7 +181,7 @@ using namespace TextureCompression;
     }
 
     bool
-    FileBasedMovie::updateToFrame(unsigned long myAbsoluteFrame) {
+    FileBasedMovie::updateToFrame(unsigned int myAbsoluteFrame) {
 
         if ((myAbsoluteFrame != _myAbsoluteFrameLast) || 
             (_myPredictionDeltaSignChanged)) {
@@ -196,9 +196,9 @@ using namespace TextureCompression;
                 return true;
             }
 
-            long long myFrame = getClampedFrame(myAbsoluteFrame);
-            long long myAbsoluteNextFrame = getPredictedFrame (myAbsoluteFrame);
-            long long myNextFrame = getClampedFrame (myAbsoluteNextFrame);
+            unsigned int myFrame = getClampedFrame(myAbsoluteFrame);
+            unsigned int myAbsoluteNextFrame = getPredictedFrame (myAbsoluteFrame);
+            unsigned int myNextFrame = getClampedFrame (myAbsoluteNextFrame);
 //cout << "Frame " << myNextFrame << "/" << _FrameCount << endl;
             // check loop
             _myCurrentLoop = myAbsoluteFrame / _FrameCount;
@@ -250,23 +250,23 @@ using namespace TextureCompression;
             }
         }
 
-    unsigned long 
+    unsigned int 
     FileBasedMovie::getHeaderOffset() {
         return sizeof(OGLT_Header);
     }
     
-    unsigned long 
+    unsigned int 
     FileBasedMovie::getNumBytesPerFrame() {
         return _myFrameDataSize;
     }
  
     void
-    FileBasedMovie::updateToFrameAsync(unsigned long frame) {
+    FileBasedMovie::updateToFrameAsync(unsigned int frame) {
 
     }
     
     bool
-    FileBasedMovie::waitForFrameAsync(unsigned long frame) {
+    FileBasedMovie::waitForFrameAsync(unsigned int frame) {
         return true;
     }
 
@@ -275,15 +275,15 @@ using namespace TextureCompression;
     FileBasedMovie::updateToTime(double runningTime) {
         AC_DEBUG << "------------------------------------------------------";
         AC_DEBUG << "FileBasedMovie::updateToTime(" << runningTime << ")";
-        unsigned long myAbsoluteFrame = _myCurrentFrame; //(unsigned long)
+        unsigned int myAbsoluteFrame = _myCurrentFrame; //(unsigned long)
                                         //(round(runningTime * _myFPS));
         bool success = (updateToFrame (myAbsoluteFrame));        
         _myCurrentFrame++;
         return success;
     }
 
-    unsigned long 
-        FileBasedMovie::getClampedFrame (unsigned long currentFrame) {
+    unsigned int 
+        FileBasedMovie::getClampedFrame (unsigned int currentFrame) {
             if (currentFrame < 0) {
                 currentFrame = _FrameCount + (currentFrame % _FrameCount);    
             } else if (currentFrame >= _FrameCount){ 
@@ -294,15 +294,15 @@ using namespace TextureCompression;
         }
 
 
-    unsigned long 
-    FileBasedMovie::getPredictedFrame (unsigned long currentFrame) {
+    unsigned int 
+    FileBasedMovie::getPredictedFrame (unsigned int currentFrame) {
         // prediction for preloading
 
-        long long frameDelta;            
+        int frameDelta;            
 
         switch (_myPredictionStrategy) {
             case CONST_DELTA:
-                frameDelta = _myPredictionDelta;
+                frameDelta = static_cast<int>(_myPredictionDelta);
                 break;
             case FRAME_DIFFERENCE:
                 frameDelta = currentFrame - _myCurrentFrame;
