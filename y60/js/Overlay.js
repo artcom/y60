@@ -76,7 +76,7 @@ function removeOverlay(theOverlayNode) {
         removeOverlay(theOverlayNode.firstChild);
     }
 
-    if (theOverlayNode.material) {
+    if ("material" in theOverlayNode && theOverlayNode.material) {
         var myMaterialNode = theOverlayNode.getElementById(theOverlayNode.material);
         if (myMaterialNode) {
 
