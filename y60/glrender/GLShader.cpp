@@ -367,18 +367,6 @@ namespace y60 {
 
         MaterialPropertiesFacadePtr myMaterialPropFacade = theMaterial.getChild<MaterialPropertiesTag>();
 
-        // depth test
-        dom::NodePtr myDepthTestProp = myMaterialPropFacade->getProperty(DEPTHTEST_PROPERTY);
-        if (myDepthTestProp) {
-            bool myDepthTest = myDepthTestProp->nodeValueAs<bool>();
-            if (myDepthTest) {
-                glEnable(GL_DEPTH_TEST);
-            } else {
-                glDisable(GL_DEPTH_TEST);
-            }
-        }
-        CHECK_OGL_ERROR;
-
         // line stipple
         dom::NodePtr myLineStippleProp = myMaterialPropFacade->getProperty(LINESTIPPLE_PROPERTY);
         if (myLineStippleProp) {
