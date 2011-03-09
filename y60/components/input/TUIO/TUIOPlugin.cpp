@@ -35,7 +35,9 @@ class TUIOPlugin : public PlugInBase,
 
 private:
     typedef std::pair<const char*, TuioCursor*> CursorEvent;
+    typedef std::pair<const char*, TuioObject*> ObjectEvent;
     typedef std::vector<CursorEvent> CursorEventList;
+    typedef std::vector<ObjectEvent> ObjectEventList;
 
 
 public:
@@ -110,25 +112,38 @@ public:
 
     EventPtrList poll() {
         AutoLocker<ThreadLock> l(_myDeliveryMutex);
-        if(_myUndeliveredCursors.size() > 0) {
+        if(_myUndeliveredCursors.size() > 0 || _myUndeliveredObjects.size() > 0) {
             EventPtrList myEvents;
-
-            CursorEventList::iterator it;
-            for(it = _myUndeliveredCursors.begin(); it != _myUndeliveredCursors.end(); ++it) {
-                CursorEvent & myEvent = *it;
-                int myCursorId = myEvent.second->getSessionID();
-                if (allow2SendCursor(myCursorId)) {
-                    myEvents.push_back(convertCursorEvent(myEvent.first, myEvent.second));
-                    if (strcmp (myEvent.first, "remove") == 0) {
-                        removeFromCursorList(myCursorId);
+            if(_myUndeliveredCursors.size() > 0) {
+                CursorEventList::iterator it;
+                for(it = _myUndeliveredCursors.begin(); it != _myUndeliveredCursors.end(); ++it) {
+                    CursorEvent & myEvent = *it;
+                    int myCursorId = myEvent.second->getSessionID();
+                    if (allow2SendCursor(myCursorId)) {
+                        myEvents.push_back(convertCursorEvent(myEvent.first, myEvent.second));
+                        if (strcmp (myEvent.first, "remove") == 0) {
+                            removeFromCursorList(myCursorId);
+                        }
                     }
+                    delete myEvent.second;
+                    myEvent.second = 0;
                 }
-                delete myEvent.second;
-                myEvent.second = 0;
+
+                _myUndeliveredCursors.clear();
+                
+            }
+            if(_myUndeliveredObjects.size() > 0) {
+                ObjectEventList::iterator it;
+                for(it = _myUndeliveredObjects.begin(); it != _myUndeliveredObjects.end(); ++it) {
+                    ObjectEvent & myEvent = *it;
+                    int myObjectId = myEvent.second->getSessionID();
+                    myEvents.push_back(convertObjectEvent(myEvent.first, myEvent.second));
+                    delete myEvent.second;
+                    myEvent.second = 0;
+                }
+                _myUndeliveredObjects.clear();
             }
 
-            _myUndeliveredCursors.clear();
-            
             DB(AC_INFO << "unfiltered tuio events # " << myEvents.size());
             // logs event statistics for multiple events per cursor and type
             DB(analyzeEvents(myEvents, "id"));
@@ -138,6 +153,7 @@ public:
             DB(analyzeEvents(myEvents, "id"));
             
             clearCursorHistoryOnRemove(myEvents);
+
             return myEvents;
         } else {
             return EventPtrList();
@@ -148,12 +164,15 @@ public:
 // TuioListener
 
     virtual void addTuioObject(TuioObject *tobj) {
+        handleObject(tobj, "add");
     }
 
     virtual void updateTuioObject(TuioObject *tobj) {
+        handleObject(tobj, "update");
     }
 
     virtual void removeTuioObject(TuioObject *tobj) {
+        handleObject(tobj, "remove");
     }
 
     virtual void addTuioCursor(TuioCursor *myCursor) {
@@ -200,32 +219,66 @@ protected:
         _myUndeliveredCursors.push_back(CursorEvent(myEventType, myCursorCopy));
     }
 
+    void handleObject(TuioObject *myObject, const char *myEventType) {
+        AC_TRACE << "Handling object " << myEventType << " for "
+                 << myObject->getSessionID() << ":" << myObject->getSymbolID();
+
+        AutoLocker<ThreadLock> l(_myDeliveryMutex);
+
+        TuioObject *myObjectCopy = new TuioObject(myObject);
+
+        _myUndeliveredObjects.push_back(ObjectEvent(myEventType, myObjectCopy));
+    }
+
+    void fillStandardTUIOInfo(NodePtr & theNode, TuioContainer* theTUIOContainer) {
+        theNode->appendAttribute<int>("id", theTUIOContainer->getSessionID());
+
+        TuioTime myStartTime = theTUIOContainer->getStartTime();
+        theNode->appendAttribute<double>("start_time", myStartTime.getSeconds() + (myStartTime.getMicroseconds() / 1000000.0));
+
+        TuioTime myValueTime = theTUIOContainer->getTuioTime();
+        theNode->appendAttribute<double>("value_time", myValueTime.getSeconds() + (myValueTime.getMicroseconds() / 1000000.0));
+
+        Vector2f myPosition = Vector2f(theTUIOContainer->getX(), theTUIOContainer->getY());
+        if (theTUIOContainer->getX() < 0 || theTUIOContainer->getX() > 1 || 
+            theTUIOContainer->getY() < 0 || theTUIOContainer->getY() > 1) {
+            AC_WARNING << "illegal coordinates " << theTUIOContainer->getX() << " " << theTUIOContainer->getY();
+            myPosition[0] = asl::clamp(theTUIOContainer->getX(),0.0f,1.0f);
+            myPosition[1] = asl::clamp(theTUIOContainer->getY(),0.0f,1.0f);
+            AC_WARNING << "fixed coordinates " << myPosition;
+        }
+        myPosition = calculateAveragePosition(theTUIOContainer->getSessionID(), myPosition);
+        theNode->appendAttribute<Vector2f>("position", myPosition);
+        theNode->appendAttribute<Vector2f>("toucharea", _myTouchArea);
+
+    }
+
+    GenericEventPtr convertObjectEvent(const char *theEventType, TuioObject *theObject) {
+        GenericEventPtr myEvent(new GenericEvent("onTuioEvent", _myEventSchemaDocument, _myEventValueFactory));
+        NodePtr myNode = myEvent->getNode();
+
+        myNode->appendAttribute<DOMString>("tuiotype", "object");
+        myNode->appendAttribute<DOMString>("type", theEventType);
+        myNode->appendAttribute<int>("symbolid", theObject->getSymbolID());
+        myNode->appendAttribute<double>("rotation", theObject->getAngle());
+        myNode->appendAttribute<double>("rotationspeed", theObject->getRotationSpeed());
+        myNode->appendAttribute<double>("rotationaccel", theObject->getRotationAccel());
+        
+
+        fillStandardTUIOInfo(myNode, theObject);
+        return myEvent;
+    }
+
     GenericEventPtr convertCursorEvent(const char *myEventType, TuioCursor *myCursor) {
         GenericEventPtr myEvent(new GenericEvent("onTuioEvent", _myEventSchemaDocument, _myEventValueFactory));
         NodePtr myNode = myEvent->getNode();
 
+        myNode->appendAttribute<DOMString>("tuiotype", "cursor");
         myNode->appendAttribute<DOMString>("type", myEventType);
 
-        myNode->appendAttribute<int>("id", myCursor->getSessionID());
+        fillStandardTUIOInfo(myNode, myCursor);
 
-        TuioTime myStartTime = myCursor->getStartTime();
-        myNode->appendAttribute<double>("start_time", myStartTime.getSeconds() + (myStartTime.getMicroseconds() / 1000000.0));
-
-        TuioTime myValueTime = myCursor->getTuioTime();
-        myNode->appendAttribute<double>("value_time", myValueTime.getSeconds() + (myValueTime.getMicroseconds() / 1000000.0));
-
-        Vector2f myPosition = Vector2f(myCursor->getX(), myCursor->getY());
-        if (myCursor->getX() < 0 || myCursor->getX() > 1 || myCursor->getY() < 0 || myCursor->getY() > 1) {
-            AC_WARNING << "illegal coordinates " << myCursor->getX() << " " << myCursor->getY();
-            myPosition[0] = asl::clamp(myCursor->getX(),0.0f,1.0f);
-            myPosition[1] = asl::clamp(myCursor->getY(),0.0f,1.0f);
-            AC_WARNING << "fixed coordinates " << myPosition;
-        }
-        myPosition = calculateAveragePosition(myCursor->getSessionID(), myPosition);
-        myNode->appendAttribute<Vector2f>("position", myPosition);
-        myNode->appendAttribute<Vector2f>("toucharea", _myTouchArea);
         myNode->appendAttribute<Vector2f>("velocity", Vector2f(myCursor->getXSpeed(), myCursor->getYSpeed()));
-
         myNode->appendAttribute<double>("speed", myCursor->getMotionSpeed());
         myNode->appendAttribute<double>("acceleration", myCursor->getMotionAccel());
 
@@ -239,6 +292,7 @@ private:
 
     ThreadLock      _myDeliveryMutex;
     CursorEventList _myUndeliveredCursors;
+    ObjectEventList _myUndeliveredObjects;
 
     std::vector<TuioClient*> _myClients;
     asl::Vector2f _myTouchArea;

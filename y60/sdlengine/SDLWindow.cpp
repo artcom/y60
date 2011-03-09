@@ -74,6 +74,13 @@
 #ifdef WIN32_LEAN_AND_MEAN
 #undef WIN32_LEAN_AND_MEAN
 #endif
+
+#ifdef WIN32
+static const int ourMagicDecorationHeight = 15;
+#else
+static const int ourMagicDecorationHeight = 0;
+#endif
+
 #include <SDL/SDL_syswm.h>
 
 #include <iostream>
@@ -227,7 +234,15 @@ SDLWindow::onResize(Event & theEvent) {
             setVideoMode(myWindowEvent.width, myWindowEvent.height, false);
         }
     } else {
-        setVideoMode(myWindowEvent.width, myWindowEvent.height, false);
+        unsigned myHeightOffset = 0;
+        asl::Vector2i myScreenSize(0,0);
+        myScreenSize = getScreenSize();
+        // in case of a decorated window, that has a bigger height as the desktop,
+        // or uneven height, we need to correct SDL-correction
+        if (myWindowEvent.height > (myScreenSize[1] - ourMagicDecorationHeight) || myWindowEvent.height/2.0  != myWindowEvent.height/2) {
+            myHeightOffset = 1;
+        }
+        setVideoMode(myWindowEvent.width, myWindowEvent.height - myHeightOffset, false);
     }
 #else
     setVideoMode(myWindowEvent.width, myWindowEvent.height, false);
@@ -271,7 +286,6 @@ SDLWindow::updateVideoMode() {
         // unbind all created textures before creating a new context
         _myScene->getTextureManager()->unbindTextures();
     }
-
     if ((_myScreen = SDL_SetVideoMode(_myWidth, _myHeight, 32, myFlags)) == NULL) {
         throw SDLWindowException(string("Couldn't set SDL-GL mode: ") + SDL_GetError(), PLUS_FILE_LINE);
     }
@@ -331,7 +345,6 @@ SDLWindow::setVideoMode(unsigned theTargetWidth, unsigned theTargetHeight,
 	_myWidth = theTargetWidth;
 	_myHeight = theTargetHeight;
 	_myFullscreenFlag = theFullscreenFlag;
-
 	updateVideoMode();
 }
 

@@ -89,6 +89,16 @@ extern "C" {
 #define AV_VERSION_INT(a,b,c) (a<<16 | b<<8 | c)
 #endif
 
+// XXX: ffmpeg defines this
+#ifdef SampleFormat
+#   ifdef _WIN32
+#       pragma message("undefing polluting SampleFormat from ffmpeg")
+#   else
+#       warning undefing polluting SampleFormat from ffmpeg
+#   endif
+#undef SampleFormat
+#endif
+
 namespace y60 {
 
 class Y60_SOUND_DECL FFMpegAudioDecoder: public IAudioDecoder

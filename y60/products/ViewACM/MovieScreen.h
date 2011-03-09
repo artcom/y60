@@ -18,7 +18,7 @@
 namespace video {
 
     class MovieBase;
-    class Image;
+    struct Image;
    
     class MovieScreen {
         public:
@@ -45,7 +45,7 @@ namespace video {
             void getRotation(double & myRotationX, double & myRotationY, double & myRotationZ);
              
             
-            bool updateToFrame(unsigned long nextFrame);
+            bool updateToFrame(unsigned int nextFrame);
             bool updateToTime(double runningtime);
             bool update();
             void draw();

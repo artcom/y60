@@ -65,6 +65,7 @@
 
 #if defined(_MSC_VER)
 #pragma warning(push,1)
+#pragma warning(disable:4250)
 #endif //defined(_MSC_VER)
 #include <gdkmm/cursor.h>
 #if defined(_MSC_VER)

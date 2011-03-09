@@ -72,8 +72,6 @@
 
 #if defined(_MSC_VER)
     #pragma warning(push,1)
-    //#pragma warning(disable:4413)
-    //#pragma warning(disable:4244 4250)
 #endif //defined(_MSC_VER)
 
 #include <gtkmm/drawingarea.h>
@@ -83,6 +81,11 @@
 #endif //defined(_MSC_VER)
 
 #include <sigc++/sigc++.h>
+
+#if defined(_MSC_VER)
+    #pragma warning(push)
+    #pragma warning(disable:4250 4275)
+#endif //defined(_MSC_VER)
 
 namespace acgtk {
 
@@ -103,5 +106,8 @@ class Y60_ACGTK_DECL GrayScale : public Gtk::DrawingArea {
 
 }
 
+#if defined(_MSC_VER)
+    #pragma warning(pop)
+#endif //defined(_MSC_VER)
 
 #endif // ACGTK_GRAY_SCALE_INCLUDED

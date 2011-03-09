@@ -101,7 +101,7 @@ Canvas::getViewportAt(const unsigned int theX, const unsigned int theY) const {
             return myViewport;
         }
     }
-    throw Exception("no suitable viewport found in canvas " + get<NameTag>(), PLUS_FILE_LINE);
+    return ViewportPtr(0);
 }
 
 bool

@@ -46,7 +46,14 @@ spark.VideoCapture.Constructor = function (Protected) {
     Base.realize = Public.realize;
     Public.realize = function (theMaterialOrShape) {
         Base.realize(theMaterialOrShape);
-        _myCaptureType  = Protected.getString("type");
+        
+        // TODO The default type is now set to dshow instead of having no default at all
+        // This leads to this Widget being creatable by code - which we should target for all
+        // widgets anyway. However if we want to dynamically create one dynamically with type
+        // 'alliedethernet' this will break. But at least we can create dshow dynamically instead
+        // of nothing. This definitely needs a better way - Ideally all spark widgets should be 
+        // dynamically creatable and all in the same way... [AM]
+        _myCaptureType  = Protected.getString("type", "dshow");
         _myFramerate    = Protected.getNumber("fps", 30);
         _myBitsPerPixel = Protected.getNumber("bpp", 24);
         

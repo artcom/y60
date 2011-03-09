@@ -103,6 +103,7 @@ void Gesture::handle(EventPtr theEvent) {
             if (myType == "add" || myType == "remove" || myType == "move" || myType == "update") {
                 GESTURE_BASE_EVENT_TYPE myBaseEventType = ASSEVENT;
                 Vector3f myPosition;
+                Vector2f myTuIOToucharea(-1,-1);
                 if (myNode->getAttribute("position3D")) {
                     // ass event
                     myPosition = asl::as<Vector3f>(myNode->getAttribute("position3D")->nodeValue());
@@ -110,6 +111,7 @@ void Gesture::handle(EventPtr theEvent) {
                 } else if (myNode->getAttribute("position")) {
                     // tuio event
                     Vector2f myTuIOPosition(asl::as<Vector2f>(myNode->getAttribute("position")->nodeValue()));
+                    myTuIOToucharea = asl::as<Vector2f>(myNode->getAttribute("toucharea")->nodeValue());
                     
                     myTimestamp = (unsigned long long)(asl::as<double>(myNode->getAttribute("value_time")->nodeValue())*1000);
                     myPosition[0] = myTuIOPosition[0];
@@ -117,7 +119,8 @@ void Gesture::handle(EventPtr theEvent) {
                     myPosition[2] = 0.0;
                     myBaseEventType = TUIOEVENT;
                 }
-                createEvent(myBaseEventType, asl::as<int>(myNode->getAttribute("id")->nodeValue()),  myType, myPosition, myTimestamp);
+                createEvent(myBaseEventType, asl::as<int>(myNode->getAttribute("id")->nodeValue()),  
+                            myType, myPosition, myTimestamp, myTuIOToucharea);
             }
             break;
         default:
@@ -135,7 +138,9 @@ Gesture::saveAllCursorPositions() {
 }
 
 dom::NodePtr
-Gesture::addGestureEvent2Queue(GESTURE_BASE_EVENT_TYPE theBaseEvent, int theID, const std::string & theType, const Vector3f & thePosition3D) {
+Gesture::addGestureEvent2Queue(GESTURE_BASE_EVENT_TYPE theBaseEvent, int theID, 
+                               const std::string & theType, const Vector3f & thePosition3D,
+                               const Vector2f & theToucharea) {
 
     MAKE_SCOPE_TIMER(Gesture_addGestureEvent2Queue);
 
@@ -146,6 +151,7 @@ Gesture::addGestureEvent2Queue(GESTURE_BASE_EVENT_TYPE theBaseEvent, int theID, 
     myNode->appendAttribute<int>("cursorid",theID);
     myNode->appendAttribute<std::string>("type", theType);
     myNode->appendAttribute<Vector3f>("position3D", thePosition3D);
+    myNode->appendAttribute<Vector2f>("toucharea", theToucharea);
     if (theType == "zoom" || theType == "cursor_pair_start" || theType == "cursor_pair_finish" || theType == "rotate") {
         if(_myCursorPartner.find(theID) != _myCursorPartner.end()) {
             myNode->appendAttribute<int>("cursorpartnerid",_myCursorPartner[theID]);            
@@ -172,7 +178,9 @@ Gesture::addGestureEvent2Queue(GESTURE_BASE_EVENT_TYPE theBaseEvent, int theID, 
 
 
 void
-Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent, int theID, const std::string & theType, const Vector3f & thePosition3D, unsigned long long & theTimestamp)
+Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent, int theID, const std::string & theType, 
+                     const Vector3f & thePosition3D, unsigned long long & theTimestamp,
+                     const Vector2f & theToucharea)
 {
     MAKE_SCOPE_TIMER(Gesture_createEvent);
         addPositionToHistory(theID, thePosition3D, theTimestamp);
@@ -227,7 +235,7 @@ Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent, int theID, const std:
                         AC_DEBUG << "register cursor_pair_start " << theID << " partner: " <<  myCursorPartnerId;
                         _myCursorPartner[theID] = myCursorPartnerId;
                         _myCursorPartner[myCursorPartnerId] = theID;
-                        dom::NodePtr myNode = addGestureEvent2Queue(theBaseEvent, theID, "cursor_pair_start", thePosition3D);
+                        dom::NodePtr myNode = addGestureEvent2Queue(theBaseEvent, theID, "cursor_pair_start", thePosition3D, theToucharea);
                         asl::Vector3f myCursorPartnerPosition = _myCurrentCursorPositions[myCursorPartnerId]._myPosition;
                         asl::Vector3f myCenterPoint = getCenter(thePosition3D, myCursorPartnerPosition);
                         myNode->appendAttribute<Vector3f>("centerpoint", myCenterPoint);
@@ -251,7 +259,7 @@ Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent, int theID, const std:
                     float myLastDistance = distance(_myLastCursorPositions[myCursorPartnerIt->first]._myPosition, myLastPosition);
 
                     if (myDistance >= _myZoomDistanceThreshold) {
-                        dom::NodePtr myNode = addGestureEvent2Queue(theBaseEvent, theID, "zoom", thePosition3D);
+                        dom::NodePtr myNode = addGestureEvent2Queue(theBaseEvent, theID, "zoom", thePosition3D, theToucharea);
                         myNode->appendAttribute<float>("distance", myDistance);
                         myNode->appendAttribute<float>("lastdistance", myLastDistance);
                         myNode->appendAttribute<float>("initialdistance", _myInitialZoomDistance[theID]);
@@ -267,7 +275,7 @@ Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent, int theID, const std:
                         myAngle = 0;
                     }
                     if (abs(myAngle) > _myRotateAngleThreshold) {
-                        dom::NodePtr myNode = addGestureEvent2Queue(theBaseEvent, theID, "rotate", thePosition3D);
+                        dom::NodePtr myNode = addGestureEvent2Queue(theBaseEvent, theID, "rotate", thePosition3D, theToucharea);
                         myNode->appendAttribute<float>("angle", myAngle);
                         myNode->appendAttribute<float>("distance", myDistance);
                         myNode->appendAttribute<Vector3f>("centerpoint", myCenterPoint);
@@ -283,7 +291,7 @@ Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent, int theID, const std:
                     float myVelocity = myMagnitude/myDuration;
                     AC_INFO << "check for wipe with velocity " << myVelocity << " threshold " << _myWipeVelocityThreshold << " history size " << _myCursorPositionHistory[theID].size();
                     if (myVelocity > _myWipeVelocityThreshold) {
-                        NodePtr myNode = addGestureEvent2Queue(theBaseEvent, theID, "wipe", thePosition3D);
+                        NodePtr myNode = addGestureEvent2Queue(theBaseEvent, theID, "wipe", thePosition3D,theToucharea);
                         myNode->appendAttribute<Vector3f>("direction", normalized(myDifference));
                         
                         myNode->appendAttribute<float>("velocity", myVelocity);
@@ -305,7 +313,7 @@ Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent, int theID, const std:
             // is the removing cursor part of a existing multicursor gesture
             if (_myCursorPartner.find(theID) != _myCursorPartner.end()) {
                 AC_DEBUG << "register cursor_pair_finish: " << theID << " partner: " <<  _myCursorPartner[theID];
-                dom::NodePtr myNode = addGestureEvent2Queue(theBaseEvent, theID, "cursor_pair_finish", thePosition3D);
+                dom::NodePtr myNode = addGestureEvent2Queue(theBaseEvent, theID, "cursor_pair_finish", thePosition3D,theToucharea);
 
                 CursorPartnerList::iterator myCursorPartnerIt = getCursorPartner(theID);
                 if (myCursorPartnerIt != _myCursorPartner.end()) {
@@ -321,7 +329,7 @@ Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent, int theID, const std:
                 if (myMagnitude < _myTapMaxDistanceThreshold &&  
                     myDuration < _myTapMaxDurationThreshold &&
                     myDuration >= _myTapMinDurationThreshold) {
-                    NodePtr myNode = addGestureEvent2Queue(theBaseEvent, theID, "tap", thePosition3D);
+                    NodePtr myNode = addGestureEvent2Queue(theBaseEvent, theID, "tap", thePosition3D, theToucharea);
                     AC_INFO << "register tap gesture, id " << theID << " pos " << thePosition3D;
                 }
             }

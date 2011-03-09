@@ -70,6 +70,11 @@
 
 #include "EmbeddedButton.h"
 
+#if defined(_MSC_VER)
+    #pragma warning(push)
+    #pragma warning(disable:4250)
+#endif //defined(_MSC_VER)
+
 namespace acgtk {
 
 class Y60_ACGTK_DECL EmbeddedToggle : public EmbeddedButton {
@@ -92,6 +97,10 @@ class Y60_ACGTK_DECL EmbeddedToggle : public EmbeddedButton {
 };
 
 }
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif //defined(_MSC_VER)
 
 #endif // ACGTK_EMBEDDED_TOGGLE_INCLUDED
 
