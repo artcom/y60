@@ -70,6 +70,11 @@
 
 #include "EmbeddedButton.h"
 
+#if defined(_MSC_VER)
+    #pragma warning(push)
+    #pragma warning(disable:4250)
+#endif //defined(_MSC_VER)
+
 namespace acgtk {
 
 class Y60_ACGTK_DECL DragButton : public EmbeddedButton {
@@ -102,6 +107,10 @@ class Y60_ACGTK_DECL DragButton : public EmbeddedButton {
 };
 
 };
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif //defined(_MSC_VER)
 
 #endif // ACGTK_DRAG_BUTTON_INCLUDED
 

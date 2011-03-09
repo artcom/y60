@@ -67,7 +67,7 @@
 
 #if defined(_MSC_VER)
     #pragma warning(push,1)
-    //#pragma warning(disable:4512 4413 4250)
+    #pragma warning(disable:4250)
 #endif //defined(_MSC_VER)
 #include <gtkmm/cellrenderertext.h>
 #if defined(_MSC_VER)
