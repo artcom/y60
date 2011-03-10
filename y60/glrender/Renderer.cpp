@@ -691,7 +691,6 @@ namespace y60 {
     Renderer::enableRenderStyles(const RenderStyles & theRenderStyles, const MaterialBase * theMaterial) {
         MAKE_GL_SCOPE_TIMER(Renderer_enableRenderStyles);
         //AC_WARNING << "Renderstyle for " << theMaterial->get<IdTag>() << " is " << theRenderStyles;
-        _myState->setIgnoreDepth(theRenderStyles[IGNORE_DEPTH]);
         _myState->setPolygonOffset( theRenderStyles[POLYGON_OFFSET]);
 
         if (theRenderStyles[NO_DEPTH_WRITES]) {
@@ -701,28 +700,28 @@ namespace y60 {
                 MaterialPropertiesFacadePtr myMaterialPropFacade = theMaterial->getChild<MaterialPropertiesTag>();
                 const TargetBuffers & myMasks = myMaterialPropFacade->get<TargetBuffersTag>();
                 _myState->setDepthWrites(myMasks[DEPTH_MASK]);
-
-                // depth test
-                dom::NodePtr myDepthTestProp = myMaterialPropFacade->getProperty(DEPTHTEST_PROPERTY);
-                if (myDepthTestProp) {
-                    bool myDepthTest = myDepthTestProp->nodeValueAs<bool>();
-                    if (myDepthTest) {
-                        glEnable(GL_DEPTH_TEST);
-                    } else {
-                        glDisable(GL_DEPTH_TEST);
-                    }
-                } else {
-                    if (_myState->getIgnoreDepth()) {
-                        glDisable(GL_DEPTH_TEST);
-                    } else {
-                        glEnable(GL_DEPTH_TEST);
-                    }
-                }
-                CHECK_OGL_ERROR;
             } else {
                 _myState->setDepthWrites(true);
             }
         }
+        CHECK_OGL_ERROR;
+        if (theRenderStyles[IGNORE_DEPTH]) {
+            _myState->setIgnoreDepth(true);
+        } else {
+            if (theMaterial) {
+                MaterialPropertiesFacadePtr myMaterialPropFacade = theMaterial->getChild<MaterialPropertiesTag>();
+                dom::NodePtr myDepthTestProp = myMaterialPropFacade->getProperty(DEPTHTEST_PROPERTY);
+                if (myDepthTestProp) {
+                    bool myDepthTest = myDepthTestProp->nodeValueAs<bool>();
+                    _myState->setIgnoreDepth(myDepthTest);
+                } else {
+                    _myState->setIgnoreDepth(false);
+                }
+            } else {
+                _myState->setIgnoreDepth(false);
+            }
+        }
+        CHECK_OGL_ERROR;
     }
 
     void Renderer::preDraw(const asl::Vector4f & theColor,
