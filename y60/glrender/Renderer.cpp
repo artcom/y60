@@ -713,7 +713,7 @@ namespace y60 {
                 dom::NodePtr myDepthTestProp = myMaterialPropFacade->getProperty(DEPTHTEST_PROPERTY);
                 if (myDepthTestProp) {
                     bool myDepthTest = myDepthTestProp->nodeValueAs<bool>();
-                    _myState->setIgnoreDepth(myDepthTest);
+                    _myState->setIgnoreDepth(!myDepthTest);
                 } else {
                     _myState->setIgnoreDepth(false);
                 }
