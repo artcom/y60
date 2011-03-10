@@ -1,0 +1,25 @@
+Griffin PowerMate Tips:
+=========================
+
+Use udev rules to associate a PowerMate with a fixed USB port.
+Here is an example for Ubuntu 10.10:
+
+/etc/udev/rules.d/70-artcom-persistent-input.rules:
+----------------------------------------------------
+
+DRIVERS=="powermate", IMPORT{program}="path_id %p"
+DRIVERS=="powermate", ENV{ID_PATH}=="pci-0000:00:1d.0-usb-0:1.1:1.0", SYMLINK+="input/by-continent/event_europe"
+DRIVERS=="powermate", ENV{ID_PATH}=="pci-0000:00:1d.0-usb-0:1.5:1.0", SYMLINK+="input/by-continent/event_asia"
+DRIVERS=="powermate", ENV{ID_PATH}=="pci-0000:00:1d.0-usb-0:1.6:1.0", SYMLINK+="input/by-continent/event_america"
+
+
+Here is a slightly different version for an older Debian system:
+
+/etc/udev/rules.d/z23_artcom_persistent-input.rules:
+----------------------------------------------------
+
+DRIVERS=="powermate", KERNELS=="2-1.5:1.0", SYMLINK+="input/by-continent/event_asia"
+DRIVERS=="powermate", KERNELS=="2-1.6:1.0", SYMLINK+="input/by-continent/event_europe"
+DRIVERS=="powermate", KERNELS=="2-1.3:1.0", SYMLINK+="input/by-continent/event_america"
+
+This stuff heavily depends on the kernel- and udev-versions. So, read the current manual.
