@@ -86,7 +86,6 @@ namespace y60 {
         dom::NodePtr nearestIntersection(const dom::NodePtr theRootNode, const asl::LineSegment<float> & theLineSegment) const;
         y60::CollisionInfoVector pickCollisionsBySweepingSphereFromBodies(const CameraPtr theCamera, const dom::Node & theViewportNode, const unsigned int theScreenPixelX, const unsigned int theScreenPixelY, const float theSphereRadius, const dom::NodePtr theRootNode) const; 
         void getNearAndFarPlanePos(const CameraPtr theCamera, const dom::Node & theViewportNode, const unsigned int theScreenPixelX, const unsigned int theScreenPixelY, asl::Point3f& theNearClipPos, asl::Point3f& theFarClipPos ) const;
-        dom::NodePtr findWorldForCamera(const CameraPtr theCamera) const; 
         void transformClipToWorld(asl::Point3f & theNearClipPos, asl::Point3f & theFarClipPos, const CameraPtr theCamera) const;
 
     };

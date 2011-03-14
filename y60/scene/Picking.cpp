@@ -81,7 +81,6 @@ using namespace y60;
 namespace y60 {
     dom::NodePtr
     Picking::pickBody (const dom::Node & theViewportNode, const unsigned int theScreenPixelX, const unsigned int theScreenPixelY) const {
-
         asl::Point3f myNearPlanePos;
         asl::Point3f myFarPlanePos;
         dom::NodePtr myCameraNode = theViewportNode.getElementById( theViewportNode.getAttributeString(CAMERA_ATTRIB) );
@@ -89,24 +88,8 @@ namespace y60 {
         getNearAndFarPlanePos(myCamera, theViewportNode, theScreenPixelX, theScreenPixelY, myNearPlanePos, myFarPlanePos); 
 
         asl::LineSegment<float> myLineSegment = asl::LineSegment<float>(myNearPlanePos, myFarPlanePos);
-        dom::NodePtr myWorldNode = findWorldForCamera(myCamera);
+        dom::NodePtr myWorldNode = myCamera->getWorld(); 
         return nearestIntersection(myWorldNode, myLineSegment);
-    }
-
-    dom::NodePtr
-    Picking::findWorldForCamera(const CameraPtr theCamera) const {
-        ScenePtr myScene = theCamera->getNode().getRootElement()->getFacade<Scene>();
-        unsigned int myWorlds = myScene->getWorldsRoot()->childNodesLength(WORLD_NODE_NAME);
-        for (unsigned int i = 0; i < myWorlds; ++i) {
-            dom::NodePtr myWorldNode = myScene->getWorldsRoot()->childNode(WORLD_NODE_NAME,i);
-            std::vector<CameraPtr> myCameras = myWorldNode->getAllFacades<Camera>(CAMERA_NODE_NAME);
-            for (unsigned int i = 0; i < myCameras.size(); ++i) {
-                if (myCameras[i] == theCamera) {
-                    return myWorldNode;
-                }
-            }
-        }
-        throw Exception("no world found for camera " + theCamera->get<NameTag>(), PLUS_FILE_LINE);
     }
 
     dom::NodePtr
@@ -114,7 +97,7 @@ namespace y60 {
         dom::NodePtr myClosestBody;
         dom::NodePtr myCameraNode = theViewportNode.getElementById( theViewportNode.getAttributeString(CAMERA_ATTRIB) );
         CameraPtr myCamera = myCameraNode->getFacade<Camera>();
-        dom::NodePtr myWorldNode = findWorldForCamera(myCamera);
+        dom::NodePtr myWorldNode = myCamera->getWorld(); 
         y60::CollisionInfoVector myCollisions = pickCollisionsBySweepingSphereFromBodies(myCamera, 
                                                                     theViewportNode,
                                                                     theScreenPixelX,
