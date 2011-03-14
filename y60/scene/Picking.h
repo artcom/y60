@@ -80,15 +80,13 @@ namespace y60 {
     public:
         dom::NodePtr pickBody(const dom::Node & theViewportNode, const unsigned int theScreenPixelX, const unsigned int theScreenPixelY) const;
         dom::NodePtr pickBodyBySweepingSphereFromBodies(const dom::Node & theViewportNode, const unsigned int theScreenPixelX, const unsigned int theScreenPixelY, const float theSphereRadius) const;
-        y60::IntersectionInfoVector getPickedBodyInformation(const dom::Node & theViewportNode, const unsigned int theScreenPixelX, const unsigned int theScreenPixelY) const;
+        y60::IntersectionInfo getPickedBodyInformation(const dom::Node & theViewportNode, const unsigned int theScreenPixelX, const unsigned int theScreenPixelY) const;
         y60::IntersectionInfoVector getPickedBodiesInformation(const dom::Node & theViewportNode, const unsigned int theScreenPixelX, const unsigned int theScreenPixelY) const;
 
     private:
+        void getLineSegmentAndWorldNode(const dom::Node & theViewportNode, const unsigned int theScreenPixelX, const unsigned int theScreenPixelY, asl::LineSegment<float> & theLineSegment, dom::NodePtr & theWoldNode) const; 
         y60::IntersectionInfoVector findAllIntersectionsInformation(const dom::NodePtr theRootNode, const asl::LineSegment<float> & theLineSegment) const;
         y60::IntersectionInfo findNearestIntersectionInformation(const dom::NodePtr theRootNode, const asl::LineSegment<float> & theLineSegment) const;
-
-        dom::NodePtr findNearestIntersection(const y60::IntersectionInfoVector & theIntersectionInfo, const asl::Point3f & theReferencePoint) const;
-        dom::NodePtr nearestIntersection(const dom::NodePtr theRootNode, const asl::LineSegment<float> & theLineSegment) const;
         y60::CollisionInfoVector pickCollisionsBySweepingSphereFromBodies(const CameraPtr theCamera, const dom::Node & theViewportNode, const unsigned int theScreenPixelX, const unsigned int theScreenPixelY, const float theSphereRadius, const dom::NodePtr theRootNode) const; 
         void getNearAndFarPlanePos(const CameraPtr theCamera, const dom::Node & theViewportNode, const unsigned int theScreenPixelX, const unsigned int theScreenPixelY, asl::Point3f& theNearClipPos, asl::Point3f& theFarClipPos ) const;
         void transformClipToWorld(asl::Point3f & theNearClipPos, asl::Point3f & theFarClipPos, const CameraPtr theCamera) const;

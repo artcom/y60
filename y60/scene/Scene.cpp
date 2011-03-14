@@ -1213,7 +1213,7 @@ namespace y60 {
     void
     Scene::getPickedBodyInformation(const unsigned int theX,
                              const unsigned int theY,
-                             y60::IntersectionInfoVector & theInformation,
+                             y60::IntersectionInfo & theInformation,
                              const dom::NodePtr theCanvas) const {
         CanvasPtr myCanvas = theCanvas->getFacade<Canvas>();
         ViewportPtr myViewport = myCanvas->getViewportAt(theX, theY);
@@ -1225,7 +1225,7 @@ namespace y60 {
     void
     Scene::getPickedBodyInformation(const unsigned int theX,
                              const unsigned int theY,
-                             y60::IntersectionInfoVector & theInformation) const {
+                             y60::IntersectionInfo & theInformation) const {
         const dom::NodePtr myCanvas = getCanvasRoot()->childNode(CANVAS_NODE_NAME);
         return getPickedBodyInformation(theX, theY, theInformation, myCanvas);
     }

@@ -181,7 +181,7 @@ getPickedBodyInformation(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, 
     DOC_PARAM("theX", "", DOC_TYPE_INTEGER);
     DOC_PARAM("theY", "", DOC_TYPE_INTEGER);
     DOC_PARAM("theCanvas", "", DOC_TYPE_NODE);
-    DOC_RVAL("IntersectionInfoVector", DOC_TYPE_ARRAY);
+    DOC_RVAL("IntersectionInfo", DOC_TYPE_OBJECT);
     DOC_END;
     try {
         MAKE_SCOPE_TIMER(pickBody);
@@ -189,16 +189,16 @@ getPickedBodyInformation(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, 
         unsigned int theX = 0;
         unsigned int theY = 0;
         dom::NodePtr myCanvas;
-        y60::IntersectionInfoVector myIntersections;
+        y60::IntersectionInfo myIntersection;
         convertFrom(cx, argv[0], theX);
         convertFrom(cx, argv[1], theY);
         if (argc > 2) {
             convertFrom(cx, argv[2], myCanvas);
-            JSScene::getJSWrapper(cx,obj).getNative().getPickedBodyInformation(theX, theY, myIntersections, myCanvas);
+            JSScene::getJSWrapper(cx,obj).getNative().getPickedBodyInformation(theX, theY, myIntersection, myCanvas);
         } else {
-            JSScene::getJSWrapper(cx,obj).getNative().getPickedBodyInformation(theX, theY, myIntersections);
+            JSScene::getJSWrapper(cx,obj).getNative().getPickedBodyInformation(theX, theY, myIntersection);
         }
-        *rval = as_jsval(cx, myIntersections);
+        *rval = as_jsval(cx, myIntersection);
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }
@@ -311,7 +311,6 @@ intersectBodies(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
             JS_ReportError(cx,"JSScene::intersectBodies: bad argument type #1");
             return JS_FALSE;
         }
-        AC_PRINT << "+++ intersect bodies " << myIntersections.size();
         *rval = as_jsval(cx, myIntersections);
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;

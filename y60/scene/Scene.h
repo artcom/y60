@@ -403,11 +403,11 @@ namespace y60 {
                              const float theSphereRadius) const;
             void getPickedBodyInformation(const unsigned int theX,
                              const unsigned int theY,
-                             y60::IntersectionInfoVector & theInformation,
+                             y60::IntersectionInfo & theInformation,
                              const dom::NodePtr theCanvas) const;
             void getPickedBodyInformation(const unsigned int theX,
                              const unsigned int theY,
-                             y60::IntersectionInfoVector & theInformation) const;
+                             y60::IntersectionInfo & theInformation) const;
             void getPickedBodiesInformation(const unsigned int theX,
                              const unsigned int theY,
                              y60::IntersectionInfoVector & theInformation,

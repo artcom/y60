@@ -158,7 +158,7 @@ namespace y60 {
             inline dom::NodePtr pickBodyBySweepingSphereFromBodies(const unsigned int theX, const unsigned int theY, const float theSphereRadius) const {
                 return _myPicking->pickBodyBySweepingSphereFromBodies(getNode(), theX, theY, theSphereRadius);
             };
-            void getPickedBodyInformation(const unsigned int theX, const unsigned int theY, y60::IntersectionInfoVector & theReturnInformation) const;
+            void getPickedBodyInformation(const unsigned int theX, const unsigned int theY, y60::IntersectionInfo & theReturnInformation) const;
             void getPickedBodiesInformation(const unsigned int theX, const unsigned int theY, y60::IntersectionInfoVector & theReturnInformation) const; 
             void applyAspectToCamera();
             bool getTop(int & theTop) const;

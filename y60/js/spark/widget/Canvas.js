@@ -164,11 +164,11 @@ spark.Canvas.Constructor = function (Protected) {
         //  - as the rectangle has no depth, there should always only appear ONE intersection
         //  - the Canvas is topmost intersection, if not, this handler would not have been called by spark
 
-        var myIntersection =  window.scene.getPickedBodyInformation(theX, theY);
-        if (myIntersection.length > 0 && myIntersection[0].intersections.length > 0) {
+        var myIntersectionInfo =  window.scene.getPickedBodyInformation(theX, theY);
+        if (myIntersectionInfo.intersections.length > 0) {
             transformMatrix = new Matrix4f(Public.innerSceneNode.globalmatrix);
             transformMatrix.invert();
-            intersecPointOnCanvas = product(myIntersection[0].intersections[0].position,
+            intersecPointOnCanvas = product(myIntersectionInfo.intersections[0].position,
                                             transformMatrix);
             intersecPointOnCanvas.y = clamp(Public.height - intersecPointOnCanvas.y, 0, Public.height-1);
         }

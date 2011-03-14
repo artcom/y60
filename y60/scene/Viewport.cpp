@@ -135,7 +135,7 @@ Viewport::applyAspectToCamera() {
 }
 
 void
-Viewport::getPickedBodyInformation(const unsigned int theX, const unsigned int theY, y60::IntersectionInfoVector & theReturnInformation) const {
+Viewport::getPickedBodyInformation(const unsigned int theX, const unsigned int theY, y60::IntersectionInfo& theReturnInformation) const {
     theReturnInformation = _myPicking->getPickedBodyInformation(getNode(), theX, theY);
 }
 
