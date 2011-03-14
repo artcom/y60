@@ -295,7 +295,6 @@ namespace y60 {
             }
             if (myFrame != myFrame % get<FrameCountTag>()) {
                 _myDecoder->setEOF(true);
-                AC_PRINT << "Movie::getFrameFromTime wraparound";
             }
             return (unsigned)(myFrame % get<FrameCountTag>());
         }
