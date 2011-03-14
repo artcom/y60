@@ -695,8 +695,10 @@ namespace y60 {
     FFMpegDecoder2::readFrame(double theTime, unsigned /*theFrame*/, RasterVector theTargetRaster)
     {
         AC_TRACE << "readFrame, Time wanted=" << theTime;
-        ASSURE(!getEOF());
-
+        //ASSURE(!getEOF());
+        if (getEOF()) {
+            return theTime;
+        }
         if (getPlayMode() == y60::PLAY_MODE_STOP) {
             AC_DEBUG << "readFrame: not playing.";
             return theTime;
@@ -719,7 +721,7 @@ namespace y60 {
                 }
                 double myFrameTime = _myLastVideoFrame->getTime();
                 double myFrameDiff = (myStreamTime-myFrameTime)*_myFrameRate;
-                if (myFrameDiff < 0.5 && myFrameDiff > -0.9) {
+                if ( myFrameDiff > -0.9 && myFrameDiff < 0.5) {
                     AC_DEBUG << "readFrame: Reusing last frame. myFrameTime=" << myFrameTime
                         << ", myStreamTime=" << myStreamTime;
                     myVideoMsg = _myLastVideoFrame;
@@ -735,7 +737,6 @@ namespace y60 {
                     if (myEOFFoundFlag && !isActive()) {
                         startOverAgain();
                     }
-
                     if (myVideoMsg->getType() == VideoMsg::MSG_EOF) {
                         setEOF(true);
                         return theTime;

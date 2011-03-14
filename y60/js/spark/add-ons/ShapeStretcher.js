@@ -32,6 +32,7 @@ spark.ShapeStretcher.Factory = (function () {
             if (theStretcherName in _myFactory) {
                 return _myFactory[theStretcherName];
             } else {
+                Logger.warning("shapestretcher " + theStretcherName + " not found in factory");
                 return _myFactory['default'];
             }
         };

@@ -293,11 +293,12 @@ namespace y60 {
             while (myFrame < 0) {
                 myFrame += get<FrameCountTag>();
             }
+            if (myFrame != myFrame % get<FrameCountTag>()) {
+                _myDecoder->setEOF(true);
+            }
             return (unsigned)(myFrame % get<FrameCountTag>());
         }
-}
-
-
+    }
 
     void
     Movie::readFrame() {

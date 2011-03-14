@@ -97,7 +97,7 @@ namespace y60 {
     }
 #endif
     double MovieDecoderBase::getMovieTime(double theSystemTime) {
-        AC_TRACE << "getMovieTime start: _myMovieTime: " << _myMovieTime
+        AC_DEBUG << "getMovieTime start: _myMovieTime: " << _myMovieTime
                 << ", theSystemTime: " << theSystemTime << ", _myLastSystemTime: "
                 << _myLastSystemTime;
         if (theSystemTime <= _myLastSystemTime) {
@@ -126,7 +126,7 @@ namespace y60 {
             }
         }
         _myLastSystemTime = theSystemTime;
-        AC_TRACE << "getMovieTime end: _myMovieTime: " << _myMovieTime
+        AC_DEBUG << "getMovieTime end: _myMovieTime: " << _myMovieTime
                 << ", theSystemTime: " << theSystemTime << ", _myLastSystemTime: "
                 << _myLastSystemTime;
         return _myMovieTime;

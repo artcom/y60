@@ -253,7 +253,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
         /* if (window.fps < 60) {
             print("miss: " + window.fps + " / " + millisec());
         }*/
-        if (_myMovieNode && _myMovieOverlay && _myMovieOverlay.visible) {
+        if (_myMovieNode && _myMovieOverlay && _myMovieOverlay.visible) {            
             //_myFrameRateLimiter.onFrame(theTime);
             var myFrameDiff = _myMovieNode.currentframe - _myLastFrame;
             if (myFrameDiff > 1) {
