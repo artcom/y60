@@ -129,9 +129,6 @@ spark.Canvas.Constructor = function (Protected) {
     });
     
     
-    Public.SetterOverride("width", applyWidth);
-    Public.SetterOverride("height", applyHeight);
-    
     function applyWidth(theWidth, theBaseSetter) {
         theBaseSetter(theWidth);
         _myImage.raster.resize(theWidth, getImageSize(_myImage).y);
@@ -141,6 +138,10 @@ spark.Canvas.Constructor = function (Protected) {
         theBaseSetter(theHeight);
         _myImage.raster.resize(getImageSize(_myImage).x, theHeight);
     }
+
+    Public.SetterOverride("width", applyWidth);
+    Public.SetterOverride("height", applyHeight);
+    
 
     //pickRadius = 0 will result in fast ray intersection picking, 
     // when pickRadius > 0 slower sweepsphere picking will be activated
@@ -162,13 +163,14 @@ spark.Canvas.Constructor = function (Protected) {
         // assumptions:
         //  - as the rectangle has no depth, there should always only appear ONE intersection
         //  - the Canvas is topmost intersection, if not, this handler would not have been called by spark
-        var myIntersection = Public.stage.picking.pickIntersection(theX, theY);
-        if (myIntersection) {
+
+        var myIntersection =  window.scene.getPickedBodyInformation(theX, theY);
+        if (myIntersection.length > 0 && myIntersection[0].intersections.length > 0) {
             transformMatrix = new Matrix4f(Public.innerSceneNode.globalmatrix);
             transformMatrix.invert();
-            intersecPointOnCanvas = product(myIntersection.info.intersections[0].position,
+            intersecPointOnCanvas = product(myIntersection[0].intersections[0].position,
                                             transformMatrix);
-            intersecPointOnCanvas.y = Public.height - intersecPointOnCanvas.y;
+            intersecPointOnCanvas.y = clamp(Public.height - intersecPointOnCanvas.y, 0, Public.height-1);
         }
         return intersecPointOnCanvas;
     };
@@ -319,11 +321,11 @@ spark.Canvas.Constructor = function (Protected) {
         var canvasPosition = Public.convertToCanvasCoordinates(theX, theY);
         if (canvasPosition) {
             if (_myPickRadius === 0) {
-                pickedBody = Public.picking.pickBody(canvasPosition.x, canvasPosition.y, _myWorld);
+                pickedBody = window.scene.pickBody(canvasPosition.x, canvasPosition.y, _myCanvasNode); 
             }  else {
-                pickedBody = Public.picking.pickBodyBySweepingSphereFromBodies(
+                pickedBody = window.scene.pickBodyBySweepingSphereFromBodies(
                                 canvasPosition.x, canvasPosition.y,
-                                _myPickRadius, _myWorld, _myViewport);
+                                _myPickRadius, _myCanvasNode);
             }
         }
         return pickedBody;

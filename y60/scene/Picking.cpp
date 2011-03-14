@@ -125,6 +125,60 @@ namespace y60 {
         return myClosestBody;
     }
 
+    y60::IntersectionInfoVector 
+    Picking::getPickedBodyInformation(const dom::Node & theViewportNode, const unsigned int theScreenPixelX, const unsigned int theScreenPixelY) const  {
+        asl::Point3f myNearPlanePos;
+        asl::Point3f myFarPlanePos;
+        dom::NodePtr myCameraNode = theViewportNode.getElementById( theViewportNode.getAttributeString(CAMERA_ATTRIB) );
+        CameraPtr myCamera = myCameraNode->getFacade<Camera>();
+        getNearAndFarPlanePos(myCamera, theViewportNode, theScreenPixelX, theScreenPixelY, myNearPlanePos, myFarPlanePos); 
+
+        asl::LineSegment<float> myLineSegment = asl::LineSegment<float>(myNearPlanePos, myFarPlanePos);
+        dom::NodePtr myWorldNode = myCamera->getWorld(); 
+        return findAllIntersectionsInformation(myWorldNode, myLineSegment);
+    }
+
+    y60::IntersectionInfoVector 
+    Picking::getPickedBodiesInformation(const dom::Node & theViewportNode, const unsigned int theScreenPixelX, const unsigned int theScreenPixelY) const {
+        asl::Point3f myNearPlanePos;
+        asl::Point3f myFarPlanePos;
+        dom::NodePtr myCameraNode = theViewportNode.getElementById( theViewportNode.getAttributeString(CAMERA_ATTRIB) );
+        CameraPtr myCamera = myCameraNode->getFacade<Camera>();
+        getNearAndFarPlanePos(myCamera, theViewportNode, theScreenPixelX, theScreenPixelY, myNearPlanePos, myFarPlanePos); 
+
+        asl::LineSegment<float> myLineSegment = asl::LineSegment<float>(myNearPlanePos, myFarPlanePos);
+        dom::NodePtr myWorldNode = myCamera->getWorld(); 
+        return findAllIntersectionsInformation(myWorldNode, myLineSegment);
+    }
+
+    y60::IntersectionInfoVector
+    Picking::findAllIntersectionsInformation(const dom::NodePtr theRootNode, const asl::LineSegment<float> & theLineSegment) const {
+        y60::IntersectionInfoVector myIntersections;
+        bool myIntersectedFlag = y60::Scene::intersectBodies(theRootNode, theLineSegment, myIntersections, true);
+        return myIntersections;
+    }
+
+    y60::IntersectionInfo
+    Picking::findNearestIntersectionInformation(const dom::NodePtr theRootNode, const asl::LineSegment<float> & theLineSegment) const {
+        y60::IntersectionInfoVector myIntersections = findAllIntersectionsInformation(theRootNode, theLineSegment);
+        float myMinDistance = std::numeric_limits<float>::max();
+        IntersectionInfo myPickedBodyInformation;
+        for (y60::IntersectionInfoVector::const_iterator it = myIntersections.begin(); it != myIntersections.end(); ++it) {
+            const Primitive::IntersectionList & myIntersectionList = *(it->_myPrimitiveIntersections);
+            for (Primitive::IntersectionList::const_iterator it2 = myIntersectionList.begin(); it2 != myIntersectionList.end(); ++it2) {
+                asl::Point3f myPosition = product( it2->_myPosition, it->_myTransformation);
+                float myDistance = asl::distance(theLineSegment.origin, myPosition);
+                if (myDistance < myMinDistance) {
+                    myMinDistance = myDistance;
+                    myPickedBodyInformation = *it;
+                }
+            }
+        }
+        return myPickedBodyInformation;
+    }
+
+
+
 
     dom::NodePtr
     Picking::findNearestIntersection(const y60::IntersectionInfoVector & theIntersectionInfo, const asl::Point3f & theReferencePoint) const {
