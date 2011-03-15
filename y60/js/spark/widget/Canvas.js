@@ -330,9 +330,11 @@ spark.Canvas.Constructor = function (Protected) {
                 }
             } else {  //filtered picking
                 var intersectionInformation = window.scene.getPickedBodiesInformation(canvasPosition.x, canvasPosition.y, _myCanvasNode);
-                for (var i = 0, l = intersectionInformation.length; i < l; ++i) {
-                    if (theFilterFunction(intersectionInformation[i])) {
-                        return intersectionInformation[i].body;
+                if (intersectionInformation) {
+                    for (var i = 0, l = intersectionInformation.length; i < l; ++i) {
+                        if (theFilterFunction(intersectionInformation[i])) {
+                            return intersectionInformation[i].body;
+                        }
                     }
                 }
             }

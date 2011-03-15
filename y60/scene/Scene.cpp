@@ -1227,7 +1227,7 @@ namespace y60 {
                              const unsigned int theY,
                              y60::IntersectionInfo & theInformation) const {
         const dom::NodePtr myCanvas = getCanvasRoot()->childNode(CANVAS_NODE_NAME);
-        return getPickedBodyInformation(theX, theY, theInformation, myCanvas);
+        getPickedBodyInformation(theX, theY, theInformation, myCanvas);
     }
 
     void
@@ -1247,7 +1247,7 @@ namespace y60 {
                              const unsigned int theY,
                              y60::IntersectionInfoVector & theInformation) const {
         const dom::NodePtr myCanvas = getCanvasRoot()->childNode(CANVAS_NODE_NAME);
-        return getPickedBodiesInformation(theX, theY, theInformation, myCanvas);
+        getPickedBodiesInformation(theX, theY, theInformation, myCanvas);
     }
     ///////////////////////////////////////////////////////////////////////////////////////////
     // Intersection / Collision detection

@@ -162,6 +162,7 @@ Timer.prototype.Constructor = function (obj, theName) {
         //dumpstack();
         _myElapsed[theIndex] = millisec() - _myTimes[theIndex];
     };
+
 /*
     obj.print = function() {
         if (ENABLE_TIMING) {
@@ -191,7 +192,7 @@ Timer.prototype.Constructor = function (obj, theName) {
             }
             for (myTimerName in _myTimerNames) {
                 var myIndex = _myTimerNames[myTimerName];
-                if (myIndex > 0) {
+                if (myIndex !== undefined && myIndex >= 0 && myIndex < _myTimes.length) {
                     var myPadding = "";
                     for (var i = 0; i < myMaxNameLength - myTimerName.length; ++i) {
                         myPadding += " ";
