@@ -165,7 +165,7 @@ spark.Canvas.Constructor = function (Protected) {
         //  - the Canvas is topmost intersection, if not, this handler would not have been called by spark
 
         var myIntersectionInfo =  window.scene.getPickedBodyInformation(theX, theY);
-        if (myIntersectionInfo.intersections.length > 0) {
+        if (myIntersectionInfo && myIntersectionInfo.intersections.length > 0) {
             transformMatrix = new Matrix4f(Public.innerSceneNode.globalmatrix);
             transformMatrix.invert();
             intersecPointOnCanvas = product(myIntersectionInfo.intersections[0].position,
@@ -316,17 +316,27 @@ spark.Canvas.Constructor = function (Protected) {
         Base.onPostViewport(theViewport);
     };
     
-    Public.pickBody = function (theX, theY) {
+    Public.pickBody = function (theX, theY, theFilterFunction) {
         var pickedBody     = null;
         var canvasPosition = Public.convertToCanvasCoordinates(theX, theY);
         if (canvasPosition) {
-            if (_myPickRadius === 0) {
-                pickedBody = window.scene.pickBody(canvasPosition.x, canvasPosition.y, _myCanvasNode); 
-            }  else {
-                pickedBody = window.scene.pickBodyBySweepingSphereFromBodies(
-                                canvasPosition.x, canvasPosition.y,
-                                _myPickRadius, _myCanvasNode);
+            if (!theFilterFunction) {
+                if (_myPickRadius === 0) {
+                    pickedBody = window.scene.pickBody(canvasPosition.x, canvasPosition.y, _myCanvasNode); 
+                }  else {
+                    pickedBody = window.scene.pickBodyBySweepingSphereFromBodies(
+                                    canvasPosition.x, canvasPosition.y,
+                                    _myPickRadius, _myCanvasNode);
+                }
+            } else {  //filtered picking
+                var intersectionInformation = window.scene.getPickedBodiesInformation(canvasPosition.x, canvasPosition.y, _myCanvasNode);
+                for (var i = 0, l = intersectionInformation.length; i < l; ++i) {
+                    if (theFilterFunction(intersectionInformation[i])) {
+                        return intersectionInformation[i].body;
+                    }
+                }
             }
+
         }
         return pickedBody;
     };
