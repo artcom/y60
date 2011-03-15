@@ -316,8 +316,18 @@ int SDLCALL TTF_CurrentLineMinX() {
 	return TTF_current_line_minx;
 }
 
+/* 
+ tracking is set in Adobe-Products units system:
+ values are 1/1000 of a the maximum width of a 
+ capital M, which is the equal to the fontsize
+ http://www.web-publisher.info/20100917_letter-spacing-kerning-laufweite-spationierung/
+ http://en.wikipedia.org/wiki/Em_%28typography%29 
+ i.e each glyph pairs offset is the input parameter 
+ of 200 means 200/1000 of the fontsize (vs, 2011)
+ */
+
 void TTF_SetTracking(float theTracking) {
-	TTF_tracking = theTracking / 64.0f;
+	TTF_tracking = theTracking/1000.0f;
 }
 
 static void TTF_SetFTError(const char *msg, FT_Error error)
@@ -464,7 +474,6 @@ TTF_Font* TTF_OpenFontIndexRW( SDL_RWops *src, int freesrc, int ptsize, long ind
 
 	/* Make sure that our font face is scalable (global metrics) */
 	if ( FT_IS_SCALABLE(face) ) {
-
 	  	/* Set the character size and use default DPI (72) */
 	  	error = FT_Set_Char_Size( font->face, 0, ptsize * 64, 0, 0 );
 			if( error ) {
@@ -1135,7 +1144,7 @@ int TTF_SizeUNICODE(TTF_Font *font, const Uint16 *text, int *w, int *h)
 	FT_Long use_kerning;
 	FT_UInt prev_index = 0;
 	int outline_delta = 0;
-
+    int myXPPem = 1;
 	/* Initialize everything to 0 */
 	if ( ! TTF_initialized ) {
 		TTF_SetError( "Library not initialized" );
@@ -1225,7 +1234,8 @@ int TTF_SizeUNICODE(TTF_Font *font, const Uint16 *text, int *w, int *h)
 			maxx = (int)ceil(z);
 		}
 		x += glyph->advance;
-        x += TTF_tracking;
+        myXPPem = font->face->size->metrics.x_ppem;
+        x += TTF_tracking * myXPPem;
 
 		if ( glyph->miny < miny ) {
 			miny = glyph->miny;
@@ -1904,7 +1914,7 @@ SDL_Surface *TTF_RenderUNICODE_Blended(TTF_Font *font,
 	FT_Error error;
 	FT_Long use_kerning;
 	FT_UInt prev_index = 0;
-
+    int myXPPem = 1;
 	/* Get the dimensions of the text surface */
 	if ( (TTF_SizeUNICODE(font, text, &width, &height) < 0) || !width ) {
 		TTF_SetError("Text has zero width");
@@ -2012,7 +2022,10 @@ SDL_Surface *TTF_RenderUNICODE_Blended(TTF_Font *font,
 		if ( TTF_HANDLE_STYLE_BOLD(font) ) {
 			xstart += font->glyph_overhang;
 		}
-        xstart += TTF_tracking;
+
+        myXPPem = font->face->size->metrics.x_ppem;
+        xstart += TTF_tracking * myXPPem;
+
 		prev_index = glyph->index;
 	}
 
