@@ -132,6 +132,7 @@ OffscreenBuffer::OffscreenBuffer() :
     _myHasFBO(hasCap("GL_EXT_framebuffer_object")),
     _myHasFBOMultisample(hasCap("GL_EXT_framebuffer_multisample GL_EXT_framebuffer_blit")),
     _myTextureNodeVersion(0),
+    _myImageNodeVersion(0),
     _myBlitFilter(GL_NEAREST)
 {
     reset();
@@ -157,11 +158,9 @@ void OffscreenBuffer::activate(TexturePtr theTexture, unsigned theSamples,
 {
     unsigned myTextureId = theTexture->getTextureId();
     AC_DEBUG << "OffscreenBuffer:activate texture id = " << myTextureId << "theSamples = "<<theSamples;
-    if (myTextureId == 0) {
-        // ensure texture object exists
-        myTextureId = theTexture->applyTexture();
-    }
-
+    // ensure texture object exists
+    myTextureId = theTexture->applyTexture();
+    
     if (_myUseFBO) {
         bindOffscreenFrameBuffer(theTexture, theSamples, theCubmapFace);
     }
@@ -295,12 +294,20 @@ void OffscreenBuffer::bindOffscreenFrameBuffer(TexturePtr theTexture, unsigned t
 {
     AC_DEBUG << "OffscreenBuffer::bindOffscreenFrameBuffer to texture=" << theTexture->get<IdTag>();
 
+    bool myImageHasChangedFlag = false;
+    ImagePtr myImage = theTexture->getImage();
+    if (myImage && myImage->getRasterValueNode()->nodeVersion() != _myImageNodeVersion) {
+        myImageHasChangedFlag = true;
+        _myImageNodeVersion = myImage->getRasterValueNode()->nodeVersion();
+    }
+
     // rebind texture if target image has changed
-    if (_myFrameBufferObject[0]
-        && theTexture->getNode().nodeVersion() != _myTextureNodeVersion)
+    if (_myFrameBufferObject[0] && 
+        (theTexture->getNode().nodeVersion() != _myTextureNodeVersion || myImageHasChangedFlag))
     {
         AC_DEBUG << "Tearing down FBO since Texture has changed "
-                 << theTexture->getNode().nodeVersion() << " != " << _myTextureNodeVersion;
+                 << theTexture->getNode().nodeVersion() << " != " << _myTextureNodeVersion 
+                 << " image changed: " << myImageHasChangedFlag;
 
         glDeleteFramebuffersEXT(2, &_myFrameBufferObject[0]);
         glDeleteRenderbuffersEXT(2, &_myColorBuffer[0]);
@@ -368,6 +375,7 @@ void OffscreenBuffer::bindOffscreenFrameBuffer(TexturePtr theTexture, unsigned t
          * setup render-to-texture framebuffer
          */
         _myTextureNodeVersion = theTexture->getNode().nodeVersion();
+
         _myColorBuffer[0] = myTextureId;
 
         AC_TRACE << "nodeVersion=" << _myTextureNodeVersion << " textureID="

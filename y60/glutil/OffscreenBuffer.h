@@ -122,6 +122,8 @@ namespace y60 {
             bool     _myHasFBOMultisample;
 
             asl::Unsigned64 _myTextureNodeVersion;
+            asl::Unsigned64 _myImageNodeVersion;
+            
             unsigned _myBlitFilter;
 
             // OpenGL id of frame buffer object
