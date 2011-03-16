@@ -12,7 +12,8 @@ spark.Canvas = spark.ComponentClass("Canvas");
 
 spark.Canvas.BINDING_SLOT = {
     PRE  : "PRE_VIEWPORT",
-    POST : "POST_VIEWPORT"
+    POST : "POST_VIEWPORT",
+    RESIZE : "RESIZE"
 };
 
 spark.Canvas.Constructor = function (Protected) {
@@ -131,12 +132,24 @@ spark.Canvas.Constructor = function (Protected) {
     
     function applyWidth(theWidth, theBaseSetter) {
         theBaseSetter(theWidth);
-        _myImage.raster.resize(theWidth, getImageSize(_myImage).y);
+        var mySize = new Vector2f(theWidth, getImageSize(_myImage).y);
+        applySize(mySize);
     }
 
     function applyHeight(theHeight, theBaseSetter) {
         theBaseSetter(theHeight);
-        _myImage.raster.resize(getImageSize(_myImage).x, theHeight);
+        var mySize = new Vector2f(getImageSize(_myImage).x, theHeight);
+        applySize(mySize);
+    }
+
+    function applySize(theSize) {
+        _myImage.raster.resize(theSize.x, theSize.y);
+        _myRenderArea.setWidth(theSize.x);
+        _myRenderArea.setHeight(theSize.y);
+        for (var handleId in _bindings[spark.Canvas.BINDING_SLOT.RESIZE]) {
+            var myHandle = _bindings[spark.Canvas.BINDING_SLOT.RESIZE][handleId];
+            myHandle.cb(theSize);
+        }
     }
 
     Public.SetterOverride("width", applyWidth);
