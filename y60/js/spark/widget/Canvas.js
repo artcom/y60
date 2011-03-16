@@ -359,7 +359,9 @@ spark.Canvas.Constructor = function (Protected) {
     Public.onFrame = function (theEvent) {
         Base.onFrame(theEvent.currenttime);
         if (_myRenderFlag) {
+            _myRenderArea.activate();
             _myRenderArea.renderToCanvas();
+            _myRenderArea.deactivate();
         }
     };
     
