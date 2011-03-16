@@ -191,7 +191,7 @@ spark.Canvas.Constructor = function (Protected) {
     Base.realize = Public.realize;
     Public.realize = function () {
         var myWorldId, myCanvasId;
-        _sampling    = Protected.getNumber("sampling", 1);
+        _sampling    = Protected.getNumber("multisamples", 0);
         var myWidth  = Protected.getNumber("width", 100);
         var myHeight = Protected.getNumber("height", 100);
         
