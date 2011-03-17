@@ -132,7 +132,8 @@ OffscreenBuffer::OffscreenBuffer() :
     _myHasFBO(hasCap("GL_EXT_framebuffer_object")),
     _myHasFBOMultisample(hasCap("GL_EXT_framebuffer_multisample GL_EXT_framebuffer_blit")),
     _myTextureNodeVersion(0),
-    _myImageNodeVersion(0),
+    _myTextureWidth(0),
+    _myTextureHeight(0),
     _myBlitFilter(GL_NEAREST)
 {
     reset();
@@ -157,7 +158,7 @@ void OffscreenBuffer::activate(TexturePtr theTexture, unsigned theSamples,
                                unsigned theCubmapFace)
 {
     unsigned myTextureId = theTexture->getTextureId();
-    AC_DEBUG << "OffscreenBuffer:activate texture id = " << myTextureId << "theSamples = "<<theSamples;
+    AC_DEBUG << "OffscreenBuffer:activate texture id = " << myTextureId << " theSamples = "<<theSamples;
     // ensure texture object exists
     myTextureId = theTexture->applyTexture();
     
@@ -187,14 +188,9 @@ void OffscreenBuffer::deactivate(TexturePtr theTexture, bool theCopyToImageFlag)
                                  GL_COLOR_BUFFER_BIT, _myBlitFilter);
             CHECK_OGL_ERROR;
 
-            // restore
-            glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, 0);
-            glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, 0);
-            glDrawBuffer(GL_BACK);
-        } else {
-            AC_DEBUG << "OffscreenBuffer:deactivate texture id = " << myTextureId << ", unbinding framebuffer";
-            glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
         }
+        AC_DEBUG << "OffscreenBuffer:deactivate texture id = " << myTextureId << ", unbinding framebuffer";
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
         CHECK_OGL_ERROR;
 
         // generate mipmap levels
@@ -241,12 +237,7 @@ void OffscreenBuffer::copyToImage(TexturePtr theTexture)
              << " image=" << myImage->get<NameTag>();
 
     if (_myUseFBO) {
-        if (_myFrameBufferObject[1]) { // UH: not a bug, to determine if
-                                       // multisampling is enabled
-            glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, _myFrameBufferObject[0]);
-        } else {
-            glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _myFrameBufferObject[0]);
-        }
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _myFrameBufferObject[0]);
     }
 
     PixelEncodingInfo myPixelEncodingInfo =
@@ -270,12 +261,7 @@ void OffscreenBuffer::copyToImage(TexturePtr theTexture)
     myImage->getRasterValueNode()->bumpVersion();
 
     if (_myUseFBO) {
-        if (_myFrameBufferObject[1]) { // UH: not a bug, to determine if
-                                       // multisampling is enabled
-            glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, 0);
-        } else {
-            glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-        }
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
         CHECK_OGL_ERROR;
     }
 }
@@ -294,20 +280,18 @@ void OffscreenBuffer::bindOffscreenFrameBuffer(TexturePtr theTexture, unsigned t
 {
     AC_DEBUG << "OffscreenBuffer::bindOffscreenFrameBuffer to texture=" << theTexture->get<IdTag>();
 
-    bool myImageHasChangedFlag = false;
-    ImagePtr myImage = theTexture->getImage();
-    if (myImage && myImage->getRasterValueNode()->nodeVersion() != _myImageNodeVersion) {
-        myImageHasChangedFlag = true;
-        _myImageNodeVersion = myImage->getRasterValueNode()->nodeVersion();
-    }
-
+    unsigned int myWidth = theTexture->get<TextureWidthTag>();
+    unsigned int myHeight = theTexture->get<TextureHeightTag>();
+    bool myTextureSizeHasChangedFlag = (_myTextureWidth != myWidth || _myTextureHeight != myHeight);
+    _myTextureWidth = myWidth;
+    _myTextureHeight = myHeight;
     // rebind texture if target image has changed
     if (_myFrameBufferObject[0] && 
-        (theTexture->getNode().nodeVersion() != _myTextureNodeVersion || myImageHasChangedFlag))
+        (theTexture->getNode().nodeVersion() != _myTextureNodeVersion || myTextureSizeHasChangedFlag))
     {
         AC_DEBUG << "Tearing down FBO since Texture has changed "
                  << theTexture->getNode().nodeVersion() << " != " << _myTextureNodeVersion 
-                 << " image changed: " << myImageHasChangedFlag;
+                 << " image size changed: " << myWidth << ", " << myHeight;
 
         glDeleteFramebuffersEXT(2, &_myFrameBufferObject[0]);
         glDeleteRenderbuffersEXT(2, &_myColorBuffer[0]);
@@ -322,8 +306,6 @@ void OffscreenBuffer::bindOffscreenFrameBuffer(TexturePtr theTexture, unsigned t
         /*
          * create FBO
          */
-        unsigned myWidth = theTexture->get<TextureWidthTag>();
-        unsigned myHeight = theTexture->get<TextureHeightTag>();
         AC_DEBUG << "setup RTT framebuffer texture=" << theTexture->get<NameTag>()
                  << " size=" << myWidth << "x" << myHeight;
         if (theSamples >= 1 && !_myHasFBOMultisample)
@@ -426,7 +408,6 @@ void OffscreenBuffer::bindOffscreenFrameBuffer(TexturePtr theTexture, unsigned t
          */
         if (_myFrameBufferObject[1]) {
             glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _myFrameBufferObject[1]);
-            glDrawBuffer(GL_COLOR_ATTACHMENT0_EXT);
         } else {
             glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _myFrameBufferObject[0]);
         }

@@ -122,7 +122,8 @@ namespace y60 {
             bool     _myHasFBOMultisample;
 
             asl::Unsigned64 _myTextureNodeVersion;
-            asl::Unsigned64 _myImageNodeVersion;
+            unsigned int  _myTextureWidth;
+            unsigned int  _myTextureHeight;
             
             unsigned _myBlitFilter;
 
