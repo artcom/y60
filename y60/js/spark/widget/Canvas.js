@@ -34,7 +34,6 @@ spark.Canvas.Constructor = function (Protected) {
     var _myPickRadius       = 0;
     var _myImage            = null;
     var _myCamera           = null;
-    var _sampling           = 1;
     var _bindings = {};
     (function () {
         for (var slot in spark.Canvas.BINDING_SLOT) {
@@ -191,13 +190,14 @@ spark.Canvas.Constructor = function (Protected) {
     Base.realize = Public.realize;
     Public.realize = function () {
         var myWorldId, myCanvasId;
-        _sampling    = Protected.getNumber("multisamples", 0);
-        var myWidth  = Protected.getNumber("width", 100);
-        var myHeight = Protected.getNumber("height", 100);
+        var myMultiSampling   = Protected.getNumber("multisamples", 0);
+        var myBackgroundColor = Protected.getVector4f("backgroundColor", new Vector4f(0,0,0,0));
+        var myWidth       = Protected.getNumber("width", 100);
+        var myHeight      = Protected.getNumber("height", 100);
         
         _myRenderArea = new OffscreenRenderArea();
         _myRenderArea.renderingCaps = Public.getDefaultRenderingCapabilites() | Renderer.FRAMEBUFFER_SUPPORT;
-        _myRenderArea.multisamples = _sampling;
+        _myRenderArea.multisamples = myMultiSampling;
         
         _myImage = Modelling.createImage(window.scene,
                                          myWidth, myHeight, "BGRA");
@@ -233,6 +233,7 @@ spark.Canvas.Constructor = function (Protected) {
         } else {
             _myCanvasNode = Node.createElement("canvas");
             _myCanvasNode.name = Public.name + "-canvas";
+            _myCanvasNode.backgroundcolor = myBackgroundColor;
             window.scene.canvases.appendChild(_myCanvasNode);
             
             _myViewport = Node.createElement("viewport");
@@ -244,17 +245,12 @@ spark.Canvas.Constructor = function (Protected) {
                 _myWorld = Node.createElement("world");
                 _myWorld.name = Public.name + "-world";
                 window.scene.worlds.appendChild(_myWorld);
-
-                
                 
                 _myCamera = Node.createElement("camera");
                 _myWorld.appendChild(_myCamera);
                 spark.setupCameraOrtho(_myCamera, myWidth, myHeight);
                 
                 _myViewport.camera = _myCamera.id;
-                _myCanvasNode.backgroundcolor[3] = 0.0;
-            } else {
-                _myCanvasNode.backgroundcolor = new Vector4f(1, 1, 1, 1);
             }
         }
         
