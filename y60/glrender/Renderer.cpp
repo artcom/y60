@@ -690,8 +690,7 @@ namespace y60 {
     void
     Renderer::enableRenderStyles(const RenderStyles & theRenderStyles, const MaterialBase * theMaterial) {
         MAKE_GL_SCOPE_TIMER(Renderer_enableRenderStyles);
-        // AC_WARNING << "Renderstyle for " << theMaterial->get<IdTag>() << " is " << theRenderStyles;
-        _myState->setIgnoreDepth(theRenderStyles[IGNORE_DEPTH]);
+        //AC_WARNING << "Renderstyle for " << theMaterial->get<IdTag>() << " is " << theRenderStyles;
         _myState->setPolygonOffset( theRenderStyles[POLYGON_OFFSET]);
 
         if (theRenderStyles[NO_DEPTH_WRITES]) {
@@ -705,7 +704,24 @@ namespace y60 {
                 _myState->setDepthWrites(true);
             }
         }
-
+        CHECK_OGL_ERROR;
+        if (theRenderStyles[IGNORE_DEPTH]) {
+            _myState->setIgnoreDepth(true);
+        } else {
+            if (theMaterial) {
+                MaterialPropertiesFacadePtr myMaterialPropFacade = theMaterial->getChild<MaterialPropertiesTag>();
+                dom::NodePtr myDepthTestProp = myMaterialPropFacade->getProperty(DEPTHTEST_PROPERTY);
+                if (myDepthTestProp) {
+                    bool myDepthTest = myDepthTestProp->nodeValueAs<bool>();
+                    _myState->setIgnoreDepth(!myDepthTest);
+                } else {
+                    _myState->setIgnoreDepth(false);
+                }
+            } else {
+                _myState->setIgnoreDepth(false);
+            }
+        }
+        CHECK_OGL_ERROR;
     }
 
     void Renderer::preDraw(const asl::Vector4f & theColor,

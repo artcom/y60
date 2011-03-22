@@ -1210,7 +1210,45 @@ namespace y60 {
         return pickBodyBySweepingSphereFromBodies(theX, theY, theSphereRadius, myCanvas);
     }
 
+    void
+    Scene::getPickedBodyInformation(const unsigned int theX,
+                             const unsigned int theY,
+                             y60::IntersectionInfo & theInformation,
+                             const dom::NodePtr theCanvas) const {
+        CanvasPtr myCanvas = theCanvas->getFacade<Canvas>();
+        ViewportPtr myViewport = myCanvas->getViewportAt(theX, theY);
+        if (myViewport) {
+            myViewport->getPickedBodyInformation(theX, theY, theInformation);
+        }
+    }
 
+    void
+    Scene::getPickedBodyInformation(const unsigned int theX,
+                             const unsigned int theY,
+                             y60::IntersectionInfo & theInformation) const {
+        const dom::NodePtr myCanvas = getCanvasRoot()->childNode(CANVAS_NODE_NAME);
+        getPickedBodyInformation(theX, theY, theInformation, myCanvas);
+    }
+
+    void
+    Scene::getPickedBodiesInformation(const unsigned int theX,
+                             const unsigned int theY,
+                             y60::IntersectionInfoVector & theInformation,
+                             const dom::NodePtr theCanvas) const {
+        CanvasPtr myCanvas = theCanvas->getFacade<Canvas>();
+        ViewportPtr myViewport = myCanvas->getViewportAt(theX, theY);
+        if (myViewport) {
+            myViewport->getPickedBodiesInformation(theX, theY, theInformation);
+        }
+    }
+
+    void
+    Scene::getPickedBodiesInformation(const unsigned int theX,
+                             const unsigned int theY,
+                             y60::IntersectionInfoVector & theInformation) const {
+        const dom::NodePtr myCanvas = getCanvasRoot()->childNode(CANVAS_NODE_NAME);
+        getPickedBodiesInformation(theX, theY, theInformation, myCanvas);
+    }
     ///////////////////////////////////////////////////////////////////////////////////////////
     // Intersection / Collision detection
     ///////////////////////////////////////////////////////////////////////////////////////////

@@ -70,7 +70,6 @@
 
 #if defined(_MSC_VER)
     #pragma warning(push,1)
-    //#pragma warning(disable:4413 4244 4251 4250)
 #endif //defined(_MSC_VER)
 #include <gtkmm/liststore.h>
 #include <gtkmm/treeview.h>
@@ -79,6 +78,11 @@
 #include <gtkmm/image.h>
 #if defined(_MSC_VER)
 #pragma warning(pop)
+#endif //defined(_MSC_VER)
+
+#if defined(_MSC_VER)
+    #pragma warning(push)
+    #pragma warning(disable:4250 4275)
 #endif //defined(_MSC_VER)
 
 namespace acgtk {
@@ -194,5 +198,9 @@ class Y60_ACGTK_DECL TNTMeasurementList : public Gtk::TreeView {
 };
 
 } // end of namespace
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif //defined(_MSC_VER)
 
 #endif // ACGTK_TNT_MEASUREMENT_LIST_INCLUDED

@@ -231,10 +231,10 @@ public:
 
         Vector4f oneCorner = Vector4f(0,0,0,1) * textureTranslation;
         Vector4f otherCorner = Vector4f(1,1,0,1) * textureTranslation;
-        int minX = floor(min(oneCorner[0],otherCorner[0])*myAtlas.getRaster()->width()+0.5);
-        int maxX = floor(max(oneCorner[0],otherCorner[0])*myAtlas.getRaster()->width()+0.5);
-        int minY = floor(min(oneCorner[1],otherCorner[1])*myAtlas.getRaster()->height()+0.5);
-        int maxY = floor(max(oneCorner[1],otherCorner[1])*myAtlas.getRaster()->height()+0.5);
+        int minX = static_cast<int>(floor(min(oneCorner[0],otherCorner[0])*myAtlas.getRaster()->width()+0.5));
+        int maxX = static_cast<int>(floor(max(oneCorner[0],otherCorner[0])*myAtlas.getRaster()->width()+0.5));
+        int minY = static_cast<int>(floor(min(oneCorner[1],otherCorner[1])*myAtlas.getRaster()->height()+0.5));
+        int maxY = static_cast<int>(floor(max(oneCorner[1],otherCorner[1])*myAtlas.getRaster()->height()+0.5));
         setSilentSuccess(true);
         for (int y = minY-1; y <= maxY; ++y) {
            for (int x = minX-1; x <= maxX; ++x) {

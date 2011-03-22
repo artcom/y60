@@ -145,7 +145,7 @@ void computeMovieScreensDefault () {
 }
 
 void setMovieScreensDefault () {
-    for (int screen = 0; screen < globalMovieScreens.size() ; screen++) {
+    for (std::vector<MovieScreen*>::size_type screen = 0; screen < globalMovieScreens.size() ; screen++) {
         globalMovieScreens[screen]->setPosition(defaultTransX[screen%4], defaultTransY[screen%4], 0.0f );
         globalMovieScreens[screen]->scaleScreen(defaultScaleX, defaultScaleY);
         globalMovieScreens[screen]->rotateScreen(0.0, 0.0, 0.0);
@@ -288,7 +288,7 @@ mouse(int button, int state, int x, int y)
 void display(void) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    for (int movies = 0; movies < globalMovieScreens.size() ; movies++) {
+    for (std::vector<MovieScreen*>::size_type movies = 0; movies < globalMovieScreens.size() ; movies++) {
 
         double myPos[3];
         globalMovieScreens[movies]->getPosition( myPos[0], myPos[1], myPos[2] );
@@ -344,7 +344,7 @@ void findBiggestAspect (MovieBase * theMovie ) {
 
 void clearFilebasedMovies () {
 
-    for (int movies = 0; movies < globalMovieScreens.size(); movies++) {
+    for (std::vector<MovieScreen*>::size_type movies = 0; movies < globalMovieScreens.size(); movies++) {
         assert(globalMovies[movies]);
         delete globalMovies[movies];
         
@@ -398,7 +398,7 @@ void periodic() {
 
         // MODE: INTERACTIVE SINGLE FRAME CONTROL
 
-        for (int movies = 0; movies < globalMovieScreens.size() ; movies++) {
+        for (std::vector<MovieScreen*>::size_type movies = 0; movies < globalMovieScreens.size() ; movies++) {
             unsigned long nextFrame = globalMovies[movies]->getCurrentFrame() + singleStepSize;
             if (nextFrame == ULONG_MAX) 
                 nextFrame = globalMovies[movies]->getFrameCount() - 1;
@@ -413,7 +413,7 @@ void periodic() {
             }
         }
         if (hasChanged) {
-            for (int moviescreens = 0; moviescreens < globalMovieScreens.size() ; moviescreens++) {
+            for (std::vector<MovieScreen*>::size_type moviescreens = 0; moviescreens < globalMovieScreens.size() ; moviescreens++) {
                 if ( globalMovieScreens[moviescreens]->update()) {
                 }
             }
@@ -425,13 +425,13 @@ void periodic() {
 
         // MODE: CONTINUOUS PLAYING MODE
 
-        for (int movies = 0; movies < globalMovieScreens.size() ; movies++) {
+        for (std::vector<MovieScreen*>::size_type movies = 0; movies < globalMovieScreens.size() ; movies++) {
             if ( globalMovies[movies]->updateToTime(runningTime)) {
                 hasChanged = true;
             }
         }
         if (hasChanged) {
-            for (int moviescreens = 0; moviescreens < globalMovieScreens.size() ; moviescreens++) {
+            for (std::vector<MovieScreen*>::size_type moviescreens = 0; moviescreens < globalMovieScreens.size() ; moviescreens++) {
                 if ( globalMovieScreens[moviescreens]->updateToTime(runningTime)) {
                     //hasChanged = true;
                 }
@@ -463,7 +463,7 @@ key(unsigned char key, int x, int y) {
         resetUI();
         break;
     case 's':
-        for (int screen = 0; screen < globalMovieScreens.size(); screen++) {
+        for (std::vector<MovieScreen*>::size_type screen = 0; screen < globalMovieScreens.size(); screen++) {
             globalMovieScreens[screen]->setStatistic(!globalMovieScreens[screen]->getStatistic());  
         }
         break;

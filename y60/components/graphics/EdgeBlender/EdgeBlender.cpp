@@ -718,7 +718,7 @@ EdgeBlender::drawBlendedEdge(float theStart, float theEnd, float theBlendWidth, 
 
         glBegin(GL_QUADS);
         for (unsigned i = 0; i < myRoughCalibrationBlocks; ++i) {
-            float myAlpha = i%2;
+            float myAlpha = float(i%2);
            
             float myRange = theEnd-theStart;
             float myY1 = theStart + ((float)i/(float)myRoughCalibrationBlocks) * myRange;

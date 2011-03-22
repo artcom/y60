@@ -166,7 +166,6 @@ spark.applyStyleDefaults = function(theStyle) {
     !theStyle.getAttribute("hinting")    ? theStyle.hinting    = spark.AUTOHINTING  : null;
 
     !theStyle.getAttribute("textColor")       ? theStyle.textColor        = "000000" : null;
-    !theStyle.getAttribute("backgroundColor") ? theStyle.backgroundColor  = "FFFFFF" : null;
 };
 			 
 spark.isFontStyleNode = function(theNode) {
@@ -182,8 +181,7 @@ spark.isFontStyleNode = function(theNode) {
             theNode.getAttribute("hAlign") || 
             theNode.getAttribute("vAlign") || 
             theNode.getAttribute("hinting") || 
-            theNode.getAttribute("textColor") || 
-            theNode.getAttribute("backgroundColor")); 
+            theNode.getAttribute("textColor")); 
 }
 
 spark.mergeFontStyles = function(theOldStyle, theNewStyle) {
@@ -225,7 +223,6 @@ spark.mergeFontStyles = function(theOldStyle, theNewStyle) {
     mergeAttributeIfPresent("hinting");
     
     mergeAttributeIfPresent("textColor");
-    mergeAttributeIfPresent("backgroundColor");
     
    return myMergedStyle; 
     
@@ -271,7 +268,6 @@ spark.fontStyleFromNode = function(theNode) {
     copyAttributeIfPresent("hinting");
 
     copyAttributeIfPresent("textColor");
-    copyAttributeIfPresent("backgroundColor");
 
     spark.applyStyleDefaults(myStyle);
     return myStyle;

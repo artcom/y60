@@ -129,6 +129,7 @@ Playlist.prototype.Constructor = function(self) {
 	            //print("### Playlist : Directory '" + theUrl + "' is null");
 	            return;
 	        }
+            myDirList.sort();
             for (var i = 0; i < myDirList.length; ++i) {
                 var myAbsoluteEntry = theUrl + '/' + myDirList[i];
                 if (isDirectory(myAbsoluteEntry)) {

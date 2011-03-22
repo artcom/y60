@@ -12,7 +12,8 @@ spark.Canvas = spark.ComponentClass("Canvas");
 
 spark.Canvas.BINDING_SLOT = {
     PRE  : "PRE_VIEWPORT",
-    POST : "POST_VIEWPORT"
+    POST : "POST_VIEWPORT",
+    RESIZE : "RESIZE"
 };
 
 spark.Canvas.Constructor = function (Protected) {
@@ -33,7 +34,6 @@ spark.Canvas.Constructor = function (Protected) {
     var _myPickRadius       = 0;
     var _myImage            = null;
     var _myCamera           = null;
-    var _sampling           = 1;
     var _bindings = {};
     (function () {
         for (var slot in spark.Canvas.BINDING_SLOT) {
@@ -129,18 +129,31 @@ spark.Canvas.Constructor = function (Protected) {
     });
     
     
-    Public.SetterOverride("width", applyWidth);
-    Public.SetterOverride("height", applyHeight);
-    
     function applyWidth(theWidth, theBaseSetter) {
         theBaseSetter(theWidth);
-        _myImage.raster.resize(theWidth, getImageSize(_myImage).y);
+        var mySize = new Vector2f(theWidth, getImageSize(_myImage).y);
+        applySize(mySize);
     }
 
     function applyHeight(theHeight, theBaseSetter) {
         theBaseSetter(theHeight);
-        _myImage.raster.resize(getImageSize(_myImage).x, theHeight);
+        var mySize = new Vector2f(getImageSize(_myImage).x, theHeight);
+        applySize(mySize);
     }
+
+    function applySize(theSize) {
+        _myImage.raster.resize(theSize.x, theSize.y);
+        _myRenderArea.setWidth(theSize.x);
+        _myRenderArea.setHeight(theSize.y);
+        for (var handleId in _bindings[spark.Canvas.BINDING_SLOT.RESIZE]) {
+            var myHandle = _bindings[spark.Canvas.BINDING_SLOT.RESIZE][handleId];
+            myHandle.cb(theSize);
+        }
+    }
+
+    Public.SetterOverride("width", applyWidth);
+    Public.SetterOverride("height", applyHeight);
+    
 
     //pickRadius = 0 will result in fast ray intersection picking, 
     // when pickRadius > 0 slower sweepsphere picking will be activated
@@ -162,13 +175,14 @@ spark.Canvas.Constructor = function (Protected) {
         // assumptions:
         //  - as the rectangle has no depth, there should always only appear ONE intersection
         //  - the Canvas is topmost intersection, if not, this handler would not have been called by spark
-        var myIntersection = Public.stage.picking.pickIntersection(theX, theY);
-        if (myIntersection) {
+
+        var myIntersectionInfo =  window.scene.getPickedBodyInformation(theX, theY);
+        if (myIntersectionInfo && myIntersectionInfo.intersections.length > 0) {
             transformMatrix = new Matrix4f(Public.innerSceneNode.globalmatrix);
             transformMatrix.invert();
-            intersecPointOnCanvas = product(myIntersection.info.intersections[0].position,
+            intersecPointOnCanvas = product(myIntersectionInfo.intersections[0].position,
                                             transformMatrix);
-            intersecPointOnCanvas.y = Public.height - intersecPointOnCanvas.y;
+            intersecPointOnCanvas.y = clamp(Public.height - intersecPointOnCanvas.y, 0, Public.height-1);
         }
         return intersecPointOnCanvas;
     };
@@ -176,13 +190,14 @@ spark.Canvas.Constructor = function (Protected) {
     Base.realize = Public.realize;
     Public.realize = function () {
         var myWorldId, myCanvasId;
-        _sampling    = Protected.getNumber("sampling", 1);
-        var myWidth  = Protected.getNumber("width", 100);
-        var myHeight = Protected.getNumber("height", 100);
+        var myMultiSampling   = Protected.getNumber("multisamples", 0);
+        var myBackgroundColor = Protected.getVector4f("backgroundColor", new Vector4f(0,0,0,0));
+        var myWidth       = Protected.getNumber("width", 100);
+        var myHeight      = Protected.getNumber("height", 100);
         
         _myRenderArea = new OffscreenRenderArea();
         _myRenderArea.renderingCaps = Public.getDefaultRenderingCapabilites() | Renderer.FRAMEBUFFER_SUPPORT;
-        _myRenderArea.multisamples = _sampling;
+        _myRenderArea.multisamples = myMultiSampling;
         
         _myImage = Modelling.createImage(window.scene,
                                          myWidth, myHeight, "BGRA");
@@ -218,6 +233,7 @@ spark.Canvas.Constructor = function (Protected) {
         } else {
             _myCanvasNode = Node.createElement("canvas");
             _myCanvasNode.name = Public.name + "-canvas";
+            _myCanvasNode.backgroundcolor = myBackgroundColor;
             window.scene.canvases.appendChild(_myCanvasNode);
             
             _myViewport = Node.createElement("viewport");
@@ -229,17 +245,12 @@ spark.Canvas.Constructor = function (Protected) {
                 _myWorld = Node.createElement("world");
                 _myWorld.name = Public.name + "-world";
                 window.scene.worlds.appendChild(_myWorld);
-
-                
                 
                 _myCamera = Node.createElement("camera");
                 _myWorld.appendChild(_myCamera);
                 spark.setupCameraOrtho(_myCamera, myWidth, myHeight);
                 
                 _myViewport.camera = _myCamera.id;
-                _myCanvasNode.backgroundcolor[3] = 0.0;
-            } else {
-                _myCanvasNode.backgroundcolor = new Vector4f(1, 1, 1, 1);
             }
         }
         
@@ -255,13 +266,6 @@ spark.Canvas.Constructor = function (Protected) {
 
         Public.setCanvas(_myCanvasNode);
         
-        Public.parent.stage.addEventListener(spark.StageEvent.FRAME, Public.onFrame);
-        Public.stage.addEventListener(spark.KeyboardEvent.KEY_DOWN, onKey);
-        Public.stage.addEventListener(spark.KeyboardEvent.KEY_UP, onKey);
-        Public.addEventListener(spark.MouseEvent.MOVE, Public.onMouseMotion);
-        Public.addEventListener(spark.MouseEvent.BUTTON_DOWN, Public.onMouseButtonDown);
-        Public.addEventListener(spark.MouseEvent.BUTTON_UP, Public.onMouseButtonUp);
-        
         Base.realize(myMaterial);
         // set the canvas material to allow proper layering of transparencies
         // see http://home.comcast.net/~tom_forsyth/blog.wiki.html#[[Premultiplied%20alpha]]
@@ -271,6 +275,17 @@ spark.Canvas.Constructor = function (Protected) {
                 _myWorld.appendChild(Public.innerSceneNode.firstChild);
             }
         }
+    };
+    
+    Base.postRealize = Public.postRealize;
+    Public.postRealize = function () {
+        Base.postRealize();
+        Public.parent.stage.addEventListener(spark.StageEvent.FRAME, Public.onFrame);
+        Public.stage.addEventListener(spark.KeyboardEvent.KEY_DOWN, onKey);
+        Public.stage.addEventListener(spark.KeyboardEvent.KEY_UP, onKey);
+        Public.addEventListener(spark.MouseEvent.MOVE, Public.onMouseMotion);
+        Public.addEventListener(spark.MouseEvent.BUTTON_DOWN, Public.onMouseButtonDown);
+        Public.addEventListener(spark.MouseEvent.BUTTON_UP, Public.onMouseButtonUp);
     };
     
     Base.setActiveCamera = Public.setActiveCamera;
@@ -314,17 +329,29 @@ spark.Canvas.Constructor = function (Protected) {
         Base.onPostViewport(theViewport);
     };
     
-    Public.pickBody = function (theX, theY) {
+    Public.pickBody = function (theX, theY, theFilterFunction) {
         var pickedBody     = null;
         var canvasPosition = Public.convertToCanvasCoordinates(theX, theY);
         if (canvasPosition) {
-            if (_myPickRadius === 0) {
-                pickedBody = Public.picking.pickBody(canvasPosition.x, canvasPosition.y, _myWorld);
-            }  else {
-                pickedBody = Public.picking.pickBodyBySweepingSphereFromBodies(
-                                canvasPosition.x, canvasPosition.y,
-                                _myPickRadius, _myWorld, _myViewport);
+            if (!theFilterFunction) {
+                if (_myPickRadius === 0) {
+                    pickedBody = window.scene.pickBody(canvasPosition.x, canvasPosition.y, _myCanvasNode); 
+                }  else {
+                    pickedBody = window.scene.pickBodyBySweepingSphereFromBodies(
+                                    canvasPosition.x, canvasPosition.y,
+                                    _myPickRadius, _myCanvasNode);
+                }
+            } else {  //filtered picking
+                var intersectionInformation = window.scene.getPickedBodiesInformation(canvasPosition.x, canvasPosition.y, _myCanvasNode);
+                if (intersectionInformation) {
+                    for (var i = 0, l = intersectionInformation.length; i < l; ++i) {
+                        if (theFilterFunction(intersectionInformation[i])) {
+                            return intersectionInformation[i].body;
+                        }
+                    }
+                }
             }
+
         }
         return pickedBody;
     };
@@ -406,8 +433,12 @@ spark.Canvas.prepareMerge = function prepareMerge(theSceneFilePath) {
         myTexSrcPath = imageNode.childNodes[i].src;
         if (myTexSrcPath.charAt(0) !== "/") {
             var myTexSrcPaths = myTexSrcPath.split("|");
-            for(var j = 0; j < myTexSrcPaths.length; j++) {
-                myTexSrcPaths[j] = myTexSrcPaths[j].replace(/^\.\//, myTargetDir + "");
+            for (var j = 0; j < myTexSrcPaths.length; j++) {
+                if (myTexSrcPaths[j].indexOf(".") === 0) {
+                    myTexSrcPaths[j] = myTexSrcPaths[j].replace(/^\.\//, myTargetDir + "");
+                } else {
+                    myTexSrcPaths[j] = myTargetDir + myTexSrcPaths[j]; 
+                }
                 if (!fileExists(myTexSrcPaths[j])) {
                     Logger.error("Could not find texture within path '" + myTexSrcPaths[j] + "'");
                 }

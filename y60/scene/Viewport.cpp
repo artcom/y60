@@ -63,6 +63,7 @@
 #include "Camera.h"
 
 #include <asl/base/Logger.h>
+#include <y60/scene/Scene.h>
 
 using namespace asl;
 using namespace dom;
@@ -133,4 +134,13 @@ Viewport::applyAspectToCamera() {
     }
 }
 
+void
+Viewport::getPickedBodyInformation(const unsigned int theX, const unsigned int theY, y60::IntersectionInfo& theReturnInformation) const {
+    theReturnInformation = _myPicking->getPickedBodyInformation(getNode(), theX, theY);
+}
+
+void
+Viewport::getPickedBodiesInformation(const unsigned int theX, const unsigned int theY, y60::IntersectionInfoVector & theReturnInformation) const {
+    theReturnInformation = _myPicking->getPickedBodiesInformation(getNode(), theX, theY);
+}
 }

@@ -70,13 +70,13 @@ use("Exception.js");
 
 function findFarthestIntersection(myIntersectionInfo, myReferencePoint) {
     var myFarthestIntersection;
-    var myMaxDistance = undefined;
-    var myMaxInfo = undefined;
+    var myMaxDistance;
+    var myMaxInfo;
     for (var i = 0; i < myIntersectionInfo.length; ++i) {
         for (var j = 0; j < myIntersectionInfo[i].intersections.length; ++j) {
             var myIntersection = myIntersectionInfo[i].intersections[j];
             var myDistance = distance(myReferencePoint, myIntersection.position);
-            if (myMaxDistance == undefined || myDistance > myMaxDistance) {
+            if (myMaxDistance === undefined || myDistance > myMaxDistance) {
                 myMaxDistance = myDistance;
                 myMaxInfo = myIntersectionInfo[i];
                 myFarthestIntersection = myIntersection;
@@ -92,13 +92,13 @@ function findFarthestIntersection(myIntersectionInfo, myReferencePoint) {
 
 function findNearestIntersection(myIntersectionInfo, myReferencePoint) {
     var myNearestIntersection = null;
-    var myMinDistance = undefined;
-    var myMinInfo = undefined;
+    var myMinDistance;
+    var myMinInfo;
     for (var i = 0; i < myIntersectionInfo.length; ++i) {
         for (var j = 0; j < myIntersectionInfo[i].intersections.length; ++j) {
             var myIntersection = myIntersectionInfo[i].intersections[j];
             var myDistance = distance(myReferencePoint, myIntersection.position);
-            if (myMinDistance == undefined || myDistance < myMinDistance) {
+            if (myMinDistance === undefined || myDistance < myMinDistance) {
                 //if (myIntersectionInfo[i].body.visible) {
                     myMinDistance = myDistance;
                     myMinInfo = myIntersectionInfo[i];
@@ -136,7 +136,7 @@ function findNearestCollision(theCollisions, theReferencePoint) {
 }
 
 function findIntersectionsByBox(theRootNode, myBox, theIntersectInVisibleShapes) {
-    if (theIntersectInVisibleShapes == null || theIntersectInVisibleShapes == undefined) {
+    if (theIntersectInVisibleShapes === null || theIntersectInVisibleShapes === undefined) {
         theIntersectInVisibleShapes = true;
     }
     var myIntersectionInfo = Scene.intersectBodies(theRootNode, myBox);
@@ -163,7 +163,7 @@ function findIntersectionsByBoxCenter(theRootNode, myBox) {
 // this function will dispatch according to the type of myLineSegment.
 // it may be a LineSegment or a Ray
 function nearestIntersection(theRootNode, myLineSegment, theIntersectInVisibleShapes) {
-    if (theIntersectInVisibleShapes == null || theIntersectInVisibleShapes == undefined) {
+    if (theIntersectInVisibleShapes === null || theIntersectInVisibleShapes === undefined) {
         theIntersectInVisibleShapes = true;
     }
     var myIntersectionInfo = Scene.intersectBodies(theRootNode, myLineSegment, theIntersectInVisibleShapes);
@@ -172,7 +172,7 @@ function nearestIntersection(theRootNode, myLineSegment, theIntersectInVisibleSh
     }
 }
 function farthestIntersection(theRootNode, myLineSegment, theIntersectInVisibleShapes) {
-    if (theIntersectInVisibleShapes == null || theIntersectInVisibleShapes == undefined) {
+    if (theIntersectInVisibleShapes === null || theIntersectInVisibleShapes === undefined) {
         theIntersectInVisibleShapes = true;
     }
     var myIntersectionInfo = Scene.intersectBodies(theRootNode, myLineSegment, theIntersectInVisibleShapes);
@@ -203,7 +203,7 @@ function drawIntersection(theIntersectionInfo, theIntersection) {
 
 	if (theIntersection.primitive.length == 4) {
 	    var myD = product(theIntersection.primitive[3], myScale);
-    	    myD = sum(myD, myPolygonOffset);
+        myD = sum(myD, myPolygonOffset);
 	    var myTriangle2nd = new Triangle(myA, myC, myD);
 	    window.draw(myTriangle2nd, [0.5,0,1,1], myMatrix);
 	}

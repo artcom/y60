@@ -73,6 +73,9 @@
 
 namespace y60 {
 
+    //struct CollisionInfo;
+    //typedef std::vector<y60::CollisionInfo> CollisionInfoVector;
+
     //                  theTagName                  theType        theAttributeName                      theDefault
     DEFINE_ATTRIBUTE_TAG(ViewportOrientationTag,     std::string,   ORIENTATION_ATTRIB,              LANDSCAPE_ORIENTATION, Y60_SCENE_DECL);
     DEFINE_ATTRIBUTE_TAG(CameraTag,                  std::string,   CAMERA_ATTRIB,                   "", Y60_SCENE_DECL);
@@ -93,7 +96,6 @@ namespace y60 {
     true, Y60_SCENE_DECL);
     DEFINE_ATTRIBUTE_TAG(ViewportDrawGlowTag,        bool,          VIEWPORT_GLOW_ATTRIB,            false, Y60_SCENE_DECL);
     DEFINE_ATTRIBUTE_TAG(ViewportDrawNormalsTag,     bool,          VIEWPORT_DRAWNORMALS_ATTRIB,     false, Y60_SCENE_DECL);
-
 
     class Y60_SCENE_DECL Viewport :
         public dom::Facade,
@@ -151,11 +153,13 @@ namespace y60 {
             //  canvas. Suitable for glViewport.
             int getLower() const;
             inline dom::NodePtr pickBody(const unsigned int theX, const unsigned int theY) const {
-                return _myPicking->pickBody(this->getNode(), theX, theY);
+                return _myPicking->pickBody(getNode(), theX, theY);
             };
             inline dom::NodePtr pickBodyBySweepingSphereFromBodies(const unsigned int theX, const unsigned int theY, const float theSphereRadius) const {
                 return _myPicking->pickBodyBySweepingSphereFromBodies(getNode(), theX, theY, theSphereRadius);
             };
+            void getPickedBodyInformation(const unsigned int theX, const unsigned int theY, y60::IntersectionInfo & theReturnInformation) const;
+            void getPickedBodiesInformation(const unsigned int theX, const unsigned int theY, y60::IntersectionInfoVector & theReturnInformation) const; 
             void applyAspectToCamera();
             bool getTop(int & theTop) const;
             bool getLeft(int & theLeft) const;

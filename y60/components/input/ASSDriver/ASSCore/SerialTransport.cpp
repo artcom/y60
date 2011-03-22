@@ -167,7 +167,7 @@ SerialTransport::readData() {
         _mySerialPort->read(myReceiveBuffer, myBytesReceived);
         myAfter.setNow();
 
-        unsigned myBlockingDuration = myAfter.millis() - myBefore.millis();
+        unsigned long long myBlockingDuration = myAfter.millis() - myBefore.millis();
 
         AC_TRACE << "Read took " << myBlockingDuration << " milliseconds.";
 

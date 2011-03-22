@@ -401,6 +401,21 @@ namespace y60 {
             dom::NodePtr pickBodyBySweepingSphereFromBodies(const unsigned int theX,
                              const unsigned int theY,
                              const float theSphereRadius) const;
+            void getPickedBodyInformation(const unsigned int theX,
+                             const unsigned int theY,
+                             y60::IntersectionInfo & theInformation,
+                             const dom::NodePtr theCanvas) const;
+            void getPickedBodyInformation(const unsigned int theX,
+                             const unsigned int theY,
+                             y60::IntersectionInfo & theInformation) const;
+            void getPickedBodiesInformation(const unsigned int theX,
+                             const unsigned int theY,
+                             y60::IntersectionInfoVector & theInformation,
+                             const dom::NodePtr theCanvas) const;
+            void getPickedBodiesInformation(const unsigned int theX,
+                             const unsigned int theY,
+                             y60::IntersectionInfoVector & theInformation) const;
+
 	        //void reverseUpdateShape(ShapePtr theShape);
             //void reverseUpdateShapes();
 

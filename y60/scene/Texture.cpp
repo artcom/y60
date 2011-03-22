@@ -61,8 +61,6 @@
 
 #include <y60/base/IScene.h>
 #include <asl/dom/Field.h>
-#include <y60/base/IScene.h>
-#include <asl/dom/Field.h>
 #include <y60/base/IResourceManager.h>
 
 using namespace asl;

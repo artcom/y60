@@ -56,7 +56,7 @@ namespace video {
     }
     
     void
-    ScreenRegion::set(const EDGE & theEdge, const double & s, const double & t) {
+    ScreenRegion::set(const EDGE & theEdge, const float & s, const float & t) {
         switch (theEdge) {
             case TOP_LEFT :
                 _myTopLeft[0] = s;
@@ -102,7 +102,7 @@ namespace video {
     }
     
     void
-    ScreenRegion::stretch(const double & myXStretch, const double & myYStretch) {
+    ScreenRegion::stretch(const float & myXStretch, const float & myYStretch) {
             _myTopLeft[0]     *= myXStretch;
             _myTopRight[0]    *= myXStretch;
             _myBottomRight[0] *= myXStretch;
@@ -115,7 +115,7 @@ namespace video {
      }
     
     void 
-    ScreenRegion::get(const EDGE& theEdge, double & s, double & t) const{
+    ScreenRegion::get(const EDGE& theEdge, float & s, float & t) const{
         switch (theEdge) {
             case TOP_LEFT :
                 s = _myTopLeft[0];

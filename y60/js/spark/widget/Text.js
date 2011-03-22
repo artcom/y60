@@ -74,7 +74,7 @@ spark.Text.Constructor = function (Protected) {
     // Protected Methods //
     ///////////////////////
     
-    Protected.render = function (theSize) {
+    Protected.render = function () {
         var myWidth = {width : 0};
         _myLineWidths = [];
         var mySize = spark.renderText(_myImage, _myText, _myStyle, new Vector2i(_myMaxWidth, _myMaxHeight), myWidth, _myLineWidths);        
@@ -100,7 +100,7 @@ spark.Text.Constructor = function (Protected) {
         } else {
             _myText = theValue;
         }
-        Protected.render(Public.size);
+        Protected.render();
         if (_myTextChangedHook) {
             _myTextChangedHook();
         }

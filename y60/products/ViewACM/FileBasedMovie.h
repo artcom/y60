@@ -32,9 +32,9 @@ class FileBasedMovie : public MovieBase {
         virtual ~FileBasedMovie();
         virtual bool init();
         virtual bool updateToTime(double runningTime);
-        virtual bool updateToFrame(unsigned long frame);
-        virtual void updateToFrameAsync(unsigned long frame);
-        virtual bool waitForFrameAsync(unsigned long frame);
+        virtual bool updateToFrame(unsigned int frame);
+        virtual void updateToFrameAsync(unsigned int frame);
+        virtual bool waitForFrameAsync(unsigned int frame);
         
         virtual void reset();
         
@@ -49,8 +49,8 @@ class FileBasedMovie : public MovieBase {
         /*FD_t     getFileID() const {
             return _myCompressedMovieFile;
         }*/
-        unsigned long getHeaderOffset();
-        unsigned long getNumBytesPerFrame();
+        unsigned int getHeaderOffset();
+        unsigned int getNumBytesPerFrame();
        
         virtual const std::string & getFileName() const {
             return _myFileName;
@@ -69,7 +69,7 @@ class FileBasedMovie : public MovieBase {
             }
             
             std::string _deviceName;
-            unsigned long _startOffset;
+            unsigned int _startOffset;
         };
         
         void    setupRawStriping(unsigned int numStripes, const StripeInfo stripeInfo[4]);
@@ -88,8 +88,8 @@ class FileBasedMovie : public MovieBase {
          
         void setPredictionStrategy(PREDICTION_STRATEGY theStrategy, 
                                 long long theDelta = 0);
-        unsigned long getClampedFrame (unsigned long currentFrame);
-        unsigned long getPredictedFrame (unsigned long currentFrame);
+        unsigned int getClampedFrame (unsigned int currentFrame);
+        unsigned int getPredictedFrame (unsigned int currentFrame);
 
         void setStatistic (bool enable);
 
@@ -116,7 +116,7 @@ class FileBasedMovie : public MovieBase {
         bool            _movieStarted;
         int             _numStripes;
         StripeInfo      _stripeInfo[4];
-        unsigned long long       _myCurrentFrame;
+        unsigned int   _myCurrentFrame;
 };
 
 } // namespace end

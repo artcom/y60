@@ -165,7 +165,7 @@ namespace y60 {
             bool theRotatedFlag) 
     {
         asl::Matrix4f myTranslation;
-        asl::Vector2f atlasSize(theAtlasSize[0], theAtlasSize[1]);
+        asl::Vector2f atlasSize(static_cast<float>(theAtlasSize[0]), static_cast<float>(theAtlasSize[1]));
 
         if (theRotatedFlag) {
             myTranslation.makeIdentity();
@@ -183,6 +183,7 @@ namespace y60 {
     TextureAtlas::findTextureSize(const std::string & theTextureName, asl::Vector2<AC_SIZE_TYPE> & theSize) const {
        UVTranslations::const_iterator it = _translations.find(theTextureName);
        if (it == _translations.end()) {
+           AC_WARNING << "Texture " << theTextureName << " not found in atlas";
            return false;
        }
        theSize = it->second.size;
@@ -193,6 +194,7 @@ namespace y60 {
     TextureAtlas::findTextureTranslation(const std::string & theTextureName, asl::Matrix4f & theTranslation) const {
        UVTranslations::const_iterator it = _translations.find(theTextureName);
        if (it == _translations.end()) {
+           AC_WARNING << "Texture " << theTextureName << " not found in atlas";
            return false;
        }
        theTranslation = it->second.matrix;

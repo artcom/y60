@@ -7,14 +7,14 @@
         swapInterval="1"
         i18nContext="global-i18n">
         
-    <Canvas name="offscreen-canvas-scene" x="25" y="25" width="400" height="250" sceneFile="fixtures/models/cube.x60"/>
+    <Canvas name="offscreen-canvas-scene" x="25" y="25" multisamples="1" width="400" height="250" sceneFile="fixtures/models/cube.x60"/>
     
-    <Canvas name="offscreen-canvas-empty" x="475" y="25" width="400" height="250" autoCreate="false"/>
+    <Canvas name="offscreen-canvas-empty" x="475" y="25" multisamples="1" backgroundColor="[1,1,1,1]" width="400" height="250" autoCreate="false"/>
     
-    <Canvas name="offscreen-canvas-default" x="475" y="325" width="400" height="250">
+    <Canvas name="offscreen-canvas-default" x="475" y="325" multisamples="1" width="400" height="250">
         <Rectangle name="rect" x="0" y="0" width="200" height="200" color="[0.2,0.5,0.7]"/>
     </Canvas>
     
-    <Canvas name="offscreen-canvas-empty-movertest" x="25" y="325" width="400" height="250" autoCreate="false"/>
+    <Canvas name="offscreen-canvas-empty-movertest" x="25" y="325" multisamples="1" backgroundColor="[1,1,1,1]" width="400" height="250" autoCreate="false"/>
     
 </SparkSceneTesterWindow>

@@ -175,6 +175,61 @@ pickBody(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     } HANDLE_CPP_EXCEPTION;
 }
 
+static JSBool
+getPickedBodyInformation(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Returns information about intersection with nearest body");
+    DOC_PARAM("theX", "", DOC_TYPE_INTEGER);
+    DOC_PARAM("theY", "", DOC_TYPE_INTEGER);
+    DOC_PARAM("theCanvas", "", DOC_TYPE_NODE);
+    DOC_RVAL("IntersectionInfo", DOC_TYPE_OBJECT);
+    DOC_END;
+    try {
+        MAKE_SCOPE_TIMER(pickBody);
+        ensureParamCount(argc, 2, 3);
+        unsigned int theX = 0;
+        unsigned int theY = 0;
+        dom::NodePtr myCanvas;
+        y60::IntersectionInfo myIntersection;
+        convertFrom(cx, argv[0], theX);
+        convertFrom(cx, argv[1], theY);
+        if (argc > 2) {
+            convertFrom(cx, argv[2], myCanvas);
+            JSScene::getJSWrapper(cx,obj).getNative().getPickedBodyInformation(theX, theY, myIntersection, myCanvas);
+        } else {
+            JSScene::getJSWrapper(cx,obj).getNative().getPickedBodyInformation(theX, theY, myIntersection);
+        }
+        *rval = as_jsval(cx, myIntersection);
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+static JSBool
+getPickedBodiesInformation(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Returns information about intersection bodies");
+    DOC_PARAM("theX", "", DOC_TYPE_INTEGER);
+    DOC_PARAM("theY", "", DOC_TYPE_INTEGER);
+    DOC_PARAM("theCanvas", "", DOC_TYPE_NODE);
+    DOC_RVAL("IntersectionInfoVector", DOC_TYPE_ARRAY);
+    DOC_END;
+    try {
+        MAKE_SCOPE_TIMER(pickBody);
+        ensureParamCount(argc, 2, 3);
+        unsigned int theX = 0;
+        unsigned int theY = 0;
+        dom::NodePtr myCanvas;
+        y60::IntersectionInfoVector myIntersections;
+        convertFrom(cx, argv[0], theX);
+        convertFrom(cx, argv[1], theY);
+        if (argc > 2) {
+            convertFrom(cx, argv[2], myCanvas);
+            JSScene::getJSWrapper(cx,obj).getNative().getPickedBodiesInformation(theX, theY, myIntersections, myCanvas);
+        } else {
+            JSScene::getJSWrapper(cx,obj).getNative().getPickedBodiesInformation(theX, theY, myIntersections);
+        }
+        *rval = as_jsval(cx, myIntersections);
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
 
 static JSBool
 pickBodyBySweepingSphereFromBodies(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -221,7 +276,7 @@ intersectBodies(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
     DOC_RESET;
     DOC_PARAM("theBody", "", DOC_TYPE_NODE);
     DOC_PARAM("theBox", "", DOC_TYPE_BOX3F);
-    DOC_RVAL("IntersectionInfoVector", DOC_TYPE_ARRAY)
+    DOC_RVAL("IntersectionInfoVector", DOC_TYPE_ARRAY);
     DOC_PARAM_OPT("theIntersectInvisibleBodysFlag", "Intersect invisible bodies, default is true.", DOC_TYPE_BOOLEAN, true);
 
     DOC_END;
@@ -564,7 +619,9 @@ JSScene::Functions() {
         {"loadMovieFrame",        loadMovieFrame,      1},
         {"ensureMovieFramecount", ensureMovieFramecount,1},
         {"loadCaptureFrame",      loadCaptureFrame,    2},
-        {"pickBody",            pickBody,              3},
+        {"pickBody",              pickBody,              3},
+        {"getPickedBodyInformation",   getPickedBodyInformation, 3},
+        {"getPickedBodiesInformation", getPickedBodiesInformation, 3},
         {"pickBodyBySweepingSphereFromBodies",     pickBodyBySweepingSphereFromBodies,   4},
         {0}
     };

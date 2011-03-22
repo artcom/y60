@@ -204,12 +204,12 @@ namespace y60 {
         //XXX: review, maybe just printing an error and using a known profile, is the proper way to handle unknown cg profiles
         try {
             /*int myVertexShaderProfile =*/ asl::getEnumFromString(_myVertexProfileName, ShaderProfileStrings); // just for parameter check
-        } catch(const asl::ParseException & ex) {
+        } catch(const asl::ParseException) {
             throw ShaderException(std::string("wanted cg vertex profile:") + _myVertexProfileName + std::string(" is unknown & unsupported by the engine"),PLUS_FILE_LINE);
         }
         try {
             /*int myFragmentShaderProfile =*/ asl::getEnumFromString(_myFragmentProfileName, ShaderProfileStrings); // just for parameter check
-        } catch(const asl::ParseException & ex) {
+        } catch(const asl::ParseException) {
             throw ShaderException(std::string("wanted cg fragment profile:") + _myFragmentProfileName + std::string(" is unknown & unsupported by the engine"),PLUS_FILE_LINE);
         }
 

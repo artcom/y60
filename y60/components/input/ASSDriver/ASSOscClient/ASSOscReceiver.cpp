@@ -94,7 +94,7 @@ ASSOscReceiver::buildConfigureEvent(int theWidth, int theHeight)
                       << 0
                       << theWidth << theHeight
                       << osc::EndMessage;
-        } catch (osc::OutOfBufferMemoryException & ex) {
+        } catch (osc::OutOfBufferMemoryException) {
             _myDidOverflow = true;
         }
     }
@@ -113,7 +113,7 @@ ASSOscReceiver::buildTransportLayerEvent(const std::string& theType)
         try {
             _myStream << osc::BeginMessage(myAddress.c_str())
                       << osc::EndMessage;
-        } catch (osc::OutOfBufferMemoryException & ex) {
+        } catch (osc::OutOfBufferMemoryException) {
             _myDidOverflow = true;
         }
     }
@@ -146,7 +146,7 @@ ASSOscReceiver::buildCursorEvent(const std::string&   theType,
                       << thePosition[0] << thePosition[1] << thePosition[2]
                       << theIntensity
                       << osc::EndMessage;
-        } catch (osc::OutOfBufferMemoryException & ex) {
+        } catch (osc::OutOfBufferMemoryException) {
             _myDidOverflow = true;
         }
     }
