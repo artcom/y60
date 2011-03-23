@@ -182,6 +182,8 @@ spark.Canvas.Constructor = function (Protected) {
             transformMatrix.invert();
             intersecPointOnCanvas = product(myIntersectionInfo.intersections[0].position,
                                             transformMatrix);
+            //due to sweeping sphere intersection in spark.Window.. values outside of canvas can result in coordinates of -1, Public.width + 1  etc. 
+            intersecPointOnCanvas.x = clamp(intersecPointOnCanvas.x, 0, Public.width-1);
             intersecPointOnCanvas.y = clamp(Public.height - intersecPointOnCanvas.y, 0, Public.height-1);
         }
         return intersecPointOnCanvas;
