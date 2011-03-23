@@ -266,13 +266,6 @@ spark.Canvas.Constructor = function (Protected) {
 
         Public.setCanvas(_myCanvasNode);
         
-        Public.parent.stage.addEventListener(spark.StageEvent.FRAME, Public.onFrame);
-        Public.stage.addEventListener(spark.KeyboardEvent.KEY_DOWN, onKey);
-        Public.stage.addEventListener(spark.KeyboardEvent.KEY_UP, onKey);
-        Public.addEventListener(spark.MouseEvent.MOVE, Public.onMouseMotion);
-        Public.addEventListener(spark.MouseEvent.BUTTON_DOWN, Public.onMouseButtonDown);
-        Public.addEventListener(spark.MouseEvent.BUTTON_UP, Public.onMouseButtonUp);
-        
         Base.realize(myMaterial);
         // set the canvas material to allow proper layering of transparencies
         // see http://home.comcast.net/~tom_forsyth/blog.wiki.html#[[Premultiplied%20alpha]]
@@ -282,6 +275,17 @@ spark.Canvas.Constructor = function (Protected) {
                 _myWorld.appendChild(Public.innerSceneNode.firstChild);
             }
         }
+    };
+    
+    Base.postRealize = Public.postRealize;
+    Public.postRealize = function () {
+        Base.postRealize();
+        Public.parent.stage.addEventListener(spark.StageEvent.FRAME, Public.onFrame);
+        Public.stage.addEventListener(spark.KeyboardEvent.KEY_DOWN, onKey);
+        Public.stage.addEventListener(spark.KeyboardEvent.KEY_UP, onKey);
+        Public.addEventListener(spark.MouseEvent.MOVE, Public.onMouseMotion);
+        Public.addEventListener(spark.MouseEvent.BUTTON_DOWN, Public.onMouseButtonDown);
+        Public.addEventListener(spark.MouseEvent.BUTTON_UP, Public.onMouseButtonUp);
     };
     
     Base.setActiveCamera = Public.setActiveCamera;
