@@ -27,7 +27,7 @@ spark.Text.Constructor = function (Protected) {
     var _myMaxWidth;
     var _myMaxHeight;
     var _myMaxTextWidth = {};
-    var _myGlyphPositions = [];
+    var _myGlyphPositions = []; // array of vector2f-pair per glyph of x1/y1 and x2/y2 coordinates in rendered image
     var _myLayoutHook;
     var _myTextChangedHook;
     var _myLineWidths = [];
