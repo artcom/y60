@@ -165,6 +165,8 @@ class JSAbstractRenderWindow :  public JSWrapper<DERIVED, asl::Ptr<DERIVED>, Sta
         static JSBool
         setTextPadding(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool
+        getTextGlyphPositions(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
+        static JSBool
         getTextCursorPosition(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool
         getTextLineWidths(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);

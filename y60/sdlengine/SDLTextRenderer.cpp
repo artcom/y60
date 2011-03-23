@@ -762,8 +762,14 @@ namespace y60 {
             TTF_SetFontStyle((TTF_Font*) myFont, mySDLFormat);
 
             myWord.surface = renderToSurface(myWord.text, myFont, myWordColor);
+            float* myXPositions = TTF_getCurrentGlyphXPositions();
+            myWord.sdl_x_position.clear();
+            for (unsigned int i = 0; i < myWord.text.length()*2; ) {
+                myWord.sdl_x_position.push_back(myXPositions[i]);
+                myWord.sdl_x_position.push_back(myXPositions[i+1]);
+                i +=2;
+            }
             myWord.minx = TTF_CurrentLineMinX();
-
             TTF_SetFontStyle((TTF_Font*) myFont, TTF_STYLE_NORMAL);
         }
     }
@@ -783,6 +789,7 @@ namespace y60 {
             {AC_TRACE << "Target size: " << theTargetWidth << "x" << theTargetHeight << endl;}
             {AC_TRACE << "-----------  Splitter  -----------" << endl;}
         )
+        _myGlyphPosition.clear();
 
         vector<Word> myWords;
         parseWords(theText, myWords);
@@ -854,6 +861,7 @@ namespace y60 {
         for (unsigned i = 0; i < myLines.size(); ++i) {
             int myMinX = myLines[i].wordCount ? myWords[myWordCount].minx : 0;
             int myXPos = calcHorizontalAlignment(mySurfaceWidth, myLines[i], myMinX);
+            
             DB2(AC_TRACE << "line: " << i << " wordcount: " << myLines[i].wordCount << endl;)
             for (unsigned j = 0; j < myLines[i].wordCount; ++j) {
                 const Word & myWord = myWords[myWordCount];
@@ -870,6 +878,20 @@ namespace y60 {
                 unsigned mySrcHeight = myWord.surface->h;
                 unsigned mySrcWidth  = myWord.surface->w;
 
+                int myGlyphXPos = myXPos;
+                for (unsigned int i = 0;  i < myWord.sdl_x_position.size();) {
+                    // this damn xpos is in default config negativ, which is
+                    // a BIG problem, when copying memory around (see below, already fixed)
+                    // but here is just zeroed in case of the first glyph (vs, 2011)
+                    if (i == 0) {
+                        myGlyphXPos = maximum(0, myXPos);
+                    } else {
+                        myGlyphXPos = myXPos;
+                    }
+                    _myGlyphPosition.push_back(Vector2f(myGlyphXPos + myWord.sdl_x_position[i], unsigned(_myTextureSurface->h) - myYPos -1));
+                    _myGlyphPosition.push_back(Vector2f(myGlyphXPos + myWord.sdl_x_position[i+1]+1, unsigned(_myTextureSurface->h) - (myYPos + mySrcHeight)));
+                    i +=2;
+                }
                 if (int(mySurfaceHeight) > (_myBottomPadding + myYPos)) {
                     if (int(mySrcHeight + myYPos) > int(mySurfaceHeight-_myBottomPadding)) {
                         mySrcHeight = mySurfaceHeight-_myBottomPadding-myYPos;
@@ -887,12 +909,11 @@ namespace y60 {
 
                 asl::Unsigned32 * mySrcLinePtr = (asl::Unsigned32 *)myWord.surface->pixels;
                 asl::Unsigned32 * myDstLinePtr = (asl::Unsigned32 *)_myTextureSurface->pixels + myYPos * _myTextureSurface->w + myXPos;
-
                 for (unsigned i = 0; i < mySrcHeight; ++i) {
                     asl::Unsigned32 * mySrcPixelPtr = mySrcLinePtr;
                     asl::Unsigned32 * myDstPixelPtr = myDstLinePtr;
                     for (unsigned j = 0; j < mySrcWidth; ++j) {
-                        if (*mySrcPixelPtr >> 24) {
+                        if (*mySrcPixelPtr >> 24 && myDstPixelPtr >= (asl::Unsigned32 *)_myTextureSurface->pixels /*do not copy ahead of dstpixelptr (vs)*/) {
                             *myDstPixelPtr = *mySrcPixelPtr;
                         }
                         ++mySrcPixelPtr;
@@ -902,7 +923,7 @@ namespace y60 {
                     mySrcLinePtr += myWord.surface->w;
                     myDstLinePtr += _myTextureSurface->w;
                 }
-
+                // what about interword kerning and tracking ?? (2011,vs)
                 myXPos += myWord.surface->w;
                 SDL_FreeSurface(myWord.surface);
             }

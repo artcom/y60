@@ -27,6 +27,7 @@ spark.Text.Constructor = function (Protected) {
     var _myMaxWidth;
     var _myMaxHeight;
     var _myMaxTextWidth = {};
+    var _myGlyphPositions = [];
     var _myLayoutHook;
     var _myTextChangedHook;
     var _myLineWidths = [];
@@ -73,15 +74,19 @@ spark.Text.Constructor = function (Protected) {
     ///////////////////////
     // Protected Methods //
     ///////////////////////
+    Protected.__defineGetter__("image", function () {
+        return _myImage;
+    });
     
     Protected.render = function () {
         var myWidth = {width : 0};
         _myLineWidths = [];
-        var mySize = spark.renderText(_myImage, _myText, _myStyle, new Vector2i(_myMaxWidth, _myMaxHeight), myWidth, _myLineWidths);        
+        var myTextInfo = spark.renderText(_myImage, _myText, _myStyle, new Vector2i(_myMaxWidth, _myMaxHeight), myWidth, _myLineWidths);
+        _myGlyphPositions = myTextInfo.positions;
         _myMaxTextWidth =  myWidth.width;
-        Public.width = mySize.x;
-        Public.height = mySize.y;
-        return mySize;
+        Public.width = myTextInfo.size.x;
+        Public.height = myTextInfo.size.y;
+        return myTextInfo.size;
     };
     
     ////////////////////
@@ -121,6 +126,9 @@ spark.Text.Constructor = function (Protected) {
     
     Public.__defineGetter__("maxTextWidth", function () {
         return _myMaxTextWidth;
+    });
+    Public.__defineGetter__("glyphPositions", function () {
+        return _myGlyphPositions;
     });
 
     Public.__defineGetter__("lineWidths", function () {
