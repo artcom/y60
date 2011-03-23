@@ -196,7 +196,16 @@ namespace y60 {
         }
     }
 
-    const asl::Vector2i &
+    const std::vector<asl::Vector2f> &
+    TextRendererManager::getGlyphPositions() const {
+        if (_myTTFRenderer) {
+            return _myTTFRenderer->getGlyphPositions();
+        } else {
+            return _myBitmapRenderer.getGlyphPositions();
+        }
+    }
+
+const asl::Vector2i &
     TextRendererManager::getTextCursorPosition() const {
         if (_myTTFRenderer) {
             return _myTTFRenderer->getTextCursorPosition();

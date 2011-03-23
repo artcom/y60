@@ -71,6 +71,7 @@
 var js = js || {};
 js.array  = ("array" in js)  ? js.array  : {};
 js.string = ("string" in js) ? js.string : {};
+js.date   = ("date" in js)   ? js.date   : {};
 
 var utils = utils || {};
 utils.dom  = ("dom" in utils)  ? utils.dom  : {};
@@ -656,7 +657,7 @@ function setPropertyValue(thePropertiesNode, theDataType, theProperty, theValue)
     }
 }
 
-function getTimestamp() {
+js.date.getTimestamp = function () {
     var myDate  = new Date();
     var myYear  = myDate.getFullYear();
     var myMonth = myDate.getMonth() + 1;
@@ -671,6 +672,11 @@ function getTimestamp() {
         ((myHour  < 10) ? "0" : "") + myHour  + "_" +
         ((myMin   < 10) ? "0" : "") + myMin   + "_" +
         ((mySec   < 10) ? "0" : "") + mySec;
+}
+
+function getTimestamp() {
+    Logger.warning("Y60JSSL :: free function 'getTimestamp' is deprecated. Use 'js.date.getTimestamp' instead.");
+    return js.date.getTimestamp();
 }
 
 function padStringFront(theString, thePaddingChar, theLength) {

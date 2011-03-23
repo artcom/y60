@@ -587,6 +587,20 @@ JSAbstractRenderWindow<DERIVED>::setTextPadding(JSContext *cx, JSObject *obj, ui
 
 template<class DERIVED>
 JSBool
+JSAbstractRenderWindow<DERIVED>::getTextGlyphPositions(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Gets the last rendered glyph position in x and y coordinates. Can be used after calling renderTextAsImage to be used in subsequent calls.");
+    DOC_RVAL("thePositions", DOC_TYPE_VECTOR2I);
+    DOC_END;
+    try {
+        const std::vector<asl::Vector2f> & myPos = jslib::JSClassTraits<DERIVED>::openNativeRef(cx, obj).getTextGlyphPositions();
+        *rval = as_jsval(cx, myPos);
+        jslib::JSClassTraits<DERIVED>::closeNativeRef(cx,obj);
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+template<class DERIVED>
+JSBool
 JSAbstractRenderWindow<DERIVED>::getTextCursorPosition(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Gets the text cursor position. Can be used after calling renderTextAsImage to be used in subsequent calls.");
     DOC_RVAL("thePosition", DOC_TYPE_VECTOR2I);
@@ -976,6 +990,7 @@ JSFunctionSpec * JSAbstractRenderWindow<DERIVED>::BaseFunctions() {
         {"getTextColor",       getTextColor,             0},
         {"renderTextAsImage",  renderTextAsImage,        6},
         {"getTextCursorPosition", getTextCursorPosition, 0},
+        {"getTextGlyphPositions", getTextGlyphPositions, 0},        
         {"getTextLineWidths",  getTextLineWidths,        0},
         {"getTextMaxWidth",    getTextMaxWidth,          0},
         {"setTextPadding",     setTextPadding,           4},
