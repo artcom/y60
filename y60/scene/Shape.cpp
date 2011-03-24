@@ -435,6 +435,7 @@ namespace y60 {
         Primitive::SphereContactsList & theSphereContacts)
     {
         MAKE_SCOPE_TIMER(Shape_collide);
+        update();
         bool myResult = false;
         for (PrimitiveVector::size_type i = 0; i < _myPrimitives.size();++i) {
             if (_myPrimitives[i]->collide(theSphere, theMotion, theTransformation, theSphereContacts)) {
@@ -451,6 +452,7 @@ namespace y60 {
         Primitive::SphereContacts & theNewContactInfo)
     {
         MAKE_SCOPE_TIMER(Shape_collide_first);
+        update();
         const asl::SweptSphereContact<float> * myCurrentContact = &theCurrentContact;
         bool myResult = false;
         for (PrimitiveVector::size_type i = 0; i < _myPrimitives.size();++i) {

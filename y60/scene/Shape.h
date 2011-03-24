@@ -167,6 +167,7 @@ namespace y60 {
                         Primitive::IntersectionList & theIntersectionInfo)
                 {
                     MAKE_SCOPE_TIMER(Shape_intersect);
+                    update();
                     bool myResult = false;
                     AC_TRACE << "Intersecting " << _myPrimitives.size() << " primitives";
                     for (PrimitiveVector::size_type i = 0; i < _myPrimitives.size();++i) {
