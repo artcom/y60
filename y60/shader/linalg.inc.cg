@@ -30,3 +30,11 @@ float3 projectVectorOnPlane(float3 theVector, float4 thePlane) {
     return theVector - (dot(theVector, thePlane.xyz)*thePlane.xyz);
 }
 
+float3x3 makeXRotating(float theAngle) {
+    float myCos = cos(theAngle);
+    float mySin = sin(theAngle);
+    
+	return float3x3(1, 0,     0,
+	                0, myCos, mySin,
+	                0, -mySin, myCos); 
+}
