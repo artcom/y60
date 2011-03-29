@@ -176,7 +176,13 @@ void HWSampleSink::delayedPlay(asl::Time theTimeToStart) {
     changeState(RUNNING);
     AudioTimeSource::run();
 }
-
+void HWSampleSink::setVolumes(const std::vector<float> & theVolumes) {
+    ASSURE(theVolumes.size() > 0.0);
+    AutoLocker<ThreadLock> myLocker(_myQueueLock);
+    // no fading here
+    _myVolumeFader->setVolumes(theVolumes);
+    _myVolume = theVolumes[0];
+}
 void HWSampleSink::setVolume(float theVolume) {
     ASSURE(theVolume <= 1.0);
     if (!asl::almostEqual(theVolume, _myVolume)) {

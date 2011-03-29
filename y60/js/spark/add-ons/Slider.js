@@ -129,6 +129,8 @@ spark.Slider.Constructor = function (Protected) {
         _mySliderBackground = Public.getChildByName("background");
         _myActiveCursor     = _mySliderBackground.getChildByName("active-cursor");
         _myIdleCursor       = _mySliderBackground.getChildByName("idle-cursor");
+        _myIdleCursor.visible = true;
+        _myActiveCursor.visible = false;
         _myCursorOrigin     = _myIdleCursor.position;
     };
 
@@ -246,6 +248,28 @@ spark.Slider.Constructor = function (Protected) {
         _myIdleCursor.y   = _myCursorOrigin.y;
         _myActiveCursor.x = _myIdleCursor.x;
         _myActiveCursor.y = _myIdleCursor.y;
+    };
+
+    Public.setCursorPosition = function (theX, theY) {
+        var myX = (theX !== undefined) ? theX : _myIdleCursor.x;
+        var myY = (theY !== undefined) ? theY : _myIdleCursor.y;
+        _myIdleCursor.x   = myX;
+        _myIdleCursor.y   = myY;
+        _myActiveCursor.x = myX;
+        _myActiveCursor.y = myY;
+        _myCursorOrigin.x = myX;
+        _myCursorOrigin.y = myY;
+    };
+
+    Public.setRelativeCursorPosition = function (theX, theY) {
+        var myX = (theX !== undefined) ? theX * (_mySliderBackground.width - _myIdleCursor.width) : _myIdleCursor.x;
+        var myY = (theY !== undefined) ? theY * (_mySliderBackground.height - _myIdleCursor.height) : _myIdleCursor.y;
+        _myIdleCursor.x   = myX;
+        _myIdleCursor.y   = myY;
+        _myActiveCursor.x = myX;
+        _myActiveCursor.y = myY;
+        _myCursorOrigin.x = myX;
+        _myCursorOrigin.y = myY;
     };
 
 };

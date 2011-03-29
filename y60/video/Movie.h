@@ -100,7 +100,7 @@ namespace y60 {
     DEFINE_ATTRIBUTE_TAG(FrameRateTag,    double,      MOVIE_FRAMERATE_ATTRIB,   25, Y60_VIDEO_DECL);
     DEFINE_ATTRIBUTE_TAG(PlaySpeedTag,    float,       MOVIE_PLAYSPEED_ATTRIB,   1, Y60_VIDEO_DECL);
     DEFINE_ATTRIBUTE_TAG(PlayModeTag,     std::string, MOVIE_PLAYMODE_ATTRIB,    "stop", Y60_VIDEO_DECL);
-    DEFINE_ATTRIBUTE_TAG(VolumeTag,       float,       MOVIE_VOLUME_ATTRIB,      1, Y60_VIDEO_DECL);
+    DEFINE_ATTRIBUTE_TAG(VolumeTag,       asl::Vector2f,MOVIE_VOLUME_ATTRIB,      asl::Vector2f(1.0f,1.0f), Y60_VIDEO_DECL);
     DEFINE_ATTRIBUTE_TAG(LoopCountTag,    unsigned,    MOVIE_LOOPCOUNT_ATTRIB,   1, Y60_VIDEO_DECL);
     DEFINE_ATTRIBUTE_TAG(AudioTag,        bool,        MOVIE_AUDIO_ATTRIB,       true, Y60_VIDEO_DECL);
     DEFINE_ATTRIBUTE_TAG(DecoderHintTag,  std::string, MOVIE_DECODERHINT_ATTRIB, "FFMpegDecoder2", Y60_VIDEO_DECL);
