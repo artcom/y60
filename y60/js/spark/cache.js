@@ -105,7 +105,9 @@ spark.openMovie = function (thePath, theTargetPixelFormat, theDecoderHint, theAu
 
     myMovie.name = "spark-movie-" + spark.ourMovieCounter++;
     myMovie.resize = "none";
-    myMovie.maxcachesize = theCacheSize
+    if (theCacheSize !== undefined) {
+        myMovie.maxcachesize = theCacheSize;
+    }
     myMovie.loopcount = "1";
     myMovie.audio = (theAudioFlag) ? "1" : (theAudioFlag === undefined) ? "1" : "0";
     myMovie.targetpixelformat = theTargetPixelFormat || "RGB";
@@ -114,6 +116,8 @@ spark.openMovie = function (thePath, theTargetPixelFormat, theDecoderHint, theAu
     }
     myMovie.src = thePath;
     
-    myMovie.currentframe = theStartFrame;
+    if (theStartFrame !== undefined) {
+        myMovie.currentframe = theStartFrame;
+    }
     return myMovie;
 };
