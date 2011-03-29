@@ -413,6 +413,7 @@ namespace y60 {
             if (!myPacket) {
                 _myAudioSink->stop(true);
                 DBA(AC_DEBUG << "---- FFMpegDecoder::readAudio(): eof");
+                DBA(AC_DEBUG << "---- FFMpegDecoder::readAudio(): play until audio buffer is empty");
                 return false;
             }
             addAudioPacket(*myPacket);
@@ -813,21 +814,23 @@ namespace y60 {
                 // decode the audio...but let the video thread sleep
                 if (hasAudio() && getDecodeAudioFlag()) {
                     DBA(AC_DEBUG<<"---sleeping ---still decode audio");
-                    readAudio();
+                    /*bool myAudioEofFlag = !*/readAudio();
                 }
                 asl::msleep(10);
                 yield();
                 continue;
             }
-            bool myAudioEofFlag = false;
             if (hasAudio()&& getDecodeAudioFlag())
             {
-                myAudioEofFlag = !readAudio();
-                AC_DEBUG<<"decode audio eof: "<<myAudioEofFlag;
+                //XXX: disabled audio eof flag beacause it doesn't make sense for the current decoder structure
+                // eof only means the demuxer demuxed all packets,
+                // but there can be a lot of packets in his queue, which the video decoder hasn't decoded yet
+                // If we had a seperate video & audio decoder, we could stop the appropriate thread
+                /*bool myAudioEofFlag = !*/readAudio();
             }
             DBV(AC_TRACE << "---- Updating cache");
             try {
-                if (!decodeFrame() || myAudioEofFlag) {
+                if (!decodeFrame()) {
                     std::vector<unsigned> myFrameSize;
                     myFrameSize.push_back(0);
                     _myMsgQueue.push_back(VideoMsgPtr(new VideoMsg(VideoMsg::MSG_EOF, 0, myFrameSize)));
