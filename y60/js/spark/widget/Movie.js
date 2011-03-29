@@ -167,7 +167,7 @@ spark.Movie.Constructor = function(Protected) {
         return _myMovie.volume;
     });
     Public.__defineSetter__("volume", function(theVolume) {
-        _myMovie.volume = theVolume;
+        _myMovie.volume = new Vector2f(theVolume, theVolume);
     });
 
     Public.__defineGetter__("hasAudio", function() {

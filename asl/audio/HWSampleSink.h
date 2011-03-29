@@ -103,6 +103,7 @@ namespace asl {
         virtual void stop(bool theRunUntilEmpty = false);
         virtual void delayedPlay(asl::Time theTimeToStart);
         virtual void setVolume(float theVolume);
+        virtual void setVolumes(const std::vector<float> & theVolumes);        
         virtual void fadeToVolume(float theVolume, float theTime);
         virtual float getVolume() const;
         bool isPlaying() const;

@@ -98,9 +98,9 @@ namespace y60 {
                 return _myAudioSink != 0;
             }
 
-            virtual void setVolume(const float theVolume) {
+            virtual void setVolumes(const std::vector<float> theVolumes) {
                 if (hasAudio()) {
-                    _myAudioSink->setVolume(theVolume);
+                    _myAudioSink->setVolumes(theVolumes);
                 }
             }
 
