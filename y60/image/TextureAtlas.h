@@ -85,6 +85,7 @@ namespace y60 {
 
             bool findTextureTranslation(const std::string & theTextureName, asl::Matrix4f & theTranslation) const;
             bool findTextureSize(const std::string & theTextureName, asl::Vector2<asl::AC_SIZE_TYPE> & theSize) const;
+            bool containsTexture(const std::string & theTextureName) const;
             asl::AC_SIZE_TYPE getTextureCount() const { return _translations.size(); };
             void saveToFile(const asl::Path & theFilename) const;
             const asl::Path & getRasterPath() const { return _masterRasterPath; }; 

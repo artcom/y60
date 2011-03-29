@@ -296,8 +296,9 @@ public:
     }
 
     width  = mLongestEdge;              // The width is no more than the longest edge of any rectangle passed in
-    int count = mTotalArea / (mLongestEdge*mLongestEdge);
-    height = (count+2)*mLongestEdge;            // We guess that the height is no more than twice the longest edge.  On exit, this will get shrunk down to the actual tallest height.
+    //int count = mTotalArea / (mLongestEdge*mLongestEdge);
+    //height = (count+2)*mLongestEdge;            // We guess that the height is no more than twice the longest edge.  On exit, this will get shrunk down to the actual tallest height.
+    height = mLongestEdge * mTextureCount;     //AC-patch: former guess was not enough
 
     mDebugCount = 0;
     newFree(0,0,width,height);
@@ -390,7 +391,6 @@ public:
       if ( bestFit )
       {
         validate();
-
         switch ( edgeCount )
         {
           case 0:
@@ -496,6 +496,7 @@ public:
         while ( mergeNodes() ); // keep merging nodes as much as we can...
       }
     }
+
 
     height = 0;
     for (int i=0; i<mTextureCount; i++)

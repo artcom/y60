@@ -97,6 +97,9 @@ namespace y60 {
             int atlasWidth;
             int atlasHeight;
             tp->packTextures(atlasWidth,atlasHeight,theForcePowerOfTwoFlag, thePixelBorderFlag);
+            if (atlasWidth > 8000 || atlasHeight > 8000) {
+                AC_WARNING << "There might be problems with images larger than 8kx8k. The dimensions resulting from packTextures are " << atlasWidth << "x" << atlasHeight << ". Reduce the number of textures in map.";
+            }
             AC_TRACE << "creating texture atlas (" << atlasWidth << " x " << atlasHeight << ")";
             _masterRaster = dynamic_cast_Ptr<dom::ResizeableRaster>(createRasterValue(y60::RGBA, atlasWidth, atlasHeight));
             _masterRaster->fillRect(0,0,atlasWidth,atlasHeight,asl::Vector4f(1,1,1,1));
@@ -199,6 +202,11 @@ namespace y60 {
        }
        theTranslation = it->second.matrix;
        return true;
+    }
+
+    bool 
+    TextureAtlas::containsTexture(const std::string & theTextureName) const {
+        return _translations.find(theTextureName) != _translations.end();
     }
 
     TextureAtlas::TextureAtlas(const asl::Path & theFilename, PackageManagerPtr thePackageManager) {

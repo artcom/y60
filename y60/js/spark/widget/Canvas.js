@@ -436,8 +436,8 @@ spark.Canvas.prepareMerge = function prepareMerge(theSceneFilePath) {
         if (myTexSrcPath.charAt(0) !== "/") {
             var myTexSrcPaths = myTexSrcPath.split("|");
             for (var j = 0; j < myTexSrcPaths.length; j++) {
-                if (myTexSrcPaths[j].indexOf(".") === 0) {
-                    myTexSrcPaths[j] = myTexSrcPaths[j].replace(/^\.\//, myTargetDir + "");
+                if (myTexSrcPaths[j].indexOf("./") === 0) {
+                    myTexSrcPaths[j] = myTexSrcPaths[j].replace(/^\.\//, myTargetDir);
                 } else {
                     myTexSrcPaths[j] = myTargetDir + myTexSrcPaths[j]; 
                 }
