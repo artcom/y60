@@ -763,11 +763,12 @@ namespace y60 {
 
             myWord.surface = renderToSurface(myWord.text, myFont, myWordColor);
             float* myXPositions = TTF_getCurrentGlyphXPositions();
+            int myReallyBlittedCharacterCount = TTF_getCurrentGlyphXPositionsCount();
             myWord.sdl_x_position.clear();
-            for (unsigned int i = 0; i < myWord.text.length()*2; ) {
-                myWord.sdl_x_position.push_back(myXPositions[i]);
-                myWord.sdl_x_position.push_back(myXPositions[i+1]);
-                i +=2;
+            for (unsigned int i = 0; i < myReallyBlittedCharacterCount/2 ;i++ ) {
+                myWord.sdl_x_position.push_back(myXPositions[i*2]);
+                myWord.sdl_x_position.push_back(myXPositions[(i*2)+1]);
+                //i +=2;
             }
             myWord.minx = TTF_CurrentLineMinX();
             TTF_SetFontStyle((TTF_Font*) myFont, TTF_STYLE_NORMAL);

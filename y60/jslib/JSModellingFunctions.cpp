@@ -87,6 +87,29 @@ namespace jslib {
 template class JSWrapper<DummyT,asl::Ptr<DummyT>, StaticAccessProtocol>;
 
 JS_STATIC_DLL_CALLBACK(JSBool)
+EnsureShapesQuadCount(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) {
+    try {
+        DOC_BEGIN("Ensure that a shape a given amount of elements");
+        DOC_PARAM("theShapeNode", "A shapenode", DOC_TYPE_NODE);
+        DOC_PARAM("theCount", "Number of elements", DOC_TYPE_INTEGER);
+        DOC_END;
+
+        ensureParamCount(argc, 2);
+
+        dom::NodePtr  myShapeNode;
+        if (!convertFrom(cx, argv[0], myShapeNode)) {
+            JS_ReportError(cx,"EnsureShapesElementsCount: argument 1 is not a node");
+            return JS_FALSE;
+        }
+        int myElementCount;
+        convertFrom(cx, argv[1], myElementCount );
+        ensureShapesQuadCount(myShapeNode, myElementCount);
+        return JS_TRUE;
+
+    } HANDLE_CPP_EXCEPTION;
+}
+
+JS_STATIC_DLL_CALLBACK(JSBool)
 CreateTransform(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) {
     try {
         DOC_BEGIN("Creates a new transform node and adds it to a given parent");
@@ -1348,6 +1371,7 @@ JSModellingFunctions::StaticFunctions() {
         {"createPhongMaterial",         CreatePhongMaterial,         5},
         {"createVoxelProxyGeometry",    CreateVoxelProxyGeometry,    7},
         {"setAlpha",                    SetAlpha,                    2},
+        {"EnsureShapesQuadCount",       EnsureShapesQuadCount,       2},        
         {0}
     };
     return myFunctions;
