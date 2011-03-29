@@ -102,27 +102,48 @@ FindTextureTranslation(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, js
 }
 static JSBool
 FindTextureSize(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Returns the original size (in pixels) of a given subtexture");
-    DOC_PARAM("theSubTextureName", "", DOC_TYPE_STRING);
-    DOC_RVAL("size", DOC_TYPE_VECTOR2I);
-    DOC_END;
-    try {
-        ensureParamCount(argc, 1, PLUS_FILE_LINE);
+DOC_BEGIN("Returns the original size (in pixels) of a given subtexture");
+DOC_PARAM("theSubTextureName", "", DOC_TYPE_STRING);
+DOC_RVAL("size", DOC_TYPE_VECTOR2I);
+DOC_END;
+try {
+    ensureParamCount(argc, 1, PLUS_FILE_LINE);
 
-        JSTextureAtlas::OWNERPTR myNative;
-        convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
+    JSTextureAtlas::OWNERPTR myNative;
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
-        string theSubTextureName;
-        convertFrom(cx, argv[0], theSubTextureName);
+    string theSubTextureName;
+    convertFrom(cx, argv[0], theSubTextureName);
 
-        Vector2<AC_SIZE_TYPE> textureSize;
-        if ( myNative->findTextureSize(theSubTextureName, textureSize) ) {
-            *rval = as_jsval(cx, textureSize);
-        } else {
-            *rval = JSVAL_NULL;
-        }
-        return JS_TRUE;
-    } HANDLE_CPP_EXCEPTION;
+    Vector2<AC_SIZE_TYPE> textureSize;
+    if ( myNative->findTextureSize(theSubTextureName, textureSize) ) {
+        *rval = as_jsval(cx, textureSize);
+    } else {
+        *rval = JSVAL_NULL;
+    }
+    return JS_TRUE;
+} HANDLE_CPP_EXCEPTION;
+}
+
+static JSBool
+ContainsTexture(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+DOC_BEGIN("Returns true if the texture is found in atlas");
+DOC_PARAM("theSubTextureName", "", DOC_TYPE_STRING);
+DOC_RVAL("containsflag", DOC_TYPE_BOOLEAN);
+DOC_END;
+try {
+    ensureParamCount(argc, 1, PLUS_FILE_LINE);
+
+    JSTextureAtlas::OWNERPTR myNative;
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
+
+    string theSubTextureName;
+    convertFrom(cx, argv[0], theSubTextureName);
+
+    bool myFound = myNative->containsTexture(theSubTextureName);
+    *rval = as_jsval(cx, myFound);
+    return JS_TRUE;
+} HANDLE_CPP_EXCEPTION;
 }
 
 static JSBool
@@ -150,6 +171,7 @@ JSTextureAtlas::Functions() {
         // name                  native                   nargs
         {"findTextureTranslation",   FindTextureTranslation,          1},
         {"findTextureSize",          FindTextureSize,                 1},
+        {"containsTexture",          ContainsTexture,                 1},
         {"saveToFile",               SaveToFile            ,          1},
         {0}
     };
