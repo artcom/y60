@@ -169,7 +169,7 @@ spark.Movie.Constructor = function(Protected) {
     Public.__defineSetter__("volume", function(theVolume) {
         _myMovie.volume = new Vector2f(theVolume, theVolume);
     });
-    Public.__defineSetter__("volume", function(theVolumes) {
+    Public.__defineSetter__("volumes", function(theVolumes) {
         _myMovie.volume = new Vector2f(theVolumes[0], theVolumes[1]);
     });
 
