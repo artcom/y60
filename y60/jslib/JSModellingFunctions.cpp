@@ -94,16 +94,30 @@ EnsureShapesQuadCount(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, j
         DOC_PARAM("theCount", "Number of elements", DOC_TYPE_INTEGER);
         DOC_END;
 
-        ensureParamCount(argc, 2);
+        ensureParamCount(argc, 4);
 
         dom::NodePtr  myShapeNode;
         if (!convertFrom(cx, argv[0], myShapeNode)) {
             JS_ReportError(cx,"EnsureShapesElementsCount: argument 1 is not a node");
             return JS_FALSE;
         }
+
+        std::vector<asl::Vector3f> myPositions;
+        convertFrom(cx, argv[1], myPositions);
+
+        std::vector<asl::Vector2f> myTexCoords;
+        if (argc > 2) {
+            convertFrom(cx, argv[2], myTexCoords);
+        }
+
+        std::vector<asl::Vector4f> myColors;
+        if (argc > 3) {
+            convertFrom(cx, argv[3], myColors);
+        }
+
         int myElementCount;
         convertFrom(cx, argv[1], myElementCount );
-        ensureShapesQuadCount(myShapeNode, myElementCount);
+        ensureShapesQuadCount(myShapeNode, myPositions, myTexCoords, myColors);
         return JS_TRUE;
 
     } HANDLE_CPP_EXCEPTION;
