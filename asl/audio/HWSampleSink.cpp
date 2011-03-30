@@ -68,9 +68,11 @@ HWSampleSink::HWSampleSink(const string & myName, SampleFormat mySampleFormat,
     _numUnderruns = 0;
 
     _myFrameCount = 0;
-    _myVolume = 1;
+    for (unsigned i = 0; i < numChannels; i ++) {
+        _myVolume.push_back(1.0);
+    }
     _myVolumeFader = VolumeFaderPtr(new VolumeFader(_mySampleFormat));
-    _myVolumeFader->setVolume(1, 0);
+    _myVolumeFader->setVolumes(_myVolume, 0);
     _myBackupBuffer = AudioBufferPtr(createAudioBuffer(_mySampleFormat, 32,
                                                        _numChannels, SampleSource::_mySampleRate));
     _myBackupBuffer->clear();
@@ -101,7 +103,7 @@ void HWSampleSink::play() {
     AutoLocker<ThreadLock> myLocker(_myQueueLock);
     if (_myState != RUNNING) {
         _myLockedSelf = _mySelf.lock();
-        _myVolumeFader->setVolume(_myVolume);
+        _myVolumeFader->setVolumes(_myVolume);
         changeState(RUNNING);
         AudioTimeSource::run();
         _myPumpTimeSource->run();
@@ -171,37 +173,39 @@ void HWSampleSink::delayedPlay(asl::Time theTimeToStart) {
     ASSURE(_myState == STOPPED || _myState == PAUSED);
     _myTimeToStart = theTimeToStart;
     _myLockedSelf = _mySelf.lock();
-    _myVolumeFader->setVolume(_myVolume);
+    _myVolumeFader->setVolumes(_myVolume);
     _isDelayingPlay = true;
     changeState(RUNNING);
     AudioTimeSource::run();
 }
 void HWSampleSink::setVolumes(const std::vector<float> & theVolumes) {
-    ASSURE(theVolumes.size() > 0.0);
+    ASSURE(theVolumes.size() > 0);
     AutoLocker<ThreadLock> myLocker(_myQueueLock);
     // no fading here
     _myVolumeFader->setVolumes(theVolumes);
-    _myVolume = theVolumes[0];
+    _myVolume = theVolumes;
 }
 void HWSampleSink::setVolume(float theVolume) {
     ASSURE(theVolume <= 1.0);
-    if (!asl::almostEqual(theVolume, _myVolume)) {
-        AutoLocker<ThreadLock> myLocker(_myQueueLock);
-        _myVolume = theVolume;
-        if (_myState == STOPPED || _myState == PAUSED) {
-            // No fade, immediate volume change.
-            _myVolumeFader->setVolume(theVolume, 0);
-        } else {
-            _myVolumeFader->setVolume(theVolume);
-        }
+    AutoLocker<ThreadLock> myLocker(_myQueueLock);
+    for (unsigned i = 0; i < _myVolume.size(); i ++) {
+        _myVolume[i] = theVolume;
+    }
+    if (_myState == STOPPED || _myState == PAUSED) {
+        // No fade, immediate volume change.
+        _myVolumeFader->setVolume(theVolume, 0);
+    } else {
+        _myVolumeFader->setVolume(theVolume);
     }
 }
 
 void HWSampleSink::fadeToVolume(float theVolume, float theTime) {
     ASSURE(theVolume <= 1.0);
     AutoLocker<ThreadLock> myLocker(_myQueueLock);
-    _myVolume = theVolume;
-    _myVolumeFader->setVolume(theVolume, unsigned(theTime*getSampleRate()));
+    for (unsigned i = 0; i < _myVolume.size(); i ++) {
+        _myVolume[i] = theVolume;
+    }
+    _myVolumeFader->setVolumes(_myVolume, unsigned(theTime*getSampleRate()));
 }
 
 bool HWSampleSink::isPlaying() const {

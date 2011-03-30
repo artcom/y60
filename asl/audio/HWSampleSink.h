@@ -158,7 +158,7 @@ namespace asl {
         Unsigned64 _myFrameCount;  // This allows for streams lasting about 13 million years
                                    // if I didn't miscalculate :-).
         VolumeFaderPtr _myVolumeFader;
-        float _myVolume;
+        std::vector<float> _myVolume;
         bool _myStopWhenEmpty;
 
         bool _isDelayingPlay;
