@@ -91,7 +91,7 @@ EnsureShapesQuadCount(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, j
     try {
         DOC_BEGIN("Ensure that a shape a given amount of elements");
         DOC_PARAM("theShapeNode", "A shapenode", DOC_TYPE_NODE);
-        DOC_PARAM("thePosition", "Array of positions", DOC_TYPE_VECTOROFVECTOR3F,"");
+        DOC_PARAM("thePosition", "Array of positions", DOC_TYPE_VECTOROFVECTOR3F);
         DOC_PARAM_OPT("theTexCoords", "Array of texcoords", DOC_TYPE_VECTOROFVECTOR2F,"");
         DOC_PARAM_OPT("theColor", "vertex color", DOC_TYPE_VECTOR4F, "");
         DOC_END;
