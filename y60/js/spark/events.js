@@ -564,8 +564,8 @@ spark.Keyboard.CTRL_ALT_SHIFT = spark.Keyboard.ALT | spark.Keyboard.SHIFT | spar
 
 spark.KeyboardEvent = spark.Class("KeyboardEvent");
 
-spark.KeyboardEvent.KEY_DOWN = "keybord-key-down";
-spark.KeyboardEvent.KEY_UP   = "keybord-key-up";
+spark.KeyboardEvent.KEY_DOWN = "keyboard-key-down";
+spark.KeyboardEvent.KEY_UP   = "keyboard-key-up";
 
 spark.KeyboardEvent.Constructor = function(Protected, theType, theKey, theModifiers) {
     var Public = this;
