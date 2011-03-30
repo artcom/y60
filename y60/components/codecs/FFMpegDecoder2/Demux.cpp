@@ -103,7 +103,7 @@ AVPacket * Demux::getPacket(const int theStreamIndex)
             myPacket = new AVPacket;
             memset(myPacket, 0, sizeof(AVPacket));
 
-            bool myEndOfFileFlag = (av_read_frame(_myFormatContext, myPacket) == AVERROR_EOF);
+            bool myEndOfFileFlag = (av_read_frame(_myFormatContext, myPacket) < 0);
             if (myEndOfFileFlag) {
                 AC_DEBUG << "Demux::getPacket: end of file.";
                 av_free_packet(myPacket);

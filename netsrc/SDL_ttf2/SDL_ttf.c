@@ -145,6 +145,7 @@ static int TTF_current_line_minx = 0;
 /* Font tracking [ART+COM Patch] */
 static float TTF_tracking = 0.0f;
 static float*  TTF_glyph_xpositions = 0;
+static int  TTF_glyph_xpositions_count = 0;
 
 /* Gets the top row of the underline. The outline
    is taken into account.
@@ -333,6 +334,9 @@ void TTF_SetTracking(float theTracking) {
 
 float* TTF_getCurrentGlyphXPositions() {
     return TTF_glyph_xpositions;
+}
+int TTF_getCurrentGlyphXPositionsCount() {
+    return TTF_glyph_xpositions_count;
 }
 
 static void TTF_SetFTError(const char *msg, FT_Error error)
@@ -1952,7 +1956,7 @@ SDL_Surface *TTF_RenderUNICODE_Blended(TTF_Font *font,
 	for ( ch=text; *ch; ++ch ) { myCharNum++; }
     free(TTF_glyph_xpositions);
     TTF_glyph_xpositions = (float*) malloc(2*myCharNum*sizeof(float));
-    myCharNum = 0;
+    TTF_glyph_xpositions_count = 0;
     // [ART+COM Patch] end
 
 	for ( ch=text; *ch; ++ch ) {
@@ -2032,8 +2036,8 @@ SDL_Surface *TTF_RenderUNICODE_Blended(TTF_Font *font,
 		}
         // malloc space for glyph position [ART+COM Patch] start
         // store xpos of current glyph
-        TTF_glyph_xpositions[myCharNum++] = xstart;
-        TTF_glyph_xpositions[myCharNum++] = xstart + width + 1;
+        TTF_glyph_xpositions[TTF_glyph_xpositions_count++] = xstart;
+        TTF_glyph_xpositions[TTF_glyph_xpositions_count++] = xstart + width + 1;
         //  [ART+COM Patch] end
 
 		xstart += glyph->advance;

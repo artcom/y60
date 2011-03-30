@@ -88,6 +88,7 @@ extern DECLSPEC double TTF_Kerning(TTF_Font * theFont, const Uint16 theFirstChar
 extern DECLSPEC void TTF_SetTracking(float theTracking);
 /* get last rendered glyph x position [ART+COM Patch] */
 extern DECLSPEC float* TTF_getCurrentGlyphXPositions();
+extern DECLSPEC int TTF_getCurrentGlyphXPositionsCount();
 
 /* Open a font file and create a font of the specified point size.
  * Some .fon fonts will have several sizes embedded in the file, so the
