@@ -297,12 +297,12 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
         if (_myTextOverlay.visible) {
             window.setTextColor([1,1,1,1]);
             var myText  = getDisplayText();
-            var myWidth = 400;
+            var myWidth = 0;
             for (var i = 0; i < myText.length; ++i) {
                 window.renderText([30, (40 + i * 20)], myText[i], "Screen15");
                 myWidth = Math.max(myWidth, myText[i].length * 10);
             }
-            //_myTextOverlay.width  = myWidth;
+            _myTextOverlay.width  = myWidth;
             _myTextOverlay.height = myText.length * 20 + 35;
         }
     }
