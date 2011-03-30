@@ -18,7 +18,7 @@ TextureAtlasManager.prototype.Constructor = function (Public) {
     ////////////////////
     
     /* explicitely load a TextureAtlas*/
-    Public.loadAtlas = function (theAtlasDefinitionFile, theScene) {
+    Public.loadAtlas = function (theAtlasDefinitionFile, theTransparencyFlag, theScene) {
         var myNewTextureAtlas, myAtlasInfo;
         if (!(theAtlasDefinitionFile in _atlases)) {
             myNewTextureAtlas = new TextureAtlas(theAtlasDefinitionFile);
@@ -29,7 +29,7 @@ TextureAtlasManager.prototype.Constructor = function (Public) {
                                    createUnlitTexturedMaterial((theScene?theScene:window.scene),
                                                                myAtlasInfo.atlas.imagePath,
                                                                theAtlasDefinitionFile + "_atlasMaterial",
-                                                               true); // transparencyFlag
+                                                               (theTransparencyFlag!==undefined)?theTransparencyFlag:true);
         }
         return _atlases[theAtlasDefinitionFile];
     };
