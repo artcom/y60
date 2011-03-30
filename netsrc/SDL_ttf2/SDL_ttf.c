@@ -2034,10 +2034,10 @@ SDL_Surface *TTF_RenderUNICODE_Blended(TTF_Font *font,
 				*dst++ |= pixel | (alpha << 24);
 			}
 		}
-        // malloc space for glyph position [ART+COM Patch] start
+        // [ART+COM Patch] start
         // store xpos of current glyph
         TTF_glyph_xpositions[TTF_glyph_xpositions_count++] = xstart;
-        TTF_glyph_xpositions[TTF_glyph_xpositions_count++] = xstart + width + 1;
+        TTF_glyph_xpositions[TTF_glyph_xpositions_count++] = xstart + width + 2;
         //  [ART+COM Patch] end
 
 		xstart += glyph->advance;

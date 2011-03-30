@@ -1248,7 +1248,7 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
     ensureShapesQuadCount(dom::NodePtr theShapeNode, 
                           const std::vector<asl::Vector3f> & thePositions,
                           const std::vector<asl::Vector2f> & theTexCoords,
-                          const std::vector<asl::Vector4f> & theColors) {
+                          asl::Vector4f  theColor) {
         // check element type: we only enhance shapes with ONE 'quads'-element
         unsigned myCurrentElementsCount = theShapeNode->childNode("primitives")->childNodesLength();
         string myType = theShapeNode->childNode("primitives")->firstChild()->getAttributeString("type");
@@ -1294,7 +1294,10 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
         if (myColorsNode) {
             dom::Node::WritableValue<VectorOfVector4f> myColorsLock(myColorsNode->firstChild());
             VectorOfVector4f & myColors = myColorsLock.get();
-            myColors = theColors;
+            myColors.clear();
+            for (unsigned i = 0; i < thePositions.size(); i++) {
+                myColors.push_back(theColor);
+            }
 
             dom::NodePtr myColorIndicesNode = theShapeNode->childNode("primitives")->firstChild()->getElementByAttribute("indices", "vertexdata", "color");
             dom::Node::WritableValue<VectorOfUnsignedInt> myColorIndicesLock(myColorIndicesNode->firstChild());
