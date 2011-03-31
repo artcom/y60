@@ -1,5 +1,7 @@
 #include "TexturePacker.h"
 #include <assert.h>
+#include <cmath>
+#include <algorithm>
 
 #pragma warning(disable:4100 4244)
 
@@ -294,11 +296,9 @@ public:
     {
       mLongestEdge = nextPow2(mLongestEdge);
     }
-
-    width  = mLongestEdge;              // The width is no more than the longest edge of any rectangle passed in
-    //int count = mTotalArea / (mLongestEdge*mLongestEdge);
-    //height = (count+2)*mLongestEdge;            // We guess that the height is no more than twice the longest edge.  On exit, this will get shrunk down to the actual tallest height.
-    height = mLongestEdge * mTextureCount;     //AC-patch: former guess was not enough
+    
+    width  = std::max(std::sqrt(mTotalArea), static_cast<double>(mLongestEdge)); 
+    height = mLongestEdge * mTextureCount;
 
     mDebugCount = 0;
     newFree(0,0,width,height);
@@ -499,6 +499,7 @@ public:
 
 
     height = 0;
+    width  = 0;
     for (int i=0; i<mTextureCount; i++)
     {
       Texture &t = mTextures[i];
@@ -510,26 +511,33 @@ public:
         t.mY++;
       }
 
-      int y;
+      int x,y;
       if (t.mFlipped)
       {
+        x = t.mX + t.mHeight;
         y = t.mY + t.mWidth;
       }
       else
       {
+        x = t.mX + t.mWidth;
         y = t.mY + t.mHeight;
       }	  
 
       if ( y > height )
         height = y;
+      
+      if ( x > width )
+        width  = x;
     }
     if (onePixelBorder) {
         height++;
+        width++;
     }
 
     if ( forcePowerOfTwo )
     {
       height = nextPow2(height);
+      width  = nextPow2(width);
     }
 
     return (width*height)-mTotalArea;
