@@ -339,7 +339,6 @@ void findBiggestAspect (MovieBase * theMovie ) {
         globalWindowHeight = theMovie->getHeightAspect();
         globalWindowWidth  = theMovie->getWidthAspect();
     }
-
 }
 
 void clearFilebasedMovies () {

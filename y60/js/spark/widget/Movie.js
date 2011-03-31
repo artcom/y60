@@ -84,7 +84,7 @@ spark.Movie.Constructor = function(Protected) {
             theNode.targetpixelformat = "YUV420";
             Base.realizeResizableRectangle = Public.realize;
             use("YUV2RGBShader.js");
-            this.Inherit(spark.YUV2RGBShader);
+            Public.Inherit(spark.YUV2RGBShader);
             Base.realizeYUV2RGBShader = Public.realize;
             Public.realize = Base.realizeResizableRectangle;
         }

@@ -1243,53 +1243,51 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
     }
 
 
-    // enhance a shape, so it has a given number of quad vertexdata, fill yourself
+    // enhance a shape, so it has a given number of quad vertexdata
     void
-    ensureShapesQuadCount(dom::NodePtr theShapeNode, unsigned theElementCount) {
-        // we create only stubbs !!!!
-        // fill yourself
-        unsigned myCurrentShapeCount = theShapeNode->childNode("primitives")->childNodesLength();
-        AC_PRINT << " Shape has # " << myCurrentShapeCount << " elements, should have : " << theElementCount;
-        if (myCurrentShapeCount == theElementCount) {
-            return; // everything is fine
-        } else if (myCurrentShapeCount < theElementCount) {
-        // we must add elements
-            for (unsigned i = 0 ; i < (theElementCount-myCurrentShapeCount); i++) {
-                dom::NodePtr myElement = theShapeNode->childNode("primitives")->firstChild();
-                theShapeNode->childNode("primitives")->appendChild(myElement->cloneNode(dom::Node::CloneDepth(true)));    
-            }
-        } else {
-            // we must remove elements
-            for (unsigned i = 0 ; i < (myCurrentShapeCount - theElementCount); i++) {
-                dom::NodePtr myElement = theShapeNode->childNode("primitives")->firstChild();
-                theShapeNode->childNode("primitives")->removeChild(myElement);
-            }
+    ensureShapesQuadCount(dom::NodePtr theShapeNode, 
+                          const std::vector<asl::Vector3f> & thePositions,
+                          const std::vector<asl::Vector2f> & theTexCoords,
+                          asl::Vector4f  theColor) {
+        // check element type: we only enhance shapes with ONE 'quads'-element
+        unsigned myCurrentElementsCount = theShapeNode->childNode("primitives")->childNodesLength();
+        string myType = theShapeNode->childNode("primitives")->firstChild()->getAttributeString("type");
 
+        if (myCurrentElementsCount != 1 || myType != PRIMITIVE_TYPE_QUADS) {
+            throw asl::Exception(std::string("ensureShapesQuadCount - can only enhance elementtype 'quads'"), PLUS_FILE_LINE);
         }
+
+        VectorOfUnsignedInt myIndices;
+        for (unsigned i = 0; i < thePositions.size(); i++) {
+            myIndices.push_back(i);
+        }
+
         dom::NodePtr myVertexData = theShapeNode->childNode("vertexdata");
 
         dom::NodePtr myPositionNode = myVertexData->getElementByAttribute("", "name","position");
         dom::Node::WritableValue<VectorOfVector3f> myPositionsLock(myPositionNode->firstChild());
         VectorOfVector3f & myPositions = myPositionsLock.get();
-        myPositions.clear();
-        for (unsigned i = 0; i < theElementCount; i++) {
-            myPositions.push_back(Vector3f(0,0,0));
-            myPositions.push_back(Vector3f(0,0,0));
-            myPositions.push_back(Vector3f(0,0,0));
-            myPositions.push_back(Vector3f(0,0,0));
-        }
+        myPositions = thePositions;
 
-        dom::NodePtr myNormalsNode = myVertexData->getElementByAttribute("", "name","normal");
+        dom::NodePtr myPositionIndicesNode = theShapeNode->childNode("primitives")->firstChild()->getElementByAttribute("indices", "vertexdata", "position");
+        dom::Node::WritableValue<VectorOfUnsignedInt> myPositionIndicesLock(myPositionIndicesNode->firstChild());
+        VectorOfUnsignedInt & myPositionIndices = myPositionIndicesLock.get();
+        myPositionIndices = myIndices;
+
+        dom::NodePtr myNormalsNode = myVertexData->getElementByAttribute("", "name", "normal");
         if (myNormalsNode) {
             dom::Node::WritableValue<VectorOfVector3f> myNormalsLock(myNormalsNode->firstChild());
             VectorOfVector3f & myNormals = myNormalsLock.get();
             myNormals.clear();
-            for (unsigned i = 0; i < theElementCount; i++) {
-                myNormals.push_back(Vector3f(0,1,0));
-                myNormals.push_back(Vector3f(0,1,0));
-                myNormals.push_back(Vector3f(0,1,0));
+            for (unsigned i = 0; i < thePositions.size(); i++) {
                 myNormals.push_back(Vector3f(0,1,0));
             }
+
+            dom::NodePtr myNormalIndicesNode = theShapeNode->childNode("primitives")->firstChild()->getElementByAttribute("indices", "vertexdata", "normal");
+            dom::Node::WritableValue<VectorOfUnsignedInt> myNormalIndicesLock(myNormalIndicesNode->firstChild());
+            VectorOfUnsignedInt & myNormalIndices = myNormalIndicesLock.get();
+            myNormalIndices = myIndices;
+
         }    
 
         dom::NodePtr myColorsNode = myVertexData->getElementByAttribute("", "name","color");
@@ -1297,25 +1295,27 @@ AC_DEBUG << "createSphericalPlane:" << " myPolarUVector = " << myPolarUVector <<
             dom::Node::WritableValue<VectorOfVector4f> myColorsLock(myColorsNode->firstChild());
             VectorOfVector4f & myColors = myColorsLock.get();
             myColors.clear();
-            for (unsigned i = 0; i < theElementCount; i++) {
-                myColors.push_back(Vector4f(1,1,1,1));
-                myColors.push_back(Vector4f(1,1,1,1));
-                myColors.push_back(Vector4f(1,1,1,1));
-                myColors.push_back(Vector4f(1,1,1,1));
+            for (unsigned i = 0; i < thePositions.size(); i++) {
+                myColors.push_back(theColor);
             }
+
+            dom::NodePtr myColorIndicesNode = theShapeNode->childNode("primitives")->firstChild()->getElementByAttribute("indices", "vertexdata", "color");
+            dom::Node::WritableValue<VectorOfUnsignedInt> myColorIndicesLock(myColorIndicesNode->firstChild());
+            VectorOfUnsignedInt & myColorIndices = myColorIndicesLock.get();
+            myColorIndices = myIndices;
         }    
 
         dom::NodePtr myUVsNode = myVertexData->getElementByAttribute("", "name","uvset");
-        if (myColorsNode) {
+        if (myUVsNode) {
             dom::Node::WritableValue<VectorOfVector2f> myUVsLock(myUVsNode->firstChild());
             VectorOfVector2f & myUVs = myUVsLock.get();
-            myUVs.clear();
-            for (unsigned i = 0; i < theElementCount; i++) {
-                myUVs.push_back(Vector2f(0.0f,0.0f));
-                myUVs.push_back(Vector2f(0.0f,0.0f));
-                myUVs.push_back(Vector2f(0.0f,0.0f));
-                myUVs.push_back(Vector2f(0.0f,0.0f));
-            }
+            myUVs = theTexCoords;
+
+            dom::NodePtr myUVSetIndicesNode = theShapeNode->childNode("primitives")->firstChild()->getElementByAttribute("indices", "vertexdata", "uvset");
+            dom::Node::WritableValue<VectorOfUnsignedInt> myUVSetIndicesLock(myUVSetIndicesNode->firstChild());
+            VectorOfUnsignedInt & myUVSetIndices = myUVSetIndicesLock.get();
+            myUVSetIndices = myIndices;
+
         }    
     }
 }
