@@ -297,7 +297,7 @@ public:
       mLongestEdge = nextPow2(mLongestEdge);
     }
     
-    width  = std::max(std::sqrt(mTotalArea), static_cast<double>(mLongestEdge)); 
+    width  = std::max(std::sqrt(static_cast<double>(mTotalArea)), static_cast<double>(mLongestEdge)); 
     height = mLongestEdge * mTextureCount;
 
     mDebugCount = 0;
