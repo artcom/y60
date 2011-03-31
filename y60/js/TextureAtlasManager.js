@@ -17,19 +17,33 @@ TextureAtlasManager.prototype.Constructor = function (Public) {
     // Public Methods //
     ////////////////////
     
-    /* explicitely load a TextureAtlas*/
-    Public.loadAtlas = function (theAtlasDefinitionFile, theTransparencyFlag, theScene) {
+    //theMaterial and the Scene are optional, theMaterial should have one textureunit
+    Public.loadAtlas = function (theAtlasDefinitionFile, theMaterial, theScene) {
         var myNewTextureAtlas, myAtlasInfo;
         if (!(theAtlasDefinitionFile in _atlases)) {
             myNewTextureAtlas = new TextureAtlas(theAtlasDefinitionFile);
             _atlases[theAtlasDefinitionFile] = {};
             myAtlasInfo = _atlases[theAtlasDefinitionFile];
             myAtlasInfo.atlas = myNewTextureAtlas;
-            myAtlasInfo.material = Modelling.
-                                   createUnlitTexturedMaterial((theScene?theScene:window.scene),
-                                                               myAtlasInfo.atlas.imagePath,
-                                                               theAtlasDefinitionFile + "_atlasMaterial",
-                                                               (theTransparencyFlag!==undefined)?theTransparencyFlag:true);
+            var myScene = (theScene?theScene:window.scene);
+            if (theMaterial) {
+                myAtlasInfo.material = theMaterial;
+                var myImg = Modelling.createImage(myScene, myAtlasInfo.atlas.imagePath); 
+                var myTexture = Modelling.createTexture(myScene, myImg);
+                var myTextureUnit;
+                if (theMaterial.childNode("textureunits").childNodesLength() > 0) {
+                    myTextureUnit = myAtlasInfo.material.childNode("textureunits").childNodes[0];
+                    myTextureUnit.texture = myTexture.id;
+                } else {
+                    Logger.warning("material should have one texture unit");
+                }
+            } else {
+                myAtlasInfo.material = Modelling.
+                                       createUnlitTexturedMaterial(myScene,
+                                                                   myAtlasInfo.atlas.imagePath,
+                                                                   theAtlasDefinitionFile + "_atlasMaterial",
+                                                                   true);
+            }
         }
         return _atlases[theAtlasDefinitionFile];
     };
