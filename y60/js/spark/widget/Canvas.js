@@ -48,7 +48,7 @@ spark.Canvas.Constructor = function (Protected) {
     /////////////////////
     
     function onKey(theEvent) {
-        var myState = (theEvent.type === "keybord-key-down");
+        var myState = (theEvent.type === spark.KeyboardEvent.KEY_DOWN);
         var myShiftFlag = (theEvent.modifiers === spark.Keyboard.SHIFT) ||
                           (theEvent.modifiers === spark.Keyboard.ALT_SHIFT) ||
                           (theEvent.modifiers === spark.Keyboard.CTRL_SHIFT) ||
@@ -59,9 +59,8 @@ spark.Canvas.Constructor = function (Protected) {
                         (theEvent.modifiers === spark.Keyboard.CTRL_ALT_SHIFT);
         // this works because keyboard modifiers are manipulated bitwise
         var myCtrlFlag = (theEvent.modifiers >= spark.Keyboard.CTRL);
-        
         if (Public.getLightManager()) {
-            Public.getLightManager().onKey(theEvent.key, myState, myShiftFlag);
+            Public.getLightManager().onKey(theEvent.key, myState, myShiftFlag, myCtrlFlag, myAltFlag);
         }
         var myMover = Public.getMover(_myViewport);
         if (myMover) {
