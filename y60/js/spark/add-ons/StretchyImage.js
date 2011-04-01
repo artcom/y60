@@ -133,6 +133,12 @@ spark.StretchyImage.Constructor = function (Protected) {
             Base.heightSetter(theHeight);
             _myShapeStretcher.updateGeometry(new Vector2f(Public.width, theHeight), false, Public.origin);
         });
+        
+        Base.originSetter = Public.__lookupSetter__("origin");
+        Public.__defineSetter__("origin", function (theOrigin) {
+            Base.originSetter(theOrigin);
+            _myShapeStretcher.updateGeometry(Public.size, false, theOrigin);
+        });
 
         _myShapeStretcher.initialize(Public.node);
         _reset();
