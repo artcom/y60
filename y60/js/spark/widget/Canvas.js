@@ -1,4 +1,4 @@
-/*jslint nomen: false, plusplus: false, bitwise: false*/
+/*jslint nomen: false, plusplus: false, bitwise: false, forin: true*/
 /*globals use, spark, OffscreenRenderArea, Modelling, window, Node, Vector3f,
           BaseViewer, LightManager, product, Matrix4f, Point3f, Logger,
           fileExists, getDirectoryPart, print, adjustNodeId, Renderer,
