@@ -176,11 +176,11 @@ spark.I18nItem.Constructor = function (Protected) {
             theLanguage = _myLanguage;
         }
         if (!(theLanguage in _myLanguageData)) {
-            Logger.debug("I18n item " + Public.name + " does not contain language " + theLanguage);
+            Logger.debug("I18n item '" + Public.name + "' does not contain language '" + theLanguage + "'");
             if (Public.parent.defaultLanguage in _myLanguageData) {
                 return _myLanguageData[Public.parent.defaultLanguage];
             } else {
-                Logger.warning("I18n item " + Public.name + " does not contain defaultlanguage " + Public.parent.defaultLanguage);
+                Logger.warning("I18n item '" + Public.name + "' does not contain defaultlanguage '" + Public.parent.defaultLanguage + "'");
                 return null;
             }
         } else {
@@ -197,11 +197,11 @@ spark.I18nItem.Constructor = function (Protected) {
             theLanguage = _myLanguage;
         }
         if(!(theLanguage in _myLanguageNodes)) {
-            Logger.debug("I18n item " + Public.name + " does not contain language " + theLanguage);
+            Logger.info("I18n item '" + Public.name + "' does not contain language '" + theLanguage + "'");
             if (Public.parent.defaultLanguage in _myLanguageNodes) {
                 return _myLanguageNodes[Public.parent.defaultLanguage];
             } else {
-                Logger.warning("I18n item " + Public.name + " does not contain defaultlanguage " + Public.parent.defaultLanguage);
+                Logger.warning("I18n item '" + Public.name + "' does not contain defaultlanguage '" + Public.parent.defaultLanguage + "'");
                 return null;
             }
         } else {
