@@ -99,13 +99,15 @@ spark.getCachedTexture = function (thePath) {
 
 spark.ourMovieCounter = 0;
 
-spark.openMovie = function (thePath, theTargetPixelFormat, theDecoderHint, theAudioFlag, theStartFrame) {
+spark.openMovie = function (thePath, theTargetPixelFormat, theDecoderHint, theAudioFlag, theStartFrame, theCacheSize) {
     var myMovie = Node.createElement("movie");
     window.scene.images.appendChild(myMovie);
 
     myMovie.name = "spark-movie-" + spark.ourMovieCounter++;
     myMovie.resize = "none";
-    myMovie.maxcachesize = "8";
+    if (theCacheSize !== undefined) {
+        myMovie.maxcachesize = theCacheSize;
+    }
     myMovie.loopcount = "1";
     myMovie.audio = (theAudioFlag) ? "1" : (theAudioFlag === undefined) ? "1" : "0";
     myMovie.targetpixelformat = theTargetPixelFormat || "RGB";
@@ -114,6 +116,8 @@ spark.openMovie = function (thePath, theTargetPixelFormat, theDecoderHint, theAu
     }
     myMovie.src = thePath;
     
-    myMovie.currentframe = theStartFrame;
+    if (theStartFrame !== undefined) {
+        myMovie.currentframe = theStartFrame;
+    }
     return myMovie;
 };

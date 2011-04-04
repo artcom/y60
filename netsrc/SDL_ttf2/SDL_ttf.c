@@ -144,6 +144,8 @@ static int TTF_current_line_minx = 0;
 
 /* Font tracking [ART+COM Patch] */
 static float TTF_tracking = 0.0f;
+static float*  TTF_glyph_xpositions = 0;
+static int  TTF_glyph_xpositions_count = 0;
 
 /* Gets the top row of the underline. The outline
    is taken into account.
@@ -328,6 +330,13 @@ int SDLCALL TTF_CurrentLineMinX() {
 
 void TTF_SetTracking(float theTracking) {
 	TTF_tracking = theTracking/1000.0f;
+}
+
+float* TTF_getCurrentGlyphXPositions() {
+    return TTF_glyph_xpositions;
+}
+int TTF_getCurrentGlyphXPositionsCount() {
+    return TTF_glyph_xpositions_count;
 }
 
 static void TTF_SetFTError(const char *msg, FT_Error error)
@@ -1915,6 +1924,8 @@ SDL_Surface *TTF_RenderUNICODE_Blended(TTF_Font *font,
 	FT_Long use_kerning;
 	FT_UInt prev_index = 0;
     int myXPPem = 1;
+    int myCharNum=0;
+
 	/* Get the dimensions of the text surface */
 	if ( (TTF_SizeUNICODE(font, text, &width, &height) < 0) || !width ) {
 		TTF_SetError("Text has zero width");
@@ -1940,6 +1951,13 @@ SDL_Surface *TTF_RenderUNICODE_Blended(TTF_Font *font,
 	swapped = TTF_byteswapped;
 	pixel = (fg.b<<16)|(fg.g<<8)|fg.r;
 	SDL_FillRect(textbuf, NULL, pixel);	/* Initialize with fg and 0 alpha */
+
+    // malloc space for glyph position [ART+COM Patch] start
+	for ( ch=text; *ch; ++ch ) { myCharNum++; }
+    free(TTF_glyph_xpositions);
+    TTF_glyph_xpositions = (float*) malloc(2*myCharNum*sizeof(float));
+    TTF_glyph_xpositions_count = 0;
+    // [ART+COM Patch] end
 
 	for ( ch=text; *ch; ++ch ) {
 		Uint16 c = *ch;
@@ -1987,7 +2005,6 @@ SDL_Surface *TTF_RenderUNICODE_Blended(TTF_Font *font,
 		if ( (ch == text) && (glyph->minx < 0) ) {
 			xstart -= glyph->minx;
 		}
-
 		for ( row = 0; row < glyph->pixmap.rows; ++row ) {
 			/* Make sure we don't go either over, or under the
 			 * limit */
@@ -2017,6 +2034,11 @@ SDL_Surface *TTF_RenderUNICODE_Blended(TTF_Font *font,
 				*dst++ |= pixel | (alpha << 24);
 			}
 		}
+        // [ART+COM Patch] start
+        // store xpos of current glyph
+        TTF_glyph_xpositions[TTF_glyph_xpositions_count++] = xstart;
+        TTF_glyph_xpositions[TTF_glyph_xpositions_count++] = xstart + width + 2;
+        //  [ART+COM Patch] end
 
 		xstart += glyph->advance;
 		if ( TTF_HANDLE_STYLE_BOLD(font) ) {

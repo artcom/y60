@@ -130,6 +130,11 @@ Y60_MODELLING_DECL dom::NodePtr createColorMaterial(y60::ScenePtr theScene,
                                  const std::string & theName = "Color",
                                  bool theTransparencyFlag = false);
 
+Y60_MODELLING_DECL void ensureShapesQuadCount(dom::NodePtr theShapeNode, 
+                                              const std::vector<asl::Vector3f> & thePositions,
+                                              const std::vector<asl::Vector2f> & theTexCoords,
+                                              asl::Vector4f theColor = asl::Vector4f(1,1,1,1));
+
 Y60_MODELLING_DECL dom::NodePtr createTransform(dom::NodePtr theParentNode,
                              const std::string & theTransformName = "Transform");
 

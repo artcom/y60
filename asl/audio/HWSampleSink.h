@@ -103,6 +103,7 @@ namespace asl {
         virtual void stop(bool theRunUntilEmpty = false);
         virtual void delayedPlay(asl::Time theTimeToStart);
         virtual void setVolume(float theVolume);
+        virtual void setVolumes(const std::vector<float> & theVolumes);        
         virtual void fadeToVolume(float theVolume, float theTime);
         virtual float getVolume() const;
         bool isPlaying() const;
@@ -157,7 +158,7 @@ namespace asl {
         Unsigned64 _myFrameCount;  // This allows for streams lasting about 13 million years
                                    // if I didn't miscalculate :-).
         VolumeFaderPtr _myVolumeFader;
-        float _myVolume;
+        std::vector<float> _myVolume;
         bool _myStopWhenEmpty;
 
         bool _isDelayingPlay;
