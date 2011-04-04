@@ -136,6 +136,10 @@ spark.Movie.Constructor = function(Protected) {
     });
 
     // frames
+    Public.__defineGetter__("fps", function() {
+        return _myMovie.fps;
+    });
+
     Public.__defineGetter__("frameCount", function() {
         return _myMovie.framecount;
     });
