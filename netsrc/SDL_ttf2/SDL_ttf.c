@@ -1925,7 +1925,7 @@ SDL_Surface *TTF_RenderUNICODE_Blended(TTF_Font *font,
 	FT_UInt prev_index = 0;
     int myXPPem = 1;
     int myCharNum=0;
-
+    int realGlyphsXPosition = 0;
 	/* Get the dimensions of the text surface */
 	if ( (TTF_SizeUNICODE(font, text, &width, &height) < 0) || !width ) {
 		TTF_SetError("Text has zero width");
@@ -1957,6 +1957,7 @@ SDL_Surface *TTF_RenderUNICODE_Blended(TTF_Font *font,
     free(TTF_glyph_xpositions);
     TTF_glyph_xpositions = (float*) malloc(2*myCharNum*sizeof(float));
     TTF_glyph_xpositions_count = 0;
+    
     // [ART+COM Patch] end
 
 	for ( ch=text; *ch; ++ch ) {
@@ -2019,6 +2020,7 @@ SDL_Surface *TTF_RenderUNICODE_Blended(TTF_Font *font,
 				(row+glyph->yoffset) * textbuf->pitch/4 +
 				dstOffset;
 
+            realGlyphsXPosition = dstOffset;
 			/* Added code to adjust src pointer for pixmaps to
 			 * account for pitch.
 			 * */
@@ -2037,7 +2039,12 @@ SDL_Surface *TTF_RenderUNICODE_Blended(TTF_Font *font,
         // [ART+COM Patch] start
         // store xpos of current glyph
         TTF_glyph_xpositions[TTF_glyph_xpositions_count++] = xstart;
-        TTF_glyph_xpositions[TTF_glyph_xpositions_count++] = xstart + width + 2;
+		if ( (ch == text) && (glyph->minx < 0) ) {
+            TTF_glyph_xpositions[TTF_glyph_xpositions_count++] = xstart + width + 2 - TTF_current_line_minx;
+        } else {
+            TTF_glyph_xpositions[TTF_glyph_xpositions_count++] = xstart + width + 2;
+        }
+
         //  [ART+COM Patch] end
 
 		xstart += glyph->advance;
