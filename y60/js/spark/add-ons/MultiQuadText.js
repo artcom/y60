@@ -16,9 +16,10 @@ spark.MultiQuadText.Constructor = function (Protected) {
         
         var myCharCount = myGlyphInfo.length/2;
         for (var i = 0 ; i < myCharCount; i++) {
+            
             var myGlyph_start = myGlyphInfo[(i*2)];
             var myGlyph_end = myGlyphInfo[(i*2)+1];
-
+            //print(Public.text[i] + "-> " + myGlyph_start[0] + " - " + myGlyph_end[0]);
             // set new vertex positions
             var myX1 = myGlyph_start[0];
             var myY1 = myGlyph_start[1];
@@ -42,6 +43,10 @@ spark.MultiQuadText.Constructor = function (Protected) {
             myTexCoords.push(new Vector2f(myX1, myY1));
                                                 
         }
+        /*if (Public.text[0] =="R") {
+            //saveImage(Protected.image, "canvas.png");
+            exit(1);
+        }*/
         Modelling.EnsureShapesQuadCount(Protected.shape, myPositions, myTexCoords);
     }
     
