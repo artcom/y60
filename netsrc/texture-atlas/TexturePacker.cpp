@@ -3,7 +3,6 @@
 #include <cmath>
 #include <algorithm>
 
-#pragma warning(disable:4100 4244)
 
 namespace TEXTURE_PACKER
 {
