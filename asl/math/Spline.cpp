@@ -227,7 +227,7 @@ namespace asl {
         yl	= _y[0];
         yr	= _y[1];
         dy_o= _dy_dx_left [1];
-        _dy_dx_left [     0] = -( dy_o * h - 3.0f * (yl-yr) ) / ( 2.0f * h );
+        _dy_dx_left [     0] = ( dy_o * h - 3.0f * (yl-yr) ) / ( 2.0f * h );
         h	= _x[_dim-1] -_x[_dim-2];
         yl	= _y[_dim-2];
         yr	= _y[_dim-1];
