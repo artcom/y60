@@ -44,8 +44,13 @@ spark.YUV2RGBShader.Constructor = function (Protected) {
     ////////////////////
     
     Public.realize = function () {
-        Public.movie = spark.openMovie(Public.src, "YUV420", 
-                Protected.getString("decoderhint", undefined), Protected.getBoolean("audio", true), Public.startFrame, Public.cachesize);
+        if (Public.useCaching) {
+            Public.movie = spark.getCachedMovie(Public.src, "YUV420", _Protected.getString("decoderhint", undefined), Protected.getBoolean("audio", true), Public.startFrame, Public.cachesize);
+        } else {                
+            Public.movie = spark.openMovie(Public.src, "YUV420", 
+                    Protected.getString("decoderhint", undefined), Protected.getBoolean("audio", true), Public.startFrame, Public.cachesize);
+        }
+        
         Base.movieSetter = Public.__lookupSetter__("movie");
         Public.__defineSetter__("movie", function (theNode) {
             Base.movieSetter(theNode);
@@ -63,12 +68,22 @@ spark.YUV2RGBShader.Constructor = function (Protected) {
         Public.__defineSetter__("src", function (theSrc) {
             _mySource = theSrc;
             if (Protected.getBoolean("setSourceWithoutChangingImageNode", false)) {
-                Public.movie.src = theSrc;
+                var myName = "spark-cached-movie-" + theSrc;
+                var myCachedMovie = spark.getNode(myName);
+                if (myCachedMovie) {
+                     Public.movie = myCachedMovie;
+                } else {                
+                    Public.movie.src = theSrc;
+                }
                 Public.currentFrame = Public.startFrame;
                 Public.onMovieChanged();
-            } else {
-                Public.movie = spark.openMovie(theSrc, "YUV420",
-                    Protected.getString("decoderhint", undefined), Protected.getBoolean("audio", true), Public.startFrame, Public.cachesize);
+            } else {                
+                if (Public.useCaching) {
+                    Public.movie = spark.getCachedMovie(theSrc, "YUV420", _Protected.getString("decoderhint", undefined), Protected.getBoolean("audio", true), Public.startFrame, Public.cachesize);
+                } else {                                
+                    Public.movie = spark.openMovie(theSrc, "YUV420",
+                        Protected.getString("decoderhint", undefined), Protected.getBoolean("audio", true), Public.startFrame, Public.cachesize);
+                }
             }
         });
         // YUV targetrasterformat allows us to use a shader to convert YUV2RGB, 
