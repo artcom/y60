@@ -98,6 +98,10 @@ spark.Canvas.Constructor = function (Protected) {
         return _myWorld;
     });
     
+    Public.__defineGetter__("canvas", function () {
+        return _myCanvasNode;
+    });
+    
     Public.__defineGetter__("viewport", function () {
         return _myViewport;
     });

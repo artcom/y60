@@ -211,6 +211,7 @@ spark.Widget.Constructor = function (Protected) {
     Public.addEventListener = function (theType, theListener, theUseCapture) {
         if (!("Stage" in Public._classes_)) {
             switch (theType) {
+            case spark.StageEvent.PROTO_FRAME:
             case spark.StageEvent.FRAME:
             case spark.StageEvent.PRE_RENDER:
             case spark.StageEvent.POST_RENDER:
@@ -240,6 +241,7 @@ spark.Widget.Constructor = function (Protected) {
     Base.removeEventListener = Public.removeEventListener;
     Public.removeEventListener = function (theType, theListener, theUseCapture) {
         switch (theType) {
+        case spark.StageEvent.PROTO_FRAME:
         case spark.StageEvent.FRAME:
         case spark.StageEvent.PRE_RENDER:
         case spark.StageEvent.POST_RENDER:
