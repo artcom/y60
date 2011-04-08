@@ -81,7 +81,7 @@ spark.StretchyAtlasImage.Constructor = function (Protected) {
         _myShapeStretcher.edges.bottom = theEdges[1];
         _myShapeStretcher.edges.right  = theEdges[2];
         _myShapeStretcher.edges.top    = theEdges[3];
-        _myShapeStretcher.updateGeometry(Public.size, false, Public.origin);
+        _reset();
     });
     
     Public.__defineGetter__("crop", function () {
@@ -135,9 +135,6 @@ spark.StretchyAtlasImage.Constructor = function (Protected) {
     Base.setTexture = Public.setTexture;
     Public.setTexture = function (theTextureName, theAtlasPath) {
         Base.setTexture(theTextureName, theAtlasPath);
-        /*_myShapeStretcher.setupGeometry(Protected.originalImageSize, Public.origin);
-        Protected.storeOriginalUVCoords();
-        Protected.applyAtlasTextureInformation();*/
         _reset();
     };
 };
