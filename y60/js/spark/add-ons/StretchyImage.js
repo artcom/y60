@@ -51,7 +51,7 @@ spark.StretchyImage.Constructor = function (Protected) {
         });
     }
     
-    function _reset() {
+    function _resetShapeStretcher() {
         _myShapeStretcher.setupGeometry(_myImageSize, Public.origin);
         _myShapeStretcher.updateGeometry(Public.size, false, Public.origin);
     }
@@ -140,8 +140,8 @@ spark.StretchyImage.Constructor = function (Protected) {
             _myShapeStretcher.updateGeometry(Public.size, false, theOrigin);
         });
 
-        _myShapeStretcher.initialize(Public.node);
-        _reset();
+        _myShapeStretcher.initialize(Public.node?Public.node:new Node("<StretchyImage/>"));
+        _resetShapeStretcher();
     };
     
     Base.postRealize = Public.postRealize;
