@@ -81,6 +81,17 @@ spark.getCachedImage = function (thePath) {
     }
     return myImage;
 };
+spark.getCachedMovie = function (thePath, theTargetPixelFormat, theDecoderHint, theAudioFlag, theStartFrame, theCacheSize) {
+    var myName = "spark-cached-movie-" + thePath;
+    var myMovie = spark.getNode(myName);
+
+    if (!myMovie) {
+        myMovie = spark.openMovie(thePath, theTargetPixelFormat, theDecoderHint, theAudioFlag, theStartFrame, theCacheSize);
+        myMovie.name = myName;
+        spark.registerNode(myName, myMovie);
+    }
+    return myMovie;
+};
 
 spark.getCachedTexture = function (thePath) {
     var myName = "spark-cached-texture-" + thePath;
