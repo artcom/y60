@@ -28,7 +28,9 @@ spark.StretchyAtlasImage.Constructor = function (Protected) {
 
         Public.__defineSetter__(theAcessorName, function (theValue) {
             _myShapeStretcher.edges[theEdgeName] = theValue;
-            _myShapeStretcher.updateGeometry(Public.size, false, Public.origin);
+            _myShapeStretcher.setupGeometry(Protected.originalImageSize, Public.origin);
+            Protected.storeOriginalUVCoords();
+            Protected.applyAtlasTextureInformation();
         });
     }
     
@@ -44,6 +46,9 @@ spark.StretchyAtlasImage.Constructor = function (Protected) {
     }
     
     function _reset() {
+        if (!_myShapeStretcher) {
+            return;
+        }
         _myShapeStretcher.setupGeometry(Protected.originalImageSize, Public.origin);
         Protected.storeOriginalUVCoords();
         Protected.applyAtlasTextureInformation();
@@ -123,7 +128,7 @@ spark.StretchyAtlasImage.Constructor = function (Protected) {
             _myShapeStretcher.updateGeometry(new Vector2f(Public.width, theHeight), false, Public.origin);
         });
 
-        _myShapeStretcher.initialize(Public.node);
+        _myShapeStretcher.initialize(Public.node?Public.node:new Node("<StretchyAtlasImage/>"));
         _reset();
     };
     
