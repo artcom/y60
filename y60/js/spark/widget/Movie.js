@@ -19,7 +19,7 @@ spark.Movie.Constructor = function(Protected) {
     var _mySource     = null;
     var _mySourceId   = null;
     var _mySourceItem = null;
-
+    var _myCacheSize  = null;
     var _myMovie             = null;
     var _myTexture           = null;
     var _myStartFrame        = 0; //movie should start at this frame after setting src
@@ -68,6 +68,7 @@ spark.Movie.Constructor = function(Protected) {
         Public.volume = Protected.getNumber("volume", 1.0);
         Public.width = Protected.getNumber("width", Public.width);
         Public.height = Protected.getNumber("height", Public.height);
+        _myCacheSize = Protected.getNumber("cachesize", 8);
     }
 
     ////////////////////
@@ -83,7 +84,7 @@ spark.Movie.Constructor = function(Protected) {
             theNode.targetpixelformat = "YUV420";
             Base.realizeResizableRectangle = Public.realize;
             use("YUV2RGBShader.js");
-            this.Inherit(spark.YUV2RGBShader);
+            Public.Inherit(spark.YUV2RGBShader);
             Base.realizeYUV2RGBShader = Public.realize;
             Public.realize = Base.realizeResizableRectangle;
         }
@@ -110,6 +111,9 @@ spark.Movie.Constructor = function(Protected) {
         }
     };
 
+    Public.__defineGetter__("cachesize", function () {
+        return _myCacheSize;
+    });
     Public.__defineGetter__("mode", function () {
         return _myMovie.playmode;
     });
@@ -132,6 +136,10 @@ spark.Movie.Constructor = function(Protected) {
     });
 
     // frames
+    Public.__defineGetter__("fps", function() {
+        return _myMovie.fps;
+    });
+
     Public.__defineGetter__("frameCount", function() {
         return _myMovie.framecount;
     });
@@ -163,7 +171,10 @@ spark.Movie.Constructor = function(Protected) {
         return _myMovie.volume;
     });
     Public.__defineSetter__("volume", function(theVolume) {
-        _myMovie.volume = theVolume;
+        _myMovie.volume = new Vector2f(theVolume, theVolume);
+    });
+    Public.__defineSetter__("volumes", function(theVolumes) {
+        _myMovie.volume = new Vector2f(theVolumes[0], theVolumes[1]);
     });
 
     Public.__defineGetter__("hasAudio", function() {
@@ -196,14 +207,14 @@ spark.Movie.Constructor = function(Protected) {
             _mySource = theSourceFile;
             if (_mySetSourceWithoutChangingImageNode) {
                 if (_myMovie.nodeName === "image") {
-                    Public.movie = spark.openMovie(theSourceFile, _myTargetPixelFormat, _myDecoderHint, Protected.getBoolean("audio", true), _myStartFrame);
+                    Public.movie = spark.openMovie(theSourceFile, _myTargetPixelFormat, _myDecoderHint, Protected.getBoolean("audio", true), _myStartFrame,_myCacheSize);
                 } else {
                     _myMovie.src = theSourceFile;
                     _myMovie.currentframe = _myStartFrame;
                     Public.onMovieChanged();
                 }
             } else {
-                Public.movie = spark.openMovie(theSourceFile, _myTargetPixelFormat, _myDecoderHint, Protected.getBoolean("audio", true), _myStartFrame);
+                Public.movie = spark.openMovie(theSourceFile, _myTargetPixelFormat, _myDecoderHint, Protected.getBoolean("audio", true), _myStartFrame, _myCacheSize);
             }
         } else {
             if(_myMovie.playmode !== "stop") {
@@ -235,6 +246,7 @@ spark.Movie.Constructor = function(Protected) {
     Public.realize = function() {
         var myMovieSource = Protected.getString("src", "");
         var myMovieSourceId = Protected.getString("srcId", "");
+        _myCacheSize = Protected.getNumber("cachesize", 8);        
         _myDecoderHint = Protected.getString("decoderhint", undefined);
         _myTargetPixelFormat = Protected.getString("targetpixelformat", "RGB");
         _mySetSourceWithoutChangingImageNode = Protected.getBoolean("setSourceWithoutChangingImageNode",false);
@@ -248,7 +260,7 @@ spark.Movie.Constructor = function(Protected) {
                 _mySourceId = myMovieSourceId;
             }
         } else {
-            _myMovie = spark.openMovie(myMovieSource, _myTargetPixelFormat, _myDecoderHint, Protected.getBoolean("audio", true), _myStartFrame);
+            _myMovie = spark.openMovie(myMovieSource, _myTargetPixelFormat, _myDecoderHint, Protected.getBoolean("audio", true), _myStartFrame, _myCacheSize);
             _mySource = myMovieSource;
         }
 

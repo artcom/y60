@@ -3136,9 +3136,9 @@ Possible values are:
 'stop'     - Stopped. Play will start at beginnig of the movie, black frame is shown</xs:documentation>
                         </xs:annotation>
                     </xs:attribute>
-                    <xs:attribute name="volume" type="xs:float">
+                    <xs:attribute name="volume" type="Vector2f">
                         <xs:annotation>
-                            <xs:documentation>Volume of audio-playback. Default is 1.0</xs:documentation>
+                            <xs:documentation>Volume of audio-playback. Default is [1.0, 1.0]</xs:documentation>
                         </xs:annotation>
                     </xs:attribute>
                     <xs:attribute name="aspectratio" type="xs:float">

@@ -87,6 +87,45 @@ namespace jslib {
 template class JSWrapper<DummyT,asl::Ptr<DummyT>, StaticAccessProtocol>;
 
 JS_STATIC_DLL_CALLBACK(JSBool)
+EnsureShapesQuadCount(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) {
+    try {
+        DOC_BEGIN("Ensure that a shape a given amount of elements");
+        DOC_PARAM("theShapeNode", "A shapenode", DOC_TYPE_NODE);
+        DOC_PARAM("thePosition", "Array of positions", DOC_TYPE_VECTOROFVECTOR3F);
+        DOC_PARAM_OPT("theTexCoords", "Array of texcoords", DOC_TYPE_VECTOROFVECTOR2F,"");
+        DOC_PARAM_OPT("theColor", "vertex color", DOC_TYPE_VECTOR4F, "");
+        DOC_END;
+
+        ensureParamCount(argc, 3,4);
+
+        dom::NodePtr  myShapeNode;
+        if (!convertFrom(cx, argv[0], myShapeNode)) {
+            JS_ReportError(cx,"EnsureShapesElementsCount: argument 1 is not a node");
+            return JS_FALSE;
+        }
+
+        std::vector<asl::Vector3f> myPositions;
+        convertFrom(cx, argv[1], myPositions);
+
+        std::vector<asl::Vector2f> myTexCoords;
+        if (argc > 2) {
+            convertFrom(cx, argv[2], myTexCoords);
+        }
+
+        asl::Vector4f myColor(1,1,1,1);
+        if (argc > 3) {
+            convertFrom(cx, argv[3], myColor);
+        }
+
+        int myElementCount;
+        convertFrom(cx, argv[1], myElementCount );
+        ensureShapesQuadCount(myShapeNode, myPositions, myTexCoords, myColor);
+        return JS_TRUE;
+
+    } HANDLE_CPP_EXCEPTION;
+}
+
+JS_STATIC_DLL_CALLBACK(JSBool)
 CreateTransform(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) {
     try {
         DOC_BEGIN("Creates a new transform node and adds it to a given parent");
@@ -1348,6 +1387,7 @@ JSModellingFunctions::StaticFunctions() {
         {"createPhongMaterial",         CreatePhongMaterial,         5},
         {"createVoxelProxyGeometry",    CreateVoxelProxyGeometry,    7},
         {"setAlpha",                    SetAlpha,                    2},
+        {"EnsureShapesQuadCount",       EnsureShapesQuadCount,       2},        
         {0}
     };
     return myFunctions;

@@ -297,12 +297,12 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
         if (_myTextOverlay.visible) {
             window.setTextColor([1,1,1,1]);
             var myText  = getDisplayText();
-            var myWidth = 400;
+            var myWidth = 0;
             for (var i = 0; i < myText.length; ++i) {
                 window.renderText([30, (40 + i * 20)], myText[i], "Screen15");
                 myWidth = Math.max(myWidth, myText[i].length * 10);
             }
-            //_myTextOverlay.width  = myWidth;
+            _myTextOverlay.width  = myWidth;
             _myTextOverlay.height = myText.length * 20 + 35;
         }
     }
@@ -522,12 +522,17 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
     function setVolume(theIncreaseFlag) {
         if (_myMovieNode && _myMovieOverlay.visible) {
             if (theIncreaseFlag) {
-                _myMovieNode.volume *= 1.1;
-                if (_myMovieNode.volume > 1) {
-                    _myMovieNode.volume = 1;
+                _myMovieNode.volume[0] *= 1.1;
+                _myMovieNode.volume[1] *= 1.1;
+                if (_myMovieNode.volume[0] > 1) {
+                    _myMovieNode.volume[0] = 1;
+                }
+                if (_myMovieNode.volume[1] > 1) {
+                    _myMovieNode.volume[1] = 1;
                 }
             } else {
-                _myMovieNode.volume *= 0.9;
+                _myMovieNode.volume[0] *= 0.9;
+                _myMovieNode.volume[1] *= 0.9;
             }
         } else if (_myCurrentMediaType == AUDIO_MEDIA) {
             if (theIncreaseFlag) {
@@ -601,7 +606,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
                 myString += "Framerate:     " + myNode.fps.toPrecision(5) +"\n";
                 myString += "Playmode:      " + myNode.playmode +"\n";
                 myString += "Playspeed:     " + myNode.playspeed.toPrecision(5) +"\n";
-                myString += "Volume:        " + myNode.volume.toFixed(2) +"\n";
+                myString += "Volume:        " + myNode.volume +"\n";
                 myString += "cachesize:     " + myNode.cachesize +"\n";
                 myString += "avdelay:       " + myNode.avdelay.toPrecision(3) + "\n";
                 myString += "Total frames:  " + _myFrameCounter + "\n";
@@ -671,7 +676,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
 
         _myMovieNode.src = theFilename;
         _myMovieNode.playmode = "play";
-        _myMovieNode.volume = 1.0;
+        _myMovieNode.volume = [1.0, 1.0];
         if (theEnsureFrameCount) {
             window.scene.ensureMovieFramecount(_myMovieNode);
         }

@@ -61,6 +61,8 @@
 #include <cstring>
 #include <asl/base/Logger.h>
 
+#define DB(x) //x
+
 using namespace std;
 
 namespace y60 {
@@ -82,27 +84,26 @@ void Demux::enableStream(const int theStreamIndex)
 
 AVPacket * Demux::getPacket(const int theStreamIndex)
 {
-    AC_TRACE << "Demux::getPacket";
+    DB(AC_TRACE << "Demux::getPacket for stream: " << theStreamIndex);
     if (_myPacketLists.find(theStreamIndex) == _myPacketLists.end()) {
         AC_ERROR << "Demux::getPacket called with nonexistent stream index "
             << theStreamIndex << ".";
     }
     PacketList & myCurPacketList = _myPacketLists.find(theStreamIndex)->second;
     if (!myCurPacketList.empty()) {
-        AC_TRACE << "Demux::getPacket: packet already there.";
+        DB(AC_TRACE << "Demux::getPacket: packet already there.");
         AVPacket * myPacket = myCurPacketList.front();
         myCurPacketList.pop_front();
         return myPacket;
     } else {
-        AC_TRACE << "Demux::getPacket: packet needs to be read.";
+        DB(AC_TRACE << "Demux::getPacket: packet needs to be read.");
         AVPacket * myPacket;
-        bool myEndOfFileFlag;
         do {
-            AC_TRACE << "Demux::getPacket: read.";
+            DB(AC_TRACE << "Demux::getPacket: read.");
             myPacket = new AVPacket;
             memset(myPacket, 0, sizeof(AVPacket));
 
-            myEndOfFileFlag = (av_read_frame(_myFormatContext, myPacket) < 0);
+            bool myEndOfFileFlag = (av_read_frame(_myFormatContext, myPacket) < 0);
             if (myEndOfFileFlag) {
                 AC_DEBUG << "Demux::getPacket: end of file.";
                 av_free_packet(myPacket);
@@ -112,7 +113,7 @@ AVPacket * Demux::getPacket(const int theStreamIndex)
             }
             if (myPacket->stream_index != theStreamIndex) {
                 if (_myPacketLists.find(myPacket->stream_index) != _myPacketLists.end()) {
-                    AC_TRACE << "Demux::getPacket: caching packet.";
+                    DB(AC_TRACE << "Demux::getPacket: caching packet.");
                     // Without av_dup_packet, ffmpeg reuses myPacket->data at first
                     // opportunity and trashes our memory.
                     av_dup_packet(myPacket);
@@ -120,14 +121,14 @@ AVPacket * Demux::getPacket(const int theStreamIndex)
                             _myPacketLists.find(myPacket->stream_index)->second;
                     myOtherPacketList.push_back(myPacket);
                 } else {
-                    AC_TRACE << "Demux::getPacket: rejecting packet.";
+                    DB(AC_DEBUG << "Demux::getPacket: rejecting packet.");
                     av_free_packet(myPacket);
                     delete myPacket;
                     myPacket = 0;
                 }
             }
         } while (!myPacket || myPacket->stream_index != theStreamIndex);
-        AC_TRACE << "Demux::getPacket: end.";
+        DB(AC_TRACE << "Demux::getPacket: end.");
         return myPacket;
     }
 }

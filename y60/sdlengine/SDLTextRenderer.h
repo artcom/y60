@@ -132,6 +132,7 @@ namespace y60 {
                 bool          newline;
                 double        kerning;
                 int           minx;
+                std::vector<float> sdl_x_position;
                 private:
                 Word() {}
             };

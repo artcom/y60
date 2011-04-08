@@ -390,7 +390,7 @@ spark.renderText = function(theImage, theText, theStyle, theSize, theMaxTextWidt
                                  theText,
                                  myFont,
                                  mySize.x*spark.fontScale, mySize.y*spark.fontScale);
-                                 
+    var myGlyphPosition = window.getTextGlyphPositions();  
     //XXX: if the image width is odd and fontscale is >1 the imagefilter can result in bad looking text
     myTextSize = new Vector2f(Math.ceil(myTextSize[0]/spark.fontScale), Math.ceil(myTextSize[1]/spark.fontScale));
     applyImageFilter(theImage, "resizehamming", [myTextSize.x, myTextSize.y, 1]);
@@ -414,5 +414,5 @@ spark.renderText = function(theImage, theText, theStyle, theSize, theMaxTextWidt
     window.setHTextAlignment(Renderer.LEFT_ALIGNMENT);
     window.setVTextAlignment(Renderer.TOP_ALIGNMENT);
     window.setTextPadding(0,0,0,0);
-    return myTextSize;
+    return {size:myTextSize, positions:myGlyphPosition};
 };

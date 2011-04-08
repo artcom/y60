@@ -405,12 +405,16 @@ namespace y60 {
             return;
         }
         MovieDecoderBase* myDecoder = const_cast<MovieDecoderBase*>(_myDecoder.get());
-        float myVolume = get<VolumeTag>();
-        myVolume = asl::clamp(myVolume, 0.0f, 1.0f);
-        if (!almostEqual(myVolume, get<VolumeTag>())) {
+        Vector2f myVolume = get<VolumeTag>();
+        myVolume[0] = asl::clamp(myVolume[0], 0.0f, 1.0f);
+        myVolume[1] = asl::clamp(myVolume[1], 0.0f, 1.0f);
+        if (!almostEqual(myVolume[0], get<VolumeTag>()[0]) || !almostEqual(myVolume[1], get<VolumeTag>()[1])) {
             set<VolumeTag>(myVolume);
         }
-        myDecoder->setVolume(myVolume);
+        std::vector<float> myVolumesVec;
+        myVolumesVec.push_back(myVolume[0]);
+        myVolumesVec.push_back(myVolume[1]);
+        myDecoder->setVolumes(myVolumesVec);
     }
 
     // callback for 'src' attribute

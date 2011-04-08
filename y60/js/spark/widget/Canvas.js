@@ -1,4 +1,4 @@
-/*jslint nomen: false, plusplus: false, bitwise: false*/
+/*jslint nomen: false, plusplus: false, bitwise: false, forin: true*/
 /*globals use, spark, OffscreenRenderArea, Modelling, window, Node, Vector3f,
           BaseViewer, LightManager, product, Matrix4f, Point3f, Logger,
           fileExists, getDirectoryPart, print, adjustNodeId, Renderer,
@@ -48,7 +48,7 @@ spark.Canvas.Constructor = function (Protected) {
     /////////////////////
     
     function onKey(theEvent) {
-        var myState = (theEvent.type === "keybord-key-down");
+        var myState = (theEvent.type === spark.KeyboardEvent.KEY_DOWN);
         var myShiftFlag = (theEvent.modifiers === spark.Keyboard.SHIFT) ||
                           (theEvent.modifiers === spark.Keyboard.ALT_SHIFT) ||
                           (theEvent.modifiers === spark.Keyboard.CTRL_SHIFT) ||
@@ -59,9 +59,8 @@ spark.Canvas.Constructor = function (Protected) {
                         (theEvent.modifiers === spark.Keyboard.CTRL_ALT_SHIFT);
         // this works because keyboard modifiers are manipulated bitwise
         var myCtrlFlag = (theEvent.modifiers >= spark.Keyboard.CTRL);
-        
         if (Public.getLightManager()) {
-            Public.getLightManager().onKey(theEvent.key, myState, myShiftFlag);
+            Public.getLightManager().onKey(theEvent.key, myState, myShiftFlag, myCtrlFlag, myAltFlag);
         }
         var myMover = Public.getMover(_myViewport);
         if (myMover) {
@@ -182,6 +181,8 @@ spark.Canvas.Constructor = function (Protected) {
             transformMatrix.invert();
             intersecPointOnCanvas = product(myIntersectionInfo.intersections[0].position,
                                             transformMatrix);
+            //due to sweeping sphere intersection in spark.Window.. values outside of canvas can result in coordinates of -1, Public.width + 1  etc. 
+            intersecPointOnCanvas.x = clamp(intersecPointOnCanvas.x, 0, Public.width-1);
             intersecPointOnCanvas.y = clamp(Public.height - intersecPointOnCanvas.y, 0, Public.height-1);
         }
         return intersecPointOnCanvas;
@@ -434,8 +435,8 @@ spark.Canvas.prepareMerge = function prepareMerge(theSceneFilePath) {
         if (myTexSrcPath.charAt(0) !== "/") {
             var myTexSrcPaths = myTexSrcPath.split("|");
             for (var j = 0; j < myTexSrcPaths.length; j++) {
-                if (myTexSrcPaths[j].indexOf(".") === 0) {
-                    myTexSrcPaths[j] = myTexSrcPaths[j].replace(/^\.\//, myTargetDir + "");
+                if (myTexSrcPaths[j].indexOf("./") === 0) {
+                    myTexSrcPaths[j] = myTexSrcPaths[j].replace(/^\.\//, myTargetDir);
                 } else {
                     myTexSrcPaths[j] = myTargetDir + myTexSrcPaths[j]; 
                 }

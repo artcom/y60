@@ -101,6 +101,10 @@ namespace y60 {
             const std::vector<unsigned int> & getLineWidths() const {
                 return _myLineWidths;
             }
+            const std::vector<asl::Vector2f> & getGlyphPositions() const {
+                return _myGlyphPosition;
+            }
+
             void setColor(const asl::Vector4f & theTextColor);
             const asl::Vector4f & getColor();
             void setPadding(int theTop, int theBottom, int theLeft, int theRight);
@@ -139,6 +143,7 @@ namespace y60 {
             asl::Vector2i _myCursorPos;
             unsigned             _myMaxWidth;
             std::vector<unsigned> _myLineWidths;
+            std::vector<asl::Vector2f> _myGlyphPosition;
         private:
             unsigned int  _myWindowWidth;
             unsigned int  _myWindowHeight;

@@ -67,8 +67,6 @@ namespace asl {
         dvector    s;    //  dvector is defined in "Spline.h":
         dvector    sPlanet;  //
         dvector    speed;    //  typedef vector<float> dvector
-        dvector    weight;    //
-        dvector    weight_reverse;  //
         vector< dvector >  value;    //
         vector<QuaternionKeyframe>::const_iterator  it;
         typedef std::vector<asl::Quaternionf> VectorOfQuaternionf;
@@ -115,35 +113,18 @@ namespace asl {
 
         quaternionSpline = new QuaternionSpline(keyFrameOrientations, time);
 
-        // CALCULATE VALUES FOR weight
-        weight = weight_reverse = time;
-        dvector::size_type iLast = time.size() -1;
-        for ( dvector::size_type i=1; i<iLast; i++ ) {
-            asl::Vector3f last_xyz    = asl::Vector3f ( value[0] [i-1], value[1] [i-1], value[2] [i-1] );
-            asl::Vector3f this_xyz    = asl::Vector3f ( value[0] [i  ], value[1] [i  ], value[2] [i  ] );
-            asl::Vector3f next_xyz    = asl::Vector3f ( value[0] [i+1], value[1] [i+1], value[2] [i+1] );
-            float dist_left    = magnitude(this_xyz-last_xyz);
-            float dist_right   = magnitude(this_xyz-next_xyz);
-            if (asl::almostEqual(dist_left + dist_right,0 )) {
-                weight[i] = 0.0;
-            } else {
-                weight[i]      = dist_left / (dist_left+dist_right);
-            }
-            weight_reverse[i]   = 1.0f -weight[i];
-        }
-
-
         // INIT SPLINES xyz(s)
         s = time;
         for ( int i=0; i<3; i++ ) {
             AC_TRACE << "initializing spline " << i << endl;
-            if ( ! _spline[i]->init ( s, value[i], weight ) ) {
+            if ( ! _spline[i]->init ( s, value[i], catmull_rom, false ) ) {
                 AC_ERROR << "CoordSpline::init: could not initialise value "<< i <<endl;
                 return false;
             }
         }
 
         // AVOID EARTH COLLISION
+        dvector::size_type iLast = time.size() -1;
         for ( dvector::size_type segment=0; segment<iLast; segment++ ) {
             avoidEarthCollision( segment );
         }

@@ -234,6 +234,10 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
     });
     
     obj.registerHeadlightWithViewport = function(theViewportNode, theLightNode) {
+        // check if viewports camera belongs to our world
+        if (!_myWorld.find(".//camera[@id='" + theViewportNode.camera + "']")) {
+            Logger.warning("<LightManager::registerHeadlightWithViewport> The viewport's camera (id: '" + theViewportNode.camera + "') does not belong to our world (name: '" + _myWorld.name + "').");
+        }
         _myViewportHeadlights[theViewportNode.id] = theLightNode;
         _myViewportHeadlightsEnabled[theViewportNode.id] = true;
     };
