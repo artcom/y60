@@ -441,7 +441,8 @@ SceneViewer.prototype.Constructor = function (self, theArguments) {
                 print("Normals: " + (self.getActiveViewport().drawnormals ? "on" : "off"));
                 break;
             case 'm':
-                self.nextMover();
+                var myNextMover = self.nextMover();
+                print("Mover Set to: " + myNextMover.constructor.name);
                 break;
             case 'F':
                 self.getActiveViewport().flatshading = !self.getActiveViewport().flatshading;
