@@ -49,7 +49,7 @@ void PLPicEncoder::MakeFileFromBmp (const char * pszFName, PLBmpBase * pBmp)
   // Some "pathological" cases however may end up with a CODEC
   // producing more data than the uncompressed version!
   // due to the "pathological" cases that occurred we augment the size by 10% 
-  int bufsize = 1.1*pBmp->GetWidth()*pBmp->GetHeight()*(pBmp->GetBitsPerPixel()/8) + 65536 ;
+  int bufsize = static_cast<int>(1.1*pBmp->GetWidth()*pBmp->GetHeight()*(pBmp->GetBitsPerPixel()/8) + 65536);
   /* This worked for years, but it's probably not enough for exif.
   int bufsize = pBmp->GetMemUsed();
   bufsize = bufsize < 20000 ? bufsize + 4096 : int(1.2 * bufsize);

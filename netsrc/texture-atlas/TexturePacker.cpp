@@ -3,8 +3,6 @@
 #include <cmath>
 #include <algorithm>
 
-#pragma warning(disable:4100 4244)
-
 namespace TEXTURE_PACKER
 {
 
@@ -297,7 +295,7 @@ public:
       mLongestEdge = nextPow2(mLongestEdge);
     }
     
-    width  = std::max(std::sqrt(static_cast<double>(mTotalArea)), static_cast<double>(mLongestEdge)); 
+    width  = static_cast<int>(std::max(std::sqrt(static_cast<double>(mTotalArea)), static_cast<double>(mLongestEdge))); 
     height = mLongestEdge * mTextureCount;
 
     mDebugCount = 0;

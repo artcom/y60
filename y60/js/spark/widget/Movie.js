@@ -21,6 +21,7 @@ spark.Movie.Constructor = function(Protected) {
     var _mySourceItem = null;
     var _myCacheSize  = null;
     var _myMovie             = null;
+    var _myUseCaching = false;    
     var _myTexture           = null;
     var _myStartFrame        = 0; //movie should start at this frame after setting src
     var _myDecoderHint       = undefined;
@@ -207,20 +208,43 @@ spark.Movie.Constructor = function(Protected) {
             _mySource = theSourceFile;
             if (_mySetSourceWithoutChangingImageNode) {
                 if (_myMovie.nodeName === "image") {
-                    Public.movie = spark.openMovie(theSourceFile, _myTargetPixelFormat, _myDecoderHint, Protected.getBoolean("audio", true), _myStartFrame,_myCacheSize);
+                    if (_myUseCaching) {
+                        Public.movie = spark.getCachedMovie(theSourceFile, _myTargetPixelFormat, _myDecoderHint, Protected.getBoolean("audio", true), _myStartFrame,_myCacheSize);
+                    } else {                
+                        Public.movie = spark.openMovie(theSourceFile, _myTargetPixelFormat, _myDecoderHint, Protected.getBoolean("audio", true), _myStartFrame,_myCacheSize);
+                    }
                 } else {
-                    _myMovie.src = theSourceFile;
+                    // check cache
+                    var myName = "spark-cached-movie-" + theSourceFile;
+                    var myCachedMovie = spark.getNode(myName);
+                    if (myCachedMovie) {
+                        Public.movie = myCachedMovie;
+                    } else {
+                        _myMovie.src = theSourceFile;
+                    }
                     _myMovie.currentframe = _myStartFrame;
                     Public.onMovieChanged();
                 }
             } else {
+            if (_myUseCaching) {
+                Public.movie = spark.getCachedMovie(theSourceFile, _myTargetPixelFormat, _myDecoderHint, Protected.getBoolean("audio", true), _myStartFrame,_myCacheSize);
+            } else {                
                 Public.movie = spark.openMovie(theSourceFile, _myTargetPixelFormat, _myDecoderHint, Protected.getBoolean("audio", true), _myStartFrame, _myCacheSize);
+            }
             }
         } else {
             if(_myMovie.playmode !== "stop") {
                 Public.stop();
             }
         }
+    });
+
+    Public.__defineGetter__("useCaching", function () {
+        return _myUseCaching;
+    });
+    
+    Public.__defineSetter__("useCaching", function (theFlag) {
+        _myUseCaching = !!theFlag;
     });
 
     Public.__defineGetter__("srcId", function() {
@@ -250,6 +274,7 @@ spark.Movie.Constructor = function(Protected) {
         _myDecoderHint = Protected.getString("decoderhint", undefined);
         _myTargetPixelFormat = Protected.getString("targetpixelformat", "RGB");
         _mySetSourceWithoutChangingImageNode = Protected.getBoolean("setSourceWithoutChangingImageNode",false);
+        _myUseCaching = Protected.getBoolean("useCaching", false);
 
         if(myMovieSource === "") {
             var myWidth  = Protected.getNumber("width", 1);
@@ -260,7 +285,12 @@ spark.Movie.Constructor = function(Protected) {
                 _mySourceId = myMovieSourceId;
             }
         } else {
-            _myMovie = spark.openMovie(myMovieSource, _myTargetPixelFormat, _myDecoderHint, Protected.getBoolean("audio", true), _myStartFrame, _myCacheSize);
+            if (_myUseCaching) {
+                _myMovie = spark.getCachedMovie(myMovieSource, _myTargetPixelFormat, _myDecoderHint, Protected.getBoolean("audio", true), _myStartFrame,_myCacheSize);
+            } else {                
+                _myMovie = spark.openMovie(myMovieSource, _myTargetPixelFormat, _myDecoderHint, Protected.getBoolean("audio", true), _myStartFrame, _myCacheSize);
+            }
+            
             _mySource = myMovieSource;
         }
 

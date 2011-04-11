@@ -45,12 +45,12 @@ try {
     var myClippingPlane = new Planef(new Vector3f(0, -1, 0), 0);
     myPlaneNode.value = myClippingPlane;
     
-    myEmptyCanvas.onPreViewportFunc = function () {
+    myEmptyCanvas.bind("PRE_VIEWPORT", function () {
         myWorld.clippingplanes = "[`" + myPlaneNode.id + "`]";
-    };
-    myEmptyCanvas.onPostViewportFunc = function () {
+    });
+    myEmptyCanvas.bind("POST_VIEWPORT", function () {
         myWorld.clippingplanes = "[]";
-    };
+    });
     
     
     // MOVER SETTINGS/MODIFICATION FOR EMPTY-MOVERTEST-CANVAS
