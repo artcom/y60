@@ -236,7 +236,7 @@ spark.Canvas.Constructor = function (Protected) {
         } else {
             _myCanvasNode = Node.createElement("canvas");
             _myCanvasNode.name = Public.name + "-canvas";
-            //_myCanvasNode.backgroundcolor = myBackgroundColor;
+            _myCanvasNode.backgroundcolor = myBackgroundColor;
             window.scene.canvases.appendChild(_myCanvasNode);
             
             _myViewport = Node.createElement("viewport");
@@ -256,7 +256,6 @@ spark.Canvas.Constructor = function (Protected) {
                 _myViewport.camera = _myCamera.id;
             }
         }
-        _myCanvasNode.backgroundcolor = myBackgroundColor;
         
         if (_myWorld) {
             var myLightManager = new LightManager(window.scene, _myWorld);
