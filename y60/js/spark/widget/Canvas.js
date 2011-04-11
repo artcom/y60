@@ -196,7 +196,7 @@ spark.Canvas.Constructor = function (Protected) {
     Public.realize = function () {
         var myWorldId, myCanvasId;
         var myMultiSampling     = Protected.getNumber("multisamples", 0);
-        var myBackgroundColor   = Protected.getVector4f("backgroundColor", new Vector4f(0,0,0,0));
+        var myBackgroundColor   = null;
         var myWidth             = Protected.getNumber("width", Public.root.width);
         var myHeight            = Protected.getNumber("height", Public.root.height);
         
@@ -233,10 +233,12 @@ spark.Canvas.Constructor = function (Protected) {
             
             _myWorld = window.scene.dom.getElementById(myWorldId);
             _myWorld.name = Public.name + "-world";
+            
+            myBackgroundColor = Protected.getVector4f("backgroundColor", undefined);
         } else {
             _myCanvasNode = Node.createElement("canvas");
             _myCanvasNode.name = Public.name + "-canvas";
-            _myCanvasNode.backgroundcolor = myBackgroundColor;
+            myBackgroundColor = Protected.getVector4f("backgroundColor", new Vector4f(0,0,0,0));
             window.scene.canvases.appendChild(_myCanvasNode);
             
             _myViewport = Node.createElement("viewport");
@@ -255,6 +257,10 @@ spark.Canvas.Constructor = function (Protected) {
                 
                 _myViewport.camera = _myCamera.id;
             }
+        }
+        
+        if (myBackgroundColor) {
+            _myCanvasNode.backgroundcolor = myBackgroundColor;
         }
         
         if (_myWorld) {
