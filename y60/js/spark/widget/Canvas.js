@@ -191,17 +191,16 @@ spark.Canvas.Constructor = function (Protected) {
     Base.realize = Public.realize;
     Public.realize = function () {
         var myWorldId, myCanvasId;
-        var myMultiSampling   = Protected.getNumber("multisamples", 0);
-        var myBackgroundColor = Protected.getVector4f("backgroundColor", new Vector4f(0,0,0,0));
-        var myWidth       = Protected.getNumber("width", 100);
-        var myHeight      = Protected.getNumber("height", 100);
+        var myMultiSampling     = Protected.getNumber("multisamples", 0);
+        var myBackgroundColor   = Protected.getVector4f("backgroundColor", new Vector4f(0,0,0,0));
+        var myWidth             = Protected.getNumber("width", Public.root.width);
+        var myHeight            = Protected.getNumber("height", Public.root.height);
         
         _myRenderArea = new OffscreenRenderArea();
         _myRenderArea.renderingCaps = Public.getDefaultRenderingCapabilites() | Renderer.FRAMEBUFFER_SUPPORT;
         _myRenderArea.multisamples = myMultiSampling;
         
-        _myImage = Modelling.createImage(window.scene,
-                                         myWidth, myHeight, "BGRA");
+        _myImage = Modelling.createImage(window.scene, myWidth, myHeight, "BGRA");
         _myImage.name = Public.name + "_canvasImage";
         var myTexture = Modelling.createTexture(window.scene, _myImage);
         myTexture.wrapmode = "clamp_to_edge";
@@ -222,19 +221,18 @@ spark.Canvas.Constructor = function (Protected) {
             myWorldId  = myDom.find(".//worlds/world").id;
             myCanvasId = myDom.find(".//canvases/canvas").id;
             
-
             spark.Canvas.mergeScenes(window.scene, myDom);
             
             _myCanvasNode = window.scene.dom.find(".//canvases/canvas[@id='" + myCanvasId + "']");
             _myViewport = _myCanvasNode.find(".//viewport");
-            _myCamera    = window.scene.dom.getElementById(myWorldId).find(".//camera");
+            _myCamera = window.scene.dom.getElementById(myWorldId).find(".//camera");
             
             _myWorld = window.scene.dom.getElementById(myWorldId);
             _myWorld.name = Public.name + "-world";
         } else {
             _myCanvasNode = Node.createElement("canvas");
             _myCanvasNode.name = Public.name + "-canvas";
-            _myCanvasNode.backgroundcolor = myBackgroundColor;
+            //_myCanvasNode.backgroundcolor = myBackgroundColor;
             window.scene.canvases.appendChild(_myCanvasNode);
             
             _myViewport = Node.createElement("viewport");
@@ -254,6 +252,7 @@ spark.Canvas.Constructor = function (Protected) {
                 _myViewport.camera = _myCamera.id;
             }
         }
+        _myCanvasNode.backgroundcolor = myBackgroundColor;
         
         if (_myWorld) {
             var myLightManager = new LightManager(window.scene, _myWorld);
