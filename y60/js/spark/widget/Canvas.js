@@ -424,9 +424,7 @@ spark.Canvas.prepareMerge = function prepareMerge(theSceneFilePath) {
         throw new Error("spark file '" + theSceneFilePath + "' does not exist.");
     }
     
-    var myDom = new Node();
-    
-    myDom.parseFile(theSceneFilePath);
+    var myDom = (new Scene(theSceneFilePath)).dom;
     
     adjustNodeId(myDom.find(".//world"), true);
     adjustNodeId(myDom.find(".//canvases/canvas"), false);
@@ -460,7 +458,7 @@ spark.Canvas.prepareMerge = function prepareMerge(theSceneFilePath) {
 
 spark.Canvas.mergeScenes = function (theTargetScene, theModelDom) {
     var childNode, receivingNode, childChildNode;
-    var mySceneNode = theModelDom.firstChild;
+    var mySceneNode = theModelDom;
     while (mySceneNode.childNodesLength()) {
         childNode = mySceneNode.firstChild;
         receivingNode = theTargetScene.dom.getNodesByTagName(childNode.nodeName)[0];
