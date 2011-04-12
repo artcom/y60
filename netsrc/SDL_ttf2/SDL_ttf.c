@@ -144,7 +144,7 @@ static int TTF_current_line_minx = 0;
 
 /* Font tracking [ART+COM Patch] */
 static float TTF_tracking = 0.0f;
-static float*  TTF_glyph_xpositions = 0;
+static int*  TTF_glyph_xpositions = 0;
 static int  TTF_glyph_xpositions_count = 0;
 
 /* Gets the top row of the underline. The outline
@@ -332,7 +332,7 @@ void TTF_SetTracking(float theTracking) {
 	TTF_tracking = theTracking/1000.0f;
 }
 
-float* TTF_getCurrentGlyphXPositions() {
+int* TTF_getCurrentGlyphXPositions() {
     return TTF_glyph_xpositions;
 }
 int TTF_getCurrentGlyphXPositionsCount() {
