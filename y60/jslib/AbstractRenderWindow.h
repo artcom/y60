@@ -196,7 +196,7 @@ namespace jslib {
                 const asl::Vector2i & theCursorPos=asl::Vector2i(0,0));
         void setTextStyle(unsigned int theStyle);
     
-        const std::vector<asl::Vector2f> & getTextGlyphPositions() const;
+        const std::vector<asl::Vector2i> & getTextGlyphPositions() const;
         const asl::Vector2i & getTextCursorPosition() const;
         const std::vector<unsigned int> & getLineWidths() const;
         const unsigned int & getMaxWidth() const;

@@ -1042,7 +1042,7 @@ const asl::Vector2i & AbstractRenderWindow::getTextCursorPosition() const
     return _myRenderer->getTextManager().getTextCursorPosition();
 }
 
-const std::vector<asl::Vector2f> & AbstractRenderWindow::getTextGlyphPositions() const
+const std::vector<asl::Vector2i> & AbstractRenderWindow::getTextGlyphPositions() const
 {
     return _myRenderer->getTextManager().getGlyphPositions();
 }

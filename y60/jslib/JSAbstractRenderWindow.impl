@@ -592,7 +592,7 @@ JSAbstractRenderWindow<DERIVED>::getTextGlyphPositions(JSContext *cx, JSObject *
     DOC_RVAL("thePositions", DOC_TYPE_VECTOR2I);
     DOC_END;
     try {
-        const std::vector<asl::Vector2f> & myPos = jslib::JSClassTraits<DERIVED>::openNativeRef(cx, obj).getTextGlyphPositions();
+        const std::vector<asl::Vector2i> & myPos = jslib::JSClassTraits<DERIVED>::openNativeRef(cx, obj).getTextGlyphPositions();
         *rval = as_jsval(cx, myPos);
         jslib::JSClassTraits<DERIVED>::closeNativeRef(cx,obj);
         return JS_TRUE;
