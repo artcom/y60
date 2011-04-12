@@ -2038,13 +2038,13 @@ SDL_Surface *TTF_RenderUNICODE_Blended(TTF_Font *font,
 		}
         // [ART+COM Patch] start
         // store xpos of current glyph
-        TTF_glyph_xpositions[TTF_glyph_xpositions_count++] = xstart;
-		if ( (ch == text) && (glyph->minx < 0) ) {
-            TTF_glyph_xpositions[TTF_glyph_xpositions_count++] = xstart + width + 2 - TTF_current_line_minx;
-        } else {
-            TTF_glyph_xpositions[TTF_glyph_xpositions_count++] = xstart + width + 2;
-        }
 
+        TTF_glyph_xpositions[TTF_glyph_xpositions_count++] = realGlyphsXPosition;
+		if ( (ch == text) && (glyph->minx < 0) ) {
+            TTF_glyph_xpositions[TTF_glyph_xpositions_count++] = realGlyphsXPosition + width - TTF_current_line_minx;
+        } else {
+            TTF_glyph_xpositions[TTF_glyph_xpositions_count++] = realGlyphsXPosition + width;
+        }
         //  [ART+COM Patch] end
 
 		xstart += glyph->advance;

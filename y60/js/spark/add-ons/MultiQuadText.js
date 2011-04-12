@@ -45,7 +45,7 @@ spark.MultiQuadText.Constructor = function (Protected) {
         }
         /*if (Public.text[0] =="R") {
             //saveImage(Protected.image, "canvas.png");
-            exit(1);
+            //exit(1);
         }*/
         Modelling.EnsureShapesQuadCount(Protected.shape, myPositions, myTexCoords);
     }

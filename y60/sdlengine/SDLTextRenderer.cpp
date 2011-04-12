@@ -881,16 +881,8 @@ namespace y60 {
 
                 int myGlyphXPos = myXPos;
                 for (unsigned int i = 0;  i < myWord.sdl_x_position.size();) {
-                    // this damn xpos is in default config negativ, which is
-                    // a BIG problem, when copying memory around (see below, already fixed)
-                    // but here is just zeroed in case of the first glyph (vs, 2011)
-                    if (i == 0) {
-                        myGlyphXPos = maximum(0, myXPos);
-                    } else {
-                        myGlyphXPos = myXPos;
-                    }
                     _myGlyphPosition.push_back(Vector2f(myGlyphXPos + myWord.sdl_x_position[i], unsigned(_myTextureSurface->h) - myYPos -1));
-                    _myGlyphPosition.push_back(Vector2f(myGlyphXPos + myWord.sdl_x_position[i+1]+1, unsigned(_myTextureSurface->h) - (myYPos + mySrcHeight)));
+                    _myGlyphPosition.push_back(Vector2f(myGlyphXPos + myWord.sdl_x_position[i+1], unsigned(_myTextureSurface->h) - (myYPos + mySrcHeight)));
                     i +=2;
                 }
                 if (int(mySurfaceHeight) > (_myBottomPadding + myYPos)) {
