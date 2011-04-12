@@ -36,14 +36,15 @@ spark.Text.Constructor = function (Protected) {
     // Private Methods //
     /////////////////////
     
-    function handleI18nLanguage(e) {
+    Protected.handleI18nLanguage = function(e) {
+        
         applyTextItemData();
     }
 
     function attachToI18nItem(theItemId) {
         if (_myTextItem) {
             _myTextItem.removeEventListener(spark.I18nEvent.LANGUAGE,
-                                            handleI18nLanguage);
+                                            Protected.handleI18nLanguage);
             _myTextItem = null;
         }
 
@@ -54,7 +55,7 @@ spark.Text.Constructor = function (Protected) {
                 Logger.fatal("no i18n item named " + theItemId);
             }
             _myTextItem.addEventListener(spark.I18nEvent.LANGUAGE,
-                    handleI18nLanguage);
+                    Protected.handleI18nLanguage);
             applyTextItemData();
         } else {
             Public.text = "";
