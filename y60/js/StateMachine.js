@@ -1,6 +1,6 @@
 /* __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Copyright (C) 1993-2008, ART+COM AG Berlin, Germany <www.artcom.de>
+// Copyright (C) 1993-2011, ART+COM AG Berlin, Germany <www.artcom.de>
 //
 // These coded instructions, statements, and computer programs contain
 // proprietary information of ART+COM AG Berlin, and are copy protected
@@ -26,213 +26,222 @@
 
 // You should have received a copy of the GNU General Public License
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
-// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
-//
-// Description: TODO
-//
-// Last Review: NEVER, NOONE
-//
-//  review status report: (perfect, ok, fair, poor, disaster, notapplicable, unknown)
-//    usefullness            : unknown
-//    formatting             : unknown
-//    documentation          : unknown
-//    test coverage          : unknown
-//    names                  : unknown
-//    style guide conformance: unknown
-//    technical soundness    : unknown
-//    dead code              : unknown
-//    readability            : unknown
-//    understandabilty       : unknown
-//    interfaces             : unknown
-//    confidence             : unknown
-//    integration            : unknown
-//    dependencies           : unknown
-//    cheesyness             : unknown
-//
-//    overall review status  : unknown
-//
-//    recommendations:
-//       - unknown
-// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
+
 */
-//
-//   $RCSfile: StateMachine.js,v $
-//   $Author: christian $
-//   $Revision: 1.9 $
-//   $Date: 2004/05/04 16:49:58 $
-//
-//
-//=============================================================================
-use("AnimationManager.js");
+/*jslint nomen:false plusplus:false*/
+/*globals Logger*/
 
-function StateMachine(theInitalState, theDefaultState, theAnimationMgr, theCharacterName) {
-    this.Constructor(this, theInitalState, theDefaultState, theAnimationMgr, theCharacterName);
-}
+var SM = (function () {
+    
+    ////////////
+    // Public //
+    ////////////
+    var State = function (theStateID) {
+        this.Constructor(this, theStateID);
+    };
+    
+    State.prototype.Constructor = function (self, theStateID) {
+        var _id = theStateID;
+        self.__defineGetter__('id', function () { 
+            return _id;
+        });
+        self.toString = function toString() {
+            return _id;
+        };
+        self.handler = {};
+    };
+    
+    var Sub = function (theStateID, theSubMachine) {
+        this.Constructor(this, theStateID, theSubMachine);
+    };
 
-StateMachine.prototype.Constructor = function(obj, theInitalState, theDefaultState, theAnimationMgr, theCharacterName) {
-    var _myAnimationManager     = theAnimationMgr;
-    var _myCharacterName        = theCharacterName;
+    Sub.prototype.Constructor = function (self, theStateID, theSubMachine) {
+        State.prototype.Constructor(self, theStateID);
+        
+        var _subMachine = theSubMachine;
+        self._enter = function () {
+            _subMachine.setup();
+        };
+        self._exit = function () {
+            _subMachine.teardown();
+        };
+        self.terminateTransition = function () {
+            _subMachine.terminateTransition.apply(_subMachine, arguments);
+        };
+        self.handleEvent = function () {
+            _subMachine.handleEvent.apply(_subMachine, arguments);
+        };
+        self.toString = function toString() {
+            return self.id + "/(" + _subMachine + ")"; 
+        };
+        self.__defineGetter__("subMachine", function () {
+            return _subMachine;
+        });
+    };
+    
+    var Parallel = function (theStateID) {
+        this.Constructor(this, theStateID, arguments);
+    };
+    
+    Parallel.prototype.Constructor = function (self, theStateID, theArguments) {
+        State.prototype.Constructor(self, theStateID);
+        // Create a new array from the contents of arguments
+        var args = Array.prototype.slice.call(theArguments);
+        if (args.length < 2) {
+            throw "not enough arguments";
+        }
+        var _id          = args.shift();
+        var _subMachines = args;
 
-    var _myStateQueue           = new Array(theInitalState);
+        self.toString = function toString() {
+            return _id + "/(" + _subMachines.join('|') + ")";
+        };
 
-    var _myStateAnims           = [];  // a array of possible states and animations
+        self._enter = function () {
+            for (var i = 0; i < _subMachines.length; ++i) {
+                _subMachines[i].setup();
+            }
+        };
+        self._exit = function () {
+            for (var i = 0; i < _subMachines.length; ++i) {
+                _subMachines[i].teardown();
+            }
+        };
+        self.terminateTransition = function () {
+            for (var i = 0; i < _subMachines.length; ++i) {
+                _subMachines[i].terminateTransition();
+            }
+        };
+        self.handleEvent = function () {
+            for (var i = 0; i < _subMachines.length; ++i) {
+                _subMachines[i].handleEvent.apply(_subMachines[i], arguments);
+            }
+        };
+    };
 
-    var _myStateChangeAnims     = [];  // a array of possible statechanges and animations
-    var _myStateChangeParams    = [];  // a array of possible statechanges and params
-    var _mySyncClips            = [];  // Clips that are played back synchronized in another character
+    var Transition = function (theNextState) {
+        var self       = this;
+        self.nextState = theNextState;
+        self.travel = function () {
+            self.switchState(self.nextState);
+        };
+        self.terminate = function () {
+            self.switchState(self.nextState);
+        };
+    };
+    
+    var StateMachine = function () {
+        this.Constructor(this, arguments);
+    };
 
-    var _myDefaultState         = theDefaultState;
+    StateMachine.prototype.Constructor = function (self, theArguments) {
+        var _states       = {};
+        self.initialState = theArguments[0].id;
+        self.transition   = null;
+        var _currentState = null;
 
-    const TRIM_QUEUE_LENGTH = 2;
+        for (var i = 0; i  < theArguments.length; ++i) {
+            _states[theArguments[i].id] = theArguments[i];
+        }
 
-    // add a state and a corresponding loop animation.
-    // theLoopAnimation can be undefined or a string or a list of animations,
-    // devided by '|'
-    obj.addState = function(theState, theLoopAnimation) {
-        var myAnimations = null;
-        if (theLoopAnimation) {
-            myAnimations = theLoopAnimation.split("|");
-            if (myAnimations.length == 0) {
-                myAnimations = [theLoopAnimation];
+        self.toString = function toString() {
+            return _states[_currentState].toString();
+        };
+        /*self.__defineGetter__("states", function () {
+            return _states;
+        });*/
+        self.__defineGetter__('stateObject', function () {
+            return _states[_currentState];
+        });
+
+        function switchState(newState) {
+            if (self.transition !== null) { 
+                self.transition.switchState = function () {
+                    Logger.debug("events from the past caught up with you");
+                }; 
+                self.transition = null;
+            }
+            Logger.debug("State transition '" + _currentState + "' => '" + newState + "'");
+            // call old state's exit handler
+            if (_currentState !== null && '_exit' in self.stateObject) {
+                Logger.debug("exiting state '" + _currentState + "'");
+                self.stateObject._exit(newState);
+            }
+            var oldState  = _currentState; 
+            _currentState = newState;
+            // call new state's enter handler
+            if (_currentState !== null && '_enter' in self.stateObject) {
+                Logger.debug("entering state '" + _currentState + "'");
+                self.stateObject._enter(oldState);
             }
         }
-        _myStateAnims[theState] = myAnimations;
-    }
 
-    // Allows you to register clips that are started syncronously with the main clip
-    obj.connectClip = function(theClip, theOtherCharacter, theOtherClip) {
-        _mySyncClips[theClip] = {character: theOtherCharacter, clip: theOtherClip};
-    }
-
-    obj.pushState = function(theDestState) {
-        var myPreviousState = _myStateQueue[_myStateQueue.length - 1];
-        //print("push state: " + myPreviousState + " -> "+ theDestState);
-
-        if (myPreviousState in _myStateChangeAnims &&
-            theDestState in _myStateChangeAnims[myPreviousState])
-        {
-            // A fitting state change is registered
-            _myStateQueue.push(theDestState);
-        } else if (theDestState in _myStateChangeAnims[_myDefaultState]) {
-            // A default state change is registered
-            _myStateQueue.push(_myDefaultState);
-            _myStateQueue.push(theDestState);
-        } else {
-            Logger.warning("Impossible state change from: " + myPreviousState + " to " + theDestState);
-        }
-
-        if (_myStateQueue.length > TRIM_QUEUE_LENGTH) {
-            trimQueue();
-        }
-        //print("queue: " + _myStateQueue);
-    }
-
-    obj.onFrame = function() {
-        if (!_myAnimationManager.isCharacterActive(_myCharacterName)) {
-            setNextState();
-        }
-    }
-
-    obj.switchToState = function(theState) {
-        //print("Switch to state: " + theState);
-        _myAnimationManager.stop(_myCharacterName);
-        _myStateQueue = new Array(theState);
-    }
-
-    // add a statechange and a corresponding animation
-    obj.addStateChange = function(theSrcState, theDestState, theAnimation, theParam) {
-        if (!(theSrcState in _myStateChangeAnims)) {
-            _myStateChangeAnims[theSrcState] = new Array();
-            _myStateChangeParams[theSrcState] = new Array();
-        }
-        _myStateChangeAnims[theSrcState][theDestState] = theAnimation;
-        _myStateChangeParams[theSrcState][theDestState] = theParam;
-    }
-
-    // reset this beast
-    obj.reset = function() {
-        _myStateQueue =  new Array(theInitalState);
-    }
-
-    obj.getCurrentState = function() {
-        return _myStateQueue[0];
-    }
-
-    /////////////////////////////////////
-    // private methods
-    /////////////////////////////////////
-
-    function setNextState() {
-        var myQueueLength = _myStateQueue.length;
-        if (myQueueLength == 1) {
-            var myState = _myStateQueue[0];
-            if (myState in _myStateAnims && _myStateAnims[myState]) {
-                changeClip(randomElement(_myStateAnims[myState]));
+        self.setup = function () {
+            Logger.debug("setting initial state: " + self.initialState);
+            _currentState = null;
+            switchState(self.initialState);
+        };
+        self.teardown = function () {
+            if (self.transition !== null) {
+                Logger.debug("terminated transition on teardown");
+                self.transition.terminate();
             }
-            //print("quequed state: "+myState);
-        } else {
-            var mySrcState  = _myStateQueue.shift();
-            var myDestState = _myStateQueue[0];
-            if (mySrcState in _myStateChangeAnims && myDestState in _myStateChangeAnims[mySrcState]) {
-                //print("  Statechange: " + mySrcState + " -> " + myDestState);
-                changeClip(_myStateChangeAnims[mySrcState][myDestState], _myStateChangeParams[mySrcState][myDestState]);
+            switchState(null);
+        };
+
+        self.terminateTransition = function (evt) {
+            // Logger.debug("may terminate transition "+self.transition+" on "+evt+": "+_currentState, DEBUG_LEVELS.TRACE);
+            if (self.transition !== null) {
+                var nextState = self.transition.nextState;
+                if (self.transition.terminate(arguments[0])) {
+                    Logger.debug(arguments[0] + " terminated transition, skipping to " + nextState);
+                    self.transition.switchState(nextState); // forces pending state-change immediately
+                } else {
+                    Logger.debug("dropped " + arguments[0] + " during transition");
+                }
             } else {
-                print("### WARNING Statechange from: " + mySrcState + " to: " + myDestState + " does not have a clip");
+                if ('terminateTransition' in self.stateObject) {
+                    self.stateObject.terminateTransition(evt);
+                }
             }
-        }
-    }
+        };
 
-    function changeClip(theAnimName, theReverseState) {
-        if (theAnimName != "") {
-            //print("change clip " + theAnimName);
-            if (theReverseState == undefined || !theReverseState) {
-                startClip(theAnimName, true)
+        self.handleEvent = function () {
+            if (self.transition !== null) {
+                Logger.debug("dropped " + arguments[0] + " during handleEvent: transition still active: " + _currentState);
+                return;
+            }
+            if (!_currentState) {
+                Logger.debug("dropped " + arguments[0] + " during handleEvent: because current state is null");
+                return;
+            }
+            var nextState = null;
+            if (arguments[0] in self.stateObject.handler) {
+                nextState = self.stateObject.handler[arguments[0]].apply(self.stateObject, arguments);
+            }
+            if (typeof(nextState) === "object" && nextState !== null) {
+                self.transition             = nextState;
+                self.transition.switchState = switchState;
+                self.transition.travel();
+            } else if (nextState !== null && nextState !== undefined) {
+                switchState(nextState);
             } else {
-                startClip(theAnimName, false)
+                // we don't know self event (nextState == null), so bubble down to the children
+                if ('handleEvent' in self.stateObject) {
+                    self.stateObject.handleEvent.apply(self.stateObject, arguments);
+                }
             }
-        }
-    }
+        };
+    };
 
-    function startClip(theAnimName, theDirection) {
-        //print("startClip " + theAnimName);
-        _myAnimationManager.setClipForwardDirection(_myCharacterName, theAnimName, theDirection);
-        _myAnimationManager.setClipLoops(_myCharacterName, theAnimName, 1);
-        _myAnimationManager.startClip(_myCharacterName, theAnimName);
-
-        if (theAnimName in _mySyncClips) {
-            var mySyncClip = _mySyncClips[theAnimName];
-            _myAnimationManager.setClipForwardDirection(mySyncClip.character, mySyncClip.clip, theDirection);
-            _myAnimationManager.setClipLoops(mySyncClip.character, mySyncClip.clip, 1);
-            _myAnimationManager.startClip(mySyncClip.character, mySyncClip.clip);
-        }
-    }
-
-    function stateChangeExist(theSourceState, theDestState) {
-        // Standard state changes from source to destination
-        if (theSourceState in _myStateChangeAnims &&
-            theDestState in _myStateChangeAnims[theSourceState])
-        {
-            return true;
-        }
-
-        // check if there is a statechange from theSourceState to defaultstate
-        if (theSourceState in _myStateChangeAnims &&
-            _myDefaultState in _myStateChangeAnims[theSourceState]) {
-
-        }
-        return false;
-    }
-
-    function trimQueue() {
-        // The queue of animations is getting too long. Throw away animations without
-        // causing jumps.
-        var myLastState = _myStateQueue[_myStateQueue.length-1];
-        for (var i = 1; i < _myStateQueue.length-1; ++i) {
-            if (myLastState == _myStateQueue[i]) {
-                _myStateQueue.splice(i, _myStateQueue.length-i-1);
-                break;
-            }
-        }
-    }
-
-}
+    //////////////
+    // Interface
+    //////////////
+    return {
+        State        : State,
+        Sub          : Sub,
+        Parallel     : Parallel,
+        Transition   : Transition,
+        StateMachine : StateMachine
+    };
+}()); // execute outer function to produce our closure
