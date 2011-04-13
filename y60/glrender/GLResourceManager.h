@@ -306,7 +306,7 @@ namespace y60 {
         /**
          * Sets up texture wrap and min, map filter
          */
-        //void setupTextureParams(const TexturePtr & theTexture, GLenum theTextureTarget);
+        void setTextureParams(const TexturePtr & theTexture, const GLenum theTextureTarget);
 
         unsigned long _myTextureMemUsage;
         // unsigned long _myVertexMemUsage;
