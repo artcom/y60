@@ -128,7 +128,7 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
     function updateSunPosition() {
         if (_mySunLight) {
             // Logger.warning("Current sun time: " + _mySunPosition.getCurrentTime());
-            _mySunLight.orientation = Quaternionf.createFromEuler(_mySunPosition.getDirection());
+            _mySunLight.orientation = Quaternionf.createFromEuler(_mySunPosition.getRotation());
             _myScene.update(Scene.WORLD);
         }
     }
@@ -172,8 +172,8 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
             _mySunLight = Node.createElement('light');
             _mySunLight.name = "Sun";
             _mySunLight.lightsource = mySunLightSource.id;
-            // calculate the local sunlight direction
-            _mySunLight.orientation = Quaternionf.createFromEuler(_mySunPosition.getDirection());
+            // calculate the local sunlight direction            
+            _mySunLight.orientation = Quaternionf.createFromEuler(_mySunPosition.getRotation());
             _myWorld.appendChild(_mySunLight);
             theScene.update(Scene.ALL);
         }
@@ -234,6 +234,10 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
     });
     
     obj.registerHeadlightWithViewport = function(theViewportNode, theLightNode) {
+        // check if viewports camera belongs to our world
+        if (!_myWorld.find(".//camera[@id='" + theViewportNode.camera + "']")) {
+            Logger.warning("<LightManager::registerHeadlightWithViewport> The viewport's camera (id: '" + theViewportNode.camera + "') does not belong to our world (name: '" + _myWorld.name + "').");
+        }
         _myViewportHeadlights[theViewportNode.id] = theLightNode;
         _myViewportHeadlightsEnabled[theViewportNode.id] = true;
     };

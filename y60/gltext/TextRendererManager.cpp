@@ -196,7 +196,7 @@ namespace y60 {
         }
     }
 
-    const std::vector<asl::Vector2f> &
+    const std::vector<asl::Vector2i> &
     TextRendererManager::getGlyphPositions() const {
         if (_myTTFRenderer) {
             return _myTTFRenderer->getGlyphPositions();

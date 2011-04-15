@@ -430,6 +430,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         }
         // switch mover
         var myNewMover = self.setMover(_myMoverConstructors[myNextMoverIndex], theViewport);
+        return myNewMover;
     };
 
     self.setAutoNearFarPlane = function(theFlag) {

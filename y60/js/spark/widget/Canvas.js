@@ -1,4 +1,4 @@
-/*jslint nomen: false, plusplus: false, bitwise: false*/
+/*jslint nomen: false, plusplus: false, bitwise: false, forin: true*/
 /*globals use, spark, OffscreenRenderArea, Modelling, window, Node, Vector3f,
           BaseViewer, LightManager, product, Matrix4f, Point3f, Logger,
           fileExists, getDirectoryPart, print, adjustNodeId, Renderer,
@@ -98,6 +98,10 @@ spark.Canvas.Constructor = function (Protected) {
         return _myWorld;
     });
     
+    Public.__defineGetter__("canvas", function () {
+        return _myCanvasNode;
+    });
+    
     Public.__defineGetter__("viewport", function () {
         return _myViewport;
     });
@@ -191,17 +195,16 @@ spark.Canvas.Constructor = function (Protected) {
     Base.realize = Public.realize;
     Public.realize = function () {
         var myWorldId, myCanvasId;
-        var myMultiSampling   = Protected.getNumber("multisamples", 0);
-        var myBackgroundColor = Protected.getVector4f("backgroundColor", new Vector4f(0,0,0,0));
-        var myWidth       = Protected.getNumber("width", 100);
-        var myHeight      = Protected.getNumber("height", 100);
+        var myMultiSampling     = Protected.getNumber("multisamples", 0);
+        var myBackgroundColor   = null;
+        var myWidth             = Protected.getNumber("width", Public.root.width);
+        var myHeight            = Protected.getNumber("height", Public.root.height);
         
         _myRenderArea = new OffscreenRenderArea();
         _myRenderArea.renderingCaps = Public.getDefaultRenderingCapabilites() | Renderer.FRAMEBUFFER_SUPPORT;
         _myRenderArea.multisamples = myMultiSampling;
         
-        _myImage = Modelling.createImage(window.scene,
-                                         myWidth, myHeight, "BGRA");
+        _myImage = Modelling.createImage(window.scene, myWidth, myHeight, "BGRA");
         _myImage.name = Public.name + "_canvasImage";
         var myTexture = Modelling.createTexture(window.scene, _myImage);
         myTexture.wrapmode = "clamp_to_edge";
@@ -222,19 +225,20 @@ spark.Canvas.Constructor = function (Protected) {
             myWorldId  = myDom.find(".//worlds/world").id;
             myCanvasId = myDom.find(".//canvases/canvas").id;
             
-
             spark.Canvas.mergeScenes(window.scene, myDom);
             
             _myCanvasNode = window.scene.dom.find(".//canvases/canvas[@id='" + myCanvasId + "']");
             _myViewport = _myCanvasNode.find(".//viewport");
-            _myCamera    = window.scene.dom.getElementById(myWorldId).find(".//camera");
+            _myCamera = window.scene.dom.getElementById(myWorldId).find(".//camera");
             
             _myWorld = window.scene.dom.getElementById(myWorldId);
             _myWorld.name = Public.name + "-world";
+            
+            myBackgroundColor = Protected.getVector4f("backgroundColor", undefined);
         } else {
             _myCanvasNode = Node.createElement("canvas");
             _myCanvasNode.name = Public.name + "-canvas";
-            _myCanvasNode.backgroundcolor = myBackgroundColor;
+            myBackgroundColor = Protected.getVector4f("backgroundColor", new Vector4f(0,0,0,0));
             window.scene.canvases.appendChild(_myCanvasNode);
             
             _myViewport = Node.createElement("viewport");
@@ -253,6 +257,10 @@ spark.Canvas.Constructor = function (Protected) {
                 
                 _myViewport.camera = _myCamera.id;
             }
+        }
+        
+        if (myBackgroundColor) {
+            _myCanvasNode.backgroundcolor = myBackgroundColor;
         }
         
         if (_myWorld) {
@@ -416,9 +424,7 @@ spark.Canvas.prepareMerge = function prepareMerge(theSceneFilePath) {
         throw new Error("spark file '" + theSceneFilePath + "' does not exist.");
     }
     
-    var myDom = new Node();
-    
-    myDom.parseFile(theSceneFilePath);
+    var myDom = (new Scene(theSceneFilePath)).dom;
     
     adjustNodeId(myDom.find(".//world"), true);
     adjustNodeId(myDom.find(".//canvases/canvas"), false);
@@ -452,7 +458,7 @@ spark.Canvas.prepareMerge = function prepareMerge(theSceneFilePath) {
 
 spark.Canvas.mergeScenes = function (theTargetScene, theModelDom) {
     var childNode, receivingNode, childChildNode;
-    var mySceneNode = theModelDom.firstChild;
+    var mySceneNode = theModelDom;
     while (mySceneNode.childNodesLength()) {
         childNode = mySceneNode.firstChild;
         receivingNode = theTargetScene.dom.getNodesByTagName(childNode.nodeName)[0];

@@ -152,7 +152,7 @@ namespace y60 {
                         theTexture->get<NameTag>() + "'", PLUS_FILE_LINE);
         }
 
-        updateTextureParams(theTexture);
+        setTextureParams(theTexture, myTextureTarget);
 
         glPopAttrib();
         CHECK_OGL_ERROR;
@@ -216,7 +216,7 @@ namespace y60 {
         }
         CHECK_OGL_ERROR;
 
-        updateTextureParams(theTexture);
+        setTextureParams(theTexture, myTextureTarget);
 
         glPopAttrib();
         CHECK_OGL_ERROR;
@@ -980,7 +980,23 @@ namespace y60 {
     GLResourceManager::updateTextureParams(const TexturePtr & theTexture) {
         MAKE_GL_SCOPE_TIMER(GLResourceManager_updateTextureParams);
 
-        AC_DEBUG << "GLResourceManager::updateTextureParams '" << theTexture->get<NameTag>()
+
+        glPushAttrib(GL_TEXTURE_BIT);
+
+        unsigned myTextureId = theTexture->getTextureId();
+        GLenum myTextureTarget = asGLTextureTarget(theTexture->getType());
+        glBindTexture(myTextureTarget, myTextureId);
+        CHECK_OGL_ERROR;
+
+        setTextureParams(theTexture, myTextureTarget);
+
+        glPopAttrib();
+        CHECK_OGL_ERROR;
+    }
+
+    void
+    GLResourceManager::setTextureParams(const TexturePtr & theTexture, const GLenum theTextureTarget) {
+        AC_DEBUG << "GLResourceManager::setTextureParams '" << theTexture->get<NameTag>()
                  << "' id='" << theTexture->get<IdTag>()
                  << "' texid='" << theTexture->get<TextureIdTag>()
                  << "' wrapmode='" << theTexture->getWrapMode()
@@ -989,13 +1005,11 @@ namespace y60 {
                  << "' magfilter='" << theTexture->getMagFilter()
                  << "'";
 
-        GLenum myTextureTarget = asGLTextureTarget(theTexture->getType());
-
 #define DONT_CHECK_TEX_ID
 #ifdef CHECK_TEX_ID
         // Do some checks
         GLint myId = 0;
-        switch (myTextureTarget) {
+        switch (theTextureTarget) {
         case GL_TEXTURE_CUBE_MAP_ARB:
         case GL_TEXTURE_2D:
         case GL_TEXTURE_RECTANGLE_ARB:
@@ -1007,7 +1021,7 @@ namespace y60 {
             AC_DEBUG << "current id = " << myId << "(GL_TEXTURE_3D_BINDING_EXT)";
             break;
         default:
-            AC_ERROR << "Unknow texture target = " << myTextureTarget;
+            AC_ERROR << "Unknown texture target = " << theTextureTarget;
        }
        if (myId == 0) {
             AC_DEBUG << "No texture bound, trace = ";
@@ -1015,32 +1029,32 @@ namespace y60 {
         }
 #endif
 
-        glTexParameteri(myTextureTarget, GL_TEXTURE_WRAP_S,
+        glTexParameteri(theTextureTarget, GL_TEXTURE_WRAP_S,
                         asGLTextureWrapMode(theTexture->getWrapMode()));
         CHECK_OGL_ERROR;
-        glTexParameteri(myTextureTarget, GL_TEXTURE_WRAP_T,
+        glTexParameteri(theTextureTarget, GL_TEXTURE_WRAP_T,
                         asGLTextureWrapMode(theTexture->getWrapMode()));
         CHECK_OGL_ERROR;
-        if (myTextureTarget == GL_TEXTURE_3D) {
-            glTexParameteri(myTextureTarget, GL_TEXTURE_WRAP_R,
+        if (theTextureTarget == GL_TEXTURE_3D) {
+            glTexParameteri(theTextureTarget, GL_TEXTURE_WRAP_R,
                             asGLTextureWrapMode(theTexture->getWrapMode()));
             CHECK_OGL_ERROR;
         }
 
         bool hasMipMaps = theTexture->get<TextureMipmapTag>();
         GLenum myFilter = asGLTextureSampleFilter(theTexture->getMagFilter(), false);
-        glTexParameteri(myTextureTarget, GL_TEXTURE_MAG_FILTER, myFilter);
+        glTexParameteri(theTextureTarget, GL_TEXTURE_MAG_FILTER, myFilter);
         CHECK_OGL_ERROR;
 
         myFilter = asGLTextureSampleFilter(theTexture->getMinFilter(), hasMipMaps);
-        glTexParameteri(myTextureTarget, GL_TEXTURE_MIN_FILTER, myFilter);
+        glTexParameteri(theTextureTarget, GL_TEXTURE_MIN_FILTER, myFilter);
         CHECK_OGL_ERROR;
 
         if (_myHasAnisotropicTex && hasMipMaps) {
             float maxAnisotropy = theTexture->get<TextureAnisotropyTag>();
             if (maxAnisotropy > 1.0f) {
                 AC_DEBUG << "setting max_anisotropy=" << maxAnisotropy;
-                glTexParameterf(myTextureTarget, GL_TEXTURE_MAX_ANISOTROPY_EXT, maxAnisotropy);
+                glTexParameterf(theTextureTarget, GL_TEXTURE_MAX_ANISOTROPY_EXT, maxAnisotropy);
                 CHECK_OGL_ERROR;
             }
         }

@@ -55,7 +55,7 @@ spark.Slider.Constructor = function (Protected) {
         if (_mySliderBackground.height === _myActiveCursor.height) {
             return 0;
         } else {
-            return (_myActiveCursor.y - _mySliderBackground.y) /
+            return (_myActiveCursor.y) /
                    (_mySliderBackground.height - _myActiveCursor.height);
         }
     }
@@ -64,7 +64,7 @@ spark.Slider.Constructor = function (Protected) {
         if (_mySliderBackground.width === _myActiveCursor.width) {
             return 0;
         } else {
-            return (_myActiveCursor.x - _mySliderBackground.x) /
+            return (_myActiveCursor.x) /
                    (_mySliderBackground.width - _myActiveCursor.width);
         }
     }
