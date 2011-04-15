@@ -153,6 +153,7 @@ spark.Window.Constructor = function (Protected, theArguments) {
                 } else {
                     myAppear = new spark.CursorEvent(spark.CursorEvent.APPEAR, myCursor);
                 }
+                
                 myPick.dispatchEvent(myAppear);
             }
             if (myCursor.active && (myPick != myFocused)) {
