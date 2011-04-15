@@ -24,12 +24,22 @@
 // * layouterToggleWidget - can be used to change widget style e.g.
 
 spark.Layouter = spark.ComponentClass("Layouter");
+spark.Layouter.BINDING_SLOT = {
+    CATCH  : "CATCH",
+    RELEASE : "RELEASE"
+};
 spark.Layouter.Constructor = function(Protected) {
 
     var Base = {};
     var Public = this;
     this.Inherit(spark.Component);
     
+    var _bindings = {};
+    (function () {
+        for (var slot in spark.Layouter.BINDING_SLOT) {
+            _bindings[spark.Layouter.BINDING_SLOT[slot]] = {};
+        }
+    }());
     var _myState       = IDLE;
     var _myOldPos      = null;
     var _myWidget      = null;
@@ -50,6 +60,28 @@ spark.Layouter.Constructor = function(Protected) {
     
     const IDLE = 0;
     const ACTIVE = 1;
+    
+    function _unbind(theHandle) {
+        delete _bindings[theHandle.bind_info.slot][theHandle.bind_info.id];
+        return true;
+    }
+    
+    function Handle(theBindInfo, theCb) {
+        this.bind_info = theBindInfo; //back-pointer
+        this.cb = theCb;
+    }
+    
+    Handle.prototype.unbind = function () {
+        _unbind(this);
+    };
+    
+    Public.bind = function (theBindingSlot, cb) {
+        var bind_info = {id   : createUniqueId(),
+                         slot : theBindingSlot};
+        var my_handle = new Handle(bind_info, cb);
+        _bindings[theBindingSlot][bind_info.id] = my_handle;
+        return my_handle;
+    };
     
     Base.realize = Public.realize;
     Public.realize = function () {
@@ -154,6 +186,11 @@ spark.Layouter.Constructor = function(Protected) {
     Public.target setter = function (theWidget) {
         print("target widget", theWidget)
         _myWidget = theWidget;
+        for (var handleId in _bindings[spark.Layouter.BINDING_SLOT.CATCH]) {
+            var myHandle = _bindings[spark.Layouter.BINDING_SLOT.CATCH][handleId];
+            myHandle.cb(_myWidget);
+        }
+
         _myBackup.originalZ = _myWidget.z;
         _myBackup.originalWidth = ("width" in _myWidget) ? _myWidget.width : null;
         _myBackup.originalHeight = ("height" in _myWidget) ? _myWidget.height : null;
@@ -323,6 +360,10 @@ spark.Layouter.Constructor = function(Protected) {
         _myState = IDLE;
         _myOldPos = null;
         if (_myWidget && _myCurrentSparkNode) {
+            for (var handleId in _bindings[spark.Layouter.BINDING_SLOT.RELEASE]) {
+                var myHandle = _bindings[spark.Layouter.BINDING_SLOT.RELEASE][handleId];
+                myHandle.cb(_myWidget);
+            }
             if ("writebackPosition" in _myWidget) {
                 _myWidget.writebackPosition(_myCurrentSparkNode, _myCurrentSparkFile);
             } else {
