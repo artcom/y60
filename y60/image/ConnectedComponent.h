@@ -74,7 +74,7 @@
 namespace y60 {
 
 
-class Run {
+class Y60_IMAGE_DECL Run {
     public:
         Run(int theRow, int theStartCol, int theEndCol);
         asl::Vector2f center();
