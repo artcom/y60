@@ -360,10 +360,6 @@ spark.Layouter.Constructor = function(Protected) {
         _myState = IDLE;
         _myOldPos = null;
         if (_myWidget && _myCurrentSparkNode) {
-            for (var handleId in _bindings[spark.Layouter.BINDING_SLOT.RELEASE]) {
-                var myHandle = _bindings[spark.Layouter.BINDING_SLOT.RELEASE][handleId];
-                myHandle.cb(_myWidget);
-            }
             if ("writebackPosition" in _myWidget) {
                 _myWidget.writebackPosition(_myCurrentSparkNode, _myCurrentSparkFile);
             } else {
@@ -383,6 +379,10 @@ spark.Layouter.Constructor = function(Protected) {
                     _myCurrentSparkNode.saveFile(_myCurrentSparkFile);
                     print("write to file ", _myCurrentSparkFile);
                 }
+            }
+            for (var handleId in _bindings[spark.Layouter.BINDING_SLOT.RELEASE]) {
+                var myHandle = _bindings[spark.Layouter.BINDING_SLOT.RELEASE][handleId];
+                myHandle.cb(_myWidget);
             }
         }
         _myWidget = null;
