@@ -13,8 +13,9 @@
 //+ moves target to parent
 //a toggles additional features of target
 //s change size of widget
-//1 moves down in z direction
-//2 moves up in z direction
+//d change z-rotation of widget
+//"down" moves down in z direction
+//"up" moves up in z direction
 //i toggles visibility of layoutImage, which can be an commandLineArgument (layoutimage=<src>)
 
 //classes using Layouter can implement hooks
@@ -47,6 +48,7 @@ spark.Layouter.Constructor = function(Protected) {
     var _myIsCtrlPressed = false;
     var _myIsSPressed = false;   //change size 
     var _myIsYPressed = false;   //change z position
+    var _myIsDPressed = false;   //change z rotation
     var _myStage       = null;
     var _myListeners = null;
     var _myCurrentSparkNode = null;
@@ -55,7 +57,7 @@ spark.Layouter.Constructor = function(Protected) {
     var _mySparkFiles = [];
     var _myVisualMode = 2; // box with mesurement
     var _myLayoutImage = null;
-    var _myBackup = {originalZ:null, originalWidth:null, originalHeight:null};
+    var _myBackup = {originalZ:null, originalWidth:null, originalHeight:null, originalRotationZ:null};
     const DEBUG_COLOR = new Vector4f(1,0,0,1);
     
     const IDLE = 0;
@@ -116,6 +118,8 @@ spark.Layouter.Constructor = function(Protected) {
                     _myIsSPressed = true;
                 } else if (theKey == "y") {
                     _myIsYPressed = true;
+                } else if (theKey == "d") {
+                    _myIsDPressed = true;
                 } else if ((theKey == "left"
                         || theKey == "right"
                         || theKey == "up"
@@ -145,6 +149,8 @@ spark.Layouter.Constructor = function(Protected) {
                     _myIsSPressed = false;
                 } else if (theKey == "y") {
                     _myIsYPressed = false;
+                } else if (theKey == "d") {
+                    _myIsDPressed = false;
                 }
             }
         }
@@ -192,6 +198,7 @@ spark.Layouter.Constructor = function(Protected) {
         }
 
         _myBackup.originalZ = _myWidget.z;
+        _myBackup.originalRotationZ = ("rotationZ" in _myWidget) ? _myWidget.rotationZ : null;
         _myBackup.originalWidth = ("width" in _myWidget) ? _myWidget.width : null;
         _myBackup.originalHeight = ("height" in _myWidget) ? _myWidget.height : null;
         _myState = ACTIVE;
@@ -334,6 +341,21 @@ spark.Layouter.Constructor = function(Protected) {
                 default:
                     break;
             }
+        } else if (_myIsDPressed) { // size manipulation
+            switch(theKey) {
+                case "up":
+                    if ("rotationZ" in _myWidget) {
+                        _myWidget.rotationZ += myDist;
+                    } 
+                    break;
+                case "down":
+                    if ("rotationZ" in _myWidget) {
+                        _myWidget.rotationZ -= myDist;
+                    } 
+                    break;
+                default:
+                    break;
+            }
         } else { 
             switch(theKey) {
                 case "left":
@@ -369,6 +391,9 @@ spark.Layouter.Constructor = function(Protected) {
                     myNode.y = Math.round(_myWidget.y);
                     if (_myWidget.z !== _myBackup.originalZ) {
                         myNode.z = Math.round(_myWidget.z);
+                    }
+                    if (_myWidget.rotationZ !== _myBackup.originalRotationZ) {
+                        myNode.rotationZ = Math.round(_myWidget.rotationZ);
                     }
                     if ("width" in _myWidget && _myWidget.width && _myWidget.width !== _myBackup.originalWidth) {
                         myNode.width = Math.round(_myWidget.width);
