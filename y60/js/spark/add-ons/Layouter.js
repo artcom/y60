@@ -12,7 +12,7 @@
 //hold ctrl, click target, move with mouse or arrows or shift-arrows
 //+ moves target to parent
 //a toggles additional features of target
-//s change size of widget
+//f change size of widget
 //d change z-rotation of widget
 //"down" moves down in z direction
 //"up" moves up in z direction
@@ -46,7 +46,7 @@ spark.Layouter.Constructor = function(Protected) {
     var _myWidget      = null;
     var _myShiftFlag   = false;
     var _myIsCtrlPressed = false;
-    var _myIsSPressed = false;   //change size 
+    var _myIsFPressed = false;   //change size 
     var _myIsYPressed = false;   //change z position
     var _myIsDPressed = false;   //change z rotation
     var _myStage       = null;
@@ -107,15 +107,15 @@ spark.Layouter.Constructor = function(Protected) {
             if (!theControlFlag) {
                 Base.onKey(theKey, theKeyState, theX, theY, theShiftFlag, theControlFlag, theAltFlag);
             }
-            Logger.info("onKey "+ theKey+" "+_myIsYPressed+" "+_myIsSPressed+" "+_myShiftFlag);
+            Logger.info("onKey "+ theKey+" "+_myIsYPressed+" "+_myIsFPressed+" "+_myShiftFlag);
             if(theKeyState) {
                 if(theKey.search(/ctrl/) != -1) {
                     _myIsCtrlPressed = true;
                     activate();
                 } else if (theKey.search(/shift/) != -1) {
                     _myShiftFlag = true;
-                } else if (theKey == "s") {
-                    _myIsSPressed = true;
+                } else if (theKey == "f") {
+                    _myIsFPressed = true;
                 } else if (theKey == "y") {
                     _myIsYPressed = true;
                 } else if (theKey == "d") {
@@ -135,7 +135,7 @@ spark.Layouter.Constructor = function(Protected) {
                 } else if (theKey == "i" && _myLayoutImage) {
                     _myLayoutImage.visible = !_myLayoutImage.visible;
                     print("layoutimage ", _myLayoutImage.visible)
-                } else if (theKey == "r") { // call SceneViewer for using the ruler
+                } else if (theKey == "r" || theKey == "s") { // call SceneViewer for using the ruler
                     Base.onKey(theKey, theKeyState, theX, theY, theShiftFlag, theControlFlag, theAltFlag);
                 }
             } else {
@@ -145,8 +145,8 @@ spark.Layouter.Constructor = function(Protected) {
                     stop();   
                 } else if (theKey.search(/shift/) != -1) {
                     _myShiftFlag = false;
-                } else if (theKey == "s") {
-                    _myIsSPressed = false;
+                } else if (theKey == "f") {
+                    _myIsFPressed = false;
                 } else if (theKey == "y") {
                     _myIsYPressed = false;
                 } else if (theKey == "d") {
@@ -316,7 +316,7 @@ spark.Layouter.Constructor = function(Protected) {
                     break;
             }
             updatePosition(myNewPos.x, window.height - myNewPos.y, myNewPos.z);
-        } else if (_myIsSPressed) { // size manipulation
+        } else if (_myIsFPressed) { // size manipulation
             switch(theKey) {
                 case "left":
                     if (_myWidget.width) {
