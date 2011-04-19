@@ -260,25 +260,28 @@ namespace y60 {
     }
 
     void FFMpegDecoder2::startMovie(double theStartTime, bool theStartAudioFlag) {
-        AC_INFO << "FFMpegDecoder2::startMovie, time: " << theStartTime << " frames in queue: "<<_myMsgQueue.size();
-        if (isUnjoined()) {
-            DB(AC_DEBUG << "Joining FFMpegDecoder Thread");
-            join();
+        AC_INFO << "FFMpegDecoder2::startMovie "<< getMovie()->get<ImageSourceTag>() << ", time: " << theStartTime << " frames in queue: "<<_myMsgQueue.size();
+        double myCurrentTime = 0.0;
+        if (_myLastVideoFrame) {
+            myCurrentTime = _myLastVideoFrame->getTime();    
         }
-
+        if (theStartTime > 0) {
+            if (isUnjoined()) {
+                DB(AC_DEBUG << "Joining FFMpegDecoder Thread");
+                join();
+            }
+        }
         if (theStartAudioFlag && hasAudio() && getDecodeAudioFlag()) {
+            if (isUnjoined()) {
+                DB(AC_DEBUG << "Joining FFMpegDecoder Thread");
+                join();
+            }
             _myAudioTimeOffset = theStartTime;
             _myAudioSink->stop();
             // ensure that the audio buffer is stopped and cleared
             while (_myAudioSink->getState() != HWSampleSink::STOPPED) {
                 asl::msleep(10);
             }
-        }
-        Movie * myMovie = getMovie();
-        _myMaxCacheSize = myMovie->get<MaxCacheSizeTag>();
-        double myCurrentTime = 0.0;
-        if (_myLastVideoFrame) {
-            myCurrentTime = _myLastVideoFrame->getTime();    
         }
         _myLastVideoFrame = VideoMsgPtr();
 
@@ -728,7 +731,7 @@ namespace y60 {
                 for(;;) {
                     myVideoMsg = _myMsgQueue.pop_front();
                     bool myEOFFoundFlag = _myMsgQueue.hasEOF();
-                    if (myEOFFoundFlag && !isActive()) {
+                    if (hasAudio() && getDecodeAudioFlag() && myEOFFoundFlag && !isActive()) {
                         startOverAgain();
                     }
                     if (myVideoMsg->getType() == VideoMsg::MSG_EOF) {
@@ -814,8 +817,7 @@ namespace y60 {
                 yield();
                 continue;
             }
-            if (hasAudio()&& getDecodeAudioFlag())
-            {
+            if (hasAudio()&& getDecodeAudioFlag()) {
                 //XXX: disabled audio eof flag beacause it doesn't make sense for the current decoder structure
                 // eof only means the demuxer demuxed all packets,
                 // but there can be a lot of packets in his queue, which the video decoder hasn't decoded yet
@@ -828,9 +830,13 @@ namespace y60 {
                     std::vector<unsigned> myFrameSize;
                     myFrameSize.push_back(0);
                     _myMsgQueue.push_back(VideoMsgPtr(new VideoMsg(VideoMsg::MSG_EOF, 0, myFrameSize)));
-                    isDone = true;
-                    AC_DEBUG << "---- EOF Yielding Thread.";
-                    continue;
+                    if (hasAudio() && getDecodeAudioFlag()) {
+                        isDone = true;
+                        AC_DEBUG << "---- EOF Yielding Thread.";
+                        continue;
+                    } else {
+                        doSeek(0, false);
+                    }
                 }
             } catch (asl::ThreadSemaphore::ClosedException &) {
                 // This should never happen.
