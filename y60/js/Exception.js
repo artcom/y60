@@ -70,20 +70,20 @@ function Exception(theMessage, theLocation, theName) {
 
     this.what = function() {
         return self.message;
-    }
+    };
     this.where = function() {
         return "[" + self.fileName + ":" + self.lineNumber + "]";
-    }
+    };
     this.toString = function() {
         return self.name + " in " + self.where() + ": " + self.message;
-    }
+    };
 
     this.set = function(theMessage, theLocation, theName) {
         self.message = theMessage;
         self.fileName   = theLocation.file;
         self.lineNumber = theLocation.line;
         self.name    = theName;
-    }
+    };
 }
 
 // This functions works for c++ and for JavaScript exceptions
@@ -110,4 +110,5 @@ function composeException(theException) {
 
 function reportException(theException) {
     Logger.error(composeException(theException));
+    dumpstack();
 }
