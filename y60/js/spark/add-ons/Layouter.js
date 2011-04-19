@@ -169,7 +169,6 @@ spark.Layouter.Constructor = function(Protected) {
                 var myViewport = _myStage.getViewportAtWindowCoordinates(0, 0); // get viewport containing upper left pixel            
                 var myDifference = difference(myBox.min, new Vector3f(0,0,myBox.min.z));
                 var myDifferenceTopLeft = difference(myBox.min, new Vector3f(0,window.height,myBox.min.z));
-                var myDebugPosition = [];
                 window.renderText([clamp(myBox.min.x-80,0,window.width), clamp(window.height - (myBox.min.y-20), 0, window.height)], "[" + myDifference.x  + "," + myDifference.y + "]", "Screen13", myViewport );
                 window.renderText([clamp(myBox.min.x-80, 0,window.width), clamp(window.height - (myBox.min.y+20), 0,window.height)], "[" + myDifferenceTopLeft.x  + "," + Math.abs(myDifferenceTopLeft.y) + "]", "Screen13", myViewport );
             }
@@ -253,6 +252,9 @@ spark.Layouter.Constructor = function(Protected) {
             _myWidget.x += myTranslation.x;
             _myWidget.y += myTranslation.y;
             _myWidget.z += myTranslation.z;
+            _myWidget.x = Math.round(_myWidget.x);
+            _myWidget.y = Math.round(_myWidget.y);
+            _myWidget.z = Math.round(_myWidget.z);
             print(_myWidget.name + " moved to x: " + _myWidget.x + " y: " + _myWidget.y + " z: " +_myWidget.z);
         } else {
             _myWidget.layouterSetPosition(_myOldPos, new Vector3f(theX, theY, theZ));
