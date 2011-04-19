@@ -110,5 +110,4 @@ function composeException(theException) {
 
 function reportException(theException) {
     Logger.error(composeException(theException));
-    dumpstack();
 }
