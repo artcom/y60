@@ -73,6 +73,7 @@ namespace asl {
     ////////////////////////////////////////////////////////////////////////////////
 
     enum HermiteInitMode { catmull_rom, minimize_fluctuations, minimize_fluctuations_forward, weighted_ratio };	// how to init Hermite
+    const char * const HermiteInitModeString[] = { "catmull_rom", "minimize_fluctuations", "minimize_fluctuations_forward", "weighted_ratio", 0 };	
 
     class ASL_MATH_DECL Hermite : public YrSpline
     {
