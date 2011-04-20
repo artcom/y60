@@ -69,10 +69,8 @@ use("common.js");
 var spark = Namespace("spark");
 
 spark.findRootElement = function (theDocument) {
-    var myRoot = theDocument.firstChild;
-    if (!myRoot) {
-        myRoot = theDocument;
-    }
+    var myRoot = (theDocument.nodeType === Node.DOCUMENT_NODE) ? theDocument.firstChild 
+                                                               : theDocument;
     // firstChild might be a xml processing instruction, a
     // comment, a doctype declaration or god knows what else.
     while (myRoot.nodeType !== Node.ELEMENT_NODE) {

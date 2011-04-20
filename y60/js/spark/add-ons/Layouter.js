@@ -12,9 +12,10 @@
 //hold ctrl, click target, move with mouse or arrows or shift-arrows
 //+ moves target to parent
 //a toggles additional features of target
-//s change size of widget
-//1 moves down in z direction
-//2 moves up in z direction
+//f change size of widget
+//d change z-rotation of widget
+//"down" moves down in z direction
+//"up" moves up in z direction
 //i toggles visibility of layoutImage, which can be an commandLineArgument (layoutimage=<src>)
 
 //classes using Layouter can implement hooks
@@ -24,19 +25,30 @@
 // * layouterToggleWidget - can be used to change widget style e.g.
 
 spark.Layouter = spark.ComponentClass("Layouter");
+spark.Layouter.BINDING_SLOT = {
+    CATCH  : "CATCH",
+    RELEASE : "RELEASE"
+};
 spark.Layouter.Constructor = function(Protected) {
 
     var Base = {};
     var Public = this;
     this.Inherit(spark.Component);
     
+    var _bindings = {};
+    (function () {
+        for (var slot in spark.Layouter.BINDING_SLOT) {
+            _bindings[spark.Layouter.BINDING_SLOT[slot]] = {};
+        }
+    }());
     var _myState       = IDLE;
     var _myOldPos      = null;
     var _myWidget      = null;
     var _myShiftFlag   = false;
     var _myIsCtrlPressed = false;
-    var _myIsSPressed = false;   //change size 
+    var _myIsFPressed = false;   //change size 
     var _myIsYPressed = false;   //change z position
+    var _myIsDPressed = false;   //change z rotation
     var _myStage       = null;
     var _myListeners = null;
     var _myCurrentSparkNode = null;
@@ -45,11 +57,33 @@ spark.Layouter.Constructor = function(Protected) {
     var _mySparkFiles = [];
     var _myVisualMode = 2; // box with mesurement
     var _myLayoutImage = null;
-    var _myBackup = {originalZ:null, originalWidth:null, originalHeight:null};
+    var _myBackup = {originalZ:null, originalWidth:null, originalHeight:null, originalRotationZ:null};
     const DEBUG_COLOR = new Vector4f(1,0,0,1);
     
     const IDLE = 0;
     const ACTIVE = 1;
+    
+    function _unbind(theHandle) {
+        delete _bindings[theHandle.bind_info.slot][theHandle.bind_info.id];
+        return true;
+    }
+    
+    function Handle(theBindInfo, theCb) {
+        this.bind_info = theBindInfo; //back-pointer
+        this.cb = theCb;
+    }
+    
+    Handle.prototype.unbind = function () {
+        _unbind(this);
+    };
+    
+    Public.bind = function (theBindingSlot, cb) {
+        var bind_info = {id   : createUniqueId(),
+                         slot : theBindingSlot};
+        var my_handle = new Handle(bind_info, cb);
+        _bindings[theBindingSlot][bind_info.id] = my_handle;
+        return my_handle;
+    };
     
     Base.realize = Public.realize;
     Public.realize = function () {
@@ -73,17 +107,19 @@ spark.Layouter.Constructor = function(Protected) {
             if (!theControlFlag) {
                 Base.onKey(theKey, theKeyState, theX, theY, theShiftFlag, theControlFlag, theAltFlag);
             }
-            Logger.info("onKey "+ theKey+" "+_myIsYPressed+" "+_myIsSPressed+" "+_myShiftFlag);
+            Logger.info("onKey "+ theKey+" "+_myIsYPressed+" "+_myIsFPressed+" "+_myShiftFlag);
             if(theKeyState) {
                 if(theKey.search(/ctrl/) != -1) {
                     _myIsCtrlPressed = true;
                     activate();
                 } else if (theKey.search(/shift/) != -1) {
                     _myShiftFlag = true;
-                } else if (theKey == "s") {
-                    _myIsSPressed = true;
+                } else if (theKey == "f") {
+                    _myIsFPressed = true;
                 } else if (theKey == "y") {
                     _myIsYPressed = true;
+                } else if (theKey == "d") {
+                    _myIsDPressed = true;
                 } else if ((theKey == "left"
                         || theKey == "right"
                         || theKey == "up"
@@ -99,7 +135,7 @@ spark.Layouter.Constructor = function(Protected) {
                 } else if (theKey == "i" && _myLayoutImage) {
                     _myLayoutImage.visible = !_myLayoutImage.visible;
                     print("layoutimage ", _myLayoutImage.visible)
-                } else if (theKey == "r") { // call SceneViewer for using the ruler
+                } else if (theKey == "r" || theKey == "s") { // call SceneViewer for using the ruler
                     Base.onKey(theKey, theKeyState, theX, theY, theShiftFlag, theControlFlag, theAltFlag);
                 }
             } else {
@@ -109,10 +145,12 @@ spark.Layouter.Constructor = function(Protected) {
                     stop();   
                 } else if (theKey.search(/shift/) != -1) {
                     _myShiftFlag = false;
-                } else if (theKey == "s") {
-                    _myIsSPressed = false;
+                } else if (theKey == "f") {
+                    _myIsFPressed = false;
                 } else if (theKey == "y") {
                     _myIsYPressed = false;
+                } else if (theKey == "d") {
+                    _myIsDPressed = false;
                 }
             }
         }
@@ -131,7 +169,6 @@ spark.Layouter.Constructor = function(Protected) {
                 var myViewport = _myStage.getViewportAtWindowCoordinates(0, 0); // get viewport containing upper left pixel            
                 var myDifference = difference(myBox.min, new Vector3f(0,0,myBox.min.z));
                 var myDifferenceTopLeft = difference(myBox.min, new Vector3f(0,window.height,myBox.min.z));
-                var myDebugPosition = [];
                 window.renderText([clamp(myBox.min.x-80,0,window.width), clamp(window.height - (myBox.min.y-20), 0, window.height)], "[" + myDifference.x  + "," + myDifference.y + "]", "Screen13", myViewport );
                 window.renderText([clamp(myBox.min.x-80, 0,window.width), clamp(window.height - (myBox.min.y+20), 0,window.height)], "[" + myDifferenceTopLeft.x  + "," + Math.abs(myDifferenceTopLeft.y) + "]", "Screen13", myViewport );
             }
@@ -154,7 +191,13 @@ spark.Layouter.Constructor = function(Protected) {
     Public.target setter = function (theWidget) {
         print("target widget", theWidget)
         _myWidget = theWidget;
+        for (var handleId in _bindings[spark.Layouter.BINDING_SLOT.CATCH]) {
+            var myHandle = _bindings[spark.Layouter.BINDING_SLOT.CATCH][handleId];
+            myHandle.cb(_myWidget);
+        }
+
         _myBackup.originalZ = _myWidget.z;
+        _myBackup.originalRotationZ = ("rotationZ" in _myWidget) ? _myWidget.rotationZ : null;
         _myBackup.originalWidth = ("width" in _myWidget) ? _myWidget.width : null;
         _myBackup.originalHeight = ("height" in _myWidget) ? _myWidget.height : null;
         _myState = ACTIVE;
@@ -209,6 +252,9 @@ spark.Layouter.Constructor = function(Protected) {
             _myWidget.x += myTranslation.x;
             _myWidget.y += myTranslation.y;
             _myWidget.z += myTranslation.z;
+            _myWidget.x = Math.round(_myWidget.x);
+            _myWidget.y = Math.round(_myWidget.y);
+            _myWidget.z = Math.round(_myWidget.z);
             print(_myWidget.name + " moved to x: " + _myWidget.x + " y: " + _myWidget.y + " z: " +_myWidget.z);
         } else {
             _myWidget.layouterSetPosition(_myOldPos, new Vector3f(theX, theY, theZ));
@@ -272,7 +318,7 @@ spark.Layouter.Constructor = function(Protected) {
                     break;
             }
             updatePosition(myNewPos.x, window.height - myNewPos.y, myNewPos.z);
-        } else if (_myIsSPressed) { // size manipulation
+        } else if (_myIsFPressed) { // size manipulation
             switch(theKey) {
                 case "left":
                     if (_myWidget.width) {
@@ -294,6 +340,21 @@ spark.Layouter.Constructor = function(Protected) {
                         _myWidget.height -= myDist;
                     } 
                     break;              
+                default:
+                    break;
+            }
+        } else if (_myIsDPressed) { // size manipulation
+            switch(theKey) {
+                case "up":
+                    if ("rotationZ" in _myWidget) {
+                        _myWidget.rotationZ += myDist;
+                    } 
+                    break;
+                case "down":
+                    if ("rotationZ" in _myWidget) {
+                        _myWidget.rotationZ -= myDist;
+                    } 
+                    break;
                 default:
                     break;
             }
@@ -333,6 +394,9 @@ spark.Layouter.Constructor = function(Protected) {
                     if (_myWidget.z !== _myBackup.originalZ) {
                         myNode.z = Math.round(_myWidget.z);
                     }
+                    if (_myWidget.rotationZ !== _myBackup.originalRotationZ) {
+                        myNode.rotationZ = Math.round(_myWidget.rotationZ);
+                    }
                     if ("width" in _myWidget && _myWidget.width && _myWidget.width !== _myBackup.originalWidth) {
                         myNode.width = Math.round(_myWidget.width);
                     }
@@ -342,6 +406,10 @@ spark.Layouter.Constructor = function(Protected) {
                     _myCurrentSparkNode.saveFile(_myCurrentSparkFile);
                     print("write to file ", _myCurrentSparkFile);
                 }
+            }
+            for (var handleId in _bindings[spark.Layouter.BINDING_SLOT.RELEASE]) {
+                var myHandle = _bindings[spark.Layouter.BINDING_SLOT.RELEASE][handleId];
+                myHandle.cb(_myWidget);
             }
         }
         _myWidget = null;

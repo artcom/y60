@@ -41,6 +41,8 @@ spark.Window.Constructor = function (Protected, theArguments) {
     var _myMouseFocused      = null;
     var _myMouseCursor       = null;
     var _myKeyboardFocused   = null;
+
+    var _myLayouter          = null;
     
     /////////////////////
     // Private Methods //
@@ -153,6 +155,7 @@ spark.Window.Constructor = function (Protected, theArguments) {
                 } else {
                     myAppear = new spark.CursorEvent(spark.CursorEvent.APPEAR, myCursor);
                 }
+                
                 myPick.dispatchEvent(myAppear);
             }
             if (myCursor.active && (myPick != myFocused)) {
@@ -301,9 +304,12 @@ spark.Window.Constructor = function (Protected, theArguments) {
             print("initializing Layouter");
             use("spark/add-ons/Layouter.js");
             var myLayouter = new Node("<Layouter name='Layouter_" + Public.name + "'/>");
-            spark.loadDocument(myLayouter);
+            _myLayouter = spark.loadDocument(myLayouter);
         }
     };
+    Public.__defineGetter__("layouter", function () {
+        return _myLayouter;
+    });
 
     // XXX: Override size, width and height properties inherited via Stage->Widget
     // They do return a boundingbox size which, from class Windows standpoint, is just

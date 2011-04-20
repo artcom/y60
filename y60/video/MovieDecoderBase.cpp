@@ -65,6 +65,8 @@
 
 using namespace std;
 
+#define DB(x) // x
+
 namespace y60 {
 
     void copyPlaneToRaster(unsigned char * theDestination, unsigned char * theSource, int theStride, unsigned theWidth, unsigned theHeight)
@@ -97,9 +99,9 @@ namespace y60 {
     }
 #endif
     double MovieDecoderBase::getMovieTime(double theSystemTime) {
-        AC_DEBUG << "getMovieTime start: _myMovieTime: " << _myMovieTime
+        DB(AC_TRACE << "getMovieTime start: _myMovieTime: " << _myMovieTime
                 << ", theSystemTime: " << theSystemTime << ", _myLastSystemTime: "
-                << _myLastSystemTime;
+                << _myLastSystemTime);
         if (theSystemTime <= _myLastSystemTime) {
             return _myMovieTime;
         }
@@ -126,9 +128,9 @@ namespace y60 {
             }
         }
         _myLastSystemTime = theSystemTime;
-        AC_DEBUG << "getMovieTime end: _myMovieTime: " << _myMovieTime
+        DB(AC_TRACE << "getMovieTime end: _myMovieTime: " << _myMovieTime
                 << ", theSystemTime: " << theSystemTime << ", _myLastSystemTime: "
-                << _myLastSystemTime;
+                << _myLastSystemTime);
         return _myMovieTime;
     }
 

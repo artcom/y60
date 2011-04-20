@@ -74,7 +74,7 @@ spark.loadFile = function (theFile, theParent, theArguments) {
     Logger.info("Loading spark file " + theFile);
     var myFileWithPath = searchFile(theFile);
     if (!myFileWithPath) {
-        throw new Error("spark file '" + theFile + "' does not exist.");
+        throw new Exception("spark.loadFile: spark file '" + theFile + "' does not exist.", fileline());
     }
     var myNode = new Node();
     myNode.parseFile(myFileWithPath);

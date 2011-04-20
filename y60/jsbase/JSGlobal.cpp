@@ -1083,8 +1083,8 @@ nearestDispatcher(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *
                 if (myStatus != NOT_FOUND) return JS_TRUE;
             }
             { // LineSegment
-                typedef Point3<LineNumber> (*NearestLineSegmentPoint)(const Point3<LineNumber> &, const Sphere<LineNumber> &);
-                myStatus = VectorObjectFunction((NearestLineSegmentPoint)&nearest, cx, myObj0, myObj1, rval);
+                typedef Point3<LineNumber> (*NearestPointLineSegment)(const Point3<LineNumber> &, const LineSegment<LineNumber> &);
+                myStatus = VectorObjectFunction((NearestPointLineSegment)&nearest, cx, myObj0, myObj1, rval);
                 if (myStatus != NOT_FOUND) return JS_TRUE;
             }
             {

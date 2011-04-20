@@ -16,6 +16,7 @@ spark.ResizableRectangle.Constructor = function (Protected) {
     var _myMaterial;
     var _myShape;
     var _myVertices;
+    var _myUVCoords = null;
     
     /////////////////////
     // Private Methods //
@@ -79,8 +80,8 @@ spark.ResizableRectangle.Constructor = function (Protected) {
         // set the material to allow proper layering of transparencies
         // after rendering, the framebuffer will have the proper alpha
         _myMaterial.properties.blendfunction = "[src_alpha,one_minus_src_alpha,one,one_minus_src_alpha]";
+        var tu = _myMaterial.find("./textureunits/textureunit");
         if (!_myShape) {
-            var tu = _myMaterial.find("./textureunits/textureunit");
             if (tu) {
                 var raster = tu.$texture.$image.raster;
                 Public.width = raster.width;
@@ -99,6 +100,10 @@ spark.ResizableRectangle.Constructor = function (Protected) {
                        1,1);
             */
             _myShape.name = Public.name + "-shape";
+        }
+                
+        if (tu) {
+            _myUVCoords = _myShape.find(".//*[@name='uvset']").firstChild.nodeValue;
         }
 
         _myVertices = _myShape.find(".//*[@name='position']").firstChild.nodeValue;
@@ -127,4 +132,8 @@ spark.ResizableRectangle.Constructor = function (Protected) {
     Protected.__defineGetter__("vertices", function () {
         return _myVertices;
     });
+    Protected.__defineGetter__("uvset", function () {
+        return _myUVCoords;
+    });
+    
 };

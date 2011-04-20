@@ -403,7 +403,7 @@ namespace y60 {
             glActiveTexture(myTexUnit);
 
             // triggers texture setup/update
-            unsigned myTextureId = myTexture->applyTexture(); //ensureTextureId();
+            unsigned myTextureId = myTexture->applyTexture();
             GLenum myTextureTarget = asGLTextureTarget(myTexture->getType());
 
             // bind/enable texture

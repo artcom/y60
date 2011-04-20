@@ -251,12 +251,6 @@ namespace y60 {
         }
         doSeek(0, false);
 
-        if (!isActive()) {
-            if (hasAudio() && getDecodeAudioFlag()) {
-                readAudio();
-            }
-            decodeFrame();
-        }
         if (!isUnjoined()) {
             DB(AC_DEBUG << "Forking FFMpegDecoder Thread");
             PosixThread::fork();
@@ -266,28 +260,28 @@ namespace y60 {
     }
 
     void FFMpegDecoder2::startMovie(double theStartTime, bool theStartAudioFlag) {
-        AC_INFO << "FFMpegDecoder2::startMovie, time: " << theStartTime;
-        if (isUnjoined()) {
-            DB(AC_DEBUG << "Joining FFMpegDecoder Thread");
-            join();
+        AC_INFO << "FFMpegDecoder2::startMovie "<< getMovie()->get<ImageSourceTag>() << ", time: " << theStartTime << " frames in queue: "<<_myMsgQueue.size();
+        double myCurrentTime = 0.0;
+        if (_myLastVideoFrame) {
+            myCurrentTime = _myLastVideoFrame->getTime();    
         }
-        while (isUnjoined()) {
-            asl::msleep(10);
+        if (theStartTime > 0) {
+            if (isUnjoined()) {
+                DB(AC_DEBUG << "Joining FFMpegDecoder Thread");
+                join();
+            }
         }
-
         if (theStartAudioFlag && hasAudio() && getDecodeAudioFlag()) {
+            if (isUnjoined()) {
+                DB(AC_DEBUG << "Joining FFMpegDecoder Thread");
+                join();
+            }
             _myAudioTimeOffset = theStartTime;
             _myAudioSink->stop();
             // ensure that the audio buffer is stopped and cleared
             while (_myAudioSink->getState() != HWSampleSink::STOPPED) {
                 asl::msleep(10);
             }
-        }
-        Movie * myMovie = getMovie();
-        _myMaxCacheSize = myMovie->get<MaxCacheSizeTag>();
-        double myCurrentTime = 0.0;
-        if (_myLastVideoFrame) {
-            myCurrentTime = _myLastVideoFrame->getTime();    
         }
         _myLastVideoFrame = VideoMsgPtr();
 
@@ -313,13 +307,15 @@ namespace y60 {
             if (theStartAudioFlag && hasAudio() && getDecodeAudioFlag()) {
                 myAudioEOFFlag = !readAudio();
             }
-            if (!decodeFrame() || myAudioEOFFlag) {
-                _myDemux->clearPacketCache();
-                _myMsgQueue.clear();
-                _myMsgQueue.reset();
-                doSeek(theStartTime);
-                if (theStartAudioFlag && hasAudio() && getDecodeAudioFlag()) {
-                    _myAdjustAudioOffsetFlag = true;
+            if (_myMsgQueue.size() == 0) {
+                if(!decodeFrame() || myAudioEOFFlag) {
+                    _myDemux->clearPacketCache();
+                    _myMsgQueue.clear();
+                    _myMsgQueue.reset();
+                    doSeek(theStartTime);
+                    if (theStartAudioFlag && hasAudio() && getDecodeAudioFlag()) {
+                        _myAdjustAudioOffsetFlag = true;
+                    }
                 }
             }
         }
@@ -735,7 +731,7 @@ namespace y60 {
                 for(;;) {
                     myVideoMsg = _myMsgQueue.pop_front();
                     bool myEOFFoundFlag = _myMsgQueue.hasEOF();
-                    if (myEOFFoundFlag && !isActive()) {
+                    if (hasAudio() && getDecodeAudioFlag() && myEOFFoundFlag && !isActive()) {
                         startOverAgain();
                     }
                     if (myVideoMsg->getType() == VideoMsg::MSG_EOF) {
@@ -816,12 +812,12 @@ namespace y60 {
                     DBA(AC_DEBUG<<"---sleeping ---still decode audio");
                     /*bool myAudioEofFlag = !*/readAudio();
                 }
+                //XXX: forces the main thread to wait when joining decode thread
                 asl::msleep(10);
                 yield();
                 continue;
             }
-            if (hasAudio()&& getDecodeAudioFlag())
-            {
+            if (hasAudio()&& getDecodeAudioFlag()) {
                 //XXX: disabled audio eof flag beacause it doesn't make sense for the current decoder structure
                 // eof only means the demuxer demuxed all packets,
                 // but there can be a lot of packets in his queue, which the video decoder hasn't decoded yet
@@ -834,9 +830,13 @@ namespace y60 {
                     std::vector<unsigned> myFrameSize;
                     myFrameSize.push_back(0);
                     _myMsgQueue.push_back(VideoMsgPtr(new VideoMsg(VideoMsg::MSG_EOF, 0, myFrameSize)));
-                    isDone = true;
-                    AC_DEBUG << "---- EOF Yielding Thread.";
-                    continue;
+                    if (hasAudio() && getDecodeAudioFlag()) {
+                        isDone = true;
+                        AC_DEBUG << "---- EOF Yielding Thread.";
+                        continue;
+                    } else {
+                        doSeek(0, false);
+                    }
                 }
             } catch (asl::ThreadSemaphore::ClosedException &) {
                 // This should never happen.
@@ -850,7 +850,7 @@ namespace y60 {
     }
 
     void FFMpegDecoder2::setupVideo(const std::string & theFilename) {
-        AC_DEBUG << "FFMpegDecoder2::setupVideo";
+        AC_INFO << "FFMpegDecoder2::setupVideo";
         AVCodecContext * myVCodec = _myVStream->codec;
         // open codec
         AVCodec * myCodec = avcodec_find_decoder(myVCodec->codec_id);
@@ -1085,9 +1085,9 @@ namespace y60 {
         }
         _myMsgQueue.push_back(myVideoFrame);
 
-        AC_DEBUG << "---- Added Frame to cache, Frame # : "
+        DBV(AC_DEBUG << "---- Added Frame to cache, Frame # : "
             << double(theTime - _myVideoStartTimestamp/_myVideoStreamTimeBase)*_myFrameRate
-            << " cache size=" << _myMsgQueue.size();
+            << " cache size=" << _myMsgQueue.size());
     }
 
     bool FFMpegDecoder2::shouldSeek(double theCurrentTime, double theDestTime) {
@@ -1101,9 +1101,6 @@ namespace y60 {
         if (isUnjoined()) {
             DB(AC_DEBUG << "Joining FFMpegDecoder Thread");
             join();
-        }
-        while (isUnjoined()) {
-            asl::msleep(10);
         }
         if (hasAudio() && getDecodeAudioFlag()) {
             _myAudioSink->stop();

@@ -82,7 +82,7 @@ function(add_rendertest TEST SUFFIX SHADERLIBRARY)
 
   if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${TEST}.js)
       list(APPEND LOAD ${TEST}.js)
-  elsE(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${TEST}.js)
+  else(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${TEST}.js)
       list(APPEND LOAD scenetest.js)
   endif(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${TEST}.js)
 
