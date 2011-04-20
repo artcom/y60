@@ -22,7 +22,6 @@
 //own header
 #include "CoordSpline.h"
 
-#include "Spline.h"
 #include "integrate_function.h"
 #include "Matrix4.h"
 
@@ -39,11 +38,19 @@ namespace asl {
 
     CoordSpline::CoordSpline ( void )
     {
+        _init_mode = catmull_rom;
         for ( int i=0; i<5; i++ ) {
             _spline.push_back ( new Hermite() );
         }
     }
 
+    CoordSpline::CoordSpline ( HermiteInitMode initMode )
+    {
+        _init_mode = initMode;
+        for ( int i=0; i<5; i++ ) {
+            _spline.push_back ( new Hermite() );
+        }
+    }
     CoordSpline::~CoordSpline ( void )
     {
 
@@ -117,7 +124,7 @@ namespace asl {
         s = time;
         for ( int i=0; i<3; i++ ) {
             AC_TRACE << "initializing spline " << i << endl;
-            if ( ! _spline[i]->init ( s, value[i], catmull_rom, false ) ) {
+            if ( ! _spline[i]->init ( s, value[i], _init_mode, false ) ) {
                 AC_ERROR << "CoordSpline::init: could not initialise value "<< i <<endl;
                 return false;
             }
@@ -131,7 +138,7 @@ namespace asl {
 
         // INIT SPLINE s(t)
         AC_TRACE << "initializing spline s(t)" << endl;
-        if ( ! _spline[TIME]->init ( time, s, catmull_rom, true ) ) {
+        if ( ! _spline[TIME]->init ( time, s, _init_mode, true ) ) {
             AC_ERROR << "CoordSpline::init: could not initialise spline" << endl;
             return false;
         }

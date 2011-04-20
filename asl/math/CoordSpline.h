@@ -28,6 +28,7 @@
 #include "Matrix4.h"
 #include "Quaternion.h"
 #include <vector>
+#include "Spline.h"
 
 
 namespace asl {
@@ -206,6 +207,7 @@ namespace asl {
     {
       public:
           CoordSpline        ( void );
+          CoordSpline        ( HermiteInitMode );
           ~CoordSpline      ( void );
         void    print        ( void );
         bool    init        ( const std::vector<asl::QuaternionKeyframe>& keyframes, float& total_path, bool planet_mode );
@@ -226,6 +228,7 @@ namespace asl {
 
         typedef std::vector<Hermite*> Spline;
         Spline  _spline;
+        HermiteInitMode _init_mode;
         bool    _planet_mode;
         int      _error_count;
         int      _error_maxnum;

@@ -74,6 +74,16 @@ template class JSWrapper<asl::CoordSpline, asl::Ptr<asl::CoordSpline>, StaticAcc
 
 typedef asl::CoordSpline NATIVE;
 
+bool convertFrom(JSContext *cx, jsval theValue, HermiteInitMode &theInitMode) {
+    int myInitMode = catmull_rom;
+    if (JS_ValueToInt32(cx, theValue, &myInitMode))
+    {
+        theInitMode = (HermiteInitMode)myInitMode;
+        return true;
+    }
+    return false;
+
+};
 static JSBool
 position(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Returns a position for a given timestamp");
@@ -180,6 +190,21 @@ JSCoordSpline::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv
         float myLength = 0;
 
         OWNERPTR myNewCoordSpline = OWNERPTR(new CoordSpline());
+        myNewCoordSpline->init(myKeyframes, myLength, false);
+        myNewObject = new JSCoordSpline(myNewCoordSpline, myNewCoordSpline.get());
+    } else if (argc == 2) {
+        std::vector<asl::QuaternionKeyframe> myKeyframes;
+        if (JSVAL_IS_VOID(argv[0]) || !convertFrom(cx, argv[0], myKeyframes)) {
+            JS_ReportError(cx, "JSStringMover::Constructor: argument #1 must be a vector of keyframes");
+            return JS_FALSE;
+        }
+        HermiteInitMode myInitMode;
+        if (JSVAL_IS_VOID(argv[1]) || !convertFrom(cx, argv[1], myInitMode)) {
+            JS_ReportError(cx, "JSStringMover::Constructor: argument #2 must be a HermiteInitMode");
+            return JS_FALSE;
+        }
+        float myLength = 0;
+        OWNERPTR myNewCoordSpline = OWNERPTR(new CoordSpline(myInitMode));
         myNewCoordSpline->init(myKeyframes, myLength, false);
         myNewObject = new JSCoordSpline(myNewCoordSpline, myNewCoordSpline.get());
     } else {
