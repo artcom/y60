@@ -125,7 +125,6 @@ Ruler.prototype.Constructor = function (Public, theSceneViewer) {
                 window.getRenderer().draw(new LineSegment(_myStartPoint, mySecondEdge), RULER_COLOR, myMatrix, 1);
                 window.getRenderer().draw(new LineSegment(myFirstEdge, _myEndPoint), RULER_COLOR, myMatrix, 1);
                 window.getRenderer().draw(new LineSegment(mySecondEdge, _myEndPoint), RULER_COLOR, myMatrix, 1);
-                window.getRenderer().draw(new LineSegment(mySecondEdge, _myEndPoint), RULER_COLOR, myMatrix, 1);
                 
                 window.getRenderer().draw(new Sphere(new Point3f(_myEndPoint), CROSS_RADIUS), CROSS_COLOR, myMatrix, 1);
                 myText = "x:" + _myEndPoint.x;

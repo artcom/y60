@@ -163,10 +163,10 @@ spark.Layouter.Constructor = function(Protected) {
             var myBox = _myWidget.sceneNode.boundingbox;
             window.getRenderer().draw(myBox, DEBUG_COLOR, myMatrix, 2);
             if (_myVisualMode > 1) {
-                window.getRenderer().draw(new LineSegment(new Point3f(0,myBox.min.y,myBox.min.z),new Point3f(window.width,myBox.min.y,myBox.min.z) ), DEBUG_COLOR, myMatrix, 1);
-                window.getRenderer().draw(new LineSegment(new Point3f(myBox.min.x, 0, myBox.min.z),new Point3f(myBox.min.x,window.height,myBox.min.z) ), DEBUG_COLOR, myMatrix, 1);
+                window.getRenderer().draw(new LineSegment(new Point3f(0,myBox.min.y,window.camera.position.z-1),new Point3f(window.width,myBox.min.y,window.camera.position.z-1) ), DEBUG_COLOR, myMatrix, 1);
+                window.getRenderer().draw(new LineSegment(new Point3f(myBox.min.x, 0, window.camera.position.z-1),new Point3f(myBox.min.x,window.height,window.camera.position.z-1) ), DEBUG_COLOR, myMatrix, 1);
                 window.setTextColor([1,0,0,1]);
-                var myViewport = _myStage.getViewportAtWindowCoordinates(0, 0); // get viewport containing upper left pixel            
+                var myViewport = _myStage.getViewportAtWindowCoordinates(0, 0);
                 var myDifference = difference(myBox.min, new Vector3f(0,0,myBox.min.z));
                 var myDifferenceTopLeft = difference(myBox.min, new Vector3f(0,window.height,myBox.min.z));
                 window.renderText([clamp(myBox.min.x-80,0,window.width), clamp(window.height - (myBox.min.y-20), 0, window.height)], "[" + myDifference.x  + "," + myDifference.y + "]", "Screen13", myViewport );
@@ -280,6 +280,9 @@ spark.Layouter.Constructor = function(Protected) {
     }
 
     function onMouseDown(theEvent) {
+        if (theEvent.target === _myStage) {
+            return;
+        }
         if (!_myWidget) {
             Public.target = theEvent.target;
             _myListeners = clone(theEvent.target.getEventListeners(spark.CursorEvent.APPEAR));
