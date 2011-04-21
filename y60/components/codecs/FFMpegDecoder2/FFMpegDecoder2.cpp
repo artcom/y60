@@ -850,7 +850,7 @@ namespace y60 {
     }
 
     void FFMpegDecoder2::setupVideo(const std::string & theFilename) {
-        AC_DEBUG << "FFMpegDecoder2::setupVideo";
+        AC_INFO << "FFMpegDecoder2::setupVideo";
         AVCodecContext * myVCodec = _myVStream->codec;
         // open codec
         AVCodec * myCodec = avcodec_find_decoder(myVCodec->codec_id);
@@ -1085,9 +1085,9 @@ namespace y60 {
         }
         _myMsgQueue.push_back(myVideoFrame);
 
-        AC_DEBUG << "---- Added Frame to cache, Frame # : "
+        DBV(AC_DEBUG << "---- Added Frame to cache, Frame # : "
             << double(theTime - _myVideoStartTimestamp/_myVideoStreamTimeBase)*_myFrameRate
-            << " cache size=" << _myMsgQueue.size();
+            << " cache size=" << _myMsgQueue.size());
     }
 
     bool FFMpegDecoder2::shouldSeek(double theCurrentTime, double theDestTime) {

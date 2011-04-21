@@ -182,6 +182,27 @@ JSCoordSpline::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv
         OWNERPTR myNewCoordSpline = OWNERPTR(new CoordSpline());
         myNewCoordSpline->init(myKeyframes, myLength, false);
         myNewObject = new JSCoordSpline(myNewCoordSpline, myNewCoordSpline.get());
+    } else if (argc == 2) {
+        std::vector<asl::QuaternionKeyframe> myKeyframes;
+        if (JSVAL_IS_VOID(argv[0]) || !convertFrom(cx, argv[0], myKeyframes)) {
+            JS_ReportError(cx, "JSStringMover::Constructor: argument #1 must be a vector of keyframes");
+            return JS_FALSE;
+        }
+        HermiteInitMode myInitMode = catmull_rom;
+        string myInitModeString;
+        if (JSVAL_IS_VOID(argv[1]) || !convertFrom(cx, argv[1], myInitModeString)) {
+            JS_ReportError(cx, "JSStringMover::Constructor: argument #2 must be a string");
+            return JS_FALSE;
+        }
+        float myLength = 0;
+        try {
+            myInitMode = (HermiteInitMode)getEnumFromString(myInitModeString, asl::HermiteInitModeString);
+        } catch (asl::ParseException) {
+            AC_WARNING << myInitModeString << " cannot be parsed probably is not a valid string";
+        }
+        OWNERPTR myNewCoordSpline = OWNERPTR(new CoordSpline(myInitMode));
+        myNewCoordSpline->init(myKeyframes, myLength, false);
+        myNewObject = new JSCoordSpline(myNewCoordSpline, myNewCoordSpline.get());
     } else {
         JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected 4 (position, orienation, timestamp, speed) %d",ClassName(), argc);
         return JS_FALSE;

@@ -133,7 +133,7 @@ namespace y60 {
              * Pauses the current playback. Audio is paused as well.
              */
             virtual void pauseMovie(bool thePauseAudioFlag = true) {
-                AC_INFO << "AsyncDecoder::pauseMovie";
+                AC_DEBUG << "AsyncDecoder::pauseMovie";
                 if (thePauseAudioFlag && _myAudioSink && getDecodeAudioFlag()) {
                     _myAudioSink->pause();
                 }
@@ -141,8 +141,8 @@ namespace y60 {
                 MovieDecoderBase::pauseMovie();
             }
 
-            void startMovie(double theStartTime, bool theStartAudioFlag = true) {
-                AC_INFO << "AsyncDecoder::startMovie";
+            virtual void startMovie(double theStartTime, bool theStartAudioFlag = true) {
+                AC_DEBUG << "AsyncDecoder::startMovie";
                 MovieDecoderBase::startMovie(theStartTime);
                 if (theStartAudioFlag && _myAudioSink && getDecodeAudioFlag()) {
                     _myAudioSink->play();
@@ -151,8 +151,8 @@ namespace y60 {
             /**
              * Resumes from pause
              */
-            void resumeMovie(double theStartTime, bool theResumeAudioFlag = true) {
-                AC_INFO << "AsyncDecoder::resumeMovie";
+            virtual void resumeMovie(double theStartTime, bool theResumeAudioFlag = true) {
+                AC_DEBUG << "AsyncDecoder::resumeMovie";
                 MovieDecoderBase::resumeMovie(theStartTime);
                 if (theResumeAudioFlag && _myAudioSink && getDecodeAudioFlag()) {
                     _myAudioSink->play();
@@ -170,7 +170,7 @@ namespace y60 {
              * the movie as if it was
              */
             virtual void stopMovie(bool theStopAudioFlag = true) {
-                //AC_DEBUG << "AsyncDecoder::stopMovie";
+                AC_DEBUG << "AsyncDecoder::stopMovie";
                 MovieDecoderBase::stopMovie();
                 if (theStopAudioFlag && _myAudioSink && getDecodeAudioFlag()) {
                     AC_DEBUG << "====== STOPPING AUDIO ";
