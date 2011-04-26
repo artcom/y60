@@ -685,7 +685,6 @@ AbstractRenderWindow::renderFrame() {
         preRender();
         render();
         postRender();
-        swapBuffers();
     }
 }
 

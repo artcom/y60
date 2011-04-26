@@ -879,6 +879,8 @@ SDLWindow::mainLoop() {
             }
         }
 
+        swapBuffers();
+
         asl::AGPMemoryFlushSingleton::get().resetGLAGPMemoryFlush();
 
         if (jslib::JSApp::getQuitFlag() == JS_TRUE) {

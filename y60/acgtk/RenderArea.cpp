@@ -246,6 +246,7 @@ RenderArea::on_expose_event (GdkEventExpose *event) {
             STOP_TIMER(handleRequests);
 
             renderFrame();
+            swapBuffers();
 
             /** done rendering **/
         } else {
