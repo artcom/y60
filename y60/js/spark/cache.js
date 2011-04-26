@@ -81,8 +81,13 @@ spark.getCachedImage = function (thePath) {
     }
     return myImage;
 };
+
+spark.getMovieCacheKey = function(thePath) {
+    return "spark-cached-movie-" + thePath;
+};
+
 spark.getCachedMovie = function (thePath, theTargetPixelFormat, theDecoderHint, theAudioFlag, theStartFrame, theCacheSize) {
-    var myName = "spark-cached-movie-" + thePath;
+    var myName = spark.getMovieCacheKey(thePath);
     var myMovie = spark.getNode(myName);
 
     if (!myMovie) {

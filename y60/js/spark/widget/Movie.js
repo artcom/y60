@@ -188,13 +188,15 @@ spark.Movie.Constructor = function(Protected) {
 
     Public.__defineSetter__("movie", function(theNode) {
         if (_myMovie) {
+            
             if (_myMovie.nodeName === "movie" && _myMovie.playmode !== "stop") {
                 Public.stop();
             }
-            _myMovie.parentNode.removeChild(_myMovie);
+            if (!_myUseCaching) {
+                _myMovie.parentNode.removeChild(_myMovie);                
+            }
             _myMovie = null;
         }
-
         _myMovie = theNode;
         _myTexture.image = theNode.id;
         Public.onMovieChanged();
@@ -205,7 +207,7 @@ spark.Movie.Constructor = function(Protected) {
     });
     Public.__defineSetter__("src", function (theSourceFile) {
         if(_mySource !== theSourceFile) {
-            _mySource = theSourceFile;
+            _mySource = theSourceFile;            
             if (_mySetSourceWithoutChangingImageNode) {
                 if (_myMovie.nodeName === "image") {
                     if (_myUseCaching) {
@@ -214,11 +216,15 @@ spark.Movie.Constructor = function(Protected) {
                         Public.movie = spark.openMovie(theSourceFile, _myTargetPixelFormat, _myDecoderHint, Protected.getBoolean("audio", true), _myStartFrame,_myCacheSize);
                     }
                 } else {
-                    // check cache
-                    var myName = "spark-cached-movie-" + theSourceFile;
-                    var myCachedMovie = spark.getNode(myName);
-                    if (myCachedMovie) {
-                        Public.movie = myCachedMovie;
+                    if (_myUseCaching) {
+                        // check cache
+                        var myName = spark.getMovieCacheKey(theSourceFile);
+                        var myCachedMovie = spark.getNode(myName);
+                        if (myCachedMovie) {
+                            Public.movie = myCachedMovie;
+                        } else {
+                            _myMovie.src = theSourceFile;
+                        }
                     } else {
                         _myMovie.src = theSourceFile;
                     }
@@ -226,11 +232,11 @@ spark.Movie.Constructor = function(Protected) {
                     Public.onMovieChanged();
                 }
             } else {
-            if (_myUseCaching) {
-                Public.movie = spark.getCachedMovie(theSourceFile, _myTargetPixelFormat, _myDecoderHint, Protected.getBoolean("audio", true), _myStartFrame,_myCacheSize);
-            } else {                
-                Public.movie = spark.openMovie(theSourceFile, _myTargetPixelFormat, _myDecoderHint, Protected.getBoolean("audio", true), _myStartFrame, _myCacheSize);
-            }
+                if (_myUseCaching) {
+                    Public.movie = spark.getCachedMovie(theSourceFile, _myTargetPixelFormat, _myDecoderHint, Protected.getBoolean("audio", true), _myStartFrame,_myCacheSize);
+                } else {                
+                    Public.movie = spark.openMovie(theSourceFile, _myTargetPixelFormat, _myDecoderHint, Protected.getBoolean("audio", true), _myStartFrame, _myCacheSize);
+                }
             }
         } else {
             if(_myMovie.playmode !== "stop") {
