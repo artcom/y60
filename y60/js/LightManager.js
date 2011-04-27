@@ -381,6 +381,10 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
     obj.getSunlight = function() {
         return _mySunLight;
     };
+    
+    obj.getSunlightSource = function() {
+        return _myLightSources.find(".//lightsource[@name='SunLightSource']");
+    };
 
     obj.setSunPosition = function(thePercentage) {
         _mySunPosition.setRelative(thePercentage);
