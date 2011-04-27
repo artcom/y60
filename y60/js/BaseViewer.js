@@ -709,13 +709,13 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
                 }
             }
         }
-        if(_myLightManager) {
+        if(_myLightManager && _myLightManager.enabled) {
             _myLightManager.onPreViewport(theViewport);
         }
     };
 
     self.onPostViewport = function(theViewport) {
-        if(_myLightManager) {
+        if(_myLightManager && _myLightManager.enabled) {
             _myLightManager.onPostViewport(theViewport);
         }
     };
@@ -774,7 +774,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
             }
         }
         
-        if (_myLightManager) {
+        if (_myLightManager && _myLightManager.enabled) {
             _myLightManager.onFrame(theTime);
         }
     };
