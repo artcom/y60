@@ -11,6 +11,8 @@
 //howto use
 //hold ctrl, click target, move with mouse or arrows or shift-arrows
 //+ moves target to parent
+//. moves target to next intersected widget
+//
 //a toggles additional features of target
 //f change size of widget
 //d change z-rotation of widget
@@ -23,11 +25,20 @@
 // * layouterSetPosition - force specific position update in widget
 // * writebackPosition
 // * layouterToggleWidget - can be used to change widget style e.g.
+//
+//use bind to register callbacks for 
+//CATCH: if a widget is clicked
+//RELEASE: if a widget was released
+//INTERSECTION_FILTER: use this to filter intersected widgets, return value of callback should be
+//  'true' if widget is valid
+//  'false' if widget should be filtered
+//
 
 spark.Layouter = spark.ComponentClass("Layouter");
 spark.Layouter.BINDING_SLOT = {
     CATCH  : "CATCH",
-    RELEASE : "RELEASE"
+    RELEASE : "RELEASE",
+    INTERSECTION_FILTER : "INTERSECTION_FILTER"
 };
 spark.Layouter.Constructor = function(Protected) {
 
@@ -51,6 +62,7 @@ spark.Layouter.Constructor = function(Protected) {
     var _myIsDPressed = false;   //change z rotation
     var _myStage       = null;
     var _myListeners = null;
+    var _myIntersections = []; //all intersected & filtered widgets
     var _myCurrentSparkNode = null;
     var _myCurrentSparkFile = null;
     var _mySparkNodes = [];
@@ -127,6 +139,10 @@ spark.Layouter.Constructor = function(Protected) {
                     correctPositionAndSize(theKey);
                 } else if (((theKey == "+")||(theKey == "]")) && Public.active && _myWidget && _myWidget.parent) { 
                     Public.target = _myWidget.parent;
+                    print("moved targed to parent: ", Public.target);
+                } else if ((theKey == ".") && Public.active && _myIntersections.length > 1) { 
+                    var myIndex = js.array.indexOf(_myIntersections, _myWidget);
+                    Public.target = _myIntersections[(myIndex + 1) % _myIntersections.length];
                     print("moved targed to parent: ", Public.target);
                 } else if ((theKey == "a") && Public.active && _myWidget && "layouterToggleWidget" in _myWidget) {
                     _myWidget.layouterToggleWidget();
@@ -277,14 +293,33 @@ spark.Layouter.Constructor = function(Protected) {
                 _myWidget.addEventListener(spark.CursorEvent.APPEAR, _myListeners[i].listener);
             }
         }
+        _myIntersections = [];
     }
 
     function onMouseDown(theEvent) {
         if (theEvent.target === _myStage) {
             return;
         }
-        if (!_myWidget) {
-            Public.target = theEvent.target;
+        var myIntersectionInformation = window.scene.getPickedBodiesInformation(theEvent.stageX, theEvent.stageY);
+        if (myIntersectionInformation) {
+            for (var i = 0, l = myIntersectionInformation.length; i < l; ++i) {
+                var myWidget = null;
+                var myBodyId = myIntersectionInformation[i].body.id;
+                if (myBodyId in spark.sceneNodeMap) {
+                    myWidget = spark.sceneNodeMap[myBodyId];
+                }
+                var isValid = true;
+                for (var handleId in _bindings[spark.Layouter.BINDING_SLOT.INTERSECTION_FILTER]) {
+                    var myHandle = _bindings[spark.Layouter.BINDING_SLOT.INTERSECTION_FILTER][handleId];
+                    isValid &= myHandle.cb(myIntersectionInformation[i], myWidget);
+                }
+                if (isValid && myWidget) {
+                    _myIntersections.push(myWidget);
+                }
+            }
+        }
+        if (!_myWidget && _myIntersections.length > 0) {
+            Public.target = _myIntersections[0];
             _myListeners = clone(theEvent.target.getEventListeners(spark.CursorEvent.APPEAR));
         }
         for (var i = 0; i < _myListeners.length; ++i) {
@@ -294,7 +329,9 @@ spark.Layouter.Constructor = function(Protected) {
             theEvent.cancelable = true;
         }
         theEvent.cancelDispatch();
-        updatePosition(theEvent.stageX, theEvent.stageY, 0);
+        if (_myWidget) {
+            updatePosition(theEvent.stageX, theEvent.stageY, 0);
+        }
     }
 
     function onMouseMove(theEvent) {
