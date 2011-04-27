@@ -69,13 +69,12 @@ function GameMover() {
     this.Constructor(this);
 }
 
-GameMover.prototype.Constructor = function(obj)
-{
+GameMover.prototype.Constructor = function(obj) {
     MoverBase.prototype.Constructor(obj);
     obj.Mover = [];
 
-    const PAN_SPEED  = 1;
-    const ZOOM_SPEED = 1;
+    var PAN_SPEED  = 1;
+    var ZOOM_SPEED = 1;
 
     //////////////////////////////////////////////////////////////////////
 
@@ -94,16 +93,17 @@ GameMover.prototype.Constructor = function(obj)
         var myDeltaY = (_myMousePosY - theY) / window.height;
         var myWorldSize = obj.getWorldSize();
 
+        var myWorldTranslation = null;
         if (obj.getRightButtonFlag()) {
-            var myWorldTranslation = new Vector3f(0, 0, myDeltaY * myWorldSize / ZOOM_SPEED);
+            myWorldTranslation = new Vector3f(0, 0, myDeltaY * myWorldSize / ZOOM_SPEED);
             obj.update(myWorldTranslation, 0);
         } else if (obj.getMiddleButtonFlag()) {
-            var myWorldTranslation = new Vector3f(0, 0, 0);
+            myWorldTranslation = new Vector3f(0, 0, 0);
             myWorldTranslation.x = - myDeltaX * myWorldSize / PAN_SPEED;
             myWorldTranslation.y = - myDeltaY * myWorldSize / PAN_SPEED;
             obj.update(myWorldTranslation, 0);
         } else if (obj.getLeftButtonFlag()) {
-            var myWorldTranslation = new Vector3f(0, 0, 0);
+            myWorldTranslation = new Vector3f(0, 0, 0);
             var myWorldHeading = myDeltaX * TWO_PI;
             obj.getMoverObject().orientation.x += myDeltaY * TWO_PI;
             obj.update(myWorldTranslation, myWorldHeading);
@@ -111,5 +111,5 @@ GameMover.prototype.Constructor = function(obj)
 
         _myMousePosX = theX;
         _myMousePosY = theY;
-    }
-}
+    };
+};

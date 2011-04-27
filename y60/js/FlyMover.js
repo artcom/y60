@@ -73,8 +73,8 @@ FlyMover.prototype.Constructor = function(self, theViewport) {
     MoverBase.prototype.Constructor(self, theViewport);
     self.Mover = {};
 
-    const INITIAL_FLY_SPEED = 0.001;
-    const MINIMUM_AUTO_ADJUST_WORLD_SIZE_PERCENTAGE = 0.0001;
+    var INITIAL_FLY_SPEED = 0.001;
+    var MINIMUM_AUTO_ADJUST_WORLD_SIZE_PERCENTAGE = 0.0001;
 
     //////////////////////////////////////////////////////////////////////
 
@@ -84,6 +84,7 @@ FlyMover.prototype.Constructor = function(self, theViewport) {
 
     var _myFlySpeed          = 0;
     var _myCurrentStartSpeed = 1;
+    var _myAdaptToWorldSize = true;
 
     //////////////////////////////////////////////////////////////////////
     //
@@ -93,26 +94,13 @@ FlyMover.prototype.Constructor = function(self, theViewport) {
 
     self.name = "FlyMover";
     
-    self.flySpeed getter = function() {
-        return _myFlySpeed;
-    };
-    self.flySpeed setter = function(theSpeed) {
-        _myFlySpeed = theSpeed;
-    };
-    
-    self.headingAngle setter = function(theAngleInRadiant) {
-        _myHeadingAngle = theAngleInRadiant;
-    };
-    self.headingAngle getter = function() {
-        return _myHeadingAngle;
-    };
-    
-    self.pitchAngle setter = function(theAngleInRadiant) {
-        _myPitchAngle = theAngleInRadiant;
-    };
-    self.pitchAngle getter = function() {
-        return _myPitchAngle;
-    };
+    self.__defineGetter__("flySpeed", function() { return _myFlySpeed; });
+    self.__defineSetter__("flySpeed", function(theSpeed) { _myFlySpeed = theSpeed; });
+    self.__defineGetter__("headingAngle", function() {return _myHeadingAngle;});
+    self.__defineSetter__("headingAngle", function(theAngleInRadiant) { _myHeadingAngle = theAngleInRadiant; });
+    self.__defineGetter__("pitchAngle", function() {return _myPitchAngle;});
+    self.__defineSetter__("pitchAngle", function(theAngleInRadiant) {_myPitchAngle = theAngleInRadiant;});
+    self.__defineSetter__("adaptToWorldSize", function(theFlag) {_myAdaptToWorldSize = theFlag;});
 
     self.Mover.reset = self.reset;
     self.reset = function() {
@@ -127,13 +115,13 @@ FlyMover.prototype.Constructor = function(self, theViewport) {
     
     self.simulate = function(theDeltaTime) {
         if (_myFlySpeed) {
-            var myWorldSize = self.getWorldSize();
+            var myWorldSize = (_myAdaptToWorldSize ? self.getWorldSize() : 1);
             var myDistance = magnitude(self.getMoverObject().position);
             // adjust flight speed corresponding to world center
             if (myDistance < myWorldSize * MINIMUM_AUTO_ADJUST_WORLD_SIZE_PERCENTAGE) {
                 myDistance = myWorldSize * MINIMUM_AUTO_ADJUST_WORLD_SIZE_PERCENTAGE;
             }
-            var myAdjustmentFactor = myDistance / myWorldSize;
+            var myAdjustmentFactor = myDistance * myWorldSize;
             var myAdjustedFlySpeed = _myFlySpeed * myAdjustmentFactor;
             
             var deltaHeading = new Quaternionf(new Vector3f(0,1,0), theDeltaTime * _myHeadingAngle);
@@ -158,8 +146,9 @@ FlyMover.prototype.Constructor = function(self, theViewport) {
         } else if (_myFlySpeed <= -_myCurrentStartSpeed) {
             _myFlySpeed = _myFlySpeed / theSpeedFactor;
         } else {
-            _myFlySpeed          = self.getWorldSize() * INITIAL_FLY_SPEED;
-            _myCurrentStartSpeed = self.getWorldSize() * INITIAL_FLY_SPEED;
+            var myWorldSize = (_myAdaptToWorldSize ? self.getWorldSize() : 1);
+            _myFlySpeed          = myWorldSize * INITIAL_FLY_SPEED;
+            _myCurrentStartSpeed = myWorldSize * INITIAL_FLY_SPEED;
         }
         if (_myFlySpeed < _myCurrentStartSpeed && _myFlySpeed > - _myCurrentStartSpeed) {
             _myFlySpeed = 0;
@@ -172,8 +161,9 @@ FlyMover.prototype.Constructor = function(self, theViewport) {
         } else if (_myFlySpeed >= _myCurrentStartSpeed) {
             _myFlySpeed = _myFlySpeed / theSpeedFactor;
         } else {
-            _myFlySpeed          = - self.getWorldSize() * INITIAL_FLY_SPEED;
-            _myCurrentStartSpeed =   self.getWorldSize() * INITIAL_FLY_SPEED;
+            var myWorldSize = (_myAdaptToWorldSize ? self.getWorldSize() : 1);
+            _myFlySpeed          = - myWorldSize * INITIAL_FLY_SPEED;
+            _myCurrentStartSpeed =   myWorldSize * INITIAL_FLY_SPEED;
         }
         if (_myFlySpeed < _myCurrentStartSpeed && _myFlySpeed > - _myCurrentStartSpeed) {
             _myFlySpeed = 0;
