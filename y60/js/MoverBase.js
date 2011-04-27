@@ -222,6 +222,11 @@ MoverBase.prototype.Constructor = function (obj, theViewport) {
 
         // update MoverObject
         var myDecomposition = myGlobalMatrix.decompose();
+        if (!myDecomposition) {
+            Logger.warning("MoverBase globalMatrix.decompose not possible, reset mover");
+            obj.reset();
+            return;
+        }
         _myMoverObject.orientation = myDecomposition.orientation;
         _myMoverObject.position    = myGlobalMatrix.getTranslation();
     };
