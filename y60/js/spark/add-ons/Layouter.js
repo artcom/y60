@@ -325,6 +325,9 @@ spark.Layouter.Constructor = function(Protected) {
             return;
         }
         collectIntersections(theEvent.stageX, theEvent.stageY);
+        _myIntersections.sort(function (a, b) {
+            return (b.sceneNode.globalmatrix.getTranslation().z - a.sceneNode.globalmatrix.getTranslation().z);
+        });
         if (!_myWidget && _myIntersections.length > 0) {
             Public.target = _myIntersections[0];
             _myListeners = clone(theEvent.target.getEventListeners(spark.CursorEvent.APPEAR));
