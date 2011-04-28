@@ -61,7 +61,7 @@ spark.Layouter.Constructor = function(Protected) {
     var _myIsYPressed = false;   //change z position
     var _myIsDPressed = false;   //change z rotation
     var _myStage       = null;
-    var _myListeners = null;
+    var _myListeners = [];
     var _myIntersections = []; //all intersected & filtered widgets
     var _myCurrentSparkNode = null;
     var _myCurrentSparkFile = null;
@@ -267,8 +267,7 @@ spark.Layouter.Constructor = function(Protected) {
             _myWidget.z += myTranslation.z;
             _myWidget.x = Math.round(_myWidget.x);
             _myWidget.y = Math.round(_myWidget.y);
-            _myWidget.z = Math.round(_myWidget.z);
-            print(_myWidget.name + " moved to x: " + _myWidget.x + " y: " + _myWidget.y + " z: " +_myWidget.z);
+            Logger.info(_myWidget.name + " moved to x: " + _myWidget.x + " y: " + _myWidget.y + " z: " +_myWidget.z);
         } else {
             _myWidget.layouterSetPosition(_myOldPos, new Vector3f(theX, theY, theZ), myTranslation);
         }
@@ -338,13 +337,13 @@ spark.Layouter.Constructor = function(Protected) {
         }
         theEvent.cancelDispatch();
         if (_myWidget) {
-            updatePosition(theEvent.stageX, theEvent.stageY, 0);
+            updatePosition(theEvent.stageX, theEvent.stageY, _myWidget.z);
         }
     }
 
     function onMouseMove(theEvent) {
         if (_myIsCtrlPressed && Public.active) {
-            updatePosition(theEvent.stageX, theEvent.stageY, 0);
+            updatePosition(theEvent.stageX, theEvent.stageY, _myWidget.z);
         }
     }
 
@@ -391,7 +390,7 @@ spark.Layouter.Constructor = function(Protected) {
                 default:
                     break;
             }
-        } else if (_myIsDPressed) { // size manipulation
+        } else if (_myIsDPressed) { // rotationZ manipulation
             switch(theKey) {
                 case "up":
                     if ("rotationZ" in _myWidget) {
