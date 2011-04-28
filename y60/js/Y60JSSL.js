@@ -255,7 +255,7 @@ js.array.insertBefore = function (theArray, theItem, theOldItem) {
         theArray.unshift(theItem);
         return true;
     } else {
-         return js.array.insertAt(theArray, theItem, index - 1);
+         return js.array.insertAt(theArray, theItem, index);
     }
 };
 
