@@ -296,17 +296,18 @@ spark.Layouter.Constructor = function(Protected) {
         _myIntersections = [];
     }
 
-    function onMouseDown(theEvent) {
-        if (theEvent.target === _myStage) {
-            return;
-        }
-        var myIntersectionInformation = window.scene.getPickedBodiesInformation(theEvent.stageX, theEvent.stageY);
+    function collectIntersections (theX, theY, theCanvas) {
+        var myIntersectionInformation = window.scene.getPickedBodiesInformation(theX, theY, theCanvas);
         if (myIntersectionInformation) {
-            for (var i = 0, l = myIntersectionInformation.length; i < l; ++i) {
+            for (var i = myIntersectionInformation.length-1; i >= 0; --i) {
                 var myWidget = null;
                 var myBodyId = myIntersectionInformation[i].body.id;
                 if (myBodyId in spark.sceneNodeMap) {
                     myWidget = spark.sceneNodeMap[myBodyId];
+                    if ("Canvas" in myWidget._classes_) {
+                        var myCanvasPosition = myWidget.convertToCanvasCoordinates(theX, theY);
+                        collectIntersections(myCanvasPosition.x, myCanvasPosition.y, myWidget.canvas);
+                    }
                 }
                 var isValid = true;
                 for (var handleId in _bindings[spark.Layouter.BINDING_SLOT.INTERSECTION_FILTER]) {
@@ -318,6 +319,13 @@ spark.Layouter.Constructor = function(Protected) {
                 }
             }
         }
+    }
+
+    function onMouseDown(theEvent) {
+        if (theEvent.target === _myStage) {
+            return;
+        }
+        collectIntersections(theEvent.stageX, theEvent.stageY);
         if (!_myWidget && _myIntersections.length > 0) {
             Public.target = _myIntersections[0];
             _myListeners = clone(theEvent.target.getEventListeners(spark.CursorEvent.APPEAR));
