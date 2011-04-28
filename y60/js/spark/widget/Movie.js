@@ -62,11 +62,14 @@ spark.Movie.Constructor = function(Protected) {
         Public.src = _mySourceItem.src;
     }
 
-    function initMovie() {
+    function initMovie(theFullInitFlag) {
+        if (theFullInitFlag || theFullInitFlag == undefined) {
+            _myMovie.currentframe = _myStartFrame;            
+            Public.mode = Protected.getString("mode", "stop");
+            Public.volume = Protected.getNumber("volume", 1.0);
+        }
         Public.loop = Protected.getBoolean("loop", false);
-        Public.mode = Protected.getString("mode", "stop");
         Public.playSpeed = Protected.getNumber("playspeed", 1);
-        Public.volume = Protected.getNumber("volume", 1.0);
         Public.width = Protected.getNumber("width", Public.width);
         Public.height = Protected.getNumber("height", Public.height);
         _myCacheSize = Protected.getNumber("cachesize", 8);
@@ -216,24 +219,39 @@ spark.Movie.Constructor = function(Protected) {
                         Public.movie = spark.openMovie(theSourceFile, _myTargetPixelFormat, _myDecoderHint, Protected.getBoolean("audio", true), _myStartFrame,_myCacheSize);
                     }
                 } else {
+                    var myFullInitFlag = true;
                     if (_myUseCaching) {
                         // check cache
                         var myName = spark.getMovieCacheKey(theSourceFile);
                         var myCachedMovie = spark.getNode(myName);
                         if (myCachedMovie) {
-                            Public.movie = myCachedMovie;
+                            _myMovie = myCachedMovie;
+                            _myTexture.image = myCachedMovie.id;
+                            // do not do a full init movie when we are using a chached video, which is already in use                            
+                            myFullInitFlag = false;
                         } else {
                             _myMovie.src = theSourceFile;
                         }
                     } else {
                         _myMovie.src = theSourceFile;
                     }
-                    _myMovie.currentframe = _myStartFrame;
-                    Public.onMovieChanged();
+                    if (myFullInitFlag) {
+                        _myMovie.currentframe = _myStartFrame;
+                    }
+                    Public.onMovieChanged(myFullInitFlag);
                 }
             } else {
                 if (_myUseCaching) {
-                    Public.movie = spark.getCachedMovie(theSourceFile, _myTargetPixelFormat, _myDecoderHint, Protected.getBoolean("audio", true), _myStartFrame,_myCacheSize);
+                    var myName = spark.getMovieCacheKey(theSourceFile);
+                    var myCachedMovie = spark.getNode(myName);
+                    if (myCachedMovie) {
+                        _myMovie = myCachedMovie;
+                        _myTexture.image = myCachedMovie.id;
+                        // do not do a full init movie when we are using a chached video, which is already in use                                                    
+                        Public.onMovieChanged(false);
+                    } else {
+                        Public.movie = spark.getCachedMovie(theSourceFile, _myTargetPixelFormat, _myDecoderHint, Protected.getBoolean("audio", true), _myStartFrame,_myCacheSize);
+                    }
                 } else {                
                     Public.movie = spark.openMovie(theSourceFile, _myTargetPixelFormat, _myDecoderHint, Protected.getBoolean("audio", true), _myStartFrame, _myCacheSize);
                 }
@@ -322,10 +340,10 @@ spark.Movie.Constructor = function(Protected) {
         Base.postRealize();
     };
 
-    Public.onMovieChanged = function() {
+    Public.onMovieChanged = function(theFullInitFlag) {
         if (_myMovie.nodeName !== "image") {
             ensureAspectRatio();
-            initMovie();
+            initMovie(theFullInitFlag);
         }
     };
 };
