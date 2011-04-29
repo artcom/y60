@@ -164,8 +164,7 @@ pickBody(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         dom::NodePtr myPickedBody;
         convertFrom(cx, argv[0], theX);
         convertFrom(cx, argv[1], theY);
-        if (argc > 2) {
-            convertFrom(cx, argv[2], theCanvas);
+        if (argc > 2 && convertFrom(cx, argv[2], theCanvas)) {
             myPickedBody = JSScene::getJSWrapper(cx,obj).getNative().pickBody(theX, theY, theCanvas);
         } else {
             myPickedBody = JSScene::getJSWrapper(cx,obj).getNative().pickBody(theX, theY);
@@ -192,8 +191,7 @@ getPickedBodyInformation(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, 
         y60::IntersectionInfo myIntersection;
         convertFrom(cx, argv[0], theX);
         convertFrom(cx, argv[1], theY);
-        if (argc > 2) {
-            convertFrom(cx, argv[2], myCanvas);
+        if (argc > 2 && convertFrom(cx, argv[2], myCanvas)) {
             JSScene::getJSWrapper(cx,obj).getNative().getPickedBodyInformation(theX, theY, myIntersection, myCanvas);
         } else {
             JSScene::getJSWrapper(cx,obj).getNative().getPickedBodyInformation(theX, theY, myIntersection);
@@ -220,8 +218,7 @@ getPickedBodiesInformation(JSContext *cx, JSObject *obj, uintN argc, jsval *argv
         y60::IntersectionInfoVector myIntersections;
         convertFrom(cx, argv[0], theX);
         convertFrom(cx, argv[1], theY);
-        if (argc > 2) {
-            convertFrom(cx, argv[2], myCanvas);
+        if (argc > 2 && convertFrom(cx, argv[2], myCanvas)) {
             JSScene::getJSWrapper(cx,obj).getNative().getPickedBodiesInformation(theX, theY, myIntersections, myCanvas);
         } else {
             JSScene::getJSWrapper(cx,obj).getNative().getPickedBodiesInformation(theX, theY, myIntersections);
@@ -252,8 +249,7 @@ pickBodyBySweepingSphereFromBodies(JSContext *cx, JSObject *obj, uintN argc, jsv
         convertFrom(cx, argv[0], theX);
         convertFrom(cx, argv[1], theY);
         convertFrom(cx, argv[2], theSphereRadius);
-        if (argc > 3) {
-            convertFrom(cx, argv[3], theCanvas);
+        if (argc > 3 && convertFrom(cx, argv[3], theCanvas)) {
             myPickedBody = JSScene::getJSWrapper(cx,obj).getNative().pickBodyBySweepingSphereFromBodies(theX, theY, theSphereRadius, theCanvas);
         } else {
             myPickedBody = JSScene::getJSWrapper(cx,obj).getNative().pickBodyBySweepingSphereFromBodies(theX, theY, theSphereRadius);

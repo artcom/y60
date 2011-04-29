@@ -229,7 +229,11 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
         }
     };
 
-    obj.__defineSetter__("setEnabled", function(theFlag) { // XXX This is a stupid name for a setter!
+    obj.__defineGetter__("enabled", function() {
+        return _myEnabledFlag;
+    });
+
+    obj.__defineSetter__("enabled", function(theFlag) {
         _myEnabledFlag = !!theFlag;
     });
     
@@ -289,6 +293,12 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
     };
 
     obj.onKey = function(theKey, theKeyState, theShiftFlag, theCtrlFlag, theAltFlag) {
+        if (!_myEnabledFlag) {
+            return;
+        }
+        if (!theCtrlFlag) {
+            return;
+        }
         // theKeyState is true, if the key is pressed
         
         if (theKey === 'd') {
@@ -296,9 +306,7 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
                 // stop sun
                 _mySunSpeed = 0;
                 print("Sun Speed " + _mySunSpeed);
-                return;
-            }
-            if(theCtrlFlag) {
+            } else {
                 if (theShiftFlag) {
                     _mySunSpeed = 30;
                     print("Sun Speed " + _mySunSpeed);
@@ -311,7 +319,7 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
         }
 
         // Key handlers following this are only activated on key down
-        if (!theKeyState || !theCtrlFlag) {
+        if (!theKeyState) {
             return;
         }
         switch (theKey) {

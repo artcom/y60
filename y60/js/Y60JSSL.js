@@ -238,6 +238,39 @@ js.array.indexOf = function (theArray, theItem, theFrom) {
     }
     return -1;
 };
+
+js.array.insertAt = function (theArray, theItem, theIndex) {
+    if ( theIndex > -1 && theIndex <= theArray.length ) {
+        theArray.splice(theIndex, 0, theItem);
+        return true;
+    }
+    return false;
+};
+
+js.array.insertBefore = function (theArray, theItem, theOldItem) {
+    var index = js.array.indexOf(theArray, theOldItem);
+    if (index === -1) {
+         return false;
+    } else if (index === 0) {
+        theArray.unshift(theItem);
+        return true;
+    } else {
+         return js.array.insertAt(theArray, theItem, index);
+    }
+};
+
+js.array.insertAfter = function (theArray, theItem, theOldItem) {
+    var index = js.array.indexOf(theArray, theOldItem);
+    if (index === -1) {
+         return false;
+    } else if (index === theArray.length - 1) {
+        theArray.push(theItem);
+        return true;
+    } else {
+         return js.array.insertAt(theArray, theItem, index + 1);
+    }
+};
+
 function indexOf(theArray, theItem, theFrom) {
     Logger.warning("Y60JSSL :: free function 'indexOf' is deprecated. Use 'js.array.indexOf' instead.");
     return js.array.indexOf(theArray, theItem, theFrom);
