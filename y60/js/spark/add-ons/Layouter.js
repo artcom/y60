@@ -53,6 +53,7 @@ spark.Layouter.Constructor = function(Protected) {
         }
     }());
     var _myState       = IDLE;
+    var _myNewFrameFlag = true;
     var _myOldPos      = null;
     var _myWidget      = null;
     var _myShiftFlag   = false;
@@ -116,21 +117,19 @@ spark.Layouter.Constructor = function(Protected) {
         Base.onKey = _myStage.onKey;
         _myStage.onKey = function(theKey, theKeyState, theX, theY,
                              theShiftFlag, theControlFlag, theAltFlag) {
-            if (!theControlFlag) {
-                Base.onKey(theKey, theKeyState, theX, theY, theShiftFlag, theControlFlag, theAltFlag);
-            }
             Logger.info("onKey "+ theKey+" "+_myZManipulation+" "+_mySizeManipulation+" "+_myShiftFlag);
+            var myKeyEaten = true;
             if(theKeyState) {
                 if(theKey.search(/ctrl/) != -1) {
                     _myIsCtrlPressed = true;
                     activate();
-                } else if (theKey.search(/shift/) != -1) {
+                } else if (Public.active && theKey.search(/shift/) != -1) {
                     _myShiftFlag = true;
-                } else if (theKey === "f") {
+                } else if (Public.active && theKey === "f") {
                     _mySizeManipulation = true;
-                } else if (theKey === "y" || theKey === "z") {
+                } else if (Public.active && (theKey === "y" || theKey === "z")) {
                     _myZManipulation = true;
-                } else if (theKey === "d") {
+                } else if (Public.active && theKey === "d") {
                     _myRotationZManipulation = true;
                 } else if ((theKey === "left"
                         || theKey === "right"
@@ -146,31 +145,39 @@ spark.Layouter.Constructor = function(Protected) {
                     print("moved targed to parent: ", Public.target);
                 } else if ((theKey === "a") && Public.active && _myWidget && "layouterToggleWidget" in _myWidget) {
                     _myWidget.layouterToggleWidget();
-                } else if (theKey === "x") {
+                } else if (Public.active && theKey === "x") {
                     _myVisualMode = (_myVisualMode + 1) % 3;
-                } else if (theKey === "i" && _myLayoutImage) {
+                } else if (Public.active && theKey === "i" && _myLayoutImage) {
                     _myLayoutImage.visible = !_myLayoutImage.visible;
                     print("layoutimage ", _myLayoutImage.visible)
-                } else if (theKey === "r" || theKey === "s") { // call SceneViewer for using the ruler
-                    Base.onKey(theKey, theKeyState, theX, theY, theShiftFlag, theControlFlag, theAltFlag);
+                } else {
+                    myKeyEaten = false;
                 }
             } else {
                 if(theKey.search(/ctrl/) != -1) {
                     _myIsCtrlPressed = false;
                     deactivate();
                     stop();   
-                } else if (theKey.search(/shift/) != -1) {
+                } else if (Public.active && theKey.search(/shift/) != -1) {
                     _myShiftFlag = false;
-                } else if (theKey === "f") {
+                } else if (Public.active && theKey === "f") {
                     _mySizeManipulation = false;
-                } else if (theKey === "y" || theKey === "z") {
+                } else if (Public.active && (theKey === "y" || theKey === "z")) {
                     _myZManipulation = false;
-                } else if (theKey === "d") {
+                } else if (Public.active && theKey === "d") {
                     _myRotationZManipulation = false;
+                } else {
+                    myKeyEaten = false;
                 }
+            }
+            if (!myKeyEaten) {
+                Base.onKey(theKey, theKeyState, theX, theY, theShiftFlag, theControlFlag, theAltFlag);
             }
         }
         _myStage.addEventListener(spark.StageEvent.POST_RENDER, onPostRender);
+        _myStage.addEventListener(spark.StageEvent.FRAME, function () {
+            _myNewFrameFlag = true;
+        });
     };
     
     function onPostRender() {
@@ -247,6 +254,10 @@ spark.Layouter.Constructor = function(Protected) {
     }
 
     function updatePosition(theX, theY, theZ) {
+        if (!_myNewFrameFlag) {
+            return;
+        }
+        _myNewFrameFlag = false;
         if(!_myOldPos) {
             _myOldPos = new Vector3f(theX, window.height - theY, theZ);
             return;
