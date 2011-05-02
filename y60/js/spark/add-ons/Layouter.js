@@ -53,13 +53,14 @@ spark.Layouter.Constructor = function(Protected) {
         }
     }());
     var _myState       = IDLE;
+    var _myNewFrameFlag = true;
     var _myOldPos      = null;
     var _myWidget      = null;
     var _myShiftFlag   = false;
     var _myIsCtrlPressed = false;
-    var _myIsFPressed = false;   //change size 
-    var _myIsYPressed = false;   //change z position
-    var _myIsDPressed = false;   //change z rotation
+    var _mySizeManipulation = false;   //change size 
+    var _myZManipulation = false;   //change z position
+    var _myRotationZManipulation = false;   //change z rotation
     var _myStage       = null;
     var _myListeners = [];
     var _myIntersections = []; //all intersected & filtered widgets
@@ -116,61 +117,67 @@ spark.Layouter.Constructor = function(Protected) {
         Base.onKey = _myStage.onKey;
         _myStage.onKey = function(theKey, theKeyState, theX, theY,
                              theShiftFlag, theControlFlag, theAltFlag) {
-            if (!theControlFlag) {
-                Base.onKey(theKey, theKeyState, theX, theY, theShiftFlag, theControlFlag, theAltFlag);
-            }
-            Logger.info("onKey "+ theKey+" "+_myIsYPressed+" "+_myIsFPressed+" "+_myShiftFlag);
+            Logger.info("onKey "+ theKey+" "+_myZManipulation+" "+_mySizeManipulation+" "+_myShiftFlag);
+            var myKeyEaten = true;
             if(theKeyState) {
                 if(theKey.search(/ctrl/) != -1) {
                     _myIsCtrlPressed = true;
                     activate();
-                } else if (theKey.search(/shift/) != -1) {
+                } else if (Public.active && theKey.search(/shift/) != -1) {
                     _myShiftFlag = true;
-                } else if (theKey == "f") {
-                    _myIsFPressed = true;
-                } else if (theKey == "y") {
-                    _myIsYPressed = true;
-                } else if (theKey == "d") {
-                    _myIsDPressed = true;
-                } else if ((theKey == "left"
-                        || theKey == "right"
-                        || theKey == "up"
-                        || theKey == "down") && Public.active) {
+                } else if (Public.active && theKey === "f") {
+                    _mySizeManipulation = true;
+                } else if (Public.active && (theKey === "y" || theKey === "z")) {
+                    _myZManipulation = true;
+                } else if (Public.active && theKey === "d") {
+                    _myRotationZManipulation = true;
+                } else if ((theKey === "left"
+                        || theKey === "right"
+                        || theKey === "up"
+                        || theKey === "down") && Public.active) {
                     correctPositionAndSize(theKey);
-                } else if (((theKey == "+")||(theKey == "]")) && Public.active && _myWidget && _myWidget.parent) { 
+                } else if (((theKey === "+")||(theKey === "]")) && Public.active && _myWidget && _myWidget.parent) { 
                     Public.target = _myWidget.parent;
                     print("moved targed to parent: ", Public.target);
-                } else if ((theKey == ".") && Public.active && _myIntersections.length > 1) { 
+                } else if ((theKey === ".") && Public.active && _myIntersections.length > 1) { 
                     var myIndex = js.array.indexOf(_myIntersections, _myWidget);
                     Public.target = _myIntersections[(myIndex + 1) % _myIntersections.length];
                     print("moved targed to parent: ", Public.target);
-                } else if ((theKey == "a") && Public.active && _myWidget && "layouterToggleWidget" in _myWidget) {
+                } else if ((theKey === "a") && Public.active && _myWidget && "layouterToggleWidget" in _myWidget) {
                     _myWidget.layouterToggleWidget();
-                } else if (theKey == "x") {
-                    _myVisualMode = (_myVisualMode + 1)%3;
-                } else if (theKey == "i" && _myLayoutImage) {
+                } else if (Public.active && theKey === "x") {
+                    _myVisualMode = (_myVisualMode + 1) % 3;
+                } else if (Public.active && theKey === "i" && _myLayoutImage) {
                     _myLayoutImage.visible = !_myLayoutImage.visible;
                     print("layoutimage ", _myLayoutImage.visible)
-                } else if (theKey == "r" || theKey == "s") { // call SceneViewer for using the ruler
-                    Base.onKey(theKey, theKeyState, theX, theY, theShiftFlag, theControlFlag, theAltFlag);
+                } else {
+                    myKeyEaten = false;
                 }
             } else {
                 if(theKey.search(/ctrl/) != -1) {
                     _myIsCtrlPressed = false;
                     deactivate();
                     stop();   
-                } else if (theKey.search(/shift/) != -1) {
+                } else if (Public.active && theKey.search(/shift/) != -1) {
                     _myShiftFlag = false;
-                } else if (theKey == "f") {
-                    _myIsFPressed = false;
-                } else if (theKey == "y") {
-                    _myIsYPressed = false;
-                } else if (theKey == "d") {
-                    _myIsDPressed = false;
+                } else if (Public.active && theKey === "f") {
+                    _mySizeManipulation = false;
+                } else if (Public.active && (theKey === "y" || theKey === "z")) {
+                    _myZManipulation = false;
+                } else if (Public.active && theKey === "d") {
+                    _myRotationZManipulation = false;
+                } else {
+                    myKeyEaten = false;
                 }
+            }
+            if (!myKeyEaten) {
+                Base.onKey(theKey, theKeyState, theX, theY, theShiftFlag, theControlFlag, theAltFlag);
             }
         }
         _myStage.addEventListener(spark.StageEvent.POST_RENDER, onPostRender);
+        _myStage.addEventListener(spark.StageEvent.FRAME, function () {
+            _myNewFrameFlag = true;
+        });
     };
     
     function onPostRender() {
@@ -201,7 +208,7 @@ spark.Layouter.Constructor = function(Protected) {
     }
 
     Public.active getter = function () {
-        return (_myState == ACTIVE);
+        return (_myState === ACTIVE);
     };
 
     Public.target setter = function (theWidget) {
@@ -247,6 +254,10 @@ spark.Layouter.Constructor = function(Protected) {
     }
 
     function updatePosition(theX, theY, theZ) {
+        if (!_myNewFrameFlag) {
+            return;
+        }
+        _myNewFrameFlag = false;
         if(!_myOldPos) {
             _myOldPos = new Vector3f(theX, window.height - theY, theZ);
             return;
@@ -356,7 +367,7 @@ spark.Layouter.Constructor = function(Protected) {
         if (_myShiftFlag) {
             myDist = 5;
         }
-        if (_myIsYPressed) {  // z-pos manipulation
+        if (_myZManipulation) {  // z-pos manipulation
             switch(theKey) {
                 case "up":
                     myNewPos = new Vector3f(_myOldPos.x, _myOldPos.y, _myOldPos.z + myDist);
@@ -368,7 +379,7 @@ spark.Layouter.Constructor = function(Protected) {
                     break;
             }
             updatePosition(myNewPos.x, window.height - myNewPos.y, myNewPos.z);
-        } else if (_myIsFPressed) { // size manipulation
+        } else if (_mySizeManipulation) { // size manipulation
             switch(theKey) {
                 case "left":
                     if (_myWidget.width) {
@@ -393,7 +404,7 @@ spark.Layouter.Constructor = function(Protected) {
                 default:
                     break;
             }
-        } else if (_myIsDPressed) { // rotationZ manipulation
+        } else if (_myRotationZManipulation) { // rotationZ manipulation
             switch(theKey) {
                 case "up":
                     if ("rotationZ" in _myWidget) {
