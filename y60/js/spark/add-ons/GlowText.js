@@ -29,6 +29,7 @@ spark.GlowText.Constructor = function (Protected) {
         Protected.material.enabled = false;        
         var myGlow = Protected.getNumber("glow", 0);
         var myBlur = Protected.getNumber("blur", 0);
+        var myScale = Protected.getNumber("scale", 1);
                 
         _myAnythingGlowsOrBlursFlag = true;
         if (myBlur >0 && myGlow > 0) {
@@ -43,12 +44,16 @@ spark.GlowText.Constructor = function (Protected) {
         } else {
             _myAnythingGlowsOrBlursFlag = false;
         }
+            
+        addMaterialProperty(Protected.material, "float", "scale", myScale);     
+        
         Protected.material.enabled = true;        
         if (_myAnythingGlowsOrBlursFlag) {
             if (myGlow > 0){
                 Protected.material.properties.offset = Protected.getVector2f("offset", "[0,0]");        
                 Protected.material.properties.glow_radius = myGlow;        
                 Protected.material.properties.glow_color = Protected.getVector4f("glow_color", "[1,1,1,1)]");
+                Protected.material.properties.scale = myScale;
             }    
             if (myBlur >0) {
                 Protected.material.properties.blur = Protected.getNumber("blur", 5);        
