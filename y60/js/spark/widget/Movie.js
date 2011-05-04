@@ -19,13 +19,13 @@ spark.Movie.Constructor = function(Protected) {
     var _mySource     = null;
     var _mySourceId   = null;
     var _mySourceItem = null;
-    var _myCacheSize  = null;
     var _myMovie             = null;
-    var _myUseCaching = false;    
+    var _myUseCaching        = false;    
     var _myTexture           = null;
     var _myStartFrame        = 0; //movie should start at this frame after setting src
     var _myDecoderHint       = undefined;
     var _myTargetPixelFormat = "RGB";
+    var _myCacheSize         = 8;
     var _mySetSourceWithoutChangingImageNode = false;
 
     /////////////////////
@@ -69,7 +69,7 @@ spark.Movie.Constructor = function(Protected) {
         Public.volume = Protected.getNumber("volume", 1.0);
         Public.width = Protected.getNumber("width", Public.width);
         Public.height = Protected.getNumber("height", Public.height);
-        _myCacheSize = Protected.getNumber("cachesize", 8);
+        _myCacheSize = Protected.getNumber("cachesize", _myCacheSize);
     }
 
     ////////////////////
@@ -211,9 +211,9 @@ spark.Movie.Constructor = function(Protected) {
             if (_mySetSourceWithoutChangingImageNode) {
                 if (_myMovie.nodeName === "image") {
                     if (_myUseCaching) {
-                        Public.movie = spark.getCachedMovie(theSourceFile, _myTargetPixelFormat, _myDecoderHint, Protected.getBoolean("audio", true), _myStartFrame,_myCacheSize);
+                        Public.movie = spark.getCachedMovie(theSourceFile, _myTargetPixelFormat, _myDecoderHint, Protected.getBoolean("audio", true), _myStartFrame, _myCacheSize);
                     } else {                
-                        Public.movie = spark.openMovie(theSourceFile, _myTargetPixelFormat, _myDecoderHint, Protected.getBoolean("audio", true), _myStartFrame,_myCacheSize);
+                        Public.movie = spark.openMovie(theSourceFile, _myTargetPixelFormat, _myDecoderHint, Protected.getBoolean("audio", true), _myStartFrame, _myCacheSize);
                     }
                 } else {
                     if (_myUseCaching) {
@@ -233,7 +233,7 @@ spark.Movie.Constructor = function(Protected) {
                 }
             } else {
                 if (_myUseCaching) {
-                    Public.movie = spark.getCachedMovie(theSourceFile, _myTargetPixelFormat, _myDecoderHint, Protected.getBoolean("audio", true), _myStartFrame,_myCacheSize);
+                    Public.movie = spark.getCachedMovie(theSourceFile, _myTargetPixelFormat, _myDecoderHint, Protected.getBoolean("audio", true), _myStartFrame, _myCacheSize);
                 } else {                
                     Public.movie = spark.openMovie(theSourceFile, _myTargetPixelFormat, _myDecoderHint, Protected.getBoolean("audio", true), _myStartFrame, _myCacheSize);
                 }
@@ -276,11 +276,11 @@ spark.Movie.Constructor = function(Protected) {
     Public.realize = function() {
         var myMovieSource = Protected.getString("src", "");
         var myMovieSourceId = Protected.getString("srcId", "");
-        _myCacheSize = Protected.getNumber("cachesize", 8);        
-        _myDecoderHint = Protected.getString("decoderhint", undefined);
-        _myTargetPixelFormat = Protected.getString("targetpixelformat", "RGB");
-        _mySetSourceWithoutChangingImageNode = Protected.getBoolean("setSourceWithoutChangingImageNode",false);
-        _myUseCaching = Protected.getBoolean("useCaching", false);
+        _myCacheSize = Protected.getNumber("cachesize", _myCacheSize);        
+        _myDecoderHint = Protected.getString("decoderhint", _myDecoderHint);
+        _myTargetPixelFormat = Protected.getString("targetpixelformat", _myTargetPixelFormat);
+        _mySetSourceWithoutChangingImageNode = Protected.getBoolean("setSourceWithoutChangingImageNode", _mySetSourceWithoutChangingImageNode);
+        _myUseCaching = Protected.getBoolean("useCaching", _myUseCaching);
 
         if(myMovieSource === "") {
             var myWidth  = Protected.getNumber("width", 1);
@@ -292,7 +292,7 @@ spark.Movie.Constructor = function(Protected) {
             }
         } else {
             if (_myUseCaching) {
-                _myMovie = spark.getCachedMovie(myMovieSource, _myTargetPixelFormat, _myDecoderHint, Protected.getBoolean("audio", true), _myStartFrame,_myCacheSize);
+                _myMovie = spark.getCachedMovie(myMovieSource, _myTargetPixelFormat, _myDecoderHint, Protected.getBoolean("audio", true), _myStartFrame, _myCacheSize);
             } else {                
                 _myMovie = spark.openMovie(myMovieSource, _myTargetPixelFormat, _myDecoderHint, Protected.getBoolean("audio", true), _myStartFrame, _myCacheSize);
             }
