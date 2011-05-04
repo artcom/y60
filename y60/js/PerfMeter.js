@@ -103,7 +103,7 @@ PerfMeter.prototype.Constructor = function (self, theSceneViewer) {
     var _myLineColor   = new Vector4f(0.5, 0.5, 0.5, 1);
     //var _myBGColor           = new Vector4f(1,0,0,0.3);
     var _myBGColor     = _myTranspColor;
-    var _myTimings    = [{"name" : "gc",                 "color" : new Vector4f(0.2, 0.9, 0.8, 1), "time" : 0, "lastelapsed" : 0 }, 
+    var _myTimings    = [{"name" : "gc",                 "color" : new Vector4f(0.3, 0.1, 0.1, 1), "time" : 0, "lastelapsed" : 0 }, 
                          {"name" : "onFrame_JSCallback", "color" : new Vector4f(0, 1, 0, 1), "time" : 0, "lastelapsed" : 0 },
                          {"name" : "SDL_GL_SwapBuffers", "color" : new Vector4f(1, 1, 0, 1), "time" : 0, "lastelapsed" : 0 },
                          {"name" : "render",             "color" : new Vector4f(0, 0, 1, 1), "time" : 0, "lastelapsed" : 0 }
@@ -181,6 +181,9 @@ PerfMeter.prototype.Constructor = function (self, theSceneViewer) {
 
     function updateTopMaxTimers(T_min, deltaT) {
         var newTopMaxTimers = Logger.getNewMaxTimers(T_min, 1, 8);
+        if (!newTopMaxTimers) {
+            return;
+        }
         for (var t = 0; t < newTopMaxTimers.length; t++) {
             var myTimer = newTopMaxTimers[t];
             // print("MAX "+ t + ":" + myTimer.name+ ", max = " + myTimer.max);
@@ -209,7 +212,7 @@ PerfMeter.prototype.Constructor = function (self, theSceneViewer) {
         T_MAX = theMax;
     };
     self.addTiming = function (theName, theColor) {
-        _myTimings.append({"name": theName, "color": theColor, "time": 0});
+        _myTimings.push({"name": theName, "color": theColor, "time": 0});
     };
     
     self.toggleEnableFlag = function () {
@@ -287,7 +290,7 @@ PerfMeter.prototype.Constructor = function (self, theSceneViewer) {
 
         for (i = 0; i < _myTimings.length; i++) {
             myTiming = _myTimings[i];
-            myPosition = sum(_myOverlay.position, new Vector2f(-220, BOX_HEIGHT + -(_myTimings.length - i) * 14));
+            myPosition = sum(_myOverlay.position, new Vector2f(-280, BOX_HEIGHT + -(_myTimings.length - i) * 14));
             window.setTextColor(myTiming.color);
             window.renderText(myPosition, myTiming.name + "=" + (myTiming.time * 1000).toFixed(1) + "ms", "Screen13", myViewport);
         }

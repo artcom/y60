@@ -227,7 +227,7 @@ spark.Component.Constructor = function (Protected) {
             }
         }
         if (theName in _myNode) {
-            return (_myNode[theName] === "true");
+            return ((_myNode[theName] === "true") || (_myNode[theName] === "1"));
         } else {
             if (arguments.length < 2) {
                 Logger.error(_myNode.nodeName + " requires attribute " + theName);

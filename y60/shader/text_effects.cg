@@ -36,13 +36,14 @@ float4 mainFragmentGlow(vert2frag IN,
                     uniform float glow_radius,
                     uniform float4 surfacecolor,
                     uniform float4 glow_color,
+                    uniform float scale,
                     uniform float2 offset) : COLOR
 {    
     float4 myGlow = float4(0.0);
     float4 myText = tex2D(tex0, float2(IN.texCoord0.xy));
     
-    float pixW = 1.0/width;
-    float pixH = 1.0/height;
+    float pixW = (1.0/width) * scale;
+    float pixH = (1.0/height) * scale;
 
     if (glow_radius != 0.0) {
         myGlow = float4(glow_color.rgb, applyGauss(tex0, IN.texCoord0.xy-(offset*float2(pixW, pixH)), 
