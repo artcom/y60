@@ -20,7 +20,7 @@
         </I18nText>
     </I18nContext>   
     
-    <!--NewText name="Language" x="100" y="100" z="5" fontSize="20" lineHeight="24" textColor="FFFFFF" textId="Text1"/>    
-    <NewText name="Language" x="100" y="300" z="10" fontSize="20" lineHeight="24" textColor="FFFFFF" textId="Text2"/-->    
+    <!--Text name="Language" x="100" y="100" z="5" fontSize="20" lineHeight="24" textColor="FFFFFF" textId="Text1"/>    
+    <Text name="Language" x="100" y="300" z="10" fontSize="20" lineHeight="24" textColor="FFFFFF" textId="Text2"/-->    
                 
 </SkeletonImpl>

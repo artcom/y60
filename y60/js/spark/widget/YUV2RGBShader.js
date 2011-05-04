@@ -72,15 +72,16 @@ spark.YUV2RGBShader.Constructor = function (Protected) {
                 var myCachedMovie = spark.getNode(myName);
                 if (myCachedMovie) {
                      Public.movie = myCachedMovie;
-                } else {                
+                } else {         
                     Public.movie.src = theSrc;
+                    Public.volume = 1.0;
                 }
                 Public.currentFrame = Public.startFrame;
                 Public.onMovieChanged();
             } else {                
                 if (Public.useCaching) {
                     Public.movie = spark.getCachedMovie(theSrc, "YUV420", _Protected.getString("decoderhint", undefined), Protected.getBoolean("audio", true), Public.startFrame, Public.cachesize);
-                } else {                                
+                } else {                            
                     Public.movie = spark.openMovie(theSrc, "YUV420",
                         Protected.getString("decoderhint", undefined), Protected.getBoolean("audio", true), Public.startFrame, Public.cachesize);
                 }

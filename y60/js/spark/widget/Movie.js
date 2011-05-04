@@ -66,7 +66,12 @@ spark.Movie.Constructor = function(Protected) {
         if (theFullInitFlag || theFullInitFlag == undefined) {
             _myMovie.currentframe = _myStartFrame;            
             Public.mode = Protected.getString("mode", "stop");
-            Public.volume = Protected.getNumber("volume", 1.0);
+            var myVolumes = Protected.getArray("volumes", []);
+            if (myVolumes.length == 0) {
+                Public.volume = Protected.getNumber("volume", 1.0);
+            } else {
+                Public.volumes = myVolumes;
+            }
         }
         Public.loop = Protected.getBoolean("loop", false);
         Public.playSpeed = Protected.getNumber("playspeed", 1);
@@ -190,8 +195,7 @@ spark.Movie.Constructor = function(Protected) {
     });
 
     Public.__defineSetter__("movie", function(theNode) {
-        if (_myMovie) {
-            
+        if (_myMovie) {            
             if (_myMovie.nodeName === "movie" && _myMovie.playmode !== "stop") {
                 Public.stop();
             }
@@ -208,9 +212,10 @@ spark.Movie.Constructor = function(Protected) {
     Public.__defineGetter__("src", function() {
         return _mySource;
     });
+    
     Public.__defineSetter__("src", function (theSourceFile) {
         if(_mySource !== theSourceFile) {
-            _mySource = theSourceFile;            
+            _mySource = theSourceFile;   
             if (_mySetSourceWithoutChangingImageNode) {
                 if (_myMovie.nodeName === "image") {
                     if (_myUseCaching) {
