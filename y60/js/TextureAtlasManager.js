@@ -70,6 +70,16 @@ TextureAtlasManager.prototype.Constructor = function (Public) {
         return myAtlasInfo.texture;
     };
     
+    Public.getTextureCount = function (theAtlasDefinitionFile) {
+        var myAtlasInfo = Public.loadAtlas(theAtlasDefinitionFile);
+        return myAtlasInfo.atlas.textureCount;
+    };
+
+    Public.getAtlas = function (theAtlasDefinitionFile) {
+        var myAtlasInfo = Public.loadAtlas(theAtlasDefinitionFile);
+        return myAtlasInfo.atlas;
+    };
+
     //assumption: unique ids across atlases
     Public.getMaterialByTextureName = function (theTextureName) {
         for (var myDefinitionFile in _atlases) {

@@ -60,6 +60,10 @@ spark.AtlasImage.Constructor = function (Protected) {
                                                        _myAtlasPath);
     });
     
+    Protected.__defineGetter__("atlas", function () {
+        return Public.root.textureAtlasManager.getAtlas(_myAtlasPath);
+    });
+
     ////////////////////
     // Public Methods //
     ////////////////////
@@ -73,21 +77,17 @@ spark.AtlasImage.Constructor = function (Protected) {
         _myAtlasPath      = Protected.getString("atlas", _myAtlasPath);
         _mySubTextureName = Protected.getString("subtexture", _mySubTextureName);
         
-        if (_mySubTextureName && _myAtlasPath) {
+        if (_myAtlasPath) {
             Base.realize(_getMaterial());
         } else {
             throw new Exception("AtlasImage \"" + Public.name + "\" cannot be realized without having set a texture and atlas first", fileline());
         }
         Protected.storeOriginalUVCoords();
-        Protected.applyAtlasTextureInformation();
-        
-        Public.width  = Protected.getNumber("width",
-                                            Public.root.textureAtlasManager.getSize(_mySubTextureName,
-                                                                                    _myAtlasPath)[0]);
-        Public.height = Protected.getNumber("height",
-                                            Public.root.textureAtlasManager.getSize(_mySubTextureName,
-                                                                                    _myAtlasPath)[1]);
         _realized = true;
+
+        if (_mySubTextureName) {
+            Public.setTexture(_mySubTextureName, _myAtlasPath);
+        }
     };
 
     Base.postRealize = Public.postRealize;
