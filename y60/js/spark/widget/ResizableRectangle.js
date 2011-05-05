@@ -2,6 +2,9 @@
 /*globals spark, Vector2f, Vector3f, product, difference, Modelling,
           window*/
 
+/* used for addMaterialProperty */
+use("BuildUtils.js")
+
 spark.ResizableRectangle = spark.AbstractClass("ResizableRectangle");
 
 spark.ResizableRectangle.Constructor = function (Protected) {
@@ -80,10 +83,10 @@ spark.ResizableRectangle.Constructor = function (Protected) {
         // set the material to allow proper layering of transparencies
         // after rendering, the framebuffer will have the proper alpha
         _myMaterial.properties.blendfunction = "[src_alpha,one_minus_src_alpha,one,one_minus_src_alpha]";
-        var tu = _myMaterial.find("./textureunits/textureunit");
+        var myTextureUnits = _myMaterial.find("./textureunits/textureunit");
         if (!_myShape) {
-            if (tu) {
-                var raster = tu.$texture.$image.raster;
+            if (myTextureUnits) {
+                var raster = myTextureUnits.$texture.$image.raster;
                 Public.width = raster.width;
                 Public.height = raster.height;
             }
@@ -102,10 +105,13 @@ spark.ResizableRectangle.Constructor = function (Protected) {
             _myShape.name = Public.name + "-shape";
         }
                 
-        if (tu) {
+        if (myTextureUnits) {
             _myUVCoords = _myShape.find(".//*[@name='uvset']").firstChild.nodeValue;
         }
 
+        addMaterialProperty(_myMaterial, "string", "targetbuffers", Protected.getString("targetbuffers", "[red,green,blue,alpha,depth]"));
+        addMaterialProperty(_myMaterial, "bool", "depthtest", Protected.getBoolean("depthtest", true));
+        
         _myVertices = _myShape.find(".//*[@name='position']").firstChild.nodeValue;
 
         var myBody = Modelling.createBody(Public.parent.innerSceneNode, _myShape.id);
