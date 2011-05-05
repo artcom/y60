@@ -109,8 +109,19 @@ spark.ResizableRectangle.Constructor = function (Protected) {
             _myUVCoords = _myShape.find(".//*[@name='uvset']").firstChild.nodeValue;
         }
 
-        addMaterialProperty(_myMaterial, "string", "targetbuffers", Protected.getString("targetbuffers", "[red,green,blue,alpha,depth]"));
-        addMaterialProperty(_myMaterial, "bool", "depthtest", Protected.getBoolean("depthtest", true));
+        var myTargetBuffers = Protected.getString("targetbuffers", undefined);
+        if (myTargetBuffers !== undefined) {
+            _myMaterial.properties.targetbuffers = myTargetBuffers;
+        }
+        var myDepthTest = Protected.getBoolean("depthtest", undefined);
+        if (myDepthTest !== undefined) {
+            var myDepthTestNode = _myMaterial.find(".//bool[@name='depthtest']");
+            if (!myDepthTestNode) {
+                addMaterialProperty(_myMaterial, "bool", "depthtest", myDepthTest);
+            } else {
+                myDepthTestNode.firstChild.nodeValue = myDepthTest;
+            }
+        }
         
         _myVertices = _myShape.find(".//*[@name='position']").firstChild.nodeValue;
 
