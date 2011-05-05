@@ -76,7 +76,7 @@ spark.AtlasImage.Constructor = function (Protected) {
         if (_mySubTextureName && _myAtlasPath) {
             Base.realize(_getMaterial());
         } else {
-            throw new Exception("AtlasImage \"" + Public.name + "\" cannot be realized without having set a texture and atlas first via 'setTexture()'", fileline());
+            throw new Exception("AtlasImage \"" + Public.name + "\" cannot be realized without having set a texture and atlas first", fileline());
         }
         Protected.storeOriginalUVCoords();
         Protected.applyAtlasTextureInformation();
@@ -102,7 +102,6 @@ spark.AtlasImage.Constructor = function (Protected) {
             Protected.applyAtlasTextureInformation();
             Protected.material = _getMaterial();
             Protected.material.properties.blendfunction = "[src_alpha,one_minus_src_alpha,one,one_minus_src_alpha]";
-            Public.originalImageSize = Public.root.textureAtlasManager.getSize(_mySubTextureName, _myAtlasPath);
             Public.width  = Protected.getNumber("width",
                                                 Public.root.textureAtlasManager.getSize(_mySubTextureName,
                                                                                         _myAtlasPath)[0]);

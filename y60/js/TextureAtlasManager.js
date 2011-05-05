@@ -30,6 +30,7 @@ TextureAtlasManager.prototype.Constructor = function (Public) {
                 myAtlasInfo.material = theMaterial;
                 var myImg = Modelling.createImage(myScene, myAtlasInfo.atlas.imagePath); 
                 var myTexture = Modelling.createTexture(myScene, myImg);
+                myAtlasInfo.texture = myTexture;
                 var myTextureUnit;
                 if (theMaterial.childNode("textureunits").childNodesLength() > 0) {
                     myTextureUnit = myAtlasInfo.material.childNode("textureunits").childNodes[0];
@@ -43,6 +44,7 @@ TextureAtlasManager.prototype.Constructor = function (Public) {
                                                                    myAtlasInfo.atlas.imagePath,
                                                                    theAtlasDefinitionFile + "_atlasMaterial",
                                                                    true);
+                myAtlasInfo.texture = myAtlasInfo.material.childNode("textureunits").firstChild.$texture;
             }
         }
         return _atlases[theAtlasDefinitionFile];
@@ -61,6 +63,11 @@ TextureAtlasManager.prototype.Constructor = function (Public) {
     Public.getMaterial = function (theAtlasDefinitionFile) {
         var myAtlasInfo = Public.loadAtlas(theAtlasDefinitionFile);
         return myAtlasInfo.material;
+    };
+
+    Public.getTexture = function (theAtlasDefinitionFile) {
+        var myAtlasInfo = Public.loadAtlas(theAtlasDefinitionFile);
+        return myAtlasInfo.texture;
     };
     
     //assumption: unique ids across atlases
