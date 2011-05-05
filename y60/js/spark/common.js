@@ -278,7 +278,7 @@ function Signal(theName) {
 function convertFromString(theType, theString) {
     switch (theType) {
     case Boolean:
-        return !(theString === "false");
+        return (!(theString === "false") && !(theString === "0"));
     case String:
         return theString;
     case Number:

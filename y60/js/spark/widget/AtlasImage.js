@@ -64,8 +64,12 @@ spark.AtlasImage.Constructor = function (Protected) {
     // Public Methods //
     ////////////////////
     
+    Public.__defineSetter__("src", function (theTextureName) {
+        Public.setTexture(theTextureName, _myAtlasPath);
+    });
+
     Base.realize = Public.realize;
-    Public.realize = function (theMaterial) {
+    Public.realize = function () {
         _myAtlasPath      = Protected.getString("atlas", _myAtlasPath);
         _mySubTextureName = Protected.getString("subtexture", _mySubTextureName);
         
@@ -99,6 +103,12 @@ spark.AtlasImage.Constructor = function (Protected) {
             Protected.material = _getMaterial();
             Protected.material.properties.blendfunction = "[src_alpha,one_minus_src_alpha,one,one_minus_src_alpha]";
             Public.originalImageSize = Public.root.textureAtlasManager.getSize(_mySubTextureName, _myAtlasPath);
+            Public.width  = Protected.getNumber("width",
+                                                Public.root.textureAtlasManager.getSize(_mySubTextureName,
+                                                                                        _myAtlasPath)[0]);
+            Public.height = Protected.getNumber("height",
+                                                Public.root.textureAtlasManager.getSize(_mySubTextureName,
+                                                                                        _myAtlasPath)[1]);
         }
     };
 };

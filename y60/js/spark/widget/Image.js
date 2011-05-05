@@ -29,10 +29,6 @@ spark.Image.Constructor = function (Protected) {
     var _myTexture    = null;
     var _myUseCaching = true;
 
-    // XXX crude hack starts here
-    var _myOnImageChanged = null;
-    // XXX crude hack ends here
-
     /////////////////////
     // Private Methods //
     /////////////////////
@@ -75,14 +71,8 @@ spark.Image.Constructor = function (Protected) {
             _myTexture.image = theNode.id;
             Public.width  = Protected.getNumber("width", _myImage.raster.width);
             Public.height = Protected.getNumber("height", _myImage.raster.height);
-
-            // XXX crude hack starts here
-            if (_myOnImageChanged) {
-                _myOnImageChanged();
-            }
-            // XXX crude hack ends here
         } else {
-            _myTexture = null;  //trigger deletion by gc
+            Logger.error("no image node to set");
         }
     });
 
@@ -132,7 +122,7 @@ spark.Image.Constructor = function (Protected) {
     });
 
     Base.realize = Public.realize;
-    Public.realize = function (theCachedMaterial) {
+    Public.realize = function () {
         var myImageSource = Protected.getString("src", "");
         var myImageSourceId = Protected.getString("srcId", "");
         _myUseCaching = Protected.getBoolean("useCaching", true);
@@ -163,12 +153,8 @@ spark.Image.Constructor = function (Protected) {
         _myTexture.name = Public.name + "-texture";
         _myTexture.wrapmode = "clamp_to_edge";
         
-        var myMaterial = theCachedMaterial;
-        if (myMaterial === undefined) {
-            myMaterial = Modelling.createUnlitTexturedMaterial(window.scene,
-                    _myTexture, Public.name + "-material", true);
-        }
-
+        var myMaterial = Modelling.createUnlitTexturedMaterial(window.scene,
+                _myTexture, Public.name + "-material", true);
         Base.realize(myMaterial);
 
         Public.width = myWidth;
@@ -183,12 +169,4 @@ spark.Image.Constructor = function (Protected) {
         Base.postRealize();
     };
 
-    // XXX crude hack starts here
-    Public.__defineGetter__("onImageChanged", function () {
-        return _myOnImageChanged;
-    });
-    Public.__defineSetter__("onImageChanged", function (f) {
-        _myOnImageChanged = f;
-    });
-    // XXX crude hack ends here
 };
