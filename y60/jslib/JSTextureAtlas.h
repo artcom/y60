@@ -79,6 +79,7 @@ class JSTextureAtlas : public JSWrapper<y60::TextureAtlas, asl::Ptr<y60::Texture
         }
         enum PropertyNumbers {
             PROP_IMAGE_PATH = -100,
+            PROP_TEXTURE_COUNT,
         };
 
         static JSFunctionSpec * Functions();

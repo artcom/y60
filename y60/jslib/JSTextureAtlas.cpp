@@ -182,6 +182,7 @@ JSPropertySpec *
 JSTextureAtlas::Properties() {
     static JSPropertySpec myProperties[] = {
         {"imagePath", PROP_IMAGE_PATH, JSPROP_READONLY|JSPROP_PERMANENT|JSPROP_SHARED},
+        {"textureCount", PROP_TEXTURE_COUNT, JSPROP_READONLY|JSPROP_PERMANENT|JSPROP_SHARED},
         {0}
     };
     return myProperties;
@@ -209,6 +210,9 @@ JSTextureAtlas::StaticFunctions() {
 JSBool
 JSTextureAtlas::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
     switch (theID) {
+        case PROP_TEXTURE_COUNT:
+            *vp = as_jsval(cx, getNative().getTextureCount());
+            return JS_TRUE;
         case PROP_IMAGE_PATH:
             *vp = as_jsval(cx, getNative().getRasterPath().toUTF8());
             return JS_TRUE;
