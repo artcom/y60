@@ -360,6 +360,10 @@ namespace jslib {
                         case 'y': n = 1; break;
                         case 'z': n = 2; break;
                         case 'w': n = 3; break;
+                        case 'r': n = 0; break;
+                        case 'g': n = 1; break;
+                        case 'b': n = 2; break;
+                        case 'a': n = 3; break;
                         case '0': n = -1; v = 0; break;
                         case '1': n = -2; v = 1; break;
                         default: return JS_TRUE;
