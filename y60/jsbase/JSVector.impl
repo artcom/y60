@@ -286,7 +286,7 @@ namespace jslib {
         if (JSVAL_IS_INT(argv[0]) || JSVAL_IS_DOUBLE(argv[0])) {
             jsdouble myNumber;
             if (!JS_ValueToNumber(cx,argv[0],&myNumber)) {
-                JS_ReportError(cx, "JSVector::add: argument 1 has to be int/float/double");
+                JS_ReportError(cx, "JSVector::mult: argument 1 has to be int/float/double");
                 return JS_FALSE;
             }
             (openNativeRef(cx,obj).NATIVE_VECTOR::mult)(ELEM(myNumber));
@@ -348,7 +348,8 @@ namespace jslib {
                 return JS_TRUE;
             }
             std::string myProperty = JS_GetStringBytes(myJSStr);
-            if (myProperty.size()>0 && myProperty.size()<=4) {
+            size_t myPosition = myProperty.find_first_not_of("xyzwrgba01");
+            if (myProperty.size() > 0 && myProperty.size() <= 4 && myPosition == std::string::npos) {
                 //NATIVE_VECTOR & myNativeVector = getNative(cx,obj);
                 const NATIVE_VECTOR & myNativeVector = getJSWrapper(cx, obj).getNative();
                 std::vector<jsval> mySwizzledArgs(myProperty.size());
@@ -438,7 +439,8 @@ namespace jslib {
                 return JS_TRUE;
             }
             std::string myProperty = JS_GetStringBytes(myJSStr);
-            if (myProperty.size()>0 && myProperty.size()<=SIZE) {
+            size_t myPosition = myProperty.find_first_not_of("xyzwrgba");
+            if (myProperty.size() > 0 && myProperty.size() <= SIZE && myPosition == std::string::npos) {
                 asl::QuadrupleOf<bool> isUsed(false,false,false,false);
                 asl::Vector4i myIndices;
                 for (std::string::size_type i = 0; i < myProperty.size(); ++i) {
@@ -448,11 +450,13 @@ namespace jslib {
                         case 'y': n = 1; break;
                         case 'z': n = 2; break;
                         case 'w': n = 3; break;
-                        //default: return JS_TRUE;
+                        case 'r': n = 0; break;
+                        case 'g': n = 1; break;
+                        case 'b': n = 2; break;
+                        case 'a': n = 3; break;
                     }
                     if (n>=SIZE) {
                         AC_WARNING << "swizzle property char '"<<myProperty[i]<<"' ignored on vector with size "<<SIZE<<std::endl;
-                        AC_INFO << " if you do not want to swizzle use a propertyname not starting with x,y,z,w or is longer than "<<SIZE<<" characters"<<std::endl;
                         return JS_TRUE;
                     }
                     myIndices[i] = n;
