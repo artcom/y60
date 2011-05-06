@@ -33,14 +33,14 @@ spark.Image.Constructor = function (Protected) {
     // Private Methods //
     /////////////////////
     
-    function handleI18nLanguage(e) {
+    Protected.handleI18nLanguage = function(e) {
         Public.src = e.src;
     }
 
     function attachToI18nItem(theItemId) {
         if (_mySourceItem) {
             _mySourceItem.removeEventListener(spark.I18nEvent.LANGUAGE,
-                                              handleI18nLanguage);
+                                              Protected.handleI18nLanguage);
             _mySourceItem = null;
         }
         _mySourceItem = Public.getI18nItemByName(theItemId);
@@ -48,7 +48,7 @@ spark.Image.Constructor = function (Protected) {
             Logger.fatal("no i18n item named " + theItemId);
         }
         _mySourceItem.addEventListener(spark.I18nEvent.LANGUAGE,
-                                       handleI18nLanguage);
+                                       Protected.handleI18nLanguage);
         Public.src = _mySourceItem.src;
     }
 
