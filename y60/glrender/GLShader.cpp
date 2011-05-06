@@ -350,9 +350,20 @@ namespace y60 {
 
         // blend equation
         if (_myHasImagingEXT && _myHasBlendMinMaxEXT) {
-            const BlendEquation & myBlendEquation = myMaterialPropFacade->get<BlendEquationTag>();
-            GLenum myEquation = asGLBlendEquation(myBlendEquation);
-            glBlendEquation(myEquation);
+            const VectorOfBlendEquation & myBlendEquation = myMaterialPropFacade->get<BlendEquationTag>();
+            if(myBlendEquation.size() == 1 || !hasCap("GL_EXT_blend_equation_separate")) {
+                glBlendEquation(asGLBlendEquation(myBlendEquation[0]));
+            } else if(myBlendEquation.size() == 2) {
+                glBlendEquationSeparate(asGLBlendEquation(myBlendEquation[0]),
+                                        asGLBlendEquation(myBlendEquation[1]));
+            } else {
+                throw ShaderException(string("Blend equation for material '")
+                                      + theMaterial.get<NameTag>()
+                                      + "' has invalid length "
+                                      + asl::as_string(myBlendEquation.size())
+                                      + ", expected 1 or 2",
+                                      PLUS_FILE_LINE);
+            }
             CHECK_OGL_ERROR;
         }
     }

@@ -89,6 +89,7 @@
 namespace y60 {
 
     typedef std::vector<BlendFunction>         VectorOfBlendFunction;
+    typedef std::vector<BlendEquation>         VectorOfBlendEquation;
 
     typedef std::vector<AcBool>                VectorOfBool;
     typedef std::vector<unsigned int>          VectorOfUnsignedInt;
