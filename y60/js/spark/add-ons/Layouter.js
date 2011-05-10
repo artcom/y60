@@ -211,6 +211,10 @@ spark.Layouter.Constructor = function(Protected) {
         return (_myState === ACTIVE);
     };
 
+    Public.target getter = function () {
+        return _myWidget;
+    };
+
     Public.target setter = function (theWidget) {
         print("target widget", theWidget)
         _myWidget = theWidget;
@@ -224,7 +228,6 @@ spark.Layouter.Constructor = function(Protected) {
         _myBackup.originalWidth = ("width" in _myWidget) ? _myWidget.width : null;
         _myBackup.originalHeight = ("height" in _myWidget) ? _myWidget.height : null;
         _myState = ACTIVE;
-        _myOldPos = null;
         if (!(_myWidget.name in _mySparkFiles)) {
             var myFile = findSparkFile(_myWidget);
             _mySparkFiles[_myWidget.name] = myFile;
@@ -258,7 +261,7 @@ spark.Layouter.Constructor = function(Protected) {
             return;
         }
         _myNewFrameFlag = false;
-        if(!_myOldPos) {
+        if (!_myOldPos) {
             _myOldPos = new Vector3f(theX, window.height - theY, theZ);
             return;
         }
@@ -362,6 +365,9 @@ spark.Layouter.Constructor = function(Protected) {
     }
 
     function correctPositionAndSize(theKey) {
+        if (!_myOldPos) {
+            return;
+        }
         var myNewPos = new Vector3f(0, 0, 0);
         var myDist = 1;
         if (_myShiftFlag) {
