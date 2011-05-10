@@ -415,7 +415,7 @@ spark.Window.Constructor = function (Protected, theArguments) {
     Base.onFrame = Public.onFrame;
     Public.onFrame = function (theTime, theDeltaT) {
         Base.onFrame(theTime, theDeltaT);
-        if (Public.hasEventListener(spark.StageEvent.FRAME)) {
+        if (Public.hasEventListenersWithType(spark.StageEvent.FRAME)) {
             var myEvent = new spark.StageEvent(spark.StageEvent.FRAME, Public, theTime, theDeltaT);
             Public.dispatchEvent(myEvent);
         }
