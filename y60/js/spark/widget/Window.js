@@ -41,6 +41,7 @@ spark.Window.Constructor = function (Protected, theArguments) {
     var _myMouseFocused      = null;
     var _myMouseCursor       = null;
     var _myKeyboardFocused   = null;
+    var _myJoystickFocused   = null;
 
     var _myLayouter          = null;
     
@@ -375,6 +376,14 @@ spark.Window.Constructor = function (Protected, theArguments) {
     Public.focusKeyboard = function (theWidget) {
         _myKeyboardFocused = theWidget;
     };
+    
+    Public.__defineGetter__("joystickFocused", function () {
+        return _myJoystickFocused;
+    });
+
+    Public.focusJoystick = function (theWidget) {
+        _myJoystickFocused = theWidget;
+    };
 
     Public.__defineGetter__("onSceneLoaded", function () {
         return _mySceneLoadedCallback;
@@ -572,14 +581,23 @@ spark.Window.Constructor = function (Protected, theArguments) {
 
     // Will be called on a joystick axis event
     Base.onAxis = Public.onAxis;
-    Public.onAxis = function (device, axis, value) {
-        Base.onAxis(device, axis, value);
+    Public.onAxis = function (theDevice, theAxis, theValue) {
+        Base.onAxis(theDevice, theAxis, theValue);
+        if (_myJoystickFocused) {
+            var myEvent = new spark.JoystickEvent(spark.JoystickEvent.AXIS, theDevice, undefined, theAxis, theValue);
+            _myJoystickFocused.dispatchEvent(myEvent);
+        }
     };
 
     // Will be called on a joystick button event
     Base.onButton = Public.onButton;
     Public.onButton = function (theDevice, theButton, theState) {
         Base.onButton(theDevice, theButton, theState);
+        if (_myJoystickFocused) {
+            var myType = theState ? spark.JoystickEvent.BUTTON_DOWN : spark.JoystickEvent.BUTTON_UP;
+            var myEvent = new spark.JoystickEvent(myType, theDevice, theButton);
+            _myJoystickFocused.dispatchEvent(myEvent);
+        }
     };
 
     // Will be called on a window reshape event

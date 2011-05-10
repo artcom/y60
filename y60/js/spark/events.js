@@ -593,6 +593,45 @@ spark.KeyboardEvent.Constructor = function(Protected, theType, theKey, theModifi
     });
 };
 
+spark.JoystickEvent = spark.Class("JoystickEvent");
+
+spark.JoystickEvent.BUTTON_DOWN = "Joystick-button-down";
+spark.JoystickEvent.BUTTON_UP = "Joystick-button-up";
+spark.JoystickEvent.AXIS   = "Joystick-axis";
+
+spark.JoystickEvent.Constructor = function(Protected, theType, theDevice, theButton, theAxis, theValue) {
+    var Public = this;
+
+    Public.Inherit(spark.Event, theType);
+    
+    var _myDevice = theDevice;
+
+    Public.__defineGetter__("device", function() {
+        return _myDevice;
+    });
+    
+        
+    if (theType === spark.JoystickEvent.AXIS) {
+        var _myAxis = theAxis;
+        var _myValue = theValue;
+    
+    
+        Public.__defineGetter__("axis", function() {
+            return _myAxis;
+        });
+        
+        Public.__defineGetter__("value", function() {
+            return _myValue;
+        });
+    } else {
+        var _myButton = theButton;
+    
+        Public.__defineGetter__("button", function() {
+            return _myButton;
+        });
+    }
+};
+
 spark.StageEvent = spark.Class("StageEvent");
 
 spark.StageEvent.PROTO_FRAME = "stage-proto-frame";
