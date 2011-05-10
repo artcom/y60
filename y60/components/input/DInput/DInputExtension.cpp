@@ -85,7 +85,9 @@ namespace y60 {
 
 
     DInputExtension::~DInputExtension() {
-        _myDI->Release();
+        if (_myDI) {
+            _myDI->Release();
+        }
         for (unsigned i = 0; i < _myJoysticks.size(); ++i) {
             _myJoysticks[i]->Release();
         }
