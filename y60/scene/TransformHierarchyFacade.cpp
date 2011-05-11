@@ -102,6 +102,7 @@ namespace y60 {
         ScaleTag::Plug(theNode),
         PivotTag::Plug(theNode),
         BillboardTag::Plug(theNode),
+        RenderOrderTag::Plug(theNode),
         CullableTag::Plug(theNode),
         ClippingPlanesTag::Plug(theNode),
         ScissorTag::Plug(theNode),

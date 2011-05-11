@@ -94,7 +94,9 @@ namespace y60 {
                         {}
 #if 1
                         bool operator <(const Key & second) const {
-                            if (this->alphaBit_ZDepth < second.alphaBit_ZDepth) {
+                            if (this->body->get<RenderOrderTag>() != second.body->get<RenderOrderTag>()) {
+                                return this->body->get<RenderOrderTag>() < second.body->get<RenderOrderTag>();
+                            } else if (this->alphaBit_ZDepth < second.alphaBit_ZDepth) {
                                 return true;
                             } else if (this->alphaBit_ZDepth == second.alphaBit_ZDepth) {
                                 if (this->material < second.material) {

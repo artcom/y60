@@ -316,6 +316,13 @@ spark.Widget.Constructor = function (Protected) {
     this.Property("y", Number, 0.0, applyPosition);
     this.Property("z", Number, 0.0, applyPosition);
 
+    this.Property("renderorder", Number, 0, applyRenderOrder);
+    function applyRenderOrder() {
+        if (_mySceneNode) {
+            _mySceneNode.renderorder = Public.renderorder;
+        }
+    }
+    
     // SCALE
     function applyScale() {
         if (_mySceneNode) {
@@ -508,6 +515,7 @@ spark.Widget.Constructor = function (Protected) {
         applyRotation();
         applyPivot();
         applyAlpha();
+        applyRenderOrder();
         //Public.propagateAlpha();
     };
 
