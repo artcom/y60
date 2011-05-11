@@ -222,7 +222,9 @@ spark.Layouter.Constructor = function(Protected) {
             var myHandle = _bindings[spark.Layouter.BINDING_SLOT.CATCH][handleId];
             myHandle.cb(_myWidget);
         }
-
+        if (_myOldPos) {
+            _myOldPos.z = _myWidget.z;
+        }
         _myBackup.originalZ = _myWidget.z;
         _myBackup.originalRotationZ = ("rotationZ" in _myWidget) ? _myWidget.rotationZ : null;
         _myBackup.originalWidth = ("width" in _myWidget) ? _myWidget.width : null;
