@@ -91,7 +91,9 @@ GUI.ParallelAnimation.prototype.Constructor = function(Public, Protected) {
         Base.play();
         if (!theComeToAnEndFlag) {
             for(var i = 0; i < Public.children.length; i++) {
-                Public.children[i].play();
+                if (Public.running) {
+                    Public.children[i].play();
+                }
             }
         }
     };
@@ -100,13 +102,13 @@ GUI.ParallelAnimation.prototype.Constructor = function(Public, Protected) {
     Public.doFrame = function(theTime)  {
         var notFinished = false;
         for(var i = 0; i < Public.children.length; i++) {
-            if(Public.children[i].running) {
+            if(Public.children[i].running && Public.running) {
                 Public.children[i].doFrame(theTime);
                 notFinished |= Public.children[i].running;
             }
         }
 
-        if(!notFinished) {
+        if(!notFinished && Public.running) {
             Protected.finish();
         }
     };
