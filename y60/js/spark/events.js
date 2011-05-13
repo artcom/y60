@@ -350,7 +350,7 @@ spark.EventDispatcher.Constructor = function (Protected) {
         // capture phase
         for (var i = 0; i < myCaptureList.length; i++) {
             var myCurrentTarget = myCaptureList[i];
-            if (myCurrentTarget.hasEventListener(theEvent.type)) {
+            if (myCurrentTarget.hasEventListenersWithType(theEvent.type)) {
                 theEvent.dispatchTo(myCurrentTarget, spark.EventPhase.CAPTURING);
                 myListeners = myCurrentTarget.getEventListeners(theEvent.type);
                 for (j = 0; j < myListeners.length; j++) {
@@ -367,7 +367,7 @@ spark.EventDispatcher.Constructor = function (Protected) {
 
         // target phase
         theEvent.dispatchTo(Public, spark.EventPhase.TARGET);
-        if (Public.hasEventListener(theEvent.type)) {
+        if (Public.hasEventListenersWithType(theEvent.type)) {
             myListeners = Public.getEventListeners(theEvent.type);
             for (j = 0; j < myListeners.length; j++) {
                 myListener = myListeners[j];
@@ -391,11 +391,34 @@ spark.EventDispatcher.Constructor = function (Protected) {
      * 
      * This is non-recursive, checking only the given dispatcher.
      */
-    Public.hasEventListener = function(theType) {
+    Public.hasEventListenersWithType = function(theType) {
         if (theType in _myListenersByType) {
             var myListeners = _myListenersByType[theType];
             if (myListeners.length > 0) {
                 return true;
+            }
+        }
+        return false;
+    };
+
+    /**
+     * Check if this dispatcher has the listener
+     * 
+     * This is non-recursive, checking only the given dispatcher.
+     */
+    Public.hasEventListener = function(theType, theListener, theUseCapture) {
+        if (!Public.hasEventListenersWithType(theType)) {
+            return false;
+        }
+        theUseCapture = theUseCapture || false;
+        var myListeners = _myListenersByType[theType];
+        for (var i = 0; i < myListeners.length; i++) {
+            var myListener = myListeners[i];
+            if (myListener.type == theType &&
+                myListener.listener == theListener &&
+                myListener.useCapture == theUseCapture) 
+            {
+               return true;
             }
         }
         return false;
@@ -465,7 +488,7 @@ spark.EventDispatcher.Constructor = function (Protected) {
      * an event is worth the effort.
      */
     Public.willTrigger = function(theType) {
-        if (Public.hasEventListener(theType)) {
+        if (Public.hasEventListenersWithType(theType)) {
             return true;
         }
         for (var i = 0; i < Public.children.length; i++) {
@@ -591,6 +614,45 @@ spark.KeyboardEvent.Constructor = function(Protected, theType, theKey, theModifi
                        _myKey;
         return myString;
     });
+};
+
+spark.JoystickEvent = spark.Class("JoystickEvent");
+
+spark.JoystickEvent.BUTTON_DOWN = "Joystick-button-down";
+spark.JoystickEvent.BUTTON_UP = "Joystick-button-up";
+spark.JoystickEvent.AXIS   = "Joystick-axis";
+
+spark.JoystickEvent.Constructor = function(Protected, theType, theDevice, theButton, theAxis, theValue) {
+    var Public = this;
+
+    Public.Inherit(spark.Event, theType);
+    
+    var _myDevice = theDevice;
+
+    Public.__defineGetter__("device", function() {
+        return _myDevice;
+    });
+    
+        
+    if (theType === spark.JoystickEvent.AXIS) {
+        var _myAxis = theAxis;
+        var _myValue = theValue;
+    
+    
+        Public.__defineGetter__("axis", function() {
+            return _myAxis;
+        });
+        
+        Public.__defineGetter__("value", function() {
+            return _myValue;
+        });
+    } else {
+        var _myButton = theButton;
+    
+        Public.__defineGetter__("button", function() {
+            return _myButton;
+        });
+    }
 };
 
 spark.StageEvent = spark.Class("StageEvent");

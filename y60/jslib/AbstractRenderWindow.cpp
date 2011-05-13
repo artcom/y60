@@ -757,7 +757,7 @@ AbstractRenderWindow::onKey(y60::Event & theEvent) {
 
             argv[7] = as_jsval(_myJSContext, theEvent.simulation_time);
 
-            JSA_CallFunctionName(_myJSContext, _myEventListener, "onKey", 7, argv, &rval);
+            JSA_CallFunctionName(_myJSContext, _myEventListener, "onKey", 8, argv, &rval);
         } catch (const asl::Exception & ex) {
             AC_ERROR << "ASL exception caught in AbstractRenderWindow::onKey(): " << ex;
         } catch (const exception & ex) {
@@ -785,7 +785,7 @@ AbstractRenderWindow::onMouseButton(y60::Event & theEvent) {
 
         argv[4] = as_jsval(_myJSContext, theEvent.simulation_time);
 
-        JSA_CallFunctionName(_myJSContext, _myEventListener, "onMouseButton", 4, argv, &rval);
+        JSA_CallFunctionName(_myJSContext, _myEventListener, "onMouseButton", 5, argv, &rval);
     }
 }
 
@@ -804,7 +804,7 @@ AbstractRenderWindow::onMouseMotion(y60::Event & theEvent) {
 
         argv[2] = as_jsval(_myJSContext, theEvent.simulation_time);
 
-        JSA_CallFunctionName(_myJSContext, _myEventListener, "onMouseMotion", 2, argv, &rval);
+        JSA_CallFunctionName(_myJSContext, _myEventListener, "onMouseMotion", 3, argv, &rval);
     }
 }
 
@@ -819,7 +819,7 @@ AbstractRenderWindow::onMouseWheel(y60::Event & theEvent) {
 
         argv[2] = as_jsval(_myJSContext, theEvent.simulation_time);
 
-        JSA_CallFunctionName(_myJSContext, _myEventListener, "onMouseWheel", 2, argv, &rval);
+        JSA_CallFunctionName(_myJSContext, _myEventListener, "onMouseWheel", 3, argv, &rval);
     }
 }
 
@@ -834,7 +834,7 @@ AbstractRenderWindow::onAxis(y60::Event & theEvent) {
 
         argv[3] = as_jsval(_myJSContext, theEvent.simulation_time);
 
-        JSA_CallFunctionName(_myJSContext, _myEventListener, "onAxis", 3, argv, &rval);
+        JSA_CallFunctionName(_myJSContext, _myEventListener, "onAxis", 4, argv, &rval);
     }
 }
 
@@ -868,7 +868,7 @@ AbstractRenderWindow::onResize(y60::Event & theEvent) {
 
         argv[2] = as_jsval(_myJSContext, theEvent.simulation_time);
 
-        JSA_CallFunctionName(_myJSContext, _myEventListener, "onResize", 2, argv, &rval);
+        JSA_CallFunctionName(_myJSContext, _myEventListener, "onResize", 3, argv, &rval);
     }
 }
 
@@ -887,7 +887,7 @@ AbstractRenderWindow::onButton(y60::Event & theEvent) {
 
         argv[3] = as_jsval(_myJSContext, theEvent.simulation_time);
 
-        JSA_CallFunctionName(_myJSContext, _myEventListener, "onButton", 3, argv, &rval);
+        JSA_CallFunctionName(_myJSContext, _myEventListener, "onButton", 4, argv, &rval);
     }
 }
 

@@ -347,6 +347,7 @@ function Property(theName, theType, theDefault, theHandler) {
 
     myProperty.setFromString = function (theString) {
         myValue = convertFromString(theType, theString);
+        
         if (theHandler) {
             theHandler(myValue);
         }

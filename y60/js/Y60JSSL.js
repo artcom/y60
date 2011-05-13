@@ -1219,6 +1219,12 @@ function attachTo(theNode, theNewParent) {
     theNode.scale = myDecomposition.scale;
 }
 
+utils.getCameraDistanceFromScreenLength = function (theScreenLength, theHFov){
+    var myAlpha = radFromDeg(theHFov / 2);
+    var myDistance = 0.5 * theScreenLength / Math.abs(Math.tan(myAlpha));
+    return myDistance;
+}
+
 utils.dom.mergeNodes = function (theTargetNode, theSourceNode) {
 
     function _adjustIds(theSourceNode) {

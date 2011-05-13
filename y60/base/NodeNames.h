@@ -210,6 +210,7 @@ namespace y60 {
     const char * const LOCAL_MATRIX_ATTRIB         = "localmatrix";
     const char * const RENDER_STYLE_ATTRIB         = "renderstyle";
     const char * const BILLBOARD_ATTRIB            = "billboard";
+    const char * const RENDERORDER_ATTRIB          = "renderorder";
     const char * const TRANSPARENCY_ATTRIB         = "transparent";
     const char * const DEPTH_TEST_ATTRIB           = "depthtest";
     const char * const INSENSIBLE_ATTRIB           = "insensible";

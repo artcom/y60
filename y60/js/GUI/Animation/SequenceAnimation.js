@@ -93,7 +93,7 @@ GUI.SequenceAnimation.prototype.Constructor = function(Public, Protected) {
     Base.play = Public.play;
     Public.play = function(theComeToAnEndFlag) {
         Base.play();
-        if(!theComeToAnEndFlag) {
+        if(!theComeToAnEndFlag && Public.running) {
             _current = 0;
             if(Public.children.length >= 1) {
                 Public.children[_current].play();
@@ -107,7 +107,7 @@ GUI.SequenceAnimation.prototype.Constructor = function(Public, Protected) {
             return;
         }
         Public.children[_current].doFrame(theTime);
-        if(!Public.children[_current].running) {
+        if(!Public.children[_current].running && Public.running) {
             _current++;
             if(_current < Public.children.length) {
                 Public.children[_current].play();

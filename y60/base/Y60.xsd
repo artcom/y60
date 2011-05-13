@@ -3352,6 +3352,11 @@ Child nodes will still be optimized tho.</xs:documentation>
                 <xs:documentation>Insensible nodes, will be ignored by intersection algorithms, such as picking</xs:documentation>
             </xs:annotation>
         </xs:attribute>
+        <xs:attribute name="renderorder" type="xs:int">
+            <xs:annotation>
+                <xs:documentation>Sets up the nodes signed renderorder, negative render before all default nodes, positive after</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
         <xs:attribute name="billboard" type="xs:string">
             <xs:annotation>
                 <xs:documentation>Sets up the node as billboard. Use 'axis' or 'point' strings for axis-/point-billboards</xs:documentation>

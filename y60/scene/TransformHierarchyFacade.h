@@ -80,6 +80,7 @@ namespace y60 {
     DEFINE_ATTRIBUTE_TAG(PivotTag,            asl::Vector3f,    PIVOT_ATTRIB,             asl::Vector3f(0,0,0), Y60_SCENE_DECL);
     DEFINE_ATTRIBUTE_TAG(InsensibleTag,       bool,             INSENSIBLE_ATTRIB,        false, Y60_SCENE_DECL);
     DEFINE_ATTRIBUTE_TAG(BillboardTag,        std::string,      BILLBOARD_ATTRIB,         "", Y60_SCENE_DECL);
+    DEFINE_ATTRIBUTE_TAG(RenderOrderTag,      int,              RENDERORDER_ATTRIB,       0, Y60_SCENE_DECL);
     DEFINE_ATTRIBUTE_TAG(CullableTag,         bool,             CULLABLE_ATTRIB,          true, Y60_SCENE_DECL);
     DEFINE_ATTRIBUTE_TAG(ClippingPlanesTag,   VectorOfString,   CLIPPING_PLANES_ATTRIB,   VectorOfString(), Y60_SCENE_DECL);
     DEFINE_ATTRIBUTE_TAG(ScissorTag,          std::string,      SCISSOR_ATTRIB,           "", Y60_SCENE_DECL);
@@ -102,6 +103,7 @@ namespace y60 {
         public ScaleTag::Plug,
         public PivotTag::Plug,
         public BillboardTag::Plug,
+        public RenderOrderTag::Plug,
         public CullableTag::Plug,
         public ClippingPlanesTag::Plug,
         public ScissorTag::Plug,
