@@ -138,4 +138,6 @@ if (!("disableSparkWidgets" in this)) {
     use("spark/add-ons/StretchyAtlasImage.js");
     use("spark/add-ons/VideoCapture.js");
     use("spark/add-ons/Slider.js");
+    use("spark/add-ons/MultiQuadText.js");
+    use("spark/add-ons/GlowWidgets.js");
 }
