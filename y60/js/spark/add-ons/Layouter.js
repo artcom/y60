@@ -207,15 +207,15 @@ spark.Layouter.Constructor = function(Protected) {
         }
     }
 
-    Public.active getter = function () {
+    Public.__defineGetter__("active", function () {
         return (_myState === ACTIVE);
-    };
+    });
 
-    Public.target getter = function () {
+    Public.__defineGetter__("target", function () {
         return _myWidget;
-    };
+    });
 
-    Public.target setter = function (theWidget) {
+    Public.__defineSetter__("target", function (theWidget) {
         print("target widget", theWidget)
         _myWidget = theWidget;
         for (var handleId in _bindings[spark.Layouter.BINDING_SLOT.CATCH]) {
@@ -246,7 +246,7 @@ spark.Layouter.Constructor = function(Protected) {
             }
             _myCurrentSparkFile = myFile;
         }
-    };
+    });
 
     function findSparkFile(theWidget) {
         if (!theWidget) {
@@ -297,15 +297,19 @@ spark.Layouter.Constructor = function(Protected) {
         print("activate")
         _myStage.addEventListenerInFront(spark.CursorEvent.APPEAR, onMouseDown , true);
         _myStage.addEventListenerInFront(spark.CursorEvent.MOVE, onMouseMove, true);
+        _myStage.addEventListenerInFront(spark.MouseEvent.BUTTON_DOWN, onMouseDown , true);
+        _myStage.addEventListenerInFront(spark.MouseEvent.MOVE, onMouseMove, true);
     }
     
     function deactivate() {
         print("deactivate")
         _myStage.removeEventListener(spark.CursorEvent.APPEAR, onMouseDown, true);
         _myStage.removeEventListener(spark.CursorEvent.MOVE, onMouseMove, true);
+        _myStage.removeEventListener(spark.MouseEvent.BUTTON_DOWN, onMouseDown , true);
+        _myStage.removeEventListener(spark.MouseEvent.MOVE, onMouseMove, true);
         if (_myWidget) {
             for (var i = 0; i < _myListeners.length; ++i) {
-                _myWidget.addEventListener(spark.CursorEvent.APPEAR, _myListeners[i].listener);
+                _myWidget.addEventListener(spark.CursorEvent.APPEAR, _myListeners[i].listener, _myListeners[i].useCapture);
             }
         }
         _myIntersections = [];

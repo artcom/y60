@@ -10,7 +10,7 @@
 
 
 float gauss(float x) {
-	return 0.39894*exp(-0.5*pow(x, 2.0)); 
+	return 0.39894*exp(-0.5*pow(x, 1.0)); 
 }
 
 float4 applyGauss(sampler2D theTexSampler, float2 theTexCoord, float theSize, float pixW, float pixH) {
@@ -21,8 +21,7 @@ float4 applyGauss(sampler2D theTexSampler, float2 theTexCoord, float theSize, fl
     {
         for (float j=-theSize; j<theSize; j++)
         { 
-            float myCenterDistance = length(float2(i, j));
-         
+            float myCenterDistance = length(float2(i, j));         
             float myStrength = gauss((myCenterDistance/(theSize/1.75)));
             myWeight += myStrength;
             
@@ -35,13 +34,14 @@ float4 applyGauss(sampler2D theTexSampler, float2 theTexCoord, float theSize, fl
     return myReturn;
 }
 
-float4 calculateTextGlow(float4 theGlow, float4 theText) {
+float4 calculateTextGlow(float4 theGlow, float4 theText, float theGlowIntensity) {
     float myDiffAlpha = max(0.0, theGlow.a - theText.a);
     float3 myGlowColor = theGlow.rgb * float3(myDiffAlpha);
     float3 myTextColor = theText.rgb * float3(theText.a);
     float3 myResultColor = myGlowColor + myTextColor;
-    float  mySumAlpha = myDiffAlpha + theText.a;
+    float  myColorDivisor = myDiffAlpha + theText.a;
+    float  mySumAlpha = (myDiffAlpha*theGlowIntensity) + theText.a;
 
-    return float4(myResultColor.rgb/float3(mySumAlpha), mySumAlpha);
+    return float4(myResultColor.rgb/float3(myColorDivisor), mySumAlpha);
 } 
 

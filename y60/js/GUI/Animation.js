@@ -73,6 +73,8 @@ use("Animation/DelayAnimation.js");
 use("Animation/QuaternionAnimation.js");
 use("Animation/VectorAnimation.js");
 
+use("Easing.js");
+
 // wrapper function for using penner easings
 // in conjunction with this library
 function unpenner() {
