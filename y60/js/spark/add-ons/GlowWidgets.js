@@ -11,7 +11,8 @@ spark.GlowPlug.Constructor = function (Protected) {
         theMaterial.enabled = false;        
         var myGlow = Protected.getNumber("glow", 0);
         var myBlur = Protected.getNumber("blur", 0);
-        var myScale = Protected.getNumber("scale", 1);
+        var myScale = Protected.getNumber("glow_scale", 1);
+        var myGlowIntensity = Protected.getNumber("glow_intensity", 1);
         _myAnythingGlowsOrBlursFlag = true;
         if (myBlur >0 && myGlow > 0) {
             addMaterialRequirement(theMaterial, "effect", "[10[glowBlur]]");
@@ -27,6 +28,7 @@ spark.GlowPlug.Constructor = function (Protected) {
         }
             
         addMaterialProperty(theMaterial, "float", "scale", myScale);     
+        addMaterialProperty(theMaterial, "float", "glow_intensity", myGlowIntensity);     
         
         theMaterial.enabled = true;        
         if (_myAnythingGlowsOrBlursFlag) {

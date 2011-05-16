@@ -37,6 +37,7 @@ float4 mainFragmentGlow(vert2frag IN,
                     uniform float4 surfacecolor,
                     uniform float4 glow_color,
                     uniform float scale,
+                    uniform float glow_intensity,
                     uniform float2 offset) : COLOR
 {    
     float4 myGlow = float4(0.0);
@@ -50,7 +51,7 @@ float4 mainFragmentGlow(vert2frag IN,
                                          glow_radius, pixW, pixH).a);
         myGlow.a *= glow_color.a;
     }
-    return calculateTextGlow(myGlow, myText) * surfacecolor;
+    return calculateTextGlow(myGlow, myText, glow_intensity) * surfacecolor;
 }
 
 // Textblur Fragment Shader
@@ -83,6 +84,7 @@ float4 mainFragmentGlowBlur(vert2frag IN,
                     uniform float glow_radius,
                     uniform float4 surfacecolor,
                     uniform float4 glow_color,
+                    uniform float glow_intensity,                    
                     uniform float2 offset) : COLOR
 {    
 
@@ -103,5 +105,5 @@ float4 mainFragmentGlowBlur(vert2frag IN,
                                          glow_radius + blur, pixW, pixH).a);
         myGlow.a *= glow_color.a;
     }
-    return calculateTextGlow(myGlow, myText) * surfacecolor;
+    return calculateTextGlow(myGlow, myText, glow_intensity) * surfacecolor;
 }
