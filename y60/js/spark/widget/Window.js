@@ -518,7 +518,7 @@ spark.Window.Constructor = function (Protected, theArguments) {
                 _myMouseCursor.update(myWidget, new Point2f(theX, theY));
                 myMouseCursorEvent = new spark.CursorEvent(spark.CursorEvent.APPEAR, _myMouseCursor);
                 myWidget.dispatchEvent(myMouseCursorEvent);
-            } else {
+            } else if (_myMouseCursor) {
                 _myMouseCursor.update(myWidget, new Point2f(theX, theY));
                 myMouseCursorEvent = new spark.CursorEvent(spark.CursorEvent.VANISH, _myMouseCursor);
                 if (_myMouseCursor.grabbed) {
