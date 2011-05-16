@@ -1913,6 +1913,7 @@
                 <float name="height">512</float>  
                 <float name="glow_radius">1.0</float>  
                 <float name="scale">1.0</float>  
+                <float name="glow_intensity">1.0</float>                  
                 <vector4f name="glow_color">[1.0,1.0,1.0,1.0]</vector4f> 
                 <vector2f name="offset">[0.0,0.0]</vector2f> 
            </properties>
@@ -1942,6 +1943,7 @@
                 <float name="height">512</float>  
                 <float name="glow_radius">1.0</float>  
                 <float name="scale">1.0</float>  
+                <float name="glow_intensity">1.0</float>                                  
                 <vector4f name="glow_color">[1.0,1.0,1.0,1.0]</vector4f> 
                 <vector2f name="offset">[0.0,0.0]</vector2f> 
            </properties>
@@ -1970,6 +1972,7 @@
                 <float name="glow_radius">0.0</float>  
                 <float name="blur">0.0</float>  
                 <float name="scale">1.0</float>  
+                <float name="glow_intensity">1.0</float>                                  
                 <vector4f name="glow_color">[1.0,1.0,1.0,1.0]</vector4f> 
                 <vector2f name="offset">[0.0,0.0]</vector2f> 
            </properties>

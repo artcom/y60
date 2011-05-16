@@ -523,7 +523,14 @@ spark.Widget.Constructor = function (Protected) {
     Public.postRealize = function () {
         var myContextName = Protected.getString("i18nContext", "");
         if (myContextName !== "") {
-            _myI18nContext = Public.getChildByName(myContextName);
+            var myParent = Public;
+            while (myParent != null) {
+                _myI18nContext = myParent.getChildByName(myContextName);
+                if (_myI18nContext != null) {
+                    break;
+                }
+                myParent = myParent.parent;
+            }
         }
         Base.postRealize();
     };
