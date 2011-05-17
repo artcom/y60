@@ -242,33 +242,23 @@ RadarTouch.prototype.Constructor = function(Public, theStage) {
 
     }
     
+    Public.planeToWindowCoords = function(theX, theY) {
+        return new Point2f(theX * (window.width - _myLeftMargin - _myRightMargin) + _myLeftMargin, 
+                           (1-theY) * (window.height - _myTopMargin - _myBottomMargin) + _myBottomMargin);
+    }
+    
     //////////////////////////////////////////////////////////////////////
     // Private
     //////////////////////////////////////////////////////////////////////
     
     function dispatchCursorEvent( theType, theCursor ) {
         var myCursorEvent = new spark.CursorEvent( theType, theCursor );
-        _myStage.dispatchEvent( myCursorEvent );
-//        if (!_myWorkspace) {
-//            _myWorkspace = _myStage.getChildByName(WORKSPACE_NAME);
-//        }
-//        var myPick = null;
-//        if (theType == spark.CursorEvent.MOVE) {
-//            myPick = _myWorkspace.pickWindow(theCursor.stageX, _myWorkspace.stage.height - theCursor.stageY);
-//        } else {
-//            myPick = _myStage.pickWidget( theCursor.stageX, theCursor.stageY );
-//        }
-//
-//        if (!myPick) {
-//            myPick = _myStage.getChildByName(WORKSPACE_NAME);
-//        }
-//        myPick.dispatchEvent( myCursorEvent );
+        var myPickedWidget = _myStage.pickWidget( theCursor.stageX, theCursor.stageY );
+        if (!myPickedWidget) {
+            myPickedWidget = _myStage;
+        }
+        myPickedWidget.dispatchEvent( myCursorEvent );
     }
     
-    function planeToWindowCoords(theX, theY) {
-        return new Point2f(theX * (window.width - _myLeftMargin - _myRightMargin) + _myLeftMargin, 
-                           (1-theY) * (window.height - _myTopMargin - _myBottomMargin) + _myBottomMargin);
-    }
-
     Public.Constructor();
 }
