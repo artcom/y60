@@ -94,7 +94,7 @@ printHelp() {
          << "  --start-frame   NUM    specify the first frame in the movie that will be overridden" << endl
          << "  --start-image   NUM    skip the first NUM input images" << endl
          << "  --num-images    NUM    only add NUM images" << endl
-         << "  --vertsion             print version information and exit" << endl
+         << "  --version              print version information and exit" << endl
          << "  --help                 print this help text and exit" << endl
          << endl
          << "Valid OpenGL compression modes:" << endl 
