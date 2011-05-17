@@ -200,9 +200,9 @@ RadarTouch.prototype.Constructor = function(Public, theStage) {
                         var myCursor = _myCursors[myArgs[i]];
                         if (myCursor.add_first) {
                             // just to keep the balance right..
-                            dispatchCursorEvent( spark.CursorEvent.ENTER, myCursor);
+                            Public.dispatchCursorEvent( spark.CursorEvent.APPEAR, myCursor);
                         }
-                        dispatchCursorEvent( spark.CursorEvent.LEAVE, myCursor );
+                        Public.dispatchCursorEvent( spark.CursorEvent.VANISH, myCursor );
                         delete _myCursors[myArgs[i]];
                     }
                 }
@@ -210,26 +210,26 @@ RadarTouch.prototype.Constructor = function(Public, theStage) {
             case "move":
                 for (var i = 0; i < myArgs.length; i=i+3) {
                     Logger.trace( "got move event with id: " + myArgs[i] ); 
-                    var myCoords = planeToWindowCoords(myArgs[i+1], myArgs[i+2]); 
+                    var myCoords = Public.planeToWindowCoords(myArgs[i+1], myArgs[i+2]); 
                     // look if we have a move without prior add: 
                     if (!(myArgs[i] in _myCursors)) {
                         var myCursor = new spark.Cursor(myArgs[i]);
                         myCursor.add_first = false;
                         myCursor.update(false, myCoords);
                         _myCursors[myArgs[i]] = myCursor;
-                        dispatchCursorEvent( spark.CursorEvent.ENTER, myCursor );
+                        Public.dispatchCursorEvent( spark.CursorEvent.APPEAR, myCursor );
                         break;
                     } else {
                         var myCursor = _myCursors[myArgs[i]];
                         myCursor.update(false, myCoords);
                         if (myCursor.add_first) {
-                            dispatchCursorEvent( spark.CursorEvent.ENTER, myCursor );
+                            Public.dispatchCursorEvent( spark.CursorEvent.APPEAR, myCursor );
                             myCursor.add_first = false;
                             break;
                         }
                         Logger.trace("Move event received: id=" + myCursor.id 
                                      + ", position=" + myCoords);
-                        dispatchCursorEvent( spark.CursorEvent.MOVE, myCursor );
+                        Public.dispatchCursorEvent( spark.CursorEvent.MOVE, myCursor );
                     }
                 }
                 break;
@@ -243,15 +243,12 @@ RadarTouch.prototype.Constructor = function(Public, theStage) {
     }
     
     Public.planeToWindowCoords = function(theX, theY) {
-        return new Point2f(theX * (window.width - _myLeftMargin - _myRightMargin) + _myLeftMargin, 
-                           (1-theY) * (window.height - _myTopMargin - _myBottomMargin) + _myBottomMargin);
+        var myWindowCoords = new Point2f(theX * (window.width - _myLeftMargin - _myRightMargin) + _myLeftMargin, 
+                                         (1-theY) * (window.height - _myTopMargin - _myBottomMargin) + _myBottomMargin);
+        return myWindowCoords;
     }
     
-    //////////////////////////////////////////////////////////////////////
-    // Private
-    //////////////////////////////////////////////////////////////////////
-    
-    function dispatchCursorEvent( theType, theCursor ) {
+    Public.dispatchCursorEvent = function( theType, theCursor ) {
         var myCursorEvent = new spark.CursorEvent( theType, theCursor );
         var myPickedWidget = _myStage.pickWidget( theCursor.stageX, theCursor.stageY );
         if (!myPickedWidget) {
@@ -260,5 +257,4 @@ RadarTouch.prototype.Constructor = function(Public, theStage) {
         myPickedWidget.dispatchEvent( myCursorEvent );
     }
     
-    Public.Constructor();
 }
