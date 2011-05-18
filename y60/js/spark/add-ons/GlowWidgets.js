@@ -54,6 +54,10 @@ spark.GlowPlug.Constructor = function (Protected) {
     Public.glow setter = function (theGlow) {
         _myMaterial.properties.glow_radius = theGlow;        
     };
+    
+    Public.glowAlpha setter = function (theAlpha) {
+        _myMaterial.properties.glow_color[3] = theAlpha;       
+    };
 
 };
 

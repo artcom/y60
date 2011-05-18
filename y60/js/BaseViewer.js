@@ -801,7 +801,10 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
             if (myViewportUnderMouse) {
                 if (_myClickedViewport) {
                     if (myViewportUnderMouse.id !== _myClickedViewport.id) {
-                        self.getMover(myViewportUnderMouse).onMouseButton(theButton, theState, theX, theY);
+                        var myMover = self.getMover(myViewportUnderMouse);
+                        if (myMover) {
+                            myMover.onMouseButton(theButton, theState, theX, theY);
+                        }
                     }
                     myMover = self.getMover(_myClickedViewport);
                     _myClickedViewport = null;
