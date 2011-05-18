@@ -746,7 +746,7 @@ AbstractRenderWindow::onKey(y60::Event & theEvent) {
         y60::KeyEvent & myKeyEvent = dynamic_cast<y60::KeyEvent&>(theEvent);
 
         try {
-            jsval argv[8], rval;
+            jsval argv[9], rval;
             argv[0] = as_jsval(_myJSContext, myKeyEvent.keyString);
             argv[1] = as_jsval(_myJSContext, myKeyEvent.type == y60::Event::KEY_DOWN);
             argv[2] = as_jsval(_myJSContext, 0); // TODO: mouse X POS
@@ -756,8 +756,9 @@ AbstractRenderWindow::onKey(y60::Event & theEvent) {
             argv[6] = as_jsval(_myJSContext, ((myKeyEvent.modifiers & y60::KEYMOD_ALT) !=0));
 
             argv[7] = as_jsval(_myJSContext, theEvent.simulation_time);
+            argv[8] = as_jsval(_myJSContext, myKeyEvent.scanCode);
 
-            JSA_CallFunctionName(_myJSContext, _myEventListener, "onKey", 8, argv, &rval);
+            JSA_CallFunctionName(_myJSContext, _myEventListener, "onKey", 9, argv, &rval);
         } catch (const asl::Exception & ex) {
             AC_ERROR << "ASL exception caught in AbstractRenderWindow::onKey(): " << ex;
         } catch (const exception & ex) {
