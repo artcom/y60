@@ -12,6 +12,10 @@ spark.RadarTouchMouseMapper.Constructor = function(Protected, theApp) {
 
     Public.parent = null;
 
+    Public.pickWidget = function(theStageX, theStageY) {
+        return _myApp.pickWidget(theStageX, theStageY);
+    }
+
     Public.addEventListener(spark.CursorEvent.ENTER, function(theEvent) {
         if (_myCursorId === null) {
             _myCursorId = theEvent.cursor.id;
