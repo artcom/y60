@@ -101,6 +101,7 @@ namespace y60 {
                   VECTOR_OF_STRING,
                   VECTOR_OF_RANKED_FEATURE,
                   BLEND_EQUATION,
+                  VECTOR_OF_BLEND_EQUATION,
                   RENDER_STYLES,
                   TARGETBUFFERS,
                   BLENDFUNCTION,
@@ -136,6 +137,7 @@ namespace y60 {
         "vectorofstring",
         "vectorofrankedfeature",
         "blendequation",
+        "vectorofblendequation",
         "renderstyles",
         "targetbuffers",
         "blendfunction",
@@ -255,6 +257,13 @@ namespace y60 {
         }
     };
 
+    template <>
+    struct TypeIdTraits<VectorOfBlendEquation> {
+        static const TypeId type_id() {
+            return VECTOR_OF_BLEND_EQUATION;
+        }
+    };
+
     template <class T>
     const char * getTypeName() {
         return asl::getStringFromEnum(TypeIdTraits<T>::type_id(), TypeIdStrings);
@@ -337,6 +346,14 @@ namespace y60 {
             return SOM_VECTOR_BLEND_FUNCTION_NAME;
         }
     };
+    
+    template <>
+    struct VectorTypeNameTrait<y60::BlendEquation> {
+        static const char * name() {
+            return SOM_VECTOR_BLEND_EQUATION_NAME;
+        }
+    };
+
 
 
 }

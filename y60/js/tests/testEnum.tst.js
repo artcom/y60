@@ -88,11 +88,11 @@ TestEnum.prototype.Constructor = function(obj, theName) {
         obj.myScene = new Scene();
         obj.myScene.setup();
         obj.myMaterial = Modelling.createUnlitTexturedMaterial(obj.myScene, "", "Foo", false);
-        ENSURE("obj.myMaterial.properties.blendequation == BlendEquation.add");
-        obj.myMaterial.properties.blendequation = BlendEquation.subtract;
-        ENSURE("obj.myMaterial.properties.blendequation == BlendEquation.subtract");
-        ENSURE("obj.myMaterial.properties.blendequation == 'subtract'");
-        switch (obj.myMaterial.properties.blendequation) {
+        ENSURE("obj.myMaterial.properties.blendequation[0] == BlendEquation.add");
+        obj.myMaterial.properties.blendequation[0] = BlendEquation.subtract;
+        ENSURE("obj.myMaterial.properties.blendequation[0] == BlendEquation.subtract");
+        ENSURE("obj.myMaterial.properties.blendequation[0] == 'subtract'");
+        switch (obj.myMaterial.properties.blendequation[0]) {
             case BlendEquation.subtract:
                 SUCCESS("switch");
                 break;

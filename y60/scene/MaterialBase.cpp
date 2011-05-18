@@ -612,7 +612,13 @@ namespace y60 {
             appendCRC32(myCRC32, myBlendFunction[2]);
             appendCRC32(myCRC32, myBlendFunction[3]);
         }
-        appendCRC32(myCRC32, get<BlendEquationTag>());
+        const VectorOfBlendEquation & myBlendEquation = get<BlendEquationTag>();
+        if(myBlendEquation.size() >= 1) {
+            appendCRC32(myCRC32, myBlendEquation[0]);
+        }
+        if(myBlendEquation.size() >= 2) {
+            appendCRC32(myCRC32, myBlendEquation[1]);
+        }
         appendCRC32(myCRC32, get<BlendColorTag>());
         appendCRC32(myCRC32, get<GlowTag>());
         appendCRC32(myCRC32, get<LineWidthTag>());

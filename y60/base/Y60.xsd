@@ -77,6 +77,20 @@ Example:
         </xs:annotation>
         <xs:restriction base="xs:string"/>
     </xs:simpleType>
+    <xs:simpleType name="VectorOfBlendEquation">
+        <xs:annotation>
+            <xs:documentation>Type for a vector of blendfunction enum values. Legal values:
+One of the following Enum values:
+- min
+- max
+- add
+- subtract
+- reverse_subtract
+            </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+
     <xs:simpleType name="VectorOfBlendFunction">
         <xs:annotation>
             <xs:documentation>Type for a vector of blendfunction enum values. Legal values:
@@ -2295,9 +2309,9 @@ linesmooth   - enable/disable line smoothing
                         <xs:documentation>Property that references a CG cubemap</xs:documentation>
                     </xs:annotation>
                 </xs:element>
-                <xs:element ref="blendequation">
+                <xs:element ref="vectorofblendequation">
                     <xs:annotation>
-                        <xs:documentation>Property that defines a blend equation</xs:documentation>
+                        <xs:documentation>Property that defines a vector of blend equation</xs:documentation>
                     </xs:annotation>
                 </xs:element>
                 <xs:element ref="vectorofblendfunction">
@@ -2655,16 +2669,16 @@ Example:
             </xs:simpleContent>
         </xs:complexType>
     </xs:element>
-    <xs:element name="blendequation">
+    <xs:element name="vectorofblendequation">
         <xs:annotation>
-            <xs:documentation>Property that defines a blend equation as a text child
-
+            <xs:documentation>
+                This element contains a vector of blendequation enum values as text child.
 Example:
-&lt;blendequation name='blendequation'&gt;max&lt;/blendequation&gt;</xs:documentation>
+                &lt;vectorofblendequation name='vectorofblendequation'&gt;max&lt;/vectorofblendequation&gt;</xs:documentation>
         </xs:annotation>
         <xs:complexType>
             <xs:simpleContent>
-                <xs:extension base="BlendEquation">
+                <xs:extension base="VectorOfBlendEquation">
                     <xs:attribute name="name" type="xs:string">
                         <xs:annotation>
                             <xs:documentation>Name of the property</xs:documentation>
@@ -3706,6 +3720,11 @@ element than can contains a list of named and typed data items
                 <xs:element ref="vectorofbool">
                     <xs:annotation>
                         <xs:documentation>Property of type vectorofbool</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="vectorofblendequation">
+                    <xs:annotation>
+                        <xs:documentation>Property of type vectorofblendequation</xs:documentation>
                     </xs:annotation>
                 </xs:element>
                 <xs:element ref="vectorofblendfunction">

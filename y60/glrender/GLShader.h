@@ -102,6 +102,7 @@ namespace y60 {
             bool _myHasImagingEXT;
             bool _myHasPointParmatersEXT;
             bool _myHasBlendMinMaxEXT;
+            bool _myHasBlendEquationSeparate;
     };
 
     typedef asl::Ptr<GLShader, dom::ThreadingModel> GLShaderPtr;
