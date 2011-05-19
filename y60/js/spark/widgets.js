@@ -242,7 +242,7 @@ spark.Widget.Constructor = function (Protected) {
     Public.removeEventListener = function (theType, theListener, theUseCapture) {
         switch (theType) {
         case spark.StageEvent.PROTO_FRAME:
-        case spark.StageEvent.FRAME:
+//        case spark.StageEvent.FRAME:
         case spark.StageEvent.PRE_RENDER:
         case spark.StageEvent.POST_RENDER:
             Logger.fatal("Removal of stage event listeners is not supported");
