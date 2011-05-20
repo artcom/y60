@@ -917,7 +917,10 @@ function transformScreenToWorld(theScreenPixelX, theScreenPixelY, theViewport, t
 function transformScreenAlignedToWorld(theScreenPixelX, theScreenPixelY, theZ, theViewport) {
     var myScreenPos = transformScreenToWorld(theScreenPixelX, theScreenPixelY, theViewport);
     var myCamera = theViewport.getElementById(theViewport.camera);
-    var myRay = new Ray(myCamera.position, myScreenPos);
+    var myGlobalPos = product(myCamera.position, myCamera.globalmatrix);
+    Logger.trace("Cam World Pos: " + myGlobalPos);
+    Logger.trace("Screen World Pos: " + myScreenPos);
+    var myRay = new Ray(myGlobalPos, myScreenPos);
     return intersection(myRay, new Planef(new Vector3f(0, 0, -1), theZ));
 }
 
