@@ -152,8 +152,6 @@ namespace y60 {
     {
         _myPathName = myShader._myFilename;
 
-        _myPreviousModelViewProjection.assign(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
-        _myPreviousModelView.assign(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
         _myUnsizedArrayAutoParamSizes[POSITIONAL_LIGHTS] = 0;
         _myUnsizedArrayAutoParamSizes[POSITIONAL_LIGHTS_DIFFUSE_COLOR] = 0;
         _myUnsizedArrayAutoParamSizes[POSITIONAL_LIGHTS_SPECULAR_COLOR] = 0;
@@ -750,41 +748,6 @@ namespace y60 {
                 myMatrix.postMultiply(myProjectionMatrix);
                 {AC_TRACE << "setting VIEWPROJECTION to " << myMatrix;}
                 setCgMatrixParameter(curParam, myMatrix);
-                break;
-            }
-            case PREVIOUS_MODELVIEW:
-            {
-                Matrix4f myMatrix = theBody.get<GlobalMatrixTag>();
-                myMatrix.postMultiply(theCamera.get<InverseGlobalMatrixTag>());
-                Matrix4f myZeroMatrix;
-                myZeroMatrix.assign(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
-                if (almostEqual(_myPreviousModelViewProjection, myZeroMatrix)) {
-                    setCgMatrixParameter(curParam, myMatrix);
-                    {AC_TRACE << "setting PREV_MODELVIEW to " << myMatrix;}
-                } else {
-                    setCgMatrixParameter(curParam, _myPreviousModelView);
-                    {AC_TRACE << "setting PREV_MODELVIEW to " << _myPreviousModelView;}
-                }
-                _myPreviousModelView = myMatrix;
-                break;
-            }
-            case PREVIOUS_MODELVIEWPROJECTION:
-            {
-                Matrix4f myMatrix = theBody.get<GlobalMatrixTag>();
-                myMatrix.postMultiply(theCamera.get<InverseGlobalMatrixTag>());
-                Matrix4f myProjectionMatrix;
-                theCamera.get<FrustumTag>().getProjectionMatrix( myProjectionMatrix );
-                myMatrix.postMultiply(myProjectionMatrix);
-                Matrix4f myZeroMatrix;
-                myZeroMatrix.assign(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
-                if (almostEqual(_myPreviousModelViewProjection, myZeroMatrix)) {
-                    setCgMatrixParameter(curParam, myMatrix);
-                    {AC_TRACE << "setting PREV_MODELVIEWPROJECTION to " << myMatrix;}
-                } else {
-                    setCgMatrixParameter(curParam, _myPreviousModelViewProjection);
-                    {AC_TRACE << "setting PREV_MODELVIEWPROJECTION to " << _myPreviousModelViewProjection;}
-                }
-                _myPreviousModelViewProjection = myMatrix;
                 break;
             }
             case OBJECTWORLD:

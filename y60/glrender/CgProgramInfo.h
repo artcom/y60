@@ -89,7 +89,6 @@ namespace y60 {
     enum CgAutoParameterID {
         OBJECTWORLD,OBJECTWORLD_I,OBJECTWORLD_T,OBJECTWORLD_IT,
         CAMERA_POSITION, CAMERA_I, CAMERA_T, VIEWPROJECTION, TEXTURE_MATRICES,
-        PREVIOUS_MODELVIEW,PREVIOUS_MODELVIEWPROJECTION,
         POSITIONAL_LIGHTS, DIRECTIONAL_LIGHTS, SPOT_LIGHTS,
         POSITIONAL_LIGHTS_DIFFUSE_COLOR, DIRECTIONAL_LIGHTS_DIFFUSE_COLOR, SPOT_LIGHTS_DIFFUSE_COLOR,
         POSITIONAL_LIGHTS_SPECULAR_COLOR, DIRECTIONAL_LIGHTS_SPECULAR_COLOR, SPOT_LIGHTS_SPECULAR_COLOR,
@@ -110,8 +109,6 @@ namespace y60 {
         "AC_CAMERA_T",
         "AC_VIEWPROJECTION",
         "AC_TEXTURE_MATRICES",
-        "AC_PREVIOUS_MODELVIEW",
-        "AC_PREVIOUS_MODELVIEWPROJECTION",
         // light position
         "AC_POSITIONAL_LIGHTS",
         "AC_DIRECTIONAL_LIGHTS",
@@ -293,8 +290,6 @@ namespace y60 {
             std::vector<const char *> _myCachedCompilerArgs;
             std::string _myCgProgramString;
             bool                        _myUsesLights;
-            asl::Matrix4f               _myPreviousModelView;
-            asl::Matrix4f               _myPreviousModelViewProjection;
     };
 
     typedef asl::Ptr<CgProgramInfo> CgProgramInfoPtr;
