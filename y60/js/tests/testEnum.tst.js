@@ -100,6 +100,13 @@ TestEnum.prototype.Constructor = function(obj, theName) {
                 FAILURE("switch");
                 break;
         }
+
+        obj.myMaterial.properties.blendequation = "[add,reverse_subtract]";
+        ENSURE("obj.myMaterial.properties.blendequation[0] == BlendEquation.add");
+        ENSURE("obj.myMaterial.properties.blendequation[1] == BlendEquation.reverse_subtract");
+        obj.myMaterial.properties.blendequation[1] = BlendEquation.min;
+        ENSURE("obj.myMaterial.properties.blendequation[1] == BlendEquation.min");
+        ENSURE("obj.myMaterial.properties.blendequation[1] == 'min'");
         print(obj.myMaterial);
         ENSURE( obj.myMaterial.properties.targetbuffers.depth);
         obj.myMaterial.properties.targetbuffers.depth = false;
