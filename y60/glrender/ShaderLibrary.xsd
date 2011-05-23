@@ -66,7 +66,9 @@ Example:
     <xs:element name="properties">
         <xs:complexType>
             <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:element ref="int"/>
                 <xs:element ref="float"/>
+                <xs:element ref="double"/>
                 <xs:element ref="point3f"/>
                 <xs:element ref="vector2f"/>
                 <xs:element ref="vector3f"/>
@@ -84,10 +86,32 @@ Example:
             </xs:sequence>
         </xs:complexType>
     </xs:element>
+    <xs:element name="int">
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="xs:int">
+                    <xs:attribute name="name" type="xs:string"/>
+                    <xs:attribute name="function" type="xs:string"/>
+                    <xs:attribute name="register" type="xs:string"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
     <xs:element name="float">
         <xs:complexType>
             <xs:simpleContent>
                 <xs:extension base="xs:float">
+                    <xs:attribute name="name" type="xs:string"/>
+                    <xs:attribute name="function" type="xs:string"/>
+                    <xs:attribute name="register" type="xs:string"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="double">
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="xs:double">
                     <xs:attribute name="name" type="xs:string"/>
                     <xs:attribute name="function" type="xs:string"/>
                     <xs:attribute name="register" type="xs:string"/>
@@ -298,6 +322,8 @@ Example:
                 <xs:element ref="vector3f"/>
                 <xs:element ref="vector4f"/>
                 <xs:element ref="float"/>
+                <xs:element ref="double"/>
+                <xs:element ref="int"/>
                 <xs:element ref="sampler2d"/>
             </xs:sequence>
         </xs:complexType>

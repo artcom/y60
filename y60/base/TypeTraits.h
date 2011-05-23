@@ -86,6 +86,7 @@ namespace y60 {
                   VECTOR4I,
                   VECTOR_OF_VECTOR2I,
                   FLOAT,
+                  DOUBLE,
                   VECTOR2F,
                   VECTOR3F,
                   VECTOR4F,
@@ -93,6 +94,7 @@ namespace y60 {
                   VECTOR_OF_VECTOR2F,
                   VECTOR_OF_VECTOR3F,
                   VECTOR_OF_VECTOR4F,
+                  MATRIX4F,
                   STRING,
                   SAMPLER1D,
                   SAMPLER2D,
@@ -122,6 +124,7 @@ namespace y60 {
         "vector4i",
         "vectorofvector2i",
         "float",
+        "double",
         "vector2f",
         "vector3f",
         "vector4f",
@@ -129,6 +132,7 @@ namespace y60 {
         "vectorofvector2f",
         "vectorofvector3f",
         "vectorofvector4f",
+        "matrix4f",
         "string",
         "sampler1d",
         "sampler2d",
@@ -169,6 +173,12 @@ namespace y60 {
         }
     };
     template <>
+    struct TypeIdTraits<double> {
+        static const TypeId type_id() {
+            return DOUBLE;
+        }
+    };
+    template <>
     struct TypeIdTraits<std::string> {
         static const TypeId type_id() {
             return STRING;
@@ -190,6 +200,12 @@ namespace y60 {
     struct TypeIdTraits<asl::Vector4f> {
         static const TypeId type_id() {
             return VECTOR4F;
+        }
+    };
+    template <>
+    struct TypeIdTraits<asl::Matrix4f> {
+        static const TypeId type_id() {
+            return MATRIX4F;
         }
     };
     template <>

@@ -152,6 +152,8 @@ namespace y60 {
     {
         _myPathName = myShader._myFilename;
 
+        _myPreviousModelViewProjection.assign(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
+        _myPreviousModelView.assign(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
         _myUnsizedArrayAutoParamSizes[POSITIONAL_LIGHTS] = 0;
         _myUnsizedArrayAutoParamSizes[POSITIONAL_LIGHTS_DIFFUSE_COLOR] = 0;
         _myUnsizedArrayAutoParamSizes[POSITIONAL_LIGHTS_SPECULAR_COLOR] = 0;
@@ -750,6 +752,41 @@ namespace y60 {
                 setCgMatrixParameter(curParam, myMatrix);
                 break;
             }
+            case PREVIOUS_MODELVIEW:
+            {
+                Matrix4f myMatrix = theBody.get<GlobalMatrixTag>();
+                myMatrix.postMultiply(theCamera.get<InverseGlobalMatrixTag>());
+                Matrix4f myZeroMatrix;
+                myZeroMatrix.assign(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
+                if (almostEqual(_myPreviousModelViewProjection, myZeroMatrix)) {
+                    setCgMatrixParameter(curParam, myMatrix);
+                    {AC_TRACE << "setting PREV_MODELVIEW to " << myMatrix;}
+                } else {
+                    setCgMatrixParameter(curParam, _myPreviousModelView);
+                    {AC_TRACE << "setting PREV_MODELVIEW to " << _myPreviousModelView;}
+                }
+                _myPreviousModelView = myMatrix;
+                break;
+            }
+            case PREVIOUS_MODELVIEWPROJECTION:
+            {
+                Matrix4f myMatrix = theBody.get<GlobalMatrixTag>();
+                myMatrix.postMultiply(theCamera.get<InverseGlobalMatrixTag>());
+                Matrix4f myProjectionMatrix;
+                theCamera.get<FrustumTag>().getProjectionMatrix( myProjectionMatrix );
+                myMatrix.postMultiply(myProjectionMatrix);
+                Matrix4f myZeroMatrix;
+                myZeroMatrix.assign(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
+                if (almostEqual(_myPreviousModelViewProjection, myZeroMatrix)) {
+                    setCgMatrixParameter(curParam, myMatrix);
+                    {AC_TRACE << "setting PREV_MODELVIEWPROJECTION to " << myMatrix;}
+                } else {
+                    setCgMatrixParameter(curParam, _myPreviousModelViewProjection);
+                    {AC_TRACE << "setting PREV_MODELVIEWPROJECTION to " << _myPreviousModelViewProjection;}
+                }
+                _myPreviousModelViewProjection = myMatrix;
+                break;
+            }
             case OBJECTWORLD:
 				{AC_TRACE << "setting OBJECTWORLD to " << theBody.get<GlobalMatrixTag>();}
                 setCgMatrixParameter(curParam, theBody.get<GlobalMatrixTag>());
@@ -860,10 +897,22 @@ namespace y60 {
         TypeId myType;
         myType.fromString(theNode.parentNode()->nodeName());
         switch(myType) {
+        case INT:
+        {
+            int myValue = theNode.nodeValueAs<int>();
+            cgGLSetParameter1f(theCgParameter, myValue);
+            break;
+        }
         case FLOAT:
         {
             float myValue = theNode.nodeValueAs<float>();
             cgGLSetParameter1f(theCgParameter, myValue);
+            break;
+        }
+        case DOUBLE:
+        {
+            double myValue = theNode.nodeValueAs<double>();
+            cgGLSetParameter1d(theCgParameter, myValue);
             break;
         }
         case VECTOR2F:
@@ -906,6 +955,12 @@ namespace y60 {
             VectorOfVector4f myValueV = theNode.nodeValueAs<VectorOfVector4f>();
             float * myValue = myValueV.begin()->begin();
             cgGLSetParameterArray4f(theCgParameter, 0, myValueV.size(), myValue);
+            break;
+        }
+        case MATRIX4F:
+        {
+            Matrix4f myMatrix = theNode.nodeValueAs<Matrix4f>();
+            cgGLSetMatrixParameterfc(theCgParameter, myMatrix.getData());
             break;
         }
         case SAMPLER2D:
