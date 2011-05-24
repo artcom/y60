@@ -22,13 +22,15 @@ StereoSceneViewer.prototype.Constructor = function (self, theArguments) {
     _.initial_camera_position   = [0, 0, 0];
     _.initial_camera_orientation = [0, 0, 0, 0];
     
-    // XXX make this configurable
-    _.focalLengthEyeSeparationFactor = 30; // eyeSeparation = _.focalLength / _.focalLengthEyeSeparationFactor
-    _.focalLength     = 3;
-    _.cameraAperture  = 45;
-    _.cameraPosition  = [0,0,_.focalLength]; // indirectly set in settings via focalLength
-    _.projection_flag = 1;    //  1: parallel (left viewport for left eye) -> beamer, 
-                              // -1: cross-view (left viewport for right eye)
+    _.focalLengthEyeSeparationFactor = 30;  // configurable via settings.xml
+    _.focalLength     = 3;                  // configurable via settings.xml
+    _.cameraAperture  = 45;                 // configurable via settings.xml
+    _.cameraPosition  = [0,0,_.focalLength];
+    _.projection_flag = 1;                  // configurable via settings.xml
+                                            // NOTE: projection_flag = 1: parallel (left viewport for left eye) -> beamer, 
+                                            //      projection_flag = -1: cross-view (left viewport for right eye)
+    // NOTE:  
+    // eyeSeparation = _.focalLength / _.focalLengthEyeSeparationFactor
     
     /////////////////////
     // Private Methods //
@@ -128,7 +130,10 @@ StereoSceneViewer.prototype.Constructor = function (self, theArguments) {
         var myMaterial = Modelling.createUnlitTexturedMaterial(self.scene, theStage.offscreenRenderer.texture);
         myMaterial.transparent = true;
         
-        var myQuad = Modelling.createQuad(self.scene, myMaterial.id, new Vector3f(-1, -1, 0), new Vector3f( 1,  1, 0));
+        var myQuad = Modelling.createQuad(self.scene, 
+                                          myMaterial.id, 
+                                          new Vector3f(-1, -1, 0),  // top-left-corner
+                                          new Vector3f( 1,  1, 0)); // bottom-right-corner
         
         theStage.offscreenBody = Modelling.createBody(self.scene.world, myQuad.id);
         theStage.offscreenBody.name = "OffscreenBody";
@@ -161,6 +166,8 @@ StereoSceneViewer.prototype.Constructor = function (self, theArguments) {
         _.setupStereoCameras();
         _.updateCameraPosition();
         _.updateStereoView();
+        
+        self.registerSettingsListener(self, "StereoView"); // updates stereo-view-parameters according to specified settings.xml
     };
     
     Base.onFrame = self.onFrame;
@@ -185,6 +192,42 @@ StereoSceneViewer.prototype.Constructor = function (self, theArguments) {
                 break;
             default : 
                 break;
+        }
+    };
+    
+    self.onUpdateSettings = function (theNode) {
+        if (!theNode) {
+            return;
+        }
+        var nodeValue;
+        if (theNode.childNode("CameraAperture")) {
+            nodeValue = Number(theNode.childNode("CameraAperture").firstChild.nodeValue);
+            if (nodeValue != _.cameraAperture) {
+                _.cameraAperture = nodeValue;
+                _.updateStereoView();
+            }
+        }
+        if (theNode.childNode("FocalLength")) {
+            nodeValue = Number(theNode.childNode("FocalLength").firstChild.nodeValue);
+            if (nodeValue != _.focalLength) {
+                _.focalLength = nodeValue;
+                _.updateCameraPosition();
+                _.updateStereoView();
+            }
+        }
+        if (theNode.childNode("FocalLengthEyeSeparationFactor")) {
+            nodeValue = Number(theNode.childNode("FocalLengthEyeSeparationFactor").firstChild.nodeValue);
+            if (nodeValue != _.focalLengthEyeSeparationFactor) {
+                _.focalLengthEyeSeparationFactor = nodeValue;
+                _.updateStereoView();
+            }
+        }
+        if (theNode.childNode("ProjectionType")) {
+            nodeValue = Number(theNode.childNode("ProjectionType").firstChild.nodeValue);
+            if (nodeValue != _.projection_flag) {
+                _.projection_flag = nodeValue;
+                _.updateStereoView();
+            }
         }
     };
     
