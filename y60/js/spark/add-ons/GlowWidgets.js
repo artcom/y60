@@ -113,5 +113,26 @@ spark.GlowImage.Constructor = function (Protected) {
     }
 };
 
+spark.GlowMovie = spark.ComponentClass("GlowMovie");
+spark.GlowMovie.Constructor = function (Protected) {
+    var Base = {};
+    var Public = this;
+    
+    Public.Inherit(spark.Movie);
+    Base.realizeMovie = Public.realize;
+    Public.Inherit(spark.GlowPlug);
+    
+    /////////////////////
+    // Public Methods //
+    /////////////////////    
+    Base.realize = Public.realize;
+    Public.realize = function () {
+        Base.realizeMovie();
+        Base.realize(Protected.material);     
+        Protected.material.properties.width = Public.width;
+        Protected.material.properties.height = Public.height;        
+    }
+};
+
 
 
