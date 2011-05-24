@@ -191,7 +191,8 @@ namespace y60 {
     }
 
     void registerEnumBitsetTypes(dom::ValueFactory & theFactory) {
-        theFactory.registerPrototype("BlendEquation", dom::ValuePtr(new dom::ValueWrapper<y60::BlendEquation>::Type(EQUATION_ADD,0)));
+        theFactory.registerPrototype("VectorOfBlendEquation",
+                                     dom::ValuePtr(new dom::ValueWrapper<y60::VectorOfBlendEquation>::Type(VectorOfBlendEquation(),0)));
         theFactory.registerPrototype("VectorOfBlendFunction",
                                      dom::ValuePtr(new dom::ValueWrapper<VectorOfBlendFunction>::Type(VectorOfBlendFunction(),0)));
 

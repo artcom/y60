@@ -86,6 +86,7 @@ namespace y60 {
                   VECTOR4I,
                   VECTOR_OF_VECTOR2I,
                   FLOAT,
+                  DOUBLE,
                   VECTOR2F,
                   VECTOR3F,
                   VECTOR4F,
@@ -93,6 +94,7 @@ namespace y60 {
                   VECTOR_OF_VECTOR2F,
                   VECTOR_OF_VECTOR3F,
                   VECTOR_OF_VECTOR4F,
+                  MATRIX4F,
                   STRING,
                   SAMPLER1D,
                   SAMPLER2D,
@@ -101,6 +103,7 @@ namespace y60 {
                   VECTOR_OF_STRING,
                   VECTOR_OF_RANKED_FEATURE,
                   BLEND_EQUATION,
+                  VECTOR_OF_BLEND_EQUATION,
                   RENDER_STYLES,
                   TARGETBUFFERS,
                   BLENDFUNCTION,
@@ -121,6 +124,7 @@ namespace y60 {
         "vector4i",
         "vectorofvector2i",
         "float",
+        "double",
         "vector2f",
         "vector3f",
         "vector4f",
@@ -128,6 +132,7 @@ namespace y60 {
         "vectorofvector2f",
         "vectorofvector3f",
         "vectorofvector4f",
+        "matrix4f",
         "string",
         "sampler1d",
         "sampler2d",
@@ -136,6 +141,7 @@ namespace y60 {
         "vectorofstring",
         "vectorofrankedfeature",
         "blendequation",
+        "vectorofblendequation",
         "renderstyles",
         "targetbuffers",
         "blendfunction",
@@ -167,6 +173,12 @@ namespace y60 {
         }
     };
     template <>
+    struct TypeIdTraits<double> {
+        static const TypeId type_id() {
+            return DOUBLE;
+        }
+    };
+    template <>
     struct TypeIdTraits<std::string> {
         static const TypeId type_id() {
             return STRING;
@@ -188,6 +200,12 @@ namespace y60 {
     struct TypeIdTraits<asl::Vector4f> {
         static const TypeId type_id() {
             return VECTOR4F;
+        }
+    };
+    template <>
+    struct TypeIdTraits<asl::Matrix4f> {
+        static const TypeId type_id() {
+            return MATRIX4F;
         }
     };
     template <>
@@ -252,6 +270,13 @@ namespace y60 {
     struct TypeIdTraits<VectorOfBlendFunction> {
         static const TypeId type_id() {
             return VECTOR_OF_BLENDFUNCTION;
+        }
+    };
+
+    template <>
+    struct TypeIdTraits<VectorOfBlendEquation> {
+        static const TypeId type_id() {
+            return VECTOR_OF_BLEND_EQUATION;
         }
     };
 
@@ -337,6 +362,14 @@ namespace y60 {
             return SOM_VECTOR_BLEND_FUNCTION_NAME;
         }
     };
+    
+    template <>
+    struct VectorTypeNameTrait<y60::BlendEquation> {
+        static const char * name() {
+            return SOM_VECTOR_BLEND_EQUATION_NAME;
+        }
+    };
+
 
 
 }

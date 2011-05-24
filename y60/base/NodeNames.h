@@ -67,6 +67,7 @@ namespace y60 {
 
     //=== Som basic type names ==============================================================
     const char * const SOM_VECTOR_BLEND_FUNCTION_NAME = "vectorofblendfunction";
+    const char * const SOM_VECTOR_BLEND_EQUATION_NAME = "vectorofblendequation";
     const char * const SOM_VECTOR_BOOL_NAME     = "vectorofbool";
     const char * const SOM_VECTOR_FLOAT_NAME    = "vectoroffloat";
     const char * const SOM_VECTOR_UNSIGNED_NAME = "vectorofunsigend";

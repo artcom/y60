@@ -634,10 +634,11 @@ SceneViewer.prototype.Constructor = function (self, theArguments) {
                 window.swapInterval = mySwapInterval;
                 print("Swap interval=" + window.swapInterval);
                 break;
-            case 'o':
-                print("Optimizing scene...");
-                window.scene.optimize();
-                break;
+            //XXX: disabled onKey scene optimizing, because it borks on a lot of scenes
+            //case 'o':
+            //    print("Optimizing scene...");
+            //    window.scene.optimize();
+            //    break;
             case '[/]':
                 self.drawFrustums = ! self.drawFrustums;
                 print("Draw frustums: " + (self.drawFrustums ? "On" : "Off"));

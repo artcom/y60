@@ -91,7 +91,12 @@ spark.ResizableRectangle.Constructor = function (Protected) {
                 Public.height = raster.height;
             }
             var mySize = new Vector3f(Public.width, Public.height, 0);
-            Public.origin = Protected.getVector3f("origin", Public.origin);
+            var myOrigin = Protected.getString("origin", undefined);
+            if (myOrigin === "center") {
+                Public.origin = product(mySize, 0.5);
+            } else {
+                Public.origin = Protected.getVector3f("origin", Public.origin);
+            }
             var myLowerLeft = product(Public.origin, -1);
             var myUpperRight = difference(mySize, Public.origin);
             _myShape = Modelling.createQuad(window.scene, _myMaterial.id,
