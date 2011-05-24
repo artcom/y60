@@ -14,8 +14,6 @@ StereoSceneViewer.prototype.Constructor = function (self, theArguments) {
     /////////////////////
     // Private Members //
     /////////////////////
-    _.stages = {};
-    
     _.leftViewport              = null;
     _.rightViewport             = null;
     _.stereoCameras             = [];
@@ -31,6 +29,13 @@ StereoSceneViewer.prototype.Constructor = function (self, theArguments) {
                                             //      projection_flag = -1: cross-view (left viewport for right eye)
     // NOTE:  
     // eyeSeparation = _.focalLength / _.focalLengthEyeSeparationFactor
+    
+    
+    ////////////////////
+    // Public Members //
+    ////////////////////
+    self.stages = {};
+    
     
     /////////////////////
     // Private Methods //
@@ -124,38 +129,14 @@ StereoSceneViewer.prototype.Constructor = function (self, theArguments) {
         }
     };
     
-    _.setupStage = function (theStage) {
-        theStage.offscreenRenderer.texture.mag_filter ="nearest";
-        
-        var myMaterial = Modelling.createUnlitTexturedMaterial(self.scene, theStage.offscreenRenderer.texture);
-        myMaterial.transparent = true;
-        
-        var myQuad = Modelling.createQuad(self.scene, 
-                                          myMaterial.id, 
-                                          new Vector3f(-1, -1, 0),  // top-left-corner
-                                          new Vector3f( 1,  1, 0)); // bottom-right-corner
-        
-        theStage.offscreenBody = Modelling.createBody(self.scene.world, myQuad.id);
-        theStage.offscreenBody.name = "OffscreenBody";
-        if ("name" in theStage) {
-            theStage.offscreenBody.name = theStage.offscreenBody.name + "_" + theStage.name;
-        }
-        theStage.offscreenBody.position = theStage.position;
-    };
     
     
     ////////////////////
     // Public Methods //
     ////////////////////
-    self.addStage = function (theFile, theId, thePosition) {
-        _.stages[theId] = spark.loadFile(theFile);
-        _.stages[theId].name = _.stages[theId].name;
-        
-        _.setupStage(_.stages[theId]);
-        
-        if (thePosition) {
-            _.stages[theId].offscreenBody.position = thePosition;
-        }
+    self.loadStage = function (theFile, theId) {
+        self.stages[theId] = spark.loadFile(theFile);
+        self.stages[theId].name = self.stages[theId].name;
     };
     
     Base.setup = self.setup;
@@ -174,10 +155,10 @@ StereoSceneViewer.prototype.Constructor = function (self, theArguments) {
     self.onFrame = function (theTime, theDeltaT) {
         Base.onFrame(theTime, theDeltaT);
         
-        for (var stage in _.stages) {
-            if (_.stages[stage].hasEventListenersWithType(spark.StageEvent.FRAME)) {
-                var myEvent = new spark.StageEvent(spark.StageEvent.FRAME, _.stages[stage], theTime, theDeltaT);
-                _.stages[stage].dispatchEvent(myEvent);
+        for (var stage in self.stages) {
+            if (self.stages[stage].hasEventListenersWithType(spark.StageEvent.FRAME)) {
+                var myEvent = new spark.StageEvent(spark.StageEvent.FRAME, self.stages[stage], theTime, theDeltaT);
+                self.stages[stage].dispatchEvent(myEvent);
             }
         }
     };
@@ -188,7 +169,7 @@ StereoSceneViewer.prototype.Constructor = function (self, theArguments) {
         
          switch (theKey) {
             case 's':
-                _.stages.first.offscreenRenderer.saveScreenshot("stage.png");
+                self.stages.first.offscreenRenderer.saveScreenshot("stage.png");
                 break;
             default : 
                 break;

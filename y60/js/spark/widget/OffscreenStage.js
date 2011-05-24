@@ -36,21 +36,20 @@ spark.OffscreenStage.Constructor = function (Protected) {
         
         // setup camera
         var myCamera = Node.createElement("camera");
-        myCamera.name = "stagex";
+        myCamera.name = "offscreenStage";
         Public.world.appendChild(myCamera);
         spark.setupCameraOrtho(myCamera, _.width, _.height);
         
         // prepare offscreenImage
         var offScreenImage = Modelling.createImage(window.scene, _.width, _.height, "RGBA");
         offScreenImage.resize = "none";
-
-        // Flip vertically since framebuffer content is upside-down
-        var mirrorMatrix = new Matrix4f;
-        mirrorMatrix.makeScaling(new Vector3f(1,-1,1));
-        offScreenImage.matrix.postMultiply(mirrorMatrix);
         
         // tie camera to offscreenRenderer
         Public.offscreenRenderer = new OffscreenRenderer([_.width, _.height], myCamera, "RGBA", offScreenImage, undefined, true, 0);
+        
+        var myFlipMatrix = Public.offscreenRenderer.texture.matrix;
+        myFlipMatrix.translate(new Vector3f(0, 1, 0));
+        
         Public.offscreenRenderer.texture.wrapmode = "clamp_to_edge";
         Public.offscreenRenderer.setBackgroundColor(_.backgroundColor);
     };
