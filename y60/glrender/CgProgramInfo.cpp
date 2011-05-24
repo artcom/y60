@@ -860,10 +860,22 @@ namespace y60 {
         TypeId myType;
         myType.fromString(theNode.parentNode()->nodeName());
         switch(myType) {
+        case INT:
+        {
+            int myValue = theNode.nodeValueAs<int>();
+            cgGLSetParameter1f(theCgParameter, myValue);
+            break;
+        }
         case FLOAT:
         {
             float myValue = theNode.nodeValueAs<float>();
             cgGLSetParameter1f(theCgParameter, myValue);
+            break;
+        }
+        case DOUBLE:
+        {
+            double myValue = theNode.nodeValueAs<double>();
+            cgGLSetParameter1d(theCgParameter, myValue);
             break;
         }
         case VECTOR2F:
@@ -906,6 +918,12 @@ namespace y60 {
             VectorOfVector4f myValueV = theNode.nodeValueAs<VectorOfVector4f>();
             float * myValue = myValueV.begin()->begin();
             cgGLSetParameterArray4f(theCgParameter, 0, myValueV.size(), myValue);
+            break;
+        }
+        case MATRIX4F:
+        {
+            Matrix4f myMatrix = theNode.nodeValueAs<Matrix4f>();
+            cgGLSetMatrixParameterfc(theCgParameter, myMatrix.getData());
             break;
         }
         case SAMPLER2D:

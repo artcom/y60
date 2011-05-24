@@ -18,7 +18,7 @@
 //d change z-rotation of widget
 //"down" moves down in z direction
 //"up" moves up in z direction
-//i toggles visibility of layoutImage, which can be an commandLineArgument (layoutimage=<src>)
+//o toggles visibility of layoutImage, which can be an commandLineArgument (layoutimage=<src>)
 
 //classes using Layouter can implement hooks
 // * layouterUpdatePosition - for additional updates in the widget
@@ -71,10 +71,11 @@ spark.Layouter.Constructor = function(Protected) {
     var _myVisualMode = 2; // box with mesurement
     var _myLayoutImage = null;
     var _myBackup = {originalZ:null, originalWidth:null, originalHeight:null, originalRotationZ:null};
-    const DEBUG_COLOR = new Vector4f(1,0,0,1);
+    var DEBUG_COLOR = new Vector4f(1,0,0,1);
     
-    const IDLE = 0;
-    const ACTIVE = 1;
+    var IDLE = 0;
+    var ACTIVE = 1;
+    var LISTENING = 2;
     
     function _unbind(theHandle) {
         delete _bindings[theHandle.bind_info.slot][theHandle.bind_info.id];
@@ -147,7 +148,7 @@ spark.Layouter.Constructor = function(Protected) {
                     _myWidget.layouterToggleWidget();
                 } else if (Public.active && theKey === "x") {
                     _myVisualMode = (_myVisualMode + 1) % 3;
-                } else if (Public.active && theKey === "i" && _myLayoutImage) {
+                } else if (Public.listening && theKey === "o" && _myLayoutImage) {
                     _myLayoutImage.visible = !_myLayoutImage.visible;
                     print("layoutimage ", _myLayoutImage.visible)
                 } else {
@@ -209,6 +210,10 @@ spark.Layouter.Constructor = function(Protected) {
 
     Public.__defineGetter__("active", function () {
         return (_myState === ACTIVE);
+    });
+
+    Public.__defineGetter__("listening", function () {
+        return (_myState === LISTENING);
     });
 
     Public.__defineGetter__("target", function () {
@@ -295,6 +300,7 @@ spark.Layouter.Constructor = function(Protected) {
     
     function activate () {
         print("activate")
+        _myState = LISTENING;
         _myStage.addEventListenerInFront(spark.CursorEvent.APPEAR, onMouseDown , true);
         _myStage.addEventListenerInFront(spark.CursorEvent.MOVE, onMouseMove, true);
         _myStage.addEventListenerInFront(spark.MouseEvent.BUTTON_DOWN, onMouseDown , true);

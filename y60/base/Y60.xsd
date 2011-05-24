@@ -2233,6 +2233,11 @@ linesmooth   - enable/disable line smoothing
                         <xs:documentation>Property of type bool</xs:documentation>
                     </xs:annotation>
                 </xs:element>
+                <xs:element ref="int">
+                    <xs:annotation>
+                        <xs:documentation>Property of type integer</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
                 <xs:element ref="unsignedint">
                     <xs:annotation>
                         <xs:documentation>Property of type unsigned integer</xs:documentation>
@@ -2241,6 +2246,11 @@ linesmooth   - enable/disable line smoothing
                 <xs:element ref="float">
                     <xs:annotation>
                         <xs:documentation>Property of type float</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="double">
+                    <xs:annotation>
+                        <xs:documentation>Property of type double</xs:documentation>
                     </xs:annotation>
                 </xs:element>
                 <xs:element ref="string">
@@ -2346,6 +2356,25 @@ Example:
             </xs:simpleContent>
         </xs:complexType>
     </xs:element>
+    <xs:element name="int">
+        <xs:annotation>
+            <xs:documentation>Property that contains an integer as text child
+
+Example:
+&lt;int name='foo'&gt;123&lt;/int&gt;</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="xs:int">
+                    <xs:attribute name="name" type="xs:string">
+                        <xs:annotation>
+                            <xs:documentation>Name of the property</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
     <xs:element name="unsignedint">
         <xs:annotation>
             <xs:documentation>Property that contains an unsigned integer as text child
@@ -2375,6 +2404,25 @@ Example:
         <xs:complexType>
             <xs:simpleContent>
                 <xs:extension base="xs:float">
+                    <xs:attribute name="name" type="xs:string">
+                        <xs:annotation>
+                            <xs:documentation>Name of the property</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="double">
+        <xs:annotation>
+            <xs:documentation>Property that contains an double as text child
+
+Example:
+&lt;double name='foo'&gt;4.56&lt;/double&gt;</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="xs:double">
                     <xs:attribute name="name" type="xs:string">
                         <xs:annotation>
                             <xs:documentation>Name of the property</xs:documentation>

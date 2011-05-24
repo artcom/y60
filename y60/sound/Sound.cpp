@@ -143,6 +143,13 @@ void Sound::setVolume(float theVolume) {
     _mySampleSink->setVolume(theVolume);
 }
 
+void Sound::setVolumes(float theLeftVolume, float theRightVolume) {
+    std::vector<float> myVolumes;
+    myVolumes.push_back(theLeftVolume);
+    myVolumes.push_back(theRightVolume);
+    _mySampleSink->setVolumes(myVolumes);
+}
+
 void Sound::fadeToVolume (float theVolume, Time theTime) {
     _mySampleSink->fadeToVolume(theVolume, float(theTime));
 }
@@ -177,7 +184,7 @@ void Sound::seek (Time thePosition)
     AutoLocker<ThreadLock> myLocker(_myLock);
     AC_TRACE << "Sound::seek()";
     bool myIsPlaying = isPlaying();
-    float myOldVolume = _mySampleSink->getVolume();
+    std::vector<float> myOldVolumes = _mySampleSink->getVolumes();
     _mySampleSink->stop();
     // Forget the old sample sink. It'll fade out and then destroy itself.
     _mySampleSink = Pump::get().createSampleSink(_myURI);
@@ -191,7 +198,7 @@ void Sound::seek (Time thePosition)
     _myDecoder->seek(thePosition);
 
     _mySampleSink->setCurrentTime(thePosition);
-    _mySampleSink->setVolume(myOldVolume);
+    _mySampleSink->setVolumes(myOldVolumes);
     _myLockedSelf = _mySelf.lock();
     if (myIsPlaying) {
         update(0.1);

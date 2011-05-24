@@ -409,7 +409,7 @@ SceneViewer.prototype.Constructor = function (self, theArguments) {
         }
     };
 
-    self.onKey = function (theKey, theKeyState, theX, theY, theShiftFlag, theCtrlFlag, theAltFlag) {
+    self.onKey = function (theKey, theKeyState, theX, theY, theShiftFlag, theCtrlFlag, theAltFlag, theTimeStamp, theScancode) {
         var myCamera, myHfov;
         var myMover = self.getMover(self.getActiveViewport());
         

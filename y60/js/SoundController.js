@@ -172,7 +172,16 @@ function playSound(theFilename, theVolume, theLoopFlag, theSeekOffset) {
     try {
         var myFileName = searchFile(theFilename);
         var mySound = new Sound(myFileName, theLoopFlag);
-        mySound.volume = theVolume;
+        var myVolumeArrayFlag = theVolume instanceof Array;        
+        if (myVolumeArrayFlag) {
+            if( theVolume.length>1) {
+                mySound.setVolumes(theVolume[0], theVolume[1]);
+            } else {
+                print("Sorry, sounds can only have 2 channels");
+            }
+        } else {
+            mySound.volume = theVolume;
+        }
         mySound.seek(theSeekOffset * mySound.duration);
         mySound.play();
         return mySound;

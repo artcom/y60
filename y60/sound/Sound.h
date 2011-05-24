@@ -90,6 +90,7 @@ class Y60_SOUND_DECL Sound :
         void pause ();
         void stop ();
         void setVolume (float theVolume);
+        void setVolumes(float theLeftVolume, float theRightVolume);
         void fadeToVolume (float Volume, asl::Time theTime);
         double getVolume () const;
         std::string getName() const;

@@ -426,7 +426,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
                 }
                 break;
             case AUDIO_MEDIA:
-                _mySoundId = playSound(myFilename, 1.0, false);
+                _mySoundId = playSound(myFilename, [1.0,1.0], false);
                 if (_mySoundId == -1) {
                     print("Sorry, File not found : " + myFilename);
                 }

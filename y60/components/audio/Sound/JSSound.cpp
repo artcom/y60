@@ -83,6 +83,11 @@ namespace jslib {
         return Method<JSSound::NATIVE>::call(&JSSound::NATIVE::pause,cx,obj,argc,argv,rval);
     }
     static JSBool
+    setVolumes(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+        DOC_BEGIN("Set volumes for each channel."); DOC_END;
+        return Method<JSSound::NATIVE>::call(&JSSound::NATIVE::setVolumes,cx,obj,argc,argv,rval);
+    }
+    static JSBool
     fadeToVolume(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         DOC_BEGIN("Fading to a specified volume over a given duration.");
         DOC_PARAM("theVolume", "", DOC_TYPE_FLOAT);
@@ -112,6 +117,7 @@ namespace jslib {
             {"play",                 play,              0},
             {"stop",                 stop,              0},
             {"pause",                pause,             0},
+            {"setVolumes",           setVolumes,        2},            
             {"fadeToVolume",         fadeToVolume,      2},
             {"seek",                 seek,              1},
             {"seekRelative",         seekRelative,      1},
