@@ -1,47 +1,59 @@
+//=============================================================================
+// Copyright (C) 2011, ART+COM AG Berlin
+//
+// These coded instructions, statements, and computer programs contain
+// unpublished proprietary information of ART+COM AG Berlin, and
+// are copy protected by law. They may not be disclosed to third parties
+// or copied or duplicated in any form, in whole or in part, without the
+// specific, prior written permission of ART+COM AG Berlin.
+//=============================================================================
+
 spark.GlowPlug = spark.AbstractClass("GlowPlug");
 spark.GlowPlug.Constructor = function (Protected) {
     var Base = {};
     var Public = this;
 
-    var _myAnythingGlowsOrBlursFlag = false;    
+    var _myAnythingGlowsOrBlursFlag = false;
     var _myMaterial = null;
-    
-    Public.realize = function (theMaterial) {
-        _myMaterial = theMaterial;
-        theMaterial.enabled = false;        
+
+    Base.realize = Public.realize;
+    Public.realize = function () {
+        Base.realize();
+        _myMaterial = Protected.material;
+        _myMaterial.enabled = false;
         var myGlow = Protected.getNumber("glow", 0);
         var myBlur = Protected.getNumber("blur", 0);
         var myScale = Protected.getNumber("glow_scale", 1);
         var myGlowIntensity = Protected.getNumber("glow_intensity", 1);
         _myAnythingGlowsOrBlursFlag = true;
         if (myBlur >0 && myGlow > 0) {
-            addMaterialRequirement(theMaterial, "effect", "[10[glowBlur]]");
-            addMaterialProperty(theMaterial, "float", "blur",myBlur);     
+            addMaterialRequirement(_myMaterial, "effect", "[10[glowBlur]]");
+            addMaterialProperty(_myMaterial, "float", "blur",myBlur);
         } else if (myGlow >0) {
-            addMaterialRequirement(theMaterial, "effect", "[10[glow]]");
-            addMaterialProperty(theMaterial, "float", "glow", "1");     
+            addMaterialRequirement(_myMaterial, "effect", "[10[glow]]");
+            addMaterialProperty(_myMaterial, "float", "glow", "1");
         } else  if (myBlur >0) {
-            addMaterialRequirement(theMaterial, "effect", "[10[blur]]");
-            addMaterialProperty(theMaterial, "float", "blur",myBlur);     
+            addMaterialRequirement(_myMaterial, "effect", "[10[blur]]");
+            addMaterialProperty(_myMaterial, "float", "blur",myBlur);
         } else {
             _myAnythingGlowsOrBlursFlag = false;
         }
-            
-        addMaterialProperty(theMaterial, "float", "scale", myScale);     
-        addMaterialProperty(theMaterial, "float", "glow_intensity", myGlowIntensity);     
-        
-        theMaterial.enabled = true;        
+
+        addMaterialProperty(_myMaterial, "float", "scale", myScale);
+        addMaterialProperty(_myMaterial, "float", "glow_intensity", myGlowIntensity);
+
+        _myMaterial.enabled = true;
         if (_myAnythingGlowsOrBlursFlag) {
             if (myGlow > 0){
-                theMaterial.properties.offset = Protected.getVector2f("offset", "[0,0]");        
-                theMaterial.properties.glow_radius = myGlow;        
-                theMaterial.properties.glow_color = Protected.getVector4f("glow_color", "[1,1,1,1)]");
-                theMaterial.properties.scale = myScale;
-            }    
+                _myMaterial.properties.offset = Protected.getVector2f("offset", "[0,0]");
+                _myMaterial.properties.glow_radius = myGlow;
+                _myMaterial.properties.glow_color = Protected.getVector4f("glow_color", "[1,1,1,1]");
+                _myMaterial.properties.scale = myScale;
+            }
             if (myBlur >0) {
-                theMaterial.properties.blur = Protected.getNumber("blur", 5);        
-            }        
-        }        
+                _myMaterial.properties.blur = Protected.getNumber("blur", 5);
+            }
+        }
     };
 
     Protected.GlowOrBlurFlag getter = function () {
@@ -50,13 +62,13 @@ spark.GlowPlug.Constructor = function (Protected) {
     Protected.GlowOrBlurFlag setter = function (theFlag) {
         _myAnythingGlowsOrBlursFlag = theFlag;
     };
-    
+
     Public.glow setter = function (theGlow) {
-        _myMaterial.properties.glow_radius = theGlow;        
+        _myMaterial.properties.glow_radius = theGlow;
     };
-    
+
     Public.glowAlpha setter = function (theAlpha) {
-        _myMaterial.properties.glow_color[3] = theAlpha;       
+        _myMaterial.properties.glow_color[3] = theAlpha;
     };
 
 };
@@ -65,13 +77,13 @@ spark.GlowText = spark.ComponentClass("GlowText");
 spark.GlowText.Constructor = function (Protected) {
     var Base = {};
     var Public = this;
-    
+
     Public.Inherit(spark.Text);
-    Base.realizeText = Public.realize;
     Public.Inherit(spark.GlowPlug);
+
     /////////////////////
     // Protected Methods //
-    /////////////////////    
+    /////////////////////
     Base.render = Protected.render;
     Protected.render = function () {
         Base.render();
@@ -79,16 +91,15 @@ spark.GlowText.Constructor = function (Protected) {
             Protected.material.properties.width = Public.width;
             Protected.material.properties.height = Public.height;
         }
-    }
-    
+    };
+
     /////////////////////
     // Public Methods //
-    /////////////////////    
+    /////////////////////
     Base.realize = Public.realize;
     Public.realize = function () {
-        Base.realizeText();
-        Base.realize(Protected.material);      
-    }
+        Base.realize();
+    };
 
 };
 
@@ -96,21 +107,30 @@ spark.GlowImage = spark.ComponentClass("GlowImage");
 spark.GlowImage.Constructor = function (Protected) {
     var Base = {};
     var Public = this;
-    
+
     Public.Inherit(spark.Image);
-    Base.realizeImage = Public.realize;
     Public.Inherit(spark.GlowPlug);
-    
+
     /////////////////////
     // Public Methods //
-    /////////////////////    
+    /////////////////////
     Base.realize = Public.realize;
     Public.realize = function () {
-        Base.realizeImage();
-        Base.realize(Protected.material);     
-        Protected.material.properties.width = Public.width;
-        Protected.material.properties.height = Public.height;        
-    }
+        Base.realize();
+        Public.SetterOverride("width", function (theWidth, theBaseSetter) {
+            theBaseSetter(theWidth);
+            if (Protected.GlowOrBlurFlag) {
+                Protected.material.properties.width = theWidth;
+            }
+        });
+        Public.SetterOverride("height", function (theHeight, theBaseSetter) {
+            theBaseSetter(theHeight);
+            if (Protected.GlowOrBlurFlag) {
+                Protected.material.properties.height = theHeight;
+            }
+        });
+        Public.size = Public.size;
+    };
 };
 
 spark.GlowMovie = spark.ComponentClass("GlowMovie");

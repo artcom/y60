@@ -106,6 +106,7 @@ namespace asl {
         virtual void setVolumes(const std::vector<float> & theVolumes);        
         virtual void fadeToVolume(float theVolume, float theTime);
         virtual float getVolume() const;
+        virtual std::vector<float> getVolumes() const;
         bool isPlaying() const;
         bool queueSamples(AudioBufferPtr& theBuffer);
         asl::Time getBufferedTime() const;

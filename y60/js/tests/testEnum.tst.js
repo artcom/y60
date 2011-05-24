@@ -88,11 +88,11 @@ TestEnum.prototype.Constructor = function(obj, theName) {
         obj.myScene = new Scene();
         obj.myScene.setup();
         obj.myMaterial = Modelling.createUnlitTexturedMaterial(obj.myScene, "", "Foo", false);
-        ENSURE("obj.myMaterial.properties.blendequation == BlendEquation.add");
-        obj.myMaterial.properties.blendequation = BlendEquation.subtract;
-        ENSURE("obj.myMaterial.properties.blendequation == BlendEquation.subtract");
-        ENSURE("obj.myMaterial.properties.blendequation == 'subtract'");
-        switch (obj.myMaterial.properties.blendequation) {
+        ENSURE("obj.myMaterial.properties.blendequation[0] == BlendEquation.add");
+        obj.myMaterial.properties.blendequation[0] = BlendEquation.subtract;
+        ENSURE("obj.myMaterial.properties.blendequation[0] == BlendEquation.subtract");
+        ENSURE("obj.myMaterial.properties.blendequation[0] == 'subtract'");
+        switch (obj.myMaterial.properties.blendequation[0]) {
             case BlendEquation.subtract:
                 SUCCESS("switch");
                 break;
@@ -100,6 +100,13 @@ TestEnum.prototype.Constructor = function(obj, theName) {
                 FAILURE("switch");
                 break;
         }
+
+        obj.myMaterial.properties.blendequation = "[add,reverse_subtract]";
+        ENSURE("obj.myMaterial.properties.blendequation[0] == BlendEquation.add");
+        ENSURE("obj.myMaterial.properties.blendequation[1] == BlendEquation.reverse_subtract");
+        obj.myMaterial.properties.blendequation[1] = BlendEquation.min;
+        ENSURE("obj.myMaterial.properties.blendequation[1] == BlendEquation.min");
+        ENSURE("obj.myMaterial.properties.blendequation[1] == 'min'");
         print(obj.myMaterial);
         ENSURE( obj.myMaterial.properties.targetbuffers.depth);
         obj.myMaterial.properties.targetbuffers.depth = false;

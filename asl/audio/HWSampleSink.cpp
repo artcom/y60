@@ -215,6 +215,11 @@ bool HWSampleSink::isPlaying() const {
 float HWSampleSink::getVolume() const {
     return _myVolumeFader->getVolume();
 }
+std::vector<float> HWSampleSink::getVolumes() const {
+    std::vector<float> myVolumes;
+    _myVolumeFader->getVolumes(myVolumes);
+    return myVolumes;
+}
 
 bool HWSampleSink::queueSamples(AudioBufferPtr& theBuffer) {
     AutoLocker<ThreadLock> myLocker(_myQueueLock);

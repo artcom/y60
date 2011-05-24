@@ -91,6 +91,11 @@ namespace y60 {
         myResult.push_back(ONE_MINUS_SRC_ALPHA);
         return myResult;
     }
+    static y60::VectorOfBlendEquation getDefaultBlendEquation() {
+        y60::VectorOfBlendEquation myResult;
+        myResult.push_back(EQUATION_ADD);
+        return myResult;
+    }
 
 #define DEFINE_MATERIAL_PROPERTY_TAG(theTagName, theType, thePropertyName, theDefault) \
     DEFINE_PROPERTY_TAG(theTagName,  MaterialPropertiesFacade, theType, y60::getTypeName<theType>(), thePropertyName,  PROPERTY_LIST_NAME, theDefault);
@@ -103,7 +108,7 @@ namespace y60 {
     DEFINE_MATERIAL_PROPERTY_TAG(ShininessTag, float, SHININESS_PROPERTY, float(1.0));
     DEFINE_MATERIAL_PROPERTY_TAG(TargetBuffersTag, y60::TargetBuffers, TARGETBUFFERS_PROPERTY, TargetBuffers((1<<RED_MASK)|(1<<GREEN_MASK)|(1<<BLUE_MASK)|(1<<ALPHA_MASK)|(1<<DEPTH_MASK)));
     DEFINE_MATERIAL_PROPERTY_TAG(BlendFunctionTag, y60::VectorOfBlendFunction, BLENDFUNCTION_PROPERTY, getDefaultBlendFunction());
-    DEFINE_MATERIAL_PROPERTY_TAG(BlendEquationTag, BlendEquation, BLENDEQUATION_PROPERTY, EQUATION_ADD);
+    DEFINE_MATERIAL_PROPERTY_TAG(BlendEquationTag, y60::VectorOfBlendEquation, BLENDEQUATION_PROPERTY, getDefaultBlendEquation());
     DEFINE_MATERIAL_PROPERTY_TAG(BlendColorTag, asl::Vector4f, BLENDCOLOR_PROPERTY, asl::Vector4f(0,0,0,0));
     DEFINE_MATERIAL_PROPERTY_TAG(GlowTag, float, GLOW_PROPERTY, 0.0f);
     DEFINE_MATERIAL_PROPERTY_TAG(LineWidthTag, float, LINEWIDTH_PROPERTY, float(1.0));
