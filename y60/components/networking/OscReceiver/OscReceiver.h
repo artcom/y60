@@ -117,7 +117,7 @@ namespace y60 {
             virtual void ProcessBundle( const osc::ReceivedBundle& theBundle,
                                          const IpEndpointName& remoteEndpoint );
 
-    private:
+    protected:
 
             std::string createMessageString(const osc::ReceivedMessage& m,
                                             const IpEndpointName& remoteEndpoint);
