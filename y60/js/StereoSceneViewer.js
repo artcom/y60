@@ -14,106 +14,113 @@ StereoSceneViewer.prototype.Constructor = function (self, theArguments) {
     /////////////////////
     // Private Members //
     /////////////////////
-    _.leftViewport              = null;
-    _.rightViewport             = null;
+    _.monoViewport              = null;
+    _.monoViewport              = null;
+    _.cameraTransform           = null;
     _.stereoCameras             = [];
-    _.initial_camera_position   = null; //[0, 0, 0];
-    _.initial_camera_orientation = null; //[0, 0, 0, 0];
-    _.vfov                      = null;
-    _.hfov                      = null;
     
+    // NOTE: eyeSeparation = _.focalLength / _.focalLengthEyeSeparationFactor
     _.focalLengthEyeSeparationFactor = 30;  // configurable via settings.xml
     _.focalLength     = 3;                  // configurable via settings.xml
     _.cameraAperture  = 45;                 // configurable via settings.xml
-    _.cameraPosition  = null; //[0,0,_.focalLength];
     _.projection_flag = 1;                  // configurable via settings.xml
                                             // NOTE: projection_flag = 1: parallel (left viewport for left eye) -> beamer, 
                                             //      projection_flag = -1: cross-view (left viewport for right eye)
-    // NOTE: eyeSeparation = _.focalLength / _.focalLengthEyeSeparationFactor
     
-    _.NEARPLANE_FOCALLENGTH_FACTOR = 1/5; // guessing, but should in any case be < 1 as nearplane = focallength * _.NEARPLANE_FOCALLENGTH_FACTOR
+    _.NEARPLANE_FOCALLENGTH_FACTOR = 1/5; // guessing, but should in any case 
+                                          // be < 1 as nearplane = focallength * _.NEARPLANE_FOCALLENGTH_FACTOR
     
     ////////////////////
     // Public Members //
     ////////////////////
-    self.stages = {};
+    self.stages     = {};
     self.stereoFlag = true;
+    self.monoCanvas = null;
+    self.stereoCanvas = null;
     
     
     /////////////////////
     // Private Methods //
     /////////////////////
-    _.setupStereoCameras = function () {
-        Logger.info("<StereoSceneViewer::_.setupStereoCameras>");
+    _.setupCameras = function () {
+        Logger.info("<StereoSceneViewer::_.setupCameras>");
         
-        // --- LEFT EYE ---
+        // create Transform
+        _.cameraTransform           = Node.createElement("transform");
+        _.cameraTransform.name      = "stereoCamera";
+        _.cameraTransform.position  = new Vector3f(self.getActiveCamera().position);         // use position of initially active camera
+        _.cameraTransform.orientation = new Quaternionf(self.getActiveCamera().orientation); // use orientation of initially active camera
+        window.scene.world.appendChild(_.cameraTransform);
+        
+        // --- ARRANGE MONO ---
         // viewport
-        _.leftViewport              = self.getActiveViewport();
-        _.leftViewport.name         = "leftEye";
-        _.leftViewport.size         = new Vector2f(0.5, 1);
-        _.leftViewport.position     = new Vector2f(0, 0);
-        _.leftViewport.resizepolicy = "no_adaption";
+        _.monoViewport              = self.getActiveViewport();
+        _.monoViewport.name         = "mono-viewport";
+        
+        self.monoCanvas             = _.monoViewport.parentNode;
         
         // camera
-        var cameraLeft              = self.getActiveCamera();
-        cameraLeft.name             = "leftEye";
-        _.stereoCameras.push(cameraLeft);
-        _.initial_camera_position   = new Vector3f(cameraLeft.position);
-        _.initial_camera_orientation = new Vector4f(cameraLeft.orientation);
-        _.vfov = cameraLeft.frustum.vfov;
-        _.hfov = cameraLeft.frustum.hfov;
+        _.monoCamera                = self.getActiveCamera();
+        _.monoCamera.name           = "mono-camera";
+        _.monoCamera.position       = new Vector3f(0, 0, 0);
+        _.monoCamera.orientation    = Quaternionf.createFromEuler(new Vector3f(0, 0, 0));
+        _.cameraTransform.appendChild(_.monoCamera);
         
-        // --- RIGHT EYE ---
-        // create viewport
-        _.rightViewport             = Node.createElement("viewport");
-        _.rightViewport.name        = "rightEye";
-        _.leftViewport.parentNode.appendChild(_.rightViewport);
-        _.rightViewport.size        = new Vector2f(0.5,1);
-        _.rightViewport.position    = new Vector2f(0.5,0);
-        _.rightViewport.resizepolicy = "no_adaption";
+        // --- ARRANGE STEREO ---
+        // create own canvas
+        self.stereoCanvas           = Node.createElement("canvas");
+        self.stereoCanvas.name      = "stereo-canvas";
+        self.scene.canvases.appendChild(self.stereoCanvas);
         
-        // create camera
-        var cameraRight             = Node.createElement("camera");
-        cameraRight.name            = "rightEye";
-        window.scene.world.appendChild(cameraRight); // XXX is this always the correct world?!
-        cameraRight.frustum         = new Frustum();
-        cameraRight.frustum.type    = "perspective";
-        cameraRight.position        = new Vector3f(_.initial_camera_position);
-        cameraRight.orientation     = new Vector4f(_.initial_camera_orientation);
-        _.stereoCameras.push(cameraRight);
-        
-        // attach camera to viewport
-        _.rightViewport.camera      = cameraRight.id;
-        
-        // create headlight for right eye
-        var rightHeadLight          = Node.createElement('light');
-        rightHeadLight.name         = "Headlight_" + _.rightViewport.id;
-        var leftHeadLight           = cameraLeft.find(".//light");
-        rightHeadLight.lightsource  = leftHeadLight.lightsource;
-        rightHeadLight.position     = leftHeadLight.position;
-        cameraRight.appendChild(rightHeadLight);
-        self.getLightManager().registerHeadlightWithViewport(_.rightViewport, rightHeadLight);
+        // setup cameras
+        _.setupStereoCameras("stereo-left", [0, 0]);
+        _.setupStereoCameras("stereo-right", [0.5, 0]);
     };
     
-    _.updateCameraPosition = function () {
-        Logger.info("<StereoSceneViewer::_.updateCameraPosition>");
-        _.cameraPosition = new Vector3f(_.initial_camera_position.x,
-                                        _.initial_camera_position.y,
-                                        _.focalLength);
+    _.setupStereoCameras = function (theName, thePosition) {
+        // create viewport
+        var myViewport          = Node.createElement("viewport");
+        myViewport.name         = theName + "-viewport";
+        self.stereoCanvas.appendChild(myViewport);
+        myViewport.size         = new Vector2f(0.5, 1);
+        myViewport.position     = new Vector2f(thePosition); // left: [0,0], right: [0.5,0]
+        myViewport.resizepolicy = "no_adaption";
+        
+        // create camera
+        var myCamera            = Node.createElement("camera");
+        myCamera.name           = theName + "-camera";
+        _.cameraTransform.appendChild(myCamera);
+        myCamera.frustum        = new Frustum();
+        myCamera.frustum.type   = "perspective";
+        myCamera.position       = new Vector3f(_.monoCamera.position);
+        myCamera.orientation    = new Quaternionf(_.monoCamera.orientation);
+        _.stereoCameras.push(myCamera);
+        
+        // attach camera to viewport
+        myViewport.camera       = myCamera.id;
+        
+        // create headlight for right eye
+        var myHeadLight         = Node.createElement('light');
+        myHeadLight.name        = myViewport.id + "-headlight";
+        var monoHeadLight       = self.scene.world.getElementById(_.monoViewport.camera).find(".//light");
+        myHeadLight.lightsource = monoHeadLight.lightsource;
+        myHeadLight.position    = monoHeadLight.position;
+        myCamera.appendChild(myHeadLight);
+        self.getLightManager().registerHeadlightWithViewport(myViewport, myHeadLight);
     };
     
     _.updateStereoView = function () {
         Logger.info("<StereoSceneViewer::_.updateStereoView>");
         
-        var horizontalAngleDiv2 = radFromDeg(_.hfov/2); //radFromDeg(_.cameraAperture/2);
-        var verticalAngleDiv2   = radFromDeg(_.vfov/2);
+        var horizontalAngleDiv2 = radFromDeg(_.monoCamera.frustum.hfov/2); //radFromDeg(_.cameraAperture/2);
+        var verticalAngleDiv2   = radFromDeg(_.monoCamera.frustum.vfov/2);
         var ratio               = self.width / self.height;
         var eyeSeparation       = _.focalLength / _.focalLengthEyeSeparationFactor;
         
         var i, widthDiv2, heightDiv2;
         for (i = 0; i < _.stereoCameras.length; i++) {
             // adjust camera position to focallength
-            _.stereoCameras[i].position.z = _.focalLength;
+            _.stereoCameras[i].position.z = _.focalLength - magnitude(_.cameraTransform.position);
             
             // calculate asymmetric frustum
             _.stereoCameras[i].frustum.near = _.focalLength * _.NEARPLANE_FOCALLENGTH_FACTOR;
@@ -123,26 +130,38 @@ StereoSceneViewer.prototype.Constructor = function (self, theArguments) {
             _.stereoCameras[i].frustum.top    =   heightDiv2;
             _.stereoCameras[i].frustum.bottom = - heightDiv2;
             
-            if (_.stereoCameras[i].name === "leftEye") {
+            if (_.stereoCameras[i].name === "stereo-left-camera") {
                 _.stereoCameras[i].frustum.left   = -ratio * widthDiv2 + 0.5 * eyeSeparation * _.NEARPLANE_FOCALLENGTH_FACTOR * _.projection_flag;
                 _.stereoCameras[i].frustum.right  =  ratio * widthDiv2 + 0.5 * eyeSeparation * _.NEARPLANE_FOCALLENGTH_FACTOR * _.projection_flag;
                 // adjust camera position to eyeSeparation
-                _.stereoCameras[i].position.x     =  _.cameraPosition.x - eyeSeparation/2 * _.projection_flag; // XXX should also translate y, z
+                _.stereoCameras[i].position.x     =  _.monoCamera.position.x - eyeSeparation/2 * _.projection_flag;
             } 
-            else if (_.stereoCameras[i].name === "rightEye") {
+            else if (_.stereoCameras[i].name === "stereo-right-camera") {
                 _.stereoCameras[i].frustum.left  = -ratio * widthDiv2 - 0.5 * eyeSeparation * _.NEARPLANE_FOCALLENGTH_FACTOR * _.projection_flag;
                 _.stereoCameras[i].frustum.right =  ratio * widthDiv2 - 0.5 * eyeSeparation * _.NEARPLANE_FOCALLENGTH_FACTOR * _.projection_flag;
                 // adjust camera position to eyeSeparation
-                _.stereoCameras[i].position.x    =  _.cameraPosition.x + eyeSeparation/2 * _.projection_flag; // XXX should also translate y, z
+                _.stereoCameras[i].position.x    =  _.monoCamera.position.x + eyeSeparation/2 * _.projection_flag;
             }
         }
     };
     
     
-    
     ////////////////////
     // Public Methods //
     ////////////////////
+    self.setStereo = function () {
+        self.getRenderWindow().canvas = self.stereoCanvas;
+    };
+    
+    self.setMono = function () {
+        self.getRenderWindow().canvas = self.monoCanvas;
+    };
+    
+    self.setBackgroundColor = function (theColor) {
+        self.stereoCanvas.backgroundcolor = theColor;
+        self.monoCanvas.backgroundcolor = theColor;
+    };
+    
     self.loadStage = function (theFile, theId) {
         self.stages[theId] = spark.loadFile(theFile);
         self.stages[theId].name = self.stages[theId].name;
@@ -154,12 +173,15 @@ StereoSceneViewer.prototype.Constructor = function (self, theArguments) {
         
         // setup stereo view
         if (self.stereoFlag) {
-            _.setupStereoCameras();
-            _.updateCameraPosition();
+            _.setupCameras();
             _.updateStereoView();
         }
         
-        self.registerSettingsListener(self, "StereoView"); // updates stereo-view-parameters according to specified settings.xml
+        // initially set stereo view
+        self.getRenderWindow().canvas = self.stereoCanvas;
+        
+         // updating stereo-view-parameters according to specified settings.xml
+        self.registerSettingsListener(self, "StereoView");
     };
     
     Base.onFrame = self.onFrame;
@@ -179,8 +201,12 @@ StereoSceneViewer.prototype.Constructor = function (self, theArguments) {
         Base.onKey(theKey, theKeyState, theX, theY, theShiftFlag, theCtrlFlag, theAltFlag);
         
          switch (theKey) {
-            case '2':
-                //self.stages.first.offscreenRenderer.saveScreenshot("stage.png");
+            case 't':
+                //if (self.getRenderWindow().canvas.id === self.monoCanvas.id) {
+                //    self.setStereo();
+                //} else {
+                //    self.setMono();
+                //}
                 break;
             default : 
                 break;
@@ -192,6 +218,8 @@ StereoSceneViewer.prototype.Constructor = function (self, theArguments) {
             return;
         }
         var nodeValue;
+        // XXX aperture values (horizontal and vertical) are currently derived 
+        //     directly from initially active camera node
         //if (theNode.childNode("CameraAperture")) {
         //    nodeValue = Number(theNode.childNode("CameraAperture").firstChild.nodeValue);
         //    if (nodeValue != _.cameraAperture) {
@@ -203,7 +231,6 @@ StereoSceneViewer.prototype.Constructor = function (self, theArguments) {
             nodeValue = Number(theNode.childNode("FocalLength").firstChild.nodeValue);
             if (nodeValue != _.focalLength) {
                 _.focalLength = nodeValue;
-                _.updateCameraPosition();
                 _.updateStereoView();
             }
         }
