@@ -71,7 +71,7 @@ spark.ResizableRectangle.Constructor = function (Protected) {
     });
 
     Public.Setter("origin", function (theValue) {
-        // XXX this triggers applyOrigin three times. See comment above^^
+        // XXX this triggers applySize three times. See comment above^^
         Public.originX = theValue.x;
         Public.originY = theValue.y;
         Public.originZ = theValue.z;
