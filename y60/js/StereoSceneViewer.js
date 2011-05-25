@@ -17,24 +17,27 @@ StereoSceneViewer.prototype.Constructor = function (self, theArguments) {
     _.leftViewport              = null;
     _.rightViewport             = null;
     _.stereoCameras             = [];
-    _.initial_camera_position   = [0, 0, 0];
-    _.initial_camera_orientation = [0, 0, 0, 0];
+    _.initial_camera_position   = null; //[0, 0, 0];
+    _.initial_camera_orientation = null; //[0, 0, 0, 0];
+    _.vfov                      = null;
+    _.hfov                      = null;
     
     _.focalLengthEyeSeparationFactor = 30;  // configurable via settings.xml
     _.focalLength     = 3;                  // configurable via settings.xml
     _.cameraAperture  = 45;                 // configurable via settings.xml
-    _.cameraPosition  = [0,0,_.focalLength];
+    _.cameraPosition  = null; //[0,0,_.focalLength];
     _.projection_flag = 1;                  // configurable via settings.xml
                                             // NOTE: projection_flag = 1: parallel (left viewport for left eye) -> beamer, 
                                             //      projection_flag = -1: cross-view (left viewport for right eye)
-    // NOTE:  
-    // eyeSeparation = _.focalLength / _.focalLengthEyeSeparationFactor
+    // NOTE: eyeSeparation = _.focalLength / _.focalLengthEyeSeparationFactor
     
+    _.NEARPLANE_FOCALLENGTH_FACTOR = 1/5; // guessing, but should in any case be < 1 as nearplane = focallength * _.NEARPLANE_FOCALLENGTH_FACTOR
     
     ////////////////////
     // Public Members //
     ////////////////////
     self.stages = {};
+    self.stereoFlag = true;
     
     
     /////////////////////
@@ -54,9 +57,11 @@ StereoSceneViewer.prototype.Constructor = function (self, theArguments) {
         // camera
         var cameraLeft              = self.getActiveCamera();
         cameraLeft.name             = "leftEye";
-        cameraLeft.position         = new Vector3f(_.initial_camera_position);
-        cameraLeft.orientation      = new Vector4f(_.initial_camera_orientation);
         _.stereoCameras.push(cameraLeft);
+        _.initial_camera_position   = new Vector3f(cameraLeft.position);
+        _.initial_camera_orientation = new Vector4f(cameraLeft.orientation);
+        _.vfov = cameraLeft.frustum.vfov;
+        _.hfov = cameraLeft.frustum.hfov;
         
         // --- RIGHT EYE ---
         // create viewport
@@ -92,39 +97,43 @@ StereoSceneViewer.prototype.Constructor = function (self, theArguments) {
     
     _.updateCameraPosition = function () {
         Logger.info("<StereoSceneViewer::_.updateCameraPosition>");
-        _.cameraPosition = new Vector3f(0,0,_.focalLength);
+        _.cameraPosition = new Vector3f(_.initial_camera_position.x,
+                                        _.initial_camera_position.y,
+                                        _.focalLength);
     };
     
     _.updateStereoView = function () {
         Logger.info("<StereoSceneViewer::_.updateStereoView>");
         
-        var radians       = radFromDeg(_.cameraAperture/2);
-        var ratio         = self.width / self.height;
-        var eyeSeparation = _.focalLength / _.focalLengthEyeSeparationFactor;
+        var horizontalAngleDiv2 = radFromDeg(_.hfov/2); //radFromDeg(_.cameraAperture/2);
+        var verticalAngleDiv2   = radFromDeg(_.vfov/2);
+        var ratio               = self.width / self.height;
+        var eyeSeparation       = _.focalLength / _.focalLengthEyeSeparationFactor;
         
-        var i, wd2, ndfl;
+        var i, widthDiv2, heightDiv2;
         for (i = 0; i < _.stereoCameras.length; i++) {
             // adjust camera position to focallength
             _.stereoCameras[i].position.z = _.focalLength;
             
             // calculate asymmetric frustum
-            _.stereoCameras[i].frustum.near = _.focalLength / 5;
-            wd2  = _.stereoCameras[i].frustum.near * Math.tan(radians);
-            ndfl = _.stereoCameras[i].frustum.near / _.focalLength;
-            _.stereoCameras[i].frustum.top    = wd2;
-            _.stereoCameras[i].frustum.bottom = -wd2;
+            _.stereoCameras[i].frustum.near = _.focalLength * _.NEARPLANE_FOCALLENGTH_FACTOR;
+            widthDiv2   = _.stereoCameras[i].frustum.near * Math.tan(horizontalAngleDiv2);
+            heightDiv2  = _.stereoCameras[i].frustum.near * Math.tan(verticalAngleDiv2);
+            
+            _.stereoCameras[i].frustum.top    =   heightDiv2;
+            _.stereoCameras[i].frustum.bottom = - heightDiv2;
             
             if (_.stereoCameras[i].name === "leftEye") {
-                _.stereoCameras[i].frustum.left   = -ratio * wd2 + 0.5 * eyeSeparation * ndfl * _.projection_flag;
-                _.stereoCameras[i].frustum.right  =  ratio * wd2 + 0.5 * eyeSeparation * ndfl * _.projection_flag;
+                _.stereoCameras[i].frustum.left   = -ratio * widthDiv2 + 0.5 * eyeSeparation * _.NEARPLANE_FOCALLENGTH_FACTOR * _.projection_flag;
+                _.stereoCameras[i].frustum.right  =  ratio * widthDiv2 + 0.5 * eyeSeparation * _.NEARPLANE_FOCALLENGTH_FACTOR * _.projection_flag;
                 // adjust camera position to eyeSeparation
-                _.stereoCameras[i].position.x     =  _.cameraPosition.x - eyeSeparation/2 * _.projection_flag;
+                _.stereoCameras[i].position.x     =  _.cameraPosition.x - eyeSeparation/2 * _.projection_flag; // XXX should also translate y, z
             } 
             else if (_.stereoCameras[i].name === "rightEye") {
-                _.stereoCameras[i].frustum.left  = -ratio * wd2 - 0.5 * eyeSeparation * ndfl * _.projection_flag;
-                _.stereoCameras[i].frustum.right =  ratio * wd2 - 0.5 * eyeSeparation * ndfl * _.projection_flag;
+                _.stereoCameras[i].frustum.left  = -ratio * widthDiv2 - 0.5 * eyeSeparation * _.NEARPLANE_FOCALLENGTH_FACTOR * _.projection_flag;
+                _.stereoCameras[i].frustum.right =  ratio * widthDiv2 - 0.5 * eyeSeparation * _.NEARPLANE_FOCALLENGTH_FACTOR * _.projection_flag;
                 // adjust camera position to eyeSeparation
-                _.stereoCameras[i].position.x    =  _.cameraPosition.x + eyeSeparation/2 * _.projection_flag;
+                _.stereoCameras[i].position.x    =  _.cameraPosition.x + eyeSeparation/2 * _.projection_flag; // XXX should also translate y, z
             }
         }
     };
@@ -144,9 +153,11 @@ StereoSceneViewer.prototype.Constructor = function (self, theArguments) {
         Base.setup.apply(self, arguments);
         
         // setup stereo view
-        _.setupStereoCameras();
-        _.updateCameraPosition();
-        _.updateStereoView();
+        if (self.stereoFlag) {
+            _.setupStereoCameras();
+            _.updateCameraPosition();
+            _.updateStereoView();
+        }
         
         self.registerSettingsListener(self, "StereoView"); // updates stereo-view-parameters according to specified settings.xml
     };
@@ -168,8 +179,8 @@ StereoSceneViewer.prototype.Constructor = function (self, theArguments) {
         Base.onKey(theKey, theKeyState, theX, theY, theShiftFlag, theCtrlFlag, theAltFlag);
         
          switch (theKey) {
-            case 's':
-                self.stages.first.offscreenRenderer.saveScreenshot("stage.png");
+            case '2':
+                //self.stages.first.offscreenRenderer.saveScreenshot("stage.png");
                 break;
             default : 
                 break;
@@ -181,13 +192,13 @@ StereoSceneViewer.prototype.Constructor = function (self, theArguments) {
             return;
         }
         var nodeValue;
-        if (theNode.childNode("CameraAperture")) {
-            nodeValue = Number(theNode.childNode("CameraAperture").firstChild.nodeValue);
-            if (nodeValue != _.cameraAperture) {
-                _.cameraAperture = nodeValue;
-                _.updateStereoView();
-            }
-        }
+        //if (theNode.childNode("CameraAperture")) {
+        //    nodeValue = Number(theNode.childNode("CameraAperture").firstChild.nodeValue);
+        //    if (nodeValue != _.cameraAperture) {
+        //        _.cameraAperture = nodeValue;
+        //        _.updateStereoView();
+        //    }
+        //}
         if (theNode.childNode("FocalLength")) {
             nodeValue = Number(theNode.childNode("FocalLength").firstChild.nodeValue);
             if (nodeValue != _.focalLength) {
