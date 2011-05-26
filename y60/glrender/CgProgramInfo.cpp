@@ -861,11 +861,6 @@ namespace y60 {
         myType.fromString(theNode.parentNode()->nodeName());
         switch(myType) {
         case INT:
-        {
-            int myValue = theNode.nodeValueAs<int>();
-            cgGLSetParameter1f(theCgParameter, myValue);
-            break;
-        }
         case FLOAT:
         {
             float myValue = theNode.nodeValueAs<float>();

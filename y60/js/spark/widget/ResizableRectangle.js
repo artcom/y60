@@ -35,11 +35,6 @@ spark.ResizableRectangle.Constructor = function (Protected) {
         }
     }
 
-    function applyOrigin(o, theBaseSetter) {
-        theBaseSetter(o);
-        applySize();
-    }
-    
     ////////////////////
     // Public Methods //
     ////////////////////
@@ -66,10 +61,25 @@ spark.ResizableRectangle.Constructor = function (Protected) {
         Public.height = theSize.y;
     });
 
-    Public.SetterOverride("origin", applyOrigin);
-
+    
     Public.Property("width",  Number, 1, applySize);
     Public.Property("height", Number, 1, applySize);
+
+    // ORIGIN
+    Public.Getter("origin", function () {
+        return new Vector3f(Public.originX, Public.originY, Public.originZ);
+    });
+
+    Public.Setter("origin", function (theValue) {
+        // XXX this triggers applySize three times. See comment above^^
+        Public.originX = theValue.x;
+        Public.originY = theValue.y;
+        Public.originZ = theValue.z;
+    });
+
+    Public.Property("originX", Number, 0.0, applySize);
+    Public.Property("originY", Number, 0.0, applySize);
+    Public.Property("originZ", Number, 0.0, applySize);
 
     Base.realize = Public.realize;
     Public.realize = function (theMaterialOrImageOrShape) {

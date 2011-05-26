@@ -143,7 +143,7 @@ spark.Layouter.Constructor = function(Protected) {
                 } else if ((theKey === ".") && Public.active && _myIntersections.length > 1) { 
                     var myIndex = js.array.indexOf(_myIntersections, _myWidget);
                     Public.target = _myIntersections[(myIndex + 1) % _myIntersections.length];
-                    print("moved targed to parent: ", Public.target);
+                    print("moved targed to intersected widget: ", Public.target);
                 } else if ((theKey === "a") && Public.active && _myWidget && "layouterToggleWidget" in _myWidget) {
                     _myWidget.layouterToggleWidget();
                 } else if (Public.active && theKey === "x") {
@@ -347,6 +347,9 @@ spark.Layouter.Constructor = function(Protected) {
     }
 
     function onMouseDown(theEvent) {
+        if (!_myNewFrameFlag) {
+            return;
+        }
         if (theEvent.target === _myStage) {
             return;
         }
@@ -371,6 +374,9 @@ spark.Layouter.Constructor = function(Protected) {
     }
 
     function onMouseMove(theEvent) {
+        if (!_myNewFrameFlag) {
+            return;
+        }
         if (_myIsCtrlPressed && Public.active) {
             updatePosition(theEvent.stageX, theEvent.stageY, _myWidget.z);
         }
