@@ -1058,6 +1058,8 @@ namespace y60 {
             DBP(MAKE_GL_SCOPE_TIMER(realREnderlisting));
             // do the billboarding here
             if (myBody.get<BillboardTag>() == AXIS_BILLBOARD) {
+                // TODO support billboardlookat for AXIS_BILLBOARD ??
+                
                 DBP(MAKE_GL_SCOPE_TIMER(update_billboards));
                 Matrix4f myBillboardTransform = myBody.get<GlobalMatrixTag>();
 
@@ -1073,6 +1075,7 @@ namespace y60 {
                 Matrix4f myBillboardMatrix = myBody.get<GlobalMatrixTag>();
                 myBillboardMatrix.scale(myFinalInverseScale);
 
+                // support billboardlookat
                 float myRotation = static_cast<float>(getBillboardRotationY(myBillboardMatrix,
                         theCamera->get<GlobalMatrixTag>()));
                 Matrix4f myLocalRotation;
@@ -1087,20 +1090,33 @@ namespace y60 {
                     myCurScale *= myCurNode->getFacade<TransformHierarchyFacade>()->get<ScaleTag>();
                     myCurNode = myCurNode->parentNode();
                 }
-                // get rid of scale in billboards global matrix
+                // get rid of scale in billboard's global matrix
                 Vector3f myFinalInverseScale(1.0f/myCurScale[0], 1.0f/myCurScale[1], 1.0f/myCurScale[2]);
                 Matrix4f myBillboardMatrix = myBody.get<GlobalMatrixTag>();
                 myBillboardMatrix.scale(myFinalInverseScale);
 
-                // transform camera into billboard space
+                // transform camera or specified billboardlookat into billboard space
                 myBillboardMatrix.invert();
-                Matrix4f myCameraMatrix = theCamera->get<GlobalMatrixTag>();
-                myCameraMatrix.postMultiply(myBillboardMatrix);
+                
+                // default billboardlookat is the camera
+                y60::TransformHierarchyFacadePtr myTransform(theCamera);
+                const string& lookatId = myBody.get<BillboardLookatTag>();
+                if (lookatId != "") {
+                    // billboardlookat specified -> use referenced transform
+                    const dom::NodePtr& myLookatTransformPtr = theNode->getElementById(lookatId);
+                    if (!myLookatTransformPtr) {
+                        throw RendererException(string("billboardlookat: Transform with ID '") + lookatId +
+                                                "' not found.", PLUS_FILE_LINE);
+                    }
+                    myTransform = myLookatTransformPtr->getFacade<TransformHierarchyFacade>();
+                }
+                Matrix4f myLookatMatrix = myTransform->get<GlobalMatrixTag>();
+                myLookatMatrix.postMultiply(myBillboardMatrix);
 
                 // calculate billboard transform matrix
-                Vector4f myCamUpVector    = myCameraMatrix.getRow(1);
+                Vector4f myCamUpVector    = myLookatMatrix.getRow(1);
                 Vector3f myCamUpVector3(myCamUpVector[0], myCamUpVector[1], myCamUpVector[2]);
-                Vector4f myCamViewVector  = myCameraMatrix.getRow(2);
+                Vector4f myCamViewVector  = myLookatMatrix.getRow(2);
                 Vector3f myCamViewVector3(myCamViewVector[0], myCamViewVector[1], myCamViewVector[2]);
                 Vector3f myRightVec       = cross(myCamUpVector3, myCamViewVector3);
 

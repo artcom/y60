@@ -85,6 +85,7 @@ namespace y60 {
             getNode()->appendAttribute(ORIENTATION_ATTRIB, asl::Quaternionf(0,0,0,1));
             getNode()->appendAttribute(PIVOT_ATTRIB, asl::Vector3f(0,0,0));
             getNode()->appendAttribute(BILLBOARD_ATTRIB, "");
+            getNode()->appendAttribute(BILLBOARD_LOOKAT_ATTRIB, "");
             getNode()->appendAttribute<int>(RENDERORDER_ATTRIB, 0);
             
         } else {
