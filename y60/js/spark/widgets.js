@@ -258,7 +258,7 @@ spark.Widget.Constructor = function (Protected) {
         Public.propagateAlpha();
     }
     
-    this.Property("alpha", Number, 1.0, applyAlpha);
+    Public.Property("alpha", Number, 1.0, applyAlpha);
     var _myActualAlpha = 1.0;
     
     Public.Getter("actualAlpha", function () {
@@ -312,11 +312,11 @@ spark.Widget.Constructor = function (Protected) {
         Public.z = theValue.z;
     });
 
-    this.Property("x", Number, 0.0, applyPosition);
-    this.Property("y", Number, 0.0, applyPosition);
-    this.Property("z", Number, 0.0, applyPosition);
+    Public.Property("x", Number, 0.0, applyPosition);
+    Public.Property("y", Number, 0.0, applyPosition);
+    Public.Property("z", Number, 0.0, applyPosition);
 
-    this.Property("renderorder", Number, 0, applyRenderOrder);
+    Public.Property("renderorder", Number, 0, applyRenderOrder);
     function applyRenderOrder() {
         if (_mySceneNode) {
             _mySceneNode.renderorder = Public.renderorder;
@@ -340,9 +340,9 @@ spark.Widget.Constructor = function (Protected) {
         Public.scaleZ = theValue.z;
     });
 
-    this.Property("scaleX", Number, 1.0, applyScale);
-    this.Property("scaleY", Number, 1.0, applyScale);
-    this.Property("scaleZ", Number, 1.0, applyScale);
+    Public.Property("scaleX", Number, 1.0, applyScale);
+    Public.Property("scaleY", Number, 1.0, applyScale);
+    Public.Property("scaleZ", Number, 1.0, applyScale);
 
     // PIVOT
     function applyPivot() {
@@ -361,30 +361,9 @@ spark.Widget.Constructor = function (Protected) {
         Public.pivotZ = theValue.z;
     });
 
-    this.Property("pivotX", Number, 0.0, applyPivot);
-    this.Property("pivotY", Number, 0.0, applyPivot);
-    this.Property("pivotZ", Number, 0.0, applyPivot);
-
-    // ORIGIN
-    // XXX: origins must be set up before realization
-    //      this is not thought out well and has been
-    //      introduced as a requirement-fullfilling hack.
-    function applyOrigin() {
-    }
-    
-    Public.Getter("origin", function () {
-        return new Vector3f(Public.originX, Public.originY, Public.originZ);
-    });
-
-    Public.Setter("origin", function (theValue) {
-        Public.originX = theValue.x;
-        Public.originY = theValue.y;
-        Public.originZ = theValue.z;
-    });
-
-    this.Property("originX", Number, 0.0, applyOrigin);
-    this.Property("originY", Number, 0.0, applyOrigin);
-    this.Property("originZ", Number, 0.0, applyOrigin);
+    Public.Property("pivotX", Number, 0.0, applyPivot);
+    Public.Property("pivotY", Number, 0.0, applyPivot);
+    Public.Property("pivotZ", Number, 0.0, applyPivot);
 
     // ROTATION
     function applyRotation() {
@@ -408,9 +387,9 @@ spark.Widget.Constructor = function (Protected) {
         Public.rotationZ = theValue.z;
     });
 
-    this.Property("rotationX", Number, 0.0, applyRotation);
-    this.Property("rotationY", Number, 0.0, applyRotation);
-    this.Property("rotationZ", Number, 0.0, applyRotation);
+    Public.Property("rotationX", Number, 0.0, applyRotation);
+    Public.Property("rotationY", Number, 0.0, applyRotation);
+    Public.Property("rotationZ", Number, 0.0, applyRotation);
 
     // INTERNATIONALISATION HOOKS
     var _myI18nContext = null;

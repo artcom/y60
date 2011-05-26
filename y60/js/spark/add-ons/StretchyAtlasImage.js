@@ -126,10 +126,20 @@ spark.StretchyAtlasImage.Constructor = function (Protected) {
             _myShapeStretcher.updateGeometry(new Vector2f(Public.width, theHeight), false, Public.origin);
         });
 
-        Base.originSetter = Public.__lookupSetter__("origin");
-        Public.__defineSetter__("origin", function (theOrigin) {
-            Base.originSetter(theOrigin);
-            _myShapeStretcher.updateGeometry(Public.size, false, theOrigin);
+        Base.originXSetter = Public.__lookupSetter__("originX");
+        Public.__defineSetter__("originX", function (theOriginX) {
+            Base.originXSetter(theOriginX);
+            _myShapeStretcher.updateGeometry(Public.size, false, Public.origin);
+        });
+        Base.originYSetter = Public.__lookupSetter__("originY");
+        Public.__defineSetter__("originY", function (theOriginY) {
+            Base.originYSetter(theOriginY);
+            _myShapeStretcher.updateGeometry(Public.size, false, Public.origin);
+        });
+        Base.originZSetter = Public.__lookupSetter__("originZ");
+        Public.__defineSetter__("originZ", function (theOriginZ) {
+            Base.originZSetter(theOriginZ);
+            _myShapeStretcher.updateGeometry(Public.size, false, Public.origin);
         });
 
         _myShapeStretcher.initialize(Public.node?Public.node:new Node("<StretchyAtlasImage/>"));
