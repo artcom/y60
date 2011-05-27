@@ -27,6 +27,16 @@ try {
             myBillboardBody.billboardlookat = CUBE_BODY_ID;
         } else if (theFrameNum === 6) {
             ourShow.saveTestImage();
+        } else if (theFrameNum === 8) {
+            // test Axis with billboardlookat
+            myBillboardBody.billboard = "axis";
+        } else if (theFrameNum === 10) {
+            ourShow.saveTestImage();
+        } else if (theFrameNum === 12) {
+            // test axis with defaulf billboardlookat
+            myBillboardBody.billboardlookat = "";
+        } else if (theFrameNum === 14) {
+            ourShow.saveTestImage();
         }
     };
     
@@ -47,7 +57,7 @@ try {
     var myBillboardBody = Modelling.createBody(window.scene.world, myShape.id);
     myBillboardBody.billboard = "point";
     
-    ourShow.setTestDurationInFrames(10);
+    ourShow.setTestDurationInFrames(16);
     ourShow.go();
 } catch (ex) {
     print("-------------------------------------------------------------------------------");

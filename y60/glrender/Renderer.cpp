@@ -1058,8 +1058,6 @@ namespace y60 {
             DBP(MAKE_GL_SCOPE_TIMER(realREnderlisting));
             // do the billboarding here
             if (myBody.get<BillboardTag>() == AXIS_BILLBOARD) {
-                // TODO support billboardlookat for AXIS_BILLBOARD ??
-                
                 DBP(MAKE_GL_SCOPE_TIMER(update_billboards));
                 Matrix4f myBillboardTransform = myBody.get<GlobalMatrixTag>();
 
@@ -1076,8 +1074,19 @@ namespace y60 {
                 myBillboardMatrix.scale(myFinalInverseScale);
 
                 // support billboardlookat
+                y60::TransformHierarchyFacadePtr myTransform(theCamera);
+                const string& lookatId = myBody.get<BillboardLookatTag>();
+                if (lookatId != "") {
+                    // billboardlookat specified -> use referenced transform
+                    const dom::NodePtr& myLookatTransformPtr = theNode->getElementById(lookatId);
+                    if (!myLookatTransformPtr) {
+                        throw RendererException(string("billboardlookat: Transform with ID '") + lookatId +
+                                                "' not found.", PLUS_FILE_LINE);
+                    }
+                    myTransform = myLookatTransformPtr->getFacade<TransformHierarchyFacade>();
+                }
                 float myRotation = static_cast<float>(getBillboardRotationY(myBillboardMatrix,
-                        theCamera->get<GlobalMatrixTag>()));
+                        myTransform->get<GlobalMatrixTag>()));
                 Matrix4f myLocalRotation;
                 myLocalRotation.makeRotating(Vector3f(0,1,0),myRotation);
                 myLocalRotation.postMultiply(myBillboardTransform);
@@ -1114,16 +1123,16 @@ namespace y60 {
                 myLookatMatrix.postMultiply(myBillboardMatrix);
 
                 // calculate billboard transform matrix
-                Vector4f myCamUpVector    = myLookatMatrix.getRow(1);
-                Vector3f myCamUpVector3(myCamUpVector[0], myCamUpVector[1], myCamUpVector[2]);
-                Vector4f myCamViewVector  = myLookatMatrix.getRow(2);
-                Vector3f myCamViewVector3(myCamViewVector[0], myCamViewVector[1], myCamViewVector[2]);
-                Vector3f myRightVec       = cross(myCamUpVector3, myCamViewVector3);
+                Vector4f myUpVector    = myLookatMatrix.getRow(1);
+                Vector3f myUpVector3(myUpVector[0], myUpVector[1], myUpVector[2]);
+                Vector4f myViewVector  = myLookatMatrix.getRow(2);
+                Vector3f myViewVector3(myViewVector[0], myViewVector[1], myViewVector[2]);
+                Vector3f myRightVec       = cross(myUpVector3, myViewVector3);
 
                 Matrix4f myScreenAlignedMatrix;
                 myScreenAlignedMatrix.assign(myRightVec[0], myRightVec[1], myRightVec[2], 0,
-                        myCamUpVector[0],myCamUpVector[1],myCamUpVector[2], 0,
-                        myCamViewVector[0],myCamViewVector[1],myCamViewVector[2], 0,
+                        myUpVector[0],myUpVector[1],myUpVector[2], 0,
+                        myViewVector[0],myViewVector[1],myViewVector[2], 0,
                         0,0,0,1, ROTATING);
 
                 Matrix4f myBillboardTransform = myBody.get<GlobalMatrixTag>();
