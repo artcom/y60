@@ -14,10 +14,15 @@ StereoSceneViewer.prototype.Constructor = function (self, theArguments) {
     /////////////////////
     // Private Members //
     /////////////////////
-    _.monoViewport              = null;
-    _.monoViewport              = null;
-    _.cameraTransform           = null;
-    _.stereoCameras             = [];
+    _.viewports = {
+        mono : null,
+        stereo : {
+            left: null,
+            right: null
+        }
+    }
+    _.cameraTransform   = null;
+    _.stereoCameras     = [];
     
     // NOTE: eyeSeparation = _.focalLength / _.focalLengthEyeSeparationFactor
     _.focalLengthEyeSeparationFactor = 30;  // configurable via settings.xml
@@ -33,7 +38,7 @@ StereoSceneViewer.prototype.Constructor = function (self, theArguments) {
     ////////////////////
     // Public Members //
     ////////////////////
-    self.stages     = {};
+    self.stages     = {}; // XXX DEPRECATED: stages should be hold in specific application
     self.stereoFlag = true;
     self.monoCanvas = null;
     self.stereoCanvas = null;
@@ -54,10 +59,10 @@ StereoSceneViewer.prototype.Constructor = function (self, theArguments) {
         
         // --- ARRANGE MONO ---
         // viewport
-        _.monoViewport              = self.getActiveViewport();
-        _.monoViewport.name         = "mono-viewport";
+        _.viewports.mono            = self.getActiveViewport();
+        _.viewports.mono.name       = "mono-viewport";
         
-        self.monoCanvas             = _.monoViewport.parentNode;
+        self.monoCanvas             = _.viewports.mono.parentNode;
         
         // camera
         _.monoCamera                = self.getActiveCamera();
@@ -73,22 +78,22 @@ StereoSceneViewer.prototype.Constructor = function (self, theArguments) {
         self.scene.canvases.appendChild(self.stereoCanvas);
         
         // setup cameras
-        _.setupStereoCameras("stereo-left", [0, 0]);
-        _.setupStereoCameras("stereo-right", [0.5, 0]);
+        _.setupStereoCameras("left", [0, 0]);
+        _.setupStereoCameras("right", [0.5, 0]);
     };
     
     _.setupStereoCameras = function (theName, thePosition) {
         // create viewport
-        var myViewport          = Node.createElement("viewport");
-        myViewport.name         = theName + "-viewport";
-        self.stereoCanvas.appendChild(myViewport);
-        myViewport.size         = new Vector2f(0.5, 1);
-        myViewport.position     = new Vector2f(thePosition); // left: [0,0], right: [0.5,0]
-        myViewport.resizepolicy = "no_adaption";
+        _.viewports.stereo[theName]             = Node.createElement("viewport");
+        _.viewports.stereo[theName].name        = "stereo-" + theName + "-viewport";
+        self.stereoCanvas.appendChild(_.viewports.stereo[theName]);
+        _.viewports.stereo[theName].size        = new Vector2f(0.5, 1);
+        _.viewports.stereo[theName].position    = new Vector2f(thePosition); // left: [0,0], right: [0.5,0]
+        _.viewports.stereo[theName].resizepolicy = "no_adaption";
         
         // create camera
         var myCamera            = Node.createElement("camera");
-        myCamera.name           = theName + "-camera";
+        myCamera.name           = "stereo-" + theName + "-camera";
         _.cameraTransform.appendChild(myCamera);
         myCamera.frustum        = new Frustum();
         myCamera.frustum.type   = "perspective";
@@ -97,16 +102,16 @@ StereoSceneViewer.prototype.Constructor = function (self, theArguments) {
         _.stereoCameras.push(myCamera);
         
         // attach camera to viewport
-        myViewport.camera       = myCamera.id;
+        _.viewports.stereo[theName].camera = myCamera.id;
         
         // create headlight for right eye
         var myHeadLight         = Node.createElement('light');
-        myHeadLight.name        = myViewport.id + "-headlight";
-        var monoHeadLight       = self.scene.world.getElementById(_.monoViewport.camera).find(".//light");
+        myHeadLight.name        = _.viewports.stereo[theName].id + "-headlight";
+        var monoHeadLight       = self.scene.world.getElementById(_.viewports.mono.camera).find(".//light");
         myHeadLight.lightsource = monoHeadLight.lightsource;
         myHeadLight.position    = monoHeadLight.position;
         myCamera.appendChild(myHeadLight);
-        self.getLightManager().registerHeadlightWithViewport(myViewport, myHeadLight);
+        self.getLightManager().registerHeadlightWithViewport(_.viewports.stereo[theName], myHeadLight);
     };
     
     _.updateStereoView = function () {
@@ -130,13 +135,13 @@ StereoSceneViewer.prototype.Constructor = function (self, theArguments) {
             _.stereoCameras[i].frustum.top    =   heightDiv2;
             _.stereoCameras[i].frustum.bottom = - heightDiv2;
             
-            if (_.stereoCameras[i].name === "stereo-left-camera") {
+            if (_.stereoCameras[i].id === _.viewports.stereo.left.camera) {
                 _.stereoCameras[i].frustum.left   = -ratio * widthDiv2 + 0.5 * eyeSeparation * _.NEARPLANE_FOCALLENGTH_FACTOR * _.projection_flag;
                 _.stereoCameras[i].frustum.right  =  ratio * widthDiv2 + 0.5 * eyeSeparation * _.NEARPLANE_FOCALLENGTH_FACTOR * _.projection_flag;
                 // adjust camera position to eyeSeparation
                 _.stereoCameras[i].position.x     =  _.monoCamera.position.x - eyeSeparation/2 * _.projection_flag;
             } 
-            else if (_.stereoCameras[i].name === "stereo-right-camera") {
+            else if (_.stereoCameras[i].id === _.viewports.stereo.right.camera) {
                 _.stereoCameras[i].frustum.left  = -ratio * widthDiv2 - 0.5 * eyeSeparation * _.NEARPLANE_FOCALLENGTH_FACTOR * _.projection_flag;
                 _.stereoCameras[i].frustum.right =  ratio * widthDiv2 - 0.5 * eyeSeparation * _.NEARPLANE_FOCALLENGTH_FACTOR * _.projection_flag;
                 // adjust camera position to eyeSeparation
@@ -151,10 +156,12 @@ StereoSceneViewer.prototype.Constructor = function (self, theArguments) {
     ////////////////////
     self.setStereo = function () {
         self.getRenderWindow().canvas = self.stereoCanvas;
+        self.setActiveViewport(_.viewports.stereo.left); // wether left or right
     };
     
     self.setMono = function () {
         self.getRenderWindow().canvas = self.monoCanvas;
+        self.setActiveViewport(_.viewports.mono);
     };
     
     self.setBackgroundColor = function (theColor) {
@@ -162,9 +169,11 @@ StereoSceneViewer.prototype.Constructor = function (self, theArguments) {
         self.monoCanvas.backgroundcolor = theColor;
     };
     
-    self.loadStage = function (theFile, theId) {
-        self.stages[theId] = spark.loadFile(theFile);
-        self.stages[theId].name = self.stages[theId].name;
+    // XXX DEPRECATED: do not use this - actually StereoSceneViewer itself should not now anything 
+    //     about how to load its containing stages since this depends on specific application
+    self.loadStage = function (theFile, theName) {
+        self.stages[theName] = spark.loadFile(theFile);
+        self.stages[theName].name = theName;
     };
     
     Base.setup = self.setup;
@@ -178,9 +187,9 @@ StereoSceneViewer.prototype.Constructor = function (self, theArguments) {
         }
         
         // initially set stereo view
-        self.getRenderWindow().canvas = self.stereoCanvas;
+        self.setStereo();
         
-         // updating stereo-view-parameters according to specified settings.xml
+        // updating stereo-view-parameters according to specified settings.xml
         self.registerSettingsListener(self, "StereoView");
     };
     
@@ -188,6 +197,8 @@ StereoSceneViewer.prototype.Constructor = function (self, theArguments) {
     self.onFrame = function (theTime, theDeltaT) {
         Base.onFrame(theTime, theDeltaT);
         
+        // XXX DEPRECATED: as StereoSceneViewer should not now anything about its 
+        //     containing stages this must actually be done in specific application
         for (var stage in self.stages) {
             if (self.stages[stage].hasEventListenersWithType(spark.StageEvent.FRAME)) {
                 var myEvent = new spark.StageEvent(spark.StageEvent.FRAME, self.stages[stage], theTime, theDeltaT);
