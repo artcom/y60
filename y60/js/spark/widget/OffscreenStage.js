@@ -45,7 +45,7 @@ spark.OffscreenStage.Constructor = function (Protected) {
         offScreenImage.resize = "none";
         
         // tie camera to offscreenRenderer
-        Public.offscreenRenderer = new OffscreenRenderer([_.width, _.height], myCamera, "RGBA", offScreenImage, undefined, true, 0);
+        Public.offscreenRenderer = new OffscreenRenderer([_.width, _.height], myCamera, "RGBA", offScreenImage, undefined, true, 4);
         
         var myFlipMatrix = Public.offscreenRenderer.texture.matrix;
         myFlipMatrix.translate(new Vector3f(0, 1, 0));
@@ -64,8 +64,8 @@ spark.OffscreenStage.Constructor = function (Protected) {
     ////////////////////
     Base.realize = Public.realize;
     Public.realize = function () {
-        _.height = Protected.getNumber("width", 200);
-        _.width  = Protected.getNumber("height", 200);
+        _.height = Protected.getNumber("height", 200);
+        _.width  = Protected.getNumber("width", 200);
         _.backgroundColor = Protected.getVector4f("backgroundColor", [1,1,1,0]);
         _.position  = Protected.getVector3f("position", [0,0,0]);
         Public.name = Protected.getString("name", "offscreen-stage");
@@ -79,6 +79,7 @@ spark.OffscreenStage.Constructor = function (Protected) {
     
     Public.onFrame = function (theEvent) {
         Public.offscreenRenderer.renderarea.renderToCanvas();
+        //Public.offscreenRenderer.render();
     };
     
     
