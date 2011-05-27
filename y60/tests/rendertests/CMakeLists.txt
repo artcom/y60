@@ -65,6 +65,7 @@ testRaster
 testSprites
 testSvgPath
 testtripletex
+testBillBoard
 tex_nearest
 transparency_test
 uvrepeat

@@ -3429,6 +3429,11 @@ Child nodes will still be optimized tho.</xs:documentation>
                 </xs:restriction>
             </xs:simpleType>
         </xs:attribute>
+        <xs:attribute name="billboardlookat" type="xs:IDREF">
+            <xs:annotation>
+                <xs:documentation>reference to transform as base for billboard orientation (defaults to camera)</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
         <xs:attribute name="sensor" type="xs:string">
             <xs:annotation>
                 <xs:documentation>Sensor nodes can be used to detect, if someone touches it.</xs:documentation>
