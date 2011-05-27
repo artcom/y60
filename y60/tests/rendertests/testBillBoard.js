@@ -46,10 +46,10 @@ try {
     ourShow.setScene(myScene);
     
     var myCubeBody = window.scene.world.getElementById(CUBE_BODY_ID);
+    myCubeBody.orientation = Quaternionf.createFromEuler([0.3,0.3,0.3]);
     
     var myImageNode = Modelling.createImage(window.scene, "tex/testbild02.png");
     var myMaterial = Modelling.createUnlitTexturedMaterial(window.scene, myImageNode);
-    //myMaterial.transparent = true;
     var myShape  = Modelling.createQuad(window.scene,
                                         myMaterial.id,
                                         [-1, -1, 0],
