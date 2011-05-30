@@ -259,4 +259,8 @@ StereoSceneViewer.prototype.Constructor = function (self, theArguments) {
     self.__defineGetter__("scene", function () {
         return self.getRenderWindow().scene;
     });
+    
+    self.__defineGetter__("cameraTransform", function () {
+        return _.cameraTransform;
+    });
 };
