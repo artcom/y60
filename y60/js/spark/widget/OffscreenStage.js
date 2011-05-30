@@ -1,5 +1,5 @@
-/*jslint*/
-/*globals spark*/
+/*jslint nomen:false*/
+/*globals spark Node Modelling OffscreenRenderer Vector3f Logger*/
 
 spark.OffscreenStage = spark.ComponentClass("OffscreenStage");
 spark.OffscreenStage.Constructor = function (Protected) {
@@ -8,27 +8,27 @@ spark.OffscreenStage.Constructor = function (Protected) {
     var _ = {};
     Public.Inherit(spark.Stage);
     
-    
     /////////////////////
     // PRIVATE MEMBERS //
     /////////////////////
+    
     _.width  = null;
     _.height = null;
     _.backgroundColor = null;
     _.position  = null;
     
-    
     ////////////////////
     // PUBLIC MEMBERS //
     ////////////////////
+    
     Public.offscreenRenderer = null;
     Public.world = null;
     Public.name = null;
     
-    
     /////////////////////
     // PRIVATE METHODS //
     /////////////////////
+    
     _.setupStageEnvironment = function () {
         // setup world
         Public.world = Node.createElement("world");
@@ -51,6 +51,7 @@ spark.OffscreenStage.Constructor = function (Protected) {
         myFlipMatrix.translate(new Vector3f(0, 1, 0));
         
         Public.offscreenRenderer.texture.wrapmode = "clamp_to_edge";
+        //Public.offscreenRenderer.texture.mipmap = 1;
         Public.offscreenRenderer.setBackgroundColor(_.backgroundColor);
     };
     
@@ -58,37 +59,33 @@ spark.OffscreenStage.Constructor = function (Protected) {
         Public.addEventListener(spark.StageEvent.FRAME, Public.onFrame);
     };
     
-    
     ////////////////////
     // PUBLIC METHODS //
     ////////////////////
+    
     Base.realize = Public.realize;
     Public.realize = function () {
         _.height = Protected.getNumber("height", 200);
         _.width  = Protected.getNumber("width", 200);
-        _.backgroundColor = Protected.getVector4f("backgroundColor", [1,1,1,0]);
-        _.position  = Protected.getVector3f("position", [0,0,0]);
+        _.backgroundColor = Protected.getVector4f("backgroundColor", [1, 1, 1, 0]);
+        _.position  = Protected.getVector3f("position", [0, 0, 0]);
         Public.name = Protected.getString("name", "offscreen-stage");
         
         _.setupStageEnvironment();
-        
         Base.realize(Public.world);
-        
         _.setupSparkEvents();
     };
     
     Public.onFrame = function (theEvent) {
         Public.offscreenRenderer.renderarea.renderToCanvas();
-        //Public.offscreenRenderer.render();
     };
-    
     
     // width property
     Public.__defineGetter__("width", function () {
         return _.width;
     });
     Public.__defineSetter__("width", function (theWidth) {
-        //XXX implement-me
+        Logger.warning("width setter for OffscreenStage not implemented!");
     });
     
     // height property
@@ -96,7 +93,7 @@ spark.OffscreenStage.Constructor = function (Protected) {
         return _.height;
     });
     Public.__defineSetter__("height", function (theHeight) {
-        //XXX implement-me
+        Logger.warning("height setter for OffscreenStage not implemented!");
     });
     
     // backgroundColor
