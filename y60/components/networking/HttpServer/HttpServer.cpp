@@ -103,36 +103,86 @@ namespace y60 {
         _myHttpServerThread->join();
     }
 
-    std::string HttpServer::invokeCallback( const JSCallback & theCallback, 
+    y60::Y60Response HttpServer::invokeCallback( const JSCallback & theCallback, 
                                             const y60::Y60Request & theRequest,
-                                            const std::string & theURI ) 
+                                            const std::string & thePath ) 
     {
-
         std::string myResponseString;
-
+        y60::Y60Response myResponse;
+        
         try {
-
             jsval argv[3], rval;
 
             argv[0] = jslib::as_jsval(theCallback.context, theRequest.method);
             argv[1] = jslib::as_jsval(theCallback.context, theRequest.body);
-            argv[2] = jslib::as_jsval(theCallback.context, theURI); 
+            argv[2] = jslib::as_jsval(theCallback.context, thePath); 
 
-			jslib::JSA_CallFunctionValue(theCallback.context, theCallback.object, theCallback.functionValue, 
+            jslib::JSA_CallFunctionValue(theCallback.context, theCallback.object, theCallback.functionValue, 
                                          3, argv, &rval);
 
+            // check if rval is array-like or string-like...
+            // sadly the convertFrom will also succeed on arrays and objects since the
+            // implement toString() -> use JS_IsArrayObject
+            
+            if (JSVAL_IS_VOID(rval)) {
+                // TODO return default no-content response (inkl. status)
+                //myResponse.headers.
+
+                return myResponse;
+            }
+            if (JSVAL_IS_OBJECT(rval)) {
+                JSObject * myJsObject;
+                if(JS_ValueToObject(theCallback.context, rval, &myJsObject)) {
+                    AC_PRINT << theCallback.context << " - " << myJsObject;
+                    if (JS_IsArrayObject(theCallback.context, myJsObject)) {
+                        AC_PRINT << "return value is of type Array (via JS_IsArrayObject)";
+                        //JS_GetElement(JSContext *cx, JSObject *obj, jsint index, jsval *vp);
+
+                        jsval curElement;
+                        
+                        // Body
+                        JS_GetElement(theCallback.context, myJsObject, 0, &curElement);
+                        if (!JSVAL_IS_VOID(curElement)) {
+                            jslib::convertFrom(theCallback.context, curElement, myResponse.payload);
+                        }
+                        
+                        // status
+                        
+                        JS_GetElement(theCallback.context, myJsObject, 1, &curElement);
+                        if (!JSVAL_IS_VOID(curElement)) {
+                            int myStatusCode;
+                            jslib::convertFrom(theCallback.context, curElement, myStatusCode);
+                            myResponse.return_code = static_cast<http::server::reply::status_type>(myStatusCode);
+                        } else {
+                            myResponse.return_code = http::server::reply::ok;
+                        }
+                        
+                        
+                        
+                        
+                        
+                        return myResponse;
+                    }
+                }
+            }
+            
             if (!jslib::convertFrom(theCallback.context, rval, myResponseString)) {
                 JS_ReportError(theCallback.context, 
                          "HttpServer::handleRequest: Callback does not return a string!");
             }
-
-
-		} catch (Exception e) {
-			AC_ERROR << e;
-		};
-		    
-        return myResponseString;
-
+            
+            myResponse.payload      = myResponseString;
+            myResponse.return_code  = http::server::reply::ok;
+            myResponse.content_type = theCallback.contentType;
+            return myResponse;
+            
+        } catch (Exception e) {
+            myResponse.return_code  = http::server::reply::internal_server_error;
+            myResponse.content_type = "text/plain";
+            myResponse.payload      = std::string("An internal error occured: ") + asl::compose_message(e);
+            AC_ERROR << e;
+            return myResponse;
+        };
     }
 
     bool HttpServer::requestsPending() {
@@ -142,42 +192,45 @@ namespace y60 {
     void HttpServer::handleRequest() {
 
         try {
-
             y60::Y60Request myRequest;
             bool hasRequest = _myRequestQueue->try_pop(myRequest);
-			if (!hasRequest) { 
-				return;
-			}
-
+            if (!hasRequest) { 
+                return;
+            }
+            
             std::string myResponseString;
             std::string myPath = myRequest.uri.substr(0, myRequest.uri.find_first_of("?"));  
             
             y60::Y60Response myResponse;
-        
+            
+            //invoke callback will not only return a string...
+            //if it returns an array - how do the headers look like?
+            //they are basically just key-value pairs (see HttpHeader.h) so in
+            //js they could just be objects?!
+            
             if (_myCallbacks.find(myPath) != _myCallbacks.end()) {
-                
                 JSCallback myCallback = _myCallbacks[myPath]; 
-                myResponseString = invokeCallback( myCallback, myRequest, myRequest.uri );
-                myResponse.payload      = myResponseString; 
-                myResponse.return_code  = http::server::reply::ok; 
-                myResponse.content_type = myCallback.contentType;
+                myResponse = invokeCallback( myCallback, myRequest, myRequest.uri );
+                //myResponseString = invokeCallback( myCallback, myRequest, myRequest.uri );
+                //myResponse.payload      = myResponseString; 
+                //myResponse.return_code  = http::server::reply::ok; 
+                //myResponse.content_type = myCallback.contentType;
             } else if (_myCallbacks.find("*") != _myCallbacks.end()) {
-                
                 JSCallback myCallback = _myCallbacks["*"]; 
-                myResponseString = invokeCallback( myCallback, myRequest, myRequest.uri );
-                myResponse.payload      = myResponseString; 
-                myResponse.return_code  = http::server::reply::ok; 
-                myResponse.content_type = "text/plain";
+                myResponse = invokeCallback( myCallback, myRequest, myRequest.uri );
+                //myResponseString = invokeCallback( myCallback, myRequest, myRequest.uri );
+                //myResponse.payload      = myResponseString; 
+                //myResponse.return_code  = http::server::reply::ok; 
+                //myResponse.content_type = "text/plain";
             } else {
-                
                 myResponse.return_code  = http::server::reply::not_found; 
                 AC_ERROR << "No callback registered for path: \"" << myPath << "\"!";
             }
 
             _myResponseQueue->push( myResponse );
 
-		} catch (Exception e) {
-			AC_ERROR << e;
-		};
+        } catch (Exception e) {
+            AC_ERROR << e;
+        };
     }
 }

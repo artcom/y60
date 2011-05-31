@@ -124,9 +124,9 @@ namespace y60 {
 
         private:
     
-            std::string invokeCallback(const JSCallback & theCallback, 
-                                       const y60::Y60Request & theRequest,
-                                       const std::string & theURI ); 
+            y60::Y60Response invokeCallback(const JSCallback & theCallback, 
+                                            const y60::Y60Request & theRequest,
+                                            const std::string & theURI ); 
 
             HttpServerPtr                     _myHttpServer;
             HttpServerThreadPtr               _myHttpServerThread;
