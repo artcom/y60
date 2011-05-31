@@ -59,7 +59,7 @@
 
 /*jslint white : false*/
 /*globals use plug UnitTest millisec Socket HttpServer ENSURE UnitTestSuite
-          print exit*/
+          print exit RequestManager Request*/
 
 use("UnitTest.js");
 
@@ -96,7 +96,14 @@ HttpServerUnitTest.prototype.Constructor = function (obj, theName) {
             },
             detailed_response_2 : function (theMethod, theBody, thePath) {
                     return ["I am Content", "201"];
+            },
+            detailed_response_3 : function (theMethod, theBody, thePath) {
+                    return [];
+            },
+            detailed_response_4 : function (theMethod, theBody, thePath) {
+                    return;
             }
+
         };
 
         obj.myServer = new HttpServer();
@@ -104,6 +111,8 @@ HttpServerUnitTest.prototype.Constructor = function (obj, theName) {
         obj.myServer.registerCallback("/test", myObj, myObj.test);
         obj.myServer.registerCallback("/foo", myObj, myObj.detailed_response);
         obj.myServer.registerCallback("/bar", myObj, myObj.detailed_response_2);
+        obj.myServer.registerCallback("/krokodil", myObj, myObj.detailed_response_3);
+        obj.myServer.registerCallback("/versicherung", myObj, myObj.detailed_response_4);
         obj.myServer.registerCallback("*", myObj, myObj.fallback);
 
         obj.myServer.start("0.0.0.0", "4042");
@@ -148,34 +157,34 @@ HttpServerUnitTest.prototype.Constructor = function (obj, theName) {
         obj.response = obj.response.substr(obj.response.search(/\r\n\r\n/) + 4);
         ENSURE("obj.response == obj.fallback_answer");
         
-        // detailed response
+        // detailed responses
+        
+        // path: bar
         var myRequestManager  = new RequestManager();
-        var myRequest2 = new Request("http://localhost:4042/bar");
-        myRequest2.onDone = function () {
+        myRequest = new Request("http://localhost:4042/bar");
+        myRequest.onDone = function () {
             obj.testResponse = this;
             ENSURE("obj.testResponse.responseCode == '201'");
             ENSURE("obj.testResponse.responseString == 'I am Content'");
             ENSURE("obj.testResponse.getResponseHeader('Content-Type') == 'text/plain'");
             ENSURE("obj.testResponse.getResponseHeader('Content-Length') == obj.testResponse.responseString.length");
-        }
-        myRequest2.onError = function () {
-            print(this.responseCode);
-        }
-        myRequest2.get();
+        };
+        myRequest.get();
 
-        myRequestManager.performRequest(myRequest2);
+        myRequestManager.performRequest(myRequest);
         while (myRequestManager.activeCount > 0) {
             myRequestManager.handleRequests();
             obj.myServer.handleRequests();
         }
 
-        var myRequest = new Request("http://localhost:4042/foo");
+        // path: foo
+        myRequest = new Request("http://localhost:4042/foo");
         myRequest.onError = function () {
             obj.testResponse = this;
             ENSURE("obj.testResponse.responseCode == '304'");
             ENSURE("obj.testResponse.getResponseHeader('Content-Type') == 'text/plain'");
             ENSURE("obj.testResponse.getResponseHeader('X-PRODUCED-BY') == 'Y60'");
-        }
+        };
         myRequest.get();
         
         myRequestManager.performRequest(myRequest);
@@ -184,8 +193,39 @@ HttpServerUnitTest.prototype.Constructor = function (obj, theName) {
             obj.myServer.handleRequests();
         }
 
+        // path: krokodil
+        myRequest = new Request("http://localhost:4042/krokodil");
+        myRequest.onDone = function () {
+            obj.testResponse = this;
+            ENSURE("obj.testResponse.responseString == ''");
+            ENSURE("obj.testResponse.responseCode == '200'");
+            ENSURE("obj.testResponse.getResponseHeader('Content-Type') == 'text/plain'");
+        };
+        myRequest.get();
+        
+        myRequestManager.performRequest(myRequest);
+        while (myRequestManager.activeCount > 0) {
+            myRequestManager.handleRequests();
+            obj.myServer.handleRequests();
+        }
+        
+        // path: versicherung
+        myRequest = new Request("http://localhost:4042/versicherung");
+        myRequest.onDone = function () {
+            obj.testResponse = this;
+            ENSURE("obj.testResponse.responseString == ''");
+            ENSURE("obj.testResponse.responseCode == '204'");
+            ENSURE("obj.testResponse.getResponseHeader('Content-Type') == 'text/plain'");
+        };
+        myRequest.get();
+        
+        myRequestManager.performRequest(myRequest);
+        while (myRequestManager.activeCount > 0) {
+            myRequestManager.handleRequests();
+            obj.myServer.handleRequests();
+        }
+        
         obj.myServer.close();
-
     };
 
 };
