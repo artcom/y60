@@ -78,18 +78,33 @@ namespace http {
             rep.status = reply::ok;
             rep.content.append(myResponse.payload.c_str(), myResponse.payload.length());
             rep.status = myResponse.return_code;
-            rep.headers.resize(2);
-            rep.headers[0].name = "Content-Length";
-            rep.headers[0].value = boost::lexical_cast<std::string>(rep.content.size());
-            rep.headers[1].name = "Content-Type";
-            if ( myResponse.content_type.length() > 0 ) {
-                rep.headers[1].value = myResponse.content_type;
-            } else {
-                rep.headers[1].value = mime_types::extension_to_type(extension);
+            rep.headers.clear();
+            
+            bool hasContentLengthFlag = false;
+            bool hasContentTypeFlag = false;
+            for (std::vector<header>::size_type i = 0; i < myResponse.headers.size(); ++i) {
+                const header &myHeader = myResponse.headers[i];
+                hasContentLengthFlag = hasContentLengthFlag || (myHeader.name == "Content-Length");
+                hasContentTypeFlag   = hasContentTypeFlag || (myHeader.name == "Content-Type");
+                rep.headers.push_back(myHeader);
+            }
+            
+            if (!hasContentLengthFlag) {
+                rep.headers.push_back(header("Content-Length",
+                                             boost::lexical_cast<std::string>(rep.content.size())));
+            }
+            
+            if (!hasContentTypeFlag) {
+                header myContentType("Content-Type", "text/html");
+                if ( myResponse.content_type.length() > 0 ) {
+                    myContentType.value = myResponse.content_type;
+                } else {
+                    myContentType.value = mime_types::extension_to_type(extension);
+                }
+                rep.headers.push_back(myContentType);
             }
         }
-  
-
+        
         bool request_handler::url_decode(const std::string& in, std::string& out)
         {
             out.clear();

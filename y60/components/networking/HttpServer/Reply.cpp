@@ -244,11 +244,11 @@ reply reply::stock_reply(reply::status_type status)
   reply rep;
   rep.status = status;
   rep.content = stock_replies::to_string(status);
-  rep.headers.resize(2);
-  rep.headers[0].name = "Content-Length";
-  rep.headers[0].value = boost::lexical_cast<std::string>(rep.content.size());
-  rep.headers[1].name = "Content-Type";
-  rep.headers[1].value = "text/html";
+  rep.headers.clear();
+  rep.headers.push_back(header("Content-Length",
+                               boost::lexical_cast<std::string>(rep.content.size())));
+  rep.headers.push_back(header("Content-Type",
+                               "text/html"));
   return rep;
 }
 

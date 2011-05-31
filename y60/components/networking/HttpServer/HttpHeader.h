@@ -18,9 +18,13 @@ namespace server {
 
 struct header
 {
+    header(const std::string &theName, const std::string &theValue):
+        name(theName), value(theValue) {}
   std::string name;
   std::string value;
 };
+
+
 
 } // namespace server
 } // namespace http

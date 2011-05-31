@@ -118,16 +118,15 @@ namespace y60 {
                                          3, argv, &rval);
             
             if (JSVAL_IS_VOID(rval)) {
-                // TODO return default no-content response (inkl. status)
+                myResponse.return_code = http::server::reply::no_content;
+                myResponse.payload = "";
+                myResponse.content_type = "text/plain";
                 return myResponse;
             }
             if (JSVAL_IS_OBJECT(rval)) {
                 JSObject * myJsObject;
                 if(JS_ValueToObject(theCallback.context, rval, &myJsObject)) {
-                    AC_PRINT << theCallback.context << " - " << myJsObject;
                     if (JS_IsArrayObject(theCallback.context, myJsObject)) {
-                        AC_PRINT << "return value is of type Array (via JS_IsArrayObject)";
-                        //JS_GetElement(JSContext *cx, JSObject *obj, jsint index, jsval *vp);
                         jsval curElement;
                         
                         // Body
@@ -146,20 +145,49 @@ namespace y60 {
                             myResponse.return_code = http::server::reply::ok;
                         }
                         
-                        
-                        
-                        
-                        
+                        // headers
+                        JS_GetElement(theCallback.context, myJsObject, 2, &curElement);
+                        if (JSVAL_IS_OBJECT(curElement)) {
+                            JSObject *headers = JSVAL_TO_OBJECT(curElement);
+                            JSIdArray *props = JS_Enumerate(theCallback.context, headers);
+                            for (int i = 0; props && i < props->length; ++i) {
+                                jsid propid = props->vector[i];
+                                jsval propname;
+                                if (!JS_IdToValue(theCallback.context, propid, &propname)) {
+                                    AC_WARNING << "Weird case";
+                                    continue;
+                                }
+                                
+                                std::string header_name;
+                                if (!jslib::convertFrom(theCallback.context, propname, header_name)) {
+                                    JS_ReportError(theCallback.context, 
+                                             "HttpServer::handleRequest: header_name is not a string!");
+                                }
+                                
+                                jsval propval;
+                                if (!JS_GetProperty(theCallback.context, headers, header_name.c_str(), &propval)) {
+                                    AC_WARNING << "Weird case";
+                                    continue;
+                                }
+                                
+                                std::string header_value;
+                                if (!jslib::convertFrom(theCallback.context, propval, header_value)) {
+                                    JS_ReportError(theCallback.context, 
+                                             "HttpServer::handleRequest: header_value is not a a string!");
+                                }
+                                myResponse.headers.push_back(http::server::header(header_name, header_value));
+                            }
+                        }
                         return myResponse;
                     }
                 }
             }
             
+            // default (backwards-compatible): treat jsval as string...
             if (!jslib::convertFrom(theCallback.context, rval, myResponseString)) {
                 JS_ReportError(theCallback.context, 
                          "HttpServer::handleRequest: Callback does not return a string!");
             }
-            
             myResponse.payload      = myResponseString;
             myResponse.return_code  = http::server::reply::ok;
             myResponse.content_type = theCallback.contentType;
@@ -190,11 +218,6 @@ namespace y60 {
             
             y60::Y60Response myResponse;
             
-            //invoke callback will not only return a string...
-            //if it returns an array - how do the headers look like?
-            //they are basically just key-value pairs (see HttpHeader.h) so in
-            //js they could just be objects?!
-            
             if (_myCallbacks.find(myPath) != _myCallbacks.end()) {
                 JSCallback myCallback = _myCallbacks[myPath]; 
                 myResponse = invokeCallback( myCallback, myRequest, myRequest.uri );
@@ -205,9 +228,7 @@ namespace y60 {
                 myResponse.return_code  = http::server::reply::not_found; 
                 AC_ERROR << "No callback registered for path: \"" << myPath << "\"!";
             }
-
             _myResponseQueue->push( myResponse );
-
         } catch (Exception e) {
             AC_ERROR << e;
         };

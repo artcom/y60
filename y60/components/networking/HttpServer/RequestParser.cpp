@@ -215,7 +215,7 @@ boost::tribool request_parser::consume(request& req, char input)
     }
     else
     {
-      req.headers.push_back(header());
+      req.headers.push_back(header("", ""));
       req.headers.back().name.push_back(input);
       state_ = header_name;
       return boost::indeterminate;
