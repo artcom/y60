@@ -81,7 +81,7 @@ namespace y60 {
         close();
     }
     
-    bool HttpServer::start( string theServerAddress, string theServerPort ) {      
+    bool HttpServer::start( string theServerAddress, string theServerPort ) {
 
         _myHttpServer = 
             HttpServerPtr(new http::server::server(  theServerAddress, 
@@ -93,7 +93,7 @@ namespace y60 {
         _myHttpServerThread = 
             HttpServerThreadPtr(new boost::thread( boost::bind( &http::server::server::run,
                                                                 &(*_myHttpServer) ) ) );
-                                                        
+
         return true; 
 
     }
