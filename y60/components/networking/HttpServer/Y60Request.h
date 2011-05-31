@@ -5,6 +5,7 @@
 #include <asl/dom/ThreadingModel.h>
 #include "Reply.h"
 #include "ConcurrentQueue.h"
+#include "HttpHeader.h"
 
 namespace y60 {
 
@@ -18,6 +19,7 @@ namespace y60 {
         std::string payload;
         std::string content_type;
         http::server::reply::status_type return_code;
+        std::vector<http::server::header> headers;
     };
 
     typedef ConcurrentQueue<Y60Request> Y60RequestQueue;
@@ -29,4 +31,3 @@ namespace y60 {
 }
 
 #endif
-
