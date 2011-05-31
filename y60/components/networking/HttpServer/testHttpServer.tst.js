@@ -82,23 +82,34 @@ HttpServerUnitTest.prototype.Constructor = function (obj, theName) {
         obj.fallback_answer = "fallback";
 
         var myObj = {
-            test : function(theMethod, theBody) {
+            test : function (theMethod, theBody) {
                 return obj.callback_answer;
             },
-            fallback : function(theMethod, theBody) {
+            fallback : function (theMethod, theBody) {
                 return obj.fallback_answer;
+            },
+            detailed_response : function (theMethod, theBody, thePath) {
+                return ["I have headers", "304", {
+                    "Content-Length" : "5",
+                    "X-PRODUCED-BY" : "Y60"
+                }];
+            },
+            detailed_response_2 : function (theMethod, theBody, thePath) {
+                    return ["I am Content", "201"];
             }
-        }
+        };
 
         obj.myServer = new HttpServer();
 
-        obj.myServer.registerCallback("/test",myObj, myObj.test);
-        obj.myServer.registerCallback("*",myObj, myObj.fallback);
+        obj.myServer.registerCallback("/test", myObj, myObj.test);
+        obj.myServer.registerCallback("/foo", myObj, myObj.detailed_response);
+        obj.myServer.registerCallback("/bar", myObj, myObj.detailed_response_2);
+        obj.myServer.registerCallback("*", myObj, myObj.fallback);
 
-        obj.myServer.start( "0.0.0.0", "4042" );
+        obj.myServer.start("0.0.0.0", "4042");
 
         obj.socket = new Socket(Socket.TCPCLIENT, "4041", "INADDR_ANY");
-        obj.socket.connect("localhost","4042");
+        obj.socket.connect("localhost", "4042");
 
         var myRequest = "GET /test HTTP/1.1\r\nHost: localhost:4042\r\n\r\n";
         obj.socket.write(myRequest);
@@ -129,15 +140,53 @@ HttpServerUnitTest.prototype.Constructor = function (obj, theName) {
         obj.myServer.handleRequests();
 
         time = millisec();
-        while (!(obj.socket.peek(1) > 0) && (millisec() - time < TIMEOUT)) 
-            ;;
+        // ARGS UGLY!
+        while (!(obj.socket.peek(1) > 0) && (millisec() - time < TIMEOUT)) {
+        }
 
         obj.response = obj.socket.read();
-        obj.response = obj.response.substr(obj.response.search(/\r\n\r\n/)+4);
+        obj.response = obj.response.substr(obj.response.search(/\r\n\r\n/) + 4);
         ENSURE("obj.response == obj.fallback_answer");
+        
+        // detailed response
+        var myRequestManager  = new RequestManager();
+        var myRequest2 = new Request("http://localhost:4042/bar");
+        myRequest2.onDone = function () {
+            obj.testResponse = this;
+            ENSURE("obj.testResponse.responseCode == '201'");
+            ENSURE("obj.testResponse.responseString == 'I am Content'");
+            ENSURE("obj.testResponse.getResponseHeader('Content-Type') == 'text/plain'");
+            ENSURE("obj.testResponse.getResponseHeader('Content-Length') == obj.testResponse.responseString.length");
+        }
+        myRequest2.onError = function () {
+            print(this.responseCode);
+        }
+        myRequest2.get();
+
+        myRequestManager.performRequest(myRequest2);
+        while (myRequestManager.activeCount > 0) {
+            myRequestManager.handleRequests();
+            obj.myServer.handleRequests();
+        }
+
+        var myRequest = new Request("http://localhost:4042/foo");
+        myRequest.onError = function () {
+            obj.testResponse = this;
+            ENSURE("obj.testResponse.responseCode == '304'");
+            ENSURE("obj.testResponse.getResponseHeader('Content-Type') == 'text/plain'");
+            ENSURE("obj.testResponse.getResponseHeader('X-PRODUCED-BY') == 'Y60'");
+        }
+        myRequest.get();
+        
+        myRequestManager.performRequest(myRequest);
+        while (myRequestManager.activeCount > 0) {
+            myRequestManager.handleRequests();
+            obj.myServer.handleRequests();
+        }
+
         obj.myServer.close();
 
-    }
+    };
 
 };
 
