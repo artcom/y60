@@ -57,22 +57,26 @@
 
 */
 
+/*jslint white : false*/
+/*globals use plug UnitTest millisec Socket HttpServer ENSURE UnitTestSuite
+          print exit*/
+
 use("UnitTest.js");
 
 plug("Network");
 plug("HttpServer");
 
-const TIMEOUT = 1000;
+var TIMEOUT = 1000;
 
 function HttpServerUnitTest() {
     this.Constructor(this, "HttpServerUnitTest");
-};
+}
 
-HttpServerUnitTest.prototype.Constructor = function(obj, theName) {
+HttpServerUnitTest.prototype.Constructor = function (obj, theName) {
 
     UnitTest.prototype.Constructor(obj, theName);
 
-    obj.run = function() {
+    obj.run = function () {
 
         obj.callback_answer = "callback";
         obj.fallback_answer = "fallback";
@@ -100,26 +104,27 @@ HttpServerUnitTest.prototype.Constructor = function(obj, theName) {
         obj.socket.write(myRequest);
 
         var time = millisec();
-        while (!obj.myServer.requestsPending() && (millisec() - time < TIMEOUT))
-            ;;
+        while (!obj.myServer.requestsPending() && (millisec() - time < TIMEOUT)) {
+        }
 
         obj.myServer.handleRequests();
 
         time = millisec();
-        while (!(obj.socket.peek(1) > 0) && (millisec() - time < TIMEOUT)) 
-            ;;
+        //UGLY
+        while (!(obj.socket.peek(1) > 0) && (millisec() - time < TIMEOUT)) {
+        }
 
         obj.response = obj.socket.read();
-        obj.response = obj.response.substr(obj.response.search(/\r\n\r\n/)+4);
+        obj.response = obj.response.substr(obj.response.search(/\r\n\r\n/) + 4);
         ENSURE("obj.response == obj.callback_answer");
 
         myRequest = "GET /somethingelse HTTP/1.1\r\nHost: localhost:4042\r\n\r\n";
-        obj.socket.connect("localhost","4042");
+        obj.socket.connect("localhost", "4042");
         obj.socket.write(myRequest);
 
         time = millisec();
-        while (!obj.myServer.requestsPending() && (millisec() - time < TIMEOUT))
-            ;;
+        while (!obj.myServer.requestsPending() && (millisec() - time < TIMEOUT)) {
+        }
 
         obj.myServer.handleRequests();
 
@@ -137,10 +142,10 @@ HttpServerUnitTest.prototype.Constructor = function(obj, theName) {
 };
 
 var myTestName = "testHttpServer.tst.js";
-var mySuite = new UnitTestSuite( myTestName );
+var mySuite = new UnitTestSuite(myTestName);
 
-mySuite.addTest( new HttpServerUnitTest() );
+mySuite.addTest(new HttpServerUnitTest());
 mySuite.run();
 
-print(">> Finished test suite '"+myTestName+"', return status = " + mySuite.returnStatus() + "");
+print(">> Finished test suite '" + myTestName + "', return status = " + mySuite.returnStatus() + "");
 exit(mySuite.returnStatus());
