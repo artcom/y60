@@ -93,9 +93,7 @@ namespace y60 {
         _myHttpServerThread = 
             HttpServerThreadPtr(new boost::thread( boost::bind( &http::server::server::run,
                                                                 &(*_myHttpServer) ) ) );
-
-        return true; 
-
+        return true;
     }
 
     void HttpServer::close() {
@@ -109,7 +107,6 @@ namespace y60 {
     {
         std::string myResponseString;
         y60::Y60Response myResponse;
-        
         try {
             jsval argv[3], rval;
 
@@ -119,15 +116,9 @@ namespace y60 {
 
             jslib::JSA_CallFunctionValue(theCallback.context, theCallback.object, theCallback.functionValue, 
                                          3, argv, &rval);
-
-            // check if rval is array-like or string-like...
-            // sadly the convertFrom will also succeed on arrays and objects since the
-            // implement toString() -> use JS_IsArrayObject
             
             if (JSVAL_IS_VOID(rval)) {
                 // TODO return default no-content response (inkl. status)
-                //myResponse.headers.
-
                 return myResponse;
             }
             if (JSVAL_IS_OBJECT(rval)) {
@@ -137,7 +128,6 @@ namespace y60 {
                     if (JS_IsArrayObject(theCallback.context, myJsObject)) {
                         AC_PRINT << "return value is of type Array (via JS_IsArrayObject)";
                         //JS_GetElement(JSContext *cx, JSObject *obj, jsint index, jsval *vp);
-
                         jsval curElement;
                         
                         // Body
@@ -147,7 +137,6 @@ namespace y60 {
                         }
                         
                         // status
-                        
                         JS_GetElement(theCallback.context, myJsObject, 1, &curElement);
                         if (!JSVAL_IS_VOID(curElement)) {
                             int myStatusCode;
@@ -175,7 +164,6 @@ namespace y60 {
             myResponse.return_code  = http::server::reply::ok;
             myResponse.content_type = theCallback.contentType;
             return myResponse;
-            
         } catch (Exception e) {
             myResponse.return_code  = http::server::reply::internal_server_error;
             myResponse.content_type = "text/plain";
@@ -190,7 +178,6 @@ namespace y60 {
     }
 
     void HttpServer::handleRequest() {
-
         try {
             y60::Y60Request myRequest;
             bool hasRequest = _myRequestQueue->try_pop(myRequest);
@@ -211,17 +198,9 @@ namespace y60 {
             if (_myCallbacks.find(myPath) != _myCallbacks.end()) {
                 JSCallback myCallback = _myCallbacks[myPath]; 
                 myResponse = invokeCallback( myCallback, myRequest, myRequest.uri );
-                //myResponseString = invokeCallback( myCallback, myRequest, myRequest.uri );
-                //myResponse.payload      = myResponseString; 
-                //myResponse.return_code  = http::server::reply::ok; 
-                //myResponse.content_type = myCallback.contentType;
             } else if (_myCallbacks.find("*") != _myCallbacks.end()) {
                 JSCallback myCallback = _myCallbacks["*"]; 
                 myResponse = invokeCallback( myCallback, myRequest, myRequest.uri );
-                //myResponseString = invokeCallback( myCallback, myRequest, myRequest.uri );
-                //myResponse.payload      = myResponseString; 
-                //myResponse.return_code  = http::server::reply::ok; 
-                //myResponse.content_type = "text/plain";
             } else {
                 myResponse.return_code  = http::server::reply::not_found; 
                 AC_ERROR << "No callback registered for path: \"" << myPath << "\"!";
