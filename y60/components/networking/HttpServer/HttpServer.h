@@ -77,15 +77,13 @@
 
 namespace y60 {
 
-
     struct JSCallback {
         JSContext*  context;
         JSObject*   object;
         JSFunction* function;
-		jsval functionValue;
+        jsval functionValue;
         std::string contentType;
     };
-
 
     typedef asl::Ptr<http::server::server, dom::ThreadingModel> HttpServerPtr;
     typedef asl::Ptr<boost::thread, dom::ThreadingModel> HttpServerThreadPtr;
@@ -103,21 +101,21 @@ namespace y60 {
 
             void registerCallback( const std::string & theUri, const JSCallback & myCallback )
             {
-				if (_myCallbacks.find(theUri) != _myCallbacks.end()) {
-					// the old callback can now be garbage collected
-					JS_RemoveRoot( _myCallbacks[theUri].context, &(_myCallbacks[theUri].functionValue));
-				}
+                if (_myCallbacks.find(theUri) != _myCallbacks.end()) {
+                    // the old callback can now be garbage collected
+                    JS_RemoveRoot( _myCallbacks[theUri].context, &(_myCallbacks[theUri].functionValue));
+                }
                 _myCallbacks[theUri] = myCallback;
-				// root callback value to prevent garbage collection of anonymous callback functions
-				JS_AddRoot( _myCallbacks[theUri].context, &(_myCallbacks[theUri].functionValue));
+                // root callback value to prevent garbage collection of anonymous callback functions
+                JS_AddRoot( _myCallbacks[theUri].context, &(_myCallbacks[theUri].functionValue));
             }
 
             void unregisterCallback( std::string theUri )
             {
-				if (_myCallbacks.find(theUri) != _myCallbacks.end()) {
-					JS_RemoveRoot( _myCallbacks[theUri].context, &(_myCallbacks[theUri].functionValue));
-					_myCallbacks.erase( theUri );
-				}
+                if (_myCallbacks.find(theUri) != _myCallbacks.end()) {
+                    JS_RemoveRoot( _myCallbacks[theUri].context, &(_myCallbacks[theUri].functionValue));
+                    _myCallbacks.erase( theUri );
+                }
             }
 
             void handleRequest();
@@ -126,9 +124,9 @@ namespace y60 {
 
         private:
     
-            std::string invokeCallback(const JSCallback & theCallback, 
-                                       const y60::Y60Request & theRequest,
-                                       const std::string & theURI ); 
+            y60::Y60Response invokeCallback(const JSCallback & theCallback, 
+                                            const y60::Y60Request & theRequest,
+                                            const std::string & theURI ); 
 
             HttpServerPtr                     _myHttpServer;
             HttpServerThreadPtr               _myHttpServerThread;

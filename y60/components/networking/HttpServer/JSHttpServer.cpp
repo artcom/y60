@@ -252,7 +252,7 @@ JSHttpServer::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *ob
 
 JSBool
 JSHttpServer::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Creates a OscSender. No connection is established.");
+    DOC_BEGIN("Creates a HttpServer.");
     DOC_END;
     if (JSA_GetClass(cx,obj) != Class()) {
         JS_ReportError(cx,"Constructor for %s bad object; did you forget a 'new'?", ClassName());

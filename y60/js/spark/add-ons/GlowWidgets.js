@@ -41,10 +41,9 @@ spark.GlowPlug.Constructor = function (Protected) {
 
         addMaterialProperty(_myMaterial, "float", "scale", myScale);
         addMaterialProperty(_myMaterial, "float", "glow_intensity", myGlowIntensity);
-
-        _myMaterial.enabled = true;
         if (_myAnythingGlowsOrBlursFlag) {
             if (myGlow > 0){
+                _myMaterial.enabled = true;
                 _myMaterial.properties.offset = Protected.getVector2f("offset", "[0,0]");
                 _myMaterial.properties.glow_radius = myGlow;
                 _myMaterial.properties.glow_color = Protected.getVector4f("glow_color", "[1,1,1,1]");
@@ -69,6 +68,12 @@ spark.GlowPlug.Constructor = function (Protected) {
 
     Public.glowAlpha setter = function (theAlpha) {
         _myMaterial.properties.glow_color[3] = theAlpha;
+    };
+    Public.glowIntensity setter = function (theIntensity) {
+        _myMaterial.properties.glow_intensity = theIntensity;
+    };
+    Public.glowIntensity getter = function () {
+        return _myMaterial.properties.glow_intensity;
     };
 
 };
@@ -139,7 +144,6 @@ spark.GlowMovie.Constructor = function (Protected) {
     var Public = this;
     
     Public.Inherit(spark.Movie);
-    Base.realizeMovie = Public.realize;
     Public.Inherit(spark.GlowPlug);
     
     /////////////////////
@@ -147,8 +151,7 @@ spark.GlowMovie.Constructor = function (Protected) {
     /////////////////////    
     Base.realize = Public.realize;
     Public.realize = function () {
-        Base.realizeMovie();
-        Base.realize(Protected.material);     
+        Base.realize();     
         Protected.material.properties.width = Public.width;
         Protected.material.properties.height = Public.height;        
     }
