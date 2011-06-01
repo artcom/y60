@@ -235,7 +235,7 @@ PerfMeter.prototype.Constructor = function (self, theSceneViewer) {
     };
 
     self.onFrame = function (theTime) {
-        if (!_myOverlay.visible) {
+        if (!_myOverlay || !_myOverlay.visible) {
             return;
         }
         var deltaT = theTime - _lastTime;
@@ -282,7 +282,7 @@ PerfMeter.prototype.Constructor = function (self, theSceneViewer) {
     };
 
     self.onPostRender = function () {
-        if (!_myOverlay.visible) {
+        if (!_myOverlay || !_myOverlay.visible) {
             return;
         }
         var i, myTiming, myPosition;
