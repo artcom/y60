@@ -164,7 +164,7 @@ SceneViewer.prototype.Constructor = function (self, theArguments) {
             myText.push("Lights:     " + myStatistics.activeLights + "/" + myStatistics.lights);
             myText.push("Overlays:   " + myStatistics.overlays);
             myText.push("Materials:  " + myStatistics.materials);
-            myText.push("gc:  " + myStatistics.gc);
+            myText.push("gc:  " + myStatistics.gc.toFixed(3));
         }
 
         var myViewport = self.getViewportAtWindowCoordinates(0, 0); // get viewport containing upper left pixel
