@@ -93,10 +93,10 @@ spark.ResizableRectangle.Constructor = function (Protected) {
         // set the material to allow proper layering of transparencies
         // after rendering, the framebuffer will have the proper alpha
         _myMaterial.properties.blendfunction = "[src_alpha,one_minus_src_alpha,one,one_minus_src_alpha]";
-        var myTextureUnits = _myMaterial.find("./textureunits/textureunit");
+        var myTextureUnit = _myMaterial.find("./textureunits/textureunit");
         if (!_myShape) {
-            if (myTextureUnits) {
-                var raster = myTextureUnits.$texture.$image.raster;
+            if (myTextureUnit) {
+                var raster = myTextureUnit.$texture.$image.raster;
                 Public.width = raster.width;
                 Public.height = raster.height;
             }
@@ -120,7 +120,7 @@ spark.ResizableRectangle.Constructor = function (Protected) {
             _myShape.name = Public.name + "-shape";
         }
                 
-        if (myTextureUnits) {
+        if (myTextureUnit) {
             _myUVCoords = _myShape.find(".//*[@name='uvset']").firstChild.nodeValue;
         }
 
