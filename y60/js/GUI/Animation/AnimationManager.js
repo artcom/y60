@@ -79,6 +79,10 @@ GUI.AnimationManager.prototype.Constructor = function(Public, Protected) {
     ////////////////////////////////////////
     // Public
     ////////////////////////////////////////
+    
+    Public.__defineGetter__("animationCount", function() {
+        return _animations.length;
+    });
 
     Public.play = function(a) {
         _animations.push(a);
@@ -88,7 +92,7 @@ GUI.AnimationManager.prototype.Constructor = function(Public, Protected) {
     Public.isPlaying = function() {
         return _animations.length > 0;
     };
-
+    
     Public.doFrame = function(theTime) {
         ourCurrentAnimationTime = theTime * 1000;
         for(var i = 0; i < _animations.length; i++) {
