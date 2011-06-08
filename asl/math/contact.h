@@ -97,7 +97,7 @@ namespace asl {
         Number a = myEdgeSquared * -dot(theMotionVector, theMotionVector) + dotEdgeAxisVector*dotEdgeAxisVector;
         Number dotEdgeOriginToPoint = dot(myEdgeVector, myOriginToPoint);
 
-        if (almostEqual(a,Number(0))) { // segment and MotionVector are parallel
+        if (almostEqual(a,Number(0),1e-15)) { // segment and MotionVector are parallel
             if (distance(theSphere.center, Line<Number>(theEdge.origin, theEdge.end)) > theSphere.radius) {
                 return 0;
             }
