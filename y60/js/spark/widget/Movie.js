@@ -43,10 +43,6 @@ spark.Movie.Constructor = function(Protected) {
         Public.height = myHeight;
     }
 
-    Protected.handleI18nLanguage = function(e) {
-        Public.src = e.src;
-    }
-
     function attachToI18nItem(theItemId) {
         if(_mySourceItem) {
             _mySourceItem.removeEventListener(spark.I18nEvent.LANGUAGE,
@@ -79,6 +75,15 @@ spark.Movie.Constructor = function(Protected) {
         Public.height = Protected.getNumber("height", Public.height);
         _myCacheSize = Protected.getNumber("cachesize", _myCacheSize);
     }
+    
+    
+    ///////////////////////
+    // Protected Methods //
+    ///////////////////////
+
+    Protected.handleI18nLanguage = function(e) {
+        Public.src = e.src;
+    };
 
     ////////////////////
     // Public Methods //

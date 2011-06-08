@@ -147,7 +147,7 @@ namespace jslib {
             return JS_FALSE;
         }
         if (argc > 1) {
-            if (JSVAL_IS_VOID(argv[1]) || !convertFrom(cx, argv[1], myPosition)) {
+            if (JSVAL_IS_VOID(argv[1]) || !convertFrom(cx, argv[1], myRelativeFlag)) {
                 JS_ReportError(cx, "JSSvgPath::line: argument #1 must be a boolean");
                 return JS_FALSE;
             }

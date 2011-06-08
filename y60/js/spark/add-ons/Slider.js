@@ -20,6 +20,7 @@ spark.Slider.Constructor = function (Protected) {
     var _verticalLock       = null;
     var _centered           = null;
     var _sticky             = null;
+    var _precision          = 10;
                             
     var _myEventTarget      = null;
                             
@@ -51,12 +52,22 @@ spark.Slider.Constructor = function (Protected) {
         theEvent.dampenedPos = myDampenedPos;
     }
 
+    function ensurePresicion() {
+        if (_mySliderBackground.height !== _myActiveCursor.height) {
+            var myRelativeY = (_myActiveCursor.y / (_mySliderBackground.height - _myActiveCursor.height));
+            _myActiveCursor.y = myRelativeY.toFixed(_precision) * (_mySliderBackground.height - _myActiveCursor.height);
+        }
+        if (_mySliderBackground.width !== _myActiveCursor.width) {
+            var myRelativeX = (_myActiveCursor.x / (_mySliderBackground.width - _myActiveCursor.width));
+            _myActiveCursor.x = myRelativeX.toFixed(_precision) * (_mySliderBackground.width - _myActiveCursor.width);
+        }
+    }
+    
     function getRelativeY() {
         if (_mySliderBackground.height === _myActiveCursor.height) {
             return 0;
         } else {
-            return (_myActiveCursor.y) /
-                   (_mySliderBackground.height - _myActiveCursor.height);
+            return (_myActiveCursor.y / (_mySliderBackground.height - _myActiveCursor.height)).toFixed(_precision);
         }
     }
 
@@ -64,8 +75,7 @@ spark.Slider.Constructor = function (Protected) {
         if (_mySliderBackground.width === _myActiveCursor.width) {
             return 0;
         } else {
-            return (_myActiveCursor.x) /
-                   (_mySliderBackground.width - _myActiveCursor.width);
+            return (_myActiveCursor.x / (_mySliderBackground.width - _myActiveCursor.width)).toFixed(_precision);
         }
     }
 
@@ -97,6 +107,14 @@ spark.Slider.Constructor = function (Protected) {
     
     Public.__defineGetter__("sticky", function () {
         return _sticky;
+    });
+    
+    Public.__defineSetter__("precision", function (thePrecision) {
+        _precision = thePrecision;
+    });
+    
+    Public.__defineGetter__("precision", function () {
+        return _precision;
     });
     
     Public.__defineGetter__("activeCursor", function () {
@@ -142,6 +160,8 @@ spark.Slider.Constructor = function (Protected) {
         _horizontalLock = Protected.getBoolean("horizontal-lock", false);
         _centered       = Protected.getBoolean("centered", true);
         _sticky         = Protected.getBoolean("sticky", true);
+        _precision      = Protected.getNumber("precision", _precision);
+        
         Public.addEventListener(spark.CursorEvent.APPEAR_ENTER, Public.onSlideStart, true);
         Public.addEventListener(spark.CursorEvent.MOVE, Public.onSlide, true);
         Public.addEventListener(spark.CursorEvent.VANISH_LEAVE, Public.onSlideStop, true);
@@ -231,8 +251,8 @@ spark.Slider.Constructor = function (Protected) {
                         _myActiveCursor.y = myNewY;
                     }
                 }
-
             }
+            ensurePresicion();
             if (_myEventTarget) {
                 var mySliderMove = new spark.SliderEvent(spark.SliderEvent.MOVE,
                                                          Public.name,
