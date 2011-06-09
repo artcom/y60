@@ -123,7 +123,6 @@ StereoSceneViewer.prototype.Constructor = function (self, theArguments) {
         
         var horizontalAngleDiv2 = radFromDeg(_.monoCamera.frustum.hfov / 2); //radFromDeg(_.cameraAperture/2);
         var verticalAngleDiv2   = radFromDeg(_.monoCamera.frustum.vfov / 2);
-        var ratio               = self.width / self.height;
         var eyeSeparation       = _.focalLength / _.focalLengthEyeSeparationFactor;
         
         var i, widthDiv2, heightDiv2;
@@ -140,14 +139,14 @@ StereoSceneViewer.prototype.Constructor = function (self, theArguments) {
             _.stereoCameras[i].frustum.bottom = - heightDiv2;
             
             if (_.stereoCameras[i].id === _.viewports.stereo.left.camera) {
-                _.stereoCameras[i].frustum.left   = -ratio * widthDiv2 + 0.5 * eyeSeparation * _.NEARPLANE_FOCALLENGTH_FACTOR * _.projection_flag;
-                _.stereoCameras[i].frustum.right  =  ratio * widthDiv2 + 0.5 * eyeSeparation * _.NEARPLANE_FOCALLENGTH_FACTOR * _.projection_flag;
+                _.stereoCameras[i].frustum.left   = - widthDiv2 + 0.5 * eyeSeparation * _.NEARPLANE_FOCALLENGTH_FACTOR * _.projection_flag;
+                _.stereoCameras[i].frustum.right  =   widthDiv2 + 0.5 * eyeSeparation * _.NEARPLANE_FOCALLENGTH_FACTOR * _.projection_flag;
                 // adjust camera position to eyeSeparation
                 _.stereoCameras[i].position.x     =  _.monoCamera.position.x - eyeSeparation / 2 * _.projection_flag;
             } 
             else if (_.stereoCameras[i].id === _.viewports.stereo.right.camera) {
-                _.stereoCameras[i].frustum.left  = -ratio * widthDiv2 - 0.5 * eyeSeparation * _.NEARPLANE_FOCALLENGTH_FACTOR * _.projection_flag;
-                _.stereoCameras[i].frustum.right =  ratio * widthDiv2 - 0.5 * eyeSeparation * _.NEARPLANE_FOCALLENGTH_FACTOR * _.projection_flag;
+                _.stereoCameras[i].frustum.left  = - widthDiv2 - 0.5 * eyeSeparation * _.NEARPLANE_FOCALLENGTH_FACTOR * _.projection_flag;
+                _.stereoCameras[i].frustum.right =   widthDiv2 - 0.5 * eyeSeparation * _.NEARPLANE_FOCALLENGTH_FACTOR * _.projection_flag;
                 // adjust camera position to eyeSeparation
                 _.stereoCameras[i].position.x    =  _.monoCamera.position.x + eyeSeparation / 2 * _.projection_flag;
             }
