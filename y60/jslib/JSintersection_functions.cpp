@@ -212,6 +212,7 @@ jsval as_jsval(JSContext *cx,
     if (!JS_DefineProperty(cx, myReturnObject, "normal", as_jsval(cx, theContact.contactNormal), 0,0, JSPROP_ENUMERATE)) return JSVAL_VOID;
     if (!JS_DefineProperty(cx, myReturnObject, "sphereCenter", as_jsval(cx, theContact.contactSphereCenter), 0,0, JSPROP_ENUMERATE)) return JSVAL_VOID;
     if (!JS_DefineProperty(cx, myReturnObject, "sphereNormal", as_jsval(cx, theContact.contactSphereNormal), 0,0, JSPROP_ENUMERATE)) return JSVAL_VOID;
+    if (!JS_DefineProperty(cx, myReturnObject, "contactType", as_jsval(cx, theContact.contactType), 0,0, JSPROP_ENUMERATE)) return JSVAL_VOID;
 
    return rval;
 }
