@@ -2,6 +2,8 @@
 /*globals use SceneViewer Logger Vector3f Quaternionf Node Frustum
           radFromDeg Vector2f magnitude*/
 
+// based on http://paulbourke.net/miscellaneous/stereographics/stereorender/
+
 use("SceneViewer.js");
 
 function StereoSceneViewer(theArguments) {
