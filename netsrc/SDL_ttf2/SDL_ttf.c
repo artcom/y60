@@ -144,8 +144,8 @@ static int TTF_current_line_minx = 0;
 
 /* Font tracking [ART+COM Patch] */
 static float TTF_tracking = 0.0f;
-static int*  TTF_glyph_xpositions = 0;
-static int  TTF_glyph_xpositions_count = 0;
+static int* TTF_glyph_xpositions = 0;
+static int TTF_glyph_xpositions_count = 0;
 
 /* Gets the top row of the underline. The outline
    is taken into account.
@@ -1924,7 +1924,7 @@ SDL_Surface *TTF_RenderUNICODE_Blended(TTF_Font *font,
 	FT_Long use_kerning;
 	FT_UInt prev_index = 0;
     int myXPPem = 1;
-    int myCharNum=0;
+    int myCharNum = 0;
     int realGlyphsXPosition = 0;
 	/* Get the dimensions of the text surface */
 	if ( (TTF_SizeUNICODE(font, text, &width, &height) < 0) || !width ) {
@@ -1955,7 +1955,7 @@ SDL_Surface *TTF_RenderUNICODE_Blended(TTF_Font *font,
     // malloc space for glyph position [ART+COM Patch] start
 	for ( ch=text; *ch; ++ch ) { myCharNum++; }
     free(TTF_glyph_xpositions);
-    TTF_glyph_xpositions = (float*) malloc(2*myCharNum*sizeof(float));
+    TTF_glyph_xpositions = (int*) malloc(2*myCharNum*sizeof(int));
     TTF_glyph_xpositions_count = 0;
     
     // [ART+COM Patch] end
