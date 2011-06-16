@@ -58,10 +58,11 @@
 
 #include "StatusServer.h"
 #include <asl/base/string_functions.h>
-#include <asl/base/Revision.h>
+#include <asl/base/buildinfo.h>
 
 using namespace asl;
 using namespace std;
+using asl::build_information;
 
 namespace inet {
 
@@ -114,6 +115,11 @@ StatusServer::processData() {
     if (this->receiveData(myInputBuffer)) {
         std::string s(&myInputBuffer[0], myInputBuffer.size());
         std::string myURL = getUrl(s);
+        std::stringstream myHistoryId;
+		build_information::const_iterator it = build_information::get().find("y60");
+        if (it != build_information::get().end()) {
+            myHistoryId << it->second.history_id();
+        }
         if (myURL == "status") {
             asl::Time t;
             asl::Signed64 myElapsed = t.millis() - StatusServer::readTick();
@@ -122,7 +128,8 @@ StatusServer::processData() {
             } else {
                 sendResponseHeader(200);
             }
-            std::string myText =  string("Y60 rev: ")+asl::ourRevision;
+
+            std::string myText =  string("Y60 rev: ") + myHistoryId.str();
             std::string myStatusText = readStatusText();
             if (!myStatusText.empty()) {
                 myText += ", "+myStatusText;
@@ -131,7 +138,7 @@ StatusServer::processData() {
             sendResponseBody(myText);
         } else if (myURL == "revision") {
             sendResponseHeader(200);
-            sendResponseBody(asl::ourRevision);
+            sendResponseBody(myHistoryId.str());
         } else {
             sendResponseHeader(404);
             sendResponseBody("not found");
