@@ -36,7 +36,9 @@ spark.Rectangle.Constructor = function (Protected) {
             _myColor = _myColor || Protected.getVector4f("color", [1, 1, 1, 1]);
             if (_myColor.length < 4) {
                 _myColor = new Vector4f(_myColor.x, _myColor.y, _myColor.z, Public.alpha);
-            } 
+            } else {
+                Public.alpha = _myColor[3];
+            }
             myMaterial = Modelling.createColorMaterial(window.scene, _myColor);
             myMaterial.transparent = true;
         }
