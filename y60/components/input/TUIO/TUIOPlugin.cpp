@@ -136,7 +136,6 @@ public:
                 ObjectEventList::iterator it;
                 for(it = _myUndeliveredObjects.begin(); it != _myUndeliveredObjects.end(); ++it) {
                     ObjectEvent & myEvent = *it;
-                    int myObjectId = myEvent.second->getSessionID();
                     myEvents.push_back(convertObjectEvent(myEvent.first, myEvent.second));
                     delete myEvent.second;
                     myEvent.second = 0;
