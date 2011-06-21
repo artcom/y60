@@ -72,6 +72,10 @@ spark.AtlasImage.Constructor = function (Protected) {
         Public.setTexture(theTextureName, _myAtlasPath);
     });
 
+    Public.__defineGetter__("src", function () {
+        return _mySubTextureName;
+    });
+
     Base.realize = Public.realize;
     Public.realize = function () {
         _myAtlasPath      = Protected.getString("atlas", _myAtlasPath);
