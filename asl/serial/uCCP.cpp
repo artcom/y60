@@ -61,6 +61,7 @@ namespace asl {
         _myEndToken(0xfeU),
         _myPayloadSize(std::numeric_limits<unsigned>::max()),
         _myErrorChecking(CRC8_CHECKING),
+        _myUseLengthByteFlag(true),
         _myDroppedBytes(0),
         _myCRCErrors(0),
         _myCorruptPackets(0),
@@ -122,7 +123,7 @@ namespace asl {
         Frame myFrame;
 
         // (1) Size field
-        if (_myPayloadSize == std::numeric_limits<unsigned>::max()) {
+        if (_myPayloadSize == std::numeric_limits<unsigned>::max() && _myUseLengthByteFlag) {
             myFrame.push_back((unsigned char)(thePacket.size()));
         }
 
@@ -238,8 +239,12 @@ namespace asl {
     uCCP::parseSize(Frame & theData) {
         unsigned myPayloadSize = _myPayloadSize;
         if (myPayloadSize == std::numeric_limits<unsigned>::max()) {
-            myPayloadSize = theData.front();
-            _myCurrentFrame.pop_front();
+            if (_myUseLengthByteFlag) {
+                myPayloadSize = theData.front();
+                _myCurrentFrame.pop_front();
+            } else {
+                return true;
+            }
         }
 
         if (theData.size() != myPayloadSize) {
@@ -368,7 +373,7 @@ namespace asl {
         // Table header
         myTable.addColumn("start",   "Start Token", Table::JUSTIFIED_MIDDLE);
 
-        if (_myPayloadSize == std::numeric_limits<unsigned>::max()) {
+        if (_myPayloadSize == std::numeric_limits<unsigned>::max() && _myUseLengthByteFlag) {
             myTable.addColumn("length",  "Length", Table::JUSTIFIED_MIDDLE);
         }
 
@@ -385,7 +390,7 @@ namespace asl {
         // Size row
         myTable.addRow();
         myTable.setField("start", " 1 Byte ");
-        if (_myPayloadSize == std::numeric_limits<unsigned>::max()) {
+        if (_myPayloadSize == std::numeric_limits<unsigned>::max() && _myUseLengthByteFlag) {
             myTable.setField("length", " 1 Byte ");
         }
         if (_myPayloadSize == std::numeric_limits<unsigned>::max()) {
@@ -404,7 +409,7 @@ namespace asl {
         myTable.addRow();
         myTable.addRow();
         myTable.setField("start", asl::as_string((unsigned)_myStartToken));
-        if (_myPayloadSize == std::numeric_limits<unsigned>::max()) {
+        if (_myPayloadSize == std::numeric_limits<unsigned>::max() && _myUseLengthByteFlag) {
             myTable.setField("length", "$XX");
         }
         if (_myPayloadSize == std::numeric_limits<unsigned>::max()) {
