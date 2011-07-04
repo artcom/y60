@@ -341,3 +341,30 @@ spark.I18nMovie.Constructor = function (Protected) {
         // return Public.getLanguageData(Public.language) || "";
     });
 };
+
+spark.I18nAudio = spark.ComponentClass("I18nAudio");
+
+spark.I18nAudio.Constructor = function (Protected) {
+    var Public = this;
+    var Base = {};
+
+    Public.Inherit(spark.I18nItem);
+    
+    Base.createEvent = Protected.createEvent;
+    Protected.createEvent = function (theLanguage) {
+        var myEvent = Base.createEvent(theLanguage);
+        myEvent.src = Public.src;
+        return myEvent;
+    };
+
+    Public.__defineGetter__("src", function () {
+        var myData = Public.getLanguageData(Public.language);
+        if (myData === null) {
+            return "";
+        } else {
+            return myData;
+        }
+        // see if this can be replaced by
+        // return Public.getLanguageData(Public.language) || "";
+    });
+};

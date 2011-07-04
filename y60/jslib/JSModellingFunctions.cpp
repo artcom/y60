@@ -105,7 +105,11 @@ EnsureShapesQuadCount(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, j
         }
 
         std::vector<asl::Vector3f> myPositions;
-        convertFrom(cx, argv[1], myPositions);
+        if (!convertFrom(cx, argv[1], myPositions)) {
+            JS_ReportError(cx,"EnsureShapesElementsCount: argument 2 is not a vectorofvector3f");
+            return JS_FALSE;
+        }
+        
 
         std::vector<asl::Vector2f> myTexCoords;
         if (argc > 2) {
@@ -117,8 +121,6 @@ EnsureShapesQuadCount(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, j
             convertFrom(cx, argv[3], myColor);
         }
 
-        int myElementCount;
-        convertFrom(cx, argv[1], myElementCount );
         ensureShapesQuadCount(myShapeNode, myPositions, myTexCoords, myColor);
         return JS_TRUE;
 

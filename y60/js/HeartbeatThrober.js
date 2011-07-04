@@ -92,7 +92,11 @@ function HeartbeatThrober(theEnableFlag, theFrequency, theFilename) {
                     '<heartbeat secondsSince1970="' + mySecondsSince1970 + '" >\n' +
                     '</heartbeat>';
                 var myHeartbeatDoc = new Node(myHeartbeatString);
-                myHeartbeatDoc.saveFile(_myFilename);
+                try {
+                    myHeartbeatDoc.saveFile(_myFilename);
+                } catch (ex) {
+                    Logger.error("caught exception during saveFile: " + ex);
+                }
                 _myLastThrobTime = theTime;
             }
         }

@@ -115,10 +115,24 @@ StatusServer::processData() {
     if (this->receiveData(myInputBuffer)) {
         std::string s(&myInputBuffer[0], myInputBuffer.size());
         std::string myURL = getUrl(s);
+        std::stringstream myName;
         std::stringstream myHistoryId;
+        std::stringstream myRepositoryId;
+        std::stringstream myScmName;
+        std::stringstream myBuildDate;
+        std::stringstream myBuildTime;
+        std::stringstream myCompiler;
+        std::stringstream myCompilerVersion;
 		build_information::const_iterator it = build_information::get().find("y60");
         if (it != build_information::get().end()) {
+            myName << it->second.name();
             myHistoryId << it->second.history_id();
+            myRepositoryId << it->second.repository_id();
+            myScmName << it->second.scm_name();
+            myBuildDate << it->second.build_date();
+            myBuildTime << it->second.build_time();
+            myCompiler << it->second.compiler();
+            myCompilerVersion << it->second.compiler_version();
         }
         if (myURL == "status") {
             asl::Time t;
@@ -129,10 +143,13 @@ StatusServer::processData() {
                 sendResponseHeader(200);
             }
 
-            std::string myText =  string("Y60 rev: ") + myHistoryId.str();
+            std::string myText = myName.str() + string(" rev: ") + myHistoryId.str().substr(0,6) + string(" ")
+                                 + myScmName.str() + string(" repo: ") + myRepositoryId.str()
+                                 + string(" builddate: ") + myBuildDate.str() + string(" ") + myBuildTime.str()
+                                 + string(" ") + myCompiler.str() + string(":") + myCompilerVersion.str();
             std::string myStatusText = readStatusText();
-            if (!myStatusText.empty()) {
-                myText += ", "+myStatusText;
+            if (myText == "" && !myStatusText.empty()) {
+                myText = myStatusText;
             }
             myText += ", perf: "+asl::as_string(myElapsed);
             sendResponseBody(myText);

@@ -85,7 +85,9 @@ GUI.AnimationManager.prototype.Constructor = function(Public, Protected) {
     });
 
     Public.play = function(a) {
-        _animations.push(a);
+        if (js.array.indexOf(_animations, a) < 0) {
+            _animations.push(a);
+        }
         a.play();
     };
 
