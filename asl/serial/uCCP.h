@@ -86,8 +86,9 @@ namespace asl {
                 _myEndToken   = theEndToken;
             }
 
-            void setVariablePayloadSize() {
+            void setVariablePayloadSize(bool theUseLengthByteFlag = true) {
                 _myPayloadSize = std::numeric_limits<unsigned>::max();
+                _myUseLengthByteFlag = theUseLengthByteFlag;
             }
 
             void setFixedPayloadSize(unsigned theSize);
@@ -127,6 +128,7 @@ namespace asl {
             unsigned char _myEndToken;
             unsigned      _myPayloadSize;
             ErrorChecking _myErrorChecking;
+            bool          _myUseLengthByteFlag;
 
             // statistic
             unsigned _myDroppedBytes;

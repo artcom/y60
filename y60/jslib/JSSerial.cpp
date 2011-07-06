@@ -203,12 +203,14 @@ setPacketFormat(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
     DOC_PARAM("theEndByte", "End byte", DOC_TYPE_INTEGER);
     DOC_PARAM("theSize", "Payload size (may be zero for variable sized payloads.)", DOC_TYPE_INTEGER);
     DOC_PARAM("theErrorChecking", "Error checking type", DOC_TYPE_ENUMERATION);
+    DOC_PARAM_OPT("theUseLengthByteFlag", "Use the payloads first byte as length field on variable packet size", DOC_TYPE_BOOLEAN, true);
     DOC_END;
     try {
         unsigned char myStartByte;
         unsigned char myEndByte;
         unsigned      mySize;
         unsigned      myErrorChecking;
+        bool          myUseLengthByteFlag = true;
 
         for (unsigned i = 0; i < argc; ++i) {
             if (JSVAL_IS_VOID(argv[i])) {
@@ -217,8 +219,8 @@ setPacketFormat(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
             }
         }
 
-        if (argc != 4) {
-            JS_ReportError(cx, "JSSerial::setPacketFormat(): expected 4 arguments, got %d. "
+        if (argc < 4) {
+            JS_ReportError(cx, "JSSerial::setPacketFormat(): expected at least 4 arguments, got %d. "
                                "Usage: (StartByte, EndByte, Size, Errorchecking)", argc);
             return JS_FALSE;
         }
@@ -242,7 +244,13 @@ setPacketFormat(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
         }
 
         if (mySize == 0) {
-            myUCCP.setVariablePayloadSize();
+            if (argc == 5) {
+                if (!convertFrom(cx, argv[4], myUseLengthByteFlag)) {
+                    JS_ReportError(cx, "JSSerial::setPacketFormat(): argument #5 must be a boolean (use length byte flag)");
+                    return JS_FALSE;
+                }
+            }
+            myUCCP.setVariablePayloadSize(myUseLengthByteFlag);
         } else {
             myUCCP.setFixedPayloadSize(mySize);
         }
