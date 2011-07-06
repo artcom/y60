@@ -65,12 +65,13 @@ function VideoRecorder(theFramesPerSecond, theDirectory, theRenderWindow) {
     //////////////////////////////////////////////////////////////////////
     // Public
     //////////////////////////////////////////////////////////////////////
+    
 
-    Public.enabled getter = function() {
+    Public.__defineGetter__("enabled", function() {
         return _myEnabledFlag;
-    }
+    });
 
-    Public.enabled setter = function(theFlag) {
+    Public.__defineSetter__("enabled" , function(theFlag) {
         if (theFlag != _myEnabledFlag) {
             if (theFlag) {
                 setup();
@@ -83,7 +84,7 @@ function VideoRecorder(theFramesPerSecond, theDirectory, theRenderWindow) {
             }
             _myEnabledFlag = theFlag;
         }
-    }
+    });
 
     Public.onFrame = function(theRenderArea) {
         if (_myEnabledFlag) {
@@ -97,7 +98,7 @@ function VideoRecorder(theFramesPerSecond, theDirectory, theRenderWindow) {
             }
             print(myFileName);
         }
-    }
+    };
 
     //////////////////////////////////////////////////////////////////////
     // Private
@@ -124,3 +125,4 @@ function VideoRecorder(theFramesPerSecond, theDirectory, theRenderWindow) {
     var _myFixedFrameTime  = window.fixedFrameTime;
     var _myDirectory       = null;
 }
+

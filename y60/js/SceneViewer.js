@@ -318,6 +318,12 @@ SceneViewer.prototype.Constructor = function (self, theArguments) {
         return _myCurrentTime;
     });
 
+    self.initializeVideoRecorder = function(theFrameRate) {
+        if (!_myVideoRecorder) {
+            _myVideoRecorder = new VideoRecorder(theFrameRate?theFrameRate:30);
+        }
+    };
+
     self.getAnimationManager = function () {
         return _myAnimationManager;
     };
@@ -351,7 +357,7 @@ SceneViewer.prototype.Constructor = function (self, theArguments) {
 
     self.toggleVideoRecording = function () {
         if (!_myVideoRecorder) {
-            _myVideoRecorder = new VideoRecorder(25);
+            _myVideoRecorder = new VideoRecorder(30);
         }
         _myVideoRecorder.enabled = !_myVideoRecorder.enabled;
     };
@@ -541,7 +547,7 @@ SceneViewer.prototype.Constructor = function (self, theArguments) {
             case "PRINT SCREEN":
             case "SYS REQ":
                 if (!_myVideoRecorder) {
-                    _myVideoRecorder = new VideoRecorder(25);
+                    _myVideoRecorder = new VideoRecorder(30);
                 }
                 _myVideoRecorder.enabled = !_myVideoRecorder.enabled;
                 break;
