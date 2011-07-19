@@ -289,7 +289,8 @@ SDLWindow::updateVideoMode() {
     asl::Vector2i myScreenSize = getScreenSize();
 
     asl::SystemInfo mySystemInfo;
-    if (mySystemInfo.GetWindowsVersion() == asl::Windows7 && 
+    if (!getenv("DISABLE_WINDOWS_7_FULLSCREEN_WORKAROUND") && 
+        mySystemInfo.GetWindowsVersion() == asl::Windows7 && 
         myScreenSize[0] == _myWidth && myScreenSize[1] == _myHeight &&
         _myWindowPosX == 0 && _myWindowPosY == 0) {
         AC_WARNING << "Adapting window width to " << _myWidth + _myWindowWidthCorrection << " to prevent windows 7 to go in some strange fullscreen mode";
