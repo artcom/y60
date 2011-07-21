@@ -8,6 +8,7 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
+/*jslint forin: true*/
 //howto use
 //hold ctrl, click target, move with mouse or arrows or shift-arrows
 //+ moves target to parent
@@ -52,6 +53,11 @@ spark.Layouter.Constructor = function(Protected) {
             _bindings[spark.Layouter.BINDING_SLOT[slot]] = {};
         }
     }());
+
+    var IDLE = 0;
+    var ACTIVE = 1;
+    var LISTENING = 2;
+
     var _myState       = IDLE;
     var _myNewFrameFlag = true;
     var _myOldPos      = null;
@@ -73,9 +79,6 @@ spark.Layouter.Constructor = function(Protected) {
     var _myBackup = {originalZ:null, originalWidth:null, originalHeight:null, originalRotationZ:null};
     var DEBUG_COLOR = new Vector4f(1,0,0,1);
     
-    var IDLE = 0;
-    var ACTIVE = 1;
-    var LISTENING = 2;
     
     function _unbind(theHandle) {
         delete _bindings[theHandle.bind_info.slot][theHandle.bind_info.id];
@@ -105,9 +108,9 @@ spark.Layouter.Constructor = function(Protected) {
         _myStage = findStage();
         _myStage.focusKeyboard(_myStage);
         
-        for (i in _myStage.arguments) {
+        for (var i in _myStage["arguments"]) {
             if (i.search(/layoutimage/i) !== -1) {
-                _myLayoutImage = _myStage.arguments[i];
+                _myLayoutImage = _myStage["arguments"][i];
                 Logger.warning("found layoutimage: " + _myLayoutImage);
                 //XXX: TODO change to overlay
                 var myNode = new Node("<Image name='layoutimage' z='50' src='" + _myLayoutImage + "' visible='false' alpha='0.4' sensible='false'/>");
@@ -132,10 +135,10 @@ spark.Layouter.Constructor = function(Protected) {
                     _myZManipulation = true;
                 } else if (Public.active && theKey === "d") {
                     _myRotationZManipulation = true;
-                } else if ((theKey === "left"
-                        || theKey === "right"
-                        || theKey === "up"
-                        || theKey === "down") && Public.active) {
+                } else if ((theKey === "left" || 
+                            theKey === "right" || 
+                            theKey === "up" || 
+                            theKey === "down") && Public.active) {
                     correctPositionAndSize(theKey);
                 } else if (((theKey === "+")||(theKey === "]")) && Public.active && _myWidget && _myWidget.parent) { 
                     Public.target = _myWidget.parent;
@@ -150,7 +153,7 @@ spark.Layouter.Constructor = function(Protected) {
                     _myVisualMode = (_myVisualMode + 1) % 3;
                 } else if (Public.listening && theKey === "o" && _myLayoutImage) {
                     _myLayoutImage.visible = !_myLayoutImage.visible;
-                    print("layoutimage ", _myLayoutImage.visible)
+                    print("layoutimage "+ _myLayoutImage.visible);
                 } else {
                     myKeyEaten = false;
                 }
@@ -174,7 +177,7 @@ spark.Layouter.Constructor = function(Protected) {
             if (!myKeyEaten) {
                 Base.onKey(theKey, theKeyState, theX, theY, theShiftFlag, theControlFlag, theAltFlag);
             }
-        }
+        };
         _myStage.addEventListener(spark.StageEvent.POST_RENDER, onPostRender);
         _myStage.addEventListener(spark.StageEvent.FRAME, function () {
             _myNewFrameFlag = true;
@@ -201,7 +204,7 @@ spark.Layouter.Constructor = function(Protected) {
     }
     // poor man's Public.stage getter
     function findStage() {
-        for (object in spark.ourComponentsByNameMap) {
+        for (var object in spark.ourComponentsByNameMap) {
             if("Stage" in spark.ourComponentsByNameMap[object]._classes_) {
                 return spark.ourComponentsByNameMap[object];
             }    
@@ -221,7 +224,7 @@ spark.Layouter.Constructor = function(Protected) {
     });
 
     Public.__defineSetter__("target", function (theWidget) {
-        print("target widget", theWidget)
+        print("target widget "+ theWidget);
         _myWidget = theWidget;
         for (var handleId in _bindings[spark.Layouter.BINDING_SLOT.CATCH]) {
             var myHandle = _bindings[spark.Layouter.BINDING_SLOT.CATCH][handleId];
@@ -235,8 +238,9 @@ spark.Layouter.Constructor = function(Protected) {
         _myBackup.originalWidth = ("width" in _myWidget) ? _myWidget.width : null;
         _myBackup.originalHeight = ("height" in _myWidget) ? _myWidget.height : null;
         _myState = ACTIVE;
+        var myFile = "";
         if (!(_myWidget.name in _mySparkFiles)) {
-            var myFile = findSparkFile(_myWidget);
+            myFile = findSparkFile(_myWidget);
             _mySparkFiles[_myWidget.name] = myFile;
         }
         if (myFile) {
@@ -299,7 +303,7 @@ spark.Layouter.Constructor = function(Protected) {
     }
     
     function activate () {
-        print("activate")
+        print("activate");
         _myState = LISTENING;
         _myStage.addEventListenerInFront(spark.CursorEvent.APPEAR, onMouseDown , true);
         _myStage.addEventListenerInFront(spark.CursorEvent.MOVE, onMouseMove, true);
@@ -308,7 +312,7 @@ spark.Layouter.Constructor = function(Protected) {
     }
     
     function deactivate() {
-        print("deactivate")
+        print("deactivate");
         _myStage.removeEventListener(spark.CursorEvent.APPEAR, onMouseDown, true);
         _myStage.removeEventListener(spark.CursorEvent.MOVE, onMouseMove, true);
         _myStage.removeEventListener(spark.MouseEvent.BUTTON_DOWN, onMouseDown , true);
@@ -520,6 +524,5 @@ spark.Layouter.Constructor = function(Protected) {
         }
         return null;
     }
-
-}
+};
 

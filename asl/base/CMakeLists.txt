@@ -148,8 +148,8 @@ if(LINUX)
 endif(LINUX)
 
 if(WIN32)
-    list(APPEND SOURCES Win32Backtrace.cpp)
-    list(APPEND HEADERS Win32Backtrace.h)
+    list(APPEND SOURCES Win32Backtrace.cpp SystemInfo.cpp)
+    list(APPEND HEADERS Win32Backtrace.h SystemInfo.h)
     list(APPEND EXTERNS PTHREADVC PSAPI)
 endif(WIN32)
 

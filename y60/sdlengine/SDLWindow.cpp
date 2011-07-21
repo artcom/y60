@@ -103,6 +103,10 @@ static const int ourMagicDecorationHeight = 0;
 #include <y60/glrender/ShaderLibrary.h>
 #include <y60/jsbase/ArgumentHolder.impl>
 
+#ifdef _WIN32
+#include <asl/base/SystemInfo.h>
+#endif
+
 #include <asl/xpath/xpath_api.h>
 
 using namespace std;
@@ -147,9 +151,11 @@ SDLWindow::SDLWindow() :
     _myHasVideoSync(false),
     _myScreen(0),
     _mySwapInterval(0),
-    _myLastSwapCounter(0)
+    _myLastSwapCounter(0),
+    _myWindowWidthCorrection(0)
 {
     setGLContext(GLContextPtr(new GLContext()));
+
 }
 
 SDLWindow::~SDLWindow() {
@@ -181,7 +187,7 @@ SDLWindow::deactivateGLContext() {
 
 int
 SDLWindow::getWidth() const {
-    return _myScreen ? _myScreen->w : 0;
+    return _myScreen ? _myScreen->w - _myWindowWidthCorrection: 0;
 }
 
 int
@@ -272,6 +278,26 @@ SDLWindow::updateVideoMode() {
 		}
 	}
 
+#ifdef _WIN32
+    // windows 7 does some strange things running a window in fullscreen mode,
+    // that means opening a window with no decorations in desktop resolution on
+    // ONE monitor. This causes in a black-screen when remote access via any vnc
+    // client. 
+    // Workaround/Solution->open a window slightly wider than desktop size not
+    // disturbing opengl canvas/viewport, but to prevent windows 7 to behave
+    // that way. (vs/2011)
+    asl::Vector2i myScreenSize = getScreenSize();
+
+    asl::SystemInfo mySystemInfo;
+    if (!getenv("DISABLE_WINDOWS_7_FULLSCREEN_WORKAROUND") && 
+        mySystemInfo.GetWindowsVersion() == asl::Windows7 && 
+        myScreenSize[0] == _myWidth && myScreenSize[1] == _myHeight &&
+        _myWindowPosX == 0 && _myWindowPosY == 0) {
+        _myWindowWidthCorrection = 1;
+        AC_WARNING << "Adapting window width to " << _myWidth + _myWindowWidthCorrection << " to prevent windows 7 to go in some strange fullscreen mode";
+    }
+#endif
+
 #ifdef AC_USE_X11
 	SDL_SysWMinfo wminfo;
 	SDL_VERSION(&wminfo.version);
@@ -286,7 +312,7 @@ SDLWindow::updateVideoMode() {
         // unbind all created textures before creating a new context
         _myScene->getTextureManager()->unbindTextures();
     }
-    if ((_myScreen = SDL_SetVideoMode(_myWidth, _myHeight, 32, myFlags)) == NULL) {
+    if ((_myScreen = SDL_SetVideoMode(_myWidth + _myWindowWidthCorrection, _myHeight, 32, myFlags)) == NULL) {
         throw SDLWindowException(string("Couldn't set SDL-GL mode: ") + SDL_GetError(), PLUS_FILE_LINE);
     }
 
