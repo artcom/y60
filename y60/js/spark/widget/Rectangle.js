@@ -33,7 +33,11 @@ spark.Rectangle.Constructor = function (Protected) {
             }
         } else {
             _myColor = Protected.getVector3f("color", null);
-            _myColor = _myColor || Protected.getVector4f("color", [1, 1, 1, 1]);
+            _myColor = _myColor || Protected.getVector4f("color", null);
+            if (_myColor === null) {
+                Logger.warning("Color attribute '" + Protected.getString("color", "") + "' missing or invalid (defaulting to [1,1,1,1]). Spark node:\n" + Public.node);
+                _myColor = [1,1,1,1];
+            }
             if (_myColor.length < 4) {
                 _myColor = new Vector4f(_myColor.x, _myColor.y, _myColor.z, Public.alpha);
             } else {
