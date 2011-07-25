@@ -217,6 +217,7 @@ namespace y60 {
 #ifdef BAD_TX
             TextureInternalFormatTag::Plug::dependsOn<TextureImageTag>(*this);
 #endif
+            TextureInternalFormatTag::Plug::dependsOn<TextureImageIdTag>(*this);
             TextureInternalFormatTag::Plug::dependsOn(getImageFacade().getRasterValue());
             TextureInternalFormatTag::Plug::dependsOn<ImageSourceTag>(getImageFacade());
             TextureInternalFormatTag::Plug::dependsOn<TextureColorBiasTag>(*this);
