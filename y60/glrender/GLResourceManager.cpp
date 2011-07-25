@@ -305,7 +305,7 @@ namespace y60 {
         AC_DEBUG << "MipMap settings match: " << myMipMapMatch;
         AC_DEBUG << "Width match: " << mySizeMatch;
         AC_DEBUG << "Image size: " << myWidth << "x" << myHeight;
-        AC_DEBUG << "UploadedTexure size: " << myUploadedWidth << "x" << myUploadedHeight;
+        AC_DEBUG << "Uploaded Texture size: " << myUploadedWidth << "x" << myUploadedHeight;
         AC_DEBUG << "Internal format match: " << myInternalFormatMatch;
         AC_DEBUG << "Uploaded InternalFormat: " << getGLEnumString(myUploadedInternalFormat);
         AC_DEBUG << "Image InternalFormat: " << getGLEnumString(myInternalFormat);
