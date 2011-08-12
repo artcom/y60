@@ -186,7 +186,7 @@ namespace y60 {
             avRegistered = true;
         }
 
-        if (av_open_input_file(&_myFormatContext, theFilename.c_str(), 0, FFM_PACKET_SIZE, 0)
+        if (av_open_input_file(&_myFormatContext, theFilename.c_str(), NULL, 0, NULL)
                 < 0) {
             throw FFMpegDecoder2Exception(std::string("Unable to open input file: ")
                     + theFilename, PLUS_FILE_LINE);
