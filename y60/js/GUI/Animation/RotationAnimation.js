@@ -78,21 +78,21 @@ GUI.RotationAnimation.prototype.Constructor = function(Public, Protected, theDur
     var _start = 0;
     var _rotation = 0;
 
-    Public.object getter = function() {
+    Public.__defineGetter__("object", function() {
         return _object;
-    }
+    });
 
-    Public.property getter = function() {
+    Public.__defineGetter__("property", function() {
         return _property;
-    }
+    });
 
-    Public.start getter = function() {
+    Public.__defineGetter__("start", function() {
         return _start;
-    }
+    });
 
-    Public.rotation getter = function() {
+    Public.__defineGetter__("rotation", function() {
         return _rotation;
-    }
+    });
 
     ////////////////////////////////////////
     // Public

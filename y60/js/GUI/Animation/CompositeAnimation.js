@@ -76,9 +76,9 @@ GUI.CompositeAnimation.Constructor = function(Public, Protected) {
     // Public
     ////////////////////////////////////////
 
-    Public.children getter = function() {
+    Public.__defineGetter__("children", function() {
         return _children;
-    };
+    });
 
     // add a child, also updating duration
     Public.add = function(theAnimation) {

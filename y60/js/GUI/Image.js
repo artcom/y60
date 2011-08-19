@@ -81,9 +81,9 @@ Image.prototype.Constructor = function(Public, theParent, theImageNode, theDepth
     var _myAlpha    = 1.0;
     var _myMaxAlpha = 1.0;
 
-    Public.bodies getter = function() {
+    Public.__defineGetter__("bodies", function() {
         return [_myQuad.body];
-    }
+    });
 
     Public.clone = function() {
         var myNode = clone(_myNode);
@@ -91,100 +91,100 @@ Image.prototype.Constructor = function(Public, theParent, theImageNode, theDepth
         return new Image(_myParent, myNode, _myDepth);
     }
 
-    Public.name getter = function() {
+    Public.__defineGetter__("name", function() {
         return _myName;
-    }
+    });
 
-    Public.body getter = function() {
+    Public.__defineGetter__("body", function() {
         return _myQuad.body;
-    }
+    });
 
-    Public.insensible setter = function(theInsensible) {
+    Public.__defineSetter__("insensible", function(theInsensible) {
         _myQuad.body.insensible = theInsensible;
-    }
+    });
 
-    Public.material getter = function() {
+    Public.__defineGetter__("material", function() {
         return _myMaterial;
-    }
+    });
 
-    Public.alpha getter = function() {
+    Public.__defineGetter__("alpha", function() {
         return _myAlpha;
-    }
+    });
 
-    Public.alpha setter = function(theAlpha) {
+    Public.__defineSetter__("alpha", function(theAlpha) {
         _myAlpha = theAlpha;
         Modelling.setAlpha(_myQuad.body, Math.min(_myMaxAlpha, _myAlpha));
-    }
+    });
 
-    Public.maxalpha setter = function(theAlpha) {
+    Public.__defineSetter__("maxalpha", function(theAlpha) {
         _myMaxAlpha = theAlpha;
         Public.alpha = _myAlpha;
-    }
+    });
 
-    Public.visible getter = function() {
+    Public.__defineGetter__("visible", function() {
         return Public.body.visible;
-    }
+    });
 
-    Public.visible setter = function(theVisibility) {
+    Public.__defineSetter__("visible", function(theVisibility) {
         Public.body.visible = theVisibility;
-    }
+    });
 
-    Public.texture getter = function() {
+    Public.__defineGetter__("texture", function() {
         var myTextureUnit = _myMaterial.childNode("textureunits").firstChild;
         return window.scene.dom.getElementById(myTextureUnit.texture);
-    }
+    });
 
-    Public.image setter = function(theImage) {
+    Public.__defineSetter__("image", function(theImage) {
         Public.texture.image = theImage.id;
-    }
+    });
 
-    Public.image getter = function() {
+    Public.__defineGetter__("image", function() {
         return window.scene.dom.getElementById(Public.texture.image);
-    }
+    });
 
-    Public.wrapmode getter = function() {
+    Public.__defineGetter__("wrapmode", function() {
         return Public.texture.wrapmode;
-    }
+    });
 
-    Public.wrapmode setter = function(theWrapmode) {
+    Public.__defineSetter__("wrapmode", function(theWrapmode) {
         Public.texture.wrapmode = theWrapmode;
-    }
+    });
 
-    Public.width getter = function() {
+    Public.__defineGetter__("width", function() {
         return _myWidth;
-    }
+    });
 
-    Public.width setter = function(theWidth) {
+    Public.__defineSetter__("width", function(theWidth) {
         _myWidth = theWidth;
-    }
+    });
 
-    Public.height getter = function() {
+    Public.__defineGetter__("height", function() {
         return _myHeight;
-    }
+    });
 
-    Public.height setter = function(theHeight) {
+    Public.__defineSetter__("height", function(theHeight) {
         _myHeight = theHeight;
-    }
+    });
 
-    Public.z getter = function() {
+    Public.__defineGetter__("z", function() {
         return Public.body.position.z;
-    }
+    });
 
-    Public.z setter = function(v) {
+    Public.__defineSetter__("z", function(v) {
         Public.body.position.z = v;
-    }
+    });
 
-    Public.playmode getter = function() {
+    Public.__defineGetter__("playmode", function() {
         if ("playmode" in Public.image) {
             return Public.image.playmode;
         }
         return "";
-    }
-    Public.playmode setter = function(theMode) {
+    });
+    Public.__defineSetter__("playmode", function(theMode) {
         if ("playmode" in Public.image) {
             Public.image.playmode = theMode;
         }
-    }
+    });
 
     ////////////////////////////////////////
     // setup

@@ -106,43 +106,43 @@ TextWidget.prototype.Constructor = function(Public, Protected, theParent, theTex
     // Public
     ////////////////////////////////////////
 
-    Public.visible setter = function(theVisible) {
+    Public.__defineSetter__("visible", function(theVisible) {
         _myQuad.body.visible = theVisible;
-    }
+    });
 
-    Public.insensible setter = function(theInsensible) {
+    Public.__defineSetter__("insensible", function(theInsensible) {
         _myQuad.body.insensible = theInsensible;
-    }
+    });
 
-    Public.body getter = function() {
+    Public.__defineGetter__("body", function() {
         return _myQuad.body;
-    }
+    });
 
-    Public.bodies getter = function() {
+    Public.__defineGetter__("bodies", function() {
         return [_myQuad.body];
-    }
+    });
 
-    Public.text setter = function(theText) {
+    Public.__defineSetter__("text", function(theText) {
         _myText = theText;
         Protected.redraw();
-    }
+    });
 
-    Public.text getter = function() {
+    Public.__defineGetter__("text", function() {
         return _myText;
-    }
+    });
 
-    Public.background setter = function(theImage) {
+    Public.__defineSetter__("background", function(theImage) {
         _myBackground = theImage;
         Protected.redraw();
-    }
+    });
 
-    Public.background getter = function() {
+    Public.__defineGetter__("background", function() {
         return _myBackground;
-    }
+    });
 
-    Public.name getter = function() {
+    Public.__defineGetter__("name", function() {
         return _myName;
-    }
+    });
 
     ////////////////////////////////////////
     // Protected

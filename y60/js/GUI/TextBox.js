@@ -115,13 +115,13 @@ TextBox.prototype.Constructor = function(Public, Protected, theParent, theTextBo
         }
     }
 
-    Public.onTextChange getter = function() {
+    Public.__defineGetter__("onTextChange", function() {
         return _myOnTextChange;
-    }
+    });
 
-    Public.onTextChange setter = function(theHandler) {
+    Public.__defineSetter__("onTextChange", function(theHandler) {
         _myOnTextChange = theHandler;
-    }
+    });
 
     ////////////////////////////////////////
     // Protected

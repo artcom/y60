@@ -78,21 +78,21 @@ GUI.QuaternionAnimation.prototype.Constructor = function(Public, Protected, theD
     var _start = 0;
     var _end = Quaternionf.createFromEuler(new Vector3f(0,0,0));
 
-    Public.object getter = function() {
+    Public.__defineGetter__("object", function() {
         return _object;
-    }
+    });
 
-    Public.property getter = function() {
+    Public.__defineGetter__("property", function() {
         return _property;
-    }
+    });
 
-    Public.start getter = function() {
+    Public.__defineGetter__("start", function() {
         return _start;
-    }
+    });
 
-    Public.end getter = function() {
+    Public.__defineGetter__("end", function() {
         return _end;
-    }
+    });
 
     ////////////////////////////////////////
     // Public

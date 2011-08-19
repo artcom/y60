@@ -95,11 +95,11 @@ GUI.Animation.Constructor = function(Public, Protected) {
     ////////////////////////////////////////
 
     // getter / setter
-    Public.id getter = function() {
+    Public.__defineGetter__("id", function() {
         return _id;
-    };
+    });
 
-    Public.path getter = function() {
+    Public.__defineGetter__("path", function() {
         var r = "" + _id;
         var p = _parent;
         while(p) {
@@ -107,84 +107,84 @@ GUI.Animation.Constructor = function(Public, Protected) {
             p = p.parent;
         }
         return r;
-    };
+    });
 
-    Public.name getter = function() {
+    Public.__defineGetter__("name", function() {
         return _name;
-    };
+    });
 
-    Public.name setter = function(v) {
+    Public.__defineSetter__("name", function(v) {
         _name = v;
-    };
+    });
 
-    Public.progress getter = function() {
+    Public.__defineGetter__("progress", function() {
         return _progress;
-    };
+    });
 
-    Public.progress setter = function(p) {
+    Public.__defineSetter__("progress", function(p) {
         _progress = p;
-    };
+    });
 
-    Public.easing getter = function() {
+    Public.__defineGetter__("easing", function() {
         return _easing;
-    };
+    });
 
-    Public.easing setter = function(theEasing) {
+    Public.__defineSetter__("easing", function(theEasing) {
         _easing = theEasing;
-    };
+    });
 
-    Public.duration getter = function() {
+    Public.__defineGetter__("duration", function() {
         return _duration;
-    };
+    });
 
-    Protected.duration setter = function(d) {
+    Protected.__defineSetter__("duration", function(d) {
         _duration = d;
         Protected.durationChanged();
-    };
+    });
 
-    Public.loop getter = function() {
+    Public.__defineGetter__("loop", function() {
         return _loop;
-    };
+    });
 
-    Public.loop setter = function(l) {
+    Public.__defineSetter__("loop", function(l) {
         _loop = l;
-    };
+    });
 
-    Public.running getter = function()  {
+    Public.__defineGetter__("running", function()  {
         return _running;
-    };
+    });
 
-    Public.parent getter = function() {
+    Public.__defineGetter__("parent", function() {
         return _parent;
-    };
+    });
 
-    Public.parent setter = function(a) {
+    Public.__defineSetter__("parent", function(a) {
         _parent = a;
-    };
+    });
 
-    Public.onPlay getter = function() {
+    Public.__defineGetter__("onPlay", function() {
         return _onPlay;
-    };
+    });
 
-    Public.onPlay setter = function(f) {
+    Public.__defineSetter__("onPlay", function(f) {
         _onPlay = f;
-    };
+    });
 
-    Public.onCancel getter = function() {
+    Public.__defineGetter__("onCancel", function() {
         return _onCancel;
-    };
+    });
 
-    Public.onCancel setter = function(f) {
+    Public.__defineSetter__("onCancel", function(f) {
         _onCancel = f;
-    };
+    });
 
-    Public.onFinish getter = function() {
+    Public.__defineGetter__("onFinish", function() {
         return _onFinish;
-    };
+    });
 
-    Public.onFinish setter = function(f) {
+    Public.__defineSetter__("onFinish", function(f) {
         _onFinish = f;
-    };
+    });
 
     ////////////////////////////////////////
     // Public

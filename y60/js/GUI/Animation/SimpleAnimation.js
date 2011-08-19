@@ -71,8 +71,8 @@ GUI.SimpleAnimation.Constructor = function(Public, Protected) {
     ////////////////////////////////////////
 
     // simple animations allow setting of their duration
-    Public.duration setter = function(d) {
+    Public.__defineSetter__("duration", function(d) {
         Protected.duration = d;
-    };
+    });
 
 };

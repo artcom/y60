@@ -102,7 +102,7 @@ LayerManager.prototype.Constructor = function(Public) {
         }
     }
 
-    Public.layers getter  = function() {
+    Public.__defineGetter__("layers", function() {
         return _myLayers;
-    }
+    });
 }
