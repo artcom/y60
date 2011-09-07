@@ -84,40 +84,40 @@ ImageButton.prototype.Constructor = function(Public, theParent, theImageButtonNo
 
     Image.prototype.Constructor(Public, theParent, theImageButtonNode, theDepth);
 
-    Public.enabled getter = function() {
+    Public.__defineGetter__("enabled", function() {
         return _myEnabled;
-    }
+    });
 
-    Public.enabled setter = function(theValue) {
+    Public.__defineSetter__("enabled", function(theValue) {
         _myEnabled = theValue;
         Public.insensible = !theValue;
         Public.visible = theValue;
-    }
+    });
 
-    Public.buttonname getter = function() {
+    Public.__defineGetter__("buttonname", function() {
         return _myButtonName;
-    }
+    });
 
-    Public.highlight getter = function() {
+    Public.__defineGetter__("highlight", function() {
         return _myHighlight;
-    }
+    });
 
-    Public.highlight setter = function(theHighlight) {
+    Public.__defineSetter__("highlight", function(theHighlight) {
         _myHighlight = theHighlight;
         if(theHighlight && _myImageHighlighted) {
             Public.image = _myImageHighlighted;
         } else {
             Public.image = _myImageNormal;
         }
-    }
+    });
 
-    Public.imageNormal getter = function() {
+    Public.__defineGetter__("imageNormal", function() {
         return _myImageNormal;
-    }
+    });
 
-    Public.imageHighlighted getter = function() {
+    Public.__defineGetter__("imageHighlighted", function() {
         return _myImageHighlighted;
-    }
+    });
 
     ////////////////////////////////////////
     // setup

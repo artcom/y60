@@ -78,19 +78,19 @@ GUI.PropertyAnimation.prototype.Constructor = function(Public, Protected, theDur
     var _min = 0;
     var _max = 0;
 
-    Public.object getter = function() {
+    Public.__defineGetter__("object", function() {
         return _object;
-    }
+    });
 
-    Public.property getter = function() {
+    Public.__defineGetter__("property", function() {
         return _property;
-    }
+    });
 
-    Public.min getter = function() { return _min; }
-    Public.min setter = function(v) { _min = v; }
+    Public.__defineGetter__("min", function() { return _min; });
+    Public.__defineSetter__("min", function(v) { _min = v; });
 
-    Public.max getter = function() { return _max; }
-    Public.max setter = function(v) { _max = v; }
+    Public.__defineGetter__("max", function() { return _max; });
+    Public.__defineSetter__("max", function(v) { _max = v; });
 
     ////////////////////////////////////////
     // Public

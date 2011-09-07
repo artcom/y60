@@ -82,11 +82,11 @@ TextButton.prototype.Constructor = function(Public, Protected, theParent, theTex
 
     TextWidget.prototype.Constructor(Public, Protected, theParent, theTextButtonNode, theDepth);
 
-    Public.enabled getter = function() {
+    Public.__defineGetter__("enabled", function() {
         return _myEnabled;
-    }
+    });
 
-    Public.enabled setter = function(theValue) {
+    Public.__defineSetter__("enabled", function(theValue) {
         _myEnabled = theValue;
         Public.insensible = !theValue;
         if(theValue) {
@@ -94,20 +94,20 @@ TextButton.prototype.Constructor = function(Public, Protected, theParent, theTex
         } else {
             Modelling.setAlpha(Public.body, BUTTON_DISABLED_ALPHA);
         }
-    }
+    });
 
-    Public.highlight getter = function() {
+    Public.__defineGetter__("highlight", function() {
         return _myHighlight;
-    }
+    });
 
-    Public.highlight setter = function(theHighlight) {
+    Public.__defineSetter__("highlight", function(theHighlight) {
         _myHighlight = theHighlight;
         if(theHighlight && _myBackgroundHighlighted) {
             Public.background = _myBackgroundHighlighted;
         } else {
             Public.background = _myBackgroundNormal;
         }
-    }
+    });
 
 
     ////////////////////////////////////////

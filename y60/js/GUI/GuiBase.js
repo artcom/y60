@@ -193,9 +193,9 @@ GuiBase.prototype.Constructor = function(self, theArguments) {
     // getters and "getters"
     ////////////////////////////////////////////
 
-    Public.layerManager getter = function() {
+    Public.__defineGetter__("layerManager", function() {
         return _myLayerManager;
-    }
+    });
 
     ////////////////////////////////////////
     // frame callback dispatch

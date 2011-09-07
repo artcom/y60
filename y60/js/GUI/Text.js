@@ -84,71 +84,71 @@ Text.prototype.Constructor = function(Public, theParent, theTextNode, theDepth) 
     // Public
     ////////////////////////////////////////
 
-    Public.text getter = function() {
+    Public.__defineGetter__("text", function() {
         return _myText;
-    }
+    });
 
-    Public.text setter = function(theText) {
+    Public.__defineSetter__("text", function(theText) {
         _myText = theText;
         draw();
-    }
+    });
 
-    Public.style getter = function() {
+    Public.__defineGetter__("style", function() {
         return _myStyle;
-    }
+    });
 
-    Public.style setter = function(theStyle) {
+    Public.__defineSetter__("style", function(theStyle) {
         _myStyle = theStyle;
         draw();
-    }
+    });
 
-    Public.bodies getter = function() {
+    Public.__defineGetter__("bodies", function() {
         return [_myQuad.body];
-    }
+    });
 
-    Public.body getter = function() {
+    Public.__defineGetter__("body", function() {
         return _myQuad.body;
-    }
+    });
 
-    Public.name getter = function() {
+    Public.__defineGetter__("name", function() {
         return _myName;
-    }
+    });
 
-    Public.color setter = function(theColor) {
+    Public.__defineSetter__("color", function(theColor) {
         _myStyle.textColor = theColor;
-    }
+    });
 
-    Public.visible getter = function() {
+    Public.__defineGetter__("visible", function() {
         return Public.body.visible;
-    }
+    });
 
-    Public.visible setter = function(theVisibility) {
+    Public.__defineSetter__("visible", function(theVisibility) {
         Public.body.visible = theVisibility;
-    }
+    });
 
-    Public.alpha getter = function() {
+    Public.__defineGetter__("alpha", function() {
         return _myMaterial.properties.surfacecolor[3];
-    }
+    });
 
-    Public.alpha setter = function(theAlpha) {
+    Public.__defineSetter__("alpha", function(theAlpha) {
         Modelling.setAlpha(_myQuad.body, theAlpha);
-    }
+    });
 
-    Public.width getter = function() {
+    Public.__defineGetter__("width", function() {
         return _myWidth;
-    }
+    });
 
-    Public.width setter = function(theWidth) {
+    Public.__defineSetter__("width", function(theWidth) {
         _myWidth = theWidth;
-    }
+    });
 
-    Public.height getter = function() {
+    Public.__defineGetter__("height", function() {
         return _myHeight;
-    }
+    });
 
-    Public.height setter = function(theHeight) {
+    Public.__defineSetter__("height", function(theHeight) {
         _myHeight = theHeight;
-    }
+    });
 
     ////////////////////////////////////////
     // setup
