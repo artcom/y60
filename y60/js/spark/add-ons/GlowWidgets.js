@@ -103,6 +103,7 @@ spark.GlowText.Constructor = function (Protected) {
     Base.realize = Public.realize;
     Public.realize = function () {
         Base.realize();
+        Protected.render();
     };
 
 };
