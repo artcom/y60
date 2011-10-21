@@ -276,6 +276,7 @@ spark.Window.Constructor = function (Protected, theArguments) {
         }
 
         Public.setMover(null);
+        Public.setAutoNearFarPlane(false);
 
         window.showMouseCursor = Protected.getBoolean("mouseCursor", true);
         window.swapInterval = Protected.getNumber("swapInterval", 1);
