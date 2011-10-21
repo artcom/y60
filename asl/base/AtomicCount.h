@@ -44,6 +44,7 @@
 #include "asl_base_settings.h"
 
 #include <iostream>
+#include <cstddef>
 
 #ifdef OSX_X86
 #include <libkern/OSAtomic.h>

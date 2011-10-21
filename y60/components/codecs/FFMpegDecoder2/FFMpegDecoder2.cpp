@@ -203,10 +203,18 @@ namespace y60 {
         // find video/audio streams
         for (unsigned i = 0; i < static_cast<unsigned>(_myFormatContext->nb_streams); ++i) {
             int myCodecType =  _myFormatContext->streams[i]->codec->codec_type;
+        #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52, 64, 0)
+            if (_myVStreamIndex == -1 && myCodecType == AVMEDIA_TYPE_VIDEO) {
+        #else
             if (_myVStreamIndex == -1 && myCodecType == CODEC_TYPE_VIDEO) {
+        #endif
                 _myVStreamIndex = i;
                 _myVStream = _myFormatContext->streams[i];
+        #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52, 64, 0)
+            } else if (_myAStreamIndex == -1 && myCodecType == AVMEDIA_TYPE_AUDIO) {
+        #else
             } else if (_myAStreamIndex == -1 && myCodecType == CODEC_TYPE_AUDIO) {
+        #endif
                 _myAStreamIndex = i;
                 _myAStream = _myFormatContext->streams[i];
             }

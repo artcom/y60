@@ -161,7 +161,9 @@ void registerStream(string theUrl, asl::Ptr<ReadableStream> theSource) {
 
     static bool avRegistered = false;
     if (!avRegistered) {
-#if LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(52,29,0)
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52, 69, 0)
+        av_register_protocol2(&acstream_protocol, sizeof(&acstream_protocol));
+#elif LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(52,29,0)
         av_register_protocol(&acstream_protocol);
 #else
         register_protocol(&acstream_protocol);
