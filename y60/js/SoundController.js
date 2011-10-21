@@ -173,7 +173,7 @@ function playSound(theFilename, theVolume, theLoopFlag, theSeekOffset) {
         var mySound = new Sound(myFileName, theLoopFlag);
         var myVolumeArrayFlag = theVolume instanceof Array;
         if (myVolumeArrayFlag) {
-            if(theVolume.length === 1) {
+            if(theVolume.length === 2) {
                 mySound.setVolumes(theVolume[0], theVolume[1]);
             } else {
                 Logger.warning("Volume arrays are restricted to 2 channels but you specified " + theVolume.length + ". Did not set any volume.");
