@@ -564,9 +564,11 @@ namespace y60 {
             case FRAMEBUFFER_SUPPORT:
                 myResult = hasCap("GL_EXT_framebuffer_object");
                 break;
-            default: break;
+            default:
+                throw OpenGLException(string("Sorry, unknown capability : ") + asl::as_string(theCap), PLUS_FILE_LINE);
+                break;
         }
-        throw OpenGLException(string("Sorry, unknown capability : ") + asl::as_string(theCap), PLUS_FILE_LINE);
+        return myResult;
     }
 
     std::string
