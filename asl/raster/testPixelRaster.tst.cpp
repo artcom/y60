@@ -885,6 +885,10 @@ void algo_perf(const char* testname)
     cerr << "**** algoperf: " << testname << endl;
 
     {
+        RGB pix1(1,2,3);
+        RGB pix2(2,3,4);
+        RGB pix3 = pix1 * pix2;
+
         typedef raster<RGB> mat;
         // Performance
         int n = 100;

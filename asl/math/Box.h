@@ -599,14 +599,14 @@ namespace asl {
         const Point3<Number> & getMax() const  {
             return this->val[MAX];
         }
-        ///** Returns the min point as a vector */
-        //const Vector3<Number> & getMinVector() const  {
-        //    return reinterpret_cast<const Vector3<Number> &>(this->val[MIN]);
-        //}
-        ///** Returns the max point as a vector */
-        //const Vector3<Number> & getMaxVector() const  {
-        //    return reinterpret_cast<const Vector3<Number> &>(this->val[MAX]);
-        //}
+        /** Returns the min point as a vector */
+        const Vector3<Number> & getMinVector() const  {
+            return reinterpret_cast<const Vector3<Number> &>(this->val[MIN]);
+        }
+        /** Returns the max point as a vector */
+        const Vector3<Number> & getMaxVector() const  {
+            return reinterpret_cast<const Vector3<Number> &>(this->val[MAX]);
+        }
         /** Sets the min point.  */
         void setMin(const Point3<Number> & theValue){
             this->val[MIN] = theValue;
@@ -625,7 +625,7 @@ namespace asl {
         }
         /** Returns the center of a box. */
         Point3<Number> getCenter() const {
-            return (getMin() + getMax()) / 2;
+            return asPoint((getMinVector() + getMaxVector()) / 2);
         }
 
         /** Extends Box if necessary to touch given 3D point. */

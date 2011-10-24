@@ -186,11 +186,8 @@ namespace y60 {
             avRegistered = true;
         }
 
-#if LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(53, 2, 0)
-        if (avformat_open_input(&_myFormatContext, theFilename.c_str(), NULL, NULL) < 0) {
-#else
-        if (av_open_input_file(&_myFormatContext, theFilename.c_str(), 0, 0, 0) < 0) {
-#endif
+        if (av_open_input_file(&_myFormatContext, theFilename.c_str(), NULL, 0, NULL)
+                < 0) {
             throw FFMpegDecoder2Exception(std::string("Unable to open input file: ")
                     + theFilename, PLUS_FILE_LINE);
         }
@@ -492,11 +489,7 @@ namespace y60 {
                 continue;
             }
             int myNumChannels = _myAStream->codec->channels;
-#if  LIBAVUTIL_VERSION_INT >= AV_VERSION_INT(51,4,0)
-            int myBytesPerSample = av_get_bytes_per_sample(_myAStream->codec->sample_fmt);
-#else
-            int myBytesPerSample = av_get_bits_per_sample_format(_myAStream->codec->sample_fmt)>>3;
-#endif
+            int myBytesPerSample = av_get_bits_per_sample_format(_myAStream->codec->sample_fmt)/8;
             if (myNumChannels == 6) {
                 if (myBytesPerSample == 2) {
                     myBytesDecoded = downmix5p1ToStereo(myAlignedBuf, myBytesDecoded);

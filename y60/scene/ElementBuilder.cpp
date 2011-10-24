@@ -156,7 +156,12 @@ namespace y60 {
 
     dom::NodePtr
     ElementBuilder::createHalfEdges() {
-        if (_myPrimitiveType != "triangles" && _myPrimitiveType != "quads") {
+        int myNumFaceVertices;
+        if (_myPrimitiveType == "triangles") {
+            myNumFaceVertices = 3;
+        } else if (_myPrimitiveType == "quads") {
+            myNumFaceVertices = 4;
+        } else {
             AC_ERROR << "Can't generate halfedges for other elements than triangles and quads";
             return dom::NodePtr();
         }

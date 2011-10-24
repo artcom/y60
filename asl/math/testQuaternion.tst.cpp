@@ -181,9 +181,10 @@ class QuaternionTest : public TemplateUnitTest {
 
                 // Quaternion / Scalar
                 Quaternion<T> myQuat8 = Quaternion<T>::createFromEuler(Vector3<T>(0,0,T(PI_2)));
+                Quaternion<T> myQuat9 = Quaternion<T>::createFromEuler(Vector3<T>(0,0,T(PI_2)));
                 Quaternion<T> myResultQuaternion5 = quotient(myQuat3, T(2.0));
                 Quaternion<T> myResultQuaternion6 = quotient(myResultQuaternion5, T(0.5));
-                ENSURE(almostEqual(myQuat8, myResultQuaternion6));
+                ENSURE(almostEqual(myQuat9, myResultQuaternion6));
 
             }
 
