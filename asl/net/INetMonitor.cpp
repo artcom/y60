@@ -104,25 +104,25 @@ namespace inet {
 
         AC_DEBUG << "INetMonitor Status: " << _myErrorBuffer;
 
-        CURLcode myCode;
+        //CURLcode myCode;
         double myNameLookupTime;
-        myCode = curl_easy_getinfo(_myCurl, CURLINFO_NAMELOOKUP_TIME, &myNameLookupTime);
+        /*myCode = */curl_easy_getinfo(_myCurl, CURLINFO_NAMELOOKUP_TIME, &myNameLookupTime);
         AC_DEBUG << "INetMonitor Status: CURLINFO_NAMELOOKUP_TIME:" << myNameLookupTime;
 
         double myConnectTime;
-        myCode = curl_easy_getinfo(_myCurl, CURLINFO_CONNECT_TIME, &myConnectTime);
+        /*myCode = */curl_easy_getinfo(_myCurl, CURLINFO_CONNECT_TIME, &myConnectTime);
         AC_DEBUG << "INetMonitor Status: CURLINFO_CONNECT_TIME:" << myConnectTime;
 
         double myPreTransferTime;
-        myCode = curl_easy_getinfo(_myCurl, CURLINFO_PRETRANSFER_TIME, &myPreTransferTime);
+        /*myCode = */curl_easy_getinfo(_myCurl, CURLINFO_PRETRANSFER_TIME, &myPreTransferTime);
         AC_DEBUG << "INetMonitor Status: CURLINFO_PRETRANSFER_TIME:" << myPreTransferTime;
 
         double myStartTranferTime;
-        myCode = curl_easy_getinfo(_myCurl, CURLINFO_STARTTRANSFER_TIME, &myStartTranferTime);
+        /*myCode = */curl_easy_getinfo(_myCurl, CURLINFO_STARTTRANSFER_TIME, &myStartTranferTime);
         AC_DEBUG << "INetMonitor Status: CURLINFO_STARTTRANFSER_TIME:" << myStartTranferTime;
 
         double myTotalTime;
-        myCode = curl_easy_getinfo(_myCurl, CURLINFO_TOTAL_TIME, &myTotalTime);
+        /*myCode = */curl_easy_getinfo(_myCurl, CURLINFO_TOTAL_TIME, &myTotalTime);
         AC_DEBUG << "INetMonitor Status: CURLINFO_TOTAL_TIME:" << myTotalTime;
     }
 
