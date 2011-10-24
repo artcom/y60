@@ -61,7 +61,6 @@ class SerialDeviceUnitTest : public UnitTest {
 public:
     SerialDeviceUnitTest() : UnitTest("SerialDeviceUnitTest") {  }
     void run() {
-        int openablePort = -1;
         int unOpenablePort = -1;
         std::vector<std::string> myDeviceNames;
         if (getSerialDeviceNames(myDeviceNames)) {
@@ -77,7 +76,6 @@ public:
                     unOpenablePort = i;
                     continue;
                 }
-                openablePort = i;
                 ENSURE(myPort->isOpen());
                 myPort->close();
                 ENSURE( ! myPort->isOpen());
