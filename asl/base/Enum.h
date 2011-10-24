@@ -141,7 +141,7 @@ template <class ENUM, int THE_MAX >
 class Enum {
     public:
         typedef ENUM Native;
-        Enum() {};
+        Enum() : _myValue() {};
         Enum( ENUM theValue ) : _myValue(theValue) {}
         Enum( const Enum & theOther ) : _myValue(theOther._myValue) {}
 

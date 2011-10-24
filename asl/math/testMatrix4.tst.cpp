@@ -2454,7 +2454,6 @@ class Matrix4UnitTest : public UnitTest {
             Point3<T> p3 = p1 + asVector(p2);
 
             Triangle<T> myTriangle(p1,p3, p2);
-            Vector3<T> myTriangleNormalBeforTransf = normalized(myTriangle.normal());
             myTriangle = myTriangle * theMatrix;
             Vector3<T> myTriangleNormal = normalized(myTriangle.normal());
 

@@ -82,6 +82,7 @@ public:
         double nowd = now;
         asl::Time nowdd = nowd;
         ENSURE(fabs(now - nowd) < 1e-3);
+        ENSURE(fabs(now - nowdd) < 1e-3);
         ENSURE(asl::Time(1) == asl::Time(1));
         DPRINT(now);
         DPRINT(later);

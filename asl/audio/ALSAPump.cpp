@@ -263,7 +263,7 @@ void ALSAPump::pump()
     }
 
     // The ALSA example has this code. It seems to be utterly useless, but who knows.
-    if (numFramesToDeliver > _myFramesPerBuffer) {
+    if (numFramesToDeliver > static_cast<snd_pcm_sframes_t>(_myFramesPerBuffer)) {
         numFramesToDeliver = _myFramesPerBuffer;
     }
 
