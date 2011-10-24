@@ -136,8 +136,6 @@ namespace y60 {
     void
     Blobs::correlatePositions(BlobListPtr & theROIs, double t)
     {
-        Matrix4f myTransform = getTransformationMatrix();
-
         const BlobList & myROIs = * theROIs;
 
         // populate a map with all distances between existing cursors and new positions

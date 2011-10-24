@@ -199,7 +199,6 @@ namespace asl {
 
     template <class InputIterator,class OutputIterator,class T>
         OutputIterator gradient(int radius,InputIterator begin, InputIterator end, OutputIterator out, const T& init) {
-            T value = init;
             InputIterator lead = begin;
             InputIterator trail = begin;
             int lead_count = 0;
@@ -231,7 +230,6 @@ namespace asl {
 
     template <class InputIterator,class OutputIterator,class T>
         OutputIterator abs_gradient(int radius,InputIterator begin, InputIterator end, OutputIterator out, const T& init) {
-            T value = init;
             InputIterator lead = begin;
             InputIterator trail = begin;
             int lead_count = 0;
