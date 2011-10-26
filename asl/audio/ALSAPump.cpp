@@ -234,10 +234,6 @@ ALSAPump::setSWParams (snd_pcm_t * theDevice) {
     myRetVal = snd_pcm_sw_params_set_avail_min(theDevice, mySWParams, _myFramesPerBuffer/2);
     checkRetVal (myRetVal, "Unable to set avail min for playback: ", PLUS_FILE_LINE);
 
-    /* align all transfers to 1 samples */
-    myRetVal = snd_pcm_sw_params_set_xfer_align(theDevice, mySWParams, 1);
-    checkRetVal (myRetVal, "Unable to set transfer align: ", PLUS_FILE_LINE);
-
     /* write the parameters to device */
     myRetVal = snd_pcm_sw_params(theDevice, mySWParams);
     checkRetVal (myRetVal, "Unable to set sw params ", PLUS_FILE_LINE);
