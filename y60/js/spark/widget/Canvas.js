@@ -130,6 +130,10 @@ spark.Canvas.Constructor = function (Protected) {
     Public.__defineGetter__("camera", function () {
         return _myCamera;
     });
+    Public.__defineSetter__("camera", function(theCamera) {
+        _myCamera = theCamera;
+        Public.viewport.camera = _myCamera.id;
+    });
     
     
     function applyWidth(theWidth, theBaseSetter) {
@@ -425,6 +429,24 @@ spark.Canvas.prepareMerge = function prepareMerge(theSceneFilePath) {
     }
     
     var myDom = (new Scene(theSceneFilePath)).dom;
+
+    var myIdMap = {};
+    
+    function adjustNodeId(theNode, theDeepAdjustFlag) {
+        if ("id" in theNode) {
+            var myNewId = createUniqueId();
+            myIdMap[theNode.id] = myNewId;
+            theNode.id = myNewId;
+        }
+        if (theDeepAdjustFlag === undefined) {
+            theDeepAdjustFlag = false;
+        }
+        if (theDeepAdjustFlag) {
+            for (var i = 0; i < theNode.childNodes.length; i++) {
+                adjustNodeId(theNode.childNodes[i], theDeepAdjustFlag);
+            }
+        }
+    }
     
     adjustNodeId(myDom.find(".//world"), true);
     adjustNodeId(myDom.find(".//canvases/canvas"), false);
@@ -432,7 +454,16 @@ spark.Canvas.prepareMerge = function prepareMerge(theSceneFilePath) {
     adjustNodeId(myViewport, false);
     // adjustNodeId(myDom.find(".//camera"), false); // XXX not necessary since already done in world 
     myViewport.camera = myDom.find(".//camera").id;
+
+    var myAnimationNodes = myDom.findAll(".//animation");
     
+    for (var i = 0; i < myAnimationNodes.length; i++) {
+        var a = myAnimationNodes[i];
+        if (a.node in myIdMap) {
+            a.node = myIdMap[a.node];
+        }
+    }
+
     // REWRITE TEXTURE SRC PATH
     var imageNode = myDom.find(".//images");
     for (var i = 0; i < imageNode.childNodesLength(); ++i) {

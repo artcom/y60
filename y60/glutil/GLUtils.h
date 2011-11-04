@@ -70,7 +70,7 @@
 
 // XXX: X11 defines this
 #ifdef GenericEvent
-#warning undefing polluting GenericEvent from X11
+//#warning undefing polluting GenericEvent from X11
 #undef GenericEvent
 #endif
 

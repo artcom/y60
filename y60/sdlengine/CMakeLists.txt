@@ -24,7 +24,9 @@ y60_sdlengine_settings.h
 set(EXTERNS SDL GLEW ${JSEXTERN})
 
 if(OSX)
-    list(APPEND EXTERNS COCOA)
+    list(APPEND EXTERNS COCOA AppKit)
+    list(APPEND SOURCES SDLWindowOSXUtils.mm)
+    list(APPEND HEADERS SDLWindowOSXUtils.h)
 endif(OSX)
 
 ac_add_library(
@@ -36,4 +38,3 @@ ac_add_library(
             y60base y60scene y60image y60video y60input y60inet y60glrender
             y60glutil y60jsbase y60jslib y60gltext acsdlttf paintlib ${JSDEPENDS}
 )
-

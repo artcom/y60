@@ -62,7 +62,8 @@
 #include <y60/glrender/GLResourceManager.h>
 
 #ifdef OSX
-#include <Carbon/Carbon.h>
+#import <Carbon/Carbon.h>
+#import "SDLWindowOSXUtils.h"
 #endif
 
 #include "SDLTextRenderer.h"
@@ -530,7 +531,11 @@ SDLWindow::getScreenSize(unsigned theScreen) const {
         AC_ERROR << "SDL_GetWMInfo: " << SDL_GetError() << endl;
     } else {
 #ifdef OSX
-	AC_WARNING << "getScreenSize not yet implemeted on OSX";
+        std::string myError = getScreenSizeOSX(myWidth, myHeight);
+        if (!myError.empty() ) {
+            myWidth = myHeight = -1;
+            throw SDLWindowException(myError, PLUS_FILE_LINE);
+        }
 #else
         Display * myDisplay = wminfo.info.x11.display;
         myWidth  = DisplayWidth(myDisplay, theScreen);
@@ -612,8 +617,11 @@ void SDLWindow::setPosition(asl::Vector2i thePos) {
     wminfo.info.x11.unlock_func();
 #endif
 
-#ifdef OSX // TODO PORT
-    AC_WARNING << "SDLWindow::setPosition not yet implemented for OSX";
+#ifdef OSX 
+    std::string myError = setWindowPositionOSX(_myWindowPosX, _myWindowPosY);
+    if (!myError.empty() ) {
+        throw SDLWindowException(myError, PLUS_FILE_LINE);
+    }
 #endif
 }
 
@@ -735,7 +743,15 @@ SDLWindow::setShowTaskbar(bool theFlag) {
 #ifdef _WIN32
     HWND myWindowHandle = FindWindow("Shell_TrayWnd", 0);
     ShowWindow(myWindowHandle, (theFlag ? SW_SHOW : SW_HIDE));
-#endif
+#endif // _WIN32
+
+#ifdef OSX
+    std::string myError = setShowTaskBarOSX(theFlag);
+    if (!myError.empty()) {
+        throw SDLWindowException(myError, PLUS_FILE_LINE);
+    }
+#endif // OSX
+
 }
 
 bool

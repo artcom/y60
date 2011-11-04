@@ -62,9 +62,9 @@ var ourSoundController = null;
 
 if (DUMMY_AUDIO_CONTROLLER) {
     ourSoundController = [];
-    ourSoundController.isRunning = function() {}
-    ourSoundController.play = function() {}
-    ourSoundController.pause = function() {}
+    ourSoundController.isRunning = function() {};
+    ourSoundController.play = function() {};
+    ourSoundController.pause = function() {};
     ourSoundController.setSeekOffset = function() {};
     ourSoundController.stop = function() {};
     ourSoundController.stopAllSounds = function() {};
@@ -78,8 +78,7 @@ function initSoundController() {
         plug("Sound");
         ourSoundController = new SoundManager();
     } catch (ex) {
-        print("### Warning: Could not construct SoundController. Sound will not work.");
-        print("### Error was " + ex);
+        Logger.error("Could not construct SoundController. Sound will not work. Error was " + ex);
     }
 }
 
@@ -95,7 +94,7 @@ function setMasterVolume(theVolume) {
         ourSoundController.volume = theVolume;
         return ourSoundController.volume;
     } catch (ex) {
-        print ("### Error setting volume to  " + theVolume);
+        Logger.error("Error setting volume to  " + theVolume);
     }
 }
 
@@ -106,7 +105,7 @@ function isPlaying(theSound) {
     try {
         return theSound.playing;
     } catch (ex) {
-        print ("### Error retrieving sound state  " + theSoundId);
+        Logger.error("Error retrieving sound state  " + theSoundId);
     }
 }
 
@@ -120,7 +119,7 @@ function stopSound(theSound) {
     try {
         theSound.stop();
     } catch (ex) {
-        print ("### Error stopping sound:  " + theSoundId);
+        Logger.error("Error stopping sound:  " + theSoundId);
     }
 }
 
@@ -134,7 +133,7 @@ function pauseSound(theSound) {
     try {
         theSound.pause();
     } catch (ex) {
-        print ("### Error pausing sound:  " + theSoundId);
+        Logger.error("Error pausing sound:  " + theSoundId);
     }
 }
 
@@ -148,7 +147,7 @@ function setSeekOffset(theSound, theSeekOffset) {
     try {
         theSound.seekRelative(theSeekOffset);
     } catch (ex) {
-        print ("### Error setting seek offset:  " + theSoundId);
+        Logger.error("Error setting seek offset:  " + theSoundId);
     }
 }
 
@@ -172,12 +171,12 @@ function playSound(theFilename, theVolume, theLoopFlag, theSeekOffset) {
     try {
         var myFileName = searchFile(theFilename);
         var mySound = new Sound(myFileName, theLoopFlag);
-        var myVolumeArrayFlag = theVolume instanceof Array;        
+        var myVolumeArrayFlag = theVolume instanceof Array;
         if (myVolumeArrayFlag) {
-            if( theVolume.length>1) {
+            if(theVolume.length === 2) {
                 mySound.setVolumes(theVolume[0], theVolume[1]);
             } else {
-                print("Sorry, sounds can only have 2 channels");
+                Logger.warning("Volume arrays are restricted to 2 channels but you specified " + theVolume.length + ". Did not set any volume.");
             }
         } else {
             mySound.volume = theVolume;
@@ -186,7 +185,7 @@ function playSound(theFilename, theVolume, theLoopFlag, theSeekOffset) {
         mySound.play();
         return mySound;
     } catch (ex) {
-        print ("### Error playing " + theFilename);
+        Logger.error("Error playing " + theFilename);
     }
 
     return null;

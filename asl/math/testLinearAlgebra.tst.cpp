@@ -613,6 +613,7 @@ class LinearAlgebraUnitTest : public LinearAlgebraTestBase {
             Plane<double> myPlane(Vector3d(0,1,0), -1);
             Point3d myNearest = nearest(Point3d(0,3,0), myPlane);
             double myDistance = distance(Point3d(0,3,0), myPlane);
+            ENSURE(almostEqual(myNearest, Point3d(0,1,0)));
             DPRINT(myDistance);
             ENSURE(distance(Point3d(0,3,0), myPlane) == distance(myPlane, Point3d(0,3,0)));
             ENSURE(almostEqual(myDistance, 2.0));

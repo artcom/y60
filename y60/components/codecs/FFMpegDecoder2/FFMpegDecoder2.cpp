@@ -186,8 +186,11 @@ namespace y60 {
             avRegistered = true;
         }
 
-        if (av_open_input_file(&_myFormatContext, theFilename.c_str(), NULL, 0, NULL)
-                < 0) {
+#if LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(53, 2, 0)
+        if (avformat_open_input(&_myFormatContext, theFilename.c_str(), NULL, NULL) < 0) {
+#else
+        if (av_open_input_file(&_myFormatContext, theFilename.c_str(), 0, 0, 0) < 0) {
+#endif
             throw FFMpegDecoder2Exception(std::string("Unable to open input file: ")
                     + theFilename, PLUS_FILE_LINE);
         }
@@ -203,10 +206,18 @@ namespace y60 {
         // find video/audio streams
         for (unsigned i = 0; i < static_cast<unsigned>(_myFormatContext->nb_streams); ++i) {
             int myCodecType =  _myFormatContext->streams[i]->codec->codec_type;
+        #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52, 64, 0)
+            if (_myVStreamIndex == -1 && myCodecType == AVMEDIA_TYPE_VIDEO) {
+        #else
             if (_myVStreamIndex == -1 && myCodecType == CODEC_TYPE_VIDEO) {
+        #endif
                 _myVStreamIndex = i;
                 _myVStream = _myFormatContext->streams[i];
+        #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52, 64, 0)
+            } else if (_myAStreamIndex == -1 && myCodecType == AVMEDIA_TYPE_AUDIO) {
+        #else
             } else if (_myAStreamIndex == -1 && myCodecType == CODEC_TYPE_AUDIO) {
+        #endif
                 _myAStreamIndex = i;
                 _myAStream = _myFormatContext->streams[i];
             }
@@ -481,7 +492,11 @@ namespace y60 {
                 continue;
             }
             int myNumChannels = _myAStream->codec->channels;
-            int myBytesPerSample = av_get_bits_per_sample_format(_myAStream->codec->sample_fmt)/8;
+#if  LIBAVUTIL_VERSION_INT >= AV_VERSION_INT(51,4,0)
+            int myBytesPerSample = av_get_bytes_per_sample(_myAStream->codec->sample_fmt);
+#else
+            int myBytesPerSample = av_get_bits_per_sample_format(_myAStream->codec->sample_fmt)>>3;
+#endif
             if (myNumChannels == 6) {
                 if (myBytesPerSample == 2) {
                     myBytesDecoded = downmix5p1ToStereo(myAlignedBuf, myBytesDecoded);

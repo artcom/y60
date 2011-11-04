@@ -194,7 +194,11 @@ namespace y60 {
         }
 
         // open file
+#if LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(53, 2, 0)
+        if (avformat_open_input(&_myFormatContext, theFilename.c_str(), NULL, NULL) < 0) {
+#else
         if (av_open_input_file(&_myFormatContext, theFilename.c_str(), 0, 0, 0) < 0) {
+#endif
             throw FFMpegDecoderException(std::string("Unable to open input file: ") + theFilename, PLUS_FILE_LINE);
         }
 
@@ -204,13 +208,14 @@ namespace y60 {
         }
 
         // find video/audio streams
-        int myIndex = 0;
         for (unsigned i = 0; i < static_cast<unsigned>(_myFormatContext->nb_streams); ++i) {
             int myCodecType;
             myCodecType = _myFormatContext->streams[i]->codec->codec_type;
-            // if (_myVStreamIndex == -1 && myCodecType == CODEC_TYPE_VIDEO) {
+        #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52, 64, 0)
+            if (myCodecType == AVMEDIA_TYPE_VIDEO) {
+        #else
             if (myCodecType == CODEC_TYPE_VIDEO) {
-                myIndex = i;
+        #endif
                 _myVStream = _myFormatContext->streams[i];
                 break;
             }
@@ -470,7 +475,11 @@ namespace y60 {
             //       if (myPacket.stream_index == _myVStreamIndex) {
             int myCodecType;
             myCodecType = _myFormatContext->streams[myPacket.stream_index]->codec->codec_type;
-            if (myCodecType == CODEC_TYPE_VIDEO) {
+            #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52, 64, 0)
+                if (myCodecType == AVMEDIA_TYPE_VIDEO) {
+            #else
+                if (myCodecType == CODEC_TYPE_VIDEO) {
+            #endif
                 if (_myLastVStreamIndex != myPacket.stream_index) {
                     setMovieParameters(myPacket.stream_index);
                 }

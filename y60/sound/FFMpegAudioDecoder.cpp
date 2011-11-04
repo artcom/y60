@@ -146,7 +146,12 @@ void FFMpegAudioDecoder::open() {
 
     try {
         int err;
-        if ((err = av_open_input_file(&_myFormatContext, _myURI.c_str(), 0, 0, 0)) < 0) {
+#if LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(53, 2, 0)
+        err = avformat_open_input(&_myFormatContext, _myURI.c_str(), NULL, NULL);
+#else
+        err = av_open_input_file(&_myFormatContext, _myURI.c_str(), 0, 0, 0);
+#endif
+        if (err < 0) {
             if (err == -6) {
                 throw DecoderException(std::string("Can't decode ")+_myURI, PLUS_FILE_LINE);
             } else {
@@ -162,7 +167,11 @@ void FFMpegAudioDecoder::open() {
         _myStreamIndex = -1;
         for (unsigned int i = 0; i < _myFormatContext->nb_streams; ++i) {
 #if (LIBAVCODEC_BUILD >= 0x4910)
+        #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52, 64, 0)
+            if (_myFormatContext->streams[i]->codec->codec_type == AVMEDIA_TYPE_AUDIO) {
+        #else
             if (_myFormatContext->streams[i]->codec->codec_type == CODEC_TYPE_AUDIO) {
+        #endif
 #else
             if (_myFormatContext->streams[i]->codec.codec_type == CODEC_TYPE_AUDIO) {
 #endif
@@ -314,7 +323,11 @@ bool FFMpegAudioDecoder::decode() {
             if ( myBytesDecoded <= 0 ) {
                 continue;
             }
+#if  LIBAVUTIL_VERSION_INT >= AV_VERSION_INT(51,4,0)
+            int numFrames = myBytesDecoded/(av_get_bytes_per_sample(myCodec->sample_fmt)*_myNumChannels);
+#else
             int numFrames = myBytesDecoded/(av_get_bits_per_sample_format(myCodec->sample_fmt)/8*_myNumChannels);
+#endif
             AC_TRACE << "FFMpegAudioDecoder::decode(): Frames per buffer= " << numFrames;
             AudioBufferPtr myBuffer;
             if (_myResampleContext) {
