@@ -49,5 +49,8 @@ ThreadLock FilePrinter::myLock;
 #ifdef _WIN32
 ThreadLock OutputWindowPrinter::myLock;
 #endif
+#ifndef _WIN32
+ThreadLock SyslogPrinter::myLock;
+#endif
 
 }
