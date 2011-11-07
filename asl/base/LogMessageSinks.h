@@ -114,6 +114,52 @@ namespace asl {
         static ThreadLock myLock;
     };
 #endif
+
+#ifndef _WIN32
+#include <syslog.h>
+    class SyslogPrinter : public MessageSink {
+    public:
+        SyslogPrinter() {
+            openlog("Y60", LOG_CONS, LOG_KERN);
+        }
+        void push(Severity theSeverity, const std::string & theMessage) {
+            myLock.lock();
+
+            int syslog_sev = -1;
+            switch (theSeverity) {
+                case SEV_FATAL :
+                    syslog_sev = LOG_EMERG;
+                    break;
+                case SEV_ERROR :
+                    syslog_sev = LOG_ERR;
+                    break;
+                case SEV_WARNING:
+                    syslog_sev = LOG_WARNING;
+                    break;
+                case SEV_INFO:
+                    syslog_sev = LOG_INFO;
+                    break;
+                case SEV_DEBUG:
+                    syslog_sev = LOG_DEBUG;
+                    break;
+                case SEV_PRINT:
+                    syslog_sev = LOG_NOTICE;
+                    break;
+                default:
+                    syslog_sev = -1;
+                    break;
+            }
+            
+            syslog(syslog_sev, "%s", (theMessage).c_str());
+            myLock.unlock();
+        }
+        ~SyslogPrinter() {
+            closelog();
+        }
+    private:
+        static ThreadLock myLock;
+    };
+#endif
 }
 
     /* @} */
