@@ -108,22 +108,24 @@ int OffscreenRenderArea::getWidth() const {
     if (_myWidth > 0) {
         return _myWidth;
     }
-    TexturePtr myTexture = getTexture();
-    if (!myTexture) {
+    std::vector<TexturePtr> myTextures = getTextures();
+    if (myTextures.empty()) {
         return 0;
     }
-    return myTexture->get<TextureWidthTag>();
+    //XXX
+    return myTextures.front()->get<TextureWidthTag>();
 }
 
 int OffscreenRenderArea::getHeight() const {
     if (_myHeight > 0) {
         return _myHeight;
     }
-    TexturePtr myTexture = getTexture();
-    if (!myTexture) {
+    std::vector<TexturePtr> myTextures = getTextures();
+    if (myTextures.empty()) {
         return 0;
     }
-    return myTexture->get<TextureHeightTag>();
+    //XXX
+    return myTextures.front()->get<TextureHeightTag>();
 }
 
 // AbstractRenderWindow
@@ -132,31 +134,33 @@ void OffscreenRenderArea::initDisplay() {
 
 void
 OffscreenRenderArea::activate(unsigned theCubemapFace) {
-    TexturePtr myTexture = getTexture();
-    if (!myTexture) {
+    std::vector<TexturePtr> myTextures = getTextures();
+    if (myTextures.empty()) {
         AC_ERROR << "OffscreenRenderArea::activate has no canvas / texture to render... ignoring";
         return;
     }
-    AC_TRACE << "OffscreenRenderArea::activate '" << myTexture->get<NameTag>() << "'";
+    //XXX
+    AC_TRACE << "OffscreenRenderArea::activate '" << myTextures.front()->get<NameTag>() << "'";
 
-    y60::OffscreenBuffer::activate(myTexture, getMultisamples(), theCubemapFace);
+    y60::OffscreenBuffer::activate(myTextures, getMultisamples(), theCubemapFace);
 
+    //XXX
     // fetch size from texture
     if (_myWidth == 0 || _myHeight == 0) {
-        setWidth(myTexture->get<TextureWidthTag>());
-        setHeight(myTexture->get<TextureHeightTag>());
+        setWidth(myTextures.front()->get<TextureWidthTag>());
+        setHeight(myTextures.front()->get<TextureHeightTag>());
     }
 }
 
 void
 OffscreenRenderArea::deactivate(bool theCopyToImageFlag) {
     AC_TRACE << "OffscreenRenderArea::deactivate";
-    TexturePtr myTexture = getTexture();
-    if ( ! myTexture) {
+    std::vector<TexturePtr> myTextures = getTextures();
+    if (myTextures.empty()) {
         AC_ERROR << "OffscreenRenderArea::deactivate has no canvas / image to render... ignoring";
         return;
     }
-    y60::OffscreenBuffer::deactivate(myTexture, theCopyToImageFlag);
+    y60::OffscreenBuffer::deactivate(myTextures, theCopyToImageFlag);
 }
 
 void
@@ -165,8 +169,8 @@ OffscreenRenderArea::renderToCanvas(bool theCopyToImageFlag, unsigned theCubemap
     AC_TRACE << "OffscreenRenderArea::renderToCanvas copyToImage=" << theCopyToImageFlag;
     MAKE_SCOPE_TIMER(OffscreenRenderArea_renderToCanvas);
 
-    TexturePtr myTexture = getTexture();
-    if ( ! myTexture) {
+    std::vector<TexturePtr> myTextures = getTextures();
+    if (myTextures.empty()) {
         AC_ERROR << "OffscreenRenderArea::renderToCanvas has no canvas / image to render... ignoring";
         return;
     }
@@ -262,10 +266,11 @@ OffscreenRenderArea::setCanvas(const NodePtr & theCanvas) {
 	AC_DEBUG << "OffscreenRenderArea::setCanvas";
     if (AbstractRenderWindow::setCanvas(theCanvas)) {
     	CanvasPtr myCanvas = theCanvas->getFacade<Canvas>();
-        TexturePtr myTexture = myCanvas->getTarget(getCurrentScene());
-        if (myTexture) {
-            setWidth(myTexture->get<TextureWidthTag>());
-            setHeight(myTexture->get<TextureHeightTag>());
+        std::vector<TexturePtr> myTextures = myCanvas->getTargets(getCurrentScene());
+        //XXX
+        if (!myTextures.empty()) {
+            setWidth(myTextures.front()->get<TextureWidthTag>());
+            setHeight(myTextures.front()->get<TextureHeightTag>());
         } else {
             throw OffscreenRendererException(std::string("No target texture defined for canvas: ") + theCanvas->getAttributeString(ID_ATTRIB), PLUS_FILE_LINE);
         }
@@ -275,30 +280,30 @@ OffscreenRenderArea::setCanvas(const NodePtr & theCanvas) {
     }
 }
 
-const TexturePtr
-OffscreenRenderArea::getTexture() const {
+const std::vector<TexturePtr>
+OffscreenRenderArea::getTextures() const {
 	NodePtr myCanvas = getCanvas();
     if (myCanvas) {
     	CanvasPtr myCanvasFacade = myCanvas->getFacade<Canvas>();
-    	TexturePtr myTexture = myCanvasFacade->getTarget(getCurrentScene());
-    	if(myTexture) {
-    		return myTexture;
+    	std::vector<TexturePtr> myTextures = myCanvasFacade->getTargets(getCurrentScene());
+        if(!myTextures.empty()) {
+    		return myTextures;
     	} else {
-    		AC_WARNING << "No texture.";
+    		AC_WARNING << "No textures.";
     	}
     } else {
     	AC_WARNING << "No canvas.";
     }
-    return TexturePtr();
+    return std::vector<TexturePtr>();
 }
 
-TexturePtr
-OffscreenRenderArea::getTexture() {
+std::vector<TexturePtr>
+OffscreenRenderArea::getTextures() {
     if (getCanvas()) {
-        return getCanvas()->getFacade<Canvas>()->getTarget( getCurrentScene() );
+        return getCanvas()->getFacade<Canvas>()->getTargets( getCurrentScene() );
     }
     AC_WARNING << "No canvas.";
-    return TexturePtr();
+    return std::vector<TexturePtr>();
 }
 
 } //namespace jslib

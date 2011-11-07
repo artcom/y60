@@ -86,14 +86,14 @@ namespace y60 {
             * activate the texture as render target and initializes FBO
             * if necessary
             */
-            void activate(TexturePtr theTexture,
+            void activate(std::vector<TexturePtr> & theTextures,
                           unsigned theSamples = 1, unsigned theCubemapFace = 0);
 
             /**
             * deactivates the texture as render target
             * @param theCopyToImageFlag copy result to texture raster.
             */
-            void deactivate(TexturePtr theTexture,
+            void deactivate(std::vector<TexturePtr> & theTextures,
                             bool theCopyToImageFlag = false);
 
         protected:
@@ -106,19 +106,17 @@ namespace y60 {
                 return _myUseFBO;
             }
 
+            void copyToImage(std::vector<TexturePtr> & theTextures);
             void copyToImage(TexturePtr theTexture);
 
         private:
-            void copyFrameBufferToTexture(TexturePtr theTexture);
-
             void reset();
 
-            void bindOffscreenFrameBuffer(TexturePtr theTexture,
+            void bindOffscreenFrameBuffer(std::vector<TexturePtr> & theTextures,
                                           unsigned theSamples = 0, unsigned theCubemapFace = 0);
             void attachCubemapFace(unsigned theCubemapFace);
 
             bool     _myUseFBO;
-            bool     _myHasFBO;
             bool     _myHasFBOMultisample;
 
             asl::Unsigned64 _myTextureNodeVersion;

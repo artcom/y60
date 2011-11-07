@@ -128,8 +128,7 @@ static void checkFramebufferStatus()
 
 
 OffscreenBuffer::OffscreenBuffer() :
-    _myUseFBO(false),
-    _myHasFBO(hasCap("GL_EXT_framebuffer_object")),
+    _myUseFBO(hasCap("GL_EXT_framebuffer_object")),
     _myHasFBOMultisample(hasCap("GL_EXT_framebuffer_multisample GL_EXT_framebuffer_blit")),
     _myTextureNodeVersion(0),
     _myTextureWidth(0),
@@ -154,26 +153,30 @@ void OffscreenBuffer::setUseFBO(bool theUseFlag)
 }
 
 
-void OffscreenBuffer::activate(TexturePtr theTexture, unsigned theSamples,
+void OffscreenBuffer::activate(std::vector<TexturePtr> & theTextures, unsigned theSamples,
                                unsigned theCubmapFace)
 {
-    unsigned myTextureId = theTexture->getTextureId();
-    AC_DEBUG << "OffscreenBuffer:activate texture id = " << myTextureId << " theSamples = "<<theSamples;
-    // ensure texture object exists
-    myTextureId = theTexture->applyTexture();
+    for (y60::VectorOfString::size_type i = 0; i < theTextures.size(); ++i) {
+        unsigned myTextureId = theTextures[i]->getTextureId();
+        AC_DEBUG << "OffscreenBuffer:activate texture id = " << myTextureId << " theSamples = "<<theSamples;
+        // ensure texture object exists
+        myTextureId = theTextures[i]->applyTexture();
+    }
     
     if (_myUseFBO) {
-        bindOffscreenFrameBuffer(theTexture, theSamples, theCubmapFace);
+        bindOffscreenFrameBuffer(theTextures, theSamples, theCubmapFace);
     }
 }
 
 
-void OffscreenBuffer::deactivate(TexturePtr theTexture, bool theCopyToImageFlag)
+void OffscreenBuffer::deactivate(std::vector<TexturePtr> & theTextures, bool theCopyToImageFlag)
 {
-    unsigned myTextureId = theTexture->getTextureId();
-    AC_DEBUG << "OffscreenBuffer:deactivate texture id = " << myTextureId << ", theCopyToImageFlag = "<<theCopyToImageFlag;
+    AC_DEBUG << "OffscreenBuffer:deactivate, render targets: " << theTextures.size() << " theCopyToImageFlag = "<<theCopyToImageFlag;
 
     if (_myUseFBO) {
+        //TODO: multisampling && mrt
+        TexturePtr myTexture = theTextures.front();
+        unsigned myTextureId = myTexture->getTextureId();
         if (_myFrameBufferObject[1]) {
             AC_DEBUG << "OffscreenBuffer:deactivate texture id = " << myTextureId << ", blit multisample buffer to texture";
             // blit multisample buffer to texture
@@ -181,36 +184,42 @@ void OffscreenBuffer::deactivate(TexturePtr theTexture, bool theCopyToImageFlag)
             glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, _myFrameBufferObject[0]);
             CHECK_OGL_ERROR;
 
-            unsigned myWidth = theTexture->get<TextureWidthTag>();
-            unsigned myHeight = theTexture->get<TextureHeightTag>();
+            unsigned myWidth = myTexture->get<TextureWidthTag>();
+            unsigned myHeight = myTexture->get<TextureHeightTag>();
             glBlitFramebufferEXT(0, 0, myWidth, myHeight,
                                  0, 0, myWidth, myHeight,
                                  GL_COLOR_BUFFER_BIT, _myBlitFilter);
             CHECK_OGL_ERROR;
 
         }
-        AC_DEBUG << "OffscreenBuffer:deactivate texture id = " << myTextureId << ", unbinding framebuffer";
+        AC_DEBUG << "OffscreenBuffer:deactivate, unbinding framebuffer";
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
         CHECK_OGL_ERROR;
 
         // generate mipmap levels
-        if (theTexture->get<TextureMipmapTag>()) {
+        if (myTexture->get<TextureMipmapTag>()) {
             AC_DEBUG << "OffscreenBuffer::deactivate: generating mipmap levels";
             glBindTexture(GL_TEXTURE_2D, myTextureId);
             glGenerateMipmapEXT(GL_TEXTURE_2D);
             glBindTexture(GL_TEXTURE_2D, 0);
         }
     } else {
+        if (theTextures.size() > 1) {
+            AC_WARNING << "multiple render targets only supported when using FBOs, copying backbuffer to first target";
+        }
+        TexturePtr myTexture = theTextures.front();
+        unsigned myTextureId = myTexture->getTextureId();
+    
         AC_DEBUG << "OffscreenBuffer:deactivate texture id = " << myTextureId << "zeroing texture";
 
         // copy backbuffer to texture
         glBindTexture(GL_TEXTURE_2D, myTextureId);
         glCopyTexSubImage2D(GL_TEXTURE_2D, 0 /*MIPMAP level*/, 0, 0,
-                0, 0, theTexture->get<TextureWidthTag>(), theTexture->get<TextureHeightTag>());
+                0, 0, myTexture->get<TextureWidthTag>(), myTexture->get<TextureHeightTag>());
         CHECK_OGL_ERROR;
 
         // generate mipmap levels
-        if (_myHasFBO && theTexture->get<TextureMipmapTag>()) {
+        if (myTexture->get<TextureMipmapTag>()) {
             AC_DEBUG << "OffscreenBuffer::deactivate: generating mipmap levels";
             glGenerateMipmapEXT(GL_TEXTURE_2D);
             CHECK_OGL_ERROR;
@@ -221,10 +230,17 @@ void OffscreenBuffer::deactivate(TexturePtr theTexture, bool theCopyToImageFlag)
     CHECK_OGL_ERROR;
 
     if (theCopyToImageFlag) {
-        copyToImage(theTexture);
+        copyToImage(theTextures);
     }
 }
 
+void OffscreenBuffer::copyToImage(std::vector<TexturePtr> & theTextures)
+{
+    //XXX: does not really work yet
+    for (y60::VectorOfString::size_type i = 0; i < theTextures.size(); ++i) {
+        copyToImage(theTextures[i]);
+    }
+}
 
 void OffscreenBuffer::copyToImage(TexturePtr theTexture)
 {
@@ -274,10 +290,12 @@ void OffscreenBuffer::reset()
     _myDepthBuffer[0] = _myDepthBuffer[1] = 0;
 }
 
-
-void OffscreenBuffer::bindOffscreenFrameBuffer(TexturePtr theTexture, unsigned theSamples,
+//TODO: use mrts
+void OffscreenBuffer::bindOffscreenFrameBuffer(std::vector<TexturePtr> & theTextures, unsigned theSamples,
                                                unsigned theCubemapFace)
 {
+    TexturePtr theTexture = theTextures.front();
+
     AC_DEBUG << "OffscreenBuffer::bindOffscreenFrameBuffer to texture=" << theTexture->get<IdTag>();
 
     unsigned int myWidth = theTexture->get<TextureWidthTag>();

@@ -154,8 +154,8 @@ namespace jslib {
             }
 
         private:
-            const TexturePtr getTexture() const;
-            TexturePtr getTexture();
+            const std::vector<TexturePtr> getTextures() const;
+            std::vector<TexturePtr> getTextures();
 
             unsigned _myWidth;
             unsigned _myHeight;

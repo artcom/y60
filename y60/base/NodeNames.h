@@ -233,7 +233,7 @@ namespace y60 {
     const char * const ANIM_DIRECTION_ATTRIB       = "direction";
 
     const char * const CANVAS_BACKGROUNDCOLOR_ATTRIB = "backgroundcolor";
-    const char * const CANVAS_TARGET_ATTRIB          = "target";
+    const char * const CANVAS_TARGETS_ATTRIB          = "targets";
 
     const char * const VIEWPORT_SIZE_ATTRIB        = "size"; // normalized
     const char * const VIEWPORT_WIDTH_ATTRIB       = "width";  // in pixels
