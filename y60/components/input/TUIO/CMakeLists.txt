@@ -12,6 +12,17 @@ set(EXTERNS
 TUIO
 )
 
+find_file(
+    TUIO_BLOB_DIR
+    TuioBlob.h
+    PATH_SUFFIXES TUIO
+)
+if(TUIO_BLOB_DIR-NOTFOUND)
+add_definitions(-DTUIO_API_VERSION_1_4)
+else(TUIO_BLOB_DIR-NOTFOUND)
+add_definitions(-DTUIO_API_VERSION_1_5)
+endif(TUIO_BLOB_DIR-NOTFOUND)
+
 if(WIN32)
     list(APPEND EXTERNS WINMM)
 endif(WIN32)
