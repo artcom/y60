@@ -87,7 +87,7 @@ namespace y60 {
             * if necessary
             */
             void activate(std::vector<TexturePtr> & theTextures,
-                          unsigned theSamples = 1, unsigned theCubemapFace = 0);
+                          unsigned theSamples = 0, unsigned theCubemapFace = 0);
 
             /**
             * deactivates the texture as render target
@@ -106,16 +106,15 @@ namespace y60 {
                 return _myUseFBO;
             }
 
-            void copyToImage(std::vector<TexturePtr> & theTextures);
             void copyToImage(TexturePtr theTexture);
 
         private:
             void reset();
-
+            void copyToImage(std::vector<TexturePtr> & theTextures);
+            
             void bindOffscreenFrameBuffer(std::vector<TexturePtr> & theTextures,
                                           unsigned theSamples = 0, unsigned theCubemapFace = 0);
-            void attachCubemapFace(unsigned theCubemapFace);
-
+            
             bool     _myUseFBO;
             bool     _myHasFBOMultisample;
 
@@ -123,16 +122,17 @@ namespace y60 {
             unsigned int  _myTextureWidth;
             unsigned int  _myTextureHeight;
             
-            unsigned _myBlitFilter;
+            unsigned int _myBlitFilter;
 
-            // OpenGL id of frame buffer object
-            GLuint _myFrameBufferObject[2];
+            GLuint _myFBO;
+            GLuint _myColorBuffer;
+            GLuint _myDepthBuffer;
 
-            // OpenGL id(s) of color buffer
-            GLuint _myColorBuffer[2];
+            //multisampling buffer
+            GLuint _myMultisampleFBO;
+            GLuint _myMultisampleColorBuffer;
+            GLuint _myMultisampleDepthBuffer;
 
-            // OpenGL id(s) of depth buffer
-            GLuint _myDepthBuffer[2];
     };
 }
 
