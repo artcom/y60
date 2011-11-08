@@ -1161,12 +1161,12 @@ Example:
 backgroundcolor='[1,0,0]' to set the backgroundcolor to red.</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
-            <xs:attribute name="target" type="xs:IDREF">
+            <xs:attribute name="targets" type="VectorOfString">
                 <xs:annotation>
-                    <xs:documentation>Defines a rendering target (texture).
+                    <xs:documentation>Defines a rendering targets (texture).
 Must reference an existing image in scene if set.
 
-Note: The texture should have mipmapping disabled since existing mipmap levels
+Note: The textures should have mipmapping disabled since existing mipmap levels
 aren't updated when subloading. It has to be disabled before the first load
 occurs.
 Note2: When reading from the framebuffer the texture is flipped vertically. A
