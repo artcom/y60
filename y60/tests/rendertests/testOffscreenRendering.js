@@ -23,7 +23,7 @@ ourShow.onFrameDone = function (theFrameCount) {
         var myCanvas = ourShow.getRenderWindow().canvas.cloneNode(true);
         myCanvas.id = createUniqueId();
         myCanvas.name = "OffscreenBuffer";
-        myCanvas.target = myTexture.id;
+        myCanvas.targets = [myTexture.id];
         // switching back to black background. This is core part of the test
         myCanvas.backgroundcolor[0] = 0.0;
 

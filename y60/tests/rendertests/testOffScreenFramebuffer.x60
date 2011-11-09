@@ -43,7 +43,7 @@
     </worlds>
     <records/>
     <canvases>
-        <canvas id="AYY68waogjM=" name="JohnDoe" backgroundcolor="[0,0,0,1]" target="">
+        <canvas id="AYY68waogjM=" name="JohnDoe" backgroundcolor="[0,0,0,1]" targets="[]">
             <viewport id="AoY68waogjM=" name="JohnDoe" camera="I4Y68waogjM=" position="[0,0]" size="[1,1]" orientation="landscape" backfaceculling="1" wireframe="0" lighting="1" texturing="1" flatshading="0" culling="1" debugculling="0" alphatest="1" drawnormals="0" glow="0" resizepolicy="adapt_vertical">
                 <overlays/>
             </viewport>

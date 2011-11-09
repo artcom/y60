@@ -215,7 +215,7 @@ function setupOffscreenRendering() {
     // Copy main canvas to offscreen canvas
     var myOffscreenCanvas = window.scene.canvases.firstChild.cloneNode(true);
     adjustNodeIds(myOffscreenCanvas);
-    myOffscreenCanvas.target = myTargetImage.id;
+    myOffscreenCanvas.targets = [myTargetImage.id];
 
     if (window.scene.canvases.childNodes.length == 1) {
         window.scene.canvases.appendChild(myOffscreenCanvas);
