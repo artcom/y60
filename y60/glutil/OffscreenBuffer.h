@@ -87,7 +87,7 @@ namespace y60 {
             * if necessary
             */
             void activate(std::vector<TexturePtr> & theTextures,
-                          unsigned theSamples = 0, unsigned theCubemapFace = 0);
+                          unsigned int theSamples = 0, unsigned int theCubemapFace = 0);
 
             /**
             * deactivates the texture as render target
@@ -106,15 +106,19 @@ namespace y60 {
                 return _myUseFBO;
             }
 
-            void copyToImage(TexturePtr theTexture);
+            void copyToImage(TexturePtr theTexture, unsigned int theColorBufferIndex = 0);
 
         private:
             void reset();
             void copyToImage(std::vector<TexturePtr> & theTextures);
             
             void bindOffscreenFrameBuffer(std::vector<TexturePtr> & theTextures,
-                                          unsigned theSamples = 0, unsigned theCubemapFace = 0);
-            
+                                          unsigned int theSamples, unsigned int theCubemapFace);
+            void setupFBO(std::vector<TexturePtr> & theTextures,
+                                          unsigned int theSamples, unsigned int theCubemapFace);
+            bool FBOrebindRequired(std::vector<TexturePtr> & theTextures) const;
+            void blitToTexture(std::vector<TexturePtr> & theTextures);
+
             bool     _myUseFBO;
             bool     _myHasFBOMultisample;
 
@@ -125,12 +129,12 @@ namespace y60 {
             unsigned int _myBlitFilter;
 
             GLuint _myFBO;
-            GLuint _myColorBuffer;
+            std::vector<GLuint> _myColorBuffers;
             GLuint _myDepthBuffer;
 
             //multisampling buffer
             GLuint _myMultisampleFBO;
-            GLuint _myMultisampleColorBuffer;
+            std::vector<GLuint> _myMultisampleColorBuffers;
             GLuint _myMultisampleDepthBuffer;
 
     };

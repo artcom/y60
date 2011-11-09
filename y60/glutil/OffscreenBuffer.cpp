@@ -135,10 +135,8 @@ OffscreenBuffer::OffscreenBuffer() :
     _myTextureHeight(0),
     _myBlitFilter(GL_NEAREST),
     _myFBO(0),
-    _myColorBuffer(0),
     _myDepthBuffer(0),
     _myMultisampleFBO(0),
-    _myMultisampleColorBuffer(0),
     _myMultisampleDepthBuffer(0)
 {}
 
@@ -150,14 +148,16 @@ OffscreenBuffer::~OffscreenBuffer() {
 void
 OffscreenBuffer::reset() {
     if (_myFBO) glDeleteFramebuffersEXT(1, &_myFBO);
-    if (_myColorBuffer) glDeleteRenderbuffersEXT(1, &_myColorBuffer);
     if (_myDepthBuffer) glDeleteRenderbuffersEXT(1, &_myDepthBuffer);
-    if (_myMultisampleFBO) glDeleteFramebuffersEXT(1, &_myFBO);
-    if (_myMultisampleColorBuffer) glDeleteRenderbuffersEXT(1, &_myMultisampleColorBuffer);
+    if (_myMultisampleFBO) glDeleteFramebuffersEXT(1, &_myMultisampleFBO);
     if (_myMultisampleDepthBuffer) glDeleteRenderbuffersEXT(1, &_myMultisampleDepthBuffer);
     _myFBO = 0; _myMultisampleFBO = 0;
-    _myColorBuffer = 0; _myMultisampleColorBuffer = 0;
     _myDepthBuffer = 0; _myMultisampleDepthBuffer = 0;
+
+    _myColorBuffers.clear();
+    if (!_myMultisampleColorBuffers.empty()) glDeleteRenderbuffersEXT(_myMultisampleColorBuffers.size(), &_myMultisampleColorBuffers[0]);
+    _myMultisampleColorBuffers.clear();
+    
 }
 
 void
@@ -172,55 +172,67 @@ OffscreenBuffer::setUseFBO(bool theUseFlag) {
 
 
 void
-OffscreenBuffer::activate(std::vector<TexturePtr> & theTextures, unsigned theSamples,
-                          unsigned theCubmapFace)
+OffscreenBuffer::activate(std::vector<TexturePtr> & theTextures, unsigned int theSamples,
+                          unsigned int theCubmapFace)
 {
-    for (y60::VectorOfString::size_type i = 0; i < theTextures.size(); ++i) {
-        unsigned myTextureId = theTextures[i]->getTextureId();
-        AC_DEBUG << "OffscreenBuffer:activate texture id = " << myTextureId << " theSamples = "<<theSamples;
+    GLint maxbuffers;
+    glGetIntegerv(GL_MAX_DRAW_BUFFERS, &maxbuffers);
+    AC_DEBUG << "OffscreenBuffer:activate, render targets: " << theTextures.size() << ", max supported render targets: " << maxbuffers
+             <<" multisamples= "<<theSamples<<" cubemapface: "<<theCubmapFace;
+    if (static_cast<GLint>(theTextures.size()) > maxbuffers) {
+        throw OffscreenRendererException("more render targets requested than available from the driver, wanted: "
+                                         + asl::as_string(theTextures.size()) + " , supported: " + asl::as_string(maxbuffers), PLUS_FILE_LINE);
+    }
+    for (std::vector<TexturePtr>::size_type i = 0; i < theTextures.size(); ++i) {
         // ensure texture object exists
-        myTextureId = theTextures[i]->applyTexture();
+        unsigned int myTextureId = theTextures[i]->applyTexture();
+        AC_DEBUG << "OffscreenBuffer:activate texture id = " << myTextureId << " theSamples = "<<theSamples;
     }
     if (_myUseFBO) {
         bindOffscreenFrameBuffer(theTextures, theSamples, theCubmapFace);
     }
 }
 
+void
+OffscreenBuffer::blitToTexture(std::vector<TexturePtr> & theTextures) {
+    if (_myMultisampleFBO) {
+        for (std::vector<TexturePtr>::size_type i = 0; i < theTextures.size(); ++i) {
+            AC_DEBUG << "OffscreenBuffer:blitToTexture texture id = " << theTextures[i]->getTextureId() << ", blit multisample buffer to texture";
+            // blit multisample buffer to texture
+            glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, _myMultisampleFBO);
+            glReadBuffer(GL_COLOR_ATTACHMENT0_EXT + i);
+            glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, _myFBO);
+            glDrawBuffer(GL_COLOR_ATTACHMENT0_EXT + i);
+            CHECK_OGL_ERROR;
+
+            glBlitFramebufferEXT(0, 0, _myTextureWidth, _myTextureHeight,
+                                 0, 0, _myTextureWidth, _myTextureHeight,
+                                 GL_COLOR_BUFFER_BIT, _myBlitFilter);
+            CHECK_OGL_ERROR;
+        }
+    }
+}
 
 void
 OffscreenBuffer::deactivate(std::vector<TexturePtr> & theTextures, bool theCopyToImageFlag) {
     AC_DEBUG << "OffscreenBuffer:deactivate, render targets: " << theTextures.size() << " theCopyToImageFlag = "<<theCopyToImageFlag;
 
     if (_myUseFBO) {
-        //TODO: multisampling && mrt
-        TexturePtr myTexture = theTextures.front();
-        unsigned myTextureId = myTexture->getTextureId();
-        if (_myMultisampleFBO) {
-            AC_DEBUG << "OffscreenBuffer:deactivate texture id = " << myTextureId << ", blit multisample buffer to texture";
-            // blit multisample buffer to texture
-            glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, _myMultisampleFBO);
-            glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, _myFBO);
-            CHECK_OGL_ERROR;
-
-            unsigned myWidth = myTexture->get<TextureWidthTag>();
-            unsigned myHeight = myTexture->get<TextureHeightTag>();
-            glBlitFramebufferEXT(0, 0, myWidth, myHeight,
-                                 0, 0, myWidth, myHeight,
-                                 GL_COLOR_BUFFER_BIT, _myBlitFilter);
-            CHECK_OGL_ERROR;
-
-        }
+        blitToTexture(theTextures);
         AC_DEBUG << "OffscreenBuffer:deactivate, unbinding framebuffer";
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+        glDrawBuffer(GL_BACK); // ?!
         CHECK_OGL_ERROR;
 
         // generate mipmap levels
-        if (myTexture->get<TextureMipmapTag>()) {
-            AC_DEBUG << "OffscreenBuffer::deactivate: generating mipmap levels";
-            glBindTexture(GL_TEXTURE_2D, myTextureId);
-            glGenerateMipmapEXT(GL_TEXTURE_2D);
-            glBindTexture(GL_TEXTURE_2D, 0);
-            CHECK_OGL_ERROR;
+        for (std::vector<TexturePtr>::size_type i = 0; i < theTextures.size(); ++i) {
+            if (theTextures[i]->get<TextureMipmapTag>()) {
+                AC_DEBUG << "OffscreenBuffer::deactivate: generating mipmap levels";
+                glBindTexture(GL_TEXTURE_2D, theTextures[i]->getTextureId());
+                glGenerateMipmapEXT(GL_TEXTURE_2D);
+                glBindTexture(GL_TEXTURE_2D, 0);
+                CHECK_OGL_ERROR;
+            }
         }
     } else { // use backbuffer
         if (theTextures.size() > 1) {
@@ -253,14 +265,13 @@ OffscreenBuffer::deactivate(std::vector<TexturePtr> & theTextures, bool theCopyT
 
 void
 OffscreenBuffer::copyToImage(std::vector<TexturePtr> & theTextures) {
-    //XXX: does not really work yet
-    for (y60::VectorOfString::size_type i = 0; i < theTextures.size(); ++i) {
-        copyToImage(theTextures[i]);
+    for (std::vector<TexturePtr>::size_type i = 0; i < theTextures.size(); ++i) {
+        copyToImage(theTextures[i], i);
     }
 }
 
 void
-OffscreenBuffer::copyToImage(TexturePtr theTexture) {
+OffscreenBuffer::copyToImage(TexturePtr theTexture, unsigned int theColorBufferIndex) {
     ImagePtr myImage = theTexture->getImage();
     if (!myImage) {
         AC_ERROR << "OffscreenBuffer::copyToImage: Texture id='" << theTexture->get<IdTag>() << "' has no image associated";
@@ -271,6 +282,7 @@ OffscreenBuffer::copyToImage(TexturePtr theTexture) {
 
     if (_myUseFBO) {
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _myFBO);
+        glReadBuffer(GL_COLOR_ATTACHMENT0_EXT + theColorBufferIndex);
     }
 
     PixelEncodingInfo myPixelEncodingInfo =
@@ -299,153 +311,155 @@ OffscreenBuffer::copyToImage(TexturePtr theTexture) {
     }
 }
 
-//TODO: use mrts
-void
-OffscreenBuffer::bindOffscreenFrameBuffer(std::vector<TexturePtr> & theTextures, unsigned theSamples,
-                                          unsigned theCubemapFace)
-{
-    TexturePtr theTexture = theTextures.front();
-
-    AC_DEBUG << "OffscreenBuffer::bindOffscreenFrameBuffer to texture=" << theTexture->get<IdTag>();
-
-    unsigned int myWidth = theTexture->get<TextureWidthTag>();
-    unsigned int myHeight = theTexture->get<TextureHeightTag>();
+bool
+OffscreenBuffer::FBOrebindRequired(std::vector<TexturePtr> & theTextures) const {
+    // mrt's have to have same texture size
+    unsigned int myWidth = theTextures.front()->get<TextureWidthTag>();
+    unsigned int myHeight = theTextures.front()->get<TextureHeightTag>();
     bool myTextureSizeHasChangedFlag = (_myTextureWidth != myWidth || _myTextureHeight != myHeight);
-    _myTextureWidth = myWidth;
-    _myTextureHeight = myHeight;
-    // rebind texture if target image has changed
-    if (_myFBO && (theTexture->getNode().nodeVersion() != _myTextureNodeVersion || myTextureSizeHasChangedFlag))
+    return (!_myFBO || (_myFBO && (theTextures.front()->getNode().nodeVersion() != _myTextureNodeVersion || myTextureSizeHasChangedFlag || (theTextures.size() != _myColorBuffers.size()))));
+}
+
+void
+OffscreenBuffer::bindOffscreenFrameBuffer(std::vector<TexturePtr> & theTextures, unsigned int theSamples,
+                                          unsigned int theCubemapFace)
+{
     {
-        AC_DEBUG << "Tearing down FBO since Texture has changed "
-                 << theTexture->getNode().nodeVersion() << " != " << _myTextureNodeVersion 
-                 << " image size changed: " << myWidth << ", " << myHeight;
+        std::string myString("OffscreenBuffer::bindOffscreenFrameBuffer to " + ((theTextures.size() == 1) ? "texture="
+            + theTextures.front()->get<IdTag>() : + "multiple render targets (" + asl::as_string((unsigned int)theTextures.size()) + ") multisamples: " + asl::as_string(theSamples)));
+        AC_DEBUG << myString;
+    }
+    if (FBOrebindRequired(theTextures)) {
+        AC_DEBUG << "Tearing down FBO since render targets have changed";
         reset();
+        // mrt's have to have same texture size
+        _myTextureWidth = theTextures.front()->get<TextureWidthTag>();
+        _myTextureHeight = theTextures.front()->get<TextureHeightTag>();
+        //XXX: TODO check all render target nodeversions
+        _myTextureNodeVersion = theTextures.front()->getNode().nodeVersion();
+    }
+    
+    if (!_myFBO) {
+        setupFBO(theTextures, theSamples, theCubemapFace);
+    }
+    {
+        std::string myString("OffscreenBuffer::bindOffscreenFrameBuffer binding FBO to " + ((theTextures.size() == 1) ? "texture="
+            + theTextures.front()->get<IdTag>() : + "multiple render targets (" + asl::as_string((unsigned int)theTextures.size()) + ") multisamples: " + asl::as_string(theSamples)));
+        AC_DEBUG << myString;
+    }
+    if (_myMultisampleFBO) {
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _myMultisampleFBO);
+        glDrawBuffer(GL_COLOR_ATTACHMENT0_EXT);
+    } else {
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _myFBO);
+        std::vector<GLenum> buffers(_myColorBuffers.size());
+        for (std::vector<GLuint>::size_type i = 0; i < _myColorBuffers.size(); ++i) {
+            buffers[i] = GL_COLOR_ATTACHMENT0_EXT + i;
+        }
+        glDrawBuffers(theTextures.size(), &buffers[0]);
+    }
+    checkOGLError(PLUS_FILE_LINE);
+}
+
+void
+OffscreenBuffer::setupFBO(std::vector<TexturePtr> & theTextures, unsigned int theSamples,
+                                          unsigned int theCubemapFace)
+{
+    GLint mySamples = theSamples;
+    if (mySamples >= 1 && !_myHasFBOMultisample) {
+        AC_WARNING << "Multisampling requested but not supported, turning it off";
+        mySamples = 0;
     }
 
-    unsigned myTextureId = theTexture->getTextureId();
-    // create FBO
-     if (!_myFBO) {
-        AC_DEBUG << "OffscreenBuffer::bindOffscreenFrameBuffer creating FBO, texture=" << theTexture->get<IdTag>();
-        AC_DEBUG << "setup RTT framebuffer texture=" << theTexture->get<NameTag>()
-                 << " size=" << myWidth << "x" << myHeight;
-        if (theSamples >= 1 && !_myHasFBOMultisample)
-        {
-            AC_WARNING << "Multisampling requested but not supported, turning it off";
-            theSamples = 0;
+//#ifdef GL_EXT_framebuffer_multisample // TODO: ugly hack to support older glew versions (<1.4.0), update linux buildserver
+    if (mySamples >= 1) { // setup multisample framebuffer
+        GLint myMaxSamples;
+        glGetIntegerv(GL_MAX_SAMPLES_EXT, &myMaxSamples);
+        AC_DEBUG << "setup multisample framebuffer multisampling samples="
+                 << mySamples << " maxSamples=" << myMaxSamples;
+        if (mySamples > myMaxSamples) {
+            AC_WARNING << "wanted " << mySamples << " multisamples but only " << myMaxSamples << " multisamples supported";
+            mySamples = myMaxSamples;
         }
-
-#ifdef GL_EXT_framebuffer_multisample // TODO: ugly hack to support older glew versions (<1.4.0), update linux buildserver
-        if (theSamples >= 1) {
-            /*
-             * setup multisample framebuffer
-             */
-            GLint myMaxSamples;
-            glGetIntegerv(GL_MAX_SAMPLES_EXT, &myMaxSamples);
-            AC_DEBUG << "setup multisample framebuffer multisampling samples="
-                     << theSamples << " max.samples=" << myMaxSamples;
-
-            // color buffer
-            glGenRenderbuffersEXT(1, &_myMultisampleColorBuffer);
-            glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, _myMultisampleColorBuffer);
-            TextureInternalFormat myImageFormat = theTexture->getInternalEncoding();
-            glRenderbufferStorageMultisampleEXT(GL_RENDERBUFFER_EXT,
-                                                theSamples,
-                                                asGLTextureInternalFormat(myImageFormat),
-                                                myWidth, myHeight);
-            checkOGLError(PLUS_FILE_LINE);
-
-            // depth buffer
-            glGenRenderbuffersEXT(1, &_myMultisampleDepthBuffer);
-            glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, _myMultisampleDepthBuffer);
-            glRenderbufferStorageMultisampleEXT(GL_RENDERBUFFER_EXT,
-                    theSamples, GL_DEPTH_COMPONENT24,
-                    myWidth, myHeight);
-            checkOGLError(PLUS_FILE_LINE);
-
-            // multisample framebuffer
-            glGenFramebuffersEXT(1, &_myMultisampleFBO);
-            glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _myMultisampleFBO);
-            glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
-                    GL_RENDERBUFFER_EXT, _myMultisampleColorBuffer);
-            glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT,
-                    GL_RENDERBUFFER_EXT, _myMultisampleDepthBuffer);
-            checkOGLError(PLUS_FILE_LINE);
-        }
-#endif
-
-        /*
-         * setup render-to-texture framebuffer
-         */
-        _myTextureNodeVersion = theTexture->getNode().nodeVersion();
-
-        _myColorBuffer = myTextureId;
-
-        AC_TRACE << "nodeVersion=" << _myTextureNodeVersion << " textureID="
-                 << _myColorBuffer;
-
-        // framebuffer
-        glGenFramebuffersEXT(1, &_myFBO);
-        checkOGLError(PLUS_FILE_LINE);
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _myFBO);
-        checkOGLError(PLUS_FILE_LINE);
-
+        // multisample framebuffer
+        glGenFramebuffersEXT(1, &_myMultisampleFBO);
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _myMultisampleFBO);
+        
         // color buffer
-        switch (theTexture->getType()) {
-            case TEXTURE_2D:
-				{AC_DEBUG << "attaching 2D texture";}
-                glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
-                                          GL_TEXTURE_2D, _myColorBuffer, 0);
-                checkOGLError(PLUS_FILE_LINE);
-                break;
+        _myMultisampleColorBuffers.resize(theTextures.size());
+        glGenRenderbuffersEXT(_myMultisampleColorBuffers.size(), &_myMultisampleColorBuffers[0]);
+        for (std::vector<TexturePtr>::size_type i = 0; i < theTextures.size(); ++i) {
+            glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, _myMultisampleColorBuffers[i]);
+            TextureInternalFormat myImageFormat = theTextures[i]->getInternalEncoding();
+            glRenderbufferStorageMultisampleEXT(GL_RENDERBUFFER_EXT,
+                                                mySamples,
+                                                asGLTextureInternalFormat(myImageFormat),
+                                                _myTextureWidth, _myTextureHeight);
+            glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT + i,
+                    GL_RENDERBUFFER_EXT, _myMultisampleColorBuffers[i]);
+            checkOGLError(PLUS_FILE_LINE);
+        }
+
+        // depth buffer
+        glGenRenderbuffersEXT(1, &_myMultisampleDepthBuffer);
+        glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, _myMultisampleDepthBuffer);
+        glRenderbufferStorageMultisampleEXT(GL_RENDERBUFFER_EXT,
+                mySamples, GL_DEPTH_COMPONENT24,
+                _myTextureWidth, _myTextureHeight);
+        glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT,
+                GL_RENDERBUFFER_EXT, _myMultisampleDepthBuffer);
+        checkOGLError(PLUS_FILE_LINE);
+
+        glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+        checkOGLError(PLUS_FILE_LINE);
+
+    }
+//#endif
+
+    // framebuffer
+    glGenFramebuffersEXT(1, &_myFBO);
+    checkOGLError(PLUS_FILE_LINE);
+    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _myFBO);
+    checkOGLError(PLUS_FILE_LINE);
+
+    // color buffer
+    _myColorBuffers.resize(theTextures.size());
+    for (std::vector<TexturePtr>::size_type i = 0; i < theTextures.size(); ++i) {
+        _myColorBuffers[i] = theTextures[i]->getTextureId();
+        switch (theTextures[i]->getType()) {
             case TEXTURE_CUBEMAP:
-                {AC_DEBUG << "attaching cubemap";}
-                glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
+                {AC_DEBUG << "attaching cubemap render target " << theTextures[i]->get<IdTag>();}
+                glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT + i,
                                           asGLCubemapFace(theCubemapFace),
-                                          _myColorBuffer, 0);
+                                          _myColorBuffers[i], 0);
+                break;
+            case TEXTURE_2D:
+                {AC_DEBUG << "attaching 2D render target " << theTextures[i]->get<IdTag>();}
+                glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT + i,
+                                          GL_TEXTURE_2D, _myColorBuffers[i], 0);
                 break;
             default:
                 throw TextureException(std::string("Unknown texture type '")+
-                        theTexture->get<NameTag>() + "'", PLUS_FILE_LINE);
+                                       asl::as_string(theTextures[i]->getType()) + "'", PLUS_FILE_LINE);
         }
         checkOGLError(PLUS_FILE_LINE);
-
-        if (theSamples == 0) {
-            // depth buffer (only necessary when not multisampling)
-            glGenRenderbuffersEXT(1, &_myDepthBuffer);
-            glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, _myDepthBuffer);
-            glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT24,
-                                     myWidth, myHeight);
-            checkOGLError(PLUS_FILE_LINE);
-            glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT,
-                    GL_RENDERBUFFER_EXT, _myDepthBuffer);
-            checkOGLError(PLUS_FILE_LINE);
-        }
-
-        checkFramebufferStatus();
-    } else {
-        AC_DEBUG << "OffscreenBuffer::bindOffscreenFrameBuffer binding FBO, texture=" << theTexture->get<IdTag>();
-        /*
-         * bind FBO
-         */
-        if (_myMultisampleFBO) {
-            glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _myMultisampleFBO);
-        } else {
-            glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _myFBO);
-        }
-
-        if (_myColorBuffer != myTextureId) {
-            _myColorBuffer = myTextureId;
-            if (theTexture->getType() == TEXTURE_CUBEMAP) {
-                glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
-                                          asGLCubemapFace(theCubemapFace),
-                                          _myColorBuffer, 0);
-            } else {
-                glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
-                                          GL_TEXTURE_2D, _myColorBuffer, 0);
-            }
-            checkOGLError(PLUS_FILE_LINE);
-        }
     }
-}
 
+    if (theSamples == 0) {
+        // depth buffer (only necessary when not multisampling)
+        glGenRenderbuffersEXT(1, &_myDepthBuffer);
+        glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, _myDepthBuffer);
+        glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT24,
+                                 _myTextureWidth, _myTextureHeight);
+        checkOGLError(PLUS_FILE_LINE);
+        glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT,
+                GL_RENDERBUFFER_EXT, _myDepthBuffer);
+        glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);
+        checkOGLError(PLUS_FILE_LINE);
+    }
+    glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);
+        
+    checkFramebufferStatus();
+}
 }
