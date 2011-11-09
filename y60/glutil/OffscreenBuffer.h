@@ -112,7 +112,7 @@ namespace y60 {
             void reset();
             void copyToImage(std::vector<TexturePtr> & theTextures);
             
-            void bindOffscreenFrameBuffer(std::vector<TexturePtr> & theTextures,
+            void bindFBO(std::vector<TexturePtr> & theTextures,
                                           unsigned int theSamples, unsigned int theCubemapFace);
             void setupFBO(std::vector<TexturePtr> & theTextures,
                                           unsigned int theSamples, unsigned int theCubemapFace);
