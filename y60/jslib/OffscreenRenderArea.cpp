@@ -112,7 +112,7 @@ int OffscreenRenderArea::getWidth() const {
     if (myTextures.empty()) {
         return 0;
     }
-    //XXX
+    // mrt's have to have same texture size
     return myTextures.front()->get<TextureWidthTag>();
 }
 
@@ -124,7 +124,7 @@ int OffscreenRenderArea::getHeight() const {
     if (myTextures.empty()) {
         return 0;
     }
-    //XXX
+    // mrt's have to have same texture size
     return myTextures.front()->get<TextureHeightTag>();
 }
 
@@ -139,19 +139,29 @@ OffscreenRenderArea::activate(unsigned theCubemapFace) {
         AC_ERROR << "OffscreenRenderArea::activate has no canvas / texture to render... ignoring";
         return;
     }
-    //XXX
-    AC_TRACE << "OffscreenRenderArea::activate '" << myTextures.front()->get<NameTag>() << "'";
+    std::string myString((myTextures.size() == 1) ? "texture="
+        + myTextures.front()->get<NameTag>() : + "multiple render targets (" + asl::as_string((std::vector<TexturePtr>::size_type)myTextures.size()));
+    AC_TRACE << "OffscreenRenderArea::activate " << myString;
 
     y60::OffscreenBuffer::activate(myTextures, getMultisamples(), theCubemapFace);
 
-    //XXX
-    // fetch size from texture
+    // fetch size from texture, ensure mrt's have same texture size
     if (_myWidth == 0 || _myHeight == 0) {
         setWidth(myTextures.front()->get<TextureWidthTag>());
         setHeight(myTextures.front()->get<TextureHeightTag>());
+        ensureRenderTargetsSize(myTextures);
     }
 }
 
+void
+OffscreenRenderArea::ensureRenderTargetsSize(std::vector<TexturePtr> & theTextures) const {
+    for (std::vector<TexturePtr>::size_type i = 1; i < theTextures.size(); ++i) {
+        if (theTextures[i]->get<TextureWidthTag>() != getWidth() || theTextures[i]->get<TextureHeightTag>() != getHeight()) {
+            throw OffscreenRendererException("render targets: " +  theTextures.front()->get<NameTag>() + " , "
+                                             + theTextures[i]->get<NameTag>() + " have different size", PLUS_FILE_LINE);
+        }
+    }
+}
 void
 OffscreenRenderArea::deactivate(bool theCopyToImageFlag) {
     AC_TRACE << "OffscreenRenderArea::deactivate";
@@ -267,10 +277,10 @@ OffscreenRenderArea::setCanvas(const NodePtr & theCanvas) {
     if (AbstractRenderWindow::setCanvas(theCanvas)) {
     	CanvasPtr myCanvas = theCanvas->getFacade<Canvas>();
         std::vector<TexturePtr> myTextures = myCanvas->getTargets(getCurrentScene());
-        //XXX
         if (!myTextures.empty()) {
             setWidth(myTextures.front()->get<TextureWidthTag>());
             setHeight(myTextures.front()->get<TextureHeightTag>());
+            ensureRenderTargetsSize(myTextures);
         } else {
             throw OffscreenRendererException(std::string("No target texture defined for canvas: ") + theCanvas->getAttributeString(ID_ATTRIB), PLUS_FILE_LINE);
         }
@@ -294,15 +304,6 @@ OffscreenRenderArea::getTextures() const {
     } else {
     	AC_WARNING << "No canvas.";
     }
-    return std::vector<TexturePtr>();
-}
-
-std::vector<TexturePtr>
-OffscreenRenderArea::getTextures() {
-    if (getCanvas()) {
-        return getCanvas()->getFacade<Canvas>()->getTargets( getCurrentScene() );
-    }
-    AC_WARNING << "No canvas.";
     return std::vector<TexturePtr>();
 }
 

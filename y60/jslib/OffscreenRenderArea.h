@@ -155,8 +155,7 @@ namespace jslib {
 
         private:
             const std::vector<TexturePtr> getTextures() const;
-            std::vector<TexturePtr> getTextures();
-
+            void ensureRenderTargetsSize(std::vector<TexturePtr> & theTextures) const;
             unsigned _myWidth;
             unsigned _myHeight;
     };
