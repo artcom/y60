@@ -156,7 +156,7 @@ OffscreenRenderArea::activate(unsigned theCubemapFace) {
 void
 OffscreenRenderArea::ensureRenderTargetsSize(std::vector<TexturePtr> & theTextures) const {
     for (std::vector<TexturePtr>::size_type i = 1; i < theTextures.size(); ++i) {
-        if (theTextures[i]->get<TextureWidthTag>() != getWidth() || theTextures[i]->get<TextureHeightTag>() != getHeight()) {
+        if (static_cast<int>(theTextures[i]->get<TextureWidthTag>()) != getWidth() || static_cast<int>(theTextures[i]->get<TextureHeightTag>()) != getHeight()) {
             throw OffscreenRendererException("render targets: " +  theTextures.front()->get<NameTag>() + " , "
                                              + theTextures[i]->get<NameTag>() + " have different size", PLUS_FILE_LINE);
         }
