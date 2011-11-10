@@ -122,7 +122,7 @@ namespace y60 {
             bool     _myUseFBO;
             bool     _myHasFBOMultisample;
 
-            asl::Unsigned64 _myTextureNodeVersion;
+            std::vector<asl::Unsigned64> _myTextureNodeVersions;
             unsigned int  _myTextureWidth;
             unsigned int  _myTextureHeight;
             

@@ -130,7 +130,6 @@ static void checkFramebufferStatus()
 OffscreenBuffer::OffscreenBuffer() :
     _myUseFBO(hasCap("GL_EXT_framebuffer_object")),
     _myHasFBOMultisample(hasCap("GL_EXT_framebuffer_multisample GL_EXT_framebuffer_blit")),
-    _myTextureNodeVersion(0),
     _myTextureWidth(0),
     _myTextureHeight(0),
     _myBlitFilter(GL_NEAREST),
@@ -157,7 +156,7 @@ OffscreenBuffer::reset() {
     _myColorBuffers.clear();
     if (!_myMultisampleColorBuffers.empty()) glDeleteRenderbuffersEXT(_myMultisampleColorBuffers.size(), &_myMultisampleColorBuffers[0]);
     _myMultisampleColorBuffers.clear();
-    
+    _myTextureNodeVersions.clear();
 }
 
 void
@@ -316,8 +315,12 @@ OffscreenBuffer::FBOrebindRequired(std::vector<TexturePtr> & theTextures) const 
     // mrt's have to have same texture size
     unsigned int myWidth = theTextures.front()->get<TextureWidthTag>();
     unsigned int myHeight = theTextures.front()->get<TextureHeightTag>();
-    bool myTextureSizeHasChangedFlag = (_myTextureWidth != myWidth || _myTextureHeight != myHeight);
-    return (!_myFBO || (_myFBO && (theTextures.front()->getNode().nodeVersion() != _myTextureNodeVersion || myTextureSizeHasChangedFlag || (theTextures.size() != _myColorBuffers.size()))));
+    bool myTextureSizeHasChanged = (_myTextureWidth != myWidth || _myTextureHeight != myHeight);
+    bool myTextureNodeVersionsChanged = false;
+    for (std::vector<asl::Unsigned64>::size_type i = 0; i < _myTextureNodeVersions.size(); ++i) {
+        myTextureNodeVersionsChanged |= _myTextureNodeVersions[i] != theTextures[i]->getNode().nodeVersion();
+    }
+    return (myTextureNodeVersionsChanged || myTextureSizeHasChanged || (theTextures.size() != _myColorBuffers.size()));
 }
 
 void
@@ -329,19 +332,19 @@ OffscreenBuffer::bindFBO(std::vector<TexturePtr> & theTextures, unsigned int the
         + ") multisamples: " + asl::as_string(theSamples)));
     AC_DEBUG << myString;
 
-    if (FBOrebindRequired(theTextures)) {
+    if (!_myFBO || FBOrebindRequired(theTextures)) {
         AC_DEBUG << "OffscreenBuffer::bindFBO tearing down FBO since render targets have changed";
-        reset();
+        reset(); // deletes fbos if any
         // mrt's have to have same texture size
         _myTextureWidth = theTextures.front()->get<TextureWidthTag>();
         _myTextureHeight = theTextures.front()->get<TextureHeightTag>();
-        //XXX: TODO check all render target nodeversions
-        _myTextureNodeVersion = theTextures.front()->getNode().nodeVersion();
-    }
-    
-    if (!_myFBO) {
+        _myTextureNodeVersions.resize(theTextures.size());
+        for (std::vector<TexturePtr>::size_type i = 0; i < theTextures.size(); ++i) {
+            _myTextureNodeVersions[i] = theTextures[i]->getNode().nodeVersion();
+        }
         setupFBO(theTextures, theSamples, theCubemapFace);
     }
+    
     if (_myMultisampleFBO) {
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _myMultisampleFBO);
         glDrawBuffer(GL_COLOR_ATTACHMENT0_EXT);
