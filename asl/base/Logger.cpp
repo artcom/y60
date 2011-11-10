@@ -71,6 +71,9 @@ const char * LOG_VISUAL_STUDIO_FILTER_ENV = "AC_LOG_VISUAL_STUDIO_FILTER";
 const char * LOG_CONSOLE_FORMAT_ENV = "AC_LOG_CONSOLE_FORMAT";
 const char * LOG_CONSOLE_FILTER_ENV = "AC_LOG_CONSOLE_FILTER";
 
+const char * LOG_SYSLOG_FORMAT_ENV = "AC_LOG_SYSLOG_FORMAT";
+const char * LOG_SYSLOG_FILTER_ENV = "AC_LOG_SYSLOG_FILTER";
+
 const char * LOG_FILE_NAME_ENV   = "AC_LOG_FILE_NAME";
 const char * LOG_FILE_FORMAT_ENV = "AC_LOG_FILE_FORMAT";
 const char * LOG_FILE_FILTER_ENV = "AC_LOG_FILE_FILTER";
@@ -151,6 +154,14 @@ Logger::Logger() :
         addMessageSink(Ptr<MessageSink>(new StreamPrinter(std::cerr)), myConsoleFormatter, myConsoleSeverity);
     }
 
+#ifndef _WIN32
+    Ptr<LogMessageFormatter> mySyslogFormatter = createFormatter(LOG_SYSLOG_FORMAT_ENV, TerseLogMessageFormatter::name(), "console");
+    Severity mySyslogSeverity = getSeverityFromEnv(LOG_SYSLOG_FILTER_ENV, SEV_DISABLED);
+    if (mySyslogSeverity != SEV_DISABLED) {
+        addMessageSink(Ptr<MessageSink>(new SyslogPrinter()), mySyslogFormatter, mySyslogSeverity);
+    }
+#endif
+
 #ifndef _SETTING_WITH_TRACE_LOG_
      if (myConsoleSeverity == SEV_TRACE) {
             std::cerr << "### WARNING: Logger: TRACE requested, but traces were disabled at compile time in release build. Compile with -DWITH_TRACE_LOG to compile with tracing, use debug build or modify settings.h "<<std::endl;
@@ -165,6 +176,7 @@ Logger::Logger() :
         addMessageSink(Ptr<MessageSink>(new OutputWindowPrinter), myVisualStudioFormatter, myVisualStudioSeverity);
     }
 #endif
+
     Ptr<LogMessageFormatter> myFileFormatter = createFormatter(LOG_FILE_FORMAT_ENV, FullLogMessageFormatter::name(), "console");
     Severity myFileSeverity = getSeverityFromEnv(LOG_FILE_FILTER_ENV, SEV_DISABLED);
     if (myFileSeverity != SEV_DISABLED) {
