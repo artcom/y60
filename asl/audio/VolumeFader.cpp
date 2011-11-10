@@ -60,7 +60,7 @@ VolumeFader::setChannelCount(unsigned int theCount) {
 }
 
 void VolumeFader::setVolumes(std::vector<float> theTargetVolumes, unsigned theFadeDurationFrames) {
-    _myBeginVolumes = _myCurrentVolumes;
+    getVolumes(_myBeginVolumes);
     if (theTargetVolumes.size() != _myCurrentVolumes.size()) {
         throw Exception("VolumeFader::setVolumes() - number of volumes doesn't match number of channels", PLUS_FILE_LINE);
     }
