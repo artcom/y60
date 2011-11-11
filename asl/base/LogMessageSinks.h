@@ -120,7 +120,7 @@ namespace asl {
     class SyslogPrinter : public MessageSink {
     public:
         SyslogPrinter() {
-            openlog("Y60", LOG_CONS, LOG_KERN);
+            openlog("Y60", LOG_CONS, LOG_LOCAL6);
         }
         void push(Severity theSeverity, const std::string & theMessage) {
             myLock.lock();
