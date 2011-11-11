@@ -185,11 +185,18 @@ public:
     virtual void removeTuioCursor(TuioCursor *myCursor) {
         handleCursor(myCursor, "remove");
     }
+    
+#ifdef TUIO_API_VERSION_1_5
+    // blobs are not used in y60
+    virtual void addTuioBlob(TuioBlob *tblb) {}
+
+    virtual void updateTuioBlob(TuioBlob *tblb) {}
+
+    virtual void removeTuioBlob(TuioBlob *tblb) {}
+#endif //TUIO_API_VERSION_1_5
 
     virtual void refresh(TuioTime ftime) {
     }
-
-// implementation of js interface
 
     void listenToUDP(Unsigned16 thePort) {
         AC_INFO << "Listening for TUIO messages on UDP port " << thePort;
@@ -297,7 +304,7 @@ private:
     asl::Vector2f _myTouchArea;
 };
 
-
+// implementation of js interface
 
 static TUIOPlugin* ourTuioPluginInstance = 0;
 
@@ -367,6 +374,7 @@ TUIOPlugin::StaticProperties() {
 }
 
 }
+
 
 extern "C"
 EXPORT asl::PlugInBase* TUIOClient_instantiatePlugIn(asl::DLHandle myDLHandle) {
