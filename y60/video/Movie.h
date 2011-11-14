@@ -107,6 +107,7 @@ namespace y60 {
     DEFINE_ATTRIBUTE_TAG(MovieTimeTag,    double,      MOVIE_MOVIETIME_ATTRIB,   0, Y60_VIDEO_DECL);
     DEFINE_ATTRIBUTE_TAG(DecoderTag,      std::string, MOVIE_DECODER_ATTRIB,     "UNKNOWN", Y60_VIDEO_DECL);
     DEFINE_ATTRIBUTE_TAG(HasAudioTag,     bool,        MOVIE_HASAUDIO_ATTRIB,    false, Y60_VIDEO_DECL);
+    DEFINE_ATTRIBUTE_TAG(AudioStreamTag,  unsigned,    MOVIE_AUDIO_STREAM_ATTRIB,  0, Y60_VIDEO_DECL);
 
     /**
     * @ingroup Y60video
@@ -126,6 +127,7 @@ namespace y60 {
         public LoopCountTag::Plug,
         public CacheSizeTag::Plug,
         public MaxCacheSizeTag::Plug,
+        public AudioStreamTag::Plug,
         public AVDelayTag::Plug,
         public AudioTag::Plug,
         public DecoderHintTag::Plug,

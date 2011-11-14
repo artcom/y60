@@ -223,6 +223,18 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
                     case "/":
                         seekToOffset(false, 100);
                         break;
+                    case "1":
+                        if (_myMovieNode && _myMovieNode.nodeName == "movie") {
+                            if (_myMovieNode.audio_stream > 0) {
+                                _myMovieNode.audio_stream--;
+                            }
+                        }                    
+                        break;                        
+                    case "2":
+                        if (_myMovieNode && _myMovieNode.nodeName == "movie") {
+                            _myMovieNode.audio_stream++;
+                        }                    
+                        break;                        
                     case "h":
                         self.setMessage("ImageViewer help:");
                         self.setMessage("   space           - show/hide text overlay");
@@ -611,6 +623,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
                 myString += "avdelay:       " + myNode.avdelay.toPrecision(3) + "\n";
                 myString += "Total frames:  " + _myFrameCounter + "\n";
                 myString += "Decoder:       " + myNode.decoder + "\n";
+                myString += "AudioStream:   " + myNode.audio_stream + "\n";
                 myString += "Misses:  sum:  " + _myMissedFrameCounter + ", max: " + _myMaxMissedFrame + "\n";
             }
             myString += "Zoom:          " + (_myZoomFactor*100).toFixed(1) + "%\n";
@@ -666,6 +679,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
             _myMovieNode.loopcount = 0;
             _myMovieNode.audio = 1;
             _myMovieNode.decoderhint = theDecoderHint;
+            _myMovieNode.audio_stream = 0;
             //_myMovieNode.maxcachesize = 32;
             _myMovieNode.targetpixelformat = "RGB";//"YUV420";//"ALPHA";//"LUMINANCE8";//"RGB" // "ALPHA";//"RGBA8";
         }

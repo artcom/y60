@@ -3187,6 +3187,11 @@ For your information only.</xs:documentation>
                             <xs:documentation>Maximum number of video frames cached by the movie decoder</xs:documentation>
                         </xs:annotation>
                     </xs:attribute>
+                    <xs:attribute name="audio_stream" type="xs:unsignedInt">
+                        <xs:annotation>
+                            <xs:documentation>Index of audiostream, if not present take '0'</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
                     <xs:attribute name="playmode" type="xs:string">
                         <xs:annotation>
                             <xs:documentation>Sets the playmode of the movie.

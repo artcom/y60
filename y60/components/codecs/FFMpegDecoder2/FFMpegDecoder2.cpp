@@ -112,6 +112,7 @@ namespace y60 {
         _myVStreamIndex(-1),
         _myVStream(0),
         _myAStreamIndex(-1),
+        _myAStreamIndexDom(-1),
         _myAStream(0),
         _myMsgQueue(),
         _myFrame(0),
@@ -200,10 +201,12 @@ namespace y60 {
                     + theFilename, PLUS_FILE_LINE);
         }
         // for debugging you can let ffmpeg tell detail about the movie
-            //char myString[200];
-            //dump_format(_myFormatContext, 0, myString, 0);
-
+        //char myString[200];
+        //dump_format(_myFormatContext, 0, myString, 0);
         // find video/audio streams
+        _myDemux = asl::Ptr<Demux>(new Demux(_myFormatContext));
+        unsigned myAudioStreamIndex = 0;
+        _myAllAudioStreamIndicies.clear();
         for (unsigned i = 0; i < static_cast<unsigned>(_myFormatContext->nb_streams); ++i) {
             int myCodecType =  _myFormatContext->streams[i]->codec->codec_type;
         #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52, 64, 0)
@@ -214,12 +217,26 @@ namespace y60 {
                 _myVStreamIndex = i;
                 _myVStream = _myFormatContext->streams[i];
         #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52, 64, 0)
-            } else if (_myAStreamIndex == -1 && myCodecType == AVMEDIA_TYPE_AUDIO) {
+            } else if (myCodecType == AVMEDIA_TYPE_AUDIO) {
         #else
-            } else if (_myAStreamIndex == -1 && myCodecType == CODEC_TYPE_AUDIO) {
+            } else if (myCodecType == CODEC_TYPE_AUDIO) {
         #endif
-                _myAStreamIndex = i;
-                _myAStream = _myFormatContext->streams[i];
+                if (_myAStreamIndex == -1 || myAudioStreamIndex == getMovie()->get<AudioStreamTag>()) {
+                    _myAStreamIndex = i;
+                    _myAStream = _myFormatContext->streams[i];
+                    getMovie()->set<AudioStreamTag>(myAudioStreamIndex);
+                    _myAStreamIndexDom = myAudioStreamIndex;
+                }
+                _myAllAudioStreamIndicies.push_back(i);
+                _myDemux->enableStream(i);
+                AVCodecContext * myACodec = _myFormatContext->streams[i]->codec;
+                // open codec
+                AVCodec * myCodec = avcodec_find_decoder(myACodec->codec_id);
+                if (avcodec_open(myACodec, myCodec) < 0 ) {
+                    throw FFMpegDecoder2Exception(std::string("Unable to open audio codec: "), PLUS_FILE_LINE);
+                }
+
+                myAudioStreamIndex++;
             }
         }
 
@@ -239,12 +256,13 @@ namespace y60 {
             _myAStream = 0;
             _myAStreamIndex = -1;
         }
-        _myDemux = asl::Ptr<Demux>(new Demux(_myFormatContext));
         if (_myVStreamIndex != -1) {
             _myDemux->enableStream(_myVStreamIndex);
         }
-        if (_myAStreamIndex != -1) {
-            _myDemux->enableStream(_myAStreamIndex);
+        for (int i = 0; i < _myAllAudioStreamIndicies.size(); i++) {
+            if (_myAllAudioStreamIndicies[i] != -1) {
+                _myDemux->enableStream(_myAllAudioStreamIndicies[i]);
+            }
         }
 
         getVideoProperties(theFilename);
@@ -307,11 +325,13 @@ namespace y60 {
                 }
             } else if (theStartAudioFlag && hasAudio() && getDecodeAudioFlag()) {
                 _myAdjustAudioOffsetFlag = true;
-                _myDemux->clearPacketCache(_myAStreamIndex);
-                av_seek_frame(_myFormatContext, _myAStreamIndex,
-                              (int64_t)(theStartTime*(1/ av_q2d(_myAStream->time_base))) +
-                              _myAStream->start_time, AVSEEK_FLAG_BACKWARD);
-                avcodec_flush_buffers(_myAStream->codec);
+                for (int i = 0; i < _myAllAudioStreamIndicies.size(); i++) {
+                    _myDemux->clearPacketCache(_myAllAudioStreamIndicies[i]);
+                    av_seek_frame(_myFormatContext, _myAllAudioStreamIndicies[i],
+                                  (int64_t)(theStartTime*(1/ av_q2d(_myAStream->time_base))) +
+                                  _myAStream->start_time, AVSEEK_FLAG_BACKWARD);
+                    avcodec_flush_buffers(_myAStream->codec);
+                }
                 _myVideoStartTimestamp = 0;
             }
             bool myAudioEOFFlag = false;
@@ -395,7 +415,9 @@ namespace y60 {
             _myFrame = 0;
         }
         if (_myAStream) {
-            avcodec_close(_myAStream->codec);
+            for (int i = 0; i < _myAllAudioStreamIndicies.size(); i++) {
+                avcodec_close(_myFormatContext->streams[_myAllAudioStreamIndicies[i]]->codec);
+            }
             _myAStreamIndex = -1;
             _myAStream = 0;
         }
@@ -416,7 +438,15 @@ namespace y60 {
         while (double(_myAudioSink->getBufferedTime()) < myDestBufferedTime) {
             DBA(AC_DEBUG << "---- FFMpegDecoder2::readAudio: getBufferedTime="
                      << _myAudioSink->getBufferedTime();)
-            AVPacket * myPacket = _myDemux->getPacket(_myAStreamIndex);
+             AVPacket * myPacket;
+             for (int i = 0; i < _myAllAudioStreamIndicies.size(); i++) {
+                 if (_myAllAudioStreamIndicies[i] == _myAStreamIndex) {
+                     myPacket = _myDemux->getPacket(_myAllAudioStreamIndicies[i]);
+                 } else {
+                     _myDemux->getPacket(_myAllAudioStreamIndicies[i]);
+                 }
+             }
+            //AVPacket * myPacket = _myDemux->getPacket(_myAStreamIndex);
             if (!myPacket) {
                 _myAudioSink->stop(true);
                 DBA(AC_DEBUG << "---- FFMpegDecoder::readAudio(): eof");
@@ -703,6 +733,41 @@ namespace y60 {
         _myDemux->dump();
     }
 
+    void
+    FFMpegDecoder2::checkAudioStream() {
+        if (_myAStreamIndexDom == getMovie()->get<AudioStreamTag>()) {
+            return;
+        }
+        unsigned myAudioStreamIndex = 0;
+        for (unsigned i = 0; i < static_cast<unsigned>(_myFormatContext->nb_streams); ++i) {
+            int myCodecType =  _myFormatContext->streams[i]->codec->codec_type;        
+        #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52, 64, 0)
+            if (myCodecType == AVMEDIA_TYPE_AUDIO) {
+        #else
+            if (myCodecType == CODEC_TYPE_AUDIO) {
+        #endif
+                if (_myAStreamIndex == -1 || myAudioStreamIndex == getMovie()->get<AudioStreamTag>()) {
+                    if (isUnjoined()) {
+                        DB(AC_DEBUG << "Joining FFMpegDecoder Thread");
+                        join();
+                    }
+                    _myAStreamIndex = i;
+                    _myAStream = _myFormatContext->streams[i];
+                    _myAStreamIndexDom = myAudioStreamIndex;
+                    getMovie()->set<AudioStreamTag>(_myAStreamIndexDom);
+                    if (!isUnjoined()) {
+                        DB(AC_DEBUG << "seek: Forking FFMpegDecoder Thread");
+                        PosixThread::fork();
+                    } else {
+                        DB(AC_DEBUG << "Thread already running. No forking.");
+                    }
+                    break;
+                }
+                myAudioStreamIndex++;
+            }
+        }
+        getMovie()->set<AudioStreamTag>(_myAStreamIndexDom);
+    }
     double
     FFMpegDecoder2::readFrame(double theTime, unsigned /*theFrame*/, RasterVector theTargetRaster)
     {
@@ -715,7 +780,10 @@ namespace y60 {
             AC_DEBUG << "readFrame: not playing.";
             return theTime;
         }
-
+        // check audio index change
+        if (hasAudio() && getDecodeAudioFlag()) {
+            checkAudioStream();
+        }
         VideoMsgPtr myVideoMsg;
         double myStreamTime = theTime;
         myStreamTime += _myVideoStartTimestamp/_myVideoStreamTimeBase;
@@ -1043,21 +1111,6 @@ namespace y60 {
     FFMpegDecoder2::setupAudio(const std::string & theFilename) {
         AVCodecContext * myACodec = _myAStream->codec;
 
-        // open codec
-        AVCodec * myCodec = avcodec_find_decoder(myACodec->codec_id);
-        if (!myCodec) {
-            throw FFMpegDecoder2Exception(std::string("Unable to find audio decoder: ")
-                    + theFilename, PLUS_FILE_LINE);
-        }
-
-        {
-            AutoLocker<ThreadLock> myLocker(_myAVCodecLock);
-            if (avcodec_open(myACodec, myCodec) < 0 ) {
-                throw FFMpegDecoder2Exception(std::string("Unable to open audio codec: ")
-                                              + theFilename, PLUS_FILE_LINE);
-            }
-        }
-
         _myAudioSink = Pump::get().createSampleSink(theFilename);
 
         unsigned myChannels = (myACodec->channels > 2) ? 2 : myACodec->channels;
@@ -1167,8 +1220,10 @@ namespace y60 {
                                 mySeekTimeInTimeBaseUnits, mySeekFlags);
         if (theSeekAudioFlag && hasAudio() && getDecodeAudioFlag()) {
             mySeekTimeInTimeBaseUnits = int64_t(theDestTime*(1/ av_q2d(_myAStream->time_base)));
-            /*int myResult =*/ av_seek_frame(_myFormatContext, _myAStreamIndex,
-                                     mySeekTimeInTimeBaseUnits, mySeekFlags);
+             for (int i = 0; i < _myAllAudioStreamIndicies.size(); i++) {
+                /*int myResult =*/ av_seek_frame(_myFormatContext, _myAllAudioStreamIndicies[i],
+                                         mySeekTimeInTimeBaseUnits, mySeekFlags);
+             }
         }
         avcodec_flush_buffers(_myVStream->codec);
         if (theSeekAudioFlag && hasAudio() && getDecodeAudioFlag()) {

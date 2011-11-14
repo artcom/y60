@@ -208,6 +208,7 @@ namespace y60 {
         void addCacheFrame(AVFrame* theFrame, double theTime);
         void convertFrame(AVFrame* theFrame, unsigned char* theBuffer);
         VideoMsgPtr createFrame(double theTimestamp);
+        void checkAudioStream();
 
         template<typename T>
         int downmix5p1ToStereo(T * theBuffer, int theBytesDecoded) {
@@ -231,7 +232,9 @@ namespace y60 {
         int _myVStreamIndex;
         AVStream * _myVStream;
 
-        int _myAStreamIndex;
+        int _myAStreamIndexDom; // this index counts from 0, comes vom y60-dom
+        std::vector<int> _myAllAudioStreamIndicies;
+        int _myAStreamIndex;    // this index points in ffmpeg stream ordering
         AVStream * _myAStream;
 
         VideoMsgQueue _myMsgQueue;

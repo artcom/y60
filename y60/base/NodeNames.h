@@ -310,6 +310,7 @@ namespace y60 {
     const char * const MOVIE_FRAMECOUNT_ATTRIB     = "framecount";
     const char * const MOVIE_ASPECT_RATIO_ATTRIB   = "aspectratio";    
     const char * const MOVIE_HASAUDIO_ATTRIB       = "has_audio";
+    const char * const MOVIE_AUDIO_STREAM_ATTRIB   = "audio_stream";
 
     const char * const MOVIE_PLAYSPEED_ATTRIB      = "playspeed";
     const char * const MOVIE_PLAYMODE_ATTRIB       = "playmode";
