@@ -125,7 +125,7 @@ Canvas::setFrameBuffer(asl::Ptr<IFrameBuffer> theFrameBuffer) {
 }
 
 std::vector<TexturePtr>
-Canvas::getTargets(asl::Ptr<Scene,dom::ThreadingModel> theScene) {
+Canvas::getTargets(asl::Ptr<Scene,dom::ThreadingModel> theScene) const {
     std::vector<TexturePtr> myTextures;
     y60::VectorOfString myTargets = get<CanvasTargetsTag>();
     for (y60::VectorOfString::size_type i = 0; i < myTargets.size(); ++i) {

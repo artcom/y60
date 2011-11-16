@@ -71,6 +71,8 @@ DEFINE_EXCEPTION( OffscreenRendererException, asl::Exception );
 namespace y60 {
     class Texture;
     typedef asl::Ptr<Texture, dom::ThreadingModel> TexturePtr;
+    class OffscreenBuffer;
+    typedef asl::Ptr<OffscreenBuffer, dom::ThreadingModel> OffscreenBufferPtr;
 
     class Y60_GLUTIL_DECL OffscreenBuffer {
         public:
@@ -80,23 +82,22 @@ namespace y60 {
             * backbuffer rendering.
             */
             OffscreenBuffer();
-            virtual ~OffscreenBuffer();
+            ~OffscreenBuffer();
 
             /**
-            * activate the texture as render target and initializes FBO
+            * activate the textures as render targets and initializes FBOs
             * if necessary
             */
-            void activate(std::vector<TexturePtr> & theTextures,
+            void activate(const std::vector<TexturePtr> & theTextures,
                           unsigned int theSamples = 0, unsigned int theCubemapFace = 0);
 
             /**
-            * deactivates the texture as render target
-            * @param theCopyToImageFlag copy result to texture raster.
+            * deactivates the textures as render targets
+            * @param theCopyToImageFlag copy result to texture rasters.
             */
-            void deactivate(std::vector<TexturePtr> & theTextures,
+            void deactivate(const std::vector<TexturePtr> & theTextures,
                             bool theCopyToImageFlag = false);
 
-        protected:
             /**
             * set to true if you want to render on a offscreen EXT_framebuffer_object
             * if false we render on the framebuffers back buffer
@@ -110,14 +111,14 @@ namespace y60 {
 
         private:
             void reset();
-            void copyToImage(std::vector<TexturePtr> & theTextures);
+            void copyToImage(const std::vector<TexturePtr> & theTextures);
             
-            void bindFBO(std::vector<TexturePtr> & theTextures,
+            void bindFBO(const std::vector<TexturePtr> & theTextures,
                                           unsigned int theSamples, unsigned int theCubemapFace);
-            void setupFBO(std::vector<TexturePtr> & theTextures,
+            void setupFBO(const std::vector<TexturePtr> & theTextures,
                                           unsigned int theSamples, unsigned int theCubemapFace);
-            bool FBOrebindRequired(std::vector<TexturePtr> & theTextures) const;
-            void blitToTexture(std::vector<TexturePtr> & theTextures);
+            bool FBOrebindRequired(const std::vector<TexturePtr> & theTextures) const;
+            void blitToTexture(const std::vector<TexturePtr> & theTextures);
 
             bool     _myUseFBO;
             bool     _myHasFBOMultisample;

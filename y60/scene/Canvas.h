@@ -101,7 +101,7 @@ namespace y60 {
             bool setFrameBuffer(asl::Ptr<IFrameBuffer> theFrameBuffer);
 
             bool hasRenderTarget() const;
-            std::vector<asl::Ptr<Texture, dom::ThreadingModel> > getTargets(asl::Ptr<Scene, dom::ThreadingModel> theScene);
+            std::vector<asl::Ptr<Texture, dom::ThreadingModel> > getTargets(asl::Ptr<Scene, dom::ThreadingModel> theScene) const;
             ViewportPtr getViewportAt(const unsigned int theX, const unsigned int theY) const;
         private:
             asl::WeakPtr<IFrameBuffer> _myFrameBuffer;
