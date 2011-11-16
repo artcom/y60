@@ -80,7 +80,8 @@ OffscreenRenderArea::create() {
 }
 
 OffscreenRenderArea::OffscreenRenderArea() :
-    _myOffscreenBuffer(OffscreenBufferPtr(new OffscreenBuffer())), AbstractRenderWindow(JSApp::ShellErrorReporter),
+    AbstractRenderWindow(JSApp::ShellErrorReporter),
+    _myOffscreenBuffer(OffscreenBufferPtr(new OffscreenBuffer())), 
     _myWidth(0),
     _myHeight(0)
 {
