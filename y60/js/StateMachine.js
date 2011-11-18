@@ -147,7 +147,8 @@ var SM = (function () {
     StateMachine.prototype.Constructor = function (self, theArguments) {
         self.states = {};
         var _myPreparedArguments = theArguments || [];
-        if (typeof(theArguments[0]) === 'array') {
+        //XXX: needed to support arrays of states, beautify this
+        if (typeof(theArguments[0]) === 'object' && theArguments[0] instanceof Array) {
             _myPreparedArguments = theArguments[0];
         }
         
