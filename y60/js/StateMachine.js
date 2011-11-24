@@ -80,25 +80,25 @@ var SM = (function () {
         };
         self.__defineGetter__("subMachine", function () {
             return _subMachine;
+        }); 
+        self.__defineGetter__("states", function () {
+            return _subMachine.states;
         });
     };
     
     var Parallel = function (theStateID) {
-        this.Constructor(this, theStateID, arguments);
+        var myStateMachines = Array.prototype.slice.call(arguments);
+        myStateMachines.shift();
+        this.Constructor(this, theStateID, myStateMachines);
     };
     
-    Parallel.prototype.Constructor = function (self, theStateID, theArguments) {
+    Parallel.prototype.Constructor = function (self, theStateID, theStatemachines) {
         State.prototype.Constructor(self, theStateID);
-        // Create a new array from the contents of arguments
-        var args = Array.prototype.slice.call(theArguments);
-        if (args.length < 2) {
-            throw "not enough arguments";
-        }
-        var _id          = args.shift();
-        var _subMachines = args;
-
+        
+        var _subMachines = theStatemachines || [];
+        
         self.toString = function toString() {
-            return _id + "/(" + _subMachines.join('|') + ")";
+            return self.id + "/(" + _subMachines.join('|') + ")";
         };
 
         self._enter = function (thePreviousState, theData) {
@@ -145,23 +145,24 @@ var SM = (function () {
     };
 
     StateMachine.prototype.Constructor = function (self, theArguments) {
-        var _states       = {};
-        var _myPreparedArguments = theArguments;
-        if (theArguments[0] && typeof(theArguments[0]) === 'object' && theArguments[0] instanceof Array) {
+        self.states = {};
+        var _myPreparedArguments = theArguments || [];
+        //XXX: needed to support arrays of states, beautify this
+        if (typeof(theArguments[0]) === 'object' && theArguments[0] instanceof Array) {
             _myPreparedArguments = theArguments[0];
         }
         
-        self.initialState = _myPreparedArguments[0].id;
+        self.initialState = !!_myPreparedArguments.length ? _myPreparedArguments[0].id : null; // NOTE: initialState needs to be set before setup()
         self.transition   = null;
         var _currentState = null;
 
         for (var i = 0; i  < _myPreparedArguments.length; ++i) {
-            _states[_myPreparedArguments[i].id] = _myPreparedArguments[i];
+            self.states[_myPreparedArguments[i].id] = _myPreparedArguments[i];
         }
 
         self.toString = function toString() {
-            if (_currentState in _states) {
-                return _states[_currentState].toString();
+            if (_currentState in self.states) {
+                return self.states[_currentState].toString();
             } else {
                 return "_uninitializedStatemachine_";
             }
@@ -170,42 +171,42 @@ var SM = (function () {
             return _states;
         });*/
         self.__defineGetter__('stateObject', function () {
-            return _states[_currentState];
+            return self.states[_currentState];
         });
 
-        function switchState(newState, theData) {
+        self.switchState = function (newState, theData) {
             if (self.transition !== null) { 
                 self.transition.switchState = function () {
-                    Logger.debug("events from the past caught up with you");
+                    Logger.debug("<StateMachine::switchState> events from the past caught up with you");
                 }; 
                 self.transition = null;
             }
             Logger.debug("State transition '" + _currentState + "' => '" + newState + "'");
             // call old state's exit handler
             if (_currentState !== null && '_exit' in self.stateObject) {
-                Logger.debug("exiting state '" + _currentState + "'");
+                Logger.debug("<StateMachine::switchState> exiting state '" + _currentState + "'");
                 self.stateObject._exit(newState, theData);
             }
             var oldState  = _currentState; 
             _currentState = newState;
             // call new state's enter handler
             if (_currentState !== null && '_enter' in self.stateObject) {
-                Logger.debug("entering state '" + _currentState + "'");
+                Logger.debug("<StateMachine::switchState> entering state '" + _currentState + "'");
                 self.stateObject._enter(oldState, theData);
             }
-        }
+        };
 
         self.setup = function (theData) {
-            Logger.debug("setting initial state: " + self.initialState);
+            Logger.debug("<StateMachine::setup> setting initial state: " + self.initialState);
             _currentState = null;
-            switchState(self.initialState, theData);
+            self.switchState(self.initialState, theData);
         };
         self.teardown = function () {
             if (self.transition !== null) {
-                Logger.debug("terminated transition on teardown");
+                Logger.debug("<StateMachine::teardown> terminated transition on teardown");
                 self.transition.terminate();
             }
-            switchState(null, {});
+            self.switchState(null, {});
         };
 
         self.terminateTransition = function (evt) {
@@ -227,7 +228,7 @@ var SM = (function () {
 
         self.handleEvent = function () {
             if (self.transition !== null && !self.transition.handleEvent.apply(self.transition, arguments)) {
-                Logger.debug("dropped " + arguments[0] + " during handleEvent: transition still active: " + _currentState);
+                Logger.debug("<StateMachine::handleEvent> dropped " + arguments[0] + " during handleEvent: transition still active: " + _currentState);
                 return;
             }
             if (!_currentState) {
@@ -240,12 +241,12 @@ var SM = (function () {
             }
             if (nextState instanceof SM.Transition) {
                 self.transition             = nextState;
-                self.transition.switchState = switchState;
+                self.transition.switchState = self.switchState;
                 self.transition.travel();
             } else if (nextState instanceof Array) {
-                switchState(nextState[0], (nextState[1] || {}));
+                self.switchState(nextState[0], (nextState[1] || {}));
             } else if (typeof(nextState) === 'string') {
-                switchState(nextState, {});
+                self.switchState(nextState, {});
             } else {
                 // we don't know self event (nextState == null), so bubble down to the children
                 if ('handleEvent' in self.stateObject) {
