@@ -182,20 +182,27 @@ void HWSampleSink::setVolumes(const std::vector<float> & theVolumes) {
     ASSURE(theVolumes.size() > 0);
     AutoLocker<ThreadLock> myLocker(_myQueueLock);
     // no fading here
-    _myVolumeFader->setVolumes(theVolumes);
+    if (_myState != PAUSING_FADE_OUT) {
+        // set volume delayed, cause volume faders volume is needed for a state change in delieverdata from PAUSING_FADE_OUT -> PAUSED
+        _myVolumeFader->setVolumes(theVolumes);
+    }
     _myVolume = theVolumes;
 }
 void HWSampleSink::setVolume(float theVolume) {
+    AC_PRINT << (void*)this << " HWSampleSink::setVolume";
     ASSURE(theVolume <= 1.0);
     AutoLocker<ThreadLock> myLocker(_myQueueLock);
     for (unsigned i = 0; i < _myVolume.size(); i ++) {
         _myVolume[i] = theVolume;
     }
-    if (_myState == STOPPED || _myState == PAUSED) {
-        // No fade, immediate volume change.
-        _myVolumeFader->setVolume(theVolume, 0);
-    } else {
-        _myVolumeFader->setVolume(theVolume);
+    if (_myState != PAUSING_FADE_OUT) {
+        // set volume delayed, cause volume faders volume is needed for a state change in delieverdata from PAUSING_FADE_OUT -> PAUSED
+        if (_myState == STOPPED || _myState == PAUSED) {
+            // No fade, immediate volume change.
+            _myVolumeFader->setVolume(theVolume, 0);
+        } else {
+            _myVolumeFader->setVolume(theVolume);
+        }
     }
 }
 
@@ -205,7 +212,10 @@ void HWSampleSink::fadeToVolume(float theVolume, float theTime) {
     for (unsigned i = 0; i < _myVolume.size(); i ++) {
         _myVolume[i] = theVolume;
     }
-    _myVolumeFader->setVolumes(_myVolume, unsigned(theTime*getSampleRate()));
+    if (_myState != PAUSING_FADE_OUT) {
+        // set volume delayed, cause volume faders volume is needed for a state change in delieverdata from PAUSING_FADE_OUT -> PAUSED
+        _myVolumeFader->setVolumes(_myVolume, unsigned(theTime*getSampleRate()));
+    }
 }
 
 bool HWSampleSink::isPlaying() const {
@@ -375,6 +385,7 @@ void HWSampleSink::deliverData(AudioBufferBase& theBuffer) {
     }
     if (_myState == PAUSING_FADE_OUT && almostEqual(_myVolumeFader->getVolume(), 0.0)) {
         changeState(PAUSED);
+        _myVolumeFader->setVolumes(_myVolume);
         _myLockedSelf = HWSampleSinkPtr();
         AudioTimeSource::pause();
     }
