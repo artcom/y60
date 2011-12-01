@@ -23,7 +23,7 @@ spark.Movie.Constructor = function(Protected) {
     var _myUseCaching        = false;    
     var _myTexture           = null;
     var _myStartFrame        = 0; //movie should start at this frame after setting src
-    var _myDecoderHint       = undefined;
+    var _myDecoderHint;
     var _myTargetPixelFormat = "RGB";
     var _myCacheSize         = 8;
     var _mySetSourceWithoutChangingImageNode = false;
@@ -59,11 +59,11 @@ spark.Movie.Constructor = function(Protected) {
     }
 
     function initMovie(theFullInitFlag) {
-        if (theFullInitFlag || theFullInitFlag == undefined) {
+        if (theFullInitFlag) {
             _myMovie.currentframe = _myStartFrame;            
             Public.mode = Protected.getString("mode", "stop");
             var myVolumes = Protected.getArray("volumes", []);
-            if (myVolumes.length == 0) {
+            if (myVolumes.length === 0) {
                 Public.volume = Protected.getNumber("volume", 1.0);
             } else {
                 Public.volumes = myVolumes;
@@ -96,11 +96,8 @@ spark.Movie.Constructor = function(Protected) {
             ("targetpixelformat" in theNode && theNode.targetpixelformat === "YUV420")))
         {
             theNode.targetpixelformat = "YUV420";
-            Base.realizeResizableRectangle = Public.realize;
             use("YUV2RGBShader.js");
             Public.Inherit(spark.YUV2RGBShader);
-            Base.realizeYUV2RGBShader = Public.realize;
-            Public.realize = Base.realizeResizableRectangle;
         }
         Base.initialize(theNode);
     };
@@ -211,7 +208,7 @@ spark.Movie.Constructor = function(Protected) {
         }
         _myMovie = theNode;
         _myTexture.image = theNode.id;
-        Public.onMovieChanged();
+        Protected.onMovieChanged(true);
     });
 
     Public.__defineGetter__("src", function() {
@@ -219,6 +216,7 @@ spark.Movie.Constructor = function(Protected) {
     });
     
     Public.__defineSetter__("src", function (theSourceFile) {
+        var myName, myCachedMovie;
         if(_mySource !== theSourceFile) {
             _mySource = theSourceFile;   
             if (_mySetSourceWithoutChangingImageNode) {
@@ -232,12 +230,12 @@ spark.Movie.Constructor = function(Protected) {
                     var myFullInitFlag = true;
                     if (_myUseCaching) {
                         // check cache
-                        var myName = spark.getMovieCacheKey(theSourceFile);
-                        var myCachedMovie = spark.getNode(myName);
+                        myName = spark.getMovieCacheKey(theSourceFile);
+                        myCachedMovie = spark.getNode(myName);
                         if (myCachedMovie) {
                             _myMovie = myCachedMovie;
                             _myTexture.image = myCachedMovie.id;
-                            // do not do a full init movie when we are using a chached video, which is already in use                            
+                            // do not do a full init movie when we are using a cached video, which is already in use                            
                             myFullInitFlag = false;
                         } else {
                             _myMovie.src = theSourceFile;
@@ -248,17 +246,17 @@ spark.Movie.Constructor = function(Protected) {
                     if (myFullInitFlag) {
                         _myMovie.currentframe = _myStartFrame;
                     }
-                    Public.onMovieChanged(myFullInitFlag);
+                    Protected.onMovieChanged(myFullInitFlag);
                 }
             } else {
                 if (_myUseCaching) {
-                    var myName = spark.getMovieCacheKey(theSourceFile);
-                    var myCachedMovie = spark.getNode(myName);
+                    myName = spark.getMovieCacheKey(theSourceFile);
+                    myCachedMovie = spark.getNode(myName);
                     if (myCachedMovie) {
                         _myMovie = myCachedMovie;
                         _myTexture.image = myCachedMovie.id;
-                        // do not do a full init movie when we are using a chached video, which is already in use                                                    
-                        Public.onMovieChanged(false);
+                        // do not do a full init movie when we are using a cached video, which is already in use                                                    
+                        Protected.onMovieChanged(false);
                     } else {
                         Public.movie = spark.getCachedMovie(theSourceFile, _myTargetPixelFormat, _myDecoderHint, Protected.getBoolean("audio", true), _myStartFrame,_myCacheSize);
                     }
@@ -310,7 +308,7 @@ spark.Movie.Constructor = function(Protected) {
         _mySetSourceWithoutChangingImageNode = Protected.getBoolean("setSourceWithoutChangingImageNode", _mySetSourceWithoutChangingImageNode);
         _myUseCaching = Protected.getBoolean("useCaching", _myUseCaching);
 
-        if(myMovieSource === "") {
+        if (myMovieSource === "") {
             var myWidth  = Protected.getNumber("width", 1);
             var myHeight = Protected.getNumber("height", 1);
             _myMovie      = Modelling.createImage(window.scene, myWidth, myHeight, "BGR");
@@ -336,21 +334,18 @@ spark.Movie.Constructor = function(Protected) {
                 _myTexture, Public.name + "-material", true);
 
         Base.realize(myMaterial);
-        Public.onMovieChanged();
+        Protected.onMovieChanged(true);
     };
 
     Base.postRealize = Public.postRealize;
     Public.postRealize = function() {
-        if(_mySourceId) {
+        if (_mySourceId) {
             attachToI18nItem(_mySourceId);
-        }
-        if ("realizeYUV2RGBShader" in Base && Base.realizeYUV2RGBShader) {
-            Base.realizeYUV2RGBShader();
         }
         Base.postRealize();
     };
 
-    Public.onMovieChanged = function(theFullInitFlag) {
+    Protected.onMovieChanged = function(theFullInitFlag) {
         if (_myMovie.nodeName !== "image") {
             ensureAspectRatio();
             initMovie(theFullInitFlag);
