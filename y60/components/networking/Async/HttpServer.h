@@ -131,8 +131,7 @@ namespace y60 {
             HttpServerPtr                     _myHttpServer;
             HttpServerThreadPtr               _myHttpServerThread;
             std::size_t                       _myNumThreads;
-            Y60RequestQueuePtr                _myRequestQueue;
-            Y60ResponseQueuePtr               _myResponseQueue;
+            ConcurrentQueue<http::server::request>          _myRequestQueue;
 
             std::map<std::string, JSCallback> _myCallbacks;
 

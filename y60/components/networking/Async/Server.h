@@ -21,7 +21,6 @@
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
 #include "Connection.h"
-#include "RequestHandler.h"
 
 namespace http {
 namespace server {
@@ -35,8 +34,7 @@ public:
   /// serve up files from the given directory.
   explicit server(const std::string& address, const std::string& port,
       const std::string& doc_root, std::size_t thread_pool_size,
-      const y60::Y60RequestQueuePtr & theRequestQueue,
-      const y60::Y60ResponseQueuePtr & theResponseQueue);
+      ConcurrentQueue<request> & theRequestQueue);
 
   /// Run the server's io_service loop.
   void run();
@@ -61,7 +59,7 @@ private:
   connection_ptr new_connection_;
 
   /// The handler for all incoming requests.
-  request_handler request_handler_;
+  ConcurrentQueue<request> & request_queue;
 };
 
 } // namespace server

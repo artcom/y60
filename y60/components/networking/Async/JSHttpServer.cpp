@@ -289,7 +289,7 @@ bool convertFrom(JSContext *cx, jsval theValue, JSHttpServer::OWNERPTR & theNati
     return false;
 }
 
-
+/*
 bool convertFrom(JSContext *cx, jsval theValue, JSHttpServer::NATIVE & theNative) {
     if (JSVAL_IS_OBJECT(theValue)) {
         JSObject * myArgument;
@@ -302,7 +302,7 @@ bool convertFrom(JSContext *cx, jsval theValue, JSHttpServer::NATIVE & theNative
     }
     return false;
 }
-
+*/
 jsval as_jsval(JSContext *cx, JSHttpServer::OWNERPTR theOwner) {
     JSObject * myReturnObject = JSHttpServer::Construct(cx, theOwner, theOwner.get());
     return OBJECT_TO_JSVAL(myReturnObject);

@@ -13,10 +13,13 @@
 
 #include <string>
 #include <vector>
+#include <boost/shared_ptr.hpp>
 #include "HttpHeader.h"
 
 namespace http {
 namespace server {
+
+class connection;
 
 /// A request received from a client.
 struct request
@@ -27,6 +30,7 @@ struct request
   int http_version_minor;
   std::vector<header> headers;
   std::string body;
+  boost::shared_ptr<connection> conn;
 };
 
 } // namespace server

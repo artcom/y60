@@ -56,10 +56,12 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 #include "HttpServer.h"
+#include "Y60Request.h"
 
 #include <string>
 #include <y60/jsbase/JScppUtils.h>
 #include <boost/bind.hpp>
+#include <boost/lexical_cast.hpp>
 
 using namespace std;
 using namespace asl;
@@ -72,8 +74,6 @@ namespace y60 {
         _myHttpServerThread(0),
         _myNumThreads(5)
     {
-        _myRequestQueue  = Y60RequestQueuePtr(new Y60RequestQueue);
-        _myResponseQueue = Y60ResponseQueuePtr(new Y60ResponseQueue);
     }
 
     HttpServer::~HttpServer()
@@ -87,8 +87,7 @@ namespace y60 {
             HttpServerPtr(new http::server::server(  theServerAddress, 
                                                      theServerPort, 
                                                      ".", _myNumThreads,
-                                                     _myRequestQueue,
-                                                     _myResponseQueue) );
+                                                     _myRequestQueue) );
 
         _myHttpServerThread = 
             HttpServerThreadPtr(new boost::thread( boost::bind( &http::server::server::run,
@@ -202,33 +201,62 @@ namespace y60 {
     }
 
     bool HttpServer::requestsPending() {
-        return !(_myRequestQueue->empty());
+        return !(_myRequestQueue.empty());
     }
 
     void HttpServer::handleRequest() {
         try {
-            y60::Y60Request myRequest;
-            bool hasRequest = _myRequestQueue->try_pop(myRequest);
-            if (!hasRequest) { 
-                return;
+            http::server::request rawRequest;
+            while (_myRequestQueue.try_pop(rawRequest)) {
+                std::string myPath = rawRequest.uri.substr(0, rawRequest.uri.find_first_of("?"));  
+            
+                y60::Y60Response myResponse;
+                y60::Y60Request myRequest;
+                myRequest.uri    = rawRequest.uri;
+                myRequest.method = rawRequest.method;
+                myRequest.body   = rawRequest.body;
+            
+                if (_myCallbacks.find(myPath) != _myCallbacks.end()) {
+                    JSCallback myCallback = _myCallbacks[myPath]; 
+                    myResponse = invokeCallback( myCallback, myRequest, myRequest.uri );
+                } else if (_myCallbacks.find("*") != _myCallbacks.end()) {
+                    JSCallback myCallback = _myCallbacks["*"]; 
+                    myResponse = invokeCallback( myCallback, myRequest, myRequest.uri );
+                } else {
+                    myResponse.return_code  = http::server::reply::not_found; 
+                    AC_ERROR << "No callback registered for path: \"" << myPath << "\"!";
+                }
+                // _myResponseQueue->push( myResponse );
+                // Fill out the reply to be sent to the client.
+                http::server::reply rep;
+                rep.content.append(myResponse.payload.c_str(), myResponse.payload.length());
+                rep.status = myResponse.return_code;
+                rep.headers.clear();
+
+                bool hasContentLengthFlag = false;
+                bool hasContentTypeFlag = false;
+                for (std::vector<http::server::header>::size_type i = 0; i < myResponse.headers.size(); ++i) {
+                    const http::server::header &myHeader = myResponse.headers[i];
+                    hasContentLengthFlag = hasContentLengthFlag || (myHeader.name == "Content-Length");
+                    hasContentTypeFlag   = hasContentTypeFlag || (myHeader.name == "Content-Type");
+                    rep.headers.push_back(myHeader);
+                }
+
+                if (!hasContentLengthFlag) {
+                    rep.headers.push_back(http::server::header("Content-Length",
+                                boost::lexical_cast<std::string>(rep.content.size())));
+                }
+            
+                if (!hasContentTypeFlag) {
+                    http::server::header myContentType("Content-Type", "text/plain");
+                    if ( myResponse.content_type.length() > 0 ) {
+                        myContentType.value = myResponse.content_type;
+                    }
+                    rep.headers.push_back(myContentType);
+                }
+                rawRequest.conn->async_respond(rep);
+                rawRequest.conn.reset();
             }
-            
-            std::string myResponseString;
-            std::string myPath = myRequest.uri.substr(0, myRequest.uri.find_first_of("?"));  
-            
-            y60::Y60Response myResponse;
-            
-            if (_myCallbacks.find(myPath) != _myCallbacks.end()) {
-                JSCallback myCallback = _myCallbacks[myPath]; 
-                myResponse = invokeCallback( myCallback, myRequest, myRequest.uri );
-            } else if (_myCallbacks.find("*") != _myCallbacks.end()) {
-                JSCallback myCallback = _myCallbacks["*"]; 
-                myResponse = invokeCallback( myCallback, myRequest, myRequest.uri );
-            } else {
-                myResponse.return_code  = http::server::reply::not_found; 
-                AC_ERROR << "No callback registered for path: \"" << myPath << "\"!";
-            }
-            _myResponseQueue->push( myResponse );
         } catch (Exception e) {
             AC_ERROR << e;
         };

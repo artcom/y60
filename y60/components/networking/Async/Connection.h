@@ -18,8 +18,8 @@
 #include <boost/enable_shared_from_this.hpp>
 #include "Reply.h"
 #include "Request.h"
-#include "RequestHandler.h"
 #include "RequestParser.h"
+#include "ConcurrentQueue.h"
 
 namespace http {
 namespace server {
@@ -31,14 +31,16 @@ class connection
 {
 public:
   /// Construct a connection with the given io_service.
-  explicit connection(boost::asio::io_service& io_service,
-      request_handler& handler);
+  explicit connection(boost::asio::io_service& io_service, ConcurrentQueue<request> & theRequestQueue);
+  virtual ~connection();
 
   /// Get the socket associated with the connection.
   boost::asio::ip::tcp::socket& socket();
 
   /// Start the first asynchronous operation for the connection.
   void start();
+  
+  void async_respond(const reply & r);
 
 private:
   /// Handle completion of a read operation.
@@ -51,11 +53,11 @@ private:
   /// Strand to ensure the connection's handlers are not called concurrently.
   boost::asio::io_service::strand strand_;
 
+  //// the request queue
+  ConcurrentQueue<request> & request_queue;
+  
   /// Socket for the connection.
   boost::asio::ip::tcp::socket socket_;
-
-  /// The handler used to process the incoming request.
-  request_handler& request_handler_;
 
   /// Buffer for incoming data.
   boost::array<char, 8192> buffer_;
@@ -68,6 +70,7 @@ private:
 
   /// The reply to be sent back to the client.
   reply reply_;
+
 };
 
 typedef boost::shared_ptr<connection> connection_ptr;

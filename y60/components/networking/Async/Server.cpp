@@ -19,13 +19,11 @@ namespace server {
 
 server::server(const std::string& address, const std::string& port,
     const std::string& doc_root, std::size_t thread_pool_size,
-    const y60::Y60RequestQueuePtr & theRequestQueue,
-    const y60::Y60ResponseQueuePtr & theResponseQueue)
+    ConcurrentQueue<request> & theRequestQueue)
   : thread_pool_size_(thread_pool_size),
     acceptor_(io_service_),
-    new_connection_(new connection(io_service_, request_handler_)),
-    // TODO: remove doc_root
-    request_handler_(doc_root, theRequestQueue, theResponseQueue)
+    new_connection_(new connection(io_service_, theRequestQueue)),
+    request_queue(theRequestQueue)
 {
   // Open the acceptor with the option to reuse the address (i.e. SO_REUSEADDR).
   boost::asio::ip::tcp::resolver resolver(io_service_);
@@ -66,7 +64,7 @@ void server::handle_accept(const boost::system::error_code& e)
   if (!e)
   {
     new_connection_->start();
-    new_connection_.reset(new connection(io_service_, request_handler_));
+    new_connection_.reset(new connection(io_service_, request_queue));
     acceptor_.async_accept(new_connection_->socket(),
         boost::bind(&server::handle_accept, this,
           boost::asio::placeholders::error));

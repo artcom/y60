@@ -5,7 +5,6 @@ JSHttpServer.cpp
 NetAsync.cpp
 MimeTypes.cpp
 Reply.cpp
-RequestHandler.cpp
 RequestParser.cpp
 Server.cpp
 )
@@ -19,10 +18,9 @@ JSHttpServer.h
 MimeTypes.h
 Reply.h
 Request.h
-RequestHandler.h
 RequestParser.h
 Server.h
-y60_httpserver_settings.h
+y60_netasync_settings.h
 )
 
 list ( APPEND EXTERNALS )

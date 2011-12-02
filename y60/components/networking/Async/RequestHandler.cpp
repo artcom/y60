@@ -22,16 +22,12 @@
 namespace http {
     namespace server {
 
-        request_handler::request_handler(const std::string& doc_root, 
-                                         const y60::Y60RequestQueuePtr & theRequestQueue,
-                                         const y60::Y60ResponseQueuePtr & theResponseQueue)
-            : doc_root_(doc_root),
-              _myRequestQueue(theRequestQueue),
-              _myResponseQueue(theResponseQueue)
+        request_handler::request_handler(const y60::Y60RequestQueuePtr & theRequestQueue)
+              : _myRequestQueue(theRequestQueue)
         {
         }
 
-        void request_handler::handle_request(const request& req, reply& rep)
+        void request_handler::handle_request(const request& req)
         {
             // Decode url to path.
             std::string request_path;
@@ -70,7 +66,9 @@ namespace http {
             myRequest.body   = req.body;
 
             _myRequestQueue->push( myRequest );
-
+            /*
+             * TODO move to response
+             *
             y60::Y60Response myResponse;
             _myResponseQueue->wait_and_pop(myResponse);
 
@@ -103,6 +101,7 @@ namespace http {
                 }
                 rep.headers.push_back(myContentType);
             }
+            */
         }
         
         bool request_handler::url_decode(const std::string& in, std::string& out)

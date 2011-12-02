@@ -23,10 +23,8 @@ namespace y60 {
     };
 
     typedef ConcurrentQueue<Y60Request> Y60RequestQueue;
-    typedef ConcurrentQueue<Y60Response> Y60ResponseQueue;
 
     typedef asl::Ptr<ConcurrentQueue<Y60Request>,dom::ThreadingModel> Y60RequestQueuePtr;
-    typedef asl::Ptr<ConcurrentQueue<Y60Response>,dom::ThreadingModel> Y60ResponseQueuePtr;
 
 }
 

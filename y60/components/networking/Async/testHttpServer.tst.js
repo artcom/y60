@@ -79,7 +79,6 @@ HttpServerUnitTest.prototype.Constructor = function (obj, theName) {
     obj.run = function () {
 
         obj.callback_answer = "callback";
-        obj.fallback_answer = "fallback";
 
         var myObj = {
             test : function (theMethod, theBody) {

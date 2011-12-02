@@ -116,7 +116,7 @@ struct JSClassTraits<JSHttpServer::NATIVE>
 
 } // namespace jslib
 
-bool convertFrom(JSContext *cx, jsval theValue, JSHttpServer::NATIVE & theNative);
+// bool convertFrom(JSContext *cx, jsval theValue, JSHttpServer::NATIVE & theNative);
 bool convertFrom(JSContext *cx, jsval theValue, JSHttpServer::OWNERPTR & theNativePtr);
 
 jsval as_jsval(JSContext *cx, JSHttpServer::OWNERPTR theOwner);
