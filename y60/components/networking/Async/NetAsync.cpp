@@ -60,25 +60,41 @@
 
 #include <asl/base/PlugInBase.h>
 #include <y60/jsbase/IScriptablePlugin.h>
+#include <y60/jslib/IRendererExtension.h>
 
 namespace y60 {
-	class JSHttpServerPlugIn : public asl::PlugInBase, public jslib::IScriptablePlugin {
+	class NetAsync : 
+        public asl::PlugInBase, 
+        public IRendererExtension, 
+        public jslib::IScriptablePlugin
+    {
     	public:
-    		JSHttpServerPlugIn(asl::DLHandle theDLHandle) : asl::PlugInBase(theDLHandle) {}
+    		NetAsync(asl::DLHandle theDLHandle) : 
+                asl::PlugInBase(theDLHandle),
+                IRendererExtension(ClassName()) 
+        {}
 
-    		virtual void initClasses(JSContext * theContext, JSObject *theGlobalObject) {
-                AC_WARNING << "HttpServer is deprecated (and buggy!). Use the Async Plugin";
-    			JSHttpServer::initClass(theContext, theGlobalObject);
-    		}
+        virtual void initClasses(JSContext * theContext, JSObject *theGlobalObject) {
+            IScriptablePlugin::initClasses(theContext, theGlobalObject);
+            JSHttpServer::initClass(theContext, theGlobalObject);
+        }
 
-    		const char * ClassName() {
-    		    static const char * myClassName = "HttpServerPlugin";
-    		    return myClassName;
-    		}
+        const char * ClassName() {
+            static const char * myClassName = "NetAsync";
+            return myClassName;
+        }
+        virtual void onStartup(jslib::AbstractRenderWindow * theWindow) {}
+        virtual bool onSceneLoaded(jslib::AbstractRenderWindow * theWindow) { return true; }
+
+        virtual void handle(jslib::AbstractRenderWindow * theWindow, y60::EventPtr theEvent) {}
+        virtual void onFrame(jslib::AbstractRenderWindow * theWindow , double t) {}
+
+        virtual void onPreRender(jslib::AbstractRenderWindow * theRenderer) {}
+        virtual void onPostRender(jslib::AbstractRenderWindow * theRenderer) {}
 	};
 }
 
 extern "C"
-EXPORT asl::PlugInBase * HttpServer_instantiatePlugIn(asl::DLHandle myDLHandle) {
-	return new y60::JSHttpServerPlugIn(myDLHandle);
+EXPORT asl::PlugInBase * NetAsync_instantiatePlugIn(asl::DLHandle myDLHandle) {
+	return new y60::NetAsync(myDLHandle);
 }
