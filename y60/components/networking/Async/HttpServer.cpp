@@ -260,8 +260,8 @@ namespace y60 {
                     }
                     rep.headers.push_back(myContentType);
                 }
-                rawRequest.conn->async_respond(rep);
-                rawRequest.conn.reset();
+                rawRequest.conn->async_respond(rep); // this is threadsafe
+                rawRequest.conn.reset(); // free shared_ptr
             }
         } catch (Exception e) {
             AC_ERROR << e;
