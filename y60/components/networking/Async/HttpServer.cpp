@@ -57,6 +57,7 @@
 */
 #include "HttpServer.h"
 #include "Y60Request.h"
+#include "NetAsync.h"
 
 #include <string>
 #include <y60/jsbase/JScppUtils.h>
@@ -70,9 +71,7 @@ using namespace inet;
 namespace y60 {
     
     HttpServer::HttpServer() :
-        _myHttpServer(0),
-        _myHttpServerThread(0),
-        _myNumThreads(5)
+        _myHttpServer(0)
     {
     }
 
@@ -82,29 +81,23 @@ namespace y60 {
         std::map<std::string, JSCallback>::iterator it;
 
         for (it = _myCallbacks.begin(); it != _myCallbacks.end(); ++it) {
-            AC_WARNING << "deleting " << it->first;
+            AC_DEBUG << "deleting " << it->first;
             JS_RemoveRoot( it->second.context, &(it->second.functionValue));
         };
         _myCallbacks.clear();
     }
     
     bool HttpServer::start( string theServerAddress, string theServerPort ) {
-
+        AC_DEBUG << "starting HttpServer";
         _myHttpServer = 
             HttpServerPtr(new http::server::server(  theServerAddress, 
                                                      theServerPort, 
-                                                     ".", _myNumThreads,
+                                                     NetAsync::io_service(),
                                                      _myRequestQueue) );
-
-        _myHttpServerThread = 
-            HttpServerThreadPtr(new boost::thread( boost::bind( &http::server::server::run,
-                                                                &(*_myHttpServer) ) ) );
         return true;
     }
 
     void HttpServer::close() {
-        _myHttpServer->stop();
-        _myHttpServerThread->join();
     }
 
     y60::Y60Response HttpServer::invokeCallback( const JSCallback & theCallback, 

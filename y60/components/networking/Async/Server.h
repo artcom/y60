@@ -33,7 +33,7 @@ public:
   /// Construct the server to listen on the specified TCP address and port, and
   /// serve up files from the given directory.
   explicit server(const std::string& address, const std::string& port,
-      const std::string& doc_root, std::size_t thread_pool_size,
+      boost::asio::io_service & io,
       ConcurrentQueue<request> & theRequestQueue);
 
   /// Run the server's io_service loop.
@@ -50,7 +50,7 @@ private:
   std::size_t thread_pool_size_;
 
   /// The io_service used to perform asynchronous operations.
-  boost::asio::io_service io_service_;
+  boost::asio::io_service & io_service_;
 
   /// Acceptor used to listen for incoming connections.
   boost::asio::ip::tcp::acceptor acceptor_;

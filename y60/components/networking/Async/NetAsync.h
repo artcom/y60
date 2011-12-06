@@ -56,65 +56,55 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-#include "NetAsync.h"
+#include "JSHttpServer.h"
+
+#include <boost/asio.hpp>
+
+#include <asl/base/PlugInBase.h>
+#include <y60/jsbase/IScriptablePlugin.h>
+#include <y60/jslib/IRendererExtension.h>
 
 namespace y60 {
-    	
-NetAsync::NetAsync(asl::DLHandle theDLHandle) : 
-                asl::PlugInBase(theDLHandle),
-                IRendererExtension(ClassName()) 
-{
-    _myAsioThread = AsioThreadPtr(new boost::thread( boost::bind( &NetAsync::run, this, 10) ) );
-};
-
-NetAsync::~NetAsync() {
-    stop();
-};
-
-boost::asio::io_service & 
-NetAsync::io_service() {
-    return io;
-};
-
-
-void 
-NetAsync::initClasses(JSContext * theContext, JSObject *theGlobalObject) {
-    IScriptablePlugin::initClasses(theContext, theGlobalObject);
-    JSHttpServer::initClass(theContext, theGlobalObject);
-};
-
-void
-NetAsync::run(std::size_t thread_pool_size) {
-    AC_DEBUG << "starting asio threads";
-    
-    // Create a pool of threads to run all of the io_services.
-    std::vector<boost::shared_ptr<boost::thread> > threads;
-    for (std::size_t i = 0; i < thread_pool_size; ++i)
+	class NetAsync : 
+        public asl::PlugInBase, 
+        public IRendererExtension, 
+        public jslib::IScriptablePlugin
     {
-        boost::shared_ptr<boost::thread> thread(new boost::thread(
-                    boost::bind(&boost::asio::io_service::run, &io)));
-        threads.push_back(thread);
-    }
+    public:
+        typedef asl::Ptr<boost::thread, dom::ThreadingModel> AsioThreadPtr;
+    	
+        NetAsync(asl::DLHandle theDLHandle);
+        virtual ~NetAsync();
+        static boost::asio::io_service & io_service();
+        virtual void initClasses(JSContext * theContext, JSObject *theGlobalObject);
 
-    // Wait for all threads in the pool to exit.
-    for (std::size_t i = 0; i < threads.size(); ++i)
-        threads[i]->join();
+        const char * ClassName() {
+            static const char * myClassName = "NetAsync";
+            return myClassName;
+        }
+        virtual void onStartup(jslib::AbstractRenderWindow * theWindow) {}
+        virtual bool onSceneLoaded(jslib::AbstractRenderWindow * theWindow) { return true; }
 
-    AC_DEBUG << "asio threads terminated";
-};
+        virtual void handle(jslib::AbstractRenderWindow * theWindow, y60::EventPtr theEvent) {}
+        virtual void onFrame(jslib::AbstractRenderWindow * theWindow , double t) {
+            // TODO: call all the current handleRequests() here so we don't have to do it 
+            // from javascript
+        }
 
-void 
-NetAsync::stop() {
-    io.stop();
-};
+        virtual void onPreRender(jslib::AbstractRenderWindow * theRenderer) {}
+        virtual void onPostRender(jslib::AbstractRenderWindow * theRenderer) {}
+    private:
+         
+        void run(std::size_t thread_pool_size);
+        void stop();
+    public:
+        /// The io_service used to perform asynchronous operations.
+        static boost::asio::io_service io;
+        // fictional work item to prevent our io_service from being out of work and terminating
+        static boost::asio::io_service::work keep_busy; 
 
-};
-
-// static initializer
-boost::asio::io_service y60::NetAsync::io;
-boost::asio::io_service::work y60::NetAsync::keep_busy(io);
-
-extern "C"
-EXPORT asl::PlugInBase * NetAsync_instantiatePlugIn(asl::DLHandle myDLHandle) {
-	return new y60::NetAsync(myDLHandle);
+    private:
+        AsioThreadPtr _myAsioThread;
+	};
 }
+

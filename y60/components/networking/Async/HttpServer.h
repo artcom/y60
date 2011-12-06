@@ -86,7 +86,6 @@ namespace y60 {
     };
 
     typedef asl::Ptr<http::server::server, dom::ThreadingModel> HttpServerPtr;
-    typedef asl::Ptr<boost::thread, dom::ThreadingModel> HttpServerThreadPtr;
 
     class HttpServer {
 
@@ -129,8 +128,6 @@ namespace y60 {
                                             const std::string & theURI ); 
 
             HttpServerPtr                     _myHttpServer;
-            HttpServerThreadPtr               _myHttpServerThread;
-            std::size_t                       _myNumThreads;
             ConcurrentQueue<http::server::request>          _myRequestQueue;
 
             std::map<std::string, JSCallback> _myCallbacks;
