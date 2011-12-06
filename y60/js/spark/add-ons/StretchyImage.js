@@ -153,9 +153,4 @@ spark.StretchyImage.Constructor = function (Protected) {
         _myShapeStretcher.initialize(Public.node?Public.node:new Node("<StretchyImage/>"));
         _resetShapeStretcher();
     };
-    
-    Base.postRealize = Public.postRealize;
-    Public.postRealize = function () {
-        Base.postRealize();
-    };
 };
