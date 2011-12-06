@@ -91,7 +91,7 @@ spark.GlowText.Constructor = function (Protected) {
     Base.render = Protected.render;
     Protected.render = function () {
         Base.render();
-        if (Protected.GlowOrBlurFlag && Public.width > 0 && Public.height >0) {
+        if (Protected.GlowOrBlurFlag && Public.width > 0 && Public.height > 0) {
             Protected.material.properties.width = Public.width;
             Protected.material.properties.height = Public.height;
         }
@@ -151,10 +151,21 @@ spark.GlowMovie.Constructor = function (Protected) {
     /////////////////////    
     Base.realize = Public.realize;
     Public.realize = function () {
-        Base.realize();     
-        Protected.material.properties.width = Public.width;
-        Protected.material.properties.height = Public.height;        
-    }
+        Base.realize();
+        Public.SetterOverride("width", function (theWidth, theBaseSetter) {
+            theBaseSetter(theWidth);
+            if (Protected.GlowOrBlurFlag) {
+                Protected.material.properties.width = theWidth;
+            }
+        });
+        Public.SetterOverride("height", function (theHeight, theBaseSetter) {
+            theBaseSetter(theHeight);
+            if (Protected.GlowOrBlurFlag) {
+                Protected.material.properties.height = theHeight;
+            }
+        });
+        Public.size = Public.size;
+    };
 };
 
 
