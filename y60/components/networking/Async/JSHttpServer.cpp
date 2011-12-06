@@ -260,8 +260,8 @@ JSHttpServer::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
     }
 
     JSHttpServer * myNewObject = 0;
-        OWNERPTR myHttpServer = OWNERPTR(new HttpServer());
-        myNewObject = new JSHttpServer(myHttpServer, myHttpServer.get());
+    OWNERPTR myHttpServer = OWNERPTR(new HttpServer());
+    myNewObject = new JSHttpServer(myHttpServer, myHttpServer.get());
 
     JS_SetPrivate(cx, obj, myNewObject);
     return JS_TRUE;
@@ -271,7 +271,6 @@ JSHttpServer::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
 JSObject *
 JSHttpServer::initClass(JSContext *cx, JSObject *theGlobalObject) {    
     JSObject *myClass = Base::initClass(cx, theGlobalObject, ClassName(), Constructor, Properties(), Functions(), ConstIntProperties());
-    AC_PRINT << "JSHttpServer::initClasses";
     DOC_MODULE_CREATE("HttpServer", JSHttpServer);
     return myClass;
 }

@@ -247,8 +247,7 @@ HttpServerUnitTest.prototype.Constructor = function (obj, theName) {
         }
 
         obj.myServer.close();
-
-
+        obj.myServer = null;
     };
 
 };

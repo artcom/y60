@@ -79,6 +79,13 @@ namespace y60 {
     HttpServer::~HttpServer()
     {
         close();
+        std::map<std::string, JSCallback>::iterator it;
+
+        for (it = _myCallbacks.begin(); it != _myCallbacks.end(); ++it) {
+            AC_WARNING << "deleting " << it->first;
+            JS_RemoveRoot( it->second.context, &(it->second.functionValue));
+        };
+        _myCallbacks.clear();
     }
     
     bool HttpServer::start( string theServerAddress, string theServerPort ) {
@@ -226,7 +233,6 @@ namespace y60 {
                     myResponse.return_code  = http::server::reply::not_found; 
                     AC_ERROR << "No callback registered for path: \"" << myPath << "\"!";
                 }
-                // _myResponseQueue->push( myResponse );
                 // Fill out the reply to be sent to the client.
                 http::server::reply rep;
                 rep.content.append(myResponse.payload.c_str(), myResponse.payload.length());
