@@ -15,30 +15,18 @@ spark.RoundedCornerMovie = spark.ComponentClass("RoundedCornerMovie");
 spark.RoundedCornerMovie.Constructor = function (Protected) {
     var Base   = {};
     var Public = this;
-    Public.Inherit(spark.RoundedCornerQuad);
-    Base.realizeRoundedCornerQuad = Public.realize;
-    Base.postRealizeRoundedCornerQuad = Public.postRealize;
     Public.Inherit(spark.Movie);
+    Public.Inherit(spark.RoundedCornerQuad);
     
-    ////////////////////
-    // Public Methods //
-    ////////////////////
-    
-    Base.realize = Public.realize;
-    Public.realize = function () {
-        Base.realize();
-        Base.realizeRoundedCornerQuad();
-    };
-    
-    Base.postRealize = Public.postRealize;
-    Public.postRealize = function () {
-        Base.postRealize();
-        Base.postRealizeRoundedCornerQuad();
-
-        Base.onMovieChanged = Public.onMovieChanged;
-        Public.onMovieChanged = function() {
-            Base.onMovieChanged();
-            Public.update();
+    Base.initialize = Public.initialize;
+    Public.initialize = function(theNode) {
+        Base.initialize(theNode);
+        Base.onMovieChanged = Protected.onMovieChanged;
+        Protected.onMovieChanged = function(theFullInitFlag) {
+            Base.onMovieChanged(theFullInitFlag);
+            if (Public.movie.nodeName !== "image") {
+                Public.update();
+            }
         };
     };
     

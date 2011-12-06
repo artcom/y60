@@ -39,16 +39,15 @@ spark.YUV2RGBShader.Constructor = function (Protected) {
     }
 
     function ensureShader() {
-        var myMaterial = Public.sceneNode.$shape.childNode("primitives").firstChild.$material;
-        var myRequirement = myMaterial.find(".//*[@name='option']");
-        if (myRequirement && myRequirement.childNode("#text") === "[10[yuv2rgb]]") {
+        var myRequirement = Protected.material.find(".//*[@name='option']");
+        if (myRequirement && myRequirement.childNode("#text").nodeValue.toString() === "[10[yuv2rgb]]") {
             return;
         }
         // YUV targetrasterformat allows us to use a shader to convert YUV2RGB, 
         // loadMovieFrame created 3 rasters for us, therefore we need 3 textures
-        myMaterial.enabled = false;
+        Protected.material.enabled = false;
         for (var i = 1; i < Public.movie.childNodesLength(); i++) {
-            var myTextureUnit = myMaterial.childNode("textureunits").appendChild(Node.createElement("textureunit"));
+            var myTextureUnit = Protected.material.childNode("textureunits").appendChild(Node.createElement("textureunit"));
             myTextureUnit.applymode = TextureApplyMode.modulate;
             var myTexture = Modelling.createTexture(window.scene, Public.movie);
             myTexture.image = Public.movie.id;
@@ -57,12 +56,12 @@ spark.YUV2RGBShader.Constructor = function (Protected) {
             _myTextures.push(myTexture);
         }
 
-        myMaterial.requires.textures = feature_n_times(120, "paint", Public.movie.childNodesLength());
+        Protected.material.requires.textures = feature_n_times(120, "paint", Public.movie.childNodesLength());
 
         if (Public.movie.childNodesLength() === 3) {
-            addMaterialRequirement(myMaterial, "option", "[10[yuv2rgb]]");
+            addMaterialRequirement(Protected.material, "option", "[10[yuv2rgb]]");
         }
-        myMaterial.enabled = true;
+        Protected.material.enabled = true;
     }
     
     ////////////////////

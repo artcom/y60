@@ -111,8 +111,8 @@ namespace y60 {
         _myFormatContext(0),
         _myVStreamIndex(-1),
         _myVStream(0),
-        _myAStreamIndex(-1),
         _myAStreamIndexDom(-1),
+        _myAStreamIndex(-1),
         _myAStream(0),
         _myMsgQueue(),
         _myFrame(0),
@@ -259,7 +259,7 @@ namespace y60 {
         if (_myVStreamIndex != -1) {
             _myDemux->enableStream(_myVStreamIndex);
         }
-        for (int i = 0; i < _myAllAudioStreamIndicies.size(); i++) {
+        for (std::vector<int>::size_type i = 0; i < _myAllAudioStreamIndicies.size(); i++) {
             if (_myAllAudioStreamIndicies[i] != -1) {
                 _myDemux->enableStream(_myAllAudioStreamIndicies[i]);
             }
@@ -325,7 +325,7 @@ namespace y60 {
                 }
             } else if (theStartAudioFlag && hasAudio() && getDecodeAudioFlag()) {
                 _myAdjustAudioOffsetFlag = true;
-                for (int i = 0; i < _myAllAudioStreamIndicies.size(); i++) {
+                for (std::vector<int>::size_type i = 0; i < _myAllAudioStreamIndicies.size(); i++) {
                     _myDemux->clearPacketCache(_myAllAudioStreamIndicies[i]);
                     av_seek_frame(_myFormatContext, _myAllAudioStreamIndicies[i],
                                   (int64_t)(theStartTime*(1/ av_q2d(_myAStream->time_base))) +
@@ -415,7 +415,7 @@ namespace y60 {
             _myFrame = 0;
         }
         if (_myAStream) {
-            for (int i = 0; i < _myAllAudioStreamIndicies.size(); i++) {
+            for (std::vector<int>::size_type i = 0; i < _myAllAudioStreamIndicies.size(); i++) {
                 avcodec_close(_myFormatContext->streams[_myAllAudioStreamIndicies[i]]->codec);
             }
             _myAStreamIndex = -1;
@@ -439,7 +439,7 @@ namespace y60 {
             DBA(AC_DEBUG << "---- FFMpegDecoder2::readAudio: getBufferedTime="
                      << _myAudioSink->getBufferedTime();)
              AVPacket * myPacket;
-             for (int i = 0; i < _myAllAudioStreamIndicies.size(); i++) {
+             for (std::vector<int>::size_type i = 0; i < _myAllAudioStreamIndicies.size(); i++) {
                  if (_myAllAudioStreamIndicies[i] == _myAStreamIndex) {
                      myPacket = _myDemux->getPacket(_myAllAudioStreamIndicies[i]);
                  } else {
@@ -631,7 +631,6 @@ namespace y60 {
                 }
 
                 if(!myFrameCompleteFlag) {
-                    // count dropped frames
                     myDecodedPacketsPerFrame++;
                     DBV(AC_DEBUG << "### needed packets to decode frame: "<<myDecodedPacketsPerFrame);
                 }
@@ -1220,7 +1219,7 @@ namespace y60 {
                                 mySeekTimeInTimeBaseUnits, mySeekFlags);
         if (theSeekAudioFlag && hasAudio() && getDecodeAudioFlag()) {
             mySeekTimeInTimeBaseUnits = int64_t(theDestTime*(1/ av_q2d(_myAStream->time_base)));
-             for (int i = 0; i < _myAllAudioStreamIndicies.size(); i++) {
+             for (std::vector<int>::size_type i = 0; i < _myAllAudioStreamIndicies.size(); i++) {
                 /*int myResult =*/ av_seek_frame(_myFormatContext, _myAllAudioStreamIndicies[i],
                                          mySeekTimeInTimeBaseUnits, mySeekFlags);
              }
