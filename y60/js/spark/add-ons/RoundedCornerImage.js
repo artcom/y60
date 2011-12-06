@@ -15,10 +15,8 @@ spark.RoundedCornerImage = spark.ComponentClass("RoundedCornerImage");
 spark.RoundedCornerImage.Constructor = function (Protected) {
     var Base = {};
     var Public = this;
-    Public.Inherit(spark.RoundedCornerQuad);
-    Base.realizeRoundedCornerQuad = Public.realize;
-    Base.postRealizeRoundedCornerQuad = Public.postRealize;
     Public.Inherit(spark.Image);
+    Public.Inherit(spark.RoundedCornerQuad);
     
     ////////////////////
     // Public Methods //
@@ -27,19 +25,11 @@ spark.RoundedCornerImage.Constructor = function (Protected) {
     Base.realize = Public.realize;
     Public.realize = function () {
         Base.realize();
-        Base.realizeRoundedCornerQuad();
+        Public.update();
     };
-    
-    Base.postRealize = Public.postRealize;
-    Public.postRealize = function () {
-        Base.postRealize();
-        Base.postRealizeRoundedCornerQuad();
-    }
-    
-    Base.imageSetter = Public.__lookupSetter__("image");
-    Public.image setter = function (theImage) {
-       Base.imageSetter(theImage);
-       Public.update();
-    };
-    
+
+    Public.SetterOverride("image", function (theImage, theBaseSetter) {
+        theBaseSetter(theImage);
+        Public.update();
+    });
 };

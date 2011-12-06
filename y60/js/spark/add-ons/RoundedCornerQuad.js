@@ -25,6 +25,37 @@ spark.RoundedCornerQuad.Constructor = function (Protected) {
         c0 ---------------- c1
        (0,1)
     */
+
+    function ensureShader () {
+        var myRequirement = Protected.material.find(".//*[@name='option']");
+        if (myRequirement && (myRequirement.childNode("#text").nodeValue.toString() === "[10[yuv2rgb_round]]" ||
+                              myRequirement.childNode("#text").nodeValue.toString() === "[10[RoundedCorner]]"))
+        {
+            return;
+        }
+        Protected.material.enabled = false;
+        Protected.material.transparent = true;
+        addMaterialRequirement(Protected.material, "vertexparams", "[10[color]]");
+        
+        var myOptionNode = Protected.material.requires.getNodesByTagName("feature");
+        var myIsYUVMovie = false;
+        for (var i = 0; i < myOptionNode.length; ++i) {
+            if (myOptionNode[i].name === "option") {
+                if (myOptionNode[i].childNode("#text").nodeValue.toString() === "[10[yuv2rgb]]") {
+                    Protected.material.requires.removeChild(myOptionNode[i]);
+                    myIsYUVMovie = true;
+                    break;
+                }
+            }
+        }
+        if (!myIsYUVMovie) {
+            addMaterialRequirement(Protected.material, "option", "[10[RoundedCorner]]");
+        } else {
+            addMaterialRequirement(Protected.material, "option", "[10[yuv2rgb_round]]");
+        }
+        Protected.material.enabled = true;
+    }
+    
     
     ////////////////////
     // Public Methods //
@@ -56,38 +87,12 @@ spark.RoundedCornerQuad.Constructor = function (Protected) {
         }
     });
     
-    Public.realize = function () {
-        Protected.material.transparent = true;
-        addMaterialRequirement(Protected.material, "vertexparams", "[10[color]]");
-    };
-
-    Public.postRealize = function () {
-        Protected.material.enabled = false;
-        var myOptionNode = Protected.material.requires.getNodesByTagName("feature");
-        var myIsYUVMovie = false;
-        for (var i = 0; i < myOptionNode.length; ++i) {
-            if (myOptionNode[i].name === "option") {
-                if (myOptionNode[i].childNode("#text").nodeValue == "[10[yuv2rgb]]") {
-                    Protected.material.requires.removeChild(myOptionNode[i]);
-                    myIsYUVMovie = true;
-                    break;
-                }
-            }
-        }
-        if (!myIsYUVMovie) {
-            addMaterialRequirement(Protected.material, "option", "[10[RoundedCorner]]");
-        } else {
-            addMaterialRequirement(Protected.material, "option", "[10[yuv2rgb_round]]");
-        }
-        Protected.material.enabled = true;
-        Public.update();
-    }
-    
     Public.updateAspectRatio = function() {
         Protected.material.properties.aspectRatio = Public.width/Public.height;
-    }
+    };
     
     Public.update = function() {
+        ensureShader();
         Public.updateAspectRatio();
         Public.radius = Protected.getNumber("radius", 17); 
         Public.cornerDistance = Protected.getNumber("cornerDistance", 17); 
