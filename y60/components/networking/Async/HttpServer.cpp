@@ -56,7 +56,6 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 #include "HttpServer.h"
-#include "Y60Request.h"
 #include "NetAsync.h"
 
 #include <string>
@@ -114,27 +113,24 @@ namespace http {
         parentPlugin->unregisterHandler(this);
     }
 
-    y60::Y60Response Server::invokeCallback( const JSCallback & theCallback, 
-                                            const y60::Y60Request & theRequest,
-                                            const std::string & thePath ) 
+    void Server::invokeCallback( const JSCallback & theCallback, 
+                                            const request & theRequest,
+                                            reply & theReply) 
     {
         std::string myResponseString;
-        y60::Y60Response myResponse;
         try {
             jsval argv[3], rval;
 
             argv[0] = jslib::as_jsval(theCallback.context, theRequest.method);
             argv[1] = jslib::as_jsval(theCallback.context, theRequest.body);
-            argv[2] = jslib::as_jsval(theCallback.context, thePath); 
+            argv[2] = jslib::as_jsval(theCallback.context, theRequest.uri ); 
 
             jslib::JSA_CallFunctionValue(theCallback.context, theCallback.object, theCallback.functionValue, 
                                          3, argv, &rval);
             
             if (JSVAL_IS_VOID(rval)) {
-                myResponse.return_code = reply::no_content;
-                myResponse.payload = "";
-                myResponse.content_type = "text/plain";
-                return myResponse;
+                theReply.status = reply::no_content;
+                return;
             }
             if (JSVAL_IS_OBJECT(rval)) {
                 JSObject * myJsObject;
@@ -145,7 +141,7 @@ namespace http {
                         // Body
                         JS_GetElement(theCallback.context, myJsObject, 0, &curElement);
                         if (!JSVAL_IS_VOID(curElement)) {
-                            jslib::convertFrom(theCallback.context, curElement, myResponse.payload);
+                            jslib::convertFrom(theCallback.context, curElement, theReply.content);
                         }
                         
                         // status
@@ -153,9 +149,9 @@ namespace http {
                         if (!JSVAL_IS_VOID(curElement)) {
                             int myStatusCode;
                             jslib::convertFrom(theCallback.context, curElement, myStatusCode);
-                            myResponse.return_code = static_cast<reply::status_type>(myStatusCode);
+                            theReply.status = static_cast<reply::status_type>(myStatusCode);
                         } else {
-                            myResponse.return_code = reply::ok;
+                            theReply.status = reply::ok;
                         }
                         
                         // headers
@@ -188,10 +184,10 @@ namespace http {
                                     JS_ReportError(theCallback.context, 
                                              "Server::handleRequest: header_value is not a a string!");
                                 }
-                                myResponse.headers.push_back(header(header_name, header_value));
+                                theReply.headers.insert(make_pair(header_name, header_value));
                             }
                         }
-                        return myResponse;
+                        return;
                     }
                 }
             }
@@ -201,16 +197,15 @@ namespace http {
                 JS_ReportError(theCallback.context, 
                          "Server::handleRequest: Callback does not return a string!");
             }
-            myResponse.payload      = myResponseString;
-            myResponse.return_code  = reply::ok;
-            myResponse.content_type = theCallback.contentType;
-            return myResponse;
+            theReply.content = myResponseString;
+            theReply.status  = reply::ok;
+            theReply.headers.insert(make_pair("Content-Type", theCallback.contentType));
+            return;
         } catch (Exception e) {
-            myResponse.return_code  = reply::internal_server_error;
-            myResponse.content_type = "text/plain";
-            myResponse.payload      = std::string("An internal error occured: ") + asl::compose_message(e);
+            theReply.status  = reply::internal_server_error;
+            theReply.content = std::string("An internal error occured: ") + asl::compose_message(e);
             AC_ERROR << e;
-            return myResponse;
+            return;
         };
     }
 
@@ -220,55 +215,33 @@ namespace http {
 
     void Server::handleRequest() {
         try {
-            request rawRequest;
-            while (_myRequestQueue.try_pop(rawRequest)) {
-                std::string myPath = rawRequest.uri.substr(0, rawRequest.uri.find_first_of("?"));  
+            request curRequest;
+            while (_myRequestQueue.try_pop(curRequest)) {
+                std::string myPath = curRequest.uri.substr(0, curRequest.uri.find_first_of("?"));  
             
-                y60::Y60Response myResponse;
-                y60::Y60Request myRequest;
-                myRequest.uri    = rawRequest.uri;
-                myRequest.method = rawRequest.method;
-                myRequest.body   = rawRequest.body;
+                reply curReply;
             
                 if (_myCallbacks.find(myPath) != _myCallbacks.end()) {
                     JSCallback myCallback = _myCallbacks[myPath]; 
-                    myResponse = invokeCallback( myCallback, myRequest, myRequest.uri );
+                    invokeCallback( myCallback, curRequest, curReply);
                 } else if (_myCallbacks.find("*") != _myCallbacks.end()) {
                     JSCallback myCallback = _myCallbacks["*"]; 
-                    myResponse = invokeCallback( myCallback, myRequest, myRequest.uri );
+                    invokeCallback( myCallback, curRequest, curReply);
                 } else {
-                    myResponse.return_code  = reply::not_found; 
+                    curReply.status  = reply::not_found; 
                     AC_ERROR << "No callback registered for path: \"" << myPath << "\"!";
                 }
                 // Fill out the reply to be sent to the client.
-                reply rep;
-                rep.content.append(myResponse.payload.c_str(), myResponse.payload.length());
-                rep.status = myResponse.return_code;
-                rep.headers.clear();
-
-                bool hasContentLengthFlag = false;
-                bool hasContentTypeFlag = false;
-                for (std::vector<header>::size_type i = 0; i < myResponse.headers.size(); ++i) {
-                    const header &myHeader = myResponse.headers[i];
-                    hasContentLengthFlag = hasContentLengthFlag || (myHeader.name == "Content-Length");
-                    hasContentTypeFlag   = hasContentTypeFlag || (myHeader.name == "Content-Type");
-                    rep.headers.push_back(myHeader);
-                }
-
-                if (!hasContentLengthFlag) {
-                    rep.headers.push_back(header("Content-Length",
-                                boost::lexical_cast<std::string>(rep.content.size())));
+                if (curReply.headers.find("Content-Length") == curReply.headers.end()) {
+                    curReply.headers.insert(make_pair("Content-Length",
+                                boost::lexical_cast<std::string>(curReply.content.size())));
                 }
             
-                if (!hasContentTypeFlag) {
-                    header myContentType("Content-Type", "text/plain");
-                    if ( myResponse.content_type.length() > 0 ) {
-                        myContentType.value = myResponse.content_type;
-                    }
-                    rep.headers.push_back(myContentType);
+                if (curReply.headers.find("Content-Type") == curReply.headers.end()) {
+                    curReply.headers.insert(make_pair("Content-Type", "text/plain"));
                 }
-                rawRequest.conn->async_respond(rep); // this is threadsafe
-                rawRequest.conn.reset(); // free shared_ptr
+                curRequest.conn->async_respond(curReply); // this is threadsafe
+                curRequest.conn.reset(); // free shared_ptr
             }
         } catch (Exception e) {
             AC_ERROR << e;

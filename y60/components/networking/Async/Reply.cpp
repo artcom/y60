@@ -105,12 +105,12 @@ std::vector<boost::asio::const_buffer> reply::to_buffers()
 {
   std::vector<boost::asio::const_buffer> buffers;
   buffers.push_back(status_strings::to_buffer(status));
-  for (std::size_t i = 0; i < headers.size(); ++i)
+  std::map<std::string,std::string>::iterator it;
+  for (it=headers.begin(); it != headers.end(); ++it)
   {
-    header& h = headers[i];
-    buffers.push_back(boost::asio::buffer(h.name));
+    buffers.push_back(boost::asio::buffer(it->first));
     buffers.push_back(boost::asio::buffer(misc_strings::name_value_separator));
-    buffers.push_back(boost::asio::buffer(h.value));
+    buffers.push_back(boost::asio::buffer(it->second));
     buffers.push_back(boost::asio::buffer(misc_strings::crlf));
   }
   buffers.push_back(boost::asio::buffer(misc_strings::crlf));
@@ -246,10 +246,10 @@ reply reply::stock_reply(reply::status_type status)
   rep.status = status;
   rep.content = stock_replies::to_string(status);
   rep.headers.clear();
-  rep.headers.push_back(header("Content-Length",
+  rep.headers.insert(std::make_pair("Content-Length",
                                boost::lexical_cast<std::string>(rep.content.size())));
-  rep.headers.push_back(header("Content-Type",
-                               "text/html"));
+  rep.headers.insert(std::make_pair("Content-Type",
+                               "text/plain"));
   return rep;
 }
 

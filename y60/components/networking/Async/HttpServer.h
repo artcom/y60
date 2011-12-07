@@ -71,7 +71,6 @@
 #include <map>
 
 #include "Connection.h"
-#include "Y60Request.h"
 
 #include <netsrc/spidermonkey/jsapi.h>
 
@@ -121,9 +120,8 @@ namespace http {
 
         private:
     
-            y60::Y60Response invokeCallback(const JSCallback & theCallback, 
-                                            const y60::Y60Request & theRequest,
-                                            const std::string & theURI ); 
+            void invokeCallback(const JSCallback & theCallback, 
+                                            const request & theRequest, reply & theReply); 
 
             std::map<std::string, JSCallback> _myCallbacks;
 
