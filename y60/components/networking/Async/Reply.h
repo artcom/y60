@@ -16,8 +16,9 @@
 #include <boost/asio.hpp>
 #include "HttpHeader.h"
 
+namespace y60 {
+namespace async {
 namespace http {
-namespace server {
 
 /// A reply to be sent to a client.
 struct reply
@@ -58,7 +59,8 @@ struct reply
   static reply stock_reply(status_type status);
 };
 
-} // namespace server
 } // namespace http
+} // namespace async
+} // namespace y60
 
 #endif // HTTP_SERVER_REPLY_HPP

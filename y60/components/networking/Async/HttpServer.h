@@ -70,12 +70,14 @@
 
 #include <map>
 
-#include "Server.h"
+#include "Connection.h"
 #include "Y60Request.h"
 
 #include <netsrc/spidermonkey/jsapi.h>
 
 namespace y60 {
+namespace async {
+namespace http {
 
     struct JSCallback {
         JSContext*  context;
@@ -85,12 +87,9 @@ namespace y60 {
         std::string contentType;
     };
 
-    typedef asl::Ptr<http::server::server, dom::ThreadingModel> HttpServerPtr;
-
     class HttpServer {
 
         public:
-
             /// creates a new HttpServer
             HttpServer();
             bool start( std::string theServerAddress,  std::string theServerPort );
@@ -120,19 +119,33 @@ namespace y60 {
             void handleRequest();
             bool requestsPending();
 
-
         private:
     
             y60::Y60Response invokeCallback(const JSCallback & theCallback, 
                                             const y60::Y60Request & theRequest,
                                             const std::string & theURI ); 
 
-            HttpServerPtr                     _myHttpServer;
-            ConcurrentQueue<http::server::request>          _myRequestQueue;
+            // HttpServerPtr                     _myHttpServer;
 
             std::map<std::string, JSCallback> _myCallbacks;
 
+            // this queue is the communication between the two threads
+            ConcurrentQueue<request>          _myRequestQueue;
+
+        /*
+         * the following members run in the async's io_server thread
+         */
+
+        /// Handle completion of an asynchronous accept operation.
+        void handle_accept(const boost::system::error_code& e);
+        /// Acceptor used to listen for incoming connections.
+        boost::asio::ip::tcp::acceptor acceptor_;
+
+        /// The next connection to be accepted.
+        connection_ptr new_connection_;
     };
 
-}
+} // http
+} // async
+} // y60
 #endif

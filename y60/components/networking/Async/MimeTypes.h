@@ -13,15 +13,15 @@
 
 #include <string>
 
-namespace http {
-namespace server {
+namespace y60 {
+namespace async {
 namespace mime_types {
 
 /// Convert a file extension into a MIME type.
 std::string extension_to_type(const std::string& extension);
 
 } // namespace mime_types
-} // namespace server
-} // namespace http
+} // namespace async
+} // namespace y60
 
 #endif // HTTP_SERVER_MIME_TYPES_HPP

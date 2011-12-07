@@ -69,9 +69,12 @@ using namespace asl;
 using namespace inet;
 
 namespace y60 {
+namespace async {
+namespace http {
     
     HttpServer::HttpServer() :
-        _myHttpServer(0)
+        acceptor_(NetAsync::io_service()),
+        new_connection_(new connection(NetAsync::io_service(), _myRequestQueue))
     {
     }
 
@@ -88,12 +91,17 @@ namespace y60 {
     }
     
     bool HttpServer::start( string theServerAddress, string theServerPort ) {
-        AC_DEBUG << "starting HttpServer";
-        _myHttpServer = 
-            HttpServerPtr(new http::server::server(  theServerAddress, 
-                                                     theServerPort, 
-                                                     NetAsync::io_service(),
-                                                     _myRequestQueue) );
+        AC_DEBUG << "starting HttpServer " << theServerAddress << ":" << theServerPort;
+        boost::asio::ip::tcp::resolver resolver(NetAsync::io_service());
+        boost::asio::ip::tcp::resolver::query query(theServerAddress, theServerPort);
+        boost::asio::ip::tcp::endpoint endpoint = *resolver.resolve(query);
+        acceptor_.open(endpoint.protocol());
+        acceptor_.set_option(boost::asio::ip::tcp::acceptor::reuse_address(true));
+        acceptor_.bind(endpoint);
+        acceptor_.listen();
+        acceptor_.async_accept(new_connection_->socket(),
+                boost::bind(&HttpServer::handle_accept, this,
+                    boost::asio::placeholders::error));
         return true;
     }
 
@@ -117,7 +125,7 @@ namespace y60 {
                                          3, argv, &rval);
             
             if (JSVAL_IS_VOID(rval)) {
-                myResponse.return_code = http::server::reply::no_content;
+                myResponse.return_code = reply::no_content;
                 myResponse.payload = "";
                 myResponse.content_type = "text/plain";
                 return myResponse;
@@ -139,9 +147,9 @@ namespace y60 {
                         if (!JSVAL_IS_VOID(curElement)) {
                             int myStatusCode;
                             jslib::convertFrom(theCallback.context, curElement, myStatusCode);
-                            myResponse.return_code = static_cast<http::server::reply::status_type>(myStatusCode);
+                            myResponse.return_code = static_cast<reply::status_type>(myStatusCode);
                         } else {
-                            myResponse.return_code = http::server::reply::ok;
+                            myResponse.return_code = reply::ok;
                         }
                         
                         // headers
@@ -174,7 +182,7 @@ namespace y60 {
                                     JS_ReportError(theCallback.context, 
                                              "HttpServer::handleRequest: header_value is not a a string!");
                                 }
-                                myResponse.headers.push_back(http::server::header(header_name, header_value));
+                                myResponse.headers.push_back(header(header_name, header_value));
                             }
                         }
                         return myResponse;
@@ -188,11 +196,11 @@ namespace y60 {
                          "HttpServer::handleRequest: Callback does not return a string!");
             }
             myResponse.payload      = myResponseString;
-            myResponse.return_code  = http::server::reply::ok;
+            myResponse.return_code  = reply::ok;
             myResponse.content_type = theCallback.contentType;
             return myResponse;
         } catch (Exception e) {
-            myResponse.return_code  = http::server::reply::internal_server_error;
+            myResponse.return_code  = reply::internal_server_error;
             myResponse.content_type = "text/plain";
             myResponse.payload      = std::string("An internal error occured: ") + asl::compose_message(e);
             AC_ERROR << e;
@@ -206,7 +214,7 @@ namespace y60 {
 
     void HttpServer::handleRequest() {
         try {
-            http::server::request rawRequest;
+            request rawRequest;
             while (_myRequestQueue.try_pop(rawRequest)) {
                 std::string myPath = rawRequest.uri.substr(0, rawRequest.uri.find_first_of("?"));  
             
@@ -223,31 +231,31 @@ namespace y60 {
                     JSCallback myCallback = _myCallbacks["*"]; 
                     myResponse = invokeCallback( myCallback, myRequest, myRequest.uri );
                 } else {
-                    myResponse.return_code  = http::server::reply::not_found; 
+                    myResponse.return_code  = reply::not_found; 
                     AC_ERROR << "No callback registered for path: \"" << myPath << "\"!";
                 }
                 // Fill out the reply to be sent to the client.
-                http::server::reply rep;
+                reply rep;
                 rep.content.append(myResponse.payload.c_str(), myResponse.payload.length());
                 rep.status = myResponse.return_code;
                 rep.headers.clear();
 
                 bool hasContentLengthFlag = false;
                 bool hasContentTypeFlag = false;
-                for (std::vector<http::server::header>::size_type i = 0; i < myResponse.headers.size(); ++i) {
-                    const http::server::header &myHeader = myResponse.headers[i];
+                for (std::vector<header>::size_type i = 0; i < myResponse.headers.size(); ++i) {
+                    const header &myHeader = myResponse.headers[i];
                     hasContentLengthFlag = hasContentLengthFlag || (myHeader.name == "Content-Length");
                     hasContentTypeFlag   = hasContentTypeFlag || (myHeader.name == "Content-Type");
                     rep.headers.push_back(myHeader);
                 }
 
                 if (!hasContentLengthFlag) {
-                    rep.headers.push_back(http::server::header("Content-Length",
+                    rep.headers.push_back(header("Content-Length",
                                 boost::lexical_cast<std::string>(rep.content.size())));
                 }
             
                 if (!hasContentTypeFlag) {
-                    http::server::header myContentType("Content-Type", "text/plain");
+                    header myContentType("Content-Type", "text/plain");
                     if ( myResponse.content_type.length() > 0 ) {
                         myContentType.value = myResponse.content_type;
                     }
@@ -260,4 +268,18 @@ namespace y60 {
             AC_ERROR << e;
         };
     }
+
+    // Note: this will be called from the io_service thread.
+    void HttpServer::handle_accept(const boost::system::error_code& e) {
+        if (!e)
+        {
+            new_connection_->start();
+            new_connection_.reset(new connection(acceptor_.get_io_service(), _myRequestQueue));
+            acceptor_.async_accept(new_connection_->socket(),
+                    boost::bind(&HttpServer::handle_accept, this,
+                        boost::asio::placeholders::error));
+        }
+    }
+}
+}
 }

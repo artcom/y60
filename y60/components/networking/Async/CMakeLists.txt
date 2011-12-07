@@ -6,7 +6,6 @@ NetAsync.cpp
 MimeTypes.cpp
 Reply.cpp
 RequestParser.cpp
-Server.cpp
 )
 
 set(HEADERS
@@ -19,7 +18,6 @@ MimeTypes.h
 Reply.h
 Request.h
 RequestParser.h
-Server.h
 y60_netasync_settings.h
 )
 

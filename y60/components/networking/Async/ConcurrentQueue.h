@@ -4,6 +4,9 @@
 #include <boost/thread.hpp> 
 #include <queue>
 
+namespace y60 {
+namespace async {
+
 template<typename Data>
 class ConcurrentQueue
 {
@@ -58,5 +61,6 @@ public:
     }
 
 };
-
+}; // namespace async
+}; //namespace y60
 #endif // CONCURRENT_QUEUE

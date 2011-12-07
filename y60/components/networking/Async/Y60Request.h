@@ -18,13 +18,13 @@ namespace y60 {
     struct Y60Response {
         std::string payload;
         std::string content_type;
-        http::server::reply::status_type return_code;
-        std::vector<http::server::header> headers;
+        async::http::reply::status_type return_code;
+        std::vector<async::http::header> headers;
     };
 
-    typedef ConcurrentQueue<Y60Request> Y60RequestQueue;
+    typedef async::ConcurrentQueue<Y60Request> Y60RequestQueue;
 
-    typedef asl::Ptr<ConcurrentQueue<Y60Request>,dom::ThreadingModel> Y60RequestQueuePtr;
+    typedef asl::Ptr<async::ConcurrentQueue<Y60Request>,dom::ThreadingModel> Y60RequestQueuePtr;
 
 }
 

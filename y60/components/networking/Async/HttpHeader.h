@@ -13,8 +13,9 @@
 
 #include <string>
 
+namespace y60 {
+namespace async {
 namespace http {
-namespace server {
 
 struct header
 {
@@ -26,7 +27,8 @@ struct header
 
 
 
-} // namespace server
 } // namespace http
+} // namespace async
+} // namespace y60
 
 #endif // HTTP_SERVER_HEADER_HPP

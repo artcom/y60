@@ -21,8 +21,9 @@
 #include "RequestParser.h"
 #include "ConcurrentQueue.h"
 
+namespace y60 {
+namespace async {
 namespace http {
-namespace server {
 
 /// Represents a single connection from a client.
 class connection
@@ -75,7 +76,8 @@ private:
 
 typedef boost::shared_ptr<connection> connection_ptr;
 
-} // namespace server
 } // namespace http
+} // namespace async
+} // namespace y60
 
 #endif // HTTP_SERVER_CONNECTION_HPP

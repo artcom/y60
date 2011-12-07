@@ -16,8 +16,9 @@
 #include <boost/shared_ptr.hpp>
 #include "HttpHeader.h"
 
+namespace y60 {
+namespace async {
 namespace http {
-namespace server {
 
 class connection;
 
@@ -33,7 +34,8 @@ struct request
   boost::shared_ptr<connection> conn;
 };
 
-} // namespace server
 } // namespace http
+} // namespace async
+} // namespace y60
 
 #endif // HTTP_SERVER_REQUEST_HPP

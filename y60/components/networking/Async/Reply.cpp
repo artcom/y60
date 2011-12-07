@@ -12,8 +12,9 @@
 #include <string>
 #include <boost/lexical_cast.hpp>
 
+namespace y60 {
+namespace async {
 namespace http {
-namespace server {
 
 namespace status_strings {
 
@@ -252,5 +253,6 @@ reply reply::stock_reply(reply::status_type status)
   return rep;
 }
 
-} // namespace server
 } // namespace http
+} // namespace async
+} // namespace y60

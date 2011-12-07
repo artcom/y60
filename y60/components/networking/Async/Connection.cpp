@@ -13,8 +13,9 @@
 #include <vector>
 #include <boost/bind.hpp>
 
+namespace y60 {
+namespace async {
 namespace http {
-namespace server {
 
 connection::connection(boost::asio::io_service& io_service, ConcurrentQueue<request> & theRequestQueue)
   : strand_(io_service),
@@ -103,5 +104,6 @@ void connection::handle_write(const boost::system::error_code& e)
   // destructor closes the socket.
 }
 
-} // namespace server
 } // namespace http
+} // namespace async
+} // namespace y60
