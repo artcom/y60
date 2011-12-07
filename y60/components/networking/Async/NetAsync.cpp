@@ -57,6 +57,9 @@
 */
 
 #include "NetAsync.h"
+#include <y60/jsbase/JSWrapper.h>
+
+using namespace jslib;
 
 namespace y60 {
     
@@ -91,6 +94,7 @@ NetAsync::initClasses(JSContext * theContext, JSObject *theGlobalObject) {
     IScriptablePlugin::initClasses(theContext, theGlobalObject);
     // start javascript namespace
     JSObject *asyncNamespace = JS_DefineObject(theContext, theGlobalObject, "Async", &Package, NULL, JSPROP_PERMANENT | JSPROP_READONLY);
+    JS_DefineFunctions(theContext, asyncNamespace, Functions());
     JSHttpServer::initClass(theContext, asyncNamespace);
 };
 
@@ -119,11 +123,31 @@ NetAsync::stop() {
     io.stop();
 };
 
+static JSBool
+OnFrame(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Triggers any waiting JS callbacks. Will be called automatically if a render window is rendering."); DOC_END;
+    asl::Ptr<NetAsync> parentPlugin = dynamic_cast_Ptr<NetAsync>(asl::Singleton<asl::PlugInManager>::get().getPlugIn(NetAsync::PluginName));
+    parentPlugin->onFrame(0,0);
+    return JS_TRUE;
+}
+
+JSFunctionSpec *
+NetAsync::Functions() {
+    IF_REG(cerr << "Registering class '"<<ClassName()<<"'"<<endl);
+    static JSFunctionSpec myFunctions[] = {
+        // name                  native                   nargs
+        {"onFrame",             OnFrame,                0},
+        {0}
+    };
+    return myFunctions;
+}
+
 };
 
 // static initializer
 boost::asio::io_service y60::NetAsync::io;
 boost::asio::io_service::work y60::NetAsync::keep_busy(io);
+const char * y60::NetAsync::PluginName = "NetAsync";
 
 extern "C"
 EXPORT asl::PlugInBase * NetAsync_instantiatePlugIn(asl::DLHandle myDLHandle) {

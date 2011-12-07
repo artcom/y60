@@ -72,32 +72,44 @@ namespace y60 {
     {
     public:
         typedef asl::Ptr<boost::thread, dom::ThreadingModel> AsioThreadPtr;
-    	
+        typedef boost::function<void()> onFrameHandler;
+        static const char * PluginName;
+
         NetAsync(asl::DLHandle theDLHandle);
         virtual ~NetAsync();
         static boost::asio::io_service & io_service();
         virtual void initClasses(JSContext * theContext, JSObject *theGlobalObject);
+        virtual JSFunctionSpec * Functions();
 
         const char * ClassName() {
-            static const char * myClassName = "NetAsync";
-            return myClassName;
+            return PluginName;
         }
         virtual void onStartup(jslib::AbstractRenderWindow * theWindow) {}
         virtual bool onSceneLoaded(jslib::AbstractRenderWindow * theWindow) { return true; }
 
         virtual void handle(jslib::AbstractRenderWindow * theWindow, y60::EventPtr theEvent) {}
         virtual void onFrame(jslib::AbstractRenderWindow * theWindow , double t) {
-            // TODO: call all the current handleRequests() here so we don't have to do it 
-            // from javascript
+            std::map<const void*, onFrameHandler>::iterator it;
+            for (it = _onFrameHandlers.begin(); it != _onFrameHandlers.end(); ++it) {
+                (it->second)();
+            }
         }
 
         virtual void onPreRender(jslib::AbstractRenderWindow * theRenderer) {}
         virtual void onPostRender(jslib::AbstractRenderWindow * theRenderer) {}
+        void registerHandler(const void * theInstance, onFrameHandler & theHandler) {
+            _onFrameHandlers.insert(std::make_pair(theInstance, theHandler));
+        }
+        void unregisterHandler(const void * theInstance) {
+            std::map<const void*, onFrameHandler>::iterator it = _onFrameHandlers.find(theInstance);
+            if (it != _onFrameHandlers.end()) {
+                _onFrameHandlers.erase(it);
+            }
+        }
     private:
-         
+        std::map<const void*, onFrameHandler> _onFrameHandlers;  
         void run(std::size_t thread_pool_size);
         void stop();
-    public:
         /// The io_service used to perform asynchronous operations.
         static boost::asio::io_service io;
         // fictional work item to prevent our io_service from being out of work and terminating

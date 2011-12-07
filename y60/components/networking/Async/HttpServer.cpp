@@ -102,10 +102,16 @@ namespace http {
         acceptor_.async_accept(new_connection_->socket(),
                 boost::bind(&Server::handle_accept, this,
                     boost::asio::placeholders::error));
+        
+        asl::Ptr<NetAsync> parentPlugin = dynamic_cast_Ptr<NetAsync>(Singleton<PlugInManager>::get().getPlugIn(NetAsync::PluginName));
+        boost::function<void()> handler = boost::bind(&Server::handleRequest, this);
+        parentPlugin->registerHandler(this, handler);
         return true;
     }
 
     void Server::close() {
+        asl::Ptr<NetAsync> parentPlugin = dynamic_cast_Ptr<NetAsync>(Singleton<PlugInManager>::get().getPlugIn(NetAsync::PluginName));
+        parentPlugin->unregisterHandler(this);
     }
 
     y60::Y60Response Server::invokeCallback( const JSCallback & theCallback, 

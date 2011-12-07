@@ -126,7 +126,7 @@ HttpServerUnitTest.prototype.Constructor = function (obj, theName) {
         while (!obj.myServer.requestsPending() && (millisec() - time < TIMEOUT)) {
         }
 
-        obj.myServer.handleRequests();
+        Async.onFrame();
 
         time = millisec();
         //UGLY
@@ -145,7 +145,7 @@ HttpServerUnitTest.prototype.Constructor = function (obj, theName) {
         while (!obj.myServer.requestsPending() && (millisec() - time < TIMEOUT)) {
         }
 
-        obj.myServer.handleRequests();
+        Async.onFrame();
 
         time = millisec();
         // ARGS UGLY!
@@ -173,7 +173,7 @@ HttpServerUnitTest.prototype.Constructor = function (obj, theName) {
         myRequestManager.performRequest(myRequest);
         while (myRequestManager.activeCount > 0) {
             myRequestManager.handleRequests();
-            obj.myServer.handleRequests();
+            Async.onFrame();
         }
 
         // path: foo
@@ -189,7 +189,7 @@ HttpServerUnitTest.prototype.Constructor = function (obj, theName) {
         myRequestManager.performRequest(myRequest);
         while (myRequestManager.activeCount > 0) {
             myRequestManager.handleRequests();
-            obj.myServer.handleRequests();
+            Async.onFrame();
         }
 
         // path: krokodil
@@ -205,7 +205,7 @@ HttpServerUnitTest.prototype.Constructor = function (obj, theName) {
         myRequestManager.performRequest(myRequest);
         while (myRequestManager.activeCount > 0) {
             myRequestManager.handleRequests();
-            obj.myServer.handleRequests();
+            Async.onFrame();
         }
         
         // path: versicherung
@@ -221,7 +221,7 @@ HttpServerUnitTest.prototype.Constructor = function (obj, theName) {
         myRequestManager.performRequest(myRequest);
         while (myRequestManager.activeCount > 0) {
             myRequestManager.handleRequests();
-            obj.myServer.handleRequests();
+            Async.onFrame();
         }
         
 
@@ -243,7 +243,7 @@ HttpServerUnitTest.prototype.Constructor = function (obj, theName) {
         // handle them all
         while (myRequestManager.activeCount > 0) {
             myRequestManager.handleRequests();
-            obj.myServer.handleRequests();
+            Async.onFrame();
         }
 
         obj.myServer.close();
