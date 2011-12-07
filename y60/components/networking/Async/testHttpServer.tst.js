@@ -105,7 +105,7 @@ HttpServerUnitTest.prototype.Constructor = function (obj, theName) {
 
         };
 
-        obj.myServer = new HttpServer();
+        obj.myServer = new Async.HttpServer();
 
         obj.myServer.registerCallback("/test", myObj, myObj.test);
         obj.myServer.registerCallback("/foo", myObj, myObj.detailed_response);

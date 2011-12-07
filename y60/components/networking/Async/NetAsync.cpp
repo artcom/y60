@@ -59,6 +59,15 @@
 #include "NetAsync.h"
 
 namespace y60 {
+    
+static JSClass Package = {
+    "Package",
+    JSCLASS_HAS_PRIVATE,
+    JS_PropertyStub, JS_PropertyStub,
+    JS_PropertyStub, JS_PropertyStub,
+    JS_EnumerateStub, JS_ResolveStub,
+    JS_ConvertStub, JS_FinalizeStub
+};
     	
 NetAsync::NetAsync(asl::DLHandle theDLHandle) : 
                 asl::PlugInBase(theDLHandle),
@@ -80,7 +89,9 @@ NetAsync::io_service() {
 void 
 NetAsync::initClasses(JSContext * theContext, JSObject *theGlobalObject) {
     IScriptablePlugin::initClasses(theContext, theGlobalObject);
-    JSHttpServer::initClass(theContext, theGlobalObject);
+    // start javascript namespace
+    JSObject *asyncNamespace = JS_DefineObject(theContext, theGlobalObject, "Async", &Package, NULL, JSPROP_PERMANENT | JSPROP_READONLY);
+    JSHttpServer::initClass(theContext, asyncNamespace);
 };
 
 void
