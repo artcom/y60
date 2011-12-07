@@ -57,9 +57,11 @@
 */
 
 #include "NetAsync.h"
+#include <y60/jsbase/JSScriptablePlugin.h>
 #include <y60/jsbase/JSWrapper.h>
 
 using namespace jslib;
+using namespace y60;
 
 namespace y60 {
     
@@ -94,7 +96,7 @@ NetAsync::initClasses(JSContext * theContext, JSObject *theGlobalObject) {
     IScriptablePlugin::initClasses(theContext, theGlobalObject);
     // start javascript namespace
     JSObject *asyncNamespace = JS_DefineObject(theContext, theGlobalObject, "Async", &Package, NULL, JSPROP_PERMANENT | JSPROP_READONLY);
-    JS_DefineFunctions(theContext, asyncNamespace, Functions());
+    JSA_AddFunctions(theContext, asyncNamespace, Functions());
     JSHttpServer::initClass(theContext, asyncNamespace);
 };
 
@@ -131,12 +133,21 @@ OnFrame(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     return JS_TRUE;
 }
 
+static JSBool
+GetExtension(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("returns a IRendererExtension suitable for adding to a RenderWindow."); DOC_END;
+    IScriptablePluginPtr parentPlugin = dynamic_cast_Ptr<IScriptablePlugin>(asl::Singleton<asl::PlugInManager>::get().getPlugIn(NetAsync::PluginName));
+    *rval = as_jsval(cx, parentPlugin);
+    return JS_TRUE;
+}
+
 JSFunctionSpec *
 NetAsync::Functions() {
     IF_REG(cerr << "Registering class '"<<ClassName()<<"'"<<endl);
     static JSFunctionSpec myFunctions[] = {
         // name                  native                   nargs
         {"onFrame",             OnFrame,                0},
+        {"getExtension",        GetExtension,           0},
         {0}
     };
     return myFunctions;
