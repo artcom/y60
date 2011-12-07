@@ -72,13 +72,13 @@ namespace y60 {
 namespace async {
 namespace http {
     
-    HttpServer::HttpServer() :
+    Server::Server() :
         acceptor_(NetAsync::io_service()),
         new_connection_(new connection(NetAsync::io_service(), _myRequestQueue))
     {
     }
 
-    HttpServer::~HttpServer()
+    Server::~Server()
     {
         close();
         std::map<std::string, JSCallback>::iterator it;
@@ -90,8 +90,8 @@ namespace http {
         _myCallbacks.clear();
     }
     
-    bool HttpServer::start( string theServerAddress, string theServerPort ) {
-        AC_DEBUG << "starting HttpServer " << theServerAddress << ":" << theServerPort;
+    bool Server::start( string theServerAddress, string theServerPort ) {
+        AC_DEBUG << "starting http::Server on " << theServerAddress << ":" << theServerPort;
         boost::asio::ip::tcp::resolver resolver(NetAsync::io_service());
         boost::asio::ip::tcp::resolver::query query(theServerAddress, theServerPort);
         boost::asio::ip::tcp::endpoint endpoint = *resolver.resolve(query);
@@ -100,15 +100,15 @@ namespace http {
         acceptor_.bind(endpoint);
         acceptor_.listen();
         acceptor_.async_accept(new_connection_->socket(),
-                boost::bind(&HttpServer::handle_accept, this,
+                boost::bind(&Server::handle_accept, this,
                     boost::asio::placeholders::error));
         return true;
     }
 
-    void HttpServer::close() {
+    void Server::close() {
     }
 
-    y60::Y60Response HttpServer::invokeCallback( const JSCallback & theCallback, 
+    y60::Y60Response Server::invokeCallback( const JSCallback & theCallback, 
                                             const y60::Y60Request & theRequest,
                                             const std::string & thePath ) 
     {
@@ -168,7 +168,7 @@ namespace http {
                                 std::string header_name;
                                 if (!jslib::convertFrom(theCallback.context, propname, header_name)) {
                                     JS_ReportError(theCallback.context, 
-                                             "HttpServer::handleRequest: header_name is not a string!");
+                                             "Server::handleRequest: header_name is not a string!");
                                 }
                                 
                                 jsval propval;
@@ -180,7 +180,7 @@ namespace http {
                                 std::string header_value;
                                 if (!jslib::convertFrom(theCallback.context, propval, header_value)) {
                                     JS_ReportError(theCallback.context, 
-                                             "HttpServer::handleRequest: header_value is not a a string!");
+                                             "Server::handleRequest: header_value is not a a string!");
                                 }
                                 myResponse.headers.push_back(header(header_name, header_value));
                             }
@@ -193,7 +193,7 @@ namespace http {
             // default (backwards-compatible): treat jsval as string...
             if (!jslib::convertFrom(theCallback.context, rval, myResponseString)) {
                 JS_ReportError(theCallback.context, 
-                         "HttpServer::handleRequest: Callback does not return a string!");
+                         "Server::handleRequest: Callback does not return a string!");
             }
             myResponse.payload      = myResponseString;
             myResponse.return_code  = reply::ok;
@@ -208,11 +208,11 @@ namespace http {
         };
     }
 
-    bool HttpServer::requestsPending() {
+    bool Server::requestsPending() {
         return !(_myRequestQueue.empty());
     }
 
-    void HttpServer::handleRequest() {
+    void Server::handleRequest() {
         try {
             request rawRequest;
             while (_myRequestQueue.try_pop(rawRequest)) {
@@ -270,13 +270,13 @@ namespace http {
     }
 
     // Note: this will be called from the io_service thread.
-    void HttpServer::handle_accept(const boost::system::error_code& e) {
+    void Server::handle_accept(const boost::system::error_code& e) {
         if (!e)
         {
             new_connection_->start();
             new_connection_.reset(new connection(acceptor_.get_io_service(), _myRequestQueue));
             acceptor_.async_accept(new_connection_->socket(),
-                    boost::bind(&HttpServer::handle_accept, this,
+                    boost::bind(&Server::handle_accept, this,
                         boost::asio::placeholders::error));
         }
     }

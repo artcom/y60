@@ -87,13 +87,13 @@ namespace http {
         std::string contentType;
     };
 
-    class HttpServer {
+    class Server {
 
         public:
             /// creates a new HttpServer
-            HttpServer();
+            Server();
             bool start( std::string theServerAddress,  std::string theServerPort );
-            virtual ~HttpServer();
+            virtual ~Server();
 
             void close();
 
@@ -124,8 +124,6 @@ namespace http {
             y60::Y60Response invokeCallback(const JSCallback & theCallback, 
                                             const y60::Y60Request & theRequest,
                                             const std::string & theURI ); 
-
-            // HttpServerPtr                     _myHttpServer;
 
             std::map<std::string, JSCallback> _myCallbacks;
 

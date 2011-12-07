@@ -128,7 +128,7 @@ registerCallback(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
 	myCallback.functionValue = argv[2];
     myCallback.contentType = myContentType;
 
-    async::http::HttpServer & myNative = JSHttpServer::getJSWrapper(cx, obj).openNative();
+    async::http::Server & myNative = JSHttpServer::getJSWrapper(cx, obj).openNative();
     myNative.registerCallback( myUri, myCallback );
 
     return JS_TRUE;
@@ -260,7 +260,7 @@ JSHttpServer::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
     }
 
     JSHttpServer * myNewObject = 0;
-    OWNERPTR myHttpServer = OWNERPTR(new async::http::HttpServer());
+    OWNERPTR myHttpServer = OWNERPTR(new async::http::Server());
     myNewObject = new JSHttpServer(myHttpServer, myHttpServer.get());
 
     JS_SetPrivate(cx, obj, myNewObject);

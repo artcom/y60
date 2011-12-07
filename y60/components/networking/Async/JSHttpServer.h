@@ -63,10 +63,10 @@
 
 #include "HttpServer.h"
 
-class JSHttpServer : public jslib::JSWrapper<y60::async::http::HttpServer, asl::Ptr<y60::async::http::HttpServer> , jslib::StaticAccessProtocol> {
+class JSHttpServer : public jslib::JSWrapper<y60::async::http::Server, asl::Ptr<y60::async::http::Server> , jslib::StaticAccessProtocol> {
         JSHttpServer() {}
     public:
-        typedef y60::async::http::HttpServer NATIVE;
+        typedef y60::async::http::Server NATIVE;
         typedef asl::Ptr<NATIVE> OWNERPTR;
         typedef jslib::JSWrapper<NATIVE,OWNERPTR, jslib::StaticAccessProtocol> Base;
 
