@@ -54,14 +54,22 @@ half4 mainFragment(vert2frag IN,
                     uniform sampler2D tex0,
                     uniform sampler2D tex1,
                     uniform sampler2D tex2,
+#ifdef ALPHA
+                    uniform sampler2D tex3,
+#endif
                     uniform half4 surfacecolor): COLOR
 {
     half3 myYUVColor;
     myYUVColor.x = h1tex2D(tex0, IN.TexCoord0)-0.0625;
     myYUVColor.y = h1tex2D(tex1, IN.TexCoord0)-0.5;
     myYUVColor.z = h1tex2D(tex2, IN.TexCoord0)-0.5;
+#ifdef ALPHA
+    half alpha = h1tex2D(tex3, IN.TexCoord0);
+#else
+    half alpha = 1;
+#endif
     half3x3 myMatrix = half3x3(1.16,  0.0,   1.60, 1.16, -0.39, -0.81,1.16,  2.01,  0.0);
-    half4 myRGBColor = half4(mul(myMatrix, myYUVColor), 1);
+    half4 myRGBColor = half4(mul(myMatrix, myYUVColor), alpha);
     return myRGBColor * surfacecolor;
 }
 

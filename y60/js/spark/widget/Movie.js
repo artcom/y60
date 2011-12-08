@@ -99,6 +99,11 @@ spark.Movie.Constructor = function(Protected) {
             use("YUV2RGBShader.js");
             Public.Inherit(spark.YUV2RGBShader);
         }
+        if (theNode && ("targetpixelformat" in theNode && theNode.targetpixelformat === "YUVA420"))
+        {
+            use("YUV2RGBShader.js");
+            Public.Inherit(spark.YUV2RGBShader);
+        }
         Base.initialize(theNode);
     };
     

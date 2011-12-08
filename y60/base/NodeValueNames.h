@@ -235,6 +235,7 @@ namespace y60 {
     const char * const TEXTURE_INTERNAL_FORMAT_YUV420              = "YUV420";
     const char * const TEXTURE_INTERNAL_FORMAT_YUV422              = "YUV422";
     const char * const TEXTURE_INTERNAL_FORMAT_YUV444              = "YUV444";
+    const char * const TEXTURE_INTERNAL_FORMAT_YUVA420             = "YUVA420";
 
     enum TextureInternalFormat {
         TEXTURE_IFMT_DEPTH,
@@ -293,7 +294,8 @@ namespace y60 {
         TEXTURE_IFMT_COMPRESSED_RGBA_S3TC_DXT5_EXT,
         TEXTURE_IFMT_YUV420,
         TEXTURE_IFMT_YUV422,
-        TEXTURE_IFMT_YUV444
+        TEXTURE_IFMT_YUV444,
+        TEXTURE_IFMT_YUVA420
     };
 
     const char * const TextureInternalFormatStrings[] = {
@@ -354,6 +356,7 @@ namespace y60 {
         TEXTURE_INTERNAL_FORMAT_YUV420,
         TEXTURE_INTERNAL_FORMAT_YUV422,
         TEXTURE_INTERNAL_FORMAT_YUV444,
+        TEXTURE_INTERNAL_FORMAT_YUVA420,
         0
     };
 

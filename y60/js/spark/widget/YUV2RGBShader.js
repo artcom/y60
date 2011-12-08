@@ -61,6 +61,9 @@ spark.YUV2RGBShader.Constructor = function (Protected) {
         if (Public.movie.childNodesLength() === 3) {
             addMaterialRequirement(Protected.material, "option", "[10[yuv2rgb]]");
         }
+        if (Public.movie.childNodesLength() === 4) {
+            addMaterialRequirement(Protected.material, "option", "[10[yuva2rgba]]");
+        }
         Protected.material.enabled = true;
     }
     

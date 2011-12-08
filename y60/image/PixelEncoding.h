@@ -100,7 +100,8 @@ namespace y60 {
         RGB_FLOAT,
         YUV420,
         YUV422,
-        YUV444
+        YUV444,
+        YUVA420
     };
 
     const char * const PixelEncodingString[] = {
@@ -131,6 +132,7 @@ namespace y60 {
         "YUV420",
         "YUV422",
         "YUV444",
+        "YUVA420",
         0
     };
     const char * const RasterEncodingString[] = {
