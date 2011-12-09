@@ -53,12 +53,15 @@ AsyncDemuxer::run() {
             int ret = av_read_frame(_myFormatContext, myPacket);
             if (ret < 0) {
                 if (ret == AVERROR_EOF) {
-                    AC_DEBUG << "---AsyncDemuxer::run: end of file.";
+                    AC_DEBUG << "---AsyncDemuxer::run: end of file. stream_index: "<<myPacket->stream_index;
+                }
+                std::map<int, PacketQueuePtr>::iterator it = _myPacketQueues.find(myPacket->stream_index);
+                if ( it != _myPacketQueues.end()) {
+                    PacketMsgPtr p = PacketMsgPtr(new PacketMsg());
+                    it->second->push(p);
                 }
                 av_free_packet(myPacket);
                 delete myPacket;
-                myPacket = 0;
-                putPacket(myPacket);
                 break;
             }
             putPacket(myPacket);
