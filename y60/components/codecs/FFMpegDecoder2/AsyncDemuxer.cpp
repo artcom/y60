@@ -42,11 +42,11 @@ AsyncDemuxer::run() {
             DB(AC_TRACE << "---AsyncDemuxer::run: ");
             boost::this_thread::interruption_point();
             //XXX: rethink that: add condition: wait as long as queues are full
-            //if (queuesFull()) {
-            //    boost::this_thread::sleep(boost::posix_time::millisec(10));
-            //    //boost::this_thread::yield();
-            //    continue;
-            //}
+            if (queuesFull()) {
+                //boost::this_thread::sleep(boost::posix_time::millisec(10));
+                boost::this_thread::yield();
+                continue;
+            }
             AVPacket * myPacket = new AVPacket;
             memset(myPacket, 0, sizeof(AVPacket));
 
