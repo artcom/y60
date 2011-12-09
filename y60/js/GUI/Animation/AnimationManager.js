@@ -56,7 +56,7 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-/*jslint nomen:false*/
+/*jslint nomen:false, plusplus:false*/
 /*globals GUI, js*/
 
 var ourCurrentAnimationTime = -1;
@@ -87,54 +87,57 @@ GUI.AnimationManager = function () {
 };
 
 GUI.AnimationManager.prototype.Constructor = function (Public, Protected) {
-
-    ////////////////////////////////////////
-    // Member
-    ////////////////////////////////////////
-
-    var _animations = [];
-
-    ////////////////////////////////////////
-    // Public
-    ////////////////////////////////////////
+    var _ = {};
     
-    Public.__defineGetter__("animationCount", function () {
-        return _animations.length;
-    });
+    /////////////////////
+    // Private Members //
+    /////////////////////
+
+    _.animations = [];
+
+    /////////////////////
+    // Private Methods //
+    /////////////////////
+
+    _.removeFinished = function () {
+        var myAnimation, i;
+        for (i = 0; i < _.animations.length; i++) {
+            myAnimation = _.animations[i];
+            if (!myAnimation.running) {
+                _.animations.splice(i, 1);
+            }
+        }
+    };
+    
+    ////////////////////
+    // Public Methods //
+    ////////////////////
 
     Public.play = function (theAnimation) { /* theNamespace */
         // Validate theAnimation is instanceof GUI.Animation
-        if (js.array.indexOf(_animations, theAnimation) < 0) {
-            _animations.push(theAnimation);
+        if (js.array.indexOf(_.animations, theAnimation) < 0) {
+            _.animations.push(theAnimation);
         }
         theAnimation.play();
     };
 
     Public.isPlaying = function () {
-        return _animations.length > 0;
+        return _.animations.length > 0;
     };
     
     Public.doFrame = function (theTime) {
+        var myAnimation, i;
         ourCurrentAnimationTime = theTime * 1000;
-        for (var i = 0; i < _animations.length; i++) {
-            var a = _animations[i];
-            if(a.running) {
-                a.doFrame(theTime * 1000);
+        for (i = 0; i < _.animations.length; i++) {
+            myAnimation = _.animations[i];
+            if (myAnimation.running) {
+                myAnimation.doFrame(theTime * 1000);
             }
         }
-        removeFinished();
+        _.removeFinished();
     };
-
-    ////////////////////////////////////////
-    // Private
-    ////////////////////////////////////////
-
-    function removeFinished() {
-        for(var i = 0; i < _animations.length; i++) {
-            var a = _animations[i];
-            if(!a.running) {
-                _animations.splice(i, 1);
-            }
-        }
-    };
+    
+    Public.__defineGetter__("animationCount", function () {
+        return _.animations.length;
+    });
 };
