@@ -40,11 +40,13 @@ spark.YUV2RGBShader.Constructor = function (Protected) {
 
     function ensureShader() {
         var myRequirement = Protected.material.find(".//*[@name='option']");
-        if (myRequirement && myRequirement.childNode("#text").nodeValue.toString() === "[10[yuv2rgb]]") {
+        if (myRequirement && (myRequirement.childNode("#text").nodeValue.toString() === "[10[yuv2rgb]]" ||
+                              myRequirement.childNode("#text").nodeValue.toString() === "[10[yuva2rgba]]"))
+        {
             return;
         }
-        // YUV targetrasterformat allows us to use a shader to convert YUV2RGB, 
-        // loadMovieFrame created 3 rasters for us, therefore we need 3 textures
+        // YUV targetrasterformat allows us to use a shader to convert YUV2RGB or YUVA2RGBA, 
+        // loadMovieFrame created 3 or 4 rasters for us, therefore we need 3 or 4 textures
         Protected.material.enabled = false;
         for (var i = 1; i < Public.movie.childNodesLength(); i++) {
             var myTextureUnit = Protected.material.childNode("textureunits").appendChild(Node.createElement("textureunit"));
