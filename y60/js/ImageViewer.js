@@ -403,6 +403,9 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
             case AUDIO_MEDIA:
                 print("Media: audio");
                 break;
+            case STREAMING_MEDIA:
+                print("Media: stream");
+                break;
             case CAPTURE_MEDIA:
                 print("Media: Capture Video");
                 if (!_myVideoCapturePlugged &&
@@ -426,6 +429,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
                     _myMovieOverlay.visible = false;
                 }
                 break;
+            case STREAMING_MEDIA:
             case VIDEO_MEDIA:
                 var mySeekableFlag = false;
                 var myEnsureFramecount = false;
