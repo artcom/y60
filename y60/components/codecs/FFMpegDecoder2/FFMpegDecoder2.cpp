@@ -1077,33 +1077,35 @@ namespace y60 {
         Movie * myMovie = getMovie();
 
         _myFrameRate = av_q2d(_myVStream->r_frame_rate);
-        
         myMovie->set<FrameRateTag>(_myFrameRate);
+        _myVideoStreamTimeBase = 1/ av_q2d(_myVStream->time_base);
         if (myVCodec->codec_id == CODEC_ID_MPEG1VIDEO || myVCodec->codec_id == CODEC_ID_MPEG2VIDEO )
         {
             // For some codecs, the duration value is not set. For MPEG1 and MPEG2,
             // ffmpeg gives often a wrong value.
-            _myVideoStreamTimeBase = 1/ av_q2d(_myVStream->time_base);
             //unsigned myFrameCount = unsigned(_myVStream->duration*_myFrameRate/_myVideoStreamTimeBase);
 
         } else if (myVCodec->codec_id == CODEC_ID_WMV1 || myVCodec->codec_id == CODEC_ID_WMV2 ||
-                   myVCodec->codec_id == CODEC_ID_WMV3)
-        {
+                   myVCodec->codec_id == CODEC_ID_WMV3) {
             myMovie->set<FrameCountTag>(int(_myVStream->duration * _myFrameRate / 1000));
-            myMovie->set<MaxCacheSizeTag>(std::min(int(myMovie->get<MaxCacheSizeTag>()), int(myMovie->get<FrameCountTag>())));
-            _myVideoStreamTimeBase = 1/ av_q2d(_myVStream->time_base);
         } else {
-            double myDuration = 0.0;
-            if(_myFormatContext->start_time == static_cast<int64_t>(AV_NOPTS_VALUE)) {
-                myDuration = (_myFormatContext->duration )*_myFrameRate/(double)AV_TIME_BASE;
-            } else {
-                myDuration = (_myFormatContext->duration - _myFormatContext->start_time )*_myFrameRate/(double)AV_TIME_BASE;
+            double myFrameCount = -1;
+            if (_myFormatContext->duration != static_cast<int64_t>(AV_NOPTS_VALUE)) {
+                if (_myFormatContext->start_time == static_cast<int64_t>(AV_NOPTS_VALUE)) {
+                    myFrameCount = (_myFormatContext->duration )*_myFrameRate/(double)AV_TIME_BASE;
+                } else {
+                    myFrameCount = (_myFormatContext->duration - _myFormatContext->start_time )*_myFrameRate/(double)AV_TIME_BASE;
+                }
             }
-            myMovie->set<FrameCountTag>(int(asl::round(myDuration)));
-            myMovie->set<MaxCacheSizeTag>(std::min(int(myMovie->get<MaxCacheSizeTag>()), int(myMovie->get<FrameCountTag>())));
-            _myVideoStreamTimeBase = 1/ av_q2d(_myVStream->time_base);
+            if (myFrameCount > 0) {
+                myMovie->set<FrameCountTag>(int(asl::round(myFrameCount)));
+            }
         }
         _myMaxCacheSize = myMovie->get<MaxCacheSizeTag>();
+        if (myMovie->get<FrameCountTag>() >= 0) {
+            _myMaxCacheSize = std::min(int(_myMaxCacheSize), int(myMovie->get<FrameCountTag>()));
+            myMovie->set<MaxCacheSizeTag>(_myMaxCacheSize);
+        }
 
         double myAspectRatio = 1.0;
         // calc aspect ratio
@@ -1124,7 +1126,7 @@ namespace y60 {
         myAspectRatio *= (float)_myVStream->codec->width / _myVStream->codec->height; 
         myMovie->set<AspectRatioTag>((float)myAspectRatio);
 
-        _myVideoStartTimestamp = _myVStream->start_time;//myPacket->dts;
+        _myVideoStartTimestamp = _myVStream->start_time;
         AC_INFO << "FFMpegDecoder2::getVideoProperties() " << theFilename << " fps="
                 << _myFrameRate << " framecount=" << getFrameCount()<< " time_base: "
                 <<_myVideoStreamTimeBase;
