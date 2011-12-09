@@ -118,6 +118,8 @@ namespace AudioBase {
 }
 
 namespace y60 {
+    class AsyncDemuxer;
+    typedef asl::Ptr<AsyncDemuxer> AsyncDemuxerPtr;
 
     DEFINE_EXCEPTION(FFMpegDecoder2Exception, asl::Exception);
     const std::string MIME_TYPE_MPG = "application/mpg";
@@ -240,7 +242,7 @@ namespace y60 {
         VideoMsgQueue _myMsgQueue;
         AVFrame * _myFrame;
 
-        DemuxPtr _myDemux;
+        AsyncDemuxerPtr _myDemux;
 
         int64_t _myVideoStartTimestamp;
 #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52,20,0)

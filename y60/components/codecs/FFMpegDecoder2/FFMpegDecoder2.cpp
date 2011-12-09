@@ -58,7 +58,7 @@
 
 #include "FFMpegDecoder2.h"
 #include "FFMpegURLProtocol.h"
-#include "Demux.h"
+#include "AsyncDemuxer.h"
 
 #include <y60/video/Movie.h>
 #include <y60/sound/SoundManager.h>
@@ -204,7 +204,7 @@ namespace y60 {
         //char myString[200];
         //dump_format(_myFormatContext, 0, myString, 0);
         // find video/audio streams
-        _myDemux = asl::Ptr<Demux>(new Demux(_myFormatContext));
+        _myDemux = AsyncDemuxerPtr(new AsyncDemuxer(_myFormatContext));
         unsigned myAudioStreamIndex = 0;
         _myAllAudioStreamIndicies.clear();
         for (unsigned i = 0; i < static_cast<unsigned>(_myFormatContext->nb_streams); ++i) {
@@ -265,6 +265,7 @@ namespace y60 {
             }
         }
 
+        _myDemux->start();
         getVideoProperties(theFilename);
         decodeFrame();
         // reload video properties after first decode
@@ -316,10 +317,11 @@ namespace y60 {
 
         if (!isActive()) {
             if (shouldSeek(myCurrentTime, theStartTime) || _myMsgQueue.hasEOF()) {
-                _myDemux->clearPacketCache();
+                _myDemux->stop();
                 _myMsgQueue.clear();
                 _myMsgQueue.reset();
                 doSeek(theStartTime);
+                _myDemux->start();
                 if (theStartAudioFlag && hasAudio() && getDecodeAudioFlag()) {
                     _myAdjustAudioOffsetFlag = true;
                 }
@@ -340,10 +342,11 @@ namespace y60 {
             }
             if (_myMsgQueue.size() == 0) {
                 if(!decodeFrame() || myAudioEOFFlag) {
-                    _myDemux->clearPacketCache();
+                    _myDemux->stop();
                     _myMsgQueue.clear();
                     _myMsgQueue.reset();
                     doSeek(theStartTime);
+                    _myDemux->start();
                     if (theStartAudioFlag && hasAudio() && getDecodeAudioFlag()) {
                         _myAdjustAudioOffsetFlag = true;
                     }
@@ -389,7 +392,7 @@ namespace y60 {
             Movie * myMovie = getMovie();
             myMovie->set<CurrentFrameTag>(0);
 
-            _myDemux->clearPacketCache();
+            _myDemux->stop();
             _myMsgQueue.clear();
             _myMsgQueue.reset();
             dumpCache();
@@ -1214,11 +1217,12 @@ namespace y60 {
             }
         }
 
-        _myDemux->clearPacketCache();
+        _myDemux->stop();
         _myMsgQueue.clear();
         _myMsgQueue.reset();
 
         doSeek(theDestTime);
+        _myDemux->start();
         _myLastVideoFrame = VideoMsgPtr();
         if (hasAudio() && getDecodeAudioFlag()) {
             if (getState() == RUN) {
