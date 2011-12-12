@@ -271,10 +271,6 @@ js.array.insertAfter = function (theArray, theItem, theOldItem) {
     }
 };
 
-function indexOf(theArray, theItem, theFrom) {
-    Logger.warning("Y60JSSL :: free function 'indexOf' is deprecated. Use 'js.array.indexOf' instead.");
-    return js.array.indexOf(theArray, theItem, theFrom);
-}
 // Does not allow filter functions that mutate the input array!
 js.array.filter = function (theArray, thefilterFunction) {
     if (typeof thefilterFunction !== "function") {
@@ -465,154 +461,6 @@ function adjustNodeId(theNode, theDeepAdjustFlag) {
             adjustNodeId(theNode.childNodes[i], theDeepAdjustFlag);
         }
     }
-}
-
-//searches for a descendant of theNode (must be in DOM below theNode)
-function getDescendantById(theNode, theId, doDeepSearch) {
-    if (doDeepSearch === undefined || !doDeepSearch) {
-        doDeepSearch = false;
-    }
-    Logger.warning("getDescendantById is deprecated");
-    dumpstack();
-    var myResult = theNode.getNodesByAttribute("", "id",  theId, doDeepSearch);
-    return myResult.length === 0 ? null:myResult[0];
-}
-
-function getDescendantByName(theNode, theName, doDeepSearch) {
-    if (doDeepSearch === undefined || !doDeepSearch) {
-        doDeepSearch = false;
-    }
-    Logger.warning("getDescendantByName is deprecated");
-    dumpstack();
-    var myResult = theNode.getNodesByAttribute("", "name",  theName, doDeepSearch);
-    return myResult.length === 0 ? null:myResult[0];
-}
-
-function getDescendantsByName(theNode, theName, doDeepSearch) {
-    if (doDeepSearch === undefined || !doDeepSearch) {
-        doDeepSearch = false;
-    }
-    Logger.warning("getDescendantsByName is deprecated");
-    dumpstack();
-    var myResult = theNode.getNodesByAttribute("", "name",  theName, doDeepSearch);
-    return myResult;
-}
-
-// Recursivly searches theNode for the first element that has theAttribute.
-// Can search deep or shallow depending on the value of doDeepSearch
-function getDescendantByAttributeName(theNode, theAttribute, doDeepSearch) {
-    if (doDeepSearch === undefined || !doDeepSearch) {
-        doDeepSearch = false;
-    }
-    Logger.warning("getDescendantByAttributeName is deprecated");
-    dumpstack();
-    var myResult = theNode.getNodesByAttribute("", theAttribute, "", doDeepSearch);
-    return myResult.length === 0 ? null:myResult[0];
-}
-
-// Recursivly searches theNode for the first element that has theAttribute with value theValue.
-// Can search deep or shallow depending on the value of doDeepSearch
-function getDescendantByAttribute(theNode, theAttribute, theValue, doDeepSearch) {
-    if (doDeepSearch === undefined || !doDeepSearch) {
-        doDeepSearch = false;
-    }
-    Logger.warning("getDescendantByAttribute is deprecated");
-    dumpstack();
-    var myResult = theNode.getNodesByAttribute("", theAttribute, theValue, doDeepSearch);
-    return myResult.length === 0 ? null:myResult[0];
-}
-
-// Recursivly searches theNode for all elements that have theAttribute with value theValue.
-// Can search deep or shallow depending on the value of doDeepSearch
-function getDescendantsByAttribute(theNode, theAttribute, theValue, doDeepSearch) {
-    if (doDeepSearch === undefined || !doDeepSearch) {
-        doDeepSearch = false;
-    }
-    Logger.warning("getDescendantsByAttribute is deprecated");
-    dumpstack();
-    var myResult = theNode.getNodesByAttribute("", theAttribute, theValue, doDeepSearch);
-    return myResult;
-}
-
-function getDescendantsByAttributeName(theNode, theAttribute, doDeepSearch) {
-    if (doDeepSearch === undefined || !doDeepSearch) {
-        doDeepSearch = false;
-    }
-    Logger.warning("getDescendantsByAttributeName is deprecated");
-    dumpstack();
-    var myResult = theNode.getNodesByAttribute("", theAttribute, "", doDeepSearch);
-    return myResult;
-}
-
-// Recursivly search for the first element by tagname
-function getDescendantByTagName(theNode, theTagName, doDeepSearch) {
-    if (doDeepSearch === undefined || !doDeepSearch) {
-        doDeepSearch = false;
-    }
-    Logger.warning("getDescendantByTagName is deprecated");
-    dumpstack();
-    var myResult = theNode.getNodesByTagName(theTagName, doDeepSearch);
-    return myResult.length === 0 ? null:myResult[0];
-}
-
-// Recursivly search for all elements by tagname
-function getDescendantsByTagName(theNode, theTagName, doDeepSearch) {
-    if (doDeepSearch === undefined || !doDeepSearch) {
-        doDeepSearch = false;
-    }
-    Logger.warning("getDescendantsByTagName is deprecated");
-    dumpstack();
-    var myResult = theNode.getNodesByTagName(theTagName, doDeepSearch);
-    return myResult;
-}
-
-function getChildElementNodes(theNode, theFilterOperation, theFilterNodeName) {
-    Logger.warning("getChildElementNodes is deprecated");
-    dumpstack();
-    var myChildElementNodes = [];
-    var i;
-
-    try {
-        if (theNode) {
-            for (var n = 0; n < theNode.childNodes.length; n++) {
-                if (theNode.childNodes[n].nodeType === Node.ELEMENT_NODE) {
-                    switch (theFilterOperation) {
-                    case 'ignore':
-                        if (theFilterNodeName !== theNode.childNodes[n].nodeName) {
-                            myChildElementNodes.push(theNode.childNodes[n]);
-                        }
-                        break;
-                    case 'match':
-                        if (theFilterNodeName === theNode.childNodes[n].nodeName) {
-                            myChildElementNodes.push(theNode.childNodes[n]);
-                        }
-                        break;
-                    case 'ignore-list':
-                        for (i = 0; i < theFilterNodeName.length; i++) {
-                            if (theFilterNodeName[i] !== theNode.childNodes[n].nodeName) {
-                                myChildElementNodes.push(theNode.childNodes[n]);
-                            }
-                        }
-                        break;
-                    case 'match-list':
-                        for (i = 0; i < theFilterNodeName.length; i++) {
-                            if (theFilterNodeName[i] === theNode.childNodes[n].nodeName) {
-                                myChildElementNodes.push(theNode.childNodes[n]);
-                            }
-                        }
-                        break;
-                    //case '':
-                    default:
-                        myChildElementNodes.push(theNode.childNodes[n]);
-                    }
-                }
-            }
-        }
-    } catch (ex) {
-        print('Exception in getChildElementNodes(' + theNode + ', ' + theFilterOperation + ', ' + theFilterNodeName + '):\n' + ex);
-    }
-
-    return myChildElementNodes;
 }
 
 function adjustNodeIds(theNode) {
@@ -1240,6 +1088,24 @@ utils.getCameraDistanceFromScreenLength = function (theScreenLength, theHFov) {
     return myDistance;
 };
 
+utils.dom.bindNodeValue = function (theSubscribingNode,
+                                    theSubscribingAttributeName,
+                                    theObservedNode,
+                                    theObservedAttributeName,
+                                    theCallback) {
+    if (theSubscribingAttributeName &&
+        theObservedAttributeName && theObservedNode &&
+        theCallback && typeof(theCallback) === 'function') {
+        var temp = theSubscribingNode[theSubscribingAttributeName]; // workaround! Don't remove - Forces Serialization
+        var mySubscribingAttrNode = theSubscribingNode.attributes.getNamedItem(theSubscribingAttributeName);
+        mySubscribingAttrNode.onReconnect = function () {
+            this.nodeValueDependsOn(theObservedNode.attributes.getNamedItem(theObservedAttributeName));
+        };
+        mySubscribingAttrNode.onOutdatedValue = function () {
+            theCallback(this);
+        };
+    }
+};
 
 utils.dom.mergeNodes = function (theTargetNode, theSourceNode) {
 
