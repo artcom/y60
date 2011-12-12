@@ -63,11 +63,20 @@ ZipPackage::getFileList(const std::string & theSubDir, bool theRecurseFlag) {
     return myMatchingFiles;
 }
 
+std::string 
+ZipPackage::prepareRelativePath(const std::string & theRelativePath) {
+    std::string myPath = theRelativePath;
+    if (myPath.find("./") == 0) {
+        myPath = myPath.substr(2);
+    }
+    return myPath;
+}
+
 std::string
 ZipPackage::findFile(const std::string & theRelativePath) const {
     AC_DEBUG << "findFile path='" << theRelativePath << "'";
     for (unsigned i = 0; i < _myFileList.size(); ++i) {
-        if (_myFileList[i].find(theRelativePath) == 0) { // must start with theRelativePath
+        if (_myFileList[i].find(prepareRelativePath(theRelativePath)) == 0) { // must start with theRelativePath
             return _myZipFilename + "/" + _myFileList[i];
         }
     }
@@ -76,12 +85,12 @@ ZipPackage::findFile(const std::string & theRelativePath) const {
 
 Ptr<ReadableBlockHandle>
 ZipPackage::getFile(const std::string & theRelativePath) {
-    return _myZipReader.getFile(theRelativePath);
+    return _myZipReader.getFile(prepareRelativePath(theRelativePath));
 }
 
 Ptr<ReadableStreamHandle>
 ZipPackage::getStream(const std::string & theRelativePath) {
-    return _myZipReader.getFile(theRelativePath);
+    return _myZipReader.getFile(prepareRelativePath(theRelativePath));
 }
 
 }
