@@ -1,0 +1,14 @@
+<SparkSceneTesterWindow name="AlphaVideoTutorial"
+        title="alphaVideoTutorial"
+        decorations="true"
+        mouseCursor="true"
+        width="900"
+        height="600"
+        swapInterval="1"
+        i18nContext="global-i18n">
+        
+   <Rectangle name="rect" x="0" y="0" width="900" height="600" color="[0.2,0.5,0.7]"/>
+   <Movie name="movie" src="fixtures/Alpha_Testvideo.flv" targetpixelformat="YUVA420" x="100" y="100" z="10"/>
+    
+    
+</SparkSceneTesterWindow>

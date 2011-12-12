@@ -63,12 +63,13 @@
 //
 //=============================================================================
 
-const AUDIO_MEDIA   = "AUDIO";
-const VIDEO_MEDIA   = "VIDEO";
-const CAPTURE_MEDIA = "CAPTURE";
-const IMAGE_MEDIA   = "IMAGE";
-const MODEL_MEDIA   = "MODEL";
-const NO_MEDIA      = "NO MEDIA";
+const AUDIO_MEDIA     = "AUDIO";
+const VIDEO_MEDIA     = "VIDEO";
+const CAPTURE_MEDIA   = "CAPTURE";
+const IMAGE_MEDIA     = "IMAGE";
+const MODEL_MEDIA     = "MODEL";
+const STREAMING_MEDIA = "STREAM";
+const NO_MEDIA        = "NO MEDIA";
 
 const ASX_REGEXP       = /<entry.*?>(?:.*?<title.*?>\s*(.*?)\s*<\/title>)?.*?<ref.+?href\s*=\s*"(.+?)"/gi;
 const ASF_REGEXP       = /Ref\d+=(.*?)\n/gi;
@@ -144,10 +145,11 @@ Playlist.prototype.Constructor = function(self) {
         }
         else {
             if (theUrl.search(/^mms:\/\//i) != -1 ||
+                theUrl.search(/^rtp:\/\//i) != -1 || 
                 theUrl.search(/^rtsp:\/\//i) != -1 )
             {
                 //streaming protocol detected
-                pushEntry(theUrl, theTitle, theMediaType);
+                pushEntry(theUrl, theTitle, STREAMING_MEDIA);
             } else {
                 //look for meta files to parse
                 switch (getMimeType(theUrl)) {
@@ -208,9 +210,7 @@ Playlist.prototype.Constructor = function(self) {
                    theUrl.search(/\.rm$/i)   != -1 ||
                    theUrl.search(/\.ra$/i)   != -1 ||
                    theUrl.search(/\.wav$/i)  != -1 ||
-                   theUrl.search(/\.asf$/i)  != -1/*||
-                   theUrl.search(/^mms:\/\//i) != -1*/ )
-                   //XXX default fallback for mms://server/dir/
+                   theUrl.search(/\.asf$/i)  != -1)
         {
             return AUDIO_MEDIA;
         } else if (theUrl.search(/\.m60$/i)  != -1 ||
@@ -238,6 +238,11 @@ Playlist.prototype.Constructor = function(self) {
                    theUrl.search(/\.sta$/i) != -1)
         {
             return MODEL_MEDIA;
+        } else if (theUrl.search(/^mms:\/\//i) != -1 ||
+                   theUrl.search(/^rtp:\/\//i) != -1 || 
+                   theUrl.search(/^rtsp:\/\//i) != -1 )
+        {
+            return STREAMING_MEDIA;
         } else {
             // one more chance for http audio
             if (theUrl.search(/:\/\//) != -1) {

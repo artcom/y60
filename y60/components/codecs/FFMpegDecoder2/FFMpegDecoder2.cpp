@@ -719,6 +719,12 @@ namespace y60 {
                 myBufferSizes.push_back(_myFrameWidth * _myFrameHeight / 4);
                 myBufferSizes.push_back(_myFrameWidth * _myFrameHeight / 4);
                 break;
+            case PIX_FMT_YUVA420P:
+                myBufferSizes.push_back(_myFrameWidth * _myFrameHeight);
+                myBufferSizes.push_back(_myFrameWidth * _myFrameHeight / 4);
+                myBufferSizes.push_back(_myFrameWidth * _myFrameHeight / 4);
+                myBufferSizes.push_back(_myFrameWidth * _myFrameHeight);
+                break;
             default:
                 myBufferSizes.push_back(_myFrameWidth * _myFrameHeight * 3);
                 break;
@@ -864,6 +870,11 @@ namespace y60 {
                     memset(theTargetRaster[0]->pixels().begin(), 16, theTargetRaster[0]->pixels().size());
                     memset(theTargetRaster[1]->pixels().begin(), 127, theTargetRaster[1]->pixels().size());
                     memset(theTargetRaster[2]->pixels().begin(), 127, theTargetRaster[2]->pixels().size());
+                } else if (_myDestinationPixelFormat == PIX_FMT_YUVA420P ) {
+                    memset(theTargetRaster[0]->pixels().begin(), 16, theTargetRaster[0]->pixels().size());
+                    memset(theTargetRaster[1]->pixels().begin(), 127, theTargetRaster[1]->pixels().size());
+                    memset(theTargetRaster[2]->pixels().begin(), 127, theTargetRaster[2]->pixels().size());
+                    memset(theTargetRaster[3]->pixels().begin(), 0, theTargetRaster[3]->pixels().size());
                 } else {
                     for (unsigned i = 0 ; i < theTargetRaster.size(); i++) {
                         memset(theTargetRaster[i]->pixels().begin(), 0, theTargetRaster[i]->pixels().size());
@@ -959,6 +970,9 @@ namespace y60 {
         if (myMovie->get<TargetPixelFormatTag>() != "") {
             TextureInternalFormat myTargetPixelFormat = TextureInternalFormat(getEnumFromString(myMovie->get<TargetPixelFormatTag>(), TextureInternalFormatStrings));
             switch(myTargetPixelFormat) {
+                case TEXTURE_IFMT_YUVA420:
+                    myRasterEncoding = YUVA420;
+                    break;
                 case TEXTURE_IFMT_YUV420:
                     myRasterEncoding = YUV420;
                     break;
@@ -1018,6 +1032,17 @@ namespace y60 {
                 myMovie->addRasterValue(createRasterValue( y60::GRAY, _myFrameWidth/2, _myFrameHeight/2), y60::GRAY, 1);
                 myMovie->addRasterValue(createRasterValue( y60::GRAY, _myFrameWidth/2, _myFrameHeight/2), y60::GRAY, 1);
                 break;
+            case YUVA420:
+                {AC_DEBUG << "Using YUVA420 pixels";}
+                _myDestinationPixelFormat = PIX_FMT_YUVA420P;
+                if (myVCodec->pix_fmt != PIX_FMT_YUVA420P) {
+                    AC_WARNING<<"you're trying to use YUV2RGB shader but the source video pixel format is not YUVA420p, src: " + theFilename;
+                }
+                myMovie->createRaster(_myFrameWidth, _myFrameHeight, 1, y60::GRAY);
+                myMovie->addRasterValue(createRasterValue( y60::GRAY, _myFrameWidth/2, _myFrameHeight/2), y60::GRAY, 1);
+                myMovie->addRasterValue(createRasterValue( y60::GRAY, _myFrameWidth/2, _myFrameHeight/2), y60::GRAY, 1);
+                myMovie->addRasterValue(createRasterValue( y60::GRAY, _myFrameWidth, _myFrameHeight), y60::GRAY, 1);
+                break;
             case RGB:
             default:
                 {AC_DEBUG << "Using BGR pixels";}
@@ -1031,6 +1056,11 @@ namespace y60 {
             memset(myMovie->getRasterPtr(0)->pixels().begin(), 16, myMovie->getRasterPtr(0)->pixels().size());
             memset(myMovie->getRasterPtr(1)->pixels().begin(), 127, myMovie->getRasterPtr(1)->pixels().size());
             memset(myMovie->getRasterPtr(2)->pixels().begin(), 127, myMovie->getRasterPtr(2)->pixels().size());
+        } else if (_myDestinationPixelFormat == PIX_FMT_YUVA420P ) {
+            memset(myMovie->getRasterPtr(0)->pixels().begin(), 16, myMovie->getRasterPtr(0)->pixels().size());
+            memset(myMovie->getRasterPtr(1)->pixels().begin(), 127, myMovie->getRasterPtr(1)->pixels().size());
+            memset(myMovie->getRasterPtr(2)->pixels().begin(), 127, myMovie->getRasterPtr(2)->pixels().size());
+            memset(myMovie->getRasterPtr(3)->pixels().begin(), 0, myMovie->getRasterPtr(3)->pixels().size());
         } else {
             for (unsigned i = 0; i < myRasterCount; i++) {
                 myMovie->getRasterPtr(i)->clear();
@@ -1047,33 +1077,35 @@ namespace y60 {
         Movie * myMovie = getMovie();
 
         _myFrameRate = av_q2d(_myVStream->r_frame_rate);
-        
         myMovie->set<FrameRateTag>(_myFrameRate);
+        _myVideoStreamTimeBase = 1/ av_q2d(_myVStream->time_base);
         if (myVCodec->codec_id == CODEC_ID_MPEG1VIDEO || myVCodec->codec_id == CODEC_ID_MPEG2VIDEO )
         {
             // For some codecs, the duration value is not set. For MPEG1 and MPEG2,
             // ffmpeg gives often a wrong value.
-            _myVideoStreamTimeBase = 1/ av_q2d(_myVStream->time_base);
             //unsigned myFrameCount = unsigned(_myVStream->duration*_myFrameRate/_myVideoStreamTimeBase);
 
         } else if (myVCodec->codec_id == CODEC_ID_WMV1 || myVCodec->codec_id == CODEC_ID_WMV2 ||
-                   myVCodec->codec_id == CODEC_ID_WMV3)
-        {
+                   myVCodec->codec_id == CODEC_ID_WMV3) {
             myMovie->set<FrameCountTag>(int(_myVStream->duration * _myFrameRate / 1000));
-            myMovie->set<MaxCacheSizeTag>(std::min(int(myMovie->get<MaxCacheSizeTag>()), int(myMovie->get<FrameCountTag>())));
-            _myVideoStreamTimeBase = 1/ av_q2d(_myVStream->time_base);
         } else {
-            double myDuration = 0.0;
-            if(_myFormatContext->start_time == static_cast<int64_t>(AV_NOPTS_VALUE)) {
-                myDuration = (_myFormatContext->duration )*_myFrameRate/(double)AV_TIME_BASE;
-            } else {
-                myDuration = (_myFormatContext->duration - _myFormatContext->start_time )*_myFrameRate/(double)AV_TIME_BASE;
+            double myFrameCount = -1;
+            if (_myFormatContext->duration != static_cast<int64_t>(AV_NOPTS_VALUE)) {
+                if (_myFormatContext->start_time == static_cast<int64_t>(AV_NOPTS_VALUE)) {
+                    myFrameCount = (_myFormatContext->duration )*_myFrameRate/(double)AV_TIME_BASE;
+                } else {
+                    myFrameCount = (_myFormatContext->duration - _myFormatContext->start_time )*_myFrameRate/(double)AV_TIME_BASE;
+                }
             }
-            myMovie->set<FrameCountTag>(int(asl::round(myDuration)));
-            myMovie->set<MaxCacheSizeTag>(std::min(int(myMovie->get<MaxCacheSizeTag>()), int(myMovie->get<FrameCountTag>())));
-            _myVideoStreamTimeBase = 1/ av_q2d(_myVStream->time_base);
+            if (myFrameCount > 0) {
+                myMovie->set<FrameCountTag>(int(asl::round(myFrameCount)));
+            }
         }
         _myMaxCacheSize = myMovie->get<MaxCacheSizeTag>();
+        if (myMovie->get<FrameCountTag>() >= 0) {
+            _myMaxCacheSize = std::min(int(_myMaxCacheSize), int(myMovie->get<FrameCountTag>()));
+            myMovie->set<MaxCacheSizeTag>(_myMaxCacheSize);
+        }
 
         double myAspectRatio = 1.0;
         // calc aspect ratio
@@ -1094,7 +1126,7 @@ namespace y60 {
         myAspectRatio *= (float)_myVStream->codec->width / _myVStream->codec->height; 
         myMovie->set<AspectRatioTag>((float)myAspectRatio);
 
-        _myVideoStartTimestamp = _myVStream->start_time;//myPacket->dts;
+        _myVideoStartTimestamp = _myVStream->start_time;
         AC_INFO << "FFMpegDecoder2::getVideoProperties() " << theFilename << " fps="
                 << _myFrameRate << " framecount=" << getFrameCount()<< " time_base: "
                 <<_myVideoStreamTimeBase;
@@ -1146,6 +1178,11 @@ namespace y60 {
                 copyPlaneToRaster(myVideoFrame->getBuffer(0), theFrame->data[0], theFrame->linesize[0], _myFrameWidth, _myFrameHeight);
                 copyPlaneToRaster(myVideoFrame->getBuffer(1), theFrame->data[1], theFrame->linesize[1], _myFrameWidth/2, _myFrameHeight/2);
                 copyPlaneToRaster(myVideoFrame->getBuffer(2), theFrame->data[2], theFrame->linesize[2], _myFrameWidth/2, _myFrameHeight/2);
+            } else if (_myDestinationPixelFormat == PIX_FMT_YUVA420P ) {
+                copyPlaneToRaster(myVideoFrame->getBuffer(0), theFrame->data[0], theFrame->linesize[0], _myFrameWidth, _myFrameHeight);
+                copyPlaneToRaster(myVideoFrame->getBuffer(1), theFrame->data[1], theFrame->linesize[1], _myFrameWidth/2, _myFrameHeight/2);
+                copyPlaneToRaster(myVideoFrame->getBuffer(2), theFrame->data[2], theFrame->linesize[2], _myFrameWidth/2, _myFrameHeight/2);
+                copyPlaneToRaster(myVideoFrame->getBuffer(3), theFrame->data[3], theFrame->linesize[3], _myFrameWidth, _myFrameHeight);
             } else {
                 convertFrame(theFrame, myVideoFrame->getBuffer());
             }

@@ -59,7 +59,8 @@
 /**
  * Animations that are time-compositions of their children.
  */
-GUI.CompositeAnimation = {};
+GUI.CompositeAnimation = {}; // <- Wtf? If an abstract base class is needed please do this
+                             // differently. This way we cannot cleanup the inheritance chain with __proto__!!
 
 GUI.CompositeAnimation.Constructor = function(Public, Protected) {
     var Base = {};

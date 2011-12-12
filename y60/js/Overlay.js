@@ -901,6 +901,10 @@ MovieOverlay.prototype.Constructor = function(Public, Protected, theScene, theSo
             Logger.info("using yuv2rgb shader to convert pixelformat");
             addMaterialRequirement(Public.material, "option", "[10[yuv2rgb]]");
         }
+        if (myImage.targetpixelformat === "YUVA420") {
+            Logger.info("using yuva2rgba shader to convert pixelformat");
+            addMaterialRequirement(Public.material, "option", "[10[yuva2rgba]]");
+        }
         if (! Public.material.enabled) {
             Public.material.enabled = true;
         }

@@ -56,6 +56,9 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+/*jslint nomen:false, plusplus:false*/
+/*globals GUI, js*/
+
 var ourCurrentAnimationTime = -1;
 
 /**
@@ -64,59 +67,77 @@ var ourCurrentAnimationTime = -1;
  * Instantiate yourself one and call its
  * doFrame() method on every frame.
  */
-GUI.AnimationManager = function() {
+ 
+// TODO introduce namespaced animatons
+/*
+The idea here is that animations is not just a flat array but a deep object
+with namespace names as the keys.
+Per default a namespace 'default' is provided.
+The AnimationManager then supports cancelling animation within a namespace.
+Namespace can be nested and nested member animations would be cancelled then as well.
+Namespace format is '<namespace_1>.<childnamespace>'
+A Namespace can contain any number of child namespaces.
+Namespaces are provided as String.
+
+Also querying would then be interesting.
+*/
+
+GUI.AnimationManager = function () {
     this.Constructor(this, {});
-}
+};
 
-GUI.AnimationManager.prototype.Constructor = function(Public, Protected) {
-
-    ////////////////////////////////////////
-    // Member
-    ////////////////////////////////////////
-
-    var _animations = [];
-
-    ////////////////////////////////////////
-    // Public
-    ////////////////////////////////////////
+GUI.AnimationManager.prototype.Constructor = function (Public, Protected) {
+    var _ = {};
     
-    Public.__defineGetter__("animationCount", function() {
-        return _animations.length;
-    });
+    /////////////////////
+    // Private Members //
+    /////////////////////
 
-    Public.play = function(a) {
-        if (js.array.indexOf(_animations, a) < 0) {
-            _animations.push(a);
+    _.animations = [];
+
+    /////////////////////
+    // Private Methods //
+    /////////////////////
+
+    _.removeFinished = function () {
+        var myAnimation, i;
+        for (i = 0; i < _.animations.length; i++) {
+            myAnimation = _.animations[i];
+            if (!myAnimation.running) {
+                _.animations.splice(i, 1);
+            }
         }
-        a.play();
-    };
-
-    Public.isPlaying = function() {
-        return _animations.length > 0;
     };
     
-    Public.doFrame = function(theTime) {
+    ////////////////////
+    // Public Methods //
+    ////////////////////
+
+    Public.play = function (theAnimation) { /* theNamespace */
+        // Validate theAnimation is instanceof GUI.Animation
+        if (js.array.indexOf(_.animations, theAnimation) < 0) {
+            _.animations.push(theAnimation);
+        }
+        theAnimation.play();
+    };
+
+    Public.isPlaying = function () {
+        return _.animations.length > 0;
+    };
+    
+    Public.doFrame = function (theTime) {
+        var myAnimation, i;
         ourCurrentAnimationTime = theTime * 1000;
-        for(var i = 0; i < _animations.length; i++) {
-            var a = _animations[i];
-            if(a.running) {
-                a.doFrame(theTime * 1000);
+        for (i = 0; i < _.animations.length; i++) {
+            myAnimation = _.animations[i];
+            if (myAnimation.running) {
+                myAnimation.doFrame(theTime * 1000);
             }
         }
-        removeFinished();
+        _.removeFinished();
     };
-
-    ////////////////////////////////////////
-    // Private
-    ////////////////////////////////////////
-
-    function removeFinished() {
-        for(var i = 0; i < _animations.length; i++) {
-            var a = _animations[i];
-            if(!a.running) {
-                _animations.splice(i, 1);
-            }
-        }
-    };
-
+    
+    Public.__defineGetter__("animationCount", function () {
+        return _.animations.length;
+    });
 };

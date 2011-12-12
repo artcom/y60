@@ -2001,6 +2001,30 @@
             </properties>
         </fragmentshader>        
     </shader>    
+    <shader id="s14141414a" name="movie_yuva2rgb" cost="10">
+        <supports>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="texcoord" values="[`uv_map`]"/>
+            <feature class="option" values="[`yuva2rgba`]"/>
+            <feature class="textures" values="[`paint`, `paint`, `paint`, `paint`]"/>            
+        </supports>
+        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`,`gp4vp`,`gp5vp`]" files="[`yuv2rgb.cg`]" entryfunctions="[`mainVertex`]" compilerargs="[[`-DALPHA`]]">
+            <properties>
+            </properties>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`,`gp4fp`,`gp5fp`]" files="[`yuv2rgb.cg`]" entryfunctions="[`mainFragment`] "compilerargs="[[`-DALPHA`]]">
+            <properties>
+                <sampler2d name="tex0">0</sampler2d>
+                <sampler2d name="tex1">1</sampler2d>
+                <sampler2d name="tex2">2</sampler2d>
+                <sampler2d name="tex3">3</sampler2d>
+            </properties>
+        </fragmentshader>        
+    </shader>    
    <shader id="s14141415" name="movie_yuv2rgb" cost="10">
         <supports>
             <feature class="lighting" values="[`unlit`]"/>
