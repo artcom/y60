@@ -111,7 +111,7 @@ namespace y60 {
         _myFormatContext(0),
         _myVStreamIndex(-1),
         _myVStream(0),
-        _myAStreamIndexDom(-1),
+        _myAStreamIndexDom(0),
         _myAStreamIndex(-1),
         _myAStream(0),
         _myMsgQueue(),
@@ -224,7 +224,8 @@ namespace y60 {
                 if (_myAStreamIndex == -1 || myAudioStreamIndex == getMovie()->get<AudioStreamTag>()) {
                     _myAStreamIndex = i;
                     _myAStream = _myFormatContext->streams[i];
-                    getMovie()->set<AudioStreamTag>(myAudioStreamIndex);
+                    //Movie myMovie = * getMovie();
+                    getMovie()->Movie::set<AudioStreamTag>(myAudioStreamIndex);
                     _myAStreamIndexDom = myAudioStreamIndex;
                 }
                 _myAllAudioStreamIndicies.push_back(i);
@@ -387,7 +388,7 @@ namespace y60 {
 
             doSeek(0);
             Movie * myMovie = getMovie();
-            myMovie->set<CurrentFrameTag>(0);
+            myMovie->Movie::set<CurrentFrameTag>(0);
 
             _myDemux->clearPacketCache();
             _myMsgQueue.clear();
@@ -759,7 +760,7 @@ namespace y60 {
                     _myAStreamIndex = i;
                     _myAStream = _myFormatContext->streams[i];
                     _myAStreamIndexDom = myAudioStreamIndex;
-                    getMovie()->set<AudioStreamTag>(_myAStreamIndexDom);
+                    getMovie()->Movie::set<AudioStreamTag>(_myAStreamIndexDom);
                     if (!isUnjoined()) {
                         DB(AC_DEBUG << "seek: Forking FFMpegDecoder Thread");
                         PosixThread::fork();
@@ -771,7 +772,7 @@ namespace y60 {
                 myAudioStreamIndex++;
             }
         }
-        getMovie()->set<AudioStreamTag>(_myAStreamIndexDom);
+        getMovie()->Movie::set<AudioStreamTag>(_myAStreamIndexDom);
     }
     double
     FFMpegDecoder2::readFrame(double theTime, unsigned /*theFrame*/, RasterVector theTargetRaster)
@@ -881,7 +882,7 @@ namespace y60 {
                     }
                 }
             }
-            getMovie()->set<CacheSizeTag>(_myMsgQueue.size());
+            getMovie()->Movie::set<CacheSizeTag>(_myMsgQueue.size());
         } catch (asl::ThreadSemaphore::ClosedException &) {
             AC_WARNING << "Semaphore Destroyed while in readframe";
         }
@@ -1077,7 +1078,7 @@ namespace y60 {
         Movie * myMovie = getMovie();
 
         _myFrameRate = av_q2d(_myVStream->r_frame_rate);
-        myMovie->set<FrameRateTag>(_myFrameRate);
+        myMovie->Movie::set<FrameRateTag>(_myFrameRate);
         _myVideoStreamTimeBase = 1/ av_q2d(_myVStream->time_base);
         if (myVCodec->codec_id == CODEC_ID_MPEG1VIDEO || myVCodec->codec_id == CODEC_ID_MPEG2VIDEO )
         {
@@ -1087,7 +1088,7 @@ namespace y60 {
 
         } else if (myVCodec->codec_id == CODEC_ID_WMV1 || myVCodec->codec_id == CODEC_ID_WMV2 ||
                    myVCodec->codec_id == CODEC_ID_WMV3) {
-            myMovie->set<FrameCountTag>(int(_myVStream->duration * _myFrameRate / 1000));
+            myMovie->Movie::set<FrameCountTag>(int(_myVStream->duration * _myFrameRate / 1000));
         } else {
             double myFrameCount = -1;
             if (_myFormatContext->duration != static_cast<int64_t>(AV_NOPTS_VALUE)) {
@@ -1098,13 +1099,13 @@ namespace y60 {
                 }
             }
             if (myFrameCount > 0) {
-                myMovie->set<FrameCountTag>(int(asl::round(myFrameCount)));
+                myMovie->Movie::set<FrameCountTag>(int(asl::round(myFrameCount)));
             }
         }
         _myMaxCacheSize = myMovie->get<MaxCacheSizeTag>();
         if (myMovie->get<FrameCountTag>() >= 0) {
             _myMaxCacheSize = std::min(int(_myMaxCacheSize), int(myMovie->get<FrameCountTag>()));
-            myMovie->set<MaxCacheSizeTag>(_myMaxCacheSize);
+            myMovie->Movie::set<MaxCacheSizeTag>(_myMaxCacheSize);
         }
 
         double myAspectRatio = 1.0;
@@ -1124,7 +1125,7 @@ namespace y60 {
             myAspectRatio = 1.0;
         }
         myAspectRatio *= (float)_myVStream->codec->width / _myVStream->codec->height; 
-        myMovie->set<AspectRatioTag>((float)myAspectRatio);
+        myMovie->Movie::set<AspectRatioTag>((float)myAspectRatio);
 
         _myVideoStartTimestamp = _myVStream->start_time;
         AC_INFO << "FFMpegDecoder2::getVideoProperties() " << theFilename << " fps="

@@ -185,7 +185,7 @@ namespace y60 {
                 throw asl::Exception("no decodable video stream found. (are width and height both multiples of two?) ", PLUS_FILE_LINE);
             }
             AC_DEBUG << "MovieDecoderBase::setEOF setting FrameCountTag: " <<_myMovie->get<CurrentFrameTag>();
-            _myMovie->set<FrameCountTag>(_myMovie->get<CurrentFrameTag>());
+            _myMovie->Movie::set<FrameCountTag>(_myMovie->get<CurrentFrameTag>());
         }
     }
 
