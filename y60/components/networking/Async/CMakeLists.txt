@@ -15,6 +15,7 @@ HttpHeader.h
 HttpServer.h
 JSHttpServer.h
 MimeTypes.h
+NetAsync.h
 Reply.h
 Request.h
 RequestParser.h
