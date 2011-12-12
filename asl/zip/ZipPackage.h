@@ -44,6 +44,8 @@ class ASL_ZIP_DECL ZipPackage : public IPackage {
         ZipReader _myZipReader;
         std::string _myZipFilename;
         FileList _myFileList;
+
+        static std::string prepareRelativePath(const std::string & theRelativePath);
 };
 
 }
