@@ -240,7 +240,7 @@ js.array.indexOf = function (theArray, theItem, theFrom) {
 };
 
 js.array.insertAt = function (theArray, theItem, theIndex) {
-    if ( theIndex > -1 && theIndex <= theArray.length ) {
+    if (theIndex > -1 && theIndex <= theArray.length) {
         theArray.splice(theIndex, 0, theItem);
         return true;
     }
@@ -250,24 +250,24 @@ js.array.insertAt = function (theArray, theItem, theIndex) {
 js.array.insertBefore = function (theArray, theItem, theOldItem) {
     var index = js.array.indexOf(theArray, theOldItem);
     if (index === -1) {
-         return false;
+        return false;
     } else if (index === 0) {
         theArray.unshift(theItem);
         return true;
     } else {
-         return js.array.insertAt(theArray, theItem, index);
+        return js.array.insertAt(theArray, theItem, index);
     }
 };
 
 js.array.insertAfter = function (theArray, theItem, theOldItem) {
     var index = js.array.indexOf(theArray, theOldItem);
     if (index === -1) {
-         return false;
+        return false;
     } else if (index === theArray.length - 1) {
         theArray.push(theItem);
         return true;
     } else {
-         return js.array.insertAt(theArray, theItem, index + 1);
+        return js.array.insertAt(theArray, theItem, index + 1);
     }
 };
 
@@ -275,14 +275,14 @@ function indexOf(theArray, theItem, theFrom) {
     Logger.warning("Y60JSSL :: free function 'indexOf' is deprecated. Use 'js.array.indexOf' instead.");
     return js.array.indexOf(theArray, theItem, theFrom);
 }
-
 // Does not allow filter functions that mutate the input array!
 js.array.filter = function (theArray, thefilterFunction) {
     if (typeof thefilterFunction !== "function") {
         throw new TypeError();
     }
     var myResult = [];
-    for (var i = 0; i < theArray.length; i++) {
+    var i;
+    for (i = 0; i < theArray.length; i++) {
         if (thefilterFunction.call(theArray, theArray[i], i, theArray)) {
             myResult.push(theArray[i]);
         }
@@ -292,7 +292,8 @@ js.array.filter = function (theArray, thefilterFunction) {
 
 function stringToByteArray(theString) {
     var myResult = [];
-    for (var i = 0; i < theString.length; ++i) {
+    var i;
+    for (i = 0; i < theString.length; ++i) {
         myResult.push(theString.charCodeAt(i));
     }
     return myResult;
@@ -346,7 +347,8 @@ function asColor(theHexString, theAlpha) {
 function arrayToString(theArray) {
     var myElement;
     var myString = "[";
-    for (var i = 0; i < theArray.length; ++i) {
+    var i;
+    for (i = 0; i < theArray.length; ++i) {
         if (i !== 0) {
             myString += ",";
         }
@@ -366,7 +368,8 @@ function arrayToString(theArray) {
 // returns a precision formated string from a Vector3f list
 function formatVector3f(theVector, thePrecision) {
     var myString = "";
-    for (var i = 0; i < theVector.length; ++i) {
+    var i;
+    for (i = 0; i < theVector.length; ++i) {
         if (i !== 0) {
             myString += ",";
         }
@@ -382,16 +385,14 @@ function formatVector3f(theVector, thePrecision) {
 // returns a precision formated string from a Vector2f list
 function formatVector2f(theVector, thePrecision) {
     var myString = "";
-    for (var i = 0; i < theVector.length; ++i) {
-
+    var i;
+    for (i = 0; i < theVector.length; ++i) {
         if (i !== 0) {
             myString += ",";
         }
-
         myString += "[" + theVector[i].x.toFixed(thePrecision) + ",";
         myString += theVector[i].y.toFixed(thePrecision) + "]";
     }
-
     return myString;
 }
 
@@ -411,7 +412,8 @@ function getOrientationFromDirection(theViewVector, theUpVector) {
 // Returns a string containing all the attributes of element E
 function listAttributes(E) {
     var myResult = ' ';
-    for (var i = 0; i < E.attributes.length; ++i) {
+    var i;
+    for (i = 0; i < E.attributes.length; ++i) {
         myResult += E.attributes[i].nodeName + '="' + E.attributes[i].nodeValue + '" ';
     }
     return myResult;
@@ -419,12 +421,13 @@ function listAttributes(E) {
 
 // Dumps element E with theMaxDepth levels of children using theSpace as base indent
 function dumpElement(E, theSpace, theMaxDepth) {
+    var myId, i;
     if (E) {
         if (E.nodeType === Node.ELEMENT_NODE) {
-            var myId = E.getAttribute('id');
+            myId = E.getAttribute('id');
             print(theSpace + '<' + E.nodeName + listAttributes(E) + '>');
             if (theMaxDepth !== 0) {
-                for (var i = 0; i < E.childNodes.length; ++i) {
+                for (i = 0; i < E.childNodes.length; ++i) {
                     dumpElement(E.childNodes[i], theSpace + '    ', theMaxDepth - 1);
                     //dumpElement(E.childNodes.item(i), theSpace+'    ',theMaxDepth-1);
                 }
@@ -450,6 +453,7 @@ function dumpElementLevels(E, maxDepth) {
 
 // Adjust Node.id (and it's descendants) to be unique
 function adjustNodeId(theNode, theDeepAdjustFlag) {
+    var i;
     if ("id" in theNode) {
         theNode.id = createUniqueId();
     }
@@ -457,14 +461,10 @@ function adjustNodeId(theNode, theDeepAdjustFlag) {
         theDeepAdjustFlag = false; // theDeepAdjustFlag = !!theDeepAdjustFlag
     }
     if (theDeepAdjustFlag) {
-        for (var i = 0; i < theNode.childNodes.length; ++i) {
+        for (i = 0; i < theNode.childNodes.length; ++i) {
             adjustNodeId(theNode.childNodes[i], theDeepAdjustFlag);
         }
     }
-}
-
-function adjustNodeIds(theNode) {
-    adjustNodeId(theNode, true);
 }
 
 //searches for a descendant of theNode (must be in DOM below theNode)
@@ -615,6 +615,10 @@ function getChildElementNodes(theNode, theFilterOperation, theFilterNodeName) {
     return myChildElementNodes;
 }
 
+function adjustNodeIds(theNode) {
+    adjustNodeId(theNode, true);
+}
+
 function findNodeByNameChecked(theRootNode, theName) {
     var myResult = theRootNode.find(".//*[@name='" + theName + "']");
     if (!myResult) {
@@ -651,7 +655,8 @@ function removeAttributeByName(theNode, theAttributeName) {
 function removeAllAttributes(theNode) {
     var myCopyNode   = Node.createElement(theNode.nodeName);
     var myChildNodesLength = theNode.childNodesLength();
-    for (var j = myChildNodesLength - 1; j >= 0; --j) {
+    var j;
+    for (j = myChildNodesLength - 1; j >= 0; --j) {
         myCopyNode.appendChild(theNode.childNode(j));
     }
     var myParentNode = theNode.parentNode;
@@ -705,7 +710,7 @@ js.date.getTimestamp = function () {
         ((myHour  < 10) ? "0" : "") + myHour  + "_" +
         ((myMin   < 10) ? "0" : "") + myMin   + "_" +
         ((mySec   < 10) ? "0" : "") + mySec;
-}
+};
 
 function getTimestamp() {
     Logger.warning("Y60JSSL :: free function 'getTimestamp' is deprecated. Use 'js.date.getTimestamp' instead.");
@@ -749,7 +754,8 @@ function numToHex(theNum, theDigitCount) {
 
 function countNodes(theNode) {
     var myCount = 1;
-    for (var i = 0; i < theNode.childNodes.length; ++i) {
+    var i;
+    for (i = 0; i < theNode.childNodes.length; ++i) {
         myCount += countNodes(theNode.childNode(i));
     }
     return myCount;
@@ -1076,7 +1082,8 @@ function stringRankedFeature(theRankedFeature) {
     }
 
     var myString = theRankedFeature.rank + "[";
-    for (var i = 0; i < theRankedFeature.features.length; ++i) {
+    var i;
+    for (i = 0; i < theRankedFeature.features.length; ++i) {
         if (i > 0) {
             myString += ",";
         }
@@ -1111,7 +1118,8 @@ function stringVectorOfRankedFeature(theVectorOfRankedFeature) {
     }
 
     var myString = "[";
-    for (var i = 0; i < theVectorOfRankedFeature.length; ++i) {
+    var i;
+    for (i = 0; i < theVectorOfRankedFeature.length; ++i) {
         myString += stringRankedFeature(theVectorOfRankedFeature[i]);
     }
     myString += "]";
@@ -1121,8 +1129,9 @@ function stringVectorOfRankedFeature(theVectorOfRankedFeature) {
 
 function parseVectorOfRankedFeature(theVectorOfString) {
     var myVectorOfRankedFeature = [];
-    for (var i = 0; i < theVectorOfString.length; ++i) {
-        var myRankedFeature = theVectorOfString[i];
+    var i, myRankedFeature;
+    for (i = 0; i < theVectorOfString.length; ++i) {
+        myRankedFeature = theVectorOfString[i];
         myVectorOfRankedFeature.push(parseRankedFeature(myRankedFeature));
     }
     return myVectorOfRankedFeature;
@@ -1141,7 +1150,8 @@ function stripIdentifier(theIdentifier) {
 
 function convertNewLine(theString) {
     // XXX can this not be done simpler?
-    for (var i = 0; i < theString.length; i++) {
+    var i;
+    for (i = 0; i < theString.length; i++) {
         if (theString[i] === "\\") {
             if (i + 1 < theString.length) {
                 if (theString[i + 1] === "n") {
@@ -1155,13 +1165,15 @@ function convertNewLine(theString) {
 }
 
 function preloadImages() {
-    for (var i = 0; i < window.scene.images.childNodes.length; i++) {
+    var i;
+    for (i = 0; i < window.scene.images.childNodes.length; i++) {
         preLoad(window.scene.images.childNode(i));
     }
 }
 
 function preloadTextures() {
-    for (var i = 0; i < window.scene.textures.childNodes.length; i++) {
+    var i;
+    for (i = 0; i < window.scene.textures.childNodes.length; i++) {
         preLoad(window.scene.textures.childNode(i));
     }
 }
@@ -1222,11 +1234,12 @@ function attachTo(theNode, theNewParent) {
     theNode.scale = myDecomposition.scale;
 }
 
-utils.getCameraDistanceFromScreenLength = function (theScreenLength, theHFov){
+utils.getCameraDistanceFromScreenLength = function (theScreenLength, theHFov) {
     var myAlpha = radFromDeg(theHFov / 2);
     var myDistance = 0.5 * theScreenLength / Math.abs(Math.tan(myAlpha));
     return myDistance;
-}
+};
+
 
 utils.dom.mergeNodes = function (theTargetNode, theSourceNode) {
 
@@ -1346,5 +1359,3 @@ utils.dom.mergeNodes = function (theTargetNode, theSourceNode) {
     _adjustIds(theSourceNode);
     return _cloneToTarget(theTargetNode, theSourceNode);
 };
-
-
