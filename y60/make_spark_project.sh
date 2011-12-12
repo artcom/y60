@@ -6,7 +6,7 @@ if [ "$1" == "-h" -o "$1" == "--help" -o "$1" == "" ]; then
     exit 1
     
 fi
-CHECKOUT_PATH="../.."
+CHECKOUT_PATH="../../.."
 
 if [ "$2" != "" ]; then
     CHECKOUT_PATH=$2
@@ -48,7 +48,7 @@ echo "      - $PROJECT_NAME.js"
 ####################################################################
 
 # Find Skeleton.js
-SKELETON="../$CHECKOUT_PATH/y60/js/spark/SparkSkeleton.js"
+SKELETON="$CHECKOUT_PATH/y60/js/spark/SparkSkeleton.js"
 if [ ! -e "$SKELETON" ]; then
     echo "### ERROR: Could not find SparkSkeleton.js"
     exit 1;
@@ -70,7 +70,7 @@ echo "      - $PROJECT_NAME.spark"
 ####################################################################
 
 # Find Skeleton.spark
-SKELETON="../$CHECKOUT_PATH/y60/js/spark/Skeleton.spark"
+SKELETON="$CHECKOUT_PATH/y60/js/spark/Skeleton.spark"
 if [ ! -e "$SKELETON" ]; then
     echo "### ERROR: Could not find Skeleton.spark"
     exit 1;
@@ -84,7 +84,7 @@ sed s/Skeleton/$PROJECT_NAME/g "$SKELETON" > LAYOUT/$PROJECT_NAME.spark
 #echo "      - default font: "$DEFAULT_FONT
 ####################################################################
 
-#cp ../$CHECKOUT_PATH/testmodels/fonts/$DEFAULT_FONT.ttf FONTS/$DEFAULT_FONT-normal.ttf
+#cp $CHECKOUT_PATH/testmodels/fonts/$DEFAULT_FONT.ttf FONTS/$DEFAULT_FONT-normal.ttf
 
 ####################################################################
 echo "      - watchdog.xml"
