@@ -201,15 +201,18 @@ AbstractRenderWindow::setSceneAndCanvas(const y60::ScenePtr & theScene, const do
         }
 
         for (ExtensionList::iterator it = _myExtensions.begin(); it != _myExtensions.end(); ++it) {
-            std::string myName = (*it)->getName() + "::onSceneLoaded";
+            IRendererExtensionPtr curExtension(it->lock());           
+            if (curExtension) {           
+                std::string myName = curExtension->getName() + "::onSceneLoaded";
 
-            try {
-                MAKE_NAMED_SCOPE_TIMER(myTimer, myName);
-                (*it)->onSceneLoaded(this);
-            } catch (const asl::Exception & ex) {
-                AC_ERROR << "Exception while calling " << myName << ": " << ex;
-            } catch (...) {
-                AC_ERROR << "Unknown exception while calling " << myName;
+                try {
+                    MAKE_NAMED_SCOPE_TIMER(myTimer, myName);
+                    curExtension->onSceneLoaded(this);
+                } catch (const asl::Exception & ex) {
+                    AC_ERROR << "Exception while calling " << myName << ": " << ex;
+                } catch (...) {
+                    AC_ERROR << "Unknown exception while calling " << myName;
+                }
             }
         }
     } catch (const asl::Exception & ex) {
@@ -531,16 +534,19 @@ AbstractRenderWindow::onFrame() {
 
     // extensions onFrame
     for (ExtensionList::iterator i = _myExtensions.begin(); i != _myExtensions.end(); ++i) {
-        const std::string myName = (*i)->getName() + "::onFrame";
-        try {
-            MAKE_NAMED_SCOPE_TIMER(myTimer, myName);
-            (*i)->onFrame(this, _myElapsedTime);
-        } catch (const asl::Exception & ex) {
-            AC_ERROR << "EXCEPTION while calling " << myName << ": " << ex;
-        } catch (const std::exception & ex) {
-            AC_ERROR << "std::exception while calling" << myName << ": " << ex.what();
-        } catch (...) {
-            AC_ERROR << "UNKNOWN EXCEPTION while calling " << myName;
+        IRendererExtensionPtr curExtension(i->lock());
+        if (curExtension) {
+            const std::string myName = curExtension->getName() + "::onFrame";
+            try {
+                MAKE_NAMED_SCOPE_TIMER(myTimer, myName);
+                curExtension->onFrame(this, _myElapsedTime);
+            } catch (const asl::Exception & ex) {
+                AC_ERROR << "EXCEPTION while calling " << myName << ": " << ex;
+            } catch (const std::exception & ex) {
+                AC_ERROR << "std::exception while calling" << myName << ": " << ex.what();
+            } catch (...) {
+                AC_ERROR << "UNKNOWN EXCEPTION while calling " << myName;
+            }
         }
     }
 
@@ -573,14 +579,17 @@ AbstractRenderWindow::preRender() {
         }
 
         for (ExtensionList::iterator i = _myExtensions.begin(); i != _myExtensions.end(); ++i) {
-            const std::string myName = (*i)->getName() + "::onPreRender";
-            try {
-                MAKE_NAMED_SCOPE_TIMER(myTimer, myName);
-                (*i)->onPreRender(this);
-            } catch (const asl::Exception & ex) {
-                AC_ERROR << "Exception while calling " << myName << ": " << ex;
-            } catch (...) {
-                AC_ERROR << "Unknown exception while calling " << myName;
+            IRendererExtensionPtr curExtension(i->lock());
+            if (curExtension) {           
+                const std::string myName = curExtension->getName() + "::onPreRender";
+                try {
+                    MAKE_NAMED_SCOPE_TIMER(myTimer, myName);
+                    curExtension->onPreRender(this);
+                } catch (const asl::Exception & ex) {
+                    AC_ERROR << "Exception while calling " << myName << ": " << ex;
+                } catch (...) {
+                    AC_ERROR << "Unknown exception while calling " << myName;
+                }
             }
         }
     } catch (const asl::Exception & ex) {
@@ -652,14 +661,17 @@ AbstractRenderWindow::postRender() {
         }
 
         for (ExtensionList::iterator i = _myExtensions.begin(); i != _myExtensions.end(); ++i) {
-            const std::string myName = (*i)->getName() + "::onPostRender";
-            try {
-                MAKE_NAMED_SCOPE_TIMER(myTimer, myName);
-                (*i)->onPostRender(this);
-            } catch (const asl::Exception & ex) {
-                AC_ERROR << "Exception while calling " << myName << ": " << ex;
-            } catch (...) {
-                AC_ERROR << "Unknown exception while calling " << myName;
+            IRendererExtensionPtr curExtension(i->lock());
+            if (curExtension) {           
+                const std::string myName = curExtension->getName() + "::onPostRender";
+                try {
+                    MAKE_NAMED_SCOPE_TIMER(myTimer, myName);
+                    curExtension->onPostRender(this);
+                } catch (const asl::Exception & ex) {
+                    AC_ERROR << "Exception while calling " << myName << ": " << ex;
+                } catch (...) {
+                    AC_ERROR << "Unknown exception while calling " << myName;
+                }
             }
         }
     } catch (const asl::Exception & ex) {
@@ -693,14 +705,17 @@ AbstractRenderWindow::handle(y60::EventPtr theEvent) {
     MAKE_SCOPE_TIMER(handleEvents);
     theEvent->simulation_time = _myElapsedTime;
     for (ExtensionList::iterator i = _myExtensions.begin(); i != _myExtensions.end(); ++i) {
-        string myName = (*i)->getName() + "::handle";
-        try {
-            MAKE_NAMED_SCOPE_TIMER(myTimer, myName);
-            (*i)->handle(this, theEvent);
-        } catch (const asl::Exception & ex) {
-            AC_ERROR << "EXCEPTION while calling " << myName << ": " << ex;
-        } catch (...) {
-            AC_ERROR << "UNKNOWN EXCEPTION while calling " << myName;
+        IRendererExtensionPtr curExtension(i->lock());
+        if (curExtension) {           
+            string myName = curExtension->getName() + "::handle";
+            try {
+                MAKE_NAMED_SCOPE_TIMER(myTimer, myName);
+                curExtension->handle(this, theEvent);
+            } catch (const asl::Exception & ex) {
+                AC_ERROR << "EXCEPTION while calling " << myName << ": " << ex;
+            } catch (...) {
+                AC_ERROR << "UNKNOWN EXCEPTION while calling " << myName;
+            }
         }
     }
 
@@ -924,7 +939,8 @@ void
 AbstractRenderWindow::addExtension(IRendererExtensionPtr theExtension) {
     const std::string & myName = theExtension->getName();
     for (ExtensionList::iterator i = _myExtensions.begin(); i != _myExtensions.end(); ++i) {
-        if ( myName == (*i)->getName()) {
+        IRendererExtensionPtr curExtension(i->lock());
+        if ( myName == curExtension->getName()) {
             AC_WARNING << "Extension name '" << myName
                 << "' is ambiguous. Statistical timers will be misleading." << endl;
         }
