@@ -5,6 +5,7 @@
 #include <asl/thread/concurrent_queue.h>
 
 #include <boost/thread.hpp>
+#include <boost/thread/condition.hpp>
 
 #ifdef OSX
     extern "C" {
@@ -63,6 +64,8 @@ namespace y60 {
             void dump() const;
 
             void start();
+            void seek(double theDestTime);
+            void seek(double theDestTime, const int theStreamIndex);
             void stop();
             void join();
 
@@ -70,8 +73,10 @@ namespace y60 {
             AVFormatContext * _myFormatContext;
             DemuxThreadPtr _myDemuxThread;
             std::map<int, PacketQueuePtr > _myPacketQueues;
-            //boost::condition _myQueueCondition;
-            //boost::mutex _myMutex;
+            volatile bool _isSeeking;
+            volatile bool _isEOF;
+            boost::mutex _myMutex;
+            boost::condition _myCondition;
             void putPacket(AVPacket * thePacket);
             bool queuesFull() const;
             //threadfunc

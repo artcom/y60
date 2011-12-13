@@ -1,6 +1,7 @@
 #include "AsyncDemuxer.h"
 
 #include <asl/base/Logger.h>
+#include <asl/base/string_functions.h>
 
 #define DB(x) x
 
@@ -11,7 +12,7 @@ namespace {
 namespace y60 {
 
 AsyncDemuxer::AsyncDemuxer(AVFormatContext * myFormatContext)
-    : _myFormatContext(myFormatContext) {
+    : _myFormatContext(myFormatContext), _isSeeking(false), _isEOF(false) {
 }
 
 AsyncDemuxer::~AsyncDemuxer() {
@@ -41,6 +42,12 @@ AsyncDemuxer::run() {
         while(true) {
             DB(AC_TRACE << "---AsyncDemuxer::run: ");
             boost::this_thread::interruption_point();
+            {
+                boost::mutex::scoped_lock lock(_myMutex);
+                while(_isSeeking) {
+                    _myCondition.wait(_myMutex);
+                }
+            }
             //XXX: rethink that: add condition: wait as long as queues are full
             if (queuesFull()) {
                 //boost::this_thread::sleep(boost::posix_time::millisec(10));
@@ -51,9 +58,10 @@ AsyncDemuxer::run() {
             memset(myPacket, 0, sizeof(AVPacket));
 
             int ret = av_read_frame(_myFormatContext, myPacket);
+            DB(AC_TRACE << "---AsyncDemuxer::av_read_frame ret: "<<ret);
             if (ret < 0) {
                 if (ret == AVERROR_EOF) {
-                    AC_DEBUG << "---AsyncDemuxer::run: end of file. stream_index: "<<myPacket->stream_index;
+                    AC_DEBUG << "---AsyncDemuxer::run: EOF end of file. stream_index: "<<myPacket->stream_index;
                 }
                 std::map<int, PacketQueuePtr>::iterator it = _myPacketQueues.find(myPacket->stream_index);
                 if ( it != _myPacketQueues.end()) {
@@ -62,9 +70,12 @@ AsyncDemuxer::run() {
                 }
                 av_free_packet(myPacket);
                 delete myPacket;
-                break;
+                boost::mutex::scoped_lock lock(_myMutex);
+                _isEOF = true;
+                _myCondition.wait(_myMutex);
+            } else {
+                putPacket(myPacket);
             }
-            putPacket(myPacket);
         }
     } catch (boost::thread_interrupted &) {
         AC_DEBUG << "---AsyncDemuxer::stop run";
@@ -75,7 +86,7 @@ void
 AsyncDemuxer::putPacket(AVPacket * thePacket) {
     std::map<int, PacketQueuePtr>::iterator it = _myPacketQueues.find(thePacket->stream_index);
     if ( it != _myPacketQueues.end()) {
-        DB(AC_TRACE << "---AsyncDemuxer::run: caching packet. " <<it->second->size());
+        DB(AC_TRACE << "---AsyncDemuxer::run: caching packet: " <<it->second->size());
         // Without av_dup_packet, ffmpeg reuses myPacket->data at first
         // opportunity and trashes our memory.
         if (thePacket) {
@@ -114,6 +125,7 @@ AsyncDemuxer::enableStream(const int theStreamIndex) {
 
 void
 AsyncDemuxer::clearPacketCache() {
+    AC_DEBUG<<"AsyncDemuxer::clearPacketCache";
     for (std::map<int, PacketQueuePtr>::iterator it = _myPacketQueues.begin(); it != _myPacketQueues.end(); ++it) {
         PacketMsgPtr p;
         while(it->second->try_pop(p)) {
@@ -124,6 +136,7 @@ AsyncDemuxer::clearPacketCache() {
 
 void
 AsyncDemuxer::clearPacketCache(const int theStreamIndex) {
+    AC_DEBUG<<"AsyncDemuxer::clearPacketCache for stream: "<<theStreamIndex;
     std::map<int, PacketQueuePtr>::iterator it = _myPacketQueues.find(theStreamIndex);
     if (it == _myPacketQueues.end()) {
         AC_ERROR << "AsyncDemuxer::clearPacketCache called with nonexistent stream index " << theStreamIndex << ".";
@@ -131,6 +144,63 @@ AsyncDemuxer::clearPacketCache(const int theStreamIndex) {
     PacketMsgPtr p;
     while(it->second->try_pop(p)) {
         p->freePacket();
+    }
+}
+
+void
+AsyncDemuxer::seek(double theDestTime) {
+    AC_DEBUG<<"AsyncDemuxer::seek to "<<theDestTime;
+    {
+        boost::mutex::scoped_lock lock(_myMutex);
+        _isSeeking = true;
+    }
+
+    for (std::map<int, PacketQueuePtr>::iterator it = _myPacketQueues.begin(); it != _myPacketQueues.end(); ++it) {
+        clearPacketCache(it->first);
+        int64_t mySeekTimeInTimeBaseUnits = int64_t(theDestTime * av_q2d(_myFormatContext->streams[it->first]->time_base));
+        /*int myResult =*/ av_seek_frame(_myFormatContext, it->first,
+                                mySeekTimeInTimeBaseUnits, AVSEEK_FLAG_BACKWARD);
+        avcodec_flush_buffers(_myFormatContext->streams[it->first]->codec);
+    }
+    {
+        boost::mutex::scoped_lock lock(_myMutex);
+        if (_isEOF) {
+            _myCondition.notify_one();
+        }
+    }
+    {
+        boost::mutex::scoped_lock lock(_myMutex);
+        _isSeeking = false;
+        _myCondition.notify_one();
+    }
+}
+
+void
+AsyncDemuxer::seek(double theDestTime, const int theStreamIndex) {
+    AC_DEBUG<<"AsyncDemuxer::seek stream: "<<theStreamIndex<<" to destTime: "<<theDestTime;
+    std::map<int, PacketQueuePtr>::iterator it = _myPacketQueues.find(theStreamIndex);
+    if (it == _myPacketQueues.end()) {
+        throw asl::Exception("AsyncDemuxer::seek called with nonexistent stream index " + asl::as_string(theStreamIndex), PLUS_FILE_LINE);
+    }
+    {
+        boost::mutex::scoped_lock lock(_myMutex);
+        _isSeeking = true;
+    }
+    clearPacketCache(it->first);
+    int64_t mySeekTimeInTimeBaseUnits = int64_t(theDestTime * av_q2d(_myFormatContext->streams[theStreamIndex]->time_base));
+    /*int myResult =*/ av_seek_frame(_myFormatContext, theStreamIndex,
+                            mySeekTimeInTimeBaseUnits, AVSEEK_FLAG_BACKWARD);
+    avcodec_flush_buffers(_myFormatContext->streams[theStreamIndex]->codec);
+    {
+        boost::mutex::scoped_lock lock(_myMutex);
+        if (_isEOF) {
+            _myCondition.notify_one();
+        }
+    }
+    {
+        boost::mutex::scoped_lock lock(_myMutex);
+        _isSeeking = false;
+        _myCondition.notify_one();
     }
 }
 

@@ -83,8 +83,8 @@
 #include <iostream>
 #include <stdlib.h>
 
-#define DB(x) //x
-#define DBV(x) //x
+#define DB(x) x
+#define DBV(x) x
 #define DBA(x) //x
 
 using namespace std;
@@ -272,22 +272,23 @@ namespace y60 {
         getVideoProperties(theFilename);
     }
 
-    void FFMpegDecoder2::startOverAgain() {
-        AC_DEBUG <<"FFMpegDecoder2::startOverAgain";
+    //void FFMpegDecoder2::startOverAgain() {
+    //    AC_DEBUG <<"FFMpegDecoder2::startOverAgain";
 
-        if (isUnjoined()) {
-            DB(AC_DEBUG << "Joining FFMpegDecoder Thread");
-            join();
-        }
-        doSeek(0, false);
+    //    if (isUnjoined()) {
+    //        DB(AC_DEBUG << "Joining FFMpegDecoder Thread");
+    //        join();
+    //    }
+    //    //doSeek(0, false);
+    //    _myDemux->seek(0, _myVStreamIndex);
 
-        if (!isUnjoined()) {
-            DB(AC_DEBUG << "Forking FFMpegDecoder Thread");
-            PosixThread::fork();
-        } else {
-            DB(AC_DEBUG << "Thread already running. No forking.");
-        }
-    }
+    //    if (!isUnjoined()) {
+    //        DB(AC_DEBUG << "Forking FFMpegDecoder Thread");
+    //        PosixThread::fork();
+    //    } else {
+    //        DB(AC_DEBUG << "Thread already running. No forking.");
+    //    }
+    //}
 
     void FFMpegDecoder2::startMovie(double theStartTime, bool theStartAudioFlag) {
         AC_INFO << "FFMpegDecoder2::startMovie "<< getMovie()->get<ImageSourceTag>() << ", time: " << theStartTime << " frames in queue: "<<_myMsgQueue.size();
@@ -320,19 +321,23 @@ namespace y60 {
                 _myDemux->stop();
                 _myMsgQueue.clear();
                 _myMsgQueue.reset();
-                doSeek(theStartTime);
+                //doSeek(theStartTime);
+                _myDemux->seek(theStartTime);
                 _myDemux->start();
                 if (theStartAudioFlag && hasAudio() && getDecodeAudioFlag()) {
                     _myAdjustAudioOffsetFlag = true;
                 }
             } else if (theStartAudioFlag && hasAudio() && getDecodeAudioFlag()) {
                 _myAdjustAudioOffsetFlag = true;
+                //for (std::vector<int>::size_type i = 0; i < _myAllAudioStreamIndicies.size(); i++) {
+                //    _myDemux->clearPacketCache(_myAllAudioStreamIndicies[i]);
+                //    av_seek_frame(_myFormatContext, _myAllAudioStreamIndicies[i],
+                //                  (int64_t)(theStartTime*(1/ av_q2d(_myAStream->time_base))) +
+                //                  _myAStream->start_time, AVSEEK_FLAG_BACKWARD);
+                //    avcodec_flush_buffers(_myAStream->codec);
+                //}
                 for (std::vector<int>::size_type i = 0; i < _myAllAudioStreamIndicies.size(); i++) {
-                    _myDemux->clearPacketCache(_myAllAudioStreamIndicies[i]);
-                    av_seek_frame(_myFormatContext, _myAllAudioStreamIndicies[i],
-                                  (int64_t)(theStartTime*(1/ av_q2d(_myAStream->time_base))) +
-                                  _myAStream->start_time, AVSEEK_FLAG_BACKWARD);
-                    avcodec_flush_buffers(_myAStream->codec);
+                    _myDemux->seek(theStartTime, _myAllAudioStreamIndicies[i]);
                 }
                 _myVideoStartTimestamp = 0;
             }
@@ -345,7 +350,8 @@ namespace y60 {
                     _myDemux->stop();
                     _myMsgQueue.clear();
                     _myMsgQueue.reset();
-                    doSeek(theStartTime);
+                    _myDemux->seek(theStartTime);
+                    //doSeek(theStartTime);
                     _myDemux->start();
                     if (theStartAudioFlag && hasAudio() && getDecodeAudioFlag()) {
                         _myAdjustAudioOffsetFlag = true;
@@ -388,7 +394,8 @@ namespace y60 {
             AC_DEBUG << "Stopping Movie";
             _myLastVideoFrame = VideoMsgPtr();
 
-            doSeek(0);
+            //doSeek(0);
+            _myDemux->seek(0);
             Movie * myMovie = getMovie();
             myMovie->set<CurrentFrameTag>(0);
 
@@ -764,7 +771,7 @@ namespace y60 {
                     _myAStreamIndexDom = myAudioStreamIndex;
                     getMovie()->set<AudioStreamTag>(_myAStreamIndexDom);
                     if (!isUnjoined()) {
-                        DB(AC_DEBUG << "seek: Forking FFMpegDecoder Thread");
+                        DB(AC_DEBUG << "checkAudioStream: Forking FFMpegDecoder Thread");
                         PosixThread::fork();
                     } else {
                         DB(AC_DEBUG << "Thread already running. No forking.");
@@ -821,10 +828,11 @@ namespace y60 {
             if (!useLastVideoFrame) {
                 for(;;) {
                     myVideoMsg = _myMsgQueue.pop_front();
-                    bool myEOFFoundFlag = _myMsgQueue.hasEOF();
-                    if (hasAudio() && getDecodeAudioFlag() && myEOFFoundFlag && !isActive()) {
-                        startOverAgain();
-                    }
+                    //bool myEOFFoundFlag = _myMsgQueue.hasEOF();
+                    //if (hasAudio() && getDecodeAudioFlag() && myEOFFoundFlag && !isActive()) {
+                    //    //startOverAgain();
+                    //    _myDemux->seek(0, _myVStreamIndex);
+                    //}
                     if (myVideoMsg->getType() == VideoMsg::MSG_EOF) {
                         setEOF(true);
                         return theTime;
@@ -914,7 +922,7 @@ namespace y60 {
                 continue;
             }
             if (hasAudio()&& getDecodeAudioFlag()) {
-                //XXX: disabled audio eof flag beacause it doesn't make sense for the current decoder structure
+                //XXX: disabled audio eof flag because it doesn't make sense for the current decoder structure
                 // eof only means the demuxer demuxed all packets,
                 // but there can be a lot of packets in his queue, which the video decoder hasn't decoded yet
                 // If we had a seperate video & audio decoder, we could stop the appropriate thread
@@ -931,7 +939,9 @@ namespace y60 {
                         AC_DEBUG << "---- EOF Yielding Thread.";
                         continue;
                     } else {
-                        doSeek(0, false);
+                        AC_DEBUG << "---- EOF seek videostream back to start.";
+                        //doSeek(0, false);
+                        _myDemux->seek(0, _myVStreamIndex);
                     }
                 }
             } catch (asl::ThreadSemaphore::ClosedException &) {
@@ -1221,7 +1231,8 @@ namespace y60 {
         _myMsgQueue.clear();
         _myMsgQueue.reset();
 
-        doSeek(theDestTime);
+        //doSeek(theDestTime);
+        _myDemux->seek(theDestTime);
         _myDemux->start();
         _myLastVideoFrame = VideoMsgPtr();
         if (hasAudio() && getDecodeAudioFlag()) {
@@ -1247,27 +1258,28 @@ namespace y60 {
         }
     }
 
-    // Calls ffmpeg seek, flushes buffers etc.
-    void FFMpegDecoder2::doSeek(double theDestTime, bool theSeekAudioFlag) {
-        AC_DEBUG << "FFMpegDecoder2::doSeek destTime: " << theDestTime << " destFrame: " << theDestTime * _myFrameRate;
+    
+    //// Calls ffmpeg seek, flushes buffers etc.
+    //void FFMpegDecoder2::doSeek(double theDestTime, bool theSeekAudioFlag) {
+    //    AC_DEBUG << "FFMpegDecoder2::doSeek destTime: " << theDestTime << " destFrame: " << theDestTime * _myFrameRate;
 
-        // AVSEEK_FLAG_ANY: seek to any frame, even non keyframes -> results in artifacts until the next iframe is decoded
-        // AVSEEK_FLAG_BACKWARD: seek backwards -> ffmpeg seek better when this flag is enabled, even when seeking forward
+    //    // AVSEEK_FLAG_ANY: seek to any frame, even non keyframes -> results in artifacts until the next iframe is decoded
+    //    // AVSEEK_FLAG_BACKWARD: seek backwards -> ffmpeg seek better when this flag is enabled, even when seeking forward
 
-        unsigned char mySeekFlags = AVSEEK_FLAG_BACKWARD;// | AVSEEK_FLAG_ANY;
-        int64_t mySeekTimeInTimeBaseUnits = int64_t(theDestTime*_myVideoStreamTimeBase);
-        /*int myResult =*/ av_seek_frame(_myFormatContext, _myVStreamIndex,
-                                mySeekTimeInTimeBaseUnits, mySeekFlags);
-        if (theSeekAudioFlag && hasAudio() && getDecodeAudioFlag()) {
-            mySeekTimeInTimeBaseUnits = int64_t(theDestTime*(1/ av_q2d(_myAStream->time_base)));
-             for (std::vector<int>::size_type i = 0; i < _myAllAudioStreamIndicies.size(); i++) {
-                /*int myResult =*/ av_seek_frame(_myFormatContext, _myAllAudioStreamIndicies[i],
-                                         mySeekTimeInTimeBaseUnits, mySeekFlags);
-             }
-        }
-        avcodec_flush_buffers(_myVStream->codec);
-        if (theSeekAudioFlag && hasAudio() && getDecodeAudioFlag()) {
-            avcodec_flush_buffers(_myAStream->codec);
-        }
-    }
+    //    unsigned char mySeekFlags = AVSEEK_FLAG_BACKWARD;// | AVSEEK_FLAG_ANY;
+    //    int64_t mySeekTimeInTimeBaseUnits = int64_t(theDestTime*_myVideoStreamTimeBase);
+    //    /*int myResult =*/ av_seek_frame(_myFormatContext, _myVStreamIndex,
+    //                            mySeekTimeInTimeBaseUnits, mySeekFlags);
+    //    if (theSeekAudioFlag && hasAudio() && getDecodeAudioFlag()) {
+    //        mySeekTimeInTimeBaseUnits = int64_t(theDestTime*(1/ av_q2d(_myAStream->time_base)));
+    //         for (std::vector<int>::size_type i = 0; i < _myAllAudioStreamIndicies.size(); i++) {
+    //            /*int myResult =*/ av_seek_frame(_myFormatContext, _myAllAudioStreamIndicies[i],
+    //                                     mySeekTimeInTimeBaseUnits, mySeekFlags);
+    //         }
+    //    }
+    //    avcodec_flush_buffers(_myVStream->codec);
+    //    if (theSeekAudioFlag && hasAudio() && getDecodeAudioFlag()) {
+    //        avcodec_flush_buffers(_myAStream->codec);
+    //    }
+    //}
 }
