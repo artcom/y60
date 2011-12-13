@@ -57,7 +57,7 @@
 */
 
 /*jslint nomen:false, plusplus:false*/
-/*globals GUI, js*/
+/*globals GUI, js, Logger*/
 
 var ourCurrentAnimationTime = -1;
 
@@ -114,6 +114,10 @@ GUI.AnimationManager.prototype.Constructor = function (Public, Protected) {
     ////////////////////
 
     Public.play = function (theAnimation) { /* theNamespace */
+        if (!(theAnimation instanceof GUI.Animation)) {
+            Logger.warning("<AnimationManager::play> Animation given (" + theAnimation + ") is not derived from GUI.Animation -> ABORTING");
+            return;
+        }
         Logger.info("<AnimationManager::play> playing '" + theAnimation + "'");
         // TODO Validate theAnimation is instanceof GUI.Animation
         if (js.array.indexOf(_.animations, theAnimation) < 0) {
