@@ -56,48 +56,49 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+/*jslint nomen:false*/
+/*globals GUI*/
 /**
  * Animations implemented with a closure function.
  */
-GUI.ClosureAnimation = function(theDuration, theEasing, theFunction) {
+GUI.ClosureAnimation = function (theDuration, theEasing, theFunction) {
     this.Constructor(this, {}, theDuration, theEasing, theFunction);
-}
+};
 
-GUI.ClosureAnimation.prototype.Constructor = function(Public, Protected, theDuration, theEasing, theFunction) {
+GUI.ClosureAnimation.prototype.__proto__ = GUI.SimpleAnimation.prototype;
+GUI.ClosureAnimation.prototype.Constructor = function (Public, Protected, theDuration, theEasing, theFunction) {
     var Base = {};
 
     GUI.SimpleAnimation.Constructor(Public, Protected);
 
-    ////////////////////////////////////////
-    // Member
-    ////////////////////////////////////////
+    ////////////////////
+    // Public Members //
+    ////////////////////
 
     Public.func = null;
 
-    ////////////////////////////////////////
-    // Public
-    ////////////////////////////////////////
+    ////////////////////
+    // Public Methods //
+    ////////////////////
 
     // initialize from arguments
-    Public.setup = function() {
+    Public.setup = function () {
         Protected.duration = theDuration;
-
-        if(theEasing != null) {
+        if (theEasing) {
             Public.easing = theEasing;
         }
-
         Public.func = theFunction;
     };
 
     // call the closure with the current progress value
     Base.render = Public.render;
-    Public.render = function() {
-        if(Public.func != null) {
+    Public.render = function () {
+        if (Public.func !== null) {
             Public.func(Public.progress);
         }
     };
 
-    Public.toString = function() {
+    Public.toString = function () {
         return "ClosureAnimation" + Public.func;
     };
 

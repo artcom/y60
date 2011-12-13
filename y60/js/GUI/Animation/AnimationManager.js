@@ -114,7 +114,8 @@ GUI.AnimationManager.prototype.Constructor = function (Public, Protected) {
     ////////////////////
 
     Public.play = function (theAnimation) { /* theNamespace */
-        // Validate theAnimation is instanceof GUI.Animation
+        Logger.info("<AnimationManager::play> playing '" + theAnimation + "'");
+        // TODO Validate theAnimation is instanceof GUI.Animation
         if (js.array.indexOf(_.animations, theAnimation) < 0) {
             _.animations.push(theAnimation);
         }

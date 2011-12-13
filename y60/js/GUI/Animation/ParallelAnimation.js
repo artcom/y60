@@ -56,29 +56,34 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+/*jslint nomen:false, plusplus:false, bitwise:false*/
+/*globals GUI*/
+
 /**
  * Play several animations in parallel.
  */
-GUI.ParallelAnimation = function() {
+GUI.ParallelAnimation = function () {
     this.Constructor(this, {});
-}
+};
 
-GUI.ParallelAnimation.prototype.Constructor = function(Public, Protected) {
+GUI.ParallelAnimation.prototype.__proto__ = GUI.CompositeAnimation.prototype;
+GUI.ParallelAnimation.prototype.Constructor = function (Public, Protected) {
     var Base = {};
 
     GUI.CompositeAnimation.Constructor.call(Public, Public, Protected);
 
-    ////////////////////////////////////////
-    // Public
-    ////////////////////////////////////////
+    ////////////////////
+    // Public Methods //
+    ////////////////////
 
     // duration = max(map(children, duration))
     Base.childDurationChanged = Public.childDurationChanged;
-    Public.childDurationChanged = function(theChild) {
+    Public.childDurationChanged = function (theChild) {
         var d = 0;
-        for(var i = 0; i < Public.children.length; i++) {
-            var c = Public.children[i].duration;
-            if(c > d) {
+        var i, c;
+        for (i = 0; i < Public.children.length; i++) {
+            c = Public.children[i].duration;
+            if (c > d) {
                 d = c;
             }
         }
@@ -87,10 +92,11 @@ GUI.ParallelAnimation.prototype.Constructor = function(Public, Protected) {
 
     // start playing all children
     Base.play = Public.play;
-    Public.play = function(theComeToAnEndFlag) {
+    Public.play = function (theComeToAnEndFlag) {
         Base.play();
+        var i;
         if (!theComeToAnEndFlag) {
-            for(var i = 0; i < Public.children.length; i++) {
+            for (i = 0; i < Public.children.length; i++) {
                 if (Public.running) {
                     Public.children[i].play();
                 }
@@ -99,22 +105,22 @@ GUI.ParallelAnimation.prototype.Constructor = function(Public, Protected) {
     };
 
     // step all children forward
-    Public.doFrame = function(theTime)  {
+    Public.doFrame = function (theTime)  {
         var notFinished = false;
-        for(var i = 0; i < Public.children.length; i++) {
-            if(Public.children[i].running && Public.running) {
+        var i;
+        for (i = 0; i < Public.children.length; i++) {
+            if (Public.children[i].running && Public.running) {
                 Public.children[i].doFrame(theTime);
                 notFinished |= Public.children[i].running;
             }
         }
 
-        if(!notFinished && Public.running) {
+        if (!notFinished && Public.running) {
             Protected.finish();
         }
     };
 
-    Public.toString = function() {
+    Public.toString = function () {
         return Protected.standardToString("ParallelAnimation");
     };
-
 };

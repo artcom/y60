@@ -56,48 +56,52 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+/*jslint nomen:false, plusplus:false*/
+/*globals GUI, Exception*/
+
 /**
  * Animations that are time-compositions of their children.
  */
-GUI.CompositeAnimation = {}; // <- Wtf? If an abstract base class is needed please do this
-                             // differently. This way we cannot cleanup the inheritance chain with __proto__!!
+GUI.CompositeAnimation =  function () {
+    throw new Exception("<CompositeAnimation> Abstract Base class cannot be instantiated");
+};
 
-GUI.CompositeAnimation.Constructor = function(Public, Protected) {
+GUI.CompositeAnimation.prototype.__proto__ = GUI.Animation.prototype;
+GUI.CompositeAnimation.Constructor = function (Public, Protected) {
     var Base = {};
+    var _ = {};
 
     GUI.Animation.Constructor(Public, Protected);
 
-    ////////////////////////////////////////
-    // Member
-    ////////////////////////////////////////
+    ////////////////////
+    // Private Member //
+    ////////////////////
 
-    var _children = [];
+    _.children = [];
 
-    ////////////////////////////////////////
-    // Public
-    ////////////////////////////////////////
-
-    Public.__defineGetter__("children", function() {
-        return _children;
-    });
+    ////////////////////
+    // Public Methods //
+    ////////////////////
 
     // add a child, also updating duration
-    Public.add = function(theAnimation) {
-        _children.push(theAnimation);
+    Public.add = function (theAnimation) {
+        // TODO check if instanceof Animation
+        _.children.push(theAnimation);
         theAnimation.parent = Public;
         Public.childDurationChanged();
     };
 
     // duration computation, should be overridden
-    Public.childDurationChanged = function(theChild) {
+    Public.childDurationChanged = function (theChild) {
     };
 
     // generic cancel
     Base.cancel = Public.cancel;
-    Public.cancel = function() {
-        for(var i = 0; i < _children.length; i++) {
-            if(_children[i].running) {
-                _children[i].cancel();
+    Public.cancel = function () {
+        var i;
+        for (i = 0; i < _.children.length; i++) {
+            if (_.children[i].running) {
+                _.children[i].cancel();
             }
         }
         Base.cancel();
@@ -105,10 +109,15 @@ GUI.CompositeAnimation.Constructor = function(Public, Protected) {
 
     // generic finish
     Base.finish = Public.finish;
-    Public.finish = function(){
-        for(var i = 0; i < _children.length; i++) {
-            _children[i].finish();
+    Public.finish = function () {
+        var i;
+        for (i = 0; i < _.children.length; i++) {
+            _.children[i].finish();
         }
         Base.finish();
     };
+    
+    Public.__defineGetter__("children", function () {
+        return _.children;
+    });
 };

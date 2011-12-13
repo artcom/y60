@@ -56,79 +56,83 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+/*jslint nomen:false*/
+/*globals GUI*/
+
 /**
  * Rotate an object using degrees as unit, normalizing the set angles.
  */
-GUI.RotationAnimation = function(theDuration, theEasing, theObject, theProperty, theStart, theRotation) {
+GUI.RotationAnimation = function (theDuration, theEasing, theObject, theProperty, theStart, theRotation) {
     this.Constructor(this, {}, theDuration, theEasing, theObject, theProperty, theStart, theRotation);
-}
+};
 
-GUI.RotationAnimation.prototype.Constructor = function(Public, Protected, theDuration, theEasing,
+GUI.RotationAnimation.prototype.__proto__ = GUI.SimpleAnimation.prototype;
+GUI.RotationAnimation.prototype.Constructor = function (Public, Protected, theDuration, theEasing,
                                                        theObject, theProperty, theStart, theRotation) {
     var Base = {};
-
+    var _ = {};
+    
     GUI.SimpleAnimation.Constructor.call(Public, Public, Protected);
 
     ////////////////////////////////////////
     // Member
     ////////////////////////////////////////
 
-    var _object = null;
-    var _property = "";
-    var _start = 0;
-    var _rotation = 0;
+    _.object   = null;
+    _.property = "";
+    _.start    = 0;
+    _.rotation = 0;
 
-    Public.__defineGetter__("object", function() {
-        return _object;
-    });
-
-    Public.__defineGetter__("property", function() {
-        return _property;
-    });
-
-    Public.__defineGetter__("start", function() {
-        return _start;
-    });
-
-    Public.__defineGetter__("rotation", function() {
-        return _rotation;
-    });
-
-    ////////////////////////////////////////
-    // Public
-    ////////////////////////////////////////
+    ////////////////////
+    // Public Methods //
+    ////////////////////
 
     // initialize from arguments
-    Public.setup = function() {
+    Public.setup = function () {
         Protected.duration = theDuration;
-
-        if(theEasing != null) {
+        if (theEasing) {
             Public.easing = theEasing;
         }
-
-        _object = theObject;
-        _property = theProperty;
-        _start = theStart;
-        _rotation = theRotation;
+        _.object = theObject;
+        _.property = theProperty;
+        _.start = theStart;
+        _.rotation = theRotation;
     };
 
     // set the current value
     Base.render = Public.render;
-    Public.render = function() {
-        var myValue = _start + Public.progress * _rotation;
+    Public.render = function () {
+        var object;
+        var myValue = _.start + Public.progress * _.rotation;
         myValue %= 360.0;
-        if(_object instanceof Array) {
-            for (var object in _object) {
-                object[_property] = myValue;
+        if (_.object instanceof Array) {
+            for (object in _.object) {
+                object[_.property] = myValue;
             }
         } else {
-            _object[_property] = myValue;
+            _.object[_.property] = myValue;
         }
     };
 
-    Public.toString = function() {
-        return Protected.standardToString("RotationAnimation" + " on "  + _object.name + "." + _property);
+    Public.toString = function () {
+        return Protected.standardToString("RotationAnimation" + " on "  + _.object.name + "." + _.property);
     };
+
+    Public.__defineGetter__("object", function () {
+        return _.object;
+    });
+
+    Public.__defineGetter__("property", function () {
+        return _.property;
+    });
+
+    Public.__defineGetter__("start", function () {
+        return _.start;
+    });
+
+    Public.__defineGetter__("rotation", function () {
+        return _.rotation;
+    });
 
     Public.setup();
 };

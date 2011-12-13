@@ -56,24 +56,28 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+/*jslint nomen:false*/
+/*globals GUI, Exception*/
+
 /**
  * Base class for non-composite animations.
  */
-GUI.SimpleAnimation = {}; // <- Wtf? If an abstract base class is needed please do this
-                          // differently. This way we cannot cleanup the inheritance chain with __proto__!!
+GUI.SimpleAnimation = function () {
+    throw new Exception("<SimpleAnimation> Abstract Base class cannot be instantiated");
+};
 
-GUI.SimpleAnimation.Constructor = function(Public, Protected) {
+GUI.SimpleAnimation.prototype.__proto__ = GUI.Animation.prototype;
+GUI.SimpleAnimation.Constructor = function (Public, Protected) {
     var Base = {};
 
     GUI.Animation.Constructor(Public, Protected);
 
-    ////////////////////////////////////////
-    // Public
-    ////////////////////////////////////////
+    ////////////
+    // Public //
+    ////////////
 
     // simple animations allow setting of their duration
-    Public.__defineSetter__("duration", function(d) {
-        Protected.duration = d;
+    Public.__defineSetter__("duration", function (theDuration) {
+        Protected.duration = theDuration;
     });
-
 };

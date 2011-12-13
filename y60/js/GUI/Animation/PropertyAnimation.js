@@ -56,76 +56,94 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+/*jslint nomen:false*/
+/*globals GUI*/
+
 /**
  * Animate a javascript property on one or more objects.
  */
-GUI.PropertyAnimation = function(theDuration, theEasing, theObject, theProperty, theMin, theMax) {
-    this.Constructor(this, {}, theDuration, theEasing, theObject, theProperty, theMin, theMax);
-}
+GUI.PropertyAnimation = function (theDuration, theEasing, theObject,
+                                  theProperty, theMin, theMax) {
+    this.Constructor(this, {}, theDuration, theEasing, theObject,
+                               theProperty, theMin, theMax);
+};
 
-GUI.PropertyAnimation.prototype.Constructor = function(Public, Protected, theDuration, theEasing,
+GUI.PropertyAnimation.prototype.__proto__ = GUI.SimpleAnimation.prototype;
+GUI.PropertyAnimation.prototype.Constructor = function (Public, Protected, theDuration, theEasing,
                                                        theObject, theProperty, theMin, theMax) {
     var Base = {};
-
+    var _ = {};
+    
     GUI.SimpleAnimation.Constructor.call(Public, Public, Protected);
 
-    ////////////////////////////////////////
-    // Member
-    ////////////////////////////////////////
+    /////////////////////
+    // Private Members //
+    /////////////////////
 
-    var _object = null;
-    var _property = "";
-    var _min = 0;
-    var _max = 0;
+    _.object = null;
+    _.property = "";
+    _.min = 0; // Numeric
+    _.max = 0; // Numeric
 
-    Public.__defineGetter__("object", function() {
-        return _object;
-    });
-
-    Public.__defineGetter__("property", function() {
-        return _property;
-    });
-
-    Public.__defineGetter__("min", function() { return _min; });
-    Public.__defineSetter__("min", function(v) { _min = v; });
-
-    Public.__defineGetter__("max", function() { return _max; });
-    Public.__defineSetter__("max", function(v) { _max = v; });
-
-    ////////////////////////////////////////
-    // Public
-    ////////////////////////////////////////
+    ////////////////////
+    // Public Methods //
+    ////////////////////
 
     // initialize from arguments
-    Public.setup = function() {
+    Public.setup = function () {
         Protected.duration = theDuration;
 
-        if(theEasing != null) {
+        if (theEasing) {
             Public.easing = theEasing;
         }
 
-        _object = theObject;
-        _property = theProperty;
-        _min = theMin;
-        _max = theMax;
+        _.object = theObject;
+        _.property = theProperty;
+        _.min = theMin;
+        _.max = theMax;
     };
 
     // set the current value
     Base.render = Public.render;
-    Public.render = function() {
-        var myValue = _min + ((_max - _min) * Public.progress);
-        if(_object instanceof Array) {
-            for (var object in _object) {
-                object[_property] = myValue;
+    Public.render = function () {
+        var object;
+        var myValue = _.min + ((_.max - _.min) * Public.progress);
+        if (_.object instanceof Array) {
+            for (object in _.object) {
+                object[_.property] = myValue;
             }
         } else {
-            _object[_property] = myValue;
+            _.object[_.property] = myValue;
         }
     };
 
-    Public.toString = function() {
-        return Protected.standardToString("PropertyAnimation" + " on "  + _object.name + "." + _property);
+    Public.toString = function () {
+        return Protected.standardToString("PropertyAnimation" + " on "  + _.object.name + "." + _.property);
     };
+    
+    Public.__defineGetter__("object", function () {
+        return _.object;
+    });
+
+    Public.__defineGetter__("property", function () {
+        return _.property;
+    });
+
+    Public.__defineGetter__("min", function () {
+        return _.min;
+    });
+    Public.__defineSetter__("min", function (theValue) {
+        // TODO validate theValue to be numeric
+        _.min = theValue;
+    });
+
+    Public.__defineGetter__("max", function () {
+        return _.max;
+    });
+    Public.__defineSetter__("max", function (theValue) {
+        // TODO validate theValue to be numeric
+        _.max = theValue;
+    });
 
     Public.setup();
 };
