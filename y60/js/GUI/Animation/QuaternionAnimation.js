@@ -72,7 +72,7 @@ GUI.QuaternionAnimation.prototype.Constructor = function (Public, Protected, the
     var Base = {};
     var _ = {};
     
-    GUI.SimpleAnimation.Constructor.call(Public, Public, Protected);
+    GUI.SimpleAnimation.Constructor(Public, Protected);
 
     /////////////////////
     // Private Members //

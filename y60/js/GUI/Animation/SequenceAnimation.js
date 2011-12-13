@@ -61,7 +61,7 @@
 /**
  * Play several animations in sequence.
  */
-GUI.SequenceAnimation = function () {
+GUI.SequenceAnimation = function SequenceAnimation() {
     this.Constructor(this, {});
 };
 

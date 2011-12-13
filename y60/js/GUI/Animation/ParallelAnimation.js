@@ -70,7 +70,7 @@ GUI.ParallelAnimation.prototype.__proto__ = GUI.CompositeAnimation.prototype;
 GUI.ParallelAnimation.prototype.Constructor = function (Public, Protected) {
     var Base = {};
 
-    GUI.CompositeAnimation.Constructor.call(Public, Public, Protected);
+    GUI.CompositeAnimation.Constructor(Public, Protected);
 
     ////////////////////
     // Public Methods //

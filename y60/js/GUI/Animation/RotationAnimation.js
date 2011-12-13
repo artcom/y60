@@ -72,7 +72,7 @@ GUI.RotationAnimation.prototype.Constructor = function (Public, Protected, theDu
     var Base = {};
     var _ = {};
     
-    GUI.SimpleAnimation.Constructor.call(Public, Public, Protected);
+    GUI.SimpleAnimation.Constructor(Public, Protected);
 
     ////////////////////////////////////////
     // Member

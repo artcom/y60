@@ -69,7 +69,7 @@ GUI.ClosureAnimation.prototype.__proto__ = GUI.SimpleAnimation.prototype;
 GUI.DelayAnimation.prototype.Constructor = function (Public, Protected, theDuration) {
     var Base = {};
 
-    GUI.SimpleAnimation.Constructor.call(Public, Public, Protected);
+    GUI.SimpleAnimation.Constructor(Public, Protected);
 
     ////////////////////
     // Public Methods //
