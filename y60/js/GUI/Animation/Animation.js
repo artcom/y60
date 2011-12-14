@@ -56,180 +56,140 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+/*jslint nomen:false, plusplus:false*/
+/*globals GUI, Logger, ourCurrentAnimationTime, Exception*/
+
 /**
  * Abstract base class for animations.
  */
-GUI.Animation = {};
+GUI.Animation = function Animation() {
+    throw new Exception("<Animation> Abstract Base class cannot be instantiated");
+};
 
 // global counter for generating animation ids
 GUI.Animation.idCounter = 0;
 
-GUI.Animation.Constructor = function(Public, Protected) {
+GUI.Animation.Constructor = function (Public, Protected) {
+    var _ = {};
+    
+    /////////////////////
+    // Private Members //
+    /////////////////////
+    
+    _.id           = GUI.Animation.idCounter++;
+    _.name         = null;
+    
+    _.parent       = null;
+    _.duration     = 100.0;
+    _.loop         = false;
+    _.running      = false;
+    _.startTime    = -1;
+    _.progressTime = 0.0;
+    _.progress     = 0.0;
+    _.finished     = false;
 
-    ////////////////////////////////////////
-    // Member
-    ////////////////////////////////////////
-
-    var _id = GUI.Animation.idCounter++;
-    var _name = null;
-
-    var _parent = null;
-    var _duration = 100.0;
-    var _loop = false;
-    var _running = false;
-    var _startTime = -1;
-    var _progressTime = 0.0;
-    var _progress = 0.0;
-    var _finished = false;
-
-    var _easing  = function(v) {
-        return v;
+    _.easing  = function (theValue) {
+        return theValue;
     };
 
-    var _onPlay        = null;
-    var _onFinish      = null;
-    var _onCancel      = null;
+    _.callbacks = {
+        onPlay   : null,
+        onFinish : null,
+        onCancel : null
+    };
 
-    ////////////////////////////////////////
-    // Properties
-    ////////////////////////////////////////
+    /////////////////////
+    // Private Methods //
+    /////////////////////
 
-    // getter / setter
-    Public.__defineGetter__("id", function() {
-        return _id;
-    });
-
-    Public.__defineGetter__("path", function() {
-        var r = "" + _id;
-        var p = _parent;
-        while(p) {
-            r = p.id + "." + r;
-            p = p.parent;
+    _.callOnPlay = function () {
+        if (_.callbacks.onPlay !== null) {
+            _.callbacks.onPlay.call(Public);
         }
-        return r;
-    });
+    };
 
-    Public.__defineGetter__("name", function() {
-        return _name;
-    });
+    _.callOnFinish = function () {
+        if (_.callbacks.onFinish !== null) {
+            _.callbacks.onFinish.call(Public);
+        }
+    };
 
-    Public.__defineSetter__("name", function(v) {
-        _name = v;
-    });
+    _.callOnCancel = function () {
+        if (_.callbacks.onCancel !== null) {
+            _.callbacks.onCancel.call(Public);
+        }
+    };
 
-    Public.__defineGetter__("progress", function() {
-        return _progress;
-    });
+    ///////////////////////
+    // Protected Methods //
+    ///////////////////////
 
-    Public.__defineSetter__("progress", function(p) {
-        _progress = p;
-    });
+    Protected.finish = function () {
+        Logger.debug("Finished " + Public);
+        _.progressTime = _.duration;
+        _.progress = 1.0;
+        Public.render();
+        _.callOnFinish();
+        if (_.loop) {
+            Public.play();
+        } else {
+            _.running = false;
+            _.finished = true;
+        }
+    };
 
-    Public.__defineGetter__("easing", function() {
-        return _easing;
-    });
+    Protected.durationChanged = function () {
+        if (_.parent) {
+            _.parent.childDurationChanged(Public);
+        }
+    };
 
-    Public.__defineSetter__("easing", function(theEasing) {
-        _easing = theEasing;
-    });
+    Protected.standardToString = function (cls) {
+        return cls + " " + Public.path + ((Public.name !== null) ? (" (" + Public.name + ") ") : "") + " running: " + _.running;
+    };
 
-    Public.__defineGetter__("duration", function() {
-        return _duration;
-    });
+    ////////////////////
+    // Public Methods //
+    ////////////////////
 
-    Protected.__defineSetter__("duration", function(d) {
-        _duration = d;
-        Protected.durationChanged();
-    });
-
-    Public.__defineGetter__("loop", function() {
-        return _loop;
-    });
-
-    Public.__defineSetter__("loop", function(l) {
-        _loop = l;
-    });
-
-    Public.__defineGetter__("running", function()  {
-        return _running;
-    });
-
-    Public.__defineGetter__("parent", function() {
-        return _parent;
-    });
-
-    Public.__defineSetter__("parent", function(a) {
-        _parent = a;
-    });
-
-    Public.__defineGetter__("onPlay", function() {
-        return _onPlay;
-    });
-
-    Public.__defineSetter__("onPlay", function(f) {
-        _onPlay = f;
-    });
-
-    Public.__defineGetter__("onCancel", function() {
-        return _onCancel;
-    });
-
-    Public.__defineSetter__("onCancel", function(f) {
-        _onCancel = f;
-    });
-
-    Public.__defineGetter__("onFinish", function() {
-        return _onFinish;
-    });
-
-    Public.__defineSetter__("onFinish", function(f) {
-        _onFinish = f;
-    });
-
-    ////////////////////////////////////////
-    // Public
-    ////////////////////////////////////////
-
-    Public.play = function() {
+    Public.play = function () {
         Logger.debug("Playing " + Public);
-        _startTime = ourCurrentAnimationTime;
-        _progressTime = 0;
-        _progress = _easing(0.0);
-        _running = true;
-        _finished = false;
-
-        callOnPlay();
-
+        _.startTime    = ourCurrentAnimationTime;
+        _.progressTime = 0;
+        _.progress     = _.easing(0.0);
+        _.running      = true;
+        _.finished     = false;
+        
+        _.callOnPlay();
         Public.render();
     };
 
-    Public.cancel = function() {
+    Public.cancel = function () {
         Logger.debug("Cancelled " + Public);
-        _running = false;
-        _finished = false;
-        callOnCancel();
+        _.running  = false;
+        _.finished = false;
+        _.callOnCancel();
     };
 
-    Public.finish = function() {
+    Public.finish = function () {
         Logger.debug("force finish of " + Public);
-        if (_finished) {
+        if (_.finished) {
             return;
         }
-        if (!_running) {
+        if (!_.running) {
             Public.play(true);
         }
         Protected.finish();
     };
 
-    Public.doFrame = function(theTime) {
-        if (_startTime == -1) {
-            _startTime = ourCurrentAnimationTime;
+    Public.doFrame = function (theTime) {
+        if (_.startTime === -1) {
+            _.startTime = ourCurrentAnimationTime;
         }
-        _progressTime = (theTime - _startTime);
-        _progress = _easing(_progressTime / _duration);
+        _.progressTime = (theTime - _.startTime);
+        _.progress = _.easing(_.progressTime / _.duration);
 
-        var finished = (_progressTime >= _duration);
-
+        var finished = (_.progressTime >= _.duration);
         if (finished) {
             Protected.finish();
         } else {
@@ -237,61 +197,114 @@ GUI.Animation.Constructor = function(Public, Protected) {
         }
     };
 
-    Public.render = function() {
+    Public.render = function () {
     };
 
-    Public.toString = function() {
+    Public.toString = function () {
         return Protected.standardToString("Animation");
     };
 
-    ////////////////////////////////////////
-    // Protected
-    ////////////////////////////////////////
+    ////////////////
+    // Properties //
+    ////////////////
 
-    Protected.finish = function() {
-        Logger.debug("Finished " + Public);
-        _progressTime = _duration;
-        _progress = 1.0;
-        Public.render();
-        callOnFinish();
-        if(_loop) {
-            Public.play();
-        } else {
-            _running = false;
-            _finished = true;
+    // getter / setter
+    Public.__defineGetter__("id", function () {
+        return _.id;
+    });
+
+    Public.__defineGetter__("path", function () {
+        var r = "" + _.id;
+        var p = _.parent;
+        while (p) {
+            r = p.id + "." + r;
+            p = p.parent;
         }
-    };
+        return r;
+    });
 
-    Protected.durationChanged = function() {
-        if(_parent) {
-            _parent.childDurationChanged(Public);
-        }
-    };
+    Public.__defineGetter__("name", function () {
+        return _.name;
+    });
 
-    Protected.standardToString = function(cls) {
-        return cls + " " + Public.path + ((Public.name != null) ? (" (" + Public.name + ") ") : "") + " running: " + _running;
-    };
+    Public.__defineSetter__("name", function (theName) {
+        _.name = theName;
+    });
 
-    ////////////////////////////////////////
-    // Private
-    ////////////////////////////////////////
+    Public.__defineGetter__("progress", function () {
+        return _.progress;
+    });
 
-    function callOnPlay() {
-        if(_onPlay != null) {
-            _onPlay.call(Public);
-        }
-    };
+    Public.__defineSetter__("progress", function (theProgress) {
+        // TODO validate theProgress to be numeric (between 0 and 1 probably)
+        _.progress = theProgress;
+    });
 
-    function callOnFinish() {
-        if(_onFinish != null) {
-            _onFinish.call(Public);
-        }
-    };
+    Public.__defineGetter__("easing", function () {
+        return _.easing;
+    });
 
-    function callOnCancel() {
-        if(_onCancel != null) {
-            _onCancel.call(Public);
-        }
-    };
+    Public.__defineSetter__("easing", function (theEasing) {
+        // TODO validate the Easing to be a proper Easing (function or even instance of something)
+        _.easing = theEasing;
+    });
 
+    Public.__defineGetter__("duration", function () {
+        return _.duration;
+    });
+
+    Protected.__defineSetter__("duration", function (theDuration) {
+        // TODO validate theDuration to be numeric
+        _.duration = theDuration;
+        Protected.durationChanged();
+    });
+
+    Public.__defineGetter__("loop", function () {
+        return _.loop;
+    });
+
+    Public.__defineSetter__("loop", function (theLoop) {
+        // TODO validate to be a boolean flag (?)
+        _.loop = theLoop;
+    });
+
+    Public.__defineGetter__("running", function ()  {
+        return _.running;
+    });
+
+    Public.__defineGetter__("parent", function () {
+        return _.parent;
+    });
+
+    Public.__defineSetter__("parent", function (theParent) {
+        // TODO validate to be another Animation
+        _.parent = theParent;
+    });
+
+    Public.__defineGetter__("onPlay", function () {
+        return _.callbacks.onPlay;
+    });
+
+    Public.__defineSetter__("onPlay", function (theFunction) {
+        // TODO check to be a function
+        _.callbacks.onPlay = theFunction;
+    });
+
+    Public.__defineGetter__("onCancel", function () {
+        return _.callbacks.onCancel;
+    });
+
+    Public.__defineSetter__("onCancel", function (theFunction) {
+        // TODO check to be a function
+        _.callbacks.onCancel = theFunction;
+    });
+
+    Public.__defineGetter__("onFinish", function () {
+        return _.callbacks.onFinish;
+    });
+
+    Public.__defineSetter__("onFinish", function (theFunction) {
+        // TODO check to be a function
+        _.callbacks.onFinish = theFunction;
+    });
 };

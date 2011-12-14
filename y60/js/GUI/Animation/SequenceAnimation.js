@@ -56,70 +56,74 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+/*jslint nomen:false, plusplus:false*/
+/*globals GUI*/
 /**
  * Play several animations in sequence.
  */
-GUI.SequenceAnimation = function() {
+GUI.SequenceAnimation = function SequenceAnimation() {
     this.Constructor(this, {});
-}
+};
 
-GUI.SequenceAnimation.prototype.Constructor = function(Public, Protected) {
+GUI.SequenceAnimation.prototype.__proto__ = GUI.CompositeAnimation.prototype;
+GUI.SequenceAnimation.prototype.Constructor = function (Public, Protected) {
     var Base = {};
+    var _ = {};
 
     GUI.CompositeAnimation.Constructor(Public, Protected);
 
-    ////////////////////////////////////////
-    // Member
-    ////////////////////////////////////////
+    /////////////////////
+    // Private Members //
+    /////////////////////
 
-    var _current = 0;
+    _.current = 0;
 
-    ////////////////////////////////////////
-    // Public
-    ////////////////////////////////////////
+    ////////////////////
+    // Public Methods //
+    ////////////////////
 
     // duration = sum(map(children, duration))
     Base.childDurationChanged = Public.childDurationChanged;
-    Public.childDurationChanged = function() {
+    Public.childDurationChanged = function () {
+        var i;
         var d = 0.0;
-        for(var i = 0; i < Public.children.length; i++) {
-                d += Public.children[i].duration;
-            }
+        for (i = 0; i < Public.children.length; i++) {
+            d += Public.children[i].duration;
+        }
         Protected.duration = d;
     };
 
     // start to play this animation
     // plays the first animation
     Base.play = Public.play;
-    Public.play = function(theComeToAnEndFlag) {
+    Public.play = function (theComeToAnEndFlag) {
         Base.play();
-        if(!theComeToAnEndFlag && Public.running) {
-            _current = 0;
-            if(Public.children.length >= 1) {
-                Public.children[_current].play();
+        if (!theComeToAnEndFlag && Public.running) {
+            _.current = 0;
+            if (Public.children.length >= 1) {
+                Public.children[_.current].play();
             }
         }
     };
 
     // iterate through child animations
-    Public.doFrame = function(theTime) {
-        if (_current >= Public.children.length) {
+    Public.doFrame = function (theTime) {
+        if (_.current >= Public.children.length) {
             Protected.finish();
             return;
         }
-        Public.children[_current].doFrame(theTime);
-        if(!Public.children[_current].running && Public.running) {
-            _current++;
-            if(_current < Public.children.length) {
-                Public.children[_current].play();
+        Public.children[_.current].doFrame(theTime);
+        if (!Public.children[_.current].running && Public.running) {
+            _.current++;
+            if (_.current < Public.children.length) {
+                Public.children[_.current].play();
             } else {
                 Protected.finish();
             }
         }
     };
 
-    Public.toString = function() {
+    Public.toString = function () {
         return Protected.standardToString("SequenceAnimation");
     };
-
 };

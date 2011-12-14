@@ -2134,12 +2134,11 @@ namespace y60 {
         myMatrix.makeIdentity();
 
         dom::Node & mySceneNode = _myScene->getNode();
-#if 1
+#if 0   // TODO: intersect with frustum and visualize something ...
         std::vector<PlanePtr> myPlanes = mySceneNode.getAllFacades<Plane>(PLANE_NODE_NAME);
         for (unsigned i = 0; i < myPlanes.size();++i) {
             PlanePtr & myFacade = myPlanes[i];
             Planef myPlane = myFacade->get<GlobalPlaneTag>();
-            // TODO: intersect with frustum and visualize something ...
         }
 #endif
         std::vector<PointPtr> myPoints = mySceneNode.getAllFacades<Point>(POINT_NODE_NAME);

@@ -56,6 +56,9 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+/*jslint nomen:false, plusplus:false*/
+/*globals GUI, js, Logger*/
+
 var ourCurrentAnimationTime = -1;
 
 /**
@@ -64,59 +67,156 @@ var ourCurrentAnimationTime = -1;
  * Instantiate yourself one and call its
  * doFrame() method on every frame.
  */
-GUI.AnimationManager = function() {
+GUI.AnimationManager = function () {
     this.Constructor(this, {});
-}
+};
 
-GUI.AnimationManager.prototype.Constructor = function(Public, Protected) {
-
-    ////////////////////////////////////////
-    // Member
-    ////////////////////////////////////////
-
-    var _animations = [];
-
-    ////////////////////////////////////////
-    // Public
-    ////////////////////////////////////////
+GUI.AnimationManager.prototype.Constructor = function (Public, Protected) {
+    var _ = {};
     
-    Public.__defineGetter__("animationCount", function() {
-        return _animations.length;
-    });
-
-    Public.play = function(a) {
-        if (js.array.indexOf(_animations, a) < 0) {
-            _animations.push(a);
+    ///////////////////
+    // Inner Classes //
+    ///////////////////
+    
+    _.Namespace = function Namespace(theName, theParent) {
+        this.name = theName;
+        this.parent = theParent;
+        this.animations = [];
+        this.subNamespaces = {};
+    };
+    
+    _.Namespace.prototype.toString = function () {
+        return "Namespace with name: '" + this.name + "' - animations: " + this.animations.length; //'[" + this.animations.join(",") + "]'";
+    };
+    
+    _.Namespace.prototype.forEachNamespaceDo = function (theFunction) {
+        var subNamespace;
+        theFunction(this);
+        for (subNamespace in this.subNamespaces) {
+            this.subNamespaces[subNamespace].forEachNamespaceDo(theFunction);
         }
-        a.play();
-    };
-
-    Public.isPlaying = function() {
-        return _animations.length > 0;
     };
     
-    Public.doFrame = function(theTime) {
+    /////////////////////
+    // Private Members //
+    /////////////////////
+
+    _.namespaces = {
+        'default' : new _.Namespace("default", null)
+    };
+
+    /////////////////////
+    // Private Methods //
+    /////////////////////
+    
+    _.getNamespaceParts = function (theNamespace) {
+        if (theNamespace.parent !== null) {
+            return _.getNamespaceParts(theNamespace.parent) + "." + theNamespace.name;
+        } else {
+            return theNamespace.name;
+        }
+    };
+    
+    _.prepareNamespace = function (theNamespace) {
+        var myNamespaceSegments = theNamespace.split(".");
+        if (myNamespaceSegments.length > 0 &&
+            !(myNamespaceSegments[0] in _.namespaces)) {
+            _.namespaces[myNamespaceSegments[0]] = new _.Namespace(myNamespaceSegments[0], null);
+        }
+        
+        var i;
+        var currentNamespace = _.namespaces[myNamespaceSegments[0]];
+        if (myNamespaceSegments.length > 1) {
+            for (i = 1; i < myNamespaceSegments.length; i++) {
+                currentNamespace.subNamespaces[myNamespaceSegments[i]] = new _.Namespace(myNamespaceSegments[i], currentNamespace);
+                currentNamespace = currentNamespace.subNamespaces[myNamespaceSegments[i]];
+            }
+        }
+        return currentNamespace;
+    };
+    
+    ////////////////////
+    // Public Methods //
+    ////////////////////
+
+    Public.play = function (theAnimation, theNamespace) {
+        if (!(theAnimation instanceof GUI.Animation)) {
+            Logger.warning("<AnimationManager::play> Animation given (" + theAnimation + ") is not derived from GUI.Animation -> ABORTING");
+            return;
+        }
+        if (theAnimation.running) {
+            Logger.warning("<AnimationManager::play> The animation '" + theAnimation + "' is already playing (potentially in the context of another AnimationManager) -> ABORTING");
+            return;
+        }
+        theNamespace = theNamespace || 'default';
+        
+        var myNamespace = _.prepareNamespace(theNamespace);
+        var namespace;
+        var isAlreadyPlaying = false;
+        
+        var checkIsAlreadyPlayingFunc = function (theCurrentNamespace) {
+            if (js.array.indexOf(theCurrentNamespace.animations, theAnimation) > -1) {
+                Logger.warning("<AnimationManager::play> The animation: '" + theAnimation + "' is already playing in namespace: '" + theCurrentNamespace + "'");
+                isAlreadyPlaying = true;
+            }
+        };
+        
+        for (namespace in _.namespaces) {
+            _.namespaces[namespace].forEachNamespaceDo(checkIsAlreadyPlayingFunc);
+            if (isAlreadyPlaying) {
+                return;
+            }
+        }
+        Logger.info("<AnimationManager::play> playing '" + theAnimation + "' in namespace: '" + theNamespace + "'");
+        myNamespace.animations.push(theAnimation);
+        theAnimation.play();
+    };
+
+    Public.isPlaying = function () {
+        return Public.animationCount > 0;
+    };
+    
+    Public.doFrame = function (theTime) {
         ourCurrentAnimationTime = theTime * 1000;
-        for(var i = 0; i < _animations.length; i++) {
-            var a = _animations[i];
-            if(a.running) {
-                a.doFrame(theTime * 1000);
+        
+        var onFramePerNamespaceFunc = function (theNamespace) {
+            var myAnimation, i;
+            for (i = 0; i < theNamespace.animations.length; i++) {
+                myAnimation = theNamespace.animations[i];
+                if (myAnimation.running) {
+                    myAnimation.doFrame(theTime * 1000);
+                } else {
+                    Logger.info("<AnimationManager::doFrame> removing animation '" + myAnimation + "' from namespace: '" + theNamespace + "' since it is done playing!");
+                    theNamespace.animations.splice(i, 1);
+                    i--; // We mutate the array as we walk it and have to mitigate this.
+                }
             }
-        }
-        removeFinished();
-    };
-
-    ////////////////////////////////////////
-    // Private
-    ////////////////////////////////////////
-
-    function removeFinished() {
-        for(var i = 0; i < _animations.length; i++) {
-            var a = _animations[i];
-            if(!a.running) {
-                _animations.splice(i, 1);
-            }
+        };
+        
+        var namespace;
+        for (namespace in _.namespaces) {
+            _.namespaces[namespace].forEachNamespaceDo(onFramePerNamespaceFunc);
         }
     };
-
+    
+    Public.__defineGetter__("animationCount", function () {
+        var namespace;
+        var animationsCount = 0;
+        
+        var animationCountingFunc = function (theNamespace) {
+            animationsCount += theNamespace.animations.length;
+        };
+        
+        for (namespace in _.namespaces) {
+            _.namespaces[namespace].forEachNamespaceDo(animationCountingFunc);
+        }
+        return animationsCount;
+    });
+    
+    // TODO: Add useful Public interfaces using namespaces
+    //    * Cancelling all Animations (with bubbling) for a namespace (and all its subnamespaces)
+    //    * Retrieve all Animations for a given namespace.
+    //    * Query useful stuff for all animations of a given namespace (e.g. if any animation for a given namespace is playing)
+    
+    // TODO Potentially cleanup existing namespaces if they are empty after cleanup (and their subnamespaces are also empty)
 };

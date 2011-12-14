@@ -240,7 +240,7 @@ js.array.indexOf = function (theArray, theItem, theFrom) {
 };
 
 js.array.insertAt = function (theArray, theItem, theIndex) {
-    if ( theIndex > -1 && theIndex <= theArray.length ) {
+    if (theIndex > -1 && theIndex <= theArray.length) {
         theArray.splice(theIndex, 0, theItem);
         return true;
     }
@@ -250,31 +250,26 @@ js.array.insertAt = function (theArray, theItem, theIndex) {
 js.array.insertBefore = function (theArray, theItem, theOldItem) {
     var index = js.array.indexOf(theArray, theOldItem);
     if (index === -1) {
-         return false;
+        return false;
     } else if (index === 0) {
         theArray.unshift(theItem);
         return true;
     } else {
-         return js.array.insertAt(theArray, theItem, index);
+        return js.array.insertAt(theArray, theItem, index);
     }
 };
 
 js.array.insertAfter = function (theArray, theItem, theOldItem) {
     var index = js.array.indexOf(theArray, theOldItem);
     if (index === -1) {
-         return false;
+        return false;
     } else if (index === theArray.length - 1) {
         theArray.push(theItem);
         return true;
     } else {
-         return js.array.insertAt(theArray, theItem, index + 1);
+        return js.array.insertAt(theArray, theItem, index + 1);
     }
 };
-
-function indexOf(theArray, theItem, theFrom) {
-    Logger.warning("Y60JSSL :: free function 'indexOf' is deprecated. Use 'js.array.indexOf' instead.");
-    return js.array.indexOf(theArray, theItem, theFrom);
-}
 
 // Does not allow filter functions that mutate the input array!
 js.array.filter = function (theArray, thefilterFunction) {
@@ -282,7 +277,8 @@ js.array.filter = function (theArray, thefilterFunction) {
         throw new TypeError();
     }
     var myResult = [];
-    for (var i = 0; i < theArray.length; i++) {
+    var i;
+    for (i = 0; i < theArray.length; i++) {
         if (thefilterFunction.call(theArray, theArray[i], i, theArray)) {
             myResult.push(theArray[i]);
         }
@@ -292,7 +288,8 @@ js.array.filter = function (theArray, thefilterFunction) {
 
 function stringToByteArray(theString) {
     var myResult = [];
-    for (var i = 0; i < theString.length; ++i) {
+    var i;
+    for (i = 0; i < theString.length; ++i) {
         myResult.push(theString.charCodeAt(i));
     }
     return myResult;
@@ -346,7 +343,8 @@ function asColor(theHexString, theAlpha) {
 function arrayToString(theArray) {
     var myElement;
     var myString = "[";
-    for (var i = 0; i < theArray.length; ++i) {
+    var i;
+    for (i = 0; i < theArray.length; ++i) {
         if (i !== 0) {
             myString += ",";
         }
@@ -366,7 +364,8 @@ function arrayToString(theArray) {
 // returns a precision formated string from a Vector3f list
 function formatVector3f(theVector, thePrecision) {
     var myString = "";
-    for (var i = 0; i < theVector.length; ++i) {
+    var i;
+    for (i = 0; i < theVector.length; ++i) {
         if (i !== 0) {
             myString += ",";
         }
@@ -382,16 +381,14 @@ function formatVector3f(theVector, thePrecision) {
 // returns a precision formated string from a Vector2f list
 function formatVector2f(theVector, thePrecision) {
     var myString = "";
-    for (var i = 0; i < theVector.length; ++i) {
-
+    var i;
+    for (i = 0; i < theVector.length; ++i) {
         if (i !== 0) {
             myString += ",";
         }
-
         myString += "[" + theVector[i].x.toFixed(thePrecision) + ",";
         myString += theVector[i].y.toFixed(thePrecision) + "]";
     }
-
     return myString;
 }
 
@@ -411,7 +408,8 @@ function getOrientationFromDirection(theViewVector, theUpVector) {
 // Returns a string containing all the attributes of element E
 function listAttributes(E) {
     var myResult = ' ';
-    for (var i = 0; i < E.attributes.length; ++i) {
+    var i;
+    for (i = 0; i < E.attributes.length; ++i) {
         myResult += E.attributes[i].nodeName + '="' + E.attributes[i].nodeValue + '" ';
     }
     return myResult;
@@ -419,12 +417,13 @@ function listAttributes(E) {
 
 // Dumps element E with theMaxDepth levels of children using theSpace as base indent
 function dumpElement(E, theSpace, theMaxDepth) {
+    var myId, i;
     if (E) {
         if (E.nodeType === Node.ELEMENT_NODE) {
-            var myId = E.getAttribute('id');
+            myId = E.getAttribute('id');
             print(theSpace + '<' + E.nodeName + listAttributes(E) + '>');
             if (theMaxDepth !== 0) {
-                for (var i = 0; i < E.childNodes.length; ++i) {
+                for (i = 0; i < E.childNodes.length; ++i) {
                     dumpElement(E.childNodes[i], theSpace + '    ', theMaxDepth - 1);
                     //dumpElement(E.childNodes.item(i), theSpace+'    ',theMaxDepth-1);
                 }
@@ -450,6 +449,7 @@ function dumpElementLevels(E, maxDepth) {
 
 // Adjust Node.id (and it's descendants) to be unique
 function adjustNodeId(theNode, theDeepAdjustFlag) {
+    var i;
     if ("id" in theNode) {
         theNode.id = createUniqueId();
     }
@@ -457,7 +457,7 @@ function adjustNodeId(theNode, theDeepAdjustFlag) {
         theDeepAdjustFlag = false; // theDeepAdjustFlag = !!theDeepAdjustFlag
     }
     if (theDeepAdjustFlag) {
-        for (var i = 0; i < theNode.childNodes.length; ++i) {
+        for (i = 0; i < theNode.childNodes.length; ++i) {
             adjustNodeId(theNode.childNodes[i], theDeepAdjustFlag);
         }
     }
@@ -465,154 +465,6 @@ function adjustNodeId(theNode, theDeepAdjustFlag) {
 
 function adjustNodeIds(theNode) {
     adjustNodeId(theNode, true);
-}
-
-//searches for a descendant of theNode (must be in DOM below theNode)
-function getDescendantById(theNode, theId, doDeepSearch) {
-    if (doDeepSearch === undefined || !doDeepSearch) {
-        doDeepSearch = false;
-    }
-    Logger.warning("getDescendantById is deprecated");
-    dumpstack();
-    var myResult = theNode.getNodesByAttribute("", "id",  theId, doDeepSearch);
-    return myResult.length === 0 ? null:myResult[0];
-}
-
-function getDescendantByName(theNode, theName, doDeepSearch) {
-    if (doDeepSearch === undefined || !doDeepSearch) {
-        doDeepSearch = false;
-    }
-    Logger.warning("getDescendantByName is deprecated");
-    dumpstack();
-    var myResult = theNode.getNodesByAttribute("", "name",  theName, doDeepSearch);
-    return myResult.length === 0 ? null:myResult[0];
-}
-
-function getDescendantsByName(theNode, theName, doDeepSearch) {
-    if (doDeepSearch === undefined || !doDeepSearch) {
-        doDeepSearch = false;
-    }
-    Logger.warning("getDescendantsByName is deprecated");
-    dumpstack();
-    var myResult = theNode.getNodesByAttribute("", "name",  theName, doDeepSearch);
-    return myResult;
-}
-
-// Recursivly searches theNode for the first element that has theAttribute.
-// Can search deep or shallow depending on the value of doDeepSearch
-function getDescendantByAttributeName(theNode, theAttribute, doDeepSearch) {
-    if (doDeepSearch === undefined || !doDeepSearch) {
-        doDeepSearch = false;
-    }
-    Logger.warning("getDescendantByAttributeName is deprecated");
-    dumpstack();
-    var myResult = theNode.getNodesByAttribute("", theAttribute, "", doDeepSearch);
-    return myResult.length === 0 ? null:myResult[0];
-}
-
-// Recursivly searches theNode for the first element that has theAttribute with value theValue.
-// Can search deep or shallow depending on the value of doDeepSearch
-function getDescendantByAttribute(theNode, theAttribute, theValue, doDeepSearch) {
-    if (doDeepSearch === undefined || !doDeepSearch) {
-        doDeepSearch = false;
-    }
-    Logger.warning("getDescendantByAttribute is deprecated");
-    dumpstack();
-    var myResult = theNode.getNodesByAttribute("", theAttribute, theValue, doDeepSearch);
-    return myResult.length === 0 ? null:myResult[0];
-}
-
-// Recursivly searches theNode for all elements that have theAttribute with value theValue.
-// Can search deep or shallow depending on the value of doDeepSearch
-function getDescendantsByAttribute(theNode, theAttribute, theValue, doDeepSearch) {
-    if (doDeepSearch === undefined || !doDeepSearch) {
-        doDeepSearch = false;
-    }
-    Logger.warning("getDescendantsByAttribute is deprecated");
-    dumpstack();
-    var myResult = theNode.getNodesByAttribute("", theAttribute, theValue, doDeepSearch);
-    return myResult;
-}
-
-function getDescendantsByAttributeName(theNode, theAttribute, doDeepSearch) {
-    if (doDeepSearch === undefined || !doDeepSearch) {
-        doDeepSearch = false;
-    }
-    Logger.warning("getDescendantsByAttributeName is deprecated");
-    dumpstack();
-    var myResult = theNode.getNodesByAttribute("", theAttribute, "", doDeepSearch);
-    return myResult;
-}
-
-// Recursivly search for the first element by tagname
-function getDescendantByTagName(theNode, theTagName, doDeepSearch) {
-    if (doDeepSearch === undefined || !doDeepSearch) {
-        doDeepSearch = false;
-    }
-    Logger.warning("getDescendantByTagName is deprecated");
-    dumpstack();
-    var myResult = theNode.getNodesByTagName(theTagName, doDeepSearch);
-    return myResult.length === 0 ? null:myResult[0];
-}
-
-// Recursivly search for all elements by tagname
-function getDescendantsByTagName(theNode, theTagName, doDeepSearch) {
-    if (doDeepSearch === undefined || !doDeepSearch) {
-        doDeepSearch = false;
-    }
-    Logger.warning("getDescendantsByTagName is deprecated");
-    dumpstack();
-    var myResult = theNode.getNodesByTagName(theTagName, doDeepSearch);
-    return myResult;
-}
-
-function getChildElementNodes(theNode, theFilterOperation, theFilterNodeName) {
-    Logger.warning("getChildElementNodes is deprecated");
-    dumpstack();
-    var myChildElementNodes = [];
-    var i;
-
-    try {
-        if (theNode) {
-            for (var n = 0; n < theNode.childNodes.length; n++) {
-                if (theNode.childNodes[n].nodeType === Node.ELEMENT_NODE) {
-                    switch (theFilterOperation) {
-                    case 'ignore':
-                        if (theFilterNodeName !== theNode.childNodes[n].nodeName) {
-                            myChildElementNodes.push(theNode.childNodes[n]);
-                        }
-                        break;
-                    case 'match':
-                        if (theFilterNodeName === theNode.childNodes[n].nodeName) {
-                            myChildElementNodes.push(theNode.childNodes[n]);
-                        }
-                        break;
-                    case 'ignore-list':
-                        for (i = 0; i < theFilterNodeName.length; i++) {
-                            if (theFilterNodeName[i] !== theNode.childNodes[n].nodeName) {
-                                myChildElementNodes.push(theNode.childNodes[n]);
-                            }
-                        }
-                        break;
-                    case 'match-list':
-                        for (i = 0; i < theFilterNodeName.length; i++) {
-                            if (theFilterNodeName[i] === theNode.childNodes[n].nodeName) {
-                                myChildElementNodes.push(theNode.childNodes[n]);
-                            }
-                        }
-                        break;
-                    //case '':
-                    default:
-                        myChildElementNodes.push(theNode.childNodes[n]);
-                    }
-                }
-            }
-        }
-    } catch (ex) {
-        print('Exception in getChildElementNodes(' + theNode + ', ' + theFilterOperation + ', ' + theFilterNodeName + '):\n' + ex);
-    }
-
-    return myChildElementNodes;
 }
 
 function findNodeByNameChecked(theRootNode, theName) {
@@ -651,7 +503,8 @@ function removeAttributeByName(theNode, theAttributeName) {
 function removeAllAttributes(theNode) {
     var myCopyNode   = Node.createElement(theNode.nodeName);
     var myChildNodesLength = theNode.childNodesLength();
-    for (var j = myChildNodesLength - 1; j >= 0; --j) {
+    var j;
+    for (j = myChildNodesLength - 1; j >= 0; --j) {
         myCopyNode.appendChild(theNode.childNode(j));
     }
     var myParentNode = theNode.parentNode;
@@ -705,7 +558,7 @@ js.date.getTimestamp = function () {
         ((myHour  < 10) ? "0" : "") + myHour  + "_" +
         ((myMin   < 10) ? "0" : "") + myMin   + "_" +
         ((mySec   < 10) ? "0" : "") + mySec;
-}
+};
 
 function getTimestamp() {
     Logger.warning("Y60JSSL :: free function 'getTimestamp' is deprecated. Use 'js.date.getTimestamp' instead.");
@@ -749,7 +602,8 @@ function numToHex(theNum, theDigitCount) {
 
 function countNodes(theNode) {
     var myCount = 1;
-    for (var i = 0; i < theNode.childNodes.length; ++i) {
+    var i;
+    for (i = 0; i < theNode.childNodes.length; ++i) {
         myCount += countNodes(theNode.childNode(i));
     }
     return myCount;
@@ -1076,7 +930,8 @@ function stringRankedFeature(theRankedFeature) {
     }
 
     var myString = theRankedFeature.rank + "[";
-    for (var i = 0; i < theRankedFeature.features.length; ++i) {
+    var i;
+    for (i = 0; i < theRankedFeature.features.length; ++i) {
         if (i > 0) {
             myString += ",";
         }
@@ -1111,7 +966,8 @@ function stringVectorOfRankedFeature(theVectorOfRankedFeature) {
     }
 
     var myString = "[";
-    for (var i = 0; i < theVectorOfRankedFeature.length; ++i) {
+    var i;
+    for (i = 0; i < theVectorOfRankedFeature.length; ++i) {
         myString += stringRankedFeature(theVectorOfRankedFeature[i]);
     }
     myString += "]";
@@ -1121,8 +977,9 @@ function stringVectorOfRankedFeature(theVectorOfRankedFeature) {
 
 function parseVectorOfRankedFeature(theVectorOfString) {
     var myVectorOfRankedFeature = [];
-    for (var i = 0; i < theVectorOfString.length; ++i) {
-        var myRankedFeature = theVectorOfString[i];
+    var i, myRankedFeature;
+    for (i = 0; i < theVectorOfString.length; ++i) {
+        myRankedFeature = theVectorOfString[i];
         myVectorOfRankedFeature.push(parseRankedFeature(myRankedFeature));
     }
     return myVectorOfRankedFeature;
@@ -1141,7 +998,8 @@ function stripIdentifier(theIdentifier) {
 
 function convertNewLine(theString) {
     // XXX can this not be done simpler?
-    for (var i = 0; i < theString.length; i++) {
+    var i;
+    for (i = 0; i < theString.length; i++) {
         if (theString[i] === "\\") {
             if (i + 1 < theString.length) {
                 if (theString[i + 1] === "n") {
@@ -1155,13 +1013,15 @@ function convertNewLine(theString) {
 }
 
 function preloadImages() {
-    for (var i = 0; i < window.scene.images.childNodes.length; i++) {
+    var i;
+    for (i = 0; i < window.scene.images.childNodes.length; i++) {
         preLoad(window.scene.images.childNode(i));
     }
 }
 
 function preloadTextures() {
-    for (var i = 0; i < window.scene.textures.childNodes.length; i++) {
+    var i;
+    for (i = 0; i < window.scene.textures.childNodes.length; i++) {
         preLoad(window.scene.textures.childNode(i));
     }
 }
@@ -1222,11 +1082,30 @@ function attachTo(theNode, theNewParent) {
     theNode.scale = myDecomposition.scale;
 }
 
-utils.getCameraDistanceFromScreenLength = function (theScreenLength, theHFov){
+utils.getCameraDistanceFromScreenLength = function (theScreenLength, theHFov) {
     var myAlpha = radFromDeg(theHFov / 2);
     var myDistance = 0.5 * theScreenLength / Math.abs(Math.tan(myAlpha));
     return myDistance;
-}
+};
+
+utils.dom.bindNodeValue = function (theSubscribingNode,
+                                    theSubscribingAttributeName,
+                                    theObservedNode,
+                                    theObservedAttributeName,
+                                    theCallback) {
+    if (theSubscribingAttributeName &&
+        theObservedAttributeName && theObservedNode &&
+        theCallback && typeof(theCallback) === 'function') {
+        var temp = theSubscribingNode[theSubscribingAttributeName]; // workaround! Don't remove - Forces Serialization
+        var mySubscribingAttrNode = theSubscribingNode.attributes.getNamedItem(theSubscribingAttributeName);
+        mySubscribingAttrNode.onReconnect = function () {
+            this.nodeValueDependsOn(theObservedNode.attributes.getNamedItem(theObservedAttributeName));
+        };
+        mySubscribingAttrNode.onOutdatedValue = function () {
+            theCallback(this);
+        };
+    }
+};
 
 utils.dom.mergeNodes = function (theTargetNode, theSourceNode) {
 
@@ -1346,5 +1225,3 @@ utils.dom.mergeNodes = function (theTargetNode, theSourceNode) {
     _adjustIds(theSourceNode);
     return _cloneToTarget(theTargetNode, theSourceNode);
 };
-
-

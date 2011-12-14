@@ -56,74 +56,76 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+/*jslint nomen:false*/
+/*globals GUI, Quaternionf, Vector3f*/
+
 /**
  * Rotate an object using degrees as unit, normalizing the set angles.
  */
-GUI.QuaternionAnimation = function(theDuration, theEasing, theObject, theProperty, theStart, theEnd) {
+GUI.QuaternionAnimation = function (theDuration, theEasing, theObject, theProperty, theStart, theEnd) {
     this.Constructor(this, {}, theDuration, theEasing, theObject, theProperty, theStart, theEnd);
-}
+};
 
-GUI.QuaternionAnimation.prototype.Constructor = function(Public, Protected, theDuration, theEasing,
+GUI.QuaternionAnimation.prototype.__proto__ = GUI.SimpleAnimation.prototype;
+GUI.QuaternionAnimation.prototype.Constructor = function (Public, Protected, theDuration, theEasing,
                                                        theObject, theProperty, theStart, theEnd) {
     var Base = {};
+    var _ = {};
+    
+    GUI.SimpleAnimation.Constructor(Public, Protected);
 
-    GUI.SimpleAnimation.Constructor.call(Public, Public, Protected);
+    /////////////////////
+    // Private Members //
+    /////////////////////
 
-    ////////////////////////////////////////
-    // Member
-    ////////////////////////////////////////
+    _.object = theObject;
+    _.property = "";
+    _.start = 0;
+    _.end = Quaternionf.createFromEuler(new Vector3f(0, 0, 0));
 
-    var _object = theObject;
-    var _property = "";
-    var _start = 0;
-    var _end = Quaternionf.createFromEuler(new Vector3f(0,0,0));
-
-    Public.__defineGetter__("object", function() {
-        return _object;
-    });
-
-    Public.__defineGetter__("property", function() {
-        return _property;
-    });
-
-    Public.__defineGetter__("start", function() {
-        return _start;
-    });
-
-    Public.__defineGetter__("end", function() {
-        return _end;
-    });
-
-    ////////////////////////////////////////
-    // Public
-    ////////////////////////////////////////
+    ////////////////////
+    // Public Methods //
+    ////////////////////
 
     // initialize from arguments
-    Public.setup = function() {
+    Public.setup = function () {
         Protected.duration = theDuration;
-
-        if(theEasing != null) {
+        if (theEasing) {
             Public.easing = theEasing;
         }
-
-        _object = theObject;
-        _property = theProperty;
-        _start = new Quaternionf(theStart); // take a copy, just in case the user
+        _.object = theObject;
+        _.property = theProperty;
+        _.start = new Quaternionf(theStart); // take a copy, just in case the user
                                             // supplied a refernce? [DS]
-        _end = theEnd;
+        _.end = theEnd;
     };
 
     // set the current value
     Base.render = Public.render;
-    Public.render = function() {
-        var myValue = Quaternionf.slerp(_start, _end, Public.progress);
-        _object[_property] = myValue;
+    Public.render = function () {
+        var myValue = Quaternionf.slerp(_.start, _.end, Public.progress);
+        _.object[_.property] = myValue;
     };
 
-    Public.toString = function() {
-        return Protected.standardToString("QuaternionAnimation" + " on "  + _object.name + "." + _property);
+    Public.toString = function () {
+        return Protected.standardToString("QuaternionAnimation" + " on "  + _.object.name + "." + _.property);
     };
+
+    Public.__defineGetter__("object", function () {
+        return _.object;
+    });
+
+    Public.__defineGetter__("property", function () {
+        return _.property;
+    });
+
+    Public.__defineGetter__("start", function () {
+        return _.start;
+    });
+
+    Public.__defineGetter__("end", function () {
+        return _.end;
+    });
 
     Public.setup();
 };
-

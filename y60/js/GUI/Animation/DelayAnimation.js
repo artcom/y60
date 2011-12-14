@@ -56,34 +56,36 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+/*jslint nomen:false*/
+/*globals GUI*/
 /**
  * Does nothing for the time of the animation
  */
-GUI.DelayAnimation = function(theDuration) {
+GUI.DelayAnimation = function (theDuration) {
     this.Constructor(this, {}, theDuration);
-}
+};
 
-GUI.DelayAnimation.prototype.Constructor = function(Public, Protected, theDuration) {
+GUI.DelayAnimation.prototype.__proto__ = GUI.SimpleAnimation.prototype;
+GUI.DelayAnimation.prototype.Constructor = function (Public, Protected, theDuration) {
     var Base = {};
 
-    GUI.SimpleAnimation.Constructor.call(Public, Public, Protected);
+    GUI.SimpleAnimation.Constructor(Public, Protected);
 
-    ////////////////////////////////////////
-    // Public
-    ////////////////////////////////////////
+    ////////////////////
+    // Public Methods //
+    ////////////////////
 
     // initialize from arguments
-    Public.setup = function() {
+    Public.setup = function () {
         Protected.duration = theDuration;
     };
 
     // does noting
     Base.render = Public.render;
-    Public.render = function() {
-
+    Public.render = function () {
     };
 
-    Public.toString = function() {
+    Public.toString = function () {
         return Protected.standardToString("DelayAnimation");
     };
 
