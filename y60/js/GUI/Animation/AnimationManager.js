@@ -86,7 +86,7 @@ GUI.AnimationManager.prototype.Constructor = function (Public, Protected) {
     };
     
     _.Namespace.prototype.toString = function () {
-        return "Namespace with name: '" + this.name + "' - animations: " + this.animations.length; //'[" + this.animations.join(",") + "]'";
+        return "Namespace with name: '" + this.name + "' - animations: " + this.animations.length; //'[" + this.animations.join(", ") + "]'";
     };
     
     _.Namespace.prototype.forEachNamespaceDo = function (theFunction) {
@@ -96,6 +96,17 @@ GUI.AnimationManager.prototype.Constructor = function (Public, Protected) {
             this.subNamespaces[subNamespace].forEachNamespaceDo(theFunction);
         }
     };
+    
+    _.Namespace.prototype.__defineGetter__("hasAnimations", function () {
+        var hasAnimations = false;
+        this.forEachNamespaceDo(function (theNamespace) {
+            if (theNamespace.animations.length > 0) {
+                hasAnimations = true;
+            }
+        });
+        
+        return hasAnimations;
+    });
     
     /////////////////////
     // Private Members //
@@ -213,10 +224,57 @@ GUI.AnimationManager.prototype.Constructor = function (Public, Protected) {
         return animationsCount;
     });
     
-    // TODO: Add useful Public interfaces using namespaces
-    //    * Cancelling all Animations (with bubbling) for a namespace (and all its subnamespaces)
-    //    * Retrieve all Animations for a given namespace.
-    //    * Query useful stuff for all animations of a given namespace (e.g. if any animation for a given namespace is playing)
+    // Additional Public Interface for performing tasks on animations via namespaces.
+    
+    Public.getAllAnimationsForNamespace = function (theNamespaceString) {
+        var myNamespace = Public.getNamespace(theNamespaceString);
+        if (myNamespace) {
+            return myNamespace.animations;
+        } else {
+            Logger.warning("<AnimationManager::getAllAnimationsForNamespace> Namespace '" + theNamespaceString + "' does not exist - returning empty array.");
+            return [];
+        }
+    };
+    
+    Public.cancelAllAnimationsForNamespace = function (theNamespaceString) {
+        Logger.info("<AnimationManager::cancelAllAnimationsForNamespace> Cancelling all animations for namespace: '" + theNamespaceString + "'");
+        var myNamespace = Public.getNamespace(theNamespaceString);
+        var animationsCancelled = 0;
+        if (myNamespace) {
+            myNamespace.forEachNamespaceDo(function (theNamespace) {
+                var myAnimation, i;
+                for (i = 0; i < theNamespace.animations.length; i++) {
+                    theNamespace.animations[i].cancel();
+                    animationsCancelled += 1;
+                }
+            });
+        } else {
+            Logger.warning("<AnimationManager::cancelAllAnimationsForNamespace> Namespace '" + theNamespaceString + "' does not exist.");
+        }
+        return animationsCancelled;
+    };
+    
+    Public.getNamespace = function (theNamespaceString) {
+        var myNamespaceSegments = theNamespaceString.split(".");
+        if (myNamespaceSegments.length > 0 &&
+            !(myNamespaceSegments[0] in _.namespaces)) {
+            return null;
+        }
+        var i;
+        var currentNamespace = _.namespaces[myNamespaceSegments[0]];
+        if (myNamespaceSegments.length > 1) {
+            for (i = 1; i < myNamespaceSegments.length; i++) {
+                if (myNamespaceSegments[i] in currentNamespace.subNamespaces) {
+                    currentNamespace = currentNamespace.subNamespaces[myNamespaceSegments[i]];
+                } else {
+                    currentNamespace = null;
+                    return currentNamespace;
+                }
+            }
+        }
+        
+        return currentNamespace;
+    };
     
     // TODO Potentially cleanup existing namespaces if they are empty after cleanup (and their subnamespaces are also empty)
 };
