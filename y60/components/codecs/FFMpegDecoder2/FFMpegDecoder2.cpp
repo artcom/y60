@@ -228,7 +228,7 @@ namespace y60 {
                     _myAStreamIndexDom = myAudioStreamIndex;
                 }
                 _myAllAudioStreamIndicies.push_back(i);
-                _myDemux->enableStream(i);
+                //_myDemux->enableStream(i);
                 AVCodecContext * myACodec = _myFormatContext->streams[i]->codec;
                 // open codec
                 AVCodec * myCodec = avcodec_find_decoder(myACodec->codec_id);
@@ -316,14 +316,14 @@ namespace y60 {
         }
         _myLastVideoFrame = VideoMsgPtr();
 
+        _myDemux->join();
+        _myDemux->start();
         if (!isActive()) {
             if (shouldSeek(myCurrentTime, theStartTime) || _myMsgQueue.hasEOF()) {
-                _myDemux->stop();
                 _myMsgQueue.clear();
                 _myMsgQueue.reset();
                 //doSeek(theStartTime);
                 _myDemux->seek(theStartTime);
-                _myDemux->start();
                 if (theStartAudioFlag && hasAudio() && getDecodeAudioFlag()) {
                     _myAdjustAudioOffsetFlag = true;
                 }
@@ -347,12 +347,10 @@ namespace y60 {
             }
             if (_myMsgQueue.size() == 0) {
                 if(!decodeFrame() || myAudioEOFFlag) {
-                    _myDemux->stop();
                     _myMsgQueue.clear();
                     _myMsgQueue.reset();
                     _myDemux->seek(theStartTime);
                     //doSeek(theStartTime);
-                    _myDemux->start();
                     if (theStartAudioFlag && hasAudio() && getDecodeAudioFlag()) {
                         _myAdjustAudioOffsetFlag = true;
                     }
@@ -835,6 +833,10 @@ namespace y60 {
                     //}
                     if (myVideoMsg->getType() == VideoMsg::MSG_EOF) {
                         setEOF(true);
+                        double myTimestamp = myVideoMsg->getTime();
+                        AC_DEBUG << "readFrame: setEOF FrameTime=" << myTimestamp << ", Calculated frame #="
+                        << (myTimestamp - (_myVideoStartTimestamp/_myVideoStreamTimeBase))*_myFrameRate
+                        << ", Cache size=" << _myMsgQueue.size();
                         return theTime;
                     }
                     double myTimestamp = myVideoMsg->getTime();
@@ -1227,13 +1229,13 @@ namespace y60 {
             }
         }
 
-        _myDemux->stop();
+        //_myDemux->stop();
         _myMsgQueue.clear();
         _myMsgQueue.reset();
 
         //doSeek(theDestTime);
         _myDemux->seek(theDestTime);
-        _myDemux->start();
+        //_myDemux->start();
         _myLastVideoFrame = VideoMsgPtr();
         if (hasAudio() && getDecodeAudioFlag()) {
             if (getState() == RUN) {
