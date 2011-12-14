@@ -67,21 +67,6 @@ var ourCurrentAnimationTime = -1;
  * Instantiate yourself one and call its
  * doFrame() method on every frame.
  */
- 
-// TODO introduce namespaced animatons
-/*
-The idea here is that animations is not just a flat array but a deep object
-with namespace names as the keys.
-Per default a namespace 'default' is provided.
-The AnimationManager then supports cancelling animation within a namespace.
-Namespace can be nested and nested member animations would be cancelled then as well.
-Namespace format is '<namespace_1>.<childnamespace>'
-A Namespace can contain any number of child namespaces.
-Namespaces are provided as String.
-
-Also querying would then be interesting.
-*/
-
 GUI.AnimationManager = function () {
     this.Constructor(this, {});
 };
@@ -159,24 +144,30 @@ GUI.AnimationManager.prototype.Constructor = function (Public, Protected) {
             Logger.warning("<AnimationManager::play> Animation given (" + theAnimation + ") is not derived from GUI.Animation -> ABORTING");
             return;
         }
+        if (theAnimation.running) {
+            Logger.warning("<AnimationManager::play> The animation '" + theAnimation + "' is already playing (potentially in the context of another AnimationManager) -> ABORTING");
+            return;
+        }
         theNamespace = theNamespace || 'default';
-        Logger.info("<AnimationManager::play> playing '" + theAnimation + "' in namespace: '" + theNamespace + "'");
         
         var myNamespace = _.prepareNamespace(theNamespace);
-        
         var namespace;
         var isAlreadyPlaying = false;
+        
+        var checkIsAlreadyPlayingFunc = function (theCurrentNamespace) {
+            if (js.array.indexOf(theCurrentNamespace.animations, theAnimation) > -1) {
+                Logger.warning("<AnimationManager::play> The animation: '" + theAnimation + "' is already playing in namespace: '" + theCurrentNamespace + "'");
+                isAlreadyPlaying = true;
+            }
+        };
+        
         for (namespace in _.namespaces) {
-            _.namespaces[namespace].forEachNamespaceDo(function (theCurrentNamespace) {
-                if (js.array.indexOf(theCurrentNamespace.animations, theAnimation) > -1) {
-                    Logger.warning("Animation: '" + theAnimation + "' is already playing in namespace: '" + theCurrentNamespace + "'");
-                    isAlreadyPlaying = true;
-                }
-            });
+            _.namespaces[namespace].forEachNamespaceDo(checkIsAlreadyPlayingFunc);
             if (isAlreadyPlaying) {
                 return;
             }
         }
+        Logger.info("<AnimationManager::play> playing '" + theAnimation + "' in namespace: '" + theNamespace + "'");
         myNamespace.animations.push(theAnimation);
         theAnimation.play();
     };
@@ -187,31 +178,37 @@ GUI.AnimationManager.prototype.Constructor = function (Public, Protected) {
     
     Public.doFrame = function (theTime) {
         ourCurrentAnimationTime = theTime * 1000;
+        
+        var onFramePerNamespaceFunc = function (theNamespace) {
+            var myAnimation, i;
+            for (i = 0; i < theNamespace.animations.length; i++) {
+                myAnimation = theNamespace.animations[i];
+                if (myAnimation.running) {
+                    myAnimation.doFrame(theTime * 1000);
+                } else {
+                    Logger.info("<AnimationManager::doFrame> removing animation '" + myAnimation + "' from namespace: '" + theNamespace + "' since it is done playing!");
+                    theNamespace.animations.splice(i, 1);
+                    i--; // We mutate the array as we walk it and have to mitigate this.
+                }
+            }
+        };
+        
         var namespace;
         for (namespace in _.namespaces) {
-            _.namespaces[namespace].forEachNamespaceDo(function(theNamespace) {
-                var myAnimation, i;
-                for (i = 0; i < theNamespace.animations.length; i++) {
-                    myAnimation = theNamespace.animations[i];
-                    if (myAnimation.running) {
-                        myAnimation.doFrame(theTime * 1000);
-                    } else {
-                        Logger.info("<AnimationManager::doFrame> removing animation '" + myAnimation + "' from namespace: '" + theNamespace + "' since it is done playing!");
-                        theNamespace.animations.splice(i, 1);
-                        i--;
-                    }
-                }
-            });
+            _.namespaces[namespace].forEachNamespaceDo(onFramePerNamespaceFunc);
         }
     };
     
     Public.__defineGetter__("animationCount", function () {
         var namespace;
         var animationsCount = 0;
+        
+        var animationCountingFunc = function (theNamespace) {
+            animationsCount += theNamespace.animations.length;
+        };
+        
         for (namespace in _.namespaces) {
-            _.namespaces[namespace].forEachNamespaceDo(function(theNamespace) {
-                animationsCount += theNamespace.animations.length;
-            });
+            _.namespaces[namespace].forEachNamespaceDo(animationCountingFunc);
         }
         return animationsCount;
     });
