@@ -81,7 +81,6 @@ namespace http {
     struct JSCallback {
         JSContext*  context;
         JSObject*   object;
-        JSFunction* function;
         jsval functionValue;
         std::string contentType;
     };
@@ -90,27 +89,50 @@ namespace http {
 
         public:
             /// creates a new HttpServer
-            Server();
+            Server(JSContext * cx);
             bool start( std::string theServerAddress,  std::string theServerPort );
             virtual ~Server();
 
             void close();
 
-            void registerCallback( const std::string & theUri, const JSCallback & myCallback )
+            void registerCallback(JSObject * theJSHttpServer, const std::string & theUri, JSCallback & myCallback )
             {
-                if (_myCallbacks.find(theUri) != _myCallbacks.end()) {
-                    // the old callback can now be garbage collected
-                    JS_RemoveRoot( _myCallbacks[theUri].context, &(_myCallbacks[theUri].functionValue));
+
+                // we protect the callbacks (which are JS Function objects) from the GC
+                // by adding them as properties to a Function-Container object. This object is then attached 
+                // as a property to the JSHttpServer wrapper object.
+                // This will ensure that the callbacks are not GC'ed while the server still exists.
+                jsval funcContainerProp;
+               
+                // get the 'callback' property if it already exists
+                JS_GetProperty(_jsContext, theJSHttpServer, "callbacks", &funcContainerProp);
+
+                if (JSVAL_IS_VOID(funcContainerProp)) { // property doesn't exists yet - create it
+                    JSObject * funcContainerObject = JS_NewObject(_jsContext, 0,0,0);
+                    funcContainerProp = OBJECT_TO_JSVAL(funcContainerObject);
+
+                    // now add it as a property to the wrapper
+                    JS_SetProperty(_jsContext, theJSHttpServer, "callbacks", &funcContainerProp);
                 }
+                // now store the function object as a property of the callback object
+                JS_SetProperty(_jsContext, JSVAL_TO_OBJECT(funcContainerProp), theUri.c_str(), &myCallback.functionValue);
+
+                // now add the callback to our internal map
                 _myCallbacks[theUri] = myCallback;
-                // root callback value to prevent garbage collection of anonymous callback functions
-                JS_AddRoot( _myCallbacks[theUri].context, &(_myCallbacks[theUri].functionValue));
             }
 
-            void unregisterCallback( std::string theUri )
+            void unregisterCallback( JSObject * theJSHttpServer, std::string theUri )
             {
+                // remove the callback from our javascript Function-Container object,
+                // so that it can be GC'ed
+                jsval funcContainerProp;
+                JS_GetProperty(_jsContext, theJSHttpServer, "callbacks", &funcContainerProp);
+                if (JSVAL_IS_OBJECT(funcContainerProp)) {
+                    JS_DeleteProperty(_jsContext, JSVAL_TO_OBJECT(funcContainerProp), theUri.c_str());
+                }
+
+                // remove the callback from our internal map
                 if (_myCallbacks.find(theUri) != _myCallbacks.end()) {
-                    JS_RemoveRoot( _myCallbacks[theUri].context, &(_myCallbacks[theUri].functionValue));
                     _myCallbacks.erase( theUri );
                 }
             }
@@ -119,26 +141,28 @@ namespace http {
             bool requestsPending();
 
         private:
+            Server(); // disbale default CTOR
     
             void invokeCallback(const JSCallback & theCallback, 
                                             const request & theRequest, reply & theReply); 
 
+            JSContext * _jsContext;
             std::map<std::string, JSCallback> _myCallbacks;
 
             // this queue is the communication between the two threads
             ConcurrentQueue<request>          _myRequestQueue;
 
-        /*
-         * the following members run in the async's io_server thread
-         */
+            /*
+             * the following members run in the async's io_server thread
+             */
 
-        /// Handle completion of an asynchronous accept operation.
-        void handle_accept(const boost::system::error_code& e);
-        /// Acceptor used to listen for incoming connections.
-        boost::asio::ip::tcp::acceptor acceptor_;
+            /// Handle completion of an asynchronous accept operation.
+            void handle_accept(const boost::system::error_code& e);
+            /// Acceptor used to listen for incoming connections.
+            boost::asio::ip::tcp::acceptor acceptor_;
 
-        /// The next connection to be accepted.
-        connection_ptr new_connection_;
+            /// The next connection to be accepted.
+            connection_ptr new_connection_;
     };
 
 } // http

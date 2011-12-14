@@ -1889,10 +1889,10 @@ JSApp::run(const std::string & theScriptFilename,
         result = processArguments(ourJSContext, glob, ourTopScriptFilename, theIncludePath, theScriptArgs);
 
         JS_ClearScope(ourJSContext, glob);
+        ourLoadedPlugIns.clear();
         JS_GC(ourJSContext);
         JS_DestroyContext(ourJSContext);
         JS_DestroyRuntime(rt);
-        ourLoadedPlugIns.clear();
     } catch (const asl::Exception & e) {
         AC_ERROR << "Unhandled asl::Exception: " << e << endl;
     } catch (const std::exception & e) {

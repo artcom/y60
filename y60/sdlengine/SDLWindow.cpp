@@ -337,9 +337,10 @@ SDLWindow::updateVideoMode() {
     }
     // reinit all extensions, because since the context is reset all opengl bound stuff is invalid
     for (ExtensionList::iterator it = _myExtensions.begin(); it != _myExtensions.end(); ++it) {
-        std::string myName = (*it)->getName() + "::onStartup";
+        IRendererExtensionPtr curExtension(it->lock());
+        std::string myName = curExtension->getName() + "::onStartup";
         try {
-            (*it)->onStartup(this);
+            curExtension->onStartup(this);
         } catch (const asl::Exception & ex) {
             AC_ERROR << "Exception while calling " << myName << ": " << ex;
         } catch (...) {
