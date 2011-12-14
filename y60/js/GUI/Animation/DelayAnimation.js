@@ -65,7 +65,7 @@ GUI.DelayAnimation = function (theDuration) {
     this.Constructor(this, {}, theDuration);
 };
 
-GUI.ClosureAnimation.prototype.__proto__ = GUI.SimpleAnimation.prototype;
+GUI.DelayAnimation.prototype.__proto__ = GUI.SimpleAnimation.prototype;
 GUI.DelayAnimation.prototype.Constructor = function (Public, Protected, theDuration) {
     var Base = {};
 
