@@ -89,59 +89,130 @@ GUI.AnimationManager = function () {
 GUI.AnimationManager.prototype.Constructor = function (Public, Protected) {
     var _ = {};
     
+    ///////////////////
+    // Inner Classes //
+    ///////////////////
+    
+    _.Namespace = function Namespace(theName, theParent) {
+        this.name = theName;
+        this.parent = theParent;
+        this.animations = [];
+        this.subNamespaces = {};
+    };
+    
+    _.Namespace.prototype.toString = function () {
+        return "Namespace with name: '" + this.name + "' - animations: " + this.animations.length; //'[" + this.animations.join(",") + "]'";
+    };
+    
+    _.Namespace.prototype.forEachNamespaceDo = function (theFunction) {
+        var subNamespace;
+        theFunction(this);
+        for (subNamespace in this.subNamespaces) {
+            this.subNamespaces[subNamespace].forEachNamespaceDo(theFunction);
+        }
+    };
+    
     /////////////////////
     // Private Members //
     /////////////////////
 
-    _.animations = [];
+    _.namespaces = {
+        'default' : new _.Namespace("default", null)
+    };
 
     /////////////////////
     // Private Methods //
     /////////////////////
-
-    _.removeFinished = function () {
-        var myAnimation, i;
-        for (i = 0; i < _.animations.length; i++) {
-            myAnimation = _.animations[i];
-            if (!myAnimation.running) {
-                _.animations.splice(i, 1);
+    
+    _.getNamespaceParts = function (theNamespace) {
+        if (theNamespace.parent !== null) {
+            return _.getNamespaceParts(theNamespace.parent) + "." + theNamespace.name;
+        } else {
+            return theNamespace.name;
+        }
+    };
+    
+    _.prepareNamespace = function (theNamespace) {
+        var myNamespaceSegments = theNamespace.split(".");
+        if (myNamespaceSegments.length > 0 &&
+            !(myNamespaceSegments[0] in _.namespaces)) {
+            _.namespaces[myNamespaceSegments[0]] = new _.Namespace(myNamespaceSegments[0], null);
+        }
+        
+        var i;
+        var currentNamespace = _.namespaces[myNamespaceSegments[0]];
+        if (myNamespaceSegments.length > 1) {
+            for (i = 1; i < myNamespaceSegments.length; i++) {
+                currentNamespace.subNamespaces[myNamespaceSegments[i]] = new _.Namespace(myNamespaceSegments[i], currentNamespace);
+                currentNamespace = currentNamespace.subNamespaces[myNamespaceSegments[i]];
             }
         }
+        return currentNamespace;
     };
     
     ////////////////////
     // Public Methods //
     ////////////////////
 
-    Public.play = function (theAnimation) { /* theNamespace */
+    Public.play = function (theAnimation, theNamespace) {
         if (!(theAnimation instanceof GUI.Animation)) {
             Logger.warning("<AnimationManager::play> Animation given (" + theAnimation + ") is not derived from GUI.Animation -> ABORTING");
             return;
         }
-        Logger.info("<AnimationManager::play> playing '" + theAnimation + "'");
-        if (js.array.indexOf(_.animations, theAnimation) < 0) {
-            _.animations.push(theAnimation);
+        theNamespace = theNamespace || 'default';
+        Logger.info("<AnimationManager::play> playing '" + theAnimation + "' in namespace: '" + theNamespace + "'");
+        
+        var myNamespace = _.prepareNamespace(theNamespace);
+        
+        var namespace;
+        var isAlreadyPlaying = false;
+        for (namespace in _.namespaces) {
+            _.namespaces[namespace].forEachNamespaceDo(function (theCurrentNamespace) {
+                if (js.array.indexOf(theCurrentNamespace.animations, theAnimation) > -1) {
+                    Logger.warning("Animation: '" + theAnimation + "' is already playing in namespace: '" + theCurrentNamespace + "'");
+                    isAlreadyPlaying = true;
+                }
+            });
+            if (isAlreadyPlaying) {
+                return;
+            }
         }
+        myNamespace.animations.push(theAnimation);
         theAnimation.play();
     };
 
     Public.isPlaying = function () {
-        return _.animations.length > 0;
+        return Public.animationCount > 0;
     };
     
     Public.doFrame = function (theTime) {
-        var myAnimation, i;
         ourCurrentAnimationTime = theTime * 1000;
-        for (i = 0; i < _.animations.length; i++) {
-            myAnimation = _.animations[i];
-            if (myAnimation.running) {
-                myAnimation.doFrame(theTime * 1000);
-            }
+        var namespace;
+        for (namespace in _.namespaces) {
+            _.namespaces[namespace].forEachNamespaceDo(function(theNamespace) {
+                var myAnimation, i;
+                for (i = 0; i < theNamespace.animations.length; i++) {
+                    myAnimation = theNamespace.animations[i];
+                    if (myAnimation.running) {
+                        myAnimation.doFrame(theTime * 1000);
+                    } else {
+                        Logger.info("<AnimationManager::doFrame> removing animation '" + myAnimation + "' from namespace: '" + theNamespace + "' since it is done playing!");
+                        theNamespace.animations.splice(i, 1);
+                        i--;
+                    }
+                }
+            });
         }
-        _.removeFinished();
     };
     
     Public.__defineGetter__("animationCount", function () {
-        return _.animations.length;
+        var namespace;
+        var animationsCount = 0;
+        for (namespace in _.namespaces) {
+            _.namespaces[namespace].forEachNamespaceDo(function(theNamespace) {
+                animationsCount += theNamespace.animations.length;
+            });
+        }
+        return animationsCount;
     });
 };
