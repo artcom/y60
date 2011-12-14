@@ -35,6 +35,7 @@ AsyncDemuxer::stop() {
 }
 void
 AsyncDemuxer::start() {
+    AC_DEBUG << "AsyncDemuxer::start forking new thread";
     _myDemuxThread = DemuxThreadPtr(new boost::thread( boost::bind( &AsyncDemuxer::run, this)));
 }
 
@@ -152,30 +153,9 @@ AsyncDemuxer::clearPacketCache(const int theStreamIndex) {
 void
 AsyncDemuxer::seek(double theDestTime) {
     AC_DEBUG<<"AsyncDemuxer::seek to "<<theDestTime;
-    {
-        boost::mutex::scoped_lock lock(_myMutex);
-        _isSeeking = true;
-        _myCondition.notify_one();
-    }
 
     for (std::map<int, PacketQueuePtr>::iterator it = _myPacketQueues.begin(); it != _myPacketQueues.end(); ++it) {
-        clearPacketCache(it->first);
-        int64_t mySeekTimeInTimeBaseUnits = int64_t(theDestTime / av_q2d(_myFormatContext->streams[it->first]->time_base));
-        /*int myResult =*/ av_seek_frame(_myFormatContext, it->first,
-                                mySeekTimeInTimeBaseUnits, AVSEEK_FLAG_BACKWARD|AVSEEK_FLAG_ANY);
-        avcodec_flush_buffers(_myFormatContext->streams[it->first]->codec);
-    }
-    {
-        boost::mutex::scoped_lock lock(_myMutex);
-        if (_isEOF) {
-            _isEOF = false;
-            _myCondition.notify_one();
-        }
-    }
-    {
-        boost::mutex::scoped_lock lock(_myMutex);
-        _isSeeking = false;
-        _myCondition.notify_one();
+        seek(theDestTime, it->first);
     }
 }
 
@@ -186,28 +166,26 @@ AsyncDemuxer::seek(double theDestTime, const int theStreamIndex) {
     if (it == _myPacketQueues.end()) {
         throw asl::Exception("AsyncDemuxer::seek called with nonexistent stream index " + asl::as_string(theStreamIndex), PLUS_FILE_LINE);
     }
-    {
         boost::mutex::scoped_lock lock(_myMutex);
         _isSeeking = true;
-        _myCondition.notify_one();
-    }
+        //_myCondition.notify_one();
     clearPacketCache(it->first);
     int64_t mySeekTimeInTimeBaseUnits = int64_t(theDestTime / av_q2d(_myFormatContext->streams[theStreamIndex]->time_base));
     /*int myResult =*/ av_seek_frame(_myFormatContext, theStreamIndex,
                             mySeekTimeInTimeBaseUnits, AVSEEK_FLAG_BACKWARD);
     avcodec_flush_buffers(_myFormatContext->streams[theStreamIndex]->codec);
-    {
-        boost::mutex::scoped_lock lock(_myMutex);
+    //{
+    //    boost::mutex::scoped_lock lock(_myMutex);
         if (_isEOF) {
             _isEOF = false;
-            _myCondition.notify_one();
+            //_myCondition.notify_one();
         }
-    }
-    {
-        boost::mutex::scoped_lock lock(_myMutex);
+    //}
+    //{
+    //    boost::mutex::scoped_lock lock(_myMutex);
         _isSeeking = false;
         _myCondition.notify_one();
-    }
+    //}
 }
 
 void
