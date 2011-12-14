@@ -178,16 +178,12 @@ namespace y60 {
         // Called from main thread
         void run();
 
-        //void startOverAgain();
-
         void setupVideo(const std::string & theFilename);
         void setupAudio(const std::string & theFilename);
         void getVideoProperties(const std::string & theFilename);
         void dumpCache();
         bool shouldSeek(double theCurrentTime, double theDestTime);
         void seek(double theDestTime);
-        //void doSeek(double theSeekTime, bool theSeekAudioFlag = true);
-
 
         // Called from both threads
         /**
@@ -269,6 +265,7 @@ namespace y60 {
         double _myLastFrameTime;  // Only used for mpeg1/2 end of file handling.
         bool _myAdjustAudioOffsetFlag;
         bool _hasShutDown;
+        bool _isStreamingMedia;
 
     };
     typedef asl::Ptr<FFMpegDecoder2> FFMpegDecoder2Ptr;
