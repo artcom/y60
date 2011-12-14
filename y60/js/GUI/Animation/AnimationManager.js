@@ -212,4 +212,11 @@ GUI.AnimationManager.prototype.Constructor = function (Public, Protected) {
         }
         return animationsCount;
     });
+    
+    // TODO: Add useful Public interfaces using namespaces
+    //    * Cancelling all Animations (with bubbling) for a namespace (and all its subnamespaces)
+    //    * Retrieve all Animations for a given namespace.
+    //    * Query useful stuff for all animations of a given namespace (e.g. if any animation for a given namespace is playing)
+    
+    // TODO Potentially cleanup existing namespaces if they are empty after cleanup (and their subnamespaces are also empty)
 };
