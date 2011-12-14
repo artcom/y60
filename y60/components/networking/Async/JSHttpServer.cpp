@@ -129,7 +129,7 @@ registerCallback(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
     myCallback.contentType = myContentType;
 
     async::http::Server & myNative = JSHttpServer::getJSWrapper(cx, obj).openNative();
-    myNative.registerCallback( myUri, myCallback );
+    myNative.registerCallback( obj, myUri, myCallback );
 
     return JS_TRUE;
 }
@@ -260,7 +260,7 @@ JSHttpServer::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
     }
 
     JSHttpServer * myNewObject = 0;
-    OWNERPTR myHttpServer = OWNERPTR(new async::http::Server());
+    OWNERPTR myHttpServer = OWNERPTR(new async::http::Server(cx));
     myNewObject = new JSHttpServer(myHttpServer, myHttpServer.get());
 
     JS_SetPrivate(cx, obj, myNewObject);
@@ -288,20 +288,6 @@ bool convertFrom(JSContext *cx, jsval theValue, JSHttpServer::OWNERPTR & theNati
     return false;
 }
 
-/*
-bool convertFrom(JSContext *cx, jsval theValue, JSHttpServer::NATIVE & theNative) {
-    if (JSVAL_IS_OBJECT(theValue)) {
-        JSObject * myArgument;
-        if (JS_ValueToObject(cx, theValue, &myArgument)) {
-            if (JSA_GetClass(cx,myArgument) == JSClassTraits<JSHttpServer::NATIVE >::Class()) {
-                theNative = JSClassTraits<JSHttpServer::NATIVE>::getNativeRef(cx,myArgument);
-                return true;
-            }
-        }
-    }
-    return false;
-}
-*/
 jsval as_jsval(JSContext *cx, JSHttpServer::OWNERPTR theOwner) {
     JSObject * myReturnObject = JSHttpServer::Construct(cx, theOwner, theOwner.get());
     return OBJECT_TO_JSVAL(myReturnObject);

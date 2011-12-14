@@ -342,7 +342,7 @@ namespace jslib {
         dom::NodePtr     _myCanvas;
         y60::RendererPtr _myRenderer;
 
-        typedef std::list<y60::IRendererExtensionPtr> ExtensionList;
+        typedef std::list< asl::WeakPtr<y60::IRendererExtension> > ExtensionList;
         ExtensionList        _myExtensions;
 
         JSObject *           _myEventListener;

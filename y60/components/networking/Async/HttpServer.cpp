@@ -71,7 +71,8 @@ namespace y60 {
 namespace async {
 namespace http {
     
-    Server::Server() :
+    Server::Server(JSContext * cx) :
+        _jsContext(cx),
         acceptor_(NetAsync::io_service()),
         new_connection_(new connection(NetAsync::io_service(), _myRequestQueue))
     {
@@ -80,12 +81,6 @@ namespace http {
     Server::~Server()
     {
         close();
-        std::map<std::string, JSCallback>::iterator it;
-
-        for (it = _myCallbacks.begin(); it != _myCallbacks.end(); ++it) {
-            AC_DEBUG << "deleting " << it->first;
-            JS_RemoveRoot( it->second.context, &(it->second.functionValue));
-        };
         _myCallbacks.clear();
     }
     
