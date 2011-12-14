@@ -265,9 +265,7 @@ namespace y60 {
             _myDemux->enableStream(_myVStreamIndex);
         }
         for (std::vector<int>::size_type i = 0; i < _myAllAudioStreamIndicies.size(); i++) {
-            if (_myAllAudioStreamIndicies[i] != -1) {
-                _myDemux->enableStream(_myAllAudioStreamIndicies[i]);
-            }
+            _myDemux->enableStream(_myAllAudioStreamIndicies[i]);
         }
 
         _myDemux->start();
@@ -421,24 +419,22 @@ namespace y60 {
         }
         while (double(_myAudioSink->getBufferedTime()) < myDestBufferedTime) {
             DBA(AC_DEBUG << "---- FFMpegDecoder2::readAudio: getBufferedTime="
-                     << _myAudioSink->getBufferedTime();)
-             AVPacket * myPacket;
-             for (std::vector<int>::size_type i = 0; i < _myAllAudioStreamIndicies.size(); i++) {
-                 if (_myAllAudioStreamIndicies[i] == _myAStreamIndex) {
-                     myPacket = _myDemux->getPacket(_myAllAudioStreamIndicies[i]);
-                 } else {
-                     _myDemux->getPacket(_myAllAudioStreamIndicies[i]);
-                 }
-             }
-            if (!myPacket) {
-                _myAudioSink->stop(true);
-                DBA(AC_DEBUG << "---- FFMpegDecoder::readAudio(): eof");
-                DBA(AC_DEBUG << "---- FFMpegDecoder::readAudio(): play until audio buffer is empty");
-                return false;
+                         << _myAudioSink->getBufferedTime();)
+            AVPacket * myPacket = 0;
+            for (std::vector<int>::size_type i = 0; i < _myAllAudioStreamIndicies.size(); i++) {
+                myPacket = _myDemux->getPacket(_myAllAudioStreamIndicies[i]);
+                if (!myPacket) {
+                    _myAudioSink->stop(true);
+                    DBA(AC_DEBUG << "---- FFMpegDecoder::readAudio(): eof");
+                    DBA(AC_DEBUG << "---- FFMpegDecoder::readAudio(): play until audio buffer is empty");
+                    return false;
+                }
+                if (_myAllAudioStreamIndicies[i] == _myAStreamIndex) {
+                    addAudioPacket(*myPacket);
+                }
+                av_free_packet(myPacket);
+                delete myPacket;
             }
-            addAudioPacket(*myPacket);
-            av_free_packet(myPacket);
-            delete myPacket;
         }
         return true;
     }
