@@ -230,7 +230,7 @@ namespace y60 {
         int _myVStreamIndex;
         AVStream * _myVStream;
 
-        int _myAStreamIndexDom; // this index counts from 0, comes vom y60-dom
+        unsigned int _myAStreamIndexDom; // this index counts from 0, comes vom y60-dom
         std::vector<int> _myAllAudioStreamIndicies;
         int _myAStreamIndex;    // this index points in ffmpeg stream ordering
         AVStream * _myAStream;

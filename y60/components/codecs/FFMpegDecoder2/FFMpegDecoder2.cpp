@@ -111,7 +111,7 @@ namespace y60 {
         _myFormatContext(0),
         _myVStreamIndex(-1),
         _myVStream(0),
-        _myAStreamIndexDom(-1),
+        _myAStreamIndexDom(0),
         _myAStreamIndex(-1),
         _myAStream(0),
         _myMsgQueue(),
@@ -719,39 +719,29 @@ namespace y60 {
 
     void
     FFMpegDecoder2::checkAudioStream() {
-        if (_myAStreamIndexDom == getMovie()->get<AudioStreamTag>()) {
+        unsigned int myNewIndex = getMovie()->get<AudioStreamTag>();
+        if (_myAStreamIndexDom == myNewIndex) {
             return;
         }
-        unsigned myAudioStreamIndex = 0;
-        for (unsigned i = 0; i < static_cast<unsigned>(_myFormatContext->nb_streams); ++i) {
-            int myCodecType =  _myFormatContext->streams[i]->codec->codec_type;        
-        #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52, 64, 0)
-            if (myCodecType == AVMEDIA_TYPE_AUDIO) {
-        #else
-            if (myCodecType == CODEC_TYPE_AUDIO) {
-        #endif
-                if (_myAStreamIndex == -1 || myAudioStreamIndex == getMovie()->get<AudioStreamTag>()) {
-                    if (isUnjoined()) {
-                        DB(AC_DEBUG << "Joining FFMpegDecoder Thread");
-                        join();
-                    }
-                    _myAStreamIndex = i;
-                    _myAStream = _myFormatContext->streams[i];
-                    _myAStreamIndexDom = myAudioStreamIndex;
-                    getMovie()->set<AudioStreamTag>(_myAStreamIndexDom);
-                    if (!isUnjoined()) {
-                        DB(AC_DEBUG << "checkAudioStream: Forking FFMpegDecoder Thread");
-                        PosixThread::fork();
-                    } else {
-                        DB(AC_DEBUG << "Thread already running. No forking.");
-                    }
-                    break;
-                }
-                myAudioStreamIndex++;
-            }
+        if (myNewIndex >= _myAllAudioStreamIndicies.size()) {
+            getMovie()->set<AudioStreamTag>(_myAStreamIndexDom);
+            return;
         }
-        getMovie()->set<AudioStreamTag>(_myAStreamIndexDom);
+        if (isUnjoined()) {
+            DB(AC_DEBUG << "Joining FFMpegDecoder Thread");
+            join();
+        }
+        _myAStreamIndexDom = myNewIndex;
+        _myAStreamIndex = _myAllAudioStreamIndicies[_myAStreamIndexDom];
+        _myAStream = _myFormatContext->streams[_myAStreamIndex];
+        if (!isUnjoined()) {
+            DB(AC_DEBUG << "checkAudioStream: Forking FFMpegDecoder Thread");
+            PosixThread::fork();
+        } else {
+            DB(AC_DEBUG << "Thread already running. No forking.");
+        }
     }
+
     double
     FFMpegDecoder2::readFrame(double theTime, unsigned /*theFrame*/, RasterVector theTargetRaster)
     {
