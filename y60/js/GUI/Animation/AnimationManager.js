@@ -139,7 +139,9 @@ GUI.AnimationManager.prototype.Constructor = function (Public, Protected) {
         var currentNamespace = _.namespaces[myNamespaceSegments[0]];
         if (myNamespaceSegments.length > 1) {
             for (i = 1; i < myNamespaceSegments.length; i++) {
-                currentNamespace.subNamespaces[myNamespaceSegments[i]] = new _.Namespace(myNamespaceSegments[i], currentNamespace);
+                if (!(myNamespaceSegments[i] in currentNamespace.subNamespaces)) {
+                    currentNamespace.subNamespaces[myNamespaceSegments[i]] = new _.Namespace(myNamespaceSegments[i], currentNamespace);
+                }
                 currentNamespace = currentNamespace.subNamespaces[myNamespaceSegments[i]];
             }
         }
@@ -178,7 +180,7 @@ GUI.AnimationManager.prototype.Constructor = function (Public, Protected) {
                 return;
             }
         }
-        Logger.info("<AnimationManager::play> playing '" + theAnimation + "' in namespace: '" + theNamespace + "'");
+        Logger.info("<AnimationManager::play> playing '" + theAnimation + "' in namespace: '" + _.getNamespaceParts(myNamespace) + "'");
         myNamespace.animations.push(theAnimation);
         theAnimation.play();
     };
@@ -197,7 +199,7 @@ GUI.AnimationManager.prototype.Constructor = function (Public, Protected) {
                 if (myAnimation.running) {
                     myAnimation.doFrame(theTime * 1000);
                 } else {
-                    Logger.info("<AnimationManager::doFrame> removing animation '" + myAnimation + "' from namespace: '" + theNamespace + "' since it is done playing!");
+                    Logger.info("<AnimationManager::doFrame> removing animation '" + myAnimation + "' from namespace: '" + _.getNamespaceParts(theNamespace) + "' since it is done playing!");
                     theNamespace.animations.splice(i, 1);
                     i--; // We mutate the array as we walk it and have to mitigate this.
                 }
