@@ -228,7 +228,6 @@ namespace y60 {
                     _myAStreamIndexDom = myAudioStreamIndex;
                 }
                 _myAllAudioStreamIndicies.push_back(i);
-                //_myDemux->enableStream(i);
                 AVCodecContext * myACodec = _myFormatContext->streams[i]->codec;
                 // open codec
                 AVCodec * myCodec = avcodec_find_decoder(myACodec->codec_id);
@@ -255,6 +254,7 @@ namespace y60 {
             _myAudioSink = HWSampleSinkPtr();
             _myAStream = 0;
             _myAStreamIndex = -1;
+            _myAllAudioStreamIndicies.clear();
         }
         if (_myVStreamIndex != -1) {
             _myDemux->enableStream(_myVStreamIndex);
