@@ -56,7 +56,7 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-/*jslint nomen:false, plusplus:false*/
+/*jslint nomen:false, plusplus:false, forin:true*/
 /*globals GUI, js, Logger*/
 
 var ourCurrentAnimationTime = -1;
@@ -238,7 +238,7 @@ GUI.AnimationManager.prototype.Constructor = function (Public, Protected) {
         }
     };
     
-    Public.cancelAllAnimationsForNamespace = function (theNamespaceString) {
+    Public.cancelAllAnimationsForNamespace = function (theNamespaceString, theDoNotCancelAnimation) {
         Logger.info("<AnimationManager::cancelAllAnimationsForNamespace> Cancelling all animations for namespace: '" + theNamespaceString + "'");
         var myNamespace = Public.getNamespace(theNamespaceString);
         var animationsCancelled = 0;
@@ -246,8 +246,10 @@ GUI.AnimationManager.prototype.Constructor = function (Public, Protected) {
             myNamespace.forEachNamespaceDo(function (theNamespace) {
                 var myAnimation, i;
                 for (i = 0; i < theNamespace.animations.length; i++) {
-                    theNamespace.animations[i].cancel();
-                    animationsCancelled += 1;
+                    if (theNamespace.animations[i] !== theDoNotCancelAnimation) {        
+                        theNamespace.animations[i].cancel();
+                        animationsCancelled += 1;
+                    }
                 }
             });
         } else {
