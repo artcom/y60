@@ -244,9 +244,11 @@ GUI.AnimationManager.prototype.Constructor = function (Public, Protected) {
         var animationsCancelled = 0;
         if (myNamespace) {
             myNamespace.forEachNamespaceDo(function (theNamespace) {
+                Logger.info("<AnimationManager::cancelAllAnimationsForNamespace> * in namespace '" + _.getNamespaceParts(theNamespace) + "' (" + theNamespace.animations.length + " animations):");
                 var myAnimation, i;
                 for (i = 0; i < theNamespace.animations.length; i++) {
-                    if (theNamespace.animations[i] !== theDoNotCancelAnimation) {        
+                    if (theNamespace.animations[i] !== theDoNotCancelAnimation) {
+                        Logger.info("<AnimationManager::cancelAllAnimationsForNamespace>     * cancelling " + theNamespace.animations[i]);
                         theNamespace.animations[i].cancel();
                         animationsCancelled += 1;
                     }
