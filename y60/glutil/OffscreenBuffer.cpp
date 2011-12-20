@@ -235,7 +235,7 @@ OffscreenBuffer::deactivate(const std::vector<TexturePtr> & theTextures, bool th
         TexturePtr myTexture = theTextures.front();
         unsigned myTextureId = myTexture->getTextureId();
     
-        AC_DEBUG << "OffscreenBuffer::deactivate texture id = " << myTextureId << "zeroing texture";
+        AC_DEBUG << "OffscreenBuffer::deactivate texture id = " << myTextureId << " zeroing texture";
 
         // copy backbuffer to texture
         glBindTexture(GL_TEXTURE_2D, myTextureId);
