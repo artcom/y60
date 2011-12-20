@@ -1,0 +1,31 @@
+
+struct vert2frag {
+    float4 position  : POSITION;
+    float4 texCoord0 : TEXCOORD0;
+    float4 texCoord1 : TEXCOORD1;
+    float4 normal    : TEXCOORD2;
+};
+
+vert2frag mainVertex(float4 thePosition : POSITION,
+                     float4 theTexCoord : TEXCOORD0,
+                     uniform float4x4 GL_MODELVIEW_PROJECTION)
+{
+    vert2frag OUT;
+    
+    OUT.position = mul(GL_MODELVIEW_PROJECTION, thePosition);
+    OUT.texCoord0 = theTexCoord;
+    return OUT;
+}
+
+void mainFragment(vert2frag IN,
+                  uniform sampler2D tex,
+                  out float4 outColor0 : COLOR0,
+                  out float4 outColor1 : COLOR1,
+                  out float4 outColor2 : COLOR2,
+                  out float4 outColor3 : COLOR3)
+{
+    outColor0 = tex2D(tex, IN.texCoord0.xy);
+    outColor1 = float4(1,0,0,1);
+    outColor2 = float4(0,1,0,1);
+    outColor3 = float4(0,0,1,1);
+}
