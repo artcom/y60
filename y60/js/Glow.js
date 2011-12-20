@@ -185,8 +185,7 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
         window.preRender();
         window.render();
         window.postRender();
-        window.swapBuffers();
-
+        
         window.scene.world.visible = true;
 
     }
