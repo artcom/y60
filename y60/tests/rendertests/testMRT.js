@@ -82,6 +82,7 @@ function ENSURE(theExpression, theMessage) {
         }
         
         var myTransform = Modelling.createTransform(myWorld);
+        
         //prepare mrt textures
         for (i = 0; i < MRTS; ++i) {
             myImage = Modelling.createImage(window.scene, window.width, window.height, "BGRA");
@@ -93,6 +94,7 @@ function ENSURE(theExpression, theMessage) {
             myFlipMatrix.translate(new Vector3f(0, 1, 0));
             myCanvasNode.targets = myCanvasNode.targets.length > 0 ? stringToArray(myCanvasNode.targets.toString()).concat([myTexture.id]) : [myTexture.id];
             
+            // build one body for each render targets to use them for the test ortho world
             myMaterial = Modelling.createUnlitTexturedMaterial(window.scene, myTexture);
             var myShape = Modelling.createQuad(window.scene, myMaterial.id, [0,0,0], [window.width/2, window.height/2, 0]);
             myBody = Modelling.createBody(myTransform, myShape.id);
@@ -102,12 +104,13 @@ function ENSURE(theExpression, theMessage) {
         
         myRenderArea.setSceneAndCanvas( window.scene, myCanvasNode);
         
-        myWorld.visible = true;
-        window.scene.world.visible = false;
+        myWorld.visible = true; // 2d on screen test world
+        window.scene.world.visible = false; // 3d offscreen world
     }
     Base.onPreRender = ourShow.onPreRender;
     ourShow.onPreRender = function() {
         Base.onPreRender();
+        //standard mrt test
         if (ourFramesWritten === 0) {
             ourFramesWritten++;
             window.scene.world.visible = true;
@@ -115,6 +118,7 @@ function ENSURE(theExpression, theMessage) {
             window.scene.world.visible = false;
             return;
         }
+        //mrt test with texture download
         if (ourFramesWritten === 1) {
             ourFramesWritten++;
             window.scene.world.visible = true;
@@ -125,6 +129,7 @@ function ENSURE(theExpression, theMessage) {
             window.scene.world.visible = false;
             return;
         }
+        //multisamples mrt test
         if (ourFramesWritten === 2) {
             ourFramesWritten++;
             window.scene.world.visible = true;
@@ -133,6 +138,7 @@ function ENSURE(theExpression, theMessage) {
             window.scene.world.visible = false;
             return;
         }
+        //multisamples mrt test with texture download
         if (ourFramesWritten === 3) {
             ourFramesWritten++;
             window.scene.world.visible = true;
