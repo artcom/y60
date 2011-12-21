@@ -67,10 +67,8 @@
 
 #include <asl/base/PlugInBase.h>
 
-#include <asl/base/PosixThread.h>
-#include <asl/base/ThreadLock.h>
-#include <asl/base/ThreadSemaphore.h>
-
+#include <boost/thread.hpp>
+#include <boost/thread/condition.hpp>
 #include <string>
 #include <list>
 
@@ -108,7 +106,6 @@ extern "C" {
 #   endif
 #endif
 
-#include <asl/base/Stream.h>
 #include <asl/base/Ptr.h>
 
 namespace AudioBase {
@@ -118,6 +115,7 @@ namespace AudioBase {
 namespace y60 {
     class AsyncDemuxer;
     typedef asl::Ptr<AsyncDemuxer> AsyncDemuxerPtr;
+    typedef asl::Ptr<boost::thread> DecodeThreadPtr;
 
     DEFINE_EXCEPTION(FFMpegDecoder3Exception, asl::Exception);
     const std::string MIME_TYPE_MPG = "application/mpg";
@@ -125,17 +123,19 @@ namespace y60 {
     /**
      * @ingroup Y60video
      * Asyncronous decoder using ffmpeg. It features audio and
-     * video decoding but no seeking.
+     * video decoding
      *
      */
     class FFMpegDecoder3 :
         public AsyncDecoder,
-        public asl::PosixThread,
         public asl::PlugInBase
     {
         static const double AUDIO_BUFFER_SIZE;   ///< Audio cache size in seconds.
 
     public:
+        //////////////
+        //mainthread//
+        //////////////
         FFMpegDecoder3(asl::DLHandle theDLHandle);
         virtual ~FFMpegDecoder3();
 
@@ -168,17 +168,49 @@ namespace y60 {
         void shutdown();
 
     private:
-        // Called from main thread
-        void run();
-
         void setupVideo(const std::string & theFilename);
         void setupAudio(const std::string & theFilename);
-        void getVideoProperties(const std::string & theFilename);
-        void dumpCache();
+        void getVideoProperties();
         bool shouldSeek(double theCurrentTime, double theDestTime);
         void seek(double theDestTime);
+        void checkAudioStream();
 
-        // Called from both threads
+
+        VideoMsgPtr _myLastVideoFrame;
+        AVFormatContext * _myFormatContext;
+        unsigned int _myAStreamIndexDom; // this index counts from 0, comes vom y60-dom
+        int64_t _myVideoStartTimestamp;
+        bool _hasShutDown;
+        bool _isStreamingMedia;
+
+        ///////////////
+        //all threads//
+        ///////////////
+        VideoMsgQueue _myMsgQueue;
+        DecodeThreadPtr _myVideoDecodeThread;
+        DecodeThreadPtr _myAudioDecodeThread;
+        //for thread sync
+        boost::mutex _myAudioMutex;
+        boost::mutex _myVideoMutex;
+        boost::condition _myAudioCondition;
+        boost::condition _myVideoCondition;
+        bool _myAudioIsEOF;
+        bool _myVideoIsEOF;
+
+        //should be locked
+        AVStream * _myVStream;
+        int _myAStreamIndex;    // this index points in ffmpeg stream ordering
+        AVStream * _myAStream;
+        AVFrame * _myFrame;
+        AsyncDemuxerPtr _myDemux;
+        bool _myAdjustAudioOffsetFlag;
+
+        ////////////////////////////
+        //decode threads////////////
+        ////////////////////////////
+
+        void run_videodecode();
+        void run_audiodecode();
         /**
          *  updates the Framecache depending on the current position
          */
@@ -199,7 +231,6 @@ namespace y60 {
         void addCacheFrame(AVFrame* theFrame, double theTime);
         void convertFrame(AVFrame* theFrame, unsigned char* theBuffer);
         VideoMsgPtr createFrame(double theTimestamp);
-        void checkAudioStream();
 
         template<typename T>
         int downmix5p1ToStereo(T * theBuffer, int theBytesDecoded) {
@@ -214,40 +245,22 @@ namespace y60 {
         }
         
     
-        // Used in main thread
-        VideoMsgPtr _myLastVideoFrame;
 
-        // Used in both threads
-        asl::ThreadLock _myAVCodecLock;
-        AVFormatContext * _myFormatContext;
-        int _myVStreamIndex;
-        AVStream * _myVStream;
 
-        unsigned int _myAStreamIndexDom; // this index counts from 0, comes vom y60-dom
-        std::vector<int> _myAllAudioStreamIndicies;
-        int _myAStreamIndex;    // this index points in ffmpeg stream ordering
-        AVStream * _myAStream;
+        ReSampleContext * _myResampleContext;
+        static asl::Block _myResampledSamples;
 
-        VideoMsgQueue _myMsgQueue;
-        AVFrame * _myFrame;
-
-        AsyncDemuxerPtr _myDemux;
-
-        int64_t _myVideoStartTimestamp;
+        // only initialized in main thread, then read from in both 
 #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52,20,0)
         PixelFormat
 #else
         int
 #endif
         _myDestinationPixelFormat;
-
-        ReSampleContext * _myResampleContext;
-        static asl::Block _myResampledSamples;
-
-        int _myNumFramesDecoded;
-        int _myNumIFramesDecoded;
-
         double _myVideoStreamTimeBase;
+        int _myVStreamIndex;
+        std::vector<int> _myAllAudioStreamIndicies;
+        double _myLastFrameTime;  // Only used for mpeg1/2 end of file handling.
 
         // worker thread values to prevent dom access and thus race conditions.
         double _myFrameRate;
@@ -255,10 +268,6 @@ namespace y60 {
         int _myFrameWidth;
         int _myFrameHeight;
         unsigned  _myBytesPerPixel;
-        double _myLastFrameTime;  // Only used for mpeg1/2 end of file handling.
-        bool _myAdjustAudioOffsetFlag;
-        bool _hasShutDown;
-        bool _isStreamingMedia;
 
     };
     typedef asl::Ptr<FFMpegDecoder3> FFMpegDecoder3Ptr;
