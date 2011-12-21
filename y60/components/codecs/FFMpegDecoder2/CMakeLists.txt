@@ -1,24 +1,18 @@
 
 set(SOURCES
-AsyncDemuxer.cpp
 Demux.cpp
 FFMpegDecoder2.cpp
 FFMpegURLProtocol.cpp
 )
 
 set(HEADERS
-AsyncDemuxer.h
 Demux.h
 FFMpegDecoder2.h
 FFMpegURLProtocol.h
 y60_ffmpegdecoder2_settings.h
 )
 
-if(NOT WIN32)
-    find_package(Boost COMPONENTS thread)
-endif(NOT WIN32)
-
-list(APPEND EXTERNALS Boost PAINTLIB FFMPEG)
+list(APPEND EXTERNALS PAINTLIB FFMPEG)
 
 add_definitions(-D__STDC_CONSTANT_MACROS) # ffmpeg is c99 only and needs some c macros
 
