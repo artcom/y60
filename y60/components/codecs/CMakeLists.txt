@@ -1,6 +1,7 @@
 
 add_subdirectory(FFMpegDecoder1)
 add_subdirectory(FFMpegDecoder2)
+add_subdirectory(FFMpegDecoder3)
 
 if(OSX)
     #add_subdirectory(QuicktimeDecoder)
