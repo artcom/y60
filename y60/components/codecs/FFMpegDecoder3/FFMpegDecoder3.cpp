@@ -57,7 +57,6 @@
 */
 
 #include "FFMpegDecoder3.h"
-#include "FFMpegURLProtocol.h"
 #include "AsyncDemuxer.h"
 
 #include <y60/video/Movie.h>
@@ -167,13 +166,6 @@ namespace y60 {
             AC_INFO << "FFMpegDecoder3 can not decode :" << theUrl << endl;
             return "";
         }
-    }
-
-    void
-    FFMpegDecoder3::load(asl::Ptr<ReadableStream> theSource, const string & theFilename) {
-        string theStreamID = string("acstream://") + theFilename;
-        registerStream(theStreamID, theSource);
-        load(theStreamID);
     }
 
     void

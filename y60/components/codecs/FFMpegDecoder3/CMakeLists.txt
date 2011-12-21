@@ -7,7 +7,7 @@ FFMpegDecoder3.cpp
 set(HEADERS
 AsyncDemuxer.h
 FFMpegDecoder3.h
-y60_ffmpegdecoder2_settings.h
+y60_ffmpegdecoder3_settings.h
 )
 
 if(NOT WIN32)

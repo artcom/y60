@@ -61,8 +61,6 @@
 
 #include "y60_ffmpegdecoder3_settings.h"
 
-#include "Demux.h"
-
 #include <y60/video/VideoMsgQueue.h>
 #include <y60/video/AsyncDecoder.h>
 #include <y60/video/MovieEncoding.h>
@@ -151,11 +149,6 @@ namespace y60 {
         void load(const std::string & theFilename);
         double readFrame(double theTime, unsigned, RasterVector theTargetRaster);
 
-        /**
-         * loads a movie from the stream given by theSource
-         * @param theFilename file to identify theSource
-         */
-        void load(asl::Ptr<asl::ReadableStream> theSource, const std::string & theFilename);
         /**
          * Starts movie decoding
          * @param theStartTime movie-time to start decoding at.
