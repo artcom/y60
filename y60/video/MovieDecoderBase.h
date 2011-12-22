@@ -180,6 +180,9 @@ namespace y60 {
              */
             virtual void closeMovie();
 
+            virtual void loop() {
+                startMovie();
+            };
             /**
              * @return new instance of the concrete MovieDecoder.
              */

@@ -174,7 +174,7 @@ namespace y60 {
     Movie::restart(double theCurrentTime) {
         AC_DEBUG  << "Movie::restart";
         _myLastDecodedFrame = std::numeric_limits<unsigned>::max();
-        _myDecoder->startMovie(0);
+        _myDecoder->loop();
         double myMovieTime = _myDecoder->getMovieTime(theCurrentTime);
         decodeFrame(myMovieTime, 0);
     }

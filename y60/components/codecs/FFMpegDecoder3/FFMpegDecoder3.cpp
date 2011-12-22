@@ -84,7 +84,7 @@
 
 #define DB(x) x
 #define DBV(x) x
-#define DBA(x) //x
+#define DBA(x) x
 
 using namespace std;
 using namespace asl;
@@ -112,7 +112,7 @@ namespace y60 {
         _isStreamingMedia(false),
         _myMsgQueue(),
         _myAudioIsEOF(false),
-        _myVideoIsEOF(false),
+        _mySeekRequested(false),
         _myVStream(0),
         _myAStreamIndex(-1),
         _myAStream(0),
@@ -260,19 +260,51 @@ namespace y60 {
 
     }
 
+    void FFMpegDecoder3::loop() {
+        AC_INFO << "FFMpegDecoder3::loop "<< getMovie()->get<ImageSourceTag>() << " frames in queue: "<<_myMsgQueue.size();
+        _myLastVideoFrame = VideoMsgPtr();
+        if (hasAudio() && getDecodeAudioFlag()) {
+            {
+                boost::mutex::scoped_lock seeklock(_mySeekMutex);
+                _mySeekRequested = true;
+                boost::mutex::scoped_lock audiolock(_myAudioMutex);
+                _myAudioIsEOF = false;
+                _myAudioCondition.notify_one();
+            }
+            _myAudioSink->stop();
+            // ensure that the audio buffer is stopped and cleared
+            while (_myAudioSink->getState() != HWSampleSink::STOPPED) {
+                asl::msleep(1);
+            }
+            for (std::vector<int>::size_type i = 0; i < _myAllAudioStreamIndicies.size(); i++) {
+                _myDemux->seek(0.0, _myAllAudioStreamIndicies[i]);
+            }
+
+            _myAdjustAudioOffsetFlag = true;
+            _myVideoStartTimestamp = 0;
+            _myAudioSink->play();
+            _myAdjustAudioOffsetFlag = true;
+
+            boost::mutex::scoped_lock seeklock(_mySeekMutex);
+            _mySeekRequested = false;
+            _mySeekCondition.notify_all();
+        }
+
+        setState(RUN);
+        AsyncDecoder::startMovie(0);
+    }
+
     void FFMpegDecoder3::startMovie(double theStartTime, bool theStartAudioFlag) {
         AC_INFO << "FFMpegDecoder3::startMovie "<< getMovie()->get<ImageSourceTag>() << ", time: " << theStartTime << " frames in queue: "<<_myMsgQueue.size();
-        //XXX
-        _myVideoIsEOF = false;
+
+        _myMsgQueue.clear();
+        _myMsgQueue.reset();
         _myDemux->start();
         getVideoProperties();
         decodeFrame();
         // reload video properties after first decode
         getVideoProperties();
         _myLastVideoFrame = VideoMsgPtr();
-        _myMsgQueue.clear();
-        _myMsgQueue.reset();
-
         if (shouldSeek(0.0, theStartTime)) {
             _myDemux->seek(theStartTime);
             if (theStartAudioFlag && hasAudio() && getDecodeAudioFlag()) {
@@ -708,19 +740,25 @@ namespace y60 {
     bool FFMpegDecoder3::shouldSeek(double theCurrentTime, double theDestTime) {
         double myDistance = (theDestTime-theCurrentTime)*_myFrameRate;
         AC_DEBUG << "FFMpegDecoder3::shouldSeek: Dest=" << theDestTime << ", Curr=" << theCurrentTime<<" --> distance: "<< myDistance;
-        return false && !_isStreamingMedia && (myDistance > _myMaxCacheSize || myDistance < 0);
+        return !_isStreamingMedia && (myDistance > _myMaxCacheSize || myDistance < 0);
     }
 
     void FFMpegDecoder3::seek(double theDestTime) {
         AC_DEBUG << "FFMpegDecoder3::seek() desttime: "<<theDestTime;
+        {
+            boost::mutex::scoped_lock lock(_mySeekMutex);
+            _mySeekRequested = true;
+            if (hasAudio() && getDecodeAudioFlag()) {
+                boost::mutex::scoped_lock lock(_myAudioMutex);
+                _myAudioIsEOF = false;
+                _myAudioCondition.notify_one();
+            }
+        }
         if (hasAudio() && getDecodeAudioFlag()) {
-            //XXX: do not join
-            _myAudioDecodeThread->interrupt();
-            _myAudioDecodeThread->join();
             _myAudioSink->stop();
             // ensure that the audio buffer is stopped and cleared
             while (_myAudioSink->getState() != HWSampleSink::STOPPED) {
-                asl::msleep(10);
+                asl::msleep(1);
             }
         }
 
@@ -730,13 +768,15 @@ namespace y60 {
         _myDemux->seek(theDestTime);
         _myLastVideoFrame = VideoMsgPtr();
         if (hasAudio() && getDecodeAudioFlag()) {
-            _myAudioDecodeThread = DecodeThreadPtr(new boost::thread( boost::bind( &FFMpegDecoder3::run_audiodecode, this)));
             if (getState() == RUN) {
                 _myAudioSink->play();
             }
             _myAudioTimeOffset = theDestTime;
             _myAdjustAudioOffsetFlag = true;
         }
+        boost::mutex::scoped_lock lock(_mySeekMutex);
+        _mySeekRequested = false;
+        _mySeekCondition.notify_all();
     }
 
 
@@ -1080,6 +1120,9 @@ namespace y60 {
             while(true) {
                 DB(AC_TRACE << "---run_audiodecode: ");
                 boost::this_thread::interruption_point();
+                while(_mySeekRequested) {
+                    _mySeekCondition.wait(_mySeekMutex);
+                }
                 double myDestBufferedTime = double(_myAudioSink->getBufferedTime())+8/_myFrameRate;
                 if (myDestBufferedTime > AUDIO_BUFFER_SIZE) {
                     myDestBufferedTime = AUDIO_BUFFER_SIZE;
@@ -1107,6 +1150,9 @@ namespace y60 {
             while(true) {
                 DB(AC_TRACE << "---run_videodecode: frames in cache: " <<_myMsgQueue.size());
                 boost::this_thread::interruption_point();
+                while(_mySeekRequested) {
+                    _mySeekCondition.wait(_mySeekMutex);
+                }
                 if (_myMsgQueue.size() >= _myMaxCacheSize) {
                     boost::this_thread::sleep(boost::posix_time::millisec(10));
                     //boost::this_thread::yield();
@@ -1114,12 +1160,13 @@ namespace y60 {
                 }
                 bool isEOF = !decodeFrame();
                 if (isEOF) { 
-                    boost::mutex::scoped_lock lock(_myVideoMutex);
-                    _myVideoIsEOF = true;
                     std::vector<unsigned> myFrameSize;
                     myFrameSize.push_back(0);
                     _myMsgQueue.push_back(VideoMsgPtr(new VideoMsg(VideoMsg::MSG_EOF, 0, myFrameSize)));
-                    _myVideoCondition.wait(_myVideoMutex);
+                    _myDemux->seek(0.0, _myVStreamIndex);
+                    //XXX: only loop when movie loopcount=0 otherwise wait
+                    //boost::mutex::scoped_lock lock(_myVideoMutex);
+                    //_myVideoCondition.wait(_myVideoMutex);
                 }
             }
         } catch (boost::thread_interrupted &) {

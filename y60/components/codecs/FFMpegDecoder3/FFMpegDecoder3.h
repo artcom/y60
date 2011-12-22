@@ -157,6 +157,7 @@ namespace y60 {
 
         void resumeMovie(double theStartTime = 0.0f, bool theResumeAudioFlag = true);
 
+        void loop();
         /**
          * Called to stop the decoding.
          */
@@ -192,10 +193,12 @@ namespace y60 {
         //for thread sync
         boost::mutex _myAudioMutex;
         boost::mutex _myVideoMutex;
+        boost::mutex _mySeekMutex;
         boost::condition _myAudioCondition;
         boost::condition _myVideoCondition;
+        boost::condition _mySeekCondition;
         bool _myAudioIsEOF;
-        bool _myVideoIsEOF;
+        bool _mySeekRequested;
 
         //should be locked
         AVStream * _myVStream;
