@@ -28,5 +28,5 @@ y60_add_component(
 
 # Disabled due to excessive flakyness ... see y60/video/testLeak.js
 #y60_add_jstest(Leak mod_ffmpeg3)
-y60_add_jstest(Movie mod_ffmpeg3)
-y60_add_jstest(Seek mod_ffmpeg3)
+#y60_add_jstest(Movie mod_ffmpeg3)
+#y60_add_jstest(Seek mod_ffmpeg3)
