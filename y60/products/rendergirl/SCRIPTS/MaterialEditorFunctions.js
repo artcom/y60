@@ -152,8 +152,10 @@ function updateMaterial(thePropertyName, theValue) {
 }
 
 function updateColorElement(theNode) {
-
     var myColorPicker = ourGlade.get_widget(theNode.name+"_color");
+    if ( ! myColorPicker ) {
+        return;
+    }
 
     // colorpicker
     myColorPicker.use_alpha = true;
