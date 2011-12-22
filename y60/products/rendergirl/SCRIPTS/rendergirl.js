@@ -107,6 +107,12 @@ var ourAllowedOptions = {
 //    'unit-size': "%d"
 };
 
+
+function getDescendantByName(theNode, theName, deep) {
+  return theNode.find('.//*[@name="'+theName+'"]');
+};
+
+
 //=================================================
 //
 //  Gtk Signal Handlers
@@ -164,7 +170,7 @@ ourHandler.on_new_activate = function() {
     var myScene = new Scene();
     myScene.setup();
     ourViewer.setScene(myScene);
-    var myCanvas = getDescendantByTagName(myScene.dom, 'canvas', true);
+    var myCanvas = myScene.dom.find('canvas');
     ourViewer.setCanvas(myCanvas);
     ourStatusBar.set("New scene");
     setupGUI();
@@ -734,7 +740,7 @@ Viewer.prototype.Constructor = function(self, theArguments) {
         }
 
         myScene.setup();
-        var myCanvas = getDescendantByTagName(myScene.dom, 'canvas', true);
+        var myCanvas = myScene.dom.find('canvas');
         ourViewer.setScene(myScene, myCanvas);
 
         if (window.scene.lightsources.childNodesLength() > 2) {
@@ -938,7 +944,7 @@ function main(argv) {
            var myScene = new Scene(ourViewer.getModelName());
            myScene.setup();
            ourViewer.setScene(myScene);
-           var myCanvas = getDescendantByTagName(myScene.dom, 'canvas', true);
+           var myCanvas = myScene.dom.find('canvas');
            ourViewer.setCanvas(myCanvas);
            setupGUI();
            */
