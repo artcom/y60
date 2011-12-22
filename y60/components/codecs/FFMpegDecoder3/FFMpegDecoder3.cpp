@@ -1123,15 +1123,16 @@ namespace y60 {
                 while(_mySeekRequested) {
                     _mySeekCondition.wait(_mySeekMutex);
                 }
-                double myDestBufferedTime = double(_myAudioSink->getBufferedTime())+8/_myFrameRate;
-                if (myDestBufferedTime > AUDIO_BUFFER_SIZE) {
-                    myDestBufferedTime = AUDIO_BUFFER_SIZE;
-                }
-                if (double(_myAudioSink->getBufferedTime()) >= myDestBufferedTime) {
-                    boost::this_thread::sleep(boost::posix_time::millisec(10));
-                    //boost::this_thread::yield();
-                    continue;
-                }
+                //XXX: pausing audio thread leads to underruns in the samplesink
+                //double myDestBufferedTime = double(_myAudioSink->getBufferedTime())+8/_myFrameRate;
+                //if (myDestBufferedTime > AUDIO_BUFFER_SIZE) {
+                //    myDestBufferedTime = AUDIO_BUFFER_SIZE;
+                //}
+                //if (double(_myAudioSink->getBufferedTime()) >= myDestBufferedTime) {
+                //    boost::this_thread::sleep(boost::posix_time::millisec(1));
+                //    //boost::this_thread::yield();
+                //    continue;
+                //}
                 bool isEOF = !readAudio();
                 if (isEOF) { 
                     boost::mutex::scoped_lock lock(_myAudioMutex);
