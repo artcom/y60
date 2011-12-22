@@ -60,6 +60,8 @@
 
 #include <asl/base/Logger.h>
 
+#define DB(x) //x
+
 using namespace asl;
 
 namespace y60 {
@@ -71,31 +73,31 @@ VideoMsgQueue::~VideoMsgQueue() {
 }
 
 void VideoMsgQueue::push_back(VideoMsgPtr theFrame) {
-    AC_DEBUG << "push_back {";
+    DB(AC_DEBUG << "push_back {";)
     _myListLock.lock();
     _myList.push_back(theFrame);
     _mySemaphore.post();
     _myListLock.unlock();
-    AC_DEBUG << "} push_back";
+    DB(AC_DEBUG << "} push_back";)
 }
 
 void VideoMsgQueue::push_front(VideoMsgPtr theFrame) {
-    AC_DEBUG << "push_front {";
+    DB(AC_DEBUG << "push_front {";)
     _myListLock.lock();
     _myList.push_front(theFrame);
     _mySemaphore.post();
     _myListLock.unlock();
-    AC_DEBUG << "} push_front";
+    DB(AC_DEBUG << "} push_front";)
 }
 
 VideoMsgPtr VideoMsgQueue::pop_front() {
-    AC_DEBUG << "pop_front {";
+    DB(AC_DEBUG << "pop_front {";)
     _mySemaphore.wait(asl::ThreadSemaphore::WAIT_INFINITE);
     _myListLock.lock();
     VideoMsgPtr myPopper = _myList.front();
     _myList.pop_front();
     _myListLock.unlock();
-    AC_DEBUG << "} pop_front";
+    DB(AC_DEBUG << "} pop_front";)
     return myPopper;
 }
 
@@ -122,35 +124,34 @@ unsigned VideoMsgQueue::size() const {
 }
 
 void VideoMsgQueue::close() {
-    AC_DEBUG << "VideoMsgQueue::close";
+    DB(AC_DEBUG << "VideoMsgQueue::close";)
     _mySemaphore.close();
 }
 
 void VideoMsgQueue::reset() {
-    AC_DEBUG << "VideoMsgQueue::reset";
+    DB(AC_DEBUG << "VideoMsgQueue::reset";)
     _mySemaphore.reset(_myList.size());
 }
 
 void VideoMsgQueue::clear() {
-    AC_DEBUG << "VideoMsgQueue::clear";
+    DB(AC_DEBUG << "VideoMsgQueue::clear";)
     _mySemaphore.close();
     _myList.clear();
     _mySemaphore.reset();
 }
 void VideoMsgQueue::dump() {
-    AC_DEBUG << "VideoMsgQueue::dump";
+    DB(AC_DEBUG << "VideoMsgQueue::dump";)
     _myListLock.lock();
     std::list<VideoMsgPtr>::iterator myItStart = _myList.begin();
     std::list<VideoMsgPtr>::iterator myItEnd = _myList.end();
     unsigned i = 0;
     for (; myItStart != myItEnd; myItStart++) {
-        AC_DEBUG << "Frame in queue #" << i << " timestamp -> " <<  (*myItStart)->getTime();
+        DB(AC_DEBUG << "Frame in queue #" << i << " timestamp -> " <<  (*myItStart)->getTime();)
         i++;
     }
     _myListLock.unlock();
 }
 bool VideoMsgQueue::hasEOF() {
-    AC_DEBUG << "VideoMsgQueue::hasEOF";
     _myListLock.lock();
     bool hasEOFFlag = false;
     std::list<VideoMsgPtr>::iterator myItStart = _myList.begin();
@@ -162,6 +163,7 @@ bool VideoMsgQueue::hasEOF() {
         }
     }
     _myListLock.unlock();
+    DB(AC_DEBUG << "VideoMsgQueue::hasEOF "<<hasEOFFlag;)
     return hasEOFFlag;
 }
 
