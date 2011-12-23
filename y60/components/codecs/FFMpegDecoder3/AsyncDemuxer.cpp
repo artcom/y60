@@ -36,6 +36,11 @@ AsyncDemuxer::stop() {
 void
 AsyncDemuxer::start() {
     AC_DEBUG << "AsyncDemuxer::start forking new thread";
+    if (_myDemuxThread && !_myDemuxThread->timed_join(boost::posix_time::millisec(1))) {
+        AC_WARNING<<"demux thread already running";
+        _myDemuxThread->interrupt();
+        _myDemuxThread->join();
+    }
     _myDemuxThread = DemuxThreadPtr(new boost::thread( boost::bind( &AsyncDemuxer::run, this)));
 }
 
@@ -45,9 +50,11 @@ AsyncDemuxer::run() {
         while(true) {
             DB(AC_TRACE << "---AsyncDemuxer::run: ");
             boost::this_thread::interruption_point();
-            boost::mutex::scoped_lock lock(_myMutex);
-            while(_isSeeking) {
-                _myCondition.wait(_myMutex);
+            {
+                boost::mutex::scoped_lock lock(_myMutex);
+                while(_isSeeking) {
+                    _myCondition.wait(lock);
+                }
             }
             //XXX: rethink that: add condition: wait as long as queues are full
             if (queuesFull()) {
@@ -72,7 +79,8 @@ AsyncDemuxer::run() {
                 av_free_packet(myPacket);
                 delete myPacket;
                 _isEOF = true;
-                _myCondition.wait(_myMutex);
+                boost::mutex::scoped_lock lock(_myMutex);
+                _myCondition.wait(lock);
             } else {
                 putPacket(myPacket);
             }
@@ -175,6 +183,7 @@ AsyncDemuxer::seek(double theDestTime, const int theStreamIndex) {
         _isEOF = false;
     }
     _isSeeking = false;
+    AC_DEBUG<<"AsyncDemuxer::Seek DONE";
     _myCondition.notify_one();
 }
 

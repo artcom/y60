@@ -297,6 +297,17 @@ namespace y60 {
     void FFMpegDecoder3::startMovie(double theStartTime, bool theStartAudioFlag) {
         AC_INFO << "FFMpegDecoder3::startMovie "<< getMovie()->get<ImageSourceTag>() << ", time: " << theStartTime << " frames in queue: "<<_myMsgQueue.size();
 
+        //XXX: happens when stop not called before starting new movie?! -> investigate this
+        if (_myVideoDecodeThread && !_myVideoDecodeThread->timed_join(boost::posix_time::millisec(1))) {
+            AC_WARNING<<"video decoder thread already running";
+            _myVideoDecodeThread->interrupt();
+            _myVideoDecodeThread->join();
+        }
+        if (_myAudioDecodeThread && !_myAudioDecodeThread->timed_join(boost::posix_time::millisec(1))) {
+            AC_WARNING<<"audio decoder thread already running";
+            _myAudioDecodeThread->interrupt();
+            _myAudioDecodeThread->join();
+        }
         _myMsgQueue.clear();
         _myMsgQueue.reset();
         _myDemux->start();
@@ -351,6 +362,7 @@ namespace y60 {
             AC_DEBUG << "Stopping Movie";
             _myLastVideoFrame = VideoMsgPtr();
 
+            _myDemux->seek(0.0);
             _myDemux->stop();
             _myMsgQueue.clear();
             _myMsgQueue.reset();
@@ -1120,8 +1132,9 @@ namespace y60 {
             while(true) {
                 DB(AC_TRACE << "---run_audiodecode: ");
                 boost::this_thread::interruption_point();
+                boost::mutex::scoped_lock seeklock(_mySeekMutex);
                 while(_mySeekRequested) {
-                    _mySeekCondition.wait(_mySeekMutex);
+                    _mySeekCondition.wait(seeklock);
                 }
                 //XXX: pausing audio thread leads to underruns in the samplesink
                 //double myDestBufferedTime = double(_myAudioSink->getBufferedTime())+8/_myFrameRate;
@@ -1137,7 +1150,7 @@ namespace y60 {
                 if (isEOF) { 
                     boost::mutex::scoped_lock lock(_myAudioMutex);
                     _myAudioIsEOF = true;
-                    _myAudioCondition.wait(_myAudioMutex);
+                    _myAudioCondition.wait(lock);
                 }
             }
         } catch (boost::thread_interrupted &) {
@@ -1151,8 +1164,9 @@ namespace y60 {
             while(true) {
                 DB(AC_TRACE << "---run_videodecode: frames in cache: " <<_myMsgQueue.size());
                 boost::this_thread::interruption_point();
+                boost::mutex::scoped_lock seeklock(_mySeekMutex);
                 while(_mySeekRequested) {
-                    _mySeekCondition.wait(_mySeekMutex);
+                    _mySeekCondition.wait(seeklock);
                 }
                 if (_myMsgQueue.size() >= _myMaxCacheSize) {
                     boost::this_thread::sleep(boost::posix_time::millisec(10));
@@ -1167,7 +1181,7 @@ namespace y60 {
                     _myDemux->seek(0.0, _myVStreamIndex);
                     //XXX: only loop when movie loopcount=0 otherwise wait
                     //boost::mutex::scoped_lock lock(_myVideoMutex);
-                    //_myVideoCondition.wait(_myVideoMutex);
+                    //_myVideoCondition.wait(lock);
                 }
             }
         } catch (boost::thread_interrupted &) {
