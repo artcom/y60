@@ -755,6 +755,7 @@ namespace y60 {
         return !_isStreamingMedia && (myDistance > _myMaxCacheSize || myDistance < 0);
     }
 
+    //XXX: seeking is currently done in mainthread, decoding & demuxing threads are pause with a condition -> is this the way to do it?!
     void FFMpegDecoder3::seek(double theDestTime) {
         AC_DEBUG << "FFMpegDecoder3::seek() desttime: "<<theDestTime;
         {

@@ -119,6 +119,7 @@ AsyncDemuxer::getPacket(const int theStreamIndex) {
         AC_ERROR << "AsyncDemuxer::getPacket called with nonexistent stream index " << theStreamIndex << ".";
     }
     PacketMsgPtr p;
+    //XXX: this triggers sometimes and should never -> investigate
     if(!it->second->timed_wait_and_pop<boost::posix_time::millisec>(p, boost::posix_time::millisec(5000))) {
         stop();
         throw asl::Exception("demuxer can't deliver anymore packets", PLUS_FILE_LINE);
