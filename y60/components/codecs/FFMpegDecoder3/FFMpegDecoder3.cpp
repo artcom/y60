@@ -168,7 +168,12 @@ namespace y60 {
 
     void
     FFMpegDecoder3::load(const std::string & theFilename) {
-        AC_INFO << "FFMpegDecoder3::load(" << theFilename << ")";
+        std::string myFilename = theFilename;
+        //get<ImageSourceTag>() returns "[theFilename]"
+        if (myFilename[0] == '[' && myFilename[myFilename.size()-1] == ']') {
+            myFilename = myFilename.substr(1,myFilename.size()-2);
+        }
+        AC_INFO << "FFMpegDecoder3::load(" << myFilename << ")";
         // register all formats and codecs
         static bool avRegistered = false;
         if (!avRegistered) {
@@ -178,22 +183,22 @@ namespace y60 {
             avRegistered = true;
         }
 
-        if (theFilename.find("rtp://") != std::string::npos || theFilename.find("rtsp://") != std::string::npos) {
+        if (myFilename.find("rtp://") != std::string::npos || myFilename.find("rtsp://") != std::string::npos) {
             _isStreamingMedia = true;
         }
-        AC_INFO<<"FFMpegDecoder3::load "<< theFilename <<" is streaming media: "<<_isStreamingMedia;
+        AC_INFO<<"FFMpegDecoder3::load "<< myFilename <<" is streaming media: "<<_isStreamingMedia;
 #if LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(53, 2, 0)
-        if (avformat_open_input(&_myFormatContext, theFilename.c_str(), NULL, NULL) < 0) {
+        if (avformat_open_input(&_myFormatContext, myFilename.c_str(), NULL, NULL) < 0) {
 #else
-        if (av_open_input_file(&_myFormatContext, theFilename.c_str(), 0, 0, 0) < 0) {
+        if (av_open_input_file(&_myFormatContext, myFilename.c_str(), 0, 0, 0) < 0) {
 #endif
             throw FFMpegDecoder3Exception(std::string("Unable to open input file: ")
-                    + theFilename, PLUS_FILE_LINE);
+                    + myFilename, PLUS_FILE_LINE);
         }
 
         if (av_find_stream_info(_myFormatContext) < 0) {
             throw FFMpegDecoder3Exception(std::string("Unable to find stream info: ")
-                    + theFilename, PLUS_FILE_LINE);
+                    + myFilename, PLUS_FILE_LINE);
         }
         // for debugging you can let ffmpeg tell detail about the movie
         //char myString[200];
@@ -235,16 +240,16 @@ namespace y60 {
         }
 
         if (_myVStream) {
-            setupVideo(theFilename);
+            setupVideo(myFilename);
         } else {
-            AC_INFO << "FFMpegDecoder3::load " << theFilename << " no video stream found";
+            AC_INFO << "FFMpegDecoder3::load " << myFilename << " no video stream found";
             _myVStream = 0;
             _myVStreamIndex = -1;
         }
         if (_myAStream && getAudioFlag()) {
-            setupAudio(theFilename);
+            setupAudio(myFilename);
         } else {
-            AC_INFO << "FFMpegDecoder3::load " << theFilename
+            AC_INFO << "FFMpegDecoder3::load " << myFilename
                     << " no audio stream found or disabled";
             _myAudioSink = HWSampleSinkPtr();
             _myAStream = 0;
