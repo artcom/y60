@@ -180,7 +180,7 @@ GUI.AnimationManager.prototype.Constructor = function (Public, Protected) {
                 return;
             }
         }
-        Logger.info("<AnimationManager::play> playing '" + theAnimation + "' in namespace: '" + _.getNamespaceParts(myNamespace) + "'");
+        Logger.debug("<AnimationManager::play> playing '" + theAnimation + "' in namespace: '" + _.getNamespaceParts(myNamespace) + "'");
         myNamespace.animations.push(theAnimation);
         theAnimation.play();
     };
@@ -199,7 +199,7 @@ GUI.AnimationManager.prototype.Constructor = function (Public, Protected) {
                 if (myAnimation.running) {
                     myAnimation.doFrame(theTime * 1000);
                 } else {
-                    Logger.info("<AnimationManager::doFrame> removing animation '" + myAnimation + "' from namespace: '" + _.getNamespaceParts(theNamespace) + "' since it is done playing!");
+                    Logger.debug("<AnimationManager::doFrame> removing animation '" + myAnimation + "' from namespace: '" + _.getNamespaceParts(theNamespace) + "' since it is done playing!");
                     theNamespace.animations.splice(i, 1);
                     i--; // We mutate the array as we walk it and have to mitigate this.
                 }
@@ -239,16 +239,16 @@ GUI.AnimationManager.prototype.Constructor = function (Public, Protected) {
     };
     
     Public.cancelAllAnimationsForNamespace = function (theNamespaceString, theDoNotCancelAnimation) {
-        Logger.info("<AnimationManager::cancelAllAnimationsForNamespace> Cancelling all animations for namespace: '" + theNamespaceString + "'");
+        Logger.debug("<AnimationManager::cancelAllAnimationsForNamespace> Cancelling all animations for namespace: '" + theNamespaceString + "'");
         var myNamespace = Public.getNamespace(theNamespaceString);
         var animationsCancelled = 0;
         if (myNamespace) {
             myNamespace.forEachNamespaceDo(function (theNamespace) {
-                Logger.info("<AnimationManager::cancelAllAnimationsForNamespace> * in namespace '" + _.getNamespaceParts(theNamespace) + "' (" + theNamespace.animations.length + " animations):");
+                Logger.debug("<AnimationManager::cancelAllAnimationsForNamespace> * in namespace '" + _.getNamespaceParts(theNamespace) + "' (" + theNamespace.animations.length + " animations):");
                 var myAnimation, i;
                 for (i = 0; i < theNamespace.animations.length; i++) {
                     if (theNamespace.animations[i] !== theDoNotCancelAnimation) {
-                        Logger.info("<AnimationManager::cancelAllAnimationsForNamespace>     * cancelling " + theNamespace.animations[i]);
+                        Logger.debug("<AnimationManager::cancelAllAnimationsForNamespace>     * cancelling " + theNamespace.animations[i]);
                         theNamespace.animations[i].cancel();
                         animationsCancelled += 1;
                     }
