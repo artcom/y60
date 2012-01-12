@@ -79,6 +79,8 @@ namespace jslib {
 
 template class JSWrapper<Block, asl::Ptr<Block>, StaticAccessProtocol>;
 
+typedef asl::Block NATIVE;
+
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Converts the block into a string.");
@@ -104,6 +106,13 @@ toBase64String(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
     return JS_TRUE;
 }
 
+static JSBool
+resize(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Resizes the block (if possible).");
+    DOC_END;
+    return Method<NATIVE>::call(&NATIVE::resize,cx,obj,argc,argv,rval);
+}
+
 JSFunctionSpec *
 JSBlock::Functions() {
     AC_DEBUG << "Registering class '"<<ClassName()<<"'"<<endl;
@@ -111,6 +120,7 @@ JSBlock::Functions() {
         // name                  native                   nargs
         {"toString",             toString,                0},
         {"toBase64String",       toBase64String,          0},
+        {"resize",               resize,                  1},
         {0}
     };
     return myFunctions;

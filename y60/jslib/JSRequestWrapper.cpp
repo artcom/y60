@@ -297,8 +297,12 @@ JSRequestWrapper::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject
                 return JS_TRUE;
             case PROP_responseBlock:
                 {
-                    asl::Ptr<asl::Block> myBlock(new Block(getNative().getResponseBlock()));
-                    *vp = as_jsval(cx, myBlock);
+                    //asl::Ptr<asl::Block> myBlock(new Block(getNative().getResponseBlock()));
+                    //*vp = as_jsval(cx, myBlock);
+                    //*vp = JSRequestWrapper::getJSWrapper(cx,obj).openNative().getResponseBlockPtr();
+                    //JSRequestWrapper::getJSWrapper(cx,obj).closeNative();
+                    
+                    *vp = as_jsval(cx, getNative().getResponseBlockPtr());
                 }
                 return JS_TRUE;
             case PROP_errorString:

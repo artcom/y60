@@ -58,6 +58,7 @@
 
 // own header
 #include "JSRequest.h"
+#include <y60/jsbase/JSBlock.h>
 
 #include <iostream>
 
@@ -159,6 +160,17 @@ JSRequest::onDone() {
         jsval argv[1], rval;
         /*JSBool ok =*/ JSA_CallFunctionName(_myJSContext, _myJSListener, "onDone", 0, argv, &rval);
     }
+}
+
+size_t
+JSRequest::onData(const char * theData, size_t theReceivedByteCount) {
+    size_t myByteCount = Request::onData(theData, theReceivedByteCount);
+    if (hasCallback("onData")) {
+        jsval argv[1], rval;
+        //argv[0] = as_jsval(_myJSContext, getResponseBlock());
+        /*JSBool ok =*/ JSA_CallFunctionName(_myJSContext, _myJSListener, "onData", 0, argv, &rval);
+    }
+    return myByteCount;
 }
 
 void 

@@ -117,6 +117,7 @@ namespace inet {
             long getResponseCode() const;
             std::string getResponseString() const;
             const asl::Block & getResponseBlock() const;
+            asl::Ptr<asl::Block> getResponseBlockPtr() const;
             std::string getErrorString() const;
             const std::string & getURL() const;
             void setLowSpeedLimit(unsigned theBytesPerSec);
@@ -194,7 +195,7 @@ namespace inet {
             struct curl_slist * _myHttpHeaderList;
             std::string         _myPostBuffer;
             asl::Ptr<asl::ReadableBlock> _myPostBlock;
-            asl::Block          _myResponseBlock;
+            asl::Ptr<asl::Block> _myResponseBlock;
             std::vector<char>   _myErrorBuffer;
             std::string         _mySSLCertificateFilename;
             std::multimap<std::string, std::string> _myResponseHeaders;

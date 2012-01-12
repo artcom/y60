@@ -85,6 +85,7 @@ class JSRequest : public inet::Request {
         bool onProgress(double theDownloadTotal, double theCurrentDownload,
                 double theUploadTotal, double theCurrentUpload);
         void onDone();
+        size_t onData(const char * theData, size_t theReceivedByteCount);
 
         void removeFromRoot();
     private:

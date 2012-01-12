@@ -89,6 +89,7 @@ namespace inet {
         _myLowSpeedLimit(0),
         _myLowSpeedTimeout(0),
         _myHttpHeaderList(0),
+        _myResponseBlock(new Block()),
         _myErrorBuffer(CURL_ERROR_SIZE, '\0'),
         _myVerboseFlag(false),
         _myVerifyPeerFlag(false)
@@ -185,11 +186,16 @@ namespace inet {
 
     std::string
     Request::getResponseString() const {
-        return std::string(_myResponseBlock.strbegin(), _myResponseBlock.strend());
+        return std::string(_myResponseBlock->strbegin(), _myResponseBlock->strend());
     };
 
     const asl::Block &
     Request::getResponseBlock() const {
+        return * _myResponseBlock;
+    };
+
+    asl::Ptr<asl::Block>
+    Request::getResponseBlockPtr() const {
         return _myResponseBlock;
     };
 
@@ -413,7 +419,7 @@ namespace inet {
 
         struct WriteBlock * myPayloadBlock = new WriteBlock();
         myPayloadBlock->dataBlock = theBlock;
-		myPayloadBlock->position  = 0;
+        myPayloadBlock->position  = 0;
 
         CURLcode myStatus = curl_easy_setopt( _myCurlHandle, CURLOPT_UPLOAD, true );        
         checkCurlStatus(myStatus, PLUS_FILE_LINE);
@@ -424,7 +430,7 @@ namespace inet {
         myStatus = curl_easy_setopt( _myCurlHandle, CURLOPT_READDATA, myPayloadBlock );
         checkCurlStatus(myStatus, PLUS_FILE_LINE);
 
-		return theBlock->size();
+        return theBlock->size();
     }
 
     // request-method type methods
@@ -521,7 +527,7 @@ namespace inet {
     // virtual callback hooks
     size_t
     Request::onData(const char * theData, size_t theReceivedByteCount) {
-        _myResponseBlock.append(theData, theReceivedByteCount);
+        _myResponseBlock->append(theData, theReceivedByteCount);
         return theReceivedByteCount;
     }
 
