@@ -1,5 +1,5 @@
 /*jslint nomen:false, white: false*/
-/*globals spark, use, Logger, Modelling, window*/
+/*globals spark, use, Logger, Modelling, window, Vector2f*/
 
 /**
  * A simple movie player.
@@ -161,7 +161,11 @@ spark.Movie.Constructor = function(Protected) {
     });
 
     Public.__defineGetter__("currentFrame", function() {
-        return _myMovie.currentframe;
+        if ("currentframe" in _myMovie) {
+            return _myMovie.currentframe;
+        } else {
+            return;
+        }
     });
     Public.__defineSetter__("currentFrame", function(f) {
         _myMovie.currentframe = f;
