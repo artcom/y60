@@ -409,15 +409,22 @@ WriteBlockToFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
     DOC_BEGIN("Writes a given binary block into a file");
     DOC_PARAM("theFilename", "The target file path", DOC_TYPE_STRING);
     DOC_PARAM("theBlock", "The block to write", DOC_TYPE_BLOCK);
+    DOC_PARAM("theAppendFlag", "Append to file? (default false)", DOC_TYPE_BOOLEAN);
     DOC_RVAL("Returns true if successful.", DOC_TYPE_BOOLEAN);
     DOC_END;
     try {
-        ensureParamCount(argc, 2);
+        ensureParamCount(argc, 2,3);
         std::string myPath;
         convertFrom(cx, argv[0], myPath);
         asl::Block * myContent = 0;
         convertFrom(cx, argv[1], myContent);
-        *rval = as_jsval(cx, asl::writeFile(myPath, *myContent));
+
+        bool myAppendFlag = false;
+        if (argc >= 3) {
+            convertFrom(cx, argv[2], myAppendFlag);
+        }
+
+        *rval = as_jsval(cx, asl::writeFile(myPath, *myContent, myAppendFlag));
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }

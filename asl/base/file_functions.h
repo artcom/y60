@@ -142,8 +142,8 @@ ASL_BASE_DECL std::string readFile(const std::string& theFileName);
 ASL_BASE_DECL bool readFile(const std::string& theFileName, std::vector<std::string> & theLines);
 ASL_BASE_DECL bool readFile(const std::string& theFileName, std::string & theContent);
 ASL_BASE_DECL bool readFile(const std::string& theFileName, asl::ResizeableBlock & theContent);
-ASL_BASE_DECL bool writeFile(const std::string& theFileName, const std::string & theContent);
-ASL_BASE_DECL bool writeFile(const std::string& theFileName, const asl::ReadableBlock & theContent);
+ASL_BASE_DECL bool writeFile(const std::string& theFileName, const std::string & theContent, bool theAppendFlag=false);
+ASL_BASE_DECL bool writeFile(const std::string& theFileName, const asl::ReadableBlock & theContent, bool theAppendFlag=false);
 
 ASL_BASE_DECL bool deleteFile(const std::string& theFileName);
 ASL_BASE_DECL bool copyFile(const std::string& theOldFileName, const std::string & theNewFileName);

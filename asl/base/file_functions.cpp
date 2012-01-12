@@ -381,8 +381,12 @@ namespace asl {
         return myResult;
     };
 
-    bool writeFile(const std::string & theUTF8Filename, const std::string & theContent) {
-        std::ofstream outFile(Path(theUTF8Filename, UTF8).toLocale().c_str(), std::ios::binary);
+    bool writeFile(const std::string & theUTF8Filename, const std::string & theContent, bool theAppendFlag) {
+        ios_base::openmode openFlags = std::ios::binary;
+        if (theAppendFlag) {
+            openFlags = openFlags | std::ios_base::app;
+        }
+        std::ofstream outFile(Path(theUTF8Filename, UTF8).toLocale().c_str(), openFlags);
         if (outFile) {
             outFile << theContent;
             return outFile != 0;
@@ -390,8 +394,12 @@ namespace asl {
         return false;
     }
 
-    bool writeFile(const std::string & theUTF8Filename, const asl::ReadableBlock & theContent) {
-        std::ofstream outFile(Path(theUTF8Filename, UTF8).toLocale().c_str(), std::ios::binary);
+    bool writeFile(const std::string & theUTF8Filename, const asl::ReadableBlock & theContent, bool theAppendFlag) {
+        ios_base::openmode openFlags = std::ios::binary;
+        if (theAppendFlag) {
+            openFlags = openFlags | std::ios_base::app;
+        }
+        std::ofstream outFile(Path(theUTF8Filename, UTF8).toLocale().c_str(), openFlags);
         if (outFile) {
             outFile.write(theContent.strbegin(),theContent.size());
             return outFile != 0;
