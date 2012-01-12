@@ -203,7 +203,7 @@ StereoSceneViewer.prototype.Constructor = function (self, theArguments) {
         if (!theKeyState) {
             return;
         }
-        if (theKey === 't') {
+        if (theAltFlag && theKey === 't') {
             if (self.getRenderWindow().canvas.id === self.monoCanvas.id) {
                 self.setStereo();
             } else {
