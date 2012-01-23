@@ -56,6 +56,7 @@ void connection::handle_read(const boost::system::error_code& e,
   if (!e)
   {
     boost::tribool result;
+    AC_TRACE << std::string(buffer_.data(), bytes_transferred);
     boost::tie(result, boost::tuples::ignore) = request_parser_.parse(
         request_, buffer_.data(), buffer_.data() + bytes_transferred);
 
