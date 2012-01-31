@@ -289,13 +289,13 @@ Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent, int theID, const std:
                     float myDuration = static_cast<float>(_myCursorPositionHistory[theID].back()._myTimestamp - _myCursorPositionHistory[theID].front()._myTimestamp);
                     myDuration /= 1000.0f; //seconds
                     float myVelocity = myMagnitude/myDuration;
-                    AC_INFO << "check for wipe with velocity " << myVelocity << " threshold " << _myWipeVelocityThreshold << " history size " << _myCursorPositionHistory[theID].size();
+                    AC_TRACE << "check for wipe with velocity " << myVelocity << " threshold " << _myWipeVelocityThreshold << " history size " << _myCursorPositionHistory[theID].size();
                     if (myVelocity > _myWipeVelocityThreshold) {
                         NodePtr myNode = addGestureEvent2Queue(theBaseEvent, theID, "wipe", thePosition3D,theToucharea);
                         myNode->appendAttribute<Vector3f>("direction", normalized(myDifference));
                         
                         myNode->appendAttribute<float>("velocity", myVelocity);
-                        AC_INFO << "register wipe gesture, id " << theID << " direction " << normalized(myDifference) << " velocity " << myVelocity << " (duration: " << myDuration <<")";
+                        AC_TRACE << "register wipe gesture, id " << theID << " direction " << normalized(myDifference) << " velocity " << myVelocity << " (duration: " << myDuration <<")";
                         //delete history to avoid additional wipes in next cursor moves
                         if (_myCursorPositionHistory.find(theID) != _myCursorPositionHistory.end()) {
                             _myCursorPositionHistory.erase(theID);
@@ -325,12 +325,12 @@ Gesture::createEvent(GESTURE_BASE_EVENT_TYPE theBaseEvent, int theID, const std:
                 Vector3f myDifference = difference(thePosition3D, _myInitialCursorPositions[theID]._myPosition);
                 float myMagnitude = magnitude(myDifference);
                 unsigned int myDuration = static_cast<unsigned int>(_myCurrentCursorPositions[theID]._myTimestamp - _myInitialCursorPositions[theID]._myTimestamp);
-                AC_INFO << "check for tap with magnitude " << myMagnitude << " threshold " << _myTapMaxDistanceThreshold << " - duration: " << myDuration << ", >= threshold: " << _myTapMinDurationThreshold << " < threshold: " << _myTapMaxDurationThreshold;
+                AC_TRACE << "check for tap with magnitude " << myMagnitude << " threshold " << _myTapMaxDistanceThreshold << " - duration: " << myDuration << ", >= threshold: " << _myTapMinDurationThreshold << " < threshold: " << _myTapMaxDurationThreshold;
                 if (myMagnitude < _myTapMaxDistanceThreshold &&  
                     myDuration < _myTapMaxDurationThreshold &&
                     myDuration >= _myTapMinDurationThreshold) {
                     NodePtr myNode = addGestureEvent2Queue(theBaseEvent, theID, "tap", thePosition3D, theToucharea);
-                    AC_INFO << "register tap gesture, id " << theID << " pos " << thePosition3D;
+                    AC_TRACE << "register tap gesture, id " << theID << " pos " << thePosition3D;
                 }
             }
             if (_myCursorPositionHistory.find(theID) != _myCursorPositionHistory.end()) {
