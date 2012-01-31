@@ -929,7 +929,7 @@ namespace y60 {
     }
 
     void FFMpegDecoder2::setupVideo(const std::string & theFilename) {
-        AC_INFO << "FFMpegDecoder2::setupVideo";
+        AC_DEBUG << "FFMpegDecoder2::setupVideo";
         AVCodecContext * myVCodec = _myVStream->codec;
         // open codec
         AVCodec * myCodec = avcodec_find_decoder(myVCodec->codec_id);
@@ -1113,14 +1113,14 @@ namespace y60 {
         myMovie->Movie::set<AspectRatioTag>((float)myAspectRatio);
 
         _myVideoStartTimestamp = _myVStream->start_time;
-        AC_INFO << "FFMpegDecoder2::getVideoProperties() " << theFilename << " fps="
+        AC_DEBUG << "FFMpegDecoder2::getVideoProperties() " << theFilename << " fps="
                 << _myFrameRate << " framecount=" << getFrameCount()<< " time_base: "
                 <<_myVideoStreamTimeBase;
-        AC_INFO << "r_framerate den: " <<_myVStream->r_frame_rate.den<< " r_framerate num: "<< _myVStream->r_frame_rate.num;
-        AC_INFO << "stream time_base: " << _myVStream->time_base.den << ","<<_myVStream->time_base.num;
-        AC_INFO << "codec time_base: " << _myVStream->codec->time_base.den << ","<<_myVStream->codec->time_base.num;
-        AC_INFO << "formatcontex start_time: " << _myFormatContext->start_time<<" stream start_time: "<<_myVStream->start_time;
-        AC_INFO << "aspect ratio= " << myAspectRatio;
+        AC_DEBUG << "r_framerate den: " <<_myVStream->r_frame_rate.den<< " r_framerate num: "<< _myVStream->r_frame_rate.num;
+        AC_DEBUG << "stream time_base: " << _myVStream->time_base.den << ","<<_myVStream->time_base.num;
+        AC_DEBUG << "codec time_base: " << _myVStream->codec->time_base.den << ","<<_myVStream->codec->time_base.num;
+        AC_DEBUG << "formatcontex start_time: " << _myFormatContext->start_time<<" stream start_time: "<<_myVStream->start_time;
+        AC_DEBUG << "aspect ratio= " << myAspectRatio;
 
     }
 

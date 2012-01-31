@@ -71,7 +71,7 @@ spark.loadString = function (theString, theParent) {
  * Load an xml file into the spark world.
  */
 spark.loadFile = function (theFile, theParent, theArguments) {
-    Logger.info("Loading spark file " + theFile);
+    Logger.debug("Loading spark file " + theFile);
     var myFileWithPath = searchFile(theFile);
     if (!myFileWithPath) {
         throw new Exception("spark.loadFile: spark file '" + theFile + "' does not exist.", fileline());
@@ -116,7 +116,7 @@ spark.instantiateRecursively = function (theNode, theParent, theArguments) {
     if (theNode.nodeName === "Template") {
         var myFile = theNode.src;
         //var myName = theNode.name;
-        Logger.info("Loading template " + theNode.name + " from file " + myFile);
+        Logger.debug("Loading template " + theNode.name + " from file " + myFile);
         spark[theNode.name] = spark.LoadedClass(theNode.name, myFile);
         return null;
     }

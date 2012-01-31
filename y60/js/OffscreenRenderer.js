@@ -104,7 +104,7 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage,
 
         // Setup canvas and viewport
         if (!theCanvas) {
-            Logger.info("Canvas undefined, copying 1st canvas/1st viewport");
+            Logger.debug("Canvas undefined, copying 1st canvas/1st viewport");
 
             // clone first viewport of first canvas
             _myViewport = window.canvas.childNode("viewport", 0).cloneNode(false);

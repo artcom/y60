@@ -502,7 +502,7 @@ Configurator.prototype.Constructor = function( obj, theSceneViewer, theSettingsF
 
         _myCommonSettingsFile = theSettingsFile;
         if (fileExists(_myCommonSettingsFile)) {
-            print("Parsing settings from '" + _myCommonSettingsFile + "'");
+            Logger.info("Parsing settings from '" + _myCommonSettingsFile + "'");
             var myCommonSettingsDom = new Node();
             myCommonSettingsDom.parseFile(_myCommonSettingsFile);
             _myOriginalCommonSettings = myCommonSettingsDom.firstChild;

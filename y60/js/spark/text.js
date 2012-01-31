@@ -99,7 +99,7 @@ spark.loadFont = function (theName, theSize, theFontStyle, theHinting, theAscend
             spark.loadFont(theName, theSize, "normal", theHinting, theAscendOffset);
         }
 
-        Logger.info("Loading font " + theName + " with size " + theSize + " and fonststyle " + theFontStyle+
+        Logger.debug("Loading font " + theName + " with size " + theSize + " and fonststyle " + theFontStyle+
                     " and hinting:"+theHinting + " and ascend offset:" + theAscendOffset);
 
         // XXX: this is a remnant from before the introduction
@@ -139,7 +139,7 @@ spark.loadFont = function (theName, theSize, theFontStyle, theHinting, theAscend
                 myFontPath = searchFile("FONTS/" + myFont + "-bold" + ".ttf");
             }
             if (myFontPath) {
-                Logger.info("loading bold font for " + myName + "," + myFontPath + "," + theSize + "," + "bold");
+                Logger.debug("loading bold font for " + myName + "," + myFontPath + "," + theSize + "," + "bold");
                 window.loadTTF(myName, searchFile(myFontPath), theSize * spark.fontScale, myHinting, Renderer.BOLD);
             }
         }

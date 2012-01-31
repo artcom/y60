@@ -394,7 +394,7 @@ function Property(theName, theType, theDefault, theHandler) {
  * 
  */
 function Class(theName) {
-    Logger.info("Defining class " + theName);
+    Logger.debug("Defining class " + theName);
     var myNamespace = this;
 
     function myConstructor() {
