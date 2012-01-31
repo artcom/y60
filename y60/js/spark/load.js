@@ -153,7 +153,7 @@ spark.instantiateRecursively = function (theNode, theParent, theArguments) {
  * Internal: instantiate a single component
  */
 spark.instantiateComponent = function (theNode, theArguments) {
-    Logger.info("Instantiating " + theNode.nodeName +
+    Logger.debug("Instantiating " + theNode.nodeName +
                 ("name" in theNode ? " named " + theNode.name :
                 ("id" in theNode ? " with id " + theNode.id : "")));
 

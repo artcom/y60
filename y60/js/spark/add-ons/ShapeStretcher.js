@@ -23,12 +23,12 @@ spark.ShapeStretcher.Factory = (function () {
             if (theStretcherName in _myFactory) {
                 Logger.warning("overwriting previously registered shapestretcher " + theStretcherName);
             }
-            Logger.info("registering shapestretcher with name '" + theStretcherName + "'");
+            Logger.debug("registering shapestretcher with name '" + theStretcherName + "'");
             _myFactory[theStretcherName] = theCtor;
         };
 
         var getShapeStretcherFromAttribute = function (theStretcherName) {
-            Logger.info("lookup shapestretcher with name '" + theStretcherName + "'");
+            Logger.debug("lookup shapestretcher with name '" + theStretcherName + "'");
             if (theStretcherName in _myFactory) {
                 return _myFactory[theStretcherName];
             } else {

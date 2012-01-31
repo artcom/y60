@@ -253,7 +253,7 @@ namespace y60 {
             throw ImageException(string("Image ") + get<ImageSourceTag>() + " target pixel format conversion not yet supported: " + get<TargetPixelFormatTag>(), PLUS_FILE_LINE);
         }
 
-        AC_INFO << "Image::load loading '" << get<ImageSourceTag>() << "'";
+        AC_DEBUG << "Image::load loading '" << get<ImageSourceTag>() << "'";
         unsigned myDepth = get<ImageDepthTag>();
         ImageLoader myImageLoader(get<ImageSourceTag>(), AppPackageManager::get().getPtr(),
             ITextureManagerPtr(), myDepth);
