@@ -254,9 +254,9 @@ GUI.AnimationManager.prototype.Constructor = function (Public, Protected) {
                     }
                 }
             });
-        } else {
+        } /*else {
             Logger.warning("<AnimationManager::cancelAllAnimationsForNamespace> Namespace '" + theNamespaceString + "' does not exist.");
-        }
+        }*/
         return animationsCancelled;
     };
     
