@@ -267,7 +267,7 @@ BaseConfigurator.prototype.Constructor = function (Public, Protected, theSceneVi
     // Protected Variables //
     /////////////////////////
     
-    Protected.myMergedSettings = null; // TODO rename
+    Protected.settings = null; // TODO rename
     
     ///////////////////////
     // Protected Methods //
@@ -287,16 +287,16 @@ BaseConfigurator.prototype.Constructor = function (Public, Protected, theSceneVi
             myListener = _.listeners[i];
             if (myListener.section) {
                 if (myListener.section === _.currentSection.nodeName) {
-                    myListener.obj.onUpdateSettings(Protected.myMergedSettings.childNode(myListener.section));
+                    myListener.obj.onUpdateSettings(Protected.settings.childNode(myListener.section));
                 }
             } else {
-                myListener.obj.onUpdateSettings(Protected.myMergedSettings);
+                myListener.obj.onUpdateSettings(Protected.settings);
             }
         }
     };
     
     Protected.setFirstSetting = function() {
-        _.currentSection = Protected.myMergedSettings.firstChild;
+        _.currentSection = Protected.settings.firstChild;
         _.currentSetting = new _.Setting(_.currentSection.firstChild);
     };
     
@@ -305,19 +305,19 @@ BaseConfigurator.prototype.Constructor = function (Public, Protected, theSceneVi
     ////////////////////
     
     Public.addListener = function (theListener, theSection) {
-        if (!Protected.myMergedSettings) {
+        if (!Protected.settings) {
             return;
         }
         var mySection;
         if (theSection) {
-            mySection = Protected.myMergedSettings.childNode(theSection);
+            mySection = Protected.settings.childNode(theSection);
             if (!mySection) {
                 Logger.warning("Section " + theSection + " does not exist.");
                 return;
             }
             theListener.onUpdateSettings(mySection);
         } else {
-            theListener.onUpdateSettings(Protected.myMergedSettings);
+            theListener.onUpdateSettings(Protected.settings);
         }
         _.listeners.push({
             obj     : theListener,
@@ -341,7 +341,7 @@ BaseConfigurator.prototype.Constructor = function (Public, Protected, theSceneVi
     };
 
     Public.onKey = function (theKey, theKeyState, theShiftFlag, theCtrlFlag, theAltFlag) {
-        if (!Protected.myMergedSettings) {
+        if (!Protected.settings) {
             return;
         }
         if (!theKeyState) {
@@ -410,8 +410,8 @@ BaseConfigurator.prototype.Constructor = function (Public, Protected, theSceneVi
     };
     
     Public.getSettings = function () {
-        if (Protected.myMergedSettings) {
-            return Protected.myMergedSettings;
+        if (Protected.settings) {
+            return Protected.settings;
         } else {
             throw new Exception("No settings found", fileline());
         }

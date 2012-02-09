@@ -196,11 +196,11 @@ LegacyConfigurator.prototype.Constructor = function (obj, Protected, theSceneVie
         var i, mySection, myCommonSection;
         for (i = 0; i < theSettings.childNodesLength(); i++) {
             mySection = theSettings.childNode(i);
-            myCommonSection = Protected.myMergedSettings.childNode(mySection.nodeName);
+            myCommonSection = Protected.settings.childNode(mySection.nodeName);
 
             if (!myCommonSection) {
                 myCommonSection = Node.createElement(mySection.nodeName);
-                Protected.myMergedSettings.appendChild(myCommonSection);
+                Protected.settings.appendChild(myCommonSection);
             }
             mergeSection(myCommonSection, mySection);
         }
@@ -216,7 +216,7 @@ LegacyConfigurator.prototype.Constructor = function (obj, Protected, theSceneVie
             myCommonSettingsDom.parseFile(_myCommonSettingsFile);
             _myOriginalCommonSettings = myCommonSettingsDom.firstChild;
 
-            Protected.myMergedSettings = myCommonSettingsDom.firstChild.cloneNode(true);
+            Protected.settings = myCommonSettingsDom.firstChild.cloneNode(true);
 
             // merge all settings in the settings file list
             for (i = 0; i < _mySettingsFileList.length; i++) {
@@ -234,7 +234,7 @@ LegacyConfigurator.prototype.Constructor = function (obj, Protected, theSceneVie
                 }
             }
 
-            _myOriginalMergedSettings = Protected.myMergedSettings.cloneNode(true);
+            _myOriginalMergedSettings = Protected.settings.cloneNode(true);
             // set default current settings
             Protected.setFirstSetting();
         } else {
@@ -254,7 +254,7 @@ LegacyConfigurator.prototype.Constructor = function (obj, Protected, theSceneVie
     
     Protected.saveSettings = function () {
         var myCommonSettingsFileSavedFlag = false;
-        var myCurrentMergedSettings = Protected.myMergedSettings.cloneNode(true);
+        var myCurrentMergedSettings = Protected.settings.cloneNode(true);
         var i, myCurrentSettings;
         for (i = _mySettingsList.length - 1; i >= 0; i--) {
             myCurrentSettings = _mySettingsList[i];
@@ -272,8 +272,8 @@ LegacyConfigurator.prototype.Constructor = function (obj, Protected, theSceneVie
 
     Protected.restoreSettings = function () {
         var i, j, myChild;
-        for (i = 0; i < Protected.myMergedSettings.childNodes.length; ++i) {
-            myChild = Protected.myMergedSettings.childNode(i);
+        for (i = 0; i < Protected.settings.childNodes.length; ++i) {
+            myChild = Protected.settings.childNode(i);
             for (j = 0; j < myChild.childNodes.length; ++j) {
                 myChild.childNode(j).firstChild.nodeValue =
                     _myOriginalMergedSettings.childNode(i).childNode(j).firstChild;
@@ -287,9 +287,9 @@ LegacyConfigurator.prototype.Constructor = function (obj, Protected, theSceneVie
     ////////////////////
 
     obj.setSetting = function (theSection, theSetting, theValue) {
-        var mySection = Protected.myMergedSettings.childNode(theSection);
+        var mySection = Protected.settings.childNode(theSection);
         if (!mySection) {
-            mySection = Protected.myMergedSettings.appendChild(Node.createElement(theSection));
+            mySection = Protected.settings.appendChild(Node.createElement(theSection));
         }
 
         var mySetting = mySection.childNode(theSetting);
@@ -329,11 +329,11 @@ LegacyConfigurator.prototype.Constructor = function (obj, Protected, theSceneVie
     };
 
     obj.hasSection = function (theSection) {
-        return (Protected.myMergedSettings.childNode(theSection) !== null);
+        return (Protected.settings.childNode(theSection) !== null);
     };
     
     obj.findSections  = function (theXpath) {
-        return Protected.myMergedSettings.findAll(theXpath);
+        return Protected.settings.findAll(theXpath);
     };
 
     setup(obj, theSceneViewer, theSettingsFile, theSettingsFileList);
