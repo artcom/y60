@@ -83,7 +83,7 @@ struct IScriptablePlugin {
 		const y60::PropertyValue & thePropertyValue)
     {}
 
-	// Function will be called if the settings.xml file changed (s. Configurator.js)
+	// Function will be called if a setting is changed (s. BaseConfigurator.js)
 	virtual void onUpdateSettings(dom::NodePtr theConfiguration) {};
 };
 

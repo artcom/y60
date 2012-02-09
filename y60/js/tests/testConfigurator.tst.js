@@ -62,7 +62,7 @@
           copyFile, deleteFile, searchFile, exit*/
 
 use("UnitTest.js");
-use("Configurator.js");
+use("LegacyConfigurator.js");
 
 function ConfiguratorUnitTest() {
     this.Constructor(this, "ConfiguratorUnitTest");
@@ -79,7 +79,7 @@ ConfiguratorUnitTest.prototype.Constructor = function (obj, theName) {
 
     function testLoadSettings() {
         try {
-            var myConfigurator = new Configurator(null, COMMON_SETTINGS,
+            var myConfigurator = new LegacyConfigurator(null, COMMON_SETTINGS,
                                                   [LIST_A_SETTINGS, LIST_B_SETTINGS]);
 
             obj.mySettings = myConfigurator.getSettings();
@@ -183,7 +183,7 @@ ConfiguratorUnitTest.prototype.Constructor = function (obj, theName) {
 
     obj.run = function () {
         try {
-            var myConfigurator = new Configurator(null, COMMON_SETTINGS,
+            var myConfigurator = new LegacyConfigurator(null, COMMON_SETTINGS,
                                                   [LIST_A_SETTINGS, LIST_B_SETTINGS]);
             obj.mySettingsFileList = myConfigurator.getSettingsFileList();
             ENSURE("obj.mySettingsFileList[0] == LIST_A_SETTINGS && " +

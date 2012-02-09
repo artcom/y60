@@ -85,7 +85,6 @@ use("AnimationManager.js");
 use("ImageManager.js");
 use("TextureAtlasManager.js");
 use("Timer.js");
-use("Configurator.js");
 use("shutter.js");
 use("OnScreenDisplay.js");
 use("MemoryMeter.js");
@@ -136,7 +135,7 @@ SceneViewer.prototype.Constructor = function (self, theArguments) {
     // Public Members //
     ////////////////////
 
-    self.configuratorClass = Configurator;
+    self.configuratorClass = null;
 
     /////////////////////
     // Private Methods //
@@ -785,6 +784,11 @@ SceneViewer.prototype.Constructor = function (self, theArguments) {
         _myImageManager = new ImageManager(self);
 
         var myOptionsString = ("settings" in self['arguments']) ? self['arguments'].settings : undefined;
+        
+        if (!self.configuratorClass) {
+            use("LegacyConfigurator.js");
+            self.configuratorClass = LegacyConfigurator;
+        }
         _myConfigurator = self.configuratorClass.create(self, myOptionsString);
 
         //exit()

@@ -115,7 +115,7 @@ namespace jslib {
         /**
          * Function will be called when some settings are changed.
          * @param theSettings Settings node.
-         * @see js/Configurator.js
+         * @see js/BaseConfigurator.js
          */
         virtual void onUpdateSettings(dom::NodePtr theSettings) {
         }
