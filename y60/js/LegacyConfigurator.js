@@ -81,9 +81,9 @@ LegacyConfigurator.create = function (theSceneViewer, theOptionsString) {
     // look for settings file
     var mySettingsFile = "";
     var i;
-    for (i = 0; i < Configurator.SETTINGS_FILE_NAMES.length; ++i) {
-        if (fileExists(Configurator.SETTINGS_FILE_NAMES[i])) {
-            mySettingsFile = Configurator.SETTINGS_FILE_NAMES[i];
+    for (i = 0; i < LegacyConfigurator.SETTINGS_FILE_NAMES.length; ++i) {
+        if (fileExists(LegacyConfigurator.SETTINGS_FILE_NAMES[i])) {
+            mySettingsFile = LegacyConfigurator.SETTINGS_FILE_NAMES[i];
             break;
         }
     }
@@ -116,7 +116,7 @@ LegacyConfigurator.create = function (theSceneViewer, theOptionsString) {
     }
 
     if (mySettingsFile !== "" || mySettingsList !== undefined) {
-        return new Configurator(theSceneViewer, mySettingsFile, mySettingsList);
+        return new LegacyConfigurator(theSceneViewer, mySettingsFile, mySettingsList);
     }
     return null;
 };
