@@ -74,6 +74,52 @@ function Configurator(theSceneViewer, theSettingsFile, theSettingsFileList) {
     this.Constructor(this, theSceneViewer, theSettingsFile, theSettingsFileList);
 }
 
+Configurator.SETTINGS_FILE_NAMES = ["settings.xml", "CONFIG/settings.xml"];
+
+Configurator.create = function (theSceneViewer, theOptionsString) {
+    // look for settings file
+    var mySettingsFile = "";
+    var i;
+    for (i = 0; i < Configurator.SETTINGS_FILE_NAMES.length; ++i) {
+        if (fileExists(Configurator.SETTINGS_FILE_NAMES[i])) {
+            mySettingsFile = Configurator.SETTINGS_FILE_NAMES[i];
+            break;
+        }
+    }
+
+    // look for host dependent settings file
+    var myHostSettingsFile = "";
+    var myHostFiles = ["settings-" + hostname() + ".xml",
+                       "CONFIG/settings-" + hostname() + ".xml"];
+    for (i = 0; i < myHostFiles.length; ++i) {
+        if (fileExists(myHostFiles[i])) {
+            myHostSettingsFile = myHostFiles[i];
+            break;
+        }
+    }
+
+    // look for command line argument of settings file(s)
+    // e.g. "settings mysettings.xml:moresettings.xml"
+    var mySettingsList;
+    if (theOptionsString) {
+        mySettingsList = theOptionsString.split(":");
+    }
+
+    // add host name dependent settings file to the beginning of the file list
+    if (myHostSettingsFile !== "") {
+        if (mySettingsList === undefined) {
+            mySettingsList = [myHostSettingsFile];
+        } else {
+            mySettingsList.unshift(myHostSettingsFile);
+        }
+    }
+
+    if (mySettingsFile !== "" || mySettingsList !== undefined) {
+        return new Configurator(theSceneViewer, mySettingsFile, mySettingsList);
+    }
+    return null;
+};
+
 Configurator.prototype.Constructor = function (obj, theSceneViewer, theSettingsFile,
                                                theSettingsFileList) {
     
@@ -137,7 +183,7 @@ Configurator.prototype.Constructor = function (obj, theSceneViewer, theSettingsF
         if (!theNode) {
             return false;
         }
-        if ((theNode.nodeType == Node.ELEMENT_NODE)/* && theNode.firstChild && (theNode.firstChild.nodeType == Node.TEXT_NODE)*/) {
+        if ((theNode.nodeType === Node.ELEMENT_NODE)/* && theNode.firstChild && (theNode.firstChild.nodeType == Node.TEXT_NODE)*/) {
             return true;
         } else {
             return false;
@@ -155,7 +201,7 @@ Configurator.prototype.Constructor = function (obj, theSceneViewer, theSettingsF
             if (isValidNode(myNode)) {
                 return myNode;
             }
-        } while (myNode != theNode);
+        } while (myNode !== theNode);
         return theNode;
     }
 
@@ -170,7 +216,7 @@ Configurator.prototype.Constructor = function (obj, theSceneViewer, theSettingsF
             if (isValidNode(myNode)) {
                 return myNode;
             }
-        } while (myNode != theNode);
+        } while (myNode !== theNode);
         return theNode;
     }
     
@@ -179,7 +225,7 @@ Configurator.prototype.Constructor = function (obj, theSceneViewer, theSettingsF
         for (i = 0; i < _myListeners.length; ++i) {
             myListener = _myListeners[i];
             if (myListener.section) {
-                if (myListener.section == _myCurrentSection.nodeName) {
+                if (myListener.section === _myCurrentSection.nodeName) {
                     myListener.obj.onUpdateSettings(_myMergedSettings.childNode(myListener.section));
                 }
             } else {
@@ -422,14 +468,10 @@ Configurator.prototype.Constructor = function (obj, theSceneViewer, theSettingsF
     
     function setup(obj, theSceneViewer, theSettingsFile, theSettingsFileList) {
         var i, myCommonSettingsDom, mySettingsFile, mySettings, mySettingsDom;
-        
-        if (theSettingsFileList != undefined) {
-            _mySettingsFileList = theSettingsFileList;
-        }
-
+        _mySettingsFileList = theSettingsFileList || [];
         _myCommonSettingsFile = theSettingsFile;
         if (fileExists(_myCommonSettingsFile)) {
-            Logger.info("Parsing settings from '" + _myCommonSettingsFile + "'");
+            Logger.info("<Configurator> Parsing settings from '" + _myCommonSettingsFile + "'");
             myCommonSettingsDom = new Node();
             myCommonSettingsDom.parseFile(_myCommonSettingsFile);
             _myOriginalCommonSettings = myCommonSettingsDom.firstChild;
@@ -444,10 +486,10 @@ Configurator.prototype.Constructor = function (obj, theSceneViewer, theSettingsF
                     mySettingsDom.parseFile(mySettingsFile);
                     mySettings = mySettingsDom.firstChild;
                     _mySettingsList.push(mySettings);
-                    print("Using settings from '" + mySettingsFile + "'");
+                    Logger.info("<Configurator> Using settings from '" + mySettingsFile + "'");
                     mergeSettings(mySettings);
                 } else {
-                    Logger.warning('Settings file "' + mySettingsFile +
+                    Logger.warning('<Configurator> Settings file "' + mySettingsFile +
                                    '" does not exist!');
                 }
             }
@@ -457,6 +499,9 @@ Configurator.prototype.Constructor = function (obj, theSceneViewer, theSettingsF
             _myCurrentSection = _myMergedSettings.firstChild;
             _myCurrentSetting = new Setting(_myCurrentSection.firstChild);
         } else {
+            if (_mySettingsFileList.length > 0) {
+                Logger.warning("Not loading settings '[" + _mySettingsFileList.join(",") + "]' since ");
+            }
             // XXX todo: no settings.xml -> no configurator?
             //throw new Exception( "Settings file " + _myCommonSettingsFile +
             //                     "does not exist!", fileline() );
@@ -501,7 +546,7 @@ Configurator.prototype.Constructor = function (obj, theSceneViewer, theSettingsF
     };
 
     obj.hasSection = function (theSection) {
-        return _myMergedSettings.childNode(theSection) != null;
+        return (_myMergedSettings.childNode(theSection) !== null);
     };
 
     obj.setSetting = function (theSection, theSetting, theValue) {
@@ -687,4 +732,4 @@ function Settings() {
     };
 }
 
-var ourSettings = (ourSettings == undefined) ? new Settings() : ourSettings;
+var ourSettings = ourSettings || new Settings();
