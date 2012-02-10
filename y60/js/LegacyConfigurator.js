@@ -285,6 +285,8 @@ LegacyConfigurator.prototype.Constructor = function (obj, Protected, theSceneVie
     ////////////////////
     // Public Methods //
     ////////////////////
+    
+    obj.saveSettings = Protected.saveSettings; // needed for tests 
 
     obj.setSetting = function (theSection, theSetting, theValue) {
         var mySection = Protected.settings.childNode(theSection);

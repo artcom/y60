@@ -104,7 +104,7 @@ ConfiguratorUnitTest.prototype.Constructor = function (obj, theName) {
         copyFile(LIST_B_SETTINGS, LIST_B_SETTINGS_COPY);
 
         // initialize the configurator with our copies
-        var myConfigurator = new Configurator(null, COMMON_SETTINGS_COPY,
+        var myConfigurator = new LegacyConfigurator(null, COMMON_SETTINGS_COPY,
                                               [LIST_A_SETTINGS_COPY,
                                                LIST_B_SETTINGS_COPY]);
 
