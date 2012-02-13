@@ -476,7 +476,7 @@ namespace y60 {
                 asl::PlugInBasePtr myPlugIn =
                     asl::PlugInManager::get().getPlugIn(myDecoderHint);
                 if (IDecoderPtr myDecoderPlug = dynamic_cast_Ptr<IDecoder>(myPlugIn)) {
-                    AC_INFO << "Plug: " << myDecoderHint << ": as Decoder" << endl;
+                    AC_DEBUG << "Plug: " << myDecoderHint << ": as Decoder" << endl;
                     DecoderManager::get().addDecoder(myDecoderPlug);
                     myDecoder = DecoderManager::get().findDecoder<MovieDecoderBase>(theFilename);
                     if (!myDecoder) {
@@ -514,7 +514,7 @@ namespace y60 {
 
     void
     Movie::loadStream(asl::Ptr<asl::ReadableStream> theSource, const std::string theUrl) {
-        AC_INFO << "Movie::loadStream " << theUrl;
+        AC_DEBUG << "Movie::loadStream " << theUrl;
         MovieDecoderBasePtr myDecoder = getDecoder(theUrl);
         if (!myDecoder) {
             throw MovieException(string("Sorry, could not find a streamable decoder for: ")
@@ -550,7 +550,7 @@ namespace y60 {
                 << ", src='" << mySourceFile << "'";
             return;
         }
-        AC_INFO << "Movie::loadFile " << (void*)this << " filename=" << myFilename;
+        AC_DEBUG << "Movie::loadFile " << (void*)this << " filename=" << myFilename;
 
         // First: Look for registered decoders that could handle the source
         _myDecoder = getDecoder(myFilename);

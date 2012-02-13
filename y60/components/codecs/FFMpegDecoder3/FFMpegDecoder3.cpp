@@ -158,10 +158,10 @@ namespace y60 {
             asl::toLowerCase(asl::getExtension(theUrl)) != "d60" &&
             asl::toLowerCase(asl::getExtension(theUrl)) != "i60" )
         {
-            AC_INFO << "FFMpegDecoder3 can decode :" << theUrl << endl;
+            AC_DEBUG << "FFMpegDecoder3 can decode :" << theUrl << endl;
             return MIME_TYPE_MPG;
         } else {
-            AC_INFO << "FFMpegDecoder3 can not decode :" << theUrl << endl;
+            AC_DEBUG << "FFMpegDecoder3 can not decode :" << theUrl << endl;
             return "";
         }
     }
@@ -173,11 +173,11 @@ namespace y60 {
         if (myFilename[0] == '[' && myFilename[myFilename.size()-1] == ']') {
             myFilename = myFilename.substr(1,myFilename.size()-2);
         }
-        AC_INFO << "FFMpegDecoder3::load(" << myFilename << ")";
+        AC_DEBUG << "FFMpegDecoder3::load(" << myFilename << ")";
         // register all formats and codecs
         static bool avRegistered = false;
         if (!avRegistered) {
-            AC_INFO << "FFMpegDecoder3::load " << LIBAVCODEC_IDENT;
+            AC_DEBUG << "FFMpegDecoder3::load " << LIBAVCODEC_IDENT;
             av_log_set_level(AV_LOG_ERROR);
             av_register_all();
             avRegistered = true;
@@ -186,7 +186,7 @@ namespace y60 {
         if (myFilename.find("rtp://") != std::string::npos || myFilename.find("rtsp://") != std::string::npos) {
             _isStreamingMedia = true;
         }
-        AC_INFO<<"FFMpegDecoder3::load "<< myFilename <<" is streaming media: "<<_isStreamingMedia;
+        AC_DEBUG<<"FFMpegDecoder3::load "<< myFilename <<" is streaming media: "<<_isStreamingMedia;
 #if LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(53, 2, 0)
         if (avformat_open_input(&_myFormatContext, myFilename.c_str(), NULL, NULL) < 0) {
 #else
@@ -242,14 +242,14 @@ namespace y60 {
         if (_myVStream) {
             setupVideo(myFilename);
         } else {
-            AC_INFO << "FFMpegDecoder3::load " << myFilename << " no video stream found";
+            AC_DEBUG << "FFMpegDecoder3::load " << myFilename << " no video stream found";
             _myVStream = 0;
             _myVStreamIndex = -1;
         }
         if (_myAStream && getAudioFlag()) {
             setupAudio(myFilename);
         } else {
-            AC_INFO << "FFMpegDecoder3::load " << myFilename
+            AC_DEBUG << "FFMpegDecoder3::load " << myFilename
                     << " no audio stream found or disabled";
             _myAudioSink = HWSampleSinkPtr();
             _myAStream = 0;
@@ -266,7 +266,7 @@ namespace y60 {
     }
 
     void FFMpegDecoder3::loop() {
-        AC_INFO << "FFMpegDecoder3::loop "<< getMovie()->get<ImageSourceTag>() << " frames in queue: "<<_myMsgQueue.size();
+        AC_DEBUG << "FFMpegDecoder3::loop "<< getMovie()->get<ImageSourceTag>() << " frames in queue: "<<_myMsgQueue.size();
         _myLastVideoFrame = VideoMsgPtr();
         if (hasAudio() && getDecodeAudioFlag()) {
             {
@@ -300,7 +300,7 @@ namespace y60 {
     }
 
     void FFMpegDecoder3::startMovie(double theStartTime, bool theStartAudioFlag) {
-        AC_INFO << "FFMpegDecoder3::startMovie "<< getMovie()->get<ImageSourceTag>() << ", time: " << theStartTime << " frames in queue: "<<_myMsgQueue.size();
+        AC_DEBUG << "FFMpegDecoder3::startMovie "<< getMovie()->get<ImageSourceTag>() << ", time: " << theStartTime << " frames in queue: "<<_myMsgQueue.size();
 
         //XXX: happens when stop not called before starting new movie?! -> investigate this
         if (_myVideoDecodeThread && !_myVideoDecodeThread->timed_join(boost::posix_time::millisec(1))) {
@@ -345,14 +345,14 @@ namespace y60 {
     }
 
     void FFMpegDecoder3::resumeMovie(double theStartTime, bool theResumeAudioFlag) {
-        AC_INFO << "FFMpegDecoder3::resumeMovie, time: " << theStartTime;
+        AC_DEBUG << "FFMpegDecoder3::resumeMovie, time: " << theStartTime;
         _myLastVideoFrame = VideoMsgPtr();
         setState(RUN);
         AsyncDecoder::resumeMovie(theStartTime, theResumeAudioFlag);
     }
 
     void FFMpegDecoder3::stopMovie(bool theStopAudioFlag) {
-        AC_INFO << "FFMpegDecoder3::stopMovie";
+        AC_DEBUG << "FFMpegDecoder3::stopMovie";
 
         if (getState() != STOP) {
             DB(AC_DEBUG << "Joining FFMpegDecoder Thread");
@@ -377,7 +377,7 @@ namespace y60 {
 
     void
     FFMpegDecoder3::closeMovie() {
-        AC_INFO << "FFMpegDecoder3::closeMovie";
+        AC_DEBUG << "FFMpegDecoder3::closeMovie";
         // stop threads
         stopMovie();
 
@@ -536,7 +536,7 @@ namespace y60 {
     }
 
     void FFMpegDecoder3::setupVideo(const std::string & theFilename) {
-        AC_INFO << "FFMpegDecoder3::setupVideo";
+        AC_DEBUG << "FFMpegDecoder3::setupVideo";
         AVCodecContext * myVCodec = _myVStream->codec;
         // open codec
         AVCodec * myCodec = avcodec_find_decoder(myVCodec->codec_id);
@@ -717,14 +717,14 @@ namespace y60 {
         myMovie->set<AspectRatioTag>((float)myAspectRatio);
 
         _myVideoStartTimestamp = _myVStream->start_time;
-        AC_INFO << "FFMpegDecoder3::getVideoProperties() " << " fps="
+        AC_DEBUG << "FFMpegDecoder3::getVideoProperties() " << " fps="
                 << _myFrameRate << " framecount=" << getFrameCount()<< " time_base: "
                 <<_myVideoStreamTimeBase;
-        AC_INFO << "r_framerate den: " <<_myVStream->r_frame_rate.den<< " r_framerate num: "<< _myVStream->r_frame_rate.num;
-        AC_INFO << "stream time_base: " << _myVStream->time_base.den << ","<<_myVStream->time_base.num;
-        AC_INFO << "codec time_base: " << _myVStream->codec->time_base.den << ","<<_myVStream->codec->time_base.num;
-        AC_INFO << "formatcontex start_time: " << _myFormatContext->start_time<<" stream start_time: "<<_myVStream->start_time;
-        AC_INFO << "aspect ratio= " << myAspectRatio;
+        AC_DEBUG << "r_framerate den: " <<_myVStream->r_frame_rate.den<< " r_framerate num: "<< _myVStream->r_frame_rate.num;
+        AC_DEBUG << "stream time_base: " << _myVStream->time_base.den << ","<<_myVStream->time_base.num;
+        AC_DEBUG << "codec time_base: " << _myVStream->codec->time_base.den << ","<<_myVStream->codec->time_base.num;
+        AC_DEBUG << "formatcontex start_time: " << _myFormatContext->start_time<<" stream start_time: "<<_myVStream->start_time;
+        AC_DEBUG << "aspect ratio= " << myAspectRatio;
 
     }
 

@@ -160,10 +160,10 @@ namespace y60 {
             asl::toLowerCase(asl::getExtension(theUrl)) != "d60" &&
             asl::toLowerCase(asl::getExtension(theUrl)) != "i60" )
         {
-            AC_INFO << "FFMpegDecoder2 can decode :" << theUrl << endl;
+            AC_DEBUG << "FFMpegDecoder2 can decode :" << theUrl << endl;
             return MIME_TYPE_MPG;
         } else {
-            AC_INFO << "FFMpegDecoder2 can not decode :" << theUrl << endl;
+            AC_DEBUG << "FFMpegDecoder2 can not decode :" << theUrl << endl;
             return "";
         }
     }
@@ -177,11 +177,11 @@ namespace y60 {
 
     void
     FFMpegDecoder2::load(const std::string & theFilename) {
-        AC_INFO << "FFMpegDecoder2::load(" << theFilename << ")";
+        AC_DEBUG << "FFMpegDecoder2::load(" << theFilename << ")";
         // register all formats and codecs
         static bool avRegistered = false;
         if (!avRegistered) {
-            AC_INFO << "FFMpegDecoder2::load " << LIBAVCODEC_IDENT;
+            AC_DEBUG << "FFMpegDecoder2::load " << LIBAVCODEC_IDENT;
             av_log_set_level(AV_LOG_ERROR);
             av_register_all();
             avRegistered = true;
@@ -243,14 +243,14 @@ namespace y60 {
         if (_myVStream) {
             setupVideo(theFilename);
         } else {
-            AC_INFO << "FFMpegDecoder2::load " << theFilename << " no video stream found";
+            AC_DEBUG << "FFMpegDecoder2::load " << theFilename << " no video stream found";
             _myVStream = 0;
             _myVStreamIndex = -1;
         }
         if (_myAStream && getAudioFlag()) {
             setupAudio(theFilename);
         } else {
-            AC_INFO << "FFMpegDecoder2::load " << theFilename
+            AC_DEBUG << "FFMpegDecoder2::load " << theFilename
                     << " no audio stream found or disabled";
             _myAudioSink = HWSampleSinkPtr();
             _myAStream = 0;
@@ -288,7 +288,7 @@ namespace y60 {
     }
 
     void FFMpegDecoder2::startMovie(double theStartTime, bool theStartAudioFlag) {
-        AC_INFO << "FFMpegDecoder2::startMovie "<< getMovie()->get<ImageSourceTag>() << ", time: " << theStartTime << " frames in queue: "<<_myMsgQueue.size();
+        AC_DEBUG << "FFMpegDecoder2::startMovie "<< getMovie()->get<ImageSourceTag>() << ", time: " << theStartTime << " frames in queue: "<<_myMsgQueue.size();
         double myCurrentTime = 0.0;
         if (_myLastVideoFrame) {
             myCurrentTime = _myLastVideoFrame->getTime();    
@@ -361,7 +361,7 @@ namespace y60 {
     }
 
     void FFMpegDecoder2::resumeMovie(double theStartTime, bool theResumeAudioFlag) {
-        AC_INFO << "FFMpegDecoder2::resumeMovie, time: " << theStartTime;
+        AC_DEBUG << "FFMpegDecoder2::resumeMovie, time: " << theStartTime;
         _myLastVideoFrame = VideoMsgPtr();
         setState(RUN);
         if (!isUnjoined()) {
@@ -374,7 +374,7 @@ namespace y60 {
     }
 
     void FFMpegDecoder2::stopMovie(bool theStopAudioFlag) {
-        AC_INFO << "FFMpegDecoder2::stopMovie";
+        AC_DEBUG << "FFMpegDecoder2::stopMovie";
 
         if (isUnjoined()) {
             DB(AC_DEBUG << "Joining FFMpegDecoder Thread");
@@ -398,7 +398,7 @@ namespace y60 {
 
     void
     FFMpegDecoder2::closeMovie() {
-        AC_INFO << "FFMpegDecoder2::closeMovie";
+        AC_DEBUG << "FFMpegDecoder2::closeMovie";
         // stop thread
         stopMovie();
 
