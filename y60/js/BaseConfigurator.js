@@ -1,4 +1,3 @@
-/*jslint nomen:false white:false plusplus:false, bitwise:false*/
 /*globals Node, print, Logger, Exception, fileline, stringToArray*/
 
 var BaseConfigurator = function BaseConfigurator(theSceneViewer) {
@@ -11,17 +10,17 @@ BaseConfigurator.create = function(theSceneViewer, theOptionsString) {
 
 BaseConfigurator.prototype.Constructor = function (Public, Protected, theSceneViewer) {
     var _ = {};
-    
+
     ///////////////////////
     // Private Variables //
     ///////////////////////
-    
+
     _.listeners = [];
     _.currentSection = null;
     _.currentSetting = null;
     _.myKeyDown        = null;
     _.mySceneViewer    = theSceneViewer;
-    
+
     //////////////////////
     // Public Variables //
     //////////////////////
@@ -29,7 +28,7 @@ BaseConfigurator.prototype.Constructor = function (Public, Protected, theSceneVi
     /////////////////////
     // Private Methods //
     /////////////////////
-    
+
     _.nextNode = function (theNode) {
         var myNode = theNode;
         do {
@@ -59,7 +58,7 @@ BaseConfigurator.prototype.Constructor = function (Public, Protected, theSceneVi
         } while (myNode !== theNode);
         return theNode;
     };
-    
+
     _.displayMessage = function (theFirstLine, theSecondLine, theThirdLine) {
         if (!theSecondLine) {
             theSecondLine = "";
@@ -80,7 +79,7 @@ BaseConfigurator.prototype.Constructor = function (Public, Protected, theSceneVi
                          _.currentSetting.name() + " = " + _.currentSetting.value(),
                          _.currentSetting.help());
     };
-    
+
     _.isValidNode = function (theNode) {
         if (!theNode) {
             return false;
@@ -103,7 +102,7 @@ BaseConfigurator.prototype.Constructor = function (Public, Protected, theSceneVi
         print("   tab   save Settings to file");
         print("shift-tab restore original Settings");
     };
-    
+
     // Inner Class
     _.Setting = function Setting(theNode) {
         var _myNode       = theNode;
@@ -157,10 +156,10 @@ BaseConfigurator.prototype.Constructor = function (Public, Protected, theSceneVi
         };
 
         this.help = function () {
-            if ("help" in _myNode) {
-                return _myNode.help;
-            } else {
+            if (typeof(_myNode.help) === "undefined") {
                 return "";
+            } else {
+                return _myNode.help;
             }
         };
 
@@ -196,7 +195,7 @@ BaseConfigurator.prototype.Constructor = function (Public, Protected, theSceneVi
                 myValue = Number(_myArray[_myArrayPos]);
             }
             var myStep = 1;
-            if ("step" in _myNode) {
+            if (typeof(_myNode.step) !== "undefined") {
                 myStep  = Number(_myNode.step);
             }
             if (theFastFlag) {
@@ -205,7 +204,7 @@ BaseConfigurator.prototype.Constructor = function (Public, Protected, theSceneVi
 
             myValue += myStep;
 
-            if ("max" in _myNode) {
+            if (typeof(_myNode.max) !== "undefined") {
                 var myMax   = Number(_myNode.max);
                 if (myValue > myMax) {
                     myValue = myMax;
@@ -233,14 +232,14 @@ BaseConfigurator.prototype.Constructor = function (Public, Protected, theSceneVi
                 myValue = Number(_myArray[_myArrayPos]);
             }
             var myStep = 1;
-            if ("step" in _myNode) {
+            if (typeof(_myNode.step) !== "undefined") {
                 myStep  = Number(_myNode.step);
             }
             if (theFastFlag) {
                 myStep *= 5;
             }
             myValue -= myStep;
-            if ("min" in _myNode) {
+            if (typeof(_myNode.min) !== "undefined") {
                 var myMin   = Number(_myNode.min);
                 if (myValue < myMin) {
                     myValue = myMin;
@@ -262,25 +261,25 @@ BaseConfigurator.prototype.Constructor = function (Public, Protected, theSceneVi
             this.setup();
         }
     };
-    
+
     /////////////////////////
     // Protected Variables //
     /////////////////////////
-    
+
     Protected.settings = null; // TODO rename
-    
+
     ///////////////////////
     // Protected Methods //
     ///////////////////////
-    
+
     Protected.restoreSettings = function () {
         Logger.warning("<BaseConfigurator::restoreSettings> -- implement me");
     };
-    
+
     Protected.saveSettings = function () {
         Logger.warning("<BaseConfigurator::saveSettings> -- implement me");
     };
-    
+
     Protected.notifyListeners = function () {
         var i, myListener;
         for (i = 0; i < _.listeners.length; ++i) {
@@ -294,16 +293,16 @@ BaseConfigurator.prototype.Constructor = function (Public, Protected, theSceneVi
             }
         }
     };
-    
+
     Protected.setFirstSetting = function() {
         _.currentSection = Protected.settings.firstChild;
         _.currentSetting = new _.Setting(_.currentSection.firstChild);
     };
-    
+
     ////////////////////
     // Public Methods //
     ////////////////////
-    
+
     Public.addListener = function (theListener, theSection) {
         if (!Protected.settings) {
             return;
@@ -324,7 +323,7 @@ BaseConfigurator.prototype.Constructor = function (Public, Protected, theSceneVi
             section : theSection
         });
     };
-    
+
     Public.removeListener = function (theListener) {
         var i;
         for (i = _.listeners.length - 1; i >= 0; --i) {
@@ -333,7 +332,7 @@ BaseConfigurator.prototype.Constructor = function (Public, Protected, theSceneVi
             }
         }
     };
-    
+
     Public.onFrame = function (theTime) {
         if (_.myKeyDown && (theTime - _.myKeyDown.time) > 0.2) {
             Public.onKey(_.myKeyDown.key, true, _.myKeyDown.shift, _.myKeyDown.ctrl, _.myKeyDown.alt);
@@ -348,17 +347,17 @@ BaseConfigurator.prototype.Constructor = function (Public, Protected, theSceneVi
             _.myKeyDown = null;
             return;
         }
-        
-        _.myKeyDown = {  key: theKey, 
-                        shift: theShiftFlag, 
-                        ctrl: theCtrlFlag, 
-                        alt: theAltFlag, 
+
+        _.myKeyDown = {  key: theKey,
+                        shift: theShiftFlag,
+                        ctrl: theCtrlFlag,
+                        alt: theAltFlag,
                         time: _.mySceneViewer.getCurrentTime()};
-        
+
         if (!theCtrlFlag) {
             return;
         }
-        
+
         switch (theKey) {
         case "up":
             _.currentSetting.increment(theShiftFlag);
@@ -408,7 +407,7 @@ BaseConfigurator.prototype.Constructor = function (Public, Protected, theSceneVi
             break;
         }
     };
-    
+
     Public.getSettings = function () {
         if (Protected.settings) {
             return Protected.settings;
