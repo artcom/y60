@@ -45,6 +45,7 @@ class WMTouchPlugin : public PlugInBase,
 
 private:
     bool _isRegistered;
+    static HHOOK _nextHook;
 
     HWND
     findSDLWindow() {
@@ -96,17 +97,9 @@ public:
     }
 // IRendererExtension
     virtual void onStartup(jslib::AbstractRenderWindow * theWindow) {
-        AC_WARNING << "onStartup";
+        // TODO: 
         HWND hWnd = findSDLWindow();
-        if (hWnd && RegisterTouchWindow) {
-            BOOL bRet = RegisterTouchWindow(0L, 0L);
-            if (bRet) {
-                AC_WARNING << "RegisterTouchWindow: " << bRet;
-                _isRegistered = true;
-            } else {
-                AC_WARNING << errorDescription(lastError()); 
-            }
-        }
+        setup(hWnd);
     };
     virtual bool onSceneLoaded(jslib::AbstractRenderWindow * theWindow) { return true; };
 
@@ -132,11 +125,32 @@ protected:
 
 private:
 
+    static 
+    LRESULT WINAPI GetMsgProc(int nCode, WPARAM wParam, LPARAM lParam) {
+        AC_WARNING << nCode << "," << wParam << "," << lParam;
+        return CallNextHookEx(_nextHook, nCode, wParam, lParam);
+    };
+
+    void 
+    setup(HWND theWindow) {
+        if (theWindow && RegisterTouchWindow) {
+            BOOL bRet = RegisterTouchWindow(theWindow, 0L);
+            if (bRet) {
+                AC_INFO << "RegisterTouchWindow succeeded: " << bRet;
+                _isRegistered = true;
+            } else {
+                AC_WARNING << errorDescription(lastError()); 
+            }
+            // register message hook
+            SetWindowsHookEx(WH_MOUSE, GetMsgProc,(HINSTANCE) NULL, GetCurrentThreadId());    
+        }
+    };
 };
 
 // implementation of js interface
 
 static WMTouchPlugin* ourWMTouchPluginInstance = 0;
+HHOOK WMTouchPlugin::_nextHook = 0;
 
 static WMTouchPlugin*
 GetInstance() {
