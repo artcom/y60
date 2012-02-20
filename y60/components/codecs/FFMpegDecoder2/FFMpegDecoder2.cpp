@@ -232,7 +232,11 @@ namespace y60 {
                 AVCodecContext * myACodec = _myFormatContext->streams[i]->codec;
                 // open codec
                 AVCodec * myCodec = avcodec_find_decoder(myACodec->codec_id);
+#if  LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(53,6,0)
+                if (avcodec_open2(myACodec, myCodec, NULL) < 0 ) {
+#else
                 if (avcodec_open(myACodec, myCodec) < 0 ) {
+#endif
                     throw FFMpegDecoder2Exception(std::string("Unable to open audio codec: "), PLUS_FILE_LINE);
                 }
 
@@ -940,7 +944,11 @@ namespace y60 {
 
         {
             AutoLocker<ThreadLock> myLocker(_myAVCodecLock);
+#if  LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(53,6,0)
+            if (avcodec_open2(myVCodec, myCodec, NULL) < 0 ) {
+#else
             if (avcodec_open(myVCodec, myCodec) < 0 ) {
+#endif
                 throw FFMpegDecoder2Exception(std::string("Unable to open video codec: ")
                                               + theFilename, PLUS_FILE_LINE);
             }

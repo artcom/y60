@@ -231,7 +231,11 @@ namespace y60 {
             throw FFMpegDecoderException(std::string("Unable to find decoder: ") + theFilename, PLUS_FILE_LINE);
         }
 
+#if  LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(53,6,0)
+        if (avcodec_open2(_myVStream->codec, myCodec, NULL) < 0 ) {
+#else
         if (avcodec_open(_myVStream->codec, myCodec) < 0 ) {
+#endif
             throw FFMpegDecoderException(std::string("Unable to open codec: ") + theFilename, PLUS_FILE_LINE);
         }
 
