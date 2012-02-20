@@ -9,6 +9,10 @@ var ourShow = spark.loadFile("fixtures/testAlphaVideo.spark");
 ourShow.parseArguments(arguments);
 
 ourShow.getRenderWindow().addExtension(new WMTouch());
+
+ourShow.onWMTouch = function(e) {
+    Logger.error(e);
+};
 try {
     ourShow.go();
 } catch (ex) {
