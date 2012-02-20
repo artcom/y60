@@ -13,6 +13,7 @@ endif(LINUX)
 
 if(WIN32)
     add_subdirectory(DInput)
+    add_subdirectory(WMTouch)
 #    add_subdirectory(DInputFFB)
 endif(WIN32)
 

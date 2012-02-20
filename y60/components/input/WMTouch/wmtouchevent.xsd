@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:simpleType name="Vector2f">
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    <xs:element name="generic">
+        <xs:complexType>
+            <xs:attribute name="when" type="xs:unsignedLong"/>
+            <xs:attribute name="simulation_time" type="xs:double"/>
+            <xs:attribute name="callback" type="xs:string"/>
+
+            <xs:attribute name="id" type="xs:int"/>
+            <xs:attribute name="position" type="Vector2f"/>
+            <xs:attribute name="contactarea" type="Vector2f"/>
+            <xs:attribute name="type" type="xs:string"/>
+            <xs:attribute name="inrange" type="xs:boolean"/>
+            <xs:attribute name="primary" type="xs:boolean"/>
+            <xs:attribute name="nocoalesce" type="xs:boolean"/>
+            <xs:attribute name="palm" type="xs:boolean"/>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>
