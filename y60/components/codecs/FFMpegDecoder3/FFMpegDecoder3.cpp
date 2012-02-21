@@ -326,6 +326,8 @@ namespace y60 {
         getVideoProperties();
         _myLastVideoFrame = VideoMsgPtr();
         if (shouldSeek(0.0, theStartTime)) {
+            _myMsgQueue.clear();
+            _myMsgQueue.reset();
             _myDemux->seek(theStartTime);
             if (theStartAudioFlag && hasAudio() && getDecodeAudioFlag()) {
                 _myAdjustAudioOffsetFlag = true;
