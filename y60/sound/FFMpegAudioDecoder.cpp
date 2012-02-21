@@ -198,7 +198,11 @@ void FFMpegAudioDecoder::open() {
 
         {
             AutoLocker<ThreadLock> myLocker(_myAVCodecLock);
+#if  LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(53,6,0)
+            if (avcodec_open2(myCodecContext, myCodec, NULL) < 0 ) {
+#else
             if (avcodec_open(myCodecContext, myCodec) < 0 ) {
+#endif
                 throw DecoderException(std::string("Unable to open codec: ") + _myURI,
                         PLUS_FILE_LINE);
             }
