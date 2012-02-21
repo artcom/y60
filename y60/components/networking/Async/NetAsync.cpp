@@ -57,6 +57,7 @@
 */
 
 #include "NetAsync.h"
+#include "JSHttpClient.h"
 #include <y60/jsbase/JSScriptablePlugin.h>
 #include <y60/jsbase/JSWrapper.h>
 
@@ -79,10 +80,12 @@ NetAsync::NetAsync(asl::DLHandle theDLHandle) :
                 IRendererExtension(ClassName()) 
 {
     _myAsioThread = AsioThreadPtr(new boost::thread( boost::bind( &NetAsync::run, this, 10) ) );
+    _curlMulti = curl_multi_init(); 
 };
 
 NetAsync::~NetAsync() {
     stop();
+    curl_multi_cleanup(_curlMulti); 
 };
 
 boost::asio::io_service & 
@@ -98,6 +101,7 @@ NetAsync::initClasses(JSContext * theContext, JSObject *theGlobalObject) {
     JSObject *asyncNamespace = JS_DefineObject(theContext, theGlobalObject, "Async", &Package, NULL, JSPROP_PERMANENT | JSPROP_READONLY);
     JSA_AddFunctions(theContext, asyncNamespace, Functions());
     JSHttpServer::initClass(theContext, asyncNamespace);
+    JSHttpClient::initClass(theContext, asyncNamespace);
 };
 
 void

@@ -1,6 +1,8 @@
 set(SOURCES
 Connection.cpp
 HttpServer.cpp
+HttpClient.cpp
+JSHttpClient.cpp
 JSHttpServer.cpp
 NetAsync.cpp
 MimeTypes.cpp
@@ -13,6 +15,8 @@ ConcurrentQueue.h
 Connection.h
 HttpHeader.h
 HttpServer.h
+HttpClient.h
+JSHttpClient.h
 JSHttpServer.h
 MimeTypes.h
 NetAsync.h

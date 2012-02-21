@@ -59,6 +59,7 @@
 #include "JSHttpServer.h"
 
 #include <boost/asio.hpp>
+#include <curl/curl.h>
 
 #include <asl/base/PlugInBase.h>
 #include <y60/jsbase/IScriptablePlugin.h>
@@ -93,6 +94,9 @@ namespace y60 {
             for (it = _onFrameHandlers.begin(); it != _onFrameHandlers.end(); ++it) {
                 (it->second)();
             }
+            // curl stuff
+            int n;
+            curl_multi_perform(_curlMulti, &n);
         }
 
         virtual void onPreRender(jslib::AbstractRenderWindow * theRenderer) {}
@@ -106,6 +110,10 @@ namespace y60 {
                 _onFrameHandlers.erase(it);
             }
         }
+
+        // curl stuff
+        void addCurlHandle(CURL* theHandle) { curl_multi_add_handle(_curlMulti,  theHandle); } ;
+        void removeCurlHandle(CURL* theHandle ){ curl_multi_add_handle(_curlMulti,  theHandle); } ;
     private:
         std::map<const void*, onFrameHandler> _onFrameHandlers;  
         void run(std::size_t thread_pool_size);
@@ -113,7 +121,10 @@ namespace y60 {
         /// The io_service used to perform asynchronous operations.
         static boost::asio::io_service io;
         // fictional work item to prevent our io_service from being out of work and terminating
-        static boost::asio::io_service::work keep_busy; 
+        static boost::asio::io_service::work keep_busy;
+
+        // curl stuff
+        CURLM * _curlMulti;
 
     private:
         AsioThreadPtr _myAsioThread;
