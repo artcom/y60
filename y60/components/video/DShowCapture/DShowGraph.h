@@ -63,17 +63,7 @@
 
 #include <dshow.h>
 
-// this is a workaround, because ms somehow decided not to ship
-// dxtrans.h, which is part of DirectX7 August/2007 SDK and included in qedit.h
-// the include qedit.h is still in newer sdk files, but dxtrans.h is not
-// ms is 'working' on this, use this workaround for compiler/linker-massage (05/2010 VS)
-#pragma include_alias( "dxtrans.h", "qedit.h" )
-#define __IDxtCompositor_INTERFACE_DEFINED__
-#define __IDxtAlphaSetter_INTERFACE_DEFINED__
-#define __IDxtJpeg_INTERFACE_DEFINED__
-#define __IDxtKey_INTERFACE_DEFINED__
-// end-workaround
-#include <qedit.h>
+#include "qedit.h"
 
 #include <string>
 #include <vector>
