@@ -57,9 +57,9 @@
 */
 
 #include "JSHttpServer.h"
+#include "CurlMultiAdapter.h"
 
 #include <boost/asio.hpp>
-#include <curl/curl.h>
 
 #include <asl/base/PlugInBase.h>
 #include <y60/jsbase/IScriptablePlugin.h>
@@ -67,16 +67,11 @@
 
 namespace y60 {
 
-    namespace async {
-        namespace http {
-            class Client; // forward declaration
-        }
-    }
-
 	class NetAsync : 
         public asl::PlugInBase, 
         public IRendererExtension, 
-        public jslib::IScriptablePlugin
+        public jslib::IScriptablePlugin,
+        public async::http::CurlMultiAdapter
     {
     public:
         typedef asl::Ptr<boost::thread, dom::ThreadingModel> AsioThreadPtr;
@@ -110,11 +105,6 @@ namespace y60 {
             }
         }
 
-        // curl stuff
-        void addClient(async::http::Client * theClient);
-        void removeClient(async::http::Client * theClient);
-        void doSocketRead(curl_socket_t theSocket);
-        void doSocketWrite(curl_socket_t theSocket);
     private:
         std::map<const void*, onFrameHandler> _onFrameHandlers;  
         void run(std::size_t thread_pool_size);
@@ -124,9 +114,6 @@ namespace y60 {
         // fictional work item to prevent our io_service from being out of work and terminating
         static boost::asio::io_service::work keep_busy;
 
-        // curl stuff
-        CURLM * _curlMulti;
-        static int curl_socket_callback(CURL *easy, /* easy handle */   curl_socket_t s, /* socket */   int action, /* see values below */   void *userp, /* private callback pointer */   void *socketp) ;/* private socket pointer */ 
 
     private:
         AsioThreadPtr _myAsioThread;
