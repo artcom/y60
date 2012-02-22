@@ -208,7 +208,7 @@ RemoveCursor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
         
         int myId;
         if (!jslib::convertFrom(cx, argv[0], myId)) {
-            JS_ReportError(cx, "TuioServerPlugin::addCursor - expected cursorId (int) as first argument");
+            JS_ReportError(cx, "TuioServerPlugin::removeCursor - expected cursorId (int) as first argument");
             return JS_FALSE;
         }
 
