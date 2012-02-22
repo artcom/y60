@@ -81,6 +81,8 @@ NetAsync::NetAsync(asl::DLHandle theDLHandle) :
 {
     _myAsioThread = AsioThreadPtr(new boost::thread( boost::bind( &NetAsync::run, this, 10) ) );
     _curlMulti = curl_multi_init(); 
+    curl_multi_setopt(_curlMulti, CURLMOPT_SOCKETFUNCTION, &NetAsync::curl_socket_callback); 
+    curl_multi_setopt(_curlMulti, CURLMOPT_SOCKETDATA, this); 
 };
 
 NetAsync::~NetAsync() {
@@ -93,6 +95,50 @@ NetAsync::io_service() {
     return io;
 };
 
+int 
+NetAsync::curl_socket_callback(CURL *easy, /* easy handle */   
+                               curl_socket_t s, /* socket */   
+                               int action, /* see values below */   
+                               void *userp, /* private callback pointer */   
+                               void *socketp) /* private socket pointer */ 
+{
+    async::http::Client * curClient = 0;
+    curl_easy_getinfo(easy, CURLINFO_PRIVATE, &curClient);
+    AC_DEBUG << "Curl Socket "<< s << " Callback: " << action << " on " << userp << "," << curClient;
+    curClient->onSocketState(action);
+    return 0;
+}
+void 
+NetAsync::addClient(async::http::Client * theClient) { 
+    AC_DEBUG << "adding client " << theClient;
+    curl_multi_add_handle(_curlMulti,  theClient->_curlHandle);
+    int i;
+    curl_multi_socket_action(_curlMulti, theClient->_socket.native_handle(), 0, &i);
+};
+void 
+NetAsync::removeClient(async::http::Client * theClient ){ 
+    AC_DEBUG << "removeClient client " << theClient;
+    if (theClient->_socket.is_open()) {
+        AC_DEBUG << "    shutting down " << theClient;
+        theClient->_socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both);
+        theClient->_socket.close();
+    }
+    // curl_multi_remove_handle(_curlMulti,  theClient->_curlHandle); 
+};
+void 
+NetAsync::doSocketRead(curl_socket_t theSocket) {
+    int i;
+    AC_TRACE << "start curl_multi_socket_action(IN)";
+    curl_multi_socket_action(_curlMulti, theSocket, CURL_CSELECT_IN, &i);
+    AC_TRACE << " done curl_multi_socket_action(IN)";
+};
+void 
+NetAsync::doSocketWrite(curl_socket_t theSocket) {
+    int i;
+    AC_DEBUG << "start curl_multi_socket_action(OUT)";
+    curl_multi_socket_action(_curlMulti, theSocket, CURL_CSELECT_OUT, &i);
+    AC_DEBUG << " done curl_multi_socket_action(OUT)";
+};
 
 void 
 NetAsync::initClasses(JSContext * theContext, JSObject *theGlobalObject) {
@@ -123,6 +169,36 @@ NetAsync::run(std::size_t thread_pool_size) {
 
     AC_DEBUG << "asio threads terminated";
 };
+
+void 
+NetAsync::onFrame(jslib::AbstractRenderWindow * theWindow , double t) {
+    std::map<const void*, onFrameHandler>::iterator it;
+    for (it = _onFrameHandlers.begin(); it != _onFrameHandlers.end(); ++it) {
+        (it->second)();
+    }
+    
+    // take care of completed requests
+    int myMessageCount = 0;
+    CURLMsg * myMessage = 0;
+    do {
+        myMessage = curl_multi_info_read(_curlMulti, &myMessageCount);
+        if (myMessage) {
+            CURL * myEasyHandle = myMessage->easy_handle;
+            async::http::Client * curClient = 0;
+            curl_easy_getinfo(myEasyHandle, CURLINFO_PRIVATE, &curClient);
+            if (myMessage->msg == CURLMSG_DONE) {
+                AC_DEBUG << "calling onDone for " << curClient;
+                curClient->onDone();
+            } else {
+                AC_ERROR << "curl request failed with error: " << curl_easy_strerror(myMessage->data.result);
+                // myRequest->onError(myResult, 0);
+            }
+            curl_multi_remove_handle(_curlMulti,  curClient->_curlHandle); 
+        }
+    } while (myMessage);
+
+};
+
 
 void 
 NetAsync::stop() {

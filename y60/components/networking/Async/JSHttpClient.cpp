@@ -155,10 +155,15 @@ JSHttpClient::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
         return JS_FALSE;
     }
 
+    std::string myUri;
+    if (!convertFrom(cx, argv[0], myUri)) {
+        JS_ReportError(cx, "HttpClient::Constructor: argument #1 is not a string");
+        return JS_FALSE;
+    }
     JSHttpClient * myNewObject = 0;
-    OWNERPTR myHttpClient = OWNERPTR(new async::http::Client(cx));
+    OWNERPTR myHttpClient = OWNERPTR(new async::http::Client(myUri));
     myNewObject = new JSHttpClient(myHttpClient, myHttpClient.get());
-
+    myHttpClient->setJSObject(cx, obj);
     JS_SetPrivate(cx, obj, myNewObject);
     return JS_TRUE;
 }

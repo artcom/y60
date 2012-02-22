@@ -67,6 +67,7 @@
 #include <asl/dom/Nodes.h>
 
 #include <boost/thread.hpp>
+#include <boost/asio.hpp>
 
 #include <map>
 
@@ -89,30 +90,50 @@ namespace http {
     */
 
     class Client {
-
+        public:
+            CURL * _curlHandle;
+            boost::asio::ip::tcp::socket _socket;
+        private:
+            const std::string _myURI;
+            JSContext * _jsContext;
+            JSObject * _jsObject;
+            std::vector<char>   _myErrorBuffer;
+            int _socketState;
+            bool _read_in_progress;
+            bool _write_in_progress;
         public:
             /// creates a new HttpClient
-            Client(JSContext * cx);
+            Client(const std::string & theURI);
             virtual ~Client();
+            void setJSObject(JSContext * cx, JSObject * theObject) { _jsContext = cx; _jsObject = theObject; };
             void get();
-
+            void onDone();
+            void onSocketState(int theAction);
         private:
             Client(); // disbale default CTOR
-    
-            JSContext * _jsContext;
-            CURL * _curlHandle;
-            std::vector<char>   _myErrorBuffer;
-            
+
+            void handleRead(const boost::system::error_code& error);
+            void handleWrite(const boost::system::error_code& error);
+            void handleOperations();
+
             void checkCurlStatus(CURLcode theStatusCode, const std::string & theWhere) const;
-            static curl_socket_t opensocket(void *clientp, curlsocktype purpose, struct curl_sockaddr *addr) {
-                AC_WARNING << "open socket";
-                return socket(addr->family, addr->socktype, addr->protocol); 
-            };
-            static int closesocket(void *clientp, curl_socket_t item) {
-                AC_WARNING << "close socket";
-                return ::close(item);
+            bool hasCallback(const char * theName);
+
+            size_t writeFunction( char *ptr, size_t size, size_t nmemb);
+            static size_t _writeFunction( char *ptr, size_t size, size_t nmemb, Client *self) {
+                return self->writeFunction(ptr, size, nmemb);
             };
 
+            curl_socket_t openSocket(curlsocktype purpose, struct curl_sockaddr *addr);
+            static curl_socket_t _openSocket(Client *self, curlsocktype purpose, struct curl_sockaddr *addr) {
+                return self->openSocket(purpose, addr);
+            };
+            /*
+            int closeSocket(curl_socket_t item);
+            static int _closeSocket(Client *self, curl_socket_t item) {
+                // return self->closeSocket(item);
+            };
+            */
     };
 
 } // http

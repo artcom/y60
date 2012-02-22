@@ -76,18 +76,59 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
 
     UnitTest.prototype.Constructor(obj, theName);
 
-    obj.run = function () {
+    function testBigRequest() {
+        var done = false;
 
-        obj.callback_answer = "callback";
+        Logger.warning("creating client");
+        obj.myClient = new Async.HttpClient("http://files.t-gallery.act/data/repository/original/vol0/24/vater_der_braut_de_hd_eff5390ebdbdf0bd62f86b716f8f8adf3d9512d6.mp4");
+        obj.myClient.onDone = function() {
+            Logger.warning("onDone called!");
+            done = true;
+        };
 
-        obj.myClient = new Async.HttpClient();
 
-
-        for (var i = 0; i < 1000; ++i) {
-        Async.onFrame();
-        msleep(5);
+        while (true) {
+            Async.onFrame();
+            msleep(50);
+            if (done) {
+                break;
+            }
         }
+    };
 
+    function testSmallRequests(onFrameFunc, RequestFactory, theCount) {
+        // test many small requests
+        var i = theCount;
+
+        var iterate = function() {
+            i--;
+            // Logger.warning(i);
+            if (i>0) {
+                obj.myClient = RequestFactory("http://gom.t-gallery.act/areas.json");
+                obj.myClient.onDone = iterate;
+            };
+        }
+        iterate();
+        while (true) {
+            onFrameFunc();
+            gc();
+            msleep(100);
+            if (i <= 0) {
+                break;
+            }
+        }
+    }
+
+    obj.run = function () {
+        Logger.warning("starting new ASIO Client");
+        testSmallRequests(Async.onFrame, function(s) { return new Async.HttpClient(s); }, 100);
+        Logger.warning(" done new ASIO Client");
+
+        obj.RM = new RequestManager();
+        Logger.warning("starting old Request Client");
+        testSmallRequests(function() { obj.RM.handleRequests();}, function(s) { var r = new Request(s); obj.RM.performRequest(r); return r;}, 100);
+        Logger.warning(" done old Request Client");
+         
     };
 
 };

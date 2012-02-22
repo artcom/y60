@@ -66,6 +66,13 @@
 #include <y60/jslib/IRendererExtension.h>
 
 namespace y60 {
+
+    namespace async {
+        namespace http {
+            class Client; // forward declaration
+        }
+    }
+
 	class NetAsync : 
         public asl::PlugInBase, 
         public IRendererExtension, 
@@ -89,15 +96,7 @@ namespace y60 {
         virtual bool onSceneLoaded(jslib::AbstractRenderWindow * theWindow) { return true; }
 
         virtual void handle(jslib::AbstractRenderWindow * theWindow, y60::EventPtr theEvent) {}
-        virtual void onFrame(jslib::AbstractRenderWindow * theWindow , double t) {
-            std::map<const void*, onFrameHandler>::iterator it;
-            for (it = _onFrameHandlers.begin(); it != _onFrameHandlers.end(); ++it) {
-                (it->second)();
-            }
-            // curl stuff
-            int n;
-            curl_multi_perform(_curlMulti, &n);
-        }
+        virtual void onFrame(jslib::AbstractRenderWindow * theWindow , double t);
 
         virtual void onPreRender(jslib::AbstractRenderWindow * theRenderer) {}
         virtual void onPostRender(jslib::AbstractRenderWindow * theRenderer) {}
@@ -112,8 +111,10 @@ namespace y60 {
         }
 
         // curl stuff
-        void addCurlHandle(CURL* theHandle) { curl_multi_add_handle(_curlMulti,  theHandle); } ;
-        void removeCurlHandle(CURL* theHandle ){ curl_multi_add_handle(_curlMulti,  theHandle); } ;
+        void addClient(async::http::Client * theClient);
+        void removeClient(async::http::Client * theClient);
+        void doSocketRead(curl_socket_t theSocket);
+        void doSocketWrite(curl_socket_t theSocket);
     private:
         std::map<const void*, onFrameHandler> _onFrameHandlers;  
         void run(std::size_t thread_pool_size);
@@ -125,6 +126,7 @@ namespace y60 {
 
         // curl stuff
         CURLM * _curlMulti;
+        static int curl_socket_callback(CURL *easy, /* easy handle */   curl_socket_t s, /* socket */   int action, /* see values below */   void *userp, /* private callback pointer */   void *socketp) ;/* private socket pointer */ 
 
     private:
         AsioThreadPtr _myAsioThread;
