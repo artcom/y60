@@ -75,6 +75,7 @@
 
 #include <curl/curl.h>
 #include <netsrc/spidermonkey/jsapi.h>
+#include <y60/jsbase/JSWrapper.h>
 
 namespace y60 {
 namespace async {
@@ -94,24 +95,39 @@ namespace http {
             CURL * _curlHandle;
             boost::asio::ip::tcp::socket _socket;
         private:
-            const std::string _myURI;
             JSContext * _jsContext;
-            JSObject * _jsObject;
+            JSObject * _jsOptsObject;
             std::vector<char>   _myErrorBuffer;
             int _socketState;
             bool _read_in_progress;
             bool _write_in_progress;
         public:
             /// creates a new HttpClient
-            Client(const std::string & theURI);
+            Client(JSContext * cx, JSObject * theOpts);
             virtual ~Client();
-            void setJSObject(JSContext * cx, JSObject * theObject) { _jsContext = cx; _jsObject = theObject; };
             void get();
             void onDone();
             void onSocketState(int theAction);
-        private:
-            Client(); // disbale default CTOR
+            
+            template<typename T>
+            bool setCurlOption(JSObject* opts, std::string theProperty, CURLoption theCurlOption) {
+                jsval propValue;
+                T nativeValue;
 
+                JS_GetProperty(_jsContext, opts, theProperty.c_str(), &propValue);
+                if (JSVAL_IS_VOID(propValue)) {
+                    return false;
+                }
+                if (!jslib::convertFrom(_jsContext, propValue, nativeValue)) {
+                    JS_ReportError(_jsContext, "Type mismatch on %s", theProperty.c_str());
+                }
+                CURLcode myStatus = curl_easy_setopt(_curlHandle, theCurlOption, nativeValue);
+                checkCurlStatus(myStatus, PLUS_FILE_LINE);
+                AC_WARNING << "set " << nativeValue;
+                return true;
+            };
+        private:
+            Client();
             void handleRead(const boost::system::error_code& error);
             void handleWrite(const boost::system::error_code& error);
             void handleOperations();
@@ -135,6 +151,8 @@ namespace http {
             };
             */
     };
+    template<>
+    bool Client::setCurlOption<std::string>(JSObject* opts, std::string theProperty, CURLoption theCurlOption);
 
 } // http
 } // async

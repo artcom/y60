@@ -80,11 +80,14 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
         var done = false;
 
         Logger.warning("creating client");
-        obj.myClient = new Async.HttpClient("http://files.t-gallery.act/data/repository/original/vol0/24/vater_der_braut_de_hd_eff5390ebdbdf0bd62f86b716f8f8adf3d9512d6.mp4");
-        obj.myClient.onDone = function() {
-            Logger.warning("onDone called!");
-            done = true;
-        };
+        obj.myClient = new Async.HttpClient({
+            url: "http://files.t-gallery.act/data/repository/original/vol0/24/vater_der_braut_de_hd_eff5390ebdbdf0bd62f86b716f8f8adf3d9512d6.mp4",
+            success: function() {
+                Logger.warning("onDone called!");
+                done = true;
+            },
+            verbose: true
+        });
 
 
         while (true) {
@@ -96,21 +99,20 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
         }
     };
 
-    function testSmallRequests(onFrameFunc, RequestFactory, theCount) {
+    function testSmallRequests() {
         // test many small requests
-        var i = theCount;
+        var i = 100;
 
         var iterate = function() {
             i--;
             // Logger.warning(i);
             if (i>0) {
-                obj.myClient = RequestFactory("http://gom.t-gallery.act/areas.json");
-                obj.myClient.onDone = iterate;
+                obj.myClient = new Async.HttpClient({ url: "http://gom.t-gallery.act/areas.json", success: iterate} );
             };
         }
         iterate();
         while (true) {
-            onFrameFunc();
+            Async.onFrame();
             gc();
             msleep(100);
             if (i <= 0) {
@@ -120,15 +122,11 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
     }
 
     obj.run = function () {
-        Logger.warning("starting new ASIO Client");
-        testSmallRequests(Async.onFrame, function(s) { return new Async.HttpClient(s); }, 100);
-        Logger.warning(" done new ASIO Client");
+        testBigRequest();
 
-        obj.RM = new RequestManager();
-        Logger.warning("starting old Request Client");
-        testSmallRequests(function() { obj.RM.handleRequests();}, function(s) { var r = new Request(s); obj.RM.performRequest(r); return r;}, 100);
-        Logger.warning(" done old Request Client");
-         
+        Logger.warning("starting new ASIO Client");
+        testSmallRequests();
+        Logger.warning(" done new ASIO Client");
     };
 
 };

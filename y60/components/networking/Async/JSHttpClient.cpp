@@ -146,6 +146,7 @@ JSHttpClient::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *ob
     return JS_TRUE;
 }
 
+
 JSBool
 JSHttpClient::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Creates a HttpClient.");
@@ -155,16 +156,20 @@ JSHttpClient::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
         return JS_FALSE;
     }
 
-    std::string myUri;
-    if (!convertFrom(cx, argv[0], myUri)) {
-        JS_ReportError(cx, "HttpClient::Constructor: argument #1 is not a string");
+    JSObject* optsObject;
+    if (!JSVAL_IS_OBJECT(argv[0])) {
+        JS_ReportError(cx, "HttpClient::Construct: argument #1 is not an object");
         return JS_FALSE;
-    }
+    } 
+    JS_ValueToObject(cx,argv[0],&optsObject);
+    
     JSHttpClient * myNewObject = 0;
-    OWNERPTR myHttpClient = OWNERPTR(new async::http::Client(myUri));
+    OWNERPTR myHttpClient = OWNERPTR(new async::http::Client(cx, optsObject));
     myNewObject = new JSHttpClient(myHttpClient, myHttpClient.get());
-    myHttpClient->setJSObject(cx, obj);
     JS_SetPrivate(cx, obj, myNewObject);
+    // now stick the opts object to the JSHttpClient wrapper so it's not GC'ed
+    jsval optsValue = OBJECT_TO_JSVAL(optsObject);
+    JS_SetProperty(cx, obj, "_opts", &optsValue);
     return JS_TRUE;
 }
 

@@ -72,25 +72,21 @@ namespace y60 {
 namespace async {
 namespace http {
 
-    Client::Client(const std::string & theURI) :
+    Client::Client(JSContext * cx, JSObject * theOpts) :
         _curlHandle(0),
         _socket(NetAsync::io_service()),
-        _myURI(theURI),
-        _jsContext(0),
-        _jsObject(0),
+        _jsContext(cx),
+        _jsOptsObject(theOpts),
         _myErrorBuffer(CURL_ERROR_SIZE, '\0'),
         _socketState(0),
         _read_in_progress(false),
         _write_in_progress(false)
     {
-        CURLcode myStatus;
         _curlHandle = curl_easy_init();
         AC_DEBUG << "curl init " << curl_version();
 
-        myStatus = curl_easy_setopt(_curlHandle, CURLOPT_URL, _myURI.c_str());
-        checkCurlStatus(myStatus, PLUS_FILE_LINE);
-        
-        curl_easy_setopt(_curlHandle, CURLOPT_ERRORBUFFER, asl::begin_ptr(_myErrorBuffer));
+        CURLcode myStatus;
+        myStatus = curl_easy_setopt(_curlHandle, CURLOPT_ERRORBUFFER, asl::begin_ptr(_myErrorBuffer));
         checkCurlStatus(myStatus, PLUS_FILE_LINE);
         myStatus = curl_easy_setopt(_curlHandle, CURLOPT_PRIVATE, this);
         checkCurlStatus(myStatus, PLUS_FILE_LINE);
@@ -105,14 +101,8 @@ namespace http {
         myStatus = curl_easy_setopt(_curlHandle, CURLOPT_OPENSOCKETDATA, this);
         checkCurlStatus(myStatus, PLUS_FILE_LINE);
 
-        /*
-        myStatus = curl_easy_setopt(_curlHandle, CURLOPT_CLOSESOCKETFUNCTION, &Client::_closeSocket);
-        checkCurlStatus(myStatus, PLUS_FILE_LINE);
-        myStatus = curl_easy_setopt(_curlHandle, CURLOPT_CLOSESOCKETDATA, this);
-        checkCurlStatus(myStatus, PLUS_FILE_LINE);
-        */
-        myStatus = curl_easy_setopt(_curlHandle, CURLOPT_VERBOSE, false);
-        checkCurlStatus(myStatus, PLUS_FILE_LINE);
+        setCurlOption<std::string>(_jsOptsObject, "url", CURLOPT_URL);
+        setCurlOption<bool>(_jsOptsObject, "verbose", CURLOPT_VERBOSE);
 
         get();
     }
@@ -188,22 +178,27 @@ namespace http {
 
     void
     Client::onDone() {
-        if (hasCallback("onDone")) {
+        AC_WARNING << "onDone. looking for success";
+        if (hasCallback("success")) {
+            AC_WARNING << "calling success";
             jsval argv[1], rval;
-            /*JSBool ok =*/ JSA_CallFunctionName(_jsContext, _jsObject, "onDone", 0, argv, &rval);
+            /*JSBool ok =*/ JSA_CallFunctionName(_jsContext, _jsOptsObject, "success", 0, argv, &rval);
         }
     }
 
     bool
-    Client::hasCallback(const char * theName) {
+        Client::hasCallback(const char * theName) {
             jsval myValue;
-            jsval myListenerValue = OBJECT_TO_JSVAL(_jsObject);
-            /* JSType myType = */ JS_TypeOfValue(_jsContext, myListenerValue);
-            if (JS_GetProperty(_jsContext, _jsObject, theName, &myValue)) {
+            AC_WARNING << "looking for " << theName << " in " <<_jsContext << "," << _jsOptsObject; 
+            if (JS_GetProperty(_jsContext, _jsOptsObject, theName, &myValue)) {
+                AC_WARNING << "hasCallback " << theName << " " << 2;
                 if (JS_TypeOfValue(_jsContext, myValue) == JSTYPE_FUNCTION) {
+                    AC_WARNING << "hasCallback " << theName << " " << 3;
                     return true;
                 }
+                AC_WARNING << "Property '" << theName << "' is not a function: type=" << JS_TypeOfValue(_jsContext, myValue);
             }
+            AC_WARNING << "hasCallback " << theName << " " << 5;
             return false;
         }
 
@@ -220,6 +215,24 @@ namespace http {
         
         AC_DEBUG << "open socket";
         return _socket.native_handle(); 
+    };
+    template<>
+    bool 
+    Client::setCurlOption<std::string>(JSObject* opts, std::string theProperty, CURLoption theCurlOption) {
+        jsval propValue;
+        std::string nativeValue;
+
+        JS_GetProperty(_jsContext, opts, theProperty.c_str(), &propValue);
+        if (JSVAL_IS_VOID(propValue)) {
+            return false;
+        }
+        if (!jslib::convertFrom(_jsContext, propValue, nativeValue)) {
+            JS_ReportError(_jsContext, "Type mismatch on %s", theProperty.c_str());
+        }
+        CURLcode myStatus = curl_easy_setopt(_curlHandle, theCurlOption, nativeValue.c_str());
+        checkCurlStatus(myStatus, PLUS_FILE_LINE);
+        AC_WARNING << "set string " << nativeValue;
+        return true;
     };
     /* 
     int 
