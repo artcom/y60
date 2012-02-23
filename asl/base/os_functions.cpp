@@ -276,8 +276,10 @@ namespace asl {
     unsigned long getThreadId() {
 #ifdef _WIN32
         return GetCurrentThreadId();
+#elif OSX
+        return pthread_mach_thread_np(pthread_self());
 #else
-        return getpid(); // TODO: check if this ok on Mac OS
+        return getpid();
 #endif
     }
 
