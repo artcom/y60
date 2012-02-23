@@ -60,6 +60,7 @@
 
 #include <string>
 #include <y60/jsbase/JScppUtils.h>
+#include <y60/jsbase/JSBlock.h>
 #include <boost/bind.hpp>
 #include <boost/lexical_cast.hpp>
 #include <netsrc/spidermonkey/jsapi.h>
@@ -78,6 +79,8 @@ namespace http {
         _jsContext(cx),
         _jsOptsObject(theOpts),
         _myErrorBuffer(CURL_ERROR_SIZE, '\0'),
+        _privateResponseBuffer(new Block()),
+        _myResponseBlock(new Block()),
         _socketState(0),
         _read_in_progress(false),
         _write_in_progress(false)
@@ -118,6 +121,15 @@ namespace http {
     {
         AC_DEBUG << "~Client " << this;
     }
+
+    curl_socket_t 
+    Client::getCurlSocket() {
+#if BOOST_VERSION < 104700
+        return _socket.native();
+#else
+        return _socket.native_handle();
+#endif
+    };
     
     void
     Client::checkCurlStatus(CURLcode theStatusCode, const string & theWhere) const {
@@ -126,85 +138,127 @@ namespace http {
         }
     }
 
+    void 
+    Client::onProgress() {
+        bool newDataReceived = false;
+        {
+            ScopeLocker L(_lockResponseBuffer, true);
+            if (_privateResponseBuffer->size() > 0) {
+                _myResponseBlock->append(*_privateResponseBuffer);
+                _privateResponseBuffer->resize(0);
+                newDataReceived = true;
+            }
+        }
+        if (newDataReceived && hasCallback("progress")) {
+            jsval argv[1], rval;
+            argv[0] = as_jsval(_jsContext, _myResponseBlock);
+            JSA_CallFunctionName(_jsContext, _jsOptsObject, "progress", 1, argv, &rval);
+        }
+    };
+
     void
     Client::onSocketState(int theAction) {
+        // NOTE: this will be called from one of io_service's threads
         _socketState = theAction;
         handleOperations();
     };
 
     void
     Client::handleOperations() {
-        if (_socketState == CURL_POLL_OUT && !_write_in_progress) {
-            AC_DEBUG << "queuing write " << this;
-            _write_in_progress = true;
-            _socket.async_write_some(
-                    boost::asio::null_buffers(),
-                    boost::bind(&Client::handleWrite, this,
-                        boost::asio::placeholders::error));
+        // NOTE: this will be called from one of io_service's threads
+        switch (_socketState) {
+            case CURL_POLL_OUT:
+                if (!_write_in_progress) {
+                    AC_TRACE << "queuing write " << this;
+                    _write_in_progress = true;
+                    _socket.async_write_some(
+                            boost::asio::null_buffers(),
+                            boost::bind(&Client::handleWrite, this,
+                                boost::asio::placeholders::error));
+                }
+                break;
+            case CURL_POLL_IN:
+                if (!_read_in_progress) {
+                    AC_TRACE << "queuing read " << this;
+                    _read_in_progress = true;
+                    _socket.async_read_some(
+                            boost::asio::null_buffers(),
+                            boost::bind(&Client::handleRead, this,
+                                boost::asio::placeholders::error));
 
-        } else if (_socketState == CURL_POLL_IN && !_read_in_progress) {
-            AC_TRACE << "queuing read " << this;
-            _read_in_progress = true;
-            _socket.async_read_some(
-                    boost::asio::null_buffers(),
-                    boost::bind(&Client::handleRead, this,
-                        boost::asio::placeholders::error));
-
-        } else if (_socketState == CURL_POLL_REMOVE) {
-            asl::Ptr<NetAsync> parentPlugin = dynamic_cast_Ptr<NetAsync>(Singleton<PlugInManager>::get().getPlugIn(NetAsync::PluginName));
-            parentPlugin->removeClient(this);
-        }
+                }
+                break;
+            case CURL_POLL_REMOVE:
+                if (_socket.is_open()) {
+                    AC_DEBUG << "    shutting down socket for " << this;
+                    _socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both);
+                    _socket.close();
+                }
+                break;
+            default:
+                throw asl::Exception("Unknown Socket State "+_socketState); 
+        };
     }
 
     void 
     Client::handleRead(const boost::system::error_code& error) {
+        // NOTE: this will be called from one of io_service's threads
         AC_TRACE << "doing read " << this;
         _read_in_progress = false;
         asl::Ptr<NetAsync> parentPlugin = dynamic_cast_Ptr<NetAsync>(Singleton<PlugInManager>::get().getPlugIn(NetAsync::PluginName));
-        parentPlugin->doSocketRead(this->_socket.native_handle());
+        parentPlugin->doSocketRead(this->getCurlSocket());
         AC_TRACE << " done read " << this;
         handleOperations();
     };
 
     void 
     Client::handleWrite(const boost::system::error_code& error) {
-        AC_DEBUG << "doing write " << this;
+        // NOTE: this will be called from one of io_service's threads
+        AC_TRACE << "doing write " << this;
         _write_in_progress = false;
         asl::Ptr<NetAsync> parentPlugin = dynamic_cast_Ptr<NetAsync>(Singleton<PlugInManager>::get().getPlugIn(NetAsync::PluginName));
-        parentPlugin->doSocketWrite(this->_socket.native_handle());
-        AC_DEBUG << " done write " << this;
+        parentPlugin->doSocketWrite(this->getCurlSocket());
+        AC_TRACE << " done write " << this;
         handleOperations();
     };
 
     void
     Client::onDone() {
-        AC_WARNING << "onDone. looking for success";
+        asl::Ptr<NetAsync> parentPlugin = dynamic_cast_Ptr<NetAsync>(Singleton<PlugInManager>::get().getPlugIn(NetAsync::PluginName));
+        parentPlugin->removeClient(this);
+        {
+            ScopeLocker L(_lockResponseBuffer, true);
+            _myResponseBlock->append(*_privateResponseBuffer);
+            _privateResponseBuffer->resize(0);
+        }
+
+        AC_DEBUG << "onDone. looking for success";
         if (hasCallback("success")) {
-            AC_WARNING << "calling success";
+            AC_DEBUG << "calling success";
             jsval argv[1], rval;
             /*JSBool ok =*/ JSA_CallFunctionName(_jsContext, _jsOptsObject, "success", 0, argv, &rval);
         }
+
     }
 
     bool
-        Client::hasCallback(const char * theName) {
-            jsval myValue;
-            AC_WARNING << "looking for " << theName << " in " <<_jsContext << "," << _jsOptsObject; 
-            if (JS_GetProperty(_jsContext, _jsOptsObject, theName, &myValue)) {
-                AC_WARNING << "hasCallback " << theName << " " << 2;
-                if (JS_TypeOfValue(_jsContext, myValue) == JSTYPE_FUNCTION) {
-                    AC_WARNING << "hasCallback " << theName << " " << 3;
-                    return true;
-                }
-                AC_WARNING << "Property '" << theName << "' is not a function: type=" << JS_TypeOfValue(_jsContext, myValue);
+    Client::hasCallback(const char * theName) {
+        jsval myValue;
+        if (JS_GetProperty(_jsContext, _jsOptsObject, theName, &myValue)) {
+            if (JS_TypeOfValue(_jsContext, myValue) == JSTYPE_FUNCTION) {
+                return true;
             }
-            AC_WARNING << "hasCallback " << theName << " " << 5;
-            return false;
+            // AC_WARNING << "Property '" << theName << "' is not a function: type=" << JS_TypeOfValue(_jsContext, myValue);
         }
+        return false;
+    }
 
     size_t 
-    Client::writeFunction( char *ptr, size_t size, size_t nmemb) {
-        return size * nmemb;
+    Client::writeFunction(const unsigned char *ptr, size_t size) {
+        // NOTE: this will be called from one of io_service's threads
+        ScopeLocker L(_lockResponseBuffer, true);
+        _privateResponseBuffer->append(ptr, size);
+        return size;
     };
 
     curl_socket_t 
@@ -214,7 +268,7 @@ namespace http {
         _socket.io_control(non_blocking_io);
         
         AC_DEBUG << "open socket";
-        return _socket.native_handle(); 
+        return getCurlSocket(); 
     };
     template<>
     bool 
@@ -231,7 +285,7 @@ namespace http {
         }
         CURLcode myStatus = curl_easy_setopt(_curlHandle, theCurlOption, nativeValue.c_str());
         checkCurlStatus(myStatus, PLUS_FILE_LINE);
-        AC_WARNING << "set string " << nativeValue;
+        AC_DEBUG << "set string option " << theProperty << " = '" << nativeValue << "'";
         return true;
     };
     /* 

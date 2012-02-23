@@ -74,6 +74,7 @@
 #include "Connection.h"
 
 #include <curl/curl.h>
+#include <asl/base/ReadWriteLock.h>
 #include <netsrc/spidermonkey/jsapi.h>
 #include <y60/jsbase/JSWrapper.h>
 
@@ -98,6 +99,9 @@ namespace http {
             JSContext * _jsContext;
             JSObject * _jsOptsObject;
             std::vector<char>   _myErrorBuffer;
+            asl::Ptr<asl::Block> _privateResponseBuffer; // filled in io_service thread, emptied in JS thread
+            asl::ReadWriteLock _lockResponseBuffer; // lock for _privateResponseBuffer;
+            asl::Ptr<asl::Block> _myResponseBlock; // used only in JS thread. 
             int _socketState;
             bool _read_in_progress;
             bool _write_in_progress;
@@ -105,8 +109,10 @@ namespace http {
             /// creates a new HttpClient
             Client(JSContext * cx, JSObject * theOpts);
             virtual ~Client();
+            curl_socket_t getCurlSocket();
             void get();
             void onDone();
+            void onProgress();
             void onSocketState(int theAction);
             
             template<typename T>
@@ -135,9 +141,9 @@ namespace http {
             void checkCurlStatus(CURLcode theStatusCode, const std::string & theWhere) const;
             bool hasCallback(const char * theName);
 
-            size_t writeFunction( char *ptr, size_t size, size_t nmemb);
-            static size_t _writeFunction( char *ptr, size_t size, size_t nmemb, Client *self) {
-                return self->writeFunction(ptr, size, nmemb);
+            size_t writeFunction(const unsigned char *ptr, size_t size);
+            static size_t _writeFunction(unsigned char *ptr, size_t size, size_t nmemb, Client *self) {
+                return self->writeFunction(ptr, size*nmemb);
             };
 
             curl_socket_t openSocket(curlsocktype purpose, struct curl_sockaddr *addr);

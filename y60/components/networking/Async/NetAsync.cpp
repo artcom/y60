@@ -127,6 +127,7 @@ NetAsync::onFrame(jslib::AbstractRenderWindow * theWindow , double t) {
     for (it = _onFrameHandlers.begin(); it != _onFrameHandlers.end(); ++it) {
         (it->second)();
     }
+    processCallbacks();
     processCompleted();    
 };
 

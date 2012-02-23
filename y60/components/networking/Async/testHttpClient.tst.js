@@ -79,9 +79,13 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
     function testBigRequest() {
         var done = false;
 
-        Logger.warning("creating client");
+        Logger.info("creating client");
         obj.myClient = new Async.HttpClient({
             url: "http://files.t-gallery.act/data/repository/original/vol0/24/vater_der_braut_de_hd_eff5390ebdbdf0bd62f86b716f8f8adf3d9512d6.mp4",
+            progress: function(theBlock) {
+                Logger.info(theBlock.size);
+                theBlock.resize(0);
+            },
             success: function() {
                 Logger.warning("onDone called!");
                 done = true;
@@ -105,7 +109,7 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
 
         var iterate = function() {
             i--;
-            // Logger.warning(i);
+            // Logger.info(i);
             if (i>0) {
                 obj.myClient = new Async.HttpClient({ url: "http://gom.t-gallery.act/areas.json", success: iterate} );
             };
