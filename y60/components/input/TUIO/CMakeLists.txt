@@ -4,6 +4,10 @@ TUIOPlugin.cpp
 tuioeventxsd.cpp
 )
 
+set(SERVER_SOURCES
+TUIOServerPlugin.cpp
+)
+
 set(HEADERS
 tuioeventxsd.h
 )
@@ -30,6 +34,14 @@ endif(WIN32)
 y60_add_component(
     TUIOClient
     SOURCES ${SOURCES}
+    HEADERS ${HEADERS}
+    DEPENDS y60jslib
+    EXTERNS ${EXTERNS}
+)
+
+y60_add_component(
+    TUIOServer
+    SOURCES ${SERVER_SOURCES}
     HEADERS ${HEADERS}
     DEPENDS y60jslib
     EXTERNS ${EXTERNS}
