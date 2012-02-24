@@ -176,7 +176,7 @@ bool AVTDShowGraph::setCameraParams(int theIndex)
         AC_INFO << "Avtivated AVT-Camera #: " << theIndex;
     }
 
-    m_AVTActiveCam->put_Rate(_myDesiredFrameRate);
+    m_AVTActiveCam->put_Rate(static_cast<float>(_myDesiredFrameRate));
     float myRate;
     m_AVTActiveCam->get_Rate(&myRate);
     if (myRate != _myDesiredFrameRate) {

@@ -174,7 +174,9 @@ namespace asl {
 #endif
 #ifdef _WIN32
     // prevent windows from defining min and max macros
+    #ifndef NOMINMAX
     #define NOMINMAX
+    #endif
     #undef HAVE_LONGLONG
 #endif
 
