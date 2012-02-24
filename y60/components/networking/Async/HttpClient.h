@@ -30,34 +30,12 @@
 //
 // Description: Base class for HttpClient  
 //
-// Last Review: NEVER, NOONE
-//
-//  review status report: (perfect, ok, fair, poor, disaster, notapplicable, unknown)
-//    usefullness            : unknown
-//    formatting             : unknown
-//    documentation          : unknown
-//    test coverage          : unknown
-//    names                  : unknown
-//    style guide conformance: unknown
-//    technical soundness    : unknown
-//    dead code              : unknown
-//    readability            : unknown
-//    understandabilty       : unknown
-//    interfaces             : unknown
-//    confidence             : unknown
-//    integration            : unknown
-//    dependencies           : unknown
-//    cheesyness             : unknown
-//
-//    overall review status  : unknown
-//
-//    recommendations: 
-//       - unknown
-// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
  */
 
-#ifndef INCL_Y60_HttpClient
-#define INCL_Y60_HttpClient
+#ifndef _ac_y60_async_http_client_h
+#define _ac_y60_async_http_client_h
+
+#include "CurlSocketInfo.h"
 
 #ifdef WIN32
 #include <winsock2.h>
@@ -71,8 +49,6 @@
 
 #include <map>
 
-#include "Connection.h"
-
 #include <curl/curl.h>
 #include <asl/base/ReadWriteLock.h>
 #include <netsrc/spidermonkey/jsapi.h>
@@ -81,7 +57,7 @@
 namespace y60 {
 namespace async {
 namespace http {
-
+    
     /*
     struct JSCallback {
         JSContext*  context;
@@ -94,7 +70,6 @@ namespace http {
     class Client {
         public:
             CURL * _curlHandle;
-            boost::asio::ip::tcp::socket _socket;
         private:
             JSContext * _jsContext;
             JSObject * _jsOptsObject;
@@ -102,7 +77,6 @@ namespace http {
             asl::Ptr<asl::Block> _privateResponseBuffer; // filled in io_service thread, emptied in JS thread
             asl::ReadWriteLock _lockResponseBuffer; // lock for _privateResponseBuffer;
             asl::Ptr<asl::Block> _myResponseBlock; // used only in JS thread. 
-            int _socketState;
             bool _read_in_progress;
             bool _write_in_progress;
         public:
@@ -113,7 +87,8 @@ namespace http {
             void get();
             void onDone();
             void onProgress();
-            void onSocketState(int theAction);
+            std::string getResponseString() const;
+            const asl::Ptr<asl::Block> & getResponseBlock() const;
             
             template<typename T>
             bool setCurlOption(JSObject* opts, std::string theProperty, CURLoption theCurlOption) {
@@ -129,16 +104,13 @@ namespace http {
                 }
                 CURLcode myStatus = curl_easy_setopt(_curlHandle, theCurlOption, nativeValue);
                 checkCurlStatus(myStatus, PLUS_FILE_LINE);
-                AC_WARNING << "set " << nativeValue;
+                AC_DEBUG << "set " << nativeValue;
                 return true;
             };
         private:
             Client();
-            void handleRead(const boost::system::error_code& error);
-            void handleWrite(const boost::system::error_code& error);
-            void handleOperations();
 
-            void checkCurlStatus(CURLcode theStatusCode, const std::string & theWhere) const;
+            void checkCurlStatus(CURLcode theStatusCode, const std::string & theWhere); 
             bool hasCallback(const char * theName);
 
             size_t writeFunction(const unsigned char *ptr, size_t size);
@@ -150,12 +122,12 @@ namespace http {
             static curl_socket_t _openSocket(Client *self, curlsocktype purpose, struct curl_sockaddr *addr) {
                 return self->openSocket(purpose, addr);
             };
-            /*
+            
             int closeSocket(curl_socket_t item);
             static int _closeSocket(Client *self, curl_socket_t item) {
-                // return self->closeSocket(item);
+                return self->closeSocket(item);
             };
-            */
+            
     };
     template<>
     bool Client::setCurlOption<std::string>(JSObject* opts, std::string theProperty, CURLoption theCurlOption);

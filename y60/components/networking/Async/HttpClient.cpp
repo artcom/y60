@@ -75,13 +75,11 @@ namespace http {
 
     Client::Client(JSContext * cx, JSObject * theOpts) :
         _curlHandle(0),
-        _socket(NetAsync::io_service()),
         _jsContext(cx),
         _jsOptsObject(theOpts),
         _myErrorBuffer(CURL_ERROR_SIZE, '\0'),
         _privateResponseBuffer(new Block()),
         _myResponseBlock(new Block()),
-        _socketState(0),
         _read_in_progress(false),
         _write_in_progress(false)
     {
@@ -104,6 +102,11 @@ namespace http {
         myStatus = curl_easy_setopt(_curlHandle, CURLOPT_OPENSOCKETDATA, this);
         checkCurlStatus(myStatus, PLUS_FILE_LINE);
 
+        myStatus = curl_easy_setopt(_curlHandle, CURLOPT_CLOSESOCKETFUNCTION, &Client::_closeSocket);
+        checkCurlStatus(myStatus, PLUS_FILE_LINE);
+        myStatus = curl_easy_setopt(_curlHandle, CURLOPT_CLOSESOCKETDATA, this);
+        checkCurlStatus(myStatus, PLUS_FILE_LINE);
+
         setCurlOption<std::string>(_jsOptsObject, "url", CURLOPT_URL);
         setCurlOption<bool>(_jsOptsObject, "verbose", CURLOPT_VERBOSE);
 
@@ -121,23 +124,23 @@ namespace http {
     {
         AC_DEBUG << "~Client " << this;
     }
-
-    curl_socket_t 
-    Client::getCurlSocket() {
-#if BOOST_VERSION < 104700
-        return _socket.native();
-#else
-        return _socket.native_handle();
-#endif
-    };
-    
+   
     void
-    Client::checkCurlStatus(CURLcode theStatusCode, const string & theWhere) const {
+    Client::checkCurlStatus(CURLcode theStatusCode, const std::string & theWhere) {
         if (theStatusCode != CURLE_OK) {
-            throw Exception(string(asl::begin_ptr(_myErrorBuffer)), theWhere);
+            throw asl::Exception(string(asl::begin_ptr(_myErrorBuffer)), theWhere);
         }
-    }
+    };
 
+    std::string
+    Client::getResponseString() const {
+        return std::string(_myResponseBlock->strbegin(), _myResponseBlock->strend());
+    };
+
+    const asl::Ptr<asl::Block> &
+    Client::getResponseBlock() const {
+        return _myResponseBlock;
+    };
     void 
     Client::onProgress() {
         bool newDataReceived = false;
@@ -154,72 +157,6 @@ namespace http {
             argv[0] = as_jsval(_jsContext, _myResponseBlock);
             JSA_CallFunctionName(_jsContext, _jsOptsObject, "progress", 1, argv, &rval);
         }
-    };
-
-    void
-    Client::onSocketState(int theAction) {
-        // NOTE: this will be called from one of io_service's threads
-        _socketState = theAction;
-        handleOperations();
-    };
-
-    void
-    Client::handleOperations() {
-        // NOTE: this will be called from one of io_service's threads
-        switch (_socketState) {
-            case CURL_POLL_OUT:
-                if (!_write_in_progress) {
-                    AC_TRACE << "queuing write " << this;
-                    _write_in_progress = true;
-                    _socket.async_write_some(
-                            boost::asio::null_buffers(),
-                            boost::bind(&Client::handleWrite, this,
-                                boost::asio::placeholders::error));
-                }
-                break;
-            case CURL_POLL_IN:
-                if (!_read_in_progress) {
-                    AC_TRACE << "queuing read " << this;
-                    _read_in_progress = true;
-                    _socket.async_read_some(
-                            boost::asio::null_buffers(),
-                            boost::bind(&Client::handleRead, this,
-                                boost::asio::placeholders::error));
-
-                }
-                break;
-            case CURL_POLL_REMOVE:
-                if (_socket.is_open()) {
-                    AC_DEBUG << "    shutting down socket for " << this;
-                    _socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both);
-                    _socket.close();
-                }
-                break;
-            default:
-                throw asl::Exception("Unknown Socket State "+_socketState); 
-        };
-    }
-
-    void 
-    Client::handleRead(const boost::system::error_code& error) {
-        // NOTE: this will be called from one of io_service's threads
-        AC_TRACE << "doing read " << this;
-        _read_in_progress = false;
-        asl::Ptr<NetAsync> parentPlugin = dynamic_cast_Ptr<NetAsync>(Singleton<PlugInManager>::get().getPlugIn(NetAsync::PluginName));
-        parentPlugin->doSocketRead(this->getCurlSocket());
-        AC_TRACE << " done read " << this;
-        handleOperations();
-    };
-
-    void 
-    Client::handleWrite(const boost::system::error_code& error) {
-        // NOTE: this will be called from one of io_service's threads
-        AC_TRACE << "doing write " << this;
-        _write_in_progress = false;
-        asl::Ptr<NetAsync> parentPlugin = dynamic_cast_Ptr<NetAsync>(Singleton<PlugInManager>::get().getPlugIn(NetAsync::PluginName));
-        parentPlugin->doSocketWrite(this->getCurlSocket());
-        AC_TRACE << " done write " << this;
-        handleOperations();
     };
 
     void
@@ -263,13 +200,23 @@ namespace http {
 
     curl_socket_t 
     Client::openSocket(curlsocktype purpose, struct curl_sockaddr *addr) {
-        _socket.open(boost::asio::ip::tcp::v4());
-        boost::asio::ip::tcp::socket::non_blocking_io non_blocking_io(true);
-        _socket.io_control(non_blocking_io);
-        
-        AC_DEBUG << "open socket";
-        return getCurlSocket(); 
+        AC_DEBUG << "curl requesting open socket";
+        asl::Ptr<NetAsync> parentPlugin = dynamic_cast_Ptr<NetAsync>(Singleton<PlugInManager>::get().getPlugIn(NetAsync::PluginName));
+        return parentPlugin->openSocket();
     };
+    int 
+    Client::closeSocket(curl_socket_t item) {
+        AC_DEBUG << "closing socket " << item;
+        asl::Ptr<NetAsync> parentPlugin = dynamic_cast_Ptr<NetAsync>(Singleton<PlugInManager>::get().getPlugIn(NetAsync::PluginName));
+        SocketPtr s = CurlSocketInfo::find(item);
+        if (s) {
+            s->boost_socket.close();
+            CurlSocketInfo::release(item);
+            AC_DEBUG << "socket " << item << " closed";
+        }
+        return 0;
+    };
+    
     template<>
     bool 
     Client::setCurlOption<std::string>(JSObject* opts, std::string theProperty, CURLoption theCurlOption) {
@@ -288,14 +235,7 @@ namespace http {
         AC_DEBUG << "set string option " << theProperty << " = '" << nativeValue << "'";
         return true;
     };
-    /* 
-    int 
-    Client::closeSocket(curl_socket_t item) {
-        AC_DEBUG << "close socket";
-        _socket.close();
-        return 0;
-    };
-    */
+     
 }
 }
 }

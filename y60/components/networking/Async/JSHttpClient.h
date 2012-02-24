@@ -30,34 +30,11 @@
 //
 // Description: TODO  
 //
-// Last Review: NEVER, NOONE
-//
-//  review status report: (perfect, ok, fair, poor, disaster, notapplicable, unknown)
-//    usefullness            : unknown
-//    formatting             : unknown
-//    documentation          : unknown
-//    test coverage          : unknown
-//    names                  : unknown
-//    style guide conformance: unknown
-//    technical soundness    : unknown
-//    dead code              : unknown
-//    readability            : unknown
-//    understandabilty       : unknown
-//    interfaces             : unknown
-//    confidence             : unknown
-//    integration            : unknown
-//    dependencies           : unknown
-//    cheesyness             : unknown
-//
-//    overall review status  : unknown
-//
-//    recommendations: 
-//       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-#ifndef _ac_jslib_JSHttpClient_h_
-#define _ac_jslib_JSHttpClient_h_
+#ifndef _ac_y60_async_http_js_http_client_h
+#define _ac_y60_async_http_js_http_client_h
 
 #include <y60/jsbase/JSWrapper.h>
 
@@ -80,6 +57,12 @@ class JSHttpClient : public jslib::JSWrapper<y60::async::http::Client, asl::Ptr<
             return "HttpClient";
         }
         static JSFunctionSpec * Functions();
+        
+        enum PropertyNumbers {
+            PROP_responseString = -100,
+            PROP_responseBlock,
+            PROP_END
+        };
 
         static JSPropertySpec * Properties();
 

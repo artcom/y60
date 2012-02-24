@@ -5,6 +5,7 @@ HttpClient.cpp
 JSHttpClient.cpp
 JSHttpServer.cpp
 NetAsync.cpp
+CurlSocketInfo.cpp
 CurlMultiAdapter.cpp
 MimeTypes.cpp
 Reply.cpp
@@ -21,6 +22,7 @@ JSHttpClient.h
 JSHttpServer.h
 MimeTypes.h
 NetAsync.h
+CurlSocketInfo.h
 CurlMultiAdapter.h
 Reply.h
 Request.h

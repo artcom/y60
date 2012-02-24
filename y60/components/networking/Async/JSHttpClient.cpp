@@ -59,6 +59,7 @@
 #include "JSHttpClient.h"
 
 #include <y60/jsbase/JSWrapper.impl>
+#include <y60/jsbase/JSBlock.h>
 #include <y60/jsbase/JSNode.h>
 
 #include <iostream>
@@ -105,6 +106,8 @@ JSHttpClient::Functions() {
 JSPropertySpec *
 JSHttpClient::Properties() {
     static JSPropertySpec myProperties[] = {
+        {"responseString", PROP_responseString, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
+        {"responseBlock", PROP_responseBlock, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
         {0}
     };
     return myProperties;
@@ -137,6 +140,17 @@ JSHttpClient::ConstIntProperties() {
 // getproperty handling
 JSBool
 JSHttpClient::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
+    switch (theID) {
+            case PROP_responseString:
+                *vp = as_jsval(cx, getNative().getResponseString());
+                return JS_TRUE;
+            case PROP_responseBlock:
+                *vp = as_jsval(cx, getNative().getResponseBlock());
+                return JS_TRUE;
+            default:
+                JS_ReportError(cx,"JSRequestWrapper::getProperty: index %d out of range", theID);
+                return JS_FALSE;
+    }
     return JS_TRUE;
 }
 

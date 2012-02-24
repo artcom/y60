@@ -30,31 +30,11 @@
 //
 // Description: TODO  
 //
-// Last Review: NEVER, NOONE
-//
-//  review status report: (perfect, ok, fair, poor, disaster, notapplicable, unknown)
-//    usefullness            : unknown
-//    formatting             : unknown
-//    documentation          : unknown
-//    test coverage          : unknown
-//    names                  : unknown
-//    style guide conformance: unknown
-//    technical soundness    : unknown
-//    dead code              : unknown
-//    readability            : unknown
-//    understandabilty       : unknown
-//    interfaces             : unknown
-//    confidence             : unknown
-//    integration            : unknown
-//    dependencies           : unknown
-//    cheesyness             : unknown
-//
-//    overall review status  : unknown
-//
-//    recommendations: 
-//       - unknown
-// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
+
+
+#ifndef _ac_y60_async_net_async_h
+#define _ac_y60_async_net_async_h
 
 #include "JSHttpServer.h"
 #include "CurlMultiAdapter.h"
@@ -104,7 +84,6 @@ namespace y60 {
                 _onFrameHandlers.erase(it);
             }
         }
-
     private:
         std::map<const void*, onFrameHandler> _onFrameHandlers;  
         void run(std::size_t thread_pool_size);
@@ -120,3 +99,4 @@ namespace y60 {
 	};
 }
 
+#endif

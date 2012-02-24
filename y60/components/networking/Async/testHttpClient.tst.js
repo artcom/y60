@@ -81,7 +81,7 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
 
         Logger.info("creating client");
         obj.myClient = new Async.HttpClient({
-            url: "http://files.t-gallery.act/data/repository/original/vol0/24/vater_der_braut_de_hd_eff5390ebdbdf0bd62f86b716f8f8adf3d9512d6.mp4",
+            url: "http://files.t-gallery.act:88/data/repository/original/vol0/24/vater_der_braut_de_hd_eff5390ebdbdf0bd62f86b716f8f8adf3d9512d6.mp4",
             progress: function(theBlock) {
                 Logger.info(theBlock.size);
                 theBlock.resize(0);
@@ -105,20 +105,22 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
 
     function testSmallRequests() {
         // test many small requests
-        var i = 100;
+        var i = 10;
 
         var iterate = function() {
+            if (obj.myClient) {
+                print(obj.myClient.responseString.length);
+            };
             i--;
-            // Logger.info(i);
             if (i>0) {
-                obj.myClient = new Async.HttpClient({ url: "http://gom.t-gallery.act/areas.json", success: iterate} );
+                obj.myClient = new Async.HttpClient({ url: "http://gom.t-gallery.act/areas.json", success: iterate, verbose:false } );
             };
         }
         iterate();
         while (true) {
             Async.onFrame();
             gc();
-            msleep(100);
+            msleep(50);
             if (i <= 0) {
                 break;
             }
@@ -128,9 +130,9 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
     obj.run = function () {
         testBigRequest();
 
-        Logger.warning("starting new ASIO Client");
+        //Logger.warning("starting new ASIO Client");
         testSmallRequests();
-        Logger.warning(" done new ASIO Client");
+        //Logger.warning(" done new ASIO Client");
     };
 
 };
