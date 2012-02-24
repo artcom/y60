@@ -160,7 +160,7 @@ namespace http {
     };
 
     void
-    Client::onDone() {
+    Client::onDone(CURLcode result) {
         asl::Ptr<NetAsync> parentPlugin = dynamic_cast_Ptr<NetAsync>(Singleton<PlugInManager>::get().getPlugIn(NetAsync::PluginName));
         parentPlugin->removeClient(this);
         {
@@ -169,11 +169,20 @@ namespace http {
             _privateResponseBuffer->resize(0);
         }
 
-        AC_DEBUG << "onDone. looking for success";
-        if (hasCallback("success")) {
-            AC_DEBUG << "calling success";
-            jsval argv[1], rval;
-            /*JSBool ok =*/ JSA_CallFunctionName(_jsContext, _jsOptsObject, "success", 0, argv, &rval);
+        AC_DEBUG << "onDone. CURLcode is " << result;
+        AC_DEBUG << "error string:" << std::string(asl::begin_ptr(_myErrorBuffer));
+        if (result == CURLE_OK) {
+            if (hasCallback("success")) {
+                AC_DEBUG << "calling success";
+                jsval argv[1], rval;
+                /*JSBool ok =*/ JSA_CallFunctionName(_jsContext, _jsOptsObject, "success", 0, argv, &rval);
+            };
+        } else {
+            if (hasCallback("error")) {
+                AC_DEBUG << "calling error";
+                jsval argv[1], rval;
+                /*JSBool ok =*/ JSA_CallFunctionName(_jsContext, _jsOptsObject, "error", 0, argv, &rval);
+            };
         }
 
     }

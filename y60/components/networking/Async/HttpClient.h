@@ -85,7 +85,7 @@ namespace http {
             virtual ~Client();
             curl_socket_t getCurlSocket();
             void get();
-            void onDone();
+            void onDone(CURLcode result);
             void onProgress();
             std::string getResponseString() const;
             const asl::Ptr<asl::Block> & getResponseBlock() const;

@@ -76,14 +76,40 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
 
     UnitTest.prototype.Constructor(obj, theName);
 
-    function testBigRequest() {
+    function testError() {
         var done = false;
 
         Logger.info("creating client");
         obj.myClient = new Async.HttpClient({
             url: "http://files.t-gallery.act:88/data/repository/original/vol0/24/vater_der_braut_de_hd_eff5390ebdbdf0bd62f86b716f8f8adf3d9512d6.mp4",
             progress: function(theBlock) {
-                Logger.info(theBlock.size);
+                // Logger.info(theBlock.size);
+                theBlock.resize(0);
+            },
+            error: function() {
+                Logger.warning("error callback called!");
+                done = true;
+            },
+            verbose: true
+        });
+
+
+        while (true) {
+            Async.onFrame();
+            msleep(50);
+            if (done) {
+                break;
+            }
+        }
+    };
+    function testBigRequest() {
+        var done = false;
+
+        Logger.info("creating client");
+        obj.myClient = new Async.HttpClient({
+            url: "http://files.t-gallery.act/data/repository/original/vol0/24/vater_der_braut_de_hd_eff5390ebdbdf0bd62f86b716f8f8adf3d9512d6.mp4",
+            progress: function(theBlock) {
+                // Logger.info(theBlock.size);
                 theBlock.resize(0);
             },
             success: function() {
@@ -128,6 +154,7 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
     }
 
     obj.run = function () {
+        testError();
         testBigRequest();
 
         //Logger.warning("starting new ASIO Client");

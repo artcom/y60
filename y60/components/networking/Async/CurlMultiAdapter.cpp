@@ -127,7 +127,7 @@ CurlMultiAdapter::processCompleted() {
             curl_easy_getinfo(myEasyHandle, CURLINFO_PRIVATE, &curClient);
             if (myMessage->msg == CURLMSG_DONE) {
                 AC_DEBUG << "calling onDone for " << curClient;
-                curClient->onDone();
+                curClient->onDone(myMessage->data.result);
             } else {
                 throw asl::Exception("Unknown CURL message encountered");
             }
