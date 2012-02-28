@@ -454,6 +454,8 @@ namespace y60 {
 #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52,27,0)
                 AVPacket myTempPacket;
                 av_init_packet(&myTempPacket);
+                myTempPacket.data = NULL;
+                myTempPacket.size = 0;
                 /*int myLen =*/ avcodec_decode_video2(_myVStream->codec, _myFrame,
                         &frameFinished, &myTempPacket);
 #else
