@@ -191,7 +191,8 @@ namespace y60 {
 
             SDLWindow & operator=(const SDLWindow &);
 
-            void updateVideoMode();
+            void initGL();
+            void updateSDLVideoMode();
 
             void ensureVideoInitialized();
 

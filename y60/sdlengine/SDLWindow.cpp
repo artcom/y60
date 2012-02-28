@@ -70,6 +70,10 @@
 
 #include <y60/jsbase/JScppUtils.h>
 
+#ifdef WIN32_LEAN_AND_MEAN
+#undef WIN32_LEAN_AND_MEAN
+#endif
+
 #include <SDL/SDL.h>
 
 #ifdef WIN32_LEAN_AND_MEAN
@@ -257,12 +261,47 @@ SDLWindow::onResize(Event & theEvent) {
     AbstractRenderWindow::onResize(theEvent);
 }
 
-void
-SDLWindow::updateVideoMode() {
-	if(!_myVideoInitializedFlag) {
-		return;
-	}
 
+void
+SDLWindow::initGL() {
+    if (_myScene) {
+        // unbind all created textures before creating a new context
+        _myScene->getTextureManager()->unbindTextures();
+    }
+    
+    if (_myRenderer) {
+        _myRenderer->initGL();
+        ShaderLibraryPtr myShaderLibrary = dynamic_cast_Ptr<ShaderLibrary> (_myRenderer->getShaderLibrary());
+        if (myShaderLibrary) {
+            myShaderLibrary->reload();
+        }
+    }
+    // reinit all extensions, because since the context is reset all opengl bound stuff is invalid
+    for (ExtensionList::iterator it = _myExtensions.begin(); it != _myExtensions.end(); ++it) {
+        IRendererExtensionPtr curExtension(it->lock());
+        std::string myName = curExtension->getName() + "::onStartup";
+        try {
+            curExtension->onStartup(this);
+        } catch (const asl::Exception & ex) {
+            AC_ERROR << "Exception while calling " << myName << ": " << ex;
+        } catch (...) {
+            AC_ERROR << "Unknown exception while calling " << myName;
+        }
+    }
+
+    if (_myScene) {
+        _myScene->updateAllModified();
+        xpath::NodeList myResult;
+        xpath::findAll(xpath::Path(std::string("//") + SHAPE_NODE_NAME), _myScene->getShapesRoot(), myResult);
+        for (xpath::NodeList::size_type myIndex = 0; myIndex < myResult.size(); ++myIndex) {
+           ShapePtr myShape = myResult[myIndex]->getFacade<Shape>();
+           myShape->enforceReload();
+        }
+    }
+}
+
+void
+SDLWindow::updateSDLVideoMode() {
 	unsigned int myFlags = 0;
 
 	myFlags |= SDL_OPENGL;
@@ -309,10 +348,6 @@ SDLWindow::updateVideoMode() {
 	}
 #endif
 
-    if (_myScene) {
-        // unbind all created textures before creating a new context
-        _myScene->getTextureManager()->unbindTextures();
-    }
     if ((_myScreen = SDL_SetVideoMode(_myWidth + _myWindowWidthCorrection, _myHeight, 32, myFlags)) == NULL) {
         throw SDLWindowException(string("Couldn't set SDL-GL mode: ") + SDL_GetError(), PLUS_FILE_LINE);
     }
@@ -325,55 +360,18 @@ SDLWindow::updateVideoMode() {
 		wminfo.info.x11.unlock_func();
 	}
 #endif
-
-    // if we are resetting the video mode (e.g. Fullscreen toggle), then the GL context
-    // will be lost. Reinit GL and setup the textures again
-    if (_myRenderer) {
-        _myRenderer->initGL();
-        ShaderLibraryPtr myShaderLibrary = dynamic_cast_Ptr<ShaderLibrary> (_myRenderer->getShaderLibrary());
-        if (myShaderLibrary) {
-            myShaderLibrary->reload();
-        }
-    }
-    // reinit all extensions, because since the context is reset all opengl bound stuff is invalid
-    for (ExtensionList::iterator it = _myExtensions.begin(); it != _myExtensions.end(); ++it) {
-        IRendererExtensionPtr curExtension(it->lock());
-        std::string myName = curExtension->getName() + "::onStartup";
-        try {
-            curExtension->onStartup(this);
-        } catch (const asl::Exception & ex) {
-            AC_ERROR << "Exception while calling " << myName << ": " << ex;
-        } catch (...) {
-            AC_ERROR << "Unknown exception while calling " << myName;
-        }
-    }
-
-    if (_myScene) {
-        //_myScene->clearShapes();
-        _myScene->updateAllModified();
-        //_myScene->update(Scene::SHAPES); // updated in updateAllModified
-//        if (!theInitializeCallFlag) {
-//            _myScene->getTextureManager()->reloadTextures();
-//        }
-    }
-    if (_myScene) {
-        xpath::NodeList myResult;
-        xpath::findAll(xpath::Path(std::string("//") + SHAPE_NODE_NAME), _myScene->getShapesRoot(), myResult);
-        for (xpath::NodeList::size_type myIndex = 0; myIndex < myResult.size(); myIndex++) {
-           ShapePtr myShape = myResult[myIndex]->getFacade<Shape>();
-           myShape->enforceReload();
-        }
-    }
 }
 
 void
 SDLWindow::setVideoMode(unsigned theTargetWidth, unsigned theTargetHeight,
                         bool theFullscreenFlag)
 {
-	_myWidth = theTargetWidth;
+    _myWidth = theTargetWidth;
 	_myHeight = theTargetHeight;
 	_myFullscreenFlag = theFullscreenFlag;
-	updateVideoMode();
+	if (_myVideoInitializedFlag) {
+        updateSDLVideoMode();
+    }
 }
 
 void
@@ -637,16 +635,9 @@ SDLWindow::getWindowTitle() const {
 }
 
 void SDLWindow::setWinDeco(bool theWinDecoFlag) {
-	bool myMustUpdate = false;
-
-	if(_myDecorationFlag != theWinDecoFlag) {
-		myMustUpdate = true;
-	}
-
-	_myDecorationFlag = theWinDecoFlag;
-
-	if(myMustUpdate) {
-		updateVideoMode();
+	if (_myDecorationFlag != theWinDecoFlag) {
+		_myDecorationFlag = theWinDecoFlag;
+        updateSDLVideoMode();
 	}
 }
 
@@ -690,7 +681,8 @@ void SDLWindow::ensureVideoInitialized() {
 		_myVideoInitializedFlag = true;
 
 		// set the video mode for the first time
-		updateVideoMode();
+		updateSDLVideoMode();
+        initGL();
 
 		// initialize glew
 		unsigned int myGlewError = glewInit();
