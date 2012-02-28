@@ -12,8 +12,6 @@ std::map<curl_socket_t, SocketPtr> CurlSocketInfo::_allSockets;
 CurlSocketInfo::CurlSocketInfo(CURLM * theCurlMultihandle) :
     boost_socket(NetAsync::io_service()),
     readyState(0),
-    read_in_progress(false),
-    write_in_progress(false),
     _curlMulti(theCurlMultihandle)
 { 
     AC_TRACE << "creating socket " << this;
@@ -36,9 +34,8 @@ CurlSocketInfo::handleOperations(SocketPtr s, curl_socket_t theCurlSocket) {
     // NOTE: this will be called from one of io_service's threads
     switch (s->readyState) {
         case CURL_POLL_OUT:
-            if (!s->write_in_progress) {
+            if (s->write_in_progress.try_lock()) {
                 AC_TRACE << "queuing write " << s;
-                s->write_in_progress = true;
                 s->boost_socket.async_write_some(
                         boost::asio::null_buffers(),
                         boost::bind(&CurlSocketInfo::handleWrite, s,
@@ -46,9 +43,8 @@ CurlSocketInfo::handleOperations(SocketPtr s, curl_socket_t theCurlSocket) {
             }
             break;
         case CURL_POLL_IN:
-            if (!s->read_in_progress) {
+            if (s->read_in_progress.try_lock()) {
                 AC_TRACE << "queuing read " << s;
-                s->read_in_progress = true;
                 s->boost_socket.async_read_some(
                         boost::asio::null_buffers(),
                         boost::bind(&CurlSocketInfo::handleRead, s,
@@ -69,8 +65,8 @@ CurlSocketInfo::handleOperations(SocketPtr s, curl_socket_t theCurlSocket) {
 void 
 CurlSocketInfo::handleRead(const boost::system::error_code& error) {
     // NOTE: this will be called from one of io_service's threads
+    read_in_progress.unlock();
     AC_TRACE << "doing read " << this;
-    read_in_progress = false;
     int i;
     CURLMcode myStatus = curl_multi_socket_action(_curlMulti, native(), CURL_CSELECT_IN, &i);
     CurlMultiAdapter::checkCurlStatus(myStatus, PLUS_FILE_LINE);
@@ -81,8 +77,8 @@ CurlSocketInfo::handleRead(const boost::system::error_code& error) {
 void 
 CurlSocketInfo::handleWrite(const boost::system::error_code& error) {
     // NOTE: this will be called from one of io_service's threads
+    write_in_progress.unlock();
     AC_TRACE << "doing write " << this;
-    write_in_progress = false;
     int i;
     CURLMcode myStatus = curl_multi_socket_action(_curlMulti, native(), CURL_CSELECT_OUT, &i);
     CurlMultiAdapter::checkCurlStatus(myStatus, PLUS_FILE_LINE);

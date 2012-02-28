@@ -36,6 +36,7 @@
 #include <asl/base/Logger.h>
 #include <curl/curl.h>
 #include <boost/asio.hpp>
+#include <boost/thread/mutex.hpp>
 #include <boost/enable_shared_from_this.hpp>
 
 namespace y60 {
@@ -50,8 +51,8 @@ class CurlSocketInfo : public boost::noncopyable, public boost::enable_shared_fr
         curl_socket_t native() { return boost_socket.native(); };
         boost::asio::ip::tcp::socket boost_socket;
         int readyState;
-        bool read_in_progress;
-        bool write_in_progress;
+        boost::mutex read_in_progress;
+        boost::mutex write_in_progress;
         void handleRead(const boost::system::error_code& error);
         void handleWrite(const boost::system::error_code& error);
         static void handleOperations(Ptr s, curl_socket_t theCurlSocket);

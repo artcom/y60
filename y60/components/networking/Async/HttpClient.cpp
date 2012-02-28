@@ -107,22 +107,42 @@ namespace http {
         myStatus = curl_easy_setopt(_curlHandle, CURLOPT_CLOSESOCKETDATA, this);
         checkCurlStatus(myStatus, PLUS_FILE_LINE);
 
-        setCurlOption<std::string>(_jsOptsObject, "url", CURLOPT_URL);
-        setCurlOption<bool>(_jsOptsObject, "verbose", CURLOPT_VERBOSE);
+        ostringstream s;
+        std::string url;
+        setCurlOption<std::string>(_jsOptsObject, "url", CURLOPT_URL, &url);
+        s << "HttpClient::" << hex << this;
+        s << " " << url;
+        AC_DEBUG << "creating client " << this << " with _jsOptsObject " << _jsOptsObject;
+        _debugIdentifier = s.str();
+        setCurlOption<bool>(_jsOptsObject, "verbose", CURLOPT_VERBOSE, 0);
 
-        get();
+        if(!JS_AddNamedRoot(_jsContext, &_jsOptsObject, _debugIdentifier.c_str())) {
+            AC_WARNING << "failed to root request object!";
+        }
+    
     }
 
     void
     Client::get() {
         AC_DEBUG << "starting request " << this;
         asl::Ptr<NetAsync> parentPlugin = dynamic_cast_Ptr<NetAsync>(Singleton<PlugInManager>::get().getPlugIn(NetAsync::PluginName));
-        parentPlugin->addClient(this);
+        parentPlugin->addClient(shared_from_this());
+    }
+
+    void 
+    Client::setWrapper(JSObject * theWrapper) {
+        _jsWrapper = theWrapper;
+        // add root to prevent garbage collection of client and its callbacks 
+        if(!JS_AddNamedRoot(_jsContext, &_jsWrapper, _debugIdentifier.c_str())) {
+            AC_WARNING << "failed to root request object!";
+        }
     }
 
     Client::~Client()
     {
         AC_DEBUG << "~Client " << this;
+        CURLcode myStatus = curl_easy_setopt(_curlHandle, CURLOPT_OPENSOCKETDATA, 0);
+        checkCurlStatus(myStatus, PLUS_FILE_LINE);
     }
    
     void
@@ -145,6 +165,7 @@ namespace http {
     Client::onProgress() {
         bool newDataReceived = false;
         {
+            AC_TRACE << "calling onProgress for " << this;
             ScopeLocker L(_lockResponseBuffer, true);
             if (_privateResponseBuffer->size() > 0) {
                 _myResponseBlock->append(*_privateResponseBuffer);
@@ -159,32 +180,55 @@ namespace http {
         }
     };
 
+JSBool
+JSA_CallFunctionName(JSContext * cx, JSObject * theThisObject, JSObject * theObject, const char * theName, uintN argc, jsval argv[], jsval *rval) {
+    jsval myValue;
+    if (JS_GetProperty(cx, theObject, theName, &myValue)) {
+        if (JS_TypeOfValue(cx, myValue) != JSTYPE_FUNCTION) {
+            AC_WARNING << "Property '" << theName << "' is not a function: type=" << JS_TypeOfValue(cx, myValue);
+            return false;
+        }
+    }
+    try {
+        AC_DEBUG << "cx:" << cx << ", obj:" << theObject << ", theName:" << theName << ", argc:" << argc << ", argv:" << argv << ", rval:" << rval;
+        JSBool ok = JS_CallFunctionValue(cx, theThisObject, myValue, argc, argv, rval);
+        if (!ok) {
+            AC_DEBUG << "Exception while calling js function '" << theName << "'" << endl;
+        }
+        return ok;
+    } HANDLE_CPP_EXCEPTION;
+};
+
     void
-    Client::onDone(CURLcode result) {
-        asl::Ptr<NetAsync> parentPlugin = dynamic_cast_Ptr<NetAsync>(Singleton<PlugInManager>::get().getPlugIn(NetAsync::PluginName));
-        parentPlugin->removeClient(this);
+    Client::onDone(CurlMultiAdapter * theParent, CURLcode result) {
         {
             ScopeLocker L(_lockResponseBuffer, true);
             _myResponseBlock->append(*_privateResponseBuffer);
             _privateResponseBuffer->resize(0);
         }
 
-        AC_DEBUG << "onDone. CURLcode is " << result;
+        AC_DEBUG << "onDone. CURLcode is " << result << " for " << this;
         AC_DEBUG << "error string:" << std::string(asl::begin_ptr(_myErrorBuffer));
         if (result == CURLE_OK) {
             if (hasCallback("success")) {
                 AC_DEBUG << "calling success";
                 jsval argv[1], rval;
-                /*JSBool ok =*/ JSA_CallFunctionName(_jsContext, _jsOptsObject, "success", 0, argv, &rval);
+                /*JSBool ok =*/ JSA_CallFunctionName(_jsContext, _jsWrapper, _jsOptsObject, "success", 0, argv, &rval);
+                AC_DEBUG << "called success";
             };
         } else {
             if (hasCallback("error")) {
                 AC_DEBUG << "calling error";
-                jsval argv[1], rval;
-                /*JSBool ok =*/ JSA_CallFunctionName(_jsContext, _jsOptsObject, "error", 0, argv, &rval);
+                jsval argv[2], rval;
+                argv[0] = as_jsval(_jsContext, result);
+                argv[1] = as_jsval(_jsContext, std::string(asl::begin_ptr(_myErrorBuffer)));
+                /*JSBool ok =*/ JSA_CallFunctionName(_jsContext, _jsWrapper, _jsOptsObject, "error", 2, argv, &rval);
             };
         }
-
+        theParent->removeClient(shared_from_this());
+        AC_DEBUG << "freeing root for " << _debugIdentifier;
+        JS_RemoveRoot(_jsContext, &_jsOptsObject);
+        JS_RemoveRoot(_jsContext, &_jsWrapper);
     }
 
     bool
@@ -194,7 +238,6 @@ namespace http {
             if (JS_TypeOfValue(_jsContext, myValue) == JSTYPE_FUNCTION) {
                 return true;
             }
-            // AC_WARNING << "Property '" << theName << "' is not a function: type=" << JS_TypeOfValue(_jsContext, myValue);
         }
         return false;
     }
@@ -213,10 +256,10 @@ namespace http {
         asl::Ptr<NetAsync> parentPlugin = dynamic_cast_Ptr<NetAsync>(Singleton<PlugInManager>::get().getPlugIn(NetAsync::PluginName));
         return parentPlugin->openSocket();
     };
+    
     int 
-    Client::closeSocket(curl_socket_t item) {
+    Client::_closeSocket(Client *self, curl_socket_t item) {
         AC_DEBUG << "closing socket " << item;
-        asl::Ptr<NetAsync> parentPlugin = dynamic_cast_Ptr<NetAsync>(Singleton<PlugInManager>::get().getPlugIn(NetAsync::PluginName));
         SocketPtr s = CurlSocketInfo::find(item);
         if (s) {
             s->boost_socket.close();
@@ -227,8 +270,8 @@ namespace http {
     };
     
     template<>
-    bool 
-    Client::setCurlOption<std::string>(JSObject* opts, std::string theProperty, CURLoption theCurlOption) {
+    bool
+    Client::setCurlOption<std::string>(JSObject* opts, std::string theProperty, CURLoption theCurlOption, std::string * theValue) {
         jsval propValue;
         std::string nativeValue;
 
@@ -242,6 +285,9 @@ namespace http {
         CURLcode myStatus = curl_easy_setopt(_curlHandle, theCurlOption, nativeValue.c_str());
         checkCurlStatus(myStatus, PLUS_FILE_LINE);
         AC_DEBUG << "set string option " << theProperty << " = '" << nativeValue << "'";
+        if (theValue) {
+            *theValue = nativeValue;
+        }
         return true;
     };
      

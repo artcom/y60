@@ -46,7 +46,7 @@
 
 #include <boost/thread.hpp>
 #include <boost/asio.hpp>
-
+#include <boost/enable_shared_from_this.hpp>
 #include <map>
 
 #include <curl/curl.h>
@@ -67,11 +67,14 @@ namespace http {
     };
     */
 
-    class Client {
+    class CurlMultiAdapter;
+
+    class Client : public boost::enable_shared_from_this<Client> {
         public:
             CURL * _curlHandle;
         private:
             JSContext * _jsContext;
+            JSObject * _jsWrapper;
             JSObject * _jsOptsObject;
             std::vector<char>   _myErrorBuffer;
             asl::Ptr<asl::Block> _privateResponseBuffer; // filled in io_service thread, emptied in JS thread
@@ -79,19 +82,21 @@ namespace http {
             asl::Ptr<asl::Block> _myResponseBlock; // used only in JS thread. 
             bool _read_in_progress;
             bool _write_in_progress;
+            std::string _debugIdentifier;
         public:
             /// creates a new HttpClient
             Client(JSContext * cx, JSObject * theOpts);
             virtual ~Client();
+            void setWrapper(JSObject * theWrapper);
             curl_socket_t getCurlSocket();
             void get();
-            void onDone(CURLcode result);
+            void onDone(CurlMultiAdapter * paraent, CURLcode result);
             void onProgress();
             std::string getResponseString() const;
             const asl::Ptr<asl::Block> & getResponseBlock() const;
             
             template<typename T>
-            bool setCurlOption(JSObject* opts, std::string theProperty, CURLoption theCurlOption) {
+            bool setCurlOption(JSObject* opts, std::string theProperty, CURLoption theCurlOption, T * theValue) {
                 jsval propValue;
                 T nativeValue;
 
@@ -105,6 +110,9 @@ namespace http {
                 CURLcode myStatus = curl_easy_setopt(_curlHandle, theCurlOption, nativeValue);
                 checkCurlStatus(myStatus, PLUS_FILE_LINE);
                 AC_DEBUG << "set " << nativeValue;
+                if (theValue) {
+                    *theValue = nativeValue;
+                }
                 return true;
             };
         private:
@@ -115,7 +123,12 @@ namespace http {
 
             size_t writeFunction(const unsigned char *ptr, size_t size);
             static size_t _writeFunction(unsigned char *ptr, size_t size, size_t nmemb, Client *self) {
-                return self->writeFunction(ptr, size*nmemb);
+                AC_DEBUG << "calling writefunction for " << self;
+                if (self) {
+                    return self->writeFunction(ptr, size*nmemb);
+                } else {
+                    return 0;
+                }
             };
 
             curl_socket_t openSocket(curlsocktype purpose, struct curl_sockaddr *addr);
@@ -123,14 +136,10 @@ namespace http {
                 return self->openSocket(purpose, addr);
             };
             
-            int closeSocket(curl_socket_t item);
-            static int _closeSocket(Client *self, curl_socket_t item) {
-                return self->closeSocket(item);
-            };
-            
+            static int _closeSocket(Client *self, curl_socket_t item);
     };
     template<>
-    bool Client::setCurlOption<std::string>(JSObject* opts, std::string theProperty, CURLoption theCurlOption);
+    bool Client::setCurlOption<std::string>(JSObject* opts, std::string theProperty, CURLoption theCurlOption, std::string * theValue);
 
 } // http
 } // async

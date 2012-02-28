@@ -34,6 +34,7 @@
 
 #include "CurlMultiAdapter.h"
 #include "HttpClient.h"
+#include "NetAsync.h"
 
 #include <asl/base/Logger.h>
 
@@ -45,14 +46,24 @@ namespace http {
         
 
 
-CurlMultiAdapter::CurlMultiAdapter() {
+CurlMultiAdapter::CurlMultiAdapter() 
+{
     _curlMulti = curl_multi_init(); 
     CURLMcode myStatus = curl_multi_setopt(_curlMulti, CURLMOPT_SOCKETFUNCTION, &CurlMultiAdapter::curl_socket_callback);
     checkCurlStatus(myStatus, PLUS_FILE_LINE);
     myStatus = curl_multi_setopt(_curlMulti, CURLMOPT_SOCKETDATA, this); 
     checkCurlStatus(myStatus, PLUS_FILE_LINE);
+
+    myStatus = curl_multi_setopt(_curlMulti, CURLMOPT_TIMERFUNCTION, &CurlMultiAdapter::curl_timer_callback);
+    checkCurlStatus(myStatus, PLUS_FILE_LINE);
+    myStatus = curl_multi_setopt(_curlMulti, CURLMOPT_TIMERDATA, this); 
+    checkCurlStatus(myStatus, PLUS_FILE_LINE);
+
 };
 CurlMultiAdapter::~CurlMultiAdapter() {
+    while (!_allClients.empty()) {
+        (*_allClients.begin())->onDone(this, CURLE_ABORTED_BY_CALLBACK );
+    }
     CURLMcode myStatus = curl_multi_cleanup(_curlMulti); 
     checkCurlStatus(myStatus, PLUS_FILE_LINE);
 };
@@ -65,7 +76,7 @@ CurlMultiAdapter::checkCurlStatus(CURLMcode theStatusCode, const std::string & t
 };
 
 void 
-CurlMultiAdapter::addClient(async::http::Client * theClient) { 
+CurlMultiAdapter::addClient(boost::shared_ptr<async::http::Client> theClient) { 
     AC_DEBUG << "adding client " << theClient;
     CURLMcode myStatus = curl_multi_add_handle(_curlMulti,  theClient->_curlHandle);
     checkCurlStatus(myStatus, PLUS_FILE_LINE);
@@ -75,7 +86,7 @@ CurlMultiAdapter::addClient(async::http::Client * theClient) {
     checkCurlStatus(myStatus, PLUS_FILE_LINE);
 };
 void 
-CurlMultiAdapter::removeClient(async::http::Client * theClient ){ 
+CurlMultiAdapter::removeClient(boost::shared_ptr<async::http::Client> theClient ){ 
     AC_DEBUG << "removeClient client " << theClient;
     CURLMcode myStatus = curl_multi_remove_handle(_curlMulti,  theClient->_curlHandle); 
     checkCurlStatus(myStatus, PLUS_FILE_LINE);
@@ -101,9 +112,28 @@ CurlMultiAdapter::curl_socket_callback(CURL *easy, /* easy handle */
     return 0;
 };
 
+int 
+CurlMultiAdapter::curl_timer_callback(CURLM *multi,  long timeout_ms, CurlMultiAdapter * self) {
+    AC_TRACE << "multi_timer_cb: Setting timeout to " << timeout_ms << " ms";
+    if ( ! self->timeout_timer) {
+        self->timeout_timer = boost::shared_ptr<boost::asio::deadline_timer>(new boost::asio::deadline_timer(NetAsync::io_service())); 
+    }
+    self->timeout_timer->expires_from_now(boost::posix_time::milliseconds(timeout_ms));
+    // self->onTimeout(boost::asio::error::operation_aborted);
+    self->timeout_timer->async_wait(bind(&CurlMultiAdapter::onTimeout, self, boost::asio::placeholders::error));
+    return 0;
+};
+
+void
+CurlMultiAdapter::onTimeout(const boost::system::error_code& error) {
+    int i;
+    CURLMcode myStatus = curl_multi_socket_action(_curlMulti, CURL_SOCKET_TIMEOUT, 0, &i);
+    checkCurlStatus(myStatus, PLUS_FILE_LINE);
+};
+
 void
 CurlMultiAdapter::processCallbacks() {
-    for (std::set<Client*>::iterator it = _allClients.begin(); it != _allClients.end(); ++it) {
+    for (std::set<boost::shared_ptr<Client> >::iterator it = _allClients.begin(); it != _allClients.end(); ++it) {
         (*it)->onProgress();
     }
 };
@@ -127,7 +157,7 @@ CurlMultiAdapter::processCompleted() {
             curl_easy_getinfo(myEasyHandle, CURLINFO_PRIVATE, &curClient);
             if (myMessage->msg == CURLMSG_DONE) {
                 AC_DEBUG << "calling onDone for " << curClient;
-                curClient->onDone(myMessage->data.result);
+                curClient->onDone(this, myMessage->data.result);
             } else {
                 throw asl::Exception("Unknown CURL message encountered");
             }

@@ -103,7 +103,7 @@ NetAsync::initClasses(JSContext * theContext, JSObject *theGlobalObject) {
 
 void
 NetAsync::run(std::size_t thread_pool_size) {
-    AC_DEBUG << "starting asio threads";
+    AC_DEBUG << "starting asio threads " << this;
     
     // Create a pool of threads to run all of the io_services.
     std::vector<boost::shared_ptr<boost::thread> > threads;
@@ -118,7 +118,7 @@ NetAsync::run(std::size_t thread_pool_size) {
     for (std::size_t i = 0; i < threads.size(); ++i)
         threads[i]->join();
 
-    AC_DEBUG << "asio threads terminated";
+    AC_DEBUG << "asio threads terminated " << this;
 };
 
 void 

@@ -50,8 +50,8 @@ class CurlMultiAdapter {
     public:
         CurlMultiAdapter();
         virtual ~CurlMultiAdapter();
-        void addClient(async::http::Client * theClient);
-        void removeClient(async::http::Client * theClient);
+        void addClient(boost::shared_ptr<async::http::Client> theClient);
+        void removeClient(boost::shared_ptr<async::http::Client> theClient);
         void processCompleted();
         void processCallbacks();
         curl_socket_t openSocket() {
@@ -70,9 +70,12 @@ class CurlMultiAdapter {
     private:
         // curl stuff
         CURLM * _curlMulti;
+        boost::shared_ptr<boost::asio::deadline_timer> timeout_timer;
 
-        std::set<async::http::Client*> _allClients;
+        std::set<boost::shared_ptr<async::http::Client> > _allClients;
         static int curl_socket_callback(CURL *easy, curl_socket_t s, int action, void *userp, void *socketp); 
+        static int curl_timer_callback(CURLM *multi,  long timeout_ms, CurlMultiAdapter * self); 
+        void onTimeout(const boost::system::error_code& error);
 
 };
 

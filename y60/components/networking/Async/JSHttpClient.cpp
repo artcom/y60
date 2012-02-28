@@ -181,9 +181,12 @@ JSHttpClient::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
     OWNERPTR myHttpClient = OWNERPTR(new async::http::Client(cx, optsObject));
     myNewObject = new JSHttpClient(myHttpClient, myHttpClient.get());
     JS_SetPrivate(cx, obj, myNewObject);
+    myHttpClient->setWrapper(obj);
     // now stick the opts object to the JSHttpClient wrapper so it's not GC'ed
     jsval optsValue = OBJECT_TO_JSVAL(optsObject);
     JS_SetProperty(cx, obj, "_opts", &optsValue);
+    // perform request
+    myHttpClient->get();
     return JS_TRUE;
 }
 
