@@ -302,21 +302,21 @@ SDLWindow::initGL() {
 
 void
 SDLWindow::updateSDLVideoMode() {
-	unsigned int myFlags = 0;
+    unsigned int myFlags = 0;
 
-	myFlags |= SDL_OPENGL;
+    myFlags |= SDL_OPENGL;
 
-	if(!_myDecorationFlag) {
-		myFlags |= SDL_NOFRAME;
-	}
+    if(!_myDecorationFlag) {
+        myFlags |= SDL_NOFRAME;
+    }
 
-	if(_myFullscreenFlag) {
-		myFlags |= SDL_FULLSCREEN;
-	} else {
-		if(_myResizableFlag) {
-			myFlags |= SDL_RESIZABLE;
-		}
-	}
+    if(_myFullscreenFlag) {
+        myFlags |= SDL_FULLSCREEN;
+    } else {
+        if(_myResizableFlag) {
+            myFlags |= SDL_RESIZABLE;
+        }
+    }
 
 #ifdef _WIN32
     // windows 7 does some strange things running a window in fullscreen mode,
@@ -339,13 +339,13 @@ SDLWindow::updateSDLVideoMode() {
 #endif
 
 #ifdef AC_USE_X11
-	SDL_SysWMinfo wminfo;
-	SDL_VERSION(&wminfo.version);
-	if (SDL_GetWMInfo(&wminfo) >= 0) {
-		wminfo.info.x11.lock_func();
-		XSync(wminfo.info.x11.display, true);
-		wminfo.info.x11.unlock_func();
-	}
+    SDL_SysWMinfo wminfo;
+    SDL_VERSION(&wminfo.version);
+    if (SDL_GetWMInfo(&wminfo) >= 0) {
+        wminfo.info.x11.lock_func();
+        XSync(wminfo.info.x11.display, true);
+        wminfo.info.x11.unlock_func();
+    }
 #endif
 
     if ((_myScreen = SDL_SetVideoMode(_myWidth + _myWindowWidthCorrection, _myHeight, 32, myFlags)) == NULL) {
@@ -353,12 +353,12 @@ SDLWindow::updateSDLVideoMode() {
     }
 
 #ifdef AC_USE_X11
-	SDL_VERSION(&wminfo.version);
-	if (SDL_GetWMInfo(&wminfo) >= 0) {
-		wminfo.info.x11.lock_func();
-		XSync(wminfo.info.x11.display, true);
-		wminfo.info.x11.unlock_func();
-	}
+    SDL_VERSION(&wminfo.version);
+    if (SDL_GetWMInfo(&wminfo) >= 0) {
+        wminfo.info.x11.lock_func();
+        XSync(wminfo.info.x11.display, true);
+        wminfo.info.x11.unlock_func();
+    }
 #endif
 }
 
@@ -367,9 +367,9 @@ SDLWindow::setVideoMode(unsigned theTargetWidth, unsigned theTargetHeight,
                         bool theFullscreenFlag)
 {
     _myWidth = theTargetWidth;
-	_myHeight = theTargetHeight;
-	_myFullscreenFlag = theFullscreenFlag;
-	if (_myVideoInitializedFlag) {
+    _myHeight = theTargetHeight;
+    _myFullscreenFlag = theFullscreenFlag;
+    if (_myVideoInitializedFlag) {
         updateSDLVideoMode();
     }
 }
@@ -635,10 +635,10 @@ SDLWindow::getWindowTitle() const {
 }
 
 void SDLWindow::setWinDeco(bool theWinDecoFlag) {
-	if (_myDecorationFlag != theWinDecoFlag) {
-		_myDecorationFlag = theWinDecoFlag;
+    if (_myDecorationFlag != theWinDecoFlag) {
+        _myDecorationFlag = theWinDecoFlag;
         updateSDLVideoMode();
-	}
+    }
 }
 
 bool SDLWindow::getWinDeco() {
@@ -650,49 +650,49 @@ bool SDLWindow::getFullScreen() {
 }
 
 void SDLWindow::ensureVideoInitialized() {
-	if(!_myVideoInitializedFlag) {
-		AC_DEBUG << "Initializing SDL video";
+    if(!_myVideoInitializedFlag) {
+        AC_DEBUG << "Initializing SDL video";
 
-		if (!SDL_WasInit(SDL_INIT_VIDEO)) {
-			if (SDL_InitSubSystem(SDL_INIT_VIDEO) == -1) {
-				throw SDLWindowException(string("Could not init SDL video subsystem: ") + SDL_GetError(), PLUS_FILE_LINE);
-			}
-		}
+        if (!SDL_WasInit(SDL_INIT_VIDEO)) {
+            if (SDL_InitSubSystem(SDL_INIT_VIDEO) == -1) {
+                throw SDLWindowException(string("Could not init SDL video subsystem: ") + SDL_GetError(), PLUS_FILE_LINE);
+            }
+        }
 
-		// enable double-buffering
-		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+        // enable double-buffering
+        SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
-		// component sizes
-		SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
-		SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
-		SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
-		SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
+        // component sizes
+        SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
+        SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
+        SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
+        SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
 
-		// depth buffer
-		SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+        // depth buffer
+        SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
-		// multisampling
-		unsigned mySamples = AbstractRenderWindow::getMultisamples();
-		if (mySamples >= 1) {
-			SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
-			SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, mySamples);
-		}
+        // multisampling
+        unsigned mySamples = AbstractRenderWindow::getMultisamples();
+        if (mySamples >= 1) {
+            SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+            SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, mySamples);
+        }
 
-		_myVideoInitializedFlag = true;
+        _myVideoInitializedFlag = true;
 
-		// set the video mode for the first time
-		updateSDLVideoMode();
+        // set the video mode for the first time
+        updateSDLVideoMode();
         initGL();
 
-		// initialize glew
-		unsigned int myGlewError = glewInit();
-		if (GLEW_OK != myGlewError) {
-			throw RendererException(std::string("Glew Initialization Error: ") +
-					std::string(reinterpret_cast<const char*>(glewGetErrorString(myGlewError))),
-					PLUS_FILE_LINE);
-		}
+        // initialize glew
+        unsigned int myGlewError = glewInit();
+        if (GLEW_OK != myGlewError) {
+            throw RendererException(std::string("Glew Initialization Error: ") +
+                    std::string(reinterpret_cast<const char*>(glewGetErrorString(myGlewError))),
+                    PLUS_FILE_LINE);
+        }
 
-		// initialize glrm
+        // initialize glrm
         GLResourceManager::get().initCaps();
 
         // find out if vsync is supported
@@ -703,7 +703,7 @@ void SDLWindow::ensureVideoInitialized() {
 #else
         _myHasVideoSync = false;
 #endif
-	}
+    }
 }
 
 void
