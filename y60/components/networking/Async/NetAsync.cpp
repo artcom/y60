@@ -57,6 +57,7 @@
 */
 
 #include "NetAsync.h"
+#include "JSHttpClient.h"
 #include <y60/jsbase/JSScriptablePlugin.h>
 #include <y60/jsbase/JSWrapper.h>
 
@@ -76,20 +77,28 @@ static JSClass Package = {
     	
 NetAsync::NetAsync(asl::DLHandle theDLHandle) : 
                 asl::PlugInBase(theDLHandle),
-                IRendererExtension(ClassName()) 
+                IRendererExtension(ClassName()),
+                CurlMultiAdapter(io),
+                keep_busy(new boost::asio::io_service::work(io))
 {
     _myAsioThread = AsioThreadPtr(new boost::thread( boost::bind( &NetAsync::run, this, 10) ) );
 };
 
 NetAsync::~NetAsync() {
-    stop();
+    AC_TRACE << "~NetAsync - canceling all sockets";
+    CurlMultiAdapter::shutdown();
+    AC_TRACE << "~NetAsync - removing keep_busy";
+    keep_busy.reset();
+    AC_TRACE << "~NetAsync - waiting for ASIO thread";
+    // io.stop();
+    _myAsioThread->join();
+    AC_TRACE << "~NetAsync done";
 };
 
 boost::asio::io_service & 
 NetAsync::io_service() {
     return io;
 };
-
 
 void 
 NetAsync::initClasses(JSContext * theContext, JSObject *theGlobalObject) {
@@ -98,11 +107,12 @@ NetAsync::initClasses(JSContext * theContext, JSObject *theGlobalObject) {
     JSObject *asyncNamespace = JS_DefineObject(theContext, theGlobalObject, "Async", &Package, NULL, JSPROP_PERMANENT | JSPROP_READONLY);
     JSA_AddFunctions(theContext, asyncNamespace, Functions());
     JSHttpServer::initClass(theContext, asyncNamespace);
+    JSHttpClient::initClass(theContext, asyncNamespace);
 };
 
 void
 NetAsync::run(std::size_t thread_pool_size) {
-    AC_DEBUG << "starting asio threads";
+    AC_DEBUG << "starting asio threads " << this;
     
     // Create a pool of threads to run all of the io_services.
     std::vector<boost::shared_ptr<boost::thread> > threads;
@@ -117,12 +127,17 @@ NetAsync::run(std::size_t thread_pool_size) {
     for (std::size_t i = 0; i < threads.size(); ++i)
         threads[i]->join();
 
-    AC_DEBUG << "asio threads terminated";
+    AC_DEBUG << "asio threads terminated " << this;
 };
 
 void 
-NetAsync::stop() {
-    io.stop();
+NetAsync::onFrame(jslib::AbstractRenderWindow * theWindow , double t) {
+    std::map<const void*, onFrameHandler>::iterator it;
+    for (it = _onFrameHandlers.begin(); it != _onFrameHandlers.end(); ++it) {
+        (it->second)();
+    }
+    processCallbacks();
+    processCompleted();    
 };
 
 static JSBool
@@ -156,8 +171,6 @@ NetAsync::Functions() {
 };
 
 // static initializer
-boost::asio::io_service y60::NetAsync::io;
-boost::asio::io_service::work y60::NetAsync::keep_busy(io);
 const char * y60::NetAsync::PluginName = "NetAsync";
 
 extern "C"

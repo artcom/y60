@@ -246,8 +246,8 @@ HttpServerUnitTest.prototype.Constructor = function (obj, theName) {
             Async.onFrame();
         }
 
-        //obj.myServer.close();
-        // obj.myServer = null;
+        obj.myServer.close();
+        obj.myServer = null;
     };
 
 };

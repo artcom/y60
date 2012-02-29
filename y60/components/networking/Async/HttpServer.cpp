@@ -71,22 +71,23 @@ namespace y60 {
 namespace async {
 namespace http {
     
-    Server::Server(JSContext * cx) :
+    Server::Server(JSContext * cx, boost::asio::io_service & theIOService) :
         _jsContext(cx),
-        acceptor_(NetAsync::io_service()),
-        new_connection_(new connection(NetAsync::io_service(), _myRequestQueue))
+        acceptor_(theIOService),
+        new_connection_(new connection(theIOService, _myRequestQueue))
     {
     }
 
     Server::~Server()
     {
+        AC_TRACE << "DTOR ~Server";
         close();
         _myCallbacks.clear();
     }
     
     bool Server::start( string theServerAddress, string theServerPort ) {
         AC_DEBUG << "starting http::Server on " << theServerAddress << ":" << theServerPort;
-        boost::asio::ip::tcp::resolver resolver(NetAsync::io_service());
+        boost::asio::ip::tcp::resolver resolver(acceptor_.get_io_service());
         boost::asio::ip::tcp::resolver::query query(theServerAddress, theServerPort);
         boost::asio::ip::tcp::endpoint endpoint = *resolver.resolve(query);
         acceptor_.open(endpoint.protocol());
@@ -104,6 +105,7 @@ namespace http {
     }
 
     void Server::close() {
+        acceptor_.close();
         asl::Ptr<NetAsync> parentPlugin = dynamic_cast_Ptr<NetAsync>(Singleton<PlugInManager>::get().getPlugIn(NetAsync::PluginName));
         parentPlugin->unregisterHandler(this);
     }
