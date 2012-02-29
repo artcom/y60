@@ -42,17 +42,18 @@
 namespace y60 {
 namespace async {
 namespace http {
-    
+
+class CurlMultiAdapter; 
+
 class CurlSocketInfo : public boost::noncopyable, public boost::enable_shared_from_this<CurlSocketInfo> {
     public:
         typedef boost::shared_ptr<CurlSocketInfo> Ptr;
-        CurlSocketInfo(boost::asio::io_service & theIOService, CURLM * theCurlMultihandle);
+        CurlSocketInfo(CurlMultiAdapter * pParent, CURLM * theCurlMultihandle);
         ~CurlSocketInfo();
         curl_socket_t native() { return boost_socket.native(); };
         boost::asio::ip::tcp::socket boost_socket;
         int readyState;
-        boost::mutex read_in_progress;
-        boost::mutex write_in_progress;
+        boost::mutex op_in_progress;
         void handleRead(const boost::system::error_code& error);
         void handleWrite(const boost::system::error_code& error);
         static void handleOperations(Ptr s, curl_socket_t theCurlSocket);
@@ -72,7 +73,6 @@ class CurlSocketInfo : public boost::noncopyable, public boost::enable_shared_fr
                 AC_TRACE << "aborting socket " << it->second->boost_socket.native() << " for " << it->second;
                 it->second->boost_socket.close();
             }
-            // _allSockets.clear();
         }
         static Ptr find(curl_socket_t s) {
             std::map<curl_socket_t, Ptr>::iterator it = _allSockets.find(s);
@@ -81,9 +81,16 @@ class CurlSocketInfo : public boost::noncopyable, public boost::enable_shared_fr
             }
             return Ptr();
         }
+        void close() {
+            curl_socket_t item = boost_socket.native();
+            boost_socket.close();
+            AC_DEBUG << "closing socket " << item;
+            release(item);
+            AC_DEBUG << "socket " << item << " closed";
+        };
     private:
-        CURLM * _curlMulti;
         CurlSocketInfo();
+        CurlMultiAdapter * _parent;
         static std::map<curl_socket_t, Ptr> _allSockets;
 };
 

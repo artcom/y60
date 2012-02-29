@@ -126,7 +126,7 @@ namespace http {
     Client::get() {
         AC_DEBUG << "starting request " << this;
         asl::Ptr<NetAsync> parentPlugin = dynamic_cast_Ptr<NetAsync>(Singleton<PlugInManager>::get().getPlugIn(NetAsync::PluginName));
-        parentPlugin->addClient(shared_from_this());
+        parentPlugin->getCurlAdapater().addClient(shared_from_this());
     }
 
     void 
@@ -254,7 +254,7 @@ JSA_CallFunctionName(JSContext * cx, JSObject * theThisObject, JSObject * theObj
     Client::openSocket(curlsocktype purpose, struct curl_sockaddr *addr) {
         AC_DEBUG << "curl requesting open socket";
         asl::Ptr<NetAsync> parentPlugin = dynamic_cast_Ptr<NetAsync>(Singleton<PlugInManager>::get().getPlugIn(NetAsync::PluginName));
-        return parentPlugin->openSocket();
+        return parentPlugin->getCurlAdapater().openSocket();
     };
     
     int 
@@ -262,9 +262,7 @@ JSA_CallFunctionName(JSContext * cx, JSObject * theThisObject, JSObject * theObj
         AC_DEBUG << "closing socket " << item;
         SocketPtr s = CurlSocketInfo::find(item);
         if (s) {
-            s->boost_socket.close();
-            CurlSocketInfo::release(item);
-            AC_DEBUG << "socket " << item << " closed";
+            s->close();
         }
         return 0;
     };

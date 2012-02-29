@@ -50,8 +50,7 @@ namespace y60 {
 	class NetAsync : 
         public asl::PlugInBase, 
         public IRendererExtension, 
-        public jslib::IScriptablePlugin,
-        public async::http::CurlMultiAdapter
+        public jslib::IScriptablePlugin
     {
     public:
         typedef asl::Ptr<boost::thread, dom::ThreadingModel> AsioThreadPtr;
@@ -84,6 +83,8 @@ namespace y60 {
                 _onFrameHandlers.erase(it);
             }
         }
+        async::http::CurlMultiAdapter & getCurlAdapater() { return _curlAdapter; };
+
     private:
         std::map<const void*, onFrameHandler> _onFrameHandlers;  
         void run(std::size_t thread_pool_size);
@@ -91,6 +92,7 @@ namespace y60 {
         boost::asio::io_service io;
         // fictional work item to prevent our io_service from being out of work and terminating
         boost::shared_ptr<boost::asio::io_service::work> keep_busy;
+        async::http::CurlMultiAdapter _curlAdapter;
 
 
     private:

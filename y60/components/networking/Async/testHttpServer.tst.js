@@ -245,8 +245,6 @@ HttpServerUnitTest.prototype.Constructor = function (obj, theName) {
             myRequestManager.handleRequests();
             Async.onFrame();
         }
-
-        obj.myServer.close();
         obj.myServer = null;
     };
 
@@ -257,6 +255,6 @@ var mySuite = new UnitTestSuite(myTestName);
 
 mySuite.addTest(new HttpServerUnitTest());
 mySuite.run();
-
+gc();
 print(">> Finished test suite '" + myTestName + "', return status = " + mySuite.returnStatus() + "");
 exit(mySuite.returnStatus());

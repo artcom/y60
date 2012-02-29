@@ -47,7 +47,8 @@ namespace http {
 
 
 CurlMultiAdapter::CurlMultiAdapter(boost::asio::io_service & theIOService) :
-    io(theIOService)
+    io(theIOService),
+    _strand(theIOService)
 {
     _curlMulti = curl_multi_init(); 
     CURLMcode myStatus = curl_multi_setopt(_curlMulti, CURLMOPT_SOCKETFUNCTION, &CurlMultiAdapter::curl_socket_callback);
@@ -134,7 +135,7 @@ CurlMultiAdapter::curl_timer_callback(CURLM *multi,  long timeout_ms, CurlMultiA
     }
     self->timeout_timer->expires_from_now(boost::posix_time::milliseconds(timeout_ms));
     // self->onTimeout(boost::asio::error::operation_aborted);
-    self->timeout_timer->async_wait(bind(&CurlMultiAdapter::onTimeout, self, boost::asio::placeholders::error));
+    self->timeout_timer->async_wait(self->_strand.wrap(bind(&CurlMultiAdapter::onTimeout, self, boost::asio::placeholders::error)));
     return 0;
 };
 

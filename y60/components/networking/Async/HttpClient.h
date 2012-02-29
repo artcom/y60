@@ -90,7 +90,7 @@ namespace http {
             void setWrapper(JSObject * theWrapper);
             curl_socket_t getCurlSocket();
             void get();
-            void onDone(CurlMultiAdapter * paraent, CURLcode result);
+            void onDone(CurlMultiAdapter * parent, CURLcode result);
             void onProgress();
             std::string getResponseString() const;
             const asl::Ptr<asl::Block> & getResponseBlock() const;

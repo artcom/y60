@@ -78,15 +78,15 @@ static JSClass Package = {
 NetAsync::NetAsync(asl::DLHandle theDLHandle) : 
                 asl::PlugInBase(theDLHandle),
                 IRendererExtension(ClassName()),
-                CurlMultiAdapter(io),
-                keep_busy(new boost::asio::io_service::work(io))
+                keep_busy(new boost::asio::io_service::work(io)),
+                _curlAdapter(io)
 {
     _myAsioThread = AsioThreadPtr(new boost::thread( boost::bind( &NetAsync::run, this, 10) ) );
 };
 
 NetAsync::~NetAsync() {
     AC_TRACE << "~NetAsync - canceling all sockets";
-    CurlMultiAdapter::shutdown();
+    _curlAdapter.shutdown();
     AC_TRACE << "~NetAsync - removing keep_busy";
     keep_busy.reset();
     AC_TRACE << "~NetAsync - waiting for ASIO thread";
@@ -136,8 +136,8 @@ NetAsync::onFrame(jslib::AbstractRenderWindow * theWindow , double t) {
     for (it = _onFrameHandlers.begin(); it != _onFrameHandlers.end(); ++it) {
         (it->second)();
     }
-    processCallbacks();
-    processCompleted();    
+    _curlAdapter.processCallbacks();
+    _curlAdapter.processCompleted();    
 };
 
 static JSBool

@@ -48,6 +48,7 @@ class Client; // forward declaration
 
 class CurlMultiAdapter {
     public:
+        friend class CurlSocketInfo;
         CurlMultiAdapter(boost::asio::io_service & theIOService);
         virtual ~CurlMultiAdapter();
         void addClient(boost::shared_ptr<async::http::Client> theClient);
@@ -55,16 +56,15 @@ class CurlMultiAdapter {
         void processCompleted();
         void processCallbacks();
         curl_socket_t openSocket() {
-            async::http::CurlSocketInfo::Ptr s(new async::http::CurlSocketInfo(io, _curlMulti));
+            async::http::CurlSocketInfo::Ptr s(new async::http::CurlSocketInfo(this, _curlMulti));
             CurlSocketInfo::add(s);
             return s->native();
         };
 
         static void checkCurlStatus(CURLMcode theStatusCode, const std::string & theWhere); 
-
+        void shutdown();
     protected:
         void setSocketInfo(curl_socket_t s, void * data);
-        void shutdown();
     private:
         CurlMultiAdapter();
         // curl stuff
@@ -78,6 +78,7 @@ class CurlMultiAdapter {
 
         // Boost IO stuff
         boost::asio::io_service & io; // owned by NetAsync
+        boost::asio::io_service::strand _strand;
 
 };
 
