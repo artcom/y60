@@ -85,8 +85,7 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
         var myClient = new Async.HttpClient({
             url: "http://192.168.56.10:3080/foo",
             success: function() {
-                print(this);
-                Logger.warning("Success Callback called!");
+                SUCCESS("FireAndForget");
                 done = true;
             },
             verbose: true
@@ -107,12 +106,16 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
         var done = false;
         Logger.info("creating client");
         obj.myClient = new Async.HttpClient({
-            url: "http://files.t-gallery.act:88/data/repository/original/vol0/24/vater_der_braut_de_hd_eff5390ebdbdf0bd62f86b716f8f8adf3d9512d6.mp4",
+            url: "http://127.0.0.1:88/foobar",
             progress: function(theBlock) {
                 Logger.info(theBlock.size);
                 theBlock.resize(0);
             },
+            success: function() {
+                FAILURE("testError");
+            },
             error: function() {
+                SUCCESS("testError");
                 print(this);
                 Logger.warning("error callback called!");
                 done = true;
@@ -166,10 +169,7 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
             Logger.warning("iterate called");
             i--;
             if (i>0) {
-                //obj.myClient = new Async.HttpClient({ url: "http://storage.service.t-gallery.act/areas/move/hotel/work/zoe.zip", success: iterate, verbose:true } );
                 obj.myClient = new Async.HttpClient({ url: "http://127.0.0.1:3003/foo", success: iterate, verbose:false } );
-                //obj.myClient = new Async.HttpClient({ url: "http://192.168.56.10:3080/bar"+i, success: iterate, verbose:true } );
-                //obj.myClient = new Async.HttpClient({ url: "http://192.168.56.10:3080/foo"+i, success: iterate, verbose:false } );
             };
             Logger.warning("iterate done");
         }
@@ -185,8 +185,7 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
     }
 
     obj.run = function () {
-        // msleep(5*1000);
-        /*        
+         
         obj.myServer = new Async.HttpServer();
         var myServer = {
             foo: function(theMethod, theBody) {
@@ -195,15 +194,14 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
         };
         obj.myServer.start("0.0.0.0", "3003");
         obj.myServer.registerCallback("/foo", myServer, myServer.foo);
-        */
-        //testFireAndForget();
+        
+        testFireAndForget();
 
-        //testError();
+        testError();
         testSmallRequests();
         // testBigRequest();
 
-        //Logger.warning("starting new ASIO Client");
-        //Logger.warning(" done new ASIO Client");
+        obj.myServer.close();
     };
 
 };

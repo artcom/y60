@@ -80,6 +80,7 @@ namespace http {
 
     Server::~Server()
     {
+        AC_TRACE << "DTOR ~Server";
         close();
         _myCallbacks.clear();
     }
@@ -104,6 +105,7 @@ namespace http {
     }
 
     void Server::close() {
+        acceptor_.close();
         asl::Ptr<NetAsync> parentPlugin = dynamic_cast_Ptr<NetAsync>(Singleton<PlugInManager>::get().getPlugIn(NetAsync::PluginName));
         parentPlugin->unregisterHandler(this);
     }

@@ -76,7 +76,9 @@ CurlMultiAdapter::shutdown() {
     CurlSocketInfo::abort();
     CURLMcode myStatus = curl_multi_cleanup(_curlMulti); 
     checkCurlStatus(myStatus, PLUS_FILE_LINE);
-    timeout_timer->cancel();
+    if (timeout_timer) {
+        timeout_timer->cancel();
+    }
     AC_TRACE << "CurlMultiAdapter::shutdown done";
 };
 
