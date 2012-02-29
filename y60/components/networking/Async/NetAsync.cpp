@@ -77,13 +77,22 @@ static JSClass Package = {
     	
 NetAsync::NetAsync(asl::DLHandle theDLHandle) : 
                 asl::PlugInBase(theDLHandle),
-                IRendererExtension(ClassName()) 
+                IRendererExtension(ClassName()),
+                CurlMultiAdapter(io),
+                keep_busy(new boost::asio::io_service::work(io))
 {
     _myAsioThread = AsioThreadPtr(new boost::thread( boost::bind( &NetAsync::run, this, 10) ) );
 };
 
 NetAsync::~NetAsync() {
-    stop();
+    AC_TRACE << "~NetAsync - canceling all sockets";
+    CurlMultiAdapter::shutdown();
+    AC_TRACE << "~NetAsync - removing keep_busy";
+    keep_busy.reset();
+    AC_TRACE << "~NetAsync - waiting for ASIO thread";
+    // io.stop();
+    _myAsioThread->join();
+    AC_TRACE << "~NetAsync done";
 };
 
 boost::asio::io_service & 
@@ -131,12 +140,6 @@ NetAsync::onFrame(jslib::AbstractRenderWindow * theWindow , double t) {
     processCompleted();    
 };
 
-
-void 
-NetAsync::stop() {
-    io.stop();
-};
-
 static JSBool
 OnFrame(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Triggers any waiting JS callbacks. Will be called automatically if a render window is rendering."); DOC_END;
@@ -168,8 +171,6 @@ NetAsync::Functions() {
 };
 
 // static initializer
-boost::asio::io_service y60::NetAsync::io;
-boost::asio::io_service::work y60::NetAsync::keep_busy(io);
 const char * y60::NetAsync::PluginName = "NetAsync";
 
 extern "C"

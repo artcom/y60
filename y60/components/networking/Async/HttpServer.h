@@ -89,7 +89,7 @@ namespace http {
 
         public:
             /// creates a new HttpServer
-            Server(JSContext * cx);
+            Server(JSContext * cx, boost::asio::io_service & theIOService);
             bool start( std::string theServerAddress,  std::string theServerPort );
             virtual ~Server();
 

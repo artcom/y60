@@ -60,7 +60,7 @@ namespace y60 {
 
         NetAsync(asl::DLHandle theDLHandle);
         virtual ~NetAsync();
-        static boost::asio::io_service & io_service();
+        boost::asio::io_service & io_service();
         virtual void initClasses(JSContext * theContext, JSObject *theGlobalObject);
         virtual JSFunctionSpec * Functions();
 
@@ -87,11 +87,10 @@ namespace y60 {
     private:
         std::map<const void*, onFrameHandler> _onFrameHandlers;  
         void run(std::size_t thread_pool_size);
-        void stop();
         /// The io_service used to perform asynchronous operations.
-        static boost::asio::io_service io;
+        boost::asio::io_service io;
         // fictional work item to prevent our io_service from being out of work and terminating
-        static boost::asio::io_service::work keep_busy;
+        boost::shared_ptr<boost::asio::io_service::work> keep_busy;
 
 
     private:

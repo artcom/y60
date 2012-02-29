@@ -48,26 +48,25 @@ class Client; // forward declaration
 
 class CurlMultiAdapter {
     public:
-        CurlMultiAdapter();
+        CurlMultiAdapter(boost::asio::io_service & theIOService);
         virtual ~CurlMultiAdapter();
         void addClient(boost::shared_ptr<async::http::Client> theClient);
         void removeClient(boost::shared_ptr<async::http::Client> theClient);
         void processCompleted();
         void processCallbacks();
         curl_socket_t openSocket() {
-            async::http::CurlSocketInfo::Ptr s(new async::http::CurlSocketInfo(_curlMulti));
+            async::http::CurlSocketInfo::Ptr s(new async::http::CurlSocketInfo(io, _curlMulti));
             CurlSocketInfo::add(s);
             return s->native();
-        };
-        void closeSocket(async::http::CurlSocketInfo::Ptr s) {
-            s->boost_socket.close();
         };
 
         static void checkCurlStatus(CURLMcode theStatusCode, const std::string & theWhere); 
 
     protected:
         void setSocketInfo(curl_socket_t s, void * data);
+        void shutdown();
     private:
+        CurlMultiAdapter();
         // curl stuff
         CURLM * _curlMulti;
         boost::shared_ptr<boost::asio::deadline_timer> timeout_timer;
@@ -76,6 +75,9 @@ class CurlMultiAdapter {
         static int curl_socket_callback(CURL *easy, curl_socket_t s, int action, void *userp, void *socketp); 
         static int curl_timer_callback(CURLM *multi,  long timeout_ms, CurlMultiAdapter * self); 
         void onTimeout(const boost::system::error_code& error);
+
+        // Boost IO stuff
+        boost::asio::io_service & io; // owned by NetAsync
 
 };
 

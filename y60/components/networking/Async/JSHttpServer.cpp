@@ -57,6 +57,7 @@
 */
 
 #include "JSHttpServer.h"
+#include "NetAsync.h"
 
 #include <y60/jsbase/JSWrapper.impl>
 #include <y60/jsbase/JSNode.h>
@@ -259,8 +260,10 @@ JSHttpServer::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
         return JS_FALSE;
     }
 
+    asl::Ptr<NetAsync> parentPlugin = dynamic_cast_Ptr<NetAsync>(Singleton<PlugInManager>::get().getPlugIn(NetAsync::PluginName));
+
     JSHttpServer * myNewObject = 0;
-    OWNERPTR myHttpServer = OWNERPTR(new async::http::Server(cx));
+    OWNERPTR myHttpServer = OWNERPTR(new async::http::Server(cx, parentPlugin->io_service()));
     myNewObject = new JSHttpServer(myHttpServer, myHttpServer.get());
 
     JS_SetPrivate(cx, obj, myNewObject);

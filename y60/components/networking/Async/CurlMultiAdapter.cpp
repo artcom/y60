@@ -46,7 +46,8 @@ namespace http {
         
 
 
-CurlMultiAdapter::CurlMultiAdapter() 
+CurlMultiAdapter::CurlMultiAdapter(boost::asio::io_service & theIOService) :
+    io(theIOService)
 {
     _curlMulti = curl_multi_init(); 
     CURLMcode myStatus = curl_multi_setopt(_curlMulti, CURLMOPT_SOCKETFUNCTION, &CurlMultiAdapter::curl_socket_callback);
@@ -61,11 +62,22 @@ CurlMultiAdapter::CurlMultiAdapter()
 
 };
 CurlMultiAdapter::~CurlMultiAdapter() {
+    AC_TRACE << "~CurlMultiAdapter done";
+};
+
+void
+CurlMultiAdapter::shutdown() {
+    AC_TRACE << "CurlMultiAdapter::shutdown";
+    
     while (!_allClients.empty()) {
         (*_allClients.begin())->onDone(this, CURLE_ABORTED_BY_CALLBACK );
     }
+    
+    CurlSocketInfo::abort();
     CURLMcode myStatus = curl_multi_cleanup(_curlMulti); 
     checkCurlStatus(myStatus, PLUS_FILE_LINE);
+    timeout_timer->cancel();
+    AC_TRACE << "CurlMultiAdapter::shutdown done";
 };
 
 void
@@ -81,9 +93,9 @@ CurlMultiAdapter::addClient(boost::shared_ptr<async::http::Client> theClient) {
     CURLMcode myStatus = curl_multi_add_handle(_curlMulti,  theClient->_curlHandle);
     checkCurlStatus(myStatus, PLUS_FILE_LINE);
     _allClients.insert(theClient);
-    int i;
-    myStatus = curl_multi_socket_action(_curlMulti, 0, 0, &i);
-    checkCurlStatus(myStatus, PLUS_FILE_LINE);
+    //int i;
+    //myStatus = curl_multi_socket_action(_curlMulti, 0, 0, &i);
+    //checkCurlStatus(myStatus, PLUS_FILE_LINE);
 };
 void 
 CurlMultiAdapter::removeClient(boost::shared_ptr<async::http::Client> theClient ){ 
@@ -116,7 +128,7 @@ int
 CurlMultiAdapter::curl_timer_callback(CURLM *multi,  long timeout_ms, CurlMultiAdapter * self) {
     AC_TRACE << "multi_timer_cb: Setting timeout to " << timeout_ms << " ms";
     if ( ! self->timeout_timer) {
-        self->timeout_timer = boost::shared_ptr<boost::asio::deadline_timer>(new boost::asio::deadline_timer(NetAsync::io_service())); 
+        self->timeout_timer = boost::shared_ptr<boost::asio::deadline_timer>(new boost::asio::deadline_timer(self->io)); 
     }
     self->timeout_timer->expires_from_now(boost::posix_time::milliseconds(timeout_ms));
     // self->onTimeout(boost::asio::error::operation_aborted);
@@ -126,6 +138,10 @@ CurlMultiAdapter::curl_timer_callback(CURLM *multi,  long timeout_ms, CurlMultiA
 
 void
 CurlMultiAdapter::onTimeout(const boost::system::error_code& error) {
+    AC_TRACE << "onTimeout " << error;
+    if (error != 0) {
+        return;
+    }
     int i;
     CURLMcode myStatus = curl_multi_socket_action(_curlMulti, CURL_SOCKET_TIMEOUT, 0, &i);
     checkCurlStatus(myStatus, PLUS_FILE_LINE);

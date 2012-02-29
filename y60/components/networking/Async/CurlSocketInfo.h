@@ -46,7 +46,7 @@ namespace http {
 class CurlSocketInfo : public boost::noncopyable, public boost::enable_shared_from_this<CurlSocketInfo> {
     public:
         typedef boost::shared_ptr<CurlSocketInfo> Ptr;
-        CurlSocketInfo(CURLM * theCurlMultihandle);
+        CurlSocketInfo(boost::asio::io_service & theIOService, CURLM * theCurlMultihandle);
         ~CurlSocketInfo();
         curl_socket_t native() { return boost_socket.native(); };
         boost::asio::ip::tcp::socket boost_socket;
@@ -57,12 +57,23 @@ class CurlSocketInfo : public boost::noncopyable, public boost::enable_shared_fr
         void handleWrite(const boost::system::error_code& error);
         static void handleOperations(Ptr s, curl_socket_t theCurlSocket);
         static void add(Ptr s) {
+            AC_TRACE << "Adding socket_" << s->native();
             _allSockets.insert(std::make_pair(s->native(), s));
         };
         static void release(curl_socket_t t) {
+            AC_TRACE << "releasing socket_" << t;
             int n = _allSockets.erase(t);
-            AC_TRACE << "erased " << n << " socket " << t << " from _allSockets.";
+            AC_DEBUG << "erased " << n << " socket " << t << " from _allSockets. " << _allSockets.size() << " left.";
         };
+
+        static void abort() {
+            std::map<curl_socket_t, Ptr>::iterator it = _allSockets.begin();
+            for (;it != _allSockets.end(); ++it) {
+                AC_TRACE << "aborting socket " << it->second->boost_socket.native() << " for " << it->second;
+                it->second->boost_socket.close();
+            }
+            // _allSockets.clear();
+        }
         static Ptr find(curl_socket_t s) {
             std::map<curl_socket_t, Ptr>::iterator it = _allSockets.find(s);
             if (it != _allSockets.end()) {

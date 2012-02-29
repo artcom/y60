@@ -168,8 +168,8 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
             if (i>0) {
                 //obj.myClient = new Async.HttpClient({ url: "http://storage.service.t-gallery.act/areas/move/hotel/work/zoe.zip", success: iterate, verbose:true } );
                 obj.myClient = new Async.HttpClient({ url: "http://127.0.0.1:3003/foo", success: iterate, verbose:false } );
-                obj.myClient = new Async.HttpClient({ url: "http://192.168.56.10:3080/bar"+i, success: iterate, verbose:false } );
-                obj.myClient = new Async.HttpClient({ url: "http://192.168.56.10:3080/foo"+i, success: iterate, verbose:false } );
+                //obj.myClient = new Async.HttpClient({ url: "http://192.168.56.10:3080/bar"+i, success: iterate, verbose:true } );
+                //obj.myClient = new Async.HttpClient({ url: "http://192.168.56.10:3080/foo"+i, success: iterate, verbose:false } );
             };
             Logger.warning("iterate done");
         }
@@ -185,7 +185,8 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
     }
 
     obj.run = function () {
-        /*
+        // msleep(5*1000);
+        /*        
         obj.myServer = new Async.HttpServer();
         var myServer = {
             foo: function(theMethod, theBody) {
@@ -195,9 +196,9 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
         obj.myServer.start("0.0.0.0", "3003");
         obj.myServer.registerCallback("/foo", myServer, myServer.foo);
         */
-        testFireAndForget();
+        //testFireAndForget();
 
-        testError();
+        //testError();
         testSmallRequests();
         // testBigRequest();
 
