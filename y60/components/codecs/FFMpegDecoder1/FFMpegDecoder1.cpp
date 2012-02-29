@@ -107,7 +107,8 @@ namespace y60 {
         _myLastVideoTimestamp(0),
         _myDestinationPixelFormat(PIX_FMT_BGR24),
         _myBytesPerPixel(0),
-        _hasShutDown(false)
+        _hasShutDown(false),
+        _myFirstFrameDecodedFlag(false)
     {
         DB(AC_DEBUG << "instantiated an FFMpegDecoder1...");
     }
@@ -317,6 +318,9 @@ namespace y60 {
         for (unsigned i = 0; i < myRasterCount; ++i) {
             myMovie->getRasterPtr(i)->clear();
         }
+
+        _myFirstFrameDecodedFlag = false; // we use the dts of the first decoded frame
+
         // framerate
         double myFPS;
         myFPS = av_q2d(_myVStream->r_frame_rate);
@@ -444,7 +448,6 @@ namespace y60 {
             int myError;
             if ((myError = av_read_frame(_myFormatContext, &myPacket)) < 0) {
                 av_free_packet(&myPacket);
-#if 1
                 /*
                  * Some codecs, such as MPEG, transmit the I and P frame with a
                  * latency of one frame. You must do the following to have a
@@ -471,11 +474,10 @@ namespace y60 {
                     } else {
                         continue;
                     }
+                } else {
+                    AC_DEBUG << "eof reached : error: " << myError << " " << (myError==-11);
+                    return false;
                 }
-#endif
-                AC_DEBUG << "eof reached : error: " << myError << " " << (myError==-11);
-
-                return false;
             }
 
             //       if (myPacket.stream_index == _myVStreamIndex) {
@@ -529,7 +531,11 @@ namespace y60 {
                     continue;
                 }
                 _myLastVideoTimestamp = double(myPacket.dts);
-
+                if (!_myFirstFrameDecodedFlag) {
+                    _myFirstFrameDecodedFlag = true;
+                    _myStartTimestamp = myPacket.dts;
+                }
+                
                 // suitable framestamp?
                 if (_myLastVideoTimestamp >= theTimestamp) {
                     DB(AC_TRACE << "found " << _myLastVideoTimestamp << " for " << theTimestamp);
