@@ -474,6 +474,18 @@ GetExtensionPart(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
     } HANDLE_CPP_EXCEPTION;
 }
 
+static JSBool
+GetCurrentWorkingDirectory(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Return the current working directory as absolute path.");
+    DOC_RVAL("The current working directory", DOC_TYPE_STRING);
+    DOC_END;
+    try {
+        ensureParamCount(argc, 0);
+        *rval = as_jsval(cx, asl::getCWD());
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
 JS_STATIC_DLL_CALLBACK(JSBool)
 FileExists(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Tests whether a given file exists.");
@@ -674,6 +686,7 @@ JSFileFunctions::Functions() {
         {"getFilenamePart",        GetFilenamePart,  1},
         {"getDirectoryPart",       GetDirectoryPart, 1},
         {"getExtensionPart",       GetExtensionPart, 1},
+        {"getCurrentWorkingDirectory",  GetCurrentWorkingDirectory,  0},
         {"deleteFile",             DeleteFile,  1},
         {"copyFile",               CopyFile,    2},
         {"moveFile",               MoveFile,    2},

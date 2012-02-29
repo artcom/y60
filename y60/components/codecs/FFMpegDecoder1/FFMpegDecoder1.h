@@ -202,6 +202,7 @@ namespace y60 {
 
         unsigned          _myBytesPerPixel;
         bool _hasShutDown;
+        bool _myFirstFrameDecodedFlag;
     };
 
     typedef asl::Ptr<FFMpegDecoder1> FFMpegDecoder1Ptr;
