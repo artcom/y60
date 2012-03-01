@@ -11,6 +11,7 @@
 
             <xs:attribute name="id" type="xs:int"/>
             <xs:attribute name="position" type="Vector2f"/>
+            <xs:attribute name="calibrated_relative_position" type="Vector2f"/>
             <xs:attribute name="contactarea" type="Vector2f"/>
             <xs:attribute name="type" type="xs:string"/>
             <xs:attribute name="inrange" type="xs:boolean"/>

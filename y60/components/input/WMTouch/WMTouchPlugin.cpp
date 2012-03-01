@@ -16,6 +16,7 @@
 #include <y60/input/GenericEventSourceFilter.h>
 #include <y60/jsbase/JSWrapper.h>
 #include <y60/jsbase/JSNode.h>
+#include <y60/jsbase/JSVector.h>
 
 #include <SDL/SDL_syswm.h>
 #include <SDL/SDL.h>
@@ -61,7 +62,8 @@ WMTouchPlugin::WMTouchPlugin(DLHandle myDLHandle)
     CloseTouchInputHandle = (CloseTouchInputHandle_M) GetProcAddress(hMod, "CloseTouchInputHandle");
     registerStandardTypes(*_myEventValueFactory);
     registerSomTypes(*_myEventValueFactory);
-
+    _calibrationPointBottomLeft = asl::Vector2f(0.0,0.0);
+    _calibrationPointTopRight = asl::Vector2f(0.0,0.0);
 }
 
 WMTouchPlugin::~WMTouchPlugin() { 
@@ -94,7 +96,16 @@ WMTouchPlugin::setup(HWND theWindow) {
         // register message hook
         SetWindowsHookEx(WH_GETMESSAGE, GetMsgProc,(HINSTANCE) NULL, GetCurrentThreadId());    
     }
-};
+}
+
+void
+WMTouchPlugin::setCalibrationPoint (const unsigned int theCalibrationPointCode, const asl::Vector2f theWMTouchPosition) {
+    if (theCalibrationPointCode == 0) {
+        _calibrationPointBottomLeft = theWMTouchPosition;
+    } else if (theCalibrationPointCode == 1) {
+        _calibrationPointTopRight = theWMTouchPosition;
+    }
+}
 
 LRESULT WINAPI 
 WMTouchPlugin::GetMsgProc(int nCode, WPARAM wParam, LPARAM lParam) {
@@ -132,8 +143,20 @@ WMTouchPlugin::onTouch(HWND hWnd, WPARAM wParam, LPARAM lParam) {
             GenericEventPtr myEvent(new GenericEvent("onWMTouch", _myEventSchemaDocument, _myEventValueFactory));
             NodePtr myNode = myEvent->getNode();
 
+            asl::Vector2f myPosition = product(Vector2f(static_cast<float>(ti.x), static_cast<float>(ti.y)), 0.01f);
+            asl::Vector2f myCalibratedRelativePosition = asl::Vector2f(0.0, 0.0);
+            float myWidth = _calibrationPointTopRight[0] - _calibrationPointBottomLeft[0];
+            float myHeight = _calibrationPointTopRight[1] - _calibrationPointBottomLeft[1];
+            if (myWidth != 0) {
+                myCalibratedRelativePosition[0] = (myPosition[0] - _calibrationPointBottomLeft[0]) / myWidth;
+            }
+            if (myHeight != 0) {
+                myCalibratedRelativePosition[1] = (myPosition[1] - _calibrationPointBottomLeft[1]) / myHeight;
+            }
+
             myNode->appendAttribute<int>("id", ti.dwID);
-            myNode->appendAttribute<Vector2f>("position", product(Vector2f(static_cast<float>(ti.x), static_cast<float>(ti.y)), 0.01f));
+            myNode->appendAttribute<Vector2f>("position", myPosition);
+            myNode->appendAttribute<Vector2f>("calibrated_relative_position", myCalibratedRelativePosition);
             if (ti.dwMask & TOUCHINPUTMASKF_CONTACTAREA) {
                 myNode->appendAttribute<Vector2f>("contactarea", product(Vector2f(static_cast<float>(ti.cxContact), static_cast<float>(ti.cyContact)), 0.01f));
             }
@@ -200,6 +223,32 @@ GetInstance() {
     }
 }
 
+static JSBool
+SetCalibrationPoint(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    try {
+        WMTouchPlugin* myPlugin = GetInstance();
+
+        int myCalibrationPoint; //0: bottom_left, 1: top_right
+		asl::Vector2f myWMTouchPosition;
+
+        if(argc != 2) {
+			JS_ReportError(cx, "WMTouchPlugin::SetCalibrationPoint - wrong number of arguments");
+			return JS_FALSE;
+		}
+        if(!jslib::convertFrom(cx, argv[0], myCalibrationPoint)) {
+            JS_ReportError(cx, "WMTouchPlugin::SetCalibrationPoint - expected int for calibrationPoint-code as first argument");
+            return JS_FALSE;
+        }
+        if(!jslib::convertFrom(cx, argv[1], myWMTouchPosition)) {
+            JS_ReportError(cx, "WMTouchPlugin::SetCalibrationPoint - expected Vector2f for WmTouchPosition as second argument");
+        }
+
+        myPlugin->setCalibrationPoint(myCalibrationPoint, myWMTouchPosition);
+    } HANDLE_CPP_EXCEPTION;
+
+    return JS_TRUE;
+}
+
 enum WMTouchPropertyNumbers {
     PROP_eventSchema = -100
 };
@@ -207,7 +256,7 @@ enum WMTouchPropertyNumbers {
 JSFunctionSpec *
 WMTouchPlugin::StaticFunctions() {
     static JSFunctionSpec myFunctions[] = {
-        // {"listenToUDP", ListenToUDP, 0},
+        {"setCalibrationPoint", SetCalibrationPoint, 2},
         {0}
     };
     return myFunctions;

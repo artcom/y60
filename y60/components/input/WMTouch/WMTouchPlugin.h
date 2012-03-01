@@ -16,6 +16,8 @@ class WMTouchPlugin : public asl::PlugInBase,
 
 private:
     EventPtrList _queuedEvents;
+    asl::Vector2f _calibrationPointBottomLeft;
+    asl::Vector2f _calibrationPointTopRight;
     bool _isRegistered;
     static HHOOK _msgHook;
     dom::DocumentPtr            _myEventSchemaDocument;
@@ -58,6 +60,8 @@ public:
     void init() { }
     dom::NodePtr WMTouchPlugin::getEventSchema();
     EventPtrList poll();
+
+	void setCalibrationPoint (const unsigned int theCalibrationPointCode, const asl::Vector2f theWMTouchPosition);
 
 private:
 
