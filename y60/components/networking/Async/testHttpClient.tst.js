@@ -62,10 +62,7 @@
 
 use("UnitTest.js");
 
-plug("Network");
-print("=========================");
 plug("NetAsync");
-print("=========================");
 
 var TIMEOUT = 1000;
 
@@ -90,8 +87,7 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
             error: function () {
                 FAILURE("FireAndForget");
                 done = true;
-            },
-            verbose: true
+            }
         });
         myClient = null;
         gc();
@@ -116,8 +112,7 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
             error: function() {
                 SUCCESS("testError");
                 done = true;
-            },
-            verbose: true
+            }
         });
 
 
@@ -141,6 +136,7 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
             progress: function(theBlock) {
                 received += theBlock.size;
                 theBlock.resize(0);
+                return true;
             },
             error: function() {
                 FAILURE("testBigRequest");
@@ -155,21 +151,81 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
                 } else {
                     FAILURE("testBigRequest");
                 }
-            },
-            verbose: true
+            }
         });
 
 
         while (true) {
             Async.onFrame();
             gc();
-            msleep(50);
+            msleep(1);
             if (done) {
                 break;
             }
         }
     }
 
+    function testRequestProgressError() {
+        var done = false;
+
+        var received = 0;
+        Logger.info("creating client");
+        obj.myClient = new Async.HttpClient({
+            url: "http://127.0.0.1:3003/big",
+            progress: function(theBlock) {
+                return false;
+            },
+            error: function(a, b) {
+                print (a,b);
+                SUCCESS("testRequestProgressError");
+                done = true;
+            },
+            success: function() {
+                FAILURE("testRequestProgressError");
+                done = true;
+            }
+        });
+
+
+        while (true) {
+            Async.onFrame();
+            gc();
+            msleep(1);
+            if (done) {
+                break;
+            }
+        }
+    }
+    
+    function testRequestAbort() {
+        var done = false;
+
+        var received = 0;
+        Logger.info("creating client");
+        obj.myClient = new Async.HttpClient({
+            url: "http://127.0.0.1:3003/big",
+            error: function(a, b) {
+                print (a,b);
+                SUCCESS("testRequestAbort");
+                done = true;
+            },
+            success: function() {
+                FAILURE("testRequestAbort");
+                done = true;
+            }
+        });
+
+
+        while (true) {
+            Async.onFrame();
+            gc();
+            msleep(1);
+            obj.myClient.abort();
+            if (done) {
+                break;
+            }
+        }
+    }
     function testSmallRequests() {
         // test many small requests
         var i = 10;
@@ -186,8 +242,7 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
                     error: function() {
                         FAILURE("testSmallRequests");
                         i = 0;
-                    },
-                    verbose:false
+                    }
                 });
             }
         };
@@ -223,6 +278,8 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
         testError();
         testSmallRequests();
         testBigRequest();
+        testRequestProgressError();
+        testRequestAbort();
 
         obj.myServer.close();
     };

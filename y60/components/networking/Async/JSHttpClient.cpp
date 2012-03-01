@@ -84,6 +84,15 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     return JS_TRUE;
 }
 
+static JSBool
+abort(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Aborts a request which is in progress."); DOC_END;
+    JSHttpClient::OWNERPTR nativePtr = JSClassTraits<JSHttpClient::NATIVE>::getNativeOwner(cx,obj);
+    nativePtr->abort();
+    return JS_TRUE;
+}
+
+
 JSHttpClient::~JSHttpClient() {
 }
 
@@ -93,6 +102,7 @@ JSHttpClient::Functions() {
     static JSFunctionSpec myFunctions[] = {
         // name                  native                   nargs
         {"toString",             toString,                0},
+        {"abort",                abort,                   0},
         {0}
     };
     return myFunctions;

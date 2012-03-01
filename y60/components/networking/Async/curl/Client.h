@@ -80,7 +80,8 @@ namespace curl {
             std::vector<char>   _myErrorBuffer;
             asl::Ptr<asl::Block> _privateResponseBuffer; // filled in io_service thread, emptied in JS thread
             asl::ReadWriteLock _lockResponseBuffer; // lock for _privateResponseBuffer;
-            asl::Ptr<asl::Block> _myResponseBlock; // used only in JS thread. 
+            asl::Ptr<asl::Block> _myResponseBlock; // used only in JS thread.
+            bool _continueFlag;
         public:
             /// creates a new HttpClient
             Client(JSContext * cx, JSObject * theOpts);
@@ -92,6 +93,7 @@ namespace curl {
             void onProgress();
             std::string getResponseString() const;
             asl::Ptr<asl::Block> getResponseBlock() const;
+            void abort() { _continueFlag = false; };
             std::string debugIdentifier;
             
             template<typename T>

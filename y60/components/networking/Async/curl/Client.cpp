@@ -80,7 +80,8 @@ namespace curl {
         _jsOptsObject(theOpts),
         _myErrorBuffer(CURL_ERROR_SIZE, '\0'),
         _privateResponseBuffer(new Block()),
-        _myResponseBlock(new Block())
+        _myResponseBlock(new Block()),
+        _continueFlag(true)
     {
         _curlHandle = curl_easy_init();
         AC_DEBUG << "curl init " << curl_version();
@@ -175,7 +176,13 @@ namespace curl {
         if (newDataReceived && hasCallback("progress")) {
             jsval argv[1], rval;
             argv[0] = as_jsval(_jsContext, _myResponseBlock);
-            JSA_CallFunctionName(_jsContext, _jsOptsObject, "progress", 1, argv, &rval);
+            JSBool ok = JSA_CallFunctionName(_jsContext, _jsOptsObject, "progress", 1, argv, &rval);
+            if (ok) {
+                if (!convertFrom(_jsContext, rval, _continueFlag)) {
+                    std::cerr << "#ERROR: HttpClient: progress callback returned a bad result (not a bool)" << std::endl;
+                    _continueFlag = true;
+                }
+            }
         }
     };
 
@@ -246,7 +253,7 @@ JSA_CallFunctionName(JSContext * cx, JSObject * theThisObject, JSObject * theObj
         // NOTE: this will be called from one of io_service's threads
         ScopeLocker L(_lockResponseBuffer, true);
         _privateResponseBuffer->append(ptr, size);
-        return size;
+        return _continueFlag ? size : 0;
     };
 
     curl_socket_t 
