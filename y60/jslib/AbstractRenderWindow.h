@@ -147,6 +147,32 @@ namespace jslib {
         void clearTimeout(long myTimeoutId);
         long setInterval(const std::string & myCommand, float myMilliseconds, JSObject * theObjectToCall);
         void clearInterval(long myIntervalId);
+ 
+        double getFrameTime() const {
+            return _myCurrentFrameTime; 
+        }
+            
+        void setFrameTime(double theTime, bool theResetFlag = false) {
+            
+            // theResetFlag - force resetting of _myLastFrameTime and _myCurrentFrameTime to avoid
+            //      big leaps in deltaT
+            
+            if (theResetFlag) {
+                _myLastFrameTime = theTime;
+            } else {
+                _myLastFrameTime = _myCurrentFrameTime;
+            }
+
+            _myCurrentFrameTime = theTime;
+        }
+        
+        void setUseExternalTimeSource(bool theExternalTimeSourceFlag) {
+            _myUseExternalTimeSourceFlag = theExternalTimeSourceFlag;
+        }
+        
+        bool getUseExternalTimeSource() const {
+            return _myUseExternalTimeSourceFlag; 
+        }
 
         bool hasCap(unsigned int theCap);
         bool hasCapAsString(const std::string & theCapStr);
@@ -167,15 +193,6 @@ namespace jslib {
 
         void printStatistics();
         double getFrameRate() const;
-
-        // Scene methods
-        y60::ImagePtr getImage(const std::string & theFileName);
-
-        // TODO: adapt for other 1 and 3 byte pixel formats
-        asl::Vector4i getImagePixel(dom::NodePtr theImageNode,
-            unsigned long theX, unsigned long theY);
-        bool setImagePixel(dom::NodePtr theImageNode, unsigned long theX,
-            unsigned long theY, const asl::Vector4i & theColor);
 
         // Text Manager Methods
         void renderText(const asl::Vector2f & thePixelPosition, const std::string & theString,
@@ -337,7 +354,13 @@ namespace jslib {
         void setGLContext(y60::GLContextPtr theContext) {
             _myGLContext = theContext;
         }
-   protected:
+
+    private:
+        AbstractRenderWindow();
+        void ensureScene();
+        double updateFrameTime(); 
+
+    protected:
         y60::ScenePtr    _myScene;
         dom::NodePtr     _myCanvas;
         y60::RendererPtr _myRenderer;
@@ -354,22 +377,21 @@ namespace jslib {
         unsigned int         _myRenderingCaps;
         unsigned int         _myMultisamples;
 
-        double               _myElapsedTime;
+        double               _myLastFrameTime;
+        double               _myCurrentFrameTime;
         bool                 _myVisiblityFlag;
 
         asl::WeakPtr<AbstractRenderWindow> _mySelf;
 
 
     private:
-        AbstractRenderWindow();
-        void ensureScene();
-
         y60::GLContextPtr _myGLContext;
         TimeoutQueue      _myTimeoutQueue;
         double            _myFixedDeltaT;
         double            _myStartTime;
         double            _myPauseTime;
         bool              _myPauseFlag;
+        bool              _myUseExternalTimeSourceFlag;
         bool              _myForceFullGC;
     };
 

@@ -145,10 +145,6 @@ class JSAbstractRenderWindow :  public JSWrapper<DERIVED, asl::Ptr<DERIVED>, Sta
         static JSBool
         printStatistics(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool
-        getImagePixel(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
-        static JSBool
-        setImagePixel(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
-        static JSBool
         getPixel(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool
         performRequest(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);

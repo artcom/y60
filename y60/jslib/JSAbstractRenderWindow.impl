@@ -274,31 +274,7 @@ JSAbstractRenderWindow<DERIVED>::printStatistics(JSContext *cx, JSObject *obj, u
     typedef void (DERIVED::*MyMethod)(void);
     return Method<DERIVED>::call((MyMethod)&DERIVED::printStatistics,cx,obj,argc,argv,rval);
 }
-template<class DERIVED>
-JSBool
-JSAbstractRenderWindow<DERIVED>::getImagePixel(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Returns the color of a pixel at position x, y of an image");
-    DOC_PARAM("theImageNode", "", DOC_TYPE_NODE);
-    DOC_PARAM("theXPosition", "", DOC_TYPE_INTEGER);
-    DOC_PARAM("theYPosition", "", DOC_TYPE_INTEGER);
-    DOC_RVAL("theColor", DOC_TYPE_VECTOR4F);
-    DOC_END;
-    typedef asl::Vector4i (DERIVED::*MyMethod)(dom::NodePtr, unsigned long, unsigned long);
-    return Method<DERIVED>::call((MyMethod)&DERIVED::getImagePixel,cx,obj,argc,argv,rval);
-}
-template<class DERIVED>
-JSBool
-JSAbstractRenderWindow<DERIVED>::setImagePixel(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Sets the color of a pixel at position x, y in an image");
-    DOC_PARAM("theImageNode", "", DOC_TYPE_NODE);
-    DOC_PARAM("theXPosition", "", DOC_TYPE_INTEGER);
-    DOC_PARAM("theYPosition", "", DOC_TYPE_INTEGER);
-    DOC_PARAM("theColor", "", DOC_TYPE_VECTOR4F);
-    DOC_RVAL("theSuccess", DOC_TYPE_BOOLEAN);
-    DOC_END;
-    typedef bool (DERIVED::*MyMethod)(dom::NodePtr, unsigned long, unsigned long, const asl::Vector4i &);
-    return Method<DERIVED>::call((MyMethod)&DERIVED::setImagePixel,cx,obj,argc,argv,rval);
-}
+
 template<class DERIVED>
 JSBool
 JSAbstractRenderWindow<DERIVED>::getPixel(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -980,8 +956,6 @@ JSFunctionSpec * JSAbstractRenderWindow<DERIVED>::BaseFunctions() {
         {"hasCap",             hasCap,                   1},
         {"hasCapAsString",     hasCapAsString,           1},
         {"printStatistics",    printStatistics,          0}, // base class
-        {"getImagePixel",      getImagePixel,            3},
-        {"setImagePixel",      setImagePixel,            4},
         {"getPixel",           getPixel,                 4},
         {"performRequest",     performRequest,           1},
         // text rendering

@@ -100,12 +100,14 @@ _myJSContext(0),
 _myErrorReporter(theErrorReporter),
 _myRenderingCaps(static_cast<unsigned int>(~0)), // enable all (~)
 _myMultisamples(0),
-_myElapsedTime(0.0),
+_myLastFrameTime(0.0),
+_myCurrentFrameTime(0.0),
 _myVisiblityFlag(true),
 _myFixedDeltaT(0.0),
 _myStartTime(-1.0),
 _myPauseTime(0.0),
 _myPauseFlag(false),
+_myUseExternalTimeSourceFlag(false),
 _myForceFullGC(false)
 {}
 
@@ -241,7 +243,12 @@ AbstractRenderWindow::go() {
         _myRenderer->setCurrentScene(getCurrentScene());
 
         setCanvas(_myScene->getCanvasRoot()->childNode("canvas"));
+    
     }
+        
+    asl::NanoTime myTime = asl::NanoTime();
+    _myStartTime = myTime.seconds();
+
     return true;
 }
 
@@ -358,6 +365,10 @@ AbstractRenderWindow::setEventListener(JSObject * theListener) {
 
 void
 AbstractRenderWindow::setPause(bool thePauseFlag) {
+    if (_myUseExternalTimeSourceFlag) {
+        return;
+    }
+    
     asl::NanoTime myTime = asl::NanoTime();
     static double _myPauseStart;
     if (thePauseFlag) {
@@ -385,7 +396,7 @@ AbstractRenderWindow::getForceFullGC() const {
 
 long
 AbstractRenderWindow::setTimeout(const std::string & myCommand, float myMilliseconds, JSObject * theObjectToCall) {
-    return _myTimeoutQueue.addTimeout(myCommand, _myElapsedTime, myMilliseconds, false, theObjectToCall);
+    return _myTimeoutQueue.addTimeout(myCommand, _myCurrentFrameTime, myMilliseconds, false, theObjectToCall);
 }
 void
 AbstractRenderWindow::clearTimeout(long myTimeoutId) {
@@ -393,7 +404,7 @@ AbstractRenderWindow::clearTimeout(long myTimeoutId) {
 }
 long
 AbstractRenderWindow::setInterval(const std::string & myCommand, float myMilliseconds, JSObject * theObjectToCall) {
-    return _myTimeoutQueue.addTimeout(myCommand, _myElapsedTime, myMilliseconds, true, theObjectToCall);
+    return _myTimeoutQueue.addTimeout(myCommand, _myCurrentFrameTime, myMilliseconds, true, theObjectToCall);
 }
 void
 AbstractRenderWindow::clearInterval(long myIntervalId) {
@@ -448,13 +459,40 @@ AbstractRenderWindow::getRenderingCaps() {
     return _myRenderingCaps;
 }
 
+double 
+AbstractRenderWindow::updateFrameTime() {
+    
+    double myDeltaT = 0.0;
+
+    if (_myUseExternalTimeSourceFlag) {
+        // use external frametime --------------------------
+        myDeltaT =  _myCurrentFrameTime - _myLastFrameTime;
+    
+    } else if (_myFixedDeltaT != 0.0) {
+        // use fixedFrameTime ---------------------------------
+        myDeltaT = _myFixedDeltaT;
+        _myLastFrameTime = _myCurrentFrameTime;
+        _myCurrentFrameTime += _myFixedDeltaT; 
+    
+    } else {    
+        // use system time ---------------------------------
+        asl::NanoTime myTime = asl::NanoTime();
+        
+        _myLastFrameTime = _myCurrentFrameTime;
+        _myCurrentFrameTime = myTime.seconds() - _myStartTime - _myPauseTime;
+        
+        myDeltaT = _myCurrentFrameTime - _myLastFrameTime;
+    }
+
+    if (myDeltaT < 0.0) {
+        myDeltaT = 0.0;
+    }
+
+    return myDeltaT;
+}
+
 void
 AbstractRenderWindow::onFrame() {
-    asl::NanoTime myTime = asl::NanoTime();
-    if (_myStartTime < 0.0) {
-        _myStartTime = myTime.seconds();
-        //AC_DEBUG << "startTime=" << _myStartTime;
-    }
 
     MAKE_SCOPE_TIMER(onFrame);
     asl::StdOutputRedirector::get().checkForFileWrapAround();
@@ -464,22 +502,12 @@ AbstractRenderWindow::onFrame() {
     }
 
     // delta-T
-    double myDeltaT;
-    if (_myFixedDeltaT != 0.0) {
-        myDeltaT = _myFixedDeltaT;
-    } else {
-        double myCurrentTime = myTime.seconds() - _myStartTime - _myPauseTime;
-        myDeltaT = myCurrentTime - _myElapsedTime;
-        if (myDeltaT < 0.0) {
-            myDeltaT = 0.0;
-        }
-    }
+    double myDeltaT = updateFrameTime();
 
-    //AC_DEBUG << "pauseT=" << _myPauseTime << " elapsedT=" << _myElapsedTime << " deltaT=" << myDeltaT;
     // Check for timeouts
     {
         MAKE_SCOPE_TIMER(onFrame_updateTimeouts);
-        while (_myTimeoutQueue.isShowTime(_myElapsedTime)) {
+        while (_myTimeoutQueue.isShowTime(_myCurrentFrameTime)) {
             TimeoutPtr myTimeout = _myTimeoutQueue.popTimeout();
 
             const std::string & myTimeoutCommand = myTimeout->getCommand();
@@ -515,7 +543,7 @@ AbstractRenderWindow::onFrame() {
         MAKE_SCOPE_TIMER(onFrame_updateMovieAndCapture);
         std::vector<MoviePtr> myMovies = _myScene->getImagesRoot()->getAllFacades<Movie>(MOVIE_NODE_NAME);        
         for (unsigned i = 0; i < myMovies.size(); ++i) {
-            _myScene->getTextureManager()->loadMovieFrame(myMovies[i], _myElapsedTime);
+            _myScene->getTextureManager()->loadMovieFrame(myMovies[i], _myCurrentFrameTime);
         }
         std::vector<CapturePtr> myCaptures = _myScene->getImagesRoot()->getAllFacades<Capture>(CAPTURE_NODE_NAME);        
         for (unsigned i = 0; i < myCaptures.size(); ++i) {
@@ -527,7 +555,7 @@ AbstractRenderWindow::onFrame() {
     if (_myEventListener && JSA_hasFunction(_myJSContext, _myEventListener, "onFrame")) {
         MAKE_SCOPE_TIMER(onFrame_JSCallback);
         jsval argv[2], rval;
-        argv[0] = as_jsval(_myJSContext, _myElapsedTime);
+        argv[0] = as_jsval(_myJSContext, _myCurrentFrameTime);
         argv[1] = as_jsval(_myJSContext, myDeltaT);
         JSA_CallFunctionName(_myJSContext, _myEventListener, "onFrame", 2, argv, &rval);
     }
@@ -539,7 +567,7 @@ AbstractRenderWindow::onFrame() {
             const std::string myName = curExtension->getName() + "::onFrame";
             try {
                 MAKE_NAMED_SCOPE_TIMER(myTimer, myName);
-                curExtension->onFrame(this, _myElapsedTime);
+                curExtension->onFrame(this, _myCurrentFrameTime);
             } catch (const asl::Exception & ex) {
                 AC_ERROR << "EXCEPTION while calling " << myName << ": " << ex;
             } catch (const std::exception & ex) {
@@ -550,18 +578,10 @@ AbstractRenderWindow::onFrame() {
         }
     }
 
-    // advance time
-    if (_myFixedDeltaT != 0.0) {
-        _myElapsedTime += _myFixedDeltaT;
-    } else {
-        _myElapsedTime = myTime.seconds() - _myStartTime - _myPauseTime;
-        // dk + uz: sometimes myTime.seconds() - _myStartTime *is* negative
-        // on the first frame.
-        if (_myElapsedTime < 0.0) {
-            _myElapsedTime = 0.0;
-        }
-    }
 }
+
+
+
 
 void
 AbstractRenderWindow::clearBuffers(unsigned int theBuffersMask) {
@@ -690,7 +710,7 @@ AbstractRenderWindow::renderFrame() {
 
     if (jslib::JSA_hasFunction(_myJSContext, _myEventListener, "onRender")) {
         jsval argv[1], rval;
-        argv[0] = jslib::as_jsval(_myJSContext, _myElapsedTime);
+        argv[0] = jslib::as_jsval(_myJSContext, _myCurrentFrameTime);
         jslib::JSA_CallFunctionName(_myJSContext, _myEventListener, "onRender", 1, argv, &rval);
     } else {
         clearBuffers(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -703,7 +723,7 @@ AbstractRenderWindow::renderFrame() {
 void
 AbstractRenderWindow::handle(y60::EventPtr theEvent) {
     MAKE_SCOPE_TIMER(handleEvents);
-    theEvent->simulation_time = _myElapsedTime;
+    theEvent->simulation_time = _myCurrentFrameTime;
     for (ExtensionList::iterator i = _myExtensions.begin(); i != _myExtensions.end(); ++i) {
         IRendererExtensionPtr curExtension(i->lock());
         if (curExtension) {           
@@ -968,65 +988,6 @@ AbstractRenderWindow::getFrameRate() const {
 // =======================================================================
 //  Scene methods
 // =======================================================================
-ImagePtr
-AbstractRenderWindow::getImage(const std::string & theFileName) {
-    if (_myScene) {
-        /* XXX
-        ImagePtr myImage = _myScene->getTextureManager()->getImage(theFileName);
-        if (myImage) {
-        return myImage;
-        }
-        */
-    }
-    return ImagePtr();
-}
-
-// TODO: adapt for other 1 and 3 byte pixel formats
-asl::Vector4i
-AbstractRenderWindow::getImagePixel(dom::NodePtr theImageNode, unsigned long theX, unsigned long theY) {
-    try {
-        ImagePtr myImage = theImageNode->getFacade<y60::Image>();
-        if (myImage) {
-            const unsigned char * myData = myImage->getRasterPtr()->pixels().begin();
-            if (myData) {
-                const unsigned char * myPixelPtr = myData +
-                    getBytesRequired(theY * myImage->get<ImageWidthTag>() + theX, myImage->getRasterEncoding());
-                asl::Vector4i myColor(*myPixelPtr, *(myPixelPtr + 1), *(myPixelPtr + 2), *(myPixelPtr + 3));
-                return myColor;
-            }
-        }
-    } catch(const exception & ex) {
-        AC_ERROR << "AbstractRenderWindow::getImagePixel: Exception caught: " << ex.what();
-    } catch(const asl::Exception & ex) {
-        AC_ERROR << "AbstractRenderWindow::getImagePixel: Exception caught: " << ex;
-    }
-    return asl::Vector4i(0,0,0,0);
-}
-
-bool
-AbstractRenderWindow::setImagePixel(dom::NodePtr theImageNode, unsigned long theX, unsigned long theY, const asl::Vector4i & theColor) {
-    try {
-        ImagePtr myImage = theImageNode->getFacade<y60::Image>();
-        if (myImage) {
-            unsigned char * myData = myImage->getRasterPtr()->pixels().begin();
-            if (myData) {
-                unsigned char * myPixelPtr = myData +
-                    getBytesRequired(theY * myImage->get<ImageWidthTag>() + theX, myImage->getRasterEncoding());
-
-                unsigned myUsedBytesPerPixel = getBytesRequired(1, myImage->getRasterEncoding());
-                for (unsigned i = 0; i < myUsedBytesPerPixel; ++i) {
-                    *(myPixelPtr + i) = static_cast<unsigned char>(theColor[i]);
-                }
-                return true;
-            }
-        }
-    } catch(const exception & ex) {
-        AC_ERROR << "AbstractRenderWindow::setImagePixel: Exception caught: " << ex.what();
-    } catch(const asl::Exception & ex) {
-        AC_ERROR << "AbstractRenderWindow::setImagePixel: Exception caught: " << ex;
-    }
-    return false;
-}
 
 void
 AbstractRenderWindow::performRequest(const jslib::JSRequestPtr & theRequest) {

@@ -889,7 +889,7 @@ SDLWindow::mainLoop() {
         // Call onProtoFrame (a second onframe that can be used to automatically run tutorials)
         if ( jslib::JSA_hasFunction(_myJSContext, _myEventListener, "onProtoFrame")) {
             jsval argv[1], rval;
-            argv[0] = jslib::as_jsval(_myJSContext, _myElapsedTime);
+            argv[0] = jslib::as_jsval(_myJSContext, getFrameTime());
             if (!jslib::JSA_CallFunctionName(_myJSContext, _myEventListener, "onProtoFrame", 1, argv, &rval)) {
                 return;
             }
