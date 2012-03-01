@@ -72,7 +72,8 @@ MultiAdapter::shutdown() {
     AC_TRACE << "MultiAdapter::shutdown";
     
     while (!_allClients.empty()) {
-        (*_allClients.begin())->onDone(this, CURLE_ABORTED_BY_CALLBACK );
+        (*_allClients.begin())->onDone(CURLE_ABORTED_BY_CALLBACK );
+        removeClient(*_allClients.begin());
     }
     
     SocketAdapter::abort();
@@ -177,7 +178,8 @@ MultiAdapter::processCompleted() {
             curl_easy_getinfo(myEasyHandle, CURLINFO_PRIVATE, &curClient);
             if (myMessage->msg == CURLMSG_DONE) {
                 AC_DEBUG << "calling onDone for " << curClient;
-                curClient->onDone(this, myMessage->data.result);
+                curClient->onDone(myMessage->data.result);
+                removeClient(curClient->shared_from_this());
             } else {
                 throw asl::Exception("Unknown CURL message encountered");
             }

@@ -101,6 +101,26 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
             }
         }
     }
+    function testBlocking() {
+        var done = false;
+        obj.myClient = new Async.HttpClient({
+            url: "http://127.0.0.1:88/foo",
+            async: false,
+            verbose: true,
+            success: function() {
+                done = true;
+            },
+            error: function() {
+                done = true;
+            }
+        });
+
+        if (done) {
+            SUCCESS("testBlocking");
+        } else {
+            FAILURE("testBlocking");
+        }
+    }
     function testError() {
         var done = false;
         Logger.info("creating client");
@@ -273,6 +293,7 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
         obj.myServer.registerCallback("/foo", myServer, myServer.foo);
         obj.myServer.registerCallback("/big", myServer, myServer.big);
 
+        testBlocking();
         testFireAndForget();
         testError();
         testSmallRequests();

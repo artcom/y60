@@ -190,8 +190,20 @@ JSHttpClient::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
     // now stick the opts object to the JSHttpClient wrapper so it's not GC'ed
     jsval optsValue = OBJECT_TO_JSVAL(optsObject);
     JS_SetProperty(cx, obj, "_opts", &optsValue);
+
+
     // perform request
-    myHttpClient->get();
+    bool performAsync = true; // default
+    jsval asyncValue;
+    JS_GetProperty(cx, optsObject, "async", &asyncValue);
+    if (JSVAL_IS_BOOLEAN(asyncValue) && JSVAL_TO_BOOLEAN(asyncValue) == false) {
+        performAsync = false;
+    }
+    if (performAsync) {
+        myHttpClient->performAsync();
+    } else {
+        myHttpClient->performSync();
+    }
     return JS_TRUE;
 }
 

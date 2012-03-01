@@ -88,8 +88,9 @@ namespace curl {
             virtual ~Client();
             void setWrapper(JSObject * theWrapper);
             curl_socket_t getCurlSocket();
-            void get();
-            void onDone(MultiAdapter * parent, CURLcode result);
+            void performSync();
+            void performAsync();
+            void onDone(CURLcode result);
             void onProgress();
             std::string getResponseString() const;
             asl::Ptr<asl::Block> getResponseBlock() const;

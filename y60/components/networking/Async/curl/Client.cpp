@@ -124,8 +124,14 @@ namespace curl {
     
     }
 
+    void 
+    Client::performSync() {
+        CURLcode myStatus = curl_easy_perform(_curlHandle);
+        onDone(myStatus);
+    }
+
     void
-    Client::get() {
+    Client::performAsync() {
         AC_DEBUG << "starting request " << this;
         asl::Ptr<NetAsync> parentPlugin = dynamic_cast_Ptr<NetAsync>(Singleton<PlugInManager>::get().getPlugIn(NetAsync::PluginName));
         parentPlugin->getCurlAdapater().addClient(shared_from_this());
@@ -208,7 +214,7 @@ JSA_CallFunctionName(JSContext * cx, JSObject * theThisObject, JSObject * theObj
 };
 
     void
-    Client::onDone(MultiAdapter * theParent, CURLcode result) {
+    Client::onDone(CURLcode result) {
         {
             ScopeLocker L(_lockResponseBuffer, true);
             _myResponseBlock->append(*_privateResponseBuffer);
@@ -233,7 +239,6 @@ JSA_CallFunctionName(JSContext * cx, JSObject * theThisObject, JSObject * theObj
                 /*JSBool ok =*/ JSA_CallFunctionName(_jsContext, _jsWrapper, _jsOptsObject, "error", 2, argv, &rval);
             };
         }
-        theParent->removeClient(shared_from_this());
         AC_DEBUG << "freeing root for " << debugIdentifier;
         JS_RemoveRoot(_jsContext, &_jsOptsObject);
         JS_RemoveRoot(_jsContext, &_jsWrapper);
