@@ -80,7 +80,8 @@ namespace curl {
         _jsOptsObject(theOpts),
         _myErrorBuffer(CURL_ERROR_SIZE, '\0'),
         _privateResponseBuffer(new Block()),
-        _myResponseBlock(new Block())
+        _myResponseBlock(new Block()),
+        _continueFlag(true)
     {
         _curlHandle = curl_easy_init();
         AC_DEBUG << "curl init " << curl_version();
@@ -113,7 +114,9 @@ namespace curl {
         s << " " << url;
         AC_DEBUG << "creating client " << this << " with _jsOptsObject " << _jsOptsObject;
         debugIdentifier = s.str();
+
         setCurlOption<bool>(_jsOptsObject, "verbose", CURLOPT_VERBOSE, 0);
+        setCurlOption<long>(_jsOptsObject, "connecttimeout", CURLOPT_CONNECTTIMEOUT, 0);
 
         if(!JS_AddNamedRoot(_jsContext, &_jsOptsObject, debugIdentifier.c_str())) {
             AC_WARNING << "failed to root request object!";
@@ -121,8 +124,14 @@ namespace curl {
     
     }
 
+    void 
+    Client::performSync() {
+        CURLcode myStatus = curl_easy_perform(_curlHandle);
+        onDone(myStatus);
+    }
+
     void
-    Client::get() {
+    Client::performAsync() {
         AC_DEBUG << "starting request " << this;
         asl::Ptr<NetAsync> parentPlugin = dynamic_cast_Ptr<NetAsync>(Singleton<PlugInManager>::get().getPlugIn(NetAsync::PluginName));
         parentPlugin->getCurlAdapater().addClient(shared_from_this());
@@ -164,7 +173,6 @@ namespace curl {
     Client::onProgress() {
         bool newDataReceived = false;
         {
-            AC_TRACE << "calling onProgress for " << this;
             ScopeLocker L(_lockResponseBuffer, true);
             if (_privateResponseBuffer->size() > 0) {
                 _myResponseBlock->append(*_privateResponseBuffer);
@@ -173,9 +181,16 @@ namespace curl {
             }
         }
         if (newDataReceived && hasCallback("progress")) {
+            AC_TRACE << "calling onProgress for " << this;
             jsval argv[1], rval;
             argv[0] = as_jsval(_jsContext, _myResponseBlock);
-            JSA_CallFunctionName(_jsContext, _jsOptsObject, "progress", 1, argv, &rval);
+            JSBool ok = JSA_CallFunctionName(_jsContext, _jsOptsObject, "progress", 1, argv, &rval);
+            if (ok) {
+                if (!convertFrom(_jsContext, rval, _continueFlag)) {
+                    std::cerr << "#ERROR: HttpClient: progress callback returned a bad result (not a bool)" << std::endl;
+                    _continueFlag = true;
+                }
+            }
         }
     };
 
@@ -199,7 +214,7 @@ JSA_CallFunctionName(JSContext * cx, JSObject * theThisObject, JSObject * theObj
 };
 
     void
-    Client::onDone(MultiAdapter * theParent, CURLcode result) {
+    Client::onDone(CURLcode result) {
         {
             ScopeLocker L(_lockResponseBuffer, true);
             _myResponseBlock->append(*_privateResponseBuffer);
@@ -224,7 +239,6 @@ JSA_CallFunctionName(JSContext * cx, JSObject * theThisObject, JSObject * theObj
                 /*JSBool ok =*/ JSA_CallFunctionName(_jsContext, _jsWrapper, _jsOptsObject, "error", 2, argv, &rval);
             };
         }
-        theParent->removeClient(shared_from_this());
         AC_DEBUG << "freeing root for " << debugIdentifier;
         JS_RemoveRoot(_jsContext, &_jsOptsObject);
         JS_RemoveRoot(_jsContext, &_jsWrapper);
@@ -246,7 +260,7 @@ JSA_CallFunctionName(JSContext * cx, JSObject * theThisObject, JSObject * theObj
         // NOTE: this will be called from one of io_service's threads
         ScopeLocker L(_lockResponseBuffer, true);
         _privateResponseBuffer->append(ptr, size);
-        return size;
+        return _continueFlag ? size : 0;
     };
 
     curl_socket_t 

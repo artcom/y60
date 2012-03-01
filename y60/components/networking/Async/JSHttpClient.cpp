@@ -84,6 +84,15 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     return JS_TRUE;
 }
 
+static JSBool
+abort(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Aborts a request which is in progress."); DOC_END;
+    JSHttpClient::OWNERPTR nativePtr = JSClassTraits<JSHttpClient::NATIVE>::getNativeOwner(cx,obj);
+    nativePtr->abort();
+    return JS_TRUE;
+}
+
+
 JSHttpClient::~JSHttpClient() {
 }
 
@@ -93,6 +102,7 @@ JSHttpClient::Functions() {
     static JSFunctionSpec myFunctions[] = {
         // name                  native                   nargs
         {"toString",             toString,                0},
+        {"abort",                abort,                   0},
         {0}
     };
     return myFunctions;
@@ -180,8 +190,20 @@ JSHttpClient::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
     // now stick the opts object to the JSHttpClient wrapper so it's not GC'ed
     jsval optsValue = OBJECT_TO_JSVAL(optsObject);
     JS_SetProperty(cx, obj, "_opts", &optsValue);
+
+
     // perform request
-    myHttpClient->get();
+    bool performAsync = true; // default
+    jsval asyncValue;
+    JS_GetProperty(cx, optsObject, "async", &asyncValue);
+    if (JSVAL_IS_BOOLEAN(asyncValue) && JSVAL_TO_BOOLEAN(asyncValue) == false) {
+        performAsync = false;
+    }
+    if (performAsync) {
+        myHttpClient->performAsync();
+    } else {
+        myHttpClient->performSync();
+    }
     return JS_TRUE;
 }
 
