@@ -685,11 +685,24 @@ namespace y60 {
 
             _myAudioSink = Pump::get().createSampleSink(theUrl);
 
+            if (myAudioBitsPerSample != 16) {
+                throw WindowsMediaException("movie has unsupported bits per sample "+
+                        asl::as_string(myAudioBitsPerSample), PLUS_FILE_LINE);
+            }
+
             if (myAudioSampleRate != Pump::get().getNativeSampleRate())
             {
-                _myResampleContext = audio_resample_init(myAudioNumberOfChannels,
-                        myAudioNumberOfChannels, Pump::get().getNativeSampleRate(),
-                        myAudioSampleRate);
+#if  LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52,15,0)
+            _myResampleContext = av_audio_resample_init(
+                    myAudioNumberOfChannels, myAudioNumberOfChannels,
+                    Pump::get().getNativeSampleRate(), myAudioSampleRate,
+                    SAMPLE_FMT_S16, SAMPLE_FMT_S16,
+                    16, 10, 0, 0.8);
+#else
+            _myResampleContext = audio_resample_init(myAudioNumberOfChannels,
+                    myAudioNumberOfChannels, Pump::get().getNativeSampleRate(),
+                    myAudioSampleRate);
+#endif
             }
             AC_INFO << "WMVDecoder::setupAudio() done. resampling "
                     << (_myResampleContext != 0);

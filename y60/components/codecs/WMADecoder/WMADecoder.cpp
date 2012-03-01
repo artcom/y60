@@ -446,8 +446,17 @@ WMADecoder::setupAudio() {
                         asl::as_string(myAudioInfo->wBitsPerSample), PLUS_FILE_LINE);
             }
             if (_mySampleRate != Pump::get().getNativeSampleRate()) {
-                _myResampleContext = audio_resample_init(_myNumChannels, _myNumChannels,
-                        Pump::get().getNativeSampleRate(), _mySampleRate);
+#if  LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52,15,0)
+                _myResampleContext = av_audio_resample_init(
+                    _myNumChannels, _myNumChannels,
+                    Pump::get().getNativeSampleRate(), _mySampleRate,
+                    SAMPLE_FMT_S16, SAMPLE_FMT_S16,
+                    16, 10, 0, 0.8);
+#else
+                _myResampleContext = audio_resample_init(_myNumChannels,
+                    _myNumChannels, Pump::get().getNativeSampleRate(),
+                    _mySampleRate);
+#endif
             }
         }
 

@@ -30,41 +30,23 @@
 //
 // Description: TODO  
 //
-// Last Review: NEVER, NOONE
-//
-//  review status report: (perfect, ok, fair, poor, disaster, notapplicable, unknown)
-//    usefullness            : unknown
-//    formatting             : unknown
-//    documentation          : unknown
-//    test coverage          : unknown
-//    names                  : unknown
-//    style guide conformance: unknown
-//    technical soundness    : unknown
-//    dead code              : unknown
-//    readability            : unknown
-//    understandabilty       : unknown
-//    interfaces             : unknown
-//    confidence             : unknown
-//    integration            : unknown
-//    dependencies           : unknown
-//    cheesyness             : unknown
-//
-//    overall review status  : unknown
-//
-//    recommendations: 
-//       - unknown
-// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-#include "JSHttpServer.h"
+
+#ifndef _ac_y60_async_net_async_h
+#define _ac_y60_async_net_async_h
+
+#include "curl/MultiAdapter.h"
 
 #include <boost/asio.hpp>
+#include <boost/thread.hpp>
 
 #include <asl/base/PlugInBase.h>
 #include <y60/jsbase/IScriptablePlugin.h>
 #include <y60/jslib/IRendererExtension.h>
 
 namespace y60 {
+
 	class NetAsync : 
         public asl::PlugInBase, 
         public IRendererExtension, 
@@ -77,7 +59,7 @@ namespace y60 {
 
         NetAsync(asl::DLHandle theDLHandle);
         virtual ~NetAsync();
-        static boost::asio::io_service & io_service();
+        boost::asio::io_service & io_service();
         virtual void initClasses(JSContext * theContext, JSObject *theGlobalObject);
         virtual JSFunctionSpec * Functions();
 
@@ -88,12 +70,7 @@ namespace y60 {
         virtual bool onSceneLoaded(jslib::AbstractRenderWindow * theWindow) { return true; }
 
         virtual void handle(jslib::AbstractRenderWindow * theWindow, y60::EventPtr theEvent) {}
-        virtual void onFrame(jslib::AbstractRenderWindow * theWindow , double t) {
-            std::map<const void*, onFrameHandler>::iterator it;
-            for (it = _onFrameHandlers.begin(); it != _onFrameHandlers.end(); ++it) {
-                (it->second)();
-            }
-        }
+        virtual void onFrame(jslib::AbstractRenderWindow * theWindow , double t);
 
         virtual void onPreRender(jslib::AbstractRenderWindow * theRenderer) {}
         virtual void onPostRender(jslib::AbstractRenderWindow * theRenderer) {}
@@ -106,17 +83,21 @@ namespace y60 {
                 _onFrameHandlers.erase(it);
             }
         }
+        async::http::curl::MultiAdapter & getCurlAdapater() { return _curlAdapter; };
+
     private:
         std::map<const void*, onFrameHandler> _onFrameHandlers;  
         void run(std::size_t thread_pool_size);
-        void stop();
         /// The io_service used to perform asynchronous operations.
-        static boost::asio::io_service io;
+        boost::asio::io_service io;
         // fictional work item to prevent our io_service from being out of work and terminating
-        static boost::asio::io_service::work keep_busy; 
+        boost::shared_ptr<boost::asio::io_service::work> keep_busy;
+        async::http::curl::MultiAdapter _curlAdapter;
+
 
     private:
         AsioThreadPtr _myAsioThread;
 	};
 }
 
+#endif

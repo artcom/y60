@@ -1,8 +1,12 @@
 set(SOURCES
 Connection.cpp
 HttpServer.cpp
+curl/Client.cpp
+JSHttpClient.cpp
 JSHttpServer.cpp
 NetAsync.cpp
+curl/SocketAdapter.cpp
+curl/MultiAdapter.cpp
 MimeTypes.cpp
 Reply.cpp
 RequestParser.cpp
@@ -13,9 +17,13 @@ ConcurrentQueue.h
 Connection.h
 HttpHeader.h
 HttpServer.h
+curl/Client.h
+JSHttpClient.h
 JSHttpServer.h
 MimeTypes.h
 NetAsync.h
+curl/SocketAdapter.h
+curl/MultiAdapter.h
 Reply.h
 Request.h
 RequestParser.h

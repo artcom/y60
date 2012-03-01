@@ -7,5 +7,7 @@ add_subdirectory(OscReceiver)
 add_subdirectory(OscSender)
 add_subdirectory(SynergyServer)
 add_subdirectory(HttpServer)
-add_subdirectory(Async)
+if(CURL_VERSION VERSION_GREATER 7.21.6)
+    add_subdirectory(Async)
+endif(CURL_VERSION VERSION_GREATER 7.21.6)
 

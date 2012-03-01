@@ -107,7 +107,7 @@ namespace y60 {
         _myLastVideoFrame(),
         _myFormatContext(0),
         _myAStreamIndexDom(0),
-        _myVideoStartTimestamp(0),
+        _myVideoStartTimestamp(-1),
         _hasShutDown(false),
         _isStreamingMedia(false),
         _myMsgQueue(),
@@ -290,7 +290,7 @@ namespace y60 {
             }
 
             _myAdjustAudioOffsetFlag = true;
-            _myVideoStartTimestamp = 0;
+            _myVideoStartTimestamp = 0; //XXX: investigate is this still correct?
             _myAudioSink->play();
             _myAdjustAudioOffsetFlag = true;
 
@@ -326,6 +326,8 @@ namespace y60 {
         getVideoProperties();
         _myLastVideoFrame = VideoMsgPtr();
         if (shouldSeek(0.0, theStartTime)) {
+            _myMsgQueue.clear();
+            _myMsgQueue.reset();
             _myDemux->seek(theStartTime);
             if (theStartAudioFlag && hasAudio() && getDecodeAudioFlag()) {
                 _myAdjustAudioOffsetFlag = true;
@@ -335,7 +337,7 @@ namespace y60 {
             for (std::vector<int>::size_type i = 0; i < _myAllAudioStreamIndicies.size(); i++) {
                 _myDemux->seek(theStartTime, _myAllAudioStreamIndicies[i]);
             }
-            _myVideoStartTimestamp = 0;
+            _myVideoStartTimestamp = 0; //XXX: investigate is this still correct?
         }
         _myVideoDecodeThread = DecodeThreadPtr(new boost::thread( boost::bind( &FFMpegDecoder3::run_videodecode, this)));
 
@@ -447,15 +449,15 @@ namespace y60 {
         VideoMsgPtr myVideoMsg;
         double myStreamTime = theTime;
         myStreamTime += _myVideoStartTimestamp/_myVideoStreamTimeBase;
-        AC_TRACE << "_myVideoStreamTimeBase: "<< _myVideoStreamTimeBase <<" _myVideoStartTimestamp: "
-                <<_myVideoStartTimestamp<<" Time=" << theTime;
-        AC_TRACE <<" - Reading frame timestamp: " << myStreamTime<< " from queue.";
+        DB(AC_TRACE <<"Reading frame timestamp: " << myStreamTime<< " from queue." << " _myVideoStreamTimeBase: "<< _myVideoStreamTimeBase <<" _myVideoStartTimestamp: "
+                <<_myVideoStartTimestamp<<" Time=" << theTime);
 
         bool useLastVideoFrame = false;
         if (_myLastVideoFrame) {
             if(shouldSeek(_myLastVideoFrame->getTime(), myStreamTime)) {
                 seek(theTime);
                 _myMovieTime = theTime;
+                _myLastFrameTime = theTime;
                 return -1;
             }
             double myFrameTime = _myLastVideoFrame->getTime();
@@ -475,17 +477,17 @@ namespace y60 {
                 if (myVideoMsg->getType() == VideoMsg::MSG_EOF) {
                     setEOF(true);
                     double myTimestamp = myVideoMsg->getTime();
-                    AC_DEBUG << "readFrame: setEOF FrameTime=" << myTimestamp << ", Calculated frame #="
+                    DB(AC_DEBUG << "readFrame: setEOF FrameTime=" << myTimestamp << ", Calculated frame #="
                     << (myTimestamp - (_myVideoStartTimestamp/_myVideoStreamTimeBase))*_myFrameRate
-                    << ", Cache size=" << _myMsgQueue.size();
+                    << ", Cache size=" << _myMsgQueue.size());
                     return theTime;
                 }
                 double myTimestamp = myVideoMsg->getTime();
-                AC_TRACE << "readFrame: FrameTime=" << myTimestamp << ", Calculated frame #="
+                DB(AC_TRACE << "readFrame: FrameTime=" << myTimestamp << ", Calculated frame #="
                     << (myTimestamp - (_myVideoStartTimestamp/_myVideoStreamTimeBase))*_myFrameRate
-                    << ", Cache size=" << _myMsgQueue.size();
+                    << ", Cache size=" << _myMsgQueue.size());
                 double myFrameDiff = (myStreamTime - myTimestamp)*_myFrameRate;
-                AC_TRACE << "           myFrameDiff=" << myFrameDiff;
+                DB(AC_TRACE << "           myFrameDiff=" << myFrameDiff);
                 if (myFrameDiff < 0.5 && myFrameDiff > -1.0) {
                     break;
                 } else if (myFrameDiff <= -1.0){
@@ -557,6 +559,8 @@ namespace y60 {
             throw FFMpegDecoder3Exception(std::string("Unable to open video codec: ")
                                           + theFilename, PLUS_FILE_LINE);
         }
+
+        _myVideoStartTimestamp = -1; // used as flag, we use the dts of the first decoded frame
 
         Movie * myMovie = getMovie();
         AC_DEBUG << "PF=" << myMovie->get<RasterPixelFormatTag>();
@@ -724,7 +728,7 @@ namespace y60 {
         myAspectRatio *= (float)_myVStream->codec->width / _myVStream->codec->height; 
         myMovie->set<AspectRatioTag>((float)myAspectRatio);
 
-        _myVideoStartTimestamp = _myVStream->start_time;
+        //_myVideoStartTimestamp = _myVStream->start_time; // we use the dts of the first decoded frame
         AC_DEBUG << "FFMpegDecoder3::getVideoProperties() " << " fps="
                 << _myFrameRate << " framecount=" << getFrameCount()<< " time_base: "
                 <<_myVideoStreamTimeBase;
@@ -764,8 +768,10 @@ namespace y60 {
 
     bool FFMpegDecoder3::shouldSeek(double theCurrentTime, double theDestTime) {
         double myDistance = (theDestTime-theCurrentTime)*_myFrameRate;
-        AC_DEBUG << "FFMpegDecoder3::shouldSeek: Dest=" << theDestTime << ", Curr=" << theCurrentTime<<" --> distance: "<< myDistance;
-        return !_isStreamingMedia && (myDistance > _myMaxCacheSize || myDistance < 0);
+        bool seek = !_isStreamingMedia && (myDistance > _myMaxCacheSize || myDistance < 0);
+        DB(AC_DEBUG << "FFMpegDecoder3::shouldSeek: '"<< (seek ? "true" : "false") << "' Dest=" 
+                    << theDestTime << ", Curr=" << theCurrentTime<<" --> distance: "<< myDistance);
+        return seek;
     }
 
     //XXX: seeking is currently done in mainthread, decoding & demuxing threads are pause with a condition -> is this the way to do it?!
@@ -838,7 +844,7 @@ namespace y60 {
     }
 
     void FFMpegDecoder3::addAudioPacket(const AVPacket & thePacket) {
-        DBA(AC_TRACE << "FFMpegDecoder3::addAudioPacket()");
+        DBA(AC_TRACE << "---- FFMpegDecoder3::addAudioPacket()");
         int64_t pts = thePacket.dts;
         if (thePacket.pts != static_cast<int64_t>(AV_NOPTS_VALUE)) {
             pts = thePacket.pts;
@@ -846,7 +852,7 @@ namespace y60 {
         double myTime = pts / (1/av_q2d(_myAStream->time_base));
         if (_myAdjustAudioOffsetFlag) {
             _myAdjustAudioOffsetFlag = false;
-            DBA(AC_DEBUG<<"adjusting audioTimeOffset old: "<<_myAudioTimeOffset<<", new: "<<myTime);
+            DBA(AC_DEBUG<<"---- adjusting audioTimeOffset old: "<<_myAudioTimeOffset<<", new: "<<myTime);
             _myAudioTimeOffset = myTime;
         }
         // we need an aligned buffer
@@ -865,13 +871,13 @@ namespace y60 {
             int myLen = avcodec_decode_audio3(_myAStream->codec,
                 myAlignedBuf, &myBytesDecoded, &myTempPacket);
             if (myLen < 0) {
-                AC_WARNING << "av_decode_audio error";
+                AC_WARNING << "---- av_decode_audio error";
                 myTempPacket.size = 0;
                 break;
             }
             myTempPacket.data += myLen;
             myTempPacket.size -= myLen;
-            DBA(AC_TRACE << "data left " << myTempPacket.size << " read " << myLen);
+            DBA(AC_TRACE << "---- data left " << myTempPacket.size << " read " << myLen);
 
 #else
         const uint8_t* myData = thePacket.data;
@@ -886,13 +892,13 @@ namespace y60 {
                 myAlignedBuf, &myBytesDecoded, myData, myDataLen);
 #   endif
             if (myLen < 0) {
-                AC_WARNING << "av_decode_audio error";
+                AC_WARNING << "---- av_decode_audio error";
                 myDataLen = 0;
                 break;
             }
             myData += myLen;
             myDataLen -= myLen;
-            DBA(AC_TRACE << "data left " << myDataLen << " read " << myLen);
+            DBA(AC_TRACE << "---- data left " << myDataLen << " read " << myLen);
 
 #endif
             if ( myBytesDecoded <= 0 ) {
@@ -915,7 +921,7 @@ namespace y60 {
                 myNumChannels = 2;
             }
             int numFrames = myBytesDecoded/(myBytesPerSample*myNumChannels);
-            DBA(AC_TRACE << "FFMpegDecoder3::decode(): Frames per buffer= " << numFrames);
+            DBA(AC_TRACE << "---- FFMpegDecoder3::addAudioPacket: Frames per buffer= " << numFrames);
             // queue audio sample
             AudioBufferPtr myBuffer;
             if (_myResampleContext) {
@@ -929,7 +935,7 @@ namespace y60 {
                 myBuffer->convert(myAlignedBuf, SF_S16, myNumChannels);
             }
             _myAudioSink->queueSamples(myBuffer);
-            DBA(AC_DEBUG << "decoded audio time=" << myTime);
+            DBA(AC_DEBUG << "---- decoded audio time=" << myTime);
         } // while
 
         av_free( myAlignedBuf );
@@ -941,6 +947,7 @@ namespace y60 {
         DBV(AC_DEBUG << "---- FFMpegDecoder3::decodeFrame");
         AVPacket * myPacket = 0;
         unsigned int myDecodedPacketsPerFrame = 0;
+        unsigned int myEOFFrames = 0;
         START_TIMER(decodeFrame_ffmpegdecode);
         // until a frame is found or eof
         bool myEndOfFileFlag = false;
@@ -948,10 +955,7 @@ namespace y60 {
             DBV(AC_TRACE << "---- decodeFrame: getPacket");
             myPacket = _myDemux->getPacket(_myVStreamIndex);
             if (myPacket == 0) {
-                myEndOfFileFlag = true;
-
-                // Usually, we're done at this point. mpeg1 and mpeg2, however,
-                // deliver another frame...
+                // Usually, we're done at this point. ffmpeg however sometimes delivers more frames
                 DBV(AC_DEBUG << "---- decodeFrame: eof");
                 int myFrameCompleteFlag = 0;
 #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52,27,0)
@@ -966,6 +970,7 @@ namespace y60 {
                         &myFrameCompleteFlag, NULL, 0);
 #endif
                 if (myFrameCompleteFlag) {
+                    ++myEOFFrames;
                     DBV(AC_DEBUG << "---- decodeFrame: Last frame.");
                     // The only way to get the timestamp of this frame is to take
                     // the timestamp of the previous frame and add an appropriate
@@ -973,10 +978,12 @@ namespace y60 {
                     // (_myFrame->coded_picture_number contains garbage on the second
                     // and successive loops.)
                     // Yuck.
-                    addCacheFrame(_myFrame, _myLastFrameTime+1.0/_myFrameRate);
+                    addCacheFrame(_myFrame, _myLastFrameTime + myEOFFrames / _myFrameRate);
                     if (_myFrame->pict_type == FF_I_TYPE) {
                         DBV(AC_DEBUG << "***** I_FRAME *****");
                     }
+                } else {
+                    myEndOfFileFlag = true;
                     break;
                 }
             } else {
@@ -996,8 +1003,8 @@ namespace y60 {
                                 &myFrameCompleteFlag, myPacket->data, myPacket->size);
 #endif
                 STOP_TIMER(decodeFrame_avcodec_decode);
-                DBV(AC_DEBUG <<"FFMpegDecoder3::decodeFrame frame doneflag :  "<< myFrameCompleteFlag<<" len: "<<myLen);
-                DBV(AC_DEBUG << "dts=" << myPacket->dts << ", position=" <<
+                DBV(AC_DEBUG <<"---- decodeFrame frame doneflag :  "<< myFrameCompleteFlag<<" len: "<<myLen);
+                DBV(AC_DEBUG << "---- dts=" << myPacket->dts << ", position=" <<
                         myPacket->pos << ", duration=" <<
                         myPacket->duration << ", packet pts=" <<
                         myPacket->pts<<", frame pts: "<<_myFrame->pts<<", size: "<<myPacket->size);
@@ -1009,15 +1016,20 @@ namespace y60 {
 
                 if(!myFrameCompleteFlag) {
                     myDecodedPacketsPerFrame++;
-                    DBV(AC_DEBUG << "### needed packets to decode frame: "<<myDecodedPacketsPerFrame);
+                    DBV(AC_DEBUG << "---- ### needed packets to decode frame: "<<myDecodedPacketsPerFrame);
                 }
                 // start_time indicates the begin of the video
                 if (myFrameCompleteFlag  && (myPacket->dts >= _myVStream->start_time)) {
                     STOP_TIMER(decodeFrame_ffmpegdecode);
+                    //XXX: no thread lock
+                    if (_myVideoStartTimestamp == -1) {
+                        _myVideoStartTimestamp = myPacket->dts;
+                        AC_DEBUG << "setting start timestamp: "<<_myVideoStartTimestamp;
+                    }
                     int64_t myNextPacketTimestamp = myPacket->dts;
                     double myFrameTime = (double)myNextPacketTimestamp/_myVideoStreamTimeBase;
-                    DBV(AC_DEBUG << "---- add decoded frame"<< " time_base:"<<_myVideoStreamTimeBase
-                                <<" FrameTime: "<<myFrameTime;)
+                    DBV(AC_DEBUG << "---- add decoded frame time_base: "<<_myVideoStreamTimeBase
+                                 <<" FrameTime: "<<myFrameTime;)
                     addCacheFrame(_myFrame, myFrameTime);
                     _myLastFrameTime = myFrameTime;
                     if (_myFrame->pict_type == FF_I_TYPE) {
@@ -1037,7 +1049,7 @@ namespace y60 {
 
     void FFMpegDecoder3::convertFrame(AVFrame* theFrame, unsigned char* theBuffer) {
         if (!theFrame) {
-            AC_ERROR << "FFMpegDecoder::convertFrame invalid AVFrame";
+            AC_ERROR << "---- FFMpegDecoder::convertFrame invalid AVFrame";
             return;
         }
 
@@ -1079,8 +1091,6 @@ namespace y60 {
     }
 
     VideoMsgPtr FFMpegDecoder3::createFrame(double theTimestamp) {
-        DBV(AC_DEBUG << "FFMpegDecoder3::createFrame");
-
         vector<unsigned> myBufferSizes;
         switch (_myDestinationPixelFormat) {
             case PIX_FMT_BGRA:

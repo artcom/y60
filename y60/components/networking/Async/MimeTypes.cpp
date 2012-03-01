@@ -10,8 +10,8 @@
 
 #include "MimeTypes.h"
 
-namespace http {
-namespace server {
+namespace y60 {
+namespace async {
 namespace mime_types {
 
 struct mapping
