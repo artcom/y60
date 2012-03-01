@@ -106,6 +106,7 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
         Logger.info("creating client");
         obj.myClient = new Async.HttpClient({
             url: "http://127.0.0.1:88/foobar",
+            connecttimeout: 5,
             success: function() {
                 FAILURE("testError");
             },
@@ -258,7 +259,6 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
     }
 
     obj.run = function () {
-
         obj.myServer = new Async.HttpServer();
         var myServer = {
             foo: function(theMethod, theBody) {
@@ -274,14 +274,14 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
         obj.myServer.registerCallback("/big", myServer, myServer.big);
 
         testFireAndForget();
-
         testError();
         testSmallRequests();
         testBigRequest();
         testRequestProgressError();
         testRequestAbort();
 
-        obj.myServer.close();
+        obj.myServer = null;
+        gc();
     };
 
 };

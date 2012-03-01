@@ -114,7 +114,9 @@ namespace curl {
         s << " " << url;
         AC_DEBUG << "creating client " << this << " with _jsOptsObject " << _jsOptsObject;
         debugIdentifier = s.str();
+
         setCurlOption<bool>(_jsOptsObject, "verbose", CURLOPT_VERBOSE, 0);
+        setCurlOption<long>(_jsOptsObject, "connecttimeout", CURLOPT_CONNECTTIMEOUT, 0);
 
         if(!JS_AddNamedRoot(_jsContext, &_jsOptsObject, debugIdentifier.c_str())) {
             AC_WARNING << "failed to root request object!";
@@ -165,7 +167,6 @@ namespace curl {
     Client::onProgress() {
         bool newDataReceived = false;
         {
-            AC_TRACE << "calling onProgress for " << this;
             ScopeLocker L(_lockResponseBuffer, true);
             if (_privateResponseBuffer->size() > 0) {
                 _myResponseBlock->append(*_privateResponseBuffer);
@@ -174,6 +175,7 @@ namespace curl {
             }
         }
         if (newDataReceived && hasCallback("progress")) {
+            AC_TRACE << "calling onProgress for " << this;
             jsval argv[1], rval;
             argv[0] = as_jsval(_jsContext, _myResponseBlock);
             JSBool ok = JSA_CallFunctionName(_jsContext, _jsOptsObject, "progress", 1, argv, &rval);
