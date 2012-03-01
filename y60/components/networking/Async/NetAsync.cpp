@@ -57,6 +57,7 @@
 */
 
 #include "NetAsync.h"
+#include "JSHttpServer.h"
 #include "JSHttpClient.h"
 #include <y60/jsbase/JSScriptablePlugin.h>
 #include <y60/jsbase/JSWrapper.h>

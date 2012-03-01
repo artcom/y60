@@ -36,10 +36,10 @@
 #ifndef _ac_y60_async_net_async_h
 #define _ac_y60_async_net_async_h
 
-#include "JSHttpServer.h"
-#include "CurlMultiAdapter.h"
+#include "curl/MultiAdapter.h"
 
 #include <boost/asio.hpp>
+#include <boost/thread.hpp>
 
 #include <asl/base/PlugInBase.h>
 #include <y60/jsbase/IScriptablePlugin.h>
@@ -83,7 +83,7 @@ namespace y60 {
                 _onFrameHandlers.erase(it);
             }
         }
-        async::http::CurlMultiAdapter & getCurlAdapater() { return _curlAdapter; };
+        async::http::curl::MultiAdapter & getCurlAdapater() { return _curlAdapter; };
 
     private:
         std::map<const void*, onFrameHandler> _onFrameHandlers;  
@@ -92,7 +92,7 @@ namespace y60 {
         boost::asio::io_service io;
         // fictional work item to prevent our io_service from being out of work and terminating
         boost::shared_ptr<boost::asio::io_service::work> keep_busy;
-        async::http::CurlMultiAdapter _curlAdapter;
+        async::http::curl::MultiAdapter _curlAdapter;
 
 
     private:

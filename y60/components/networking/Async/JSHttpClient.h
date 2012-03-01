@@ -38,12 +38,12 @@
 
 #include <y60/jsbase/JSWrapper.h>
 
-#include "HttpClient.h"
+#include "curl/Client.h"
 
-class JSHttpClient : public jslib::JSWrapper<y60::async::http::Client, boost::shared_ptr<y60::async::http::Client> , jslib::StaticAccessProtocol> {
+class JSHttpClient : public jslib::JSWrapper<y60::async::http::curl::Client, boost::shared_ptr<y60::async::http::curl::Client> , jslib::StaticAccessProtocol> {
         JSHttpClient() {}
     public:
-        typedef y60::async::http::Client NATIVE;
+        typedef y60::async::http::curl::Client NATIVE;
         typedef boost::shared_ptr<NATIVE> OWNERPTR;
         typedef jslib::JSWrapper<NATIVE,OWNERPTR, jslib::StaticAccessProtocol> Base;
 

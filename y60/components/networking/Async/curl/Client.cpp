@@ -55,8 +55,8 @@
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
-#include "HttpClient.h"
-#include "NetAsync.h"
+#include "Client.h"
+#include "../NetAsync.h"
 
 #include <string>
 #include <y60/jsbase/JScppUtils.h>
@@ -72,6 +72,7 @@ using namespace jslib;
 namespace y60 {
 namespace async {
 namespace http {
+namespace curl {
 
     Client::Client(JSContext * cx, JSObject * theOpts) :
         _curlHandle(0),
@@ -200,7 +201,7 @@ JSA_CallFunctionName(JSContext * cx, JSObject * theThisObject, JSObject * theObj
 };
 
     void
-    Client::onDone(CurlMultiAdapter * theParent, CURLcode result) {
+    Client::onDone(MultiAdapter * theParent, CURLcode result) {
         {
             ScopeLocker L(_lockResponseBuffer, true);
             _myResponseBlock->append(*_privateResponseBuffer);
@@ -260,7 +261,7 @@ JSA_CallFunctionName(JSContext * cx, JSObject * theThisObject, JSObject * theObj
     int 
     Client::_closeSocket(Client *self, curl_socket_t item) {
         AC_DEBUG << "closing socket " << item;
-        SocketPtr s = CurlSocketInfo::find(item);
+        SocketPtr s = SocketAdapter::find(item);
         if (s) {
             s->close();
         }
@@ -289,6 +290,7 @@ JSA_CallFunctionName(JSContext * cx, JSObject * theThisObject, JSObject * theObj
         return true;
     };
      
+}
 }
 }
 }

@@ -33,7 +33,7 @@
 #ifndef _ac_y60_async_http_curl_multi_adapter_h
 #define _ac_y60_async_http_curl_multi_adapter_h
 
-#include "CurlSocketInfo.h"
+#include "SocketAdapter.h"
 
 #include <asl/base/Logger.h>
 #include <curl/curl.h>
@@ -43,21 +43,22 @@
 namespace y60 {
 namespace async {
 namespace http {
+namespace curl {
     
 class Client; // forward declaration
 
-class CurlMultiAdapter {
+class MultiAdapter {
     public:
-        friend class CurlSocketInfo;
-        CurlMultiAdapter(boost::asio::io_service & theIOService);
-        virtual ~CurlMultiAdapter();
-        void addClient(boost::shared_ptr<async::http::Client> theClient);
-        void removeClient(boost::shared_ptr<async::http::Client> theClient);
+        friend class SocketAdapter;
+        MultiAdapter(boost::asio::io_service & theIOService);
+        virtual ~MultiAdapter();
+        void addClient(boost::shared_ptr<Client> theClient);
+        void removeClient(boost::shared_ptr<Client> theClient);
         void processCompleted();
         void processCallbacks();
         curl_socket_t openSocket() {
-            async::http::CurlSocketInfo::Ptr s(new async::http::CurlSocketInfo(this, _curlMulti));
-            CurlSocketInfo::add(s);
+            SocketAdapter::Ptr s(new SocketAdapter(this, _curlMulti));
+            SocketAdapter::add(s);
             return s->native();
         };
 
@@ -66,14 +67,14 @@ class CurlMultiAdapter {
     protected:
         void setSocketInfo(curl_socket_t s, void * data);
     private:
-        CurlMultiAdapter();
+        MultiAdapter();
         // curl stuff
         CURLM * _curlMulti;
         boost::shared_ptr<boost::asio::deadline_timer> timeout_timer;
 
-        std::set<boost::shared_ptr<async::http::Client> > _allClients;
+        std::set<boost::shared_ptr<Client> > _allClients;
         static int curl_socket_callback(CURL *easy, curl_socket_t s, int action, void *userp, void *socketp); 
-        static int curl_timer_callback(CURLM *multi,  long timeout_ms, CurlMultiAdapter * self); 
+        static int curl_timer_callback(CURLM *multi,  long timeout_ms, MultiAdapter * self); 
         void onTimeout(const boost::system::error_code& error);
 
         // Boost IO stuff
@@ -82,6 +83,7 @@ class CurlMultiAdapter {
 
 };
 
+}
 }
 }
 }

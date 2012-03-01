@@ -35,7 +35,7 @@
 #ifndef _ac_y60_async_http_client_h
 #define _ac_y60_async_http_client_h
 
-#include "CurlSocketInfo.h"
+#include "SocketAdapter.h"
 
 #ifdef WIN32
 #include <winsock2.h>
@@ -57,6 +57,7 @@
 namespace y60 {
 namespace async {
 namespace http {
+namespace curl {
     
     /*
     struct JSCallback {
@@ -67,7 +68,7 @@ namespace http {
     };
     */
 
-    class CurlMultiAdapter;
+    class MultiAdapter;
 
     class Client : public boost::enable_shared_from_this<Client> {
         public:
@@ -90,7 +91,7 @@ namespace http {
             void setWrapper(JSObject * theWrapper);
             curl_socket_t getCurlSocket();
             void get();
-            void onDone(CurlMultiAdapter * parent, CURLcode result);
+            void onDone(MultiAdapter * parent, CURLcode result);
             void onProgress();
             std::string getResponseString() const;
             const asl::Ptr<asl::Block> & getResponseBlock() const;
@@ -141,6 +142,7 @@ namespace http {
     template<>
     bool Client::setCurlOption<std::string>(JSObject* opts, std::string theProperty, CURLoption theCurlOption, std::string * theValue);
 
+} // curl
 } // http
 } // async
 } // y60

@@ -178,7 +178,7 @@ JSHttpClient::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
     JS_ValueToObject(cx,argv[0],&optsObject);
     
     JSHttpClient * myNewObject = 0;
-    OWNERPTR myHttpClient = OWNERPTR(new async::http::Client(cx, optsObject));
+    OWNERPTR myHttpClient = OWNERPTR(new async::http::curl::Client(cx, optsObject));
     myNewObject = new JSHttpClient(myHttpClient, myHttpClient.get());
     JS_SetPrivate(cx, obj, myNewObject);
     myHttpClient->setWrapper(obj);

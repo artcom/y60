@@ -42,14 +42,15 @@
 namespace y60 {
 namespace async {
 namespace http {
+namespace curl {
 
-class CurlMultiAdapter; 
+class MultiAdapter; 
 
-class CurlSocketInfo : public boost::noncopyable, public boost::enable_shared_from_this<CurlSocketInfo> {
+class SocketAdapter : public boost::noncopyable, public boost::enable_shared_from_this<SocketAdapter> {
     public:
-        typedef boost::shared_ptr<CurlSocketInfo> Ptr;
-        CurlSocketInfo(CurlMultiAdapter * pParent, CURLM * theCurlMultihandle);
-        ~CurlSocketInfo();
+        typedef boost::shared_ptr<SocketAdapter> Ptr;
+        SocketAdapter(MultiAdapter * pParent, CURLM * theCurlMultihandle);
+        ~SocketAdapter();
         curl_socket_t native() { return boost_socket.native(); };
         boost::asio::ip::tcp::socket boost_socket;
         int readyState;
@@ -89,13 +90,14 @@ class CurlSocketInfo : public boost::noncopyable, public boost::enable_shared_fr
             AC_DEBUG << "socket " << item << " closed";
         };
     private:
-        CurlSocketInfo();
-        CurlMultiAdapter * _parent;
+        SocketAdapter();
+        MultiAdapter * _parent;
         static std::map<curl_socket_t, Ptr> _allSockets;
 };
 
-typedef CurlSocketInfo::Ptr SocketPtr;
+typedef SocketAdapter::Ptr SocketPtr;
 
+}
 }
 }
 }
