@@ -36,9 +36,9 @@
 #ifndef _ac_y60_async_http_js_http_client_h
 #define _ac_y60_async_http_js_http_client_h
 
+#include "curl/Client.h"
 #include <y60/jsbase/JSWrapper.h>
 
-#include "curl/Client.h"
 
 class JSHttpClient : public jslib::JSWrapper<y60::async::http::curl::Client, boost::shared_ptr<y60::async::http::curl::Client> , jslib::StaticAccessProtocol> {
         JSHttpClient() {}

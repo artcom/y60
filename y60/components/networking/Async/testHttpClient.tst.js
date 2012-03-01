@@ -57,9 +57,8 @@
 
 */
 
-/*jslint white : false*/
-/*globals use plug UnitTest millisec Socket HttpClient ENSURE UnitTestSuite
-          print exit RequestManager Request*/
+/*globals use, plug, UnitTest, millisec, msleep, Async, ENSURE, SUCCESS, FAILURE, gc, UnitTestSuite,
+          print, exit, RequestManager, Request, Logger */
 
 use("UnitTest.js");
 
@@ -83,14 +82,18 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
 
         Logger.info("creating client");
         var myClient = new Async.HttpClient({
-            url: "http://192.168.56.10:3080/foo",
-            success: function() {
+            url: "http://127.0.0.1:3003/foo",
+            success: function () {
                 SUCCESS("FireAndForget");
+                done = true;
+            },
+            error: function () {
+                FAILURE("FireAndForget");
                 done = true;
             },
             verbose: true
         });
-        var myClient = null;
+        myClient = null;
         gc();
 
         while (true) {
@@ -101,23 +104,17 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
                 break;
             }
         }
-    };
+    }
     function testError() {
         var done = false;
         Logger.info("creating client");
         obj.myClient = new Async.HttpClient({
             url: "http://127.0.0.1:88/foobar",
-            progress: function(theBlock) {
-                Logger.info(theBlock.size);
-                theBlock.resize(0);
-            },
             success: function() {
                 FAILURE("testError");
             },
             error: function() {
                 SUCCESS("testError");
-                print(this);
-                Logger.warning("error callback called!");
                 done = true;
             },
             verbose: true
@@ -132,20 +129,32 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
                 break;
             }
         }
-    };
+    }
     function testBigRequest() {
         var done = false;
 
+        var received = 0;
         Logger.info("creating client");
         obj.myClient = new Async.HttpClient({
-            url: "http://files.t-gallery.act/data/repository/original/vol0/24/vater_der_braut_de_hd_eff5390ebdbdf0bd62f86b716f8f8adf3d9512d6.mp4",
+            url: "http://127.0.0.1:3003/big",
+            // url: "http://files.t-gallery.act/data/repository/original/vol0/24/vater_der_braut_de_hd_eff5390ebdbdf0bd62f86b716f8f8adf3d9512d6.mp4",
             progress: function(theBlock) {
-                // Logger.info(theBlock.size);
+                received += theBlock.size;
                 theBlock.resize(0);
             },
-            success: function() {
-                Logger.warning("onDone called!");
+            error: function() {
+                FAILURE("testBigRequest");
                 done = true;
+            },
+            success: function() {
+                print("received in Progress: "+received);
+                print("last responseBlock:"+this.responseBlock.size);
+                done = true;
+                if (received + this.responseBlock.size === 1024*1024*5) {
+                    SUCCESS("testBigRequest");
+                } else {
+                    FAILURE("testBigRequest");
+                }
             },
             verbose: true
         });
@@ -159,20 +168,29 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
                 break;
             }
         }
-    };
+    }
 
     function testSmallRequests() {
         // test many small requests
         var i = 10;
 
         var iterate = function() {
-            Logger.warning("iterate called");
-            i--;
             if (i>0) {
-                obj.myClient = new Async.HttpClient({ url: "http://127.0.0.1:3003/foo", success: iterate, verbose:false } );
-            };
-            Logger.warning("iterate done");
-        }
+                obj.myClient = new Async.HttpClient({
+                    url: "http://127.0.0.1:3003/foo",
+                    success: function() {
+                        SUCCESS("testSmallRequests");
+                        i--;
+                        iterate();
+                    },
+                    error: function() {
+                        FAILURE("testSmallRequests");
+                        i = 0;
+                    },
+                    verbose:false
+                });
+            }
+        };
         iterate();
         while (true) {
             Async.onFrame();
@@ -185,21 +203,26 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
     }
 
     obj.run = function () {
-         
+
         obj.myServer = new Async.HttpServer();
         var myServer = {
             foo: function(theMethod, theBody) {
-                     return "ok"; 
+                     return "ok";
+                 },
+            big: function(theMethod, theBody) {
+                return new Array(1024*1024+1).join("Fubar"); // 100 MB
                  }
+
         };
         obj.myServer.start("0.0.0.0", "3003");
         obj.myServer.registerCallback("/foo", myServer, myServer.foo);
-        
+        obj.myServer.registerCallback("/big", myServer, myServer.big);
+
         testFireAndForget();
 
         testError();
         testSmallRequests();
-        // testBigRequest();
+        testBigRequest();
 
         obj.myServer.close();
     };
@@ -212,5 +235,5 @@ var mySuite = new UnitTestSuite(myTestName);
 mySuite.addTest(new HttpClientUnitTest());
 mySuite.run();
 
-print(">> Finished test suite '" + myTestName + "', return status = " + mySuite.returnStatus() + "");
+print(">> Finished test suite '" + myTestName + "', return status = " + mySuite.returnStatus() + ".");
 exit(mySuite.returnStatus());
