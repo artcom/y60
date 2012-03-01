@@ -48,6 +48,8 @@ y60_add_component(
     EXTERNS ${EXTERNALS} Boost 
 )
 
-# XXX Hangs (occasionally) on windows
-# y60_add_jstest(HttpServer mod_HttpServer)
+# XXX old implementation hangs (occasionally) on windows
+# see if this one is better
+y60_add_jstest(HttpServer mod_Async)
+y60_add_jstest(HttpClient mod_Async)
 
