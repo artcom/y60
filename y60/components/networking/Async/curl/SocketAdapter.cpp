@@ -1,18 +1,19 @@
 
 
-#include "CurlSocketInfo.h"
-#include "NetAsync.h"
+#include "SocketAdapter.h"
+#include "../NetAsync.h"
 
 namespace y60 {
 namespace async {
 namespace http {
+namespace curl {
     
-std::map<curl_socket_t, SocketPtr> CurlSocketInfo::_allSockets;
+std::map<curl_socket_t, SocketPtr> SocketAdapter::_allSockets;
 
-CurlSocketInfo::CurlSocketInfo(boost::asio::io_service & theIOService, CURLM * theCurlMultihandle) :
-    boost_socket(theIOService),
+SocketAdapter::SocketAdapter(MultiAdapter * pParent, CURLM * theCurlMultihandle) :
+    boost_socket(pParent->io),
     readyState(0),
-    _curlMulti(theCurlMultihandle)
+    _parent(pParent)
 { 
     AC_DEBUG << "creating socket " << this;
     boost_socket.open(boost::asio::ip::tcp::v4());
@@ -21,22 +22,21 @@ CurlSocketInfo::CurlSocketInfo(boost::asio::io_service & theIOService, CURLM * t
     AC_TRACE << "         socket is " << native();
 };
 
-CurlSocketInfo::~CurlSocketInfo() {
+SocketAdapter::~SocketAdapter() {
     /*
-    if ( read_in_progress.try_lock()) {
-        read_in_progress.unlock();
+    if ( op_in_progress.try_lock()) {
+        op_in_progress.unlock();
     } else {
         AC_TRACE << "read still in progress";
     }
     */
     // abort();
-    write_in_progress.unlock();
-    read_in_progress.unlock();
-    AC_TRACE << "CurlSocketInfo::DTOR socket " << this;
+    op_in_progress.unlock();
+    AC_TRACE << "SocketAdapter::DTOR socket " << this;
 };
 
 void
-CurlSocketInfo::handleOperations(SocketPtr s, curl_socket_t theCurlSocket) {
+SocketAdapter::handleOperations(SocketPtr s, curl_socket_t theCurlSocket) {
     AC_TRACE << "handleOperations: socket " << theCurlSocket << " is " << s->readyState;
     if (!s->boost_socket.is_open()) {
         return;
@@ -44,21 +44,23 @@ CurlSocketInfo::handleOperations(SocketPtr s, curl_socket_t theCurlSocket) {
     // NOTE: this will be called from one of io_service's threads
     switch (s->readyState) {
         case CURL_POLL_OUT:
-            if (s->write_in_progress.try_lock()) {
+            if (s->op_in_progress.try_lock()) {
                 AC_TRACE << "queuing write " << s->native();
                 s->boost_socket.async_write_some(
                         boost::asio::null_buffers(),
-                        boost::bind(&CurlSocketInfo::handleWrite, s,
-                            boost::asio::placeholders::error));
+                        s->_parent->_strand.wrap(
+                        boost::bind(&SocketAdapter::handleWrite, s,
+                            boost::asio::placeholders::error)));
             }
             break;
         case CURL_POLL_IN:
-            if (s->read_in_progress.try_lock()) {
+            if (s->op_in_progress.try_lock()) {
                 AC_TRACE << "queuing read " << s->native();
                 s->boost_socket.async_read_some(
                         boost::asio::null_buffers(),
-                        boost::bind(&CurlSocketInfo::handleRead, s,
-                            boost::asio::placeholders::error));
+                        s->_parent->_strand.wrap(
+                        boost::bind(&SocketAdapter::handleRead, s,
+                            boost::asio::placeholders::error)));
 
             }
             break;
@@ -73,11 +75,11 @@ CurlSocketInfo::handleOperations(SocketPtr s, curl_socket_t theCurlSocket) {
 
 
 void 
-CurlSocketInfo::handleRead(const boost::system::error_code& error) {
+SocketAdapter::handleRead(const boost::system::error_code& error) {
     Ptr self(shared_from_this());
     // NOTE: this will be called from one of io_service's threads
     AC_TRACE << "  doing read " << this << " on socket " << native() << " with error " << error;
-    read_in_progress.unlock();
+    op_in_progress.unlock();
     if (error != 0) {
         if (error == boost::asio::error::operation_aborted) {
             AC_TRACE << "Read aborted";
@@ -87,35 +89,31 @@ CurlSocketInfo::handleRead(const boost::system::error_code& error) {
         return;
     }
     int i;
-    CURLMcode myStatus = curl_multi_socket_action(_curlMulti, native(), CURL_CSELECT_IN, &i);
-    CurlMultiAdapter::checkCurlStatus(myStatus, PLUS_FILE_LINE);
+    CURLMcode myStatus = curl_multi_socket_action(_parent->_curlMulti, native(), CURL_CSELECT_IN, &i);
+    MultiAdapter::checkCurlStatus(myStatus, PLUS_FILE_LINE);
     AC_TRACE << "   done read " << this << " socket " << native();
-    CurlSocketInfo::handleOperations(self, native());
+    SocketAdapter::handleOperations(self, native());
 };
 
 void 
-CurlSocketInfo::handleWrite(const boost::system::error_code& error) {
+SocketAdapter::handleWrite(const boost::system::error_code& error) {
     Ptr self(shared_from_this());
     // NOTE: this will be called from one of io_service's threads
-    AC_TRACE << "  doing write " << this << " with error " << error;
-    write_in_progress.unlock();
-    if (error != 0) {
-        if (error == boost::asio::error::operation_aborted) {
-            AC_TRACE << "Read aborted";
-        } else {
-            AC_TRACE << "Read aborted with unknown error " << error;
-        }
-        return;
-    }
-    if (boost_socket.is_open()) {
+    AC_TRACE << "  doing write " << this << " with error " << error << " socket is " << native();
+    if (boost_socket.is_open() && error == 0) {
         int i;
-        CURLMcode myStatus = curl_multi_socket_action(_curlMulti, native(), CURL_CSELECT_OUT, &i);
-        CurlMultiAdapter::checkCurlStatus(myStatus, PLUS_FILE_LINE);
+        CURLMcode myStatus = curl_multi_socket_action(_parent->_curlMulti, native(), CURL_CSELECT_OUT, &i);
+        MultiAdapter::checkCurlStatus(myStatus, PLUS_FILE_LINE);
         AC_TRACE << "   done write " << this;
-        CurlSocketInfo::handleOperations(self, native());
     }
+    op_in_progress.unlock();
+
+    if (boost_socket.is_open() && error == 0) {
+        SocketAdapter::handleOperations(self, native());
+    } 
 };
 
+}
 }
 }
 }
