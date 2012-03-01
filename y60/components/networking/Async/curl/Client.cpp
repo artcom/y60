@@ -80,9 +80,7 @@ namespace curl {
         _jsOptsObject(theOpts),
         _myErrorBuffer(CURL_ERROR_SIZE, '\0'),
         _privateResponseBuffer(new Block()),
-        _myResponseBlock(new Block()),
-        _read_in_progress(false),
-        _write_in_progress(false)
+        _myResponseBlock(new Block())
     {
         _curlHandle = curl_easy_init();
         AC_DEBUG << "curl init " << curl_version();
@@ -114,10 +112,10 @@ namespace curl {
         s << "HttpClient::" << hex << this;
         s << " " << url;
         AC_DEBUG << "creating client " << this << " with _jsOptsObject " << _jsOptsObject;
-        _debugIdentifier = s.str();
+        debugIdentifier = s.str();
         setCurlOption<bool>(_jsOptsObject, "verbose", CURLOPT_VERBOSE, 0);
 
-        if(!JS_AddNamedRoot(_jsContext, &_jsOptsObject, _debugIdentifier.c_str())) {
+        if(!JS_AddNamedRoot(_jsContext, &_jsOptsObject, debugIdentifier.c_str())) {
             AC_WARNING << "failed to root request object!";
         }
     
@@ -134,7 +132,7 @@ namespace curl {
     Client::setWrapper(JSObject * theWrapper) {
         _jsWrapper = theWrapper;
         // add root to prevent garbage collection of client and its callbacks 
-        if(!JS_AddNamedRoot(_jsContext, &_jsWrapper, _debugIdentifier.c_str())) {
+        if(!JS_AddNamedRoot(_jsContext, &_jsWrapper, debugIdentifier.c_str())) {
             AC_WARNING << "failed to root request object!";
         }
     }
@@ -158,7 +156,7 @@ namespace curl {
         return std::string(_myResponseBlock->strbegin(), _myResponseBlock->strend());
     };
 
-    const asl::Ptr<asl::Block> &
+    asl::Ptr<asl::Block> 
     Client::getResponseBlock() const {
         return _myResponseBlock;
     };
@@ -191,7 +189,7 @@ JSA_CallFunctionName(JSContext * cx, JSObject * theThisObject, JSObject * theObj
         }
     }
     try {
-        AC_DEBUG << "cx:" << cx << ", obj:" << theObject << ", theName:" << theName << ", argc:" << argc << ", argv:" << argv << ", rval:" << rval;
+        AC_DEBUG << "cx:" << cx << ", this:" << theThisObject << ", obj:" << theObject << ", theName:" << theName << ", argc:" << argc << ", argv:" << argv << ", rval:" << rval;
         JSBool ok = JS_CallFunctionValue(cx, theThisObject, myValue, argc, argv, rval);
         if (!ok) {
             AC_DEBUG << "Exception while calling js function '" << theName << "'" << endl;
@@ -227,7 +225,7 @@ JSA_CallFunctionName(JSContext * cx, JSObject * theThisObject, JSObject * theObj
             };
         }
         theParent->removeClient(shared_from_this());
-        AC_DEBUG << "freeing root for " << _debugIdentifier;
+        AC_DEBUG << "freeing root for " << debugIdentifier;
         JS_RemoveRoot(_jsContext, &_jsOptsObject);
         JS_RemoveRoot(_jsContext, &_jsWrapper);
     }

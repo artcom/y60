@@ -81,9 +81,6 @@ namespace curl {
             asl::Ptr<asl::Block> _privateResponseBuffer; // filled in io_service thread, emptied in JS thread
             asl::ReadWriteLock _lockResponseBuffer; // lock for _privateResponseBuffer;
             asl::Ptr<asl::Block> _myResponseBlock; // used only in JS thread. 
-            bool _read_in_progress;
-            bool _write_in_progress;
-            std::string _debugIdentifier;
         public:
             /// creates a new HttpClient
             Client(JSContext * cx, JSObject * theOpts);
@@ -94,7 +91,8 @@ namespace curl {
             void onDone(MultiAdapter * parent, CURLcode result);
             void onProgress();
             std::string getResponseString() const;
-            const asl::Ptr<asl::Block> & getResponseBlock() const;
+            asl::Ptr<asl::Block> getResponseBlock() const;
+            std::string debugIdentifier;
             
             template<typename T>
             bool setCurlOption(JSObject* opts, std::string theProperty, CURLoption theCurlOption, T * theValue) {
