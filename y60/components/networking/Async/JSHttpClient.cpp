@@ -78,14 +78,9 @@ const unsigned READ_BUFFER_SIZE = 20000;
 
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-/*    DOC_BEGIN("Returns information on socket connection."); DOC_END;
-    const inet::Socket & mySocket = JSHttpClient::getJSWrapper(cx,obj).getNative();
-    std::string myStringRep = string("Socket [local ip: ") +
-        as_dotted_address(mySocket.getLocalAddress()) + ", port: " +
-        as_string(mySocket.getLocalPort()) + " | remote ip: " +
-        as_dotted_address(mySocket.getRemoteAddress()) + ", port: " +
-        as_string(mySocket.getRemotePort()) + "]";
-    *rval = as_jsval(cx, myStringRep);*/
+    DOC_BEGIN("Returns information on http client."); DOC_END;
+    const async::http::curl::Client & myClient = JSHttpClient::getJSWrapper(cx,obj).getNative();
+    *rval = as_jsval(cx, myClient.debugIdentifier);
     return JS_TRUE;
 }
 

@@ -33,8 +33,8 @@
 #ifndef _ac_y60_async_http_curl_socket_info_h
 #define _ac_y60_async_http_curl_socket_info_h
 
-#include <asl/base/Logger.h>
 #include <curl/curl.h>
+#include <asl/base/Logger.h>
 #include <boost/asio.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/enable_shared_from_this.hpp>
