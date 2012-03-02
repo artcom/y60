@@ -85,7 +85,6 @@ TimeTest.prototype.Constructor = function(self, theArguments) {
 
     var _overlay = null;
     var _height = 0;
-    var _width = 0;
 
     // setup
     Base.setup = self.setup;
@@ -96,17 +95,15 @@ TimeTest.prototype.Constructor = function(self, theArguments) {
         var mySyncExtension = new TimeSyncBarrier();
         window.addExtension(mySyncExtension);
         
-        _overlay = new Overlay(window.scene, [1,1,1,1], [0,0], [1, theHeight]); // theWidth, 1]);
+        _overlay = new Overlay(window.scene, [1,1,1,1], [0,0], [theWidth, theHeight/100]);
         _height = theHeight;
-        _width  = theWidth;
     }
 
     Base.onFrame = self.onFrame;
     self.onFrame = function(theTime) {
         Base.onFrame(theTime);
        
-       // _overlay.position.y = (theTime * (_height/2)) % _height; 
-       _overlay.position.x = (theTime * (_width)) % _width; 
+       _overlay.position.y = (theTime * (_height/2)) % _height; 
     }
 }
 
@@ -115,5 +112,5 @@ TimeTest.prototype.Constructor = function(self, theArguments) {
 //
 
 var ourTimeTest = new TimeTest();
-ourTimeTest.setup(1000, 250, "RendererExtensionTest");
+ourTimeTest.setup(250, 1000, "RendererExtensionTest");
 ourTimeTest.go();
