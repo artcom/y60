@@ -637,7 +637,9 @@ SDLWindow::getWindowTitle() const {
 void SDLWindow::setWinDeco(bool theWinDecoFlag) {
     if (_myDecorationFlag != theWinDecoFlag) {
         _myDecorationFlag = theWinDecoFlag;
-        updateSDLVideoMode();
+        if (_myVideoInitializedFlag) {
+            updateSDLVideoMode();
+        }
     }
 }
 
