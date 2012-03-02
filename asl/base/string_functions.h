@@ -118,6 +118,12 @@ namespace asl {
 
 
 
+    template <class T>
+    inline std::string as_hex(const T& x) {
+        std::ostringstream streamer;
+        streamer << std::hex << x;
+        return streamer.str();
+    }
 
     template <class T>
     T
