@@ -298,7 +298,11 @@ struct FixedVector  {
     // @}
 
 protected:
+#if __GNUC__ > 3
+    FixedVector_type val __attribute__((__may_alias__));
+#else
     FixedVector_type val;
+#endif
 };
 /*
 template <class RealType, int SIZE, class Number>

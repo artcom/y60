@@ -111,8 +111,8 @@ class EventDispatcherTest : public UnitTest, IEventSink {
         virtual void handle(EventPtr theEvent) {
             DB (cerr << "Handling " << theEvent->when
                     << ", should be " << _myExpectedEvents.front()->when << endl);
-            ENSURE( theEvent->when == _myExpectedEvents.front()->when);
-            ENSURE( theEvent->type == _myExpectedEvents.front()->type);
+            ENSURE_EQUAL( theEvent->when, _myExpectedEvents.front()->when);
+            ENSURE_EQUAL( theEvent->type, _myExpectedEvents.front()->type);
             _myExpectedEvents.pop_front();
         }
 
@@ -177,14 +177,14 @@ class EventDispatcherTest : public UnitTest, IEventSink {
                 dom::NodePtr myNode = myTestDocument.firstChild();
                 EventPtr myEvent = EventPtr(new Event(Event::KEY_UP, myNode));
                 EventPtr myExpectedEvent = EventPtr(new Event(Event::KEY_UP, 0.002));
-                ENSURE( myEvent->when.millis() == myExpectedEvent->when.millis());
+                ENSURE_EQUAL( myEvent->when.millis(), myExpectedEvent->when.millis());
             }
             {
                 dom::Node myTestDocument("<event type='test'/>");
                 dom::NodePtr myNode = myTestDocument.firstChild();
                 EventPtr myEvent = EventPtr(new Event(Event::KEY_UP, myNode));
                 EventPtr myExpectedEvent = EventPtr(new Event(Event::KEY_UP, 0));
-                ENSURE( myEvent->when.millis() == myExpectedEvent->when.millis());
+                ENSURE_EQUAL( myEvent->when.millis(), myExpectedEvent->when.millis());
             }
         }
 };
