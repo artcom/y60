@@ -228,24 +228,10 @@ void
 SDLWindow::onResize(Event & theEvent) {
     WindowEvent & myWindowEvent = dynamic_cast<WindowEvent&>(theEvent);
     AC_DEBUG << "Window Resize Event: " << myWindowEvent.width << "x" << myWindowEvent.height;
-#ifdef _WIN32
-    if (!_myDecorationFlag) {
-        // Sorry, in case of a non decorated window SDL seems to use getClientRect for getting the window size.
-        // This is wrong, because decorations are excluded, and so height and width are not right
-        // and the window is too small, use GetWindowRect instead. (VS)
-        SDL_SysWMinfo wminfo;
-        SDL_VERSION(&wminfo.version);
-        LPCTSTR myRenderGirlWindowName = _myWindowTitle.c_str();
-        HWND myRenderGirlWindow = FindWindow(0, myRenderGirlWindowName);
-        if (myRenderGirlWindow) {
-            RECT myRect;
-            GetWindowRect(myRenderGirlWindow, &myRect);
-            setVideoMode(myRect.right - myRect.left, myRect.bottom - myRect.top);
-        } else {
-            setVideoMode(myWindowEvent.width, myWindowEvent.height, false);
-        }
-    } else {
+    if (_myDecorationFlag && !_myFullscreenFlag 
+        && (myWindowEvent.width != _myWidth || myWindowEvent.height != _myHeight)) {
         unsigned myHeightOffset = 0;
+#ifdef _WIN32
         asl::Vector2i myScreenSize(0,0);
         myScreenSize = getScreenSize();
         // in case of a decorated window, that has a bigger height as the desktop,
@@ -253,22 +239,23 @@ SDLWindow::onResize(Event & theEvent) {
         if (myWindowEvent.height > (myScreenSize[1] - ourMagicDecorationHeight) || myWindowEvent.height/2.0  != myWindowEvent.height/2) {
             myHeightOffset = 1;
         }
-        setVideoMode(myWindowEvent.width, myWindowEvent.height - myHeightOffset, false);
-    }
-#else
-    setVideoMode(myWindowEvent.width, myWindowEvent.height, false);
 #endif
-    AbstractRenderWindow::onResize(theEvent);
+        setVideoMode(myWindowEvent.width, myWindowEvent.height - myHeightOffset, false);
+        AbstractRenderWindow::onResize(theEvent);
+    }
+    
 }
 
+void
+SDLWindow::unbindTextures() {
+    if (_myScene) {
+        // unbind all created textures while we still have a valid context
+        _myScene->getTextureManager()->unbindTextures();
+    }
+}
 
 void
 SDLWindow::initGL() {
-    if (_myScene) {
-        // unbind all created textures before creating a new context
-        _myScene->getTextureManager()->unbindTextures();
-    }
-    
     if (_myRenderer) {
         _myRenderer->initGL();
         ShaderLibraryPtr myShaderLibrary = dynamic_cast_Ptr<ShaderLibrary> (_myRenderer->getShaderLibrary());
@@ -303,7 +290,7 @@ SDLWindow::initGL() {
 void
 SDLWindow::updateSDLVideoMode() {
     unsigned int myFlags = 0;
-
+    AC_DEBUG << "setting SDL video mode decorations: " << _myDecorationFlag << " resizable: " << _myResizableFlag << " fullscreen: " << _myFullscreenFlag;
     myFlags |= SDL_OPENGL;
 
     if(!_myDecorationFlag) {
@@ -329,7 +316,7 @@ SDLWindow::updateSDLVideoMode() {
     asl::Vector2i myScreenSize = getScreenSize();
 
     asl::SystemInfo mySystemInfo;
-    if (!getenv("DISABLE_WINDOWS_7_FULLSCREEN_WORKAROUND") && 
+    if (!_myFullscreenFlag && !getenv("DISABLE_WINDOWS_7_FULLSCREEN_WORKAROUND") && 
         mySystemInfo.GetWindowsVersion() == asl::Windows7 && 
         myScreenSize[0] == _myWidth && myScreenSize[1] == _myHeight &&
         _myWindowPosX == 0 && _myWindowPosY == 0) {
@@ -366,11 +353,20 @@ void
 SDLWindow::setVideoMode(unsigned theTargetWidth, unsigned theTargetHeight,
                         bool theFullscreenFlag)
 {
-    _myWidth = theTargetWidth;
-    _myHeight = theTargetHeight;
-    _myFullscreenFlag = theFullscreenFlag;
-    if (_myVideoInitializedFlag) {
-        updateSDLVideoMode();
+    bool reinitGL = _myFullscreenFlag != theFullscreenFlag; //SDL resets gl context when toggling fullscreen mode
+    if (reinitGL || theTargetWidth != _myWidth || theTargetHeight != _myHeight) {
+        _myWidth = theTargetWidth;
+        _myHeight = theTargetHeight;
+        _myFullscreenFlag = theFullscreenFlag;
+        if (_myVideoInitializedFlag) {
+            if (reinitGL) {
+                unbindTextures();
+            }
+            updateSDLVideoMode();
+            if (reinitGL) {
+                initGL(); //XXX: handle shader and offscreen rendering here
+            }
+        }
     }
 }
 
@@ -378,7 +374,6 @@ void
 SDLWindow::initDisplay() {
     ensureVideoInitialized();
 
-    //setVideoMode(_myInitialWidth, _myInitialHeight, _myFullscreenFlag, true);
     setWindowTitle("Y60 Renderer");
 
     if (!_myFullscreenFlag) {
@@ -637,8 +632,12 @@ SDLWindow::getWindowTitle() const {
 void SDLWindow::setWinDeco(bool theWinDecoFlag) {
     if (_myDecorationFlag != theWinDecoFlag) {
         _myDecorationFlag = theWinDecoFlag;
+        _myResizableFlag = _myDecorationFlag;
         if (_myVideoInitializedFlag) {
+            unbindTextures();
             updateSDLVideoMode();
+             //SDL resets gl context when toggling fullscreen mode
+            initGL(); //XXX: handle shader and offscreen rendering here
         }
     }
 }

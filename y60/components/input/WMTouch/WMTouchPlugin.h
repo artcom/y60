@@ -16,6 +16,8 @@ class WMTouchPlugin : public asl::PlugInBase,
 
 private:
     EventPtrList _queuedEvents;
+    asl::Vector2f _calibrationPositionBottomLeft;
+    asl::Vector2f _calibrationPositionTopRight;
     bool _isRegistered;
     static HHOOK _msgHook;
     dom::DocumentPtr            _myEventSchemaDocument;
@@ -23,6 +25,7 @@ private:
     std::set<DWORD> _downCursors;
     HWND findSDLWindow();
     void onTouch(HWND hWnd, WPARAM wParam, LPARAM lParam);
+    dom::NodePtr getWMTouchSettings(dom::NodePtr theSettings);
     
 public:
 
@@ -38,7 +41,7 @@ public:
     JSFunctionSpec *StaticFunctions();
     JSPropertySpec *StaticProperties();
     
-    virtual void onUpdateSettings(dom::NodePtr theSettings) {}
+    virtual void onUpdateSettings(dom::NodePtr theSettings);
 // IRendererExtension
     virtual void onStartup(jslib::AbstractRenderWindow * theWindow) {
         HWND hWnd = findSDLWindow();

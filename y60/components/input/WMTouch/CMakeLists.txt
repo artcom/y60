@@ -5,7 +5,8 @@ set(SOURCES
 )
 
 set(HEADERS
-y60_wmtouch_settings.h
+    WMTouchPlugin.h
+    y60_wmtouch_settings.h
 )
 
 set(EXTERNS SDL)

@@ -16,6 +16,7 @@
 #include <y60/input/GenericEventSourceFilter.h>
 #include <y60/jsbase/JSWrapper.h>
 #include <y60/jsbase/JSNode.h>
+#include <y60/jsbase/JSVector.h>
 
 #include <SDL/SDL_syswm.h>
 #include <SDL/SDL.h>
@@ -61,7 +62,8 @@ WMTouchPlugin::WMTouchPlugin(DLHandle myDLHandle)
     CloseTouchInputHandle = (CloseTouchInputHandle_M) GetProcAddress(hMod, "CloseTouchInputHandle");
     registerStandardTypes(*_myEventValueFactory);
     registerSomTypes(*_myEventValueFactory);
-
+    _calibrationPositionBottomLeft = asl::Vector2f(0.0,0.0);
+    _calibrationPositionTopRight = asl::Vector2f(0.0,0.0);
 }
 
 WMTouchPlugin::~WMTouchPlugin() { 
@@ -94,7 +96,35 @@ WMTouchPlugin::setup(HWND theWindow) {
         // register message hook
         SetWindowsHookEx(WH_GETMESSAGE, GetMsgProc,(HINSTANCE) NULL, GetCurrentThreadId());    
     }
-};
+}
+
+void 
+WMTouchPlugin::onUpdateSettings(dom::NodePtr theSettings) {
+    dom::NodePtr mySettings = getWMTouchSettings(theSettings);
+    getConfigSetting( mySettings, "CalibrationPositionBottomLeft", _calibrationPositionBottomLeft, asl::Vector2f(0.0,0.0));
+    getConfigSetting( mySettings, "CalibrationPositionTopRight", _calibrationPositionTopRight, asl::Vector2f(0.0,0.0));
+}
+
+dom::NodePtr
+WMTouchPlugin::getWMTouchSettings(dom::NodePtr theSettings) {
+    dom::NodePtr mySettings;
+    if ( theSettings->nodeType() == dom::Node::DOCUMENT_NODE) {
+        if (theSettings->childNode(0)->nodeName() == "settings") {
+            mySettings = theSettings->childNode(0)->childNode("WMTouch", 0);
+        }
+    } else if ( theSettings->nodeName() == "settings") {
+        mySettings = theSettings->childNode("WMTouch", 0);
+    } else if ( theSettings->nodeName() == "WMTouch" ) {
+        mySettings = theSettings;
+    }
+
+    if ( ! mySettings ) {
+        throw Exception(
+            std::string("Could not find WMTouch node in settings: ") +
+            as_string( * theSettings), PLUS_FILE_LINE );
+    }
+    return mySettings;
+}
 
 LRESULT WINAPI 
 WMTouchPlugin::GetMsgProc(int nCode, WPARAM wParam, LPARAM lParam) {
@@ -132,8 +162,20 @@ WMTouchPlugin::onTouch(HWND hWnd, WPARAM wParam, LPARAM lParam) {
             GenericEventPtr myEvent(new GenericEvent("onWMTouch", _myEventSchemaDocument, _myEventValueFactory));
             NodePtr myNode = myEvent->getNode();
 
+            asl::Vector2f myPosition = product(Vector2f(static_cast<float>(ti.x), static_cast<float>(ti.y)), 0.01f);
+            asl::Vector2f myCalibratedRelativePosition = asl::Vector2f(0.0, 0.0);
+            float myWidth = _calibrationPositionTopRight[0] - _calibrationPositionBottomLeft[0];
+            float myHeight = _calibrationPositionTopRight[1] - _calibrationPositionBottomLeft[1];
+            if (myWidth != 0) {
+                myCalibratedRelativePosition[0] = (myPosition[0] - _calibrationPositionBottomLeft[0]) / myWidth;
+            }
+            if (myHeight != 0) {
+                myCalibratedRelativePosition[1] = (myPosition[1] - _calibrationPositionBottomLeft[1]) / myHeight;
+            }
+
             myNode->appendAttribute<int>("id", ti.dwID);
-            myNode->appendAttribute<Vector2f>("position", product(Vector2f(static_cast<float>(ti.x), static_cast<float>(ti.y)), 0.01f));
+            myNode->appendAttribute<Vector2f>("position", myPosition);
+            myNode->appendAttribute<Vector2f>("calibrated_relative_position", myCalibratedRelativePosition);
             if (ti.dwMask & TOUCHINPUTMASKF_CONTACTAREA) {
                 myNode->appendAttribute<Vector2f>("contactarea", product(Vector2f(static_cast<float>(ti.cxContact), static_cast<float>(ti.cyContact)), 0.01f));
             }
@@ -200,6 +242,30 @@ GetInstance() {
     }
 }
 
+static JSBool
+OnUpdateSettings(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    try {
+        WMTouchPlugin* myPlugin = GetInstance();
+
+        if (argc != 1) {
+            JS_ReportError(cx, "WMTouchPlugin::onUpdateSettings(): Wrong number of arguments. One (ConfigNode) expected");
+            return JS_FALSE;
+        }
+
+        dom::NodePtr myConfigNode;
+        if (JSVAL_IS_VOID(argv[0]) || !jslib::convertFrom(cx, argv[0], myConfigNode)) {
+            JS_ReportError(cx, "WMTouchPlugin::onUpdateSettings(): Argument #1 must be a node");
+            return JS_FALSE;
+        }
+
+        myPlugin->onUpdateSettings(myConfigNode);
+
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+
+    return JS_TRUE;
+}
+
 enum WMTouchPropertyNumbers {
     PROP_eventSchema = -100
 };
@@ -207,7 +273,7 @@ enum WMTouchPropertyNumbers {
 JSFunctionSpec *
 WMTouchPlugin::StaticFunctions() {
     static JSFunctionSpec myFunctions[] = {
-        // {"listenToUDP", ListenToUDP, 0},
+        {"onUpdateSettings", OnUpdateSettings, 1},
         {0}
     };
     return myFunctions;
