@@ -191,6 +191,7 @@ namespace y60 {
 
             SDLWindow & operator=(const SDLWindow &);
 
+            void unbindTextures();
             void initGL();
             void updateSDLVideoMode();
 
