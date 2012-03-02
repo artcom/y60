@@ -102,7 +102,7 @@ namespace dom {
                 std::string myError = "Bad magic reading Dictionary, thePos=";
                 myError += asl::as_string(thePos);
                 myError += ", myMagic=";
-                myError += asl::as_string((void*)myMagic);
+                myError += asl::as_string(asl::as_hex(myMagic));
                 throw FormatCorrupted(myError, PLUS_FILE_LINE, theOldPos);
             }
             asl::Unsigned64 myCount;
