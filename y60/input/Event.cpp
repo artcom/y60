@@ -79,7 +79,7 @@ namespace y60 {
 
     Event::Event(Type theType, const dom::NodePtr & theNode) :
         type(theType),
-        when(theNode->getAttributeValue<unsigned long long>("when", 0)/1.0e3)
+        when(0, theNode->getAttributeValue<unsigned long long>("when", 0)*1000)
     {
     }
 

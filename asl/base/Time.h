@@ -158,11 +158,23 @@ namespace asl {
                 /**
                  * Constructor.
                  * @param secs Number of seconds. If this has to be a absolute time,
-         *             the number of seconds since 1.1.1970 0:00.
+                 *    the number of seconds since 1.1.1970 0:00.
                  */
                 Time(const double secs) {
                         when.tv_sec=static_cast<long>(floor(secs));
                         when.tv_usec=static_cast<long>(fmod(secs, 1.0)*1.0e6);
+                }
+                /**
+                 * Constructor.
+                 * @param secs Number of seconds. 
+                 * @param secs Number of microseconds. 
+                 *
+                 * Note: If this has to be a absolute time,
+                 *    the number of seconds since 1.1.1970 0:00.
+                 */
+                Time(const long secs, long usecs) {
+                        when.tv_sec=secs+(usecs/1000000L);
+                        when.tv_usec=usecs;
                 }
                 /**
                  * Sets the instance to the current time (GMT).
