@@ -116,51 +116,11 @@ HttpServerUnitTest.prototype.Constructor = function (obj, theName) {
 
         obj.myServer.start("0.0.0.0", "4042");
 
-        obj.socket = new Socket(Socket.TCPCLIENT, "4041", "INADDR_ANY");
-        obj.socket.connect("localhost", "4042");
-
-        var myRequest = "GET /test HTTP/1.1\r\nHost: localhost:4042\r\n\r\n";
-        obj.socket.write(myRequest);
-
-        var time = millisec();
-        while (!obj.myServer.requestsPending() && (millisec() - time < TIMEOUT)) {
-        }
-
-        Async.onFrame();
-
-        time = millisec();
-        //UGLY
-        while (!(obj.socket.peek(1) > 0) && (millisec() - time < TIMEOUT)) {
-        }
-
-        obj.response = obj.socket.read();
-        obj.response = obj.response.substr(obj.response.search(/\r\n\r\n/) + 4);
-        ENSURE("obj.response == obj.callback_answer");
-
-        myRequest = "GET /somethingelse HTTP/1.1\r\nHost: localhost:4042\r\n\r\n";
-        obj.socket.connect("localhost", "4042");
-        obj.socket.write(myRequest);
-
-        time = millisec();
-        while (!obj.myServer.requestsPending() && (millisec() - time < TIMEOUT)) {
-        }
-
-        Async.onFrame();
-
-        time = millisec();
-        // ARGS UGLY!
-        while (!(obj.socket.peek(1) > 0) && (millisec() - time < TIMEOUT)) {
-        }
-
-        obj.response = obj.socket.read();
-        obj.response = obj.response.substr(obj.response.search(/\r\n\r\n/) + 4);
-        ENSURE("obj.response == '/somethingelse'");
-        
         // detailed responses
         
         // path: bar
         var myRequestManager  = new RequestManager();
-        myRequest = new Request("http://localhost:4042/bar");
+        var myRequest = new Request("http://localhost:4042/bar");
         myRequest.onDone = function () {
             obj.testResponse = this;
             ENSURE("obj.testResponse.responseCode == '201'");
