@@ -56,7 +56,7 @@
 //============================================================================= */
 
 #include "TimeSyncBarrier.h"
-
+#include <y60/glutil/GLUtils.h>
 
 using namespace std;
 using namespace asl;
@@ -66,8 +66,12 @@ using namespace y60;
 
 TimeSyncBarrier::TimeSyncBarrier(DLHandle theDLHandle) :
     PlugInBase(theDLHandle),
-    IRendererExtension("TimeSyncBarrier")
-{}
+    IRendererExtension("TimeSyncBarrier"),
+    _mySocket(0),
+    _myAddress("localhost"),
+    _myPort(3456)
+{
+}
 
 void
 TimeSyncBarrier::foo() {
@@ -75,7 +79,18 @@ TimeSyncBarrier::foo() {
 
 void
 TimeSyncBarrier::onStartup(jslib::AbstractRenderWindow * theWindow) {
+    // TODO:: 
+    //  - try to connect to the sync master
+    //  - setup blocking socket
+    
+    
+    // set abstractrenderwindow to external time mode
     theWindow->setUseExternalTimeSource(true);
+
+    unsigned long myRemoteHostAddress = asl::hostaddress(_myAddress);
+    _mySocket = inet::TCPClientSocketPtr(new inet::TCPClientSocket());
+    _mySocket->setRemoteAddr(myRemoteHostAddress, _myPort);
+    _mySocket->connect();
 }
 
 bool
@@ -97,9 +112,32 @@ TimeSyncBarrier::onPreRender(AbstractRenderWindow * theRenderer) {
 
 void
 TimeSyncBarrier::onPostRender(AbstractRenderWindow * theRenderer) {
+    // TODO:: 
+    //  - tell syncmaster that the current frame has been rendered 
+    //  - wait for master reply
+    //  - set application time
+   
+    std::string ready = "<?xml version='1.0' encoding='utf-8'?><ready/>";
+    _mySocket->send(ready.c_str(), ready.size());
     
-    double myTime = theRenderer->getFrameTime();
-    theRenderer->setFrameTime(myTime + 1.0/600.0);
+    char myBuffer[2048];
+    unsigned int readBytes = _mySocket->receive(&myBuffer, sizeof(myBuffer));
+    
+    std::string serverTime(myBuffer, readBytes); 
+    
+    glFlush();
+
+
+    dom::NodePtr myNode = dom::NodePtr(new dom::Node());
+    if (myNode->parseAll(serverTime)) {
+        dom::NodePtr myTimeNode = myNode->childNode("time", 0);
+        double myTime = asl::as<double>(myTimeNode->firstChild()->nodeValue());
+        theRenderer->setFrameTime(myTime);
+    
+    } else {
+        // TODO: process error
+    }
+
 }
 
 static JSBool

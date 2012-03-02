@@ -3,6 +3,9 @@
 #define __Y60_TIME_SYNC_BARRIER_INCLUDED__
 
 #include <asl/base/PlugInBase.h>
+#include <asl/net/TCPSocket.h>
+#include <asl/net/TCPClientSocket.h>
+#include <asl/net/net_functions.h>
 #include <y60/jslib/IRendererExtension.h>
 #include <y60/jslib/AbstractRenderWindow.h>
 #include <y60/jsbase/JSScriptablePlugin.h>
@@ -42,6 +45,11 @@ public:
     void onPreRender(jslib::AbstractRenderWindow * theRenderer);
     void onPostRender(jslib::AbstractRenderWindow * theRenderer);
     void foo();
+
+private:
+    inet::TCPClientSocketPtr _mySocket;
+    std::string        _myAddress;
+    asl::Unsigned16    _myPort;
 };
 
 #endif // __Y60_TIME_SYNC_BARRIER_INCLUDED__
