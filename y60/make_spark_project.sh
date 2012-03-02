@@ -50,7 +50,7 @@ echo "      - $PROJECT_NAME.js"
 # Find Skeleton.js
 SKELETON="$CHECKOUT_PATH/y60/js/spark/SparkSkeleton.js"
 if [ ! -e "$SKELETON" ]; then
-    echo "### ERROR: Could not find SparkSkeleton.js"
+    echo "### ERROR: Could not find SparkSkeleton.js in '$CHECKOUT_PATH/y60/js/spark/SparkSkeleton.js'"
     exit 1;
 fi
 
