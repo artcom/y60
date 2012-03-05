@@ -1085,10 +1085,8 @@ GC(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
     DOC_END;
     try {
         JSRuntime *rt;
-        uint32 preBytes;
 
         rt = cx->runtime;
-        preBytes = rt->gcBytes;
 #ifdef GC_MARK_DEBUG
         if (argc && JSVAL_IS_STRING(argv[0])) {
             string myName;

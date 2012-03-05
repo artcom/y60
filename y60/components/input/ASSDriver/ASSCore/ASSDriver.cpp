@@ -518,7 +518,6 @@ namespace y60 {
             for(unsigned y=0; y<height; y++) {
                 for(unsigned x=0; x<width; x++) {
                     asl::GRAY val = *(pixels + myResampledRaster.offset(x,y));
-                    asl::gray<unsigned char> threshold = static_cast<unsigned char>(_myComponentThreshold);
                     if( val.get() > _myComponentThreshold ){
                         //AC_PRINT << val;
                         _myTmpPositions.push_back( Vector2f(static_cast<float>(x/GRID_SCALE_X)
