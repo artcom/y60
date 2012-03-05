@@ -73,6 +73,7 @@
     #endif
     #include <windows.h>
     #undef max
+    #undef WIN32_LEAN_AND_MEAN
 #endif
 
 #define RENDERSTATE_GETTER_SETTER(THE_NAME) \

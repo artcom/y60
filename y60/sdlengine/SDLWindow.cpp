@@ -70,15 +70,7 @@
 
 #include <y60/jsbase/JScppUtils.h>
 
-#ifdef WIN32_LEAN_AND_MEAN
-#undef WIN32_LEAN_AND_MEAN
-#endif
-
 #include <SDL/SDL.h>
-
-#ifdef WIN32_LEAN_AND_MEAN
-#undef WIN32_LEAN_AND_MEAN
-#endif
 
 #ifdef WIN32
 static const int ourMagicDecorationHeight = 15;
