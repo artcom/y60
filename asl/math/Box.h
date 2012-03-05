@@ -601,7 +601,7 @@ namespace asl {
         }
         /** Returns the min point as a vector */
         const Vector3<Number> & getMinVector() const  {
-            return reinterpret_cast<const Vector3<Number> &>(this->val[MIN]);
+            return asVector(this->val[MIN]);
         }
         /** Returns the max point as a vector */
         const Vector3<Number> & getMaxVector() const  {

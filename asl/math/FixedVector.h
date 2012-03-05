@@ -65,7 +65,11 @@ template <int SIZE, class T>
 struct FixedVectorPOD {
     typedef FixedVectorPOD<SIZE, T> base_type;
     typedef T value_type;
+#if (((__GNUC__ * 100) + __GNUC_MINOR__) >= 303)
+    typedef T __attribute__((__may_alias__)) FixedVector_type[SIZE];
+#else
     typedef T FixedVector_type[SIZE];
+#endif
     typedef T * iterator;
     typedef const T * const_iterator;
     typedef std::size_t size_type;
@@ -111,7 +115,11 @@ struct FixedVector  {
     enum { SIZE = THE_SIZE };
     typedef FixedVector<SIZE, T> my_type;
     typedef T value_type;
+#if (((__GNUC__ * 100) + __GNUC_MINOR__) >= 303)
+    typedef T __attribute__((__may_alias__)) FixedVector_type[SIZE];
+#else
     typedef T FixedVector_type[SIZE];
+#endif
     typedef T * iterator;
     typedef const T * const_iterator;
     typedef std::size_t size_type;
@@ -298,11 +306,7 @@ struct FixedVector  {
     // @}
 
 protected:
-#if __GNUC__ > 3
-    FixedVector_type val __attribute__((__may_alias__));
-#else
     FixedVector_type val;
-#endif
 };
 /*
 template <class RealType, int SIZE, class Number>
