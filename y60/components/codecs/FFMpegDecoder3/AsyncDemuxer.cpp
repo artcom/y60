@@ -68,9 +68,7 @@ AsyncDemuxer::run() {
             int ret = av_read_frame(_myFormatContext, myPacket);
             DB(AC_TRACE << "---AsyncDemuxer::av_read_frame ret: "<<ret);
             if (ret < 0) {
-                if (ret == AVERROR_EOF) {
-                    AC_DEBUG << "---AsyncDemuxer::run: EOF end of file. stream_index: "<<myPacket->stream_index;
-                }
+                AC_DEBUG << "---AsyncDemuxer::run: EOF end of file. stream_index: "<<myPacket->stream_index;
                 std::map<int, PacketQueuePtr>::iterator it = _myPacketQueues.find(myPacket->stream_index);
                 if ( it != _myPacketQueues.end()) {
                     PacketMsgPtr p = PacketMsgPtr(new PacketMsg());
