@@ -221,7 +221,7 @@ SDLWindow::onResize(Event & theEvent) {
     WindowEvent & myWindowEvent = dynamic_cast<WindowEvent&>(theEvent);
     AC_DEBUG << "Window Resize Event: " << myWindowEvent.width << "x" << myWindowEvent.height;
     if (_myDecorationFlag && !_myFullscreenFlag 
-        && (myWindowEvent.width != _myWidth || myWindowEvent.height != _myHeight)) {
+        && (static_cast<unsigned int>(myWindowEvent.width) != _myWidth || static_cast<unsigned int>(myWindowEvent.height) != _myHeight)) {
         unsigned myHeightOffset = 0;
 #ifdef _WIN32
         asl::Vector2i myScreenSize(0,0);
