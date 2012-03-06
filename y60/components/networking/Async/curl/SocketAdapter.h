@@ -54,7 +54,9 @@ class SocketAdapter : public boost::noncopyable, public boost::enable_shared_fro
         curl_socket_t native() { return boost_socket.native(); };
         boost::asio::ip::tcp::socket boost_socket;
         int readyState;
-        boost::mutex op_in_progress;
+        bool read_in_progress;
+        bool write_in_progress;
+        boost::mutex op_in_progress_;
         void handleRead(const boost::system::error_code& error);
         void handleWrite(const boost::system::error_code& error);
         static void handleOperations(Ptr s, curl_socket_t theCurlSocket);
