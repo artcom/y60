@@ -40,6 +40,7 @@
 
 #ifdef LINUX
   #include <sys/types.h>
+  #include <sys/syscall.h>
 #endif
 
 #define DB(x) // x;
@@ -278,8 +279,10 @@ namespace asl {
         return GetCurrentThreadId();
 #elif OSX
         return pthread_mach_thread_np(pthread_self());
+#elif LINUX
+        return syscall(SYS_gettid);
 #else
-        return getpid();
+        return pthread_self(); // for future use
 #endif
     }
 
