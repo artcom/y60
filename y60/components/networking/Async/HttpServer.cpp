@@ -237,6 +237,7 @@ namespace http {
                 if (curReply.headers.find("Content-Type") == curReply.headers.end()) {
                     curReply.headers.insert(make_pair("Content-Type", "text/plain"));
                 }
+                AC_TRACE << "JS Handler returned, queuing write for " << curRequest.conn;
                 curRequest.conn->async_respond(curReply); // this is threadsafe
                 curRequest.conn.reset(); // free shared_ptr
             }

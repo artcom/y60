@@ -11,10 +11,13 @@
 #ifndef HTTP_SERVER_REPLY_HPP
 #define HTTP_SERVER_REPLY_HPP
 
+#include "y60_netasync_settings.h" 
+
+#include "HttpHeader.h"
+
 #include <string>
 #include <vector>
 #include <boost/asio.hpp>
-#include "HttpHeader.h"
 
 namespace y60 {
 namespace async {

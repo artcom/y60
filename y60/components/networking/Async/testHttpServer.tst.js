@@ -88,8 +88,7 @@ HttpServerUnitTest.prototype.Constructor = function (obj, theName) {
                 return thePath;
             },
             detailed_response : function (theMethod, theBody, thePath) {
-                return ["I have headers", "304", {
-                    "Content-Length" : "5",
+                return ["Hello", "202", {
                     "X-PRODUCED-BY" : "Y60"
                 }];
             },
@@ -132,24 +131,25 @@ HttpServerUnitTest.prototype.Constructor = function (obj, theName) {
 
         myRequestManager.performRequest(myRequest);
         while (myRequestManager.activeCount > 0) {
-            myRequestManager.handleRequests();
             Async.onFrame();
+            myRequestManager.handleRequests();
         }
 
         // path: foo
         myRequest = new Request("http://localhost:4042/foo");
         myRequest.onError = function () {
             obj.testResponse = this;
-            ENSURE("obj.testResponse.responseCode == '304'");
+            ENSURE("obj.testResponse.responseCode == '202'");
             ENSURE("obj.testResponse.getResponseHeader('Content-Type') == 'text/plain'");
             ENSURE("obj.testResponse.getResponseHeader('X-PRODUCED-BY') == 'Y60'");
         };
+        myRequest.verbose = true;
         myRequest.get();
         
         myRequestManager.performRequest(myRequest);
         while (myRequestManager.activeCount > 0) {
-            myRequestManager.handleRequests();
             Async.onFrame();
+            myRequestManager.handleRequests();
         }
 
         // path: krokodil
@@ -183,11 +183,10 @@ HttpServerUnitTest.prototype.Constructor = function (obj, theName) {
             myRequestManager.handleRequests();
             Async.onFrame();
         }
-        
 
         // now we do multiple concurrent requests
         // set up 100 requests
-        for (var i = 1; i < 100; ++i) {
+        for (var i = 1; i < 50; ++i) {
             (function() {
                 var p = i;
                 myRequest = new Request("http://localhost:4042/"+i);
@@ -195,6 +194,7 @@ HttpServerUnitTest.prototype.Constructor = function (obj, theName) {
                     obj.testResponse = this;
                     ENSURE("obj.testResponse.responseString == '/"+p+"'");
                 };
+                myRequest.verbose = true;
             })();
             myRequest.get();
             myRequestManager.performRequest(myRequest);
@@ -202,6 +202,7 @@ HttpServerUnitTest.prototype.Constructor = function (obj, theName) {
 
         // handle them all
         while (myRequestManager.activeCount > 0) {
+            msleep(100);
             myRequestManager.handleRequests();
             Async.onFrame();
         }

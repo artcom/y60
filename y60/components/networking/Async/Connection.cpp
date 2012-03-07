@@ -22,9 +22,11 @@ connection::connection(boost::asio::io_service& io_service, ConcurrentQueue<requ
     request_queue(theRequestQueue),
     socket_(io_service)
 {
+    AC_TRACE << "Connection CTOR " << this;
 }
 
 connection::~connection() {
+    AC_TRACE << "Connection DTOR " << this;
 }
 
 boost::asio::ip::tcp::socket& connection::socket()
@@ -34,6 +36,7 @@ boost::asio::ip::tcp::socket& connection::socket()
 
 void connection::start()
 {
+  AC_TRACE << "starting to read " << this;
   socket_.async_read_some(boost::asio::buffer(buffer_),
       strand_.wrap(
         boost::bind(&connection::handle_read, shared_from_this(),
@@ -42,7 +45,9 @@ void connection::start()
 }
 
 void connection::async_respond(const reply & r) {
+    AC_TRACE << "queuing response " << this;
     reply_ = r;
+    AC_TRACE << "replay: '" << reply_.content << "'";
     boost::asio::async_write(socket_, reply_.to_buffers(),
             strand_.wrap(
                 boost::bind(&connection::handle_write, shared_from_this(),
@@ -53,6 +58,7 @@ void connection::async_respond(const reply & r) {
 void connection::handle_read(const boost::system::error_code& e,
     std::size_t bytes_transferred)
 {
+  AC_TRACE << "read completed " << e << " for " << this;
   if (!e)
   {
     boost::tribool result;
@@ -62,12 +68,14 @@ void connection::handle_read(const boost::system::error_code& e,
 
     if (result)
     {
+      AC_TRACE << "queuing request to JS " << this;
       request_.conn = shared_from_this();
       request_queue.push(request_);
       request_.conn.reset();
     }
     else if (!result)
     {
+        AC_TRACE << "queuing write bad_request " << this;
       reply_ = reply::stock_reply(reply::bad_request);
       boost::asio::async_write(socket_, reply_.to_buffers(),
           strand_.wrap(
@@ -76,6 +84,7 @@ void connection::handle_read(const boost::system::error_code& e,
     }
     else
     {
+      AC_TRACE << "need to read more: queuing again " << this;
       socket_.async_read_some(boost::asio::buffer(buffer_),
           strand_.wrap(
             boost::bind(&connection::handle_read, shared_from_this(),
@@ -92,6 +101,7 @@ void connection::handle_read(const boost::system::error_code& e,
 
 void connection::handle_write(const boost::system::error_code& e)
 {
+  AC_TRACE << "response done. Closing connection " << e << " for " << this;
   if (!e)
   {
     // Initiate graceful connection closure.

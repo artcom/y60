@@ -35,24 +35,25 @@
 #ifndef _ac_y60_async_http_client_h
 #define _ac_y60_async_http_client_h
 
-#include "SocketAdapter.h"
+#include "../y60_netasync_settings.h" 
 
-#ifdef WIN32
-#include <winsock2.h>
-#endif
+#include "SocketAdapter.h"
 
 #include <asl/net/UDPConnection.h>
 #include <asl/dom/Nodes.h>
+#include <asl/base/ReadWriteLock.h>
+
+#include <netsrc/spidermonkey/jsapi.h>
+
+#include <y60/jsbase/JSWrapper.h>
+
+#include <map>
 
 #include <boost/thread.hpp>
 #include <boost/asio.hpp>
 #include <boost/enable_shared_from_this.hpp>
-#include <map>
 
 #include <curl/curl.h>
-#include <asl/base/ReadWriteLock.h>
-#include <netsrc/spidermonkey/jsapi.h>
-#include <y60/jsbase/JSWrapper.h>
 
 namespace y60 {
 namespace async {

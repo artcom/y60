@@ -36,14 +36,15 @@
 #ifndef _ac_y60_async_net_async_h
 #define _ac_y60_async_net_async_h
 
+#include "y60_netasync_settings.h" 
 #include "curl/MultiAdapter.h"
-
-#include <boost/asio.hpp>
-#include <boost/thread.hpp>
 
 #include <asl/base/PlugInBase.h>
 #include <y60/jsbase/IScriptablePlugin.h>
 #include <y60/jslib/IRendererExtension.h>
+
+#include <boost/asio.hpp>
+#include <boost/thread.hpp>
 
 namespace y60 {
 

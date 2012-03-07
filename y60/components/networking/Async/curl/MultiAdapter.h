@@ -33,12 +33,15 @@
 #ifndef _ac_y60_async_http_curl_multi_adapter_h
 #define _ac_y60_async_http_curl_multi_adapter_h
 
-#include <curl/curl.h>
+#include "../y60_netasync_settings.h" 
+
 #include "SocketAdapter.h"
 
 #include <asl/base/Logger.h>
-#include <boost/asio.hpp>
+
 #include <set>
+#include <curl/curl.h>
+#include <boost/asio.hpp>
 
 namespace y60 {
 namespace async {

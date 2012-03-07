@@ -11,15 +11,18 @@
 #ifndef HTTP_SERVER_CONNECTION_HPP
 #define HTTP_SERVER_CONNECTION_HPP
 
+#include "y60_netasync_settings.h" 
+
+#include "Reply.h"
+#include "Request.h"
+#include "RequestParser.h"
+#include "ConcurrentQueue.h"
+
 #include <boost/asio.hpp>
 #include <boost/array.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
-#include "Reply.h"
-#include "Request.h"
-#include "RequestParser.h"
-#include "ConcurrentQueue.h"
 
 namespace y60 {
 namespace async {
