@@ -35,9 +35,9 @@
 
 #include "../y60_netasync_settings.h" 
 
-#include <curl/curl.h>
 #include <asl/base/Logger.h>
 
+#include <curl/curl.h>
 #include <boost/asio.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/enable_shared_from_this.hpp>
