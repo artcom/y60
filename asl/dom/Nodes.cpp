@@ -2415,17 +2415,12 @@ dom::Node::parseSystemAttributes(const String & is, int pos, int end_pos, const 
 
         if (myAttributeName.size()) {
             std::string myDecodedData = entity_decode_data(myAttributeValue, par_end, doctype);
-            bool isSystemAttribute = false;
 
             if (myAttributeName == XSI_SCHEMALOCATION ||
                 myAttributeName == XSI_NONAMESPACESCHEMALOCATION) {
                 if (_myParent) {
                     _myParent->loadSchemas(myDecodedData);
                 }
-                isSystemAttribute = true;
-            }
-            if (myAttributeName.find(XMLNS) == 0) {
-                isSystemAttribute = true;
             }
         }
         pos = par_end;
