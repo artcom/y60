@@ -37,10 +37,10 @@
 
 #include "SocketAdapter.h"
 
+#include <curl/curl.h>
 #include <asl/base/Logger.h>
 
 #include <set>
-#include <curl/curl.h>
 #include <boost/asio.hpp>
 
 namespace y60 {
