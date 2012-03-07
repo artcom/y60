@@ -10,7 +10,9 @@
 //////////////////////////////////////////////////////////////////////
 #define BUFSIZE 80
 
+#ifndef VER_SUITE_WH_SERVER
 #define VER_SUITE_WH_SERVER 0x8000
+#endif
 
 typedef void (WINAPI *PGetNativeSystemInfo)(LPSYSTEM_INFO);
 

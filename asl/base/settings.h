@@ -185,7 +185,7 @@ namespace asl {
 #endif
 
 #ifdef _WIN32
-    #define _WINSOCKAPI_   /* Prevent inclusion of winsock.h in windows.h */
+    #define WIN32_LEAN_AND_MEAN  /* Prevent inclusion of winsock.h in windows.h */
 #endif
 
 //#define PROFILING_LEVEL_NORMAL 1

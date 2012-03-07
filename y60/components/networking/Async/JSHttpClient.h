@@ -36,6 +36,8 @@
 #ifndef _ac_y60_async_http_js_http_client_h
 #define _ac_y60_async_http_js_http_client_h
 
+#include "y60_netasync_settings.h" 
+
 #include "curl/Client.h"
 #include <y60/jsbase/JSWrapper.h>
 

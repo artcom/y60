@@ -45,15 +45,12 @@
 
 #include "TraceUtils.h"
 
-#define _WINSOCKAPI_ // prevent winsock.h #include's
-
 #include <crtdbg.h>
 #if _MSC_VER > 1000
 #pragma once
 #endif // _MSC_VER > 1000
 
 // Exclude rarely-used stuff from Windows headers
-//#define WIN32_LEAN_AND_MEAN
 //#define VC_EXTRALEAN
 
 #ifndef _WIN32_WINNT

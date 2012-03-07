@@ -31,6 +31,10 @@
   #include <unistd.h>
 #endif
 
+#ifdef _WIN32
+#include <Oleauto.h>
+#endif
+
 using namespace std;
 using namespace asl;
 

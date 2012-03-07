@@ -27,6 +27,10 @@
 #include <stdlib.h>
 #include <math.h>
 
+#ifdef _WIN32
+#include <Oleauto.h>
+#endif
+
 using namespace std;
 
 namespace asl {
