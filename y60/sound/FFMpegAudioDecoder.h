@@ -76,7 +76,7 @@ struct ReSampleContext;
 
 namespace y60 {
 
-class FFMpegAudioDecoderFactory;
+class Y60_SOUND_DECL FFMpegAudioDecoderFactory;
 
 class Y60_SOUND_DECL FFMpegAudioDecoder: public IAudioDecoder
 {
@@ -118,7 +118,7 @@ class Y60_SOUND_DECL FFMpegAudioDecoder: public IAudioDecoder
 
 };
 
-class FFMpegAudioDecoderFactory: public IAudioDecoderFactory
+class Y60_SOUND_DECL FFMpegAudioDecoderFactory: public IAudioDecoderFactory
 {
     public:
         FFMpegAudioDecoderFactory();

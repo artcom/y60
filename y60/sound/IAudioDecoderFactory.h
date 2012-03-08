@@ -72,7 +72,7 @@ namespace y60 {
 DEFINE_EXCEPTION(DecoderException, asl::Exception);
 DEFINE_EXCEPTION(FileNotFoundException, asl::Exception);
 
-class IAudioDecoderFactory
+class Y60_SOUND_DECL IAudioDecoderFactory
 {
     public:
         // Throws a decoder exception if not successful.
