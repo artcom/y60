@@ -383,6 +383,10 @@ unsigned FFMpegAudioDecoder::getNumChannels() {
 }
 
 FFMpegAudioDecoderFactory::FFMpegAudioDecoderFactory() {
+    AC_INFO << "Soundmanager: using " << LIBAVCODEC_IDENT << endl;
+    av_log_set_level(AV_LOG_ERROR);
+    av_register_all();
+
 }
 
 IAudioDecoder* FFMpegAudioDecoderFactory::tryCreateDecoder(const std::string& myURI)

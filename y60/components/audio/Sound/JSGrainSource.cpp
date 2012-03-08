@@ -81,7 +81,9 @@ namespace jslib {
             JS_ReportError(cx, "loadSoundFile: argument 1 is not a string");
             return JS_FALSE;
         }
-        IAudioDecoder* myDecoder = new FFMpegAudioDecoder(mySoundFile);
+        FFMpegAudioDecoderFactory myDecoderFactory;
+
+        IAudioDecoder* myDecoder = myDecoderFactory.tryCreateDecoder(mySoundFile);
         JSGrainSource::OWNERPTR myNative;
         convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 

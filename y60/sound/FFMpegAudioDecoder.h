@@ -76,10 +76,11 @@ struct ReSampleContext;
 
 namespace y60 {
 
+class FFMpegAudioDecoderFactory;
+
 class Y60_SOUND_DECL FFMpegAudioDecoder: public IAudioDecoder
 {
     public:
-        FFMpegAudioDecoder (const std::string& myURI);
         virtual ~FFMpegAudioDecoder();
 
         virtual unsigned getSampleRate();
@@ -95,6 +96,8 @@ class Y60_SOUND_DECL FFMpegAudioDecoder: public IAudioDecoder
         virtual bool decode();
 
     private:
+        friend class FFMpegAudioDecoderFactory;
+        FFMpegAudioDecoder (const std::string& myURI); // should only be created by the factory
         void open();
         void close();
 

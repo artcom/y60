@@ -98,9 +98,10 @@ public:
                   mySampleFormat,
                   mySampleRate, 2,
                   myGrainSize));
+    
+              FFMpegAudioDecoderFactory myDecoderFactory;
 
-              IAudioDecoder* myDecoder =
-                  new FFMpegAudioDecoder(mySoundFile);
+              IAudioDecoder* myDecoder = myDecoderFactory.tryCreateDecoder(mySoundFile);
               myDecoder->setSampleSink(myGrainSource.get());
               myGrainSource->clearAudioData();
               myDecoder->decodeEverything();
