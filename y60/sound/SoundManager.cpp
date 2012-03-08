@@ -62,6 +62,23 @@
 #include "FFMpegAudioDecoder.h"
 #include "CacheReader.h"
 
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+
+extern "C" {
+#ifdef OSX
+#   include <libavformat/avformat.h>
+#else
+#   if defined(_MSC_VER)
+#       pragma warning (push, 1)
+#   endif //defined(_MSC_VER)
+#   include <avformat.h>
+#   if defined(_MSC_VER)
+#       pragma warning (pop)
+#   endif //defined(_MSC_VER)
+#endif
+}
+
+
 #include <asl/base/Logger.h>
 #include <asl/audio/Pump.h>
 #include <asl/base/Auto.h>

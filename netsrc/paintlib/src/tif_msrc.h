@@ -23,12 +23,12 @@ extern TIFF* TIFFOpenMem (unsigned char* pData,
 typedef struct
 {
   unsigned char* pData;
-  int    CurPos;
-  int    MaxFileSize;
+  tsize_t  CurPos;
+  tsize_t  MaxFileSize;
   // used when open for reading
-  int    rFileSize;
+  tsize_t  rFileSize;
   // not NULL when open for writing
-  int*   pFileSize;
+  tsize_t* pFileSize;
   char   mode[2];
 }
 MemSrcTIFFInfo;

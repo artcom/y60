@@ -99,14 +99,14 @@ _tiffSeekProc(thandle_t fd, toff_t off, int whence)
 	switch(whence)
 	{
 		case 1:
-			pInfo->CurPos += off;
+			pInfo->CurPos += (tsize_t)off;
 			break;
 		case 2:
-			pInfo->CurPos = *pInfo->pFileSize - off;
+			pInfo->CurPos = *pInfo->pFileSize - (tsize_t)off;
 			break;
 		case 0:
 		default:
-			pInfo->CurPos = off;
+			pInfo->CurPos = (tsize_t)off;
 			break;
 	}
 	CHECKNEWSIZE;

@@ -105,7 +105,7 @@ set_target_properties(
 )
 if (WIN32)
     # disable a bunch of warnings inside of spidermonkey - we assume they know what they're doing
-    ac_add_target_properties(spidermonkey COMPILE_FLAGS "/wd4055 /wd4214 /wd4127 /wd4706 /wd4202 /wd4100 /wd4244 /wd4702 /wd4131 /wd4100 /wd4232 /wd4214")
+    ac_add_target_properties(spidermonkey COMPILE_FLAGS "/wd4055 /wd4214 /wd4127 /wd4706 /wd4202 /wd4100 /wd4244 /wd4702 /wd4131 /wd4100 /wd4232 /wd4214 /wd4700")
 endif (WIN32)
 
 

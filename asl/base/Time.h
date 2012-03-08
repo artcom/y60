@@ -168,9 +168,9 @@ namespace asl {
                  * Note: If this has to be a absolute time,
                  *    the number of seconds since 1.1.1970 0:00.
                  */
-                Time(const long secs, long usecs) {
-                        when.tv_sec=secs+(usecs/1000000L);
-                        when.tv_usec=usecs;
+                Time(long secs, long long usecs) {
+                        when.tv_sec=secs+static_cast<long>(usecs/1000000LL);
+                        when.tv_usec=static_cast<long>(usecs % 1000000LL);
                 }
                 /**
                  * Sets the instance to the current time (GMT).

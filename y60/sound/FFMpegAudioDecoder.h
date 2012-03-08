@@ -71,33 +71,8 @@
 #define EMULATE_INTTYPES
 #endif
 
-extern "C" {
-#ifdef OSX
-#   include <libavformat/avformat.h>
-#else
-#   if defined(_MSC_VER)
-#       pragma warning (push, 1)
-#   endif //defined(_MSC_VER)
-#   include <avformat.h>
-#   if defined(_MSC_VER)
-#       pragma warning (pop)
-#   endif //defined(_MSC_VER)
-#endif
-}
-
-#ifndef AV_VERSION_INT
-#define AV_VERSION_INT(a,b,c) (a<<16 | b<<8 | c)
-#endif
-
-// ffmpeg defines this
-#ifdef SampleFormat
-#   ifdef _WIN32
-#       pragma message("undefing polluting SampleFormat from ffmpeg")
-#   else
-#       //warning undefing polluting SampleFormat from ffmpeg
-#   endif
-#undef SampleFormat
-#endif
+struct AVFormatContext;
+struct ReSampleContext;
 
 namespace y60 {
 

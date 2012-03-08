@@ -87,8 +87,6 @@ public:
           unsigned mySampleRate = Pump::get().getNativeSampleRate();
           asl::SampleFormat mySampleFormat = Pump::get().getNativeSampleFormat();
 
-          av_register_all(); // never forget :)
-
           for (unsigned i = 1; i <= 10; i++) {
               unsigned myGrainSize = 2*i;
               //unsigned myGrainRate = i;
