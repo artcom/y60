@@ -153,7 +153,7 @@ void EncodeData (png_structp png_ptr, png_bytep data, png_size_t length)
 {
   PLPNGEncoder *pClass;
 
-  pClass = (PLPNGEncoder *)(png_ptr->io_ptr);
+  pClass = (PLPNGEncoder *)(png_get_io_ptr(png_ptr));
 
   PLASSERT (pClass);
   PLDataSink * pSink = pClass->GetDataSink();
@@ -216,7 +216,7 @@ void PLPNGEncoder::DoEncode (PLBmpBase * pBmp, PLDataSink* pDataSnk)
   /* Set error handling.  REQUIRED if you aren't supplying your own
    * error handling functions in the png_create_write_struct() call.
    */
-  if (setjmp(png_ptr->jmpbuf))
+  if (setjmp(png_jmpbuf(png_ptr)))
   {
     /* If we get here, we had a problem reading the file */
     /* close the file */
