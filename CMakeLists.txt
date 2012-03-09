@@ -22,7 +22,7 @@ find_package(AcMake)
 # declare our packaging solution
 ac_begin_solution(
     PRO60
-    VERSION_MAJOR 1 VERSION_MINOR 0 VERSION_PATCH 5
+    VERSION_MAJOR 1 VERSION_MINOR 0 VERSION_PATCH 6
     DESCRIPTION  "PRO60 Environment"
     VENDOR       "ART+COM Technologies GmbH"
     CONTACT      "y60@artcom.de"
