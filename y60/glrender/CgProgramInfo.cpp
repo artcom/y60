@@ -110,25 +110,6 @@ using namespace dom;
 
 namespace y60 {
 
-    // a little help for the compiler to find our << operator in the asl namespace
-    std::ostream & operator<<(std::ostream & os, const std::vector<float> & t) {
-        return asl::operator<<(os,t);
-    }
-    std::ostream & operator<<(std::ostream & os, const std::vector<string> & t) {
-        return asl::operator<<(os,t);
-    }
-    std::ostream & operator<<(std::ostream & os, const std::vector<const char*> & t) {
-        os << "[array size ="<<t.size()<<"]"<<endl;
-        for (unsigned i = 0; i < t.size(); ++i) {
-            if (t[i]) {
-                os << "'" << t[i] << "'" << endl;
-            } else {
-                os << "(NULL)" << endl;
-            }
-        }
-        return os;
-    }
-
     void
     assertCg(const std::string & theWhere, const CGcontext theCgContext) {
         CGerror myCgError = cgGetError();
