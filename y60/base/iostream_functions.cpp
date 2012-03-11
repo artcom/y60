@@ -73,7 +73,9 @@
 #include <iostream>
 #include <string>
 
-namespace asl {
+using namespace asl;
+
+namespace y60 {
 
     template <class T>
     std::ostream &
@@ -181,7 +183,8 @@ namespace asl {
 
         return theStream;
     }
-
+}
+namespace dom {
     std::ostream &
     operator << (std::ostream & theStream, const dom::ResizeableVector & theVector) {
         theStream << "[";

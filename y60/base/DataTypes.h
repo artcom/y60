@@ -81,12 +81,10 @@
 #include <vector>
 
 namespace y60 {
-
-	Y60_BASE_DECL void registerSomImageTypes(dom::ValueFactory & theFactory);
-	Y60_BASE_DECL void registerSomMathTypes(dom::ValueFactory & theFactory);
-	Y60_BASE_DECL void registerSomVectorTypes(dom::ValueFactory & theFactory);
+    Y60_BASE_DECL void registerSomImageTypes(dom::ValueFactory & theFactory);
+    Y60_BASE_DECL void registerSomMathTypes(dom::ValueFactory & theFactory);
+    Y60_BASE_DECL void registerSomVectorTypes(dom::ValueFactory & theFactory);
     Y60_BASE_DECL void registerSomTypes(dom::ValueFactory & theFactory);
-
 }
 
 namespace dom {

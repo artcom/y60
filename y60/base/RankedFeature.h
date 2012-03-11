@@ -110,10 +110,6 @@ namespace y60 {
     };
     */
 
-}
-
-namespace asl {
-
     Y60_BASE_DECL std::ostream & operator << (std::ostream & theStream, const y60::RankedFeature & theRankedFeature);
     Y60_BASE_DECL std::istream & operator >> (std::istream & theStream, y60::RankedFeature & theRankedFeature);
 }

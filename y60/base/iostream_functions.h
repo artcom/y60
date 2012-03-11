@@ -68,7 +68,7 @@
 #include <asl/base/Block.h>
 #include <asl/dom/Value.h>
 
-namespace asl {
+namespace y60 {
 
     template <class T>
     std::istream & parseVector(std::istream & is, std::vector<T> & v) {
@@ -102,7 +102,9 @@ namespace asl {
         }
         return is;
     }
+}
 
+namespace std {
     template <class T>
     std::ostream & operator<<(std::ostream & os, const std::vector<T> & t) {
         return asl::printVector(os,t,t.size()>4);
@@ -110,9 +112,10 @@ namespace asl {
 
     template <class T>
     std::istream & operator>>(std::istream & is, std::vector<T> & t) {
-        return asl::parseVector<T>(is, t);
+        return y60::parseVector<T>(is, t);
     }
-
+}
+namespace y60 {
     Y60_BASE_DECL std::ostream &
     operator << (std::ostream & theStream, const y60::VectorOfBool & theVector);
 
@@ -131,9 +134,13 @@ namespace asl {
     Y60_BASE_DECL std::istream &
     operator >> (std::istream & theStream, y60::VectorOfString & theStringVector);
 
+}
+namespace dom {
     Y60_BASE_DECL std::ostream &
     operator << (std::ostream & theStream, const dom::ResizeableVector & theVector);
+}
 
+namespace asl {
 //
 ///  generic ostream output operator template for raster templates
 //
