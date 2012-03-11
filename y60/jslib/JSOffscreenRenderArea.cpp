@@ -73,7 +73,6 @@ namespace jslib {
 template class JSWrapper<OffscreenRenderArea, asl::Ptr<OffscreenRenderArea>,
          StaticAccessProtocol>;
 
-template class JSAbstractRenderWindow<OffscreenRenderArea>;
 
 typedef jslib::AbstractRenderWindow BASE;
 
