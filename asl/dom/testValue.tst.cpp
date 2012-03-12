@@ -122,9 +122,7 @@ namespace std {
         return asl::parseVector<T>(is, t);
     }
 
-}
 
-namespace asl {
     std::ostream &
     operator << (std::ostream & theStream, const std::vector<std::string> & theStringVector);
 
@@ -178,7 +176,9 @@ operator >> (std::istream & theStream, std::vector<std::string> & theStringVecto
         return theStream;
 }
 
+}
 
+namespace asl {
 template <class T>
 class XmlValueUnitTest : public TemplateUnitTest {
 public:

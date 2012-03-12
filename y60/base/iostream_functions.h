@@ -114,8 +114,7 @@ namespace std {
     std::istream & operator>>(std::istream & is, std::vector<T> & t) {
         return y60::parseVector<T>(is, t);
     }
-}
-namespace y60 {
+
     Y60_BASE_DECL std::ostream &
     operator << (std::ostream & theStream, const y60::VectorOfBool & theVector);
 
@@ -134,13 +133,9 @@ namespace y60 {
     Y60_BASE_DECL std::istream &
     operator >> (std::istream & theStream, y60::VectorOfString & theStringVector);
 
-}
-namespace dom {
     Y60_BASE_DECL std::ostream &
     operator << (std::ostream & theStream, const dom::ResizeableVector & theVector);
-}
 
-namespace asl {
 //
 ///  generic ostream output operator template for raster templates
 //
