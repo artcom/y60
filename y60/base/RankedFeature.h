@@ -110,13 +110,21 @@ namespace y60 {
     };
     */
 
-    Y60_BASE_DECL std::ostream & operator << (std::ostream & theStream, const y60::RankedFeature & theRankedFeature);
-    Y60_BASE_DECL std::istream & operator >> (std::istream & theStream, y60::RankedFeature & theRankedFeature);
+    Y60_BASE_DECL std::ostream & operator << (
+        std::ostream & theStream, const y60::RankedFeature & theRankedFeature
+    );
+    Y60_BASE_DECL std::istream & operator >> (
+        std::istream & theStream, y60::RankedFeature & theRankedFeature
+    );
 }
 
 namespace dom {
-    Y60_BASE_DECL void binarize(const y60::RankedFeature & myValue, asl::WriteableStream & theDest);
-	Y60_BASE_DECL asl::AC_SIZE_TYPE debinarize(y60::RankedFeature & myValue, const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos = 0);
+    Y60_BASE_DECL void binarize(
+        const y60::RankedFeature & myValue, asl::WriteableStream & theDest
+    );
+    Y60_BASE_DECL asl::AC_SIZE_TYPE debinarize(
+        y60::RankedFeature & myValue, 
+        const asl::ReadableStream & theSource, 
+        asl::AC_SIZE_TYPE thePos = 0
+    );
 }
-
-#endif
