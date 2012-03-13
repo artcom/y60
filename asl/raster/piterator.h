@@ -799,9 +799,9 @@ public:
             dv = abs(V);//if (dv>0) --dv;
 
             if (dv > dh) {
-                swap(dh, dv);
+                std::swap(dh, dv);
 #ifdef SHORT_SLOW
-                swap(hstride, vstride);
+                std::swap(hstride, vstride);
 #else
                 swapped = 1;
 #endif

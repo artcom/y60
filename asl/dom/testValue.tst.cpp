@@ -109,15 +109,19 @@ namespace asl {
         return is;
     }
 
+} // namespace asl
+
+// Note: clang requires these functions to be in a argument-dependent namespace to qualify for ADL
+namespace std {
     template <class T>
     std::ostream & operator<<(std::ostream & os, const std::vector<T> & t) {
         return asl::printVector(os,t,t.size()>4);
     }
-
     template <class T>
     std::istream & operator>>(std::istream & is, std::vector<T> & t) {
         return asl::parseVector<T>(is, t);
     }
+
 
     std::ostream &
     operator << (std::ostream & theStream, const std::vector<std::string> & theStringVector);
@@ -128,16 +132,16 @@ namespace asl {
     inline
     std::ostream &
     operator << (std::ostream & theStream, const std::vector<std::string> & theStringVector) {
-    theStream << "[";
-    for (unsigned i = 0; i < theStringVector.size(); ++i) {
-        theStream << theStringVector[i];
-        if (i < theStringVector.size() - 1) {
-            theStream << ",";
-        }
+        theStream << "[";
+	for (unsigned i = 0; i < theStringVector.size(); ++i) {
+		theStream << theStringVector[i];
+		if (i < theStringVector.size() - 1) {
+			theStream << ",";
+		}
+	}
+	theStream << "]";
+	return theStream;
     }
-    theStream << "]";
-    return theStream;
-}
 
 inline
 std::istream &
@@ -172,6 +176,9 @@ operator >> (std::istream & theStream, std::vector<std::string> & theStringVecto
         return theStream;
 }
 
+}
+
+namespace asl {
 template <class T>
 class XmlValueUnitTest : public TemplateUnitTest {
 public:
@@ -242,7 +249,6 @@ template<class T, class ElementValue> struct ValueTraits<ComplexValue,T, Element
 template<class T, class ElementValue> struct ValueTraits<VectorValue,T,ElementValue> {
     typedef VectorValue<T, MakeResizeableVector, ElementValue> ValueType;
 };
-
 
 template <template <class,
                     template<class,class,class> class,
@@ -760,7 +766,6 @@ class BitsetValueUnitTest : public UnitTest {
         }
 };
 
-
 class MyTestSuite : public UnitTestSuite {
 public:
     MyTestSuite(const char * myName, int argc, char *argv[]) : UnitTestSuite(myName, argc, argv) {}
@@ -794,7 +799,6 @@ public:
 }; // asl
 
 int main(int argc, char *argv[]) {
-
     asl::MyTestSuite mySuite(argv[0], argc, argv);
 
     mySuite.run();
@@ -803,6 +807,5 @@ int main(int argc, char *argv[]) {
          << ", return status = " << mySuite.returnStatus() << endl;
 
     return mySuite.returnStatus();
-
 }
 

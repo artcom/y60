@@ -854,18 +854,19 @@ namespace dom {
     DEFINE_EXCEPTION(SizeMismatch,asl::Exception);
     DEFINE_PARSE_EXCEPTION(ConversionFailed,ParseException);
 
-    // common template base class adding unboxing operations for all wrapped native types
-    // Note that no references to native types should be stored in client code.
-    // References can be stored temporarily on then stack using the open/close interface.
-    // but beware of exception safety. (You should use the Node::WritableValue class when possible)
-    // A value can be opened for writing only by one user, trying to open an already open value will throw.
-    // The open/close mechanism is not intented for multi-threaded access,
-    // it serves as a safeguard and reminder not to store references.
-    // Internally it is reuqired to perform the lazy synchronization
-    // between native, binary and text representation.
+    // common template base class adding unboxing operations for all wrapped
+    // native types Note that no references to native types should be stored
+    // in client code.  References can be stored temporarily on then stack
+    // using the open/close interface.  but beware of exception safety. (You
+    // should use the Node::WritableValue class when possible) A value can be
+    // opened for writing only by one user, trying to open an already open
+    // value will throw.  The open/close mechanism is not intented for
+    // multi-threaded access, it serves as a safeguard and reminder not to
+    // store references.  Internally it is reuqired to perform the lazy
+    // synchronization between native, binary and text representation.
     // openWriteableValue() invalidates the cached binary and text
-    // representation. Reading of the native type does not invalidate
-    // these caches, so no open/close is required here.
+    // representation. Reading of the native type does not invalidate these
+    // caches, so no open/close is required here.
     template <class T>
     class Value : public StringValue {
     protected:
@@ -879,13 +880,14 @@ namespace dom {
     protected:
         static T asT(const DOMString & theValue) {
             T theResult;
-            if (!asl::fromString(theValue,theResult)) {
-                throw ConversionFailed("could not convert string value '"+theValue+"' to type '"+typeid(T).name()+"'",
-                    "Value<T>::asT()");
+            if (!asl::fromString(theValue, theResult)) {
+                throw ConversionFailed(
+                    "could not convert string value '" + theValue + 
+                    "' to type '"+typeid(T).name()+"'", "Value<T>::asT()"
+                );
             }
             return theResult;
         }
-
     };
 
     // helper functions to perform dynamic casts and unboxing

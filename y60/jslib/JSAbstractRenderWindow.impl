@@ -1132,32 +1132,32 @@ JSBool JSAbstractRenderWindow<DERIVED>::getPropertySwitch(DERIVED & theNative, u
                 return JS_TRUE;
             }
         case PROP_flatshading:
-            *vp = as_jsval(cx, theNative.getSingleViewport()->y60::Viewport::get<y60::ViewportFlatshadingTag>());
+            *vp = as_jsval(cx, theNative.getSingleViewport()->y60::Viewport::template get<y60::ViewportFlatshadingTag>());
             return JS_TRUE;
         case PROP_texturing:
-            *vp = as_jsval(cx, theNative.getSingleViewport()->y60::Viewport::get<y60::ViewportTexturingTag>());
+            *vp = as_jsval(cx, theNative.getSingleViewport()->y60::Viewport::template get<y60::ViewportTexturingTag>());
             return JS_TRUE;
         case PROP_wireframe:
-            *vp = as_jsval(cx, theNative.getSingleViewport()->y60::Viewport::get<y60::ViewportWireframeTag>());
+            *vp = as_jsval(cx, theNative.getSingleViewport()->y60::Viewport::template get<y60::ViewportWireframeTag>());
             return JS_TRUE;
         case PROP_drawnormals:
-            *vp = as_jsval(cx, theNative.getSingleViewport()->y60::Viewport::get<y60::ViewportDrawNormalsTag>());
+            *vp = as_jsval(cx, theNative.getSingleViewport()->y60::Viewport::template get<y60::ViewportDrawNormalsTag>());
             return JS_TRUE;
         case PROP_backfaceCulling:
-            *vp = as_jsval(cx, theNative.getSingleViewport()->y60::Viewport::get<y60::ViewportBackfaceCullingTag>());
+            *vp = as_jsval(cx, theNative.getSingleViewport()->y60::Viewport::template get<y60::ViewportBackfaceCullingTag>());
             return JS_TRUE;
         case PROP_culling:
-            *vp = as_jsval(cx, theNative.getSingleViewport()->y60::Viewport::get<y60::ViewportCullingTag>());
+            *vp = as_jsval(cx, theNative.getSingleViewport()->y60::Viewport::template get<y60::ViewportCullingTag>());
             return JS_TRUE;
         case PROP_debugCulling:
-            *vp = as_jsval(cx, theNative.getSingleViewport()->y60::Viewport::get<y60::ViewportDebugCullingTag>());
+            *vp = as_jsval(cx, theNative.getSingleViewport()->y60::Viewport::template get<y60::ViewportDebugCullingTag>());
             return JS_TRUE;
         case PROP_lighting:
-            *vp = as_jsval(cx, theNative.getSingleViewport()->y60::Viewport::get<y60::ViewportLightingTag>());
+            *vp = as_jsval(cx, theNative.getSingleViewport()->y60::Viewport::template get<y60::ViewportLightingTag>());
             return JS_TRUE;
         case PROP_backgroundColor:
             {
-                y60::CanvasPtr myCanvas = theNative.getCanvas()->dom::Node::getFacade<y60::Canvas>();
+                y60::CanvasPtr myCanvas = theNative.getCanvas()->dom::Node::template getFacade<y60::Canvas>();
                 *vp = as_jsval(cx, myCanvas->y60::Canvas::get<y60::CanvasBackgroundColorTag>());
                 return JS_TRUE;
             }

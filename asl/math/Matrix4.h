@@ -882,12 +882,12 @@ namespace asl {
                 return;
             }
             if ((_myType <= LINEAR) && (b.getType() == TRANSLATING)) {
-                multiplyLinearTranslating(*this, b, *this);
+                this->multiplyLinearTranslating(*this, b, *this);
                 _myType = AFFINE;
                 return;
             }
             if ((_myType == TRANSLATING) && (b.getType() <= LINEAR)) {
-                multiplyTranslatingLinear(*this, b, *this);
+                this->multiplyTranslatingLinear(*this, b, *this);
                 _myType = AFFINE;
                 return;
             }
@@ -925,7 +925,7 @@ namespace asl {
                 a[2][1] = this->val[2][1];
                 a[2][2] = this->val[2][2];
 
-                multiplyLinear(a,b,*this);
+                this->multiplyLinear(a,b,*this);
 
                 if (b.getType() == ROTATING && _myType <= ROTATING) {
                     _myType = ROTATING;
@@ -949,7 +949,7 @@ namespace asl {
                 a[3][0] = this->val[3][0];
                 a[3][1] = this->val[3][1];
                 a[3][2] = this->val[3][2];
-                multiplyAffine(a, b, *this);
+                this->multiplyAffine(a, b, *this);
 
                 if (b.getType() == ROTATING && _myType <= ROTATING) {
                     _myType = ROTATING;
@@ -963,14 +963,14 @@ namespace asl {
             if (b.getType() == LINEAR) {
                 Matrix4<Number> a;
                 a = *this;
-                multiplyUnkownLinear(a, b, *this);
+                this->multiplyUnkownLinear(a, b, *this);
 
                 // Type does not change
                 return;
             }
 
             Matrix4<Number> a = *this;
-            multiplyFull(a,b,*this);
+            this->multiplyFull(a,b,*this);
             _myType = UNKNOWN;
         }
 #else
@@ -1006,7 +1006,7 @@ namespace asl {
                     return;
                 case TRANSLATING:
                     if (b.getType() <= LINEAR) {
-                        multiplyTranslatingLinear(*this, b, *this);
+                        this->multiplyTranslatingLinear(*this, b, *this);
                         _myType = AFFINE;
                         return;
                     }
@@ -1017,7 +1017,7 @@ namespace asl {
                     break;
             }
             if ((_myType <= LINEAR) && (b.getType() == TRANSLATING)) {
-                multiplyLinearTranslating(*this, b, *this);
+                this->multiplyLinearTranslating(*this, b, *this);
                 _myType = AFFINE;
                 return;
             }
@@ -1034,7 +1034,7 @@ namespace asl {
                 a[2][1] = this->val[2][1];
                 a[2][2] = this->val[2][2];
 
-                multiplyLinear(a,b,*this);
+                this->multiplyLinear(a,b,*this);
 
                 if (b.getType() == ROTATING && _myType <= ROTATING) {
                     _myType = ROTATING;
@@ -1058,7 +1058,7 @@ namespace asl {
                 a[3][0] = this->val[3][0];
                 a[3][1] = this->val[3][1];
                 a[3][2] = this->val[3][2];
-                multiplyAffine(a, b, *this);
+                this->multiplyAffine(a, b, *this);
 
                 if (b.getType() == ROTATING && _myType <= ROTATING) {
                     _myType = ROTATING;
@@ -1072,14 +1072,14 @@ unknown:
             if (b.getType() == LINEAR) {
                 Matrix4<Number> a;
                 a = *this;
-                multiplyUnkownLinear(a, b, *this);
+                this->multiplyUnkownLinear(a, b, *this);
 
                 // Type does not change
                 return;
             }
 
             Matrix4<Number> a = *this;
-            multiplyFull(a,b,*this);
+            this->multiplyFull(a,b,*this);
             _myType = UNKNOWN;
         }
 #endif

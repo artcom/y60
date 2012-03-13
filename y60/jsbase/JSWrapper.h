@@ -611,13 +611,13 @@ struct StaticAccessProtocol {
 template <class NATIVE, class VALUEPTR>
 struct NodeAccessProtocol {
     static NATIVE & openWriteableValue(NATIVE &, VALUEPTR v) {
-        return v->dom::Node::nodeValueRefOpen<NATIVE>();
+        return v->dom::Node::template nodeValueRefOpen<NATIVE>();
     }
     static void closeWriteableValue(NATIVE &, VALUEPTR v) {
-        v->dom::Node::nodeValueRefClose<NATIVE>();
+        v->dom::Node::template nodeValueRefClose<NATIVE>();
     }
     static const NATIVE & accessReadableValue(const NATIVE &, const VALUEPTR v) {
-        return v->dom::Node::nodeValueRef<NATIVE>();
+        return v->dom::Node::template nodeValueRef<NATIVE>();
         //return v->getValue();
     }
 };

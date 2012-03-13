@@ -103,7 +103,7 @@ namespace asl {
 
         /** Assignment operator */
         Box2 & operator=(const Box2 & t) {
-            assign(t);
+            this->assign(t);
             return *this;
         }
 
@@ -919,7 +919,7 @@ namespace asl {
         }
 
         Box3 & operator=(const Box3 & t) {
-            assign(t);
+            this->assign(t);
             return *this;
         }
 
