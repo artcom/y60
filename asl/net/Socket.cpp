@@ -145,7 +145,7 @@ namespace inet {
         	//throw SocketDisconnected(PLUS_FILE_LINE);
         } else {
             int err = getLastSocketError();
-            if((err == OS_SOCKET_ERROR(EWOULDBLOCK))) {
+            if(err == OS_SOCKET_ERROR(EWOULDBLOCK)) {
             	return 0;
             } else {
             	throw SocketError(err, "receive() failed");

@@ -37,7 +37,7 @@ using namespace dom;
 
 dom::NodePtr
 dom::NodeList::removeItem(size_type i) {
-    if (i>=0 && i<size()) {
+    if (i<size()) {
         NodePtr myResult = item(i);
         _myNodes.erase(_myNodes.begin()+i);
         if (_myShell) {
@@ -120,7 +120,7 @@ dom::NodeList::findByOffset(asl::Unsigned64 myOffset, asl::AC_SIZE_TYPE & theInd
 NodePtr
 dom::NodeList::nextSibling(const Node * theNode) {
     size_type myIndex = findIndex(theNode);
-    if (myIndex >= 0 && myIndex+1 < length()) {
+    if (myIndex+1 < length()) {
         return item(myIndex+1);
     }
     return NodePtr();
@@ -129,7 +129,7 @@ dom::NodeList::nextSibling(const Node * theNode) {
 const NodePtr
 dom::NodeList::nextSibling(const Node * theNode) const {
     size_type myIndex = findIndex(theNode);
-    if (myIndex >= 0 && myIndex+1 < length()) {
+    if (myIndex+1 < length()) {
         return item(myIndex+1);
     }
     return NodePtr();
@@ -159,13 +159,13 @@ const Node & dom::NodeList::operator[](size_type i) const {
     return *item(i);
 }
 NodePtr dom::NodeList::item(size_type i) {
-    if (i < 0 || i >= length()) {
+    if (i >= length()) {
         throw DomException(JUST_FILE_LINE,DomException::INDEX_SIZE_ERR);
     }
     return _myNodes[i];
 }
 const NodePtr dom::NodeList::item(size_type i) const {
-    if (i < 0 || i >= length()) {
+    if (i >= length()) {
         throw DomException(JUST_FILE_LINE,DomException::INDEX_SIZE_ERR);
     }
     return _myNodes[i];
@@ -300,7 +300,7 @@ dom::NodeList::appendWithoutReparenting(NodePtr theNewNode) {
 }
 
 void dom::NodeList::insert(size_type theIndex, NodePtr theNewNode) {
-    if (theIndex < 0 || theIndex >= length()) {
+    if (theIndex >= length()) {
         throw DomException(JUST_FILE_LINE,DomException::INDEX_SIZE_ERR);
     }
     _myNodes.insert(_myNodes.begin()+theIndex, theNewNode);

@@ -169,7 +169,7 @@ namespace asl {
 
         /// Get element.
         LineSegment3fPtr getElement(unsigned theIndex) const {
-            if (theIndex >= 0 && theIndex < _myElements.size()) {
+            if (theIndex < _myElements.size()) {
                 return _myElements[theIndex];
             }
             return LineSegment3fPtr();
@@ -180,7 +180,7 @@ namespace asl {
         }
 
         BSplinePtr getBezierSegment(unsigned theIndex) {
-            if (theIndex >= 0 && theIndex < _myBezierSegments.size()) {
+            if (theIndex < _myBezierSegments.size()) {
                 return _myBezierSegments[theIndex];
             }
             return BSplinePtr();

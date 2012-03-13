@@ -665,7 +665,7 @@ namespace dom {
             @exception DomException(INDEX_SIZE_ERR) if i is out of range [0..childNodesLength()-1]
         */
         const NodePtr childNode(NodeList::size_type i) const {
-            if (i < 0 || i >= getChildren().size()) {
+            if (i >= getChildren().size()) {
                 throw DomException(JUST_FILE_LINE,DomException::INDEX_SIZE_ERR);
             }
             return getChildren().item(i);
@@ -674,7 +674,7 @@ namespace dom {
             @exception DomException(INDEX_SIZE_ERR) if i is out of range [0..childNodesLength()-1]
         */
         NodePtr childNode(NodeList::size_type i)  {
-            if (i < 0 || i >=getChildren().size()) {
+            if (i >=getChildren().size()) {
                 throw DomException(JUST_FILE_LINE,DomException::INDEX_SIZE_ERR);
             }
             return getChildren().item(i);
@@ -896,7 +896,7 @@ namespace dom {
             @exception DomException(INDEX_SIZE_ERR) if i is out of range [0..attributesLength()-1]
         */
         const NodePtr getAttribute(NodeList::size_type i) const {
-            if (i < 0 || i >=_myAttributes.size())
+            if (i >=_myAttributes.size())
                 throw DomException(JUST_FILE_LINE,DomException::INDEX_SIZE_ERR);
             return _myAttributes.item(i);
         }
@@ -905,7 +905,7 @@ namespace dom {
             @exception DomException(INDEX_SIZE_ERR) if i is out of range [0..attributesLength()-1]
         */
         NodePtr getAttribute(NodeList::size_type i) {
-            if (i < 0 || i >=_myAttributes.size())
+            if (i >=_myAttributes.size())
                 throw DomException(JUST_FILE_LINE,DomException::INDEX_SIZE_ERR);
             return _myAttributes.item(i);
         }

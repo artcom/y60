@@ -250,7 +250,6 @@ template<class T, class ElementValue> struct ValueTraits<VectorValue,T,ElementVa
     typedef VectorValue<T, MakeResizeableVector, ElementValue> ValueType;
 };
 
-
 template <template <class,
                     template<class,class,class> class,
                     class >
@@ -767,7 +766,6 @@ class BitsetValueUnitTest : public UnitTest {
         }
 };
 
-
 class MyTestSuite : public UnitTestSuite {
 public:
     MyTestSuite(const char * myName, int argc, char *argv[]) : UnitTestSuite(myName, argc, argv) {}
@@ -801,7 +799,6 @@ public:
 }; // asl
 
 int main(int argc, char *argv[]) {
-
     asl::MyTestSuite mySuite(argv[0], argc, argv);
 
     mySuite.run();
@@ -810,6 +807,5 @@ int main(int argc, char *argv[]) {
          << ", return status = " << mySuite.returnStatus() << endl;
 
     return mySuite.returnStatus();
-
 }
 

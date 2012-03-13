@@ -511,7 +511,7 @@ namespace asl {
         try {
             for(;;) {
                 new(current_raw++) value_type(*it_beg++);
-                ++this->size;
+                ++size_;
                 if( it_beg == it_end ) {
                     break;
                 }

@@ -100,10 +100,13 @@ namespace asl {
     inline bool fromString(const std::string & theString, T & outValue) {
         std::istringstream myStream(theString);
         myStream >> outValue;
-        return (myStream != 0); // Shouldn't this be (myStream.good() || myStream.eof()) ? (MS)
-                                // PM: it would be the same, stream::operator void*() is called here which
-                                // return 0 whhen neither the fail nor the bad bit is set, and ignores eofbit
-                                // while good() considers all three existing error flagss.
+
+            // Shouldn't this be (myStream.good() || myStream.eof()) ? (MS)
+            // PM: it would be the same, stream::operator void*() is called
+            // here which return 0 whhen neither the fail nor the bad bit is
+            // set, and ignores eofbit while good() considers all three
+            // existing error flags.
+        return (myStream != 0); 
     }
 #endif
 
@@ -130,7 +133,10 @@ namespace asl {
     as(const std::string & theString) {
         T outValue;
         if (!asl::fromString(theString,outValue)) {
-            throw ParseException("as<T>",std::string("could not convert '")+theString+"' to type "+demangled_name<T>());
+            throw ParseException(
+                "as<T>", "could not convert '" + theString + "' to type " + \
+                demangled_name<T>()
+            );
         };
         return outValue;
     }
