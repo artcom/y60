@@ -86,7 +86,7 @@ class ConduitServer : public ThreadedConduit<POLICY> {
         // hide ctors - can only be constructed by factory method
         ConduitServer();
         ConduitServer(const ConduitServer &);
-        ConduitServer operator=(const ConduitServer &);
+        ConduitServer & operator=(const ConduitServer &);
 
 
         void setSelf (Ptr theSelfPtr) {

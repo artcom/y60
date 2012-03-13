@@ -65,9 +65,9 @@
 #include <string>
 #include <vector>
 
-using namespace y60;
+using namespace asl;
 
-namespace asl {
+namespace y60 {
 
     std::ostream &
     operator << (std::ostream & theStream, const RankedFeature & theRankedFeature) {

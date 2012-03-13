@@ -676,7 +676,7 @@ namespace asl {
                     std::string("WriteableFile::append(size=")+as_string(theSize)+")",
                     std::string("Filename='")+ _myFileName.toLocale() + "' failed." );
             }
-            countBytes(theSize);
+            this->countBytes(theSize);
             return *this;
         }
         operator const void*() const {

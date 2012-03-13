@@ -73,7 +73,9 @@
 #include <iostream>
 #include <string>
 
-namespace asl {
+using namespace asl;
+
+namespace y60 {
 
     template <class T>
     std::ostream &
@@ -92,26 +94,28 @@ namespace asl {
         theStream << "]";
         return theStream;
     }
+}
+namespace std {
 
     std::ostream &
     operator << (std::ostream & theStream, const y60::VectorOfBool & theVector) {
-        return printSimpleVector(theStream, theVector);
+        return y60::printSimpleVector(theStream, theVector);
 
     }
 
     std::ostream &
     operator << (std::ostream & theStream, const y60::VectorOfUnsignedInt & theVector) {
-        return printSimpleVector(theStream, theVector);
+        return y60::printSimpleVector(theStream, theVector);
     }
 
     std::ostream &
     operator << (std::ostream & theStream, const y60::VectorOfSignedInt & theVector) {
-        return printSimpleVector(theStream, theVector);
+        return y60::printSimpleVector(theStream, theVector);
     }
 
     std::ostream &
     operator << (std::ostream & theStream, const y60::VectorOfFloat & theVector) {
-        return printSimpleVector(theStream, theVector);
+        return y60::printSimpleVector(theStream, theVector);
     }
 
     std::ostream &
@@ -181,7 +185,7 @@ namespace asl {
 
         return theStream;
     }
-
+    
     std::ostream &
     operator << (std::ostream & theStream, const dom::ResizeableVector & theVector) {
         theStream << "[";

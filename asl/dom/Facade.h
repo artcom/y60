@@ -133,11 +133,11 @@ namespace dom {
     IMPLEMENT_FACADE(CLASS) \
     template <class TAG> \
     const asl::Ptr< typename TAG::CHILDFACADE, dom::ThreadingModel> getChild() const{ \
-        return TAG::Plug::getChildNode(getNode())->dom::Node::getFacade<typename TAG::CHILDFACADE>(); \
+        return TAG::Plug::getChildNode(getNode())->dom::Node::template getFacade<typename TAG::CHILDFACADE>(); \
     } \
     template <class TAG> \
     asl::Ptr< typename TAG::CHILDFACADE, dom::ThreadingModel> getChild() { \
-        return TAG::Plug::getChildNode(getNode())->dom::Node::getFacade<typename TAG::CHILDFACADE>(); \
+        return TAG::Plug::getChildNode(getNode())->dom::Node::template getFacade<typename TAG::CHILDFACADE>(); \
     }
 
 #define IMPLEMENT_DYNAMIC_FACADE(CLASS) \

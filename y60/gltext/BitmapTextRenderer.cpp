@@ -110,7 +110,7 @@ namespace y60 {
                 glDrawString(theText->_myString.c_str(), Bookman72);
                 break;
             case COURIER24_FONT:
-                glDrawString(theText->_myString.c_str(), Courier24);
+                glDrawString(theText->_myString.c_str(), ::Courier24);
                 break;
             case HELV24_FONT:
                 glDrawString(theText->_myString.c_str(), Helv24);

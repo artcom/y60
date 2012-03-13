@@ -176,7 +176,7 @@ struct Pair {
     void set(const T2 & x) {second(x);}
 
     my_type & operator+=(const my_type & x) {
-        first+=x.first(); second+=x.second(); return *this;
+        this->first+=x.first(); this->second+=x.second(); return *this;
     }
 
     DERIVED operator*(const DERIVED & y) const {

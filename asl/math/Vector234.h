@@ -83,7 +83,7 @@ namespace asl {
 
         /** Assignment operator. */
         PairOf & operator=(const PairOf & t) {
-            assign(t);
+            this->assign(t);
             return *this;
         }
         /** Construct from C style array. */
@@ -114,7 +114,7 @@ namespace asl {
         TripleOf(const T * theBegin, const T * theEnd) : Base(theBegin, theEnd) {}
         /** Assignment operator. */
         TripleOf & operator=(const TripleOf & t) {
-            assign(t);
+            this->assign(t);
             return *this;
         }
         /** Construct from three scalar values. */
@@ -146,7 +146,7 @@ namespace asl {
         }
         /** Assignment operator. */
         QuadrupleOf & operator=(const QuadrupleOf & t) {
-            assign(t);
+            this->assign(t);
             return *this;
         }
     };
@@ -172,7 +172,7 @@ namespace asl {
         explicit Vector2(const Number * theBegin, const Number * theEnd) : Base(theBegin, theEnd) {}
         /** Assignment operator. */
         Vector2 & operator=(const Vector2 & t) {
-            assign(t);
+            this->assign(t);
             return *this;
         }
         /** @name Vector - Scalar Operations */
@@ -391,7 +391,7 @@ namespace asl {
         Vector3(const Number* t) : Base(TripleOf<Number>(t)) {};
         Vector3(const Number * theBegin, const Number * theEnd) : Base(theBegin, theEnd) {}
         Vector3 & operator=(const Vector3 & t) {
-            assign(t);
+            this->assign(t);
             return *this;
         }
         template <class otherReal>
@@ -541,7 +541,7 @@ namespace asl {
         Vector4(const Number* t) : Base(QuadrupleOf<Number>(t)) {};
         Vector4(const Number * theBegin, const Number * theEnd) : Base(theBegin, theEnd) {}
         Vector4 & operator=(const Vector4 & t) {
-            assign(t);
+            this->assign(t);
             return *this;
         }
         template <class otherReal>

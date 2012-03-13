@@ -72,7 +72,7 @@ namespace asl {
 		Point2(const Number * t) : Base(t) {};
         explicit Point2(const Number * theBegin, const Number * theEnd) : Base(theBegin, theEnd) {}
 		Point2 & operator=(const Point2 & t) {
-            assign(t);
+            this->assign(t);
             return *this;
         }
         template <class otherReal>
@@ -198,7 +198,7 @@ namespace asl {
 		Point3(const Number* t) : Base(TripleOf<Number>(t)) {};
         Point3(const Number * theBegin, const Number * theEnd) : Base(theBegin, theEnd) {}
 		Point3 & operator=(const Point3 & t) {
-            assign(t);
+            this->assign(t);
             return *this;
         }
         template <class otherReal>
@@ -324,7 +324,7 @@ namespace asl {
 		Point4(const Number* t) : Base(QuadrupleOf<Number>(t)) {};
         Point4(const Number * theBegin, const Number * theEnd) : Base(theBegin, theEnd) {}
 		Point4 & operator=(const Point4 & t) {
-            assign(t);
+            this->assign(t);
             return *this;
         }
         template <class otherReal>
