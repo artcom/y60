@@ -128,3 +128,5 @@ namespace dom {
         asl::AC_SIZE_TYPE thePos = 0
     );
 }
+
+#endif
