@@ -20,6 +20,9 @@ AVTDShowGraph.h
 set(EXTERNALS FFMPEG STRMIIDS ATL WINDOWSSDK)
 
 add_definitions(-D__STDC_CONSTANT_MACROS) # ffmpeg is c99 only and needs some c macros
+if(MSVC)
+add_definitions( /MP1 ) # #import is not supported with /MP
+endif(MSVC)
 
 y60_add_component(
     DShowCapture
