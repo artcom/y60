@@ -146,7 +146,7 @@ template <class NATIVE, class OWNERPTR,
           template <class, class> class ACCESS_PROTOCOL>
 JSBool JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL>::getPropertyByNumericId(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp)
 {
-    if ((theID >= 0) && (theID < length())) {
+    if (theID < length()) {
         return getPropertyIndex(theID, cx, obj, id, vp);
     }
     return getPropertySwitch(theID, cx, obj, id, vp);
@@ -180,7 +180,7 @@ template <class NATIVE, class OWNERPTR,
           template <class, class> class ACCESS_PROTOCOL>
 JSBool JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL>::setPropertyByNumericId(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp)
 {
-    if ((theID >= 0) && (theID < length())) {
+    if (theID < length()) {
         return setPropertyIndex(theID, cx, obj, id, vp);
     }
     return setPropertySwitch(theID, cx, obj, id, vp);
