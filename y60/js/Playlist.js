@@ -229,6 +229,7 @@ Playlist.prototype.Constructor = function(self) {
                    theUrl.search(/\.mts$/i)  != -1 ||
                    theUrl.search(/\.webm$/i) != -1 ||
                    theUrl.search(/\.ogm$/i)  != -1 ||
+                   theUrl.search(/\.m2ts$/i)  != -1 ||
                    theUrl.search(/\.m2v$/i)  != -1)
         {
             return VIDEO_MEDIA;
@@ -290,6 +291,7 @@ Playlist.prototype.Constructor = function(self) {
             theUrl.search(/\.mov$/i)  != -1 ||
             theUrl.search(/\.m4v$/i)  != -1 ||
             theUrl.search(/\.mts$/i)  != -1 ||
+            theUrl.search(/\.m2ts$/i)  != -1 ||
             theUrl.search(/\.m2v$/i)  != -1 ) {
             if (theSeekableFlag) {
                 myDecoderHint = "FFMpegDecoder2";
