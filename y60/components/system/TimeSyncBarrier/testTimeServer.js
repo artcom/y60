@@ -92,6 +92,7 @@ TimeServer.prototype.Constructor = function(self, theArguments) {
 
     var _myServerSocket = null;
     var _mySockets = [];
+    var _myRefTime = 0;
     
     // setup
     Base.setup = self.setup;
@@ -134,7 +135,7 @@ TimeServer.prototype.Constructor = function(self, theArguments) {
         for (i=0; i<_mySockets.length; i++) {
             try {
                 mySocket = _mySockets[i];
-                var myTimeFrame = new Node("<time>"+theTime+"</time>");
+                var myTimeFrame = new Node("<time>" + (theTime - _myRefTime) +"</time>");
                 mySocket.write("<?xml version='1.0' encoding='utf-8'?>"+myTimeFrame);
 
             } catch(ex) {
@@ -143,6 +144,14 @@ TimeServer.prototype.Constructor = function(self, theArguments) {
                 _mySockets.splice(i,1);
             }
         }
+    }
+
+    // Base.onKey = self.onKey;
+    // self.onKey = function() {
+    //     _myRefTime  = self.getCurrentTime();
+    // }
+    self.onMouseButton = function() {
+        _myRefTime  = self.getCurrentTime();
     }
 
     Base.onExit = self.onExit;

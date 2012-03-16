@@ -74,16 +74,17 @@ TimeSyncBarrier::TimeSyncBarrier(DLHandle theDLHandle) :
 }
 
 void
-TimeSyncBarrier::foo() {
+TimeSyncBarrier::setConfiguration(std::string serverAddress, unsigned int port) {
+    if (_mySocket) {
+        throw asl::Exception("parameters cannot be changed after socket setup.", PLUS_FILE_LINE);
+    }
+    
+    _myAddress = serverAddress;
+    _myPort = port;
 }
 
 void
 TimeSyncBarrier::onStartup(jslib::AbstractRenderWindow * theWindow) {
-    // TODO:: 
-    //  - try to connect to the sync master
-    //  - setup blocking socket
-    
-    
     // set abstractrenderwindow to external time mode
     theWindow->setUseExternalTimeSource(true);
 
@@ -112,41 +113,55 @@ TimeSyncBarrier::onPreRender(AbstractRenderWindow * theRenderer) {
 
 void
 TimeSyncBarrier::onPostRender(AbstractRenderWindow * theRenderer) {
-    // TODO:: 
-    //  - tell syncmaster that the current frame has been rendered 
-    //  - wait for master reply
-    //  - set application time
    
+    // send ready message to the server. this happens after the frame has been completed.
+    // the server waits for every client to be ready and then sends releases the barrier.
     std::string ready = "<?xml version='1.0' encoding='utf-8'?><ready/>";
     _mySocket->send(ready.c_str(), ready.size());
-    
+   
+    // blocking read.
+    // wait for the server to release the barrier.
     char myBuffer[2048];
     unsigned int readBytes = _mySocket->receive(&myBuffer, sizeof(myBuffer));
     
+    // parse time from the received packet
     std::string serverTime(myBuffer, readBytes); 
-    
-    glFlush();
-
-
     dom::NodePtr myNode = dom::NodePtr(new dom::Node());
     if (myNode->parseAll(serverTime)) {
         dom::NodePtr myTimeNode = myNode->childNode("time", 0);
         double myTime = asl::as<double>(myTimeNode->firstChild()->nodeValue());
+        
+        // set global time to synchronized time. the time will be used to render the next frame.
         theRenderer->setFrameTime(myTime);
     
     } else {
         // TODO: process error
     }
-
+    
+    // now the client is ready to swap the buffers and proceed to the next frame.
 }
 
 static JSBool
-Foo(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+SetConfiguration(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
+
+    ensureParamCount(argc, 2);
+
+    std::string hostname;
+    unsigned int port;
+    
+    if (!convertFrom(cx, argv[0], hostname)) {
+        throw asl::Exception("cannot convert argument 1 to string"); 
+    }
+    
+    if (!convertFrom(cx, argv[0], port)) {
+        throw asl::Exception("cannot convert argument 2 to Number"); 
+    }
+
     asl::Ptr<TimeSyncBarrier> myNative = getNativeAs<TimeSyncBarrier>(cx, obj);
     if (myNative) {
-        myNative->foo();
+        myNative->setConfiguration(hostname, port);
     }
     
     return JS_TRUE;
@@ -156,7 +171,7 @@ JSFunctionSpec *
 TimeSyncBarrier::Functions() {
     AC_DEBUG << "TimeSyncBarrier::Functions";
     static JSFunctionSpec myFunctions[] = {
-        {"foo", Foo, 0},
+        {"setConfiguration", SetConfiguration, 2},
         {0}
     };
     return myFunctions;

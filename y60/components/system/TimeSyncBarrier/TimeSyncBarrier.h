@@ -44,7 +44,7 @@ public:
     void onFrame(jslib::AbstractRenderWindow * theWindow , double t);
     void onPreRender(jslib::AbstractRenderWindow * theRenderer);
     void onPostRender(jslib::AbstractRenderWindow * theRenderer);
-    void foo();
+    void setConfiguration(std::string hostname, unsigned int port);
 
 private:
     inet::TCPClientSocketPtr _mySocket;

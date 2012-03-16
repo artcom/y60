@@ -518,7 +518,7 @@ SceneViewer.prototype.Constructor = function (self, theArguments) {
                     _myOnScreenStatistics = 0;
                 }
                 window.printStatistics();
-                print("  Scene size     " + window.scene.getWorldSize(self.getActiveCamera()).toFixed(1) + "m");
+                // print("  Scene size     " + window.scene.getWorldSize(self.getActiveCamera()).toFixed(1) + "m");
                 break;
             case 'S':
                 self.getScene().save("saved_scene.x60", false);
