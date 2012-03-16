@@ -2869,7 +2869,7 @@ dom::Node::debinarize(const asl::ReadableStream & theSource,
         thePos = theSource.readUnsigned32(myVersion, thePos);
 
         if (myVersion != BINARIZER_VERSION) {
-            throw VersionMismatch(std::string("expected ")+asl::as_string((void*)(asl::Unsigned32(BINARIZER_VERSION)))+", got "+asl::as_string((void*)(myVersion)), PLUS_FILE_LINE);
+            throw VersionMismatch(std::string("expected ")+asl::as_string(asl::as_hex((asl::Unsigned32(BINARIZER_VERSION))))+", got "+asl::as_string(asl::as_hex((myVersion))), PLUS_FILE_LINE);
         }
     }
 
