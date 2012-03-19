@@ -14,15 +14,6 @@
 #   define AC_USE_OSX_CGL
 #endif
 
-#ifdef _WIN32
-#    define NOMINMAX
-#    ifndef WIN32_LEAN_AND_MEAN
-#       define WIN32_LEAN_AND_MEAN 1
-#    endif
-#    include <windows.h>
-#    undef WIN32_LEAN_AND_MEAN
-#endif
-
 #if defined(LINUX)
 #   define AC_USE_X11
 #endif

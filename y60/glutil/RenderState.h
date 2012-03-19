@@ -67,15 +67,6 @@
 
 #include <GL/glew.h>
 
-#ifdef _WIN32
-    #ifndef WIN32_LEAN_AND_MEAN
-    #define WIN32_LEAN_AND_MEAN 1
-    #endif
-    #include <windows.h>
-    #undef max
-    #undef WIN32_LEAN_AND_MEAN
-#endif
-
 #define RENDERSTATE_GETTER_SETTER(THE_NAME) \
     public: \
         void set ## THE_NAME (bool theFlag) { \
