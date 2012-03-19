@@ -67,23 +67,11 @@
 
 #include <wmsdk.h>
 
-#ifdef OSX
-    extern "C" {
-#       include <libavformat/avformat.h>
-    }
-#   undef AV_NOPTS_VALUE
-#   define AV_NOPTS_VALUE 0x8000000000000000LL
-#else
-#   if defined(_MSC_VER)
-#       pragma warning(push,1)
-#   endif
-    extern "C" {
+#pragma warning(push,1)
+extern "C" {
 #   include <avformat.h>
-    }
-#   if defined(_MSC_VER)
-#       pragma warning(pop)
-#   endif
-#endif
+}
+#pragma warning(pop)
 
 namespace y60 {
 

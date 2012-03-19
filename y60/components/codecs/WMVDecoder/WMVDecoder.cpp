@@ -79,6 +79,11 @@
 #include <dsound.h> //For the DSSPEAKER_5POINT1 value
 #include <mmreg.h> //For WAVEFORMATEXTENSIBLE (if you use it)
 
+#pragma warning(push,1)
+extern "C" {
+#   include <avformat.h>
+}
+#pragma warning(pop)
 
 using namespace std;
 using namespace asl;
