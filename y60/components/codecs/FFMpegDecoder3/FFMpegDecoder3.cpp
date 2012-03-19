@@ -62,11 +62,10 @@
 #include <y60/video/Movie.h>
 #include <y60/sound/SoundManager.h>
 #include <asl/base/Ptr.h>
-#include <asl/base/Auto.h>
-#include <asl/audio/Pump.h>
 #include <asl/base/Logger.h>
 #include <asl/base/file_functions.h>
 #include <asl/base/string_functions.h>
+#include <asl/audio/Pump.h>
 
 // remove ffmpeg macros
 #ifdef START_TIMER
@@ -76,9 +75,9 @@
 #   undef STOP_TIMER
 #endif
 
-
-
 #include <asl/base/Dashboard.h>
+
+
 #include <iostream>
 #include <stdlib.h>
 

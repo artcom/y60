@@ -5,6 +5,7 @@ FFMpegDecoder3.cpp
 )
 
 set(HEADERS
+PacketQueue.h
 AsyncDemuxer.h
 FFMpegDecoder3.h
 y60_ffmpegdecoder3_settings.h

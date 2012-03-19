@@ -61,31 +61,9 @@
 
 #include "y60_ffmpegdecoder3_settings.h"
 
-#include <y60/video/VideoMsgQueue.h>
-#include <y60/video/AsyncDecoder.h>
-#include <y60/video/MovieEncoding.h>
-
-#include <asl/base/PlugInBase.h>
-
-#include <boost/thread.hpp>
-#include <boost/thread/condition.hpp>
-#include <string>
-#include <list>
-
-extern "C" {
-#ifdef OSX
-#   include <libavformat/avformat.h>
-#else
-#   include <avformat.h>
-#endif
-}
-
-#ifndef AV_VERSION_INT
-#define AV_VERSION_INT(a,b,c) (a<<16 | b<<8 | c)
-#endif
-
 #ifdef OSX
     extern "C" {
+#       include <libavformat/avformat.h>
 #       if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(51,38,0)
 #           include <libswscale/swscale.h>
 #       endif
@@ -97,6 +75,7 @@ extern "C" {
 #       pragma warning(push,1)
 #   endif
     extern "C" {
+#   include <avformat.h>
 #   if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(51,38,0)
 #       include <swscale.h>
 #   endif
@@ -106,7 +85,24 @@ extern "C" {
 #   endif
 #endif
 
+#ifndef AV_VERSION_INT
+#define AV_VERSION_INT(a,b,c) (a<<16 | b<<8 | c)
+#endif
+
+#include <y60/video/VideoMsgQueue.h>
+#include <y60/video/AsyncDecoder.h>
+#include <y60/video/MovieEncoding.h>
+
+#include <asl/base/PlugInBase.h>
 #include <asl/base/Ptr.h>
+
+#include <boost/thread.hpp>
+#include <boost/thread/condition.hpp>
+#include <string>
+#include <list>
+
+
+
 
 namespace AudioBase {
     class BufferedSource;

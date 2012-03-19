@@ -76,7 +76,6 @@
 #   define AV_NOPTS_VALUE 0x8000000000000000LL
 #else
 #   if defined(_MSC_VER)
-#       define EMULATE_INTTYPES
 #       pragma warning(push,1)
 #   endif
     extern "C" {

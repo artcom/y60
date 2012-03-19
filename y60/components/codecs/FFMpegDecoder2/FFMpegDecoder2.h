@@ -68,28 +68,18 @@
 #include <y60/video/MovieEncoding.h>
 
 #include <asl/base/PlugInBase.h>
-
 #include <asl/base/PosixThread.h>
 #include <asl/base/ThreadLock.h>
 #include <asl/base/ThreadSemaphore.h>
+#include <asl/base/Stream.h>
+#include <asl/base/Ptr.h>
 
 #include <string>
 #include <list>
 
-extern "C" {
-#ifdef OSX
-#   include <libavformat/avformat.h>
-#else
-#   include <avformat.h>
-#endif
-}
-
-#ifndef AV_VERSION_INT
-#define AV_VERSION_INT(a,b,c) (a<<16 | b<<8 | c)
-#endif
-
 #ifdef OSX
     extern "C" {
+#       include <libavformat/avformat.h>
 #       if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(51,38,0)
 #           include <libswscale/swscale.h>
 #       endif
@@ -101,6 +91,7 @@ extern "C" {
 #       pragma warning(push,1)
 #   endif
     extern "C" {
+#   include <avformat.h>
 #   if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(51,38,0)
 #       include <swscale.h>
 #   endif
@@ -110,8 +101,9 @@ extern "C" {
 #   endif
 #endif
 
-#include <asl/base/Stream.h>
-#include <asl/base/Ptr.h>
+#ifndef AV_VERSION_INT
+#define AV_VERSION_INT(a,b,c) (a<<16 | b<<8 | c)
+#endif
 
 namespace AudioBase {
     class BufferedSource;
