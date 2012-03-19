@@ -27,25 +27,25 @@
 
 namespace y60 {
     class PacketMsg {
-	    public:
-	        PacketMsg() : _myPacket(0) {};
-	        PacketMsg(AVPacket * thePacket) : _myPacket(thePacket) {};
-	        ~PacketMsg() {/*av_free_packet(_myPacket); delete _myPacket;*/};
-	
-	        AVPacket * getPacket() { return _myPacket;}
-	        void freePacket() {
+        public:
+            PacketMsg() : _myPacket(0) {};
+            PacketMsg(AVPacket * thePacket) : _myPacket(thePacket) {};
+            ~PacketMsg() {/*av_free_packet(_myPacket); delete _myPacket;*/};
+    
+            AVPacket * getPacket() { return _myPacket;}
+            void freePacket() {
                 if(_myPacket) {
                     av_free_packet(_myPacket);
                     delete _myPacket;
                     _myPacket = 0;
                 }
             }
-	    private:
-	        AVPacket * _myPacket;
-	};
-	typedef asl::Ptr<PacketMsg> PacketMsgPtr;
-	typedef asl::thread::concurrent_queue<PacketMsgPtr> PacketQueue;
-	typedef asl::Ptr<PacketQueue> PacketQueuePtr;
+        private:
+            AVPacket * _myPacket;
+    };
+    typedef asl::Ptr<PacketMsg> PacketMsgPtr;
+    typedef asl::thread::concurrent_queue<PacketMsgPtr> PacketQueue;
+    typedef asl::Ptr<PacketQueue> PacketQueuePtr;
 
 }
 #endif

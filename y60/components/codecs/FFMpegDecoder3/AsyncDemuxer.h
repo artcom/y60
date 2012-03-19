@@ -16,8 +16,8 @@ namespace y60 {
     
     class PacketMsg;
     typedef asl::Ptr<PacketMsg> PacketMsgPtr;
-	typedef asl::thread::concurrent_queue<PacketMsgPtr> PacketQueue;
-	typedef asl::Ptr<PacketQueue> PacketQueuePtr;
+    typedef asl::thread::concurrent_queue<PacketMsgPtr> PacketQueue;
+    typedef asl::Ptr<PacketQueue> PacketQueuePtr;
 
     typedef asl::Ptr<boost::thread> DemuxThreadPtr;
 
