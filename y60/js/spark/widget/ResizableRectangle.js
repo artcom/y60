@@ -97,8 +97,8 @@ spark.ResizableRectangle.Constructor = function (Protected) {
         if (!_myShape) {
             if (myTextureUnit) {
                 var raster = myTextureUnit.$texture.$image.raster;
-                Public.width = raster.width;
-                Public.height = raster.height;
+                Public.width = Protected.getNumber("width", raster.width);
+                Public.height = Protected.getNumber("height", raster.height);
             }
             var mySize = new Vector3f(Public.width, Public.height, 0);
             var myOrigin = Protected.getString("origin", undefined);

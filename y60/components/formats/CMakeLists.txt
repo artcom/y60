@@ -2,6 +2,7 @@
 add_subdirectory(StlImporter)
 add_subdirectory(X3dImporter)
 add_subdirectory(OpenEXR)
+add_subdirectory(Assimp)
 
 if(Boost_VERSION GREATER 104099)
     # we need (boost-sprit >= 2.1), which is in Boost 1.41
