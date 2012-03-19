@@ -67,10 +67,6 @@
 #include <asl/audio/ISampleSink.h>
 #include <asl/base/Block.h>
 
-#ifdef _WIN32
-#define EMULATE_INTTYPES
-#endif
-
 struct AVFormatContext;
 struct ReSampleContext;
 

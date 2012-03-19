@@ -125,10 +125,11 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
         var done = false;
         Logger.info("creating client");
         obj.myClient = new Async.HttpClient({
-            url: "http://127.0.0.1:88/foobar",
+            url: "http://127.0.0.1:8765/foobar",
             connecttimeout: 5,
             success: function() {
                 FAILURE("testError");
+                done = true;
             },
             error: function() {
                 SUCCESS("testError");

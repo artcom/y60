@@ -55,7 +55,7 @@ spark.Window.Constructor = function (Protected, theArguments) {
             myWidget = theCursor.grabHolder;
         } else {
             if (theCursor.id in _myPickList) {
-                myWidget = _myPickList[theCursor.id];
+                myWidget = null; // we only want one event per cursor per frame 
             } else {
                 myWidget = Public.pickWidget(thePosition.x, thePosition.y);
                 _myPickList[theCursor.id] = myWidget;

@@ -62,11 +62,10 @@
 #include <y60/video/Movie.h>
 #include <y60/sound/SoundManager.h>
 #include <asl/base/Ptr.h>
-#include <asl/base/Auto.h>
-#include <asl/audio/Pump.h>
 #include <asl/base/Logger.h>
 #include <asl/base/file_functions.h>
 #include <asl/base/string_functions.h>
+#include <asl/audio/Pump.h>
 
 // remove ffmpeg macros
 #ifdef START_TIMER
@@ -76,9 +75,9 @@
 #   undef STOP_TIMER
 #endif
 
-
-
 #include <asl/base/Dashboard.h>
+
+
 #include <iostream>
 #include <stdlib.h>
 
@@ -196,7 +195,11 @@ namespace y60 {
                     + myFilename, PLUS_FILE_LINE);
         }
 
+#if LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(53, 6, 0)
+        if (avformat_find_stream_info(_myFormatContext, NULL) < 0) {
+#else
         if (av_find_stream_info(_myFormatContext) < 0) {
+#endif
             throw FFMpegDecoder3Exception(std::string("Unable to find stream info: ")
                     + myFilename, PLUS_FILE_LINE);
         }
@@ -405,7 +408,11 @@ namespace y60 {
             _myAStream = 0;
         }
         if (_myFormatContext) {
+#if LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(53, 17, 0)
+            avformat_close_input(&_myFormatContext);
+#else
             av_close_input_file(_myFormatContext);
+#endif
             _myFormatContext = 0;
         }
         AsyncDecoder::closeMovie();

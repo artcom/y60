@@ -130,7 +130,7 @@ namespace y60 {
             case GL_RGB_FLOAT32_ATI: return "GL_RGB_FLOAT32_ATI";
             case GL_HALF_FLOAT_ARB: return "GL_HALF_FLOAT_ARB";
             case GL_FLOAT: return "GL_FLOAT";
-            default:return std::string("UNKNOWN_GL_ENUM=0x")+asl::as_string((void*)theFormat);
+            default:return std::string("UNKNOWN_GL_ENUM=0x")+asl::as_string(asl::as_hex(theFormat));
         }
     }
 }

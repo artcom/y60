@@ -58,8 +58,6 @@
 
 #include "FFMpegURLProtocol.h"
 
-//#include <CG/glext.h> //offset_h
-
 #include <asl/base/Ptr.h>
 #include <asl/base/Block.h>
 #include <asl/base/MappedBlock.h>

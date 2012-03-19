@@ -79,9 +79,7 @@
 #include <wmsdk.h>
 #include <deque>
 
-extern "C" {
-#include <avformat.h>
-}
+struct ReSampleContext;
 
 namespace y60 {
     DEFINE_EXCEPTION(WindowsMediaException, asl::Exception);

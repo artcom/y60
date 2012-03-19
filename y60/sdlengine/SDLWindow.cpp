@@ -270,11 +270,9 @@ SDLWindow::initGL() {
 
     if (_myScene) {
         _myScene->updateAllModified();
-        xpath::NodeList myResult;
-        xpath::findAll(xpath::Path(std::string("//") + SHAPE_NODE_NAME), _myScene->getShapesRoot(), myResult);
-        for (xpath::NodeList::size_type myIndex = 0; myIndex < myResult.size(); ++myIndex) {
-           ShapePtr myShape = myResult[myIndex]->getFacade<Shape>();
-           myShape->enforceReload();
+        std::vector<ShapePtr> myShapes = _myScene->getShapesRoot()->getAllFacades<Shape>(SHAPE_NODE_NAME);
+        for (unsigned i = 0; i < myShapes.size(); ++i) {
+            myShapes[i]->enforceReload();
         }
     }
 }

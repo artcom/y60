@@ -66,23 +66,17 @@
 #include <iostream>
 
 
-#ifdef WIN32
 // Disable FFMPeg Warning in Windows
 #pragma warning(push)
 #pragma warning(disable:4244)
-#define EMULATE_INTTYPES
-#endif
 extern "C" {
-#include <avformat.h>
+#   include <avformat.h>
 
-#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(38<<8)+0)
-#   include <swscale.h>
-#endif
+#   if LIBAVCODEC_VERSION_INT >= ((51<<16)+(38<<8)+0)
+#       include <swscale.h>
+#   endif
 }
-
-#ifdef WIN32
 #pragma warning(pop)
-#endif
 
 extern "C"
 EXPORT asl::PlugInBase * DShowCapture_instantiatePlugIn(asl::DLHandle myDLHandle) {

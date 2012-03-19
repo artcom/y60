@@ -246,7 +246,7 @@ NodeOffsetCatalog::debinarize(const asl::ReadableStream & theSource, asl::AC_SIZ
         std::string myError = "Bad magic reading ID Catalog, thePos=";
         myError += asl::as_string(thePos);
         myError += ", myMagic=";
-        myError += asl::as_string((void*)myMagic);
+        myError += asl::as_string(asl::as_hex(myMagic));
         throw FormatCorrupted(myError, PLUS_FILE_LINE, theOldPos);
     }
 #ifndef USE_SINGLE_ID_ATTRIB
