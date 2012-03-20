@@ -968,7 +968,7 @@ Use(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
                 JS_ReportError(cx, "Use could not convert argument value to string.");
                 return JS_FALSE;
             }
-            AC_DEBUG << "use: myIncludeFile=" << myIncludeFile;
+            AC_TRACE << "use: myIncludeFile=" << myIncludeFile;
 
             // Compute file path relative to file in which the use() statement was called
             const char * myCurrentFile;
@@ -978,14 +978,14 @@ Use(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             }
 
             std::string myIncludePath = asl::getDirectoryPart(myCurrentFile);
-            AC_DEBUG << "use: myIncludePath=" << myIncludePath;
+            AC_TRACE << "use: myIncludePath=" << myIncludePath;
             std::string myIncludeFileWithPath = asl::searchFile(myIncludeFile, myIncludePath);
 
             if (myIncludeFileWithPath.empty()) {
                 // Try looking in the package manager:
                 myIncludeFileWithPath = JSApp::getPackageManager()->searchFile(myIncludeFile);
             }
-            AC_DEBUG << "use myIncludeFileWithPath=" << myIncludeFileWithPath;
+            AC_TRACE << "use myIncludeFileWithPath=" << myIncludeFileWithPath;
             if (myIncludeFileWithPath.empty()) {
                 AC_ERROR << "File '" << myIncludeFile << "' not found in " << myIncludePath << ";" << JSApp::getPackageManager()->getSearchPath() << std::endl;
                 throwException(cx, "File not found", myIncludeFile, myLine);
@@ -995,7 +995,7 @@ Use(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
                 if (it == ourIncludeGuard.end()) {
                     script = JS_CompileFile(cx, obj, myIncludeFileWithPath.c_str());
                     ourIncludeGuard.push_back(myIncludeFileWithPath);
-                    AC_DEBUG << "use: compiled: " << myIncludeFileWithPath;
+                    AC_TRACE << "use: compiled: " << myIncludeFileWithPath;
                 } else {
                     AC_DEBUG << "use: has been already included: " << myIncludeFileWithPath;
                     return JS_TRUE;
