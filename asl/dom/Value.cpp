@@ -16,7 +16,7 @@
 #include "Nodes.h"
 #include <asl/base/Logger.h>
 
-#define DB(x)  x
+#define DB(x)  // x
 #define DB2(x) // x
 
 using namespace std;
