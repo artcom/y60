@@ -50,12 +50,12 @@ using namespace boost::spirit::qi;
 
 template <typename Iterator>
 struct CSVParser : grammar<Iterator, std::vector<std::vector<std::string> >()> {
-    CSVParser() : CSVParser::base_type(csvFile) {
+    CSVParser(const char delimiter = ',') : CSVParser::base_type(csvFile) {
 
         subField %= *(char_ - '"');
         optionalSpaces = *(lit(' ')|lit('\t'));
 
-        simpleField %= +(char_ - ';' - eol - '\t' - ' ' - '"');
+        simpleField %= +(char_ - delimiter - eol - '\t' - ' ' - '"');
         quotedField %= '"' > escapedField > '"';
 
         rawField %= simpleField | quotedField;
@@ -63,7 +63,7 @@ struct CSVParser : grammar<Iterator, std::vector<std::vector<std::string> >()> {
 
         escapedField = subField[_val+=_1] > *(lit("\"\"")[_val+='"'] > subField[_val+=_1]);
 
-        csvStringList =  rawString[push_back(_val,_1)] > *(';' > rawString[push_back(_val,_1)]);
+        csvStringList =  rawString[push_back(_val,_1)] > *(delimiter > rawString[push_back(_val,_1)]);
         csvRecord = csvStringList >> eol;
         csvFile = *(csvRecord[push_back(_val,_1)]);
 
@@ -81,7 +81,7 @@ struct CSVParser : grammar<Iterator, std::vector<std::vector<std::string> >()> {
 
         on_error<fail> (
             csvFile, std::cout
-                << val("Error! Expecting ")
+                << val("CSVParser Error! Expecting ")
                 << _4                               // what failed?
                 << val(" here: \"")
                 << construct<std::string>(_3, _2)   // iterators to error-pos, end
@@ -105,15 +105,18 @@ struct CSVParser : grammar<Iterator, std::vector<std::vector<std::string> >()> {
 namespace asl {
 
 void
-parseCSV(std::string const& input, std::vector<std::vector<std::string> > & result) {
+parseCSV(std::string const& input, 
+         std::vector<std::vector<std::string> > & result,
+         const char delimiter) {
+
     typedef std::string::const_iterator iterator_type;
     typedef CSVParser<iterator_type> CSVParser;
-    CSVParser ourCSVParser; 
+    CSVParser ourCSVParser(delimiter); 
     std::string::const_iterator s = input.begin();
     std::string::const_iterator e = input.end();
     bool r = parse(s, e, ourCSVParser, result);
     if (! r || s != e) {
-        throw "KAPUTT";
+        throw CSVParsingFailed("Error parsing csv string", PLUS_FILE_LINE);
     }
 }
 

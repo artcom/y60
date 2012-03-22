@@ -24,13 +24,19 @@
 #include <string>
 #include <vector>
 
+#include <asl/base/Exception.h>
+
 /*! \addtogroup aslcsv */
 /* @{ */
 
 namespace asl {
 
-ASL_CSV_DECL void
-parseCSV(std::string const& input, std::vector<std::vector<std::string> > & result);
+    ASL_CSV_DECL void
+    parseCSV(std::string const& input, 
+             std::vector<std::vector<std::string> > & result, 
+             const char delimiter = ',');
+
+    DEFINE_EXCEPTION(CSVParsingFailed, asl::Exception);
 
 }
 

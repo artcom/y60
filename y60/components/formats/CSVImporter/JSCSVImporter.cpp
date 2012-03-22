@@ -47,7 +47,13 @@ namespace jslib {
         DOC_END;
         std::string myFileName;
         convertFrom(cx, argv[0], myFileName );
-        *rval = as_jsval(cx, csv::CSVImporter::csv2array(myFileName));
+        if (argc > 1) {
+            std::string myDelimiter;
+            convertFrom(cx, argv[1], myDelimiter);
+            *rval = as_jsval(cx, csv::CSVImporter::csv2array(myFileName, myDelimiter[0]));
+        } else {
+            *rval = as_jsval(cx, csv::CSVImporter::csv2array(myFileName));
+        }
         return JS_TRUE;
     }
 
@@ -125,7 +131,7 @@ namespace jslib {
         AC_DEBUG << "Registering class '"<<ClassName()<<"'"<<endl;
         static JSFunctionSpec myFunctions[] = {
             // name                  native                   nargs
-            {"csv2array",            Csv2array,               1},
+            {"csv2array",            Csv2array,               2},
             {0}
         };
         return myFunctions;

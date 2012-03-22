@@ -40,10 +40,10 @@ using namespace y60;
 
 namespace jslib {
     vector<vector<string> > 
-    csv::CSVImporter::csv2array(string theFileName) {
+    csv::CSVImporter::csv2array(const string theFileName, const char theDelimiter) {
         std::vector<std::vector<std::string> > myResult;
         string myContent = readFile(theFileName);
-        asl::parseCSV(myContent, myResult);
+        asl::parseCSV(myContent, myResult, theDelimiter);
         return myResult;
     }
 } // namespace jslib

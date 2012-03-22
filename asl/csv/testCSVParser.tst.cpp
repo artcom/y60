@@ -63,7 +63,7 @@ public:
             std::vector<std::vector<std::string> > result;
 
             if (fixtureList[i].find(".invalid.") != string::npos) {
-                ENSURE_EXCEPTION(parseCSV(s, result), char *);
+                ENSURE_EXCEPTION(parseCSV(s, result), CSVParsingFailed);
             } else {
                 parseCSV(s, result);
                 DPRINT(result.size());
@@ -74,7 +74,7 @@ public:
     void testRecordCount() {
         std::vector<std::vector<std::string> > result;
         // Linux-Style line breaks
-        parseCSV("foo;bar;baz\nsnarf;\"ba\nrf\";narf\n", result);
+        parseCSV("foo,bar,baz\nsnarf,\"ba\nrf\",narf\n", result);
         ENSURE_EQUAL(2, result.size());
         ENSURE_EQUAL(3, result[0].size());
         ENSURE_EQUAL("foo", result[0][0]);
@@ -82,7 +82,7 @@ public:
         ENSURE_EQUAL("snarf", result[1][0]);
         // Windows-Style line breaks
         result.clear();
-        parseCSV("foo;bar;baz\r\nsnarf;\"ba\r\nrf\";narf\r\n", result);
+        parseCSV("foo,bar,baz\r\n_snarf,\"ba\r\nrf\",narf\r\n", result);
         for (AC_SIZE_TYPE r = 0; r < result.size(); ++r) {
             for (AC_SIZE_TYPE f = 0; f < result[r].size(); ++f) {
                 cerr << "[" << r << "," << f << "]='" << result[r][f] << "'" << endl;
@@ -92,12 +92,23 @@ public:
         ENSURE_EQUAL(3, result[0].size());
         ENSURE_EQUAL("foo", result[0][0]);
         ENSURE_EQUAL(3, result[1].size());
-        ENSURE_EQUAL("snarf", result[1][0]);
+        ENSURE_EQUAL("_snarf", result[1][0]);
+    }
+
+    void testModifiedDelimiter() {
+        std::vector<std::vector<std::string> > result;
+        parseCSV("xfoo~bar~baz\nxsnarf~\"ba\nrf\"~narf\n", result, '~');
+        ENSURE_EQUAL(2, result.size());
+        ENSURE_EQUAL(3, result[0].size());
+        ENSURE_EQUAL("xfoo", result[0][0]);
+        ENSURE_EQUAL(3, result[1].size());
+        ENSURE_EQUAL("xsnarf", result[1][0]);
     }
 
     void run() {
         testValidInvalid();
         testRecordCount();
+        testModifiedDelimiter();
     }
 
     DirectoryPackage fixturesDir;
