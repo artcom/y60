@@ -185,6 +185,9 @@ namespace y60 {
             AC_INFO << "FFMpegDecoder2::load";
             AC_INFO << "\tlibavcodec:\t" << LIBAVCODEC_IDENT;
             AC_INFO << "\tlibavformat:\t" << LIBAVFORMAT_IDENT;
+#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(53,8,0)
+            AC_INFO << "multithreaded decoding is not available - update your ffmpeg libs to libavcodec >= " << AV_STRINGIFY(AV_VERSION(53,8,0));
+#endif
             av_log_set_level(AV_LOG_ERROR);
             av_register_all();
             avRegistered = true;
@@ -948,7 +951,6 @@ namespace y60 {
             }
             if (avcodec_open2(myCodecContext, myCodec, &opts) < 0 ) {
 #else
-            AC_INFO << "multithreaded decoding is not available - update your ffmpeg libs to libavcodec >= " << AV_STRINGIFY(AV_VERSION(53,8,0));
             if (avcodec_open(myCodecContext, myCodec) < 0 ) {
 #endif
                 throw FFMpegDecoder2Exception(std::string("Unable to open codec "), PLUS_FILE_LINE);
