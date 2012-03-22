@@ -165,6 +165,7 @@ namespace y60 {
         void shutdown();
 
     private:
+        void openStreams();
         void setupVideo(const std::string & theFilename);
         void setupAudio(const std::string & theFilename);
         void getVideoProperties();

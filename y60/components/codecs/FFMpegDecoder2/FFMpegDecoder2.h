@@ -169,7 +169,7 @@ namespace y60 {
         void run();
 
         void startOverAgain();
-
+        void openStreams();
         void setupVideo(const std::string & theFilename);
         void setupAudio(const std::string & theFilename);
         void getVideoProperties(const std::string & theFilename);

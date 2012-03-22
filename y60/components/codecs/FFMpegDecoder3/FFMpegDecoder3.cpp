@@ -206,58 +206,10 @@ namespace y60 {
             throw FFMpegDecoder3Exception(std::string("Unable to find stream info: ")
                     + myFilename, PLUS_FILE_LINE);
         }
-        // for debugging you can let ffmpeg tell detail about the movie
-        //char myString[200];
-        //dump_format(_myFormatContext, 0, myString, 0);
-        // find video/audio streams
+        
         _myDemux = AsyncDemuxerPtr(new AsyncDemuxer(_myFormatContext));
-        unsigned myAudioStreamIndex = 0;
-        _myAllAudioStreamIndicies.clear();
-        for (unsigned i = 0; i < static_cast<unsigned>(_myFormatContext->nb_streams); ++i) {
-            int myCodecType =  _myFormatContext->streams[i]->codec->codec_type;
-        #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52, 64, 0)
-            if (_myVStreamIndex == -1 && myCodecType == AVMEDIA_TYPE_VIDEO) {
-        #else
-            if (_myVStreamIndex == -1 && myCodecType == CODEC_TYPE_VIDEO) {
-        #endif
-                _myVStreamIndex = i;
-                _myVStream = _myFormatContext->streams[i];
-        #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52, 64, 0)
-            } else if (myCodecType == AVMEDIA_TYPE_AUDIO) {
-        #else
-            } else if (myCodecType == CODEC_TYPE_AUDIO) {
-        #endif
-                if (_myAStreamIndex == -1 || myAudioStreamIndex == getMovie()->get<AudioStreamTag>()) {
-                    _myAStreamIndex = i;
-                    _myAStream = _myFormatContext->streams[i];
-                    getMovie()->set<AudioStreamTag>(myAudioStreamIndex);
-                    _myAStreamIndexDom = myAudioStreamIndex;
-                }
-                _myAllAudioStreamIndicies.push_back(i);
-                AVCodecContext * myACodec = _myFormatContext->streams[i]->codec;
-                // open codec
-                AVCodec * myCodec = avcodec_find_decoder(myACodec->codec_id);
-#if  LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(53,8,0)
-                std::string thread_count = "auto";
-                asl::get_environment_var("Y60_FFMPEG_DECODER_THREADS", thread_count);
-                AVDictionary *opts = NULL;
-                if (!av_dict_get(opts, "threads", NULL, 0)) {
-                    av_dict_set(&opts, "threads", thread_count.c_str(), 0);
-                }
-                if (avcodec_open2(myACodec, myCodec, &opts) < 0 ) {
-#else
-                AC_INFO << "multithreaded decoding is not available - update your ffmpeg libs to libavcodec >= " << AV_STRINGIFY(AV_VERSION(53,8,0));
-                if (avcodec_open(myACodec, myCodec) < 0 ) {
-#endif
-                    throw FFMpegDecoder3Exception(std::string("Unable to open audio codec: "), PLUS_FILE_LINE);
-                }
-#if  LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(53,8,0)
-                av_dict_free(&opts);
-#endif
-                myAudioStreamIndex++;
-            }
-        }
-
+        
+        openStreams();
         if (_myVStream) {
             setupVideo(myFilename);
         } else {
@@ -560,34 +512,58 @@ namespace y60 {
         return theTime;
     }
 
+    void FFMpegDecoder3::openStreams() {
+        unsigned myAudioStreamIndex = 0;
+        _myAllAudioStreamIndicies.clear();
+        for (unsigned i = 0; i < static_cast<unsigned>(_myFormatContext->nb_streams); ++i) {
+            int myCodecType =  _myFormatContext->streams[i]->codec->codec_type;
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52, 64, 0)
+            if (_myVStreamIndex == -1 && myCodecType == AVMEDIA_TYPE_VIDEO) {
+#else
+            if (_myVStreamIndex == -1 && myCodecType == CODEC_TYPE_VIDEO) {
+#endif
+                _myVStreamIndex = i;
+                _myVStream = _myFormatContext->streams[i];
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52, 64, 0)
+            } else if (myCodecType == AVMEDIA_TYPE_AUDIO) {
+#else
+            } else if (myCodecType == CODEC_TYPE_AUDIO) {
+#endif
+                if (_myAStreamIndex == -1 || myAudioStreamIndex == getMovie()->get<AudioStreamTag>()) {
+                    _myAStreamIndex = i;
+                    _myAStream = _myFormatContext->streams[i];
+                    getMovie()->Movie::set<AudioStreamTag>(myAudioStreamIndex);
+                    _myAStreamIndexDom = myAudioStreamIndex;
+                }
+                _myAllAudioStreamIndicies.push_back(i);
+                myAudioStreamIndex++;
+            }
+            // open codec
+            AVCodecContext * myCodecContext = _myFormatContext->streams[i]->codec;
+            AVCodec * myCodec = avcodec_find_decoder(myCodecContext->codec_id);
+#if  LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(53,8,0)
+            std::string thread_count = "auto";
+            asl::get_environment_var("Y60_FFMPEG_DECODER_THREADS", thread_count);
+            AVDictionary *opts = NULL;
+            if (!av_dict_get(opts, "threads", NULL, 0)) {
+                av_dict_set(&opts, "threads", thread_count.c_str(), 0);
+            }
+            if (avcodec_open2(myCodecContext, myCodec, &opts) < 0 ) {
+#else
+            AC_INFO << "multithreaded decoding is not available - update your ffmpeg libs to libavcodec >= " << AV_STRINGIFY(AV_VERSION(53,8,0));
+            if (avcodec_open(myCodecContext, myCodec) < 0 ) {
+#endif
+                throw FFMpegDecoder3Exception(std::string("Unable to open codec "), PLUS_FILE_LINE);
+            }
+#if  LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(53,8,0)
+            av_dict_free(&opts);
+#endif
+        }
+    }
+
     void FFMpegDecoder3::setupVideo(const std::string & theFilename) {
         AC_DEBUG << "FFMpegDecoder3::setupVideo";
         AVCodecContext * myVCodec = _myVStream->codec;
-        // open codec
-        AVCodec * myCodec = avcodec_find_decoder(myVCodec->codec_id);
-        if (!myCodec) {
-            throw FFMpegDecoder3Exception(std::string("Unable to find video codec: ")
-                    + theFilename, PLUS_FILE_LINE);
-        }
-
-#if  LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(53,8,0)
-        std::string thread_count = "auto";
-        asl::get_environment_var("Y60_FFMPEG_DECODER_THREADS", thread_count);
-        AVDictionary *opts = NULL;
-        if (!av_dict_get(opts, "threads", NULL, 0)) {
-            av_dict_set(&opts, "threads", thread_count.c_str(), 0);
-        }
-        if (avcodec_open2(myVCodec, myCodec, &opts) < 0 ) {
-#else
-        AC_INFO << "multithreaded decoding is not available - update your ffmpeg libs to libavcodec >= " << AV_STRINGIFY(AV_VERSION(53,8,0));
-        if (avcodec_open(myVCodec, myCodec) < 0 ) {
-#endif
-            throw FFMpegDecoder3Exception(std::string("Unable to open video codec: ")
-                                          + theFilename, PLUS_FILE_LINE);
-        }
-#if  LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(53,8,0)
-        av_dict_free(&opts);
-#endif
         _myVideoStartTimestamp = -1; // used as flag, we use the dts of the first decoded frame
 
         Movie * myMovie = getMovie();
