@@ -60,6 +60,7 @@
 
 #include <y60/video/Movie.h>
 #include <asl/base/Logger.h>
+#include <asl/base/os_functions.h>
 #include <asl/base/file_functions.h>
 #include <asl/base/string_functions.h>
 
@@ -192,7 +193,9 @@ namespace y60 {
         // register all formats and codecs
         static bool avRegistered = false;
         if (!avRegistered) {
-            AC_INFO << "FFMpegDecoder1 avcodec version " << LIBAVCODEC_IDENT;
+            AC_INFO << "FFMpegDecoder2::load";
+            AC_INFO << "\tlibavcodec:\t" << LIBAVCODEC_IDENT;
+            AC_INFO << "\tlibavformat:\t" << LIBAVFORMAT_IDENT;
             av_log_set_level(AV_LOG_ERROR);
             av_register_all();
             avRegistered = true;
@@ -240,14 +243,23 @@ namespace y60 {
             throw FFMpegDecoderException(std::string("Unable to find decoder: ") + theFilename, PLUS_FILE_LINE);
         }
 
-#if  LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(53,6,0)
-        if (avcodec_open2(_myVStream->codec, myCodec, NULL) < 0 ) {
+#if  LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(53,8,0)
+        std::string thread_count = "auto";
+        asl::get_environment_var("Y60_FFMPEG_DECODER_THREADS", thread_count);
+        AVDictionary *opts = NULL;
+        if (!av_dict_get(opts, "threads", NULL, 0)) {
+            av_dict_set(&opts, "threads", thread_count.c_str(), 0);
+        }
+        if (avcodec_open2(_myVStream->codec, myCodec, &opts) < 0 ) {
 #else
+        AC_INFO << "multithreaded decoding is not available - update your ffmpeg libs to libavcodec >= " << AV_STRINGIFY(AV_VERSION(53,8,0));
         if (avcodec_open(_myVStream->codec, myCodec) < 0 ) {
 #endif
             throw FFMpegDecoderException(std::string("Unable to open codec: ") + theFilename, PLUS_FILE_LINE);
         }
-
+#if  LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(53,8,0)
+        av_dict_free(&opts);
+#endif
         // allocate frame for YUV data
         _myFrame = avcodec_alloc_frame();
 
