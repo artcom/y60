@@ -519,12 +519,14 @@ namespace y60 {
         unsigned myAudioStreamIndex = 0;
         _myAllAudioStreamIndicies.clear();
         for (unsigned i = 0; i < static_cast<unsigned>(_myFormatContext->nb_streams); ++i) {
+            bool validStream = false;
             int myCodecType =  _myFormatContext->streams[i]->codec->codec_type;
 #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52, 64, 0)
             if (_myVStreamIndex == -1 && myCodecType == AVMEDIA_TYPE_VIDEO) {
 #else
             if (_myVStreamIndex == -1 && myCodecType == CODEC_TYPE_VIDEO) {
 #endif
+                validStream = true;
                 _myVStreamIndex = i;
                 _myVStream = _myFormatContext->streams[i];
 #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52, 64, 0)
@@ -532,6 +534,7 @@ namespace y60 {
 #else
             } else if (myCodecType == CODEC_TYPE_AUDIO) {
 #endif
+                validStream = true;
                 if (_myAStreamIndex == -1 || myAudioStreamIndex == getMovie()->get<AudioStreamTag>()) {
                     _myAStreamIndex = i;
                     _myAStream = _myFormatContext->streams[i];
@@ -540,6 +543,9 @@ namespace y60 {
                 }
                 _myAllAudioStreamIndicies.push_back(i);
                 myAudioStreamIndex++;
+            }
+            if (!validStream) {
+                continue;
             }
             // open codec
             AVCodecContext * myCodecContext = _myFormatContext->streams[i]->codec;
@@ -555,7 +561,7 @@ namespace y60 {
 #else
             if (avcodec_open(myCodecContext, myCodec) < 0 ) {
 #endif
-                throw FFMpegDecoder3Exception(std::string("Unable to open codec "), PLUS_FILE_LINE);
+                throw FFMpegDecoder3Exception(std::string("Unable to open codec " + myCodecContext->codec_id), PLUS_FILE_LINE);
             }
 #if  LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(53,8,0)
             av_dict_free(&opts);
