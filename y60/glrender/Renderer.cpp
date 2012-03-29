@@ -1094,11 +1094,16 @@ namespace y60 {
             } else if (myBody.get<BillboardTag>() == POINT_BILLBOARD) {
                 // calculate absolute scale of transform hierarchy:
                 Vector3f myCurScale = myBody.get<ScaleTag>();
+                
+                // reset orientation, otherwise the matrix will explode [sh]
+                myBody.set<OrientationTag>(asl::Vector4f(0,0,0,1));
+
                 const dom::Node* myCurNode = myBody.getNode().parentNode();
                 while(myCurNode->nodeName() != WORLD_NODE_NAME) {
                     myCurScale *= myCurNode->getFacade<TransformHierarchyFacade>()->get<ScaleTag>();
                     myCurNode = myCurNode->parentNode();
                 }
+                
                 // get rid of scale in billboard's global matrix
                 Vector3f myFinalInverseScale(1.0f/myCurScale[0], 1.0f/myCurScale[1], 1.0f/myCurScale[2]);
                 Matrix4f myBillboardMatrix = myBody.get<GlobalMatrixTag>();
@@ -1119,6 +1124,7 @@ namespace y60 {
                     }
                     myTransform = myLookatTransformPtr->getFacade<TransformHierarchyFacade>();
                 }
+                
                 Matrix4f myLookatMatrix = myTransform->get<GlobalMatrixTag>();
                 myLookatMatrix.postMultiply(myBillboardMatrix);
 
