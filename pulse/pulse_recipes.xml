@@ -25,7 +25,6 @@
 
     <macro name="update_submodules">
         <executable name="test" exe="${git.bin}" args="status"/>
-        <executable name="test2" exe="${git.bin}" args="status >&out.txt"/>
         <executable name="update_submodules" exe="${git.bin}" args="submodule update --init"/>
     </macro>
     <macro name="run_cmake">
