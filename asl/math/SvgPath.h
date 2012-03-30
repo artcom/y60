@@ -38,8 +38,8 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-#ifndef _y60_SvgPath_h_
-#define _y60_SvgPath_h_
+#ifndef _asl_SvgPath_h_
+#define _asl_SvgPath_h_
 
 #include "asl_math_settings.h"
 

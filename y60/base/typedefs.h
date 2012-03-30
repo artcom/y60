@@ -77,6 +77,7 @@
 
 #include "AcBool.h"
 #include "NodeValueNames.h"
+#include "y60_pixel_types.h"
 
 #include <asl/math/Vector234.h>
 #include <asl/math/Quaternion.h>
@@ -119,8 +120,8 @@ namespace y60 {
     typedef asl::raster<asl::DXT3>             RasterOfDXT3;
     typedef asl::raster<asl::DXT5>             RasterOfDXT5;
 
-    typedef asl::raster<asl::RGBA_HALF> RasterOfRGBA_HALF;
-    typedef asl::raster<asl::RGB_HALF>  RasterOfRGB_HALF;
+    typedef asl::raster<y60::RASTER_PIXEL_TYPE_RGBA_HALF> RasterOfRGBA_HALF;
+    typedef asl::raster<y60::RASTER_PIXEL_TYPE_RGB_HALF>  RasterOfRGB_HALF;
     typedef asl::raster<asl::RGBA_FLOAT> RasterOfRGBA_FLOAT;
     typedef asl::raster<asl::RGB_FLOAT>  RasterOfRGB_FLOAT;
 }

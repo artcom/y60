@@ -17,12 +17,9 @@ PixelRaster
 Pixels
 )
 
-list( APPEND EXTERNALS OPENEXR )
-
 ac_add_library(
     aslraster asl/raster
     HEADERS ${HEADERS}
     DEPENDS aslbase
     TESTS   ${TESTS}
-    EXTERNS ${EXTERNALS}
 )
