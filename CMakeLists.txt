@@ -23,8 +23,8 @@ find_package(AcMake)
 ac_begin_solution(
     PRO60
     VERSION_MAJOR 1 VERSION_MINOR 0 VERSION_PATCH 6
-    DESCRIPTION  "PRO60 Environment"
-    VENDOR       "ART+COM Technologies GmbH"
+    DESCRIPTION  "Y60 Media Engine"
+    VENDOR       "ART+COM AG"
     CONTACT      "y60@artcom.de"
     DESCRIPTION_FILE "${CMAKE_SOURCE_DIR}/DESCRIPTION.txt"
     LICENSE_FILE     "${CMAKE_SOURCE_DIR}/LICENSE.txt"
@@ -40,7 +40,7 @@ if(ACMAKE_DEBIAN)
         SECTION graphics
         PRIORITY optional
         MAINTAINER
-            "Ingo Albrecht <ingo@artcom.de>"
+            "<y60@artcom.de>"
         HOMEPAGE
             "http://y60.artcom.de/"
         PROVIDE_DEBUG_PACKAGE
