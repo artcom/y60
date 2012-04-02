@@ -24,7 +24,6 @@
     <regex-test.pp name="ctest.pp" name-group="3" status-group="4" details-group="5" pass-status="Passed" failure-status="***"><![CDATA[^\\s*\\d+/\\d+\\s+Test(ing)?\\s+(#\\d+:\\s+)?(\\w+)[ .]*(\\*\\*\\*|Passed)(.*)\$]]></regex-test.pp>
 
     <macro name="update_submodules">
-        <executable name="update_submodules_test" exe="${git.bin}" args="status"/>
         <executable name="update_submodules" exe="${git.bin}" args="submodule update --init"/>
     </macro>
     <macro name="run_cmake">
