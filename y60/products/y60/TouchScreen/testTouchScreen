@@ -1,1 +1,0 @@
-acxpshellOPT -I $PRO/src/y60/js/ testTouchScreen.js unit_cube.x60 $PRO/src/y60/shader/shaderlibrary_nocg.xml $*
