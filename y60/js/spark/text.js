@@ -89,14 +89,17 @@ spark.fontScale = 1;
  * Internal: ensure loading of font appropriate for the given style
  */
 
-spark.loadFont = function (theName, theSize, theFontStyle, theHinting, theAscendOffset) {
+spark.loadFont = function (theName, theSize, theFontScale, theFontStyle, theHinting, theAscendOffset) {
+    if (theFontScale == undefined) {
+        theFontScale = 1;
+    }
     if (theAscendOffset == undefined) {
         theAscendOffset = 0;
     }
     var myName = theName + "-" + theFontStyle + "-" + theSize + "-" + theHinting + "-" + theAscendOffset;
     if (!(myName in spark.ourLoadedFonts)) {
         if (theFontStyle != "normal") {
-            spark.loadFont(theName, theSize, "normal", theHinting, theAscendOffset);
+            spark.loadFont(theName, theSize, theFontScale, "normal", theHinting, theAscendOffset);
         }
 
         Logger.debug("Loading font " + theName + " with size " + theSize + " and fonststyle " + theFontStyle+
@@ -124,9 +127,9 @@ spark.loadFont = function (theName, theSize, theFontStyle, theHinting, theAscend
 
         var myHinting = spark.hintingFromString(theHinting);    
         // enforce loadttf of a normal font, otherwise we get an exception
-        window.loadTTF(myName, searchFile(myFontPath), theSize * spark.fontScale, myHinting, spark.styleFromString("normal"), theAscendOffset);
+        window.loadTTF(myName, searchFile(myFontPath), theSize * theFontScale, myHinting, spark.styleFromString("normal"), theAscendOffset);
         if (theFontStyle != "normal") {
-            window.loadTTF(myName, searchFile(myFontPath), theSize * spark.fontScale, myHinting, spark.styleFromString(theFontStyle));
+            window.loadTTF(myName, searchFile(myFontPath), theSize * theFontScale, myHinting, spark.styleFromString(theFontStyle));
         }
         spark.ourLoadedFonts[myName] = true;
 
@@ -140,7 +143,7 @@ spark.loadFont = function (theName, theSize, theFontStyle, theHinting, theAscend
             }
             if (myFontPath) {
                 Logger.debug("loading bold font for " + myName + "," + myFontPath + "," + theSize + "," + "bold");
-                window.loadTTF(myName, searchFile(myFontPath), theSize * spark.fontScale, myHinting, Renderer.BOLD);
+                window.loadTTF(myName, searchFile(myFontPath), theSize * theFontScale, myHinting, Renderer.BOLD);
             }
         }
     }
@@ -152,6 +155,7 @@ spark.loadFont = function (theName, theSize, theFontStyle, theHinting, theAscend
  */
 spark.applyStyleDefaults = function(theStyle) {
     !theStyle.getAttribute("fontStyle")  ? theStyle.fontStyle = "normal" : null;
+    !theStyle.getAttribute("fontScale")  ? theStyle.fontScale = spark.fontScale : null;
 
     !theStyle.getAttribute("topPad")     ? theStyle.topPad    = 0 : null;
     !theStyle.getAttribute("bottomPad")  ? theStyle.bottomPad = 0 : null;
@@ -171,6 +175,7 @@ spark.applyStyleDefaults = function(theStyle) {
 spark.isFontStyleNode = function(theNode) {
     return (theNode.getAttribute("font") ||
             theNode.getAttribute("fontSize") || 
+            theNode.getAttribute("fontScale") || 
             theNode.getAttribute("fontStyle") || 
             theNode.getAttribute("topPad") || 
             theNode.getAttribute("bottomPad") || 
@@ -252,6 +257,7 @@ spark.fontStyleFromNode = function(theNode) {
 
     copyAttributeIfPresent("font");
     copyAttributeIfPresent("fontSize");
+    copyAttributeIfPresent("fontScale");
     copyAttributeIfPresent("ascendOffset");
     copyAttributeIfPresent("fontStyle");
 
@@ -279,10 +285,11 @@ spark.fontStyleFromNode = function(theNode) {
 spark.fontForStyle = function(theStyle) {
     !theStyle.getAttribute("font")      ? theStyle.font    = "arial" : null;
     !theStyle.getAttribute("fontSize")  ? theStyle.fontSize = 12 : null;
+    !theStyle.getAttribute("fontScale")  ? theStyle.fontScale =  spark.fontScale : null;
     !theStyle.getAttribute("fontStyle") ? theStyle.fontStyle  = "normal" : null;
     !theStyle.getAttribute("hinting") ? theStyle.hinting  = spark.AUTOHINTING : null;
     !theStyle.getAttribute("ascendOffset") ? theStyle.ascendOffset  = 0 : null;
-    return spark.loadFont(theStyle.font, theStyle.fontSize, theStyle.fontStyle, theStyle.hinting, theStyle.ascendOffset);
+    return spark.loadFont(theStyle.font, theStyle.fontSize, theStyle.fontScale, theStyle.fontStyle, theStyle.hinting, theStyle.ascendOffset);
 };
 
 /**
@@ -377,22 +384,21 @@ spark.renderText = function(theImage, theText, theStyle, theSize, theMaxTextWidt
 
     window.setTextColor(asColor(theStyle.textColor));
     window.setTracking(theStyle.tracking);
-    window.setLineHeight(theStyle.lineHeight*spark.fontScale);
+    window.setLineHeight(theStyle.lineHeight*theStyle.fontScale);
 
     var myFont = spark.fontForStyle(theStyle);
     var mySize = new Vector2f(theImage.width, theImage.height);
     if(theSize != undefined) {
         mySize = theSize;
     }
-
     var myTextSize =
         window.renderTextAsImage(theImage,
                                  theText,
                                  myFont,
-                                 mySize.x*spark.fontScale, mySize.y*spark.fontScale);
+                                 mySize.x*theStyle.fontScale, mySize.y*theStyle.fontScale);
     var myGlyphPosition = window.getTextGlyphPositions();  
     //XXX: if the image width is odd and fontscale is >1 the imagefilter can result in bad looking text
-    myTextSize = new Vector2f(Math.ceil(myTextSize[0]/spark.fontScale), Math.ceil(myTextSize[1]/spark.fontScale));
+    myTextSize = new Vector2f(Math.ceil(myTextSize[0]/theStyle.fontScale), Math.ceil(myTextSize[1]/theStyle.fontScale));
     applyImageFilter(theImage, "resizehamming", [myTextSize.x, myTextSize.y, 1]);
     if (theImage.width > 0 && theImage.height > 0) {
         var myMatrix = new Matrix4f();
