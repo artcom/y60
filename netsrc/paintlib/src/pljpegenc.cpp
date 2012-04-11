@@ -93,7 +93,9 @@ void PLJPEGEncoder::DoEncode
       PLDataSink * pDataSink
     )
 {
-  PLASSERT (pBmp->GetBitsPerPixel() == 32); // Only true-color supported.
+  if (pBmp->GetBitsPerPixel() < 24) {
+      throw PLTextException(PL_ERRFORMAT_NOT_SUPPORTED, " bitsPerPixel Unsupported.");
+  }
   try
   {
   // todo: notification not implemented for encoders.
@@ -145,7 +147,11 @@ void PLJPEGEncoder::DoEncode
       m_pExifData->WriteData(m_pcinfo);
     }
 
-    encodeRGB (pBmp, pBmp->GetHeight());
+    if (pBmp->GetBitsPerPixel() == 24) {
+        encodeRGB24 (pBmp, pBmp->GetHeight());
+    } else {
+        encodeRGB32 (pBmp, pBmp->GetHeight());
+    }
 
     jpeg_finish_compress (m_pcinfo);
     if (m_pExifData)
@@ -168,7 +174,7 @@ void PLJPEGEncoder::DoEncode
 
 // °°° RGB_PIXELSIZE constant from libjpeg !!!
 // °°° RGB_RED, RGB_GREEN, RGB_BLUE constants from libjpeg !!!
-void PLJPEGEncoder::encodeRGB
+void PLJPEGEncoder::encodeRGB32
     ( PLBmpBase * pBmp,
       int iScanLines
     )
@@ -203,7 +209,55 @@ void PLJPEGEncoder::encodeRGB
     CurLine++;
 #else
     PLBYTE ** pLineArray = pBmp->GetLineArray();
-    written = jpeg_write_scanlines (m_pcinfo,&pLineArray[CurLine], 32);
+    written = jpeg_write_scanlines (m_pcinfo,&pLineArray[CurLine], pBmp->GetBitsPerPixel());
+    CurLine+=written;
+
+    if(!written)
+      break;
+#endif
+  }
+  if(pBuf)
+  {
+    delete[] pBuf;
+  }
+}
+
+void PLJPEGEncoder::encodeRGB24
+    ( PLBmpBase * pBmp,
+      int iScanLines
+    )
+    // Assumes IJPEG decoder is already set up.
+{
+
+  PLBYTE * pBuf = NULL;
+  int CurLine = 0;
+  JSAMPARRAY ppBuf = &pBuf;
+
+#if ((PL_RGBA_RED!=RGB_RED)||(PL_RGBA_GREEN!=RGB_GREEN)||(PL_RGBA_BLUE!=RGB_BLUE)||(4!=RGB_PIXELSIZE))
+  pBuf = new PLBYTE [pBmp->GetWidth()*RGB_PIXELSIZE];
+#else
+  int written = 0;
+#endif
+
+  while (CurLine < iScanLines)
+  {
+#if ((PL_RGBA_RED!=RGB_RED)||(PL_RGBA_GREEN!=RGB_GREEN)||(PL_RGBA_BLUE!=RGB_BLUE)||(4!=RGB_PIXELSIZE))
+    PLPixel24 ** pLineArray = pBmp->GetLineArray24();
+    int i;
+    for (i=0;i<pBmp->GetWidth();i++)
+    {
+
+      PLPixel24 * pSrcPixel = pLineArray[CurLine]+i;
+      PLBYTE * pDestPixel = pBuf+i*RGB_PIXELSIZE;
+      pDestPixel[RGB_RED] = pSrcPixel->GetR();
+      pDestPixel[RGB_GREEN] = pSrcPixel->GetG();
+      pDestPixel[RGB_BLUE] = pSrcPixel->GetB();
+    }
+    jpeg_write_scanlines (m_pcinfo, ppBuf, 1);
+    CurLine++;
+#else
+    PLBYTE ** pLineArray = pBmp->GetLineArray();
+    written = jpeg_write_scanlines (m_pcinfo,&pLineArray[CurLine], pBmp->GetBitsPerPixel());
     CurLine+=written;
 
     if(!written)

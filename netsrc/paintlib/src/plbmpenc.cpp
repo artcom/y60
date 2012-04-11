@@ -104,7 +104,49 @@ void PLBmpEncoder::DoEncode
       pSink->Skip(PadBytes);
     }
   }
-  else
+  else if (BPP == 16)
+  {
+    PLPixel16 * pCurLine;
+    FileBMI.biBitCount = 24;  // not 32...
+    pSink->WriteNBytes (sizeof (WINBITMAPINFOHEADER),(PLBYTE *) &FileBMI);
+
+    int LinePadding = 4-((FileBMI.biWidth*3)&3);
+    if (LinePadding == 4)
+      LinePadding = 0;
+    for (y=FileBMI.biHeight-1; y>=0; y--)
+    {
+      pCurLine = pBmp->GetLineArray16()[y];
+      for (x=0; x<FileBMI.biWidth; x++)
+      {
+        pSink->WriteByte (pCurLine[x].GetB());
+        pSink->WriteByte (pCurLine[x].GetG());
+        pSink->WriteByte (pCurLine[x].GetR());
+      }
+      pSink->WriteNBytes(LinePadding,(PLBYTE *) " ");
+    }
+  }
+  else if (BPP == 24)
+  {
+    PLPixel24 * pCurLine;
+    FileBMI.biBitCount = 24;  // not 32...
+    pSink->WriteNBytes (sizeof (WINBITMAPINFOHEADER),(PLBYTE *) &FileBMI);
+
+    int LinePadding = 4-((FileBMI.biWidth*3)&3);
+    if (LinePadding == 4)
+      LinePadding = 0;
+    for (y=FileBMI.biHeight-1; y>=0; y--)
+    {
+      pCurLine = pBmp->GetLineArray24()[y];
+      for (x=0; x<FileBMI.biWidth; x++)
+      {
+        pSink->WriteByte (pCurLine[x].GetB());
+        pSink->WriteByte (pCurLine[x].GetG());
+        pSink->WriteByte (pCurLine[x].GetR());
+      }
+      pSink->WriteNBytes(LinePadding,(PLBYTE *) " ");
+    }
+  }
+  else if (BPP == 32)
   {
     PLPixel32 * pCurLine;
     FileBMI.biBitCount = 24;  // not 32...
@@ -119,11 +161,15 @@ void PLBmpEncoder::DoEncode
       for (x=0; x<FileBMI.biWidth; x++)
       {
         pSink->WriteByte (pCurLine[x].GetB());
-        pSink->WriteByte (pCurLine[x].GetG());        
+        pSink->WriteByte (pCurLine[x].GetG());
         pSink->WriteByte (pCurLine[x].GetR());
       }
       pSink->WriteNBytes(LinePadding,(PLBYTE *) " ");
     }
+  }
+  else 
+  {
+      throw (PLTextException (PL_ERRFORMAT_NOT_SUPPORTED, " bitsPerPixel Unsupported."));
   }
 
 }
