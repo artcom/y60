@@ -79,6 +79,9 @@
 
 #include <list>
 
+namespace y60 {
+    class BufferToFile;
+}
 namespace jslib {
 
     DEFINE_EXCEPTION(RenderWindowException, asl::Exception);
@@ -260,7 +263,7 @@ namespace jslib {
         void addExtension(y60::IRendererExtensionPtr theExtension);
 
         /// save framebuffer to file
-        void saveBuffer(const std::string & theFilename);
+        void saveBuffer(const std::string & theFilename, const unsigned int theComponents = 4);
 
         /// copy framebuffer to Texture (and optionally to Image raster).
         void copyBufferToTexture(dom::NodePtr & theTexture, const asl::Vector2i & theOffset, bool theCopyToRasterFlag = false);
@@ -371,6 +374,7 @@ namespace jslib {
         double            _myPauseTime;
         bool              _myPauseFlag;
         bool              _myForceFullGC;
+        asl::Ptr<y60::BufferToFile> _myBufferToFileWriter;
     };
 
 }

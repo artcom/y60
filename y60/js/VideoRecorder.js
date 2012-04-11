@@ -94,9 +94,9 @@ function VideoRecorder(theFramesPerSecond, theDirectory, theRenderWindow) {
             if (theRenderArea) {
                 theRenderArea.renderToCanvas(true);
             } else {
-                window.saveBuffer(myFileName);
+                window.saveBuffer(myFileName, 3);
             }
-            print(myFileName);
+            Logger.info("saving frame: " + myFileName);
         }
     };
 

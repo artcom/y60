@@ -75,6 +75,9 @@
 #   pragma warning (pop)
 #endif //defined(_MSC_VER)
 
+#include <boost/shared_ptr.hpp>
+#include <asl/thread/threadpool.hpp>
+
 namespace y60 {
 
     enum GLSourceBuffer {
@@ -85,14 +88,18 @@ namespace y60 {
     DEFINE_EXCEPTION(GLBufferAdapterException, asl::Exception);
     class Y60_GLUTIL_DECL BufferAdapter {
         public:
+            BufferAdapter();
             BufferAdapter(unsigned theWidth, unsigned theHeight, unsigned theComponents);
             virtual ~BufferAdapter();
             virtual void performAction(GLSourceBuffer theSourceBuffer);
 
             asl::Block & getBlock();
-            unsigned getWidth() const;
-            unsigned getHeight() const;
-            unsigned getComponents() const;
+            unsigned getWidth() const {return _myWidth;};
+            unsigned getHeight() const {return _myHeight;};
+            unsigned getComponents() const {return _myComponents;};
+            void setWidth(unsigned theWidth) {_myWidth = theWidth;};
+            void setHeight(unsigned theHeight) {_myHeight = theHeight;};
+            void setComponents(unsigned theComponents) {_myComponents = theComponents;};
             unsigned getBufferFormat(GLSourceBuffer theSourceBuffer) const;
         protected:
             void alloc(const unsigned myMemorySize);
@@ -123,13 +130,20 @@ namespace y60 {
 
     class Y60_GLUTIL_DECL BufferToFile : public BufferAdapter {
         public:
+            BufferToFile();
             BufferToFile(const std::string & theFilename, unsigned theFormat,
                          unsigned theWidth, unsigned theHeight, unsigned theComponents);
             virtual ~BufferToFile();
             virtual void performAction(GLSourceBuffer theSourceBuffer);
+            unsigned getFormat() const {return _myFormat;};
+            void setFormat(unsigned theFormat) {_myFormat = theFormat;};
+            std::string getFilename() const {return _myFilename;};
+            void setFilename(std::string theFilename) {_myFilename = theFilename;};
         private:
+            void encodeBuffer(const std::string & thePath, unsigned theFormat, boost::shared_ptr<PLAnyBmp> & theBmp);
             std::string _myFilename;
             unsigned _myFormat;
+            boost::threadpool::pool _myThreadPool;
     };
 
     class Y60_GLUTIL_DECL BufferToTexture : public BufferAdapter {

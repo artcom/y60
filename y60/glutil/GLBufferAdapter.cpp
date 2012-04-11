@@ -80,10 +80,13 @@
 #include <GL/glew.h>
 
 #include <asl/base/string_functions.h>
+#include <asl/base/os_functions.h>
 #include <y60/image/PixelEncoding.h>
 
 #include "GLUtils.h"
 #include "PixelEncodingInfo.h"
+
+#include <boost/thread.hpp>
 
 using namespace std;
 using namespace asl;
@@ -92,8 +95,11 @@ namespace y60 {
 
     BufferAdapter::BufferAdapter (unsigned theWidth, unsigned theHeight, unsigned theComponents) :
                 _myWidth(theWidth), _myHeight(theHeight), _myComponents(theComponents) {
-        //alloc(_myWidth * _myHeight * _myComponents);
     }
+    BufferAdapter::BufferAdapter () :
+        _myWidth(1), _myHeight(1), _myComponents(3) {
+    }
+
     BufferAdapter::~BufferAdapter() {
     }
 
@@ -105,21 +111,6 @@ namespace y60 {
     asl::Block &
     BufferAdapter::getBlock() {
         return _myData;
-    }
-
-    unsigned
-    BufferAdapter::getWidth() const {
-        return _myWidth;
-    }
-
-    unsigned
-    BufferAdapter::getHeight() const {
-        return _myHeight;
-    }
-
-    unsigned
-    BufferAdapter::getComponents() const {
-        return _myComponents;
     }
 
     unsigned
@@ -171,6 +162,13 @@ namespace y60 {
         _myFilename(theFilename), _myFormat(theFormat)
     {
     }
+    BufferToFile::BufferToFile() :
+        BufferAdapter(),
+        _myFilename(""), _myFormat(PL_FT_PNG),
+        _myThreadPool(asl::getenv("Y60_SAVE_BUFFER_THREADS", 4))
+    {
+        AC_INFO << "BufferToFile: using threadpool with "<<_myThreadPool.size() << " threads";
+    }
 
     BufferToFile::~BufferToFile() {
     }
@@ -178,11 +176,12 @@ namespace y60 {
     void
     BufferToFile::performAction(GLSourceBuffer theSourceBuffer)
     {
-        BufferAdapter::performAction(theSourceBuffer);
-
+        {
+            MAKE_SCOPE_TIMER(BufferAdapter_glReadPixels);
+            BufferAdapter::performAction(theSourceBuffer);
+        }
         Path myPath(_myFilename, UTF8);
-        PLAnyPicDecoder myDecoder;
-        PLAnyBmp myBmp;
+        boost::shared_ptr<PLAnyBmp> myBmp;
         PixelEncoding myEncoding;
 
         switch(getComponents()) {
@@ -202,39 +201,49 @@ namespace y60 {
         if (!mapPixelEncodingToFormat(myEncoding, pf)) {
             throw GLBufferAdapterException(std::string("unsupported pixel format"), PLUS_FILE_LINE);
         }
-        myBmp.Create( getWidth(), getHeight(), pf,
-                      getBlock().begin() + getWidth() * (getHeight()-1) * getComponents(), -1 * getWidth() * getComponents());
+        {
+            MAKE_SCOPE_TIMER(GLBufferAdapter_createBMP);
+            myBmp = boost::shared_ptr<PLAnyBmp>(new PLAnyBmp());
+            myBmp->Create( getWidth(), getHeight(), pf,
+                          getBlock().begin() + getWidth() * (getHeight()-1) * getComponents(),
+                          -1 * getWidth() * getComponents());
+        }
+        _myThreadPool.schedule(boost::bind(&BufferToFile::encodeBuffer, this, myPath.toLocale(), _myFormat, myBmp));
+    }
 
-        switch(_myFormat) {
+    void
+    BufferToFile::encodeBuffer(const std::string & thePath, unsigned theFormat, boost::shared_ptr<PLAnyBmp> & theBmp) {
+        MAKE_SCOPE_TIMER(GLBufferAdapter_MakeFileFromBmp);
+        switch(theFormat) {
             case PL_FT_PNG:
                 {
                     PLPNGEncoder myEncoder;
-                    myEncoder.MakeFileFromBmp(myPath.toLocale().c_str(), &myBmp);
+                    myEncoder.MakeFileFromBmp(thePath.c_str(), theBmp.get());
                 }
                 break;
             case PL_FT_JPEG:
                 {
                     PLJPEGEncoder myEncoder;
-                    myBmp.ApplyFilter(PLFilterFlipRGB());
-                    myEncoder.MakeFileFromBmp(myPath.toLocale().c_str(), &myBmp);
+                    theBmp->ApplyFilter(PLFilterFlipRGB());
+                    myEncoder.MakeFileFromBmp(thePath.c_str(), theBmp.get());
                 }
                 break;
             case PL_FT_WINBMP:
                 {
                     PLBmpEncoder myEncoder;
-                    myBmp.ApplyFilter(PLFilterFlipRGB());
-                    myEncoder.MakeFileFromBmp(myPath.toLocale().c_str(), &myBmp);
+                    theBmp->ApplyFilter(PLFilterFlipRGB());
+                    myEncoder.MakeFileFromBmp(thePath.c_str(), theBmp.get());
                 }
                 break;
             case PL_FT_TIFF:
                 {
                     PLTIFFEncoder myEncoder;
-                    myBmp.ApplyFilter(PLFilterFlipRGB());
-                    myEncoder.MakeFileFromBmp(myPath.toLocale().c_str(), &myBmp);
+                    theBmp->ApplyFilter(PLFilterFlipRGB());
+                    myEncoder.MakeFileFromBmp(thePath.c_str(), theBmp.get());
                 }
                 break;
              default:
-                throw GLBufferAdapterException(std::string("Unknown target image format: " ) + asl::as_string(_myFormat),
+                throw GLBufferAdapterException(std::string("Unknown target image format: " ) + asl::as_string(theFormat),
                                                PLUS_FILE_LINE);
         }
     }

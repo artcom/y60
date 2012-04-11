@@ -30,7 +30,11 @@ glExtensions.h
 y60_glutil_settings.h
 )
 
-list( APPEND EXTERNALS GLEW NVIDIA_CG )
+if(NOT WIN32)
+    find_package(Boost COMPONENTS thread)
+endif(NOT WIN32)
+
+list( APPEND EXTERNALS GLEW NVIDIA_CG Boost)
 
 ac_add_library(
     y60glutil y60/glutil
