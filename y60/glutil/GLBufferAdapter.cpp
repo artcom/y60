@@ -159,12 +159,16 @@ namespace y60 {
     BufferToFile::BufferToFile(const std::string & theFilename, unsigned theFormat,
             unsigned theWidth, unsigned theHeight, unsigned theComponents) :
         BufferAdapter(theWidth, theHeight, theComponents),
-        _myFilename(theFilename), _myFormat(theFormat)
+        _myFilename(theFilename), _myFormat(theFormat),
+        _myCompressionOrQualityLevel(-1),
+        _myThreadPool(asl::getenv("Y60_SAVE_BUFFER_THREADS", 4))
     {
+        AC_INFO << "BufferToFile: using threadpool with "<<_myThreadPool.size() << " threads";
     }
     BufferToFile::BufferToFile() :
         BufferAdapter(),
         _myFilename(""), _myFormat(PL_FT_PNG),
+        _myCompressionOrQualityLevel(-1),
         _myThreadPool(asl::getenv("Y60_SAVE_BUFFER_THREADS", 4))
     {
         AC_INFO << "BufferToFile: using threadpool with "<<_myThreadPool.size() << " threads";
@@ -211,22 +215,33 @@ namespace y60 {
                           getBlock().begin() + getWidth() * (getHeight()-1) * getComponents(),
                           -1 * getWidth() * getComponents());
         }
-        _myThreadPool.schedule(boost::bind(&BufferToFile::encodeBuffer, this, myPath.toLocale(), _myFormat, myBmp));
+        _myThreadPool.schedule(boost::bind(&BufferToFile::encodeBuffer, this,
+                                           myPath.toLocale(), _myFormat, _myCompressionOrQualityLevel, myBmp));
     }
 
     void
-    BufferToFile::encodeBuffer(const std::string & thePath, unsigned theFormat, boost::shared_ptr<PLAnyBmp> & theBmp) {
+    BufferToFile::encodeBuffer(const std::string thePath, const unsigned int theFormat,
+                               const int theCompressionOrQualityLevel, boost::shared_ptr<PLAnyBmp> & theBmp)
+    {
         MAKE_SCOPE_TIMER(GLBufferAdapter_MakeFileFromBmp);
         switch(theFormat) {
             case PL_FT_PNG:
                 {
                     PLPNGEncoder myEncoder;
+                    if (theCompressionOrQualityLevel != -1) {
+                        unsigned short myCompression = 9 * theCompressionOrQualityLevel / 100;
+                        myEncoder.SetCompressionLevel(myCompression);
+                    }
                     myEncoder.MakeFileFromBmp(thePath.c_str(), theBmp.get());
                 }
                 break;
             case PL_FT_JPEG:
                 {
                     PLJPEGEncoder myEncoder;
+                    if (theCompressionOrQualityLevel != -1) {
+                        int myQuality = theCompressionOrQualityLevel;
+                        myEncoder.SetQuality(myQuality);
+                    }
                     if (theBmp->GetBitsPerPixel() >= 24 ) {
                         theBmp->ApplyFilter(PLFilterFlipRGB());
                     }
@@ -256,7 +271,11 @@ namespace y60 {
                                                PLUS_FILE_LINE);
         }
     }
-
+    
+    void
+    BufferToFile::setCompressionOrQualityLevel(const int theCompressionOrQualityLevel) {
+        _myCompressionOrQualityLevel = asl::clamp(theCompressionOrQualityLevel, -1, 100);
+    }
     // ----------------------------------------------------------------------------------------
     BufferToTexture::BufferToTexture(TexturePtr theTexture, const asl::Vector2i & theOffset, bool theCopyToImageFlag) :
         BufferAdapter(theTexture->get<TextureWidthTag>(), theTexture->get<TextureHeightTag>(), 4),

@@ -302,7 +302,9 @@ AbstractRenderWindow::setCanvas(const dom::NodePtr & theCanvas) {
 }
 
 void
-AbstractRenderWindow::saveBuffer(const std::string & theFilename, const unsigned int theComponents) {
+AbstractRenderWindow::saveBuffer(const std::string & theFilename, const unsigned int theComponents,
+                                 const int theCompressionOrQualityLevel)
+{
 
     // see GLBufferAdapter.h for possible format consts
     unsigned myFormat = PL_FT_PNG;
@@ -329,6 +331,7 @@ AbstractRenderWindow::saveBuffer(const std::string & theFilename, const unsigned
     _myBufferToFileWriter->setFilename(theFilename);
     _myBufferToFileWriter->setFormat(myFormat);
     _myBufferToFileWriter->setComponents(theComponents);
+    _myBufferToFileWriter->setCompressionOrQualityLevel(theCompressionOrQualityLevel);
     _myBufferToFileWriter->performAction(FRAME_BUFFER);
 }
 

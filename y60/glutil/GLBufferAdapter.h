@@ -136,19 +136,25 @@ namespace y60 {
             virtual ~BufferToFile();
             virtual void performAction(GLSourceBuffer theSourceBuffer);
             unsigned getFormat() const {return _myFormat;};
-            void setFormat(unsigned theFormat) {_myFormat = theFormat;};
+            void setFormat(const unsigned int theFormat) {_myFormat = theFormat;};
             std::string getFilename() const {return _myFilename;};
-            void setFilename(std::string theFilename) {_myFilename = theFilename;};
+            void setFilename(const std::string & theFilename) {_myFilename = theFilename;};
+            int getCompressionOrQualityLevel() const {return _myCompressionOrQualityLevel;};
+            void setCompressionOrQualityLevel(const int theCompressionOrQualityLevel);
+
         private:
-            void encodeBuffer(const std::string & thePath, unsigned theFormat, boost::shared_ptr<PLAnyBmp> & theBmp);
+            void encodeBuffer(const std::string thePath, const unsigned int theFormat,
+                              const int theCompressionOrQualityLevel, boost::shared_ptr<PLAnyBmp> & theBmp);
             std::string _myFilename;
-            unsigned _myFormat;
+            unsigned int _myFormat;
+            int _myCompressionOrQualityLevel;
             boost::threadpool::pool _myThreadPool;
     };
 
     class Y60_GLUTIL_DECL BufferToTexture : public BufferAdapter {
         public:
-            BufferToTexture(TexturePtr theTexture, const asl::Vector2i & theOffset, bool theCopyToImageFlag = false);
+            BufferToTexture(TexturePtr theTexture, const asl::Vector2i & theOffset,
+                            bool theCopyToImageFlag = false);
             virtual ~BufferToTexture();
             virtual void performAction(GLSourceBuffer theSourceBuffer);
 

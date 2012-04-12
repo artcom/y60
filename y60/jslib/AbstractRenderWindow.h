@@ -263,7 +263,8 @@ namespace jslib {
         void addExtension(y60::IRendererExtensionPtr theExtension);
 
         /// save framebuffer to file
-        void saveBuffer(const std::string & theFilename, const unsigned int theComponents = 4);
+        void saveBuffer(const std::string & theFilename, const unsigned int theComponents = 3,
+                        const int theCompressionOrQualityLevel = -1);
 
         /// copy framebuffer to Texture (and optionally to Image raster).
         void copyBufferToTexture(dom::NodePtr & theTexture, const asl::Vector2i & theOffset, bool theCopyToRasterFlag = false);
