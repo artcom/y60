@@ -186,6 +186,9 @@ namespace y60 {
 
         switch(getComponents()) {
           case 1:
+              if (_myFormat == PL_FT_JPEG) {
+                  throw GLBufferAdapterException(std::string("unsupported pixel format 'gray' for jpeg encoding"), PLUS_FILE_LINE);
+              }
               myEncoding = GRAY;
               break;
           case 3:
@@ -224,21 +227,27 @@ namespace y60 {
             case PL_FT_JPEG:
                 {
                     PLJPEGEncoder myEncoder;
-                    theBmp->ApplyFilter(PLFilterFlipRGB());
+                    if (theBmp->GetBitsPerPixel() >= 24 ) {
+                        theBmp->ApplyFilter(PLFilterFlipRGB());
+                    }
                     myEncoder.MakeFileFromBmp(thePath.c_str(), theBmp.get());
                 }
                 break;
             case PL_FT_WINBMP:
                 {
                     PLBmpEncoder myEncoder;
-                    theBmp->ApplyFilter(PLFilterFlipRGB());
+                    if (theBmp->GetBitsPerPixel() >= 24 ) {
+                        theBmp->ApplyFilter(PLFilterFlipRGB());
+                    }
                     myEncoder.MakeFileFromBmp(thePath.c_str(), theBmp.get());
                 }
                 break;
             case PL_FT_TIFF:
                 {
                     PLTIFFEncoder myEncoder;
-                    theBmp->ApplyFilter(PLFilterFlipRGB());
+                    if (theBmp->GetBitsPerPixel() >= 24 ) {
+                        theBmp->ApplyFilter(PLFilterFlipRGB());
+                    }
                     myEncoder.MakeFileFromBmp(thePath.c_str(), theBmp.get());
                 }
                 break;
