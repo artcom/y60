@@ -215,6 +215,8 @@ namespace y60 {
                           getBlock().begin() + getWidth() * (getHeight()-1) * getComponents(),
                           -1 * getWidth() * getComponents());
         }
+
+        _myThreadPool.wait(_myThreadPool.size()*2); //allow only threadpool size pending tasks
         _myThreadPool.schedule(boost::bind(&BufferToFile::encodeBuffer, this,
                                            myPath.toLocale(), _myFormat, _myCompressionOrQualityLevel, myBmp));
     }
