@@ -169,9 +169,40 @@ JSBool
 JSAbstractRenderWindow<DERIVED>::saveBuffer(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Saves a screenshot to a given file");
     DOC_PARAM("theFilename", "Filename to save to", DOC_TYPE_STRING);
+    DOC_PARAM_OPT("theComponents", "components to save default 3 (RGB)", DOC_TYPE_INTEGER, 3);
+    DOC_PARAM_OPT("theCompressionOrQualityLevel", "compression level in percent, for png: 100=highest compression, for jpeg: 100=best quality", DOC_TYPE_INTEGER, 0);
     DOC_END;
-    typedef void (DERIVED::*MyMethod)(const std::string & );
-    return Method<DERIVED>::call((MyMethod)&DERIVED::saveBuffer,cx,obj,argc,argv,rval);
+    ensureParamCount(argc, 1, 3);
+    DERIVED * mySelf;
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), mySelf);
+
+    std::string myFilename;
+    if (!convertFrom(cx, argv[0], myFilename)) {
+        return JS_FALSE;
+    }
+    if (argc == 1) {
+        mySelf->saveBuffer(myFilename);
+         return JS_TRUE;
+    } else if (argc == 2) {
+        unsigned int myComponents;
+        if (!convertFrom(cx, argv[1], myComponents)) {
+            return JS_FALSE;
+        }
+        mySelf->saveBuffer(myFilename, myComponents);
+         return JS_TRUE;
+    } else {
+        unsigned int myComponents;
+        if (!convertFrom(cx, argv[1], myComponents)) {
+            return JS_FALSE;
+        }
+        int myCompressionOrQualityLevel;
+        if (!convertFrom(cx, argv[2], myCompressionOrQualityLevel)) {
+            return JS_FALSE;
+        }
+        mySelf->saveBuffer(myFilename, myComponents, myCompressionOrQualityLevel);
+         return JS_TRUE;
+    }
+    return JS_FALSE;
 }
 
 template<class DERIVED>
@@ -948,7 +979,7 @@ JSFunctionSpec * JSAbstractRenderWindow<DERIVED>::BaseFunctions() {
         {"setInterval",        setInterval,              3},
         {"clearTimeout",       clearTimeout,             1},
         {"clearInterval",      clearInterval,            1},
-        {"saveBuffer",         saveBuffer,               1},
+        {"saveBuffer",         saveBuffer,               3},
         {"copyBufferToTexture", copyBufferToTexture,     3},
         {"getRenderer",        getRenderer,              0},
         {"addExtension",       addExtension,             1},

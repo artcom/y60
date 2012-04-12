@@ -66,7 +66,6 @@ void PLTIFFEncoder::DoEncode (PLBmpBase * pBmp, PLDataSink* pDataSnk)
 
 void PLTIFFEncoder::DoTiffEncode (PLBmpBase* pBmp, TIFF* tif)
 {
-  int k;
   uint32 l, c, image_length, image_width;
   // iterate over data
   PLBYTE **pla = pBmp->GetLineArray();
@@ -97,9 +96,30 @@ void PLTIFFEncoder::DoTiffEncode (PLBmpBase* pBmp, TIFF* tif)
 
     case 1:  // TODO: a bit of error checking
       for (l = 0; l < image_length; l++)
-        k = TIFFWriteScanline( tif, pla[l], l, 0 );
+        if(TIFFWriteScanline( tif, pla[l], l, 0 ) < 1) {
+            throw PLTextException(PL_ERRINTERNAL, "TIFFWriteScanline failed");
+        }
       break;
 
+    case 24:
+      {
+        // TODO: check whether (r,g,b) components come in the correct order here...
+        PLBYTE* pBuf = new PLBYTE[3*image_width];
+        for (l = 0; l < image_length; l++)
+        {
+          for (c = 0; c < image_width; c++)
+          {
+            pBuf[c*3 + 0] = pla[l][c*sizeof(PLPixel24) + PL_RGBA_RED];
+            pBuf[c*3 + 1] = pla[l][c*sizeof(PLPixel24) + PL_RGBA_GREEN];
+            pBuf[c*3 + 2] = pla[l][c*sizeof(PLPixel24) + PL_RGBA_BLUE];
+          }
+          if(TIFFWriteScanline( tif, pBuf, l, 0 ) < 1) {
+              throw PLTextException(PL_ERRINTERNAL, "TIFFWriteScanline failed");
+          }
+        }
+        delete [] pBuf;
+      }
+      break;
     case 32:
       {
         // TODO: check whether (r,g,b) components come in the correct order here...
@@ -117,7 +137,9 @@ void PLTIFFEncoder::DoTiffEncode (PLBmpBase* pBmp, TIFF* tif)
                     ((uint32)(pla[l][c*sizeof(PLPixel32) + PL_RGBA_GREEN]) << 8 ) |
                     ((uint32)(pla[l][c*sizeof(PLPixel32) + PL_RGBA_RED]));
             }
-            k = TIFFWriteScanline( tif, plBuf, l, 0 );
+            if(TIFFWriteScanline( tif, plBuf, l, 0 ) < 1) {
+                throw PLTextException(PL_ERRINTERNAL, "TIFFWriteScanline failed");
+            }
           }
           delete [] plBuf;
         }
@@ -132,7 +154,9 @@ void PLTIFFEncoder::DoTiffEncode (PLBmpBase* pBmp, TIFF* tif)
               pBuf[c*3 + 1] = pla[l][c*sizeof(PLPixel32) + PL_RGBA_GREEN];
               pBuf[c*3 + 2] = pla[l][c*sizeof(PLPixel32) + PL_RGBA_BLUE];
             }
-            k = TIFFWriteScanline( tif, pBuf, l, 0 );
+            if(TIFFWriteScanline( tif, pBuf, l, 0 ) < 1) {
+                throw PLTextException(PL_ERRINTERNAL, "TIFFWriteScanline failed");
+            }
           }
           delete [] pBuf;
         }
@@ -141,6 +165,7 @@ void PLTIFFEncoder::DoTiffEncode (PLBmpBase* pBmp, TIFF* tif)
 
     default:
       PLASSERT(false);
+      throw PLTextException(PL_ERRFORMAT_NOT_SUPPORTED, "unsupported bitsPerPixel");
   }
   // we could flush at this point, but TIFFClose will do it anyway
 }
@@ -227,6 +252,7 @@ int PLTIFFEncoder::SetBaseTags (TIFF* tif, PLBmpBase* pBmp)
       SetField( tif, TIFFTAG_PHOTOMETRIC,    ui16 );
       break;
 
+    case 24:
     case 32:
       ui16 = PHOTOMETRIC_RGB;
       SetField( tif, TIFFTAG_PHOTOMETRIC,    ui16 );

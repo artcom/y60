@@ -1,5 +1,8 @@
-#if 0 // XXX disabled because of a nameclash with jpeg8 
 extern "C" {
+#ifndef JCONFIG_INCLUDED
+#include "jconfig.h"
+#endif
+#if JPEG_LIB_VERSION < 80
 
 GLOBAL(void)
 jpeg_mem_dest (j_compress_ptr cinfo,
@@ -8,5 +11,5 @@ jpeg_mem_dest (j_compress_ptr cinfo,
               PLDataSink * pDataSrc
 );
 
-}
 #endif
+}

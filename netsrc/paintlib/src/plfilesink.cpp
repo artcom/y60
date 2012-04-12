@@ -18,14 +18,26 @@
   #define WIN32_LEAN_AND_MEAN  /* Prevent including <winsock*.h> in <windows.h> */
   #define VC_EXTRALEAN  // Exclude rarely-used stuff from Windows headers
   #include <windows.h>
+#else
+#include <sys/mman.h>
+#include <unistd.h>
+#include <fcntl.h>
 #endif
 
+#include <iostream>
+#include <errno.h>
+#include <string.h>
 
 PLFileSink::PLFileSink ()
 : PLDataSink (),
 #ifdef PL_FILE_MAPPING
+#   ifdef _WIN32
   m_hf (INVALID_HANDLE_VALUE),    // File handle.
   m_hm (NULL),    // Handle to file-mapping object.
+#   else
+  m_File (0),
+  _myMappedSize(0),
+#   endif
 #else
   m_pFile (NULL),
 #endif
@@ -36,18 +48,23 @@ PLFileSink::PLFileSink ()
 PLFileSink::~PLFileSink ()
 {
 #ifdef PL_FILE_MAPPING
+#   ifdef _WIN32
   if (m_hf && m_hf != INVALID_HANDLE_VALUE)
     Close();
+#   else
+  if (m_File)
+    Close();
+#   endif
 #else
   if (m_pFile)
     Close();
 #endif
 }
 
-
 int PLFileSink::Open (const char * pszFName, int MaxFileSize)
 {
 #ifdef PL_FILE_MAPPING
+#   ifdef _WIN32
   // Use memory-mapped files
   m_hf = CreateFileA (pszFName, GENERIC_READ | GENERIC_WRITE, 0, NULL,
                        CREATE_ALWAYS,
@@ -70,6 +87,15 @@ int PLFileSink::Open (const char * pszFName, int MaxFileSize)
   PLDataSink::Open(pszFName, m_pDataBuf, MaxFileSize);
   return 0;
   
+#   else
+  if ((m_File = open (pszFName, O_RDWR|O_CREAT, 0666))) {
+      resizeMapping(MaxFileSize);
+      PLDataSink::Open(pszFName, m_pDataBuf, MaxFileSize);
+      return 0;
+  } else {
+    return -1;
+  }
+#   endif
 #else
   // Generic code assuming memory mapped files are not available.
   // we could actually open the file in "Close()",
@@ -120,6 +146,7 @@ int PLFileSink::OpenW (const wchar_t * pszwFName, int MaxFileSize)
 void PLFileSink::Close ()
 {
 #ifdef PL_FILE_MAPPING
+#   ifdef _WIN32
   UnmapViewOfFile (m_pStartData);
   CloseHandle (m_hm);
   m_hm = NULL;
@@ -127,14 +154,25 @@ void PLFileSink::Close ()
   ::SetEndOfFile(m_hf); //Truncate the file to the right size
   CloseHandle (m_hf);
   m_hf = NULL;
+#   else
+  resizeMapping(GetDataSize());
+  if (munmap(m_pDataBuf, GetDataSize()) != 0) {
+    std::cerr <<"munmap failed, got error "<< strerror(errno)<<std::endl;
+    throw PLTextException(PL_ERRINTERNAL, "munmap failed");
+  }
+  m_pDataBuf = NULL;
+  close( m_File );
+  m_File = 0;
+
+#   endif
 #else
   int towrite = GetDataSize();
   int written = fwrite( m_pStartData, 1, towrite, m_pFile );
-#ifndef _DEBUG
+#   ifndef _DEBUG
 // avoid warnings
     (void)(towrite);
     (void)(written);
-#endif
+#   endif
   PLASSERT( written == towrite );
   fclose( m_pFile );
   m_pFile = 0;
@@ -148,6 +186,32 @@ void PLFileSink::Close ()
 
   PLDataSink::Close();
 }
+
+#ifdef PL_FILE_MAPPING
+#   ifndef _WIN32
+void PLFileSink::resizeMapping(size_t theNewSize) {
+    if (m_pDataBuf) {
+        if (munmap(m_pDataBuf, _myMappedSize) != 0) {
+        }
+        m_pDataBuf = 0;
+        _myMappedSize = 0;
+    }
+    if (theNewSize > 0) {
+        if (ftruncate(m_File, theNewSize) != 0) {
+            throw PLTextException(PL_ERRINTERNAL, "error truncating to new size");
+        }
+        m_pDataBuf = (PLBYTE *) mmap(NULL, theNewSize, PROT_READ|PROT_WRITE,
+                MAP_SHARED, m_File, 0);
+
+        if (m_pDataBuf == MAP_FAILED) {
+            std::cerr <<"mmap failed, got error "<< strerror(errno)<<std::endl;
+            throw PLTextException(PL_ERRINTERNAL, "mmap failed");
+        }
+        _myMappedSize = theNewSize;
+    }
+}
+#   endif
+#endif
 
 #ifdef _WIN32
 int PLFileSink::getLastPLError() 

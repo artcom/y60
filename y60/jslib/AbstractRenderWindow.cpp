@@ -309,7 +309,9 @@ AbstractRenderWindow::setCanvas(const dom::NodePtr & theCanvas) {
 }
 
 void
-AbstractRenderWindow::saveBuffer(const std::string & theFilename) {
+AbstractRenderWindow::saveBuffer(const std::string & theFilename, const unsigned int theComponents,
+                                 const int theCompressionOrQualityLevel)
+{
 
     // see GLBufferAdapter.h for possible format consts
     unsigned myFormat = PL_FT_PNG;
@@ -328,10 +330,16 @@ AbstractRenderWindow::saveBuffer(const std::string & theFilename) {
     }
 
     y60::ScopedGLContext myContextLock(this);
-    BufferToFile myBufferWriter(theFilename, myFormat,
-        _myCanvas->getFacade<Canvas>()->getWidth(),
-        _myCanvas->getFacade<Canvas>()->getHeight(), 4);
-    myBufferWriter.performAction(FRAME_BUFFER);
+    if (!_myBufferToFileWriter) {
+        _myBufferToFileWriter = asl::Ptr<BufferToFile>(new BufferToFile());
+    }
+    _myBufferToFileWriter->setWidth(_myCanvas->getFacade<Canvas>()->getWidth());
+    _myBufferToFileWriter->setHeight(_myCanvas->getFacade<Canvas>()->getHeight());
+    _myBufferToFileWriter->setFilename(theFilename);
+    _myBufferToFileWriter->setFormat(myFormat);
+    _myBufferToFileWriter->setComponents(theComponents);
+    _myBufferToFileWriter->setCompressionOrQualityLevel(theCompressionOrQualityLevel);
+    _myBufferToFileWriter->performAction(FRAME_BUFFER);
 }
 
 void

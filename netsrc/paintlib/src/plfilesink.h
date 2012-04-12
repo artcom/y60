@@ -18,6 +18,8 @@
 
 #ifdef _WIN32
 #define PL_FILE_MAPPING
+#else
+#define PL_FILE_MAPPING
 #endif
 
 #ifdef _WIN32
@@ -69,8 +71,14 @@ private:
 #endif  
 
 #ifdef PL_FILE_MAPPING
+#   ifdef _WIN32
   HANDLE m_hf;    // File handle.
   HANDLE m_hm;    // Handle to file-mapping object.
+#   else
+  int m_File;
+  size_t _myMappedSize;
+  void resizeMapping(size_t theNewSize);
+#   endif
 #else
   FILE * m_pFile;
 #endif

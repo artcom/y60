@@ -66,7 +66,11 @@ protected:
 
 private:
   // Assumes IJPEG decoder is already set up.
-  void encodeRGB
+  void encodeRGB32
+    ( PLBmpBase * pBmp,
+      int iScanLines
+    );
+  void encodeRGB24
     ( PLBmpBase * pBmp,
       int iScanLines
     );
