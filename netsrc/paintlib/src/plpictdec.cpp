@@ -90,11 +90,11 @@ void PLPictDecoder::readHeader
     // Performs checks to make sure the data is really a pict file.
 {
   PLBYTE ch;
-  PLWORD PicSize;  // Version 1 picture size. Ignored in version 2.
+  //PLWORD PicSize;  // Version 1 picture size. Ignored in version 2.
   char sz[256];
   MacRect Frame;
 
-  PicSize = ReadMWord (pDataSrc);
+  /*PicSize = */ReadMWord (pDataSrc);
 
   readRect (&Frame, pDataSrc);
 
@@ -405,10 +405,9 @@ void PLPictDecoder::longComment
     ( PLDataSource * pDataSrc
     )
 {
-  PLWORD type;
   PLWORD len;
 
-  type = ReadMWord(pDataSrc);
+  /*PLWORD type = */ReadMWord(pDataSrc);
   len = ReadMWord(pDataSrc);
   if (len > 0)
     pDataSrc->Skip (len);
@@ -957,12 +956,7 @@ void PLPictDecoder::expandBuf
     )
     // Expands Width units to 32-bit pixel data.
 {
-  PLBYTE * pSrc;
-  PLBYTE * pDest;
   int i;
-
-  pSrc = pSrcBuf;
-  pDest = pDestBuf;
 
   switch (bpp)
   {
@@ -1100,13 +1094,12 @@ void PLPictDecoder::readColourTable
     )
     // Reads a mac colour table into a bitmap palette.
 {
-  PLLONG        ctSeed;
   PLWORD        ctFlags;
   PLWORD        val;
 
   Trace (3, "Getting color table info.\n");
 
-  ctSeed = ReadMLong(pDataSrc);
+  /*PLLONG ctSeed = */ReadMLong(pDataSrc);
   ctFlags = ReadMWord(pDataSrc);
   *pNumColors = ReadMWord(pDataSrc)+1;
 
