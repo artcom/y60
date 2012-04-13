@@ -537,7 +537,6 @@ namespace y60 {
         DBV(AC_DEBUG << "---- FFMpegDecoder2::decodeFrame");
         AVPacket * myPacket = 0;
         unsigned int myDecodedPacketsPerFrame = 1;
-        unsigned int myEOFFrames = 0;
         START_TIMER(decodeFrame_ffmpegdecode);
         // until a frame is found or eof
         bool myEndOfFileFlag = false;
@@ -560,15 +559,9 @@ namespace y60 {
                         &myFrameCompleteFlag, NULL, 0);
 #endif
                 if (myFrameCompleteFlag) {
-                    ++myEOFFrames;
                     DBV(AC_DEBUG << "---- decodeFrame: Last frame.");
-                    // The only way to get the timestamp of this frame is to take
-                    // the timestamp of the previous frame and add an appropriate
-                    // amount.
-                    // (_myFrame->coded_picture_number contains garbage on the second
-                    // and successive loops.)
-                    // Yuck.
-                    addCacheFrame(_myFrame, _myLastFrameTime + myEOFFrames / _myFrameRate);
+                    _myLastFrameTime += 1/_myFrameRate;
+                    addCacheFrame(_myFrame, _myLastFrameTime);
                     _myNumFramesDecoded++;
                     if (_myFrame->pict_type == FF_I_TYPE) {
                         DBV(AC_DEBUG << "***** I_FRAME *****");
@@ -580,6 +573,7 @@ namespace y60 {
                 }
             } else {
                 DBV(AC_DEBUG << "---- myPacket->dts=" << myPacket->dts);
+                _myLastFrameTime = (double)myPacket->dts/_myVideoStreamTimeBase;
                 int myFrameCompleteFlag = 0;
                 START_TIMER(decodeFrame_avcodec_decode);
 #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52,27,0)
@@ -618,12 +612,9 @@ namespace y60 {
                         AC_DEBUG << "setting start timestamp: "<<_myVideoStartTimestamp;
                     }
                     STOP_TIMER(decodeFrame_ffmpegdecode);
-                    int64_t myNextPacketTimestamp = myPacket->dts;
-                    double myFrameTime = (double)myNextPacketTimestamp/_myVideoStreamTimeBase;
                     DBV(AC_DEBUG << "---- add decoded frame time_base: "<<_myVideoStreamTimeBase
-                                 <<" FrameTime: "<<myFrameTime;)
-                    addCacheFrame(_myFrame, myFrameTime);
-                    _myLastFrameTime = myFrameTime;
+                                 <<" FrameTime: "<<_myLastFrameTime;)
+                    addCacheFrame(_myFrame, _myLastFrameTime);
                     _myNumFramesDecoded++;
                     if (_myFrame->pict_type == FF_I_TYPE) {
                         DBV(AC_DEBUG << "***** I_FRAME *****");
@@ -770,7 +761,6 @@ namespace y60 {
                 if(shouldSeek(_myLastVideoFrame->getTime(), myStreamTime)) {
                     seek(theTime);
                     _myMovieTime = theTime;
-                    _myLastFrameTime = theTime;
                     return -1;
                 }
                 double myFrameTime = _myLastVideoFrame->getTime();
