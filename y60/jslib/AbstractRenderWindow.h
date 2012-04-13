@@ -73,15 +73,13 @@
 #include <y60/glutil/IGLContextManager.h>
 #include <y60/inet/RequestManager.h>
 #include <y60/glutil/GLContext.h>
+#include <y60/glutil/GLBufferAdapter.h>
 #include <y60/scene/Scene.h>
 #include <y60/input/IEventSink.h>
 #include <y60/input/IEventSource.h>
 
 #include <list>
 
-namespace y60 {
-    class BufferToFile;
-}
 namespace jslib {
 
     DEFINE_EXCEPTION(RenderWindowException, asl::Exception);

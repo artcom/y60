@@ -73,7 +73,6 @@
 #include <y60/image/Image.h>
 #include <y60/video/Movie.h>
 #include <y60/video/Capture.h>
-#include <y60/glutil/GLBufferAdapter.h>
 
 #include <asl/base/file_functions.h>
 #include <asl/base/os_functions.h>
