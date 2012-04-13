@@ -397,16 +397,18 @@ spark.renderText = function(theImage, theText, theStyle, theSize, theMaxTextWidt
                                  myFont,
                                  mySize.x*theStyle.fontScale, mySize.y*theStyle.fontScale);
     var myGlyphPosition = window.getTextGlyphPositions();  
-    //XXX: if the image width is odd and fontscale is >1 the imagefilter can result in bad looking text
-    myTextSize = new Vector2f(Math.ceil(myTextSize[0]/theStyle.fontScale), Math.ceil(myTextSize[1]/theStyle.fontScale));
-    applyImageFilter(theImage, "resizehamming", [myTextSize.x, myTextSize.y, 1]);
-    if (theImage.width > 0 && theImage.height > 0) {
-        var myMatrix = new Matrix4f();
-        myMatrix.makeScaling(new Vector3f(myTextSize.x / theImage.width, 
-                                          myTextSize.y / theImage.height, 1));
-        theImage.matrix = myMatrix;
-    }
-    
+    if (theStyle.fontScale != 1.0) {
+        //XXX: if the image width is odd and fontscale is >1 the imagefilter can result in bad looking text
+        myTextSize = new Vector2f(Math.ceil(myTextSize[0]/theStyle.fontScale), Math.ceil(myTextSize[1]/theStyle.fontScale));
+        var start = millisec();
+        applyImageFilter(theImage, "resizehamming", [myTextSize.x, myTextSize.y, 1]);
+        if (theImage.width > 0 && theImage.height > 0) {
+            var myMatrix = new Matrix4f();
+            myMatrix.makeScaling(new Vector3f(myTextSize.x / theImage.width, 
+                                              myTextSize.y / theImage.height, 1));
+            theImage.matrix = myMatrix;
+        }
+    }    
     if (theMaxTextWidth) {
         theMaxTextWidth.width = window.getTextMaxWidth();
     }
