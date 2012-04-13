@@ -805,9 +805,11 @@ try {
             if (arguments[i].search(/resolution/) != -1) {
                 myWidth = arguments[i + 1];
                 myHeight = arguments[i + 2];
+                arguments.splice(i,3);
             }
             if (arguments[i].search(/theater/) != -1) {
                 myTheaterFlag = arguments[i + 1] == "1" ? true:false;
+                arguments.splice(i,2);
             }
         }
         ourImageViewerApp.setup(myWidth, myHeight, "iv", myTheaterFlag);
