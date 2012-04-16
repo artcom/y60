@@ -219,25 +219,25 @@ ColorAtPointHDR::sampleTexture( const std::string & theFilename,
     clearResult();
 
 
-    float du = (theMaxU - theMinU) / (theSamplesU - 1);
-    float dv = (theMaxV - theMinV) / (theSamplesV - 1);
+    double du = (theMaxU - theMinU) / (theSamplesU - 1);
+    double dv = (theMaxV - theMinV) / (theSamplesV - 1);
 
 
     //cout << "w: " << myWidth << " h: " << myHeight << endl;
 
-    for (unsigned myUSteps = 0; myUSteps < theSamplesU; ++myUSteps) {
-        float myU = (theMinU + myUSteps * du) * (myWidth - 1);
+    for (int myUSteps = 0; myUSteps < theSamplesU; ++myUSteps) {
+        double myU = (theMinU + myUSteps * du) * (myWidth - 1);
         int myLowerU = int( floor( myU + 0.5 ));
         //cerr << "u: " << myU << " int u: " << myLowerU << endl;
         int myUpperU = min( myLowerU + 1, (myWidth - 1) ); // XXX
-        float myUWeight = myU - myLowerU;
+        double myUWeight = myU - myLowerU;
 
-        for (unsigned myVSteps = 0; myVSteps < theSamplesV; ++myVSteps) {
-            float myV = (theMinV + myVSteps * dv) * (myHeight - 1);
+        for (int myVSteps = 0; myVSteps < theSamplesV; ++myVSteps) {
+            double myV = (theMinV + myVSteps * dv) * (myHeight - 1);
             myV = (myHeight -1) - myV;
             int myLowerV = int( floor( myV  + 0.5));
             int myUpperV = min( myLowerV + 1, (myHeight - 1 )); // XXX
-            float myVWeight = myV - myLowerV;
+            double myVWeight = myV - myLowerV;
 
             float mySample = myPixels[myLowerV][myLowerU].r;
 
