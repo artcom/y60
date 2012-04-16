@@ -52,14 +52,12 @@ spark.Slider.Constructor = function (Protected) {
         theEvent.dampenedPos = myDampenedPos;
     }
 
-    function ensurePresicion() {
+    function ensurePrecision() {
         if (_mySliderBackground.height !== _myActiveCursor.height) {
-            var myRelativeY = (_myActiveCursor.y / (_mySliderBackground.height - _myActiveCursor.height));
-            _myActiveCursor.y = myRelativeY.toFixed(_precision) * (_mySliderBackground.height - _myActiveCursor.height);
+            _myActiveCursor.y = getRelativeY() * (_mySliderBackground.height - _myActiveCursor.height);
         }
         if (_mySliderBackground.width !== _myActiveCursor.width) {
-            var myRelativeX = (_myActiveCursor.x / (_mySliderBackground.width - _myActiveCursor.width));
-            _myActiveCursor.x = myRelativeX.toFixed(_precision) * (_mySliderBackground.width - _myActiveCursor.width);
+            _myActiveCursor.x = getRelativeX() * (_mySliderBackground.width - _myActiveCursor.width);
         }
     }
     
@@ -67,7 +65,8 @@ spark.Slider.Constructor = function (Protected) {
         if (_mySliderBackground.height === _myActiveCursor.height) {
             return 0;
         } else {
-            return (_myActiveCursor.y / (_mySliderBackground.height - _myActiveCursor.height)).toFixed(_precision);
+            var myRelativeY = _myActiveCursor.y / (_mySliderBackground.height - _myActiveCursor.height);
+            return (_precision === 0) ? myRelativeY : myRelativeY.toFixed(_precision);
         }
     }
 
@@ -75,7 +74,8 @@ spark.Slider.Constructor = function (Protected) {
         if (_mySliderBackground.width === _myActiveCursor.width) {
             return 0;
         } else {
-            return (_myActiveCursor.x / (_mySliderBackground.width - _myActiveCursor.width)).toFixed(_precision);
+            var myRelativeX = _myActiveCursor.x / (_mySliderBackground.width - _myActiveCursor.width);
+            return (_precision === 0) ? myRelativeX : myRelativeX.toFixed(_precision);
         }
     }
 
@@ -252,7 +252,7 @@ spark.Slider.Constructor = function (Protected) {
                     }
                 }
             }
-            ensurePresicion();
+            ensurePrecision();
             if (_myEventTarget) {
                 var mySliderMove = new spark.SliderEvent(spark.SliderEvent.MOVE,
                                                          Public.name,
