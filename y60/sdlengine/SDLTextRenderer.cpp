@@ -132,7 +132,6 @@ namespace y60 {
             // Font already loaded
             return;
         }
-        _myFontHintingMap[theName] = theFonthint;
 
         if (theFontType != SDLFontInfo::NORMAL) {
             if (_myFonts.find(makeFontName(theName, SDLFontInfo::NORMAL)) == _myFonts.end()) {
@@ -148,7 +147,7 @@ namespace y60 {
         if (!myFont) {
             throw GLTextRendererException(string("Could not load font: ") + theName+ ", " + myFileName, PLUS_FILE_LINE);
         }
-        TTF_SetFontHinting(myFont, (int)_myFontHintingMap[theName]);
+        TTF_SetFontHinting(myFont, theFonthint);
         _myFonts[myFontName] = SDLFontInfo(myFont, theFontType, theHeight, theFonthint);
 
         AC_DEBUG << "TTFTextRenderer - loaded font: " << theName << ", " << myFileName << " with size: "
@@ -168,14 +167,6 @@ namespace y60 {
         return myIt->second;
     }
 
-    const TTFFontInfo::FONTHINTING &
-    SDLTextRenderer::getFontHint(const string & theName) const {
-        std::map<std::string, TTFFontInfo::FONTHINTING>::const_iterator myIt = _myFontHintingMap.find(theName);
-        if (myIt == _myFontHintingMap.end()) {
-            throw GLTextRendererException(string("Font: ") + theName+ " not found in fontlibrary.", PLUS_FILE_LINE);
-        }
-        return myIt->second;
-    }
 
     const TTF_Font *
     SDLTextRenderer::getFont(const string & theName) const {
@@ -185,7 +176,6 @@ namespace y60 {
         }
         return myIt->second.getFont();
     }
-
     TextPtr
     SDLTextRenderer::createText(const asl::Vector2f & thePos,
                                 const std::string & theString, const std::string & theFontName)
@@ -198,6 +188,21 @@ namespace y60 {
         return (_myFonts.find(makeFontName(theName, SDLFontInfo::NORMAL)) != _myFonts.end());
     }
 
+    void
+    SDLTextRenderer::renderTextInSurface(const string & theText,
+                                         const string & theFontName,
+                                         unsigned int theTargetWidth,
+                                         unsigned int theTargetHeight,
+                                         SDLFontInfo & theSDLFontInfo,
+                                         const TTF_Font * myBoldFont,
+                                         const TTF_Font * myItalicFont,
+                                         const TTF_Font * myBoldItalicFont)
+    {
+        TTF_SetTracking(_myTextStyle._myTracking);
+        _myTextSize = createTextSurface(theText, theFontName, getTextColor(),
+            theSDLFontInfo, myBoldFont, myItalicFont, myBoldItalicFont, theTargetWidth, theTargetHeight);        
+    }
+
     Vector2i
     SDLTextRenderer::renderTextAsImage(TextureManager & theTextureManager,
                                             dom::NodePtr theImageNode,
@@ -208,7 +213,7 @@ namespace y60 {
                                             const asl::Vector2i & theCursorPos)
     {
         MAKE_GL_SCOPE_TIMER(SDLTextRenderer_renderTextAsImage);
-        TTF_SetTracking(_myTracking);
+
 
         ImagePtr myImage = theImageNode->getFacade<y60::Image>();
 
@@ -217,14 +222,22 @@ namespace y60 {
         }
 
         _myCursorPos = theCursorPos;
+
         MAKE_GL_SCOPE_TIMER(SDLTextRenderer_renderTextAsImage2);
-        Vector2i myTextSize = createTextSurface(theText, theFontName, getTextColor(),
-            theTargetWidth, theTargetHeight);
+
+        SDLFontInfo mySDLFontInfo = (getFontInfo(makeFontName(theFontName, SDLFontInfo::NORMAL)));
+        const TTF_Font * myBoldFont       = getFont(makeFontName(theFontName, SDLFontInfo::BOLD));
+        const TTF_Font * myItalicFont     = getFont(makeFontName(theFontName, SDLFontInfo::ITALIC));
+        const TTF_Font * myBoldItalicFont = getFont(makeFontName(theFontName, SDLFontInfo::BOLDITALIC));
+
+        renderTextInSurface(theText, theFontName, theTargetWidth, theTargetHeight,
+                                                  mySDLFontInfo, myBoldFont, myItalicFont, myBoldItalicFont);
+        Vector2i myTextSize = _myTextSize;
+
         if ( myTextSize[0] == 0 && myTextSize[1] == 0) {
             myImage->getRasterPtr()->clear();
             return myTextSize;
         }
-
         unsigned int myImageDataSize = _myTextureSurface->w * _myTextureSurface->h * sizeof(asl::RGBA);
 
 
@@ -336,13 +349,13 @@ namespace y60 {
         if (theMinX < 0) {
             theMinX = 0;
         }
-        switch(_myHorizontalAlignment) {
-            case LEFT_ALIGNMENT:
-                return _myLeftPadding - theMinX + static_cast<int>(theLine.indent);
-            case RIGHT_ALIGNMENT:
-                return static_cast<int>(theSurfaceWidth)-_myRightPadding-static_cast<int>(theLine.width);
-            case CENTER_ALIGNMENT:
-                return (_myLeftPadding-_myRightPadding+static_cast<int>(theSurfaceWidth)-static_cast<int>(theLine.width)) / 2;
+        switch(_myTextStyle._myHorizontalAlignment) {
+            case TextStyle::LEFT_ALIGNMENT:
+                return _myTextStyle._myLeftPadding - theMinX + static_cast<int>(theLine.indent);
+            case TextStyle::RIGHT_ALIGNMENT:
+                return static_cast<int>(theSurfaceWidth)-_myTextStyle._myRightPadding-static_cast<int>(theLine.width);
+            case TextStyle::CENTER_ALIGNMENT:
+                return (_myTextStyle._myLeftPadding-_myTextStyle._myRightPadding+static_cast<int>(theSurfaceWidth)-static_cast<int>(theLine.width)) / 2;
             default:
                 break; // avoid unused enum value warning
         }
@@ -351,13 +364,13 @@ namespace y60 {
 
     int
     SDLTextRenderer::calcVerticalAlignment(unsigned theSurfaceHeight, unsigned theTextHeight) {
-        switch(_myVerticalAlignment) {
-            case TOP_ALIGNMENT:
-                return _myTopPadding;
-            case BOTTOM_ALIGNMENT:
-                return static_cast<int>(theSurfaceHeight)-_myBottomPadding-static_cast<int>(theTextHeight);
-            case CENTER_ALIGNMENT:
-                return (_myTopPadding-_myBottomPadding+static_cast<int>(theSurfaceHeight)-static_cast<int>(theTextHeight)) / 2;
+        switch(_myTextStyle._myVerticalAlignment) {
+            case TextStyle::TOP_ALIGNMENT:
+                return _myTextStyle._myTopPadding;
+            case TextStyle::BOTTOM_ALIGNMENT:
+                return static_cast<int>(theSurfaceHeight)-_myTextStyle._myBottomPadding-static_cast<int>(theTextHeight);
+            case TextStyle::CENTER_ALIGNMENT:
+                return (_myTextStyle._myTopPadding-_myTextStyle._myBottomPadding+static_cast<int>(theSurfaceHeight)-static_cast<int>(theTextHeight)) / 2;
             default:
                 break; // avoid unused enum value warning
         }
@@ -368,7 +381,6 @@ namespace y60 {
     SDLTextRenderer::createTargetSurface(unsigned theWidth, unsigned theHeight, const Vector4f & theTextColor) {
         DB2(AC_TRACE << "createTargetSurface with size: " << theWidth << "x" << theHeight << endl;)
         SDL_FreeSurface(_myTextureSurface);
-
         _myTextureSurface = SDL_CreateRGBSurface(
                 SDL_SWSURFACE,
                 theWidth, theHeight,
@@ -605,7 +617,7 @@ namespace y60 {
                 myWordStart = myTextPos;
                 myWordEnd   = myTextPos;
             } else if ( 0 != (myOffset = parseWord(theText, myTextPos))) {
-                if (_myHorizontalAlignment == RIGHT_ALIGNMENT) {
+                if (_myTextStyle._myHorizontalAlignment == TextStyle::RIGHT_ALIGNMENT) {
                     theResult.push_back(Word(theText.substr(myWordStart, myWordEnd - myWordStart)));
                     myNextWordOffset = myOffset;
                 } else {
@@ -655,8 +667,8 @@ namespace y60 {
             if (theLines.back().width + myWord.surface->w > theLineWidth && ((i+1)*theLineHeight <= theSurfaceHeight)) {
                 // start new line
                 theLines.push_back(Line());
-                theLines.back().indent = (myIndentNextLine) ? _myIndentation:0;
-                theLines.back().width = (myIndentNextLine) ? _myIndentation:0;
+                theLines.back().indent = (myIndentNextLine) ? _myTextStyle._myIndentation:0;
+                theLines.back().width = (myIndentNextLine) ? _myTextStyle._myIndentation:0;
             }
 
             // Update line metrics
@@ -668,8 +680,8 @@ namespace y60 {
                     " and wordcount: "<< theLines.back().wordCount << endl;)
                 theLines.back().newline = true;
                 theLines.push_back(Line());
-                theLines.back().indent =  (myIndentNextLine) ? _myIndentation:0;
-                theLines.back().width =  (myIndentNextLine) ? _myIndentation:0;
+                theLines.back().indent =  (myIndentNextLine) ? _myTextStyle._myIndentation:0;
+                theLines.back().width =  (myIndentNextLine) ? _myTextStyle._myIndentation:0;
                 myNewlineCount++;
             } else {
                 // Check if next word fits into the line
@@ -678,14 +690,14 @@ namespace y60 {
                         " wordcount: "<< theLines.back().wordCount << endl;)
                     // start new line
                     theLines.push_back(Line());
-                    theLines.back().indent =  (myIndentNextLine) ? _myIndentation:0;
-                    theLines.back().width =  (myIndentNextLine) ? _myIndentation:0;
+                    theLines.back().indent =  (myIndentNextLine) ? _myTextStyle._myIndentation:0;
+                    theLines.back().width =  (myIndentNextLine) ? _myTextStyle._myIndentation:0;
                 }
             }
         }
 
         // Calculate total height
-        unsigned myTotalHeight = (myNewlineCount + 1) * (_myParagraphBottomOffset + _myParagraphTopOffset);
+        unsigned myTotalHeight = (myNewlineCount + 1) * (_myTextStyle._myParagraphBottomOffset + _myTextStyle._myParagraphTopOffset);
         if (theWords.size()) {
             // Make sure the last is rendered all the way to the bottom
             myTotalHeight += theWords[0].surface->h;
@@ -697,23 +709,23 @@ namespace y60 {
     void
     SDLTextRenderer::renderWords(vector<Word> & theWords,
                                  const string & theFontName,
-                                 const Vector4f & theTextColor)
+                                 const Vector4f & theTextColor,
+                                 SDLFontInfo & theSDLFontInfo,
+                                 const TTF_Font * myBoldFont,
+                                 const TTF_Font * myItalicFont,
+                                 const TTF_Font * myBoldItalicFont
+                                 )
     {
         DB2(AC_TRACE << "-------  Render Words  -------" << endl;)
-        SDLFontInfo mySDLFontInfo = (getFontInfo(makeFontName(theFontName, SDLFontInfo::NORMAL)));
 
-        TTF_Font * myNormalFont = mySDLFontInfo.getFont();
+        TTF_Font * myNormalFont = theSDLFontInfo.getFont();
         if (!myNormalFont) {
             throw GLTextRendererException("Internal error: Normal font not defined.", PLUS_FILE_LINE);
         }
 
-        if (TTF_GetFontHinting (myNormalFont) != (int)getFontHint(theFontName)) {
-            TTF_SetFontHinting(myNormalFont, (int)getFontHint(theFontName));
+        if (TTF_GetFontHinting (myNormalFont) != (int)theSDLFontInfo.getFontHinting()){ 
+            TTF_SetFontHinting(myNormalFont, (int)theSDLFontInfo.getFontHinting());
         }
-
-        const TTF_Font * myBoldFont       = getFont(makeFontName(theFontName, SDLFontInfo::BOLD));
-        const TTF_Font * myItalicFont     = getFont(makeFontName(theFontName, SDLFontInfo::ITALIC));
-        const TTF_Font * myBoldItalicFont = getFont(makeFontName(theFontName, SDLFontInfo::BOLDITALIC));
 
         SDL_Color myTextColor = { Uint8(theTextColor[0] * 255),
                                   Uint8(theTextColor[1] * 255),
@@ -774,15 +786,80 @@ namespace y60 {
             TTF_SetFontStyle((TTF_Font*) myFont, TTF_STYLE_NORMAL);
         }
     }
-
     Vector2i
-    SDLTextRenderer::createTextSurface(const string & theText, const string & theFontName,
+    SDLTextRenderer::createTextSurfaceDimension(const string & theText, const string & theFontName,
                                        const Vector4f & theTextColor,
+                                       SDLFontInfo & theSDLFontInfo,
+                                       const TTF_Font * myBoldFont,
+                                       const TTF_Font * myItalicFont,
+                                       const TTF_Font * myBoldItalicFont,
                                        unsigned int theTargetWidth,
                                        unsigned int theTargetHeight)
     {
         unsigned mySurfaceWidth  = 0;
         unsigned mySurfaceHeight = 0;
+
+        //_myGlyphPosition.clear();
+
+        vector<Word> myWords;
+        parseWords(theText, myWords);
+        if (myWords.empty()) {
+            return Vector2i(0,0);
+        }
+        renderWords(myWords, theFontName, theTextColor, theSDLFontInfo, myBoldFont, myItalicFont, myBoldItalicFont);
+
+        if (theTargetWidth == 0) {
+            // Use the surface width and (if not given) height
+            unsigned myWidth = 0;
+            unsigned myMaxWidth = 0;
+            for (unsigned i = 0; i < myWords.size(); ++i) {
+                myWidth += myWords[i].surface->w;
+                if (myWords[i].newline) {
+                    myMaxWidth = std::max( myMaxWidth, myWidth );
+                    myWidth = 0;
+                }
+            }
+            myMaxWidth = std::max( myMaxWidth, myWidth );
+            mySurfaceWidth  = myMaxWidth + _myTextStyle._myRightPadding + _myTextStyle._myLeftPadding;
+
+            if (theTargetHeight == 0) {
+                mySurfaceHeight = myWords[0].surface->h + _myTextStyle._myTopPadding + _myTextStyle._myBottomPadding;
+            } else {
+                mySurfaceHeight = theTargetHeight;
+            }
+        } else {
+            // Use the given size
+            mySurfaceWidth  = theTargetWidth;
+            mySurfaceHeight = theTargetHeight;
+        }
+
+        vector<Line> myLines;
+        unsigned myLineHeight = _myTextStyle._myLineHeight;
+        if (myLineHeight == 0) {
+            myLineHeight = TTF_FontLineSkip(theSDLFontInfo.getFont());
+        }
+
+        unsigned myTotalLineHeight = createLines(myWords, myLines,
+                    mySurfaceWidth-_myTextStyle._myLeftPadding-_myTextStyle._myRightPadding, myLineHeight, mySurfaceHeight);
+        if (theTargetHeight == 0) {
+            mySurfaceHeight = myTotalLineHeight + _myTextStyle._myTopPadding +_myCursorPos[1]+ _myTextStyle._myBottomPadding;
+        }
+        return Vector2i(mySurfaceWidth, mySurfaceHeight);
+    }
+
+    Vector2i
+    SDLTextRenderer::createTextSurface(const string & theText, const string & theFontName,
+                                       const Vector4f & theTextColor,
+                                       SDLFontInfo & theSDLFontInfo,
+                                       const TTF_Font * myBoldFont,
+                                       const TTF_Font * myItalicFont,
+                                       const TTF_Font * myBoldItalicFont,
+                                       unsigned int theTargetWidth,
+                                       unsigned int theTargetHeight)
+    {
+        unsigned mySurfaceWidth  = 0;
+        unsigned mySurfaceHeight = 0;
+
 
         DB2(
             {AC_TRACE << "----------------------------------" << endl;}
@@ -797,7 +874,7 @@ namespace y60 {
         if (myWords.empty()) {
             return Vector2i(0,0);
         }
-        renderWords(myWords, theFontName, theTextColor);
+        renderWords(myWords, theFontName, theTextColor, theSDLFontInfo, myBoldFont, myItalicFont, myBoldItalicFont);
 
         if (theTargetWidth == 0) {
             // Use the surface width and (if not given) height
@@ -811,11 +888,11 @@ namespace y60 {
                 }
             }
             myMaxWidth = std::max( myMaxWidth, myWidth );
-            mySurfaceWidth  = myMaxWidth + _myRightPadding + _myLeftPadding;
+            mySurfaceWidth  = myMaxWidth + _myTextStyle._myRightPadding + _myTextStyle._myLeftPadding;
 
             DB2(AC_TRACE << "Set auto-width to " << mySurfaceWidth << endl;)
             if (theTargetHeight == 0) {
-                mySurfaceHeight = myWords[0].surface->h + _myTopPadding + _myBottomPadding;
+                mySurfaceHeight = myWords[0].surface->h + _myTextStyle._myTopPadding + _myTextStyle._myBottomPadding;
             } else {
                 mySurfaceHeight = theTargetHeight;
             }
@@ -826,16 +903,16 @@ namespace y60 {
         }
 
         vector<Line> myLines;
-        unsigned myLineHeight = _myLineHeight;
+        unsigned myLineHeight = _myTextStyle._myLineHeight;
         if (myLineHeight == 0) {
-            myLineHeight = TTF_FontLineSkip(getFontInfo(makeFontName(theFontName)).getFont());
+            myLineHeight = TTF_FontLineSkip(theSDLFontInfo.getFont());
         }
 
         unsigned myTotalLineHeight = createLines(myWords, myLines,
-                    mySurfaceWidth-_myLeftPadding-_myRightPadding, myLineHeight, mySurfaceHeight);
+                    mySurfaceWidth-_myTextStyle._myLeftPadding-_myTextStyle._myRightPadding, myLineHeight, mySurfaceHeight);
         if (theTargetHeight == 0) {
             DB2(AC_TRACE << "Set auto-height to " << myTotalLineHeight << endl;)
-            mySurfaceHeight = myTotalLineHeight + _myTopPadding +_myCursorPos[1]+ _myBottomPadding;
+            mySurfaceHeight = myTotalLineHeight + _myTextStyle._myTopPadding +_myCursorPos[1]+ _myTextStyle._myBottomPadding;
         }
 
         _myMaxWidth = 0;
@@ -845,7 +922,6 @@ namespace y60 {
             _myMaxWidth = std::max(myLines[i].width, _myMaxWidth);
             _myLineWidths.push_back(myLines[i].width);
         }
-
         createTargetSurface( mySurfaceWidth, mySurfaceHeight, theTextColor);
 
         DB2(
@@ -858,7 +934,7 @@ namespace y60 {
 
         // Render lines
         unsigned myWordCount = 0;
-        int myYPos = calcVerticalAlignment(mySurfaceHeight, myTotalLineHeight) + _myParagraphTopOffset + _myCursorPos[1];
+        int myYPos = calcVerticalAlignment(mySurfaceHeight, myTotalLineHeight) + _myTextStyle._myParagraphTopOffset + _myCursorPos[1];
         for (unsigned i = 0; i < myLines.size(); ++i) {
             int myMinX = myLines[i].wordCount ? myWords[myWordCount].minx : 0;
             int myXPos = calcHorizontalAlignment(mySurfaceWidth, myLines[i], myMinX);
@@ -885,9 +961,9 @@ namespace y60 {
                     _myGlyphPosition.push_back(Vector2i(myGlyphXPos + myWord.sdl_x_position[i+1], unsigned(_myTextureSurface->h) - (myYPos + mySrcHeight)));
                     i +=2;
                 }
-                if (int(mySurfaceHeight) > (_myBottomPadding + myYPos)) {
-                    if (int(mySrcHeight + myYPos) > int(mySurfaceHeight-_myBottomPadding)) {
-                        mySrcHeight = mySurfaceHeight-_myBottomPadding-myYPos;
+                if (int(mySurfaceHeight) > (_myTextStyle._myBottomPadding + myYPos)) {
+                    if (int(mySrcHeight + myYPos) > int(mySurfaceHeight-_myTextStyle._myBottomPadding)) {
+                        mySrcHeight = mySurfaceHeight-_myTextStyle._myBottomPadding-myYPos;
                     }
                 } else {
                     mySrcHeight = 0;
@@ -920,12 +996,12 @@ namespace y60 {
                 myXPos += myWord.surface->w;
                 SDL_FreeSurface(myWord.surface);
             }
-            _myCursorPos[0] = myXPos - _myRightPadding;
+            _myCursorPos[0] = myXPos - _myTextStyle._myRightPadding;
 
             if (myLines[i].newline) {
-                myYPos += _myParagraphBottomOffset + _myParagraphTopOffset;
+                myYPos += _myTextStyle._myParagraphBottomOffset + _myTextStyle._myParagraphTopOffset;
             }
-            _myCursorPos[1] = myYPos - calcVerticalAlignment(mySurfaceHeight, myTotalLineHeight) - _myParagraphTopOffset;
+            _myCursorPos[1] = myYPos - calcVerticalAlignment(mySurfaceHeight, myTotalLineHeight) - _myTextStyle._myParagraphTopOffset;
             myYPos += myLineHeight;
         }
 
@@ -940,9 +1016,15 @@ namespace y60 {
             throw GLTextRendererException("SDLTextRenderer - can only render SDLText objects.", PLUS_FILE_LINE);
         }
 
+        SDLFontInfo mySDLFontInfo = (getFontInfo(makeFontName(mySDLText->_myFont, SDLFontInfo::NORMAL)));
+        const TTF_Font * myBoldFont       = getFont(makeFontName(mySDLText->_myFont, SDLFontInfo::BOLD));
+        const TTF_Font * myItalicFont     = getFont(makeFontName(mySDLText->_myFont, SDLFontInfo::ITALIC));
+        const TTF_Font * myBoldItalicFont = getFont(makeFontName(mySDLText->_myFont, SDLFontInfo::BOLDITALIC));
+
         Vector2i myTextSize = createTextSurface(mySDLText->_myString,
             mySDLText->_myFont,
-            mySDLText->_myTextColor);
+            mySDLText->_myTextColor,
+            mySDLFontInfo, myBoldFont, myItalicFont, myBoldItalicFont);
 
         GLfloat texMinX = 0.0f;         /* Min X */
         GLfloat texMinY = 0.0f;         /* Min Y */
@@ -974,5 +1056,86 @@ namespace y60 {
         DB(AC_TRACE << "unbinding texture" << endl);
         glBindTexture(GL_TEXTURE_2D,0);
         CHECK_OGL_ERROR;
+    }
+
+    void 
+    SDLTextRenderer::copyText2Image() {
+
+        ImagePtr myImage = _myImageNode->getFacade<y60::Image>();
+        // copy data in image
+        if ( _myTextSize[0] == 0 && _myTextSize[1] == 0) {
+            myImage->getRasterPtr()->clear();
+            return;
+        }
+        unsigned int myImageDataSize = getTextureSurface()->w * getTextureSurface()->h * sizeof(asl::RGBA);
+
+        MAKE_GL_SCOPE_TIMER(SDLTextRenderer_renderTextAsImage_assign);
+        myImage->getRasterPtr()->assign(getTextureSurface()->w, getTextureSurface()->h,
+                        ReadableBlockAdapter((unsigned char*)getTextureSurface()->pixels,
+                        (unsigned char*)getTextureSurface()->pixels + myImageDataSize));
+
+    }
+
+//--------------------------------------------------------------------------------
+    AsyncSDLTextRenderer::AsyncSDLTextRenderer(): _myRealTextRenderer(0) {
+    }
+    
+    AsyncSDLTextRenderer::~AsyncSDLTextRenderer() {
+    }
+
+
+    asl::Vector2i 
+        AsyncSDLTextRenderer::renderTextAsImage(TextureManager & theTextureManager,
+            dom::NodePtr theImageNode,
+            const std::string & theText, const std::string & theFontName,
+            unsigned int theTargetWidth, unsigned int theTargetHeight,
+            const asl::Vector2i & theCursorPos) 
+    {
+        //asl::Time myBefore, myAfter;
+        
+        bool myAsyncFlag = false;
+        // preset image
+        MAKE_GL_SCOPE_TIMER(SDLTextRenderer_renderTextAsImage);
+        ImagePtr myImage = theImageNode->getFacade<y60::Image>();
+        if (myImage->getRasterEncoding() != y60::RGBA) {
+            myImage->createRaster(1, 1, 1, y60::RGBA);
+        }
+
+        // render text
+        MAKE_GL_SCOPE_TIMER(SDLTextRenderer_renderTextAsImage2);
+        _myRealTextRenderer = SDLTextRendererPtr(new SDLTextRenderer());
+        _myRealTextRenderer->setImageNode(theImageNode);
+        _myRealTextRenderer->setTextStyle(getTextStyle());
+        _myRealTextRenderer->setCursorPos(theCursorPos);
+
+        SDLFontInfo mySDLFontInfo = (getFontInfo(makeFontName(theFontName, SDLFontInfo::NORMAL)));
+        const TTF_Font * myBoldFont       = getFont(makeFontName(theFontName, SDLFontInfo::BOLD));
+        const TTF_Font * myItalicFont     = getFont(makeFontName(theFontName, SDLFontInfo::ITALIC));
+        const TTF_Font * myBoldItalicFont = getFont(makeFontName(theFontName, SDLFontInfo::BOLDITALIC));
+
+        Vector2i myTextSize(theTargetWidth,theTargetHeight);
+        if (myAsyncFlag) {
+            if (myTextSize[0] == 0 || myTextSize[1] == 0) {
+                myTextSize = _myRealTextRenderer->createTextSurfaceDimension(theText, theFontName, _myRealTextRenderer->getTextColor(),                                                                             
+                                                                             mySDLFontInfo, myBoldFont, myItalicFont, myBoldItalicFont,
+                                                                             theTargetWidth, theTargetHeight);
+                AC_PRINT << "Async text dimension calc: " << myTextSize;
+            }
+        } else {
+            _myRealTextRenderer->renderTextInSurface(theText, theFontName, theTargetWidth, theTargetHeight,
+                                                     mySDLFontInfo, myBoldFont, myItalicFont, myBoldItalicFont);
+            myTextSize = _myRealTextRenderer->getTextSize();
+        }
+        //myAfter.setNow();
+        //unsigned long long myDuration = myAfter.millis() - myBefore.millis();
+        //AC_PRINT << "myDuration : " << myDuration;
+        return myTextSize;
+    }
+
+    void 
+    AsyncSDLTextRenderer::copyText2Image() {
+        if (_myRealTextRenderer) {
+            _myRealTextRenderer->copyText2Image();
+        }
     }
 }

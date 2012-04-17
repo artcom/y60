@@ -73,15 +73,34 @@ namespace y60 {
 
     DEFINE_EXCEPTION(GLTextRendererException, asl::Exception);
 
+    struct Y60_GLTEXT_DECL TextStyle {
+        enum TextAligment {
+            CENTER_ALIGNMENT,
+            LEFT_ALIGNMENT,
+            RIGHT_ALIGNMENT,
+            TOP_ALIGNMENT,
+            BOTTOM_ALIGNMENT
+        };
+
+        asl::Vector4f _myTextColor;
+        int           _myTopPadding;
+        int           _myBottomPadding;
+        int           _myLeftPadding;
+        int           _myRightPadding;
+        TextAligment  _myHorizontalAlignment;
+        TextAligment  _myVerticalAlignment;
+
+        unsigned      _myLineHeight;
+    	unsigned      _myParagraphTopOffset;
+    	unsigned      _myParagraphBottomOffset;
+        float         _myTracking;
+        int           _myIndentation;
+
+
+    };
+
     class Y60_GLTEXT_DECL TextRenderer {
         public:
-            enum TextAligment {
-                CENTER_ALIGNMENT,
-                LEFT_ALIGNMENT,
-                RIGHT_ALIGNMENT,
-                TOP_ALIGNMENT,
-                BOTTOM_ALIGNMENT
-            };
 
             TextRenderer();
             virtual ~TextRenderer();
@@ -110,44 +129,34 @@ namespace y60 {
             void setPadding(int theTop, int theBottom, int theLeft, int theRight);
             void setCursor(asl::Vector2i thePosition);
             void setIndentation(int theIndent);
-        	void setVTextAlignment(TextRenderer::TextAligment theVAlignment);
-	        void setHTextAlignment(TextRenderer::TextAligment theHAlignment);
+        	void setVTextAlignment(TextStyle::TextAligment theVAlignment);
+	        void setHTextAlignment(TextStyle::TextAligment theHAlignment);
 	        void setLineHeight(unsigned theHeight) {
-	            _myLineHeight = theHeight;
+	            _myTextStyle._myLineHeight = theHeight;
 	        }
         	void setParagraph(unsigned theTopOffset, unsigned theBottomOffset) {
-        	    _myParagraphTopOffset    = theTopOffset;
-        	    _myParagraphBottomOffset = theBottomOffset;
+        	    _myTextStyle._myParagraphTopOffset    = theTopOffset;
+        	    _myTextStyle._myParagraphBottomOffset = theBottomOffset;
         	}
             void setTracking(float theTracking) {
-                _myTracking = theTracking;
+                _myTextStyle._myTracking = theTracking;
             }
 
             const unsigned int & getWindowHeight() const { return _myWindowHeight; }
             const unsigned int & getWindowWidth() const { return _myWindowWidth; }
-            const asl::Vector4f & getTextColor() const { return _myCurrentTextColor; }
+            const asl::Vector4f & getTextColor() const { return _myTextStyle._myTextColor;}
+            const TextStyle & getTextStyle() { return _myTextStyle;}
+            void setTextStyle(const TextStyle & theTextStyle);
+
         protected:
-   	        TextAligment  _myHorizontalAlignment;
-   	        TextAligment  _myVerticalAlignment;
-
-            int           _myTopPadding;
-            int           _myBottomPadding;
-            int           _myLeftPadding;
-            int           _myRightPadding;
-
-            unsigned      _myLineHeight;
-        	unsigned      _myParagraphTopOffset;
-        	unsigned      _myParagraphBottomOffset;
-            float         _myTracking;
-            int           _myIndentation;
-            asl::Vector2i _myCursorPos;
+            TextStyle      _myTextStyle;
             unsigned             _myMaxWidth;
+            asl::Vector2i _myCursorPos;
             std::vector<unsigned> _myLineWidths;
             std::vector<asl::Vector2i> _myGlyphPosition;
         private:
             unsigned int  _myWindowWidth;
             unsigned int  _myWindowHeight;
-   	        asl::Vector4f _myCurrentTextColor;
 
     };
     typedef asl::Ptr<TextRenderer> TextRendererPtr;

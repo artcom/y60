@@ -168,7 +168,8 @@ SDLWindow::~SDLWindow() {
 
 TTFTextRendererPtr
 SDLWindow::createTTFRenderer() {
-    return TTFTextRendererPtr(new SDLTextRenderer());
+    return TTFTextRendererPtr(new AsyncSDLTextRenderer());
+    //return TTFTextRendererPtr(new SDLTextRenderer());
 }
 
 void

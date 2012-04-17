@@ -94,8 +94,8 @@ namespace y60 {
             const asl::Vector4f & getColor();
             void setPadding(int topPadding, int bottomPadding, int leftpadding, int rightpadding);
 	        void setIndentation(int theIndentation);
-            void setVTextAlignment(TextRenderer::TextAligment theVAlignment);
-            void setHTextAlignment(TextRenderer::TextAligment theHAlignment);
+            void setVTextAlignment(TextStyle::TextAligment theVAlignment);
+            void setHTextAlignment(TextStyle::TextAligment theHAlignment);
             void setLineHeight(unsigned theHeight);
             void setParagraph(unsigned theTopOffset, unsigned theBottomOffset);
             void loadTTF(const std::string & theName, const std::string & theFileName,

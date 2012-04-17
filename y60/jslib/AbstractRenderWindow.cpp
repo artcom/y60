@@ -517,6 +517,11 @@ AbstractRenderWindow::onFrame() {
         }
     }
 
+    // collect async text render thread image data
+    //if (_myRenderer && _myRenderer->getTextManager()) {
+        //_myRenderer->getTextManager();
+    //}
+
     // update movies and capture
     if (_myScene) {
         MAKE_SCOPE_TIMER(onFrame_updateMovieAndCapture);
@@ -1085,8 +1090,13 @@ asl::Vector2i AbstractRenderWindow::renderTextAsImage(dom::NodePtr theImageNode,
                                                       const unsigned int & theTargetWidth, const unsigned int & theTargetHeight,
                                                       const asl::Vector2i & theCursorPos)
 {
-    return _myRenderer->getTextManager().renderTextAsImage(*(_myScene->getTextureManager()),
+    asl::NanoTime myTime = asl::NanoTime();
+    asl::Vector2i mySize = _myRenderer->getTextManager().renderTextAsImage(*(_myScene->getTextureManager()),
         theImageNode, theString, theFont, theTargetWidth, theTargetHeight, theCursorPos);
+    double z = myTime.millis();
+    AC_PRINT << "renderTextAsImage duration: " << z;
+
+    return mySize;
 }
 
 void AbstractRenderWindow::setTextPadding(int topPadding, int bottomPadding, int leftPadding, int rightPadding) {
@@ -1097,11 +1107,11 @@ void AbstractRenderWindow::setTextIndentation(int theIndentaion) {
     _myRenderer->getTextManager().setIndentation(theIndentaion);
 }
 void AbstractRenderWindow::setHTextAlignment(unsigned int theHAlignment) {
-    _myRenderer->getTextManager().setHTextAlignment(TextRenderer::TextAligment(theHAlignment));
+    _myRenderer->getTextManager().setHTextAlignment(TextStyle::TextAligment(theHAlignment));
 }
 
 void AbstractRenderWindow::setVTextAlignment(unsigned int theVAlignment) {
-    _myRenderer->getTextManager().setVTextAlignment(TextRenderer::TextAligment(theVAlignment));
+    _myRenderer->getTextManager().setVTextAlignment(TextStyle::TextAligment(theVAlignment));
 }
 void AbstractRenderWindow::setLineHeight(unsigned int theLineHeight) {
     _myRenderer->getTextManager().setLineHeight(theLineHeight);

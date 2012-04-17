@@ -75,25 +75,29 @@ using namespace asl;
 namespace y60 {
 
     TextRenderer::TextRenderer() :
-        _myHorizontalAlignment(LEFT_ALIGNMENT),
-        _myVerticalAlignment(TOP_ALIGNMENT),
 
-        _myTopPadding(0),
-        _myBottomPadding(0),
-        _myLeftPadding(0),
-        _myRightPadding(0),
-
-        _myLineHeight(0),
-        _myParagraphTopOffset(0),
-        _myParagraphBottomOffset(0),
-        _myTracking(0.0f),
-        _myIndentation(0),
         _myCursorPos(0,0),
         _myMaxWidth(0),
         _myWindowWidth(0),
-        _myWindowHeight(0),
-        _myCurrentTextColor(Vector4f(1.0, 1.0, 1.0, 1.0))
-    {}
+        _myWindowHeight(0) /*,
+        _myCurrentTextColor(Vector4f(1.0, 1.0, 1.0, 1.0))*/
+    {
+        _myTextStyle._myTextColor = Vector4f(1.0, 1.0, 1.0, 1.0);
+        _myTextStyle._myTopPadding = 0;
+        _myTextStyle._myBottomPadding = 0;
+        _myTextStyle._myLeftPadding = 0;
+        _myTextStyle._myRightPadding = 0;
+        _myTextStyle._myHorizontalAlignment = TextStyle::LEFT_ALIGNMENT;
+        _myTextStyle._myVerticalAlignment = TextStyle::TOP_ALIGNMENT;
+        _myTextStyle._myLineHeight = 0;
+        _myTextStyle._myParagraphTopOffset = 0;
+        _myTextStyle._myParagraphBottomOffset = 0;
+        _myTextStyle._myTracking = 0.0f;
+        _myTextStyle._myIndentation = 0;
+
+
+
+    }
 
     TextRenderer::~TextRenderer() {}
 
@@ -114,22 +118,25 @@ namespace y60 {
         _myWindowHeight = theWindowHeight;
     }
 
+    void TextRenderer::setTextStyle(const TextStyle & theTextStyle) { 
+        _myTextStyle = theTextStyle;
+    }
 
     void
     TextRenderer::setColor(const asl::Vector4f & theTextColor) {
-        _myCurrentTextColor = theTextColor;
+        _myTextStyle._myTextColor = theTextColor;
     }
     const asl::Vector4f &
     TextRenderer::getColor() {
-        return _myCurrentTextColor;
+        return _myTextStyle._myTextColor;
     }
 
     void
     TextRenderer::setPadding(int theTop, int theBottom, int theLeft, int theRight) {
-        _myTopPadding = theTop;
-        _myBottomPadding = theBottom;
-        _myLeftPadding = theLeft;
-        _myRightPadding = theRight;
+        _myTextStyle._myTopPadding = theTop;
+        _myTextStyle._myBottomPadding = theBottom;
+        _myTextStyle._myLeftPadding = theLeft;
+        _myTextStyle._myRightPadding = theRight;
     }
 
     void
@@ -139,16 +146,16 @@ namespace y60 {
 
     void
     TextRenderer::setIndentation(int theIndent) {
-        _myIndentation = theIndent;
+        _myTextStyle._myIndentation = theIndent;
     }
 
 	void
-	TextRenderer::setVTextAlignment(TextRenderer::TextAligment theVAlignment) {
-	    _myVerticalAlignment = theVAlignment;
+	TextRenderer::setVTextAlignment(TextStyle::TextAligment theVAlignment) {
+	    _myTextStyle._myVerticalAlignment = theVAlignment;
 	}
 
     void
-    TextRenderer::setHTextAlignment(TextRenderer::TextAligment theHAlignment) {
-        _myHorizontalAlignment = theHAlignment;
+    TextRenderer::setHTextAlignment(TextStyle::TextAligment theHAlignment) {
+        _myTextStyle._myHorizontalAlignment = theHAlignment;
 	}
 }

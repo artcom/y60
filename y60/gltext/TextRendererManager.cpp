@@ -181,7 +181,7 @@ namespace y60 {
     }
 
 	void
-	TextRendererManager::setVTextAlignment(TextRenderer::TextAligment theVAlignment) {
+	TextRendererManager::setVTextAlignment(TextStyle::TextAligment theVAlignment) {
         _myBitmapRenderer.setVTextAlignment(theVAlignment);
         if (_myTTFRenderer) {
             _myTTFRenderer->setVTextAlignment(theVAlignment);
@@ -189,7 +189,7 @@ namespace y60 {
     }
 
 	void
-	TextRendererManager::setHTextAlignment(TextRenderer::TextAligment theHAlignment) {
+	TextRendererManager::setHTextAlignment(TextStyle::TextAligment theHAlignment) {
         _myBitmapRenderer.setHTextAlignment(theHAlignment);
         if (_myTTFRenderer) {
             _myTTFRenderer->setHTextAlignment(theHAlignment);
@@ -269,10 +269,12 @@ const asl::Vector2i &
                                   const std::string & theFont,
                                   unsigned int theTargetWidth, unsigned int theTargetHeight,
                                   const asl::Vector2i & theCursorPos)
-    {
-        return _myTTFRenderer->renderTextAsImage(theTextureManager,
-                                              theImageNode, theString, theFont,
-                                              theTargetWidth, theTargetHeight, theCursorPos);
+    {        
+        Vector2i mySize = _myTTFRenderer->renderTextAsImage(theTextureManager,
+                                          theImageNode, theString, theFont,
+                                          theTargetWidth, theTargetHeight, theCursorPos);
+        _myTTFRenderer->copyText2Image();
+        return mySize;
 	}
 
 	void

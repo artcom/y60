@@ -81,33 +81,50 @@ namespace y60 {
     class SDLTextRenderer : public TTFTextRenderer {
         public:
             SDLTextRenderer();
-            ~SDLTextRenderer();
+            virtual ~SDLTextRenderer();
 
-            void loadFont(const std::string & theName, const std::string & theFileName,
+            virtual void loadFont(const std::string & theName, const std::string & theFileName,
                     int theHeight, TTFFontInfo::FONTHINTING & theFonthint,
                     TTFFontInfo::FONTTYPE theFontType, int theAscendOffset = 0);
-            TextPtr createText(const asl::Vector2f & thePos,
+            virtual TextPtr createText(const asl::Vector2f & thePos,
                     const std::string & theString,
                     const std::string & theFontName);
 
-            bool haveFont(const std::string theFontName);
-            void renderText(TextPtr & theText);
-            asl::Vector2i renderTextAsImage(TextureManager & theTextureManager,
+            virtual bool haveFont(const std::string theFontName);
+            virtual void renderText(TextPtr & theText);
+            virtual asl::Vector2i renderTextAsImage(TextureManager & theTextureManager,
                     dom::NodePtr theImageNode,
                     const std::string & theText, const std::string & theFontName,
                     unsigned int theTextureWidth = 0, unsigned int theTextureHeight = 0,
                     const asl::Vector2i & theCursorPos = asl::Vector2i(0,0));
 
-            bool getFontMetrics(const std::string & theFontName,
+            virtual bool getFontMetrics(const std::string & theFontName,
                     int & theFontHeight,
                     int & theFontAscent, int & theFontDescent,
                     int & theFontLineSkip) const;
 
-            bool getGlyphMetrics(const std::string & theFontName, const std::string & theCharacter, asl::Box2f & theGlyphBox, double & theAdvance) const;
-            double getKerning(const std::string & theFontName, const std::string & theFirstCharacter, const std::string & theSecondCharacter) const;
-            bool hasGlyph(const std::string& theFontName, const std::string& theCharacter) const;
+            virtual bool getGlyphMetrics(const std::string & theFontName, const std::string & theCharacter, asl::Box2f & theGlyphBox, double & theAdvance) const;
+            virtual double getKerning(const std::string & theFontName, const std::string & theFirstCharacter, const std::string & theSecondCharacter) const;
+            virtual bool hasGlyph(const std::string& theFontName, const std::string& theCharacter) const;
 
-        private:
+            SDL_Surface * getTextureSurface() { return _myTextureSurface;}
+            virtual asl::Vector2i getTextSize() { return _myTextSize; }
+            void renderTextInSurface(const std::string & theText, const std::string & theFontName, unsigned int theTargetWidth,unsigned int theTargetHeight,
+                                         SDLFontInfo & theSDLFontInfo, const TTF_Font * myBoldFont, const TTF_Font * myItalicFont, const TTF_Font * myBoldItalicFont);
+            void setCursorPos(const asl::Vector2i & theCursorPos) {_myCursorPos =  theCursorPos;}
+            void setImageNode(dom::NodePtr theImageNode) {_myImageNode = theImageNode;}
+            void copyText2Image();
+
+            asl::Vector2i createTextSurfaceDimension(const std::string & theText, const std::string & theFontName,
+                    const asl::Vector4f & theTextColor,
+                    SDLFontInfo & theSDLFontInfo,
+                    const TTF_Font * myBoldFont,
+                    const TTF_Font * myItalicFont,
+                    const TTF_Font * myBoldItalicFont,
+                    unsigned int theTextureWidth = 0,
+                    unsigned int theTextureHeight = 0);
+
+        protected:
             typedef std::map<std::string, SDLFontInfo> FontLibrary;
 
             struct Format {
@@ -145,9 +162,12 @@ namespace y60 {
                 bool     newline;
                 unsigned indent;
             };
-
             asl::Vector2i createTextSurface(const std::string & theText, const std::string & theFontName,
                     const asl::Vector4f & theTextColor,
+                    SDLFontInfo & theSDLFontInfo,
+                    const TTF_Font * myBoldFont,
+                    const TTF_Font * myItalicFont,
+                    const TTF_Font * myBoldItalicFont,
                     unsigned int theTextureWidth = 0,
                     unsigned int theTextureHeight = 0);
             void createTargetSurface(unsigned theWidth, unsigned theHeight, const asl::Vector4f & theTextColor);
@@ -163,7 +183,6 @@ namespace y60 {
                     int theMinX);
             int calcVerticalAlignment(unsigned theTextHeight, unsigned theBlockHeight);
             SDLFontInfo & getFontInfo(const std::string & theName);
-            const TTFFontInfo::FONTHINTING & getFontHint(const std::string & theName) const;
 
             std::string makeFontName(const std::string & theName, SDLFontInfo::FONTTYPE theFontType = SDLFontInfo::NORMAL) const;
             const TTF_Font * getFont(const std::string & theName) const;
@@ -171,7 +190,11 @@ namespace y60 {
 
             void renderWords(std::vector<Word> & theWords,
                     const std::string & theFontName,
-                    const asl::Vector4f & theTextColor);
+                    const asl::Vector4f & theTextColor,
+                    SDLFontInfo & theSDLFontInfo,
+                    const TTF_Font * myBoldFont,
+                    const TTF_Font * myItalicFont,
+                    const TTF_Font * myBoldItalicFont);
 
             unsigned parseNewline(const std::string & theText, unsigned thePos, Format & theFormat);
             unsigned parseHtmlTag(const std::string & theText, unsigned thePos, Format & theFormat);
@@ -183,11 +206,26 @@ namespace y60 {
             SDL_Surface *        _myTextureSurface;
             FontLibrary          _myFonts;
             std::string          _myWordDelimiters;
-            std::map<std::string, TTFFontInfo::FONTHINTING> _myFontHintingMap;
+            asl::Vector2i        _myTextSize;
+            dom::NodePtr         _myImageNode;
 
     };
     typedef asl::Ptr<SDLTextRenderer> SDLTextRendererPtr;
-
+    
+    class AsyncSDLTextRenderer : public SDLTextRenderer {
+        public:
+            AsyncSDLTextRenderer();
+            ~AsyncSDLTextRenderer();
+            asl::Vector2i renderTextAsImage(TextureManager & theTextureManager,
+                    dom::NodePtr theImageNode,
+                    const std::string & theText, const std::string & theFontName,
+                    unsigned int theTextureWidth = 0, unsigned int theTextureHeight = 0,
+                    const asl::Vector2i & theCursorPos = asl::Vector2i(0,0));
+            void copyText2Image();
+        private:
+            SDLTextRendererPtr _myRealTextRenderer;
+    };
+    typedef asl::Ptr<AsyncSDLTextRenderer> AsyncSDLTextRendererPtr;
 
 
 } // namespace y60
