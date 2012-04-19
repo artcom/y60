@@ -84,23 +84,7 @@ using namespace y60;
 //
 ////////////////////////////////////////////////////////////////////////
 
-
-void printVersion();
-
-asl::Arguments::AllowedOption myOptions[] = {
-                                             {"--outfile",      "%s"},
-                                             {"--front",        "%s"},
-                                             {"--back",         "%s"},
-                                             {"--left",         "%s"},
-                                             {"--right",        "%s"},
-                                             {"--top",          "%s"},
-                                             {"--bottom",       "%s"},
-                                             {"--size",         "%s"},
-                                             {"--version",      ""  },
-                                             {"--help",         ""  },
-                                             {"", ""}
-                                            };
-asl::Arguments myArguments(myOptions);
+asl::Arguments myArguments;
 
 template <class TX>
 bool
@@ -110,24 +94,6 @@ getParameter(const string & theParamName, const asl::Arguments & theArguments, T
         return true;
     }
     return false;
-}
-
-void
-printHelp() {
-    // TODO: Please help to maintain this function
-    myArguments.printUsage();
-    cout << "Command line options:" << endl
-         << "  --outfile       FILE   write movie to FILE" << endl
-         << "  --front         FILE   cubemaps front map." << endl
-         << "  --back          FILE   cubemaps back map." << endl
-         << "  --left          FILE   cubemaps left map." << endl
-         << "  --right         FILE   cubemaps rught map." << endl
-         << "  --top           FILE   cubemaps top map." << endl
-         << "  --bottom        FILE   cubemaps bottom map." << endl
-         << "  --size          PIXEL  set image size to PIXELxPIXEL." << endl
-         << "  --version              print version information and exit" << endl
-         << "  --help                 print this help text and exit" << endl
-         << endl;
 }
 
 void copyImageData(asl::Ptr<ImageLoader> theSource, PLBmp & theDestination, unsigned int theOffset) {
@@ -189,29 +155,30 @@ void addCubeMapImage(const std::string & theFace, PLBmp & theTargetBitmap, bool 
 
 
 int main( int argc, char *argv[])  {
-    cout << getFilenamePart(argv[0]) << " copyright (c) 2001-2004 ART+COM AG" << endl;
-    string myArgDesc = string("See '") + string(getFilenamePart(argv[0])) +
-                              " --help' for more information.";
-    myArguments.setShortDescription(myArgDesc.c_str());
+
+    Arguments::AllowedOptionWithDocumentation myOptions[] = {
+         {"--outfile",      "FILE", "output filename"},
+         {"--front",        "FILE", "cubemaps front map."},
+         {"--back",         "FILE", "cubemaps back map."},
+         {"--left",         "FILE", "cubemaps left map."},
+         {"--right",        "FILE", "cubemaps right map."},
+         {"--top",          "FILE", "cubemaps top map."},
+         {"--bottom",       "FILE", "cubemaps bottom map."},
+         {"--size",         "PIXEL", "set image size to PIXELxPIXEL."},
+         {"", ""}
+    };
+    myArguments.addAllowedOptionsWithDocumentation(myOptions);
 
     if (!myArguments.parse( argc, argv )) {
         return 1;
     }
-    if (myArguments.haveOption("--help")) {
-        printHelp();
-        return 0;
-    }
-    if (myArguments.haveOption("--version")) {
-        printVersion();
-        return 0;
-    }
-
     try {
         string myTargetFileName;
         if (myArguments.haveOption("--outfile")) {
             myTargetFileName = myArguments.getOptionArgument("--outfile");
         } else {
             cerr << "### ERROR: No output file specified" << endl;
+            myArguments.printUsage();
             return -1;
         }
 
@@ -247,11 +214,4 @@ int main( int argc, char *argv[])  {
         return -1;
     }
     return 0;
-}
-
-
-void
-printVersion() {
-    cout << "CVS $Revision: 1.8 $ $Date: 2005/03/24 23:36:01 $." << endl;
-    cout << "Build at " << __DATE__ << " " << __TIME__ << "." << endl;
 }

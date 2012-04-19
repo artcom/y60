@@ -82,10 +82,9 @@
 #include <y60/base/NodeNames.h>
 #include <y60/base/Y60xsd.h>
 
-#include <asl/base/Revision.h>
-
 #include <iostream>
 
+#include <asl/base/buildinfo.h>
 #include <asl/base/string_functions.h>
 #include <asl/dom/Schema.h>
 #include <asl/dom/Nodes.h>
@@ -114,10 +113,15 @@ namespace y60 {
             setNode(mySceneNode);
         } else {
             _myDocument->appendChild(getNode());
-            if (asl::ourRevision.empty()) {
-                asl::ourRevision = "0";
+#if 0 //TODO: requires schema change
+            std::string myRevision = asl::build_information::get().executable().history_id();
+            if (myRevision.empty()) {
+                myRevision = "0";
             }
-            getNode()->appendAttribute(REVISION_ATTRIB, asl::ourRevision);
+#else
+            int myRevision = 0;
+#endif
+            getNode()->appendAttribute(REVISION_ATTRIB, myRevision);
         }
 
         // Create container nodes

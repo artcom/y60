@@ -82,46 +82,20 @@ using namespace asl;
 //
 ////////////////////////////////////////////////////////////////////////
 
-void printVersion();
-
-asl::Arguments::AllowedOption myOptions[] = {
-                                             {"--tolerance", "%f"},
-                                             {"--threshold", "%s"},
-                                             {"--version",   ""  },
-                                             {"--help",      ""  },
-                                             {"", ""}
-                                            };
-asl::Arguments myArguments(myOptions);
-
-void
-printHelp() {
-    // TODO: Please help to maintain this function
-    myArguments.printUsage();
-    cout << "Command line options:" << endl
-         << "  --tolerance     maximum number of 'bright' pixels in the difference bitmap allowed (in %)" << endl
-         << "  --threshold     when a pixel is considered 'bright' (0..255)" << endl
-         << "  --version       print version information and exit" << endl
-         << "  --help          print this help text and exit" << endl
-         << endl;
-}
-
 int main( int argc, char *argv[])  {
-    string myArgDesc = string("image1 image2\nSee '") + string(getFilenamePart(argv[0])) +
-                              " --help' for more information.";
-    myArguments.setShortDescription(myArgDesc.c_str());
-
+    Arguments::AllowedOptionWithDocumentation myOptions[] = {
+        {"--tolerance", "%f", "maximum number of 'bright' pixels in the difference bitmap allowed (in %)"},
+        {"--threshold", "%s", "when a pixel is considered 'bright' (0..255)"},
+        {"", "image1", "first image to compare"},
+        {"", "image2", "second image to compare"},
+        {"", ""}
+    };
+    asl::Arguments myArguments;
+    myArguments.addAllowedOptionsWithDocumentation(myOptions);
+    
     if (!myArguments.parse( argc, argv )) {
         return 1;
     }
-    if (myArguments.haveOption("--help")) {
-        printHelp();
-        return 0;
-    }
-    if (myArguments.haveOption("--version")) {
-        printVersion();
-        return 0;
-    }
-
     if ( myArguments.getCount() != 2) {
         string myErrorMsg = string("Please specify two images to compare.");
         perror(myErrorMsg.c_str());
@@ -223,9 +197,3 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     return main(__argc, __argv);
 }
 #endif
-
-void
-printVersion() {
-    AC_INFO << "CVS $Revision: 1.6 $ $Date: 2005/03/09 17:11:16 $." << endl;
-    AC_INFO << "Build at " << __DATE__ << " " << __TIME__ << "." << endl;
-}

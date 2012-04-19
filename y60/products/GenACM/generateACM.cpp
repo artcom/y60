@@ -40,89 +40,44 @@ bool gAppend = false;
 int  gStartFrame = 0;
 int  gStartImage = 0;
 
-void printVersion();
-
-
-asl::Arguments::AllowedOption myOptions[] = {{"--outfile",      "%s"},
-                                             {"--img-dir",      "%s"},
-                                             {"--compression",  "%s"},
-                                             {"--xsize",        "%d"},
-                                             {"--ysize",        "%d"},
-                                             {"--xaspect",      "%d"},
-                                             {"--yaspect",      "%d"},
-                                             {"--fps",          "%f"},
-                                             {"--rotate90",     ""},
-                                             {"--pre-flip",     ""},
-                                             {"--post-flip",    ""},
-                                             {"--pre-xsize",    "%d"},
-                                             {"--pre-ysize",    "%d"},
-                                             {"--crop",         ""},
-                                             {"--cropleft",     "%d"},
-                                             {"--croptop",      "%d"},
-                                             {"--cropright",    "%d"},
-                                             {"--cropbottom",   "%d"},
-                                             {"--version",      ""  },
-                                             {"--help",         ""  },
-                                             {"", ""} 
-                                            };
-asl::Arguments myArguments(myOptions);
-
-void
-printHelp() {
-    // TODO: Please help to maintain this function
-    myArguments.printUsage();
-    cerr << "Command line options:" << endl
-         << "  --outfile       FILE   write movie to FILE" << endl
-         << "  --img-dir       DIR    search for input files in DIR. files on the command line will be ignored." << endl
-         << "  --compression   MODE   set OpenGL texture compression mode to MODE (default: S3TC_DXT5)." << endl
-         << "  --xsize         PIXEL  set movie-width to PIXEL." << endl
-         << "  --ysize         PIXEL  set movie-height to PIXEL." << endl
-         << "  --xaspect       PIXEL  set replay x-aspect ratio to PIXEL." << endl
-         << "  --yaspect       PIXEL  set replay y-aspect ratio to PIXEL." << endl
-         << "  --fps           FPS    set frames per second to FPS (default: 30.0Hz)." << endl
-         << "  --pre-xsize     PIXEL  resize source image width to PIXEL before doing anything else." << endl
-         << "  --pre-ysize     PIXEL  resize source image height to PIXEL before doing anything else." << endl
-         << "  --rotate90             rotate source image by 90°." << endl
-         << "  --pre-flip             flip source image upside down before applying rotation." << endl
-         << "  --post-flip            flip source image upside down after applying rotation." << endl
-         << "  --crop                 crop the movie to xsize * ysize instead of scaling it." << endl
-         << "  --cropleft      PIXEL  set left border to PIXEL." << endl
-         << "  --croptop       PIXEL  set top border to PIXEL." << endl
-         << "  --cropright     PIXEL  set right border to PIXEL." << endl
-         << "  --cropbottom    PIXEL  set bottom border to PIXEL" << endl
-         << "  --append               append images at the end of an existing movie" << endl
-         << "  --start-frame   NUM    specify the first frame in the movie that will be overridden" << endl
-         << "  --start-image   NUM    skip the first NUM input images" << endl
-         << "  --num-images    NUM    only add NUM images" << endl
-         << "  --version              print version information and exit" << endl
-         << "  --help                 print this help text and exit" << endl
-         << endl
-         << "Valid OpenGL compression modes:" << endl 
-         << "GENERIC_RGB, GENERIC_RGBA, GENERIC_ALPHA, GENERIC_LUMINANCE," << endl
-         << "GENERIC_LUMINANCE_ALPHA, GENERIC_INTENSITY, S3TC_DXT1, S3TC_DXT1A,"<< endl
-         << "S3TC_DXT3, S3TC_DXT5" << endl;
-}
-
 
 
 int main( int argc, char *argv[] ) 
 {
-    cerr << getFilenamePart(argv[0]) << " copyright (c) 2001-2002 ART+COM AG" << endl;
-    string myArgDesc = string("[image ... ]\nSee '") + string(getFilenamePart(argv[0])) +
-                              " --help' for more information.";
-
+    asl::Arguments myArguments;
+    asl::Arguments::AllowedOptionWithDocumentation myOptions[] = {
+         {"--outfile",      "FILE", "write movie to FILE"},
+         {"--img-dir",      "DIR", "search for input files in DIR. files on the command line will be ignored."},
+         {"--compression",  "MODE", "set OpenGL texture compression mode to MODE (default: S3TC_DXT5)."},
+         {"--xsize",        "PIXEL", "set movie-width to PIXEL."},
+         {"--ysize",        "PIXEL", "set movie-height to PIXEL."},
+         {"--xaspect",      "PIXEL", "set replay x-aspect ratio to PIXEL."},
+         {"--yaspect",      "PIXEL", "set replay y-aspect ratio to PIXEL."},
+         {"--fps",          "FPS", "set frames per second to FPS (default: 30.0Hz)."},
+         {"--rotate90",     "", "rotate source image by 90°."},
+         {"--pre-flip",     "", "flip source image upside down before applying rotation."},
+         {"--post-flip",    "", "flip source image upside down after applying rotation."},
+         {"--pre-xsize",    "PIXEL", "resize source image width to PIXEL before doing anything else."},
+         {"--pre-ysize",    "PIXEL", "resize source image height to PIXEL before doing anything else."},
+         {"--crop",         "", "crop the movie to xsize * ysize instead of scaling it."},
+         {"--cropleft",     "PIXEL", "set left border to PIXEL."},
+         {"--croptop",      "PIXEL", "set top border to PIXEL."},
+         {"--cropright",    "PIXEL", "set right border to PIXEL."},
+         {"--cropbottom",   "PIXEL", "set bottom border to PIXEL."},
+         {"--append",      "", "append images at the end of an existing movie"},
+         {"--start-frame",    "NUM", "specify the first frame in the movie that will be overridden"},
+         {"--start-image",   "NUM", "skip the first NUM input images"},
+         {"--num-images",   "NUM", "only add NUM images"},
+         {"", ""} 
+    };
+    myArguments.addAllowedOptionsWithDocumentation(myOptions);
+    myArguments.setShortDescription(myArguments.getProgramName() +
+                " Valid OpenGL compression modes:\n GENERIC_RGB, GENERIC_RGBA, GENERIC_ALPHA, GENERIC_LUMINANCE,\n"
+                + " GENERIC_LUMINANCE_ALPHA, GENERIC_INTENSITY, S3TC_DXT1, S3TC_DXT1A,\n S3TC_DXT3, S3TC_DXT5");
+    
     if ( ! myArguments.parse( argc, argv )) {
         return 1;
     }
-    if (myArguments.haveOption("--help")) {
-        printHelp();
-        return 0;
-    }
-    if (myArguments.haveOption("--version")) {
-        printVersion();
-        return 0;
-    }
-
     vector<string> mySourceFiles;
 
     if ( myArguments.haveOption("--img-dir")) {
@@ -149,6 +104,7 @@ int main( int argc, char *argv[] )
         }
     } else {
         cerr << "### ERROR: No input files found." << endl;
+        myArguments.printUsage();
         return 1;
     }
 
@@ -184,7 +140,7 @@ int main( int argc, char *argv[] )
         {
             cerr << "### ERROR: Format '" << theCompressionFormat 
                 << "' not supported!" << endl << endl;
-            printHelp();
+            myArguments.printUsage();
         }
 
         try {
@@ -410,11 +366,6 @@ int main( int argc, char *argv[] )
     return 0;
 }
 
-
-void
-printVersion() {
-    cerr << "Build at " << __DATE__ << " " << __TIME__ << "." << endl;
-}
 
 //==============================================================================
 //

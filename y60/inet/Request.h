@@ -67,9 +67,9 @@
     #undef max
 #endif
 
+#include <asl/base/buildinfo.h>
 #include <asl/base/Exception.h>
 #include <asl/base/Enum.h>
-#include <asl/base/Revision.h>
 #include <asl/base/Block.h>
 #include <asl/base/Ptr.h>
 
@@ -111,7 +111,7 @@ namespace inet {
         friend class RequestManager;
 
         public:
-            Request(const std::string & theURL, const std::string & theUserAgent = std::string("Y60/")+asl::ourRevision);
+            Request(const std::string & theURL, const std::string & theUserAgent = std::string("Y60/")+asl::build_information::get().executable().history_id());
             virtual ~Request();
             CURL * getHandle() const;
             long getResponseCode() const;

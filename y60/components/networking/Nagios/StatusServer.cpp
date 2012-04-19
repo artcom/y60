@@ -115,25 +115,15 @@ StatusServer::processData() {
     if (this->receiveData(myInputBuffer)) {
         std::string s(&myInputBuffer[0], myInputBuffer.size());
         std::string myURL = getUrl(s);
-        std::stringstream myName;
-        std::stringstream myHistoryId;
-        std::stringstream myRepositoryId;
-        std::stringstream myScmName;
-        std::stringstream myBuildDate;
-        std::stringstream myBuildTime;
-        std::stringstream myCompiler;
-        std::stringstream myCompilerVersion;
-		build_information::const_iterator it = build_information::get().find("y60");
-        if (it != build_information::get().end()) {
-            myName << it->second.name();
-            myHistoryId << it->second.history_id();
-            myRepositoryId << it->second.repository_id();
-            myScmName << it->second.scm_name();
-            myBuildDate << it->second.build_date();
-            myBuildTime << it->second.build_time();
-            myCompiler << it->second.compiler();
-            myCompilerVersion << it->second.compiler_version();
-        }
+        asl::build_target_info const& executable = asl::build_information::get().executable();
+        std::string myName = executable.name();
+        std::string myHistoryId = executable.history_id();
+        std::string myRepositoryId = executable.repository_id();
+        std::string myScmName = executable.scm_name();
+        std::string myBuildDate = executable.build_date();
+        std::string myBuildTime = executable.build_time();
+        std::string myCompiler = executable.compiler();
+        std::string myCompilerVersion = executable.compiler_version();
         if (myURL == "status") {
             asl::Time t;
             asl::Signed64 myElapsed = t.millis() - StatusServer::readTick();
@@ -143,10 +133,10 @@ StatusServer::processData() {
                 sendResponseHeader(200);
             }
 
-            std::string myText = myName.str() + string(" rev: ") + myHistoryId.str().substr(0,6) + string(" ")
-                                 + myScmName.str() + string(" repo: ") + myRepositoryId.str()
-                                 + string(" builddate: ") + myBuildDate.str() + string(" ") + myBuildTime.str()
-                                 + string(" ") + myCompiler.str() + string(":") + myCompilerVersion.str();
+            std::string myText = myName + string(" rev: ") + myHistoryId.substr(0,6) + string(" ")
+                                 + myScmName + string(" repo: ") + myRepositoryId
+                                 + string(" builddate: ") + myBuildDate + string(" ") + myBuildTime
+                                 + string(" ") + myCompiler + string(":") + myCompilerVersion;
             std::string myStatusText = readStatusText();
             if (myText == "" && !myStatusText.empty()) {
                 myText = myStatusText;
@@ -155,7 +145,7 @@ StatusServer::processData() {
             sendResponseBody(myText);
         } else if (myURL == "revision") {
             sendResponseHeader(200);
-            sendResponseBody(myHistoryId.str());
+            sendResponseBody(myHistoryId);
         } else {
             sendResponseHeader(404);
             sendResponseBody("not found");

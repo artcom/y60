@@ -77,7 +77,6 @@
 #include <asl/base/Arguments.h>
 #include <asl/base/PlugInManager.h>
 #include <asl/base/Logger.h>
-#include <asl/base/Revision.h>
 #include <asl/math/numeric_functions.h>
 #include <asl/base/checksum.h>
 #include <asl/base/buildinfo.h>
@@ -1046,13 +1045,9 @@ Revision(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_RVAL("The SVN revision number", DOC_TYPE_STRING);
     DOC_END;
     try {
-        std::stringstream myHistoryId;
-		build_information::const_iterator it = build_information::get().find("y60");
-        if (it != build_information::get().end()) {
-            myHistoryId << it->second.history_id();
-        }
-        
-        *rval = as_jsval(cx, myHistoryId.str());
+        asl::build_target_info const& executable = asl::build_information::get().executable();
+        std::string myHistoryId = executable.history_id();
+        *rval = as_jsval(cx, myHistoryId);
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }
