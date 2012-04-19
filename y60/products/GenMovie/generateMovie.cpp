@@ -89,37 +89,6 @@ using namespace y60;
 asl::Ptr<ImageLoader> ourPreviousFrame;
 float            ourFramesPerSecond = 25.0f;
 
-void printVersion();
-
-asl::Arguments::AllowedOption myOptions[] = {
-                                             {"--outfile",      "%s"},
-                                             {"--source-dir",   "%s"},
-                                             {"--encoding",     "%s"},
-                                             {"--resize",       "%s"},
-                                             {"--fps",          "%s"},
-                                             {"--version",      ""  },
-                                             {"--help",         ""  },
-                                             {"", ""}
-                                            };
-asl::Arguments myArguments(myOptions);
-
-void
-printHelp() {
-    // TODO: Please help to maintain this function
-    myArguments.printUsage();
-    AC_PRINT << "Command line options:" << endl
-         << "  --outfile       FILE   write movie to FILE" << endl
-         << "  --source-dir    DIR    search for input files in DIR. files on the command line will be ignored." << endl
-         << "  --encoding      MODE   set movie encoding mode to MODE (default: DRLE)." << endl
-         << "  --resize        MODE   set frame resize mode in case of non power of two dimensions to MODE (default: scale) [none, pad]." << endl
-         << "  --fps           FLOAT  Set the playback speed in frames per second (default is 25)" << endl
-         << "  --version              print version information and exit" << endl
-         << "  --help                 print this help text and exit" << endl
-         << endl
-         << "Valid encoding modes:" << endl
-         << "RLE, DIFF, DRLE" << endl;
-}
-
 string
 getTargetFilename(const string & theTargetDir, const string & theSourceFileName) {
 
@@ -221,22 +190,24 @@ appendFrame(const string & theSourceFile, asl::WriteableStream & theTargetBlock,
 }
 
 int main( int argc, char *argv[])  {
-    string myArgDesc = string("[image ... ]\nSee '") + string(getFilenamePart(argv[0])) +
-                              " --help' for more information.";
-    myArguments.setShortDescription(myArgDesc.c_str());
+
+    asl::Arguments myArguments;
+
+    asl::Arguments::AllowedOptionWithDocumentation myOptions[] = {
+         {"--outfile",      "FILE", "write movie to FILE"},
+         {"--source-dir",   "DIR", "search for input files in DIR. files on the command line will be ignored."},
+         {"--encoding",     "MODE", "set movie encoding mode to MODE (default: DRLE)."},
+         {"--resize",       "MODE", "set frame resize mode in case of non power of two dimensions to MODE (default: scale) [none, pad]."},
+         {"--fps",          "FLOAT", "Set the playback speed in frames per second (default is 25)"},
+         {"", ""}
+    };
+    myArguments.addAllowedOptionsWithDocumentation(myOptions);
+
+    myArguments.setShortDescription("Valid encoding modes:\n RLE, DIFF, DRLE\n");
 
     if (!myArguments.parse( argc, argv )) {
         return 1;
     }
-    if (myArguments.haveOption("--help")) {
-        printHelp();
-        return 0;
-    }
-    if (myArguments.haveOption("--version")) {
-        printVersion();
-        return 0;
-    }
-
     if (myArguments.haveOption("--fps")) {
         ourFramesPerSecond = asl::as<float>(myArguments.getOptionArgument("--fps"));
     }
@@ -277,6 +248,7 @@ int main( int argc, char *argv[])  {
             }
         } else {
             cerr << "### ERROR: No input files found." << endl;
+            myArguments.printUsage();
             return 1;
         }
 
@@ -285,6 +257,7 @@ int main( int argc, char *argv[])  {
             myTargetFileName = myArguments.getOptionArgument("--outfile");
         } else {
             cerr << "### ERROR: No output file specified" << endl;
+            myArguments.printUsage();
             return -1;
         }
 
@@ -300,7 +273,7 @@ int main( int argc, char *argv[])  {
         } catch (ParseException & ex) {
             cerr << "### ERROR: Format '" << theEncodingFormat
                 << "' not supported!" << endl << endl << ex << endl;
-            printHelp();
+            myArguments.printUsage();
             return 1;
         }
 
@@ -322,7 +295,7 @@ int main( int argc, char *argv[])  {
             myResizeMode != IMAGE_RESIZE_PAD ) {
                 cerr << "### ERROR: Resizemode '" << myResizeMode
                     << "' not supported!" << endl << endl << endl;
-                printHelp();
+                myArguments.printUsage();
                 return 1;
         }
 
@@ -399,11 +372,4 @@ int main( int argc, char *argv[])  {
         return -1;
     }
     return 0;
-}
-
-
-void
-printVersion() {
-    cout << "CVS $Revision: 1.29 $ $Date: 2005/04/24 00:41:20 $." << endl;
-    cout << "Build at " << __DATE__ << " " << __TIME__ << "." << endl;
 }

@@ -100,71 +100,6 @@ using namespace asl;
 using namespace dom;
 using namespace y60;
 
-void printVersion();
-
-asl::Arguments::AllowedOption myOptions[] = {{"--xml-config",   "%s"},
-                                             {"--outfile",      "%s"},
-                                             {"--img-dir",      "%s"},
-                                             {"--out-dir",      "%s"},
-                                             {"--targetdir",    "%s"},
-                                             {"--target-size",  "%s"},
-                                             {"--compression",  "%s"},
-                                             {"--xsize",        "%d"},
-                                             {"--ysize",        "%d"},
-                                             {"--xaspect",      "%d"},
-                                             {"--yaspect",      "%d"},
-                                             {"--pre-flip",     ""},
-                                             {"--post-flip",    ""},
-                                             {"--pre-xsize",    "%d"},
-                                             {"--pre-ysize",    "%d"},
-                                             {"--crop",         ""},
-                                             {"--cropleft",     "%d"},
-                                             {"--croptop",      "%d"},
-                                             {"--cropright",    "%d"},
-                                             {"--cropbottom",   "%d"},
-                                             {"--layer",        "%d"},
-                                             {"--no-overwrite", ""},
-                                             {"--version",      ""  },
-                                             {"--help",         ""  },
-                                             {"", ""}
-                                            };
-asl::Arguments myArguments(myOptions);
-
-void
-printHelp() {
-    myArguments.printUsage();
-    cout << "Command line options:" << endl
-         << "  --xml-config    FILE   use xml-formatted config file" << endl
-         << "  --outfile       FILE   write frame to FILE" << endl
-         << "  --img-dir       DIR    search for input files in DIR. files on the command line will be ignored." << endl
-         << "  --targetdir     DIR    prepend DIR to output files." << endl
-         << "  --target-size   BYTES  skip file if all targets have BYTES length" << endl
-         << "  --out-dir       DIR    subdir inside targetdir where to write files" << endl
-         << "  --compression   MODE   set OpenGL texture compression mode to MODE" << endl
-         <<                           "(default for images with alpha channel: S3TC_DXT5, for images without: S3TC_DXT1)." << endl
-         << "  --xsize         PIXEL  set frame-width to PIXEL." << endl
-         << "  --ysize         PIXEL  set frame-height to PIXEL." << endl
-         << "  --xaspect       PIXEL  set replay x-aspect ratio to PIXEL." << endl
-         << "  --yaspect       PIXEL  set replay y-aspect ratio to PIXEL." << endl
-         << "  --pre-xsize     PIXEL  resize source image width to PIXEL before doing anything else." << endl
-         << "  --pre-ysize     PIXEL  resize source image height to PIXEL before doing anything else." << endl
-         << "  --pre-flip             flip source image upside down before applying rotation." << endl
-         << "  --post-flip            flip source image upside down after applying rotation." << endl
-         << "  --crop                 crop the frame to xsize * ysize instead of scaling it." << endl
-         << "  --cropleft      PIXEL  set left border to PIXEL." << endl
-         << "  --croptop       PIXEL  set top border to PIXEL." << endl
-         << "  --cropright     PIXEL  set right border to PIXEL." << endl
-         << "  --cropbottom    PIXEL  set bottom border to PIXEL" << endl
-         << "  --layer         N      create i60 with N layer" << endl
-         << "  --no-overwrite         enable existing image skipping" << endl
-         << "  --version              print version information and exit" << endl
-         << "  --help                 print this help text and exit" << endl
-         << endl
-         << "Valid OpenGL compression modes:" << endl
-         << "GENERIC_RGB, GENERIC_RGBA, GENERIC_ALPHA, GENERIC_LUMINANCE," << endl
-         << "GENERIC_LUMINANCE_ALPHA, GENERIC_INTENSITY, S3TC_DXT1, S3TC_DXT1A,"<< endl
-         << "S3TC_DXT3, S3TC_DXT5, NONE" << endl;
-}
 
 #if 0
 
@@ -191,8 +126,8 @@ initExtensions() {
 template <class TX>
 bool
 getParameter(const string & theParamName, const asl::Arguments & theArguments, dom::NodePtr theNode, TX & theResult) {
-    if (myArguments.haveOption(string("--")+theParamName)) {
-        theResult = asl::as<TX>(myArguments.getOptionArgument(string("--")+theParamName));
+    if (theArguments.haveOption(string("--")+theParamName)) {
+        theResult = asl::as<TX>(theArguments.getOptionArgument(string("--")+theParamName));
         return true;
     }
 
@@ -464,7 +399,7 @@ PixelEncoding
 getPixelEncoding(const PLAnyBmp & theBmp, const asl::Arguments & theArguments) {
     string myCompressionFormat;
     if (theArguments.haveOption("--compression")) {
-        myCompressionFormat = myArguments.getOptionArgument("--compression");
+        myCompressionFormat = theArguments.getOptionArgument("--compression");
     } else {
         if (theBmp.HasAlpha()) {
             myCompressionFormat = "S3TC_DXT5";
@@ -478,7 +413,7 @@ getPixelEncoding(const PLAnyBmp & theBmp, const asl::Arguments & theArguments) {
         return PixelEncoding(getEnumFromString(myCompressionFormat, PixelEncodingString));
     } catch (asl::ParseException & ex) {
         cerr << "### ERROR: Format '" << myCompressionFormat << "' not supported!" << endl << ex << endl;
-        printHelp();
+        theArguments.printUsage();
         exit(1);
     }
 }
@@ -511,20 +446,42 @@ convertFile(const string & theKeyFrameSourceFile, vector<string> &  theSourceFil
 }
 
 int main(int argc, char *argv[]) {
-    string myArgDesc = string("[image ... ]\nSee '") + string(getFilenamePart(argv[0])) +
-                              " --help' for more information.";
-    myArguments.setShortDescription(myArgDesc.c_str());
+    asl::Arguments myArguments;
+    asl::Arguments::AllowedOptionWithDocumentation myOptions[] = {
+         {"--xml-config",   "FILE", "use xml-formatted config file"},
+         {"--outfile",      "FILE", "write frame to FILE"},
+         {"--img-dir",      "DIR", "search for input files in DIR. files on the command line will be ignored."},
+         {"--out-dir",      "DIR", "subdir inside targetdir where to write files"},
+         {"--targetdir",    "DIR", "prepend DIR to output files."},
+         {"--target-size",  "BYTES", "skip file if all targets have BYTES length"},
+         {"--compression",  "MODE", "set OpenGL texture compression mode to MODE(default for images with alpha channel: S3TC_DXT5, for images without: S3TC_DXT1)."},
+         {"--xsize",        "PIXEL", "set frame-width to PIXEL."},
+         {"--ysize",        "PIXEL", "set frame-height to PIXEL."},
+         {"--xaspect",      "PIXEL", "set replay x-aspect ratio to PIXEL."},
+         {"--yaspect",      "PIXEL", "set replay y-aspect ratio to PIXEL."},
+         {"--pre-flip",     "", "flip source image upside down before applying rotation."},
+         {"--post-flip",    "", "flip source image upside down after applying rotation."},
+         {"--pre-xsize",    "PIXEL", "resize source image width to PIXEL before doing anything else."},
+         {"--pre-ysize",    "PIXEL", "resize source image height to PIXEL before doing anything else."},
+         {"--crop",         "", "crop the frame to xsize * ysize instead of scaling it."},
+         {"--cropleft",     "PIXEL", "set left border to PIXEL."},
+         {"--croptop",      "PIXEL", "set top border to PIXEL."},
+         {"--cropright",    "PIXEL", "set right border to PIXEL."},
+         {"--cropbottom",   "PIXEL", "set bottom border to PIXEL"},
+         {"--layer",        "N", "create i60 with N layer"},
+         {"--no-overwrite", "", "enable existing image skipping"},
+         {"", ""}
+    };
+    myArguments.addAllowedOptionsWithDocumentation(myOptions);
+
+    string myArgDesc = string("Valid OpenGL compression modes:\n")
+                       + string("GENERIC_RGB, GENERIC_RGBA, GENERIC_ALPHA, GENERIC_LUMINANCE,\n")
+                       + string("GENERIC_LUMINANCE_ALPHA, GENERIC_INTENSITY, S3TC_DXT1, S3TC_DXT1A,\n")
+                       + string("S3TC_DXT3, S3TC_DXT5, NONE");
+    myArguments.setShortDescription(myArgDesc);
 
     if ( ! myArguments.parse( argc, argv )) {
         return 1;
-    }
-    if (myArguments.haveOption("--help")) {
-        printHelp();
-        return 0;
-    }
-    if (myArguments.haveOption("--version")) {
-        printVersion();
-        return 0;
     }
     dom::NodePtr myXmlConfigDocument(new dom::Document());
     dom::NodePtr myXmlConfig;
@@ -563,6 +520,7 @@ int main(int argc, char *argv[]) {
         }
     } else {
         cerr << "### ERROR: No input files found." << endl;
+        myArguments.printUsage();
         return 1;
     }
 
@@ -653,10 +611,4 @@ int main(int argc, char *argv[]) {
         SDL_Quit();
     }
     return 0;
-}
-
-void
-printVersion() {
-    cout << "CVS $Revision: 1.24 $ $Date: 2005/03/24 23:36:01 $." << endl;
-    cout << "Build at " << __DATE__ << " " << __TIME__ << "." << endl;
 }

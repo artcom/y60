@@ -108,7 +108,7 @@ double lastRunningTime = 0.0;
 int singleStepSize = 0;
 
 
-
+asl::Arguments ourArguments;
 
 void initWindow ();
 
@@ -172,28 +172,6 @@ void resetUI() {
 
     globalCursor = 1;
     glutSetCursor( globalCursor ? GLUT_CURSOR_INHERIT : GLUT_CURSOR_NONE);
-}
-
-
-asl::Arguments::AllowedOption ourOptions[] = {
-    {"--fps",            "%d"},
-    {"--verbose",        ""  },
-    {"--statistic",      ""  },
-    {"--help",           ""  },
-    {"--window",         ""  },
-    {"--fullscreen",     ""  },
-    {"--pos-x",          "%d"},
-    {"--pos-y",          "%d"},
-    {"",                 ""  }
-};
-
-asl::Arguments ourArguments(ourOptions);
-
-
-void printUsage()  
-{
-    cerr <<"usage: viewCompressedTex moviefilename1 [moviefilename2]"<<endl;
-    ourArguments.printUsage();
 }
 
 void debugGLUT  () {
@@ -554,13 +532,22 @@ int main( int argc, char *argv[] )
 {
 
     // ARGUMENT HANDLING
+    asl::Arguments::AllowedOptionWithDocumentation myOptions[] = {
+        {"--fps",            "%d", ""},
+        {"--verbose",        ""  , ""},
+        {"--statistic",      ""  , ""},
+        {"--window",         ""  , ""},
+        {"--fullscreen",     ""  , ""},
+        {"--pos-x",          "%d", ""},
+        {"--pos-y",          "%d", ""},
+        {"",          "moviefilename1", ""},
+        {"",          "[moviefilename2]", ""},
+        {"",                 ""  }
+    };
+
+    ourArguments.addAllowedOptionsWithDocumentation(myOptions);
 
     ourArguments.parse( argc, argv );
-    if (ourArguments.haveOption("--help")) {
-        printUsage();
-        return 0;
-    }
-
     if (ourArguments.haveOption("--window")) {
         globalCursor = 1;
     }

@@ -91,7 +91,6 @@ const asl::Arguments::AllowedOptionWithDocumentation ourAllowedOptions[] = {
 #endif
     {"--buildinfo","component|'all'", "print details about this build and exit"},
 //    {"--exec", "", "treat first argument expression and execute it"},
-    {"--help", "", "print this text and exit."},
      //y60 will quit automatically after some frames taking a screen shot.
     {"", "jsmain",   "file containing javascript code"},
     //{"", "args,...", "arguments passed to the script"},
@@ -138,11 +137,6 @@ main(int argc, char **argv) {
             myApp.enableXML(true);
         }
 #endif
-
-        if (ourArguments.haveOption("--help")) {
-            ourArguments.printHelp();
-            return EXIT_SUCCESS;
-        }
 
         if (ourArguments.haveOption("--buildinfo")) {
             using asl::build_information;
