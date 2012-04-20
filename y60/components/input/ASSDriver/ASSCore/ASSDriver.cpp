@@ -1215,9 +1215,8 @@ namespace y60 {
     void
     ASSDriver::drawLabel(jslib::AbstractRenderWindow * theWindow, const std::string & theText) {
         TextStyle myTextStyle = theWindow->getTextStyle();
-        //TextStyle myLabelTextStyle;
-        //myLabelTextStyle._myTextColor = _myTextColor;
-        theWindow->setTextStyle( TextStyle(_myTextColor) );
+        TextStyle myLabelTextStyle(_myTouchColor);
+        theWindow->setTextStyle( myLabelTextStyle );
         theWindow->renderText( Vector2f( 50, 50 ), theText, "Screen15");
         theWindow->setTextStyle( myTextStyle );
     }

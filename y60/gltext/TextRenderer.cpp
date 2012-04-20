@@ -76,8 +76,8 @@ namespace y60 {
 
     TextRenderer::TextRenderer() :
 
-        _myCursorPos(0,0),
         _myMaxWidth(0),
+        _myCursorPos(0,0),
         _myWindowWidth(0),
         _myWindowHeight(0)
     {

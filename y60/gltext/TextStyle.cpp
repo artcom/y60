@@ -119,18 +119,23 @@ namespace y60 {
             std::string myAttribute = theStyleNode->getAttribute(theAttributeName)->nodeValue();
             if (myAttribute.substr(0, 1) == "[") {
                 asl::fromString(myAttribute, theMember);
-            } else {
+            } else if (myAttribute.size() == 6) {
                 // hex color conversion
-                unsigned r,g,b;
+                unsigned r = 0;
+                unsigned g = 0;
+                unsigned b = 0;
                 bool success = is_hex_number(myAttribute.substr(0, 2), r);
                 success     &= is_hex_number(myAttribute.substr(2, 2), g);
                 success     &= is_hex_number(myAttribute.substr(4, 2), b);
-                theMember[0]= r/255.0f;
-                theMember[1]= g/255.0f;
-                theMember[2]= b/255.0f;
-                theMember[3] = 1.0f;
+                if (success) {
+                    theMember[0]= r/255.0f;
+                    theMember[1]= g/255.0f;
+                    theMember[2]= b/255.0f;
+                    theMember[3] = 1.0f;
+                }
+            } else {
+                throw asl::Exception("unknown textstyle color format " + myAttribute, PLUS_FILE_LINE);
             }
-
         }
     }
     TextStyle::TextStyle() {fillDefault();}
