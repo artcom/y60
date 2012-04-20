@@ -126,7 +126,7 @@ namespace y60 {
             childNode(0)->nodeValueRef<VectorOfUnsignedInt>();
 
         if (myIndices.size() > 1024*64) {
-            AC_WARNING << "Primitive larger than 64k vertices, may cause problems on some graphics cards";
+            AC_DEBUG << "Primitive larger than 64k vertices, may cause problems on some graphics cards";
         }
 
 
