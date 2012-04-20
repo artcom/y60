@@ -66,6 +66,7 @@
 #include "IRendererExtension.h"
 
 #include <y60/glutil/ScopedGLContext.h>
+
 #include <asl/base/string_functions.h>
 #include <asl/base/os_functions.h>
 
@@ -436,43 +437,58 @@ template<class DERIVED>
 JSBool
 JSAbstractRenderWindow<DERIVED>::renderText(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Renders a text onto the screen");
+    DOC_PARAM("theStyleObject", "A textstyle object", DOC_TYPE_OBJECT);    
     DOC_PARAM("thePosition in Pixel", "", DOC_TYPE_VECTOR2F);
     DOC_PARAM("theTextString", "", DOC_TYPE_STRING);
     DOC_PARAM_OPT("theFontName", "An OpenGL compiled font name", DOC_TYPE_STRING, "Screen15");
     DOC_PARAM_OPT("theViewport", "", DOC_TYPE_OBJECT, "");
     DOC_END;
     try {
-        ensureParamCount(argc, 2, 4);
+
+    
+        ensureParamCount(argc, 3, 5);
+
+        y60::TextStyle myTextStyle;
+    
+        dom::NodePtr myStyleNode;
+        if (!convertFrom(cx,argv[0], myStyleNode)) {
+            JS_ReportError(cx,"JSRenderWindow::renderTextAsImage: parameter 1 must be a style node");
+            return JS_FALSE;
+        }
+        myTextStyle = y60::TextStyle(myStyleNode);
 
         asl::Vector2f thePixelPosition;
-        if (!convertFrom(cx, argv[0], thePixelPosition)) {
-            JS_ReportError(cx,"JSRenderWindow::renderText: parameter 1 must be a Vector2f");
+        if (!convertFrom(cx, argv[1], thePixelPosition)) {
+            JS_ReportError(cx,"JSRenderWindow::renderText: parameter 2 must be a Vector2f");
             return JS_FALSE;
         }
 
         std::string theString;
-        if (!convertFrom(cx, argv[1], theString)) {
-            JS_ReportError(cx,"JSRenderWindow::renderText: parameter 2 must be a string");
+        if (!convertFrom(cx, argv[2], theString)) {
+            JS_ReportError(cx,"JSRenderWindow::renderText: parameter 3 must be a string");
             return JS_FALSE;
         }
 
-        if (argc == 2) {
+        if (argc == 3) {
+            jslib::JSClassTraits<DERIVED>::openNativeRef(cx, obj).setTextStyle(myTextStyle);
             jslib::JSClassTraits<DERIVED>::openNativeRef(cx, obj).renderText(thePixelPosition, theString);
             jslib::JSClassTraits<DERIVED>::closeNativeRef(cx,obj);
         } else {
             std::string theFont;
-            if (!convertFrom(cx, argv[2], theFont)) {
-                JS_ReportError(cx,"JSRenderWindow::renderText: parameter 3 must be a fontname");
+            if (!convertFrom(cx, argv[3], theFont)) {
+                JS_ReportError(cx,"JSRenderWindow::renderText: parameter 4 must be a fontname");
                 return JS_FALSE;
             }
-            if (argc >3) {
+            if (argc >4) {
                 dom::NodePtr theViewportNode;
-                if (!convertFrom(cx,argv[3],theViewportNode)) {
-                    JS_ReportError(cx,"JSRenderWindow::renderTextAsImage: parameter 4 must be an viewport node");
+                if (!convertFrom(cx,argv[4],theViewportNode)) {
+                    JS_ReportError(cx,"JSRenderWindow::renderText: parameter 5 must be an viewport node");
                     return JS_FALSE;
                 }
+                jslib::JSClassTraits<DERIVED>::openNativeRef(cx, obj).setTextStyle(myTextStyle);
                 jslib::JSClassTraits<DERIVED>::openNativeRef(cx, obj).renderText(thePixelPosition, theString, theFont, theViewportNode->getFacade<y60::Viewport>());
             } else {
+                jslib::JSClassTraits<DERIVED>::openNativeRef(cx, obj).setTextStyle(myTextStyle);
                 jslib::JSClassTraits<DERIVED>::openNativeRef(cx, obj).renderText(thePixelPosition, theString, theFont);
             }
             jslib::JSClassTraits<DERIVED>::closeNativeRef(cx,obj);
@@ -484,43 +500,9 @@ JSAbstractRenderWindow<DERIVED>::renderText(JSContext *cx, JSObject *obj, uintN 
 
 template<class DERIVED>
 JSBool
-JSAbstractRenderWindow<DERIVED>::setTextColor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Sets the text foreground and background color");
-    DOC_PARAM("theTextColor", "", DOC_TYPE_VECTOR4F);
-    DOC_END;
-    try {
-        ensureParamCount(argc, 1, 1);
-
-        asl::Vector4f theTextColor;
-        if (!convertFrom(cx, argv[0], theTextColor)) {
-            JS_ReportError(cx,"JSRenderWindow::setTextColor: parameter 1 must be a Vector4f (textcolor)");
-            return JS_FALSE;
-        }
-
-        jslib::JSClassTraits<DERIVED>::openNativeRef(cx, obj).setTextColor(theTextColor);
-        jslib::JSClassTraits<DERIVED>::closeNativeRef(cx,obj);
-        return JS_TRUE;
-    } HANDLE_CPP_EXCEPTION;
-}
-
-template<class DERIVED>
-JSBool
-JSAbstractRenderWindow<DERIVED>::getTextColor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Gets the current text color");
-    DOC_END;
-    ensureParamCount(argc, 0);
-    try {
-        const asl::Vector4f & myColor = jslib::JSClassTraits<DERIVED>::openNativeRef(cx, obj).getTextColor();
-        *rval = as_jsval(cx, myColor);
-        jslib::JSClassTraits<DERIVED>::closeNativeRef(cx,obj);
-        return JS_TRUE;
-    } HANDLE_CPP_EXCEPTION;
-}
-
-template<class DERIVED>
-JSBool
 JSAbstractRenderWindow<DERIVED>::renderTextAsImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Renders a text into a target image node");
+    DOC_PARAM("theStyleObject", "A textstyle object", DOC_TYPE_OBJECT);
     DOC_PARAM("theImageNode", "A X60 target imagenode", DOC_TYPE_NODE);
     DOC_PARAM("theTextString", "The text to render", DOC_TYPE_STRING);
     DOC_PARAM("theFontName", "The font name", DOC_TYPE_STRING);
@@ -529,6 +511,10 @@ JSAbstractRenderWindow<DERIVED>::renderTextAsImage(JSContext *cx, JSObject *obj,
     DOC_PARAM("theCursorPos", "where to place the text cursor. default is (0,0)", DOC_TYPE_VECTOR2I);
     DOC_RVAL("theFilledTextBoxSize", DOC_TYPE_VECTOR2I);
     DOC_END;
+
+    //asl::NanoTime myStartTime;
+    //myStartTime.setNow();
+    
     dom::NodePtr theImageNode;
     std::string theTextString;
     std::string theFontName;
@@ -536,62 +522,75 @@ JSAbstractRenderWindow<DERIVED>::renderTextAsImage(JSContext *cx, JSObject *obj,
     unsigned int theTextBoxHeight;
     asl::Vector2i theCursorPos;
     asl::Vector2i myBoxSize;
-
+    y60::TextStyle myTextStyle;
+    
     if (argc >= 1) {
-        if (!convertFrom(cx,argv[0],theImageNode)) {
-            JS_ReportError(cx,"JSRenderWindow::renderTextAsImage: parameter 1 must be an image node");
+        dom::NodePtr myStyleNode;
+        if (!convertFrom(cx,argv[0], myStyleNode)) {
+            JS_ReportError(cx,"JSRenderWindow::renderTextAsImage: parameter 1 must be a style node");
             return JS_FALSE;
         }
+        myTextStyle = y60::TextStyle(myStyleNode);
     }
     if (argc >= 2) {
-        if (!convertFrom(cx,argv[1],theTextString)) {
-            JS_ReportError(cx,"JSRenderWindow::renderTextAsImage: parameter 2 must be a string");
+        if (!convertFrom(cx,argv[1],theImageNode)) {
+            JS_ReportError(cx,"JSRenderWindow::renderTextAsImage: parameter 2 must be an image node");
             return JS_FALSE;
         }
     }
     if (argc >= 3) {
-        if (!convertFrom(cx,argv[2],theFontName)) {
+        if (!convertFrom(cx,argv[2],theTextString)) {
             JS_ReportError(cx,"JSRenderWindow::renderTextAsImage: parameter 3 must be a string");
             return JS_FALSE;
         }
     }
     if (argc >= 4) {
-        if (!convertFrom(cx,argv[3],theTextBoxWidth)) {
-            JS_ReportError(cx,"JSRenderWindow::renderTextAsImage: parameter 4 must be an int");
+        if (!convertFrom(cx,argv[3],theFontName)) {
+            JS_ReportError(cx,"JSRenderWindow::renderTextAsImage: parameter 4 must be a string");
             return JS_FALSE;
         }
     }
     if (argc >= 5) {
-        if (!convertFrom(cx,argv[4],theTextBoxHeight)) {
+        if (!convertFrom(cx,argv[4],theTextBoxWidth)) {
             JS_ReportError(cx,"JSRenderWindow::renderTextAsImage: parameter 5 must be an int");
             return JS_FALSE;
         }
     }
     if (argc >= 6) {
-        if (!convertFrom(cx,argv[5],theCursorPos)) {
-            JS_ReportError(cx,"JSRenderWindow::renderTextAsImage: parameter 6 must be a vector2i ");
+        if (!convertFrom(cx,argv[5],theTextBoxHeight)) {
+            JS_ReportError(cx,"JSRenderWindow::renderTextAsImage: parameter 6 must be an int");
+            return JS_FALSE;
+        }
+    }
+    if (argc >= 7) {
+        if (!convertFrom(cx,argv[6],theCursorPos)) {
+            JS_ReportError(cx,"JSRenderWindow::renderTextAsImage: parameter 7 must be a vector2i ");
             return JS_FALSE;
         }
     }
 
     try {
     switch (argc) {
-        case 3:
+        case 4:
+            jslib::JSClassTraits<DERIVED>::openNativeRef(cx, obj).setTextStyle(myTextStyle);
             myBoxSize = jslib::JSClassTraits<DERIVED>::openNativeRef(cx, obj).
                 renderTextAsImage(theImageNode, theTextString, theFontName);
             jslib::JSClassTraits<DERIVED>::closeNativeRef(cx,obj);
             break;
-        case 4:
+        case 5:
+            jslib::JSClassTraits<DERIVED>::openNativeRef(cx, obj).setTextStyle(myTextStyle);
             myBoxSize = jslib::JSClassTraits<DERIVED>::openNativeRef(cx, obj).
                 renderTextAsImage(theImageNode, theTextString, theFontName, theTextBoxWidth);
             jslib::JSClassTraits<DERIVED>::closeNativeRef(cx,obj);
             break;
-        case 5:
+        case 6:
+            jslib::JSClassTraits<DERIVED>::openNativeRef(cx, obj).setTextStyle(myTextStyle);
             myBoxSize = jslib::JSClassTraits<DERIVED>::openNativeRef(cx, obj).
                 renderTextAsImage(theImageNode, theTextString, theFontName, theTextBoxWidth, theTextBoxHeight);
             jslib::JSClassTraits<DERIVED>::closeNativeRef(cx,obj);
             break;
-        case 6:
+        case 7:
+            jslib::JSClassTraits<DERIVED>::openNativeRef(cx, obj).setTextStyle(myTextStyle);
             myBoxSize = jslib::JSClassTraits<DERIVED>::openNativeRef(cx, obj).
                 renderTextAsImage(theImageNode, theTextString, theFontName, theTextBoxWidth, theTextBoxHeight, theCursorPos);
             jslib::JSClassTraits<DERIVED>::closeNativeRef(cx,obj);
@@ -601,21 +600,9 @@ JSAbstractRenderWindow<DERIVED>::renderTextAsImage(JSContext *cx, JSObject *obj,
             return JS_FALSE;
     }
     *rval = as_jsval(cx, myBoxSize);
+    //AC_PRINT << "JSAbstractRenderWindow::renderTextAsImage duration: " << (asl::NanoTime() - myStartTime).millis();    
     return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
-}
-
-template<class DERIVED>
-JSBool
-JSAbstractRenderWindow<DERIVED>::setTextPadding(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Sets padding in pixels around text paragraphs");
-    DOC_PARAM("theTopPadding", "", DOC_TYPE_INTEGER);
-    DOC_PARAM("theBottomPadding", "", DOC_TYPE_INTEGER);
-    DOC_PARAM("theLeftPadding", "", DOC_TYPE_INTEGER);
-    DOC_PARAM("theRightPadding", "", DOC_TYPE_INTEGER);
-    DOC_END;
-    typedef void (DERIVED::*MyMethod)(int, int, int, int);
-    return Method<DERIVED>::call((MyMethod)&DERIVED::setTextPadding,cx,obj,argc,argv,rval);
 }
 
 template<class DERIVED>
@@ -683,35 +670,6 @@ JSAbstractRenderWindow<DERIVED>::setTextIndentation(JSContext *cx, JSObject *obj
     DOC_END;
     typedef void (DERIVED::*MyMethod)(int);
     return Method<DERIVED>::call((MyMethod)&DERIVED::setTextIndentation,cx,obj,argc,argv,rval);
-}
-template<class DERIVED>
-JSBool
-JSAbstractRenderWindow<DERIVED>::setHTextAlignment(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Sets horizontal alignment for text paragraphs" \
-              "See Renderer static properties for possible constants");
-    DOC_PARAM("theHorizontalAlignment", "", DOC_TYPE_ENUMERATION);
-    DOC_END;
-    typedef void (DERIVED::*MyMethod)(unsigned);
-    return Method<DERIVED>::call((MyMethod)&DERIVED::setHTextAlignment,cx,obj,argc,argv,rval);
-}
-template<class DERIVED>
-JSBool
-JSAbstractRenderWindow<DERIVED>::setVTextAlignment(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Sets vertical alignment for text paragraphs" \
-              "See Renderer static properties for possible constants");
-    DOC_PARAM("theVerticalAlignment", "", DOC_TYPE_ENUMERATION);
-    DOC_END;
-    typedef void (DERIVED::*MyMethod)(unsigned);
-    return Method<DERIVED>::call((MyMethod)&DERIVED::setVTextAlignment,cx,obj,argc,argv,rval);
-}
-template<class DERIVED>
-JSBool
-JSAbstractRenderWindow<DERIVED>::setLineHeight(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Sets line height in pixel for text paragraphs. Set to 0 to use default spacing.");
-    DOC_PARAM("theLineHeight", "", DOC_TYPE_INTEGER);
-    DOC_END;
-    typedef void (DERIVED::*MyMethod)(unsigned);
-    return Method<DERIVED>::call((MyMethod)&DERIVED::setLineHeight,cx,obj,argc,argv,rval);
 }
 template<class DERIVED>
 JSBool
@@ -1019,18 +977,12 @@ JSFunctionSpec * JSAbstractRenderWindow<DERIVED>::BaseFunctions() {
         {"performRequest",     performRequest,           1},
         // text rendering
         {"renderText",         renderText,               4},
-        {"setTextColor",       setTextColor,             1},
-        {"getTextColor",       getTextColor,             0},
         {"renderTextAsImage",  renderTextAsImage,        6},
         {"getTextCursorPosition", getTextCursorPosition, 0},
         {"getTextGlyphPositions", getTextGlyphPositions, 0},        
         {"getTextLineWidths",  getTextLineWidths,        0},
         {"getTextMaxWidth",    getTextMaxWidth,          0},
-        {"setTextPadding",     setTextPadding,           4},
         {"setTextIndentation", setTextIndentation,       1},
-        {"setHTextAlignment",  setHTextAlignment,        1},
-        {"setVTextAlignment",  setVTextAlignment,        1},
-        {"setLineHeight",      setLineHeight,            1},
         {"setParagraph",       setParagraph,             2},
         {"getFontMetrics",     getFontMetrics,           1},
         {"getGlyphMetrics",    getGlyphMetrics,          2},
@@ -1350,6 +1302,7 @@ JSBool JSAbstractRenderWindow<DERIVED>::setPropertySwitch(NATIVE & theNative, un
             return JS_FALSE;
     }
 }
+
 
 }
 

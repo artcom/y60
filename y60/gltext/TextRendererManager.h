@@ -90,17 +90,13 @@ namespace y60 {
             void render(ViewportPtr theViewport);
             void addText(const asl::Vector2f & thePos, const std::string & theString,
                     const std::string & theFont, ViewportPtr theViewport);
-            void setColor(const asl::Vector4f & theTextColor);
-            const asl::Vector4f & getColor();
-            void setPadding(int topPadding, int bottomPadding, int leftpadding, int rightpadding);
 	        void setIndentation(int theIndentation);
-            void setVTextAlignment(TextStyle::TextAligment theVAlignment);
-            void setHTextAlignment(TextStyle::TextAligment theHAlignment);
-            void setLineHeight(unsigned theHeight);
             void setParagraph(unsigned theTopOffset, unsigned theBottomOffset);
             void loadTTF(const std::string & theName, const std::string & theFileName,
                     int theHeight, TTFFontInfo::FONTHINTING & theFonthint, TTFFontInfo::FONTTYPE & theFonttype, 
                     int theAscendOffse = 0);
+            void setTextStyle(TextStyle & theTextStyle);
+            const TextStyle & getTextStyle();
             asl::Vector2i renderTextAsImage(TextureManager & theTextureManager, dom::NodePtr theImageNode,
                     const std::string & theString,
                     const std::string & theFont,

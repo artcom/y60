@@ -62,42 +62,18 @@
 #include "y60_gltext_settings.h"
 
 #include "Text.h"
+#include "TextStyle.h"
 #include <asl/base/Exception.h>
 #include <asl/base/Ptr.h>
 #include <asl/math/Vector234.h>
 #include <asl/math/Box.h>
+#include <asl/dom/Nodes.h>
 
 #include <map>
 namespace y60 {
-
-
+    
     DEFINE_EXCEPTION(GLTextRendererException, asl::Exception);
 
-    struct Y60_GLTEXT_DECL TextStyle {
-        enum TextAligment {
-            CENTER_ALIGNMENT,
-            LEFT_ALIGNMENT,
-            RIGHT_ALIGNMENT,
-            TOP_ALIGNMENT,
-            BOTTOM_ALIGNMENT
-        };
-
-        asl::Vector4f _myTextColor;
-        int           _myTopPadding;
-        int           _myBottomPadding;
-        int           _myLeftPadding;
-        int           _myRightPadding;
-        TextAligment  _myHorizontalAlignment;
-        TextAligment  _myVerticalAlignment;
-
-        unsigned      _myLineHeight;
-    	unsigned      _myParagraphTopOffset;
-    	unsigned      _myParagraphBottomOffset;
-        float         _myTracking;
-        int           _myIndentation;
-
-
-    };
 
     class Y60_GLTEXT_DECL TextRenderer {
         public:

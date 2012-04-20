@@ -111,9 +111,9 @@ using namespace asl;
 using namespace y60;
 using namespace dom;
 
-#if MAYA_API_VERSION < 700 || MAYA_API_VERSION > 200900
+/*#if MAYA_API_VERSION < 700 || MAYA_API_VERSION > 200900
     #error "Y60 Maya exporter not yet released for this Maya version"
-#endif
+#endif*/
 #ifdef LINUX
 #if MAYA_API_VERSION < 800 && __GNUC__ == 3 && __GNUC_MINOR__ != 3
     #error "gcc 3.3.x must be used to create Maya 7.0 plugins"

@@ -87,6 +87,7 @@ spark.Text.Constructor = function (Protected) {
         _myMaxTextWidth =  myWidth.width;
         Public.width = myTextInfo.size.x;
         Public.height = myTextInfo.size.y;
+        
         return myTextInfo.size;
     };
     
@@ -100,7 +101,7 @@ spark.Text.Constructor = function (Protected) {
     Public.__defineSetter__("text", function (theValue) {
         if (theValue && _myUpcase) {
             theValue = theValue.toUpperCase();
-        }
+        }        
         if (_myLayoutHook) {
             _myText = _myLayoutHook(theValue);
         } else {

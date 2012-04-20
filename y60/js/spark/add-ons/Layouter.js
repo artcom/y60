@@ -192,12 +192,12 @@ spark.Layouter.Constructor = function(Protected) {
             if (_myVisualMode > 1) {
                 window.getRenderer().draw(new LineSegment(new Point3f(0,myBox.min.y,window.camera.position.z-1),new Point3f(window.width,myBox.min.y,window.camera.position.z-1) ), DEBUG_COLOR, myMatrix, 1);
                 window.getRenderer().draw(new LineSegment(new Point3f(myBox.min.x, 0, window.camera.position.z-1),new Point3f(myBox.min.x,window.height,window.camera.position.z-1) ), DEBUG_COLOR, myMatrix, 1);
-                window.setTextColor([1,0,0,1]);
+                var myTextColor = new Vector4f(1,0,0,1);                                        
                 var myViewport = _myStage.getViewportAtWindowCoordinates(0, 0);
                 var myDifference = difference(myBox.min, new Vector3f(0,0,myBox.min.z));
                 var myDifferenceTopLeft = difference(myBox.min, new Vector3f(0,window.height,myBox.min.z));
-                window.renderText([clamp(myBox.min.x-80,0,window.width), clamp(window.height - (myBox.min.y-20), 0, window.height)], "[" + myDifference.x  + "," + myDifference.y + "]", "Screen13", myViewport );
-                window.renderText([clamp(myBox.min.x-80, 0,window.width), clamp(window.height - (myBox.min.y+20), 0,window.height)], "[" + myDifferenceTopLeft.x  + "," + Math.abs(myDifferenceTopLeft.y) + "]", "Screen13", myViewport );
+                window.renderText(new Node("<style textColor='" + myTextColor + "'/>").childNode(0), [clamp(myBox.min.x-80,0,window.width), clamp(window.height - (myBox.min.y-20), 0, window.height)], "[" + myDifference.x  + "," + myDifference.y + "]", "Screen13", myViewport );
+                window.renderText(new Node("<style textColor='" + myTextColor + "'/>").childNode(0), [clamp(myBox.min.x-80, 0,window.width), clamp(window.height - (myBox.min.y+20), 0,window.height)], "[" + myDifferenceTopLeft.x  + "," + Math.abs(myDifferenceTopLeft.y) + "]", "Screen13", myViewport );
             }
         }
         

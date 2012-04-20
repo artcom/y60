@@ -388,9 +388,9 @@ TouchScreen.prototype.Constructor = function(obj, theEventReceiver, theComPort, 
         }
 
         if (_myCalibrationModeFlag || _myFollowMode) {
-            window.setTextColor([0.4,0.4,1,1]);
-            window.renderText([50, 50], _myMessageTop, "SyntaxBold18");
-            window.renderText([50, 100], _myMessageBottom, "SyntaxBold18");
+            var myTextColor = new Vector4f(0.4,0.4,1,1);                                        
+            window.renderText(new Node("<style textColor='" + myTextColor + "'/>").childNode(0), [50, 50], _myMessageTop, "SyntaxBold18");
+            window.renderText(new Node("<style textColor='" + myTextColor + "'/>").childNode(0), [50, 100], _myMessageBottom, "SyntaxBold18");
             return true;
         } else {
             return false;

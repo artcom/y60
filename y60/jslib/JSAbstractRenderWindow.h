@@ -64,6 +64,7 @@
 #include <y60/jsbase/JSWrapper.h>
 #include "AbstractRenderWindow.h"
 #include <y60/scene/Viewport.h>
+#include <y60/gltext/TextRenderer.h>
 
 namespace jslib {
 
@@ -157,13 +158,7 @@ class JSAbstractRenderWindow :  public JSWrapper<DERIVED, asl::Ptr<DERIVED>, Sta
         static JSBool
         renderText(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool
-        setTextColor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
-        static JSBool
-        getTextColor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
-        static JSBool
         renderTextAsImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
-        static JSBool
-        setTextPadding(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool
         getTextGlyphPositions(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool
@@ -174,12 +169,6 @@ class JSAbstractRenderWindow :  public JSWrapper<DERIVED, asl::Ptr<DERIVED>, Sta
         getTextMaxWidth(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool
         setTextIndentation(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
-        static JSBool
-        setHTextAlignment(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
-        static JSBool
-        setVTextAlignment(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
-        static JSBool
-        setLineHeight(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool
         setParagraph(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool
@@ -249,6 +238,7 @@ class JSAbstractRenderWindow :  public JSWrapper<DERIVED, asl::Ptr<DERIVED>, Sta
             return JS_TRUE;
         }
     };
+    bool convertFrom(JSContext *cx, jsval theValue, y60::TextStyle & theTextStyle);
 }
 
 #endif

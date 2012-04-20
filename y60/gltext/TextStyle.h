@@ -56,90 +56,47 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-//own header
-#include "TextRenderer.h"
+#ifndef AC_Y60_TEXTTYLE
+#define AC_Y60_TEXTTYLE
+
+#include "y60_gltext_settings.h"
+
+#include <asl/dom/Nodes.h>
+#include <map>
 
 
-#include <y60/glutil/GLUtils.h>
+namespace y60 {
+    
 
-#include <asl/math/Vector234.h>
-#include <asl/base/Dashboard.h>
-#include <asl/math/numeric_functions.h>
+    struct Y60_GLTEXT_DECL TextStyle {
+        enum TextAligment {
+            CENTER_ALIGNMENT,
+            LEFT_ALIGNMENT,
+            RIGHT_ALIGNMENT,
+            TOP_ALIGNMENT,
+            BOTTOM_ALIGNMENT
+        };
+        TextStyle();
+        TextStyle(dom::NodePtr myStyleNode);
+        TextStyle(const asl::Vector4f &  myTextColor); // Convenience, ouwh
+        ~TextStyle();
+        void fillDefault();
+        asl::Vector4f _myTextColor;
+        int           _myTopPadding;
+        int           _myBottomPadding;
+        int           _myLeftPadding;
+        int           _myRightPadding;
+        TextAligment  _myHorizontalAlignment;
+        TextAligment  _myVerticalAlignment;
 
-#include <iostream>
+        unsigned      _myLineHeight;
+    	unsigned      _myParagraphTopOffset;
+    	unsigned      _myParagraphBottomOffset;
+        float         _myTracking;
+        int           _myIndentation;
 
+    };
 
-using namespace std;
-using namespace asl;
+} // namespace y60
 
-namespace y60 {    
-
-    TextRenderer::TextRenderer() :
-
-        _myCursorPos(0,0),
-        _myMaxWidth(0),
-        _myWindowWidth(0),
-        _myWindowHeight(0)
-    {
-    }
-
-    TextRenderer::~TextRenderer() {}
-
-    TextPtr
-    TextRenderer::createText(const Vector2f & thePos,
-                             const string & theString,
-                             const string & theFont)
-    {
-        return TextPtr(new Text(this, thePos, getTextColor(), theString, theFont));
-    }
-
-
-    void
-    TextRenderer::setWindowSize(const unsigned int & theWindowWidth,
-                               const unsigned int & theWindowHeight)
-    {
-        _myWindowWidth  = theWindowWidth;
-        _myWindowHeight = theWindowHeight;
-    }
-
-    void TextRenderer::setTextStyle(const TextStyle & theTextStyle) { 
-        _myTextStyle = theTextStyle;
-    }
-
-    void
-    TextRenderer::setColor(const asl::Vector4f & theTextColor) {
-        _myTextStyle._myTextColor = theTextColor;
-    }
-    const asl::Vector4f &
-    TextRenderer::getColor() {
-        return _myTextStyle._myTextColor;
-    }
-
-    void
-    TextRenderer::setPadding(int theTop, int theBottom, int theLeft, int theRight) {
-        _myTextStyle._myTopPadding = theTop;
-        _myTextStyle._myBottomPadding = theBottom;
-        _myTextStyle._myLeftPadding = theLeft;
-        _myTextStyle._myRightPadding = theRight;
-    }
-
-    void
-    TextRenderer::setCursor(asl::Vector2i thePosition) {
-        _myCursorPos = thePosition;
-    }
-
-    void
-    TextRenderer::setIndentation(int theIndent) {
-        _myTextStyle._myIndentation = theIndent;
-    }
-
-	void
-	TextRenderer::setVTextAlignment(TextStyle::TextAligment theVAlignment) {
-	    _myTextStyle._myVerticalAlignment = theVAlignment;
-	}
-
-    void
-    TextRenderer::setHTextAlignment(TextStyle::TextAligment theHAlignment) {
-        _myTextStyle._myHorizontalAlignment = theHAlignment;
-	}
-}
+#endif // AC_Y60_TEXTTYLE

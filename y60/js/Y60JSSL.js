@@ -332,6 +332,7 @@ function asColor(theHexString, theAlpha) {
         var myBlue  = parseInt(theHexString.substr(4, 2), 16) / 255;
         return new Vector4f(myRed, myGreen, myBlue, theAlpha);
     } else {
+        dumpstack();
         // Wtf is that good for?
         var retval = eval(theHexString);
         Logger.trace("asColor: eval " + theHexString + " ergibt " + retval);

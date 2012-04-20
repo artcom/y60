@@ -121,15 +121,12 @@ LabelBase.prototype.Constructor = function(Public, Protected, theScene,
         var HTextAlign = "HTextAlign"  in myStyle ? myStyle.HTextAlign : Renderer.LEFT_ALIGNMENT;
         var VTextAlign = "VTextAlign"  in myStyle ? myStyle.VTextAlign : Renderer.TOP_ALIGNMENT;
 
-        window.setTextPadding(topPad, bottomPad, leftPad, rightPad);
-        window.setHTextAlignment(HTextAlign);
-        window.setVTextAlignment(VTextAlign);
-        window.setTextColor(asColor(myStyle.textColor));
-        window.setTracking(tracking);
-        window.setLineHeight(lineHeight);
         var myFontName = loadFont(myStyle.font, myStyle.fontsize);
         var myImage = Protected.getImageNode();
-        _myTextSize = window.renderTextAsImage(myImage, theText, myFontName,
+        var myStyle = new Node("<style/>");
+        myStyle = myStyle.childNode(0);                
+        
+        _myTextSize = window.renderTextAsImage(myStyle, myImage, theText, myFontName,
                         theSize&&theSize[0]>0?Public.width:null,
                         theSize&&theSize[1]>0?Public.height:null,
                         Public.textCursorPos);
@@ -137,9 +134,9 @@ LabelBase.prototype.Constructor = function(Public, Protected, theScene,
 
         Public.srcsize.x = _myTextSize[0] / myImage.width;
         Public.srcsize.y = _myTextSize[1] / myImage.height;
-        window.setHTextAlignment(Renderer.LEFT_ALIGNMENT);
+        /*window.setHTextAlignment(Renderer.LEFT_ALIGNMENT);
         window.setVTextAlignment(Renderer.TOP_ALIGNMENT);
-        window.setTextPadding(0,0,0,0);
+        window.setTextPadding(0,0,0,0);*/
 
         if (theSize == null) {
             Public.width = _myTextSize[0];

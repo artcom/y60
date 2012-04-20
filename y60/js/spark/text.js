@@ -102,7 +102,7 @@ spark.loadFont = function (theName, theSize, theFontScale, theFontStyle, theHint
             spark.loadFont(theName, theSize, theFontScale, "normal", theHinting, theAscendOffset);
         }
 
-        Logger.debug("Loading font " + theName + " with size " + theSize + " and fonststyle " + theFontStyle+
+        Logger.info("Loading font " + theName + " with size " + theSize + " and fonststyle " + theFontStyle+
                     " and hinting:"+theHinting + " and ascend offset:" + theAscendOffset);
 
         // XXX: this is a remnant from before the introduction
@@ -145,7 +145,7 @@ spark.loadFont = function (theName, theSize, theFontScale, theFontStyle, theHint
                 Logger.debug("loading bold font for " + myName + "," + myFontPath + "," + theSize + "," + "bold");
                 window.loadTTF(myName, searchFile(myFontPath), theSize * theFontScale, myHinting, Renderer.BOLD);
             }
-        }
+        } 
     }
     return myName;
 };
@@ -242,7 +242,7 @@ spark.mergeFontStyles = function(theOldStyle, theNewStyle) {
  * 
  * Returns a font style node that can be used with renderText.
  */
-spark.fontStyleFromNode = function(theNode) {
+spark.fontStyleFromNode = function(theNode) {    
     var myStyle = new Node("<style/>");
     myStyle = myStyle.childNode(0);
 
@@ -275,7 +275,7 @@ spark.fontStyleFromNode = function(theNode) {
 
     copyAttributeIfPresent("textColor");
 
-    spark.applyStyleDefaults(myStyle);
+    //spark.applyStyleDefaults(myStyle);
     return myStyle;
 };
 
@@ -290,28 +290,6 @@ spark.fontForStyle = function(theStyle) {
     !theStyle.getAttribute("hinting") ? theStyle.hinting  = spark.AUTOHINTING : null;
     !theStyle.getAttribute("ascendOffset") ? theStyle.ascendOffset  = 0 : null;
     return spark.loadFont(theStyle.font, theStyle.fontSize, theStyle.fontScale, theStyle.fontStyle, theStyle.hinting, theStyle.ascendOffset);
-};
-
-/**
- * Internal: Convert text alignment from string to Y60 enum.
- */
-spark.alignmentFromString = function(theString) {
-    if (theString === "top") {
-        return Renderer.TOP_ALIGNMENT;
-    }
-    if (theString === "bottom") {
-        return Renderer.BOTTOM_ALIGNMENT;
-    }
-    if (theString === "left") {
-        return Renderer.LEFT_ALIGNMENT;
-    }
-    if (theString === "right") {
-        return Renderer.RIGHT_ALIGNMENT;
-    }
-    if (theString === "center") {
-        return Renderer.CENTER_ALIGNMENT;
-    }
-    throw new Error("Unknown alignment: " + theString);
 };
 
 /**
@@ -376,23 +354,16 @@ spark.createTextImage = function(theSize) {
  * allowing the client some layout trickery.
  */
 spark.renderText = function(theImage, theText, theStyle, theSize, theMaxTextWidth, theLineWidths) {
-    spark.applyStyleDefaults(theStyle);
-
-    window.setTextPadding(theStyle.topPad, theStyle.bottomPad, theStyle.leftPad, theStyle.rightPad);
-    window.setHTextAlignment(spark.alignmentFromString(theStyle.hAlign));
-    window.setVTextAlignment(spark.alignmentFromString(theStyle.vAlign));
-
-    window.setTextColor(asColor(theStyle.textColor));
-    window.setTracking(theStyle.tracking);
-    window.setLineHeight(theStyle.lineHeight*theStyle.fontScale);
-
+//var myStart = millisec();        
+    
     var myFont = spark.fontForStyle(theStyle);
     var mySize = new Vector2f(theImage.width, theImage.height);
     if(theSize != undefined) {
         mySize = theSize;
     }
+    
     var myTextSize =
-        window.renderTextAsImage(theImage,
+        window.renderTextAsImage(theStyle, theImage,
                                  theText,
                                  myFont,
                                  mySize.x*theStyle.fontScale, mySize.y*theStyle.fontScale);
@@ -418,9 +389,7 @@ spark.renderText = function(theImage, theText, theStyle, theSize, theMaxTextWidt
             theLineWidths.push(myLineWidths[i]);
         }
     }
+//print("         Text.js render: " + (millisec()- myStart), theText);        
 
-    window.setHTextAlignment(Renderer.LEFT_ALIGNMENT);
-    window.setVTextAlignment(Renderer.TOP_ALIGNMENT);
-    window.setTextPadding(0,0,0,0);
     return {size:myTextSize, positions:myGlyphPosition};
 };

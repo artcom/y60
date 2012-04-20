@@ -262,7 +262,7 @@ function fontStyleFromNode(theNode) {
     copyAttributeIfPresent(theNode, myStyle, "textColor");
     copyAttributeIfPresent(theNode, myStyle, "backgroundColor");
 
-    applyStyleDefaults(myStyle);
+    //applyStyleDefaults(myStyle);
 
     return myStyle;
 }
@@ -349,21 +349,14 @@ function textAsImage(theText, theStyle, theSize) {
 }
 
 function textToImage(theImage, theText, theStyle, theSize) {
-    applyStyleDefaults(theStyle);
-
-    window.setTextPadding(theStyle.topPad, theStyle.bottomPad, theStyle.leftPad, theStyle.rightPad);
-    window.setHTextAlignment(alignmentFromString(theStyle.hAlign));
-    window.setVTextAlignment(alignmentFromString(theStyle.vAlign));
-    window.setTextColor(asColor(theStyle.textColor));
-    window.setTracking(theStyle.tracking);
-    window.setLineHeight(theStyle.lineHeight);
 
     // theImage.resize = "pad";
     // theImage.wrapmode = "clamp_to_edge"
     // theImage.mipmap = false;
 
     var myTextSize =
-        window.renderTextAsImage(theImage,
+        window.renderTextAsImage(theStyle,
+                                 theImage,
                                  theText,
                                  fontForStyle(theStyle),
                                  theSize.x, theSize.y,

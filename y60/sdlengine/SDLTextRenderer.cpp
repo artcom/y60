@@ -132,6 +132,7 @@ namespace y60 {
             // Font already loaded
             return;
         }
+        _myFontHintingMap[theName] = theFonthint;
 
         if (theFontType != SDLFontInfo::NORMAL) {
             if (_myFonts.find(makeFontName(theName, SDLFontInfo::NORMAL)) == _myFonts.end()) {
@@ -147,7 +148,7 @@ namespace y60 {
         if (!myFont) {
             throw GLTextRendererException(string("Could not load font: ") + theName+ ", " + myFileName, PLUS_FILE_LINE);
         }
-        TTF_SetFontHinting(myFont, theFonthint);
+        TTF_SetFontHinting(myFont, (int)_myFontHintingMap[theName]);
         _myFonts[myFontName] = SDLFontInfo(myFont, theFontType, theHeight, theFonthint);
 
         AC_DEBUG << "TTFTextRenderer - loaded font: " << theName << ", " << myFileName << " with size: "
@@ -167,6 +168,14 @@ namespace y60 {
         return myIt->second;
     }
 
+    const TTFFontInfo::FONTHINTING &
+    SDLTextRenderer::getFontHint(const string & theName) const {
+        std::map<std::string, TTFFontInfo::FONTHINTING>::const_iterator myIt = _myFontHintingMap.find(theName);
+        if (myIt == _myFontHintingMap.end()) {
+            throw GLTextRendererException(string("Font: ") + theName+ " not found in fontlibrary.", PLUS_FILE_LINE);
+        }
+        return myIt->second;
+    }
 
     const TTF_Font *
     SDLTextRenderer::getFont(const string & theName) const {
@@ -176,6 +185,7 @@ namespace y60 {
         }
         return myIt->second.getFont();
     }
+
     TextPtr
     SDLTextRenderer::createText(const asl::Vector2f & thePos,
                                 const std::string & theString, const std::string & theFontName)
@@ -188,21 +198,6 @@ namespace y60 {
         return (_myFonts.find(makeFontName(theName, SDLFontInfo::NORMAL)) != _myFonts.end());
     }
 
-    void
-    SDLTextRenderer::renderTextInSurface(const string & theText,
-                                         const string & theFontName,
-                                         unsigned int theTargetWidth,
-                                         unsigned int theTargetHeight,
-                                         SDLFontInfo & theSDLFontInfo,
-                                         const TTF_Font * myBoldFont,
-                                         const TTF_Font * myItalicFont,
-                                         const TTF_Font * myBoldItalicFont)
-    {
-        TTF_SetTracking(_myTextStyle._myTracking);
-        _myTextSize = createTextSurface(theText, theFontName, getTextColor(),
-            theSDLFontInfo, myBoldFont, myItalicFont, myBoldItalicFont, theTargetWidth, theTargetHeight);        
-    }
-
     Vector2i
     SDLTextRenderer::renderTextAsImage(TextureManager & theTextureManager,
                                             dom::NodePtr theImageNode,
@@ -213,7 +208,7 @@ namespace y60 {
                                             const asl::Vector2i & theCursorPos)
     {
         MAKE_GL_SCOPE_TIMER(SDLTextRenderer_renderTextAsImage);
-
+        TTF_SetTracking(_myTextStyle._myTracking);
 
         ImagePtr myImage = theImageNode->getFacade<y60::Image>();
 
@@ -222,22 +217,14 @@ namespace y60 {
         }
 
         _myCursorPos = theCursorPos;
-
         MAKE_GL_SCOPE_TIMER(SDLTextRenderer_renderTextAsImage2);
-
-        SDLFontInfo mySDLFontInfo = (getFontInfo(makeFontName(theFontName, SDLFontInfo::NORMAL)));
-        const TTF_Font * myBoldFont       = getFont(makeFontName(theFontName, SDLFontInfo::BOLD));
-        const TTF_Font * myItalicFont     = getFont(makeFontName(theFontName, SDLFontInfo::ITALIC));
-        const TTF_Font * myBoldItalicFont = getFont(makeFontName(theFontName, SDLFontInfo::BOLDITALIC));
-
-        renderTextInSurface(theText, theFontName, theTargetWidth, theTargetHeight,
-                                                  mySDLFontInfo, myBoldFont, myItalicFont, myBoldItalicFont);
-        Vector2i myTextSize = _myTextSize;
-
+        Vector2i myTextSize = createTextSurface(theText, theFontName, getTextColor(),
+            theTargetWidth, theTargetHeight);
         if ( myTextSize[0] == 0 && myTextSize[1] == 0) {
             myImage->getRasterPtr()->clear();
             return myTextSize;
         }
+
         unsigned int myImageDataSize = _myTextureSurface->w * _myTextureSurface->h * sizeof(asl::RGBA);
 
 
@@ -381,6 +368,7 @@ namespace y60 {
     SDLTextRenderer::createTargetSurface(unsigned theWidth, unsigned theHeight, const Vector4f & theTextColor) {
         DB2(AC_TRACE << "createTargetSurface with size: " << theWidth << "x" << theHeight << endl;)
         SDL_FreeSurface(_myTextureSurface);
+
         _myTextureSurface = SDL_CreateRGBSurface(
                 SDL_SWSURFACE,
                 theWidth, theHeight,
@@ -709,23 +697,23 @@ namespace y60 {
     void
     SDLTextRenderer::renderWords(vector<Word> & theWords,
                                  const string & theFontName,
-                                 const Vector4f & theTextColor,
-                                 SDLFontInfo & theSDLFontInfo,
-                                 const TTF_Font * myBoldFont,
-                                 const TTF_Font * myItalicFont,
-                                 const TTF_Font * myBoldItalicFont
-                                 )
+                                 const Vector4f & theTextColor)
     {
         DB2(AC_TRACE << "-------  Render Words  -------" << endl;)
+        SDLFontInfo mySDLFontInfo = (getFontInfo(makeFontName(theFontName, SDLFontInfo::NORMAL)));
 
-        TTF_Font * myNormalFont = theSDLFontInfo.getFont();
+        TTF_Font * myNormalFont = mySDLFontInfo.getFont();
         if (!myNormalFont) {
             throw GLTextRendererException("Internal error: Normal font not defined.", PLUS_FILE_LINE);
         }
 
-        if (TTF_GetFontHinting (myNormalFont) != (int)theSDLFontInfo.getFontHinting()){ 
-            TTF_SetFontHinting(myNormalFont, (int)theSDLFontInfo.getFontHinting());
+        if (TTF_GetFontHinting (myNormalFont) != (int)getFontHint(theFontName)) {
+            TTF_SetFontHinting(myNormalFont, (int)getFontHint(theFontName));
         }
+
+        const TTF_Font * myBoldFont       = getFont(makeFontName(theFontName, SDLFontInfo::BOLD));
+        const TTF_Font * myItalicFont     = getFont(makeFontName(theFontName, SDLFontInfo::ITALIC));
+        const TTF_Font * myBoldItalicFont = getFont(makeFontName(theFontName, SDLFontInfo::BOLDITALIC));
 
         SDL_Color myTextColor = { Uint8(theTextColor[0] * 255),
                                   Uint8(theTextColor[1] * 255),
@@ -786,80 +774,15 @@ namespace y60 {
             TTF_SetFontStyle((TTF_Font*) myFont, TTF_STYLE_NORMAL);
         }
     }
-    Vector2i
-    SDLTextRenderer::createTextSurfaceDimension(const string & theText, const string & theFontName,
-                                       const Vector4f & theTextColor,
-                                       SDLFontInfo & theSDLFontInfo,
-                                       const TTF_Font * myBoldFont,
-                                       const TTF_Font * myItalicFont,
-                                       const TTF_Font * myBoldItalicFont,
-                                       unsigned int theTargetWidth,
-                                       unsigned int theTargetHeight)
-    {
-        unsigned mySurfaceWidth  = 0;
-        unsigned mySurfaceHeight = 0;
-
-        //_myGlyphPosition.clear();
-
-        vector<Word> myWords;
-        parseWords(theText, myWords);
-        if (myWords.empty()) {
-            return Vector2i(0,0);
-        }
-        renderWords(myWords, theFontName, theTextColor, theSDLFontInfo, myBoldFont, myItalicFont, myBoldItalicFont);
-
-        if (theTargetWidth == 0) {
-            // Use the surface width and (if not given) height
-            unsigned myWidth = 0;
-            unsigned myMaxWidth = 0;
-            for (unsigned i = 0; i < myWords.size(); ++i) {
-                myWidth += myWords[i].surface->w;
-                if (myWords[i].newline) {
-                    myMaxWidth = std::max( myMaxWidth, myWidth );
-                    myWidth = 0;
-                }
-            }
-            myMaxWidth = std::max( myMaxWidth, myWidth );
-            mySurfaceWidth  = myMaxWidth + _myTextStyle._myRightPadding + _myTextStyle._myLeftPadding;
-
-            if (theTargetHeight == 0) {
-                mySurfaceHeight = myWords[0].surface->h + _myTextStyle._myTopPadding + _myTextStyle._myBottomPadding;
-            } else {
-                mySurfaceHeight = theTargetHeight;
-            }
-        } else {
-            // Use the given size
-            mySurfaceWidth  = theTargetWidth;
-            mySurfaceHeight = theTargetHeight;
-        }
-
-        vector<Line> myLines;
-        unsigned myLineHeight = _myTextStyle._myLineHeight;
-        if (myLineHeight == 0) {
-            myLineHeight = TTF_FontLineSkip(theSDLFontInfo.getFont());
-        }
-
-        unsigned myTotalLineHeight = createLines(myWords, myLines,
-                    mySurfaceWidth-_myTextStyle._myLeftPadding-_myTextStyle._myRightPadding, myLineHeight, mySurfaceHeight);
-        if (theTargetHeight == 0) {
-            mySurfaceHeight = myTotalLineHeight + _myTextStyle._myTopPadding +_myCursorPos[1]+ _myTextStyle._myBottomPadding;
-        }
-        return Vector2i(mySurfaceWidth, mySurfaceHeight);
-    }
 
     Vector2i
     SDLTextRenderer::createTextSurface(const string & theText, const string & theFontName,
                                        const Vector4f & theTextColor,
-                                       SDLFontInfo & theSDLFontInfo,
-                                       const TTF_Font * myBoldFont,
-                                       const TTF_Font * myItalicFont,
-                                       const TTF_Font * myBoldItalicFont,
                                        unsigned int theTargetWidth,
                                        unsigned int theTargetHeight)
     {
         unsigned mySurfaceWidth  = 0;
         unsigned mySurfaceHeight = 0;
-
 
         DB2(
             {AC_TRACE << "----------------------------------" << endl;}
@@ -874,7 +797,7 @@ namespace y60 {
         if (myWords.empty()) {
             return Vector2i(0,0);
         }
-        renderWords(myWords, theFontName, theTextColor, theSDLFontInfo, myBoldFont, myItalicFont, myBoldItalicFont);
+        renderWords(myWords, theFontName, theTextColor);
 
         if (theTargetWidth == 0) {
             // Use the surface width and (if not given) height
@@ -905,7 +828,7 @@ namespace y60 {
         vector<Line> myLines;
         unsigned myLineHeight = _myTextStyle._myLineHeight;
         if (myLineHeight == 0) {
-            myLineHeight = TTF_FontLineSkip(theSDLFontInfo.getFont());
+            myLineHeight = TTF_FontLineSkip(getFontInfo(makeFontName(theFontName)).getFont());
         }
 
         unsigned myTotalLineHeight = createLines(myWords, myLines,
@@ -922,6 +845,7 @@ namespace y60 {
             _myMaxWidth = std::max(myLines[i].width, _myMaxWidth);
             _myLineWidths.push_back(myLines[i].width);
         }
+
         createTargetSurface( mySurfaceWidth, mySurfaceHeight, theTextColor);
 
         DB2(
@@ -1016,15 +940,9 @@ namespace y60 {
             throw GLTextRendererException("SDLTextRenderer - can only render SDLText objects.", PLUS_FILE_LINE);
         }
 
-        SDLFontInfo mySDLFontInfo = (getFontInfo(makeFontName(mySDLText->_myFont, SDLFontInfo::NORMAL)));
-        const TTF_Font * myBoldFont       = getFont(makeFontName(mySDLText->_myFont, SDLFontInfo::BOLD));
-        const TTF_Font * myItalicFont     = getFont(makeFontName(mySDLText->_myFont, SDLFontInfo::ITALIC));
-        const TTF_Font * myBoldItalicFont = getFont(makeFontName(mySDLText->_myFont, SDLFontInfo::BOLDITALIC));
-
         Vector2i myTextSize = createTextSurface(mySDLText->_myString,
             mySDLText->_myFont,
-            mySDLText->_myTextColor,
-            mySDLFontInfo, myBoldFont, myItalicFont, myBoldItalicFont);
+            mySDLText->_myTextStyle._myTextColor);
 
         GLfloat texMinX = 0.0f;         /* Min X */
         GLfloat texMinY = 0.0f;         /* Min Y */
@@ -1056,86 +974,5 @@ namespace y60 {
         DB(AC_TRACE << "unbinding texture" << endl);
         glBindTexture(GL_TEXTURE_2D,0);
         CHECK_OGL_ERROR;
-    }
-
-    void 
-    SDLTextRenderer::copyText2Image() {
-
-        ImagePtr myImage = _myImageNode->getFacade<y60::Image>();
-        // copy data in image
-        if ( _myTextSize[0] == 0 && _myTextSize[1] == 0) {
-            myImage->getRasterPtr()->clear();
-            return;
-        }
-        unsigned int myImageDataSize = getTextureSurface()->w * getTextureSurface()->h * sizeof(asl::RGBA);
-
-        MAKE_GL_SCOPE_TIMER(SDLTextRenderer_renderTextAsImage_assign);
-        myImage->getRasterPtr()->assign(getTextureSurface()->w, getTextureSurface()->h,
-                        ReadableBlockAdapter((unsigned char*)getTextureSurface()->pixels,
-                        (unsigned char*)getTextureSurface()->pixels + myImageDataSize));
-
-    }
-
-//--------------------------------------------------------------------------------
-    AsyncSDLTextRenderer::AsyncSDLTextRenderer(): _myRealTextRenderer(0) {
-    }
-    
-    AsyncSDLTextRenderer::~AsyncSDLTextRenderer() {
-    }
-
-
-    asl::Vector2i 
-        AsyncSDLTextRenderer::renderTextAsImage(TextureManager & theTextureManager,
-            dom::NodePtr theImageNode,
-            const std::string & theText, const std::string & theFontName,
-            unsigned int theTargetWidth, unsigned int theTargetHeight,
-            const asl::Vector2i & theCursorPos) 
-    {
-        //asl::Time myBefore, myAfter;
-        
-        bool myAsyncFlag = false;
-        // preset image
-        MAKE_GL_SCOPE_TIMER(SDLTextRenderer_renderTextAsImage);
-        ImagePtr myImage = theImageNode->getFacade<y60::Image>();
-        if (myImage->getRasterEncoding() != y60::RGBA) {
-            myImage->createRaster(1, 1, 1, y60::RGBA);
-        }
-
-        // render text
-        MAKE_GL_SCOPE_TIMER(SDLTextRenderer_renderTextAsImage2);
-        _myRealTextRenderer = SDLTextRendererPtr(new SDLTextRenderer());
-        _myRealTextRenderer->setImageNode(theImageNode);
-        _myRealTextRenderer->setTextStyle(getTextStyle());
-        _myRealTextRenderer->setCursorPos(theCursorPos);
-
-        SDLFontInfo mySDLFontInfo = (getFontInfo(makeFontName(theFontName, SDLFontInfo::NORMAL)));
-        const TTF_Font * myBoldFont       = getFont(makeFontName(theFontName, SDLFontInfo::BOLD));
-        const TTF_Font * myItalicFont     = getFont(makeFontName(theFontName, SDLFontInfo::ITALIC));
-        const TTF_Font * myBoldItalicFont = getFont(makeFontName(theFontName, SDLFontInfo::BOLDITALIC));
-
-        Vector2i myTextSize(theTargetWidth,theTargetHeight);
-        if (myAsyncFlag) {
-            if (myTextSize[0] == 0 || myTextSize[1] == 0) {
-                myTextSize = _myRealTextRenderer->createTextSurfaceDimension(theText, theFontName, _myRealTextRenderer->getTextColor(),                                                                             
-                                                                             mySDLFontInfo, myBoldFont, myItalicFont, myBoldItalicFont,
-                                                                             theTargetWidth, theTargetHeight);
-                AC_PRINT << "Async text dimension calc: " << myTextSize;
-            }
-        } else {
-            _myRealTextRenderer->renderTextInSurface(theText, theFontName, theTargetWidth, theTargetHeight,
-                                                     mySDLFontInfo, myBoldFont, myItalicFont, myBoldItalicFont);
-            myTextSize = _myRealTextRenderer->getTextSize();
-        }
-        //myAfter.setNow();
-        //unsigned long long myDuration = myAfter.millis() - myBefore.millis();
-        //AC_PRINT << "myDuration : " << myDuration;
-        return myTextSize;
-    }
-
-    void 
-    AsyncSDLTextRenderer::copyText2Image() {
-        if (_myRealTextRenderer) {
-            _myRealTextRenderer->copyText2Image();
-        }
     }
 }
