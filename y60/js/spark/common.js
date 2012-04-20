@@ -327,16 +327,22 @@ function convertToString(theType, theValue) {
  *     Allows getting the property value in string form.
  * 
  */
-function Property(theName, theType, theDefault, theHandler) {
+ const CALL_HANDLER_ON_CHANGE = 1;
+ const CALL_HANDLER_ON_CALL   = 0;
+function Property(theName, theType, theDefault, theHandler, theOnChangePolicy) {
     var myProperty = {};
 
     var myValue = theDefault;
-
+    var myOnChangePolicy = theOnChangePolicy || CALL_HANDLER_ON_CALL;
+    
     this.Getter(theName, function () {
         return myValue;
     });
 
     this.Setter(theName, function (theValue) {
+        if (myOnChangePolicy == CALL_HANDLER_ON_CHANGE && myValue == theValue) {
+            return;
+        }
         myValue = theValue;
         if (theHandler) {
             theHandler(myValue);
@@ -346,7 +352,11 @@ function Property(theName, theType, theDefault, theHandler) {
     myProperty.name = theName;
 
     myProperty.setFromString = function (theString) {
-        myValue = convertFromString(theType, theString);
+        var myNewValue = convertFromString(theType, theString);
+        if (myOnChangePolicy == CALL_HANDLER_ON_CHANGE && myValue == myNewValue) {
+            return;
+        }
+        myValue = myNewValue
         
         if (theHandler) {
             theHandler(myValue);

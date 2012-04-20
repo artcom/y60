@@ -187,10 +187,8 @@ namespace jslib {
         void renderText(const asl::Vector2f & thePixelPosition, const std::string & theString) {
             return renderText(thePixelPosition, theString, getDefaultFont(), getSingleViewport());
         }
-
-        void setTextColor(const asl::Vector4f & theTextColor);
-        const asl::Vector4f & getTextColor();
-
+        const y60::TextStyle & getTextStyle();
+        void setTextStyle(y60::TextStyle & theTextStyle);
         asl::Vector2i renderTextAsImage(dom::NodePtr theImageNode,
                 const std::string & theString, const std::string & theFont,
                 const unsigned int & theTargetWidth=0, const unsigned int & theTargetHeight=0,
@@ -201,12 +199,8 @@ namespace jslib {
         const asl::Vector2i & getTextCursorPosition() const;
         const std::vector<unsigned int> & getLineWidths() const;
         const unsigned int & getMaxWidth() const;
-        void setTextPadding(int topPadding, int bottomPadding, int leftPadding, int rightPadding);
         void setTextIndentation(int theIndentation);
 
-        void setHTextAlignment(unsigned int theHAlignment);
-        void setVTextAlignment(unsigned int theVAlignment);
-        void setLineHeight(unsigned int theLineHeight);
         void setParagraph(unsigned int theTopMargin, unsigned int theBottomMargin);
 
         bool getFontMetrics(const std::string & theFontName,

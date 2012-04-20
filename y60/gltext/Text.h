@@ -63,7 +63,7 @@
 
 #include <asl/base/Ptr.h>
 #include <asl/math/Vector234.h>
-
+#include "TextStyle.h"
 #include <map>
 #include <string>
 namespace y60 {
@@ -74,14 +74,14 @@ namespace y60 {
         public:
             Text(TextRenderer * theRenderer,
                  const asl::Vector2f & thePos,
-                 const asl::Vector4f & theTextColor,
+                 const TextStyle & theTextStyle,
                  const std::string & theString,
                  const std::string theFont);
             virtual ~Text();
             void render();
             const asl::Vector2f _myPos;
             const std::string   _myString;
-   	        const asl::Vector4f _myTextColor;
+            const TextStyle     _myTextStyle;
    	        const std::string   _myFont;
    	        TextRenderer*      _myRenderer;
         private:

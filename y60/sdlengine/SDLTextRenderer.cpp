@@ -208,7 +208,7 @@ namespace y60 {
                                             const asl::Vector2i & theCursorPos)
     {
         MAKE_GL_SCOPE_TIMER(SDLTextRenderer_renderTextAsImage);
-        TTF_SetTracking(_myTracking);
+        TTF_SetTracking(_myTextStyle._myTracking);
 
         ImagePtr myImage = theImageNode->getFacade<y60::Image>();
 
@@ -336,13 +336,13 @@ namespace y60 {
         if (theMinX < 0) {
             theMinX = 0;
         }
-        switch(_myHorizontalAlignment) {
-            case LEFT_ALIGNMENT:
-                return _myLeftPadding - theMinX + static_cast<int>(theLine.indent);
-            case RIGHT_ALIGNMENT:
-                return static_cast<int>(theSurfaceWidth)-_myRightPadding-static_cast<int>(theLine.width);
-            case CENTER_ALIGNMENT:
-                return (_myLeftPadding-_myRightPadding+static_cast<int>(theSurfaceWidth)-static_cast<int>(theLine.width)) / 2;
+        switch(_myTextStyle._myHorizontalAlignment) {
+            case TextStyle::LEFT_ALIGNMENT:
+                return _myTextStyle._myLeftPadding - theMinX + static_cast<int>(theLine.indent);
+            case TextStyle::RIGHT_ALIGNMENT:
+                return static_cast<int>(theSurfaceWidth)-_myTextStyle._myRightPadding-static_cast<int>(theLine.width);
+            case TextStyle::CENTER_ALIGNMENT:
+                return (_myTextStyle._myLeftPadding-_myTextStyle._myRightPadding+static_cast<int>(theSurfaceWidth)-static_cast<int>(theLine.width)) / 2;
             default:
                 break; // avoid unused enum value warning
         }
@@ -351,13 +351,13 @@ namespace y60 {
 
     int
     SDLTextRenderer::calcVerticalAlignment(unsigned theSurfaceHeight, unsigned theTextHeight) {
-        switch(_myVerticalAlignment) {
-            case TOP_ALIGNMENT:
-                return _myTopPadding;
-            case BOTTOM_ALIGNMENT:
-                return static_cast<int>(theSurfaceHeight)-_myBottomPadding-static_cast<int>(theTextHeight);
-            case CENTER_ALIGNMENT:
-                return (_myTopPadding-_myBottomPadding+static_cast<int>(theSurfaceHeight)-static_cast<int>(theTextHeight)) / 2;
+        switch(_myTextStyle._myVerticalAlignment) {
+            case TextStyle::TOP_ALIGNMENT:
+                return _myTextStyle._myTopPadding;
+            case TextStyle::BOTTOM_ALIGNMENT:
+                return static_cast<int>(theSurfaceHeight)-_myTextStyle._myBottomPadding-static_cast<int>(theTextHeight);
+            case TextStyle::CENTER_ALIGNMENT:
+                return (_myTextStyle._myTopPadding-_myTextStyle._myBottomPadding+static_cast<int>(theSurfaceHeight)-static_cast<int>(theTextHeight)) / 2;
             default:
                 break; // avoid unused enum value warning
         }
@@ -605,7 +605,7 @@ namespace y60 {
                 myWordStart = myTextPos;
                 myWordEnd   = myTextPos;
             } else if ( 0 != (myOffset = parseWord(theText, myTextPos))) {
-                if (_myHorizontalAlignment == RIGHT_ALIGNMENT) {
+                if (_myTextStyle._myHorizontalAlignment == TextStyle::RIGHT_ALIGNMENT) {
                     theResult.push_back(Word(theText.substr(myWordStart, myWordEnd - myWordStart)));
                     myNextWordOffset = myOffset;
                 } else {
@@ -655,8 +655,8 @@ namespace y60 {
             if (theLines.back().width + myWord.surface->w > theLineWidth && ((i+1)*theLineHeight <= theSurfaceHeight)) {
                 // start new line
                 theLines.push_back(Line());
-                theLines.back().indent = (myIndentNextLine) ? _myIndentation:0;
-                theLines.back().width = (myIndentNextLine) ? _myIndentation:0;
+                theLines.back().indent = (myIndentNextLine) ? _myTextStyle._myIndentation:0;
+                theLines.back().width = (myIndentNextLine) ? _myTextStyle._myIndentation:0;
             }
 
             // Update line metrics
@@ -668,8 +668,8 @@ namespace y60 {
                     " and wordcount: "<< theLines.back().wordCount << endl;)
                 theLines.back().newline = true;
                 theLines.push_back(Line());
-                theLines.back().indent =  (myIndentNextLine) ? _myIndentation:0;
-                theLines.back().width =  (myIndentNextLine) ? _myIndentation:0;
+                theLines.back().indent =  (myIndentNextLine) ? _myTextStyle._myIndentation:0;
+                theLines.back().width =  (myIndentNextLine) ? _myTextStyle._myIndentation:0;
                 myNewlineCount++;
             } else {
                 // Check if next word fits into the line
@@ -678,14 +678,14 @@ namespace y60 {
                         " wordcount: "<< theLines.back().wordCount << endl;)
                     // start new line
                     theLines.push_back(Line());
-                    theLines.back().indent =  (myIndentNextLine) ? _myIndentation:0;
-                    theLines.back().width =  (myIndentNextLine) ? _myIndentation:0;
+                    theLines.back().indent =  (myIndentNextLine) ? _myTextStyle._myIndentation:0;
+                    theLines.back().width =  (myIndentNextLine) ? _myTextStyle._myIndentation:0;
                 }
             }
         }
 
         // Calculate total height
-        unsigned myTotalHeight = (myNewlineCount + 1) * (_myParagraphBottomOffset + _myParagraphTopOffset);
+        unsigned myTotalHeight = (myNewlineCount + 1) * (_myTextStyle._myParagraphBottomOffset + _myTextStyle._myParagraphTopOffset);
         if (theWords.size()) {
             // Make sure the last is rendered all the way to the bottom
             myTotalHeight += theWords[0].surface->h;
@@ -811,11 +811,11 @@ namespace y60 {
                 }
             }
             myMaxWidth = std::max( myMaxWidth, myWidth );
-            mySurfaceWidth  = myMaxWidth + _myRightPadding + _myLeftPadding;
+            mySurfaceWidth  = myMaxWidth + _myTextStyle._myRightPadding + _myTextStyle._myLeftPadding;
 
             DB2(AC_TRACE << "Set auto-width to " << mySurfaceWidth << endl;)
             if (theTargetHeight == 0) {
-                mySurfaceHeight = myWords[0].surface->h + _myTopPadding + _myBottomPadding;
+                mySurfaceHeight = myWords[0].surface->h + _myTextStyle._myTopPadding + _myTextStyle._myBottomPadding;
             } else {
                 mySurfaceHeight = theTargetHeight;
             }
@@ -826,16 +826,16 @@ namespace y60 {
         }
 
         vector<Line> myLines;
-        unsigned myLineHeight = _myLineHeight;
+        unsigned myLineHeight = _myTextStyle._myLineHeight;
         if (myLineHeight == 0) {
             myLineHeight = TTF_FontLineSkip(getFontInfo(makeFontName(theFontName)).getFont());
         }
 
         unsigned myTotalLineHeight = createLines(myWords, myLines,
-                    mySurfaceWidth-_myLeftPadding-_myRightPadding, myLineHeight, mySurfaceHeight);
+                    mySurfaceWidth-_myTextStyle._myLeftPadding-_myTextStyle._myRightPadding, myLineHeight, mySurfaceHeight);
         if (theTargetHeight == 0) {
             DB2(AC_TRACE << "Set auto-height to " << myTotalLineHeight << endl;)
-            mySurfaceHeight = myTotalLineHeight + _myTopPadding +_myCursorPos[1]+ _myBottomPadding;
+            mySurfaceHeight = myTotalLineHeight + _myTextStyle._myTopPadding +_myCursorPos[1]+ _myTextStyle._myBottomPadding;
         }
 
         _myMaxWidth = 0;
@@ -858,7 +858,7 @@ namespace y60 {
 
         // Render lines
         unsigned myWordCount = 0;
-        int myYPos = calcVerticalAlignment(mySurfaceHeight, myTotalLineHeight) + _myParagraphTopOffset + _myCursorPos[1];
+        int myYPos = calcVerticalAlignment(mySurfaceHeight, myTotalLineHeight) + _myTextStyle._myParagraphTopOffset + _myCursorPos[1];
         for (unsigned i = 0; i < myLines.size(); ++i) {
             int myMinX = myLines[i].wordCount ? myWords[myWordCount].minx : 0;
             int myXPos = calcHorizontalAlignment(mySurfaceWidth, myLines[i], myMinX);
@@ -885,9 +885,9 @@ namespace y60 {
                     _myGlyphPosition.push_back(Vector2i(myGlyphXPos + myWord.sdl_x_position[i+1], unsigned(_myTextureSurface->h) - (myYPos + mySrcHeight)));
                     i +=2;
                 }
-                if (int(mySurfaceHeight) > (_myBottomPadding + myYPos)) {
-                    if (int(mySrcHeight + myYPos) > int(mySurfaceHeight-_myBottomPadding)) {
-                        mySrcHeight = mySurfaceHeight-_myBottomPadding-myYPos;
+                if (int(mySurfaceHeight) > (_myTextStyle._myBottomPadding + myYPos)) {
+                    if (int(mySrcHeight + myYPos) > int(mySurfaceHeight-_myTextStyle._myBottomPadding)) {
+                        mySrcHeight = mySurfaceHeight-_myTextStyle._myBottomPadding-myYPos;
                     }
                 } else {
                     mySrcHeight = 0;
@@ -920,12 +920,12 @@ namespace y60 {
                 myXPos += myWord.surface->w;
                 SDL_FreeSurface(myWord.surface);
             }
-            _myCursorPos[0] = myXPos - _myRightPadding;
+            _myCursorPos[0] = myXPos - _myTextStyle._myRightPadding;
 
             if (myLines[i].newline) {
-                myYPos += _myParagraphBottomOffset + _myParagraphTopOffset;
+                myYPos += _myTextStyle._myParagraphBottomOffset + _myTextStyle._myParagraphTopOffset;
             }
-            _myCursorPos[1] = myYPos - calcVerticalAlignment(mySurfaceHeight, myTotalLineHeight) - _myParagraphTopOffset;
+            _myCursorPos[1] = myYPos - calcVerticalAlignment(mySurfaceHeight, myTotalLineHeight) - _myTextStyle._myParagraphTopOffset;
             myYPos += myLineHeight;
         }
 
@@ -942,7 +942,7 @@ namespace y60 {
 
         Vector2i myTextSize = createTextSurface(mySDLText->_myString,
             mySDLText->_myFont,
-            mySDLText->_myTextColor);
+            mySDLText->_myTextStyle._myTextColor);
 
         GLfloat texMinX = 0.0f;         /* Min X */
         GLfloat texMinY = 0.0f;         /* Min Y */

@@ -11,6 +11,7 @@ Screen8.cpp
 SyntaxBold18.cpp
 SyntaxMed144.cpp
 Text.cpp
+TextStyle.cpp
 TextRenderer.cpp
 TextRendererManager.cpp
 Times12.cpp
@@ -33,6 +34,7 @@ SyntaxMed144.h
 TTFFontInfo.h
 TTFTextRenderer.h
 Text.h
+TextStyle.h
 TextRenderer.h
 TextRendererManager.h
 Times12.h

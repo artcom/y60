@@ -295,7 +295,7 @@ enum PropertyNumbers {
 #define DEFINE_SCENE_FLAG(NAME) { #NAME, PROP_ ## NAME , y60::Scene::NAME }
 #define DEFINE_TEXT_FLAG(NAME) { #NAME, PROP_ ## NAME , y60::Text::NAME }
 #define DEFINE_FONT_FLAG(NAME) { #NAME, PROP_ ## NAME , y60::TTFFontInfo::NAME }
-#define DEFINE_TEXTRENDERER_FLAG(NAME) { #NAME, PROP_ ## NAME , y60::TextRenderer::NAME }
+#define DEFINE_TEXTRENDERER_FLAG(NAME) { #NAME, PROP_ ## NAME , y60::TextStyle::NAME }
 
 JSConstIntPropertySpec *
 JSRenderer::ConstIntProperties() {

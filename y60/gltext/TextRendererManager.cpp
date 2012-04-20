@@ -168,34 +168,6 @@ namespace y60 {
         _myTextSnippetsMap[theViewport->get<IdTag>()].push_back(getTextRendererByFont(theFont).createText(thePos, theString, theFont));
     }
 
-	void
-	TextRendererManager::setColor(const asl::Vector4f & theTextColor) {
-        _myBitmapRenderer.setColor(theTextColor);
-        if (_myTTFRenderer) {
-            _myTTFRenderer->setColor(theTextColor);
-        }
-    }
-    const asl::Vector4f &
-    TextRendererManager::getColor() {
-        return _myBitmapRenderer.getColor();
-    }
-
-	void
-	TextRendererManager::setVTextAlignment(TextRenderer::TextAligment theVAlignment) {
-        _myBitmapRenderer.setVTextAlignment(theVAlignment);
-        if (_myTTFRenderer) {
-            _myTTFRenderer->setVTextAlignment(theVAlignment);
-        }
-    }
-
-	void
-	TextRendererManager::setHTextAlignment(TextRenderer::TextAligment theHAlignment) {
-        _myBitmapRenderer.setHTextAlignment(theHAlignment);
-        if (_myTTFRenderer) {
-            _myTTFRenderer->setHTextAlignment(theHAlignment);
-        }
-    }
-
     const std::vector<asl::Vector2i> &
     TextRendererManager::getGlyphPositions() const {
         if (_myTTFRenderer) {
@@ -232,26 +204,11 @@ const asl::Vector2i &
         }
     }
 
-	void
-	TextRendererManager::setPadding(int topPadding, int bottomPadding, int leftpadding, int rightpadding) {
-        _myBitmapRenderer.setPadding(topPadding, bottomPadding, leftpadding, rightpadding);
-        if (_myTTFRenderer) {
-            _myTTFRenderer->setPadding(topPadding, bottomPadding, leftpadding, rightpadding);
-        }
-    }
-
     void
 	TextRendererManager::setIndentation(int theIndentation) {
         _myBitmapRenderer.setIndentation(theIndentation);
         if (_myTTFRenderer) {
             _myTTFRenderer->setIndentation(theIndentation);
-        }
-    }
-    void
-	TextRendererManager::setLineHeight(unsigned theHeight) {
-        _myBitmapRenderer.setLineHeight(theHeight);
-        if (_myTTFRenderer) {
-            _myTTFRenderer->setLineHeight(theHeight);
         }
     }
 
@@ -263,16 +220,26 @@ const asl::Vector2i &
         }
     }
 
+    const TextStyle & TextRendererManager::getTextStyle() {
+        return _myTTFRenderer->getTextStyle();
+    }
+
+    void TextRendererManager::setTextStyle(TextStyle & theTextStyle) {
+        _myBitmapRenderer.setTextStyle(theTextStyle);
+        _myTTFRenderer->setTextStyle(theTextStyle);
+    }
+
     Vector2i
     TextRendererManager::renderTextAsImage(TextureManager & theTextureManager, dom::NodePtr theImageNode,
                                   const std::string & theString,
                                   const std::string & theFont,
                                   unsigned int theTargetWidth, unsigned int theTargetHeight,
                                   const asl::Vector2i & theCursorPos)
-    {
-        return _myTTFRenderer->renderTextAsImage(theTextureManager,
-                                              theImageNode, theString, theFont,
-                                              theTargetWidth, theTargetHeight, theCursorPos);
+    {        
+        Vector2i mySize = _myTTFRenderer->renderTextAsImage(theTextureManager,
+                                          theImageNode, theString, theFont,
+                                          theTargetWidth, theTargetHeight, theCursorPos);
+        return mySize;
 	}
 
 	void

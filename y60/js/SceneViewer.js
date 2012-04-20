@@ -125,7 +125,7 @@ SceneViewer.prototype.Constructor = function (self, theArguments) {
     var _myPerfMeter              = null;
     var _myOnScreenStatistics     = 0;
     var _myVideoRecorder          = null;
-    var _myStatisticColor         = [1, 1, 1, 1];
+    var _myTextStyle              = new Node("<style textColor='[1,1,1,1]'/>").childNode(0);
     var _myStatisticPositionX     = null;
     var _myStatisticPositionY     = null;
     var _mySinceLastVersion       = "1";
@@ -172,10 +172,8 @@ SceneViewer.prototype.Constructor = function (self, theArguments) {
 
         var myViewport = self.getViewportAtWindowCoordinates(0, 0); // get viewport containing upper left pixel
         for (var i = 0; i < myText.length; ++i) {
-            window.setTextColor([0, 0, 0, 1]);
-            window.renderText([_myStatisticPositionX ? _myStatisticPositionX : (myViewport.size[0] * window.width) - 201, _myStatisticPositionY ? _myStatisticPositionY : 19 + (i * 15)], myText[i], "Screen13", myViewport);
-            window.setTextColor(_myStatisticColor);
-            window.renderText([_myStatisticPositionX ? _myStatisticPositionX : (myViewport.size[0] * window.width) - 200.8, _myStatisticPositionY ? _myStatisticPositionY : 19.2 + (i * 15)], myText[i], "Screen13", myViewport);
+            window.renderText(new Node("<style textColor='[0,0,0,1]'/>").childNode(0), [_myStatisticPositionX ? _myStatisticPositionX : (myViewport.size[0] * window.width) - 201, _myStatisticPositionY ? _myStatisticPositionY : 19 + (i * 15)], myText[i], "Screen13", myViewport);
+            window.renderText(_myTextStyle, [_myStatisticPositionX ? _myStatisticPositionX : (myViewport.size[0] * window.width) - 200.8, _myStatisticPositionY ? _myStatisticPositionY : 19.2 + (i * 15)], myText[i], "Screen13", myViewport);
         }
     }
 
@@ -307,7 +305,7 @@ SceneViewer.prototype.Constructor = function (self, theArguments) {
     };
     
     self.__defineSetter__("statisticColor", function (theColor) {
-        _myStatisticColor = theColor;
+        _myTextStyle.textColor = theColor;
     });
 
     self.__defineSetter__("statisticPositionX", function (thePosition) {

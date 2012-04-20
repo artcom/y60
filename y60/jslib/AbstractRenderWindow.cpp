@@ -517,6 +517,11 @@ AbstractRenderWindow::onFrame() {
         }
     }
 
+    // collect async text render thread image data
+    //if (_myRenderer && _myRenderer->getTextManager()) {
+        //_myRenderer->getTextManager();
+    //}
+
     // update movies and capture
     if (_myScene) {
         MAKE_SCOPE_TIMER(onFrame_updateMovieAndCapture);
@@ -1051,14 +1056,6 @@ void AbstractRenderWindow::renderText(const asl::Vector2f & thePixelPosition, co
     _myRenderer->getTextManager().addText(myRelativePosition, theString, theFont, theViewport);
 }
 
-void AbstractRenderWindow::setTextColor(const asl::Vector4f & theTextColor)
-{
-    _myRenderer->getTextManager().setColor(theTextColor);
-}
-const asl::Vector4f &
-AbstractRenderWindow::getTextColor() {
-    return _myRenderer->getTextManager().getColor();
-}
 
 const asl::Vector2i & AbstractRenderWindow::getTextCursorPosition() const
 {
@@ -1080,32 +1077,30 @@ const unsigned int & AbstractRenderWindow::getMaxWidth() const
     return _myRenderer->getTextManager().getMaxWidth();
 }
 
+const TextStyle & AbstractRenderWindow::getTextStyle() {
+    return _myRenderer->getTextManager().getTextStyle();
+}
+
+void  AbstractRenderWindow::setTextStyle(TextStyle & theTextStyle){
+    _myRenderer->getTextManager().setTextStyle(theTextStyle);
+}
+
 asl::Vector2i AbstractRenderWindow::renderTextAsImage(dom::NodePtr theImageNode,
                                                       const std::string & theString, const std::string & theFont,
                                                       const unsigned int & theTargetWidth, const unsigned int & theTargetHeight,
                                                       const asl::Vector2i & theCursorPos)
 {
-    return _myRenderer->getTextManager().renderTextAsImage(*(_myScene->getTextureManager()),
+    asl::Vector2i mySize = _myRenderer->getTextManager().renderTextAsImage(*(_myScene->getTextureManager()),
         theImageNode, theString, theFont, theTargetWidth, theTargetHeight, theCursorPos);
+
+    return mySize;
 }
 
-void AbstractRenderWindow::setTextPadding(int topPadding, int bottomPadding, int leftPadding, int rightPadding) {
-    _myRenderer->getTextManager().setPadding(topPadding, bottomPadding, leftPadding, rightPadding);
-}
 
 void AbstractRenderWindow::setTextIndentation(int theIndentaion) {
     _myRenderer->getTextManager().setIndentation(theIndentaion);
 }
-void AbstractRenderWindow::setHTextAlignment(unsigned int theHAlignment) {
-    _myRenderer->getTextManager().setHTextAlignment(TextRenderer::TextAligment(theHAlignment));
-}
 
-void AbstractRenderWindow::setVTextAlignment(unsigned int theVAlignment) {
-    _myRenderer->getTextManager().setVTextAlignment(TextRenderer::TextAligment(theVAlignment));
-}
-void AbstractRenderWindow::setLineHeight(unsigned int theLineHeight) {
-    _myRenderer->getTextManager().setLineHeight(theLineHeight);
-}
 void AbstractRenderWindow::setParagraph(unsigned int theTopMargin, unsigned int theBottomMargin) {
     _myRenderer->getTextManager().setParagraph(theTopMargin, theBottomMargin);
 }

@@ -62,8 +62,8 @@ spark.ResizableRectangle.Constructor = function (Protected) {
     });
 
     
-    Public.Property("width",  Number, 1, applySize);
-    Public.Property("height", Number, 1, applySize);
+    Public.Property("width",  Number, 1, applySize, CALL_HANDLER_ON_CHANGE);
+    Public.Property("height", Number, 1, applySize, CALL_HANDLER_ON_CHANGE);
 
     // ORIGIN
     Public.Getter("origin", function () {
@@ -77,9 +77,9 @@ spark.ResizableRectangle.Constructor = function (Protected) {
         Public.originZ = theValue.z;
     });
 
-    Public.Property("originX", Number, 0.0, applySize);
-    Public.Property("originY", Number, 0.0, applySize);
-    Public.Property("originZ", Number, 0.0, applySize);
+    Public.Property("originX", Number, 0.0, applySize, CALL_HANDLER_ON_CHANGE);
+    Public.Property("originY", Number, 0.0, applySize, CALL_HANDLER_ON_CHANGE);
+    Public.Property("originZ", Number, 0.0, applySize, CALL_HANDLER_ON_CHANGE);
 
     Base.realize = Public.realize;
     Public.realize = function (theMaterialOrImageOrShape) {

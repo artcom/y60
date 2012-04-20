@@ -70,12 +70,12 @@ namespace y60 {
 
     Text::Text(TextRenderer *  theRenderer,
                const Vector2f & thePos,
-               const asl::Vector4f & theTextColor,
+               const TextStyle & theTextStyle,
                const string & theString,
                const string theFont)
             : _myPos(thePos),
             _myString(theString),
-            _myTextColor(theTextColor),
+            _myTextStyle(theTextStyle),
             _myFont(theFont),
             _myRenderer(theRenderer)
     {}
