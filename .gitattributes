@@ -1,2 +1,3 @@
 *.sh            eol=lf
+*.sh.in         eol=lf
 *.svg           eol=native

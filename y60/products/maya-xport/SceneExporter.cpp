@@ -66,11 +66,11 @@
 #include "ProgressBar.h"
 
 #include <asl/dom/Nodes.h>
+#include <asl/base/buildinfo.h>
 #include <asl/base/Dashboard.h>
 #include <asl/math/numeric_functions.h>
 #include <asl/base/file_functions.h>
 #include <asl/base/MappedBlock.h>
-#include <asl/base/Revision.h>
 
 #include <y60/scene/SceneBuilder.h>
 #include <y60/scene/LightBuilder.h>
@@ -143,7 +143,11 @@ MStatus
 initializePlugin(MObject theObject) {
     DB(AC_TRACE << "SceneExporter::initializePlugin()" << endl);
     MStatus myStatus;
-    MFnPlugin myPlugin(theObject, "ART+COM XML exporter plugin", ourRevision.c_str(), "Any");
+    std::string myRevision = asl::build_information::get().executable().history_id().substr(0,6);
+    if (myRevision.empty()) {
+        myRevision = "0";
+    }
+    MFnPlugin myPlugin(theObject, "ART+COM XML exporter plugin", myRevision.c_str(), "Any");
 
     // Register the translator with the system
     //
