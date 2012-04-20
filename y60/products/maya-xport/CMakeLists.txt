@@ -41,6 +41,7 @@ configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/install.sh.in
     ${CMAKE_CURRENT_BINARY_DIR}/install.sh
     @ONLY
+    NEWLINE_STYLE LF
 )
 
 set(MAYA_XPORT_PLUGIN_LOCATION)
