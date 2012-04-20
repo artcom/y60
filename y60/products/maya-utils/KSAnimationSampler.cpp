@@ -248,10 +248,10 @@ KSAnimationSampler::doIt( const MArgList & theArgs ) {
         myStatus = MS::kSuccess;
     } catch (const std::exception & ex) {
         myStatus = MS::kFailure;
-        cerr << "std::exception" << endl;
+        cerr << "std::exception " << ex.what() << endl;
     } catch (const asl::Exception & ex) {
         myStatus = MS::kFailure;
-        cerr << "asl::Exception" << endl;
+        cerr << "asl::Exception" << ex << endl;
     } catch (...) {
         myStatus = MS::kFailure;
         cerr << "Unknown exception" << endl;
@@ -360,11 +360,11 @@ KSAnimationSampler::saveKSAnimation( const vector<ValueListPtr> & thePositions,
         myData.resize( myFrameCount );
 
         for (unsigned j = 0; j < myFrameCount; ++j ) {
-            float myP = (*thePositions[j])[i];
+            float myP = static_cast<float>((*thePositions[j])[i]);
             if ( fabs(myP) < 0.001) {
                 myP = 0.0;
             }
-            float myV = (*theVelocities[j])[i];
+            float myV = static_cast<float>((*theVelocities[j])[i]);
             if ( fabs(myV) < 0.001) {
                 myV = 0.0;
             }
