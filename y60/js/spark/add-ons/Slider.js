@@ -20,6 +20,7 @@ spark.Slider.Constructor = function (Protected) {
     var _verticalLock       = null;
     var _centered           = null;
     var _sticky             = null;
+    var _snappy             = null;
     var _precision          = 10;
                             
     var _myEventTarget      = null;
@@ -28,6 +29,7 @@ spark.Slider.Constructor = function (Protected) {
     var _myPosHistory       = {};
     
     var _stopTime           = 0;
+    var _myCursorOffset     = null;
 
     var DAMPENING_HISTORY = 5;
     
@@ -109,6 +111,14 @@ spark.Slider.Constructor = function (Protected) {
         return _sticky;
     });
     
+    Public.__defineSetter__("snappy", function (theFlag) {
+        _snappy = theFlag;
+    });
+    
+    Public.__defineGetter__("snappy", function () {
+        return _snappy;
+    });
+    
     Public.__defineSetter__("precision", function (thePrecision) {
         _precision = thePrecision;
     });
@@ -160,6 +170,7 @@ spark.Slider.Constructor = function (Protected) {
         _horizontalLock = Protected.getBoolean("horizontal-lock", false);
         _centered       = Protected.getBoolean("centered", true);
         _sticky         = Protected.getBoolean("sticky", true);
+        _snappy         = Protected.getBoolean("snappy", true);
         _precision      = Protected.getNumber("precision", _precision);
         
         Public.addEventListener(spark.CursorEvent.APPEAR_ENTER, Public.onSlideStart, true);
@@ -180,6 +191,14 @@ spark.Slider.Constructor = function (Protected) {
         _myIdleCursor.visible   = false;
         _myActiveCursor.visible = true;
         theEvent.cursor.grab(theEvent.target);
+        _myCursorOffset = new Vector2f(theEvent.stageX - _myActiveCursor.worldPosition.x, 
+                                        Public.stage.height - theEvent.stageY - _myActiveCursor.worldPosition.y);
+        if ((_myCursorOffset.x > _myActiveCursor.width || _myCursorOffset.x < 0) && _snappy) {
+            _myCursorOffset.x = _myActiveCursor.width/2;
+        }
+         if ((_myCursorOffset.y > _myActiveCursor.height || _myCursorOffset.y < 0) && _snappy) {
+            _myCursorOffset.y = _myActiveCursor.height/2;
+        }
         Public.onSlide(theEvent);
         if (_myEventTarget) {
             var mySliderStart = new spark.SliderEvent(spark.SliderEvent.START,
@@ -219,7 +238,7 @@ spark.Slider.Constructor = function (Protected) {
                 var myNewX = theEvent.dampenedPos.x -
                              Public.worldPosition.x -
                              _mySliderBackground.x -
-                             _myActiveCursor.width / 2;
+                             _myCursorOffset.x;
                 var myMinX = _mySliderBackground.x;
                 if (myNewX < myMinX) {
                     _myActiveCursor.x = myMinX;
@@ -239,7 +258,7 @@ spark.Slider.Constructor = function (Protected) {
                              Public.stage.height -
                              Public.worldPosition.y -
                              _mySliderBackground.y -
-                             _myActiveCursor.height / 2;
+                             _myCursorOffset.y;
                 var myMinY = _mySliderBackground.y;
                 if (myNewY < myMinY) {
                     _myActiveCursor.y = myMinY;
