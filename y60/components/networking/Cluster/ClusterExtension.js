@@ -394,15 +394,14 @@ ClusterExtensionApp.prototype.Constructor = function(self, theArguments) {
 
     function createTextOverlay() {
         window.loadTTF("Arial", "${PRO}/src/y60/gl/text/fonts/arial.ttf", 18);
-        window.setTextPadding(10,10,10,10);
-        window.setTextColor([0.2,0.2,1,1]);
 
         var myTextImage = self.getImageManager().getImageNode("infobox");
         _myTextOverlay = new ImageOverlay(window.getScene(), myTextImage.id, [0,0]);
         _myTextOverlay.texture.applymode = "decal";
         _myTextOverlay.color = new Vector4f(0.8,0.8,1,0.6);
 
-        var myTextSize = window.renderTextAsImage(myTextImage, "Press Ctrl-Q to quit.", "Arial", 300, 0);
+        var myTextSize = window.renderTextAsImage( myTextImage, "Press Ctrl-Q to quit.",
+                                                   new Node("<style textColor='[0.2,0.2,1,1]'/>").childNode(0),  "Arial", 300, 0);
         _myTextOverlay.width  = myTextSize.x;
         _myTextOverlay.height = myTextSize.y;
         _myTextOverlay.srcsize.x = myTextSize.x / myTextImage.width;

@@ -306,7 +306,7 @@ PerfMeter.prototype.Constructor = function (self, theSceneViewer) {
                 myPosition = sum(_myOverlay.position, new Vector2f(xToMap(myTiming.frame), yToMap(_myBaseLine) - i * 14));
                 // print("pos = "+myPosition);
                 var myTextColor = new Vector4f(1, 0.5, 0, 1);                            
-                window.renderText(new Node("<style textColor='" + myTextColor + "'/>").childNode(0), myPosition, myTiming.name + "=" + (myTiming.lastelapsed * 1000).toFixed(1) + "ms", "Screen13", myViewport);
+                window.renderText(myPosition, myTiming.name + "=" + (myTiming.lastelapsed * 1000).toFixed(1) + "ms", new Node("<style textColor='" + myTextColor + "'/>").childNode(0), "Screen13", myViewport);
             }
             ++i;
         }

@@ -24,20 +24,15 @@ try {
 
     ourShow.SceneTester = [];
     ourCounter = 0;
-    function renderTextPart(theText, thePosition) {
-        window.setHTextAlignment(Renderer.LEFT_ALIGNMENT);
-        window.setVTextAlignment(Renderer.TOP_ALIGNMENT);
-        window.setLineHeight(0);
-        window.setParagraph(0, 0);
-        window.setTextPadding(0,0,0,0);
-        window.setTracking(0.0);
+    function renderTextPart(theText, thePosition, theTextColor) {
         //var myImageNode = ourShow.getImageManager().getImageNode(ourCounter++);
         var myImageNode = Node.createElement("image");
         window.scene.images.appendChild(myImageNode);
         myImageNode.name = ourCounter++;
         myImageNode.resize = "none";
         
-        var myTextSize = window.renderTextAsImage( myImageNode, theText, "Arial60", 600, 400, thePosition);
+        var myTextSize = window.renderTextAsImage(myImageNode, theText, "Arial60", 
+                                                  new Node("<style textColor='" + theTextColor + "'/>").childNode(0), 600, 400, thePosition);
         var myCursorPos = window.getTextCursorPosition();
         var myOverlay = new ImageOverlay(window.scene, myImageNode);
         myOverlay.position.x = 100;
@@ -54,24 +49,19 @@ try {
         window.loadTTF("Arial60", "fonts/arial.ttf", 60, Renderer.NOHINTING);
         var myTextPos = [0,0];
 
-        window.setTextColor([1,1,1,1]);
-        renderTextPart("The quick ", myTextPos);
+        renderTextPart("The quick ", myTextPos, new Vector4f(1,1,1,1));
         myTextPos = window.getTextCursorPosition();
 
-        window.setTextColor([1,0,0,1]);
-        renderTextPart("red ", myTextPos);
+        renderTextPart("red ", myTextPos, new Vector4f(1,0,0,1));
         myTextPos = window.getTextCursorPosition();
 
-        window.setTextColor([1,1,1,1]);
-        renderTextPart("fox jumps over the lazy ", myTextPos);
+        renderTextPart("fox jumps over the lazy ", myTextPos, new Vector4f(1,1,1,1));
         myTextPos = window.getTextCursorPosition();
 
-        window.setTextColor([0.5,0.3,0,0.3]);
-        renderTextPart("brown ", myTextPos);
+        renderTextPart("brown ", myTextPos, new Vector4f(0.5,0.3,0,0.3));
         myTextPos = window.getTextCursorPosition();
 
-        window.setTextColor([1,1,1,1]);
-        renderTextPart("dog.", myTextPos);
+        renderTextPart("dog.", myTextPos, new Vector4f(1,1,1,1));
 
     }
     ourShow.setup(800, 600);

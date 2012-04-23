@@ -142,6 +142,7 @@ namespace y60 {
             default:
                 throw GLTextRendererException("Sorry, font not found: " + theText->_myFont, PLUS_FILE_LINE);
         };
+
     }
 
     bool

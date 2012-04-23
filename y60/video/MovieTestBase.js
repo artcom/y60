@@ -118,14 +118,13 @@ function MovieTestBase(Public, theArguments, theDecoderName) {
         Base.onPostRender();
 
         var myPos = 10;
-        window.setTextColor([1,1,1,1]);
         if (_myMovie) {
             myPos += 20;
             var myText  = getFilenamePart(_myMovie.src) + " " + _myMovie.playmode
-            window.renderText([10, myPos], myText, "Screen15");
+            window.renderText([10, myPos], myText, new Node("<style/>").childNode(0), "Screen15");
             myPos += 20;
             myText  = " Frame " + _myMovie.currentframe + " of " + _myMovie.framecount;
-            window.renderText([10, myPos], myText, "Screen15");
+            window.renderText( [10, myPos], myText, new Node("<style/>").childNode(0), "Screen15");
         }
     }
 

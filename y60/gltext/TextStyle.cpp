@@ -165,7 +165,7 @@ namespace y60 {
     }
     TextStyle::~TextStyle() {}
     void TextStyle::fillDefault() {
-        _myTextColor = Vector4f(0.0, 0.0, 0.0, 1.0);
+        _myTextColor = Vector4f(1.0, 1.0, 1.0, 1.0);
         _myTopPadding = 0;
         _myBottomPadding = 0;
         _myLeftPadding = 0;

@@ -111,7 +111,8 @@ MovieLeakUnitTest.prototype.Constructor = function(obj, theName, theFiles, theDe
                 //print("---- memory = "+getProcessMemoryUsage());
                 toggleMovie();
                 var myText = "Loop : " + (_myFrameCount - START_FRAMES) + "/" + theVideoCount;
-                window.renderText([500,100], myText, "Screen15");
+                
+                window.renderText([500,100], myText);
             } else if (_myFrameCount >= START_FRAMES + theVideoCount + END_FRAMES + 1) {
                 //window.scene.save("empty.xml", false);
                 var myUsedMemory = myMem;
@@ -153,11 +154,11 @@ MovieLeakUnitTest.prototype.Constructor = function(obj, theName, theFiles, theDe
                 _myMinFrame = _myFrameCount;
             }
 
-            window.renderText([500,150], "Delta memory usage: " + asMemoryString(myMem-_myLastMemory), "Screen15");
-            window.renderText([500,175], "Total memory usage: " + asMemoryString(myMem), "Screen15");
-            window.renderText([500,200], "Trend:              " + _myTrend.toFixed(0), "Screen15");
-            window.renderText([500,225], "Max. memory usage:  " + asMemoryString(_myMaxMemory), "Screen15");
-            window.renderText([500,250], "Max. in Frame       " + _myMaxFrame, "Screen15");
+            window.renderText( [500,150], "Delta memory usage: " + asMemoryString(myMem-_myLastMemory));
+            window.renderText( [500,175], "Total memory usage: " + asMemoryString(myMem));
+            window.renderText( [500,200], "Trend:              " + _myTrend.toFixed(0));
+            window.renderText( [500,225], "Max. memory usage:  " + asMemoryString(_myMaxMemory));
+            window.renderText( [500,250], "Max. in Frame       " + _myMaxFrame);
             _myFrameCount++;
             _myLastMemory = myMem;
         }

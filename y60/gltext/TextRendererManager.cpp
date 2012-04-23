@@ -205,12 +205,18 @@ const asl::Vector2i &
     }
 
     const TextStyle & TextRendererManager::getTextStyle() {
-        return _myTTFRenderer->getTextStyle();
+        if (_myTTFRenderer) {
+            return _myTTFRenderer->getTextStyle();
+        } else {
+            return _myBitmapRenderer.getTextStyle();
+        }
     }
 
     void TextRendererManager::setTextStyle(TextStyle & theTextStyle) {
         _myBitmapRenderer.setTextStyle(theTextStyle);
-        _myTTFRenderer->setTextStyle(theTextStyle);
+        if (_myTTFRenderer) {
+            _myTTFRenderer->setTextStyle(theTextStyle);
+        }
     }
 
     Vector2i
