@@ -147,8 +147,11 @@ namespace y60 {
         fillDefault();
         _myTextColor = myTextColor;
     }
-    TextStyle::TextStyle(dom::NodePtr myStyleNode) {
+    TextStyle::TextStyle(dom::NodePtr theStyleNode) {
         fillDefault();
+        dom::NodePtr myStyleNode  = (theStyleNode->nodeType() == dom::Node::DOCUMENT_NODE
+                                     && theStyleNode->hasChildNodes()) ? theStyleNode->firstChild() : theStyleNode;
+        
         getAttributeFromNode(myStyleNode, TOP_PADDING_NAME, _myTopPadding);        
         getAttributeFromNode(myStyleNode, BOTTOM_PADDING_NAME, _myBottomPadding);        
         getAttributeFromNode(myStyleNode, LEFT_PADDING_NAME, _myLeftPadding);        
