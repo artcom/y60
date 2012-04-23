@@ -519,7 +519,7 @@ AbstractRenderWindow::onFrame() {
 
     // update images
     if (_myScene) {
-        std::vector<ImagePtr> myImages = _myScene->getImagesRoot()->getAllFacades<Capture>(IMAGE_NODE_NAME);        
+        std::vector<ImagePtr> myImages = _myScene->getImagesRoot()->getAllFacades<Image>(IMAGE_NODE_NAME);        
         for (unsigned i = 0; i < myImages.size(); ++i) {
             //_myScene->getTextureManager()->loadCaptureFrame(myCaptures[i]);
         }
