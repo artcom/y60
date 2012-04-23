@@ -517,10 +517,13 @@ AbstractRenderWindow::onFrame() {
         }
     }
 
-    // collect async text render thread image data
-    //if (_myRenderer && _myRenderer->getTextManager()) {
-        //_myRenderer->getTextManager();
-    //}
+    // update images
+    if (_myScene) {
+        std::vector<ImagePtr> myImages = _myScene->getImagesRoot()->getAllFacades<Capture>(IMAGE_NODE_NAME);        
+        for (unsigned i = 0; i < myImages.size(); ++i) {
+            //_myScene->getTextureManager()->loadCaptureFrame(myCaptures[i]);
+        }
+    }
 
     // update movies and capture
     if (_myScene) {
