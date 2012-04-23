@@ -168,10 +168,6 @@ class JSAbstractRenderWindow :  public JSWrapper<DERIVED, asl::Ptr<DERIVED>, Sta
         static JSBool
         getTextMaxWidth(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool
-        setTextIndentation(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
-        static JSBool
-        setParagraph(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
-        static JSBool
         getFontMetrics(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool
         getGlyphMetrics(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
@@ -179,8 +175,6 @@ class JSAbstractRenderWindow :  public JSWrapper<DERIVED, asl::Ptr<DERIVED>, Sta
         getKerning(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool
         hasGlyph(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
-        static JSBool
-        setTracking(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool
         playClip(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool

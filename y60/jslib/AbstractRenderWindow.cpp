@@ -1099,15 +1099,6 @@ asl::Vector2i AbstractRenderWindow::renderTextAsImage(dom::NodePtr theImageNode,
     return mySize;
 }
 
-
-void AbstractRenderWindow::setTextIndentation(int theIndentaion) {
-    _myRenderer->getTextManager().setIndentation(theIndentaion);
-}
-
-void AbstractRenderWindow::setParagraph(unsigned int theTopMargin, unsigned int theBottomMargin) {
-    _myRenderer->getTextManager().setParagraph(theTopMargin, theBottomMargin);
-}
-
 bool AbstractRenderWindow::getFontMetrics(const std::string & theFontName,
                                           int & theFontHeight,
                                           int & theFontAscent, int & theFontDescent,
@@ -1129,9 +1120,6 @@ double AbstractRenderWindow::getKerning(const std::string & theFontName,
 bool AbstractRenderWindow::hasGlyph(const std::string & theFontName,
                                     const std::string & theCharacter) {
                                         return _myRenderer->getTextManager().hasGlyph(theFontName, theCharacter);
-}
-void AbstractRenderWindow::setTracking(float theTracking) {
-    _myRenderer->getTextManager().setTracking(theTracking);
 }
 
 // =======================================================================

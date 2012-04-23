@@ -664,26 +664,6 @@ JSAbstractRenderWindow<DERIVED>::getTextMaxWidth(JSContext *cx, JSObject *obj, u
 
 template<class DERIVED>
 JSBool
-JSAbstractRenderWindow<DERIVED>::setTextIndentation(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Sets the indentation for 2nd and following lines of a paragraph");
-    DOC_PARAM("theIndentation", "", DOC_TYPE_INTEGER);
-    DOC_END;
-    typedef void (DERIVED::*MyMethod)(int);
-    return Method<DERIVED>::call((MyMethod)&DERIVED::setTextIndentation,cx,obj,argc,argv,rval);
-}
-template<class DERIVED>
-JSBool
-JSAbstractRenderWindow<DERIVED>::setParagraph(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Sets top and bottom margins in pixel for text paragraphs");
-    DOC_PARAM("theTopMargin", "", DOC_TYPE_INTEGER);
-    DOC_PARAM("theBottomMargin", "", DOC_TYPE_INTEGER);
-    DOC_END;
-    typedef void (DERIVED::*MyMethod)(unsigned, unsigned);
-    return Method<DERIVED>::call((MyMethod)&DERIVED::setParagraph,cx,obj,argc,argv,rval);
-}
-
-template<class DERIVED>
-JSBool
 JSAbstractRenderWindow<DERIVED>::getFontMetrics(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Gets metrics of the given font");
     DOC_PARAM("theFont", "Font name", DOC_TYPE_STRING);
@@ -776,15 +756,6 @@ JSAbstractRenderWindow<DERIVED>::hasGlyph(JSContext *cx, JSObject *obj, uintN ar
     DOC_END;
     typedef bool (DERIVED::*MyMethod)(const std::string &, const std::string &);
     return Method<DERIVED>::call((MyMethod)&DERIVED::hasGlyph,cx,obj,argc,argv,rval);
-}
-template<class DERIVED>
-JSBool
-JSAbstractRenderWindow<DERIVED>::setTracking(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Set font tracking");
-    DOC_PARAM("theTracking", "Tracking value", DOC_TYPE_FLOAT);
-    DOC_END;
-    typedef void (DERIVED::*MyMethod)(float);
-    return Method<DERIVED>::call((MyMethod)&DERIVED::setTracking,cx,obj,argc,argv,rval);
 }
 
 template<class DERIVED>
@@ -982,13 +953,10 @@ JSFunctionSpec * JSAbstractRenderWindow<DERIVED>::BaseFunctions() {
         {"getTextGlyphPositions", getTextGlyphPositions, 0},        
         {"getTextLineWidths",  getTextLineWidths,        0},
         {"getTextMaxWidth",    getTextMaxWidth,          0},
-        {"setTextIndentation", setTextIndentation,       1},
-        {"setParagraph",       setParagraph,             2},
         {"getFontMetrics",     getFontMetrics,           1},
         {"getGlyphMetrics",    getGlyphMetrics,          2},
         {"getKerning",         getKerning,               3},
         {"hasGlyph",           hasGlyph,                 2},
-        {"setTracking",        setTracking,              1},
         // animations
         {"runAnimations",      runAnimations,            1},
         {"playClip",           playClip,                 3},

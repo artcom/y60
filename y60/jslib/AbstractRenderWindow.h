@@ -199,10 +199,6 @@ namespace jslib {
         const asl::Vector2i & getTextCursorPosition() const;
         const std::vector<unsigned int> & getLineWidths() const;
         const unsigned int & getMaxWidth() const;
-        void setTextIndentation(int theIndentation);
-
-        void setParagraph(unsigned int theTopMargin, unsigned int theBottomMargin);
-
         bool getFontMetrics(const std::string & theFontName,
                 int & theFontHeight,
                 int & theFontAscent, int & theFontDescent,
@@ -218,8 +214,6 @@ namespace jslib {
 
         bool hasGlyph(const std::string & theFontName,
                        const std::string & theCharacter);
-
-        void setTracking(float theTracking);
 
         // Animation Manager
         void runAnimations(float theTime);

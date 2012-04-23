@@ -82,6 +82,10 @@ namespace y60 {
     static const char * const VERTICAL_ALIGNMENT_NAME = "vAlign";
     static const char * const TRACKING_NAME = "tracking";
     static const char * const TEXTCOLOR_NAME = "textColor";
+    static const char * const PARAGRAPH_BOTTOM_OFFSET_NAME = "paragraphBottomOffset";
+    static const char * const PARAGRAPH_TOP_OFFSET_NAME = "paragraphTopOffset";
+    static const char * const TEXT_INDENTATION_NAME = "indentation";
+    
 
     void getAttributeFromNode(dom::NodePtr theStyleNode, const std::string& theAttributeName, TextStyle::TextAligment & theMember) {
         if (theStyleNode->getAttribute(theAttributeName)) {
@@ -149,8 +153,12 @@ namespace y60 {
         getAttributeFromNode(myStyleNode, BOTTOM_PADDING_NAME, _myBottomPadding);        
         getAttributeFromNode(myStyleNode, LEFT_PADDING_NAME, _myLeftPadding);        
         getAttributeFromNode(myStyleNode, RIGHT_PADDING_NAME, _myRightPadding);        
-        getAttributeFromNode(myStyleNode, LINE_HEIGHT_NAME, _myLineHeight);        
+        getAttributeFromNode(myStyleNode, LINE_HEIGHT_NAME, _myLineHeight);
+        getAttributeFromNode(myStyleNode, PARAGRAPH_BOTTOM_OFFSET_NAME, _myParagraphBottomOffset);
+        getAttributeFromNode(myStyleNode, PARAGRAPH_TOP_OFFSET_NAME, _myParagraphTopOffset);
         getAttributeFromNode(myStyleNode, HORIZONTAL_ALIGNMENT_NAME, _myHorizontalAlignment);        
+        getAttributeFromNode(myStyleNode, TEXT_INDENTATION_NAME, _myIndentation);        
+        
         getAttributeFromNode(myStyleNode, VERTICAL_ALIGNMENT_NAME, _myVerticalAlignment);        
         getAttributeFromNode(myStyleNode, TRACKING_NAME, _myTracking);        
         getColorAttributeFromNode(myStyleNode, TEXTCOLOR_NAME, _myTextColor);        

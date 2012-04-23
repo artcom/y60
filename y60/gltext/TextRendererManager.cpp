@@ -204,22 +204,6 @@ const asl::Vector2i &
         }
     }
 
-    void
-	TextRendererManager::setIndentation(int theIndentation) {
-        _myBitmapRenderer.setIndentation(theIndentation);
-        if (_myTTFRenderer) {
-            _myTTFRenderer->setIndentation(theIndentation);
-        }
-    }
-
-	void
-	TextRendererManager::setParagraph(unsigned theTopOffset, unsigned theBottomOffset) {
-        _myBitmapRenderer.setParagraph(theTopOffset, theBottomOffset);
-        if (_myTTFRenderer) {
-            _myTTFRenderer->setParagraph(theTopOffset, theBottomOffset);
-        }
-    }
-
     const TextStyle & TextRendererManager::getTextStyle() {
         return _myTTFRenderer->getTextStyle();
     }
@@ -276,11 +260,6 @@ const asl::Vector2i &
     TextRendererManager::hasGlyph(const std::string& theFontName, const std::string& theCharacter) const
     {
         return _myTTFRenderer->hasGlyph(theFontName, theCharacter);
-    }
-
-    void
-    TextRendererManager::setTracking(float theTracking) {
-        _myTTFRenderer->setTracking(theTracking);
     }
 
 }
