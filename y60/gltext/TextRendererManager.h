@@ -90,8 +90,6 @@ namespace y60 {
             void render(ViewportPtr theViewport);
             void addText(const asl::Vector2f & thePos, const std::string & theString,
                     const std::string & theFont, ViewportPtr theViewport);
-	        void setIndentation(int theIndentation);
-            void setParagraph(unsigned theTopOffset, unsigned theBottomOffset);
             void loadTTF(const std::string & theName, const std::string & theFileName,
                     int theHeight, TTFFontInfo::FONTHINTING & theFonthint, TTFFontInfo::FONTTYPE & theFonttype, 
                     int theAscendOffse = 0);
@@ -116,7 +114,6 @@ namespace y60 {
                     asl::Box2f & theGlyphBox, double & theAdvance) const;
             double getKerning(const std::string & theFontName, const std::string & theFirstCharacter, const std::string & theSecondCharacter) const;
             bool hasGlyph(const std::string & theFontName, const std::string & theCharacter) const;
-            void setTracking(float theTracking);
 
         private:
             TextRenderer & getTextRendererByFont(const std::string & theFont);

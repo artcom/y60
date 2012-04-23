@@ -100,23 +100,8 @@ namespace y60 {
                 return _myGlyphPosition;
             }
 
-            void setColor(const asl::Vector4f & theTextColor);
             const asl::Vector4f & getColor();
-            void setPadding(int theTop, int theBottom, int theLeft, int theRight);
             void setCursor(asl::Vector2i thePosition);
-            void setIndentation(int theIndent);
-        	void setVTextAlignment(TextStyle::TextAligment theVAlignment);
-	        void setHTextAlignment(TextStyle::TextAligment theHAlignment);
-	        void setLineHeight(unsigned theHeight) {
-	            _myTextStyle._myLineHeight = theHeight;
-	        }
-        	void setParagraph(unsigned theTopOffset, unsigned theBottomOffset) {
-        	    _myTextStyle._myParagraphTopOffset    = theTopOffset;
-        	    _myTextStyle._myParagraphBottomOffset = theBottomOffset;
-        	}
-            void setTracking(float theTracking) {
-                _myTextStyle._myTracking = theTracking;
-            }
 
             const unsigned int & getWindowHeight() const { return _myWindowHeight; }
             const unsigned int & getWindowWidth() const { return _myWindowWidth; }

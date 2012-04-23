@@ -106,21 +106,9 @@ namespace y60 {
         _myTextStyle = theTextStyle;
     }
 
-    void
-    TextRenderer::setColor(const asl::Vector4f & theTextColor) {
-        _myTextStyle._myTextColor = theTextColor;
-    }
     const asl::Vector4f &
     TextRenderer::getColor() {
         return _myTextStyle._myTextColor;
-    }
-
-    void
-    TextRenderer::setPadding(int theTop, int theBottom, int theLeft, int theRight) {
-        _myTextStyle._myTopPadding = theTop;
-        _myTextStyle._myBottomPadding = theBottom;
-        _myTextStyle._myLeftPadding = theLeft;
-        _myTextStyle._myRightPadding = theRight;
     }
 
     void
@@ -128,18 +116,4 @@ namespace y60 {
         _myCursorPos = thePosition;
     }
 
-    void
-    TextRenderer::setIndentation(int theIndent) {
-        _myTextStyle._myIndentation = theIndent;
-    }
-
-	void
-	TextRenderer::setVTextAlignment(TextStyle::TextAligment theVAlignment) {
-	    _myTextStyle._myVerticalAlignment = theVAlignment;
-	}
-
-    void
-    TextRenderer::setHTextAlignment(TextStyle::TextAligment theHAlignment) {
-        _myTextStyle._myHorizontalAlignment = theHAlignment;
-	}
 }
