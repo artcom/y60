@@ -306,7 +306,6 @@ JSAbstractRenderWindow<DERIVED>::printStatistics(JSContext *cx, JSObject *obj, u
     DOC_BEGIN("Prints render statistics and profiling information to the console");
     DOC_END;
     typedef void (DERIVED::*MyMethod)(void);
-    AC_PRINT << "JSAbstractRenderWindow::printStatistics";
     return Method<DERIVED>::call((MyMethod)&DERIVED::printStatistics,cx,obj,argc,argv,rval);
 }
 template<class DERIVED>
