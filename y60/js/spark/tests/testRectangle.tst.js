@@ -19,7 +19,7 @@ RectangleUnitTest.prototype.Constructor = function (obj, theName) {
         ENSURE_EQUAL(1, obj.App.children.length, "has one child");
         var myRectangle = obj.App.getChildByName("testRectangle");
         ENSURE_EQUAL("testRectangle", myRectangle.name, "Rectangle has correct name");
-        ENSURE_EQUAL("[1,0.5,0,1]", myRectangle.color.toString(), "Rectangle has correct correctColor");
+        ENSURE_EQUAL("[1,0.5,0]", myRectangle.color.toString(), "Rectangle has correct correctColor");
         ENSURE_EQUAL(50, myRectangle.x, "correct x");
         ENSURE_EQUAL(40, myRectangle.y, "correct y");
         ENSURE_EQUAL(0, myRectangle.z, "correct z");
