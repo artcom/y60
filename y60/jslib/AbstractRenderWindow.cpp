@@ -1077,11 +1077,11 @@ const unsigned int & AbstractRenderWindow::getMaxWidth() const
     return _myRenderer->getTextManager().getMaxWidth();
 }
 
-const TextStyle & AbstractRenderWindow::getTextStyle() {
+const y60::TextStyle & AbstractRenderWindow::getTextStyle() {
     return _myRenderer->getTextManager().getTextStyle();
 }
 
-void  AbstractRenderWindow::setTextStyle(TextStyle & theTextStyle){
+void  AbstractRenderWindow::setTextStyle(y60::TextStyle & theTextStyle){
     _myRenderer->getTextManager().setTextStyle(theTextStyle);
 }
 
