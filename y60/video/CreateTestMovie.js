@@ -130,8 +130,8 @@ function CreateTestMovie(theArguments) {
         var myTimeString = myMinutesString + ":" + mySecondsString + "." + myFramesString;
 
         var myPos = [MOVIE_WIDTH/2 - 30, MOVIE_HEIGHT/2];
-        window.setTextColor([1,0,0,1]);
-        window.renderText(myPos, myTimeString, "Screen15");
+        window.renderText( myPos, myTimeString, 
+                           new Node("<style textColor='[1,0,0,1]'/>").childNode(0), "Screen15");
 
         if(myFrames < 0.1) {
             if (mySeconds % 10 == 0){

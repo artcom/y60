@@ -33,13 +33,15 @@ try {
     var onPreRender = ourShow.onPreRender;
     ourShow.onPreRender = function() {
         onPreRender();
-        ourShow.getRenderWindow().setTextColor([1,0,0,1]);
-        ourShow.getRenderWindow().renderText([400, 30], "Normal", "Screen15");
-        ourShow.getRenderWindow().renderText([600, 30], "Flipped", "Screen15");
+        var myTextColor = new Vector4f(1,0,0,1);       
+        var myTextStyle = new Node("<style textColor='" + myTextColor + "'/>").childNode(0);
+        ourShow.getRenderWindow().renderText([400, 30], "Normal", myTextStyle, "Screen15");
+        ourShow.getRenderWindow().renderText([600, 30], "Flipped", myTextStyle, "Screen15");
 
         var myPos = 90;
         for (var i = 0; i < _myTests.length; ++i) {
-            ourShow.getRenderWindow().renderText([10, myPos], "Renderstyle: " + _myTests[i], "Screen15");
+            ourShow.getRenderWindow().renderText([10, myPos], "Renderstyle: " + _myTests[i], 
+                                                 new Node("<style textColor='" + myTextColor + "'/>").childNode(0), "Screen15");
             myPos += 100;
         }
     }

@@ -362,9 +362,10 @@ spark.renderText = function(theImage, theText, theStyle, theSize, theMaxTextWidt
     }
     
     var myTextSize =
-        window.renderTextAsImage(theStyle, theImage,
+        window.renderTextAsImage(theImage,
                                  theText,
                                  myFont,
+                                 theStyle,
                                  mySize.x*theStyle.fontScale, mySize.y*theStyle.fontScale);
     var myGlyphPosition = window.getTextGlyphPositions();  
     if (theStyle.fontScale != 1.0) {

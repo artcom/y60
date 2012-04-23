@@ -232,7 +232,7 @@ function setupOffscreenRendering() {
     ourOffscreenRenderArea.getRenderer().boundingVolumeMode = window.getRenderer().boundingVolumeMode;
 
     ourOffscreenRenderArea.onFrame = function() {
-        ourOffscreenRenderArea.renderText([30, 500], ourFrameCounter + ". " + ourTests[ourFrameCounter].title);
+        ourOffscreenRenderArea.renderText(new Node("<style/>").childNode(0), [30, 500], ourFrameCounter + ". " + ourTests[ourFrameCounter].title);
     }
 
     ourOffscreenRenderArea.onPreViewport = function() {

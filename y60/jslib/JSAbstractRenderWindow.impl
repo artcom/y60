@@ -306,6 +306,7 @@ JSAbstractRenderWindow<DERIVED>::printStatistics(JSContext *cx, JSObject *obj, u
     DOC_BEGIN("Prints render statistics and profiling information to the console");
     DOC_END;
     typedef void (DERIVED::*MyMethod)(void);
+    AC_PRINT << "JSAbstractRenderWindow::printStatistics";
     return Method<DERIVED>::call((MyMethod)&DERIVED::printStatistics,cx,obj,argc,argv,rval);
 }
 template<class DERIVED>
@@ -437,39 +438,40 @@ template<class DERIVED>
 JSBool
 JSAbstractRenderWindow<DERIVED>::renderText(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Renders a text onto the screen");
-    DOC_PARAM("theStyleObject", "A textstyle object", DOC_TYPE_OBJECT);    
     DOC_PARAM("thePosition in Pixel", "", DOC_TYPE_VECTOR2F);
     DOC_PARAM("theTextString", "", DOC_TYPE_STRING);
+    DOC_PARAM("theStyleObject", "A textstyle object", DOC_TYPE_OBJECT);    
     DOC_PARAM_OPT("theFontName", "An OpenGL compiled font name", DOC_TYPE_STRING, "Screen15");
     DOC_PARAM_OPT("theViewport", "", DOC_TYPE_OBJECT, "");
     DOC_END;
     try {
-
     
-        ensureParamCount(argc, 3, 5);
+        ensureParamCount(argc, 2, 5);
 
         y60::TextStyle myTextStyle;
-    
         dom::NodePtr myStyleNode;
-        if (!convertFrom(cx,argv[0], myStyleNode)) {
-            JS_ReportError(cx,"JSRenderWindow::renderTextAsImage: parameter 1 must be a style node");
-            return JS_FALSE;
-        }
-        myTextStyle = y60::TextStyle(myStyleNode);
 
         asl::Vector2f thePixelPosition;
-        if (!convertFrom(cx, argv[1], thePixelPosition)) {
-            JS_ReportError(cx,"JSRenderWindow::renderText: parameter 2 must be a Vector2f");
+        if (!convertFrom(cx, argv[0], thePixelPosition)) {
+            JS_ReportError(cx,"JSRenderWindow::renderText: parameter 1 must be a Vector2f");
             return JS_FALSE;
         }
 
         std::string theString;
-        if (!convertFrom(cx, argv[2], theString)) {
-            JS_ReportError(cx,"JSRenderWindow::renderText: parameter 3 must be a string");
+        if (!convertFrom(cx, argv[1], theString)) {
+            JS_ReportError(cx,"JSRenderWindow::renderText: parameter 2 must be a string");
             return JS_FALSE;
+        }
+        if (argc >= 3) {
+            if (!convertFrom(cx,argv[2], myStyleNode)) {
+                JS_ReportError(cx,"JSRenderWindow::renderText: parameter 3 must be a style node");
+                return JS_FALSE;
+            }
+            myTextStyle = y60::TextStyle(myStyleNode);
         }
 
         if (argc == 3) {
+
             jslib::JSClassTraits<DERIVED>::openNativeRef(cx, obj).setTextStyle(myTextStyle);
             jslib::JSClassTraits<DERIVED>::openNativeRef(cx, obj).renderText(thePixelPosition, theString);
             jslib::JSClassTraits<DERIVED>::closeNativeRef(cx,obj);
@@ -479,6 +481,7 @@ JSAbstractRenderWindow<DERIVED>::renderText(JSContext *cx, JSObject *obj, uintN 
                 JS_ReportError(cx,"JSRenderWindow::renderText: parameter 4 must be a fontname");
                 return JS_FALSE;
             }
+            
             if (argc >4) {
                 dom::NodePtr theViewportNode;
                 if (!convertFrom(cx,argv[4],theViewportNode)) {
@@ -488,6 +491,7 @@ JSAbstractRenderWindow<DERIVED>::renderText(JSContext *cx, JSObject *obj, uintN 
                 jslib::JSClassTraits<DERIVED>::openNativeRef(cx, obj).setTextStyle(myTextStyle);
                 jslib::JSClassTraits<DERIVED>::openNativeRef(cx, obj).renderText(thePixelPosition, theString, theFont, theViewportNode->getFacade<y60::Viewport>());
             } else {
+            
                 jslib::JSClassTraits<DERIVED>::openNativeRef(cx, obj).setTextStyle(myTextStyle);
                 jslib::JSClassTraits<DERIVED>::openNativeRef(cx, obj).renderText(thePixelPosition, theString, theFont);
             }
@@ -502,10 +506,10 @@ template<class DERIVED>
 JSBool
 JSAbstractRenderWindow<DERIVED>::renderTextAsImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Renders a text into a target image node");
-    DOC_PARAM("theStyleObject", "A textstyle object", DOC_TYPE_OBJECT);
     DOC_PARAM("theImageNode", "A X60 target imagenode", DOC_TYPE_NODE);
     DOC_PARAM("theTextString", "The text to render", DOC_TYPE_STRING);
     DOC_PARAM("theFontName", "The font name", DOC_TYPE_STRING);
+    DOC_PARAM("theStyleObject", "A textstyle object", DOC_TYPE_OBJECT);
     DOC_PARAM("theTextBoxWidth", "The textbox width, 0 to fit text", DOC_TYPE_INTEGER);
     DOC_PARAM("theTextBoxHeight", "The textbox height, 0 to fit text", DOC_TYPE_INTEGER);
     DOC_PARAM("theCursorPos", "where to place the text cursor. default is (0,0)", DOC_TYPE_VECTOR2I);
@@ -525,30 +529,30 @@ JSAbstractRenderWindow<DERIVED>::renderTextAsImage(JSContext *cx, JSObject *obj,
     y60::TextStyle myTextStyle;
     
     if (argc >= 1) {
-        dom::NodePtr myStyleNode;
-        if (!convertFrom(cx,argv[0], myStyleNode)) {
-            JS_ReportError(cx,"JSRenderWindow::renderTextAsImage: parameter 1 must be a style node");
+        if (!convertFrom(cx,argv[0],theImageNode)) {
+            JS_ReportError(cx,"JSRenderWindow::renderTextAsImage: parameter 1 must be an image node");
             return JS_FALSE;
         }
-        myTextStyle = y60::TextStyle(myStyleNode);
     }
     if (argc >= 2) {
-        if (!convertFrom(cx,argv[1],theImageNode)) {
-            JS_ReportError(cx,"JSRenderWindow::renderTextAsImage: parameter 2 must be an image node");
+        if (!convertFrom(cx,argv[1],theTextString)) {
+            JS_ReportError(cx,"JSRenderWindow::renderTextAsImage: parameter 2 must be a string");
             return JS_FALSE;
         }
     }
     if (argc >= 3) {
-        if (!convertFrom(cx,argv[2],theTextString)) {
+        if (!convertFrom(cx,argv[2],theFontName)) {
             JS_ReportError(cx,"JSRenderWindow::renderTextAsImage: parameter 3 must be a string");
             return JS_FALSE;
         }
     }
     if (argc >= 4) {
-        if (!convertFrom(cx,argv[3],theFontName)) {
-            JS_ReportError(cx,"JSRenderWindow::renderTextAsImage: parameter 4 must be a string");
+        dom::NodePtr myStyleNode;
+        if (!convertFrom(cx,argv[3], myStyleNode)) {
+            JS_ReportError(cx,"JSRenderWindow::renderTextAsImage: parameter 4 must be a style node");
             return JS_FALSE;
         }
+        myTextStyle = y60::TextStyle(myStyleNode);
     }
     if (argc >= 5) {
         if (!convertFrom(cx,argv[4],theTextBoxWidth)) {
@@ -947,8 +951,8 @@ JSFunctionSpec * JSAbstractRenderWindow<DERIVED>::BaseFunctions() {
         {"getPixel",           getPixel,                 4},
         {"performRequest",     performRequest,           1},
         // text rendering
-        {"renderText",         renderText,               4},
-        {"renderTextAsImage",  renderTextAsImage,        6},
+        {"renderText",         renderText,               5},
+        {"renderTextAsImage",  renderTextAsImage,        7},
         {"getTextCursorPosition", getTextCursorPosition, 0},
         {"getTextGlyphPositions", getTextGlyphPositions, 0},        
         {"getTextLineWidths",  getTextLineWidths,        0},

@@ -103,14 +103,17 @@ try {
         var myPos = 42;
         for (var i = 0; i < _myTests.length; ++i) {
             var myRenderer = ourShow.getRenderWindow(); 
-            myRenderer.setTextColor([0,1,1,1]);
-            myRenderer.renderText([10, myPos], _myTests[i], "Screen15");
-            myRenderer.setTextColor([1,1,1,1]);
+            var myTextColor = new Vector4f(0,1,1,1);            
+            myRenderer.renderText([10, myPos], _myTests[i], new Node("<style textColor='" + myTextColor + "'/>").childNode(0),
+                                  "Screen15");
+            var myTextColor = new Vector4f(1,1,1,1);            
             myPos += 20;
             for (var j = 0; j < ourMovieSources.length; ++j) {
                 var myMovie = ourMovies[i * ourMovieSources.length + j];
-                myRenderer.renderText([10, myPos], myMovie.src, "Screen15");
-                myRenderer.renderText([800, myPos], myMovie.currentframe, "Screen15");
+                myRenderer.renderText([10, myPos], myMovie.src, new Node("<style textColor='" + myTextColor + "'/>").childNode(0),
+                                      "Screen15");
+                myRenderer.renderText([800, myPos], myMovie.currentframe, new Node("<style textColor='" + myTextColor + "'/>").childNode(0),
+                                      "Screen15");
                 myPos += 20;
             }
             myPos += 10;

@@ -120,7 +120,6 @@ ParticlesTest.prototype.Constructor = function(self, theArguments) {
     }
 
     self.onPostRender = function() {
-        window.setTextColor([1,1,1,1]);
         window.renderText([10,10], window.fps);
     }
 

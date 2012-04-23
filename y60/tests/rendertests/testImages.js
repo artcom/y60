@@ -30,8 +30,9 @@ function createTextIntoTexture(theId, theText, thePosX, thePosY, theWidth, theHe
     myImageNode.name = theId;
     myImageNode.resize = "none";
     
-    window.setTextColor(theFrontColor);
-    var myTextSize = window.renderTextAsImage(myImageNode, theText, "Arial60", theWidth, theHeight);
+    var myTextSize = window.renderTextAsImage(myImageNode, theText, "Arial60", 
+                                              new Node("<style textColor='" + theFrontColor + "'/>").childNode(0),
+                                              theWidth, theHeight);
 
     var myOverlay = new ImageOverlay(window.scene, myImageNode);
     myOverlay.position.x = thePosX;
