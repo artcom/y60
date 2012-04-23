@@ -319,6 +319,9 @@ spark.Component.Constructor = function (Protected) {
             if (myString.length === 0) {
                 return [];
             }
+            if (_myNode[theName][0] !== "[") {
+                Logger.error(Public._className_ + " has attribute '" + theName + "' which should be an array but isn't: '" + _myNode[theName] + "'");
+            }
             var myArray = findChildArray(trim(myString));
             return myArray;
         } else {
