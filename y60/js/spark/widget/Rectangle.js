@@ -32,38 +32,19 @@ spark.Rectangle.Constructor = function (Protected) {
                 myMaterial = theMaterialOrShape;
             }
         } else {
-            _myColor = Protected.getVector3f("color", null);
-            _myColor = _myColor || Protected.getVector4f("color", null);
-            if (_myColor === null) {
-                Logger.warning("Color attribute '" + Protected.getString("color", "") + "' missing or invalid (defaulting to [1,1,1,1]). Spark node:\n" + Public.node);
-                _myColor = [1,1,1,1];
-            }
-            if (_myColor.length < 4) {
-                _myColor = new Vector4f(_myColor.x, _myColor.y, _myColor.z, Public.alpha);
-            } else {
-                Public.alpha = _myColor[3];
-            }
-            myMaterial = Modelling.createColorMaterial(window.scene, _myColor);
+            _myColor = Protected.getVector3f("color", new Vector3f(1,1,1));
+            myMaterial = Modelling.createColorMaterial(window.scene, _myColor.rgb1);
             myMaterial.transparent = true;
         }
         Base.realize(myMaterial);
     };
     
-    //XXX without this transparency is not working??
-    Base.postRealize = Public.postRealize;
-    Public.postRealize = function () {
-        Base.postRealize();
-        if (_myColor) {
-            Public.color = _myColor;
-        }
-    };
-
     Public.__defineGetter__("color", function () {
-        var c = Protected.material.properties.surfacecolor;
-        return new Vector4f(c[0], c[1], c[2], c[3]);
+        return _myColor;
     });
 
     Public.__defineSetter__("color", function (theColor) {
-        Protected.material.properties.surfacecolor = theColor;
+        _myColor = theColor;
+        Protected.material.properties.surfacecolor = new Vector4f(_myColor.x, _myColor.y, _myColor.z, Public.alpha);
     });
 };
