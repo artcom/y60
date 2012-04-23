@@ -165,23 +165,25 @@ GUI.AnimationManager.prototype.Constructor = function (Public, Protected) {
         
         var myNamespace = _.prepareNamespace(theNamespace);
         var namespace;
-        var isAlreadyPlaying = false;
+        var isAlreadyRegistered = false;
         
-        var checkIsAlreadyPlayingFunc = function (theCurrentNamespace) {
+        var checkIsAlreadyRegisteredFunc = function (theCurrentNamespace) {
             if (js.array.indexOf(theCurrentNamespace.animations, theAnimation) > -1) {
-                Logger.warning("<AnimationManager::play> The animation: '" + theAnimation + "' is already playing in namespace: '" + theCurrentNamespace + "'");
-                isAlreadyPlaying = true;
+                Logger.debug("<AnimationManager::play> The animation: '" + theAnimation + "' is already registered in namespace: '" + theCurrentNamespace + "'");
+                isAlreadyRegistered = true;
             }
         };
         
         for (namespace in _.namespaces) {
-            _.namespaces[namespace].forEachNamespaceDo(checkIsAlreadyPlayingFunc);
-            if (isAlreadyPlaying) {
-                return;
+            _.namespaces[namespace].forEachNamespaceDo(checkIsAlreadyRegisteredFunc);
+            if (isAlreadyRegistered) {
+                break;
             }
         }
+        if (!isAlreadyRegistered) {
+            myNamespace.animations.push(theAnimation);
+        }
         Logger.debug("<AnimationManager::play> playing '" + theAnimation + "' in namespace: '" + _.getNamespaceParts(myNamespace) + "'");
-        myNamespace.animations.push(theAnimation);
         theAnimation.play();
     };
 
