@@ -16,21 +16,18 @@ Linux*)
     cp -vf "${PLUGIN}" "${DESTINATION}/plug-ins/mayaY60-export.so"
 
     mkdir -p "${DESTINATION}/scripts"
-    cp -vf ${CURRENT_SOURCE}/*.mel "${DESTINATION}/scripts"
+    cp -vf "${CURRENT_SOURCE}"/*.mel "${DESTINATION}/scripts"
 
     ;;
 CYGWIN*)
 
-   BINARY=`cygpath -ma ${BINARY}`
-   SOURCE=`cygpath -ma ${SOURCE}`
-
    DESTINATION=$USERPROFILE/"Eigene Dateien"/maya/${MAYA_VERSION}
 
    mkdir -p "${DESTINATION}/plug-ins"
-   cp -vf ${BINARY}/lib/Release/maya-xport.dll "${DESTINATION}/plug-ins/mayaY60export.mll"
+   cp -vf "${BINARY}/lib/Release/maya-xport.dll" "${DESTINATION}/plug-ins/mayaY60export.mll"
 
    mkdir -p "${DESTINATION}/scripts"
-   cp -vf ${CURRENT_SOURCE}/*.mel "${DESTINATION}/scripts"
+   cp -vf "${CURRENT_SOURCE}"/*.mel "${DESTINATION}/scripts"
 
    ;;
 esac
