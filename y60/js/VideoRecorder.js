@@ -90,11 +90,11 @@ function VideoRecorder(theFramesPerSecond, theDirectory, theRenderWindow) {
         if (_myEnabledFlag) {
             var myFileName = _myDirectory + "/frame";
             myFileName += padStringFront(_myFrameCount++, "0", 5);
-            myFileName += ".png";
+            myFileName += ".jpg";
             if (theRenderArea) {
                 theRenderArea.renderToCanvas(true);
             } else {
-                window.saveBuffer(myFileName, 3);
+                window.saveBuffer(myFileName, 3, 100);
             }
             Logger.info("saving frame: " + myFileName);
         }
