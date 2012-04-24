@@ -81,6 +81,7 @@
 
 #include <asl/base/string_functions.h>
 #include <asl/base/os_functions.h>
+#include <asl/base/Time.h>
 #include <y60/image/PixelEncoding.h>
 
 #include "GLUtils.h"
@@ -215,6 +216,9 @@ namespace y60 {
                           getBlock().begin() + getWidth() * (getHeight()-1) * getComponents(),
                           -1 * getWidth() * getComponents());
         }
+        
+        _myThreadPool.wait(static_cast<size_t>(_myThreadPool.size()*2)) ;
+
         _myThreadPool.schedule(boost::bind(&BufferToFile::encodeBuffer, this,
                                            myPath.toLocale(), _myFormat, _myCompressionOrQualityLevel, myBmp));
     }
