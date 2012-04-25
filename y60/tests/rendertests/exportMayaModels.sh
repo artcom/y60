@@ -3,7 +3,7 @@
 cd ../../products/maya-xport
 
 # export all to x60
-#./maya2x60.sh ../../tests/rendertests/*.mb
+./maya2x60.sh ../../tests/rendertests/*.mb
 
 #export all b60 new
 for file in ../../tests/rendertests/*.b60
