@@ -258,22 +258,19 @@ SceneExporter::writer(const MFileObject & theFile,
             myProgressBar.setStatus("Writing file to disk");
             if (myOptions.binaryFlag) {
                 MAKE_SCOPE_TIMER(writer_binary);
-#ifdef USE_MEM_COLLECT_BLOCK_OUT
-                asl::Block myBlock;
+#ifdef DONT_USE_MAPPED_BLOCK_IO
+            asl::Block myBlock;
 #else
-#ifdef USE_MAPPED_BLOCK_OUT
-                asl::MappedBlock myBlock(myFileName.asChar());
-#else
-                asl::WriteableFile myBlock(myFileName.asChar());
+            asl::WriteableFile myBlock(myFileName.asChar());
+            if (!myBlock) {
+                throw IOError(std::string("Could map the new writable binary file. '") + myFileName.asChar() + "'", "SceneExporter::writer()");
+            }
 #endif
-#endif
-                dom::Document myDocument;
-                myDocument.appendChild(mySceneBuilder.getNode());
-                myDocument.binarize(myBlock);
-#ifdef USE_MEM_COLLECT_BLOCK_OUT
-                if (!asl::writeFile(myFileName.asChar(), myBlock)) {
-                    throw IOError(std::string("Could not write binary file '") + myFileName.asChar() + "'", "SceneExporter::writer()");
-                }
+            mySceneBuilder.binarize(myBlock);
+#ifdef DONT_USE_MAPPED_BLOCK_IO
+            if (!asl::writeFile(myFileName.asChar(), myBlock)) {
+                throw IOError(std::string("Could not write binary file '") + myFileName.asChar() + "'", "SceneExporter::writer()");
+            }
 #endif
             } else {
                 MAKE_SCOPE_TIMER(writer_ascii);
