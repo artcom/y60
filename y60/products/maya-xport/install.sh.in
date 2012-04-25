@@ -13,7 +13,7 @@ Linux*)
     DESTINATION="${HOME}/maya/${MAYA_VERSION}"
 
     mkdir -p "${DESTINATION}/plug-ins"
-    cp -vf "${PLUGIN}" "${DESTINATION}/plug-ins/mayaY60-export.so"
+    cp -vf "${PLUGIN}" "${DESTINATION}/plug-ins/mayaY60export.so"
 
     mkdir -p "${DESTINATION}/scripts"
     cp -vf "${CURRENT_SOURCE}"/*.mel "${DESTINATION}/scripts"
