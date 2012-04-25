@@ -426,7 +426,7 @@ namespace y60 {
     }
 
     // returns offset past end of s if s is the exact next part
-    inline unsigned
+    unsigned
     read_if_string(const std::string & is, unsigned pos, const std::string & s) {
         std::string::size_type i = 0;
         std::string::size_type n = asl::minimum(s.size(),is.size()-pos);
@@ -439,13 +439,18 @@ namespace y60 {
         return 0;
     }
 
-    inline unsigned
+    unsigned
     SDLTextRenderer::parseNewline(const string & theText, unsigned thePos, Format & theFormat) {
         if (thePos < theText.size() && theText[thePos] == '\x0A')
         {
             return 1;
         }
         if (thePos + 1 < theText.size() && theText[thePos] == '\x0D' && theText[thePos+1] == '\x0A')
+        {
+            return 2;
+        }
+        //convert '\n' to newline
+        if (thePos + 1 < theText.size() && theText[thePos] == '\x5C' && theText[thePos+1] == '\x6E')
         {
             return 2;
         }
@@ -541,7 +546,7 @@ namespace y60 {
         }
     }
 
-    inline unsigned
+    unsigned
     SDLTextRenderer::parseWord(const string & theText, unsigned thePos) {
         for (unsigned i = 0; i < _myWordDelimiters.size(); ++i) {
             if (theText[thePos] == _myWordDelimiters[i]) {
