@@ -135,6 +135,13 @@ static JSBool debug(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval
     DOC_END;
     return log(asl::SEV_DEBUG, cx, obj, argc, argv, rval);
 }
+static JSBool print(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Log at print level");
+    DOC_PARAM("theMessage", "", DOC_TYPE_STRING);
+    DOC_PARAM_OPT("theChannel", "", DOC_TYPE_STRING, "");
+    DOC_END;
+    return log(asl::SEV_PRINT, cx, obj, argc, argv, rval);
+}
 
 static JSBool addFileSink(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Add a log file to the logger");
@@ -298,6 +305,7 @@ JSLogger::StaticFunctions() {
         {"info",      info,      2},
         {"debug",     debug,     2},
         {"trace",     trace,     2},
+        {"print",     print,     2},
         {"setVerbosity", setVerbosity, 4},
         {"addFileSink", addFileSink, 1},
         {"addFarewellSink", addFarewellSink, 0},
