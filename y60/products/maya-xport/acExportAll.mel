@@ -1,16 +1,20 @@
-global proc acExportAll() {
+global proc acExportAll(string $arg, string $binary, string $inlineTextures) {
     // Load plugin
-    loadPlugin -quiet "mayaY60-export";
+    loadPlugin -quiet "mayaY60export";
 
     // Export all
-    $myFilename = `workspace -fullName` + "/test";
+    //$myFilename = `workspace -fullName` + "/test";
+    string $myFilename = $arg;
+    string $option = "binary=" + $binary + ";inlineTextures=" + $inlineTextures + ";progressBar=0;";
     print "Export file: ";
     print $myFilename;
+    print "\noptions: ";
+    print $option;
     print "\n";
-    if (catch(`file -op "binary=1;inlineTextures=0;" -typ "Y60" -pr -ea $myFilename`)) {
+    if (catch(`file -op $option -typ "Y60" -f -pr -ea $myFilename`)) {
         print "Could not export file.\n";
     }
 
     // Unload plugin
-    unloadPlugin "mayaY60-export";
+    unloadPlugin "mayaY60export";
 }
