@@ -3,7 +3,7 @@
 
 use("SceneTester.js");
 
-var CUBE_BODY_ID = "DxI58waogW8=";
+var CUBE_BODY_NAME = "pCube1";
 
 try {
     var Base = {};
@@ -24,7 +24,7 @@ try {
             ourShow.saveTestImage();
         } else if (theFrameNum === 4) {
             // test billboardlookat
-            myBillboardBody.billboardlookat = CUBE_BODY_ID;
+            myBillboardBody.billboardlookat = myCubeBody.id;
         } else if (theFrameNum === 6) {
             ourShow.saveTestImage();
         } else if (theFrameNum === 8) {
@@ -45,7 +45,7 @@ try {
     myScene.setup();
     ourShow.setScene(myScene);
     
-    var myCubeBody = window.scene.world.getElementById(CUBE_BODY_ID);
+    var myCubeBody = window.scene.world.find("body[@name='" + CUBE_BODY_NAME + "']");
     myCubeBody.orientation = Quaternionf.createFromEuler([0.3,0.3,0.3]);
     
     var myImageNode = Modelling.createImage(window.scene, "tex/testbild02.png");
