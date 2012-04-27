@@ -84,7 +84,7 @@
 #include <y60/base/IScene.h>
 
 #include "I60Header.h"
-#include "ImageLoader.h"
+
 
 using namespace asl;
 using namespace std;
@@ -93,6 +93,14 @@ using namespace std;
 #define DB(x) // x
 
 namespace y60 {
+
+
+    ImageLoaderThreadPool::ImageLoaderThreadPool():
+                _myThreadPool(asl::getenv("Y60_IMAGE_LOAD_THREADS", 4)) {
+        AC_INFO << "ImageLoaderThreadPool: using threadpool with "<<_myThreadPool.size() << " threads";
+    }
+                ImageLoaderThreadPool::~ImageLoaderThreadPool(){}
+    boost::threadpool::pool & ImageLoaderThreadPool::getThreadPool() { return _myThreadPool; }
 
     DEFINE_EXCEPTION(UnknownEncodingException, asl::Exception);
 
@@ -108,9 +116,11 @@ namespace y60 {
         ImageFilterTag::Plug(theNode),
         ImageFilterParamsTag::Plug(theNode),
         ImageMatrixTag::Plug(theNode),
+        ImageAsyncFlagTag::Plug(theNode),
         ImageTileTag::Plug(theNode),
         ImageDepthTag::Plug(theNode),
-        TargetPixelFormatTag::Plug(theNode),
+        TargetPixelFormatTag::Plug(theNode),        
+        LoadStateTag::Plug(theNode),        
         dom::FacadeAttributePlug<RasterPixelFormatTag>(this),
         dom::FacadeAttributePlug<ImageBytesPerPixelTag>(this),
         dom::FacadeAttributePlug<ImageWidthTag>(this),
@@ -187,8 +197,7 @@ namespace y60 {
             myRasterValue->registerPrecursor(ImageResizeTag::Plug::getValuePtr());
             myRasterValue->registerPrecursor(ImageFilterTag::Plug::getValuePtr());
             myRasterValue->registerPrecursor(ImageFilterParamsTag::Plug::getValuePtr());
-            myRasterValue->setCalculatorFunction(dynamic_cast_Ptr<Image>(getSelf()),
-                &Image::load);
+            myRasterValue->setCalculatorFunction(dynamic_cast_Ptr<Image>(getSelf()), &Image::load);
             myRasterValue->setClean();
 
         }
@@ -209,6 +218,8 @@ namespace y60 {
             ImageHeightTag::Plug::dependsOn(getRasterValue());
             ImageHeightTag::Plug::getValuePtr()->setCalculatorFunction(
                 dynamic_cast_Ptr<Image>(getSelf()), &Image::calculateHeight);
+
+
         }
     }
 
@@ -232,6 +243,7 @@ namespace y60 {
         ImageSourceTag::Plug::getValuePtr()->setDirty(); // force call to load()
     }
 
+
     void
     Image::load() {
         // facade contruction will always lead to a raster ctor,
@@ -239,6 +251,7 @@ namespace y60 {
         if (!allowInlineFlag) {
             return;
         }
+        set<LoadStateTag>(false);
         std::string mySrcAttrib = get<ImageSourceTag>();
         if (get<ImageSourceTag>() == "") {
             AC_DEBUG << "Image '" << get<NameTag>() << "' has not been loaded because of empty source attribute";
@@ -249,30 +262,63 @@ namespace y60 {
             }
             return;
         }
+        if (get<ImageAsyncFlagTag>()) {
+            createRaster(1,1,1,GRAY);
+        }
         if (get<TargetPixelFormatTag>() != "") {
             throw ImageException(string("Image ") + get<ImageSourceTag>() + " target pixel format conversion not yet supported: " + get<TargetPixelFormatTag>(), PLUS_FILE_LINE);
         }
 
         AC_DEBUG << "Image::load loading '" << get<ImageSourceTag>() << "'";
+        AC_INFO << get<ImageSourceTag>() << " is loaded async -> " << get<ImageAsyncFlagTag>();
         unsigned myDepth = get<ImageDepthTag>();
-        ImageLoader myImageLoader(get<ImageSourceTag>(), AppPackageManager::get().getPtr(),
-            ITextureManagerPtr(), myDepth);
+        if (get<ImageAsyncFlagTag>()) {
+            ImageLoaderThreadPool::get().getThreadPool().wait(ImageLoaderThreadPool::get().getThreadPool().size()*2); //allow only threadpool size pending tasks
+            ImageLoaderThreadPool::get().getThreadPool().schedule(boost::bind(&Image::aSyncLoad, this,myDepth));
+        } else {
+             boost::shared_ptr<ImageLoader> myImageLoader = boost::shared_ptr<ImageLoader>(new ImageLoader(get<ImageSourceTag>(), AppPackageManager::get().getPtr(),
+                ITextureManagerPtr(), myDepth));
 
+            processNewRaster(myImageLoader);
+        }
+    }
+
+    void Image::aSyncLoad(unsigned theDepth) {
+        _myImageLoaderQueue.push(boost::shared_ptr<ImageLoader>(new ImageLoader(get<ImageSourceTag>(), AppPackageManager::get().getPtr(),
+            ITextureManagerPtr(), theDepth)));
+
+    }
+
+    void Image::processNewRaster(boost::shared_ptr<ImageLoader> theImageLoader) {
         string myFilter = get<ImageFilterTag>();
         if (!myFilter.empty()) {
             AC_INFO << "Image::load filter=" << myFilter;
             VectorOfFloat myFilterParams = get<ImageFilterParamsTag>();
-            myImageLoader.applyCustomFilter(myFilter, myFilterParams);
+            theImageLoader->applyCustomFilter(myFilter, myFilterParams);
         }
 
+        unsigned myDepth = get<ImageDepthTag>();
         // ImageTileTag only relevant for getType() == CUBEMAP
-        myImageLoader.ensurePowerOfTwo(get<ImageResizeTag>(), myDepth, &(get<ImageTileTag>()));
+        theImageLoader->ensurePowerOfTwo(get<ImageResizeTag>(), myDepth, &(get<ImageTileTag>()));
 
         // Drop alpha channel if unused
-        myImageLoader.removeUnusedAlpha();
+        theImageLoader->removeUnusedAlpha();
 
-        set<ImageMatrixTag>(myImageLoader.getImageMatrix());
-        setRasterValue(myImageLoader.getData(), myImageLoader.getEncoding(), myDepth);
+        setRasterValue(theImageLoader->getData(), theImageLoader->getEncoding(), myDepth);
+        set<ImageMatrixTag>(theImageLoader->getImageMatrix());
+
+        set<ImageWidthTag>(getRasterPtr()->width());
+        set<ImageHeightTag>(getRasterPtr()->height());
+
+        set<LoadStateTag>(true);
+    }
+
+    void Image::checkAsyncLoad() {
+        boost::shared_ptr<ImageLoader> myImageLoader;
+        if (_myImageLoaderQueue.try_pop(myImageLoader)) {
+            processNewRaster(myImageLoader);
+            AC_INFO << get<ImageSourceTag>() << " is loaded";
+        }
     }
 
     dom::ResizeableRasterPtr

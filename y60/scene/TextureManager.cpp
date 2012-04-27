@@ -145,6 +145,11 @@ namespace y60 {
         return _myMaxTextureSize;
     }
 
+    void 
+    TextureManager::checkImageLoad(ImagePtr theImage) {
+            theImage->checkAsyncLoad();
+    }
+
     void
     TextureManager::loadMovieFrame(MoviePtr theMovie, double theCurrentTime) {
         MAKE_SCOPE_TIMER(TextureManager_loadMovieFrame);

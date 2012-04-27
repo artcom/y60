@@ -69,17 +69,17 @@ spark.getDummyImage = function () {
     return spark.dummyImage;
 };
 
-spark.getCachedImage = function (thePath) {
+spark.getCachedImage = function (thePath, theASyncFlag) {
     var myName = "spark-cached-image-" + thePath;
     var myImage = spark.getNode(myName);
-
+    var myCachedFlag = true;
     if (!myImage) {
-        myImage = Modelling.createImage(window.scene, thePath);
+        myImage = Modelling.createImage(window.scene, thePath, theASyncFlag);        
         myImage.name = myName;
-
+        myCachedFlag = false;
         spark.registerNode(myName, myImage);
     }
-    return myImage;
+    return {image:myImage, cached:myCachedFlag};
 };
 
 spark.getMovieCacheKey = function(thePath) {

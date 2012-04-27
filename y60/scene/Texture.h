@@ -179,6 +179,7 @@ namespace y60 {
             void registerDependenciesForTextureWidthUpdate();
             void registerDependenciesForTextureHeightUpdate();
             void registerDependenciesForInternalFormatUpdate();
+            void updateDependenciesForInternalFormatUpdate();
             void registerDependenciesForTextureParamChanged();
             void registerDependenciesForTextureTypeUpdate();
             void registerDependenciesForTextureUpdate();

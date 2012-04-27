@@ -753,6 +753,7 @@ CreateImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
     DOC_BEGIN("Creates an image inside the scene");
     DOC_PARAM("theScene", "Scene where the image is created", DOC_TYPE_SCENE);
     DOC_PARAM("theFilename", "Path to image file", DOC_TYPE_STRING);
+    DOC_PARAM_OPT("theASyncFlag", "Image will be laoded async", DOC_TYPE_BOOLEAN, false);
     DOC_RESET;
     DOC_PARAM("theScene", "Scene where the image is created", DOC_TYPE_SCENE);
     DOC_PARAM("theWidth", "Image width", DOC_TYPE_INTEGER);
@@ -766,15 +767,22 @@ CreateImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
         y60::ScenePtr myScene;
         convertFrom(cx, argv[0], myScene);
 
-        if (argc == 2) {
+        bool myASyncLoadFlag = false;
+        if (argc == 2 || argc == 3) {
             std::string myImageSrc;
             if (!convertFrom(cx, argv[1], myImageSrc)) {
                 JS_ReportError(cx, "JSScene::createImage(): argument #2 must be a string (File path)");
                 return JS_FALSE;
             }
-
+            if (argc == 3) {
+                if (!convertFrom(cx, argv[2], myASyncLoadFlag)) {
+                    JS_ReportError(cx, "JSScene::createImage(): argument #3 must be a bool (async flag)");
+                    return JS_FALSE;
+                }
+            }
             dom::NodePtr myResult = myScene->getImagesRoot()->appendChild(
                 dom::NodePtr(new dom::Element("image")));
+            myResult->appendAttribute<bool>(IMAGE_ASYNC_LOAD_ATTRIB, myASyncLoadFlag);
             myResult->appendAttribute(IMAGE_SRC_ATTRIB, myImageSrc);
             myResult->appendAttribute(ID_ATTRIB, IdTag::getDefault());
             *rval = as_jsval(cx, myResult);

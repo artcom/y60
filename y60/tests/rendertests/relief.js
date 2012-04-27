@@ -34,7 +34,7 @@ try {
         myImage.name = "depth_normal_map";
         myImage.src = "./tex/aphrodite_normal.png";
         window.scene.images.appendChild(myImage);
-
+print(window.scene.images);
         // create texture
         var myTexture = window.scene.textures.firstChild.cloneNode();
         myTexture.id = createUniqueId();

@@ -300,6 +300,8 @@ namespace y60 {
     const char * const IMAGE_FILTER_PARAMS_ATTRIB      = "filter_params";
     const char * const IMAGE_TILE_ATTRIB               = "tile";
     const char * const IMAGE_RASTER_ATTRIB             = "raster"; // for easy raster access
+    const char * const IMAGE_ASYNC_LOAD_ATTRIB         = "loadasync";
+    const char * const IMAGE_LOADSTATE_ATTRIB          = "loaded";
 
     const char * const MOVIE_NODE_NAME             = "movie";
     const char * const MOVIE_FRAME_ATTRIB          = "currentframe";

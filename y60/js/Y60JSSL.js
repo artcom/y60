@@ -332,7 +332,6 @@ function asColor(theHexString, theAlpha) {
         var myBlue  = parseInt(theHexString.substr(4, 2), 16) / 255;
         return new Vector4f(myRed, myGreen, myBlue, theAlpha);
     } else {
-        dumpstack();
         // Wtf is that good for?
         var retval = eval(theHexString);
         Logger.trace("asColor: eval " + theHexString + " ergibt " + retval);
@@ -1093,16 +1092,39 @@ utils.dom.bindNodeValue = function (theSubscribingNode,
                                     theSubscribingAttributeName,
                                     theObservedNode,
                                     theObservedAttributeName,
-                                    theCallback) {
+                                    theOutdatedCallback,
+                                    theSetCallback) {
     if (theSubscribingAttributeName &&
         theObservedAttributeName && theObservedNode &&
-        theCallback && typeof(theCallback) === 'function') {
+        (theOutdatedCallback && typeof(theOutdatedCallback) === 'function' ||
+         theSetCallback && typeof(theSetCallback) === 'function')) {
         var temp = theSubscribingNode[theSubscribingAttributeName]; // workaround! Don't remove - Forces Serialization
         var mySubscribingAttrNode = theSubscribingNode.attributes.getNamedItem(theSubscribingAttributeName);
         mySubscribingAttrNode.onReconnect = function () {
             this.nodeValueDependsOn(theObservedNode.attributes.getNamedItem(theObservedAttributeName));
         };
-        mySubscribingAttrNode.onOutdatedValue = function () {
+        if (theOutdatedCallback) {
+            mySubscribingAttrNode.onOutdatedValue = function () {
+                theOutdatedCallback(this);
+            };
+        }
+        if (theSetCallback) {
+            mySubscribingAttrNode.onSetValue = function () {
+                theSetCallback(this);
+            };
+        }
+    }
+};
+
+utils.dom.bindOnSetNodeValue = function (theSubscribingNode,
+                                         theSubscribingAttributeName,
+                                         theCallback) {
+    if (theSubscribingAttributeName &&
+        theSubscribingNode && 
+        theCallback && typeof(theCallback) === 'function') {
+        var myTemp = theSubscribingNode[theSubscribingAttributeName];
+        var mySubscribingAttrNode = theSubscribingNode.attributes.getNamedItem(theSubscribingAttributeName);
+        mySubscribingAttrNode.onSetValue = function () {
             theCallback(this);
         };
     }
