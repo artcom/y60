@@ -125,6 +125,9 @@ namespace y60 {
         Facade::registerDependenciesRegistrators();
         AC_DEBUG << "Texture::registerDependenciesRegistrators '" << get<NameTag>();
 
+        TextureImageIdTag::Plug::getValuePtr()->setImmediateCallBack(dynamic_cast_Ptr<Texture>(getSelf()), 
+                                                                     &Texture::updateDependenciesForInternalFormatUpdate);
+
         //TextureImageTag::Plug::setReconnectFunction(&Texture::registerDependenciesForImageTag);
         //TextureIdTag::Plug::setReconnectFunction(&Texture::registerDependenciesForTextureUpdate);
         TextureParamChangedTag::Plug::setReconnectFunction(&Texture::registerDependenciesForTextureParamChanged);
@@ -211,6 +214,26 @@ namespace y60 {
     }
 
     void
+    Texture::updateDependenciesForInternalFormatUpdate() {
+        if (getNode() && getImage()) {
+            if (TextureInternalFormatTag::Plug::alreadyDependsOn(getImageFacade().getRasterValue())) {
+                TextureInternalFormatTag::Plug::noLongerDependsOn(getImageFacade().getRasterValue());
+            }
+            TextureInternalFormatTag::Plug::dependsOn(getImageFacade().getRasterValue());
+
+            if (TextureInternalFormatTag::Plug::alreadyDependsOn<ImageSourceTag>(getImageFacade())) {
+                TextureInternalFormatTag::Plug::noLongerDependsOn<ImageSourceTag>(getImageFacade());
+            }
+            TextureInternalFormatTag::Plug::dependsOn<ImageSourceTag>(getImageFacade());
+
+            if (TextureInternalFormatTag::Plug::alreadyDependsOn<RasterPixelFormatTag>(getImageFacade())) {
+                TextureInternalFormatTag::Plug::noLongerDependsOn<RasterPixelFormatTag>(getImageFacade()); 
+            }
+            TextureInternalFormatTag::Plug::dependsOn<RasterPixelFormatTag>(getImageFacade());            
+        }
+    }
+
+    void
     Texture::registerDependenciesForInternalFormatUpdate() {
         AC_TRACE << "Texture::registerDependenciesForInternalFormatUpdate";
         if (getNode()) {
@@ -218,8 +241,6 @@ namespace y60 {
             TextureInternalFormatTag::Plug::dependsOn<TextureImageTag>(*this);
 #endif
             TextureInternalFormatTag::Plug::dependsOn<TextureImageIdTag>(*this);
-            TextureInternalFormatTag::Plug::dependsOn(getImageFacade().getRasterValue());
-            TextureInternalFormatTag::Plug::dependsOn<ImageSourceTag>(getImageFacade());
             TextureInternalFormatTag::Plug::dependsOn<TextureColorBiasTag>(*this);
             TextureInternalFormatTag::Plug::dependsOn<TextureColorScaleTag>(*this);
             TextureInternalFormatTag::Plug::dependsOn<TexturePixelFormatTag>(*this);

@@ -217,6 +217,8 @@ OverlayBase.prototype.Constructor = function(Public, Protected, theScene, thePos
         myParent.insertBefore(_myNode, myParent.firstChild);
     };
 
+    Public.onFrame = function(theTime) {};
+
     /// This checks if the square defined by theX/theY and theSquareSize overlaps with the overlay
     //  @param theXPos        integer   X-Center of the square to check for overlap
     //  @param theXPos        integer   Y-Center of the square to check for overlap
@@ -697,7 +699,7 @@ function ImageOverlayBase(theScene, theSource, thePosition, theParent) {
 ImageOverlayBase.prototype.Constructor = function(Public, Protected, theScene, theSource, thePosition, theParent) {
 
     TextureOverlay.prototype.Constructor(Public, Protected, theScene, thePosition, theParent);
-
+    Public._myPublicAttribute = 0;
     ///////////////////////////////////////////////////////////////////////////////////////////
     // Private
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -710,10 +712,11 @@ ImageOverlayBase.prototype.Constructor = function(Public, Protected, theScene, t
             } else {
                 // theSource is a string
                 myImage = Node.createElement("image");
-                myImage.src  = expandEnvironment(theSource);
                 //myImage.resize = "pad";
                 //myImage.mipmap = false;
                 theScene.images.appendChild(myImage);
+                utils.dom.bindOnSetNodeValue(myImage, "loaded", Public.onChange);
+                myImage.src  = expandEnvironment(theSource);
                 myImage.name = mySource;
                 //myImage.wrapmode  = TextureWrapMode.repeat;
                 //myImage.type = ImageType.single;
@@ -726,10 +729,15 @@ ImageOverlayBase.prototype.Constructor = function(Public, Protected, theScene, t
             Logger.error("Invalid type of source argument in addImage");
             return;
         }
-
-        Protected.addTexture(myImage.id);
         Protected.myImages.push(myImage);
+        Protected.addTexture(myImage.id);
     };
+    Public.onChange = function(theAttrib) {
+        var myImage = theAttrib.parentNode;
+        var mySize = getImageSize(myImage);
+        Public.width  = mySize.x;
+        Public.height = mySize.y;
+    }
 
     function setup() {
         if (theSource) {

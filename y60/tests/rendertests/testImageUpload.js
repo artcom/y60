@@ -99,7 +99,6 @@ ourShow.setup = function () {
     ourTexture.color_scale[3] = 1;
     ENSURE("ourTexture.internal_format == 'RGB8'");
 }
-
 function updateAndRender() {
     window.scene.updateAllModified();
     ourShow.saveTestImage();
@@ -171,6 +170,7 @@ ourShow.onFrameDone = function(theFrameCount) {
                 // Test image filtering
                 ourImage.filter = "resizebilinear";
                 ourImage.filter_params = [20, 10];
+                //explicit image load triggern
                 //ENSURE("ourImage.loadcount == " + ourLoadCount);
                 ENSURE("ourImage.width == 32");
                 ENSURE("ourImage.height == 16");

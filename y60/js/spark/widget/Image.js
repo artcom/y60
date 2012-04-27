@@ -28,7 +28,9 @@ spark.Image.Constructor = function (Protected) {
 
     var _myTexture    = null;
     var _myUseCaching = true;
-
+    var _myASyncLoad  = false;
+    var _myLoadCB     = null;
+    
     /////////////////////
     // Private Methods //
     /////////////////////
@@ -82,19 +84,30 @@ spark.Image.Constructor = function (Protected) {
 
     Public.__defineSetter__("src", function (theSourceFile) {
         _mySource = theSourceFile;
+        var myCachedImageFlag = false;
         if (_myUseCaching) {
-            Public.image = spark.getCachedImage(_mySource);
+            var myCacheInfo = spark.getCachedImage(_mySource, _myASyncLoad); 
+            Public.image = myCacheInfo.image
+            myCachedImageFlag = myCacheInfo.cached; 
         } else {
             if (_mySource === "") {
                 Public.image = Modelling.createImage(window.scene, Public.width, Public.height, "BGRA");
             } else {
-                Public.image = Modelling.createImage(window.scene, _mySource);
+                Public.image = Modelling.createImage(window.scene, _mySource, _myASyncLoad);
             }
+        }
+        if (_myASyncLoad && !myCachedImageFlag) {
+            bindOnSetCB();        
+        } else {
+            _myLoadCB ? _myLoadCB():null
         }
     });
 
     Public.__defineGetter__("srcId", function () {
         return _mySourceId;
+    });
+    Public.__defineGetter__("source", function () {
+        return _mySource;
     });
     Public.__defineSetter__("srcId", function (theValue) {
         _mySourceId = theValue;
@@ -107,7 +120,15 @@ spark.Image.Constructor = function (Protected) {
     Public.__defineSetter__("i18nItem", function (i) {
         Public.srcId = i;
     });
-
+    Public.__defineSetter__("onLoadCB", function (i) {
+        _myLoadCB = i;
+    });
+    Public.__defineGetter__("onLoadCB", function () {
+        return _myLoadCB;
+    });
+    Public.__defineGetter__("loadasync", function () {
+        return _myASyncLoad;
+    });
     // XXX: this should not exist.
     Public.__defineGetter__("texture", function () {
         return _myTexture;
@@ -125,10 +146,12 @@ spark.Image.Constructor = function (Protected) {
     Public.realize = function () {
         var myImageSource = Protected.getString("src", "");
         var myImageSourceId = Protected.getString("srcId", "");
+        _myASyncLoad = Protected.getBoolean("loadasync", false);
         _myUseCaching = Protected.getBoolean("useCaching", true);
 
         var myWidth = 0;
         var myHeight = 0;
+        var myCachedImageFlag = false;        
         if (myImageSource === "") {
             myWidth = Protected.getNumber("width", 1);
             myHeight = Protected.getNumber("height", 1);
@@ -140,9 +163,11 @@ spark.Image.Constructor = function (Protected) {
             }
         } else {
             if (_myUseCaching) {
-                _myImage = spark.getCachedImage(myImageSource);
+                var myCacheInfo = spark.getCachedImage(myImageSource, _myASyncLoad);                 
+                _myImage = myCacheInfo.image;
+                myCachedImageFlag = myCacheInfo.cached;                 
             } else {
-                _myImage = Modelling.createImage(window.scene, myImageSource);
+                _myImage = Modelling.createImage(window.scene, myImageSource, _myASyncLoad);
             }
             _mySource = myImageSource;
             myWidth = Protected.getNumber("width", _myImage.raster.width);
@@ -159,8 +184,25 @@ spark.Image.Constructor = function (Protected) {
 
         Public.width = myWidth;
         Public.height = myHeight;
+        if (_myASyncLoad && !myCachedImageFlag) {
+            bindOnSetCB();        
+        } else {
+            _myLoadCB ? _myLoadCB():null
+        }        
     };
-
+    
+    function bindOnSetCB() {
+        utils.dom.bindOnSetNodeValue(_myImage, "loaded", function(theAttribNode) {
+            if (_myImage) {                                
+                Public.width = Protected.getNumber("width", _myImage.raster.width);
+                Public.height = Protected.getNumber("height", _myImage.raster.height);
+                if (theAttribNode.nodeValue) {
+                    _myLoadCB ? _myLoadCB():null
+                }
+            }
+        });        
+    };
+    
     Base.postRealize = Public.postRealize;
     Public.postRealize = function () {
         if (_mySourceId) {

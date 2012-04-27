@@ -91,7 +91,6 @@ using namespace std;
 using namespace asl;
 
 namespace y60 {
-
     /* Image filtering on save/load */
     void
     applyCustomFilter(PLBmp & theBitmap, const VectorOfString & theFilterName, const VectorOfVectorOfFloat & theFilterparams) {
@@ -217,6 +216,7 @@ namespace y60 {
 
     void
     ImageLoader::loadSingleImage(asl::Ptr<ReadableBlockHandle> theImageBlock) {
+
         I60Header myHeader;
         theImageBlock->getBlock().readData(myHeader, 0);
 

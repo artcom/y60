@@ -3117,6 +3117,17 @@ Possible values are:
                 <xs:documentation>A list of float values used by the filter as paramters</xs:documentation>
             </xs:annotation>
         </xs:attribute>
+        <xs:attribute name="loadasync" type="xs:boolean">
+            <xs:annotation>
+                <xs:documentation>Control image load process</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="loaded" type="xs:boolean">
+            <xs:annotation>
+                <xs:documentation>A flag indicating the load state of the image</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        
         <xs:attribute name="tile" type="Vector2i">
             <xs:annotation>
                 <xs:documentation>Defines how the six images of a cubemap are arranged
