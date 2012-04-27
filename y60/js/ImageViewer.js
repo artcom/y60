@@ -55,7 +55,6 @@
 //       - unknown
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
-var ourFrameCounter = 0;
 if (__main__ == undefined) var __main__ = "ImageViewer";
 
 use("SceneViewer.js");
@@ -262,10 +261,6 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
     self.onFrame = function(theTime) {
 
         Base.onFrame(theTime);
-        ourFrameCounter++;
-        if (ourFrameCounter == 60) {
-            showImage("TEX/gier_plan_8000px.png");
-        }
         _myImageOverlay.onFrame();
         /* if (window.fps < 60) {
             print("miss: " + window.fps + " / " + millisec());
