@@ -35,11 +35,18 @@ Raster
 TextureAtlas
 )
 
+if(NOT WIN32)
+    find_package(Boost COMPONENTS thread)
+endif(NOT WIN32)
+
+list(APPEND EXTERNALS Boost)
+
 ac_add_library(
     y60image y60/image
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     DEPENDS aslbase asldom aslmath aslzip
             y60base paintlib textureatlas
+    EXTERNS ${EXTERNALS}
     TESTS   ${TESTS}
 )
