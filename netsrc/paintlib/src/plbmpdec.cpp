@@ -37,7 +37,7 @@ void PLBmpDecoder::Open (PLDataSource * pDataSrc)
   
   PLPixelFormat pf;
   if (m_pBMI->biBitCount <= 8) {
-    pf = PLPixelFormat::I8;
+    pf = PLPixelFormat::L8;
   } else {
     if (m_pBMI->biBitCount == 32) {
       pf = PLPixelFormat::A8R8G8B8;
