@@ -153,6 +153,9 @@ namespace y60 {
         }
 
         alloc(_myWidth * _myHeight * _myComponents);
+        if (_myComponents != 4) {
+            glPixelStorei(GL_PACK_ALIGNMENT, 1);
+        }
         glReadPixels(0, 0, _myWidth, _myHeight, myFormat, GL_UNSIGNED_BYTE, _myData.begin());
     }
 
