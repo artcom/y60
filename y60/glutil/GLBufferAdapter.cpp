@@ -247,7 +247,7 @@ namespace y60 {
                         int myQuality = theCompressionOrQualityLevel;
                         myEncoder.SetQuality(myQuality);
                     }
-                    if (theBmp->GetBitsPerPixel() >= 24 ) {
+                    if (theBmp->GetBitsPerPixel() > 24 ) {
                         theBmp->ApplyFilter(PLFilterFlipRGB());
                     }
                     myEncoder.MakeFileFromBmp(thePath.c_str(), theBmp.get());

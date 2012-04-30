@@ -231,38 +231,16 @@ void PLJPEGEncoder::encodeRGB24
 
   PLBYTE * pBuf = NULL;
   int CurLine = 0;
-  JSAMPARRAY ppBuf = &pBuf;
-
-#if ((PL_RGBA_RED!=RGB_RED)||(PL_RGBA_GREEN!=RGB_GREEN)||(PL_RGBA_BLUE!=RGB_BLUE)||(4!=RGB_PIXELSIZE))
-  pBuf = new PLBYTE [pBmp->GetWidth()*RGB_PIXELSIZE];
-#else
   int written = 0;
-#endif
 
   while (CurLine < iScanLines)
   {
-#if ((PL_RGBA_RED!=RGB_RED)||(PL_RGBA_GREEN!=RGB_GREEN)||(PL_RGBA_BLUE!=RGB_BLUE)||(4!=RGB_PIXELSIZE))
-    PLPixel24 ** pLineArray = pBmp->GetLineArray24();
-    int i;
-    for (i=0;i<pBmp->GetWidth();i++)
-    {
-
-      PLPixel24 * pSrcPixel = pLineArray[CurLine]+i;
-      PLBYTE * pDestPixel = pBuf+i*RGB_PIXELSIZE;
-      pDestPixel[RGB_RED] = pSrcPixel->GetR();
-      pDestPixel[RGB_GREEN] = pSrcPixel->GetG();
-      pDestPixel[RGB_BLUE] = pSrcPixel->GetB();
-    }
-    jpeg_write_scanlines (m_pcinfo, ppBuf, 1);
-    CurLine++;
-#else
     PLBYTE ** pLineArray = pBmp->GetLineArray();
     written = jpeg_write_scanlines (m_pcinfo,&pLineArray[CurLine], pBmp->GetBitsPerPixel());
     CurLine+=written;
 
     if(!written)
       break;
-#endif
   }
   if(pBuf)
   {
