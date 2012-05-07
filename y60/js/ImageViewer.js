@@ -261,7 +261,6 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
     self.onFrame = function(theTime) {
 
         Base.onFrame(theTime);
-        _myImageOverlay.onFrame();
         /* if (window.fps < 60) {
             print("miss: " + window.fps + " / " + millisec());
         }*/

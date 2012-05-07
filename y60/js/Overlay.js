@@ -217,8 +217,6 @@ OverlayBase.prototype.Constructor = function(Public, Protected, theScene, thePos
         myParent.insertBefore(_myNode, myParent.firstChild);
     };
 
-    Public.onFrame = function(theTime) {};
-
     /// This checks if the square defined by theX/theY and theSquareSize overlaps with the overlay
     //  @param theXPos        integer   X-Center of the square to check for overlap
     //  @param theXPos        integer   Y-Center of the square to check for overlap
@@ -699,7 +697,7 @@ function ImageOverlayBase(theScene, theSource, thePosition, theParent) {
 ImageOverlayBase.prototype.Constructor = function(Public, Protected, theScene, theSource, thePosition, theParent) {
 
     TextureOverlay.prototype.Constructor(Public, Protected, theScene, thePosition, theParent);
-    Public._myPublicAttribute = 0;
+    
     ///////////////////////////////////////////////////////////////////////////////////////////
     // Private
     ///////////////////////////////////////////////////////////////////////////////////////////

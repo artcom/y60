@@ -170,7 +170,6 @@ ourShow.onFrameDone = function(theFrameCount) {
                 // Test image filtering
                 ourImage.filter = "resizebilinear";
                 ourImage.filter_params = [20, 10];
-                //explicit image load triggern
                 //ENSURE("ourImage.loadcount == " + ourLoadCount);
                 ENSURE("ourImage.width == 32");
                 ENSURE("ourImage.height == 16");

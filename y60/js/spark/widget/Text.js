@@ -224,7 +224,7 @@ spark.Text.Constructor = function (Protected) {
     });
 
     Public.__defineSetter__("hinting", function (theHinting) {
-        _myStyle.hinting= theHinting;
+        _myStyle.hinting = theHinting;
         Protected.render();
     });
     Public.__defineGetter__("hinting", function () {
