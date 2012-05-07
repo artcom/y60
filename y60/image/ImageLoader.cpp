@@ -228,14 +228,7 @@ namespace y60 {
                 myDecoder.MakeBmpFromMemory(const_cast<unsigned char*>(theImageBlock->getBlock().begin()),
                         theImageBlock->getBlock().size(), this);
             } catch (const PLTextException & e) {
-#if 0
-                // create black image
-                AC_ERROR << "Paintlib exception occured while loading " << _myFilename << ": " << static_cast<const char *>(e);
-                internalCreate(512, 512, PLPixelFormat::B8G8R8);
-#else
-                // throw exception
                 throw ImageLoaderException(_myFilename + " - " + static_cast<const char *>(e), PLUS_FILE_LINE);
-#endif
 			} catch(std::exception & e) {
                 throw ImageLoaderException(_myFilename + " - " + e.what(), PLUS_FILE_LINE);
 			} catch(const asl::Exception &) {
@@ -359,7 +352,8 @@ namespace y60 {
         if (!mapFormatToPixelEncoding(thePixelformat, _myEncoding)) {
             throw ImageLoaderException(string("Unsupported Pixel Encoding: ") + thePixelformat.GetName(), PLUS_FILE_LINE);
         }
-        _myRasterData = createRasterValue(_myEncoding, theWidth, theHeight);
+        _myData = asl::Ptr<Block>(new Block());
+        _myData->resize(getBytesRequired(theWidth * theHeight, _myEncoding));
 
         initLocals (theWidth, theHeight, thePixelformat);
     }
@@ -388,7 +382,7 @@ namespace y60 {
         unsigned myHeight     = GetHeight();
         unsigned myLineStride = GetBytesPerLine();
 
-        const unsigned char * pBits = getRaster()->pixels().begin();
+        const unsigned char * pBits = _myData->begin();
         for (unsigned i = 0; i < myHeight; ++i) {
             m_pLineArray[i] = (PLBYTE*)pBits; // caution: const leak
             pBits += myLineStride;
@@ -478,7 +472,6 @@ namespace y60 {
             }
 
             // Update internal representation
-            //_myData = myDestinationBlock;
             switch (_myEncoding) {
                 case RGBA :
                     _myEncoding = RGB;
@@ -489,8 +482,7 @@ namespace y60 {
                 default:
                     throw ImageLoaderException("Unsupported pixel encoding", PLUS_FILE_LINE);
             }
-            _myRasterData = createRasterValue(_myEncoding, myWidth, myHeight,
-                *myDestinationBlock);
+            _myData = myDestinationBlock;
             PLPixelFormat myPixelFormat;
             mapPixelEncodingToFormat(_myEncoding, myPixelFormat);
             SetBmpInfo(GetSize(), GetResolution(), myPixelFormat);
