@@ -330,7 +330,7 @@ PerfMeter.prototype.Constructor = function (self, theSceneViewer) {
             }
             var myViewport = theSceneViewer.getViewportAtWindowCoordinates(0, 0); // get viewport containing upper left pixel
 
-            window.renderText(new Node("<style textColor='" + myTextColor + "'/>").childNode(0), new Vector2f(10, 10), asMemoryString(getProcessMemoryUsage()), "Screen8", myViewport);
+            window.renderText(new Vector2f(10, 10), asMemoryString(getProcessMemoryUsage()), new Node("<style textColor='" + myTextColor + "'/>"), "Screen8", myViewport);
 
             var myAge = _mySceneViewer.getCurrentTime() - _myMaxMemoryTime;
             var myRed   = 1;
@@ -344,10 +344,10 @@ PerfMeter.prototype.Constructor = function (self, theSceneViewer) {
             }
 
             myTextColor = new Vector4f(myRed,myGreen,0,1);
-            window.renderText(new Node("<style textColor='" + myTextColor + "'/>").childNode(0), new Vector2f(10, 20), asMemoryString(_myMaxMemoryUsage), "Screen8", myViewport);
+            window.renderText(new Vector2f(10, 20), asMemoryString(_myMaxMemoryUsage), new Node("<style textColor='" + myTextColor + "'/>"), "Screen8", myViewport);
 
             var myMem = asMemoryString(getFreeMemory()) + "/" + asMemoryString(getTotalMemory());
-            window.renderText(new Node("<style textColor='" + myTextColor + "'/>").childNode(0), new Vector2f(10, 30), myMem, "Screen8", myViewport);
+            window.renderText(new Vector2f(10, 30), myMem, new Node("<style textColor='" + myTextColor + "'/>"), "Screen8", myViewport);
         }
         */
     };

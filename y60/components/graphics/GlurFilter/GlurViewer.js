@@ -115,7 +115,7 @@ window.onStartMainLoop = function() {
     window.loadTTF("Arial", "${PRO}/testmodels/fonts/arial.ttf", 18);
     var myImageNode = window.scene.images.appendChild(new Node("<image/>").firstChild);
     glurImage(myImageNode);
-    window.renderTextAsImage(myImageNode, "hallo welt", new Node("<style/>").childNode(0), "Arial", 200, 100)
+    window.renderTextAsImage(myImageNode, "hallo welt", "Arial", new Node("<style/>"), 200, 100)
     var myTextOverlay = new ImageOverlay(window.scene, myImageNode, [100,100]);
     //saveImage(myImageNode, "test.png");
     print(myImageNode.filter_params);

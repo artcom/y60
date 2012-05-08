@@ -177,18 +177,19 @@ OnScreenDisplay.prototype.Constructor = function(self, theSceneViewer) {
             if (myYPos < 10) {
                 myYPos = 10;
             }
-
             var myLine = 0;
             for (var i = _myNextMessageLine; i < _myMessage.length; ++i) {
                 myGreyValue = 1 - (_myMessage.length - myLine) * (0.3 / LINE_COUNT);
                 var myTextColor = new Vector4f(myGreyValue,myGreyValue,myGreyValue,_myOverlay.alpha);
-                window.renderText(new Node("<style textColor='" + myTextColor + "'/>").childNode(0), new Vector2f(myXPos, (myYPos + (myLine * 24))), _myMessage[i], _myFontname, _myViewport);
+                var myStyle = new Node("<style textColor='" + myTextColor + "'/>");
+                window.renderText(new Vector2f(myXPos, (myYPos + (myLine * 24))), _myMessage[i], myStyle, _myFontname, _myViewport);
                 myLine++;
             }
             for (i = 0; i < _myNextMessageLine; ++i) {
                 myGreyValue = 1 - (_myMessage.length - myLine) * (0.3 / LINE_COUNT);
                 var myTextColor = new Vector4f(myGreyValue,myGreyValue,myGreyValue,_myOverlay.alpha);
-                window.renderText(new Node("<style textColor='" + myTextColor + "'/>").childNode(0), new Vector2f(myXPos, (myYPos + (myLine * 24))), _myMessage[i], _myFontname, _myViewport);
+                var myStyle = new Node("<style textColor='" + myTextColor + "'/>");
+                window.renderText(new Vector2f(myXPos, (myYPos + (myLine * 24))), _myMessage[i], myStyle, _myFontname, _myViewport);
                 myLine++;
             }
         }

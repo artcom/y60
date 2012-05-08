@@ -355,10 +355,10 @@ function textToImage(theImage, theText, theStyle, theSize) {
     // theImage.mipmap = false;
 
     var myTextSize =
-        window.renderTextAsImage(theStyle,
-                                 theImage,
+        window.renderTextAsImage( theImage,
                                  theText,
                                  fontForStyle(theStyle),
+                                 theStyle,
                                  theSize.x, theSize.y,
                                  new Vector2i(0,0));
 

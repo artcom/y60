@@ -124,9 +124,8 @@ LabelBase.prototype.Constructor = function(Public, Protected, theScene,
         var myFontName = loadFont(myStyle.font, myStyle.fontsize);
         var myImage = Protected.getImageNode();
         var myStyle = new Node("<style/>");
-        myStyle = myStyle.childNode(0);                
         
-        _myTextSize = window.renderTextAsImage(myStyle, myImage, theText, myFontName,
+        _myTextSize = window.renderTextAsImage(myImage, theText, myFontName, myStyle, 
                         theSize&&theSize[0]>0?Public.width:null,
                         theSize&&theSize[1]>0?Public.height:null,
                         Public.textCursorPos);
