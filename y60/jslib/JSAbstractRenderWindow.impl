@@ -439,7 +439,7 @@ JSAbstractRenderWindow<DERIVED>::renderText(JSContext *cx, JSObject *obj, uintN 
     DOC_BEGIN("Renders a text onto the screen");
     DOC_PARAM("thePosition in Pixel", "", DOC_TYPE_VECTOR2F);
     DOC_PARAM("theTextString", "", DOC_TYPE_STRING);
-    DOC_PARAM("theStyleObject", "A textstyle object", DOC_TYPE_OBJECT);    
+    DOC_PARAM_OPT("theStyleObject", "A textstyle object", DOC_TYPE_OBJECT, "");    
     DOC_PARAM_OPT("theFontName", "An OpenGL compiled font name", DOC_TYPE_STRING, "Screen15");
     DOC_PARAM_OPT("theViewport", "", DOC_TYPE_OBJECT, "");
     DOC_END;
@@ -508,16 +508,14 @@ JSAbstractRenderWindow<DERIVED>::renderTextAsImage(JSContext *cx, JSObject *obj,
     DOC_PARAM("theImageNode", "A X60 target imagenode", DOC_TYPE_NODE);
     DOC_PARAM("theTextString", "The text to render", DOC_TYPE_STRING);
     DOC_PARAM("theFontName", "The font name", DOC_TYPE_STRING);
-    DOC_PARAM("theStyleObject", "A textstyle object", DOC_TYPE_OBJECT);
-    DOC_PARAM("theTextBoxWidth", "The textbox width, 0 to fit text", DOC_TYPE_INTEGER);
-    DOC_PARAM("theTextBoxHeight", "The textbox height, 0 to fit text", DOC_TYPE_INTEGER);
-    DOC_PARAM("theCursorPos", "where to place the text cursor. default is (0,0)", DOC_TYPE_VECTOR2I);
+    DOC_PARAM_OPT("theStyleObject", "A textstyle object", DOC_TYPE_OBJECT, "");
+    DOC_PARAM_OPT("theTextBoxWidth", "The textbox width, 0 to fit text", DOC_TYPE_INTEGER, 0);
+    DOC_PARAM_OPT("theTextBoxHeight", "The textbox height, 0 to fit text", DOC_TYPE_INTEGER, 0);
+    DOC_PARAM_OPT("theCursorPos", "where to place the text cursor. default is (0,0)", DOC_TYPE_VECTOR2I, asl::Vector2i(0,0));
     DOC_RVAL("theFilledTextBoxSize", DOC_TYPE_VECTOR2I);
     DOC_END;
 
-    //asl::NanoTime myStartTime;
-    //myStartTime.setNow();
-    
+    ensureParamCount(argc, 3, 7);
     dom::NodePtr theImageNode;
     std::string theTextString;
     std::string theFontName;
@@ -574,6 +572,7 @@ JSAbstractRenderWindow<DERIVED>::renderTextAsImage(JSContext *cx, JSObject *obj,
 
     try {
     switch (argc) {
+        case 3:
         case 4:
             jslib::JSClassTraits<DERIVED>::openNativeRef(cx, obj).setTextStyle(myTextStyle);
             myBoxSize = jslib::JSClassTraits<DERIVED>::openNativeRef(cx, obj).
@@ -599,11 +598,10 @@ JSAbstractRenderWindow<DERIVED>::renderTextAsImage(JSContext *cx, JSObject *obj,
             jslib::JSClassTraits<DERIVED>::closeNativeRef(cx,obj);
             break;
         default:
-            JS_ReportError(cx,"JSRenderWindow::renderTextAsImage: wrong number of arguments, 3 to 6 expected ");
+            JS_ReportError(cx,"JSRenderWindow::renderTextAsImage: wrong number of arguments, 3 to 7 expected ");
             return JS_FALSE;
     }
     *rval = as_jsval(cx, myBoxSize);
-    //AC_PRINT << "JSAbstractRenderWindow::renderTextAsImage duration: " << (asl::NanoTime() - myStartTime).millis();    
     return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }
