@@ -94,7 +94,7 @@ namespace y60 {
 
     SDLTextRenderer::SDLTextRenderer() :
          _myTextureSurface(0),
-         _myWordDelimiters(" \t;-:\\/|")
+         _myWordDelimiters(" \t;-:/|")
     {
         if ( TTF_Init() < 0 ) {
             AC_ERROR << "Couldn't initialize TTF: "<< SDL_GetError()<<endl;
