@@ -137,8 +137,8 @@ class RasterTest : public UnitTest {
 		        myImageLoader.SetResolution(PLPoint(0,0)); // ignore dpi in file
                 ENSURE(myReferenceBmp == myImageLoader);
 
-                ResizeableRasterPtr myRaster = myImageLoader.getRaster();
-                dom::ValuePtr myRasterValue = myImageLoader.getData();
+                dom::ValuePtr myRasterValue = createRasterValue(myImageLoader.getEncoding(), myImageLoader.GetWidth(), myImageLoader.GetHeight(), *myImageLoader.getData());
+                ResizeableRasterPtr myRaster = dynamic_cast_Ptr<dom::ResizeableRaster>(myRasterValue); 
                 string myRasterString = myRasterValue->getString();
 
                 //cerr << myRasterString << endl;

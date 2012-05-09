@@ -273,8 +273,9 @@ namespace y60 {
         AC_INFO << get<ImageSourceTag>() << " is loaded async -> " << get<ImageAsyncFlagTag>();
         unsigned myDepth = get<ImageDepthTag>();
         if (get<ImageAsyncFlagTag>()) {
+            AC_DEBUG << "ImageLoaderThreadPool pending tasks: " << ImageLoaderThreadPool::get().getThreadPool().pending();
             ImageLoaderThreadPool::get().getThreadPool().wait(ImageLoaderThreadPool::get().getThreadPool().size()*2); //allow only threadpool size pending tasks
-            ImageLoaderThreadPool::get().getThreadPool().schedule(boost::bind(&Image::aSyncLoad, this,myDepth));
+            ImageLoaderThreadPool::get().getThreadPool().schedule(boost::bind(&Image::aSyncLoad, this,myDepth, get<ImageSourceTag>()));
         } else {
              boost::shared_ptr<ImageLoader> myImageLoader = boost::shared_ptr<ImageLoader>(new ImageLoader(get<ImageSourceTag>(), AppPackageManager::get().getPtr(),
                 ITextureManagerPtr(), myDepth));
@@ -283,8 +284,8 @@ namespace y60 {
         }
     }
 
-    void Image::aSyncLoad(unsigned theDepth) {
-        _myImageLoaderQueue.push(boost::shared_ptr<ImageLoader>(new ImageLoader(get<ImageSourceTag>(), AppPackageManager::get().getPtr(),
+    void Image::aSyncLoad(unsigned theDepth, const std::string theSource) {
+        _myImageLoaderQueue.push(boost::shared_ptr<ImageLoader>(new ImageLoader(theSource, AppPackageManager::get().getPtr(),
             ITextureManagerPtr(), theDepth)));
 
     }
@@ -304,7 +305,8 @@ namespace y60 {
         // Drop alpha channel if unused
         theImageLoader->removeUnusedAlpha();
 
-        setRasterValue(theImageLoader->getData(), theImageLoader->getEncoding(), myDepth);
+        dom::ValuePtr myRaster = createRasterValue(theImageLoader->getEncoding(), theImageLoader->GetWidth(), theImageLoader->GetHeight(), *theImageLoader->getData());
+        setRasterValue(myRaster, theImageLoader->getEncoding(), myDepth);
         set<ImageMatrixTag>(theImageLoader->getImageMatrix());
 
         set<ImageWidthTag>(getRasterPtr()->width());

@@ -251,9 +251,9 @@ JSTextureAtlas::createSubtexturesFromJSObject(JSContext *cx, JSObject * theSubte
                 throw ArgumentConversionFailed("JSTextureAtlas: value for '"+textureName+"' must be a file path (string)", PLUS_FILE_LINE);
             };
             ImageLoader imageLoader(Path(texturePath, UTF8).toLocale(), JSApp::getPackageManager());
+            dom::ValuePtr myRaster = createRasterValue(imageLoader.getEncoding(), imageLoader.GetWidth(), imageLoader.GetHeight(), *imageLoader.getData());
             
-            dom::ResizeableRasterPtr myRaster = imageLoader.getRaster();
-            mySubtextures.insert(make_pair(textureName, myRaster));
+            mySubtextures.insert(make_pair(textureName, dynamic_cast_Ptr<dom::ResizeableRaster>(myRaster)));
         }
     }
     if (myPropIds) {

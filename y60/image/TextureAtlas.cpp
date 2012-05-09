@@ -153,11 +153,6 @@ namespace y60 {
 
     const dom::ResizeableRasterPtr 
     TextureAtlas::getRaster() const {
-        if (!_masterRaster) {
-            // load the raster
-            ImageLoader imageLoader(_masterRasterPath.toLocale());
-            _masterRaster = imageLoader.getRaster();
-        }
         return _masterRaster;
     }
 

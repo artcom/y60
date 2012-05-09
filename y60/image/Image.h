@@ -261,7 +261,7 @@ namespace y60 {
 
         asl::Ptr<asl::PackageManager> _myPackageManager;
 
-        void aSyncLoad(unsigned theDepth);
+        void aSyncLoad(unsigned theDepth, const std::string theSource);
         asl::thread::concurrent_queue<boost::shared_ptr<ImageLoader> > _myImageLoaderQueue;
 
     };
