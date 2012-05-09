@@ -223,11 +223,10 @@ CharacterSoup.prototype.Constructor = function(self, theFontname,
                                    + Math.abs(myMetric.min.x);
                 var surfaceHeight = myHeight+_myGlyphPadding;
                 var myStyle = new Node("<style/>");
-                myStyle = myStyle.childNode(0);                
-                var mySurfaceSize = window.renderTextAsImage(myStyle,
-                                                             myTmpImage,
+                var mySurfaceSize = window.renderTextAsImage(myTmpImage,
                                                              myChar,
                                                              myFontName,
+                                                             myStyle,
                                                              surfaceWidth,
                                                              surfaceHeight,
                                                              [_myGlyphPadding,
