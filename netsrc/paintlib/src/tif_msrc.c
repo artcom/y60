@@ -147,7 +147,7 @@ _tiffDummyUnmapProc(thandle_t fd, tdata_t base, toff_t size)
 }
 
 
-#ifndef LIBTIFF_MACOSX /* NON-MACOSX ONLY */
+#ifndef OSX /* NON-MACOSX ONLY */
 
 TIFF*
 TIFFFdOpen(int ifd, const char* name, const char* mode)
@@ -195,7 +195,7 @@ TIFFOpenMem (unsigned char * pData,
 	return (tif);
 }
 
-#ifndef LIBTIFF_MACOSX /* NON-MACOSX */
+#ifndef OSX /* NON-MACOSX */
 
 tdata_t
 _TIFFmalloc(tsize_t s)
