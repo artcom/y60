@@ -90,6 +90,13 @@ GUI.CompositeAnimation.Constructor = function (Public, Protected) {
         theAnimation.parent = Public;
         Public.childDurationChanged();
     };
+    
+    Public.remove = function (theAnimation) {
+        // TODO check if instanceof Animation
+        var index = js.array.indexOf (_.children, theAnimation);
+        _.children.splice(index,1);
+        Public.childDurationChanged();
+    };
 
     // duration computation, should be overridden
     Public.childDurationChanged = function (theChild) {
