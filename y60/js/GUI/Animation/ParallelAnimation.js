@@ -89,7 +89,15 @@ GUI.ParallelAnimation.prototype.Constructor = function (Public, Protected) {
         }
         Protected.duration = d;
     };
-
+    
+    Base.add = Public.add;
+    Public.add = function (theAnimation) {
+        Base.add(theAnimation);
+        if (Public.running) {
+            theAnimation.play();
+        }
+    };
+    
     // start playing all children
     Base.play = Public.play;
     Public.play = function (theComeToAnEndFlag) {
