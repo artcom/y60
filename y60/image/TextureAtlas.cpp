@@ -154,9 +154,8 @@ namespace y60 {
     const dom::ResizeableRasterPtr 
     TextureAtlas::getRaster() const {
         if (!_masterRaster) {
-            // load the raster
-            ImageLoader imageLoader(_masterRasterPath.toLocale());
-            _masterRaster = imageLoader.getRaster();
+            ImageLoader myImageLoader(_masterRasterPath.toLocale());//, thePackageManager);
+            _masterRaster = dynamic_cast_Ptr<dom::ResizeableRaster>(createRasterValue(myImageLoader.getEncoding(), myImageLoader.GetWidth(), myImageLoader.GetHeight(), *myImageLoader.getData()));
         }
         return _masterRaster;
     }
@@ -235,6 +234,7 @@ namespace y60 {
         
         std::string atlasDirectory = getDirectoryPart(theFilename.toUTF8());
         _masterRasterPath = Path(atlasDirectory+ doc.childNode("TextureAtlas")->getAttributeString("src"), UTF8);
+
         // load the translation table
         for (AC_SIZE_TYPE i = 0; i < doc.childNode("TextureAtlas")->childNodesLength("Subtexture"); ++i) {
             const dom::NodePtr subTextureNode =  doc.childNode("TextureAtlas")->childNode("Subtexture",i);

@@ -158,32 +158,33 @@ appendFrame(const string & theSourceFile, asl::WriteableStream & theTargetBlock,
                 as_string(myFrame->getHeaderSize()) + " previous frame had: " +
                 as_string(ourPreviousFrame->getHeaderSize()));
         }
-        if (myFrame->getRaster()->pixels().size() != ourPreviousFrame->getRaster()->pixels().size()) {
+        if (myFrame->getData()->size() != ourPreviousFrame->getData()->size()) {
             throw asl::Exception(string("Frame ") + theSourceFile + " has different size than previous frame");
         }
     }
 
-    dom::ValuePtr myNewFrame;
+    asl::Ptr<asl::Block> myNewFrame;
     if (ourPreviousFrame && (theMovieEncoding == MOVIE_DIFF || theMovieEncoding == MOVIE_DRLE)) {
-        myNewFrame = dom::ValuePtr(myFrame->getData()->clone(0));
-        raster_cast(myNewFrame)->sub(*ourPreviousFrame->getData());
+        dom::StringValue myPreviousData(*ourPreviousFrame->getData(), 0);
+        dom::ValuePtr myRasterValue = createRasterValue(myFrame->getEncoding(), myFrame->GetWidth(), myFrame->GetHeight(), *myFrame->getData());
+        raster_cast(myRasterValue)->sub(myPreviousData);
     } else {
         myNewFrame = myFrame->getData();
     }
     if (theMovieEncoding == MOVIE_RLE || theMovieEncoding == MOVIE_DRLE) {
         DB(
-            cerr << "  Appending compressed frame with size: " << myNewFrame->accessReadableBlock().size() << endl;
+            cerr << "  Appending compressed frame with size: " << myNewFrame->size() << endl;
             cerr << "  at fileposition: " << theTargetBlock.size() << endl;
         )
-        theTargetBlock.appendUnsigned32(myNewFrame->accessReadableBlock().size());
-        theTargetBlock.append(myNewFrame->accessReadableBlock());
+        theTargetBlock.appendUnsigned32(myNewFrame->size());
+        theTargetBlock.append(*myNewFrame);
     } else {
         DB(
-            cerr << "  Appending uncompressed frame with size: " << raster_cast(myNewFrame)->pixels().size() << endl;
+            cerr << "  Appending uncompressed frame with size: " << myNewFrame->size() << endl;
             cerr << "  at fileposition: " << theTargetBlock.size() << endl;
         )
-        theTargetBlock.appendUnsigned32(raster_cast(myNewFrame)->pixels().size());
-        theTargetBlock.append(raster_cast(myNewFrame)->pixels());
+        theTargetBlock.appendUnsigned32(myNewFrame->size());
+        theTargetBlock.append(*myNewFrame);
     }
 
     ourPreviousFrame = myFrame;

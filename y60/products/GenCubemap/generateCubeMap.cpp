@@ -148,7 +148,7 @@ void addCubeMapImage(const std::string & theFace, PLBmp & theTargetBitmap, bool 
     }
 
     cout << "Added face: " << theFace << " from file: " << myFileName << endl;
-    copyImageData(myFace,  theTargetBitmap, (myFace->getRaster()->pixels().size()) * myCounter);
+    copyImageData(myFace,  theTargetBitmap, (myFace->getData()->size()) * myCounter);
 
 }
 

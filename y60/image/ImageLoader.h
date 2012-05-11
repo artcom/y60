@@ -131,11 +131,8 @@ namespace y60 {
             return _myEncoding;
         }
 
-        dom::ValuePtr getData() {
-            return _myRasterData;
-        }
-        dom::ResizeableRasterPtr getRaster() {
-            return dynamic_cast_Ptr<dom::ResizeableRaster>(_myRasterData);
+        asl::Ptr<asl::Block> getData() {
+            return _myData;
         }
 
         const asl::Matrix4f & getImageMatrix() const {
@@ -183,7 +180,7 @@ namespace y60 {
         void loadI60File(asl::Ptr<asl::ReadableBlockHandle> theImageBlock);
         void updateLineArray();
 
-        dom::ValuePtr                 _myRasterData;
+        asl::Ptr<asl::Block>          _myData;
         PixelEncoding                 _myEncoding;
         std::string                   _myFilename;
         unsigned long                 _myHeaderSize;

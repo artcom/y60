@@ -862,7 +862,6 @@ CreateImageFromBlock(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
         asl::Ptr<asl::ReadableBlockHandle> myBlockHandlePtr(new asl::AnyReadableBlockHandle(myImageBlockPtr));
         y60::ImageLoader myImageLoader( myBlockHandlePtr );
 
-        dom::ResizeableRasterPtr myRaster = myImageLoader.getRaster();
         y60::PixelEncoding myEncoding = myImageLoader.getEncoding();
 
         // remove existing raster
@@ -879,7 +878,9 @@ CreateImageFromBlock(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
         dom::DOMString myRasterName = RasterElementNames[myEncoding];
         dom::NodePtr myRasterChild = myImageNode->appendChild(dom::NodePtr(new dom::Element(myRasterName)));
         dom::NodePtr myTextChild = myRasterChild->appendChild(dom::NodePtr(new dom::Text()));
-        myTextChild->nodeValueWrapperPtr(myImageLoader.getData());
+
+        dom::ValuePtr myRaster = createRasterValue(myImageLoader.getEncoding(), myImageLoader.GetWidth(), myImageLoader.GetHeight(), *myImageLoader.getData());
+        myTextChild->nodeValueWrapperPtr(myRaster);
 
         myImageNode->bumpVersion();
 
