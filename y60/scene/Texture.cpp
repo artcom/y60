@@ -393,9 +393,7 @@ namespace y60 {
         TexturePtr myTexture = dynamic_cast_Ptr<Texture>(getSelf());
 
         bool myForceSetupFlag = isDirty<TextureIdTag>();
-        AC_TRACE << "ForceSetupFlag(0) : " << myForceSetupFlag;
         myForceSetupFlag |= get<TextureIdTag>() ? false:true;
-        AC_TRACE << "ForceSetupFlag(1) : " << myForceSetupFlag;
         bool myImageContentChangedFlag = false;
 
         // setup flags
@@ -419,7 +417,8 @@ namespace y60 {
             _myResourceManager->unbindTexture(this);
             _myTextureId = 0;
         }
-        AC_TRACE << "ForceSetupFlag(2) : " << myForceSetupFlag << " myImageContentChangedFlag : " << myImageContentChangedFlag;
+        AC_TRACE << "ForceSetupFlag : " << myForceSetupFlag << " myImageContentChangedFlag : " << myImageContentChangedFlag;
+        AC_TRACE << "         Image : " << myImage->get<ImageSourceTag>() << " -> " << myImage->get<ImageWidthTag>() << "/" << myImage->get<ImageHeightTag>();
         if (myForceSetupFlag) {
             _myTextureId = _myResourceManager->setupTexture(myTexture);
             AC_TRACE << "set<TextureIdTag>("<<_myTextureId<<")";

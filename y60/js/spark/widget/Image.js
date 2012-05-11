@@ -96,9 +96,9 @@ spark.Image.Constructor = function (Protected) {
                 Public.image = Modelling.createImage(window.scene, _mySource, _myASyncLoad);
             }
         }
-        if (_myASyncLoad && !myCachedImageFlag) {
+        if (_myASyncLoad) {
             bindOnSetCB();        
-        } else {
+        } else if (!myCachedImageFlag ) {
             _myLoadCB ? _myLoadCB():null
         }
     });
@@ -184,15 +184,14 @@ spark.Image.Constructor = function (Protected) {
 
         Public.width = myWidth;
         Public.height = myHeight;
-        if (_myASyncLoad && !myCachedImageFlag) {
+        if (_myASyncLoad) {// && !myCachedImageFlag) {
             bindOnSetCB();        
-        } else {
-            _myLoadCB ? _myLoadCB():null
+        } else if (!myCachedImageFlag ) {
+            _myLoadCB ? _myLoadCB():null // do it once per onload
         }        
     };
-    
     function bindOnSetCB() {
-        utils.dom.bindOnSetNodeValue(_myImage, "loaded", function(theAttribNode) {
+        registerImageOnLoadCallBack(_myImage, Public, function(theAttribNode) {
             if (_myImage) {                                
                 Public.width = Protected.getNumber("width", _myImage.raster.width);
                 Public.height = Protected.getNumber("height", _myImage.raster.height);
@@ -200,7 +199,7 @@ spark.Image.Constructor = function (Protected) {
                     _myLoadCB ? _myLoadCB():null
                 }
             }
-        });        
+        });
     };
     
     Base.postRealize = Public.postRealize;
@@ -212,3 +211,18 @@ spark.Image.Constructor = function (Protected) {
     };
 
 };
+var ourImageOnLoadCallBackMap = [];
+function registerImageOnLoadCallBack(theImage, theSparkObject, theCallBack) {
+    if (!(theImage.id in ourImageOnLoadCallBackMap)) {
+        utils.dom.bindOnSetNodeValue(theImage, "loaded", imageOnLoadCallBackDispatcher);
+        ourImageOnLoadCallBackMap[theImage.id] = [];
+    }
+    ourImageOnLoadCallBackMap[theImage.id].push({object: theSparkObject, callback: theCallBack});    
+}
+
+function imageOnLoadCallBackDispatcher(theAttribNode) {    
+    var myObjects = ourImageOnLoadCallBackMap[theAttribNode.parentNode.id];
+    for (var i = 0; i < myObjects.length; i++) {
+        myObjects[i].callback(theAttribNode);
+    }    
+}
