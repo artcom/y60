@@ -719,7 +719,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
             _myImageOverlay.topborder    = 1;
             _myImageNode = _myImageOverlay.image;
         }
-
+        _myImageNode.loadasync = false;
         _myImageNode.src = theFilename;
 
         if (_myFullSizeMode) {

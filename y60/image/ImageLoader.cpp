@@ -318,10 +318,11 @@ namespace y60 {
                                         float(myHeader.height) / myHeightPowerOfTwo,
                                         1.0f));
         // maybe we should cut off the i60 header here?
-        //_myData = theImageBlock;
-        _myRasterData = createRasterValue(_myEncoding, myWidthPowerOfTwo,
-            myHeightPowerOfTwo * myHeader.layercount,
-            asl::ReadableBlockAdapter(theImageBlock->getBlock().begin()+sizeof(I60Header), theImageBlock->getBlock().end()));
+        unsigned myBlockSize = theImageBlock->getBlock().size();
+        _myData = asl::Ptr<Block>(new Block());
+        _myData->resize(myBlockSize - sizeof(I60Header));
+        std::copy(theImageBlock->getBlock().begin()+sizeof(I60Header),
+                  theImageBlock->getBlock().end(), _myData->begin());
 
         // TODO: Add support for other compression formats
         SetBmpInfo(PLPoint(myWidthPowerOfTwo, myHeightPowerOfTwo * myHeader.layercount),
