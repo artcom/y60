@@ -96,7 +96,7 @@ spark.loadFont = function (theName, theSize, theFontScale, theFontStyle, theHint
     if (theAscendOffset == undefined) {
         theAscendOffset = 0;
     }
-    var myName = theName + "-" + theFontStyle + "-" + theSize + "-" + theHinting + "-" + theAscendOffset;
+    var myName = theName + "-" + theFontStyle + "-" + theSize + "-" + theHinting + "-" + theAscendOffset + "-" + theFontScale;
     if (!(myName in spark.ourLoadedFonts)) {
         if (theFontStyle != "normal") {
             spark.loadFont(theName, theSize, theFontScale, "normal", theHinting, theAscendOffset);
