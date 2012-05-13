@@ -123,7 +123,7 @@ namespace y60 {
             throw ShaderLibraryException(string("Could not find library '") + theLibraryFileName + "' in " +
                     AppPackageManager::get().getPtr()->getSearchPath(), PLUS_FILE_LINE);
         }
-        myPackageManager->add(asl::getDirectoryPart(theLibraryFileName));
+        myPackageManager->add(asl::getDirectoryPart(myShaderLibraryFileName));
 
         string myShaderLibraryStr;
         asl::readFile(myShaderLibraryFileName, myShaderLibraryStr);
