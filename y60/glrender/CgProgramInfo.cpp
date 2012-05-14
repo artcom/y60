@@ -177,7 +177,6 @@ namespace y60 {
             const std::string myParamName = asl::getStringFromEnum(it->first, CgAutoParameterString);
             int myArrayLength = it->second;
             string myDefine = string("-D")+myParamName+"_LENGTH="+asl::as_string(myArrayLength);
-            //string myDefine = string("-D")+myParamName+"_LENGTH=1";
             theArgStrings.push_back(myDefine);
         }
         for (unsigned i = 0; i < theArgStrings.size(); ++i) {
@@ -186,7 +185,8 @@ namespace y60 {
     }
 
     void CgProgramInfo::createAndCompileProgram() {
-        AC_DEBUG << "createAndCompileProgram '" << _myPathName.c_str() <<"', profile = " << ShaderProfileStrings[_myShader._myProfile];
+        AC_DEBUG << "createAndCompileProgram '" << _myPathName.c_str()
+                 <<"', profile = " << ShaderProfileStrings[_myShader._myProfile];
         DBP2(MAKE_GL_SCOPE_TIMER(CgProgramInfo_createAndCompileProgram));
 
         if (_myCgProgramString.empty()) {
@@ -196,13 +196,11 @@ namespace y60 {
             // create null terminated array of null terminated strings
             _myCachedCompilerArgs.resize(0);
             for (std::vector<std::string>::size_type i=0; i < _myShader._myCompilerArgs.size(); ++i) {
-                AC_DEBUG << "Using arg '" << _myShader._myCompilerArgs[i].c_str() << "'" << endl;
                 _myCachedCompilerArgs.push_back(_myShader._myCompilerArgs[i].c_str());
             }
 
-            //_myCachedCompilerArgs.push_back(0);
-
-            AC_DEBUG << "cgCreateProgramFromFile profile = " << ShaderProfileStrings[_myShader._myProfile] << ", entry= "<<_myShader._myEntryFunction;
+            AC_DEBUG << "cgCreateProgramFromFile profile = " << ShaderProfileStrings[_myShader._myProfile]
+                     << ", entry= "<<_myShader._myEntryFunction;
             DBP2(START_TIMER(CgProgramInfo_cgCreateProgramFromFile));
             std::vector<string> myArgStrings;
             std::vector<const char *> myArgs = _myCachedCompilerArgs;
@@ -218,7 +216,6 @@ namespace y60 {
 #endif
             myArgs.push_back(0);
             AC_TRACE << "cgCreateProgramFromFile  args = " << myArgs;
-            //AC_TRACE << "cgCreateProgram  unsized array fix args = " << myArgStrings;
             _myCgProgramID = cgCreateProgramFromFile(_myContext, CG_SOURCE,
                                                      _myPathName.c_str(),
                                                      getCgProfile(),
@@ -254,9 +251,9 @@ namespace y60 {
             }
 #endif
             myArgs.push_back(0);
-            //AC_TRACE << "cgCreateProgram  unsized array fix args = " << myArgStrings;
-            AC_TRACE << "cgCreateProgram  args = " << myArgs;
-            AC_DEBUG << "cgCreateProgram  profile = " << ShaderProfileStrings[_myShader._myProfile] << ", entry= "<<_myShader._myEntryFunction;
+            AC_DEBUG << "cgCreateProgram  args = " << myArgs;
+            AC_DEBUG << "cgCreateProgram  profile = " << ShaderProfileStrings[_myShader._myProfile]
+                     << ", entry= "<<_myShader._myEntryFunction;
             _myCgProgramID = cgCreateProgram(_myContext, CG_SOURCE, _myCgProgramString.c_str(),
                                              getCgProfile(), _myShader._myEntryFunction.c_str(),
                                              asl::begin_ptr(myArgs));
@@ -410,7 +407,9 @@ namespace y60 {
         AC_TRACE << "CgProgramInfo::setCGGLParameters";
         for (unsigned i=0; i<_myGlParams.size(); ++i) {
             CgProgramGlParam myParam = _myGlParams[i];
-            AC_TRACE << "setting CgGL parameter " << myParam._myParamName << " param=" << myParam._myParameter << " type=" << myParam._myStateMatrixType << " transform=" << myParam._myTransform;
+            AC_TRACE << "setting CgGL parameter " << myParam._myParamName
+                     << " param=" << myParam._myParameter << " type=" << myParam._myStateMatrixType
+                     << " transform=" << myParam._myTransform;
             cgGLSetStateMatrixParameter(myParam._myParameter,
                                         myParam._myStateMatrixType,
                                         myParam._myTransform);
@@ -424,7 +423,7 @@ namespace y60 {
         const MaterialBase & theMaterial)
     {
         DBP2(MAKE_GL_SCOPE_TIMER(CgProgramInfo_reloadIfRequired));
-        AC_DEBUG << "reloadIfRequired - " << ShaderProfileStrings[_myShader._myProfile];
+        AC_TRACE << "reloadIfRequired - " << ShaderProfileStrings[_myShader._myProfile];
 
         bool myReload = false;
         unsigned myPositionalLightCount = 0;
@@ -500,7 +499,6 @@ namespace y60 {
         if (myReload == false /* && _myAutoParams.find(TEXTURE_MATRICES) != _myAutoParams.end() */) {
             unsigned myLastCount = _myUnsizedArrayAutoParamSizes[TEXTURE_MATRICES];
             if (myLastCount != theMaterial.getTextureUnitCount()) {
-                AC_TRACE << "myLastCount="<< myLastCount;
                 myReload = true;
             }
         }
@@ -567,7 +565,8 @@ namespace y60 {
         const Body & theBody,
         const Camera & theCamera)
     {
-        AC_TRACE << "CgProgramInfo::bindBodyParams for shader filename=" << _myShader._myFilename << " entry=" << _myShader._myEntryFunction
+        AC_TRACE << "CgProgramInfo::bindBodyParams for shader filename=" << _myShader._myFilename
+                 << " entry=" << _myShader._myEntryFunction
                  << " body=" << theBody.get<NameTag>()<< " material=" << theMaterial.get<NameTag>()
                  << " camera=" << theCamera.get<NameTag>() << " viewport=" << theViewport.get<NameTag>();
 
@@ -802,7 +801,8 @@ namespace y60 {
 
     void
     CgProgramInfo::bindMaterialParams(const MaterialBase & theMaterial) {
-        AC_TRACE << "CgProgramInfo::bindMaterialParams shader filename=" << _myShader._myFilename << " entry=" << _myShader._myEntryFunction << " material=" << theMaterial.get<NameTag>();
+        AC_TRACE << "CgProgramInfo::bindMaterialParams shader filename=" << _myShader._myFilename
+                 << " entry=" << _myShader._myEntryFunction << " material=" << theMaterial.get<NameTag>();
         const MaterialPropertiesFacadePtr myPropFacade = theMaterial.getChild<MaterialPropertiesTag>();
         const Facade::PropertyMap & myProperties = myPropFacade->getProperties();
         for (unsigned i=0; i < _myMiscParams.size(); ++i) {
@@ -837,7 +837,10 @@ namespace y60 {
                                           const std::string & thePropertyName,
                                           const MaterialBase & theMaterial)
     {
-        AC_TRACE << "CgProgramInfo::setCgMaterialParameter: cgparam=" << theCgParameter << " node=" << theNode.nodeName() << " value=" << theNode.nodeValue() << " property=" << thePropertyName << " material=" << theMaterial.get<NameTag>() << " type=" << theNode.parentNode()->nodeName();
+        DB(AC_TRACE << "CgProgramInfo::setCgMaterialParameter: cgparam=" << theCgParameter
+                 << " node=" << theNode.nodeName() << " value=" << theNode.nodeValue()
+                 << " property=" << thePropertyName << " material=" << theMaterial.get<NameTag>()
+                 << " type=" << theNode.parentNode()->nodeName();)
         TypeId myType;
         myType.fromString(theNode.parentNode()->nodeName());
         switch(myType) {
@@ -911,11 +914,11 @@ namespace y60 {
                 const TextureUnit & myTextureUnit = theMaterial.getTextureUnit(myTextureIndex);
                 TexturePtr myTexture = myTextureUnit.getTexture();
                 unsigned myTextureId = myTexture->applyTexture();
-                AC_TRACE << "cgGLSetTextureParameter param=" << theCgParameter << " texid=" << myTextureId;
+                DB(AC_TRACE << "cgGLSetTextureParameter param=" << theCgParameter << " texid=" << myTextureId;)
                 cgGLSetTextureParameter( theCgParameter, myTextureId);
-                    AC_TRACE << "cgGLSetTextureParameter: Texture index " << as_string(myTextureIndex)
-                   << ", texid=" << myTextureId << ", property=" << thePropertyName
-                       << " to parameter : "<< cgGetParameterName(theCgParameter) << endl;
+                    DB(AC_TRACE << "cgGLSetTextureParameter: Texture index " << as_string(myTextureIndex)
+                                << ", texid=" << myTextureId << ", property=" << thePropertyName
+                                << " to parameter : "<< cgGetParameterName(theCgParameter);)
             } else {
                 throw ShaderException(string("Texture index ") + as_string(myTextureIndex) +
                                       " not found. Material id=" + theMaterial.get<IdTag>() + " name=" + theMaterial.get<NameTag>() + " has " + as_string(theMaterial.getTextureUnitCount()) + " texture(s)",
@@ -988,7 +991,7 @@ namespace y60 {
     {
         if (theParam._myType == CG_ARRAY) {
             int mySize = cgGetArraySize(theParam._myParameter, 0);
-            AC_TRACE << "setting array 3f size " << mySize;
+            DB(AC_TRACE << "setting array 3f size " << mySize;)
             if (mySize) {
                 cgGLSetParameterArray3f(theParam._myParameter, 0,
                                         mySize, theValue.begin()->begin());
@@ -1006,6 +1009,7 @@ namespace y60 {
     {
         if (theParam._myType == CG_ARRAY) {
             int mySize = cgGetArraySize(theParam._myParameter, 0);
+            DB(AC_TRACE << "setting array 4f size " << mySize;)
             if (mySize) {
                 cgGLSetParameterArray4f(theParam._myParameter, 0,
                                         mySize, theValue.begin()->begin());
@@ -1029,7 +1033,7 @@ namespace y60 {
         }
         for(int i = 0; i < mySize; ++i) {
             CGparameter myElement = cgGetArrayParameter(theParam._myParameter, i);
-            //AC_TRACE << "setting component " << i << " to " << theValue[i];
+            DB(AC_TRACE << "setting component " << i << " to " << theValue[i];)
             if (i < static_cast<int>(theValue.size())) {
                 cgSetParameter1f(myElement, theValue[i]);
             }
@@ -1049,7 +1053,7 @@ namespace y60 {
         }
         for(int i = 0; i < mySize; ++i) {
             CGparameter myElement = cgGetArrayParameter(theParam._myParameter, i);
-            AC_TRACE << "setting component " << i << " to " << theValue[i];
+            DB(AC_TRACE << "setting component " << i << " to " << theValue[i];)
             if (i < static_cast<int>(theValue.size())) {
                 cgSetParameter3f(myElement, theValue[i][0], theValue[i][1], theValue[i][2]);
             }
@@ -1069,7 +1073,7 @@ namespace y60 {
         }
         for(int i = 0; i < mySize; ++i) {
             CGparameter myElement = cgGetArrayParameter(theParam._myParameter, i);
-            //AC_TRACE << "setting component " << i << " to " << theValue[i];
+            DB(AC_TRACE << "setting component " << i << " to " << theValue[i];)
             cgSetParameter4f(myElement, theValue[i][0], theValue[i][1], theValue[i][2], theValue[i][3]);
         }
         assertCg(string("setCgUnsizedArrayParameter ") + theParam._myName, _myContext);

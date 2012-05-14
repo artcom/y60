@@ -130,6 +130,9 @@ namespace std {
     Y60_BASE_DECL std::ostream &
     operator << (std::ostream & theStream, const y60::VectorOfString & theStringVector);
 
+    Y60_BASE_DECL std::ostream &
+    operator << (std::ostream & theStream, const std::vector<const char *> & theStringVector);
+
     Y60_BASE_DECL std::istream &
     operator >> (std::istream & theStream, y60::VectorOfString & theStringVector);
 

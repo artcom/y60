@@ -308,27 +308,9 @@ namespace y60 {
         PackageList myPackages = AppPackageManager::get().getPtr()->getPackageList();
         PackageList::const_iterator it = myPackages.begin();
         while( it != myPackages.end() ) {
-            std::string myArg = " -I" + (*it++)->getPath();
+            std::string myArg = "-I" + (*it++)->getPath();
             theShader._myCompilerArgs.push_back( myArg );
         }
-
-#if 0
-        //old:
-        string myFilename = theShaderNode->getAttributeString(CG_FILE_PROPERTY);
-        theShader._myFilename = AppPackageManager::get().getPtr()->searchFile(myFilename);
-        if (theShader._myFilename.empty()) {
-            throw ShaderException(string("Could not find cg-shader '") + myFilename + "' in " +
-                                  AppPackageManager::get().getPtr()->getSearchPath(), PLUS_FILE_LINE);
-        }
-        theShader._myEntryFunction = theShaderNode->getAttributeString(CG_ENTRY_FUNCTION_PROPERTY);
-        string myProfile = theShaderNode->getAttributeString(CG_PROFILE_PROPERTY);
-        theShader._myProfile = ShaderProfile(asl::getEnumFromString(myProfile,
-                                                                    ShaderProfileStrings));
-        if (theShaderNode->getAttribute(CG_COMPILERARGS_PROPERTY)) {
-            processCompilerArgs(theShader._myCompilerArgs,
-                                theShaderNode->getAttributeString(CG_COMPILERARGS_PROPERTY));
-        }
-#endif
     }
 
     bool

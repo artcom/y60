@@ -140,6 +140,30 @@ namespace std {
         return theStream;
     }
 
+    std::ostream &
+    operator << (std::ostream & theStream, const std::vector<const char *> & theStringVector) {
+        theStream << "[";
+        for (unsigned i = 0; i < theStringVector.size(); ++i) {
+            if (theStringVector[i]) {
+                std::string myString(theStringVector[i]);
+                theStream << VECTOR_OF_STRING_DELIMITER;
+                for (std::string::size_type j = 0; j < myString.size();++j) {
+                    const char & c = myString[j];
+                    if (c == VECTOR_OF_STRING_DELIMITER || c == '[' || c == ']' || c == ',' || c == '\\') {
+                        theStream << '\\';
+                    }
+                    theStream << c;
+                }
+                theStream << VECTOR_OF_STRING_DELIMITER;
+                if (i < theStringVector.size() - 1) {
+                    theStream << ",";
+                }
+            }
+        }
+        theStream << "]";
+        return theStream;
+    }
+
     std::istream &
     operator >> (std::istream & theStream, y60::VectorOfString & theStringVector) {
         char myChar;
