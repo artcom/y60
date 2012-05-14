@@ -145,7 +145,7 @@ GUI.Animation.Constructor = function (Public, Protected) {
     };
 
     Protected.standardToString = function (cls) {
-        return cls + " " + Public.path + ((Public.name !== null) ? (" (" + Public.name + ") ") : "") + "; running: " + _.running + "; duration: " + _.duration;
+        return cls + " " + Public.path + ((Public.name !== null) ? (" (" + Public.name + ") ") : "") + "; running: " + _.running + "; duration: " + _.duration + "; loop: " + _.loop;
     };
 
     ////////////////////
