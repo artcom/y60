@@ -96,11 +96,11 @@ spark.Image.Constructor = function (Protected) {
                 Public.image = Modelling.createImage(window.scene, _mySource, _myASyncLoad);
             }
         }
-        if (_myASyncLoad) {
+        if (_myASyncLoad && !myCachedImageFlag) {
             bindOnSetCB();        
-        } else if (!myCachedImageFlag ) {
-            _myLoadCB ? _myLoadCB():null
-        }
+        } else {
+            onLoad();
+        }        
     });
 
     Public.__defineGetter__("srcId", function () {
@@ -184,24 +184,22 @@ spark.Image.Constructor = function (Protected) {
 
         Public.width = myWidth;
         Public.height = myHeight;
-        if (_myASyncLoad) {// && !myCachedImageFlag) {
+        if (_myASyncLoad && !myCachedImageFlag) {
             bindOnSetCB();        
-        } else if (!myCachedImageFlag ) {
-            _myLoadCB ? _myLoadCB():null // do it once per onload
+        } else {
+            onLoad();
         }        
     };
     function bindOnSetCB() {
-        registerImageOnLoadCallBack(_myImage, Public, function(theAttribNode) {
-            if (_myImage) {                                
-                Public.width = Protected.getNumber("width", _myImage.raster.width);
-                Public.height = Protected.getNumber("height", _myImage.raster.height);
-                if (theAttribNode.nodeValue) {
-                    _myLoadCB ? _myLoadCB():null
-                }
-            }
-        });
+        registerImageOnLoadCallBack(_myImage, Public, function(theAttribNode) {onLoad();});
     };
-    
+    function onLoad() {
+        if (_myImage) {                                
+            Public.width = Protected.getNumber("width", _myImage.raster.width);
+            Public.height = Protected.getNumber("height", _myImage.raster.height);
+            _myLoadCB ? _myLoadCB():null
+        }
+    }
     Base.postRealize = Public.postRealize;
     Public.postRealize = function () {
         if (_mySourceId) {

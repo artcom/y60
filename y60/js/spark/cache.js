@@ -79,6 +79,9 @@ spark.getCachedImage = function (thePath, theASyncFlag) {
         myCachedFlag = false;
         spark.registerNode(myName, myImage);
     }
+    if (!myImage.loaded) {
+        myCachedFlag = false;
+    }
     return {image:myImage, cached:myCachedFlag};
 };
 
