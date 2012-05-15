@@ -162,7 +162,7 @@ namespace y60 {
         for (unsigned i = 0; i < myFilenames.size(); ++i) {
             asl::Ptr<ReadableBlockHandle> myBlock;
             if (thePackageManager) {
-                myBlock = thePackageManager->readFile(myFilenames[i]);
+                myBlock = thePackageManager->readFile(myFilenames[i], "" , true);
             }
 #if 1
             // PM: This seems unreasonable, but need to watch out for compat problems
