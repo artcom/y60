@@ -280,7 +280,7 @@ SDLWindow::initGL() {
 void
 SDLWindow::updateSDLVideoMode() {
     unsigned int myFlags = 0;
-    AC_DEBUG << "setting SDL video mode, resolution: "<<_myWidth << "x" << _myHeight << " decorations: " 
+    AC_INFO << "setting SDL video mode, resolution: "<<_myWidth << "x" << _myHeight << " decorations: " 
              << _myDecorationFlag << " resizable: " << _myResizableFlag << " fullscreen: " << _myFullscreenFlag;
     myFlags |= SDL_OPENGL;
 
