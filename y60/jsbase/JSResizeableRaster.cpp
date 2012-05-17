@@ -97,9 +97,40 @@ fillRectAlpha(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
     DOC_PARAM("xmax", "right", DOC_TYPE_INTEGER);
     DOC_PARAM("ymax", "bottom", DOC_TYPE_INTEGER);
     DOC_PARAM("theAlpha", "the Alpha value between zero and one", DOC_TYPE_FLOAT);
+    DOC_RESET;
+    DOC_PARAM("theAlphas", "the Alpha values between zero and one", DOC_TYPE_VECTOROFFLOAT);
     DOC_END;
+    NativeRef<dom::ResizeableRaster> myNativeRef(cx, obj);
 
-    return Method<NATIVE>::call(&NATIVE::fillRectAlpha,cx,obj,argc,argv,rval);
+    try {
+        ensureParamCount(argc, 5);
+        int myXMin;
+        convertFrom(cx, argv[0], myXMin);
+        int myYMin;
+        convertFrom(cx, argv[1], myYMin);
+        int myXMax;
+        convertFrom(cx, argv[2], myXMax);
+        int myYMax;
+        convertFrom(cx, argv[3], myYMax);
+        if (JSVAL_IS_OBJECT(argv[4])) {
+            std::vector<float> myAlphas;
+            if ( ! convertFrom(cx, argv[4], myAlphas)) {
+                JS_ReportError(cx, "argument 4 must be a vector of floats");
+                return JS_FALSE;
+            }
+            myNativeRef.getValue().fillRectAlpha(myXMin, myYMin, myXMax, myYMax, myAlphas);
+            return JS_TRUE;
+        } else {
+            float myAlpha;
+            if ( ! convertFrom(cx, argv[4], myAlpha)) {
+                JS_ReportError(cx, "argument 4 must be a float");
+                return JS_FALSE;
+            }
+            myNativeRef.getValue().fillRectAlpha(myXMin, myYMin, myXMax, myYMax, myAlpha);
+            return JS_TRUE;
+        }
+    } HANDLE_CPP_EXCEPTION;
+    
 }
 
 static JSBool
