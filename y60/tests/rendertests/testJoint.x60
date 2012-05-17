@@ -1,26 +1,26 @@
-<scene revision="20287">
+<scene revision="0">
     <worlds>
-        <world visible="1" id="BUo68waoghE=">
-            <transform visible="1" name="groundPlane_transform" position="[0,0,0]" scale="[12,12,1]" orientation="[0.707107,0,0,-0.707107]" pivot="[0,0,0]" billboard="" id="Bko68waoghE="/>
-            <camera visible="1" name="perspShape" position="[0.0494183,0.0101943,0.0370552]" scale="[1,1,1]" orientation="[-0.0352088,0.430183,0.0167937,-0.901898]" pivot="[0,0,0]" billboard="" frustum="perspective[-0.0514286,0.0514286,-0.0509525,0.0509525,0.1,10000]" id="CEo68waoghE="/>
-            <transform visible="0" name="top" position="[0,1,0]" scale="[1,1,1]" orientation="[-0.707107,0,0,-0.707107]" pivot="[0,0,0]" billboard="" id="CUo68waoghE="/>
-            <transform visible="0" name="front" position="[0,0,1]" scale="[1,1,1]" orientation="[0,0,0,-1]" pivot="[0,0,0]" billboard="" id="Cko68waoghE="/>
-            <transform visible="0" name="side" position="[1,0.00829049,-0.0137643]" scale="[1,1,1]" orientation="[0,0.707107,0,-0.707107]" pivot="[0,0,0]" billboard="" id="C0o68waoghE="/>
-            <joint visible="1" name="joint1" position="[0,0.0213654,0.000170189]" scale="[1,1,1]" orientation="[0,0,0,-1]" pivot="[0,0,0]" billboard="" jointorientation="[-0.496846,0.503135,0.496846,0.503135]" id="DEo68waoghE=">
-                <body shape="A0o68waoghE=" id="Dko68waoghE=" name="pCube3" visible="1" insensible="0" position="[0,0,1.01827e-17]" orientation="[0,0.707107,0,-0.707107]" scale="[1,1,1]" pivot="[0,0,0]" billboard="" cullable="1" clippingplanes="[]" scissor="" sticky="0" events="[]" skeleton="[]"/>
+        <world visible="1" id="BQAd8w0fHtw=">
+            <transform visible="1" name="groundPlane_transform" position="[0,0,0]" scale="[12,12,1]" orientation="[0.707107,0,0,-0.707107]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="BgAd8w0fHtw="/>
+            <camera visible="1" name="perspShape" position="[0.0494183,0.0101943,0.0370552]" scale="[1,1,1]" orientation="[-0.0352088,0.430183,0.0167937,-0.901898]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" frustum="perspective[-0.0514286,0.0514286,-0.0509525,0.0509525,0.1,10000]" id="CAAd8w0fHtw="/>
+            <transform visible="0" name="top" position="[0,1,0]" scale="[1,1,1]" orientation="[-0.707107,0,0,-0.707107]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="CQAd8w0fHtw="/>
+            <transform visible="0" name="front" position="[0,0,1]" scale="[1,1,1]" orientation="[0,0,0,-1]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="CgAd8w0fHtw="/>
+            <transform visible="0" name="side" position="[1,0.00829049,-0.0137643]" scale="[1,1,1]" orientation="[0,0.707107,0,-0.707107]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="CwAd8w0fHtw="/>
+            <joint visible="1" name="joint1" position="[0,0.0213654,0.000170189]" scale="[1,1,1]" orientation="[0,0,0,-1]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" jointorientation="[-0.496846,0.503135,0.496846,0.503135]" id="DAAd8w0fHtw=">
+                <body shape="AwAd8w0fHtw=" id="DgAd8w0fHtw=" name="pCube3" position="[0,0,1.01827e-017]" orientation="[0,0.707107,0,-0.707107]"/>
             </joint>
         </world>
     </worlds>
     <records/>
     <canvases>
-        <canvas id="AUo68waoghE=" name="JohnDoe" backgroundcolor="[0,0,0,1]" targets="[]">
-            <viewport id="Ako68waoghE=" name="JohnDoe" camera="CEo68waoghE=" position="[0,0]" size="[1,1]" orientation="landscape" backfaceculling="1" wireframe="0" lighting="1" texturing="1" flatshading="0" culling="1" debugculling="0" alphatest="1" drawnormals="0" glow="0" resizepolicy="adapt_vertical">
+        <canvas id="AQAd8w0fHtw=">
+            <viewport id="AgAd8w0fHtw=" camera="CAAd8w0fHtw=">
                 <overlays/>
             </viewport>
         </canvas>
     </canvases>
     <materials>
-        <material name="lambert1" id="BEo68waoghE=">
+        <material name="lambert1" id="BAAd8w0fHtw=">
             <properties>
                 <vector4f name="ambient">[0,0,0,1]</vector4f>
                 <vector4f name="diffuse">[0.4,0.4,0.4,1]</vector4f>
@@ -34,13 +34,13 @@
     </materials>
     <lightsources/>
     <animations>
-        <animation name="joint1_translateY" enabled="1" attribute="position.y" property="" node="DEo68waoghE=" begin="0" duration="0.48" pause="0" count="0" direction="forward" id="D0o68waoghE=">
+        <animation name="joint1_translateY" enabled="1" attribute="position.y" property="" node="DAAd8w0fHtw=" begin="0" duration="0.48" pause="0" count="0" direction="forward" id="DwAd8w0fHtw=">
             <vectoroffloat>[0.0213654,0.0211351,0.0209047,0.0206744,0.0204441,0.0202137,0.0199834,0.019753,0.0195227,0.0192923,0.019062,0.0188316,0.0186013]</vectoroffloat>
         </animation>
-        <animation name="joint1_translateZ" enabled="1" attribute="position.z" property="" node="DEo68waoghE=" begin="0" duration="0.48" pause="0" count="0" direction="forward" id="EEo68waoghE=">
+        <animation name="joint1_translateZ" enabled="1" attribute="position.z" property="" node="DAAd8w0fHtw=" begin="0" duration="0.48" pause="0" count="0" direction="forward" id="EAAd8w0fHtw=">
             <vectoroffloat>[0.000170189,-0.000743993,-0.00165818,-0.00257236,-0.00348654,-0.00440072,-0.0053149,-0.00622909,-0.00714327,-0.00805745,-0.00897163,-0.00988581,-0.0108]</vectoroffloat>
         </animation>
-        <animation name="joint1_rotateZ" enabled="1" attribute="orientation" property="" node="DEo68waoghE=" begin="0" duration="0.48" pause="0" count="0" direction="forward" id="EUo68waoghE=">
+        <animation name="joint1_rotateZ" enabled="1" attribute="orientation" property="" node="DAAd8w0fHtw=" begin="0" duration="0.48" pause="0" count="0" direction="forward" id="EQAd8w0fHtw=">
             <vectorofquaternionf>[
 [0,0,0,1],
 [0,0,-0.0327191,0.999465],
@@ -59,7 +59,7 @@
     </animations>
     <characters/>
     <shapes>
-        <shape name="pCubeShape3" renderstyle="[frontfacing,backfacing]" id="A0o68waoghE=">
+        <shape name="pCubeShape3" renderstyle="[frontfacing,backfacing]" id="AwAd8w0fHtw=">
             <vertexdata>
                 <vectorofvector3f name="position" vertexbufferusage="static_draw">[
 [-0.005,-0.005,0.005],
@@ -113,7 +113,7 @@
 [-1,0]]</vectorofvector2f>
             </vertexdata>
             <primitives>
-                <elements type="quads" material="BEo68waoghE=">
+                <elements type="quads" material="BAAd8w0fHtw=">
                     <indices vertexdata="position" role="position">[0,1,3,2,2,3,5,4,4,5,7,6,6,7,1,0,1,7,5,3,6,0,2,4]</indices>
                     <indices vertexdata="normal" role="normal">[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23]</indices>
                 </elements>
