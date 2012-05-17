@@ -274,7 +274,7 @@ spark.Canvas.Constructor = function (Protected) {
         
         Public.setupWindow(_myRenderArea, false);
         
-        _myCanvasNode.target = myTexture.id;
+        _myCanvasNode.targets = [myTexture.id];
         _myRenderArea.setSceneAndCanvas(window.scene, _myCanvasNode);
 
         Public.setCanvas(_myCanvasNode);

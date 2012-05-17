@@ -79,7 +79,7 @@ namespace jslib {
 
     typedef asl::Ptr<y60::Texture, dom::ThreadingModel> TexturePtr;
 
-    class OffscreenRenderArea : public y60::OffscreenBuffer, public AbstractRenderWindow {
+    class OffscreenRenderArea : public AbstractRenderWindow {
         public:
             static asl::Ptr<OffscreenRenderArea> create();
 
@@ -144,6 +144,7 @@ namespace jslib {
             //TODO make some stuff from AbstractRenderWindow private
 
             // activates the offscreen buffer as render target
+            // simple api methods using overriden private methods
             void activate(unsigned theCubemapFace = 0);
             void deactivate(bool theCopyToImageFlag = false);
 
@@ -154,9 +155,11 @@ namespace jslib {
             }
 
         private:
-            const TexturePtr getTexture() const;
-            TexturePtr getTexture();
-
+            void activate(std::vector<TexturePtr> & theTextures, unsigned theCubemapFace = 0);
+            void deactivate(const std::vector<TexturePtr> & theTextures, bool theCopyToImageFlag = false);
+            const std::vector<TexturePtr> getRenderTargets() const;
+            void ensureRenderTargets(std::vector<TexturePtr> & theTextures);
+            y60::OffscreenBufferPtr _myOffscreenBuffer;
             unsigned _myWidth;
             unsigned _myHeight;
     };

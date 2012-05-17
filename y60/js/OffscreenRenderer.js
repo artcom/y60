@@ -147,7 +147,7 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage,
         }
 
         // Setup target
-        _myCanvas.target = self.texture.id;
+        _myCanvas.targets = [self.texture.id];
         _myViewport.camera = self.camera.id;
         //_myViewport.wireframe = true;
 
@@ -239,13 +239,13 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage,
             window.scene.textures.removeChild(self.texture);
             self.texture = Modelling.createTexture(window.scene, self.image);
             self.texture.name = "newTexture";
-            _myCanvas.target = self.texture.id;
+            _myCanvas.targets = [self.texture.id];
         }
     };
 
     self.setImage = function (theImage) {
         if (!theImage) {
-            _myCanvas.target = "";
+            _myCanvas.targets = [];
             return;
         }
 

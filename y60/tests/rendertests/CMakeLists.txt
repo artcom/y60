@@ -19,6 +19,7 @@ testParticles
 testSpotlight
 testSprites
 testVertexShaderOnly
+testMRT
 )
 
 set(NOCG_TESTS

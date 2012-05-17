@@ -124,17 +124,21 @@ Canvas::setFrameBuffer(asl::Ptr<IFrameBuffer> theFrameBuffer) {
     }
 }
 
-TexturePtr
-Canvas::getTarget(asl::Ptr<Scene,dom::ThreadingModel> theScene) {
-    dom::NodePtr myTextureNode = theScene->getSceneDom()->getElementById( get<CanvasTargetTag>() );
-    if (myTextureNode) {
-        return myTextureNode->getFacade<Texture>();
+std::vector<TexturePtr>
+Canvas::getTargets(asl::Ptr<Scene,dom::ThreadingModel> theScene) const {
+    std::vector<TexturePtr> myTextures;
+    y60::VectorOfString myTargets = get<CanvasTargetsTag>();
+    for (y60::VectorOfString::size_type i = 0; i < myTargets.size(); ++i) {
+        dom::NodePtr myTextureNode = theScene->getSceneDom()->getElementById( myTargets[i] );
+        if (myTextureNode) {
+            myTextures.push_back(myTextureNode->getFacade<Texture>());
+        }
     }
-    return TexturePtr();
+    return myTextures;
 }
 
 bool
 Canvas::hasRenderTarget() const {
-    return ! get<CanvasTargetTag>().empty();
+    return ! get<CanvasTargetsTag>().empty();
 }
 }

@@ -88,7 +88,7 @@ TestOffScreen.prototype.Constructor = function(obj, theArguments) {
         var myCanvas = obj.getRenderWindow().canvas.cloneNode(true);
         myCanvas.id = createUniqueId();
         myCanvas.name = "OffscreenBuffer";
-        myCanvas.target = myTexture.id;
+        myCanvas.targets = [myTexture.id];
         myCanvas.backgroundcolor = [1,1,1,1];
 
         // setup offscreen camera

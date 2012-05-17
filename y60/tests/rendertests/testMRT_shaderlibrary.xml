@@ -1,0 +1,2207 @@
+<?xml version="1.0"?>
+<shaders>
+    <shader id="test_mrt" name="test_mrt" cost="10">
+        <supports>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="textures" values="[`paint`]"/>
+            <feature class="texcoord" values="[`uv_map`]"/>
+            <feature class="option" values="[`test_mrt`]"/>
+        </supports>
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`,`gp4fp`,`gp5fp`]" files="[`testMRT.cg`]" entryfunctions="[`mainFragment`]">
+            <properties>
+                <sampler2d name="tex">0</sampler2d>
+                <vector4f name="diffuse">[1,1,1,1]</vector4f>
+                <vector4f name="specular">[1,1,1,1]</vector4f>
+                <vector4f name="ambient">[1,1,1,1]</vector4f>
+                <float name="shininess">1.0</float>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+            </properties>
+        </fragmentshader>
+        <vertexshader profiles="[`arbvp1`, `vp20`,`vp30`,`vp40`,`gp4vp`,`gp5vp`]" files="[`testMRT.cg`]" entryfunctions="[`mainVertex`]">
+            <properties/>
+            <vertexparameters>
+                <vector3f name="normal"/>
+                <vector3f name="position"/>
+                <vector2f name="texcoord0"/>
+                <!--vector2f name="texcoord1"/-->
+            </vertexparameters>
+        </vertexshader>
+    </shader>
+    <shader id="s0" name="phongBump" cost="100">
+        <supports>
+            <feature class="lighting" values="[`phong`]"/>
+            <feature class="textures" values="[`bump`]"/>
+            <feature class="texcoord" values="[`uv_map`,`uv_map`]"/>
+        </supports>
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`,`gp4fp`,`gp5fp`]" files="[`phongBump.cg`]" entryfunctions="[`mainFragment`]">
+            <properties>
+                <sampler2d name="normalMap">0</sampler2d>
+                <vector4f name="diffuse">[1,1,1,1]</vector4f>
+                <vector4f name="specular">[1,1,1,1]</vector4f>
+                <vector4f name="ambient">[1,1,1,1]</vector4f>
+                <float name="shininess">1.0</float>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+            </properties>
+        </fragmentshader>
+        <vertexshader profiles="[`arbvp1`, `vp20`,`vp30`,`vp40`,`gp4vp`,`gp5vp`]" files="[`phongBump.cg`]" entryfunctions="[`mainVertex`]">
+            <properties/>
+            <vertexparameters>
+                <vector3f name="normal"/>
+                <vector3f name="position"/>
+                <vector2f name="texcoord0"/>
+                <vector2f name="texcoord1"/>
+            </vertexparameters>
+        </vertexshader>
+    </shader>
+    <shader id="s1" name="phongPaintBump" cost="100">
+        <supports>
+            <feature class="lighting" values="[`phong`]"/>
+            <feature class="textures" values="[`paint`,`bump`]"/>
+            <feature class="texcoord" values="[`uv_map`,`uv_map`]"/>
+        </supports>
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`,`gp4fp`,`gp5fp`]" files="[`phongBump.cg`]" entryfunctions="[`mainFragment`]" compilerargs="[[`-DPAINT`]]">
+            <properties>
+                <sampler2d name="colorMap">0</sampler2d>
+                <sampler2d name="normalMap">1</sampler2d>
+                <vector4f name="diffuse">[1,1,1,1]</vector4f>
+                <vector4f name="specular">[1,1,1,1]</vector4f>
+                <vector4f name="ambient">[1,1,1,1]</vector4f>
+                <float name="shininess">1.0</float>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+            </properties>
+        </fragmentshader>
+        <vertexshader profiles="[`arbvp1`,`vp20`,`vp30`,`vp40`,`gp4vp`,`gp5vp`]" files="[`phongBump.cg`]" entryfunctions="[`mainVertex`]" compilerargs="[[`-DPAINT`]]">
+            <properties/>
+            <vertexparameters>
+                <vector3f name="normal"/>
+                <vector3f name="position"/>
+                <vector2f name="texcoord0"/>
+                <vector2f name="texcoord1"/>
+            </vertexparameters>
+        </vertexshader>
+    </shader>
+    <shader id="s2" name="tex_lambert" cost="120">
+        <supports>
+            <feature class="textures" values="[`paint`]"/>
+            <feature class="lighting" values="[`lambert`]"/>
+            <feature class="texcoord" values="[`uv_map`]"/>
+        </supports>
+        <fixedfunctionshader>
+            <properties>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[1,1,1,1]</vector4f>
+                <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                <float name="shininess">1.0</float>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+            </properties>
+            <vertexparameters>
+                <vector3f name="normal"/>
+                <vector3f name="position"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </fixedfunctionshader>
+    </shader>
+    <shader id="s2a" name="occlusion_lambert" cost="120">
+        <supports>
+            <feature class="textures" values="[`occlusion`]"/>
+            <feature class="lighting" values="[`lambert`]"/>
+            <feature class="texcoord" values="[`uv_map`]"/>
+        </supports>
+        <fixedfunctionshader>
+            <properties>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[1,1,1,1]</vector4f>
+                <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                <float name="shininess">1.0</float>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+            </properties>
+            <vertexparameters>
+                <vector3f name="normal"/>
+                <vector3f name="position"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </fixedfunctionshader>
+    </shader>
+    <shader id="s2.5" name="LambertColor" cost="120">
+        <supports>
+            <feature class="lighting" values="[`lambert`]"/>
+            <feature class="vertexparams" values="[`color`]"/>
+        </supports>
+        <fixedfunctionshader>
+            <properties>
+                <vector4f name="diffuse">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                <float name="shininess">1.0</float>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+            </properties>
+            <vertexparameters>
+                <vector3f name="normal"/>
+                <vector3f name="color"/>
+                <vector3f name="position"/>
+            </vertexparameters>
+        </fixedfunctionshader>
+    </shader>
+    <shader id="s3" name="doubletex_lambert" cost="120">
+        <supports>
+            <feature class="textures" values="[`paint`,`paint`]"/>
+            <feature class="lighting" values="[`lambert`]"/>
+            <feature class="texcoord" values="[`uv_map`,`uv_map`]"/>
+        </supports>
+        <fixedfunctionshader>
+            <properties>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                <float name="shininess">1.0</float>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+            </properties>
+            <vertexparameters>
+                <vector3f name="normal"/>
+                <vector3f name="position"/>
+                <vector2f name="texcoord0"/>
+                <vector2f name="texcoord1"/>
+            </vertexparameters>
+        </fixedfunctionshader>
+    </shader>
+    <shader id="s4" name="tripletex_lambert" cost="120">
+        <supports>
+            <feature class="textures" values="[`paint`,`paint`,`paint`]"/>
+            <feature class="lighting" values="[`lambert`]"/>
+            <feature class="texcoord" values="[`uv_map`,`uv_map`,`uv_map`]"/>
+        </supports>
+        <fixedfunctionshader>
+            <properties>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                <float name="shininess">1.0</float>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+            </properties>
+            <vertexparameters>
+                <vector3f name="normal"/>
+                <vector3f name="position"/>
+                <vector2f name="texcoord0"/>
+                <vector2f name="texcoord1"/>
+                <vector2f name="texcoord2"/>
+            </vertexparameters>
+        </fixedfunctionshader>
+    </shader>
+    <shader id="s5" name="tex_phong" cost="120">
+        <supports>
+            <feature class="textures" values="[`paint`]"/>
+            <feature class="lighting" values="[`phong`]"/>
+            <feature class="texcoord" values="[`uv_map`]"/>
+        </supports>
+        <fixedfunctionshader>
+            <properties>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[1,1,1,1]</vector4f>
+                <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                <float name="shininess">1.0</float>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+            </properties>
+            <vertexparameters>
+                <vector3f name="normal"/>
+                <vector3f name="position"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </fixedfunctionshader>
+    </shader>
+    <shader id="s5a" name="occlusion_phong" cost="120">
+        <supports>
+            <feature class="textures" values="[`occlusion`]"/>
+            <feature class="lighting" values="[`phong`]"/>
+            <feature class="texcoord" values="[`uv_map`]"/>
+        </supports>
+        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`,`gp4vp`,`gp5vp`]" files="[`envmap.cg`]" entryfunctions="[`mainVertex`]" compilerargs="[[`-DOCCLUSION`,`-DPHONG_SPECULAR`]]">
+            <properties>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[1,1,1,1]</vector4f>
+                <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                <float name="shininess">1.0</float>
+            </properties>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector3f name="normal"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`,`gp4fp`,`gp5fp`]" files="[`envmap.cg`]" entryfunctions="[`mainFragment`]" compilerargs="[[`-DOCCLUSION`,`-DPHONG_SPECULAR`]]">
+            <properties>
+                <sampler2d name="occlusionTex">0</sampler2d>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+            </properties>
+        </fragmentshader>
+    </shader>
+    <shader id="s6" name="lambert" cost="120">
+        <supports>
+            <feature class="lighting" values="[`lambert`]"/>
+        </supports>
+        <fixedfunctionshader>
+            <properties>
+                <vector4f name="ambient">[0,0,0,1]</vector4f>
+                <vector4f name="diffuse">[1,1,1,1]</vector4f>
+                <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                <float name="shininess">1.0</float>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+            </properties>
+            <vertexparameters>
+                <vector3f name="normal"/>
+                <vector3f name="position"/>
+            </vertexparameters>
+        </fixedfunctionshader>
+    </shader>
+    <shader id="s7" name="unlittex" cost="120">
+        <supports>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="textures" values="[`paint`]"/>
+            <feature class="texcoord" values="[`uv_map`]"/>
+        </supports>
+        <fixedfunctionshader>
+            <properties>
+                <vector4f name="surfacecolor">[1.0,1.0,1.0,1]</vector4f>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+            </properties>
+            <vertexparameters>
+                <vector3f name="position"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </fixedfunctionshader>
+    </shader>
+    <shader id="s8" name="unlitmultitex" cost="120">
+        <supports>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="textures" values="[`paint`,`paint`]"/>
+            <feature class="texcoord" values="[`uv_map`,`uv_map`]"/>
+        </supports>
+        <fixedfunctionshader>
+            <properties>
+                <vector4f name="surfacecolor">[1.0,1.0,1.0,1]</vector4f>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+            </properties>
+            <vertexparameters>
+                <vector3f name="position"/>
+                <vector2f name="texcoord0"/>
+                <vector2f name="texcoord1"/>
+            </vertexparameters>
+        </fixedfunctionshader>
+    </shader>
+    <shader id="s9" name="unlittripletex" cost="120">
+        <supports>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="textures" values="[`paint`,`paint`,`paint`]"/>
+            <feature class="texcoord" values="[`uv_map`,`uv_map`,`uv_map`]"/>
+        </supports>
+        <fixedfunctionshader>
+            <properties>
+                <vector4f name="surfacecolor">[1.0,1.0,1.0,1]</vector4f>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+            </properties>
+            <vertexparameters>
+                <vector3f name="position"/>
+                <vector2f name="texcoord0"/>
+                <vector2f name="texcoord1"/>
+                <vector2f name="texcoord2"/>
+            </vertexparameters>
+        </fixedfunctionshader>
+    </shader>
+    <shader id="s8pp" name="unlitDualTexProj" cost="120">
+        <supports>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="textures" values="[`paint`,`paint`]"/>
+            <feature class="texcoord" values="[`uv_map`,`*`]"/>
+        </supports>
+        <fixedfunctionshader>
+            <properties>
+                <vector4f name="surfacecolor">[1.0,1.0,1.0,1]</vector4f>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+            </properties>
+            <vertexparameters>
+                <vector3f name="position"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </fixedfunctionshader>
+    </shader>
+    <shader id="s8pl" name="lambertDualTexProj" cost="120">
+        <supports>
+            <feature class="lighting" values="[`lambert`]"/>
+            <feature class="textures" values="[`paint`,`paint`]"/>
+            <feature class="texcoord" values="[`uv_map`,`*`]"/>
+        </supports>
+        <fixedfunctionshader>
+            <properties>
+                <vector4f name="surfacecolor">[1.0,1.0,1.0,1]</vector4f>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+            </properties>
+            <vertexparameters>
+                <vector3f name="normal"/>
+                <vector3f name="position"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </fixedfunctionshader>
+    </shader>
+    <shader id="s9pp" name="unlitTripleTexProj" cost="120">
+        <supports>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="textures" values="[`paint`,`paint`,`paint`]"/>
+            <feature class="texcoord" values="[`uv_map`,`uv_map`,`*`]"/>
+        </supports>
+        <fixedfunctionshader>
+            <properties>
+                <vector4f name="surfacecolor">[1.0,1.0,1.0,1]</vector4f>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+            </properties>
+            <vertexparameters>
+                <vector3f name="position"/>
+                <vector2f name="texcoord0"/>
+                <vector2f name="texcoord1"/>
+            </vertexparameters>
+        </fixedfunctionshader>
+    </shader>
+    <shader id="s9pl" name="lambertTripleTexProj" cost="120">
+        <supports>
+            <feature class="lighting" values="[`lambert`]"/>
+            <feature class="textures" values="[`paint`,`paint`,`paint`]"/>
+            <feature class="texcoord" values="[`uv_map`,`uv_map`,`*`]"/>
+        </supports>
+        <fixedfunctionshader>
+            <properties>
+                <vector4f name="surfacecolor">[1.0,1.0,1.0,1]</vector4f>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+            </properties>
+            <vertexparameters>
+                <vector3f name="normal"/>
+                <vector3f name="position"/>
+                <vector2f name="texcoord0"/>
+                <vector2f name="texcoord1"/>
+            </vertexparameters>
+        </fixedfunctionshader>
+    </shader>
+    <shader id="s9qp" name="unlitQuadTexProj" cost="120">
+        <supports>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="textures" values="[`paint`,`paint`,`paint`,`paint`]"/>
+            <feature class="texcoord" values="[`uv_map`,`uv_map`,`uv_map`,`*`]"/>
+        </supports>
+        <fixedfunctionshader>
+            <properties>
+                <vector4f name="surfacecolor">[1.0,1.0,1.0,1]</vector4f>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+            </properties>
+            <vertexparameters>
+                <vector3f name="position"/>
+                <vector2f name="texcoord0"/>
+                <vector2f name="texcoord1"/>
+                <vector2f name="texcoord2"/>
+            </vertexparameters>
+        </fixedfunctionshader>
+    </shader>
+    <shader id="s9ql" name="lambertQuadTexProj" cost="120">
+        <supports>
+            <feature class="lighting" values="[`lambert`]"/>
+            <feature class="textures" values="[`paint`,`paint`,`paint`,`paint`]"/>
+            <feature class="texcoord" values="[`uv_map`,`uv_map`,`uv_map`,`*`]"/>
+        </supports>
+        <fixedfunctionshader>
+            <properties>
+                <vector4f name="surfacecolor">[1.0,1.0,1.0,1]</vector4f>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+            </properties>
+            <vertexparameters>
+                <vector3f name="normal"/>
+                <vector3f name="position"/>
+                <vector2f name="texcoord0"/>
+                <vector2f name="texcoord1"/>
+                <vector2f name="texcoord2"/>
+            </vertexparameters>
+        </fixedfunctionshader>
+    </shader>
+    <shader id="s10" name="unlit" cost="120">
+        <supports>
+            <feature class="lighting" values="[`unlit`]"/>
+        </supports>
+        <fixedfunctionshader>
+            <properties>
+                <vector4f name="surfacecolor">[1.0,1.0,1.0,1]</vector4f>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+            </properties>
+            <vertexparameters>
+                <vector3f name="position"/>
+            </vertexparameters>
+        </fixedfunctionshader>
+    </shader>
+    <shader id="s10b" name="unlitcolor" cost="120">
+        <supports>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="vertexparams" values="[`color`]"/>
+        </supports>
+        <fixedfunctionshader>
+            <properties>
+                <vector4f name="surfacecolor">[1.0,1.0,1.0,1]</vector4f>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+            </properties>
+            <vertexparameters>
+                <vector3f name="position"/>
+                <vector4f name="color"/>
+            </vertexparameters>
+        </fixedfunctionshader>
+    </shader>
+    <shader id="s10c" name="unlitcolortex" cost="120">
+        <supports>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="vertexparams" values="[`color`]"/>
+            <feature class="textures" values="[`paint`]"/>
+            <feature class="texcoord" values="[`uv_map`]"/>
+        </supports>
+        <fixedfunctionshader>
+            <properties>
+                <vector4f name="surfacecolor">[1.0,1.0,1.0,1]</vector4f>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+            </properties>
+            <vertexparameters>
+                <vector3f name="position"/>
+                <vector2f name="texcoord0"/>
+                <vector4f name="color"/>
+            </vertexparameters>
+        </fixedfunctionshader>
+    </shader>
+    <shader id="s13" name="toon" cost="10">
+        <supports>
+            <feature class="textures" values="[`paint`]"/>
+            <feature class="texcoord" values="[`uv_map`]"/>
+            <feature class="lighting" values="[`toon`]"/>
+        </supports>
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`,`gp4fp`,`gp5fp`]" files="[`toon2.cg`]" entryfunctions="[`mainFragment`]">
+            <properties>
+                <vector4f name="ambient">[0.8,0,0,1]</vector4f>
+                <vector4f name="diffuse">[0.8,0,0,1]</vector4f>
+                <vector4f name="specular">[1.0,1.0,1.0,1]</vector4f>
+                <float name="shininess">40</float>
+                <sampler2d name="decalTex">0</sampler2d>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+            </properties>
+        </fragmentshader>
+        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`,`gp4vp`,`gp5vp`]" files="[`toon2.cg`]" entryfunctions="[`mainVertex`]">
+            <properties/>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector3f name="normal"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </vertexshader>
+    </shader>
+    <shader id="s14" name="chrome" cost="10">
+        <supports>
+            <feature class="textures" values="[`paint`]"/>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="texcoord" values="[`reflective`]"/>
+        </supports>
+        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`,`gp4vp`,`gp5vp`]" files="[`envmap.cg`]" entryfunctions="[`mainVertex`]">
+            <properties>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[1,1,1,1]</vector4f>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+                <float name="reflectivity">1</float>
+            </properties>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector3f name="normal"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`,`gp4fp`,`gp5fp`]" files="[`envmap.cg`]" entryfunctions="[`mainFragment`]">
+            <properties>
+                <samplerCUBE name="envTex">0</samplerCUBE>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+            </properties>
+        </fragmentshader>
+    </shader>
+    <shader id="s150" name="occlusion_carpaint" cost="10">
+        <supports>
+            <feature class="textures" values="[`occlusion`,`paint`,`emissive`]"/>
+            <feature class="texcoord" values="[`uv_map`,`reflective`,`reflective`]"/>
+            <feature class="lighting" values="[`unlit`]"/>
+        </supports>
+        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`,`gp4vp`,`gp5vp`]" files="[`carpaint.cg`]" entryfunctions="[`mainVertex`]" compilerargs="[[`-DPAINT`,`-DOCCLUSION`]]">
+            <properties>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[1,1,1,1]</vector4f>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+                <float name="reflectivity">1</float>
+                <float name="specularrolloff">1</float>
+                <float name="eccentricity">1</float>
+            </properties>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector3f name="normal"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`,`gp4fp`,`gp5fp`]" files="[`carpaint.cg`]" entryfunctions="[`mainFragment`]" compilerargs="[[`-DPAINT`,`-DOCCLUSION`]]">
+            <properties>
+                <sampler2d name="occlusionTex">0</sampler2d>
+                <samplerCUBE name="envTex">1</samplerCUBE>
+                <samplerCUBE name="emissiveEnvTex">2</samplerCUBE>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+            </properties>
+        </fragmentshader>
+    </shader>
+    <shader id="s151" name="carpaint" cost="10">
+        <supports>
+            <feature class="textures" values="[`paint`,`emissive`]"/>
+            <feature class="texcoord" values="[`reflective`,`reflective`]"/>
+            <feature class="lighting" values="[`unlit`]"/>
+        </supports>
+        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`,`gp4vp`,`gp5vp`]" files="[`carpaint.cg`]" entryfunctions="[`mainVertex`]" compilerargs="[[`-DPAINT`]]">
+            <properties>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[1,1,1,1]</vector4f>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+                <float name="reflectivity">1</float>
+            </properties>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector3f name="normal"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`,`gp4fp`,`gp5fp`]" files="[`carpaint.cg`]" entryfunctions="[`mainFragment`]" compilerargs="[[`-DPAINT`]]">
+            <properties>
+                <samplerCUBE name="envTex">0</samplerCUBE>
+                <samplerCUBE name="emissiveEnvTex">1</samplerCUBE>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+            </properties>
+        </fragmentshader>
+    </shader>
+    <shader id="s16" name="glassdbltex" cost="10">
+        <supports>
+            <feature class="textures" values="[`paint`,`paint`,`paint`]"/>
+            <feature class="texcoord" values="[`uv_map`,`uv_map`,`reflective`]"/>
+            <feature class="lighting" values="[`lambert`]"/>
+        </supports>
+        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`,`gp4vp`,`gp5vp`]" files="[`envmap.cg`]" entryfunctions="[`mainVertex`]" compilerargs="[[`-DPAINT=2`]]">
+            <properties>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[0.5,0.5,1.0,1]</vector4f>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+                <float name="reflectivity">1</float>
+            </properties>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector3f name="normal"/>
+                <vector2f name="texcoord0"/>
+                <vector2f name="texcoord1"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`,`gp4fp`,`gp5fp`]" files="[`envmap.cg`]" entryfunctions="[`mainFragment`]" compilerargs="[[`-DPAINT=2`]]">
+            <properties>
+                <sampler2d name="decalTex">0</sampler2d>
+                <sampler2d name="emissiveTex">1</sampler2d>
+                <samplerCUBE name="envTex">2</samplerCUBE>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+            </properties>
+        </fragmentshader>
+    </shader>
+    <shader id="s16a" name="lambert_occlusion_paint_env" cost="10">
+        <supports>
+            <feature class="textures" values="[`occlusion`,`paint`,`paint`]"/>
+            <feature class="texcoord" values="[`uv_map`,`uv_map`,`reflective`]"/>
+            <feature class="lighting" values="[`lambert`]"/>
+        </supports>
+        <vertexshader profiles="[`arbvp1`,`glslv`,`vp20`,`vp30`,`vp40`,`gp4vp`,`gp5vp`]" files="[`envmap.cg`]" entryfunctions="[`mainVertex`]" compilerargs="[[`-DPAINT`,`-DOCCLUSION`]]">
+            <properties>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[0.5,0.5,1.0,1]</vector4f>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+                <float name="reflectivity">1</float>
+            </properties>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector3f name="normal"/>
+                <vector2f name="texcoord0"/>
+                <vector2f name="texcoord1"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`arbfp1`,`glslf`,`fp30`,`fp40`,`gp4fp`,`gp5fp`]" files="[`envmap.cg`]" entryfunctions="[`mainFragment`]" compilerargs="[[`-DPAINT`,`-DOCCLUSION`]]">
+            <properties>
+                <sampler2d name="occlusionTex">0</sampler2d>
+                <sampler2d name="decalTex">1</sampler2d>
+                <samplerCUBE name="envTex">2</samplerCUBE>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+            </properties>
+        </fragmentshader>
+    </shader>
+    <shader id="s17" name="skybox" cost="100">
+        <supports>
+            <feature class="textures" values="[`skybox`]"/>
+            <feature class="lighting" values="[`unlit`]"/>
+        </supports>
+        <fixedfunctionshader>
+            <properties>
+                <vector4f name="surfacecolor">[1,1,1,1]</vector4f>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+            </properties>
+            <vertexparameters>
+                <vector3f name="position"/>
+            </vertexparameters>
+        </fixedfunctionshader>
+    </shader>
+    <shader id="s18" name="wind" cost="400">
+        <supports>
+            <feature class="physics" values="[`wind`]"/>
+            <feature class="textures" values="[`paint`]"/>
+            <feature class="texcoord" values="[`uv_map`]"/>
+            <feature class="lighting" values="[`lambert`]"/>
+        </supports>
+        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`,`gp4vp`,`gp5vp`]" files="[`wind.cg`]" entryfunctions="[`main`]" compilerargs="[[`-DCONST`]]">
+            <properties>
+                <vector4f name="WindParams">[0.18, 0.18, 0.1, 1]</vector4f>
+                <vector4f name="WindDirection">[-2, 1, 0, 0]</vector4f>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+            </properties>
+            <vertexparameters>
+                <vector3f name="position"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`,`gp4fp`,`gp5fp`]" files="[`wind.cg`]" entryfunctions="[`mainFragment`]" compilerargs="[[`-DCONST`]]">
+            <properties>
+                <sampler2d name="paintTex">0</sampler2d>
+            </properties>
+        </fragmentshader>
+    </shader>
+    <shader id="s19" name="wave_2d" cost="400">
+        <supports>
+            <feature class="physics" values="[`wave_2d`]"/>
+            <feature class="textures" values="[`paint`]"/>
+            <feature class="texcoord" values="[`uv_map`]"/>
+            <feature class="lighting" values="[`lambert`]"/>
+        </supports>
+        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`,`gp4vp`,`gp5vp`]" files="[`wave_2d.cg`]" entryfunctions="[`main`]" compilerargs="[[`-DCONST`]]">
+            <properties>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+                <vector4f name="WaveParams">[1, 1, 1, 0]</vector4f>
+                <vector4f name="WaveColor">[1.0,1.0,1.0,0.5]</vector4f>
+            </properties>
+            <vertexparameters>
+                <vector3f name="normal"/>
+                <vector3f name="position"/>
+                <vector4f name="color"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`,`gp4fp`,`gp5fp`]" files="[`wave_2d.cg`]" entryfunctions="[`mainFragment`]" compilerargs="[[`-DCONST`]]">
+            <properties>
+                <sampler2d name="paintTex">0</sampler2d>
+            </properties>
+        </fragmentshader>
+    </shader>
+    <shader id="s20" name="wave_1d" cost="400">
+        <supports>
+            <feature class="physics" values="[`wave_1d`]"/>
+            <feature class="lighting" values="[`lambert`]"/>
+        </supports>
+        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`,`gp4vp`,`gp5vp`]" files="[`wave_1d.cg`]" entryfunctions="[`main`]" compilerargs="[[`-DCONST`]]">
+            <properties>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+                <vector4f name="WaveParams">[1, 1, 1, 0]</vector4f>
+                <vector4f name="WaveColor">[1.0,1.0,1.0,0.5]</vector4f>
+            </properties>
+            <vertexparameters>
+                <vector3f name="normal"/>
+                <vector3f name="position"/>
+                <vector4f name="color"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`,`gp4fp`,`gp5fp`]" files="[`wave_1d.cg`]" entryfunctions="[`mainFragment`]" compilerargs="[[`-DCONST`]]">
+            <properties/>
+        </fragmentshader>
+    </shader>
+    <shader id="s21" name="SkinAndBones" cost="10">
+        <supports>
+            <feature class="textures" values="[`paint`]"/>
+            <feature class="texcoord" values="[`uv_map`]"/>
+            <feature class="physics" values="[`skin`]"/>
+            <feature class="lighting" values="[`lambert`]"/>
+        </supports>
+        <vertexshader profiles="[`arbvp1`,`vp40`]" files="[`SkinAndBones_arb1.cg`,`SkinAndBones.cg`]" entryfunctions="[`mainVertex`]" compilerargs="[[`-profileopts`,`MaxLocalParams=256`],[]]">
+            <properties>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[0.5,0.5,1.0,1]</vector4f>
+                <vectorofvector4f name="BoneMatrix">[[1,0,0,0],[0,1,0,0],[0,0,1,0]]</vectorofvector4f>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+            </properties>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector3f name="normal"/>
+                <vector2f name="texcoord0"/>
+                <vector4f name="joint_weights_0" register="texcoord1"/>
+                <vector4f name="joint_indices_0" register="texcoord2"/>
+                <vector4f name="joint_weights_1" register="texcoord3"/>
+                <vector4f name="joint_indices_1" register="texcoord4"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`arbfp1`,`fp40`]" files="[`SkinAndBones_arb1.cg`,`SkinAndBones.cg`]" entryfunctions="[`mainFragment`]">
+            <properties>
+                <sampler2d name="decalTex">0</sampler2d>
+            </properties>
+        </fragmentshader>
+    </shader>
+    <shader id="s23" name="hexwisp" cost="400">
+        <supports>
+            <feature class="physics" values="[`hexwisp`]"/>
+            <feature class="textures" values="[`paint`,`paint`]"/>
+            <feature class="texcoord" values="[`uv_map`,`uv_map`]"/>
+            <feature class="lighting" values="[`lambert`]"/>
+        </supports>
+        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`,`gp4vp`,`gp5vp`]" files="[`hexwisp.cg`]" entryfunctions="[`main`]" compilerargs="[[`-DCONST`]]">
+            <properties>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+                <vector2f name="mirrorpoint">[0,0]</vector2f>
+                <vector2f name="wispScale">[2,2]</vector2f>
+                <vectorofvector2f name="wisppos">[[3,3]]</vectorofvector2f>
+            </properties>
+            <vertexparameters>
+                <vector3f name="normal"/>
+                <vector3f name="position"/>
+                <vector4f name="color"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`,`gp4fp`,`gp5fp`]" files="[`hexwisp.cg`]" entryfunctions="[`mainFragment`]" compilerargs="[[`-DCONST`]]">
+            <properties>
+                <sampler2d name="paintTex">0</sampler2d>
+                <sampler2d name="wispTex">1</sampler2d>
+            </properties>
+        </fragmentshader>
+    </shader>
+    <shader id="s24" name="phong_painted_environment" cost="10">
+        <supports>
+            <feature class="textures" values="[`paint`,`paint`]"/>
+            <feature class="texcoord" values="[`uv_map`,`reflective`]"/>
+            <feature class="lighting" values="[`phong`]"/>
+        </supports>
+        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`,`gp4vp`,`gp5vp`]" files="[`envmap.cg`]" entryfunctions="[`mainVertex`]" compilerargs="[[`-DPAINT`,`-DPHONG_SPECULAR`]]">
+            <properties>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[0.5,0.5,1.0,1]</vector4f>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+                <float name="reflectivity">1</float>
+            </properties>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector3f name="normal"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`,`gp4fp`,`gp5fp`]" files="[`envmap.cg`]" entryfunctions="[`mainFragment`]" compilerargs="[[`-DPAINT`,`-DPHONG_SPECULAR`]]">
+            <properties>
+                <sampler2d name="decalTex">0</sampler2d>
+                <samplerCUBE name="envTex">1</samplerCUBE>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+            </properties>
+        </fragmentshader>
+    </shader>
+    <shader id="s24a" name="phong_occlusion_env" cost="10">
+        <supports>
+            <feature class="textures" values="[`occlusion`,`paint`]"/>
+            <feature class="texcoord" values="[`uv_map`,`reflective`]"/>
+            <feature class="lighting" values="[`phong`]"/>
+        </supports>
+        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`,`gp4vp`,`gp5vp`]" files="[`envmap.cg`]" entryfunctions="[`mainVertex`]" compilerargs="[[`-DOCCLUSION`,`-DPHONG_SPECULAR`]]">
+            <properties>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[0.5,0.5,1.0,1]</vector4f>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+                <float name="reflectivity">1</float>
+            </properties>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector3f name="normal"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`,`gp4fp`,`gp5fp`]" files="[`envmap.cg`]" entryfunctions="[`mainFragment`]" compilerargs="[[`-DOCCLUSION`,`-DPHONG_SPECULAR`]]">
+            <properties>
+                <sampler2d name="occlusionTex">0</sampler2d>
+                <samplerCUBE name="envTex">1</samplerCUBE>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+            </properties>
+        </fragmentshader>
+    </shader>
+    <shader id="s24b" name="phong_brakes" cost="10">
+        <supports>
+            <feature class="textures" values="[`paint`,`paint`,`paint`,`paint`]"/>
+            <feature class="texcoord" values="[`uv_map`,`reflective`]"/>
+            <feature class="lighting" values="[`phong`]"/>
+        </supports>
+        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`,`gp4vp`,`gp5vp`]" files="[`envmap_brakes.cg`]" entryfunctions="[`mainVertex`]" compilerargs="[[`-DPAINT`,`-DPHONG_SPECULAR`]]">
+            <properties>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[0.5,0.5,1.0,1]</vector4f>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+                <float name="reflectivity">1</float>
+            </properties>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector3f name="normal"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`,`gp4fp`,`gp5fp`]" files="[`envmap_brakes.cg`]" entryfunctions="[`mainFragment`]" compilerargs="[[`-DPAINT`,`-DPHONG_SPECULAR`]]">
+            <properties>
+                <sampler2d name="decalTex">0</sampler2d>
+                <samplerCUBE name="envTex">1</samplerCUBE>
+                <sampler2d name="brakeOneTex">2</sampler2d>
+                <sampler2d name="brakeTwoTex">3</sampler2d>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+                <float name="strength">0</float>
+            </properties>
+        </fragmentshader>
+    </shader>
+    <shader id="s24c" name="blinn_painted_environment" cost="10">
+        <supports>
+            <feature class="textures" values="[`paint`,`paint`]"/>
+            <feature class="texcoord" values="[`uv_map`,`reflective`]"/>
+            <feature class="lighting" values="[`blinn`]"/>
+        </supports>
+        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`,`gp4vp`,`gp5vp`]" files="[`envmap.cg`]" entryfunctions="[`mainVertex`]" compilerargs="[[`-DPAINT`]]">
+            <properties>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[0.5,0.5,1.0,1]</vector4f>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+                <float name="reflectivity">1</float>
+            </properties>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector3f name="normal"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`,`gp4fp`,`gp5fp`]" files="[`envmap.cg`]" entryfunctions="[`mainFragment`]" compilerargs="[[`-DPAINT`]]">
+            <properties>
+                <sampler2d name="decalTex">0</sampler2d>
+                <samplerCUBE name="envTex">1</samplerCUBE>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+            </properties>
+        </fragmentshader>
+    </shader>
+    <shader id="s25a" name="litchrome_blinn" cost="10">
+        <supports>
+            <feature class="textures" values="[`paint`]"/>
+            <feature class="lighting" values="[`blinn`]"/>
+            <feature class="texcoord" values="[`reflective`]"/>
+        </supports>
+        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`,`gp4vp`,`gp5vp`]" files="[`envmap.cg`]" entryfunctions="[`mainVertex`]">
+            <properties>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[1,1,1,1]</vector4f>
+                <vector4f name="specular">[0,0,0,1]</vector4f>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+                <float name="reflectivity">1</float>
+            </properties>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector3f name="normal"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`,`gp4fp`,`gp5fp`]" files="[`envmap.cg`]" entryfunctions="[`mainFragment`]">
+            <properties>
+                <samplerCUBE name="envTex">0</samplerCUBE>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+            </properties>
+        </fragmentshader>
+    </shader>
+    <shader id="s25b" name="litchrome_phong" cost="10">
+        <supports>
+            <feature class="textures" values="[`paint`]"/>
+            <feature class="lighting" values="[`phong`]"/>
+            <feature class="texcoord" values="[`reflective`]"/>
+        </supports>
+        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`,`gp4vp`,`gp5vp`]" files="[`envmap.cg`]" entryfunctions="[`mainVertex`]" compilerargs="[[`-DPHONG_SPECULAR`]]">
+            <properties>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[1,1,1,1]</vector4f>
+                <vector4f name="specular">[0,0,0,1]</vector4f>
+                <float name="shininess">32</float>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+                <float name="reflectivity">1</float>
+            </properties>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector3f name="normal"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`,`gp4fp`,`gp5fp`]" files="[`envmap.cg`]" entryfunctions="[`mainFragment`]" compilerargs="[[`-DPHONG_SPECULAR`]]">
+            <properties>
+                <samplerCUBE name="envTex">0</samplerCUBE>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+            </properties>
+        </fragmentshader>
+    </shader>
+    <shader id="s26" name="generictex_lambert" cost="120">
+        <supports>
+            <feature class="textures" values="[`paint`]"/>
+            <feature class="lighting" values="[`lambert`]"/>
+            <feature class="texcoord" values="[`*`]"/>
+        </supports>
+        <fixedfunctionshader>
+            <properties>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[1,1,1,1]</vector4f>
+                <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                <float name="shininess">1.0</float>
+                <vectorofvector4f name="texgenparam0">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,0]]</vectorofvector4f>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+            </properties>
+            <vertexparameters>
+                <vector3f name="normal"/>
+                <vector3f name="position"/>
+            </vertexparameters>
+        </fixedfunctionshader>
+    </shader>
+    <shader id="s27" name="voxel_plasma" cost="120">
+        <supports>
+            <feature class="textures" values="[`paint`]"/>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="texcoord" values="[`*`]"/>
+        </supports>
+        <fixedfunctionshader>
+            <properties>
+                <vectorofvector4f name="texgenparam0">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,0]]</vectorofvector4f>
+                <vectorofblendfunction name="blendfunction">[one,one_minus_src_alpha]</vectorofblendfunction>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[1.0,1.0,1.0,1]</vector4f>
+                <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                <float name="shininess">1.0</float>
+            </properties>
+            <vertexparameters>
+                <vector3f name="position"/>
+            </vertexparameters>
+        </fixedfunctionshader>
+    </shader>
+    <shader id="s28" name="generic_dualtex_lambert" cost="120">
+        <supports>
+            <feature class="textures" values="[`paint`,`paint`]"/>
+            <feature class="lighting" values="[`lambert`]"/>
+            <feature class="texcoord" values="[`*`,`*`]"/>
+        </supports>
+        <fixedfunctionshader>
+            <properties>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[1,1,1,1]</vector4f>
+                <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                <float name="shininess">1.0</float>
+                <vectorofvector4f name="texgenparam0">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,0]]</vectorofvector4f>
+                <vectorofvector4f name="texgenparam1">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,0]]</vectorofvector4f>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+            </properties>
+            <vertexparameters>
+                <vector3f name="normal"/>
+                <vector3f name="position"/>
+            </vertexparameters>
+        </fixedfunctionshader>
+    </shader>
+    <shader id="s281" name="singletex_projective_lambert" cost="120">
+        <supports>
+            <feature class="textures" values="[`paint`,`paint`]"/>
+            <feature class="lighting" values="[`lambert`]"/>
+            <feature class="texcoord" values="[`uv_map`,`frontal_projection`]"/>
+        </supports>
+        <fixedfunctionshader>
+            <properties>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[1,1,1,1]</vector4f>
+                <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                <float name="shininess">1.0</float>
+                <vectorofvector4f name="texgenparam1">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,0]]</vectorofvector4f>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+            </properties>
+            <vertexparameters>
+                <vector3f name="normal"/>
+                <vector3f name="position"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </fixedfunctionshader>
+    </shader>
+    <shader id="s282" name="doubletex_projective_lambert" cost="120">
+        <supports>
+            <feature class="textures" values="[`paint`,`paint`,`paint`]"/>
+            <feature class="lighting" values="[`lambert`]"/>
+            <feature class="texcoord" values="[`uv_map`,`uv_map`,`frontal_projection`]"/>
+        </supports>
+        <fixedfunctionshader>
+            <properties>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[1,1,1,1]</vector4f>
+                <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                <float name="shininess">1.0</float>
+                <vectorofvector4f name="texgenparam2">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,0]]</vectorofvector4f>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+            </properties>
+            <vertexparameters>
+                <vector3f name="normal"/>
+                <vector3f name="position"/>
+                <vector2f name="texcoord0"/>
+                <vector2f name="texcoord1"/>
+            </vertexparameters>
+        </fixedfunctionshader>
+    </shader>
+    <shader id="s283" name="singletex_doubleprojective_lambert" cost="120">
+        <supports>
+            <feature class="textures" values="[`paint`,`paint`,`paint`]"/>
+            <feature class="lighting" values="[`lambert`]"/>
+            <feature class="texcoord" values="[`uv_map`,`frontal_projection`,`frontal_projection`]"/>
+        </supports>
+        <fixedfunctionshader>
+            <properties>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[1,1,1,1]</vector4f>
+                <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                <float name="shininess">1.0</float>
+                <vectorofvector4f name="texgenparam1">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,0]]</vectorofvector4f>
+                <vectorofvector4f name="texgenparam2">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,0]]</vectorofvector4f>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+            </properties>
+            <vertexparameters>
+                <vector3f name="normal"/>
+                <vector3f name="position"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </fixedfunctionshader>
+    </shader>
+    <shader id="s284" name="doubletex_doubleprojective_lambert" cost="120">
+        <supports>
+            <feature class="textures" values="[`paint`,`paint`,`paint`,`paint`]"/>
+            <feature class="lighting" values="[`lambert`]"/>
+            <feature class="texcoord" values="[`uv_map`,`uv_map`,`frontal_projection`,`frontal_projection`]"/>
+        </supports>
+        <fixedfunctionshader>
+            <properties>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[1,1,1,1]</vector4f>
+                <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                <float name="shininess">1.0</float>
+                <vectorofvector4f name="texgenparam2">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,0]]</vectorofvector4f>
+                <vectorofvector4f name="texgenparam3">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,0]]</vectorofvector4f>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+            </properties>
+            <vertexparameters>
+                <vector3f name="normal"/>
+                <vector3f name="position"/>
+                <vector2f name="texcoord0"/>
+                <vector2f name="texcoord1"/>
+            </vertexparameters>
+        </fixedfunctionshader>
+    </shader>
+    <shader id="s29" name="generic_tripletex_lambert" cost="120">
+        <supports>
+            <feature class="textures" values="[`paint`,`paint`,`paint`]"/>
+            <feature class="lighting" values="[`lambert`]"/>
+            <feature class="texcoord" values="[`*`,`*`,`*`]"/>
+        </supports>
+        <fixedfunctionshader>
+            <properties>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[1,1,1,1]</vector4f>
+                <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                <float name="shininess">1.0</float>
+                <vectorofvector4f name="texgenparam0">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,0]]</vectorofvector4f>
+                <vectorofvector4f name="texgenparam1">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,0]]</vectorofvector4f>
+                <vectorofvector4f name="texgenparam2">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,0]]</vectorofvector4f>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+            </properties>
+            <vertexparameters>
+                <vector3f name="normal"/>
+                <vector3f name="position"/>
+            </vertexparameters>
+        </fixedfunctionshader>
+    </shader>
+    <shader id="s30" name="generic_quadrupletex_lambert" cost="120">
+        <supports>
+            <feature class="textures" values="[`paint`,`paint`,`paint`,`paint`]"/>
+            <feature class="lighting" values="[`lambert`]"/>
+            <feature class="texcoord" values="[`*`,`*`,`*`,`*`]"/>
+        </supports>
+        <fixedfunctionshader>
+            <properties>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[1,1,1,1]</vector4f>
+                <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                <float name="shininess">1.0</float>
+                <vectorofvector4f name="texgenparam0">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,0]]</vectorofvector4f>
+                <vectorofvector4f name="texgenparam1">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,0]]</vectorofvector4f>
+                <vectorofvector4f name="texgenparam2">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,0]]</vectorofvector4f>
+                <vectorofvector4f name="texgenparam3">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,0]]</vectorofvector4f>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+            </properties>
+            <vertexparameters>
+                <vector3f name="normal"/>
+                <vector3f name="position"/>
+            </vertexparameters>
+        </fixedfunctionshader>
+    </shader>
+    <shader id="s31" name="hdr" cost="10">
+        <supports>
+            <feature class="textures" values="[`hdr_paint`]"/>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="texcoord" values="[`*`]"/>
+        </supports>
+        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`,`gp4vp`,`gp5vp`]" files="[`hdr.cg`]" entryfunctions="[`mainVertex`]">
+            <properties>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+                <vector2f name="hdr">[0,1]</vector2f>
+            </properties>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector3f name="normal"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`,`gp4fp`,`gp5fp`]" files="[`hdr.cg`]" entryfunctions="[`mainFragment`]">
+            <properties>
+                <sampler2d name="tex">0</sampler2d>
+            </properties>
+        </fragmentshader>
+    </shader>
+    <shader id="s32" name="antialias" cost="10">
+        <supports>
+            <feature class="filter" values="[`antialias`]"/>
+            <feature class="textures" values="[`paint`]"/>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="texcoord" values="[`*`]"/>
+        </supports>
+        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`,`gp4vp`,`gp5vp`]" files="[`antialias.cg`]" entryfunctions="[`mainVertex`]">
+            <properties>
+                <vector4f name="surfacecolor">[1,1,1,1]</vector4f>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+                <vector2f name="pixelSize">[0,0]</vector2f>
+            </properties>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector3f name="normal"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`,`gp4fp`,`gp5fp`]" files="[`antialias.cg`]" entryfunctions="[`mainFragment`]">
+            <properties>
+                <sampler2d name="tex">0</sampler2d>
+            </properties>
+        </fragmentshader>
+    </shader>
+    <shader id="s33" name="accumulation" cost="120">
+        <supports>
+            <feature class="filter" values="[`accumulation`]"/>
+            <feature class="textures" values="[`paint`,`paint`,`paint`,`paint`,`paint`,`paint`,`paint`,`paint`]"/>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="texcoord" values="[`uv_map`]"/>
+        </supports>
+        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`,`gp4vp`,`gp5vp`]" files="[`accumulation.cg`]" entryfunctions="[`mainVertex`]">
+            <properties>
+                <vector4f name="surfacecolor">[1,1,1,1]</vector4f>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+            </properties>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector3f name="normal"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`,`gp4fp`,`gp5fp`]" files="[`accumulation.cg`]" entryfunctions="[`mainFragment`]">
+            <properties>
+                <sampler2d name="tex0">0</sampler2d>
+                <sampler2d name="tex1">1</sampler2d>
+                <sampler2d name="tex2">2</sampler2d>
+                <sampler2d name="tex3">3</sampler2d>
+                <sampler2d name="tex4">4</sampler2d>
+                <sampler2d name="tex5">5</sampler2d>
+                <sampler2d name="tex6">6</sampler2d>
+                <sampler2d name="tex7">7</sampler2d>
+            </properties>
+        </fragmentshader>
+    </shader>
+    <shader id="s123" name="VoxelTransferFunction" cost="9">
+        <supports>
+            <feature class="voxels" values="[`colored`]"/>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="textures" values="[`paint`,`paint`]"/>
+            <feature class="texcoord" values="[`uv_map`,`*`]"/>
+        </supports>
+        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`,`gp4vp`,`gp5vp`]" files="[`voxelUnlit.cg`]" entryfunctions="[`mainVertex`]">
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector3f name="texcoord0"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`,`gp4fp`,`gp5fp`]" files="[`voxelUnlit.cg`]" entryfunctions="[`mainFragmentTF`]">
+            <properties>
+                <sampler3d name="theDataTex">0</sampler3d>
+                <sampler2d name="theTransferTable">1</sampler2d>
+                <float name="theAlphaFactor">1.0</float>
+                <float name="theScaleCorrection">1.0</float>
+                <vector2f name="theValueRange">[0.0, 1.0]</vector2f>
+            </properties>
+        </fragmentshader>
+    </shader>
+    <shader id="s124" name="VoxelGrayWindow" cost="9">
+        <supports>
+            <feature class="voxels" values="[`gray`]"/>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="textures" values="[`paint`]"/>
+            <feature class="texcoord" values="[`uv_map`]"/>
+        </supports>
+        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`,`gp4vp`,`gp5vp`]" files="[`voxelUnlit.cg`]" entryfunctions="[`mainVertex`]">
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector3f name="texcoord0"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`,`gp4fp`,`gp5fp`]" files="[`voxelUnlit.cg`]" entryfunctions="[`mainFragmentBW`]">
+            <properties>
+                <sampler3d name="theDataTex">0</sampler3d>
+                <float name="theAlphaFactor">1.0</float>
+                <float name="theScaleCorrection">1.0</float>
+                <vector2f name="theValueRange">[0.0, 1.0]</vector2f>
+            </properties>
+        </fragmentshader>
+    </shader>
+    <shader id="s125" name="unlitmulticolortex" cost="120">
+        <supports>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="textures" values="[`paint`,`paint`]"/>
+            <feature class="texcoord" values="[`uv_map`,`uv_map`]"/>
+            <feature class="vertexparams" values="[`color`]"/>
+        </supports>
+        <fixedfunctionshader>
+            <properties>
+                <vector4f name="surfacecolor">[1.0,1.0,1.0,1]</vector4f>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+            </properties>
+            <vertexparameters>
+                <vector3f name="position"/>
+                <vector2f name="texcoord0"/>
+                <vector2f name="texcoord1"/>
+                <vector3f name="color"/>
+            </vertexparameters>
+        </fixedfunctionshader>
+    </shader>
+    <shader id="s126" name="particles" cost="10">
+        <supports>
+            <feature class="vertexparams" values="[`particles`]"/>
+            <feature class="textures" values="[`paint`]"/>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="texcoord" values="[`*`]"/>
+        </supports>
+        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`,`gp4vp`,`gp5vp`]" files="[`particles.cg`]" entryfunctions="[`mainVertex`]">
+            <properties>
+                <vector4f name="gravity">[0,0,0,0]</vector4f>
+                <vector3f name="size">[16,0,64]</vector3f>
+                <float name="time">0.0</float>
+                <float name="stoptime">10000000000000.0</float>
+                <float name="timetolive">3.0</float>
+            </properties>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector3f name="normal"/>
+                <vector4f name="color"/>
+                <vector2f name="texcoord0"/>
+                <vector4f name="texcoord1"/>
+                <vector4f name="texcoord2"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`,`gp4fp`,`gp5fp`]" files="[`particles.cg`]" entryfunctions="[`mainFragment`]">
+            <properties>
+                <sampler3d name="tex">0</sampler3d>
+            </properties>
+        </fragmentshader>
+    </shader>
+    <shader id="s127" name="glow" cost="10">
+        <supports>
+            <feature class="textures" values="[`glow`,`glow`]"/>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="texcoord" values="[`*`]"/>
+        </supports>
+        <vertexshader profiles="[`arbvp1`,`vp40`,`gp4vp`,`gp5vp`]" files="[`glow_arb1.cg`,`glow.cg`,`glow.cg`,`glow.cg`]" entryfunctions="[`mainVertex`]">
+            <properties/>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`arbfp1`,`fp40`,`gp4fp`,`gp5fp`]" files="[`glow_arb1.cg`,`glow.cg`,`glow.cg`,`glow.cg`]" entryfunctions="[`mainFragment`]">
+            <properties>
+                <sampler2d name="tex">0</sampler2d>
+                <sampler2d name="blurKernel">1</sampler2d>
+                <vector3f name="texelSize">[0,0,0]</vector3f>
+                <float name="glowScale">1.0</float>
+                <float name="kernelSize">1</float>
+                <float name="blurKernelTexSize">1</float>
+            </properties>
+        </fragmentshader>
+    </shader>
+    <shader id="s128" name="nightgrinder_with_lightmap" cost="10">
+        <supports>
+            <feature class="textures" values="[`paint`,`paint`,`paint`]"/>
+            <feature class="texcoord" values="[`*`,`*`,`*`]"/>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="vertexparams" values="[`nightgrinder`]"/>
+        </supports>
+        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`,`gp4vp`,`gp5vp`]" files="[`ng_fragment_lighting.cg`]" entryfunctions="[`mainVertex`]" compilerargs="[[`-DHAS_LIGHTMAP`]]">
+            <properties>
+                <!--           <vector4f name="diffuse">[0,0,0,0]</vector4f><vector4f name="ambient">[0,0,0,0]</vector4f> -->
+                <vector2f name="nearFar">[20.0, 15.0]</vector2f>
+            </properties>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector3f name="normal"/>
+                <vector4f name="texcoord0"/>
+                <vector4f name="texcoord1"/>
+                <vector4f name="texcoord2"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`,`gp4fp`,`gp5fp`]" files="[`ng_fragment_lighting.cg`]" entryfunctions="[`mainFragment`]" compilerargs="[[`-DHAS_LIGHTMAP`]]">
+            <properties>
+                <sampler2d name="tex0">0</sampler2d>
+                <sampler2d name="tex1">1</sampler2d>
+                <sampler2d name="tex2">2</sampler2d>
+            </properties>
+        </fragmentshader>
+    </shader>
+    <shader id="s129" name="flow" cost="10">
+        <supports>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="textures" values="[`flow`]"/>
+            <feature class="texcoord" values="[`*`,`*`]"/>
+        </supports>
+        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`,`gp4vp`,`gp5vp`]" files="[`flow.cg`]" entryfunctions="[`mainVertex`]">
+            <properties/>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector2f name="texcoord0"/>
+                <vector2f name="texcoord1"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`,`gp4fp`,`gp5fp`]" files="[`flow.cg`]" entryfunctions="[`mainFragment`]">
+            <properties>
+                <sampler2d name="tex0">0</sampler2d>
+                <sampler2d name="tex1">1</sampler2d>
+                <vector3f name="gausscolor">[0,0,0]</vector3f>
+                <vector2f name="gaussposition">[0,0]</vector2f>
+                <float name="gaussradius">0.0</float>
+                <vector2f name="windowDims">[0,0]</vector2f>
+            </properties>
+        </fragmentshader>
+    </shader>
+    <shader id="s130" name="splat" cost="10">
+        <supports>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="textures" values="[`splat`]"/>
+            <feature class="texcoord" values="[`*`]"/>
+        </supports>
+        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`,`gp4vp`,`gp5vp`]" files="[`splat.cg`]" entryfunctions="[`mainVertex`]">
+            <properties/>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`,`gp4fp`,`gp5fp`]" files="[`splat.cg`]" entryfunctions="[`mainFragment`]">
+            <properties>
+                <sampler2d name="tex0">0</sampler2d>
+                <vector3f name="gausscolor">[0,0,0]</vector3f>
+                <vector2f name="gaussposition">[0,0]</vector2f>
+                <float name="gaussradius">0.0</float>
+                <vector2f name="windowDims">[0,0]</vector2f>
+            </properties>
+        </fragmentshader>
+    </shader>
+    <shader id="s131" name="blur" cost="10">
+        <supports>
+            <feature class="textures" values="[`blur`,`blur`]"/>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="texcoord" values="[`*`]"/>
+        </supports>
+        <vertexshader profiles="[`arbvp1`,`vp40`,`gp4vp`,`gp5vp`]" files="[`blur_arb1.cg`,`blur.cg`,`blur.cg`,`blur.cg`]" entryfunctions="[`mainVertex`]">
+            <properties/>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`arbfp1`,`fp40`,`gp4fp`,`gp5fp`]" files="[`blur_arb1.cg`,`blur.cg`,`blur.cg`,`blur.cg`]" entryfunctions="[`mainFragment`]">
+            <properties>
+                <sampler2d name="tex">0</sampler2d>
+                <sampler2d name="blurKernel">1</sampler2d>
+                <vector3f name="texelSize">[0,0,0]</vector3f>
+                <float name="kernelSize">1</float>
+                <float name="blurKernelTexSize">1</float>
+            </properties>
+        </fragmentshader>
+    </shader>
+    <shader id="s132" name="fade" cost="10">
+        <supports>
+            <feature class="textures" values="[`fade`]"/>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="texcoord" values="[`*`]"/>
+        </supports>
+        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`,`gp4vp`,`gp5vp`]" files="[`fade.cg`]" entryfunctions="[`mainVertex`]">
+            <properties/>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`,`gp4fp`,`gp5fp`]" files="[`fade.cg`]" entryfunctions="[`mainFragment`]">
+            <properties>
+                <sampler2d name="tex0">0</sampler2d>
+                <vector4f name="offset">[0,0,0,0]</vector4f>
+            </properties>
+        </fragmentshader>
+    </shader>
+    <shader id="s133" name="nightvision" cost="10">
+        <supports>
+            <feature class="textures" values="[`paint`,`paint`]"/>
+            <feature class="texcoord" values="[`*`,`*`]"/>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="option" values="[`nightvision`]"/>
+        </supports>
+        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`,`gp4vp`,`gp5vp`]" files="[`nightvision.cg`]" entryfunctions="[`mainVertex`]">
+            <properties/>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`,`gp4fp`,`gp5fp`]" files="[`nightvision.cg`]" entryfunctions="[`mainFragment`]">
+            <properties>
+                <sampler2d name="tex0">0</sampler2d>
+                <sampler2d name="tex1">1</sampler2d>
+            </properties>
+        </fragmentshader>
+    </shader>
+    <shader id="s134" name="spotlight_no_texture" cost="10">
+        <supports>
+            <feature class="lighting" values="[`lambert`]"/>
+            <feature class="option" values="[`spotlight`]"/>
+        </supports>
+        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`]" files="[`spotlight.cg`]" entryfunctions="[`mainVertex`]">
+            <properties/>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector4f name="normal"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`]" files="[`spotlight.cg`]" entryfunctions="[`mainFragment`]">
+            <properties>
+                <vector4f name="fogColor">[0.0, 0.0, 0.0, 1.0]</vector4f>
+                <float name="penumbra">0.0</float>
+                <float name="fogDensity">0.0</float>
+            </properties>
+        </fragmentshader>
+    </shader>
+    <shader id="s135" name="spotlight_one_texture" cost="10">
+        <supports>
+            <feature class="textures" values="[`paint`]"/>
+            <feature class="texcoord" values="[`*`]"/>
+            <feature class="lighting" values="[`lambert`]"/>
+            <feature class="option" values="[`spotlight`]"/>
+        </supports>
+        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`]" files="[`spotlight.cg`]" entryfunctions="[`mainVertex`]" compilerargs="[[`-DPAINT`]]">
+            <properties>
+                <float name="penumbra">0.0</float>
+                <vector4f name="fogColor">[0.0, 0.0, 0.0, 1.0]</vector4f>
+                <float name="fogDensity">0.0</float>
+            </properties>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector4f name="normal"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`]" files="[`spotlight.cg`]" entryfunctions="[`mainFragment`]" compilerargs="[[`-DPAINT`]]">
+            <properties>
+                <sampler2d name="tex0">0</sampler2d>
+            </properties>
+        </fragmentshader>
+    </shader>
+    <shader id="s136" name="spotlight_two_textures" cost="10">
+        <supports>
+            <feature class="textures" values="[`paint`,`paint`]"/>
+            <feature class="texcoord" values="[`*`,`*`]"/>
+            <feature class="lighting" values="[`lambert`]"/>
+            <feature class="option" values="[`spotlight`]"/>
+        </supports>
+        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`]" files="[`spotlight.cg`]" entryfunctions="[`mainVertex`]" compilerargs="[[`-DPAINT=2`]]">
+            <properties/>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector4f name="normal"/>
+                <vector2f name="texcoord0"/>
+                <vector2f name="texcoord1"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`]" files="[`spotlight.cg`]" entryfunctions="[`mainFragment`]" compilerargs="[[`-DPAINT=2`]]">
+            <properties>
+                <sampler2d name="tex0">0</sampler2d>
+                <sampler2d name="tex1">1</sampler2d>
+                <float name="penumbra">0.0</float>
+                <vector4f name="fogColor">[0.0, 0.0, 0.0, 1.0]</vector4f>
+                <float name="fogDensity">0.0</float>
+            </properties>
+        </fragmentshader>
+    </shader>
+    <shader id="s134b" name="spotlight_no_texture_no_ambient" cost="10">
+        <supports>
+            <feature class="lighting" values="[`lambert`]"/>
+            <feature class="option" values="[`spotlight_no_ambient`]"/>
+        </supports>
+        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`]" files="[`spotlight.cg`]" entryfunctions="[`mainVertex`]" compilerargs="[[`-DIGNORE_AMBIENT`]]">
+            <properties/>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector4f name="normal"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`]" files="[`spotlight.cg`]" entryfunctions="[`mainFragment`]" compilerargs="[[`-DIGNORE_AMBIENT`]]">
+            <properties>
+                <vector4f name="fogColor">[0.0, 0.0, 0.0, 1.0]</vector4f>
+                <float name="penumbra">0.0</float>
+                <float name="fogDensity">0.0</float>
+            </properties>
+        </fragmentshader>
+    </shader>
+    <shader id="s135b" name="spotlight_one_texture_no_ambient" cost="10">
+        <supports>
+            <feature class="textures" values="[`paint`]"/>
+            <feature class="texcoord" values="[`*`]"/>
+            <feature class="lighting" values="[`lambert`]"/>
+            <feature class="option" values="[`spotlight_no_ambient`]"/>
+        </supports>
+        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`]" files="[`spotlight.cg`]" entryfunctions="[`mainVertex`]" compilerargs="[[`-DPAINT`,`-DIGNORE_AMBIENT`]]">
+            <properties>
+                <float name="penumbra">0.0</float>
+                <vector4f name="fogColor">[0.0, 0.0, 0.0, 1.0]</vector4f>
+                <float name="fogDensity">0.0</float>
+            </properties>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector4f name="normal"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`]" files="[`spotlight.cg`]" entryfunctions="[`mainFragment`]" compilerargs="[[`-DPAINT`,`-DIGNORE_AMBIENT`]]">
+            <properties>
+                <sampler2d name="tex0">0</sampler2d>
+            </properties>
+        </fragmentshader>
+    </shader>
+    <shader id="s136b" name="spotlight_two_textures_no_ambient" cost="10">
+        <supports>
+            <feature class="textures" values="[`paint`,`paint`]"/>
+            <feature class="texcoord" values="[`*`,`*`]"/>
+            <feature class="lighting" values="[`lambert`]"/>
+            <feature class="option" values="[`spotlight_no_ambient`]"/>
+        </supports>
+        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`]" files="[`spotlight.cg`]" entryfunctions="[`mainVertex`]" compilerargs="[[`-DPAINT=2`,`-DIGNORE_AMBIENT`]]">
+            <properties/>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector4f name="normal"/>
+                <vector2f name="texcoord0"/>
+                <vector2f name="texcoord1"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`]" files="[`spotlight.cg`]" entryfunctions="[`mainFragment`]" compilerargs="[[`-DPAINT=2`,`-DIGNORE_AMBIENT`]]">
+            <properties>
+                <sampler2d name="tex0">0</sampler2d>
+                <sampler2d name="tex1">1</sampler2d>
+                <float name="penumbra">0.0</float>
+                <vector4f name="fogColor">[0.0, 0.0, 0.0, 1.0]</vector4f>
+                <float name="fogDensity">0.0</float>
+            </properties>
+        </fragmentshader>
+    </shader>
+    <shader id="s137" name="snowstreet" cost="100">
+        <supports>
+            <feature class="lighting" values="[`lambert`]"/>
+            <feature class="textures" values="[`paint`,`paint`,`paint`,`paint`,`paint`]"/>
+            <feature class="texcoord" values="[`uv_map`,`uv_map`,`planar_projection`]"/>
+        </supports>
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`,`gp4fp`,`gp5fp`]" files="[`snow.cg`]" entryfunctions="[`mainFragment`]">
+            <properties>
+                <sampler2d name="ground">0</sampler2d>
+                <sampler2d name="snow">1</sampler2d>
+                <sampler2d name="shadow">2</sampler2d>
+                <sampler2d name="normalMap">3</sampler2d>
+                <sampler2d name="sparkleMap">4</sampler2d>
+                <vector4f name="diffuse">[1,1,1,1]</vector4f>
+                <vector4f name="specular">[1,1,1,1]</vector4f>
+                <vector4f name="ambient">[1,1,1,1]</vector4f>
+                <vectorofvector4f name="texgenparam2">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]</vectorofvector4f>
+                <float name="shininess">1.0</float>
+            </properties>
+        </fragmentshader>
+        <vertexshader profiles="[`arbvp1`,`vp20`,`vp30`,`vp40`,`gp4vp`,`gp5vp`]" files="[`snow.cg`]" entryfunctions="[`mainVertex`]">
+            <properties>
+                <vector4f name="lightPosition">[1.0, 1.0, 1.0, 1.0]</vector4f>
+            </properties>
+            <vertexparameters>
+                <vector3f name="normal"/>
+                <vector3f name="position"/>
+                <vector2f name="texcoord0"/>
+                <vector2f name="texcoord1"/>
+            </vertexparameters>
+        </vertexshader>
+    </shader>
+    <shader id="s138" name="snowstreet" cost="100">
+        <supports>
+            <feature class="lighting" values="[`lambert`]"/>
+            <feature class="textures" values="[`paint`,`paint`,`paint`,`paint`,`paint`]"/>
+            <feature class="texcoord" values="[`uv_map`,`uv_map`,`frontal_projection`]"/>
+        </supports>
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`,`gp4fp`,`gp5fp`]" files="[`snow.cg`]" entryfunctions="[`mainFragment`]">
+            <properties>
+                <sampler2d name="ground">0</sampler2d>
+                <sampler2d name="snow">1</sampler2d>
+                <sampler2d name="shadow">2</sampler2d>
+                <sampler2d name="normalMap">3</sampler2d>
+                <sampler2d name="sparkleMap">4</sampler2d>
+                <vector4f name="diffuse">[1,1,1,1]</vector4f>
+                <vector4f name="specular">[1,1,1,1]</vector4f>
+                <vector4f name="ambient">[1,1,1,1]</vector4f>
+                <vectorofvector4f name="texgenparam2">[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]</vectorofvector4f>
+                <float name="shininess">1.0</float>
+            </properties>
+        </fragmentshader>
+        <vertexshader profiles="[`arbvp1`,`vp20`,`vp30`,`vp40`,`gp4vp`,`gp5vp`]" files="[`snow.cg`]" entryfunctions="[`mainVertex`]">
+            <properties>
+                <vector4f name="lightPosition">[1.0, 1.0, 1.0, 1.0]</vector4f>
+            </properties>
+            <vertexparameters>
+                <vector3f name="normal"/>
+                <vector3f name="position"/>
+                <vector2f name="texcoord0"/>
+                <vector2f name="texcoord1"/>
+            </vertexparameters>
+        </vertexshader>
+    </shader>
+    <shader id="s139" name="paint_occlusion_lambert" cost="20">
+        <supports>
+            <feature class="textures" values="[`paint`,`occlusion`]"/>
+            <feature class="lighting" values="[`lambert`]"/>
+            <feature class="texcoord" values="[`uv_map`,`uv_map`]"/>
+        </supports>
+        <fixedfunctionshader>
+            <properties>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[1,1,1,1]</vector4f>
+                <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                <float name="shininess">1.0</float>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+            </properties>
+            <vertexparameters>
+                <vector3f name="normal"/>
+                <vector3f name="position"/>
+                <vector2f name="texcoord0"/>
+                <vector2f name="texcoord1"/>
+            </vertexparameters>
+        </fixedfunctionshader>
+    </shader>
+    <shader id="s140" name="occlusion_paint_lambert" cost="20">
+        <supports>
+            <feature class="textures" values="[`occlusion`,`paint`]"/>
+            <feature class="lighting" values="[`lambert`]"/>
+            <feature class="texcoord" values="[`uv_map`,`uv_map`]"/>
+        </supports>
+        <fixedfunctionshader>
+            <properties>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[1,1,1,1]</vector4f>
+                <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                <float name="shininess">1.0</float>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+            </properties>
+            <vertexparameters>
+                <vector3f name="normal"/>
+                <vector3f name="position"/>
+                <vector2f name="texcoord0"/>
+                <vector2f name="texcoord1"/>
+            </vertexparameters>
+        </fixedfunctionshader>
+    </shader>
+    <shader id="s141" name="tex_zoom" cost="12">
+        <supports>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="textures" values="[`paint`]"/>
+            <feature class="texcoord" values="[`uv_map`]"/>
+            <feature class="option" values="[`lens`]"/>
+        </supports>
+        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`,`gp4vp`,`gp5vp`]" files="[`zoom.cg`]" entryfunctions="[`mainVertex`]">
+            <properties/>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector4f name="normal"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`,`gp4fp`,`gp5fp`]" files="[`zoom.cg`]" entryfunctions="[`mainFragment`]">
+            <properties>
+                <sampler2d name="tex0">0</sampler2d>
+                <vector2f name="center">[0.0,0.0]</vector2f>
+                <float name="size">0.1</float>
+                <float name="slope">0.02</float>
+                <float name="maxzoom">2.5</float>
+            </properties>
+        </fragmentshader>
+    </shader>
+    <shader id="relief_unlit" name="relief" cost="12">
+        <supports>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="textures" values="[`paint`,`paint`]"/>
+            <feature class="texcoord" values="[`uv_map`,`uv_map`]"/>
+            <feature class="option" values="[`relief`]"/>
+        </supports>
+        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`,`gp4vp`,`gp5vp`]" files="[`relief.cg`]" entryfunctions="[`mainVertex`]">
+            <properties/>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector4f name="normal"/>
+                <vector2f name="texcoord0"/>
+                <vector2f name="texcoord1"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`]" files="[`relief.cg`]" entryfunctions="[`mainFragment`]">
+            <properties>
+                <sampler2d name="tex0">0</sampler2d>
+                <sampler2d name="tex1">1</sampler2d>
+                <vector2f name="center">[0.0,0.0]</vector2f>
+                <vector2f name="planes">[0.1,10000.0]</vector2f>
+                <vector3f name="lightpos">[-20,-20,-20]</vector3f>
+                <float name="depth">0.10</float>
+                <float name="tile">1.0</float>
+            </properties>
+        </fragmentshader>
+    </shader>
+    <shader id="mirror" name="mirror" cost="12">
+        <supports>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="textures" values="[`paint`,`paint`]"/>
+            <feature class="texcoord" values="[`uv_map`]"/>
+            <feature class="option" values="[`mirror`]"/>
+        </supports>
+        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`,`gp4vp`,`gp5vp`]" files="[`mirror.cg`]" entryfunctions="[`mainVertex`]">
+            <properties/>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector4f name="normal"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`,`gp4fp`,`gp5fp`]" files="[`mirror.cg`]" entryfunctions="[`mainFragment`]">
+            <properties>
+                <sampler2d name="tex0">0</sampler2d>
+                <sampler2d name="tex1">1</sampler2d>
+            </properties>
+        </fragmentshader>
+    </shader>
+    <shader id="s1414" name="ripple" cost="10">
+        <supports>
+            <feature class="textures" values="[`paint`, `paint`]"/>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="texcoord" values="[`uv_map`,`uv_map`]"/>
+            <feature class="effect" values="[`ripple`]"/>
+        </supports>
+        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`,`gp4vp`,`gp5vp`]" files="[`ripple.cg`]" entryfunctions="[`mainVertex`]">
+            <properties>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[1,1,1,1]</vector4f>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+                <float name="reflectivity">1</float>
+            </properties>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector3f name="normal"/>
+                <vector3f name="color"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`,`gp4fp`,`gp5fp`]" files="[`ripple.cg`]" entryfunctions="[`mainFragment`]">
+            <properties>
+                <sampler2d name="floor">0</sampler2d>
+                <sampler2d name="surface">1</sampler2d>
+                <vectorofblendfunction name="blendfunction">[src_alpha,one_minus_src_alpha]</vectorofblendfunction>
+            </properties>
+        </fragmentshader>
+    </shader>    
+    <shader id="s14141" name="sinus" cost="10">
+        <supports>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="texcoord" values="[`uv_map`]"/>
+            <feature class="effect" values="[`sine`]"/>
+        </supports>
+        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`,`gp4vp`,`gp5vp`]" files="[`sinus.cg`]" entryfunctions="[`mainVertex`]">
+            <properties>
+                <float name="amplitude">0.5</float>
+            </properties>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`,`gp4fp`,`gp5fp`]" files="[`sinus.cg`]" entryfunctions="[`mainFragment`]">
+            <properties>
+            </properties>
+        </fragmentshader>        
+    </shader>    
+
+    <shader id="s141414" name="watersimulator" cost="10">
+        <supports>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="texcoord" values="[`uv_map`, `uv_map`]"/>
+            <feature class="effect" values="[`watersimulator`]"/>
+            <feature class="textures" values="[`paint`, `paint`]"/>            
+        </supports>
+        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`,`gp4vp`,`gp5vp`]" files="[`simulation.cg`]" entryfunctions="[`mainVertex`]">
+            <properties>
+            </properties>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`,`gp4fp`,`gp5fp`]" files="[`simulation.cg`]" entryfunctions="[`mainFragment`]">
+            <properties>
+                <sampler2d name="current_cells">0</sampler2d>
+                <sampler2d name="previous_cells">1</sampler2d>         
+                <float name="damping">0.999</float>       
+            </properties>
+        </fragmentshader>        
+    </shader>    
+    <shader id="s1414143" name="text_blur" cost="10">
+        <supports>
+            <feature class="textures" values="[`paint`]"/>
+            <feature class="texcoord" values="[`*`]"/>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="effect"   values="[`blur`]"/>
+        </supports>
+        <vertexshader profiles="[`vp40`,`gp4vp`,`gp5vp`]" files="[`text_effects.cg`]" entryfunctions="[`mainVertex`]">
+            <properties/>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`fp40`,`gp4fp`,`gp5fp`]" files="[`text_effects.cg`]" entryfunctions="[`mainFragmentBlur`]">
+            <properties>
+                <vector4f name="surfacecolor">[1.0,1.0,1.0,1.0]</vector4f>
+                <sampler2d name="tex0">0</sampler2d>
+                <float name="blur">1.0</float>  
+                <float name="width">512</float>  
+                <float name="height">512</float>  
+            </properties>
+        </fragmentshader>
+    </shader>
+    <shader id="s1414144" name="text_glow" cost="10">
+        <supports>
+            <feature class="textures" values="[`paint`]"/>
+            <feature class="texcoord" values="[`*`]"/>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="effect"   values="[`glow`]"/>
+        </supports>
+        <vertexshader profiles="[`vp40`,`gp4vp`,`gp5vp`]" files="[`text_effects.cg`]" entryfunctions="[`mainVertex`]">
+            <properties/>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`fp40`,`gp4fp`,`gp5fp`]" files="[`text_effects.cg`]" entryfunctions="[`mainFragmentGlow`]">
+            <properties>
+                <vector4f name="surfacecolor">[1.0,1.0,1.0,1.0]</vector4f>
+                <sampler2d name="tex0">0</sampler2d>
+                <float name="width">512</float>  
+                <float name="height">512</float>  
+                <float name="glow_radius">1.0</float>  
+                <float name="scale">1.0</float>  
+                <float name="glow_intensity">1.0</float>                  
+                <vector4f name="glow_color">[1.0,1.0,1.0,1.0]</vector4f> 
+                <vector2f name="offset">[0.0,0.0]</vector2f> 
+           </properties>
+        </fragmentshader>
+    </shader>
+    <shader id="s1414144v" name="text_glow_vertex_color" cost="10">
+        <supports>
+            <feature class="textures" values="[`paint`]"/>
+            <feature class="texcoord" values="[`*`]"/>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="effect"   values="[`glow_vertex_color`]"/>
+            <feature class="vertexparams" values="[`color`]"/>
+        </supports>
+        <vertexshader profiles="[`vp40`,`gp4vp`,`gp5vp`]" files="[`text_effects.cg`]" entryfunctions="[`mainVertex`]">
+            <properties/>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector2f name="texcoord0"/>
+                <vector4f name="color"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`fp40`,`gp4fp`,`gp5fp`]" files="[`text_effects.cg`]" entryfunctions="[`mainFragmentGlow`]">
+            <properties>
+                <vector4f name="surfacecolor">[1.0,1.0,1.0,1.0]</vector4f>
+                <sampler2d name="tex0">0</sampler2d>
+                <float name="width">512</float>  
+                <float name="height">512</float>  
+                <float name="glow_radius">1.0</float>  
+                <float name="scale">1.0</float>  
+                <float name="glow_intensity">1.0</float>                                  
+                <vector4f name="glow_color">[1.0,1.0,1.0,1.0]</vector4f> 
+                <vector2f name="offset">[0.0,0.0]</vector2f> 
+           </properties>
+        </fragmentshader>
+    </shader>
+    <shader id="s1414145" name="text_glow_blurred" cost="10">
+        <supports>
+            <feature class="textures" values="[`paint`]"/>
+            <feature class="texcoord" values="[`*`]"/>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="effect"   values="[`glowBlur`]"/>
+        </supports>
+        <vertexshader profiles="[`vp40`,`gp4vp`,`gp5vp`]" files="[`text_effects.cg`]" entryfunctions="[`mainVertex`]">
+            <properties/>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`fp40`,`gp4fp`,`gp5fp`]" files="[`text_effects.cg`]" entryfunctions="[`mainFragmentGlowBlur`]">
+            <properties>
+                <vector4f name="surfacecolor">[1.0,1.0,1.0,1.0]</vector4f>
+                <sampler2d name="tex0">0</sampler2d>
+                <float name="width">512</float>  
+                <float name="height">512</float>  
+                <float name="glow_radius">0.0</float>  
+                <float name="blur">0.0</float>  
+                <float name="scale">1.0</float>  
+                <float name="glow_intensity">1.0</float>                                  
+                <vector4f name="glow_color">[1.0,1.0,1.0,1.0]</vector4f> 
+                <vector2f name="offset">[0.0,0.0]</vector2f> 
+           </properties>
+        </fragmentshader>
+    </shader>
+    <shader id="s14141414" name="movie_yuv2rgb" cost="10">
+        <supports>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="texcoord" values="[`uv_map`]"/>
+            <feature class="option" values="[`yuv2rgb`]"/>
+            <feature class="textures" values="[`paint`, `paint`, `paint`]"/>            
+        </supports>
+        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`,`gp4vp`,`gp5vp`]" files="[`yuv2rgb.cg`]" entryfunctions="[`mainVertex`]">
+            <properties>
+            </properties>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`,`gp4fp`,`gp5fp`]" files="[`yuv2rgb.cg`]" entryfunctions="[`mainFragment`]">
+            <properties>
+                <sampler2d name="tex0">0</sampler2d>
+                <sampler2d name="tex1">1</sampler2d>
+                <sampler2d name="tex2">2</sampler2d>
+            </properties>
+        </fragmentshader>        
+    </shader>    
+   <shader id="s14141415" name="movie_yuv2rgb" cost="10">
+        <supports>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="texcoord" values="[`uv_map`]"/>
+            <feature class="option" values="[`yuv2rgb`]"/>
+            <feature class="vertexparams" values="[`color`]"/>
+            <feature class="textures" values="[`paint`, `paint`, `paint`]"/>            
+        </supports>
+        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`,`gp4vp`,`gp5vp`]" files="[`yuv2rgb.cg`]" entryfunctions="[`mainVertexColor`]">
+            <properties>
+            </properties>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector2f name="texcoord0"/>
+                <vector4f name="color"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`,`gp4fp`,`gp5fp`]" files="[`yuv2rgb.cg`]" entryfunctions="[`mainFragment`]">
+            <properties>
+                <sampler2d name="tex0">0</sampler2d>
+                <sampler2d name="tex1">1</sampler2d>
+                <sampler2d name="tex2">2</sampler2d>
+            </properties>
+        </fragmentshader>        
+    </shader>    
+    <shader id="s14141RoundedCorner" name="RoundedCorner" cost="10">
+        <supports>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="texcoord" values="[`uv_map`]"/>
+            <feature class="option" values="[`RoundedCorner`]"/>
+            <feature class="vertexparams" values="[`color`]"/>
+            <feature class="textures" values="[`paint`]"/>            
+        </supports>
+        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`,`gp4vp`,`gp5vp`]" files="[`roundCorners.cg`]" entryfunctions="[`mainVertex`]">
+            <properties>
+            </properties>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector4f name="color"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`,`gp4fp`,`gp5fp`]" files="[`roundCorners.cg`]" entryfunctions="[`mainFragment`]">
+            <properties>
+                <sampler2d name="backgroundTex">0</sampler2d>
+                <float name="radius">0.2</float>
+                <float name="cornerDistance">0.2</float>
+                <float name="aspectRatio">1</float>
+                <vector4f name="cornerToggle">[1,1,1,1]</vector4f>
+            </properties>
+        </fragmentshader>        
+    </shader>        
+    <shader id="s1414RoundedCornerMovie" name="movie_yuv2rgb_rounded_corner" cost="10">
+        <supports>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="texcoord" values="[`uv_map`]"/>
+            <feature class="option" values="[`yuv2rgb_round`]"/>
+            <feature class="vertexparams" values="[`color`]"/>
+            <feature class="textures" values="[`paint`, `paint`, `paint`]"/>
+        </supports>
+        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`,`gp4vp`,`gp5vp`]" files="[`yuv2rgb-round.cg`]" entryfunctions="[`mainVertex`]">
+            <properties/>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector4f name="color"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`,`gp4fp`,`gp5fp`]" files="[`yuv2rgb-round.cg`]" entryfunctions="[`mainFragment`]">
+            <properties>
+                <sampler2d name="tex0">0</sampler2d>
+                <sampler2d name="tex1">1</sampler2d>
+                <sampler2d name="tex2">2</sampler2d>
+                <float name="radius">0.2</float>
+                <float name="cornerDistance">0.2</float>
+                <float name="aspectRatio">1</float>
+                <vector4f name="cornerToggle">[1,1,1,1]</vector4f>
+            </properties>
+        </fragmentshader>
+    </shader> 
+    <shader id="s14141SunWorld" name="SunWorldClock" cost="10">
+        <supports>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="texcoord" values="[`uv_map`]"/>
+            <feature class="option" values="[`SunWorldClock`]"/>
+            <feature class="textures" values="[`paint`]"/>
+        </supports>
+        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`,`gp4vp`,`gp5vp`]" files="[`sunWorldClock.cg`]" entryfunctions="[`mainVertex`]">
+            <properties/>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`arbfp1`,`fp30`,`fp40`,`gp4fp`,`gp5fp`]" files="[`sunWorldClock.cg`]" entryfunctions="[`mainFragment`]">
+            <properties>
+                <sampler2d name="night">0</sampler2d>
+                <float name="alpha">0.0</float>
+                <float name="gst">0.0</float>
+                <float name="lineThickness">0.28</float>
+                <float name="lineAlpha">0.2</float>
+                <float name="cropRightPercent">0.80291</float>
+                <float name="cropBottomPercent">0.86924</float>
+            </properties>
+        </fragmentshader>
+    </shader> 
+   <shader id="s199ottobock_waves" name="ottobock_waves" cost="10">
+        <supports>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="option" values="[`ottobock_waves`]"/>
+            <feature class="textures" values="[`paint`]"/>
+        </supports>
+        <vertexshader profiles="[`arbvp1`,`vp30`,`vp40`,`gp4vp`,`gp5vp`]" files="[`ottobock_waves.cg`]" entryfunctions="[`mainVertex`]">
+            <properties>
+                <float name="theta">0</float>
+                <float name="period">0.5</float>
+                <float name="amplitude">25</float>
+                <float name="alpha">1</float>
+                <vector2f name="touchPosition">[-1,-1]</vector2f>
+        	</properties>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector3f name="color"/>
+            </vertexparameters>
+        </vertexshader>
+    </shader>
+</shaders>
+<combiners>
+    <!-- 'previous' + 'texture' -->
+    <combiner id="c00" name="add">
+        <combineRGB mode="add">
+            <arg0 source="previous" operand="src_color"/>
+            <arg1 source="texture" operand="src_color"/>
+        </combineRGB>
+        <combineAlpha mode="add">
+            <arg0 source="previous" operand="src_alpha"/>
+            <arg1 source="texture" operand="src_alpha"/>
+        </combineAlpha>
+    </combiner>
+    <!-- 'previous' - 'texture' -->
+    <combiner id="c01" name="subtract">
+        <combineRGB mode="subtract">
+            <arg0 source="previous" operand="src_color"/>
+            <arg1 source="texture" operand="src_color"/>
+        </combineRGB>
+        <combineAlpha mode="subtract">
+            <arg0 source="previous" operand="src_alpha"/>
+            <arg1 source="texture" operand="src_alpha"/>
+        </combineAlpha>
+    </combiner>
+    <!-- 'previous' * 'texture' -->
+    <combiner id="c02" name="modulate">
+        <combineRGB mode="modulate">
+            <arg0 source="previous" operand="src_color"/>
+            <arg1 source="texture" operand="src_color"/>
+        </combineRGB>
+        <combineAlpha mode="modulate">
+            <arg0 source="previous" operand="src_alpha"/>
+            <arg1 source="texture" operand="src_alpha"/>
+        </combineAlpha>
+    </combiner>
+    <!-- interpolate between 'previous' and 'texture' controlled by the alpha component of textureunit.color
+        arg0 * arg2 + arg1 * (1-arg2)
+    -->
+    <combiner id="c03" name="interpolate">
+        <combineRGB mode="interpolate">
+            <arg0 source="previous" operand="src_color"/>
+            <arg1 source="texture" operand="src_color"/>
+            <arg2 source="constant" operand="src_alpha"/>
+        </combineRGB>
+        <combineAlpha mode="interpolate">
+            <arg0 source="previous" operand="src_alpha"/>
+            <arg1 source="texture" operand="src_alpha"/>
+            <arg2 source="constant" operand="src_alpha"/>
+        </combineAlpha>
+    </combiner>
+</combiners>

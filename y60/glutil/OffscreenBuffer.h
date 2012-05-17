@@ -71,6 +71,8 @@ DEFINE_EXCEPTION( OffscreenRendererException, asl::Exception );
 namespace y60 {
     class Texture;
     typedef asl::Ptr<Texture, dom::ThreadingModel> TexturePtr;
+    class OffscreenBuffer;
+    typedef asl::Ptr<OffscreenBuffer, dom::ThreadingModel> OffscreenBufferPtr;
 
     class Y60_GLUTIL_DECL OffscreenBuffer {
         public:
@@ -80,23 +82,22 @@ namespace y60 {
             * backbuffer rendering.
             */
             OffscreenBuffer();
-            virtual ~OffscreenBuffer();
+            ~OffscreenBuffer();
 
             /**
-            * activate the texture as render target and initializes FBO
+            * activate the textures as render targets and initializes FBOs
             * if necessary
             */
-            void activate(TexturePtr theTexture,
-                          unsigned theSamples = 1, unsigned theCubemapFace = 0);
+            void activate(const std::vector<TexturePtr> & theTextures,
+                          unsigned int theSamples = 0, unsigned int theCubemapFace = 0);
 
             /**
-            * deactivates the texture as render target
-            * @param theCopyToImageFlag copy result to texture raster.
+            * deactivates the textures as render targets
+            * @param theCopyToImageFlag copy result to texture rasters.
             */
-            void deactivate(TexturePtr theTexture,
+            void deactivate(const std::vector<TexturePtr> & theTextures,
                             bool theCopyToImageFlag = false);
 
-        protected:
             /**
             * set to true if you want to render on a offscreen EXT_framebuffer_object
             * if false we render on the framebuffers back buffer
@@ -106,35 +107,37 @@ namespace y60 {
                 return _myUseFBO;
             }
 
-            void copyToImage(TexturePtr theTexture);
+            void copyToImage(TexturePtr theTexture, unsigned int theColorBufferIndex = 0);
 
         private:
-            void copyFrameBufferToTexture(TexturePtr theTexture);
-
             void reset();
-
-            void bindOffscreenFrameBuffer(TexturePtr theTexture,
-                                          unsigned theSamples = 0, unsigned theCubemapFace = 0);
-            void attachCubemapFace(unsigned theCubemapFace);
+            void copyToImage(const std::vector<TexturePtr> & theTextures);
+            
+            void bindFBO(const std::vector<TexturePtr> & theTextures,
+                                          unsigned int theSamples, unsigned int theCubemapFace);
+            void setupFBO(const std::vector<TexturePtr> & theTextures,
+                                          unsigned int theSamples, unsigned int theCubemapFace);
+            bool FBOrebindRequired(const std::vector<TexturePtr> & theTextures) const;
+            void blitToTexture(const std::vector<TexturePtr> & theTextures);
 
             bool     _myUseFBO;
-            bool     _myHasFBO;
             bool     _myHasFBOMultisample;
 
-            asl::Unsigned64 _myTextureNodeVersion;
+            std::vector<asl::Unsigned64> _myTextureNodeVersions;
             unsigned int  _myTextureWidth;
             unsigned int  _myTextureHeight;
             
-            unsigned _myBlitFilter;
+            unsigned int _myBlitFilter;
 
-            // OpenGL id of frame buffer object
-            GLuint _myFrameBufferObject[2];
+            GLuint _myFBO;
+            std::vector<GLuint> _myColorBuffers;
+            GLuint _myDepthBuffer;
 
-            // OpenGL id(s) of color buffer
-            GLuint _myColorBuffer[2];
+            //multisampling buffer
+            GLuint _myMultisampleFBO;
+            std::vector<GLuint> _myMultisampleColorBuffers;
+            GLuint _myMultisampleDepthBuffer;
 
-            // OpenGL id(s) of depth buffer
-            GLuint _myDepthBuffer[2];
     };
 }
 

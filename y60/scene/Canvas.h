@@ -77,14 +77,14 @@ namespace y60 {
 
     //                  theTagName                theType        theAttributeName                    theDefault
     DEFINE_ATTRIBUTE_TAG(CanvasBackgroundColorTag, asl::Vector4f, CANVAS_BACKGROUNDCOLOR_ATTRIB, asl::Vector4f(0,0,0,1), Y60_SCENE_DECL);
-    DEFINE_ATTRIBUTE_TAG(CanvasTargetTag,          std::string,   CANVAS_TARGET_ATTRIB, "", Y60_SCENE_DECL);
+    DEFINE_ATTRIBUTE_TAG(CanvasTargetsTag,          y60::VectorOfString,   CANVAS_TARGETS_ATTRIB, y60::VectorOfString(), Y60_SCENE_DECL);
 
     class Y60_SCENE_DECL Canvas :
         public dom::Facade,
 		public IdTag::Plug,
 		public NameTag::Plug,
 		public CanvasBackgroundColorTag::Plug,
-		public CanvasTargetTag::Plug
+		public CanvasTargetsTag::Plug
     {
         public:
             Canvas(dom::Node & theNode) :
@@ -92,7 +92,7 @@ namespace y60 {
                   IdTag::Plug(theNode),
                   NameTag::Plug(theNode),
                   CanvasBackgroundColorTag::Plug(theNode),
-                  CanvasTargetTag::Plug(theNode)
+                  CanvasTargetsTag::Plug(theNode)
               {}
             IMPLEMENT_FACADE(Canvas);
 
@@ -101,7 +101,7 @@ namespace y60 {
             bool setFrameBuffer(asl::Ptr<IFrameBuffer> theFrameBuffer);
 
             bool hasRenderTarget() const;
-            asl::Ptr<Texture, dom::ThreadingModel> getTarget(asl::Ptr<Scene, dom::ThreadingModel> theScene);
+            std::vector<asl::Ptr<Texture, dom::ThreadingModel> > getTargets(asl::Ptr<Scene, dom::ThreadingModel> theScene) const;
             ViewportPtr getViewportAt(const unsigned int theX, const unsigned int theY) const;
         private:
             asl::WeakPtr<IFrameBuffer> _myFrameBuffer;
