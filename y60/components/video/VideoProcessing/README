@@ -1,4 +1,0 @@
-
-shot detection quickstart:
-VideoProcessing.sh $PRO/testmodels/movies/testshot.mpg
-

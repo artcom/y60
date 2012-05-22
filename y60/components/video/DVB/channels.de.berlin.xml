@@ -1,4 +1,0 @@
-<dvb_channel_list>
-    <channel name="ZDF" carrier_frequency="570000000" inversion="INVERSION_AUTO" bandwidth="BANDWIDTH_8_MHZ" code_rate_HP="FEC_2_3" code_rate_LP="FEC_1_2" constellation="QAM_16" transmission_mode="TRANSMISSION_MODE_8K" guard_interval="GUARD_INTERVAL_1_8" hierarchy_information="HIERARCHY_NONE" pmt_pid="544" video_pid="545" audio_pid="546" video_text_pid="551"/>
-    <channel name="Das Erste" carrier_frequency="522000000" inversion="INVERSION_AUTO" bandwidth="BANDWIDTH_8_MHZ" code_rate_HP="FEC_2_3" code_rate_LP="FEC_1_2" constellation="QAM_16" transmission_mode="TRANSMISSION_MODE_8K" guard_interval="GUARD_INTERVAL_1_8" hierarchy_information="HIERARCHY_NONE" pmt_pid="1400" video_pid="1401" audio_pid="1402" video_text_pid="1234"/>
-</dvb_channel_list>
