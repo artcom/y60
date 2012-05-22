@@ -12,7 +12,7 @@ OscReceiver.h
 OscReceiverPlugin.h
 )
 
-list ( APPEND EXTERNALS OPENEXR OSCPACK )
+list ( APPEND EXTERNALS OSCPACK )
 
 if(WIN32)
     list( APPEND EXTERNALS PTHREADVC )
