@@ -8,7 +8,6 @@ endif(TUIO_FOUND)
 
 if(LINUX)
     add_subdirectory(Powermate)
-    #add_subdirectory(Wiimote)
 endif(LINUX)
 
 if(WIN32)
@@ -21,7 +20,5 @@ if(WIN32)
     if (WINDOWS_7_SDK_FOUND) 
         add_subdirectory(WMTouch)
     endif (WINDOWS_7_SDK_FOUND) 
-
-#    add_subdirectory(DInputFFB)
 endif(WIN32)
 

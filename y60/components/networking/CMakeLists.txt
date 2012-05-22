@@ -1,6 +1,4 @@
 
-add_subdirectory(Cluster)
-add_subdirectory(CMSCache)
 add_subdirectory(Nagios)
 add_subdirectory(Network)
 add_subdirectory(OscReceiver)

@@ -1,5 +1,0 @@
-<cmsconfig username="y60" password="acclienty60">
-    <zopeconfig baseurl="http://welt.bmw.artcom.de:8080" loginpage="login/logged_in"
-                presentationpage="exportXML" />
-    <cmscache localdir="/tmp/cmsmirror" backend="OCS"/>
-</cmsconfig>
