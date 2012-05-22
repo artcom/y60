@@ -11,7 +11,7 @@
 #=============================================================================
 
 if [ $# -eq 0 ]; then
-    echo "Usage: `basename $0` [-m] [-b] [-i] <file.mb> ...]"
+    echo "Usage: `basename $0` [-b] [-i] <file.mb> ...]"
     echo "-b Export as binary"
     echo "-i Export with inline textures"
     exit 0
