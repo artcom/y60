@@ -80,10 +80,6 @@ elseif(LINUX)
     list(APPEND OPT_PKGCONFIG PANGO pango)
     list(APPEND OPT_PKGCONFIG PANGOCAIRO pangocairo)
 
-    # gstreamer
-    # XXX: might work on OSX
-    list(APPEND OPT_PKGCONFIG GSTREAMER gstreamer-0.10)
-    
 elseif(OSX)
 
     # cairo backend
