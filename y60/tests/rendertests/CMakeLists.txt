@@ -15,7 +15,6 @@ relief
 testEnv
 testLights
 testNightvision
-testParticles
 testSpotlight
 testSprites
 testVertexShaderOnly
@@ -45,7 +44,6 @@ negativeScale
 npot
 offscreenBuffer
 projector
-stlcodec
 test16Bit
 testAnimationClip
 testCheckers
