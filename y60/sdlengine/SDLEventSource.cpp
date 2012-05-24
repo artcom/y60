@@ -91,9 +91,7 @@ SDLEventSource::SDLEventSource() {
 }
 
 void SDLEventSource::init() {
-#ifndef _WIN32
     initJoysticks();
-#endif
 }
 
 std::vector<EventPtr>
@@ -239,11 +237,11 @@ SDLEventSource::initJoysticks() {
             AC_WARNING << "Warning: could not open joystick # " << i << "of"
                 << SDL_NumJoysticks();
         } else {
-            printf("Opened Joystick %i\n", i);
-            printf("Name: %s\n", SDL_JoystickName(i));
-            printf("Number of Axes: %d\n", SDL_JoystickNumAxes(myJoystick));
-            printf("Number of Buttons: %d\n", SDL_JoystickNumButtons(myJoystick));
-            printf("Number of Balls: %d\n", SDL_JoystickNumBalls(myJoystick));
+            AC_INFO<<"Opened Joystick "<< i;
+            AC_INFO<<"Name: " << SDL_JoystickName(i);
+            AC_INFO<<"Number of Axes: " << SDL_JoystickNumAxes(myJoystick);
+            AC_INFO<<"Number of Buttons: " << SDL_JoystickNumButtons(myJoystick);
+            AC_INFO<<"Number of Balls: " << SDL_JoystickNumBalls(myJoystick);
         }
 
     }
