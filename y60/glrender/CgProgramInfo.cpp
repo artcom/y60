@@ -264,7 +264,14 @@ namespace y60 {
         }
 
         DBP2(START_TIMER(CgProgramInfo_processParameters));
-        processParameters();
+        _myGlParams.clear();
+        _myAutoParams.clear();
+        _myTextureParams.clear();
+        _myMiscParams.clear();
+        CGparameter myParam = cgGetFirstParameter(_myCgProgramID, CG_GLOBAL);
+        processParameters(myParam);
+        myParam = cgGetFirstParameter(_myCgProgramID, CG_PROGRAM);
+        processParameters(myParam);
         DBP2(STOP_TIMER(CgProgramInfo_processParameters));
 
         DBP2(MAKE_GL_SCOPE_TIMER(CgProgramInfo_compileProgram));
@@ -282,23 +289,22 @@ namespace y60 {
     }
 
     void
-    CgProgramInfo::processParameters() {
+    CgProgramInfo::processParameters(const CGparameter & theParam) {
         AC_TRACE << "processParameters -" << ShaderProfileStrings[_myShader._myProfile];
 
-        _myGlParams.clear();
-        _myAutoParams.clear();
-        _myTextureParams.clear();
-        _myMiscParams.clear();
-
-        for (CGparameter myParam = cgGetFirstParameter(_myCgProgramID, CG_PROGRAM);
-             myParam != 0;  myParam = cgGetNextParameter(myParam))
+        CGparameter myParam = theParam;
+        for (;myParam != 0; myParam = cgGetNextParameter(myParam))
         {
             string myParamName(cgGetParameterName(myParam));
-            //XXX cgGetParameterVariability crashes on unsized arrays
-            //CGenum myParamVariability = cgGetParameterVariability(myParam);
-            CGenum myParamVariability = CG_UNIFORM;
-            CGtype myParameterType    = cgGetParameterType(myParam);
-            AC_TRACE << "processing " << myParamName;
+            if (myParamName == _myShader._myEntryFunction) {
+                continue;
+            }
+            CGtype myParameterType = cgGetParameterType(myParam);
+            string myParamTypeString(cgGetTypeString(myParameterType));
+            string myParamSemantic(cgGetParameterSemantic(myParam));
+            CGenum myParamVariability = cgGetParameterVariability(myParam);
+            AC_DEBUG << "processing '" << myParamName << "' with type: " << myParamTypeString
+                << ((!myParamSemantic.empty()) ? string(" semantic: ") + myParamSemantic : "");
 
             if (myParamName.compare(0, 3, "GL_") == 0) { // scan for reserved GL_ prefix in uniform parameters
                 if (myParamVariability != CG_UNIFORM) {

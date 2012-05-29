@@ -221,8 +221,8 @@ namespace y60 {
                 public:
                     CgTextureParam(const std::string & theParamName, CGparameter theParameter) :
                         CgProgramNamedParam(theParamName, theParameter),
-                        _myTextureUnit(),
-                        _myInUseFlag()
+                        _myTextureUnit(0),
+                        _myInUseFlag(false)
                     {}
 
                     void
@@ -233,7 +233,7 @@ namespace y60 {
                             _myInUseFlag = true;
                         } else if (myError == CG_INVALID_PARAMETER_ERROR) {
                             _myInUseFlag = false;
-                            AC_WARNING << "Shaderlibrary declares texture '"
+                            AC_DEBUG << "Shaderlibrary declares texture '"
                                        << _myParamName << "' but shader '"
                                        << theShaderName << "' does not use it.";
                         } else {
@@ -263,7 +263,7 @@ namespace y60 {
             CgProgramInfo(const CgProgramInfo &); // disable copy constructor
             CgProgramInfo & operator=(const CgProgramInfo &);     // disable assignment op
 
-            void processParameters();
+            void processParameters(const CGparameter & theParam);
             void setCgVectorParameter(const CgProgramAutoParam & theParam, const asl::Vector3f & theValue);
             void setCgVectorParameter(const CgProgramAutoParam & theParam, const asl::Vector4f & theValue);
             void setCgMatrixParameter(const CgProgramAutoParam & theParam, const asl::Matrix4f & theValue);
