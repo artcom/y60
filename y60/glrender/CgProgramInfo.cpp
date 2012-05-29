@@ -301,9 +301,6 @@ namespace y60 {
             }
             CGtype myParameterType = cgGetParameterType(myParam);
             string myParamTypeString(cgGetTypeString(myParameterType));
-            if (myParamTypeString.empty()) {
-                continue;
-            }
             string myParamSemantic(cgGetParameterSemantic(myParam));
             //XXX cgGetParameterVariability crashes on unsized arrays
             //CGenum myParamVariability = cgGetParameterVariability(myParam);
