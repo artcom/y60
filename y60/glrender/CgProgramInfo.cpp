@@ -302,9 +302,7 @@ namespace y60 {
             CGtype myParameterType = cgGetParameterType(myParam);
             string myParamTypeString(cgGetTypeString(myParameterType));
             string myParamSemantic(cgGetParameterSemantic(myParam));
-            //XXX cgGetParameterVariability crashes on unsized arrays
-            //CGenum myParamVariability = cgGetParameterVariability(myParam);
-            CGenum myParamVariability = CG_UNIFORM;
+            CGenum myParamVariability = cgGetParameterVariability(myParam);
             AC_DEBUG << "processing '" << myParamName << "' with type: " << myParamTypeString
                 << ((!myParamSemantic.empty()) ? string(" semantic: ") + myParamSemantic : "");
 
