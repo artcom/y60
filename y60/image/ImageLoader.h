@@ -85,6 +85,7 @@ namespace asl {
 }
 */
 namespace y60 {
+    class Image;
     typedef std::vector<ImageFilter> VectorOfImageFilter;
 
     /* Image filtering on save/load */
@@ -138,7 +139,7 @@ namespace y60 {
         const asl::Matrix4f & getImageMatrix() const {
             return _myImageMatrix;
         }
-
+                
         /**
          * Ensure the loaded image is power-of-two.
          * @param theResizeMode controls how the image is to be resized if it's not power-of-two.

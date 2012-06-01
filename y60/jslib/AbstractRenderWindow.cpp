@@ -518,9 +518,9 @@ AbstractRenderWindow::onFrame() {
     }
     // update images
     if (_myScene) {
-        std::vector<ImagePtr> myImages = _myScene->getImagesRoot()->getAllFacades<Image>(IMAGE_NODE_NAME);        
-        for (unsigned i = 0; i < myImages.size(); ++i) {
-            _myScene->getTextureManager()->checkImageLoad(myImages[i]);
+        ImageLoadTask myImageLoader;
+        if (ImageLoaderQueue::get().getQueue().try_pop(myImageLoader)) {
+            myImageLoader.first->processNewRaster(myImageLoader.second);
         }
     }
 

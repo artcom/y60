@@ -100,6 +100,19 @@ namespace y60 {
             ImageLoaderThreadPool();
             boost::threadpool::pool _myThreadPool;
     };
+
+    typedef std::pair<Image*, boost::shared_ptr<ImageLoader> > ImageLoadTask;
+    typedef asl::thread::concurrent_queue<ImageLoadTask> ImageLoadTaskQueue;
+    class Y60_IMAGE_DECL ImageLoaderQueue : public asl::Singleton<ImageLoaderQueue>
+    {
+        friend class asl::SingletonManager;
+        public:
+            virtual ~ImageLoaderQueue();
+            ImageLoadTaskQueue & getQueue(); 
+        private:
+            ImageLoaderQueue();
+            ImageLoadTaskQueue _myImageLoaderQueue;
+    };
     /**
     * Exception
     */
@@ -169,8 +182,6 @@ namespace y60 {
             }
             return 0;
         }
-        // check if a async load process is done
-        void checkAsyncLoad();
 
         /** Saves the image to a block in memory (currently only as png) */
         void saveToBlock(asl::Ptr<asl::Block> & theBlock,
@@ -239,6 +250,7 @@ namespace y60 {
         virtual void registerDependenciesRegistrators();
 
         void preload();
+        void processNewRaster(boost::shared_ptr<ImageLoader> theImageLoader);
 
     private:
         Image();
@@ -251,7 +263,6 @@ namespace y60 {
 
         void calculateWidth();
         void calculateHeight();
-        void processNewRaster(boost::shared_ptr<ImageLoader> theImageLoader);
 
         dom::ResizeableRasterPtr setRasterValue(dom::ValuePtr theRaster,
             PixelEncoding theEncoding, unsigned theDepth);
@@ -262,7 +273,6 @@ namespace y60 {
         asl::Ptr<asl::PackageManager> _myPackageManager;
 
         void aSyncLoad(unsigned theDepth, const std::string theSource);
-        asl::thread::concurrent_queue<boost::shared_ptr<ImageLoader> > _myImageLoaderQueue;
 
     };
 

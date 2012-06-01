@@ -95,12 +95,14 @@ using namespace std;
 namespace y60 {
 
 
-    ImageLoaderThreadPool::ImageLoaderThreadPool():
-                _myThreadPool(asl::getenv("Y60_IMAGE_LOAD_THREADS", 4)) {
-        AC_INFO << "ImageLoaderThreadPool: using threadpool with "<<_myThreadPool.size() << " threads";
+    ImageLoaderThreadPool::ImageLoaderThreadPool() : _myThreadPool(asl::getenv("Y60_ASYNC_IMAGE_LOAD_THREADS", 1)) {
     }
-                ImageLoaderThreadPool::~ImageLoaderThreadPool(){}
+    ImageLoaderThreadPool::~ImageLoaderThreadPool(){}
     boost::threadpool::pool & ImageLoaderThreadPool::getThreadPool() { return _myThreadPool; }
+
+    ImageLoaderQueue::ImageLoaderQueue() {}
+    ImageLoaderQueue::~ImageLoaderQueue(){}
+    ImageLoadTaskQueue & ImageLoaderQueue::getQueue() { return _myImageLoaderQueue; }
 
     DEFINE_EXCEPTION(UnknownEncodingException, asl::Exception);
 
@@ -274,7 +276,7 @@ namespace y60 {
         unsigned myDepth = get<ImageDepthTag>();
         if (get<ImageAsyncFlagTag>()) {
             AC_DEBUG << "ImageLoaderThreadPool pending tasks: " << ImageLoaderThreadPool::get().getThreadPool().pending();
-            ImageLoaderThreadPool::get().getThreadPool().wait(ImageLoaderThreadPool::get().getThreadPool().size()*2); //allow only threadpool size pending tasks
+            ImageLoaderThreadPool::get().getThreadPool().wait(ImageLoaderThreadPool::get().getThreadPool().size()*100);
             ImageLoaderThreadPool::get().getThreadPool().schedule(boost::bind(&Image::aSyncLoad, this,myDepth, get<ImageSourceTag>()));
         } else {
              boost::shared_ptr<ImageLoader> myImageLoader = boost::shared_ptr<ImageLoader>(new ImageLoader(get<ImageSourceTag>(), AppPackageManager::get().getPtr(),
@@ -284,10 +286,13 @@ namespace y60 {
         }
     }
 
-    void Image::aSyncLoad(unsigned theDepth, const std::string theSource) {
-        _myImageLoaderQueue.push(boost::shared_ptr<ImageLoader>(new ImageLoader(theSource, AppPackageManager::get().getPtr(),
-            ITextureManagerPtr(), theDepth)));
-
+    void Image::aSyncLoad(unsigned theDepth, const std::string theSource) {        
+        /*while(ImageLoaderQueue::get().getQueue().size() >= 2) {
+            msleep(10);
+        }*/
+        ImageLoaderQueue::get().getQueue().push(std::make_pair(this, 
+                                                               boost::shared_ptr<ImageLoader>(new ImageLoader(theSource, AppPackageManager::get().getPtr(),
+                                                                                              ITextureManagerPtr(), theDepth))));
     }
 
     void Image::processNewRaster(boost::shared_ptr<ImageLoader> theImageLoader) {
@@ -313,14 +318,6 @@ namespace y60 {
         set<ImageHeightTag>(getRasterPtr()->height());
 
         set<LoadStateTag>(true);
-    }
-
-    void Image::checkAsyncLoad() {
-        boost::shared_ptr<ImageLoader> myImageLoader;
-        if (_myImageLoaderQueue.try_pop(myImageLoader)) {
-            processNewRaster(myImageLoader);
-            AC_INFO << get<ImageSourceTag>() << " is loaded";
-        }
     }
 
     dom::ResizeableRasterPtr
