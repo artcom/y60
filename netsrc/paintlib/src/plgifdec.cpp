@@ -31,6 +31,24 @@ extern "C"
 #include "gif_lib.h"
 }
 
+/* GIFLIB_MAJOR is only defined in libgif >= 4.1.6 */ 
+/* libgif 4.2.0 has retired PrintGifError() and added GifErrorString() */
+#if defined(GIFLIB_MAJOR) && defined(GIFLIB_MINOR) && \
+    ((GIFLIB_MAJOR == 4 && GIFLIB_MINOR >= 2) || GIFLIB_MAJOR > 4)
+
+void
+PrintGifError(void) {
+    char *Err = GifErrorString();
+
+    if (Err != NULL) {
+        fprintf(stderr, "\nGIF-LIB error: %s.\n", Err);
+    } else {
+        fprintf(stderr, "\nGIF-LIB undefined error %d.\n", GifError());
+    }
+}
+
+#endif
+
 static int
     InterlacedOffset[] = { 0, 4, 2, 1 }, /* The way Interlaced image should. */
     InterlacedJumps[] = { 8, 8, 4, 2 };    /* be read - offsets and jumps... */
