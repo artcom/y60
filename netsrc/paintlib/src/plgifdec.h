@@ -17,6 +17,16 @@
 #endif // _MSC_VER > 1000
 
 #include "plpicdec.h"
+#include "gif_lib.h"
+
+/* GIFLIB_MAJOR is only defined in libgif >= 4.1.6 */ 
+/* libgif 4.2.0 has retired PrintGifError() and added GifErrorString() */
+#if defined(GIFLIB_MAJOR) && defined(GIFLIB_MINOR) && \
+    ((GIFLIB_MAJOR == 4 && GIFLIB_MINOR >= 2) || GIFLIB_MAJOR > 4)
+
+void PrintGifError(void);
+
+#endif
 
 //! Compuserve gif file decoder using libungif to do the actual work. The
 //! bitmap returned always has 8 bpp. If the gif has a transparent color,
