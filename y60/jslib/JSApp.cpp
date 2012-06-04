@@ -1079,9 +1079,6 @@ GC(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
     DOC_PARAM_OPT("theFileName", "If GC_MARK_DEBUG is defined a filename can be given to dump the GC heap for debugging reasons.", DOC_TYPE_STRING, "null");
     DOC_END;
     try {
-        JSRuntime *rt;
-
-        rt = cx->runtime;
 #ifdef GC_MARK_DEBUG
         if (argc && JSVAL_IS_STRING(argv[0])) {
             string myName;
@@ -1104,6 +1101,8 @@ GC(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 #endif
 
 #ifdef JS_GCMETER
+        JSRuntime *rt;
+        rt = cx->runtime;
         js_DumpGCStats(rt, stdout);
 #endif
         return JS_TRUE;

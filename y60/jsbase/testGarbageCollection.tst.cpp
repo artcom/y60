@@ -108,7 +108,6 @@ static JSClass global_class = {
 static JSBool
 GC(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 {
-    JSRuntime *rt;
     uint32 maxObjects = 0;
 
     ensureParamCount(argc, 0, 1);
@@ -117,12 +116,13 @@ GC(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
       maxObjects = JSVAL_TO_INT(argv[0]);
     }
 
-    rt = cx->runtime;
 #ifdef USE_SPIDERMONKEY_INCREMENTAL_GC
     JS_IncrementalGC(cx, maxObjects);
 #endif
 
 #ifdef JS_GCMETER
+    JSRuntime *rt;
+    rt = cx->runtime;
     js_DumpGCStats(rt, stdout);
 #endif
     return JS_TRUE;
