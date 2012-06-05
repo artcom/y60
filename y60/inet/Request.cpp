@@ -312,6 +312,13 @@ namespace inet {
         // follow the "Location"-header field on response codes 3xx (redirection) [jb]
         CURLcode myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_FOLLOWLOCATION, theFollowFlag);
         checkCurlStatus(myStatus, PLUS_FILE_LINE);
+
+    }
+    void
+    Request::verifySSLPeer(bool theVerifyFlag) {
+        // This option determines whether curl verifies the authenticity of the peer's certificate.
+        CURLcode myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_SSL_VERIFYPEER, theVerifyFlag);
+        checkCurlStatus(myStatus, PLUS_FILE_LINE);
     }
 
     void
