@@ -755,12 +755,12 @@ namespace y60 {
             myV00 * (1 - myWeight[0]) * (1 - myWeight[1]);
 
 
-        int myROIChanged = 0;
+        //int myROIChanged = 0;
         if ( theCursorIt->second.previousRoi.hasPosition() &&
             (theCursorIt->second.roi[Box2f::MIN] != theCursorIt->second.previousRoi[Box2f::MIN] ||
              theCursorIt->second.roi[Box2f::MAX] != theCursorIt->second.previousRoi[Box2f::MAX]))
         {
-            myROIChanged = int(myIntensity);
+            //myROIChanged = int(myIntensity);
             myIntensity = (theCursorIt->second.previousIntensity + myIntensity) / 2;
         }
 
