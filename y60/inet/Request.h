@@ -135,6 +135,7 @@ namespace inet {
             void setCredentials(const std::string & theUsername, const std::string & thePassword,
                                 AuthentType theAuthentType = ANY);
             void setFollowLocation(bool theFollowFlag);
+            void verifySSLPeer(bool theVerifyFlag);
 
             // request-method type methods
             size_t put(const std::string & thePutData);

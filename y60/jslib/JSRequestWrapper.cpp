@@ -187,6 +187,23 @@ setCookie(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     return Method<inet::Request>::call(&inet::Request::setCookie,cx,obj,argc,argv,rval);
 }
 
+
+static JSBool
+verifySSLPeer(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Sets the curl flag for verifying ssl certificates.");
+    DOC_PARAM("theFlag", "", DOC_TYPE_BOOLEAN);
+    DOC_END;
+    return Method<inet::Request>::call(&inet::Request::verifySSLPeer,cx,obj,argc,argv,rval);
+}
+
+static JSBool
+setFollowLocation(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Sets the curl flag for following redirections.");
+    DOC_PARAM("theFlag", "", DOC_TYPE_BOOLEAN);
+    DOC_END;
+    return Method<inet::Request>::call(&inet::Request::setFollowLocation,cx,obj,argc,argv,rval);
+}
+
 static JSBool
 setProxy(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Sets a HTTP Proxy.");
@@ -245,6 +262,8 @@ JSRequestWrapper::Functions() {
         {"setCredentials",    setCredentials,      3},
         {"setCookie",         setCookie,      1},
         {"setProxy",          setProxy,       2},
+        {"setFollowLocation", setFollowLocation, 1},        
+        {"verifySSLPeer",     verifySSLPeer, 1},                
         {0}
     };
     return myFunctions;
