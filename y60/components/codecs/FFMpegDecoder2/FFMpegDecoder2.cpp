@@ -77,7 +77,12 @@
 #   undef STOP_TIMER
 #endif
 
-
+#if LIBAVCODEC_VERSION_MAJOR < 54
+#define AV_PICTURE_TYPE_B FF_B_TYPE
+#define AV_PICTURE_TYPE_I FF_I_TYPE
+#define AV_PICTURE_TYPE_P FF_P_TYPE
+#define AV_SAMPLE_FMT_S16 SAMPLE_FMT_S16
+#endif
 
 #include <asl/base/Dashboard.h>
 #include <iostream>
@@ -555,7 +560,7 @@ namespace y60 {
                     _myLastFrameTime += 1/_myFrameRate;
                     addCacheFrame(_myFrame, _myLastFrameTime);
                     _myNumFramesDecoded++;
-                    if (_myFrame->pict_type == FF_I_TYPE) {
+                    if (_myFrame->pict_type == AV_PICTURE_TYPE_I) {
                         DBV(AC_DEBUG << "***** I_FRAME *****");
                         _myNumIFramesDecoded++;
                     }
@@ -608,7 +613,7 @@ namespace y60 {
                                  <<" FrameTime: "<<_myLastFrameTime;)
                     addCacheFrame(_myFrame, _myLastFrameTime);
                     _myNumFramesDecoded++;
-                    if (_myFrame->pict_type == FF_I_TYPE) {
+                    if (_myFrame->pict_type == AV_PICTURE_TYPE_I) {
                         DBV(AC_DEBUG << "***** I_FRAME *****");
                         _myNumIFramesDecoded++;
                     }
@@ -1140,13 +1145,13 @@ namespace y60 {
 
         unsigned myChannels = (myACodec->channels > 2) ? 2 : myACodec->channels;
         if (myACodec->sample_rate != static_cast<int>(Pump::get().getNativeSampleRate()) ||
-            myACodec->sample_fmt != SAMPLE_FMT_S16)
+            myACodec->sample_fmt != AV_SAMPLE_FMT_S16)
         {
 #if  LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52,15,0)
             _myResampleContext = av_audio_resample_init(
                     myChannels, myChannels,
                     Pump::get().getNativeSampleRate(), myACodec->sample_rate,
-                    SAMPLE_FMT_S16, myACodec->sample_fmt,
+                    AV_SAMPLE_FMT_S16, myACodec->sample_fmt,
                     16, 10, 0, 0.8);
 #else
             _myResampleContext = audio_resample_init(myChannels,
