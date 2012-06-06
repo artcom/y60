@@ -2,13 +2,11 @@
 set(SOURCES
 Demux.cpp
 FFMpegDecoder2.cpp
-FFMpegURLProtocol.cpp
 )
 
 set(HEADERS
 Demux.h
 FFMpegDecoder2.h
-FFMpegURLProtocol.h
 y60_ffmpegdecoder2_settings.h
 )
 

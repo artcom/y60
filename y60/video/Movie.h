@@ -203,7 +203,6 @@ namespace y60 {
         */
         bool reloadRequired();
 
-        void setup();
         void stop();
         void restart(double theCurrentTime);
         void setPlayMode(MoviePlayMode thePlayMode);
@@ -213,9 +212,6 @@ namespace y60 {
         double getTimeFromFrame(unsigned theFrame) const;
         unsigned getFrameFromTime(double theTime);
         void loadFile(const std::string & theSourceFile);
-        void loadStream(asl::Ptr<asl::ReadableStream> theSource,
-            const std::string theName);
-
         void postLoad();
 
         asl::Ptr<MovieDecoderBase>  getDecoder(const std::string theFilename);

@@ -57,7 +57,6 @@
 */
 
 #include "FFMpegDecoder2.h"
-#include "FFMpegURLProtocol.h"
 #include "Demux.h"
 
 #include <y60/video/Movie.h>
@@ -167,13 +166,6 @@ namespace y60 {
             AC_DEBUG << "FFMpegDecoder2 can not decode :" << theUrl << endl;
             return "";
         }
-    }
-
-    void
-    FFMpegDecoder2::load(asl::Ptr<ReadableStream> theSource, const string & theFilename) {
-        string theStreamID = string("acstream://") + theFilename;
-        registerStream(theStreamID, theSource);
-        load(theStreamID);
     }
 
     void

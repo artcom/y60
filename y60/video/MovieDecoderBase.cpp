@@ -134,11 +134,6 @@ namespace y60 {
         return _myMovieTime;
     }
 
-    void MovieDecoderBase::load(asl::Ptr<asl::ReadableStream> theSource,
-            const std::string & theFilename)
-    {
-        throw asl::NotYetImplemented(JUST_FILE_LINE);
-    }
     void MovieDecoderBase::setDecodeAudioFlag(bool theDecodeAudioFlag) {
         _myDecodeAudioFlag = theDecodeAudioFlag;
     }

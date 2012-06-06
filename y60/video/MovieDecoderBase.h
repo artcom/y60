@@ -134,13 +134,6 @@ namespace y60 {
              */
             virtual void load(const std::string & theFilename) = 0;
 
-            /**
-             * loads a movie from the stream given by theSource
-             * @param theFilename file to identify theSource
-             */
-            virtual void load(asl::Ptr<asl::ReadableStream> theSource,
-                    const std::string & theFilename);
-
             int getFrameCount() const;
             unsigned getFrameWidth() const;
             unsigned getFrameHeight() const;

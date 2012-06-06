@@ -142,11 +142,6 @@ namespace y60 {
         double readFrame(double theTime, unsigned, RasterVector theTargetRaster);
 
         /**
-         * loads a movie from the stream given by theSource
-         * @param theFilename file to identify theSource
-         */
-        void load(asl::Ptr<asl::ReadableStream> theSource, const std::string & theFilename);
-        /**
          * Starts movie decoding
          * @param theStartTime movie-time to start decoding at.
          */

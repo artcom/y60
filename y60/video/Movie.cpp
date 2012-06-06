@@ -112,9 +112,6 @@ namespace y60 {
         _myCurrentLoopCount(0)
     {
         AC_DEBUG  << "Movie::Movie " << (void*)this;
-        if (getNode()) {
-            setup();
-        }
     }
 
     void
@@ -129,24 +126,6 @@ namespace y60 {
         setPlayMode();
         setVolume();
     }
-
-    void Movie::setup() {
-        //check if we have an inline movie, if so open it using FFMpeg
-        dom::NodePtr myBinaryElement = getNode().firstChild();
-        if (myBinaryElement && !getRasterPtr()) {
-            AC_DEBUG << "found an inline movie for " << get<ImageSourceTag>();
-
-            //DK hold this as a member, otherwise our ReadableStream goes out of scope :-(
-            _myStreamData = myBinaryElement->firstChild()->nodeValueWrapperPtr();
-
-            asl::ReadableStream * myStream
-                = const_cast<asl::ReadableBlock*>(&_myStreamData->accessReadableBlock());
-
-            loadStream( asl::Ptr<asl::ReadableStream>(myStream), get<ImageSourceTag>());
-        }
-    }
-
-
 
     Movie::~Movie() {
         AC_DEBUG  << "Movie::~Movie " << (void*)this;
@@ -436,24 +415,9 @@ namespace y60 {
             readFrame();
         }
     }
-    
 
     void Movie::load(asl::PackageManager & thePackageManager) {
-        /*
-        * XXX
-        * decide here wether you want to use the stream interface of thePackageManager
-        * advantage: you could load mpegs which are in a zip file known to thePackageManager
-        * disadvantages: 1) big files (> 200MB) are AFAIK currently not handled by
-        *                   thePackageManager
-        *                2) loadStream currently does not fallback to loadFile for WMV
-        *                   and alike
-        * DK
-        */
-#if 0
-        loadStream( thePackageManager.openFile(get<ImageSourceTag>()), get<ImageSourceTag>());
-#else
         loadFile( thePackageManager.searchFile(get<ImageSourceTag>()));
-#endif
     }
 
 
@@ -509,26 +473,6 @@ namespace y60 {
     Movie::load(const std::string & theTexturePath) {
         loadFile( asl::searchFile(get<ImageSourceTag>(), theTexturePath) );
     }
-
-
-
-    void
-    Movie::loadStream(asl::Ptr<asl::ReadableStream> theSource, const std::string theUrl) {
-        AC_DEBUG << "Movie::loadStream " << theUrl;
-        MovieDecoderBasePtr myDecoder = getDecoder(theUrl);
-        if (!myDecoder) {
-            throw MovieException(string("Sorry, could not find a streamable decoder for: ")
-                + theUrl, PLUS_FILE_LINE);
-        }
-        _myDecoder = myDecoder->instance();
-
-        _myDecoder->initialize(this);
-        _myDecoder->load(theSource, theUrl);
-
-        postLoad();
-    }
-
-
 
     void
     Movie::loadFile(const std::string & theUrl) {
