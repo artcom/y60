@@ -80,6 +80,9 @@ extern "C" {
 #ifndef AV_VERSION_INT
 #define AV_VERSION_INT(a,b,c) (a<<16 | b<<8 | c)
 #endif
+#if LIBAVCODEC_VERSION_MAJOR < 54
+#define AV_SAMPLE_FMT_S16 SAMPLE_FMT_S16
+#endif
 
 #include <asl/base/Auto.h>
 #include <asl/audio/Pump.h>
@@ -241,13 +244,13 @@ void FFMpegAudioDecoder::open() {
         AC_DEBUG << "Sample format: " << myCodecContext->sample_fmt << endl;
 
         if (_mySampleRate != Pump::get().getNativeSampleRate() || 
-            myCodecContext->sample_fmt != SAMPLE_FMT_S16) 
+            myCodecContext->sample_fmt != AV_SAMPLE_FMT_S16) 
         {
 #if  LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52,15,0)
             _myResampleContext = av_audio_resample_init(
                     _myNumChannels, _myNumChannels,
                     Pump::get().getNativeSampleRate(), _mySampleRate,
-                    SAMPLE_FMT_S16, myCodecContext->sample_fmt,
+                    AV_SAMPLE_FMT_S16, myCodecContext->sample_fmt,
                     16, 10, 0, 0.8);
 #else
             _myResampleContext = audio_resample_init(_myNumChannels, _myNumChannels,
