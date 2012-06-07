@@ -67,6 +67,8 @@
 
 
 // Disable FFMPeg Warning in Windows
+#undef INTMAX_C
+#undef UINTMAX_C
 #pragma warning(push)
 #pragma warning(disable:4244)
 extern "C" {
