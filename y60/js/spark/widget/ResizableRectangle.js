@@ -26,7 +26,7 @@ spark.ResizableRectangle.Constructor = function (Protected) {
     /////////////////////
     
     function applySize() {
-        if (_myVertices) {
+        if (_myVertices && _myVertices.length === 4) {
             var o = Public.origin;
             _myVertices[0] = [-o.x, -o.y, -o.z];
             _myVertices[1] = [Public.width - o.x, -o.y, -o.z];
