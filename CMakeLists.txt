@@ -22,7 +22,7 @@ find_package(AcMake)
 # declare our packaging solution
 ac_begin_solution(
     PRO60
-    VERSION_MAJOR 1 VERSION_MINOR 0 VERSION_PATCH 6
+    VERSION_MAJOR 1 VERSION_MINOR 0 VERSION_PATCH 7
     DESCRIPTION  "Y60 Media Engine"
     VENDOR       "ART+COM AG"
     CONTACT      "y60@artcom.de"
