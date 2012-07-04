@@ -94,7 +94,12 @@ cat << __EOF > watchdog.xml
 <WatchdogConfig logfile="LOGFILES\watch.log" watchFrequency="15">
     <Application binary="y60.exe">
         <EnvironmentVariables>
-            <EnvironmentVariable name="DUMMYDIR"><![CDATA[C:/DUMMY]]></EnvironmentVariable>
+            <EnvironmentVariable name="AC_LOG_CONSOLE_FORMAT">
+                <![CDATA[FULL]]>
+            </EnvironmentVariable>
+            <EnvironmentVariable name="AC_LOG_VERBOSITY">
+                <![CDATA[INFO]]>
+            </EnvironmentVariable>
         </EnvironmentVariables>
         <Arguments>
             <Argument>-I "SCRIPTS"</Argument>
