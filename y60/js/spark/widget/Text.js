@@ -99,14 +99,14 @@ spark.Text.Constructor = function (Protected) {
         return _myText;
     });
     Public.__defineSetter__("text", function (theValue) {
-        if (theValue && _myUpcase) {
-            theValue = theValue.toUpperCase();
-        }        
         if (_myLayoutHook) {
             _myText = _myLayoutHook(theValue);
         } else {
             _myText = theValue;
         }
+        if (_myText && _myUpcase) {
+            _myText = _myText.toUpperCase();
+        }        
         Protected.render();
         if (_myTextChangedHook) {
             _myTextChangedHook();
