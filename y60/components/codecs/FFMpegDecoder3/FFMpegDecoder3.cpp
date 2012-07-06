@@ -265,12 +265,7 @@ namespace y60 {
             for (std::vector<int>::size_type i = 0; i < _myAllAudioStreamIndicies.size(); i++) {
                 _myDemux->seek(0.0, _myAllAudioStreamIndicies[i]);
             }
-
-            _myAdjustAudioOffsetFlag = true;
-            _myVideoStartTimestamp = 0; //XXX: investigate is this still correct?
             _myAudioSink->play();
-            _myAdjustAudioOffsetFlag = true;
-
             boost::mutex::scoped_lock seeklock(_mySeekMutex);
             _mySeekRequested = false;
             _mySeekCondition.notify_all();
@@ -310,11 +305,9 @@ namespace y60 {
                 _myAdjustAudioOffsetFlag = true;
             }
         } else if (!_isStreamingMedia && theStartAudioFlag && hasAudio() && getDecodeAudioFlag()) {
-            _myAdjustAudioOffsetFlag = true;
             for (std::vector<int>::size_type i = 0; i < _myAllAudioStreamIndicies.size(); i++) {
                 _myDemux->seek(theStartTime, _myAllAudioStreamIndicies[i]);
             }
-            _myVideoStartTimestamp = 0; //XXX: investigate is this still correct?
         }
         _myVideoDecodeThread = DecodeThreadPtr(new boost::thread( boost::bind( &FFMpegDecoder3::run_videodecode, this)));
 
@@ -1036,7 +1029,9 @@ namespace y60 {
                     //XXX: no thread lock
                     if (_myVideoStartTimestamp == -1) {
                         _myVideoStartTimestamp = myPacket->dts;
-                        AC_DEBUG << "setting start timestamp: "<<_myVideoStartTimestamp;
+                        _myAudioTimeOffset = _myVideoStartTimestamp / (1/av_q2d(_myVStream->time_base));
+                        DBV(AC_DEBUG << "---- setting video start timestamp: "<<_myVideoStartTimestamp
+                                     << " setting audio offset to: " << _myAudioTimeOffset;)
                     }
                     DBV(AC_DEBUG << "---- add decoded frame time_base: "<<_myVideoStreamTimeBase
                                  <<" FrameTime: "<<_myLastFrameTime;)
