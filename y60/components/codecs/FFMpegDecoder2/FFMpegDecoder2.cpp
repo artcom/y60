@@ -263,7 +263,7 @@ namespace y60 {
         AC_DEBUG << "FFMpegDecoder2::startMovie "<< getMovie()->get<ImageSourceTag>() << ", time: " << theStartTime << " frames in queue: "<<_myMsgQueue.size();
         double myCurrentTime = 0.0;
         if (_myLastVideoFrame) {
-            myCurrentTime = _myLastVideoFrame->getTime();    
+            myCurrentTime = _myLastVideoFrame->getTime();
         }
         if (theStartTime > 0) {
             if (isUnjoined()) {
@@ -276,7 +276,6 @@ namespace y60 {
                 DB(AC_DEBUG << "Joining FFMpegDecoder Thread");
                 join();
             }
-            _myAudioTimeOffset = theStartTime;
             _myAudioSink->stop();
             // ensure that the audio buffer is stopped and cleared
             while (_myAudioSink->getState() != HWSampleSink::STOPPED) {
@@ -295,7 +294,6 @@ namespace y60 {
                     _myAdjustAudioOffsetFlag = true;
                 }
             } else if (theStartAudioFlag && hasAudio() && getDecodeAudioFlag()) {
-                _myAdjustAudioOffsetFlag = true;
                 for (std::vector<int>::size_type i = 0; i < _myAllAudioStreamIndicies.size(); i++) {
                     _myDemux->clearPacketCache(_myAllAudioStreamIndicies[i]);
                     av_seek_frame(_myFormatContext, _myAllAudioStreamIndicies[i],
@@ -303,7 +301,6 @@ namespace y60 {
                                   _myAStream->start_time, AVSEEK_FLAG_BACKWARD);
                     avcodec_flush_buffers(_myAStream->codec);
                 }
-                _myVideoStartTimestamp = 0; //XXX: investigate is this still correct?
             }
             bool myAudioEOFFlag = false;
             if (theStartAudioFlag && hasAudio() && getDecodeAudioFlag()) {
@@ -404,7 +401,7 @@ namespace y60 {
     }
 
     bool FFMpegDecoder2::readAudio() {
-        DBA(AC_TRACE << "---- FFMpegDecoder2::readAudio: "<<_myAudioSink->getPumpTime();)
+        DBA(AC_DEBUG << "---- FFMpegDecoder2::readAudio: "<<_myAudioSink->getPumpTime();)
         //XXX: think about replacing BufferedTime with PumpTime here, as PumpTime is used anywhere else
         double myDestBufferedTime = double(_myAudioSink->getBufferedTime())+8/_myFrameRate;
         if (myDestBufferedTime > AUDIO_BUFFER_SIZE) {
@@ -606,7 +603,10 @@ namespace y60 {
                     //XXX: no thread lock
                     if (_myVideoStartTimestamp == -1) {
                         _myVideoStartTimestamp = myPacket->dts;
-                        AC_DEBUG << "setting start timestamp: "<<_myVideoStartTimestamp;
+                        double myTime = _myVideoStartTimestamp / (1/av_q2d(_myVStream->time_base));
+                        _myAudioTimeOffset = myTime;
+                        DBV(AC_DEBUG << "---- setting video start timestamp: "<<_myVideoStartTimestamp
+                                     << " setting audio offset to: " << _myAudioTimeOffset;)
                     }
                     STOP_TIMER(decodeFrame_ffmpegdecode);
                     DBV(AC_DEBUG << "---- add decoded frame time_base: "<<_myVideoStreamTimeBase
