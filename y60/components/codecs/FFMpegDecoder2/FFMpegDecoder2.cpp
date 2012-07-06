@@ -603,8 +603,7 @@ namespace y60 {
                     //XXX: no thread lock
                     if (_myVideoStartTimestamp == -1) {
                         _myVideoStartTimestamp = myPacket->dts;
-                        double myTime = _myVideoStartTimestamp / (1/av_q2d(_myVStream->time_base));
-                        _myAudioTimeOffset = myTime;
+                        _myAudioTimeOffset = _myVideoStartTimestamp / (1/av_q2d(_myVStream->time_base));
                         DBV(AC_DEBUG << "---- setting video start timestamp: "<<_myVideoStartTimestamp
                                      << " setting audio offset to: " << _myAudioTimeOffset;)
                     }
