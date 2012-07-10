@@ -53,14 +53,6 @@ endif(ACMAKE_DEBIAN)
 add_subdirectory(netsrc)
 add_subdirectory(y60)
 
-# integrate testmodels and tutorials if present
-if(EXISTS ${CMAKE_SOURCE_DIR}/../testmodels)
-  add_subdirectory(../testmodels ${CMAKE_CURRENT_BINARY_DIR}/testmodels)
-endif(EXISTS ${CMAKE_SOURCE_DIR}/../testmodels)
-if(EXISTS ${CMAKE_SOURCE_DIR}/../tutorials)
-  add_subdirectory(../tutorials ${CMAKE_CURRENT_BINARY_DIR}/tutorials)
-endif(EXISTS ${CMAKE_SOURCE_DIR}/../tutorials)
-
 ac_end_solution(PRO60)
 
 if(ACMAKE_DEBIAN)
