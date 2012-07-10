@@ -5,9 +5,6 @@ project(Y60)
 
 option(Y60_WITH_TRACEMONKEY "use latest experimental js interpreter" OFF)
 
-set(ACMAKE_BUILDINFO_TEMPLATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/../asl/base/buildinfo.cpp.in)
-
 if (Y60_WITH_TRACEMONKEY)
     set(JSDEPENDS "")
     set(JSEXTERN MOZJS)
@@ -15,9 +12,6 @@ else(Y60_WITH_TRACEMONKEY)
     set(JSDEPENDS spidermonkey)
     set(JSEXTERN "")
 endif(Y60_WITH_TRACEMONKEY)
-
-# Include ACMake
-find_package(AcMake)
 
 # Discover dependencies
 include(Y60Dependencies.cmake)

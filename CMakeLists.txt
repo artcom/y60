@@ -7,17 +7,8 @@ project(PRO60)
 
 list(INSERT CMAKE_PREFIX_PATH 0 ${CMAKE_BINARY_DIR})
 
-# tell acmake that it is being used in integrated mode
-set(ACMAKE_INTEGRATED_BUILD YES)
-
-# set the global default buildinfo template
-set(ACMAKE_BUILDINFO_TEMPLATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/asl/base/buildinfo.cpp.in)
-
-# add acmake to build
-add_subdirectory(acmake)
-
 find_package(AcMake)
+find_package(ASL)
 
 # declare our packaging solution
 ac_begin_solution(
@@ -60,7 +51,6 @@ endif(ACMAKE_DEBIAN)
 
 # add our packages
 add_subdirectory(netsrc)
-add_subdirectory(asl)
 add_subdirectory(y60)
 
 # integrate testmodels and tutorials if present
