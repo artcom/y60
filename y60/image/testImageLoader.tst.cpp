@@ -59,7 +59,7 @@
 
 #include <iostream>
 
-#include <acmake/y60image_paths.h>
+#include <y60/image/y60image_paths.h>
 
 #include <asl/zip/PackageManager.h>
 #include <asl/base/string_functions.h>

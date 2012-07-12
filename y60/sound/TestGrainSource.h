@@ -70,7 +70,7 @@
 using namespace y60;
 using namespace asl;
 
-#include <acmake/y60sound_paths.h>
+#include <y60/sound/y60sound_paths.h>
 #define TEST_FILES CMAKE_CURRENT_SOURCE_DIR"/testfiles"
 
 class GrainSourceStressTest : public UnitTest {

@@ -59,7 +59,7 @@
 // own header
 #include "JSApp.h"
 
-#include <acmake/y60jslib_paths.h>
+#include <y60/jslib/y60jslib_paths.h>
 
 #include <errno.h>
 #include <stdio.h>

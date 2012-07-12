@@ -60,6 +60,7 @@
 #include <asl/base/Logger.h>
 #include <y60/jsbase/jssettings.h>
 #include <y60/jsbase/JSVector.h>
+#include <y60/jsbase/y60jsbase_paths.h>
 
 #ifdef USE_LEGACY_SPIDERMONKEY
 #include <js/spidermonkey/jsapi.h>
@@ -87,7 +88,6 @@
 
 #include <errno.h>
 
-#include <acmake/y60jsbase_paths.h>
 #define TEST_DATA_DIR CMAKE_CURRENT_SOURCE_DIR
 
 FILE *gErrFile = stderr;
