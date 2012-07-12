@@ -23,9 +23,6 @@
 
     <regex-test.pp name="ctest.pp" name-group="3" status-group="4" details-group="5" pass-status="Passed" failure-status="***"><![CDATA[^\\s*\\d+/\\d+\\s+Test(ing)?\\s+(#\\d+:\\s+)?(\\w+)[ .]*(\\*\\*\\*|Passed)(.*)\$]]></regex-test.pp>
 
-    <macro name="update_submodules">
-        <executable name="update_submodules" exe="${git.bin}" args="submodule update --init"/>
-    </macro>
     <macro name="run_cmake">
         <executable name="create_build_dir" exe="${cmake.bin}" args="-E make_directory ${build.dir}"/>
         <executable name="flush_cmake_cache" exe="${cmake.bin}" working-dir="${build.dir}" args="-E remove CMakeCache.txt"/>
@@ -96,7 +93,6 @@
         <recipe name="GMake Linux Continuous">
             <property name="cmake.generator" value="Unix Makefiles"/>
 
-            <macro-ref macro="${update_submodules}"/>
             <macro-ref macro="${run_cmake}"/>
             <macro-ref macro="${run_gmake_build}"/>
             <macro-ref macro="${run_ctest}"/>
@@ -105,7 +101,6 @@
         <recipe name="GMake Linux Nightly">
             <property name="cmake.generator" value="Unix Makefiles"/>
 
-            <macro-ref macro="${update_submodules}"/>
             <macro-ref macro="${run_cmake}"/>
             <macro-ref macro="${run_gmake_build}"/>
             <macro-ref macro="${run_gmake_docs}"/>
@@ -116,7 +111,6 @@
         <recipe name="GMake OSX Continuous">
             <property name="cmake.generator" value="Unix Makefiles"/>
 
-            <macro-ref macro="${update_submodules}"/>
             <macro-ref macro="${run_cmake}"/>
             <macro-ref macro="${run_gmake_build}"/>
             <macro-ref macro="${run_ctest}"/>
@@ -125,7 +119,6 @@
         <recipe name="GMake OSX Nightly">
             <property name="cmake.generator" value="Unix Makefiles"/>
 
-            <macro-ref macro="${update_submodules}"/>
             <macro-ref macro="${run_cmake}"/>
             <macro-ref macro="${run_gmake_build}"/>
             <macro-ref macro="${run_gmake_docs}"/>
@@ -138,7 +131,6 @@
 
             <property name="cmake.recipe.args" value="${cmake.recipe.args} -D ACMAKE_PARALLEL_CL=${parallel.jobs}"/>
 
-            <macro-ref macro="${update_submodules}"/>
             <macro-ref macro="${run_cmake}"/>
             <macro-ref macro="${run_nmake_build}"/>
             <macro-ref macro="${run_ctest}"/>
@@ -150,7 +142,6 @@
 
             <property name="cmake.recipe.args" value="${cmake.recipe.args} -D ACMAKE_PARALLEL_CL=${parallel.jobs}"/>
 
-            <macro-ref macro="${update_submodules}"/>
             <macro-ref macro="${run_cmake}"/>
             <macro-ref macro="${run_nmake_build}"/>
             <macro-ref macro="${run_nmake_docs}"/>
