@@ -64,6 +64,7 @@
 #include <asl/math/numeric_functions.h>
 
 #include <asl/base/UnitTest.h>
+#include <y60/image/y60image_paths.h>
 #include "TextureAtlas.h"
 #include "Image.h"
 
@@ -271,7 +272,7 @@ public:
         textPixels(myAtlas, "yellow", Vector4f(1,1,0,1));
         textPixels(myAtlas, "green", Vector4f(0,1,0,1));
         
-        myAtlas.saveToFile(asl::Path(getTempDirectory()+"testRotated.xml", UTF8));
+        myAtlas.saveToFile(asl::Path(getTempDirectory(CMAKE_BINARY_DIR)+"testRotated.xml", UTF8));
     }
     
     void testLoadSave() {
@@ -285,9 +286,9 @@ public:
         makeSubtexture("blue", 2, 2, Vector4f(0,0,1,1));
 
         TextureAtlas firstAtlas(_mySubtextures, true, false);
-        firstAtlas.saveToFile(asl::Path(getTempDirectory()+"test.xml", UTF8));
+        firstAtlas.saveToFile(asl::Path(getTempDirectory(CMAKE_BINARY_DIR)+"test.xml", UTF8));
 
-        TextureAtlas secondAtlas(asl::Path(getTempDirectory()+"test.xml", UTF8));
+        TextureAtlas secondAtlas(asl::Path(getTempDirectory(CMAKE_BINARY_DIR)+"test.xml", UTF8));
 
         Matrix4f textureTranslation;
         ENSURE( ! secondAtlas.findTextureTranslation("doesn't exist", textureTranslation) );
