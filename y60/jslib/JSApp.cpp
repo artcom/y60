@@ -1227,6 +1227,18 @@ MilliSec(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 }
 
 JS_STATIC_DLL_CALLBACK(JSBool)
+MilliSecSince1970(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Returns the localtime since 1.1.1970 start in milliseconds.");
+    DOC_RVAL("The localtime in milliseconds", DOC_TYPE_FLOAT);
+    DOC_END;
+
+	unsigned long long myMillisecs = asl::getLocalMillisecsSince1970();
+    try {
+        return JS_NewDoubleValue(cx, myMillisecs, rval);
+    } HANDLE_CPP_EXCEPTION;
+}
+
+JS_STATIC_DLL_CALLBACK(JSBool)
 MSleep(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Sleeps for a certain time.");
     DOC_PARAM("theMilliSecs", "Specifies the number of milliseconds to sleep", DOC_TYPE_INTEGER);
@@ -1670,7 +1682,8 @@ static JSFunctionSpec glob_functions[] = {
     {"__LINE__",          Line,           0},
     {"fileline",          FileLine,       0},
     {"dumpstack",         DumpStack,      0},
-    {"millisec",          MilliSec,       0},
+	{"milliSecSince1970", MilliSecSince1970,0},
+	{"millisec",          MilliSec,       0},
     {"msleep",            MSleep,         1},
     {"getProgramName",    GetProgramName, 0},
     {"hostname",          HostName,       0},
