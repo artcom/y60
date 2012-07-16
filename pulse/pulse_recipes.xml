@@ -51,7 +51,7 @@
     </macro>
 
     <macro name="run_gmake_docs">
-        <make args="ASL-doxygen Y60-doxygen Y60-jsapi Y60-jsdoc" working-dir="${build.dir}" name="documentation"/>
+        <make args="Y60-doxygen Y60-jsapi Y60-jsdoc" working-dir="${build.dir}" name="documentation"/>
     </macro>
 
     <macro name="run_nmake_build">
@@ -61,7 +61,7 @@
     </macro>
 
     <macro name="run_nmake_docs">
-        <executable exe="${vs.nmake.bin}" working-dir="${build.dir}" args="ASL-doxygen Y60-doxygen Y60-jsapi Y60-jsdoc" name="documentation">
+        <executable exe="${vs.nmake.bin}" working-dir="${build.dir}" args="Y60-doxygen Y60-jsapi Y60-jsdoc" name="documentation">
                 <process processor="${msbuild.pp}"/>
             </executable>
     </macro>
