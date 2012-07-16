@@ -194,6 +194,10 @@ jsval as_jsval(JSContext *cx, unsigned long theValue) {
     return as_jsval(cx, double(theValue));
 }
 
+jsval as_jsval(JSContext *cx, unsigned long long theValue) {
+    return as_jsval(cx, double(theValue));
+}
+
 jsval as_jsval(JSContext *cx, unsigned int theValue) {
     return as_jsval(cx, double(theValue));
 }

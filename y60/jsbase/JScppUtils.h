@@ -343,6 +343,7 @@ Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, double theValue);
 Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, float theValue);
 Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, long theValue);
 Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, unsigned long theValue);
+Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, unsigned long long theValue);
 Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, int theValue);
 Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, unsigned int theValue);
 Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, char theValue);
