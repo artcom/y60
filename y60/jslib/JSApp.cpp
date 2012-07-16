@@ -1231,9 +1231,9 @@ MilliSecSince1970(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *
     DOC_BEGIN("Returns the localtime since 1.1.1970 start in milliseconds.");
     DOC_RVAL("The localtime in milliseconds", DOC_TYPE_FLOAT);
     DOC_END;
-    unsigned long long myMillisecs = asl::getLocalMillisecsSince1970();
     try {
-        *rval = as_jsval(cx, myMillisecs);
+        asl::Time now;
+        *rval = as_jsval(cx, now.millis());
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }
