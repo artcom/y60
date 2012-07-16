@@ -1233,7 +1233,8 @@ MilliSecSince1970(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *
     DOC_END;
     unsigned long long myMillisecs = asl::getLocalMillisecsSince1970();
     try {
-        return JS_NewDoubleValue(cx, myMillisecs, rval);
+        *rval = as_jsval(cx, myMillisecs);
+        return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }
 
