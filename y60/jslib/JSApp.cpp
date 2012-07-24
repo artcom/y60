@@ -1233,6 +1233,7 @@ MilliSecSince1970(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *
     DOC_END;
     try {
         asl::Time now;
+        now.toLocalTime();
         *rval = as_jsval(cx, now.millis());
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
