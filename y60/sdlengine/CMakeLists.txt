@@ -37,4 +37,8 @@ ac_add_library(
     DEPENDS aslbase aslmath aslserial aslnet aslipc asldom aslxpath aslzip
             y60base y60scene y60image y60video y60input y60inet y60glrender
             y60glutil y60jsbase y60jslib y60gltext acsdlttf paintlib ${JSDEPENDS}
+    VERSION ${VERSION_STRING}
+    SOVERSION ${VERSION_MAJOR}
+    RUNTIME_INSTALL_COMPONENT ${RUNTIME_COMPONENT}
+    DEVELOPMENT_INSTALL_COMPONENT ${DEVELOPMENT_COMPONENT}
 )

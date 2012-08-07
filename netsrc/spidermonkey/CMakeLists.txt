@@ -92,6 +92,10 @@ ac_add_library(
     spidermonkey js/spidermonkey
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
+    VERSION ${VERSION_STRING}
+    SOVERSION ${VERSION_MAJOR}
+    RUNTIME_INSTALL_COMPONENT ${RUNTIME_COMPONENT}
+    DEVELOPMENT_INSTALL_COMPONENT ${DEVELOPMENT_COMPONENT}
 )
 
 _ac_add_include_path(spidermonkey ${CMAKE_CURRENT_BINARY_DIR}/include YES)
@@ -115,6 +119,7 @@ ac_add_executable(
     smonkey
     SOURCES js.c
     DEPENDS spidermonkey
+    INSTALL_COMPONENT ${RUNTIME_COMPONENT}
 )
 
 ac_end_project(Spidermonkey)

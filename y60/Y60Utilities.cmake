@@ -76,6 +76,9 @@ endfunction(y60_add_assets)
 
 macro(y60_add_component COMPONENT_NAME)
     string(TOLOWER ${COMPONENT_NAME} COMPONENT_NAME_LOWER)
+    # add aslbase to dependencies
+    #list(APPEND THIS_PLUGIN_DEPENDS aslbase)
+
     ac_add_plugin(
         ${COMPONENT_NAME} y60/components
         RUNTIME_DEBIAN_PACKAGE     y60-plugin-${COMPONENT_NAME_LOWER}

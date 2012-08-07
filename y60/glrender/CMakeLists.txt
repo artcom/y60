@@ -41,6 +41,10 @@ ac_add_library(
             y60base y60image y60video y60scene y60glutil y60gltext
     EXTERNS GLEW NVIDIA_CG
     TESTS   ${TESTS}
+    VERSION ${VERSION_STRING}
+    SOVERSION ${VERSION_MAJOR}
+    RUNTIME_INSTALL_COMPONENT ${RUNTIME_COMPONENT}
+    DEVELOPMENT_INSTALL_COMPONENT ${DEVELOPMENT_COMPONENT}
 )
 
 asl_add_schema(

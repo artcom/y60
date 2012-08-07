@@ -43,4 +43,8 @@ ac_add_library(
     DEPENDS aslbase aslmath asldom aslzip
             y60base y60scene y60image y60video
     EXTERNS ${EXTERNALS}
+    VERSION ${VERSION_STRING}
+    SOVERSION ${VERSION_MAJOR}
+    RUNTIME_INSTALL_COMPONENT ${RUNTIME_COMPONENT}
+    DEVELOPMENT_INSTALL_COMPONENT ${DEVELOPMENT_COMPONENT}
 )

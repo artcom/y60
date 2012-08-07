@@ -85,6 +85,18 @@ endif(GTKMM_FOUND AND GTKGLEXT_FOUND AND GLADEMM_FOUND)
 
 # Add optional gtk-based components
 if(Y60_WITH_GTK)
+    cpack_add_component_group( G60
+                           DESCRIPTION "G60"
+                           EXPANDED)
+    cpack_add_component( G60_runtime
+            DISPLAY_NAME "G60 Runtime"
+            DESCRIPTION "runtime libraries" REQUIRED
+            GROUP G60)
+    cpack_add_component( G60_development
+            DISPLAY_NAME "G60 Development"
+            DESCRIPTION "header files and import libraries"
+            GROUP G60)
+            
     add_subdirectory(acgtk)
     add_subdirectory(jsgtk)
 endif(Y60_WITH_GTK)
@@ -93,7 +105,7 @@ endif(Y60_WITH_GTK)
 install(
     DIRECTORY js
     DESTINATION lib/y60
-    COMPONENT Y60_runtime
+    COMPONENT ${RUNTIME_COMPONENT}
     FILES_MATCHING
         PATTERN "*.js"
         PATTERN ".svn" EXCLUDE
@@ -103,7 +115,7 @@ install(
 install(
     DIRECTORY shader
     DESTINATION lib/y60
-    COMPONENT Y60_runtime
+    COMPONENT ${RUNTIME_COMPONENT}
     FILES_MATCHING
         PATTERN "*.cg"
         PATTERN "*.xml"

@@ -55,6 +55,8 @@ ac_add_library(
             y60glrender y60glutil y60gltext y60modelling y60jslib
             paintlib
     EXTERNS GTKMM GTKGLEXT
+    VERSION ${VERSION_STRING}
+    SOVERSION ${VERSION_MAJOR}
     RUNTIME_INSTALL_COMPONENT G60_runtime
     DEVELOPMENT_INSTALL_COMPONENT G60_development
 )
