@@ -96,6 +96,7 @@ spark.Image.Constructor = function (Protected) {
         } else {
             if (_mySource === "") {
                 Public.image = Modelling.createImage(window.scene, Public.width, Public.height, "BGRA");
+                _myImageOwned = true;
             } else {
                 Public.image = Modelling.createImage(window.scene, _mySource, _myASyncLoad);
             }
