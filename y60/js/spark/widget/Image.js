@@ -40,18 +40,22 @@ spark.Image.Constructor = function (Protected) {
     }
 
     function attachToI18nItem(theItemId) {
-        if (_mySourceItem) {
+        var mySrc = "";
+        if(_mySourceItem) {
             _mySourceItem.removeEventListener(spark.I18nEvent.LANGUAGE,
                                               Protected.handleI18nLanguage);
             _mySourceItem = null;
         }
-        _mySourceItem = Public.getI18nItemByName(theItemId);
-        if (!_mySourceItem) {
-            Logger.fatal("no i18n item named " + theItemId);
+        if (theItemId) {
+            _mySourceItem = Public.getI18nItemByName(theItemId);
+            if(!_mySourceItem) {
+                Logger.fatal("no i18n item named " + theItemId);
+            }
+            _mySourceItem.addEventListener(spark.I18nEvent.LANGUAGE,
+                                           Protected.handleI18nLanguage);
+            mySrc = _mySourceItem.src;
         }
-        _mySourceItem.addEventListener(spark.I18nEvent.LANGUAGE,
-                                       Protected.handleI18nLanguage);
-        Public.src = _mySourceItem.src;
+        Public.src = mySrc;
     }
 
     ////////////////////
