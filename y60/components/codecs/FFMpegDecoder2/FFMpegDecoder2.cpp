@@ -685,6 +685,16 @@ namespace y60 {
                 myBufferSizes.push_back(_myFrameWidth * _myFrameHeight / 4);
                 myBufferSizes.push_back(_myFrameWidth * _myFrameHeight / 4);
                 break;
+            case PIX_FMT_YUV422P:
+                myBufferSizes.push_back(_myFrameWidth * _myFrameHeight);
+                myBufferSizes.push_back(_myFrameWidth * _myFrameHeight / 2);
+                myBufferSizes.push_back(_myFrameWidth * _myFrameHeight / 2);
+                break;
+            case PIX_FMT_YUV444P:
+                myBufferSizes.push_back(_myFrameWidth * _myFrameHeight);
+                myBufferSizes.push_back(_myFrameWidth * _myFrameHeight);
+                myBufferSizes.push_back(_myFrameWidth * _myFrameHeight);
+                break;
             case PIX_FMT_YUVA420P:
                 myBufferSizes.push_back(_myFrameWidth * _myFrameHeight);
                 myBufferSizes.push_back(_myFrameWidth * _myFrameHeight / 4);
@@ -821,7 +831,10 @@ namespace y60 {
             } else {
                 // TODO: Figure out if/why this happens. Delete?
                 AC_WARNING << "readFrame, empty frame.";
-                if (_myDestinationPixelFormat == PIX_FMT_YUV420P ) {
+                if (_myDestinationPixelFormat == PIX_FMT_YUV420P
+                    || _myDestinationPixelFormat == PIX_FMT_YUV422P
+                    || _myDestinationPixelFormat == PIX_FMT_YUV444P)
+                {
                     memset(theTargetRaster[0]->pixels().begin(), 16, theTargetRaster[0]->pixels().size());
                     memset(theTargetRaster[1]->pixels().begin(), 127, theTargetRaster[1]->pixels().size());
                     memset(theTargetRaster[2]->pixels().begin(), 127, theTargetRaster[2]->pixels().size());
@@ -974,6 +987,12 @@ namespace y60 {
                 case TEXTURE_IFMT_YUV420:
                     myRasterEncoding = YUV420;
                     break;
+                case TEXTURE_IFMT_YUV422:
+                    myRasterEncoding = YUV422;
+                    break;
+                case TEXTURE_IFMT_YUV444:
+                    myRasterEncoding = YUV444;
+                    break;
                 case TEXTURE_IFMT_RGBA8:
                     myRasterEncoding = RGBA;
                     break;
@@ -1041,6 +1060,26 @@ namespace y60 {
                 myMovie->addRasterValue(createRasterValue( y60::GRAY, _myFrameWidth/2, _myFrameHeight/2), y60::GRAY, 1);
                 myMovie->addRasterValue(createRasterValue( y60::GRAY, _myFrameWidth, _myFrameHeight), y60::GRAY, 1);
                 break;
+            case YUV422:
+                {AC_DEBUG << "Using YUV422 pixels";}
+                _myDestinationPixelFormat = PIX_FMT_YUV422P;
+                if (myVCodec->pix_fmt != PIX_FMT_YUV422P) {
+                    AC_WARNING<<"you're trying to use YUV2RGB shader but the source video pixel format is not YUV422p, src: " + theFilename;
+                }
+                myMovie->createRaster(_myFrameWidth, _myFrameHeight, 1, y60::GRAY);
+                myMovie->addRasterValue(createRasterValue( y60::GRAY, _myFrameWidth, _myFrameHeight/2), y60::GRAY, 1);
+                myMovie->addRasterValue(createRasterValue( y60::GRAY, _myFrameWidth, _myFrameHeight/2), y60::GRAY, 1);
+                break;
+            case YUV444:
+                {AC_DEBUG << "Using YUV444 pixels";}
+                _myDestinationPixelFormat = PIX_FMT_YUV444P;
+                if (myVCodec->pix_fmt != PIX_FMT_YUV444P) {
+                    AC_WARNING<<"you're trying to use YUV2RGB shader but the source video pixel format is not YUV444p, src: " + theFilename;
+                }
+                myMovie->createRaster(_myFrameWidth, _myFrameHeight, 1, y60::GRAY);
+                myMovie->addRasterValue(createRasterValue( y60::GRAY, _myFrameWidth, _myFrameHeight), y60::GRAY, 1);
+                myMovie->addRasterValue(createRasterValue( y60::GRAY, _myFrameWidth, _myFrameHeight), y60::GRAY, 1);
+                break;
             case RGB:
             default:
                 {AC_DEBUG << "Using BGR pixels";}
@@ -1050,7 +1089,10 @@ namespace y60 {
                 break;
         }
         unsigned myRasterCount = myMovie->getNode().childNodesLength();
-        if (_myDestinationPixelFormat == PIX_FMT_YUV420P ) {
+        if (_myDestinationPixelFormat == PIX_FMT_YUV420P
+            || _myDestinationPixelFormat == PIX_FMT_YUV422P
+            || _myDestinationPixelFormat == PIX_FMT_YUV444P)
+        {
             memset(myMovie->getRasterPtr(0)->pixels().begin(), 16, myMovie->getRasterPtr(0)->pixels().size());
             memset(myMovie->getRasterPtr(1)->pixels().begin(), 127, myMovie->getRasterPtr(1)->pixels().size());
             memset(myMovie->getRasterPtr(2)->pixels().begin(), 127, myMovie->getRasterPtr(2)->pixels().size());
@@ -1171,19 +1213,25 @@ namespace y60 {
             copyPlaneToRaster(myVideoFrame->getBuffer(0), theFrame->data[0], theFrame->linesize[0], _myFrameWidth, _myFrameHeight);
         } else if (myVCodec->pix_fmt == PIX_FMT_BGRA && _myDestinationPixelFormat == PIX_FMT_BGRA) {
             copyPlaneToRaster(myVideoFrame->getBuffer(0), theFrame->data[0], theFrame->linesize[0], _myFrameWidth*4, _myFrameHeight);
+        } else if (myVCodec->pix_fmt == PIX_FMT_YUV420P && _myDestinationPixelFormat == PIX_FMT_YUV420P) {
+            copyPlaneToRaster(myVideoFrame->getBuffer(0), theFrame->data[0], theFrame->linesize[0], _myFrameWidth, _myFrameHeight);
+            copyPlaneToRaster(myVideoFrame->getBuffer(1), theFrame->data[1], theFrame->linesize[1], _myFrameWidth/2, _myFrameHeight/2);
+            copyPlaneToRaster(myVideoFrame->getBuffer(2), theFrame->data[2], theFrame->linesize[2], _myFrameWidth/2, _myFrameHeight/2);
+        } else if (myVCodec->pix_fmt == PIX_FMT_YUV422P && _myDestinationPixelFormat == PIX_FMT_YUV422P) {
+            copyPlaneToRaster(myVideoFrame->getBuffer(0), theFrame->data[0], theFrame->linesize[0], _myFrameWidth, _myFrameHeight);
+            copyPlaneToRaster(myVideoFrame->getBuffer(1), theFrame->data[1], theFrame->linesize[1], _myFrameWidth, _myFrameHeight/2);
+            copyPlaneToRaster(myVideoFrame->getBuffer(2), theFrame->data[2], theFrame->linesize[2], _myFrameWidth, _myFrameHeight/2);
+        } else if (myVCodec->pix_fmt == PIX_FMT_YUV444P && _myDestinationPixelFormat == PIX_FMT_YUV444P) {
+            copyPlaneToRaster(myVideoFrame->getBuffer(0), theFrame->data[0], theFrame->linesize[0], _myFrameWidth, _myFrameHeight);
+            copyPlaneToRaster(myVideoFrame->getBuffer(1), theFrame->data[1], theFrame->linesize[1], _myFrameWidth, _myFrameHeight);
+            copyPlaneToRaster(myVideoFrame->getBuffer(2), theFrame->data[2], theFrame->linesize[2], _myFrameWidth, _myFrameHeight);
+        } else if (myVCodec->pix_fmt == PIX_FMT_YUVA420P && _myDestinationPixelFormat == PIX_FMT_YUVA420P) {
+            copyPlaneToRaster(myVideoFrame->getBuffer(0), theFrame->data[0], theFrame->linesize[0], _myFrameWidth, _myFrameHeight);
+            copyPlaneToRaster(myVideoFrame->getBuffer(1), theFrame->data[1], theFrame->linesize[1], _myFrameWidth/2, _myFrameHeight/2);
+            copyPlaneToRaster(myVideoFrame->getBuffer(2), theFrame->data[2], theFrame->linesize[2], _myFrameWidth/2, _myFrameHeight/2);
+            copyPlaneToRaster(myVideoFrame->getBuffer(3), theFrame->data[3], theFrame->linesize[3], _myFrameWidth, _myFrameHeight);
         } else {
-            if (_myDestinationPixelFormat == PIX_FMT_YUV420P ) {
-                copyPlaneToRaster(myVideoFrame->getBuffer(0), theFrame->data[0], theFrame->linesize[0], _myFrameWidth, _myFrameHeight);
-                copyPlaneToRaster(myVideoFrame->getBuffer(1), theFrame->data[1], theFrame->linesize[1], _myFrameWidth/2, _myFrameHeight/2);
-                copyPlaneToRaster(myVideoFrame->getBuffer(2), theFrame->data[2], theFrame->linesize[2], _myFrameWidth/2, _myFrameHeight/2);
-            } else if (_myDestinationPixelFormat == PIX_FMT_YUVA420P ) {
-                copyPlaneToRaster(myVideoFrame->getBuffer(0), theFrame->data[0], theFrame->linesize[0], _myFrameWidth, _myFrameHeight);
-                copyPlaneToRaster(myVideoFrame->getBuffer(1), theFrame->data[1], theFrame->linesize[1], _myFrameWidth/2, _myFrameHeight/2);
-                copyPlaneToRaster(myVideoFrame->getBuffer(2), theFrame->data[2], theFrame->linesize[2], _myFrameWidth/2, _myFrameHeight/2);
-                copyPlaneToRaster(myVideoFrame->getBuffer(3), theFrame->data[3], theFrame->linesize[3], _myFrameWidth, _myFrameHeight);
-            } else {
-                convertFrame(theFrame, myVideoFrame->getBuffer());
-            }
+            convertFrame(theFrame, myVideoFrame->getBuffer());
         }
         _myMsgQueue.push_back(myVideoFrame);
 

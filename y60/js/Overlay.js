@@ -903,7 +903,7 @@ MovieOverlay.prototype.Constructor = function(Public, Protected, theScene, theSo
         if (myImage.childNodesLength() > 1) {
             Public.material.requires.textures = Public.createTextureFeatureString(myImage.childNodesLength());
         }
-        if (myImage.targetpixelformat === "YUV420") {
+        if (myImage.targetpixelformat === "YUV420" || myImage.targetpixelformat === "YUV422" || myImage.targetpixelformat === "YUV444") {
             Logger.info("using yuv2rgb shader to convert pixelformat");
             addMaterialRequirement(Public.material, "option", "[10[yuv2rgb]]");
         }

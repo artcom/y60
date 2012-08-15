@@ -36,7 +36,7 @@ TextureAtlas
 )
 
 if(NOT WIN32)
-    find_package(Boost COMPONENTS thread)
+    find_package(Boost COMPONENTS thread system)
 endif(NOT WIN32)
 
 list(APPEND EXTERNALS Boost)

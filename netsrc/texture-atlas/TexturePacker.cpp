@@ -210,7 +210,7 @@ public:
     mTextureIndex = 0;
     mFreeList = 0;
   }
-  ~MyTexturePacker(void)
+  virtual ~MyTexturePacker(void)
   {
     reset();
   }

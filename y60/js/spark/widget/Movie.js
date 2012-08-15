@@ -44,23 +44,27 @@ spark.Movie.Constructor = function(Protected) {
     }
 
     function attachToI18nItem(theItemId) {
+        var mySrc = "";
         if(_mySourceItem) {
             _mySourceItem.removeEventListener(spark.I18nEvent.LANGUAGE,
                                               Protected.handleI18nLanguage);
             _mySourceItem = null;
         }
-        _mySourceItem = Public.getI18nItemByName(theItemId);
-        if(!_mySourceItem) {
-            Logger.fatal("no i18n item named " + theItemId);
+        if (theItemId) {
+            _mySourceItem = Public.getI18nItemByName(theItemId);
+            if(!_mySourceItem) {
+                Logger.fatal("no i18n item named " + theItemId);
+            }
+            _mySourceItem.addEventListener(spark.I18nEvent.LANGUAGE,
+                                           Protected.handleI18nLanguage);
+            mySrc = _mySourceItem.src;
         }
-        _mySourceItem.addEventListener(spark.I18nEvent.LANGUAGE,
-                                       Protected.handleI18nLanguage);
-        Public.src = _mySourceItem.src;
+        Public.src = mySrc;
     }
 
     function initMovie(theFullInitFlag) {
         if (theFullInitFlag) {
-            _myMovie.currentframe = _myStartFrame;            
+            _myMovie.currentframe = _myStartFrame;
             Public.mode = Protected.getString("mode", "stop");
             var myVolumes = Protected.getArray("volumes", []);
             if (myVolumes.length === 0) {
@@ -92,14 +96,11 @@ spark.Movie.Constructor = function(Protected) {
     
     Base.initialize = Public.initialize;
     Public.initialize = function(theNode) {
-        if (theNode && (("useYuv2RgbShader" in theNode && theNode.useYuv2RgbShader === "true") ||
-            ("targetpixelformat" in theNode && theNode.targetpixelformat === "YUV420")))
-        {
-            theNode.targetpixelformat = "YUV420";
-            use("YUV2RGBShader.js");
-            Public.Inherit(spark.YUV2RGBShader);
-        }
-        if (theNode && ("targetpixelformat" in theNode && theNode.targetpixelformat === "YUVA420"))
+        if (theNode && "targetpixelformat" in theNode
+            && (theNode.targetpixelformat === "YUV420" ||
+                theNode.targetpixelformat === "YUV422" ||
+                theNode.targetpixelformat === "YUV444" ||
+                theNode.targetpixelformat === "YUVA420"))
         {
             use("YUV2RGBShader.js");
             Public.Inherit(spark.YUV2RGBShader);
@@ -226,13 +227,13 @@ spark.Movie.Constructor = function(Protected) {
     
     Public.__defineSetter__("src", function (theSourceFile) {
         var myName, myCachedMovie;
-        if(_mySource !== theSourceFile) {
-            _mySource = theSourceFile;   
+        if (theSourceFile && _mySource !== theSourceFile) {
+            _mySource = theSourceFile;
             if (_mySetSourceWithoutChangingImageNode) {
                 if (_myMovie.nodeName === "image") {
                     if (_myUseCaching) {
                         Public.movie = spark.getCachedMovie(theSourceFile, _myTargetPixelFormat, _myDecoderHint, Protected.getBoolean("audio", true), _myStartFrame, _myCacheSize);
-                    } else {                
+                    } else {
                         Public.movie = spark.openMovie(theSourceFile, _myTargetPixelFormat, _myDecoderHint, Protected.getBoolean("audio", true), _myStartFrame, _myCacheSize);
                     }
                 } else {
@@ -269,12 +270,13 @@ spark.Movie.Constructor = function(Protected) {
                     } else {
                         Public.movie = spark.getCachedMovie(theSourceFile, _myTargetPixelFormat, _myDecoderHint, Protected.getBoolean("audio", true), _myStartFrame,_myCacheSize);
                     }
-                } else {                
+                } else {
                     Public.movie = spark.openMovie(theSourceFile, _myTargetPixelFormat, _myDecoderHint, Protected.getBoolean("audio", true), _myStartFrame, _myCacheSize);
                 }
             }
         } else {
-            if(_myMovie.playmode !== "stop") {
+            _mySource = theSourceFile;
+            if (_myMovie.nodeName === "movie" && _myMovie.playmode !== "stop") {
                 Public.stop();
             }
         }
@@ -311,7 +313,7 @@ spark.Movie.Constructor = function(Protected) {
     Public.realize = function() {
         var myMovieSource = Protected.getString("src", "");
         var myMovieSourceId = Protected.getString("srcId", "");
-        _myCacheSize = Protected.getNumber("cachesize", _myCacheSize);        
+        _myCacheSize = Protected.getNumber("cachesize", _myCacheSize);
         _myDecoderHint = Protected.getString("decoderhint", _myDecoderHint);
         _myTargetPixelFormat = Protected.getString("targetpixelformat", _myTargetPixelFormat);
         _mySetSourceWithoutChangingImageNode = Protected.getBoolean("setSourceWithoutChangingImageNode", _mySetSourceWithoutChangingImageNode);
@@ -331,7 +333,6 @@ spark.Movie.Constructor = function(Protected) {
             } else {                
                 _myMovie = spark.openMovie(myMovieSource, _myTargetPixelFormat, _myDecoderHint, Protected.getBoolean("audio", true), _myStartFrame, _myCacheSize);
             }
-            
             _mySource = myMovieSource;
         }
 
