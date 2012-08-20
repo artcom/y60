@@ -10,5 +10,10 @@ ac_add_executable(
     DEPENDS 
         aslbase aslmath aslzip asldom y60base y60image paintlib
     EXTERNS ${EXTERNALS}
-    INSTALL_COMPONENT Y60_utilities
+    INSTALL_COMPONENT genmovie
 )
+
+cpack_add_component( genmovie
+            DESCRIPTION "genmovie"
+            DISABLED
+            GROUP Utilities)

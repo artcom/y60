@@ -33,5 +33,10 @@ ac_add_executable(
             y60gltext y60sdlengine ${Y60_SDLMAIN}
             sdlttf2 jsspidermonkey y60modelling aslzip paintlib
     EXTERNS ${EXTERNALS}
-    INSTALL_COMPONENT Y60_utilities
+    INSTALL_COMPONENT viewacm
 )
+
+cpack_add_component( viewacm
+            DESCRIPTION "viewacm"
+            DISABLED
+            GROUP Utilities)

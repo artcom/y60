@@ -25,5 +25,10 @@ ac_add_executable(
             y60gltext y60sdlengine ${Y60_SDLMAIN}
             sdlttf2 jsspidermonkey y60modelling aslzip paintlib
     EXTERNS ${EXTERNALS}
-    INSTALL_COMPONENT Y60_utilities
+    INSTALL_COMPONENT genacm
 )
+
+cpack_add_component( genacm
+            DESCRIPTION "genacm"
+            DISABLED
+            GROUP Utilities)

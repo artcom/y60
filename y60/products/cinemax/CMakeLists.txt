@@ -36,6 +36,7 @@ ac_add_plugin(
     DEPENDS aslbase aslmath aslzip asldom    
             y60base y60image y60video y60scene y60modelling paintlib
     EXTERNS C4D
+    DONT_INSTALL
 )
 
 

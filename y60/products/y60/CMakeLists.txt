@@ -15,5 +15,6 @@ ac_add_executable(
           y60modelling y60sdlengine ${Y60_SDLMAIN} ${JSDEPENDS} 
           aslzip acsdlttf
   EXTERNS ${EXTERNALS}
+  INSTALL_COMPONENT ${RUNTIME_COMPONENT}
   ${Y60_APP_STYLE}
 )

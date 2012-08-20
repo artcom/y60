@@ -9,4 +9,10 @@ ac_add_executable(
        aslbase paintlib
     EXTERNS
        OPENEXR
+    INSTALL_COMPONENT compareimage
 )
+
+cpack_add_component( compareimage
+            DESCRIPTION "compareimage"
+            DISABLED
+            GROUP Utilities)

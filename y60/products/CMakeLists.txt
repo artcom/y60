@@ -27,3 +27,6 @@ endif(MAYA_FOUND)
 if(C4D_FOUND)
     add_subdirectory(cinemax)
 endif(C4D_FOUND)
+
+cpack_add_component_group( Utilities
+                           DESCRIPTION "various utilities")
