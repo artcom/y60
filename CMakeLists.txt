@@ -36,11 +36,11 @@ set(RUNTIME_COMPONENT Y60_runtime)
 set(DEVELOPMENT_COMPONENT Y60_development)
 
 cpack_add_component( ${RUNTIME_COMPONENT}
-            DISPLAY_NAME "Runtime"
-            DESCRIPTION "runtime libraries" REQUIRED)
+            DISPLAY_NAME "Y60 Runtime"
+            DESCRIPTION "Y60 runtime libraries" REQUIRED)
 cpack_add_component( ${DEVELOPMENT_COMPONENT}
-            DISPLAY_NAME "Development"
-            DESCRIPTION "header files and import libraries")
+            DISPLAY_NAME "Y60 Development"
+            DESCRIPTION "Y60 header files and import libraries")
 
 
 # define debian packages
