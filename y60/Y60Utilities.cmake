@@ -75,16 +75,35 @@ function(y60_add_assets DIRECTORY)
 endfunction(y60_add_assets)
 
 macro(y60_add_component COMPONENT_NAME)
+    parse_arguments(
+        THIS_COMPONENT
+        "RUNTIME_INSTALL_COMPONENT;DEVELOPMENT_INSTALL_COMPONENT"
+        ""
+        ${ARGN}
+    )
     string(TOLOWER ${COMPONENT_NAME} COMPONENT_NAME_LOWER)
-    # add aslbase to dependencies
-    #list(APPEND THIS_PLUGIN_DEPENDS aslbase)
+    
+    if(NOT THIS_COMPONENT_RUNTIME_INSTALL_COMPONENT)
+        set(THIS_COMPONENT_RUNTIME_INSTALL_COMPONENT ${COMPONENT_NAME_LOWER})
+    endif(NOT THIS_COMPONENT_RUNTIME_INSTALL_COMPONENT)
+    if(NOT THIS_COMPONENT_DEVELOPMENT_INSTALL_COMPONENT)
+        set(THIS_COMPONENT_DEVELOPMENT_INSTALL_COMPONENT "${COMPONENT_NAME_LOWER}_development")
+    endif(NOT THIS_COMPONENT_DEVELOPMENT_INSTALL_COMPONENT)
 
     ac_add_plugin(
         ${COMPONENT_NAME} y60/components
         RUNTIME_DEBIAN_PACKAGE     y60-plugin-${COMPONENT_NAME_LOWER}
         DEVELOPMENT_DEBIAN_PACKAGE y60-plugin-${COMPONENT_NAME_LOWER}-dev
+        RUNTIME_INSTALL_COMPONENT ${THIS_COMPONENT_RUNTIME_INSTALL_COMPONENT}
+        DEVELOPMENT_INSTALL_COMPONENT ${THIS_COMPONENT_DEVELOPMENT_INSTALL_COMPONENT}
         ${ARGN}
     )
+    cpack_add_component( ${THIS_COMPONENT_RUNTIME_INSTALL_COMPONENT}
+            DESCRIPTION "${COMPONENT_NAME} runtime"
+            GROUP y60_components_runtime)
+    cpack_add_component( ${THIS_COMPONENT_DEVELOPMENT_INSTALL_COMPONENT}
+            DESCRIPTION "${COMPONENT_NAME} header files"
+            GROUP y60_components_development)        
 endmacro(y60_add_component)
 
 macro(y60_add_launcher NAME)

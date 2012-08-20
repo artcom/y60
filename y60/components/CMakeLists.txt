@@ -16,3 +16,9 @@ if(Y60_APE_EXPERIMENT)
     add_subdirectory(yape)
 endif(Y60_APE_EXPERIMENT)
 
+cpack_add_component_group( y60_components_runtime
+                           DISPLAY_NAME "Y60 Components"
+                           DESCRIPTION "Y60 Components runtime libraries")
+cpack_add_component_group( y60_components_development
+                           DISPLAY_NAME "Y60 Components Development"
+                           DESCRIPTION "Y60 Components header files and import libraries")
