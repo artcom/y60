@@ -32,7 +32,7 @@ ac_add_project(
 add_subdirectory(osc)
 add_subdirectory(ip)
 
-ac_end_project(OSCPACK)
+ac_end_project(OSCPACK DONT_INSTALL)
 
 
 

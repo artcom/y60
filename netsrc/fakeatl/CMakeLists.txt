@@ -20,4 +20,4 @@ ac_add_library(
     DEVELOPMENT_INSTALL_COMPONENT ${DEVELOPMENT_COMPONENT}
 )
 
-ac_end_project(FakeATL)
+ac_end_project(FakeATL DONT_INSTALL)

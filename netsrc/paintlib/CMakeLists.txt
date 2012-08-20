@@ -12,4 +12,4 @@ ac_add_project(
 
 add_subdirectory(src)
 
-ac_end_project(Paintlib)
+ac_end_project(Paintlib DONT_INSTALL)
