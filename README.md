@@ -5,17 +5,17 @@ Y60 itself is implemented in C++ for the Windows, Linux and Mac OS X platforms. 
 It is open-source licensed under GPL and available for windows, linux and mac-osx.
 
 # Prerequisits
-- CMake: download and install the latest installer from: [CMAKE]
-- Cg Toolkit: get the latest installer from [CG_Toolkit] or install it with your favorite package manager on your OS
-- y60 relies heavily on ASL the ART+COM Standard Library and AcMake, so you need to install or build those too. Instructions can be found in the readme at [ASL_github] and [AcMake_github]
-## Windows
-- DirectX SDK: download from [DIRECTX_SDK]
-- get the latest dependencies: PRO60Dependencies-*.*.*-win32.exe [y60artcomde_installer]
-- Nullsoft Scriptable Install System NSIS from [NSIS] (optional, only needed for building packages)
+- CMake: download and install the latest installer from: [cmake]
+- Cg Toolkit: get the latest installer from [NVIDIA Cg Toolkit] or install it with your favorite package manager on your OS
+- y60 relies heavily on ASL the ART+COM Standard Library and AcMake, so you need to install or build those too. Instructions can be found in the readme at [ASL] and [AcMake]
+- windows only
+-- DirectX SDK: download from [DirectX SDK]
+-- get the latest dependencies: PRO60Dependencies-*.*.*-win32.exe [Y60 Prebuild Installer]
+-- Nullsoft Scriptable Install System NSIS from [NSIS] (optional, only needed for building packages)
 
 
 # Prebuild Windows 32 Bit binary
-Currently, we distribute windows installers at [y60artcomde_installer]
+Currently, we distribute windows installers at [Y60 Prebuild Installer]
 Install the following packages and you should be able to run y60 applications
 - get the latest installer Y60-*.*.*-win32.exe 
 - get the appropriate dependencies: PRO60Dependencies-*.*.*-win32.exe
@@ -30,7 +30,7 @@ Checkout y60 sources
 ### Build on Windows
 #### Prerequisits
 - Visual Studio Express 9 2008, 32Bit
-from [y60artcomde_installer]
+from [Y60 Prebuild Installer]
 - get the latest dependencies: PRO60Dependencies-*.*.*-win32.exe
 - get the appropriate asl library: ASL-*.*.*-win32.exe
 - get the appropriate acmake library: AcMake-*.*.*-win32.exe
@@ -39,6 +39,18 @@ and install them
 #### If you want to use the gtk binding, also known as G60 (optional), you also need:
 
 install Gtkmm 2.14 or higher (development package) from [gtkmm]
+
+#### Cygwin shell
+It is recommended to build Y60 within cygwin, but the instructions should also work with the Windows Command Shell
+If you are working with cywin:
+- do not use the cygwin cmake
+- you must move the following cygwin executables out of the way because they are in conflict with the MS compiler:
+    mv /usr/bin/link.exe /usr/bin/_link_cygw.exe
+    mv /usr/bin/mt.exe /usr/bin/_mt_cygw.exe
+
+- setup the environment for visual studio, therefore add the following line to the cygwin.bat located in your cygwin install directory
+
+    call "C:\Programme\Microsoft Visual Studio 9.0\Common7\Tools\vsvars32.bat" 
 
 #### Build process
 Create build target directory:
@@ -53,7 +65,11 @@ Build with ide:
     cmake -G "Visual Studio 9 2008" .. 
     open Y60.sln and build it using the ide
 
-Build with nMake via shell: 
+You can also build using Visual Studio from the command line:
+
+    vcbuild Y60.sln "Release|Win32" 
+
+Build with nmake via shell: 
 
     cmake -G "NMake Makefiles" ..
     nmake
@@ -100,7 +116,7 @@ We have Homebrew [Homebrew] support. This makes installing on Mac OS X easier th
 
 #### Prerequisites:
 
-- Homebrew Installation: [Homebrew_install]
+- Homebrew Installation: [Homebrew Installation]
 
 #### Now pull the ART+COM homebrew fork:
 
@@ -134,13 +150,13 @@ The results will be y60/doc/doxygen.
 - - -
 *Copyright (c) [ART+COM AG](http://www.artcom.de/), Berlin Germany 2012 - Author: Gunnar Marten (gunnar.marten@artcom.de)*
 
-[Homebrew_install]: https://github.com/mxcl/homebrew/wiki/installation
+[Homebrew Installation]: https://github.com/mxcl/homebrew/wiki/installation
 [Homebrew]: https://github.com/mxcl/homebrew/
 [gtkmm]: https://live.gnome.org/gtkmm/MSWindows
-[y60artcomde_installer]: https://y60.artcom.de/redmine/projects/y60/files
+[Y60 Prebuild Installer]: https://y60.artcom.de/redmine/projects/y60/files
 [NSIS]: http://nsis.sourceforge.net/
-[DIRECTX_SDK]: http://www.microsoft.com/en-us/download/details.aspx?id=6812
-[ASL_github]: https://github.com/artcom/asl
-[AcMake_github]: https://github.com/artcom/acmake
-[CG_Toolkit]: http://developer.nvidia.com/cg-toolkit
-[CMAKE]: http://cmake.org/cmake/resources/software.html
+[DirectX SDK]: http://www.microsoft.com/en-us/download/details.aspx?id=6812
+[ASL]: https://github.com/artcom/asl
+[AcMake]: https://github.com/artcom/acmake
+[NVIDIA Cg Toolkit]: http://developer.nvidia.com/cg-toolkit
+[cmake]: http://cmake.org/cmake/resources/software.html
