@@ -8,10 +8,10 @@ It is open-source licensed under GPL and available for windows, linux and mac-os
 - CMake: download and install the latest installer from: [cmake]
 - Cg Toolkit: get the latest installer from [NVIDIA Cg Toolkit] or install it with your favorite package manager on your OS
 - y60 relies heavily on ASL the ART+COM Standard Library and AcMake, so you need to install or build those too. Instructions can be found in the readme at [ASL] and [AcMake]
-- windows only
--- DirectX SDK: download from [DirectX SDK]
--- get the latest dependencies: PRO60Dependencies-*.*.*-win32.exe [Y60 Prebuild Installer]
--- Nullsoft Scriptable Install System NSIS from [NSIS] (optional, only needed for building packages)
+- windows only:
+    - DirectX SDK: download from [DirectX SDK]
+    - get the latest dependencies: PRO60Dependencies-*.*.*-win32.exe [Y60 Prebuild Installer]
+    - Nullsoft Scriptable Install System NSIS from [NSIS] (optional, only needed for building packages)
 
 
 # Prebuild Windows 32 Bit binary
@@ -45,12 +45,12 @@ It is recommended to build Y60 within cygwin, but the instructions should also w
 If you are working with cywin:
 - do not use the cygwin cmake
 - you must move the following cygwin executables out of the way because they are in conflict with the MS compiler:
-    mv /usr/bin/link.exe /usr/bin/_link_cygw.exe
-    mv /usr/bin/mt.exe /usr/bin/_mt_cygw.exe
+        mv /usr/bin/link.exe /usr/bin/_link_cygw.exe
+        mv /usr/bin/mt.exe /usr/bin/_mt_cygw.exe
 
 - setup the environment for visual studio, therefore add the following line to the cygwin.bat located in your cygwin install directory
 
-    call "C:\Programme\Microsoft Visual Studio 9.0\Common7\Tools\vsvars32.bat" 
+        call "C:\Programme\Microsoft Visual Studio 9.0\Common7\Tools\vsvars32.bat" 
 
 #### Build process
 Create build target directory:
