@@ -41,10 +41,10 @@ and install them
 install Gtkmm 2.14 or higher (development package) from [gtkmm]
 
 #### Cygwin shell
-It is recommended to build Y60 within cygwin, but the instructions should also work with the Windows Command Shell
-If you are working with cywin:
+It is recommended to build Y60 within cygwin, but the instructions should also work with the Windows Command Shell.
 - do not use the cygwin cmake
 - you must move the following cygwin executables out of the way because they are in conflict with the MS compiler:
+
         mv /usr/bin/link.exe /usr/bin/_link_cygw.exe
         mv /usr/bin/mt.exe /usr/bin/_mt_cygw.exe
 
