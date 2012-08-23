@@ -122,4 +122,4 @@ ac_add_executable(
     INSTALL_COMPONENT ${RUNTIME_COMPONENT}
 )
 
-ac_end_project(Spidermonkey DONT_INSTALL)
+ac_end_project(Spidermonkey)

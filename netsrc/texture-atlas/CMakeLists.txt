@@ -30,4 +30,4 @@ ac_add_library(
 
 _ac_add_include_path(textureatlas ${CMAKE_CURRENT_BINARY_DIR}/include YES)
 
-ac_end_project(TEXTUREATLAS DONT_INSTALL)
+ac_end_project(TEXTUREATLAS)
