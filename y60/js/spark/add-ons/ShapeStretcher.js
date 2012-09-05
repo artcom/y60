@@ -151,8 +151,6 @@ spark.ShapeStretcher.Constructor = function (Protected, theShape) {
         _myNumVertices     = _myVerticesPerSide.x * _myVerticesPerSide.y;
         _myNumQuads        = _myQuadsPerSide.x * _myQuadsPerSide.y;
         _myUVCoords        = Protected.getVertexData(_myShape, 'uvset');
-        _myVerticesPerSide = new Vector2f(_myQuadsPerSide.x + 1,
-                                          _myQuadsPerSide.y + 1);
         Logger.debug("ShapeStretcher::  quadsPerSide " + _myQuadsPerSide +
                      ", verticesPerSide " + _myVerticesPerSide +
                      ", numVertices " + _myNumVertices +
