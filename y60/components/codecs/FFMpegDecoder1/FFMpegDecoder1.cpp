@@ -629,7 +629,7 @@ AC_PRINT<<"4";
             myMovie->getRasterPtr(0)->resize(getFrameWidth(), getFrameHeight());
             copyPlaneToRaster(myMovie->getRasterPtr(0)->pixels().begin(), _myFrame->data[0], _myFrame->linesize[0], getFrameWidth(), getFrameHeight());
         } else if (myVCodec->pix_fmt == PIX_FMT_BGRA && _myDestinationPixelFormat == PIX_FMT_BGRA) {
-            myMovie->getRasterPtr(0)->resize(getFrameWidth()*4, getFrameHeight());
+            myMovie->getRasterPtr(0)->resize(getFrameWidth(), getFrameHeight());
             copyPlaneToRaster(myMovie->getRasterPtr(0)->pixels().begin(), _myFrame->data[0], _myFrame->linesize[0], getFrameWidth()*4, getFrameHeight());
         } else if (myVCodec->pix_fmt == PIX_FMT_YUV420P && _myDestinationPixelFormat == PIX_FMT_YUV420P) {
             myMovie->getRasterPtr(0)->resize(getFrameWidth(), getFrameHeight());
