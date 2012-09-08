@@ -335,7 +335,7 @@ AC_PRINT<<"2";
                 if (myVCodec->pix_fmt != PIX_FMT_YUV420P) {
                     AC_WARNING<<"you're trying to use YUV2RGB shader but the source video pixel format is not YUV420p, src: " + theFilename;
                 }
-                myMovie->createRaster(myWidth, getFrameHeight(), 1, y60::GRAY);
+                myMovie->createRaster(myWidth, myHeight, 1, y60::GRAY);
                 myMovie->addRasterValue(createRasterValue( y60::GRAY, myWidth/2, myHeight/2), y60::GRAY, 1);
                 myMovie->addRasterValue(createRasterValue( y60::GRAY, myWidth/2, myHeight/2), y60::GRAY, 1);
                 break;
