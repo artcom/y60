@@ -454,6 +454,11 @@ namespace y60 {
         {
             return 2;
         }
+        // allow '\N' too
+        if (thePos + 1 < theText.size() && theText[thePos] == '\x5C' && theText[thePos+1] == '\x4E')
+        {
+            return 2;
+        }
 
         std::string myTag = extractTag(theText, thePos);
         if ( myTag == "p" || myTag == "P" || myTag == "P/" || myTag =="p/") {
