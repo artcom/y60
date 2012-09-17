@@ -97,7 +97,7 @@ spark.Text.Constructor = function (Protected) {
 
     Public.__defineSetter__("text", function (theValue) {
         if (_myLayoutHook) {
-            _myText = _myLayoutHook(theValue);
+            _myText = _myLayoutHook.apply(this, arguments);
         } else {
             _myText = theValue;
         }
@@ -106,7 +106,7 @@ spark.Text.Constructor = function (Protected) {
         }        
         Protected.render();
         if (_myTextChangedHook) {
-            _myTextChangedHook();
+            _myTextChangedHook.apply(this, arguments);
         }
     });
 
