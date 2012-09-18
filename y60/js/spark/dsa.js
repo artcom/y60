@@ -59,16 +59,12 @@
 /*jslint nomen: false*/
 /*globals spark, Logger, plug, Node*/
 
-if ("sparkDSASensoric" in this) {
-    Logger.info("DSA sensoric support enabled");
-
-    spark.enableDSASensoric = function (theSettingsFile) {
-        var myDSAConfig = new Node();
-        Logger.info("using DSA sensoric settings " + theSettingsFile);
-        myDSAConfig.parseFile(theSettingsFile);
-        plug("DSADriver", myDSAConfig);
-    };
-}
+spark.enableDSASensoric = function (theSettingsFile) {
+    var myDSAConfig = new Node();
+    Logger.info("DSA sensoric support enabled using sensoric settings " + theSettingsFile);
+    myDSAConfig.parseFile(theSettingsFile);
+    plug("DSADriver", myDSAConfig);
+};
 
 spark.DSAEvent = spark.Class("DSAEvent");
 spark.DSAEvent.TOUCH = "dsa-touch";

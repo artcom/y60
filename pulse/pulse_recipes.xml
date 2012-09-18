@@ -65,6 +65,12 @@
                 <process processor="${msbuild.pp}"/>
             </executable>
     </macro>
+    
+    <macro name="run_nmake_install">
+        <executable exe="${vs.nmake.bin}" args="install" working-dir="${build.dir}" name="install">
+            <process processor="${msbuild.pp}"/>
+        </executable>
+    </macro>
 
     <macro name="run_cpack_windows">
         <executable exe="${cpack.bin}" args="${cpack.agent.args} ${cpack.extra.args}" working-dir="${build.dir}" name="package">
@@ -135,6 +141,7 @@
             <macro-ref macro="${run_cmake}"/>
             <macro-ref macro="${run_nmake_build}"/>
             <macro-ref macro="${run_ctest}"/>
+            <macro-ref macro="${run_nmake_install}"/>
         </recipe>
 
         <recipe name="NMake Nightly">
@@ -147,6 +154,7 @@
             <macro-ref macro="${run_nmake_build}"/>
             <macro-ref macro="${run_nmake_docs}"/>
             <macro-ref macro="${run_ctest}"/>
+            <!--<macro-ref macro="${run_nmake_install}"/>-->
             <macro-ref macro="${run_cpack_windows}"/>
         </recipe>
     </scope>

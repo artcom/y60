@@ -37,9 +37,8 @@ spark.Text.Constructor = function (Protected) {
     /////////////////////
     
     Protected.handleI18nLanguage = function(e) {
-        
         applyTextItemData();
-    }
+    };
 
     function attachToI18nItem(theItemId) {
         if (_myTextItem) {
@@ -47,10 +46,8 @@ spark.Text.Constructor = function (Protected) {
                                             Protected.handleI18nLanguage);
             _myTextItem = null;
         }
-
         if (theItemId) {
             _myTextItem = Public.getI18nItemByName(theItemId);
-
             if (!_myTextItem) {
                 Logger.fatal("no i18n item named " + theItemId);
             }
@@ -64,7 +61,7 @@ spark.Text.Constructor = function (Protected) {
  
     function applyTextItemData() {
         var myNewFontStyle = _myTextItem.fontStyle;
-        if(myNewFontStyle) {
+        if (myNewFontStyle) {
             if(spark.isFontStyleNode(myNewFontStyle)) {
                 _myStyle = spark.mergeFontStyles(_myStyle, myNewFontStyle);
             }
@@ -87,7 +84,6 @@ spark.Text.Constructor = function (Protected) {
         _myMaxTextWidth =  myWidth.width;
         Public.width = myTextInfo.size.x;
         Public.height = myTextInfo.size.y;
-        
         return myTextInfo.size;
     };
     
@@ -98,9 +94,10 @@ spark.Text.Constructor = function (Protected) {
     Public.__defineGetter__("text", function () {
         return _myText;
     });
+
     Public.__defineSetter__("text", function (theValue) {
         if (_myLayoutHook) {
-            _myText = _myLayoutHook(theValue);
+            _myText = _myLayoutHook.apply(this, arguments);
         } else {
             _myText = theValue;
         }
@@ -109,7 +106,7 @@ spark.Text.Constructor = function (Protected) {
         }        
         Protected.render();
         if (_myTextChangedHook) {
-            _myTextChangedHook();
+            _myTextChangedHook.apply(this, arguments);
         }
     });
 
@@ -129,6 +126,7 @@ spark.Text.Constructor = function (Protected) {
     Public.__defineGetter__("maxTextWidth", function () {
         return _myMaxTextWidth;
     });
+
     Public.__defineGetter__("glyphPositions", function () {
         return _myGlyphPositions;
     });

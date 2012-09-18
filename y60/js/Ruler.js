@@ -127,14 +127,14 @@ Ruler.prototype.Constructor = function (Public, theSceneViewer) {
                 
                 window.getRenderer().draw(new Sphere(new Point3f(_myEndPoint), CROSS_RADIUS), CROSS_COLOR, myMatrix, 1);
                 myText = "x:" + _myEndPoint.x;
-                window.renderText(new Vector2f(_myEndPoint.x + TEXT_DISTANCE, window.height-_myEndPoint.y + TEXT_DISTANCE), myText, _myTextStyle);
+                window.renderText(new Vector2f(Math.min(_myEndPoint.x + TEXT_DISTANCE, window.width - TEXT_DISTANCE - 75), Math.min(window.height-_myEndPoint.y + TEXT_DISTANCE, window.height - 6*TEXT_DISTANCE)), myText, _myTextStyle);
                 myText = "y:" + _myEndPoint.y + "|" + (window.height-_myEndPoint.y);
-                window.renderText(new Vector2f(_myEndPoint.x + TEXT_DISTANCE, window.height-_myEndPoint.y + 2*TEXT_DISTANCE), myText, _myTextStyle);
+                window.renderText(new Vector2f(Math.min(_myEndPoint.x + TEXT_DISTANCE, window.width - TEXT_DISTANCE - 75), Math.min(window.height-_myEndPoint.y + 2*TEXT_DISTANCE, window.height - 5*TEXT_DISTANCE)), myText, _myTextStyle);
                 var myLength = magnitude(difference(_myStartPoint, _myEndPoint)).toFixed(1);
                 
                 if (_myShiftFlag) {
                     myText = "length:" +  myLength;
-                    window.renderText(new Vector2f(_myEndPoint.x + TEXT_DISTANCE, window.height-_myEndPoint.y + 4*TEXT_DISTANCE), myText, _myTextStyle);
+                    window.renderText(new Vector2f(Math.min(_myEndPoint.x + TEXT_DISTANCE, window.width - TEXT_DISTANCE - 75), Math.min(window.height-_myEndPoint.y + 4*TEXT_DISTANCE, window.height - 3*TEXT_DISTANCE)), myText, _myTextStyle);
                 } else {
                     var myAdjacentLeg = magnitude(difference(mySecondEdge, _myStartPoint));
                     var myHypotenuse = magnitude(difference(_myEndPoint, _myStartPoint));
@@ -143,11 +143,11 @@ Ruler.prototype.Constructor = function (Public, theSceneViewer) {
                     var myWidth = Math.abs(_myStartPoint.x-_myEndPoint.x);
                     var myHeight = Math.abs(_myStartPoint.y-_myEndPoint.y);
                     myText = "size:" + myWidth + "x" + myHeight; 
-                    window.renderText(new Vector2f(_myEndPoint.x + TEXT_DISTANCE, window.height-_myEndPoint.y + 4*TEXT_DISTANCE), myText, _myTextStyle);
+                    window.renderText(new Vector2f(Math.min(_myEndPoint.x + TEXT_DISTANCE, window.width - TEXT_DISTANCE - 75), Math.min(window.height-_myEndPoint.y + 4*TEXT_DISTANCE, window.height - 3*TEXT_DISTANCE)), myText, _myTextStyle);
                     myText = "length:" +  myLength;
-                    window.renderText(new Vector2f(_myEndPoint.x + TEXT_DISTANCE, window.height-_myEndPoint.y + 5*TEXT_DISTANCE), myText, _myTextStyle);
+                    window.renderText(new Vector2f(Math.min(_myEndPoint.x + TEXT_DISTANCE, window.width - TEXT_DISTANCE - 75), Math.min(window.height-_myEndPoint.y + 5*TEXT_DISTANCE, window.height - 2*TEXT_DISTANCE)), myText, _myTextStyle);
                     myText = "angle:" + myAlpha;
-                    window.renderText(new Vector2f(_myEndPoint.x + TEXT_DISTANCE, window.height-_myEndPoint.y + 6*TEXT_DISTANCE), myText, _myTextStyle);
+                    window.renderText(new Vector2f(Math.min(_myEndPoint.x + TEXT_DISTANCE, window.width - TEXT_DISTANCE - 75), Math.min(window.height-_myEndPoint.y + 6*TEXT_DISTANCE, window.height - 1*TEXT_DISTANCE)), myText, _myTextStyle);
                 }
         }
     }

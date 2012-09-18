@@ -267,7 +267,6 @@ namespace y60 {
         int myWidth = myVCodec->width;
         int myHeight = myVCodec->height;
 
-AC_PRINT<<"1";
         // pixelformat stuff
         Movie * myMovie = getMovie();
         PixelEncoding myRasterEncoding = PixelEncoding(getEnumFromString(myMovie->get<RasterPixelFormatTag>(), PixelEncodingString));
@@ -309,22 +308,21 @@ AC_PRINT<<"1";
             }
         }
 
-AC_PRINT<<"2";
         switch (myRasterEncoding) {
             case RGBA:
-                {AC_TRACE << "Using TEXTURE_IFMT_RGBA8 pixels";}
+                {AC_DEBUG << "Using TEXTURE_IFMT_RGBA8 pixels";}
                 _myDestinationPixelFormat = PIX_FMT_BGRA;
                 _myBytesPerPixel = 4;
                 myMovie->createRaster(myWidth, myHeight, 1, y60::BGRA);
                 break;
             case ALPHA:
-                {AC_TRACE << "Using GRAY pixels";}
+                {AC_DEBUG << "Using GRAY pixels";}
                 _myDestinationPixelFormat = PIX_FMT_GRAY8;
                 _myBytesPerPixel = 1;
                 myMovie->createRaster(myWidth, myHeight, 1, y60::ALPHA);
                 break;
             case GRAY:
-                {AC_TRACE << "Using GRAY pixels";}
+                {AC_DEBUG << "Using GRAY pixels";}
                 _myDestinationPixelFormat = PIX_FMT_GRAY8;
                 _myBytesPerPixel = 1;
                 myMovie->createRaster(myWidth, myHeight, 1, y60::GRAY);
@@ -335,7 +333,7 @@ AC_PRINT<<"2";
                 if (myVCodec->pix_fmt != PIX_FMT_YUV420P) {
                     AC_WARNING<<"you're trying to use YUV2RGB shader but the source video pixel format is not YUV420p, src: " + theFilename;
                 }
-                myMovie->createRaster(myWidth, getFrameHeight(), 1, y60::GRAY);
+                myMovie->createRaster(myWidth, myHeight, 1, y60::GRAY);
                 myMovie->addRasterValue(createRasterValue( y60::GRAY, myWidth/2, myHeight/2), y60::GRAY, 1);
                 myMovie->addRasterValue(createRasterValue( y60::GRAY, myWidth/2, myHeight/2), y60::GRAY, 1);
                 break;
@@ -372,7 +370,7 @@ AC_PRINT<<"2";
                 break;
             case RGB:
             default:
-                {AC_TRACE << "Using BGR pixels";}
+                {AC_DEBUG << "Using BGR pixels";}
                 _myDestinationPixelFormat = PIX_FMT_BGR24;
                 _myBytesPerPixel = 3;
                 myMovie->createRaster(myWidth, myHeight, 1, y60::BGR);
@@ -403,7 +401,6 @@ AC_PRINT<<"2";
         double myFPS;
         myFPS = av_q2d(_myVStream->r_frame_rate);
         myMovie->set<FrameRateTag>(myFPS);
-AC_PRINT<<"3";
 
         // duration
         if (myVCodec->codec_id == CODEC_ID_MPEG1VIDEO || myVCodec->codec_id == CODEC_ID_MPEG2VIDEO )
@@ -458,8 +455,6 @@ AC_PRINT<<"3";
         }
         myAspectRatio *= (float)_myVStream->codec->width / _myVStream->codec->height; 
         myMovie->set<AspectRatioTag>((float)myAspectRatio);
-AC_PRINT<<"4";
-
     }
 
     double
@@ -629,7 +624,7 @@ AC_PRINT<<"4";
             myMovie->getRasterPtr(0)->resize(getFrameWidth(), getFrameHeight());
             copyPlaneToRaster(myMovie->getRasterPtr(0)->pixels().begin(), _myFrame->data[0], _myFrame->linesize[0], getFrameWidth(), getFrameHeight());
         } else if (myVCodec->pix_fmt == PIX_FMT_BGRA && _myDestinationPixelFormat == PIX_FMT_BGRA) {
-            myMovie->getRasterPtr(0)->resize(getFrameWidth()*4, getFrameHeight());
+            myMovie->getRasterPtr(0)->resize(getFrameWidth(), getFrameHeight());
             copyPlaneToRaster(myMovie->getRasterPtr(0)->pixels().begin(), _myFrame->data[0], _myFrame->linesize[0], getFrameWidth()*4, getFrameHeight());
         } else if (myVCodec->pix_fmt == PIX_FMT_YUV420P && _myDestinationPixelFormat == PIX_FMT_YUV420P) {
             myMovie->getRasterPtr(0)->resize(getFrameWidth(), getFrameHeight());

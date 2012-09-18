@@ -172,8 +172,8 @@ SceneViewer.prototype.Constructor = function (self, theArguments) {
 
         var myViewport = self.getViewportAtWindowCoordinates(0, 0); // get viewport containing upper left pixel
         for (var i = 0; i < myText.length; ++i) {
-            window.renderText([_myStatisticPositionX ? _myStatisticPositionX : (myViewport.size[0] * window.width) - 201, _myStatisticPositionY ? _myStatisticPositionY : 19 + (i * 15)], myText[i], new Node("<style textColor='[0,0,0,1]'/>").childNode(0), "Screen13", myViewport);
-            window.renderText([_myStatisticPositionX ? _myStatisticPositionX : (myViewport.size[0] * window.width) - 200.8, _myStatisticPositionY ? _myStatisticPositionY : 19.2 + (i * 15)], myText[i], _myTextStyle, "Screen13", myViewport);
+            window.renderText([_myStatisticPositionX ? _myStatisticPositionX : (myViewport.size[0] * window.width) - 201, _myStatisticPositionY ? _myStatisticPositionY + (i * 15) : 19 + (i * 15)], myText[i], new Node("<style textColor='[0,0,0,1]'/>").childNode(0), "Screen13", myViewport);
+            window.renderText([_myStatisticPositionX ? _myStatisticPositionX : (myViewport.size[0] * window.width) - 200.8, _myStatisticPositionY ? _myStatisticPositionY + (i * 15) : 19.2 + (i * 15)], myText[i], _myTextStyle, "Screen13", myViewport);
         }
     }
 
