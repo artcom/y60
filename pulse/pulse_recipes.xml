@@ -96,6 +96,7 @@
             <macro-ref macro="${run_cmake}"/>
             <macro-ref macro="${run_gmake_build}"/>
             <macro-ref macro="${run_ctest}"/>
+            <macro-ref macro="${run_gmake_install}"/>
         </recipe>
 
         <recipe name="GMake Linux Nightly">
