@@ -28,7 +28,6 @@ spark.Window.Constructor = function (Protected, theArguments) {
     var _myCamera            = null;
     var _myWorld             = null;
     var _myPickRadius        = PICK_RADIUS;
-    var _myPickList          = {};
     var _myMultitouchCursors = {};
     
     // XXX: a somewhat hackish callback to get a hand on the scene
@@ -54,12 +53,7 @@ spark.Window.Constructor = function (Protected, theArguments) {
         if (theCursor.grabbed) {
             myWidget = theCursor.grabHolder;
         } else {
-            if (theCursor.id in _myPickList) {
-                myWidget = null; // we only want one event per cursor per frame 
-            } else {
-                myWidget = Public.pickWidget(thePosition.x, thePosition.y);
-                _myPickList[theCursor.id] = myWidget;
-            }
+            myWidget = Public.pickWidget(thePosition.x, thePosition.y);
         }
         if (!myWidget) {
             myWidget = Public;
@@ -420,7 +414,6 @@ spark.Window.Constructor = function (Protected, theArguments) {
             var myEvent = new spark.StageEvent(spark.StageEvent.FRAME, Public, theTime, theDeltaT);
             Public.dispatchEvent(myEvent);
         }
-        _myPickList = {};
     };
 
     // Will be called before rendering the frame
