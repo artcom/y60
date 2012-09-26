@@ -49,6 +49,13 @@
                 <process processor="${gcc.pp}"/>
             </make>
     </macro>
+    
+    <macro name="run_gmake_install">
+        <make args="install VERBOSE=1" working-dir="${build.dir}" name="install">
+                <process processor="${gcc.pp}"/>
+            </make>
+    </macro>
+
 
     <macro name="run_gmake_docs">
         <make args="Y60-doxygen Y60-jsapi Y60-jsdoc" working-dir="${build.dir}" name="documentation"/>
@@ -98,19 +105,23 @@
 
         <recipe name="GMake Linux Continuous">
             <property name="cmake.generator" value="Unix Makefiles"/>
+            <property name="cmake.recipe.args" value="${cmake.recipe.args} -D CMAKE_INSTALL_PREFIX=${build.installprefix}"/>
 
             <macro-ref macro="${run_cmake}"/>
             <macro-ref macro="${run_gmake_build}"/>
             <macro-ref macro="${run_ctest}"/>
+            <macro-ref macro="${run_gmake_install}"/>
         </recipe>
 
         <recipe name="GMake Linux Nightly">
             <property name="cmake.generator" value="Unix Makefiles"/>
+            <property name="cmake.recipe.args" value="${cmake.recipe.args} -D CMAKE_INSTALL_PREFIX=${build.installprefix}"/>
 
             <macro-ref macro="${run_cmake}"/>
             <macro-ref macro="${run_gmake_build}"/>
             <macro-ref macro="${run_gmake_docs}"/>
             <macro-ref macro="${run_ctest}"/>
+            <macro-ref macro="${run_gmake_install}"/>
             <macro-ref macro="${run_cpack_linux}"/>
         </recipe>
 
