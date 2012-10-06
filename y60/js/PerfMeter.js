@@ -287,11 +287,10 @@ PerfMeter.prototype.Constructor = function (self, theSceneViewer) {
         }
         var i, myTiming, myPosition;
         var myViewport = _mySceneViewer.getViewportAtWindowCoordinates(0, 0); // get viewport containing upper left pixel
-
         for (i = 0; i < _myTimings.length; i++) {
             myTiming = _myTimings[i];
-            myPosition = sum(_myOverlay.position, new Vector2f(-280, BOX_HEIGHT + -(_myTimings.length - i) * 14));
-            var myTextColor = new Vector4f(myTiming.color);            
+            myPosition = sum(_myOverlay.position, new Vector2f(- Math.min(_myOverlay.position.x, 280), BOX_HEIGHT + -(_myTimings.length - i) * 14));
+            var myTextColor = new Vector4f(myTiming.color); 
             window.renderText(myPosition, myTiming.name + "=" + (myTiming.time * 1000).toFixed(1) + "ms", new Node("<style textColor='" + myTextColor + "'/>"), "Screen13", myViewport);
         }
         
