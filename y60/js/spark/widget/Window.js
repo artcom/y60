@@ -402,8 +402,10 @@ spark.Window.Constructor = function (Protected, theArguments) {
 
     //  Will be called before onFrame, has the time since application start
     Public.onProtoFrame = function (theTime) {
-        var myEvent = new spark.StageEvent(spark.StageEvent.PROTO_FRAME, Public, theTime);
-        Public.dispatchEvent(myEvent);
+        if (Public.hasEventListenersWithType(spark.StageEvent.PROTO_FRAME)) {
+            var myEvent = new spark.StageEvent(spark.StageEvent.PROTO_FRAME, Public, theTime);
+            Public.dispatchEvent(myEvent);
+        }
     };
 
     //  Will be called first in renderloop, has the time since application start
@@ -420,16 +422,20 @@ spark.Window.Constructor = function (Protected, theArguments) {
     Base.onPreRender = Public.onPreRender;
     Public.onPreRender = function () {
         Base.onPreRender();
-        var myEvent = new spark.StageEvent(spark.StageEvent.PRE_RENDER, Public);
-        Public.dispatchEvent(myEvent);
+        if (Public.hasEventListenersWithType(spark.StageEvent.PRE_RENDER)) {
+            var myEvent = new spark.StageEvent(spark.StageEvent.PRE_RENDER, Public);
+            Public.dispatchEvent(myEvent);
+        }
     };
 
     // Will be called after rendering the frame, but before swap buffer
     Base.onPostRender = Public.onPostRender;
     Public.onPostRender = function () {
         Base.onPostRender();
-        var myEvent = new spark.StageEvent(spark.StageEvent.POST_RENDER, Public);
-        Public.dispatchEvent(myEvent);
+        if (Public.hasEventListenersWithType(spark.StageEvent.POST_RENDER)) {
+            var myEvent = new spark.StageEvent(spark.StageEvent.POST_RENDER, Public);
+            Public.dispatchEvent(myEvent);
+        }
     };
 
     // Will be called on a mouse move
