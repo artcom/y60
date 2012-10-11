@@ -55,7 +55,11 @@ spark.StretchyImage.Constructor = function (Protected) {
         _myShapeStretcher.setupGeometry(_myImageSize, Public.origin);
         _myShapeStretcher.updateGeometry(Public.size, false, Public.origin);
     }
-    
+
+    function _applySize(theValue) {
+        _myShapeStretcher.updateGeometry(Public.size, false, Public.origin);
+    }
+
     ////////////////////
     // Public Methods //
     ////////////////////
@@ -125,35 +129,12 @@ spark.StretchyImage.Constructor = function (Protected) {
             _myShapeStretcher.setupGeometry(_myImageSize, Public.origin);
             _myShapeStretcher.updateGeometry(Public.size, false, Public.origin);
         });
-
-        Base.widthSetter = Public.__lookupSetter__("width");
-        Public.__defineSetter__("width", function (theWidth) {
-            Base.widthSetter(theWidth);
-            _myShapeStretcher.updateGeometry(new Vector2f(theWidth, Public.height), false, Public.origin);
-        });
-
-        Base.heightSetter = Public.__lookupSetter__("height");
-        Public.__defineSetter__("height", function (theHeight) {
-            Base.heightSetter(theHeight);
-            _myShapeStretcher.updateGeometry(new Vector2f(Public.width, theHeight), false, Public.origin);
-        });
-        
-        Base.originXSetter = Public.__lookupSetter__("originX");
-        Public.__defineSetter__("originX", function (theOriginX) {
-            Base.originXSetter(theOriginX);
-            _myShapeStretcher.updateGeometry(Public.size, false, Public.origin);
-        });
-        Base.originYSetter = Public.__lookupSetter__("originY");
-        Public.__defineSetter__("originY", function (theOriginY) {
-            Base.originYSetter(theOriginY);
-            _myShapeStretcher.updateGeometry(Public.size, false, Public.origin);
-        });
-        Base.originZSetter = Public.__lookupSetter__("originZ");
-        Public.__defineSetter__("originZ", function (theOriginZ) {
-            Base.originZSetter(theOriginZ);
-            _myShapeStretcher.updateGeometry(Public.size, false, Public.origin);
-        });
-
+        var pToOverride = {height:true, width:true, originX:true, originY:true, originZ:true};
+        for (var p in pToOverride) {
+            js.array.filter(Public._properties_, function (theItem, i, theArray) {
+                return theItem.name === p;
+            })[0].handler = _applySize;
+        }
         _myShapeStretcher.initialize(Public.node?Public.node:new Node("<StretchyImage/>"));
         _resetShapeStretcher();
     };
