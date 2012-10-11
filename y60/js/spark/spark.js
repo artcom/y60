@@ -82,6 +82,8 @@ spark.findRootElement = function (theDocument) {
     return myRoot;
 };
 
+spark.CALL_PROPERTY_HANDLER_ON_CHANGE = 1;
+spark.CALL_PROPERTY_HANDLER_ON_CALL   = 0;
 // component instantiator
 use("meta.js");
 // spark file (and dom) loader

@@ -222,7 +222,7 @@ function Inherit(theClass) {
 function Initialize(theNode) {
     var myProps = this._properties_;
 
-    for (var i = 0; i < myProps.length; i++) {
+    for (var i = 0, l = myProps.length; i < l; ++i) {
         var myProp = myProps[i];
         var myName = myProp.name;
         if (myName in theNode) {
@@ -327,45 +327,41 @@ function convertToString(theType, theValue) {
  *     Allows getting the property value in string form.
  * 
  */
- const CALL_HANDLER_ON_CHANGE = 1;
- const CALL_HANDLER_ON_CALL   = 0;
+
 function Property(theName, theType, theDefault, theHandler, theOnChangePolicy) {
-    var myProperty = {};
+    var that = this;
+    var _myValue = theDefault;
 
-    var myValue = theDefault;
-    var myOnChangePolicy = theOnChangePolicy || CALL_HANDLER_ON_CALL;
+    var myProperty = {
+        name : theName,
+        type : theType,
+        handler : theHandler,
+        onchange_policy : theOnChangePolicy || spark.CALL_PROPERTY_HANDLER_ON_CALL,
+        setter : function (theValue) {
+                     if (myProperty.onchange_policy === spark.CALL_PROPERTY_HANDLER_ON_CHANGE && _myValue === theValue) {
+                         return;
+                     }
+                     myProperty.dirty = true;
+                     _myValue = theValue;
+                     if (myProperty.handler) {
+                         myProperty.handler.call(that, _myValue);
+                     }
+                 },
+        setFromString : function (theString) {
+                            var myNewValue = convertFromString(myProperty.type, theString);
+                            myProperty.setter(myNewValue);
+                        },
+        getAsString : function () {
+                         return convertToString(myProperty.type, _myValue);
+                      }
+    };
+
     
-    this.Getter(theName, function () {
-        return myValue;
+    that.Getter(theName, function () {
+        return _myValue;
     });
 
-    this.Setter(theName, function (theValue) {
-        if (myOnChangePolicy == CALL_HANDLER_ON_CHANGE && myValue == theValue) {
-            return;
-        }
-        myValue = theValue;
-        if (theHandler) {
-            theHandler(myValue);
-        }
-    });
-
-    myProperty.name = theName;
-
-    myProperty.setFromString = function (theString) {
-        var myNewValue = convertFromString(theType, theString);
-        if (myOnChangePolicy == CALL_HANDLER_ON_CHANGE && myValue == myNewValue) {
-            return;
-        }
-        myValue = myNewValue
-        
-        if (theHandler) {
-            theHandler(myValue);
-        }
-    };
-
-    myProperty.getAsString = function () {
-        return convertToString(theType, myValue);
-    };
+    that.Setter(theName, myProperty.setter);
 
     this._properties_.push(myProperty);
 }
