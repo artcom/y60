@@ -734,6 +734,10 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         }
     };
 
+    self.onPreRender = function () {
+    };
+
+
     self.onPostRender = function() {
         if (_myDrawCameraFrustumFlag) {
             self.drawCameraFrustums();
