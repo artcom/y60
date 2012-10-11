@@ -196,41 +196,39 @@ spark.DefaultShapeStretcher.Constructor = function (Protected, theShape) {
         var myOrigin = theOrigin;
         var v = 0;
         
-        for (var i = 0; i < Protected.verticesPerSide.y; ++i) {
-            for (var j = 0; j < Protected.verticesPerSide.x; ++j) {
+        for (var i = 0, l = Protected.verticesPerSide.y; i < l; ++i) {
+            for (var j = 0, ll = Protected.verticesPerSide.x; j < ll; ++j) {
                 v = i * Protected.verticesPerSide.x + j;
                 var myX = -myOrigin.x;
                 var myY = -myOrigin.y;
                 var myCropX = 0;
                 var myCropY = 0;
                 if (j === 0) {
-                    myX = -myOrigin.x;
                     myCropX = Public.crop.left;
                 } else if (j === Protected.verticesPerSide.x - 3) {
-                    myX = -myOrigin.x + clamp(Public.edges.left +
+                    myX += clamp(Public.edges.left +
                           spark.ShapeStretcher.applyEdgeFilteringOffset(Public.edges.left),0,myWidth);
                     myCropX = Public.crop.left;
                 } else if (j === Protected.verticesPerSide.x - 2) {
-                    myX = -myOrigin.x + clamp(myWidth - Public.edges.right -
+                    myX += clamp(myWidth - Public.edges.right -
                           spark.ShapeStretcher.applyEdgeFilteringOffset(Public.edges.right),Math.min(Public.edges.left,myWidth),myWidth);
                     myCropX = -Public.crop.right;
-                } else if (j === Protected.verticesPerSide.x - 1) {
-                    myX = -myOrigin.x + clamp(myWidth,Math.min(Public.edges.left,myWidth),myWidth);
+                } else {
+                    myX += clamp(myWidth,Math.min(Public.edges.left,myWidth),myWidth);
                     myCropX = -Public.crop.right;
                 }
                 if (i === 0) {
-                    myY = -myOrigin.y;
                     myCropY = Public.crop.bottom;
                 } else if (i === Protected.verticesPerSide.y - 3) {
-                    myY = -myOrigin.y + clamp(Public.edges.bottom +
+                    myY += clamp(Public.edges.bottom +
                           spark.ShapeStretcher.applyEdgeFilteringOffset(Public.edges.bottom),0,myHeight);
                     myCropY = Public.crop.bottom;
                 } else if (i === Protected.verticesPerSide.y - 2) {
-                    myY = -myOrigin.y + clamp(myHeight - Public.edges.top -
+                    myY += clamp(myHeight - Public.edges.top -
                           spark.ShapeStretcher.applyEdgeFilteringOffset(Public.edges.top),Math.min(Public.edges.bottom,myHeight),myHeight);
                     myCropY = -Public.crop.top;
-                } else if (i === Protected.verticesPerSide.y - 1) {
-                    myY = -myOrigin.y + clamp(myHeight,Math.min(Public.edges.bottom,myHeight),myHeight);
+                } else {
+                    myY += clamp(myHeight,Math.min(Public.edges.bottom,myHeight),myHeight);
                     myCropY = -Public.crop.top;
                 }
                 Protected.vertices[v] = [myX, myY, 0];
