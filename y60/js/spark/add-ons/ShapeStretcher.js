@@ -189,55 +189,108 @@ spark.DefaultShapeStretcher.Constructor = function (Protected, theShape) {
     ////////////////////
     // Public Methods //
     ////////////////////
-    
-    Public.updateGeometry = function (theSize, theUVCoordFlag, theOrigin) {
-        var myWidth  = theSize.x;
-        var myHeight = theSize.y;
-        var myOrigin = theOrigin;
-        var v = 0;
-        
-        for (var i = 0, l = Protected.verticesPerSide.y; i < l; ++i) {
-            for (var j = 0, ll = Protected.verticesPerSide.x; j < ll; ++j) {
-                v = i * Protected.verticesPerSide.x + j;
-                var myX = -myOrigin.x;
-                var myY = -myOrigin.y;
-                var myCropX = 0;
-                var myCropY = 0;
-                if (j === 0) {
-                    myCropX = Public.crop.left;
-                } else if (j === Protected.verticesPerSide.x - 3) {
-                    myX += clamp(Public.edges.left +
-                          spark.ShapeStretcher.applyEdgeFilteringOffset(Public.edges.left),0,myWidth);
-                    myCropX = Public.crop.left;
-                } else if (j === Protected.verticesPerSide.x - 2) {
-                    myX += clamp(myWidth - Public.edges.right -
-                          spark.ShapeStretcher.applyEdgeFilteringOffset(Public.edges.right),Math.min(Public.edges.left,myWidth),myWidth);
-                    myCropX = -Public.crop.right;
-                } else {
-                    myX += clamp(myWidth,Math.min(Public.edges.left,myWidth),myWidth);
-                    myCropX = -Public.crop.right;
-                }
-                if (i === 0) {
-                    myCropY = Public.crop.bottom;
-                } else if (i === Protected.verticesPerSide.y - 3) {
-                    myY += clamp(Public.edges.bottom +
-                          spark.ShapeStretcher.applyEdgeFilteringOffset(Public.edges.bottom),0,myHeight);
-                    myCropY = Public.crop.bottom;
-                } else if (i === Protected.verticesPerSide.y - 2) {
-                    myY += clamp(myHeight - Public.edges.top -
-                          spark.ShapeStretcher.applyEdgeFilteringOffset(Public.edges.top),Math.min(Public.edges.bottom,myHeight),myHeight);
-                    myCropY = -Public.crop.top;
-                } else {
-                    myY += clamp(myHeight,Math.min(Public.edges.bottom,myHeight),myHeight);
-                    myCropY = -Public.crop.top;
-                }
-                Protected.vertices[v] = [myX, myY, 0];
-                if (theUVCoordFlag) {
-                    Protected.uvcoords[v] = [(myWidth > 0 ? (myX + myCropX + myOrigin.x) / myWidth : 0),
-                                      (myHeight > 0 ? 1 - (myY + myCropY + myOrigin.y) / myHeight : 0)];
-                }
-            }
+
+    function setVertices (index, x, y, w, h, ox, oy, cx, cy, theUVCoordFlag) {
+        Protected.vertices[index] = [x, y, 0];
+        if (theUVCoordFlag) {
+            Protected.uvcoords[index] = [(w > 0 ? (x + cx + ox) / w : 0),
+                              (h > 0 ? 1 - (y + cy + oy) / h : 0)];
+        }
+    }
+
+    Base.initialize = Public.initialize;
+    Public.initialize = function (theNode) {
+        Base.initialize(theNode);
+        if (Protected.verticesPerSide.x === 4 && Protected.verticesPerSide.y === 4) {
+            Public.updateGeometry = updateGeometry4x4;
+        } else if (Protected.verticesPerSide.x === 4 && Protected.verticesPerSide.y === 2) {
+            Public.updateGeometry = updateGeometry4x2;
+        } else if (Protected.verticesPerSide.x === 2 && Protected.verticesPerSide.y === 4) {
+            Public.updateGeometry = updateGeometry2x4;
+        } else if (Protected.verticesPerSide.x !== 2 && Protected.verticesPerSide.y !== 2) {
+            Logger.error("the default shapestretcher only supports 4x4,2x4,4x2,2,2 vertices per side");
         }
     };
+
+    function updateGeometry4x4 (theSize, theUVCoordFlag, theOrigin) {
+        var myWidth  = theSize.x;
+        var myHeight = theSize.y;
+        var myOriginX = theOrigin.x;
+        var myOriginY = theOrigin.y;
+        var myX0 = -myOriginX;
+        var myX1 = -myOriginX + clamp(Public.edges.left +
+                   spark.ShapeStretcher.applyEdgeFilteringOffset(Public.edges.left),0,myWidth);
+        var myX2 = -myOriginX + clamp(myWidth - Public.edges.right -
+                   spark.ShapeStretcher.applyEdgeFilteringOffset(Public.edges.right),Math.min(Public.edges.left,myWidth),myWidth);
+        var myX3 = -myOriginX + clamp(myWidth,Math.min(Public.edges.left,myWidth),myWidth);
+        var myY0 = -myOriginY;
+        var myY1 = -myOriginY + clamp(Public.edges.bottom +
+                   spark.ShapeStretcher.applyEdgeFilteringOffset(Public.edges.bottom),0,myHeight);
+        var myY2 = -myOriginY + clamp(myHeight - Public.edges.top -
+                   spark.ShapeStretcher.applyEdgeFilteringOffset(Public.edges.top),Math.min(Public.edges.bottom,myHeight),myHeight);
+        var myY3 = -myOriginY + clamp(myHeight,Math.min(Public.edges.bottom,myHeight),myHeight);
+        setVertices(0, myX0, myY0, myWidth, myHeight, myOriginX, myOriginY, Public.crop.left, Public.crop.bottom, theUVCoordFlag);
+        setVertices(1, myX1, myY0, myWidth, myHeight, myOriginX, myOriginY, Public.crop.left, Public.crop.bottom, theUVCoordFlag);
+        setVertices(2, myX2, myY0, myWidth, myHeight, myOriginX, myOriginY, -Public.crop.right, Public.crop.bottom, theUVCoordFlag);
+        setVertices(3, myX3, myY0, myWidth, myHeight, myOriginX, myOriginY, -Public.crop.right, Public.crop.bottom, theUVCoordFlag);
+        setVertices(4, myX0, myY1, myWidth, myHeight, myOriginX, myOriginY, Public.crop.left, Public.crop.bottom, theUVCoordFlag);
+        setVertices(5, myX1, myY1, myWidth, myHeight, myOriginX, myOriginY, Public.crop.left, Public.crop.bottom, theUVCoordFlag);
+        setVertices(6, myX2, myY1, myWidth, myHeight, myOriginX, myOriginY, -Public.crop.right, Public.crop.bottom, theUVCoordFlag);
+        setVertices(7, myX3, myY1, myWidth, myHeight, myOriginX, myOriginY, -Public.crop.right, Public.crop.bottom, theUVCoordFlag);
+        setVertices(8, myX0, myY2, myWidth, myHeight, myOriginX, myOriginY, Public.crop.left, -Public.crop.top, theUVCoordFlag);
+        setVertices(9, myX1, myY2, myWidth, myHeight, myOriginX, myOriginY, Public.crop.left, -Public.crop.top, theUVCoordFlag);
+        setVertices(10, myX2, myY2, myWidth, myHeight, myOriginX, myOriginY, -Public.crop.right, -Public.crop.top, theUVCoordFlag);
+        setVertices(11, myX3, myY2, myWidth, myHeight, myOriginX, myOriginY, -Public.crop.right, -Public.crop.top, theUVCoordFlag);
+        setVertices(12, myX0, myY3, myWidth, myHeight, myOriginX, myOriginY, Public.crop.left, -Public.crop.top, theUVCoordFlag);
+        setVertices(13, myX1, myY3, myWidth, myHeight, myOriginX, myOriginY, Public.crop.left, -Public.crop.top, theUVCoordFlag);
+        setVertices(14, myX2, myY3, myWidth, myHeight, myOriginX, myOriginY, -Public.crop.right, -Public.crop.top, theUVCoordFlag);
+        setVertices(15, myX3, myY3, myWidth, myHeight, myOriginX, myOriginY, -Public.crop.right, -Public.crop.top, theUVCoordFlag);
+    }
+
+    function updateGeometry4x2 (theSize, theUVCoordFlag, theOrigin) {
+        var myWidth  = theSize.x;
+        var myHeight = theSize.y;
+        var myOriginX = theOrigin.x;
+        var myOriginY = theOrigin.y;
+        var myX0 = -myOriginX;
+        var myX1 = -myOriginX + clamp(Public.edges.left +
+                   spark.ShapeStretcher.applyEdgeFilteringOffset(Public.edges.left),0,myWidth);
+        var myX2 = -myOriginX + clamp(myWidth - Public.edges.right -
+                   spark.ShapeStretcher.applyEdgeFilteringOffset(Public.edges.right),Math.min(Public.edges.left,myWidth),myWidth);
+        var myX3 = -myOriginX + clamp(myWidth,Math.min(Public.edges.left,myWidth),myWidth);
+        var myY0 = -myOriginY;
+        var myY1 = -myOriginY + clamp(myHeight,Math.min(Public.edges.bottom,myHeight),myHeight);
+        setVertices(0, myX0, myY0, myWidth, myHeight, myOriginX, myOriginY, Public.crop.left, Public.crop.bottom, theUVCoordFlag);
+        setVertices(1, myX1, myY0, myWidth, myHeight, myOriginX, myOriginY, Public.crop.left, Public.crop.bottom, theUVCoordFlag);
+        setVertices(2, myX2, myY0, myWidth, myHeight, myOriginX, myOriginY, -Public.crop.right, Public.crop.bottom, theUVCoordFlag);
+        setVertices(3, myX3, myY0, myWidth, myHeight, myOriginX, myOriginY, -Public.crop.right, Public.crop.bottom, theUVCoordFlag);
+        setVertices(4, myX0, myY1, myWidth, myHeight, myOriginX, myOriginY, Public.crop.left, -Public.crop.top, theUVCoordFlag);
+        setVertices(5, myX1, myY1, myWidth, myHeight, myOriginX, myOriginY, Public.crop.left, -Public.crop.top, theUVCoordFlag);
+        setVertices(6, myX2, myY1, myWidth, myHeight, myOriginX, myOriginY, -Public.crop.right, -Public.crop.top, theUVCoordFlag);
+        setVertices(7, myX3, myY1, myWidth, myHeight, myOriginX, myOriginY, -Public.crop.right, -Public.crop.top, theUVCoordFlag);
+    }
+
+    function updateGeometry2x4 (theSize, theUVCoordFlag, theOrigin) {
+        var myWidth  = theSize.x;
+        var myHeight = theSize.y;
+        var myOriginX = theOrigin.x;
+        var myOriginY = theOrigin.y;
+        var myX0 = -myOriginX;
+        var myX1 = -myOriginX + clamp(myWidth,Math.min(Public.edges.left,myWidth),myWidth);
+        var myY0 = -myOriginY;
+        var myY1 = -myOriginY + clamp(Public.edges.bottom +
+                   spark.ShapeStretcher.applyEdgeFilteringOffset(Public.edges.bottom),0,myHeight);
+        var myY2 = -myOriginY + clamp(myHeight - Public.edges.top -
+                   spark.ShapeStretcher.applyEdgeFilteringOffset(Public.edges.top),Math.min(Public.edges.bottom,myHeight),myHeight);
+        var myY3 = -myOriginY + clamp(myHeight,Math.min(Public.edges.bottom,myHeight),myHeight);
+        setVertices(0, myX0, myY0, myWidth, myHeight, myOriginX, myOriginY, Public.crop.left, Public.crop.bottom, theUVCoordFlag);
+        setVertices(1, myX1, myY0, myWidth, myHeight, myOriginX, myOriginY, -Public.crop.right, Public.crop.bottom, theUVCoordFlag);
+        setVertices(2, myX0, myY1, myWidth, myHeight, myOriginX, myOriginY, Public.crop.left, Public.crop.bottom, theUVCoordFlag);
+        setVertices(3, myX1, myY1, myWidth, myHeight, myOriginX, myOriginY, -Public.crop.right, Public.crop.bottom, theUVCoordFlag);
+        setVertices(4, myX0, myY2, myWidth, myHeight, myOriginX, myOriginY, Public.crop.left, -Public.crop.top, theUVCoordFlag);
+        setVertices(5, myX1, myY2, myWidth, myHeight, myOriginX, myOriginY, -Public.crop.right, -Public.crop.top, theUVCoordFlag);
+        setVertices(6, myX0, myY3, myWidth, myHeight, myOriginX, myOriginY, Public.crop.left, -Public.crop.top, theUVCoordFlag);
+        setVertices(7, myX1, myY3, myWidth, myHeight, myOriginX, myOriginY, -Public.crop.right, -Public.crop.top, theUVCoordFlag);
+    }
 };
 
