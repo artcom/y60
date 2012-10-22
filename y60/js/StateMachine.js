@@ -235,6 +235,7 @@ var SM = (function () {
                 Logger.debug("dropped " + arguments[0] + " during handleEvent: because current state is null");
                 return;
             }
+            Logger.trace("<StateMachine::handleEvent> got event " + arguments[0]);
             var nextState = null;
             if (arguments[0] in self.stateObject.handler) {
                 nextState = self.stateObject.handler[arguments[0]].apply(self.stateObject, arguments);
