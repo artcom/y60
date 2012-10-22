@@ -80,7 +80,7 @@ spark.I18nContext.Constructor = function (Protected) {
     });
     
     Public.switchLanguage = function (theLanguage) {
-        Logger.info("I18n context " + Public.name + " switching to language " + theLanguage + " _myLanguage: " + _myLanguage);
+        Logger.info("I18n context " + Public.name + " switching to language " + theLanguage + " current language: " + _myLanguage);
         if (theLanguage !== _myLanguage) {
             _myLanguage = theLanguage;
             var myChildren = Public.children;
