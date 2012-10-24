@@ -138,8 +138,8 @@ StatusServer::processData() {
                                  + string(" builddate: ") + myBuildDate + string(" ") + myBuildTime
                                  + string(" ") + myCompiler + string(":") + myCompilerVersion;
             std::string myStatusText = readStatusText();
-            if (myText == "" && !myStatusText.empty()) {
-                myText = myStatusText;
+            if (!myStatusText.empty()) {
+                myText += ", status: " + myStatusText;
             }
             myText += ", perf: "+asl::as_string(myElapsed);
             sendResponseBody(myText);
