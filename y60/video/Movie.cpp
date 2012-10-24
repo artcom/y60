@@ -429,12 +429,22 @@ namespace y60 {
         std::string myDecoderHint = get<DecoderHintTag>();
         std::string myFileExtension = asl::toLowerCase(asl::getExtension(theFilename));
 
+        if (!myDecoderHint.empty()) {
+            std::vector<MovieDecoderBasePtr>::iterator it;
+            for(it = myDecoders.begin(); it != myDecoders.end(); ++it) {
+                AC_DEBUG << "possible decoder " << (*it)->getName();
+                if ((*it)->getName() == myDecoderHint) {
+                    myDecoder = (*it);
+                    break;
+                }
+            }
+        }
         // no decoder initialized or no decoder for filetype found
-        if (myDecoders.size() == 0) {
+        if (!myDecoder) {
             if (myFileExtension == "m60") {
                 return MovieDecoderBasePtr(new M60Decoder());
             } else {
-                if (myDecoderHint == "" ) { 
+                if (myDecoderHint.empty()) { 
                     myDecoderHint = "FFMpegDecoder2";
                 }
                 asl::PlugInBasePtr myPlugIn =
@@ -442,7 +452,10 @@ namespace y60 {
                 if (IDecoderPtr myDecoderPlug = dynamic_cast_Ptr<IDecoder>(myPlugIn)) {
                     AC_DEBUG << "Plug: " << myDecoderHint << ": as Decoder" << endl;
                     DecoderManager::get().addDecoder(myDecoderPlug);
-                    myDecoder = DecoderManager::get().findDecoder<MovieDecoderBase>(theFilename);
+                    myDecoder = dynamic_cast_Ptr<MovieDecoderBase>(myDecoderPlug);
+                    if (myDecoder && myDecoder->canDecode(theFilename).empty()) {
+                        myDecoder = asl::Ptr<MovieDecoderBase>();
+                    }
                     if (!myDecoder) {
                         throw MovieException(std::string("Sorry, could not find decoder for: ")
                             + theFilename, PLUS_FILE_LINE);
@@ -452,17 +465,6 @@ namespace y60 {
                         + myDecoderHint, PLUS_FILE_LINE);
                 }
             }
-        } else if (myDecoderHint != "") {
-            std::vector<MovieDecoderBasePtr>::iterator it;
-            for(it = myDecoders.begin(); it != myDecoders.end(); ++it) {
-                AC_DEBUG << "possible decoder " << (*it)->getName();
-                if ((*it)->getName() == myDecoderHint) {
-                    myDecoder = (*it);
-                    break;
-                }
-            }
-        } else {
-            myDecoder = *(myDecoders.begin());
         }
         return myDecoder->instance();
     }
