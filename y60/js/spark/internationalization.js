@@ -80,7 +80,7 @@ spark.I18nContext.Constructor = function (Protected) {
     });
     
     Public.switchLanguage = function (theLanguage) {
-        Logger.info("I18n context " + Public.name + " switching to language " + theLanguage + " current language: " + _myLanguage);
+        Logger.info("I18n context " + Public.name + " switching to language: '" + theLanguage + "' current language: '" + _myLanguage + "'");
         if (theLanguage !== _myLanguage) {
             _myLanguage = theLanguage;
             var myChildren = Public.children;
@@ -197,7 +197,7 @@ spark.I18nItem.Constructor = function (Protected) {
             theLanguage = _myLanguage;
         }
         if(!(theLanguage in _myLanguageNodes)) {
-            Logger.info("I18n item '" + Public.name + "' does not contain language '" + theLanguage + "'");
+            Logger.debug("I18n item '" + Public.name + "' does not contain language '" + theLanguage + "'");
             if (Public.parent.defaultLanguage in _myLanguageNodes) {
                 return _myLanguageNodes[Public.parent.defaultLanguage];
             } else {
@@ -220,10 +220,10 @@ spark.I18nItem.Constructor = function (Protected) {
 
         // XXX; one of these tests is redundant now
         if (!(theLanguage in _myLanguageData)) {
-            Logger.debug("I18n item " + Public.name + " does not contain language " + theLanguage);
+            Logger.debug("I18n item '" + Public.name + "' does not contain language '" + theLanguage + "'");
         }
         if(!(theLanguage in _myLanguageNodes)) {
-            Logger.debug("I18n item " + Public.name + " does not contain language node " + theLanguage);
+            Logger.debug("I18n item '" + Public.name + "' does not contain language node '" + theLanguage + "'");
         }
         _myLanguage = theLanguage;
         var myEvent = Protected.createEvent(theLanguage);
@@ -232,21 +232,21 @@ spark.I18nItem.Constructor = function (Protected) {
 
     Public.addLanguageData = function (theLanguage, theData) {
         if (theLanguage in _myLanguageData) {
-            Logger.warning("duplicate i18n data for item " + Public.name + " in language " + theLanguage);
+            Logger.warning("duplicate i18n data for item '" + Public.name + "' in language '" + theLanguage + "'");
         }
         _myLanguageData[theLanguage] = theData;
     };
     	   
     Public.addLanguageNode = function(theLanguage, theNode) {
         if(theLanguage in _myLanguageNodes) {
-            Logger.warning("duplicate i18n node for item " + Public.name + " in language " + theLanguage);
+            Logger.warning("duplicate i18n node for item '" + Public.name + "' in language '" + theLanguage + "'");
         }
         _myLanguageNodes[theLanguage] = theNode;
     };
 
     Public.changeLanguageData = function (theLanguage, theData) {
         if (theLanguage in _myLanguageData) {
-            Logger.info("overwrite i18n data for item " + Public.name + " in language " + theLanguage);
+            Logger.debug("overwrite i18n data for item '" + Public.name + "' in language '" + theLanguage + "'");
         }
         _myLanguageData[theLanguage] = theData;
         var myEvent = Protected.createEvent(theLanguage);
