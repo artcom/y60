@@ -86,17 +86,13 @@ void DSADriver::onUpdateSettings(dom::NodePtr theConfiguration) {
         for (unsigned i = 0; i < myPortsNode->childNodesLength("Port"); ++i) {
             const dom::NodePtr & myPortNode = myPortsNode->childNode("Port", i);
             unsigned myPortID = asl::as<int>(myPortNode->getAttribute("id")->nodeValue());
-            unsigned myComPort = asl::as<int>(myPortNode->getAttribute("comport")->nodeValue());
             unsigned myBaudRate = asl::as<int>(myPortNode->getAttribute("baudrate")->nodeValue());
+            std::string myComPort = myPortNode->getAttribute("comport")->nodeValue();
 
             AC_DEBUG << "DSADriver: Port=" << myPortID << " on comport=" << myComPort << " @ " << myBaudRate;
-            try {
-                SensorServerPtr mySensorServer(new SensorServer(myComPort, myBaudRate));
-                _mySensorServers[myPortID] = mySensorServer;
-            } catch (asl::SerialPortException & e) {
-                AC_WARNING << "DSADriver: Could not open com port in " << __FILE__ << ", "
-                     << __LINE__ << ". Message was " << e.what();
-            }
+            SensorServerPtr mySensorServer(new SensorServer());
+            mySensorServer->openDevice(myComPort, myBaudRate);
+            _mySensorServers[myPortID] = mySensorServer;
         }
     }
 

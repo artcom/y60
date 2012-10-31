@@ -69,16 +69,27 @@
 
 #include <asl/serial/SerialDeviceFactory.h>
 #include <asl/base/Logger.h>
+#include <asl/base/string_functions.h>
 #include <sstream>
 #include <memory>
 
 using namespace std;
 
-SensorServer::SensorServer(unsigned theComPort, unsigned theBaudRate) {
-    _myComPort = asl::Ptr<asl::SerialDevice>(asl::getSerialDevice(theComPort));
-    _myComPort->open(theBaudRate, 8, asl::SerialDevice::NO_PARITY, 1);
+SensorServer::SensorServer() {
 }
 
+void
+SensorServer::openDevice(const std::string & theComPort, unsigned theBaudRate) {
+    unsigned port = -1;
+    asl::SerialDevice * myComPort = 0;
+    if (asl::is_decimal_number(theComPort, port)) {
+        myComPort = asl::getSerialDevice(port);
+    } else {
+        myComPort = asl::getSerialDeviceByName(theComPort);
+    }
+    _myComPort = asl::Ptr<asl::SerialDevice>(myComPort);
+    _myComPort->open(theBaudRate, 8, asl::SerialDevice::NO_PARITY, 1);
+}
 
 void
 SensorServer::parseLine(const string & theLine, unsigned & theController, unsigned & theBitMask) {

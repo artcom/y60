@@ -79,10 +79,11 @@
 
 class SensorServer {
 public:
-    SensorServer(unsigned theComPort, unsigned theBaudRate);
+    SensorServer();
 
 	typedef std::vector< std::pair<unsigned,unsigned> > SensorData;
 	void poll(SensorData & theSensorData);
+    void openDevice(const std::string & theComPort, unsigned theBaudRate);
 
 private:
 	void parseLine(const std::string & theLine, unsigned & theController, unsigned & theBitMask);
