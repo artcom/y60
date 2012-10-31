@@ -586,48 +586,50 @@ JSSerial::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsv
     DOC_BEGIN("Creates a new serial device");
     DOC_PARAM("thePort", "Zero based com-port number or device name. Use port '999' to create a debug loopback device.", DOC_TYPE_INTEGER);
     DOC_END;
-    if (JSA_GetClass(cx,obj) != Class()) {
-        JS_ReportError(cx,"Constructor for %s  bad object; did you forget a 'new'?",ClassName());
-        return JS_FALSE;
-    }
-    JSSerial * myNewObject = 0;
-
-    if (argc == 1) {
-        if (JSVAL_IS_VOID(argv[0])) {
-            JS_ReportError(cx,"JSSerial::Constructor: bad argument #1 (undefined)");
+    try {
+        if (JSA_GetClass(cx,obj) != Class()) {
+            JS_ReportError(cx,"Constructor for %s  bad object; did you forget a 'new'?",ClassName());
             return JS_FALSE;
         }
+        JSSerial * myNewObject = 0;
 
-        unsigned myPortNumber = 0;
-        string myDeviceName;
-        if (convertFrom(cx, argv[0], myPortNumber)) {
-            if (myPortNumber == 999) {
-                OWNERPTR myNewSerial = OWNERPTR(new DebugPort("MyDebug Port #999"));
+        if (argc == 1) {
+            if (JSVAL_IS_VOID(argv[0])) {
+                JS_ReportError(cx,"JSSerial::Constructor: bad argument #1 (undefined)");
+                return JS_FALSE;
+            }
+
+            unsigned myPortNumber = 0;
+            string myDeviceName;
+            if (convertFrom(cx, argv[0], myPortNumber)) {
+                if (myPortNumber == 999) {
+                    OWNERPTR myNewSerial = OWNERPTR(new DebugPort("MyDebug Port #999"));
+                    myNewObject = new JSSerial(myNewSerial, myNewSerial.get());
+                } else {
+                    OWNERPTR myNewSerial = OWNERPTR(getSerialDevice(myPortNumber));
+                    myNewObject = new JSSerial(myNewSerial, myNewSerial.get());
+                }
+            } else if (convertFrom(cx, argv[0], myDeviceName)) {
+                OWNERPTR myNewSerial = OWNERPTR(getSerialDeviceByName( myDeviceName ));
                 myNewObject = new JSSerial(myNewSerial, myNewSerial.get());
             } else {
-                OWNERPTR myNewSerial = OWNERPTR(getSerialDevice(myPortNumber));
-                myNewObject = new JSSerial(myNewSerial, myNewSerial.get());
+                JS_ReportError(cx, "JSSerial::Constructor: argument #1 must be an integer (port number)"
+                                    " or a string (device name).");
+                return JS_FALSE;
             }
-        } else if (convertFrom(cx, argv[0], myDeviceName)) {
-            OWNERPTR myNewSerial = OWNERPTR(getSerialDeviceByName( myDeviceName ));
-            myNewObject = new JSSerial(myNewSerial, myNewSerial.get());
+
         } else {
-            JS_ReportError(cx, "JSSerial::Constructor: argument #1 must be an integer (port number)"
-                                " or a string (device name).");
+            JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected 1 (PortNumber) %d",ClassName(), argc);
             return JS_FALSE;
         }
 
-    } else {
-        JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected 1 (PortNumber) %d",ClassName(), argc);
+        if (myNewObject) {
+            JS_SetPrivate(cx,obj,myNewObject);
+            return JS_TRUE;
+        }
+        JS_ReportError(cx,"JSSerial::Constructor: bad parameters");
         return JS_FALSE;
-    }
-
-    if (myNewObject) {
-        JS_SetPrivate(cx,obj,myNewObject);
-        return JS_TRUE;
-    }
-    JS_ReportError(cx,"JSSerial::Constructor: bad parameters");
-    return JS_FALSE;
+    } HANDLE_CPP_EXCEPTION;
 }
 
 JSConstIntPropertySpec *
