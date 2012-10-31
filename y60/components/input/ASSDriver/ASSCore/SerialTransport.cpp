@@ -131,11 +131,6 @@ SerialTransport::establishConnection() {
         _mySerialPort = getSerialDeviceByName(_myPortName);
     }
 
-    if (!_mySerialPort) {
-        AC_ERROR << "ASS does not have a serial port configured";
-        return;
-    }
-
     try {
         _mySerialPort->open(_myBaudRate, 8, SerialDevice::NO_PARITY, 1, false, 0, 1);
 
