@@ -1501,7 +1501,7 @@ JSNode::getProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
                     *vp = as_jsval(cx, myNode->nodeValueWrapperPtr()->getImmediateCallBack());
                     break;
                 case PROP_onReconnect:
-                    *vp = as_jsval(cx, myNode->nodeValueWrapperPtr()->geReconnectFunction());
+                    *vp = as_jsval(cx, myNode->nodeValueWrapperPtr()->getReconnectFunction());
                     break;
             }
         } else {
