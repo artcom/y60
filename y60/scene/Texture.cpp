@@ -376,10 +376,10 @@ namespace y60 {
 
     unsigned
     Texture::applyTexture() {
+        AC_TRACE << "Texture::applyTexture '" << get<NameTag>() << "' id=" << get<IdTag>() << " texId=" << _myTextureId;
 
         ensureResourceManager();
 
-        AC_TRACE << "Texture::applyTexture '" << get<NameTag>() << "' id=" << get<IdTag>() << " texId=" << _myTextureId;
 
         TexturePtr myTexture = dynamic_cast_Ptr<Texture>(getSelf());
 
