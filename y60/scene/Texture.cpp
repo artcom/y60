@@ -418,7 +418,7 @@ namespace y60 {
             _myTextureId = 0;
         }
         AC_TRACE << "ForceSetupFlag : " << myForceSetupFlag << " myImageContentChangedFlag : " << myImageContentChangedFlag;
-        AC_TRACE << "         Image : " << myImage->get<ImageSourceTag>() << " -> " << myImage->get<ImageWidthTag>() << "/" << myImage->get<ImageHeightTag>();
+		AC_TRACE << "         Image : " << myImage->get<ImageSourceTag>() << " id : " << myImage->get<IdTag>() << " -> " << myImage->get<ImageWidthTag>() << "/" << myImage->get<ImageHeightTag>();
         if (myForceSetupFlag) {
             _myTextureId = _myResourceManager->setupTexture(myTexture);
             AC_TRACE << "set<TextureIdTag>("<<_myTextureId<<")";

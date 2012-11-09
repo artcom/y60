@@ -222,7 +222,8 @@ triggerUpload(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
 
 void
 cairo::JSSurface::doTriggerUpload() {
-    //_myImageNode->getFacade<y60::Image>()->triggerUpload();
+	dom::ResizeableRasterPtr myRasterPtr = _myImageNode->getFacade<y60::Image>()->getRasterPtr();
+	myRasterPtr->resize(myRasterPtr->width(), myRasterPtr->height());
 }
 
 JSFunctionSpec *
