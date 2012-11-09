@@ -69,8 +69,6 @@ using namespace std;
 #undef DB
 #define DB(x) // x
 
-//XXX remove BAD_TX sections and check what parameters are actually required and if they are updated correctly
-
 namespace y60 {
 
     DEFINE_EXCEPTION(UnknownEncodingException, asl::Exception);
@@ -81,7 +79,6 @@ namespace y60 {
         NameTag::Plug(theNode),
         TextureImageIdTag::Plug(theNode),
         TexturePixelFormatTag::Plug(theNode),
-        //TextureTypeTag::Plug(theNode),
         TextureMipmapTag::Plug(theNode),
         TextureAnisotropyTag::Plug(theNode),
         TextureMatrixTag::Plug(theNode),
@@ -97,9 +94,6 @@ namespace y60 {
         dom::FacadeAttributePlug<TextureWidthTag>(this),
         dom::FacadeAttributePlug<TextureHeightTag>(this),
         dom::FacadeAttributePlug<TextureDepthTag>(this),
-#ifdef BAD_TX
-        dom::FacadeAttributePlug<TextureImageTag>(this),
-#endif
         dom::FacadeAttributePlug<TextureNPOTMatrixTag>(this),
         dom::FacadeAttributePlug<TextureParamChangedTag>(this),
         dom::FacadeAttributePlug<LastActiveFrameTag>(this),
@@ -128,7 +122,6 @@ namespace y60 {
         TextureImageIdTag::Plug::getValuePtr()->setImmediateCallBack(dynamic_cast_Ptr<Texture>(getSelf()), 
                                                                      &Texture::updateDependenciesForInternalFormatUpdate);
 
-        //TextureImageTag::Plug::setReconnectFunction(&Texture::registerDependenciesForImageTag);
         //TextureIdTag::Plug::setReconnectFunction(&Texture::registerDependenciesForTextureUpdate);
         TextureParamChangedTag::Plug::setReconnectFunction(&Texture::registerDependenciesForTextureParamChanged);
         TextureInternalFormatTag::Plug::setReconnectFunction(&Texture::registerDependenciesForInternalFormatUpdate);
@@ -139,22 +132,8 @@ namespace y60 {
     }
 
     void
-    Texture::registerDependenciesForImageTag() {
-#ifdef BAD_TX
-        if (getNode()) {
-            TextureImageTag::Plug::dependsOn<TextureImageIdTag>(*this);
-            TextureImageTag::Plug::getValuePtr()->setCalculatorFunction(
-                dynamic_cast_Ptr<Texture>(getSelf()), &Texture::calculateImageTag);
-        }
-#endif
-    }
-
-    void
     Texture::registerDependenciesForTextureUpdate() {
         if (getNode()) {
-#ifdef BAD_TX
-            TextureIdTag::Plug::dependsOn<TextureImageTag>(*this);
-#endif
             TextureIdTag::Plug::dependsOn<TextureColorBiasTag>(*this);
             TextureIdTag::Plug::dependsOn<TextureColorScaleTag>(*this);
             TextureIdTag::Plug::dependsOn<TextureMipmapTag>(*this);
@@ -168,9 +147,6 @@ namespace y60 {
     Texture::registerDependenciesForTextureWidthUpdate() {
         AC_TRACE << "Texture::registerDependenciesForTextureWidthUpdate";
         if (getNode()) {
-#ifdef BAD_TX
-            TextureWidthTag::Plug::dependsOn<TextureImageTag>(*this);
-#endif
             /*TextureWidthTag::Plug::getValuePtr()->setCalculatorFunction(
                 dynamic_cast_Ptr<Texture>(getSelf()), &Texture::calculateWidth);*/
         }
@@ -180,9 +156,6 @@ namespace y60 {
     Texture::registerDependenciesForTextureHeightUpdate() {
         AC_TRACE << "Texture::registerDependenciesForTextureHeightUpdate";
         if (getNode()) {
-#ifdef BAD_TX
-            TextureHeightTag::Plug::dependsOn<TextureImageTag>(*this);
-#endif
             /*TextureHeightTag::Plug::getValuePtr()->setCalculatorFunction(
                 dynamic_cast_Ptr<Texture>(getSelf()), &Texture::calculateHeight);*/
         }
@@ -192,9 +165,6 @@ namespace y60 {
     Texture::registerDependenciesForTextureTypeUpdate() {
         AC_TRACE << "Texture::registerDependenciesForTextureTypeUpdate";
         if (getNode()) {
-#ifdef BAD_TX
-            TextureTypeTag::Plug::dependsOn<TextureImageTag>(*this);
-#endif
             TextureTypeTag::Plug::getValuePtr()->setCalculatorFunction(
                 dynamic_cast_Ptr<Texture>(getSelf()), &Texture::calculateTextureType);
         }
@@ -228,9 +198,6 @@ namespace y60 {
     Texture::registerDependenciesForInternalFormatUpdate() {
         AC_TRACE << "Texture::registerDependenciesForInternalFormatUpdate";
         if (getNode()) {
-#ifdef BAD_TX
-            TextureInternalFormatTag::Plug::dependsOn<TextureImageTag>(*this);
-#endif
             TextureInternalFormatTag::Plug::dependsOn<TextureImageIdTag>(*this);
             TextureInternalFormatTag::Plug::dependsOn<TextureColorBiasTag>(*this);
             TextureInternalFormatTag::Plug::dependsOn<TextureColorScaleTag>(*this);
@@ -350,22 +317,6 @@ namespace y60 {
         }
     }
 
-
-    void
-    Texture::calculateImageTag() {
-        AC_DEBUG << "Texture::calculateImageTag '" << get<NameTag>() << "'";
-        const std::string & myImageId = get<TextureImageIdTag>();
-        dom::NodePtr myImageNode = getNode().getElementById(myImageId);
-        if (!myImageNode) {
-            AC_ERROR << "Texture '" << get<NameTag>() << "' id=" << get<IdTag>() << " references invalid image id=" << myImageId;
-            return;
-        }
-        ImagePtr myImage = myImageNode->getFacade<Image>();
-#ifdef BAD_TX
-        set<TextureImageTag>(ImageWeakPtr(myImage));
-#endif
-    }
-
     void
     Texture::preload() {
         AC_DEBUG << "Texture::triggerUpload '" << get<NameTag>() << "' id=" << get<IdTag>();
@@ -461,10 +412,7 @@ namespace y60 {
 
     ImagePtr
     Texture::getImage() const {
-#ifdef BAD_TX
-        return get<TextureImageTag>().lock();
-#else
-      const std::string & myImageId = get<TextureImageIdTag>();
+        const std::string & myImageId = get<TextureImageIdTag>();
         dom::NodePtr myImageNode = getNode().getElementById(myImageId);
         if (!myImageNode) {
             // AC_ERROR << "Texture '" << get<NameTag>() << "' id=" << get<IdTag>() << " references invalid image id=" << myImageId;
@@ -474,7 +422,6 @@ namespace y60 {
         }
         ImagePtr myImage = myImageNode->getFacade<Image>();
         return myImage;
-#endif
     }
 
     TextureInternalFormat

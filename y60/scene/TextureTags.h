@@ -106,10 +106,6 @@ namespace y60 {
     DEFINE_ATTRIBUTE_TAG(TextureWrapModeTag,       TextureWrapMode,     TEXTURE_WRAPMODE_ATTRIB,        REPEAT, Y60_SCENE_DECL);
     DEFINE_ATTRIBUTE_TAG(TextureMinFilterTag,      TextureSampleFilter, TEXTURE_MIN_FILTER_ATTRIB,      LINEAR, Y60_SCENE_DECL);
     DEFINE_ATTRIBUTE_TAG(TextureMagFilterTag,      TextureSampleFilter, TEXTURE_MAG_FILTER_ATTRIB,      LINEAR, Y60_SCENE_DECL);
-#ifdef BAD_TX
-    DEFINE_ATTRIBUTE_TAG(TextureImageTag,          ImageWeakPtr,        "textureImage",                 ImagePtr(0), Y60_SCENE_DECL);
-#endif
-
     DEFINE_FACADE_ATTRIBUTE_TAG(TextureTypeTag,           TextureType,         TEXTURE_TYPE_ATTRIB,            TEXTURE_2D, Y60_SCENE_DECL);
     DEFINE_FACADE_ATTRIBUTE_TAG(TextureIdTag,             unsigned,            TEXTURE_ID_ATTRIB,              0, Y60_SCENE_DECL);
     DEFINE_FACADE_ATTRIBUTE_TAG(TextureInternalFormatTag, std::string,         TEXTURE_INTERNAL_FORMAT_ATTRIB, "", Y60_SCENE_DECL);
