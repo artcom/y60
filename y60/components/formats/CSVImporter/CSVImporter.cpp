@@ -33,16 +33,12 @@
 #include <asl/csv/CSVParser.h>
 #include <y60/jsbase/JSNode.h>
 
-using namespace std;
-using namespace asl;
-using namespace dom;
-using namespace y60;
 
 namespace jslib {
-    vector<vector<string> > 
-    csv::CSVImporter::csv2array(const string theFileName, const char theDelimiter) {
+    std::vector<std::vector<std::string> > 
+    csv::CSVImporter::csv2array(const std::string & theFileName, const char theDelimiter) {
         std::vector<std::vector<std::string> > myResult;
-        string myContent = readFile(theFileName);
+        std::string myContent = asl::readFile(theFileName);
         asl::parseCSV(myContent, myResult, theDelimiter);
         return myResult;
     }
