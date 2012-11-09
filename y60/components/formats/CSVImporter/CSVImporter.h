@@ -44,7 +44,7 @@ namespace jslib {
         public:
             CSVImporter() {};
             virtual ~CSVImporter() {};
-            static std::vector<std::vector<std::string> > csv2array(const std::string theFileName, const char theDelimiter = ',');
+            static std::vector<std::vector<std::string> > csv2array(const std::string & theFileName, const char theDelimiter = ',');
         };
 
         typedef asl::Ptr<CSVImporter> CSVImporterPtr;

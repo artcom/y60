@@ -175,7 +175,6 @@ namespace y60 {
 
             Texture();
 
-            void registerDependenciesForImageTag();
             void registerDependenciesForTextureWidthUpdate();
             void registerDependenciesForTextureHeightUpdate();
             void registerDependenciesForInternalFormatUpdate();
@@ -188,7 +187,6 @@ namespace y60 {
             void calculateWidth();
             void calculateHeight();
             void calculateTextureType();
-            void calculateImageTag();
 
             /// Get ResourceManager from Scene facade.
             void ensureResourceManager();
