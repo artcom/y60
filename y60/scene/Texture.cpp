@@ -215,21 +215,12 @@ namespace y60 {
 
     void
     Texture::updateDependenciesForInternalFormatUpdate() {
+        AC_TRACE << "Texture::updateDependenciesForInternalFormatUpdate";
+        TextureInternalFormatTag::Plug::getValuePtr()->markPrecursorDependenciesOutdated();
         if (getNode() && getImage()) {
-            if (TextureInternalFormatTag::Plug::alreadyDependsOn(getImageFacade().getRasterValue())) {
-                TextureInternalFormatTag::Plug::noLongerDependsOn(getImageFacade().getRasterValue());
-            }
             TextureInternalFormatTag::Plug::dependsOn(getImageFacade().getRasterValue());
-
-            if (TextureInternalFormatTag::Plug::alreadyDependsOn<ImageSourceTag>(getImageFacade())) {
-                TextureInternalFormatTag::Plug::noLongerDependsOn<ImageSourceTag>(getImageFacade());
-            }
             TextureInternalFormatTag::Plug::dependsOn<ImageSourceTag>(getImageFacade());
-
-            if (TextureInternalFormatTag::Plug::alreadyDependsOn<RasterPixelFormatTag>(getImageFacade())) {
-                TextureInternalFormatTag::Plug::noLongerDependsOn<RasterPixelFormatTag>(getImageFacade()); 
-            }
-            TextureInternalFormatTag::Plug::dependsOn<RasterPixelFormatTag>(getImageFacade());            
+            TextureInternalFormatTag::Plug::dependsOn<RasterPixelFormatTag>(getImageFacade());
         }
     }
 
