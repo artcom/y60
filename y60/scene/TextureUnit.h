@@ -117,7 +117,6 @@ namespace y60 {
         private:
             TextureUnit();
 
-            void updateTexture();
             void updateCombiner();
 
             TextureManagerPtr _myTextureManager;

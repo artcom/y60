@@ -113,23 +113,6 @@ namespace y60 {
     }
 
     void
-    TextureUnit::updateTexture() {
-
-        TexturePtr myTexture = getTexture();
-        if (myTexture) {
-            myTexture->unrefTexture();
-        }
-
-        const std::string & myTextureId = get<TextureUnitTextureIdTag>();
-        myTexture = _myTextureManager->findTexture(myTextureId);
-        if (!myTexture) {
-            AC_WARNING << "TextureUnit::updateTexture textureunit references invalid texture id=" << myTextureId;
-            return;
-        }
-        myTexture->refTexture();
-    }
-
-    void
     TextureUnit::updateCombiner() {
 
         std::string myCombinerName = get<TextureUnitCombinerTag>();
