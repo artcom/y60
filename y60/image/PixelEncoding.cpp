@@ -86,28 +86,28 @@ bool mapPixelEncodingToFormat(const PixelEncoding & theEncoding,
             theFormat = PLPixelFormat::A8R8G8B8;
             break;
         case RGB:
-		    theFormat = PLPixelFormat::B8G8R8; // PLPixelFormats are backwards
+            theFormat = PLPixelFormat::B8G8R8; // PLPixelFormats are backwards
             break;
         case BGR:
-			theFormat = PLPixelFormat::R8G8B8; // PLPixelFormats are backwards
+            theFormat = PLPixelFormat::R8G8B8; // PLPixelFormats are backwards
             break;
         case RGBA:
-			theFormat = PLPixelFormat::A8B8G8R8; // PLPixelFormats are backwards
+            theFormat = PLPixelFormat::A8B8G8R8; // PLPixelFormats are backwards
             break;
         case BGRA:
-			theFormat = PLPixelFormat::A8R8G8B8; // PLPixelFormats are backwards
+            theFormat = PLPixelFormat::A8R8G8B8; // PLPixelFormats are backwards
             break;
         case RGBA_HALF:
-			theFormat = PLPixelFormat::A16B16G16R16; // PLPixelFormats are backwards
+            theFormat = PLPixelFormat::A16B16G16R16; // PLPixelFormats are backwards
             break;
         case RGB_HALF:
-			theFormat = PLPixelFormat::B16G16R16; // PLPixelFormats are backwards
+            theFormat = PLPixelFormat::B16G16R16; // PLPixelFormats are backwards
             break;
         case RGBA_FLOAT:
-			theFormat = PLPixelFormat::A32B32G32R32; // PLPixelFormats are backwards
+            theFormat = PLPixelFormat::A32B32G32R32; // PLPixelFormats are backwards
             break;
         case RGB_FLOAT:
-			theFormat = PLPixelFormat::B32G32R32; // PLPixelFormats are backwards
+            theFormat = PLPixelFormat::B32G32R32; // PLPixelFormats are backwards
             break;
         default:
             return false;

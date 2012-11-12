@@ -131,10 +131,10 @@ class RasterTest : public UnitTest {
                 PLAnyPicDecoder myDecoder;
                 PLAnyBmp myReferenceBmp;
                 myDecoder.MakeBmpFromFile(theFileName.c_str(), &myReferenceBmp);
-		        myReferenceBmp.SetResolution(PLPoint(0,0)); // ignore dpi in file
+                myReferenceBmp.SetResolution(PLPoint(0,0)); // ignore dpi in file
                 ImageLoader myImageLoader(theFileName);
                 ENSURE_EQUAL(myReferenceBmp.GetBitsPerPixel(), myImageLoader.GetBitsPerPixel());
-		        myImageLoader.SetResolution(PLPoint(0,0)); // ignore dpi in file
+                myImageLoader.SetResolution(PLPoint(0,0)); // ignore dpi in file
                 ENSURE(myReferenceBmp == myImageLoader);
 
                 dom::ValuePtr myRasterValue = createRasterValue(myImageLoader.getEncoding(), myImageLoader.GetWidth(), myImageLoader.GetHeight(), *myImageLoader.getData());

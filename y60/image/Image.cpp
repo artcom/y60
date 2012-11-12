@@ -471,7 +471,7 @@ namespace y60 {
         myPNGEncoder.SaveBmp(&myBmp, &myMemSink);
 
         theBlock->resize(myMemSink.GetDataSize());
-		memcpy(theBlock->begin(), myMemSink.GetBytes(), myMemSink.GetDataSize());
+        memcpy(theBlock->begin(), myMemSink.GetBytes(), myMemSink.GetDataSize());
         myMemSink.Close();
     }
 

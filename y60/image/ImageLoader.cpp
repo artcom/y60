@@ -154,7 +154,7 @@ namespace y60 {
         _myImageMatrix.makeIdentity();
         // Cubemaps are encoded as
         // theFrontFileName + "|" + theRightFileName + "|" + theBackFileName + "|" + theLeftFileName + "|"
-		// + theTopFileName + "|" + theBottomFileName;
+        // + theTopFileName + "|" + theBottomFileName;
         vector<string> myFilenames = asl::splitString(theFilename, "|");
         vector<asl::Ptr<ReadableBlockHandle> > myBlocks;
 
@@ -229,11 +229,11 @@ namespace y60 {
                         theImageBlock->getBlock().size(), this);
             } catch (const PLTextException & e) {
                 throw ImageLoaderException(_myFilename + " - " + static_cast<const char *>(e), PLUS_FILE_LINE);
-			} catch(std::exception & e) {
+            } catch(std::exception & e) {
                 throw ImageLoaderException(_myFilename + " - " + e.what(), PLUS_FILE_LINE);
-			} catch(const asl::Exception &) {
+            } catch(const asl::Exception &) {
                 throw;
-			} catch(...) {
+            } catch(...) {
                 throw ImageLoaderException(_myFilename + "Unknown (Paintlib) exception occured while loading.", PLUS_FILE_LINE);
             }
         }
@@ -326,7 +326,7 @@ namespace y60 {
 
         // TODO: Add support for other compression formats
         SetBmpInfo(PLPoint(myWidthPowerOfTwo, myHeightPowerOfTwo * myHeader.layercount),
-			GetResolution(), PLPixelFormat::L1 /* only correct for DXT5 */);
+            GetResolution(), PLPixelFormat::L1 /* only correct for DXT5 */);
     }
 
     long
@@ -398,15 +398,15 @@ namespace y60 {
     void
     ImageLoader::setFixedAlpha(float theAlpha) {
        if (!_isI60) {
-			AC_INFO << "Set alpha channel : "
-				    << theAlpha << " in image: " << _myFilename << endl;
+            AC_INFO << "Set alpha channel : "
+                    << theAlpha << " in image: " << _myFilename << endl;
             if (GetBitsPerPixel() != 32) {
-				// Add Alpha channel (do we ever get here ? dk/vs)
+                // Add Alpha channel (do we ever get here ? dk/vs)
                 // A: yes - when 24-bit files and an alpha-scale != 1.0 are combined.
-				AC_INFO << "Create alpha channel for setting alpha on a "
-					    << getStringFromEnum(_myEncoding,PixelEncodingString)  << " encoded image: "
-						<< _myFilename << endl;
-				PLAnyBmp myCopy;
+                AC_INFO << "Create alpha channel for setting alpha on a "
+                        << getStringFromEnum(_myEncoding,PixelEncodingString)  << " encoded image: "
+                        << _myFilename << endl;
+                PLAnyBmp myCopy;
                 switch (_myEncoding) {
                     case RGB:
                         _myEncoding = RGBA;
@@ -418,13 +418,13 @@ namespace y60 {
                         throw ImageLoaderException(string("setFixedAlpha: unsupported pixel encoding.")
                             + _myFilename, PLUS_FILE_LINE);
                 }
-				PLPixelFormat myFormat;
-				mapPixelEncodingToFormat(_myEncoding, myFormat);
+                PLPixelFormat myFormat;
+                mapPixelEncodingToFormat(_myEncoding, myFormat);
 
-				myCopy.CreateCopy(*this, myFormat);
+                myCopy.CreateCopy(*this, myFormat);
                 CreateCopy(myCopy, myFormat);
 
-			}
+            }
             unsigned myHeight = GetHeight();
             unsigned myWidth  = GetWidth();
             unsigned char ** myLineArray   = GetLineArray();
