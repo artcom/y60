@@ -321,7 +321,6 @@ namespace y60 {
     Texture::preload() {
         AC_DEBUG << "Texture::triggerUpload '" << get<NameTag>() << "' id=" << get<IdTag>();
         TextureIdTag::Plug::getValuePtr()->setDirty(); // force call to applyTexture()
-        AC_INFO << "TextureManager::reloadTextures preload() disabled;";
         applyTexture();
     }
 

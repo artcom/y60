@@ -96,7 +96,6 @@ namespace y60 {
             asl::WeakPtr<ITextureManager> getSelf() const;
             void setTextureList(dom::NodePtr theTexturesListNode);
 
-            void reloadTextures();
             void loadMovieFrame(asl::Ptr<Movie, dom::ThreadingModel> theMovie,
                                 double theCurrentTime = -1);
             void loadCaptureFrame(asl::Ptr<Capture, dom::ThreadingModel> theCapture);

@@ -175,21 +175,6 @@ namespace y60 {
         theCapture->readFrame();
     }
 
-    void
-    TextureManager::reloadTextures() {
-        AC_DEBUG << "TextureManager::reloadTextures";
-        AC_INFO << "TextureManager::reloadTextures preload() disabled";
-        AC_DEBUG << StackTrace();
-        return;
-        //unsigned myTextureCount = _myTextureList->childNodesLength();
-        //for (unsigned i = 0; i < myTextureCount; ++i) {
-        //    dom::NodePtr myTextureNode = _myTextureList->childNode(i);
-        //    if (myTextureNode->nodeType() == dom::Node::ELEMENT_NODE) {
-        //        myTextureNode->getFacade<Texture>()->preload();
-        //    }
-        //}
-    }
-
     TexturePtr
     TextureManager::getTexture(const std::string & theTextureId) const{
         TexturePtr myTexture = findTexture(theTextureId);
