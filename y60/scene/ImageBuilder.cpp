@@ -71,19 +71,19 @@ namespace y60 {
     ImageBuilder::ImageBuilder(const std::string & theName)
         : BuilderBase(IMAGE_NODE_NAME)
     {
-		init(theName);
+        init(theName);
 
     }
-	ImageBuilder::ImageBuilder(const std::string & theNodeName,
-		                       const std::string & theName) : BuilderBase(theNodeName)
-	{
-		init(theName);
-	}
+    ImageBuilder::ImageBuilder(const std::string & theNodeName,
+                               const std::string & theName) : BuilderBase(theNodeName)
+    {
+        init(theName);
+    }
 
     ImageBuilder::~ImageBuilder() {
     }
 
-	void
+    void
     ImageBuilder::init(const std::string & theName) {
         dom::NodePtr myNode = getNode();
         if (!myNode->hasFacade()) {
@@ -93,10 +93,10 @@ namespace y60 {
             myNode->appendAttribute(IMAGE_TYPE_ATTRIB, IMAGE_TYPE_SINGLE);
             myNode->appendAttribute(DEPTH_ATTRIB, (unsigned int)(1));
             myNode->appendAttribute(IMAGE_TILE_ATTRIB, asl::Vector2i(1,1));
-		} else {
+        } else {
             myNode->getFacade<Image>()->set<NameTag>(theName);
-		}
-	}
+        }
+    }
 
     const std::string &
     ImageBuilder::getName() const {

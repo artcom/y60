@@ -79,20 +79,20 @@ namespace y60 {
 
     //                  TagName             Type           PropertyName                    Default
 
-	class RecordFacade :
-		public PropertyListFacade,
-		public IdTag::Plug,
-		public NameTag::Plug
-	{
-		public:
-			RecordFacade(dom::Node & theNode) :
-			    PropertyListFacade(theNode),
-				IdTag::Plug(theNode),
-				NameTag::Plug(theNode)
-			{}
-			IMPLEMENT_FACADE(RecordFacade);
-	};
-	typedef asl::Ptr<RecordFacade, dom::ThreadingModel> RecordFacadePtr;
+    class RecordFacade :
+        public PropertyListFacade,
+        public IdTag::Plug,
+        public NameTag::Plug
+    {
+        public:
+            RecordFacade(dom::Node & theNode) :
+                PropertyListFacade(theNode),
+                IdTag::Plug(theNode),
+                NameTag::Plug(theNode)
+            {}
+            IMPLEMENT_FACADE(RecordFacade);
+    };
+    typedef asl::Ptr<RecordFacade, dom::ThreadingModel> RecordFacadePtr;
 
 }
 

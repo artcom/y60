@@ -162,7 +162,7 @@ namespace y60 {
 /*
     bool
     MaterialBase::rebindRequired() {
-		if (getNode().getAttribute(ID_ATTRIB)->nodeVersion() != _myIdTagVersion) {
+        if (getNode().getAttribute(ID_ATTRIB)->nodeVersion() != _myIdTagVersion) {
             _myIdTagVersion = getNode().getAttribute(ID_ATTRIB)->nodeVersion();
             return true;
         } else {

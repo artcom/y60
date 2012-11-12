@@ -175,7 +175,7 @@ namespace y60 {
         if (myDataBin) {
             if (myDataBin->size() != myIndices.size()) {
                 AC_ERROR << "Primitive::unload: gl vertex data and dom index array have different size, vertex data role "<<myRoleString<<
-					" has size "<<myDataBin->size()<<", index array has size "<< myIndices.size()<<", shape id ="<< getShape().Shape::get<IdTag>()<<endl;
+                    " has size "<<myDataBin->size()<<", index array has size "<< myIndices.size()<<", shape id ="<< getShape().Shape::get<IdTag>()<<endl;
                 return;
             } else {
                 myDataBin->unload(myIndices, myDataNode);
@@ -411,7 +411,7 @@ namespace y60 {
 
 #ifdef OLD
         VertexData2f::VertexDataVector & myUVSet
-			= _myVertexData[myRole]->VertexDataBase::getVertexDataCast<asl::Vector2f>();
+            = _myVertexData[myRole]->VertexDataBase::getVertexDataCast<asl::Vector2f>();
 #else
         asl::Ptr<VertexDataAccessor<Vector2f> > myUVSetAccessor =
             _myVertexData[myRole]->VertexDataBase::getVertexDataAccessor<asl::Vector2f>();
@@ -470,7 +470,7 @@ namespace y60 {
                 }
                 break;
             case TRIANGLE_FAN:
-				{AC_TRACE << "Scanning " << thePositions.size() << " positions.";}
+                {AC_TRACE << "Scanning " << thePositions.size() << " positions.";}
                 for (unsigned i = 1; i < (thePositions.size()-1); ++i) {
                     asl::Triangle<float> myTriangle(asl::asPoint(thePositions[0]),
                             asl::asPoint(thePositions[i]),
@@ -486,7 +486,7 @@ namespace y60 {
             case TRIANGLES:
                 myStep = 3;
             case TRIANGLE_STRIP:
-				{AC_TRACE << "Scanning " << thePositions.size() << " positions.";}
+                {AC_TRACE << "Scanning " << thePositions.size() << " positions.";}
                 for (unsigned i = 0; (i + 2) < thePositions.size(); i += myStep) {
                     if (myHasNormals) {
                         myHit |= theDetector(this, i, asl::asTriangle(asl::asPoint(thePositions[i])),

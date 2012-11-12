@@ -84,9 +84,9 @@ namespace y60 {
     }
 
     const std::string &
-	BuilderBase::getId() const {
-		return _myNode->getAttributeString(ID_ATTRIB);
-	}
+    BuilderBase::getId() const {
+        return _myNode->getAttributeString(ID_ATTRIB);
+    }
 
     const std::string &
     BuilderBase::appendNodeWithId(const BuilderBase & theChildBuilder,

@@ -81,10 +81,10 @@ namespace y60 {
 
     class Y60_SCENE_DECL Canvas :
         public dom::Facade,
-		public IdTag::Plug,
-		public NameTag::Plug,
-		public CanvasBackgroundColorTag::Plug,
-		public CanvasTargetsTag::Plug
+        public IdTag::Plug,
+        public NameTag::Plug,
+        public CanvasBackgroundColorTag::Plug,
+        public CanvasTargetsTag::Plug
     {
         public:
             Canvas(dom::Node & theNode) :

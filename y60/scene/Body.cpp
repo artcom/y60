@@ -116,24 +116,24 @@ namespace y60 {
                 return false;
         }
     }
-	ShapePtr
-	Body::getShapePtr() {
+    ShapePtr
+    Body::getShapePtr() {
         dom::NodePtr myShapeNode = getNode().getElementById(get<ShapeTag>());
         if (!myShapeNode) {
             throw asl::Exception(string("Body ") + get<NameTag>() + ": Could not find shape with id: " + get<ShapeTag>(), PLUS_FILE_LINE);
         } else {
             return myShapeNode->getFacade<Shape>();
         }
-	}
-	const ShapePtr
-	Body::getShapePtr() const {
+    }
+    const ShapePtr
+    Body::getShapePtr() const {
         const dom::NodePtr myShapeNode = getNode().getElementById(get<ShapeTag>());
         if (!myShapeNode) {
             throw asl::Exception(string("Body ") + get<NameTag>() + ": Could not find shape with id: " + get<ShapeTag>(), PLUS_FILE_LINE);
         } else {
             return myShapeNode->getFacade<Shape>();
         }
-	}
+    }
 
     Shape &
     Body::getShape() {

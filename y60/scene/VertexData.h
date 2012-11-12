@@ -164,12 +164,12 @@ namespace y60 {
             virtual void * getDataPtr() = 0;
 
             template <class T>
-			typename VertexData<T>::VertexDataVector & getVertexDataCast() {
+            typename VertexData<T>::VertexDataVector & getVertexDataCast() {
                 return dynamic_cast<VertexData<T>&>(*this).getData();
             }
 
             template <class T>
-			const typename VertexData<T>::VertexDataVector & getVertexDataCast() const {
+            const typename VertexData<T>::VertexDataVector & getVertexDataCast() const {
                 return dynamic_cast<const VertexData<T>&>(*this).getData();
             }
 #else

@@ -91,12 +91,12 @@ namespace y60 {
         }
         RenderStyles myDefaultStyle(BIT(FRONT));
         if (!myNode->hasFacade()) {
-	        myNode->appendAttribute(RENDER_STYLE_ATTRIB, as_string(myDefaultStyle));
+            myNode->appendAttribute(RENDER_STYLE_ATTRIB, as_string(myDefaultStyle));
         } else {
             myNode->getFacade<Shape>()->set<RenderStylesTag>(myDefaultStyle);
         }
         /*
-	    myNode->appendAttribute(RENDER_STYLE_ATTRIB, as_string(RenderStyles()));
+        myNode->appendAttribute(RENDER_STYLE_ATTRIB, as_string(RenderStyles()));
 
         setFrontFacing(true);
         setBackFacing(true);

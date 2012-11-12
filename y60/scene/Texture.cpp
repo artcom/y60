@@ -87,7 +87,7 @@ namespace y60 {
         TextureWrapModeTag::Plug(theNode),
         TextureMinFilterTag::Plug(theNode),
         TextureMagFilterTag::Plug(theNode),
-		TextureImageIndexTag::Plug(theNode),
+        TextureImageIndexTag::Plug(theNode),
         dom::FacadeAttributePlug<TextureTypeTag>(this),
         dom::FacadeAttributePlug<TextureIdTag>(this),
         dom::FacadeAttributePlug<TextureInternalFormatTag>(this),

@@ -416,7 +416,7 @@ namespace y60 {
                              const unsigned int theY,
                              y60::IntersectionInfoVector & theInformation) const;
 
-	        //void reverseUpdateShape(ShapePtr theShape);
+            //void reverseUpdateShape(ShapePtr theShape);
             //void reverseUpdateShapes();
 
             void setup();

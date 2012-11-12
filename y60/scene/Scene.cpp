@@ -869,7 +869,7 @@ namespace y60 {
             MAKE_SCOPE_TIMER(updateAnimationsReload);
             NodePtr myWorlds = getWorldsRoot();
             for(unsigned i = 0; i < myWorlds->childNodesLength("world"); i++) {
-            	loadAnimations(myWorlds->childNode("world", i));
+                loadAnimations(myWorlds->childNode("world", i));
             }
         } else if (theUpdateFlags & ANIMATIONS) {
             AC_TRACE << "updateAnimations";
@@ -892,10 +892,10 @@ namespace y60 {
 
             NodePtr myWorlds = getWorldsRoot();
             for(unsigned i = 0; i < myWorlds->childNodesLength("world"); i++) {
-            	NodePtr myWorldNode = myWorlds->childNode("world", i);
-            	WorldPtr myWorldFacade = myWorldNode->getFacade<World>();
-            	myWorldFacade->updateLights();
-            	updateTransformHierachy(myWorldNode);
+                NodePtr myWorldNode = myWorlds->childNode("world", i);
+                WorldPtr myWorldFacade = myWorldNode->getFacade<World>();
+                myWorldFacade->updateLights();
+                updateTransformHierachy(myWorldNode);
             }
         }
     }
@@ -914,7 +914,7 @@ namespace y60 {
             NodePtr myMaterialNode = myMaterialList->childNode(i);
             MaterialBaseFacadePtr myMaterial = myMaterialNode->getFacade<MaterialBase>();
             if (myMaterial) {
-				if (myMaterial->reloadRequired()) {
+                if (myMaterial->reloadRequired()) {
                     reloadMaterial(myMaterialNode, myMaterial);
                 }
                  // check for a rebind (i.e. if the id has changed and alle primitives must be rebind)
@@ -1003,13 +1003,13 @@ namespace y60 {
 
     NodePtr
     Scene::getWorldRoot() {
-    	//AC_WARNING << "getWorldRoot is deprecated";
+        //AC_WARNING << "getWorldRoot is deprecated";
         return getNode().childNode(WORLD_LIST_NAME)->childNode(WORLD_NODE_NAME);
     }
 
     const NodePtr
     Scene::getWorldRoot() const {
-    	//AC_WARNING << "getWorldRoot is deprecated";
+        //AC_WARNING << "getWorldRoot is deprecated";
         return getNode().childNode(WORLD_LIST_NAME)->childNode(WORLD_NODE_NAME);
     }
 
@@ -1740,7 +1740,7 @@ namespace y60 {
         collectReferences(mySceneNode.childNode(CANVAS_LIST_NAME), myReferences);
         NodePtr myWorlds = getWorldsRoot();
         for(unsigned i = 0; i < myWorlds->childNodesLength("world"); i++) {
-        	collectReferences(myWorlds->childNode("world", i), myReferences);
+            collectReferences(myWorlds->childNode("world", i), myReferences);
         }
         removeUnreferencedNodes(getNode().childNode(LIGHTSOURCE_LIST_NAME), myReferences);
         removeUnreferencedNodes(getShapesRoot(), myReferences);

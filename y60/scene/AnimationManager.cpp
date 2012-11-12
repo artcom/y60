@@ -159,10 +159,10 @@ namespace y60 {
     AnimationManager::createAnimation(const dom::NodePtr theNode, dom::NodePtr theWorld) {
         // Find node to be animated
         dom::NodePtr myAnimatedNode;
-		dom::NodePtr myNodeRefAttribute = theNode->getAttribute(ANIM_NODEREF_ATTRIB);
+        dom::NodePtr myNodeRefAttribute = theNode->getAttribute(ANIM_NODEREF_ATTRIB);
         string myNodeRef;
         if (myNodeRefAttribute) {
-			myNodeRef = myNodeRefAttribute->nodeValue();
+            myNodeRef = myNodeRefAttribute->nodeValue();
             myAnimatedNode = theWorld->getElementById(myNodeRef);
             if (!myAnimatedNode) {
                 throw AnimationManagerException(string("Animation points to a node that does not exist.\n") +
@@ -178,7 +178,7 @@ namespace y60 {
         string          myAttributeRef;
         bool            myAngleAttribute = false;
         AnimationBase::AttributeComponent myAttributeComponent = AnimationBase::FULL_VALUE;
-		dom::NodePtr    myAttribute = theNode->getAttribute(ANIM_ATTRIBUTE_ATTRIB);
+        dom::NodePtr    myAttribute = theNode->getAttribute(ANIM_ATTRIBUTE_ATTRIB);
 
         if (myAttribute && (myAttribute->nodeValue() != "")) {
             myAttributeRef = myAttribute->nodeValue();

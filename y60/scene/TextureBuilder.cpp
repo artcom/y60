@@ -76,11 +76,11 @@ namespace y60 {
             // because there is no schema available at this time
             myNode->appendAttribute(NAME_ATTRIB, theName);
             myNode->appendAttribute(TEXTURE_IMAGE_ATTRIB, theImageId);
-		} else {
+        } else {
             TexturePtr myTexture = myNode->getFacade<Texture>();
             myTexture->set<NameTag>(theName);
             myTexture->set<TextureImageIdTag>(theImageId);
-		}
+        }
     }
 
     TextureBuilder::~TextureBuilder() {

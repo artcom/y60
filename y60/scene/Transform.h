@@ -65,13 +65,13 @@
 
 namespace y60 {
 
-	class TransformFacade :
-		public TransformHierarchyFacade
-	{
-	public:
-		TransformFacade(dom::Node & theNode) : TransformHierarchyFacade(theNode) {}
-		IMPLEMENT_FACADE(TransformFacade);
-	};
+    class TransformFacade :
+        public TransformHierarchyFacade
+    {
+    public:
+        TransformFacade(dom::Node & theNode) : TransformHierarchyFacade(theNode) {}
+        IMPLEMENT_FACADE(TransformFacade);
+    };
 
 }
 

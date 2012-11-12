@@ -84,7 +84,7 @@
 #include "PropertyListFacade.h"
 
 #define DEFINE_LIGHT_PROPERTY_TAG(theTagName, theType, thePropertyName, theDefault) \
-	DEFINE_PROPERTY_TAG(theTagName,  LightPropertiesFacade, theType, y60::getTypeName<theType>(), thePropertyName,  "properties", theDefault);
+    DEFINE_PROPERTY_TAG(theTagName,  LightPropertiesFacade, theType, y60::getTypeName<theType>(), thePropertyName,  "properties", theDefault);
 
 namespace y60 {
 
@@ -99,37 +99,37 @@ namespace y60 {
     DEFINE_LIGHT_PROPERTY_TAG(ExponentTag,    float,         SPOTLIGHT_EXPONENT_ATTRIB, 0);
 
 
-	class LightPropertiesFacade :
-		public PropertyListFacade,
-		public LightAmbientTag::Plug,
-		public LightDiffuseTag::Plug,
-		public LightSpecularTag::Plug,
-		public AttenuationTag::Plug,
-		public CutOffTag::Plug,
-		public ExponentTag::Plug
-	{
-		public:
-			LightPropertiesFacade(dom::Node & theNode) :
-			    PropertyListFacade(theNode),
-				LightAmbientTag::Plug(this),
-				LightDiffuseTag::Plug(this),
-				LightSpecularTag::Plug(this),
-				AttenuationTag::Plug(this),
-				CutOffTag::Plug(this),
-				ExponentTag::Plug(this)
-			{}
-			IMPLEMENT_FACADE(LightPropertiesFacade);
-	};
-	typedef asl::Ptr<LightPropertiesFacade, dom::ThreadingModel> LightPropertiesFacadePtr;
+    class LightPropertiesFacade :
+        public PropertyListFacade,
+        public LightAmbientTag::Plug,
+        public LightDiffuseTag::Plug,
+        public LightSpecularTag::Plug,
+        public AttenuationTag::Plug,
+        public CutOffTag::Plug,
+        public ExponentTag::Plug
+    {
+        public:
+            LightPropertiesFacade(dom::Node & theNode) :
+                PropertyListFacade(theNode),
+                LightAmbientTag::Plug(this),
+                LightDiffuseTag::Plug(this),
+                LightSpecularTag::Plug(this),
+                AttenuationTag::Plug(this),
+                CutOffTag::Plug(this),
+                ExponentTag::Plug(this)
+            {}
+            IMPLEMENT_FACADE(LightPropertiesFacade);
+    };
+    typedef asl::Ptr<LightPropertiesFacade, dom::ThreadingModel> LightPropertiesFacadePtr;
 
-	DEFINE_CHILDNODE_TAG(LightPropertiesTag, LightSource, LightPropertiesFacade, "properties");
+    DEFINE_CHILDNODE_TAG(LightPropertiesTag, LightSource, LightPropertiesFacade, "properties");
 
     class Y60_SCENE_DECL LightSource :
-		public dom::Facade,
+        public dom::Facade,
         public IdTag::Plug,
         public NameTag::Plug,
         public LightSourceTypeTag::Plug,
-		public LightPropertiesTag::Plug
+        public LightPropertiesTag::Plug
     {
         public:
             LightSource(dom::Node & theNode);

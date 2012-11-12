@@ -74,20 +74,20 @@ namespace y60 {
             ImageBuilder(const std::string & theName);
             virtual ~ImageBuilder();
 
-		    void inlineImage(const std::string & theFileName, ImageFilter theFilter, const std::string & theResizeMode);
+            void inlineImage(const std::string & theFileName, ImageFilter theFilter, const std::string & theResizeMode);
             void createFileReference(const std::string & myFileName, const std::string & theResizeMode);
 
             void setTiling(asl::Vector2i theTiling);
             void setDepth(unsigned int theDepth);
 
             const std::string & getName() const;
-			void setInternalFormat(const std::string & theType);
+            void setInternalFormat(const std::string & theType);
 
-		protected:
+        protected:
             ImageBuilder(const std::string & theNodeName, const std::string & theName);
 
         private:
-			void init(const std::string & theName);
+            void init(const std::string & theName);
             void setImage(const std::string & theFileName, const std::string & theFilter,
                 const std::string & theResizeMode);
     };

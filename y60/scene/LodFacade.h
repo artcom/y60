@@ -70,10 +70,10 @@ namespace y60 {
     DEFINE_ATTRIBUTE_TAG(RangesTag,  VectorOfFloat, LODRANGES_ATTRIB,  TYPE(), Y60_SCENE_DECL);
 /*
     struct RangesTag {
-		typedef VectorOfFloat TYPE;
+        typedef VectorOfFloat TYPE;
         typedef dom::AttributePlug<RangesTag> Plug;
         static const char * getName() { return LODRANGES_ATTRIB; }
-		static const TYPE getDefault() { return VectorOfFloat(); }
+        static const TYPE getDefault() { return VectorOfFloat(); }
     };
 */
     class LodFacade :

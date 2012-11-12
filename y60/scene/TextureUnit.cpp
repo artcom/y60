@@ -76,7 +76,7 @@ namespace y60 {
         TextureUnitCombinerTag::Plug(theNode),
         TextureUnitEnvColorTag::Plug(theNode),
         TextureUnitSpriteTag::Plug(theNode),
-		TextureUnitMatrixTag::Plug(theNode),
+        TextureUnitMatrixTag::Plug(theNode),
         ResizePolicyTag::Plug(theNode)
     {
         AC_TRACE << "TextureUnit::TextureUnit " << (void*) this;

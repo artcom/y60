@@ -125,15 +125,15 @@ namespace y60 {
             IMPLEMENT_FACADE(TransformHierarchyFacade);
 
             dom::NodePtr getWorld() const {
-            	const dom::Node& myOwnNode = getNode();
-            	dom::NodePtr myNode = myOwnNode.self().lock();
-            	while(myNode) {
-            		myNode = myNode->parentNode()->self().lock();
-            		if(myNode->nodeName() == "world") {
-            			return myNode;
-            		}
-            	}
-            	return dom::NodePtr();
+                const dom::Node& myOwnNode = getNode();
+                dom::NodePtr myNode = myOwnNode.self().lock();
+                while(myNode) {
+                    myNode = myNode->parentNode()->self().lock();
+                    if(myNode->nodeName() == "world") {
+                        return myNode;
+                    }
+                }
+                return dom::NodePtr();
             }
 
             asl::Vector3f getViewVector() const;

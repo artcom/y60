@@ -99,7 +99,7 @@ namespace y60 {
             Shape & getShape();
             const Shape & getShape() const;
 
-			ShapePtr getShapePtr();
+            ShapePtr getShapePtr();
             const ShapePtr getShapePtr() const;
             double calculateVolume(const Scene & theScene) const;
 

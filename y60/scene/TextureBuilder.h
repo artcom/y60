@@ -81,7 +81,7 @@ namespace y60 {
             void setMatrix(const asl::Matrix4f & theMatrix);
             void setTextureFormat(const std::string & theInternalFormat);
 
-		protected:
+        protected:
 
         private:
     };

@@ -76,31 +76,31 @@
 #include <vector>
 
 namespace y60 {
-	class Y60_SCENE_DECL PropertyListFacade : public dom::Facade {
-		public:
-			PropertyListFacade(dom::Node & theNode) : dom::Facade(theNode), _myNodeVersion(0) {}
-			void ensureProperties() const {
-				if (getNode().nodeVersion() != _myNodeVersion) {
+    class Y60_SCENE_DECL PropertyListFacade : public dom::Facade {
+        public:
+            PropertyListFacade(dom::Node & theNode) : dom::Facade(theNode), _myNodeVersion(0) {}
+            void ensureProperties() const {
+                if (getNode().nodeVersion() != _myNodeVersion) {
                     _myPropertyNodes.clear();
                     unsigned mySize = getNode().childNodesLength();
-					for (unsigned i = 0; i < mySize; ++i) {
-						dom::NodePtr myNode = getNode().childNode(i);
-						if (myNode->nodeType() == dom::Node::ELEMENT_NODE &&
+                    for (unsigned i = 0; i < mySize; ++i) {
+                        dom::NodePtr myNode = getNode().childNode(i);
+                        if (myNode->nodeType() == dom::Node::ELEMENT_NODE &&
                             myNode->nodeName() != "#comment")
                         {
                             std::string myName = myNode->getAttributeString(NAME_ATTRIB);
-							if (_myPropertyNodes.find(myName) == _myPropertyNodes.end()) {
-								_myPropertyNodes[myName] = myNode->childNode("#text");
-							}
-						}
-					}
-					_myNodeVersion = getNode().nodeVersion();
-				}
-			}
+                            if (_myPropertyNodes.find(myName) == _myPropertyNodes.end()) {
+                                _myPropertyNodes[myName] = myNode->childNode("#text");
+                            }
+                        }
+                    }
+                    _myNodeVersion = getNode().nodeVersion();
+                }
+            }
 
-		private:
-			mutable unsigned long long _myNodeVersion;
-	};
+        private:
+            mutable unsigned long long _myNodeVersion;
+    };
 }
 
 #endif

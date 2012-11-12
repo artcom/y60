@@ -64,7 +64,7 @@ namespace y60 {
 
 void
 World::updateLights() {
-		_myLights.clear();
+        _myLights.clear();
 
         dom::Node & myWorldNode = this->getNode();
 
