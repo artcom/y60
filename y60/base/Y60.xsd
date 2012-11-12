@@ -2787,13 +2787,7 @@ Possible values are (see also OpenGL documentation on GL_TEXTURE_ENV_MODE):
 'replace'    - Color and alpha values are replaced
 'blend'      - Color values are blended, alpha values are multiplied
 'add'        - Color and alpha values are added
-'subtract'   - Values are subtracted
-'combine'    - Texture environment combiner in the 'combiner' attribute is used</xs:documentation>
-                </xs:annotation>
-            </xs:attribute>
-            <xs:attribute name="combiner" type="xs:string">
-                <xs:annotation>
-                    <xs:documentation>Texture environment combiner name as defined in the shaderlibrary.</xs:documentation>
+'subtract'   - Values are subtracted</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
             <xs:attribute name="envcolor" type="Vector4f">

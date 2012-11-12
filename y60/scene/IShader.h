@@ -128,19 +128,9 @@ namespace y60 {
     };
     typedef asl::Ptr<IShader, dom::ThreadingModel> IShaderPtr;
 
-    class ICombiner {
-    public:
-        virtual bool setup(dom::NodePtr theNode) = 0;
-        virtual void apply() = 0;
-        virtual ~ICombiner() {}
-    };
-    typedef asl::Ptr<ICombiner, dom::ThreadingModel> ICombinerPtr;
-    typedef asl::WeakPtr<ICombiner, dom::ThreadingModel> ICombinerWeakPtr;
-
     class Y60_SCENE_DECL IShaderLibrary {
     public:
         virtual IShaderPtr findShader(MaterialBasePtr theMaterial) = 0;
-        virtual ICombinerPtr findCombiner(const std::string & theCombinerName) = 0;
 
         virtual const std::string & getVertexProfileName() = 0;
         virtual const std::string & getFragmentProfileName() = 0;

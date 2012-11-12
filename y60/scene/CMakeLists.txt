@@ -14,7 +14,6 @@ Canvas.cpp
 CanvasBuilder.cpp
 CharacterBuilder.cpp
 ClipBuilder.cpp
-Combiner.cpp
 ElementBuilder.cpp
 Geometry.cpp
 ImageBuilder.cpp
@@ -63,7 +62,6 @@ Canvas.h
 CanvasBuilder.h
 CharacterBuilder.h
 ClipBuilder.h
-Combiner.h
 ElementBuilder.h
 Facades.h
 Geometry.h

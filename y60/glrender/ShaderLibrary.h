@@ -131,8 +131,6 @@ namespace y60 {
             virtual IShaderPtr findShader(MaterialBasePtr theMaterial);
             const GLShaderVector & getShaders() const { return _myShaders; };
 
-            virtual ICombinerPtr findCombiner(const std::string& theName);
-
 #ifndef _AC_NO_CG_
             CGcontext getCgContext();
 #endif

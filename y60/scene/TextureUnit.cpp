@@ -73,7 +73,6 @@ namespace y60 {
         TextureUnitTextureIdTag::Plug(theNode),
         TextureUnitProjectorIdTag::Plug(theNode),
         TextureUnitApplyModeTag::Plug(theNode),
-        TextureUnitCombinerTag::Plug(theNode),
         TextureUnitEnvColorTag::Plug(theNode),
         TextureUnitSpriteTag::Plug(theNode),
         TextureUnitMatrixTag::Plug(theNode),
@@ -100,26 +99,5 @@ namespace y60 {
     TextureUnit::getTexture() const {
        const std::string & myTextureId = get<TextureUnitTextureIdTag>();
        return _myTextureManager->getTexture(myTextureId);
-    }
-
-    ICombinerPtr
-    TextureUnit::getCombiner() const {
-        return ICombinerPtr();
-    }
-
-    void
-    TextureUnit::updateCombiner() {
-
-        std::string myCombinerName = get<TextureUnitCombinerTag>();
-        AC_TRACE << "TextureUnit::updateCombiner combiner=" << myCombinerName;
-
-        /*CombinerPtr myCombiner;
-        //myCombiner = _myTextureManager->findCombiner(myCombinerName);
-        if (!myCombiner) {
-            AC_WARNING << "TextureUnit::updateTexture textureunit references invalid combiner name=" << myCombinerName;
-            return;
-        }
-        set<TextureUnitCombinerPtrTag>(CombinerWeakPtr(myCombiner));
-        */
     }
 }

@@ -176,7 +176,6 @@ namespace y60 {
     const char * const TEXTUREUNIT_NODE_NAME     = "textureunit";
     const char * const TEXTUREUNIT_TEXTURE_ATTRIB   = "texture";
     const char * const TEXTUREUNIT_APPLYMODE_ATTRIB = "applymode";
-    const char * const TEXTUREUNIT_COMBINER_ATTRIB  = "combiner";
     const char * const TEXTUREUNIT_ENVCOLOR_ATTRIB  = "envcolor";
     const char * const TEXTUREUNIT_SPRITE_ATTRIB    = "sprite";
     const char * const TEXTUREUNIT_PROJECTOR_ATTRIB = "projector";

@@ -382,11 +382,4 @@ namespace y60 {
             +  theMaterial->get<NameTag>() + "', requirement = " + as_string(myReqFacade->getNode()),
                                      PLUS_FILE_LINE);
     }
-
-    ICombinerPtr
-    ShaderLibrary::findCombiner(const std::string& theName) {
-
-        AC_PRINT << "ShaderLibrary::findCombiner '" << theName << "'";
-        return ICombinerPtr();
-    }
 }
