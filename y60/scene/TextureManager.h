@@ -100,8 +100,7 @@ namespace y60 {
                                 double theCurrentTime = -1);
             void loadCaptureFrame(asl::Ptr<Capture, dom::ThreadingModel> theCapture);
             TexturePtr getTexture(const std::string & theTextureId) const;
-            TexturePtr findTexture(const std::string & theTextureId) const;
-
+            
             // Delegates to virtual methods of ResourceManager
             virtual int getMaxTextureSize(int theDimensions) const;
             //void updateTextureData(const TexturePtr & theTexture);
@@ -123,13 +122,12 @@ namespace y60 {
             ResourceManager * getResourceManager() { return _myResourceManager; }
             const ResourceManager * getResourceManager() const { return _myResourceManager; }
 
-        protected:
+        private:
+            TextureManager();
+            TexturePtr findTexture(const std::string & theTextureId) const;
             dom::NodePtr      _myTextureList;
             ResourceManager * _myResourceManager;
             int               _myResourceManagerCount;
-
-        private:
-            TextureManager();
             asl::WeakPtr<ITextureManager> _mySelf;
             unsigned _myMaxTextureSize;
             MemoryResourceManagerPtr _myMemoryResourceManager;

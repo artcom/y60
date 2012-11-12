@@ -99,12 +99,7 @@ namespace y60 {
     TexturePtr
     TextureUnit::getTexture() const {
        const std::string & myTextureId = get<TextureUnitTextureIdTag>();
-       TexturePtr myTexture = _myTextureManager->findTexture(myTextureId);
-        if (!myTexture) {
-            AC_WARNING << "TextureUnit::updateTexture textureunit references invalid texture id=" << myTextureId;
-            return TexturePtr();
-        }
-        return myTexture;
+       return _myTextureManager->getTexture(myTextureId);
     }
 
     ICombinerPtr
