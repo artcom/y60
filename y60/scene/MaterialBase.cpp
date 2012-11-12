@@ -416,11 +416,6 @@ namespace y60 {
             TextureUnitPtr myTextureUnit = theTextureUnitNode->getFacade<TextureUnit>();
             myTextureUnit->setTextureManager(theTextureManager);
             _myTextureUnits.push_back(myTextureUnit);
-            TexturePtr myTexture = myTextureUnit->getTexture();
-            if (myTexture && myTexture->getTextureId() == 0) {
-                //AC_DEBUG << "addTexture triggering texture upload id=" << myTexture->get<IdTag>() << " texId=" << myTexture->getTextureId();
-                //myTexture->preload();
-            }
         } else {
             AC_WARNING << "Your OpenGL implementation only supports "
                  << asl::as_string(myMaxUnits) << " texture units, "
