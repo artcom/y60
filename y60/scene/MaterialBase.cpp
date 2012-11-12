@@ -145,7 +145,7 @@ namespace y60 {
     bool
     MaterialBase::reloadRequired() const {
         const MaterialRequirementFacadePtr myReqFacade = getChild<MaterialRequirementTag>();
-        if (myReqFacade && myReqFacade->getNode().nodeVersion() == _myRequiresVersion) {
+        if (_myShader && myReqFacade && myReqFacade->getNode().nodeVersion() == _myRequiresVersion) {
             AC_TRACE << "Not reloading params for material " << get<NameTag>() << " last requiresVersion:" << _myRequiresVersion;
             AC_TRACE << "Not reloading params for material " << get<NameTag>() << " cur. requiresVersion:" << myReqFacade->getNode().nodeVersion();
             return false;
