@@ -396,7 +396,7 @@ namespace y60 {
                                 string myTextureName = mySamplerNode->getAttributeString("name");
                                 dom::NodePtr myTextureNode = myShaderTextures->childNodeByAttribute("texture","name",myTextureName);
                                 if (myTextureNode) {
-                                    AC_DEBUG << "Loading default texture " << myTextureIndex << " " << myTextureName << endl;
+                                    AC_DEBUG << "adding textureunit " << myTextureIndex << " " << myTextureName << endl;
                                     addTexture(myTextureNode, theTextureManager);
                                 }
                             }
