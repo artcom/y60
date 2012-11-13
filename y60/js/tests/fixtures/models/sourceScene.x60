@@ -30,7 +30,7 @@
                 <vector4f name="emissive">[0,0,0,1]</vector4f>
             </properties>
             <textureunits>
-                <textureunit texture="source_texture_1" projector="" applymode="modulate" combiner="" envcolor="[1,1,1,1]" sprite="0" matrix="identity[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]" resizepolicy="adapt_vertical"/>
+                <textureunit texture="source_texture_1" projector="" applymode="modulate" envcolor="[1,1,1,1]" sprite="0" matrix="identity[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]" resizepolicy="adapt_vertical"/>
             </textureunits>
             <requires>
                 <feature name="textures">[100[paint]]</feature>

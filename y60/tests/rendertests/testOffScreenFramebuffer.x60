@@ -1,56 +1,56 @@
 <scene revision="0">
     <worlds>
-        <world visible="1" id="IKAX8w0fHv4=">
-            <transform visible="1" name="groundPlane_transform" position="[0,0,0]" scale="[12,12,1]" orientation="[0.707107,0,0,-0.707107]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="IaAX8w0fHv4="/>
-            <camera visible="1" name="perspShape" position="[1.60001,1.69881,3.52813]" scale="[1,1,1]" orientation="[-0.106284,0.146953,0.0158843,-0.983288]" pivot="[-1.88738e-017,-1.25178e-016,-2.37588e-016]" billboard="" billboardlookat="" renderorder="0" frustum="perspective[-0.0514286,0.0514286,-0.0509525,0.0509525,0.1,10000]" id="I6AX8w0fHv4="/>
-            <transform visible="0" name="top" position="[-0.112803,100.003,0.159082]" scale="[1,1,1]" orientation="[-0.707107,0,0,-0.707107]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="JKAX8w0fHv4="/>
-            <transform visible="0" name="front" position="[0.0211417,0.0242796,100]" scale="[1,1,1]" orientation="[0,0,0,-1]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="JaAX8w0fHv4="/>
-            <transform visible="0" name="side" position="[2.27453e-015,-5.67269e-019,100]" scale="[1,1,1]" orientation="[0,0,0,-1]" pivot="[-2.30926e-015,-1.38778e-017,-4.71845e-018]" billboard="" billboardlookat="" renderorder="0" id="JqAX8w0fHv4="/>
-            <transform visible="1" name="cameleon_philippe_starck" position="[-0.960169,0,0]" scale="[1,1,1]" orientation="[-6.05258e-018,0.754801,-6.05258e-018,-0.655954]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="J6AX8w0fHv4=">
-                <body shape="A6AX8w0fHv4=" id="KaAX8w0fHv4=" name="DRIADE_CAM" position="[-4.4972e-009,-6.70135e-017,-6.33313e-010]" orientation="[0,0,0,-1]"/>
-                <body shape="BaAX8w0fHv4=" id="K6AX8w0fHv4=" name="metall" orientation="[0,0,0,-1]"/>
+        <world visible="1" id="IEAV8w4MVBk=">
+            <transform visible="1" name="groundPlane_transform" position="[0,0,0]" scale="[12,12,1]" orientation="[0.707107,0,0,-0.707107]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="IUAV8w4MVBk="/>
+            <camera visible="1" name="perspShape" position="[1.60001,1.69881,3.52813]" scale="[1,1,1]" orientation="[-0.106284,0.146953,0.0158843,-0.983288]" pivot="[-1.88738e-017,-1.25178e-016,-2.37588e-016]" billboard="" billboardlookat="" renderorder="0" frustum="perspective[-0.0514286,0.0514286,-0.0509525,0.0509525,0.1,10000]" id="I0AV8w4MVBk="/>
+            <transform visible="0" name="top" position="[-0.112803,100.003,0.159082]" scale="[1,1,1]" orientation="[-0.707107,0,0,-0.707107]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="JEAV8w4MVBk="/>
+            <transform visible="0" name="front" position="[0.0211417,0.0242796,100]" scale="[1,1,1]" orientation="[0,0,0,-1]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="JUAV8w4MVBk="/>
+            <transform visible="0" name="side" position="[2.27453e-015,-5.67269e-019,100]" scale="[1,1,1]" orientation="[0,0,0,-1]" pivot="[-2.30926e-015,-1.38778e-017,-4.71845e-018]" billboard="" billboardlookat="" renderorder="0" id="JkAV8w4MVBk="/>
+            <transform visible="1" name="cameleon_philippe_starck" position="[-0.960169,0,0]" scale="[1,1,1]" orientation="[-6.05258e-018,0.754801,-6.05258e-018,-0.655954]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="J0AV8w4MVBk=">
+                <body shape="A0AV8w4MVBk=" id="KUAV8w4MVBk=" name="DRIADE_CAM" position="[-4.4972e-009,-6.70135e-017,-6.33313e-010]" orientation="[0,0,0,-1]"/>
+                <body shape="BUAV8w4MVBk=" id="K0AV8w4MVBk=" name="metall" orientation="[0,0,0,-1]"/>
             </transform>
-            <transform visible="1" name="cameleon_philippe_starck_2" position="[0.906164,0,-0.0354845]" scale="[1,1,1]" orientation="[4.56916e-009,-0.613263,-5.88506e-009,-0.789879]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="LKAX8w0fHv4=">
-                <transform visible="1" name="cameleon_philippe_starck_3" position="[0,0,0]" scale="[1,1,1]" orientation="[0,0,0,-1]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="LaAX8w0fHv4=">
-                    <body shape="B6AX8w0fHv4=" id="L6AX8w0fHv4=" name="DRIADE_CAM_2" position="[-4.61963e-009,-6.88379e-017,-1.18169e-009]" orientation="[0,0,0,-1]"/>
-                    <body shape="CKAX8w0fHv4=" id="MaAX8w0fHv4=" name="metall_2" orientation="[0,0,0,-1]"/>
+            <transform visible="1" name="cameleon_philippe_starck_2" position="[0.906164,0,-0.0354845]" scale="[1,1,1]" orientation="[4.56916e-009,-0.613263,-5.88506e-009,-0.789879]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="LEAV8w4MVBk=">
+                <transform visible="1" name="cameleon_philippe_starck_3" position="[0,0,0]" scale="[1,1,1]" orientation="[0,0,0,-1]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="LUAV8w4MVBk=">
+                    <body shape="B0AV8w4MVBk=" id="L0AV8w4MVBk=" name="DRIADE_CAM_2" position="[-4.61963e-009,-6.88379e-017,-1.18169e-009]" orientation="[0,0,0,-1]"/>
+                    <body shape="CEAV8w4MVBk=" id="MUAV8w4MVBk=" name="metall_2" orientation="[0,0,0,-1]"/>
                 </transform>
             </transform>
-            <body shape="CaAX8w0fHv4=" id="M6AX8w0fHv4=" name="frau_sitzt_passiv" position="[-0.736681,-0.521639,0.0189865]" orientation="[-0.102618,0.616038,0.0813861,-0.776752]" scale="[250,250,250]"/>
-            <light visible="1" name="Licht" position="[0,1.83538,0]" scale="[1,1,1]" orientation="[0.707107,0,0,-0.707107]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" lightsource="H6AX8w0fHv4=" id="NaAX8w0fHv4="/>
-            <transform visible="1" name="Tisch_klein" position="[-0.456391,-1.99746e-006,-0.0527786]" scale="[1,1,1]" orientation="[-1.60186e-007,2.21123e-014,-1.38042e-007,-1]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="NqAX8w0fHv4=">
-                <body shape="C6AX8w0fHv4=" id="OKAX8w0fHv4=" name="tischgestell" position="[0.941395,0.383358,0.00241655]" orientation="[0,-0.171351,0,-0.98521]"/>
-                <body shape="DaAX8w0fHv4=" id="OqAX8w0fHv4=" name="tischplatte" position="[0.694948,0.755841,-0.0442322]" orientation="[0,8.74228e-008,0,-1]"/>
-                <transform visible="1" name="W_rfel" position="[0.495501,0.0415725,-0.000381785]" scale="[1,1,1]" orientation="[-2.10293e-007,0.707107,2.10293e-007,-0.707107]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="O6AX8w0fHv4=">
-                    <body shape="D6AX8w0fHv4=" id="PKAX8w0fHv4=" name="W_rfel"/>
-                    <body shape="EKAX8w0fHv4=" id="PqAX8w0fHv4=" name="Zylinder" position="[-0.00162109,-0.0218524,0.372823]" orientation="[0,0,0,-1]"/>
-                    <body shape="EaAX8w0fHv4=" id="QKAX8w0fHv4=" name="Zylinder_2" position="[-0.00160159,-0.0218525,-0.372727]" orientation="[0,0,0,-1]"/>
+            <body shape="CUAV8w4MVBk=" id="M0AV8w4MVBk=" name="frau_sitzt_passiv" position="[-0.736681,-0.521639,0.0189865]" orientation="[-0.102618,0.616038,0.0813861,-0.776752]" scale="[250,250,250]"/>
+            <light visible="1" name="Licht" position="[0,1.83538,0]" scale="[1,1,1]" orientation="[0.707107,0,0,-0.707107]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" lightsource="H0AV8w4MVBk=" id="NUAV8w4MVBk="/>
+            <transform visible="1" name="Tisch_klein" position="[-0.456391,-1.99746e-006,-0.0527786]" scale="[1,1,1]" orientation="[-1.60186e-007,2.21123e-014,-1.38042e-007,-1]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="NkAV8w4MVBk=">
+                <body shape="C0AV8w4MVBk=" id="OEAV8w4MVBk=" name="tischgestell" position="[0.941395,0.383358,0.00241655]" orientation="[0,-0.171351,0,-0.98521]"/>
+                <body shape="DUAV8w4MVBk=" id="OkAV8w4MVBk=" name="tischplatte" position="[0.694948,0.755841,-0.0442322]" orientation="[0,8.74228e-008,0,-1]"/>
+                <transform visible="1" name="W_rfel" position="[0.495501,0.0415725,-0.000381785]" scale="[1,1,1]" orientation="[-2.10293e-007,0.707107,2.10293e-007,-0.707107]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="O0AV8w4MVBk=">
+                    <body shape="D0AV8w4MVBk=" id="PEAV8w4MVBk=" name="W_rfel"/>
+                    <body shape="EEAV8w4MVBk=" id="PkAV8w4MVBk=" name="Zylinder" position="[-0.00162109,-0.0218524,0.372823]" orientation="[0,0,0,-1]"/>
+                    <body shape="EUAV8w4MVBk=" id="QEAV8w4MVBk=" name="Zylinder_2" position="[-0.00160159,-0.0218525,-0.372727]" orientation="[0,0,0,-1]"/>
                 </transform>
-                <transform visible="1" name="W_rfel_2" position="[0.929733,0.041572,-0.00769941]" scale="[1,1,1]" orientation="[0,0.00299063,0,-0.999996]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="QaAX8w0fHv4=">
-                    <body shape="EqAX8w0fHv4=" id="QqAX8w0fHv4=" name="W_rfel_2"/>
-                    <body shape="E6AX8w0fHv4=" id="RKAX8w0fHv4=" name="Zylinder_3" position="[-0.448203,-0.0218525,0.375566]" orientation="[0,0,0,-1]"/>
-                    <body shape="FKAX8w0fHv4=" id="RqAX8w0fHv4=" name="Zylinder_4" position="[-0.448183,-0.0218526,-0.369984]" orientation="[0,0,0,-1]"/>
+                <transform visible="1" name="W_rfel_2" position="[0.929733,0.041572,-0.00769941]" scale="[1,1,1]" orientation="[0,0.00299063,0,-0.999996]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="QUAV8w4MVBk=">
+                    <body shape="EkAV8w4MVBk=" id="QkAV8w4MVBk=" name="W_rfel_2"/>
+                    <body shape="E0AV8w4MVBk=" id="REAV8w4MVBk=" name="Zylinder_3" position="[-0.448203,-0.0218525,0.375566]" orientation="[0,0,0,-1]"/>
+                    <body shape="FEAV8w4MVBk=" id="RkAV8w4MVBk=" name="Zylinder_4" position="[-0.448183,-0.0218526,-0.369984]" orientation="[0,0,0,-1]"/>
                 </transform>
             </transform>
-            <camera visible="1" name="cameraShape1" position="[-0.0130899,1.30858,-3.15789]" scale="[1,1,1]" orientation="[-0.302176,-0.109067,0.0326488,-0.946429]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" frustum="perspective[-0.0514286,0.0514286,-0.0509525,0.0509525,0.1,10000]" id="SKAX8w0fHv4="/>
-            <body shape="FaAX8w0fHv4=" id="SqAX8w0fHv4=" name="spiegel" position="[0,1,-2]" orientation="[0.707107,0,0,-0.707107]" scale="[4,1,2]"/>
-            <body shape="GaAX8w0fHv4=" id="TKAX8w0fHv4=" name="bolt" orientation="[0,0,0,-1]"/>
-            <body shape="G6AX8w0fHv4=" id="TqAX8w0fHv4=" name="sight" orientation="[0,0,0,-1]"/>
-            <body shape="HKAX8w0fHv4=" id="UKAX8w0fHv4=" name="trigger" orientation="[0,0,0,-1]"/>
-            <body shape="HaAX8w0fHv4=" id="UqAX8w0fHv4=" name="saftey" orientation="[0,0,0,-1]"/>
-            <body shape="HqAX8w0fHv4=" id="VKAX8w0fHv4=" name="winder" orientation="[0,0,0,-1]"/>
+            <camera visible="1" name="cameraShape1" position="[-0.0130899,1.30858,-3.15789]" scale="[1,1,1]" orientation="[-0.302176,-0.109067,0.0326488,-0.946429]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" frustum="perspective[-0.0514286,0.0514286,-0.0509525,0.0509525,0.1,10000]" id="SEAV8w4MVBk="/>
+            <body shape="FUAV8w4MVBk=" id="SkAV8w4MVBk=" name="spiegel" position="[0,1,-2]" orientation="[0.707107,0,0,-0.707107]" scale="[4,1,2]"/>
+            <body shape="GUAV8w4MVBk=" id="TEAV8w4MVBk=" name="bolt" orientation="[0,0,0,-1]"/>
+            <body shape="G0AV8w4MVBk=" id="TkAV8w4MVBk=" name="sight" orientation="[0,0,0,-1]"/>
+            <body shape="HEAV8w4MVBk=" id="UEAV8w4MVBk=" name="trigger" orientation="[0,0,0,-1]"/>
+            <body shape="HUAV8w4MVBk=" id="UkAV8w4MVBk=" name="saftey" orientation="[0,0,0,-1]"/>
+            <body shape="HkAV8w4MVBk=" id="VEAV8w4MVBk=" name="winder" orientation="[0,0,0,-1]"/>
         </world>
     </worlds>
     <records/>
     <canvases>
-        <canvas id="AaAX8w0fHv4=">
-            <viewport id="AqAX8w0fHv4=" camera="I6AX8w0fHv4=">
+        <canvas id="AUAV8w4MVBk=">
+            <viewport id="AkAV8w4MVBk=" camera="I0AV8w4MVBk=">
                 <overlays/>
             </viewport>
         </canvas>
     </canvases>
     <materials>
-        <material name="plastik_schwarz" id="BKAX8w0fHv4=">
+        <material name="plastik_schwarz" id="BEAV8w4MVBk=">
             <properties>
                 <vector4f name="ambient">[0,0,0,1]</vector4f>
                 <vector4f name="diffuse">[0.17,0.17,0.17,1]</vector4f>
@@ -69,7 +69,7 @@
 10[unlit]]</feature>
             </requires>
         </material>
-        <material name="alurohr" id="BqAX8w0fHv4=">
+        <material name="alurohr" id="BkAV8w4MVBk=">
             <properties>
                 <vector4f name="ambient">[0,0,0,1]</vector4f>
                 <vector4f name="diffuse">[0.384,0.384,0.384,1]</vector4f>
@@ -88,7 +88,7 @@
 10[unlit]]</feature>
             </requires>
         </material>
-        <material name="lambert5" id="CqAX8w0fHv4=">
+        <material name="lambert5" id="CkAV8w4MVBk=">
             <properties>
                 <vector4f name="ambient">[0,0,0,1]</vector4f>
                 <vector4f name="diffuse">[0.1192,0.376202,0.8,1]</vector4f>
@@ -99,7 +99,7 @@
                 <feature name="lighting">[30[lambert],20[flat],10[unlit]]</feature>
             </requires>
         </material>
-        <material name="metall_gestrahlt" id="DKAX8w0fHv4=">
+        <material name="metall_gestrahlt" id="DEAV8w4MVBk=">
             <properties>
                 <vector4f name="ambient">[0,0,0,1]</vector4f>
                 <vector4f name="diffuse">[0.8,0.784,0.776,1]</vector4f>
@@ -118,7 +118,7 @@
 10[unlit]]</feature>
             </requires>
         </material>
-        <material name="tischplatte1" id="DqAX8w0fHv4=">
+        <material name="tischplatte1" id="DkAV8w4MVBk=">
             <properties>
                 <vector4f name="ambient">[0,0,0,1]</vector4f>
                 <vector4f name="diffuse">[0.8,0.8,0.8,1]</vector4f>
@@ -137,14 +137,14 @@
 10[unlit]]</feature>
             </requires>
         </material>
-        <material name="lambert4" id="FqAX8w0fHv4=" transparent="0">
+        <material name="lambert4" id="FkAV8w4MVBk=" transparent="0">
             <properties>
                 <vector4f name="ambient">[0,0,0,1]</vector4f>
                 <vector4f name="diffuse">[0.8,0.8,0.8,1]</vector4f>
                 <vector4f name="emissive">[0,0,0,1]</vector4f>
             </properties>
             <textureunits>
-                <textureunit texture="GKAX8w0fHv4="/>
+                <textureunit texture="GEAV8w4MVBk="/>
             </textureunits>
             <requires>
                 <feature name="textures">[100[paint]]</feature>
@@ -152,7 +152,7 @@
                 <feature name="lighting">[30[lambert],20[flat],10[unlit]]</feature>
             </requires>
         </material>
-        <material name="lambert1" id="GqAX8w0fHv4=">
+        <material name="lambert1" id="GkAV8w4MVBk=">
             <properties>
                 <vector4f name="ambient">[0,0,0,1]</vector4f>
                 <vector4f name="diffuse">[0.4,0.4,0.4,1]</vector4f>
@@ -165,7 +165,7 @@
         </material>
     </materials>
     <lightsources>
-        <lightsource name="LichtShape" type="positional" id="H6AX8w0fHv4=">
+        <lightsource name="LichtShape" type="positional" id="H0AV8w4MVBk=">
             <properties>
                 <vector4f name="ambient">[0,0,0,0]</vector4f>
                 <vector4f name="diffuse">[1,1,1,1]</vector4f>
@@ -176,7 +176,7 @@
     <animations/>
     <characters/>
     <shapes>
-        <shape name="polySurfaceShape1" renderstyle="[frontfacing,backfacing]" id="A6AX8w0fHv4=">
+        <shape name="polySurfaceShape1" renderstyle="[frontfacing,backfacing]" id="A0AV8w4MVBk=">
             <vertexdata>
                 <vectorofvector3f name="position" vertexbufferusage="static_draw">[
 [0.2734,0.47899,0.19215],
@@ -878,7 +878,7 @@
                 <vectorofvector2f name="map1" vertexbufferusage="static_draw">[]</vectorofvector2f>
             </vertexdata>
             <primitives>
-                <elements type="triangles" material="BKAX8w0fHv4=">
+                <elements type="triangles" material="BEAV8w4MVBk=">
                     <indices vertexdata="position" role="position">[34,17,65,333,334,179,234,10,240,18,274,239,87,34,95,8,337,127,287,273,189,8,75,296,214,
 159,125,308,152,73,244,305,47,340,249,197,46,194,177,134,151,184,185,34,256,89,330,151,220,
 88,104,72,344,194,318,233,3,211,319,200,164,32,122,62,208,192,94,338,25,340,284,91,296,
@@ -1056,7 +1056,7 @@
                 </elements>
             </primitives>
         </shape>
-        <shape name="polySurfaceShape4" renderstyle="[frontfacing,backfacing]" id="BaAX8w0fHv4=">
+        <shape name="polySurfaceShape4" renderstyle="[frontfacing,backfacing]" id="BUAV8w4MVBk=">
             <vertexdata>
                 <vectorofvector3f name="position" vertexbufferusage="static_draw">[
 [-0.25455,0.446,0.277232],
@@ -5834,7 +5834,7 @@
                 <vectorofvector2f name="map1" vertexbufferusage="static_draw">[]</vectorofvector2f>
             </vertexdata>
             <primitives>
-                <elements type="triangles" material="BqAX8w0fHv4=">
+                <elements type="triangles" material="BkAV8w4MVBk=">
                     <indices vertexdata="position" role="position">[191,1,0,3,191,173,3,2,191,4,3,173,173,175,4,191,11,173,5,191,6,187,188,5,6,
 187,5,2,6,191,184,7,2,3,184,2,181,3,179,181,8,3,4,179,3,175,176,4,173,
 9,175,10,173,11,11,170,10,0,11,191,1,166,0,12,1,191,114,14,13,114,15,14,113,
@@ -7008,7 +7008,7 @@
                 </elements>
             </primitives>
         </shape>
-        <shape name="polySurfaceShape2" renderstyle="[frontfacing,backfacing]" id="B6AX8w0fHv4=">
+        <shape name="polySurfaceShape2" renderstyle="[frontfacing,backfacing]" id="B0AV8w4MVBk=">
             <vertexdata>
                 <vectorofvector3f name="position" vertexbufferusage="static_draw">[
 [0.2734,0.47899,0.19215],
@@ -7710,7 +7710,7 @@
                 <vectorofvector2f name="map1" vertexbufferusage="static_draw">[]</vectorofvector2f>
             </vertexdata>
             <primitives>
-                <elements type="triangles" material="BKAX8w0fHv4=">
+                <elements type="triangles" material="BEAV8w4MVBk=">
                     <indices vertexdata="position" role="position">[34,17,65,333,334,179,234,10,240,18,274,239,87,34,95,8,337,127,287,273,189,8,75,296,214,
 159,125,308,152,73,244,305,47,340,249,197,46,194,177,134,151,184,185,34,256,89,330,151,220,
 88,104,72,344,194,318,233,3,211,319,200,164,32,122,62,208,192,94,338,25,340,284,91,296,
@@ -7888,7 +7888,7 @@
                 </elements>
             </primitives>
         </shape>
-        <shape name="polySurfaceShape5" renderstyle="[frontfacing,backfacing]" id="CKAX8w0fHv4=">
+        <shape name="polySurfaceShape5" renderstyle="[frontfacing,backfacing]" id="CEAV8w4MVBk=">
             <vertexdata>
                 <vectorofvector3f name="position" vertexbufferusage="static_draw">[
 [-0.25455,0.446,0.277232],
@@ -12666,7 +12666,7 @@
                 <vectorofvector2f name="map1" vertexbufferusage="static_draw">[]</vectorofvector2f>
             </vertexdata>
             <primitives>
-                <elements type="triangles" material="BqAX8w0fHv4=">
+                <elements type="triangles" material="BkAV8w4MVBk=">
                     <indices vertexdata="position" role="position">[191,1,0,3,191,173,3,2,191,4,3,173,173,175,4,191,11,173,5,191,6,187,188,5,6,
 187,5,2,6,191,184,7,2,3,184,2,181,3,179,181,8,3,4,179,3,175,176,4,173,
 9,175,10,173,11,11,170,10,0,11,191,1,166,0,12,1,191,114,14,13,114,15,14,113,
@@ -13840,7 +13840,7 @@
                 </elements>
             </primitives>
         </shape>
-        <shape name="polySurfaceShape3" renderstyle="[frontfacing,backfacing]" id="CaAX8w0fHv4=">
+        <shape name="polySurfaceShape3" renderstyle="[frontfacing,backfacing]" id="CUAV8w4MVBk=">
             <vertexdata>
                 <vectorofvector3f name="position" vertexbufferusage="static_draw">[
 [-0.000284993,0.00610688,0.000972163],
@@ -17692,7 +17692,7 @@
                 <vectorofvector2f name="map1" vertexbufferusage="static_draw">[]</vectorofvector2f>
             </vertexdata>
             <primitives>
-                <elements type="triangles" material="CqAX8w0fHv4=">
+                <elements type="triangles" material="CkAV8w4MVBk=">
                     <indices vertexdata="position" role="position">[929,676,951,98,6,2,1759,240,1240,6,10,9,1238,47,668,705,552,1255,10,16,17,1752,1454,504,16,
 134,19,134,20,19,20,22,25,22,24,25,24,26,27,1044,1259,1559,26,30,33,30,32,33,32,
 34,33,1447,914,1748,34,164,39,1759,1102,1229,1130,645,1832,103,1147,111,809,1812,292,608,1534,657,1319,
@@ -18602,7 +18602,7 @@
                 </elements>
             </primitives>
         </shape>
-        <shape name="polySurfaceShape8" renderstyle="[frontfacing,backfacing]" id="C6AX8w0fHv4=">
+        <shape name="polySurfaceShape8" renderstyle="[frontfacing,backfacing]" id="C0AV8w4MVBk=">
             <vertexdata>
                 <vectorofvector3f name="position" vertexbufferusage="static_draw">[
 [-0.434191,0.283831,0.149537],
@@ -18670,7 +18670,7 @@
                 <vectorofvector2f name="map1" vertexbufferusage="static_draw">[]</vectorofvector2f>
             </vertexdata>
             <primitives>
-                <elements type="triangles" material="DKAX8w0fHv4=">
+                <elements type="triangles" material="DEAV8w4MVBk=">
                     <indices vertexdata="position" role="position">[5,2,32,32,2,34,33,35,31,31,35,29,35,3,29,29,3,26,3,7,26,26,7,27,7,
 11,27,27,11,23,11,15,23,23,15,19,21,17,24,24,17,25,17,13,25,25,13,28,13,
 9,28,28,9,30,9,5,30,30,5,32]</indices>
@@ -18678,7 +18678,7 @@
 12,11,11,12,13,12,14,13,13,14,15,23,22,16,16,22,17,22,21,17,17,21,18,21,
 20,18,18,20,19,20,0,19,19,0,2]</indices>
                 </elements>
-                <elements type="quads" material="DKAX8w0fHv4=">
+                <elements type="quads" material="DEAV8w4MVBk=">
                     <indices vertexdata="position" role="position">[27,24,25,26,26,25,28,29,29,28,30,31,31,30,32,33,33,32,34,35,35,34,2,3,3,
 2,5,7,7,5,9,11,11,9,13,15,15,13,17,19,19,17,21,23,23,21,24,27]</indices>
                     <indices vertexdata="normal" role="normal">[11,16,17,9,9,17,18,7,7,18,19,6,6,19,2,4,4,2,3,5,5,3,1,8,8,
@@ -18686,7 +18686,7 @@
                 </elements>
             </primitives>
         </shape>
-        <shape name="polySurfaceShape9" renderstyle="[frontfacing,backfacing]" id="DaAX8w0fHv4=">
+        <shape name="polySurfaceShape9" renderstyle="[frontfacing,backfacing]" id="DUAV8w4MVBk=">
             <vertexdata>
                 <vectorofvector3f name="position" vertexbufferusage="static_draw">[
 [-0.717407,-0.0622756,-0.455934],
@@ -18758,7 +18758,7 @@
                 <vectorofvector2f name="map1" vertexbufferusage="static_draw">[]</vectorofvector2f>
             </vertexdata>
             <primitives>
-                <elements type="quads" material="DqAX8w0fHv4=">
+                <elements type="quads" material="DkAV8w4MVBk=">
                     <indices vertexdata="position" role="position">[19,10,13,16,9,18,22,25,17,15,28,21,14,12,31,27,11,8,24,30,29,23,20,26,16,
 13,1,2,13,10,0,1,10,19,3,0,19,16,2,3,25,22,4,5,22,18,3,4,18,
 9,0,3,9,25,5,0,21,28,6,4,28,15,2,6,15,17,3,2,17,21,4,3,27,
@@ -18772,7 +18772,7 @@
                 </elements>
             </primitives>
         </shape>
-        <shape name="polySurfaceShape10" renderstyle="[frontfacing,backfacing]" id="D6AX8w0fHv4=">
+        <shape name="polySurfaceShape10" renderstyle="[frontfacing,backfacing]" id="D0AV8w4MVBk=">
             <vertexdata>
                 <vectorofvector3f name="position" vertexbufferusage="static_draw">[
 [-0.0081491,-0.0324148,0.373247],
@@ -18804,17 +18804,17 @@
                 <vectorofvector2f name="map1" vertexbufferusage="static_draw">[]</vectorofvector2f>
             </vertexdata>
             <primitives>
-                <elements type="triangles" material="DKAX8w0fHv4=">
+                <elements type="triangles" material="DEAV8w4MVBk=">
                     <indices vertexdata="position" role="position">[2,8,3,6,10,7,4,11,8,2,4,8,0,1,9,6,0,9,6,9,10,4,5,11]</indices>
                     <indices vertexdata="normal" role="normal">[0,4,1,5,9,6,8,11,4,0,8,4,3,2,10,5,3,10,5,10,9,8,7,11]</indices>
                 </elements>
-                <elements type="quads" material="DKAX8w0fHv4=">
+                <elements type="quads" material="DEAV8w4MVBk=">
                     <indices vertexdata="position" role="position">[2,3,1,0,6,7,5,4,3,8,9,1,4,2,0,6,8,11,10,9,11,5,7,10]</indices>
                     <indices vertexdata="normal" role="normal">[0,1,2,3,5,6,7,8,1,4,10,2,8,0,3,5,4,11,9,10,11,7,6,9]</indices>
                 </elements>
             </primitives>
         </shape>
-        <shape name="polySurfaceShape12" renderstyle="[frontfacing,backfacing]" id="EKAX8w0fHv4=">
+        <shape name="polySurfaceShape12" renderstyle="[frontfacing,backfacing]" id="EEAV8w4MVBk=">
             <vertexdata>
                 <vectorofvector3f name="position" vertexbufferusage="static_draw">[
 [0,-0.02,0],
@@ -18986,7 +18986,7 @@
                 <vectorofvector2f name="map1" vertexbufferusage="static_draw">[]</vectorofvector2f>
             </vertexdata>
             <primitives>
-                <elements type="triangles" material="DKAX8w0fHv4=">
+                <elements type="triangles" material="DEAV8w4MVBk=">
                     <indices vertexdata="position" role="position">[6,2,0,9,1,5,10,6,0,13,1,9,14,10,0,17,1,13,18,14,0,21,1,17,22,
 18,0,25,1,21,26,22,0,29,1,25,30,26,0,33,1,29,34,30,0,37,1,33,38,
 34,0,41,1,37,42,38,0,45,1,41,46,42,0,49,1,45,50,46,0,53,1,49,54,
@@ -18998,7 +18998,7 @@
 50,2,57,8,53,58,54,2,61,8,57,62,58,2,65,8,61,66,62,2,69,8,65,70,
 66,2,73,8,69,74,70,2,77,8,73,78,74,2,81,8,77,1,78,2,9,8,81]</indices>
                 </elements>
-                <elements type="quads" material="DKAX8w0fHv4=">
+                <elements type="quads" material="DEAV8w4MVBk=">
                     <indices vertexdata="position" role="position">[7,8,4,3,11,12,8,7,15,16,12,11,19,20,16,15,23,24,20,19,27,28,24,23,31,
 32,28,27,35,36,32,31,39,40,36,35,43,44,40,39,47,48,44,43,51,52,48,47,55,
 56,52,51,59,60,56,55,63,64,60,59,67,68,64,63,71,72,68,67,75,76,72,71,79,
@@ -19010,7 +19010,7 @@
                 </elements>
             </primitives>
         </shape>
-        <shape name="polySurfaceShape13" renderstyle="[frontfacing,backfacing]" id="EaAX8w0fHv4=">
+        <shape name="polySurfaceShape13" renderstyle="[frontfacing,backfacing]" id="EUAV8w4MVBk=">
             <vertexdata>
                 <vectorofvector3f name="position" vertexbufferusage="static_draw">[
 [0,-0.02,0],
@@ -19182,7 +19182,7 @@
                 <vectorofvector2f name="map1" vertexbufferusage="static_draw">[]</vectorofvector2f>
             </vertexdata>
             <primitives>
-                <elements type="triangles" material="DKAX8w0fHv4=">
+                <elements type="triangles" material="DEAV8w4MVBk=">
                     <indices vertexdata="position" role="position">[6,2,0,9,1,5,10,6,0,13,1,9,14,10,0,17,1,13,18,14,0,21,1,17,22,
 18,0,25,1,21,26,22,0,29,1,25,30,26,0,33,1,29,34,30,0,37,1,33,38,
 34,0,41,1,37,42,38,0,45,1,41,46,42,0,49,1,45,50,46,0,53,1,49,54,
@@ -19194,7 +19194,7 @@
 50,2,57,8,53,58,54,2,61,8,57,62,58,2,65,8,61,66,62,2,69,8,65,70,
 66,2,73,8,69,74,70,2,77,8,73,78,74,2,81,8,77,1,78,2,9,8,81]</indices>
                 </elements>
-                <elements type="quads" material="DKAX8w0fHv4=">
+                <elements type="quads" material="DEAV8w4MVBk=">
                     <indices vertexdata="position" role="position">[7,8,4,3,11,12,8,7,15,16,12,11,19,20,16,15,23,24,20,19,27,28,24,23,31,
 32,28,27,35,36,32,31,39,40,36,35,43,44,40,39,47,48,44,43,51,52,48,47,55,
 56,52,51,59,60,56,55,63,64,60,59,67,68,64,63,71,72,68,67,75,76,72,71,79,
@@ -19206,7 +19206,7 @@
                 </elements>
             </primitives>
         </shape>
-        <shape name="polySurfaceShape11" renderstyle="[frontfacing,backfacing]" id="EqAX8w0fHv4=">
+        <shape name="polySurfaceShape11" renderstyle="[frontfacing,backfacing]" id="EkAV8w4MVBk=">
             <vertexdata>
                 <vectorofvector3f name="position" vertexbufferusage="static_draw">[
 [-0.454025,-0.0324149,0.365436],
@@ -19238,17 +19238,17 @@
                 <vectorofvector2f name="map1" vertexbufferusage="static_draw">[]</vectorofvector2f>
             </vertexdata>
             <primitives>
-                <elements type="triangles" material="DKAX8w0fHv4=">
+                <elements type="triangles" material="DEAV8w4MVBk=">
                     <indices vertexdata="position" role="position">[2,8,3,6,10,7,4,11,8,2,4,8,0,1,9,6,0,9,6,9,10,4,5,11]</indices>
                     <indices vertexdata="normal" role="normal">[0,4,1,5,9,6,8,11,4,0,8,4,3,2,10,5,3,10,5,10,9,8,7,11]</indices>
                 </elements>
-                <elements type="quads" material="DKAX8w0fHv4=">
+                <elements type="quads" material="DEAV8w4MVBk=">
                     <indices vertexdata="position" role="position">[2,3,1,0,6,7,5,4,3,8,9,1,4,2,0,6,8,11,10,9,11,5,7,10]</indices>
                     <indices vertexdata="normal" role="normal">[0,1,2,3,5,6,7,8,1,4,10,2,8,0,3,5,4,11,9,10,11,7,6,9]</indices>
                 </elements>
             </primitives>
         </shape>
-        <shape name="polySurfaceShape14" renderstyle="[frontfacing,backfacing]" id="E6AX8w0fHv4=">
+        <shape name="polySurfaceShape14" renderstyle="[frontfacing,backfacing]" id="E0AV8w4MVBk=">
             <vertexdata>
                 <vectorofvector3f name="position" vertexbufferusage="static_draw">[
 [0,-0.02,0],
@@ -19420,7 +19420,7 @@
                 <vectorofvector2f name="map1" vertexbufferusage="static_draw">[]</vectorofvector2f>
             </vertexdata>
             <primitives>
-                <elements type="triangles" material="DKAX8w0fHv4=">
+                <elements type="triangles" material="DEAV8w4MVBk=">
                     <indices vertexdata="position" role="position">[6,2,0,9,1,5,10,6,0,13,1,9,14,10,0,17,1,13,18,14,0,21,1,17,22,
 18,0,25,1,21,26,22,0,29,1,25,30,26,0,33,1,29,34,30,0,37,1,33,38,
 34,0,41,1,37,42,38,0,45,1,41,46,42,0,49,1,45,50,46,0,53,1,49,54,
@@ -19432,7 +19432,7 @@
 50,2,57,8,53,58,54,2,61,8,57,62,58,2,65,8,61,66,62,2,69,8,65,70,
 66,2,73,8,69,74,70,2,77,8,73,78,74,2,81,8,77,1,78,2,9,8,81]</indices>
                 </elements>
-                <elements type="quads" material="DKAX8w0fHv4=">
+                <elements type="quads" material="DEAV8w4MVBk=">
                     <indices vertexdata="position" role="position">[7,8,4,3,11,12,8,7,15,16,12,11,19,20,16,15,23,24,20,19,27,28,24,23,31,
 32,28,27,35,36,32,31,39,40,36,35,43,44,40,39,47,48,44,43,51,52,48,47,55,
 56,52,51,59,60,56,55,63,64,60,59,67,68,64,63,71,72,68,67,75,76,72,71,79,
@@ -19444,7 +19444,7 @@
                 </elements>
             </primitives>
         </shape>
-        <shape name="polySurfaceShape15" renderstyle="[frontfacing,backfacing]" id="FKAX8w0fHv4=">
+        <shape name="polySurfaceShape15" renderstyle="[frontfacing,backfacing]" id="FEAV8w4MVBk=">
             <vertexdata>
                 <vectorofvector3f name="position" vertexbufferusage="static_draw">[
 [0,-0.02,0],
@@ -19616,7 +19616,7 @@
                 <vectorofvector2f name="map1" vertexbufferusage="static_draw">[]</vectorofvector2f>
             </vertexdata>
             <primitives>
-                <elements type="triangles" material="DKAX8w0fHv4=">
+                <elements type="triangles" material="DEAV8w4MVBk=">
                     <indices vertexdata="position" role="position">[6,2,0,9,1,5,10,6,0,13,1,9,14,10,0,17,1,13,18,14,0,21,1,17,22,
 18,0,25,1,21,26,22,0,29,1,25,30,26,0,33,1,29,34,30,0,37,1,33,38,
 34,0,41,1,37,42,38,0,45,1,41,46,42,0,49,1,45,50,46,0,53,1,49,54,
@@ -19628,7 +19628,7 @@
 50,2,57,8,53,58,54,2,61,8,57,62,58,2,65,8,61,66,62,2,69,8,65,70,
 66,2,73,8,69,74,70,2,77,8,73,78,74,2,81,8,77,1,78,2,9,8,81]</indices>
                 </elements>
-                <elements type="quads" material="DKAX8w0fHv4=">
+                <elements type="quads" material="DEAV8w4MVBk=">
                     <indices vertexdata="position" role="position">[7,8,4,3,11,12,8,7,15,16,12,11,19,20,16,15,23,24,20,19,27,28,24,23,31,
 32,28,27,35,36,32,31,39,40,36,35,43,44,40,39,47,48,44,43,51,52,48,47,55,
 56,52,51,59,60,56,55,63,64,60,59,67,68,64,63,71,72,68,67,75,76,72,71,79,
@@ -19640,7 +19640,7 @@
                 </elements>
             </primitives>
         </shape>
-        <shape name="spiegelShape" renderstyle="[frontfacing,backfacing]" id="FaAX8w0fHv4=">
+        <shape name="spiegelShape" renderstyle="[frontfacing,backfacing]" id="FUAV8w4MVBk=">
             <vertexdata>
                 <vectorofvector3f name="position" vertexbufferusage="static_draw">[
 [-0.5,-1.11022e-016,0.5],
@@ -20011,7 +20011,7 @@
 [1,0]]</vectorofvector2f>
             </vertexdata>
             <primitives>
-                <elements type="quads" material="FqAX8w0fHv4=">
+                <elements type="quads" material="FkAV8w4MVBk=">
                     <indices vertexdata="position" role="position">[0,1,12,11,1,2,13,12,2,3,14,13,3,4,15,14,4,5,16,15,5,6,17,16,6,
 7,18,17,7,8,19,18,8,9,20,19,9,10,21,20,11,12,23,22,12,13,24,23,13,
 14,25,24,14,15,26,25,15,16,27,26,16,17,28,27,17,18,29,28,18,19,30,29,19,
@@ -20066,7 +20066,7 @@
                 </elements>
             </primitives>
         </shape>
-        <shape name="boltShape" renderstyle="[frontfacing,backfacing]" id="GaAX8w0fHv4=">
+        <shape name="boltShape" renderstyle="[frontfacing,backfacing]" id="GUAV8w4MVBk=">
             <vertexdata>
                 <vectorofvector3f name="position" vertexbufferusage="static_draw">[
 [0.0526519,0.0235557,0.00178693],
@@ -20904,7 +20904,7 @@
             </vertexdata>
             <primitives/>
         </shape>
-        <shape name="sightShape" renderstyle="[frontfacing,backfacing]" id="G6AX8w0fHv4=">
+        <shape name="sightShape" renderstyle="[frontfacing,backfacing]" id="G0AV8w4MVBk=">
             <vertexdata>
                 <vectorofvector3f name="position" vertexbufferusage="static_draw">[
 [0.100756,0.024767,0.00665196],
@@ -21761,7 +21761,7 @@
             </vertexdata>
             <primitives/>
         </shape>
-        <shape name="triggerShape" renderstyle="[frontfacing,backfacing]" id="HKAX8w0fHv4=">
+        <shape name="triggerShape" renderstyle="[frontfacing,backfacing]" id="HEAV8w4MVBk=">
             <vertexdata>
                 <vectorofvector3f name="position" vertexbufferusage="static_draw">[
 [0.0482164,0.00192881,0.00110294],
@@ -21898,7 +21898,7 @@
             </vertexdata>
             <primitives/>
         </shape>
-        <shape name="safteyShape" renderstyle="[frontfacing,backfacing]" id="HaAX8w0fHv4=">
+        <shape name="safteyShape" renderstyle="[frontfacing,backfacing]" id="HUAV8w4MVBk=">
             <vertexdata>
                 <vectorofvector3f name="position" vertexbufferusage="static_draw">[
 [0.0476594,0.0054764,0.00688041],
@@ -22143,7 +22143,7 @@
             </vertexdata>
             <primitives/>
         </shape>
-        <shape name="winderShape" renderstyle="[frontfacing,backfacing]" id="HqAX8w0fHv4=">
+        <shape name="winderShape" renderstyle="[frontfacing,backfacing]" id="HkAV8w4MVBk=">
             <vertexdata>
                 <vectorofvector3f name="position" vertexbufferusage="static_draw">[
 [0.0107771,-0.014,0],
@@ -22912,7 +22912,7 @@
                 <vectorofvector2f name="map1" vertexbufferusage="static_draw">[]</vectorofvector2f>
             </vertexdata>
             <primitives>
-                <elements type="triangles" material="GqAX8w0fHv4=">
+                <elements type="triangles" material="GkAV8w4MVBk=">
                     <indices vertexdata="position" role="position">[0,1,2,0,3,4,0,5,6,0,7,8,0,9,10,0,11,12,0,13,14,0,15,16,0,
 17,18,0,19,20,0,21,22,0,23,24,0,22,23,0,20,21,0,18,19,0,16,17,0,
 14,15,0,12,13,0,10,11,0,8,9,0,6,7,0,4,5,0,2,3,0,24,1]</indices>
@@ -22920,7 +22920,7 @@
 25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,
 49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71]</indices>
                 </elements>
-                <elements type="quads" material="GqAX8w0fHv4=">
+                <elements type="quads" material="GkAV8w4MVBk=">
                     <indices vertexdata="position" role="position">[25,26,27,28,27,29,30,28,31,32,33,34,35,36,37,38,29,35,38,30,36,39,40,37,32,
 41,42,33,43,44,31,34,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,
 62,63,64,47,61,64,65,62,57,60,63,58,53,56,59,54,49,52,55,50,44,43,51,66,
@@ -22970,9 +22970,9 @@
         </shape>
     </shapes>
     <textures>
-        <texture name="spiegel_" image="F6AX8w0fHv4=" id="GKAX8w0fHv4=" mipmap="1"/>
+        <texture name="spiegel_" image="F0AV8w4MVBk=" id="GEAV8w4MVBk=" mipmap="1"/>
     </textures>
     <images>
-        <image name="spiegel_" type="single" id="F6AX8w0fHv4=" src="../../products/maya-xport/../../tests/rendertests/tex/white.rgb"/>
+        <image name="spiegel_" type="single" id="F0AV8w4MVBk=" src="../../products/maya-xport/../../tests/rendertests/tex/white.rgb"/>
     </images>
 </scene>

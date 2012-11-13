@@ -1,42 +1,42 @@
 <scene revision="0">
     <worlds>
-        <world visible="1" id="KrgY8w0fHqE=">
-            <transform visible="1" name="groundPlane_transform" position="[0,0,0]" scale="[12,12,1]" orientation="[0.707107,0,0,-0.707107]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="K7gY8w0fHqE="/>
-            <camera visible="1" name="perspShape" position="[-0.0106788,0.851649,0.152801]" scale="[1,1,1]" orientation="[-0.643711,-0.00133564,-0.00112349,-0.765267]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" frustum="perspective[-0.0514286,0.0514286,-0.0509525,0.0509525,0.1,10000]" id="LbgY8w0fHqE="/>
-            <transform visible="0" name="top" position="[0,100,0]" scale="[1,1,1]" orientation="[-0.707107,0,0,-0.707107]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="LrgY8w0fHqE="/>
-            <transform visible="0" name="front" position="[0,0,100]" scale="[1,1,1]" orientation="[0,0,0,-1]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="L7gY8w0fHqE="/>
-            <transform visible="0" name="side" position="[100,0,0]" scale="[1,1,1]" orientation="[0,0.707107,0,-0.707107]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="MLgY8w0fHqE="/>
-            <body shape="A7gY8w0fHqE=" id="MrgY8w0fHqE=" name="pPlane1" orientation="[0,0,0,-1]"/>
-            <body shape="B7gY8w0fHqE=" id="NLgY8w0fHqE=" name="pPlane2" position="[0.1,0.1,-0.2]" orientation="[0,0,0,-1]"/>
-            <body shape="C7gY8w0fHqE=" id="NrgY8w0fHqE=" name="pPlane3" position="[0.3,0.1,0]" orientation="[0,0,0,-1]"/>
-            <body shape="D7gY8w0fHqE=" id="OLgY8w0fHqE=" name="pPlane4" position="[-0.1,0.1,0.2]" orientation="[0,0,0,-1]"/>
-            <body shape="EbgY8w0fHqE=" id="OrgY8w0fHqE=" name="pPlane5" position="[-0.1,0.1,0]" orientation="[0,0,0,-1]"/>
-            <body shape="FbgY8w0fHqE=" id="PLgY8w0fHqE=" name="pPlane6" position="[0.1,0.1,0]" orientation="[0,0,0,-1]"/>
-            <body shape="GbgY8w0fHqE=" id="PrgY8w0fHqE=" name="pPlane7" position="[-0.3,0.1,0.000169662]" orientation="[0,0,0,-1]"/>
-            <body shape="HbgY8w0fHqE=" id="QLgY8w0fHqE=" name="pPlane8" position="[-0.1,0.1,-0.2]" orientation="[0,0,0,-1]"/>
-            <body shape="IbgY8w0fHqE=" id="QrgY8w0fHqE=" name="pPlane9" position="[-0.3,0.1,0.2]" orientation="[0,0,0,-1]"/>
-            <body shape="JbgY8w0fHqE=" id="RLgY8w0fHqE=" name="pPlane10" position="[0.1,0.1,0.2]" orientation="[0,0,0,-1]"/>
-            <body shape="J7gY8w0fHqE=" id="RrgY8w0fHqE=" name="pPlane11" position="[-0.3,0.1,-0.2]" orientation="[0,0,0,-1]"/>
-            <body shape="KLgY8w0fHqE=" id="SLgY8w0fHqE=" name="pPlane12" position="[0.3,0.1,0.2]" orientation="[0,0,0,-1]"/>
+        <world visible="1" id="KpgX8w4MU70=">
+            <transform visible="1" name="groundPlane_transform" position="[0,0,0]" scale="[12,12,1]" orientation="[0.707107,0,0,-0.707107]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="K5gX8w4MU70="/>
+            <camera visible="1" name="perspShape" position="[-0.0106788,0.851649,0.152801]" scale="[1,1,1]" orientation="[-0.643711,-0.00133564,-0.00112349,-0.765267]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" frustum="perspective[-0.0514286,0.0514286,-0.0509525,0.0509525,0.1,10000]" id="LZgX8w4MU70="/>
+            <transform visible="0" name="top" position="[0,100,0]" scale="[1,1,1]" orientation="[-0.707107,0,0,-0.707107]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="LpgX8w4MU70="/>
+            <transform visible="0" name="front" position="[0,0,100]" scale="[1,1,1]" orientation="[0,0,0,-1]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="L5gX8w4MU70="/>
+            <transform visible="0" name="side" position="[100,0,0]" scale="[1,1,1]" orientation="[0,0.707107,0,-0.707107]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="MJgX8w4MU70="/>
+            <body shape="A5gX8w4MU70=" id="MpgX8w4MU70=" name="pPlane1" orientation="[0,0,0,-1]"/>
+            <body shape="B5gX8w4MU70=" id="NJgX8w4MU70=" name="pPlane2" position="[0.1,0.1,-0.2]" orientation="[0,0,0,-1]"/>
+            <body shape="C5gX8w4MU70=" id="NpgX8w4MU70=" name="pPlane3" position="[0.3,0.1,0]" orientation="[0,0,0,-1]"/>
+            <body shape="D5gX8w4MU70=" id="OJgX8w4MU70=" name="pPlane4" position="[-0.1,0.1,0.2]" orientation="[0,0,0,-1]"/>
+            <body shape="EZgX8w4MU70=" id="OpgX8w4MU70=" name="pPlane5" position="[-0.1,0.1,0]" orientation="[0,0,0,-1]"/>
+            <body shape="FZgX8w4MU70=" id="PJgX8w4MU70=" name="pPlane6" position="[0.1,0.1,0]" orientation="[0,0,0,-1]"/>
+            <body shape="GZgX8w4MU70=" id="PpgX8w4MU70=" name="pPlane7" position="[-0.3,0.1,0.000169662]" orientation="[0,0,0,-1]"/>
+            <body shape="HZgX8w4MU70=" id="QJgX8w4MU70=" name="pPlane8" position="[-0.1,0.1,-0.2]" orientation="[0,0,0,-1]"/>
+            <body shape="IZgX8w4MU70=" id="QpgX8w4MU70=" name="pPlane9" position="[-0.3,0.1,0.2]" orientation="[0,0,0,-1]"/>
+            <body shape="JZgX8w4MU70=" id="RJgX8w4MU70=" name="pPlane10" position="[0.1,0.1,0.2]" orientation="[0,0,0,-1]"/>
+            <body shape="J5gX8w4MU70=" id="RpgX8w4MU70=" name="pPlane11" position="[-0.3,0.1,-0.2]" orientation="[0,0,0,-1]"/>
+            <body shape="KJgX8w4MU70=" id="SJgX8w4MU70=" name="pPlane12" position="[0.3,0.1,0.2]" orientation="[0,0,0,-1]"/>
         </world>
     </worlds>
     <records/>
     <canvases>
-        <canvas id="AbgY8w0fHqE=">
-            <viewport id="ArgY8w0fHqE=" camera="LbgY8w0fHqE=">
+        <canvas id="AZgX8w4MU70=">
+            <viewport id="ApgX8w4MU70=" camera="LZgX8w4MU70=">
                 <overlays/>
             </viewport>
         </canvas>
     </canvases>
     <materials>
-        <material name="lambert1" id="BLgY8w0fHqE=" transparent="0">
+        <material name="lambert1" id="BJgX8w4MU70=" transparent="0">
             <properties>
                 <vector4f name="ambient">[0,0,0,1]</vector4f>
                 <vector4f name="diffuse">[0.8,0.8,0.8,1]</vector4f>
                 <vector4f name="emissive">[0,0,0,1]</vector4f>
             </properties>
             <textureunits>
-                <textureunit texture="BrgY8w0fHqE="/>
+                <textureunit texture="BpgX8w4MU70="/>
             </textureunits>
             <requires>
                 <feature name="textures">[100[paint]]</feature>
@@ -44,14 +44,14 @@
                 <feature name="lighting">[30[lambert],20[flat],10[unlit]]</feature>
             </requires>
         </material>
-        <material name="lambert2" id="CLgY8w0fHqE=" transparent="1">
+        <material name="lambert2" id="CJgX8w4MU70=" transparent="1">
             <properties>
                 <vector4f name="ambient">[0,0,0,1]</vector4f>
                 <vector4f name="diffuse">[0.8,0.8,0.8,1]</vector4f>
                 <vector4f name="emissive">[0,0,0,1]</vector4f>
             </properties>
             <textureunits>
-                <textureunit texture="CrgY8w0fHqE="/>
+                <textureunit texture="CpgX8w4MU70="/>
             </textureunits>
             <requires>
                 <feature name="textures">[100[paint]]</feature>
@@ -59,15 +59,15 @@
                 <feature name="lighting">[30[lambert],20[flat],10[unlit]]</feature>
             </requires>
         </material>
-        <material name="lambert4" id="DLgY8w0fHqE=">
+        <material name="lambert4" id="DJgX8w4MU70=">
             <properties>
                 <vector4f name="ambient">[0,0,0,1]</vector4f>
                 <vector4f name="diffuse">[0.8,0.8,0.8,1]</vector4f>
                 <vector4f name="emissive">[0,0,0,1]</vector4f>
             </properties>
             <textureunits>
-                <textureunit texture="BrgY8w0fHqE="/>
-                <textureunit texture="DrgY8w0fHqE=" applymode="add"/>
+                <textureunit texture="BpgX8w4MU70="/>
+                <textureunit texture="DpgX8w4MU70=" applymode="add"/>
             </textureunits>
             <requires>
                 <feature name="textures">[100[paint,paint]]</feature>
@@ -75,15 +75,15 @@
                 <feature name="lighting">[30[lambert],20[flat],10[unlit]]</feature>
             </requires>
         </material>
-        <material name="lambert5" id="ELgY8w0fHqE=">
+        <material name="lambert5" id="EJgX8w4MU70=">
             <properties>
                 <vector4f name="ambient">[0,0,0,1]</vector4f>
                 <vector4f name="diffuse">[0.8,0.8,0.8,1]</vector4f>
                 <vector4f name="emissive">[0,0,0,1]</vector4f>
             </properties>
             <textureunits>
-                <textureunit texture="BrgY8w0fHqE="/>
-                <textureunit texture="CrgY8w0fHqE=" applymode="decal"/>
+                <textureunit texture="BpgX8w4MU70="/>
+                <textureunit texture="CpgX8w4MU70=" applymode="decal"/>
             </textureunits>
             <requires>
                 <feature name="textures">[100[paint,paint]]</feature>
@@ -91,15 +91,15 @@
                 <feature name="lighting">[30[lambert],20[flat],10[unlit]]</feature>
             </requires>
         </material>
-        <material name="lambert3" id="ErgY8w0fHqE=">
+        <material name="lambert3" id="EpgX8w4MU70=">
             <properties>
                 <vector4f name="ambient">[0,0,0,1]</vector4f>
                 <vector4f name="diffuse">[0.8,0.8,0.8,1]</vector4f>
                 <vector4f name="emissive">[0,0,0,1]</vector4f>
             </properties>
             <textureunits>
-                <textureunit texture="BrgY8w0fHqE="/>
-                <textureunit texture="FLgY8w0fHqE=" applymode="decal"/>
+                <textureunit texture="BpgX8w4MU70="/>
+                <textureunit texture="FJgX8w4MU70=" applymode="decal"/>
             </textureunits>
             <requires>
                 <feature name="textures">[100[paint,paint]]</feature>
@@ -107,15 +107,15 @@
                 <feature name="lighting">[30[lambert],20[flat],10[unlit]]</feature>
             </requires>
         </material>
-        <material name="lambert6" id="FrgY8w0fHqE=">
+        <material name="lambert6" id="FpgX8w4MU70=">
             <properties>
                 <vector4f name="ambient">[0,0,0,1]</vector4f>
                 <vector4f name="diffuse">[0.8,0.8,0.8,1]</vector4f>
                 <vector4f name="emissive">[0,0,0,1]</vector4f>
             </properties>
             <textureunits>
-                <textureunit texture="BrgY8w0fHqE="/>
-                <textureunit texture="GLgY8w0fHqE="/>
+                <textureunit texture="BpgX8w4MU70="/>
+                <textureunit texture="GJgX8w4MU70="/>
             </textureunits>
             <requires>
                 <feature name="textures">[100[paint,paint]]</feature>
@@ -123,15 +123,15 @@
                 <feature name="lighting">[30[lambert],20[flat],10[unlit]]</feature>
             </requires>
         </material>
-        <material name="lambert7" id="GrgY8w0fHqE=">
+        <material name="lambert7" id="GpgX8w4MU70=">
             <properties>
                 <vector4f name="ambient">[0,0,0,1]</vector4f>
                 <vector4f name="diffuse">[0.8,0.8,0.8,1]</vector4f>
                 <vector4f name="emissive">[0,0,0,1]</vector4f>
             </properties>
             <textureunits>
-                <textureunit texture="BrgY8w0fHqE="/>
-                <textureunit texture="HLgY8w0fHqE=" applymode="replace"/>
+                <textureunit texture="BpgX8w4MU70="/>
+                <textureunit texture="HJgX8w4MU70=" applymode="replace"/>
             </textureunits>
             <requires>
                 <feature name="textures">[100[paint,paint]]</feature>
@@ -139,14 +139,14 @@
                 <feature name="lighting">[30[lambert],20[flat],10[unlit]]</feature>
             </requires>
         </material>
-        <material name="lambert8" id="HrgY8w0fHqE=" transparent="0">
+        <material name="lambert8" id="HpgX8w4MU70=" transparent="0">
             <properties>
                 <vector4f name="ambient">[0,0,0,1]</vector4f>
                 <vector4f name="diffuse">[0.8,0.8,0.8,1]</vector4f>
                 <vector4f name="emissive">[0,0,0,1]</vector4f>
             </properties>
             <textureunits>
-                <textureunit texture="ILgY8w0fHqE="/>
+                <textureunit texture="IJgX8w4MU70="/>
             </textureunits>
             <requires>
                 <feature name="textures">[100[paint]]</feature>
@@ -154,15 +154,15 @@
                 <feature name="lighting">[30[lambert],20[flat],10[unlit]]</feature>
             </requires>
         </material>
-        <material name="lambert9" id="IrgY8w0fHqE=">
+        <material name="lambert9" id="IpgX8w4MU70=">
             <properties>
                 <vector4f name="ambient">[0,0,0,1]</vector4f>
                 <vector4f name="diffuse">[0.8,0.8,0.8,1]</vector4f>
                 <vector4f name="emissive">[0,0,0,1]</vector4f>
             </properties>
             <textureunits>
-                <textureunit texture="BrgY8w0fHqE="/>
-                <textureunit texture="JLgY8w0fHqE=" applymode="replace"/>
+                <textureunit texture="BpgX8w4MU70="/>
+                <textureunit texture="JJgX8w4MU70=" applymode="replace"/>
             </textureunits>
             <requires>
                 <feature name="textures">[100[paint,paint]]</feature>
@@ -170,15 +170,15 @@
                 <feature name="lighting">[30[lambert],20[flat],10[unlit]]</feature>
             </requires>
         </material>
-        <material name="lambert10" id="JrgY8w0fHqE=">
+        <material name="lambert10" id="JpgX8w4MU70=">
             <properties>
                 <vector4f name="ambient">[0,0,0,1]</vector4f>
                 <vector4f name="diffuse">[0.8,0.8,0.8,1]</vector4f>
                 <vector4f name="emissive">[0,0,0,1]</vector4f>
             </properties>
             <textureunits>
-                <textureunit texture="BrgY8w0fHqE="/>
-                <textureunit texture="CrgY8w0fHqE="/>
+                <textureunit texture="BpgX8w4MU70="/>
+                <textureunit texture="CpgX8w4MU70="/>
             </textureunits>
             <requires>
                 <feature name="textures">[100[paint,paint]]</feature>
@@ -186,7 +186,7 @@
                 <feature name="lighting">[30[lambert],20[flat],10[unlit]]</feature>
             </requires>
         </material>
-        <material name="lambert11" id="KbgY8w0fHqE=" transparent="1">
+        <material name="lambert11" id="KZgX8w4MU70=" transparent="1">
             <properties>
                 <vector4f name="ambient">[0,0,0,1]</vector4f>
                 <vector4f name="diffuse">[0.8,0.8,0.8,0.99174]</vector4f>
@@ -194,8 +194,8 @@
                 <targetbuffers name="targetbuffers">[red,green,blue,alpha]</targetbuffers>
             </properties>
             <textureunits>
-                <textureunit texture="BrgY8w0fHqE="/>
-                <textureunit texture="CrgY8w0fHqE=" applymode="add"/>
+                <textureunit texture="BpgX8w4MU70="/>
+                <textureunit texture="CpgX8w4MU70=" applymode="add"/>
             </textureunits>
             <requires>
                 <feature name="textures">[100[paint,paint]]</feature>
@@ -208,7 +208,7 @@
     <animations/>
     <characters/>
     <shapes>
-        <shape name="pPlaneShape1" renderstyle="[frontfacing,backfacing]" id="A7gY8w0fHqE=">
+        <shape name="pPlaneShape1" renderstyle="[frontfacing,backfacing]" id="A5gX8w4MU70=">
             <vertexdata>
                 <vectorofvector3f name="position" vertexbufferusage="static_draw">[
 [-0.5,-1.11022e-016,0.5],
@@ -579,7 +579,7 @@
 [1,0]]</vectorofvector2f>
             </vertexdata>
             <primitives>
-                <elements type="quads" material="BLgY8w0fHqE=">
+                <elements type="quads" material="BJgX8w4MU70=">
                     <indices vertexdata="position" role="position">[0,1,12,11,1,2,13,12,2,3,14,13,3,4,15,14,4,5,16,15,5,6,17,16,6,
 7,18,17,7,8,19,18,8,9,20,19,9,10,21,20,11,12,23,22,12,13,24,23,13,
 14,25,24,14,15,26,25,15,16,27,26,16,17,28,27,17,18,29,28,18,19,30,29,19,
@@ -634,7 +634,7 @@
                 </elements>
             </primitives>
         </shape>
-        <shape name="pPlaneShape2" renderstyle="[frontfacing,backfacing]" id="B7gY8w0fHqE=">
+        <shape name="pPlaneShape2" renderstyle="[frontfacing,backfacing]" id="B5gX8w4MU70=">
             <vertexdata>
                 <vectorofvector3f name="position" vertexbufferusage="static_draw">[[-0.05,-1.11022e-017,0.05],[0.05,-1.11022e-017,0.05],[-0.05,1.11022e-017,-0.05],[0.05,1.11022e-017,-0.05]]</vectorofvector3f>
                 <vectorofvector3f name="normal" vertexbufferusage="static_draw">[[0,1,2.22045e-016],[0,1,2.22045e-016],[0,1,2.22045e-016],[0,1,2.22045e-016]]</vectorofvector3f>
@@ -642,14 +642,14 @@
                 <vectorofvector2f name="map1" vertexbufferusage="static_draw">[[0,1],[1,1],[0,0],[1,0]]</vectorofvector2f>
             </vertexdata>
             <primitives>
-                <elements type="quads" material="CLgY8w0fHqE=">
+                <elements type="quads" material="CJgX8w4MU70=">
                     <indices vertexdata="position" role="position">[0,1,3,2]</indices>
                     <indices vertexdata="normal" role="normal">[0,1,2,3]</indices>
                     <indices vertexdata="map1" role="texcoord0">[0,1,3,2]</indices>
                 </elements>
             </primitives>
         </shape>
-        <shape name="pPlaneShape3" renderstyle="[frontfacing,backfacing]" id="C7gY8w0fHqE=">
+        <shape name="pPlaneShape3" renderstyle="[frontfacing,backfacing]" id="C5gX8w4MU70=">
             <vertexdata>
                 <vectorofvector3f name="position" vertexbufferusage="static_draw">[[-0.05,-1.11022e-017,0.05],[0.05,-1.11022e-017,0.05],[-0.05,1.11022e-017,-0.05],[0.05,1.11022e-017,-0.05]]</vectorofvector3f>
                 <vectorofvector3f name="normal" vertexbufferusage="static_draw">[[0,1,2.22045e-016],[0,1,2.22045e-016],[0,1,2.22045e-016],[0,1,2.22045e-016]]</vectorofvector3f>
@@ -657,23 +657,7 @@
                 <vectorofvector2f name="map1" vertexbufferusage="static_draw">[[0,1],[1,1],[0,0],[1,0]]</vectorofvector2f>
             </vertexdata>
             <primitives>
-                <elements type="quads" material="DLgY8w0fHqE=">
-                    <indices vertexdata="position" role="position">[0,1,3,2]</indices>
-                    <indices vertexdata="normal" role="normal">[0,1,2,3]</indices>
-                    <indices vertexdata="map1" role="texcoord0">[0,1,3,2]</indices>
-                    <indices vertexdata="map1" role="texcoord1">[0,1,3,2]</indices>
-                </elements>
-            </primitives>
-        </shape>
-        <shape name="pPlaneShape4" renderstyle="[frontfacing,backfacing]" id="D7gY8w0fHqE=">
-            <vertexdata>
-                <vectorofvector3f name="position" vertexbufferusage="static_draw">[[-0.05,-1.11022e-017,0.05],[0.05,-1.11022e-017,0.05],[-0.05,1.11022e-017,-0.05],[0.05,1.11022e-017,-0.05]]</vectorofvector3f>
-                <vectorofvector3f name="normal" vertexbufferusage="static_draw">[[0,1,2.22045e-016],[0,1,2.22045e-016],[0,1,2.22045e-016],[0,1,2.22045e-016]]</vectorofvector3f>
-                <vectorofvector4f name="color" vertexbufferusage="static_draw">[[1,1,1,1]]</vectorofvector4f>
-                <vectorofvector2f name="map1" vertexbufferusage="static_draw">[[0,1],[1,1],[0,0],[1,0]]</vectorofvector2f>
-            </vertexdata>
-            <primitives>
-                <elements type="quads" material="ELgY8w0fHqE=">
+                <elements type="quads" material="DJgX8w4MU70=">
                     <indices vertexdata="position" role="position">[0,1,3,2]</indices>
                     <indices vertexdata="normal" role="normal">[0,1,2,3]</indices>
                     <indices vertexdata="map1" role="texcoord0">[0,1,3,2]</indices>
@@ -681,7 +665,7 @@
                 </elements>
             </primitives>
         </shape>
-        <shape name="pPlaneShape5" renderstyle="[frontfacing,backfacing]" id="EbgY8w0fHqE=">
+        <shape name="pPlaneShape4" renderstyle="[frontfacing,backfacing]" id="D5gX8w4MU70=">
             <vertexdata>
                 <vectorofvector3f name="position" vertexbufferusage="static_draw">[[-0.05,-1.11022e-017,0.05],[0.05,-1.11022e-017,0.05],[-0.05,1.11022e-017,-0.05],[0.05,1.11022e-017,-0.05]]</vectorofvector3f>
                 <vectorofvector3f name="normal" vertexbufferusage="static_draw">[[0,1,2.22045e-016],[0,1,2.22045e-016],[0,1,2.22045e-016],[0,1,2.22045e-016]]</vectorofvector3f>
@@ -689,7 +673,7 @@
                 <vectorofvector2f name="map1" vertexbufferusage="static_draw">[[0,1],[1,1],[0,0],[1,0]]</vectorofvector2f>
             </vertexdata>
             <primitives>
-                <elements type="quads" material="ErgY8w0fHqE=">
+                <elements type="quads" material="EJgX8w4MU70=">
                     <indices vertexdata="position" role="position">[0,1,3,2]</indices>
                     <indices vertexdata="normal" role="normal">[0,1,2,3]</indices>
                     <indices vertexdata="map1" role="texcoord0">[0,1,3,2]</indices>
@@ -697,7 +681,7 @@
                 </elements>
             </primitives>
         </shape>
-        <shape name="pPlaneShape6" renderstyle="[frontfacing,backfacing]" id="FbgY8w0fHqE=">
+        <shape name="pPlaneShape5" renderstyle="[frontfacing,backfacing]" id="EZgX8w4MU70=">
             <vertexdata>
                 <vectorofvector3f name="position" vertexbufferusage="static_draw">[[-0.05,-1.11022e-017,0.05],[0.05,-1.11022e-017,0.05],[-0.05,1.11022e-017,-0.05],[0.05,1.11022e-017,-0.05]]</vectorofvector3f>
                 <vectorofvector3f name="normal" vertexbufferusage="static_draw">[[0,1,2.22045e-016],[0,1,2.22045e-016],[0,1,2.22045e-016],[0,1,2.22045e-016]]</vectorofvector3f>
@@ -705,7 +689,7 @@
                 <vectorofvector2f name="map1" vertexbufferusage="static_draw">[[0,1],[1,1],[0,0],[1,0]]</vectorofvector2f>
             </vertexdata>
             <primitives>
-                <elements type="quads" material="FrgY8w0fHqE=">
+                <elements type="quads" material="EpgX8w4MU70=">
                     <indices vertexdata="position" role="position">[0,1,3,2]</indices>
                     <indices vertexdata="normal" role="normal">[0,1,2,3]</indices>
                     <indices vertexdata="map1" role="texcoord0">[0,1,3,2]</indices>
@@ -713,7 +697,7 @@
                 </elements>
             </primitives>
         </shape>
-        <shape name="pPlaneShape7" renderstyle="[frontfacing,backfacing]" id="GbgY8w0fHqE=">
+        <shape name="pPlaneShape6" renderstyle="[frontfacing,backfacing]" id="FZgX8w4MU70=">
             <vertexdata>
                 <vectorofvector3f name="position" vertexbufferusage="static_draw">[[-0.05,-1.11022e-017,0.05],[0.05,-1.11022e-017,0.05],[-0.05,1.11022e-017,-0.05],[0.05,1.11022e-017,-0.05]]</vectorofvector3f>
                 <vectorofvector3f name="normal" vertexbufferusage="static_draw">[[0,1,2.22045e-016],[0,1,2.22045e-016],[0,1,2.22045e-016],[0,1,2.22045e-016]]</vectorofvector3f>
@@ -721,7 +705,7 @@
                 <vectorofvector2f name="map1" vertexbufferusage="static_draw">[[0,1],[1,1],[0,0],[1,0]]</vectorofvector2f>
             </vertexdata>
             <primitives>
-                <elements type="quads" material="GrgY8w0fHqE=">
+                <elements type="quads" material="FpgX8w4MU70=">
                     <indices vertexdata="position" role="position">[0,1,3,2]</indices>
                     <indices vertexdata="normal" role="normal">[0,1,2,3]</indices>
                     <indices vertexdata="map1" role="texcoord0">[0,1,3,2]</indices>
@@ -729,7 +713,7 @@
                 </elements>
             </primitives>
         </shape>
-        <shape name="pPlaneShape8" renderstyle="[frontfacing,backfacing]" id="HbgY8w0fHqE=">
+        <shape name="pPlaneShape7" renderstyle="[frontfacing,backfacing]" id="GZgX8w4MU70=">
             <vertexdata>
                 <vectorofvector3f name="position" vertexbufferusage="static_draw">[[-0.05,-1.11022e-017,0.05],[0.05,-1.11022e-017,0.05],[-0.05,1.11022e-017,-0.05],[0.05,1.11022e-017,-0.05]]</vectorofvector3f>
                 <vectorofvector3f name="normal" vertexbufferusage="static_draw">[[0,1,2.22045e-016],[0,1,2.22045e-016],[0,1,2.22045e-016],[0,1,2.22045e-016]]</vectorofvector3f>
@@ -737,22 +721,7 @@
                 <vectorofvector2f name="map1" vertexbufferusage="static_draw">[[0,1],[1,1],[0,0],[1,0]]</vectorofvector2f>
             </vertexdata>
             <primitives>
-                <elements type="quads" material="HrgY8w0fHqE=">
-                    <indices vertexdata="position" role="position">[0,1,3,2]</indices>
-                    <indices vertexdata="normal" role="normal">[0,1,2,3]</indices>
-                    <indices vertexdata="map1" role="texcoord0">[0,1,3,2]</indices>
-                </elements>
-            </primitives>
-        </shape>
-        <shape name="pPlaneShape9" renderstyle="[frontfacing,backfacing]" id="IbgY8w0fHqE=">
-            <vertexdata>
-                <vectorofvector3f name="position" vertexbufferusage="static_draw">[[-0.05,-1.11022e-017,0.05],[0.05,-1.11022e-017,0.05],[-0.05,1.11022e-017,-0.05],[0.05,1.11022e-017,-0.05]]</vectorofvector3f>
-                <vectorofvector3f name="normal" vertexbufferusage="static_draw">[[0,1,2.22045e-016],[0,1,2.22045e-016],[0,1,2.22045e-016],[0,1,2.22045e-016]]</vectorofvector3f>
-                <vectorofvector4f name="color" vertexbufferusage="static_draw">[[1,1,1,1]]</vectorofvector4f>
-                <vectorofvector2f name="map1" vertexbufferusage="static_draw">[[0,1],[1,1],[0,0],[1,0]]</vectorofvector2f>
-            </vertexdata>
-            <primitives>
-                <elements type="quads" material="IrgY8w0fHqE=">
+                <elements type="quads" material="GpgX8w4MU70=">
                     <indices vertexdata="position" role="position">[0,1,3,2]</indices>
                     <indices vertexdata="normal" role="normal">[0,1,2,3]</indices>
                     <indices vertexdata="map1" role="texcoord0">[0,1,3,2]</indices>
@@ -760,7 +729,7 @@
                 </elements>
             </primitives>
         </shape>
-        <shape name="pPlaneShape10" renderstyle="[frontfacing,backfacing]" id="JbgY8w0fHqE=">
+        <shape name="pPlaneShape8" renderstyle="[frontfacing,backfacing]" id="HZgX8w4MU70=">
             <vertexdata>
                 <vectorofvector3f name="position" vertexbufferusage="static_draw">[[-0.05,-1.11022e-017,0.05],[0.05,-1.11022e-017,0.05],[-0.05,1.11022e-017,-0.05],[0.05,1.11022e-017,-0.05]]</vectorofvector3f>
                 <vectorofvector3f name="normal" vertexbufferusage="static_draw">[[0,1,2.22045e-016],[0,1,2.22045e-016],[0,1,2.22045e-016],[0,1,2.22045e-016]]</vectorofvector3f>
@@ -768,7 +737,22 @@
                 <vectorofvector2f name="map1" vertexbufferusage="static_draw">[[0,1],[1,1],[0,0],[1,0]]</vectorofvector2f>
             </vertexdata>
             <primitives>
-                <elements type="quads" material="JrgY8w0fHqE=">
+                <elements type="quads" material="HpgX8w4MU70=">
+                    <indices vertexdata="position" role="position">[0,1,3,2]</indices>
+                    <indices vertexdata="normal" role="normal">[0,1,2,3]</indices>
+                    <indices vertexdata="map1" role="texcoord0">[0,1,3,2]</indices>
+                </elements>
+            </primitives>
+        </shape>
+        <shape name="pPlaneShape9" renderstyle="[frontfacing,backfacing]" id="IZgX8w4MU70=">
+            <vertexdata>
+                <vectorofvector3f name="position" vertexbufferusage="static_draw">[[-0.05,-1.11022e-017,0.05],[0.05,-1.11022e-017,0.05],[-0.05,1.11022e-017,-0.05],[0.05,1.11022e-017,-0.05]]</vectorofvector3f>
+                <vectorofvector3f name="normal" vertexbufferusage="static_draw">[[0,1,2.22045e-016],[0,1,2.22045e-016],[0,1,2.22045e-016],[0,1,2.22045e-016]]</vectorofvector3f>
+                <vectorofvector4f name="color" vertexbufferusage="static_draw">[[1,1,1,1]]</vectorofvector4f>
+                <vectorofvector2f name="map1" vertexbufferusage="static_draw">[[0,1],[1,1],[0,0],[1,0]]</vectorofvector2f>
+            </vertexdata>
+            <primitives>
+                <elements type="quads" material="IpgX8w4MU70=">
                     <indices vertexdata="position" role="position">[0,1,3,2]</indices>
                     <indices vertexdata="normal" role="normal">[0,1,2,3]</indices>
                     <indices vertexdata="map1" role="texcoord0">[0,1,3,2]</indices>
@@ -776,7 +760,7 @@
                 </elements>
             </primitives>
         </shape>
-        <shape name="pPlaneShape11" renderstyle="[frontfacing,backfacing]" id="J7gY8w0fHqE=">
+        <shape name="pPlaneShape10" renderstyle="[frontfacing,backfacing]" id="JZgX8w4MU70=">
             <vertexdata>
                 <vectorofvector3f name="position" vertexbufferusage="static_draw">[[-0.05,-1.11022e-017,0.05],[0.05,-1.11022e-017,0.05],[-0.05,1.11022e-017,-0.05],[0.05,1.11022e-017,-0.05]]</vectorofvector3f>
                 <vectorofvector3f name="normal" vertexbufferusage="static_draw">[[0,1,2.22045e-016],[0,1,2.22045e-016],[0,1,2.22045e-016],[0,1,2.22045e-016]]</vectorofvector3f>
@@ -784,14 +768,30 @@
                 <vectorofvector2f name="map1" vertexbufferusage="static_draw">[[0,1],[1,1],[0,0],[1,0]]</vectorofvector2f>
             </vertexdata>
             <primitives>
-                <elements type="quads" material="BLgY8w0fHqE=">
+                <elements type="quads" material="JpgX8w4MU70=">
+                    <indices vertexdata="position" role="position">[0,1,3,2]</indices>
+                    <indices vertexdata="normal" role="normal">[0,1,2,3]</indices>
+                    <indices vertexdata="map1" role="texcoord0">[0,1,3,2]</indices>
+                    <indices vertexdata="map1" role="texcoord1">[0,1,3,2]</indices>
+                </elements>
+            </primitives>
+        </shape>
+        <shape name="pPlaneShape11" renderstyle="[frontfacing,backfacing]" id="J5gX8w4MU70=">
+            <vertexdata>
+                <vectorofvector3f name="position" vertexbufferusage="static_draw">[[-0.05,-1.11022e-017,0.05],[0.05,-1.11022e-017,0.05],[-0.05,1.11022e-017,-0.05],[0.05,1.11022e-017,-0.05]]</vectorofvector3f>
+                <vectorofvector3f name="normal" vertexbufferusage="static_draw">[[0,1,2.22045e-016],[0,1,2.22045e-016],[0,1,2.22045e-016],[0,1,2.22045e-016]]</vectorofvector3f>
+                <vectorofvector4f name="color" vertexbufferusage="static_draw">[[1,1,1,1]]</vectorofvector4f>
+                <vectorofvector2f name="map1" vertexbufferusage="static_draw">[[0,1],[1,1],[0,0],[1,0]]</vectorofvector2f>
+            </vertexdata>
+            <primitives>
+                <elements type="quads" material="BJgX8w4MU70=">
                     <indices vertexdata="position" role="position">[0,1,3,2]</indices>
                     <indices vertexdata="normal" role="normal">[0,1,2,3]</indices>
                     <indices vertexdata="map1" role="texcoord0">[0,1,3,2]</indices>
                 </elements>
             </primitives>
         </shape>
-        <shape name="pPlaneShape12" renderstyle="[frontfacing,backfacing]" id="KLgY8w0fHqE=">
+        <shape name="pPlaneShape12" renderstyle="[frontfacing,backfacing]" id="KJgX8w4MU70=">
             <vertexdata>
                 <vectorofvector3f name="position" vertexbufferusage="static_draw">[[-0.05,-1.11022e-017,0.05],[0.05,-1.11022e-017,0.05],[-0.05,1.11022e-017,-0.05],[0.05,1.11022e-017,-0.05]]</vectorofvector3f>
                 <vectorofvector3f name="normal" vertexbufferusage="static_draw">[[0,1,2.22045e-016],[0,1,2.22045e-016],[0,1,2.22045e-016],[0,1,2.22045e-016]]</vectorofvector3f>
@@ -799,7 +799,7 @@
                 <vectorofvector2f name="map1" vertexbufferusage="static_draw">[[0,1],[1,1],[0,0],[1,0]]</vectorofvector2f>
             </vertexdata>
             <primitives>
-                <elements type="quads" material="KbgY8w0fHqE=">
+                <elements type="quads" material="KZgX8w4MU70=">
                     <indices vertexdata="position" role="position">[0,1,3,2]</indices>
                     <indices vertexdata="normal" role="normal">[0,1,2,3]</indices>
                     <indices vertexdata="map1" role="texcoord0">[0,1,3,2]</indices>
@@ -809,23 +809,23 @@
         </shape>
     </shapes>
     <textures>
-        <texture name="file3" image="BbgY8w0fHqE=" id="BrgY8w0fHqE=" mipmap="1"/>
-        <texture name="file4" image="CbgY8w0fHqE=" id="CrgY8w0fHqE=" mipmap="1"/>
-        <texture name="add" image="DbgY8w0fHqE=" id="DrgY8w0fHqE=" mipmap="1"/>
-        <texture name="decal" image="E7gY8w0fHqE=" id="FLgY8w0fHqE=" mipmap="1"/>
-        <texture name="modulate" image="F7gY8w0fHqE=" id="GLgY8w0fHqE=" mipmap="1"/>
-        <texture name="replace" image="G7gY8w0fHqE=" id="HLgY8w0fHqE=" mipmap="1"/>
-        <texture name="file17" image="H7gY8w0fHqE=" id="ILgY8w0fHqE=" mipmap="1"/>
-        <texture name="file19" image="I7gY8w0fHqE=" id="JLgY8w0fHqE=" mipmap="1"/>
+        <texture name="file3" image="BZgX8w4MU70=" id="BpgX8w4MU70=" mipmap="1"/>
+        <texture name="file4" image="CZgX8w4MU70=" id="CpgX8w4MU70=" mipmap="1"/>
+        <texture name="add" image="DZgX8w4MU70=" id="DpgX8w4MU70=" mipmap="1"/>
+        <texture name="decal" image="E5gX8w4MU70=" id="FJgX8w4MU70=" mipmap="1"/>
+        <texture name="modulate" image="F5gX8w4MU70=" id="GJgX8w4MU70=" mipmap="1"/>
+        <texture name="replace" image="G5gX8w4MU70=" id="HJgX8w4MU70=" mipmap="1"/>
+        <texture name="file17" image="H5gX8w4MU70=" id="IJgX8w4MU70=" mipmap="1"/>
+        <texture name="file19" image="I5gX8w4MU70=" id="JJgX8w4MU70=" mipmap="1"/>
     </textures>
     <images>
-        <image name="file3" type="single" id="BbgY8w0fHqE=" src="../../products/maya-xport/../../tests/rendertests/tex/testbild00.rgb"/>
-        <image name="file4" type="single" id="CbgY8w0fHqE=" src="../../products/maya-xport/../../tests/rendertests/tex/HalfAlpha.rgb"/>
-        <image name="add" type="single" id="DbgY8w0fHqE=" src="../../products/maya-xport/../../tests/rendertests/tex/rampAdd.rgb"/>
-        <image name="decal" type="single" id="E7gY8w0fHqE=" src="../../products/maya-xport/../../tests/rendertests/tex/rampDecal.rgb"/>
-        <image name="modulate" type="single" id="F7gY8w0fHqE=" src="../../products/maya-xport/../../tests/rendertests/tex/rampModulate.rgb"/>
-        <image name="replace" type="single" id="G7gY8w0fHqE=" src="../../products/maya-xport/../../tests/rendertests/tex/rampReplace.rgb"/>
-        <image name="file17" type="single" id="H7gY8w0fHqE=" src="../../products/maya-xport/../../tests/rendertests/tex/ramp.rgb"/>
-        <image name="file19" type="single" id="I7gY8w0fHqE=" src="../../products/maya-xport/../../tests/rendertests/tex/NoAlpha.rgb"/>
+        <image name="file3" type="single" id="BZgX8w4MU70=" src="../../products/maya-xport/../../tests/rendertests/tex/testbild00.rgb"/>
+        <image name="file4" type="single" id="CZgX8w4MU70=" src="../../products/maya-xport/../../tests/rendertests/tex/HalfAlpha.rgb"/>
+        <image name="add" type="single" id="DZgX8w4MU70=" src="../../products/maya-xport/../../tests/rendertests/tex/rampAdd.rgb"/>
+        <image name="decal" type="single" id="E5gX8w4MU70=" src="../../products/maya-xport/../../tests/rendertests/tex/rampDecal.rgb"/>
+        <image name="modulate" type="single" id="F5gX8w4MU70=" src="../../products/maya-xport/../../tests/rendertests/tex/rampModulate.rgb"/>
+        <image name="replace" type="single" id="G5gX8w4MU70=" src="../../products/maya-xport/../../tests/rendertests/tex/rampReplace.rgb"/>
+        <image name="file17" type="single" id="H5gX8w4MU70=" src="../../products/maya-xport/../../tests/rendertests/tex/ramp.rgb"/>
+        <image name="file19" type="single" id="I5gX8w4MU70=" src="../../products/maya-xport/../../tests/rendertests/tex/NoAlpha.rgb"/>
     </images>
 </scene>

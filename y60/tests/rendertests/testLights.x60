@@ -1,37 +1,37 @@
 <scene revision="0">
     <worlds>
-        <world visible="1" id="DrAa8w0fHuk=">
-            <transform visible="1" name="groundPlane_transform" position="[0,0,0]" scale="[12,12,1]" orientation="[0.707107,0,0,-0.707107]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="D7Aa8w0fHuk="/>
-            <camera visible="1" name="perspShape" position="[0.0551221,0.0413416,0.0551221]" scale="[1,1,1]" orientation="[-0.223024,0.371366,0.0923797,-0.896556]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" frustum="perspective[-0.0514286,0.0514286,-0.0509525,0.0509525,0.1,10000]" id="EbAa8w0fHuk="/>
-            <transform visible="0" name="top" position="[0,1.001,0]" scale="[1,1,1]" orientation="[-0.707107,0,0,-0.707107]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="ErAa8w0fHuk="/>
-            <transform visible="0" name="front" position="[0,0,1.001]" scale="[1,1,1]" orientation="[0,0,0,-1]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="E7Aa8w0fHuk="/>
-            <transform visible="0" name="side" position="[1.001,0,0]" scale="[1,1,1]" orientation="[0,0.707107,0,-0.707107]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="FLAa8w0fHuk="/>
-            <body shape="A7Aa8w0fHuk=" id="FrAa8w0fHuk=" name="pCube1" position="[-0.0151785,0.00250224,0.0133018]" orientation="[0,0,0,-1]"/>
-            <body shape="B7Aa8w0fHuk=" id="GLAa8w0fHuk=" name="pSphere1" position="[0.011552,0.0013463,-0.0125617]" orientation="[0,0,0,-1]"/>
-            <light visible="1" name="spotLight1" position="[-0.01,-0.00850867,0.0274673]" scale="[1,1,1]" orientation="[0.382683,0,0,-0.92388]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" lightsource="CbAa8w0fHuk=" id="GrAa8w0fHuk="/>
-            <light visible="1" name="ambientLight1" position="[0,0,0]" scale="[1,1,1]" orientation="[0,0,0,-1]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" lightsource="CrAa8w0fHuk=" id="HLAa8w0fHuk="/>
-            <light visible="1" name="directionalLight1" position="[0.0128107,-0.0194198,0.00175409]" scale="[1,1,1]" orientation="[0.236372,0.219277,0.723547,-0.610349]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" lightsource="C7Aa8w0fHuk=" id="HrAa8w0fHuk="/>
-            <light visible="1" name="pointLight1" position="[-0.00375148,0.0228232,-0.013366]" scale="[1,1,1]" orientation="[0,0,0,-1]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" lightsource="DLAa8w0fHuk=" id="ILAa8w0fHuk="/>
-            <light visible="1" name="spotLight2" position="[0.0467874,0.0148856,-0.0211128]" scale="[1,1,1]" orientation="[-0.568979,0.532195,-0.415502,-0.469457]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" lightsource="DbAa8w0fHuk=" id="IrAa8w0fHuk="/>
+        <world visible="1" id="DjgW8w4MVAU=">
+            <transform visible="1" name="groundPlane_transform" position="[0,0,0]" scale="[12,12,1]" orientation="[0.707107,0,0,-0.707107]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="DzgW8w4MVAU="/>
+            <camera visible="1" name="perspShape" position="[0.0551221,0.0413416,0.0551221]" scale="[1,1,1]" orientation="[-0.223024,0.371366,0.0923797,-0.896556]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" frustum="perspective[-0.0514286,0.0514286,-0.0509525,0.0509525,0.1,10000]" id="ETgW8w4MVAU="/>
+            <transform visible="0" name="top" position="[0,1.001,0]" scale="[1,1,1]" orientation="[-0.707107,0,0,-0.707107]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="EjgW8w4MVAU="/>
+            <transform visible="0" name="front" position="[0,0,1.001]" scale="[1,1,1]" orientation="[0,0,0,-1]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="EzgW8w4MVAU="/>
+            <transform visible="0" name="side" position="[1.001,0,0]" scale="[1,1,1]" orientation="[0,0.707107,0,-0.707107]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="FDgW8w4MVAU="/>
+            <body shape="AzgW8w4MVAU=" id="FjgW8w4MVAU=" name="pCube1" position="[-0.0151785,0.00250224,0.0133018]" orientation="[0,0,0,-1]"/>
+            <body shape="BzgW8w4MVAU=" id="GDgW8w4MVAU=" name="pSphere1" position="[0.011552,0.0013463,-0.0125617]" orientation="[0,0,0,-1]"/>
+            <light visible="1" name="spotLight1" position="[-0.01,-0.00850867,0.0274673]" scale="[1,1,1]" orientation="[0.382683,0,0,-0.92388]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" lightsource="CTgW8w4MVAU=" id="GjgW8w4MVAU="/>
+            <light visible="1" name="ambientLight1" position="[0,0,0]" scale="[1,1,1]" orientation="[0,0,0,-1]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" lightsource="CjgW8w4MVAU=" id="HDgW8w4MVAU="/>
+            <light visible="1" name="directionalLight1" position="[0.0128107,-0.0194198,0.00175409]" scale="[1,1,1]" orientation="[0.236372,0.219277,0.723547,-0.610349]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" lightsource="CzgW8w4MVAU=" id="HjgW8w4MVAU="/>
+            <light visible="1" name="pointLight1" position="[-0.00375148,0.0228232,-0.013366]" scale="[1,1,1]" orientation="[0,0,0,-1]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" lightsource="DDgW8w4MVAU=" id="IDgW8w4MVAU="/>
+            <light visible="1" name="spotLight2" position="[0.0467874,0.0148856,-0.0211128]" scale="[1,1,1]" orientation="[-0.568979,0.532195,-0.415502,-0.469457]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" lightsource="DTgW8w4MVAU=" id="IjgW8w4MVAU="/>
         </world>
     </worlds>
     <records/>
     <canvases>
-        <canvas id="AbAa8w0fHuk=">
-            <viewport id="ArAa8w0fHuk=" camera="EbAa8w0fHuk=">
+        <canvas id="ATgW8w4MVAU=">
+            <viewport id="AjgW8w4MVAU=" camera="ETgW8w4MVAU=">
                 <overlays/>
             </viewport>
         </canvas>
     </canvases>
     <materials>
-        <material name="lambert2" id="BLAa8w0fHuk=" transparent="0">
+        <material name="lambert2" id="BDgW8w4MVAU=" transparent="0">
             <properties>
                 <vector4f name="ambient">[1,1,1,1]</vector4f>
                 <vector4f name="diffuse">[1,1,1,1]</vector4f>
                 <vector4f name="emissive">[0,0,0,1]</vector4f>
             </properties>
             <textureunits>
-                <textureunit texture="BrAa8w0fHuk="/>
+                <textureunit texture="BjgW8w4MVAU="/>
             </textureunits>
             <requires>
                 <feature name="textures">[100[paint]]</feature>
@@ -39,7 +39,7 @@
                 <feature name="lighting">[30[lambert],20[flat],10[unlit]]</feature>
             </requires>
         </material>
-        <material name="lambert1" id="CLAa8w0fHuk=">
+        <material name="lambert1" id="CDgW8w4MVAU=">
             <properties>
                 <vector4f name="ambient">[1,1,1,1]</vector4f>
                 <vector4f name="diffuse">[0.6,0.6,0.6,1]</vector4f>
@@ -52,7 +52,7 @@
         </material>
     </materials>
     <lightsources>
-        <lightsource name="spotLightShape1" type="spot" id="CbAa8w0fHuk=">
+        <lightsource name="spotLightShape1" type="spot" id="CTgW8w4MVAU=">
             <properties>
                 <vector4f name="ambient">[0,0,0,0]</vector4f>
                 <vector4f name="diffuse">[1,0,0,1]</vector4f>
@@ -61,28 +61,28 @@
                 <float name="exponent">0</float>
             </properties>
         </lightsource>
-        <lightsource name="ambientLightShape1" type="ambient" id="CrAa8w0fHuk=">
+        <lightsource name="ambientLightShape1" type="ambient" id="CjgW8w4MVAU=">
             <properties>
                 <vector4f name="ambient">[0.259294,0.259294,0,0.6612]</vector4f>
                 <vector4f name="diffuse">[0,0,0,0]</vector4f>
                 <vector4f name="specular">[0,0,0,0]</vector4f>
             </properties>
         </lightsource>
-        <lightsource name="directionalLightShape1" type="directional" id="C7Aa8w0fHuk=">
+        <lightsource name="directionalLightShape1" type="directional" id="CzgW8w4MVAU=">
             <properties>
                 <vector4f name="ambient">[0,0,0,0]</vector4f>
                 <vector4f name="diffuse">[0,1,0,1]</vector4f>
                 <vector4f name="specular">[0,1,0,1]</vector4f>
             </properties>
         </lightsource>
-        <lightsource name="pointLightShape1" type="positional" id="DLAa8w0fHuk=">
+        <lightsource name="pointLightShape1" type="positional" id="DDgW8w4MVAU=">
             <properties>
                 <vector4f name="ambient">[0,0,0,0]</vector4f>
                 <vector4f name="diffuse">[0,0,1,1]</vector4f>
                 <vector4f name="specular">[0,0,1,1]</vector4f>
             </properties>
         </lightsource>
-        <lightsource name="spotLightShape2" type="spot" id="DbAa8w0fHuk=">
+        <lightsource name="spotLightShape2" type="spot" id="DTgW8w4MVAU=">
             <properties>
                 <vector4f name="ambient">[0,0,0,0]</vector4f>
                 <vector4f name="diffuse">[1,0,0,1]</vector4f>
@@ -95,7 +95,7 @@
     <animations/>
     <characters/>
     <shapes>
-        <shape name="pCubeShape1" renderstyle="[frontfacing,backfacing]" id="A7Aa8w0fHuk=">
+        <shape name="pCubeShape1" renderstyle="[frontfacing,backfacing]" id="AzgW8w4MVAU=">
             <vertexdata>
                 <vectorofvector3f name="position" vertexbufferusage="static_draw">[
 [0.000510196,-0.00438676,-0.000970121],
@@ -149,14 +149,14 @@
 [-1,0]]</vectorofvector2f>
             </vertexdata>
             <primitives>
-                <elements type="quads" material="BLAa8w0fHuk=">
+                <elements type="quads" material="BDgW8w4MVAU=">
                     <indices vertexdata="position" role="position">[0,1,3,2,2,3,5,4,4,5,7,6,6,7,1,0,1,7,5,3,6,0,2,4]</indices>
                     <indices vertexdata="normal" role="normal">[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23]</indices>
                     <indices vertexdata="map1" role="texcoord0">[0,1,3,2,2,3,5,4,4,5,7,6,6,7,9,8,1,10,11,3,12,0,2,13]</indices>
                 </elements>
             </primitives>
         </shape>
-        <shape name="pSphereShape1" renderstyle="[frontfacing,backfacing]" id="B7Aa8w0fHuk=">
+        <shape name="pSphereShape1" renderstyle="[frontfacing,backfacing]" id="BzgW8w4MVAU=">
             <vertexdata>
                 <vectorofvector3f name="position" vertexbufferusage="static_draw">[
 [0.00148778,-0.00987688,-0.000483409],
@@ -1367,7 +1367,7 @@
 [0.975,0]]</vectorofvector2f>
             </vertexdata>
             <primitives>
-                <elements type="triangles" material="CLAa8w0fHuk=">
+                <elements type="triangles" material="CDgW8w4MVAU=">
                     <indices vertexdata="position" role="position">[1,0,380,2,1,380,3,2,380,4,3,380,5,4,380,6,5,380,7,6,380,8,7,380,9,
 8,380,10,9,380,11,10,380,12,11,380,13,12,380,14,13,380,15,14,380,16,15,380,17,
 16,380,18,17,380,19,18,380,0,19,380,360,361,381,361,362,381,362,363,381,363,364,381,364,
@@ -1379,7 +1379,7 @@
 365,381,365,366,381,366,367,381,367,368,381,368,369,381,369,370,381,370,371,381,371,372,381,372,
 373,381,373,374,381,374,375,381,375,376,381,376,377,381,377,378,381,378,379,381,379,361,381]</indices>
                 </elements>
-                <elements type="quads" material="CLAa8w0fHuk=">
+                <elements type="quads" material="CDgW8w4MVAU=">
                     <indices vertexdata="position" role="position">[0,1,21,20,1,2,22,21,2,3,23,22,3,4,24,23,4,5,25,24,5,6,26,25,6,
 7,27,26,7,8,28,27,8,9,29,28,9,10,30,29,10,11,31,30,11,12,32,31,12,
 13,33,32,13,14,34,33,14,15,35,34,15,16,36,35,16,17,37,36,17,18,38,37,18,
@@ -1505,9 +1505,9 @@
         </shape>
     </shapes>
     <textures>
-        <texture name="file1" image="BbAa8w0fHuk=" id="BrAa8w0fHuk=" mipmap="1"/>
+        <texture name="file1" image="BTgW8w4MVAU=" id="BjgW8w4MVAU=" mipmap="1"/>
     </textures>
     <images>
-        <image name="file1" type="single" id="BbAa8w0fHuk=" src="../../products/maya-xport/../../tests/rendertests/tex/testbild01.rgb"/>
+        <image name="file1" type="single" id="BTgW8w4MVAU=" src="../../products/maya-xport/../../tests/rendertests/tex/testbild01.rgb"/>
     </images>
 </scene>

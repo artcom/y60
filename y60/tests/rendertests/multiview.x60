@@ -1,33 +1,33 @@
 <scene revision="0">
     <worlds>
-        <world visible="1" id="B3gU8w0fHqg=">
-            <transform visible="1" name="groundPlane_transform" position="[0,0,0]" scale="[12,12,1]" orientation="[0.707107,0,0,-0.707107]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="CHgU8w0fHqg="/>
-            <camera visible="1" name="perspShape" position="[2.45298,2.39319,2.45298]" scale="[1,1,1]" orientation="[-0.223024,0.371366,0.0923797,-0.896556]" pivot="[1.61156e-017,-1.43774e-016,2.20379e-016]" billboard="" billboardlookat="" renderorder="0" frustum="perspective[-0.0514286,0.0514286,-0.0509525,0.0509525,0.1,10000]" id="CngU8w0fHqg="/>
-            <transform visible="0" name="top" position="[0,100,0]" scale="[1,1,1]" orientation="[-0.707107,0,0,-0.707107]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="C3gU8w0fHqg="/>
-            <transform visible="0" name="front" position="[0,0,100]" scale="[1,1,1]" orientation="[0,0,0,-1]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="DHgU8w0fHqg="/>
-            <transform visible="0" name="side" position="[100,0,0]" scale="[1,1,1]" orientation="[0,0.707107,0,-0.707107]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="DXgU8w0fHqg="/>
-            <body shape="A3gU8w0fHqg=" id="D3gU8w0fHqg=" name="pCube1" orientation="[0,0,0,-1]"/>
-            <camera visible="1" name="cameraShape1" position="[0,4.30463,0]" scale="[1,1,1]" orientation="[-0.662314,0.199361,0.196657,-0.694925]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" frustum="perspective[-0.0514286,0.0514286,-0.0509525,0.0509525,0.1,10000]" id="EXgU8w0fHqg="/>
-            <camera visible="1" name="cameraShape2" position="[0,1.78335,3.81267]" scale="[1,1,1]" orientation="[-0.210209,0,0,-0.977656]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" frustum="perspective[-0.0514286,0.0514286,-0.0509525,0.0509525,0.1,10000]" id="E3gU8w0fHqg="/>
+        <world visible="1" id="BwgV8w4MU88=">
+            <transform visible="1" name="groundPlane_transform" position="[0,0,0]" scale="[12,12,1]" orientation="[0.707107,0,0,-0.707107]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="CAgV8w4MU88="/>
+            <camera visible="1" name="perspShape" position="[2.45298,2.39319,2.45298]" scale="[1,1,1]" orientation="[-0.223024,0.371366,0.0923797,-0.896556]" pivot="[1.61156e-017,-1.43774e-016,2.20379e-016]" billboard="" billboardlookat="" renderorder="0" frustum="perspective[-0.0514286,0.0514286,-0.0509525,0.0509525,0.1,10000]" id="CggV8w4MU88="/>
+            <transform visible="0" name="top" position="[0,100,0]" scale="[1,1,1]" orientation="[-0.707107,0,0,-0.707107]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="CwgV8w4MU88="/>
+            <transform visible="0" name="front" position="[0,0,100]" scale="[1,1,1]" orientation="[0,0,0,-1]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="DAgV8w4MU88="/>
+            <transform visible="0" name="side" position="[100,0,0]" scale="[1,1,1]" orientation="[0,0.707107,0,-0.707107]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="DQgV8w4MU88="/>
+            <body shape="AwgV8w4MU88=" id="DwgV8w4MU88=" name="pCube1" orientation="[0,0,0,-1]"/>
+            <camera visible="1" name="cameraShape1" position="[0,4.30463,0]" scale="[1,1,1]" orientation="[-0.662314,0.199361,0.196657,-0.694925]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" frustum="perspective[-0.0514286,0.0514286,-0.0509525,0.0509525,0.1,10000]" id="EQgV8w4MU88="/>
+            <camera visible="1" name="cameraShape2" position="[0,1.78335,3.81267]" scale="[1,1,1]" orientation="[-0.210209,0,0,-0.977656]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" frustum="perspective[-0.0514286,0.0514286,-0.0509525,0.0509525,0.1,10000]" id="EwgV8w4MU88="/>
         </world>
     </worlds>
     <records/>
     <canvases>
-        <canvas id="AXgU8w0fHqg=">
-            <viewport id="AngU8w0fHqg=" camera="CngU8w0fHqg=">
+        <canvas id="AQgV8w4MU88=">
+            <viewport id="AggV8w4MU88=" camera="CggV8w4MU88=">
                 <overlays/>
             </viewport>
         </canvas>
     </canvases>
     <materials>
-        <material name="lambert2" id="BHgU8w0fHqg=" transparent="0">
+        <material name="lambert2" id="BAgV8w4MU88=" transparent="0">
             <properties>
                 <vector4f name="ambient">[0,0,0,1]</vector4f>
                 <vector4f name="diffuse">[0.8,0.8,0.8,1]</vector4f>
                 <vector4f name="emissive">[0,0,0,1]</vector4f>
             </properties>
             <textureunits>
-                <textureunit texture="BngU8w0fHqg="/>
+                <textureunit texture="BggV8w4MU88="/>
             </textureunits>
             <requires>
                 <feature name="textures">[100[paint]]</feature>
@@ -40,7 +40,7 @@
     <animations/>
     <characters/>
     <shapes>
-        <shape name="pCubeShape1" renderstyle="[frontfacing,backfacing]" id="A3gU8w0fHqg=">
+        <shape name="pCubeShape1" renderstyle="[frontfacing,backfacing]" id="AwgV8w4MU88=">
             <vertexdata>
                 <vectorofvector3f name="position" vertexbufferusage="static_draw">[
 [-0.5,-0.5,0.5],
@@ -94,7 +94,7 @@
 [-1,0]]</vectorofvector2f>
             </vertexdata>
             <primitives>
-                <elements type="triangles" material="BHgU8w0fHqg=">
+                <elements type="triangles" material="BAgV8w4MU88=">
                     <indices vertexdata="position" role="position">[0,1,2,1,3,2,2,3,4,3,5,4,4,5,6,5,7,6,6,7,0,7,1,0,1,
 7,3,7,5,3,6,0,4,0,2,4]</indices>
                     <indices vertexdata="normal" role="normal">[0,1,2,1,3,2,4,5,6,5,7,6,8,9,10,9,11,10,12,13,14,13,15,14,16,
@@ -106,9 +106,9 @@
         </shape>
     </shapes>
     <textures>
-        <texture name="file1" image="BXgU8w0fHqg=" id="BngU8w0fHqg=" mipmap="1"/>
+        <texture name="file1" image="BQgV8w4MU88=" id="BggV8w4MU88=" mipmap="1"/>
     </textures>
     <images>
-        <image name="file1" type="single" id="BXgU8w0fHqg=" src="../../products/maya-xport/../../tests/rendertests/tex/testbild00.rgb"/>
+        <image name="file1" type="single" id="BQgV8w4MU88=" src="../../products/maya-xport/../../tests/rendertests/tex/testbild00.rgb"/>
     </images>
 </scene>

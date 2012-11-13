@@ -1,24 +1,24 @@
 <scene revision="0">
     <worlds>
-        <world visible="1" id="BfwL8w0fHsk=">
-            <transform visible="1" name="groundPlane_transform" position="[0,0,0]" scale="[12,12,1]" orientation="[0.707107,0,0,-0.707107]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="BvwL8w0fHsk="/>
-            <camera visible="1" name="perspShape" position="[0.79272,1.4684,3.51348]" scale="[1,1,1]" orientation="[-0.136835,0.146388,0.0204501,-0.979504]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" frustum="perspective[-0.0514286,0.0514286,-0.0509525,0.0509525,0.1,10000]" id="CPwL8w0fHsk="/>
-            <transform visible="0" name="top" position="[0.218447,100,-0.873786]" scale="[1,1,1]" orientation="[-0.707107,0,0,-0.707107]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="CfwL8w0fHsk="/>
-            <transform visible="0" name="front" position="[0.129564,0.372446,100]" scale="[1,1,1]" orientation="[0,0,0,-1]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="CvwL8w0fHsk="/>
-            <transform visible="0" name="side" position="[100,0,0]" scale="[1,1,1]" orientation="[0,0.707107,0,-0.707107]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="C@wL8w0fHsk="/>
-            <body shape="A@wL8w0fHsk=" id="DfwL8w0fHsk=" name="pCube1" orientation="[0,0.382683,0,-0.92388]" scale="[1,2,1]"/>
+        <world visible="1" id="BTwI8w4MU_c=">
+            <transform visible="1" name="groundPlane_transform" position="[0,0,0]" scale="[12,12,1]" orientation="[0.707107,0,0,-0.707107]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="BjwI8w4MU_c="/>
+            <camera visible="1" name="perspShape" position="[0.79272,1.4684,3.51348]" scale="[1,1,1]" orientation="[-0.136835,0.146388,0.0204501,-0.979504]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" frustum="perspective[-0.0514286,0.0514286,-0.0509525,0.0509525,0.1,10000]" id="CDwI8w4MU_c="/>
+            <transform visible="0" name="top" position="[0.218447,100,-0.873786]" scale="[1,1,1]" orientation="[-0.707107,0,0,-0.707107]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="CTwI8w4MU_c="/>
+            <transform visible="0" name="front" position="[0.129564,0.372446,100]" scale="[1,1,1]" orientation="[0,0,0,-1]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="CjwI8w4MU_c="/>
+            <transform visible="0" name="side" position="[100,0,0]" scale="[1,1,1]" orientation="[0,0.707107,0,-0.707107]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="CzwI8w4MU_c="/>
+            <body shape="AzwI8w4MU_c=" id="DTwI8w4MU_c=" name="pCube1" orientation="[0,0.382683,0,-0.92388]" scale="[1,2,1]"/>
         </world>
     </worlds>
     <records/>
     <canvases>
-        <canvas id="AfwL8w0fHsk=">
-            <viewport id="AvwL8w0fHsk=" camera="CPwL8w0fHsk=">
+        <canvas id="ATwI8w4MU_c=">
+            <viewport id="AjwI8w4MU_c=" camera="CDwI8w4MU_c=">
                 <overlays/>
             </viewport>
         </canvas>
     </canvases>
     <materials>
-        <material name="lambert1" id="BPwL8w0fHsk=">
+        <material name="lambert1" id="BDwI8w4MU_c=">
             <properties>
                 <vector4f name="ambient">[0,0,0,1]</vector4f>
                 <vector4f name="diffuse">[0.4,0.4,0.4,1]</vector4f>
@@ -33,9 +33,9 @@
     <lightsources/>
     <animations/>
     <characters>
-        <character name="pCube1Ch" id="DvwL8w0fHsk=">
-            <clip name="clipSource" id="D@wL8w0fHsk=">
-                <animation name="animCurveTA3" enabled="1" attribute="orientation" property="" node="DfwL8w0fHsk=" begin="0" duration="2" pause="0" count="0" direction="forward" id="EPwL8w0fHsk=">
+        <character name="pCube1Ch" id="DjwI8w4MU_c=">
+            <clip name="clipSource" id="DzwI8w4MU_c=">
+                <animation name="animCurveTA3" enabled="1" attribute="orientation" property="" node="DTwI8w4MU_c=" begin="0" duration="2" pause="0" count="0" direction="forward" id="EDwI8w4MU_c=">
                     <vectorofquaternionf>[
 [0,-0.382683,0,0.92388],
 [-0.0360315,-0.382051,0.0242833,0.923119],
@@ -90,8 +90,8 @@
 [-0.481175,-0.0659948,0.655447,0.578364]]</vectorofquaternionf>
                 </animation>
             </clip>
-            <clip name="clipSource1" id="EfwL8w0fHsk=">
-                <animation name="pCube1_rotateX" enabled="1" attribute="orientation" property="" node="DfwL8w0fHsk=" begin="0" duration="2" pause="0" count="0" direction="forward" id="EvwL8w0fHsk=">
+            <clip name="clipSource1" id="ETwI8w4MU_c=">
+                <animation name="pCube1_rotateX" enabled="1" attribute="orientation" property="" node="DTwI8w4MU_c=" begin="0" duration="2" pause="0" count="0" direction="forward" id="EjwI8w4MU_c=">
                     <vectorofquaternionf>[
 [0,-0.382683,0,0.92388],
 [-0.0360315,-0.382051,0.0242833,0.923119],
@@ -149,7 +149,7 @@
         </character>
     </characters>
     <shapes>
-        <shape name="pCubeShape1" renderstyle="[frontfacing,backfacing]" id="A@wL8w0fHsk=">
+        <shape name="pCubeShape1" renderstyle="[frontfacing,backfacing]" id="AzwI8w4MU_c=">
             <vertexdata>
                 <vectorofvector3f name="position" vertexbufferusage="static_draw">[
 [-0.644057,-0.500815,0.282036],
@@ -232,11 +232,11 @@
 [2,0.415288]]</vectorofvector2f>
             </vertexdata>
             <primitives>
-                <elements type="triangles" material="BPwL8w0fHsk=">
+                <elements type="triangles" material="BDwI8w4MU_c=">
                     <indices vertexdata="position" role="position">[2,3,4,5,1,0]</indices>
                     <indices vertexdata="normal" role="normal">[4,5,6,7,8,9]</indices>
                 </elements>
-                <elements type="quads" material="BPwL8w0fHsk=">
+                <elements type="quads" material="BDwI8w4MU_c=">
                     <indices vertexdata="position" role="position">[10,0,1,11,11,1,5,9,9,5,0,10,6,7,13,12,7,8,14,13,8,6,12,14,10,
 11,7,6,11,9,8,7,9,10,6,8,2,12,13,3,3,13,14,4,14,12,2,4]</indices>
                     <indices vertexdata="normal" role="normal">[0,1,2,3,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,0,

@@ -1,37 +1,37 @@
 <scene revision="0">
     <worlds>
-        <world visible="1" id="B5gd8w0fHnI=">
-            <transform visible="1" name="groundPlane_transform" position="[0,0,0]" scale="[12,12,1]" orientation="[0.707107,0,0,-0.707107]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="CJgd8w0fHnI="/>
-            <camera visible="1" name="perspShape" position="[0.179865,0.0917023,0.179516]" scale="[1,1,1]" orientation="[-0.164282,0.395426,0.0721149,-0.900805]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" frustum="perspective[-0.0514286,0.0514286,-0.0509525,0.0509525,0.1,10000]" id="Cpgd8w0fHnI="/>
-            <transform visible="0" name="top" position="[0.000954915,1.00701,0.015]" scale="[1,1,1]" orientation="[-0.707107,0,0,-0.707107]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="C5gd8w0fHnI="/>
-            <transform visible="0" name="front" position="[0.000954915,0,1.00076]" scale="[1,1,1]" orientation="[0,0,0,-1]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="DJgd8w0fHnI="/>
-            <transform visible="0" name="side" position="[1.00011,0,0.015]" scale="[1,1,1]" orientation="[0,0.707107,0,-0.707107]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="DZgd8w0fHnI="/>
-            <joint visible="1" name="joint1" position="[0,0.1,0]" scale="[1,1,1]" orientation="[0,0,0,-1]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" jointorientation="[0,0,0.707107,0.707107]" id="Dpgd8w0fHnI=">
-                <joint visible="1" name="joint2" position="[0.1,-1.77636e-017,0.03]" scale="[1,1,1]" orientation="[0,0,0,-1]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" jointorientation="[0,0,0,1]" id="D5gd8w0fHnI=">
-                    <joint visible="1" name="joint3" position="[0.1,-1.77636e-017,-0.03]" scale="[1,1,1]" orientation="[0,0,0,-1]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" jointorientation="[0,0,-0.707107,0.707107]" id="EJgd8w0fHnI="/>
+        <world visible="1" id="B7wS8w4MU50=">
+            <transform visible="1" name="groundPlane_transform" position="[0,0,0]" scale="[12,12,1]" orientation="[0.707107,0,0,-0.707107]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="CLwS8w4MU50="/>
+            <camera visible="1" name="perspShape" position="[0.179865,0.0917023,0.179516]" scale="[1,1,1]" orientation="[-0.164282,0.395426,0.0721149,-0.900805]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" frustum="perspective[-0.0514286,0.0514286,-0.0509525,0.0509525,0.1,10000]" id="CrwS8w4MU50="/>
+            <transform visible="0" name="top" position="[0.000954915,1.00701,0.015]" scale="[1,1,1]" orientation="[-0.707107,0,0,-0.707107]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="C7wS8w4MU50="/>
+            <transform visible="0" name="front" position="[0.000954915,0,1.00076]" scale="[1,1,1]" orientation="[0,0,0,-1]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="DLwS8w4MU50="/>
+            <transform visible="0" name="side" position="[1.00011,0,0.015]" scale="[1,1,1]" orientation="[0,0.707107,0,-0.707107]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="DbwS8w4MU50="/>
+            <joint visible="1" name="joint1" position="[0,0.1,0]" scale="[1,1,1]" orientation="[0,0,0,-1]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" jointorientation="[0,0,0.707107,0.707107]" id="DrwS8w4MU50=">
+                <joint visible="1" name="joint2" position="[0.1,-1.77636e-017,0.03]" scale="[1,1,1]" orientation="[0,0,0,-1]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" jointorientation="[0,0,0,1]" id="D7wS8w4MU50=">
+                    <joint visible="1" name="joint3" position="[0.1,-1.77636e-017,-0.03]" scale="[1,1,1]" orientation="[0,0,0,-1]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" jointorientation="[0,0,-0.707107,0.707107]" id="ELwS8w4MU50="/>
                 </joint>
             </joint>
-            <body shape="A5gd8w0fHnI=" id="Epgd8w0fHnI=" name="pCylinder1" orientation="[0,0,0,-1]" skeleton="[`Dpgd8w0fHnI=`,`D5gd8w0fHnI=`,`EJgd8w0fHnI=`]"/>
-            <transform visible="1" name="transform2" position="[0,0,0]" scale="[1,1,1]" orientation="[0,0,0,-1]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="E5gd8w0fHnI="/>
+            <body shape="A7wS8w4MU50=" id="ErwS8w4MU50=" name="pCylinder1" orientation="[0,0,0,-1]" skeleton="[`DrwS8w4MU50=`,`D7wS8w4MU50=`,`ELwS8w4MU50=`]"/>
+            <transform visible="1" name="transform2" position="[0,0,0]" scale="[1,1,1]" orientation="[0,0,0,-1]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="E7wS8w4MU50="/>
         </world>
     </worlds>
     <records/>
     <canvases>
-        <canvas id="AZgd8w0fHnI=">
-            <viewport id="Apgd8w0fHnI=" camera="Cpgd8w0fHnI=">
+        <canvas id="AbwS8w4MU50=">
+            <viewport id="ArwS8w4MU50=" camera="CrwS8w4MU50=">
                 <overlays/>
             </viewport>
         </canvas>
     </canvases>
     <materials>
-        <material name="lambert1" id="BJgd8w0fHnI=" transparent="0">
+        <material name="lambert1" id="BLwS8w4MU50=" transparent="0">
             <properties>
                 <vector4f name="ambient">[0,0,0,1]</vector4f>
                 <vector4f name="diffuse">[0.8,0.8,0.8,1]</vector4f>
                 <vector4f name="emissive">[0,0,0,1]</vector4f>
             </properties>
             <textureunits>
-                <textureunit texture="Bpgd8w0fHnI="/>
+                <textureunit texture="BrwS8w4MU50="/>
             </textureunits>
             <requires>
                 <feature name="physics">[100[skin]]</feature>
@@ -45,7 +45,7 @@
     <animations/>
     <characters/>
     <shapes>
-        <shape name="pCylinderShape1" renderstyle="[frontfacing,backfacing]" id="A5gd8w0fHnI=">
+        <shape name="pCylinderShape1" renderstyle="[frontfacing,backfacing]" id="A7wS8w4MU50=">
             <vertexdata>
                 <vectorofvector3f name="position" vertexbufferusage="static_draw">[
 [0.00309017,-0.1,-0.00951057],
@@ -165,7 +165,7 @@
 [0,0,0,0]]</vectorofvector4f>
             </vertexdata>
             <primitives>
-                <elements type="quads" material="BJgd8w0fHnI=">
+                <elements type="quads" material="BLwS8w4MU50=">
                     <indices vertexdata="position" role="position">[0,1,6,5,1,2,7,6,2,3,8,7,3,4,9,8,4,0,5,9,5,6,11,10,6,
 7,12,11,7,8,13,12,8,9,14,13,9,5,10,14]</indices>
                     <indices vertexdata="normal" role="normal">[0,1,2,3,1,4,5,2,4,6,7,5,6,8,9,7,8,0,3,9,3,2,10,11,2,
@@ -185,9 +185,9 @@
         </shape>
     </shapes>
     <textures>
-        <texture name="file1" image="BZgd8w0fHnI=" id="Bpgd8w0fHnI=" mipmap="1"/>
+        <texture name="file1" image="BbwS8w4MU50=" id="BrwS8w4MU50=" mipmap="1"/>
     </textures>
     <images>
-        <image name="file1" type="single" id="BZgd8w0fHnI=" src="../../products/maya-xport/../../tests/rendertests/tex/testbild00.rgb"/>
+        <image name="file1" type="single" id="BbwS8w4MU50=" src="../../products/maya-xport/../../tests/rendertests/tex/testbild00.rgb"/>
     </images>
 </scene>

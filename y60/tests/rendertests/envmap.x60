@@ -1,26 +1,26 @@
 <scene revision="0">
     <worlds>
-        <world visible="1" id="CtAe8w0fHmQ=">
-            <transform visible="1" name="groundPlane_transform" position="[0,0,0]" scale="[12,12,1]" orientation="[0.707107,0,0,-0.707107]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="C9Ae8w0fHmQ="/>
-            <camera visible="1" name="perspShape" position="[3.40367,1.35441,-4.11461]" scale="[1,1,1]" orientation="[-0.0384353,0.953612,0.138593,-0.26446]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" frustum="perspective[-0.0514286,0.0514286,-0.0509525,0.0509525,0.1,10000]" id="DdAe8w0fHmQ="/>
-            <transform visible="0" name="top" position="[0.498026,100,-0.16256]" scale="[1,1,1]" orientation="[-0.707107,0,0,-0.707107]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="DtAe8w0fHmQ="/>
-            <transform visible="0" name="front" position="[-1.14441e-007,0,100]" scale="[1,1,1]" orientation="[0,0,0,-1]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="D9Ae8w0fHmQ="/>
-            <transform visible="0" name="side" position="[100,0,-1.14441e-007]" scale="[1,1,1]" orientation="[0,0.707107,0,-0.707107]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="ENAe8w0fHmQ="/>
-            <body shape="A9Ae8w0fHmQ=" id="EtAe8w0fHmQ=" name="pSphere1" orientation="[0,0,0,-1]"/>
-            <light visible="1" name="directionalLight1" position="[0.0558155,0.0474277,-0.00586658]" scale="[1,1,1]" orientation="[-0.229953,0.697883,0.255389,-0.628377]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" lightsource="CdAe8w0fHmQ=" id="FNAe8w0fHmQ="/>
-            <body shape="B9Ae8w0fHmQ=" id="FtAe8w0fHmQ=" name="pSphere2" position="[2.19812,0,0]" orientation="[0,0,0,-1]"/>
+        <world visible="1" id="CvgO8w4MU5A=">
+            <transform visible="1" name="groundPlane_transform" position="[0,0,0]" scale="[12,12,1]" orientation="[0.707107,0,0,-0.707107]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="C@gO8w4MU5A="/>
+            <camera visible="1" name="perspShape" position="[3.40367,1.35441,-4.11461]" scale="[1,1,1]" orientation="[-0.0384353,0.953612,0.138593,-0.26446]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" frustum="perspective[-0.0514286,0.0514286,-0.0509525,0.0509525,0.1,10000]" id="DfgO8w4MU5A="/>
+            <transform visible="0" name="top" position="[0.498026,100,-0.16256]" scale="[1,1,1]" orientation="[-0.707107,0,0,-0.707107]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="DvgO8w4MU5A="/>
+            <transform visible="0" name="front" position="[-1.14441e-007,0,100]" scale="[1,1,1]" orientation="[0,0,0,-1]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="D@gO8w4MU5A="/>
+            <transform visible="0" name="side" position="[100,0,-1.14441e-007]" scale="[1,1,1]" orientation="[0,0.707107,0,-0.707107]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" id="EPgO8w4MU5A="/>
+            <body shape="A@gO8w4MU5A=" id="EvgO8w4MU5A=" name="pSphere1" orientation="[0,0,0,-1]"/>
+            <light visible="1" name="directionalLight1" position="[0.0558155,0.0474277,-0.00586658]" scale="[1,1,1]" orientation="[-0.229953,0.697883,0.255389,-0.628377]" pivot="[0,0,0]" billboard="" billboardlookat="" renderorder="0" lightsource="CfgO8w4MU5A=" id="FPgO8w4MU5A="/>
+            <body shape="B@gO8w4MU5A=" id="FvgO8w4MU5A=" name="pSphere2" position="[2.19812,0,0]" orientation="[0,0,0,-1]"/>
         </world>
     </worlds>
     <records/>
     <canvases>
-        <canvas id="AdAe8w0fHmQ=">
-            <viewport id="AtAe8w0fHmQ=" camera="DdAe8w0fHmQ=">
+        <canvas id="AfgO8w4MU5A=">
+            <viewport id="AvgO8w4MU5A=" camera="DfgO8w4MU5A=">
                 <overlays/>
             </viewport>
         </canvas>
     </canvases>
     <materials>
-        <material name="phong1" id="BNAe8w0fHmQ=" transparent="0">
+        <material name="phong1" id="BPgO8w4MU5A=" transparent="0">
             <properties>
                 <vector4f name="ambient">[0,0,0,1]</vector4f>
                 <vector4f name="diffuse">[0.8,0.8,0.8,1]</vector4f>
@@ -30,7 +30,7 @@
                 <float name="shininess">25.6</float>
             </properties>
             <textureunits>
-                <textureunit texture="BtAe8w0fHmQ="/>
+                <textureunit texture="BvgO8w4MU5A="/>
             </textureunits>
             <requires>
                 <feature name="textures">[100[paint]]</feature>
@@ -43,7 +43,7 @@
 10[unlit]]</feature>
             </requires>
         </material>
-        <material name="phong4" id="CNAe8w0fHmQ=" transparent="1">
+        <material name="phong4" id="CPgO8w4MU5A=" transparent="1">
             <properties>
                 <vector4f name="ambient">[0,0,0,1]</vector4f>
                 <vector4f name="diffuse">[0.8,0,0,0.54546]</vector4f>
@@ -65,7 +65,7 @@
         </material>
     </materials>
     <lightsources>
-        <lightsource name="directionalLightShape1" type="directional" id="CdAe8w0fHmQ=">
+        <lightsource name="directionalLightShape1" type="directional" id="CfgO8w4MU5A=">
             <properties>
                 <vector4f name="ambient">[0,0,0,0]</vector4f>
                 <vector4f name="diffuse">[1,1,1,1]</vector4f>
@@ -76,7 +76,7 @@
     <animations/>
     <characters/>
     <shapes>
-        <shape name="pSphereShape1" renderstyle="[frontfacing,backfacing]" id="A9Ae8w0fHmQ=">
+        <shape name="pSphereShape1" renderstyle="[frontfacing,backfacing]" id="A@gO8w4MU5A=">
             <vertexdata>
                 <vectorofvector3f name="position" vertexbufferusage="static_draw">[
 [0.148778,-0.987688,-0.0483409],
@@ -1249,7 +1249,7 @@
 [0.5,0]]</vectorofvector2f>
             </vertexdata>
             <primitives>
-                <elements type="triangles" material="BNAe8w0fHmQ=">
+                <elements type="triangles" material="BPgO8w4MU5A=">
                     <indices vertexdata="position" role="position">[21,20,1,0,1,20,22,21,2,1,2,21,23,22,3,2,3,22,24,23,4,3,4,23,25,
 24,5,4,5,24,26,25,6,5,6,25,27,26,7,6,7,26,28,27,8,7,8,27,29,
 28,9,8,9,28,30,29,10,9,10,29,31,30,11,10,11,30,32,31,12,11,12,31,33,
@@ -1538,7 +1538,7 @@
                 </elements>
             </primitives>
         </shape>
-        <shape name="pSphereShape2" renderstyle="[frontfacing,backfacing]" id="B9Ae8w0fHmQ=">
+        <shape name="pSphereShape2" renderstyle="[frontfacing,backfacing]" id="B@gO8w4MU5A=">
             <vertexdata>
                 <vectorofvector3f name="position" vertexbufferusage="static_draw">[
 [0.148778,-0.987688,-0.0483409],
@@ -2711,7 +2711,7 @@
 [0.5,0]]</vectorofvector2f>
             </vertexdata>
             <primitives>
-                <elements type="triangles" material="CNAe8w0fHmQ=">
+                <elements type="triangles" material="CPgO8w4MU5A=">
                     <indices vertexdata="position" role="position">[21,20,1,0,1,20,22,21,2,1,2,21,23,22,3,2,3,22,24,23,4,3,4,23,25,
 24,5,4,5,24,26,25,6,5,6,25,27,26,7,6,7,26,28,27,8,7,8,27,29,
 28,9,8,9,28,30,29,10,9,10,29,31,30,11,10,11,30,32,31,12,11,12,31,33,
@@ -2907,9 +2907,9 @@
         </shape>
     </shapes>
     <textures>
-        <texture name="testbild00" image="BdAe8w0fHmQ=" id="BtAe8w0fHmQ=" mipmap="1" color_scale="[0.238087,0.197,1,1]"/>
+        <texture name="testbild00" image="BfgO8w4MU5A=" id="BvgO8w4MU5A=" mipmap="1" color_scale="[0.238087,0.197,1,1]"/>
     </textures>
     <images>
-        <image name="testbild00" type="single" id="BdAe8w0fHmQ=" src="../../products/maya-xport/../../tests/rendertests/tex/testbild00.rgb"/>
+        <image name="testbild00" type="single" id="BfgO8w4MU5A=" src="../../products/maya-xport/../../tests/rendertests/tex/testbild00.rgb"/>
     </images>
 </scene>
