@@ -119,15 +119,7 @@ MemoryMeter.prototype.Constructor = function (self, theSceneViewer) {
         }
 
         if (self.enabled) {
-            var myBackgroundColor = window.canvas.backgroundcolor;
-            var myBrightness = (myBackgroundColor[0] + myBackgroundColor[1] + myBackgroundColor[2]) / 3;
-            var myTextColor = new Vector4f(1, 1, 1, 1);
-            if (myBrightness > 0.5) {
-                myTextColor = new Vector4f(0, 0, 0, 1);
-            }
             var myViewport = theSceneViewer.getViewportAtWindowCoordinates(0, 0); // get viewport containing upper left pixel
-            window.renderText(new Vector2f(10, 10), asMemoryString(getProcessMemoryUsage()), new Node("<style textColor='" + myTextColor + "'/>").childNode(0), "Screen8", myViewport);
-
             var myAge = _mySceneViewer.getCurrentTime() - _myMaxMemoryTime;
             var myRed   = 1;
             var myGreen = 1;
@@ -139,17 +131,18 @@ MemoryMeter.prototype.Constructor = function (self, theSceneViewer) {
                 myRed = 1 - (myAge - MAX_MEMORY_GREEN_TIME) / MAX_MEMORY_GREEN_TIME;
             }
 
-            myTextColor = new Vector4f(myRed, myGreen, 0, 1);
-            window.renderText( new Vector2f(10, 20), asMemoryString(_myMaxMemoryUsage), new Node("<style textColor='" + myTextColor + "'/>").childNode(0), "Screen8", myViewport);
+            var myTextColor = new Vector4f(myRed, myGreen, 0, 1);
+            var myStyle = new Node("<style textColor='" + myTextColor + "'/>");
+            window.renderText(new Vector2f(10, 10), asMemoryString(getProcessMemoryUsage()), myStyle, "Screen8", myViewport);
+
+            window.renderText(new Vector2f(10, 20), asMemoryString(_myMaxMemoryUsage), myStyle, "Screen8", myViewport);
 
             var myMem = asMemoryString(getFreeMemory()) + "/" + asMemoryString(getTotalMemory());
-            window.renderText(new Vector2f(10, 30), myMem, new Node("<style textColor='" + myTextColor + "'/>").childNode(0),
-                              "Screen8", myViewport);
+            window.renderText(new Vector2f(10, 30), myMem, myStyle, "Screen8", myViewport);
             if (_myGLMemExtensionAvail) {
                 var myTotalGLMem = gl.GetTotalMem();
                 var myGLMem = "GL: " + asMemoryString(myTotalGLMem - gl.GetFreeMem()) + "/" + asMemoryString(myTotalGLMem);
-                window.renderText(new Vector2f(10, 40), myGLMem, new Node("<style textColor='" + myTextColor + "'/>").childNode(0),
-                                  "Screen8", myViewport);
+                window.renderText(new Vector2f(10, 40), myGLMem, myStyle, "Screen8", myViewport);
             }
         }
     };
