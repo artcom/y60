@@ -99,12 +99,7 @@ namespace y60 {
 
     void
     TextureManager::setTextureList(dom::NodePtr theTextureListNode) {
-#if 0
-        _myTextureList = theTextureListNode;
-#else
-        // speedup getElementByName
         _myTextureList = theTextureListNode->getRootNode()->self().lock();
-#endif
     }
 
     void
@@ -120,21 +115,10 @@ namespace y60 {
     void
     TextureManager::unbindTextures() {
         AC_DEBUG << "TextureManager::unbindTextures";
-#if 0
-        unsigned myTextureCount = _myTextureList->childNodesLength();
-        for (unsigned i = 0; i < myTextureCount; ++i) {
-            dom::NodePtr myTextureNode = _myTextureList->childNode(i);
-            if (myTextureNode->nodeType() == dom::Node::ELEMENT_NODE) {
-                TexturePtr myTexture = myTextureNode->getFacade<Texture>();
-                unbindTexture(myTexture.get());
-            }
-        }
-#else
         std::vector<TexturePtr> myTextures = _myTextureList->getAllFacades<Texture>(TEXTURE_NODE_NAME);
         for (unsigned i = 0; i < myTextures.size(); ++i) {
             unbindTexture(myTextures[i].get());
         }
-#endif
     }
 
     int
@@ -193,18 +177,6 @@ namespace y60 {
         }
         return TexturePtr();
     }
-
-    /*
-    void TextureManager::updateTextureData(const TexturePtr & theTexture) {
-        AC_PRINT << "XXX TextureManager::updateTextureData";
-        _myResourceManager->updateTextureData(theTexture);
-    }
-
-    void TextureManager::setTexturePriority(const TexturePtr & theTexture, float thePriority) {
-        AC_PRINT << "XXX TextureManager::setTexturePriority id=" << theTexture->get<IdTag>();
-        _myResourceManager->setTexturePriority(theTexture, thePriority);
-    }
-    */
 
     void TextureManager::unbindTexture(Texture * theTexture) {
         AC_DEBUG << "TextureManager::unbindTexture id=" << theTexture->get<IdTag>();
