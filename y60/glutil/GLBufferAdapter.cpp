@@ -228,7 +228,6 @@ namespace y60 {
     BufferToFile::encodeBuffer(const std::string thePath, const unsigned int theFormat,
                                const int theCompressionOrQualityLevel, boost::shared_ptr<PLAnyBmp> & theBmp)
     {
-        MAKE_SCOPE_TIMER(GLBufferAdapter_MakeFileFromBmp);
         switch(theFormat) {
             case PL_FT_PNG:
                 {
@@ -282,6 +281,7 @@ namespace y60 {
         _myCompressionOrQualityLevel = asl::clamp(theCompressionOrQualityLevel, -1, 100);
     }
     // ----------------------------------------------------------------------------------------
+    //
     BufferToTexture::BufferToTexture(TexturePtr theTexture, const asl::Vector2i & theOffset, bool theCopyToImageFlag) :
         BufferAdapter(theTexture->get<TextureWidthTag>(), theTexture->get<TextureHeightTag>(), 4),
         _myTexture(theTexture), _myOffset(theOffset), _myCopyToImage(theCopyToImageFlag)
