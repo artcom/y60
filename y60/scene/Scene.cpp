@@ -393,15 +393,6 @@ namespace y60 {
         _myTextureManager->setTextureList(getTexturesRoot());
 
         setupShaderLibrary();
-#if 0
-        AC_INFO << "Loading materials...";
-        NodePtr myMaterialList = getNode().childNode(MATERIAL_LIST_NAME);
-        unsigned myMaterialCount = myMaterialList->childNodesLength();
-        for (unsigned i = 0; i < myMaterialCount; ++i) {
-            NodePtr myMaterialNode = myMaterialList->childNode(i);
-            loadMaterial(myMaterialNode);
-        }
-#endif
         AC_INFO << "Loading world...";
         update(ANIMATIONS_LOAD|SHAPES|WORLD);
         asl::Time setupEnd;
@@ -416,392 +407,9 @@ namespace y60 {
         } else {
             myOptimizer.run();
         }
-        //save("optimizedScene.x60", false);
         update(SHAPES|WORLD);
     }
-#if 0
-    void
-    Scene::loadMaterial(NodePtr theMaterialNode) {
-        DB(AC_TRACE << "Scene::loadMaterial " << *theMaterialNode);
-        MaterialBasePtr myMaterial = theMaterialNode->getFacade<MaterialBase>();
 
-        IShaderPtr myShader;
-        if (getShaderLibrary()) {
-            // 2. ask shaderlib for shaderdefinition
-            myShader = getShaderLibrary()->findShader(myMaterial);
-            if (!myShader) {
-                throw SceneException(string("No shader defintion found for Material: ") +
-                    myMaterial->get<NameTag>(), PLUS_FILE_LINE);
-            }
-            DB(AC_TRACE << "load shader");
-            myShader->load(*getShaderLibrary());
-            // 3. decide which material to build
-            // 4. load material from node
-            // 5. give material the found shaderdefinition
-        }
-        myMaterial->setShader(myShader);
-        DB(AC_TRACE << "Scene::loadMaterial(): Load material " << endl << *theMaterialNode <<
-            endl << " with shader: " << (myShader ? myShader->getName() : "NULL"));
-
-        if (myShader) {
-            typedef map<string,bool> PropertyUsedMap;
-            PropertyUsedMap myPropertyNames;
-
-            NodePtr myPropertiesNode = theMaterialNode->childNode(PROPERTY_LIST_NAME);
-            if (myPropertiesNode) {
-                // remove sampler properties since they may change with the new shader
-                for (int i = myPropertiesNode->childNodesLength()-1; i >= 0; --i) {
-                    NodePtr myPropertyNode = myPropertiesNode->childNode(i);
-                    const std::string & myPropTagName = myPropertyNode->nodeName();
-                    const std::string & myPropName = myPropertyNode->getAttributeString("name");
-                    if (myPropTagName == "sampler1d" || myPropTagName == "sampler2d" || myPropTagName == "samplerCUBE") {
-                        AC_DEBUG << "Removing sampler property '" << myPropName << "'";
-                        myPropertiesNode->removeChild(myPropertyNode);
-                    } else {
-                        myPropertyNames[myPropName] = false;
-                    }
-                }
-            }
-
-            for (unsigned i = 0; i < myShader->getPropertyNodeCount(); ++i) {
-                // default property with the shader default, unless the material already has that property
-                myPropertiesNode = myShader->getPropertyNode(i);
-                for (unsigned j = 0; j < myPropertiesNode->childNodesLength(); ++j) {
-                    dom::NodePtr myPropertyNode  = myPropertiesNode->childNode(j);
-                    if (myPropertyNode->nodeType() == dom::Node::ELEMENT_NODE && myPropertyNode->nodeName() != "#comment") {
-                        const std::string & myPropName = myPropertyNode->getAttributeString("name");
-                        if (myPropertyNames.find(myPropName) == myPropertyNames.end()) {
-                            myMaterial->mergeProperties(myPropertyNode);
-                        }
-                    }
-                }
-            }
-        }
-        myMaterial->load(_myTextureManager);
-        DB(AC_TRACE << "Scene::loadMaterial() - id: " << myMaterial->get<IdTag>()
-                    << ", name: " << myMaterial->get<NameTag>());
-    }
-    void
-    Scene::rebindMaterials() {
-        PrimitiveVector myAffectedPrimitives;
-        NodePtr myShapeListNode = getShapesRoot();
-        unsigned myShapeCount = myShapeListNode->childNodesLength();
-        for (unsigned i = 0; i < myShapeCount; ++i) {
-            NodePtr myShapeNode = myShapeListNode->childNode(i);
-            ShapePtr myShape = myShapeNode->getFacade<Shape>();
-
-            NodePtr myPrimitiveListNode = myShapeNode->childNode(PRIMITIVE_LIST_NAME);
-            if (myPrimitiveListNode) {
-                unsigned myPrimitiveCount = myPrimitiveListNode->childNodesLength(ELEMENTS_NODE_NAME);
-                for (unsigned j = 0; j < myPrimitiveCount; ++j) {
-                    NodePtr myElementsNode = myPrimitiveListNode->childNode(ELEMENTS_NODE_NAME, j);
-                    // get new Material of the affected primitive
-                    std::string myMaterialId = myElementsNode->getAttributeString(MATERIAL_REF_ATTRIB);
-                    MaterialBaseFacadePtr myNewMaterial = myElementsNode->getElementById(myMaterialId)->getFacade<MaterialBase>();
-                    Primitive & myPrimitive = *(myShape->getPrimitives()[j]);
-                    myPrimitive.setMaterial(myNewMaterial);
-                }
-            }
-        }
-    }
-#endif
-
-#if 0
-    void
-    Scene::reloadMaterial(NodePtr theMaterialNode, MaterialBasePtr theMaterial) {
-        // Find all primitives that reference the material
-        MaterialBase * myMaterial = theMaterial.get();
-        PrimitiveVector myAffectedPrimitives;
-        NodePtr myShapeListNode = getShapesRoot();
-        unsigned myShapeCount = myShapeListNode->childNodesLength();
-        for (unsigned i = 0; i < myShapeCount; ++i) {
-            NodePtr myShapeNode = myShapeListNode->childNode(i);
-            ShapePtr myShape = myShapeNode->getFacade<Shape>();
-            const PrimitiveVector & myPrimitives = myShape->getPrimitives();
-            for (unsigned j = 0; j < myPrimitives.size(); ++j) {
-                if (&(myPrimitives[j]->getMaterial()) == myMaterial) {
-                    myAffectedPrimitives.push_back(myPrimitives[j]);
-                }
-            }
-        }
-
-        loadMaterial(theMaterialNode);
-        for (unsigned i = 0; i < myAffectedPrimitives.size(); ++i) {
-            MaterialBasePtr myNewMaterial = theMaterialNode->getFacade<MaterialBase>();
-            myAffectedPrimitives[i]->setMaterial(myNewMaterial);
-        }
-    }
-#else
-#if 0
-    void
-    Scene::reloadMaterial(NodePtr theMaterialNode, MaterialBasePtr theMaterial) {
-        AC_TRACE << " Scene::reloadMaterial id="<< theMaterialNode->getAttributeString("id");
-        // Find all primitives that reference the material
-        MaterialBase * myMaterial = theMaterial.get();
-        PrimitiveVector myAffectedPrimitives;
-        std::vector<NodePtr> myShapes = xpath::findAll(getNode(), "//shape");
-        unsigned myShapeCount = myShapes.size();
-        for (unsigned i = 0; i < myShapeCount; ++i) {
-            NodePtr myShapeNode = myShapes[i];
-            ShapePtr myShape = myShapeNode->getFacade<Shape>();
-            const PrimitiveVector & myPrimitives = myShape->getPrimitives();
-            for (unsigned j = 0; j < myPrimitives.size(); ++j) {
-                if (&(myPrimitives[j]->getMaterial()) == myMaterial) {
-                    myAffectedPrimitives.push_back(myPrimitives[j]);
-                }
-            }
-        }
-
-        loadMaterial(theMaterialNode);
-        for (unsigned i = 0; i < myAffectedPrimitives.size(); ++i) {
-            MaterialBasePtr myNewMaterial = theMaterialNode->getFacade<MaterialBase>();
-            myAffectedPrimitives[i]->setMaterial(myNewMaterial);
-        }
-    }
-#endif
-#endif
-
-#if 0
-    NodePtr
-    Scene::getVertexDataNode(NodePtr theShapeNode, const std::string & theDataName) {
-        NodePtr myVertexDataListNode = theShapeNode->childNode(VERTEX_DATA_NAME);
-        if (myVertexDataListNode) {
-            for (unsigned i = 0; i < myVertexDataListNode->childNodesLength(); ++i) {
-                NodePtr myVertexDataNode = myVertexDataListNode->childNode(i);
-                if (myVertexDataNode->nodeType() == Node::ELEMENT_NODE &&
-                    myVertexDataNode->getAttributeString(NAME_ATTRIB) == theDataName)
-                {
-                    return myVertexDataNode;
-                }
-            }
-        }
-
-        throw SomError(std::string("Could not find vertex data '") + theDataName + "' in shape '" +
-            theShapeNode->getAttributeString("id")+"'", "Scene::getListData()");
-
-        return NodePtr(0);
-    }
-
-    void
-    Scene::calculateShapeBoundingBox(ShapePtr theShape) {
-        NodePtr myDataNode = getVertexDataNode(theShape->getXmlNode(), POSITION_ROLE);
-        const VectorOfVector3f & myPositions =
-            myDataNode->childNode(0)->nodeValueRef<VectorOfVector3f>();
-
-        asl::Box3f myBoundingBox;
-        myBoundingBox.makeEmpty();
-        for (unsigned i = 0; i < myPositions.size(); ++i) {
-            myBoundingBox.extendBy(asPoint(myPositions[i]));
-        }
-        theShape->set<BoundingBoxTag>(myBoundingBox);
-    }
-#endif
-#if 0
-    unsigned
-    Scene::findMaxIndexSize(NodePtr theElementsNode) {
-        size_t myLargestSize = 0;
-        unsigned myIndicesCount = theElementsNode->childNodesLength(VERTEX_INDICES_NAME);
-        for (unsigned i = 0; i < myIndicesCount; ++i) {
-            NodePtr myIndicesNode = theElementsNode->childNode(VERTEX_INDICES_NAME, i);
-            const VectorOfUnsignedInt & myIndices = myIndicesNode->
-                childNode(0)->nodeValueRef<VectorOfUnsignedInt>();
-
-            myLargestSize = asl::maximum(myLargestSize, myIndices.size());
-        }
-        return myLargestSize;
-    }
-    void
-    Scene::clearShapes() {
-        // TODO: clears only shape nodes under the <shapes> element
-        NodePtr myShapeListNode = getShapesRoot();
-        unsigned myShapeCount = myShapeListNode->childNodesLength();
-        for (int myShapeIndex = 0; myShapeIndex < myShapeCount; myShapeIndex++) {
-            NodePtr myShapeNode = myShapeListNode->childNode(myShapeIndex);
-            ShapePtr myShape = myShapeNode->getFacade<Shape>();
-            myShape->clear();
-        }
-    }
-
-    void
-    Scene::updateShapes() {
-        NodePtr myShapeListNode = getShapesRoot();
-        unsigned myShapeCount = myShapeListNode->childNodesLength();
-        _myStatistics.vertexCount = 0;
-        _myStatistics.primitiveCount = 0;
-        for (int myShapeIndex = 0; myShapeIndex < myShapeCount; myShapeIndex++) {
-            NodePtr myShapeNode = myShapeListNode->childNode(myShapeIndex);
-            ShapePtr myShape = myShapeNode->getFacade<Shape>();
-            if (myShapeNode->nodeVersion() > myShape->getLastRenderVersion()) {
-                buildShape(myShape);
-            }
-            _myStatistics.vertexCount += myShape->getVertexCount();
-            _myStatistics.primitiveCount += myShape->getPrimitives().size();
-        }
-    }
-#else
-#if 0
-    void
-    Scene::clearShapes() {
-        std::vector<NodePtr> myShapes = xpath::findAll(getNode(), "//shape");
-        unsigned myShapeCount = myShapes.size();
-        for (int myShapeIndex = 0; myShapeIndex < myShapeCount; myShapeIndex++) {
-            NodePtr myShapeNode = myShapes[myShapeIndex];
-            ShapePtr myShape = myShapeNode->getFacade<Shape>();
-            myShape->clear();
-        }
-    }
-
-    void
-    Scene::updateShapes() {
-        std::vector<NodePtr> myShapes = xpath::findAll(getNode(), "//shape");
-        unsigned myShapeCount = myShapes.size();
-        _myStatistics.vertexCount = 0;
-        _myStatistics.primitiveCount = 0;
-        for (int myShapeIndex = 0; myShapeIndex < myShapeCount; myShapeIndex++) {
-            NodePtr myShapeNode = myShapes[myShapeIndex];
-            ShapePtr myShape = myShapeNode->getFacade<Shape>();
-            if (myShapeNode->nodeVersion() > myShape->getLastRenderVersion()) {
-                buildShape(myShape);
-            }
-            _myStatistics.vertexCount += myShape->getVertexCount();
-            _myStatistics.primitiveCount += myShape->getPrimitives().size();
-        }
-    }
-#endif
-#endif
-#if 0
-    void
-    Scene::buildShape(ShapePtr theShape) {
-        NodePtr myShapeNode = theShape->getXmlNode();
-        theShape->clear();
-
-        unsigned long myShapeVertexCount = 0;
-        const std::string & myShapeId = myShapeNode->getAttributeString("id");
-
-        // Iterate over all indices and find the corresponding data
-        NodePtr myPrimitiveListNode = myShapeNode->childNode(PRIMITIVE_LIST_NAME);
-        if (myPrimitiveListNode) {
-            unsigned myPrimitiveCount = myPrimitiveListNode->childNodesLength(ELEMENTS_NODE_NAME);
-            for (unsigned j = 0; j < myPrimitiveCount; ++j) {
-                NodePtr myElementsNode = myPrimitiveListNode->childNode(ELEMENTS_NODE_NAME, j);
-                std::string myMaterialId =
-                    myElementsNode->getAttributeString(MATERIAL_REF_ATTRIB);
-                PrimitiveType myPrimitiveType = Primitive::getTypeFromNode(myElementsNode);
-                MaterialBaseFacadePtr myMaterial = myElementsNode->getElementById(myMaterialId)->getFacade<MaterialBase>();//getMaterial(myMaterialId);
-                if (!myMaterial) {
-                    throw SceneException(std::string("Could not find material with id: ") +
-                                            myMaterialId, PLUS_FILE_LINE);
-                }
-
-                // Make sure elements do not get bigger than 64k
-                const unsigned myMaximumElementSize = 1024 * 64;
-                unsigned myBegin = 0;
-                unsigned myEnd   = 0;
-                unsigned myMaxIndexSize = findMaxIndexSize(myElementsNode);
-                unsigned myVerticesPerPrimitive = getVerticesPerPrimitive(myPrimitiveType);
-                do {
-                    if (myVerticesPerPrimitive == 0) {
-                        myEnd = myMaxIndexSize;
-                    } else {
-                        myEnd += myMaximumElementSize - (myMaximumElementSize % myVerticesPerPrimitive);
-                        if (myEnd > myMaxIndexSize) {
-                            myEnd = myMaxIndexSize;
-                        }
-                    }
-
-                    Primitive & myPrimitive = theShape->createPrimitive(myPrimitiveType,
-                        myMaterial, myBegin);
-
-
-                    // collect renderstyles for this element
-                    myPrimitive.getRenderStyles() = myElementsNode->getAttributeValue<RenderStyles>(RENDER_STYLE_ATTRIB,
-                                                            RenderStyles(0));
-                    unsigned myIndicesCount = myElementsNode->childNodesLength(VERTEX_INDICES_NAME);
-                    for (unsigned k = 0; k < myIndicesCount; ++k) {
-                        NodePtr myIndicesNode = myElementsNode->childNode(VERTEX_INDICES_NAME, k);
-                        const string & myName = myIndicesNode->getAttributeString(VERTEX_DATA_ATTRIB);
-                        NodePtr myDataNode = getVertexDataNode(myShapeNode, myName);
-
-                        ResourceManager * myResourceManager = _myTextureManager->getResourceManager();
-                        myPrimitive.load(myResourceManager, myIndicesNode, myDataNode, myBegin, myEnd);
-                    }
-
-                    myShapeVertexCount += myPrimitive.size();
-                    myBegin = myEnd;
-                } while (myEnd < myMaxIndexSize);
-            }
-        } else {
-            throw SceneException(std::string("Node with name '") +
-                                    PRIMITIVE_LIST_NAME + "' not found for shape: " +
-                                    myShapeId, PLUS_FILE_LINE);
-        }
-
-        // collect per shape renderstyles
-        // theShape->getRenderStyles() = myShapeNode->getAttributeValue<RenderStyles>(RENDER_STYLE_ATTRIB, RenderStyles(0));
-
-        // Set vertex count
-        theShape->setVertexCount(myShapeVertexCount);
-        DB(AC_TRACE << "shape: " << myShapeId << " has " << theShape->getPrimitives().size() << " materials";)
-
-        calculateShapeBoundingBox(theShape);
-        theShape->setLastRenderVersion(myShapeNode->nodeVersion()+1);
-    }
-#endif
-#if 0
-    void
-    Scene::reverseUpdateShapes() {
-        NodePtr myShapeListNode = getShapesRoot();
-        unsigned myShapeCount = myShapeListNode->childNodesLength();
-        for (int myShapeIndex = 0; myShapeIndex < myShapeCount; myShapeIndex++) {
-            NodePtr myShapeNode = myShapeListNode->childNode(myShapeIndex);
-            ShapePtr myShape = myShapeNode->getFacade<Shape>();
-            if (myShapeNode->nodeVersion() < myShape->getLastRenderVersion()) {
-                reverseUpdateShape(myShape);
-            }
-        }
-    }
-
-    void
-    Scene::reverseUpdateShape(ShapePtr theShape) {
-        NodePtr myShapeNode = theShape->getXmlNode();
-
-        unsigned long myShapeVertexCount = 0;
-        const std::string & myShapeId = myShapeNode->getAttributeString("id");
-
-        // Iterate over all indices and find the corresponding data
-        NodePtr myPrimitiveListNode = myShapeNode->childNode(PRIMITIVE_LIST_NAME);
-        if (myPrimitiveListNode) {
-            unsigned myPrimitiveCount = myPrimitiveListNode->childNodesLength(ELEMENTS_NODE_NAME);
-            if (myPrimitiveCount != theShape->getPrimitives().size()) {
-                return;
-            }
-            for (unsigned j = 0; j < myPrimitiveCount; ++j) {
-                NodePtr myElementsNode = myPrimitiveListNode->childNode(ELEMENTS_NODE_NAME, j);
-                Primitive & myPrimitive = *(theShape->getPrimitives()[j]);
-
-                unsigned myIndicesCount = myElementsNode->childNodesLength(VERTEX_INDICES_NAME);
-                for (unsigned k = 0; k < myIndicesCount; ++k) {
-                    NodePtr myIndicesNode = myElementsNode->childNode(VERTEX_INDICES_NAME, k);
-                    const string & myName = myIndicesNode->getAttributeString(VERTEX_DATA_ATTRIB);
-                    NodePtr myDataNode = getVertexDataNode(myShapeNode, myName);
-                    const VectorOfUnsignedInt & myIndices = myIndicesNode->
-                        childNode(0)->nodeValueRef<VectorOfUnsignedInt>();
-                    //TODO: find mechanism for selective range update with dirty flags/regions
-                    unsigned myBegin = 0;
-                    unsigned myEnd   =  myIndices.size();
-                    myPrimitive.unload(myIndicesNode, myDataNode, myBegin, myEnd);
-                }
-            }
-        } else {
-            throw SceneException(std::string("Node with name '") +
-                PRIMITIVE_LIST_NAME + "' not found for shape: " +
-                myShapeId, PLUS_FILE_LINE);
-        }
-        calculateShapeBoundingBox(theShape);
-        myShapeNode->bumpVersion();
-        theShape->setLastRenderVersion(myShapeNode->nodeVersion()+1);
-    }
-#endif
     void
     Scene::loadAnimations(NodePtr theWorld) {
         NodePtr myAnimationNodes = getNode().childNode(ANIMATION_LIST_NAME);
@@ -855,15 +463,6 @@ namespace y60 {
     Scene::update(unsigned short theUpdateFlags) {
         //AC_WARNING << "update() disabled by pavel";
         //return;
-#if 0
-        MAKE_SCOPE_TIMER(updateScene);
-        if (theUpdateFlags & MATERIALS) {
-            AC_TRACE << "updateMaterials";
-            MAKE_SCOPE_TIMER(updateMaterials);
-            updateMaterials(); //ok
-        }
-#endif
-
         if (theUpdateFlags & ANIMATIONS_LOAD) {
             AC_TRACE << "updateAnimationsReload";
             MAKE_SCOPE_TIMER(updateAnimationsReload);
@@ -876,19 +475,11 @@ namespace y60 {
             MAKE_SCOPE_TIMER(updateAnimations);
             _myAnimationManager.update();
         }
-#if 0
-        if (theUpdateFlags & SHAPES) {
-            AC_TRACE << "updateShapes";
-            MAKE_SCOPE_TIMER(updateShapes);
-            updateShapes();
-        }
-#endif
         if (theUpdateFlags & WORLD) {
             AC_TRACE << "updateWorld";
             MAKE_SCOPE_TIMER(updateWorld);
             Matrix4f myInitialMatrix;
             myInitialMatrix.makeIdentity();
-            //_myAnalyticGeometry.clear();
 
             NodePtr myWorlds = getWorldsRoot();
             for(unsigned i = 0; i < myWorlds->childNodesLength("world"); i++) {
@@ -899,73 +490,6 @@ namespace y60 {
             }
         }
     }
-#if 0
-    void
-    Scene::updateMaterials() {
-        AC_WARNING << "updateMaterials() disabled by pavel";
-        //AC_DEBUG << asl::StackTrace();
-        return;
-
-        NodePtr myMaterialList = getNode().childNode(MATERIAL_LIST_NAME);
-        unsigned myMaterialCount = myMaterialList->childNodesLength();
-        bool myMaterialRebindFlag = false;
-        AC_DEBUG << "Scene::updateMaterials() - material count: " << myMaterialCount;
-        for (unsigned i = 0; i < myMaterialCount; ++i) {
-            NodePtr myMaterialNode = myMaterialList->childNode(i);
-            MaterialBaseFacadePtr myMaterial = myMaterialNode->getFacade<MaterialBase>();
-            if (myMaterial) {
-                if (myMaterial->reloadRequired()) {
-                    reloadMaterial(myMaterialNode, myMaterial);
-                }
-                 // check for a rebind (i.e. if the id has changed and alle primitives must be rebind)
-                if (myMaterial->rebindRequired()) {
-                    myMaterialRebindFlag = true;
-                }
-
-
-            } else {
-                const std::string myMaterialId = myMaterialNode->getAttributeString("id");
-                AC_TRACE << "could not find material " << myMaterialId << ", loading";
-            }
-        }
-        // check if one material forces a material rebind
-        if (myMaterialRebindFlag) {
-            rebindMaterials();
-        }
-    }
-#else
-#if 0
-    void
-    Scene::updateMaterials() {
-        std::vector<NodePtr> myMaterials = xpath::findAll(getNode(), "//material");
-        unsigned myMaterialCount = myMaterials.size();
-        bool myMaterialRebindFlag = false;
-        AC_DEBUG << "Scene::updateMaterials() - material count: " << myMaterialCount;
-        for (unsigned i = 0; i < myMaterialCount; ++i) {
-            NodePtr myMaterialNode = myMaterials[i];
-            MaterialBaseFacadePtr myMaterial = myMaterialNode->getFacade<MaterialBase>();
-            if (myMaterial) {
-                if (myMaterial->reloadRequired()) {
-                    reloadMaterial(myMaterialNode, myMaterial);
-                }
-                 // check for a rebind (i.e. if the id has changed and alle primitives must be rebind)
-                if (myMaterial->rebindRequired()) {
-                    myMaterialRebindFlag = true;
-                }
-            } else {
-                const std::string myMaterialId = myMaterialNode->getAttributeString("id");
-                AC_TRACE << "could not find material " << myMaterialId << ", loading";
-            }
-        }
-        // check if one material forces a material rebind
-        if (myMaterialRebindFlag) {
-            rebindMaterials();
-        }
-    }
-#endif
-#endif
-
-
 
     //////////////////////////////////////////////////////////////////////////////////////
     // Scene traversal
@@ -1065,57 +589,6 @@ namespace y60 {
         myWorldBox.extendBy(myCameraPos);
         return asl::distance(myWorldBox[0], myWorldBox[1]);
     }
-#if 0
-    void
-    Scene::updateTransformHierachy(NodePtr theNode, const asl::Matrix4f & theParentMatrix) {
-        TransformHierarchyFacadePtr myFacade = theNode->tryGetFacade<TransformHierarchyFacade>();
-        if (!myFacade) {
-            return;
-        }
-        DB(AC_TRACE << "updateTransformHierachy for Node " << myFacade->get<IdTag>();)
-        bool isLightNode   = (theNode->nodeName() == LIGHT_NODE_NAME);
-        bool isIncludeNode = (theNode->nodeName() == INCLUDE_NODE_NAME);
-
-        // break travsersal if:
-        // not visible and not a light (always continue for lights, since
-        // lights can be turned on/off at any time, e.g. per viewport pass)
-        if (myFacade->get<VisibleTag>() == false && !isLightNode) {
-            return;
-        }
-
-        COUNT(WorldNodes);
-
-        if (isLightNode) {
-            LightPtr myLight = theNode->getFacade<Light>();
-            _myLights.push_back(myLight);
-        } else if (isIncludeNode) {
-            // If this is an include node, we reload the included dom, if necessary
-            IncludeFacadePtr myInclude = theNode->getFacade<IncludeFacade>();
-
-            // Check if src has a new revision
-            if (!myInclude->isUpToDate()) {
-                myInclude->setUpToDate();
-                if (theNode->childNodesLength()) {
-                    while (theNode->childNodesLength()) {
-                        theNode->removeChild(theNode->firstChild());
-                    }
-                    collectGarbage();
-                }
-                if (myInclude->get<IncludeSrcTag>() != "") {
-                    import(myInclude->get<IncludeSrcTag>(), AppPackageManager::get().getPtr(), theNode);
-                }
-            }
-        } else if ( isAnalyticGeometry( theNode->nodeName() ) ) {
-            _myAnalyticGeometry.push_back( theNode );
-        }
-
-        for (unsigned i = 0; i < theNode->childNodesLength(); ++i) {
-            if (theNode->childNode(i) == Node::ELEMENT_NODE) {
-                updateTransformHierachy(theNode->childNode(i), theParentMatrix);
-            }
-        }
-    }
-#else
     void
     Scene::updateTransformHierachy(NodePtr theNode) {
 
@@ -1143,7 +616,6 @@ namespace y60 {
          }
          //COUNT(WorldNodes);
     }
-#endif
     ///////////////////////////////////////////////////////////////////////////////////////////
     // Camera handling
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -1422,7 +894,6 @@ namespace y60 {
         Box3f myBoundingBox = myTransform->TransformHierarchyFacade::get<BoundingBoxTag>();
         bool isLeafNode = theNode->childNodesLength() == 0;
         if (isVisibleVisitFlag && theVisitor.hitBoundingBox(myBoundingBox, isInsensible, isLeafNode) ) {
-            //AC_WARNING << "hit BB " << myTransform->TransformHierarchyFacade::get<y60::NameTag>();
             // check bounding box hierarchy first
             if (theNode->nodeName() == BODY_NODE_NAME) {
                 // prepare check for intersection with body geometry
@@ -1597,7 +1068,6 @@ namespace y60 {
             theRoot = getWorldRoot();
         }
 
-        // asl::Ptr<ReadableStream> mySource = thePackageManager->readFile(theFilename);
         asl::Ptr<ReadableStreamHandle> mySource = thePackageManager->readStream(theFilename);
         if (!mySource) {
             AC_ERROR << "Could not open include file '" << theFilename + "'. So I will ignore it.";

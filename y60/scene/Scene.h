@@ -150,8 +150,6 @@ namespace y60 {
                 unsigned long lightCount;
             };
 
-            //typedef std::map<std::string, MaterialBasePtr> MaterialIdMap;
-
             DEFINE_NESTED_EXCEPTION(Scene,Exception,asl::Exception);
             DEFINE_NESTED_EXCEPTION(Scene,IOError,Exception);
             DEFINE_NESTED_EXCEPTION(Scene,OpenFailed,IOError);
@@ -267,12 +265,6 @@ namespace y60 {
 
             void saveSchema(const std::string & theFilename,
                             int theSchemaIndex, bool theBinaryFlag = false);
-
-#if 0
-            std::vector<dom::NodePtr> & getAnalyticGeometry() {
-                return _myAnalyticGeometry;
-            }
-#endif
 
             const Statistics getStatistics() const;
 
@@ -416,11 +408,7 @@ namespace y60 {
                              const unsigned int theY,
                              y60::IntersectionInfoVector & theInformation) const;
 
-            //void reverseUpdateShape(ShapePtr theShape);
-            //void reverseUpdateShapes();
-
             void setup();
-            //void clearShapes();
 
             /**
              * Register a ResourceManager with the scenes Texturemanager. The ResourceManager
@@ -447,43 +435,24 @@ namespace y60 {
             void createUniqueIds(dom::NodePtr theDocument, dom::NodePtr theNode,
                 std::map<std::string, std::string> & theOldToNewIdMap, const std::string & theFilename);
 
-            //void buildShape(ShapePtr theShape);
-            //void updateShapes();
-            //void loadMaterial(dom::NodePtr theMaterialNode);
-            //void reloadMaterial(dom::NodePtr theMaterialNode, MaterialBasePtr theMaterial);
-            //void rebindMaterials();
             void loadAnimations(dom::NodePtr theWorld);
-            //void updateMaterials();
 
             void collectReferences(dom::NodePtr theNode, std::set<std::string> & theReferences);
             void removeDangelingNodes(dom::NodePtr theNode, dom::NodePtr theDocument);
             bool isDangelingNode(dom::NodePtr theNode, dom::NodePtr theDocument);
             void removeUnreferencedNodes(dom::NodePtr theNode, const std::set<std::string> & theReferences);
 
-            void calculateShapeBoundingBox(ShapePtr myShape);
-
             void updateTransformHierachy(dom::NodePtr theNode);
-/*
-            Primitive & createPrimitive(int theMaterialNumber,
-                                        const std::string & theShapeId, unsigned int theDomIndex);
-*/
             void collectCameras(dom::NodeList & theCameras, dom::NodePtr theNode) const;
 
             template <class VISITOR>
             static bool visitBodys(VISITOR & theVisitor, dom::NodePtr theNode, bool theIntersectInvisibleBodysFlag);
-
-            static
-            dom::NodePtr getVertexDataNode(dom::NodePtr theShapeNode, const std::string & theDataName);
-
-            unsigned findMaxIndexSize(dom::NodePtr theElementsNode);
 
             void setupShaderLibrary();
 
             SceneBuilderPtr          _mySceneBuilder;
             TextureManagerPtr        _myTextureManager;
             AnimationManager         _myAnimationManager;
-
-            //std::vector<dom::NodePtr> _myAnalyticGeometry;
 
             dom::DocumentPtr         _mySceneDom;
             Statistics               _myStatistics;
