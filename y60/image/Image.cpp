@@ -310,9 +310,6 @@ namespace y60 {
 
         set<ImageMatrixTag>(theImageLoader->getImageMatrix());
 
-        set<ImageWidthTag>(getRasterPtr()->width());
-        set<ImageHeightTag>(getRasterPtr()->height());
-
         set<LoadStateTag>(true);
     }
 
