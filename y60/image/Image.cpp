@@ -138,11 +138,8 @@ namespace y60 {
 
     void
     Image::unregisterRasterValue() {
-        dom::ValuePtr myRasterValue = getRasterValue();
-        if (myRasterValue) {
-            ImageWidthTag::Plug::noLongerDependsOn(getRasterValue());
-            ImageHeightTag::Plug::noLongerDependsOn(getRasterValue());
-        }
+        ImageWidthTag::Plug::getValuePtr()->markPrecursorDependenciesOutdated();
+        ImageHeightTag::Plug::getValuePtr()->markPrecursorDependenciesOutdated();
     }
 
     dom::ResizeableRasterPtr
@@ -151,6 +148,7 @@ namespace y60 {
                         unsigned theDepth,
                         PixelEncoding theEncoding)
     {
+        unregisterRasterValue();
         return setRasterValue(createRasterValue(theEncoding, theWidth, theHeight), theEncoding, theDepth);
     }
 
@@ -241,7 +239,6 @@ namespace y60 {
         ImageSourceTag::Plug::getValuePtr()->setDirty(); // force call to load()
     }
 
-
     void
     Image::load() {
         // facade contruction will always lead to a raster ctor,
@@ -307,8 +304,10 @@ namespace y60 {
         // Drop alpha channel if unused
         theImageLoader->removeUnusedAlpha();
 
-        dom::ValuePtr myRaster = createRasterValue(theImageLoader->getEncoding(), theImageLoader->GetWidth(), theImageLoader->GetHeight(), *theImageLoader->getData());
-        setRasterValue(myRaster, theImageLoader->getEncoding(), myDepth);
+        createRaster(theImageLoader->GetWidth(), theImageLoader->GetHeight(),
+                     myDepth, theImageLoader->getEncoding(),
+                     *theImageLoader->getData());
+
         set<ImageMatrixTag>(theImageLoader->getImageMatrix());
 
         set<ImageWidthTag>(getRasterPtr()->width());
