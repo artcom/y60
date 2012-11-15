@@ -1389,20 +1389,19 @@ namespace y60 {
                 }
 
                 // (3) render skybox
-                    renderSkyBox(*theViewport, myCamera);
-                    CHECK_OGL_ERROR;
+                renderSkyBox(*theViewport, myCamera);
+                CHECK_OGL_ERROR;
 
                 // (4) Setup camera
                 bindViewMatrix(myCamera);
 
                 // (5) activate all visible lights
-                    enableVisibleLights(myWorldFacade);
-                    CHECK_OGL_ERROR;
+                enableVisibleLights(myWorldFacade);
+                CHECK_OGL_ERROR;
 
                 // (6) enable fog
-
-                    enableFog(myWorldFacade);
-                    CHECK_OGL_ERROR;
+                enableFog(myWorldFacade);
+                CHECK_OGL_ERROR;
 
                 // (7) render bodies
                 if (! myBodyParts.empty()) {
