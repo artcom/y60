@@ -1374,7 +1374,7 @@ namespace y60 {
 
             // don't render anything if world isn't visible
             if (myWorld->getFacade<TransformHierarchyFacade>()->get<VisibleTag>()) {
-
+                COUNT(ActiveWorlds);
                 // (2) Create lists of render objects
                 BodyPartMap myBodyParts;
                 {
