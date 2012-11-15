@@ -93,7 +93,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
     var _myFrameRateLimiter = new FrameRateLimiter(FRAME_RATE);
 
     var _myCurrentMediaType = -1;
-    var _mySoundId	        = -1;
+    var _mySoundId          = -1;
     var _myMasterVolume     = 1.0;
     var _myVideoCapturePlugged= false;
     var _myMissedFrameCounter = 0;
@@ -286,7 +286,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
             window.scene.loadCaptureFrame(_myCaptureNode);
         }
         if (_mySoundId != -1 && !isPlaying(_mySoundId)) {
-			nextFile();
+            nextFile();
         }
     }
 
@@ -464,7 +464,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
     function stepFrame(theForwardFlag) {
         if (_myMovieNode && _myMovieOverlay.visible) {
             var myStepSize = Math.abs(_myMovieNode.playspeed);
-			_myMovieNode.playmode = "pause";
+            _myMovieNode.playmode = "pause";
             if (theForwardFlag) {
                 _myMovieNode.currentframe += myStepSize;
             } else {

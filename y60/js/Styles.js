@@ -66,7 +66,7 @@ function addDefaultStyleValues(theStyle) {
     // we try to find sensible values or set defaults.
 
     if (theStyle instanceof Node) {
-	Logger.error("no nodes as style primitives!");
+    Logger.error("no nodes as style primitives!");
     }
 
     if (!theStyle["topPad"])           theStyle.topPad     = 0;
@@ -87,9 +87,9 @@ function addDefaultStyleValues(theStyle) {
 
     if (!theStyle["textColor"])        {
         if (theStyle["textcolor"]) {
-	    theStyle.textColor = theStyle["textcolor"];
+        theStyle.textColor = theStyle["textcolor"];
         } else if (theStyle["color"]) {
-	    theStyle.textColor = theStyle["color"];
+        theStyle.textColor = theStyle["color"];
         } else {
             theStyle.textColor  = "FFFFFF";
         }
@@ -101,12 +101,12 @@ function addDefaultStyleValues(theStyle) {
         } else if (theStyle["face"]) {
              theStyle.fontfile   = theStyle["face"];
         } else {
-	    Logger.warning("style " + theStyle + " has no font file and no face!");
+        Logger.warning("style " + theStyle + " has no font file and no face!");
         }
 
-	if (!fileExists(theStyle.fontfile) && fileExists("FONTS/"+theStyle.fontfile)) {
+    if (!fileExists(theStyle.fontfile) && fileExists("FONTS/"+theStyle.fontfile)) {
              theStyle.fontfile = "FONTS/" + theStyle.fontfile;
-	}
+    }
     }
 
     if (!theStyle["fontsize"]) {
@@ -131,35 +131,35 @@ var ourFontStyleCache = {};
 
 function getCachedStyle(theKey) {
         if (theKey == "default") {
-	    Logger.trace("using default style");
+        Logger.trace("using default style");
             return DEFAULT_STYLE;
         }
         if (theKey in ourFontStyleCache) {
             var theCachedStyle = ourFontStyleCache[theKey];
-	    Logger.trace("got cached style for " + theKey + ":");
+        Logger.trace("got cached style for " + theKey + ":");
         }
         return undefined;
 }
 
 function getOrCreateCachedStyle(theKey, theTemplate) {
-	Logger.trace("getOrCreate cached style for " + theKey);
+    Logger.trace("getOrCreate cached style for " + theKey);
         var result = getCachedStyle(theKey);
-	if (!result) {
+    if (!result) {
 
-		var theItem = addDefaultStyleValues(clone(theTemplate));
+        var theItem = addDefaultStyleValues(clone(theTemplate));
 
-		Logger.trace("created new style for " + theKey + ":");
-		for (i in theItem) {
-		    print(i+ ": "+ theItem[i]);
-		}
-		ourFontStyleCache[theKey] = theItem;
-		if (theItem.fontface) {
+        Logger.trace("created new style for " + theKey + ":");
+        for (i in theItem) {
+            print(i+ ": "+ theItem[i]);
+        }
+        ourFontStyleCache[theKey] = theItem;
+        if (theItem.fontface) {
                    Logger.warning("LOADING FONT "+theItem.name + " " + theItem.fontfile + " " + theItem.fontsize + " " + theItem.fontface);
-		   window.loadTTF(theItem.name, theItem.fontfile, theItem.fontsize, theItem.fontface);
-		} else {
+           window.loadTTF(theItem.name, theItem.fontfile, theItem.fontsize, theItem.fontface);
+        } else {
                    Logger.warning("LOADING FONT "+theItem.name + " " + theItem.fontfile + " " + theItem.fontsize + " ");
                    window.loadTTF(theItem.name, theItem.fontfile, theItem.fontsize);
-		}
-	}
-	return getCachedStyle(theKey);
+        }
+    }
+    return getCachedStyle(theKey);
 }

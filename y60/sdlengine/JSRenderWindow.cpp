@@ -436,11 +436,11 @@ JSRenderWindow::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *
             return Method<SDLWindow>::call(&SDLWindow::setWindowTitle, cx, obj, 1, vp, &dummy);
         case PROP_position:
             return Method<SDLWindow>::call(&SDLWindow::setPosition, cx, obj, 1, vp, &dummy);
-		case PROP_swapInterval: {
-				JSBool myResult = Method<SDLWindow>::call(&SDLWindow::setSwapInterval, cx, obj, 1, vp, &dummy);
-				AC_TRACE << "You set swapinterval, you may want to adjust window.fixedFrameTime to 1/(MonitorFrequency/" << myObj.getNative().getSwapInterval() << ") for good video performance?";
-				return myResult;
-			}
+        case PROP_swapInterval: {
+                JSBool myResult = Method<SDLWindow>::call(&SDLWindow::setSwapInterval, cx, obj, 1, vp, &dummy);
+                AC_TRACE << "You set swapinterval, you may want to adjust window.fixedFrameTime to 1/(MonitorFrequency/" << myObj.getNative().getSwapInterval() << ") for good video performance?";
+                return myResult;
+            }
         default:
             return JSBASE::setPropertySwitch(myObj.getNative(),theID, cx, obj, id, vp);
     }

@@ -145,7 +145,7 @@ namespace y60 {
             {}
 
             const y60::World & getWorld() const {
-            	return _myWorld;
+                return _myWorld;
             }
 
             const y60::Body & getBody() const {

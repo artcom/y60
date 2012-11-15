@@ -90,7 +90,7 @@ getItem(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_PARAM("theIndex", "Index of the element to retrieve.", DOC_TYPE_INTEGER);
     DOC_RVAL("theElement", DOC_TYPE_OBJECT);
     DOC_END;
-	typedef dom::ValuePtr (NATIVE_VECTOR::*MyMethod)(asl::AC_SIZE_TYPE) const;
+    typedef dom::ValuePtr (NATIVE_VECTOR::*MyMethod)(asl::AC_SIZE_TYPE) const;
     return Method<NATIVE_VECTOR>::call((MyMethod)&NATIVE_VECTOR::getItem,cx,obj,argc,argv,rval);
 }
 

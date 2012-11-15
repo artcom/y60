@@ -103,8 +103,6 @@ namespace y60 {
             
             // Delegates to virtual methods of ResourceManager
             virtual int getMaxTextureSize(int theDimensions) const;
-            //void updateTextureData(const TexturePtr & theTexture);
-            //void setTexturePriority(const TexturePtr & theTexture, float thePriority);
 
             void unbindTexture(Texture * theTexture);
             void unbindTextures();

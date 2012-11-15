@@ -127,7 +127,7 @@ namespace dom {
         dom::binarize(myValue._myFeature,theDest);
     };
 
-	asl::AC_SIZE_TYPE debinarize(y60::RankedFeature & myValue, const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos) {
+    asl::AC_SIZE_TYPE debinarize(y60::RankedFeature & myValue, const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos) {
         thePos = theSource.readFloat32(myValue._myRanking,thePos);
         return dom::debinarize(myValue._myFeature,theSource,thePos);
     };

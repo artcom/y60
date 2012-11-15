@@ -78,12 +78,12 @@ namespace y60 {
 
     void
     SkinAndBonesShader::setup(MaterialBase & theMaterial) {
-		dom::NodePtr myProperties = theMaterial.getNode().childNode(PROPERTY_LIST_NAME);
+        dom::NodePtr myProperties = theMaterial.getNode().childNode(PROPERTY_LIST_NAME);
         unsigned myChildCount = myProperties->childNodesLength();
         for (unsigned i = 0; i < myChildCount; ++i) {
             if (myProperties->childNode(i)->getAttributeString("name") == "BoneMatrix") {
-	            _myBoneMatrixPropertyNode = myProperties->childNode(i)->childNode(0);
-				break;
+                _myBoneMatrixPropertyNode = myProperties->childNode(i)->childNode(0);
+                break;
             }
         }
         if (!_myBoneMatrixPropertyNode) {

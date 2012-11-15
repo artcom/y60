@@ -117,7 +117,7 @@ ButtonBase.prototype.Constructor = function(Public, Protected, theScene, theId,
     }
 
     Public.setPressed = function(theFlag) {
-	Logger.trace(Public.id + ": setPressed("+theFlag+")");
+    Logger.trace(Public.id + ": setPressed("+theFlag+")");
         if (theFlag) {
             Public.color = Public.style.selectedColor;
         } else {
@@ -129,15 +129,15 @@ ButtonBase.prototype.Constructor = function(Public, Protected, theScene, theId,
     Public.onMouseButton = function(theState, theX, theY, theRadius) {
         if (Public.enabled && Protected.isVisible(Public.node)) {
             if (theState == MOUSE_UP && Protected.isPressed) {
-    	        Logger.trace("Unpressing button " + Public.id);
+                Logger.trace("Unpressing button " + Public.id);
                 Public.setPressed(false);
-        		if (Public.touches(theX, theY, theRadius)) {
+                if (Public.touches(theX, theY, theRadius)) {
                     Public.onClick(Public);
-        			return true;
-        		}
+                    return true;
+                }
             } else if (theState == MOUSE_DOWN && !Protected.isPressed && Public.touches(theX, theY, theRadius)) {
-    	        Logger.trace(Public.id + ": registered mouse press at coords("+theX+","+theY+").");
-                    Public.setPressed(true);
+                Logger.trace(Public.id + ": registered mouse press at coords("+theX+","+theY+").");
+                Public.setPressed(true);
             } else {
             }
         }
@@ -203,7 +203,7 @@ ButtonBase.prototype.Constructor = function(Public, Protected, theScene, theId,
         if (!theNode || theNode.nodeName != "overlay") {
             return true;
         } else {
-	    // check visibility of parent chain recursively
+            // check visibility of parent chain recursively
             return (theNode.visible ? Protected.isVisible(theNode.parentNode) : false);
         }
     }
@@ -265,7 +265,7 @@ function DualImageButton(theScene, theId, theSources,
 }
 
 DualImageButton.prototype.Constructor = function(Public, Protected, theScene, theId, theSources,
-			                         thePosition, theStyle, theParent) {
+                                     thePosition, theStyle, theParent) {
     var Base      = [];
     ButtonBase.prototype.Constructor(Public, Protected, theScene, theId,
                [1,1], thePosition, theStyle, theParent);
@@ -312,7 +312,7 @@ function ColorButton(theScene, theId, theSize, thePosition, theStyle, theParent)
 };
 
 ColorButton.prototype.Constructor = function(Public, Protected, theScene, theId,
-						theSize, thePosition, theStyle, theParent) {
+                        theSize, thePosition, theStyle, theParent) {
 
     ButtonBase.prototype.Constructor(Public, Protected, theScene, theId, theSize,
                thePosition, theStyle, theParent);

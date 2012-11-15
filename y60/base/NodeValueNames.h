@@ -640,7 +640,7 @@ namespace y60 {
     const char * const PRIMITIVE_TYPE_POLYGON         = "polygon";
 
     const char * const PrimitiveTypeStrings[] = {
-		PRIMITIVE_TYPE_POINTS,
+        PRIMITIVE_TYPE_POINTS,
         PRIMITIVE_TYPE_LINES,
         PRIMITIVE_TYPE_LINE_LOOP,
         PRIMITIVE_TYPE_LINE_STRIP,

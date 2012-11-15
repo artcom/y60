@@ -98,14 +98,14 @@ namespace y60 {
     };
 
     class Y60_GLTEXT_DECL BitmapTextRenderer : public TextRenderer{
-    	public:
-    		BitmapTextRenderer();
-    		~BitmapTextRenderer();
+        public:
+            BitmapTextRenderer();
+            ~BitmapTextRenderer();
 
             virtual void renderText(TextPtr & theText);
             virtual bool haveFont(const std::string theFontName);
 
-    	private:
+        private:
     };
     typedef asl::Ptr<BitmapTextRenderer> BitmapTextRendererPtr;
 

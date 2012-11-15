@@ -389,7 +389,7 @@ namespace y60 {
         IShaderPtr myShader = myMaterial.getShader();
         if (myShader) {
             if (myMaterial.hasTexGen()) {
-            	DBP2(START_TIMER(renderBodyPart_materialChanged_enableTextureProjection));
+                DBP2(START_TIMER(renderBodyPart_materialChanged_enableTextureProjection));
                 myShader->enableTextureProjection( myMaterial, theViewport, theCamera );
                 DBP2(STOP_TIMER(renderBodyPart_materialChanged_enableTextureProjection));
             }
@@ -522,7 +522,7 @@ namespace y60 {
                         myData.useAsColor();
                         break;
                     default:
-                    	DBP2(START_TIMER(renderBodyPart_renderPrimitives_loopdefault));
+                        DBP2(START_TIMER(renderBodyPart_renderPrimitives_loopdefault));
                         GLenum myGlRegister = asGLTextureRegister(myRegister);
                         glActiveTexture(myGlRegister);
                         glClientActiveTexture(myGlRegister);
@@ -531,11 +531,11 @@ namespace y60 {
                         break;
                 }
                 CHECK_OGL_ERROR;
-			} else {
-				throw RendererException(string("Body Part of shape: ") + theBodyPart.getShape().get<IdTag>() +
-					" does not contain required vertexdata of role: " +
-					getStringFromEnum(myParameter.getRole(), GLRegisterString), PLUS_FILE_LINE);
-			}
+            } else {
+                throw RendererException(string("Body Part of shape: ") + theBodyPart.getShape().get<IdTag>() +
+                    " does not contain required vertexdata of role: " +
+                    getStringFromEnum(myParameter.getRole(), GLRegisterString), PLUS_FILE_LINE);
+            }
         }
         DBP2(STOP_TIMER(renderBodyPart_renderPrimitives_loop));
         /*
@@ -1005,8 +1005,8 @@ namespace y60 {
 //#define DB(x) x
     void
     Renderer::createRenderList(const WorldPtr & theWorld,
-    		                   const dom::NodePtr & theNode,
-    		                   BodyPartMap & theBodyParts,
+                               const dom::NodePtr & theNode,
+                               BodyPartMap & theBodyParts,
                                const CameraPtr theCamera,
                                const Matrix4f & theEyeSpaceTransform,
                                ViewportPtr theViewport,
@@ -1374,7 +1374,7 @@ namespace y60 {
 
             // don't render anything if world isn't visible
             if (myWorld->getFacade<TransformHierarchyFacade>()->get<VisibleTag>()) {
-
+                COUNT(ActiveWorlds);
                 // (2) Create lists of render objects
                 BodyPartMap myBodyParts;
                 {
@@ -1389,25 +1389,24 @@ namespace y60 {
                 }
 
                 // (3) render skybox
-                    renderSkyBox(*theViewport, myCamera);
-                    CHECK_OGL_ERROR;
+                renderSkyBox(*theViewport, myCamera);
+                CHECK_OGL_ERROR;
 
                 // (4) Setup camera
                 bindViewMatrix(myCamera);
 
                 // (5) activate all visible lights
-                    enableVisibleLights(myWorldFacade);
-                    CHECK_OGL_ERROR;
+                enableVisibleLights(myWorldFacade);
+                CHECK_OGL_ERROR;
 
                 // (6) enable fog
-
-                    enableFog(myWorldFacade);
-                    CHECK_OGL_ERROR;
+                enableFog(myWorldFacade);
+                CHECK_OGL_ERROR;
 
                 // (7) render bodies
                 if (! myBodyParts.empty()) {
 
-                	DBP2(START_TIMER(render_renderBodyParts));
+                    DBP2(START_TIMER(render_renderBodyParts));
                     MAKE_GL_SCOPE_TIMER(renderBodyParts);
                     _myPreviousBody = 0;
 
@@ -1423,7 +1422,7 @@ namespace y60 {
                         if (theViewport->get<ViewportAlphaTestTag>()
                             && !currentMaterialHasAlpha && it->first.getTransparencyFlag())
                         {
-                        	DBP2(START_TIMER(render_renderBodyParts_enableAlpha));
+                            DBP2(START_TIMER(render_renderBodyParts_enableAlpha));
                             glEnable(GL_ALPHA_TEST);
                             currentMaterialHasAlpha = true;
                             DBP2(STOP_TIMER(render_renderBodyParts_enableAlpha));
@@ -1579,7 +1578,7 @@ namespace y60 {
     void
     Renderer::enableLight(const y60::LightPtr & theLight, int theActiveLightIndex) {
         LightSourcePtr myLightSource = theLight->getLightSource();
-		LightPropertiesFacadePtr myLightPropFacade = myLightSource->getChild<LightPropertiesTag>();
+        LightPropertiesFacadePtr myLightPropFacade = myLightSource->getChild<LightPropertiesTag>();
 
         LightSourceType myType = myLightSource->getType();
         switch (myType) {
@@ -1587,8 +1586,8 @@ namespace y60 {
             case POSITIONAL:
             case SPOT:
                 break;
-	        case AMBIENT:
-		        glLightModelfv(GL_LIGHT_MODEL_AMBIENT, myLightPropFacade->get<LightAmbientTag>().begin());
+            case AMBIENT:
+                glLightModelfv(GL_LIGHT_MODEL_AMBIENT, myLightPropFacade->get<LightAmbientTag>().begin());
                 return;
             case UNSUPPORTED:
                 return;

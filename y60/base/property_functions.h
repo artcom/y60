@@ -87,7 +87,7 @@ namespace y60 {
     template <class T>
     void
     setPropertyValue(dom::NodePtr theParentNode, const char * theType, const char * thePropertyName, const T & theValue,
-	                 const char * theListName = PROPERTY_LIST_NAME) {
+                     const char * theListName = PROPERTY_LIST_NAME) {
         dom::NodePtr myPropertyListNode = theParentNode->childNode(theListName);
 
         if (myPropertyListNode) {
@@ -111,14 +111,14 @@ namespace y60 {
     template <class T>
     T
     getPropertyValue(dom::NodePtr theParentNode, const char * theType, const char * thePropertyName,
-	                 const char * theListName = PROPERTY_LIST_NAME) {
+                     const char * theListName = PROPERTY_LIST_NAME) {
         return getPropertyValue<T>(*theParentNode, theType, thePropertyName, theListName);
     }
 
     template <class T>
     T
     getPropertyValue(const dom::Node & theParentNode, const char * theType, const char * thePropertyName,
-	                 const char * theListName = PROPERTY_LIST_NAME) {
+                     const char * theListName = PROPERTY_LIST_NAME) {
         dom::NodePtr myPropertyListNode = theParentNode.childNode(theListName);
         if (!myPropertyListNode) {
             throw SOM_PROPERTYLIST_MISSING(std::string("Propertylist in node ")+theParentNode.nodeName()+" not found",PLUS_FILE_LINE);
@@ -133,7 +133,7 @@ namespace y60 {
     template <class T>
     bool
     hasPropertyValue(dom::NodePtr theParentNode, const char * theType, const char * thePropertyName,
-	                 const char * theListName = PROPERTY_LIST_NAME) {
+                     const char * theListName = PROPERTY_LIST_NAME) {
         dom::NodePtr myPropertyListNode = theParentNode->childNode(theListName);
         if (!myPropertyListNode) {
             return false;
@@ -147,7 +147,7 @@ namespace y60 {
     template <class T>
     T
     getPropertyValue(dom::NodePtr theParentNode, const char * theType, const char * thePropertyName, const T & theDefault,
-	                 const char * theListName = PROPERTY_LIST_NAME) {
+                     const char * theListName = PROPERTY_LIST_NAME) {
         if (hasPropertyValue<T>(theParentNode, theType, thePropertyName,theListName) ) {
             try {
                 return getPropertyValue<T>(theParentNode, theType, thePropertyName, theListName);

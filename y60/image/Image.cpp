@@ -128,17 +128,18 @@ namespace y60 {
         dom::FacadeAttributePlug<ImageWidthTag>(this),
         dom::FacadeAttributePlug<ImageHeightTag>(this),
         dom::FacadeAttributePlug<LastActiveFrameTag>(this)
-    {}
+    {
+        AC_TRACE << "Image::Image " << (void*) this;
+    }
 
-    Image::~Image() {}
+    Image::~Image() {
+        AC_TRACE << "Image::~Image " << (void*) this;
+    }
 
     void
     Image::unregisterRasterValue() {
-        dom::ValuePtr myRasterValue = getRasterValue();
-        if (myRasterValue) {
-            ImageWidthTag::Plug::noLongerDependsOn(getRasterValue());
-            ImageHeightTag::Plug::noLongerDependsOn(getRasterValue());
-        }
+        ImageWidthTag::Plug::getValuePtr()->markPrecursorDependenciesOutdated();
+        ImageHeightTag::Plug::getValuePtr()->markPrecursorDependenciesOutdated();
     }
 
     dom::ResizeableRasterPtr
@@ -147,6 +148,7 @@ namespace y60 {
                         unsigned theDepth,
                         PixelEncoding theEncoding)
     {
+        unregisterRasterValue();
         return setRasterValue(createRasterValue(theEncoding, theWidth, theHeight), theEncoding, theDepth);
     }
 
@@ -166,21 +168,14 @@ namespace y60 {
     Image::registerDependenciesRegistrators() {
         Facade::registerDependenciesRegistrators();
         AC_DEBUG << "Image::registerDependenciesRegistrators '" << get<NameTag>();
-
         ImageSourceTag::Plug::getValuePtr()->setImmediateCallBack(dynamic_cast_Ptr<Image>(getSelf()), &Image::load);
-
         dom::ValuePtr myRasterValue = getRasterValue();
         if (myRasterValue) {
-            // AC_DEBUG << getNode();
             const string & myRasterElementName = getNode().firstChild()->nodeName();
-            // AC_DEBUG << "myRasterElementName="<<myRasterElementName;
             PixelEncoding myEncoding = PixelEncoding(getEnumFromString(myRasterElementName, RasterElementNames));
-            // AC_DEBUG << "myEncoding="<<int(myEncoding);
             const char * myRasterPixelFormat = getStringFromEnum(myEncoding, PixelEncodingString);
-            // AC_DEBUG << "myRasterPixelFormat="<<int(myRasterPixelFormat);
             set<RasterPixelFormatTag>(myRasterPixelFormat);
             set<ImageBytesPerPixelTag>(float(getBytesRequired(4, myEncoding))/4.0f);
-
             registerDependenciesForRasterValueUpdate();
         } else {
             // Load the raster value, and register dependency update functions
@@ -193,20 +188,20 @@ namespace y60 {
 
     void
     Image::registerDependenciesForRasterValueUpdate() {
+        AC_TRACE << "Image::registerDependenciesForRasterValueUpdate";
         if (getNode()) {
             dom::ValuePtr myRasterValue = getRasterValue();
-            //myRasterValue->registerPrecursor(ImageSourceTag::Plug::getValuePtr());
             myRasterValue->registerPrecursor(ImageResizeTag::Plug::getValuePtr());
             myRasterValue->registerPrecursor(ImageFilterTag::Plug::getValuePtr());
             myRasterValue->registerPrecursor(ImageFilterParamsTag::Plug::getValuePtr());
             myRasterValue->setCalculatorFunction(dynamic_cast_Ptr<Image>(getSelf()), &Image::load);
             myRasterValue->setClean();
-
         }
     }
 
     void
     Image::registerDependenciesForImageWidthUpdate() {
+        AC_TRACE << "Image::registerDependenciesForImageWidthUpdate";
         if (getNode()) {
             ImageWidthTag::Plug::dependsOn(getRasterValue());
             ImageWidthTag::Plug::getValuePtr()->setCalculatorFunction(
@@ -216,12 +211,11 @@ namespace y60 {
 
     void
     Image::registerDependenciesForImageHeightUpdate() {
+        AC_TRACE << "Image::registerDependenciesForImageHeightUpdate";
         if (getNode()) {
             ImageHeightTag::Plug::dependsOn(getRasterValue());
             ImageHeightTag::Plug::getValuePtr()->setCalculatorFunction(
                 dynamic_cast_Ptr<Image>(getSelf()), &Image::calculateHeight);
-
-
         }
     }
 
@@ -245,7 +239,6 @@ namespace y60 {
         ImageSourceTag::Plug::getValuePtr()->setDirty(); // force call to load()
     }
 
-
     void
     Image::load() {
         // facade contruction will always lead to a raster ctor,
@@ -256,7 +249,8 @@ namespace y60 {
         set<LoadStateTag>(false);
         std::string mySrcAttrib = get<ImageSourceTag>();
         if (get<ImageSourceTag>() == "") {
-            AC_DEBUG << "Image '" << get<NameTag>() << "' has not been loaded because of empty source attribute";
+            AC_DEBUG << "Image '" << get<NameTag>()
+                     << "' has not been loaded because of empty source attribute";
             dom::ValuePtr myRasterValue = getRasterValue();
             if (!myRasterValue) {
                 // Create default raster
@@ -268,14 +262,17 @@ namespace y60 {
             createRaster(1,1,1,GRAY);
         }
         if (get<TargetPixelFormatTag>() != "") {
-            throw ImageException(string("Image ") + get<ImageSourceTag>() + " target pixel format conversion not yet supported: " + get<TargetPixelFormatTag>(), PLUS_FILE_LINE);
+            throw ImageException(string("Image ") + get<ImageSourceTag>() +
+                                 " target pixel format conversion not yet supported: " +
+                                 get<TargetPixelFormatTag>(), PLUS_FILE_LINE);
         }
 
-        AC_DEBUG << "Image::load loading '" << get<ImageSourceTag>() << "'";
-        AC_INFO << get<ImageSourceTag>() << " is loaded async -> " << get<ImageAsyncFlagTag>();
+        AC_DEBUG << "Image::load loading '" << get<ImageSourceTag>()
+                 << "' is loaded async -> " << get<ImageAsyncFlagTag>();
         unsigned myDepth = get<ImageDepthTag>();
         if (get<ImageAsyncFlagTag>()) {
-            AC_DEBUG << "ImageLoaderThreadPool pending tasks: " << ImageLoaderThreadPool::get().getThreadPool().pending();
+            AC_DEBUG << "ImageLoaderThreadPool pending tasks: "
+                     << ImageLoaderThreadPool::get().getThreadPool().pending();
             ImageLoaderThreadPool::get().getThreadPool().wait(ImageLoaderThreadPool::get().getThreadPool().size()*100);
             ImageLoaderThreadPool::get().getThreadPool().schedule(boost::bind(&Image::aSyncLoad, this,myDepth, get<ImageSourceTag>()));
         } else {
@@ -287,9 +284,6 @@ namespace y60 {
     }
 
     void Image::aSyncLoad(unsigned theDepth, const std::string theSource) {        
-        /*while(ImageLoaderQueue::get().getQueue().size() >= 2) {
-            msleep(10);
-        }*/
         ImageLoaderQueue::get().getQueue().push(std::make_pair(this, 
                                                                boost::shared_ptr<ImageLoader>(new ImageLoader(theSource, AppPackageManager::get().getPtr(),
                                                                                               ITextureManagerPtr(), theDepth))));
@@ -298,7 +292,7 @@ namespace y60 {
     void Image::processNewRaster(boost::shared_ptr<ImageLoader> theImageLoader) {
         string myFilter = get<ImageFilterTag>();
         if (!myFilter.empty()) {
-            AC_INFO << "Image::load filter=" << myFilter;
+            AC_DEBUG << "Image::processNewRaster filter=" << myFilter;
             VectorOfFloat myFilterParams = get<ImageFilterParamsTag>();
             theImageLoader->applyCustomFilter(myFilter, myFilterParams);
         }
@@ -310,19 +304,18 @@ namespace y60 {
         // Drop alpha channel if unused
         theImageLoader->removeUnusedAlpha();
 
-        dom::ValuePtr myRaster = createRasterValue(theImageLoader->getEncoding(), theImageLoader->GetWidth(), theImageLoader->GetHeight(), *theImageLoader->getData());
-        setRasterValue(myRaster, theImageLoader->getEncoding(), myDepth);
-        set<ImageMatrixTag>(theImageLoader->getImageMatrix());
+        createRaster(theImageLoader->GetWidth(), theImageLoader->GetHeight(),
+                     myDepth, theImageLoader->getEncoding(),
+                     *theImageLoader->getData());
 
-        set<ImageWidthTag>(getRasterPtr()->width());
-        set<ImageHeightTag>(getRasterPtr()->height());
+        set<ImageMatrixTag>(theImageLoader->getImageMatrix());
 
         set<LoadStateTag>(true);
     }
 
     dom::ResizeableRasterPtr
     Image::setRasterValue(dom::ValuePtr theRaster, PixelEncoding theEncoding, unsigned theDepth) {
-        AC_DEBUG << "setRasterValue '" << get<NameTag>() << "' id=" << get<IdTag>();
+        AC_DEBUG << "setRasterValue of image '" << get<NameTag>() << "' id=" << get<IdTag>();
 
         // Remove existing raster
         if (getNode().childNodes().size()) {
@@ -350,8 +343,6 @@ namespace y60 {
     Image::getRasterEncoding() const {
         return PixelEncoding(getEnumFromString(get<RasterPixelFormatTag>(), PixelEncodingString));
     }
-
-
 
     void
     Image::blitImage(const asl::Ptr<Image, dom::ThreadingModel> & theSourceImage, const asl::Vector2i & theTargetPos,
@@ -389,7 +380,6 @@ namespace y60 {
             // image must be resized to fit new size
             throw ImageException(std::string("Image::blitImage(): Sourceimage does not fit into targetimage."), PLUS_FILE_LINE);
         }
-
     }
 
     void

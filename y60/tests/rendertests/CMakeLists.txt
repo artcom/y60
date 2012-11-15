@@ -18,7 +18,7 @@ testNightvision
 testSpotlight
 testSprites
 testVertexShaderOnly
-#testMRT #flaky test disabled for now, probably some racecondition leads to segfault
+testMRT
 )
 
 set(NOCG_TESTS

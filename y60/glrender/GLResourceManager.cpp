@@ -769,7 +769,7 @@ namespace y60 {
                  << " image=" << myWidth << "x" << myHeight << " #tiles=" << myNumTiles
                  << " tile=" << myTileWidth << "x" << myTileHeight;
 
-		PixelEncodingInfo myPixelEncoding = getPixelEncoding(theTexture, myImage);
+        PixelEncodingInfo myPixelEncoding = getPixelEncoding(theTexture, myImage);
         unsigned int myTopLevelTextureSize = myImage->getMemUsed();
         _myTextureMemUsage +=  myTopLevelTextureSize;
 

@@ -90,8 +90,8 @@ namespace y60 {
         TextAligment  _myVerticalAlignment;
 
         unsigned      _myLineHeight;
-    	unsigned      _myParagraphTopOffset;
-    	unsigned      _myParagraphBottomOffset;
+        unsigned      _myParagraphTopOffset;
+        unsigned      _myParagraphBottomOffset;
         float         _myTracking;
         int           _myIndentation;
 

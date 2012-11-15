@@ -81,7 +81,7 @@ namespace y60 {
         : _myDisplay(0), _myDrawable(0), _myGLXContext(0)
 #endif
 #ifdef AC_USE_OSX_CGL
-		: _myCGLContext(0)
+        : _myCGLContext(0)
 #endif
     {
         _myStateCache = RenderStatePtr(new RenderState());
@@ -103,7 +103,7 @@ namespace y60 {
         _myGLXContext = glXGetCurrentContext();
 #endif
 #ifdef AC_USE_OSX_CGL
-		_myCGLContext = CGLGetCurrentContext();
+        _myCGLContext = CGLGetCurrentContext();
 #endif
         return true;
     }
@@ -147,7 +147,7 @@ namespace y60 {
         return (_myDisplay && _myDrawable && _myGLXContext);
 #endif
 #ifdef AC_USE_OSX_CGL
-		return (_myCGLContext);
+        return (_myCGLContext);
 #endif
     }
 

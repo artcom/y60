@@ -108,7 +108,7 @@ namespace jslib {
 
     void
     IScriptablePlugin::initClasses(JSContext * theContext, JSObject *theGlobalObject) {
-	    JSScriptablePlugin::initClass(theContext, theGlobalObject, ClassName(),
+        JSScriptablePlugin::initClass(theContext, theGlobalObject, ClassName(),
                 Functions(), StaticFunctions(), ConstIntProperties(), StaticProperties());
     }
 }

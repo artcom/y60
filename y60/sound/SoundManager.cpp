@@ -195,10 +195,10 @@ SoundPtr SoundManager::createSound(const string & theURI, bool theLoop,
             << ", use cache: " << theUseCache;
     AutoLocker<ThreadLock> myLocker(_myLock);
     if (getNumOpenSounds() >= getMaxOpenSounds()) {
-        AC_ERROR << "Maximum number of concurrent sounds ("<<getMaxOpenSounds()<<") reached,"
-                 << "fix your application or adjust the Y60_MAX_OPEN_SOUNDS environment variable"
-                 <<  "and the limits for maximum number of open files";
-        return SoundPtr();
+        throw SoundException(std::string("Maximum number of concurrent sounds (")
+              + asl::as_string(getMaxOpenSounds())
+              + ") reached, fix your application or adjust the Y60_MAX_OPEN_SOUNDS environment variable "
+              + "and the limits for maximum number of open files", PLUS_FILE_LINE);
     }
     IAudioDecoder * myDecoder;
     SoundCacheItemPtr myCacheItem = SoundCacheItemPtr();

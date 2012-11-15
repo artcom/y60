@@ -117,7 +117,7 @@ namespace y60 {
                 bool italics;
                 bool underline;
                 bool indent;
-				asl::Vector4f color;
+                asl::Vector4f color;
             };
 
             struct Word {

@@ -167,62 +167,62 @@ setHeight(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 static JSBool
 setScene(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-	try {
-		DOC_BEGIN("Set the scene the offscreen area should render");
-		DOC_PARAM("theScene", "", DOC_TYPE_NODE);
-		DOC_END;
+    try {
+        DOC_BEGIN("Set the scene the offscreen area should render");
+        DOC_PARAM("theScene", "", DOC_TYPE_NODE);
+        DOC_END;
 
-		ensureParamCount(argc, 1);
+        ensureParamCount(argc, 1);
         OffscreenRenderArea * myNative(0);
         convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
-		y60::ScenePtr myScene;
-		convertFrom(cx, argv[0], myScene);
-		myNative->setScene(myScene);
-		return JS_TRUE;
+        y60::ScenePtr myScene;
+        convertFrom(cx, argv[0], myScene);
+        myNative->setScene(myScene);
+        return JS_TRUE;
 
-	} HANDLE_CPP_EXCEPTION;
+    } HANDLE_CPP_EXCEPTION;
 }
 
 static JSBool
 setCanvas(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-	try {
-		DOC_BEGIN("Set the canvas the offscreen area should render to");
-		DOC_PARAM("theCanvas", "", DOC_TYPE_NODE);
-		DOC_END;
+    try {
+        DOC_BEGIN("Set the canvas the offscreen area should render to");
+        DOC_PARAM("theCanvas", "", DOC_TYPE_NODE);
+        DOC_END;
 
-		ensureParamCount(argc, 1);
+        ensureParamCount(argc, 1);
         OffscreenRenderArea * myNative(0);
         convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
-		dom::NodePtr myCanvas;
-		convertFrom(cx, argv[0], myCanvas);
-		myNative->setCanvas(myCanvas);
-		return JS_TRUE;
+        dom::NodePtr myCanvas;
+        convertFrom(cx, argv[0], myCanvas);
+        myNative->setCanvas(myCanvas);
+        return JS_TRUE;
 
-	} HANDLE_CPP_EXCEPTION;
+    } HANDLE_CPP_EXCEPTION;
 }
 
 static JSBool
 setSceneAndCanvas(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-	try {
-		DOC_BEGIN("Set the canvas the offscreen area should render into the given canvas");
-		DOC_PARAM("theScene", "", DOC_TYPE_OBJECT);
-		DOC_PARAM("theCanvas", "", DOC_TYPE_NODE);
-		DOC_END;
+    try {
+        DOC_BEGIN("Set the canvas the offscreen area should render into the given canvas");
+        DOC_PARAM("theScene", "", DOC_TYPE_OBJECT);
+        DOC_PARAM("theCanvas", "", DOC_TYPE_NODE);
+        DOC_END;
 
-		ensureParamCount(argc, 2);
+        ensureParamCount(argc, 2);
         OffscreenRenderArea * myNative(0);
         convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
-		y60::ScenePtr myScene;
-		convertFrom(cx, argv[0], myScene);
-		dom::NodePtr myCanvas;
-		convertFrom(cx, argv[1], myCanvas);
-		myNative->setSceneAndCanvas(myScene, myCanvas);
-		return JS_TRUE;
+        y60::ScenePtr myScene;
+        convertFrom(cx, argv[0], myScene);
+        dom::NodePtr myCanvas;
+        convertFrom(cx, argv[1], myCanvas);
+        myNative->setSceneAndCanvas(myScene, myCanvas);
+        return JS_TRUE;
 
-	} HANDLE_CPP_EXCEPTION;
+    } HANDLE_CPP_EXCEPTION;
 }
 
 static JSBool

@@ -177,7 +177,7 @@ ASSOSD.prototype.Constructor = function(Public, Protected, theViewer) {
             if (operatingSystem() == "WIN32") {
                 myFontPath = "${SYSTEMROOT}/fonts/arial.ttf";
             } else {
-	        Logger.error("Could not find a font for rendering");
+                Logger.error("Could not find a font for rendering");
             }
         }
 

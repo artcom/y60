@@ -78,7 +78,7 @@ spark.I18nContext.Constructor = function (Protected) {
     Public.__defineGetter__("defaultLanguage", function () {
         return _myDefaultLanguage;
     });
-    
+
     Public.switchLanguage = function (theLanguage) {
         Logger.info("I18n context " + Public.name + " switching to language: '" + theLanguage + "' current language: '" + _myLanguage + "'");
         if (theLanguage !== _myLanguage) {
@@ -144,7 +144,7 @@ spark.I18nItem.Constructor = function (Protected) {
     });
 
     var _myLanguageData = {};
-    var _myLanguageNodes = {}; 
+    var _myLanguageNodes = {};
 
     Protected.languageData = function () {
         return _myLanguageData;
@@ -191,7 +191,7 @@ spark.I18nItem.Constructor = function (Protected) {
     Public.hasLanguageData = function (theLanguage) {
         return theLanguage in _myLanguageData;
     };
-    
+
     Public.getLanguageNode = function(theLanguage) {
         if(!theLanguage) {
             theLanguage = _myLanguage;
@@ -208,7 +208,7 @@ spark.I18nItem.Constructor = function (Protected) {
             return _myLanguageNodes[theLanguage];
         }
     };
-    
+
     Public.hasLanguageNode = function(theLanguage) {
         return theLanguage in _myLanguageNodes;
     };
@@ -236,7 +236,7 @@ spark.I18nItem.Constructor = function (Protected) {
         }
         _myLanguageData[theLanguage] = theData;
     };
-    	   
+
     Public.addLanguageNode = function(theLanguage, theNode) {
         if(theLanguage in _myLanguageNodes) {
             Logger.warning("duplicate i18n node for item '" + Public.name + "' in language '" + theLanguage + "'");
@@ -281,7 +281,7 @@ spark.I18nText.Constructor = function (Protected) {
         // see if this can be replaced by
         // return Public.getLanguageData(Public.language) || "";
     });
-		
+
     Public.__defineGetter__("fontStyle", function() {
         var myFontStyleNode = Public.getLanguageNode(Public.language);
         return myFontStyleNode;
@@ -322,7 +322,7 @@ spark.I18nMovie.Constructor = function (Protected) {
     var Base = {};
 
     Public.Inherit(spark.I18nItem);
-    
+
     Base.createEvent = Protected.createEvent;
     Protected.createEvent = function (theLanguage) {
         var myEvent = Base.createEvent(theLanguage);
@@ -349,7 +349,7 @@ spark.I18nAudio.Constructor = function (Protected) {
     var Base = {};
 
     Public.Inherit(spark.I18nItem);
-    
+
     Base.createEvent = Protected.createEvent;
     Protected.createEvent = function (theLanguage) {
         var myEvent = Base.createEvent(theLanguage);

@@ -77,18 +77,18 @@ static JSBool log(asl::Severity theSeverity, JSContext *cx, JSObject *obj, uintN
     try {
         const char * myFilename;
         int myLineNo;
-		if (! getFileLine(cx, obj, argc, argv, myFilename, myLineNo)) {
-			myLineNo = 0;
-			myFilename = "unknown";
-		}
-		std::string myModuleName(myFilename);
-		std::string myMessage;
-		ensureParamCount(argc, 1);
-		convertFrom(cx, argv[0], myMessage);
-		if (argc > 1 ) {
-    		convertFrom(cx, argv[1], myModuleName);		    
-		}
-		AC_LOG_CHECK(theSeverity, myModuleName.c_str(), myLineNo) << myMessage;
+        if (! getFileLine(cx, obj, argc, argv, myFilename, myLineNo)) {
+            myLineNo = 0;
+            myFilename = "unknown";
+        }
+        std::string myModuleName(myFilename);
+        std::string myMessage;
+        ensureParamCount(argc, 1);
+        convertFrom(cx, argv[0], myMessage);
+        if (argc > 1 ) {
+            convertFrom(cx, argv[1], myModuleName);         
+        }
+        AC_LOG_CHECK(theSeverity, myModuleName.c_str(), myLineNo) << myMessage;
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }

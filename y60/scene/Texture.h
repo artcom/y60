@@ -136,15 +136,9 @@ namespace y60 {
             }
 
             unsigned applyTexture();
-            void applyTextureParams();
-
             void preload();
 
-            void refTexture();
-            void unrefTexture();
-
             ImagePtr getImage() const;
-
             TextureType getType() const;
             TextureWrapMode getWrapMode() const;
             TextureSampleFilter getMinFilter() const;
@@ -167,7 +161,6 @@ namespace y60 {
             // a global variable.
         private:
             IResourceManager * _myResourceManager;
-            unsigned _myRefCount;
             unsigned _myTextureId;
             unsigned _myPixelBufferId;
             unsigned _myImageNodeVersion;
@@ -175,17 +168,12 @@ namespace y60 {
 
             Texture();
 
-            void registerDependenciesForTextureWidthUpdate();
-            void registerDependenciesForTextureHeightUpdate();
             void registerDependenciesForInternalFormatUpdate();
             void updateDependenciesForInternalFormatUpdate();
             void registerDependenciesForTextureParamChanged();
             void registerDependenciesForTextureTypeUpdate();
-            void registerDependenciesForTextureUpdate();
 
             void calculateInternalFormat();
-            void calculateWidth();
-            void calculateHeight();
             void calculateTextureType();
 
             /// Get ResourceManager from Scene facade.

@@ -98,16 +98,15 @@ namespace y60 {
         dom::FacadeAttributePlug<TextureParamChangedTag>(this),
         dom::FacadeAttributePlug<LastActiveFrameTag>(this),
         _myResourceManager(0),
-        _myRefCount(0),
         _myTextureId(0),
         _myPixelBufferId(0),
         _myImageNodeVersion(0)
     {
-        AC_DEBUG << "Texture::Texture " << (void*) this;
+        AC_TRACE << "Texture::Texture " << (void*) this;
     }
 
     Texture::~Texture() {
-        AC_DEBUG << "Texture::~Texture " << (void*) this;
+        AC_TRACE << "Texture::~Texture " << (void*) this;
         if (_myResourceManager) {
             _myResourceManager->unbindTexture(this);
             unbind();
@@ -121,44 +120,9 @@ namespace y60 {
 
         TextureImageIdTag::Plug::getValuePtr()->setImmediateCallBack(dynamic_cast_Ptr<Texture>(getSelf()), 
                                                                      &Texture::updateDependenciesForInternalFormatUpdate);
-
-        //TextureIdTag::Plug::setReconnectFunction(&Texture::registerDependenciesForTextureUpdate);
         TextureParamChangedTag::Plug::setReconnectFunction(&Texture::registerDependenciesForTextureParamChanged);
         TextureInternalFormatTag::Plug::setReconnectFunction(&Texture::registerDependenciesForInternalFormatUpdate);
-
-        TextureWidthTag::Plug::setReconnectFunction(&Texture::registerDependenciesForTextureWidthUpdate);
-        TextureHeightTag::Plug::setReconnectFunction(&Texture::registerDependenciesForTextureHeightUpdate);
         TextureTypeTag::Plug::setReconnectFunction(&Texture::registerDependenciesForTextureTypeUpdate);
-    }
-
-    void
-    Texture::registerDependenciesForTextureUpdate() {
-        if (getNode()) {
-            TextureIdTag::Plug::dependsOn<TextureColorBiasTag>(*this);
-            TextureIdTag::Plug::dependsOn<TextureColorScaleTag>(*this);
-            TextureIdTag::Plug::dependsOn<TextureMipmapTag>(*this);
-            TextureIdTag::Plug::dependsOn<TextureInternalFormatTag>(*this);
-            //TextureIdTag::Plug::getValuePtr()->setCalculatorFunction(
-            //    dynamic_cast_Ptr<Texture>(getSelf()), &Texture::applyTexture);
-        }
-    }
-
-    void
-    Texture::registerDependenciesForTextureWidthUpdate() {
-        AC_TRACE << "Texture::registerDependenciesForTextureWidthUpdate";
-        if (getNode()) {
-            /*TextureWidthTag::Plug::getValuePtr()->setCalculatorFunction(
-                dynamic_cast_Ptr<Texture>(getSelf()), &Texture::calculateWidth);*/
-        }
-    }
-
-    void
-    Texture::registerDependenciesForTextureHeightUpdate() {
-        AC_TRACE << "Texture::registerDependenciesForTextureHeightUpdate";
-        if (getNode()) {
-            /*TextureHeightTag::Plug::getValuePtr()->setCalculatorFunction(
-                dynamic_cast_Ptr<Texture>(getSelf()), &Texture::calculateHeight);*/
-        }
     }
 
     void
@@ -178,8 +142,6 @@ namespace y60 {
             TextureParamChangedTag::Plug::dependsOn<TextureWrapModeTag>(*this);
             TextureParamChangedTag::Plug::dependsOn<TextureMinFilterTag>(*this);
             TextureParamChangedTag::Plug::dependsOn<TextureMagFilterTag>(*this);
-            /*TextureParamChangedTag::Plug::getValuePtr()->setCalculatorFunction(
-                dynamic_cast_Ptr<Texture>(getSelf()), &Texture::applyTextureParams);*/
         }
     }
 
@@ -207,22 +169,6 @@ namespace y60 {
         }
     }
 
-#if 0
-    // This function may be correct but it looks fragile and might easily break when the dom structure
-    // wil be changed.
-    // PM: and it broke...
-    void
-    Texture::ensureResourceManager() {
-        AC_TRACE << "Texture::ensureResourceManager '" << get<NameTag>() << "' _myResourceManager=" << (void*)_myResourceManager;
-        if (_myResourceManager == 0) {
-            if (getNode()) {
-                IScenePtr myScene = getNode().parentNode()->parentNode()->getFacade<IScene>();
-                _myResourceManager = myScene->getResourceManager();
-            }
-        }
-        AC_TRACE << "Texture::ensureResourceManager (onexit)'" << get<NameTag>() << "' _myResourceManager=" << (void*)_myResourceManager;
-    }
-#else
     void
     Texture::ensureResourceManager() {
         AC_TRACE << "Texture::ensureResourceManager '" << get<NameTag>() << "' _myResourceManager=" << (void*)_myResourceManager;
@@ -234,27 +180,6 @@ namespace y60 {
         }
         AC_TRACE << "Texture::ensureResourceManager (onexit)'" << get<NameTag>() << "' _myResourceManager=" << (void*)_myResourceManager;
     }
-#endif
-
-    void
-    Texture::calculateWidth() {
-        ImagePtr myImage = getImage();
-        if (myImage) {
-            AC_TRACE << "Texture::calculateWidth '" << get<NameTag>() << "' width=" << myImage->Image::get<ImageWidthTag>();
-            set<TextureWidthTag>(myImage->Image::get<ImageWidthTag>());
-        }
-    }
-
-    void
-    Texture::calculateHeight() {
-        ImagePtr myImage = getImage();
-        if (myImage) {
-            AC_TRACE << "Texture::calculateHeight '" << get<NameTag>() << "' height=" << myImage->Image::get<ImageHeightTag>();
-            set<TextureHeightTag>(myImage->get<ImageHeightTag>());
-        }
-    }
-
-
 
     void
     Texture::calculateInternalFormat() {
@@ -292,8 +217,6 @@ namespace y60 {
         set<TextureInternalFormatTag>(myInternalFormat);
     }
 
-
-
     void
     Texture::calculateTextureType() {
         ImagePtr myImage = getImage();
@@ -327,10 +250,7 @@ namespace y60 {
     unsigned
     Texture::applyTexture() {
         AC_TRACE << "Texture::applyTexture '" << get<NameTag>() << "' id=" << get<IdTag>() << " texId=" << _myTextureId;
-
         ensureResourceManager();
-
-
         TexturePtr myTexture = dynamic_cast_Ptr<Texture>(getSelf());
 
         bool myForceSetupFlag = isDirty<TextureIdTag>();
@@ -339,7 +259,6 @@ namespace y60 {
 
         // setup flags
         ImagePtr myImage = getImage();
-        //if (myImage && myImage.getNode().nodeVersion() != _myImageNodeVersion) {
         if (myImage && myImage->getRasterValueNode()->nodeVersion() != _myImageNodeVersion) {
             bool myImageMatchesTextureFlag = _myResourceManager->imageMatchesGLTexture(myTexture);
             if (!myImageMatchesTextureFlag) {
@@ -348,8 +267,6 @@ namespace y60 {
                 // do upload
                 myImageContentChangedFlag = true;
             }
-
-            //_myImageNodeVersion = myImage->getNode().nodeVersion();
             _myImageNodeVersion = static_cast<unsigned>(myImage->getRasterValueNode()->nodeVersion());
         }
 
@@ -379,14 +296,7 @@ namespace y60 {
                 (void) get<TextureIdTag>();
             }
         }
-
         return _myTextureId;
-    }
-
-    void
-    Texture::applyTextureParams() {
-        AC_DEBUG << "Texture::applyTextureParams";
-        _myResourceManager->updateTextureParams(dynamic_cast_Ptr<Texture>(getSelf()));
     }
 
     TextureType
@@ -433,7 +343,7 @@ namespace y60 {
 
     void
     Texture::removeTextureFromResourceManager() {
-        //AC_DEBUG << "removeTextureFromResourceManager '" << get<NameTag>() << "' id=" << get<IdTag>() << " texId=" << _myTextureId;
+        AC_TRACE << "removeTextureFromResourceManager '" << get<NameTag>() << "' id=" << get<IdTag>() << " texId=" << _myTextureId;
         if (_myTextureId == 0) {
             return;
         }
@@ -466,22 +376,6 @@ namespace y60 {
         _myTextureId = 0;
         set<TextureIdTag>(_myTextureId);
         //TextureIdTag::Plug::getValuePtr()->setDirty();
-    }
-
-    void
-    Texture::refTexture() {
-        if (_myRefCount++ == 0) {
-            ensureResourceManager();
-            _myResourceManager->setTexturePriority(dynamic_cast_Ptr<Texture>(getSelf()), TEXTURE_PRIORITY_IN_USE);
-        }
-    }
-
-    void
-    Texture::unrefTexture() {
-        if (--_myRefCount == 0) {
-            ensureResourceManager();
-            _myResourceManager->setTexturePriority(dynamic_cast_Ptr<Texture>(getSelf()), TEXTURE_PRIORITY_IDLE);
-        }
     }
 
     bool

@@ -189,35 +189,35 @@ function drawIntersection(theIntersectionInfo, theIntersection) {
     var myCulling = renderer.backfaceCulling;
     renderer.backfaceCulling = false;
 /*
-	// Draw intersected triangles
-	var myScale         = new Vector3f(1.01, 1.01, 1.01);
-	var myPolygonOffset = new Vector3f(0.1,0.1,0.1);
-	var myA = product(theIntersection.primitive[0], myScale);
-	    myA = sum(myA, myPolygonOffset);
-	var myB = product(theIntersection.primitive[1], myScale);
-	    myB = sum(myB, myPolygonOffset);
-	var myC = product(theIntersection.primitive[2], myScale);
-	    myC = sum(myC, myPolygonOffset);
-	var myTriangle = new Triangle(myA, myB, myC);
-	window.draw(myTriangle, [0.5,0,1,1], myMatrix);
+    // Draw intersected triangles
+    var myScale         = new Vector3f(1.01, 1.01, 1.01);
+    var myPolygonOffset = new Vector3f(0.1,0.1,0.1);
+    var myA = product(theIntersection.primitive[0], myScale);
+        myA = sum(myA, myPolygonOffset);
+    var myB = product(theIntersection.primitive[1], myScale);
+        myB = sum(myB, myPolygonOffset);
+    var myC = product(theIntersection.primitive[2], myScale);
+        myC = sum(myC, myPolygonOffset);
+    var myTriangle = new Triangle(myA, myB, myC);
+    window.draw(myTriangle, [0.5,0,1,1], myMatrix);
 
-	if (theIntersection.primitive.length == 4) {
-	    var myD = product(theIntersection.primitive[3], myScale);
+    if (theIntersection.primitive.length == 4) {
+        var myD = product(theIntersection.primitive[3], myScale);
         myD = sum(myD, myPolygonOffset);
-	    var myTriangle2nd = new Triangle(myA, myC, myD);
-	    window.draw(myTriangle2nd, [0.5,0,1,1], myMatrix);
-	}
+        var myTriangle2nd = new Triangle(myA, myC, myD);
+        window.draw(myTriangle2nd, [0.5,0,1,1], myMatrix);
+    }
 */
-	// Draw normal
-	//
-	var myNormalTo = sum(theIntersection.position, product(theIntersection.normal, [3,3,3]));
+    // Draw normal
+    //
+    var myNormalTo = sum(theIntersection.position, product(theIntersection.normal, [3,3,3]));
 
-	window.draw(new LineSegment(theIntersection.position, myNormalTo),
-				[0.5,1.0,0.5,1], myMatrix);
+    window.draw(new LineSegment(theIntersection.position, myNormalTo),
+                [0.5,1.0,0.5,1], myMatrix);
 
-	var myPlaneNormalTo = sum(theIntersection.position, product(theIntersection.primitive.normal, [3,3,3]));
-	window.draw(new LineSegment(theIntersection.position, myNormalTo),
-				[1.0,1.0,0.5,1], myMatrix);
+    var myPlaneNormalTo = sum(theIntersection.position, product(theIntersection.primitive.normal, [3,3,3]));
+    window.draw(new LineSegment(theIntersection.position, myNormalTo),
+                [1.0,1.0,0.5,1], myMatrix);
 
     // Reset backface culling to previous state
     renderer.backfaceCulling = myCulling;

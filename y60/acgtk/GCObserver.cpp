@@ -70,11 +70,11 @@ GCObserver::GCObserver() : _myContext(0), _myPrevCallback(0) {
 }
 
 GCObserver::~GCObserver() {
-	/* TODO: do this before shutting down the JS context
+    /* TODO: do this before shutting down the JS context
     if (_myContext) {
          JS_SetGCCallback(_myContext, _myPrevCallback);
     }
-	*/
+    */
     AC_TRACE << "DTOR" << endl;
 }
 #ifdef USE_LEGACY_SPIDERMONKEY

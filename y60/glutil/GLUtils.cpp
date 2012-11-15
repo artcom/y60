@@ -74,7 +74,7 @@ GdkGLProc gdk_gl_get_proc_address            (const char *proc_name);
 #include <asl/base/Logger.h>
 
 #ifndef _AC_NO_CG_
-	#include <Cg/cgGL.h>
+    #include <Cg/cgGL.h>
 #endif
 #ifdef OSX
     #include <OpenGL/CGLCurrent.h>

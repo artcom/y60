@@ -678,19 +678,15 @@ JSBool
 JSScene::getStatistics(JSContext *cx, jsval *vp) {
     JSObject * myReturnObject = JS_NewArrayObject(cx, 0, NULL);
     jsval rval = OBJECT_TO_JSVAL(myReturnObject);
-    Scene::Statistics myStatistics = getNative().getStatistics();
     asl::Dashboard & myDashboard = getDashboard();
     unsigned long myRenderedPrimitives = myDashboard.getCounterValue("TransparentPrimitives") + myDashboard.getCounterValue("OpaquePrimitives");
     double myElapsedGC =  myDashboard.getTimer("gc")->getLastElapsed().millis();
-    if (!JS_DefineProperty(cx, myReturnObject, "primitives", as_jsval(cx, myStatistics.primitiveCount), 0,0, JSPROP_ENUMERATE)) return JS_FALSE;
     if (!JS_DefineProperty(cx, myReturnObject, "renderedPrimitives", as_jsval(cx, myRenderedPrimitives),  0,0, JSPROP_ENUMERATE)) return JS_FALSE;
-    if (!JS_DefineProperty(cx, myReturnObject, "vertices", as_jsval(cx, myStatistics.vertexCount), 0,0, JSPROP_ENUMERATE)) return JS_FALSE;
     if (!JS_DefineProperty(cx, myReturnObject, "renderedVertices", as_jsval(cx, myDashboard.getCounterValue("Vertices")), 0,0, JSPROP_ENUMERATE)) return JS_FALSE;
-    if (!JS_DefineProperty(cx, myReturnObject, "materials", as_jsval(cx, myStatistics.materialCount), 0,0, JSPROP_ENUMERATE)) return JS_FALSE;
-    if (!JS_DefineProperty(cx, myReturnObject, "lights", as_jsval(cx, myStatistics.lightCount), 0,0, JSPROP_ENUMERATE)) return JS_FALSE;
+    if (!JS_DefineProperty(cx, myReturnObject, "materialChange", as_jsval(cx, myDashboard.getCounterValue("materialChange")), 0,0, JSPROP_ENUMERATE)) return JS_FALSE;
     if (!JS_DefineProperty(cx, myReturnObject, "activeLights", as_jsval(cx, myDashboard.getCounterValue("ActiveLights")), 0,0, JSPROP_ENUMERATE)) return JS_FALSE;
     if (!JS_DefineProperty(cx, myReturnObject, "bodies", as_jsval(cx, myDashboard.getCounterValue("RenderedBodies")), 0,0, JSPROP_ENUMERATE)) return JS_FALSE;
-    if (!JS_DefineProperty(cx, myReturnObject, "worldNodes", as_jsval(cx, myDashboard.getCounterValue("WorldNodes")),  0,0, JSPROP_ENUMERATE)) return JS_FALSE;
+    if (!JS_DefineProperty(cx, myReturnObject, "activeWorlds", as_jsval(cx, myDashboard.getCounterValue("ActiveWorlds")),  0,0, JSPROP_ENUMERATE)) return JS_FALSE;
     if (!JS_DefineProperty(cx, myReturnObject, "overlays", as_jsval(cx, myDashboard.getCounterValue("Overlays")),  0,0, JSPROP_ENUMERATE)) return JS_FALSE;
     if (!JS_DefineProperty(cx, myReturnObject, "gc", as_jsval(cx, myElapsedGC),  0,0, JSPROP_ENUMERATE)) return JS_FALSE;
     *vp = rval;
@@ -721,8 +717,8 @@ JSScene::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, js
             *vp = as_jsval(cx, getNative().getWorldRoot());
             return JS_TRUE;
         case PROP_worlds:
-        	*vp = as_jsval(cx, getNative().getWorldsRoot());
-        	return JS_TRUE;
+            *vp = as_jsval(cx, getNative().getWorldsRoot());
+            return JS_TRUE;
         case PROP_canvases:
             *vp = as_jsval(cx, getNative().getCanvasRoot());
             return JS_TRUE;
