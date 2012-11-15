@@ -142,13 +142,6 @@ namespace y60 {
      */
     class Y60_SCENE_DECL Scene : public dom::Facade, public IScene {
         public:
-            struct Statistics {
-                Statistics();
-                unsigned long primitiveCount;
-                unsigned long vertexCount;
-                unsigned long materialCount;
-                unsigned long lightCount;
-            };
 
             DEFINE_NESTED_EXCEPTION(Scene,Exception,asl::Exception);
             DEFINE_NESTED_EXCEPTION(Scene,IOError,Exception);
@@ -265,8 +258,6 @@ namespace y60 {
 
             void saveSchema(const std::string & theFilename,
                             int theSchemaIndex, bool theBinaryFlag = false);
-
-            const Statistics getStatistics() const;
 
             void collectCameras(dom::NodeList & theCameras) const;
 
@@ -455,7 +446,6 @@ namespace y60 {
             AnimationManager         _myAnimationManager;
 
             dom::DocumentPtr         _mySceneDom;
-            Statistics               _myStatistics;
 
             unsigned long long       _myPreviousDomVersion;
     };

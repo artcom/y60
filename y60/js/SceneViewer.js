@@ -160,13 +160,14 @@ SceneViewer.prototype.Constructor = function (self, theArguments) {
 
         if (_myOnScreenStatistics > 1) {
             var myStatistics = window.scene.statistics;
-            myText.push("Vertices:   " + myStatistics.renderedVertices + "/" + myStatistics.vertices);
-            myText.push("Primitives: " + myStatistics.renderedPrimitives + "/" + myStatistics.primitives);
-            myText.push("Worldnodes: " + myStatistics.worldNodes);
-            myText.push("Bodies:     " + myStatistics.bodies);
-            myText.push("Lights:     " + myStatistics.activeLights + "/" + myStatistics.lights);
-            myText.push("Overlays:   " + myStatistics.overlays);
-            myText.push("Materials:  " + myStatistics.materials);
+            myText.push("Vertices:     " + myStatistics.renderedVertices);
+            myText.push("Primitives:   " + myStatistics.renderedPrimitives);
+            myText.push("Bodies:       " + myStatistics.bodies);
+            myText.push("ActiveWorlds: " + myStatistics.activeWorlds);
+            myText.push("ActiveLights: " + myStatistics.activeLights);
+            myText.push("Overlays:     " + myStatistics.overlays);
+            myText.push("Materials:    " + window.scene.materials.childNodesLength());
+            myText.push("MaterialChange: " + myStatistics.materialChange);
             myText.push("gc:  " + myStatistics.gc.toFixed(3));
         }
 

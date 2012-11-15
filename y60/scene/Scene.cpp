@@ -248,8 +248,6 @@ namespace y60 {
     void
     Scene::clear() {
         _mySceneDom = dom::DocumentPtr(new dom::Document());
-        _myStatistics.primitiveCount = 0;
-        _myStatistics.vertexCount = 0;
         _myPreviousDomVersion = 0;
     }
 
@@ -613,8 +611,7 @@ namespace y60 {
                     import(myInclude->get<IncludeSrcTag>(), AppPackageManager::get().getPtr(), myIncludeNode.self().lock());
                 }
             }
-         }
-         //COUNT(WorldNodes);
+        }
     }
     ///////////////////////////////////////////////////////////////////////////////////////////
     // Camera handling
@@ -1318,21 +1315,6 @@ namespace y60 {
     IResourceManager *
     Scene::getResourceManager() {
         return _myTextureManager->getResourceManager();
-    }
-
-    Scene::Statistics::Statistics() :
-        primitiveCount(0),
-        vertexCount(0),
-        materialCount(0),
-        lightCount(0)
-    {}
-
-    const Scene::Statistics
-    Scene::getStatistics() const {
-        Scene::Statistics myStatistics = _myStatistics;
-        myStatistics.lightCount     = -1; // XXX: _myLights.size();
-        myStatistics.materialCount  =  getNode().childNode(MATERIAL_LIST_NAME)->childNodesLength();
-        return myStatistics;
     }
 }
 
