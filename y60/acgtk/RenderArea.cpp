@@ -133,10 +133,10 @@ RenderArea::RenderArea(RenderAreaPtr theContext) : AbstractRenderWindow(jslib::J
     /* Set OpenGL-capability to the widget. */
     DB(cerr << "RenderArea::RenderArea() sharing with " << myGdkGLContext << endl);
     if (!gtk_widget_set_gl_capability (GTK_WIDGET(gobj()),
-				myGLConfig,
-				myGdkGLContext,
-				true,
-				GDK_GL_RGBA_TYPE))
+                myGLConfig,
+                myGdkGLContext,
+                true,
+                GDK_GL_RGBA_TYPE))
     {
         throw asl::Exception("RenderArea: could not create GL context!", PLUS_FILE_LINE);
     }

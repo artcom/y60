@@ -139,7 +139,7 @@ namespace y60 {
                     theElementBuilder.appendIndex(POSITIONS, myBaseIndex + theXVertexCount);
                     theElementBuilder.appendIndex(NORMALS, myBaseIndex + theXVertexCount);
                     theElementBuilder.appendIndex(COLORS, myBaseIndex + theXVertexCount);
-					theElementBuilder.appendIndex(getTextureRole(0), myTexBaseIndex - theXVertexCount);
+                    theElementBuilder.appendIndex(getTextureRole(0), myTexBaseIndex - theXVertexCount);
                 }
             }
         }

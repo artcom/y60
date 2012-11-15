@@ -91,8 +91,8 @@
 
 // CG support
 #ifndef _AC_NO_CG_
-	#include <Cg/cg.h>
-	#include <Cg/cgGL.h>
+    #include <Cg/cg.h>
+    #include <Cg/cgGL.h>
 #endif
 
 #include <string>
@@ -174,8 +174,8 @@ namespace y60 {
             dom::NodePtr getActiveLodChild(dom::NodePtr theNode, const y60::CameraPtr theCamera);
 
             void createRenderList(const WorldPtr & theWorld,
-								  const dom::NodePtr & theNode,
-								  BodyPartMap & theBodyParts,
+                                  const dom::NodePtr & theNode,
+                                  BodyPartMap & theBodyParts,
                                   const y60::CameraPtr theCamera,
                                   const asl::Matrix4f & theEyeSpaceTransform,
                                   ViewportPtr theViewport,

@@ -239,13 +239,13 @@ public:
     void cleanup(bool incremental = false) {
         JS_ClearScope(cx, globalObject);
 
-	if (incremental) {
+    if (incremental) {
         int j = 10000;
 #ifdef USE_SPIDERMONKEY_INCREMENTAL_GC
-	    while (!(JS_IncrementalGC(cx, 100)) && --j > 0);
+        while (!(JS_IncrementalGC(cx, 100)) && --j > 0);
 #endif
-	    ENSURE_MSG((j >= 0), "GC cycles < 1000");
-	}
+        ENSURE_MSG((j >= 0), "GC cycles < 1000");
+    }
         // finally, do a full forced gc to get rid of newborns and the like.
         JS_GC(cx);
     }

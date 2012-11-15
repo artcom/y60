@@ -76,7 +76,7 @@ namespace asl
         return y60::hasCap("GL_NV_vertex_array_range");
 #else
 #ifdef AC_IGNORE_NV_MEMORY_MANAGEMENT 
-		return false;
+        return false;
 #endif // AC_IGNORE_NV_MEMORY_MANAGEMENT
 #endif // AC_USE_X11
 #endif // _WIN32

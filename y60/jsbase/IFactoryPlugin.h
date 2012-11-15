@@ -73,12 +73,12 @@
 #include <asl/dom/Nodes.h>
 
 namespace jslib {
-	struct IFactoryPlugin {
-		virtual ~IFactoryPlugin() {};
-		virtual void initClasses(JSContext * theContext, JSObject *theGlobalObject) = 0;
-		virtual jslib::IScriptablePluginPtr createInstance() = 0;
-	};
-	typedef asl::Ptr<IFactoryPlugin> IFactoryPluginPtr;
+    struct IFactoryPlugin {
+        virtual ~IFactoryPlugin() {};
+        virtual void initClasses(JSContext * theContext, JSObject *theGlobalObject) = 0;
+        virtual jslib::IScriptablePluginPtr createInstance() = 0;
+    };
+    typedef asl::Ptr<IFactoryPlugin> IFactoryPluginPtr;
 }
 
 #endif

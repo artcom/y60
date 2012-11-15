@@ -230,15 +230,15 @@ const asl::Vector2i &
                                           theImageNode, theString, theFont,
                                           theTargetWidth, theTargetHeight, theCursorPos);
         return mySize;
-	}
+    }
 
-	void
-	TextRendererManager::loadTTF(const std::string & theName, const std::string & theFileName,
-	                  int theHeight, TTFFontInfo::FONTHINTING & theFonthint,
-	                  TTFFontInfo::FONTTYPE & theFonttype, int theAscendOffset)
+    void
+    TextRendererManager::loadTTF(const std::string & theName, const std::string & theFileName,
+                      int theHeight, TTFFontInfo::FONTHINTING & theFonthint,
+                      TTFFontInfo::FONTTYPE & theFonttype, int theAscendOffset)
     {
         _myTTFRenderer->loadFont(theName, expandEnvironment(theFileName), theHeight, theFonthint, theFonttype, theAscendOffset);
-	}
+    }
 
     bool
     TextRendererManager::getFontMetrics(const std::string & theFontName,

@@ -90,7 +90,7 @@ using namespace dom;
 namespace y60 {
     bool ShaderLibrary::_myGLisReadyFlag = false;
 
-	ShaderLibrary::ShaderLibrary() {
+    ShaderLibrary::ShaderLibrary() {
         // Cg Context created by CgContextHolder
     }
 
@@ -101,9 +101,9 @@ namespace y60 {
 
 #ifndef _AC_NO_CG_
     CGcontext
-	ShaderLibrary::getCgContext() {
-		return _myCgContext.get();
-	}
+    ShaderLibrary::getCgContext() {
+        return _myCgContext.get();
+    }
 
     CgContextHolder::~CgContextHolder() {
         if (_myCgContext) {

@@ -341,7 +341,7 @@ PathText.prototype.Constructor = function(self, theText, theFontSize, theCharact
 
             var myCharacterPos = new Vector3f(-0.5, -0.5, 0.0);
             var myCharacterSize = new Vector3f(1.0, 1.0, 0.0);
-      	    var myUVCoordX = 0.0;
+            var myUVCoordX = 0.0;
 
             for (var i = 0; i < _myText.length; ++i) {
                 var myCharacter = _myCharacters[i];

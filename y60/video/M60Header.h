@@ -76,11 +76,11 @@ namespace y60 {
     const unsigned long CURRENT_MOVIE_FORMAT_VERSION = 4;
     const char * M60_MAGIC_NUMBER = "m60 ";
 
-	/**
-	 * @ingroup y60-video
+    /**
+     * @ingroup y60-video
      * Header for M60 Files.
-	 *
-	 */
+     *
+     */
     struct M60Header {
 
         // For reading movies

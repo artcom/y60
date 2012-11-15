@@ -717,8 +717,8 @@ JSScene::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, js
             *vp = as_jsval(cx, getNative().getWorldRoot());
             return JS_TRUE;
         case PROP_worlds:
-        	*vp = as_jsval(cx, getNative().getWorldsRoot());
-        	return JS_TRUE;
+            *vp = as_jsval(cx, getNative().getWorldsRoot());
+            return JS_TRUE;
         case PROP_canvases:
             *vp = as_jsval(cx, getNative().getCanvasRoot());
             return JS_TRUE;

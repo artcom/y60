@@ -78,12 +78,12 @@ namespace y60 {
 
     DEFINE_EXCEPTION(M60DecoderException, asl::Exception);
 
-	/**
-	 * @ingroup y60-video
+    /**
+     * @ingroup y60-video
      * Decoder for M60 Files.
-	 *
-	 */
-	class M60Decoder : public MovieDecoderBase {
+     *
+     */
+    class M60Decoder : public MovieDecoderBase {
         public:
             M60Decoder();
             virtual ~M60Decoder();

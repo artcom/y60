@@ -116,7 +116,7 @@ namespace y60 {
             GLShader::activateGroup1(theMaterial, theViewport); // activate exotic properties, like linewidth, glow, etc.
         }
 
-		MaterialPropertiesFacadePtr myMaterialPropFacade = theMaterial.getChild<MaterialPropertiesTag>();
+        MaterialPropertiesFacadePtr myMaterialPropFacade = theMaterial.getChild<MaterialPropertiesTag>();
         if (theMaterial.getLightingModel() != UNLIT) {
 
             glMaterialfv(GL_FRONT, GL_DIFFUSE,  myMaterialPropFacade->get<MaterialDiffuseTag>().begin());

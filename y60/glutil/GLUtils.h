@@ -100,23 +100,23 @@ struct GLExceptionHelper {
 
 namespace y60 {
     class Y60_GLUTIL_DECL GLScopeTimer {
-	public:
-		GLScopeTimer(asl::TimerPtr theTimer) : _myTimer(theTimer) {
+    public:
+        GLScopeTimer(asl::TimerPtr theTimer) : _myTimer(theTimer) {
            if (_flushGL_before_stop) {
                 glFlush();
             }
-			_myTimer->start();
-		}
-		~GLScopeTimer() {
+            _myTimer->start();
+        }
+        ~GLScopeTimer() {
             if (_flushGL_before_stop) {
                 glFlush();
             }
-			_myTimer->stop();
-		}
+            _myTimer->stop();
+        }
         static bool _flushGL_before_stop;
-	private:
-		asl::TimerPtr _myTimer;
-	};
+    private:
+        asl::TimerPtr _myTimer;
+    };
     #define MAKE_GL_SCOPE_TIMER(NAME) \
     static asl::TimerPtr myScopeTimer ## NAME = asl::getDashboard().getTimer(#NAME);\
         y60::GLScopeTimer myScopeTimerWrapper ## NAME ( myScopeTimer ## NAME);

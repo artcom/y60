@@ -37,22 +37,22 @@
 
 function SOAPClientParameters()
 {
-	var _pl = new Array();
-	this.add = function(name, value)
-	{
-		_pl[name] = value;
-		return this;
-	}
-	this.toXml = function()
-	{
-		var xml = "";
-		for(var p in _pl)
-		{
-			if(typeof(_pl[p]) != "function")
-				xml += "<" + p + ">" + _pl[p].toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") + "</" + p + ">";
-		}
-		return xml;
-	}
+    var _pl = new Array();
+    this.add = function(name, value)
+    {
+        _pl[name] = value;
+        return this;
+    }
+    this.toXml = function()
+    {
+        var xml = "";
+        for(var p in _pl)
+        {
+            if(typeof(_pl[p]) != "function")
+                xml += "<" + p + ">" + _pl[p].toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") + "</" + p + ">";
+        }
+        return xml;
+    }
 }
 
 function SOAPClient() {}
@@ -82,16 +82,16 @@ SOAPClient._loadWsdl = function(theWsdlUrl, theService, thePort, theOperation, t
         if (xmlHttp.responseCode != 200) {
             throw Exception("SOAPClient_cacheWsdl request failed:" + xmlHttp.responseCode);
         }
-	    SOAPClient_cacheWsdl[theWsdlUrl] = new Node(xmlHttp.responseString);	// save a copy in cache
+        SOAPClient_cacheWsdl[theWsdlUrl] = new Node(xmlHttp.responseString);    // save a copy in cache
     }
-	return SOAPClient._sendSoapRequest(theService, thePort, theOperation, theParams, theCookies, SOAPClient_cacheWsdl[theWsdlUrl]);
+    return SOAPClient._sendSoapRequest(theService, thePort, theOperation, theParams, theCookies, SOAPClient_cacheWsdl[theWsdlUrl]);
 }
 
 SOAPClient._sendSoapRequest = function(theService, thePort, theOperation, theParams, theCookies, theWSDL)
 {
-	// get namespace
+    // get namespace
     var ns =  (theWSDL.childNode('wsdl:definitions').targetNamespace);
-	// build SOAP request
+    // build SOAP request
     var soapRequest = '<?xml version="1.0" encoding="UTF-8"?>'+
 '<soapenv:Envelope'+
 ' xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"'+
@@ -124,12 +124,12 @@ theParams.toXml()+
     }
 
     Logger.info("invoking "+theOperation+" at "+myAddressNode.location);
-	var xmlHttp = new Request(myAddressNode.location);
+    var xmlHttp = new Request(myAddressNode.location);
     // xmlHttp.verbose = true;
     xmlHttp.post(soapRequest);
-	var soapAction = ((ns.lastIndexOf("/") != ns.length - 1) ? ns + "/" : ns) + theOperation;
-	xmlHttp.addHttpHeader("SOAPAction", soapAction);
-	xmlHttp.addHttpHeader("Content-Type", "text/xml; charset=utf-8");
+    var soapAction = ((ns.lastIndexOf("/") != ns.length - 1) ? ns + "/" : ns) + theOperation;
+    xmlHttp.addHttpHeader("SOAPAction", soapAction);
+    xmlHttp.addHttpHeader("Content-Type", "text/xml; charset=utf-8");
     if (theCookies) {
         for (var i = 0; i < theCookies.length; ++i) {
             xmlHttp.setCookie( theCookies[i] );

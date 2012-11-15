@@ -266,7 +266,7 @@ LabelBase.prototype.Constructor = function(Public, Protected, theScene,
     }
 
     function setup() {
-    	var myColor = asColor(Public.style.color);
+        var myColor = asColor(Public.style.color);
         Public.color = myColor;
         if (theSize) {
             Public.width  = theSize[0];

@@ -82,8 +82,8 @@ namespace y60 {
             const asl::Vector2f _myPos;
             const std::string   _myString;
             const TextStyle     _myTextStyle;
-   	        const std::string   _myFont;
-   	        TextRenderer*      _myRenderer;
+            const std::string   _myFont;
+            TextRenderer*      _myRenderer;
         private:
     };
     typedef asl::Ptr<Text> TextPtr;

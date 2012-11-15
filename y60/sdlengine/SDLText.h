@@ -93,7 +93,7 @@ namespace y60 {
             virtual ~SDLText();
             const GLuint createTextureFromSurface(SDL_Surface *surface);
         private:
-        	GLuint      _glTexture;
+            GLuint      _glTexture;
     };
     typedef asl::Ptr<SDLText> SDLTextPtr;
 

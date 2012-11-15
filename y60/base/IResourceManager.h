@@ -110,7 +110,7 @@ namespace y60 {
             virtual void setTexturePriority(const TexturePtr & theTexture,
                                             float thePriority) = 0;
             virtual int getMaxTextureSize(int theDimensions) const = 0;
-			virtual bool imageMatchesGLTexture(TexturePtr theTexture) const  = 0;
+            virtual bool imageMatchesGLTexture(TexturePtr theTexture) const  = 0;
             virtual ~IResourceManager() {}
     };
 

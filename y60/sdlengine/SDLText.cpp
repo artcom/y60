@@ -110,10 +110,10 @@ namespace y60 {
             : Text(theRenderer, thePos, theTextColor, theString, theFontName),
                    _glTexture(0)
     {
-       	glGenTextures(1, &_glTexture);
-    	glBindTexture(GL_TEXTURE_2D, _glTexture);
-    	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glGenTextures(1, &_glTexture);
+        glBindTexture(GL_TEXTURE_2D, _glTexture);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     }
 
     SDLText::~SDLText() {
@@ -128,14 +128,14 @@ namespace y60 {
     {
         glBindTexture(GL_TEXTURE_2D, _glTexture);
         glTexImage2D(GL_TEXTURE_2D,
-    	        0,
-    	        GL_RGBA,
-    	        theTextureSurface->w,
-    	        theTextureSurface->h,
-    	        0,
-    	        GL_RGBA,
-    	        GL_UNSIGNED_BYTE,
-    	        theTextureSurface->pixels);
+                0,
+                GL_RGBA,
+                theTextureSurface->w,
+                theTextureSurface->h,
+                0,
+                GL_RGBA,
+                GL_UNSIGNED_BYTE,
+                theTextureSurface->pixels);
 #ifdef CREATE_PNG_FROM_TEXT
         PLAnyPicDecoder myDecoder;
         PLAnyBmp myBmp;

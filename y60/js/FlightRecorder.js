@@ -596,7 +596,7 @@ GTKFlightRecorder.prototype.Constructor = function(obj, theArguments, theName) {
             var myOldPos = window.camera.position;
             var myOldOrientation = window.camera.orientation;
             window.camera.position    = myNewPos;
-			window.camera.orientation = Quaternionf.slerp(_myStartOrientation, _myEndOrientation, theBlendFactor);
+            window.camera.orientation = Quaternionf.slerp(_myStartOrientation, _myEndOrientation, theBlendFactor);
             window.queue_draw();
         }
     }

@@ -67,9 +67,9 @@
 #include "RenderState.h"
 
 #ifdef AC_USE_OSX_CGL
-//	#include <OpenGL/gliContext.h>
-	#include <OpenGL/OpenGL.h>
-	#include <OpenGL/CGLTypes.h>
+//  #include <OpenGL/gliContext.h>
+    #include <OpenGL/OpenGL.h>
+    #include <OpenGL/CGLTypes.h>
 #endif
 
 #include <vector>
@@ -88,7 +88,7 @@ namespace y60 {
             virtual bool activate() const;
             virtual bool saveCurrent();
 
-    	    static void checkLastError(const std::string & theScope);
+            static void checkLastError(const std::string & theScope);
 
             RenderStatePtr getStateCache() const {
                 return _myStateCache;
@@ -106,10 +106,10 @@ namespace y60 {
             GLXDrawable _myDrawable;
             GLXContext  _myGLXContext;
     #endif
-	#ifdef AC_USE_OSX_CGL
-			//GLIContext           _myGLIContext;
-			CGLContextObj       _myCGLContext;
-	#endif
+    #ifdef AC_USE_OSX_CGL
+            //GLIContext           _myGLIContext;
+            CGLContextObj       _myCGLContext;
+    #endif
             mutable RenderStatePtr _myStateCache;
             mutable bool           _myStateCacheInitialized;
     };
