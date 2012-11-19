@@ -387,7 +387,7 @@ namespace y60 {
         {
             myMovie->set<FrameCountTag>(int(_myVStream->duration * myFPS / 1000));
         } else {
-	        double myDuration = 0.0;
+            double myDuration = 0.0;
             if(_myFormatContext->start_time == static_cast<int64_t>(AV_NOPTS_VALUE)) {
                 myDuration = (_myFormatContext->duration )*myFPS/(double)AV_TIME_BASE;
             } else {

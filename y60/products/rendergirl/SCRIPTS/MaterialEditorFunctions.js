@@ -100,7 +100,7 @@ function updateMaterialEditor() {
 }
 
 function updateMaterial(thePropertyName, theValue) {
-	var isPaused = window.pause;
+    var isPaused = window.pause;
     window.pause = true;
 
     var myMaterial = getSelectedMaterial();

@@ -76,5 +76,5 @@ namespace y60 {
 /**********************************************/
 extern "C"
 EXPORT asl::PlugInBase * CSV_instantiatePlugIn(asl::DLHandle myDLHandle) {
-	return new y60::JSCSVPlugin(myDLHandle);
+    return new y60::JSCSVPlugin(myDLHandle);
 }

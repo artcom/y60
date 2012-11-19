@@ -34,5 +34,5 @@
 
 extern "C"
 EXPORT asl::PlugInBase * OscReceiver_instantiatePlugIn(asl::DLHandle myDLHandle) {
-	return new y60::OscReceiverPlugIn(myDLHandle);
+    return new y60::OscReceiverPlugIn(myDLHandle);
 }

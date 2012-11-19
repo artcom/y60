@@ -79,9 +79,9 @@ receiveFrame(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
     myReceived = myServer.receiveFrame(myFrame);
 
     if(!myReceived) {
-    	*rval = JSVAL_NULL;
+        *rval = JSVAL_NULL;
     } else {
-    	*rval = as_jsval(cx, myFrame);
+        *rval = as_jsval(cx, myFrame);
     }
 
     return JS_TRUE;
@@ -151,8 +151,8 @@ JSFrameSocket::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv
 
     inet::TCPSocketPtr myTCPSocket = dynamic_cast_Ptr<inet::TCPSocket>(mySocket);
     if(!myTCPSocket) {
-    	JS_ReportError(cx, "JSFrameSocket::Constructor: argument #1 must be a tcp socket");
-    	return JS_FALSE;
+        JS_ReportError(cx, "JSFrameSocket::Constructor: argument #1 must be a tcp socket");
+        return JS_FALSE;
     }
 
     OWNERPTR myNewFrameSocket = OWNERPTR(new inet::FrameSocket(myTCPSocket));

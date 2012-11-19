@@ -37,25 +37,25 @@
 #include <y60/jsbase/IScriptablePlugin.h>
 
 namespace y60 {
-	class JSNetPlugIn : public asl::PlugInBase, public jslib::IScriptablePlugin {
-    	public:
-    		JSNetPlugIn(asl::DLHandle theDLHandle) : asl::PlugInBase(theDLHandle) {}
+    class JSNetPlugIn : public asl::PlugInBase, public jslib::IScriptablePlugin {
+        public:
+            JSNetPlugIn(asl::DLHandle theDLHandle) : asl::PlugInBase(theDLHandle) {}
 
-    		virtual void initClasses(JSContext * theContext,
-    			JSObject *theGlobalObject) {
-    			JSSocket::initClass(theContext, theGlobalObject);
-    			JSTCPServer::initClass(theContext, theGlobalObject);
-    			JSFrameSocket::initClass(theContext, theGlobalObject);
-    		}
+            virtual void initClasses(JSContext * theContext,
+                JSObject *theGlobalObject) {
+                JSSocket::initClass(theContext, theGlobalObject);
+                JSTCPServer::initClass(theContext, theGlobalObject);
+                JSFrameSocket::initClass(theContext, theGlobalObject);
+            }
 
-    		const char * ClassName() {
-    		    static const char * myClassName = "Socket";
-    		    return myClassName;
-    		}
-	};
+            const char * ClassName() {
+                static const char * myClassName = "Socket";
+                return myClassName;
+            }
+    };
 }
 
 extern "C"
 EXPORT asl::PlugInBase * Network_instantiatePlugIn(asl::DLHandle myDLHandle) {
-	return new y60::JSNetPlugIn(myDLHandle);
+    return new y60::JSNetPlugIn(myDLHandle);
 }

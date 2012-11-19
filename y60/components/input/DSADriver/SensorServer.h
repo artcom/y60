@@ -54,13 +54,13 @@ class SensorServer {
 public:
     SensorServer();
 
-	typedef std::vector< std::pair<unsigned,unsigned> > SensorData;
-	void poll(SensorData & theSensorData);
+    typedef std::vector< std::pair<unsigned,unsigned> > SensorData;
+    void poll(SensorData & theSensorData);
     void openDevice(const std::string & theComPort, unsigned theBaudRate);
 
 private:
-	void parseLine(const std::string & theLine, unsigned & theController, unsigned & theBitMask);
-	void handleLines(std::string & theBuffer, SensorData & theSensorData);
+    void parseLine(const std::string & theLine, unsigned & theController, unsigned & theBitMask);
+    void handleLines(std::string & theBuffer, SensorData & theSensorData);
 
 private:
     asl::Ptr<asl::SerialDevice> _myComPort;

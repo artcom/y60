@@ -35,23 +35,23 @@
 #include <y60/jsbase/IScriptablePlugin.h>
 
 namespace y60 {
-	class JSHttpServerPlugIn : public asl::PlugInBase, public jslib::IScriptablePlugin {
-    	public:
-    		JSHttpServerPlugIn(asl::DLHandle theDLHandle) : asl::PlugInBase(theDLHandle) {}
+    class JSHttpServerPlugIn : public asl::PlugInBase, public jslib::IScriptablePlugin {
+        public:
+            JSHttpServerPlugIn(asl::DLHandle theDLHandle) : asl::PlugInBase(theDLHandle) {}
 
-    		virtual void initClasses(JSContext * theContext, JSObject *theGlobalObject) {
+            virtual void initClasses(JSContext * theContext, JSObject *theGlobalObject) {
                 AC_WARNING << "HttpServer is deprecated (and buggy!). Use the Async Plugin";
-    			JSHttpServer::initClass(theContext, theGlobalObject);
-    		}
+                JSHttpServer::initClass(theContext, theGlobalObject);
+            }
 
-    		const char * ClassName() {
-    		    static const char * myClassName = "HttpServerPlugin";
-    		    return myClassName;
-    		}
-	};
+            const char * ClassName() {
+                static const char * myClassName = "HttpServerPlugin";
+                return myClassName;
+            }
+    };
 }
 
 extern "C"
 EXPORT asl::PlugInBase * HttpServer_instantiatePlugIn(asl::DLHandle myDLHandle) {
-	return new y60::JSHttpServerPlugIn(myDLHandle);
+    return new y60::JSHttpServerPlugIn(myDLHandle);
 }

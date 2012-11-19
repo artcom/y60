@@ -195,7 +195,7 @@ PowermateInputExtension::pulseLED(int theStaticBrightness, int thePulseSpeed, in
     if(thePulseTable > 2)
         thePulseTable = 2;
     thePulseAsleep = !!thePulseAsleep;
-		thePulseAwake = !!thePulseAwake;
+        thePulseAwake = !!thePulseAwake;
 
     ev.type = EV_MSC;
     ev.code = MSC_PULSELED;

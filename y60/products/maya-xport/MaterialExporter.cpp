@@ -1111,8 +1111,8 @@ MaterialExporter::setBaseDirectory(const std::string & theDirectory) {
         _myBaseDirectory += '/';
     }
 
-		PackageManagerPtr myPackageManager = AppPackageManager::get().getPtr();
-		myPackageManager->add(_myBaseDirectory);
+        PackageManagerPtr myPackageManager = AppPackageManager::get().getPtr();
+        myPackageManager->add(_myBaseDirectory);
 
     AC_DEBUG << "MaterialExporter::setBaseDirectory _myBaseDirectory=" << _myBaseDirectory << ", was:" << theDirectory;
 }

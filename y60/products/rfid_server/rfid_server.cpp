@@ -88,7 +88,7 @@ asl::Arguments::AllowedOption myOptions[] = {
                                              {"--localport",    "%d"},
                                              {"--remoteport",   "%d"},
                                              {"--interval",     "%f"},
-                                             {"--prefix",     	"%s"},
+                                             {"--prefix",       "%s"},
                                              {"--version",      ""  },
                                              {"--help",         ""  },
                                              {"", ""}
@@ -209,13 +209,13 @@ int main( int argc, char *argv[])  {
 
     double interval = DEFAULT_INTERVAL;
     if (myArguments.haveOption("--interval")) {
-		interval = asl::as<double>(myArguments.getOptionArgument("--interval"));
+        interval = asl::as<double>(myArguments.getOptionArgument("--interval"));
     }
 
-	string prefix = "";
-	if (myArguments.haveOption("--prefix")) {
-		prefix = asl::as<string>(myArguments.getOptionArgument("--prefix"));
-	}
+    string prefix = "";
+    if (myArguments.haveOption("--prefix")) {
+        prefix = asl::as<string>(myArguments.getOptionArgument("--prefix"));
+    }
 
 
     try {
@@ -365,36 +365,36 @@ int main( int argc, char *argv[])  {
 
                         vector<unsigned char> buffer(1024);
                         int bytesRead = buffer.size();
-#if 0	// this is because Jürgen Rieker don't want to change his code
+#if 0   // this is because Jürgen Rieker don't want to change his code
                         if (
-							myTag->ReadDataWithCRCAndLength(
-								8, // start address
-								&buffer[0],
-								bytesRead,
-								retries
-							)
-						) {
-							// successfully read tag data
-							// terminate string
-							buffer[bytesRead] = 0;
-							myNameCache[uid] = string((char*)&buffer[0]);
-							nci = myNameCache.find(uid);
+                            myTag->ReadDataWithCRCAndLength(
+                                8, // start address
+                                &buffer[0],
+                                bytesRead,
+                                retries
+                            )
+                        ) {
+                            // successfully read tag data
+                            // terminate string
+                            buffer[bytesRead] = 0;
+                            myNameCache[uid] = string((char*)&buffer[0]);
+                            nci = myNameCache.find(uid);
                         }
 #else
                         if (
-							myTag->ReadData(
-								8,
-								&buffer[0],
-								56,
-								bytesRead,
-								retries
-							)
-						) {
-							if (bytesRead == 56) {
-								// successfully read tag data
-								myNameCache[uid] = string((char*)&buffer[0]);
-								nci = myNameCache.find(uid);
-							}
+                            myTag->ReadData(
+                                8,
+                                &buffer[0],
+                                56,
+                                bytesRead,
+                                retries
+                            )
+                        ) {
+                            if (bytesRead == 56) {
+                                // successfully read tag data
+                                myNameCache[uid] = string((char*)&buffer[0]);
+                                nci = myNameCache.find(uid);
+                            }
                         }
 #endif
                     }
@@ -419,10 +419,10 @@ int main( int argc, char *argv[])  {
             }
 
             if (Time() - lastTransmission > interval) {
-				// send over UDP
-				lastTransmission  = Time();
-				mySocket.sendTo(theRemoteHost, remoteUDPPort, &msg[0], msg.size());
-			}
+                // send over UDP
+                lastTransmission  = Time();
+                mySocket.sendTo(theRemoteHost, remoteUDPPort, &msg[0], msg.size());
+            }
         }
 
         myReader->Disconnect();

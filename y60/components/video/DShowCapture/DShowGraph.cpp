@@ -58,34 +58,34 @@ static const GUID CLSID_ColorSpaceConverter =
 DShowGraph::DShowGraph()
 {
     // Put the pointers to NULL to indicate no initialization yet
-	m_pCaptureGraphBuilder2 = NULL;
+    m_pCaptureGraphBuilder2 = NULL;
     m_pGraphBuilder  = NULL;
     m_pMediaControl  = NULL;
     m_pFilterGraph   = NULL;
-	m_pSrcFilter	 = NULL;
-	// Default setup for the render methods
-	m_fIsScaling    = false;	// no scaling
-	m_dwGraphRegister = 1;		// init it to indicate if it is registered.
+    m_pSrcFilter     = NULL;
+    // Default setup for the render methods
+    m_fIsScaling    = false;    // no scaling
+    m_dwGraphRegister = 1;      // init it to indicate if it is registered.
 
-	_myDesiredFrameRate = 25;
-	_myDesiredHeight = 320;
-	_myDesiredWidth = 240;
+    _myDesiredFrameRate = 25;
+    _myDesiredHeight = 320;
+    _myDesiredWidth = 240;
     _myDesiredBits = 24;
     _myDesiredVideoStandard = AnalogVideo_PAL_B;
 
     m_pColorConv = NULL;
-	m_pGrabFilter = NULL;
-	m_pSampleGrabber = NULL;
-	m_pTrackingCB = NULL;
+    m_pGrabFilter = NULL;
+    m_pSampleGrabber = NULL;
+    m_pTrackingCB = NULL;
 }
 
 DShowGraph::~DShowGraph()
 {
     stopGraph();
     destroyFilterGraph();
-	if (m_pTrackingCB) {
-	    delete m_pTrackingCB;
-	}
+    if (m_pTrackingCB) {
+        delete m_pTrackingCB;
+    }
 }
 
 void DShowGraph::setAnalogVideoFormat(void)
@@ -130,48 +130,48 @@ void DShowGraph::setAnalogVideoFormat(void)
 }
 
 bool DShowGraph::buildCaptureGraph(IBaseFilter * pSrcFilter, int theIndex) {
-	HRESULT hr = CoCreateInstance (CLSID_CaptureGraphBuilder2 , NULL, CLSCTX_INPROC,
-		IID_ICaptureGraphBuilder2, (void **) &m_pCaptureGraphBuilder2);
-	if (FAILED(hr))	{
-	    checkForDShowError(hr, "CoCreateInstance(m_pCaptureGraphBuilder2) failed", PLUS_FILE_LINE);
-	    return false;
-	}
-	// Attach the filter graph to the capture graph
+    HRESULT hr = CoCreateInstance (CLSID_CaptureGraphBuilder2 , NULL, CLSCTX_INPROC,
+        IID_ICaptureGraphBuilder2, (void **) &m_pCaptureGraphBuilder2);
+    if (FAILED(hr)) {
+        checkForDShowError(hr, "CoCreateInstance(m_pCaptureGraphBuilder2) failed", PLUS_FILE_LINE);
+        return false;
+    }
+    // Attach the filter graph to the capture graph
 
-	hr = m_pCaptureGraphBuilder2->SetFiltergraph(m_pGraphBuilder);
-	if (FAILED(hr))	{
-	    checkForDShowError(hr, "SetFiltergraph(m_pGraphBuilder) failed", PLUS_FILE_LINE);
-	    return false;
-	}
+    hr = m_pCaptureGraphBuilder2->SetFiltergraph(m_pGraphBuilder);
+    if (FAILED(hr)) {
+        checkForDShowError(hr, "SetFiltergraph(m_pGraphBuilder) failed", PLUS_FILE_LINE);
+        return false;
+    }
 
-	if (pSrcFilter == 0) {
-		// Use the system device enumerator and class enumerator to find
-		// a video capture/preview device, such as a desktop USB video camera.
-		hr = findCaptureDevice(&pSrcFilter, theIndex);
-	    if (FAILED(hr))	{
-	        checkForDShowError(hr, "findCaptureDevice failed", PLUS_FILE_LINE);
-	        return false;
-	    }
+    if (pSrcFilter == 0) {
+        // Use the system device enumerator and class enumerator to find
+        // a video capture/preview device, such as a desktop USB video camera.
+        hr = findCaptureDevice(&pSrcFilter, theIndex);
+        if (FAILED(hr)) {
+            checkForDShowError(hr, "findCaptureDevice failed", PLUS_FILE_LINE);
+            return false;
+        }
 
-	}
-	m_pSrcFilter = pSrcFilter;
+    }
+    m_pSrcFilter = pSrcFilter;
     
-	// Add Capture filter to our graph.
-	hr = m_pGraphBuilder->AddFilter(pSrcFilter, L"Video Capture");
-	if (FAILED(hr))	{
-	    checkForDShowError(hr, "AddFilter(\"Video Capture\") failed", PLUS_FILE_LINE);
-	    return false;
-	}
+    // Add Capture filter to our graph.
+    hr = m_pGraphBuilder->AddFilter(pSrcFilter, L"Video Capture");
+    if (FAILED(hr)) {
+        checkForDShowError(hr, "AddFilter(\"Video Capture\") failed", PLUS_FILE_LINE);
+        return false;
+    }
 
-	setAnalogVideoFormat();
+    setAnalogVideoFormat();
 
-	addExtraFilters();
+    addExtraFilters();
 
     hr = selectVideoFormat();
 
-	if (FAILED(hr)) {
-	    checkForDShowError(hr, "selectVideoFormat() failed", PLUS_FILE_LINE);
-    	//return false;  // unable to build graph
+    if (FAILED(hr)) {
+        checkForDShowError(hr, "selectVideoFormat() failed", PLUS_FILE_LINE);
+        //return false;  // unable to build graph
     }
 
 /*

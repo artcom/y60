@@ -280,23 +280,23 @@ jsval as_jsval(JSContext *cx, JSClassicAdder::OWNERPTR theOwner, JSClassicAdder:
 
 
 namespace y60 {
-	class ape_bench_classic_binding : public asl::PlugInBase, public jslib::IScriptablePlugin {
-    	public:
-    		ape_bench_classic_binding(asl::DLHandle theDLHandle) : asl::PlugInBase(theDLHandle) {}
+    class ape_bench_classic_binding : public asl::PlugInBase, public jslib::IScriptablePlugin {
+        public:
+            ape_bench_classic_binding(asl::DLHandle theDLHandle) : asl::PlugInBase(theDLHandle) {}
 
-    		virtual void initClasses(JSContext * theContext, JSObject *theGlobalObject) {
+            virtual void initClasses(JSContext * theContext, JSObject *theGlobalObject) {
                 jslib::JSClassicAdder::initClass( theContext, theGlobalObject );
                 JS_DefineFunctions(theContext, theGlobalObject, jslib::free_functions() );
-    		}
+            }
 
-    		const char * ClassName() {
-    		    static const char * myClassName = "ape_bench_classic_binding";
-    		    return myClassName;
-    		}
-	};
+            const char * ClassName() {
+                static const char * myClassName = "ape_bench_classic_binding";
+                return myClassName;
+            }
+    };
 }
 
 extern "C"
 EXPORT asl::PlugInBase * ape_bench_classic_binding_instantiatePlugIn(asl::DLHandle myDLHandle) {
-	return new y60::ape_bench_classic_binding(myDLHandle);
+    return new y60::ape_bench_classic_binding(myDLHandle);
 }

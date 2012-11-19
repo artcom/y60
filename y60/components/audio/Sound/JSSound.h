@@ -112,23 +112,23 @@ namespace jslib {
 }
 
 namespace y60 {
-	class JSSoundPlugIn : public asl::PlugInBase, public jslib::IScriptablePlugin {
-    	public:
-    		JSSoundPlugIn(asl::DLHandle theDLHandle) : asl::PlugInBase(theDLHandle) {}
+    class JSSoundPlugIn : public asl::PlugInBase, public jslib::IScriptablePlugin {
+        public:
+            JSSoundPlugIn(asl::DLHandle theDLHandle) : asl::PlugInBase(theDLHandle) {}
 
-    		virtual void initClasses(JSContext * theContext,
-    			JSObject *theGlobalObject)
+            virtual void initClasses(JSContext * theContext,
+                JSObject *theGlobalObject)
             {
                 jslib::JSSound::initClass(theContext, theGlobalObject);
                 jslib::JSSoundManager::initClass(theContext, theGlobalObject);
                 jslib::JSGrainSource::initClass(theContext, theGlobalObject);
-    		}
+            }
 
-    		const char * ClassName() {
-    		    static const char * myClassName = "Sound";
-    		    return myClassName;
-    		}
-	};
+            const char * ClassName() {
+                static const char * myClassName = "Sound";
+                return myClassName;
+            }
+    };
 }
 
 #endif

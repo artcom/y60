@@ -199,5 +199,5 @@ vector<y60::EventPtr> DSADriver::poll()
 
 extern "C"
 EXPORT asl::PlugInBase* DSADriver_instantiatePlugIn(asl::DLHandle myDLHandle) {
-	return new DSADriver(myDLHandle);
+    return new DSADriver(myDLHandle);
 }

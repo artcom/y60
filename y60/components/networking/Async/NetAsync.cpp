@@ -48,7 +48,7 @@ static JSClass Package = {
     JS_EnumerateStub, JS_ResolveStub,
     JS_ConvertStub, JS_FinalizeStub
 };
-    	
+        
 NetAsync::NetAsync(asl::DLHandle theDLHandle) : 
                 asl::PlugInBase(theDLHandle),
                 IRendererExtension(ClassName()),
@@ -149,5 +149,5 @@ const char * y60::NetAsync::PluginName = "NetAsync";
 
 extern "C"
 EXPORT asl::PlugInBase * NetAsync_instantiatePlugIn(asl::DLHandle myDLHandle) {
-	return new y60::NetAsync(myDLHandle);
+    return new y60::NetAsync(myDLHandle);
 }

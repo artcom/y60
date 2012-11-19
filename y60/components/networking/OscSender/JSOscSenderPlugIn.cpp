@@ -35,22 +35,22 @@
 #include <y60/jsbase/IScriptablePlugin.h>
 
 namespace y60 {
-	class JSOscSenderPlugIn : public asl::PlugInBase, public jslib::IScriptablePlugin {
-    	public:
-    		JSOscSenderPlugIn(asl::DLHandle theDLHandle) : asl::PlugInBase(theDLHandle) {}
+    class JSOscSenderPlugIn : public asl::PlugInBase, public jslib::IScriptablePlugin {
+        public:
+            JSOscSenderPlugIn(asl::DLHandle theDLHandle) : asl::PlugInBase(theDLHandle) {}
 
-    		virtual void initClasses(JSContext * theContext, JSObject *theGlobalObject) {
-    			JSOscSender::initClass(theContext, theGlobalObject);
-    		}
+            virtual void initClasses(JSContext * theContext, JSObject *theGlobalObject) {
+                JSOscSender::initClass(theContext, theGlobalObject);
+            }
 
-    		const char * ClassName() {
-    		    static const char * myClassName = "OscSenderPlugin";
-    		    return myClassName;
-    		}
-	};
+            const char * ClassName() {
+                static const char * myClassName = "OscSenderPlugin";
+                return myClassName;
+            }
+    };
 }
 
 extern "C"
 EXPORT asl::PlugInBase * OscSender_instantiatePlugIn(asl::DLHandle myDLHandle) {
-	return new y60::JSOscSenderPlugIn(myDLHandle);
+    return new y60::JSOscSenderPlugIn(myDLHandle);
 }

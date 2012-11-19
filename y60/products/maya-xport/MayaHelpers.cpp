@@ -172,11 +172,11 @@ dumpAttributes(const MObject & theObject) {
 void
 dumpGraph(MObject & theObject, MItDependencyGraph::Direction theDirection) {
     MStatus myStatus;
-	MItDependencyGraph itDG(theObject, MFn::kInvalid,
-								theDirection,
-								MItDependencyGraph::kBreadthFirst,
-								MItDependencyGraph::kNodeLevel,
-								&myStatus);
+    MItDependencyGraph itDG(theObject, MFn::kInvalid,
+                                theDirection,
+                                MItDependencyGraph::kBreadthFirst,
+                                MItDependencyGraph::kNodeLevel,
+                                &myStatus);
     while (!itDG.isDone()) {
         cerr << "------- Attributes of Node type '" << itDG.thisNode().apiTypeStr() << "' --------" << endl;
         dumpAttributes(itDG.thisNode());

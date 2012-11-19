@@ -60,9 +60,9 @@ waitForConnection(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *
     const inet::TCPServer & myServer = JSTCPServer::getJSWrapper(cx,obj).getNative();
     asl::Ptr<inet::Socket> mySocket(myServer.waitForConnection());
     if(mySocket) {
-    	*rval = as_jsval(cx, mySocket);
+        *rval = as_jsval(cx, mySocket);
     } else {
-    	*rval = JSVAL_NULL;
+        *rval = JSVAL_NULL;
     }
     return JS_TRUE;
 }

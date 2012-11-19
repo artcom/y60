@@ -19,7 +19,7 @@ namespace tuttle {
     static void         tuttle_report_error (JSContext *cx, const char *message, JSErrorReport *report);
 
     Debugger::Debugger(Application &theApplication) :
-	_myApplication(theApplication) {
+    _myApplication(theApplication) {
 
         _myApplication.attachDebugger(this);
 
@@ -121,11 +121,11 @@ namespace tuttle {
     void Debugger::executeCommands() {
         JSTrapStatus myDummy;
         bool myWait = false;
-	while(myWait || !queueEmpty()) {
-	    Command *myCommand = queuePop();
-	    myWait = myCommand->execute(&myDummy);
+    while(myWait || !queueEmpty()) {
+        Command *myCommand = queuePop();
+        myWait = myCommand->execute(&myDummy);
             _myResultSemaphore.post();
-	}
+    }
     }
 
     bool Debugger::queueEmpty() {

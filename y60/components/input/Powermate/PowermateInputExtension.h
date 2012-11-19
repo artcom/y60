@@ -52,7 +52,7 @@ namespace y60 {
     {
         public:
             PowermateInputExtension(asl::DLHandle theDLHandle);
-		        ~PowermateInputExtension();
+                ~PowermateInputExtension();
             virtual void init();
             virtual y60::EventPtrList poll();
 

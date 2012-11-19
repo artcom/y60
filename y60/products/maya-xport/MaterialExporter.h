@@ -120,7 +120,7 @@ class MaterialExporter {
         void setBaseDirectory(const std::string & theDirectory);
 
     private:
-		std::string getTextureMappingType(const MObject & theTextureNode);
+        std::string getTextureMappingType(const MObject & theTextureNode);
         std::string createMaterial(const MFnMesh * theMesh, const MObject & theShaderNode, y60::SceneBuilder & theSceneBuilder,
             const SpecialFeatures & theSpecialFeatures);
         MPlug getPlug(const MObject & theShaderNode,const char * theName);
@@ -134,10 +134,10 @@ class MaterialExporter {
 #if 0
         void exportVertexParameters(y60::MaterialBuilder & theBuilder);
 #endif
-		void exportShader(const MFnMesh * theMesh, const MObject & theShaderNode,
-							   y60::MaterialBuilder & theMaterialBuilder,
+        void exportShader(const MFnMesh * theMesh, const MObject & theShaderNode,
+                               y60::MaterialBuilder & theMaterialBuilder,
                                y60::SceneBuilder & theSceneBuilder,
-							   y60::VectorOfRankedFeature & theLightingFeature);
+                               y60::VectorOfRankedFeature & theLightingFeature);
         bool exportTextures(const MFnMesh * theMesh, const MObject & theShaderNode,
                             y60::MaterialBuilder & theBuilder, y60::SceneBuilder & theSceneBuilder,
                             const std::string & thePlugName,
@@ -181,7 +181,7 @@ class MaterialExporter {
         void exportBlinnFeatures(const MFnMesh * theMesh, const MObject & theShaderNode, y60::MaterialBuilder & theBuilder, y60::SceneBuilder & theSceneBuilder);
         void exportUnlitFeatures(const MFnMesh * theMesh, const MObject & theShaderNode, y60::MaterialBuilder & theBuilder, y60::SceneBuilder & theSceneBuilder);
 
-		std::string getStrippedTextureFilename(const MPlug & theTexturePlug);
+        std::string getStrippedTextureFilename(const MPlug & theTexturePlug);
         std::string findRelativeFilePath(const std::string & theFileName);
 
         bool checkTransparency(const MObject & theShaderNode);

@@ -54,7 +54,7 @@ public:
   virtual void Apply(PLBmpBase * pBmpSource, PLBmp * pBmpDest)
     const;
 private:
-	PLBmpBase * m_pBmpSubtrahend;
+    PLBmpBase * m_pBmpSubtrahend;
 };
 
 #endif

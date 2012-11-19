@@ -101,18 +101,18 @@ protected:
     // release the resource related to the extra filters
     virtual void    releaseExtraFilters();
     // initialization the extra filters after the graph is finished
-    virtual void	initExtraFilters();
+    virtual void    initExtraFilters();
 
     // Get the input or output pin to connect filters
     IPin* get_pin( IBaseFilter* pFilter, PIN_DIRECTION dir );
 
     // DirectShow interface pointers
-    IGraphBuilder *			m_pGraphBuilder; // build render graph
+    IGraphBuilder *         m_pGraphBuilder; // build render graph
     ICaptureGraphBuilder2 * m_pCaptureGraphBuilder2; // for capture
-    IMediaControl*			m_pMediaControl; // MediaControl
-    IFilterGraph*			m_pFilterGraph;  // Filter Graph
-	// The interface to set callback function
-	// ColorConverter is needed to convert other color to RGB24
+    IMediaControl*          m_pMediaControl; // MediaControl
+    IFilterGraph*           m_pFilterGraph;  // Filter Graph
+    // The interface to set callback function
+    // ColorConverter is needed to convert other color to RGB24
     IBaseFilter *           m_pColorConv;
     // Grab filter which get image data for each frame
     IBaseFilter *           m_pGrabFilter;

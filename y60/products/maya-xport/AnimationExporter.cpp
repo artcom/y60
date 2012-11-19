@@ -203,17 +203,17 @@ AnimationExporter::exportCharacter(const MObject & theNode, std::map<std::string
     _mySceneBuilder.appendCharacter(myCharacterBuilder);
 
     // get character clips
-    unsigned int myNumClips 	= myCharacterNode.getSourceClipCount(&myStatus);
+    unsigned int myNumClips     = myCharacterNode.getSourceClipCount(&myStatus);
     if (myStatus != MStatus::kSuccess) {
         throw ExportException(std::string("Character does not have any clips."),
                 PLUS_FILE_LINE);
     }
     DB(AC_TRACE << "exportCharacter() found clips: " <<  myNumClips << endl;)
-	///
-	for (unsigned int i = 0; i < myNumClips; i++) {
+    ///
+    for (unsigned int i = 0; i < myNumClips; i++) {
         RotationMap myRotations;
 
-	    MObject	myClipObject = myCharacterNode.getSourceClip(i, &myStatus);
+        MObject myClipObject = myCharacterNode.getSourceClip(i, &myStatus);
         if (myStatus != MStatus::kSuccess) {
             throw ExportException(std::string("Sorry, can't retrieve clip from character."),
                     PLUS_FILE_LINE);
@@ -240,7 +240,7 @@ AnimationExporter::exportCharacter(const MObject & theNode, std::map<std::string
         for (unsigned myCurveIndex = 0; myCurveIndex < myNumCurves; ++myCurveIndex) {
             const MPlug &myPlug = mySrcPlugArray[myCurveIndex];
             // we do not support subcharacters yet
-		    if (myPlug.node().hasFn (MFn::kCharacter)) {
+            if (myPlug.node().hasFn (MFn::kCharacter)) {
                 throw ExportException(std::string("Sorry, subcharacters are not supported yet."),
                         PLUS_FILE_LINE);
             }

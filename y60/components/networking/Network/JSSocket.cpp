@@ -238,7 +238,7 @@ connect(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             return JS_TRUE;
         }
 
-    	JS_ReportError(cx, "Tried to call connect() on a socket that was instantiated without a socket type");
+        JS_ReportError(cx, "Tried to call connect() on a socket that was instantiated without a socket type");
         return JS_FALSE;
 
     } HANDLE_CPP_EXCEPTION;
@@ -309,8 +309,8 @@ JSSocket::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, j
             *vp = as_jsval(cx, getNative().isValid());
             return JS_TRUE;
         case PROP_isConnected:
-        	*vp = as_jsval(cx, getNative().isConnected());
-        	return JS_TRUE;
+            *vp = as_jsval(cx, getNative().isConnected());
+            return JS_TRUE;
         case PROP_sendBufferSize:
             *vp = as_jsval(cx, getNative().getSendBufferSize());
             return JS_TRUE;

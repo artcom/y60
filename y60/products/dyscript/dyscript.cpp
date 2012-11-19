@@ -152,10 +152,10 @@ function myFunction = (bool x = true, count y = 0) : { x * y };
     string myString = "bla";
 
     object myObject = {
-	    count c = 0;
-	    function init() = {
-		    run();
-	    };
+        count c = 0;
+        function init() = {
+            run();
+        };
     };
 }
 
@@ -3025,14 +3025,14 @@ main(int argc, char **argv)
     }
 
     /*
-	if (-1 == SDL_Init(SDL_INIT_NOPARACHUTE)) { // prevents SDL from catching fatal signals
-		cerr << SDL_GetError() << endl;
-		return -1;
-	}
+    if (-1 == SDL_Init(SDL_INIT_NOPARACHUTE)) { // prevents SDL from catching fatal signals
+        cerr << SDL_GetError() << endl;
+        return -1;
+    }
 
     int rv = y60::run(myFilename, myScriptArgs);
 
-	SDL_Quit();
+    SDL_Quit();
 */
     return 0;
 }

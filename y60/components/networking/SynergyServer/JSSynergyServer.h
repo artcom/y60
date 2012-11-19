@@ -112,16 +112,16 @@ namespace jslib {
 namespace y60 {
     class JSSynergyServerPlugIn : public asl::PlugInBase, public jslib::IScriptablePlugin {
     public:
-    	JSSynergyServerPlugIn(asl::DLHandle theDLHandle) : asl::PlugInBase(theDLHandle) {}
+        JSSynergyServerPlugIn(asl::DLHandle theDLHandle) : asl::PlugInBase(theDLHandle) {}
 
-    	virtual void initClasses(JSContext * theContext, JSObject * theGlobalObject) {
+        virtual void initClasses(JSContext * theContext, JSObject * theGlobalObject) {
             jslib::JSSynergyServer::initClass(theContext, theGlobalObject);
-  	}
+    }
 
-   	const char * ClassName() {
-    	    static const char * myClassName = "SynergyServerPlugIn";
-    	    return myClassName;
-    	}
+    const char * ClassName() {
+            static const char * myClassName = "SynergyServerPlugIn";
+            return myClassName;
+        }
 };
 }
 

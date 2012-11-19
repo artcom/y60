@@ -37,21 +37,21 @@
 #include "JSOscReceiver.h"
 
 namespace y60 {
-	class OscReceiverPlugIn : public asl::PlugInBase, public jslib::IScriptablePlugin {
-    	public:
-    		OscReceiverPlugIn(asl::DLHandle theDLHandle) : asl::PlugInBase(theDLHandle) {}
+    class OscReceiverPlugIn : public asl::PlugInBase, public jslib::IScriptablePlugin {
+        public:
+            OscReceiverPlugIn(asl::DLHandle theDLHandle) : asl::PlugInBase(theDLHandle) {}
 
-    		virtual void initClasses(JSContext * theContext,
-    			JSObject *theGlobalObject)
+            virtual void initClasses(JSContext * theContext,
+                JSObject *theGlobalObject)
             {
                 jslib::JSOscReceiver::initClass(theContext, theGlobalObject);
-    		}
+            }
 
-    		const char * ClassName() {
-    		    static const char * myClassName = "OscReceiver";
-    		    return myClassName;
-    		}
-	};
+            const char * ClassName() {
+                static const char * myClassName = "OscReceiver";
+                return myClassName;
+            }
+    };
 }
 
 #endif

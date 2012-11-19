@@ -211,7 +211,7 @@ pango::JSFontDescription::Constructor(JSContext *cx, JSObject *obj, uintN argc, 
     if (argc == 0) {
         PangoFontDescription * myDescr = pango_font_description_new();
         newNative = new NATIVE(myDescr);
-	} else if (argc == 1) {
+    } else if (argc == 1) {
         string fontDescription;
         convertFrom(cx, argv[0], fontDescription);
 

@@ -55,7 +55,7 @@ namespace y60 {
     {
         public:
             DInputExtension(asl::DLHandle theDLHandle);
-    		~DInputExtension();
+            ~DInputExtension();
             virtual void init();
             virtual y60::EventPtrList poll();
 
@@ -88,7 +88,7 @@ namespace y60 {
         private:
             void initJoysticks(DWORD theFlags, DWORD theCoopLevel);
 
-    		static int CALLBACK EnumJoysticksCallback(const DIDEVICEINSTANCE* pdidInstance,
+            static int CALLBACK EnumJoysticksCallback(const DIDEVICEINSTANCE* pdidInstance,
                     void* This);
 
             void createForceEffect(LPDIRECTINPUTDEVICE8 & theJoystick, LPDIRECTINPUTEFFECT & theEffect);

@@ -84,10 +84,10 @@ registerCallback(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
     } 
     JS_ValueToObject(cx,argv[1],&myCallingObject);
 
-	if (!JS_ValueToFunction(cx, argv[2])) {
-		JS_ReportError(cx, "Argument 3 is not a function!" );
-		return JS_FALSE;
-	}
+    if (!JS_ValueToFunction(cx, argv[2])) {
+        JS_ReportError(cx, "Argument 3 is not a function!" );
+        return JS_FALSE;
+    }
     
     std::string myContentType = "text/plain";
     if (argc > 3 && !convertFrom(cx, argv[3], myContentType)) {
@@ -98,7 +98,7 @@ registerCallback(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
     JSCallback myCallback;
     myCallback.context = cx;
     myCallback.object = myCallingObject;
-	myCallback.functionValue = argv[2];
+    myCallback.functionValue = argv[2];
     myCallback.contentType = myContentType;
 
     HttpServer & myNative = JSHttpServer::getJSWrapper(cx, obj).openNative();

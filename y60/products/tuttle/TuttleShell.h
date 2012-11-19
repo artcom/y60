@@ -20,7 +20,7 @@ namespace tuttle {
         bool_t launch(void);
         bool_t shutdown(void);
 
-	void execute(Command *theCommand);
+    void execute(Command *theCommand);
 
 #define CLISH_BUILTIN(name, symbol)                               \
         bool command##symbol (Shell               *theShell,      \

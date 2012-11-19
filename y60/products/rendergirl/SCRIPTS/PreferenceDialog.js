@@ -32,10 +32,10 @@
 const PREFERENCE_FILE_NAME = "preference.xml";
 
 const PREFERENCE_NAMES = ["background_color", "headlight", "sunlight",
-													"daytime", "window_width", "window_height", "skymap",
-													"fog_disabled", "fog_linear", "fog_exponential",
-													"range_start", "range_end", "fog_density",
-													"fog_color", "fog_type_exp", "fog_type_exp2"];
+                                                    "daytime", "window_width", "window_height", "skymap",
+                                                    "fog_disabled", "fog_linear", "fog_exponential",
+                                                    "range_start", "range_end", "fog_density",
+                                                    "fog_color", "fog_type_exp", "fog_type_exp2"];
 
 function PreferenceDialog(theGladeHandle, theViewer) {
     this.Constructor(this, theGladeHandle, theViewer);
@@ -73,35 +73,35 @@ PreferenceDialog.prototype.Constructor = function(self, theGladeHandle, theViewe
         _myGladeHandle.get_widget("headlight1").active = _myWidgets.headlight.active;
         _myGladeHandle.get_widget("sunlight1").active = _myWidgets.sunlight.active;
 
-				if (_myWidgets.fog_disabled.active) {
-					window.scene.world.fogmode = "";
-					ourHandler.on_fog_disabled();
-				} else if (_myWidgets.fog_linear.active) {
-					window.scene.world.fogmode = "linear";
-					window.canvas.backgroundcolor = _myWidgets.fog_color.color;
-        	window.scene.world.fogcolor = _myWidgets.fog_color.color;
-        	window.scene.world.fogrange = [_myWidgets.range_start.value,_myWidgets.range_end.value];
-        	window.scene.world.fogdensity = _myWidgets.fog_density.value;
-        	ourHandler.on_fog_linear();
+                if (_myWidgets.fog_disabled.active) {
+                    window.scene.world.fogmode = "";
+                    ourHandler.on_fog_disabled();
+                } else if (_myWidgets.fog_linear.active) {
+                    window.scene.world.fogmode = "linear";
+                    window.canvas.backgroundcolor = _myWidgets.fog_color.color;
+            window.scene.world.fogcolor = _myWidgets.fog_color.color;
+            window.scene.world.fogrange = [_myWidgets.range_start.value,_myWidgets.range_end.value];
+            window.scene.world.fogdensity = _myWidgets.fog_density.value;
+            ourHandler.on_fog_linear();
 
-				} else if (_myWidgets.fog_exponential.active) {
-					if(_myWidgets.fog_type_exp.active) {
-						window.scene.world.fogmode = "exp";
-					} else {
-						window.scene.world.fogmode = "exp2";
-					}
+                } else if (_myWidgets.fog_exponential.active) {
+                    if(_myWidgets.fog_type_exp.active) {
+                        window.scene.world.fogmode = "exp";
+                    } else {
+                        window.scene.world.fogmode = "exp2";
+                    }
 
-					window.canvas.backgroundcolor = _myWidgets.fog_color.color;
-        	window.scene.world.fogcolor = _myWidgets.fog_color.color;
-        	window.scene.world.fogrange = [_myWidgets.range_start.value,_myWidgets.range_end.value];
-        	window.scene.world.fogdensity = _myWidgets.fog_density.value;
-        	ourHandler.on_fog_exponential();
+                    window.canvas.backgroundcolor = _myWidgets.fog_color.color;
+            window.scene.world.fogcolor = _myWidgets.fog_color.color;
+            window.scene.world.fogrange = [_myWidgets.range_start.value,_myWidgets.range_end.value];
+            window.scene.world.fogdensity = _myWidgets.fog_density.value;
+            ourHandler.on_fog_exponential();
 
-				}
+                }
 
-				ourHandler.on_range_start();
+                ourHandler.on_range_start();
         ourHandler.on_range_end();
-				ourHandler.on_fog_density();
+                ourHandler.on_fog_density();
 
         ourViewer.getLightManager().setSunPosition(_myWidgets.daytime.value);
         ourMainWindow.resize(_myWidgets.window_width.value, _myWidgets.window_height.value);

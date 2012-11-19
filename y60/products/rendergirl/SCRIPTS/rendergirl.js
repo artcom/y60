@@ -99,39 +99,39 @@ ourHandler.on_mainWindow_realize = function() {
 //
 //=================================================
 ourHandler.on_fog_disabled = function() {
-  	ourGlade.get_widget("fog_start_box").hide();
-  	ourGlade.get_widget("fog_end_box").hide();
-  	ourGlade.get_widget("fog_density_box").hide();
-  	ourGlade.get_widget("fog_color_box").hide();
-  	ourGlade.get_widget("fog_type_box").hide();
+    ourGlade.get_widget("fog_start_box").hide();
+    ourGlade.get_widget("fog_end_box").hide();
+    ourGlade.get_widget("fog_density_box").hide();
+    ourGlade.get_widget("fog_color_box").hide();
+    ourGlade.get_widget("fog_type_box").hide();
 }
 
 ourHandler.on_fog_linear = function() {
-  	ourGlade.get_widget("fog_start_box").show();
-  	ourGlade.get_widget("fog_end_box").show();
-  	ourGlade.get_widget("fog_density_box").hide();
-  	ourGlade.get_widget("fog_color_box").show();
-  	ourGlade.get_widget("fog_type_box").hide();
+    ourGlade.get_widget("fog_start_box").show();
+    ourGlade.get_widget("fog_end_box").show();
+    ourGlade.get_widget("fog_density_box").hide();
+    ourGlade.get_widget("fog_color_box").show();
+    ourGlade.get_widget("fog_type_box").hide();
 }
 
 ourHandler.on_fog_exponential = function() {
-  	ourGlade.get_widget("fog_start_box").hide();
-  	ourGlade.get_widget("fog_end_box").hide();
-  	ourGlade.get_widget("fog_density_box").show();
-  	ourGlade.get_widget("fog_color_box").show();
-  	ourGlade.get_widget("fog_type_box").show();
+    ourGlade.get_widget("fog_start_box").hide();
+    ourGlade.get_widget("fog_end_box").hide();
+    ourGlade.get_widget("fog_density_box").show();
+    ourGlade.get_widget("fog_color_box").show();
+    ourGlade.get_widget("fog_type_box").show();
 }
 
 ourHandler.on_range_start = function() {
-	ourGlade.get_widget("range_start_label").text=ourGlade.get_widget("range_start").value.toFixed(2);
+    ourGlade.get_widget("range_start_label").text=ourGlade.get_widget("range_start").value.toFixed(2);
 }
 
 ourHandler.on_range_end = function() {
-	ourGlade.get_widget("range_end_label").text=ourGlade.get_widget("range_end").value.toFixed(2);
+    ourGlade.get_widget("range_end_label").text=ourGlade.get_widget("range_end").value.toFixed(2);
 }
 
 ourHandler.on_fog_density = function() {
-	ourGlade.get_widget("fog_density_label").text=ourGlade.get_widget("fog_density").value.toFixed(2);
+    ourGlade.get_widget("fog_density_label").text=ourGlade.get_widget("fog_density").value.toFixed(2);
 }
 
 //=================================================
@@ -166,7 +166,7 @@ ourHandler.on_include_activate = function() {
     ourViewer.recollectSwitchNodes();
     ourViewer.setupSwitchNodeMenu();
     ourMaterialTable = ourViewer.applyMaterialTable();
-	ourSceneViewerDialog.setBaseNode(window.scene.world);
+    ourSceneViewerDialog.setBaseNode(window.scene.world);
     window.pause = false;
 }
 
@@ -249,12 +249,12 @@ ourHandler.on_preferences_activate = function() {
 //=================================================
 
 ourHandler.on_scene_activate = function() {
-	ourSceneViewerDialog.show();
+    ourSceneViewerDialog.show();
 }
 
 
 ourHandler.on_normals_activate = function(theMenuItem) {
-	window.drawnormals = theMenuItem.active;
+    window.drawnormals = theMenuItem.active;
     ourStatusBar.set("Normals " + (theMenuItem.active ? "on" : "off"));
     window.queue_draw();
 }
@@ -467,7 +467,7 @@ ourHandler.on_material_dlg_save_clicked = function() {
 
 
 ourHandler.on_material_dlg_save_table_clicked = function() {
-	var isPaused = window.pause;
+    var isPaused = window.pause;
     window.pause = true;
 
     var myMaterial = getSelectedMaterial();
@@ -662,13 +662,13 @@ ourHandler.on_walkmover_toggled = function(theButton) {
 //=================================================
 
 ourHandler.on_text_edit = function() {
-		ourScenePaused = window.pause;
-		window.pause = true;
+        ourScenePaused = window.pause;
+        window.pause = true;
 }
 
 ourHandler.on_text_edit_end = function() {
-		window.pause = ourScenePaused;
-		window.queue_draw();
+        window.pause = ourScenePaused;
+        window.queue_draw();
 }
 
 //=================================================
@@ -949,10 +949,10 @@ function setupGUI() {
 
     // XXX it should be enough to set one radio button...
     var myBVMode = window.getRenderer().boundingVolumeMode;
-  	ourGlade.get_widget("off1").active = (myBVMode == Renderer.BV_NONE);
-  	ourGlade.get_widget("body1").active = (myBVMode == Renderer.BV_BODY);
-  	ourGlade.get_widget("shape1").active = (myBVMode == Renderer.BV_SHAPE);
-  	ourGlade.get_widget("hierarchy1").active = (myBVMode == Renderer.BV_HIERARCHY);
+    ourGlade.get_widget("off1").active = (myBVMode == Renderer.BV_NONE);
+    ourGlade.get_widget("body1").active = (myBVMode == Renderer.BV_BODY);
+    ourGlade.get_widget("shape1").active = (myBVMode == Renderer.BV_SHAPE);
+    ourGlade.get_widget("hierarchy1").active = (myBVMode == Renderer.BV_HIERARCHY);
 }
 
 if (main(arguments) != 0 || GtkMain.exitCode != 0) {
