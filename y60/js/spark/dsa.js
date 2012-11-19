@@ -63,7 +63,9 @@ spark.enableDSASensoric = function (theSettingsFile) {
     var myDSAConfig = new Node();
     Logger.info("DSA sensoric support enabled using sensoric settings " + theSettingsFile);
     myDSAConfig.parseFile(theSettingsFile);
-    plug("DSADriver", myDSAConfig);
+    plug("DSADriver");
+    var myDSADriver = new DSADriver();
+    myDSADriver.onUpdateSettings(myDSAConfig);
 };
 
 spark.DSAEvent = spark.Class("DSAEvent");
