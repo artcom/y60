@@ -1,11 +1,14 @@
 
 set(SOURCES
+JSDSADriverPlugin.cpp
+JSDSADriver.cpp
 DSADriver.cpp
 SensorArray.cpp
 SensorServer.cpp
 )
 
 set(HEADERS
+JSDSADriver.h
 DSADriver.h
 SensorArray.h
 SensorServer.h

@@ -28,52 +28,38 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
-//
-//    $RCSfile: DSADriver.h,v $
-//     $Author: ulrich $
-//   $Revision: 1.12 $
-//       $Date: 2005/02/03 16:59:51 $
-//
-// Dieters Sensor Array...
-//
 //=============================================================================
-
-#ifndef _DSA_DRIVER_INCLUDED
-#define _DSA_DRIVER_INCLUDED
 
 #include "y60_dsadriver_settings.h"
 
-#include "SensorServer.h"
-#include "SensorArray.h"
+#include "JSDSADriver.h"
 
-#include <y60/input/IEventSource.h>
-
-#include <vector>
-#include <map>
+#include <asl/base/PlugInBase.h>
+#include <y60/jsbase/JSScriptablePlugin.h>
 
 namespace y60 {
-    class DSADriver :
-        public y60::IEventSource
+    class JSDSADriverPlugin :
+        public asl::PlugInBase,
+        public jslib::IScriptablePlugin
     {
     public:
-        DSADriver();
+        JSDSADriverPlugin(asl::DLHandle theDLHandle) : asl::PlugInBase(theDLHandle) {}
+        virtual void initClasses(JSContext * theContext,
+            JSObject *theGlobalObject)
+        {
+            jslib::JSDSADriver::initClass(theContext, theGlobalObject);
+        }
 
-        void onUpdateSettings(dom::NodePtr theConfiguration);
-
-        void init() {};
-        std::vector<y60::EventPtr> poll();
-        void calibrate(const std::string & theFileName);
-        std::string  getStatus() const;
-
-    private:
-        bool             _myInterpolateFlag;
-
-        typedef std::map<int, SensorServerPtr> SensorServerList;
-        SensorServerList _mySensorServers;
-
-        typedef std::map<int, SensorArrayPtr> SensorArrayList;
-        SensorArrayList  _mySensorArray;
+        const char * ClassName() {
+            static const char * myClassName = "DSADriverPlugin";
+            return myClassName;
+        }
     };
 }
 
-#endif
+extern "C"
+EXPORT asl::PlugInBase* DSADriver_instantiatePlugIn(asl::DLHandle myDLHandle) {
+	return new y60::JSDSADriverPlugin(myDLHandle);
+}
+
+
